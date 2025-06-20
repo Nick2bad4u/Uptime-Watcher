@@ -1,0 +1,70 @@
+{
+  "name": "uptime-watcher",
+  "version": "1.0.0",
+  "description": "An Electron app to monitor website uptime status",
+  "main": "dist-electron/main.js",
+  "homepage": "./",
+  "scripts": {
+    "start": "concurrently \"npm run dev\" \"npm run electron\"",
+    "dev": "vite",
+    "build": "vite build && electron-builder",
+    "preview": "vite preview",
+    "electron": "wait-on tcp:5173 && electron .",
+    "electron-dev": "concurrently \"npm run dev\" \"npm run electron\"",
+    "electron-pack": "electron-builder",
+    "dist": "npm run build && electron-builder --publish=never"
+  },
+  "keywords": [
+    "electron",
+    "react",
+    "uptime",
+    "monitoring"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.19",
+    "concurrently": "^9.1.2",
+    "electron": "^36.5.0",
+    "electron-builder": "^26.0.17",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.2.2",
+    "vite": "^6.3.5",
+    "vite-plugin-electron": "^0.29.0",
+    "wait-on": "^8.0.3"
+  },
+  "dependencies": {
+    "axios": "^1.6.8",
+    "chart.js": "^4.4.2",
+    "lowdb": "^7.0.1",
+    "react": "^19.1.0",
+    "react-chartjs-2": "^5.2.0",
+    "react-dom": "^19.1.0",
+    "zustand": "^5.0.5"
+  },
+  "build": {
+    "appId": "com.yourcompany.uptime-watcher",
+    "productName": "Uptime Watcher",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*",
+      "node_modules/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.utilities"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Uptime Watcher",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["start"],
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "env": {
+        "NODE_ENV": "development"
+      }
+    },
+    {
+      "name": "Launch with PowerShell",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": "npm start",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Debug Electron Main Process",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/electron/main.ts",
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "preLaunchTask": "Start Vite Dev Server",
+      "outFiles": ["${workspaceFolder}/dist-electron/**/*.js"]
+    }
+  ]
+}
