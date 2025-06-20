@@ -5,6 +5,7 @@ import { Header } from "./components/Header";
 import { SiteList } from "./components/SiteList";
 import { AddSiteForm } from "./components/AddSiteForm";
 import { Settings } from "./components/Settings";
+import { SiteDetails } from "./components/SiteDetails";
 import {
   ThemeProvider,
   ThemedBox,
@@ -22,6 +23,9 @@ function App() {
     darkMode,
     showSettings,
     setShowSettings,
+    selectedSite,
+    showSiteDetails,
+    setShowSiteDetails,
     setError,
     setLoading,
     lastError,
@@ -218,6 +222,14 @@ function App() {
 
         {/* Settings Modal */}
         {showSettings && <Settings onClose={() => setShowSettings(false)} />}
+
+        {/* Site Details Modal */}
+        {showSiteDetails && selectedSite && (
+          <SiteDetails
+            site={selectedSite}
+            onClose={() => setShowSiteDetails(false)}
+          />
+        )}
       </div>
     </ThemeProvider>
   );

@@ -22,6 +22,10 @@ interface AppState {
   settings: AppSettings;
   showSettings: boolean;
 
+  // Site details view
+  selectedSite: Site | null;
+  showSiteDetails: boolean;
+
   // Error handling
   lastError: string | null;
   isLoading: boolean;
@@ -37,6 +41,10 @@ interface AppState {
   updateSettings: (settings: Partial<AppSettings>) => void;
   setShowSettings: (show: boolean) => void;
   resetSettings: () => void;
+
+  // Site details actions
+  setSelectedSite: (site: Site | null) => void;
+  setShowSiteDetails: (show: boolean) => void;
 
   // Error handling actions
   setError: (error: string | null) => void;
@@ -63,6 +71,10 @@ export const useStore = create<AppState>()(
       darkMode: false,
       settings: defaultSettings,
       showSettings: false,
+
+      // Site details initial state
+      selectedSite: null,
+      showSiteDetails: false,
 
       // Error handling initial state
       lastError: null,
@@ -104,6 +116,11 @@ export const useStore = create<AppState>()(
       setShowSettings: (show: boolean) => set({ showSettings: show }),
 
       resetSettings: () => set({ settings: defaultSettings }),
+
+      // Site details actions
+      setSelectedSite: (site: Site | null) => set({ selectedSite: site }),
+
+      setShowSiteDetails: (show: boolean) => set({ showSiteDetails: show }),
 
       // Error handling actions
       setError: (error: string | null) => set({ lastError: error }),

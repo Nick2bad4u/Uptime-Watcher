@@ -1,3 +1,4 @@
+import { MouseEvent } from "react";
 import { Site } from "../types";
 import { useStore } from "../store";
 import { useTheme } from "../theme/useTheme";
@@ -14,10 +15,12 @@ interface SiteCardProps {
 }
 
 export function SiteCard({ site }: SiteCardProps) {
-  const { removeSite, setError, setLoading, isLoading } = useStore();
+  const { removeSite, setError, setLoading, isLoading, setSelectedSite, setShowSiteDetails } = useStore();
   const { isDark } = useTheme();
 
-  const handleRemove = async () => {
+  const handleRemove = async (e: MouseEvent) => {
+    e.stopPropagation(); // Prevent card click
+    
     if (
       !window.confirm(
         `Are you sure you want to remove ${site.name || site.url}?`,
@@ -38,6 +41,11 @@ export function SiteCard({ site }: SiteCardProps) {
     }
   };
 
+  const handleCardClick = () => {
+    setSelectedSite(site);
+    setShowSiteDetails(true);
+  };
+
   const formatResponseTime = (time?: number) => {
     if (!time) return "N/A";
     if (time < 1000) return `${time}ms`;
@@ -50,11 +58,12 @@ export function SiteCard({ site }: SiteCardProps) {
   };
 
   return (
-    <ThemedBox
-      surface="base"
-      padding="lg"
-      className={`site-card-hover ${isDark ? "dark" : ""}`}
-    >
+    <div onClick={handleCardClick} className="cursor-pointer">
+      <ThemedBox
+        surface="base"
+        padding="lg"
+        className={`site-card-hover ${isDark ? "dark" : ""}`}
+      >
       <div className="flex items-center justify-between">
         <div className="flex-1 min-w-0">
           <div className="flex items-center space-x-3">
@@ -93,16 +102,17 @@ export function SiteCard({ site }: SiteCardProps) {
         </div>
 
         <div className="flex items-center space-x-2 ml-4">
-          <ThemedButton
-            variant="error"
-            size="sm"
-            onClick={handleRemove}
-            disabled={isLoading}
-            className="p-2"
-            aria-label={`Remove ${site.name || site.url}`}
-          >
-            🗑️
-          </ThemedButton>
+          <div onClick={handleRemove}>
+            <ThemedButton
+              variant="error"
+              size="sm"
+              disabled={isLoading}
+              className="p-2"
+              aria-label={`Remove ${site.name || site.url}`}
+            >
+              🗑️
+            </ThemedButton>
+          </div>
         </div>
       </div>
 
@@ -133,5 +143,6 @@ export function SiteCard({ site }: SiteCardProps) {
         </ThemedBox>
       )}
     </ThemedBox>
+    </div>
   );
 }

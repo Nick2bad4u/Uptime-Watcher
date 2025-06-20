@@ -1,0 +1,73 @@
+/* SiteDetails Modal Styles */
+.site-details-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background-color: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+}
+
+.site-details-modal > div {
+  width: 100%;
+  max-width: 1200px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Background for elevated surfaces in dark mode */
+.bg-surface-elevated {
+  background-color: var(--theme-surface-elevated, #f8f9fa);
+}
+
+/* Dark mode styles */
+.dark .bg-surface-elevated {
+  background-color: var(--theme-surface-elevated-dark, #374151);
+}
+
+/* Chart containers */
+.site-details-modal .h-64 {
+  height: 16rem;
+  position: relative;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .site-details-modal {
+    padding: 0.5rem;
+  }
+  
+  .site-details-modal > div {
+    max-height: 95vh;
+  }
+  
+  .grid-cols-2.md\\:grid-cols-4 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+  
+  .grid-cols-1.lg\\:grid-cols-2 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 768px) {
+  .grid-cols-2.md\\:grid-cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid-cols-1.lg\\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  
+  .grid-cols-2.md\\:grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
