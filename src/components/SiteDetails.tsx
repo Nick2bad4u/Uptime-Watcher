@@ -48,7 +48,7 @@ interface SiteDetailsProps {
 
 export function SiteDetails({ site, onClose }: SiteDetailsProps) {
     const { currentTheme, getStatusColor } = useTheme();
-    const { removeSite, setError, setLoading, isLoading, selectedSite, updateSiteStatus } = useStore();
+    const { removeSite, setError, setLoading, isLoading, selectedSite, updateSiteStatus, clearError } = useStore();
     
     // Enhanced state management
     const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'history' | 'settings'>('overview');
@@ -347,13 +347,14 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
             setIsRefreshing(true);
         } else {
             setLoading(true);
+            clearError(); // Clear previous errors
         }
         
         try {
             await window.electronAPI.checkSiteNow(currentSite.url);
         } catch (error) {
             console.error("Failed to check site:", error);
-            setError("Failed to check site");
+            setError(`Failed to check site: ${error instanceof Error ? error.message : 'Unknown error'}`);
         } finally {
             if (isAutoRefresh) {
                 setIsRefreshing(false);
@@ -369,13 +370,15 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
         }
 
         setLoading(true);
+        clearError(); // Clear previous errors
+        
         try {
             await window.electronAPI.removeSite(currentSite.url);
             removeSite(currentSite.url);
             onClose(); // Close the details view after removing
         } catch (error) {
             console.error("Failed to remove site:", error);
-            setError("Failed to remove site");
+            setError(`Failed to remove site: ${error instanceof Error ? error.message : 'Unknown error'}`);
         } finally {
             setLoading(false);
         }
@@ -483,8 +486,7 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
     };
 
     // Tab component
-    const TabButton = ({ id, label, isActive, onClick }: { 
-        id: string; 
+    const TabButton = ({ label, isActive, onClick }: { 
         label: string; 
         isActive: boolean; 
         onClick: () => void;
@@ -580,25 +582,21 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                     <ThemedBox variant="secondary" padding="lg" className="border-b">
                         <div className="flex flex-wrap gap-2">
                             <TabButton 
-                                id="overview" 
                                 label="📊 Overview" 
                                 isActive={activeTab === 'overview'} 
                                 onClick={() => setActiveTab('overview')}
                             />
                             <TabButton 
-                                id="analytics" 
                                 label="📈 Analytics" 
                                 isActive={activeTab === 'analytics'} 
                                 onClick={() => setActiveTab('analytics')}
                             />
                             <TabButton 
-                                id="history" 
                                 label="📜 History" 
                                 isActive={activeTab === 'history'} 
                                 onClick={() => setActiveTab('history')}
                             />
                             <TabButton 
-                                id="settings" 
                                 label="⚙️ Settings" 
                                 isActive={activeTab === 'settings'} 
                                 onClick={() => setActiveTab('settings')}
