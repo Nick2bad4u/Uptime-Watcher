@@ -49,6 +49,11 @@ export const lightTheme: Theme = {
             elevated: "#ffffff",
             overlay: "#f9fafb",
         },
+        hover: {
+            light: "rgba(0, 0, 0, 0.03)",
+            medium: "rgba(0, 0, 0, 0.05)",
+            dark: "rgba(0, 0, 0, 0.08)",
+        },
     },
     spacing: {
         xs: "0.25rem",
@@ -133,7 +138,7 @@ export const darkTheme: Theme = {
         background: {
             primary: "#111827",
             secondary: "#1f2937",
-            tertiary: "#374151",
+            tertiary: "#1a1f29",
             modal: "rgba(0, 0, 0, 0.8)",
         },
         text: {
@@ -143,14 +148,19 @@ export const darkTheme: Theme = {
             inverse: "#111827",
         },
         border: {
-            primary: "#374151",
+            primary: "#1a1f29",
             secondary: "#4b5563",
             focus: "#60a5fa",
         },
         surface: {
             base: "#1f2937",
-            elevated: "#374151",
+            elevated: "#1a1f29",
             overlay: "#111827",
+        },
+        hover: {
+            light: "rgba(255, 255, 255, 0.05)",
+            medium: "rgba(255, 255, 255, 0.08)",
+            dark: "rgba(255, 255, 255, 0.12)",
         },
     },
     spacing: {
@@ -255,6 +265,11 @@ export const highContrastTheme: Theme = {
             base: "#000000",
             elevated: "#1a1a1a",
             overlay: "#000000",
+        },
+        hover: {
+            light: "rgba(255, 255, 255, 0.1)",
+            medium: "rgba(255, 255, 255, 0.15)",
+            dark: "rgba(255, 255, 255, 0.2)",
         },
     },
     spacing: {

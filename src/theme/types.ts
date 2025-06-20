@@ -57,6 +57,13 @@ export interface ThemeColors {
         elevated: string;
         overlay: string;
     };
+
+    // Hover states
+    hover: {
+        light: string;
+        medium: string;
+        dark: string;
+    };
 }
 
 export interface ThemeSpacing {
