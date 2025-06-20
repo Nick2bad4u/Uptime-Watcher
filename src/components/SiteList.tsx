@@ -1,17 +1,9 @@
-import React from "react";
-import { Site } from "../types";
 import { SiteCard } from "./SiteCard";
 import { useStore } from "../store";
 import { ThemedBox, ThemedText } from "../theme/components";
 
-interface SiteListProps {
-  sites?: Site[]; // Make optional for backward compatibility
-}
-
-export function SiteList({ sites: propSites }: SiteListProps) {
-  // Use sites from store if not provided via props
-  const { sites: storeSites } = useStore();
-  const sites = propSites || storeSites;
+export function SiteList() {
+  const { sites } = useStore();
 
   if (sites.length === 0) {
     return (

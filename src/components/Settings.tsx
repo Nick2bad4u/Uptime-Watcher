@@ -1,4 +1,3 @@
-import React from "react";
 import { useStore } from "../store";
 import { 
   ThemedBox, 
@@ -10,6 +9,7 @@ import {
   ThemedCheckbox
 } from "../theme/components";
 import { useTheme } from "../theme/useTheme";
+import { CHECK_INTERVALS } from "../constants";
 
 interface SettingsProps {
   onClose: () => void;
@@ -25,6 +25,8 @@ export function Settings({ onClose }: SettingsProps) {
     lastError,
     clearError,
     isLoading,
+    setLoading,
+    setError,
   } = useStore();
 
   const { setTheme, availableThemes } = useTheme();
@@ -33,8 +35,17 @@ export function Settings({ onClose }: SettingsProps) {
     updateSettings({ [key]: value });
   };
 
-  const handleIntervalChange = (interval: number) => {
-    setCheckInterval(interval);
+  const handleIntervalChange = async (interval: number) => {
+    setLoading(true);
+    try {
+      setCheckInterval(interval);
+      await window.electronAPI.updateCheckInterval(interval);
+    } catch (error) {
+      console.error("Failed to update check interval:", error);
+      setError("Failed to update check interval");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleReset = () => {
@@ -124,13 +135,11 @@ export function Settings({ onClose }: SettingsProps) {
                   disabled={isLoading}
                   aria-label="Check interval for monitoring sites"
                 >
-                  <option value={15000}>15 seconds</option>
-                  <option value={30000}>30 seconds</option>
-                  <option value={60000}>1 minute</option>
-                  <option value={300000}>5 minutes</option>
-                  <option value={600000}>10 minutes</option>
-                  <option value={1800000}>30 minutes</option>
-                  <option value={3600000}>1 hour</option>
+                  {CHECK_INTERVALS.map((interval) => (
+                    <option key={interval.value} value={interval.value}>
+                      {interval.label}
+                    </option>
+                  ))}
                 </ThemedSelect>
               </div>
 

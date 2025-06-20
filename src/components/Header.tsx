@@ -1,7 +1,7 @@
-import React from "react";
 import { useStore } from "../store";
 import { ThemedBox, ThemedText, ThemedButton, StatusIndicator, ThemedSelect } from "../theme/components";
 import { useTheme } from "../theme/useTheme";
+import { CHECK_INTERVALS } from "../constants";
 
 interface HeaderProps {
   onStartMonitoring: () => void;
@@ -16,6 +16,9 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
     checkInterval,
     setCheckInterval,
     setShowSettings,
+    isLoading,
+    setError,
+    setLoading,
   } = useStore();
 
   const { toggleTheme } = useTheme();
@@ -25,11 +28,39 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
   const pendingSites = sites.filter((site) => site.status === "pending").length;
 
   const handleIntervalChange = async (interval: number) => {
-    setCheckInterval(interval);
+    setLoading(true);
     try {
+      setCheckInterval(interval);
       await window.electronAPI.updateCheckInterval(interval);
     } catch (error) {
       console.error("Failed to update check interval:", error);
+      setError("Failed to update check interval");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStartMonitoring = async () => {
+    setLoading(true);
+    try {
+      await onStartMonitoring();
+    } catch (error) {
+      console.error("Failed to start monitoring:", error);
+      setError("Failed to start monitoring");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStopMonitoring = async () => {
+    setLoading(true);
+    try {
+      await onStopMonitoring();
+    } catch (error) {
+      console.error("Failed to stop monitoring:", error);
+      setError("Failed to stop monitoring");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -74,14 +105,15 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
               <ThemedSelect
                 value={checkInterval}
                 onChange={(e) => handleIntervalChange(Number(e.target.value))}
+                disabled={isLoading}
                 aria-label="Check interval"
                 className="text-sm"
               >
-                <option value={30000}>30 seconds</option>
-                <option value={60000}>1 minute</option>
-                <option value={300000}>5 minutes</option>
-                <option value={600000}>10 minutes</option>
-                <option value={1800000}>30 minutes</option>
+                {CHECK_INTERVALS.map((interval) => (
+                  <option key={interval.value} value={interval.value}>
+                    {interval.label}
+                  </option>
+                ))}
               </ThemedSelect>
             </div>
             
@@ -91,7 +123,9 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
                 <ThemedButton
                   variant="error"
                   size="sm"
-                  onClick={onStopMonitoring}
+                  onClick={handleStopMonitoring}
+                  disabled={isLoading}
+                  loading={isLoading}
                 >
                   ⏸️ Stop Monitoring
                 </ThemedButton>
@@ -99,7 +133,9 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
                 <ThemedButton
                   variant="success"
                   size="sm"
-                  onClick={onStartMonitoring}
+                  onClick={handleStartMonitoring}
+                  disabled={isLoading}
+                  loading={isLoading}
                 >
                   ▶️ Start Monitoring
                 </ThemedButton>

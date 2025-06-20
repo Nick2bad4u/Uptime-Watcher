@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { Site, StatusUpdate } from "./types";
 import { ThemeName } from "./theme/types";
+import { DEFAULT_CHECK_INTERVAL } from "./constants";
 
 interface AppSettings {
   notifications: boolean;
@@ -58,7 +59,7 @@ export const useStore = create<AppState>()(
     (set) => ({
       sites: [],
       isMonitoring: false,
-      checkInterval: 60000, // 1 minute
+      checkInterval: DEFAULT_CHECK_INTERVAL,
       darkMode: false,
       settings: defaultSettings,
       showSettings: false,

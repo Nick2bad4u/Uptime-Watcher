@@ -1,4 +1,3 @@
-import React from "react";
 import { Site } from "../types";
 import { useStore } from "../store";
 import { ThemedBox, ThemedText, ThemedButton, StatusIndicator, MiniChartBar } from "../theme/components";
@@ -8,14 +7,22 @@ interface SiteCardProps {
 }
 
 export function SiteCard({ site }: SiteCardProps) {
-  const { removeSite } = useStore();
+  const { removeSite, setError, setLoading, isLoading } = useStore();
 
   const handleRemove = async () => {
+    if (!window.confirm(`Are you sure you want to remove ${site.name || site.url}?`)) {
+      return;
+    }
+
+    setLoading(true);
     try {
       await window.electronAPI.removeSite(site.url);
       removeSite(site.url);
     } catch (error) {
       console.error("Failed to remove site:", error);
+      setError("Failed to remove site");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -81,7 +88,9 @@ export function SiteCard({ site }: SiteCardProps) {
             variant="error"
             size="sm"
             onClick={handleRemove}
+            disabled={isLoading}
             className="p-2"
+            aria-label={`Remove ${site.name || site.url}`}
           >
             🗑️
           </ThemedButton>

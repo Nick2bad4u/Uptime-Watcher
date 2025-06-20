@@ -1,10 +1,10 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useStore } from "./store";
 import { Header } from "./components/Header";
 import { SiteList } from "./components/SiteList";
 import { AddSiteForm } from "./components/AddSiteForm";
 import { Settings } from "./components/Settings";
-import { ThemeProvider, ThemedBox, ThemedText } from "./theme/components";
+import { ThemeProvider, ThemedBox, ThemedText, ThemedButton } from "./theme/components";
 import { StatusUpdate } from "./types";
 
 function App() {
@@ -16,6 +16,11 @@ function App() {
     darkMode,
     showSettings,
     setShowSettings,
+    setError,
+    setLoading,
+    lastError,
+    clearError,
+    isLoading,
   } = useStore();
 
   useEffect(() => {
@@ -30,11 +35,15 @@ function App() {
   useEffect(() => {
     // Load initial sites when app starts
     const loadSites = async () => {
+      setLoading(true);
       try {
         const sites = await window.electronAPI.getSites();
         setSites(sites);
       } catch (error) {
         console.error("Failed to load sites:", error);
+        setError("Failed to load sites");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -51,29 +60,73 @@ function App() {
     return () => {
       window.electronAPI.removeAllListeners("status-update");
     };
-  }, [setSites, updateSiteStatus]);
+  }, [setSites, updateSiteStatus, setError, setLoading]);
 
   const handleStartMonitoring = async () => {
+    setLoading(true);
     try {
       await window.electronAPI.startMonitoring();
       setMonitoring(true);
     } catch (error) {
       console.error("Failed to start monitoring:", error);
+      setError("Failed to start monitoring");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleStopMonitoring = async () => {
+    setLoading(true);
     try {
       await window.electronAPI.stopMonitoring();
       setMonitoring(false);
     } catch (error) {
       console.error("Failed to stop monitoring:", error);
+      setError("Failed to stop monitoring");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <ThemeProvider>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        {/* Global Loading Indicator */}
+        {isLoading && (
+          <div className="fixed top-0 left-0 right-0 z-50">
+            <ThemedBox surface="elevated" padding="sm" className="rounded-none">
+              <div className="flex items-center justify-center space-x-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                <ThemedText size="sm">Loading...</ThemedText>
+              </div>
+            </ThemedBox>
+          </div>
+        )}
+
+        {/* Global Error Notification */}
+        {lastError && (
+          <div className="fixed top-0 left-0 right-0 z-50">
+            <ThemedBox surface="elevated" padding="md" className="rounded-none border-l-4 border-red-500">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <div className="text-red-500">⚠️</div>
+                  <ThemedText size="sm" className="text-red-600 dark:text-red-400">
+                    {lastError}
+                  </ThemedText>
+                </div>
+                <ThemedButton
+                  variant="secondary"
+                  size="sm"
+                  onClick={clearError}
+                  className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200"
+                >
+                  ✕
+                </ThemedButton>
+              </div>
+            </ThemedBox>
+          </div>
+        )}
+
         <Header
           onStartMonitoring={handleStartMonitoring}
           onStopMonitoring={handleStopMonitoring}
@@ -90,7 +143,7 @@ function App() {
                   </ThemedText>
                 </ThemedBox>
                 <div className="p-0">
-                  <SiteList sites={sites} />
+                  <SiteList />
                 </div>
               </ThemedBox>
             </div>
