@@ -4,6 +4,7 @@ import { Header } from "./components/Header";
 import { SiteList } from "./components/SiteList";
 import { AddSiteForm } from "./components/AddSiteForm";
 import { Settings } from "./components/Settings";
+import { ThemeProvider, ThemedBox, ThemedText } from "./theme/components";
 import { StatusUpdate } from "./types";
 
 function App() {
@@ -71,41 +72,45 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Header
-        onStartMonitoring={handleStartMonitoring}
-        onStopMonitoring={handleStopMonitoring}
-      />
+    <ThemeProvider>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <Header
+          onStartMonitoring={handleStartMonitoring}
+          onStopMonitoring={handleStopMonitoring}
+        />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main content */}
-          <div className="lg:col-span-2">
-            <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg">
-              <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                  Monitored Sites ({sites.length})
-                </h2>
-              </div>
-              <SiteList sites={sites} />
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Main content */}
+            <div className="lg:col-span-2">
+              <ThemedBox surface="elevated" padding="md" shadow="sm" rounded="lg">
+                <ThemedBox surface="base" padding="md" border className="border-b">
+                  <ThemedText size="lg" weight="medium">
+                    Monitored Sites ({sites.length})
+                  </ThemedText>
+                </ThemedBox>
+                <div className="p-0">
+                  <SiteList sites={sites} />
+                </div>
+              </ThemedBox>
+            </div>
+
+            {/* Sidebar */}
+            <div className="lg:col-span-1">
+              <ThemedBox surface="elevated" padding="lg" shadow="sm" rounded="lg">
+                <ThemedText size="lg" weight="medium" className="mb-4">
+                  Add New Site
+                </ThemedText>
+                <AddSiteForm />
+              </ThemedBox>
             </div>
           </div>
+        </main>
 
-          {/* Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
-                Add New Site
-              </h3>
-              <AddSiteForm />
-            </div>{" "}
-          </div>
-        </div>
-      </main>
-
-      {/* Settings Modal */}
-      {showSettings && <Settings onClose={() => setShowSettings(false)} />}
-    </div>
+        {/* Settings Modal */}
+        {showSettings && <Settings onClose={() => setShowSettings(false)} />}
+      </div>
+    </ThemeProvider>
   );
 }
 

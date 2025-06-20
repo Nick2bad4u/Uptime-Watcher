@@ -1,18 +1,19 @@
 import React, { useState } from "react";
 import { useStore } from "../store";
+import { ThemedBox, ThemedText, ThemedButton, ThemedInput } from "../theme/components";
 
 export function AddSiteForm() {
-  const { addSite } = useStore();
+  const { addSite, setError, setLoading, isLoading, lastError, clearError } = useStore();
   const [url, setUrl] = useState("");
   const [name, setName] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!url.trim()) return;
 
-    setIsSubmitting(true);
+    setLoading(true);
+    clearError();
 
     try {
       const siteData = {
@@ -27,64 +28,84 @@ export function AddSiteForm() {
       setUrl("");
       setName("");
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to add site";
       console.error("Failed to add site:", error);
-      // You could show an error message to the user here
+      setError(errorMessage);
     } finally {
-      setIsSubmitting(false);
+      setLoading(false);
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label
-          htmlFor="site-name"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-        >
+        <ThemedText size="sm" weight="medium" variant="secondary" className="block mb-1">
           Site Name (Optional)
-        </label>
-        <input
-          id="site-name"
+        </ThemedText>
+        <ThemedInput
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="My Website"
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+          aria-label="Site name (optional)"
         />
       </div>
 
       <div>
-        <label
-          htmlFor="site-url"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-        >
+        <ThemedText size="sm" weight="medium" variant="secondary" className="block mb-1">
           Website URL *
-        </label>
-        <input
-          id="site-url"
+        </ThemedText>
+        <ThemedInput
           type="url"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           placeholder="https://example.com"
           required
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+          aria-label="Website URL (required)"
         />
       </div>
 
-      <button
+      <ThemedButton
         type="submit"
-        disabled={!url.trim() || isSubmitting}
-        className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        variant="primary"
+        disabled={!url.trim() || isLoading}
+        fullWidth
+        loading={isLoading}
       >
-        {isSubmitting ? "Adding..." : "Add Site"}
-      </button>
+        Add Site
+      </ThemedButton>
 
-      <div className="text-xs text-gray-500 dark:text-gray-400">
-        <p>
-          • Make sure to include the full URL with protocol (http:// or
-          https://)
-        </p>
-        <p>• The site will be checked according to your monitoring interval</p>
+      {/* Error Message */}
+      {lastError && (
+        <ThemedBox 
+          surface="base" 
+          padding="md" 
+          className="border border-red-300 bg-red-50 dark:bg-red-900/20 dark:border-red-700"
+          rounded="md"
+        >
+          <div className="flex items-center">
+            <ThemedText size="sm" className="text-red-800 dark:text-red-200">
+              ❌ {lastError}
+            </ThemedText>
+            <ThemedButton
+              variant="secondary"
+              size="xs"
+              onClick={clearError}
+              className="ml-auto text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200"
+            >
+              ✕
+            </ThemedButton>
+          </div>
+        </ThemedBox>
+      )}
+
+      <div className="space-y-1">
+        <ThemedText size="xs" variant="tertiary">
+          • Enter the full URL including http:// or https://
+        </ThemedText>
+        <ThemedText size="xs" variant="tertiary">
+          • The site will be checked according to your monitoring interval
+        </ThemedText>
       </div>
     </form>
   );

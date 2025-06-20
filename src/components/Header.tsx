@@ -1,5 +1,7 @@
 import React from "react";
 import { useStore } from "../store";
+import { ThemedBox, ThemedText, ThemedButton, StatusIndicator, ThemedSelect } from "../theme/components";
+import { useTheme } from "../theme/useTheme";
 
 interface HeaderProps {
   onStartMonitoring: () => void;
@@ -10,12 +12,13 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
   const {
     isMonitoring,
     sites,
-    toggleDarkMode,
     darkMode,
     checkInterval,
     setCheckInterval,
     setShowSettings,
   } = useStore();
+
+  const { toggleTheme } = useTheme();
 
   const upSites = sites.filter((site) => site.status === "up").length;
   const downSites = sites.filter((site) => site.status === "down").length;
@@ -31,33 +34,33 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
   };
 
   return (
-    <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+    <ThemedBox surface="elevated" padding="md" className="shadow-sm border-b" border>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           <div className="flex items-center space-x-4">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            <ThemedText size="2xl" weight="bold">
               📊 Uptime Watcher
-            </h1>
+            </ThemedText>
 
             {/* Status Summary */}
-            <div className="flex items-center space-x-4 text-sm">
-              <div className="flex items-center">
-                <div className="w-3 h-3 bg-green-500 rounded-full mr-1"></div>
-                <span className="text-gray-600 dark:text-gray-300">
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-1">
+                <StatusIndicator status="up" size="sm" />
+                <ThemedText size="sm" variant="secondary">
                   {upSites} Up
-                </span>
+                </ThemedText>
               </div>
-              <div className="flex items-center">
-                <div className="w-3 h-3 bg-red-500 rounded-full mr-1"></div>
-                <span className="text-gray-600 dark:text-gray-300">
+              <div className="flex items-center space-x-1">
+                <StatusIndicator status="down" size="sm" />
+                <ThemedText size="sm" variant="secondary">
                   {downSites} Down
-                </span>
+                </ThemedText>
               </div>
-              <div className="flex items-center">
-                <div className="w-3 h-3 bg-yellow-500 rounded-full mr-1"></div>
-                <span className="text-gray-600 dark:text-gray-300">
+              <div className="flex items-center space-x-1">
+                <StatusIndicator status="pending" size="sm" />
+                <ThemedText size="sm" variant="secondary">
                   {pendingSites} Pending
-                </span>
+                </ThemedText>
               </div>
             </div>
           </div>
@@ -65,58 +68,66 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
           <div className="flex items-center space-x-4">
             {/* Check Interval Selector */}
             <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-600 dark:text-gray-300">
+              <ThemedText size="sm" variant="secondary">
                 Check every:
-              </span>
-              <select
+              </ThemedText>
+              <ThemedSelect
                 value={checkInterval}
                 onChange={(e) => handleIntervalChange(Number(e.target.value))}
-                className="text-sm border border-gray-300 dark:border-gray-600 rounded-md px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                aria-label="Check interval"
+                className="text-sm"
               >
                 <option value={30000}>30 seconds</option>
                 <option value={60000}>1 minute</option>
                 <option value={300000}>5 minutes</option>
                 <option value={600000}>10 minutes</option>
                 <option value={1800000}>30 minutes</option>
-              </select>
+              </ThemedSelect>
             </div>
+            
             {/* Monitoring Controls */}
             <div className="flex items-center space-x-2">
               {isMonitoring ? (
-                <button
+                <ThemedButton
+                  variant="error"
+                  size="sm"
                   onClick={onStopMonitoring}
-                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm font-medium"
                 >
                   ⏸️ Stop Monitoring
-                </button>
+                </ThemedButton>
               ) : (
-                <button
+                <ThemedButton
+                  variant="success"
+                  size="sm"
                   onClick={onStartMonitoring}
-                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm font-medium"
                 >
                   ▶️ Start Monitoring
-                </button>
+                </ThemedButton>
               )}
-            </div>{" "}
-            {/* Dark Mode Toggle */}
-            <button
-              onClick={toggleDarkMode}
-              className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
-              title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+            </div>
+            
+            {/* Theme Toggle */}
+            <ThemedButton
+              variant="secondary"
+              size="sm"
+              onClick={toggleTheme}
+              className="p-2"
             >
               {darkMode ? "☀️" : "🌙"}
-            </button>
+            </ThemedButton>
+            
             {/* Settings Button */}
-            <button
+            <ThemedButton
+              variant="secondary"
+              size="sm"
               onClick={() => setShowSettings(true)}
-              className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
-              title="Open Settings"
+              className="p-2"
             >
               ⚙️
-            </button>
+            </ThemedButton>
           </div>
         </div>
       </div>
-    </header>
+    </ThemedBox>
   );
 }

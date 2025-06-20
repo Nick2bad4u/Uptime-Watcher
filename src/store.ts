@@ -1,12 +1,13 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { Site, StatusUpdate } from "./types";
+import { ThemeName } from "./theme/types";
 
 interface AppSettings {
   notifications: boolean;
   autoStart: boolean;
   minimizeToTray: boolean;
-  theme: "light" | "dark" | "system";
+  theme: ThemeName;
   timeout: number;
   maxRetries: number;
   soundAlerts: boolean;
@@ -20,6 +21,10 @@ interface AppState {
   settings: AppSettings;
   showSettings: boolean;
 
+  // Error handling
+  lastError: string | null;
+  isLoading: boolean;
+
   // Actions
   setSites: (sites: Site[]) => void;
   addSite: (site: Site) => void;
@@ -31,6 +36,11 @@ interface AppState {
   updateSettings: (settings: Partial<AppSettings>) => void;
   setShowSettings: (show: boolean) => void;
   resetSettings: () => void;
+
+  // Error handling actions
+  setError: (error: string | null) => void;
+  setLoading: (loading: boolean) => void;
+  clearError: () => void;
 }
 
 const defaultSettings: AppSettings = {
@@ -52,6 +62,10 @@ export const useStore = create<AppState>()(
       darkMode: false,
       settings: defaultSettings,
       showSettings: false,
+      
+      // Error handling initial state
+      lastError: null,
+      isLoading: false,
 
       setSites: (sites: Site[]) => set({ sites }),
 
@@ -89,6 +103,13 @@ export const useStore = create<AppState>()(
       setShowSettings: (show: boolean) => set({ showSettings: show }),
 
       resetSettings: () => set({ settings: defaultSettings }),
+      
+      // Error handling actions
+      setError: (error: string | null) => set({ lastError: error }),
+      
+      setLoading: (loading: boolean) => set({ isLoading: loading }),
+      
+      clearError: () => set({ lastError: null }),
     }),
     {
       name: "uptime-watcher-storage",
@@ -96,6 +117,7 @@ export const useStore = create<AppState>()(
         checkInterval: state.checkInterval,
         darkMode: state.darkMode,
         settings: state.settings,
+        // Don't persist error states
       }),
     },
   ),

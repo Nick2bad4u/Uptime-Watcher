@@ -1,23 +1,29 @@
 import React from "react";
 import { Site } from "../types";
 import { SiteCard } from "./SiteCard";
+import { useStore } from "../store";
+import { ThemedBox, ThemedText } from "../theme/components";
 
 interface SiteListProps {
-  sites: Site[];
+  sites?: Site[]; // Make optional for backward compatibility
 }
 
-export function SiteList({ sites }: SiteListProps) {
+export function SiteList({ sites: propSites }: SiteListProps) {
+  // Use sites from store if not provided via props
+  const { sites: storeSites } = useStore();
+  const sites = propSites || storeSites;
+
   if (sites.length === 0) {
     return (
-      <div className="text-center py-12">
+      <ThemedBox surface="base" padding="xl" className="text-center">
         <div className="text-gray-400 text-6xl mb-4">🌐</div>
-        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+        <ThemedText size="lg" weight="medium" className="mb-2">
           No sites to monitor
-        </h3>
-        <p className="text-gray-600 dark:text-gray-300">
+        </ThemedText>
+        <ThemedText variant="secondary">
           Add your first website to start monitoring its uptime.
-        </p>
-      </div>
+        </ThemedText>
+      </ThemedBox>
     );
   }
 
