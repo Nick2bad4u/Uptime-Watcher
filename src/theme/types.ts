@@ -25,6 +25,7 @@ export interface ThemeColors {
     success: string;
     warning: string;
     error: string;
+    errorAlert: string;
     info: string;
 
     // Background colors

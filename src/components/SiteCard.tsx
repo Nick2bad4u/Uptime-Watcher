@@ -124,14 +124,14 @@ export function SiteCard({ site }: SiteCardProps) {
                         <img 
                             src={getSiteIcon()} 
                             alt=""
-                            className="w-8 h-8 rounded-md"
+                            className="site-icon"
                             onError={(e) => {
-                                e.currentTarget.style.display = 'none';
+                                e.currentTarget.classList.add('hidden');
                                 const fallback = e.currentTarget.nextElementSibling as HTMLDivElement;
-                                if (fallback) fallback.style.display = 'block';
+                                if (fallback) fallback.classList.remove('site-icon-fallback-hidden');
                             }}
                         />
-                        <div className="w-8 h-8 rounded-md bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-lg" style={{display: 'none'}}>
+                        <div className="site-icon-fallback site-icon-fallback-hidden">
                             🌐
                         </div>
                     </div>

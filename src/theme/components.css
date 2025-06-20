@@ -573,48 +573,30 @@
 .error-alert {
     margin: 1.5rem;
     margin-top: 1rem;
-    border: 1px solid #fca5a5;
-    background-color: #fef2f2;
+    border: 1px solid var(--color-error);
+    background-color: var(--color-background-secondary);
     padding: 1rem;
     border-radius: var(--border-radius-lg);
     animation: slideInRight var(--transition-normal) ease-out;
     box-shadow: var(--shadow-elevation-2);
 }
 
-.error-alert.dark {
-    background-color: rgb(153 27 27 / 20%);
-    border-color: #b91c1c;
-}
-
 .error-alert__text {
-    color: #991b1b;
-}
-
-.error-alert__text.dark {
-    color: #fecaca;
+    color: var(--color-error-alert);
 }
 
 .error-alert__close {
     margin-left: auto;
-    color: #dc2626;
+    color: var(--color-error);
     transition: all var(--transition-normal);
     border-radius: var(--border-radius-sm);
     padding: 0.25rem;
 }
 
 .error-alert__close:hover {
-    color: #991b1b;
-    background-color: rgb(220 38 38 / 10%);
+    color: var(--color-error-alert);
+    background-color: var(--color-background-tertiary);
     transform: scale(1.1);
-}
-
-.error-alert__close.dark {
-    color: #f87171;
-}
-
-.error-alert__close.dark:hover {
-    color: #fecaca;
-    transform: scale(1.05);
 }
 
 /* Professional Container Animations */
@@ -1667,4 +1649,43 @@
     .themed-select {
         border-width: 2px;
     }
+}
+
+/* Site Icon Components */
+.site-icon-container {
+    position: relative;
+    width: 2rem;
+    height: 2rem;
+    flex-shrink: 0;
+}
+
+.site-icon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--radius-md);
+    transition: all var(--transition-normal);
+}
+
+.site-icon-fallback {
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--radius-md);
+    background-color: var(--color-background-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.125rem;
+    line-height: 1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: all var(--transition-normal);
+}
+
+.site-icon-fallback-hidden {
+    display: none;
+}
+
+.hidden {
+    display: none;
 }

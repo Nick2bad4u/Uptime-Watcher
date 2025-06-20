@@ -25,6 +25,7 @@ export const lightTheme: Theme = {
         success: "#10b981",
         warning: "#f59e0b",
         error: "#ef4444",
+        errorAlert: "#991b1b", // Dark red for error alerts
         info: "#3b82f6",
         background: {
             primary: "#ffffff",
@@ -127,6 +128,7 @@ export const darkTheme: Theme = {
         success: "#34d399",
         warning: "#fbbf24",
         error: "#f87171",
+        errorAlert: "#dc2626", // Red for error alerts in dark mode
         info: "#60a5fa",
         background: {
             primary: "#111827",
@@ -230,6 +232,7 @@ export const highContrastTheme: Theme = {
         success: "#00ff00",
         warning: "#ffff00",
         error: "#ff0000",
+        errorAlert: "#cc0000", // Dark red for error alerts in high contrast
         info: "#00ffff",
         background: {
             primary: "#000000",
