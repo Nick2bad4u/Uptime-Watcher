@@ -318,10 +318,10 @@ jobs:
               with:
                   name: dist-${{ matrix.os }}-${{ matrix.arch }}
                   path: |
-                      .dist/Uptime-Watcher-*
-                      .dist/latest*.yml
-                      .dist/squirrel*/*
-                      .dist/nsis-web/*
+                      dist/Uptime-Watcher-*
+                      dist/latest*.yml
+                      dist/squirrel*/*
+                      dist/nsis-web/*
                   include-hidden-files: true
               continue-on-error: true
 
