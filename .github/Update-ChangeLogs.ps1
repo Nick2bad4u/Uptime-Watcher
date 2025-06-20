@@ -5,13 +5,7 @@ $repoRoot = Resolve-Path "$PSScriptRoot\.."
 
 $folders = @(
     "$repoRoot",
-    "$repoRoot\.github",
-    "$repoRoot\electron-app",
-    "$repoRoot\electron-app\icons",
-    "$repoRoot\electron-app\libs",
-    "$repoRoot\electron-app\screenshots",
-    "$repoRoot\electron-app\tests",
-    "$repoRoot\electron-app\utils"
+    "$repoRoot\.github"
 )
 
 foreach ($folder in $folders) {

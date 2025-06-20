@@ -148,9 +148,13 @@ export const useStore = create<AppState>()(
         set((state) => {
           const updatedSettings = { ...state.settings, ...newSettings };
           // Keep darkMode in sync with theme setting for backwards compatibility
-          const darkMode = updatedSettings.theme === "dark" || 
-            (updatedSettings.theme === "system" && 
-             window.matchMedia?.("(prefers-color-scheme: dark)").matches);
+          let darkMode = state.darkMode;
+          
+          if (newSettings.theme) {
+            darkMode = updatedSettings.theme === "dark" || 
+              (updatedSettings.theme === "system" && 
+               window.matchMedia?.("(prefers-color-scheme: dark)").matches);
+          }
           
           return {
             settings: updatedSettings,

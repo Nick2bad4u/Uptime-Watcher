@@ -1,0 +1,19 @@
+# Ignore libs folder recursively
+libs/
+
+# Ignore node_modules
+node_modules/
+
+# Ignore other common folders that shouldn't be formatted
+dist/
+build/
+coverage/
+*.min.js
+*.min.css
+
+# Ignore Change Logs
+**/CHANGELOG.md
+
+# Ignore package in electron-app
+electron-app/package.json
+electron-app/package-lock.json
