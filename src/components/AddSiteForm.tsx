@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { useStore } from "../store";
+import { useTheme } from "../theme/useTheme";
 import { ThemedBox, ThemedText, ThemedButton, ThemedInput } from "../theme/components";
 
 export function AddSiteForm() {
   const { addSite, setError, setLoading, isLoading, lastError, clearError } = useStore();
+  const { isDark } = useTheme();
   const [url, setUrl] = useState("");
   const [name, setName] = useState("");
 
@@ -103,18 +105,18 @@ export function AddSiteForm() {
         <ThemedBox 
           surface="base" 
           padding="md" 
-          className="border border-red-300 bg-red-50 dark:bg-red-900/20 dark:border-red-700"
+          className={`error-alert ${isDark ? 'dark' : ''}`}
           rounded="md"
         >
           <div className="flex items-center">
-            <ThemedText size="sm" className="text-red-800 dark:text-red-200">
+            <ThemedText size="sm" className={`error-alert__text ${isDark ? 'dark' : ''}`}>
               ❌ {lastError}
             </ThemedText>
             <ThemedButton
               variant="secondary"
               size="xs"
               onClick={clearError}
-              className="ml-auto text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200"
+              className={`error-alert__close ${isDark ? 'dark' : ''}`}
             >
               ✕
             </ThemedButton>

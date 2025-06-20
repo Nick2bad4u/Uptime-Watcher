@@ -30,7 +30,7 @@ export function Settings({ onClose }: SettingsProps) {
     setError,
   } = useStore();
 
-  const { setTheme, availableThemes } = useTheme();
+  const { setTheme, availableThemes, isDark } = useTheme();
 
   // Delayed loading state for button spinners (100ms delay)
   const [showButtonLoading, setShowButtonLoading] = useState(false);
@@ -86,13 +86,13 @@ export function Settings({ onClose }: SettingsProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="modal-overlay">
       <ThemedBox
         surface="overlay"
         padding="md"
         rounded="lg"
         shadow="xl"
-        className="w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto"
+        className="modal-container"
       >
         {/* Header */}
         <ThemedBox
@@ -110,7 +110,7 @@ export function Settings({ onClose }: SettingsProps) {
               variant="secondary"
               size="sm"
               onClick={onClose}
-              className="hover:opacity-75 transition-opacity"
+              className="hover-opacity"
             >
               ✕
             </ThemedButton>
@@ -122,18 +122,18 @@ export function Settings({ onClose }: SettingsProps) {
           <ThemedBox
             surface="base"
             padding="md"
-            className="mx-6 mt-4 border border-red-300 bg-red-50 dark:bg-red-900/20 dark:border-red-700"
+            className={`error-alert ${isDark ? 'dark' : ''}`}
             rounded="md"
           >
             <div className="flex items-center justify-between">
-              <ThemedText variant="primary" size="sm" className="text-red-800 dark:text-red-200">
+              <ThemedText variant="primary" size="sm" className={`error-alert__text ${isDark ? 'dark' : ''}`}>
                 ⚠️ {lastError}
               </ThemedText>
               <ThemedButton
                 variant="secondary"
                 size="xs"
                 onClick={clearError}
-                className="text-red-600 hover:text-red-800"
+                className={`error-alert__close ${isDark ? 'dark' : ''}`}
               >
                 ✕
               </ThemedButton>
@@ -216,12 +216,12 @@ export function Settings({ onClose }: SettingsProps) {
               🔔 Notifications
             </ThemedText>
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <ThemedText size="sm" weight="medium">
+              <div className="setting-item">
+                <div className="setting-info">
+                  <ThemedText size="sm" weight="medium" className="setting-title">
                     Desktop Notifications
                   </ThemedText>
-                  <ThemedText size="xs" variant="tertiary">
+                  <ThemedText size="xs" variant="tertiary" className="setting-description">
                     Show notifications when sites go up or down
                   </ThemedText>
                 </div>
@@ -235,12 +235,12 @@ export function Settings({ onClose }: SettingsProps) {
                 />
               </div>
 
-              <div className="flex items-center justify-between">
-                <div>
-                  <ThemedText size="sm" weight="medium">
+              <div className="setting-item">
+                <div className="setting-info">
+                  <ThemedText size="sm" weight="medium" className="setting-title">
                     Sound Alerts
                   </ThemedText>
-                  <ThemedText size="xs" variant="tertiary">
+                  <ThemedText size="xs" variant="tertiary" className="setting-description">
                     Play sound when status changes occur
                   </ThemedText>
                 </div>
@@ -288,12 +288,12 @@ export function Settings({ onClose }: SettingsProps) {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between">
-                <div>
-                  <ThemedText size="sm" weight="medium">
+              <div className="setting-item">
+                <div className="setting-info">
+                  <ThemedText size="sm" weight="medium" className="setting-title">
                     Auto-start with System
                   </ThemedText>
-                  <ThemedText size="xs" variant="tertiary">
+                  <ThemedText size="xs" variant="tertiary" className="setting-description">
                     Launch Uptime Watcher when your computer starts
                   </ThemedText>
                 </div>
@@ -307,12 +307,12 @@ export function Settings({ onClose }: SettingsProps) {
                 />
               </div>
 
-              <div className="flex items-center justify-between">
-                <div>
-                  <ThemedText size="sm" weight="medium">
+              <div className="setting-item">
+                <div className="setting-info">
+                  <ThemedText size="sm" weight="medium" className="setting-title">
                     Minimize to System Tray
                   </ThemedText>
-                  <ThemedText size="xs" variant="tertiary">
+                  <ThemedText size="xs" variant="tertiary" className="setting-description">
                     Keep app running in system tray when window is closed
                   </ThemedText>
                 </div>

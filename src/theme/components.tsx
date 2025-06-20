@@ -199,10 +199,9 @@ export function ThemedButton({
       style={styles}
       onClick={onClick}
       disabled={disabled || loading}
-    >
-      {loading ? (
-        <div className="flex items-center space-x-2">
-          <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-current"></div>
+    >      {loading ? (
+        <div className="themed-button__loading">
+          <div className="themed-button__spinner"></div>
           <span>{children}</span>
         </div>
       ) : (
@@ -265,12 +264,11 @@ export function StatusIndicator({
     fontWeight: currentTheme.typography.fontWeight.medium,
     marginLeft: currentTheme.spacing.xs,
   };
-  
-  return (
-    <div className={`flex items-center ${className}`}>
-      <div style={indicatorStyle} />
+    return (
+    <div className={`themed-status-indicator ${className}`}>
+      <div className="themed-status-indicator__dot" style={indicatorStyle} />
       {showText && (
-        <span style={textStyle}>
+        <span className="themed-status-indicator__text" style={textStyle}>
           {status.charAt(0).toUpperCase() + status.slice(1)}
         </span>
       )}
@@ -320,8 +318,7 @@ export function ThemedInput({
     fontSize: currentTheme.typography.fontSize.sm,
     transition: 'all 0.2s ease-in-out',
   };
-  
-  return (
+    return (
     <input
       type={type}
       value={value}
@@ -331,7 +328,7 @@ export function ThemedInput({
       min={min}
       max={max}
       step={step}
-      className={`focus:ring-2 focus:ring-blue-500 ${className}`}
+      className={`themed-input ${className}`}
       style={styles}
       aria-label={ariaLabel}
       onChange={onChange}
@@ -373,13 +370,12 @@ export function ThemedSelect({
     fontSize: currentTheme.typography.fontSize.sm,
     transition: 'all 0.2s ease-in-out',
   };
-  
-  return (
+    return (
     <select
       value={value}
       disabled={disabled}
       required={required}
-      className={`focus:ring-2 focus:ring-blue-500 ${className}`}
+      className={`themed-select ${className}`}
       style={styles}
       aria-label={ariaLabel}
       onChange={onChange}
@@ -405,14 +401,13 @@ export function ThemedCheckbox({
   className = '',
   'aria-label': ariaLabel,
   onChange,
-}: ThemedCheckboxProps) {
-  return (
+}: ThemedCheckboxProps) {  return (
     <input
       type="checkbox"
       checked={checked}
       disabled={disabled}
       required={required}
-      className={`h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded ${className}`}
+      className={`themed-checkbox ${className}`}
       aria-label={ariaLabel}
       onChange={onChange}
     />
@@ -447,10 +442,9 @@ export function MiniChartBar({
     borderRadius: currentTheme.borderRadius.sm,
     backgroundColor: getStatusColor(status),
   };
-  
-  return (
+    return (
     <div
-      className={className}
+      className={`themed-mini-chart-bar ${className}`}
       style={styles}
       title={`${status} - ${formatResponseTime(responseTime)} at ${new Date(timestamp).toLocaleString()}`}
     />

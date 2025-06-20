@@ -1,14 +1,16 @@
 import { SiteCard } from "./SiteCard";
 import { useStore } from "../store";
+import { useTheme } from "../theme/useTheme";
 import { ThemedBox, ThemedText } from "../theme/components";
 
 export function SiteList() {
   const { sites } = useStore();
+  const { isDark } = useTheme();
 
   if (sites.length === 0) {
     return (
       <ThemedBox surface="base" padding="xl" className="text-center">
-        <div className="text-gray-400 text-6xl mb-4">🌐</div>
+        <div className="empty-state-icon">🌐</div>
         <ThemedText size="lg" weight="medium" className="mb-2">
           No sites to monitor
         </ThemedText>
@@ -20,7 +22,7 @@ export function SiteList() {
   }
 
   return (
-    <div className="divide-y divide-gray-200 dark:divide-gray-700">
+    <div className={`divider-y ${isDark ? 'dark' : ''}`}>
       {sites.map((site) => (
         <SiteCard key={site.id} site={site} />
       ))}

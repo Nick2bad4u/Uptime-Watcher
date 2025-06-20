@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useStore } from "./store";
+import { useTheme } from "./theme/useTheme";
 import { Header } from "./components/Header";
 import { SiteList } from "./components/SiteList";
 import { AddSiteForm } from "./components/AddSiteForm";
@@ -22,6 +23,8 @@ function App() {
     clearError,
     isLoading,
   } = useStore();
+
+  const { isDark } = useTheme();
 
   // Delayed loading state to prevent flash for quick operations
   const [showLoadingOverlay, setShowLoadingOverlay] = useState(false);
@@ -114,13 +117,13 @@ function App() {
 
   return (
     <ThemeProvider>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className={`app-container ${isDark ? 'dark' : ''}`}>
         {/* Global Loading Overlay */}
         {showLoadingOverlay && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="loading-overlay">
             <ThemedBox surface="elevated" padding="lg" rounded="lg" shadow="xl">
-              <div className="flex items-center space-x-3">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+              <div className="loading-content">
+                <div className="loading-spinner"></div>
                 <ThemedText size="base" weight="medium">Loading...</ThemedText>
               </div>
             </ThemedBox>
@@ -156,10 +159,10 @@ function App() {
           onStopMonitoring={handleStopMonitoring}
         />
 
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <main className="main-container">
+          <div className="grid-layout">
             {/* Main content */}
-            <div className="lg:col-span-2">
+            <div>
               <ThemedBox surface="elevated" padding="md" shadow="sm" rounded="lg">
                 <ThemedBox surface="base" padding="md" border className="border-b">
                   <ThemedText size="lg" weight="medium">
@@ -173,7 +176,7 @@ function App() {
             </div>
 
             {/* Sidebar */}
-            <div className="lg:col-span-1">
+            <div>
               <ThemedBox surface="elevated" padding="lg" shadow="sm" rounded="lg">
                 <ThemedText size="lg" weight="medium" className="mb-4">
                   Add New Site

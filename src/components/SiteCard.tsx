@@ -1,5 +1,6 @@
 import { Site } from "../types";
 import { useStore } from "../store";
+import { useTheme } from "../theme/useTheme";
 import { ThemedBox, ThemedText, ThemedButton, StatusIndicator, MiniChartBar } from "../theme/components";
 
 interface SiteCardProps {
@@ -8,6 +9,7 @@ interface SiteCardProps {
 
 export function SiteCard({ site }: SiteCardProps) {
   const { removeSite, setError, setLoading, isLoading } = useStore();
+  const { isDark } = useTheme();
 
   const handleRemove = async () => {
     if (!window.confirm(`Are you sure you want to remove ${site.name || site.url}?`)) {
@@ -41,7 +43,7 @@ export function SiteCard({ site }: SiteCardProps) {
     <ThemedBox 
       surface="base" 
       padding="lg" 
-      className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+      className={`site-card-hover ${isDark ? 'dark' : ''}`}
     >
       <div className="flex items-center justify-between">
         <div className="flex-1 min-w-0">

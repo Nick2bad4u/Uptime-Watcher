@@ -90,8 +90,8 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
 
   return (
     <ThemedBox surface="elevated" padding="md" className="shadow-sm border-b" border>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center py-4">
+      <div className="header-container">
+        <div className="flex items-center justify-between py-4">
           <div className="flex items-center space-x-4">
             <ThemedText size="2xl" weight="bold">
               📊 Uptime Watcher
@@ -146,23 +146,21 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
               {isMonitoring ? (
                 <ThemedButton
                   variant="error"
-                  size="sm"
-                  onClick={handleStopMonitoring}
-                  disabled={isLoading}
-                  loading={showButtonLoading}
-                  className="min-w-[140px]"
-                >
+                  size="sm"                onClick={handleStopMonitoring}
+                disabled={isLoading}
+                loading={showButtonLoading}
+                className="min-w-140"
+              >
                   ⏸️ Stop Monitoring
                 </ThemedButton>
               ) : (
                 <ThemedButton
                   variant="success"
-                  size="sm"
-                  onClick={handleStartMonitoring}
-                  disabled={isLoading}
-                  loading={showButtonLoading}
-                  className="min-w-[140px]"
-                >
+                  size="sm"                onClick={handleStartMonitoring}
+                disabled={isLoading}
+                loading={showButtonLoading}
+                className="min-w-140"
+              >
                   ▶️ Start Monitoring
                 </ThemedButton>
               )}
