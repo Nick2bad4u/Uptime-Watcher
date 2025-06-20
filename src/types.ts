@@ -26,6 +26,7 @@ declare global {
       addSite: (site: Omit<Site, "id" | "status" | "history">) => Promise<Site>;
       removeSite: (url: string) => Promise<boolean>;
       getSites: () => Promise<Site[]>;
+      checkSiteNow: (url: string) => Promise<StatusUpdate>;
       startMonitoring: () => Promise<boolean>;
       stopMonitoring: () => Promise<boolean>;
       updateCheckInterval: (interval: number) => Promise<void>;

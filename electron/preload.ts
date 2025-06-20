@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
   addSite: (site: any) => ipcRenderer.invoke("add-site", site),
   removeSite: (url: string) => ipcRenderer.invoke("remove-site", url),
   getSites: () => ipcRenderer.invoke("get-sites"),
+  checkSiteNow: (url: string) => ipcRenderer.invoke("check-site-now", url),
 
   // Monitoring controls
   startMonitoring: () => ipcRenderer.invoke("start-monitoring"),

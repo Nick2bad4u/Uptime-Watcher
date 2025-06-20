@@ -94,7 +94,7 @@ export function ThemedText({
 }
 
 interface ThemedButtonProps {
-  variant?: "primary" | "secondary" | "success" | "warning" | "error";
+  variant?: "primary" | "secondary" | "success" | "warning" | "error" | "ghost";
   size?: "xs" | "sm" | "md" | "lg";
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
@@ -149,6 +149,12 @@ export function ThemedButton({
           backgroundColor: currentTheme.colors.error,
           color: currentTheme.colors.text.inverse,
           borderColor: currentTheme.colors.error,
+        };
+      case "ghost":
+        return {
+          backgroundColor: "transparent",
+          color: currentTheme.colors.text.secondary,
+          borderColor: "transparent",
         };
       default:
         return {};

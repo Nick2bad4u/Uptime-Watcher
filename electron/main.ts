@@ -86,6 +86,10 @@ class Main {
     ipcMain.handle("stop-monitoring", async () => {
       this.uptimeMonitor.stopMonitoring();
       return true;
+    });
+
+    ipcMain.handle("check-site-now", async (_, url) => {
+      return this.uptimeMonitor.checkSiteManually(url);
     }); // Listen for status updates from monitor
     this.uptimeMonitor.on("status-update", (data: StatusUpdate) => {
       this.mainWindow?.webContents.send("status-update", data);

@@ -11,10 +11,12 @@ import {
   Legend,
   TimeScale,
   ChartOptions,
+  Filler,
 } from "chart.js";
 import { Line, Bar } from "react-chartjs-2";
 import { Site } from "../types";
 import { useTheme } from "../theme/useTheme";
+import { useStore } from "../store";
 import {
   ThemedBox,
   ThemedText,
@@ -34,7 +36,8 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  TimeScale
+  TimeScale,
+  Filler
 );
 
 interface SiteDetailsProps {
@@ -44,6 +47,7 @@ interface SiteDetailsProps {
 
 export function SiteDetails({ site, onClose }: SiteDetailsProps) {
   const { currentTheme } = useTheme();
+  const { removeSite, setError, setLoading, isLoading } = useStore();
 
   // Memoize chart options to ensure they update when theme changes
   const lineChartOptions = useMemo((): ChartOptions<"line"> => ({
@@ -224,6 +228,50 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
     : 0;
   const uptime = site.history.length > 0 ? ((upCount / site.history.length) * 100).toFixed(2) : "0";
 
+  // Enhanced statistics
+  const recentHistory = site.history.slice(-24); // Last 24 checks
+  const recentUptime = recentHistory.length > 0 
+    ? ((recentHistory.filter(h => h.status === "up").length / recentHistory.length) * 100).toFixed(1)
+    : "0";
+  
+  const fastestResponse = site.history.length > 0 
+    ? Math.min(...site.history.map(h => h.responseTime))
+    : 0;
+  
+  const slowestResponse = site.history.length > 0 
+    ? Math.max(...site.history.map(h => h.responseTime))
+    : 0;
+  // Handler functions
+  const handleCheckNow = async () => {
+    setLoading(true);
+    try {
+      await window.electronAPI.checkSiteNow(site.url);
+    } catch (error) {
+      console.error("Failed to check site:", error);
+      setError("Failed to check site");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRemoveSite = async () => {
+    if (!window.confirm(`Are you sure you want to remove ${site.name || site.url}?`)) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await window.electronAPI.removeSite(site.url);
+      removeSite(site.url);
+      onClose(); // Close the details view after removing
+    } catch (error) {
+      console.error("Failed to remove site:", error);
+      setError("Failed to remove site");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const barChartData = useMemo(() => ({
     labels: ["Up", "Down"],
     datasets: [
@@ -274,16 +322,29 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
               </ThemedText>
             )}
           </div>
+        </div>        <div className="flex items-center space-x-2">
+          <ThemedButton
+            variant="primary"
+            size="sm"
+            onClick={handleCheckNow}
+            loading={isLoading}
+            className="px-4"
+          >
+            {isLoading ? "Checking..." : "Check Now"}
+          </ThemedButton>
+          <ThemedButton
+            variant="secondary"
+            size="sm"
+            onClick={handleRemoveSite}
+            loading={isLoading}
+            className="px-4"
+          >
+            Remove Site
+          </ThemedButton>
+          <ThemedButton variant="ghost" size="sm" onClick={onClose}>
+            ✕
+          </ThemedButton>
         </div>
-        <ThemedButton
-          variant="secondary"
-          size="sm"
-          onClick={onClose}
-          className="text-2xl p-2"
-          aria-label="Close details"
-        >
-          ✕
-        </ThemedButton>
       </div>
 
       {/* Statistics Cards */}
@@ -317,6 +378,53 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
           <ThemedText size="lg" weight="medium" className="mt-1">
             {site.history.length}
           </ThemedText>
+        </ThemedBox>
+      </div>
+
+      {/* Enhanced Statistics */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <ThemedBox surface="base" padding="md" border>
+          <ThemedText size="sm" variant="secondary">Recent Uptime</ThemedText>
+          <ThemedText size="lg" weight="medium" className="mt-1">
+            {recentUptime}%
+          </ThemedText>
+        </ThemedBox>
+
+        <ThemedBox surface="base" padding="md" border>
+          <ThemedText size="sm" variant="secondary">Fastest Response</ThemedText>
+          <ThemedText size="lg" weight="medium" className="mt-1">
+            {formatResponseTime(fastestResponse)}
+          </ThemedText>
+        </ThemedBox>
+
+        <ThemedBox surface="base" padding="md" border>
+          <ThemedText size="sm" variant="secondary">Slowest Response</ThemedText>
+          <ThemedText size="lg" weight="medium" className="mt-1">
+            {formatResponseTime(slowestResponse)}
+          </ThemedText>
+        </ThemedBox>
+
+        <ThemedBox surface="base" padding="md" border>
+          <ThemedText size="sm" variant="secondary">Action</ThemedText>
+          <div className="flex space-x-2 mt-1">            <ThemedButton
+              variant="primary"
+              size="sm"
+              onClick={handleCheckNow}
+              loading={isLoading}
+              className="flex-1"
+            >
+              Check Now
+            </ThemedButton>
+            <ThemedButton
+              variant="secondary"
+              size="sm"
+              onClick={handleRemoveSite}
+              loading={isLoading}
+              className="flex-1"
+            >
+              Remove
+            </ThemedButton>
+          </div>
         </ThemedBox>
       </div>
 

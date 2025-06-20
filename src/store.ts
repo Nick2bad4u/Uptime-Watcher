@@ -18,7 +18,7 @@ interface AppState {
   sites: Site[];
   isMonitoring: boolean;
   checkInterval: number;
-  darkMode: boolean;
+  darkMode: boolean; // Keep for backwards compatibility
   settings: AppSettings;
   showSettings: boolean;
 
@@ -30,6 +30,10 @@ interface AppState {
   lastError: string | null;
   isLoading: boolean;
 
+  // Statistics
+  totalUptime: number;
+  totalDowntime: number;
+
   // Actions
   setSites: (sites: Site[]) => void;
   addSite: (site: Site) => void;
@@ -37,7 +41,7 @@ interface AppState {
   updateSiteStatus: (update: StatusUpdate) => void;
   setMonitoring: (isMonitoring: boolean) => void;
   setCheckInterval: (interval: number) => void;
-  toggleDarkMode: () => void;
+  toggleDarkMode: () => void; // Keep for backwards compatibility
   updateSettings: (settings: Partial<AppSettings>) => void;
   setShowSettings: (show: boolean) => void;
   resetSettings: () => void;
@@ -80,6 +84,10 @@ export const useStore = create<AppState>()(
       lastError: null,
       isLoading: false,
 
+      // Statistics initial state
+      totalUptime: 0,
+      totalDowntime: 0,
+
       setSites: (sites: Site[]) => set({ sites }),
 
       addSite: (site: Site) =>
@@ -90,32 +98,70 @@ export const useStore = create<AppState>()(
       removeSite: (url: string) =>
         set((state) => ({
           sites: state.sites.filter((site) => site.url !== url),
+          // Clear selected site if it's being removed
+          selectedSite: state.selectedSite?.url === url ? null : state.selectedSite,
+          showSiteDetails: state.selectedSite?.url === url ? false : state.showSiteDetails,
         })),
 
       updateSiteStatus: (update: StatusUpdate) =>
-        set((state) => ({
-          sites: state.sites.map((site) =>
+        set((state) => {
+          const updatedSites = state.sites.map((site) =>
             site.url === update.site.url ? update.site : site,
-          ),
-        })),
+          );
+          
+          // Update selected site if it matches
+          const updatedSelectedSite = state.selectedSite?.url === update.site.url 
+            ? update.site 
+            : state.selectedSite;
+
+          // Calculate uptime/downtime statistics
+          const allHistory = updatedSites.flatMap(site => site.history);
+          const totalUptime = allHistory.filter(h => h.status === "up").length;
+          const totalDowntime = allHistory.filter(h => h.status === "down").length;
+
+          return {
+            sites: updatedSites,
+            selectedSite: updatedSelectedSite,
+            totalUptime,
+            totalDowntime,
+          };
+        }),
 
       setMonitoring: (isMonitoring: boolean) => set({ isMonitoring }),
 
       setCheckInterval: (interval: number) => set({ checkInterval: interval }),
 
       toggleDarkMode: () =>
-        set((state) => ({
-          darkMode: !state.darkMode,
-        })),
+        set((state) => {
+          const newDarkMode = !state.darkMode;
+          // Update theme setting to match
+          const newTheme = newDarkMode ? "dark" : "light";
+          return {
+            darkMode: newDarkMode,
+            settings: { ...state.settings, theme: newTheme },
+          };
+        }),
 
       updateSettings: (newSettings: Partial<AppSettings>) =>
-        set((state) => ({
-          settings: { ...state.settings, ...newSettings },
-        })),
+        set((state) => {
+          const updatedSettings = { ...state.settings, ...newSettings };
+          // Keep darkMode in sync with theme setting for backwards compatibility
+          const darkMode = updatedSettings.theme === "dark" || 
+            (updatedSettings.theme === "system" && 
+             window.matchMedia?.("(prefers-color-scheme: dark)").matches);
+          
+          return {
+            settings: updatedSettings,
+            darkMode,
+          };
+        }),
 
       setShowSettings: (show: boolean) => set({ showSettings: show }),
 
-      resetSettings: () => set({ settings: defaultSettings }),
+      resetSettings: () => set({ 
+        settings: defaultSettings,
+        darkMode: false, // Reset to light mode
+      }),
 
       // Site details actions
       setSelectedSite: (site: Site | null) => set({ selectedSite: site }),
@@ -135,7 +181,10 @@ export const useStore = create<AppState>()(
         checkInterval: state.checkInterval,
         darkMode: state.darkMode,
         settings: state.settings,
-        // Don't persist error states
+        sites: state.sites, // Persist sites to maintain history
+        totalUptime: state.totalUptime,
+        totalDowntime: state.totalDowntime,
+        // Don't persist error states, loading states, or UI states
       }),
     },
   ),

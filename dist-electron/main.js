@@ -8927,8 +8927,16 @@ class UptimeMonitor extends events.EventEmitter {
     if (previousStatus === "up" && newStatus === "down") {
       this.emit("site-down", site);
     } else if (previousStatus === "down" && newStatus === "up") {
-      this.emit("site-restored", site);
+      this.emit("site-up", site);
     }
+    return statusUpdate;
+  }
+  async checkSiteManually(url) {
+    const site = this.sites.get(url);
+    if (!site) {
+      throw new Error(`Site with URL ${url} not found`);
+    }
+    return await this.checkSite(site);
   }
 }
 class Main {
@@ -9000,6 +9008,9 @@ class Main {
     electron.ipcMain.handle("stop-monitoring", async () => {
       this.uptimeMonitor.stopMonitoring();
       return true;
+    });
+    electron.ipcMain.handle("check-site-now", async (_, url) => {
+      return this.uptimeMonitor.checkSiteManually(url);
     });
     this.uptimeMonitor.on("status-update", (data) => {
       var _a;
