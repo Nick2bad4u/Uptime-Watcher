@@ -99,6 +99,8 @@ interface ThemedButtonProps {
     disabled?: boolean;
     loading?: boolean;
     fullWidth?: boolean;
+    icon?: string;
+    iconPosition?: "left" | "right";
     className?: string;
     onClick?: () => void;
     children: React.ReactNode;
@@ -111,6 +113,8 @@ export function ThemedButton({
     disabled = false,
     loading = false,
     fullWidth = false,
+    icon,
+    iconPosition = "left",
     className = "",
     onClick,
     children,
@@ -198,18 +202,66 @@ export function ThemedButton({
         opacity: disabled || loading ? 0.6 : 1,
         width: fullWidth ? "100%" : "auto",
         transition: "all 0.2s ease-in-out",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: currentTheme.spacing.xs,
     };
-    return (
-        <button type={type} className={className} style={styles} onClick={onClick} disabled={disabled || loading}>
-            {" "}
-            {loading ? (
-                <div className="themed-button__loading">
-                    <div className="themed-button__spinner"></div>
+
+    const renderContent = () => {
+        if (loading) {
+            return (
+                <div className="themed-button__loading" style={{ display: "flex", alignItems: "center", gap: currentTheme.spacing.xs }}>
+                    <div className="themed-button__spinner" style={{
+                        width: "16px",
+                        height: "16px",
+                        border: "2px solid transparent",
+                        borderTop: "2px solid currentColor",
+                        borderRadius: "50%",
+                        animation: "spin 1s linear infinite"
+                    }}></div>
                     <span>{children}</span>
                 </div>
+            );
+        }
+
+        if (icon) {
+            const iconElement = (
+                <span style={{ 
+                    fontSize: "1.1em", 
+                    lineHeight: "1",
+                    display: "flex",
+                    alignItems: "center"
+                }}>
+                    {icon}
+                </span>
+            );
+
+            return iconPosition === "left" ? (
+                <>
+                    {iconElement}
+                    <span>{children}</span>
+                </>
             ) : (
-                children
-            )}
+                <>
+                    <span>{children}</span>
+                    {iconElement}
+                </>
+            );
+        }
+
+        return children;
+    };
+
+    return (
+        <button 
+            type={type} 
+            className={`themed-button themed-button--${variant} themed-button--${size} ${className}`} 
+            style={styles} 
+            onClick={onClick} 
+            disabled={disabled || loading}
+        >
+            {renderContent()}
         </button>
     );
 }
@@ -225,6 +277,21 @@ export function StatusIndicator({ status, size = "md", showText = false, classNa
     const { getStatusColor } = useTheme();
     const { currentTheme } = useTheme();
 
+    const getStatusIcon = () => {
+        switch (status) {
+            case "up":
+                return "✅";
+            case "down":
+                return "❌";
+            case "pending":
+                return "⏳";
+            case "unknown":
+                return "❓";
+            default:
+                return "⚪";
+        }
+    };
+
     const getSizeStyles = () => {
         switch (size) {
             case "sm":
@@ -232,39 +299,66 @@ export function StatusIndicator({ status, size = "md", showText = false, classNa
                     width: "8px",
                     height: "8px",
                     fontSize: currentTheme.typography.fontSize.xs,
+                    iconSize: "12px",
                 };
             case "md":
                 return {
                     width: "12px",
                     height: "12px",
                     fontSize: currentTheme.typography.fontSize.sm,
+                    iconSize: "16px",
                 };
             case "lg":
                 return {
                     width: "16px",
                     height: "16px",
                     fontSize: currentTheme.typography.fontSize.base,
+                    iconSize: "20px",
                 };
             default:
-                return {};
+                return { iconSize: "16px" };
         }
     };
 
+    const sizeStyles = getSizeStyles();
+
     const indicatorStyle: React.CSSProperties = {
-        ...getSizeStyles(),
+        width: sizeStyles.width,
+        height: sizeStyles.height,
         backgroundColor: getStatusColor(status),
         borderRadius: currentTheme.borderRadius.full,
+        position: "relative",
+        boxShadow: `0 0 0 2px ${currentTheme.colors.background.primary}`,
+        animation: status === "pending" ? "pulse 1.5s ease-in-out infinite" : undefined,
+    };
+
+    const iconStyle: React.CSSProperties = {
+        fontSize: sizeStyles.iconSize,
+        lineHeight: "1",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
     };
 
     const textStyle: React.CSSProperties = {
         color: getStatusColor(status),
-        fontSize: getSizeStyles().fontSize,
+        fontSize: sizeStyles.fontSize,
         fontWeight: currentTheme.typography.fontWeight.medium,
         marginLeft: currentTheme.spacing.xs,
+        display: "flex",
+        alignItems: "center",
+        gap: currentTheme.spacing.xs,
     };
+
     return (
-        <div className={`themed-status-indicator ${className}`}>
-            <div className="themed-status-indicator__dot" style={indicatorStyle} />
+        <div className={`themed-status-indicator ${className}`} style={{ display: "flex", alignItems: "center" }}>
+            {showText ? (
+                <div style={iconStyle}>
+                    {getStatusIcon()}
+                </div>
+            ) : (
+                <div className="themed-status-indicator__dot" style={indicatorStyle} />
+            )}
             {showText && (
                 <span className="themed-status-indicator__text" style={textStyle}>
                     {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -448,5 +542,372 @@ export function MiniChartBar({ status, responseTime, timestamp, className = "" }
             style={styles}
             title={`${status} - ${formatResponseTime(responseTime)} at ${new Date(timestamp).toLocaleString()}`}
         />
+    );
+}
+
+// Enhanced components with better visual feedback and icons
+
+interface ThemedIconButtonProps {
+    icon: string;
+    variant?: "primary" | "secondary" | "success" | "warning" | "error" | "ghost";
+    size?: "xs" | "sm" | "md" | "lg";
+    disabled?: boolean;
+    loading?: boolean;
+    tooltip?: string;
+    className?: string;
+    onClick?: () => void;
+}
+
+export function ThemedIconButton({
+    icon,
+    variant = "ghost",
+    size = "md",
+    disabled = false,
+    loading = false,
+    tooltip,
+    className = "",
+    onClick,
+}: ThemedIconButtonProps) {
+    const { currentTheme } = useTheme();
+
+    const getSize = () => {
+        switch (size) {
+            case "xs": return "24px";
+            case "sm": return "32px";
+            case "md": return "40px";
+            case "lg": return "48px";
+            default: return "40px";
+        }
+    };
+
+    const buttonSize = getSize();
+
+    return (
+        <ThemedButton
+            variant={variant}
+            size={size}
+            disabled={disabled}
+            loading={loading}
+            className={`themed-icon-button ${className}`}
+            onClick={onClick}
+            icon={icon}
+            style={{
+                width: buttonSize,
+                height: buttonSize,
+                padding: "0",
+                minWidth: "unset",
+            }}
+            title={tooltip}
+        >
+        </ThemedButton>
+    );
+}
+
+interface ThemedCardProps {
+    title?: string;
+    subtitle?: string;
+    icon?: string;
+    variant?: "primary" | "secondary" | "tertiary";
+    padding?: "xs" | "sm" | "md" | "lg" | "xl";
+    rounded?: "none" | "sm" | "md" | "lg" | "xl";
+    shadow?: "sm" | "md" | "lg" | "xl";
+    hoverable?: boolean;
+    clickable?: boolean;
+    className?: string;
+    onClick?: () => void;
+    children: React.ReactNode;
+}
+
+export function ThemedCard({
+    title,
+    subtitle,
+    icon,
+    variant = "primary",
+    padding = "lg",
+    rounded = "lg",
+    shadow = "md",
+    hoverable = false,
+    clickable = false,
+    className = "",
+    onClick,
+    children,
+}: ThemedCardProps) {
+    const { currentTheme } = useTheme();
+
+    const cardStyles: React.CSSProperties = {
+        transition: "all 0.2s ease-in-out",
+        cursor: clickable ? "pointer" : "default",
+        position: "relative",
+        overflow: "hidden",
+    };
+
+    const hoverStyles = hoverable || clickable ? {
+        transform: "translateY(-2px)",
+        boxShadow: currentTheme.shadows.lg,
+    } : {};
+
+    return (
+        <ThemedBox
+            variant={variant}
+            surface="elevated"
+            padding={padding}
+            rounded={rounded}
+            shadow={shadow}
+            className={`themed-card ${hoverable ? 'themed-card--hoverable' : ''} ${clickable ? 'themed-card--clickable' : ''} ${className}`}
+            style={cardStyles}
+            onClick={clickable ? onClick : undefined}
+        >
+            {(title || subtitle || icon) && (
+                <div className="themed-card__header" style={{ 
+                    display: "flex", 
+                    alignItems: "center", 
+                    gap: currentTheme.spacing.md,
+                    marginBottom: currentTheme.spacing.md 
+                }}>
+                    {icon && (
+                        <div style={{ 
+                            fontSize: "1.5em", 
+                            lineHeight: "1",
+                            color: currentTheme.colors.primary[500] 
+                        }}>
+                            {icon}
+                        </div>
+                    )}
+                    <div style={{ flex: 1 }}>
+                        {title && (
+                            <ThemedText variant="primary" size="lg" weight="semibold">
+                                {title}
+                            </ThemedText>
+                        )}
+                        {subtitle && (
+                            <ThemedText variant="secondary" size="sm">
+                                {subtitle}
+                            </ThemedText>
+                        )}
+                    </div>
+                </div>
+            )}
+            <div className="themed-card__content">
+                {children}
+            </div>
+        </ThemedBox>
+    );
+}
+
+interface ThemedBadgeProps {
+    variant?: "primary" | "secondary" | "success" | "warning" | "error" | "info";
+    size?: "xs" | "sm" | "md";
+    icon?: string;
+    className?: string;
+    children: React.ReactNode;
+}
+
+export function ThemedBadge({
+    variant = "primary",
+    size = "sm",
+    icon,
+    className = "",
+    children,
+}: ThemedBadgeProps) {
+    const { currentTheme } = useTheme();
+
+    const getVariantStyles = () => {
+        switch (variant) {
+            case "primary":
+                return {
+                    backgroundColor: currentTheme.colors.primary[100],
+                    color: currentTheme.colors.primary[700],
+                    borderColor: currentTheme.colors.primary[200],
+                };
+            case "secondary":
+                return {
+                    backgroundColor: currentTheme.colors.background.secondary,
+                    color: currentTheme.colors.text.secondary,
+                    borderColor: currentTheme.colors.border.secondary,
+                };
+            case "success":
+                return {
+                    backgroundColor: `${currentTheme.colors.success}20`,
+                    color: currentTheme.colors.success,
+                    borderColor: `${currentTheme.colors.success}40`,
+                };
+            case "warning":
+                return {
+                    backgroundColor: `${currentTheme.colors.warning}20`,
+                    color: currentTheme.colors.warning,
+                    borderColor: `${currentTheme.colors.warning}40`,
+                };
+            case "error":
+                return {
+                    backgroundColor: `${currentTheme.colors.error}20`,
+                    color: currentTheme.colors.error,
+                    borderColor: `${currentTheme.colors.error}40`,
+                };
+            case "info":
+                return {
+                    backgroundColor: `${currentTheme.colors.primary[500]}20`,
+                    color: currentTheme.colors.primary[600],
+                    borderColor: `${currentTheme.colors.primary[500]}40`,
+                };
+            default:
+                return {};
+        }
+    };
+
+    const getSizeStyles = () => {
+        switch (size) {
+            case "xs":
+                return {
+                    padding: `${currentTheme.spacing.xs} ${currentTheme.spacing.sm}`,
+                    fontSize: currentTheme.typography.fontSize.xs,
+                };
+            case "sm":
+                return {
+                    padding: `${currentTheme.spacing.sm} ${currentTheme.spacing.md}`,
+                    fontSize: currentTheme.typography.fontSize.sm,
+                };
+            case "md":
+                return {
+                    padding: `${currentTheme.spacing.md} ${currentTheme.spacing.lg}`,
+                    fontSize: currentTheme.typography.fontSize.base,
+                };
+            default:
+                return {};
+        }
+    };
+
+    const badgeStyles: React.CSSProperties = {
+        ...getVariantStyles(),
+        ...getSizeStyles(),
+        display: "inline-flex",
+        alignItems: "center",
+        gap: currentTheme.spacing.xs,
+        borderRadius: currentTheme.borderRadius.full,
+        borderWidth: "1px",
+        borderStyle: "solid",
+        fontWeight: currentTheme.typography.fontWeight.medium,
+        lineHeight: "1",
+        whiteSpace: "nowrap",
+    };
+
+    return (
+        <span className={`themed-badge themed-badge--${variant} themed-badge--${size} ${className}`} style={badgeStyles}>
+            {icon && (
+                <span style={{ fontSize: "0.9em", lineHeight: "1" }}>
+                    {icon}
+                </span>
+            )}
+            {children}
+        </span>
+    );
+}
+
+interface ThemedProgressProps {
+    value: number;
+    max?: number;
+    variant?: "primary" | "success" | "warning" | "error";
+    size?: "xs" | "sm" | "md" | "lg";
+    showLabel?: boolean;
+    label?: string;
+    className?: string;
+}
+
+export function ThemedProgress({
+    value,
+    max = 100,
+    variant = "primary",
+    size = "md",
+    showLabel = false,
+    label,
+    className = "",
+}: ThemedProgressProps) {
+    const { currentTheme } = useTheme();
+
+    const percentage = Math.min(Math.max((value / max) * 100, 0), 100);
+
+    const getVariantColor = () => {
+        switch (variant) {
+            case "primary": return currentTheme.colors.primary[500];
+            case "success": return currentTheme.colors.success;
+            case "warning": return currentTheme.colors.warning;
+            case "error": return currentTheme.colors.error;
+            default: return currentTheme.colors.primary[500];
+        }
+    };
+
+    const getHeight = () => {
+        switch (size) {
+            case "xs": return "4px";
+            case "sm": return "6px";
+            case "md": return "8px";
+            case "lg": return "12px";
+            default: return "8px";
+        }
+    };
+
+    const containerStyles: React.CSSProperties = {
+        width: "100%",
+        height: getHeight(),
+        backgroundColor: currentTheme.colors.background.secondary,
+        borderRadius: currentTheme.borderRadius.full,
+        overflow: "hidden",
+        position: "relative",
+    };
+
+    const progressStyles: React.CSSProperties = {
+        height: "100%",
+        width: `${percentage}%`,
+        backgroundColor: getVariantColor(),
+        borderRadius: currentTheme.borderRadius.full,
+        transition: "width 0.3s ease-in-out",
+    };
+
+    return (
+        <div className={`themed-progress ${className}`}>
+            {(showLabel || label) && (
+                <div style={{ 
+                    display: "flex", 
+                    justifyContent: "space-between", 
+                    alignItems: "center",
+                    marginBottom: currentTheme.spacing.xs 
+                }}>
+                    {label && (
+                        <ThemedText variant="secondary" size="sm">
+                            {label}
+                        </ThemedText>
+                    )}
+                    {showLabel && (
+                        <ThemedText variant="secondary" size="sm">
+                            {percentage.toFixed(1)}%
+                        </ThemedText>
+                    )}
+                </div>
+            )}
+            <div style={containerStyles}>
+                <div style={progressStyles} />
+            </div>
+        </div>
+    );
+}
+
+interface ThemedTooltipProps {
+    content: string;
+    position?: "top" | "bottom" | "left" | "right";
+    className?: string;
+    children: React.ReactNode;
+}
+
+export function ThemedTooltip({
+    content,
+    position = "top",
+    className = "",
+    children,
+}: ThemedTooltipProps) {
+    const { currentTheme } = useTheme();
+
+    return (
+        <div className={`themed-tooltip ${className}`} title={content}>
+            {children}
+        </div>
     );
 }

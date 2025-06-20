@@ -1160,3 +1160,385 @@
 .setting-description {
     display: block;
 }
+
+/* Enhanced Icon Button */
+.themed-icon-button {
+    min-width: unset !important;
+    padding: 0 !important;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-normal);
+}
+
+.themed-icon-button:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-elevation-2);
+}
+
+/* Themed Card Component */
+.themed-card {
+    position: relative;
+    overflow: hidden;
+    transition: all var(--transition-normal);
+}
+
+.themed-card--hoverable:hover,
+.themed-card--clickable:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-elevation-3) !important;
+}
+
+.themed-card--clickable {
+    cursor: pointer;
+}
+
+.themed-card__header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.themed-card__header-icon {
+    font-size: 1.5em;
+    line-height: 1;
+}
+
+.themed-card__header-content {
+    flex: 1;
+}
+
+.themed-card__content {
+    position: relative;
+}
+
+/* Themed Badge Component */
+.themed-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    border-radius: 9999px;
+    border-width: 1px;
+    border-style: solid;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    transition: all var(--transition-fast);
+}
+
+.themed-badge--xs {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+}
+
+.themed-badge--sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+.themed-badge--md {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+}
+
+.themed-badge:hover {
+    transform: scale(1.02);
+}
+
+/* Themed Progress Component */
+.themed-progress {
+    width: 100%;
+}
+
+.themed-progress__container {
+    width: 100%;
+    border-radius: 9999px;
+    overflow: hidden;
+    position: relative;
+    transition: all var(--transition-normal);
+}
+
+.themed-progress__bar {
+    height: 100%;
+    border-radius: 9999px;
+    transition: width 0.3s ease-in-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.themed-progress__bar::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 30%), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* Themed Tooltip Component */
+.themed-tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.themed-tooltip::before,
+.themed-tooltip::after {
+    position: absolute;
+    visibility: hidden;
+    opacity: 0;
+    transition: all var(--transition-normal);
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.themed-tooltip::before {
+    content: attr(title);
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--border-radius-sm);
+    font-size: 0.875rem;
+    white-space: nowrap;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-0.25rem);
+}
+
+.themed-tooltip::after {
+    content: "";
+    border: 4px solid transparent;
+    border-top-color: rgba(0, 0, 0, 0.9);
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.themed-tooltip:hover::before,
+.themed-tooltip:hover::after {
+    visibility: visible;
+    opacity: 1;
+    transform: translateX(-50%);
+}
+
+/* Enhanced Status Indicator Animations */
+.themed-status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.themed-status-indicator__dot {
+    position: relative;
+    box-shadow: 0 0 0 2px var(--bg-primary);
+    transition: all var(--transition-normal);
+}
+
+.themed-status-indicator__dot--pending {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+.themed-status-indicator__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.themed-status-indicator__text {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(1.1);
+    }
+}
+
+/* Enhanced Button Loading State */
+.themed-button__loading {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.themed-button__spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Enhanced Input Focus States */
+.themed-input:focus,
+.themed-select:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    border-color: #3b82f6;
+    transform: translateY(-1px);
+}
+
+.themed-input:hover,
+.themed-select:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-elevation-1);
+}
+
+/* Enhanced Checkbox Styling */
+.themed-checkbox {
+    appearance: none;
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 2px solid #d1d5db;
+    border-radius: var(--border-radius-sm);
+    background: white;
+    cursor: pointer;
+    position: relative;
+    transition: all var(--transition-normal);
+}
+
+.themed-checkbox:checked {
+    background: #3b82f6;
+    border-color: #3b82f6;
+}
+
+.themed-checkbox:checked::after {
+    content: "✓";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 0.875rem;
+    font-weight: bold;
+}
+
+.themed-checkbox:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-elevation-1);
+}
+
+/* Mini Chart Bar Enhancements */
+.themed-mini-chart-bar {
+    transition: all var(--transition-normal);
+    cursor: pointer;
+    position: relative;
+}
+
+.themed-mini-chart-bar:hover {
+    transform: scaleY(1.1);
+    box-shadow: var(--shadow-elevation-1);
+}
+
+.themed-mini-chart-bar::after {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: inherit;
+    background: inherit;
+    opacity: 0.3;
+    transform: scale(0);
+    transition: transform var(--transition-normal);
+}
+
+.themed-mini-chart-bar:hover::after {
+    transform: scale(1);
+}
+
+/* Responsive Design Helpers */
+@media (max-width: 768px) {
+    .themed-button {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+    
+    .themed-card {
+        padding: 1rem;
+    }
+    
+    .themed-card__header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+}
+
+/* Dark Mode Specific Enhancements */
+@media (prefers-color-scheme: dark) {
+    .themed-tooltip::before {
+        background: rgba(255, 255, 255, 0.9);
+        color: black;
+    }
+    
+    .themed-tooltip::after {
+        border-top-color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .themed-checkbox {
+        background: #374151;
+        border-color: #6b7280;
+    }
+    
+    .themed-checkbox:checked {
+        background: #3b82f6;
+        border-color: #3b82f6;
+    }
+}
+
+/* Accessibility Enhancements */
+@media (prefers-reduced-motion: reduce) {
+    .themed-button,
+    .themed-card,
+    .themed-badge,
+    .themed-progress__bar,
+    .themed-status-indicator__dot,
+    .themed-mini-chart-bar {
+        animation: none;
+        transition: none;
+    }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+    .themed-button {
+        border-width: 2px;
+    }
+    
+    .themed-badge {
+        border-width: 2px;
+    }
+    
+    .themed-input,
+    .themed-select {
+        border-width: 2px;
+    }
+}

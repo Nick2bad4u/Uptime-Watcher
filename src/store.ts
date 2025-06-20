@@ -40,6 +40,7 @@ interface AppState {
     addSite: (site: Site) => void;
     removeSite: (url: string) => void;
     updateSiteStatus: (update: StatusUpdate) => void;
+    updateSite: (url: string, updates: Partial<Site>) => void;
     setMonitoring: (isMonitoring: boolean) => void;
     setCheckInterval: (interval: number) => void;
     toggleDarkMode: () => void; // Keep for backwards compatibility
@@ -93,9 +94,13 @@ export const useStore = create<AppState>()(
             setSites: (sites: Site[]) => set({ sites }),
 
             addSite: (site: Site) =>
-                set((state) => ({
-                    sites: [...state.sites, site],
-                })),
+                set((state) => {
+                    const newSites = [...state.sites, site];
+                    // Force persistence by updating the state
+                    return {
+                        sites: newSites,
+                    };
+                }),
 
             removeSite: (url: string) =>
                 set((state) => ({
@@ -123,6 +128,24 @@ export const useStore = create<AppState>()(
                         selectedSite: updatedSelectedSite,
                         totalUptime,
                         totalDowntime,
+                    };
+                }),
+
+            updateSite: (url: string, updates: Partial<Site>) =>
+                set((state) => {
+                    const updatedSites = state.sites.map((site) =>
+                        site.url === url ? { ...site, ...updates } : site
+                    );
+
+                    // Update selected site if it matches
+                    const updatedSelectedSite =
+                        state.selectedSite?.url === url
+                            ? { ...state.selectedSite, ...updates }
+                            : state.selectedSite;
+
+                    return {
+                        sites: updatedSites,
+                        selectedSite: updatedSelectedSite,
                     };
                 }),
 

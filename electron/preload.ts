@@ -1,4 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron";
+import { Site } from "./types";
 
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
@@ -6,6 +7,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
     // Site management
     addSite: (site: any) => ipcRenderer.invoke("add-site", site),
     removeSite: (url: string) => ipcRenderer.invoke("remove-site", url),
+    updateSite: (url: string, updates: Partial<Site>) => ipcRenderer.invoke("update-site", url, updates),
     getSites: () => ipcRenderer.invoke("get-sites"),
     checkSiteNow: (url: string) => ipcRenderer.invoke("check-site-now", url),
 

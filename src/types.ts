@@ -25,6 +25,7 @@ declare global {
         electronAPI: {
             addSite: (site: Omit<Site, "id" | "status" | "history">) => Promise<Site>;
             removeSite: (url: string) => Promise<boolean>;
+            updateSite: (url: string, updates: Partial<Site>) => Promise<Site>;
             getSites: () => Promise<Site[]>;
             checkSiteNow: (url: string) => Promise<StatusUpdate>;
             exportData: () => Promise<string>;

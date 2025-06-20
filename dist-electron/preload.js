@@ -1,1 +1,27 @@
-"use strict";const i=require("electron");i.contextBridge.exposeInMainWorld("electronAPI",{addSite:e=>i.ipcRenderer.invoke("add-site",e),removeSite:e=>i.ipcRenderer.invoke("remove-site",e),getSites:()=>i.ipcRenderer.invoke("get-sites"),checkSiteNow:e=>i.ipcRenderer.invoke("check-site-now",e),exportData:()=>i.ipcRenderer.invoke("export-data"),importData:e=>i.ipcRenderer.invoke("import-data",e),startMonitoring:()=>i.ipcRenderer.invoke("start-monitoring"),stopMonitoring:()=>i.ipcRenderer.invoke("stop-monitoring"),updateCheckInterval:e=>i.ipcRenderer.invoke("update-check-interval",e),getCheckInterval:()=>i.ipcRenderer.invoke("get-check-interval"),updateHistoryLimit:e=>i.ipcRenderer.invoke("update-history-limit",e),getHistoryLimit:()=>i.ipcRenderer.invoke("get-history-limit"),onStatusUpdate:e=>{i.ipcRenderer.on("status-update",(r,t)=>e(t))},removeAllListeners:e=>{i.ipcRenderer.removeAllListeners(e)}});
+"use strict";
+const electron = require("electron");
+electron.contextBridge.exposeInMainWorld("electronAPI", {
+  // Site management
+  addSite: (site) => electron.ipcRenderer.invoke("add-site", site),
+  removeSite: (url) => electron.ipcRenderer.invoke("remove-site", url),
+  updateSite: (url, updates) => electron.ipcRenderer.invoke("update-site", url, updates),
+  getSites: () => electron.ipcRenderer.invoke("get-sites"),
+  checkSiteNow: (url) => electron.ipcRenderer.invoke("check-site-now", url),
+  // Data management
+  exportData: () => electron.ipcRenderer.invoke("export-data"),
+  importData: (data) => electron.ipcRenderer.invoke("import-data", data),
+  // Monitoring controls
+  startMonitoring: () => electron.ipcRenderer.invoke("start-monitoring"),
+  stopMonitoring: () => electron.ipcRenderer.invoke("stop-monitoring"),
+  updateCheckInterval: (interval) => electron.ipcRenderer.invoke("update-check-interval", interval),
+  getCheckInterval: () => electron.ipcRenderer.invoke("get-check-interval"),
+  updateHistoryLimit: (limit) => electron.ipcRenderer.invoke("update-history-limit", limit),
+  getHistoryLimit: () => electron.ipcRenderer.invoke("get-history-limit"),
+  // Event listeners
+  onStatusUpdate: (callback) => {
+    electron.ipcRenderer.on("status-update", (_, data) => callback(data));
+  },
+  removeAllListeners: (channel) => {
+    electron.ipcRenderer.removeAllListeners(channel);
+  }
+});

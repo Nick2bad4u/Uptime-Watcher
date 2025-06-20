@@ -49,6 +49,9 @@ export function AddSiteForm() {
             const newSite = await window.electronAPI.addSite(siteData);
             addSite(newSite);
 
+            // The site is automatically saved by the backend when added
+            // The store persistence will also save it to the frontend store
+
             // Reset form
             setUrl("");
             setName("");

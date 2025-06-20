@@ -112,6 +112,10 @@ class Main {
             return this.uptimeMonitor.importData(data);
         });
 
+        ipcMain.handle("update-site", async (_, url, updates) => {
+            return this.uptimeMonitor.updateSite(url, updates);
+        });
+
         // Listen for status updates from monitor
         this.uptimeMonitor.on("status-update", (data: StatusUpdate) => {
             this.mainWindow?.webContents.send("status-update", data);

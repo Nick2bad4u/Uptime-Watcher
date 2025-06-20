@@ -222,6 +222,19 @@ export class UptimeMonitor extends EventEmitter {
         return await this.checkSite(site);
     }
 
+    public async updateSite(url: string, updates: Partial<Site>): Promise<Site> {
+        const site = this.sites.get(url);
+        if (!site) {
+            throw new Error(`Site not found: ${url}`);
+        }
+
+        const updatedSite = { ...site, ...updates };
+        this.sites.set(url, updatedSite);
+        await this.saveSites();
+
+        return updatedSite;
+    }
+
     // Export/Import functionality
     public async exportData(): Promise<string> {
         await this.db.read();

@@ -20,7 +20,18 @@ import { Line, Bar, Doughnut } from "react-chartjs-2";
 import { Site } from "../types";
 import { useTheme } from "../theme/useTheme";
 import { useStore } from "../store";
-import { ThemedBox, ThemedText, ThemedButton, StatusIndicator } from "../theme/components";
+import { 
+    ThemedBox, 
+    ThemedText, 
+    ThemedButton, 
+    StatusIndicator, 
+    ThemedCard,
+    ThemedBadge,
+    ThemedProgress,
+    ThemedIconButton,
+    ThemedInput,
+    ThemedCheckbox
+} from "../theme/components";
 import "chartjs-adapter-date-fns";
 import "./SiteDetails.css";
 
@@ -47,7 +58,7 @@ interface SiteDetailsProps {
 }
 
 export function SiteDetails({ site, onClose }: SiteDetailsProps) {
-    const { currentTheme, getStatusColor } = useTheme();
+    const { currentTheme } = useTheme();
     const { removeSite, setError, setLoading, isLoading, selectedSite, updateSiteStatus, clearError } = useStore();
 
     // Enhanced state management
@@ -110,7 +121,6 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
         totalChecks > 0 ? Math.round(filteredHistory.reduce((sum, h) => sum + h.responseTime, 0) / totalChecks) : 0;
 
     const uptime = totalChecks > 0 ? ((upCount / totalChecks) * 100).toFixed(2) : "0";
-    const availability = totalChecks > 0 ? ((upCount / totalChecks) * 100).toFixed(1) : "0";
 
     const fastestResponse = filteredHistory.length > 0 ? Math.min(...filteredHistory.map((h) => h.responseTime)) : 0;
     const slowestResponse = filteredHistory.length > 0 ? Math.max(...filteredHistory.map((h) => h.responseTime)) : 0;
@@ -475,17 +485,21 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
         return `${seconds}s`;
     };
 
-    // Tab component
-    const TabButton = ({ label, isActive, onClick }: { label: string; isActive: boolean; onClick: () => void }) => (
-        <ThemedButton
-            variant={isActive ? "primary" : "ghost"}
-            size="sm"
-            onClick={onClick}
-            className={`px-4 py-2 ${isActive ? "shadow-sm" : ""}`}
-        >
-            {label}
-        </ThemedButton>
-    );
+    // Tab component with enhanced icons
+    const TabButton = ({ label, isActive, onClick }: { label: string; isActive: boolean; onClick: () => void }) => {
+        const [icon, ...textParts] = label.split(' ');
+        return (
+            <ThemedButton
+                variant={isActive ? "primary" : "ghost"}
+                size="sm"
+                onClick={onClick}
+                className={`px-4 py-2 ${isActive ? "shadow-sm" : ""}`}
+                icon={icon}
+            >
+                {textParts.join(' ')}
+            </ThemedButton>
+        );
+    };
 
     return (
         <div className="site-details-modal" onClick={onClose}>
@@ -532,31 +546,28 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                                 </div>
                             </div>
                             <div className="site-details-actions">
-                                <ThemedButton
+                                <ThemedIconButton
+                                    icon={autoRefresh ? "⏸️" : "▶️"}
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => setAutoRefresh(!autoRefresh)}
-                                    className="themed-button-ghost"
-                                >
-                                    {autoRefresh ? "⏸️" : "▶️"}
-                                </ThemedButton>
-                                <ThemedButton
+                                    tooltip={autoRefresh ? "Pause auto-refresh" : "Enable auto-refresh"}
+                                />
+                                <ThemedIconButton
+                                    icon="🔄"
                                     variant="ghost"
                                     size="sm"
                                     onClick={handleCheckNow}
                                     loading={isLoading}
-                                    className="themed-button-ghost"
-                                >
-                                    {isLoading ? "Checking..." : "🔄 Check Now"}
-                                </ThemedButton>
-                                <ThemedButton
+                                    tooltip="Check now"
+                                />
+                                <ThemedIconButton
+                                    icon="✕"
                                     variant="ghost"
                                     size="sm"
                                     onClick={onClose}
-                                    className="themed-button-ghost"
-                                >
-                                    ✕
-                                </ThemedButton>
+                                    tooltip="Close"
+                                />
                             </div>
                         </div>
                     </div>
@@ -704,113 +715,86 @@ function OverviewTab({
         <div className="space-y-6">
             {/* Key Metrics Grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <ThemedBox
-                    surface="base"
-                    padding="lg"
-                    border
-                    rounded="lg"
-                    className="text-center hover:shadow-md transition-shadow"
+                <ThemedCard
+                    icon="📊"
+                    title="Status"
+                    hoverable
+                    className="text-center"
                 >
-                    <StatusIndicator status={currentSite.status as any} size="lg" className="mx-auto mb-2" />
-                    <ThemedText size="sm" variant="secondary">
-                        Current Status
-                    </ThemedText>
-                    <ThemedText size="xl" weight="bold" className="capitalize mt-1">
-                        {currentSite.status}
-                    </ThemedText>
-                </ThemedBox>
+                    <StatusIndicator status={currentSite.status as any} size="lg" showText />
+                </ThemedCard>
 
-                <ThemedBox
-                    surface="base"
-                    padding="lg"
-                    border
-                    rounded="lg"
-                    className="text-center hover:shadow-md transition-shadow"
+                <ThemedCard
+                    icon="⏱️"
+                    title="Uptime"
+                    hoverable
+                    className="text-center"
                 >
-                    <div className="text-3xl mb-2">⏱️</div>
-                    <ThemedText size="sm" variant="secondary">
-                        Uptime
-                    </ThemedText>
-                    <ThemedText size="xl" weight="bold" className="mt-1 text-green-600">
+                    <ThemedProgress value={parseFloat(uptime)} variant="success" showLabel />
+                    <ThemedBadge variant="success" size="sm" className="mt-2">
                         {uptime}%
-                    </ThemedText>
-                </ThemedBox>
+                    </ThemedBadge>
+                </ThemedCard>
 
-                <ThemedBox
-                    surface="base"
-                    padding="lg"
-                    border
-                    rounded="lg"
-                    className="text-center hover:shadow-md transition-shadow"
+                <ThemedCard
+                    icon="⚡"
+                    title="Response Time"
+                    hoverable
+                    className="text-center"
                 >
-                    <div className="text-3xl mb-2">⚡</div>
-                    <ThemedText size="sm" variant="secondary">
-                        Avg Response
-                    </ThemedText>
-                    <ThemedText size="xl" weight="bold" className="mt-1">
+                    <ThemedText size="xl" weight="bold">
                         {formatResponseTime(avgResponseTime)}
                     </ThemedText>
-                </ThemedBox>
+                </ThemedCard>
 
-                <ThemedBox
-                    surface="base"
-                    padding="lg"
-                    border
-                    rounded="lg"
-                    className="text-center hover:shadow-md transition-shadow"
+                <ThemedCard
+                    icon="📈"
+                    title="Total Checks"
+                    hoverable
+                    className="text-center"
                 >
-                    <div className="text-3xl mb-2">📊</div>
-                    <ThemedText size="sm" variant="secondary">
-                        Total Checks
-                    </ThemedText>
-                    <ThemedText size="xl" weight="bold" className="mt-1">
+                    <ThemedText size="xl" weight="bold">
                         {totalChecks}
                     </ThemedText>
-                </ThemedBox>
+                </ThemedCard>
             </div>
 
             {/* Performance Metrics */}
-            <ThemedBox surface="base" padding="lg" border rounded="lg">
-                <ThemedText size="lg" weight="semibold" className="mb-4">
-                    Performance Overview
-                </ThemedText>
+            <ThemedCard icon="🚀" title="Performance Overview">
                 <div className="grid grid-cols-2 gap-6">
                     <div>
                         <ThemedText size="sm" variant="secondary">
                             Fastest Response
                         </ThemedText>
-                        <ThemedText size="lg" weight="medium" className="text-green-600">
+                        <ThemedBadge variant="success" icon="🚀">
                             {formatResponseTime(fastestResponse)}
-                        </ThemedText>
+                        </ThemedBadge>
                     </div>
                     <div>
                         <ThemedText size="sm" variant="secondary">
                             Slowest Response
                         </ThemedText>
-                        <ThemedText size="lg" weight="medium" className="text-orange-600">
+                        <ThemedBadge variant="warning" icon="🐌">
                             {formatResponseTime(slowestResponse)}
-                        </ThemedText>
+                        </ThemedBadge>
                     </div>
                 </div>
-            </ThemedBox>
+            </ThemedCard>
 
             {/* Quick Actions */}
-            <ThemedBox surface="base" padding="lg" border rounded="lg">
-                <ThemedText size="lg" weight="semibold" className="mb-4">
-                    Quick Actions
-                </ThemedText>
+            <ThemedCard icon="⚡" title="Quick Actions">
                 <div className="flex space-x-3">
-                    <ThemedButton
-                        variant="error"
-                        size="md"
-                        onClick={handleRemoveSite}
-                        loading={isLoading}
-                        className="flex-1"
+                    <ThemedButton 
+                        variant="error" 
+                        size="sm" 
+                        onClick={handleRemoveSite} 
+                        disabled={isLoading}
+                        icon="🗑️"
                     >
-                        🗑️ Remove Site
+                        Remove Site
                     </ThemedButton>
                 </div>
-            </ThemedBox>
+            </ThemedCard>
         </div>
     );
 }
@@ -1092,95 +1076,173 @@ function HistoryTab({ currentSite, formatTimestamp, formatResponseTime }: Histor
     );
 }
 
+// Enhanced Settings Tab Component
 interface SettingsTabProps {
     currentSite: Site;
     handleRemoveSite: () => Promise<void>;
     isLoading: boolean;
     autoRefresh: boolean;
-    setAutoRefresh: (enabled: boolean) => void;
+    setAutoRefresh: (value: boolean) => void;
 }
 
-function SettingsTab({ currentSite, handleRemoveSite, isLoading, autoRefresh, setAutoRefresh }: SettingsTabProps) {
+function SettingsTab({
+    currentSite,
+    handleRemoveSite,
+    isLoading,
+    autoRefresh,
+    setAutoRefresh,
+}: SettingsTabProps) {
+    const { updateSite, setError, setLoading, clearError } = useStore();
+    const [localName, setLocalName] = useState(currentSite.name || "");
+    const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+    // Track changes
+    useEffect(() => {
+        setHasUnsavedChanges(localName !== (currentSite.name || ""));
+    }, [localName, currentSite.name]);
+
+    const handleSaveName = async () => {
+        if (!hasUnsavedChanges) return;
+
+        setLoading(true);
+        clearError();
+
+        try {
+            const updates = { name: localName.trim() || undefined };
+            await window.electronAPI.updateSite(currentSite.url, updates);
+            updateSite(currentSite.url, updates);
+            setHasUnsavedChanges(false);
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : "Failed to update site";
+            setError(errorMessage);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleAutoRefreshChange = (value: boolean) => {
+        setAutoRefresh(value);
+        // Auto-save this setting immediately
+        // Note: This is a UI-only setting, not persisted to the site
+    };
+
     return (
         <div className="space-y-6">
-            {/* Site Information */}
-            <ThemedBox surface="base" padding="lg" border rounded="lg">
-                <ThemedText size="lg" weight="semibold" className="mb-4">
-                    Site Information
-                </ThemedText>
-                <div className="space-y-3">
+            {/* Site Configuration */}
+            <ThemedCard icon="⚙️" title="Site Configuration">
+                <div className="space-y-4">
                     <div>
-                        <ThemedText size="sm" variant="secondary">
-                            Name
+                        <ThemedText size="sm" weight="medium" variant="secondary" className="block mb-2">
+                            Site Name
                         </ThemedText>
-                        <ThemedText size="base" weight="medium">
-                            {currentSite.name || "No name set"}
-                        </ThemedText>
+                        <div className="flex gap-2">
+                            <ThemedInput
+                                type="text"
+                                value={localName}
+                                onChange={(e) => setLocalName(e.target.value)}
+                                placeholder="Enter a custom name for this site"
+                                className="flex-1"
+                            />
+                            <ThemedButton
+                                variant={hasUnsavedChanges ? "primary" : "secondary"}
+                                size="sm"
+                                onClick={handleSaveName}
+                                disabled={!hasUnsavedChanges || isLoading}
+                                loading={isLoading}
+                                icon="💾"
+                            >
+                                Save
+                            </ThemedButton>
+                        </div>
+                        {hasUnsavedChanges && (
+                            <ThemedBadge variant="warning" size="xs" className="mt-1">
+                                ⚠️ Unsaved changes
+                            </ThemedBadge>
+                        )}
                     </div>
+
                     <div>
-                        <ThemedText size="sm" variant="secondary">
-                            URL
+                        <ThemedText size="sm" weight="medium" variant="secondary" className="block mb-2">
+                            Site URL
                         </ThemedText>
-                        <ThemedText size="base" weight="medium" className="break-all">
-                            {currentSite.url}
-                        </ThemedText>
-                    </div>
-                    <div>
-                        <ThemedText size="sm" variant="secondary">
-                            Added
-                        </ThemedText>
-                        <ThemedText size="base" weight="medium">
-                            {new Date(currentSite.lastChecked || Date.now()).toLocaleDateString()}
+                        <ThemedInput
+                            type="url"
+                            value={currentSite.url}
+                            disabled
+                            className="opacity-60"
+                        />
+                        <ThemedText size="xs" variant="tertiary" className="mt-1">
+                            URL cannot be changed after creation
                         </ThemedText>
                     </div>
                 </div>
-            </ThemedBox>
+            </ThemedCard>
 
             {/* Monitoring Settings */}
-            <ThemedBox surface="base" padding="lg" border rounded="lg">
-                <ThemedText size="lg" weight="semibold" className="mb-4">
-                    Monitoring Settings
-                </ThemedText>
+            <ThemedCard icon="📡" title="Monitoring Settings">
                 <div className="space-y-4">
                     <div className="flex items-center justify-between">
                         <div>
-                            <ThemedText size="base" weight="medium">
-                                Auto-refresh
+                            <ThemedText size="sm" weight="medium">
+                                Auto-refresh Details
                             </ThemedText>
-                            <ThemedText size="sm" variant="secondary">
-                                Automatically refresh data every 30 seconds
+                            <ThemedText size="xs" variant="secondary">
+                                Automatically refresh site data in this view
                             </ThemedText>
                         </div>
-                        <ThemedButton
-                            variant={autoRefresh ? "success" : "secondary"}
-                            size="sm"
-                            onClick={() => setAutoRefresh(!autoRefresh)}
-                        >
-                            {autoRefresh ? "Enabled" : "Disabled"}
-                        </ThemedButton>
+                        <ThemedCheckbox
+                            checked={autoRefresh}
+                            onChange={(e) => handleAutoRefreshChange(e.target.checked)}
+                        />
                     </div>
                 </div>
-            </ThemedBox>
+            </ThemedCard>
+
+            {/* Site Information */}
+            <ThemedCard icon="📊" title="Site Information">
+                <div className="space-y-3">
+                    <div className="flex justify-between">
+                        <ThemedText size="sm" variant="secondary">Site ID:</ThemedText>
+                        <ThemedBadge variant="secondary" size="xs">{currentSite.id}</ThemedBadge>
+                    </div>
+                    <div className="flex justify-between">
+                        <ThemedText size="sm" variant="secondary">Total History Records:</ThemedText>
+                        <ThemedBadge variant="info" size="xs">{currentSite.history.length}</ThemedBadge>
+                    </div>
+                    <div className="flex justify-between">
+                        <ThemedText size="sm" variant="secondary">Last Checked:</ThemedText>
+                        <ThemedText size="xs" variant="tertiary">
+                            {currentSite.lastChecked 
+                                ? new Date(currentSite.lastChecked).toLocaleString()
+                                : 'Never'
+                            }
+                        </ThemedText>
+                    </div>
+                </div>
+            </ThemedCard>
 
             {/* Danger Zone */}
-            <ThemedBox surface="base" padding="lg" border rounded="lg" className="border-red-200">
-                <ThemedText size="lg" weight="semibold" className="mb-4 text-red-600">
-                    Danger Zone
-                </ThemedText>
+            <ThemedCard icon="⚠️" title="Danger Zone" variant="tertiary">
                 <div className="space-y-4">
                     <div>
-                        <ThemedText size="base" weight="medium">
+                        <ThemedText size="sm" weight="medium" variant="secondary" className="mb-2">
                             Remove Site
                         </ThemedText>
-                        <ThemedText size="sm" variant="secondary" className="mb-3">
-                            This action cannot be undone. All monitoring data for this site will be permanently deleted.
+                        <ThemedText size="xs" variant="tertiary" className="mb-3">
+                            This action cannot be undone. All history data for this site will be lost.
                         </ThemedText>
-                        <ThemedButton variant="error" size="md" onClick={handleRemoveSite} loading={isLoading}>
-                            🗑️ Remove Site Permanently
+                        <ThemedButton
+                            variant="error"
+                            size="sm"
+                            onClick={handleRemoveSite}
+                            loading={isLoading}
+                            icon="🗑️"
+                        >
+                            Remove Site
                         </ThemedButton>
                     </div>
                 </div>
-            </ThemedBox>
+            </ThemedCard>
         </div>
     );
 }
