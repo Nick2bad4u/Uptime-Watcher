@@ -1,5 +1,11 @@
 import { useStore } from "../store";
-import { ThemedBox, ThemedText, ThemedButton, StatusIndicator, ThemedSelect } from "../theme/components";
+import {
+  ThemedBox,
+  ThemedText,
+  ThemedButton,
+  StatusIndicator,
+  ThemedSelect,
+} from "../theme/components";
 import { useTheme } from "../theme/useTheme";
 import { CHECK_INTERVALS } from "../constants";
 import { useState, useEffect } from "react";
@@ -89,7 +95,12 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
   };
 
   return (
-    <ThemedBox surface="elevated" padding="md" className="shadow-sm border-b" border>
+    <ThemedBox
+      surface="elevated"
+      padding="md"
+      className="shadow-sm border-b"
+      border
+    >
       <div className="header-container">
         <div className="flex items-center justify-between py-4">
           <div className="flex items-center space-x-4">
@@ -140,32 +151,34 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
                 ))}
               </ThemedSelect>
             </div>
-            
+
             {/* Monitoring Controls */}
             <div className="flex items-center space-x-2">
               {isMonitoring ? (
                 <ThemedButton
                   variant="error"
-                  size="sm"                onClick={handleStopMonitoring}
-                disabled={isLoading}
-                loading={showButtonLoading}
-                className="min-w-140"
-              >
+                  size="sm"
+                  onClick={handleStopMonitoring}
+                  disabled={isLoading}
+                  loading={showButtonLoading}
+                  className="min-w-140"
+                >
                   ⏸️ Stop Monitoring
                 </ThemedButton>
               ) : (
                 <ThemedButton
                   variant="success"
-                  size="sm"                onClick={handleStartMonitoring}
-                disabled={isLoading}
-                loading={showButtonLoading}
-                className="min-w-140"
-              >
+                  size="sm"
+                  onClick={handleStartMonitoring}
+                  disabled={isLoading}
+                  loading={showButtonLoading}
+                  className="min-w-140"
+                >
                   ▶️ Start Monitoring
                 </ThemedButton>
               )}
             </div>
-            
+
             {/* Theme Toggle */}
             <ThemedButton
               variant="secondary"
@@ -175,7 +188,7 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
             >
               {darkMode ? "☀️" : "🌙"}
             </ThemedButton>
-            
+
             {/* Settings Button */}
             <ThemedButton
               variant="secondary"

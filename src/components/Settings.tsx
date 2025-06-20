@@ -1,12 +1,12 @@
 import { useStore } from "../store";
-import { 
-  ThemedBox, 
-  ThemedText, 
-  ThemedButton, 
+import {
+  ThemedBox,
+  ThemedText,
+  ThemedButton,
   StatusIndicator,
   ThemedInput,
   ThemedSelect,
-  ThemedCheckbox
+  ThemedCheckbox,
 } from "../theme/components";
 import { useTheme } from "../theme/useTheme";
 import { CHECK_INTERVALS } from "../constants";
@@ -122,18 +122,22 @@ export function Settings({ onClose }: SettingsProps) {
           <ThemedBox
             surface="base"
             padding="md"
-            className={`error-alert ${isDark ? 'dark' : ''}`}
+            className={`error-alert ${isDark ? "dark" : ""}`}
             rounded="md"
           >
             <div className="flex items-center justify-between">
-              <ThemedText variant="primary" size="sm" className={`error-alert__text ${isDark ? 'dark' : ''}`}>
+              <ThemedText
+                variant="primary"
+                size="sm"
+                className={`error-alert__text ${isDark ? "dark" : ""}`}
+              >
                 ⚠️ {lastError}
               </ThemedText>
               <ThemedButton
                 variant="secondary"
                 size="xs"
                 onClick={clearError}
-                className={`error-alert__close ${isDark ? 'dark' : ''}`}
+                className={`error-alert__close ${isDark ? "dark" : ""}`}
               >
                 ✕
               </ThemedButton>
@@ -150,7 +154,12 @@ export function Settings({ onClose }: SettingsProps) {
             </ThemedText>
             <div className="space-y-4">
               <div>
-                <ThemedText size="sm" weight="medium" variant="secondary" className="block mb-2">
+                <ThemedText
+                  size="sm"
+                  weight="medium"
+                  variant="secondary"
+                  className="block mb-2"
+                >
                   Check Interval
                 </ThemedText>
                 <ThemedSelect
@@ -168,7 +177,12 @@ export function Settings({ onClose }: SettingsProps) {
               </div>
 
               <div>
-                <ThemedText size="sm" weight="medium" variant="secondary" className="block mb-2">
+                <ThemedText
+                  size="sm"
+                  weight="medium"
+                  variant="secondary"
+                  className="block mb-2"
+                >
                   Request Timeout (ms)
                 </ThemedText>
                 <ThemedInput
@@ -189,7 +203,12 @@ export function Settings({ onClose }: SettingsProps) {
               </div>
 
               <div>
-                <ThemedText size="sm" weight="medium" variant="secondary" className="block mb-2">
+                <ThemedText
+                  size="sm"
+                  weight="medium"
+                  variant="secondary"
+                  className="block mb-2"
+                >
                   Max Retries
                 </ThemedText>
                 <ThemedInput
@@ -218,10 +237,18 @@ export function Settings({ onClose }: SettingsProps) {
             <div className="space-y-4">
               <div className="setting-item">
                 <div className="setting-info">
-                  <ThemedText size="sm" weight="medium" className="setting-title">
+                  <ThemedText
+                    size="sm"
+                    weight="medium"
+                    className="setting-title"
+                  >
                     Desktop Notifications
                   </ThemedText>
-                  <ThemedText size="xs" variant="tertiary" className="setting-description">
+                  <ThemedText
+                    size="xs"
+                    variant="tertiary"
+                    className="setting-description"
+                  >
                     Show notifications when sites go up or down
                   </ThemedText>
                 </div>
@@ -237,10 +264,18 @@ export function Settings({ onClose }: SettingsProps) {
 
               <div className="setting-item">
                 <div className="setting-info">
-                  <ThemedText size="sm" weight="medium" className="setting-title">
+                  <ThemedText
+                    size="sm"
+                    weight="medium"
+                    className="setting-title"
+                  >
                     Sound Alerts
                   </ThemedText>
-                  <ThemedText size="xs" variant="tertiary" className="setting-description">
+                  <ThemedText
+                    size="xs"
+                    variant="tertiary"
+                    className="setting-description"
+                  >
                     Play sound when status changes occur
                   </ThemedText>
                 </div>
@@ -263,7 +298,12 @@ export function Settings({ onClose }: SettingsProps) {
             </ThemedText>
             <div className="space-y-4">
               <div>
-                <ThemedText size="sm" weight="medium" variant="secondary" className="block mb-2">
+                <ThemedText
+                  size="sm"
+                  weight="medium"
+                  variant="secondary"
+                  className="block mb-2"
+                >
                   Theme
                 </ThemedText>
                 <ThemedSelect
@@ -290,10 +330,18 @@ export function Settings({ onClose }: SettingsProps) {
 
               <div className="setting-item">
                 <div className="setting-info">
-                  <ThemedText size="sm" weight="medium" className="setting-title">
+                  <ThemedText
+                    size="sm"
+                    weight="medium"
+                    className="setting-title"
+                  >
                     Auto-start with System
                   </ThemedText>
-                  <ThemedText size="xs" variant="tertiary" className="setting-description">
+                  <ThemedText
+                    size="xs"
+                    variant="tertiary"
+                    className="setting-description"
+                  >
                     Launch Uptime Watcher when your computer starts
                   </ThemedText>
                 </div>
@@ -309,10 +357,18 @@ export function Settings({ onClose }: SettingsProps) {
 
               <div className="setting-item">
                 <div className="setting-info">
-                  <ThemedText size="sm" weight="medium" className="setting-title">
+                  <ThemedText
+                    size="sm"
+                    weight="medium"
+                    className="setting-title"
+                  >
                     Minimize to System Tray
                   </ThemedText>
-                  <ThemedText size="xs" variant="tertiary" className="setting-description">
+                  <ThemedText
+                    size="xs"
+                    variant="tertiary"
+                    className="setting-description"
+                  >
                     Keep app running in system tray when window is closed
                   </ThemedText>
                 </div>

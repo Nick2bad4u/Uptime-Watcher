@@ -63,7 +63,7 @@ export const useStore = create<AppState>()(
       darkMode: false,
       settings: defaultSettings,
       showSettings: false,
-      
+
       // Error handling initial state
       lastError: null,
       isLoading: false,
@@ -104,12 +104,12 @@ export const useStore = create<AppState>()(
       setShowSettings: (show: boolean) => set({ showSettings: show }),
 
       resetSettings: () => set({ settings: defaultSettings }),
-      
+
       // Error handling actions
       setError: (error: string | null) => set({ lastError: error }),
-      
+
       setLoading: (loading: boolean) => set({ isLoading: loading }),
-      
+
       clearError: () => set({ lastError: null }),
     }),
     {

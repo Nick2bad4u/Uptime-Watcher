@@ -12,7 +12,7 @@ export interface ThemeColors {
     800: string;
     900: string;
   };
-  
+
   // Status colors
   status: {
     up: string;
@@ -20,13 +20,13 @@ export interface ThemeColors {
     pending: string;
     unknown: string;
   };
-  
+
   // Semantic colors
   success: string;
   warning: string;
   error: string;
   info: string;
-  
+
   // Background colors
   background: {
     primary: string;
@@ -34,7 +34,7 @@ export interface ThemeColors {
     tertiary: string;
     modal: string;
   };
-  
+
   // Text colors
   text: {
     primary: string;
@@ -42,14 +42,14 @@ export interface ThemeColors {
     tertiary: string;
     inverse: string;
   };
-  
+
   // Border colors
   border: {
     primary: string;
     secondary: string;
     focus: string;
   };
-  
+
   // Surface colors
   surface: {
     base: string;
@@ -64,8 +64,8 @@ export interface ThemeSpacing {
   md: string;
   lg: string;
   xl: string;
-  '2xl': string;
-  '3xl': string;
+  "2xl": string;
+  "3xl": string;
 }
 
 export interface ThemeTypography {
@@ -79,9 +79,9 @@ export interface ThemeTypography {
     base: string;
     lg: string;
     xl: string;
-    '2xl': string;
-    '3xl': string;
-    '4xl': string;
+    "2xl": string;
+    "3xl": string;
+    "4xl": string;
   };
   fontWeight: {
     normal: string;
@@ -123,11 +123,16 @@ export interface Theme {
   isDark: boolean;
 }
 
-export type ThemeName = 'light' | 'dark' | 'high-contrast' | 'system' | 'custom';
+export type ThemeName =
+  | "light"
+  | "dark"
+  | "high-contrast"
+  | "system"
+  | "custom";
 
 export interface ThemeState {
   currentTheme: ThemeName;
   customThemes: Record<string, Theme>;
   activeTheme: Theme;
-  systemThemePreference: 'light' | 'dark';
+  systemThemePreference: "light" | "dark";
 }

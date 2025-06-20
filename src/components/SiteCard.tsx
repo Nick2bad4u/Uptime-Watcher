@@ -1,7 +1,13 @@
 import { Site } from "../types";
 import { useStore } from "../store";
 import { useTheme } from "../theme/useTheme";
-import { ThemedBox, ThemedText, ThemedButton, StatusIndicator, MiniChartBar } from "../theme/components";
+import {
+  ThemedBox,
+  ThemedText,
+  ThemedButton,
+  StatusIndicator,
+  MiniChartBar,
+} from "../theme/components";
 
 interface SiteCardProps {
   site: Site;
@@ -12,7 +18,11 @@ export function SiteCard({ site }: SiteCardProps) {
   const { isDark } = useTheme();
 
   const handleRemove = async () => {
-    if (!window.confirm(`Are you sure you want to remove ${site.name || site.url}?`)) {
+    if (
+      !window.confirm(
+        `Are you sure you want to remove ${site.name || site.url}?`,
+      )
+    ) {
       return;
     }
 
@@ -40,27 +50,24 @@ export function SiteCard({ site }: SiteCardProps) {
   };
 
   return (
-    <ThemedBox 
-      surface="base" 
-      padding="lg" 
-      className={`site-card-hover ${isDark ? 'dark' : ''}`}
+    <ThemedBox
+      surface="base"
+      padding="lg"
+      className={`site-card-hover ${isDark ? "dark" : ""}`}
     >
       <div className="flex items-center justify-between">
         <div className="flex-1 min-w-0">
           <div className="flex items-center space-x-3">
-            <StatusIndicator 
-              status={site.status as any} 
-              size="lg" 
-            />
+            <StatusIndicator status={site.status as any} size="lg" />
             <div className="flex-1 min-w-0">
               <div className="flex items-center space-x-2">
                 <ThemedText size="lg" weight="medium" className="truncate">
                   {site.name || site.url}
                 </ThemedText>
-                <StatusIndicator 
-                  status={site.status as any} 
-                  size="sm" 
-                  showText 
+                <StatusIndicator
+                  status={site.status as any}
+                  size="sm"
+                  showText
                 />
               </div>
 
@@ -101,9 +108,9 @@ export function SiteCard({ site }: SiteCardProps) {
 
       {/* Mini chart area - placeholder for future chart implementation */}
       {site.history.length > 0 && (
-        <ThemedBox 
-          surface="elevated" 
-          padding="md" 
+        <ThemedBox
+          surface="elevated"
+          padding="md"
           className="mt-4 border-t"
           border
         >

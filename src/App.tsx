@@ -5,7 +5,12 @@ import { Header } from "./components/Header";
 import { SiteList } from "./components/SiteList";
 import { AddSiteForm } from "./components/AddSiteForm";
 import { Settings } from "./components/Settings";
-import { ThemeProvider, ThemedBox, ThemedText, ThemedButton } from "./theme/components";
+import {
+  ThemeProvider,
+  ThemedBox,
+  ThemedText,
+  ThemedButton,
+} from "./theme/components";
 import { StatusUpdate } from "./types";
 
 function App() {
@@ -117,14 +122,16 @@ function App() {
 
   return (
     <ThemeProvider>
-      <div className={`app-container ${isDark ? 'dark' : ''}`}>
+      <div className={`app-container ${isDark ? "dark" : ""}`}>
         {/* Global Loading Overlay */}
         {showLoadingOverlay && (
           <div className="loading-overlay">
             <ThemedBox surface="elevated" padding="lg" rounded="lg" shadow="xl">
               <div className="loading-content">
                 <div className="loading-spinner"></div>
-                <ThemedText size="base" weight="medium">Loading...</ThemedText>
+                <ThemedText size="base" weight="medium">
+                  Loading...
+                </ThemedText>
               </div>
             </ThemedBox>
           </div>
@@ -133,11 +140,18 @@ function App() {
         {/* Global Error Notification */}
         {lastError && (
           <div className="fixed top-0 left-0 right-0 z-50">
-            <ThemedBox surface="elevated" padding="md" className="rounded-none border-l-4 border-red-500">
+            <ThemedBox
+              surface="elevated"
+              padding="md"
+              className="rounded-none border-l-4 border-red-500"
+            >
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <div className="text-red-500">⚠️</div>
-                  <ThemedText size="sm" className="text-red-600 dark:text-red-400">
+                  <ThemedText
+                    size="sm"
+                    className="text-red-600 dark:text-red-400"
+                  >
                     {lastError}
                   </ThemedText>
                 </div>
@@ -163,8 +177,18 @@ function App() {
           <div className="grid-layout">
             {/* Main content */}
             <div>
-              <ThemedBox surface="elevated" padding="md" shadow="sm" rounded="lg">
-                <ThemedBox surface="base" padding="md" border className="border-b">
+              <ThemedBox
+                surface="elevated"
+                padding="md"
+                shadow="sm"
+                rounded="lg"
+              >
+                <ThemedBox
+                  surface="base"
+                  padding="md"
+                  border
+                  className="border-b"
+                >
                   <ThemedText size="lg" weight="medium">
                     Monitored Sites ({sites.length})
                   </ThemedText>
@@ -177,7 +201,12 @@ function App() {
 
             {/* Sidebar */}
             <div>
-              <ThemedBox surface="elevated" padding="lg" shadow="sm" rounded="lg">
+              <ThemedBox
+                surface="elevated"
+                padding="lg"
+                shadow="sm"
+                rounded="lg"
+              >
                 <ThemedText size="lg" weight="medium" className="mb-4">
                   Add New Site
                 </ThemedText>

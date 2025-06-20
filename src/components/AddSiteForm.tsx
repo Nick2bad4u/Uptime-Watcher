@@ -1,10 +1,16 @@
 import { useState, useEffect } from "react";
 import { useStore } from "../store";
 import { useTheme } from "../theme/useTheme";
-import { ThemedBox, ThemedText, ThemedButton, ThemedInput } from "../theme/components";
+import {
+  ThemedBox,
+  ThemedText,
+  ThemedButton,
+  ThemedInput,
+} from "../theme/components";
 
 export function AddSiteForm() {
-  const { addSite, setError, setLoading, isLoading, lastError, clearError } = useStore();
+  const { addSite, setError, setLoading, isLoading, lastError, clearError } =
+    useStore();
   const { isDark } = useTheme();
   const [url, setUrl] = useState("");
   const [name, setName] = useState("");
@@ -53,7 +59,8 @@ export function AddSiteForm() {
       setUrl("");
       setName("");
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to add site";
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to add site";
       console.error("Failed to add site:", error);
       setError(errorMessage);
     } finally {
@@ -64,7 +71,12 @@ export function AddSiteForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <ThemedText size="sm" weight="medium" variant="secondary" className="block mb-1">
+        <ThemedText
+          size="sm"
+          weight="medium"
+          variant="secondary"
+          className="block mb-1"
+        >
           Site Name (Optional)
         </ThemedText>
         <ThemedInput
@@ -77,7 +89,12 @@ export function AddSiteForm() {
       </div>
 
       <div>
-        <ThemedText size="sm" weight="medium" variant="secondary" className="block mb-1">
+        <ThemedText
+          size="sm"
+          weight="medium"
+          variant="secondary"
+          className="block mb-1"
+        >
           Website URL *
         </ThemedText>
         <ThemedInput
@@ -102,21 +119,24 @@ export function AddSiteForm() {
 
       {/* Error Message */}
       {lastError && (
-        <ThemedBox 
-          surface="base" 
-          padding="md" 
-          className={`error-alert ${isDark ? 'dark' : ''}`}
+        <ThemedBox
+          surface="base"
+          padding="md"
+          className={`error-alert ${isDark ? "dark" : ""}`}
           rounded="md"
         >
           <div className="flex items-center">
-            <ThemedText size="sm" className={`error-alert__text ${isDark ? 'dark' : ''}`}>
+            <ThemedText
+              size="sm"
+              className={`error-alert__text ${isDark ? "dark" : ""}`}
+            >
               ❌ {lastError}
             </ThemedText>
             <ThemedButton
               variant="secondary"
               size="xs"
               onClick={clearError}
-              className={`error-alert__close ${isDark ? 'dark' : ''}`}
+              className={`error-alert__close ${isDark ? "dark" : ""}`}
             >
               ✕
             </ThemedButton>
