@@ -27,7 +27,7 @@ jobs:
         runs-on: ubuntu-latest
         defaults:
             run:
-              working-directory: .
+                working-directory: .
         outputs:
             new_version: ${{ steps.bump.outputs.new_version }}
         steps:

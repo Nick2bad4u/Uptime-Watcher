@@ -3,36 +3,32 @@ import { contextBridge, ipcRenderer } from "electron";
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld("electronAPI", {
-  // Site management
-  addSite: (site: any) => ipcRenderer.invoke("add-site", site),
-  removeSite: (url: string) => ipcRenderer.invoke("remove-site", url),
-  getSites: () => ipcRenderer.invoke("get-sites"),
-  checkSiteNow: (url: string) => ipcRenderer.invoke("check-site-now", url),
+    // Site management
+    addSite: (site: any) => ipcRenderer.invoke("add-site", site),
+    removeSite: (url: string) => ipcRenderer.invoke("remove-site", url),
+    getSites: () => ipcRenderer.invoke("get-sites"),
+    checkSiteNow: (url: string) => ipcRenderer.invoke("check-site-now", url),
 
-  // Data management
-  exportData: () => ipcRenderer.invoke("export-data"),
-  importData: (data: string) => ipcRenderer.invoke("import-data", data),
+    // Data management
+    exportData: () => ipcRenderer.invoke("export-data"),
+    importData: (data: string) => ipcRenderer.invoke("import-data", data),
 
-  // Monitoring controls
-  startMonitoring: () => ipcRenderer.invoke("start-monitoring"),
-  stopMonitoring: () => ipcRenderer.invoke("stop-monitoring"),
-  updateCheckInterval: (interval: number) =>
-    ipcRenderer.invoke("update-check-interval", interval),
-  getCheckInterval: () =>
-    ipcRenderer.invoke("get-check-interval"),
+    // Monitoring controls
+    startMonitoring: () => ipcRenderer.invoke("start-monitoring"),
+    stopMonitoring: () => ipcRenderer.invoke("stop-monitoring"),
+    updateCheckInterval: (interval: number) => ipcRenderer.invoke("update-check-interval", interval),
+    getCheckInterval: () => ipcRenderer.invoke("get-check-interval"),
 
-  updateHistoryLimit: (limit: number) =>
-    ipcRenderer.invoke("update-history-limit", limit),
+    updateHistoryLimit: (limit: number) => ipcRenderer.invoke("update-history-limit", limit),
 
-  getHistoryLimit: () =>
-    ipcRenderer.invoke("get-history-limit"),
+    getHistoryLimit: () => ipcRenderer.invoke("get-history-limit"),
 
-  // Event listeners
-  onStatusUpdate: (callback: (data: any) => void) => {
-    ipcRenderer.on("status-update", (_, data) => callback(data));
-  },
+    // Event listeners
+    onStatusUpdate: (callback: (data: any) => void) => {
+        ipcRenderer.on("status-update", (_, data) => callback(data));
+    },
 
-  removeAllListeners: (channel: string) => {
-    ipcRenderer.removeAllListeners(channel);
-  },
+    removeAllListeners: (channel: string) => {
+        ipcRenderer.removeAllListeners(channel);
+    },
 });

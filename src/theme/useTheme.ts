@@ -4,154 +4,144 @@ import { themeManager } from "./ThemeManager";
 import { useStore } from "../store";
 
 export function useTheme() {
-  const { settings, updateSettings } = useStore();
-  const [systemTheme, setSystemTheme] = useState<"light" | "dark">("light");
+    const { settings, updateSettings } = useStore();
+    const [systemTheme, setSystemTheme] = useState<"light" | "dark">("light");
 
-  // Get current theme based on settings
-  const getCurrentTheme = (): Theme => {
-    const themeName = settings.theme as ThemeName;
-    return themeManager.getTheme(themeName);
-  };
+    // Get current theme based on settings
+    const getCurrentTheme = (): Theme => {
+        const themeName = settings.theme as ThemeName;
+        return themeManager.getTheme(themeName);
+    };
 
-  const [currentTheme, setCurrentTheme] = useState<Theme>(getCurrentTheme);
+    const [currentTheme, setCurrentTheme] = useState<Theme>(getCurrentTheme);
 
-  // Update theme when settings change
-  useEffect(() => {
-    const newTheme = getCurrentTheme();
-    setCurrentTheme(newTheme);
-    themeManager.applyTheme(newTheme);
-  }, [settings.theme, systemTheme]);
+    // Update theme when settings change
+    useEffect(() => {
+        const newTheme = getCurrentTheme();
+        setCurrentTheme(newTheme);
+        themeManager.applyTheme(newTheme);
+    }, [settings.theme, systemTheme]);
 
-  // Listen for system theme changes
-  useEffect(() => {
-    const cleanup = themeManager.onSystemThemeChange((isDark) => {
-      const newSystemTheme = isDark ? "dark" : "light";
-      setSystemTheme(newSystemTheme);
-    });
+    // Listen for system theme changes
+    useEffect(() => {
+        const cleanup = themeManager.onSystemThemeChange((isDark) => {
+            const newSystemTheme = isDark ? "dark" : "light";
+            setSystemTheme(newSystemTheme);
+        });
 
-    // Set initial system theme
-    setSystemTheme(themeManager.getSystemThemePreference());
+        // Set initial system theme
+        setSystemTheme(themeManager.getSystemThemePreference());
 
-    return cleanup;
-  }, []);
+        return cleanup;
+    }, []);
 
-  // Change theme
-  const setTheme = (themeName: ThemeName) => {
-    updateSettings({ theme: themeName });
-  };
+    // Change theme
+    const setTheme = (themeName: ThemeName) => {
+        updateSettings({ theme: themeName });
+    };
 
-  // Toggle between light and dark
-  const toggleTheme = () => {
-    const newTheme = currentTheme.isDark ? "light" : "dark";
-    setTheme(newTheme);
-  };
+    // Toggle between light and dark
+    const toggleTheme = () => {
+        const newTheme = currentTheme.isDark ? "light" : "dark";
+        setTheme(newTheme);
+    };
 
-  // Get theme-aware color
-  const getColor = (path: string): string => {
-    const keys = path.split(".");
-    let value: any = currentTheme.colors;
+    // Get theme-aware color
+    const getColor = (path: string): string => {
+        const keys = path.split(".");
+        let value: any = currentTheme.colors;
 
-    for (const key of keys) {
-      if (value && typeof value === "object") {
-        value = value[key];
-      } else {
-        return "#000000"; // Fallback
-      }
-    }
+        for (const key of keys) {
+            if (value && typeof value === "object") {
+                value = value[key];
+            } else {
+                return "#000000"; // Fallback
+            }
+        }
 
-    return typeof value === "string" ? value : "#000000";
-  };
+        return typeof value === "string" ? value : "#000000";
+    };
 
-  // Get status color
-  const getStatusColor = (
-    status: "up" | "down" | "pending" | "unknown",
-  ): string => {
-    return currentTheme.colors.status[status];
-  };
+    // Get status color
+    const getStatusColor = (status: "up" | "down" | "pending" | "unknown"): string => {
+        return currentTheme.colors.status[status];
+    };
 
-  // Get available themes
-  const availableThemes = themeManager.getAvailableThemes();
+    // Get available themes
+    const availableThemes = themeManager.getAvailableThemes();
 
-  return {
-    currentTheme,
-    themeName: settings.theme as ThemeName,
-    systemTheme,
-    setTheme,
-    toggleTheme,
-    getColor,
-    getStatusColor,
-    availableThemes,
-    isDark: currentTheme.isDark,
-    themeManager,
-  };
+    return {
+        currentTheme,
+        themeName: settings.theme as ThemeName,
+        systemTheme,
+        setTheme,
+        toggleTheme,
+        getColor,
+        getStatusColor,
+        availableThemes,
+        isDark: currentTheme.isDark,
+        themeManager,
+    };
 }
 
 // Utility hook for getting theme values in components
 export function useThemeValue<T>(selector: (theme: Theme) => T): T {
-  const { currentTheme } = useTheme();
-  return selector(currentTheme);
+    const { currentTheme } = useTheme();
+    return selector(currentTheme);
 }
 
 // Hook for theme-aware status colors
 export function useStatusColors() {
-  const { currentTheme } = useTheme();
+    const { currentTheme } = useTheme();
 
-  return {
-    up: currentTheme.colors.status.up,
-    down: currentTheme.colors.status.down,
-    pending: currentTheme.colors.status.pending,
-    unknown: currentTheme.colors.status.unknown,
-  };
+    return {
+        up: currentTheme.colors.status.up,
+        down: currentTheme.colors.status.down,
+        pending: currentTheme.colors.status.pending,
+        unknown: currentTheme.colors.status.unknown,
+    };
 }
 
 // Hook for theme-aware CSS classes
 export function useThemeClasses() {
-  const { currentTheme, getColor } = useTheme();
+    const { currentTheme, getColor } = useTheme();
 
-  const getBackgroundClass = (
-    variant: "primary" | "secondary" | "tertiary" = "primary",
-  ) => {
-    return {
-      backgroundColor: currentTheme.colors.background[variant],
+    const getBackgroundClass = (variant: "primary" | "secondary" | "tertiary" = "primary") => {
+        return {
+            backgroundColor: currentTheme.colors.background[variant],
+        };
     };
-  };
 
-  const getTextClass = (
-    variant: "primary" | "secondary" | "tertiary" | "inverse" = "primary",
-  ) => {
-    return {
-      color: currentTheme.colors.text[variant],
+    const getTextClass = (variant: "primary" | "secondary" | "tertiary" | "inverse" = "primary") => {
+        return {
+            color: currentTheme.colors.text[variant],
+        };
     };
-  };
 
-  const getBorderClass = (
-    variant: "primary" | "secondary" | "focus" = "primary",
-  ) => {
-    return {
-      borderColor: currentTheme.colors.border[variant],
+    const getBorderClass = (variant: "primary" | "secondary" | "focus" = "primary") => {
+        return {
+            borderColor: currentTheme.colors.border[variant],
+        };
     };
-  };
 
-  const getSurfaceClass = (
-    variant: "base" | "elevated" | "overlay" = "base",
-  ) => {
-    return {
-      backgroundColor: currentTheme.colors.surface[variant],
+    const getSurfaceClass = (variant: "base" | "elevated" | "overlay" = "base") => {
+        return {
+            backgroundColor: currentTheme.colors.surface[variant],
+        };
     };
-  };
 
-  const getStatusClass = (status: "up" | "down" | "pending" | "unknown") => {
-    return {
-      color: currentTheme.colors.status[status],
+    const getStatusClass = (status: "up" | "down" | "pending" | "unknown") => {
+        return {
+            color: currentTheme.colors.status[status],
+        };
     };
-  };
 
-  return {
-    getBackgroundClass,
-    getTextClass,
-    getBorderClass,
-    getSurfaceClass,
-    getStatusClass,
-    getColor,
-  };
+    return {
+        getBackgroundClass,
+        getTextClass,
+        getBorderClass,
+        getSurfaceClass,
+        getStatusClass,
+        getColor,
+    };
 }

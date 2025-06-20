@@ -6,259 +6,226 @@ import { SiteList } from "./components/SiteList";
 import { AddSiteForm } from "./components/AddSiteForm";
 import { Settings } from "./components/Settings";
 import { SiteDetails } from "./components/SiteDetails";
-import {
-  ThemeProvider,
-  ThemedBox,
-  ThemedText,
-  ThemedButton,
-} from "./theme/components";
+import { ThemeProvider, ThemedBox, ThemedText, ThemedButton } from "./theme/components";
 import { StatusUpdate } from "./types";
 
 function App() {
-  const {
-    sites,
-    setSites,
-    updateSiteStatus,
-    setMonitoring,
-    checkInterval,
-    setCheckInterval,
-    settings,
-    updateSettings,
-    darkMode,
-    showSettings,
-    setShowSettings,
-    selectedSite,
-    showSiteDetails,
-    setShowSiteDetails,
-    setError,
-    setLoading,
-    lastError,
-    clearError,
-    isLoading,
-  } = useStore();
+    const {
+        sites,
+        setSites,
+        updateSiteStatus,
+        setMonitoring,
+        checkInterval,
+        setCheckInterval,
+        settings,
+        updateSettings,
+        darkMode,
+        showSettings,
+        setShowSettings,
+        selectedSite,
+        showSiteDetails,
+        setShowSiteDetails,
+        setError,
+        setLoading,
+        lastError,
+        clearError,
+        isLoading,
+    } = useStore();
 
-  const { isDark } = useTheme();
+    const { isDark } = useTheme();
 
-  // Delayed loading state to prevent flash for quick operations
-  const [showLoadingOverlay, setShowLoadingOverlay] = useState(false);
+    // Delayed loading state to prevent flash for quick operations
+    const [showLoadingOverlay, setShowLoadingOverlay] = useState(false);
 
-  // Only show loading overlay if loading takes more than 100ms
-  useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
+    // Only show loading overlay if loading takes more than 100ms
+    useEffect(() => {
+        let timeoutId: NodeJS.Timeout;
 
-    if (isLoading) {
-      // Show loading overlay after 100ms delay
-      timeoutId = setTimeout(() => {
-        setShowLoadingOverlay(true);
-      }, 100);
-    } else {
-      // Hide loading overlay immediately when loading stops
-      setShowLoadingOverlay(false);
-    }
-
-    return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-    };
-  }, [isLoading]);
-
-  useEffect(() => {
-    // Apply dark mode class to document
-    if (darkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [darkMode]);
-
-  useEffect(() => {
-    // Load initial sites and sync settings when app starts
-    const loadInitialData = async () => {
-      setLoading(true);
-      try {
-        // Load sites and sync settings from backend
-        const [sites, backendCheckInterval, backendHistoryLimit] = await Promise.all([
-          window.electronAPI.getSites(),
-          window.electronAPI.getCheckInterval(),
-          window.electronAPI.getHistoryLimit(),
-        ]);
-        
-        setSites(sites);
-        
-        // Sync check interval from backend if different
-        if (backendCheckInterval !== checkInterval) {
-          setCheckInterval(backendCheckInterval);
+        if (isLoading) {
+            // Show loading overlay after 100ms delay
+            timeoutId = setTimeout(() => {
+                setShowLoadingOverlay(true);
+            }, 100);
+        } else {
+            // Hide loading overlay immediately when loading stops
+            setShowLoadingOverlay(false);
         }
-        
-        // Sync history limit from backend if different
-        if (backendHistoryLimit !== settings.historyLimit) {
-          updateSettings({ historyLimit: backendHistoryLimit });
+
+        return () => {
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+            }
+        };
+    }, [isLoading]);
+
+    useEffect(() => {
+        // Apply dark mode class to document
+        if (darkMode) {
+            document.documentElement.classList.add("dark");
+        } else {
+            document.documentElement.classList.remove("dark");
         }
-        
-        // Auto-start monitoring if there are sites to monitor
-        if (sites.length > 0) {
-          await window.electronAPI.startMonitoring();
-          setMonitoring(true);
+    }, [darkMode]);
+
+    useEffect(() => {
+        // Load initial sites and sync settings when app starts
+        const loadInitialData = async () => {
+            setLoading(true);
+            try {
+                // Load sites and sync settings from backend
+                const [sites, backendCheckInterval, backendHistoryLimit] = await Promise.all([
+                    window.electronAPI.getSites(),
+                    window.electronAPI.getCheckInterval(),
+                    window.electronAPI.getHistoryLimit(),
+                ]);
+
+                setSites(sites);
+
+                // Sync check interval from backend if different
+                if (backendCheckInterval !== checkInterval) {
+                    setCheckInterval(backendCheckInterval);
+                }
+
+                // Sync history limit from backend if different
+                if (backendHistoryLimit !== settings.historyLimit) {
+                    updateSettings({ historyLimit: backendHistoryLimit });
+                }
+
+                // Auto-start monitoring if there are sites to monitor
+                if (sites.length > 0) {
+                    await window.electronAPI.startMonitoring();
+                    setMonitoring(true);
+                }
+            } catch (error) {
+                console.error("Failed to load initial data:", error);
+                setError("Failed to load initial data");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadInitialData();
+
+        // Listen for status updates
+        const handleStatusUpdate = (update: StatusUpdate) => {
+            updateSiteStatus(update);
+        };
+
+        window.electronAPI.onStatusUpdate(handleStatusUpdate);
+
+        // Cleanup
+        return () => {
+            window.electronAPI.removeAllListeners("status-update");
+        };
+    }, [setSites, updateSiteStatus, setError, setLoading, setMonitoring]);
+
+    const handleStartMonitoring = async () => {
+        setLoading(true);
+        try {
+            await window.electronAPI.startMonitoring();
+            setMonitoring(true);
+        } catch (error) {
+            console.error("Failed to start monitoring:", error);
+            setError("Failed to start monitoring");
+        } finally {
+            setLoading(false);
         }
-      } catch (error) {
-        console.error("Failed to load initial data:", error);
-        setError("Failed to load initial data");
-      } finally {
-        setLoading(false);
-      }
     };
 
-    loadInitialData();
-
-    // Listen for status updates
-    const handleStatusUpdate = (update: StatusUpdate) => {
-      updateSiteStatus(update);
+    const handleStopMonitoring = async () => {
+        setLoading(true);
+        try {
+            await window.electronAPI.stopMonitoring();
+            setMonitoring(false);
+        } catch (error) {
+            console.error("Failed to stop monitoring:", error);
+            setError("Failed to stop monitoring");
+        } finally {
+            setLoading(false);
+        }
     };
 
-    window.electronAPI.onStatusUpdate(handleStatusUpdate);
+    return (
+        <ThemeProvider>
+            <div className={`app-container ${isDark ? "dark" : ""}`}>
+                {/* Global Loading Overlay */}
+                {showLoadingOverlay && (
+                    <div className="loading-overlay">
+                        <ThemedBox surface="elevated" padding="lg" rounded="lg" shadow="xl">
+                            <div className="loading-content">
+                                <div className="loading-spinner"></div>
+                                <ThemedText size="base" weight="medium">
+                                    Loading...
+                                </ThemedText>
+                            </div>
+                        </ThemedBox>
+                    </div>
+                )}
 
-    // Cleanup
-    return () => {
-      window.electronAPI.removeAllListeners("status-update");
-    };
-  }, [setSites, updateSiteStatus, setError, setLoading, setMonitoring]);
+                {/* Global Error Notification */}
+                {lastError && (
+                    <div className="fixed top-0 left-0 right-0 z-50">
+                        <ThemedBox surface="elevated" padding="md" className="rounded-none border-l-4 border-red-500">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-2">
+                                    <div className="text-red-500">⚠️</div>
+                                    <ThemedText size="sm" className="text-red-600 dark:text-red-400">
+                                        {lastError}
+                                    </ThemedText>
+                                </div>
+                                <ThemedButton
+                                    variant="secondary"
+                                    size="sm"
+                                    onClick={clearError}
+                                    className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200"
+                                >
+                                    ✕
+                                </ThemedButton>
+                            </div>
+                        </ThemedBox>
+                    </div>
+                )}
 
-  const handleStartMonitoring = async () => {
-    setLoading(true);
-    try {
-      await window.electronAPI.startMonitoring();
-      setMonitoring(true);
-    } catch (error) {
-      console.error("Failed to start monitoring:", error);
-      setError("Failed to start monitoring");
-    } finally {
-      setLoading(false);
-    }
-  };
+                <Header onStartMonitoring={handleStartMonitoring} onStopMonitoring={handleStopMonitoring} />
 
-  const handleStopMonitoring = async () => {
-    setLoading(true);
-    try {
-      await window.electronAPI.stopMonitoring();
-      setMonitoring(false);
-    } catch (error) {
-      console.error("Failed to stop monitoring:", error);
-      setError("Failed to stop monitoring");
-    } finally {
-      setLoading(false);
-    }
-  };
+                <main className="main-container">
+                    <div className="grid-layout">
+                        {/* Main content */}
+                        <div>
+                            <ThemedBox surface="elevated" padding="md" shadow="sm" rounded="lg">
+                                <ThemedBox surface="base" padding="md" border className="border-b">
+                                    <ThemedText size="lg" weight="medium">
+                                        Monitored Sites ({sites.length})
+                                    </ThemedText>
+                                </ThemedBox>
+                                <div className="p-0">
+                                    <SiteList />
+                                </div>
+                            </ThemedBox>
+                        </div>
 
-  return (
-    <ThemeProvider>
-      <div className={`app-container ${isDark ? "dark" : ""}`}>
-        {/* Global Loading Overlay */}
-        {showLoadingOverlay && (
-          <div className="loading-overlay">
-            <ThemedBox surface="elevated" padding="lg" rounded="lg" shadow="xl">
-              <div className="loading-content">
-                <div className="loading-spinner"></div>
-                <ThemedText size="base" weight="medium">
-                  Loading...
-                </ThemedText>
-              </div>
-            </ThemedBox>
-          </div>
-        )}
+                        {/* Sidebar */}
+                        <div>
+                            <ThemedBox surface="elevated" padding="lg" shadow="sm" rounded="lg">
+                                <ThemedText size="lg" weight="medium" className="mb-4">
+                                    Add New Site
+                                </ThemedText>
+                                <AddSiteForm />
+                            </ThemedBox>
+                        </div>
+                    </div>
+                </main>
 
-        {/* Global Error Notification */}
-        {lastError && (
-          <div className="fixed top-0 left-0 right-0 z-50">
-            <ThemedBox
-              surface="elevated"
-              padding="md"
-              className="rounded-none border-l-4 border-red-500"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <div className="text-red-500">⚠️</div>
-                  <ThemedText
-                    size="sm"
-                    className="text-red-600 dark:text-red-400"
-                  >
-                    {lastError}
-                  </ThemedText>
-                </div>
-                <ThemedButton
-                  variant="secondary"
-                  size="sm"
-                  onClick={clearError}
-                  className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200"
-                >
-                  ✕
-                </ThemedButton>
-              </div>
-            </ThemedBox>
-          </div>
-        )}
+                {/* Settings Modal */}
+                {showSettings && <Settings onClose={() => setShowSettings(false)} />}
 
-        <Header
-          onStartMonitoring={handleStartMonitoring}
-          onStopMonitoring={handleStopMonitoring}
-        />
-
-        <main className="main-container">
-          <div className="grid-layout">
-            {/* Main content */}
-            <div>
-              <ThemedBox
-                surface="elevated"
-                padding="md"
-                shadow="sm"
-                rounded="lg"
-              >
-                <ThemedBox
-                  surface="base"
-                  padding="md"
-                  border
-                  className="border-b"
-                >
-                  <ThemedText size="lg" weight="medium">
-                    Monitored Sites ({sites.length})
-                  </ThemedText>
-                </ThemedBox>
-                <div className="p-0">
-                  <SiteList />
-                </div>
-              </ThemedBox>
+                {/* Site Details Modal */}
+                {showSiteDetails && selectedSite && (
+                    <SiteDetails site={selectedSite} onClose={() => setShowSiteDetails(false)} />
+                )}
             </div>
-
-            {/* Sidebar */}
-            <div>
-              <ThemedBox
-                surface="elevated"
-                padding="lg"
-                shadow="sm"
-                rounded="lg"
-              >
-                <ThemedText size="lg" weight="medium" className="mb-4">
-                  Add New Site
-                </ThemedText>
-                <AddSiteForm />
-              </ThemedBox>
-            </div>
-          </div>
-        </main>
-
-        {/* Settings Modal */}
-        {showSettings && <Settings onClose={() => setShowSettings(false)} />}
-
-        {/* Site Details Modal */}
-        {showSiteDetails && selectedSite && (
-          <SiteDetails
-            site={selectedSite}
-            onClose={() => setShowSiteDetails(false)}
-          />
-        )}
-      </div>
-    </ThemeProvider>
-  );
+        </ThemeProvider>
+    );
 }
 
 export default App;

@@ -8909,9 +8909,7 @@ class UptimeMonitor extends events.EventEmitter {
     this.isMonitoring = false;
   }
   async checkAllSites() {
-    const promises2 = Array.from(this.sites.values()).map(
-      (site) => this.checkSite(site)
-    );
+    const promises2 = Array.from(this.sites.values()).map((site) => this.checkSite(site));
     await Promise.allSettled(promises2);
   }
   async checkSite(site) {

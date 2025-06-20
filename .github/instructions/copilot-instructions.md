@@ -21,27 +21,27 @@ The application uses Zustand for centralized state management with the following
 
 ```typescript
 interface AppState {
-  // Core data
-  sites: Site[];
-  isMonitoring: boolean;
-  checkInterval: number;
-  settings: AppSettings;
-  
-  // UI state
-  showSettings: boolean;
-  selectedSite: Site | null;
-  showSiteDetails: boolean;
-  
-  // Error handling
-  lastError: string | null;
-  isLoading: boolean;
-  
-  // Statistics
-  totalUptime: number;
-  totalDowntime: number;
-  
-  // Legacy compatibility
-  darkMode: boolean; // Synced with settings.theme
+ // Core data
+ sites: Site[];
+ isMonitoring: boolean;
+ checkInterval: number;
+ settings: AppSettings;
+
+ // UI state
+ showSettings: boolean;
+ selectedSite: Site | null;
+ showSiteDetails: boolean;
+
+ // Error handling
+ lastError: string | null;
+ isLoading: boolean;
+
+ // Statistics
+ totalUptime: number;
+ totalDowntime: number;
+
+ // Legacy compatibility
+ darkMode: boolean; // Synced with settings.theme
 }
 ```
 
@@ -49,14 +49,14 @@ interface AppState {
 
 ```typescript
 interface AppSettings {
-  notifications: boolean;
-  autoStart: boolean;
-  minimizeToTray: boolean;
-  theme: ThemeName; // "light" | "dark" | "high-contrast" | "system"
-  timeout: number;
-  maxRetries: number;
-  soundAlerts: boolean;
-  historyLimit: number;
+ notifications: boolean;
+ autoStart: boolean;
+ minimizeToTray: boolean;
+ theme: ThemeName; // "light" | "dark" | "high-contrast" | "system"
+ timeout: number;
+ maxRetries: number;
+ soundAlerts: boolean;
+ historyLimit: number;
 }
 ```
 
@@ -69,15 +69,15 @@ const { sites, addSite, updateSiteStatus, setError, setLoading } = useStore();
 
 // Add site with proper error handling
 const handleAddSite = async (siteData) => {
-  setLoading(true);
-  try {
-    const newSite = await window.electronAPI.addSite(siteData);
-    addSite(newSite);
-  } catch (error) {
-    setError(`Failed to add site: ${error.message}`);
-  } finally {
-    setLoading(false);
-  }
+ setLoading(true);
+ try {
+  const newSite = await window.electronAPI.addSite(siteData);
+  addSite(newSite);
+ } catch (error) {
+  setError(`Failed to add site: ${error.message}`);
+ } finally {
+  setLoading(false);
+ }
 };
 ```
 
@@ -100,18 +100,18 @@ All async operations should follow this pattern:
 const { setError, setLoading, clearError } = useStore();
 
 const handleAsyncOperation = async () => {
-  setLoading(true);
-  clearError(); // Clear previous errors
-  
-  try {
-    const result = await window.electronAPI.someOperation();
-    // Update state with result
-    // Show success notification if needed
-  } catch (error) {
-    setError(`Operation failed: ${error.message}`);
-  } finally {
-    setLoading(false);
-  }
+ setLoading(true);
+ clearError(); // Clear previous errors
+
+ try {
+  const result = await window.electronAPI.someOperation();
+  // Update state with result
+  // Show success notification if needed
+ } catch (error) {
+  setError(`Operation failed: ${error.message}`);
+ } finally {
+  setLoading(false);
+ }
 };
 ```
 
@@ -142,13 +142,13 @@ The theme system is built around a singleton ThemeManager that handles:
 
 ```typescript
 interface Theme {
-  name: string;
-  colors: ThemeColors; // Comprehensive color palette
-  spacing: ThemeSpacing; // Consistent spacing scale
-  typography: ThemeTypography; // Typography system
-  shadows: ThemeShadows; // Box shadow variations
-  borderRadius: ThemeBorderRadius; // Consistent border radius
-  isDark: boolean; // Dark mode flag
+ name: string;
+ colors: ThemeColors; // Comprehensive color palette
+ spacing: ThemeSpacing; // Consistent spacing scale
+ typography: ThemeTypography; // Typography system
+ shadows: ThemeShadows; // Box shadow variations
+ borderRadius: ThemeBorderRadius; // Consistent border radius
+ isDark: boolean; // Dark mode flag
 }
 ```
 
@@ -161,7 +161,7 @@ The theme system is connected to the state store through the `settings.theme` pr
 const { settings, updateSettings } = useStore();
 
 const setTheme = (themeName: ThemeName) => {
-  updateSettings({ theme: themeName });
+ updateSettings({ theme: themeName });
 };
 ```
 
@@ -171,16 +171,16 @@ const setTheme = (themeName: ThemeName) => {
 
 ```typescript
 const {
-  currentTheme,       // Current active theme object
-  themeName,          // Current theme name from settings
-  systemTheme,        // System preference ("light" | "dark")
-  setTheme,           // Change theme function
-  toggleTheme,        // Toggle between light/dark
-  getColor,           // Get theme color by path
-  getStatusColor,     // Get status-specific colors
-  availableThemes,    // List of available themes
-  isDark,             // Boolean for dark mode
-  themeManager        // Direct access to manager
+ currentTheme, // Current active theme object
+ themeName, // Current theme name from settings
+ systemTheme, // System preference ("light" | "dark")
+ setTheme, // Change theme function
+ toggleTheme, // Toggle between light/dark
+ getColor, // Get theme color by path
+ getStatusColor, // Get status-specific colors
+ availableThemes, // List of available themes
+ isDark, // Boolean for dark mode
+ themeManager, // Direct access to manager
 } = useTheme();
 ```
 
@@ -188,12 +188,12 @@ const {
 
 ```typescript
 const {
-  getBackgroundClass,  // Background color styles
-  getTextClass,        // Text color styles
-  getBorderClass,      // Border color styles
-  getSurfaceClass,     // Surface color styles
-  getStatusClass,      // Status color styles
-  getColor            // Direct color access
+ getBackgroundClass, // Background color styles
+ getTextClass, // Text color styles
+ getBorderClass, // Border color styles
+ getSurfaceClass, // Surface color styles
+ getStatusClass, // Status color styles
+ getColor, // Direct color access
 } = useThemeClasses();
 ```
 
@@ -201,7 +201,7 @@ const {
 
 ```typescript
 // For theme-dependent values
-const fontSize = useThemeValue(theme => theme.typography.fontSize.lg);
+const fontSize = useThemeValue((theme) => theme.typography.fontSize.lg);
 
 // For status colors
 const { up, down, pending, unknown } = useStatusColors();
@@ -273,7 +273,7 @@ Most components support variants that automatically adapt to the current theme:
 <ThemedBox variant="secondary" />   // Secondary background
 <ThemedBox variant="tertiary" />    // Subtle background
 
-// Surface variants  
+// Surface variants
 <ThemedBox surface="base" />        // Base surface
 <ThemedBox surface="elevated" />    // Elevated surface
 <ThemedBox surface="overlay" />     // Modal/overlay surface
@@ -294,24 +294,26 @@ Most components support variants that automatically adapt to the current theme:
 When creating new components, follow these patterns:
 
 #### 1. Use Store for State Management
+
 ```typescript
 import { useStore } from "../store";
 
 function NewComponent() {
-  const { 
-    // Select only what you need
-    sites, 
-    addSite, 
-    setError, 
-    setLoading,
-    isLoading 
-  } = useStore();
-  
-  // Component logic
+ const {
+  // Select only what you need
+  sites,
+  addSite,
+  setError,
+  setLoading,
+  isLoading,
+ } = useStore();
+
+ // Component logic
 }
 ```
 
 #### 2. Use Themed Components
+
 ```typescript
 import {
   ThemedBox,
@@ -322,7 +324,7 @@ import { useTheme } from "../theme/useTheme";
 
 function NewComponent() {
   const { getStatusColor } = useTheme();
-  
+
   return (
     <ThemedBox variant="primary" padding="lg">
       <ThemedText variant="primary" size="lg">
@@ -334,35 +336,38 @@ function NewComponent() {
 ```
 
 #### 3. Implement Error Handling
+
 ```typescript
 function NewComponent() {
-  const { setError, setLoading, clearError } = useStore();
-  
-  const handleAction = async () => {
-    setLoading(true);
-    clearError();
-    
-    try {
-      await someAsyncOperation();
-      // Handle success
-    } catch (error) {
-      setError(`Action failed: ${error.message}`);
-    } finally {
-      setLoading(false);
-    }
-  };
+ const { setError, setLoading, clearError } = useStore();
+
+ const handleAction = async () => {
+  setLoading(true);
+  clearError();
+
+  try {
+   await someAsyncOperation();
+   // Handle success
+  } catch (error) {
+   setError(`Action failed: ${error.message}`);
+  } finally {
+   setLoading(false);
+  }
+ };
 }
 ```
 
 ### Modifying Existing Components
 
 #### State Updates
+
 - Always use store actions, never mutate state directly
 - Clear previous errors before new operations
 - Use loading states for user feedback
 - Handle both success and error cases
 
 #### Theme Updates
+
 - Use themed components instead of hardcoded styles
 - Leverage the variant system for consistency
 - Use theme hooks for dynamic styling
@@ -371,6 +376,7 @@ function NewComponent() {
 ### Error Handling Patterns
 
 #### Global Error Display
+
 Errors are automatically displayed in the main App component:
 
 ```typescript
@@ -384,15 +390,16 @@ Errors are automatically displayed in the main App component:
 ```
 
 #### Component-Level Error Handling
+
 ```typescript
 function ComponentWithAsyncAction() {
   const { setError, setLoading, isLoading } = useStore();
   const [localError, setLocalError] = useState<string | null>(null);
-  
+
   const handleAction = async () => {
     setLoading(true);
     setLocalError(null);
-    
+
     try {
       const result = await window.electronAPI.action();
       // Handle success
@@ -405,14 +412,14 @@ function ComponentWithAsyncAction() {
       setLoading(false);
     }
   };
-  
+
   return (
     <ThemedBox>
       {localError && (
         <ThemedText variant="error">{localError}</ThemedText>
       )}
-      <ThemedButton 
-        disabled={isLoading} 
+      <ThemedButton
+        disabled={isLoading}
         loading={isLoading}
         onClick={handleAction}
       >
@@ -426,6 +433,7 @@ function ComponentWithAsyncAction() {
 ## 🎯 Common Patterns and Best Practices
 
 ### State Selection Optimization
+
 ```typescript
 // ✅ Good: Select only what you need
 const { sites, addSite } = useStore();
@@ -435,6 +443,7 @@ const store = useStore();
 ```
 
 ### Theme Integration
+
 ```typescript
 // ✅ Good: Use theme hooks for dynamic values
 const { getStatusColor, currentTheme } = useTheme();
@@ -445,55 +454,60 @@ const statusColor = site.status === "up" ? "#10b981" : "#ef4444";
 ```
 
 ### Loading State Management
+
 ```typescript
 // ✅ Good: Centralized loading with delayed UI updates
 const { isLoading, setLoading } = useStore();
 const [showLoadingSpinner, setShowLoadingSpinner] = useState(false);
 
 useEffect(() => {
-  let timeoutId: NodeJS.Timeout;
-  
-  if (isLoading) {
-    // Prevent flash for quick operations
-    timeoutId = setTimeout(() => setShowLoadingSpinner(true), 100);
-  } else {
-    setShowLoadingSpinner(false);
-  }
-  
-  return () => timeoutId && clearTimeout(timeoutId);
+ let timeoutId: NodeJS.Timeout;
+
+ if (isLoading) {
+  // Prevent flash for quick operations
+  timeoutId = setTimeout(() => setShowLoadingSpinner(true), 100);
+ } else {
+  setShowLoadingSpinner(false);
+ }
+
+ return () => timeoutId && clearTimeout(timeoutId);
 }, [isLoading]);
 ```
 
 ### Settings Integration
+
 ```typescript
 // ✅ Good: Update settings through store
 const { settings, updateSettings } = useStore();
 
 const handleSettingChange = (key: keyof AppSettings, value: any) => {
-  updateSettings({ [key]: value });
-  
-  // Sync with electron backend if needed
-  if (key === 'historyLimit') {
-    window.electronAPI.updateHistoryLimit(value);
-  }
+ updateSettings({ [key]: value });
+
+ // Sync with electron backend if needed
+ if (key === "historyLimit") {
+  window.electronAPI.updateHistoryLimit(value);
+ }
 };
 ```
 
 ## 🚫 Common Pitfalls to Avoid
 
 ### State Management
+
 - ❌ Don't mutate state directly: `sites.push(newSite)`
 - ❌ Don't ignore error handling in async operations
 - ❌ Don't use local state for data that needs persistence
 - ❌ Don't forget to clear loading states in finally blocks
 
 ### Theme Integration
+
 - ❌ Don't hardcode colors or spacing values
 - ❌ Don't create custom CSS classes instead of using themed components
 - ❌ Don't ignore system theme preferences
 - ❌ Don't forget to handle theme changes in dynamic content
 
 ### Performance
+
 - ❌ Don't select entire store when only specific values are needed
 - ❌ Don't create unnecessary re-renders by not memoizing callbacks
 - ❌ Don't forget to clean up event listeners and timers
@@ -501,23 +515,26 @@ const handleSettingChange = (key: keyof AppSettings, value: any) => {
 ## 🔍 Debugging and Development
 
 ### Development Tools
+
 - Use browser dev tools to inspect CSS custom properties
 - Check Redux DevTools (Zustand supports it) for state changes
 - Use React Developer Tools to inspect component props and state
 
 ### Theme Debugging
+
 ```typescript
 // Access theme manager directly for debugging
 const { themeManager } = useTheme();
-console.log('Current theme:', themeManager.getTheme('system'));
-console.log('Available themes:', themeManager.getAvailableThemes());
+console.log("Current theme:", themeManager.getTheme("system"));
+console.log("Available themes:", themeManager.getAvailableThemes());
 ```
 
 ### State Debugging
+
 ```typescript
 // Log state changes during development
 const store = useStore();
-console.log('Current state:', store.getState());
+console.log("Current state:", store.getState());
 ```
 
 ## 📋 Checklist for New Features
@@ -525,6 +542,7 @@ console.log('Current state:', store.getState());
 When implementing new features, ensure:
 
 ### State Integration
+
 - [ ] Uses `useStore()` hook for all state access
 - [ ] Implements proper error handling with `setError` and `clearError`
 - [ ] Uses loading states with `setLoading` for async operations
@@ -532,6 +550,7 @@ When implementing new features, ensure:
 - [ ] Persists only necessary state (not UI state)
 
 ### Theme Integration
+
 - [ ] Uses themed components instead of custom styling
 - [ ] Leverages the variant system for consistency
 - [ ] Responds to theme changes automatically
@@ -539,12 +558,14 @@ When implementing new features, ensure:
 - [ ] Uses theme hooks for dynamic styling
 
 ### Error Handling
+
 - [ ] Handles both success and error cases
 - [ ] Provides meaningful error messages to users
 - [ ] Clears previous errors before new operations
 - [ ] Uses try-catch-finally pattern consistently
 
 ### Performance
+
 - [ ] Selects only needed state properties
 - [ ] Avoids unnecessary re-renders
 - [ ] Cleans up event listeners and timers
@@ -555,6 +576,7 @@ When implementing new features, ensure:
 The Uptime Watcher application has a robust and well-integrated state management and theme system. By following these patterns and guidelines, you can maintain consistency, ensure proper error handling, and create a seamless user experience across all features.
 
 Key principles:
+
 1. **Centralized state** through Zustand store
 2. **Themed components** for consistent UI
 3. **Proper error handling** with user feedback
