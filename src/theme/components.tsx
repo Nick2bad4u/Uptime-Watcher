@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTheme, useThemeClasses } from '../theme/useTheme';
+import './components.css';
 
 interface ThemeProviderProps {
   children: React.ReactNode;
@@ -191,8 +192,7 @@ export function ThemedButton({
     opacity: disabled || loading ? 0.6 : 1,
     width: fullWidth ? '100%' : 'auto',
     transition: 'all 0.2s ease-in-out',
-  };
-    return (
+  };  return (
     <button
       type={type}
       className={className}
@@ -200,7 +200,14 @@ export function ThemedButton({
       onClick={onClick}
       disabled={disabled || loading}
     >
-      {loading ? 'Loading...' : children}
+      {loading ? (
+        <div className="flex items-center space-x-2">
+          <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-current"></div>
+          <span>{children}</span>
+        </div>
+      ) : (
+        children
+      )}
     </button>
   );
 }

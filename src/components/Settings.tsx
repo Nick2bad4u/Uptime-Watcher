@@ -10,6 +10,7 @@ import {
 } from "../theme/components";
 import { useTheme } from "../theme/useTheme";
 import { CHECK_INTERVALS } from "../constants";
+import { useState, useEffect } from "react";
 
 interface SettingsProps {
   onClose: () => void;
@@ -30,6 +31,29 @@ export function Settings({ onClose }: SettingsProps) {
   } = useStore();
 
   const { setTheme, availableThemes } = useTheme();
+
+  // Delayed loading state for button spinners (100ms delay)
+  const [showButtonLoading, setShowButtonLoading] = useState(false);
+
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+
+    if (isLoading) {
+      // Show button loading after 100ms delay
+      timeoutId = setTimeout(() => {
+        setShowButtonLoading(true);
+      }, 100);
+    } else {
+      // Hide button loading immediately when loading stops
+      setShowButtonLoading(false);
+    }
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [isLoading]);
 
   const handleSettingChange = (key: keyof typeof settings, value: any) => {
     updateSettings({ [key]: value });
@@ -319,6 +343,7 @@ export function Settings({ onClose }: SettingsProps) {
               size="sm"
               onClick={handleReset}
               disabled={isLoading}
+              loading={showButtonLoading}
             >
               Reset to Defaults
             </ThemedButton>
@@ -335,7 +360,7 @@ export function Settings({ onClose }: SettingsProps) {
                 variant="primary"
                 size="sm"
                 onClick={onClose}
-                loading={isLoading}
+                loading={showButtonLoading}
               >
                 Save Changes
               </ThemedButton>

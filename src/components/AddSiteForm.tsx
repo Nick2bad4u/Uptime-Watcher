@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useStore } from "../store";
 import { ThemedBox, ThemedText, ThemedButton, ThemedInput } from "../theme/components";
 
@@ -6,6 +6,29 @@ export function AddSiteForm() {
   const { addSite, setError, setLoading, isLoading, lastError, clearError } = useStore();
   const [url, setUrl] = useState("");
   const [name, setName] = useState("");
+
+  // Delayed loading state for button spinner (100ms delay)
+  const [showButtonLoading, setShowButtonLoading] = useState(false);
+
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+
+    if (isLoading) {
+      // Show button loading after 100ms delay
+      timeoutId = setTimeout(() => {
+        setShowButtonLoading(true);
+      }, 100);
+    } else {
+      // Hide button loading immediately when loading stops
+      setShowButtonLoading(false);
+    }
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [isLoading]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,7 +93,7 @@ export function AddSiteForm() {
         variant="primary"
         disabled={!url.trim() || isLoading}
         fullWidth
-        loading={isLoading}
+        loading={showButtonLoading}
       >
         Add Site
       </ThemedButton>

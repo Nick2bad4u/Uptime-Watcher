@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useStore } from "./store";
 import { Header } from "./components/Header";
 import { SiteList } from "./components/SiteList";
@@ -22,6 +22,30 @@ function App() {
     clearError,
     isLoading,
   } = useStore();
+
+  // Delayed loading state to prevent flash for quick operations
+  const [showLoadingOverlay, setShowLoadingOverlay] = useState(false);
+
+  // Only show loading overlay if loading takes more than 100ms
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+
+    if (isLoading) {
+      // Show loading overlay after 100ms delay
+      timeoutId = setTimeout(() => {
+        setShowLoadingOverlay(true);
+      }, 100);
+    } else {
+      // Hide loading overlay immediately when loading stops
+      setShowLoadingOverlay(false);
+    }
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [isLoading]);
 
   useEffect(() => {
     // Apply dark mode class to document
@@ -91,13 +115,13 @@ function App() {
   return (
     <ThemeProvider>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        {/* Global Loading Indicator */}
-        {isLoading && (
-          <div className="fixed top-0 left-0 right-0 z-50">
-            <ThemedBox surface="elevated" padding="sm" className="rounded-none">
-              <div className="flex items-center justify-center space-x-2">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                <ThemedText size="sm">Loading...</ThemedText>
+        {/* Global Loading Overlay */}
+        {showLoadingOverlay && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <ThemedBox surface="elevated" padding="lg" rounded="lg" shadow="xl">
+              <div className="flex items-center space-x-3">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                <ThemedText size="base" weight="medium">Loading...</ThemedText>
               </div>
             </ThemedBox>
           </div>

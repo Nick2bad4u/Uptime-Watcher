@@ -2,6 +2,7 @@ import { useStore } from "../store";
 import { ThemedBox, ThemedText, ThemedButton, StatusIndicator, ThemedSelect } from "../theme/components";
 import { useTheme } from "../theme/useTheme";
 import { CHECK_INTERVALS } from "../constants";
+import { useState, useEffect } from "react";
 
 interface HeaderProps {
   onStartMonitoring: () => void;
@@ -22,6 +23,29 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
   } = useStore();
 
   const { toggleTheme } = useTheme();
+
+  // Delayed loading state for button spinners (100ms delay)
+  const [showButtonLoading, setShowButtonLoading] = useState(false);
+
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+
+    if (isLoading) {
+      // Show button loading after 100ms delay
+      timeoutId = setTimeout(() => {
+        setShowButtonLoading(true);
+      }, 100);
+    } else {
+      // Hide button loading immediately when loading stops
+      setShowButtonLoading(false);
+    }
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [isLoading]);
 
   const upSites = sites.filter((site) => site.status === "up").length;
   const downSites = sites.filter((site) => site.status === "down").length;
@@ -125,7 +149,8 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
                   size="sm"
                   onClick={handleStopMonitoring}
                   disabled={isLoading}
-                  loading={isLoading}
+                  loading={showButtonLoading}
+                  className="min-w-[140px]"
                 >
                   ⏸️ Stop Monitoring
                 </ThemedButton>
@@ -135,7 +160,8 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
                   size="sm"
                   onClick={handleStartMonitoring}
                   disabled={isLoading}
-                  loading={isLoading}
+                  loading={showButtonLoading}
+                  className="min-w-[140px]"
                 >
                   ▶️ Start Monitoring
                 </ThemedButton>
