@@ -78,6 +78,18 @@ class Main {
       return this.uptimeMonitor.setCheckInterval(interval);
     });
 
+    ipcMain.handle("get-check-interval", async () => {
+      return this.uptimeMonitor.getCheckInterval();
+    });
+
+    ipcMain.handle("update-history-limit", async (_, limit) => {
+      return this.uptimeMonitor.setHistoryLimit(limit);
+    });
+
+    ipcMain.handle("get-history-limit", async () => {
+      return this.uptimeMonitor.getHistoryLimit();
+    });
+
     ipcMain.handle("start-monitoring", async () => {
       this.uptimeMonitor.startMonitoring();
       return true;
@@ -90,7 +102,17 @@ class Main {
 
     ipcMain.handle("check-site-now", async (_, url) => {
       return this.uptimeMonitor.checkSiteManually(url);
-    }); // Listen for status updates from monitor
+    });
+
+    ipcMain.handle("export-data", async () => {
+      return this.uptimeMonitor.exportData();
+    });
+
+    ipcMain.handle("import-data", async (_, data) => {
+      return this.uptimeMonitor.importData(data);
+    });
+
+    // Listen for status updates from monitor
     this.uptimeMonitor.on("status-update", (data: StatusUpdate) => {
       this.mainWindow?.webContents.send("status-update", data);
     });

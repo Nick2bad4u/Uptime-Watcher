@@ -12,6 +12,7 @@ interface AppSettings {
   timeout: number;
   maxRetries: number;
   soundAlerts: boolean;
+  historyLimit: number;
 }
 
 interface AppState {
@@ -64,6 +65,7 @@ const defaultSettings: AppSettings = {
   timeout: 10000,
   maxRetries: 3,
   soundAlerts: false,
+  historyLimit: 100,
 };
 
 export const useStore = create<AppState>()(

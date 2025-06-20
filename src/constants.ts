@@ -17,3 +17,16 @@ export const CHECK_INTERVALS: IntervalOption[] = [
 
 // Default check interval (1 minute)
 export const DEFAULT_CHECK_INTERVAL = 60000;
+
+// History limit options
+export const HISTORY_LIMIT_OPTIONS: IntervalOption[] = [
+  { value: 25, label: "25 records" },
+  { value: 50, label: "50 records" },
+  { value: 100, label: "100 records" },
+  { value: 200, label: "200 records" },
+  { value: 500, label: "500 records" },
+  { value: 1000, label: "1000 records" },
+];
+
+// Default history limit
+export const DEFAULT_HISTORY_LIMIT = 100;

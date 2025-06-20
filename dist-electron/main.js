@@ -8806,6 +8806,8 @@ class UptimeMonitor extends events.EventEmitter {
     __publicField(this, "sites", /* @__PURE__ */ new Map());
     __publicField(this, "checkInterval", 6e4);
     // 1 minute default
+    __publicField(this, "historyLimit", 100);
+    // Default history limit
     __publicField(this, "monitoringInterval", null);
     __publicField(this, "isMonitoring", false);
     this.initDatabase();
@@ -8815,25 +8817,37 @@ class UptimeMonitor extends events.EventEmitter {
     const defaultData = {
       sites: [],
       settings: {
-        checkInterval: 6e4
+        checkInterval: 6e4,
+        historyLimit: 100
       }
     };
     this.db = await JSONFilePreset(dbPath, defaultData);
     await this.loadSites();
   }
   async loadSites() {
+    var _a, _b;
     await this.db.read();
     const sites = this.db.data.sites || [];
     for (const siteData of sites) {
       const site = {
         ...siteData,
-        lastChecked: siteData.lastChecked ? new Date(siteData.lastChecked) : void 0,
-        history: siteData.history || []
+        lastChecked: siteData.lastChecked ? new Date(siteData.lastChecked) : void 0
       };
       this.sites.set(site.url, site);
     }
+    this.checkInterval = ((_a = this.db.data.settings) == null ? void 0 : _a.checkInterval) || 6e4;
+    this.historyLimit = ((_b = this.db.data.settings) == null ? void 0 : _b.historyLimit) || 100;
   }
-  addSite(siteData) {
+  async saveSites() {
+    const sitesArray = Array.from(this.sites.values());
+    this.db.data.sites = sitesArray;
+    this.db.data.settings = {
+      checkInterval: this.checkInterval,
+      historyLimit: this.historyLimit
+    };
+    await this.db.write();
+  }
+  async addSite(siteData) {
     const site = {
       id: Date.now().toString(),
       ...siteData,
@@ -8841,30 +8855,43 @@ class UptimeMonitor extends events.EventEmitter {
       history: []
     };
     this.sites.set(site.url, site);
-    this.saveSites();
+    await this.saveSites();
+    await this.checkSite(site);
     return site;
   }
-  removeSite(url) {
-    const site = this.sites.get(url);
-    if (!site) return false;
-    this.sites.delete(url);
-    this.saveSites();
-    return true;
+  async removeSite(url) {
+    const removed = this.sites.delete(url);
+    if (removed) {
+      await this.saveSites();
+    }
+    return removed;
   }
-  async saveSites() {
-    await this.db.read();
-    this.db.data.sites = Array.from(this.sites.values());
-    await this.db.write();
-  }
-  getSites() {
+  async getSites() {
     return Array.from(this.sites.values());
   }
   setCheckInterval(interval) {
     this.checkInterval = interval;
+    this.saveSites();
     if (this.isMonitoring) {
       this.stopMonitoring();
       this.startMonitoring();
     }
+  }
+  getCheckInterval() {
+    return this.checkInterval;
+  }
+  setHistoryLimit(limit) {
+    this.historyLimit = Math.max(10, Math.min(1e3, limit));
+    this.saveSites();
+    for (const site of this.sites.values()) {
+      if (site.history.length > this.historyLimit) {
+        site.history = site.history.slice(0, this.historyLimit);
+      }
+    }
+    this.saveSites();
+  }
+  getHistoryLimit() {
+    return this.historyLimit;
   }
   startMonitoring() {
     if (this.isMonitoring) return;
@@ -8875,12 +8902,11 @@ class UptimeMonitor extends events.EventEmitter {
     this.checkAllSites();
   }
   stopMonitoring() {
-    if (!this.isMonitoring) return;
-    this.isMonitoring = false;
     if (this.monitoringInterval) {
       clearInterval(this.monitoringInterval);
       this.monitoringInterval = null;
     }
+    this.isMonitoring = false;
   }
   async checkAllSites() {
     const promises2 = Array.from(this.sites.values()).map(
@@ -8915,8 +8941,8 @@ class UptimeMonitor extends events.EventEmitter {
       responseTime
     };
     site.history.unshift(historyEntry);
-    if (site.history.length > 100) {
-      site.history = site.history.slice(0, 100);
+    if (site.history.length > this.historyLimit) {
+      site.history = site.history.slice(0, this.historyLimit);
     }
     this.saveSites();
     const statusUpdate = {
@@ -8937,6 +8963,23 @@ class UptimeMonitor extends events.EventEmitter {
       throw new Error(`Site with URL ${url} not found`);
     }
     return await this.checkSite(site);
+  }
+  // Export/Import functionality
+  async exportData() {
+    await this.db.read();
+    return JSON.stringify(this.db.data, null, 2);
+  }
+  async importData(data) {
+    try {
+      const parsedData = JSON.parse(data);
+      this.db.data = parsedData;
+      await this.db.write();
+      await this.loadSites();
+      return true;
+    } catch (error) {
+      console.error("Failed to import data:", error);
+      return false;
+    }
   }
 }
 class Main {
@@ -9001,6 +9044,15 @@ class Main {
     electron.ipcMain.handle("update-check-interval", async (_, interval) => {
       return this.uptimeMonitor.setCheckInterval(interval);
     });
+    electron.ipcMain.handle("get-check-interval", async () => {
+      return this.uptimeMonitor.getCheckInterval();
+    });
+    electron.ipcMain.handle("update-history-limit", async (_, limit) => {
+      return this.uptimeMonitor.setHistoryLimit(limit);
+    });
+    electron.ipcMain.handle("get-history-limit", async () => {
+      return this.uptimeMonitor.getHistoryLimit();
+    });
     electron.ipcMain.handle("start-monitoring", async () => {
       this.uptimeMonitor.startMonitoring();
       return true;
@@ -9011,6 +9063,12 @@ class Main {
     });
     electron.ipcMain.handle("check-site-now", async (_, url) => {
       return this.uptimeMonitor.checkSiteManually(url);
+    });
+    electron.ipcMain.handle("export-data", async () => {
+      return this.uptimeMonitor.exportData();
+    });
+    electron.ipcMain.handle("import-data", async (_, data) => {
+      return this.uptimeMonitor.importData(data);
     });
     this.uptimeMonitor.on("status-update", (data) => {
       var _a;

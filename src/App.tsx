@@ -20,6 +20,10 @@ function App() {
     setSites,
     updateSiteStatus,
     setMonitoring,
+    checkInterval,
+    setCheckInterval,
+    settings,
+    updateSettings,
     darkMode,
     showSettings,
     setShowSettings,
@@ -69,21 +73,43 @@ function App() {
   }, [darkMode]);
 
   useEffect(() => {
-    // Load initial sites when app starts
-    const loadSites = async () => {
+    // Load initial sites and sync settings when app starts
+    const loadInitialData = async () => {
       setLoading(true);
       try {
-        const sites = await window.electronAPI.getSites();
+        // Load sites and sync settings from backend
+        const [sites, backendCheckInterval, backendHistoryLimit] = await Promise.all([
+          window.electronAPI.getSites(),
+          window.electronAPI.getCheckInterval(),
+          window.electronAPI.getHistoryLimit(),
+        ]);
+        
         setSites(sites);
+        
+        // Sync check interval from backend if different
+        if (backendCheckInterval !== checkInterval) {
+          setCheckInterval(backendCheckInterval);
+        }
+        
+        // Sync history limit from backend if different
+        if (backendHistoryLimit !== settings.historyLimit) {
+          updateSettings({ historyLimit: backendHistoryLimit });
+        }
+        
+        // Auto-start monitoring if there are sites to monitor
+        if (sites.length > 0) {
+          await window.electronAPI.startMonitoring();
+          setMonitoring(true);
+        }
       } catch (error) {
-        console.error("Failed to load sites:", error);
-        setError("Failed to load sites");
+        console.error("Failed to load initial data:", error);
+        setError("Failed to load initial data");
       } finally {
         setLoading(false);
       }
     };
 
-    loadSites();
+    loadInitialData();
 
     // Listen for status updates
     const handleStatusUpdate = (update: StatusUpdate) => {
@@ -96,7 +122,7 @@ function App() {
     return () => {
       window.electronAPI.removeAllListeners("status-update");
     };
-  }, [setSites, updateSiteStatus, setError, setLoading]);
+  }, [setSites, updateSiteStatus, setError, setLoading, setMonitoring]);
 
   const handleStartMonitoring = async () => {
     setLoading(true);

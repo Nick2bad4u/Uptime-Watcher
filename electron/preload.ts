@@ -9,11 +9,23 @@ contextBridge.exposeInMainWorld("electronAPI", {
   getSites: () => ipcRenderer.invoke("get-sites"),
   checkSiteNow: (url: string) => ipcRenderer.invoke("check-site-now", url),
 
+  // Data management
+  exportData: () => ipcRenderer.invoke("export-data"),
+  importData: (data: string) => ipcRenderer.invoke("import-data", data),
+
   // Monitoring controls
   startMonitoring: () => ipcRenderer.invoke("start-monitoring"),
   stopMonitoring: () => ipcRenderer.invoke("stop-monitoring"),
   updateCheckInterval: (interval: number) =>
     ipcRenderer.invoke("update-check-interval", interval),
+  getCheckInterval: () =>
+    ipcRenderer.invoke("get-check-interval"),
+
+  updateHistoryLimit: (limit: number) =>
+    ipcRenderer.invoke("update-history-limit", limit),
+
+  getHistoryLimit: () =>
+    ipcRenderer.invoke("get-history-limit"),
 
   // Event listeners
   onStatusUpdate: (callback: (data: any) => void) => {

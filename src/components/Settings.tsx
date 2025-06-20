@@ -9,7 +9,7 @@ import {
   ThemedCheckbox,
 } from "../theme/components";
 import { useTheme } from "../theme/useTheme";
-import { CHECK_INTERVALS } from "../constants";
+import { CHECK_INTERVALS, HISTORY_LIMIT_OPTIONS } from "../constants";
 import { useState, useEffect } from "react";
 
 interface SettingsProps {
@@ -62,11 +62,28 @@ export function Settings({ onClose }: SettingsProps) {
   const handleIntervalChange = async (interval: number) => {
     setLoading(true);
     try {
-      setCheckInterval(interval);
+      // Update the backend first
       await window.electronAPI.updateCheckInterval(interval);
+      // Then update the store
+      setCheckInterval(interval);
     } catch (error) {
       console.error("Failed to update check interval:", error);
       setError("Failed to update check interval");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleHistoryLimitChange = async (limit: number) => {
+    setLoading(true);
+    try {
+      // Update the backend first
+      await window.electronAPI.updateHistoryLimit(limit);
+      // Then update the store setting
+      updateSettings({ historyLimit: limit });
+    } catch (error) {
+      console.error("Failed to update history limit:", error);
+      setError("Failed to update history limit");
     } finally {
       setLoading(false);
     }
@@ -83,6 +100,53 @@ export function Settings({ onClose }: SettingsProps) {
 
   const handleThemeChange = (themeName: string) => {
     setTheme(themeName as any);
+  };
+
+  const handleExportData = async () => {
+    setLoading(true);
+    try {
+      const data = await window.electronAPI.exportData();
+      const blob = new Blob([data], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `uptime-watcher-backup-${new Date()
+        .toISOString()
+        .split("T")[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Failed to export data:", error);
+      setError("Failed to export data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleImportData = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setLoading(true);
+    try {
+      const text = await file.text();
+      const success = await window.electronAPI.importData(text);
+      if (success) {
+        // Refresh the page to show imported data
+        window.location.reload();
+      } else {
+        setError("Failed to import data - invalid format");
+      }
+    } catch (error) {
+      console.error("Failed to import data:", error);
+      setError("Failed to import data");
+    } finally {
+      setLoading(false);
+      // Reset file input
+      event.target.value = "";
+    }
   };
 
   return (
@@ -174,6 +238,32 @@ export function Settings({ onClose }: SettingsProps) {
                     </option>
                   ))}
                 </ThemedSelect>
+              </div>
+
+              <div>
+                <ThemedText
+                  size="sm"
+                  weight="medium"
+                  variant="secondary"
+                  className="block mb-2"
+                >
+                  History Limit
+                </ThemedText>
+                <ThemedSelect
+                  value={settings.historyLimit}
+                  onChange={(e) => handleHistoryLimitChange(Number(e.target.value))}
+                  disabled={isLoading}
+                  aria-label="Maximum number of history records to keep per site"
+                >
+                  {HISTORY_LIMIT_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </ThemedSelect>
+                <ThemedText size="xs" variant="secondary" className="mt-1">
+                  Maximum number of check results to store per site
+                </ThemedText>
               </div>
 
               <div>
@@ -380,6 +470,58 @@ export function Settings({ onClose }: SettingsProps) {
                   disabled={isLoading}
                   aria-label="Enable minimize to system tray"
                 />
+              </div>
+            </div>
+          </section>
+
+          {/* Data Management */}
+          <section>
+            <ThemedText size="lg" weight="medium" className="mb-4">
+              📂 Data Management
+            </ThemedText>
+            <div className="space-y-4">
+              <div>
+                <ThemedText
+                  size="sm"
+                  weight="medium"
+                  variant="secondary"
+                  className="block mb-2"
+                >
+                  Export Data
+                </ThemedText>
+                <ThemedButton
+                  variant="primary"
+                  size="sm"
+                  onClick={handleExportData}
+                  disabled={isLoading}
+                >
+                  Download Backup
+                </ThemedButton>
+                <ThemedText size="xs" variant="tertiary" className="mt-1 block">
+                  Backup your data and settings as a JSON file
+                </ThemedText>
+              </div>
+
+              <div>
+                <ThemedText
+                  size="sm"
+                  weight="medium"
+                  variant="secondary"
+                  className="block mb-2"
+                >
+                  Import Data
+                </ThemedText>
+                <input
+                  type="file"
+                  accept=".json"
+                  onChange={handleImportData}
+                  disabled={isLoading}
+                  aria-label="Import data from a JSON file"
+                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary file:text-white hover:file:bg-primary-dark disabled:opacity-50"
+                />
+                <ThemedText size="xs" variant="tertiary" className="mt-1 block">
+                  Restore your data and settings from a backup file
+                </ThemedText>
               </div>
             </div>
           </section>

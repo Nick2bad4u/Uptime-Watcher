@@ -27,9 +27,14 @@ declare global {
       removeSite: (url: string) => Promise<boolean>;
       getSites: () => Promise<Site[]>;
       checkSiteNow: (url: string) => Promise<StatusUpdate>;
+      exportData: () => Promise<string>;
+      importData: (data: string) => Promise<boolean>;
       startMonitoring: () => Promise<boolean>;
       stopMonitoring: () => Promise<boolean>;
       updateCheckInterval: (interval: number) => Promise<void>;
+      getCheckInterval: () => Promise<number>;
+      updateHistoryLimit: (limit: number) => Promise<void>;
+      getHistoryLimit: () => Promise<number>;
       onStatusUpdate: (callback: (data: StatusUpdate) => void) => void;
       removeAllListeners: (channel: string) => void;
     };

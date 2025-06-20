@@ -1,0 +1,62 @@
+# This is a Dependabot configuration file for automating dependency updates.
+# The configuration is set to version 2 of the Dependabot schema.
+# It defines update settings for three package ecosystems: GitHub Actions, Bundler, and npm.
+# Each ecosystem has its own update configuration, including:
+# - The directory to scan for dependencies (root directory in this case).
+# - The schedule for checking updates (daily).
+# - Allowing both direct and indirect updates for all packages.
+# - Grouping updates by ecosystem with specific patterns for version updates.
+
+version: 2
+updates:
+    - package-ecosystem: github-actions
+      directory: /
+      schedule:
+          interval: daily
+          time: "05:30"
+          timezone: "America/Detroit"
+      assignees: ["Nick2bad4u"]
+      allow:
+          # Allow both direct and indirect updates for all packages
+          - dependency-type: "all"
+      labels:
+          - "github-actions"
+          - "dependabot"
+          - "dependencies"
+      commit-message:
+          prefix: "[ci]"
+          prefix-development: "[ci]"
+          include: "scope"
+      groups:
+          github-actions:
+              applies-to: version-updates
+              patterns:
+                  - "*"
+
+    - package-ecosystem: npm
+      directory: /electron-app
+      schedule:
+          interval: daily
+      assignees: ["Nick2bad4u"]
+      versioning-strategy: increase
+      allow:
+          # Allow both direct and indirect updates for all packages
+          - dependency-type: "all"
+      ignore:
+          - dependency-name: "electron-builder"
+            versions: ["< 26.0.18"]
+          - dependency-name: "electron-builder-squirrel-windows"
+            versions: ["< 26.0.18"]
+      labels:
+          - "npm"
+          - "dependabot"
+          - "dependencies"
+      commit-message:
+          prefix: "[dependency]"
+          prefix-development: "[dev-dependency]"
+          include: "scope"
+      groups:
+          npm-all:
+              applies-to: version-updates
+              patterns:
+                  - "*"

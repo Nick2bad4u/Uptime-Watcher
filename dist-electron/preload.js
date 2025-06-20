@@ -6,10 +6,16 @@ electron.contextBridge.exposeInMainWorld("electronAPI", {
   removeSite: (url) => electron.ipcRenderer.invoke("remove-site", url),
   getSites: () => electron.ipcRenderer.invoke("get-sites"),
   checkSiteNow: (url) => electron.ipcRenderer.invoke("check-site-now", url),
+  // Data management
+  exportData: () => electron.ipcRenderer.invoke("export-data"),
+  importData: (data) => electron.ipcRenderer.invoke("import-data", data),
   // Monitoring controls
   startMonitoring: () => electron.ipcRenderer.invoke("start-monitoring"),
   stopMonitoring: () => electron.ipcRenderer.invoke("stop-monitoring"),
   updateCheckInterval: (interval) => electron.ipcRenderer.invoke("update-check-interval", interval),
+  getCheckInterval: () => electron.ipcRenderer.invoke("get-check-interval"),
+  updateHistoryLimit: (limit) => electron.ipcRenderer.invoke("update-history-limit", limit),
+  getHistoryLimit: () => electron.ipcRenderer.invoke("get-history-limit"),
   // Event listeners
   onStatusUpdate: (callback) => {
     electron.ipcRenderer.on("status-update", (_, data) => callback(data));
