@@ -34,7 +34,7 @@ updates:
                   - "*"
 
     - package-ecosystem: npm
-      directory: /electron-app
+      directory: /
       schedule:
           interval: daily
       assignees: ["Nick2bad4u"]
