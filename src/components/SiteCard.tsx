@@ -1,8 +1,15 @@
-import { MouseEvent } from "react";
+import { useState } from "react";
 import { Site } from "../types";
 import { useStore } from "../store";
-import { useTheme } from "../theme/useTheme";
-import { ThemedBox, ThemedText, ThemedButton, StatusIndicator, MiniChartBar } from "../theme/components";
+import { 
+    ThemedCard, 
+    ThemedText, 
+    ThemedIconButton,
+    ThemedBadge,
+    StatusIndicator, 
+    MiniChartBar,
+    ThemedTooltip
+} from "../theme/components";
 
 interface SiteCardProps {
     site: Site;
@@ -10,11 +17,21 @@ interface SiteCardProps {
 
 export function SiteCard({ site }: SiteCardProps) {
     const { removeSite, setError, setLoading, isLoading, setSelectedSite, setShowSiteDetails } = useStore();
-    const { isDark } = useTheme();
+    const [showQuickActions, setShowQuickActions] = useState(false);
 
-    const handleRemove = async (e: MouseEvent) => {
-        e.stopPropagation(); // Prevent card click
+    const handleQuickCheck = async () => {
+        setLoading(true);
+        try {
+            await window.electronAPI.checkSiteNow(site.url);
+        } catch (error) {
+            console.error("Failed to check site:", error);
+            setError("Failed to check site");
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    const handleQuickRemove = async () => {
         if (!window.confirm(`Are you sure you want to remove ${site.name || site.url}?`)) {
             return;
         }
@@ -44,82 +61,201 @@ export function SiteCard({ site }: SiteCardProps) {
 
     const formatLastChecked = (date?: Date) => {
         if (!date) return "Never";
-        return new Date(date).toLocaleString();
+        const now = new Date();
+        const checked = new Date(date);
+        const diffMs = now.getTime() - checked.getTime();
+        const diffMins = Math.floor(diffMs / 60000);
+        
+        if (diffMins < 1) return "Just now";
+        if (diffMins < 60) return `${diffMins}m ago`;
+        if (diffMins < 1440) return `${Math.floor(diffMins / 60)}h ago`;
+        return checked.toLocaleDateString();
     };
 
+    const calculateUptime = () => {
+        if (site.history.length === 0) return 0;
+        const upCount = site.history.filter(record => record.status === "up").length;
+        return Math.round((upCount / site.history.length) * 100);
+    };
+
+    const getUptimeColor = (uptime: number) => {
+        if (uptime >= 95) return "success";
+        if (uptime >= 90) return "warning";
+        return "error";
+    };
+
+    const getTrendIcon = () => {
+        if (site.history.length < 2) return "➖";
+        const recent = site.history.slice(-5);
+        const upCount = recent.filter(r => r.status === "up").length;
+        const ratio = upCount / recent.length;
+        
+        if (ratio >= 0.8) return "📈";
+        if (ratio >= 0.4) return "➖";
+        return "📉";
+    };
+
+    const getSiteIcon = () => {
+        try {
+            const url = new URL(site.url);
+            return `https://www.google.com/s2/favicons?domain=${url.hostname}&sz=32`;
+        } catch {
+            return "🌐";
+        }
+    };
+
+    const uptime = calculateUptime();
+
     return (
-        <div onClick={handleCardClick} className="cursor-pointer">
-            <ThemedBox surface="base" padding="lg" className={`site-card-hover ${isDark ? "dark" : ""}`}>
-                <div className="flex items-center justify-between">
-                    <div className="flex-1 min-w-0">
-                        <div className="flex items-center space-x-3">
-                            <StatusIndicator status={site.status as any} size="lg" />
-                            <div className="flex-1 min-w-0">
-                                <div className="flex items-center space-x-2">
-                                    <ThemedText size="lg" weight="medium" className="truncate">
-                                        {site.name || site.url}
-                                    </ThemedText>
-                                    <StatusIndicator status={site.status as any} size="sm" showText />
-                                </div>
-
-                                {site.name && (
-                                    <ThemedText size="sm" variant="tertiary" className="truncate">
-                                        {site.url}
-                                    </ThemedText>
-                                )}
-
-                                <div className="flex items-center space-x-4 mt-2">
-                                    <ThemedText size="sm" variant="secondary">
-                                        Response: {formatResponseTime(site.responseTime)}
-                                    </ThemedText>
-                                    <ThemedText size="sm" variant="secondary">
-                                        Last checked: {formatLastChecked(site.lastChecked)}
-                                    </ThemedText>
-                                    <ThemedText size="sm" variant="secondary">
-                                        History: {site.history.length} records
-                                    </ThemedText>
-                                </div>
-                            </div>
+        <ThemedCard 
+            variant="primary" 
+            padding="lg" 
+            shadow="sm"
+            clickable
+            onClick={handleCardClick}
+            className="site-card-enhanced group"
+            onMouseEnter={() => setShowQuickActions(true)}
+            onMouseLeave={() => setShowQuickActions(false)}
+        >
+            {/* Header Section */}
+            <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center space-x-3 flex-1 min-w-0">
+                    <div className="site-icon-container">
+                        <img 
+                            src={getSiteIcon()} 
+                            alt=""
+                            className="w-8 h-8 rounded-md"
+                            onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                                const fallback = e.currentTarget.nextElementSibling as HTMLDivElement;
+                                if (fallback) fallback.style.display = 'block';
+                            }}
+                        />
+                        <div className="w-8 h-8 rounded-md bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-lg" style={{display: 'none'}}>
+                            🌐
                         </div>
                     </div>
-
-                    <div className="flex items-center space-x-2 ml-4">
-                        <div onClick={handleRemove}>
-                            <ThemedButton
-                                variant="error"
-                                size="sm"
-                                disabled={isLoading}
-                                className="p-2"
-                                aria-label={`Remove ${site.name || site.url}`}
-                            >
-                                🗑️
-                            </ThemedButton>
+                    
+                    <div className="flex-1 min-w-0">
+                        <div className="flex items-center space-x-2 mb-1">
+                            <ThemedText size="lg" weight="semibold" className="truncate">
+                                {site.name || site.url}
+                            </ThemedText>
+                            <span className="text-sm">{getTrendIcon()}</span>
                         </div>
+                        
+                        {site.name && (
+                            <ThemedText size="sm" variant="tertiary" className="truncate">
+                                {site.url}
+                            </ThemedText>
+                        )}
                     </div>
                 </div>
 
-                {/* Mini chart area - placeholder for future chart implementation */}
-                {site.history.length > 0 && (
-                    <ThemedBox surface="elevated" padding="md" className="mt-4 border-t" border>
-                        <div className="flex items-center space-x-1">
-                            {site.history
-                                .slice(0, 20)
-                                .reverse()
-                                .map((record, index) => (
-                                    <MiniChartBar
-                                        key={index}
-                                        status={record.status as any}
-                                        responseTime={record.responseTime}
-                                        timestamp={record.timestamp}
-                                    />
-                                ))}
+                <div className="flex items-center space-x-2">
+                    <StatusIndicator status={site.status as any} size="md" />
+                    {showQuickActions && (
+                        <div className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <ThemedTooltip content="Check now">
+                                <ThemedIconButton
+                                    icon="🔄"
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={handleQuickCheck}
+                                    disabled={isLoading}
+                                />
+                            </ThemedTooltip>
+                            <ThemedTooltip content="Remove site">
+                                <ThemedIconButton
+                                    icon="🗑️"
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={handleQuickRemove}
+                                    disabled={isLoading}
+                                />
+                            </ThemedTooltip>
                         </div>
-                        <ThemedText size="xs" variant="tertiary" className="mt-1">
-                            Recent status history (last 20 checks)
+                    )}
+                </div>
+            </div>
+
+            {/* Metrics Section */}
+            <div className="grid grid-cols-4 gap-4 mb-4">
+                <div className="text-center">
+                    <ThemedText size="xs" variant="secondary" className="block mb-1">
+                        Status
+                    </ThemedText>
+                    <ThemedBadge 
+                        variant={site.status === "up" ? "success" : site.status === "down" ? "error" : "warning"}
+                        size="sm"
+                    >
+                        {site.status?.toUpperCase() || "UNKNOWN"}
+                    </ThemedBadge>
+                </div>
+                
+                <div className="text-center">
+                    <ThemedText size="xs" variant="secondary" className="block mb-1">
+                        Uptime
+                    </ThemedText>
+                    <ThemedBadge 
+                        variant={getUptimeColor(uptime)}
+                        size="sm"
+                    >
+                        {uptime}%
+                    </ThemedBadge>
+                </div>
+                
+                <div className="text-center">
+                    <ThemedText size="xs" variant="secondary" className="block mb-1">
+                        Response
+                    </ThemedText>
+                    <ThemedText size="sm" weight="medium">
+                        {formatResponseTime(site.responseTime)}
+                    </ThemedText>
+                </div>
+                
+                <div className="text-center">
+                    <ThemedText size="xs" variant="secondary" className="block mb-1">
+                        Checks
+                    </ThemedText>
+                    <ThemedText size="sm" weight="medium">
+                        {site.history.length}
+                    </ThemedText>
+                </div>
+            </div>
+
+            {/* Status History Section */}
+            {site.history.length > 0 && (
+                <div className="mb-3">
+                    <div className="flex items-center justify-between mb-2">
+                        <ThemedText size="xs" variant="secondary">
+                            Recent History
                         </ThemedText>
-                    </ThemedBox>
-                )}
-            </ThemedBox>
-        </div>
+                        <ThemedText size="xs" variant="tertiary">
+                            Last: {formatLastChecked(site.lastChecked)}
+                        </ThemedText>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                        {site.history
+                            .slice(-20)
+                            .map((record, index) => (
+                                <MiniChartBar
+                                    key={index}
+                                    status={record.status as any}
+                                    responseTime={record.responseTime}
+                                    timestamp={record.timestamp}
+                                />
+                            ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Footer - Click to view details hint */}
+            <div className="border-t pt-2 mt-2">
+                <ThemedText size="xs" variant="tertiary" className="text-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    Click to view detailed statistics and settings
+                </ThemedText>
+            </div>
+        </ThemedCard>
     );
 }

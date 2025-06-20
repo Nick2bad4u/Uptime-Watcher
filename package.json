@@ -61,6 +61,8 @@
     ],
     "scripts": {
         "start": "concurrently \"npm run dev\" \"npm run electron\"",
+        "start-electron": "npm run electron",
+        "start-electron-dev": "npm run dev",
         "dev": "vite",
         "build": "vite build && electron-builder",
         "preview": "vite preview",

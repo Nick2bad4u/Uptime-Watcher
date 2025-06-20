@@ -6,6 +6,7 @@ import { useStore } from "../store";
 export function useTheme() {
     const { settings, updateSettings } = useStore();
     const [systemTheme, setSystemTheme] = useState<"light" | "dark">("light");
+    const [themeVersion, setThemeVersion] = useState(0); // Force re-renders
 
     // Get current theme based on settings
     const getCurrentTheme = (): Theme => {
@@ -20,6 +21,7 @@ export function useTheme() {
         const newTheme = getCurrentTheme();
         setCurrentTheme(newTheme);
         themeManager.applyTheme(newTheme);
+        setThemeVersion(prev => prev + 1); // Force re-render of all themed components
     }, [settings.theme, systemTheme]);
 
     // Listen for system theme changes
@@ -81,6 +83,7 @@ export function useTheme() {
         availableThemes,
         isDark: currentTheme.isDark,
         themeManager,
+        themeVersion, // Include for forcing re-renders
     };
 }
 
@@ -102,37 +105,37 @@ export function useStatusColors() {
     };
 }
 
-// Hook for theme-aware CSS classes
+// Hook for theme-aware CSS classes using CSS custom properties
 export function useThemeClasses() {
-    const { currentTheme, getColor } = useTheme();
+    const { getColor } = useTheme();
 
     const getBackgroundClass = (variant: "primary" | "secondary" | "tertiary" = "primary") => {
         return {
-            backgroundColor: currentTheme.colors.background[variant],
+            backgroundColor: `var(--color-background-${variant})`,
         };
     };
 
     const getTextClass = (variant: "primary" | "secondary" | "tertiary" | "inverse" = "primary") => {
         return {
-            color: currentTheme.colors.text[variant],
+            color: `var(--color-text-${variant})`,
         };
     };
 
     const getBorderClass = (variant: "primary" | "secondary" | "focus" = "primary") => {
         return {
-            borderColor: currentTheme.colors.border[variant],
+            borderColor: `var(--color-border-${variant})`,
         };
     };
 
     const getSurfaceClass = (variant: "base" | "elevated" | "overlay" = "base") => {
         return {
-            backgroundColor: currentTheme.colors.surface[variant],
+            backgroundColor: `var(--color-surface-${variant})`,
         };
     };
 
     const getStatusClass = (status: "up" | "down" | "pending" | "unknown") => {
         return {
-            color: currentTheme.colors.status[status],
+            color: `var(--color-status-${status})`,
         };
     };
 

@@ -21,6 +21,10 @@ interface ThemedBoxProps {
     shadow?: "sm" | "md" | "lg" | "xl" | "inner";
     border?: boolean;
     className?: string;
+    style?: React.CSSProperties;
+    onClick?: () => void;
+    onMouseEnter?: () => void;
+    onMouseLeave?: () => void;
     children: React.ReactNode;
 }
 
@@ -32,26 +36,31 @@ export function ThemedBox({
     shadow,
     border = false,
     className = "",
+    style = {},
+    onClick,
+    onMouseEnter,
+    onMouseLeave,
     children,
 }: ThemedBoxProps) {
-    const { currentTheme } = useTheme();
-    const { getBackgroundClass, getSurfaceClass, getBorderClass } = useThemeClasses();
-
-    const styles: React.CSSProperties = {
-        ...getBackgroundClass(variant),
-        ...getSurfaceClass(surface),
-        padding: currentTheme.spacing[padding],
-        borderRadius: currentTheme.borderRadius[rounded],
-        ...(shadow && { boxShadow: currentTheme.shadows[shadow] }),
-        ...(border && {
-            borderWidth: "1px",
-            borderStyle: "solid",
-            ...getBorderClass("primary"),
-        }),
-    };
+    const classNames = [
+        "themed-box",
+        `themed-box--background-${variant}`,
+        `themed-box--surface-${surface}`,
+        `themed-box--padding-${padding}`,
+        `themed-box--rounded-${rounded}`,
+        shadow && `themed-box--shadow-${shadow}`,
+        border && "themed-box--border",
+        className,
+    ].filter(Boolean).join(" ");
 
     return (
-        <div className={className} style={styles}>
+        <div 
+            className={classNames}
+            style={style}
+            onClick={onClick}
+            onMouseEnter={onMouseEnter}
+            onMouseLeave={onMouseLeave}
+        >
             {children}
         </div>
     );
@@ -74,19 +83,17 @@ export function ThemedText({
     className = "",
     children,
 }: ThemedTextProps) {
-    const { currentTheme } = useTheme();
-    const { getTextClass } = useThemeClasses();
-
-    const styles: React.CSSProperties = {
-        ...getTextClass(variant),
-        fontSize: currentTheme.typography.fontSize[size],
-        fontWeight: currentTheme.typography.fontWeight[weight],
-        textAlign: align,
-        lineHeight: currentTheme.typography.lineHeight.normal,
-    };
+    const classNames = [
+        "themed-text",
+        `themed-text--${variant}`,
+        `themed-text--size-${size}`,
+        `themed-text--weight-${weight}`,
+        `themed-text--align-${align}`,
+        className,
+    ].filter(Boolean).join(" ");
 
     return (
-        <span className={className} style={styles}>
+        <span className={classNames}>
             {children}
         </span>
     );
@@ -102,6 +109,8 @@ interface ThemedButtonProps {
     icon?: string;
     iconPosition?: "left" | "right";
     className?: string;
+    style?: React.CSSProperties;
+    title?: string;
     onClick?: () => void;
     children: React.ReactNode;
 }
@@ -116,110 +125,25 @@ export function ThemedButton({
     icon,
     iconPosition = "left",
     className = "",
+    style = {},
+    title,
     onClick,
     children,
 }: ThemedButtonProps) {
-    const { currentTheme } = useTheme();
-
-    const getVariantStyles = () => {
-        switch (variant) {
-            case "primary":
-                return {
-                    backgroundColor: currentTheme.colors.primary[500],
-                    color: currentTheme.colors.text.inverse,
-                    borderColor: currentTheme.colors.primary[500],
-                };
-            case "secondary":
-                return {
-                    backgroundColor: "transparent",
-                    color: currentTheme.colors.text.primary,
-                    borderColor: currentTheme.colors.border.primary,
-                };
-            case "success":
-                return {
-                    backgroundColor: currentTheme.colors.success,
-                    color: currentTheme.colors.text.inverse,
-                    borderColor: currentTheme.colors.success,
-                };
-            case "warning":
-                return {
-                    backgroundColor: currentTheme.colors.warning,
-                    color: currentTheme.colors.text.inverse,
-                    borderColor: currentTheme.colors.warning,
-                };
-            case "error":
-                return {
-                    backgroundColor: currentTheme.colors.error,
-                    color: currentTheme.colors.text.inverse,
-                    borderColor: currentTheme.colors.error,
-                };
-            case "ghost":
-                return {
-                    backgroundColor: "transparent",
-                    color: currentTheme.colors.text.secondary,
-                    borderColor: "transparent",
-                };
-            default:
-                return {};
-        }
-    };
-
-    const getSizeStyles = () => {
-        switch (size) {
-            case "xs":
-                return {
-                    padding: `${currentTheme.spacing.xs} ${currentTheme.spacing.sm}`,
-                    fontSize: currentTheme.typography.fontSize.xs,
-                };
-            case "sm":
-                return {
-                    padding: `${currentTheme.spacing.sm} ${currentTheme.spacing.md}`,
-                    fontSize: currentTheme.typography.fontSize.sm,
-                };
-            case "md":
-                return {
-                    padding: `${currentTheme.spacing.md} ${currentTheme.spacing.lg}`,
-                    fontSize: currentTheme.typography.fontSize.base,
-                };
-            case "lg":
-                return {
-                    padding: `${currentTheme.spacing.lg} ${currentTheme.spacing.xl}`,
-                    fontSize: currentTheme.typography.fontSize.lg,
-                };
-            default:
-                return {};
-        }
-    };
-
-    const styles: React.CSSProperties = {
-        ...getVariantStyles(),
-        ...getSizeStyles(),
-        borderWidth: "1px",
-        borderStyle: "solid",
-        borderRadius: currentTheme.borderRadius.md,
-        fontWeight: currentTheme.typography.fontWeight.medium,
-        cursor: disabled || loading ? "not-allowed" : "pointer",
-        opacity: disabled || loading ? 0.6 : 1,
-        width: fullWidth ? "100%" : "auto",
-        transition: "all 0.2s ease-in-out",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: currentTheme.spacing.xs,
-    };
+    const classNames = [
+        "themed-button",
+        `themed-button--${variant}`,
+        `themed-button--size-${size}`,
+        fullWidth && "themed-button--full-width",
+        (disabled || loading) && "themed-button--loading",
+        className,
+    ].filter(Boolean).join(" ");
 
     const renderContent = () => {
         if (loading) {
             return (
-                <div className="themed-button__loading" style={{ display: "flex", alignItems: "center", gap: currentTheme.spacing.xs }}>
-                    <div className="themed-button__spinner" style={{
-                        width: "16px",
-                        height: "16px",
-                        border: "2px solid transparent",
-                        borderTop: "2px solid currentColor",
-                        borderRadius: "50%",
-                        animation: "spin 1s linear infinite"
-                    }}></div>
+                <div className="themed-button__loading">
+                    <div className="themed-button__spinner"></div>
                     <span>{children}</span>
                 </div>
             );
@@ -227,12 +151,7 @@ export function ThemedButton({
 
         if (icon) {
             const iconElement = (
-                <span style={{ 
-                    fontSize: "1.1em", 
-                    lineHeight: "1",
-                    display: "flex",
-                    alignItems: "center"
-                }}>
+                <span className="themed-button__icon">
                     {icon}
                 </span>
             );
@@ -256,10 +175,11 @@ export function ThemedButton({
     return (
         <button 
             type={type} 
-            className={`themed-button themed-button--${variant} themed-button--${size} ${className}`} 
-            style={styles} 
+            className={classNames}
+            style={style}
             onClick={onClick} 
             disabled={disabled || loading}
+            title={title}
         >
             {renderContent()}
         </button>
@@ -599,6 +519,7 @@ export function ThemedIconButton({
             }}
             title={tooltip}
         >
+            {/* Empty children since we're using icon prop */}
         </ThemedButton>
     );
 }
@@ -615,6 +536,8 @@ interface ThemedCardProps {
     clickable?: boolean;
     className?: string;
     onClick?: () => void;
+    onMouseEnter?: () => void;
+    onMouseLeave?: () => void;
     children: React.ReactNode;
 }
 
@@ -630,6 +553,8 @@ export function ThemedCard({
     clickable = false,
     className = "",
     onClick,
+    onMouseEnter,
+    onMouseLeave,
     children,
 }: ThemedCardProps) {
     const { currentTheme } = useTheme();
@@ -641,11 +566,6 @@ export function ThemedCard({
         overflow: "hidden",
     };
 
-    const hoverStyles = hoverable || clickable ? {
-        transform: "translateY(-2px)",
-        boxShadow: currentTheme.shadows.lg,
-    } : {};
-
     return (
         <ThemedBox
             variant={variant}
@@ -656,6 +576,8 @@ export function ThemedCard({
             className={`themed-card ${hoverable ? 'themed-card--hoverable' : ''} ${clickable ? 'themed-card--clickable' : ''} ${className}`}
             style={cardStyles}
             onClick={clickable ? onClick : undefined}
+            onMouseEnter={onMouseEnter}
+            onMouseLeave={onMouseLeave}
         >
             {(title || subtitle || icon) && (
                 <div className="themed-card__header" style={{ 
