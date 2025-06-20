@@ -2,18 +2,18 @@
 
 /* CSS Custom Properties for animations */
 :root {
-  --transition-fast: 0.15s ease-out;
-  --transition-normal: 0.25s ease-out;
-  --transition-slow: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  --transition-bounce: 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-  --shadow-elevation-1: 0 2px 4px rgb(0 0 0 / 6%), 0 1px 2px rgb(0 0 0 / 10%);
-  --shadow-elevation-2: 0 4px 6px rgb(0 0 0 / 7%), 0 2px 4px rgb(0 0 0 / 6%);
-  --shadow-elevation-3: 0 10px 15px rgb(0 0 0 / 10%), 0 4px 6px rgb(0 0 0 / 5%);
-  --shadow-elevation-4: 0 20px 25px rgb(0 0 0 / 10%), 0 10px 10px rgb(0 0 0 / 4%);
-  --border-radius-sm: 0.375rem;
-  --border-radius-md: 0.5rem;
-  --border-radius-lg: 0.75rem;
-  --border-radius-xl: 1rem;
+    --transition-fast: 0.15s ease-out;
+    --transition-normal: 0.25s ease-out;
+    --transition-slow: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --transition-bounce: 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    --shadow-elevation-1: 0 2px 4px rgb(0 0 0 / 6%), 0 1px 2px rgb(0 0 0 / 10%);
+    --shadow-elevation-2: 0 4px 6px rgb(0 0 0 / 7%), 0 2px 4px rgb(0 0 0 / 6%);
+    --shadow-elevation-3: 0 10px 15px rgb(0 0 0 / 10%), 0 4px 6px rgb(0 0 0 / 5%);
+    --shadow-elevation-4: 0 20px 25px rgb(0 0 0 / 10%), 0 10px 10px rgb(0 0 0 / 4%);
+    --border-radius-sm: 0.375rem;
+    --border-radius-md: 0.5rem;
+    --border-radius-lg: 0.75rem;
+    --border-radius-xl: 1rem;
 }
 
 /* Themed Button Base - Enhanced */
@@ -34,7 +34,7 @@
 }
 
 .themed-button::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: -100%;
@@ -134,8 +134,12 @@
 }
 
 @keyframes spin-smooth {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* Professional fade in animation */
@@ -185,7 +189,7 @@
 }
 
 .status-indicator::after {
-    content: '';
+    content: "";
     position: absolute;
     inset: -2px;
     border-radius: 50%;
@@ -221,13 +225,14 @@
 }
 
 @keyframes pulse-glow {
-    0%, 100% { 
-        opacity: 1; 
+    0%,
+    100% {
+        opacity: 1;
         transform: scale(1);
     }
 
-    50% { 
-        opacity: 0.7; 
+    50% {
+        opacity: 0.7;
         transform: scale(1.1);
     }
 }
@@ -343,7 +348,7 @@
 }
 
 .mini-chart-bar::after {
-    content: '';
+    content: "";
     position: absolute;
     inset: -2px -1px;
     background: currentcolor;
@@ -365,7 +370,7 @@
 }
 
 .site-card-hover::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     background: linear-gradient(135deg, transparent 0%, rgb(255 255 255 / 2%) 50%, transparent 100%);
@@ -408,8 +413,12 @@
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 .modal-content {
@@ -573,7 +582,7 @@
 }
 
 .icon-button::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     background: currentcolor;
@@ -607,7 +616,7 @@
 }
 
 .site-card-enhanced::after {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -650,7 +659,7 @@
 }
 
 .form-control-wrapper::after {
-    content: '';
+    content: "";
     position: absolute;
     bottom: 0;
     left: 0;
@@ -693,12 +702,20 @@
     animation: loading-bounce 1.4s ease-in-out infinite both;
 }
 
-.loading-dot:nth-child(1) { animation-delay: -0.32s; }
-.loading-dot:nth-child(2) { animation-delay: -0.16s; }
-.loading-dot:nth-child(3) { animation-delay: 0s; }
+.loading-dot:nth-child(1) {
+    animation-delay: -0.32s;
+}
+.loading-dot:nth-child(2) {
+    animation-delay: -0.16s;
+}
+.loading-dot:nth-child(3) {
+    animation-delay: 0s;
+}
 
 @keyframes loading-bounce {
-    0%, 80%, 100% {
+    0%,
+    80%,
+    100% {
         transform: scale(0);
         opacity: 0.5;
     }
@@ -734,7 +751,7 @@
 }
 
 .tooltip::after {
-    content: '';
+    content: "";
     position: absolute;
     bottom: 100%;
     left: 50%;
@@ -768,7 +785,8 @@
 }
 
 @keyframes float {
-    0%, 100% {
+    0%,
+    100% {
         transform: translateY(0);
     }
 
@@ -797,7 +815,7 @@
 }
 
 .button-micro::after {
-    content: '';
+    content: "";
     position: absolute;
     top: 50%;
     left: 50%;
@@ -806,13 +824,17 @@
     border-radius: 50%;
     background: rgb(255 255 255 / 40%);
     transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
+    transition:
+        width 0.6s,
+        height 0.6s;
 }
 
 .button-micro:active::after {
     width: 300px;
     height: 300px;
-    transition: width 0s, height 0s;
+    transition:
+        width 0s,
+        height 0s;
 }
 
 /* Professional scrollbar styling */
