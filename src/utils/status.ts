@@ -31,20 +31,6 @@ export function formatStatusWithIcon(status: string): string {
     return `${icon} ${text}`;
 }
 
-/**
- * Get status color class for styling
- */
-export function getStatusColorClass(status: string): string {
-    switch (status.toLowerCase()) {
-        case "up":
-            return "text-green-600";
-        case "down":
-            return "text-red-600";
-        case "pending":
-            return "text-yellow-600";
-        case "unknown":
-            return "text-gray-600";
-        default:
-            return "text-gray-400";
-    }
-}
+
+
+

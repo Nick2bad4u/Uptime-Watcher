@@ -139,6 +139,19 @@
     color: var(--color-error-alert);
 }
 
+/* Status color variants for text */
+.themed-text--success {
+    color: var(--color-status-up);
+}
+
+.themed-text--warning {
+    color: var(--color-status-pending);
+}
+
+.themed-text--danger {
+    color: var(--color-status-down);
+}
+
 .themed-text--size-xs {
     font-size: var(--font-size-xs);
 }
@@ -764,7 +777,7 @@
 }
 
 .header-title {
-    background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+    background: linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-primary-700) 100%);
     background-clip: text;
     -webkit-text-fill-color: transparent;
     font-weight: 800;
@@ -891,7 +904,7 @@
     left: 0;
     right: 0;
     height: 2px;
-    background: linear-gradient(90deg, transparent 0%, #2563eb 50%, transparent 100%);
+    background: linear-gradient(90deg, transparent 0%, var(--color-primary-600) 50%, transparent 100%);
     transform: scaleX(0);
     transition: transform var(--transition-normal);
 }
@@ -1097,7 +1110,7 @@
 
 /* Dividers */
 .divider-y > * + * {
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid var(--color-border-primary);
 }
 
 .divider-y.dark > * + * {
@@ -1112,7 +1125,7 @@
 
 .border-b {
     border-bottom: 1px solid;
-    color: #3b82f6;
+    color: var(--color-primary-500);
 }
 
 .text-center {
@@ -1251,7 +1264,7 @@
     width: 1.5rem;
     height: 1.5rem;
     border: 2px solid transparent;
-    border-bottom: 2px solid #2563eb;
+    border-bottom: 2px solid var(--color-primary-600);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -1645,7 +1658,7 @@
     appearance: none;
     width: 1.25rem;
     height: 1.25rem;
-    border: 2px solid #d1d5db;
+    border: 2px solid var(--color-border-primary);
     border-radius: var(--border-radius-sm);
     background: white;
     cursor: pointer;
@@ -1654,8 +1667,8 @@
 }
 
 .themed-checkbox:checked {
-    background: #3b82f6;
-    border-color: #3b82f6;
+    background: var(--color-primary-500);
+    border-color: var(--color-primary-500);
 }
 
 .themed-checkbox:checked::after {
@@ -1731,13 +1744,13 @@
     }
 
     .themed-checkbox {
-        background: #374151;
-        border-color: #6b7280;
+        background: var(--color-surface-elevated);
+        border-color: var(--color-border-secondary);
     }
 
     .themed-checkbox:checked {
-        background: #3b82f6;
-        border-color: #3b82f6;
+        background: var(--color-primary-500);
+        border-color: var(--color-primary-500);
     }
 }
 

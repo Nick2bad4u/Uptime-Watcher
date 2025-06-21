@@ -68,11 +68,12 @@ export function ThemedBox({
 }
 
 interface ThemedTextProps {
-    variant?: "primary" | "secondary" | "tertiary" | "inverse" | "error";
+    variant?: "primary" | "secondary" | "tertiary" | "inverse" | "error" | "success" | "warning" | "danger";
     size?: "xs" | "sm" | "base" | "lg" | "xl" | "2xl" | "3xl" | "4xl";
     weight?: "normal" | "medium" | "semibold" | "bold";
     align?: "left" | "center" | "right";
     className?: string;
+    style?: React.CSSProperties;
     children: React.ReactNode;
 }
 
@@ -82,6 +83,7 @@ export function ThemedText({
     weight = "normal",
     align = "left",
     className = "",
+    style = {},
     children,
 }: ThemedTextProps) {
     const classNames = [
@@ -94,7 +96,7 @@ export function ThemedText({
     ].filter(Boolean).join(" ");
 
     return (
-        <span className={classNames}>
+        <span className={classNames} style={style}>
             {children}
         </span>
     );

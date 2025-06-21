@@ -18,7 +18,7 @@ import {
 import zoomPlugin from "chartjs-plugin-zoom";
 import { Line, Bar, Doughnut } from "react-chartjs-2";
 import { Site } from "../types";
-import { useTheme } from "../theme/useTheme";
+import { useTheme, useAvailabilityColors } from "../theme/useTheme";
 import { useStore } from "../store";
 import { formatStatusWithIcon } from "../utils/status";
 import {
@@ -60,6 +60,7 @@ interface SiteDetailsProps {
 
 export function SiteDetails({ site, onClose }: SiteDetailsProps) {
     const { currentTheme } = useTheme();
+    const { getAvailabilityColor, getAvailabilityVariant, getAvailabilityDescription } = useAvailabilityColors();
     const { removeSite, setError, setLoading, isLoading, selectedSite, updateSiteStatus, clearError } = useStore();
 
     // Enhanced state management
@@ -661,6 +662,9 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                                 formatDuration={formatDuration}
                                 showAdvancedMetrics={showAdvancedMetrics}
                                 setShowAdvancedMetrics={setShowAdvancedMetrics}
+                                getAvailabilityColor={getAvailabilityColor}
+                                getAvailabilityVariant={getAvailabilityVariant}
+                                getAvailabilityDescription={getAvailabilityDescription}
                             />
                         )}
 
@@ -716,24 +720,29 @@ function OverviewTab({
         <div className="space-y-6">
             {/* Key Metrics Grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <ThemedCard icon="📊" title="Status" hoverable className="text-center">
+                <ThemedCard icon="📊" title="Status" hoverable className="text-center flex flex-col items-center">
                     <StatusIndicator status={currentSite.status as any} size="lg" showText />
                 </ThemedCard>
 
-                <ThemedCard icon="⏱️" title="Uptime" hoverable className="text-center">
-                    <ThemedProgress value={parseFloat(uptime)} variant="success" showLabel />
+                <ThemedCard icon="⏱️" title="Uptime" hoverable className="text-center flex flex-col items-center">
+                    <ThemedProgress
+                        value={parseFloat(uptime)}
+                        variant="success"
+                        showLabel
+                        className="flex flex-col items-center"
+                    />
                     <ThemedBadge variant="success" size="sm" className="mt-2">
                         {uptime}%
                     </ThemedBadge>
                 </ThemedCard>
 
-                <ThemedCard icon="⚡" title="Response Time" hoverable className="text-center">
+                <ThemedCard icon="⚡" title="Response Time" hoverable className="text-center flex flex-col items-center">
                     <ThemedText size="xl" weight="bold">
                         {formatResponseTime(avgResponseTime)}
                     </ThemedText>
                 </ThemedCard>
 
-                <ThemedCard icon="📈" title="Total Checks" hoverable className="text-center">
+                <ThemedCard icon="📈" title="Total Checks" hoverable className="text-center flex flex-col items-center">
                     <ThemedText size="xl" weight="bold">
                         {totalChecks}
                     </ThemedText>
@@ -747,7 +756,7 @@ function OverviewTab({
                         <ThemedText size="sm" variant="secondary">
                             Fastest Response
                         </ThemedText>
-                        <ThemedBadge variant="success" icon="🚀">
+                        <ThemedBadge variant="success" icon="🚀" className="ml-4">
                             {formatResponseTime(fastestResponse)}
                         </ThemedBadge>
                     </div>
@@ -755,7 +764,7 @@ function OverviewTab({
                         <ThemedText size="sm" variant="secondary">
                             Slowest Response
                         </ThemedText>
-                        <ThemedBadge variant="warning" icon="🐌">
+                        <ThemedBadge variant="warning" icon="🐌" className="ml-4">
                             {formatResponseTime(slowestResponse)}
                         </ThemedBadge>
                     </div>
@@ -798,6 +807,9 @@ interface AnalyticsTabProps {
     formatDuration: (ms: number) => string;
     showAdvancedMetrics: boolean;
     setShowAdvancedMetrics: (show: boolean) => void;
+    getAvailabilityColor: (percentage: number) => string;
+    getAvailabilityVariant: (percentage: number) => "success" | "warning" | "danger";
+    getAvailabilityDescription: (percentage: number) => string;
 }
 
 function AnalyticsTab({
@@ -823,24 +835,35 @@ function AnalyticsTab({
     formatDuration,
     showAdvancedMetrics,
     setShowAdvancedMetrics,
+    getAvailabilityColor,
+    getAvailabilityVariant,
+    getAvailabilityDescription,
 }: AnalyticsTabProps) {
     return (
         <div className="space-y-6">
             {/* Analytics Summary */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <ThemedBox surface="base" padding="lg" border rounded="lg" className="text-center">
+                <ThemedBox surface="base" padding="lg" border rounded="lg" className="text-center flex flex-col items-center">
                     <ThemedText size="sm" variant="secondary">
                         Availability ({chartTimeRange})
                     </ThemedText>
-                    <ThemedText size="3xl" weight="bold" className="text-green-600">
+                    <ThemedText 
+                        size="3xl" 
+                        weight="bold" 
+                        variant={getAvailabilityVariant(parseFloat(uptime))}
+                        style={{ color: getAvailabilityColor(parseFloat(uptime)) }}
+                    >
                         {uptime}%
                     </ThemedText>
                     <ThemedText size="xs" variant="tertiary">
                         {upCount} up / {downCount} down
                     </ThemedText>
+                    <ThemedText size="xs" variant="secondary" className="mt-1">
+                        {getAvailabilityDescription(parseFloat(uptime))}
+                    </ThemedText>
                 </ThemedBox>
 
-                <ThemedBox surface="base" padding="lg" border rounded="lg" className="text-center">
+                <ThemedBox surface="base" padding="lg" border rounded="lg" className="text-center flex flex-col items-center">
                     <ThemedText size="sm" variant="secondary">
                         Avg Response Time
                     </ThemedText>
@@ -852,11 +875,11 @@ function AnalyticsTab({
                     </ThemedText>
                 </ThemedBox>
 
-                <ThemedBox surface="base" padding="lg" border rounded="lg" className="text-center">
+                <ThemedBox surface="base" padding="lg" border rounded="lg" className="text-center flex flex-col items-center">
                     <ThemedText size="sm" variant="secondary">
                         Total Downtime
                     </ThemedText>
-                    <ThemedText size="3xl" weight="bold" className="text-red-600">
+                    <ThemedText size="3xl" weight="bold" variant="danger">
                         {formatDuration(totalDowntime)}
                     </ThemedText>
                     <ThemedText size="xs" variant="tertiary">
