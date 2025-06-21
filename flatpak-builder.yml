@@ -1,0 +1,29 @@
+app-id: com.example.uptimewatcher
+runtime: org.freedesktop.Platform
+runtime-version: "23.08"
+sdk: org.freedesktop.Sdk
+command: electron
+finish-args:
+  - --share=network
+  - --socket=x11
+  - --socket=wayland
+  - --device=dri
+  - --filesystem=host
+  - --env=ELECTRON_IS_DEV=0
+modules:
+  - name: app
+    buildsystem: simple
+    build-commands:
+      - cp -r ./node_modules /app/
+      - install -Dm755 ./node_modules/electron/dist/electron /app/bin/electron
+      - install -Dm755 ./dist-electron/main.js /app/main.js
+      - cp -r ./dist /app/dist
+      - cp -r ./dist-electron /app/dist-electron
+      - cp -r ./icons /app/icons
+      - install -Dm644 ./package.json /app/package.json
+      # Optionally include the following if you use them in production
+      - cp -r ./assets /app/assets || true
+      - cp -r ./preload.js /app/preload.js || true
+    sources:
+      - type: dir
+        path: .
