@@ -66,8 +66,9 @@ jobs:
               env:
                   SARIF_ESLINT_IGNORE_SUPPRESSED: "true"
               run: |
+                  rm -f eslint-results.sarif
                   npx eslint . --ignore-pattern libs --format stylish
-                  npx eslint . --ignore-pattern libs --format @microsoft/eslint-formatter-sarif --output-file ../eslint-results.sarif
+                  npx eslint . --ignore-pattern libs --format @microsoft/eslint-formatter-sarif --output-file eslint-results.sarif
               working-directory: .
               continue-on-error: true
 

@@ -28,6 +28,9 @@ modules:
 
     - name: uptime-watcher
       buildsystem: simple
+      build-options:
+          env:
+              PATH: "/app/bin:/usr/bin:/bin"
       build-commands:
           # Install Node.js dependencies
           - npm ci --omit=dev

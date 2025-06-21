@@ -4,8 +4,8 @@
     "version": "1.8.0",
     "description": "An Electron app to monitor website uptime status",
     "main": "dist-electron/main.js",
-    "appid": "com.example.uptimewatcher",
-    "homepage": "./",
+    "appid": "io.github.uptime-watcher",
+    "homepage": "https://github.com/Nick2bad4u/Uptime-Watcher",
     "maintainers": [
         {
             "name": "Nick2bad4u",
