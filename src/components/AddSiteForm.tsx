@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useStore } from "../store";
+import { UI_DELAYS } from "../constants";
 import { useTheme } from "../theme/useTheme";
 import { ThemedBox, ThemedText, ThemedButton, ThemedInput } from "../theme/components";
 
@@ -19,7 +20,7 @@ export function AddSiteForm() {
             // Show button loading after 100ms delay
             timeoutId = setTimeout(() => {
                 setShowButtonLoading(true);
-            }, 100);
+            }, UI_DELAYS.LOADING_BUTTON);
         } else {
             // Hide button loading immediately when loading stops
             setShowButtonLoading(false);

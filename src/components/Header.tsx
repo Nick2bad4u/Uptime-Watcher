@@ -1,4 +1,5 @@
 import { useStore } from "../store";
+import { UI_DELAYS } from "../constants";
 import { ThemedBox, ThemedText, ThemedButton, StatusIndicator, ThemedSelect } from "../theme/components";
 import { useTheme } from "../theme/useTheme";
 import { CHECK_INTERVALS } from "../constants";
@@ -31,7 +32,7 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
             // Show button loading after 100ms delay
             timeoutId = setTimeout(() => {
                 setShowButtonLoading(true);
-            }, 100);
+            }, UI_DELAYS.LOADING_BUTTON);
         } else {
             // Hide button loading immediately when loading stops
             setShowButtonLoading(false);

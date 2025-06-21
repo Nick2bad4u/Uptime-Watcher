@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Site } from "../types";
 import { useStore } from "../store";
+import { formatResponseTime, formatLastChecked } from "../utils/time";
+import { UPTIME_THRESHOLDS } from "../constants";
 import {
     ThemedCard,
     ThemedText,
@@ -46,25 +48,6 @@ export function SiteCard({ site }: SiteCardProps) {
         setShowSiteDetails(true);
     };
 
-    const formatResponseTime = (time?: number) => {
-        if (!time) return "N/A";
-        if (time < 1000) return `${time}ms`;
-        return `${(time / 1000).toFixed(2)}s`;
-    };
-
-    const formatLastChecked = (date?: Date) => {
-        if (!date) return "Never";
-        const now = new Date();
-        const checked = new Date(date);
-        const diffMs = now.getTime() - checked.getTime();
-        const diffMins = Math.floor(diffMs / 60000);
-
-        if (diffMins < 1) return "Just now";
-        if (diffMins < 60) return `${diffMins}m ago`;
-        if (diffMins < 1440) return `${Math.floor(diffMins / 60)}h ago`;
-        return checked.toLocaleDateString();
-    };
-
     const calculateUptime = () => {
         if (site.history.length === 0) return 0;
         const upCount = site.history.filter((record) => record.status === "up").length;
@@ -72,8 +55,8 @@ export function SiteCard({ site }: SiteCardProps) {
     };
 
     const getUptimeColor = (uptime: number) => {
-        if (uptime >= 95) return "success";
-        if (uptime >= 90) return "warning";
+        if (uptime >= UPTIME_THRESHOLDS.EXCELLENT) return "success";
+        if (uptime >= UPTIME_THRESHOLDS.GOOD) return "warning";
         return "error";
     };
 

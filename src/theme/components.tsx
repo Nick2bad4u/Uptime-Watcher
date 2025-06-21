@@ -1,6 +1,7 @@
 import React from "react";
 import { useTheme, useThemeClasses } from "../theme/useTheme";
 import { getStatusIcon } from "../utils/status";
+import { formatResponseTime } from "../utils/time";
 import "./components.css";
 
 interface ThemeProviderProps {
@@ -436,12 +437,6 @@ interface MiniChartBarProps {
 export function MiniChartBar({ status, responseTime, timestamp, className = "" }: MiniChartBarProps) {
     const { getStatusColor } = useTheme();
     const { currentTheme } = useTheme();
-
-    const formatResponseTime = (time?: number) => {
-        if (!time) return "N/A";
-        if (time < 1000) return `${time}ms`;
-        return `${(time / 1000).toFixed(2)}s`;
-    };
 
     const styles: React.CSSProperties = {
         width: "8px",

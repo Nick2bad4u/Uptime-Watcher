@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useStore } from "./store";
+import { UI_DELAYS } from "./constants";
 import { useTheme } from "./theme/useTheme";
 import { Header } from "./components/Header";
 import { SiteList } from "./components/SiteList";
@@ -42,7 +43,7 @@ function App() {
             // Show loading overlay after 100ms delay
             timeoutId = setTimeout(() => {
                 setShowLoadingOverlay(true);
-            }, 100);
+            }, UI_DELAYS.LOADING_OVERLAY);
         } else {
             // Hide loading overlay immediately when loading stops
             setShowLoadingOverlay(false);

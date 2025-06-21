@@ -9,7 +9,7 @@ import {
     ThemedCheckbox,
 } from "../theme/components";
 import { useTheme } from "../theme/useTheme";
-import { CHECK_INTERVALS, HISTORY_LIMIT_OPTIONS } from "../constants";
+import { CHECK_INTERVALS, HISTORY_LIMIT_OPTIONS, TIMEOUT_CONSTRAINTS, UI_DELAYS } from "../constants";
 import { useState, useEffect } from "react";
 
 interface SettingsProps {
@@ -43,7 +43,7 @@ export function Settings({ onClose }: SettingsProps) {
             // Show button loading after 100ms delay
             timeoutId = setTimeout(() => {
                 setShowButtonLoading(true);
-            }, 100);
+            }, UI_DELAYS.LOADING_BUTTON);
         } else {
             // Hide button loading immediately when loading stops
             setShowButtonLoading(false);
@@ -223,9 +223,9 @@ export function Settings({ onClose }: SettingsProps) {
                                 </ThemedText>
                                 <ThemedInput
                                     type="number"
-                                    min="1000"
-                                    max="60000"
-                                    step="1000"
+                                    min={TIMEOUT_CONSTRAINTS.MIN}
+                                    max={TIMEOUT_CONSTRAINTS.MAX}
+                                    step={TIMEOUT_CONSTRAINTS.STEP}
                                     value={settings.timeout}
                                     onChange={(e) => handleSettingChange("timeout", Number(e.target.value))}
                                     disabled={isLoading}

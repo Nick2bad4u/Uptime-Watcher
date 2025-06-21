@@ -21,6 +21,8 @@ import { Site } from "../types";
 import { useTheme, useAvailabilityColors } from "../theme/useTheme";
 import { useStore } from "../store";
 import { formatStatusWithIcon } from "../utils/status";
+import { formatResponseTime, formatFullTimestamp, formatDuration, TIME_PERIODS, TIME_PERIOD_LABELS, TimePeriod } from "../utils/time";
+import { AUTO_REFRESH_INTERVAL } from "../constants";
 import {
     ThemedBox,
     ThemedText,
@@ -78,7 +80,7 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
             if (!isLoading && !isRefreshing) {
                 await handleCheckNow(true);
             }
-        }, 30000); // Auto-refresh every 30 seconds
+        }, AUTO_REFRESH_INTERVAL); // Auto-refresh every 30 seconds
 
         return () => clearInterval(interval);
     }, [autoRefresh, isLoading, isRefreshing]);
@@ -88,13 +90,7 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
     // Enhanced statistics with time-based filtering
     const getFilteredHistory = (timeRange: string) => {
         const now = Date.now();
-        const ranges = {
-            "1h": 60 * 60 * 1000,
-            "24h": 24 * 60 * 60 * 1000,
-            "7d": 7 * 24 * 60 * 60 * 1000,
-            "30d": 30 * 24 * 60 * 60 * 1000,
-        };
-        const cutoff = now - ranges[timeRange as keyof typeof ranges];
+        const cutoff = now - TIME_PERIODS[timeRange as TimePeriod];
         return currentSite.history.filter((record) => record.timestamp >= cutoff);
     };
 
@@ -445,26 +441,6 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
         }),
         [currentTheme, totalChecks]
     );
-    // Utility functions
-    const formatTimestamp = (timestamp: number) => {
-        return new Date(timestamp).toLocaleString();
-    };
-
-    const formatResponseTime = (time: number) => {
-        if (time < 1000) return `${time}ms`;
-        return `${(time / 1000).toFixed(2)}s`;
-    };
-
-    const formatDuration = (ms: number) => {
-        const seconds = Math.floor(ms / 1000);
-        const minutes = Math.floor(seconds / 60);
-        const hours = Math.floor(minutes / 60);
-
-        if (hours > 0) return `${hours}h ${minutes % 60}m`;
-        if (minutes > 0) return `${minutes}m ${seconds % 60}s`;
-        return `${seconds}s`;
-    };
-
     // Tab component with enhanced icons
     const TabButton = ({ label, isActive, onClick }: { label: string; isActive: boolean; onClick: () => void }) => {
         const [icon, ...textParts] = label.split(" ");
@@ -510,7 +486,7 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                                     <div className="site-details-meta">
                                         <div className="site-details-last-checked">
                                             Last checked:{" "}
-                                            {formatTimestamp(
+                                            {formatFullTimestamp(
                                                 typeof currentSite.lastChecked === "number"
                                                     ? currentSite.lastChecked
                                                     : Date.now()
@@ -647,11 +623,7 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                         )}
 
                         {activeTab === "history" && (
-                            <HistoryTab
-                                currentSite={currentSite}
-                                formatTimestamp={formatTimestamp}
-                                formatResponseTime={formatResponseTime}
-                            />
+                            <HistoryTab currentSite={currentSite} />
                         )}
 
                         {activeTab === "settings" && (
@@ -959,11 +931,9 @@ function AnalyticsTab({
 
 interface HistoryTabProps {
     currentSite: Site;
-    formatTimestamp: (timestamp: number) => string;
-    formatResponseTime: (time: number) => string;
 }
 
-function HistoryTab({ currentSite, formatTimestamp, formatResponseTime }: HistoryTabProps) {
+function HistoryTab({ currentSite }: HistoryTabProps) {
     const [historyFilter, setHistoryFilter] = useState<"all" | "up" | "down">("all");
     const [historyLimit, setHistoryLimit] = useState(50);
 
@@ -1023,7 +993,7 @@ function HistoryTab({ currentSite, formatTimestamp, formatResponseTime }: Histor
                                 <StatusIndicator status={record.status as any} size="sm" />
                                 <div>
                                     <ThemedText size="sm" weight="medium">
-                                        {formatTimestamp(record.timestamp)}
+                                        {formatFullTimestamp(record.timestamp)}
                                     </ThemedText>
                                     <ThemedText size="xs" variant="secondary" className="ml-4">
                                         Check #{currentSite.history.length - index}

@@ -67,3 +67,26 @@ export const HISTORY_LIMIT_OPTIONS: IntervalOption[] = [
 
 // Default history limit
 export const DEFAULT_HISTORY_LIMIT = 1000;
+
+// Auto-refresh interval for site details (30 seconds)
+export const AUTO_REFRESH_INTERVAL = 30000;
+
+// Request timeout constraints
+export const TIMEOUT_CONSTRAINTS = {
+    MIN: 1000,  // 1 second minimum
+    MAX: 60000, // 60 seconds maximum
+    STEP: 1000, // 1 second increments
+} as const;
+
+// UI delays and timing
+export const UI_DELAYS = {
+    LOADING_BUTTON: 100,  // Delay before showing loading spinners (ms)
+    LOADING_OVERLAY: 100, // Delay before showing loading overlay (ms)
+} as const;
+
+// Uptime quality thresholds
+export const UPTIME_THRESHOLDS = {
+    EXCELLENT: 95,  // >= 95% is excellent (green)
+    GOOD: 90,       // >= 90% is good (yellow/warning)
+    // < 90% is poor (red/error)
+} as const;
