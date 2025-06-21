@@ -35,6 +35,11 @@ interface AppState {
     totalUptime: number;
     totalDowntime: number;
 
+    // Synchronized UI state for SiteDetails
+    activeSiteDetailsTab: "overview" | "analytics" | "history" | "settings";
+    siteDetailsChartTimeRange: "1h" | "24h" | "7d" | "30d";
+    showAdvancedMetrics: boolean;
+
     // Actions - Backend integration
     initializeApp: () => Promise<void>;
     createSite: (siteData: Omit<Site, "id" | "status" | "history">) => Promise<void>;
@@ -69,6 +74,11 @@ interface AppState {
     setError: (error: string | null) => void;
     setLoading: (loading: boolean) => void;
     clearError: () => void;
+
+    // Synchronized UI actions
+    setActiveSiteDetailsTab: (tab: "overview" | "analytics" | "history" | "settings") => void;
+    setSiteDetailsChartTimeRange: (range: "1h" | "24h" | "7d" | "30d") => void;
+    setShowAdvancedMetrics: (show: boolean) => void;
 }
 
 const defaultSettings: AppSettings = {
@@ -103,6 +113,11 @@ export const useStore = create<AppState>()(
             // Statistics initial state
             totalUptime: 0,
             totalDowntime: 0,
+
+            // Synchronized UI state for SiteDetails
+            activeSiteDetailsTab: "overview",
+            siteDetailsChartTimeRange: "24h",
+            showAdvancedMetrics: false,
 
             // Backend integration actions
             initializeApp: async () => {
@@ -390,6 +405,11 @@ export const useStore = create<AppState>()(
             setLoading: (loading: boolean) => set({ isLoading: loading }),
 
             clearError: () => set({ lastError: null }),
+
+            // Synchronized UI actions
+            setActiveSiteDetailsTab: (tab: "overview" | "analytics" | "history" | "settings") => set({ activeSiteDetailsTab: tab }),
+            setSiteDetailsChartTimeRange: (range: "1h" | "24h" | "7d" | "30d") => set({ siteDetailsChartTimeRange: range }),
+            setShowAdvancedMetrics: (show: boolean) => set({ showAdvancedMetrics: show }),
         }),
         {
             name: "uptime-watcher-storage",
@@ -400,6 +420,9 @@ export const useStore = create<AppState>()(
                 sites: state.sites, // Persist sites to maintain history
                 totalUptime: state.totalUptime,
                 totalDowntime: state.totalDowntime,
+                activeSiteDetailsTab: state.activeSiteDetailsTab,
+                siteDetailsChartTimeRange: state.siteDetailsChartTimeRange,
+                showAdvancedMetrics: state.showAdvancedMetrics,
                 // Don't persist error states, loading states, or UI states
             }),
         }

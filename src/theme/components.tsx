@@ -114,13 +114,50 @@ interface ThemedButtonProps {
     disabled?: boolean;
     loading?: boolean;
     fullWidth?: boolean;
-    icon?: string;
+    icon?: React.ReactNode;
+    iconColor?: string;
     iconPosition?: "left" | "right";
     className?: string;
     style?: React.CSSProperties;
     title?: string;
     onClick?: () => void;
     children?: React.ReactNode;
+}
+
+// Utility: map color name to CSS class for icon coloring
+function getIconColorClass(color?: string): string | undefined {
+    if (!color) return undefined;
+    switch (color) {
+        case "primary":
+            return "themed-icon--primary";
+        case "secondary":
+            return "themed-icon--secondary";
+        case "success":
+            return "themed-icon--success";
+        case "warning":
+            return "themed-icon--warning";
+        case "error":
+        case "danger":
+            return "themed-icon--error";
+        case "info":
+            return "themed-icon--info";
+        default:
+            // If it's a hex or rgb(a) or custom string, fallback to inline style
+            return undefined;
+    }
+}
+
+// Utility: always wrap icon in a <span> with color class or style
+function renderColoredIcon(icon: React.ReactNode, color?: string) {
+    if (!icon) return icon;
+    const colorClass = getIconColorClass(color);
+    if (colorClass) {
+        return <span className={colorClass}>{icon}</span>;
+    }
+    if (color) {
+        return <span style={{ color }}>{icon}</span>;
+    }
+    return icon;
 }
 
 export function ThemedButton({
@@ -131,6 +168,7 @@ export function ThemedButton({
     loading = false,
     fullWidth = false,
     icon,
+    iconColor,
     iconPosition = "left",
     className = "",
     style = {},
@@ -158,15 +196,18 @@ export function ThemedButton({
                 </div>
             );
         }
-
         if (icon) {
-            const iconElement = <span className="themed-button__icon">{icon}</span>;
-
-            // If there are no children, just show the icon
+            let iconElement: React.ReactNode;
+            if (React.isValidElement(icon) && iconColor) {
+                iconElement = renderColoredIcon(icon, iconColor);
+            } else if (iconColor) {
+                iconElement = renderColoredIcon(icon, iconColor);
+            } else {
+                iconElement = icon;
+            }
             if (!children) {
                 return iconElement;
             }
-
             return iconPosition === "left" ? (
                 <>
                     {iconElement}
@@ -179,7 +220,6 @@ export function ThemedButton({
                 </>
             );
         }
-
         return children;
     };
 
@@ -456,7 +496,8 @@ export function MiniChartBar({ status, responseTime, timestamp, className = "" }
 // Enhanced components with better visual feedback and icons
 
 interface ThemedIconButtonProps {
-    icon: string;
+    icon: React.ReactNode;
+    iconColor?: string;
     variant?: "primary" | "secondary" | "success" | "warning" | "error" | "ghost";
     size?: "xs" | "sm" | "md" | "lg";
     disabled?: boolean;
@@ -468,6 +509,7 @@ interface ThemedIconButtonProps {
 
 export function ThemedIconButton({
     icon,
+    iconColor,
     variant = "ghost",
     size = "md",
     disabled = false,
@@ -502,6 +544,7 @@ export function ThemedIconButton({
             className={`themed-icon-button ${className}`}
             onClick={onClick}
             icon={icon}
+            iconColor={iconColor}
             style={{
                 width: buttonSize,
                 height: buttonSize,
@@ -509,16 +552,15 @@ export function ThemedIconButton({
                 minWidth: "unset",
             }}
             title={tooltip}
-        >
-            {/* Empty children since we're using icon prop */}
-        </ThemedButton>
+        />
     );
 }
 
 interface ThemedCardProps {
     title?: string;
     subtitle?: string;
-    icon?: string;
+    icon?: React.ReactNode;
+    iconColor?: string;
     variant?: "primary" | "secondary" | "tertiary";
     padding?: "xs" | "sm" | "md" | "lg" | "xl";
     rounded?: "none" | "sm" | "md" | "lg" | "xl";
@@ -536,6 +578,7 @@ export function ThemedCard({
     title,
     subtitle,
     icon,
+    iconColor,
     variant = "primary",
     padding = "lg",
     rounded = "lg",
@@ -581,15 +624,16 @@ export function ThemedCard({
                     }}
                 >
                     {icon && (
-                        <div
+                        <span
                             style={{
                                 fontSize: "1.5em",
                                 lineHeight: "1",
-                                color: currentTheme.colors.primary[500],
+                                display: "flex",
+                                alignItems: "center",
                             }}
                         >
-                            {icon}
-                        </div>
+                            {renderColoredIcon(icon, iconColor || "primary")}
+                        </span>
                     )}
                     <div style={{ flex: 1 }}>
                         {title && (
@@ -613,12 +657,13 @@ export function ThemedCard({
 interface ThemedBadgeProps {
     variant?: "primary" | "secondary" | "success" | "warning" | "error" | "info";
     size?: "xs" | "sm" | "md";
-    icon?: string;
+    icon?: React.ReactNode;
+    iconColor?: string;
     className?: string;
     children: React.ReactNode;
 }
 
-export function ThemedBadge({ variant = "primary", size = "sm", icon, className = "", children }: ThemedBadgeProps) {
+export function ThemedBadge({ variant = "primary", size = "sm", icon, iconColor, className = "", children }: ThemedBadgeProps) {
     const { currentTheme } = useTheme();
 
     const getVariantStyles = () => {
@@ -705,7 +750,11 @@ export function ThemedBadge({ variant = "primary", size = "sm", icon, className 
             className={`themed-badge themed-badge--${variant} themed-badge--${size} ${className}`}
             style={badgeStyles}
         >
-            {icon && <span style={{ fontSize: "0.9em", lineHeight: "1" }}>{icon}</span>}
+            {icon && (
+                <span style={{ fontSize: "0.9em", lineHeight: "1" }}>
+                    {renderColoredIcon(icon, iconColor || variant)}
+                </span>
+            )}
             {children}
         </span>
     );

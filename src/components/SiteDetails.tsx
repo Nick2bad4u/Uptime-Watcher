@@ -36,10 +36,14 @@ import {
     ThemedProgress,
     ThemedIconButton,
     ThemedInput,
-    ThemedCheckbox,
 } from "../theme/components";
 import "chartjs-adapter-date-fns";
 import "./SiteDetails.css";
+import { FaPause, FaPlay } from "react-icons/fa";
+import { FiRefreshCw, FiX, FiTrash2, FiSave } from "react-icons/fi";
+import { MdAccessTime, MdBolt, MdBarChart, MdSettings, MdHistory, MdDelete, MdClose, MdSpeed, MdOutlineFactCheck } from "react-icons/md";
+import { BsGraphUp } from "react-icons/bs";
+import { FaListOl } from "react-icons/fa";
 
 // Register Chart.js components
 ChartJS.register(
@@ -66,33 +70,41 @@ interface SiteDetailsProps {
 export function SiteDetails({ site, onClose }: SiteDetailsProps) {
     const { currentTheme } = useTheme();
     const { getAvailabilityColor, getAvailabilityVariant, getAvailabilityDescription } = useAvailabilityColors();
-    const { sites, deleteSite, checkSiteNow, isLoading, clearError } = useStore();
+    const {
+        sites,
+        deleteSite,
+        checkSiteNow,
+        isLoading,
+        clearError,
+        isMonitoring,
+        setMonitoring,
+        // Synchronized UI state from store
+        activeSiteDetailsTab,
+        setActiveSiteDetailsTab,
+        siteDetailsChartTimeRange,
+        setSiteDetailsChartTimeRange,
+        showAdvancedMetrics,
+        setShowAdvancedMetrics,
+    } = useStore();
 
-    // Enhanced state management
-    const [activeTab, setActiveTab] = useState<"overview" | "analytics" | "history" | "settings">("overview");
-    const [chartTimeRange, setChartTimeRange] = useState<TimePeriod>("24h");
     const [isRefreshing, setIsRefreshing] = useState(false);
-    const [showAdvancedMetrics, setShowAdvancedMetrics] = useState(false);
-    const [autoRefresh, setAutoRefresh] = useState(true);
 
     // Auto-refresh interval
     useEffect(() => {
-        if (!autoRefresh) return;
-
         const interval = setInterval(async () => {
-            if (!isLoading && !isRefreshing) {
+            if (isMonitoring && !isLoading && !isRefreshing) {
                 await handleCheckNow(true);
             }
         }, AUTO_REFRESH_INTERVAL); // Auto-refresh every 30 seconds
 
         return () => clearInterval(interval);
-    }, [autoRefresh, isLoading, isRefreshing]);
+    }, [isMonitoring, isLoading, isRefreshing]);
 
     // Use the updated site from store if available, always get the latest data
     const currentSite = sites.find((s) => s.url === site.url) || site;
 
     // Use analytics hook for all calculations
-    const analytics = useSiteAnalytics(currentSite, chartTimeRange);
+    const analytics = useSiteAnalytics(currentSite, siteDetailsChartTimeRange);
 
     // Create chart config service instance
     const chartConfig = useMemo(() => new ChartConfigService(currentTheme), [currentTheme]);
@@ -190,8 +202,16 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
         }
     };
     // Tab component with enhanced icons
+    const tabIcons: Record<string, React.ReactNode> = {
+        Overview: <MdBarChart />,
+        Analytics: <BsGraphUp />,
+        History: <MdHistory />,
+        Settings: <MdSettings />,
+    };
     const TabButton = ({ label, isActive, onClick }: { label: string; isActive: boolean; onClick: () => void }) => {
-        const [icon, ...textParts] = label.split(" ");
+        const { currentTheme } = useTheme();
+        const labelText = label.replace(/^[^ ]+ /, "");
+        const icon = tabIcons[labelText] || null;
         return (
             <ThemedButton
                 variant={isActive ? "primary" : "ghost"}
@@ -199,8 +219,17 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                 onClick={onClick}
                 className={`px-4 py-2 ${isActive ? "shadow-sm" : ""}`}
                 icon={icon}
+                style={
+                    isActive
+                        ? {
+                              backgroundColor: currentTheme.colors.primary[400],
+                              borderColor: currentTheme.colors.primary[400],
+                              color: currentTheme.colors.text.inverse,
+                          }
+                        : undefined
+                }
             >
-                {textParts.join(" ")}
+                {labelText}
             </ThemedButton>
         );
     };
@@ -219,8 +248,10 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                     <div className="site-details-header">
                         <div className="site-details-header-overlay"></div>
                         <div className="site-details-header-content">
+                            {/* Left accent bar */}
+                            <div className="site-details-header-accent" />
                             <div className="site-details-header-info">
-                                <div className="relative">
+                                <div className="site-details-status-indicator">
                                     <StatusIndicator status={currentSite.status} size="lg" />
                                     {isRefreshing && (
                                         <div className="site-details-loading-spinner">
@@ -228,22 +259,49 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                                         </div>
                                     )}
                                 </div>
-                                <div className="flex-1">
-                                    <div className="site-details-title">{currentSite.name || currentSite.url}</div>
-                                    {currentSite.name && <div className="site-details-url">{currentSite.url}</div>}
+                                <div className="flex-1 min-w-0">
+                                    <ThemedText size="2xl" weight="bold" className="site-details-title truncate">
+                                        {currentSite.name || currentSite.url}
+                                    </ThemedText>
+                                    {currentSite.name && (
+                                        <a
+                                            href={currentSite.url}
+                                            className="site-details-url truncate"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            tabIndex={0}
+                                            aria-label={`Open ${currentSite.url} in browser`}
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                if (hasOpenExternal(window.electronAPI)) {
+                                                    window.electronAPI.openExternal(currentSite.url);
+                                                } else {
+                                                    window.open(currentSite.url, "_blank", "noopener");
+                                                }
+                                            }}
+                                        >
+                                            {currentSite.url}
+                                        </a>
+                                    )}
                                     <div className="site-details-meta">
-                                        <div className="site-details-last-checked">
+                                        <ThemedText size="xs" variant="tertiary" className="site-details-last-checked">
                                             Last checked:{" "}
                                             {formatFullTimestamp(
                                                 typeof currentSite.lastChecked === "number"
                                                     ? currentSite.lastChecked
                                                     : Date.now()
                                             )}
-                                        </div>
-                                        {autoRefresh && (
-                                            <div className="site-details-auto-refresh">
-                                                <div className="site-details-refresh-indicator"></div>
-                                                <div className="site-details-refresh-text">Auto-refresh enabled</div>
+                                        </ThemedText>
+                                        {isMonitoring && (
+                                            <div className="site-details-auto-refresh flex items-center gap-1">
+                                                <div className="site-details-refresh-indicator" />
+                                                <ThemedText
+                                                    size="xs"
+                                                    variant="success"
+                                                    className="site-details-refresh-text"
+                                                >
+                                                    Monitoring enabled
+                                                </ThemedText>
                                             </div>
                                         )}
                                     </div>
@@ -251,14 +309,14 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                             </div>
                             <div className="site-details-actions">
                                 <ThemedIconButton
-                                    icon={autoRefresh ? "⏸️" : "▶️"}
+                                    icon={isMonitoring ? <FaPause /> : <FaPlay />}
                                     variant="ghost"
                                     size="sm"
-                                    onClick={() => setAutoRefresh(!autoRefresh)}
-                                    tooltip={autoRefresh ? "Pause auto-refresh" : "Enable auto-refresh"}
+                                    onClick={() => setMonitoring(!isMonitoring)}
+                                    tooltip={isMonitoring ? "Pause monitoring" : "Resume monitoring"}
                                 />
                                 <ThemedIconButton
-                                    icon="🔄"
+                                    icon={<FiRefreshCw />}
                                     variant="ghost"
                                     size="sm"
                                     onClick={handleCheckNow}
@@ -266,7 +324,7 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                                     tooltip="Check now"
                                 />
                                 <ThemedIconButton
-                                    icon="✕"
+                                    icon={<FiX />}
                                     variant="ghost"
                                     size="sm"
                                     onClick={onClose}
@@ -281,28 +339,28 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                         <div className="flex flex-wrap gap-2">
                             <TabButton
                                 label="📊 Overview"
-                                isActive={activeTab === "overview"}
-                                onClick={() => setActiveTab("overview")}
+                                isActive={activeSiteDetailsTab === "overview"}
+                                onClick={() => setActiveSiteDetailsTab("overview")}
                             />
                             <TabButton
                                 label="📈 Analytics"
-                                isActive={activeTab === "analytics"}
-                                onClick={() => setActiveTab("analytics")}
+                                isActive={activeSiteDetailsTab === "analytics"}
+                                onClick={() => setActiveSiteDetailsTab("analytics")}
                             />
                             <TabButton
                                 label="📜 History"
-                                isActive={activeTab === "history"}
-                                onClick={() => setActiveTab("history")}
+                                isActive={activeSiteDetailsTab === "history"}
+                                onClick={() => setActiveSiteDetailsTab("history")}
                             />
                             <TabButton
                                 label="⚙️ Settings"
-                                isActive={activeTab === "settings"}
-                                onClick={() => setActiveTab("settings")}
+                                isActive={activeSiteDetailsTab === "settings"}
+                                onClick={() => setActiveSiteDetailsTab("settings")}
                             />
                         </div>
 
                         {/* Time Range Selector for Analytics */}
-                        {activeTab === "analytics" && (
+                        {activeSiteDetailsTab === "analytics" && (
                             <div className="flex items-center flex-wrap gap-3 mt-4">
                                 <ThemedText size="sm" variant="secondary" className="mr-2">
                                     Time Range:
@@ -311,9 +369,9 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                                     {(["1h", "24h", "7d", "30d"] as const).map((range) => (
                                         <ThemedButton
                                             key={range}
-                                            variant={chartTimeRange === range ? "primary" : "ghost"}
+                                            variant={siteDetailsChartTimeRange === range ? "primary" : "ghost"}
                                             size="xs"
-                                            onClick={() => setChartTimeRange(range)}
+                                            onClick={() => setSiteDetailsChartTimeRange(range)}
                                         >
                                             {range}
                                         </ThemedButton>
@@ -325,7 +383,7 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
 
                     {/* Tab Content */}
                     <ThemedBox variant="primary" padding="lg" className="max-h-[70vh] overflow-y-auto">
-                        {activeTab === "overview" && (
+                        {activeSiteDetailsTab === "overview" && (
                             <OverviewTab
                                 currentSite={currentSite}
                                 uptime={analytics.uptime}
@@ -339,7 +397,7 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                             />
                         )}
 
-                        {activeTab === "analytics" && (
+                        {activeSiteDetailsTab === "analytics" && (
                             <AnalyticsTab
                                 filteredHistory={analytics.filteredHistory}
                                 upCount={analytics.upCount}
@@ -353,7 +411,7 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                                 mttr={analytics.mttr}
                                 totalDowntime={analytics.totalDowntime}
                                 downtimePeriods={analytics.downtimePeriods}
-                                chartTimeRange={chartTimeRange}
+                                chartTimeRange={siteDetailsChartTimeRange}
                                 lineChartData={lineChartData}
                                 lineChartOptions={lineChartOptions}
                                 barChartData={barChartData}
@@ -370,15 +428,13 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                             />
                         )}
 
-                        {activeTab === "history" && <HistoryTab currentSite={currentSite} />}
+                        {activeSiteDetailsTab === "history" && <HistoryTab currentSite={currentSite} />}
 
-                        {activeTab === "settings" && (
+                        {activeSiteDetailsTab === "settings" && (
                             <SettingsTab
                                 currentSite={currentSite}
                                 handleRemoveSite={handleRemoveSite}
                                 isLoading={isLoading}
-                                autoRefresh={autoRefresh}
-                                setAutoRefresh={setAutoRefresh}
                             />
                         )}
                     </ThemedBox>
@@ -412,8 +468,9 @@ function OverviewTab({
     handleRemoveSite,
     isLoading,
 }: OverviewTabProps) {
-    const { getAvailabilityVariant } = useAvailabilityColors();
-    
+    const { getAvailabilityVariant, getAvailabilityColor } = useAvailabilityColors();
+    const { currentTheme } = useTheme();
+
     // Map availability variant to progress/badge variant
     const mapAvailabilityToBadgeVariant = (availability: number): "success" | "warning" | "error" => {
         const variant = getAvailabilityVariant(availability);
@@ -423,15 +480,36 @@ function OverviewTab({
     const uptimeValue = parseFloat(uptime);
     const progressVariant = mapAvailabilityToBadgeVariant(uptimeValue);
 
+    // Icon colors from theme/availability
+    const statusIconColor = getAvailabilityColor(uptimeValue); // Status icon color by availability
+    const uptimeIconColor = getAvailabilityColor(uptimeValue); // Uptime icon color by availability
+    const responseIconColor = currentTheme.colors.warning; // Response time icon uses theme warning
+    const checksIconColor = currentTheme.colors.primary[500]; // Checks icon uses theme primary
+    const fastestIconColor = currentTheme.colors.success; // Fastest uses theme success
+    const slowestIconColor = currentTheme.colors.warning; // Slowest uses theme warning
+    const quickActionIconColor = currentTheme.colors.error; // Quick action uses theme error
+
     return (
         <div className="space-y-6">
             {/* Key Metrics Grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <ThemedCard icon="📊" title="Status" hoverable className="text-center flex flex-col items-center">
+                <ThemedCard
+                    icon={<MdOutlineFactCheck />}
+                    iconColor={statusIconColor}
+                    title="Status"
+                    hoverable
+                    className="text-center flex flex-col items-center"
+                >
                     <StatusIndicator status={currentSite.status} size="lg" showText />
                 </ThemedCard>
 
-                <ThemedCard icon="⏱️" title="Uptime" hoverable className="text-center flex flex-col items-center">
+                <ThemedCard
+                    icon={<MdAccessTime />}
+                    iconColor={uptimeIconColor}
+                    title="Uptime"
+                    hoverable
+                    className="text-center flex flex-col items-center"
+                >
                     <ThemedProgress
                         value={uptimeValue}
                         variant={progressVariant}
@@ -444,7 +522,8 @@ function OverviewTab({
                 </ThemedCard>
 
                 <ThemedCard
-                    icon="⚡"
+                    icon={<MdSpeed />}
+                    iconColor={responseIconColor}
                     title="Response Time"
                     hoverable
                     className="text-center flex flex-col items-center"
@@ -454,7 +533,13 @@ function OverviewTab({
                     </ThemedText>
                 </ThemedCard>
 
-                <ThemedCard icon="📈" title="Total Checks" hoverable className="text-center flex flex-col items-center">
+                <ThemedCard
+                    icon={<FaListOl />}
+                    iconColor={checksIconColor}
+                    title="Total Checks"
+                    hoverable
+                    className="text-center flex flex-col items-center"
+                >
                     <ThemedText size="xl" weight="bold">
                         {totalChecks}
                     </ThemedText>
@@ -462,13 +547,13 @@ function OverviewTab({
             </div>
 
             {/* Performance Metrics */}
-            <ThemedCard icon="🚀" title="Performance Overview">
+            <ThemedCard icon={<MdBolt color={fastestIconColor} />} title="Performance Overview">
                 <div className="grid grid-cols-2 gap-6">
                     <div>
                         <ThemedText size="sm" variant="secondary">
                             Fastest Response
                         </ThemedText>
-                        <ThemedBadge variant="success" icon="🚀" className="ml-4">
+                        <ThemedBadge variant="success" icon={<MdBolt />} iconColor={fastestIconColor} className="ml-4">
                             {formatResponseTime(fastestResponse)}
                         </ThemedBadge>
                     </div>
@@ -476,7 +561,7 @@ function OverviewTab({
                         <ThemedText size="sm" variant="secondary">
                             Slowest Response
                         </ThemedText>
-                        <ThemedBadge variant="warning" icon="🐌" className="ml-4">
+                        <ThemedBadge variant="warning" icon={<MdAccessTime />} iconColor={slowestIconColor} className="ml-4">
                             {formatResponseTime(slowestResponse)}
                         </ThemedBadge>
                     </div>
@@ -484,9 +569,9 @@ function OverviewTab({
             </ThemedCard>
 
             {/* Quick Actions */}
-            <ThemedCard icon="⚡" title="Quick Actions">
+            <ThemedCard icon={<MdBolt color={quickActionIconColor} />} title="Quick Actions">
                 <div className="flex space-x-3">
-                    <ThemedButton variant="error" size="sm" onClick={handleRemoveSite} disabled={isLoading} icon="🗑️">
+                    <ThemedButton variant="error" size="sm" onClick={handleRemoveSite} disabled={isLoading} icon={<FiTrash2 />}>
                         Remove Site
                     </ThemedButton>
                 </div>
@@ -807,11 +892,9 @@ interface SettingsTabProps {
     currentSite: Site;
     handleRemoveSite: () => Promise<void>;
     isLoading: boolean;
-    autoRefresh: boolean;
-    setAutoRefresh: (value: boolean) => void;
 }
 
-function SettingsTab({ currentSite, handleRemoveSite, isLoading, autoRefresh, setAutoRefresh }: SettingsTabProps) {
+function SettingsTab({ currentSite, handleRemoveSite, isLoading }: SettingsTabProps) {
     const { modifySite, clearError } = useStore();
     const [localName, setLocalName] = useState(currentSite.name || "");
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -837,12 +920,6 @@ function SettingsTab({ currentSite, handleRemoveSite, isLoading, autoRefresh, se
         }
     };
 
-    const handleAutoRefreshChange = (value: boolean) => {
-        setAutoRefresh(value);
-        // Auto-save this setting immediately
-        // Note: This is a UI-only setting, not persisted to the site
-    };
-
     return (
         <div className="space-y-6">
             {/* Site Configuration */}
@@ -866,7 +943,7 @@ function SettingsTab({ currentSite, handleRemoveSite, isLoading, autoRefresh, se
                                 onClick={handleSaveName}
                                 disabled={!hasUnsavedChanges || isLoading}
                                 loading={isLoading}
-                                icon="💾"
+                                icon={<FiSave />}
                             >
                                 Save
                             </ThemedButton>
@@ -891,24 +968,7 @@ function SettingsTab({ currentSite, handleRemoveSite, isLoading, autoRefresh, se
             </ThemedCard>
 
             {/* Monitoring Settings */}
-            <ThemedCard icon="📡" title="Monitoring Settings">
-                <div className="space-y-4">
-                    <div className="flex items-center justify-between gap-4">
-                        <div className="flex-1 space-y-2">
-                            <ThemedText size="sm" weight="medium">
-                                Auto-refresh Details
-                            </ThemedText>
-                            <ThemedText size="xs" variant="secondary" className="ml-4">
-                                Automatically refresh site data in this view
-                            </ThemedText>
-                        </div>
-                        <ThemedCheckbox
-                            checked={autoRefresh}
-                            onChange={(e) => handleAutoRefreshChange(e.target.checked)}
-                        />
-                    </div>
-                </div>
-            </ThemedCard>
+            {/* Removed Auto-refresh Details toggle and card as it is redundant with real-time state updates */}
 
             {/* Site Information */}
             <ThemedCard icon="📊" title="Site Information">
@@ -955,7 +1015,7 @@ function SettingsTab({ currentSite, handleRemoveSite, isLoading, autoRefresh, se
                             size="sm"
                             onClick={handleRemoveSite}
                             loading={isLoading}
-                            icon="🗑️"
+                            icon={<FiTrash2 />}
                         >
                             Remove Site
                         </ThemedButton>
@@ -964,4 +1024,9 @@ function SettingsTab({ currentSite, handleRemoveSite, isLoading, autoRefresh, se
             </ThemedCard>
         </div>
     );
+}
+
+// Add this type guard at the top of the file (after imports):
+function hasOpenExternal(api: any): api is { openExternal: (url: string) => void } {
+    return typeof api?.openExternal === "function";
 }
