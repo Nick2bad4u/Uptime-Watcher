@@ -141,11 +141,15 @@
       "output": "dist"
     },
     "files": [
-      "dist/**/*",
       "dist-electron/**/*",
+      "dist/**/*",
       "node_modules/**/*",
       "!node_modules/@tailwindcss/oxide-*",
-      "!node_modules/@tailwindcss/oxide-*/**"
+      "!node_modules/@tailwindcss/oxide-*/**",
+      "!dist/mac-universal-*",
+      "!dist/*.app",
+      "!dist/*.dmg",
+      "!dist/*.zip"
     ],
     "win": {
       "icon": "icons/favicon-256x256.ico",
@@ -231,8 +235,7 @@
       "category": "public.app-category.productivity",
       "hardenedRuntime": true,
       "gatekeeperAssess": true,
-      "x64ArchFiles": "Contents/Resources/app.asar.unpacked/node_modules/lightningcss-darwin-arm64/**",
-      "allowList": "dist/mac-universal-x64-temp/Electron.app"
+      "x64ArchFiles": "Contents/Resources/app.asar.unpacked/node_modules/lightningcss-darwin-arm64/**"
     },
     "linux": {
       "icon": "icons/favicon-256x256.png",
