@@ -7,9 +7,106 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[45f6ecd](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/45f6ecd4a96d60d29d410c652092dc1009e6b8ef)...
-[45f6ecd](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/45f6ecd4a96d60d29d410c652092dc1009e6b8ef)]
-([compare](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/compare/45f6ecd4a96d60d29d410c652092dc1009e6b8ef...45f6ecd4a96d60d29d410c652092dc1009e6b8ef))
+[[0733182](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/0733182d8e7d3c6dc43fbeec991718c3b8724188)...
+[0733182](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/0733182d8e7d3c6dc43fbeec991718c3b8724188)]
+([compare](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/compare/0733182d8e7d3c6dc43fbeec991718c3b8724188...0733182d8e7d3c6dc43fbeec991718c3b8724188))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 1.7.0 [`(0733182)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/0733182d8e7d3c6dc43fbeec991718c3b8724188)
+
+
+
+
+
+
+## [1.7.0] - 2025-06-21
+
+
+[[50b2260](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/50b226067cb7937fdfa5dfebf50ecde976683f05)...
+[f047a8c](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/f047a8c6129c45d8318d82df43d26b84cbf30f2a)]
+([compare](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/compare/50b226067cb7937fdfa5dfebf50ecde976683f05...f047a8c6129c45d8318d82df43d26b84cbf30f2a))
+
+
+### 🚀 Features
+
+- Implement availability color utility and enhance themed components with new status variants [`(50b2260)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/50b226067cb7937fdfa5dfebf50ecde976683f05)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher) [`(7d52d3c)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/7d52d3cedf02fedd1b2899f27b4c2de3c975d561)
+
+
+
+### 💼 Other
+
+- Update package.json [`(f047a8c)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/f047a8c6129c45d8318d82df43d26b84cbf30f2a)
+
+
+- Refactor code for improved readability and consistency
+
+- Cleaned up formatting and spacing in SiteDetails component for better readability.
+- Consolidated memoization hooks in SiteDetails for line and bar chart options.
+- Streamlined logger service for consistent logging format and improved clarity.
+- Enhanced theme component styles for better maintainability.
+- Updated constants for consistent spacing and formatting.
+- Refactored useSiteAnalytics hook for clarity and performance.
+- Improved time formatting utility functions for consistency.
+- Removed unnecessary whitespace and comments in various files. [`(6e75286)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/6e75286ce8d9f7eccf287f3dbfb5cbb17c19be20)
+
+
+- Migrates to structured logging using electron-log
+
+Replaces all console-based statements with a centralized, production-ready logging approach powered by electron-log. Introduces a shared logging service for both main and renderer processes, providing contextual log levels, error stack capture, and log rotation. Enhances traceability of site operations, user actions, settings changes, and application events, supporting easier debugging and future log analytics. Updates Flatpak and build configs for new log file paths and improves package metadata for distribution.
+
+See Logging-Migration-Summary.md for migration details. [`(deab1aa)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/deab1aaa57f205516f8658816b8f53715b0c4677)
+
+
+- Centralizes time period constants for analytics
+
+Eliminates duplicate time period definitions by introducing a single source of truth for analytics-related time intervals. Updates relevant modules to use the new centralized constants, improving maintainability and reducing risk of inconsistencies. Also replaces a magic number for timeout with a derived constant to enhance configuration clarity. [`(361601f)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/361601f52824d2fff76e2ffce017b69efc3a053f)
+
+
+- Refactors analytics and chart config for maintainability
+
+Centralizes chart configuration and site analytics logic into
+dedicated, reusable services and hooks, reducing code duplication
+and improving type safety. Introduces comprehensive constants
+management for easier global configuration and future extensibility.
+Enhances performance through memoization and clarifies application
+structure for easier future development and testing. [`(78dc5b9)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/78dc5b9bbd99e23ca0fd5869192050b09ecf239f)
+
+
+- Centralizes timing logic and UI thresholds
+
+Moves time formatting utilities and UI delay values into shared modules for improved consistency and maintainability.
+Unifies response time and timestamp formatting, uptime thresholds, and timeout constraints, reducing code duplication and easing future updates to timing logic across the app. [`(d174393)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/d174393e816e391634730a83cd6dcccc937561ae)
+
+
+- Refactors store actions for unified backend integration
+
+Streamlines state management by consolidating all backend-related logic into async store actions, improving error handling and reducing UI code duplication. Updates components to use new store methods for site CRUD, monitoring, and settings, removing direct backend calls and redundant loading/error state management. Expands interval and history limit options for greater configurability.
+
+Improves maintainability and enables clearer separation of concerns between UI and data logic. [`(dcb8db7)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/dcb8db74e3f71717fd1a9cde2f9cdc3e860ed88b)
+
+
+
+### 🎨 Styling
+
+- Format code for improved readability in preload.js [`(0ea0dbc)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/0ea0dbc81ad04fd4e95574e9d1f4470b6a6afe2d)
+
+
+
+### ⚙️ Miscellaneous Tasks
+
+- Update changelogs for v1.6.0 [skip ci] [`(0d47ce3)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/0d47ce3703ec536f5462bbb978e06e54d87ac5b6)
+
+
+- Update Tailwind CSS to version 4.1.10 and adjust configuration [`(58ba9f7)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/58ba9f7b3c60edfd811e0dd382ba9d0cbed659b5)
+
 
 
 ### 📦 Dependencies
