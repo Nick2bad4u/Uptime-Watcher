@@ -38,6 +38,7 @@ declare global {
             getHistoryLimit: () => Promise<number>;
             onStatusUpdate: (callback: (data: StatusUpdate) => void) => void;
             removeAllListeners: (channel: string) => void;
+            quitAndInstall?: () => void;
         };
     }
 }

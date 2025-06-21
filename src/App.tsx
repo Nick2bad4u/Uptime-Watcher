@@ -19,15 +19,22 @@ function App() {
         showSiteDetails,
         lastError,
         isLoading,
+        updateStatus,
+        updateError,
         // Store actions - backend integration
         initializeApp,
         startSiteMonitoring,
         stopSiteMonitoring,
         updateSiteStatus,
+        subscribeToStatusUpdates,
+        unsubscribeFromStatusUpdates,
         // UI actions
         setShowSettings,
         setShowSiteDetails,
         clearError,
+        setUpdateStatus,
+        setUpdateError,
+        applyUpdate,
     } = useStore();
 
     const { isDark } = useTheme();
@@ -57,8 +64,9 @@ function App() {
     }, [isLoading]);
 
     useEffect(() => {
-        // Initialize app data on startup
-        logger.app.started();
+        if (process.env.NODE_ENV === "production") {
+            logger.app.started();
+        }
         initializeApp();
 
         // Listen for status updates
@@ -66,13 +74,13 @@ function App() {
             updateSiteStatus(update);
         };
 
-        window.electronAPI.onStatusUpdate(handleStatusUpdate);
+        subscribeToStatusUpdates(handleStatusUpdate);
 
         // Cleanup
         return () => {
-            window.electronAPI.removeAllListeners("status-update");
+            unsubscribeFromStatusUpdates();
         };
-    }, [initializeApp, updateSiteStatus]);
+    }, [initializeApp, updateSiteStatus, subscribeToStatusUpdates, unsubscribeFromStatusUpdates]);
 
     const handleStartMonitoring = async () => {
         try {
@@ -128,6 +136,54 @@ function App() {
                                 >
                                     ✕
                                 </ThemedButton>
+                            </div>
+                        </ThemedBox>
+                    </div>
+                )}
+
+                {/* Update Notification */}
+                {(updateStatus === "available" ||
+                    updateStatus === "downloading" ||
+                    updateStatus === "downloaded" ||
+                    updateStatus === "error") && (
+                    <div className="fixed top-12 left-0 right-0 z-50">
+                        <ThemedBox
+                            surface="elevated"
+                            padding="md"
+                            className={`update-alert update-alert--${updateStatus}`}
+                        >
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-2">
+                                    <div className="update-alert__icon">
+                                        {updateStatus === "available" && "⬇️"}
+                                        {updateStatus === "downloading" && "⏬"}
+                                        {updateStatus === "downloaded" && "✅"}
+                                        {updateStatus === "error" && "⚠️"}
+                                    </div>
+                                    <ThemedText size="sm" variant={updateStatus === "error" ? "error" : "primary"}>
+                                        {updateStatus === "available" && "A new update is available. Downloading..."}
+                                        {updateStatus === "downloading" && "Update is downloading..."}
+                                        {updateStatus === "downloaded" && "Update downloaded! Restart to apply."}
+                                        {updateStatus === "error" && (updateError || "Update failed.")}
+                                    </ThemedText>
+                                </div>
+                                {(updateStatus === "downloaded" || updateStatus === "error") && (
+                                    <ThemedButton
+                                        variant="secondary"
+                                        size="sm"
+                                        onClick={() => {
+                                            if (updateStatus === "downloaded") {
+                                                applyUpdate();
+                                            } else {
+                                                setUpdateStatus("idle");
+                                                setUpdateError(null);
+                                            }
+                                        }}
+                                        className="update-alert__action ml-4"
+                                    >
+                                        {updateStatus === "downloaded" ? "Restart Now" : "Dismiss"}
+                                    </ThemedButton>
+                                )}
                             </div>
                         </ThemedBox>
                     </div>

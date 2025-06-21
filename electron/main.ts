@@ -1,4 +1,5 @@
 import { app, BrowserWindow, ipcMain, Notification } from "electron";
+import { autoUpdater } from "electron-updater";
 import path from "path";
 import { isDev } from "./utils";
 import { UptimeMonitor } from "./uptimeMonitor";
@@ -43,6 +44,8 @@ class Main {
         app.on("ready", () => {
             logger.info("App ready, creating main window");
             this.createMainWindow();
+            // Start auto-updater after window is created
+            this.setupAutoUpdater();
         });
 
         app.on("window-all-closed", () => {
@@ -191,6 +194,33 @@ class Main {
                 logger.warn("Notifications not supported on this platform");
             }
         });
+
+        ipcMain.on("quit-and-install", () => {
+            autoUpdater.quitAndInstall();
+        });
+    }
+
+    private setupAutoUpdater() {
+        if (!this.mainWindow) return;
+        autoUpdater.on("checking-for-update", () => {
+            this.mainWindow?.webContents.send("update-status", { status: "checking" });
+        });
+        autoUpdater.on("update-available", () => {
+            this.mainWindow?.webContents.send("update-status", { status: "available" });
+        });
+        autoUpdater.on("update-not-available", () => {
+            this.mainWindow?.webContents.send("update-status", { status: "idle" });
+        });
+        autoUpdater.on("download-progress", () => {
+            this.mainWindow?.webContents.send("update-status", { status: "downloading" });
+        });
+        autoUpdater.on("update-downloaded", () => {
+            this.mainWindow?.webContents.send("update-status", { status: "downloaded" });
+        });
+        autoUpdater.on("error", (err) => {
+            this.mainWindow?.webContents.send("update-status", { status: "error", error: err?.message || String(err) });
+        });
+        autoUpdater.checkForUpdatesAndNotify();
     }
 }
 

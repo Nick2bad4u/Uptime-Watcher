@@ -33,4 +33,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
     removeAllListeners: (channel: string) => {
         ipcRenderer.removeAllListeners(channel);
     },
+
+    // Updater: allow renderer to trigger quitAndInstall
+    quitAndInstall: () => ipcRenderer.send("quit-and-install"),
 });

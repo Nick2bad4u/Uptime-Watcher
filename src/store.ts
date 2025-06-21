@@ -4,6 +4,8 @@ import { Site, StatusUpdate } from "./types";
 import { ThemeName } from "./theme/types";
 import { DEFAULT_CHECK_INTERVAL, TIMEOUT_CONSTRAINTS } from "./constants";
 
+export type UpdateStatus = "idle" | "checking" | "available" | "downloading" | "downloaded" | "error";
+
 interface AppSettings {
     notifications: boolean;
     autoStart: boolean;
@@ -39,6 +41,10 @@ interface AppState {
     activeSiteDetailsTab: "overview" | "analytics" | "history" | "settings";
     siteDetailsChartTimeRange: "1h" | "24h" | "7d" | "30d";
     showAdvancedMetrics: boolean;
+
+    // Update status
+    updateStatus: UpdateStatus;
+    updateError: string | null;
 
     // Actions - Backend integration
     initializeApp: () => Promise<void>;
@@ -79,6 +85,14 @@ interface AppState {
     setActiveSiteDetailsTab: (tab: "overview" | "analytics" | "history" | "settings") => void;
     setSiteDetailsChartTimeRange: (range: "1h" | "24h" | "7d" | "30d") => void;
     setShowAdvancedMetrics: (show: boolean) => void;
+
+    // Update status actions
+    setUpdateStatus: (status: UpdateStatus) => void;
+    setUpdateError: (error: string | null) => void;
+    // Update: apply downloaded update and restart
+    applyUpdate: () => void;
+    subscribeToStatusUpdates: (callback: (update: StatusUpdate) => void) => void;
+    unsubscribeFromStatusUpdates: () => void;
 }
 
 const defaultSettings: AppSettings = {
@@ -118,6 +132,10 @@ export const useStore = create<AppState>()(
             activeSiteDetailsTab: "overview",
             siteDetailsChartTimeRange: "24h",
             showAdvancedMetrics: false,
+
+            // Update status initial state
+            updateStatus: "idle",
+            updateError: null,
 
             // Backend integration actions
             initializeApp: async () => {
@@ -412,6 +430,20 @@ export const useStore = create<AppState>()(
             setSiteDetailsChartTimeRange: (range: "1h" | "24h" | "7d" | "30d") =>
                 set({ siteDetailsChartTimeRange: range }),
             setShowAdvancedMetrics: (show: boolean) => set({ showAdvancedMetrics: show }),
+
+            // Update status actions
+            setUpdateStatus: (status: UpdateStatus) => set({ updateStatus: status }),
+            setUpdateError: (error: string | null) => set({ updateError: error }),
+            // Update: apply downloaded update and restart
+            applyUpdate: () => {
+                window.electronAPI.quitAndInstall?.();
+            },
+            subscribeToStatusUpdates: (callback: (update: StatusUpdate) => void) => {
+                window.electronAPI.onStatusUpdate(callback);
+            },
+            unsubscribeFromStatusUpdates: () => {
+                window.electronAPI.removeAllListeners("status-update");
+            },
         }),
         {
             name: "uptime-watcher-storage",

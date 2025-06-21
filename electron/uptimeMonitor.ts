@@ -140,16 +140,23 @@ export class UptimeMonitor extends EventEmitter {
     }
 
     public setHistoryLimit(limit: number) {
-        this.historyLimit = Math.max(10, Math.min(1000, limit)); // Clamp between 10 and 1000
-        this.saveSites();
-
-        // Trim existing history for all sites to new limit
-        for (const site of this.sites.values()) {
-            if (site.history.length > this.historyLimit) {
-                site.history = site.history.slice(0, this.historyLimit);
-            }
+        // Allow unlimited if limit is 0 or negative, otherwise clamp to at least 10
+        if (limit <= 0) {
+            this.historyLimit = 0; // 0 means unlimited
+        } else {
+            this.historyLimit = Math.max(10, limit);
         }
         this.saveSites();
+
+        // Trim existing history for all sites only if limit > 0
+        if (this.historyLimit > 0) {
+            for (const site of this.sites.values()) {
+                if (site.history.length > this.historyLimit) {
+                    site.history = site.history.slice(0, this.historyLimit);
+                }
+            }
+            this.saveSites();
+        }
     }
 
     public getHistoryLimit(): number {
@@ -223,7 +230,7 @@ export class UptimeMonitor extends EventEmitter {
         };
 
         site.history.unshift(historyEntry); // Add to beginning for newest first
-        if (site.history.length > this.historyLimit) {
+        if (this.historyLimit > 0 && site.history.length > this.historyLimit) {
             site.history = site.history.slice(0, this.historyLimit);
         }
 
