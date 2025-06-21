@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Uptime Watcher
+Comment=Monitor website uptime and performance
+Exec=io.github.uptimewatcher %U
+Icon=io.github.uptimewatcher
+Type=Application
+Categories=Network;Monitor;System;
+Keywords=uptime;monitoring;website;performance;network;
+StartupNotify=true
+MimeType=application/x-uptime-watcher;

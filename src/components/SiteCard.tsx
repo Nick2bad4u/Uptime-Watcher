@@ -12,6 +12,7 @@ import {
     MiniChartBar,
     ThemedTooltip,
 } from "../theme/components";
+import logger from "../services/logger";
 
 interface SiteCardProps {
     site: Site;
@@ -25,8 +26,9 @@ export function SiteCard({ site }: SiteCardProps) {
         e?.stopPropagation(); // Prevent card click
         try {
             await checkSiteNow(site.url);
+            logger.user.action('Quick site check', { url: site.url });
         } catch (error) {
-            console.error("Failed to check site:", error);
+            logger.site.error(site.url, error instanceof Error ? error : String(error));
         }
     };
 
@@ -38,8 +40,9 @@ export function SiteCard({ site }: SiteCardProps) {
 
         try {
             await deleteSite(site.url);
+            logger.site.removed(site.url);
         } catch (error) {
-            console.error("Failed to remove site:", error);
+            logger.site.error(site.url, error instanceof Error ? error : String(error));
         }
     };
 

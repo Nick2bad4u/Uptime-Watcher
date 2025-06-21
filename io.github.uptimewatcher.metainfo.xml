@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.uptimewatcher</id>
+  <metadata_license>MIT</metadata_license>
+  <project_license>MIT</project_license>
+  <name>Uptime Watcher</name>
+  <summary>Monitor website uptime and performance</summary>
+  <description>
+    <p>
+      Uptime Watcher is a desktop application for monitoring website uptime 
+      and performance. Track multiple websites, get notifications when sites go down, 
+      and view detailed analytics and response time charts.
+    </p>
+    <p>Features:</p>
+    <ul>
+      <li>Real-time website monitoring</li>
+      <li>Multiple theme support (light, dark, high-contrast)</li>
+      <li>Detailed analytics and charts</li>
+      <li>Desktop notifications for downtime alerts</li>
+      <li>Export/import monitoring data</li>
+      <li>Customizable check intervals</li>
+    </ul>
+  </description>
+  <launchable type="desktop-id">io.github.uptimewatcher.desktop</launchable>
+  <screenshots>
+    <screenshot type="default">
+      <caption>Main application window showing site monitoring dashboard</caption>
+    </screenshot>
+  </screenshots>
+  <url type="homepage">https://github.com/YourUsername/Uptime-Watcher</url>
+  <url type="bugtracker">https://github.com/YourUsername/Uptime-Watcher/issues</url>
+  <categories>
+    <category>Network</category>
+    <category>Monitor</category>
+    <category>System</category>
+  </categories>
+  <keywords>
+    <keyword>uptime</keyword>
+    <keyword>monitoring</keyword>
+    <keyword>website</keyword>
+    <keyword>performance</keyword>
+    <keyword>network</keyword>
+  </keywords>
+  <provides>
+    <binary>io.github.uptimewatcher</binary>
+  </provides>
+  <releases>
+    <release version="1.0.0" date="2025-06-21">
+      <description>
+        <p>Initial release of Uptime Watcher</p>
+        <ul>
+          <li>Website uptime monitoring</li>
+          <li>Multiple theme support</li>
+          <li>Analytics and charting</li>
+          <li>Desktop notifications</li>
+        </ul>
+      </description>
+    </release>
+  </releases>
+</component>

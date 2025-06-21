@@ -115,6 +115,7 @@
     "chart.js": "^4.4.2",
     "chartjs-adapter-date-fns": "^3.0.0",
     "chartjs-plugin-zoom": "^2.2.0",
+    "electron-log": "^5.4.1",
     "lowdb": "^7.0.1",
     "react": "^19.1.0",
     "react-chartjs-2": "^5.2.0",
@@ -123,7 +124,7 @@
   },
   "build": {
     "icon": "icons/favicon.ico",
-    "appId": "com.example.uptime-watcher",
+    "appId": "io.github.uptime-watcher",
     "artifactName": "Uptime-Watcher-${platform}-${arch}-${version}.${ext}",
     "asar": true,
     "publish": [

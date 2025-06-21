@@ -11,6 +11,7 @@ import {
 import { useTheme } from "../theme/useTheme";
 import { CHECK_INTERVALS, HISTORY_LIMIT_OPTIONS, TIMEOUT_CONSTRAINTS, UI_DELAYS } from "../constants";
 import { useState, useEffect } from "react";
+import logger from "../services/logger";
 
 interface SettingsProps {
     onClose: () => void;
@@ -57,14 +58,17 @@ export function Settings({ onClose }: SettingsProps) {
     }, [isLoading]);
 
     const handleSettingChange = (key: keyof typeof settings, value: any) => {
+        const oldValue = settings[key];
         updateSettings({ [key]: value });
+        logger.user.settingsChange(key, oldValue, value);
     };
 
     const handleIntervalChange = async (interval: number) => {
         try {
             await updateCheckIntervalValue(interval);
+            logger.user.settingsChange('checkInterval', checkInterval, interval);
         } catch (error) {
-            console.error("Failed to update check interval:", error);
+            logger.error("Failed to update check interval from settings", error);
             // Error is already handled by the store action
         }
     };
@@ -72,8 +76,9 @@ export function Settings({ onClose }: SettingsProps) {
     const handleHistoryLimitChange = async (limit: number) => {
         try {
             await updateHistoryLimitValue(limit);
+            logger.user.settingsChange('historyLimit', settings.historyLimit, limit);
         } catch (error) {
-            console.error("Failed to update history limit:", error);
+            logger.error("Failed to update history limit from settings", error);
             // Error is already handled by the store action
         }
     };
@@ -82,11 +87,14 @@ export function Settings({ onClose }: SettingsProps) {
         if (window.confirm("Are you sure you want to reset all settings to defaults?")) {
             resetSettings();
             clearError(); // Clear any errors when resetting
+            logger.user.action('Reset settings to defaults');
         }
     };
 
     const handleThemeChange = (themeName: string) => {
+        const oldTheme = settings.theme;
         setTheme(themeName as any);
+        logger.user.settingsChange('theme', oldTheme, themeName);
     };
 
     const handleExportData = async () => {
@@ -101,8 +109,9 @@ export function Settings({ onClose }: SettingsProps) {
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+            logger.user.action('Exported app data');
         } catch (error) {
-            console.error("Failed to export data:", error);
+            logger.error("Failed to export data from settings", error);
             // Error is already handled by the store action
         }
     };
@@ -115,11 +124,12 @@ export function Settings({ onClose }: SettingsProps) {
             const text = await file.text();
             const success = await importAppData(text);
             if (success) {
+                logger.user.action('Imported app data successfully');
                 // Refresh the page to show imported data
                 window.location.reload();
             }
         } catch (error) {
-            console.error("Failed to import data:", error);
+            logger.error("Failed to import data from settings", error);
             // Error is already handled by the store action
         } finally {
             // Reset file input

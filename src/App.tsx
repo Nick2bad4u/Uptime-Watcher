@@ -9,6 +9,7 @@ import { Settings } from "./components/Settings";
 import { SiteDetails } from "./components/SiteDetails";
 import { ThemeProvider, ThemedBox, ThemedText, ThemedButton } from "./theme/components";
 import { StatusUpdate } from "./types";
+import logger from "./services/logger";
 
 function App() {
     const {
@@ -58,6 +59,7 @@ function App() {
 
     useEffect(() => {
         // Initialize app data on startup
+        logger.app.started();
         initializeApp();
 
         // Listen for status updates
@@ -76,16 +78,18 @@ function App() {
     const handleStartMonitoring = async () => {
         try {
             await startSiteMonitoring();
+            logger.user.action('Started monitoring');
         } catch (error) {
-            console.error("Failed to start monitoring:", error);
+            logger.app.error('start monitoring', error instanceof Error ? error : new Error(String(error)));
         }
     };
 
     const handleStopMonitoring = async () => {
         try {
             await stopSiteMonitoring();
+            logger.user.action('Stopped monitoring');
         } catch (error) {
-            console.error("Failed to stop monitoring:", error);
+            logger.app.error('stop monitoring', error instanceof Error ? error : new Error(String(error)));
         }
     };
 

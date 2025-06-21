@@ -4,6 +4,21 @@ import { JSONFilePreset } from "lowdb/node";
 import path from "path";
 import { app } from "electron";
 import { Site, StatusHistory, StatusUpdate } from "./types";
+import log from "electron-log/main";
+
+// Configure logger for uptime monitor
+const logger = {
+  info: (message: string, ...args: any[]) => log.info(`[MONITOR] ${message}`, ...args),
+  error: (message: string, error?: Error | any, ...args: any[]) => {
+    if (error instanceof Error) {
+      log.error(`[MONITOR] ${message}`, { message: error.message, stack: error.stack }, ...args);
+    } else {
+      log.error(`[MONITOR] ${message}`, error, ...args);
+    }
+  },
+  debug: (message: string, ...args: any[]) => log.debug(`[MONITOR] ${message}`, ...args),
+  warn: (message: string, ...args: any[]) => log.warn(`[MONITOR] ${message}`, ...args),
+};
 
 interface DatabaseSchema {
     sites: Site[];
@@ -70,6 +85,8 @@ export class UptimeMonitor extends EventEmitter {
     }
 
     public async addSite(siteData: Omit<Site, "id" | "status" | "history">): Promise<Site> {
+        logger.info(`Adding new site: ${siteData.url}`);
+        
         const site: Site = {
             id: Date.now().toString(),
             ...siteData,
@@ -83,13 +100,19 @@ export class UptimeMonitor extends EventEmitter {
         // Initial check
         await this.checkSite(site);
 
+        logger.info(`Site added successfully: ${site.url} (${site.name || 'unnamed'})`);
         return site;
     }
 
     public async removeSite(url: string): Promise<boolean> {
+        logger.info(`Removing site: ${url}`);
+        
         const removed = this.sites.delete(url);
         if (removed) {
             await this.saveSites();
+            logger.info(`Site removed successfully: ${url}`);
+        } else {
+            logger.warn(`Site not found for removal: ${url}`);
         }
         return removed;
     }
@@ -131,8 +154,12 @@ export class UptimeMonitor extends EventEmitter {
     }
 
     public startMonitoring() {
-        if (this.isMonitoring) return;
+        if (this.isMonitoring) {
+            logger.debug('Monitoring already running');
+            return;
+        }
 
+        logger.info(`Starting monitoring with ${this.sites.size} sites (interval: ${this.checkInterval}ms)`);
         this.isMonitoring = true;
         this.monitoringInterval = setInterval(() => {
             this.checkAllSites();
@@ -144,13 +171,17 @@ export class UptimeMonitor extends EventEmitter {
 
     public stopMonitoring() {
         if (this.monitoringInterval) {
+            logger.info('Stopping monitoring');
             clearInterval(this.monitoringInterval);
             this.monitoringInterval = null;
+        } else {
+            logger.debug('No monitoring interval to stop');
         }
         this.isMonitoring = false;
     }
 
     private async checkAllSites() {
+        logger.debug(`Checking ${this.sites.size} sites`);
         const promises = Array.from(this.sites.values()).map((site) => this.checkSite(site));
         await Promise.allSettled(promises);
     }
@@ -242,14 +273,16 @@ export class UptimeMonitor extends EventEmitter {
     }
 
     public async importData(data: string): Promise<boolean> {
+        logger.info('Importing data');
         try {
             const parsedData = JSON.parse(data);
             this.db.data = parsedData;
             await this.db.write();
             await this.loadSites();
+            logger.info('Data imported successfully');
             return true;
         } catch (error) {
-            console.error("Failed to import data:", error);
+            logger.error("Failed to import data", error);
             return false;
         }
     }

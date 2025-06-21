@@ -4,6 +4,7 @@ import { ThemedBox, ThemedText, ThemedButton, StatusIndicator, ThemedSelect } fr
 import { useTheme } from "../theme/useTheme";
 import { CHECK_INTERVALS } from "../constants";
 import { useState, useEffect } from "react";
+import logger from "../services/logger";
 
 interface HeaderProps {
     onStartMonitoring: () => void;
@@ -52,8 +53,9 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
     const handleIntervalChange = async (interval: number) => {
         try {
             await updateCheckIntervalValue(interval);
+            logger.user.settingsChange('checkInterval', checkInterval, interval);
         } catch (error) {
-            console.error("Failed to update check interval:", error);
+            logger.error("Failed to update check interval from header", error);
             // Error is already handled by the store action
         }
     };
@@ -61,8 +63,9 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
     const handleStartMonitoring = async () => {
         try {
             await onStartMonitoring();
+            logger.user.action('Started monitoring from header');
         } catch (error) {
-            console.error("Failed to start monitoring:", error);
+            logger.error("Failed to start monitoring from header", error);
             // Error is handled by the calling component
         }
     };
@@ -70,8 +73,9 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
     const handleStopMonitoring = async () => {
         try {
             await onStopMonitoring();
+            logger.user.action('Stopped monitoring from header');
         } catch (error) {
-            console.error("Failed to stop monitoring:", error);
+            logger.error("Failed to stop monitoring from header", error);
             // Error is handled by the calling component
         }
     };

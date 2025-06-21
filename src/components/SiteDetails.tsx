@@ -23,6 +23,7 @@ import { formatStatusWithIcon } from "../utils/status";
 import { formatResponseTime, formatFullTimestamp, formatDuration } from "../utils/time";
 import { AUTO_REFRESH_INTERVAL } from "../constants";
 import { ChartConfigService } from "../services/chartConfig";
+import logger from "../services/logger";
 import { useSiteAnalytics, TimePeriod } from "../hooks/useSiteAnalytics";
 import {
     ThemedBox,
@@ -170,8 +171,11 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
 
         try {
             await checkSiteNow(currentSite.url);
+            if (!isAutoRefresh) {
+                logger.user.action('Manual site check', { url: currentSite.url });
+            }
         } catch (error) {
-            console.error("Failed to check site:", error);
+            logger.site.error(currentSite.url, error instanceof Error ? error : String(error));
             // Error is already handled by the store action
         } finally {
             if (isAutoRefresh) {
@@ -189,9 +193,10 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
 
         try {
             await deleteSite(currentSite.url);
+            logger.site.removed(currentSite.url);
             onClose(); // Close the details view after removing
         } catch (error) {
-            console.error("Failed to remove site:", error);
+            logger.site.error(currentSite.url, error instanceof Error ? error : String(error));
             // Error is already handled by the store action
         }
     };
@@ -804,9 +809,10 @@ function SettingsTab({ currentSite, handleRemoveSite, isLoading, autoRefresh, se
             const updates = { name: localName.trim() || undefined };
             await modifySite(currentSite.url, updates);
             setHasUnsavedChanges(false);
+            logger.user.action('Updated site name', { url: currentSite.url, name: localName.trim() });
         } catch (error) {
             // Error is already handled by the store action
-            console.error("Failed to update site:", error);
+            logger.site.error(currentSite.url, error instanceof Error ? error : String(error));
         }
     };
 

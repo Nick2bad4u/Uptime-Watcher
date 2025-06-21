@@ -3,6 +3,7 @@ import { useStore } from "../store";
 import { UI_DELAYS } from "../constants";
 import { useTheme } from "../theme/useTheme";
 import { ThemedBox, ThemedText, ThemedButton, ThemedInput } from "../theme/components";
+import logger from "../services/logger";
 
 export function AddSiteForm() {
     const { createSite, isLoading, lastError, clearError } = useStore();
@@ -51,9 +52,10 @@ export function AddSiteForm() {
             // Reset form on success
             setUrl("");
             setName("");
+            logger.user.action('Added site', { url: url.trim(), name: name.trim() });
         } catch (error) {
             // Error is already handled by the store action
-            console.error("Failed to add site:", error);
+            logger.error("Failed to add site from form", error);
         }
     };
 
