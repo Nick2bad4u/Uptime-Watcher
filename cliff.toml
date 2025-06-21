@@ -22,16 +22,16 @@ body = """
   ## [Unreleased]
 {% endif %}
 {% if commit_range and commit_range.from and commit_range.to %}
-  [[{{ commit_range.from | truncate(length=7, end="") }}](https://github.com/Nick2bad4u/FitFileViewer/commit/{{ commit_range.from }})...
-  [{{ commit_range.to | truncate(length=7, end="") }}](https://github.com/Nick2bad4u/FitFileViewer/commit/{{ commit_range.to }})]
-  ([compare](https://github.com/Nick2bad4u/FitFileViewer/compare/{{ commit_range.from }}...{{ commit_range.to }}))
+  [[{{ commit_range.from | truncate(length=7, end="") }}](https://github.com/Nick2bad4u/Uptime-Watcher/commit/{{ commit_range.from }})...
+  [{{ commit_range.to | truncate(length=7, end="") }}](https://github.com/Nick2bad4u/Uptime-Watcher/commit/{{ commit_range.to }})]
+  ([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/{{ commit_range.from }}...{{ commit_range.to }}))
 {% endif %}
 {% for group, commits in commits | group_by(attribute="group") %}
   ### {{ group | striptags | trim | upper_first }}
   {% for commit in commits %}
     - {% if commit.scope %}*({{ commit.scope }})* {% endif %}\
       {% if commit.breaking %}[**breaking**] {% endif %}\
-      {{ commit.message | upper_first | replace(from="\n", to="\n    ") }} [`({{ commit.id | truncate(length=7, end="") }})`](https://github.com/Nick2bad4u/FitFileViewer/commit/{{ commit.id }})
+      {{ commit.message | upper_first | replace(from="\n", to="\n    ") }} [`({{ commit.id | truncate(length=7, end="") }})`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/{{ commit.id }})
 
   {% endfor %}
 {% endfor %}\n
@@ -52,9 +52,9 @@ body = """
 # template for the changelog footer
 footer = """
 ## Contributors
-Thanks to all the [contributors](https://github.com/Nick2bad4u/FitFileViewer/graphs/contributors) for their hard work!
+Thanks to all the [contributors](https://github.com/Nick2bad4u/Uptime-Watcher/graphs/contributors) for their hard work!
 ## License
-This project is licensed under the [MIT License](https://github.com/Nick2bad4u/FitFileViewer/blob/main/LICENSE.md)
+This project is licensed under the [MIT License](https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/LICENSE.md)
 *This changelog was automatically generated with [git-cliff](https://github.com/orhun/git-cliff).*
 """
 # Remove leading and trailing whitespace from the changelog content
@@ -63,7 +63,7 @@ trim = true
 render_always = true
 protect_breaking_commits = false
 postprocessors = [
-  { pattern = 'fitfileviewer', replace = "[FitFileViewer](https://github.com/Nick2bad4u/FitFileViewer)" }, # replace repository URL
+  { pattern = 'Uptime-Watcher', replace = "[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)" }, # replace repository URL
   { pattern = 'merge branch', replace = "[chore] Merge Branch" },                                          # replace merge branch commit messages
   { pattern = 'Merge branch', replace = "[chore] Merge Branch" },                                          # replace merge branch commit messages
   { pattern = '\[dependency\]', replace = 'test' },
@@ -156,6 +156,6 @@ topo_order = true
 sort_commits = "newest"
 # [remote.github]
 # owner = "nick2bad4u"
-# repo = "FitFileViewer"
+# repo = "Uptime-Watcher"
 # api_url = "https://api.github.com"
 # native_tls = false
