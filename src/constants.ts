@@ -108,6 +108,14 @@ export const TIME_PERIODS = {
     LAST_90_DAYS: 90 * 24 * 60 * 60 * 1000, // 90 days
 } as const;
 
+// Chart time periods (for analytics components)
+export const CHART_TIME_PERIODS = {
+    "1h": 60 * 60 * 1000,
+    "24h": 24 * 60 * 60 * 1000,
+    "7d": 7 * 24 * 60 * 60 * 1000,
+    "30d": 30 * 24 * 60 * 60 * 1000,
+} as const;
+
 // Chart display configuration
 export const CHART_CONFIG = {
     MAX_DATA_POINTS: 100,        // Maximum data points to show in charts

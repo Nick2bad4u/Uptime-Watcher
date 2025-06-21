@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { Site } from "../types";
+import { CHART_TIME_PERIODS } from "../constants";
 
 // Enhanced types for better IntelliSense and error catching
 export interface DowntimePeriod {
@@ -35,14 +36,7 @@ export interface SiteAnalytics {
     filteredHistory: any[];
 }
 
-export type TimePeriod = "1h" | "24h" | "7d" | "30d";
-
-const TIME_PERIODS: Record<TimePeriod, number> = {
-    "1h": 60 * 60 * 1000,
-    "24h": 24 * 60 * 60 * 1000,
-    "7d": 7 * 24 * 60 * 60 * 1000,
-    "30d": 30 * 24 * 60 * 60 * 1000,
-};
+export type TimePeriod = keyof typeof CHART_TIME_PERIODS;
 
 /**
  * Advanced hook for site analytics calculations
@@ -52,7 +46,7 @@ export function useSiteAnalytics(site: Site, timeRange: TimePeriod = "24h"): Sit
     return useMemo(() => {
         // Filter history based on time range
         const now = Date.now();
-        const cutoff = now - TIME_PERIODS[timeRange];
+        const cutoff = now - CHART_TIME_PERIODS[timeRange];
         const filteredHistory = site.history.filter((record) => record.timestamp >= cutoff);
         
         const totalChecks = filteredHistory.length;

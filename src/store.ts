@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { Site, StatusUpdate } from "./types";
 import { ThemeName } from "./theme/types";
-import { DEFAULT_CHECK_INTERVAL } from "./constants";
+import { DEFAULT_CHECK_INTERVAL, TIMEOUT_CONSTRAINTS } from "./constants";
 
 interface AppSettings {
     notifications: boolean;
@@ -76,7 +76,7 @@ const defaultSettings: AppSettings = {
     autoStart: false,
     minimizeToTray: true,
     theme: "system",
-    timeout: 10000,
+    timeout: TIMEOUT_CONSTRAINTS.MAX / 10, // 6 seconds (reasonable default)
     maxRetries: 3,
     soundAlerts: false,
     historyLimit: 100,

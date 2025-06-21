@@ -81,15 +81,7 @@ export function formatDuration(ms: number): string {
     return `${seconds}s`;
 }
 
-/**
- * Time period constants for analytics
- */
-export const TIME_PERIODS = {
-    "1h": 60 * 60 * 1000,
-    "24h": 24 * 60 * 60 * 1000,
-    "7d": 7 * 24 * 60 * 60 * 1000,
-    "30d": 30 * 24 * 60 * 60 * 1000,
-} as const;
+import { CHART_TIME_PERIODS } from "../constants";
 
 /**
  * Format time periods for display
@@ -101,4 +93,4 @@ export const TIME_PERIOD_LABELS = {
     "30d": "Last 30 Days",
 } as const;
 
-export type TimePeriod = keyof typeof TIME_PERIODS;
+export type TimePeriod = keyof typeof CHART_TIME_PERIODS;
