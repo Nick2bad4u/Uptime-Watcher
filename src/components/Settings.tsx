@@ -22,12 +22,13 @@ export function Settings({ onClose }: SettingsProps) {
         updateSettings,
         resetSettings,
         checkInterval,
-        setCheckInterval,
         lastError,
         clearError,
         isLoading,
-        setLoading,
-        setError,
+        updateCheckIntervalValue,
+        updateHistoryLimitValue,
+        exportAppData,
+        importAppData,
     } = useStore();
 
     const { setTheme, availableThemes, isDark } = useTheme();
@@ -60,32 +61,20 @@ export function Settings({ onClose }: SettingsProps) {
     };
 
     const handleIntervalChange = async (interval: number) => {
-        setLoading(true);
         try {
-            // Update the backend first
-            await window.electronAPI.updateCheckInterval(interval);
-            // Then update the store
-            setCheckInterval(interval);
+            await updateCheckIntervalValue(interval);
         } catch (error) {
             console.error("Failed to update check interval:", error);
-            setError("Failed to update check interval");
-        } finally {
-            setLoading(false);
+            // Error is already handled by the store action
         }
     };
 
     const handleHistoryLimitChange = async (limit: number) => {
-        setLoading(true);
         try {
-            // Update the backend first
-            await window.electronAPI.updateHistoryLimit(limit);
-            // Then update the store setting
-            updateSettings({ historyLimit: limit });
+            await updateHistoryLimitValue(limit);
         } catch (error) {
             console.error("Failed to update history limit:", error);
-            setError("Failed to update history limit");
-        } finally {
-            setLoading(false);
+            // Error is already handled by the store action
         }
     };
 
@@ -101,9 +90,8 @@ export function Settings({ onClose }: SettingsProps) {
     };
 
     const handleExportData = async () => {
-        setLoading(true);
         try {
-            const data = await window.electronAPI.exportData();
+            const data = await exportAppData();
             const blob = new Blob([data], { type: "application/json" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
@@ -115,9 +103,7 @@ export function Settings({ onClose }: SettingsProps) {
             URL.revokeObjectURL(url);
         } catch (error) {
             console.error("Failed to export data:", error);
-            setError("Failed to export data");
-        } finally {
-            setLoading(false);
+            // Error is already handled by the store action
         }
     };
 
@@ -125,21 +111,17 @@ export function Settings({ onClose }: SettingsProps) {
         const file = event.target.files?.[0];
         if (!file) return;
 
-        setLoading(true);
         try {
             const text = await file.text();
-            const success = await window.electronAPI.importData(text);
+            const success = await importAppData(text);
             if (success) {
                 // Refresh the page to show imported data
                 window.location.reload();
-            } else {
-                setError("Failed to import data - invalid format");
             }
         } catch (error) {
             console.error("Failed to import data:", error);
-            setError("Failed to import data");
+            // Error is already handled by the store action
         } finally {
-            setLoading(false);
             // Reset file input
             event.target.value = "";
         }

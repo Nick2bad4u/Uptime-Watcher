@@ -61,7 +61,7 @@ interface SiteDetailsProps {
 export function SiteDetails({ site, onClose }: SiteDetailsProps) {
     const { currentTheme } = useTheme();
     const { getAvailabilityColor, getAvailabilityVariant, getAvailabilityDescription } = useAvailabilityColors();
-    const { removeSite, setError, setLoading, isLoading, selectedSite, updateSiteStatus, clearError } = useStore();
+    const { sites, deleteSite, checkSiteNow, modifySite, isLoading, clearError } = useStore();
 
     // Enhanced state management
     const [activeTab, setActiveTab] = useState<"overview" | "analytics" | "history" | "settings">("overview");
@@ -69,21 +69,6 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [showAdvancedMetrics, setShowAdvancedMetrics] = useState(false);
     const [autoRefresh, setAutoRefresh] = useState(true);
-
-    // Auto-refresh when selected site updates
-    useEffect(() => {
-        const handleStatusUpdate = (update: any) => {
-            if (update.site.url === site.url) {
-                updateSiteStatus(update);
-            }
-        };
-
-        window.electronAPI.onStatusUpdate(handleStatusUpdate);
-
-        return () => {
-            window.electronAPI.removeAllListeners("status-update");
-        };
-    }, [site.url, updateSiteStatus]);
 
     // Auto-refresh interval
     useEffect(() => {
@@ -98,8 +83,8 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
         return () => clearInterval(interval);
     }, [autoRefresh, isLoading, isRefreshing]);
 
-    // Use the updated site from store if available
-    const currentSite = selectedSite && selectedSite.url === site.url ? selectedSite : site;
+    // Use the updated site from store if available, always get the latest data
+    const currentSite = sites.find(s => s.url === site.url) || site;
     // Enhanced statistics with time-based filtering
     const getFilteredHistory = (timeRange: string) => {
         const now = Date.now();
@@ -353,20 +338,17 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
         if (isAutoRefresh) {
             setIsRefreshing(true);
         } else {
-            setLoading(true);
             clearError(); // Clear previous errors
         }
 
         try {
-            await window.electronAPI.checkSiteNow(currentSite.url);
+            await checkSiteNow(currentSite.url);
         } catch (error) {
             console.error("Failed to check site:", error);
-            setError(`Failed to check site: ${error instanceof Error ? error.message : "Unknown error"}`);
+            // Error is already handled by the store action
         } finally {
             if (isAutoRefresh) {
                 setIsRefreshing(false);
-            } else {
-                setLoading(false);
             }
         }
     };
@@ -376,18 +358,14 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
             return;
         }
 
-        setLoading(true);
         clearError(); // Clear previous errors
 
         try {
-            await window.electronAPI.removeSite(currentSite.url);
-            removeSite(currentSite.url);
+            await deleteSite(currentSite.url);
             onClose(); // Close the details view after removing
         } catch (error) {
             console.error("Failed to remove site:", error);
-            setError(`Failed to remove site: ${error instanceof Error ? error.message : "Unknown error"}`);
-        } finally {
-            setLoading(false);
+            // Error is already handled by the store action
         }
     };
 
@@ -904,24 +882,24 @@ function AnalyticsTab({
                 </div>
 
                 <div className="grid grid-cols-3 gap-4 mb-4">
-                    <div className="text-center">
-                        <ThemedText size="sm" variant="secondary">
+                    <div className="text-center flex flex-col items-center">
+                        <ThemedText size="sm" variant="secondary" className="mb-4">
                             P50
                         </ThemedText>
                         <ThemedText size="lg" weight="medium">
                             {formatResponseTime(p50)}
                         </ThemedText>
                     </div>
-                    <div className="text-center">
-                        <ThemedText size="sm" variant="secondary">
+                    <div className="text-center flex flex-col items-center">
+                        <ThemedText size="sm" variant="secondary" className="mb-4">
                             P95
                         </ThemedText>
                         <ThemedText size="lg" weight="medium">
                             {formatResponseTime(p95)}
                         </ThemedText>
                     </div>
-                    <div className="text-center">
-                        <ThemedText size="sm" variant="secondary">
+                    <div className="text-center flex flex-col items-center">
+                        <ThemedText size="sm" variant="secondary" className="mb-4">
                             P99
                         </ThemedText>
                         <ThemedText size="lg" weight="medium">
@@ -932,16 +910,16 @@ function AnalyticsTab({
 
                 {showAdvancedMetrics && (
                     <div className="grid grid-cols-2 gap-4 pt-4 border-t">
-                        <div>
-                            <ThemedText size="sm" variant="secondary">
+                        <div className="text-center flex flex-col items-center">
+                            <ThemedText size="sm" variant="secondary" className="mb-4">
                                 Mean Time To Recovery
                             </ThemedText>
                             <ThemedText size="lg" weight="medium">
                                 {formatDuration(mttr)}
                             </ThemedText>
                         </div>
-                        <div>
-                            <ThemedText size="sm" variant="secondary">
+                        <div className="text-center flex flex-col items-center">
+                            <ThemedText size="sm" variant="secondary"  className="mb-4">
                                 Incidents
                             </ThemedText>
                             <ThemedText size="lg" weight="medium">
@@ -1084,7 +1062,7 @@ interface SettingsTabProps {
 }
 
 function SettingsTab({ currentSite, handleRemoveSite, isLoading, autoRefresh, setAutoRefresh }: SettingsTabProps) {
-    const { updateSite, setError, setLoading, clearError } = useStore();
+    const { modifySite, clearError } = useStore();
     const [localName, setLocalName] = useState(currentSite.name || "");
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
@@ -1096,19 +1074,15 @@ function SettingsTab({ currentSite, handleRemoveSite, isLoading, autoRefresh, se
     const handleSaveName = async () => {
         if (!hasUnsavedChanges) return;
 
-        setLoading(true);
         clearError();
 
         try {
             const updates = { name: localName.trim() || undefined };
-            await window.electronAPI.updateSite(currentSite.url, updates);
-            updateSite(currentSite.url, updates);
+            await modifySite(currentSite.url, updates);
             setHasUnsavedChanges(false);
         } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : "Failed to update site";
-            setError(errorMessage);
-        } finally {
-            setLoading(false);
+            // Error is already handled by the store action
+            console.error("Failed to update site:", error);
         }
     };
 

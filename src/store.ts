@@ -35,7 +35,20 @@ interface AppState {
     totalUptime: number;
     totalDowntime: number;
 
-    // Actions
+    // Actions - Backend integration
+    initializeApp: () => Promise<void>;
+    createSite: (siteData: any) => Promise<void>;
+    deleteSite: (url: string) => Promise<void>;
+    checkSiteNow: (url: string) => Promise<void>;
+    modifySite: (url: string, updates: Partial<Site>) => Promise<void>;
+    updateCheckIntervalValue: (interval: number) => Promise<void>;
+    updateHistoryLimitValue: (limit: number) => Promise<void>;
+    startSiteMonitoring: () => Promise<void>;
+    stopSiteMonitoring: () => Promise<void>;
+    exportAppData: () => Promise<string>;
+    importAppData: (data: string) => Promise<boolean>;
+
+    // Internal state actions (used by backend actions)
     setSites: (sites: Site[]) => void;
     addSite: (site: Site) => void;
     removeSite: (url: string) => void;
@@ -71,7 +84,7 @@ const defaultSettings: AppSettings = {
 
 export const useStore = create<AppState>()(
     persist(
-        (set) => ({
+        (set, get) => ({
             sites: [],
             isMonitoring: false,
             checkInterval: DEFAULT_CHECK_INTERVAL,
@@ -91,6 +104,185 @@ export const useStore = create<AppState>()(
             totalUptime: 0,
             totalDowntime: 0,
 
+            // Backend integration actions
+            initializeApp: async () => {
+                const state = get();
+                state.setLoading(true);
+                state.clearError();
+
+                try {
+                    const [sites, checkInterval, historyLimit] = await Promise.all([
+                        window.electronAPI.getSites(),
+                        window.electronAPI.getCheckInterval(),
+                        window.electronAPI.getHistoryLimit(),
+                    ]);
+
+                    state.setSites(sites);
+                    state.setCheckInterval(checkInterval);
+                    state.updateSettings({ historyLimit });
+
+                    // Start monitoring if we have sites
+                    if (sites.length > 0) {
+                        await window.electronAPI.startMonitoring();
+                        state.setMonitoring(true);
+                    }
+                } catch (error) {
+                    state.setError(`Failed to initialize app: ${(error as Error).message}`);
+                } finally {
+                    state.setLoading(false);
+                }
+            },
+
+            createSite: async (siteData: any) => {
+                const state = get();
+                state.setLoading(true);
+                state.clearError();
+
+                try {
+                    const newSite = await window.electronAPI.addSite(siteData);
+                    state.addSite(newSite);
+                } catch (error) {
+                    state.setError(`Failed to add site: ${(error as Error).message}`);
+                    throw error; // Re-throw to allow component handling
+                } finally {
+                    state.setLoading(false);
+                }
+            },
+
+            deleteSite: async (url: string) => {
+                const state = get();
+                state.setLoading(true);
+                state.clearError();
+
+                try {
+                    await window.electronAPI.removeSite(url);
+                    state.removeSite(url);
+                } catch (error) {
+                    state.setError(`Failed to remove site: ${(error as Error).message}`);
+                    throw error;
+                } finally {
+                    state.setLoading(false);
+                }
+            },
+
+            checkSiteNow: async (url: string) => {
+                const state = get();
+                state.clearError();
+
+                try {
+                    const statusUpdate = await window.electronAPI.checkSiteNow(url);
+                    state.updateSiteStatus(statusUpdate);
+                } catch (error) {
+                    state.setError(`Failed to check site: ${(error as Error).message}`);
+                    throw error;
+                }
+            },
+
+            modifySite: async (url: string, updates: Partial<Site>) => {
+                const state = get();
+                state.setLoading(true);
+                state.clearError();
+
+                try {
+                    await window.electronAPI.updateSite(url, updates);
+                    state.updateSite(url, updates);
+                } catch (error) {
+                    state.setError(`Failed to update site: ${(error as Error).message}`);
+                    throw error;
+                } finally {
+                    state.setLoading(false);
+                }
+            },
+
+            updateCheckIntervalValue: async (interval: number) => {
+                const state = get();
+                state.clearError();
+
+                try {
+                    await window.electronAPI.updateCheckInterval(interval);
+                    state.setCheckInterval(interval);
+                } catch (error) {
+                    state.setError(`Failed to update check interval: ${(error as Error).message}`);
+                    throw error;
+                }
+            },
+
+            updateHistoryLimitValue: async (limit: number) => {
+                const state = get();
+                state.clearError();
+
+                try {
+                    await window.electronAPI.updateHistoryLimit(limit);
+                    state.updateSettings({ historyLimit: limit });
+                } catch (error) {
+                    state.setError(`Failed to update history limit: ${(error as Error).message}`);
+                    throw error;
+                }
+            },
+
+            startSiteMonitoring: async () => {
+                const state = get();
+                state.clearError();
+
+                try {
+                    await window.electronAPI.startMonitoring();
+                    state.setMonitoring(true);
+                } catch (error) {
+                    state.setError(`Failed to start monitoring: ${(error as Error).message}`);
+                    throw error;
+                }
+            },
+
+            stopSiteMonitoring: async () => {
+                const state = get();
+                state.clearError();
+
+                try {
+                    await window.electronAPI.stopMonitoring();
+                    state.setMonitoring(false);
+                } catch (error) {
+                    state.setError(`Failed to stop monitoring: ${(error as Error).message}`);
+                    throw error;
+                }
+            },
+
+            exportAppData: async () => {
+                const state = get();
+                state.setLoading(true);
+                state.clearError();
+
+                try {
+                    const data = await window.electronAPI.exportData();
+                    return data;
+                } catch (error) {
+                    state.setError(`Failed to export data: ${(error as Error).message}`);
+                    throw error;
+                } finally {
+                    state.setLoading(false);
+                }
+            },
+
+            importAppData: async (data: string) => {
+                const state = get();
+                state.setLoading(true);
+                state.clearError();
+
+                try {
+                    const success = await window.electronAPI.importData(data);
+                    if (success) {
+                        // Reload app data after successful import
+                        await state.initializeApp();
+                    }
+                    return success;
+                } catch (error) {
+                    state.setError(`Failed to import data: ${(error as Error).message}`);
+                    throw error;
+                } finally {
+                    state.setLoading(false);
+                }
+            },
+
+            // Internal state actions (used by backend actions and internal logic)
             setSites: (sites: Site[]) => set({ sites }),
 
             addSite: (site: Site) =>

@@ -16,35 +16,28 @@ interface SiteCardProps {
 }
 
 export function SiteCard({ site }: SiteCardProps) {
-    const { removeSite, setError, setLoading, isLoading, setSelectedSite, setShowSiteDetails } = useStore();
+    const { deleteSite, checkSiteNow, isLoading, setSelectedSite, setShowSiteDetails } = useStore();
     const [showQuickActions, setShowQuickActions] = useState(false);
 
-    const handleQuickCheck = async () => {
-        setLoading(true);
+    const handleQuickCheck = async (e?: React.MouseEvent) => {
+        e?.stopPropagation(); // Prevent card click
         try {
-            await window.electronAPI.checkSiteNow(site.url);
+            await checkSiteNow(site.url);
         } catch (error) {
             console.error("Failed to check site:", error);
-            setError("Failed to check site");
-        } finally {
-            setLoading(false);
         }
     };
 
-    const handleQuickRemove = async () => {
+    const handleQuickRemove = async (e?: React.MouseEvent) => {
+        e?.stopPropagation(); // Prevent card click
         if (!window.confirm(`Are you sure you want to remove ${site.name || site.url}?`)) {
             return;
         }
 
-        setLoading(true);
         try {
-            await window.electronAPI.removeSite(site.url);
-            removeSite(site.url);
+            await deleteSite(site.url);
         } catch (error) {
             console.error("Failed to remove site:", error);
-            setError("Failed to remove site");
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -153,7 +146,10 @@ export function SiteCard({ site }: SiteCardProps) {
                 <div className="flex items-center space-x-2">
                     <StatusIndicator status={site.status as any} size="md" />
                     {showQuickActions && (
-                        <div className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div 
+                            className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={(e) => e.stopPropagation()}
+                        >
                             <ThemedTooltip content="Check now">
                                 <ThemedIconButton
                                     icon="🔄"
@@ -178,8 +174,8 @@ export function SiteCard({ site }: SiteCardProps) {
             </div>
 
             {/* Metrics Section */}
-            <div className="grid grid-cols-4 gap-4 mb-4 ">
-                <div className="text-center">
+            <div className="grid grid-cols-4 gap-4 mb-4">
+                <div className="text-center flex flex-col items-center">
                     <ThemedText size="xs" variant="secondary" className="block mb-1">
                         Status
                     </ThemedText>
@@ -191,7 +187,7 @@ export function SiteCard({ site }: SiteCardProps) {
                     </ThemedBadge>
                 </div>
 
-                <div className="text-center">
+                <div className="text-center flex flex-col items-center">
                     <ThemedText size="xs" variant="secondary" className="block mb-1">
                         Uptime
                     </ThemedText>
@@ -200,7 +196,7 @@ export function SiteCard({ site }: SiteCardProps) {
                     </ThemedBadge>
                 </div>
 
-                <div className="text-center">
+                <div className="text-center flex flex-col items-center">
                     <ThemedText size="xs" variant="secondary" className="block mb-1">
                         Response
                     </ThemedText>
@@ -209,7 +205,7 @@ export function SiteCard({ site }: SiteCardProps) {
                     </ThemedText>
                 </div>
 
-                <div className="text-center">
+                <div className="text-center flex flex-col items-center">
                     <ThemedText size="xs" variant="secondary" className="block mb-1">
                         Checks
                     </ThemedText>

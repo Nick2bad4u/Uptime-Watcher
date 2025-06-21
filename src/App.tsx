@@ -12,24 +12,21 @@ import { StatusUpdate } from "./types";
 function App() {
     const {
         sites,
-        setSites,
-        updateSiteStatus,
-        setMonitoring,
-        checkInterval,
-        setCheckInterval,
-        settings,
-        updateSettings,
-        darkMode,
+        isMonitoring,
         showSettings,
-        setShowSettings,
         selectedSite,
         showSiteDetails,
-        setShowSiteDetails,
-        setError,
-        setLoading,
         lastError,
-        clearError,
         isLoading,
+        // Store actions - backend integration
+        initializeApp,
+        startSiteMonitoring,
+        stopSiteMonitoring,
+        updateSiteStatus,
+        // UI actions
+        setShowSettings,
+        setShowSiteDetails,
+        clearError,
     } = useStore();
 
     const { isDark } = useTheme();
@@ -59,52 +56,8 @@ function App() {
     }, [isLoading]);
 
     useEffect(() => {
-        // Apply dark mode class to document
-        if (darkMode) {
-            document.documentElement.classList.add("dark");
-        } else {
-            document.documentElement.classList.remove("dark");
-        }
-    }, [darkMode]);
-
-    useEffect(() => {
-        // Load initial sites and sync settings when app starts
-        const loadInitialData = async () => {
-            setLoading(true);
-            try {
-                // Load sites and sync settings from backend
-                const [sites, backendCheckInterval, backendHistoryLimit] = await Promise.all([
-                    window.electronAPI.getSites(),
-                    window.electronAPI.getCheckInterval(),
-                    window.electronAPI.getHistoryLimit(),
-                ]);
-
-                setSites(sites);
-
-                // Sync check interval from backend if different
-                if (backendCheckInterval !== checkInterval) {
-                    setCheckInterval(backendCheckInterval);
-                }
-
-                // Sync history limit from backend if different
-                if (backendHistoryLimit !== settings.historyLimit) {
-                    updateSettings({ historyLimit: backendHistoryLimit });
-                }
-
-                // Auto-start monitoring if there are sites to monitor
-                if (sites.length > 0) {
-                    await window.electronAPI.startMonitoring();
-                    setMonitoring(true);
-                }
-            } catch (error) {
-                console.error("Failed to load initial data:", error);
-                setError("Failed to load initial data");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        loadInitialData();
+        // Initialize app data on startup
+        initializeApp();
 
         // Listen for status updates
         const handleStatusUpdate = (update: StatusUpdate) => {
@@ -117,31 +70,21 @@ function App() {
         return () => {
             window.electronAPI.removeAllListeners("status-update");
         };
-    }, [setSites, updateSiteStatus, setError, setLoading, setMonitoring]);
+    }, [initializeApp, updateSiteStatus]);
 
     const handleStartMonitoring = async () => {
-        setLoading(true);
         try {
-            await window.electronAPI.startMonitoring();
-            setMonitoring(true);
+            await startSiteMonitoring();
         } catch (error) {
             console.error("Failed to start monitoring:", error);
-            setError("Failed to start monitoring");
-        } finally {
-            setLoading(false);
         }
     };
 
     const handleStopMonitoring = async () => {
-        setLoading(true);
         try {
-            await window.electronAPI.stopMonitoring();
-            setMonitoring(false);
+            await stopSiteMonitoring();
         } catch (error) {
             console.error("Failed to stop monitoring:", error);
-            setError("Failed to stop monitoring");
-        } finally {
-            setLoading(false);
         }
     };
 

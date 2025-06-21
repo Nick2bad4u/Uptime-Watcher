@@ -13,16 +13,13 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
     const {
         isMonitoring,
         sites,
-        darkMode,
         checkInterval,
-        setCheckInterval,
         setShowSettings,
         isLoading,
-        setError,
-        setLoading,
+        updateCheckIntervalValue,
     } = useStore();
 
-    const { toggleTheme } = useTheme();
+    const { toggleTheme, isDark } = useTheme();
 
     // Delayed loading state for button spinners (100ms delay)
     const [showButtonLoading, setShowButtonLoading] = useState(false);
@@ -52,39 +49,29 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
     const pendingSites = sites.filter((site) => site.status === "pending").length;
 
     const handleIntervalChange = async (interval: number) => {
-        setLoading(true);
         try {
-            setCheckInterval(interval);
-            await window.electronAPI.updateCheckInterval(interval);
+            await updateCheckIntervalValue(interval);
         } catch (error) {
             console.error("Failed to update check interval:", error);
-            setError("Failed to update check interval");
-        } finally {
-            setLoading(false);
+            // Error is already handled by the store action
         }
     };
 
     const handleStartMonitoring = async () => {
-        setLoading(true);
         try {
             await onStartMonitoring();
         } catch (error) {
             console.error("Failed to start monitoring:", error);
-            setError("Failed to start monitoring");
-        } finally {
-            setLoading(false);
+            // Error is handled by the calling component
         }
     };
 
     const handleStopMonitoring = async () => {
-        setLoading(true);
         try {
             await onStopMonitoring();
         } catch (error) {
             console.error("Failed to stop monitoring:", error);
-            setError("Failed to stop monitoring");
-        } finally {
-            setLoading(false);
+            // Error is handled by the calling component
         }
     };
 
@@ -170,7 +157,7 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
 
                         {/* Theme Toggle */}
                         <ThemedButton variant="secondary" size="sm" onClick={toggleTheme} className="p-2">
-                            {darkMode ? "☀️" : "🌙"}
+                            {isDark ? "☀️" : "🌙"}
                         </ThemedButton>
 
                         {/* Settings Button */}

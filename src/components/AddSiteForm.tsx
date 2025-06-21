@@ -4,7 +4,7 @@ import { useTheme } from "../theme/useTheme";
 import { ThemedBox, ThemedText, ThemedButton, ThemedInput } from "../theme/components";
 
 export function AddSiteForm() {
-    const { addSite, setError, setLoading, isLoading, lastError, clearError } = useStore();
+    const { createSite, isLoading, lastError, clearError } = useStore();
     const { isDark } = useTheme();
     const [url, setUrl] = useState("");
     const [name, setName] = useState("");
@@ -37,7 +37,6 @@ export function AddSiteForm() {
 
         if (!url.trim()) return;
 
-        setLoading(true);
         clearError();
 
         try {
@@ -46,21 +45,14 @@ export function AddSiteForm() {
                 name: name.trim() || undefined,
             };
 
-            const newSite = await window.electronAPI.addSite(siteData);
-            addSite(newSite);
+            await createSite(siteData);
 
-            // The site is automatically saved by the backend when added
-            // The store persistence will also save it to the frontend store
-
-            // Reset form
+            // Reset form on success
             setUrl("");
             setName("");
         } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : "Failed to add site";
+            // Error is already handled by the store action
             console.error("Failed to add site:", error);
-            setError(errorMessage);
-        } finally {
-            setLoading(false);
         }
     };
 
