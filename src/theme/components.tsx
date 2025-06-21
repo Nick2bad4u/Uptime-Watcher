@@ -1,5 +1,6 @@
 import React from "react";
 import { useTheme, useThemeClasses } from "../theme/useTheme";
+import { getStatusIcon } from "../utils/status";
 import "./components.css";
 
 interface ThemeProviderProps {
@@ -67,7 +68,7 @@ export function ThemedBox({
 }
 
 interface ThemedTextProps {
-    variant?: "primary" | "secondary" | "tertiary" | "inverse";
+    variant?: "primary" | "secondary" | "tertiary" | "inverse" | "error";
     size?: "xs" | "sm" | "base" | "lg" | "xl" | "2xl" | "3xl" | "4xl";
     weight?: "normal" | "medium" | "semibold" | "bold";
     align?: "left" | "center" | "right";
@@ -112,7 +113,7 @@ interface ThemedButtonProps {
     style?: React.CSSProperties;
     title?: string;
     onClick?: () => void;
-    children: React.ReactNode;
+    children?: React.ReactNode;
 }
 
 export function ThemedButton({
@@ -156,6 +157,11 @@ export function ThemedButton({
                 </span>
             );
 
+            // If there are no children, just show the icon
+            if (!children) {
+                return iconElement;
+            }
+
             return iconPosition === "left" ? (
                 <>
                     {iconElement}
@@ -196,21 +202,6 @@ interface StatusIndicatorProps {
 export function StatusIndicator({ status, size = "md", showText = false, className = "" }: StatusIndicatorProps) {
     const { getStatusColor } = useTheme();
     const { currentTheme } = useTheme();
-
-    const getStatusIcon = () => {
-        switch (status) {
-            case "up":
-                return "✅";
-            case "down":
-                return "❌";
-            case "pending":
-                return "⏳";
-            case "unknown":
-                return "❓";
-            default:
-                return "⚪";
-        }
-    };
 
     const getSizeStyles = () => {
         switch (size) {
@@ -274,7 +265,7 @@ export function StatusIndicator({ status, size = "md", showText = false, classNa
         <div className={`themed-status-indicator ${className}`} style={{ display: "flex", alignItems: "center" }}>
             {showText ? (
                 <div style={iconStyle}>
-                    {getStatusIcon()}
+                    {getStatusIcon(status)}
                 </div>
             ) : (
                 <div className="themed-status-indicator__dot" style={indicatorStyle} />
@@ -488,8 +479,6 @@ export function ThemedIconButton({
     className = "",
     onClick,
 }: ThemedIconButtonProps) {
-    const { currentTheme } = useTheme();
-
     const getSize = () => {
         switch (size) {
             case "xs": return "24px";
@@ -825,8 +814,6 @@ export function ThemedTooltip({
     className = "",
     children,
 }: ThemedTooltipProps) {
-    const { currentTheme } = useTheme();
-
     return (
         <div className={`themed-tooltip ${className}`} title={content}>
             {children}

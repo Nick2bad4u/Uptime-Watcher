@@ -60,7 +60,8 @@
     "snap"
   ],
   "scripts": {
-    "start": "concurrently \"npm run dev\" \"npm run electron\"",
+    "start": "npm run dev",
+    "start-both": "concurrently \"npm run dev\" \"npm run electron-dev\"",
     "dev": "vite",
     "build": "vite build && electron-builder",
     "preview": "vite preview",
@@ -242,13 +243,13 @@
         "tar.bz2"
       ],
       "category": "Utility",
-      "synopsis": "A cross-platform viewer for .fit activity files.",
+      "synopsis": "A cross-platform Electron app to monitor website uptime status",
       "maintainer": "Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com>",
       "desktop": {
         "entry": {
-          "Name": "Fit File Viewer",
-          "Comment": "View and analyze .fit activity files",
-          "Categories": "Utility;Sports;"
+          "Name": "Uptime Watcher",
+          "Comment": "View and analyze Website Uptime",
+          "Categories": "Utility;"
         }
       }
     }

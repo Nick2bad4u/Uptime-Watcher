@@ -122,15 +122,6 @@ export function AddSiteForm() {
                 </ThemedBox>
             )}
 
-            {/* Save Sites after adding */}
-            <script>
-                {`
-                    if (window.electronAPI && window.electronAPI.saveSites) {
-                        window.electronAPI.saveSites();
-                    }
-                `}
-            </script>
-
             <div className="space-y-1">
                 <ThemedText size="xs" variant="tertiary">
                     • Enter the full URL including http:// or https://

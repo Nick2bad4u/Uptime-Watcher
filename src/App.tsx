@@ -165,11 +165,11 @@ function App() {
                 {/* Global Error Notification */}
                 {lastError && (
                     <div className="fixed top-0 left-0 right-0 z-50">
-                        <ThemedBox surface="elevated" padding="md" className="rounded-none border-l-4 border-red-500">
+                        <ThemedBox surface="elevated" padding="md" className="error-alert">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-2">
-                                    <div className="text-red-500">⚠️</div>
-                                    <ThemedText size="sm" className="text-red-600 dark:text-red-400">
+                                    <div className="error-alert__icon">⚠️</div>
+                                    <ThemedText size="sm" variant="error">
                                         {lastError}
                                     </ThemedText>
                                 </div>
@@ -177,7 +177,7 @@ function App() {
                                     variant="secondary"
                                     size="sm"
                                     onClick={clearError}
-                                    className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200"
+                                    className="error-alert__close ml-4"
                                 >
                                     ✕
                                 </ThemedButton>

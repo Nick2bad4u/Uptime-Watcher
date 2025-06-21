@@ -20,17 +20,18 @@ import { Line, Bar, Doughnut } from "react-chartjs-2";
 import { Site } from "../types";
 import { useTheme } from "../theme/useTheme";
 import { useStore } from "../store";
-import { 
-    ThemedBox, 
-    ThemedText, 
-    ThemedButton, 
-    StatusIndicator, 
+import { formatStatusWithIcon } from "../utils/status";
+import {
+    ThemedBox,
+    ThemedText,
+    ThemedButton,
+    StatusIndicator,
     ThemedCard,
     ThemedBadge,
     ThemedProgress,
     ThemedIconButton,
     ThemedInput,
-    ThemedCheckbox
+    ThemedCheckbox,
 } from "../theme/components";
 import "chartjs-adapter-date-fns";
 import "./SiteDetails.css";
@@ -487,7 +488,7 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
 
     // Tab component with enhanced icons
     const TabButton = ({ label, isActive, onClick }: { label: string; isActive: boolean; onClick: () => void }) => {
-        const [icon, ...textParts] = label.split(' ');
+        const [icon, ...textParts] = label.split(" ");
         return (
             <ThemedButton
                 variant={isActive ? "primary" : "ghost"}
@@ -496,7 +497,7 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                 className={`px-4 py-2 ${isActive ? "shadow-sm" : ""}`}
                 icon={icon}
             >
-                {textParts.join(' ')}
+                {textParts.join(" ")}
             </ThemedButton>
         );
     };
@@ -715,44 +716,24 @@ function OverviewTab({
         <div className="space-y-6">
             {/* Key Metrics Grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <ThemedCard
-                    icon="📊"
-                    title="Status"
-                    hoverable
-                    className="text-center"
-                >
+                <ThemedCard icon="📊" title="Status" hoverable className="text-center">
                     <StatusIndicator status={currentSite.status as any} size="lg" showText />
                 </ThemedCard>
 
-                <ThemedCard
-                    icon="⏱️"
-                    title="Uptime"
-                    hoverable
-                    className="text-center"
-                >
+                <ThemedCard icon="⏱️" title="Uptime" hoverable className="text-center">
                     <ThemedProgress value={parseFloat(uptime)} variant="success" showLabel />
                     <ThemedBadge variant="success" size="sm" className="mt-2">
                         {uptime}%
                     </ThemedBadge>
                 </ThemedCard>
 
-                <ThemedCard
-                    icon="⚡"
-                    title="Response Time"
-                    hoverable
-                    className="text-center"
-                >
+                <ThemedCard icon="⚡" title="Response Time" hoverable className="text-center">
                     <ThemedText size="xl" weight="bold">
                         {formatResponseTime(avgResponseTime)}
                     </ThemedText>
                 </ThemedCard>
 
-                <ThemedCard
-                    icon="📈"
-                    title="Total Checks"
-                    hoverable
-                    className="text-center"
-                >
+                <ThemedCard icon="📈" title="Total Checks" hoverable className="text-center">
                     <ThemedText size="xl" weight="bold">
                         {totalChecks}
                     </ThemedText>
@@ -784,13 +765,7 @@ function OverviewTab({
             {/* Quick Actions */}
             <ThemedCard icon="⚡" title="Quick Actions">
                 <div className="flex space-x-3">
-                    <ThemedButton 
-                        variant="error" 
-                        size="sm" 
-                        onClick={handleRemoveSite} 
-                        disabled={isLoading}
-                        icon="🗑️"
-                    >
+                    <ThemedButton variant="error" size="sm" onClick={handleRemoveSite} disabled={isLoading} icon="🗑️">
                         Remove Site
                     </ThemedButton>
                 </div>
@@ -1010,7 +985,7 @@ function HistoryTab({ currentSite, formatTimestamp, formatResponseTime }: Histor
                                 variant={historyFilter === filter ? "primary" : "ghost"}
                                 size="xs"
                                 onClick={() => setHistoryFilter(filter)}
-                                className="capitalize"
+                                className="capitalize ml-4"
                             >
                                 {filter === "all" ? "All" : filter === "up" ? "✅ Up" : "❌ Down"}
                             </ThemedButton>
@@ -1049,7 +1024,7 @@ function HistoryTab({ currentSite, formatTimestamp, formatResponseTime }: Histor
                                     <ThemedText size="sm" weight="medium">
                                         {formatTimestamp(record.timestamp)}
                                     </ThemedText>
-                                    <ThemedText size="xs" variant="secondary">
+                                    <ThemedText size="xs" variant="secondary" className="ml-4">
                                         Check #{currentSite.history.length - index}
                                     </ThemedText>
                                 </div>
@@ -1058,8 +1033,8 @@ function HistoryTab({ currentSite, formatTimestamp, formatResponseTime }: Histor
                                 <ThemedText size="sm" weight="medium">
                                     {formatResponseTime(record.responseTime)}
                                 </ThemedText>
-                                <ThemedText size="xs" variant="secondary" className="capitalize">
-                                    {record.status}
+                                <ThemedText size="xs" variant="secondary" className="ml-4">
+                                    {formatStatusWithIcon(record.status)}
                                 </ThemedText>
                             </div>
                         </div>
@@ -1085,13 +1060,7 @@ interface SettingsTabProps {
     setAutoRefresh: (value: boolean) => void;
 }
 
-function SettingsTab({
-    currentSite,
-    handleRemoveSite,
-    isLoading,
-    autoRefresh,
-    setAutoRefresh,
-}: SettingsTabProps) {
+function SettingsTab({ currentSite, handleRemoveSite, isLoading, autoRefresh, setAutoRefresh }: SettingsTabProps) {
     const { updateSite, setError, setLoading, clearError } = useStore();
     const [localName, setLocalName] = useState(currentSite.name || "");
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -1165,12 +1134,7 @@ function SettingsTab({
                         <ThemedText size="sm" weight="medium" variant="secondary" className="block mb-2">
                             Site URL
                         </ThemedText>
-                        <ThemedInput
-                            type="url"
-                            value={currentSite.url}
-                            disabled
-                            className="opacity-60"
-                        />
+                        <ThemedInput type="url" value={currentSite.url} disabled className="opacity-60" />
                         <ThemedText size="xs" variant="tertiary" className="mt-1">
                             URL cannot be changed after creation
                         </ThemedText>
@@ -1181,12 +1145,12 @@ function SettingsTab({
             {/* Monitoring Settings */}
             <ThemedCard icon="📡" title="Monitoring Settings">
                 <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                        <div>
+                    <div className="flex items-center justify-between gap-4">
+                        <div className="flex-1 space-y-2">
                             <ThemedText size="sm" weight="medium">
                                 Auto-refresh Details
                             </ThemedText>
-                            <ThemedText size="xs" variant="secondary">
+                            <ThemedText size="xs" variant="secondary" className="ml-4">
                                 Automatically refresh site data in this view
                             </ThemedText>
                         </div>
@@ -1202,20 +1166,27 @@ function SettingsTab({
             <ThemedCard icon="📊" title="Site Information">
                 <div className="space-y-3">
                     <div className="flex justify-between">
-                        <ThemedText size="sm" variant="secondary">Site ID:</ThemedText>
-                        <ThemedBadge variant="secondary" size="xs">{currentSite.id}</ThemedBadge>
+                        <ThemedText size="sm" variant="secondary">
+                            Site ID:
+                        </ThemedText>
+                        <ThemedBadge variant="secondary" size="xs">
+                            {currentSite.id}
+                        </ThemedBadge>
                     </div>
                     <div className="flex justify-between">
-                        <ThemedText size="sm" variant="secondary">Total History Records:</ThemedText>
-                        <ThemedBadge variant="info" size="xs">{currentSite.history.length}</ThemedBadge>
+                        <ThemedText size="sm" variant="secondary">
+                            Total History Records:
+                        </ThemedText>
+                        <ThemedBadge variant="info" size="xs">
+                            {currentSite.history.length}
+                        </ThemedBadge>
                     </div>
                     <div className="flex justify-between">
-                        <ThemedText size="sm" variant="secondary">Last Checked:</ThemedText>
+                        <ThemedText size="sm" variant="secondary">
+                            Last Checked:
+                        </ThemedText>
                         <ThemedText size="xs" variant="tertiary">
-                            {currentSite.lastChecked 
-                                ? new Date(currentSite.lastChecked).toLocaleString()
-                                : 'Never'
-                            }
+                            {currentSite.lastChecked ? new Date(currentSite.lastChecked).toLocaleString() : "Never"}
                         </ThemedText>
                     </div>
                 </div>
@@ -1228,7 +1199,7 @@ function SettingsTab({
                         <ThemedText size="sm" weight="medium" variant="secondary" className="mb-2">
                             Remove Site
                         </ThemedText>
-                        <ThemedText size="xs" variant="tertiary" className="mb-3">
+                        <ThemedText size="xs" variant="tertiary" className="mb-3 ml-4">
                             This action cannot be undone. All history data for this site will be lost.
                         </ThemedText>
                         <ThemedButton
