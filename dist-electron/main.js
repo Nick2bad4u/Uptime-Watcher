@@ -10947,6 +10947,7 @@ function requireMain() {
 }
 var mainExports = requireMain();
 const log = /* @__PURE__ */ getDefaultExportFromCjs(mainExports);
+const DEFAULT_REQUEST_TIMEOUT = 1e4;
 const logger$1 = {
   info: (message, ...args) => log.info(`[MONITOR] ${message}`, ...args),
   error: (message, error, ...args) => {
@@ -11092,7 +11093,7 @@ class UptimeMonitor extends require$$0$4.EventEmitter {
     let responseTime = 0;
     try {
       await axios.get(site.url, {
-        timeout: 1e4,
+        timeout: DEFAULT_REQUEST_TIMEOUT,
         validateStatus: (status) => status < 500
         // Consider 4xx as "up"
       });

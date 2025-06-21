@@ -24,7 +24,8 @@ import { formatResponseTime, formatFullTimestamp, formatDuration } from "../util
 import { AUTO_REFRESH_INTERVAL } from "../constants";
 import { ChartConfigService } from "../services/chartConfig";
 import logger from "../services/logger";
-import { useSiteAnalytics, TimePeriod, type DowntimePeriod } from "../hooks/useSiteAnalytics";
+import { useSiteAnalytics, type DowntimePeriod } from "../hooks/useSiteAnalytics";
+import type { TimePeriod } from "../utils/time";
 import {
     ThemedBox,
     ThemedText,
@@ -411,6 +412,17 @@ function OverviewTab({
     handleRemoveSite,
     isLoading,
 }: OverviewTabProps) {
+    const { getAvailabilityVariant } = useAvailabilityColors();
+    
+    // Map availability variant to progress/badge variant
+    const mapAvailabilityToBadgeVariant = (availability: number): "success" | "warning" | "error" => {
+        const variant = getAvailabilityVariant(availability);
+        return variant === "danger" ? "error" : variant;
+    };
+
+    const uptimeValue = parseFloat(uptime);
+    const progressVariant = mapAvailabilityToBadgeVariant(uptimeValue);
+
     return (
         <div className="space-y-6">
             {/* Key Metrics Grid */}
@@ -421,12 +433,12 @@ function OverviewTab({
 
                 <ThemedCard icon="⏱️" title="Uptime" hoverable className="text-center flex flex-col items-center">
                     <ThemedProgress
-                        value={parseFloat(uptime)}
-                        variant="success"
+                        value={uptimeValue}
+                        variant={progressVariant}
                         showLabel
                         className="flex flex-col items-center"
                     />
-                    <ThemedBadge variant="success" size="sm" className="mt-2">
+                    <ThemedBadge variant={progressVariant} size="sm" className="mt-2">
                         {uptime}%
                     </ThemedBadge>
                 </ThemedCard>

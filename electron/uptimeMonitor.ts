@@ -6,6 +6,9 @@ import { app } from "electron";
 import { Site, StatusHistory, StatusUpdate } from "./types";
 import log from "electron-log/main";
 
+// Default timeout for HTTP requests (10 seconds)
+const DEFAULT_REQUEST_TIMEOUT = 10000;
+
 // Configure logger for uptime monitor
 const logger = {
     info: (message: string, ...args: any[]) => log.info(`[MONITOR] ${message}`, ...args),
@@ -193,7 +196,7 @@ export class UptimeMonitor extends EventEmitter {
 
         try {
             await axios.get(site.url, {
-                timeout: 10000,
+                timeout: DEFAULT_REQUEST_TIMEOUT,
                 validateStatus: (status: number) => status < 500, // Consider 4xx as "up"
             });
 

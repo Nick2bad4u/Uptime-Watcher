@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { Site, StatusHistory } from "../types";
 import { CHART_TIME_PERIODS } from "../constants";
+import type { TimePeriod } from "../utils/time";
 import type { Theme } from "../theme/types";
 
 // Enhanced types for better IntelliSense and error catching
@@ -36,8 +37,6 @@ export interface SiteAnalytics {
     // Filtered data
     filteredHistory: StatusHistory[];
 }
-
-export type TimePeriod = keyof typeof CHART_TIME_PERIODS;
 
 /**
  * Advanced hook for site analytics calculations

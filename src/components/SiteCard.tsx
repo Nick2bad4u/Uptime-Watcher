@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Site } from "../types";
 import { useStore } from "../store";
 import { formatResponseTime, formatLastChecked } from "../utils/time";
-import { UPTIME_THRESHOLDS } from "../constants";
 import {
     ThemedCard,
     ThemedText,
@@ -12,6 +11,7 @@ import {
     MiniChartBar,
     ThemedTooltip,
 } from "../theme/components";
+import { useAvailabilityColors } from "../theme/useTheme";
 import logger from "../services/logger";
 
 interface SiteCardProps {
@@ -20,6 +20,7 @@ interface SiteCardProps {
 
 export function SiteCard({ site }: SiteCardProps) {
     const { deleteSite, checkSiteNow, isLoading, setSelectedSite, setShowSiteDetails } = useStore();
+    const { getAvailabilityVariant } = useAvailabilityColors();
     const [showQuickActions, setShowQuickActions] = useState(false);
 
     const handleQuickCheck = async (e?: React.MouseEvent) => {
@@ -57,10 +58,9 @@ export function SiteCard({ site }: SiteCardProps) {
         return Math.round((upCount / site.history.length) * 100);
     };
 
-    const getUptimeColor = (uptime: number) => {
-        if (uptime >= UPTIME_THRESHOLDS.EXCELLENT) return "success";
-        if (uptime >= UPTIME_THRESHOLDS.GOOD) return "warning";
-        return "error";
+    const mapAvailabilityToBadgeVariant = (availability: number): "success" | "warning" | "error" => {
+        const variant = getAvailabilityVariant(availability);
+        return variant === "danger" ? "error" : variant;
     };
 
     const getTrendIcon = () => {
@@ -177,7 +177,7 @@ export function SiteCard({ site }: SiteCardProps) {
                     <ThemedText size="xs" variant="secondary" className="block mb-1">
                         Uptime
                     </ThemedText>
-                    <ThemedBadge variant={getUptimeColor(uptime)} size="sm">
+                    <ThemedBadge variant={mapAvailabilityToBadgeVariant(uptime)} size="sm">
                         {uptime}%
                     </ThemedBadge>
                 </div>

@@ -86,19 +86,19 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
                         <div className="flex items-center space-x-4">
                             <div className="flex items-center space-x-1">
                                 <StatusIndicator status="up" size="sm" />
-                                <ThemedText size="sm" variant="secondary">
+                                <ThemedText size="sm" variant="secondary" className="text-center flex flex-col items-center">
                                     {upSites} Up
                                 </ThemedText>
                             </div>
                             <div className="flex items-center space-x-1">
                                 <StatusIndicator status="down" size="sm" />
-                                <ThemedText size="sm" variant="secondary">
+                                <ThemedText size="sm" variant="secondary" className="text-center flex flex-col items-center">
                                     {downSites} Down
                                 </ThemedText>
                             </div>
                             <div className="flex items-center space-x-1">
                                 <StatusIndicator status="pending" size="sm" />
-                                <ThemedText size="sm" variant="secondary">
+                                <ThemedText size="sm" variant="secondary" className="text-center flex flex-col items-center">
                                     {pendingSites} Pending
                                 </ThemedText>
                             </div>
@@ -108,7 +108,7 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
                     <div className="flex items-center space-x-4">
                         {/* Check Interval Selector */}
                         <div className="flex items-center space-x-2">
-                            <ThemedText size="sm" variant="secondary">
+                            <ThemedText size="sm" variant="secondary" className="text-center flex flex-col items-center">
                                 Check every:
                             </ThemedText>
                             <ThemedSelect

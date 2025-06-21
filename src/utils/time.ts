@@ -84,13 +84,16 @@ export function formatDuration(ms: number): string {
 import { CHART_TIME_PERIODS } from "../constants";
 
 /**
+ * Type for time period keys
+ */
+export type TimePeriod = keyof typeof CHART_TIME_PERIODS;
+
+/**
  * Format time periods for display
  */
-export const TIME_PERIOD_LABELS = {
+export const TIME_PERIOD_LABELS: Record<TimePeriod, string> = {
     "1h": "Last Hour",
     "24h": "Last 24 Hours",
     "7d": "Last 7 Days",
     "30d": "Last 30 Days",
 } as const;
-
-export type TimePeriod = keyof typeof CHART_TIME_PERIODS;
