@@ -9,6 +9,7 @@ function ExampleWithHook() {
 const { currentTheme } = useTheme();
 
 return (
+
 <div style={{ color: currentTheme.colors.errorAlert }}>
 This text uses the errorAlert color from the theme
 </div>
@@ -18,6 +19,7 @@ This text uses the errorAlert color from the theme
 // Method 2: Using CSS classes with theme variables (RECOMMENDED)
 function ExampleWithCSS() {
 return (
+
 <div className="error-alert__text">
 This text uses the errorAlert color via CSS custom property
 </div>
@@ -46,6 +48,7 @@ return (
 
 export default function ExampleUsage() {
 return (
+
 <div>
 <h2>Examples of using the errorAlert theme color:</h2>
 <ExampleWithHook />

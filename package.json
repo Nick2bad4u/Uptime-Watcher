@@ -104,13 +104,14 @@
         "electron": "^36.5.0",
         "electron-builder": "^26.0.17",
         "postcss": "^8.4.38",
-        "tailwindcss": "^3.4.17",
+        "tailwindcss": "4.1.10",
         "typescript": "^5.2.2",
         "vite": "^6.3.5",
         "vite-plugin-electron": "^0.29.0",
         "wait-on": "^8.0.3"
     },
     "dependencies": {
+        "@tailwindcss/postcss": "^4.1.10",
         "axios": "^1.6.8",
         "chart.js": "^4.4.2",
         "chartjs-adapter-date-fns": "^3.0.0",

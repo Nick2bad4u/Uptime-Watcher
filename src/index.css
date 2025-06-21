@@ -1,8 +1,39 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import url("tailwindcss");
 
 :root {
+    /* Define gray color palette for compatibility */
+    --color-gray-50: oklch(98.4% 0.003 247.858deg);
+    --color-gray-100: oklch(96.8% 0.007 247.896deg);
+    --color-gray-200: oklch(92.9% 0.013 255.508deg);
+    --color-gray-300: oklch(86.9% 0.022 252.894deg);
+    --color-gray-400: oklch(70.4% 0.04 256.788deg);
+    --color-gray-500: oklch(55.4% 0.046 257.417deg);
+    --color-gray-600: oklch(44.6% 0.043 257.281deg);
+    --color-gray-700: oklch(37.2% 0.044 257.287deg);
+    --color-gray-800: oklch(27.9% 0.041 260.031deg);
+    --color-gray-900: oklch(20.8% 0.042 265.755deg);
+    --color-gray-950: oklch(12.9% 0.042 264.695deg);
+
+    /* Define other color palettes used in the app */
+    --color-red-100: oklch(94.2% 0.093 17.38deg);
+    --color-red-800: oklch(54.8% 0.194 17.651deg);
+    --color-red-900: oklch(50.6% 0.181 17.694deg);
+    --color-red-200: oklch(89.8% 0.121 16.422deg);
+    --color-green-100: oklch(92.1% 0.094 142.425deg);
+    --color-green-800: oklch(54.8% 0.155 156.743deg);
+    --color-green-900: oklch(49.8% 0.137 158.96deg);
+    --color-green-200: oklch(87% 0.13 141.966deg);
+    --color-yellow-100: oklch(92.5% 0.098 85.87deg);
+    --color-yellow-800: oklch(65.8% 0.15 79.87deg);
+    --color-yellow-900: oklch(59.8% 0.137 82.23deg);
+    --color-yellow-200: oklch(87% 0.13 85.87deg);
+
+    /* Custom status colors from tailwind.config.js */
+    --color-status-up: #10b981;
+    --color-status-down: #ef4444;
+    --color-status-pending: #f59e0b;
+
+    /* Font and general styling */
     font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
     line-height: 1.5;
     font-weight: 400;

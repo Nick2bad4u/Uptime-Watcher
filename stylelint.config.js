@@ -5,5 +5,11 @@ export default {
         "block-no-empty": true,
         "media-feature-range-notation": null,
         "selector-id-pattern": null, // Ignore kebab-case enforcement for IDs
+        "at-rule-no-unknown": [
+            true,
+            {
+                ignoreAtRules: ["apply", "layer", "theme"],
+            },
+        ],
     },
 };
