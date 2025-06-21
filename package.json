@@ -231,7 +231,8 @@
       "category": "public.app-category.productivity",
       "hardenedRuntime": true,
       "gatekeeperAssess": true,
-      "x64ArchFiles": "Contents/Resources/app.asar.unpacked/node_modules/lightningcss-darwin-arm64/**"
+      "x64ArchFiles": "Contents/Resources/app.asar.unpacked/node_modules/lightningcss-darwin-arm64/**",
+      "allowList": "dist/mac-universal-x64-temp/Electron.app"
     },
     "linux": {
       "icon": "icons/favicon-256x256.png",
