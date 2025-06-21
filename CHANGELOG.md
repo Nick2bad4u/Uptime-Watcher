@@ -7,14 +7,82 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[126ba5e](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/126ba5e841d35548e1953888debe228732459c8a)...
+[fd1f3ea](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/fd1f3eaf10114b3f44c8fe2cb507599447b38e99)]
+([compare](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/compare/126ba5e841d35548e1953888debe228732459c8a...fd1f3eaf10114b3f44c8fe2cb507599447b38e99))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 1.8.0 in package.json and package-lock.json [`(fd1f3ea)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/fd1f3eaf10114b3f44c8fe2cb507599447b38e99)
+
+
+- [dependency] Update version 1.8.0 [`(126ba5e)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/126ba5e841d35548e1953888debe228732459c8a)
+
+
+
+
+
+
+## [1.8.0] - 2025-06-21
+
+
 [[0733182](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/0733182d8e7d3c6dc43fbeec991718c3b8724188)...
-[0733182](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/0733182d8e7d3c6dc43fbeec991718c3b8724188)]
-([compare](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/compare/0733182d8e7d3c6dc43fbeec991718c3b8724188...0733182d8e7d3c6dc43fbeec991718c3b8724188))
+[884adc3](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/884adc398b1d12c3a39acfa0983e5e13614f6d9b)]
+([compare](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/compare/0733182d8e7d3c6dc43fbeec991718c3b8724188...884adc398b1d12c3a39acfa0983e5e13614f6d9b))
+
+
+### 💼 Other
+
+- Reformats codebase for improved readability
+
+Applies consistent indentation, line breaks, and formatting across
+multiple sections to enhance maintainability and clarity.
+No functional or logic changes are introduced. [`(884adc3)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/884adc398b1d12c3a39acfa0983e5e13614f6d9b)
+
+
+- Adds screenshot preview and improves site details UI
+
+Introduces website screenshot thumbnail previews to site details, including a portal-based larger image overlay on hover for better visual context. Refines site settings and information layout with improved spacing, grouping, and visual hierarchy. Enhances button, checkbox, and status indicator styles for a more consistent and accessible interface. Cleans up redundant or duplicate CSS and improves maintainability. Also updates configuration files for markdown and linting. [`(cd4b190)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/cd4b190698be6dcbdfac2a1b28c54bd315e8ade5)
+
+
+- Enhances UI with modern icons and synchronized state
+
+Refactors the header and site details interfaces to use consistent, theme-aware iconography via a new icon library for a more modern, accessible look. Introduces new visual feedback and accessibility improvements with custom CSS, including improved status summaries and interactive elements.
+
+Synchronizes key UI state (like tab selection and chart time range) across the app for a seamless user experience, persisting state between sessions. Removes redundant settings and streamlines code for clarity.
+
+Adds `react-icons` as a dependency and supports flexible icon coloring in themed components, enabling better visual consistency throughout the application. [`(722e4f9)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/722e4f943ee79c0ee6f9005630f3582b7a2cfe23)
+
+
+- Unifies uptime quality logic and cleans up constants
+
+Refactors uptime color mapping to use a centralized theme utility instead of scattered thresholds. Cleans up and removes unused constants, types, and configuration blocks to improve maintainability and reduce duplication. Enhances type safety for time periods and streamlines related imports. [`(398a536)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/398a5369561404bbf6ee5f49c482623064c0ff47)
+
+
+- Restricts CI workflows to src directory changes
+
+Updates all GitHub Actions workflows to only trigger on modifications within the src directory, reducing unnecessary runs for unrelated file changes. Also updates Flatpak build to use runtime and base version 24.08, sets NODE_ENV to production, and optimizes dependency installation for production builds. [`(6a6ed55)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/6a6ed55504265c5d65b611fb32b02cea96dd3600)
+
+
+
+### ⚙️ Miscellaneous Tasks
+
+- Update changelogs for v1.7.0 [skip ci] [`(a52fdc4)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/a52fdc431623c6b19923ef4dd85b605e3970db42)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 1.7.0 [`(0733182)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/0733182d8e7d3c6dc43fbeec991718c3b8724188)
+
+
+
+### 🛡️ Security
+
+- Improves type safety and updates dependencies
+
+Switches many uses of 'any' to more precise types for site data, status, and chart props, enhancing type safety and maintainability. Updates several dependencies and devDependencies to newer versions for better compatibility and security. Cleans up some component props and utility functions for improved clarity and reliability. [`(65ccbe3)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/65ccbe3f372f8d30ad303348869c92e1adc963d1)
 
 
 
