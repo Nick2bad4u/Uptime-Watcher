@@ -100,14 +100,12 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
                             padding="sm"
                             rounded="lg"
                             shadow="sm"
-                            className="flex items-center space-x-3 transition-all duration-300 min-w-[340px] header-status-summary-box"
+                            className="flex items-center sphace-x-3 transition-all duration-300 min-w-[340px] header-status-summary-box"
                         >
                             {/* Overall Health Badge */}
                             {totalSites > 0 && (
                                 <div
-                                    className={
-                                        `flex items-center space-x-2 px-3 py-1 rounded-md group transition-all duration-200 health-badge`
-                                    }
+                                    className={`flex items-center space-x-2 px-3 py-1 rounded-md group transition-all duration-200 health-badge`}
                                     data-health-color={getAvailabilityColor(uptimePercentage)}
                                 >
                                     <div
@@ -133,9 +131,7 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
                             {totalSites > 0 && <div className="w-px h-8 bg-current opacity-20"></div>}
 
                             {/* Up Status */}
-                            <div
-                                className="flex items-center space-x-2 px-2 py-1 rounded-md transition-all duration-200 group status-up-badge"
-                            >
+                            <div className="flex items-center space-x-2 px-2 py-1 rounded-md transition-all duration-200 group status-up-badge">
                                 <StatusIndicator status="up" size="sm" />
                                 <div className="flex flex-col">
                                     <ThemedText size="sm" weight="semibold" variant="primary">
@@ -151,9 +147,7 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
                             <div className="w-px h-8 bg-current opacity-20"></div>
 
                             {/* Down Status */}
-                            <div
-                                className="flex items-center space-x-2 px-2 py-1 rounded-md transition-all duration-200 group status-down-badge"
-                            >
+                            <div className="flex items-center space-x-2 px-2 py-1 rounded-md transition-all duration-200 group status-down-badge">
                                 <StatusIndicator status="down" size="sm" />
                                 <div className="flex flex-col">
                                     <ThemedText size="sm" weight="semibold" variant="primary">
@@ -169,9 +163,7 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
                             <div className="w-px h-8 bg-current opacity-20"></div>
 
                             {/* Pending Status */}
-                            <div
-                                className="flex items-center space-x-2 px-2 py-1 rounded-md transition-all duration-200 group status-pending-badge"
-                            >
+                            <div className="flex items-center space-x-2 px-2 py-1 rounded-md transition-all duration-200 group status-pending-badge">
                                 <StatusIndicator status="pending" size="sm" />
                                 <div className="flex flex-col">
                                     <ThemedText size="sm" weight="semibold" variant="primary">
@@ -212,7 +204,11 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
                             rounded="md"
                             className="flex items-center gap-2 px-3 py-1 header-interval-box"
                         >
-                            <ThemedText size="sm" variant="secondary" className="text-center flex flex-col items-center">
+                            <ThemedText
+                                size="sm"
+                                variant="secondary"
+                                className="text-center flex flex-col items-center"
+                            >
                                 Check every:
                             </ThemedText>
                             <ThemedSelect

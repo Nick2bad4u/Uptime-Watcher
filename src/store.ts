@@ -407,8 +407,10 @@ export const useStore = create<AppState>()(
             clearError: () => set({ lastError: null }),
 
             // Synchronized UI actions
-            setActiveSiteDetailsTab: (tab: "overview" | "analytics" | "history" | "settings") => set({ activeSiteDetailsTab: tab }),
-            setSiteDetailsChartTimeRange: (range: "1h" | "24h" | "7d" | "30d") => set({ siteDetailsChartTimeRange: range }),
+            setActiveSiteDetailsTab: (tab: "overview" | "analytics" | "history" | "settings") =>
+                set({ activeSiteDetailsTab: tab }),
+            setSiteDetailsChartTimeRange: (range: "1h" | "24h" | "7d" | "30d") =>
+                set({ siteDetailsChartTimeRange: range }),
             setShowAdvancedMetrics: (show: boolean) => set({ showAdvancedMetrics: show }),
         }),
         {

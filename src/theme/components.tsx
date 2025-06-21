@@ -663,7 +663,14 @@ interface ThemedBadgeProps {
     children: React.ReactNode;
 }
 
-export function ThemedBadge({ variant = "primary", size = "sm", icon, iconColor, className = "", children }: ThemedBadgeProps) {
+export function ThemedBadge({
+    variant = "primary",
+    size = "sm",
+    icon,
+    iconColor,
+    className = "",
+    children,
+}: ThemedBadgeProps) {
     const { currentTheme } = useTheme();
 
     const getVariantStyles = () => {

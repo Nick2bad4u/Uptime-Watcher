@@ -25,7 +25,6 @@ import { AUTO_REFRESH_INTERVAL } from "../constants";
 import { ChartConfigService } from "../services/chartConfig";
 import logger from "../services/logger";
 import { useSiteAnalytics, type DowntimePeriod } from "../hooks/useSiteAnalytics";
-import type { TimePeriod } from "../utils/time";
 import {
     ThemedBox,
     ThemedText,
@@ -41,9 +40,11 @@ import "chartjs-adapter-date-fns";
 import "./SiteDetails.css";
 import { FaPause, FaPlay } from "react-icons/fa";
 import { FiRefreshCw, FiX, FiTrash2, FiSave } from "react-icons/fi";
-import { MdAccessTime, MdBolt, MdBarChart, MdSettings, MdHistory, MdDelete, MdClose, MdSpeed, MdOutlineFactCheck } from "react-icons/md";
+import { MdAccessTime, MdBolt, MdBarChart, MdSettings, MdHistory, MdSpeed, MdOutlineFactCheck } from "react-icons/md";
 import { BsGraphUp } from "react-icons/bs";
 import { FaListOl } from "react-icons/fa";
+import React from "react";
+import { createPortal } from "react-dom";
 
 // Register Chart.js components
 ChartJS.register(
@@ -250,7 +251,12 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                         <div className="site-details-header-content">
                             {/* Left accent bar */}
                             <div className="site-details-header-accent" />
-                            <div className="site-details-header-info">
+                            <div className="site-details-header-info flex items-center gap-4">
+                                {/* Website Screenshot Thumbnail */}
+                                <ScreenshotThumbnail
+                                    url={currentSite.url}
+                                    siteName={currentSite.name || currentSite.url}
+                                />
                                 <div className="site-details-status-indicator">
                                     <StatusIndicator status={currentSite.status} size="lg" />
                                     {isRefreshing && (
@@ -292,21 +298,22 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                                                     : Date.now()
                                             )}
                                         </ThemedText>
-                                        {isMonitoring && (
-                                            <div className="site-details-auto-refresh flex items-center gap-1">
-                                                <div className="site-details-refresh-indicator" />
-                                                <ThemedText
-                                                    size="xs"
-                                                    variant="success"
-                                                    className="site-details-refresh-text"
-                                                >
-                                                    Monitoring enabled
-                                                </ThemedText>
-                                            </div>
-                                        )}
                                     </div>
                                 </div>
                             </div>
+                            {/* Monitoring enabled indicator moved above the actions */}
+                            {isMonitoring && (
+                                <div className="site-details-monitoring-indicator flex flex-col items-center justify-center gap-1 mt-2">
+                                    <div className="site-details-refresh-indicator" />
+                                    <ThemedText
+                                        size="xs"
+                                        variant="success"
+                                        className="site-details-refresh-text text-center"
+                                    >
+                                        Monitoring enabled
+                                    </ThemedText>
+                                </div>
+                            )}
                             <div className="site-details-actions">
                                 <ThemedIconButton
                                     icon={isMonitoring ? <FaPause /> : <FaPlay />}
@@ -561,7 +568,12 @@ function OverviewTab({
                         <ThemedText size="sm" variant="secondary">
                             Slowest Response
                         </ThemedText>
-                        <ThemedBadge variant="warning" icon={<MdAccessTime />} iconColor={slowestIconColor} className="ml-4">
+                        <ThemedBadge
+                            variant="warning"
+                            icon={<MdAccessTime />}
+                            iconColor={slowestIconColor}
+                            className="ml-4"
+                        >
                             {formatResponseTime(slowestResponse)}
                         </ThemedBadge>
                     </div>
@@ -571,7 +583,13 @@ function OverviewTab({
             {/* Quick Actions */}
             <ThemedCard icon={<MdBolt color={quickActionIconColor} />} title="Quick Actions">
                 <div className="flex space-x-3">
-                    <ThemedButton variant="error" size="sm" onClick={handleRemoveSite} disabled={isLoading} icon={<FiTrash2 />}>
+                    <ThemedButton
+                        variant="error"
+                        size="sm"
+                        onClick={handleRemoveSite}
+                        disabled={isLoading}
+                        icon={<FiTrash2 />}
+                    >
                         Remove Site
                     </ThemedButton>
                 </div>
@@ -915,21 +933,21 @@ function SettingsTab({ currentSite, handleRemoveSite, isLoading }: SettingsTabPr
             setHasUnsavedChanges(false);
             logger.user.action("Updated site name", { url: currentSite.url, name: localName.trim() });
         } catch (error) {
-            // Error is already handled by the store action
             logger.site.error(currentSite.url, error instanceof Error ? error : String(error));
         }
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-10">
             {/* Site Configuration */}
-            <ThemedCard icon="⚙️" title="Site Configuration">
-                <div className="space-y-4">
+            <ThemedCard icon="⚙️" title="Site Configuration" padding="xl" rounded="xl" shadow="lg" className="mb-6">
+                <div className="space-y-8">
+                    {/* Site Name */}
                     <div>
                         <ThemedText size="sm" weight="medium" variant="secondary" className="block mb-2">
                             Site Name
                         </ThemedText>
-                        <div className="flex gap-2">
+                        <div className="flex gap-3 items-center">
                             <ThemedInput
                                 type="text"
                                 value={localName}
@@ -944,22 +962,24 @@ function SettingsTab({ currentSite, handleRemoveSite, isLoading }: SettingsTabPr
                                 disabled={!hasUnsavedChanges || isLoading}
                                 loading={isLoading}
                                 icon={<FiSave />}
+                                className="min-w-[90px]"
                             >
                                 Save
                             </ThemedButton>
                         </div>
                         {hasUnsavedChanges && (
-                            <ThemedBadge variant="warning" size="xs" className="mt-1">
+                            <ThemedBadge variant="warning" size="xs" className="mt-2">
                                 ⚠️ Unsaved changes
                             </ThemedBadge>
                         )}
                     </div>
 
+                    {/* Site URL */}
                     <div>
                         <ThemedText size="sm" weight="medium" variant="secondary" className="block mb-2">
                             Site URL
                         </ThemedText>
-                        <ThemedInput type="url" value={currentSite.url} disabled className="opacity-60" />
+                        <ThemedInput type="url" value={currentSite.url} disabled className="opacity-70" />
                         <ThemedText size="xs" variant="tertiary" className="mt-1">
                             URL cannot be changed after creation
                         </ThemedText>
@@ -967,55 +987,65 @@ function SettingsTab({ currentSite, handleRemoveSite, isLoading }: SettingsTabPr
                 </div>
             </ThemedCard>
 
-            {/* Monitoring Settings */}
-            {/* Removed Auto-refresh Details toggle and card as it is redundant with real-time state updates */}
-
             {/* Site Information */}
-            <ThemedCard icon="📊" title="Site Information">
-                <div className="space-y-3">
-                    <div className="flex justify-between">
-                        <ThemedText size="sm" variant="secondary">
-                            Site ID:
-                        </ThemedText>
-                        <ThemedBadge variant="secondary" size="xs">
-                            {currentSite.id}
-                        </ThemedBadge>
+            <ThemedCard icon="📊" title="Site Information" padding="xl" rounded="xl" shadow="md" className="mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="flex flex-col gap-3">
+                        <div className="flex items-center justify-between">
+                            <ThemedText size="sm" variant="secondary">
+                                Site ID:
+                            </ThemedText>
+                            <ThemedBadge variant="secondary" size="xs">
+                                {currentSite.id}
+                            </ThemedBadge>
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <ThemedText size="sm" variant="secondary">
+                                Total History Records:
+                            </ThemedText>
+                            <ThemedBadge variant="info" size="xs">
+                                {currentSite.history.length}
+                            </ThemedBadge>
+                        </div>
                     </div>
-                    <div className="flex justify-between">
-                        <ThemedText size="sm" variant="secondary">
-                            Total History Records:
-                        </ThemedText>
-                        <ThemedBadge variant="info" size="xs">
-                            {currentSite.history.length}
-                        </ThemedBadge>
-                    </div>
-                    <div className="flex justify-between">
-                        <ThemedText size="sm" variant="secondary">
-                            Last Checked:
-                        </ThemedText>
-                        <ThemedText size="xs" variant="tertiary">
-                            {currentSite.lastChecked ? new Date(currentSite.lastChecked).toLocaleString() : "Never"}
-                        </ThemedText>
+                    <div className="flex flex-col gap-3">
+                        <div className="flex items-center justify-between">
+                            <ThemedText size="sm" variant="secondary">
+                                Last Checked:
+                            </ThemedText>
+                            <ThemedText size="xs" variant="tertiary">
+                                {currentSite.lastChecked ? new Date(currentSite.lastChecked).toLocaleString() : "Never"}
+                            </ThemedText>
+                        </div>
                     </div>
                 </div>
             </ThemedCard>
 
             {/* Danger Zone */}
-            <ThemedCard icon="⚠️" title="Danger Zone" variant="tertiary">
-                <div className="space-y-4">
+            <ThemedCard
+                icon="⚠️"
+                title="Danger Zone"
+                variant="tertiary"
+                padding="xl"
+                rounded="xl"
+                shadow="md"
+                className="border-2 border-error/30"
+            >
+                <div className="space-y-6">
                     <div>
-                        <ThemedText size="sm" weight="medium" variant="secondary" className="mb-2">
+                        <ThemedText size="sm" weight="medium" variant="error" className="mb-2">
                             Remove Site
                         </ThemedText>
-                        <ThemedText size="xs" variant="tertiary" className="mb-3 ml-4">
+                        <ThemedText size="xs" variant="tertiary" className="mb-4 ml-1 block">
                             This action cannot be undone. All history data for this site will be lost.
                         </ThemedText>
                         <ThemedButton
                             variant="error"
-                            size="sm"
+                            size="md"
                             onClick={handleRemoveSite}
                             loading={isLoading}
                             icon={<FiTrash2 />}
+                            className="w-full"
                         >
                             Remove Site
                         </ThemedButton>
@@ -1026,7 +1056,96 @@ function SettingsTab({ currentSite, handleRemoveSite, isLoading }: SettingsTabPr
     );
 }
 
-// Add this type guard at the top of the file (after imports):
+// Ensure hasOpenExternal is defined at the top (after imports):
 function hasOpenExternal(api: any): api is { openExternal: (url: string) => void } {
     return typeof api?.openExternal === "function";
+}
+
+// Update ScreenshotThumbnail to use only CSS classes for overlay/image
+function ScreenshotThumbnail({ url, siteName }: { url: string; siteName: string }) {
+    const [hovered, setHovered] = React.useState(false);
+    const [overlayVars, setOverlayVars] = React.useState<React.CSSProperties>({});
+    const { themeName } = useTheme();
+    const linkRef = React.useRef<HTMLAnchorElement>(null);
+    const screenshotUrl = `https://api.microlink.io/?url=${encodeURIComponent(url)}&screenshot=true&meta=false&embed=screenshot.url&colorScheme=auto`;
+
+    function handleClick(e: React.MouseEvent) {
+        e.preventDefault();
+        if (hasOpenExternal(window.electronAPI)) {
+            window.electronAPI.openExternal(url);
+        } else {
+            window.open(url, "_blank", "noopener");
+        }
+    }
+
+    // Position overlay above or below the thumbnail, always fit in viewport
+    React.useEffect(() => {
+        if (hovered && linkRef.current) {
+            const rect = linkRef.current.getBoundingClientRect();
+            const viewportW = window.innerWidth;
+            const viewportH = window.innerHeight;
+            const maxImgW = Math.min(viewportW * 0.9, 900); // 90vw or 900px max
+            const maxImgH = Math.min(viewportH * 0.9, 700); // 90vh or 700px max
+            let overlayW = maxImgW;
+            let overlayH = maxImgH;
+            let top = rect.top - overlayH - 16; // 16px gap above
+            let left = rect.left + rect.width / 2 - overlayW / 2;
+            if (top < 0) {
+                top = rect.bottom + 16;
+            }
+            if (left < 8) left = 8;
+            if (left + overlayW > viewportW - 8) left = viewportW - overlayW - 8;
+            if (top < 8) top = 8;
+            if (top + overlayH > viewportH - 8) top = viewportH - overlayH - 8;
+            setOverlayVars({
+                "--overlay-top": `${top}px`,
+                "--overlay-left": `${left}px`,
+                "--overlay-width": `${overlayW}px`,
+                "--overlay-height": `${overlayH}px`,
+            } as React.CSSProperties);
+        } else if (!hovered) {
+            setOverlayVars({});
+        }
+    }, [hovered]);
+
+    // Portal overlay for enlarged preview
+    const overlay = hovered
+        ? createPortal(
+              <div className={`site-details-thumbnail-portal-overlay theme-${themeName}`} style={overlayVars}>
+                  <div className="site-details-thumbnail-portal-img-wrapper">
+                      <img
+                          src={screenshotUrl}
+                          alt={`Large screenshot of ${siteName}`}
+                          className="site-details-thumbnail-img-portal"
+                          loading="lazy"
+                          tabIndex={0}
+                      />
+                  </div>
+              </div>,
+              document.body
+          )
+        : null;
+    return (
+        <>
+            <a
+                ref={linkRef}
+                href={url}
+                tabIndex={0}
+                aria-label={`Open ${url} in browser`}
+                onClick={handleClick}
+                className="site-details-thumbnail-link"
+                onMouseEnter={() => setHovered(true)}
+                onMouseLeave={() => setHovered(false)}
+            >
+                <img
+                    src={screenshotUrl}
+                    alt={`Screenshot of ${siteName}`}
+                    className="site-details-thumbnail-img"
+                    loading="lazy"
+                />
+                <span className="site-details-thumbnail-caption">Preview: {siteName}</span>
+            </a>
+            {overlay}
+        </>
+    );
 }
