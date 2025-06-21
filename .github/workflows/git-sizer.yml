@@ -7,20 +7,14 @@ on:
         paths-ignore:
             - "*"
             - "*/**"
-            - "!.icons/**"
-            - "!.icons"
-            - "!.**"
-            - "!."
+            - "!src/**"
             - "**/CHANGELOG.md"
             - "CHANGELOG.md"
     pull_request:
         paths-ignore:
             - "*"
             - "*/**"
-            - "!.icons/**"
-            - "!.icons"
-            - "!.**"
-            - "!."
+            - "!src/**"
             - "**/CHANGELOG.md"
             - "CHANGELOG.md"
     workflow_dispatch:

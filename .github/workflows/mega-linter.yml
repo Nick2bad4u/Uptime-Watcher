@@ -3,7 +3,19 @@ name: MegaLinter
 
 on:
     push:
+        paths-ignore:
+            - "*"
+            - "*/**"
+            - "!src/**"
+            - "**/CHANGELOG.md"
+            - "CHANGELOG.md"
     pull_request:
+        paths-ignore:
+            - "*"
+            - "*/**"
+            - "!src/**"
+            - "**/CHANGELOG.md"
+            - "CHANGELOG.md"
     workflow_dispatch:
 
 permissions: write-all

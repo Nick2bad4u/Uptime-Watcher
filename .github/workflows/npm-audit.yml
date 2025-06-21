@@ -5,10 +5,7 @@ on:
         paths-ignore:
             - "*"
             - "*/**"
-            - "!.icons/**"
-            - "!.icons"
-            - "!.**"
-            - "!electron-app"
+            - "!src/**"
             - "**/CHANGELOG.md"
             - "CHANGELOG.md"
     push:
@@ -18,10 +15,7 @@ on:
         paths-ignore:
             - "*"
             - "*/**"
-            - "!.icons/**"
-            - "!.icons"
-            - "!.**"
-            - "!electron-app"
+            - "!src/**"
             - "**/CHANGELOG.md"
             - "CHANGELOG.md"
     # schedule:

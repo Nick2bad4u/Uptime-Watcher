@@ -1,9 +1,9 @@
 app-id: io.github.uptimewatcher
 runtime: org.freedesktop.Platform
-runtime-version: "23.08"
+runtime-version: "24.08"
 sdk: org.freedesktop.Sdk
 base: org.electronjs.Electron2.BaseApp
-base-version: "23.08"
+base-version: "24.08"
 command: run.sh
 separate-locales: false
 finish-args:
@@ -18,12 +18,19 @@ finish-args:
     - --talk-name=org.kde.StatusNotifierWatcher
     - --env=ELECTRON_IS_DEV=0
     - --env=ELECTRON_FORCE_IS_PACKAGED=true
+    - --env=NODE_ENV=production
 modules:
+    - name: nodejs
+      buildsystem: simple
+      build-commands:
+          - echo "Using Node.js from Electron base"
+      sources: []
+
     - name: uptime-watcher
       buildsystem: simple
       build-commands:
           # Install Node.js dependencies
-          - npm ci --production
+          - npm ci --omit=dev
 
           # Build the application
           - npm run build

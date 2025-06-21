@@ -41,10 +41,7 @@ on:
         paths-ignore:
             - "*"
             - "*/**"
-            - "!.icons/**"
-            - "!.icons"
-            - "!.**"
-            - "!electron-app"
+            - "!src/**"
             - "**/CHANGELOG.md"
             - "CHANGELOG.md"
     merge_group:
@@ -55,10 +52,7 @@ on:
         paths-ignore:
             - "*"
             - "*/**"
-            - "!.icons/**"
-            - "!.icons"
-            - "!.**"
-            - "!electron-app"
+            - "!src/**"
             - "**/CHANGELOG.md"
             - "CHANGELOG.md"
     workflow_dispatch:

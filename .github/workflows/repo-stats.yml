@@ -9,10 +9,7 @@ on:
         paths-ignore:
             - "*"
             - "*/**"
-            - "!.icons/**"
-            - "!.icons"
-            - "!.**"
-            - "!electron-app"
+            - "!src/**"
             - "**/CHANGELOG.md"
             - "CHANGELOG.md"
     pull_request:
@@ -20,10 +17,7 @@ on:
         paths-ignore:
             - "*"
             - "*/**"
-            - "!.icons/**"
-            - "!.icons"
-            - "!.**"
-            - "!electron-app"
+            - "!src/**"
             - "**/CHANGELOG.md"
             - "CHANGELOG.md"
 
