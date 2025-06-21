@@ -215,27 +215,27 @@ const { up, down, pending, unknown } = useStatusColors();
 
 ```typescript
 import {
-  ThemedBox,
-  ThemedText,
-  ThemedButton,
-  StatusIndicator,
-  ThemedInput,
-  ThemedSelect,
-  ThemedCheckbox
+ ThemedBox,
+ ThemedText,
+ ThemedButton,
+ StatusIndicator,
+ ThemedInput,
+ ThemedSelect,
+ ThemedCheckbox,
 } from "../theme/components";
 
 function MyComponent() {
-  return (
-    <ThemedBox variant="secondary" padding="lg" rounded="lg" shadow="md">
-      <ThemedText variant="primary" size="lg" weight="semibold">
-        Site Status
-      </ThemedText>
-      <StatusIndicator status="up" size="md" />
-      <ThemedButton variant="primary" size="md" onClick={handleAction}>
-        Check Now
-      </ThemedButton>
-    </ThemedBox>
-  );
+ return (
+  <ThemedBox variant="secondary" padding="lg" rounded="lg" shadow="md">
+   <ThemedText variant="primary" size="lg" weight="semibold">
+    Site Status
+   </ThemedText>
+   <StatusIndicator status="up" size="md" />
+   <ThemedButton variant="primary" size="md" onClick={handleAction}>
+    Check Now
+   </ThemedButton>
+  </ThemedBox>
+ );
 }
 ```
 
@@ -244,13 +244,11 @@ function MyComponent() {
 ```typescript
 // DON'T DO THIS - Hardcoded colors and styles
 function MyComponent() {
-  return (
-    <div style={{ backgroundColor: '#ffffff', padding: '16px' }}>
-      <span style={{ color: '#000000', fontSize: '18px' }}>
-        Site Status
-      </span>
-    </div>
-  );
+ return (
+  <div style={{ backgroundColor: "#ffffff", padding: "16px" }}>
+   <span style={{ color: "#000000", fontSize: "18px" }}>Site Status</span>
+  </div>
+ );
 }
 ```
 
@@ -315,23 +313,19 @@ function NewComponent() {
 #### 2. Use Themed Components
 
 ```typescript
-import {
-  ThemedBox,
-  ThemedText,
-  ThemedButton
-} from "../theme/components";
+import { ThemedBox, ThemedText, ThemedButton } from "../theme/components";
 import { useTheme } from "../theme/useTheme";
 
 function NewComponent() {
-  const { getStatusColor } = useTheme();
+ const { getStatusColor } = useTheme();
 
-  return (
-    <ThemedBox variant="primary" padding="lg">
-      <ThemedText variant="primary" size="lg">
-        Content
-      </ThemedText>
-    </ThemedBox>
-  );
+ return (
+  <ThemedBox variant="primary" padding="lg">
+   <ThemedText variant="primary" size="lg">
+    Content
+   </ThemedText>
+  </ThemedBox>
+ );
 }
 ```
 
@@ -381,52 +375,48 @@ Errors are automatically displayed in the main App component:
 
 ```typescript
 // In App.tsx - automatic error handling
-{lastError && (
+{
+ lastError && (
   <div className="error-notification">
-    <ThemedText variant="error">{lastError}</ThemedText>
-    <ThemedButton onClick={clearError}>Dismiss</ThemedButton>
+   <ThemedText variant="error">{lastError}</ThemedText>
+   <ThemedButton onClick={clearError}>Dismiss</ThemedButton>
   </div>
-)}
+ );
+}
 ```
 
 #### Component-Level Error Handling
 
 ```typescript
 function ComponentWithAsyncAction() {
-  const { setError, setLoading, isLoading } = useStore();
-  const [localError, setLocalError] = useState<string | null>(null);
+ const { setError, setLoading, isLoading } = useStore();
+ const [localError, setLocalError] = useState<string | null>(null);
 
-  const handleAction = async () => {
-    setLoading(true);
-    setLocalError(null);
+ const handleAction = async () => {
+  setLoading(true);
+  setLocalError(null);
 
-    try {
-      const result = await window.electronAPI.action();
-      // Handle success
-    } catch (error) {
-      // For user-facing errors, use global error
-      setError(`Failed to perform action: ${error.message}`);
-      // For component-specific errors, use local state
-      setLocalError("Please check your input and try again");
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+   const result = await window.electronAPI.action();
+   // Handle success
+  } catch (error) {
+   // For user-facing errors, use global error
+   setError(`Failed to perform action: ${error.message}`);
+   // For component-specific errors, use local state
+   setLocalError("Please check your input and try again");
+  } finally {
+   setLoading(false);
+  }
+ };
 
-  return (
-    <ThemedBox>
-      {localError && (
-        <ThemedText variant="error">{localError}</ThemedText>
-      )}
-      <ThemedButton
-        disabled={isLoading}
-        loading={isLoading}
-        onClick={handleAction}
-      >
-        {isLoading ? "Processing..." : "Perform Action"}
-      </ThemedButton>
-    </ThemedBox>
-  );
+ return (
+  <ThemedBox>
+   {localError && <ThemedText variant="error">{localError}</ThemedText>}
+   <ThemedButton disabled={isLoading} loading={isLoading} onClick={handleAction}>
+    {isLoading ? "Processing..." : "Perform Action"}
+   </ThemedButton>
+  </ThemedBox>
+ );
 }
 ```
 

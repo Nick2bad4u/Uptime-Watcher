@@ -28,9 +28,12 @@
     --color-yellow-900: oklch(59.8% 0.137 82.23deg);
     --color-yellow-200: oklch(87% 0.13 85.87deg);
 
-    /* Custom status colors from tailwind.config.js */
-    --color-status-up: #10b981;
+    /* Status indicator background and text colors for theming (match themes.ts) */
+    --color-status-up-bg: #e6f9f0; /* light background for up */
+    --color-status-up: #10b981; /* text and main color for up */
+    --color-status-down-bg: #fde8e8;
     --color-status-down: #ef4444;
+    --color-status-pending-bg: #fff7e6;
     --color-status-pending: #f59e0b;
 
     /* Font and general styling */
@@ -75,14 +78,17 @@ body {
     }
 
     .status-up {
-        @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200;
+        background-color: var(--color-status-up-bg, #e6f9f0);
+        color: var(--color-status-up, #10b981);
     }
 
     .status-down {
-        @apply bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200;
+        background-color: var(--color-status-down-bg, #fde8e8);
+        color: var(--color-status-down, #ef4444);
     }
 
     .status-pending {
-        @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200;
+        background-color: var(--color-status-pending-bg, #fff7e6);
+        color: var(--color-status-pending, #f59e0b);
     }
 }
