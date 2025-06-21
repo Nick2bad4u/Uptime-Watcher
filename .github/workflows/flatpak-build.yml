@@ -57,6 +57,10 @@ jobs:
                   cd .
                   npm install
 
+            - name: Build application
+              run: |
+                  npm run build
+
             - name: Build Flatpak
               run: |
                   cd .
