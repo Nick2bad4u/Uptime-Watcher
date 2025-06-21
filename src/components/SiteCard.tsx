@@ -26,7 +26,7 @@ export function SiteCard({ site }: SiteCardProps) {
         e?.stopPropagation(); // Prevent card click
         try {
             await checkSiteNow(site.url);
-            logger.user.action('Quick site check', { url: site.url });
+            logger.user.action("Quick site check", { url: site.url });
         } catch (error) {
             logger.site.error(site.url, error instanceof Error ? error : String(error));
         }
@@ -132,7 +132,7 @@ export function SiteCard({ site }: SiteCardProps) {
                 <div className="flex items-center space-x-2">
                     <StatusIndicator status={site.status as any} size="md" />
                     {showQuickActions && (
-                        <div 
+                        <div
                             className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity"
                             onClick={(e) => e.stopPropagation()}
                         >

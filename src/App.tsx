@@ -78,18 +78,18 @@ function App() {
     const handleStartMonitoring = async () => {
         try {
             await startSiteMonitoring();
-            logger.user.action('Started monitoring');
+            logger.user.action("Started monitoring");
         } catch (error) {
-            logger.app.error('start monitoring', error instanceof Error ? error : new Error(String(error)));
+            logger.app.error("start monitoring", error instanceof Error ? error : new Error(String(error)));
         }
     };
 
     const handleStopMonitoring = async () => {
         try {
             await stopSiteMonitoring();
-            logger.user.action('Stopped monitoring');
+            logger.user.action("Stopped monitoring");
         } catch (error) {
-            logger.app.error('stop monitoring', error instanceof Error ? error : new Error(String(error)));
+            logger.app.error("stop monitoring", error instanceof Error ? error : new Error(String(error)));
         }
     };
 

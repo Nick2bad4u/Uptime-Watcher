@@ -1065,13 +1065,17 @@
     border-radius: 50%;
     background: rgb(255 255 255 / 40%);
     transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
+    transition:
+        width 0.6s,
+        height 0.6s;
 }
 
 .button-micro:active::after {
     width: 300px;
     height: 300px;
-    transition: width 0s, height 0s;
+    transition:
+        width 0s,
+        height 0s;
 }
 
 /* Professional scrollbar styling */

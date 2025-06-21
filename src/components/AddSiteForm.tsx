@@ -52,7 +52,7 @@ export function AddSiteForm() {
             // Reset form on success
             setUrl("");
             setName("");
-            logger.user.action('Added site', { url: url.trim(), name: name.trim() });
+            logger.user.action("Added site", { url: url.trim(), name: name.trim() });
         } catch (error) {
             // Error is already handled by the store action
             logger.error("Failed to add site from form", error);

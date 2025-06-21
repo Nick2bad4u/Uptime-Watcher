@@ -12,14 +12,7 @@ interface HeaderProps {
 }
 
 export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
-    const {
-        isMonitoring,
-        sites,
-        checkInterval,
-        setShowSettings,
-        isLoading,
-        updateCheckIntervalValue,
-    } = useStore();
+    const { isMonitoring, sites, checkInterval, setShowSettings, isLoading, updateCheckIntervalValue } = useStore();
 
     const { toggleTheme, isDark } = useTheme();
 
@@ -53,7 +46,7 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
     const handleIntervalChange = async (interval: number) => {
         try {
             await updateCheckIntervalValue(interval);
-            logger.user.settingsChange('checkInterval', checkInterval, interval);
+            logger.user.settingsChange("checkInterval", checkInterval, interval);
         } catch (error) {
             logger.error("Failed to update check interval from header", error);
             // Error is already handled by the store action
@@ -63,7 +56,7 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
     const handleStartMonitoring = async () => {
         try {
             await onStartMonitoring();
-            logger.user.action('Started monitoring from header');
+            logger.user.action("Started monitoring from header");
         } catch (error) {
             logger.error("Failed to start monitoring from header", error);
             // Error is handled by the calling component
@@ -73,7 +66,7 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
     const handleStopMonitoring = async () => {
         try {
             await onStopMonitoring();
-            logger.user.action('Stopped monitoring from header');
+            logger.user.action("Stopped monitoring from header");
         } catch (error) {
             logger.error("Failed to stop monitoring from header", error);
             // Error is handled by the calling component

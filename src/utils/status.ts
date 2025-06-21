@@ -30,7 +30,3 @@ export function formatStatusWithIcon(status: string): string {
     const text = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
     return `${icon} ${text}`;
 }
-
-
-
-

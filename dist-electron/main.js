@@ -11291,7 +11291,9 @@ class Main {
     });
     this.uptimeMonitor.on("status-update", (data) => {
       var _a;
-      logger.debug(`Status update for ${data.site.url}: ${data.site.status}${data.site.responseTime ? ` (${data.site.responseTime}ms)` : ""}`);
+      logger.debug(
+        `Status update for ${data.site.url}: ${data.site.status}${data.site.responseTime ? ` (${data.site.responseTime}ms)` : ""}`
+      );
       (_a = this.mainWindow) == null ? void 0 : _a.webContents.send("status-update", data);
     });
     this.uptimeMonitor.on("site-down", (site) => {

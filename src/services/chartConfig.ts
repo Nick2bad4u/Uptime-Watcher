@@ -192,7 +192,8 @@ export class ChartConfigService {
                     ...this.getBaseConfig().plugins?.tooltip,
                     callbacks: {
                         label: function (context) {
-                            const percentage = totalChecks > 0 ? ((context.parsed / totalChecks) * 100).toFixed(1) : "0";
+                            const percentage =
+                                totalChecks > 0 ? ((context.parsed / totalChecks) * 100).toFixed(1) : "0";
                             return `${context.label}: ${context.parsed} (${percentage}%)`;
                         },
                     },
@@ -207,7 +208,7 @@ export class ChartConfigService {
  */
 export function useChartConfigs(theme: Theme, totalChecks: number = 0) {
     const chartService = new ChartConfigService(theme);
-    
+
     return {
         lineChartOptions: chartService.getLineChartConfig(),
         barChartOptions: chartService.getBarChartConfig(),

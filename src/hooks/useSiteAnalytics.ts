@@ -16,22 +16,22 @@ export interface SiteAnalytics {
     downCount: number;
     uptime: string;
     avgResponseTime: number;
-    
+
     // Performance metrics
     fastestResponse: number;
     slowestResponse: number;
-    
+
     // Percentiles
     p50: number;
     p95: number;
     p99: number;
-    
+
     // Reliability metrics
     downtimePeriods: DowntimePeriod[];
     totalDowntime: number;
     mttr: number; // Mean Time To Recovery
     incidentCount: number;
-    
+
     // Filtered data
     filteredHistory: any[];
 }
@@ -48,45 +48,44 @@ export function useSiteAnalytics(site: Site, timeRange: TimePeriod = "24h"): Sit
         const now = Date.now();
         const cutoff = now - CHART_TIME_PERIODS[timeRange];
         const filteredHistory = site.history.filter((record) => record.timestamp >= cutoff);
-        
+
         const totalChecks = filteredHistory.length;
         const upCount = filteredHistory.filter((h) => h.status === "up").length;
         const downCount = filteredHistory.filter((h) => h.status === "down").length;
-        
+
         // Basic metrics
         const uptime = totalChecks > 0 ? ((upCount / totalChecks) * 100).toFixed(2) : "0";
-        const avgResponseTime = totalChecks > 0 
-            ? Math.round(filteredHistory.reduce((sum, h) => sum + h.responseTime, 0) / totalChecks) 
-            : 0;
-        
+        const avgResponseTime =
+            totalChecks > 0 ? Math.round(filteredHistory.reduce((sum, h) => sum + h.responseTime, 0) / totalChecks) : 0;
+
         // Performance metrics
         const responseTimes = filteredHistory.map((h) => h.responseTime);
         const fastestResponse = responseTimes.length > 0 ? Math.min(...responseTimes) : 0;
         const slowestResponse = responseTimes.length > 0 ? Math.max(...responseTimes) : 0;
-        
+
         // Calculate percentiles
         const sortedResponseTimes = [...responseTimes].sort((a, b) => a - b);
         const getPercentile = (p: number) => {
             const index = Math.floor(sortedResponseTimes.length * p);
             return sortedResponseTimes[index] || 0;
         };
-        
+
         const p50 = getPercentile(0.5);
         const p95 = getPercentile(0.95);
         const p99 = getPercentile(0.99);
-        
+
         // Calculate downtime periods
         const downtimePeriods: DowntimePeriod[] = [];
         let currentDowntime: DowntimePeriod | null = null;
-        
+
         // Process in reverse chronological order for proper downtime calculation
         for (const record of [...filteredHistory].reverse()) {
             if (record.status === "down") {
                 if (!currentDowntime) {
-                    currentDowntime = { 
-                        start: record.timestamp, 
-                        end: record.timestamp, 
-                        duration: 0 
+                    currentDowntime = {
+                        start: record.timestamp,
+                        end: record.timestamp,
+                        duration: 0,
                     };
                 } else {
                     currentDowntime.end = record.timestamp;
@@ -97,16 +96,16 @@ export function useSiteAnalytics(site: Site, timeRange: TimePeriod = "24h"): Sit
                 currentDowntime = null;
             }
         }
-        
+
         // Handle ongoing downtime
         if (currentDowntime) {
             currentDowntime.duration = currentDowntime.end - currentDowntime.start;
             downtimePeriods.push(currentDowntime);
         }
-        
+
         const totalDowntime = downtimePeriods.reduce((sum, period) => sum + period.duration, 0);
         const mttr = downtimePeriods.length > 0 ? totalDowntime / downtimePeriods.length : 0;
-        
+
         return {
             totalChecks,
             upCount,
@@ -134,7 +133,7 @@ export function useSiteAnalytics(site: Site, timeRange: TimePeriod = "24h"): Sit
 export function useChartData(site: Site, theme: any) {
     return useMemo(() => {
         const sortedHistory = [...site.history].sort((a, b) => a.timestamp - b.timestamp);
-        
+
         const lineChartData = {
             datasets: [
                 {
@@ -159,7 +158,7 @@ export function useChartData(site: Site, theme: any) {
                 },
             ],
         };
-        
+
         return { lineChartData };
     }, [site.history, theme]);
 }
@@ -177,7 +176,7 @@ export const SiteAnalyticsUtils = {
         if (uptime >= 95) return "warning";
         return "critical";
     },
-    
+
     /**
      * Get performance status based on response time
      */
@@ -187,11 +186,14 @@ export const SiteAnalyticsUtils = {
         if (responseTime <= 1000) return "warning";
         return "critical";
     },
-    
+
     /**
      * Calculate SLA compliance
      */
-    calculateSLA(uptime: number, targetSLA: number = 99.9): {
+    calculateSLA(
+        uptime: number,
+        targetSLA: number = 99.9
+    ): {
         compliant: boolean;
         deficit: number;
         allowedDowntime: number;
@@ -201,7 +203,7 @@ export const SiteAnalyticsUtils = {
         const deficit = Math.max(0, targetSLA - uptime);
         const allowedDowntime = (100 - targetSLA) / 100;
         const actualDowntime = (100 - uptime) / 100;
-        
+
         return {
             compliant,
             deficit,

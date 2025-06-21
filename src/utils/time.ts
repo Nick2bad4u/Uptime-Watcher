@@ -6,7 +6,7 @@
  * @returns Formatted time string (e.g., "234ms" or "1.23s")
  */
 export function formatResponseTime(time?: number): string {
-    if (!time && time !== 0) return 'N/A';
+    if (!time && time !== 0) return "N/A";
     if (time < 1000) return `${time}ms`;
     return `${(time / 1000).toFixed(2)}s`;
 }
@@ -23,11 +23,11 @@ export function formatTimestamp(timestamp: number): string {
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
 
-    if (days > 0) return `${days} day${days > 1 ? 's' : ''} ago`;
-    if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-    if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
-    if (seconds > 0) return `${seconds} second${seconds > 1 ? 's' : ''} ago`;
-    return 'Just now';
+    if (days > 0) return `${days} day${days > 1 ? "s" : ""} ago`;
+    if (hours > 0) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+    if (minutes > 0) return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+    if (seconds > 0) return `${seconds} second${seconds > 1 ? "s" : ""} ago`;
+    return "Just now";
 }
 
 /**
@@ -51,7 +51,7 @@ export function formatLastChecked(lastChecked?: number | Date): string {
     let timestamp: number;
     if (lastChecked instanceof Date) {
         timestamp = lastChecked.getTime();
-    } else if (typeof lastChecked === 'number') {
+    } else if (typeof lastChecked === "number") {
         timestamp = lastChecked;
     } else {
         return "Never";
@@ -68,7 +68,7 @@ export function formatLastChecked(lastChecked?: number | Date): string {
 
 /**
  * Format duration in a human-readable format
- * @param ms - Duration in milliseconds  
+ * @param ms - Duration in milliseconds
  * @returns Formatted duration string (e.g., "2h 15m", "45s")
  */
 export function formatDuration(ms: number): string {
@@ -88,7 +88,7 @@ import { CHART_TIME_PERIODS } from "../constants";
  */
 export const TIME_PERIOD_LABELS = {
     "1h": "Last Hour",
-    "24h": "Last 24 Hours", 
+    "24h": "Last 24 Hours",
     "7d": "Last 7 Days",
     "30d": "Last 30 Days",
 } as const;

@@ -88,23 +88,17 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
     }, [autoRefresh, isLoading, isRefreshing]);
 
     // Use the updated site from store if available, always get the latest data
-    const currentSite = sites.find(s => s.url === site.url) || site;
-    
+    const currentSite = sites.find((s) => s.url === site.url) || site;
+
     // Use analytics hook for all calculations
     const analytics = useSiteAnalytics(currentSite, chartTimeRange);
-    
+
     // Create chart config service instance
     const chartConfig = useMemo(() => new ChartConfigService(currentTheme), [currentTheme]);
     // Chart configurations using the service
-    const lineChartOptions = useMemo(
-        () => chartConfig.getLineChartConfig(),
-        [chartConfig]
-    );
+    const lineChartOptions = useMemo(() => chartConfig.getLineChartConfig(), [chartConfig]);
 
-    const barChartOptions = useMemo(
-        () => chartConfig.getBarChartConfig(),
-        [chartConfig]
-    );
+    const barChartOptions = useMemo(() => chartConfig.getBarChartConfig(), [chartConfig]);
 
     // Chart data using analytics
     const lineChartData = useMemo(
@@ -130,10 +124,7 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
             datasets: [
                 {
                     data: [analytics.upCount, analytics.downCount],
-                    backgroundColor: [
-                        currentTheme.colors.success,
-                        currentTheme.colors.error,
-                    ],
+                    backgroundColor: [currentTheme.colors.success, currentTheme.colors.error],
                 },
             ],
         }),
@@ -146,10 +137,7 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
             datasets: [
                 {
                     data: [analytics.upCount, analytics.downCount],
-                    backgroundColor: [
-                        currentTheme.colors.success,
-                        currentTheme.colors.error,
-                    ],
+                    backgroundColor: [currentTheme.colors.success, currentTheme.colors.error],
                 },
             ],
         }),
@@ -172,7 +160,7 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
         try {
             await checkSiteNow(currentSite.url);
             if (!isAutoRefresh) {
-                logger.user.action('Manual site check', { url: currentSite.url });
+                logger.user.action("Manual site check", { url: currentSite.url });
             }
         } catch (error) {
             logger.site.error(currentSite.url, error instanceof Error ? error : String(error));
@@ -381,9 +369,7 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                             />
                         )}
 
-                        {activeTab === "history" && (
-                            <HistoryTab currentSite={currentSite} />
-                        )}
+                        {activeTab === "history" && <HistoryTab currentSite={currentSite} />}
 
                         {activeTab === "settings" && (
                             <SettingsTab
@@ -445,7 +431,12 @@ function OverviewTab({
                     </ThemedBadge>
                 </ThemedCard>
 
-                <ThemedCard icon="⚡" title="Response Time" hoverable className="text-center flex flex-col items-center">
+                <ThemedCard
+                    icon="⚡"
+                    title="Response Time"
+                    hoverable
+                    className="text-center flex flex-col items-center"
+                >
                     <ThemedText size="xl" weight="bold">
                         {formatResponseTime(avgResponseTime)}
                     </ThemedText>
@@ -552,13 +543,19 @@ function AnalyticsTab({
         <div className="space-y-6">
             {/* Analytics Summary */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <ThemedBox surface="base" padding="lg" border rounded="lg" className="text-center flex flex-col items-center">
+                <ThemedBox
+                    surface="base"
+                    padding="lg"
+                    border
+                    rounded="lg"
+                    className="text-center flex flex-col items-center"
+                >
                     <ThemedText size="sm" variant="secondary">
                         Availability ({chartTimeRange})
                     </ThemedText>
-                    <ThemedText 
-                        size="3xl" 
-                        weight="bold" 
+                    <ThemedText
+                        size="3xl"
+                        weight="bold"
                         variant={getAvailabilityVariant(parseFloat(uptime))}
                         style={{ color: getAvailabilityColor(parseFloat(uptime)) }}
                     >
@@ -572,7 +569,13 @@ function AnalyticsTab({
                     </ThemedText>
                 </ThemedBox>
 
-                <ThemedBox surface="base" padding="lg" border rounded="lg" className="text-center flex flex-col items-center">
+                <ThemedBox
+                    surface="base"
+                    padding="lg"
+                    border
+                    rounded="lg"
+                    className="text-center flex flex-col items-center"
+                >
                     <ThemedText size="sm" variant="secondary">
                         Avg Response Time
                     </ThemedText>
@@ -584,7 +587,13 @@ function AnalyticsTab({
                     </ThemedText>
                 </ThemedBox>
 
-                <ThemedBox surface="base" padding="lg" border rounded="lg" className="text-center flex flex-col items-center">
+                <ThemedBox
+                    surface="base"
+                    padding="lg"
+                    border
+                    rounded="lg"
+                    className="text-center flex flex-col items-center"
+                >
                     <ThemedText size="sm" variant="secondary">
                         Total Downtime
                     </ThemedText>
@@ -650,7 +659,7 @@ function AnalyticsTab({
                             </ThemedText>
                         </div>
                         <div className="text-center flex flex-col items-center">
-                            <ThemedText size="sm" variant="secondary"  className="mb-4">
+                            <ThemedText size="sm" variant="secondary" className="mb-4">
                                 Incidents
                             </ThemedText>
                             <ThemedText size="lg" weight="medium">
@@ -809,7 +818,7 @@ function SettingsTab({ currentSite, handleRemoveSite, isLoading, autoRefresh, se
             const updates = { name: localName.trim() || undefined };
             await modifySite(currentSite.url, updates);
             setHasUnsavedChanges(false);
-            logger.user.action('Updated site name', { url: currentSite.url, name: localName.trim() });
+            logger.user.action("Updated site name", { url: currentSite.url, name: localName.trim() });
         } catch (error) {
             // Error is already handled by the store action
             logger.site.error(currentSite.url, error instanceof Error ? error : String(error));

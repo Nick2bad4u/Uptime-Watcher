@@ -21,7 +21,7 @@ export function useTheme() {
         const newTheme = getCurrentTheme();
         setCurrentTheme(newTheme);
         themeManager.applyTheme(newTheme);
-        setThemeVersion(prev => prev + 1); // Force re-render of all themed components
+        setThemeVersion((prev) => prev + 1); // Force re-render of all themed components
     }, [settings.theme, systemTheme]);
 
     // Listen for system theme changes
@@ -156,7 +156,7 @@ export function useAvailabilityColors() {
     const getAvailabilityColor = (percentage: number): string => {
         // Clamp percentage between 0 and 100
         const clampedPercentage = Math.max(0, Math.min(100, percentage));
-        
+
         // Use theme colors for consistency
         if (clampedPercentage >= 99) {
             return currentTheme.colors.status.up; // Excellent
@@ -177,7 +177,7 @@ export function useAvailabilityColors() {
 
     const getAvailabilityVariant = (percentage: number): "success" | "warning" | "danger" => {
         const clampedPercentage = Math.max(0, Math.min(100, percentage));
-        
+
         if (clampedPercentage >= 95) {
             return "success";
         } else if (clampedPercentage >= 80) {
@@ -189,7 +189,7 @@ export function useAvailabilityColors() {
 
     const getAvailabilityDescription = (percentage: number): string => {
         const clampedPercentage = Math.max(0, Math.min(100, percentage));
-        
+
         if (clampedPercentage >= 99.9) {
             return "Excellent";
         } else if (clampedPercentage >= 99) {

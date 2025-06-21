@@ -53,10 +53,12 @@ export function ThemedBox({
         shadow && `themed-box--shadow-${shadow}`,
         border && "themed-box--border",
         className,
-    ].filter(Boolean).join(" ");
+    ]
+        .filter(Boolean)
+        .join(" ");
 
     return (
-        <div 
+        <div
             className={classNames}
             style={style}
             onClick={onClick}
@@ -94,7 +96,9 @@ export function ThemedText({
         `themed-text--weight-${weight}`,
         `themed-text--align-${align}`,
         className,
-    ].filter(Boolean).join(" ");
+    ]
+        .filter(Boolean)
+        .join(" ");
 
     return (
         <span className={classNames} style={style}>
@@ -141,7 +145,9 @@ export function ThemedButton({
         fullWidth && "themed-button--full-width",
         (disabled || loading) && "themed-button--loading",
         className,
-    ].filter(Boolean).join(" ");
+    ]
+        .filter(Boolean)
+        .join(" ");
 
     const renderContent = () => {
         if (loading) {
@@ -154,11 +160,7 @@ export function ThemedButton({
         }
 
         if (icon) {
-            const iconElement = (
-                <span className="themed-button__icon">
-                    {icon}
-                </span>
-            );
+            const iconElement = <span className="themed-button__icon">{icon}</span>;
 
             // If there are no children, just show the icon
             if (!children) {
@@ -182,11 +184,11 @@ export function ThemedButton({
     };
 
     return (
-        <button 
-            type={type} 
+        <button
+            type={type}
             className={classNames}
             style={style}
-            onClick={onClick} 
+            onClick={onClick}
             disabled={disabled || loading}
             title={title}
         >
@@ -267,9 +269,7 @@ export function StatusIndicator({ status, size = "md", showText = false, classNa
     return (
         <div className={`themed-status-indicator ${className}`} style={{ display: "flex", alignItems: "center" }}>
             {showText ? (
-                <div style={iconStyle}>
-                    {getStatusIcon(status)}
-                </div>
+                <div style={iconStyle}>{getStatusIcon(status)}</div>
             ) : (
                 <div className="themed-status-indicator__dot" style={indicatorStyle} />
             )}
@@ -478,11 +478,16 @@ export function ThemedIconButton({
 }: ThemedIconButtonProps) {
     const getSize = () => {
         switch (size) {
-            case "xs": return "24px";
-            case "sm": return "32px";
-            case "md": return "40px";
-            case "lg": return "48px";
-            default: return "40px";
+            case "xs":
+                return "24px";
+            case "sm":
+                return "32px";
+            case "md":
+                return "40px";
+            case "lg":
+                return "48px";
+            default:
+                return "40px";
         }
     };
 
@@ -559,25 +564,30 @@ export function ThemedCard({
             padding={padding}
             rounded={rounded}
             shadow={shadow}
-            className={`themed-card ${hoverable ? 'themed-card--hoverable' : ''} ${clickable ? 'themed-card--clickable' : ''} ${className}`}
+            className={`themed-card ${hoverable ? "themed-card--hoverable" : ""} ${clickable ? "themed-card--clickable" : ""} ${className}`}
             style={cardStyles}
             onClick={clickable ? onClick : undefined}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
         >
             {(title || subtitle || icon) && (
-                <div className="themed-card__header" style={{ 
-                    display: "flex", 
-                    alignItems: "center", 
-                    gap: currentTheme.spacing.md,
-                    marginBottom: currentTheme.spacing.md 
-                }}>
+                <div
+                    className="themed-card__header"
+                    style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: currentTheme.spacing.md,
+                        marginBottom: currentTheme.spacing.md,
+                    }}
+                >
                     {icon && (
-                        <div style={{ 
-                            fontSize: "1.5em", 
-                            lineHeight: "1",
-                            color: currentTheme.colors.primary[500] 
-                        }}>
+                        <div
+                            style={{
+                                fontSize: "1.5em",
+                                lineHeight: "1",
+                                color: currentTheme.colors.primary[500],
+                            }}
+                        >
                             {icon}
                         </div>
                     )}
@@ -595,9 +605,7 @@ export function ThemedCard({
                     </div>
                 </div>
             )}
-            <div className="themed-card__content">
-                {children}
-            </div>
+            <div className="themed-card__content">{children}</div>
         </ThemedBox>
     );
 }
@@ -610,13 +618,7 @@ interface ThemedBadgeProps {
     children: React.ReactNode;
 }
 
-export function ThemedBadge({
-    variant = "primary",
-    size = "sm",
-    icon,
-    className = "",
-    children,
-}: ThemedBadgeProps) {
+export function ThemedBadge({ variant = "primary", size = "sm", icon, className = "", children }: ThemedBadgeProps) {
     const { currentTheme } = useTheme();
 
     const getVariantStyles = () => {
@@ -699,12 +701,11 @@ export function ThemedBadge({
     };
 
     return (
-        <span className={`themed-badge themed-badge--${variant} themed-badge--${size} ${className}`} style={badgeStyles}>
-            {icon && (
-                <span style={{ fontSize: "0.9em", lineHeight: "1" }}>
-                    {icon}
-                </span>
-            )}
+        <span
+            className={`themed-badge themed-badge--${variant} themed-badge--${size} ${className}`}
+            style={badgeStyles}
+        >
+            {icon && <span style={{ fontSize: "0.9em", lineHeight: "1" }}>{icon}</span>}
             {children}
         </span>
     );
@@ -735,21 +736,31 @@ export function ThemedProgress({
 
     const getVariantColor = () => {
         switch (variant) {
-            case "primary": return currentTheme.colors.primary[500];
-            case "success": return currentTheme.colors.success;
-            case "warning": return currentTheme.colors.warning;
-            case "error": return currentTheme.colors.error;
-            default: return currentTheme.colors.primary[500];
+            case "primary":
+                return currentTheme.colors.primary[500];
+            case "success":
+                return currentTheme.colors.success;
+            case "warning":
+                return currentTheme.colors.warning;
+            case "error":
+                return currentTheme.colors.error;
+            default:
+                return currentTheme.colors.primary[500];
         }
     };
 
     const getHeight = () => {
         switch (size) {
-            case "xs": return "4px";
-            case "sm": return "6px";
-            case "md": return "8px";
-            case "lg": return "12px";
-            default: return "8px";
+            case "xs":
+                return "4px";
+            case "sm":
+                return "6px";
+            case "md":
+                return "8px";
+            case "lg":
+                return "12px";
+            default:
+                return "8px";
         }
     };
 
@@ -773,12 +784,14 @@ export function ThemedProgress({
     return (
         <div className={`themed-progress ${className}`}>
             {(showLabel || label) && (
-                <div style={{ 
-                    display: "flex", 
-                    justifyContent: "space-between", 
-                    alignItems: "center",
-                    marginBottom: currentTheme.spacing.xs 
-                }}>
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginBottom: currentTheme.spacing.xs,
+                    }}
+                >
                     {label && (
                         <ThemedText variant="secondary" size="sm">
                             {label}
@@ -805,12 +818,7 @@ interface ThemedTooltipProps {
     children: React.ReactNode;
 }
 
-export function ThemedTooltip({
-    content,
-    position = "top",
-    className = "",
-    children,
-}: ThemedTooltipProps) {
+export function ThemedTooltip({ content, position = "top", className = "", children }: ThemedTooltipProps) {
     return (
         <div className={`themed-tooltip ${className}`} title={content}>
             {children}

@@ -325,15 +325,11 @@ export const useStore = create<AppState>()(
 
             updateSite: (url: string, updates: Partial<Site>) =>
                 set((state) => {
-                    const updatedSites = state.sites.map((site) =>
-                        site.url === url ? { ...site, ...updates } : site
-                    );
+                    const updatedSites = state.sites.map((site) => (site.url === url ? { ...site, ...updates } : site));
 
                     // Update selected site if it matches
                     const updatedSelectedSite =
-                        state.selectedSite?.url === url
-                            ? { ...state.selectedSite, ...updates }
-                            : state.selectedSite;
+                        state.selectedSite?.url === url ? { ...state.selectedSite, ...updates } : state.selectedSite;
 
                     return {
                         sites: updatedSites,

@@ -66,7 +66,7 @@ export function Settings({ onClose }: SettingsProps) {
     const handleIntervalChange = async (interval: number) => {
         try {
             await updateCheckIntervalValue(interval);
-            logger.user.settingsChange('checkInterval', checkInterval, interval);
+            logger.user.settingsChange("checkInterval", checkInterval, interval);
         } catch (error) {
             logger.error("Failed to update check interval from settings", error);
             // Error is already handled by the store action
@@ -76,7 +76,7 @@ export function Settings({ onClose }: SettingsProps) {
     const handleHistoryLimitChange = async (limit: number) => {
         try {
             await updateHistoryLimitValue(limit);
-            logger.user.settingsChange('historyLimit', settings.historyLimit, limit);
+            logger.user.settingsChange("historyLimit", settings.historyLimit, limit);
         } catch (error) {
             logger.error("Failed to update history limit from settings", error);
             // Error is already handled by the store action
@@ -87,14 +87,14 @@ export function Settings({ onClose }: SettingsProps) {
         if (window.confirm("Are you sure you want to reset all settings to defaults?")) {
             resetSettings();
             clearError(); // Clear any errors when resetting
-            logger.user.action('Reset settings to defaults');
+            logger.user.action("Reset settings to defaults");
         }
     };
 
     const handleThemeChange = (themeName: string) => {
         const oldTheme = settings.theme;
         setTheme(themeName as any);
-        logger.user.settingsChange('theme', oldTheme, themeName);
+        logger.user.settingsChange("theme", oldTheme, themeName);
     };
 
     const handleExportData = async () => {
@@ -109,7 +109,7 @@ export function Settings({ onClose }: SettingsProps) {
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            logger.user.action('Exported app data');
+            logger.user.action("Exported app data");
         } catch (error) {
             logger.error("Failed to export data from settings", error);
             // Error is already handled by the store action
@@ -124,7 +124,7 @@ export function Settings({ onClose }: SettingsProps) {
             const text = await file.text();
             const success = await importAppData(text);
             if (success) {
-                logger.user.action('Imported app data successfully');
+                logger.user.action("Imported app data successfully");
                 // Refresh the page to show imported data
                 window.location.reload();
             }
