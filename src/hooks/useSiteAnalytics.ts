@@ -1,6 +1,7 @@
 import { useMemo } from "react";
-import { Site } from "../types";
+import { Site, StatusHistory } from "../types";
 import { CHART_TIME_PERIODS } from "../constants";
+import type { Theme } from "../theme/types";
 
 // Enhanced types for better IntelliSense and error catching
 export interface DowntimePeriod {
@@ -33,7 +34,7 @@ export interface SiteAnalytics {
     incidentCount: number;
 
     // Filtered data
-    filteredHistory: any[];
+    filteredHistory: StatusHistory[];
 }
 
 export type TimePeriod = keyof typeof CHART_TIME_PERIODS;
@@ -130,7 +131,7 @@ export function useSiteAnalytics(site: Site, timeRange: TimePeriod = "24h"): Sit
  * Hook for generating chart data
  * Separates data preparation from component logic
  */
-export function useChartData(site: Site, theme: any) {
+export function useChartData(site: Site, theme: Theme) {
     return useMemo(() => {
         const sortedHistory = [...site.history].sort((a, b) => a.timestamp - b.timestamp);
 

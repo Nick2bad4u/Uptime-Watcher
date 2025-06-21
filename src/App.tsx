@@ -14,7 +14,6 @@ import logger from "./services/logger";
 function App() {
     const {
         sites,
-        isMonitoring,
         showSettings,
         selectedSite,
         showSiteDetails,

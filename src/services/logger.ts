@@ -1,6 +1,10 @@
 /**
  * Centralized logging service using electron-log
- * Provides consistent logging across main and renderer processes
+ * Provides consistent logging across ma        action: (action: string, details?: unknown) => {
+            logger.info(`User action: ${action}`, details);
+        },
+
+        settingsChange: (setting: string, oldValue: unknown, newValue: unknown) => {d renderer processes
  */
 
 import log from "electron-log/renderer";
@@ -18,22 +22,22 @@ if (log.transports.file) {
 // Create logger with app context
 const logger = {
     // Debug level - for development debugging
-    debug: (message: string, ...args: any[]) => {
+    debug: (message: string, ...args: unknown[]) => {
         log.debug(`[UPTIME-WATCHER] ${message}`, ...args);
     },
 
     // Info level - general application flow
-    info: (message: string, ...args: any[]) => {
+    info: (message: string, ...args: unknown[]) => {
         log.info(`[UPTIME-WATCHER] ${message}`, ...args);
     },
 
     // Warn level - something unexpected but not an error
-    warn: (message: string, ...args: any[]) => {
+    warn: (message: string, ...args: unknown[]) => {
         log.warn(`[UPTIME-WATCHER] ${message}`, ...args);
     },
 
     // Error level - errors that should be investigated
-    error: (message: string, error?: Error | any, ...args: any[]) => {
+    error: (message: string, error?: Error | unknown, ...args: unknown[]) => {
         if (error instanceof Error) {
             log.error(
                 `[UPTIME-WATCHER] ${message}`,
@@ -52,12 +56,12 @@ const logger = {
     },
 
     // Verbose level - very detailed debugging
-    verbose: (message: string, ...args: any[]) => {
+    verbose: (message: string, ...args: unknown[]) => {
         log.verbose(`[UPTIME-WATCHER] ${message}`, ...args);
     },
 
     // Silly level - extremely detailed debugging
-    silly: (message: string, ...args: any[]) => {
+    silly: (message: string, ...args: unknown[]) => {
         log.silly(`[UPTIME-WATCHER] ${message}`, ...args);
     },
 

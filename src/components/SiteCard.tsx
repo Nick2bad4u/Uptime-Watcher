@@ -130,7 +130,7 @@ export function SiteCard({ site }: SiteCardProps) {
                 </div>
 
                 <div className="flex items-center space-x-2">
-                    <StatusIndicator status={site.status as any} size="md" />
+                    <StatusIndicator status={site.status} size="md" />
                     {showQuickActions && (
                         <div
                             className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -216,7 +216,7 @@ export function SiteCard({ site }: SiteCardProps) {
                         {site.history.slice(-20).map((record, index) => (
                             <MiniChartBar
                                 key={index}
-                                status={record.status as any}
+                                status={record.status}
                                 responseTime={record.responseTime}
                                 timestamp={record.timestamp}
                             />

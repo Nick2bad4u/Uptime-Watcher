@@ -1,4 +1,5 @@
 import { useStore } from "../store";
+import { ThemeName } from "../theme/types";
 import {
     ThemedBox,
     ThemedText,
@@ -57,7 +58,7 @@ export function Settings({ onClose }: SettingsProps) {
         };
     }, [isLoading]);
 
-    const handleSettingChange = (key: keyof typeof settings, value: any) => {
+    const handleSettingChange = (key: keyof typeof settings, value: unknown) => {
         const oldValue = settings[key];
         updateSettings({ [key]: value });
         logger.user.settingsChange(key, oldValue, value);
@@ -93,7 +94,7 @@ export function Settings({ onClose }: SettingsProps) {
 
     const handleThemeChange = (themeName: string) => {
         const oldTheme = settings.theme;
-        setTheme(themeName as any);
+        setTheme(themeName as ThemeName);
         logger.user.settingsChange("theme", oldTheme, themeName);
     };
 

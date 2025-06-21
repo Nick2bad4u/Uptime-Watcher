@@ -37,7 +37,7 @@ interface AppState {
 
     // Actions - Backend integration
     initializeApp: () => Promise<void>;
-    createSite: (siteData: any) => Promise<void>;
+    createSite: (siteData: Omit<Site, "id" | "status" | "history">) => Promise<void>;
     deleteSite: (url: string) => Promise<void>;
     checkSiteNow: (url: string) => Promise<void>;
     modifySite: (url: string, updates: Partial<Site>) => Promise<void>;
@@ -133,7 +133,7 @@ export const useStore = create<AppState>()(
                 }
             },
 
-            createSite: async (siteData: any) => {
+            createSite: async (siteData: Omit<Site, "id" | "status" | "history">) => {
                 const state = get();
                 state.setLoading(true);
                 state.clearError();

@@ -16,7 +16,7 @@ import {
 } from "chart.js";
 import zoomPlugin from "chartjs-plugin-zoom";
 import { Line, Bar, Doughnut } from "react-chartjs-2";
-import { Site } from "../types";
+import { Site, StatusHistory } from "../types";
 import { useTheme, useAvailabilityColors } from "../theme/useTheme";
 import { useStore } from "../store";
 import { formatStatusWithIcon } from "../utils/status";
@@ -24,7 +24,7 @@ import { formatResponseTime, formatFullTimestamp, formatDuration } from "../util
 import { AUTO_REFRESH_INTERVAL } from "../constants";
 import { ChartConfigService } from "../services/chartConfig";
 import logger from "../services/logger";
-import { useSiteAnalytics, TimePeriod } from "../hooks/useSiteAnalytics";
+import { useSiteAnalytics, TimePeriod, type DowntimePeriod } from "../hooks/useSiteAnalytics";
 import {
     ThemedBox,
     ThemedText,
@@ -220,7 +220,7 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                         <div className="site-details-header-content">
                             <div className="site-details-header-info">
                                 <div className="relative">
-                                    <StatusIndicator status={currentSite.status as any} size="lg" />
+                                    <StatusIndicator status={currentSite.status} size="lg" />
                                     {isRefreshing && (
                                         <div className="site-details-loading-spinner">
                                             <div className="site-details-spinner"></div>
@@ -416,7 +416,7 @@ function OverviewTab({
             {/* Key Metrics Grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <ThemedCard icon="📊" title="Status" hoverable className="text-center flex flex-col items-center">
-                    <StatusIndicator status={currentSite.status as any} size="lg" showText />
+                    <StatusIndicator status={currentSite.status} size="lg" showText />
                 </ThemedCard>
 
                 <ThemedCard icon="⏱️" title="Uptime" hoverable className="text-center flex flex-col items-center">
@@ -484,7 +484,7 @@ function OverviewTab({
 }
 
 interface AnalyticsTabProps {
-    filteredHistory: any[];
+    filteredHistory: StatusHistory[];
     upCount: number;
     downCount: number;
     totalChecks: number;
@@ -495,14 +495,14 @@ interface AnalyticsTabProps {
     p99: number;
     mttr: number;
     totalDowntime: number;
-    downtimePeriods: any[];
+    downtimePeriods: DowntimePeriod[];
     chartTimeRange: string;
-    lineChartData: any;
-    lineChartOptions: any;
-    barChartData: any;
-    barChartOptions: any;
-    uptimeChartData: any;
-    doughnutOptions: any;
+    lineChartData: Record<string, unknown>;
+    lineChartOptions: Record<string, unknown>;
+    barChartData: Record<string, unknown>;
+    barChartOptions: Record<string, unknown>;
+    uptimeChartData: Record<string, unknown>;
+    doughnutOptions: Record<string, unknown>;
     formatResponseTime: (time: number) => string;
     formatDuration: (ms: number) => string;
     showAdvancedMetrics: boolean;
@@ -675,21 +675,21 @@ function AnalyticsTab({
                 {/* Response Time Chart */}
                 <ThemedBox surface="base" padding="md" border rounded="lg">
                     <div className="h-64">
-                        <Line data={lineChartData} options={lineChartOptions} />
+                        <Line data={lineChartData as any} options={lineChartOptions as any} />
                     </div>
                 </ThemedBox>
 
                 {/* Uptime Doughnut Chart */}
                 <ThemedBox surface="base" padding="md" border rounded="lg">
                     <div className="h-64">
-                        <Doughnut data={uptimeChartData} options={doughnutOptions} />
+                        <Doughnut data={uptimeChartData as any} options={doughnutOptions as any} />
                     </div>
                 </ThemedBox>
 
                 {/* Status Distribution Bar Chart */}
                 <ThemedBox surface="base" padding="md" border rounded="lg" className="lg:col-span-2">
                     <div className="h-64">
-                        <Bar data={barChartData} options={barChartOptions} />
+                        <Bar data={barChartData as any} options={barChartOptions as any} />
                     </div>
                 </ThemedBox>
             </div>
@@ -758,7 +758,7 @@ function HistoryTab({ currentSite }: HistoryTabProps) {
                             className="flex items-center justify-between p-3 rounded-lg hover:bg-surface-elevated transition-colors"
                         >
                             <div className="flex items-center space-x-3">
-                                <StatusIndicator status={record.status as any} size="sm" />
+                                <StatusIndicator status={record.status} size="sm" />
                                 <div>
                                     <ThemedText size="sm" weight="medium">
                                         {formatFullTimestamp(record.timestamp)}

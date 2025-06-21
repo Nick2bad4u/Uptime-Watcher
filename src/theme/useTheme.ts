@@ -51,11 +51,11 @@ export function useTheme() {
     // Get theme-aware color
     const getColor = (path: string): string => {
         const keys = path.split(".");
-        let value: any = currentTheme.colors;
+        let value: unknown = currentTheme.colors;
 
         for (const key of keys) {
-            if (value && typeof value === "object") {
-                value = value[key];
+            if (value && typeof value === "object" && key in value) {
+                value = (value as Record<string, unknown>)[key];
             } else {
                 return "#000000"; // Fallback
             }

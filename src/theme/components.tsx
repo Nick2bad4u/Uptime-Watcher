@@ -818,7 +818,7 @@ interface ThemedTooltipProps {
     children: React.ReactNode;
 }
 
-export function ThemedTooltip({ content, position = "top", className = "", children }: ThemedTooltipProps) {
+export function ThemedTooltip({ content, className = "", children }: ThemedTooltipProps) {
     return (
         <div className={`themed-tooltip ${className}`} title={content}>
             {children}
