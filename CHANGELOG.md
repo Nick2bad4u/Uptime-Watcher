@@ -7,9 +7,53 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[b733de2](https://github.com/Nick2bad4u/FitFileViewer/commit/b733de28c8cf537ee67a389c1f5b4aeabfc062a8)...
-[b733de2](https://github.com/Nick2bad4u/FitFileViewer/commit/b733de28c8cf537ee67a389c1f5b4aeabfc062a8)]
-([compare](https://github.com/Nick2bad4u/FitFileViewer/compare/b733de28c8cf537ee67a389c1f5b4aeabfc062a8...b733de28c8cf537ee67a389c1f5b4aeabfc062a8))
+[[e32cf47](https://github.com/Nick2bad4u/FitFileViewer/commit/e32cf47c9367428d069dda13ae97827984cbb6ec)...
+[94bfc72](https://github.com/Nick2bad4u/FitFileViewer/commit/94bfc72ffdb09401a11febe1b2b6d49fd6efc512)]
+([compare](https://github.com/Nick2bad4u/FitFileViewer/compare/e32cf47c9367428d069dda13ae97827984cbb6ec...94bfc72ffdb09401a11febe1b2b6d49fd6efc512))
+
+
+### 🛠️ GitHub Actions
+
+- Create flatpak-builder.yml [`(94bfc72)`](https://github.com/Nick2bad4u/FitFileViewer/commit/94bfc72ffdb09401a11febe1b2b6d49fd6efc512)
+
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 1.5.0 [`(e32cf47)`](https://github.com/Nick2bad4u/FitFileViewer/commit/e32cf47c9367428d069dda13ae97827984cbb6ec)
+
+
+
+
+
+
+## [1.5.0] - 2025-06-20
+
+
+[[9174b15](https://github.com/Nick2bad4u/FitFileViewer/commit/9174b15321660e184ec4a9ef72dcdec586f3350c)...
+[f1de760](https://github.com/Nick2bad4u/FitFileViewer/commit/f1de76048978a1126954a0d2716d2cf7dc5f0c13)]
+([compare](https://github.com/Nick2bad4u/FitFileViewer/compare/9174b15321660e184ec4a9ef72dcdec586f3350c...f1de76048978a1126954a0d2716d2cf7dc5f0c13))
+
+
+### 🚀 Features
+
+- Enhance theme with hover states and update spacing variables in CSS [`(f1de760)`](https://github.com/Nick2bad4u/FitFileViewer/commit/f1de76048978a1126954a0d2716d2cf7dc5f0c13)
+
+
+- Enhance error alert styles and add site icon fallback functionality [`(0741ce0)`](https://github.com/Nick2bad4u/FitFileViewer/commit/0741ce0e3fca5246d0e3e703b270efe4b107e9d8)
+
+
+- Enhance SiteCard component with quick actions and improved uptime metrics [`(982281f)`](https://github.com/Nick2bad4u/FitFileViewer/commit/982281f0d8ea0bce20e8265ddeb9391f5b705c66)
+
+
+- Add updateSite functionality to store and types [`(9174b15)`](https://github.com/Nick2bad4u/FitFileViewer/commit/9174b15321660e184ec4a9ef72dcdec586f3350c)
+
+
+
+### ⚙️ Miscellaneous Tasks
+
+- Update changelogs for v1.4.0 [skip ci] [`(ba7ab4c)`](https://github.com/Nick2bad4u/FitFileViewer/commit/ba7ab4cab57610645d1b20ced69477674c02810d)
+
 
 
 ### 📦 Dependencies
