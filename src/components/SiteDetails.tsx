@@ -10,7 +10,6 @@ import {
     Tooltip,
     Legend,
     TimeScale,
-    ChartOptions,
     Filler,
     DoughnutController,
     ArcElement,
@@ -21,8 +20,10 @@ import { Site } from "../types";
 import { useTheme, useAvailabilityColors } from "../theme/useTheme";
 import { useStore } from "../store";
 import { formatStatusWithIcon } from "../utils/status";
-import { formatResponseTime, formatFullTimestamp, formatDuration, TIME_PERIODS, TIME_PERIOD_LABELS, TimePeriod } from "../utils/time";
+import { formatResponseTime, formatFullTimestamp, formatDuration } from "../utils/time";
 import { AUTO_REFRESH_INTERVAL } from "../constants";
+import { ChartConfigService } from "../services/chartConfig";
+import { useSiteAnalytics, TimePeriod } from "../hooks/useSiteAnalytics";
 import {
     ThemedBox,
     ThemedText,
@@ -63,11 +64,11 @@ interface SiteDetailsProps {
 export function SiteDetails({ site, onClose }: SiteDetailsProps) {
     const { currentTheme } = useTheme();
     const { getAvailabilityColor, getAvailabilityVariant, getAvailabilityDescription } = useAvailabilityColors();
-    const { sites, deleteSite, checkSiteNow, modifySite, isLoading, clearError } = useStore();
+    const { sites, deleteSite, checkSiteNow, isLoading, clearError } = useStore();
 
     // Enhanced state management
     const [activeTab, setActiveTab] = useState<"overview" | "analytics" | "history" | "settings">("overview");
-    const [chartTimeRange, setChartTimeRange] = useState<"1h" | "24h" | "7d" | "30d">("24h");
+    const [chartTimeRange, setChartTimeRange] = useState<TimePeriod>("24h");
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [showAdvancedMetrics, setShowAdvancedMetrics] = useState(false);
     const [autoRefresh, setAutoRefresh] = useState(true);
@@ -87,247 +88,77 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
 
     // Use the updated site from store if available, always get the latest data
     const currentSite = sites.find(s => s.url === site.url) || site;
-    // Enhanced statistics with time-based filtering
-    const getFilteredHistory = (timeRange: string) => {
-        const now = Date.now();
-        const cutoff = now - TIME_PERIODS[timeRange as TimePeriod];
-        return currentSite.history.filter((record) => record.timestamp >= cutoff);
-    };
-
-    const filteredHistory = getFilteredHistory(chartTimeRange);
-    const upCount = filteredHistory.filter((h) => h.status === "up").length;
-    const downCount = filteredHistory.filter((h) => h.status === "down").length;
-    const totalChecks = filteredHistory.length;
-
-    // Advanced metrics calculations
-    const avgResponseTime =
-        totalChecks > 0 ? Math.round(filteredHistory.reduce((sum, h) => sum + h.responseTime, 0) / totalChecks) : 0;
-
-    const uptime = totalChecks > 0 ? ((upCount / totalChecks) * 100).toFixed(2) : "0";
-
-    const fastestResponse = filteredHistory.length > 0 ? Math.min(...filteredHistory.map((h) => h.responseTime)) : 0;
-    const slowestResponse = filteredHistory.length > 0 ? Math.max(...filteredHistory.map((h) => h.responseTime)) : 0;
-
-    // Calculate response time percentiles
-    const sortedResponseTimes = filteredHistory.map((h) => h.responseTime).sort((a, b) => a - b);
-    const p50 = sortedResponseTimes[Math.floor(sortedResponseTimes.length * 0.5)] || 0;
-    const p95 = sortedResponseTimes[Math.floor(sortedResponseTimes.length * 0.95)] || 0;
-    const p99 = sortedResponseTimes[Math.floor(sortedResponseTimes.length * 0.99)] || 0;
-
-    // Downtime periods calculation
-    const downtimePeriods = [];
-    let currentDowntime = null;
-    for (const record of [...filteredHistory].reverse()) {
-        if (record.status === "down") {
-            if (!currentDowntime) {
-                currentDowntime = { start: record.timestamp, end: record.timestamp, duration: 0 };
-            } else {
-                currentDowntime.end = record.timestamp;
-            }
-        } else if (currentDowntime) {
-            currentDowntime.duration = currentDowntime.end - currentDowntime.start;
-            downtimePeriods.push(currentDowntime);
-            currentDowntime = null;
-        }
-    }
-
-    const totalDowntime = downtimePeriods.reduce((sum, period) => sum + period.duration, 0);
-    const mttr = downtimePeriods.length > 0 ? totalDowntime / downtimePeriods.length : 0; // Mean Time To Recovery
+    
+    // Use analytics hook for all calculations
+    const analytics = useSiteAnalytics(currentSite, chartTimeRange);
+    
+    // Create chart config service instance
+    const chartConfig = useMemo(() => new ChartConfigService(currentTheme), [currentTheme]);
+    // Chart configurations using the service
     const lineChartOptions = useMemo(
-        (): ChartOptions<"line"> => ({
-            responsive: true,
-            maintainAspectRatio: false,
-            interaction: {
-                intersect: false,
-                mode: "index",
-            },
-            plugins: {
-                legend: {
-                    position: "top" as const,
-                    labels: {
-                        color: currentTheme.colors.text.primary,
-                        font: {
-                            family: currentTheme.typography.fontFamily.sans.join(", "),
-                            size: 12,
-                        },
-                    },
-                },
-                title: {
-                    display: true,
-                    text: "Response Time Over Time",
-                    color: currentTheme.colors.text.primary,
-                    font: {
-                        family: currentTheme.typography.fontFamily.sans.join(", "),
-                        size: 16,
-                        weight: "bold",
-                    },
-                },
-                tooltip: {
-                    backgroundColor: currentTheme.colors.surface.elevated,
-                    titleColor: currentTheme.colors.text.primary,
-                    bodyColor: currentTheme.colors.text.secondary,
-                    borderColor: currentTheme.colors.border.primary,
-                    borderWidth: 1,
-                },
-                zoom: {
-                    zoom: {
-                        wheel: {
-                            enabled: true,
-                        },
-                        pinch: {
-                            enabled: true,
-                        },
-                        mode: "x",
-                    },
-                    pan: {
-                        enabled: true,
-                        mode: "x",
-                    },
-                },
-            },
-            scales: {
-                x: {
-                    type: "time" as const,
-                    time: {
-                        displayFormats: {
-                            minute: "HH:mm",
-                            hour: "HH:mm",
-                            day: "MMM dd",
-                        },
-                    },
-                    grid: {
-                        color: currentTheme.colors.border.secondary,
-                    },
-                    ticks: {
-                        color: currentTheme.colors.text.secondary,
-                        font: {
-                            family: currentTheme.typography.fontFamily.sans.join(", "),
-                            size: 11,
-                        },
-                    },
-                },
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: "Response Time (ms)",
-                        color: currentTheme.colors.text.secondary,
-                        font: {
-                            family: currentTheme.typography.fontFamily.sans.join(", "),
-                            size: 12,
-                        },
-                    },
-                    grid: {
-                        color: currentTheme.colors.border.secondary,
-                    },
-                    ticks: {
-                        color: currentTheme.colors.text.secondary,
-                        font: {
-                            family: currentTheme.typography.fontFamily.sans.join(", "),
-                            size: 11,
-                        },
-                    },
-                },
-            },
-        }),
-        [currentTheme]
+        () => chartConfig.getLineChartConfig(),
+        [chartConfig]
     );
 
     const barChartOptions = useMemo(
-        (): ChartOptions<"bar"> => ({
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false,
-                },
-                title: {
-                    display: true,
-                    text: "Status Distribution",
-                    color: currentTheme.colors.text.primary,
-                    font: {
-                        family: currentTheme.typography.fontFamily.sans.join(", "),
-                        size: 16,
-                        weight: "bold",
-                    },
-                },
-                tooltip: {
-                    backgroundColor: currentTheme.colors.surface.elevated,
-                    titleColor: currentTheme.colors.text.primary,
-                    bodyColor: currentTheme.colors.text.secondary,
-                    borderColor: currentTheme.colors.border.primary,
-                    borderWidth: 1,
-                },
-            },
-            scales: {
-                x: {
-                    grid: {
-                        color: currentTheme.colors.border.secondary,
-                    },
-                    ticks: {
-                        color: currentTheme.colors.text.secondary,
-                        font: {
-                            family: currentTheme.typography.fontFamily.sans.join(", "),
-                            size: 11,
-                        },
-                    },
-                },
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: "Count",
-                        color: currentTheme.colors.text.secondary,
-                        font: {
-                            family: currentTheme.typography.fontFamily.sans.join(", "),
-                            size: 12,
-                        },
-                    },
-                    grid: {
-                        color: currentTheme.colors.border.secondary,
-                    },
-                    ticks: {
-                        color: currentTheme.colors.text.secondary,
-                        font: {
-                            family: currentTheme.typography.fontFamily.sans.join(", "),
-                            size: 11,
-                        },
-                    },
-                },
-            },
-        }),
-        [currentTheme]
+        () => chartConfig.getBarChartConfig(),
+        [chartConfig]
     );
-    // Memoize chart data to ensure theme updates
-    const lineChartData = useMemo(() => {
-        // Sort history from oldest to newest for proper chart display
-        const sortedHistory = [...currentSite.history].sort((a, b) => a.timestamp - b.timestamp);
 
-        return {
+    // Chart data using analytics
+    const lineChartData = useMemo(
+        () => ({
+            labels: analytics.filteredHistory.map((h) => new Date(h.timestamp)),
             datasets: [
                 {
-                    label: "Response Time",
-                    data: sortedHistory.map((record) => ({
-                        x: record.timestamp,
-                        y: record.responseTime,
-                    })),
+                    label: "Response Time (ms)",
+                    data: analytics.filteredHistory.map((h) => h.responseTime),
                     borderColor: currentTheme.colors.primary[500],
-                    backgroundColor: `${currentTheme.colors.primary[500]}20`,
-                    borderWidth: 2,
+                    backgroundColor: currentTheme.colors.primary[500] + "20",
                     fill: true,
                     tension: 0.1,
-                    pointBackgroundColor: sortedHistory.map((record) =>
-                        record.status === "up" ? currentTheme.colors.success : currentTheme.colors.error
-                    ),
-                    pointBorderColor: sortedHistory.map((record) =>
-                        record.status === "up" ? currentTheme.colors.success : currentTheme.colors.error
-                    ),
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
                 },
             ],
-        };
-    }, [currentSite.history, currentTheme]);
+        }),
+        [analytics.filteredHistory, currentTheme]
+    );
+
+    const barChartData = useMemo(
+        () => ({
+            labels: ["Up", "Down"],
+            datasets: [
+                {
+                    data: [analytics.upCount, analytics.downCount],
+                    backgroundColor: [
+                        currentTheme.colors.success,
+                        currentTheme.colors.error,
+                    ],
+                },
+            ],
+        }),
+        [analytics.upCount, analytics.downCount, currentTheme]
+    );
+
+    const doughnutChartData = useMemo(
+        () => ({
+            labels: ["Up", "Down"],
+            datasets: [
+                {
+                    data: [analytics.upCount, analytics.downCount],
+                    backgroundColor: [
+                        currentTheme.colors.success,
+                        currentTheme.colors.error,
+                    ],
+                },
+            ],
+        }),
+        [analytics.upCount, analytics.downCount, currentTheme]
+    );
+
+    const doughnutOptions = useMemo(
+        () => chartConfig.getDoughnutChartConfig(analytics.totalChecks),
+        [chartConfig, analytics.totalChecks]
+    );
 
     // Enhanced handler functions
     const handleCheckNow = async (isAutoRefresh = false) => {
@@ -364,83 +195,6 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
             // Error is already handled by the store action
         }
     };
-
-    // Enhanced chart data with time filtering
-    const barChartData = useMemo(
-        () => ({
-            labels: ["Up", "Down"],
-            datasets: [
-                {
-                    label: "Status Count",
-                    data: [upCount, downCount],
-                    backgroundColor: [currentTheme.colors.success, currentTheme.colors.error],
-                    borderColor: [currentTheme.colors.success, currentTheme.colors.error],
-                    borderWidth: 1,
-                },
-            ],
-        }),
-        [upCount, downCount, currentTheme]
-    );
-
-    // New doughnut chart for uptime visualization
-    const uptimeChartData = useMemo(
-        () => ({
-            labels: ["Uptime", "Downtime"],
-            datasets: [
-                {
-                    data: [upCount, downCount],
-                    backgroundColor: [currentTheme.colors.success, currentTheme.colors.error],
-                    borderColor: [currentTheme.colors.success, currentTheme.colors.error],
-                    borderWidth: 2,
-                },
-            ],
-        }),
-        [upCount, downCount, currentTheme]
-    );
-
-    const doughnutOptions = useMemo(
-        (): ChartOptions<"doughnut"> => ({
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: "bottom" as const,
-                    labels: {
-                        color: currentTheme.colors.text.primary,
-                        font: {
-                            family: currentTheme.typography.fontFamily.sans.join(", "),
-                            size: 12,
-                        },
-                    },
-                },
-                title: {
-                    display: true,
-                    text: "Uptime Distribution",
-                    color: currentTheme.colors.text.primary,
-                    font: {
-                        family: currentTheme.typography.fontFamily.sans.join(", "),
-                        size: 16,
-                        weight: "bold",
-                    },
-                },
-                tooltip: {
-                    backgroundColor: currentTheme.colors.surface.elevated,
-                    titleColor: currentTheme.colors.text.primary,
-                    bodyColor: currentTheme.colors.text.secondary,
-                    borderColor: currentTheme.colors.border.primary,
-                    borderWidth: 1,
-                    callbacks: {
-                        label: function (context) {
-                            const percentage =
-                                totalChecks > 0 ? ((context.parsed / totalChecks) * 100).toFixed(1) : "0";
-                            return `${context.label}: ${context.parsed} (${percentage}%)`;
-                        },
-                    },
-                },
-            },
-        }),
-        [currentTheme, totalChecks]
-    );
     // Tab component with enhanced icons
     const TabButton = ({ label, isActive, onClick }: { label: string; isActive: boolean; onClick: () => void }) => {
         const [icon, ...textParts] = label.split(" ");
@@ -580,11 +334,11 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                         {activeTab === "overview" && (
                             <OverviewTab
                                 currentSite={currentSite}
-                                uptime={uptime}
-                                avgResponseTime={avgResponseTime}
-                                totalChecks={totalChecks}
-                                fastestResponse={fastestResponse}
-                                slowestResponse={slowestResponse}
+                                uptime={analytics.uptime}
+                                avgResponseTime={analytics.avgResponseTime}
+                                totalChecks={analytics.totalChecks}
+                                fastestResponse={analytics.fastestResponse}
+                                slowestResponse={analytics.slowestResponse}
                                 formatResponseTime={formatResponseTime}
                                 handleRemoveSite={handleRemoveSite}
                                 isLoading={isLoading}
@@ -593,24 +347,24 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
 
                         {activeTab === "analytics" && (
                             <AnalyticsTab
-                                filteredHistory={filteredHistory}
-                                upCount={upCount}
-                                downCount={downCount}
-                                totalChecks={totalChecks}
-                                uptime={uptime}
-                                avgResponseTime={avgResponseTime}
-                                p50={p50}
-                                p95={p95}
-                                p99={p99}
-                                mttr={mttr}
-                                totalDowntime={totalDowntime}
-                                downtimePeriods={downtimePeriods}
+                                filteredHistory={analytics.filteredHistory}
+                                upCount={analytics.upCount}
+                                downCount={analytics.downCount}
+                                totalChecks={analytics.totalChecks}
+                                uptime={analytics.uptime}
+                                avgResponseTime={analytics.avgResponseTime}
+                                p50={analytics.p50}
+                                p95={analytics.p95}
+                                p99={analytics.p99}
+                                mttr={analytics.mttr}
+                                totalDowntime={analytics.totalDowntime}
+                                downtimePeriods={analytics.downtimePeriods}
                                 chartTimeRange={chartTimeRange}
                                 lineChartData={lineChartData}
                                 lineChartOptions={lineChartOptions}
                                 barChartData={barChartData}
                                 barChartOptions={barChartOptions}
-                                uptimeChartData={uptimeChartData}
+                                uptimeChartData={doughnutChartData}
                                 doughnutOptions={doughnutOptions}
                                 formatResponseTime={formatResponseTime}
                                 formatDuration={formatDuration}

@@ -90,3 +90,117 @@ export const UPTIME_THRESHOLDS = {
     GOOD: 90,       // >= 90% is good (yellow/warning)
     // < 90% is poor (red/error)
 } as const;
+
+// Performance thresholds for response times (in milliseconds)
+export const RESPONSE_TIME_THRESHOLDS = {
+    FAST: 200,      // <= 200ms is fast (green)
+    MODERATE: 1000, // <= 1000ms is moderate (yellow)
+    // > 1000ms is slow (red)
+} as const;
+
+// Time periods for analytics and reporting
+export const TIME_PERIODS = {
+    LAST_HOUR: 60 * 60 * 1000,      // 1 hour
+    LAST_6_HOURS: 6 * 60 * 60 * 1000, // 6 hours
+    LAST_24_HOURS: 24 * 60 * 60 * 1000, // 24 hours
+    LAST_7_DAYS: 7 * 24 * 60 * 60 * 1000, // 7 days
+    LAST_30_DAYS: 30 * 24 * 60 * 60 * 1000, // 30 days
+    LAST_90_DAYS: 90 * 24 * 60 * 60 * 1000, // 90 days
+} as const;
+
+// Chart display configuration
+export const CHART_CONFIG = {
+    MAX_DATA_POINTS: 100,        // Maximum data points to show in charts
+    MIN_DATA_POINTS: 10,         // Minimum data points before showing chart
+    ANIMATION_DURATION: 300,     // Chart animation duration (ms)
+    UPDATE_THROTTLE: 1000,       // Throttle chart updates (ms)
+    HEIGHT: {
+        MINI: 40,                // Mini chart height (px)
+        SMALL: 100,              // Small chart height (px)
+        MEDIUM: 200,             // Medium chart height (px)
+        LARGE: 400,              // Large chart height (px)
+    },
+} as const;
+
+// Site management constraints
+export const SITE_CONSTRAINTS = {
+    MAX_SITES: 1000,             // Maximum number of sites
+    URL_MAX_LENGTH: 2048,        // Maximum URL length
+    NAME_MAX_LENGTH: 100,        // Maximum site name length
+    DESCRIPTION_MAX_LENGTH: 500, // Maximum description length
+    MIN_CHECK_INTERVAL: 5000,    // Minimum check interval (5 seconds)
+    MAX_CHECK_INTERVAL: 2592000000, // Maximum check interval (30 days)
+} as const;
+
+// Notification and alert configuration
+export const NOTIFICATION_CONFIG = {
+    MAX_RETRIES: 3,              // Maximum notification retries
+    RETRY_DELAY: 5000,           // Delay between retries (ms)
+    SOUND_VOLUME: 0.5,           // Default sound volume (0-1)
+    TOAST_DURATION: 5000,        // Toast notification duration (ms)
+    BATCH_DELAY: 2000,           // Delay before batching multiple notifications (ms)
+} as const;
+
+// Data validation patterns
+export const VALIDATION_PATTERNS = {
+    URL: /^https?:\/\/.+/,       // Basic URL validation
+    EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, // Basic email validation
+    IP_ADDRESS: /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/, // IPv4
+} as const;
+
+// Feature flags for experimental or optional features
+export const FEATURE_FLAGS = {
+    DARK_MODE_AUTO: true,        // Auto dark mode based on system preference
+    SOUND_ALERTS: true,          // Sound alert functionality
+    EXPORT_DATA: true,           // Data export functionality
+    IMPORT_DATA: true,           // Data import functionality
+    ADVANCED_CHARTS: true,       // Advanced chart features
+    BULK_OPERATIONS: true,       // Bulk site operations
+    CUSTOM_THEMES: false,        // Custom theme creation (future feature)
+    API_INTEGRATION: false,      // Third-party API integration (future feature)
+    TEAM_COLLABORATION: false,   // Team features (future feature)
+} as const;
+
+// Storage and persistence configuration
+export const STORAGE_CONFIG = {
+    KEY_PREFIX: 'uptime-watcher-', // Prefix for all storage keys
+    VERSION: '1.0',               // Storage schema version
+    BACKUP_FREQUENCY: 24 * 60 * 60 * 1000, // Auto-backup frequency (24 hours)
+    MAX_BACKUP_FILES: 5,          // Maximum backup files to keep
+    COMPRESSION_ENABLED: true,    // Enable data compression for large datasets
+} as const;
+
+// Application metadata
+export const APP_CONFIG = {
+    NAME: 'Uptime Watcher',
+    VERSION: '1.0.0',
+    AUTHOR: 'Your Name',
+    WEBSITE: 'https://github.com/yourusername/uptime-watcher',
+    SUPPORT_EMAIL: 'support@example.com',
+    UPDATE_CHECK_INTERVAL: 24 * 60 * 60 * 1000, // Check for updates daily
+} as const;
+
+// Error handling configuration
+export const ERROR_CONFIG = {
+    MAX_ERROR_HISTORY: 100,       // Maximum error entries to keep
+    AUTO_CLEAR_ERRORS: 30000,     // Auto-clear errors after 30 seconds
+    RETRY_ATTEMPTS: 3,            // Default retry attempts for failed operations
+    RETRY_DELAY: 1000,            // Base delay between retries (ms)
+    RETRY_BACKOFF_MULTIPLIER: 2,  // Exponential backoff multiplier
+} as const;
+
+// Accessibility and UX configuration
+export const ACCESSIBILITY_CONFIG = {
+    FOCUS_VISIBLE_OUTLINE: '2px solid currentColor', // Focus outline style
+    REDUCED_MOTION_DURATION: 0,   // Animation duration when prefers-reduced-motion
+    HIGH_CONTRAST_MULTIPLIER: 1.5, // Color contrast multiplier for high-contrast theme
+    MINIMUM_TOUCH_TARGET: 44,     // Minimum touch target size (px)
+} as const;
+
+// Development and debugging configuration
+export const DEBUG_CONFIG = {
+    ENABLE_CONSOLE_LOGS: process.env.NODE_ENV === 'development',
+    ENABLE_PERFORMANCE_MONITORING: process.env.NODE_ENV === 'development',
+    MOCK_SLOW_NETWORK: false,     // Simulate slow network for testing
+    MOCK_ERRORS: false,           // Simulate errors for testing
+} as const;
