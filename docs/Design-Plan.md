@@ -1,10 +1,8 @@
 .
 
-🛠 App Overview: “Uptime Watcher”
-An Electron app to monitor the uptime status of a list of user-defined websites, displaying live status updates, response times, and historical data.
+🛠 App Overview: "Uptime Watcher" An Electron app to monitor the uptime status of a list of user-defined websites, displaying live status updates, response times, and historical data.
 
-1. Tech Stack
-   Frontend: React (with Vite for bundling), Tailwind CSS
+1. Tech Stack Frontend: React (with Vite for bundling), Tailwind CSS
 
 State Management: Zustand (lightweight and React-friendly)
 
@@ -14,12 +12,11 @@ Backend/API: Node.js with Axios for periodic HTTP checks
 
 Database: SQLite (using better-sqlite3 or lowdb for simplicity)
 
-IPC Layer: Electron’s ipcMain/ipcRenderer bridge for background checks
+IPC Layer: Electron's ipcMain/ipcRenderer bridge for background checks
 
 Optional: Chart.js or Recharts for plotting status over time
 
-2. App Architecture
-   Main Process (Electron):
+1. App Architecture Main Process (Electron):
 
 Manages app lifecycle
 
@@ -39,27 +36,13 @@ Scheduled pings using Axios (or Node HTTP lib)
 
 Aggregates results and sends events back to renderer
 
-3. Zustand Store Example
-   ts
-   import { create } from 'zustand'
+1. Zustand Store Example ts import { create } from 'zustand'
 
-const useStore = create(set => ({
-sites: [],
+const useStore = create(set => ({ sites: [],
 
-addSite: site => set(state => ({
-sites: [...state.sites, { ...site, status: 'pending', history: [] }]
-})),
+addSite: site => set(state => ({ sites: [...state.sites, { ...site, status: 'pending', history: [] }] })),
 
-updateSiteStatus: (url, status, responseTime) =>
-set(state => ({
-sites: state.sites.map(site =>
-site.url === url
-? { ...site, status, history: [...site.history, { timestamp: Date.now(), status, responseTime }] }
-: site
-)
-}))
-})) 4. Core Features
-Add/Remove Sites to monitor
+updateSiteStatus: (url, status, responseTime) => set(state => ({ sites: state.sites.map(site => site.url === url ? { ...site, status, history: [...site.history, { timestamp: Date.now(), status, responseTime }] } : site ) })) })) 4\. Core Features Add/Remove Sites to monitor
 
 Live Status Updates (green = OK, red = down)
 
@@ -73,8 +56,7 @@ Notifications on status changes (via Electron Notification API)
 
 Auto-start on Boot (if enabled)
 
-5. Design Considerations
-   Efficient polling via setInterval or background cron-style tasks
+1. Design Considerations Efficient polling via setInterval or background cron-style tasks
 
 Throttle requests for large site lists to avoid overwhelming bandwidth
 

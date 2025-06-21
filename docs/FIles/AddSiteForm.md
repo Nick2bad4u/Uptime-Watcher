@@ -7,11 +7,13 @@
 ---
 
 ## Location
+
 - **File:** `src/components/AddSiteForm.tsx`
 
 ---
 
 ## Purpose
+
 - Allows users to add a new site (URL and optional name) to the monitoring list.
 - Handles form validation, error display, and loading feedback.
 - Integrates with the global store for state updates and error handling.
@@ -34,6 +36,7 @@
 ## Component Structure
 
 ### Imports
+
 - React hooks: `useState`, `useEffect`
 - Zustand store: `useStore`
 - Constants: `UI_DELAYS`
@@ -42,17 +45,20 @@
 - Logger: `logger`
 
 ### State
+
 - `url` (string): The website URL to add (required).
 - `name` (string): Optional display name for the site.
 - `showButtonLoading` (boolean): Controls the loading spinner on the submit button.
 
 ### Store Selectors
+
 - `createSite`: Store action to add a new site.
 - `isLoading`: Global loading state.
 - `lastError`: Last error message from the store.
 - `clearError`: Store action to clear errors.
 
 ### Theme
+
 - `isDark`: Boolean indicating if the current theme is dark (for error box styling).
 
 ---
@@ -60,10 +66,12 @@
 ## Logic Details
 
 ### Loading Spinner Delay
+
 - Uses a 100ms delay before showing the button spinner to avoid flicker for fast operations.
 - Cleans up the timer on unmount or when loading state changes.
 
 ### Form Submission (`handleSubmit`)
+
 - Prevents default form submission.
 - Validates that the URL is not empty.
 - Clears any previous error.
@@ -72,14 +80,17 @@
 - On error, logs the error (store handles user-facing error display).
 
 ### Error Display
+
 - If `lastError` is set, displays a themed error box with a close button to clear the error.
 - Error box adapts to dark mode.
 
 ### Accessibility
+
 - All inputs have `aria-label` attributes.
 - Required fields are marked with `*` in the label.
 
 ### Themed Components
+
 - Uses only themed components for all UI elements:
   - `ThemedBox` for error alert container
   - `ThemedText` for labels, help text, and error messages
@@ -89,6 +100,7 @@
 ---
 
 ## UI Layout
+
 - **Site Name (Optional):** Text input, not required.
 - **Website URL:** URL input, required.
 - **Submit Button:** Disabled if URL is empty or loading. Shows spinner if loading.
@@ -98,11 +110,13 @@
 ---
 
 ## Example Usage
+
 This component is typically rendered in a modal or a section of the main app UI where users can add new sites.
 
 ---
 
 ## Best Practices Followed
+
 - Uses store actions for all state changes (no direct mutation).
 - Handles both global and local errors.
 - Uses loading state for user feedback.
@@ -113,6 +127,7 @@ This component is typically rendered in a modal or a section of the main app UI 
 ---
 
 ## Future Improvements
+
 - Add more advanced URL validation (currently only checks for non-empty string).
 - Optionally support additional site metadata fields.
 - Add keyboard accessibility enhancements if needed.
@@ -121,6 +136,7 @@ This component is typically rendered in a modal or a section of the main app UI 
 ---
 
 ## Related Files
+
 - `src/store.ts` (Zustand store/actions)
 - `src/theme/components.tsx` (Themed UI components)
 - `src/theme/useTheme.ts` (Theme hook)
@@ -130,4 +146,5 @@ This component is typically rendered in a modal or a section of the main app UI 
 ---
 
 ## Contact
+
 For questions or improvements, see the project README or open an issue on GitHub.

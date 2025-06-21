@@ -4,7 +4,8 @@ runtime-version: "24.08"
 sdk: org.freedesktop.Sdk
 base: org.electronjs.Electron2.BaseApp
 base-version: "24.08"
-command: run.sh
+command: electron
+desktop-file-name: io.github.uptimewatcher.desktop
 separate-locales: false
 finish-args:
     - --share=network
@@ -28,55 +29,20 @@ modules:
 
     - name: uptime-watcher
       buildsystem: simple
-      build-options:
-          env:
-              PATH: "/app/bin:/usr/bin:/bin"
       build-commands:
-          # Install Node.js dependencies
-          - /app/bin/npm ci --omit=dev
-
-          # Build the application
-          - /app/bin/npm run build
-
-          # Create application directory structure
-          - install -d /app/bin
-          - install -d /app/lib
-
-          # Copy built application files
-          - cp -r dist /app/lib/
-          - cp -r dist-electron /app/lib/
-          - cp -r node_modules /app/lib/
-          - cp -r icons /app/lib/
-          - cp package.json /app/lib/
-
-          # Create wrapper script
-          - |
-              cat > /app/bin/run.sh << 'EOF'
-              #!/bin/bash
-              export NODE_ENV=production
-              export ELECTRON_IS_DEV=0
-              export ELECTRON_FORCE_IS_PACKAGED=true
-              cd /app/lib
-              exec electron dist-electron/main.js "$@"
-              EOF
-          - chmod +x /app/bin/run.sh
-          # Install desktop file and icons
-          - install -Dm644 io.github.uptimewatcher.desktop
-            /app/share/applications/io.github.uptimewatcher.desktop
-          - install -Dm644 icons/icon.png
-            /app/share/icons/hicolor/512x512/apps/io.github.uptimewatcher.png
-          - install -Dm644 icons/icon-256.png
-            /app/share/icons/hicolor/256x256/apps/io.github.uptimewatcher.png
-          - install -Dm644 icons/icon-128.png
-            /app/share/icons/hicolor/128x128/apps/io.github.uptimewatcher.png
-          - install -Dm644 icons/icon-64.png
-            /app/share/icons/hicolor/64x64/apps/io.github.uptimewatcher.png
-          - install -Dm644 icons/icon-16.png
-            /app/share/icons/hicolor/16x16/apps/io.github.uptimewatcher.png
-
-          # Install AppStream metadata
-          - install -Dm644 io.github.uptimewatcher.metainfo.xml
-            /app/share/metainfo/io.github.uptimewatcher.metainfo.xml
+          - cp -r dist /app/
+          - cp -r dist-electron /app/
+          - cp -r node_modules /app/
+          - cp -r icons /app/
+          - cp package.json /app/
+          - install -Dm755 node_modules/electron/dist/electron /app/bin/electron
+          - install -Dm644 io.github.uptimewatcher.desktop /app/share/applications/io.github.uptimewatcher.desktop
+          - install -Dm644 icons/icon.png /app/share/icons/hicolor/512x512/apps/io.github.uptimewatcher.png
+          - install -Dm644 icons/icon-256.png /app/share/icons/hicolor/256x256/apps/io.github.uptimewatcher.png
+          - install -Dm644 icons/icon-128.png /app/share/icons/hicolor/128x128/apps/io.github.uptimewatcher.png
+          - install -Dm644 icons/icon-64.png /app/share/icons/hicolor/64x64/apps/io.github.uptimewatcher.png
+          - install -Dm644 icons/icon-16.png /app/share/icons/hicolor/16x16/apps/io.github.uptimewatcher.png
+          - install -Dm644 io.github.uptimewatcher.metainfo.xml /app/share/metainfo/io.github.uptimewatcher.metainfo.xml
       sources:
           - type: dir
             path: .
