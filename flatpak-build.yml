@@ -33,10 +33,10 @@ modules:
               PATH: "/app/bin:/usr/bin:/bin"
       build-commands:
           # Install Node.js dependencies
-          - npm ci --omit=dev
+          - /app/bin/npm ci --omit=dev
 
           # Build the application
-          - npm run build
+          - /app/bin/npm run build
 
           # Create application directory structure
           - install -d /app/bin
