@@ -62,7 +62,7 @@ export const HISTORY_LIMIT_OPTIONS: IntervalOption[] = [
     { value: 250000, label: "250,000 records" },
     { value: 500000, label: "500,000 records" },
     { value: 1000000, label: "1,000,000 records" },
-    { value: Infinity, label: "Unlimited" },
+    { value: Number.MAX_SAFE_INTEGER, label: "Unlimited" },
 ];
 
 // Auto-refresh interval for site details (30 seconds)

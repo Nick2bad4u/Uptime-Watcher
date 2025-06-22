@@ -121,6 +121,14 @@ export class UptimeMonitor extends EventEmitter {
             if (typeof this.db.data.settings?.historyLimit === "number") {
                 this.historyLimit = this.db.data.settings.historyLimit;
             }
+            // Resume monitoring for all monitors that were running before restart
+            for (const site of this.sites.values()) {
+                for (const monitor of site.monitors) {
+                    if (monitor.monitoring) {
+                        this.startMonitoringForSite(site.identifier, monitor.type);
+                    }
+                }
+            }
         } catch (error) {
             logger.error("Failed to load sites from DB", error);
             this.emit("db-error", { error, operation: "loadSites" });

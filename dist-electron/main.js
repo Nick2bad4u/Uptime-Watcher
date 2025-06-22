@@ -25202,6 +25202,13 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
       if (typeof ((_a = this.db.data.settings) == null ? void 0 : _a.historyLimit) === "number") {
         this.historyLimit = this.db.data.settings.historyLimit;
       }
+      for (const site of this.sites.values()) {
+        for (const monitor of site.monitors) {
+          if (monitor.monitoring) {
+            this.startMonitoringForSite(site.identifier, monitor.type);
+          }
+        }
+      }
     } catch (error2) {
       logger$1.error("Failed to load sites from DB", error2);
       this.emit("db-error", { error: error2, operation: "loadSites" });
