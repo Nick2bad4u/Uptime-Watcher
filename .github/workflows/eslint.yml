@@ -61,7 +61,7 @@ jobs:
               run: |
                   cd .
                   npm install -D
-                  npm install typescript-eslint eslint-plugin-import
+                  npm install typescript-eslint eslint-plugin-import @microsoft/eslint-formatter-sarif
 
             - name: Run ESLint
               env:
