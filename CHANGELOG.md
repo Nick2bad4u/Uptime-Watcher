@@ -7,12 +7,38 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[511db9c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/511db9c3702299b887ae391263df33754a7eacf0)...
+[511db9c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/511db9c3702299b887ae391263df33754a7eacf0)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/511db9c3702299b887ae391263df33754a7eacf0...511db9c3702299b887ae391263df33754a7eacf0))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 1.8.11 [`(511db9c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/511db9c3702299b887ae391263df33754a7eacf0)
+
+
+
+
+
+
+## [1.8.11] - 2025-06-22
+
+
 [[2fbba3b](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2fbba3b84d5ac91a8eb5a8deabed10f89de06c64)...
-[5891ca1](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5891ca1db6282484242760d041dcf46198772a86)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/2fbba3b84d5ac91a8eb5a8deabed10f89de06c64...5891ca1db6282484242760d041dcf46198772a86))
+[69f2b18](https://github.com/Nick2bad4u/Uptime-Watcher/commit/69f2b18ac835418771df6af79c26367056ce284c)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/2fbba3b84d5ac91a8eb5a8deabed10f89de06c64...69f2b18ac835418771df6af79c26367056ce284c))
 
 
 ### 🛠️ GitHub Actions
+
+- Update npm-audit.yml [`(5a7a035)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5a7a035edd2b637e554d6d583f606ab573be0000)
+
+
+- Update flatpak-build.yml [`(28205d0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/28205d0f46ea48fcf3db4b74523684ec84343e42)
+
+
+- Update flatpak-build.yml [`(a9154ae)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a9154ae0ae672b9a5d88df69edbb21456de25227)
+
 
 - Update eslint.yml [`(5891ca1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5891ca1db6282484242760d041dcf46198772a86)
 
@@ -23,7 +49,20 @@ All notable changes to this project will be documented in this file.
 
 ### 💼 Other
 
+- Resumes active monitors after restart and improves history limit
+
+Ensures that monitoring automatically resumes for previously active monitors upon app restart, improving reliability for ongoing uptime checks.
+
+Also replaces the use of Infinity with Number.MAX_SAFE_INTEGER for the unlimited history option to avoid potential issues with serialization and internal calculations. [`(69f2b18)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/69f2b18ac835418771df6af79c26367056ce284c)
+
+
 - Rename eslint.config.js to eslint.config.mjs [`(6e70037)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6e700375ea147aebb01a6156c0ea6fd06220f318)
+
+
+
+### ⚙️ Miscellaneous Tasks
+
+- Update changelogs for v1.8.10 [skip ci] [`(1cbea90)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1cbea90d8062d42263da2ece56f373d74cc439cf)
 
 
 
