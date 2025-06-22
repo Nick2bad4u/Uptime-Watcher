@@ -61,6 +61,7 @@ jobs:
               run: |
                   cd .
                   npm install
+                  npm install typescript/tslint
 
             - name: Run ESLint
               env:
