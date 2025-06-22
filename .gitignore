@@ -195,3 +195,4 @@ release/
 dist/
 node_modules/
 dist-electron/
+node_modules_backup/
