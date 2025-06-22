@@ -29,7 +29,7 @@ const compat = new FlatCompat({
 
 export default [
     {
-        ignores: ["node_modules/", "dist/", "dist-electron/", "release/"],
+        ignores: ["node_modules/", "dist/", "dist-electron/", "release/", "package.json", "package-lock.json"],
     },
     // Markdown files
     {

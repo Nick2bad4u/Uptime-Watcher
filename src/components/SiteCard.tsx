@@ -45,7 +45,10 @@ export function SiteCard({ site }: SiteCardProps) {
     const handleCheckNow = () => {
         checkSiteNow(latestSite.identifier, selectedMonitorType)
             .then(() =>
-                logger.user.action("Quick site check", { identifier: latestSite.identifier, monitorType: selectedMonitorType })
+                logger.user.action("Quick site check", {
+                    identifier: latestSite.identifier,
+                    monitorType: selectedMonitorType,
+                })
             )
             .catch((error) => logger.site.error(latestSite.identifier, error instanceof Error ? error : String(error)));
     };

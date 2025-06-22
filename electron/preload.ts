@@ -9,7 +9,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
     removeSite: (identifier: string) => ipcRenderer.invoke("remove-site", identifier),
     updateSite: (identifier: string, updates: Partial<Site>) => ipcRenderer.invoke("update-site", identifier, updates),
     getSites: () => ipcRenderer.invoke("get-sites"),
-    checkSiteNow: (identifier: string, monitorType: string) => ipcRenderer.invoke("check-site-now", identifier, monitorType),
+    checkSiteNow: (identifier: string, monitorType: string) =>
+        ipcRenderer.invoke("check-site-now", identifier, monitorType),
 
     // Data management
     exportData: () => ipcRenderer.invoke("export-data"),

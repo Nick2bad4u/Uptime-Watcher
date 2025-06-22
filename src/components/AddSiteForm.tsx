@@ -11,15 +11,16 @@ export function AddSiteForm() {
     const { isDark } = useTheme();
     // Remove identifier state, use only for monitor input
     const [target, setTarget] = useState(""); // For HTTP URL
-    const [host, setHost] = useState("");     // For Port monitor host
-    const [port, setPort] = useState("");     // For Port monitor port (string for input)
+    const [host, setHost] = useState(""); // For Port monitor host
+    const [port, setPort] = useState(""); // For Port monitor port (string for input)
     const [name, setName] = useState("");
     const [monitorType, setMonitorType] = useState<"http" | "port">("http");
     const [checkInterval, setCheckInterval] = useState(CHECK_INTERVALS[6]?.value || 60000); // Default 1 min
     // UUID state
-    const generateUUID = () => (typeof crypto !== "undefined" && crypto.randomUUID)
-        ? crypto.randomUUID()
-        : `site-${Math.random().toString(36).slice(2, 10)}-${Date.now()}`;
+    const generateUUID = () =>
+        typeof crypto !== "undefined" && crypto.randomUUID
+            ? crypto.randomUUID()
+            : `site-${Math.random().toString(36).slice(2, 10)}-${Date.now()}`;
     const [siteId, setSiteId] = useState<string>(generateUUID());
 
     // New: Add mode toggle

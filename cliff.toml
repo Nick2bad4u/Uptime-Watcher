@@ -63,7 +63,7 @@ trim = true
 render_always = true
 protect_breaking_commits = false
 postprocessors = [
-  { pattern = 'Uptime-Watcher', replace = "[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)" }, # replace repository URL
+  # { pattern = 'Uptime-Watcher', replace = "[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)" }, # replace repository URL
   { pattern = 'merge branch', replace = "[chore] Merge Branch" },                                          # replace merge branch commit messages
   { pattern = 'Merge branch', replace = "[chore] Merge Branch" },                                          # replace merge branch commit messages
   { pattern = '\[dependency\]', replace = 'test' },

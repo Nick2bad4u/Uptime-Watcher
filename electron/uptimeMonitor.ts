@@ -352,7 +352,10 @@ export class UptimeMonitor extends EventEmitter {
         return statusUpdate;
     }
 
-    public async checkSiteManually(identifier: string, monitorType: MonitorType = "http"): Promise<StatusUpdate | null> {
+    public async checkSiteManually(
+        identifier: string,
+        monitorType: MonitorType = "http"
+    ): Promise<StatusUpdate | null> {
         const site = this.sites.get(identifier);
         if (!site) {
             throw new Error(`Site with identifier ${identifier} not found`);
@@ -380,7 +383,10 @@ export class UptimeMonitor extends EventEmitter {
                 const prevMonitor = site.monitors.find((m) => m.type === updatedMonitor.type);
                 if (!prevMonitor) continue;
                 // If checkInterval changed, restart timer for this monitor
-                if (typeof updatedMonitor.checkInterval === "number" && updatedMonitor.checkInterval !== prevMonitor.checkInterval) {
+                if (
+                    typeof updatedMonitor.checkInterval === "number" &&
+                    updatedMonitor.checkInterval !== prevMonitor.checkInterval
+                ) {
                     this.stopMonitoringForSite(identifier, updatedMonitor.type);
                     this.startMonitoringForSite(identifier, updatedMonitor.type);
                 }

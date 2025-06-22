@@ -90,7 +90,10 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
 
     const [isRefreshing, setIsRefreshing] = useState(false);
     // Always call hooks first, use fallback for currentSite
-    const currentSite = sites.find((s) => s.identifier === site.identifier) || { monitors: [], identifier: site.identifier };
+    const currentSite = sites.find((s) => s.identifier === site.identifier) || {
+        monitors: [],
+        identifier: site.identifier,
+    };
     const monitorTypes = currentSite.monitors.map((m) => m.type);
     const defaultMonitorType = monitorTypes[0] || "http";
     const selectedMonitorType = getSelectedMonitorType(currentSite.identifier) || defaultMonitorType;
@@ -360,7 +363,11 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                                 {/* Render analytics tab for selected monitor type only */}
                                 <ThemedButton
                                     key={selectedMonitorType}
-                                    variant={activeSiteDetailsTab === `${selectedMonitorType}-analytics` ? "primary" : "secondary"}
+                                    variant={
+                                        activeSiteDetailsTab === `${selectedMonitorType}-analytics`
+                                            ? "primary"
+                                            : "secondary"
+                                    }
                                     onClick={() => setActiveSiteDetailsTab(`${selectedMonitorType}-analytics`)}
                                 >
                                     {`📈 ${selectedMonitorType.toUpperCase()}`}
@@ -387,17 +394,19 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                                     {CHECK_INTERVALS.map((interval) => {
                                         // Support both number and object forms
                                         const value = typeof interval === "number" ? interval : interval.value;
-                                        const label = typeof interval === "number"
-                                            ? value < 60000
-                                                ? `${value / 1000}s`
-                                                : value < 3600000
-                                                ? `${value / 60000}m`
-                                                : `${value / 3600000}h`
-                                            : interval.label || (interval.value < 60000
-                                                ? `${interval.value / 1000}s`
-                                                : interval.value < 3600000
-                                                ? `${interval.value / 60000}m`
-                                                : `${interval.value / 3600000}h`);
+                                        const label =
+                                            typeof interval === "number"
+                                                ? value < 60000
+                                                    ? `${value / 1000}s`
+                                                    : value < 3600000
+                                                      ? `${value / 60000}m`
+                                                      : `${value / 3600000}h`
+                                                : interval.label ||
+                                                  (interval.value < 60000
+                                                      ? `${interval.value / 1000}s`
+                                                      : interval.value < 3600000
+                                                        ? `${interval.value / 60000}m`
+                                                        : `${interval.value / 3600000}h`);
                                         return (
                                             <option key={value} value={value}>
                                                 {label}
@@ -1138,17 +1147,19 @@ function SettingsTab({
                     {CHECK_INTERVALS.map((interval) => {
                         // Support both number and object forms
                         const value = typeof interval === "number" ? interval : interval.value;
-                        const label = typeof interval === "number"
-                            ? value < 60000
-                                ? `${value / 1000}s`
-                                : value < 3600000
-                                ? `${value / 60000}m`
-                                : `${value / 3600000}h`
-                            : interval.label || (interval.value < 60000
-                                ? `${interval.value / 1000}s`
-                                : interval.value < 3600000
-                                ? `${interval.value / 60000}m`
-                                : `${interval.value / 3600000}h`);
+                        const label =
+                            typeof interval === "number"
+                                ? value < 60000
+                                    ? `${value / 1000}s`
+                                    : value < 3600000
+                                      ? `${value / 60000}m`
+                                      : `${value / 3600000}h`
+                                : interval.label ||
+                                  (interval.value < 60000
+                                      ? `${interval.value / 1000}s`
+                                      : interval.value < 3600000
+                                        ? `${interval.value / 60000}m`
+                                        : `${interval.value / 3600000}h`);
                         return (
                             <option key={value} value={value}>
                                 {label}

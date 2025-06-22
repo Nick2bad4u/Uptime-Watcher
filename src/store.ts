@@ -404,11 +404,13 @@ export const useStore = create<AppState>()(
                 set((state) => ({
                     sites: state.sites.filter((site) => site.identifier !== identifier),
                     selectedSiteId:
-                        state.selectedSiteId && state.sites.find((s) => s.identifier === identifier && s.identifier === state.selectedSiteId)
+                        state.selectedSiteId &&
+                        state.sites.find((s) => s.identifier === identifier && s.identifier === state.selectedSiteId)
                             ? null
                             : state.selectedSiteId,
                     showSiteDetails:
-                        state.selectedSiteId && state.sites.find((s) => s.identifier === identifier && s.identifier === state.selectedSiteId)
+                        state.selectedSiteId &&
+                        state.sites.find((s) => s.identifier === identifier && s.identifier === state.selectedSiteId)
                             ? false
                             : state.showSiteDetails,
                 })),
