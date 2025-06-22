@@ -60,7 +60,8 @@ jobs:
             - name: Install all required ESLint plugins
               run: |
                   cd .
-                  npm install
+                  npm install -D
+                  npm install typescript-eslint eslint-plugin-import
 
             - name: Run ESLint
               env:
