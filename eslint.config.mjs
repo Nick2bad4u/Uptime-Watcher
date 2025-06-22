@@ -3,12 +3,19 @@ import globals from "globals";
 import json from "@eslint/json";
 import markdown from "@eslint/markdown";
 import css from "@eslint/css";
+import tseslint from "@typescript-eslint/eslint-plugin";
+import tsParser from "@typescript-eslint/parser";
 import { defineConfig } from "eslint/config";
 
 export default defineConfig([
-    { files: ["**/*.{js,mjs,cjs,ts}"], plugins: { js: js }, extends: ["js/recommended"] },
+    {
+        files: ["**/*.{js,mjs,cjs,ts,tsx}"],
+        plugins: { js: js, "@typescript-eslint": tseslint },
+        extends: ["js/recommended", "plugin:@typescript-eslint/recommended"],
+        languageOptions: { parser: tsParser },
+    },
     // Merging browser and node globals to support environments where both are used, such as Electron.
-    { files: ["**/*.{js,mjs,cjs,ts}"], languageOptions: { globals: { ...globals.browser, ...globals.node } } },
+    { files: ["**/*.{js,mjs,cjs,ts,tsx}"], languageOptions: { globals: { ...globals.browser, ...globals.node } } },
     {
         files: ["**/*.json"],
         plugins: { json },

@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useState } from "react";
+import { useMemo, useEffect, useState, useRef } from "react";
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -16,7 +16,7 @@ import {
 } from "chart.js";
 import zoomPlugin from "chartjs-plugin-zoom";
 import { Line, Bar, Doughnut } from "react-chartjs-2";
-import { Site, StatusHistory } from "../types";
+import { Site, StatusHistory, MonitorType, Monitor } from "../types";
 import { useTheme, useAvailabilityColors } from "../theme/useTheme";
 import { useStore } from "../store";
 import { formatStatusWithIcon } from "../utils/status";
@@ -35,14 +35,13 @@ import {
     ThemedProgress,
     ThemedIconButton,
     ThemedInput,
+    ThemedSelect,
 } from "../theme/components";
 import "chartjs-adapter-date-fns";
 import "./SiteDetails.css";
-import { FaPause, FaPlay } from "react-icons/fa";
+import { FaPause, FaPlay, FaListOl } from "react-icons/fa";
 import { FiRefreshCw, FiX, FiTrash2, FiSave } from "react-icons/fi";
-import { MdAccessTime, MdBolt, MdBarChart, MdSettings, MdHistory, MdSpeed, MdOutlineFactCheck } from "react-icons/md";
-import { BsGraphUp } from "react-icons/bs";
-import { FaListOl } from "react-icons/fa";
+import { MdAccessTime, MdBolt, MdSpeed, MdOutlineFactCheck } from "react-icons/md";
 import React from "react";
 import { createPortal } from "react-dom";
 
@@ -89,6 +88,18 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
     } = useStore();
 
     const [isRefreshing, setIsRefreshing] = useState(false);
+    // --- Monitor selection state (now based on currentSite) ---
+    const currentSite = sites.find((s) => s.id === site.id);
+    if (!currentSite) return null;
+    const monitorTypes = currentSite.monitors.map((m) => m.type);
+    const [selectedMonitorType, setSelectedMonitorType] = useState<MonitorType>(monitorTypes[0]);
+    // Ensure selectedMonitorType is always valid for the current site
+    useEffect(() => {
+        if (!monitorTypes.includes(selectedMonitorType)) {
+            setSelectedMonitorType(monitorTypes[0]);
+        }
+    }, [monitorTypes.join(","), selectedMonitorType]);
+    const selectedMonitor = currentSite.monitors.find((m) => m.type === selectedMonitorType) || currentSite.monitors[0];
 
     // Auto-refresh interval
     useEffect(() => {
@@ -99,19 +110,15 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
         }, AUTO_REFRESH_INTERVAL); // Auto-refresh every 30 seconds
 
         return () => clearInterval(interval);
-    }, [isMonitoring, isLoading, isRefreshing]);
+    }, [isMonitoring, isLoading, isRefreshing, selectedMonitorType]);
 
-    // Use the updated site from store if available, always get the latest data
-    const currentSite = sites.find((s) => s.url === site.url) || site;
-
-    // Use analytics hook for all calculations
-    const analytics = useSiteAnalytics(currentSite, siteDetailsChartTimeRange);
+    // Use analytics hook (pass only selectedMonitor and timeRange)
+    const analytics = useSiteAnalytics(selectedMonitor, siteDetailsChartTimeRange); // <-- Make sure the hook uses only this monitor's history
 
     // Create chart config service instance
     const chartConfig = useMemo(() => new ChartConfigService(currentTheme), [currentTheme]);
     // Chart configurations using the service
     const lineChartOptions = useMemo(() => chartConfig.getLineChartConfig(), [chartConfig]);
-
     const barChartOptions = useMemo(() => chartConfig.getBarChartConfig(), [chartConfig]);
 
     // Chart data using analytics
@@ -163,22 +170,25 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
         [chartConfig, analytics.totalChecks]
     );
 
-    // Enhanced handler functions
+    // Handler for monitor type change
+    const handleMonitorTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedMonitorType(e.target.value as MonitorType);
+    };
+
+    // Handler for check now
     const handleCheckNow = async (isAutoRefresh = false) => {
         if (isAutoRefresh) {
             setIsRefreshing(true);
         } else {
-            clearError(); // Clear previous errors
+            clearError();
         }
-
         try {
-            await checkSiteNow(currentSite.url);
+            await checkSiteNow(currentSite.url, selectedMonitorType);
             if (!isAutoRefresh) {
-                logger.user.action("Manual site check", { url: currentSite.url });
+                logger.user.action("Manual site check", { url: currentSite.url, monitorType: selectedMonitorType });
             }
         } catch (error) {
             logger.site.error(currentSite.url, error instanceof Error ? error : String(error));
-            // Error is already handled by the store action
         } finally {
             if (isAutoRefresh) {
                 setIsRefreshing(false);
@@ -202,39 +212,6 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
             // Error is already handled by the store action
         }
     };
-    // Tab component with enhanced icons
-    const tabIcons: Record<string, React.ReactNode> = {
-        Overview: <MdBarChart />,
-        Analytics: <BsGraphUp />,
-        History: <MdHistory />,
-        Settings: <MdSettings />,
-    };
-    const TabButton = ({ label, isActive, onClick }: { label: string; isActive: boolean; onClick: () => void }) => {
-        const { currentTheme } = useTheme();
-        const labelText = label.replace(/^[^ ]+ /, "");
-        const icon = tabIcons[labelText] || null;
-        return (
-            <ThemedButton
-                variant={isActive ? "primary" : "ghost"}
-                size="sm"
-                onClick={onClick}
-                className={`px-4 py-2 ${isActive ? "shadow-sm" : ""}`}
-                icon={icon}
-                style={
-                    isActive
-                        ? {
-                              backgroundColor: currentTheme.colors.primary[400],
-                              borderColor: currentTheme.colors.primary[400],
-                              color: currentTheme.colors.text.inverse,
-                          }
-                        : undefined
-                }
-            >
-                {labelText}
-            </ThemedButton>
-        );
-    };
-
     return (
         <div className="site-details-modal" onClick={onClose}>
             <div onClick={(e) => e.stopPropagation()}>
@@ -258,7 +235,7 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                                     siteName={currentSite.name || currentSite.url}
                                 />
                                 <div className="site-details-status-indicator">
-                                    <StatusIndicator status={currentSite.status} size="lg" />
+                                    <StatusIndicator status={selectedMonitor.status} size="lg" />
                                     {isRefreshing && (
                                         <div className="site-details-loading-spinner">
                                             <div className="site-details-spinner"></div>
@@ -267,37 +244,44 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <ThemedText size="2xl" weight="bold" className="site-details-title truncate">
-                                        {currentSite.name || currentSite.url}
+                                        {site.name || site.url}
                                     </ThemedText>
-                                    {currentSite.name && (
+                                    {site.name && (
                                         <a
-                                            href={currentSite.url}
+                                            href={site.url}
                                             className="site-details-url truncate"
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             tabIndex={0}
-                                            aria-label={`Open ${currentSite.url} in browser`}
+                                            aria-label={`Open ${site.url} in browser`}
                                             onClick={(e) => {
                                                 e.preventDefault();
                                                 if (hasOpenExternal(window.electronAPI)) {
-                                                    window.electronAPI.openExternal(currentSite.url);
+                                                    window.electronAPI.openExternal(site.url);
                                                 } else {
-                                                    window.open(currentSite.url, "_blank", "noopener");
+                                                    window.open(site.url, "_blank", "noopener");
                                                 }
                                             }}
                                         >
-                                            {currentSite.url}
+                                            {site.url}
                                         </a>
                                     )}
-                                    <div className="site-details-meta">
+                                    <div className="site-details-meta flex items-center gap-2">
                                         <ThemedText size="xs" variant="tertiary" className="site-details-last-checked">
-                                            Last checked:{" "}
-                                            {formatFullTimestamp(
-                                                typeof currentSite.lastChecked === "number"
-                                                    ? currentSite.lastChecked
+                                            Last checked: {formatFullTimestamp(
+                                                typeof selectedMonitor.lastChecked === "number"
+                                                    ? selectedMonitor.lastChecked
                                                     : Date.now()
                                             )}
                                         </ThemedText>
+                                        {/* Show monitor type badge */}
+                                        <ThemedBadge variant="secondary" size="xs">
+                                            {selectedMonitor.type === "http"
+                                                ? "HTTP Status Check"
+                                                : selectedMonitor.type === "port"
+                                                ? "Port Check"
+                                                : "?"}
+                                        </ThemedBadge>
                                     </div>
                                 </div>
                             </div>
@@ -341,33 +325,55 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                         </div>
                     </div>
 
-                    {/* Tab Navigation */}
+                    {/* Tab Navigation + Monitor Type Selector (integrated) */}
                     <ThemedBox variant="secondary" padding="lg" className="border-b">
-                        <div className="flex flex-wrap gap-2">
-                            <TabButton
-                                label="📊 Overview"
-                                isActive={activeSiteDetailsTab === "overview"}
+                        <div className="flex flex-wrap gap-2 items-center">
+                            <ThemedButton
+                                variant={activeSiteDetailsTab === "overview" ? "primary" : "secondary"}
                                 onClick={() => setActiveSiteDetailsTab("overview")}
-                            />
-                            <TabButton
-                                label="📈 Analytics"
-                                isActive={activeSiteDetailsTab === "analytics"}
-                                onClick={() => setActiveSiteDetailsTab("analytics")}
-                            />
-                            <TabButton
-                                label="📜 History"
-                                isActive={activeSiteDetailsTab === "history"}
+                            >
+                                📊 Overview
+                            </ThemedButton>
+                            {/* Render analytics tabs for each monitor type */}
+                            {monitorTypes.map((type) => (
+                                <ThemedButton
+                                    key={type}
+                                    variant={activeSiteDetailsTab === `${type}-analytics` ? "primary" : "secondary"}
+                                    onClick={() => {
+                                        setActiveSiteDetailsTab(`${type}-analytics`);
+                                        setSelectedMonitorType(type as MonitorType);
+                                    }}
+                                >
+                                    {`📈 ${type.toUpperCase()}`}
+                                </ThemedButton>
+                            ))}
+                            <ThemedButton
+                                variant={activeSiteDetailsTab === "history" ? "primary" : "secondary"}
                                 onClick={() => setActiveSiteDetailsTab("history")}
-                            />
-                            <TabButton
-                                label="⚙️ Settings"
-                                isActive={activeSiteDetailsTab === "settings"}
+                            >
+                                📜 History
+                            </ThemedButton>
+                            <ThemedButton
+                                variant={activeSiteDetailsTab === "settings" ? "primary" : "secondary"}
                                 onClick={() => setActiveSiteDetailsTab("settings")}
-                            />
+                            >
+                                ⚙️ Settings
+                            </ThemedButton>
+                            {/* Monitor type selector visually integrated with tabs */}
+                            <div className="ml-auto flex items-center gap-2">
+                                <ThemedText variant="secondary" size="base">Monitor Type:</ThemedText>
+                                <ThemedSelect
+                                    value={selectedMonitorType}
+                                    onChange={handleMonitorTypeChange}
+                                >
+                                    {site.monitors.map(m => (
+                                        <option key={m.type} value={m.type}>{m.type.toUpperCase()}</option>
+                                    ))}
+                                </ThemedSelect>
+                            </div>
                         </div>
-
-                        {/* Time Range Selector for Analytics */}
-                        {activeSiteDetailsTab === "analytics" && (
+                        {/* Time Range Selector for Analytics Tab (only for http) */}
+                        {activeSiteDetailsTab === `${selectedMonitorType}-analytics` && selectedMonitorType === "http" && (
                             <div className="flex items-center flex-wrap gap-3 mt-4">
                                 <ThemedText size="sm" variant="secondary" className="mr-2">
                                     Time Range:
@@ -392,7 +398,7 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                     <ThemedBox variant="primary" padding="lg" className="max-h-[70vh] overflow-y-auto">
                         {activeSiteDetailsTab === "overview" && (
                             <OverviewTab
-                                currentSite={currentSite}
+                                selectedMonitor={selectedMonitor}
                                 uptime={analytics.uptime}
                                 avgResponseTime={analytics.avgResponseTime}
                                 totalChecks={analytics.totalChecks}
@@ -403,8 +409,8 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                                 isLoading={isLoading}
                             />
                         )}
-
-                        {activeSiteDetailsTab === "analytics" && (
+                        {/* Analytics Tab: dynamic for all monitor types */}
+                        {activeSiteDetailsTab === `${selectedMonitorType}-analytics` && selectedMonitorType === "http" && (
                             <AnalyticsTab
                                 filteredHistory={analytics.filteredHistory}
                                 upCount={analytics.upCount}
@@ -434,12 +440,29 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                                 getAvailabilityDescription={getAvailabilityDescription}
                             />
                         )}
-
-                        {activeSiteDetailsTab === "history" && <HistoryTab currentSite={currentSite} />}
-
+                        {/* Analytics Tab: placeholder for other monitor types */}
+                        {activeSiteDetailsTab === `${selectedMonitorType}-analytics` && selectedMonitorType !== "http" && (
+                            <ThemedBox variant="primary" padding="xl" className="flex flex-col items-center justify-center min-h-[200px]">
+                                <ThemedText size="xl" weight="semibold" variant="secondary" className="mb-4">
+                                    Analytics (Coming Soon)
+                                </ThemedText>
+                                <ThemedText size="base" variant="tertiary">
+                                    Analytics for this monitor type will appear here as soon as it is supported.
+                                </ThemedText>
+                            </ThemedBox>
+                        )}
+                        {activeSiteDetailsTab === "history" && (
+                            <HistoryTab
+                                selectedMonitor={selectedMonitor}
+                                formatResponseTime={formatResponseTime}
+                                formatFullTimestamp={formatFullTimestamp}
+                                formatStatusWithIcon={formatStatusWithIcon}
+                            />
+                        )}
                         {activeSiteDetailsTab === "settings" && (
                             <SettingsTab
-                                currentSite={currentSite}
+                                currentSite={site}
+                                selectedMonitor={selectedMonitor}
                                 handleRemoveSite={handleRemoveSite}
                                 isLoading={isLoading}
                             />
@@ -452,8 +475,9 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
 }
 
 // Tab Components
-interface OverviewTabProps {
-    currentSite: Site;
+// Update OverviewTabProps
+type OverviewTabProps = {
+    selectedMonitor: Monitor;
     uptime: string;
     avgResponseTime: number;
     totalChecks: number;
@@ -462,10 +486,10 @@ interface OverviewTabProps {
     formatResponseTime: (time: number) => string;
     handleRemoveSite: () => Promise<void>;
     isLoading: boolean;
-}
+};
 
 function OverviewTab({
-    currentSite,
+    selectedMonitor,
     uptime,
     avgResponseTime,
     totalChecks,
@@ -507,7 +531,7 @@ function OverviewTab({
                     hoverable
                     className="text-center flex flex-col items-center"
                 >
-                    <StatusIndicator status={currentSite.status} size="lg" showText />
+                    <StatusIndicator status={selectedMonitor.status} size="lg" showText />
                 </ThemedCard>
 
                 <ThemedCard
@@ -813,16 +837,21 @@ function AnalyticsTab({
 }
 
 interface HistoryTabProps {
-    currentSite: Site;
+    selectedMonitor: any; // Adjusted type for selectedMonitor
+    formatResponseTime: (time: number) => string;
+    formatFullTimestamp: (timestamp: number) => string;
+    formatStatusWithIcon: (status: string) => string;
 }
 
-function HistoryTab({ currentSite }: HistoryTabProps) {
+function HistoryTab({ selectedMonitor, formatResponseTime, formatFullTimestamp, formatStatusWithIcon }: Omit<HistoryTabProps, 'site'>) {
     const [historyFilter, setHistoryFilter] = useState<"all" | "up" | "down">("all");
     const [historyLimit, setHistoryLimit] = useState(50);
 
-    const filteredHistoryRecords = currentSite.history
-        .filter((record) => historyFilter === "all" || record.status === historyFilter)
+    const filteredHistoryRecords = (selectedMonitor.history || [])
+        .filter((record: any) => historyFilter === "all" || record.status === historyFilter)
         .slice(0, historyLimit);
+
+    const historyLength = (selectedMonitor.history || []).length;
 
     return (
         <div className="space-y-6">
@@ -859,7 +888,7 @@ function HistoryTab({ currentSite }: HistoryTabProps) {
                         <option value={25}>25</option>
                         <option value={50}>50</option>
                         <option value={100}>100</option>
-                        <option value={currentSite.history.length}>All ({currentSite.history.length})</option>
+                        <option value={historyLength}>All ({historyLength})</option>
                     </select>
                 </div>
             </div>
@@ -867,7 +896,7 @@ function HistoryTab({ currentSite }: HistoryTabProps) {
             {/* History List */}
             <ThemedBox surface="base" padding="md" border rounded="lg" className="max-h-96 overflow-y-auto">
                 <div className="space-y-2">
-                    {filteredHistoryRecords.map((record, index) => (
+                    {filteredHistoryRecords.map((record: any, index: number) => (
                         <div
                             key={index}
                             className="flex items-center justify-between p-3 rounded-lg hover:bg-surface-elevated transition-colors"
@@ -879,7 +908,7 @@ function HistoryTab({ currentSite }: HistoryTabProps) {
                                         {formatFullTimestamp(record.timestamp)}
                                     </ThemedText>
                                     <ThemedText size="xs" variant="secondary" className="ml-4">
-                                        Check #{currentSite.history.length - index}
+                                        Check #{(selectedMonitor.history || []).length - index}
                                     </ThemedText>
                                 </div>
                             </div>
@@ -905,14 +934,14 @@ function HistoryTab({ currentSite }: HistoryTabProps) {
     );
 }
 
-// Enhanced Settings Tab Component
 interface SettingsTabProps {
     currentSite: Site;
+    selectedMonitor: Monitor;
     handleRemoveSite: () => Promise<void>;
     isLoading: boolean;
 }
 
-function SettingsTab({ currentSite, handleRemoveSite, isLoading }: SettingsTabProps) {
+function SettingsTab({ currentSite, selectedMonitor, handleRemoveSite, isLoading }: SettingsTabProps) {
     const { modifySite, clearError } = useStore();
     const [localName, setLocalName] = useState(currentSite.name || "");
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -1004,7 +1033,7 @@ function SettingsTab({ currentSite, handleRemoveSite, isLoading }: SettingsTabPr
                                 Total History Records:
                             </ThemedText>
                             <ThemedBadge variant="info" size="xs">
-                                {currentSite.history.length}
+                                {(selectedMonitor.history || []).length}
                             </ThemedBadge>
                         </div>
                     </div>
@@ -1014,7 +1043,7 @@ function SettingsTab({ currentSite, handleRemoveSite, isLoading }: SettingsTabPr
                                 Last Checked:
                             </ThemedText>
                             <ThemedText size="xs" variant="tertiary">
-                                {currentSite.lastChecked ? new Date(currentSite.lastChecked).toLocaleString() : "Never"}
+                                {selectedMonitor.lastChecked ? new Date(selectedMonitor.lastChecked).toLocaleString() : "Never"}
                             </ThemedText>
                         </div>
                     </div>
@@ -1063,10 +1092,10 @@ function hasOpenExternal(api: any): api is { openExternal: (url: string) => void
 
 // Update ScreenshotThumbnail to use only CSS classes for overlay/image
 function ScreenshotThumbnail({ url, siteName }: { url: string; siteName: string }) {
-    const [hovered, setHovered] = React.useState(false);
-    const [overlayVars, setOverlayVars] = React.useState<React.CSSProperties>({});
+    const [hovered, setHovered] = useState(false);
+    const [overlayVars, setOverlayVars] = useState<React.CSSProperties>({});
+    const linkRef = useRef<HTMLAnchorElement>(null);
     const { themeName } = useTheme();
-    const linkRef = React.useRef<HTMLAnchorElement>(null);
     const screenshotUrl = `https://api.microlink.io/?url=${encodeURIComponent(url)}&screenshot=true&meta=false&embed=screenshot.url&colorScheme=auto`;
 
     function handleClick(e: React.MouseEvent) {
@@ -1078,8 +1107,7 @@ function ScreenshotThumbnail({ url, siteName }: { url: string; siteName: string 
         }
     }
 
-    // Position overlay above or below the thumbnail, always fit in viewport
-    React.useEffect(() => {
+    useEffect(() => {
         if (hovered && linkRef.current) {
             const rect = linkRef.current.getBoundingClientRect();
             const viewportW = window.innerWidth;
@@ -1106,25 +1134,7 @@ function ScreenshotThumbnail({ url, siteName }: { url: string; siteName: string 
         } else if (!hovered) {
             setOverlayVars({});
         }
-    }, [hovered]);
-
-    // Portal overlay for enlarged preview
-    const overlay = hovered
-        ? createPortal(
-              <div className={`site-details-thumbnail-portal-overlay theme-${themeName}`} style={overlayVars}>
-                  <div className="site-details-thumbnail-portal-img-wrapper">
-                      <img
-                          src={screenshotUrl}
-                          alt={`Large screenshot of ${siteName}`}
-                          className="site-details-thumbnail-img-portal"
-                          loading="lazy"
-                          tabIndex={0}
-                      />
-                  </div>
-              </div>,
-              document.body
-          )
-        : null;
+    }, [hovered, url, siteName]);
     return (
         <>
             <a
@@ -1136,6 +1146,8 @@ function ScreenshotThumbnail({ url, siteName }: { url: string; siteName: string 
                 className="site-details-thumbnail-link"
                 onMouseEnter={() => setHovered(true)}
                 onMouseLeave={() => setHovered(false)}
+                onFocus={() => setHovered(true)}
+                onBlur={() => setHovered(false)}
             >
                 <img
                     src={screenshotUrl}
@@ -1145,7 +1157,22 @@ function ScreenshotThumbnail({ url, siteName }: { url: string; siteName: string 
                 />
                 <span className="site-details-thumbnail-caption">Preview: {siteName}</span>
             </a>
-            {overlay}
+            {hovered &&
+                createPortal(
+                    <div className={`site-details-thumbnail-portal-overlay theme-${themeName}`} style={overlayVars}>
+                        <div className="site-details-thumbnail-portal-img-wrapper">
+                            <img
+                                src={screenshotUrl}
+                                alt={`Large screenshot of ${siteName}`}
+                                className="site-details-thumbnail-img-portal"
+                                loading="lazy"
+                                tabIndex={0}
+                            />
+                        </div>
+                    </div>,
+                    document.body
+                )
+            }
         </>
     );
 }

@@ -3,7 +3,7 @@ import axios from "axios";
 import { JSONFilePreset } from "lowdb/node";
 import path from "path";
 import { app } from "electron";
-import { Site, StatusHistory, StatusUpdate } from "./types";
+import { Site, StatusHistory, StatusUpdate, Monitor, MonitorType } from "./types";
 import log from "electron-log/main";
 
 // Default timeout for HTTP requests (10 seconds)
@@ -65,20 +65,51 @@ export class UptimeMonitor extends EventEmitter {
         const sites = this.db.data.sites || [];
 
         for (const siteData of sites) {
-            const site: Site = {
-                ...siteData,
-                lastChecked: siteData.lastChecked ? new Date(siteData.lastChecked) : undefined,
-            };
+            // MIGRATION: Convert legacy flat fields to monitors array if needed
+            let site: Site;
+            if (Array.isArray(siteData.monitors)) {
+                // Already new format
+                site = {
+                    ...siteData,
+                    monitors: siteData.monitors.map((m: any) => ({
+                        ...m,
+                        lastChecked: m.lastChecked ? new Date(m.lastChecked) : undefined,
+                        history: m.history || [],
+                    })),
+                };
+            } else {
+                // Legacy: migrate flat fields to monitors array
+                site = {
+                    ...siteData,
+                    monitors: [{
+                        type: siteData.monitorType || "http",
+                        status: siteData.status || "pending",
+                        responseTime: siteData.responseTime,
+                        lastChecked: siteData.lastChecked ? new Date(siteData.lastChecked) : undefined,
+                        history: siteData.history || [],
+                    }],
+                };
+            }
             this.sites.set(site.url, site);
         }
 
         // Load settings
         this.checkInterval = this.db.data.settings?.checkInterval || 60000;
-        this.historyLimit = this.db.data.settings?.historyLimit || 100;
+        if (typeof this.db.data.settings?.historyLimit === "number") {
+            this.historyLimit = this.db.data.settings.historyLimit;
+        }
     }
 
     private async saveSites() {
-        const sitesArray = Array.from(this.sites.values());
+        // Save only new format
+        const sitesArray = Array.from(this.sites.values()).map((site) => ({
+            ...site,
+            monitors: site.monitors.map((m) => ({
+                ...m,
+                // Ensure lastChecked is serializable
+                lastChecked: m.lastChecked ? new Date(m.lastChecked).toISOString() : undefined,
+            })),
+        }));
         this.db.data.sites = sitesArray;
         this.db.data.settings = {
             checkInterval: this.checkInterval,
@@ -87,22 +118,23 @@ export class UptimeMonitor extends EventEmitter {
         await this.db.write();
     }
 
-    public async addSite(siteData: Omit<Site, "id" | "status" | "history">): Promise<Site> {
+    public async addSite(siteData: Omit<Site, "id" | "monitors"> & { monitors?: Monitor[] }): Promise<Site> {
         logger.info(`Adding new site: ${siteData.url}`);
-
+        const id = Date.now().toString();
+        const monitors = siteData.monitors && siteData.monitors.length > 0
+            ? siteData.monitors.map((m) => ({ ...m, history: m.history || [] }))
+            : [{ type: ("http" as MonitorType), status: "pending" as "pending", history: [] }];
         const site: Site = {
-            id: Date.now().toString(),
+            id,
             ...siteData,
-            status: "pending",
-            history: [],
+            monitors,
         };
-
         this.sites.set(site.url, site);
         await this.saveSites();
-
-        // Initial check
-        await this.checkSite(site);
-
+        // Initial check for all monitors
+        for (const monitor of site.monitors) {
+            await this.checkMonitor(site, monitor.type);
+        }
         logger.info(`Site added successfully: ${site.url} (${site.name || "unnamed"})`);
         return site;
     }
@@ -140,19 +172,19 @@ export class UptimeMonitor extends EventEmitter {
     }
 
     public setHistoryLimit(limit: number) {
-        // Allow unlimited if limit is 0 or negative, otherwise clamp to at least 10
         if (limit <= 0) {
-            this.historyLimit = 0; // 0 means unlimited
+            this.historyLimit = 0;
         } else {
             this.historyLimit = Math.max(10, limit);
         }
         this.saveSites();
-
-        // Trim existing history for all sites only if limit > 0
+        // Trim existing history for all monitors only if limit > 0
         if (this.historyLimit > 0) {
             for (const site of this.sites.values()) {
-                if (site.history.length > this.historyLimit) {
-                    site.history = site.history.slice(0, this.historyLimit);
+                for (const monitor of site.monitors) {
+                    if (monitor.history.length > this.historyLimit) {
+                        monitor.history = monitor.history.slice(0, this.historyLimit);
+                    }
                 }
             }
             this.saveSites();
@@ -192,75 +224,73 @@ export class UptimeMonitor extends EventEmitter {
 
     private async checkAllSites() {
         logger.debug(`Checking ${this.sites.size} sites`);
-        const promises = Array.from(this.sites.values()).map((site) => this.checkSite(site));
+        const promises = Array.from(this.sites.values()).flatMap((site) =>
+            site.monitors.map((monitor) => this.checkMonitor(site, monitor.type))
+        );
         await Promise.allSettled(promises);
     }
 
-    private async checkSite(site: Site) {
+    private async checkMonitor(site: Site, monitorType: MonitorType) {
+        const monitor = site.monitors.find((m) => m.type === monitorType);
+        if (!monitor) return;
         const startTime = Date.now();
         let newStatus: "up" | "down" = "down";
         let responseTime = 0;
-
         try {
-            await axios.get(site.url, {
-                timeout: DEFAULT_REQUEST_TIMEOUT,
-                validateStatus: (status: number) => status < 500, // Consider 4xx as "up"
-            });
-
-            responseTime = Date.now() - startTime;
-            newStatus = "up";
+            if (monitorType === "http") {
+                await axios.get(site.url, {
+                    timeout: DEFAULT_REQUEST_TIMEOUT,
+                    validateStatus: (status: number) => status < 500,
+                });
+                responseTime = Date.now() - startTime;
+                newStatus = "up";
+            } else if (monitorType === "port") {
+                // Placeholder for port check
+                responseTime = Date.now() - startTime;
+                newStatus = "down";
+            }
         } catch (error) {
             responseTime = Date.now() - startTime;
             newStatus = "down";
         }
-
-        const previousStatus = site.status;
+        const previousStatus = monitor.status;
         const now = new Date();
-
-        // Update site
-        site.status = newStatus;
-        site.responseTime = responseTime;
-        site.lastChecked = now;
-
+        // Update monitor
+        monitor.status = newStatus;
+        monitor.responseTime = responseTime;
+        monitor.lastChecked = now;
         // Add to history
         const historyEntry: StatusHistory = {
             timestamp: now.getTime(),
             status: newStatus,
             responseTime,
         };
-
-        site.history.unshift(historyEntry); // Add to beginning for newest first
-        if (this.historyLimit > 0 && site.history.length > this.historyLimit) {
-            site.history = site.history.slice(0, this.historyLimit);
+        monitor.history.unshift(historyEntry);
+        if (this.historyLimit > 0 && monitor.history.length > this.historyLimit) {
+            monitor.history = monitor.history.slice(0, this.historyLimit);
         }
-
-        // Save to database
-        this.saveSites();
-
-        // Emit events
+        await this.saveSites();
+        // Emit StatusUpdate with new Site shape
         const statusUpdate: StatusUpdate = {
-            site: { ...site },
+            site: { ...site, monitors: site.monitors.map((m) => ({ ...m })) },
             previousStatus,
         };
-
         this.emit("status-update", statusUpdate);
-
         if (previousStatus === "up" && newStatus === "down") {
             this.emit("site-down", site);
         } else if (previousStatus === "down" && newStatus === "up") {
             this.emit("site-up", site);
         }
-
         return statusUpdate;
     }
 
-    public async checkSiteManually(url: string): Promise<StatusUpdate | null> {
+    public async checkSiteManually(url: string, monitorType: MonitorType = "http"): Promise<StatusUpdate | null> {
         const site = this.sites.get(url);
         if (!site) {
             throw new Error(`Site with URL ${url} not found`);
         }
-
-        return await this.checkSite(site);
+        const result = await this.checkMonitor(site, monitorType);
+        return result || null;
     }
 
     public async updateSite(url: string, updates: Partial<Site>): Promise<Site> {
@@ -268,11 +298,14 @@ export class UptimeMonitor extends EventEmitter {
         if (!site) {
             throw new Error(`Site not found: ${url}`);
         }
-
-        const updatedSite = { ...site, ...updates };
+        // Only update allowed fields
+        const updatedSite: Site = {
+            ...site,
+            ...updates,
+            monitors: updates.monitors || site.monitors,
+        };
         this.sites.set(url, updatedSite);
         await this.saveSites();
-
         return updatedSite;
     }
 

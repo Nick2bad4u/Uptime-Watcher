@@ -1,11 +1,26 @@
-export interface Site {
-    id: string;
-    name?: string;
-    url: string;
+export type UpdateStatus = "idle" | "checking" | "available" | "downloading" | "downloaded" | "error";
+
+export type MonitorType = "http" | "port";
+
+export interface Monitor {
+    type: MonitorType;
     status: "up" | "down" | "pending";
     responseTime?: number;
     lastChecked?: Date;
     history: StatusHistory[];
+}
+
+export interface Site {
+    id: string;
+    name?: string;
+    url: string;
+    monitors: Monitor[];
+    // Legacy fields for migration:
+    // monitorType?: MonitorType;
+    // status?: "up" | "down" | "pending";
+    // responseTime?: number;
+    // lastChecked?: Date;
+    // history?: StatusHistory[];
 }
 
 export interface StatusHistory {
@@ -23,11 +38,12 @@ export interface StatusUpdate {
 declare global {
     interface Window {
         electronAPI: {
-            addSite: (site: Omit<Site, "id" | "status" | "history">) => Promise<Site>;
+            // Now expects Site shape with monitors: Monitor[]
+            addSite: (site: Omit<Site, "id">) => Promise<Site>;
             removeSite: (url: string) => Promise<boolean>;
             updateSite: (url: string, updates: Partial<Site>) => Promise<Site>;
             getSites: () => Promise<Site[]>;
-            checkSiteNow: (url: string) => Promise<StatusUpdate>;
+            checkSiteNow: (url: string, monitorType: MonitorType) => Promise<StatusUpdate>;
             exportData: () => Promise<string>;
             importData: (data: string) => Promise<boolean>;
             startMonitoring: () => Promise<boolean>;

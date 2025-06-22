@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Site, StatusHistory } from "../types";
+import { Monitor, StatusHistory } from "../types";
 import { CHART_TIME_PERIODS } from "../constants";
 import type { TimePeriod } from "../utils/time";
 import type { Theme } from "../theme/types";
@@ -39,15 +39,15 @@ export interface SiteAnalytics {
 }
 
 /**
- * Advanced hook for site analytics calculations
+ * Advanced hook for monitor analytics calculations
  * Memoizes expensive calculations and provides comprehensive metrics
  */
-export function useSiteAnalytics(site: Site, timeRange: TimePeriod = "24h"): SiteAnalytics {
+export function useSiteAnalytics(monitor: Monitor, timeRange: TimePeriod = "24h"): SiteAnalytics {
     return useMemo(() => {
         // Filter history based on time range
         const now = Date.now();
         const cutoff = now - CHART_TIME_PERIODS[timeRange];
-        const filteredHistory = site.history.filter((record) => record.timestamp >= cutoff);
+        const filteredHistory = monitor.history.filter((record) => record.timestamp >= cutoff);
 
         const totalChecks = filteredHistory.length;
         const upCount = filteredHistory.filter((h) => h.status === "up").length;
@@ -123,16 +123,16 @@ export function useSiteAnalytics(site: Site, timeRange: TimePeriod = "24h"): Sit
             incidentCount: downtimePeriods.length,
             filteredHistory,
         };
-    }, [site.history, timeRange]);
+    }, [monitor.history, timeRange]);
 }
 
 /**
  * Hook for generating chart data
  * Separates data preparation from component logic
  */
-export function useChartData(site: Site, theme: Theme) {
+export function useChartData(monitor: Monitor, theme: Theme) {
     return useMemo(() => {
-        const sortedHistory = [...site.history].sort((a, b) => a.timestamp - b.timestamp);
+        const sortedHistory = [...monitor.history].sort((a, b) => a.timestamp - b.timestamp);
 
         const lineChartData = {
             datasets: [
@@ -160,7 +160,7 @@ export function useChartData(site: Site, theme: Theme) {
         };
 
         return { lineChartData };
-    }, [site.history, theme]);
+    }, [monitor.history, theme]);
 }
 
 /**

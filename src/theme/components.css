@@ -1649,6 +1649,10 @@
 .themed-input:hover,
 .themed-select:hover {
     transform: translateY(-1px);
+}
+
+.themed-input:disabled,
+.themed-select:disabled {
     cursor: not-allowed;
     opacity: 0.6;
 }

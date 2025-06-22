@@ -253,20 +253,10 @@
 }
 
 .site-details-thumbnail-img {
-    width: 144px;
-    height: 108px;
-    border-radius: var(--border-radius-md);
+    width: 128px;
+    height: 128px;
+    border-radius: 16px;
     object-fit: cover;
-    box-shadow: var(--shadow-md);
-    border: 2px solid var(--color-border-focus, var(--color-primary-400)); /* More visible outline */
-    background: var(--color-surface-overlay);
-    flex-shrink: 0;
-    display: block;
-    transition:
-        box-shadow 0.2s,
-        border-color 0.2s;
-    cursor: pointer;
-    object-position: center;
 }
 
 .site-details-thumbnail-caption {

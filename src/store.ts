@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { Site, StatusUpdate } from "./types";
+import { Site, StatusUpdate, Monitor, MonitorType } from "./types";
 import { ThemeName } from "./theme/types";
 import { DEFAULT_CHECK_INTERVAL, TIMEOUT_CONSTRAINTS } from "./constants";
 
@@ -38,7 +38,7 @@ interface AppState {
     totalDowntime: number;
 
     // Synchronized UI state for SiteDetails
-    activeSiteDetailsTab: "overview" | "analytics" | "history" | "settings";
+    activeSiteDetailsTab: string; // Was: "overview" | "analytics" | "history" | "settings"
     siteDetailsChartTimeRange: "1h" | "24h" | "7d" | "30d";
     showAdvancedMetrics: boolean;
 
@@ -48,9 +48,9 @@ interface AppState {
 
     // Actions - Backend integration
     initializeApp: () => Promise<void>;
-    createSite: (siteData: Omit<Site, "id" | "status" | "history">) => Promise<void>;
+    createSite: (siteData: Omit<Site, "id" | "monitors"> & { monitors?: Monitor[] }) => Promise<void>;
     deleteSite: (url: string) => Promise<void>;
-    checkSiteNow: (url: string) => Promise<void>;
+    checkSiteNow: (url: string, monitorType: MonitorType) => Promise<void>;
     modifySite: (url: string, updates: Partial<Site>) => Promise<void>;
     updateCheckIntervalValue: (interval: number) => Promise<void>;
     updateHistoryLimitValue: (limit: number) => Promise<void>;
@@ -82,7 +82,7 @@ interface AppState {
     clearError: () => void;
 
     // Synchronized UI actions
-    setActiveSiteDetailsTab: (tab: "overview" | "analytics" | "history" | "settings") => void;
+    setActiveSiteDetailsTab: (tab: string) => void; // Was: (tab: "overview" | "analytics" | "history" | "settings") => void;
     setSiteDetailsChartTimeRange: (range: "1h" | "24h" | "7d" | "30d") => void;
     setShowAdvancedMetrics: (show: boolean) => void;
 
@@ -150,12 +150,27 @@ export const useStore = create<AppState>()(
                         window.electronAPI.getHistoryLimit(),
                     ]);
 
-                    state.setSites(sites);
+                    // Migrate legacy sites to new monitors[] structure if needed
+                    const migratedSites = sites.map((site: any) => {
+                        if (!site.monitors) {
+                            // Legacy: convert monitorType, status, history to monitors[]
+                            return {
+                                ...site,
+                                monitors: [{
+                                    type: site.monitorType || "http",
+                                    status: site.status,
+                                    history: site.history || [],
+                                }],
+                            };
+                        }
+                        return site;
+                    });
+
+                    state.setSites(migratedSites);
                     state.setCheckInterval(checkInterval);
                     state.updateSettings({ historyLimit });
 
-                    // Start monitoring if we have sites
-                    if (sites.length > 0) {
+                    if (migratedSites.length > 0) {
                         await window.electronAPI.startMonitoring();
                         state.setMonitoring(true);
                     }
@@ -166,17 +181,19 @@ export const useStore = create<AppState>()(
                 }
             },
 
-            createSite: async (siteData: Omit<Site, "id" | "status" | "history">) => {
+            createSite: async (siteData: Omit<Site, "id" | "monitors"> & { monitors?: Monitor[] }) => {
                 const state = get();
                 state.setLoading(true);
                 state.clearError();
 
                 try {
-                    const newSite = await window.electronAPI.addSite(siteData);
+                    // Default to HTTP monitor if none provided
+                    const monitors = siteData.monitors || [{ type: "http", status: "pending", history: [] }];
+                    const newSite = await window.electronAPI.addSite({ ...siteData, monitors });
                     state.addSite(newSite);
                 } catch (error) {
                     state.setError(`Failed to add site: ${(error as Error).message}`);
-                    throw error; // Re-throw to allow component handling
+                    throw error;
                 } finally {
                     state.setLoading(false);
                 }
@@ -198,12 +215,11 @@ export const useStore = create<AppState>()(
                 }
             },
 
-            checkSiteNow: async (url: string) => {
+            checkSiteNow: async (url: string, monitorType: MonitorType) => {
                 const state = get();
                 state.clearError();
-
                 try {
-                    const statusUpdate = await window.electronAPI.checkSiteNow(url);
+                    const statusUpdate = await window.electronAPI.checkSiteNow(url, monitorType);
                     state.updateSiteStatus(statusUpdate);
                 } catch (error) {
                     state.setError(`Failed to check site: ${(error as Error).message}`);
@@ -321,30 +337,41 @@ export const useStore = create<AppState>()(
             addSite: (site: Site) =>
                 set((state) => {
                     const newSites = [...state.sites, site];
-                    // Force persistence by updating the state
-                    return {
-                        sites: newSites,
-                    };
+                    return { sites: newSites };
                 }),
 
             removeSite: (url: string) =>
                 set((state) => ({
                     sites: state.sites.filter((site) => site.url !== url),
-                    // Clear selected site if it's being removed
                     selectedSite: state.selectedSite?.url === url ? null : state.selectedSite,
                     showSiteDetails: state.selectedSite?.url === url ? false : state.showSiteDetails,
                 })),
 
             updateSiteStatus: (update: StatusUpdate) =>
                 set((state) => {
-                    const updatedSites = state.sites.map((site) => (site.url === update.site.url ? update.site : site));
+                    // update.site: { url, monitors }
+                    const updatedSites = state.sites.map((site) => {
+                        if (site.url !== update.site.url) return site;
+                        // Merge monitors by type
+                        const updatedMonitors = site.monitors.map((monitor: Monitor) => {
+                            const updated = update.site.monitors.find((m: Monitor) => m.type === monitor.type);
+                            return updated ? { ...monitor, ...updated } : monitor;
+                        });
+                        // Add any new monitor types from update
+                        update.site.monitors.forEach((m: Monitor) => {
+                            if (!updatedMonitors.find((um) => um.type === m.type)) {
+                                updatedMonitors.push(m);
+                            }
+                        });
+                        return { ...site, monitors: updatedMonitors };
+                    });
 
                     // Update selected site if it matches
                     const updatedSelectedSite =
                         state.selectedSite?.url === update.site.url ? update.site : state.selectedSite;
 
-                    // Calculate uptime/downtime statistics
-                    const allHistory = updatedSites.flatMap((site) => site.history);
+                    // Calculate uptime/downtime statistics (all monitors)
+                    const allHistory = updatedSites.flatMap((site) => site.monitors.flatMap((m) => m.history));
                     const totalUptime = allHistory.filter((h) => h.status === "up").length;
                     const totalDowntime = allHistory.filter((h) => h.status === "down").length;
 
@@ -359,11 +386,8 @@ export const useStore = create<AppState>()(
             updateSite: (url: string, updates: Partial<Site>) =>
                 set((state) => {
                     const updatedSites = state.sites.map((site) => (site.url === url ? { ...site, ...updates } : site));
-
-                    // Update selected site if it matches
                     const updatedSelectedSite =
                         state.selectedSite?.url === url ? { ...state.selectedSite, ...updates } : state.selectedSite;
-
                     return {
                         sites: updatedSites,
                         selectedSite: updatedSelectedSite,
@@ -425,7 +449,7 @@ export const useStore = create<AppState>()(
             clearError: () => set({ lastError: null }),
 
             // Synchronized UI actions
-            setActiveSiteDetailsTab: (tab: "overview" | "analytics" | "history" | "settings") =>
+            setActiveSiteDetailsTab: (tab: string) =>
                 set({ activeSiteDetailsTab: tab }),
             setSiteDetailsChartTimeRange: (range: "1h" | "24h" | "7d" | "30d") =>
                 set({ siteDetailsChartTimeRange: range }),

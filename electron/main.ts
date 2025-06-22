@@ -143,8 +143,8 @@ class Main {
             return true;
         });
 
-        ipcMain.handle("check-site-now", async (_, url) => {
-            return this.uptimeMonitor.checkSiteManually(url);
+        ipcMain.handle("check-site-now", async (_, url, monitorType) => {
+            return this.uptimeMonitor.checkSiteManually(url, monitorType);
         });
 
         ipcMain.handle("export-data", async () => {
@@ -161,8 +161,9 @@ class Main {
 
         // Listen for status updates from monitor
         this.uptimeMonitor.on("status-update", (data: StatusUpdate) => {
+            const monitorStatuses = data.site.monitors.map(m => `${m.type}: ${m.status}${m.responseTime ? ` (${m.responseTime}ms)` : ""}`).join(", ");
             logger.debug(
-                `Status update for ${data.site.url}: ${data.site.status}${data.site.responseTime ? ` (${data.site.responseTime}ms)` : ""}`
+                `Status update for ${data.site.url}: ${monitorStatuses}`
             );
             this.mainWindow?.webContents.send("status-update", data);
         });
