@@ -1,301 +1,301 @@
 {
-    "name": "uptime-watcher",
-    "packageManager": "npm@11.4.2",
-    "version": "1.8.10",
-    "description": "An Electron app to monitor website uptime status",
-    "main": "dist-electron/main.js",
-    "appid": "io.github.uptime-watcher",
-    "type": "commonjs",
-    "homepage": "https://github.com/Nick2bad4u/Uptime-Watcher",
-    "maintainers": [
-        {
-            "name": "Nick2bad4u",
-            "email": "20943337+Nick2bad4u@users.noreply.github.com"
-        }
+  "name": "uptime-watcher",
+  "packageManager": "npm@11.4.2",
+  "version": "1.8.11",
+  "description": "An Electron app to monitor website uptime status",
+  "main": "dist-electron/main.js",
+  "appid": "io.github.uptime-watcher",
+  "type": "commonjs",
+  "homepage": "https://github.com/Nick2bad4u/Uptime-Watcher",
+  "maintainers": [
+    {
+      "name": "Nick2bad4u",
+      "email": "20943337+Nick2bad4u@users.noreply.github.com"
+    }
+  ],
+  "os": [
+    "windows",
+    "linux",
+    "mac",
+    "macOS",
+    "win64",
+    "win64-exe",
+    "win64-squirrel",
+    "win64-msi",
+    "win64-zip",
+    "win64-7z",
+    "win64-nsis",
+    "win64-nsis-web",
+    "win64-portable",
+    "win64-tar.bz2",
+    "win64-tar.gz",
+    "win64-tar.xz",
+    "win32",
+    "win32-exe",
+    "win32-squirrel",
+    "win32-msi",
+    "win32-zip",
+    "win32-7z",
+    "win32-nsis",
+    "win32-nsis-web",
+    "win32-portable",
+    "win32-tar.bz2",
+    "win32-tar.gz",
+    "win32-tar.xz",
+    "mac-x64-dmg",
+    "mac-x64-pkg",
+    "mac-x64-tar.xz",
+    "mac-x64-tar.gz",
+    "mac-x64-tar.bz2",
+    "mac-arm64-dmg",
+    "mac-arm64-pkg",
+    "mac-arm64-tar.xz",
+    "mac-arm64-tar.gz",
+    "mac-arm64-tar.bz2",
+    "darwin",
+    "freebsd",
+    "apk",
+    "pacman",
+    "deb",
+    "rpm",
+    "snap"
+  ],
+  "scripts": {
+    "start": "npm run dev",
+    "start-both": "concurrently \"npm run dev\" \"npm run electron-dev\"",
+    "dev": "vite",
+    "build": "vite build && electron-builder",
+    "preview": "vite preview",
+    "electron": "wait-on tcp:5173 && electron .",
+    "electron-dev": "concurrently \"npm run dev\" \"npm run electron\"",
+    "electron-pack": "electron-builder",
+    "dist": "npm run build && electron-builder --publish=never"
+  },
+  "keywords": [
+    "electron",
+    "react",
+    "uptime",
+    "monitoring"
+  ],
+  "author": "Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> (https://Uptime-Watcher.typpi.online)",
+  "contributors": [
+    {
+      "name": "Nick2bad4u",
+      "email": "20943337+Nick2bad4u@users.noreply.github.com",
+      "url": "https://github.com/Nick2bad4u"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Nick2bad4u/Uptime-Watcher.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Nick2bad4u/Uptime-Watcher/issues",
+    "email": "20943337+Nick2bad4u@users.noreply.github.com"
+  },
+  "license": "Unlicense",
+  "readme": "README.md",
+  "icon": "icons/favicon.ico",
+  "devDependencies": {
+    "@eslint/css": "^0.9.0",
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.2.0",
+    "@eslint/json": "^0.12.0",
+    "@eslint/markdown": "^6.6.0",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@typescript-eslint/eslint-plugin": "^8.34.1",
+    "@typescript-eslint/parser": "^8.34.1",
+    "@vitejs/plugin-react": "^4.5.2",
+    "autoprefixer": "^10.4.21",
+    "concurrently": "^9.1.2",
+    "electron": "^36.5.0",
+    "electron-builder": "^26.0.17",
+    "eslint": "^9.2.0",
+    "eslint-config": "^0.1.0",
+    "eslint-plugin-eslint-comments": "^3.2.0",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-perfectionist": "^4.15.0",
+    "eslint-plugin-prettier": "^5.5.0",
+    "eslint-plugin-promise": "^7.2.1",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-security": "^3.0.1",
+    "eslint-plugin-sonarjs": "^3.0.3",
+    "eslint-plugin-unused-imports": "^4.1.4",
+    "globals": "^16.2.0",
+    "jscpd": "^4.0.5",
+    "markdown-link-check": "^3.11.1",
+    "markdownlint": "^0.38.0",
+    "postcss": "^8.5.6",
+    "prettier": "^3.2.5",
+    "stylelint": "^16.4.2",
+    "stylelint-config-recommended": "^16.0.0",
+    "stylelint-config-standard": "38.0.0",
+    "stylelint-config-tailwindcss": "^1.0.0",
+    "stylelint-order": "^7.0.0",
+    "tailwindcss": "4.1.10",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.34.1",
+    "vite": "^6.3.5",
+    "vite-plugin-electron": "^0.29.0",
+    "wait-on": "^8.0.3"
+  },
+  "dependencies": {
+    "@tailwindcss/postcss": "^4.1.10",
+    "axios": "^1.10.0",
+    "chart.js": "^4.5.0",
+    "chartjs-adapter-date-fns": "^3.0.0",
+    "chartjs-plugin-zoom": "^2.2.0",
+    "electron-log": "^5.4.1",
+    "electron-updater": "^6.6.2",
+    "is-port-reachable": "^4.0.0",
+    "lowdb": "^7.0.1",
+    "react": "^19.1.0",
+    "react-chartjs-2": "^5.3.0",
+    "react-dom": "^19.1.0",
+    "react-icons": "^5.5.0",
+    "zustand": "^5.0.5"
+  },
+  "build": {
+    "icon": "icons/favicon.ico",
+    "appId": "io.github.uptime-watcher",
+    "artifactName": "Uptime-Watcher-${platform}-${arch}-${version}.${ext}",
+    "asar": true,
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "Nick2bad4u",
+        "repo": "Uptime-Watcher"
+      }
     ],
-    "os": [
-        "windows",
-        "linux",
-        "mac",
-        "macOS",
-        "win64",
-        "win64-exe",
-        "win64-squirrel",
-        "win64-msi",
-        "win64-zip",
-        "win64-7z",
-        "win64-nsis",
-        "win64-nsis-web",
-        "win64-portable",
-        "win64-tar.bz2",
-        "win64-tar.gz",
-        "win64-tar.xz",
-        "win32",
-        "win32-exe",
-        "win32-squirrel",
-        "win32-msi",
-        "win32-zip",
-        "win32-7z",
-        "win32-nsis",
-        "win32-nsis-web",
-        "win32-portable",
-        "win32-tar.bz2",
-        "win32-tar.gz",
-        "win32-tar.xz",
-        "mac-x64-dmg",
-        "mac-x64-pkg",
-        "mac-x64-tar.xz",
-        "mac-x64-tar.gz",
-        "mac-x64-tar.bz2",
-        "mac-arm64-dmg",
-        "mac-arm64-pkg",
-        "mac-arm64-tar.xz",
-        "mac-arm64-tar.gz",
-        "mac-arm64-tar.bz2",
-        "darwin",
-        "freebsd",
-        "apk",
-        "pacman",
+    "productName": "Uptime-Watcher",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "dist-electron/**/*",
+      "dist/**/*",
+      "node_modules/**/*",
+      "!node_modules/@tailwindcss/oxide-*",
+      "!node_modules/@tailwindcss/oxide-*/**",
+      "!dist/mac-universal-*",
+      "!dist/*.app",
+      "!dist/*.dmg",
+      "!dist/*.zip"
+    ],
+    "win": {
+      "icon": "icons/favicon-256x256.ico",
+      "target": [
+        "nsis",
+        "nsis-web",
+        "zip",
+        "7z",
+        "portable",
+        "squirrel",
+        "msi",
+        "tar.xz",
+        "tar.gz",
+        "tar.bz2"
+      ],
+      "legalTrademarks": "Fit File Viewer",
+      "requestedExecutionLevel": "asInvoker"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "runAfterFinish": true,
+      "artifactName": "Uptime-Watcher-nsis-${arch}-${version}.${ext}"
+    },
+    "nsisWeb": {
+      "artifactName": "Uptime-Watcher-nsis-web-${arch}-${version}.${ext}"
+    },
+    "portable": {
+      "artifactName": "Uptime-Watcher-portable-${arch}-${version}.${ext}"
+    },
+    "squirrelWindows": {
+      "artifactName": "Uptime-Watcher-squirrel-${arch}-${version}.${ext}"
+    },
+    "msi": {
+      "artifactName": "Uptime-Watcher-msi-${arch}-${version}.${ext}"
+    },
+    "appImage": {
+      "artifactName": "Uptime-Watcher-appimage-${arch}-${version}.${ext}"
+    },
+    "deb": {
+      "artifactName": "Uptime-Watcher-deb-${arch}-${version}.${ext}"
+    },
+    "rpm": {
+      "artifactName": "Uptime-Watcher-rpm-${arch}-${version}.${ext}"
+    },
+    "snap": {
+      "artifactName": "Uptime-Watcher-snap-${arch}-${version}.${ext}"
+    },
+    "freebsd": {
+      "artifactName": "Uptime-Watcher-freebsd-${arch}-${version}.${ext}"
+    },
+    "pacman": {
+      "artifactName": "Uptime-Watcher-pacman-${arch}-${version}.${ext}"
+    },
+    "p5p": {
+      "artifactName": "Uptime-Watcher-p5p-${arch}-${version}.${ext}"
+    },
+    "apk": {
+      "artifactName": "Uptime-Watcher-apk-${arch}-${version}.${ext}"
+    },
+    "dmg": {
+      "artifactName": "Uptime-Watcher-dmg-${arch}-${version}.${ext}"
+    },
+    "pkg": {
+      "artifactName": "Uptime-Watcher-pkg-${arch}-${version}.${ext}"
+    },
+    "flatpak": {
+      "artifactName": "Uptime-Watcher-flatpak-${arch}-${version}.${ext}"
+    },
+    "mac": {
+      "icon": "icons/favicon-512x512.icns",
+      "target": [
+        "dmg",
+        "zip",
+        "pkg",
+        "tar.xz",
+        "tar.gz",
+        "tar.bz2"
+      ],
+      "category": "public.app-category.productivity",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": true,
+      "x64ArchFiles": "Contents/Resources/app.asar.unpacked/node_modules/lightningcss-darwin-arm64/**"
+    },
+    "linux": {
+      "icon": "icons/favicon-256x256.png",
+      "target": [
+        "AppImage",
         "deb",
         "rpm",
-        "snap"
-    ],
-    "scripts": {
-        "start": "npm run dev",
-        "start-both": "concurrently \"npm run dev\" \"npm run electron-dev\"",
-        "dev": "vite",
-        "build": "vite build && electron-builder",
-        "preview": "vite preview",
-        "electron": "wait-on tcp:5173 && electron .",
-        "electron-dev": "concurrently \"npm run dev\" \"npm run electron\"",
-        "electron-pack": "electron-builder",
-        "dist": "npm run build && electron-builder --publish=never"
-    },
-    "keywords": [
-        "electron",
-        "react",
-        "uptime",
-        "monitoring"
-    ],
-    "author": "Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> (https://Uptime-Watcher.typpi.online)",
-    "contributors": [
-        {
-            "name": "Nick2bad4u",
-            "email": "20943337+Nick2bad4u@users.noreply.github.com",
-            "url": "https://github.com/Nick2bad4u"
+        "snap",
+        "freebsd",
+        "pacman",
+        "apk",
+        "zip",
+        "tar.xz",
+        "tar.gz",
+        "tar.bz2"
+      ],
+      "category": "Utility",
+      "synopsis": "A cross-platform Electron app to monitor website uptime status",
+      "maintainer": "Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com>",
+      "desktop": {
+        "entry": {
+          "Name": "Uptime Watcher",
+          "Comment": "View and analyze Website Uptime",
+          "Categories": "Utility;"
         }
-    ],
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/Nick2bad4u/Uptime-Watcher.git"
-    },
-    "bugs": {
-        "url": "https://github.com/Nick2bad4u/Uptime-Watcher/issues",
-        "email": "20943337+Nick2bad4u@users.noreply.github.com"
-    },
-    "license": "Unlicense",
-    "readme": "README.md",
-    "icon": "icons/favicon.ico",
-    "devDependencies": {
-        "@eslint/css": "^0.9.0",
-        "@eslint/eslintrc": "^3.3.1",
-        "@eslint/js": "^9.2.0",
-        "@eslint/json": "^0.12.0",
-        "@eslint/markdown": "^6.6.0",
-        "@types/react": "^19.1.8",
-        "@types/react-dom": "^19.1.6",
-        "@typescript-eslint/eslint-plugin": "^8.34.1",
-        "@typescript-eslint/parser": "^8.34.1",
-        "@vitejs/plugin-react": "^4.5.2",
-        "autoprefixer": "^10.4.21",
-        "concurrently": "^9.1.2",
-        "electron": "^36.5.0",
-        "electron-builder": "^26.0.17",
-        "eslint": "^9.2.0",
-        "eslint-config": "^0.1.0",
-        "eslint-plugin-eslint-comments": "^3.2.0",
-        "eslint-plugin-import": "^2.32.0",
-        "eslint-plugin-jsx-a11y": "^6.10.2",
-        "eslint-plugin-perfectionist": "^4.15.0",
-        "eslint-plugin-prettier": "^5.5.0",
-        "eslint-plugin-promise": "^7.2.1",
-        "eslint-plugin-react": "^7.37.5",
-        "eslint-plugin-react-hooks": "^5.2.0",
-        "eslint-plugin-security": "^3.0.1",
-        "eslint-plugin-sonarjs": "^3.0.3",
-        "eslint-plugin-unused-imports": "^4.1.4",
-        "globals": "^16.2.0",
-        "jscpd": "^4.0.5",
-        "markdown-link-check": "^3.11.1",
-        "markdownlint": "^0.38.0",
-        "postcss": "^8.5.6",
-        "prettier": "^3.2.5",
-        "stylelint": "^16.4.2",
-        "stylelint-config-recommended": "^16.0.0",
-        "stylelint-config-standard": "38.0.0",
-        "stylelint-config-tailwindcss": "^1.0.0",
-        "stylelint-order": "^7.0.0",
-        "tailwindcss": "4.1.10",
-        "typescript": "^5.8.3",
-        "typescript-eslint": "^8.34.1",
-        "vite": "^6.3.5",
-        "vite-plugin-electron": "^0.29.0",
-        "wait-on": "^8.0.3"
-    },
-    "dependencies": {
-        "@tailwindcss/postcss": "^4.1.10",
-        "axios": "^1.10.0",
-        "chart.js": "^4.5.0",
-        "chartjs-adapter-date-fns": "^3.0.0",
-        "chartjs-plugin-zoom": "^2.2.0",
-        "electron-log": "^5.4.1",
-        "electron-updater": "^6.6.2",
-        "is-port-reachable": "^4.0.0",
-        "lowdb": "^7.0.1",
-        "react": "^19.1.0",
-        "react-chartjs-2": "^5.3.0",
-        "react-dom": "^19.1.0",
-        "react-icons": "^5.5.0",
-        "zustand": "^5.0.5"
-    },
-    "build": {
-        "icon": "icons/favicon.ico",
-        "appId": "io.github.uptime-watcher",
-        "artifactName": "Uptime-Watcher-${platform}-${arch}-${version}.${ext}",
-        "asar": true,
-        "publish": [
-            {
-                "provider": "github",
-                "owner": "Nick2bad4u",
-                "repo": "Uptime-Watcher"
-            }
-        ],
-        "productName": "Uptime-Watcher",
-        "directories": {
-            "output": "dist"
-        },
-        "files": [
-            "dist-electron/**/*",
-            "dist/**/*",
-            "node_modules/**/*",
-            "!node_modules/@tailwindcss/oxide-*",
-            "!node_modules/@tailwindcss/oxide-*/**",
-            "!dist/mac-universal-*",
-            "!dist/*.app",
-            "!dist/*.dmg",
-            "!dist/*.zip"
-        ],
-        "win": {
-            "icon": "icons/favicon-256x256.ico",
-            "target": [
-                "nsis",
-                "nsis-web",
-                "zip",
-                "7z",
-                "portable",
-                "squirrel",
-                "msi",
-                "tar.xz",
-                "tar.gz",
-                "tar.bz2"
-            ],
-            "legalTrademarks": "Fit File Viewer",
-            "requestedExecutionLevel": "asInvoker"
-        },
-        "nsis": {
-            "oneClick": false,
-            "allowElevation": true,
-            "allowToChangeInstallationDirectory": true,
-            "createDesktopShortcut": true,
-            "createStartMenuShortcut": true,
-            "runAfterFinish": true,
-            "artifactName": "Uptime-Watcher-nsis-${arch}-${version}.${ext}"
-        },
-        "nsisWeb": {
-            "artifactName": "Uptime-Watcher-nsis-web-${arch}-${version}.${ext}"
-        },
-        "portable": {
-            "artifactName": "Uptime-Watcher-portable-${arch}-${version}.${ext}"
-        },
-        "squirrelWindows": {
-            "artifactName": "Uptime-Watcher-squirrel-${arch}-${version}.${ext}"
-        },
-        "msi": {
-            "artifactName": "Uptime-Watcher-msi-${arch}-${version}.${ext}"
-        },
-        "appImage": {
-            "artifactName": "Uptime-Watcher-appimage-${arch}-${version}.${ext}"
-        },
-        "deb": {
-            "artifactName": "Uptime-Watcher-deb-${arch}-${version}.${ext}"
-        },
-        "rpm": {
-            "artifactName": "Uptime-Watcher-rpm-${arch}-${version}.${ext}"
-        },
-        "snap": {
-            "artifactName": "Uptime-Watcher-snap-${arch}-${version}.${ext}"
-        },
-        "freebsd": {
-            "artifactName": "Uptime-Watcher-freebsd-${arch}-${version}.${ext}"
-        },
-        "pacman": {
-            "artifactName": "Uptime-Watcher-pacman-${arch}-${version}.${ext}"
-        },
-        "p5p": {
-            "artifactName": "Uptime-Watcher-p5p-${arch}-${version}.${ext}"
-        },
-        "apk": {
-            "artifactName": "Uptime-Watcher-apk-${arch}-${version}.${ext}"
-        },
-        "dmg": {
-            "artifactName": "Uptime-Watcher-dmg-${arch}-${version}.${ext}"
-        },
-        "pkg": {
-            "artifactName": "Uptime-Watcher-pkg-${arch}-${version}.${ext}"
-        },
-        "flatpak": {
-            "artifactName": "Uptime-Watcher-flatpak-${arch}-${version}.${ext}"
-        },
-        "mac": {
-            "icon": "icons/favicon-512x512.icns",
-            "target": [
-                "dmg",
-                "zip",
-                "pkg",
-                "tar.xz",
-                "tar.gz",
-                "tar.bz2"
-            ],
-            "category": "public.app-category.productivity",
-            "hardenedRuntime": true,
-            "gatekeeperAssess": true,
-            "x64ArchFiles": "Contents/Resources/app.asar.unpacked/node_modules/lightningcss-darwin-arm64/**"
-        },
-        "linux": {
-            "icon": "icons/favicon-256x256.png",
-            "target": [
-                "AppImage",
-                "deb",
-                "rpm",
-                "snap",
-                "freebsd",
-                "pacman",
-                "apk",
-                "zip",
-                "tar.xz",
-                "tar.gz",
-                "tar.bz2"
-            ],
-            "category": "Utility",
-            "synopsis": "A cross-platform Electron app to monitor website uptime status",
-            "maintainer": "Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com>",
-            "desktop": {
-                "entry": {
-                    "Name": "Uptime Watcher",
-                    "Comment": "View and analyze Website Uptime",
-                    "Categories": "Utility;"
-                }
-            }
-        }
+      }
     }
+  }
 }
