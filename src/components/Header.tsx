@@ -1,84 +1,30 @@
 import { useStore } from "../store";
-import { UI_DELAYS } from "../constants";
-import { ThemedBox, ThemedText, ThemedButton, StatusIndicator, ThemedSelect } from "../theme/components";
+import { ThemedBox, ThemedText, ThemedButton, StatusIndicator } from "../theme/components";
 import { useTheme } from "../theme/useTheme";
 import { useAvailabilityColors } from "../theme/useTheme";
-import { CHECK_INTERVALS } from "../constants";
-import { useState, useEffect } from "react";
-import logger from "../services/logger";
 import "./Header.css";
 
-interface HeaderProps {
-    onStartMonitoring: () => void;
-    onStopMonitoring: () => void;
-}
-
-export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
-    const { isMonitoring, sites, checkInterval, setShowSettings, isLoading, updateCheckIntervalValue } = useStore();
-
+export function Header() {
+    const { sites, setShowSettings } = useStore();
     const { toggleTheme, isDark } = useTheme();
     const { getAvailabilityColor } = useAvailabilityColors();
 
-    // Delayed loading state for button spinners (100ms delay)
-    const [showButtonLoading, setShowButtonLoading] = useState(false);
+    // Count all monitors across all sites by status
+    let upMonitors = 0;
+    let downMonitors = 0;
+    let pendingMonitors = 0;
+    let totalMonitors = 0;
+    sites.forEach((site) => {
+        site.monitors?.forEach((monitor) => {
+            totalMonitors++;
+            if (monitor.status === "up") upMonitors++;
+            else if (monitor.status === "down") downMonitors++;
+            else if (monitor.status === "pending") pendingMonitors++;
+        });
+    });
 
-    useEffect(() => {
-        let timeoutId: NodeJS.Timeout;
-
-        if (isLoading) {
-            // Show button loading after 100ms delay
-            timeoutId = setTimeout(() => {
-                setShowButtonLoading(true);
-            }, UI_DELAYS.LOADING_BUTTON);
-        } else {
-            // Hide button loading immediately when loading stops
-            setShowButtonLoading(false);
-        }
-
-        return () => {
-            if (timeoutId) {
-                clearTimeout(timeoutId);
-            }
-        };
-    }, [isLoading]);
-
-    const upSites = sites.filter((site) => site.status === "up").length;
-    const downSites = sites.filter((site) => site.status === "down").length;
-    const pendingSites = sites.filter((site) => site.status === "pending").length;
-    const totalSites = sites.length;
-
-    // Calculate uptime percentage
-    const uptimePercentage = totalSites > 0 ? Math.round((upSites / totalSites) * 100) : 0;
-
-    const handleIntervalChange = async (interval: number) => {
-        try {
-            await updateCheckIntervalValue(interval);
-            logger.user.settingsChange("checkInterval", checkInterval, interval);
-        } catch (error) {
-            logger.error("Failed to update check interval from header", error);
-            // Error is already handled by the store action
-        }
-    };
-
-    const handleStartMonitoring = async () => {
-        try {
-            await onStartMonitoring();
-            logger.user.action("Started monitoring from header");
-        } catch (error) {
-            logger.error("Failed to start monitoring from header", error);
-            // Error is handled by the calling component
-        }
-    };
-
-    const handleStopMonitoring = async () => {
-        try {
-            await onStopMonitoring();
-            logger.user.action("Stopped monitoring from header");
-        } catch (error) {
-            logger.error("Failed to stop monitoring from header", error);
-            // Error is handled by the calling component
-        }
-    };
+    // Calculate uptime percentage for monitors
+    const uptimePercentage = totalMonitors > 0 ? Math.round((upMonitors / totalMonitors) * 100) : 0;
 
     return (
         <ThemedBox surface="elevated" padding="md" className="shadow-sm border-b" border>
@@ -103,7 +49,7 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
                             className="flex items-center sphace-x-3 transition-all duration-300 min-w-[340px] header-status-summary-box"
                         >
                             {/* Overall Health Badge */}
-                            {totalSites > 0 && (
+                            {totalMonitors > 0 && (
                                 <div
                                     className={`flex items-center space-x-2 px-3 py-1 rounded-md group transition-all duration-200 health-badge`}
                                     data-health-color={getAvailabilityColor(uptimePercentage)}
@@ -128,14 +74,14 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
                                 </div>
                             )}
 
-                            {totalSites > 0 && <div className="w-px h-8 bg-current opacity-20"></div>}
+                            {totalMonitors > 0 && <div className="w-px h-8 bg-current opacity-20"></div>}
 
                             {/* Up Status */}
                             <div className="flex items-center space-x-2 px-2 py-1 rounded-md transition-all duration-200 group status-up-badge">
                                 <StatusIndicator status="up" size="sm" />
                                 <div className="flex flex-col">
                                     <ThemedText size="sm" weight="semibold" variant="primary">
-                                        {upSites}
+                                        {upMonitors}
                                     </ThemedText>
                                     <ThemedText size="xs" variant="secondary" className="leading-none">
                                         Up
@@ -151,7 +97,7 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
                                 <StatusIndicator status="down" size="sm" />
                                 <div className="flex flex-col">
                                     <ThemedText size="sm" weight="semibold" variant="primary">
-                                        {downSites}
+                                        {downMonitors}
                                     </ThemedText>
                                     <ThemedText size="xs" variant="secondary" className="leading-none">
                                         Down
@@ -167,7 +113,7 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
                                 <StatusIndicator status="pending" size="sm" />
                                 <div className="flex flex-col">
                                     <ThemedText size="sm" weight="semibold" variant="primary">
-                                        {pendingSites}
+                                        {pendingMonitors}
                                     </ThemedText>
                                     <ThemedText size="xs" variant="secondary" className="leading-none">
                                         Pending
@@ -176,14 +122,14 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
                             </div>
 
                             {/* Total Sites Badge */}
-                            {totalSites > 0 && (
+                            {totalMonitors > 0 && (
                                 <>
                                     <div className="w-px h-8 bg-current opacity-20"></div>
                                     <div className="flex items-center space-x-2 px-2 py-1 rounded-md bg-opacity-10 total-sites-badge">
                                         <div className="w-2 h-2 rounded-full bg-current opacity-50"></div>
                                         <div className="flex flex-col">
                                             <ThemedText size="sm" weight="semibold" variant="primary">
-                                                {totalSites}
+                                                {totalMonitors}
                                             </ThemedText>
                                             <ThemedText size="xs" variant="secondary" className="leading-none">
                                                 Total
@@ -197,67 +143,6 @@ export function Header({ onStartMonitoring, onStopMonitoring }: HeaderProps) {
 
                     {/* Right: Controls */}
                     <div className="flex items-center gap-3 flex-wrap">
-                        {/* Check Interval Selector */}
-                        <ThemedBox
-                            variant="tertiary"
-                            padding="xs"
-                            rounded="md"
-                            className="flex items-center gap-2 px-3 py-1 header-interval-box"
-                        >
-                            <ThemedText
-                                size="sm"
-                                variant="secondary"
-                                className="text-center flex flex-col items-center"
-                            >
-                                Check every:
-                            </ThemedText>
-                            <ThemedSelect
-                                value={checkInterval}
-                                onChange={(e) => handleIntervalChange(Number(e.target.value))}
-                                disabled={isLoading}
-                                aria-label="Check interval"
-                                className="text-sm min-w-[110px]"
-                            >
-                                {CHECK_INTERVALS.map((interval) => (
-                                    <option key={interval.value} value={interval.value}>
-                                        {interval.label}
-                                    </option>
-                                ))}
-                            </ThemedSelect>
-                        </ThemedBox>
-
-                        {/* Monitoring Controls */}
-                        <ThemedBox
-                            variant="tertiary"
-                            padding="xs"
-                            rounded="md"
-                            className="flex items-center gap-2 px-2 py-1 header-controls-box"
-                        >
-                            {isMonitoring ? (
-                                <ThemedButton
-                                    variant="error"
-                                    size="sm"
-                                    onClick={handleStopMonitoring}
-                                    disabled={isLoading}
-                                    loading={showButtonLoading}
-                                    className="min-w-140"
-                                >
-                                    ⏸️ Stop Monitoring
-                                </ThemedButton>
-                            ) : (
-                                <ThemedButton
-                                    variant="success"
-                                    size="sm"
-                                    onClick={handleStartMonitoring}
-                                    disabled={isLoading}
-                                    loading={showButtonLoading}
-                                    className="min-w-140"
-                                >
-                                    ▶️ Start Monitoring
-                                </ThemedButton>
-                            )}
-                        </ThemedBox>
-
                         {/* Theme Toggle */}
                         <ThemedBox
                             variant="tertiary"

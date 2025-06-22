@@ -13,8 +13,6 @@ electron.contextBridge.exposeInMainWorld("electronAPI", {
   // Monitoring controls
   startMonitoring: () => electron.ipcRenderer.invoke("start-monitoring"),
   stopMonitoring: () => electron.ipcRenderer.invoke("stop-monitoring"),
-  updateCheckInterval: (interval) => electron.ipcRenderer.invoke("update-check-interval", interval),
-  getCheckInterval: () => electron.ipcRenderer.invoke("get-check-interval"),
   updateHistoryLimit: (limit) => electron.ipcRenderer.invoke("update-history-limit", limit),
   getHistoryLimit: () => electron.ipcRenderer.invoke("get-history-limit"),
   // Event listeners
@@ -25,5 +23,8 @@ electron.contextBridge.exposeInMainWorld("electronAPI", {
     electron.ipcRenderer.removeAllListeners(channel);
   },
   // Updater: allow renderer to trigger quitAndInstall
-  quitAndInstall: () => electron.ipcRenderer.send("quit-and-install")
+  quitAndInstall: () => electron.ipcRenderer.send("quit-and-install"),
+  // Per-site monitoring
+  startMonitoringForSite: (url, monitorType) => electron.ipcRenderer.invoke("start-monitoring-for-site", url, monitorType),
+  stopMonitoringForSite: (url, monitorType) => electron.ipcRenderer.invoke("stop-monitoring-for-site", url, monitorType)
 });

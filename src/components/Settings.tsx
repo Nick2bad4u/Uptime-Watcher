@@ -10,8 +10,8 @@ import {
     ThemedCheckbox,
 } from "../theme/components";
 import { useTheme } from "../theme/useTheme";
-import { CHECK_INTERVALS, HISTORY_LIMIT_OPTIONS, TIMEOUT_CONSTRAINTS, UI_DELAYS } from "../constants";
-import { useState, useEffect } from "react";
+import { HISTORY_LIMIT_OPTIONS, TIMEOUT_CONSTRAINTS, UI_DELAYS } from "../constants";
+import { useState, useEffect, useCallback } from "react";
 import logger from "../services/logger";
 
 interface SettingsProps {
@@ -23,14 +23,13 @@ export function Settings({ onClose }: SettingsProps) {
         settings,
         updateSettings,
         resetSettings,
-        checkInterval,
         lastError,
         clearError,
         isLoading,
-        updateCheckIntervalValue,
         updateHistoryLimitValue,
         exportAppData,
         importAppData,
+        syncSitesFromBackend,
     } = useStore();
 
     const { setTheme, availableThemes, isDark } = useTheme();
@@ -62,16 +61,6 @@ export function Settings({ onClose }: SettingsProps) {
         const oldValue = settings[key];
         updateSettings({ [key]: value });
         logger.user.settingsChange(key, oldValue, value);
-    };
-
-    const handleIntervalChange = async (interval: number) => {
-        try {
-            await updateCheckIntervalValue(interval);
-            logger.user.settingsChange("checkInterval", checkInterval, interval);
-        } catch (error) {
-            logger.error("Failed to update check interval from settings", error);
-            // Error is already handled by the store action
-        }
     };
 
     const handleHistoryLimitChange = async (limit: number) => {
@@ -138,6 +127,11 @@ export function Settings({ onClose }: SettingsProps) {
         }
     };
 
+    // Manual Sync Now handler (moved from Header)
+    const handleSyncNow = useCallback(async () => {
+        await syncSitesFromBackend();
+    }, [syncSitesFromBackend]);
+
     return (
         <div className="modal-overlay">
             <ThemedBox surface="overlay" padding="md" rounded="lg" shadow="xl" className="modal-container">
@@ -189,24 +183,6 @@ export function Settings({ onClose }: SettingsProps) {
                             🔍 Monitoring
                         </ThemedText>
                         <div className="space-y-4">
-                            <div>
-                                <ThemedText size="sm" weight="medium" variant="secondary" className="block mb-2">
-                                    Check Interval
-                                </ThemedText>
-                                <ThemedSelect
-                                    value={checkInterval}
-                                    onChange={(e) => handleIntervalChange(Number(e.target.value))}
-                                    disabled={isLoading}
-                                    aria-label="Check interval for monitoring sites"
-                                >
-                                    {CHECK_INTERVALS.map((interval) => (
-                                        <option key={interval.value} value={interval.value}>
-                                            {interval.label}
-                                        </option>
-                                    ))}
-                                </ThemedSelect>
-                            </div>
-
                             <div>
                                 <ThemedText size="sm" weight="medium" variant="secondary" className="block mb-2">
                                     History Limit
@@ -383,6 +359,18 @@ export function Settings({ onClose }: SettingsProps) {
                             📂 Data Management
                         </ThemedText>
                         <div className="space-y-4">
+                            {/* Sync Data Button */}
+                            <ThemedButton
+                                variant="secondary"
+                                size="sm"
+                                onClick={handleSyncNow}
+                                loading={showButtonLoading}
+                                disabled={isLoading}
+                                className="w-full"
+                            >
+                                🔄 Sync Data
+                            </ThemedButton>
+
                             <div>
                                 <ThemedText size="sm" weight="medium" variant="secondary" className="block mb-2">
                                     Export Data

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useStore } from "../store";
-import { UI_DELAYS } from "../constants";
+import { UI_DELAYS, CHECK_INTERVALS } from "../constants";
 import { useTheme } from "../theme/useTheme";
 import { ThemedBox, ThemedText, ThemedButton, ThemedInput, ThemedSelect } from "../theme/components";
 import logger from "../services/logger";
@@ -12,6 +12,7 @@ export function AddSiteForm() {
     const [url, setUrl] = useState("");
     const [name, setName] = useState("");
     const [monitorType, setMonitorType] = useState<"http" | "port">("http");
+    const [checkInterval, setCheckInterval] = useState(CHECK_INTERVALS[6]?.value || 60000); // Default 1 min
 
     // Delayed loading state for button spinner (100ms delay)
     const [showButtonLoading, setShowButtonLoading] = useState(false);
@@ -62,6 +63,7 @@ export function AddSiteForm() {
                         history: [] as Monitor["history"],
                     },
                 ],
+                checkInterval,
             };
 
             await createSite(siteData);
@@ -70,6 +72,7 @@ export function AddSiteForm() {
             setUrl("");
             setName("");
             setMonitorType("http");
+            setCheckInterval(CHECK_INTERVALS[6]?.value || 60000);
             logger.user.action("Added site", { url: url.trim(), name: name.trim(), monitorType });
         } catch (error) {
             // Error is already handled by the store action
@@ -112,11 +115,30 @@ export function AddSiteForm() {
                 </ThemedText>
                 <ThemedSelect
                     value={monitorType}
-                    onChange={e => setMonitorType(e.target.value as "http" | "port")}
+                    onChange={(e) => setMonitorType(e.target.value as "http" | "port")}
                     aria-label="Monitor Type"
                 >
                     <option value="http">HTTP (Website/API)</option>
-                    <option value="port" disabled>Port (Coming Soon)</option>
+                    <option value="port" disabled>
+                        Port (Coming Soon)
+                    </option>
+                </ThemedSelect>
+            </div>
+
+            <div>
+                <ThemedText size="sm" weight="medium" variant="secondary" className="block mb-1">
+                    Check Interval
+                </ThemedText>
+                <ThemedSelect
+                    value={checkInterval}
+                    onChange={(e) => setCheckInterval(Number(e.target.value))}
+                    aria-label="Check Interval"
+                >
+                    {CHECK_INTERVALS.map((interval) => (
+                        <option key={interval.value} value={interval.value}>
+                            {interval.label}
+                        </option>
+                    ))}
                 </ThemedSelect>
             </div>
 
@@ -140,7 +162,10 @@ export function AddSiteForm() {
                         <ThemedButton
                             variant="secondary"
                             size="xs"
-                            onClick={() => { clearError(); setFormError(null); }}
+                            onClick={() => {
+                                clearError();
+                                setFormError(null);
+                            }}
                             className={`error-alert__close ${isDark ? "dark" : ""}`}
                         >
                             ✕

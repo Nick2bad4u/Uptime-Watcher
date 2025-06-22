@@ -10,12 +10,12 @@ import { SiteDetails } from "./components/SiteDetails";
 import { ThemeProvider, ThemedBox, ThemedText, ThemedButton } from "./theme/components";
 import { StatusUpdate } from "./types";
 import logger from "./services/logger";
+import { useBackendFocusSync } from "./hooks/useBackendFocusSync";
 
 function App() {
     const {
         sites,
         showSettings,
-        selectedSite,
         showSiteDetails,
         lastError,
         isLoading,
@@ -23,18 +23,17 @@ function App() {
         updateError,
         // Store actions - backend integration
         initializeApp,
-        startSiteMonitoring,
-        stopSiteMonitoring,
         updateSiteStatus,
         subscribeToStatusUpdates,
         unsubscribeFromStatusUpdates,
+        clearError,
         // UI actions
         setShowSettings,
         setShowSiteDetails,
-        clearError,
         setUpdateStatus,
         setUpdateError,
         applyUpdate,
+        getSelectedSite,
     } = useStore();
 
     const { isDark } = useTheme();
@@ -82,23 +81,10 @@ function App() {
         };
     }, [initializeApp, updateSiteStatus, subscribeToStatusUpdates, unsubscribeFromStatusUpdates]);
 
-    const handleStartMonitoring = async () => {
-        try {
-            await startSiteMonitoring();
-            logger.user.action("Started monitoring");
-        } catch (error) {
-            logger.app.error("start monitoring", error instanceof Error ? error : new Error(String(error)));
-        }
-    };
+    // --- State Sync: Focus only (no polling) ---
+    useBackendFocusSync(false); // Set to true to enable focus-based backend sync
 
-    const handleStopMonitoring = async () => {
-        try {
-            await stopSiteMonitoring();
-            logger.user.action("Stopped monitoring");
-        } catch (error) {
-            logger.app.error("stop monitoring", error instanceof Error ? error : new Error(String(error)));
-        }
-    };
+    const selectedSite = getSelectedSite();
 
     return (
         <ThemeProvider>
@@ -189,7 +175,7 @@ function App() {
                     </div>
                 )}
 
-                <Header onStartMonitoring={handleStartMonitoring} onStopMonitoring={handleStopMonitoring} />
+                <Header />
 
                 <main className="main-container">
                     <div className="grid-layout">

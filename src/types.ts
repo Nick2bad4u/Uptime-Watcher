@@ -8,6 +8,8 @@ export interface Monitor {
     responseTime?: number;
     lastChecked?: Date;
     history: StatusHistory[];
+    monitoring?: boolean; // Per-monitor-type monitoring state
+    checkInterval?: number; // Per-monitor check interval (ms)
 }
 
 export interface Site {
@@ -15,6 +17,7 @@ export interface Site {
     name?: string;
     url: string;
     monitors: Monitor[];
+    checkInterval: number; // Per-site monitoring interval (ms)
     // Legacy fields for migration:
     // monitorType?: MonitorType;
     // status?: "up" | "down" | "pending";
@@ -55,6 +58,8 @@ declare global {
             onStatusUpdate: (callback: (data: StatusUpdate) => void) => void;
             removeAllListeners: (channel: string) => void;
             quitAndInstall?: () => void;
+            startMonitoringForSite: (url: string, monitorType?: MonitorType) => Promise<boolean>;
+            stopMonitoringForSite: (url: string, monitorType?: MonitorType) => Promise<boolean>;
         };
     }
 }

@@ -24944,87 +24944,131 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
     super();
     __publicField(this, "db");
     __publicField(this, "sites", /* @__PURE__ */ new Map());
-    __publicField(this, "checkInterval", 6e4);
-    // 1 minute default
+    __publicField(this, "siteIntervals", /* @__PURE__ */ new Map());
+    // Per-site intervals
     __publicField(this, "historyLimit", 100);
     // Default history limit
-    __publicField(this, "monitoringInterval", null);
     __publicField(this, "isMonitoring", false);
     this.initDatabase();
   }
-  async initDatabase() {
-    const dbPath = require$$1$2.join(require$$1$6.app.getPath("userData"), "uptime.json");
-    const defaultData = {
-      sites: [],
-      settings: {
-        checkInterval: 6e4,
-        historyLimit: 100
+  // Helper: Retry logic for file operations
+  async saveSitesWithRetry(maxRetries = 5, delayMs = 300) {
+    let attempt = 0;
+    let lastError = null;
+    while (attempt < maxRetries) {
+      try {
+        await this.saveSites();
+        return;
+      } catch (error2) {
+        lastError = error2;
+        logger$1.error(`saveSites failed (attempt ${attempt + 1}/${maxRetries})`, error2);
+        await new Promise((res) => setTimeout(res, delayMs));
       }
-    };
-    this.db = await JSONFilePreset(dbPath, defaultData);
-    await this.loadSites();
+      attempt++;
+    }
+    logger$1.error("Persistent DB write failure after retries", lastError);
+    this.emit("db-error", { error: lastError, operation: "saveSites" });
+  }
+  // Helper: Retry logic for loading sites (DB read)
+  async loadSitesWithRetry(maxRetries = 5, delayMs = 300) {
+    let attempt = 0;
+    let lastError = null;
+    while (attempt < maxRetries) {
+      try {
+        await this.loadSites();
+        return;
+      } catch (error2) {
+        lastError = error2;
+        logger$1.error(`loadSites failed (attempt ${attempt + 1}/${maxRetries})`, error2);
+        await new Promise((res) => setTimeout(res, delayMs));
+      }
+      attempt++;
+    }
+    logger$1.error("Persistent DB read failure after retries", lastError);
+    this.emit("db-error", { error: lastError, operation: "loadSites" });
+  }
+  async initDatabase() {
+    try {
+      const dbPath = require$$1$2.join(require$$1$6.app.getPath("userData"), "uptime.json");
+      const defaultData = {
+        sites: [],
+        settings: {
+          checkInterval: 6e4,
+          historyLimit: 100
+        }
+      };
+      this.db = await JSONFilePreset(dbPath, defaultData);
+      await this.loadSitesWithRetry();
+    } catch (error2) {
+      logger$1.error("Failed to initialize database", error2);
+      this.emit("db-error", { error: error2, operation: "initDatabase" });
+    }
   }
   async loadSites() {
-    var _a, _b;
-    await this.db.read();
-    const sites = this.db.data.sites || [];
-    for (const siteData of sites) {
-      let site;
-      if (Array.isArray(siteData.monitors)) {
-        site = {
+    var _a;
+    try {
+      await this.db.read();
+      const sites = this.db.data.sites || [];
+      for (const siteData of sites) {
+        if (!Array.isArray(siteData.monitors)) {
+          throw new Error("Invalid site data: missing monitors array. Please use a clean database.");
+        }
+        const site = {
           ...siteData,
           monitors: siteData.monitors.map((m) => ({
             ...m,
             lastChecked: m.lastChecked ? new Date(m.lastChecked) : void 0,
-            history: m.history || []
-          }))
+            history: m.history || [],
+            monitoring: typeof m.monitoring === "undefined" ? true : m.monitoring
+          })),
+          checkInterval: siteData.checkInterval || 6e4
         };
-      } else {
-        site = {
-          ...siteData,
-          monitors: [{
-            type: siteData.monitorType || "http",
-            status: siteData.status || "pending",
-            responseTime: siteData.responseTime,
-            lastChecked: siteData.lastChecked ? new Date(siteData.lastChecked) : void 0,
-            history: siteData.history || []
-          }]
-        };
+        this.sites.set(site.url, site);
       }
-      this.sites.set(site.url, site);
-    }
-    this.checkInterval = ((_a = this.db.data.settings) == null ? void 0 : _a.checkInterval) || 6e4;
-    if (typeof ((_b = this.db.data.settings) == null ? void 0 : _b.historyLimit) === "number") {
-      this.historyLimit = this.db.data.settings.historyLimit;
+      if (typeof ((_a = this.db.data.settings) == null ? void 0 : _a.historyLimit) === "number") {
+        this.historyLimit = this.db.data.settings.historyLimit;
+      }
+    } catch (error2) {
+      logger$1.error("Failed to load sites from DB", error2);
+      this.emit("db-error", { error: error2, operation: "loadSites" });
     }
   }
   async saveSites() {
-    const sitesArray = Array.from(this.sites.values()).map((site) => ({
-      ...site,
-      monitors: site.monitors.map((m) => ({
-        ...m,
-        // Ensure lastChecked is serializable
-        lastChecked: m.lastChecked ? new Date(m.lastChecked).toISOString() : void 0
-      }))
-    }));
-    this.db.data.sites = sitesArray;
-    this.db.data.settings = {
-      checkInterval: this.checkInterval,
-      historyLimit: this.historyLimit
-    };
-    await this.db.write();
+    try {
+      const sitesArray = Array.from(this.sites.values()).map((site) => ({
+        ...site,
+        monitors: site.monitors.map((m) => ({
+          ...m,
+          lastChecked: m.lastChecked ? new Date(m.lastChecked).toISOString() : void 0,
+          monitoring: typeof m.monitoring === "undefined" ? true : m.monitoring
+        })),
+        checkInterval: site.checkInterval || 6e4
+      }));
+      this.db.data.sites = sitesArray;
+      this.db.data.settings = {
+        historyLimit: this.historyLimit
+      };
+      await this.db.write();
+    } catch (error2) {
+      logger$1.error("Failed to save sites to DB", error2);
+      throw error2;
+    }
   }
   async addSite(siteData) {
     logger$1.info(`Adding new site: ${siteData.url}`);
     const id = Date.now().toString();
-    const monitors = siteData.monitors && siteData.monitors.length > 0 ? siteData.monitors.map((m) => ({ ...m, history: m.history || [] })) : [{ type: "http", status: "pending", history: [] }];
+    const monitors = siteData.monitors && siteData.monitors.length > 0 ? siteData.monitors.map((m) => ({
+      ...m,
+      history: m.history || [],
+      monitoring: typeof m.monitoring === "undefined" ? true : m.monitoring
+    })) : [{ type: "http", status: "pending", history: [], monitoring: true }];
     const site = {
       id,
       ...siteData,
       monitors
     };
     this.sites.set(site.url, site);
-    await this.saveSites();
+    await this.saveSitesWithRetry();
     for (const monitor of site.monitors) {
       await this.checkMonitor(site, monitor.type);
     }
@@ -25035,7 +25079,7 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
     logger$1.info(`Removing site: ${url}`);
     const removed = this.sites.delete(url);
     if (removed) {
-      await this.saveSites();
+      await this.saveSitesWithRetry();
       logger$1.info(`Site removed successfully: ${url}`);
     } else {
       logger$1.warn(`Site not found for removal: ${url}`);
@@ -25045,24 +25089,13 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
   async getSites() {
     return Array.from(this.sites.values());
   }
-  setCheckInterval(interval) {
-    this.checkInterval = interval;
-    this.saveSites();
-    if (this.isMonitoring) {
-      this.stopMonitoring();
-      this.startMonitoring();
-    }
-  }
-  getCheckInterval() {
-    return this.checkInterval;
-  }
   setHistoryLimit(limit) {
     if (limit <= 0) {
       this.historyLimit = 0;
     } else {
       this.historyLimit = Math.max(10, limit);
     }
-    this.saveSites();
+    this.saveSitesWithRetry();
     if (this.historyLimit > 0) {
       for (const site of this.sites.values()) {
         for (const monitor of site.monitors) {
@@ -25071,7 +25104,7 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
           }
         }
       }
-      this.saveSites();
+      this.saveSitesWithRetry();
     }
   }
   getHistoryLimit() {
@@ -25082,29 +25115,70 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
       logger$1.debug("Monitoring already running");
       return;
     }
-    logger$1.info(`Starting monitoring with ${this.sites.size} sites (interval: ${this.checkInterval}ms)`);
+    logger$1.info(`Starting monitoring with ${this.sites.size} sites (per-site intervals)`);
     this.isMonitoring = true;
-    this.monitoringInterval = setInterval(() => {
-      this.checkAllSites();
-    }, this.checkInterval);
-    this.checkAllSites();
+    for (const site of this.sites.values()) {
+      this.startMonitoringForSite(site.url);
+    }
   }
   stopMonitoring() {
-    if (this.monitoringInterval) {
-      logger$1.info("Stopping monitoring");
-      clearInterval(this.monitoringInterval);
-      this.monitoringInterval = null;
-    } else {
-      logger$1.debug("No monitoring interval to stop");
+    for (const interval of this.siteIntervals.values()) {
+      clearInterval(interval);
     }
+    this.siteIntervals.clear();
     this.isMonitoring = false;
+    logger$1.info("Stopped all site monitoring intervals");
   }
-  async checkAllSites() {
-    logger$1.debug(`Checking ${this.sites.size} sites`);
-    const promises2 = Array.from(this.sites.values()).flatMap(
-      (site) => site.monitors.map((monitor) => this.checkMonitor(site, monitor.type))
-    );
-    await Promise.allSettled(promises2);
+  startMonitoringForSite(url, monitorType) {
+    const site = this.sites.get(url);
+    if (site) {
+      if (monitorType) {
+        const intervalKey = `${url}|${monitorType}`;
+        if (this.siteIntervals.has(intervalKey)) {
+          clearInterval(this.siteIntervals.get(intervalKey));
+        }
+        const interval = setInterval(() => {
+          this.checkMonitor(site, monitorType);
+        }, site.checkInterval || 6e4);
+        this.siteIntervals.set(intervalKey, interval);
+        const monitor = site.monitors.find((m) => m.type === monitorType);
+        if (monitor) {
+          monitor.monitoring = true;
+          this.saveSitesWithRetry();
+        }
+        const statusUpdate = {
+          site: { ...site, monitors: site.monitors.map((m) => ({ ...m })) },
+          previousStatus: void 0
+        };
+        this.emit("status-update", statusUpdate);
+        return true;
+      }
+    }
+    return false;
+  }
+  stopMonitoringForSite(url, monitorType) {
+    const site = this.sites.get(url);
+    if (site) {
+      if (monitorType) {
+        const intervalKey = `${url}|${monitorType}`;
+        if (this.siteIntervals.has(intervalKey)) {
+          clearInterval(this.siteIntervals.get(intervalKey));
+          this.siteIntervals.delete(intervalKey);
+        }
+        const monitor = site.monitors.find((m) => m.type === monitorType);
+        if (monitor) {
+          monitor.monitoring = false;
+          this.saveSitesWithRetry();
+        }
+        const statusUpdate = {
+          site: { ...site, monitors: site.monitors.map((m) => ({ ...m })) },
+          previousStatus: void 0
+        };
+        this.emit("status-update", statusUpdate);
+        return true;
+      }
+    }
+    return false;
   }
   async checkMonitor(site, monitorType) {
     const monitor = site.monitors.find((m) => m.type === monitorType);
@@ -25142,16 +25216,16 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
     if (this.historyLimit > 0 && monitor.history.length > this.historyLimit) {
       monitor.history = monitor.history.slice(0, this.historyLimit);
     }
-    await this.saveSites();
+    await this.saveSitesWithRetry();
     const statusUpdate = {
       site: { ...site, monitors: site.monitors.map((m) => ({ ...m })) },
       previousStatus
     };
     this.emit("status-update", statusUpdate);
     if (previousStatus === "up" && newStatus === "down") {
-      this.emit("site-down", site);
+      this.emit("site-monitor-down", { site, monitorType, monitor });
     } else if (previousStatus === "down" && newStatus === "up") {
-      this.emit("site-up", site);
+      this.emit("site-monitor-up", { site, monitorType, monitor });
     }
     return statusUpdate;
   }
@@ -25174,13 +25248,23 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
       monitors: updates.monitors || site.monitors
     };
     this.sites.set(url, updatedSite);
-    await this.saveSites();
+    await this.saveSitesWithRetry();
+    if (typeof updates.checkInterval === "number") {
+      this.stopMonitoringForSite(url);
+      this.startMonitoringForSite(url);
+    }
     return updatedSite;
   }
   // Export/Import functionality
   async exportData() {
-    await this.db.read();
-    return JSON.stringify(this.db.data, null, 2);
+    try {
+      await this.db.read();
+      return JSON.stringify(this.db.data, null, 2);
+    } catch (error2) {
+      logger$1.error("Failed to export data", error2);
+      this.emit("db-error", { error: error2, operation: "exportData" });
+      throw error2;
+    }
   }
   async importData(data) {
     logger$1.info("Importing data");
@@ -25193,6 +25277,7 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
       return true;
     } catch (error2) {
       logger$1.error("Failed to import data", error2);
+      this.emit("db-error", { error: error2, operation: "importData" });
       return false;
     }
   }
@@ -25289,12 +25374,6 @@ class Main {
     require$$1$6.ipcMain.handle("get-sites", async () => {
       return this.uptimeMonitor.getSites();
     });
-    require$$1$6.ipcMain.handle("update-check-interval", async (_, interval) => {
-      return this.uptimeMonitor.setCheckInterval(interval);
-    });
-    require$$1$6.ipcMain.handle("get-check-interval", async () => {
-      return this.uptimeMonitor.getCheckInterval();
-    });
     require$$1$6.ipcMain.handle("update-history-limit", async (_, limit) => {
       return this.uptimeMonitor.setHistoryLimit(limit);
     });
@@ -25321,36 +25400,40 @@ class Main {
     require$$1$6.ipcMain.handle("update-site", async (_, url, updates) => {
       return this.uptimeMonitor.updateSite(url, updates);
     });
+    require$$1$6.ipcMain.handle("start-monitoring-for-site", async (_, url, monitorType) => {
+      return this.uptimeMonitor.startMonitoringForSite(url, monitorType);
+    });
+    require$$1$6.ipcMain.handle("stop-monitoring-for-site", async (_, url, monitorType) => {
+      return this.uptimeMonitor.stopMonitoringForSite(url, monitorType);
+    });
     this.uptimeMonitor.on("status-update", (data) => {
       var _a;
       const monitorStatuses = data.site.monitors.map((m) => `${m.type}: ${m.status}${m.responseTime ? ` (${m.responseTime}ms)` : ""}`).join(", ");
-      logger.debug(
-        `Status update for ${data.site.url}: ${monitorStatuses}`
-      );
+      logger.debug(`Status update for ${data.site.url}: ${monitorStatuses}`);
       (_a = this.mainWindow) == null ? void 0 : _a.webContents.send("status-update", data);
     });
-    this.uptimeMonitor.on("site-down", (site) => {
-      logger.warn(`Site down alert: ${site.name || site.url}`);
+    this.uptimeMonitor.on("site-monitor-down", ({ site, monitorType }) => {
+      logger.warn(`Monitor down alert: ${site.name || site.url} [${monitorType}]`);
       if (require$$1$6.Notification.isSupported()) {
         new require$$1$6.Notification({
-          title: "Site Down Alert",
-          body: `${site.name || site.url} is currently down!`,
+          title: "Monitor Down Alert",
+          body: `${site.name || site.url} (${monitorType}) is currently down!`,
           urgency: "critical"
         }).show();
-        logger.info(`Notification sent for site down: ${site.name || site.url}`);
+        logger.info(`Notification sent for monitor down: ${site.name || site.url} (${monitorType})`);
       } else {
         logger.warn("Notifications not supported on this platform");
       }
     });
-    this.uptimeMonitor.on("site-restored", (site) => {
-      logger.info(`Site restored: ${site.name || site.url}`);
+    this.uptimeMonitor.on("site-monitor-up", ({ site, monitorType }) => {
+      logger.info(`Monitor restored: ${site.name || site.url} [${monitorType}]`);
       if (require$$1$6.Notification.isSupported()) {
         new require$$1$6.Notification({
-          title: "Site Restored",
-          body: `${site.name || site.url} is back online!`,
+          title: "Monitor Restored",
+          body: `${site.name || site.url} (${monitorType}) is back online!`,
           urgency: "normal"
         }).show();
-        logger.info(`Notification sent for site restored: ${site.name || site.url}`);
+        logger.info(`Notification sent for monitor restored: ${site.name || site.url} (${monitorType})`);
       } else {
         logger.warn("Notifications not supported on this platform");
       }

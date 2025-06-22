@@ -18,8 +18,6 @@ contextBridge.exposeInMainWorld("electronAPI", {
     // Monitoring controls
     startMonitoring: () => ipcRenderer.invoke("start-monitoring"),
     stopMonitoring: () => ipcRenderer.invoke("stop-monitoring"),
-    updateCheckInterval: (interval: number) => ipcRenderer.invoke("update-check-interval", interval),
-    getCheckInterval: () => ipcRenderer.invoke("get-check-interval"),
 
     updateHistoryLimit: (limit: number) => ipcRenderer.invoke("update-history-limit", limit),
 
@@ -36,4 +34,10 @@ contextBridge.exposeInMainWorld("electronAPI", {
 
     // Updater: allow renderer to trigger quitAndInstall
     quitAndInstall: () => ipcRenderer.send("quit-and-install"),
+
+    // Per-site monitoring
+    startMonitoringForSite: (url: string, monitorType?: string) =>
+        ipcRenderer.invoke("start-monitoring-for-site", url, monitorType),
+    stopMonitoringForSite: (url: string, monitorType?: string) =>
+        ipcRenderer.invoke("stop-monitoring-for-site", url, monitorType),
 });

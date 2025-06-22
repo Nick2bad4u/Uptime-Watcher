@@ -6,6 +6,7 @@ export interface Monitor {
     responseTime?: number;
     lastChecked?: Date;
     history: StatusHistory[];
+    monitoring?: boolean; // Per-monitor monitoring state
 }
 
 export interface Site {
@@ -13,6 +14,8 @@ export interface Site {
     name?: string;
     url: string;
     monitors: Monitor[];
+    monitoring?: boolean; // Per-site monitoring state
+    checkInterval: number; // Per-site monitoring interval (ms)
     // Legacy fields for migration only:
     // monitorType?: MonitorType;
     // status?: "up" | "down" | "pending";

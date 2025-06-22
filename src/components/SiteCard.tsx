@@ -1,14 +1,7 @@
 import { useState } from "react";
 import { Site, MonitorType } from "../types";
 import { useStore } from "../store";
-import {
-    ThemedBox,
-    ThemedText,
-    ThemedButton,
-    ThemedSelect,
-    StatusIndicator,
-    MiniChartBar
-} from "../theme/components";
+import { ThemedBox, ThemedText, ThemedButton, ThemedSelect, StatusIndicator, MiniChartBar } from "../theme/components";
 import logger from "../services/logger";
 
 interface SiteCardProps {
@@ -16,41 +9,50 @@ interface SiteCardProps {
 }
 
 export function SiteCard({ site }: SiteCardProps) {
-    const { deleteSite, checkSiteNow, setSelectedSite, setShowSiteDetails } = useStore();
-    const [selectedMonitorType, setSelectedMonitorType] = useState<MonitorType>(site.monitors[0]?.type || "http");
-
-    // Find the monitor for the selected type
-    const monitor = site.monitors.find((m) => m.type === selectedMonitorType);
+    // Always select the latest site from the store by id
+    const {
+        sites,
+        checkSiteNow,
+        setSelectedSite,
+        setShowSiteDetails,
+        startSiteMonitorMonitoring,
+        stopSiteMonitorMonitoring,
+        isLoading,
+    } = useStore();
+    const latestSite = sites.find((s) => s.id === site.id) || site;
+    const [selectedMonitorType, setSelectedMonitorType] = useState<MonitorType>(latestSite.monitors[0]?.type || "http");
+    const monitor = latestSite.monitors.find((m) => m.type === selectedMonitorType);
     const status = monitor?.status || "pending";
     const responseTime = monitor?.responseTime;
     const filteredHistory = monitor?.history || [];
+    const isMonitoring = monitor?.monitoring !== false; // default to true if undefined
 
     const handleMonitorTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedMonitorType(e.target.value as MonitorType);
     };
 
-    const handleQuickCheck = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        checkSiteNow(site.url, selectedMonitorType)
-            .then(() => logger.user.action("Quick site check", { url: site.url }))
-            .catch((error) => logger.site.error(site.url, error instanceof Error ? error : String(error)));
+    // Refactor handlers to not require event argument
+    const handleStartMonitoring = () => {
+        startSiteMonitorMonitoring(latestSite.url, selectedMonitorType);
     };
-
-    const handleQuickRemove = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        if (!window.confirm(`Are you sure you want to remove ${site.name || site.url}?`)) {
-            return;
-        }
-        deleteSite(site.url)
-            .then(() => logger.site.removed(site.url))
-            .catch((error) => logger.site.error(site.url, error instanceof Error ? error : String(error)));
+    const handleStopMonitoring = () => {
+        stopSiteMonitorMonitoring(latestSite.url, selectedMonitorType);
+    };
+    const handleQuickCheck = () => {
+        if (!monitor) return;
+        checkSiteNow(latestSite.url, selectedMonitorType)
+            .then(() =>
+                logger.user.action("Quick site check", { url: latestSite.url, monitorType: selectedMonitorType })
+            )
+            .catch((error) => logger.site.error(latestSite.url, error instanceof Error ? error : String(error)));
     };
 
     const handleCardClick = () => {
-        setSelectedSite(site);
+        setSelectedSite({ id: latestSite.id } as Site); // Only set id, store logic will handle lookup
         setShowSiteDetails(true);
     };
 
+    // Calculate uptime for the selected monitor
     const calculateUptime = () => {
         if (filteredHistory.length === 0) return 0;
         const upCount = filteredHistory.filter((record) => record.status === "up").length;
@@ -69,40 +71,61 @@ export function SiteCard({ site }: SiteCardProps) {
         >
             <div className="flex items-center justify-between">
                 <ThemedText variant="primary" size="lg" weight="semibold">
-                    {site.name || site.url}
+                    {latestSite.name || latestSite.url}
                 </ThemedText>
                 <div className="flex items-center gap-2 min-w-[180px]">
-                    <div onClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()}>
+                    <div onClick={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()}>
                         <ThemedSelect
                             value={selectedMonitorType}
                             onChange={handleMonitorTypeChange}
                             className="min-w-[80px]"
                         >
-                            {site.monitors.map((m) => (
+                            {latestSite.monitors.map((m) => (
                                 <option key={m.type} value={m.type}>
                                     {m.type.toUpperCase()}
                                 </option>
                             ))}
                         </ThemedSelect>
                     </div>
-                    <ThemedButton
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleQuickCheck as any}
-                        className="min-w-[32px]"
-                        aria-label="Check Now"
-                    >
-                        <span onClick={handleQuickCheck}>🔄</span>
-                    </ThemedButton>
-                    <ThemedButton
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleQuickRemove as any}
-                        className="min-w-[32px]"
-                        aria-label="Delete"
-                    >
-                        <span onClick={handleQuickRemove}>🗑️</span>
-                    </ThemedButton>
+                    <div onClick={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()}>
+                        <ThemedButton
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleQuickCheck}
+                            className="min-w-[32px]"
+                            aria-label="Check Now"
+                            disabled={isLoading || !monitor}
+                        >
+                            <span>🔄</span>
+                        </ThemedButton>
+                    </div>
+                    {isMonitoring ? (
+                        <div onClick={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()}>
+                            <ThemedButton
+                                variant="error"
+                                size="sm"
+                                onClick={handleStopMonitoring}
+                                className="min-w-[32px]"
+                                aria-label="Stop Monitoring"
+                                disabled={isLoading || !monitor}
+                            >
+                                ⏸️
+                            </ThemedButton>
+                        </div>
+                    ) : (
+                        <div onClick={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()}>
+                            <ThemedButton
+                                variant="success"
+                                size="sm"
+                                onClick={handleStartMonitoring}
+                                className="min-w-[32px]"
+                                aria-label="Start Monitoring"
+                                disabled={isLoading || !monitor}
+                            >
+                                ▶️
+                            </ThemedButton>
+                        </div>
+                    )}
                 </div>
             </div>
             <div className="flex items-center gap-3">
@@ -153,8 +176,8 @@ export function SiteCard({ site }: SiteCardProps) {
                                 {selectedMonitorType === "http"
                                     ? "HTTP History"
                                     : selectedMonitorType === "port"
-                                    ? "Port History"
-                                    : "?"}
+                                      ? "Port History"
+                                      : "?"}
                             </ThemedText>
                         </div>
                     </div>

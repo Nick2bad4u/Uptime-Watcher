@@ -117,14 +117,6 @@ class Main {
             return this.uptimeMonitor.getSites();
         });
 
-        ipcMain.handle("update-check-interval", async (_, interval) => {
-            return this.uptimeMonitor.setCheckInterval(interval);
-        });
-
-        ipcMain.handle("get-check-interval", async () => {
-            return this.uptimeMonitor.getCheckInterval();
-        });
-
         ipcMain.handle("update-history-limit", async (_, limit) => {
             return this.uptimeMonitor.setHistoryLimit(limit);
         });
@@ -159,38 +151,45 @@ class Main {
             return this.uptimeMonitor.updateSite(url, updates);
         });
 
+        ipcMain.handle("start-monitoring-for-site", async (_, url, monitorType) => {
+            return this.uptimeMonitor.startMonitoringForSite(url, monitorType);
+        });
+        ipcMain.handle("stop-monitoring-for-site", async (_, url, monitorType) => {
+            return this.uptimeMonitor.stopMonitoringForSite(url, monitorType);
+        });
+
         // Listen for status updates from monitor
         this.uptimeMonitor.on("status-update", (data: StatusUpdate) => {
-            const monitorStatuses = data.site.monitors.map(m => `${m.type}: ${m.status}${m.responseTime ? ` (${m.responseTime}ms)` : ""}`).join(", ");
-            logger.debug(
-                `Status update for ${data.site.url}: ${monitorStatuses}`
-            );
+            const monitorStatuses = data.site.monitors
+                .map((m) => `${m.type}: ${m.status}${m.responseTime ? ` (${m.responseTime}ms)` : ""}`)
+                .join(", ");
+            logger.debug(`Status update for ${data.site.url}: ${monitorStatuses}`);
             this.mainWindow?.webContents.send("status-update", data);
         });
 
-        this.uptimeMonitor.on("site-down", (site: Site) => {
-            logger.warn(`Site down alert: ${site.name || site.url}`);
+        this.uptimeMonitor.on("site-monitor-down", ({ site, monitorType }) => {
+            logger.warn(`Monitor down alert: ${site.name || site.url} [${monitorType}]`);
             if (Notification.isSupported()) {
                 new Notification({
-                    title: "Site Down Alert",
-                    body: `${site.name || site.url} is currently down!`,
+                    title: "Monitor Down Alert",
+                    body: `${site.name || site.url} (${monitorType}) is currently down!`,
                     urgency: "critical",
                 }).show();
-                logger.info(`Notification sent for site down: ${site.name || site.url}`);
+                logger.info(`Notification sent for monitor down: ${site.name || site.url} (${monitorType})`);
             } else {
                 logger.warn("Notifications not supported on this platform");
             }
         });
 
-        this.uptimeMonitor.on("site-restored", (site: Site) => {
-            logger.info(`Site restored: ${site.name || site.url}`);
+        this.uptimeMonitor.on("site-monitor-up", ({ site, monitorType }) => {
+            logger.info(`Monitor restored: ${site.name || site.url} [${monitorType}]`);
             if (Notification.isSupported()) {
                 new Notification({
-                    title: "Site Restored",
-                    body: `${site.name || site.url} is back online!`,
+                    title: "Monitor Restored",
+                    body: `${site.name || site.url} (${monitorType}) is back online!`,
                     urgency: "normal",
                 }).show();
-                logger.info(`Notification sent for site restored: ${site.name || site.url}`);
+                logger.info(`Notification sent for monitor restored: ${site.name || site.url} (${monitorType})`);
             } else {
                 logger.warn("Notifications not supported on this platform");
             }
