@@ -7,17 +7,85 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[534364d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/534364d09cd58223bc556944a844da7bf10590c1)...
-[9a393ef](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9a393ef8221afa08cf76e132bced427fb3605257)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/534364d09cd58223bc556944a844da7bf10590c1...9a393ef8221afa08cf76e132bced427fb3605257))
+[[2fbba3b](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2fbba3b84d5ac91a8eb5a8deabed10f89de06c64)...
+[5891ca1](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5891ca1db6282484242760d041dcf46198772a86)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/2fbba3b84d5ac91a8eb5a8deabed10f89de06c64...5891ca1db6282484242760d041dcf46198772a86))
 
 
 ### 🛠️ GitHub Actions
+
+- Update eslint.yml [`(5891ca1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5891ca1db6282484242760d041dcf46198772a86)
+
+
+- Update eslint.yml [`(ec839b0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ec839b09ade2c9ee06b1598540da1b55f90fb572)
+
+
+
+### 💼 Other
+
+- Rename eslint.config.js to eslint.config.mjs [`(6e70037)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6e700375ea147aebb01a6156c0ea6fd06220f318)
+
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 1.8.10 [`(2fbba3b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2fbba3b84d5ac91a8eb5a8deabed10f89de06c64)
+
+
+
+
+
+
+## [1.8.10] - 2025-06-22
+
+
+[[ab20722](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ab20722bb8cc27a69305ef294ea1b134b871ed8f)...
+[efe1967](https://github.com/Nick2bad4u/Uptime-Watcher/commit/efe19678d1f47839dcdf772c4298cc1d05da6cec)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/ab20722bb8cc27a69305ef294ea1b134b871ed8f...efe19678d1f47839dcdf772c4298cc1d05da6cec))
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher
+
+Updates changelog links and bumps version to 1.8.9
+
+Improves consistency and accuracy of changelog URLs by removing redundant path segments. Updates package version to 1.8.9 and adjusts ESLint workflow for clearer plugin installation, supporting better release management and CI reliability. [`(466c94a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/466c94a2c2d8b2611c56a08ea60faf492c6f32db)
+
+
+
+### 🛠️ GitHub Actions
+
+- Update eslint.yml [`(5c3a9fa)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5c3a9fab9bcccc09e2ee33057d163b9fe37eacc7)
+
 
 - Update eslint.yml [`(9a393ef)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9a393ef8221afa08cf76e132bced427fb3605257)
 
 
 - Update eslint.yml [`(a85db5c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a85db5cdf98b09bc0158052c1944e5086be72e2d)
+
+
+
+### 💼 Other
+
+- Adds typescript-eslint and fixes devDependencies order
+
+Introduces typescript-eslint for improved TypeScript linting and code quality.
+Reorders devDependencies for better organization and consistency, and sets "type" to "commonjs" for module clarity. [`(efe1967)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/efe19678d1f47839dcdf772c4298cc1d05da6cec)
+
+
+- Adds code quality, linting, and style tools
+
+Integrates new dev dependencies for markdown linting, code duplication detection, stylelint, and link checking to improve code quality and maintainability. Updates ESLint config dependencies and refines .gitignore for node_modules backup. No production logic is affected. [`(ab20722)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ab20722bb8cc27a69305ef294ea1b134b871ed8f)
+
+
+
+### ⚙️ Miscellaneous Tasks
+
+- Update version to 1.8.9 and adjust markdownlint dependency [`(02c4ee5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/02c4ee54e25645f12e817772ad881485ede5d028)
+
+
+- Update changelogs for v1.8.9 [skip ci] [`(ca2fdf5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ca2fdf5b1fefda2ba053bf059000d4083110a35d)
 
 
 
