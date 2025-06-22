@@ -7,9 +7,26 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[ab8c318](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/ab8c3181dbd175bd62190b4dff06d1b2a0550ca6)...
+[ab8c318](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/ab8c3181dbd175bd62190b4dff06d1b2a0550ca6)]
+([compare](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/compare/ab8c3181dbd175bd62190b4dff06d1b2a0550ca6...ab8c3181dbd175bd62190b4dff06d1b2a0550ca6))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 1.8.8 [`(ab8c318)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/ab8c3181dbd175bd62190b4dff06d1b2a0550ca6)
+
+
+
+
+
+
+## [1.8.8] - 2025-06-22
+
+
 [[7fe4d2c](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/7fe4d2c95c6af4a6bf98cf4fbfc012ea8ced7b4c)...
-[09fd227](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/09fd2278b525ad3c1c6f95db695e91c7dad02618)]
-([compare](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/compare/7fe4d2c95c6af4a6bf98cf4fbfc012ea8ced7b4c...09fd2278b525ad3c1c6f95db695e91c7dad02618))
+[2cef839](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/2cef839bd26e541d48a53027d08a7ab363b6a086)]
+([compare](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/compare/7fe4d2c95c6af4a6bf98cf4fbfc012ea8ced7b4c...2cef839bd26e541d48a53027d08a7ab363b6a086))
 
 
 ### 🐛 Bug Fixes
@@ -20,7 +37,39 @@ All notable changes to this project will be documented in this file.
 
 ### 🔀 Merge Commits
 
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher) [`(2cef839)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/2cef839bd26e541d48a53027d08a7ab363b6a086)
+
+
 - [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher) [`(09fd227)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/09fd2278b525ad3c1c6f95db695e91c7dad02618)
+
+
+
+### 💼 Other
+
+- Update metrics.repository.svg - [Skip GitHub Action] [`(2da3265)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/2da3265dcc58bf4847285ec9b079014df9e6e26c)
+
+
+- Refactor SiteCard and SiteDetails components for per-monitor monitoring state
+
+- Updated SiteCard to always select the latest site from the store and handle monitoring state per monitor type.
+- Refactored event handlers in SiteCard to simplify logic and improve readability.
+- Enhanced SiteDetails to manage per-monitor check intervals and monitoring state.
+- Introduced useBackendFocusSync hook to sync sites from backend on window focus.
+- Modified store to support per-monitor monitoring and check intervals, removing global monitoring state.
+- Updated types to include monitoring state and check intervals for monitors.
+- Adjusted actions in the store for starting and stopping monitoring on a per-monitor basis.
+- Improved UI components to reflect changes in monitoring controls and check interval settings. [`(599c634)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/599c634d8c044a7314e0e8f7299d638e511ea9d2)
+
+
+- Refactors code for improved readability and consistency
+
+Streamlines code formatting by reducing line breaks and consolidating multi-line statements, resulting in more concise and readable logic. Aligns style for variable declarations, function definitions, and control structures to enhance maintainability and make future updates easier. No functional changes are introduced. [`(e2e9171)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/e2e917101087de9bf7f8daf394cbef955a3961e9)
+
+
+
+### ⚙️ Miscellaneous Tasks
+
+- Update changelogs for v1.8.7 [skip ci] [`(5156f85)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/5156f85174e6275a7ede04dfa43254906ce55dab)
 
 
 
@@ -36,38 +85,15 @@ All notable changes to this project will be documented in this file.
 ## [1.8.7] - 2025-06-21
 
 
-[[9c0ea9e](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/9c0ea9e6998e424f5212f104cc315a78056a9805)...
+[[26bc4ef](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/26bc4ef07e2232af8754ecd2a3a99c3702195b85)...
 [9a3a01d](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/9a3a01d9f14cb3f26a181c321b2de6c3b3ba8a82)]
-([compare](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/compare/9c0ea9e6998e424f5212f104cc315a78056a9805...9a3a01d9f14cb3f26a181c321b2de6c3b3ba8a82))
+([compare](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/compare/26bc4ef07e2232af8754ecd2a3a99c3702195b85...9a3a01d9f14cb3f26a181c321b2de6c3b3ba8a82))
 
 
 ### 🚀 Features
 
 - Implement update notification system and enhance app state management [`(9a3a01d)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/9a3a01d9f14cb3f26a181c321b2de6c3b3ba8a82)
 
-
-
-### 💼 Other
-
-- Create eslint.config.mjs [`(1add9a3)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/1add9a313c51bbb6b56355a8a2721de164324e48)
-
-
-
-### 📦 Dependencies
-
-- [dependency] Update version 1.8.6 [`(9c0ea9e)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/9c0ea9e6998e424f5212f104cc315a78056a9805)
-
-
-
-
-
-
-## [1.8.6] - 2025-06-21
-
-
-[[26bc4ef](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/26bc4ef07e2232af8754ecd2a3a99c3702195b85)...
-[229bb5e](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/229bb5ed2cec6e8eee5ef4319f9a1f52989cc6c8)]
-([compare](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/compare/26bc4ef07e2232af8754ecd2a3a99c3702195b85...229bb5ed2cec6e8eee5ef4319f9a1f52989cc6c8))
 
 
 ### 🐛 Bug Fixes
@@ -82,7 +108,16 @@ All notable changes to this project will be documented in this file.
 
 
 
+### 💼 Other
+
+- Create eslint.config.mjs [`(1add9a3)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/1add9a313c51bbb6b56355a8a2721de164324e48)
+
+
+
 ### 📦 Dependencies
+
+- [dependency] Update version 1.8.6 [`(9c0ea9e)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/9c0ea9e6998e424f5212f104cc315a78056a9805)
+
 
 - [dependency] Update version 1.8.5 [`(fd1ede2)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/fd1ede2668e108d54e2d86cfdd64a3d442617a03)
 
@@ -219,59 +254,9 @@ All notable changes to this project will be documented in this file.
 ## [1.8.1] - 2025-06-21
 
 
-[[126ba5e](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/126ba5e841d35548e1953888debe228732459c8a)...
-[6e69bb7](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/6e69bb7c04203d1e76dfe10ad1f44426a7f1372b)]
-([compare](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/compare/126ba5e841d35548e1953888debe228732459c8a...6e69bb7c04203d1e76dfe10ad1f44426a7f1372b))
-
-
-### 🐛 Bug Fixes
-
-- Update npm commands in Flatpak build configuration to use absolute paths [`(6e69bb7)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/6e69bb7c04203d1e76dfe10ad1f44426a7f1372b)
-
-
-
-### 🔀 Merge Commits
-
-- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher) [`(89f5b29)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/89f5b29fcbc31a6de79ccbaf9b65b93e9154a18a)
-
-
-
-### 💼 Other
-
-- Update ESLint output file path and add build options for Flatpak [`(cfd4f50)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/cfd4f504f22dd8b8634b10f7a719dd8faea7ae42)
-
-
-- Refactor preload.js: Align formatting of electronAPI methods for consistency [`(0929b27)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/0929b27309150d724102b15785fe6e973ed29edc)
-
-
-- Update Flatpak platform and SDK versions to 24.08 for improved compatibility [`(8ebcb04)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/8ebcb047d6e8fe556394fc1c5046919eeb5db763)
-
-
-
-### ⚙️ Miscellaneous Tasks
-
-- Update changelogs for v1.8.0 [skip ci] [`(6c5ba74)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/6c5ba749b399c0d533ddb5bc202d8d7ce196ea6a)
-
-
-
-### 📦 Dependencies
-
-- [dependency] Update version 1.8.0 in package.json and package-lock.json [`(fd1f3ea)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/fd1f3eaf10114b3f44c8fe2cb507599447b38e99)
-
-
-- [dependency] Update version 1.8.0 [`(126ba5e)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/126ba5e841d35548e1953888debe228732459c8a)
-
-
-
-
-
-
-## [1.8.0] - 2025-06-21
-
-
 [[9174b15](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/9174b15321660e184ec4a9ef72dcdec586f3350c)...
-[884adc3](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/884adc398b1d12c3a39acfa0983e5e13614f6d9b)]
-([compare](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/compare/9174b15321660e184ec4a9ef72dcdec586f3350c...884adc398b1d12c3a39acfa0983e5e13614f6d9b))
+[6e69bb7](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/6e69bb7c04203d1e76dfe10ad1f44426a7f1372b)]
+([compare](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/compare/9174b15321660e184ec4a9ef72dcdec586f3350c...6e69bb7c04203d1e76dfe10ad1f44426a7f1372b))
 
 
 ### 🚀 Features
@@ -292,7 +277,16 @@ All notable changes to this project will be documented in this file.
 
 
 
+### 🐛 Bug Fixes
+
+- Update npm commands in Flatpak build configuration to use absolute paths [`(6e69bb7)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/6e69bb7c04203d1e76dfe10ad1f44426a7f1372b)
+
+
+
 ### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher) [`(89f5b29)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/89f5b29fcbc31a6de79ccbaf9b65b93e9154a18a)
+
 
 - [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher) [`(7d52d3c)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/7d52d3cedf02fedd1b2899f27b4c2de3c975d561)
 
@@ -311,6 +305,15 @@ All notable changes to this project will be documented in this file.
 
 
 ### 💼 Other
+
+- Update ESLint output file path and add build options for Flatpak [`(cfd4f50)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/cfd4f504f22dd8b8634b10f7a719dd8faea7ae42)
+
+
+- Refactor preload.js: Align formatting of electronAPI methods for consistency [`(0929b27)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/0929b27309150d724102b15785fe6e973ed29edc)
+
+
+- Update Flatpak platform and SDK versions to 24.08 for improved compatibility [`(8ebcb04)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/8ebcb047d6e8fe556394fc1c5046919eeb5db763)
+
 
 - Reformats codebase for improved readability
 
@@ -413,6 +416,9 @@ Modernizes the application's theme by introducing error text styling, consistent
 
 ### ⚙️ Miscellaneous Tasks
 
+- Update changelogs for v1.8.0 [skip ci] [`(6c5ba74)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/6c5ba749b399c0d533ddb5bc202d8d7ce196ea6a)
+
+
 - Update changelogs for v1.7.0 [skip ci] [`(a52fdc4)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/a52fdc431623c6b19923ef4dd85b605e3970db42)
 
 
@@ -430,6 +436,12 @@ Modernizes the application's theme by introducing error text styling, consistent
 
 
 ### 📦 Dependencies
+
+- [dependency] Update version 1.8.0 in package.json and package-lock.json [`(fd1f3ea)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/fd1f3eaf10114b3f44c8fe2cb507599447b38e99)
+
+
+- [dependency] Update version 1.8.0 [`(126ba5e)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/126ba5e841d35548e1953888debe228732459c8a)
+
 
 - [dependency] Update version 1.7.0 [`(0733182)`](https://github.com/Nick2bad4u/[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)/commit/0733182d8e7d3c6dc43fbeec991718c3b8724188)
 
