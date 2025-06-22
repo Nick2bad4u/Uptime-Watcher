@@ -32,6 +32,7 @@ require("node:fs");
 const promises = require("node:fs/promises");
 const path = require("node:path");
 const node_url = require("node:url");
+const net = require("node:net");
 var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
 function getDefaultExportFromCjs(x) {
   return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, "default") ? x["default"] : x;
@@ -11755,16 +11756,18 @@ function requireProvider() {
   };
   Provider.Provider = Provider$1;
   function findFile(files, extension, not) {
+    var _a;
     if (files.length === 0) {
       throw (0, builder_util_runtime_1.newError)("No files provided", "ERR_UPDATER_NO_FILES_PROVIDED");
     }
-    const result = files.find((it) => it.url.pathname.toLowerCase().endsWith(`.${extension}`));
-    if (result != null) {
+    const filteredFiles = files.filter((it) => it.url.pathname.toLowerCase().endsWith(`.${extension.toLowerCase()}`));
+    const result = (_a = filteredFiles.find((it) => [it.url.pathname, it.info.url].some((n) => n.includes(process.arch)))) !== null && _a !== void 0 ? _a : filteredFiles.shift();
+    if (result) {
       return result;
     } else if (not == null) {
       return files[0];
     } else {
-      return files.find((fileInfo) => !not.some((ext) => fileInfo.url.pathname.toLowerCase().endsWith(`.${ext}`)));
+      return files.find((fileInfo) => !not.some((ext) => fileInfo.url.pathname.toLowerCase().endsWith(`.${ext.toLowerCase()}`)));
     }
   }
   function parseUpdateInfo(rawData, channelFile, channelFileUrl) {
@@ -12698,7 +12701,7 @@ function requireMultipleRangeDownloader() {
         return;
       }
       const contentType = (0, builder_util_runtime_1.safeGetHeader)(response, "content-type");
-      const m = /^multipart\/.+?(?:; boundary=(?:(?:"(.+)")|(?:([^\s]+))))$/i.exec(contentType);
+      const m = /^multipart\/.+?\s*;\s*boundary=(?:"([^"]+)"|([^\s";]+))\s*$/i.exec(contentType);
       if (m == null) {
         reject(new Error(`Content-Type "multipart/byteranges" is expected, but got "${contentType}"`));
         return;
@@ -13220,6 +13223,19 @@ function requireAppUpdater() {
         this._isUpdateSupported = value;
       }
     }
+    /**
+     * Allows developer to override default logic for determining if the user is below the rollout threshold.
+     * The default logic compares the staging percentage with numerical representation of user ID.
+     * An override can define custom logic, or bypass it if needed.
+     */
+    get isUserWithinRollout() {
+      return this._isUserWithinRollout;
+    }
+    set isUserWithinRollout(value) {
+      if (value) {
+        this._isUserWithinRollout = value;
+      }
+    }
     constructor(options, app) {
       super();
       this.autoDownload = true;
@@ -13238,6 +13254,7 @@ function requireAppUpdater() {
       this.signals = new types_1.UpdaterSignal(this);
       this._appUpdateConfigPath = null;
       this._isUpdateSupported = (updateInfo) => this.checkIfUpdateSupported(updateInfo);
+      this._isUserWithinRollout = (updateInfo) => this.isStagingMatch(updateInfo);
       this.clientPromise = null;
       this.stagingUserIdPromise = new lazy_val_1.Lazy(() => this.getOrCreateStagingUserId());
       this.configOnDisk = new lazy_val_1.Lazy(() => this.loadUpdateConfig());
@@ -13389,8 +13406,8 @@ function requireAppUpdater() {
       if (!await Promise.resolve(this.isUpdateSupported(updateInfo))) {
         return false;
       }
-      const isStagingMatch = await this.isStagingMatch(updateInfo);
-      if (!isStagingMatch) {
+      const isUserWithinRollout = await Promise.resolve(this.isUserWithinRollout(updateInfo));
+      if (!isUserWithinRollout) {
         return false;
       }
       const isLatestVersionNewer = (0, semver_1.gt)(latestVersion, currentVersion);
@@ -13595,7 +13612,7 @@ function requireAppUpdater() {
       const packageInfo = fileInfo.packageInfo;
       function getCacheUpdateFileName() {
         const urlPath = decodeURIComponent(taskOptions.fileInfo.url.pathname);
-        if (urlPath.endsWith(`.${taskOptions.fileExtension}`)) {
+        if (urlPath.toLowerCase().endsWith(`.${taskOptions.fileExtension.toLowerCase()}`)) {
           return path2.basename(urlPath);
         } else {
           return taskOptions.fileInfo.info.url;
@@ -13755,7 +13772,7 @@ function requireBaseUpdater() {
       const installerPath = this.installerPath;
       const downloadedFileInfo = downloadedUpdateHelper == null ? null : downloadedUpdateHelper.downloadedFileInfo;
       if (installerPath == null || downloadedFileInfo == null) {
-        this.dispatchError(new Error("No valid update available, can't quit and install"));
+        this.dispatchError(new Error("No update filepath provided, can't quit and install"));
         return false;
       }
       this.quitAndInstallCalled = true;
@@ -13792,21 +13809,6 @@ function requireBaseUpdater() {
         this._logger.info("Auto install update on quit");
         this.install(true, false);
       });
-    }
-    wrapSudo() {
-      const { name } = this.app;
-      const installComment = `"${name} would like to update"`;
-      const sudo = this.spawnSyncLog("which gksudo || which kdesudo || which pkexec || which beesu");
-      const command = [sudo];
-      if (/kdesudo/i.test(sudo)) {
-        command.push("--comment", installComment);
-        command.push("-c");
-      } else if (/gksudo/i.test(sudo)) {
-        command.push("--message", installComment);
-      } else if (/pkexec/i.test(sudo)) {
-        command.push("--disable-internal-agent");
-      }
-      return command.join(" ");
     }
     spawnSyncLog(cmd, args = [], env = {}) {
       this._logger.info(`Executing: ${cmd} with args: ${args}`);
@@ -13916,7 +13918,7 @@ function requireAppImageUpdater() {
       super(options, app);
     }
     isUpdaterActive() {
-      if (process.env["APPIMAGE"] == null) {
+      if (process.env["APPIMAGE"] == null && !this.forceDevUpdateConfig) {
         if (process.env["SNAP"] == null) {
           this._logger.warn("APPIMAGE env is not defined, current application is not an AppImage");
         } else {
@@ -13977,7 +13979,7 @@ function requireAppImageUpdater() {
       const existingBaseName = path2.basename(appImageFile);
       const installerPath = this.installerPath;
       if (installerPath == null) {
-        this.dispatchError(new Error("No valid update available, can't quit and install"));
+        this.dispatchError(new Error("No update filepath provided, can't quit and install"));
         return false;
       }
       if (path2.basename(installerPath) === existingBaseName || !/\d+\.\d+\.\d+/.test(existingBaseName)) {
@@ -14006,16 +14008,110 @@ function requireAppImageUpdater() {
   return AppImageUpdater;
 }
 var DebUpdater = {};
+var LinuxUpdater = {};
+var hasRequiredLinuxUpdater;
+function requireLinuxUpdater() {
+  if (hasRequiredLinuxUpdater) return LinuxUpdater;
+  hasRequiredLinuxUpdater = 1;
+  Object.defineProperty(LinuxUpdater, "__esModule", { value: true });
+  LinuxUpdater.LinuxUpdater = void 0;
+  const BaseUpdater_1 = requireBaseUpdater();
+  let LinuxUpdater$1 = class LinuxUpdater extends BaseUpdater_1.BaseUpdater {
+    constructor(options, app) {
+      super(options, app);
+    }
+    /**
+     * Returns true if the current process is running as root.
+     */
+    isRunningAsRoot() {
+      var _a;
+      return ((_a = process.getuid) === null || _a === void 0 ? void 0 : _a.call(process)) === 0;
+    }
+    /**
+     * Sanitizies the installer path for using with command line tools.
+     */
+    get installerPath() {
+      var _a, _b;
+      return (_b = (_a = super.installerPath) === null || _a === void 0 ? void 0 : _a.replace(/\\/g, "\\\\").replace(/ /g, "\\ ")) !== null && _b !== void 0 ? _b : null;
+    }
+    runCommandWithSudoIfNeeded(commandWithArgs) {
+      if (this.isRunningAsRoot()) {
+        this._logger.info("Running as root, no need to use sudo");
+        return this.spawnSyncLog(commandWithArgs[0], commandWithArgs.slice(1));
+      }
+      const { name } = this.app;
+      const installComment = `"${name} would like to update"`;
+      const sudo = this.sudoWithArgs(installComment);
+      this._logger.info(`Running as non-root user, using sudo to install: ${sudo}`);
+      const wrapper = /pkexec/i.test(sudo[0]) ? "" : `"`;
+      return this.spawnSyncLog(sudo[0], [...sudo.length > 1 ? sudo.slice(1) : [], `${wrapper}/bin/bash`, "-c", `'${commandWithArgs.join(" ")}'${wrapper}`]);
+    }
+    sudoWithArgs(installComment) {
+      const sudo = this.determineSudoCommand();
+      const command = [sudo];
+      if (/kdesudo/i.test(sudo)) {
+        command.push("--comment", installComment);
+        command.push("-c");
+      } else if (/gksudo/i.test(sudo)) {
+        command.push("--message", installComment);
+      } else if (/pkexec/i.test(sudo)) {
+        command.push("--disable-internal-agent");
+      }
+      return command;
+    }
+    hasCommand(cmd) {
+      try {
+        this.spawnSyncLog(`command`, ["-v", cmd]);
+        return true;
+      } catch {
+        return false;
+      }
+    }
+    determineSudoCommand() {
+      const sudos = ["gksudo", "kdesudo", "pkexec", "beesu"];
+      for (const sudo of sudos) {
+        if (this.hasCommand(sudo)) {
+          return sudo;
+        }
+      }
+      return "sudo";
+    }
+    /**
+     * Detects the package manager to use based on the available commands.
+     * Allows overriding the default behavior by setting the ELECTRON_BUILDER_LINUX_PACKAGE_MANAGER environment variable.
+     * If the environment variable is set, it will be used directly. (This is useful for testing each package manager logic path.)
+     * Otherwise, it checks for the presence of the specified package manager commands in the order provided.
+     * @param pms - An array of package manager commands to check for, in priority order.
+     * @returns The detected package manager command or "unknown" if none are found.
+     */
+    detectPackageManager(pms) {
+      var _a;
+      const pmOverride = (_a = process.env.ELECTRON_BUILDER_LINUX_PACKAGE_MANAGER) === null || _a === void 0 ? void 0 : _a.trim();
+      if (pmOverride) {
+        return pmOverride;
+      }
+      for (const pm of pms) {
+        if (this.hasCommand(pm)) {
+          return pm;
+        }
+      }
+      this._logger.warn(`No package manager found in the list: ${pms.join(", ")}. Defaulting to the first one: ${pms[0]}`);
+      return pms[0];
+    }
+  };
+  LinuxUpdater.LinuxUpdater = LinuxUpdater$1;
+  return LinuxUpdater;
+}
 var hasRequiredDebUpdater;
 function requireDebUpdater() {
   if (hasRequiredDebUpdater) return DebUpdater;
   hasRequiredDebUpdater = 1;
   Object.defineProperty(DebUpdater, "__esModule", { value: true });
   DebUpdater.DebUpdater = void 0;
-  const BaseUpdater_1 = requireBaseUpdater();
   const Provider_1 = requireProvider();
   const types_1 = requireTypes();
-  let DebUpdater$1 = class DebUpdater extends BaseUpdater_1.BaseUpdater {
+  const LinuxUpdater_1 = requireLinuxUpdater();
+  let DebUpdater$1 = class DebUpdater2 extends LinuxUpdater_1.LinuxUpdater {
     constructor(options, app) {
       super(options, app);
     }
@@ -14035,24 +14131,55 @@ function requireDebUpdater() {
         }
       });
     }
-    get installerPath() {
-      var _a, _b;
-      return (_b = (_a = super.installerPath) === null || _a === void 0 ? void 0 : _a.replace(/ /g, "\\ ")) !== null && _b !== void 0 ? _b : null;
-    }
     doInstall(options) {
-      const sudo = this.wrapSudo();
-      const wrapper = /pkexec/i.test(sudo) ? "" : `"`;
       const installerPath = this.installerPath;
       if (installerPath == null) {
-        this.dispatchError(new Error("No valid update available, can't quit and install"));
+        this.dispatchError(new Error("No update filepath provided, can't quit and install"));
         return false;
       }
-      const cmd = ["dpkg", "-i", installerPath, "||", "apt-get", "install", "-f", "-y"];
-      this.spawnSyncLog(sudo, [`${wrapper}/bin/bash`, "-c", `'${cmd.join(" ")}'${wrapper}`]);
+      if (!this.hasCommand("dpkg") && !this.hasCommand("apt")) {
+        this.dispatchError(new Error("Neither dpkg nor apt command found. Cannot install .deb package."));
+        return false;
+      }
+      const priorityList = ["dpkg", "apt"];
+      const packageManager = this.detectPackageManager(priorityList);
+      try {
+        DebUpdater2.installWithCommandRunner(packageManager, installerPath, this.runCommandWithSudoIfNeeded.bind(this), this._logger);
+      } catch (error2) {
+        this.dispatchError(error2);
+        return false;
+      }
       if (options.isForceRunAfter) {
         this.app.relaunch();
       }
       return true;
+    }
+    static installWithCommandRunner(packageManager, installerPath, commandRunner, logger2) {
+      var _a;
+      if (packageManager === "dpkg") {
+        try {
+          commandRunner(["dpkg", "-i", installerPath]);
+        } catch (error2) {
+          logger2.warn((_a = error2.message) !== null && _a !== void 0 ? _a : error2);
+          logger2.warn("dpkg installation failed, trying to fix broken dependencies with apt-get");
+          commandRunner(["apt-get", "install", "-f", "-y"]);
+        }
+      } else if (packageManager === "apt") {
+        logger2.warn("Using apt to install a local .deb. This may fail for unsigned packages unless properly configured.");
+        commandRunner([
+          "apt",
+          "install",
+          "-y",
+          "--allow-unauthenticated",
+          // needed for unsigned .debs
+          "--allow-downgrades",
+          // allow lower version installs
+          "--allow-change-held-packages",
+          installerPath
+        ]);
+      } else {
+        throw new Error(`Package manager ${packageManager} not supported`);
+      }
     }
   };
   DebUpdater.DebUpdater = DebUpdater$1;
@@ -14065,10 +14192,10 @@ function requirePacmanUpdater() {
   hasRequiredPacmanUpdater = 1;
   Object.defineProperty(PacmanUpdater, "__esModule", { value: true });
   PacmanUpdater.PacmanUpdater = void 0;
-  const BaseUpdater_1 = requireBaseUpdater();
   const types_1 = requireTypes();
   const Provider_1 = requireProvider();
-  let PacmanUpdater$1 = class PacmanUpdater extends BaseUpdater_1.BaseUpdater {
+  const LinuxUpdater_1 = requireLinuxUpdater();
+  let PacmanUpdater$1 = class PacmanUpdater2 extends LinuxUpdater_1.LinuxUpdater {
     constructor(options, app) {
       super(options, app);
     }
@@ -14088,24 +14215,38 @@ function requirePacmanUpdater() {
         }
       });
     }
-    get installerPath() {
-      var _a, _b;
-      return (_b = (_a = super.installerPath) === null || _a === void 0 ? void 0 : _a.replace(/ /g, "\\ ")) !== null && _b !== void 0 ? _b : null;
-    }
     doInstall(options) {
-      const sudo = this.wrapSudo();
-      const wrapper = /pkexec/i.test(sudo) ? "" : `"`;
       const installerPath = this.installerPath;
       if (installerPath == null) {
-        this.dispatchError(new Error("No valid update available, can't quit and install"));
+        this.dispatchError(new Error("No update filepath provided, can't quit and install"));
         return false;
       }
-      const cmd = ["pacman", "-U", "--noconfirm", installerPath];
-      this.spawnSyncLog(sudo, [`${wrapper}/bin/bash`, "-c", `'${cmd.join(" ")}'${wrapper}`]);
+      try {
+        PacmanUpdater2.installWithCommandRunner(installerPath, this.runCommandWithSudoIfNeeded.bind(this), this._logger);
+      } catch (error2) {
+        this.dispatchError(error2);
+        return false;
+      }
       if (options.isForceRunAfter) {
         this.app.relaunch();
       }
       return true;
+    }
+    static installWithCommandRunner(installerPath, commandRunner, logger2) {
+      var _a;
+      try {
+        commandRunner(["pacman", "-U", "--noconfirm", installerPath]);
+      } catch (error2) {
+        logger2.warn((_a = error2.message) !== null && _a !== void 0 ? _a : error2);
+        logger2.warn("pacman installation failed, attempting to update package database and retry");
+        try {
+          commandRunner(["pacman", "-Sy", "--noconfirm"]);
+          commandRunner(["pacman", "-U", "--noconfirm", installerPath]);
+        } catch (retryError) {
+          logger2.error("Retry after pacman -Sy failed");
+          throw retryError;
+        }
+      }
     }
   };
   PacmanUpdater.PacmanUpdater = PacmanUpdater$1;
@@ -14118,10 +14259,10 @@ function requireRpmUpdater() {
   hasRequiredRpmUpdater = 1;
   Object.defineProperty(RpmUpdater, "__esModule", { value: true });
   RpmUpdater.RpmUpdater = void 0;
-  const BaseUpdater_1 = requireBaseUpdater();
   const types_1 = requireTypes();
   const Provider_1 = requireProvider();
-  let RpmUpdater$1 = class RpmUpdater extends BaseUpdater_1.BaseUpdater {
+  const LinuxUpdater_1 = requireLinuxUpdater();
+  let RpmUpdater$1 = class RpmUpdater2 extends LinuxUpdater_1.LinuxUpdater {
     constructor(options, app) {
       super(options, app);
     }
@@ -14141,31 +14282,40 @@ function requireRpmUpdater() {
         }
       });
     }
-    get installerPath() {
-      var _a, _b;
-      return (_b = (_a = super.installerPath) === null || _a === void 0 ? void 0 : _a.replace(/ /g, "\\ ")) !== null && _b !== void 0 ? _b : null;
-    }
     doInstall(options) {
-      const sudo = this.wrapSudo();
-      const wrapper = /pkexec/i.test(sudo) ? "" : `"`;
-      const packageManager = this.spawnSyncLog("which zypper");
       const installerPath = this.installerPath;
       if (installerPath == null) {
-        this.dispatchError(new Error("No valid update available, can't quit and install"));
+        this.dispatchError(new Error("No update filepath provided, can't quit and install"));
         return false;
       }
-      let cmd;
-      if (!packageManager) {
-        const packageManager2 = this.spawnSyncLog("which dnf || which yum");
-        cmd = [packageManager2, "-y", "install", installerPath];
-      } else {
-        cmd = [packageManager, "--no-refresh", "install", "--allow-unsigned-rpm", "-y", "-f", installerPath];
+      const priorityList = ["zypper", "dnf", "yum", "rpm"];
+      const packageManager = this.detectPackageManager(priorityList);
+      try {
+        RpmUpdater2.installWithCommandRunner(packageManager, installerPath, this.runCommandWithSudoIfNeeded.bind(this), this._logger);
+      } catch (error2) {
+        this.dispatchError(error2);
+        return false;
       }
-      this.spawnSyncLog(sudo, [`${wrapper}/bin/bash`, "-c", `'${cmd.join(" ")}'${wrapper}`]);
       if (options.isForceRunAfter) {
         this.app.relaunch();
       }
       return true;
+    }
+    static installWithCommandRunner(packageManager, installerPath, commandRunner, logger2) {
+      if (packageManager === "zypper") {
+        return commandRunner(["zypper", "--non-interactive", "--no-refresh", "install", "--allow-unsigned-rpm", "-f", installerPath]);
+      }
+      if (packageManager === "dnf") {
+        return commandRunner(["dnf", "install", "--nogpgcheck", "-y", installerPath]);
+      }
+      if (packageManager === "yum") {
+        return commandRunner(["yum", "install", "--nogpgcheck", "-y", installerPath]);
+      }
+      if (packageManager === "rpm") {
+        logger2.warn("Installing with rpm only (no dependency resolution).");
+        return commandRunner(["rpm", "-Uvh", "--replacepkgs", "--replacefiles", "--nodeps", installerPath]);
+      }
+      throw new Error(`Package manager ${packageManager} not supported`);
     }
   };
   RpmUpdater.RpmUpdater = RpmUpdater$1;
@@ -14620,7 +14770,7 @@ function requireNsisUpdater() {
     doInstall(options) {
       const installerPath = this.installerPath;
       if (installerPath == null) {
-        this.dispatchError(new Error("No valid update available, can't quit and install"));
+        this.dispatchError(new Error("No update filepath provided, can't quit and install"));
         return false;
       }
       const args = ["--updated"];
@@ -14781,7 +14931,7 @@ function requireMain$2() {
               break;
           }
         } catch (error2) {
-          console.warn("Unable to detect 'package-type' for autoUpdater (beta rpm/deb support). If you'd like to expand support, please consider contributing to electron-builder", error2.message);
+          console.warn("Unable to detect 'package-type' for autoUpdater (beta rpm/deb/pacman support). If you'd like to expand support, please consider contributing to electron-builder", error2.message);
         }
       }
       return _autoUpdater;
@@ -24926,6 +25076,31 @@ function requireMain() {
 }
 var mainExports = requireMain();
 const log = /* @__PURE__ */ getDefaultExportFromCjs(mainExports);
+async function isPortReachable(port, { host, timeout = 1e3 } = {}) {
+  if (typeof host !== "string") {
+    throw new TypeError("Specify a `host`");
+  }
+  const promise = new Promise((resolve, reject) => {
+    const socket = new net.Socket();
+    const onError = () => {
+      socket.destroy();
+      reject();
+    };
+    socket.setTimeout(timeout);
+    socket.once("error", onError);
+    socket.once("timeout", onError);
+    socket.connect(port, host, () => {
+      socket.end();
+      resolve();
+    });
+  });
+  try {
+    await promise;
+    return true;
+  } catch {
+    return false;
+  }
+}
 const DEFAULT_REQUEST_TIMEOUT = 1e4;
 const logger$1 = {
   info: (message, ...args) => log.info(`[MONITOR] ${message}`, ...args),
@@ -24944,6 +25119,7 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
     super();
     __publicField(this, "db");
     __publicField(this, "sites", /* @__PURE__ */ new Map());
+    // key: site.identifier
     __publicField(this, "siteIntervals", /* @__PURE__ */ new Map());
     // Per-site intervals
     __publicField(this, "historyLimit", 100);
@@ -24993,7 +25169,6 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
       const defaultData = {
         sites: [],
         settings: {
-          checkInterval: 6e4,
           historyLimit: 100
         }
       };
@@ -25020,10 +25195,9 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
             lastChecked: m.lastChecked ? new Date(m.lastChecked) : void 0,
             history: m.history || [],
             monitoring: typeof m.monitoring === "undefined" ? true : m.monitoring
-          })),
-          checkInterval: siteData.checkInterval || 6e4
+          }))
         };
-        this.sites.set(site.url, site);
+        this.sites.set(site.identifier, site);
       }
       if (typeof ((_a = this.db.data.settings) == null ? void 0 : _a.historyLimit) === "number") {
         this.historyLimit = this.db.data.settings.historyLimit;
@@ -25041,8 +25215,7 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
           ...m,
           lastChecked: m.lastChecked ? new Date(m.lastChecked).toISOString() : void 0,
           monitoring: typeof m.monitoring === "undefined" ? true : m.monitoring
-        })),
-        checkInterval: site.checkInterval || 6e4
+        }))
       }));
       this.db.data.sites = sitesArray;
       this.db.data.settings = {
@@ -25055,35 +25228,27 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
     }
   }
   async addSite(siteData) {
-    logger$1.info(`Adding new site: ${siteData.url}`);
-    const id = Date.now().toString();
-    const monitors = siteData.monitors && siteData.monitors.length > 0 ? siteData.monitors.map((m) => ({
-      ...m,
-      history: m.history || [],
-      monitoring: typeof m.monitoring === "undefined" ? true : m.monitoring
-    })) : [{ type: "http", status: "pending", history: [], monitoring: true }];
+    logger$1.info(`Adding new site: ${siteData.identifier}`);
     const site = {
-      id,
-      ...siteData,
-      monitors
+      ...siteData
     };
-    this.sites.set(site.url, site);
+    this.sites.set(site.identifier, site);
     await this.saveSitesWithRetry();
     for (const monitor of site.monitors) {
       await this.checkMonitor(site, monitor.type);
     }
-    logger$1.info(`Site added successfully: ${site.url} (${site.name || "unnamed"})`);
+    logger$1.info(`Site added successfully: ${site.identifier} (${site.name || "unnamed"})`);
     return site;
   }
-  async removeSite(url) {
-    logger$1.info(`Removing site: ${url}`);
-    const removed = this.sites.delete(url);
+  async removeSite(identifier) {
+    logger$1.info(`Removing site: ${identifier}`);
+    const removed = this.sites.delete(identifier);
     if (removed) {
-      await this.saveSitesWithRetry();
-      logger$1.info(`Site removed successfully: ${url}`);
+      logger$1.info(`Site removed successfully: ${identifier}`);
     } else {
-      logger$1.warn(`Site not found for removal: ${url}`);
+      logger$1.warn(`Site not found for removal: ${identifier}`);
     }
+    await this.saveSitesWithRetry();
     return removed;
   }
   async getSites() {
@@ -25118,7 +25283,7 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
     logger$1.info(`Starting monitoring with ${this.sites.size} sites (per-site intervals)`);
     this.isMonitoring = true;
     for (const site of this.sites.values()) {
-      this.startMonitoringForSite(site.url);
+      this.startMonitoringForSite(site.identifier);
     }
   }
   stopMonitoring() {
@@ -25129,23 +25294,23 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
     this.isMonitoring = false;
     logger$1.info("Stopped all site monitoring intervals");
   }
-  startMonitoringForSite(url, monitorType) {
-    const site = this.sites.get(url);
+  startMonitoringForSite(identifier, monitorType) {
+    const site = this.sites.get(identifier);
     if (site) {
       if (monitorType) {
-        const intervalKey = `${url}|${monitorType}`;
+        const intervalKey = `${identifier}|${monitorType}`;
         if (this.siteIntervals.has(intervalKey)) {
           clearInterval(this.siteIntervals.get(intervalKey));
         }
+        const monitor = site.monitors.find((m) => m.type === monitorType);
+        if (!monitor) return false;
+        const monitorInterval = monitor.checkInterval || 6e4;
         const interval = setInterval(() => {
           this.checkMonitor(site, monitorType);
-        }, site.checkInterval || 6e4);
+        }, monitorInterval);
         this.siteIntervals.set(intervalKey, interval);
-        const monitor = site.monitors.find((m) => m.type === monitorType);
-        if (monitor) {
-          monitor.monitoring = true;
-          this.saveSitesWithRetry();
-        }
+        monitor.monitoring = true;
+        this.saveSitesWithRetry();
         const statusUpdate = {
           site: { ...site, monitors: site.monitors.map((m) => ({ ...m })) },
           previousStatus: void 0
@@ -25153,14 +25318,18 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
         this.emit("status-update", statusUpdate);
         return true;
       }
+      for (const monitor of site.monitors) {
+        this.startMonitoringForSite(identifier, monitor.type);
+      }
+      return true;
     }
     return false;
   }
-  stopMonitoringForSite(url, monitorType) {
-    const site = this.sites.get(url);
+  stopMonitoringForSite(identifier, monitorType) {
+    const site = this.sites.get(identifier);
     if (site) {
       if (monitorType) {
-        const intervalKey = `${url}|${monitorType}`;
+        const intervalKey = `${identifier}|${monitorType}`;
         if (this.siteIntervals.has(intervalKey)) {
           clearInterval(this.siteIntervals.get(intervalKey));
           this.siteIntervals.delete(intervalKey);
@@ -25177,6 +25346,10 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
         this.emit("status-update", statusUpdate);
         return true;
       }
+      for (const monitor of site.monitors) {
+        this.stopMonitoringForSite(identifier, monitor.type);
+      }
+      return true;
     }
     return false;
   }
@@ -25188,15 +25361,18 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
     let responseTime = 0;
     try {
       if (monitorType === "http") {
-        await axios.get(site.url, {
+        if (!monitor.url) throw new Error("HTTP monitor missing URL");
+        await axios.get(monitor.url, {
           timeout: DEFAULT_REQUEST_TIMEOUT,
           validateStatus: (status) => status < 500
         });
         responseTime = Date.now() - startTime;
         newStatus = "up";
       } else if (monitorType === "port") {
+        if (!monitor.host || !monitor.port) throw new Error("Port monitor missing host or port");
+        const available = await isPortReachable(monitor.port, { host: monitor.host });
         responseTime = Date.now() - startTime;
-        newStatus = "down";
+        newStatus = available ? "up" : "down";
       }
     } catch (error2) {
       responseTime = Date.now() - startTime;
@@ -25229,29 +25405,35 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
     }
     return statusUpdate;
   }
-  async checkSiteManually(url, monitorType = "http") {
-    const site = this.sites.get(url);
+  async checkSiteManually(identifier, monitorType = "http") {
+    const site = this.sites.get(identifier);
     if (!site) {
-      throw new Error(`Site with URL ${url} not found`);
+      throw new Error(`Site with identifier ${identifier} not found`);
     }
     const result = await this.checkMonitor(site, monitorType);
     return result || null;
   }
-  async updateSite(url, updates) {
-    const site = this.sites.get(url);
+  async updateSite(identifier, updates) {
+    const site = this.sites.get(identifier);
     if (!site) {
-      throw new Error(`Site not found: ${url}`);
+      throw new Error(`Site not found: ${identifier}`);
     }
     const updatedSite = {
       ...site,
       ...updates,
       monitors: updates.monitors || site.monitors
     };
-    this.sites.set(url, updatedSite);
+    this.sites.set(identifier, updatedSite);
     await this.saveSitesWithRetry();
-    if (typeof updates.checkInterval === "number") {
-      this.stopMonitoringForSite(url);
-      this.startMonitoringForSite(url);
+    if (updates.monitors) {
+      for (const updatedMonitor of updates.monitors) {
+        const prevMonitor = site.monitors.find((m) => m.type === updatedMonitor.type);
+        if (!prevMonitor) continue;
+        if (typeof updatedMonitor.checkInterval === "number" && updatedMonitor.checkInterval !== prevMonitor.checkInterval) {
+          this.stopMonitoringForSite(identifier, updatedMonitor.type);
+          this.startMonitoringForSite(identifier, updatedMonitor.type);
+        }
+      }
     }
     return updatedSite;
   }
@@ -25368,8 +25550,8 @@ class Main {
     require$$1$6.ipcMain.handle("add-site", async (_, site) => {
       return this.uptimeMonitor.addSite(site);
     });
-    require$$1$6.ipcMain.handle("remove-site", async (_, url) => {
-      return this.uptimeMonitor.removeSite(url);
+    require$$1$6.ipcMain.handle("remove-site", async (_, identifier) => {
+      return this.uptimeMonitor.removeSite(identifier);
     });
     require$$1$6.ipcMain.handle("get-sites", async () => {
       return this.uptimeMonitor.getSites();
@@ -25388,8 +25570,8 @@ class Main {
       this.uptimeMonitor.stopMonitoring();
       return true;
     });
-    require$$1$6.ipcMain.handle("check-site-now", async (_, url, monitorType) => {
-      return this.uptimeMonitor.checkSiteManually(url, monitorType);
+    require$$1$6.ipcMain.handle("check-site-now", async (_, identifier, monitorType) => {
+      return this.uptimeMonitor.checkSiteManually(identifier, monitorType);
     });
     require$$1$6.ipcMain.handle("export-data", async () => {
       return this.uptimeMonitor.exportData();
@@ -25397,43 +25579,43 @@ class Main {
     require$$1$6.ipcMain.handle("import-data", async (_, data) => {
       return this.uptimeMonitor.importData(data);
     });
-    require$$1$6.ipcMain.handle("update-site", async (_, url, updates) => {
-      return this.uptimeMonitor.updateSite(url, updates);
+    require$$1$6.ipcMain.handle("update-site", async (_, identifier, updates) => {
+      return this.uptimeMonitor.updateSite(identifier, updates);
     });
-    require$$1$6.ipcMain.handle("start-monitoring-for-site", async (_, url, monitorType) => {
-      return this.uptimeMonitor.startMonitoringForSite(url, monitorType);
+    require$$1$6.ipcMain.handle("start-monitoring-for-site", async (_, identifier, monitorType) => {
+      return this.uptimeMonitor.startMonitoringForSite(identifier, monitorType);
     });
-    require$$1$6.ipcMain.handle("stop-monitoring-for-site", async (_, url, monitorType) => {
-      return this.uptimeMonitor.stopMonitoringForSite(url, monitorType);
+    require$$1$6.ipcMain.handle("stop-monitoring-for-site", async (_, identifier, monitorType) => {
+      return this.uptimeMonitor.stopMonitoringForSite(identifier, monitorType);
     });
     this.uptimeMonitor.on("status-update", (data) => {
       var _a;
       const monitorStatuses = data.site.monitors.map((m) => `${m.type}: ${m.status}${m.responseTime ? ` (${m.responseTime}ms)` : ""}`).join(", ");
-      logger.debug(`Status update for ${data.site.url}: ${monitorStatuses}`);
+      logger.debug(`Status update for ${data.site.identifier}: ${monitorStatuses}`);
       (_a = this.mainWindow) == null ? void 0 : _a.webContents.send("status-update", data);
     });
     this.uptimeMonitor.on("site-monitor-down", ({ site, monitorType }) => {
-      logger.warn(`Monitor down alert: ${site.name || site.url} [${monitorType}]`);
+      logger.warn(`Monitor down alert: ${site.name || site.identifier} [${monitorType}]`);
       if (require$$1$6.Notification.isSupported()) {
         new require$$1$6.Notification({
           title: "Monitor Down Alert",
-          body: `${site.name || site.url} (${monitorType}) is currently down!`,
+          body: `${site.name || site.identifier} (${monitorType}) is currently down!`,
           urgency: "critical"
         }).show();
-        logger.info(`Notification sent for monitor down: ${site.name || site.url} (${monitorType})`);
+        logger.info(`Notification sent for monitor down: ${site.name || site.identifier} (${monitorType})`);
       } else {
         logger.warn("Notifications not supported on this platform");
       }
     });
     this.uptimeMonitor.on("site-monitor-up", ({ site, monitorType }) => {
-      logger.info(`Monitor restored: ${site.name || site.url} [${monitorType}]`);
+      logger.info(`Monitor restored: ${site.name || site.identifier} [${monitorType}]`);
       if (require$$1$6.Notification.isSupported()) {
         new require$$1$6.Notification({
           title: "Monitor Restored",
-          body: `${site.name || site.url} (${monitorType}) is back online!`,
+          body: `${site.name || site.identifier} (${monitorType}) is back online!`,
           urgency: "normal"
         }).show();
-        logger.info(`Notification sent for monitor restored: ${site.name || site.url} (${monitorType})`);
+        logger.info(`Notification sent for monitor restored: ${site.name || site.identifier} (${monitorType})`);
       } else {
         logger.warn("Notifications not supported on this platform");
       }

@@ -3,10 +3,10 @@ const electron = require("electron");
 electron.contextBridge.exposeInMainWorld("electronAPI", {
   // Site management
   addSite: (site) => electron.ipcRenderer.invoke("add-site", site),
-  removeSite: (url) => electron.ipcRenderer.invoke("remove-site", url),
-  updateSite: (url, updates) => electron.ipcRenderer.invoke("update-site", url, updates),
+  removeSite: (identifier) => electron.ipcRenderer.invoke("remove-site", identifier),
+  updateSite: (identifier, updates) => electron.ipcRenderer.invoke("update-site", identifier, updates),
   getSites: () => electron.ipcRenderer.invoke("get-sites"),
-  checkSiteNow: (url, monitorType) => electron.ipcRenderer.invoke("check-site-now", url, monitorType),
+  checkSiteNow: (identifier, monitorType) => electron.ipcRenderer.invoke("check-site-now", identifier, monitorType),
   // Data management
   exportData: () => electron.ipcRenderer.invoke("export-data"),
   importData: (data) => electron.ipcRenderer.invoke("import-data", data),
@@ -25,6 +25,6 @@ electron.contextBridge.exposeInMainWorld("electronAPI", {
   // Updater: allow renderer to trigger quitAndInstall
   quitAndInstall: () => electron.ipcRenderer.send("quit-and-install"),
   // Per-site monitoring
-  startMonitoringForSite: (url, monitorType) => electron.ipcRenderer.invoke("start-monitoring-for-site", url, monitorType),
-  stopMonitoringForSite: (url, monitorType) => electron.ipcRenderer.invoke("stop-monitoring-for-site", url, monitorType)
+  startMonitoringForSite: (identifier, monitorType) => electron.ipcRenderer.invoke("start-monitoring-for-site", identifier, monitorType),
+  stopMonitoringForSite: (identifier, monitorType) => electron.ipcRenderer.invoke("stop-monitoring-for-site", identifier, monitorType)
 });

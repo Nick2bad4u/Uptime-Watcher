@@ -3,7 +3,7 @@ import { autoUpdater } from "electron-updater";
 import path from "path";
 import { isDev } from "./utils";
 import { UptimeMonitor } from "./uptimeMonitor";
-import { StatusUpdate, Site } from "./types";
+import { StatusUpdate } from "./types";
 import log from "electron-log/main";
 
 // Configure electron-log for main process
@@ -109,8 +109,8 @@ class Main {
             return this.uptimeMonitor.addSite(site);
         });
 
-        ipcMain.handle("remove-site", async (_, url) => {
-            return this.uptimeMonitor.removeSite(url);
+        ipcMain.handle("remove-site", async (_, identifier) => {
+            return this.uptimeMonitor.removeSite(identifier);
         });
 
         ipcMain.handle("get-sites", async () => {
@@ -135,8 +135,8 @@ class Main {
             return true;
         });
 
-        ipcMain.handle("check-site-now", async (_, url, monitorType) => {
-            return this.uptimeMonitor.checkSiteManually(url, monitorType);
+        ipcMain.handle("check-site-now", async (_, identifier, monitorType) => {
+            return this.uptimeMonitor.checkSiteManually(identifier, monitorType);
         });
 
         ipcMain.handle("export-data", async () => {
@@ -147,15 +147,15 @@ class Main {
             return this.uptimeMonitor.importData(data);
         });
 
-        ipcMain.handle("update-site", async (_, url, updates) => {
-            return this.uptimeMonitor.updateSite(url, updates);
+        ipcMain.handle("update-site", async (_, identifier, updates) => {
+            return this.uptimeMonitor.updateSite(identifier, updates);
         });
 
-        ipcMain.handle("start-monitoring-for-site", async (_, url, monitorType) => {
-            return this.uptimeMonitor.startMonitoringForSite(url, monitorType);
+        ipcMain.handle("start-monitoring-for-site", async (_, identifier, monitorType) => {
+            return this.uptimeMonitor.startMonitoringForSite(identifier, monitorType);
         });
-        ipcMain.handle("stop-monitoring-for-site", async (_, url, monitorType) => {
-            return this.uptimeMonitor.stopMonitoringForSite(url, monitorType);
+        ipcMain.handle("stop-monitoring-for-site", async (_, identifier, monitorType) => {
+            return this.uptimeMonitor.stopMonitoringForSite(identifier, monitorType);
         });
 
         // Listen for status updates from monitor
@@ -163,33 +163,33 @@ class Main {
             const monitorStatuses = data.site.monitors
                 .map((m) => `${m.type}: ${m.status}${m.responseTime ? ` (${m.responseTime}ms)` : ""}`)
                 .join(", ");
-            logger.debug(`Status update for ${data.site.url}: ${monitorStatuses}`);
+            logger.debug(`Status update for ${data.site.identifier}: ${monitorStatuses}`);
             this.mainWindow?.webContents.send("status-update", data);
         });
 
         this.uptimeMonitor.on("site-monitor-down", ({ site, monitorType }) => {
-            logger.warn(`Monitor down alert: ${site.name || site.url} [${monitorType}]`);
+            logger.warn(`Monitor down alert: ${site.name || site.identifier} [${monitorType}]`);
             if (Notification.isSupported()) {
                 new Notification({
                     title: "Monitor Down Alert",
-                    body: `${site.name || site.url} (${monitorType}) is currently down!`,
+                    body: `${site.name || site.identifier} (${monitorType}) is currently down!`,
                     urgency: "critical",
                 }).show();
-                logger.info(`Notification sent for monitor down: ${site.name || site.url} (${monitorType})`);
+                logger.info(`Notification sent for monitor down: ${site.name || site.identifier} (${monitorType})`);
             } else {
                 logger.warn("Notifications not supported on this platform");
             }
         });
 
         this.uptimeMonitor.on("site-monitor-up", ({ site, monitorType }) => {
-            logger.info(`Monitor restored: ${site.name || site.url} [${monitorType}]`);
+            logger.info(`Monitor restored: ${site.name || site.identifier} [${monitorType}]`);
             if (Notification.isSupported()) {
                 new Notification({
                     title: "Monitor Restored",
-                    body: `${site.name || site.url} (${monitorType}) is back online!`,
+                    body: `${site.name || site.identifier} (${monitorType}) is back online!`,
                     urgency: "normal",
                 }).show();
-                logger.info(`Notification sent for monitor restored: ${site.name || site.url} (${monitorType})`);
+                logger.info(`Notification sent for monitor restored: ${site.name || site.identifier} (${monitorType})`);
             } else {
                 logger.warn("Notifications not supported on this platform");
             }

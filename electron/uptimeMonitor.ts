@@ -3,8 +3,9 @@ import axios from "axios";
 import { JSONFilePreset } from "lowdb/node";
 import path from "path";
 import { app } from "electron";
-import { Site, StatusHistory, StatusUpdate, Monitor, MonitorType } from "./types";
+import { Site, StatusHistory, StatusUpdate, MonitorType } from "./types";
 import log from "electron-log/main";
+import isPortReachable from "is-port-reachable";
 
 // Default timeout for HTTP requests (10 seconds)
 const DEFAULT_REQUEST_TIMEOUT = 10000;
@@ -26,14 +27,13 @@ const logger = {
 interface DatabaseSchema {
     sites: Site[];
     settings: {
-        checkInterval: number;
         historyLimit: number;
     };
 }
 
 export class UptimeMonitor extends EventEmitter {
     private db: any;
-    private sites: Map<string, Site> = new Map();
+    private sites: Map<string, Site> = new Map(); // key: site.identifier
     private siteIntervals: Map<string, NodeJS.Timeout> = new Map(); // Per-site intervals
     private historyLimit: number = 100; // Default history limit
     private isMonitoring: boolean = false;
@@ -88,7 +88,6 @@ export class UptimeMonitor extends EventEmitter {
             const defaultData: DatabaseSchema = {
                 sites: [],
                 settings: {
-                    checkInterval: 60000,
                     historyLimit: 100,
                 },
             };
@@ -105,7 +104,6 @@ export class UptimeMonitor extends EventEmitter {
             await this.db.read();
             const sites = this.db.data.sites || [];
             for (const siteData of sites) {
-                // Only accept new format (monitors array)
                 if (!Array.isArray(siteData.monitors)) {
                     throw new Error("Invalid site data: missing monitors array. Please use a clean database.");
                 }
@@ -117,9 +115,8 @@ export class UptimeMonitor extends EventEmitter {
                         history: m.history || [],
                         monitoring: typeof m.monitoring === "undefined" ? true : m.monitoring,
                     })),
-                    checkInterval: (siteData as any).checkInterval || 60000,
                 };
-                this.sites.set(site.url, site);
+                this.sites.set(site.identifier, site); // Use identifier as key
             }
             if (typeof this.db.data.settings?.historyLimit === "number") {
                 this.historyLimit = this.db.data.settings.historyLimit;
@@ -140,7 +137,6 @@ export class UptimeMonitor extends EventEmitter {
                     lastChecked: m.lastChecked ? new Date(m.lastChecked).toISOString() : undefined,
                     monitoring: typeof m.monitoring === "undefined" ? true : m.monitoring,
                 })),
-                checkInterval: site.checkInterval || 60000,
             }));
             this.db.data.sites = sitesArray;
             this.db.data.settings = {
@@ -153,41 +149,30 @@ export class UptimeMonitor extends EventEmitter {
         }
     }
 
-    public async addSite(siteData: Omit<Site, "id" | "monitors"> & { monitors?: Monitor[] }): Promise<Site> {
-        logger.info(`Adding new site: ${siteData.url}`);
-        const id = Date.now().toString();
-        const monitors =
-            siteData.monitors && siteData.monitors.length > 0
-                ? siteData.monitors.map((m) => ({
-                      ...m,
-                      history: m.history || [],
-                      monitoring: typeof m.monitoring === "undefined" ? true : m.monitoring,
-                  }))
-                : [{ type: "http" as MonitorType, status: "pending" as "pending", history: [], monitoring: true }];
+    public async addSite(siteData: Site): Promise<Site> {
+        logger.info(`Adding new site: ${siteData.identifier}`);
         const site: Site = {
-            id,
             ...siteData,
-            monitors,
         };
-        this.sites.set(site.url, site);
+        this.sites.set(site.identifier, site); // Use identifier as key
         await this.saveSitesWithRetry();
         // Initial check for all monitors
         for (const monitor of site.monitors) {
             await this.checkMonitor(site, monitor.type);
         }
-        logger.info(`Site added successfully: ${site.url} (${site.name || "unnamed"})`);
+        logger.info(`Site added successfully: ${site.identifier} (${site.name || "unnamed"})`);
         return site;
     }
 
-    public async removeSite(url: string): Promise<boolean> {
-        logger.info(`Removing site: ${url}`);
-        const removed = this.sites.delete(url);
+    public async removeSite(identifier: string): Promise<boolean> {
+        logger.info(`Removing site: ${identifier}`);
+        const removed = this.sites.delete(identifier);
         if (removed) {
-            await this.saveSitesWithRetry();
-            logger.info(`Site removed successfully: ${url}`);
+            logger.info(`Site removed successfully: ${identifier}`);
         } else {
-            logger.warn(`Site not found for removal: ${url}`);
+            logger.warn(`Site not found for removal: ${identifier}`);
         }
+        await this.saveSitesWithRetry();
         return removed;
     }
 
@@ -228,7 +213,7 @@ export class UptimeMonitor extends EventEmitter {
         this.isMonitoring = true;
         // Start interval for each site
         for (const site of this.sites.values()) {
-            this.startMonitoringForSite(site.url);
+            this.startMonitoringForSite(site.identifier);
         }
     }
 
@@ -241,25 +226,26 @@ export class UptimeMonitor extends EventEmitter {
         logger.info("Stopped all site monitoring intervals");
     }
 
-    public startMonitoringForSite(url: string, monitorType?: MonitorType): boolean {
-        const site = this.sites.get(url);
+    public startMonitoringForSite(identifier: string, monitorType?: MonitorType): boolean {
+        const site = this.sites.get(identifier);
         if (site) {
             if (monitorType) {
                 // Per-monitor-type: start interval for only this monitor
-                const intervalKey = `${url}|${monitorType}`;
+                const intervalKey = `${identifier}|${monitorType}`;
                 if (this.siteIntervals.has(intervalKey)) {
                     clearInterval(this.siteIntervals.get(intervalKey)!);
                 }
+                const monitor = site.monitors.find((m) => m.type === monitorType);
+                if (!monitor) return false;
+                // Use monitor-specific checkInterval, fallback to default
+                const monitorInterval = monitor.checkInterval || 60000;
                 const interval = setInterval(() => {
                     this.checkMonitor(site, monitorType);
-                }, site.checkInterval || 60000);
+                }, monitorInterval);
                 this.siteIntervals.set(intervalKey, interval);
                 // Set monitoring=true for this monitor and persist
-                const monitor = site.monitors.find((m) => m.type === monitorType);
-                if (monitor) {
-                    monitor.monitoring = true;
-                    this.saveSitesWithRetry();
-                }
+                monitor.monitoring = true;
+                this.saveSitesWithRetry();
                 // Emit status-update for this monitorType
                 const statusUpdate = {
                     site: { ...site, monitors: site.monitors.map((m) => ({ ...m })) },
@@ -268,17 +254,21 @@ export class UptimeMonitor extends EventEmitter {
                 this.emit("status-update", statusUpdate);
                 return true;
             }
-            // If no monitorType is provided, do nothing (no legacy fallback)
+            // If no monitorType is provided, start all monitors for this site
+            for (const monitor of site.monitors) {
+                this.startMonitoringForSite(identifier, monitor.type);
+            }
+            return true;
         }
         return false;
     }
 
-    public stopMonitoringForSite(url: string, monitorType?: MonitorType): boolean {
-        const site = this.sites.get(url);
+    public stopMonitoringForSite(identifier: string, monitorType?: MonitorType): boolean {
+        const site = this.sites.get(identifier);
         if (site) {
             if (monitorType) {
                 // Per-monitor-type: stop interval for only this monitor
-                const intervalKey = `${url}|${monitorType}`;
+                const intervalKey = `${identifier}|${monitorType}`;
                 if (this.siteIntervals.has(intervalKey)) {
                     clearInterval(this.siteIntervals.get(intervalKey)!);
                     this.siteIntervals.delete(intervalKey);
@@ -297,7 +287,11 @@ export class UptimeMonitor extends EventEmitter {
                 this.emit("status-update", statusUpdate);
                 return true;
             }
-            // If no monitorType is provided, do nothing (no legacy fallback)
+            // If no monitorType is provided, stop all monitors for this site
+            for (const monitor of site.monitors) {
+                this.stopMonitoringForSite(identifier, monitor.type);
+            }
+            return true;
         }
         return false;
     }
@@ -310,16 +304,18 @@ export class UptimeMonitor extends EventEmitter {
         let responseTime = 0;
         try {
             if (monitorType === "http") {
-                await axios.get(site.url, {
+                if (!monitor.url) throw new Error("HTTP monitor missing URL");
+                await axios.get(monitor.url, {
                     timeout: DEFAULT_REQUEST_TIMEOUT,
                     validateStatus: (status: number) => status < 500,
                 });
                 responseTime = Date.now() - startTime;
                 newStatus = "up";
             } else if (monitorType === "port") {
-                // Placeholder for port check
+                if (!monitor.host || !monitor.port) throw new Error("Port monitor missing host or port");
+                const available = await isPortReachable(monitor.port, { host: monitor.host });
                 responseTime = Date.now() - startTime;
-                newStatus = "down";
+                newStatus = available ? "up" : "down";
             }
         } catch (error) {
             responseTime = Date.now() - startTime;
@@ -356,19 +352,19 @@ export class UptimeMonitor extends EventEmitter {
         return statusUpdate;
     }
 
-    public async checkSiteManually(url: string, monitorType: MonitorType = "http"): Promise<StatusUpdate | null> {
-        const site = this.sites.get(url);
+    public async checkSiteManually(identifier: string, monitorType: MonitorType = "http"): Promise<StatusUpdate | null> {
+        const site = this.sites.get(identifier);
         if (!site) {
-            throw new Error(`Site with URL ${url} not found`);
+            throw new Error(`Site with identifier ${identifier} not found`);
         }
         const result = await this.checkMonitor(site, monitorType);
         return result || null;
     }
 
-    public async updateSite(url: string, updates: Partial<Site>): Promise<Site> {
-        const site = this.sites.get(url);
+    public async updateSite(identifier: string, updates: Partial<Site>): Promise<Site> {
+        const site = this.sites.get(identifier);
         if (!site) {
-            throw new Error(`Site not found: ${url}`);
+            throw new Error(`Site not found: ${identifier}`);
         }
         // Only update allowed fields
         const updatedSite: Site = {
@@ -376,12 +372,19 @@ export class UptimeMonitor extends EventEmitter {
             ...updates,
             monitors: updates.monitors || site.monitors,
         };
-        this.sites.set(url, updatedSite);
+        this.sites.set(identifier, updatedSite);
         await this.saveSitesWithRetry();
-        // If checkInterval changed, restart interval
-        if (typeof updates.checkInterval === "number") {
-            this.stopMonitoringForSite(url);
-            this.startMonitoringForSite(url);
+        // If monitors were updated, check for interval changes and restart timers as needed
+        if (updates.monitors) {
+            for (const updatedMonitor of updates.monitors) {
+                const prevMonitor = site.monitors.find((m) => m.type === updatedMonitor.type);
+                if (!prevMonitor) continue;
+                // If checkInterval changed, restart timer for this monitor
+                if (typeof updatedMonitor.checkInterval === "number" && updatedMonitor.checkInterval !== prevMonitor.checkInterval) {
+                    this.stopMonitoringForSite(identifier, updatedMonitor.type);
+                    this.startMonitoringForSite(identifier, updatedMonitor.type);
+                }
+            }
         }
         return updatedSite;
     }

@@ -5,6 +5,18 @@ export type MonitorType = "http" | "port";
 export interface Monitor {
     type: MonitorType;
     status: "up" | "down" | "pending";
+    /**
+     * Optional URL for HTTP monitors. For other types (e.g., port, IP), this is undefined.
+     */
+    url?: string;
+    /**
+     * Hostname or IP for port monitors.
+     */
+    host?: string;
+    /**
+     * Port number for port monitors.
+     */
+    port?: number;
     responseTime?: number;
     lastChecked?: Date;
     history: StatusHistory[];
@@ -13,12 +25,20 @@ export interface Monitor {
 }
 
 export interface Site {
-    id: string;
+    /**
+     * Unique identifier for the site (UUID, used as the key everywhere)
+     */
+    identifier: string;
+    /**
+     * Optional legacy id (for migration only)
+     */
+    id?: string;
     name?: string;
-    url: string;
     monitors: Monitor[];
-    checkInterval: number; // Per-site monitoring interval (ms)
-    // Legacy fields for migration:
+    monitoring?: boolean; // Per-site monitoring state
+    // Removed checkInterval: number; // Per-site monitoring interval (ms)
+    // Legacy fields for migration only:
+    // url?: string;
     // monitorType?: MonitorType;
     // status?: "up" | "down" | "pending";
     // responseTime?: number;
@@ -43,10 +63,10 @@ declare global {
         electronAPI: {
             // Now expects Site shape with monitors: Monitor[]
             addSite: (site: Omit<Site, "id">) => Promise<Site>;
-            removeSite: (url: string) => Promise<boolean>;
-            updateSite: (url: string, updates: Partial<Site>) => Promise<Site>;
+            removeSite: (identifier: string) => Promise<boolean>;
+            updateSite: (identifier: string, updates: Partial<Site>) => Promise<Site>;
             getSites: () => Promise<Site[]>;
-            checkSiteNow: (url: string, monitorType: MonitorType) => Promise<StatusUpdate>;
+            checkSiteNow: (identifier: string, monitorType: MonitorType) => Promise<StatusUpdate>;
             exportData: () => Promise<string>;
             importData: (data: string) => Promise<boolean>;
             startMonitoring: () => Promise<boolean>;
@@ -58,8 +78,8 @@ declare global {
             onStatusUpdate: (callback: (data: StatusUpdate) => void) => void;
             removeAllListeners: (channel: string) => void;
             quitAndInstall?: () => void;
-            startMonitoringForSite: (url: string, monitorType?: MonitorType) => Promise<boolean>;
-            stopMonitoringForSite: (url: string, monitorType?: MonitorType) => Promise<boolean>;
+            startMonitoringForSite: (identifier: string, monitorType?: MonitorType) => Promise<boolean>;
+            stopMonitoringForSite: (identifier: string, monitorType?: MonitorType) => Promise<boolean>;
         };
     }
 }

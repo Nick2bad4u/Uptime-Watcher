@@ -22,7 +22,7 @@ export function SiteList() {
     return (
         <div className={`divider-y ${isDark ? "dark" : ""}`}>
             {sites.map((site) => (
-                <SiteCard key={site.id} site={site} />
+                <SiteCard key={site.identifier} site={site} />
             ))}
         </div>
     );

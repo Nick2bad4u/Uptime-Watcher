@@ -6,10 +6,10 @@ import { Site } from "./types";
 contextBridge.exposeInMainWorld("electronAPI", {
     // Site management
     addSite: (site: any) => ipcRenderer.invoke("add-site", site),
-    removeSite: (url: string) => ipcRenderer.invoke("remove-site", url),
-    updateSite: (url: string, updates: Partial<Site>) => ipcRenderer.invoke("update-site", url, updates),
+    removeSite: (identifier: string) => ipcRenderer.invoke("remove-site", identifier),
+    updateSite: (identifier: string, updates: Partial<Site>) => ipcRenderer.invoke("update-site", identifier, updates),
     getSites: () => ipcRenderer.invoke("get-sites"),
-    checkSiteNow: (url: string, monitorType: string) => ipcRenderer.invoke("check-site-now", url, monitorType),
+    checkSiteNow: (identifier: string, monitorType: string) => ipcRenderer.invoke("check-site-now", identifier, monitorType),
 
     // Data management
     exportData: () => ipcRenderer.invoke("export-data"),
@@ -36,8 +36,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
     quitAndInstall: () => ipcRenderer.send("quit-and-install"),
 
     // Per-site monitoring
-    startMonitoringForSite: (url: string, monitorType?: string) =>
-        ipcRenderer.invoke("start-monitoring-for-site", url, monitorType),
-    stopMonitoringForSite: (url: string, monitorType?: string) =>
-        ipcRenderer.invoke("stop-monitoring-for-site", url, monitorType),
+    startMonitoringForSite: (identifier: string, monitorType?: string) =>
+        ipcRenderer.invoke("start-monitoring-for-site", identifier, monitorType),
+    stopMonitoringForSite: (identifier: string, monitorType?: string) =>
+        ipcRenderer.invoke("stop-monitoring-for-site", identifier, monitorType),
 });

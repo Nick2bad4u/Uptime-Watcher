@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Site, MonitorType } from "../types";
 import { useStore } from "../store";
 import { ThemedBox, ThemedText, ThemedButton, ThemedSelect, StatusIndicator, MiniChartBar } from "../theme/components";
@@ -18,9 +17,14 @@ export function SiteCard({ site }: SiteCardProps) {
         startSiteMonitorMonitoring,
         stopSiteMonitorMonitoring,
         isLoading,
+        setSelectedMonitorType,
+        getSelectedMonitorType,
     } = useStore();
-    const latestSite = sites.find((s) => s.id === site.id) || site;
-    const [selectedMonitorType, setSelectedMonitorType] = useState<MonitorType>(latestSite.monitors[0]?.type || "http");
+    const latestSite = sites.find((s) => s.identifier === site.identifier) || site;
+    // Use global store for selected monitor type
+    const monitorTypes = latestSite.monitors.map((m) => m.type);
+    const defaultMonitorType = monitorTypes[0] || "http";
+    const selectedMonitorType = getSelectedMonitorType(latestSite.identifier) || defaultMonitorType;
     const monitor = latestSite.monitors.find((m) => m.type === selectedMonitorType);
     const status = monitor?.status || "pending";
     const responseTime = monitor?.responseTime;
@@ -28,27 +32,27 @@ export function SiteCard({ site }: SiteCardProps) {
     const isMonitoring = monitor?.monitoring !== false; // default to true if undefined
 
     const handleMonitorTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedMonitorType(e.target.value as MonitorType);
+        setSelectedMonitorType(latestSite.identifier, e.target.value as MonitorType);
     };
 
     // Refactor handlers to not require event argument
     const handleStartMonitoring = () => {
-        startSiteMonitorMonitoring(latestSite.url, selectedMonitorType);
+        startSiteMonitorMonitoring(latestSite.identifier, selectedMonitorType);
     };
     const handleStopMonitoring = () => {
-        stopSiteMonitorMonitoring(latestSite.url, selectedMonitorType);
+        stopSiteMonitorMonitoring(latestSite.identifier, selectedMonitorType);
     };
-    const handleQuickCheck = () => {
-        if (!monitor) return;
-        checkSiteNow(latestSite.url, selectedMonitorType)
+    const handleCheckNow = () => {
+        checkSiteNow(latestSite.identifier, selectedMonitorType)
             .then(() =>
-                logger.user.action("Quick site check", { url: latestSite.url, monitorType: selectedMonitorType })
+                logger.user.action("Quick site check", { identifier: latestSite.identifier, monitorType: selectedMonitorType })
             )
-            .catch((error) => logger.site.error(latestSite.url, error instanceof Error ? error : String(error)));
+            .catch((error) => logger.site.error(latestSite.identifier, error instanceof Error ? error : String(error)));
     };
 
     const handleCardClick = () => {
-        setSelectedSite({ id: latestSite.id } as Site); // Only set id, store logic will handle lookup
+        setSelectedSite(latestSite);
+        setSelectedMonitorType(latestSite.identifier, selectedMonitorType);
         setShowSiteDetails(true);
     };
 
@@ -71,7 +75,7 @@ export function SiteCard({ site }: SiteCardProps) {
         >
             <div className="flex items-center justify-between">
                 <ThemedText variant="primary" size="lg" weight="semibold">
-                    {latestSite.name || latestSite.url}
+                    {latestSite.name || latestSite.identifier}
                 </ThemedText>
                 <div className="flex items-center gap-2 min-w-[180px]">
                     <div onClick={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()}>
@@ -91,7 +95,7 @@ export function SiteCard({ site }: SiteCardProps) {
                         <ThemedButton
                             variant="ghost"
                             size="sm"
-                            onClick={handleQuickCheck}
+                            onClick={handleCheckNow}
                             className="min-w-[32px]"
                             aria-label="Check Now"
                             disabled={isLoading || !monitor}

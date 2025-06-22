@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useState, useRef } from "react";
+import React, { useMemo, useEffect, useState, useRef, useCallback } from "react";
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -41,7 +41,6 @@ import "./SiteDetails.css";
 import { FaListOl } from "react-icons/fa";
 import { FiTrash2, FiSave } from "react-icons/fi";
 import { MdAccessTime, MdBolt, MdSpeed, MdOutlineFactCheck } from "react-icons/md";
-import React from "react";
 import { createPortal } from "react-dom";
 
 // Register Chart.js components
@@ -62,7 +61,7 @@ ChartJS.register(
 );
 
 interface SiteDetailsProps {
-    site: Site; // Accepts a site object, but we will use its id to look up the latest
+    site: Site; // Accepts a site object, but we will use its identifier to look up the latest
     onClose: () => void;
 }
 
@@ -85,24 +84,45 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
         setSiteDetailsChartTimeRange,
         showAdvancedMetrics,
         setShowAdvancedMetrics,
+        setSelectedMonitorType,
+        getSelectedMonitorType,
     } = useStore();
 
     const [isRefreshing, setIsRefreshing] = useState(false);
-    // --- Monitor selection state (now based on currentSite) ---
-    const currentSite = sites.find((s) => s.id === site.id);
-    if (!currentSite) return null;
+    // Always call hooks first, use fallback for currentSite
+    const currentSite = sites.find((s) => s.identifier === site.identifier) || { monitors: [], identifier: site.identifier };
     const monitorTypes = currentSite.monitors.map((m) => m.type);
-    const [selectedMonitorType, setSelectedMonitorType] = useState<MonitorType>(monitorTypes[0]);
-    // Ensure selectedMonitorType is always valid for the current site
-    useEffect(() => {
-        if (!monitorTypes.includes(selectedMonitorType)) {
-            setSelectedMonitorType(monitorTypes[0]);
-        }
-    }, [monitorTypes.join(","), selectedMonitorType]);
+    const defaultMonitorType = monitorTypes[0] || "http";
+    const selectedMonitorType = getSelectedMonitorType(currentSite.identifier) || defaultMonitorType;
     const selectedMonitor = currentSite.monitors.find((m) => m.type === selectedMonitorType) || currentSite.monitors[0];
-
-    // Per-monitor monitoring state (declare after selectedMonitor)
     const isMonitoring = selectedMonitor?.monitoring !== false;
+
+    // Handler for check now
+    const handleCheckNow = useCallback(
+        async (isAutoRefresh = false) => {
+            if (isAutoRefresh) {
+                setIsRefreshing(true);
+            } else {
+                clearError();
+            }
+            try {
+                await checkSiteNow(currentSite.identifier, selectedMonitorType);
+                if (!isAutoRefresh) {
+                    logger.user.action("Manual site check", {
+                        identifier: currentSite.identifier,
+                        monitorType: selectedMonitorType,
+                    });
+                }
+            } catch (error) {
+                logger.site.error(currentSite.identifier, error instanceof Error ? error : String(error));
+            } finally {
+                if (isAutoRefresh) {
+                    setIsRefreshing(false);
+                }
+            }
+        },
+        [checkSiteNow, clearError, currentSite.identifier, selectedMonitorType]
+    );
 
     // Auto-refresh interval
     useEffect(() => {
@@ -113,7 +133,7 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
         }, AUTO_REFRESH_INTERVAL); // Auto-refresh every 30 seconds
 
         return () => clearInterval(interval);
-    }, [isMonitoring, isLoading, isRefreshing, selectedMonitorType]);
+    }, [isMonitoring, isLoading, isRefreshing, selectedMonitorType, handleCheckNow]);
 
     // Use analytics hook (pass only selectedMonitor and timeRange)
     const analytics = useSiteAnalytics(selectedMonitor, siteDetailsChartTimeRange); // <-- Make sure the hook uses only this monitor's history
@@ -175,53 +195,37 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
 
     // Handler for monitor type change
     const handleMonitorTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedMonitorType(e.target.value as MonitorType);
-    };
-
-    // Handler for check now
-    const handleCheckNow = async (isAutoRefresh = false) => {
-        if (isAutoRefresh) {
-            setIsRefreshing(true);
-        } else {
-            clearError();
-        }
-        try {
-            await checkSiteNow(currentSite.url, selectedMonitorType);
-            if (!isAutoRefresh) {
-                logger.user.action("Manual site check", { url: currentSite.url, monitorType: selectedMonitorType });
-            }
-        } catch (error) {
-            logger.site.error(currentSite.url, error instanceof Error ? error : String(error));
-        } finally {
-            if (isAutoRefresh) {
-                setIsRefreshing(false);
-            }
+        const newType = e.target.value as MonitorType;
+        setSelectedMonitorType(currentSite.identifier, newType);
+        // If current tab is an analytics tab, switch to the new monitor's analytics tab
+        if (activeSiteDetailsTab.endsWith("-analytics")) {
+            setActiveSiteDetailsTab(`${newType}-analytics`);
         }
     };
 
     const handleRemoveSite = async () => {
-        if (!window.confirm(`Are you sure you want to remove ${currentSite.name || currentSite.url}?`)) {
+        if (!window.confirm(`Are you sure you want to remove ${currentSite.name || currentSite.identifier}?`)) {
             return;
         }
 
         clearError(); // Clear previous errors
 
         try {
-            await deleteSite(currentSite.url);
-            logger.site.removed(currentSite.url);
+            await deleteSite(currentSite.identifier);
+            logger.site.removed(currentSite.identifier);
             onClose(); // Close the details view after removing
         } catch (error) {
-            logger.site.error(currentSite.url, error instanceof Error ? error : String(error));
+            logger.site.error(currentSite.identifier, error instanceof Error ? error : String(error));
             // Error is already handled by the store action
         }
     };
 
     // Handler for per-monitor monitoring
     const handleStartMonitoring = () => {
-        startSiteMonitorMonitoring(currentSite.url, selectedMonitorType);
+        startSiteMonitorMonitoring(currentSite.identifier, selectedMonitorType);
     };
     const handleStopMonitoring = () => {
-        stopSiteMonitorMonitoring(currentSite.url, selectedMonitorType);
+        stopSiteMonitorMonitoring(currentSite.identifier, selectedMonitorType);
     };
 
     // Check interval state and handlers
@@ -230,15 +234,19 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
     useEffect(() => {
         setLocalCheckInterval(selectedMonitor?.checkInterval || 60000);
         setIntervalChanged(false);
-    }, [selectedMonitor?.checkInterval, selectedMonitor?.type, currentSite.id]);
+    }, [selectedMonitor?.checkInterval, selectedMonitor?.type, currentSite.identifier]);
     const handleIntervalChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setLocalCheckInterval(Number(e.target.value));
         setIntervalChanged(Number(e.target.value) !== selectedMonitor?.checkInterval);
     };
     const handleSaveInterval = async () => {
-        await updateSiteCheckInterval(currentSite.url, selectedMonitorType, localCheckInterval);
+        // Always use currentSite.identifier as the first argument
+        await updateSiteCheckInterval(currentSite.identifier, selectedMonitorType, localCheckInterval);
         setIntervalChanged(false);
     };
+
+    // Only return null after all hooks
+    if (!sites.find((s) => s.identifier === site.identifier)) return null;
 
     return (
         <div className="site-details-modal" onClick={onClose}>
@@ -259,8 +267,8 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                             <div className="site-details-header-info flex items-center gap-4">
                                 {/* Website Screenshot Thumbnail */}
                                 <ScreenshotThumbnail
-                                    url={currentSite.url}
-                                    siteName={currentSite.name || currentSite.url}
+                                    url={selectedMonitor?.type === "http" ? (selectedMonitor?.url ?? "") : ""}
+                                    siteName={currentSite.name || currentSite.identifier}
                                 />
                                 <div className="site-details-status-indicator">
                                     <StatusIndicator status={selectedMonitor.status} size="lg" />
@@ -272,27 +280,34 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <ThemedText size="2xl" weight="bold" className="site-details-title truncate">
-                                        {site.name || site.url}
+                                        {site.name || site.identifier}
                                     </ThemedText>
-                                    {site.name && (
+                                    {/* Show URL for HTTP, host:port for port monitor */}
+                                    {selectedMonitor.type === "http" && selectedMonitor.url && (
                                         <a
-                                            href={site.url}
+                                            href={selectedMonitor.url}
                                             className="site-details-url truncate"
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             tabIndex={0}
-                                            aria-label={`Open ${site.url} in browser`}
+                                            aria-label={`Open ${selectedMonitor.url} in browser`}
                                             onClick={(e) => {
                                                 e.preventDefault();
+                                                const url = selectedMonitor.url || "";
                                                 if (hasOpenExternal(window.electronAPI)) {
-                                                    window.electronAPI.openExternal(site.url);
+                                                    window.electronAPI.openExternal(url);
                                                 } else {
-                                                    window.open(site.url, "_blank", "noopener");
+                                                    window.open(url, "_blank", "noopener");
                                                 }
                                             }}
                                         >
-                                            {site.url}
+                                            {selectedMonitor.url}
                                         </a>
+                                    )}
+                                    {selectedMonitor.type === "port" && (
+                                        <div className="site-details-url truncate font-mono text-xs">
+                                            {selectedMonitor.host}:{selectedMonitor.port}
+                                        </div>
                                     )}
                                     <div className="site-details-meta flex items-center gap-2">
                                         <ThemedText size="xs" variant="tertiary" className="site-details-last-checked">
@@ -314,7 +329,7 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                                     </div>
                                 </div>
                             </div>
-                            {/* Monitoring enabled indicator moved above the actions */}
+                            {/* Monitoring enabled indicator for selected monitor */}
                             {isMonitoring && (
                                 <div className="site-details-monitoring-indicator flex flex-col items-center justify-center gap-1 mt-2">
                                     <div className="site-details-refresh-indicator" />
@@ -342,19 +357,14 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                                 >
                                     📊 Overview
                                 </ThemedButton>
-                                {/* Render analytics tabs for each monitor type */}
-                                {monitorTypes.map((type) => (
-                                    <ThemedButton
-                                        key={type}
-                                        variant={activeSiteDetailsTab === `${type}-analytics` ? "primary" : "secondary"}
-                                        onClick={() => {
-                                            setActiveSiteDetailsTab(`${type}-analytics`);
-                                            setSelectedMonitorType(type as MonitorType);
-                                        }}
-                                    >
-                                        {`📈 ${type.toUpperCase()}`}
-                                    </ThemedButton>
-                                ))}
+                                {/* Render analytics tab for selected monitor type only */}
+                                <ThemedButton
+                                    key={selectedMonitorType}
+                                    variant={activeSiteDetailsTab === `${selectedMonitorType}-analytics` ? "primary" : "secondary"}
+                                    onClick={() => setActiveSiteDetailsTab(`${selectedMonitorType}-analytics`)}
+                                >
+                                    {`📈 ${selectedMonitorType.toUpperCase()}`}
+                                </ThemedButton>
                                 <ThemedButton
                                     variant={activeSiteDetailsTab === "history" ? "primary" : "secondary"}
                                     onClick={() => setActiveSiteDetailsTab("history")}
@@ -374,17 +384,26 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                                     Interval:
                                 </ThemedText>
                                 <ThemedSelect value={localCheckInterval} onChange={handleIntervalChange}>
-                                    {[5000, 10000, 15000, 30000, 60000, 120000, 300000, 600000, 1800000, 3600000].map(
-                                        (interval) => (
-                                            <option key={interval} value={interval}>
-                                                {interval < 60000
-                                                    ? `${interval / 1000}s`
-                                                    : interval < 3600000
-                                                      ? `${interval / 60000}m`
-                                                      : `${interval / 3600000}h`}
+                                    {CHECK_INTERVALS.map((interval) => {
+                                        // Support both number and object forms
+                                        const value = typeof interval === "number" ? interval : interval.value;
+                                        const label = typeof interval === "number"
+                                            ? value < 60000
+                                                ? `${value / 1000}s`
+                                                : value < 3600000
+                                                ? `${value / 60000}m`
+                                                : `${value / 3600000}h`
+                                            : interval.label || (interval.value < 60000
+                                                ? `${interval.value / 1000}s`
+                                                : interval.value < 3600000
+                                                ? `${interval.value / 60000}m`
+                                                : `${interval.value / 3600000}h`);
+                                        return (
+                                            <option key={value} value={value}>
+                                                {label}
                                             </option>
-                                        )
-                                    )}
+                                        );
+                                    })}
                                 </ThemedSelect>
                                 {intervalChanged && (
                                     <ThemedButton variant="primary" size="sm" onClick={handleSaveInterval}>
@@ -438,9 +457,9 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                                 </ThemedSelect>
                             </div>
                         </div>
-                        {/* Time Range Selector for Analytics Tab (only for http) */}
+                        {/* Time Range Selector for Analytics Tab (show for both http and port) */}
                         {activeSiteDetailsTab === `${selectedMonitorType}-analytics` &&
-                            selectedMonitorType === "http" && (
+                            (selectedMonitorType === "http" || selectedMonitorType === "port") && (
                                 <div className="flex items-center flex-wrap gap-3 mt-4">
                                     <ThemedText size="sm" variant="secondary" className="mr-2">
                                         Time Range:
@@ -476,54 +495,38 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                                 isLoading={isLoading}
                             />
                         )}
-                        {/* Analytics Tab: dynamic for all monitor types */}
-                        {activeSiteDetailsTab === `${selectedMonitorType}-analytics` &&
-                            selectedMonitorType === "http" && (
-                                <AnalyticsTab
-                                    filteredHistory={analytics.filteredHistory}
-                                    upCount={analytics.upCount}
-                                    downCount={analytics.downCount}
-                                    totalChecks={analytics.totalChecks}
-                                    uptime={analytics.uptime}
-                                    avgResponseTime={analytics.avgResponseTime}
-                                    p50={analytics.p50}
-                                    p95={analytics.p95}
-                                    p99={analytics.p99}
-                                    mttr={analytics.mttr}
-                                    totalDowntime={analytics.totalDowntime}
-                                    downtimePeriods={analytics.downtimePeriods}
-                                    chartTimeRange={siteDetailsChartTimeRange}
-                                    lineChartData={lineChartData}
-                                    lineChartOptions={lineChartOptions}
-                                    barChartData={barChartData}
-                                    barChartOptions={barChartOptions}
-                                    uptimeChartData={doughnutChartData}
-                                    doughnutOptions={doughnutOptions}
-                                    formatResponseTime={formatResponseTime}
-                                    formatDuration={formatDuration}
-                                    showAdvancedMetrics={showAdvancedMetrics}
-                                    setShowAdvancedMetrics={setShowAdvancedMetrics}
-                                    getAvailabilityColor={getAvailabilityColor}
-                                    getAvailabilityVariant={getAvailabilityVariant}
-                                    getAvailabilityDescription={getAvailabilityDescription}
-                                />
-                            )}
-                        {/* Analytics Tab: placeholder for other monitor types */}
-                        {activeSiteDetailsTab === `${selectedMonitorType}-analytics` &&
-                            selectedMonitorType !== "http" && (
-                                <ThemedBox
-                                    variant="primary"
-                                    padding="xl"
-                                    className="flex flex-col items-center justify-center min-h-[200px]"
-                                >
-                                    <ThemedText size="xl" weight="semibold" variant="secondary" className="mb-4">
-                                        Analytics (Coming Soon)
-                                    </ThemedText>
-                                    <ThemedText size="base" variant="tertiary">
-                                        Analytics for this monitor type will appear here as soon as it is supported.
-                                    </ThemedText>
-                                </ThemedBox>
-                            )}
+                        {/* Only show analytics for selected monitor type and tab */}
+                        {activeSiteDetailsTab === `${selectedMonitorType}-analytics` && (
+                            <AnalyticsTab
+                                filteredHistory={analytics.filteredHistory}
+                                upCount={analytics.upCount}
+                                downCount={analytics.downCount}
+                                totalChecks={analytics.totalChecks}
+                                uptime={analytics.uptime}
+                                avgResponseTime={analytics.avgResponseTime}
+                                p50={analytics.p50}
+                                p95={analytics.p95}
+                                p99={analytics.p99}
+                                mttr={analytics.mttr}
+                                totalDowntime={analytics.totalDowntime}
+                                downtimePeriods={analytics.downtimePeriods}
+                                chartTimeRange={siteDetailsChartTimeRange}
+                                lineChartData={lineChartData}
+                                lineChartOptions={lineChartOptions}
+                                barChartData={barChartData}
+                                barChartOptions={barChartOptions}
+                                uptimeChartData={doughnutChartData}
+                                doughnutOptions={doughnutOptions}
+                                formatResponseTime={formatResponseTime}
+                                formatDuration={formatDuration}
+                                showAdvancedMetrics={showAdvancedMetrics}
+                                setShowAdvancedMetrics={setShowAdvancedMetrics}
+                                getAvailabilityColor={getAvailabilityColor}
+                                getAvailabilityVariant={getAvailabilityVariant}
+                                getAvailabilityDescription={getAvailabilityDescription}
+                                monitorType={selectedMonitorType}
+                            />
+                        )}
                         {activeSiteDetailsTab === "history" && (
                             <HistoryTab
                                 selectedMonitor={selectedMonitor}
@@ -726,6 +729,7 @@ interface AnalyticsTabProps {
     getAvailabilityColor: (percentage: number) => string;
     getAvailabilityVariant: (percentage: number) => "success" | "warning" | "danger";
     getAvailabilityDescription: (percentage: number) => string;
+    monitorType: MonitorType;
 }
 
 function AnalyticsTab({
@@ -754,6 +758,7 @@ function AnalyticsTab({
     getAvailabilityColor,
     getAvailabilityVariant,
     getAvailabilityDescription,
+    monitorType,
 }: AnalyticsTabProps) {
     return (
         <div className="space-y-6">
@@ -785,23 +790,26 @@ function AnalyticsTab({
                     </ThemedText>
                 </ThemedBox>
 
-                <ThemedBox
-                    surface="base"
-                    padding="lg"
-                    border
-                    rounded="lg"
-                    className="text-center flex flex-col items-center"
-                >
-                    <ThemedText size="sm" variant="secondary">
-                        Avg Response Time
-                    </ThemedText>
-                    <ThemedText size="3xl" weight="bold">
-                        {formatResponseTime(avgResponseTime)}
-                    </ThemedText>
-                    <ThemedText size="xs" variant="tertiary">
-                        Based on {totalChecks} checks
-                    </ThemedText>
-                </ThemedBox>
+                {/* Hide avg response time for port monitors */}
+                {(monitorType === "http" || monitorType === "port") && (
+                    <ThemedBox
+                        surface="base"
+                        padding="lg"
+                        border
+                        rounded="lg"
+                        className="text-center flex flex-col items-center"
+                    >
+                        <ThemedText size="sm" variant="secondary">
+                            Avg Response Time
+                        </ThemedText>
+                        <ThemedText size="3xl" weight="bold">
+                            {formatResponseTime(avgResponseTime)}
+                        </ThemedText>
+                        <ThemedText size="xs" variant="tertiary">
+                            Based on {totalChecks} checks
+                        </ThemedText>
+                    </ThemedBox>
+                )}
 
                 <ThemedBox
                     surface="base"
@@ -823,77 +831,81 @@ function AnalyticsTab({
             </div>
 
             {/* Response Time Percentiles */}
-            <ThemedBox surface="base" padding="lg" border rounded="lg">
-                <div className="flex items-center justify-between mb-4">
-                    <ThemedText size="lg" weight="semibold">
-                        Response Time Analysis
-                    </ThemedText>
-                    <ThemedButton
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setShowAdvancedMetrics(!showAdvancedMetrics)}
-                    >
-                        {showAdvancedMetrics ? "Hide" : "Show"} Advanced
-                    </ThemedButton>
-                </div>
+            {(monitorType === "http" || monitorType === "port") && (
+                <ThemedBox surface="base" padding="lg" border rounded="lg">
+                    <div className="flex items-center justify-between mb-4">
+                        <ThemedText size="lg" weight="semibold">
+                            Response Time Analysis
+                        </ThemedText>
+                        <ThemedButton
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setShowAdvancedMetrics(!showAdvancedMetrics)}
+                        >
+                            {showAdvancedMetrics ? "Hide" : "Show"} Advanced
+                        </ThemedButton>
+                    </div>
 
-                <div className="grid grid-cols-3 gap-4 mb-4">
-                    <div className="text-center flex flex-col items-center">
-                        <ThemedText size="sm" variant="secondary" className="mb-4">
-                            P50
-                        </ThemedText>
-                        <ThemedText size="lg" weight="medium">
-                            {formatResponseTime(p50)}
-                        </ThemedText>
-                    </div>
-                    <div className="text-center flex flex-col items-center">
-                        <ThemedText size="sm" variant="secondary" className="mb-4">
-                            P95
-                        </ThemedText>
-                        <ThemedText size="lg" weight="medium">
-                            {formatResponseTime(p95)}
-                        </ThemedText>
-                    </div>
-                    <div className="text-center flex flex-col items-center">
-                        <ThemedText size="sm" variant="secondary" className="mb-4">
-                            P99
-                        </ThemedText>
-                        <ThemedText size="lg" weight="medium">
-                            {formatResponseTime(p99)}
-                        </ThemedText>
-                    </div>
-                </div>
-
-                {showAdvancedMetrics && (
-                    <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+                    <div className="grid grid-cols-3 gap-4 mb-4">
                         <div className="text-center flex flex-col items-center">
                             <ThemedText size="sm" variant="secondary" className="mb-4">
-                                Mean Time To Recovery
+                                P50
                             </ThemedText>
                             <ThemedText size="lg" weight="medium">
-                                {formatDuration(mttr)}
+                                {formatResponseTime(p50)}
                             </ThemedText>
                         </div>
                         <div className="text-center flex flex-col items-center">
                             <ThemedText size="sm" variant="secondary" className="mb-4">
-                                Incidents
+                                P95
                             </ThemedText>
                             <ThemedText size="lg" weight="medium">
-                                {downtimePeriods.length}
+                                {formatResponseTime(p95)}
+                            </ThemedText>
+                        </div>
+                        <div className="text-center flex flex-col items-center">
+                            <ThemedText size="sm" variant="secondary" className="mb-4">
+                                P99
+                            </ThemedText>
+                            <ThemedText size="lg" weight="medium">
+                                {formatResponseTime(p99)}
                             </ThemedText>
                         </div>
                     </div>
-                )}
-            </ThemedBox>
+
+                    {showAdvancedMetrics && (
+                        <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+                            <div className="text-center flex flex-col items-center">
+                                <ThemedText size="sm" variant="secondary" className="mb-4">
+                                    Mean Time To Recovery
+                                </ThemedText>
+                                <ThemedText size="lg" weight="medium">
+                                    {formatDuration(mttr)}
+                                </ThemedText>
+                            </div>
+                            <div className="text-center flex flex-col items-center">
+                                <ThemedText size="sm" variant="secondary" className="mb-4">
+                                    Incidents
+                                </ThemedText>
+                                <ThemedText size="lg" weight="medium">
+                                    {downtimePeriods.length}
+                                </ThemedText>
+                            </div>
+                        </div>
+                    )}
+                </ThemedBox>
+            )}
 
             {/* Charts Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Response Time Chart */}
-                <ThemedBox surface="base" padding="md" border rounded="lg">
-                    <div className="h-64">
-                        <Line data={lineChartData as any} options={lineChartOptions as any} />
-                    </div>
-                </ThemedBox>
+                {(monitorType === "http" || monitorType === "port") && (
+                    <ThemedBox surface="base" padding="md" border rounded="lg">
+                        <div className="h-64">
+                            <Line data={lineChartData as any} options={lineChartOptions as any} />
+                        </div>
+                    </ThemedBox>
+                )}
 
                 {/* Uptime Doughnut Chart */}
                 <ThemedBox surface="base" padding="md" border rounded="lg">
@@ -1054,11 +1066,11 @@ function SettingsTab({
 
         try {
             const updates = { name: localName.trim() || undefined };
-            await modifySite(currentSite.url, updates);
+            await modifySite(currentSite.identifier, updates);
             setHasUnsavedChanges(false);
-            logger.user.action("Updated site name", { url: currentSite.url, name: localName.trim() });
+            logger.user.action("Updated site name", { identifier: currentSite.identifier, name: localName.trim() });
         } catch (error) {
-            logger.site.error(currentSite.url, error instanceof Error ? error : String(error));
+            logger.site.error(currentSite.identifier, error instanceof Error ? error : String(error));
         }
     };
 
@@ -1104,7 +1116,12 @@ function SettingsTab({
                         <ThemedText size="sm" weight="medium" variant="secondary" className="block mb-2">
                             Site URL
                         </ThemedText>
-                        <ThemedInput type="url" value={currentSite.url} disabled className="opacity-70" />
+                        <ThemedInput
+                            type="text"
+                            value={selectedMonitor?.url ?? currentSite.identifier}
+                            disabled
+                            className="opacity-70"
+                        />
                         <ThemedText size="xs" variant="tertiary" className="mt-1">
                             URL cannot be changed after creation
                         </ThemedText>
@@ -1118,11 +1135,26 @@ function SettingsTab({
                     Check every:
                 </ThemedText>
                 <ThemedSelect value={localCheckInterval} onChange={handleIntervalChange}>
-                    {CHECK_INTERVALS.map((interval) => (
-                        <option key={interval.value} value={interval.value}>
-                            {interval.label}
-                        </option>
-                    ))}
+                    {CHECK_INTERVALS.map((interval) => {
+                        // Support both number and object forms
+                        const value = typeof interval === "number" ? interval : interval.value;
+                        const label = typeof interval === "number"
+                            ? value < 60000
+                                ? `${value / 1000}s`
+                                : value < 3600000
+                                ? `${value / 60000}m`
+                                : `${value / 3600000}h`
+                            : interval.label || (interval.value < 60000
+                                ? `${interval.value / 1000}s`
+                                : interval.value < 3600000
+                                ? `${interval.value / 60000}m`
+                                : `${interval.value / 3600000}h`);
+                        return (
+                            <option key={value} value={value}>
+                                {label}
+                            </option>
+                        );
+                    })}
                 </ThemedSelect>
                 <ThemedButton
                     variant={intervalChanged ? "primary" : "secondary"}
@@ -1133,7 +1165,7 @@ function SettingsTab({
                     Save
                 </ThemedButton>
                 <ThemedText size="xs" variant="tertiary" className="ml-2">
-                    (This site checks every {Math.round(localCheckInterval / 1000)}s)
+                    (This monitor checks every {Math.round(localCheckInterval / 1000)}s)
                 </ThemedText>
             </ThemedBox>
 
@@ -1143,10 +1175,10 @@ function SettingsTab({
                     <div className="flex flex-col gap-3">
                         <div className="flex items-center justify-between">
                             <ThemedText size="sm" variant="secondary">
-                                Site ID:
+                                Site Identifier:
                             </ThemedText>
                             <ThemedBadge variant="secondary" size="xs">
-                                {currentSite.id}
+                                {currentSite.identifier}
                             </ThemedBadge>
                         </div>
                         <div className="flex items-center justify-between">

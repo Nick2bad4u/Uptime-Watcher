@@ -69,27 +69,27 @@ const logger = {
 
     // Log site monitoring events
     site: {
-        check: (url: string, status: string, responseTime?: number) => {
-            logger.info(`Site check: ${url} - Status: ${status}${responseTime ? ` (${responseTime}ms)` : ""}`);
+        check: (identifier: string, status: string, responseTime?: number) => {
+            logger.info(`Site check: ${identifier} - Status: ${status}${responseTime ? ` (${responseTime}ms)` : ""}`);
         },
 
-        statusChange: (url: string, oldStatus: string, newStatus: string) => {
-            logger.info(`Site status change: ${url} - ${oldStatus} -> ${newStatus}`);
+        statusChange: (identifier: string, oldStatus: string, newStatus: string) => {
+            logger.info(`Site status change: ${identifier} - ${oldStatus} -> ${newStatus}`);
         },
 
-        added: (url: string) => {
-            logger.info(`Site added: ${url}`);
+        added: (identifier: string) => {
+            logger.info(`Site added: ${identifier}`);
         },
 
-        removed: (url: string) => {
-            logger.info(`Site removed: ${url}`);
+        removed: (identifier: string) => {
+            logger.info(`Site removed: ${identifier}`);
         },
 
-        error: (url: string, error: Error | string) => {
+        error: (identifier: string, error: Error | string) => {
             if (typeof error === "string") {
-                logger.error(`Site check error: ${url} - ${error}`);
+                logger.error(`Site check error: ${identifier} - ${error}`);
             } else {
-                logger.error(`Site check error: ${url}`, error);
+                logger.error(`Site check error: ${identifier}`, error);
             }
         },
     },

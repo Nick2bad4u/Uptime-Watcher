@@ -194,3 +194,4 @@ $RECYCLE.BIN/
 release/
 dist/
 node_modules/
+dist-electron/
