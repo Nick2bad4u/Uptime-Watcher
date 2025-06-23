@@ -70,14 +70,11 @@ jobs:
                   PATCH=$(echo "$VERSION" | cut -d. -f3)
                   # PATCH appears unused, so remove or export if needed
                   # export PATCH
-                  # Standard semantic versioning: always increment PATCH
-                  NEW_VERSION="$MAJOR.$MINOR.$((PATCH + 1))"
-                  # If you want to increment MINOR or MAJOR, adjust logic here.
-                  # For example, to increment MINOR and reset PATCH:
-                  # NEW_VERSION="$MAJOR.$((MINOR + 1)).0"
-                  # To increment MAJOR and reset MINOR/PATCH:
-                  # NEW_VERSION="$((MAJOR + 1)).0.0"
-                  # Document your versioning policy above if you change this.
+                  if [ "$MINOR" -lt 9 ]; then
+                    NEW_VERSION="$MAJOR.$((MINOR + 1)).0"
+                  else
+                    NEW_VERSION="$((MAJOR + 1)).0.0"
+                  fi
                   jq --arg v "$NEW_VERSION" '.version = $v' package.json > tmp.json && mv tmp.json package.json
                   echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
 

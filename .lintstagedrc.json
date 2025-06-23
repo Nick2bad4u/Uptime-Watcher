@@ -2,7 +2,7 @@
     "*.{js,jsx,ts,tsx}": ["eslint --fix"],
     "*.{css,scss}": ["stylelint --fix"],
     "*.md": ["markdownlint --fix"],
-    "*.yaml": ["yamllint"],
-    "*.yml": ["yamllint"],
+    "*.yaml": ["set PYTHONIOENCODING=utf-8 && yamllint"],
+    "*.yml": ["set PYTHONIOENCODING=utf-8 && yamllint"],
     "*.{js,jsx,ts,tsx,css,scss,md,json,yaml,yml}": ["prettier --write"]
 }
