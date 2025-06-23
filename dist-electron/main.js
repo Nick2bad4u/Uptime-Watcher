@@ -1,16 +1,7 @@
 "use strict";
 var __defProp = Object.defineProperty;
-var __typeError = (msg) => {
-  throw TypeError(msg);
-};
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
-var __accessCheck = (obj, member, msg) => member.has(obj) || __typeError("Cannot " + msg);
-var __privateGet = (obj, member, getter) => (__accessCheck(obj, member, "read from private field"), getter ? getter.call(obj) : member.get(obj));
-var __privateAdd = (obj, member, value) => member.has(obj) ? __typeError("Cannot add the same private member more than once") : member instanceof WeakSet ? member.add(obj) : member.set(obj, value);
-var __privateSet = (obj, member, value, setter) => (__accessCheck(obj, member, "write to private field"), setter ? setter.call(obj, value) : member.set(obj, value), value);
-var __privateMethod = (obj, member, method) => (__accessCheck(obj, member, "access private method"), method);
-var _filename, _tempFilename, _locked, _prev, _next, _nextPromise, _nextData, _Writer_instances, add_fn, write_fn, _filename2, _writer, _adapter, _parse, _stringify, _data;
 const require$$1$6 = require("electron");
 const require$$1$1 = require("fs");
 const require$$0$1 = require("constants");
@@ -28,11 +19,9 @@ const require$$1$5 = require("string_decoder");
 const zlib = require("zlib");
 const require$$4 = require("http");
 const require$$4$1 = require("https");
-require("node:fs");
-const promises = require("node:fs/promises");
-const path = require("node:path");
-const node_url = require("node:url");
 const net = require("node:net");
+const require$$0$5 = require("node:path");
+const require$$1$8 = require("node:crypto");
 var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
 function getDefaultExportFromCjs(x) {
   return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, "default") ? x["default"] : x;
@@ -120,14 +109,14 @@ function requirePolyfills() {
     fs2.fstatSync = statFixSync(fs2.fstatSync);
     fs2.lstatSync = statFixSync(fs2.lstatSync);
     if (fs2.chmod && !fs2.lchmod) {
-      fs2.lchmod = function(path2, mode, cb) {
+      fs2.lchmod = function(path, mode, cb) {
         if (cb) process.nextTick(cb);
       };
       fs2.lchmodSync = function() {
       };
     }
     if (fs2.chown && !fs2.lchown) {
-      fs2.lchown = function(path2, uid, gid, cb) {
+      fs2.lchown = function(path, uid, gid, cb) {
         if (cb) process.nextTick(cb);
       };
       fs2.lchownSync = function() {
@@ -194,9 +183,9 @@ function requirePolyfills() {
       };
     }(fs2.readSync);
     function patchLchmod(fs22) {
-      fs22.lchmod = function(path2, mode, callback) {
+      fs22.lchmod = function(path, mode, callback) {
         fs22.open(
-          path2,
+          path,
           constants2.O_WRONLY | constants2.O_SYMLINK,
           mode,
           function(err, fd) {
@@ -212,8 +201,8 @@ function requirePolyfills() {
           }
         );
       };
-      fs22.lchmodSync = function(path2, mode) {
-        var fd = fs22.openSync(path2, constants2.O_WRONLY | constants2.O_SYMLINK, mode);
+      fs22.lchmodSync = function(path, mode) {
+        var fd = fs22.openSync(path, constants2.O_WRONLY | constants2.O_SYMLINK, mode);
         var threw = true;
         var ret;
         try {
@@ -234,8 +223,8 @@ function requirePolyfills() {
     }
     function patchLutimes(fs22) {
       if (constants2.hasOwnProperty("O_SYMLINK") && fs22.futimes) {
-        fs22.lutimes = function(path2, at, mt, cb) {
-          fs22.open(path2, constants2.O_SYMLINK, function(er, fd) {
+        fs22.lutimes = function(path, at, mt, cb) {
+          fs22.open(path, constants2.O_SYMLINK, function(er, fd) {
             if (er) {
               if (cb) cb(er);
               return;
@@ -247,8 +236,8 @@ function requirePolyfills() {
             });
           });
         };
-        fs22.lutimesSync = function(path2, at, mt) {
-          var fd = fs22.openSync(path2, constants2.O_SYMLINK);
+        fs22.lutimesSync = function(path, at, mt) {
+          var fd = fs22.openSync(path, constants2.O_SYMLINK);
           var ret;
           var threw = true;
           try {
@@ -367,11 +356,11 @@ function requireLegacyStreams() {
       ReadStream,
       WriteStream
     };
-    function ReadStream(path2, options) {
-      if (!(this instanceof ReadStream)) return new ReadStream(path2, options);
+    function ReadStream(path, options) {
+      if (!(this instanceof ReadStream)) return new ReadStream(path, options);
       Stream.call(this);
       var self2 = this;
-      this.path = path2;
+      this.path = path;
       this.fd = null;
       this.readable = true;
       this.paused = false;
@@ -416,10 +405,10 @@ function requireLegacyStreams() {
         self2._read();
       });
     }
-    function WriteStream(path2, options) {
-      if (!(this instanceof WriteStream)) return new WriteStream(path2, options);
+    function WriteStream(path, options) {
+      if (!(this instanceof WriteStream)) return new WriteStream(path, options);
       Stream.call(this);
-      this.path = path2;
+      this.path = path;
       this.fd = null;
       this.writable = true;
       this.flags = "w";
@@ -562,14 +551,14 @@ function requireGracefulFs() {
     fs22.createWriteStream = createWriteStream;
     var fs$readFile = fs22.readFile;
     fs22.readFile = readFile;
-    function readFile(path2, options, cb) {
+    function readFile(path, options, cb) {
       if (typeof options === "function")
         cb = options, options = null;
-      return go$readFile(path2, options, cb);
-      function go$readFile(path22, options2, cb2, startTime) {
-        return fs$readFile(path22, options2, function(err) {
+      return go$readFile(path, options, cb);
+      function go$readFile(path2, options2, cb2, startTime) {
+        return fs$readFile(path2, options2, function(err) {
           if (err && (err.code === "EMFILE" || err.code === "ENFILE"))
-            enqueue([go$readFile, [path22, options2, cb2], err, startTime || Date.now(), Date.now()]);
+            enqueue([go$readFile, [path2, options2, cb2], err, startTime || Date.now(), Date.now()]);
           else {
             if (typeof cb2 === "function")
               cb2.apply(this, arguments);
@@ -579,14 +568,14 @@ function requireGracefulFs() {
     }
     var fs$writeFile = fs22.writeFile;
     fs22.writeFile = writeFile;
-    function writeFile(path2, data, options, cb) {
+    function writeFile(path, data, options, cb) {
       if (typeof options === "function")
         cb = options, options = null;
-      return go$writeFile(path2, data, options, cb);
-      function go$writeFile(path22, data2, options2, cb2, startTime) {
-        return fs$writeFile(path22, data2, options2, function(err) {
+      return go$writeFile(path, data, options, cb);
+      function go$writeFile(path2, data2, options2, cb2, startTime) {
+        return fs$writeFile(path2, data2, options2, function(err) {
           if (err && (err.code === "EMFILE" || err.code === "ENFILE"))
-            enqueue([go$writeFile, [path22, data2, options2, cb2], err, startTime || Date.now(), Date.now()]);
+            enqueue([go$writeFile, [path2, data2, options2, cb2], err, startTime || Date.now(), Date.now()]);
           else {
             if (typeof cb2 === "function")
               cb2.apply(this, arguments);
@@ -597,14 +586,14 @@ function requireGracefulFs() {
     var fs$appendFile = fs22.appendFile;
     if (fs$appendFile)
       fs22.appendFile = appendFile;
-    function appendFile(path2, data, options, cb) {
+    function appendFile(path, data, options, cb) {
       if (typeof options === "function")
         cb = options, options = null;
-      return go$appendFile(path2, data, options, cb);
-      function go$appendFile(path22, data2, options2, cb2, startTime) {
-        return fs$appendFile(path22, data2, options2, function(err) {
+      return go$appendFile(path, data, options, cb);
+      function go$appendFile(path2, data2, options2, cb2, startTime) {
+        return fs$appendFile(path2, data2, options2, function(err) {
           if (err && (err.code === "EMFILE" || err.code === "ENFILE"))
-            enqueue([go$appendFile, [path22, data2, options2, cb2], err, startTime || Date.now(), Date.now()]);
+            enqueue([go$appendFile, [path2, data2, options2, cb2], err, startTime || Date.now(), Date.now()]);
           else {
             if (typeof cb2 === "function")
               cb2.apply(this, arguments);
@@ -635,31 +624,31 @@ function requireGracefulFs() {
     var fs$readdir = fs22.readdir;
     fs22.readdir = readdir;
     var noReaddirOptionVersions = /^v[0-5]\./;
-    function readdir(path2, options, cb) {
+    function readdir(path, options, cb) {
       if (typeof options === "function")
         cb = options, options = null;
-      var go$readdir = noReaddirOptionVersions.test(process.version) ? function go$readdir2(path22, options2, cb2, startTime) {
-        return fs$readdir(path22, fs$readdirCallback(
-          path22,
+      var go$readdir = noReaddirOptionVersions.test(process.version) ? function go$readdir2(path2, options2, cb2, startTime) {
+        return fs$readdir(path2, fs$readdirCallback(
+          path2,
           options2,
           cb2,
           startTime
         ));
-      } : function go$readdir2(path22, options2, cb2, startTime) {
-        return fs$readdir(path22, options2, fs$readdirCallback(
-          path22,
+      } : function go$readdir2(path2, options2, cb2, startTime) {
+        return fs$readdir(path2, options2, fs$readdirCallback(
+          path2,
           options2,
           cb2,
           startTime
         ));
       };
-      return go$readdir(path2, options, cb);
-      function fs$readdirCallback(path22, options2, cb2, startTime) {
+      return go$readdir(path, options, cb);
+      function fs$readdirCallback(path2, options2, cb2, startTime) {
         return function(err, files) {
           if (err && (err.code === "EMFILE" || err.code === "ENFILE"))
             enqueue([
               go$readdir,
-              [path22, options2, cb2],
+              [path2, options2, cb2],
               err,
               startTime || Date.now(),
               Date.now()
@@ -730,7 +719,7 @@ function requireGracefulFs() {
       enumerable: true,
       configurable: true
     });
-    function ReadStream(path2, options) {
+    function ReadStream(path, options) {
       if (this instanceof ReadStream)
         return fs$ReadStream.apply(this, arguments), this;
       else
@@ -750,7 +739,7 @@ function requireGracefulFs() {
         }
       });
     }
-    function WriteStream(path2, options) {
+    function WriteStream(path, options) {
       if (this instanceof WriteStream)
         return fs$WriteStream.apply(this, arguments), this;
       else
@@ -768,22 +757,22 @@ function requireGracefulFs() {
         }
       });
     }
-    function createReadStream(path2, options) {
-      return new fs22.ReadStream(path2, options);
+    function createReadStream(path, options) {
+      return new fs22.ReadStream(path, options);
     }
-    function createWriteStream(path2, options) {
-      return new fs22.WriteStream(path2, options);
+    function createWriteStream(path, options) {
+      return new fs22.WriteStream(path, options);
     }
     var fs$open = fs22.open;
     fs22.open = open;
-    function open(path2, flags, mode, cb) {
+    function open(path, flags, mode, cb) {
       if (typeof mode === "function")
         cb = mode, mode = null;
-      return go$open(path2, flags, mode, cb);
-      function go$open(path22, flags2, mode2, cb2, startTime) {
-        return fs$open(path22, flags2, mode2, function(err, fd) {
+      return go$open(path, flags, mode, cb);
+      function go$open(path2, flags2, mode2, cb2, startTime) {
+        return fs$open(path2, flags2, mode2, function(err, fd) {
           if (err && (err.code === "EMFILE" || err.code === "ENFILE"))
-            enqueue([go$open, [path22, flags2, mode2, cb2], err, startTime || Date.now(), Date.now()]);
+            enqueue([go$open, [path2, flags2, mode2, cb2], err, startTime || Date.now(), Date.now()]);
           else {
             if (typeof cb2 === "function")
               cb2.apply(this, arguments);
@@ -955,10 +944,10 @@ var hasRequiredUtils$1;
 function requireUtils$1() {
   if (hasRequiredUtils$1) return utils$3;
   hasRequiredUtils$1 = 1;
-  const path2 = require$$1$2;
+  const path = require$$1$2;
   utils$3.checkPath = function checkPath(pth) {
     if (process.platform === "win32") {
-      const pathHasInvalidWinCharacters = /[<>:"|?*]/.test(pth.replace(path2.parse(pth).root, ""));
+      const pathHasInvalidWinCharacters = /[<>:"|?*]/.test(pth.replace(path.parse(pth).root, ""));
       if (pathHasInvalidWinCharacters) {
         const error2 = new Error(`Path contains invalid characters: ${pth}`);
         error2.code = "EINVAL";
@@ -1021,8 +1010,8 @@ function requirePathExists() {
   hasRequiredPathExists = 1;
   const u = requireUniversalify().fromPromise;
   const fs2 = /* @__PURE__ */ requireFs();
-  function pathExists(path2) {
-    return fs2.access(path2).then(() => true).catch(() => false);
+  function pathExists(path) {
+    return fs2.access(path).then(() => true).catch(() => false);
   }
   pathExists_1 = {
     pathExists: u(pathExists),
@@ -1036,8 +1025,8 @@ function requireUtimes() {
   if (hasRequiredUtimes) return utimes;
   hasRequiredUtimes = 1;
   const fs2 = requireGracefulFs();
-  function utimesMillis(path2, atime, mtime, callback) {
-    fs2.open(path2, "r+", (err, fd) => {
+  function utimesMillis(path, atime, mtime, callback) {
+    fs2.open(path, "r+", (err, fd) => {
       if (err) return callback(err);
       fs2.futimes(fd, atime, mtime, (futimesErr) => {
         fs2.close(fd, (closeErr) => {
@@ -1046,8 +1035,8 @@ function requireUtimes() {
       });
     });
   }
-  function utimesMillisSync(path2, atime, mtime) {
-    const fd = fs2.openSync(path2, "r+");
+  function utimesMillisSync(path, atime, mtime) {
+    const fd = fs2.openSync(path, "r+");
     fs2.futimesSync(fd, atime, mtime);
     return fs2.closeSync(fd);
   }
@@ -1063,7 +1052,7 @@ function requireStat() {
   if (hasRequiredStat) return stat;
   hasRequiredStat = 1;
   const fs2 = /* @__PURE__ */ requireFs();
-  const path2 = require$$1$2;
+  const path = require$$1$2;
   const util2 = require$$1;
   function getStats(src2, dest, opts) {
     const statFunc = opts.dereference ? (file2) => fs2.stat(file2, { bigint: true }) : (file2) => fs2.lstat(file2, { bigint: true });
@@ -1093,8 +1082,8 @@ function requireStat() {
       const { srcStat, destStat } = stats;
       if (destStat) {
         if (areIdentical(srcStat, destStat)) {
-          const srcBaseName = path2.basename(src2);
-          const destBaseName = path2.basename(dest);
+          const srcBaseName = path.basename(src2);
+          const destBaseName = path.basename(dest);
           if (funcName === "move" && srcBaseName !== destBaseName && srcBaseName.toLowerCase() === destBaseName.toLowerCase()) {
             return cb(null, { srcStat, destStat, isChangingCase: true });
           }
@@ -1117,8 +1106,8 @@ function requireStat() {
     const { srcStat, destStat } = getStatsSync(src2, dest, opts);
     if (destStat) {
       if (areIdentical(srcStat, destStat)) {
-        const srcBaseName = path2.basename(src2);
-        const destBaseName = path2.basename(dest);
+        const srcBaseName = path.basename(src2);
+        const destBaseName = path.basename(dest);
         if (funcName === "move" && srcBaseName !== destBaseName && srcBaseName.toLowerCase() === destBaseName.toLowerCase()) {
           return { srcStat, destStat, isChangingCase: true };
         }
@@ -1137,9 +1126,9 @@ function requireStat() {
     return { srcStat, destStat };
   }
   function checkParentPaths(src2, srcStat, dest, funcName, cb) {
-    const srcParent = path2.resolve(path2.dirname(src2));
-    const destParent = path2.resolve(path2.dirname(dest));
-    if (destParent === srcParent || destParent === path2.parse(destParent).root) return cb();
+    const srcParent = path.resolve(path.dirname(src2));
+    const destParent = path.resolve(path.dirname(dest));
+    if (destParent === srcParent || destParent === path.parse(destParent).root) return cb();
     fs2.stat(destParent, { bigint: true }, (err, destStat) => {
       if (err) {
         if (err.code === "ENOENT") return cb();
@@ -1152,9 +1141,9 @@ function requireStat() {
     });
   }
   function checkParentPathsSync(src2, srcStat, dest, funcName) {
-    const srcParent = path2.resolve(path2.dirname(src2));
-    const destParent = path2.resolve(path2.dirname(dest));
-    if (destParent === srcParent || destParent === path2.parse(destParent).root) return;
+    const srcParent = path.resolve(path.dirname(src2));
+    const destParent = path.resolve(path.dirname(dest));
+    if (destParent === srcParent || destParent === path.parse(destParent).root) return;
     let destStat;
     try {
       destStat = fs2.statSync(destParent, { bigint: true });
@@ -1171,8 +1160,8 @@ function requireStat() {
     return destStat.ino && destStat.dev && destStat.ino === srcStat.ino && destStat.dev === srcStat.dev;
   }
   function isSrcSubdir(src2, dest) {
-    const srcArr = path2.resolve(src2).split(path2.sep).filter((i) => i);
-    const destArr = path2.resolve(dest).split(path2.sep).filter((i) => i);
+    const srcArr = path.resolve(src2).split(path.sep).filter((i) => i);
+    const destArr = path.resolve(dest).split(path.sep).filter((i) => i);
     return srcArr.reduce((acc, cur, i) => acc && destArr[i] === cur, true);
   }
   function errMsg(src2, dest, funcName) {
@@ -1194,7 +1183,7 @@ function requireCopy$1() {
   if (hasRequiredCopy$1) return copy_1;
   hasRequiredCopy$1 = 1;
   const fs2 = requireGracefulFs();
-  const path2 = require$$1$2;
+  const path = require$$1$2;
   const mkdirs2 = requireMkdirs().mkdirs;
   const pathExists = requirePathExists().pathExists;
   const utimesMillis = requireUtimes().utimesMillis;
@@ -1229,7 +1218,7 @@ function requireCopy$1() {
     });
   }
   function checkParentDir(destStat, src2, dest, opts, cb) {
-    const destParent = path2.dirname(dest);
+    const destParent = path.dirname(dest);
     pathExists(destParent, (err, dirExists) => {
       if (err) return cb(err);
       if (dirExists) return getStats(destStat, src2, dest, opts, cb);
@@ -1337,8 +1326,8 @@ function requireCopy$1() {
     return copyDirItem(items, item, src2, dest, opts, cb);
   }
   function copyDirItem(items, item, src2, dest, opts, cb) {
-    const srcItem = path2.join(src2, item);
-    const destItem = path2.join(dest, item);
+    const srcItem = path.join(src2, item);
+    const destItem = path.join(dest, item);
     stat2.checkPaths(srcItem, destItem, "copy", opts, (err, stats) => {
       if (err) return cb(err);
       const { destStat } = stats;
@@ -1352,7 +1341,7 @@ function requireCopy$1() {
     fs2.readlink(src2, (err, resolvedSrc) => {
       if (err) return cb(err);
       if (opts.dereference) {
-        resolvedSrc = path2.resolve(process.cwd(), resolvedSrc);
+        resolvedSrc = path.resolve(process.cwd(), resolvedSrc);
       }
       if (!destStat) {
         return fs2.symlink(resolvedSrc, dest, cb);
@@ -1363,7 +1352,7 @@ function requireCopy$1() {
             return cb(err2);
           }
           if (opts.dereference) {
-            resolvedDest = path2.resolve(process.cwd(), resolvedDest);
+            resolvedDest = path.resolve(process.cwd(), resolvedDest);
           }
           if (stat2.isSrcSubdir(resolvedSrc, resolvedDest)) {
             return cb(new Error(`Cannot copy '${resolvedSrc}' to a subdirectory of itself, '${resolvedDest}'.`));
@@ -1391,7 +1380,7 @@ function requireCopySync() {
   if (hasRequiredCopySync) return copySync_1;
   hasRequiredCopySync = 1;
   const fs2 = requireGracefulFs();
-  const path2 = require$$1$2;
+  const path = require$$1$2;
   const mkdirsSync = requireMkdirs().mkdirsSync;
   const utimesMillisSync = requireUtimes().utimesMillisSync;
   const stat2 = /* @__PURE__ */ requireStat();
@@ -1415,7 +1404,7 @@ function requireCopySync() {
   }
   function handleFilterAndCopy(destStat, src2, dest, opts) {
     if (opts.filter && !opts.filter(src2, dest)) return;
-    const destParent = path2.dirname(dest);
+    const destParent = path.dirname(dest);
     if (!fs2.existsSync(destParent)) mkdirsSync(destParent);
     return getStats(destStat, src2, dest, opts);
   }
@@ -1480,15 +1469,15 @@ function requireCopySync() {
     fs2.readdirSync(src2).forEach((item) => copyDirItem(item, src2, dest, opts));
   }
   function copyDirItem(item, src2, dest, opts) {
-    const srcItem = path2.join(src2, item);
-    const destItem = path2.join(dest, item);
+    const srcItem = path.join(src2, item);
+    const destItem = path.join(dest, item);
     const { destStat } = stat2.checkPathsSync(srcItem, destItem, "copy", opts);
     return startCopy(destStat, srcItem, destItem, opts);
   }
   function onLink(destStat, src2, dest, opts) {
     let resolvedSrc = fs2.readlinkSync(src2);
     if (opts.dereference) {
-      resolvedSrc = path2.resolve(process.cwd(), resolvedSrc);
+      resolvedSrc = path.resolve(process.cwd(), resolvedSrc);
     }
     if (!destStat) {
       return fs2.symlinkSync(resolvedSrc, dest);
@@ -1501,7 +1490,7 @@ function requireCopySync() {
         throw err;
       }
       if (opts.dereference) {
-        resolvedDest = path2.resolve(process.cwd(), resolvedDest);
+        resolvedDest = path.resolve(process.cwd(), resolvedDest);
       }
       if (stat2.isSrcSubdir(resolvedSrc, resolvedDest)) {
         throw new Error(`Cannot copy '${resolvedSrc}' to a subdirectory of itself, '${resolvedDest}'.`);
@@ -1537,7 +1526,7 @@ function requireRimraf() {
   if (hasRequiredRimraf) return rimraf_1;
   hasRequiredRimraf = 1;
   const fs2 = requireGracefulFs();
-  const path2 = require$$1$2;
+  const path = require$$1$2;
   const assert = require$$5;
   const isWindows = process.platform === "win32";
   function defaults2(options) {
@@ -1682,7 +1671,7 @@ function requireRimraf() {
       let errState;
       if (n === 0) return options.rmdir(p, cb);
       files.forEach((f) => {
-        rimraf(path2.join(p, f), options, (er2) => {
+        rimraf(path.join(p, f), options, (er2) => {
           if (errState) {
             return;
           }
@@ -1747,7 +1736,7 @@ function requireRimraf() {
   function rmkidsSync(p, options) {
     assert(p);
     assert(options);
-    options.readdirSync(p).forEach((f) => rimrafSync(path2.join(p, f), options));
+    options.readdirSync(p).forEach((f) => rimrafSync(path.join(p, f), options));
     if (isWindows) {
       const startTime = Date.now();
       do {
@@ -1774,13 +1763,13 @@ function requireRemove() {
   const fs2 = requireGracefulFs();
   const u = requireUniversalify().fromCallback;
   const rimraf = /* @__PURE__ */ requireRimraf();
-  function remove(path2, callback) {
-    if (fs2.rm) return fs2.rm(path2, { recursive: true, force: true }, callback);
-    rimraf(path2, callback);
+  function remove(path, callback) {
+    if (fs2.rm) return fs2.rm(path, { recursive: true, force: true }, callback);
+    rimraf(path, callback);
   }
-  function removeSync(path2) {
-    if (fs2.rmSync) return fs2.rmSync(path2, { recursive: true, force: true });
-    rimraf.sync(path2);
+  function removeSync(path) {
+    if (fs2.rmSync) return fs2.rmSync(path, { recursive: true, force: true });
+    rimraf.sync(path);
   }
   remove_1 = {
     remove: u(remove),
@@ -1795,7 +1784,7 @@ function requireEmpty() {
   hasRequiredEmpty = 1;
   const u = requireUniversalify().fromPromise;
   const fs2 = /* @__PURE__ */ requireFs();
-  const path2 = require$$1$2;
+  const path = require$$1$2;
   const mkdir = /* @__PURE__ */ requireMkdirs();
   const remove = /* @__PURE__ */ requireRemove();
   const emptyDir = u(async function emptyDir2(dir) {
@@ -1805,7 +1794,7 @@ function requireEmpty() {
     } catch {
       return mkdir.mkdirs(dir);
     }
-    return Promise.all(items.map((item) => remove.remove(path2.join(dir, item))));
+    return Promise.all(items.map((item) => remove.remove(path.join(dir, item))));
   });
   function emptyDirSync(dir) {
     let items;
@@ -1815,7 +1804,7 @@ function requireEmpty() {
       return mkdir.mkdirsSync(dir);
     }
     items.forEach((item) => {
-      item = path2.join(dir, item);
+      item = path.join(dir, item);
       remove.removeSync(item);
     });
   }
@@ -1833,7 +1822,7 @@ function requireFile$2() {
   if (hasRequiredFile$2) return file$1;
   hasRequiredFile$2 = 1;
   const u = requireUniversalify().fromCallback;
-  const path2 = require$$1$2;
+  const path = require$$1$2;
   const fs2 = requireGracefulFs();
   const mkdir = /* @__PURE__ */ requireMkdirs();
   function createFile(file2, callback) {
@@ -1845,7 +1834,7 @@ function requireFile$2() {
     }
     fs2.stat(file2, (err, stats) => {
       if (!err && stats.isFile()) return callback();
-      const dir = path2.dirname(file2);
+      const dir = path.dirname(file2);
       fs2.stat(dir, (err2, stats2) => {
         if (err2) {
           if (err2.code === "ENOENT") {
@@ -1872,7 +1861,7 @@ function requireFile$2() {
     } catch {
     }
     if (stats && stats.isFile()) return;
-    const dir = path2.dirname(file2);
+    const dir = path.dirname(file2);
     try {
       if (!fs2.statSync(dir).isDirectory()) {
         fs2.readdirSync(dir);
@@ -1895,7 +1884,7 @@ function requireLink() {
   if (hasRequiredLink) return link;
   hasRequiredLink = 1;
   const u = requireUniversalify().fromCallback;
-  const path2 = require$$1$2;
+  const path = require$$1$2;
   const fs2 = requireGracefulFs();
   const mkdir = /* @__PURE__ */ requireMkdirs();
   const pathExists = requirePathExists().pathExists;
@@ -1914,7 +1903,7 @@ function requireLink() {
           return callback(err);
         }
         if (dstStat && areIdentical(srcStat, dstStat)) return callback(null);
-        const dir = path2.dirname(dstpath);
+        const dir = path.dirname(dstpath);
         pathExists(dir, (err2, dirExists) => {
           if (err2) return callback(err2);
           if (dirExists) return makeLink(srcpath, dstpath);
@@ -1939,7 +1928,7 @@ function requireLink() {
       err.message = err.message.replace("lstat", "ensureLink");
       throw err;
     }
-    const dir = path2.dirname(dstpath);
+    const dir = path.dirname(dstpath);
     const dirExists = fs2.existsSync(dir);
     if (dirExists) return fs2.linkSync(srcpath, dstpath);
     mkdir.mkdirsSync(dir);
@@ -1956,11 +1945,11 @@ var hasRequiredSymlinkPaths;
 function requireSymlinkPaths() {
   if (hasRequiredSymlinkPaths) return symlinkPaths_1;
   hasRequiredSymlinkPaths = 1;
-  const path2 = require$$1$2;
+  const path = require$$1$2;
   const fs2 = requireGracefulFs();
   const pathExists = requirePathExists().pathExists;
   function symlinkPaths(srcpath, dstpath, callback) {
-    if (path2.isAbsolute(srcpath)) {
+    if (path.isAbsolute(srcpath)) {
       return fs2.lstat(srcpath, (err) => {
         if (err) {
           err.message = err.message.replace("lstat", "ensureSymlink");
@@ -1972,8 +1961,8 @@ function requireSymlinkPaths() {
         });
       });
     } else {
-      const dstdir = path2.dirname(dstpath);
-      const relativeToDst = path2.join(dstdir, srcpath);
+      const dstdir = path.dirname(dstpath);
+      const relativeToDst = path.join(dstdir, srcpath);
       return pathExists(relativeToDst, (err, exists) => {
         if (err) return callback(err);
         if (exists) {
@@ -1989,7 +1978,7 @@ function requireSymlinkPaths() {
             }
             return callback(null, {
               toCwd: srcpath,
-              toDst: path2.relative(dstdir, srcpath)
+              toDst: path.relative(dstdir, srcpath)
             });
           });
         }
@@ -1998,7 +1987,7 @@ function requireSymlinkPaths() {
   }
   function symlinkPathsSync(srcpath, dstpath) {
     let exists;
-    if (path2.isAbsolute(srcpath)) {
+    if (path.isAbsolute(srcpath)) {
       exists = fs2.existsSync(srcpath);
       if (!exists) throw new Error("absolute srcpath does not exist");
       return {
@@ -2006,8 +1995,8 @@ function requireSymlinkPaths() {
         toDst: srcpath
       };
     } else {
-      const dstdir = path2.dirname(dstpath);
-      const relativeToDst = path2.join(dstdir, srcpath);
+      const dstdir = path.dirname(dstpath);
+      const relativeToDst = path.join(dstdir, srcpath);
       exists = fs2.existsSync(relativeToDst);
       if (exists) {
         return {
@@ -2019,7 +2008,7 @@ function requireSymlinkPaths() {
         if (!exists) throw new Error("relative srcpath does not exist");
         return {
           toCwd: srcpath,
-          toDst: path2.relative(dstdir, srcpath)
+          toDst: path.relative(dstdir, srcpath)
         };
       }
     }
@@ -2068,7 +2057,7 @@ function requireSymlink() {
   if (hasRequiredSymlink) return symlink;
   hasRequiredSymlink = 1;
   const u = requireUniversalify().fromCallback;
-  const path2 = require$$1$2;
+  const path = require$$1$2;
   const fs2 = /* @__PURE__ */ requireFs();
   const _mkdirs = /* @__PURE__ */ requireMkdirs();
   const mkdirs2 = _mkdirs.mkdirs;
@@ -2102,7 +2091,7 @@ function requireSymlink() {
       srcpath = relative.toDst;
       symlinkType(relative.toCwd, type2, (err2, type3) => {
         if (err2) return callback(err2);
-        const dir = path2.dirname(dstpath);
+        const dir = path.dirname(dstpath);
         pathExists(dir, (err3, dirExists) => {
           if (err3) return callback(err3);
           if (dirExists) return fs2.symlink(srcpath, dstpath, type3, callback);
@@ -2128,7 +2117,7 @@ function requireSymlink() {
     const relative = symlinkPathsSync(srcpath, dstpath);
     srcpath = relative.toDst;
     type2 = symlinkTypeSync(relative.toCwd, type2);
-    const dir = path2.dirname(dstpath);
+    const dir = path.dirname(dstpath);
     const exists = fs2.existsSync(dir);
     if (exists) return fs2.symlinkSync(srcpath, dstpath, type2);
     mkdirsSync(dir);
@@ -2280,7 +2269,7 @@ function requireOutputFile() {
   hasRequiredOutputFile = 1;
   const u = requireUniversalify().fromCallback;
   const fs2 = requireGracefulFs();
-  const path2 = require$$1$2;
+  const path = require$$1$2;
   const mkdir = /* @__PURE__ */ requireMkdirs();
   const pathExists = requirePathExists().pathExists;
   function outputFile(file2, data, encoding, callback) {
@@ -2288,7 +2277,7 @@ function requireOutputFile() {
       callback = encoding;
       encoding = "utf8";
     }
-    const dir = path2.dirname(file2);
+    const dir = path.dirname(file2);
     pathExists(dir, (err, itDoes) => {
       if (err) return callback(err);
       if (itDoes) return fs2.writeFile(file2, data, encoding, callback);
@@ -2299,7 +2288,7 @@ function requireOutputFile() {
     });
   }
   function outputFileSync(file2, ...args) {
-    const dir = path2.dirname(file2);
+    const dir = path.dirname(file2);
     if (fs2.existsSync(dir)) {
       return fs2.writeFileSync(file2, ...args);
     }
@@ -2364,7 +2353,7 @@ function requireMove$1() {
   if (hasRequiredMove$1) return move_1;
   hasRequiredMove$1 = 1;
   const fs2 = requireGracefulFs();
-  const path2 = require$$1$2;
+  const path = require$$1$2;
   const copy2 = requireCopy().copy;
   const remove = requireRemove().remove;
   const mkdirp = requireMkdirs().mkdirp;
@@ -2383,7 +2372,7 @@ function requireMove$1() {
       stat2.checkParentPaths(src2, srcStat, dest, "move", (err2) => {
         if (err2) return cb(err2);
         if (isParentRoot(dest)) return doRename(src2, dest, overwrite, isChangingCase, cb);
-        mkdirp(path2.dirname(dest), (err3) => {
+        mkdirp(path.dirname(dest), (err3) => {
           if (err3) return cb(err3);
           return doRename(src2, dest, overwrite, isChangingCase, cb);
         });
@@ -2391,8 +2380,8 @@ function requireMove$1() {
     });
   }
   function isParentRoot(dest) {
-    const parent = path2.dirname(dest);
-    const parsedPath = path2.parse(parent);
+    const parent = path.dirname(dest);
+    const parsedPath = path.parse(parent);
     return parsedPath.root === parent;
   }
   function doRename(src2, dest, overwrite, isChangingCase, cb) {
@@ -2435,7 +2424,7 @@ function requireMoveSync() {
   if (hasRequiredMoveSync) return moveSync_1;
   hasRequiredMoveSync = 1;
   const fs2 = requireGracefulFs();
-  const path2 = require$$1$2;
+  const path = require$$1$2;
   const copySync = requireCopy().copySync;
   const removeSync = requireRemove().removeSync;
   const mkdirpSync = requireMkdirs().mkdirpSync;
@@ -2445,12 +2434,12 @@ function requireMoveSync() {
     const overwrite = opts.overwrite || opts.clobber || false;
     const { srcStat, isChangingCase = false } = stat2.checkPathsSync(src2, dest, "move", opts);
     stat2.checkParentPathsSync(src2, srcStat, dest, "move");
-    if (!isParentRoot(dest)) mkdirpSync(path2.dirname(dest));
+    if (!isParentRoot(dest)) mkdirpSync(path.dirname(dest));
     return doRename(src2, dest, overwrite, isChangingCase);
   }
   function isParentRoot(dest) {
-    const parent = path2.dirname(dest);
-    const parsedPath = path2.parse(parent);
+    const parent = path.dirname(dest);
+    const parsedPath = path.parse(parent);
     return parsedPath.root === parent;
   }
   function doRename(src2, dest, overwrite, isChangingCase) {
@@ -11311,7 +11300,7 @@ function requireDownloadedUpdateHelper() {
   const fs_1 = require$$1$1;
   const isEqual = requireLodash_isequal();
   const fs_extra_1 = /* @__PURE__ */ requireLib();
-  const path2 = require$$1$2;
+  const path = require$$1$2;
   let DownloadedUpdateHelper$1 = class DownloadedUpdateHelper {
     constructor(cacheDir) {
       this.cacheDir = cacheDir;
@@ -11331,7 +11320,7 @@ function requireDownloadedUpdateHelper() {
       return this._packageFile;
     }
     get cacheDirForPendingUpdate() {
-      return path2.join(this.cacheDir, "pending");
+      return path.join(this.cacheDir, "pending");
     }
     async validateDownloadedPath(updateFile, updateInfo, fileInfo, logger2) {
       if (this.versionInfo != null && this.file === updateFile && this.fileInfo != null) {
@@ -11410,7 +11399,7 @@ function requireDownloadedUpdateHelper() {
         await this.cleanCacheDirForPendingUpdate();
         return null;
       }
-      const updateFile = path2.join(this.cacheDirForPendingUpdate, cachedInfo.fileName);
+      const updateFile = path.join(this.cacheDirForPendingUpdate, cachedInfo.fileName);
       if (!await (0, fs_extra_1.pathExists)(updateFile)) {
         logger2.info("Cached update file doesn't exist");
         return null;
@@ -11425,7 +11414,7 @@ function requireDownloadedUpdateHelper() {
       return updateFile;
     }
     getUpdateInfoFile() {
-      return path2.join(this.cacheDirForPendingUpdate, "update-info.json");
+      return path.join(this.cacheDirForPendingUpdate, "update-info.json");
     }
   };
   DownloadedUpdateHelper.DownloadedUpdateHelper = DownloadedUpdateHelper$1;
@@ -11445,7 +11434,7 @@ function requireDownloadedUpdateHelper() {
   }
   async function createTempUpdateFile(name, cacheDir, log2) {
     let nameCounter = 0;
-    let result = path2.join(cacheDir, name);
+    let result = path.join(cacheDir, name);
     for (let i = 0; i < 3; i++) {
       try {
         await (0, fs_extra_1.unlink)(result);
@@ -11455,7 +11444,7 @@ function requireDownloadedUpdateHelper() {
           return result;
         }
         log2.warn(`Error on remove temp update file: ${e}`);
-        result = path2.join(cacheDir, `${nameCounter++}-${name}`);
+        result = path.join(cacheDir, `${nameCounter++}-${name}`);
       }
     }
     return result;
@@ -11470,17 +11459,17 @@ function requireAppAdapter() {
   hasRequiredAppAdapter = 1;
   Object.defineProperty(AppAdapter, "__esModule", { value: true });
   AppAdapter.getAppCacheDir = getAppCacheDir;
-  const path2 = require$$1$2;
+  const path = require$$1$2;
   const os_1 = require$$1$4;
   function getAppCacheDir() {
     const homedir = (0, os_1.homedir)();
     let result;
     if (process.platform === "win32") {
-      result = process.env["LOCALAPPDATA"] || path2.join(homedir, "AppData", "Local");
+      result = process.env["LOCALAPPDATA"] || path.join(homedir, "AppData", "Local");
     } else if (process.platform === "darwin") {
-      result = path2.join(homedir, "Library", "Caches");
+      result = path.join(homedir, "Library", "Caches");
     } else {
-      result = process.env["XDG_CACHE_HOME"] || path2.join(homedir, ".cache");
+      result = process.env["XDG_CACHE_HOME"] || path.join(homedir, ".cache");
     }
     return result;
   }
@@ -11492,7 +11481,7 @@ function requireElectronAppAdapter() {
   hasRequiredElectronAppAdapter = 1;
   Object.defineProperty(ElectronAppAdapter, "__esModule", { value: true });
   ElectronAppAdapter.ElectronAppAdapter = void 0;
-  const path2 = require$$1$2;
+  const path = require$$1$2;
   const AppAdapter_1 = requireAppAdapter();
   let ElectronAppAdapter$1 = class ElectronAppAdapter {
     constructor(app = require$$1$6.app) {
@@ -11511,7 +11500,7 @@ function requireElectronAppAdapter() {
       return this.app.isPackaged === true;
     }
     get appUpdateConfigPath() {
-      return this.isPackaged ? path2.join(process.resourcesPath, "app-update.yml") : path2.join(this.app.getAppPath(), "dev-app-update.yml");
+      return this.isPackaged ? path.join(process.resourcesPath, "app-update.yml") : path.join(this.app.getAppPath(), "dev-app-update.yml");
     }
     get userDataPath() {
       return this.app.getPath("userData");
@@ -12162,7 +12151,7 @@ function requirePrivateGitHubProvider() {
   PrivateGitHubProvider.PrivateGitHubProvider = void 0;
   const builder_util_runtime_1 = requireOut();
   const js_yaml_1 = requireJsYaml();
-  const path2 = require$$1$2;
+  const path = require$$1$2;
   const url_1 = require$$0$3;
   const util_1 = requireUtil();
   const GitHubProvider_1 = requireGitHubProvider();
@@ -12231,7 +12220,7 @@ function requirePrivateGitHubProvider() {
     }
     resolveFiles(updateInfo) {
       return (0, Provider_1.getFileList)(updateInfo).map((it) => {
-        const name = path2.posix.basename(it.url).replace(/ /g, "-");
+        const name = path.posix.basename(it.url).replace(/ /g, "-");
         const asset = updateInfo.assets.find((it2) => it2 != null && it2.name === name);
         if (asset == null) {
           throw (0, builder_util_runtime_1.newError)(`Cannot find asset "${name}" in: ${JSON.stringify(updateInfo.assets, null, 2)}`, "ERR_UPDATER_ASSET_NOT_FOUND");
@@ -13145,7 +13134,7 @@ function requireAppUpdater() {
   const fs_extra_1 = /* @__PURE__ */ requireLib();
   const js_yaml_1 = requireJsYaml();
   const lazy_val_1 = requireMain$3();
-  const path2 = require$$1$2;
+  const path = require$$1$2;
   const semver_1 = requireSemver();
   const DownloadedUpdateHelper_1 = requireDownloadedUpdateHelper();
   const ElectronAppAdapter_1 = requireElectronAppAdapter();
@@ -13543,7 +13532,7 @@ function requireAppUpdater() {
       return this.computeFinalHeaders({ accept: "*/*" });
     }
     async getOrCreateStagingUserId() {
-      const file2 = path2.join(this.app.userDataPath, ".updaterId");
+      const file2 = path.join(this.app.userDataPath, ".updaterId");
       try {
         const id2 = await (0, fs_extra_1.readFile)(file2, "utf-8");
         if (builder_util_runtime_1.UUID.check(id2)) {
@@ -13587,7 +13576,7 @@ function requireAppUpdater() {
         if (dirName == null) {
           logger2.error("updaterCacheDirName is not specified in app-update.yml Was app build using at least electron-builder 20.34.0?");
         }
-        const cacheDir = path2.join(this.app.baseCachePath, dirName || this.app.name);
+        const cacheDir = path.join(this.app.baseCachePath, dirName || this.app.name);
         if (logger2.debug != null) {
           logger2.debug(`updater cache dir: ${cacheDir}`);
         }
@@ -13613,7 +13602,7 @@ function requireAppUpdater() {
       function getCacheUpdateFileName() {
         const urlPath = decodeURIComponent(taskOptions.fileInfo.url.pathname);
         if (urlPath.toLowerCase().endsWith(`.${taskOptions.fileExtension.toLowerCase()}`)) {
-          return path2.basename(urlPath);
+          return path.basename(urlPath);
         } else {
           return taskOptions.fileInfo.info.url;
         }
@@ -13622,8 +13611,8 @@ function requireAppUpdater() {
       const cacheDir = downloadedUpdateHelper.cacheDirForPendingUpdate;
       await (0, fs_extra_1.mkdir)(cacheDir, { recursive: true });
       const updateFileName = getCacheUpdateFileName();
-      let updateFile = path2.join(cacheDir, updateFileName);
-      const packageFile = packageInfo == null ? null : path2.join(cacheDir, `package-${version}${path2.extname(packageInfo.path) || ".7z"}`);
+      let updateFile = path.join(cacheDir, updateFileName);
+      const packageFile = packageInfo == null ? null : path.join(cacheDir, `package-${version}${path.extname(packageInfo.path) || ".7z"}`);
       const done = async (isSaveCache) => {
         await downloadedUpdateHelper.setDownloadedFile(updateFile, packageFile, updateInfo, fileInfo, updateFileName, isSaveCache);
         await taskOptions.done({
@@ -13682,7 +13671,7 @@ function requireAppUpdater() {
         };
         const downloadOptions = {
           newUrl: fileInfo.url,
-          oldFile: path2.join(this.downloadedUpdateHelper.cacheDir, oldInstallerFileName),
+          oldFile: path.join(this.downloadedUpdateHelper.cacheDir, oldInstallerFileName),
           logger: this._logger,
           newFile: installerPath,
           isUseMultipleRangeRequest: provider.isUseMultipleRangeRequest,
@@ -13908,7 +13897,7 @@ function requireAppImageUpdater() {
   const child_process_1 = require$$1$7;
   const fs_extra_1 = /* @__PURE__ */ requireLib();
   const fs_1 = require$$1$1;
-  const path2 = require$$1$2;
+  const path = require$$1$2;
   const BaseUpdater_1 = requireBaseUpdater();
   const FileWithEmbeddedBlockMapDifferentialDownloader_1 = requireFileWithEmbeddedBlockMapDifferentialDownloader();
   const Provider_1 = requireProvider();
@@ -13976,16 +13965,16 @@ function requireAppImageUpdater() {
       }
       (0, fs_1.unlinkSync)(appImageFile);
       let destination;
-      const existingBaseName = path2.basename(appImageFile);
+      const existingBaseName = path.basename(appImageFile);
       const installerPath = this.installerPath;
       if (installerPath == null) {
         this.dispatchError(new Error("No update filepath provided, can't quit and install"));
         return false;
       }
-      if (path2.basename(installerPath) === existingBaseName || !/\d+\.\d+\.\d+/.test(existingBaseName)) {
+      if (path.basename(installerPath) === existingBaseName || !/\d+\.\d+\.\d+/.test(existingBaseName)) {
         destination = appImageFile;
       } else {
-        destination = path2.join(path2.dirname(appImageFile), path2.basename(installerPath));
+        destination = path.join(path.dirname(appImageFile), path.basename(installerPath));
       }
       (0, child_process_1.execFileSync)("mv", ["-f", installerPath, destination]);
       if (destination !== appImageFile) {
@@ -14331,7 +14320,7 @@ function requireMacUpdater() {
   const builder_util_runtime_1 = requireOut();
   const fs_extra_1 = /* @__PURE__ */ requireLib();
   const fs_1 = require$$1$1;
-  const path2 = require$$1$2;
+  const path = require$$1$2;
   const http_1 = require$$4;
   const AppUpdater_1 = requireAppUpdater();
   const Provider_1 = requireProvider();
@@ -14410,7 +14399,7 @@ function requireMacUpdater() {
         fileInfo: zipFileInfo,
         downloadUpdateOptions,
         task: async (destinationFile, downloadOptions) => {
-          const cachedUpdateFilePath = path2.join(this.downloadedUpdateHelper.cacheDir, CURRENT_MAC_APP_ZIP_FILE_NAME);
+          const cachedUpdateFilePath = path.join(this.downloadedUpdateHelper.cacheDir, CURRENT_MAC_APP_ZIP_FILE_NAME);
           const canDifferentialDownload = () => {
             if (!(0, fs_extra_1.pathExistsSync)(cachedUpdateFilePath)) {
               log2.info("Unable to locate previous update.zip for differential download (is this first install?), falling back to full download");
@@ -14429,7 +14418,7 @@ function requireMacUpdater() {
         done: async (event) => {
           if (!downloadUpdateOptions.disableDifferentialDownload) {
             try {
-              const cachedUpdateFilePath = path2.join(this.downloadedUpdateHelper.cacheDir, CURRENT_MAC_APP_ZIP_FILE_NAME);
+              const cachedUpdateFilePath = path.join(this.downloadedUpdateHelper.cacheDir, CURRENT_MAC_APP_ZIP_FILE_NAME);
               await (0, fs_extra_1.copyFile)(event.downloadedFile, cachedUpdateFilePath);
             } catch (error2) {
               this._logger.warn(`Unable to copy file for caching for future differential downloads: ${error2.message}`);
@@ -14573,7 +14562,7 @@ function requireWindowsExecutableCodeSignatureVerifier() {
   const builder_util_runtime_1 = requireOut();
   const child_process_1 = require$$1$7;
   const os = require$$1$4;
-  const path2 = require$$1$2;
+  const path = require$$1$2;
   function verifySignature(publisherNames, unescapedTempUpdateFile, logger2) {
     return new Promise((resolve, reject) => {
       const tempUpdateFile = unescapedTempUpdateFile.replace(/'/g, "''");
@@ -14592,8 +14581,8 @@ function requireWindowsExecutableCodeSignatureVerifier() {
           const data = parseOut(stdout);
           if (data.Status === 0) {
             try {
-              const normlaizedUpdateFilePath = path2.normalize(data.Path);
-              const normalizedTempUpdateFile = path2.normalize(unescapedTempUpdateFile);
+              const normlaizedUpdateFilePath = path.normalize(data.Path);
+              const normalizedTempUpdateFile = path.normalize(unescapedTempUpdateFile);
               logger2.info(`LiteralPath: ${normlaizedUpdateFilePath}. Update Path: ${normalizedTempUpdateFile}`);
               if (normlaizedUpdateFilePath !== normalizedTempUpdateFile) {
                 handleError(logger2, new Error(`LiteralPath of ${normlaizedUpdateFilePath} is different than ${normalizedTempUpdateFile}`), stderr, reject);
@@ -14679,7 +14668,7 @@ function requireNsisUpdater() {
   Object.defineProperty(NsisUpdater, "__esModule", { value: true });
   NsisUpdater.NsisUpdater = void 0;
   const builder_util_runtime_1 = requireOut();
-  const path2 = require$$1$2;
+  const path = require$$1$2;
   const BaseUpdater_1 = requireBaseUpdater();
   const FileWithEmbeddedBlockMapDifferentialDownloader_1 = requireFileWithEmbeddedBlockMapDifferentialDownloader();
   const types_1 = requireTypes();
@@ -14788,7 +14777,7 @@ function requireNsisUpdater() {
         args.push(`--package-file=${packagePath}`);
       }
       const callUsingElevation = () => {
-        this.spawnLog(path2.join(process.resourcesPath, "elevate.exe"), [installerPath].concat(args)).catch((e) => this.dispatchError(e));
+        this.spawnLog(path.join(process.resourcesPath, "elevate.exe"), [installerPath].concat(args)).catch((e) => this.dispatchError(e));
       };
       if (options.isAdminRightsRequired) {
         this._logger.info("isAdminRightsRequired is set to true, run installer using elevate.exe");
@@ -14815,7 +14804,7 @@ function requireNsisUpdater() {
       try {
         const downloadOptions = {
           newUrl: new url_1.URL(packageInfo.path),
-          oldFile: path2.join(this.downloadedUpdateHelper.cacheDir, builder_util_runtime_1.CURRENT_APP_PACKAGE_FILE_NAME),
+          oldFile: path.join(this.downloadedUpdateHelper.cacheDir, builder_util_runtime_1.CURRENT_APP_PACKAGE_FILE_NAME),
           logger: this._logger,
           newFile: packagePath,
           requestHeaders: this.requestHeaders,
@@ -14860,7 +14849,7 @@ function requireMain$2() {
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.NsisUpdater = exports.MacUpdater = exports.RpmUpdater = exports.PacmanUpdater = exports.DebUpdater = exports.AppImageUpdater = exports.Provider = exports.NoOpLogger = exports.AppUpdater = exports.BaseUpdater = void 0;
     const fs_extra_1 = /* @__PURE__ */ requireLib();
-    const path2 = require$$1$2;
+    const path = require$$1$2;
     var BaseUpdater_1 = requireBaseUpdater();
     Object.defineProperty(exports, "BaseUpdater", { enumerable: true, get: function() {
       return BaseUpdater_1.BaseUpdater;
@@ -14910,7 +14899,7 @@ function requireMain$2() {
       } else {
         _autoUpdater = new (requireAppImageUpdater()).AppImageUpdater();
         try {
-          const identity = path2.join(process.resourcesPath, "package-type");
+          const identity = path.join(process.resourcesPath, "package-type");
           if (!(0, fs_extra_1.existsSync)(identity)) {
             return _autoUpdater;
           }
@@ -18009,11 +17998,11 @@ function requireMimeTypes() {
       }
       return exts[0];
     }
-    function lookup(path2) {
-      if (!path2 || typeof path2 !== "string") {
+    function lookup(path) {
+      if (!path || typeof path !== "string") {
         return false;
       }
-      var extension2 = extname("x." + path2).toLowerCase().substr(1);
+      var extension2 = extname("x." + path).toLowerCase().substr(1);
       if (!extension2) {
         return false;
       }
@@ -19122,7 +19111,7 @@ function requireForm_data() {
   hasRequiredForm_data = 1;
   var CombinedStream = requireCombined_stream();
   var util2 = require$$1;
-  var path2 = require$$1$2;
+  var path = require$$1$2;
   var http = require$$4;
   var https = require$$4$1;
   var parseUrl = require$$0$3.parse;
@@ -19249,11 +19238,11 @@ function requireForm_data() {
   FormData2.prototype._getContentDisposition = function(value, options) {
     var filename;
     if (typeof options.filepath === "string") {
-      filename = path2.normalize(options.filepath).replace(/\\/g, "/");
+      filename = path.normalize(options.filepath).replace(/\\/g, "/");
     } else if (options.filename || value && (value.name || value.path)) {
-      filename = path2.basename(options.filename || value && (value.name || value.path));
+      filename = path.basename(options.filename || value && (value.name || value.path));
     } else if (value && value.readable && hasOwn(value, "httpVersion")) {
-      filename = path2.basename(value.client._httpMessage.path || "");
+      filename = path.basename(value.client._httpMessage.path || "");
     }
     if (filename) {
       return 'filename="' + filename + '"';
@@ -19445,9 +19434,9 @@ function isVisitable(thing) {
 function removeBrackets(key) {
   return utils$1.endsWith(key, "[]") ? key.slice(0, -2) : key;
 }
-function renderKey(path2, key, dots) {
-  if (!path2) return key;
-  return path2.concat(key).map(function each(token, i) {
+function renderKey(path, key, dots) {
+  if (!path) return key;
+  return path.concat(key).map(function each(token, i) {
     token = removeBrackets(token);
     return !dots && i ? "[" + token + "]" : token;
   }).join(dots ? "." : "");
@@ -19495,9 +19484,9 @@ function toFormData$1(obj, formData, options) {
     }
     return value;
   }
-  function defaultVisitor(value, key, path2) {
+  function defaultVisitor(value, key, path) {
     let arr = value;
-    if (value && !path2 && typeof value === "object") {
+    if (value && !path && typeof value === "object") {
       if (utils$1.endsWith(key, "{}")) {
         key = metaTokens ? key : key.slice(0, -2);
         value = JSON.stringify(value);
@@ -19516,7 +19505,7 @@ function toFormData$1(obj, formData, options) {
     if (isVisitable(value)) {
       return true;
     }
-    formData.append(renderKey(path2, key, dots), convertValue(value));
+    formData.append(renderKey(path, key, dots), convertValue(value));
     return false;
   }
   const stack = [];
@@ -19525,10 +19514,10 @@ function toFormData$1(obj, formData, options) {
     convertValue,
     isVisitable
   });
-  function build(value, path2) {
+  function build(value, path) {
     if (utils$1.isUndefined(value)) return;
     if (stack.indexOf(value) !== -1) {
-      throw Error("Circular reference detected in " + path2.join("."));
+      throw Error("Circular reference detected in " + path.join("."));
     }
     stack.push(value);
     utils$1.forEach(value, function each(el, key) {
@@ -19536,11 +19525,11 @@ function toFormData$1(obj, formData, options) {
         formData,
         el,
         utils$1.isString(key) ? key.trim() : key,
-        path2,
+        path,
         exposedHelpers
       );
       if (result === true) {
-        build(el, path2 ? path2.concat(key) : [key]);
+        build(el, path ? path.concat(key) : [key]);
       }
     });
     stack.pop();
@@ -19727,7 +19716,7 @@ const platform = {
 };
 function toURLEncodedForm(data, options) {
   return toFormData$1(data, new platform.classes.URLSearchParams(), Object.assign({
-    visitor: function(value, key, path2, helpers) {
+    visitor: function(value, key, path, helpers) {
       if (platform.isNode && utils$1.isBuffer(value)) {
         this.append(key, value.toString("base64"));
         return false;
@@ -19754,11 +19743,11 @@ function arrayToObject(arr) {
   return obj;
 }
 function formDataToJSON(formData) {
-  function buildPath(path2, value, target, index) {
-    let name = path2[index++];
+  function buildPath(path, value, target, index) {
+    let name = path[index++];
     if (name === "__proto__") return true;
     const isNumericKey = Number.isFinite(+name);
-    const isLast = index >= path2.length;
+    const isLast = index >= path.length;
     name = !name && utils$1.isArray(target) ? target.length : name;
     if (isLast) {
       if (utils$1.hasOwnProp(target, name)) {
@@ -19771,7 +19760,7 @@ function formDataToJSON(formData) {
     if (!target[name] || !utils$1.isObject(target[name])) {
       target[name] = [];
     }
-    const result = buildPath(path2, value, target[name], index);
+    const result = buildPath(path, value, target[name], index);
     if (result && utils$1.isArray(target[name])) {
       target[name] = arrayToObject(target[name]);
     }
@@ -21423,9 +21412,9 @@ const httpAdapter = isHttpAdapterSupported && function httpAdapter2(config) {
       auth = urlUsername + ":" + urlPassword;
     }
     auth && headers.delete("authorization");
-    let path2;
+    let path;
     try {
-      path2 = buildURL(
+      path = buildURL(
         parsed.pathname + parsed.search,
         config.params,
         config.paramsSerializer
@@ -21443,7 +21432,7 @@ const httpAdapter = isHttpAdapterSupported && function httpAdapter2(config) {
       false
     );
     const options = {
-      path: path2,
+      path,
       method,
       headers: headers.toJSON(),
       agents: { http: config.httpAgent, https: config.httpsAgent },
@@ -21669,10 +21658,10 @@ const isURLSameOrigin = platform.hasStandardBrowserEnv ? /* @__PURE__ */ ((origi
 const cookies = platform.hasStandardBrowserEnv ? (
   // Standard browser envs support document.cookie
   {
-    write(name, value, expires, path2, domain, secure) {
+    write(name, value, expires, path, domain, secure) {
       const cookie = [name + "=" + encodeURIComponent(value)];
       utils$1.isNumber(expires) && cookie.push("expires=" + new Date(expires).toGMTString());
-      utils$1.isString(path2) && cookie.push("path=" + path2);
+      utils$1.isString(path) && cookie.push("path=" + path);
       utils$1.isString(domain) && cookie.push("domain=" + domain);
       secure === true && cookie.push("secure");
       document.cookie = cookie.join("; ");
@@ -22718,8 +22707,8 @@ axios.VERSION = VERSION$1;
 axios.toFormData = toFormData$1;
 axios.AxiosError = AxiosError$1;
 axios.Cancel = axios.CanceledError;
-axios.all = function all(promises2) {
-  return Promise.all(promises2);
+axios.all = function all(promises) {
+  return Promise.all(promises);
 };
 axios.spread = spread$1;
 axios.isAxiosError = isAxiosError$1;
@@ -22747,195 +22736,13 @@ const {
   getAdapter,
   mergeConfig
 } = axios;
-function getTempFilename(file2) {
-  const f = file2 instanceof URL ? node_url.fileURLToPath(file2) : file2.toString();
-  return path.join(path.dirname(f), `.${path.basename(f)}.tmp`);
-}
-async function retryAsyncOperation(fn, maxRetries, delayMs) {
-  for (let i = 0; i < maxRetries; i++) {
-    try {
-      return await fn();
-    } catch (error2) {
-      if (i < maxRetries - 1) {
-        await new Promise((resolve) => setTimeout(resolve, delayMs));
-      } else {
-        throw error2;
-      }
-    }
-  }
-}
-class Writer {
-  constructor(filename) {
-    __privateAdd(this, _Writer_instances);
-    __privateAdd(this, _filename);
-    __privateAdd(this, _tempFilename);
-    __privateAdd(this, _locked, false);
-    __privateAdd(this, _prev, null);
-    __privateAdd(this, _next, null);
-    __privateAdd(this, _nextPromise, null);
-    __privateAdd(this, _nextData, null);
-    __privateSet(this, _filename, filename);
-    __privateSet(this, _tempFilename, getTempFilename(filename));
-  }
-  async write(data) {
-    return __privateGet(this, _locked) ? __privateMethod(this, _Writer_instances, add_fn).call(this, data) : __privateMethod(this, _Writer_instances, write_fn).call(this, data);
-  }
-}
-_filename = new WeakMap();
-_tempFilename = new WeakMap();
-_locked = new WeakMap();
-_prev = new WeakMap();
-_next = new WeakMap();
-_nextPromise = new WeakMap();
-_nextData = new WeakMap();
-_Writer_instances = new WeakSet();
-// File is locked, add data for later
-add_fn = function(data) {
-  __privateSet(this, _nextData, data);
-  __privateGet(this, _nextPromise) || __privateSet(this, _nextPromise, new Promise((resolve, reject) => {
-    __privateSet(this, _next, [resolve, reject]);
-  }));
-  return new Promise((resolve, reject) => {
-    var _a;
-    (_a = __privateGet(this, _nextPromise)) == null ? void 0 : _a.then(resolve).catch(reject);
-  });
-};
-write_fn = async function(data) {
-  var _a, _b;
-  __privateSet(this, _locked, true);
-  try {
-    await promises.writeFile(__privateGet(this, _tempFilename), data, "utf-8");
-    await retryAsyncOperation(async () => {
-      await promises.rename(__privateGet(this, _tempFilename), __privateGet(this, _filename));
-    }, 10, 100);
-    (_a = __privateGet(this, _prev)) == null ? void 0 : _a[0]();
-  } catch (err) {
-    if (err instanceof Error) {
-      (_b = __privateGet(this, _prev)) == null ? void 0 : _b[1](err);
-    }
-    throw err;
-  } finally {
-    __privateSet(this, _locked, false);
-    __privateSet(this, _prev, __privateGet(this, _next));
-    __privateSet(this, _next, __privateSet(this, _nextPromise, null));
-    if (__privateGet(this, _nextData) !== null) {
-      const nextData = __privateGet(this, _nextData);
-      __privateSet(this, _nextData, null);
-      await this.write(nextData);
-    }
-  }
-};
-class TextFile {
-  constructor(filename) {
-    __privateAdd(this, _filename2);
-    __privateAdd(this, _writer);
-    __privateSet(this, _filename2, filename);
-    __privateSet(this, _writer, new Writer(filename));
-  }
-  async read() {
-    let data;
-    try {
-      data = await promises.readFile(__privateGet(this, _filename2), "utf-8");
-    } catch (e) {
-      if (e.code === "ENOENT") {
-        return null;
-      }
-      throw e;
-    }
-    return data;
-  }
-  write(str2) {
-    return __privateGet(this, _writer).write(str2);
-  }
-}
-_filename2 = new WeakMap();
-_writer = new WeakMap();
-class DataFile {
-  constructor(filename, { parse, stringify }) {
-    __privateAdd(this, _adapter);
-    __privateAdd(this, _parse);
-    __privateAdd(this, _stringify);
-    __privateSet(this, _adapter, new TextFile(filename));
-    __privateSet(this, _parse, parse);
-    __privateSet(this, _stringify, stringify);
-  }
-  async read() {
-    const data = await __privateGet(this, _adapter).read();
-    if (data === null) {
-      return null;
-    } else {
-      return __privateGet(this, _parse).call(this, data);
-    }
-  }
-  write(obj) {
-    return __privateGet(this, _adapter).write(__privateGet(this, _stringify).call(this, obj));
-  }
-}
-_adapter = new WeakMap();
-_parse = new WeakMap();
-_stringify = new WeakMap();
-class JSONFile extends DataFile {
-  constructor(filename) {
-    super(filename, {
-      parse: JSON.parse,
-      stringify: (data) => JSON.stringify(data, null, 2)
-    });
-  }
-}
-class Memory {
-  constructor() {
-    __privateAdd(this, _data, null);
-  }
-  read() {
-    return Promise.resolve(__privateGet(this, _data));
-  }
-  write(obj) {
-    __privateSet(this, _data, obj);
-    return Promise.resolve();
-  }
-}
-_data = new WeakMap();
-function checkArgs(adapter, defaultData) {
-  if (adapter === void 0)
-    throw new Error("lowdb: missing adapter");
-  if (defaultData === void 0)
-    throw new Error("lowdb: missing default data");
-}
-class Low {
-  constructor(adapter, defaultData) {
-    __publicField(this, "adapter");
-    __publicField(this, "data");
-    checkArgs(adapter, defaultData);
-    this.adapter = adapter;
-    this.data = defaultData;
-  }
-  async read() {
-    const data = await this.adapter.read();
-    if (data)
-      this.data = data;
-  }
-  async write() {
-    if (this.data)
-      await this.adapter.write(this.data);
-  }
-  async update(fn) {
-    fn(this.data);
-    await this.write();
-  }
-}
-async function JSONFilePreset(filename, defaultData) {
-  const adapter = process.env.NODE_ENV === "test" ? new Memory() : new JSONFile(filename);
-  const db = new Low(adapter, defaultData);
-  await db.read();
-  return db;
-}
 var packageJson;
 var hasRequiredPackageJson;
 function requirePackageJson() {
   if (hasRequiredPackageJson) return packageJson;
   hasRequiredPackageJson = 1;
   const fs2 = require$$1$1;
-  const path2 = require$$1$2;
+  const path = require$$1$2;
   packageJson = {
     findAndReadPackageJson,
     tryReadJsonAt
@@ -22948,7 +22755,7 @@ function requirePackageJson() {
       return void 0;
     }
     try {
-      const searchPath = path2.join(...searchPaths);
+      const searchPath = path.join(...searchPaths);
       const fileName = findUp("package.json", searchPath);
       if (!fileName) {
         return void 0;
@@ -22969,11 +22776,11 @@ function requirePackageJson() {
   function findUp(fileName, cwd) {
     let currentPath = cwd;
     while (true) {
-      const parsedPath = path2.parse(currentPath);
+      const parsedPath = path.parse(currentPath);
       const root = parsedPath.root;
       const dir = parsedPath.dir;
-      if (fs2.existsSync(path2.join(currentPath, fileName))) {
-        return path2.resolve(path2.join(currentPath, fileName));
+      if (fs2.existsSync(path.join(currentPath, fileName))) {
+        return path.resolve(path.join(currentPath, fileName));
       }
       if (currentPath === root) {
         return null;
@@ -23008,7 +22815,7 @@ function requireNodeExternalApi() {
   hasRequiredNodeExternalApi = 1;
   const childProcess = require$$1$7;
   const os = require$$1$4;
-  const path2 = require$$1$2;
+  const path = require$$1$2;
   const packageJson2 = requirePackageJson();
   class NodeExternalApi {
     constructor() {
@@ -23018,9 +22825,9 @@ function requireNodeExternalApi() {
     }
     getAppLogPath(appName = this.getAppName()) {
       if (this.platform === "darwin") {
-        return path2.join(this.getSystemPathHome(), "Library/Logs", appName);
+        return path.join(this.getSystemPathHome(), "Library/Logs", appName);
       }
-      return path2.join(this.getAppUserDataPath(appName), "logs");
+      return path.join(this.getAppUserDataPath(appName), "logs");
     }
     getAppName() {
       var _a;
@@ -23043,7 +22850,7 @@ function requireNodeExternalApi() {
       return this.appPackageJson;
     }
     getAppUserDataPath(appName = this.getAppName()) {
-      return appName ? path2.join(this.getSystemPathAppData(), appName) : void 0;
+      return appName ? path.join(this.getSystemPathAppData(), appName) : void 0;
     }
     getAppVersion() {
       var _a;
@@ -23097,13 +22904,13 @@ function requireNodeExternalApi() {
       const home = this.getSystemPathHome();
       switch (this.platform) {
         case "darwin": {
-          return path2.join(home, "Library/Application Support");
+          return path.join(home, "Library/Application Support");
         }
         case "win32": {
-          return process.env.APPDATA || path2.join(home, "AppData/Roaming");
+          return process.env.APPDATA || path.join(home, "AppData/Roaming");
         }
         default: {
-          return process.env.XDG_CONFIG_HOME || path2.join(home, ".config");
+          return process.env.XDG_CONFIG_HOME || path.join(home, ".config");
         }
       }
     }
@@ -23189,7 +22996,7 @@ var hasRequiredElectronExternalApi;
 function requireElectronExternalApi() {
   if (hasRequiredElectronExternalApi) return ElectronExternalApi_1;
   hasRequiredElectronExternalApi = 1;
-  const path2 = require$$1$2;
+  const path = require$$1$2;
   const NodeExternalApi = requireNodeExternalApi();
   class ElectronExternalApi extends NodeExternalApi {
     /**
@@ -23257,7 +23064,7 @@ function requireElectronExternalApi() {
         return !this.electron.app.isPackaged;
       }
       if (typeof process.execPath === "string") {
-        const execFileName = path2.basename(process.execPath).toLowerCase();
+        const execFileName = path.basename(process.execPath).toLowerCase();
         return execFileName.startsWith("electron");
       }
       return super.isDev();
@@ -23440,7 +23247,7 @@ function requireInitialize() {
   hasRequiredInitialize = 1;
   const fs2 = require$$1$1;
   const os = require$$1$4;
-  const path2 = require$$1$2;
+  const path = require$$1$2;
   const preloadInitializeFn = requireElectronLogPreload();
   initialize = {
     initialize({
@@ -23478,14 +23285,14 @@ function requireInitialize() {
   }) {
     let preloadPath = typeof preloadOption === "string" ? preloadOption : void 0;
     try {
-      preloadPath = path2.resolve(
+      preloadPath = path.resolve(
         __dirname,
         "../renderer/electron-log-preload.js"
       );
     } catch {
     }
     if (!preloadPath || !fs2.existsSync(preloadPath)) {
-      preloadPath = path2.join(
+      preloadPath = path.join(
         externalApi.getAppUserDataPath() || os.tmpdir(),
         "electron-log-preload.js"
       );
@@ -24509,7 +24316,7 @@ function requireFile$1() {
   const os = require$$1$4;
   class File extends EventEmitter {
     constructor({
-      path: path2,
+      path,
       writeOptions = { encoding: "utf8", flag: "a", mode: 438 },
       writeAsync = false
     }) {
@@ -24521,7 +24328,7 @@ function requireFile$1() {
       __publicField(this, "initialSize");
       __publicField(this, "writeOptions", null);
       __publicField(this, "writeAsync", false);
-      this.path = path2;
+      this.path = path;
       this.writeOptions = writeOptions;
       this.writeAsync = writeAsync;
     }
@@ -24665,7 +24472,7 @@ function requireFileRegistry() {
   hasRequiredFileRegistry = 1;
   const EventEmitter = require$$0$2;
   const fs2 = require$$1$1;
-  const path2 = require$$1$2;
+  const path = require$$1$2;
   const File = requireFile$1();
   const NullFile = requireNullFile();
   class FileRegistry extends EventEmitter {
@@ -24684,7 +24491,7 @@ function requireFileRegistry() {
     provide({ filePath, writeOptions = {}, writeAsync = false }) {
       let file2;
       try {
-        filePath = path2.resolve(filePath);
+        filePath = path.resolve(filePath);
         if (this.store[filePath]) {
           return this.store[filePath];
         }
@@ -24722,7 +24529,7 @@ function requireFileRegistry() {
      * @private
      */
     testFileWriting({ filePath, writeOptions }) {
-      fs2.mkdirSync(path2.dirname(filePath), { recursive: true });
+      fs2.mkdirSync(path.dirname(filePath), { recursive: true });
       fs2.writeFileSync(filePath, "", { flag: "a", mode: writeOptions.mode });
     }
   }
@@ -24736,7 +24543,7 @@ function requireFile() {
   hasRequiredFile = 1;
   const fs2 = require$$1$1;
   const os = require$$1$4;
-  const path2 = require$$1$2;
+  const path = require$$1$2;
   const FileRegistry = requireFileRegistry();
   const { transform } = requireTransform();
   const { removeStyles } = requireStyle();
@@ -24767,9 +24574,9 @@ function requireFile() {
       writeOptions: { flag: "a", mode: 438, encoding: "utf8" },
       archiveLogFn(file2) {
         const oldPath = file2.toString();
-        const inf = path2.parse(oldPath);
+        const inf = path.parse(oldPath);
         try {
-          fs2.renameSync(oldPath, path2.join(inf.dir, `${inf.name}.old${inf.ext}`));
+          fs2.renameSync(oldPath, path.join(inf.dir, `${inf.name}.old${inf.ext}`));
         } catch (e) {
           logConsole("Could not rotate log", e);
           const quarterOfMaxSize = Math.round(transport.maxSize / 4);
@@ -24777,7 +24584,7 @@ function requireFile() {
         }
       },
       resolvePathFn(vars) {
-        return path2.join(vars.libraryDefaultDir, vars.fileName);
+        return path.join(vars.libraryDefaultDir, vars.fileName);
       },
       setAppName(name) {
         logger2.dependencies.externalApi.setAppName(name);
@@ -24838,11 +24645,11 @@ function requireFile() {
     }
     function readAllLogs({ fileFilter = (f) => f.endsWith(".log") } = {}) {
       initializeOnFirstAccess();
-      const logsPath = path2.dirname(transport.resolvePathFn(pathVariables));
+      const logsPath = path.dirname(transport.resolvePathFn(pathVariables));
       if (!fs2.existsSync(logsPath)) {
         return [];
       }
-      return fs2.readdirSync(logsPath).map((fileName) => path2.join(logsPath, fileName)).filter(fileFilter).map((logPath) => {
+      return fs2.readdirSync(logsPath).map((fileName) => path.join(logsPath, fileName)).filter(fileFilter).map((logPath) => {
         try {
           return {
             path: logPath,
@@ -25101,6 +24908,1372 @@ async function isPortReachable(port, { host, timeout = 1e3 } = {}) {
     return false;
   }
 }
+var nodeSqlite3Wasm = { exports: {} };
+var hasRequiredNodeSqlite3Wasm;
+function requireNodeSqlite3Wasm() {
+  if (hasRequiredNodeSqlite3Wasm) return nodeSqlite3Wasm.exports;
+  hasRequiredNodeSqlite3Wasm = 1;
+  (function(module2, exports) {
+    var Module = (/* @__PURE__ */ (() => {
+      return function(moduleArg = {}) {
+        var moduleRtn;
+        var Module2 = moduleArg;
+        const INT32_MIN = -2147483648;
+        const INT32_MAX = 2147483647;
+        const NULL = 0;
+        const SQLITE_OK = 0;
+        const SQLITE_ROW = 100;
+        const SQLITE_DONE = 101;
+        const SQLITE_INTEGER = 1;
+        const SQLITE_FLOAT = 2;
+        const SQLITE_TEXT = 3;
+        const SQLITE_BLOB = 4;
+        const SQLITE_NULL = 5;
+        const SQLITE_UTF8 = 1;
+        const SQLITE_TRANSIENT = -1;
+        const SQLITE_DETERMINISTIC = 2048;
+        let temp;
+        const sqlite3 = {};
+        Module2.onRuntimeInitialized = () => {
+          temp = stackAlloc(4);
+          const v = null;
+          const n = "number";
+          const s = "string";
+          const n1 = [n];
+          const n2 = [n, ...n1];
+          const n3 = [n, ...n2];
+          const n4 = [n, ...n3];
+          const n5 = [n, ...n4];
+          const signatures = { open_v2: [n, [s, n, n, s]], exec: [n, n5], errmsg: [s, n1], prepare_v2: [n, n5], close_v2: [n, n1], finalize: [n, n1], reset: [n, n1], clear_bindings: [n, n1], bind_int: [n, n3], bind_int64: [n, n3], bind_double: [n, n3], bind_text: [n, n5], bind_blob: [n, n5], bind_blob64: [n, n5], bind_null: [n, n2], bind_parameter_index: [n, [n, s]], step: [n, n1], column_int64: [n, n2], column_double: [n, n2], column_text: [s, n2], column_blob: [n, n2], column_type: [n, n2], column_name: [s, n2], column_count: [n, n1], column_bytes: [n, n2], last_insert_rowid: [n, n1], changes: [n, n1], create_function_v2: [n, [n, s, n, n, n, n, n, n, n]], value_type: [n, n1], value_text: [s, n1], value_blob: [n, n1], value_int64: [n, n1], value_double: [n, n1], value_bytes: [n, n1], result_double: [v, n2], result_null: [v, n1], result_text: [v, n4], result_blob: [v, n4], result_blob64: [v, n4], result_int: [v, n2], result_int64: [v, n2], result_error: [v, n3], column_table_name: [s, n2], get_autocommit: [n, n1] };
+          for (const [name, sig] of Object.entries(signatures)) {
+            sqlite3[name] = cwrap(`sqlite3_${name}`, sig[0], sig[1]);
+          }
+        };
+        class SQLite3Error extends Error {
+          constructor(message) {
+            super(message);
+            this.name = "SQLite3Error";
+          }
+        }
+        function arrayToHeap(array) {
+          const ptr = _malloc(array.byteLength);
+          HEAPU8.set(array, ptr);
+          return ptr;
+        }
+        function stringToHeap(str2) {
+          const size = lengthBytesUTF8(str2) + 1;
+          const ptr = _malloc(size);
+          stringToUTF8(str2, ptr, size);
+          return ptr;
+        }
+        function toNumberOrNot(bigInt) {
+          if (bigInt >= Number.MIN_SAFE_INTEGER && bigInt <= Number.MAX_SAFE_INTEGER) {
+            return Number(bigInt);
+          }
+          return bigInt;
+        }
+        function parseFunctionArguments(argc, argv) {
+          const args = [];
+          for (let i = 0; i < argc; i++) {
+            const ptr = getValue(argv + 4 * i, "i32");
+            const type2 = sqlite3.value_type(ptr);
+            let arg;
+            switch (type2) {
+              case SQLITE_INTEGER:
+                arg = toNumberOrNot(sqlite3.value_int64(ptr));
+                break;
+              case SQLITE_FLOAT:
+                arg = sqlite3.value_double(ptr);
+                break;
+              case SQLITE_TEXT:
+                arg = sqlite3.value_text(ptr);
+                break;
+              case SQLITE_BLOB:
+                const p = sqlite3.value_blob(ptr);
+                if (p != NULL) {
+                  arg = HEAPU8.slice(p, p + sqlite3.value_bytes(ptr));
+                } else {
+                  arg = new Uint8Array();
+                }
+                break;
+              case SQLITE_NULL:
+                arg = null;
+                break;
+            }
+            args.push(arg);
+          }
+          return args;
+        }
+        function setFunctionResult(cx, result) {
+          switch (typeof result) {
+            case "boolean":
+              sqlite3.result_int(cx, result ? 1 : 0);
+              break;
+            case "number":
+              if (Number.isSafeInteger(result)) {
+                if (result >= INT32_MIN && result <= INT32_MAX) {
+                  sqlite3.result_int(cx, result);
+                } else {
+                  sqlite3.result_int64(cx, BigInt(result));
+                }
+              } else {
+                sqlite3.result_double(cx, result);
+              }
+              break;
+            case "bigint":
+              sqlite3.result_int64(cx, result);
+              break;
+            case "string":
+              const tempPtr = stringToHeap(result);
+              sqlite3.result_text(cx, tempPtr, -1, SQLITE_TRANSIENT);
+              _free(tempPtr);
+              break;
+            case "object":
+              if (result === null) {
+                sqlite3.result_null(cx);
+              } else if (result instanceof Uint8Array) {
+                const tempPtr2 = arrayToHeap(result);
+                if (result.byteLength <= INT32_MAX) {
+                  sqlite3.result_blob(cx, tempPtr2, result.byteLength, SQLITE_TRANSIENT);
+                } else {
+                  sqlite3.result_blob64(cx, tempPtr2, BigInt(result.byteLength), SQLITE_TRANSIENT);
+                }
+                _free(tempPtr2);
+              } else {
+                throw new SQLite3Error(`Unsupported type for function result: "${typeof result}"`);
+              }
+              break;
+            default:
+              throw new SQLite3Error(`Unsupported type for function result: "${typeof result}"`);
+          }
+        }
+        class Database {
+          constructor(filename, { fileMustExist = false, readOnly = false } = {}) {
+            let flags;
+            if (readOnly) {
+              flags = SQLITE_OPEN_READONLY;
+            } else {
+              flags = SQLITE_OPEN_READWRITE;
+              if (!fileMustExist) flags |= SQLITE_OPEN_CREATE;
+            }
+            const rc = sqlite3.open_v2(filename, temp, flags, NULL);
+            this._ptr = getValue(temp, "i32");
+            if (rc !== SQLITE_OK) {
+              if (this._ptr !== NULL) sqlite3.close_v2(this._ptr);
+              throw new SQLite3Error(`Could not open the database "${filename}"`);
+            }
+            this._functions = /* @__PURE__ */ new Map();
+          }
+          get isOpen() {
+            return this._ptr !== null;
+          }
+          get inTransaction() {
+            this._assertOpen();
+            return sqlite3.get_autocommit(this._ptr) === 0;
+          }
+          close() {
+            this._assertOpen();
+            for (const func of this._functions.values()) removeFunction(func);
+            this._functions.clear();
+            this._handleError(sqlite3.close_v2(this._ptr));
+            this._ptr = null;
+          }
+          function(name, func, { deterministic = false } = {}) {
+            this._assertOpen();
+            function wrappedFunc(cx, argc, argv) {
+              const args = parseFunctionArguments(argc, argv);
+              let result;
+              try {
+                result = func.apply(null, args);
+              } catch (err2) {
+                const tempPtr = stringToHeap(err2.toString());
+                sqlite3.result_error(cx, tempPtr, -1);
+                _free(tempPtr);
+                return;
+              }
+              setFunctionResult(cx, result);
+            }
+            if (this._functions.has(name)) {
+              removeFunction(this._functions.get(name));
+              this._functions.delete(name);
+            }
+            const funcPtr = addFunction(wrappedFunc, "viii");
+            this._functions.set(name, funcPtr);
+            let eTextRep = SQLITE_UTF8;
+            if (deterministic) eTextRep |= SQLITE_DETERMINISTIC;
+            this._handleError(sqlite3.create_function_v2(this._ptr, name, func.length, eTextRep, NULL, funcPtr, NULL, NULL, NULL));
+            return this;
+          }
+          exec(sql) {
+            this._assertOpen();
+            const tempPtr = stringToHeap(sql);
+            try {
+              this._handleError(sqlite3.exec(this._ptr, tempPtr, NULL, NULL, NULL));
+            } finally {
+              _free(tempPtr);
+            }
+          }
+          prepare(sql) {
+            this._assertOpen();
+            return new Statement(this, sql);
+          }
+          run(sql, values) {
+            const stmt = this.prepare(sql);
+            try {
+              return stmt.run(values);
+            } finally {
+              stmt.finalize();
+            }
+          }
+          all(sql, values, { expand = false } = {}) {
+            return this._query(sql, values, false, expand);
+          }
+          get(sql, values, { expand = false } = {}) {
+            return this._query(sql, values, true, expand);
+          }
+          _query(sql, values, single, expand) {
+            const stmt = this.prepare(sql);
+            try {
+              if (single) {
+                return stmt.get(values, { expand });
+              } else {
+                return stmt.all(values, { expand });
+              }
+            } finally {
+              stmt.finalize();
+            }
+          }
+          _assertOpen() {
+            if (!this.isOpen) throw new SQLite3Error("Database already closed");
+          }
+          _handleError(returnCode) {
+            if (returnCode !== SQLITE_OK) throw new SQLite3Error(sqlite3.errmsg(this._ptr));
+          }
+        }
+        class Statement {
+          constructor(db, sql) {
+            const tempPtr = stringToHeap(sql);
+            try {
+              db._handleError(sqlite3.prepare_v2(db._ptr, tempPtr, -1, temp, NULL));
+            } finally {
+              _free(tempPtr);
+            }
+            this._ptr = getValue(temp, "i32");
+            if (this._ptr === NULL) throw new SQLite3Error("Nothing to prepare");
+            this._db = db;
+          }
+          get database() {
+            return this._db;
+          }
+          get isFinalized() {
+            return this._ptr === null;
+          }
+          run(values) {
+            this._assertReady();
+            this._bind(values);
+            this._step();
+            return { changes: sqlite3.changes(this._db._ptr), lastInsertRowid: toNumberOrNot(sqlite3.last_insert_rowid(this._db._ptr)) };
+          }
+          iterate(values, { expand = false } = {}) {
+            return this._queryRows(values, expand);
+          }
+          all(values, { expand = false } = {}) {
+            return Array.from(this.iterate(values, { expand }));
+          }
+          get(values, { expand = false } = {}) {
+            const result = this._queryRows(values, expand).next();
+            return result.done ? null : result.value;
+          }
+          finalize() {
+            if (this.isFinalized) throw new SQLite3Error("Statement already finalized");
+            try {
+              this._db._handleError(sqlite3.finalize(this._ptr));
+            } finally {
+              this._ptr = null;
+            }
+          }
+          _reset() {
+            return sqlite3.clear_bindings(this._ptr) === SQLITE_OK && sqlite3.reset(this._ptr) === SQLITE_OK;
+          }
+          *_queryRows(values, expand) {
+            this._assertReady();
+            this._bind(values);
+            const columns = this._getColumnNames();
+            while (this._step()) yield this._getRow(columns, expand);
+          }
+          _bind(values) {
+            if (!this._reset()) {
+              throw new SQLite3Error("Could not reset statement prior to binding new values");
+            }
+            if (Array.isArray(values)) {
+              this._bindArray(values);
+            } else if (values != null && typeof values === "object") {
+              this._bindObject(values);
+            } else if (typeof values !== "undefined") {
+              this._bindValue(values, 1);
+            }
+          }
+          _step() {
+            const ret = sqlite3.step(this._ptr);
+            switch (ret) {
+              case SQLITE_ROW:
+                return true;
+              case SQLITE_DONE:
+                return false;
+              default:
+                this._db._handleError(ret);
+            }
+          }
+          _getRow(columns, expand) {
+            const row = {};
+            for (let i = 0; i < columns.length; i++) {
+              let v;
+              const colType = sqlite3.column_type(this._ptr, i);
+              switch (colType) {
+                case SQLITE_INTEGER:
+                  v = toNumberOrNot(sqlite3.column_int64(this._ptr, i));
+                  break;
+                case SQLITE_FLOAT:
+                  v = sqlite3.column_double(this._ptr, i);
+                  break;
+                case SQLITE_TEXT:
+                  v = sqlite3.column_text(this._ptr, i);
+                  break;
+                case SQLITE_BLOB:
+                  const p = sqlite3.column_blob(this._ptr, i);
+                  if (p != NULL) {
+                    v = HEAPU8.slice(p, p + sqlite3.column_bytes(this._ptr, i));
+                  } else {
+                    v = new Uint8Array();
+                  }
+                  break;
+                case SQLITE_NULL:
+                  v = null;
+                  break;
+              }
+              const column = columns[i];
+              if (expand) {
+                let table = sqlite3.column_table_name(this._ptr, i);
+                table = table === "" ? "$" : table;
+                if (Object.hasOwn(row, table)) {
+                  row[table][column] = v;
+                } else {
+                  row[table] = { [column]: v };
+                }
+              } else {
+                row[column] = v;
+              }
+            }
+            return row;
+          }
+          _getColumnNames() {
+            const names = [];
+            const columns = sqlite3.column_count(this._ptr);
+            for (let i = 0; i < columns; i++) names.push(sqlite3.column_name(this._ptr, i));
+            return names;
+          }
+          _bindArray(values) {
+            for (let i = 0; i < values.length; i++) this._bindValue(values[i], i + 1);
+          }
+          _bindObject(values) {
+            for (const [param, value] of Object.entries(values)) {
+              const i = sqlite3.bind_parameter_index(this._ptr, param);
+              if (i === 0) throw new SQLite3Error(`Unknown binding parameter: "${param}"`);
+              this._bindValue(value, i);
+            }
+          }
+          _bindValue(value, position) {
+            let ret;
+            switch (typeof value) {
+              case "string":
+                const tempPtr = stringToHeap(value);
+                ret = sqlite3.bind_text(this._ptr, position, tempPtr, -1, SQLITE_TRANSIENT);
+                _free(tempPtr);
+                break;
+              case "number":
+                if (Number.isSafeInteger(value)) {
+                  if (value >= INT32_MIN && value <= INT32_MAX) {
+                    ret = sqlite3.bind_int(this._ptr, position, value);
+                  } else {
+                    ret = sqlite3.bind_int64(this._ptr, position, BigInt(value));
+                  }
+                } else {
+                  ret = sqlite3.bind_double(this._ptr, position, value);
+                }
+                break;
+              case "bigint":
+                ret = sqlite3.bind_int64(this._ptr, position, value);
+                break;
+              case "boolean":
+                ret = sqlite3.bind_int(this._ptr, position, value ? 1 : 0);
+                break;
+              case "object":
+                if (value === null) {
+                  ret = sqlite3.bind_null(this._ptr, position);
+                } else if (value instanceof Uint8Array) {
+                  const tempPtr2 = arrayToHeap(value);
+                  if (value.byteLength <= INT32_MAX) {
+                    ret = sqlite3.bind_blob(this._ptr, position, tempPtr2, value.byteLength, SQLITE_TRANSIENT);
+                  } else {
+                    ret = sqlite3.bind_blob64(this._ptr, position, tempPtr2, BigInt(value.byteLength), SQLITE_TRANSIENT);
+                  }
+                  _free(tempPtr2);
+                } else {
+                  throw new SQLite3Error(`Unsupported type for binding: "${typeof value}"`);
+                }
+                break;
+              default:
+                throw new SQLite3Error(`Unsupported type for binding: "${typeof value}"`);
+            }
+            if (ret !== SQLITE_OK) this._db._handleError(ret);
+          }
+          _assertReady() {
+            if (this.isFinalized) throw new SQLite3Error("Statement already finalized");
+            if (!this._db.isOpen) throw new SQLite3Error("Database is closed");
+          }
+        }
+        Module2.Database = Database;
+        Module2.SQLite3Error = SQLite3Error;
+        const path = require$$0$5;
+        const crypto = require$$1$8;
+        const SQLITE_CANTOPEN = 14;
+        const SQLITE_IOERR_READ = 266;
+        const SQLITE_IOERR_SHORT_READ = 522;
+        const SQLITE_IOERR_FSYNC = 1034;
+        const SQLITE_IOERR_WRITE = 778;
+        const SQLITE_IOERR_DELETE = 2570;
+        const SQLITE_IOERR_CLOSE = 4106;
+        const SQLITE_IOERR_TRUNCATE = 1546;
+        const SQLITE_IOERR_FSTAT = 1802;
+        const SQLITE_IOERR_LOCK = 3850;
+        const SQLITE_IOERR_UNLOCK = 2058;
+        const SQLITE_OPEN_READONLY = 1;
+        const SQLITE_OPEN_READWRITE = 2;
+        const SQLITE_OPEN_CREATE = 4;
+        const SQLITE_OPEN_EXCLUSIVE = 16;
+        const SQLITE_ACCESS_READWRITE = 1;
+        const SQLITE_ACCESS_READ = 2;
+        const SQLITE_LOCK_NONE = 0;
+        const SQLITE_BUSY = 5;
+        function _fd(fileInfo) {
+          return getValue(fileInfo + 4, "i32");
+        }
+        function _isLocked(fileInfo) {
+          return getValue(fileInfo + 8, "i32") != 0;
+        }
+        function _setLocked(fileInfo, locked) {
+          setValue(fileInfo + 8, locked ? 1 : 0, "i32");
+        }
+        function _path(fileInfo) {
+          return UTF8ToString(getValue(fileInfo + 12, "i32"));
+        }
+        function _safeInt(bigInt) {
+          if (bigInt < Number.MIN_SAFE_INTEGER || bigInt > Number.MAX_SAFE_INTEGER) throw 0;
+          return Number(bigInt);
+        }
+        var quit_ = (status, toThrow) => {
+          throw toThrow;
+        };
+        if (typeof __filename != "undefined") {
+          __filename;
+        }
+        var scriptDirectory = "";
+        function locateFile(path2) {
+          if (Module2["locateFile"]) {
+            return Module2["locateFile"](path2, scriptDirectory);
+          }
+          return scriptDirectory + path2;
+        }
+        var readBinary;
+        {
+          var fs2 = require$$1$1;
+          scriptDirectory = __dirname + "/";
+          readBinary = (filename) => {
+            filename = isFileURI(filename) ? new URL(filename) : filename;
+            var ret = fs2.readFileSync(filename);
+            return ret;
+          };
+          if (process.argv.length > 1) {
+            process.argv[1].replace(/\\/g, "/");
+          }
+          process.argv.slice(2);
+          quit_ = (status, toThrow) => {
+            process.exitCode = status;
+            throw toThrow;
+          };
+        }
+        console.log.bind(console);
+        var err = console.error.bind(console);
+        var wasmBinary;
+        var ABORT = false;
+        var EXITSTATUS;
+        var isFileURI = (filename) => filename.startsWith("file://");
+        var wasmMemory;
+        var HEAP8, HEAPU8, HEAP16, HEAP32, HEAPU32, HEAPF32, HEAPF64;
+        var HEAP64;
+        function updateMemoryViews() {
+          var b = wasmMemory.buffer;
+          HEAP8 = new Int8Array(b);
+          HEAP16 = new Int16Array(b);
+          HEAPU8 = new Uint8Array(b);
+          HEAP32 = new Int32Array(b);
+          HEAPU32 = new Uint32Array(b);
+          HEAPF32 = new Float32Array(b);
+          HEAPF64 = new Float64Array(b);
+          HEAP64 = new BigInt64Array(b);
+          new BigUint64Array(b);
+        }
+        function preRun() {
+          if (Module2["preRun"]) {
+            if (typeof Module2["preRun"] == "function") Module2["preRun"] = [Module2["preRun"]];
+            while (Module2["preRun"].length) {
+              addOnPreRun(Module2["preRun"].shift());
+            }
+          }
+          callRuntimeCallbacks(onPreRuns);
+        }
+        function initRuntime() {
+          wasmExports["z"]();
+        }
+        function postRun() {
+          if (Module2["postRun"]) {
+            if (typeof Module2["postRun"] == "function") Module2["postRun"] = [Module2["postRun"]];
+            while (Module2["postRun"].length) {
+              addOnPostRun(Module2["postRun"].shift());
+            }
+          }
+          callRuntimeCallbacks(onPostRuns);
+        }
+        var runDependencies = 0;
+        var dependenciesFulfilled = null;
+        function addRunDependency(id) {
+          var _a;
+          runDependencies++;
+          (_a = Module2["monitorRunDependencies"]) == null ? void 0 : _a.call(Module2, runDependencies);
+        }
+        function removeRunDependency(id) {
+          var _a;
+          runDependencies--;
+          (_a = Module2["monitorRunDependencies"]) == null ? void 0 : _a.call(Module2, runDependencies);
+          if (runDependencies == 0) {
+            if (dependenciesFulfilled) {
+              var callback = dependenciesFulfilled;
+              dependenciesFulfilled = null;
+              callback();
+            }
+          }
+        }
+        function abort(what) {
+          var _a;
+          (_a = Module2["onAbort"]) == null ? void 0 : _a.call(Module2, what);
+          what = "Aborted(" + what + ")";
+          err(what);
+          ABORT = true;
+          what += ". Build with -sASSERTIONS for more info.";
+          var e = new WebAssembly.RuntimeError(what);
+          throw e;
+        }
+        var wasmBinaryFile;
+        function findWasmBinary() {
+          return locateFile("node-sqlite3-wasm.wasm");
+        }
+        function getBinarySync(file2) {
+          if (file2 == wasmBinaryFile && wasmBinary) {
+            return new Uint8Array(wasmBinary);
+          }
+          if (readBinary) {
+            return readBinary(file2);
+          }
+          throw 'sync fetching of the wasm failed: you can preload it to Module["wasmBinary"] manually, or emcc.py will do that for you when generating HTML (but not JS)';
+        }
+        function instantiateSync(file2, info) {
+          var module3;
+          var binary2 = getBinarySync(file2);
+          module3 = new WebAssembly.Module(binary2);
+          var instance = new WebAssembly.Instance(module3, info);
+          return [instance, module3];
+        }
+        function getWasmImports() {
+          return { a: wasmImports };
+        }
+        function createWasm() {
+          function receiveInstance(instance, module3) {
+            wasmExports = instance.exports;
+            wasmMemory = wasmExports["y"];
+            updateMemoryViews();
+            wasmTable = wasmExports["sa"];
+            assignWasmExports(wasmExports);
+            removeRunDependency();
+            return wasmExports;
+          }
+          addRunDependency();
+          var info = getWasmImports();
+          if (Module2["instantiateWasm"]) {
+            return new Promise((resolve, reject) => {
+              Module2["instantiateWasm"](info, (mod, inst) => {
+                resolve(receiveInstance(mod));
+              });
+            });
+          }
+          wasmBinaryFile ?? (wasmBinaryFile = findWasmBinary());
+          var result = instantiateSync(wasmBinaryFile, info);
+          return receiveInstance(result[0]);
+        }
+        class ExitStatus {
+          constructor(status) {
+            __publicField(this, "name", "ExitStatus");
+            this.message = `Program terminated with exit(${status})`;
+            this.status = status;
+          }
+        }
+        var callRuntimeCallbacks = (callbacks) => {
+          while (callbacks.length > 0) {
+            callbacks.shift()(Module2);
+          }
+        };
+        var onPostRuns = [];
+        var addOnPostRun = (cb) => onPostRuns.push(cb);
+        var onPreRuns = [];
+        var addOnPreRun = (cb) => onPreRuns.push(cb);
+        function getValue(ptr, type2 = "i8") {
+          if (type2.endsWith("*")) type2 = "*";
+          switch (type2) {
+            case "i1":
+              return HEAP8[ptr];
+            case "i8":
+              return HEAP8[ptr];
+            case "i16":
+              return HEAP16[ptr >> 1];
+            case "i32":
+              return HEAP32[ptr >> 2];
+            case "i64":
+              return HEAP64[ptr >> 3];
+            case "float":
+              return HEAPF32[ptr >> 2];
+            case "double":
+              return HEAPF64[ptr >> 3];
+            case "*":
+              return HEAPU32[ptr >> 2];
+            default:
+              abort(`invalid type for getValue: ${type2}`);
+          }
+        }
+        var noExitRuntime = true;
+        function setValue(ptr, value, type2 = "i8") {
+          if (type2.endsWith("*")) type2 = "*";
+          switch (type2) {
+            case "i1":
+              HEAP8[ptr] = value;
+              break;
+            case "i8":
+              HEAP8[ptr] = value;
+              break;
+            case "i16":
+              HEAP16[ptr >> 1] = value;
+              break;
+            case "i32":
+              HEAP32[ptr >> 2] = value;
+              break;
+            case "i64":
+              HEAP64[ptr >> 3] = BigInt(value);
+              break;
+            case "float":
+              HEAPF32[ptr >> 2] = value;
+              break;
+            case "double":
+              HEAPF64[ptr >> 3] = value;
+              break;
+            case "*":
+              HEAPU32[ptr >> 2] = value;
+              break;
+            default:
+              abort(`invalid type for setValue: ${type2}`);
+          }
+        }
+        var stackRestore = (val) => __emscripten_stack_restore(val);
+        var stackSave = () => _emscripten_stack_get_current();
+        var __abort_js = () => abort("");
+        var runtimeKeepaliveCounter = 0;
+        var __emscripten_runtime_keepalive_clear = () => {
+          noExitRuntime = false;
+          runtimeKeepaliveCounter = 0;
+        };
+        var isLeapYear = (year) => year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+        var MONTH_DAYS_LEAP_CUMULATIVE = [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335];
+        var MONTH_DAYS_REGULAR_CUMULATIVE = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+        var ydayFromDate = (date) => {
+          var leap = isLeapYear(date.getFullYear());
+          var monthDaysCumulative = leap ? MONTH_DAYS_LEAP_CUMULATIVE : MONTH_DAYS_REGULAR_CUMULATIVE;
+          var yday = monthDaysCumulative[date.getMonth()] + date.getDate() - 1;
+          return yday;
+        };
+        var INT53_MAX = 9007199254740992;
+        var INT53_MIN = -9007199254740992;
+        var bigintToI53Checked = (num) => num < INT53_MIN || num > INT53_MAX ? NaN : Number(num);
+        function __localtime_js(time, tmPtr) {
+          time = bigintToI53Checked(time);
+          var date = new Date(time * 1e3);
+          HEAP32[tmPtr >> 2] = date.getSeconds();
+          HEAP32[tmPtr + 4 >> 2] = date.getMinutes();
+          HEAP32[tmPtr + 8 >> 2] = date.getHours();
+          HEAP32[tmPtr + 12 >> 2] = date.getDate();
+          HEAP32[tmPtr + 16 >> 2] = date.getMonth();
+          HEAP32[tmPtr + 20 >> 2] = date.getFullYear() - 1900;
+          HEAP32[tmPtr + 24 >> 2] = date.getDay();
+          var yday = ydayFromDate(date) | 0;
+          HEAP32[tmPtr + 28 >> 2] = yday;
+          HEAP32[tmPtr + 36 >> 2] = -(date.getTimezoneOffset() * 60);
+          var start = new Date(date.getFullYear(), 0, 1);
+          var summerOffset = new Date(date.getFullYear(), 6, 1).getTimezoneOffset();
+          var winterOffset = start.getTimezoneOffset();
+          var dst = (summerOffset != winterOffset && date.getTimezoneOffset() == Math.min(winterOffset, summerOffset)) | 0;
+          HEAP32[tmPtr + 32 >> 2] = dst;
+        }
+        var timers = {};
+        var handleException = (e) => {
+          if (e instanceof ExitStatus || e == "unwind") {
+            return EXITSTATUS;
+          }
+          quit_(1, e);
+        };
+        var keepRuntimeAlive = () => noExitRuntime || runtimeKeepaliveCounter > 0;
+        var _proc_exit = (code) => {
+          var _a;
+          EXITSTATUS = code;
+          if (!keepRuntimeAlive()) {
+            (_a = Module2["onExit"]) == null ? void 0 : _a.call(Module2, code);
+            ABORT = true;
+          }
+          quit_(code, new ExitStatus(code));
+        };
+        var exitJS = (status, implicit) => {
+          EXITSTATUS = status;
+          _proc_exit(status);
+        };
+        var _exit = exitJS;
+        var maybeExit = () => {
+          if (!keepRuntimeAlive()) {
+            try {
+              _exit(EXITSTATUS);
+            } catch (e) {
+              handleException(e);
+            }
+          }
+        };
+        var callUserCallback = (func) => {
+          if (ABORT) {
+            return;
+          }
+          try {
+            func();
+            maybeExit();
+          } catch (e) {
+            handleException(e);
+          }
+        };
+        var _emscripten_get_now = () => performance.now();
+        var __setitimer_js = (which, timeout_ms) => {
+          if (timers[which]) {
+            clearTimeout(timers[which].id);
+            delete timers[which];
+          }
+          if (!timeout_ms) return 0;
+          var id = setTimeout(() => {
+            delete timers[which];
+            callUserCallback(() => __emscripten_timeout(which, _emscripten_get_now()));
+          }, timeout_ms);
+          timers[which] = { id, timeout_ms };
+          return 0;
+        };
+        var stringToUTF8Array = (str2, heap, outIdx, maxBytesToWrite) => {
+          if (!(maxBytesToWrite > 0)) return 0;
+          var startIdx = outIdx;
+          var endIdx = outIdx + maxBytesToWrite - 1;
+          for (var i = 0; i < str2.length; ++i) {
+            var u = str2.codePointAt(i);
+            if (u <= 127) {
+              if (outIdx >= endIdx) break;
+              heap[outIdx++] = u;
+            } else if (u <= 2047) {
+              if (outIdx + 1 >= endIdx) break;
+              heap[outIdx++] = 192 | u >> 6;
+              heap[outIdx++] = 128 | u & 63;
+            } else if (u <= 65535) {
+              if (outIdx + 2 >= endIdx) break;
+              heap[outIdx++] = 224 | u >> 12;
+              heap[outIdx++] = 128 | u >> 6 & 63;
+              heap[outIdx++] = 128 | u & 63;
+            } else {
+              if (outIdx + 3 >= endIdx) break;
+              heap[outIdx++] = 240 | u >> 18;
+              heap[outIdx++] = 128 | u >> 12 & 63;
+              heap[outIdx++] = 128 | u >> 6 & 63;
+              heap[outIdx++] = 128 | u & 63;
+              i++;
+            }
+          }
+          heap[outIdx] = 0;
+          return outIdx - startIdx;
+        };
+        var stringToUTF8 = (str2, outPtr, maxBytesToWrite) => stringToUTF8Array(str2, HEAPU8, outPtr, maxBytesToWrite);
+        var __tzset_js = (timezone, daylight, std_name, dst_name) => {
+          var currentYear = (/* @__PURE__ */ new Date()).getFullYear();
+          var winter = new Date(currentYear, 0, 1);
+          var summer = new Date(currentYear, 6, 1);
+          var winterOffset = winter.getTimezoneOffset();
+          var summerOffset = summer.getTimezoneOffset();
+          var stdTimezoneOffset = Math.max(winterOffset, summerOffset);
+          HEAPU32[timezone >> 2] = stdTimezoneOffset * 60;
+          HEAP32[daylight >> 2] = Number(winterOffset != summerOffset);
+          var extractZone = (timezoneOffset) => {
+            var sign2 = timezoneOffset >= 0 ? "-" : "+";
+            var absOffset = Math.abs(timezoneOffset);
+            var hours = String(Math.floor(absOffset / 60)).padStart(2, "0");
+            var minutes = String(absOffset % 60).padStart(2, "0");
+            return `UTC${sign2}${hours}${minutes}`;
+          };
+          var winterName = extractZone(winterOffset);
+          var summerName = extractZone(summerOffset);
+          if (summerOffset < winterOffset) {
+            stringToUTF8(winterName, std_name, 17);
+            stringToUTF8(summerName, dst_name, 17);
+          } else {
+            stringToUTF8(winterName, dst_name, 17);
+            stringToUTF8(summerName, std_name, 17);
+          }
+        };
+        var _emscripten_date_now = () => Date.now();
+        var getHeapMax = () => 2147483648;
+        var alignMemory = (size, alignment) => Math.ceil(size / alignment) * alignment;
+        var growMemory = (size) => {
+          var b = wasmMemory.buffer;
+          var pages = (size - b.byteLength + 65535) / 65536 | 0;
+          try {
+            wasmMemory.grow(pages);
+            updateMemoryViews();
+            return 1;
+          } catch (e) {
+          }
+        };
+        var _emscripten_resize_heap = (requestedSize) => {
+          var oldSize = HEAPU8.length;
+          requestedSize >>>= 0;
+          var maxHeapSize = getHeapMax();
+          if (requestedSize > maxHeapSize) {
+            return false;
+          }
+          for (var cutDown = 1; cutDown <= 4; cutDown *= 2) {
+            var overGrownHeapSize = oldSize * (1 + 0.2 / cutDown);
+            overGrownHeapSize = Math.min(overGrownHeapSize, requestedSize + 100663296);
+            var newSize = Math.min(maxHeapSize, alignMemory(Math.max(requestedSize, overGrownHeapSize), 65536));
+            var replacement = growMemory(newSize);
+            if (replacement) {
+              return true;
+            }
+          }
+          return false;
+        };
+        var UTF8Decoder = typeof TextDecoder != "undefined" ? new TextDecoder() : void 0;
+        var UTF8ArrayToString = (heapOrArray, idx = 0, maxBytesToRead = NaN) => {
+          var endIdx = idx + maxBytesToRead;
+          var endPtr = idx;
+          while (heapOrArray[endPtr] && !(endPtr >= endIdx)) ++endPtr;
+          if (endPtr - idx > 16 && heapOrArray.buffer && UTF8Decoder) {
+            return UTF8Decoder.decode(heapOrArray.subarray(idx, endPtr));
+          }
+          var str2 = "";
+          while (idx < endPtr) {
+            var u0 = heapOrArray[idx++];
+            if (!(u0 & 128)) {
+              str2 += String.fromCharCode(u0);
+              continue;
+            }
+            var u1 = heapOrArray[idx++] & 63;
+            if ((u0 & 224) == 192) {
+              str2 += String.fromCharCode((u0 & 31) << 6 | u1);
+              continue;
+            }
+            var u2 = heapOrArray[idx++] & 63;
+            if ((u0 & 240) == 224) {
+              u0 = (u0 & 15) << 12 | u1 << 6 | u2;
+            } else {
+              u0 = (u0 & 7) << 18 | u1 << 12 | u2 << 6 | heapOrArray[idx++] & 63;
+            }
+            if (u0 < 65536) {
+              str2 += String.fromCharCode(u0);
+            } else {
+              var ch = u0 - 65536;
+              str2 += String.fromCharCode(55296 | ch >> 10, 56320 | ch & 1023);
+            }
+          }
+          return str2;
+        };
+        var UTF8ToString = (ptr, maxBytesToRead) => ptr ? UTF8ArrayToString(HEAPU8, ptr, maxBytesToRead) : "";
+        function _nodejsAccess(vfs, filePath, flags, outResult) {
+          let aflags = fs2.constants.F_OK;
+          if (flags == SQLITE_ACCESS_READWRITE) aflags = fs2.constants.R_OK | fs2.constants.W_OK;
+          if (flags == SQLITE_ACCESS_READ) aflags = fs2.constants.R_OK;
+          try {
+            fs2.accessSync(UTF8ToString(filePath), aflags);
+            setValue(outResult, 1, "i32");
+          } catch {
+            setValue(outResult, 0, "i32");
+          }
+          return SQLITE_OK;
+        }
+        function _nodejsCheckReservedLock(fi, outResult) {
+          try {
+            fs2.accessSync(`${_path(fi)}.lock`, fs2.constants.F_OK);
+            setValue(outResult, 1, "i32");
+          } catch {
+            setValue(outResult, 0, "i32");
+          }
+          return SQLITE_OK;
+        }
+        function _nodejsClose(fi) {
+          _nodejsUnlock(fi, SQLITE_LOCK_NONE);
+          try {
+            fs2.closeSync(_fd(fi));
+          } catch {
+            return SQLITE_IOERR_CLOSE;
+          }
+          return SQLITE_OK;
+        }
+        function _nodejsDelete(vfs, filePath, dirSync) {
+          const pathStr = UTF8ToString(filePath);
+          try {
+            fs2.unlinkSync(pathStr);
+          } catch (err2) {
+            if (err2.code != "ENOENT") return SQLITE_IOERR_DELETE;
+          }
+          if (dirSync) {
+            let fd = -1;
+            try {
+              fd = fs2.openSync(path.dirname(pathStr), "r");
+              fs2.fsyncSync(fd);
+            } catch {
+              return SQLITE_IOERR_FSYNC;
+            } finally {
+              try {
+                fs2.closeSync(fd);
+              } catch {
+                return SQLITE_IOERR_FSYNC;
+              }
+            }
+          }
+          return SQLITE_OK;
+        }
+        function _nodejsFileSize(fi, outSize) {
+          try {
+            setValue(outSize, fs2.fstatSync(_fd(fi)).size, "i64");
+          } catch {
+            return SQLITE_IOERR_FSTAT;
+          }
+          return SQLITE_OK;
+        }
+        function _nodejsFullPathname(vfs, relPath, sizeFullPath, outFullPath) {
+          const full = path.resolve(UTF8ToString(relPath));
+          stringToUTF8(full, outFullPath, sizeFullPath);
+          return full.length < sizeFullPath ? SQLITE_OK : SQLITE_CANTOPEN;
+        }
+        function _nodejsLock(fi, level) {
+          if (!_isLocked(fi)) {
+            try {
+              fs2.mkdirSync(`${_path(fi)}.lock`);
+            } catch (err2) {
+              return err2.code == "EEXIST" ? SQLITE_BUSY : SQLITE_IOERR_LOCK;
+            }
+            _setLocked(fi, true);
+          }
+          return SQLITE_OK;
+        }
+        function _nodejsRandomness(vfs, bytes, outBuffer) {
+          const buf = HEAPU8.subarray(outBuffer, outBuffer + bytes);
+          crypto.randomFillSync(buf);
+          return bytes;
+        }
+        function _nodejsRead(fi, outBuffer, bytes, offset) {
+          const buf = HEAPU8.subarray(outBuffer, outBuffer + bytes);
+          let bytesRead;
+          try {
+            bytesRead = fs2.readSync(_fd(fi), buf, 0, bytes, offset);
+          } catch {
+            return SQLITE_IOERR_READ;
+          }
+          if (bytesRead == bytes) {
+            return SQLITE_OK;
+          } else if (bytesRead >= 0) {
+            if (bytesRead < bytes) {
+              try {
+                buf.fill(0, bytesRead);
+              } catch {
+                return SQLITE_IOERR_READ;
+              }
+            }
+            return SQLITE_IOERR_SHORT_READ;
+          }
+          return SQLITE_IOERR_READ;
+        }
+        function _nodejsSync(fi, flags) {
+          try {
+            fs2.fsyncSync(_fd(fi));
+          } catch {
+            return SQLITE_IOERR_FSYNC;
+          }
+          return SQLITE_OK;
+        }
+        function _nodejsTruncate(fi, size) {
+          try {
+            fs2.ftruncateSync(_fd(fi), _safeInt(size));
+          } catch {
+            return SQLITE_IOERR_TRUNCATE;
+          }
+          return SQLITE_OK;
+        }
+        function _nodejsUnlock(fi, level) {
+          if (level == SQLITE_LOCK_NONE && _isLocked(fi)) {
+            try {
+              fs2.rmdirSync(`${_path(fi)}.lock`);
+            } catch (err2) {
+              if (err2.code != "ENOENT") return SQLITE_IOERR_UNLOCK;
+            }
+            _setLocked(fi, false);
+          }
+          return SQLITE_OK;
+        }
+        function _nodejsWrite(fi, buffer, bytes, offset) {
+          try {
+            const bytesWritten = fs2.writeSync(_fd(fi), HEAPU8.subarray(buffer, buffer + bytes), 0, bytes, _safeInt(offset));
+            return bytesWritten != bytes ? SQLITE_IOERR_WRITE : SQLITE_OK;
+          } catch {
+            return SQLITE_IOERR_WRITE;
+          }
+        }
+        function _nodejs_max_path_length() {
+          return process.platform == "win32" ? 260 : 4096;
+        }
+        function _nodejs_open(filePath, flags, mode) {
+          let oflags = 0;
+          if (flags & SQLITE_OPEN_EXCLUSIVE) oflags |= fs2.constants.O_EXCL;
+          if (flags & SQLITE_OPEN_CREATE) oflags |= fs2.constants.O_CREAT;
+          if (flags & SQLITE_OPEN_READONLY) oflags |= fs2.constants.O_RDONLY;
+          if (flags & SQLITE_OPEN_READWRITE) oflags |= fs2.constants.O_RDWR;
+          try {
+            return fs2.openSync(UTF8ToString(filePath), oflags, mode);
+          } catch {
+            return -1;
+          }
+        }
+        var getCFunc = (ident) => {
+          var func = Module2["_" + ident];
+          return func;
+        };
+        var writeArrayToMemory = (array, buffer) => {
+          HEAP8.set(array, buffer);
+        };
+        var lengthBytesUTF8 = (str2) => {
+          var len = 0;
+          for (var i = 0; i < str2.length; ++i) {
+            var c = str2.charCodeAt(i);
+            if (c <= 127) {
+              len++;
+            } else if (c <= 2047) {
+              len += 2;
+            } else if (c >= 55296 && c <= 57343) {
+              len += 4;
+              ++i;
+            } else {
+              len += 3;
+            }
+          }
+          return len;
+        };
+        var stackAlloc = (sz) => __emscripten_stack_alloc(sz);
+        var stringToUTF8OnStack = (str2) => {
+          var size = lengthBytesUTF8(str2) + 1;
+          var ret = stackAlloc(size);
+          stringToUTF8(str2, ret, size);
+          return ret;
+        };
+        var ccall = (ident, returnType, argTypes, args, opts) => {
+          var toC = { string: (str2) => {
+            var ret2 = 0;
+            if (str2 !== null && str2 !== void 0 && str2 !== 0) {
+              ret2 = stringToUTF8OnStack(str2);
+            }
+            return ret2;
+          }, array: (arr) => {
+            var ret2 = stackAlloc(arr.length);
+            writeArrayToMemory(arr, ret2);
+            return ret2;
+          } };
+          function convertReturnValue(ret2) {
+            if (returnType === "string") {
+              return UTF8ToString(ret2);
+            }
+            if (returnType === "boolean") return Boolean(ret2);
+            return ret2;
+          }
+          var func = getCFunc(ident);
+          var cArgs = [];
+          var stack = 0;
+          if (args) {
+            for (var i = 0; i < args.length; i++) {
+              var converter = toC[argTypes[i]];
+              if (converter) {
+                if (stack === 0) stack = stackSave();
+                cArgs[i] = converter(args[i]);
+              } else {
+                cArgs[i] = args[i];
+              }
+            }
+          }
+          var ret = func(...cArgs);
+          function onDone(ret2) {
+            if (stack !== 0) stackRestore(stack);
+            return convertReturnValue(ret2);
+          }
+          ret = onDone(ret);
+          return ret;
+        };
+        var cwrap = (ident, returnType, argTypes, opts) => {
+          var numericArgs = !argTypes || argTypes.every((type2) => type2 === "number" || type2 === "boolean");
+          var numericRet = returnType !== "string";
+          if (numericRet && numericArgs && !opts) {
+            return getCFunc(ident);
+          }
+          return (...args) => ccall(ident, returnType, argTypes, args);
+        };
+        var uleb128Encode = (n, target) => {
+          if (n < 128) {
+            target.push(n);
+          } else {
+            target.push(n % 128 | 128, n >> 7);
+          }
+        };
+        var sigToWasmTypes = (sig) => {
+          var typeNames = { i: "i32", j: "i64", f: "f32", d: "f64", e: "externref", p: "i32" };
+          var type2 = { parameters: [], results: sig[0] == "v" ? [] : [typeNames[sig[0]]] };
+          for (var i = 1; i < sig.length; ++i) {
+            type2.parameters.push(typeNames[sig[i]]);
+          }
+          return type2;
+        };
+        var generateFuncType = (sig, target) => {
+          var sigRet = sig.slice(0, 1);
+          var sigParam = sig.slice(1);
+          var typeCodes = { i: 127, p: 127, j: 126, f: 125, d: 124, e: 111 };
+          target.push(96);
+          uleb128Encode(sigParam.length, target);
+          for (var paramType of sigParam) {
+            target.push(typeCodes[paramType]);
+          }
+          if (sigRet == "v") {
+            target.push(0);
+          } else {
+            target.push(1, typeCodes[sigRet]);
+          }
+        };
+        var convertJsFunctionToWasm = (func, sig) => {
+          if (typeof WebAssembly.Function == "function") {
+            return new WebAssembly.Function(sigToWasmTypes(sig), func);
+          }
+          var typeSectionBody = [1];
+          generateFuncType(sig, typeSectionBody);
+          var bytes = [0, 97, 115, 109, 1, 0, 0, 0, 1];
+          uleb128Encode(typeSectionBody.length, bytes);
+          bytes.push(...typeSectionBody);
+          bytes.push(2, 7, 1, 1, 101, 1, 102, 0, 0, 7, 5, 1, 1, 102, 0, 0);
+          var module3 = new WebAssembly.Module(new Uint8Array(bytes));
+          var instance = new WebAssembly.Instance(module3, { e: { f: func } });
+          var wrappedFunc = instance.exports["f"];
+          return wrappedFunc;
+        };
+        var wasmTableMirror = [];
+        var wasmTable;
+        var getWasmTableEntry = (funcPtr) => {
+          var func = wasmTableMirror[funcPtr];
+          if (!func) {
+            wasmTableMirror[funcPtr] = func = wasmTable.get(funcPtr);
+          }
+          return func;
+        };
+        var updateTableMap = (offset, count) => {
+          if (functionsInTableMap) {
+            for (var i = offset; i < offset + count; i++) {
+              var item = getWasmTableEntry(i);
+              if (item) {
+                functionsInTableMap.set(item, i);
+              }
+            }
+          }
+        };
+        var functionsInTableMap;
+        var getFunctionAddress = (func) => {
+          if (!functionsInTableMap) {
+            functionsInTableMap = /* @__PURE__ */ new WeakMap();
+            updateTableMap(0, wasmTable.length);
+          }
+          return functionsInTableMap.get(func) || 0;
+        };
+        var freeTableIndexes = [];
+        var getEmptyTableSlot = () => {
+          if (freeTableIndexes.length) {
+            return freeTableIndexes.pop();
+          }
+          try {
+            wasmTable.grow(1);
+          } catch (err2) {
+            if (!(err2 instanceof RangeError)) {
+              throw err2;
+            }
+            throw "Unable to grow wasm table. Set ALLOW_TABLE_GROWTH.";
+          }
+          return wasmTable.length - 1;
+        };
+        var setWasmTableEntry = (idx, func) => {
+          wasmTable.set(idx, func);
+          wasmTableMirror[idx] = wasmTable.get(idx);
+        };
+        var addFunction = (func, sig) => {
+          var rtn = getFunctionAddress(func);
+          if (rtn) {
+            return rtn;
+          }
+          var ret = getEmptyTableSlot();
+          try {
+            setWasmTableEntry(ret, func);
+          } catch (err2) {
+            if (!(err2 instanceof TypeError)) {
+              throw err2;
+            }
+            var wrapped = convertJsFunctionToWasm(func, sig);
+            setWasmTableEntry(ret, wrapped);
+          }
+          functionsInTableMap.set(func, ret);
+          return ret;
+        };
+        var removeFunction = (index) => {
+          functionsInTableMap.delete(getWasmTableEntry(index));
+          setWasmTableEntry(index, null);
+          freeTableIndexes.push(index);
+        };
+        {
+          if (Module2["noExitRuntime"]) noExitRuntime = Module2["noExitRuntime"];
+          if (Module2["print"]) Module2["print"];
+          if (Module2["printErr"]) err = Module2["printErr"];
+          if (Module2["wasmBinary"]) wasmBinary = Module2["wasmBinary"];
+          if (Module2["arguments"]) Module2["arguments"];
+          if (Module2["thisProgram"]) Module2["thisProgram"];
+        }
+        Module2["cwrap"] = cwrap;
+        Module2["addFunction"] = addFunction;
+        Module2["removeFunction"] = removeFunction;
+        var _malloc, _free, __emscripten_timeout, __emscripten_stack_restore, __emscripten_stack_alloc, _emscripten_stack_get_current;
+        function assignWasmExports(wasmExports2) {
+          Module2["_sqlite3_finalize"] = wasmExports2["A"];
+          Module2["_sqlite3_reset"] = wasmExports2["B"];
+          Module2["_sqlite3_clear_bindings"] = wasmExports2["C"];
+          Module2["_sqlite3_value_blob"] = wasmExports2["D"];
+          Module2["_sqlite3_value_text"] = wasmExports2["E"];
+          Module2["_sqlite3_value_bytes"] = wasmExports2["F"];
+          Module2["_sqlite3_value_double"] = wasmExports2["G"];
+          Module2["_sqlite3_value_int64"] = wasmExports2["H"];
+          Module2["_sqlite3_value_type"] = wasmExports2["I"];
+          Module2["_sqlite3_result_blob"] = wasmExports2["J"];
+          Module2["_sqlite3_result_blob64"] = wasmExports2["K"];
+          Module2["_sqlite3_result_double"] = wasmExports2["L"];
+          Module2["_sqlite3_result_error"] = wasmExports2["M"];
+          Module2["_sqlite3_result_int"] = wasmExports2["N"];
+          Module2["_sqlite3_result_int64"] = wasmExports2["O"];
+          Module2["_sqlite3_result_null"] = wasmExports2["P"];
+          Module2["_sqlite3_result_text"] = wasmExports2["Q"];
+          Module2["_sqlite3_step"] = wasmExports2["R"];
+          Module2["_sqlite3_column_count"] = wasmExports2["S"];
+          Module2["_sqlite3_column_blob"] = wasmExports2["T"];
+          Module2["_sqlite3_column_bytes"] = wasmExports2["U"];
+          Module2["_sqlite3_column_double"] = wasmExports2["V"];
+          Module2["_sqlite3_column_int64"] = wasmExports2["W"];
+          Module2["_sqlite3_column_text"] = wasmExports2["X"];
+          Module2["_sqlite3_column_type"] = wasmExports2["Y"];
+          Module2["_sqlite3_column_name"] = wasmExports2["Z"];
+          Module2["_sqlite3_column_table_name"] = wasmExports2["_"];
+          Module2["_sqlite3_bind_blob"] = wasmExports2["$"];
+          Module2["_sqlite3_bind_blob64"] = wasmExports2["aa"];
+          Module2["_sqlite3_bind_double"] = wasmExports2["ba"];
+          Module2["_sqlite3_bind_int"] = wasmExports2["ca"];
+          Module2["_sqlite3_bind_int64"] = wasmExports2["da"];
+          Module2["_sqlite3_bind_null"] = wasmExports2["ea"];
+          Module2["_sqlite3_bind_text"] = wasmExports2["fa"];
+          Module2["_sqlite3_bind_parameter_index"] = wasmExports2["ga"];
+          Module2["_sqlite3_exec"] = wasmExports2["ha"];
+          Module2["_sqlite3_prepare_v2"] = wasmExports2["ia"];
+          Module2["_sqlite3_errmsg"] = wasmExports2["ja"];
+          Module2["_sqlite3_last_insert_rowid"] = wasmExports2["ka"];
+          Module2["_sqlite3_changes"] = wasmExports2["la"];
+          Module2["_sqlite3_close_v2"] = wasmExports2["ma"];
+          Module2["_sqlite3_create_function_v2"] = wasmExports2["na"];
+          Module2["_sqlite3_open_v2"] = wasmExports2["oa"];
+          Module2["_sqlite3_get_autocommit"] = wasmExports2["pa"];
+          Module2["_malloc"] = _malloc = wasmExports2["qa"];
+          Module2["_free"] = _free = wasmExports2["ra"];
+          __emscripten_timeout = wasmExports2["ta"];
+          __emscripten_stack_restore = wasmExports2["ua"];
+          __emscripten_stack_alloc = wasmExports2["va"];
+          _emscripten_stack_get_current = wasmExports2["wa"];
+        }
+        var wasmImports = { k: __abort_js, j: __emscripten_runtime_keepalive_clear, o: __localtime_js, l: __setitimer_js, p: __tzset_js, q: _emscripten_date_now, a: _emscripten_get_now, n: _emscripten_resize_heap, w: _nodejsAccess, s: _nodejsCheckReservedLock, f: _nodejsClose, x: _nodejsDelete, v: _nodejsFileSize, m: _nodejsFullPathname, u: _nodejsLock, h: _nodejsRandomness, e: _nodejsRead, b: _nodejsSync, c: _nodejsTruncate, t: _nodejsUnlock, d: _nodejsWrite, g: _nodejs_max_path_length, r: _nodejs_open, i: _proc_exit };
+        var wasmExports = createWasm();
+        function run() {
+          if (runDependencies > 0) {
+            dependenciesFulfilled = run;
+            return;
+          }
+          preRun();
+          if (runDependencies > 0) {
+            dependenciesFulfilled = run;
+            return;
+          }
+          function doRun() {
+            var _a;
+            Module2["calledRun"] = true;
+            if (ABORT) return;
+            initRuntime();
+            (_a = Module2["onRuntimeInitialized"]) == null ? void 0 : _a.call(Module2);
+            postRun();
+          }
+          if (Module2["setStatus"]) {
+            Module2["setStatus"]("Running...");
+            setTimeout(() => {
+              setTimeout(() => Module2["setStatus"](""), 1);
+              doRun();
+            }, 1);
+          } else {
+            doRun();
+          }
+        }
+        function preInit() {
+          if (Module2["preInit"]) {
+            if (typeof Module2["preInit"] == "function") Module2["preInit"] = [Module2["preInit"]];
+            while (Module2["preInit"].length > 0) {
+              Module2["preInit"].shift()();
+            }
+          }
+        }
+        preInit();
+        run();
+        moduleRtn = Module2;
+        return moduleRtn;
+      };
+    })())();
+    {
+      module2.exports = Module;
+      module2.exports.default = Module;
+    }
+  })(nodeSqlite3Wasm);
+  return nodeSqlite3Wasm.exports;
+}
+var nodeSqlite3WasmExports = requireNodeSqlite3Wasm();
 const DEFAULT_REQUEST_TIMEOUT = 1e4;
 const logger$1 = {
   info: (message, ...args) => log.info(`[MONITOR] ${message}`, ...args),
@@ -25138,7 +26311,7 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
       } catch (error2) {
         lastError = error2;
         logger$1.error(`saveSites failed (attempt ${attempt + 1}/${maxRetries})`, error2);
-        await new Promise((res) => setTimeout(res, delayMs));
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
       }
       attempt++;
     }
@@ -25156,7 +26329,7 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
       } catch (error2) {
         lastError = error2;
         logger$1.error(`loadSites failed (attempt ${attempt + 1}/${maxRetries})`, error2);
-        await new Promise((res) => setTimeout(res, delayMs));
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
       }
       attempt++;
     }
@@ -25165,14 +26338,53 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
   }
   async initDatabase() {
     try {
-      const dbPath = require$$1$2.join(require$$1$6.app.getPath("userData"), "uptime.json");
-      const defaultData = {
-        sites: [],
-        settings: {
-          historyLimit: 100
-        }
-      };
-      this.db = await JSONFilePreset(dbPath, defaultData);
+      const dbPath = require$$1$2.join(require$$1$6.app.getPath("userData"), "uptime-watcher.sqlite");
+      logger$1.info(`[initDatabase] Using SQLite DB at: ${dbPath}`);
+      this.db = new nodeSqlite3WasmExports.Database(dbPath);
+      await this.db.run(`
+                CREATE TABLE IF NOT EXISTS sites (
+                    identifier TEXT PRIMARY KEY,
+                    name TEXT
+                );
+            `);
+      await this.db.run(`
+                CREATE TABLE IF NOT EXISTS monitors (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    site_identifier TEXT,
+                    type TEXT,
+                    url TEXT,
+                    host TEXT,
+                    port INTEGER,
+                    checkInterval INTEGER,
+                    monitoring BOOLEAN,
+                    status TEXT,
+                    responseTime INTEGER,
+                    lastChecked DATETIME,
+                    FOREIGN KEY(site_identifier) REFERENCES sites(identifier)
+                );
+            `);
+      await this.db.run(`
+                CREATE TABLE IF NOT EXISTS history (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    monitor_id INTEGER,
+                    timestamp INTEGER,
+                    status TEXT,
+                    responseTime INTEGER,
+                    FOREIGN KEY(monitor_id) REFERENCES monitors(id)
+                );
+            `);
+      await this.db.run(`
+                CREATE TABLE IF NOT EXISTS settings (
+                    key TEXT PRIMARY KEY,
+                    value TEXT
+                );
+            `);
+      await this.db.run(`
+                CREATE TABLE IF NOT EXISTS stats (
+                    key TEXT PRIMARY KEY,
+                    value TEXT
+                );
+            `);
       await this.loadSitesWithRetry();
     } catch (error2) {
       logger$1.error("Failed to initialize database", error2);
@@ -25180,27 +26392,43 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
     }
   }
   async loadSites() {
-    var _a;
     try {
-      await this.db.read();
-      const sites = this.db.data.sites || [];
-      for (const siteData of sites) {
-        if (!Array.isArray(siteData.monitors)) {
-          throw new Error("Invalid site data: missing monitors array. Please use a clean database.");
+      const siteRows = await this.db.all("SELECT * FROM sites");
+      this.sites.clear();
+      for (const siteRow of siteRows) {
+        const monitorRows = await this.db.all("SELECT * FROM monitors WHERE site_identifier = ?", [siteRow.identifier]);
+        const monitors = [];
+        for (const row of monitorRows) {
+          const historyRows = await this.db.all("SELECT timestamp, status, responseTime FROM history WHERE monitor_id = ? ORDER BY timestamp DESC", [row.id]);
+          const history = historyRows.map((h) => ({
+            timestamp: typeof h.timestamp === "number" ? h.timestamp : Number(h.timestamp),
+            status: h.status === "up" || h.status === "down" ? h.status : "down",
+            responseTime: typeof h.responseTime === "number" ? h.responseTime : Number(h.responseTime)
+          }));
+          monitors.push({
+            id: typeof row.id === "number" ? row.id : Number(row.id),
+            type: typeof row.type === "string" ? row.type : "http",
+            status: typeof row.status === "string" ? row.status : "down",
+            responseTime: typeof row.responseTime === "number" ? row.responseTime : row.responseTime ? Number(row.responseTime) : void 0,
+            lastChecked: row.lastChecked && (typeof row.lastChecked === "string" || typeof row.lastChecked === "number") ? new Date(row.lastChecked) : void 0,
+            monitoring: !!row.monitoring,
+            url: row.url != null ? String(row.url) : void 0,
+            host: row.host != null ? String(row.host) : void 0,
+            port: typeof row.port === "number" ? row.port : row.port ? Number(row.port) : void 0,
+            checkInterval: typeof row.checkInterval === "number" ? row.checkInterval : row.checkInterval ? Number(row.checkInterval) : void 0,
+            history
+          });
         }
         const site = {
-          ...siteData,
-          monitors: siteData.monitors.map((m) => ({
-            ...m,
-            lastChecked: m.lastChecked ? new Date(m.lastChecked) : void 0,
-            history: m.history || [],
-            monitoring: typeof m.monitoring === "undefined" ? true : m.monitoring
-          }))
+          identifier: String(siteRow.identifier),
+          name: siteRow.name ? String(siteRow.name) : void 0,
+          monitors
         };
         this.sites.set(site.identifier, site);
       }
-      if (typeof ((_a = this.db.data.settings) == null ? void 0 : _a.historyLimit) === "number") {
-        this.historyLimit = this.db.data.settings.historyLimit;
+      const setting = await this.db.get("SELECT value FROM settings WHERE key = 'historyLimit'");
+      if (setting && typeof setting.value === "string") {
+        this.historyLimit = parseInt(setting.value, 10);
       }
       for (const site of this.sites.values()) {
         for (const monitor of site.monitors) {
@@ -25214,21 +26442,105 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
       this.emit("db-error", { error: error2, operation: "loadSites" });
     }
   }
+  async getSites() {
+    const siteRows = await this.db.all("SELECT * FROM sites");
+    const sites = [];
+    for (const siteRow of siteRows) {
+      const monitorRows = await this.db.all("SELECT * FROM monitors WHERE site_identifier = ?", [siteRow.identifier]);
+      const monitors = [];
+      for (const row of monitorRows) {
+        const historyRows = await this.db.all("SELECT timestamp, status, responseTime FROM history WHERE monitor_id = ? ORDER BY timestamp DESC", [row.id]);
+        const history = historyRows.map((h) => ({
+          timestamp: typeof h.timestamp === "number" ? h.timestamp : Number(h.timestamp),
+          status: h.status === "up" || h.status === "down" ? h.status : "down",
+          responseTime: typeof h.responseTime === "number" ? h.responseTime : Number(h.responseTime)
+        }));
+        monitors.push({
+          id: typeof row.id === "number" ? row.id : Number(row.id),
+          type: typeof row.type === "string" ? row.type : "http",
+          status: typeof row.status === "string" ? row.status : "down",
+          responseTime: typeof row.responseTime === "number" ? row.responseTime : row.responseTime ? Number(row.responseTime) : void 0,
+          lastChecked: row.lastChecked && (typeof row.lastChecked === "string" || typeof row.lastChecked === "number") ? new Date(row.lastChecked) : void 0,
+          monitoring: !!row.monitoring,
+          url: row.url != null ? String(row.url) : void 0,
+          host: row.host != null ? String(row.host) : void 0,
+          port: typeof row.port === "number" ? row.port : row.port ? Number(row.port) : void 0,
+          checkInterval: typeof row.checkInterval === "number" ? row.checkInterval : row.checkInterval ? Number(row.checkInterval) : void 0,
+          history
+        });
+      }
+      sites.push({
+        identifier: String(siteRow.identifier),
+        name: siteRow.name ? String(siteRow.name) : void 0,
+        monitors
+      });
+    }
+    return sites;
+  }
   async saveSites() {
     try {
-      const sitesArray = Array.from(this.sites.values()).map((site) => ({
-        ...site,
-        monitors: site.monitors.map((m) => ({
-          ...m,
-          lastChecked: m.lastChecked ? new Date(m.lastChecked).toISOString() : void 0,
-          monitoring: typeof m.monitoring === "undefined" ? true : m.monitoring
-        }))
-      }));
-      this.db.data.sites = sitesArray;
-      this.db.data.settings = {
-        historyLimit: this.historyLimit
-      };
-      await this.db.write();
+      for (const site of this.sites.values()) {
+        await this.db.run(
+          `INSERT OR REPLACE INTO sites (identifier, name) VALUES (?, ?)`,
+          [site.identifier, site.name ?? null]
+        );
+        const dbMonitors = await this.db.all(
+          `SELECT id, type FROM monitors WHERE site_identifier = ?`,
+          [site.identifier]
+        );
+        const toDelete = dbMonitors.filter(
+          (dbm) => !site.monitors.some((m) => m.type === dbm.type)
+        );
+        for (const del of toDelete) {
+          await this.db.run(`DELETE FROM history WHERE monitor_id = ?`, [del.id]);
+          await this.db.run(`DELETE FROM monitors WHERE id = ?`, [del.id]);
+        }
+        for (const monitor of site.monitors) {
+          if (typeof monitor.id === "number") {
+            await this.db.run(
+              `UPDATE monitors SET url = ?, host = ?, port = ?, checkInterval = ?, monitoring = ?, status = ?, responseTime = ?, lastChecked = ? WHERE id = ?`,
+              [
+                monitor.url ? String(monitor.url) : null,
+                monitor.host ? String(monitor.host) : null,
+                monitor.port !== void 0 && monitor.port !== null ? Number(monitor.port) : null,
+                monitor.checkInterval !== void 0 && monitor.checkInterval !== null ? Number(monitor.checkInterval) : null,
+                monitor.monitoring ? 1 : 0,
+                monitor.status,
+                monitor.responseTime !== void 0 && monitor.responseTime !== null ? Number(monitor.responseTime) : null,
+                monitor.lastChecked ? monitor.lastChecked.toISOString() : null,
+                monitor.id
+              ]
+            );
+          } else {
+            await this.db.run(
+              `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, monitoring, status, responseTime, lastChecked) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+              [
+                site.identifier,
+                monitor.type,
+                monitor.url ? String(monitor.url) : null,
+                monitor.host ? String(monitor.host) : null,
+                monitor.port !== void 0 && monitor.port !== null ? Number(monitor.port) : null,
+                monitor.checkInterval !== void 0 && monitor.checkInterval !== null ? Number(monitor.checkInterval) : null,
+                monitor.monitoring ? 1 : 0,
+                monitor.status,
+                monitor.responseTime !== void 0 && monitor.responseTime !== null ? Number(monitor.responseTime) : null,
+                monitor.lastChecked ? monitor.lastChecked.toISOString() : null
+              ]
+            );
+            const row = await this.db.get(
+              `SELECT id FROM monitors WHERE site_identifier = ? AND type = ? ORDER BY id DESC LIMIT 1`,
+              [site.identifier, monitor.type]
+            );
+            if (row && typeof row.id === "number") {
+              monitor.id = row.id;
+            }
+          }
+        }
+      }
+      await this.db.run(
+        `INSERT OR REPLACE INTO settings (key, value) VALUES ('historyLimit', ?)`,
+        [this.historyLimit.toString()]
+      );
     } catch (error2) {
       logger$1.error("Failed to save sites to DB", error2);
       throw error2;
@@ -25240,7 +26552,42 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
       ...siteData
     };
     this.sites.set(site.identifier, site);
-    await this.saveSitesWithRetry();
+    await this.db.run(
+      `INSERT OR REPLACE INTO sites (identifier, name) VALUES (?, ?)`,
+      [site.identifier, site.name ?? null]
+    );
+    await this.db.run(`DELETE FROM monitors WHERE site_identifier = ?`, [site.identifier]);
+    for (const monitor of site.monitors) {
+      await this.db.run(
+        `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, monitoring, status, responseTime, lastChecked) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          site.identifier,
+          monitor.type,
+          monitor.url ? String(monitor.url) : null,
+          monitor.host ? String(monitor.host) : null,
+          monitor.port !== void 0 && monitor.port !== null ? Number(monitor.port) : null,
+          monitor.checkInterval !== void 0 && monitor.checkInterval !== null ? Number(monitor.checkInterval) : null,
+          monitor.monitoring ? 1 : 0,
+          monitor.status,
+          monitor.responseTime !== void 0 && monitor.responseTime !== null ? Number(monitor.responseTime) : null,
+          monitor.lastChecked ? monitor.lastChecked.toISOString() : null
+        ]
+      );
+      const row = await this.db.get(
+        `SELECT id FROM monitors WHERE site_identifier = ? AND type = ? ORDER BY id DESC LIMIT 1`,
+        [site.identifier, monitor.type]
+      );
+      if (!row || typeof row.id !== "number") {
+        logger$1.error("Failed to fetch monitor id after insert", {
+          site: site.identifier,
+          monitorType: monitor.type
+        });
+        throw new Error(
+          `Failed to fetch monitor id after insert for site ${site.identifier}, type ${monitor.type}`
+        );
+      }
+      monitor.id = row.id;
+    }
     for (const monitor of site.monitors) {
       await this.checkMonitor(site, monitor.type);
     }
@@ -25250,16 +26597,14 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
   async removeSite(identifier) {
     logger$1.info(`Removing site: ${identifier}`);
     const removed = this.sites.delete(identifier);
+    await this.db.run(`DELETE FROM monitors WHERE site_identifier = ?`, [identifier]);
+    await this.db.run(`DELETE FROM sites WHERE identifier = ?`, [identifier]);
     if (removed) {
       logger$1.info(`Site removed successfully: ${identifier}`);
     } else {
       logger$1.warn(`Site not found for removal: ${identifier}`);
     }
-    await this.saveSitesWithRetry();
     return removed;
-  }
-  async getSites() {
-    return Array.from(this.sites.values());
   }
   setHistoryLimit(limit) {
     if (limit <= 0) {
@@ -25362,7 +26707,24 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
   }
   async checkMonitor(site, monitorType) {
     const monitor = site.monitors.find((m) => m.type === monitorType);
-    if (!monitor) return;
+    if (!monitor) {
+      logger$1.error(`[checkMonitor] Monitor not found for type: ${monitorType} on site: ${site.identifier}`);
+      return;
+    }
+    if (typeof monitor.id !== "number") {
+      const row = await this.db.get(
+        `SELECT id FROM monitors WHERE site_identifier = ? AND type = ? ORDER BY id DESC LIMIT 1`,
+        [site.identifier, monitorType]
+      );
+      if (row && typeof row.id === "number") {
+        monitor.id = row.id;
+        logger$1.warn(`[checkMonitor] Auto-repaired monitor.id for ${site.identifier} ${monitorType}: ${monitor.id}`);
+      } else {
+        logger$1.error(`[checkMonitor] Could not find monitor.id for ${site.identifier} ${monitorType}, skipping history insert.`);
+        return;
+      }
+    }
+    logger$1.info(`[checkMonitor] Checking monitor: site=${site.identifier}, type=${monitorType}, monitor.id=${monitor.id}`);
     const startTime = Date.now();
     let newStatus = "down";
     let responseTime = 0;
@@ -25381,9 +26743,10 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
         responseTime = Date.now() - startTime;
         newStatus = available ? "up" : "down";
       }
-    } catch (error2) {
+    } catch (err) {
       responseTime = Date.now() - startTime;
       newStatus = "down";
+      logger$1.error(`[checkMonitor] Error during check: site=${site.identifier}, type=${monitorType}`, err);
     }
     const previousStatus = monitor.status;
     const now = /* @__PURE__ */ new Date();
@@ -25395,9 +26758,24 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
       status: newStatus,
       responseTime
     };
-    monitor.history.unshift(historyEntry);
-    if (this.historyLimit > 0 && monitor.history.length > this.historyLimit) {
-      monitor.history = monitor.history.slice(0, this.historyLimit);
+    try {
+      await this.db.run(
+        `INSERT INTO history (monitor_id, timestamp, status, responseTime) VALUES (?, ?, ?, ?)`,
+        [monitor.id, historyEntry.timestamp, historyEntry.status, historyEntry.responseTime]
+      );
+      logger$1.info(`[checkMonitor] Inserted history row: monitor_id=${monitor.id}, status=${historyEntry.status}, responseTime=${historyEntry.responseTime}, timestamp=${historyEntry.timestamp}`);
+    } catch (err) {
+      logger$1.error(`[checkMonitor] Failed to insert history row: monitor_id=${monitor.id}`, err);
+    }
+    if (this.historyLimit > 0) {
+      const excess = await this.db.all(
+        `SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?`,
+        [monitor.id, this.historyLimit]
+      );
+      const excessIds = excess.map((row) => row.id);
+      if (excessIds.length > 0) {
+        await this.db.run(`DELETE FROM history WHERE id IN (${excessIds.join(",")})`);
+      }
     }
     await this.saveSitesWithRetry();
     const statusUpdate = {
@@ -25431,7 +26809,10 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
       monitors: updates.monitors || site.monitors
     };
     this.sites.set(identifier, updatedSite);
-    await this.saveSitesWithRetry();
+    await this.db.run(
+      `INSERT OR REPLACE INTO sites (identifier, name) VALUES (?, ?)`,
+      [updatedSite.identifier, updatedSite.name ?? null]
+    );
     if (updates.monitors) {
       for (const updatedMonitor of updates.monitors) {
         const prevMonitor = site.monitors.find((m) => m.type === updatedMonitor.type);
@@ -25447,8 +26828,22 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
   // Export/Import functionality
   async exportData() {
     try {
-      await this.db.read();
-      return JSON.stringify(this.db.data, null, 2);
+      const sites = await this.db.all("SELECT * FROM sites");
+      const settings = await this.db.all("SELECT * FROM settings");
+      const exportObj = {
+        sites: sites.map((row) => ({
+          identifier: row.identifier ? String(row.identifier) : "",
+          name: row.name ? String(row.name) : void 0,
+          monitors: row.monitors_json ? JSON.parse(row.monitors_json) : []
+        })),
+        settings: settings.reduce((acc, row) => {
+          if (typeof row.key === "string") {
+            acc[row.key] = String(row.value);
+          }
+          return acc;
+        }, {})
+      };
+      return JSON.stringify(exportObj, null, 2);
     } catch (error2) {
       logger$1.error("Failed to export data", error2);
       this.emit("db-error", { error: error2, operation: "exportData" });
@@ -25459,8 +26854,62 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
     logger$1.info("Importing data");
     try {
       const parsedData = JSON.parse(data);
-      this.db.data = parsedData;
-      await this.db.write();
+      await this.db.run("DELETE FROM sites");
+      await this.db.run("DELETE FROM settings");
+      await this.db.run("DELETE FROM monitors");
+      await this.db.run("DELETE FROM history");
+      if (Array.isArray(parsedData.sites)) {
+        for (const site of parsedData.sites) {
+          await this.db.run(
+            `INSERT INTO sites (identifier, name) VALUES (?, ?)`,
+            [site.identifier, site.name ?? null]
+          );
+        }
+      }
+      if (parsedData.settings && typeof parsedData.settings === "object") {
+        for (const [key, value] of Object.entries(parsedData.settings)) {
+          await this.db.run(`INSERT INTO settings (key, value) VALUES (?, ?)`, [key, String(value)]);
+        }
+      }
+      for (const site of parsedData.sites) {
+        if (Array.isArray(site.monitors)) {
+          for (const monitor of site.monitors) {
+            await this.db.run(
+              `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, monitoring, status, responseTime, lastChecked) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+              [
+                site.identifier,
+                monitor.type,
+                monitor.url ?? null,
+                monitor.host ?? null,
+                monitor.port ?? null,
+                monitor.checkInterval ?? null,
+                monitor.monitoring ? 1 : 0,
+                monitor.status,
+                monitor.responseTime,
+                monitor.lastChecked ? typeof monitor.lastChecked === "string" ? monitor.lastChecked : monitor.lastChecked.toISOString() : null
+              ]
+            );
+            const monitorRow = await this.db.get(
+              `SELECT id FROM monitors WHERE site_identifier = ? AND type = ? ORDER BY id DESC LIMIT 1`,
+              [site.identifier, monitor.type]
+            );
+            const monitorId = monitorRow == null ? void 0 : monitorRow.id;
+            if (Array.isArray(monitor.history) && typeof monitorId === "number") {
+              for (const h of monitor.history) {
+                await this.db.run(
+                  `INSERT INTO history (monitor_id, timestamp, status, responseTime) VALUES (?, ?, ?, ?)`,
+                  [
+                    monitorId,
+                    h.timestamp,
+                    h.status === "up" || h.status === "down" ? h.status : "down",
+                    h.responseTime
+                  ]
+                );
+              }
+            }
+          }
+        }
+      }
       await this.loadSites();
       logger$1.info("Data imported successfully");
       return true;

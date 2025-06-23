@@ -274,7 +274,7 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                                     siteName={currentSite.name || currentSite.identifier}
                                 />
                                 <div className="site-details-status-indicator">
-                                    <StatusIndicator status={selectedMonitor.status} size="lg" />
+                                    <StatusIndicator status={selectedMonitor?.status ?? "unknown"} size="lg" />
                                     {isRefreshing && (
                                         <div className="site-details-loading-spinner">
                                             <div className="site-details-spinner"></div>
@@ -286,7 +286,7 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                                         {site.name || site.identifier}
                                     </ThemedText>
                                     {/* Show URL for HTTP, host:port for port monitor */}
-                                    {selectedMonitor.type === "http" && selectedMonitor.url && (
+                                    {selectedMonitor?.type === "http" && selectedMonitor?.url && (
                                         <a
                                             href={selectedMonitor.url}
                                             className="site-details-url truncate"
@@ -300,52 +300,21 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                                                 if (hasOpenExternal(window.electronAPI)) {
                                                     window.electronAPI.openExternal(url);
                                                 } else {
-                                                    window.open(url, "_blank", "noopener");
+                                                    window.open(url, "_blank");
                                                 }
                                             }}
                                         >
                                             {selectedMonitor.url}
                                         </a>
                                     )}
-                                    {selectedMonitor.type === "port" && (
-                                        <div className="site-details-url truncate font-mono text-xs">
-                                            {selectedMonitor.host}:{selectedMonitor.port}
-                                        </div>
-                                    )}
-                                    <div className="site-details-meta flex items-center gap-2">
-                                        <ThemedText size="xs" variant="tertiary" className="site-details-last-checked">
-                                            Last checked:{" "}
-                                            {formatFullTimestamp(
-                                                typeof selectedMonitor.lastChecked === "number"
-                                                    ? selectedMonitor.lastChecked
-                                                    : Date.now()
-                                            )}
+                                    {/* Fallback if no monitor is available */}
+                                    {!selectedMonitor && (
+                                        <ThemedText variant="warning" size="md">
+                                            No monitor data available for this site.
                                         </ThemedText>
-                                        {/* Show monitor type badge */}
-                                        <ThemedBadge variant="secondary" size="xs">
-                                            {selectedMonitor.type === "http"
-                                                ? "HTTP Status Check"
-                                                : selectedMonitor.type === "port"
-                                                  ? "Port Check"
-                                                  : "?"}
-                                        </ThemedBadge>
-                                    </div>
+                                    )}
                                 </div>
                             </div>
-                            {/* Monitoring enabled indicator for selected monitor */}
-                            {isMonitoring && (
-                                <div className="site-details-monitoring-indicator flex flex-col items-center justify-center gap-1 mt-2">
-                                    <div className="site-details-refresh-indicator" />
-                                    <ThemedText
-                                        size="xs"
-                                        variant="success"
-                                        className="site-details-refresh-text text-center"
-                                    >
-                                        Monitoring enabled
-                                    </ThemedText>
-                                </div>
-                            )}
-                            {/* Removed the old location for per-monitor monitoring controls */}
                         </div>
                     </div>
 

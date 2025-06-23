@@ -1,6 +1,7 @@
 export type MonitorType = "http" | "port";
 
 export interface Monitor {
+    id?: number; // DB primary key for normalized schema
     type: MonitorType;
     status: "up" | "down" | "pending";
     responseTime?: number;

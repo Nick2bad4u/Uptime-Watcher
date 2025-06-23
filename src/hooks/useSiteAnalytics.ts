@@ -42,12 +42,14 @@ export interface SiteAnalytics {
  * Advanced hook for monitor analytics calculations
  * Memoizes expensive calculations and provides comprehensive metrics
  */
-export function useSiteAnalytics(monitor: Monitor, timeRange: TimePeriod = "24h"): SiteAnalytics {
+export function useSiteAnalytics(monitor: Monitor | undefined, timeRange: TimePeriod = "24h"): SiteAnalytics {
     return useMemo(() => {
+        // Defensive: handle undefined monitor
+        const history = monitor?.history ?? [];
         // Filter history based on time range
         const now = Date.now();
         const cutoff = now - CHART_TIME_PERIODS[timeRange];
-        const filteredHistory = monitor.history.filter((record) => record.timestamp >= cutoff);
+        const filteredHistory = history.filter((record) => record.timestamp >= cutoff);
 
         const totalChecks = filteredHistory.length;
         const upCount = filteredHistory.filter((h) => h.status === "up").length;
@@ -123,7 +125,7 @@ export function useSiteAnalytics(monitor: Monitor, timeRange: TimePeriod = "24h"
             incidentCount: downtimePeriods.length,
             filteredHistory,
         };
-    }, [monitor.history, timeRange]);
+    }, [monitor?.history, timeRange]);
 }
 
 /**

@@ -26,6 +26,12 @@ export function SiteCard({ site }: SiteCardProps) {
     const defaultMonitorType = monitorTypes[0] || "http";
     const selectedMonitorType = getSelectedMonitorType(latestSite.identifier) || defaultMonitorType;
     const monitor = latestSite.monitors.find((m) => m.type === selectedMonitorType);
+    // Debug: log the monitor and its history
+    if (monitor) {
+        console.log("[SiteCard] Monitor", monitor.type, "history:", monitor.history);
+    } else {
+        console.log("[SiteCard] No monitor found for", selectedMonitorType, "in site", latestSite.identifier);
+    }
     const status = monitor?.status || "pending";
     const responseTime = monitor?.responseTime;
     const filteredHistory = monitor?.history || [];

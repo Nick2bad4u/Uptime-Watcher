@@ -23,7 +23,6 @@ function App() {
         updateError,
         // Store actions - backend integration
         initializeApp,
-        updateSiteStatus,
         subscribeToStatusUpdates,
         unsubscribeFromStatusUpdates,
         clearError,
@@ -34,6 +33,7 @@ function App() {
         setUpdateError,
         applyUpdate,
         getSelectedSite,
+        syncSitesFromBackend, // Add this
     } = useStore();
 
     const { isDark } = useTheme();
@@ -69,8 +69,9 @@ function App() {
         initializeApp();
 
         // Listen for status updates
-        const handleStatusUpdate = (update: StatusUpdate) => {
-            updateSiteStatus(update);
+        const handleStatusUpdate = () => {
+            // No need to call updateSiteStatus; just sync from backend
+            syncSitesFromBackend();
         };
 
         subscribeToStatusUpdates(handleStatusUpdate);
@@ -79,7 +80,7 @@ function App() {
         return () => {
             unsubscribeFromStatusUpdates();
         };
-    }, [initializeApp, updateSiteStatus, subscribeToStatusUpdates, unsubscribeFromStatusUpdates]);
+    }, [initializeApp, syncSitesFromBackend, subscribeToStatusUpdates, unsubscribeFromStatusUpdates]);
 
     // --- State Sync: Focus only (no polling) ---
     useBackendFocusSync(false); // Set to true to enable focus-based backend sync
