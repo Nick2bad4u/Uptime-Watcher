@@ -7,9 +7,66 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[511db9c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/511db9c3702299b887ae391263df33754a7eacf0)...
-[511db9c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/511db9c3702299b887ae391263df33754a7eacf0)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/511db9c3702299b887ae391263df33754a7eacf0...511db9c3702299b887ae391263df33754a7eacf0))
+[[170f373](https://github.com/Nick2bad4u/Uptime-Watcher/commit/170f3738e826daae007abd3fa583637b923a62ea)...
+[170f373](https://github.com/Nick2bad4u/Uptime-Watcher/commit/170f3738e826daae007abd3fa583637b923a62ea)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/170f3738e826daae007abd3fa583637b923a62ea...170f3738e826daae007abd3fa583637b923a62ea))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 1.8.12 [`(170f373)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/170f3738e826daae007abd3fa583637b923a62ea)
+
+
+
+
+
+
+## [1.8.12] - 2025-06-23
+
+
+[[67b5fe7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/67b5fe731fe24bcf6740917e646b30dfc57a6bab)...
+[d09bb06](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d09bb0657dcd173662bda0721843bdac785bbbe6)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/67b5fe731fe24bcf6740917e646b30dfc57a6bab...d09bb0657dcd173662bda0721843bdac785bbbe6))
+
+
+### 🚀 Features
+
+- Enhance build process and add new scripts [`(67b5fe7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/67b5fe731fe24bcf6740917e646b30dfc57a6bab)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher
+
+Updates version to 1.8.11 and refreshes changelog
+
+Documents recent dependency upgrades, workflow updates, and improvements—such as resuming active monitors after restart and refining history limit logic—for better reliability and history handling. Also synchronizes metrics and TODOs with latest project state. [`(d09bb06)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d09bb0657dcd173662bda0721843bdac785bbbe6)
+
+
+
+### 💼 Other
+
+- Update metrics.repository.svg - [Skip GitHub Action] [`(2337adc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2337adc2a8387d8007e889c653741963268064c8)
+
+
+- Switches monitoring logic to use unique monitor IDs
+
+Refactors app logic to identify and manage monitors via unique string IDs
+instead of type, enabling multiple monitors of the same type per site.
+Updates backend, IPC, and UI to consistently use monitor IDs. Adds direct
+SQLite backup download for advanced users. Improves history limit handling
+and site/monitor sync. Removes legacy JSON export/import.
+
+Addresses user needs for better extensibility, safer data handling, and more
+robust monitoring operations. [`(30bc1af)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/30bc1afd510d803564fccc25489d81d52fd54be0)
+
+
+
+### ⚙️ Miscellaneous Tasks
+
+- Update changelogs for v1.8.11 [skip ci] [`(049c5a7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/049c5a73c55a56b1e5a81392348ad0872dba0d23)
+
 
 
 ### 📦 Dependencies
