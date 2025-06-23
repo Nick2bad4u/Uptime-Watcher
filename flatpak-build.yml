@@ -4,7 +4,7 @@ runtime-version: "24.08"
 sdk: org.freedesktop.Sdk
 base: org.electronjs.Electron2.BaseApp
 base-version: "24.08"
-command: electron /app/dist-electron/main.js
+command: run-electron.sh
 separate-locales: false
 finish-args:
     - --share=network
@@ -41,6 +41,9 @@ modules:
 
           # Install Electron
           - install -Dm755 node_modules/electron/dist/electron /app/bin/electron
+
+          # Install shell wrapper
+          - install -Dm755 run-electron.sh /app/bin/run-electron.sh
 
           # Install desktop file and icons
           - install -Dm644 io.github.uptimewatcher.desktop
