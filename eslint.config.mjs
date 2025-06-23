@@ -43,6 +43,12 @@ export default [
             "release/",
             "package.json",
             "package-lock.json",
+            ".vscode/",
+            ".vscode/settings.json",
+            "commitlint.config.js",
+            "stylelint.config.js",
+            ".github/",
+            ".github/**/*",
             "commitlint.config.js",
             "stylelint.config.js"
         ],

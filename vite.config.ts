@@ -1,11 +1,23 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import electron from "vite-plugin-electron";
 import path from "path";
-import { viteStaticCopy } from 'vite-plugin-static-copy';
+// eslint-disable-next-line perfectionist/sort-imports
+import react from "@vitejs/plugin-react";
+import { defineConfig } from "vite";
+import electron from "vite-plugin-electron";
+import { viteStaticCopy } from "vite-plugin-static-copy";
 
 export default defineConfig({
-    base: './', // Ensures relative asset paths for Electron
+    base: "./", // Ensures relative asset paths for Electron
+    build: {
+        emptyOutDir: true, // Clean output before build
+        outDir: "dist",
+        rollupOptions: {
+            output: {
+                manualChunks: undefined, // Avoids code splitting for Electron main/preload
+            },
+        },
+        sourcemap: true, // Recommended for Electron debugging
+        target: "esnext", // Modern output for Electron
+    },
     plugins: [
         react(),
         electron([
@@ -35,35 +47,24 @@ export default defineConfig({
         viteStaticCopy({
             targets: [
                 {
-                    src: 'node_modules/node-sqlite3-wasm/dist/node-sqlite3-wasm.wasm',
-                    dest: '' // Copies to dist/
+                    dest: "", // Copies to dist/
+                    src: "node_modules/node-sqlite3-wasm/dist/node-sqlite3-wasm.wasm",
                 },
                 {
-                    src: 'node_modules/node-sqlite3-wasm/dist/node-sqlite3-wasm.wasm',
-                    dest: '../dist-electron' // Copies to dist-electron/
-                }
-            ]
-        })
+                    dest: "../dist-electron", // Copies to dist-electron/
+                    src: "node_modules/node-sqlite3-wasm/dist/node-sqlite3-wasm.wasm",
+                },
+            ],
+        }),
     ],
-    server: {
-        port: 5173,
-        strictPort: true, // Fail if port is taken (prevents silent port changes)
-        open: false, // Don't auto-open browser (Electron only)
-    },
-    build: {
-        outDir: 'dist',
-        sourcemap: true, // Recommended for Electron debugging
-        emptyOutDir: true, // Clean output before build
-        target: 'esnext', // Modern output for Electron
-        rollupOptions: {
-            output: {
-                manualChunks: undefined // Avoids code splitting for Electron main/preload
-            }
-        }
-    },
     resolve: {
         alias: {
-            '@': path.resolve(__dirname, 'src'),
+            "@": path.resolve(__dirname, "src"),
         },
+    },
+    server: {
+        open: false, // Don't auto-open browser (Electron only)
+        port: 5173,
+        strictPort: true, // Fail if port is taken (prevents silent port changes)
     },
 });

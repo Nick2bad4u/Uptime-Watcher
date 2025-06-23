@@ -6,10 +6,8 @@
         "module": "ESNext",
         "skipLibCheck": true,
         "moduleResolution": "bundler",
-        "allowImportingTsExtensions": true,
         "resolveJsonModule": true,
         "isolatedModules": true,
-        "noEmit": true,
         "jsx": "react-jsx",
         "strict": true,
         "noUnusedLocals": true,
@@ -19,8 +17,16 @@
         "baseUrl": ".",
         "paths": {
             "@/*": ["src/*"]
-        }
+        },
     },
-    "include": ["src", "electron", "vite.config.ts"],
-    "references": [{ "path": "./tsconfig.node.json" }]
+    "include": [
+        "src",
+        "electron",
+        "tests",
+        "*.ts",
+        "*.tsx",
+        "**/*.ts",
+        "**/*.tsx",
+        "vite.config.ts"
+    ]
 }

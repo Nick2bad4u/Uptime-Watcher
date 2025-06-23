@@ -6,10 +6,4 @@
         "**/dist-electron": true,
         "**/release": true
     },
-    "problems.exclude": {
-        "**/node_modules/**": true,
-        "**/dist/**": true,
-        "**/dist-electron/**": true,
-        "**/release/**": true
-    }
 }
