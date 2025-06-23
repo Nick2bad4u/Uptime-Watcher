@@ -18,6 +18,13 @@ import pluginSonarjs from "eslint-plugin-sonarjs";
 import pluginSecurity from "eslint-plugin-security";
 import pluginEslintComments from "eslint-plugin-eslint-comments";
 import pluginPerfectionist from "eslint-plugin-perfectionist";
+import pluginTestingLibrary from "eslint-plugin-testing-library";
+import pluginUnicorn from "eslint-plugin-unicorn";
+import pluginFunctional from "eslint-plugin-functional";
+import pluginFilenames from "eslint-plugin-filenames";
+import pluginRegexp from "eslint-plugin-regexp";
+import pluginTsdoc from "eslint-plugin-tsdoc";
+
 
 // mimic CommonJS variables -- not needed if using CommonJS
 const __filename = fileURLToPath(import.meta.url);
@@ -29,7 +36,16 @@ const compat = new FlatCompat({
 
 export default [
     {
-        ignores: ["node_modules/", "dist/", "dist-electron/", "release/", "package.json", "package-lock.json"],
+        ignores: [
+            "node_modules/",
+            "dist/",
+            "dist-electron/",
+            "release/",
+            "package.json",
+            "package-lock.json",
+            "commitlint.config.js",
+            "stylelint.config.js"
+        ],
     },
     // Markdown files
     {
@@ -59,19 +75,26 @@ export default [
             sonarjs: pluginSonarjs,
             security: pluginSecurity,
             "eslint-comments": pluginEslintComments,
-            // perfectionist: pluginPerfectionist // temporarily disabled
+            perfectionist: pluginPerfectionist,
+            // new plugins
+            "testing-library": pluginTestingLibrary,
+            unicorn: pluginUnicorn,
+            functional: pluginFunctional,
+            filenames: pluginFilenames,
+            regexp: pluginRegexp,
+            tsdoc: pluginTsdoc
         },
         rules: {
             ...js.configs.recommended.rules,
             // import plugin: enable a few best-practice rules manually
-            // "import/order": [
-            //     "warn",
-            //     {
-            //         alphabetize: { order: "asc" },
-            //         groups: ["builtin", "external", "internal", "parent", "sibling", "index"],
-            //     },
-            // ],
-            // "import/newline-after-import": "warn",
+            "import/order": [
+                "warn",
+                {
+                    alphabetize: { order: "asc" },
+                    groups: ["builtin", "external", "internal", "parent", "sibling", "index"],
+                },
+            ],
+            "import/newline-after-import": "warn",
             // promise plugin: enable a few best-practice rules manually
             "promise/always-return": "warn",
             "promise/no-return-wrap": "warn",
@@ -106,8 +129,25 @@ export default [
             "eslint-comments/no-unused-disable": "warn",
             "eslint-comments/no-unlimited-disable": "warn",
             // perfectionist
-            // 'perfectionist/sort-objects': ['warn', { type: 'natural', order: 'asc' }],
-            // 'perfectionist/sort-imports': ['warn', { type: 'natural', order: 'asc' }]
+            'perfectionist/sort-objects': ['warn', { type: 'natural', order: 'asc' }],
+            'perfectionist/sort-imports': ['warn', { type: 'natural', order: 'asc' }],
+            // unicorn
+            "unicorn/filename-case": ["warn", { "cases": { "kebabCase": true, "camelCase": true, "pascalCase": true } }],
+            "unicorn/no-abusive-eslint-disable": "warn",
+            "unicorn/no-array-callback-reference": "warn",
+            "unicorn/no-array-for-each": "warn",
+            "unicorn/no-null": "warn",
+            // functional
+            "functional/immutable-data": "off",
+            "functional/no-let": "warn",
+            // regexp
+            "regexp/no-dupe-characters-character-class": "warn",
+            "regexp/no-empty-alternative": "warn",
+            // tsdoc
+            "tsdoc/syntax": "warn",
+            // testing-library (only for test files, but safe to add as warn)
+            "testing-library/no-debugging-utils": "warn",
+            "testing-library/no-dom-import": "warn",
         },
     },
     // TypeScript files
@@ -146,18 +186,26 @@ export default [
             sonarjs: pluginSonarjs,
             security: pluginSecurity,
             "eslint-comments": pluginEslintComments,
-            // perfectionist: pluginPerfectionist // temporarily disabled
+            perfectionist: pluginPerfectionist,
+            // new plugins
+            "testing-library": pluginTestingLibrary,
+            unicorn: pluginUnicorn,
+            functional: pluginFunctional,
+            filenames: pluginFilenames,
+            regexp: pluginRegexp,
+            tsdoc: pluginTsdoc
         },
         rules: {
+            ...tseslint.configs.recommended.rules,
             // import plugin: enable a few best-practice rules manually
-            // "import/order": [
-            //     "warn",
-            //     {
-            //         alphabetize: { order: "asc" },
-            //         groups: ["builtin", "external", "internal", "parent", "sibling", "index"],
-            //     },
-            // ],
-            // "import/newline-after-import": "warn",
+            "import/order": [
+                "warn",
+                {
+                    alphabetize: { order: "asc" },
+                    groups: ["builtin", "external", "internal", "parent", "sibling", "index"],
+                },
+            ],
+            "import/newline-after-import": "warn",
             // promise plugin: enable a few best-practice rules manually
             "promise/always-return": "warn",
             "promise/no-return-wrap": "warn",
@@ -192,8 +240,25 @@ export default [
             "eslint-comments/no-unused-disable": "warn",
             "eslint-comments/no-unlimited-disable": "warn",
             // perfectionist
-            // 'perfectionist/sort-objects': ['warn', { type: 'natural', order: 'asc' }],
-            // 'perfectionist/sort-imports': ['warn', { type: 'natural', order: 'asc' }]
+            'perfectionist/sort-objects': ['warn', { type: 'natural', order: 'asc' }],
+            'perfectionist/sort-imports': ['warn', { type: 'natural', order: 'asc' }],
+            // unicorn
+            "unicorn/filename-case": ["warn", { "cases": { "kebabCase": true, "camelCase": true, "pascalCase": true } }],
+            "unicorn/no-abusive-eslint-disable": "warn",
+            "unicorn/no-array-callback-reference": "warn",
+            "unicorn/no-array-for-each": "warn",
+            "unicorn/no-null": "warn",
+            // functional
+            "functional/immutable-data": "off",
+            "functional/no-let": "warn",
+            // regexp
+            "regexp/no-dupe-characters-character-class": "warn",
+            "regexp/no-empty-alternative": "warn",
+            // tsdoc
+            "tsdoc/syntax": "warn",
+            // testing-library (only for test files, but safe to add as warn)
+            "testing-library/no-debugging-utils": "warn",
+            "testing-library/no-dom-import": "warn",
         },
     },
     // Global browser variables

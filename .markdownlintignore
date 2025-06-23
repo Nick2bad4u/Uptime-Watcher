@@ -2,3 +2,5 @@
 SECURITY.md
 copilot-instructions.md
 electron-app/LICENSE.md
+node_modules/
+release/
