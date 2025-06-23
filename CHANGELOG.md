@@ -7,9 +7,132 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[170f373](https://github.com/Nick2bad4u/Uptime-Watcher/commit/170f3738e826daae007abd3fa583637b923a62ea)...
-[170f373](https://github.com/Nick2bad4u/Uptime-Watcher/commit/170f3738e826daae007abd3fa583637b923a62ea)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/170f3738e826daae007abd3fa583637b923a62ea...170f3738e826daae007abd3fa583637b923a62ea))
+[[0010075](https://github.com/Nick2bad4u/Uptime-Watcher/commit/00100759ca445500faf72b8001accf69c540043a)...
+[0010075](https://github.com/Nick2bad4u/Uptime-Watcher/commit/00100759ca445500faf72b8001accf69c540043a)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/00100759ca445500faf72b8001accf69c540043a...00100759ca445500faf72b8001accf69c540043a))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 2.2.0 [`(0010075)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/00100759ca445500faf72b8001accf69c540043a)
+
+
+
+
+
+
+## [2.2.0] - 2025-06-23
+
+
+[[a2a74ca](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a2a74caf1d7216b788d227376e008784568ad02c)...
+[32b2e14](https://github.com/Nick2bad4u/Uptime-Watcher/commit/32b2e14e4f6ab95b789e03c0adebe8ce2f984ab5)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/a2a74caf1d7216b788d227376e008784568ad02c...32b2e14e4f6ab95b789e03c0adebe8ce2f984ab5))
+
+
+### 🚀 Features
+
+- Add shell wrapper for running Electron application [`(a2a74ca)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a2a74caf1d7216b788d227376e008784568ad02c)
+
+
+
+### 🐛 Bug Fixes
+
+- Update dependencies and correct version numbers in package.json and package-lock.json [`(32b2e14)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/32b2e14e4f6ab95b789e03c0adebe8ce2f984ab5)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(809ec32)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/809ec32f53a89e12b586cebfd00de37b3851681a)
+
+
+
+### ⚙️ Miscellaneous Tasks
+
+- Add cross-env dependency to package.json [`(33c8e79)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/33c8e79805d5b60758a5d43fad9765bb80b90bd8)
+
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 2.1.0 [`(d90dfb4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d90dfb49fd05a3a650e6268832de9635d3fad6b4)
+
+
+
+
+
+
+## [2.1.0] - 2025-06-23
+
+
+[[cad9b86](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cad9b860e88e319e1d701f8fc2666cf12bb7a13c)...
+[6413137](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6413137561abb68e7a4eb224ce46a590c017bf87)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/cad9b860e88e319e1d701f8fc2666cf12bb7a13c...6413137561abb68e7a4eb224ce46a590c017bf87))
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(a53c12e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a53c12ea30c20c3de4f3f182a131c4f4f01aa788)
+
+
+
+### 🚜 Refactor
+
+- Update version bump logic to handle minor version increments [`(6413137)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6413137561abb68e7a4eb224ce46a590c017bf87)
+
+
+
+### ⚙️ Miscellaneous Tasks
+
+- Add .husky directory to .gitignore and update package.json scripts [`(cad9b86)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cad9b860e88e319e1d701f8fc2666cf12bb7a13c)
+
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 2.0.1 [`(2a2f6d2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2a2f6d2b361acd07b2ed334717c5e0ecbea7fe75)
+
+
+
+
+
+
+## [2.0.1] - 2025-06-23
+
+
+[[1983e4c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1983e4c44558506048d978822ba06b1ff927656f)...
+[c275d7d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c275d7d85c21774a671c3f23a76dcee96f3dba19)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/1983e4c44558506048d978822ba06b1ff927656f...c275d7d85c21774a671c3f23a76dcee96f3dba19))
+
+
+### 💼 Other
+
+- Update package.json [`(c09c0ba)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c09c0bae505d39c02ee00ff29077871b8bae74d2)
+
+
+- Update .prettierignore [`(44330e4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/44330e46033a48424d490dda11832950c949e03c)
+
+
+
+### 🚜 Refactor
+
+- Remove unused ESLint and Husky configurations [`(c275d7d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c275d7d85c21774a671c3f23a76dcee96f3dba19)
+
+
+
+### ⚡ Performance
+
+- ⚡️ migration from lowdb to SQLite3 WASM [`(1983e4c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1983e4c44558506048d978822ba06b1ff927656f)
+
+
+
+### ⚙️ Miscellaneous Tasks
+
+- Update changelog for version 1.8.12 and document recent changes [`(239f3cf)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/239f3cf8f1934f3d170c04b284200ca96b83a996)
+
+
+- Update changelogs for v1.8.12 [skip ci] [`(2c5afc9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2c5afc966f1cdf658ca5542a05b019cc0edad30f)
+
 
 
 ### 📦 Dependencies
