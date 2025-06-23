@@ -1,10 +1,10 @@
 {
     "compilerOptions": {
         "target": "ES2020",
+        "skipDefaultLibCheck": false,
         "useDefineForClassFields": true,
         "lib": ["ES2020", "DOM", "DOM.Iterable"],
         "module": "ESNext",
-        "skipLibCheck": true,
         "moduleResolution": "bundler",
         "resolveJsonModule": true,
         "isolatedModules": true,
@@ -17,16 +17,8 @@
         "baseUrl": ".",
         "paths": {
             "@/*": ["src/*"]
-        },
+        }
     },
-    "include": [
-        "src",
-        "electron",
-        "tests",
-        "*.ts",
-        "*.tsx",
-        "**/*.ts",
-        "**/*.tsx",
-        "vite.config.ts"
-    ]
+    "include": ["src", "electron", "tests", "*.ts", "*.tsx", "**/*.ts", "**/*.tsx", "vite.config.ts"],
+    "exclude": ["node_modules", "dist", "release", "out"]
 }

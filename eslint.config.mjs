@@ -50,7 +50,14 @@ export default [
             ".github/",
             ".github/**/*",
             "commitlint.config.js",
-            "stylelint.config.js"
+            "stylelint.config.js",
+            "tsconfig.json",
+            "tsconfig.*.json",
+            "tsconfig.eslint.json",
+            "eslint.config.mjs",
+            "eslint.config.js",
+            "eslint.config.cjs",
+            "node_modules/**"
         ],
     },
     // Markdown files

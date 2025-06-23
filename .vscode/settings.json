@@ -4,6 +4,35 @@
         "**/node_modules": true,
         "**/dist": true,
         "**/dist-electron": true,
-        "**/release": true
+        "**/release": true,
+        "**/.husky": true
     },
+    "prettier-eslint-typescript.eslintConfig": {
+        "rules": {
+            "curly": "error",
+            "dot-notation": "error",
+            "no-undef-init": "error",
+            "no-useless-rename": "error",
+            "no-useless-return": "error",
+            "no-var": "error",
+            "object-shorthand": "error",
+            "one-var": ["error", { "initialized": "never", "uninitialized": "always" }],
+            "prefer-const": "error",
+            "prefer-template": "error",
+            "array-bracket-spacing": ["error", "always"],
+            "generator-star-spacing": ["error", "both"],
+            "space-before-function-paren": ["error", "always"],
+            "yield-star-spacing": ["error", "both"]
+        }
+    },
+    "prettier-eslint-typescript.prettierOptions": {
+        "arrowParens": "avoid",
+        "bracketSpacing": true,
+        "printWidth": 120,
+        "quoteProps": "as-needed",
+        "singleQuote": true,
+        "tabWidth": 3,
+        "trailingComma": "none",
+        "useTabs": false
+    }
 }
