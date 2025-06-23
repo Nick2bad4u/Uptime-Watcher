@@ -1,0 +1,3 @@
+fix logger centralization from db migration
+check new db location and calls
+check state mangement/improve for new calls/db?

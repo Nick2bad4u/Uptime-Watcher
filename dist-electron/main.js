@@ -26385,6 +26385,15 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
                     value TEXT
                 );
             `);
+      await this.db.run(`
+                CREATE TABLE IF NOT EXISTS logs (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    level TEXT,
+                    message TEXT,
+                    data TEXT
+                );
+            `);
       await this.loadSitesWithRetry();
     } catch (error2) {
       logger$1.error("Failed to initialize database", error2);
@@ -26406,7 +26415,7 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
             responseTime: typeof h.responseTime === "number" ? h.responseTime : Number(h.responseTime)
           }));
           monitors.push({
-            id: typeof row.id === "number" ? row.id : Number(row.id),
+            id: row.id != null ? String(row.id) : "-1",
             type: typeof row.type === "string" ? row.type : "http",
             status: typeof row.status === "string" ? row.status : "down",
             responseTime: typeof row.responseTime === "number" ? row.responseTime : row.responseTime ? Number(row.responseTime) : void 0,
@@ -26433,7 +26442,7 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
       for (const site of this.sites.values()) {
         for (const monitor of site.monitors) {
           if (monitor.monitoring) {
-            this.startMonitoringForSite(site.identifier, monitor.type);
+            this.startMonitoringForSite(site.identifier, String(monitor.id));
           }
         }
       }
@@ -26456,7 +26465,7 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
           responseTime: typeof h.responseTime === "number" ? h.responseTime : Number(h.responseTime)
         }));
         monitors.push({
-          id: typeof row.id === "number" ? row.id : Number(row.id),
+          id: row.id != null ? String(row.id) : "-1",
           type: typeof row.type === "string" ? row.type : "http",
           status: typeof row.status === "string" ? row.status : "down",
           responseTime: typeof row.responseTime === "number" ? row.responseTime : row.responseTime ? Number(row.responseTime) : void 0,
@@ -26482,21 +26491,24 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
       for (const site of this.sites.values()) {
         await this.db.run(
           `INSERT OR REPLACE INTO sites (identifier, name) VALUES (?, ?)`,
-          [site.identifier, site.name ?? null]
+          [
+            site.identifier,
+            site.name ?? null
+          ]
         );
         const dbMonitors = await this.db.all(
-          `SELECT id, type FROM monitors WHERE site_identifier = ?`,
+          `SELECT id FROM monitors WHERE site_identifier = ?`,
           [site.identifier]
         );
         const toDelete = dbMonitors.filter(
-          (dbm) => !site.monitors.some((m) => m.type === dbm.type)
+          (dbm) => !site.monitors.some((m) => String(m.id) === String(dbm.id))
         );
         for (const del of toDelete) {
           await this.db.run(`DELETE FROM history WHERE monitor_id = ?`, [del.id]);
           await this.db.run(`DELETE FROM monitors WHERE id = ?`, [del.id]);
         }
         for (const monitor of site.monitors) {
-          if (typeof monitor.id === "number") {
+          if (monitor.id && !isNaN(Number(monitor.id))) {
             await this.db.run(
               `UPDATE monitors SET url = ?, host = ?, port = ?, checkInterval = ?, monitoring = ?, status = ?, responseTime = ?, lastChecked = ? WHERE id = ?`,
               [
@@ -26528,11 +26540,11 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
               ]
             );
             const row = await this.db.get(
-              `SELECT id FROM monitors WHERE site_identifier = ? AND type = ? ORDER BY id DESC LIMIT 1`,
-              [site.identifier, monitor.type]
+              `SELECT id FROM monitors WHERE site_identifier = ? ORDER BY id DESC LIMIT 1`,
+              [site.identifier]
             );
             if (row && typeof row.id === "number") {
-              monitor.id = row.id;
+              monitor.id = String(row.id);
             }
           }
         }
@@ -26574,22 +26586,20 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
         ]
       );
       const row = await this.db.get(
-        `SELECT id FROM monitors WHERE site_identifier = ? AND type = ? ORDER BY id DESC LIMIT 1`,
-        [site.identifier, monitor.type]
+        `SELECT id FROM monitors WHERE site_identifier = ? ORDER BY id DESC LIMIT 1`,
+        [site.identifier]
       );
       if (!row || typeof row.id !== "number") {
         logger$1.error("Failed to fetch monitor id after insert", {
           site: site.identifier,
           monitorType: monitor.type
         });
-        throw new Error(
-          `Failed to fetch monitor id after insert for site ${site.identifier}, type ${monitor.type}`
-        );
+        throw new Error(`Failed to fetch monitor id after insert for site ${site.identifier}`);
       }
-      monitor.id = row.id;
+      monitor.id = String(row.id);
     }
     for (const monitor of site.monitors) {
-      await this.checkMonitor(site, monitor.type);
+      await this.checkMonitor(site, String(monitor.id));
     }
     logger$1.info(`Site added successfully: ${site.identifier} (${site.name || "unnamed"})`);
     return site;
@@ -26597,6 +26607,10 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
   async removeSite(identifier) {
     logger$1.info(`Removing site: ${identifier}`);
     const removed = this.sites.delete(identifier);
+    const monitorRows = await this.db.all(`SELECT id FROM monitors WHERE site_identifier = ?`, [identifier]);
+    for (const row of monitorRows) {
+      await this.db.run(`DELETE FROM history WHERE monitor_id = ?`, [row.id]);
+    }
     await this.db.run(`DELETE FROM monitors WHERE site_identifier = ?`, [identifier]);
     await this.db.run(`DELETE FROM sites WHERE identifier = ?`, [identifier]);
     if (removed) {
@@ -26606,22 +26620,26 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
     }
     return removed;
   }
-  setHistoryLimit(limit) {
+  async setHistoryLimit(limit) {
     if (limit <= 0) {
       this.historyLimit = 0;
     } else {
       this.historyLimit = Math.max(10, limit);
     }
-    this.saveSitesWithRetry();
+    await this.db.run(
+      `INSERT OR REPLACE INTO settings (key, value) VALUES ('historyLimit', ?)`,
+      [this.historyLimit.toString()]
+    );
     if (this.historyLimit > 0) {
-      for (const site of this.sites.values()) {
-        for (const monitor of site.monitors) {
-          if (monitor.history.length > this.historyLimit) {
-            monitor.history = monitor.history.slice(0, this.historyLimit);
-          }
-        }
+      const monitorRows = await this.db.all(`SELECT id FROM monitors`);
+      for (const row of monitorRows) {
+        await this.db.run(
+          `DELETE FROM history WHERE monitor_id = ? AND id NOT IN (
+                        SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT ?
+                    )`,
+          [row.id, row.id, this.historyLimit]
+        );
       }
-      this.saveSitesWithRetry();
     }
   }
   getHistoryLimit() {
@@ -26646,19 +26664,19 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
     this.isMonitoring = false;
     logger$1.info("Stopped all site monitoring intervals");
   }
-  startMonitoringForSite(identifier, monitorType) {
+  startMonitoringForSite(identifier, monitorId) {
     const site = this.sites.get(identifier);
     if (site) {
-      if (monitorType) {
-        const intervalKey = `${identifier}|${monitorType}`;
+      if (monitorId) {
+        const intervalKey = `${identifier}|${monitorId}`;
         if (this.siteIntervals.has(intervalKey)) {
           clearInterval(this.siteIntervals.get(intervalKey));
         }
-        const monitor = site.monitors.find((m) => m.type === monitorType);
+        const monitor = site.monitors.find((m) => String(m.id) === String(monitorId));
         if (!monitor) return false;
         const monitorInterval = monitor.checkInterval || 6e4;
         const interval = setInterval(() => {
-          this.checkMonitor(site, monitorType);
+          this.checkMonitor(site, monitorId);
         }, monitorInterval);
         this.siteIntervals.set(intervalKey, interval);
         monitor.monitoring = true;
@@ -26671,22 +26689,22 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
         return true;
       }
       for (const monitor of site.monitors) {
-        this.startMonitoringForSite(identifier, monitor.type);
+        this.startMonitoringForSite(identifier, String(monitor.id));
       }
       return true;
     }
     return false;
   }
-  stopMonitoringForSite(identifier, monitorType) {
+  stopMonitoringForSite(identifier, monitorId) {
     const site = this.sites.get(identifier);
     if (site) {
-      if (monitorType) {
-        const intervalKey = `${identifier}|${monitorType}`;
+      if (monitorId) {
+        const intervalKey = `${identifier}|${monitorId}`;
         if (this.siteIntervals.has(intervalKey)) {
           clearInterval(this.siteIntervals.get(intervalKey));
           this.siteIntervals.delete(intervalKey);
         }
-        const monitor = site.monitors.find((m) => m.type === monitorType);
+        const monitor = site.monitors.find((m) => String(m.id) === String(monitorId));
         if (monitor) {
           monitor.monitoring = false;
           this.saveSitesWithRetry();
@@ -26699,37 +26717,28 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
         return true;
       }
       for (const monitor of site.monitors) {
-        this.stopMonitoringForSite(identifier, monitor.type);
+        this.stopMonitoringForSite(identifier, String(monitor.id));
       }
       return true;
     }
     return false;
   }
-  async checkMonitor(site, monitorType) {
-    const monitor = site.monitors.find((m) => m.type === monitorType);
+  async checkMonitor(site, monitorId) {
+    const monitor = site.monitors.find((m) => String(m.id) === String(monitorId));
     if (!monitor) {
-      logger$1.error(`[checkMonitor] Monitor not found for type: ${monitorType} on site: ${site.identifier}`);
+      logger$1.error(`[checkMonitor] Monitor not found for id: ${monitorId} on site: ${site.identifier}`);
       return;
     }
-    if (typeof monitor.id !== "number") {
-      const row = await this.db.get(
-        `SELECT id FROM monitors WHERE site_identifier = ? AND type = ? ORDER BY id DESC LIMIT 1`,
-        [site.identifier, monitorType]
-      );
-      if (row && typeof row.id === "number") {
-        monitor.id = row.id;
-        logger$1.warn(`[checkMonitor] Auto-repaired monitor.id for ${site.identifier} ${monitorType}: ${monitor.id}`);
-      } else {
-        logger$1.error(`[checkMonitor] Could not find monitor.id for ${site.identifier} ${monitorType}, skipping history insert.`);
-        return;
-      }
+    if (!monitor.id) {
+      logger$1.error(`[checkMonitor] Monitor missing id for ${site.identifier}, skipping history insert.`);
+      return;
     }
-    logger$1.info(`[checkMonitor] Checking monitor: site=${site.identifier}, type=${monitorType}, monitor.id=${monitor.id}`);
+    logger$1.info(`[checkMonitor] Checking monitor: site=${site.identifier}, id=${monitor.id}`);
     const startTime = Date.now();
     let newStatus = "down";
     let responseTime = 0;
     try {
-      if (monitorType === "http") {
+      if (monitor.type === "http") {
         if (!monitor.url) throw new Error("HTTP monitor missing URL");
         await axios.get(monitor.url, {
           timeout: DEFAULT_REQUEST_TIMEOUT,
@@ -26737,7 +26746,7 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
         });
         responseTime = Date.now() - startTime;
         newStatus = "up";
-      } else if (monitorType === "port") {
+      } else if (monitor.type === "port") {
         if (!monitor.host || !monitor.port) throw new Error("Port monitor missing host or port");
         const available = await isPortReachable(monitor.port, { host: monitor.host });
         responseTime = Date.now() - startTime;
@@ -26746,7 +26755,7 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
     } catch (err) {
       responseTime = Date.now() - startTime;
       newStatus = "down";
-      logger$1.error(`[checkMonitor] Error during check: site=${site.identifier}, type=${monitorType}`, err);
+      logger$1.error(`[checkMonitor] Error during check: site=${site.identifier}, id=${monitor.id}`, err);
     }
     const previousStatus = monitor.status;
     const now = /* @__PURE__ */ new Date();
@@ -26761,9 +26770,16 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
     try {
       await this.db.run(
         `INSERT INTO history (monitor_id, timestamp, status, responseTime) VALUES (?, ?, ?, ?)`,
-        [monitor.id, historyEntry.timestamp, historyEntry.status, historyEntry.responseTime]
+        [
+          monitor.id,
+          historyEntry.timestamp,
+          historyEntry.status,
+          historyEntry.responseTime
+        ]
       );
-      logger$1.info(`[checkMonitor] Inserted history row: monitor_id=${monitor.id}, status=${historyEntry.status}, responseTime=${historyEntry.responseTime}, timestamp=${historyEntry.timestamp}`);
+      logger$1.info(
+        `[checkMonitor] Inserted history row: monitor_id=${monitor.id}, status=${historyEntry.status}, responseTime=${historyEntry.responseTime}, timestamp=${historyEntry.timestamp}`
+      );
     } catch (err) {
       logger$1.error(`[checkMonitor] Failed to insert history row: monitor_id=${monitor.id}`, err);
     }
@@ -26784,18 +26800,18 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
     };
     this.emit("status-update", statusUpdate);
     if (previousStatus === "up" && newStatus === "down") {
-      this.emit("site-monitor-down", { site, monitorType, monitor });
+      this.emit("site-monitor-down", { site, monitorId, monitor });
     } else if (previousStatus === "down" && newStatus === "up") {
-      this.emit("site-monitor-up", { site, monitorType, monitor });
+      this.emit("site-monitor-up", { site, monitorId, monitor });
     }
     return statusUpdate;
   }
-  async checkSiteManually(identifier, monitorType = "http") {
+  async checkSiteManually(identifier, monitorId = "http") {
     const site = this.sites.get(identifier);
     if (!site) {
       throw new Error(`Site with identifier ${identifier} not found`);
     }
-    const result = await this.checkMonitor(site, monitorType);
+    const result = await this.checkMonitor(site, monitorId);
     return result || null;
   }
   async updateSite(identifier, updates) {
@@ -26814,12 +26830,68 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
       [updatedSite.identifier, updatedSite.name ?? null]
     );
     if (updates.monitors) {
+      const dbMonitors = await this.db.all(
+        `SELECT id FROM monitors WHERE site_identifier = ?`,
+        [identifier]
+      );
+      const toDelete = dbMonitors.filter(
+        (dbm) => !updates.monitors.some((m) => String(m.id) === String(dbm.id))
+      );
+      for (const del of toDelete) {
+        await this.db.run(`DELETE FROM history WHERE monitor_id = ?`, [del.id]);
+        await this.db.run(`DELETE FROM monitors WHERE id = ?`, [del.id]);
+      }
+      for (const monitor of updates.monitors) {
+        const numericId = monitor.id && !isNaN(Number(monitor.id)) ? Number(monitor.id) : void 0;
+        if (numericId) {
+          await this.db.run(
+            `UPDATE monitors SET type = ?, url = ?, host = ?, port = ?, checkInterval = ?, monitoring = ?, status = ?, responseTime = ?, lastChecked = ? WHERE id = ?`,
+            [
+              monitor.type,
+              monitor.url ? String(monitor.url) : null,
+              monitor.host ? String(monitor.host) : null,
+              monitor.port !== void 0 && monitor.port !== null ? Number(monitor.port) : null,
+              monitor.checkInterval !== void 0 && monitor.checkInterval !== null ? Number(monitor.checkInterval) : null,
+              monitor.monitoring ? 1 : 0,
+              monitor.status,
+              monitor.responseTime !== void 0 && monitor.responseTime !== null ? Number(monitor.responseTime) : null,
+              monitor.lastChecked ? monitor.lastChecked instanceof Date ? monitor.lastChecked.toISOString() : monitor.lastChecked : null,
+              numericId
+            ]
+          );
+        } else {
+          await this.db.run(
+            `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, monitoring, status, responseTime, lastChecked) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [
+              identifier,
+              monitor.type,
+              monitor.url ? String(monitor.url) : null,
+              monitor.host ? String(monitor.host) : null,
+              monitor.port !== void 0 && monitor.port !== null ? Number(monitor.port) : null,
+              monitor.checkInterval !== void 0 && monitor.checkInterval !== null ? Number(monitor.checkInterval) : null,
+              monitor.monitoring ? 1 : 0,
+              monitor.status,
+              monitor.responseTime !== void 0 && monitor.responseTime !== null ? Number(monitor.responseTime) : null,
+              monitor.lastChecked ? monitor.lastChecked instanceof Date ? monitor.lastChecked.toISOString() : monitor.lastChecked : null
+            ]
+          );
+          const row = await this.db.get(
+            `SELECT id FROM monitors WHERE site_identifier = ? ORDER BY id DESC LIMIT 1`,
+            [identifier]
+          );
+          if (row && typeof row.id === "number") {
+            monitor.id = String(row.id);
+          }
+        }
+      }
+    }
+    if (updates.monitors) {
       for (const updatedMonitor of updates.monitors) {
-        const prevMonitor = site.monitors.find((m) => m.type === updatedMonitor.type);
+        const prevMonitor = site.monitors.find((m) => String(m.id) === String(updatedMonitor.id));
         if (!prevMonitor) continue;
         if (typeof updatedMonitor.checkInterval === "number" && updatedMonitor.checkInterval !== prevMonitor.checkInterval) {
-          this.stopMonitoringForSite(identifier, updatedMonitor.type);
-          this.startMonitoringForSite(identifier, updatedMonitor.type);
+          this.stopMonitoringForSite(identifier, String(updatedMonitor.id));
+          this.startMonitoringForSite(identifier, String(updatedMonitor.id));
         }
       }
     }
@@ -26862,7 +26934,10 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
         for (const site of parsedData.sites) {
           await this.db.run(
             `INSERT INTO sites (identifier, name) VALUES (?, ?)`,
-            [site.identifier, site.name ?? null]
+            [
+              site.identifier,
+              site.name ?? null
+            ]
           );
         }
       }
@@ -26890,11 +26965,12 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
               ]
             );
             const monitorRow = await this.db.get(
-              `SELECT id FROM monitors WHERE site_identifier = ? AND type = ? ORDER BY id DESC LIMIT 1`,
-              [site.identifier, monitor.type]
+              `SELECT id FROM monitors WHERE site_identifier = ? ORDER BY id DESC LIMIT 1`,
+              [site.identifier]
             );
-            const monitorId = monitorRow == null ? void 0 : monitorRow.id;
-            if (Array.isArray(monitor.history) && typeof monitorId === "number") {
+            const monitorId = (monitorRow == null ? void 0 : monitorRow.id) ? String(monitorRow.id) : void 0;
+            monitor.id = monitorId;
+            if (Array.isArray(monitor.history) && monitorId) {
               for (const h of monitor.history) {
                 await this.db.run(
                   `INSERT INTO history (monitor_id, timestamp, status, responseTime) VALUES (?, ?, ?, ?)`,
@@ -27043,6 +27119,20 @@ class Main {
     });
     require$$1$6.ipcMain.handle("stop-monitoring-for-site", async (_, identifier, monitorType) => {
       return this.uptimeMonitor.stopMonitoringForSite(identifier, monitorType);
+    });
+    const dbPath = require$$1$2.join(require$$1$6.app.getPath("userData"), "uptime-watcher.sqlite");
+    require$$1$6.ipcMain.handle("download-sqlite-backup", async () => {
+      try {
+        const buffer = require$$1$1.readFileSync(dbPath);
+        return {
+          buffer,
+          fileName: "uptime-watcher-backup.sqlite"
+        };
+      } catch (error2) {
+        logger.error("Failed to read SQLite backup file", error2);
+        const message = error2 instanceof Error ? error2.message : String(error2);
+        throw new Error("Failed to read SQLite backup file: " + message);
+      }
     });
     this.uptimeMonitor.on("status-update", (data) => {
       var _a;

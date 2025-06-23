@@ -84,8 +84,8 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
         setSiteDetailsChartTimeRange,
         showAdvancedMetrics,
         setShowAdvancedMetrics,
-        setSelectedMonitorType,
-        getSelectedMonitorType,
+        setSelectedMonitorId,
+        getSelectedMonitorId,
     } = useStore();
 
     const [isRefreshing, setIsRefreshing] = useState(false);
@@ -94,10 +94,10 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
         monitors: [],
         identifier: site.identifier,
     };
-    const monitorTypes = currentSite.monitors.map((m) => m.type);
-    const defaultMonitorType = monitorTypes[0] || "http";
-    const selectedMonitorType = getSelectedMonitorType(currentSite.identifier) || defaultMonitorType;
-    const selectedMonitor = currentSite.monitors.find((m) => m.type === selectedMonitorType) || currentSite.monitors[0];
+    const monitorIds = currentSite.monitors.map((m) => m.id);
+    const defaultMonitorId = monitorIds[0] || "";
+    const selectedMonitorId = getSelectedMonitorId(currentSite.identifier) || defaultMonitorId;
+    const selectedMonitor = currentSite.monitors.find((m) => m.id === selectedMonitorId) || currentSite.monitors[0];
     const isMonitoring = selectedMonitor?.monitoring !== false;
 
     // Handler for check now
@@ -109,11 +109,11 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                 clearError();
             }
             try {
-                await checkSiteNow(currentSite.identifier, selectedMonitorType);
+                await checkSiteNow(currentSite.identifier, selectedMonitorId);
                 if (!isAutoRefresh) {
                     logger.user.action("Manual site check", {
                         identifier: currentSite.identifier,
-                        monitorType: selectedMonitorType,
+                        monitorId: selectedMonitorId,
                     });
                 }
             } catch (error) {
@@ -124,7 +124,7 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                 }
             }
         },
-        [checkSiteNow, clearError, currentSite.identifier, selectedMonitorType]
+        [checkSiteNow, clearError, currentSite.identifier, selectedMonitorId]
     );
 
     // Auto-refresh interval
@@ -136,7 +136,7 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
         }, AUTO_REFRESH_INTERVAL); // Auto-refresh every 30 seconds
 
         return () => clearInterval(interval);
-    }, [isMonitoring, isLoading, isRefreshing, selectedMonitorType, handleCheckNow]);
+    }, [isMonitoring, isLoading, isRefreshing, selectedMonitorId, handleCheckNow]);
 
     // Use analytics hook (pass only selectedMonitor and timeRange)
     const analytics = useSiteAnalytics(selectedMonitor, siteDetailsChartTimeRange); // <-- Make sure the hook uses only this monitor's history
@@ -196,13 +196,13 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
         [chartConfig, analytics.totalChecks]
     );
 
-    // Handler for monitor type change
-    const handleMonitorTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const newType = e.target.value as MonitorType;
-        setSelectedMonitorType(currentSite.identifier, newType);
+    // Handler for monitor selection change (dropdown)
+    const handleMonitorIdChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const newId = e.target.value;
+        setSelectedMonitorId(currentSite.identifier, newId);
         // If current tab is an analytics tab, switch to the new monitor's analytics tab
         if (activeSiteDetailsTab.endsWith("-analytics")) {
-            setActiveSiteDetailsTab(`${newType}-analytics`);
+            setActiveSiteDetailsTab(`${newId}-analytics`);
         }
     };
 
@@ -225,10 +225,10 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
 
     // Handler for per-monitor monitoring
     const handleStartMonitoring = () => {
-        startSiteMonitorMonitoring(currentSite.identifier, selectedMonitorType);
+        startSiteMonitorMonitoring(currentSite.identifier, selectedMonitorId);
     };
     const handleStopMonitoring = () => {
-        stopSiteMonitorMonitoring(currentSite.identifier, selectedMonitorType);
+        stopSiteMonitorMonitoring(currentSite.identifier, selectedMonitorId);
     };
 
     // Check interval state and handlers
@@ -244,7 +244,7 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
     };
     const handleSaveInterval = async () => {
         // Always use currentSite.identifier as the first argument
-        await updateSiteCheckInterval(currentSite.identifier, selectedMonitorType, localCheckInterval);
+        await updateSiteCheckInterval(currentSite.identifier, selectedMonitorId, localCheckInterval);
         setIntervalChanged(false);
     };
 
@@ -331,15 +331,15 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                                 </ThemedButton>
                                 {/* Render analytics tab for selected monitor type only */}
                                 <ThemedButton
-                                    key={selectedMonitorType}
+                                    key={selectedMonitorId}
                                     variant={
-                                        activeSiteDetailsTab === `${selectedMonitorType}-analytics`
+                                        activeSiteDetailsTab === `${selectedMonitorId}-analytics`
                                             ? "primary"
                                             : "secondary"
                                     }
-                                    onClick={() => setActiveSiteDetailsTab(`${selectedMonitorType}-analytics`)}
+                                    onClick={() => setActiveSiteDetailsTab(`${selectedMonitorId}-analytics`)}
                                 >
-                                    {`📈 ${selectedMonitorType.toUpperCase()}`}
+                                    {`📈 ${selectedMonitorId.toUpperCase()}`}
                                 </ThemedButton>
                                 <ThemedButton
                                     variant={activeSiteDetailsTab === "history" ? "primary" : "secondary"}
@@ -424,20 +424,20 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                                 )}
                                 {/* Monitor type selector (far right) */}
                                 <ThemedText variant="secondary" size="base">
-                                    Monitor Type:
+                                    Monitor:
                                 </ThemedText>
-                                <ThemedSelect value={selectedMonitorType} onChange={handleMonitorTypeChange}>
-                                    {monitorTypes.map((type) => (
-                                        <option key={type} value={type}>
-                                            {type.toUpperCase()}
+                                <ThemedSelect value={selectedMonitorId} onChange={handleMonitorIdChange}>
+                                    {currentSite.monitors.map((monitor) => (
+                                        <option key={monitor.id} value={monitor.id}>
+                                            {monitor.type.toUpperCase()}
                                         </option>
                                     ))}
                                 </ThemedSelect>
                             </div>
                         </div>
                         {/* Time Range Selector for Analytics Tab (show for both http and port) */}
-                        {activeSiteDetailsTab === `${selectedMonitorType}-analytics` &&
-                            (selectedMonitorType === "http" || selectedMonitorType === "port") && (
+                        {activeSiteDetailsTab === `${selectedMonitorId}-analytics` &&
+                            (selectedMonitorId === "http" || selectedMonitorId === "port") && (
                                 <div className="flex items-center flex-wrap gap-3 mt-4">
                                     <ThemedText size="sm" variant="secondary" className="mr-2">
                                         Time Range:
@@ -474,7 +474,7 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                             />
                         )}
                         {/* Only show analytics for selected monitor type and tab */}
-                        {activeSiteDetailsTab === `${selectedMonitorType}-analytics` && (
+                        {activeSiteDetailsTab === `${selectedMonitorId}-analytics` && (
                             <AnalyticsTab
                                 filteredHistory={analytics.filteredHistory}
                                 upCount={analytics.upCount}
@@ -502,7 +502,7 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                                 getAvailabilityColor={getAvailabilityColor}
                                 getAvailabilityVariant={getAvailabilityVariant}
                                 getAvailabilityDescription={getAvailabilityDescription}
-                                monitorType={selectedMonitorType}
+                                monitorType={selectedMonitor?.type}
                             />
                         )}
                         {activeSiteDetailsTab === "history" && (
@@ -916,14 +916,27 @@ function HistoryTab({
     formatFullTimestamp,
     formatStatusWithIcon,
 }: Omit<HistoryTabProps, "site">) {
+    const { settings } = useStore();
     const [historyFilter, setHistoryFilter] = useState<"all" | "up" | "down">("all");
-    const [historyLimit, setHistoryLimit] = useState(50);
+    const historyLength = (selectedMonitor.history || []).length;
+    const backendLimit = settings.historyLimit || 25;
+    // Dropdown options: 25, 50, 100, All (clamped to backendLimit and available history)
+    const maxShow = Math.min(backendLimit, historyLength);
+    const showOptions = [10, 25, 50, 100, 250, 500, 1000, 10000].filter(opt => opt <= maxShow);
+    // Always include 'All' if there are fewer than backendLimit
+    if (historyLength > 0 && historyLength <= backendLimit && !showOptions.includes(historyLength)) {
+        showOptions.push(historyLength);
+    }
+    // Default to 50, but never more than backendLimit or available history
+    const defaultHistoryLimit = Math.min(50, backendLimit, historyLength);
+    const [historyLimit, setHistoryLimit] = useState(defaultHistoryLimit);
+    useEffect(() => {
+        setHistoryLimit(Math.min(50, backendLimit, (selectedMonitor.history || []).length));
+    }, [settings.historyLimit, selectedMonitor.history?.length]);
 
     const filteredHistoryRecords = (selectedMonitor.history || [])
         .filter((record: any) => historyFilter === "all" || record.status === historyFilter)
         .slice(0, historyLimit);
-
-    const historyLength = (selectedMonitor.history || []).length;
 
     return (
         <div className="space-y-6">
@@ -957,11 +970,16 @@ function HistoryTab({
                         className="px-2 py-1 border rounded"
                         aria-label="History limit"
                     >
-                        <option value={25}>25</option>
-                        <option value={50}>50</option>
-                        <option value={100}>100</option>
-                        <option value={historyLength}>All ({historyLength})</option>
+                        {showOptions.map(opt => (
+                            <option key={opt} value={opt}>{opt}</option>
+                        ))}
+                        {historyLength > backendLimit && (
+                            <option value={historyLength}>All ({historyLength})</option>
+                        )}
                     </select>
+                    <ThemedText size="sm" variant="secondary">
+                        of {historyLength} checks
+                    </ThemedText>
                 </div>
             </div>
 
@@ -1092,7 +1110,7 @@ function SettingsTab({
                     {/* Site URL */}
                     <div>
                         <ThemedText size="sm" weight="medium" variant="secondary" className="block mb-2">
-                            Site URL
+                            Site Identifier
                         </ThemedText>
                         <ThemedInput
                             type="text"
@@ -1101,7 +1119,7 @@ function SettingsTab({
                             className="opacity-70"
                         />
                         <ThemedText size="xs" variant="tertiary" className="mt-1">
-                            URL cannot be changed after creation
+                            Identifier cannot be changed
                         </ThemedText>
                     </div>
                 </div>

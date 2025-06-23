@@ -5,6 +5,7 @@ import { isDev } from "./utils";
 import { UptimeMonitor } from "./uptimeMonitor";
 import { StatusUpdate } from "./types";
 import log from "electron-log/main";
+import fs from "fs";
 
 // Configure electron-log for main process
 log.initialize({ preload: true });
@@ -156,6 +157,22 @@ class Main {
         });
         ipcMain.handle("stop-monitoring-for-site", async (_, identifier, monitorType) => {
             return this.uptimeMonitor.stopMonitoringForSite(identifier, monitorType);
+        });
+
+        // Direct SQLite backup download
+        const dbPath = path.join(app.getPath("userData"), "uptime-watcher.sqlite");
+        ipcMain.handle("download-sqlite-backup", async () => {
+            try {
+                const buffer = fs.readFileSync(dbPath);
+                return {
+                    buffer,
+                    fileName: "uptime-watcher-backup.sqlite",
+                };
+            } catch (error) {
+                logger.error("Failed to read SQLite backup file", error);
+                const message = error instanceof Error ? error.message : String(error);
+                throw new Error("Failed to read SQLite backup file: " + message);
+            }
         });
 
         // Listen for status updates from monitor

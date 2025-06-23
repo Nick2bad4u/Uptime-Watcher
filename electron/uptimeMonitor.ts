@@ -127,6 +127,15 @@ export class UptimeMonitor extends EventEmitter {
                     value TEXT
                 );
             `);
+            await this.db.run(`
+                CREATE TABLE IF NOT EXISTS logs (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    level TEXT,
+                    message TEXT,
+                    data TEXT
+                );
+            `);
             await this.loadSitesWithRetry();
         } catch (error) {
             logger.error("Failed to initialize database", error);
@@ -151,7 +160,7 @@ export class UptimeMonitor extends EventEmitter {
                         responseTime: typeof h.responseTime === "number" ? h.responseTime : Number(h.responseTime),
                     }));
                     monitors.push({
-                        id: typeof row.id === "number" ? row.id : Number(row.id),
+                        id: row.id != null ? String(row.id) : "-1",
                         type: typeof row.type === "string" ? (row.type as MonitorType) : "http",
                         status: typeof row.status === "string" ? (row.status as "up" | "down" | "pending") : "down",
                         responseTime:
@@ -198,7 +207,7 @@ export class UptimeMonitor extends EventEmitter {
             for (const site of this.sites.values()) {
                 for (const monitor of site.monitors) {
                     if (monitor.monitoring) {
-                        this.startMonitoringForSite(site.identifier, monitor.type);
+                        this.startMonitoringForSite(site.identifier, String(monitor.id));
                     }
                 }
             }
@@ -223,7 +232,7 @@ export class UptimeMonitor extends EventEmitter {
                     responseTime: typeof h.responseTime === "number" ? h.responseTime : Number(h.responseTime),
                 }));
                 monitors.push({
-                    id: typeof row.id === "number" ? row.id : Number(row.id),
+                    id: row.id != null ? String(row.id) : "-1",
                     type: typeof row.type === "string" ? (row.type as MonitorType) : "http",
                     status: typeof row.status === "string" ? (row.status as "up" | "down" | "pending") : "down",
                     responseTime:
@@ -268,17 +277,19 @@ export class UptimeMonitor extends EventEmitter {
             for (const site of this.sites.values()) {
                 // Upsert site row
                 await this.db.run(
-                    `INSERT OR REPLACE INTO sites (identifier, name) VALUES (?, ?)`,
-                    [site.identifier, site.name ?? null]
+                    `INSERT OR REPLACE INTO sites (identifier, name) VALUES (?, ?)`, [
+                        site.identifier,
+                        site.name ?? null
+                    ]
                 );
                 // Get current monitors in DB for this site
                 const dbMonitors = (await this.db.all(
-                    `SELECT id, type FROM monitors WHERE site_identifier = ?`,
+                    `SELECT id FROM monitors WHERE site_identifier = ?`,
                     [site.identifier]
-                )) as { id: number; type: string }[];
+                )) as { id: number }[];
                 // Find monitors to delete (in DB but not in current site.monitors)
                 const toDelete = dbMonitors.filter(
-                    (dbm) => !site.monitors.some((m) => m.type === dbm.type)
+                    (dbm) => !site.monitors.some((m) => String(m.id) === String(dbm.id))
                 );
                 for (const del of toDelete) {
                     await this.db.run(`DELETE FROM history WHERE monitor_id = ?`, [del.id]);
@@ -286,8 +297,7 @@ export class UptimeMonitor extends EventEmitter {
                 }
                 // Upsert all current monitors
                 for (const monitor of site.monitors) {
-                    // If monitor.id exists, update; else insert
-                    if (typeof monitor.id === "number") {
+                    if (monitor.id && !isNaN(Number(monitor.id))) {
                         await this.db.run(
                             `UPDATE monitors SET url = ?, host = ?, port = ?, checkInterval = ?, monitoring = ?, status = ?, responseTime = ?, lastChecked = ? WHERE id = ?`,
                             [
@@ -320,11 +330,11 @@ export class UptimeMonitor extends EventEmitter {
                         );
                         // Fetch and assign id
                         const row = await this.db.get(
-                            `SELECT id FROM monitors WHERE site_identifier = ? AND type = ? ORDER BY id DESC LIMIT 1`,
-                            [site.identifier, monitor.type]
+                            `SELECT id FROM monitors WHERE site_identifier = ? ORDER BY id DESC LIMIT 1`,
+                            [site.identifier]
                         );
                         if (row && typeof row.id === "number") {
-                            monitor.id = row.id;
+                            monitor.id = String(row.id);
                         }
                     }
                 }
@@ -373,25 +383,23 @@ export class UptimeMonitor extends EventEmitter {
                     monitor.lastChecked ? monitor.lastChecked.toISOString() : null,
                 ]
             );
-            // Fetch the id of the last inserted monitor for this site/type
+            // Fetch the id of the last inserted monitor for this site
             const row = await this.db.get(
-                `SELECT id FROM monitors WHERE site_identifier = ? AND type = ? ORDER BY id DESC LIMIT 1`,
-                [site.identifier, monitor.type]
+                `SELECT id FROM monitors WHERE site_identifier = ? ORDER BY id DESC LIMIT 1`,
+                [site.identifier]
             );
             if (!row || typeof row.id !== "number") {
                 logger.error("Failed to fetch monitor id after insert", {
                     site: site.identifier,
                     monitorType: monitor.type,
                 });
-                throw new Error(
-                    `Failed to fetch monitor id after insert for site ${site.identifier}, type ${monitor.type}`
-                );
+                throw new Error(`Failed to fetch monitor id after insert for site ${site.identifier}`);
             }
-            monitor.id = row.id;
+            monitor.id = String(row.id);
         }
         // Initial check for all monitors
         for (const monitor of site.monitors) {
-            await this.checkMonitor(site, monitor.type);
+            await this.checkMonitor(site, String(monitor.id));
         }
         logger.info(`Site added successfully: ${site.identifier} (${site.name || "unnamed"})`);
         return site;
@@ -400,8 +408,14 @@ export class UptimeMonitor extends EventEmitter {
     public async removeSite(identifier: string): Promise<boolean> {
         logger.info(`Removing site: ${identifier}`);
         const removed = this.sites.delete(identifier);
-        // Remove from DB
+        // Remove all monitor history for this site's monitors
+        const monitorRows = await this.db.all(`SELECT id FROM monitors WHERE site_identifier = ?`, [identifier]);
+        for (const row of monitorRows as { id: number }[]) {
+            await this.db.run(`DELETE FROM history WHERE monitor_id = ?`, [row.id]);
+        }
+        // Remove monitors for this site
         await this.db.run(`DELETE FROM monitors WHERE site_identifier = ?`, [identifier]);
+        // Remove the site row
         await this.db.run(`DELETE FROM sites WHERE identifier = ?`, [identifier]);
         if (removed) {
             logger.info(`Site removed successfully: ${identifier}`);
@@ -411,23 +425,28 @@ export class UptimeMonitor extends EventEmitter {
         return removed;
     }
 
-    public setHistoryLimit(limit: number) {
+    public async setHistoryLimit(limit: number) {
         if (limit <= 0) {
             this.historyLimit = 0;
         } else {
             this.historyLimit = Math.max(10, limit);
         }
-        this.saveSitesWithRetry();
-        // Trim existing history for all monitors only if limit > 0
+        // Save to settings table
+        await this.db.run(
+            `INSERT OR REPLACE INTO settings (key, value) VALUES ('historyLimit', ?)`,
+            [this.historyLimit.toString()]
+        );
+        // Prune history in DB for all monitors if limit > 0
         if (this.historyLimit > 0) {
-            for (const site of this.sites.values()) {
-                for (const monitor of site.monitors) {
-                    if (monitor.history.length > this.historyLimit) {
-                        monitor.history = monitor.history.slice(0, this.historyLimit);
-                    }
-                }
+            const monitorRows = await this.db.all(`SELECT id FROM monitors`);
+            for (const row of monitorRows as { id: number }[]) {
+                await this.db.run(
+                    `DELETE FROM history WHERE monitor_id = ? AND id NOT IN (
+                        SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT ?
+                    )`,
+                    [row.id, row.id, this.historyLimit]
+                );
             }
-            this.saveSitesWithRetry();
         }
     }
 
@@ -457,27 +476,27 @@ export class UptimeMonitor extends EventEmitter {
         logger.info("Stopped all site monitoring intervals");
     }
 
-    public startMonitoringForSite(identifier: string, monitorType?: MonitorType): boolean {
+    public startMonitoringForSite(identifier: string, monitorId?: string): boolean {
         const site = this.sites.get(identifier);
         if (site) {
-            if (monitorType) {
-                // Per-monitor-type: start interval for only this monitor
-                const intervalKey = `${identifier}|${monitorType}`;
+            if (monitorId) {
+                // Per-monitor-id: start interval for only this monitor
+                const intervalKey = `${identifier}|${monitorId}`;
                 if (this.siteIntervals.has(intervalKey)) {
                     clearInterval(this.siteIntervals.get(intervalKey)!);
                 }
-                const monitor = site.monitors.find((m) => m.type === monitorType);
+                const monitor = site.monitors.find((m) => String(m.id) === String(monitorId));
                 if (!monitor) return false;
                 // Use monitor-specific checkInterval, fallback to default
                 const monitorInterval = monitor.checkInterval || 60000;
                 const interval = setInterval(() => {
-                    this.checkMonitor(site, monitorType);
+                    this.checkMonitor(site, monitorId);
                 }, monitorInterval);
                 this.siteIntervals.set(intervalKey, interval);
                 // Set monitoring=true for this monitor and persist
                 monitor.monitoring = true;
                 this.saveSitesWithRetry();
-                // Emit status-update for this monitorType
+                // Emit status-update for this monitorId
                 const statusUpdate = {
                     site: { ...site, monitors: site.monitors.map((m) => ({ ...m })) },
                     previousStatus: undefined,
@@ -485,32 +504,32 @@ export class UptimeMonitor extends EventEmitter {
                 this.emit("status-update", statusUpdate);
                 return true;
             }
-            // If no monitorType is provided, start all monitors for this site
+            // If no monitorId is provided, start all monitors for this site
             for (const monitor of site.monitors) {
-                this.startMonitoringForSite(identifier, monitor.type);
+                this.startMonitoringForSite(identifier, String(monitor.id));
             }
             return true;
         }
         return false;
     }
 
-    public stopMonitoringForSite(identifier: string, monitorType?: MonitorType): boolean {
+    public stopMonitoringForSite(identifier: string, monitorId?: string): boolean {
         const site = this.sites.get(identifier);
         if (site) {
-            if (monitorType) {
-                // Per-monitor-type: stop interval for only this monitor
-                const intervalKey = `${identifier}|${monitorType}`;
+            if (monitorId) {
+                // Per-monitor-id: stop interval for only this monitor
+                const intervalKey = `${identifier}|${monitorId}`;
                 if (this.siteIntervals.has(intervalKey)) {
                     clearInterval(this.siteIntervals.get(intervalKey)!);
                     this.siteIntervals.delete(intervalKey);
                 }
                 // Set monitoring=false for this monitor and persist
-                const monitor = site.monitors.find((m) => m.type === monitorType);
+                const monitor = site.monitors.find((m) => String(m.id) === String(monitorId));
                 if (monitor) {
                     monitor.monitoring = false;
                     this.saveSitesWithRetry();
                 }
-                // Emit status-update for this monitorType
+                // Emit status-update for this monitorId
                 const statusUpdate = {
                     site: { ...site, monitors: site.monitors.map((m) => ({ ...m })) },
                     previousStatus: undefined,
@@ -518,42 +537,32 @@ export class UptimeMonitor extends EventEmitter {
                 this.emit("status-update", statusUpdate);
                 return true;
             }
-            // If no monitorType is provided, stop all monitors for this site
+            // If no monitorId is provided, stop all monitors for this site
             for (const monitor of site.monitors) {
-                this.stopMonitoringForSite(identifier, monitor.type);
+                this.stopMonitoringForSite(identifier, String(monitor.id));
             }
             return true;
         }
         return false;
     }
 
-    private async checkMonitor(site: Site, monitorType: MonitorType) {
-        const monitor = site.monitors.find((m) => m.type === monitorType);
+    private async checkMonitor(site: Site, monitorId: string) {
+        const monitor = site.monitors.find((m) => String(m.id) === String(monitorId));
         if (!monitor) {
-            logger.error(`[checkMonitor] Monitor not found for type: ${monitorType} on site: ${site.identifier}`);
+            logger.error(`[checkMonitor] Monitor not found for id: ${monitorId} on site: ${site.identifier}`);
             return;
         }
         // Ensure monitor.id is present and valid before proceeding
-        if (typeof monitor.id !== "number") {
-            // Try to auto-repair: fetch from DB
-            const row = await this.db.get(
-                `SELECT id FROM monitors WHERE site_identifier = ? AND type = ? ORDER BY id DESC LIMIT 1`,
-                [site.identifier, monitorType]
-            );
-            if (row && typeof row.id === "number") {
-                monitor.id = row.id;
-                logger.warn(`[checkMonitor] Auto-repaired monitor.id for ${site.identifier} ${monitorType}: ${monitor.id}`);
-            } else {
-                logger.error(`[checkMonitor] Could not find monitor.id for ${site.identifier} ${monitorType}, skipping history insert.`);
-                return;
-            }
+        if (!monitor.id) {
+            logger.error(`[checkMonitor] Monitor missing id for ${site.identifier}, skipping history insert.`);
+            return;
         }
-        logger.info(`[checkMonitor] Checking monitor: site=${site.identifier}, type=${monitorType}, monitor.id=${monitor.id}`);
+        logger.info(`[checkMonitor] Checking monitor: site=${site.identifier}, id=${monitor.id}`);
         const startTime = Date.now();
         let newStatus: "up" | "down" = "down";
         let responseTime = 0;
         try {
-            if (monitorType === "http") {
+            if (monitor.type === "http") {
                 if (!monitor.url) throw new Error("HTTP monitor missing URL");
                 await axios.get(monitor.url, {
                     timeout: DEFAULT_REQUEST_TIMEOUT,
@@ -561,7 +570,7 @@ export class UptimeMonitor extends EventEmitter {
                 });
                 responseTime = Date.now() - startTime;
                 newStatus = "up";
-            } else if (monitorType === "port") {
+            } else if (monitor.type === "port") {
                 if (!monitor.host || !monitor.port) throw new Error("Port monitor missing host or port");
                 const available = await isPortReachable(monitor.port, { host: monitor.host });
                 responseTime = Date.now() - startTime;
@@ -570,7 +579,7 @@ export class UptimeMonitor extends EventEmitter {
         } catch (err) {
             responseTime = Date.now() - startTime;
             newStatus = "down";
-            logger.error(`[checkMonitor] Error during check: site=${site.identifier}, type=${monitorType}`, err);
+            logger.error(`[checkMonitor] Error during check: site=${site.identifier}, id=${monitor.id}`, err);
         }
         const previousStatus = monitor.status;
         const now = new Date();
@@ -586,10 +595,16 @@ export class UptimeMonitor extends EventEmitter {
         };
         try {
             await this.db.run(
-                `INSERT INTO history (monitor_id, timestamp, status, responseTime) VALUES (?, ?, ?, ?)`,
-                [monitor.id, historyEntry.timestamp, historyEntry.status, historyEntry.responseTime]
+                `INSERT INTO history (monitor_id, timestamp, status, responseTime) VALUES (?, ?, ?, ?)`, [
+                    monitor.id,
+                    historyEntry.timestamp,
+                    historyEntry.status,
+                    historyEntry.responseTime
+                ]
             );
-            logger.info(`[checkMonitor] Inserted history row: monitor_id=${monitor.id}, status=${historyEntry.status}, responseTime=${historyEntry.responseTime}, timestamp=${historyEntry.timestamp}`);
+            logger.info(
+                `[checkMonitor] Inserted history row: monitor_id=${monitor.id}, status=${historyEntry.status}, responseTime=${historyEntry.responseTime}, timestamp=${historyEntry.timestamp}`
+            );
         } catch (err) {
             logger.error(`[checkMonitor] Failed to insert history row: monitor_id=${monitor.id}`, err);
         }
@@ -612,22 +627,19 @@ export class UptimeMonitor extends EventEmitter {
         };
         this.emit("status-update", statusUpdate);
         if (previousStatus === "up" && newStatus === "down") {
-            this.emit("site-monitor-down", { site, monitorType, monitor });
+            this.emit("site-monitor-down", { site, monitorId, monitor });
         } else if (previousStatus === "down" && newStatus === "up") {
-            this.emit("site-monitor-up", { site, monitorType, monitor });
+            this.emit("site-monitor-up", { site, monitorId, monitor });
         }
         return statusUpdate;
     }
 
-    public async checkSiteManually(
-        identifier: string,
-        monitorType: MonitorType = "http"
-    ): Promise<StatusUpdate | null> {
+    public async checkSiteManually(identifier: string, monitorId: string = "http"): Promise<StatusUpdate | null> {
         const site = this.sites.get(identifier);
         if (!site) {
             throw new Error(`Site with identifier ${identifier} not found`);
         }
-        const result = await this.checkMonitor(site, monitorType);
+        const result = await this.checkMonitor(site, monitorId);
         return result || null;
     }
 
@@ -648,18 +660,82 @@ export class UptimeMonitor extends EventEmitter {
             `INSERT OR REPLACE INTO sites (identifier, name) VALUES (?, ?)`,
             [updatedSite.identifier, updatedSite.name ?? null]
         );
+        // --- Monitor upsert logic (robust, normalized) ---
+        if (updates.monitors) {
+            // 1. Get current monitors in DB for this site
+            const dbMonitors = (await this.db.all(
+                `SELECT id FROM monitors WHERE site_identifier = ?`,
+                [identifier]
+            )) as { id: number }[];
+            // 2. Remove monitors from DB that are not in the new array
+            const toDelete = dbMonitors.filter(
+                (dbm) => !updates.monitors!.some((m) => String(m.id) === String(dbm.id))
+            );
+            for (const del of toDelete) {
+                await this.db.run(`DELETE FROM history WHERE monitor_id = ?`, [del.id]);
+                await this.db.run(`DELETE FROM monitors WHERE id = ?`, [del.id]);
+            }
+            // 3. Upsert all current monitors
+            for (const monitor of updates.monitors) {
+                // If monitor.id is a string that parses to a number, treat as existing
+                const numericId = monitor.id && !isNaN(Number(monitor.id)) ? Number(monitor.id) : undefined;
+                if (numericId) {
+                    // Update existing monitor
+                    await this.db.run(
+                        `UPDATE monitors SET type = ?, url = ?, host = ?, port = ?, checkInterval = ?, monitoring = ?, status = ?, responseTime = ?, lastChecked = ? WHERE id = ?`,
+                        [
+                            monitor.type,
+                            monitor.url ? String(monitor.url) : null,
+                            monitor.host ? String(monitor.host) : null,
+                            monitor.port !== undefined && monitor.port !== null ? Number(monitor.port) : null,
+                            monitor.checkInterval !== undefined && monitor.checkInterval !== null ? Number(monitor.checkInterval) : null,
+                            monitor.monitoring ? 1 : 0,
+                            monitor.status,
+                            monitor.responseTime !== undefined && monitor.responseTime !== null ? Number(monitor.responseTime) : null,
+                            monitor.lastChecked ? (monitor.lastChecked instanceof Date ? monitor.lastChecked.toISOString() : monitor.lastChecked) : null,
+                            numericId,
+                        ]
+                    );
+                } else {
+                    // Insert new monitor
+                    await this.db.run(
+                        `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, monitoring, status, responseTime, lastChecked) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                        [
+                            identifier,
+                            monitor.type,
+                            monitor.url ? String(monitor.url) : null,
+                            monitor.host ? String(monitor.host) : null,
+                            monitor.port !== undefined && monitor.port !== null ? Number(monitor.port) : null,
+                            monitor.checkInterval !== undefined && monitor.checkInterval !== null ? Number(monitor.checkInterval) : null,
+                            monitor.monitoring ? 1 : 0,
+                            monitor.status,
+                            monitor.responseTime !== undefined && monitor.responseTime !== null ? Number(monitor.responseTime) : null,
+                            monitor.lastChecked ? (monitor.lastChecked instanceof Date ? monitor.lastChecked.toISOString() : monitor.lastChecked) : null,
+                        ]
+                    );
+                    // Fetch and assign id
+                    const row = await this.db.get(
+                        `SELECT id FROM monitors WHERE site_identifier = ? ORDER BY id DESC LIMIT 1`,
+                        [identifier]
+                    );
+                    if (row && typeof row.id === "number") {
+                        monitor.id = String(row.id);
+                    }
+                }
+            }
+        }
         // If monitors were updated, check for interval changes and restart timers as needed
         if (updates.monitors) {
             for (const updatedMonitor of updates.monitors) {
-                const prevMonitor = site.monitors.find((m) => m.type === updatedMonitor.type);
+                const prevMonitor = site.monitors.find((m) => String(m.id) === String(updatedMonitor.id));
                 if (!prevMonitor) continue;
                 // If checkInterval changed, restart timer for this monitor
                 if (
                     typeof updatedMonitor.checkInterval === "number" &&
                     updatedMonitor.checkInterval !== prevMonitor.checkInterval
                 ) {
-                    this.stopMonitoringForSite(identifier, updatedMonitor.type);
-                    this.startMonitoringForSite(identifier, updatedMonitor.type);
+                    this.stopMonitoringForSite(identifier, String(updatedMonitor.id));
+                    this.startMonitoringForSite(identifier, String(updatedMonitor.id));
                 }
             }
         }
@@ -706,8 +782,10 @@ export class UptimeMonitor extends EventEmitter {
             if (Array.isArray(parsedData.sites)) {
                 for (const site of parsedData.sites) {
                     await this.db.run(
-                        `INSERT INTO sites (identifier, name) VALUES (?, ?)`,
-                        [site.identifier, site.name ?? null]
+                        `INSERT INTO sites (identifier, name) VALUES (?, ?)`, [
+                            site.identifier,
+                            site.name ?? null
+                        ]
                     );
                 }
             }
@@ -741,14 +819,15 @@ export class UptimeMonitor extends EventEmitter {
                                     : null,
                             ]
                         );
-                        // Get monitor id
+                        // Always fetch and assign string id
                         const monitorRow = await this.db.get(
-                            `SELECT id FROM monitors WHERE site_identifier = ? AND type = ? ORDER BY id DESC LIMIT 1`,
-                            [site.identifier, monitor.type]
+                            `SELECT id FROM monitors WHERE site_identifier = ? ORDER BY id DESC LIMIT 1`,
+                            [site.identifier]
                         );
-                        const monitorId = monitorRow?.id;
+                        const monitorId = monitorRow?.id ? String(monitorRow.id) : undefined;
+                        monitor.id = monitorId;
                         // Insert history
-                        if (Array.isArray(monitor.history) && typeof monitorId === "number") {
+                        if (Array.isArray(monitor.history) && monitorId) {
                             for (const h of monitor.history) {
                                 await this.db.run(
                                     `INSERT INTO history (monitor_id, timestamp, status, responseTime) VALUES (?, ?, ?, ?)`,

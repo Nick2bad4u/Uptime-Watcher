@@ -3,6 +3,7 @@ export type UpdateStatus = "idle" | "checking" | "available" | "downloading" | "
 export type MonitorType = "http" | "port";
 
 export interface Monitor {
+    id: string; // Unique identifier for this monitor (UUID or similar)
     type: MonitorType;
     status: "up" | "down" | "pending";
     /**
@@ -29,10 +30,6 @@ export interface Site {
      * Unique identifier for the site (UUID, used as the key everywhere)
      */
     identifier: string;
-    /**
-     * Optional legacy id (for migration only)
-     */
-    id?: string;
     name?: string;
     monitors: Monitor[];
     monitoring?: boolean; // Per-site monitoring state
@@ -61,25 +58,21 @@ export interface StatusUpdate {
 declare global {
     interface Window {
         electronAPI: {
-            // Now expects Site shape with monitors: Monitor[]
-            addSite: (site: Omit<Site, "id">) => Promise<Site>;
-            removeSite: (identifier: string) => Promise<boolean>;
-            updateSite: (identifier: string, updates: Partial<Site>) => Promise<Site>;
             getSites: () => Promise<Site[]>;
-            checkSiteNow: (identifier: string, monitorType: MonitorType) => Promise<StatusUpdate>;
+            getHistoryLimit: () => Promise<number>;
+            updateHistoryLimit: (limit: number) => Promise<void>;
+            addSite: (site: Omit<Site, "id">) => Promise<Site>;
+            removeSite: (id: string) => Promise<void>;
+            updateSite: (id: string, updates: Partial<Site>) => Promise<void>;
+            checkSiteNow: (siteId: string, monitorId: string) => Promise<void>;
+            startMonitoringForSite: (siteId: string, monitorId: string) => Promise<void>;
+            stopMonitoringForSite: (siteId: string, monitorId: string) => Promise<void>;
             exportData: () => Promise<string>;
             importData: (data: string) => Promise<boolean>;
-            startMonitoring: () => Promise<boolean>;
-            stopMonitoring: () => Promise<boolean>;
-            updateCheckInterval: (interval: number) => Promise<void>;
-            getCheckInterval: () => Promise<number>;
-            updateHistoryLimit: (limit: number) => Promise<void>;
-            getHistoryLimit: () => Promise<number>;
-            onStatusUpdate: (callback: (data: StatusUpdate) => void) => void;
-            removeAllListeners: (channel: string) => void;
-            quitAndInstall?: () => void;
-            startMonitoringForSite: (identifier: string, monitorType?: MonitorType) => Promise<boolean>;
-            stopMonitoringForSite: (identifier: string, monitorType?: MonitorType) => Promise<boolean>;
+            downloadSQLiteBackup: () => Promise<{ buffer: ArrayBuffer; fileName: string }>;
+            onStatusUpdate: (callback: (update: StatusUpdate) => void) => void;
+            removeAllListeners: (event: string) => void;
+            quitAndInstall: () => void;
         };
     }
 }

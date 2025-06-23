@@ -107,6 +107,7 @@ export function AddSiteForm() {
         try {
             const identifier = addMode === "new" ? siteId : selectedExistingSite;
             const monitor: any = {
+                id: generateUUID(), // Always assign a unique string id
                 type: monitorType,
                 status: "pending" as const,
                 history: [] as Monitor["history"],
@@ -125,7 +126,7 @@ export function AddSiteForm() {
                     monitors: [monitor],
                 };
                 await createSite(siteData);
-                logger.user.action("Added site", { identifier, name: name.trim(), monitorType });
+                logger.user.action("Added site", { identifier, name: name.trim(), monitorType, monitorId: monitor.id });
             } else {
                 await addMonitorToSite(identifier, monitor);
                 logger.user.action("Added monitor to site", { identifier, monitorType });

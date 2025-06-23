@@ -20,6 +20,11 @@ contextBridge.exposeInMainWorld("electronAPI", {
     startMonitoring: () => ipcRenderer.invoke("start-monitoring"),
     stopMonitoring: () => ipcRenderer.invoke("stop-monitoring"),
 
+    /**
+     * Update the history limit in the backend and prune old history rows.
+     * @param {number} limit - The new history limit per monitor
+     * @returns {Promise<void>}
+     */
     updateHistoryLimit: (limit: number) => ipcRenderer.invoke("update-history-limit", limit),
 
     getHistoryLimit: () => ipcRenderer.invoke("get-history-limit"),
@@ -41,4 +46,10 @@ contextBridge.exposeInMainWorld("electronAPI", {
         ipcRenderer.invoke("start-monitoring-for-site", identifier, monitorType),
     stopMonitoringForSite: (identifier: string, monitorType?: string) =>
         ipcRenderer.invoke("stop-monitoring-for-site", identifier, monitorType),
+
+    // Direct SQLite backup download
+    downloadSQLiteBackup: async () => {
+        // Returns { buffer: ArrayBuffer, fileName: string }
+        return await ipcRenderer.invoke("download-sqlite-backup");
+    },
 });

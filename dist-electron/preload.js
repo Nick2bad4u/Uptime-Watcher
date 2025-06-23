@@ -13,6 +13,11 @@ electron.contextBridge.exposeInMainWorld("electronAPI", {
   // Monitoring controls
   startMonitoring: () => electron.ipcRenderer.invoke("start-monitoring"),
   stopMonitoring: () => electron.ipcRenderer.invoke("stop-monitoring"),
+  /**
+   * Update the history limit in the backend and prune old history rows.
+   * @param {number} limit - The new history limit per monitor
+   * @returns {Promise<void>}
+   */
   updateHistoryLimit: (limit) => electron.ipcRenderer.invoke("update-history-limit", limit),
   getHistoryLimit: () => electron.ipcRenderer.invoke("get-history-limit"),
   // Event listeners
@@ -26,5 +31,9 @@ electron.contextBridge.exposeInMainWorld("electronAPI", {
   quitAndInstall: () => electron.ipcRenderer.send("quit-and-install"),
   // Per-site monitoring
   startMonitoringForSite: (identifier, monitorType) => electron.ipcRenderer.invoke("start-monitoring-for-site", identifier, monitorType),
-  stopMonitoringForSite: (identifier, monitorType) => electron.ipcRenderer.invoke("stop-monitoring-for-site", identifier, monitorType)
+  stopMonitoringForSite: (identifier, monitorType) => electron.ipcRenderer.invoke("stop-monitoring-for-site", identifier, monitorType),
+  // Direct SQLite backup download
+  downloadSQLiteBackup: async () => {
+    return await electron.ipcRenderer.invoke("download-sqlite-backup");
+  }
 });

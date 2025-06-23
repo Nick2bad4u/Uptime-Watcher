@@ -27,15 +27,17 @@ export function Settings({ onClose }: SettingsProps) {
         clearError,
         isLoading,
         updateHistoryLimitValue,
-        exportAppData,
-        importAppData,
         syncSitesFromBackend,
+        downloadSQLiteBackup, // <-- keep this
+        setError, // <-- keep this
     } = useStore();
 
     const { setTheme, availableThemes, isDark } = useTheme();
 
     // Delayed loading state for button spinners (100ms delay)
     const [showButtonLoading, setShowButtonLoading] = useState(false);
+    // Local state for sync success message
+    const [syncSuccess, setSyncSuccess] = useState(false);
 
     useEffect(() => {
         let timeoutId: NodeJS.Timeout;
@@ -87,56 +89,38 @@ export function Settings({ onClose }: SettingsProps) {
         logger.user.settingsChange("theme", oldTheme, themeName);
     };
 
-    const handleExportData = async () => {
-        try {
-            const data = await exportAppData();
-            const blob = new Blob([data], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `uptime-watcher-backup-${new Date().toISOString().split("T")[0]}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            logger.user.action("Exported app data");
-        } catch (error) {
-            logger.error("Failed to export data from settings", error);
-            // Error is already handled by the store action
-        }
-    };
-
-    const handleImportData = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (!file) return;
-
-        try {
-            const text = await file.text();
-            const success = await importAppData(text);
-            if (success) {
-                logger.user.action("Imported app data successfully");
-                // Refresh the page to show imported data
-                window.location.reload();
-            }
-        } catch (error) {
-            logger.error("Failed to import data from settings", error);
-            // Error is already handled by the store action
-        } finally {
-            // Reset file input
-            event.target.value = "";
-        }
-    };
-
     // Manual Sync Now handler (moved from Header)
     const handleSyncNow = useCallback(async () => {
-        await syncSitesFromBackend();
-    }, [syncSitesFromBackend]);
+        setSyncSuccess(false);
+        try {
+            await syncSitesFromBackend();
+            setSyncSuccess(true);
+            logger.user.action("Synced data from SQLite backend");
+        } catch (error: any) {
+            logger.error("Failed to sync data from backend", error);
+            setError("Failed to sync data: " + (error && error.message ? error.message : String(error)));
+        }
+    }, [syncSitesFromBackend, setError]);
+
+    const handleDownloadSQLite = async () => {
+        setShowButtonLoading(true);
+        clearError();
+        try {
+            await downloadSQLiteBackup();
+            logger.user.action("Downloaded SQLite backup");
+        } catch (error: any) {
+            logger.error("Failed to download SQLite backup", error);
+            setError("Failed to download SQLite backup: " + (error && error.message ? error.message : String(error)));
+        } finally {
+            setShowButtonLoading(false);
+        }
+    };
 
     return (
         <div className="modal-overlay">
             <ThemedBox surface="overlay" padding="md" rounded="lg" shadow="xl" className="modal-container">
                 {/* Header */}
-                <ThemedBox surface="elevated" padding="lg" rounded="none" border={true} className="border-b">
+                <ThemedBox surface="elevated" padding="lg" rounded="none" border className="border-b">
                     <div className="flex items-center justify-between">
                         <ThemedText size="xl" weight="semibold">
                             ⚙️ Settings
@@ -172,6 +156,19 @@ export function Settings({ onClose }: SettingsProps) {
                                 ✕
                             </ThemedButton>
                         </div>
+                    </ThemedBox>
+                )}
+                {/* Sync Success Display */}
+                {syncSuccess && !lastError && (
+                    <ThemedBox
+                        surface="base"
+                        padding="md"
+                        className="success-alert"
+                        rounded="md"
+                    >
+                        <ThemedText variant="success" size="sm">
+                            ✅ Data synced from database.
+                        </ThemedText>
                     </ThemedBox>
                 )}
 
@@ -371,37 +368,22 @@ export function Settings({ onClose }: SettingsProps) {
                                 🔄 Sync Data
                             </ThemedButton>
 
+                            {/* SQLite direct download */}
                             <div>
                                 <ThemedText size="sm" weight="medium" variant="secondary" className="block mb-2">
-                                    Export Data
+                                    Export SQLite Database
                                 </ThemedText>
                                 <ThemedButton
                                     variant="primary"
                                     size="sm"
-                                    onClick={handleExportData}
-                                    disabled={isLoading}
+                                    onClick={handleDownloadSQLite}
+                                    disabled={isLoading || showButtonLoading}
+                                    loading={showButtonLoading}
                                 >
-                                    Download Backup
+                                    Download SQLite Backup
                                 </ThemedButton>
                                 <ThemedText size="xs" variant="tertiary" className="mt-1 block">
-                                    Backup your data and settings as a JSON file
-                                </ThemedText>
-                            </div>
-
-                            <div>
-                                <ThemedText size="sm" weight="medium" variant="secondary" className="block mb-2">
-                                    Import Data
-                                </ThemedText>
-                                <input
-                                    type="file"
-                                    accept=".json"
-                                    onChange={handleImportData}
-                                    disabled={isLoading}
-                                    aria-label="Import data from a JSON file"
-                                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary file:text-white hover:file:bg-primary-dark disabled:opacity-50"
-                                />
-                                <ThemedText size="xs" variant="tertiary" className="mt-1 block">
-                                    Restore your data and settings from a backup file
+                                    Download a direct backup of the raw SQLite database file for advanced backup or migration.
                                 </ThemedText>
                             </div>
                         </div>
@@ -409,7 +391,7 @@ export function Settings({ onClose }: SettingsProps) {
                 </ThemedBox>
 
                 {/* Footer */}
-                <ThemedBox surface="elevated" padding="lg" rounded="none" border={true} className="border-t">
+                <ThemedBox surface="elevated" padding="lg" rounded="none" border className="border-t">
                     <div className="flex items-center justify-between">
                         <ThemedButton
                             variant="error"

@@ -1,4 +1,4 @@
-import { Site, MonitorType } from "../types";
+import { Site } from "../types";
 import { useStore } from "../store";
 import { ThemedBox, ThemedText, ThemedButton, ThemedSelect, StatusIndicator, MiniChartBar } from "../theme/components";
 import logger from "../services/logger";
@@ -17,43 +17,46 @@ export function SiteCard({ site }: SiteCardProps) {
         startSiteMonitorMonitoring,
         stopSiteMonitorMonitoring,
         isLoading,
-        setSelectedMonitorType,
-        getSelectedMonitorType,
+        setSelectedMonitorId, // updated
+        getSelectedMonitorId, // updated
     } = useStore();
     const latestSite = sites.find((s) => s.identifier === site.identifier) || site;
-    // Use global store for selected monitor type
-    const monitorTypes = latestSite.monitors.map((m) => m.type);
-    const defaultMonitorType = monitorTypes[0] || "http";
-    const selectedMonitorType = getSelectedMonitorType(latestSite.identifier) || defaultMonitorType;
-    const monitor = latestSite.monitors.find((m) => m.type === selectedMonitorType);
+    // Use global store for selected monitor id
+    const monitorIds = latestSite.monitors.map((m) => m.id);
+    const defaultMonitorId = monitorIds[0] || "";
+    const selectedMonitorId = getSelectedMonitorId(latestSite.identifier) || defaultMonitorId;
+    const monitor = latestSite.monitors.find((m) => m.id === selectedMonitorId);
     // Debug: log the monitor and its history
-    if (monitor) {
-        console.log("[SiteCard] Monitor", monitor.type, "history:", monitor.history);
-    } else {
-        console.log("[SiteCard] No monitor found for", selectedMonitorType, "in site", latestSite.identifier);
-    }
+    // if (monitor) {
+    //     logger.debug(`[SiteCard] [${latestSite.identifier}] Monitor ${monitor.type} history:`, monitor.history);
+    // } else {
+    //     logger.debug(`[SiteCard] [${latestSite.identifier}] No monitor found for ${selectedMonitorType} in site ${latestSite.identifier}`);
+    // }
     const status = monitor?.status || "pending";
     const responseTime = monitor?.responseTime;
     const filteredHistory = monitor?.history || [];
     const isMonitoring = monitor?.monitoring !== false; // default to true if undefined
 
-    const handleMonitorTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedMonitorType(latestSite.identifier, e.target.value as MonitorType);
+    const handleMonitorIdChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedMonitorId(latestSite.identifier, e.target.value);
     };
 
     // Refactor handlers to not require event argument
     const handleStartMonitoring = () => {
-        startSiteMonitorMonitoring(latestSite.identifier, selectedMonitorType);
+        if (!monitor) return;
+        startSiteMonitorMonitoring(latestSite.identifier, monitor.id);
     };
     const handleStopMonitoring = () => {
-        stopSiteMonitorMonitoring(latestSite.identifier, selectedMonitorType);
+        if (!monitor) return;
+        stopSiteMonitorMonitoring(latestSite.identifier, monitor.id);
     };
     const handleCheckNow = () => {
-        checkSiteNow(latestSite.identifier, selectedMonitorType)
+        if (!monitor) return;
+        checkSiteNow(latestSite.identifier, monitor.id)
             .then(() =>
                 logger.user.action("Quick site check", {
                     identifier: latestSite.identifier,
-                    monitorType: selectedMonitorType,
+                    monitorId: monitor.id,
                 })
             )
             .catch((error) => logger.site.error(latestSite.identifier, error instanceof Error ? error : String(error)));
@@ -61,7 +64,7 @@ export function SiteCard({ site }: SiteCardProps) {
 
     const handleCardClick = () => {
         setSelectedSite(latestSite);
-        setSelectedMonitorType(latestSite.identifier, selectedMonitorType);
+        setSelectedMonitorId(latestSite.identifier, selectedMonitorId);
         setShowSiteDetails(true);
     };
 
@@ -89,13 +92,13 @@ export function SiteCard({ site }: SiteCardProps) {
                 <div className="flex items-center gap-2 min-w-[180px]">
                     <div onClick={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()}>
                         <ThemedSelect
-                            value={selectedMonitorType}
-                            onChange={handleMonitorTypeChange}
+                            value={selectedMonitorId}
+                            onChange={handleMonitorIdChange}
                             className="min-w-[80px]"
                         >
                             {latestSite.monitors.map((m) => (
-                                <option key={m.type} value={m.type}>
-                                    {m.type.toUpperCase()}
+                                <option key={m.id} value={m.id}>
+                                    {m.type.toUpperCase()} {m.port ? `:${m.port}` : m.url ? `: ${m.url}` : ''}
                                 </option>
                             ))}
                         </ThemedSelect>
@@ -144,7 +147,7 @@ export function SiteCard({ site }: SiteCardProps) {
             <div className="flex items-center gap-3">
                 <StatusIndicator status={status} size="sm" />
                 <ThemedText variant="secondary" size="sm">
-                    {selectedMonitorType.toUpperCase()} Status: {status}
+                    {selectedMonitorId.toUpperCase()} Status: {status}
                 </ThemedText>
             </div>
             <div className="grid grid-cols-4 gap-4 mb-4">
@@ -186,11 +189,13 @@ export function SiteCard({ site }: SiteCardProps) {
                     <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                             <ThemedText size="xs" variant="secondary">
-                                {selectedMonitorType === "http"
-                                    ? "HTTP History"
-                                    : selectedMonitorType === "port"
-                                      ? "Port History"
-                                      : "?"}
+                                {monitor
+                                    ? monitor.type === "http"
+                                        ? `HTTP History${monitor.url ? ` (${monitor.url})` : ""}`
+                                        : monitor.type === "port"
+                                            ? `Port History${monitor.port ? ` (${monitor.host}:${monitor.port})` : monitor.host ? ` (${monitor.host})` : ""}`
+                                            : `${monitor.type} History`
+                                    : "No Monitor Selected"}
                             </ThemedText>
                         </div>
                     </div>
