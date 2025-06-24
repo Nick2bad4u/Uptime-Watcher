@@ -26370,6 +26370,7 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
                     timestamp INTEGER,
                     status TEXT,
                     responseTime INTEGER,
+                    details TEXT, -- New: flexible details column
                     FOREIGN KEY(monitor_id) REFERENCES monitors(id)
                 );
             `);
@@ -26411,13 +26412,14 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
         const monitors = [];
         for (const row of monitorRows) {
           const historyRows = await this.db.all(
-            "SELECT timestamp, status, responseTime FROM history WHERE monitor_id = ? ORDER BY timestamp DESC",
+            "SELECT timestamp, status, responseTime, details FROM history WHERE monitor_id = ? ORDER BY timestamp DESC",
             [row.id]
           );
           const history = historyRows.map((h) => ({
             responseTime: typeof h.responseTime === "number" ? h.responseTime : Number(h.responseTime),
             status: h.status === "up" || h.status === "down" ? h.status : "down",
-            timestamp: typeof h.timestamp === "number" ? h.timestamp : Number(h.timestamp)
+            timestamp: typeof h.timestamp === "number" ? h.timestamp : Number(h.timestamp),
+            details: h.details != null ? String(h.details) : void 0
           }));
           monitors.push({
             checkInterval: typeof row.checkInterval === "number" ? row.checkInterval : row.checkInterval ? Number(row.checkInterval) : void 0,
@@ -26466,13 +26468,14 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
       const monitors = [];
       for (const row of monitorRows) {
         const historyRows = await this.db.all(
-          "SELECT timestamp, status, responseTime FROM history WHERE monitor_id = ? ORDER BY timestamp DESC",
+          "SELECT timestamp, status, responseTime, details FROM history WHERE monitor_id = ? ORDER BY timestamp DESC",
           [row.id]
         );
         const history = historyRows.map((h) => ({
           responseTime: typeof h.responseTime === "number" ? h.responseTime : Number(h.responseTime),
           status: h.status === "up" || h.status === "down" ? h.status : "down",
-          timestamp: typeof h.timestamp === "number" ? h.timestamp : Number(h.timestamp)
+          timestamp: typeof h.timestamp === "number" ? h.timestamp : Number(h.timestamp),
+          details: h.details != null ? String(h.details) : void 0
         }));
         monitors.push({
           checkInterval: typeof row.checkInterval === "number" ? row.checkInterval : row.checkInterval ? Number(row.checkInterval) : void 0,
@@ -26741,20 +26744,23 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
     const startTime = Date.now();
     let newStatus = "down";
     let responseTime = 0;
+    let details = null;
     try {
       if (monitor.type === "http") {
         if (!monitor.url) throw new Error("HTTP monitor missing URL");
-        await axios.get(monitor.url, {
+        const response = await axios.get(monitor.url, {
           timeout: DEFAULT_REQUEST_TIMEOUT,
           validateStatus: (status) => status < 500
         });
         responseTime = Date.now() - startTime;
         newStatus = "up";
+        details = response.status ? String(response.status) : null;
       } else if (monitor.type === "port") {
         if (!monitor.host || !monitor.port) throw new Error("Port monitor missing host or port");
         const available = await isPortReachable(monitor.port, { host: monitor.host });
         responseTime = Date.now() - startTime;
         newStatus = available ? "up" : "down";
+        details = monitor.port ? String(monitor.port) : null;
       }
     } catch (err) {
       responseTime = Date.now() - startTime;
@@ -26771,15 +26777,21 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
       status: newStatus,
       timestamp: now.getTime()
     };
+    if (monitor.type === "http") {
+      details = newStatus === "up" ? "200" : "0";
+    } else if (monitor.type === "port") {
+      details = monitor.port !== void 0 ? String(monitor.port) : null;
+    }
     try {
-      await this.db.run(`INSERT INTO history (monitor_id, timestamp, status, responseTime) VALUES (?, ?, ?, ?)`, [
+      await this.db.run(`INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)`, [
         monitor.id,
         historyEntry.timestamp,
         historyEntry.status,
-        historyEntry.responseTime
+        historyEntry.responseTime,
+        details
       ]);
       logger$1.info(
-        `[checkMonitor] Inserted history row: monitor_id=${monitor.id}, status=${historyEntry.status}, responseTime=${historyEntry.responseTime}, timestamp=${historyEntry.timestamp}`
+        `[checkMonitor] Inserted history row: monitor_id=${monitor.id}, status=${historyEntry.status}, responseTime=${historyEntry.responseTime}, timestamp=${historyEntry.timestamp}, details=${details}`
       );
     } catch (err) {
       logger$1.error(`[checkMonitor] Failed to insert history row: monitor_id=${monitor.id}`, err);
@@ -26973,12 +26985,13 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
             if (Array.isArray(monitor.history) && monitorId) {
               for (const h of monitor.history) {
                 await this.db.run(
-                  `INSERT INTO history (monitor_id, timestamp, status, responseTime) VALUES (?, ?, ?, ?)`,
+                  `INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)`,
                   [
                     monitorId,
                     h.timestamp,
                     h.status === "up" || h.status === "down" ? h.status : "down",
-                    h.responseTime
+                    h.responseTime,
+                    h.details ?? null
                   ]
                 );
               }

@@ -3,3 +3,9 @@ check new db location and calls
 check state mangement/improve for new calls/db?
 
 re-enable tslint plugins once cleared more bugs
+
+come up with new "site" ui by clicking site name in site card.
+ideally site overview would show all monitor statuses and charts, while clicking near
+the monitor will open the "monitor overiew" we already have.
+
+allow users to display more than 1 chart on the site card.

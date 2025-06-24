@@ -938,6 +938,18 @@ function HistoryTab({
         .filter((record: any) => historyFilter === "all" || record.status === historyFilter)
         .slice(0, historyLimit);
 
+    // Helper to render details with label
+    function renderDetails(record: any) {
+        if (!record.details) return null;
+        if (selectedMonitor.type === "port") {
+            return <ThemedText size="xs" variant="secondary" className="ml-4">Port: {record.details}</ThemedText>;
+        }
+        if (selectedMonitor.type === "http") {
+            return <ThemedText size="xs" variant="secondary" className="ml-4">Response Code: {record.details}</ThemedText>;
+        }
+        return <ThemedText size="xs" variant="secondary" className="ml-4">{record.details}</ThemedText>;
+    }
+
     return (
         <div className="space-y-6">
             {/* History Controls */}
@@ -1000,6 +1012,7 @@ function HistoryTab({
                                     <ThemedText size="xs" variant="secondary" className="ml-4">
                                         Check #{(selectedMonitor.history || []).length - index}
                                     </ThemedText>
+                                    {renderDetails(record)}
                                 </div>
                             </div>
                             <div className="text-right">
