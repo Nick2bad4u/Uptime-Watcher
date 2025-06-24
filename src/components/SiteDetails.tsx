@@ -309,7 +309,7 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                                     )}
                                     {/* Fallback if no monitor is available */}
                                     {!selectedMonitor && (
-                                        <ThemedText variant="warning" size="md">
+                                        <ThemedText variant="warning" size="base">
                                             No monitor data available for this site.
                                         </ThemedText>
                                     )}

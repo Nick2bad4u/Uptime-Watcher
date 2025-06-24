@@ -16,7 +16,11 @@
         "toml",
         "github-actions-workflow"
     ],
-    "files.exclude": {},
+    "files.exclude": {
+        ".husky": true,
+        "release": true,
+        "node_modules": true,
+    },
     "search.exclude": {
         "**/node_modules": true,
         "**/dist": true,
@@ -51,5 +55,6 @@
         "tabWidth": 3,
         "trailingComma": "none",
         "useTabs": false
-    }
+    },
+    "debug.defaultCompound": "Dev: Vite + Electron Main"
 }

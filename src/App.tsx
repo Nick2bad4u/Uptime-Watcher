@@ -1,16 +1,17 @@
+/* eslint-disable perfectionist/sort-objects */
 import { useEffect, useState } from "react";
-import { useStore } from "./store";
-import { UI_DELAYS } from "./constants";
-import { useTheme } from "./theme/useTheme";
-import { Header } from "./components/Header";
-import { SiteList } from "./components/SiteList";
+
 import { AddSiteForm } from "./components/AddSiteForm";
+import { Header } from "./components/Header";
 import { Settings } from "./components/Settings";
 import { SiteDetails } from "./components/SiteDetails";
-import { ThemeProvider, ThemedBox, ThemedText, ThemedButton } from "./theme/components";
-import { StatusUpdate } from "./types";
-import logger from "./services/logger";
+import { SiteList } from "./components/SiteList";
+import { UI_DELAYS } from "./constants";
 import { useBackendFocusSync } from "./hooks/useBackendFocusSync";
+import logger from "./services/logger";
+import { useStore } from "./store";
+import { ThemeProvider, ThemedBox, ThemedText, ThemedButton } from "./theme/components";
+import { useTheme } from "./theme/useTheme";
 
 function App() {
     const {
@@ -95,7 +96,7 @@ function App() {
                     <div className="loading-overlay">
                         <ThemedBox surface="elevated" padding="lg" rounded="lg" shadow="xl">
                             <div className="loading-content">
-                                <div className="loading-spinner"></div>
+                                <div className="loading-spinner" />
                                 <ThemedText size="base" weight="medium">
                                     Loading...
                                 </ThemedText>

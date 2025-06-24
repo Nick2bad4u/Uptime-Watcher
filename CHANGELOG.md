@@ -7,9 +7,63 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[b7385f3](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b7385f3983f14e2a79656e6e6736a9f9437578be)...
+[e6627ae](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e6627ae06b36ec4d73429f72be7a99949f65bc98)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/b7385f3983f14e2a79656e6e6736a9f9437578be...e6627ae06b36ec4d73429f72be7a99949f65bc98))
+
+
+### 🛠️ GitHub Actions
+
+- Update _config.yml [skip-ci] [`(e6627ae)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e6627ae06b36ec4d73429f72be7a99949f65bc98)
+
+
+- Update .mega-linter.yml [skip-ci] [`(e681f07)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e681f073dbf0f764b0642700ab480bd919d2c804)
+
+
+
+### 💼 Other
+
+- Update .markdownlintignore [skip-ci] [`(8e92aa5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8e92aa55e40da0aa48f986c8769d2e992b480df9)
+
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 2.4.0 [`(b7385f3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b7385f3983f14e2a79656e6e6736a9f9437578be)
+
+
+
+
+
+
+## [2.4.0] - 2025-06-24
+
+
 [[1e3bb29](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1e3bb2952ccdf397177c20cb3e3391884eaf3554)...
-[1e3bb29](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1e3bb2952ccdf397177c20cb3e3391884eaf3554)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/1e3bb2952ccdf397177c20cb3e3391884eaf3554...1e3bb2952ccdf397177c20cb3e3391884eaf3554))
+[776f214](https://github.com/Nick2bad4u/Uptime-Watcher/commit/776f214be3b319b60e31367766a78400c305cbc5)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/1e3bb2952ccdf397177c20cb3e3391884eaf3554...776f214be3b319b60e31367766a78400c305cbc5))
+
+
+### 💼 Other
+
+- Adds full-featured Electron+React frontend with per-site monitoring
+
+Introduces a React-based UI integrated with Electron, enabling per-site and per-monitor interval configuration, detailed site analytics, charting, and flexible theming. Implements robust IPC between renderer and main processes, persistent SQLite storage, direct backup/download, and advanced state management via Zustand. Improves developer experience with enhanced VSCode launch tasks, hot reload, and unified test/build workflow. Lays groundwork for future extensibility and improved monitoring reliability. [skip-ci] [`(776f214)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/776f214be3b319b60e31367766a78400c305cbc5)
+
+
+- Merge pull request #5 from Nick2bad4u/chore/prettier-fix [skip-ci]
+
+chore: format code with Prettier [`(4ff1e39)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4ff1e39350f371c1899530a9b0ec2d87626c109b)
+
+
+
+### ⚙️ Miscellaneous Tasks
+
+- Format code with Prettier [`(c24b09f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c24b09fc25fe4eb88036d470b5fa348b20c116ee)
+
+
+- Update changelogs for v2.3.0 [skip ci] [`(410aabd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/410aabd49731c2fa7b0a9f928b4703753045c028)
+
 
 
 ### 📦 Dependencies

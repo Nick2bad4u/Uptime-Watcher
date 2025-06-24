@@ -24,14 +24,35 @@
             "name": "Debug Electron Main Process",
             "type": "node",
             "request": "launch",
-            "program": "${workspaceFolder}/electron/main.ts",
+            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+            "args": ["${workspaceFolder}/dist-electron/main.js"],
             "console": "integratedTerminal",
             "skipFiles": ["<node_internals>/**"],
             "env": {
                 "NODE_ENV": "development"
             },
-            "preLaunchTask": "Start Vite Dev Server",
+            "preLaunchTask": "Build Electron Main (Dev)",
             "outFiles": ["${workspaceFolder}/dist-electron/**/*.js"]
+        },
+        {
+            "name": "Run Vite Dev Server",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run", "dev"],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "skipFiles": ["<node_internals>/**"]
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Dev: Vite + Electron Main",
+            "configurations": [
+                "Run Vite Dev Server",
+                "Debug Electron Main Process"
+            ],
+            "stopAll": true
         }
     ]
 }

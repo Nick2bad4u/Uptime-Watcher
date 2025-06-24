@@ -1,73 +1,61 @@
-import { useEffect, useState, useCallback } from "react";
-
-import { useStore } from "../store";
-import { themeManager } from "./ThemeManager";
-import { Theme, ThemeName } from "./types";
-
-export function useTheme() {
-    const { settings, updateSettings } = useStore();
-    const [systemTheme, setSystemTheme] = useState<"light" | "dark">("light");
-    const [themeVersion, setThemeVersion] = useState(0); // Force re-renders
-
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.useTheme = useTheme;
+exports.useThemeValue = useThemeValue;
+exports.useStatusColors = useStatusColors;
+exports.useThemeClasses = useThemeClasses;
+exports.useAvailabilityColors = useAvailabilityColors;
+const react_1 = require("react");
+const store_1 = require("../store");
+const ThemeManager_1 = require("./ThemeManager");
+function useTheme() {
+    const { settings, updateSettings } = (0, store_1.useStore)();
+    const [systemTheme, setSystemTheme] = (0, react_1.useState)("light");
+    const [themeVersion, setThemeVersion] = (0, react_1.useState)(0); // Force re-renders
     // Memoized getCurrentTheme to satisfy useEffect deps and avoid unnecessary re-renders
-    const getCurrentTheme = useCallback((): Theme => {
-        const themeName = settings.theme as ThemeName;
-        return themeManager.getTheme(themeName);
+    const getCurrentTheme = (0, react_1.useCallback)(() => {
+        const themeName = settings.theme;
+        return ThemeManager_1.themeManager.getTheme(themeName);
     }, [settings.theme]);
-
-    const [currentTheme, setCurrentTheme] = useState<Theme>(getCurrentTheme);
-
+    const [currentTheme, setCurrentTheme] = (0, react_1.useState)(getCurrentTheme);
     // Update theme when settings or systemTheme change
-    useEffect(() => {
+    (0, react_1.useEffect)(() => {
         const newTheme = getCurrentTheme();
         setCurrentTheme(newTheme);
-        themeManager.applyTheme(newTheme);
+        ThemeManager_1.themeManager.applyTheme(newTheme);
         setThemeVersion((prev) => prev + 1); // Force re-render of all themed components
     }, [settings.theme, systemTheme, getCurrentTheme]);
-
     // Listen for system theme changes
-    useEffect(() => {
-        const cleanup = themeManager.onSystemThemeChange((isDark) => {
+    (0, react_1.useEffect)(() => {
+        const cleanup = ThemeManager_1.themeManager.onSystemThemeChange((isDark) => {
             const newSystemTheme = isDark ? "dark" : "light";
             setSystemTheme(newSystemTheme);
         });
-
         // Set initial system theme
-        setSystemTheme(themeManager.getSystemThemePreference());
-
+        setSystemTheme(ThemeManager_1.themeManager.getSystemThemePreference());
         return cleanup;
     }, []);
-
     // Change theme
-    const setTheme = (themeName: ThemeName) => {
+    const setTheme = (themeName) => {
         updateSettings({ theme: themeName });
     };
-
     // Toggle between light and dark
     const toggleTheme = () => {
         const newTheme = currentTheme.isDark ? "light" : "dark";
         setTheme(newTheme);
     };
-
     // Get theme-aware color
-    const getColor = (path: string): string => {
+    const getColor = (path) => {
         const keys = path.split(".");
-        const value = keys.reduce<unknown>(
-            (acc, key) =>
-                acc && typeof acc === "object" && key in acc ? (acc as Record<string, unknown>)[key] : undefined,
-            currentTheme.colors
-        );
+        const value = keys.reduce((acc, key) => acc && typeof acc === "object" && key in acc ? acc[key] : undefined, currentTheme.colors);
         return typeof value === "string" ? value : "#000000";
     };
-
     // Get status color
-    const getStatusColor = (status: "up" | "down" | "pending" | "unknown"): string => {
+    const getStatusColor = (status) => {
         return currentTheme.colors.status[status];
     };
-
     // Get available themes
-    const availableThemes = themeManager.getAvailableThemes();
-
+    const availableThemes = ThemeManager_1.themeManager.getAvailableThemes();
     return {
         availableThemes,
         currentTheme,
@@ -76,23 +64,20 @@ export function useTheme() {
         isDark: currentTheme.isDark,
         setTheme,
         systemTheme,
-        themeManager,
-        themeName: settings.theme as ThemeName,
+        themeManager: ThemeManager_1.themeManager,
+        themeName: settings.theme,
         themeVersion, // Include for forcing re-renders
         toggleTheme,
     };
 }
-
 // Utility hook for getting theme values in components
-export function useThemeValue<T>(selector: (theme: Theme) => T): T {
+function useThemeValue(selector) {
     const { currentTheme } = useTheme();
     return selector(currentTheme);
 }
-
 // Hook for theme-aware status colors
-export function useStatusColors() {
+function useStatusColors() {
     const { currentTheme } = useTheme();
-
     return {
         down: currentTheme.colors.status.down,
         pending: currentTheme.colors.status.pending,
@@ -100,41 +85,34 @@ export function useStatusColors() {
         up: currentTheme.colors.status.up,
     };
 }
-
 // Hook for theme-aware CSS classes using CSS custom properties
-export function useThemeClasses() {
+function useThemeClasses() {
     const { getColor } = useTheme();
-
-    const getBackgroundClass = (variant: "primary" | "secondary" | "tertiary" = "primary") => {
+    const getBackgroundClass = (variant = "primary") => {
         return {
             backgroundColor: `var(--color-background-${variant})`,
         };
     };
-
-    const getTextClass = (variant: "primary" | "secondary" | "tertiary" | "inverse" = "primary") => {
+    const getTextClass = (variant = "primary") => {
         return {
             color: `var(--color-text-${variant})`,
         };
     };
-
-    const getBorderClass = (variant: "primary" | "secondary" | "focus" = "primary") => {
+    const getBorderClass = (variant = "primary") => {
         return {
             borderColor: `var(--color-border-${variant})`,
         };
     };
-
-    const getSurfaceClass = (variant: "base" | "elevated" | "overlay" = "base") => {
+    const getSurfaceClass = (variant = "base") => {
         return {
             backgroundColor: `var(--color-surface-${variant})`,
         };
     };
-
-    const getStatusClass = (status: "up" | "down" | "pending" | "unknown") => {
+    const getStatusClass = (status) => {
         return {
             color: `var(--color-status-${status})`,
         };
     };
-
     return {
         getBackgroundClass,
         getBorderClass,
@@ -144,65 +122,71 @@ export function useThemeClasses() {
         getTextClass,
     };
 }
-
 // Hook for availability-based colors
-export function useAvailabilityColors() {
+function useAvailabilityColors() {
     const { currentTheme } = useTheme();
-
-    const getAvailabilityColor = (percentage: number): string => {
+    const getAvailabilityColor = (percentage) => {
         // Clamp percentage between 0 and 100
         const clampedPercentage = Math.max(0, Math.min(100, percentage));
-
         // Use theme colors for consistency
         if (clampedPercentage >= 99) {
             return currentTheme.colors.status.up; // Excellent
-        } else if (clampedPercentage >= 95) {
+        }
+        else if (clampedPercentage >= 95) {
             return currentTheme.colors.success; // Very good
-        } else if (clampedPercentage >= 90) {
+        }
+        else if (clampedPercentage >= 90) {
             return currentTheme.colors.status.up; // Good
-        } else if (clampedPercentage >= 80) {
+        }
+        else if (clampedPercentage >= 80) {
             return currentTheme.colors.status.pending; // Fair (warning)
-        } else if (clampedPercentage >= 70) {
+        }
+        else if (clampedPercentage >= 70) {
             return currentTheme.colors.warning; // Warning
-        } else if (clampedPercentage >= 50) {
+        }
+        else if (clampedPercentage >= 50) {
             return currentTheme.colors.error; // Poor
-        } else {
+        }
+        else {
             return currentTheme.colors.status.down; // Critical
         }
     };
-
-    const getAvailabilityVariant = (percentage: number): "success" | "warning" | "danger" => {
+    const getAvailabilityVariant = (percentage) => {
         const clampedPercentage = Math.max(0, Math.min(100, percentage));
-
         if (clampedPercentage >= 95) {
             return "success";
-        } else if (clampedPercentage >= 80) {
+        }
+        else if (clampedPercentage >= 80) {
             return "warning";
-        } else {
+        }
+        else {
             return "danger";
         }
     };
-
-    const getAvailabilityDescription = (percentage: number): string => {
+    const getAvailabilityDescription = (percentage) => {
         const clampedPercentage = Math.max(0, Math.min(100, percentage));
-
         if (clampedPercentage >= 99.9) {
             return "Excellent";
-        } else if (clampedPercentage >= 99) {
+        }
+        else if (clampedPercentage >= 99) {
             return "Very Good";
-        } else if (clampedPercentage >= 95) {
+        }
+        else if (clampedPercentage >= 95) {
             return "Good";
-        } else if (clampedPercentage >= 90) {
+        }
+        else if (clampedPercentage >= 90) {
             return "Fair";
-        } else if (clampedPercentage >= 80) {
+        }
+        else if (clampedPercentage >= 80) {
             return "Poor";
-        } else if (clampedPercentage >= 50) {
+        }
+        else if (clampedPercentage >= 50) {
             return "Critical";
-        } else {
+        }
+        else {
             return "Failed";
         }
     };
-
     return {
         getAvailabilityColor,
         getAvailabilityDescription,
