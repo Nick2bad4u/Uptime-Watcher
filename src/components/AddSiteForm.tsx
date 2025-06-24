@@ -29,7 +29,7 @@ export function AddSiteForm() {
 
     // Delayed loading state for button spinner (100ms delay)
     const [showButtonLoading, setShowButtonLoading] = useState(false);
-    const [formError, setFormError] = useState<string | null>(null);
+    const [formError, setFormError] = useState<string | undefined>(undefined);
 
     useEffect(() => {
         let timeoutId: NodeJS.Timeout;
@@ -51,7 +51,7 @@ export function AddSiteForm() {
 
     // Reset fields when monitor type changes
     useEffect(() => {
-        setFormError(null);
+        setFormError(undefined);
         setTarget("");
         setHost("");
         setPort("");
@@ -65,12 +65,12 @@ export function AddSiteForm() {
         } else {
             setName("");
         }
-        setFormError(null);
+        setFormError(undefined);
     }, [addMode]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setFormError(null);
+        setFormError(undefined);
         if (addMode === "new" && !name.trim()) {
             setFormError("Site name is required");
             return;
@@ -331,7 +331,7 @@ export function AddSiteForm() {
                             size="xs"
                             onClick={() => {
                                 clearError();
-                                setFormError(null);
+                                setFormError(undefined);
                             }}
                             className={`error-alert__close ${isDark ? "dark" : ""}`}
                         >

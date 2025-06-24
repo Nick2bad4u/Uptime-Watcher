@@ -24,11 +24,11 @@ interface AppState {
     settings: AppSettings;
     // UI state
     showSettings: boolean;
-    selectedSiteId: string | null; // Store only the identifier
+    selectedSiteId: string | undefined; // Store only the identifier
     showSiteDetails: boolean;
 
     // Error handling
-    lastError: string | null;
+    lastError: string | undefined;
     isLoading: boolean;
 
     // Statistics
@@ -45,10 +45,10 @@ interface AppState {
 
     // Update status
     updateStatus: UpdateStatus;
-    updateError: string | null;
+    updateError: string | undefined;
 
     // Derived selector
-    getSelectedSite: () => Site | null;
+    getSelectedSite: () => Site | undefined;
 
     // Actions - Backend integration
     initializeApp: () => Promise<void>;
@@ -74,11 +74,11 @@ interface AppState {
     resetSettings: () => void;
 
     // Site details actions
-    setSelectedSite: (site: Site | null) => void;
+    setSelectedSite: (site: Site | undefined) => void;
     setShowSiteDetails: (show: boolean) => void;
 
     // Error handling actions
-    setError: (error: string | null) => void;
+    setError: (error: string | undefined) => void;
     setLoading: (loading: boolean) => void;
     clearError: () => void;
 
@@ -89,7 +89,7 @@ interface AppState {
 
     // Update status actions
     setUpdateStatus: (status: UpdateStatus) => void;
-    setUpdateError: (error: string | null) => void;
+    setUpdateError: (error: string | undefined) => void;
     // Update: apply downloaded update and restart
     applyUpdate: () => void;
     subscribeToStatusUpdates: (callback: (update: StatusUpdate) => void) => void;
@@ -126,11 +126,11 @@ export const useStore = create<AppState>()(
             darkMode: false,
             settings: defaultSettings,
             showSettings: false,
-            selectedSiteId: null,
+            selectedSiteId: undefined,
             showSiteDetails: false,
 
             // Error handling initial state
-            lastError: null,
+            lastError: undefined,
             isLoading: false,
 
             // Statistics initial state
@@ -147,13 +147,13 @@ export const useStore = create<AppState>()(
 
             // Update status initial state
             updateStatus: "idle",
-            updateError: null,
+            updateError: undefined,
 
             // Derived selector
             getSelectedSite: () => {
                 const { sites, selectedSiteId } = get();
-                if (!selectedSiteId) return null;
-                return sites.find((s) => s.identifier === selectedSiteId) || null;
+                if (!selectedSiteId) return undefined;
+                return sites.find((s) => s.identifier === selectedSiteId) || undefined;
             },
 
             // Backend integration actions
@@ -374,7 +374,7 @@ export const useStore = create<AppState>()(
                     selectedSiteId:
                         state.selectedSiteId &&
                         state.sites.find((s) => s.identifier === identifier && s.identifier === state.selectedSiteId)
-                            ? null
+                            ? undefined
                             : state.selectedSiteId,
                     showSiteDetails:
                         state.selectedSiteId &&
@@ -423,18 +423,18 @@ export const useStore = create<AppState>()(
                 }),
 
             // Site details actions
-            setSelectedSite: (site: Site | null) => {
-                set({ selectedSiteId: site ? site.identifier : null });
+            setSelectedSite: (site: Site | undefined) => {
+                set({ selectedSiteId: site ? site.identifier : undefined });
             },
 
             setShowSiteDetails: (show: boolean) => set({ showSiteDetails: show }),
 
             // Error handling actions
-            setError: (error: string | null) => set({ lastError: error }),
+            setError: (error: string | undefined) => set({ lastError: error }),
 
             setLoading: (loading: boolean) => set({ isLoading: loading }),
 
-            clearError: () => set({ lastError: null }),
+            clearError: () => set({ lastError: undefined }),
 
             // Synchronized UI actions
             setActiveSiteDetailsTab: (tab: string) => set({ activeSiteDetailsTab: tab }),
@@ -444,7 +444,7 @@ export const useStore = create<AppState>()(
 
             // Update status actions
             setUpdateStatus: (status: UpdateStatus) => set({ updateStatus: status }),
-            setUpdateError: (error: string | null) => set({ updateError: error }),
+            setUpdateError: (error: string | undefined) => set({ updateError: error }),
             // Update: apply downloaded update and restart
             applyUpdate: () => {
                 window.electronAPI.quitAndInstall?.();
