@@ -1,5 +1,5 @@
 DISABLE_LINTERS: []
-EXCLUDED_DIRECTORIES: [libs, tests, screenshots, node_modules, icons, docs]
+EXCLUDED_DIRECTORIES: [libs, tests, screenshots, node_modules, icons, docs, dist-electron]
 SHOW_ELAPSED_TIME: true
 GITHUB_STATUS_REPORTER: true
 FILEIO_REPORTER: true
