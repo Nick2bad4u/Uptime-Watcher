@@ -1,4 +1,21 @@
 {
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact",
+        "json",
+        "jsonc",
+        "yaml",
+        "yml",
+        "markdown",
+        "html",
+        "css",
+        "scss",
+        "less",
+        "toml",
+        "github-actions-workflow"
+    ],
     "files.exclude": {},
     "search.exclude": {
         "**/node_modules": true,

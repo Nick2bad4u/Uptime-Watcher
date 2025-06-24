@@ -88,3 +88,8 @@ export const CHART_TIME_PERIODS = {
     "7d": 7 * 24 * 60 * 60 * 1000,
     "30d": 30 * 24 * 60 * 60 * 1000,
 } as const;
+
+// Common ARIA attribute constants
+export const ARIA_LABEL = "aria-label";
+
+export const TRANSITION_ALL = "all 0.2s ease-in-out";

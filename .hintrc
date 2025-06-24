@@ -9,6 +9,6 @@
     "not ios_saf <= 15.8"
   ],
   "hints": {
-    "no-inline-styles": "warning"
+    "no-inline-styles": "off"
   }
 }

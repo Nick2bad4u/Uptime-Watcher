@@ -1,4 +1,6 @@
 import React from "react";
+
+import { ARIA_LABEL, TRANSITION_ALL } from "../constants";
 import { useTheme, useThemeClasses } from "../theme/useTheme";
 import { getStatusIcon } from "../utils/status";
 import { formatResponseTime } from "../utils/time";
@@ -31,18 +33,18 @@ interface ThemedBoxProps {
 }
 
 export function ThemedBox({
-    variant = "primary",
-    surface = "base",
-    padding = "md",
-    rounded = "md",
-    shadow,
     border = false,
+    children,
     className = "",
-    style = {},
     onClick,
     onMouseEnter,
     onMouseLeave,
-    children,
+    padding = "md",
+    rounded = "md",
+    shadow,
+    style = {},
+    surface = "base",
+    variant = "primary",
 }: ThemedBoxProps) {
     const classNames = [
         "themed-box",
@@ -81,13 +83,13 @@ interface ThemedTextProps {
 }
 
 export function ThemedText({
-    variant = "primary",
-    size = "base",
-    weight = "normal",
     align = "left",
-    className = "",
-    style = {},
     children,
+    className = "",
+    size = "base",
+    style = {},
+    variant = "primary",
+    weight = "normal",
 }: ThemedTextProps) {
     const classNames = [
         "themed-text",
@@ -161,20 +163,20 @@ function renderColoredIcon(icon: React.ReactNode, color?: string) {
 }
 
 export function ThemedButton({
-    variant = "primary",
-    size = "md",
-    type = "button",
+    children,
+    className = "",
     disabled = false,
-    loading = false,
     fullWidth = false,
     icon,
     iconColor,
     iconPosition = "left",
-    className = "",
+    loading = false,
+    onClick,
+    size = "md",
     style = {},
     title,
-    onClick,
-    children,
+    type = "button",
+    variant = "primary",
 }: ThemedButtonProps) {
     const classNames = [
         "themed-button",
@@ -191,12 +193,13 @@ export function ThemedButton({
         if (loading) {
             return (
                 <div className="themed-button__loading">
-                    <div className="themed-button__spinner"></div>
+                    <div className="themed-button__spinner" />
                     <span>{children}</span>
                 </div>
             );
         }
         if (icon) {
+            // eslint-disable-next-line functional/no-let -- we assign iconElement conditionally
             let iconElement: React.ReactNode;
             if (React.isValidElement(icon) && iconColor) {
                 iconElement = renderColoredIcon(icon, iconColor);
@@ -244,7 +247,7 @@ interface StatusIndicatorProps {
     className?: string;
 }
 
-export function StatusIndicator({ status, size = "md", showText = false, className = "" }: StatusIndicatorProps) {
+export function StatusIndicator({ className = "", showText = false, size = "md", status }: StatusIndicatorProps) {
     const { getStatusColor } = useTheme();
     const { currentTheme } = useTheme();
 
@@ -252,24 +255,24 @@ export function StatusIndicator({ status, size = "md", showText = false, classNa
         switch (size) {
             case "sm":
                 return {
-                    width: "8px",
-                    height: "8px",
                     fontSize: currentTheme.typography.fontSize.xs,
+                    height: "8px",
                     iconSize: "12px",
+                    width: "8px",
                 };
             case "md":
                 return {
-                    width: "12px",
-                    height: "12px",
                     fontSize: currentTheme.typography.fontSize.sm,
+                    height: "12px",
                     iconSize: "16px",
+                    width: "12px",
                 };
             case "lg":
                 return {
-                    width: "16px",
-                    height: "16px",
                     fontSize: currentTheme.typography.fontSize.base,
+                    height: "16px",
                     iconSize: "20px",
+                    width: "16px",
                 };
             default:
                 return { iconSize: "16px" };
@@ -279,35 +282,35 @@ export function StatusIndicator({ status, size = "md", showText = false, classNa
     const sizeStyles = getSizeStyles();
 
     const indicatorStyle: React.CSSProperties = {
-        width: sizeStyles.width,
-        height: sizeStyles.height,
+        animation: status === "pending" ? "pulse 1.5s ease-in-out infinite" : undefined,
         backgroundColor: getStatusColor(status),
         borderRadius: currentTheme.borderRadius.full,
-        position: "relative",
         boxShadow: `0 0 0 2px ${currentTheme.colors.background.primary}`,
-        animation: status === "pending" ? "pulse 1.5s ease-in-out infinite" : undefined,
+        height: sizeStyles.height,
+        position: "relative",
+        width: sizeStyles.width,
     };
 
     const iconStyle: React.CSSProperties = {
-        fontSize: sizeStyles.iconSize,
-        lineHeight: "1",
-        display: "flex",
         alignItems: "center",
+        display: "flex",
+        fontSize: sizeStyles.iconSize,
         justifyContent: "center",
+        lineHeight: "1",
     };
 
     const textStyle: React.CSSProperties = {
+        alignItems: "center",
         color: getStatusColor(status),
+        display: "flex",
         fontSize: sizeStyles.fontSize,
         fontWeight: currentTheme.typography.fontWeight.medium,
-        marginLeft: currentTheme.spacing.xs,
-        display: "flex",
-        alignItems: "center",
         gap: currentTheme.spacing.xs,
+        marginLeft: currentTheme.spacing.xs,
     };
 
     return (
-        <div className={`themed-status-indicator ${className}`} style={{ display: "flex", alignItems: "center" }}>
+        <div className={`themed-status-indicator ${className}`} style={{ alignItems: "center", display: "flex" }}>
             {showText ? (
                 <div style={iconStyle}>{getStatusIcon(status)}</div>
             ) : (
@@ -332,25 +335,26 @@ interface ThemedInputProps {
     max?: string | number;
     step?: string | number;
     className?: string;
+    // eslint-disable-next-line sonarjs/no-duplicate-string -- false positive due to matching ARIA_LABEL constant
     "aria-label"?: string;
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export function ThemedInput({
+    [ARIA_LABEL]: ariaLabel,
+    className = "",
+    disabled = false,
+    max,
+    min,
+    onChange,
+    placeholder,
+    required = false,
+    step,
     type = "text",
     value,
-    placeholder,
-    disabled = false,
-    required = false,
-    min,
-    max,
-    step,
-    className = "",
-    "aria-label": ariaLabel,
-    onChange,
 }: ThemedInputProps) {
     const { currentTheme } = useTheme();
-    const { getBackgroundClass, getTextClass, getBorderClass } = useThemeClasses();
+    const { getBackgroundClass, getBorderClass, getTextClass } = useThemeClasses();
 
     // Ensure value is always defined to prevent controlled/uncontrolled warnings
     const inputValue = value ?? "";
@@ -359,13 +363,13 @@ export function ThemedInput({
         ...getBackgroundClass("primary"),
         ...getTextClass("primary"),
         ...getBorderClass("primary"),
-        borderWidth: "1px",
-        borderStyle: "solid",
         borderRadius: currentTheme.borderRadius.md,
-        padding: `${currentTheme.spacing.sm} ${currentTheme.spacing.md}`,
-        width: "100%",
+        borderStyle: "solid",
+        borderWidth: "1px",
         fontSize: currentTheme.typography.fontSize.sm,
-        transition: "all 0.2s ease-in-out",
+        padding: `${currentTheme.spacing.sm} ${currentTheme.spacing.md}`,
+        transition: TRANSITION_ALL,
+        width: "100%",
     };
     return (
         <input
@@ -396,16 +400,16 @@ interface ThemedSelectProps {
 }
 
 export function ThemedSelect({
-    value,
-    disabled = false,
-    required = false,
-    className = "",
-    "aria-label": ariaLabel,
-    onChange,
+    [ARIA_LABEL]: ariaLabel,
     children,
+    className = "",
+    disabled = false,
+    onChange,
+    required = false,
+    value,
 }: ThemedSelectProps) {
     const { currentTheme } = useTheme();
-    const { getBackgroundClass, getTextClass, getBorderClass } = useThemeClasses();
+    const { getBackgroundClass, getBorderClass, getTextClass } = useThemeClasses();
 
     // Ensure value is always defined to prevent controlled/uncontrolled warnings
     const selectValue = value ?? "";
@@ -414,13 +418,13 @@ export function ThemedSelect({
         ...getBackgroundClass("primary"),
         ...getTextClass("primary"),
         ...getBorderClass("primary"),
-        borderWidth: "1px",
-        borderStyle: "solid",
         borderRadius: currentTheme.borderRadius.md,
-        padding: `${currentTheme.spacing.sm} ${currentTheme.spacing.md}`,
-        width: "100%",
+        borderStyle: "solid",
+        borderWidth: "1px",
         fontSize: currentTheme.typography.fontSize.sm,
-        transition: "all 0.2s ease-in-out",
+        padding: `${currentTheme.spacing.sm} ${currentTheme.spacing.md}`,
+        transition: TRANSITION_ALL,
+        width: "100%",
     };
     return (
         <select
@@ -447,12 +451,12 @@ interface ThemedCheckboxProps {
 }
 
 export function ThemedCheckbox({
+    [ARIA_LABEL]: ariaLabel,
     checked = false,
-    disabled = false,
-    required = false,
     className = "",
-    "aria-label": ariaLabel,
+    disabled = false,
     onChange,
+    required = false,
 }: ThemedCheckboxProps) {
     return (
         <input
@@ -474,15 +478,15 @@ interface MiniChartBarProps {
     className?: string;
 }
 
-export function MiniChartBar({ status, responseTime, timestamp, className = "" }: MiniChartBarProps) {
+export function MiniChartBar({ className = "", responseTime, status, timestamp }: MiniChartBarProps) {
     const { getStatusColor } = useTheme();
     const { currentTheme } = useTheme();
 
     const styles: React.CSSProperties = {
-        width: "8px",
-        height: "32px",
-        borderRadius: currentTheme.borderRadius.sm,
         backgroundColor: getStatusColor(status),
+        borderRadius: currentTheme.borderRadius.sm,
+        height: "32px",
+        width: "8px",
     };
     return (
         <div
@@ -508,15 +512,15 @@ interface ThemedIconButtonProps {
 }
 
 export function ThemedIconButton({
+    className = "",
+    disabled = false,
     icon,
     iconColor,
-    variant = "ghost",
-    size = "md",
-    disabled = false,
     loading = false,
-    tooltip,
-    className = "",
     onClick,
+    size = "md",
+    tooltip,
+    variant = "ghost",
 }: ThemedIconButtonProps) {
     const getSize = () => {
         switch (size) {
@@ -546,10 +550,10 @@ export function ThemedIconButton({
             icon={icon}
             iconColor={iconColor}
             style={{
-                width: buttonSize,
                 height: buttonSize,
-                padding: "0",
                 minWidth: "unset",
+                padding: "0",
+                width: buttonSize,
             }}
             title={tooltip}
         />
@@ -575,29 +579,29 @@ interface ThemedCardProps {
 }
 
 export function ThemedCard({
-    title,
-    subtitle,
+    children,
+    className = "",
+    clickable = false,
+    hoverable = false,
     icon,
     iconColor,
-    variant = "primary",
-    padding = "lg",
-    rounded = "lg",
-    shadow = "md",
-    hoverable = false,
-    clickable = false,
-    className = "",
     onClick,
     onMouseEnter,
     onMouseLeave,
-    children,
+    padding = "lg",
+    rounded = "lg",
+    shadow = "md",
+    subtitle,
+    title,
+    variant = "primary",
 }: ThemedCardProps) {
     const { currentTheme } = useTheme();
 
     const cardStyles: React.CSSProperties = {
-        transition: "all 0.2s ease-in-out",
         cursor: clickable ? "pointer" : "default",
-        position: "relative",
         overflow: "hidden",
+        position: "relative",
+        transition: TRANSITION_ALL,
     };
 
     return (
@@ -617,8 +621,8 @@ export function ThemedCard({
                 <div
                     className="themed-card__header"
                     style={{
-                        display: "flex",
                         alignItems: "center",
+                        display: "flex",
                         gap: currentTheme.spacing.md,
                         marginBottom: currentTheme.spacing.md,
                     }}
@@ -626,10 +630,10 @@ export function ThemedCard({
                     {icon && (
                         <span
                             style={{
+                                alignItems: "center",
+                                display: "flex",
                                 fontSize: "1.5em",
                                 lineHeight: "1",
-                                display: "flex",
-                                alignItems: "center",
                             }}
                         >
                             {renderColoredIcon(icon, iconColor || "primary")}
@@ -664,12 +668,12 @@ interface ThemedBadgeProps {
 }
 
 export function ThemedBadge({
-    variant = "primary",
-    size = "sm",
+    children,
+    className = "",
     icon,
     iconColor,
-    className = "",
-    children,
+    size = "sm",
+    variant = "primary",
 }: ThemedBadgeProps) {
     const { currentTheme } = useTheme();
 
@@ -678,38 +682,38 @@ export function ThemedBadge({
             case "primary":
                 return {
                     backgroundColor: currentTheme.colors.primary[100],
-                    color: currentTheme.colors.primary[700],
                     borderColor: currentTheme.colors.primary[200],
+                    color: currentTheme.colors.primary[700],
                 };
             case "secondary":
                 return {
                     backgroundColor: currentTheme.colors.background.secondary,
-                    color: currentTheme.colors.text.secondary,
                     borderColor: currentTheme.colors.border.secondary,
+                    color: currentTheme.colors.text.secondary,
                 };
             case "success":
                 return {
                     backgroundColor: `${currentTheme.colors.success}20`,
-                    color: currentTheme.colors.success,
                     borderColor: `${currentTheme.colors.success}40`,
+                    color: currentTheme.colors.success,
                 };
             case "warning":
                 return {
                     backgroundColor: `${currentTheme.colors.warning}20`,
-                    color: currentTheme.colors.warning,
                     borderColor: `${currentTheme.colors.warning}40`,
+                    color: currentTheme.colors.warning,
                 };
             case "error":
                 return {
                     backgroundColor: `${currentTheme.colors.error}20`,
-                    color: currentTheme.colors.error,
                     borderColor: `${currentTheme.colors.error}40`,
+                    color: currentTheme.colors.error,
                 };
             case "info":
                 return {
                     backgroundColor: `${currentTheme.colors.primary[500]}20`,
-                    color: currentTheme.colors.primary[600],
                     borderColor: `${currentTheme.colors.primary[500]}40`,
+                    color: currentTheme.colors.primary[600],
                 };
             default:
                 return {};
@@ -720,18 +724,18 @@ export function ThemedBadge({
         switch (size) {
             case "xs":
                 return {
-                    padding: `${currentTheme.spacing.xs} ${currentTheme.spacing.sm}`,
                     fontSize: currentTheme.typography.fontSize.xs,
+                    padding: `${currentTheme.spacing.xs} ${currentTheme.spacing.sm}`,
                 };
             case "sm":
                 return {
-                    padding: `${currentTheme.spacing.sm} ${currentTheme.spacing.md}`,
                     fontSize: currentTheme.typography.fontSize.sm,
+                    padding: `${currentTheme.spacing.sm} ${currentTheme.spacing.md}`,
                 };
             case "md":
                 return {
-                    padding: `${currentTheme.spacing.md} ${currentTheme.spacing.lg}`,
                     fontSize: currentTheme.typography.fontSize.base,
+                    padding: `${currentTheme.spacing.md} ${currentTheme.spacing.lg}`,
                 };
             default:
                 return {};
@@ -741,13 +745,13 @@ export function ThemedBadge({
     const badgeStyles: React.CSSProperties = {
         ...getVariantStyles(),
         ...getSizeStyles(),
-        display: "inline-flex",
         alignItems: "center",
-        gap: currentTheme.spacing.xs,
         borderRadius: currentTheme.borderRadius.full,
-        borderWidth: "1px",
         borderStyle: "solid",
+        borderWidth: "1px",
+        display: "inline-flex",
         fontWeight: currentTheme.typography.fontWeight.medium,
+        gap: currentTheme.spacing.xs,
         lineHeight: "1",
         whiteSpace: "nowrap",
     };
@@ -778,13 +782,13 @@ interface ThemedProgressProps {
 }
 
 export function ThemedProgress({
-    value,
-    max = 100,
-    variant = "primary",
-    size = "md",
-    showLabel = false,
-    label,
     className = "",
+    label,
+    max = 100,
+    showLabel = false,
+    size = "md",
+    value,
+    variant = "primary",
 }: ThemedProgressProps) {
     const { currentTheme } = useTheme();
 
@@ -821,20 +825,20 @@ export function ThemedProgress({
     };
 
     const containerStyles: React.CSSProperties = {
-        width: "100%",
-        height: getHeight(),
         backgroundColor: currentTheme.colors.background.secondary,
         borderRadius: currentTheme.borderRadius.full,
+        height: getHeight(),
         overflow: "hidden",
         position: "relative",
+        width: "100%",
     };
 
     const progressStyles: React.CSSProperties = {
-        height: "100%",
-        width: `${percentage}%`,
         backgroundColor: getVariantColor(),
         borderRadius: currentTheme.borderRadius.full,
+        height: "100%",
         transition: "width 0.3s ease-in-out",
+        width: `${percentage}%`,
     };
 
     return (
@@ -842,9 +846,9 @@ export function ThemedProgress({
             {(showLabel || label) && (
                 <div
                     style={{
+                        alignItems: "center",
                         display: "flex",
                         justifyContent: "space-between",
-                        alignItems: "center",
                         marginBottom: currentTheme.spacing.xs,
                     }}
                 >
@@ -874,7 +878,7 @@ interface ThemedTooltipProps {
     children: React.ReactNode;
 }
 
-export function ThemedTooltip({ content, className = "", children }: ThemedTooltipProps) {
+export function ThemedTooltip({ children, className = "", content }: ThemedTooltipProps) {
     return (
         <div className={`themed-tooltip ${className}`} title={content}>
             {children}
