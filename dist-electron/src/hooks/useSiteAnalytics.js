@@ -38,7 +38,7 @@ function useSiteAnalytics(monitor, timeRange = "24h") {
         const p99 = getPercentile(0.99);
         // Calculate downtime periods
         const downtimePeriods = [];
-        let currentDowntime = null;
+        let currentDowntime = undefined;
         // Process in reverse chronological order for proper downtime calculation
         for (const record of [...filteredHistory].reverse()) {
             if (record.status === "down") {
@@ -56,7 +56,7 @@ function useSiteAnalytics(monitor, timeRange = "24h") {
             else if (currentDowntime) {
                 currentDowntime.duration = currentDowntime.end - currentDowntime.start;
                 downtimePeriods.push(currentDowntime);
-                currentDowntime = null;
+                currentDowntime = undefined;
             }
         }
         // Handle ongoing downtime

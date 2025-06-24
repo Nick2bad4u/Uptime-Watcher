@@ -165,9 +165,9 @@ function SiteDetails({ site, onClose }) {
         await updateSiteCheckInterval(currentSite.identifier, selectedMonitorId, localCheckInterval);
         setIntervalChanged(false);
     };
-    // Only return null after all hooks
+    // Only return undefined after all hooks
     if (!sites.find((s) => s.identifier === site.identifier))
-        return null;
+        return undefined;
     return ((0, jsx_runtime_1.jsx)("div", { className: "site-details-modal", onClick: onClose, children: (0, jsx_runtime_1.jsx)("div", { onClick: (e) => e.stopPropagation(), children: (0, jsx_runtime_1.jsxs)(components_1.ThemedBox, { surface: "overlay", padding: "lg", rounded: "lg", shadow: "xl", className: "site-details-content overflow-hidden animate-scale-in", children: [(0, jsx_runtime_1.jsxs)("div", { className: "site-details-header", children: [(0, jsx_runtime_1.jsx)("div", { className: "site-details-header-overlay" }), (0, jsx_runtime_1.jsxs)("div", { className: "site-details-header-content", children: [(0, jsx_runtime_1.jsx)("div", { className: "site-details-header-accent" }), (0, jsx_runtime_1.jsxs)("div", { className: "site-details-header-info flex items-center gap-4", children: [(0, jsx_runtime_1.jsx)(ScreenshotThumbnail, { url: selectedMonitor?.type === "http" ? (selectedMonitor?.url ?? "") : "", siteName: currentSite.name || currentSite.identifier }), (0, jsx_runtime_1.jsxs)("div", { className: "site-details-status-indicator", children: [(0, jsx_runtime_1.jsx)(components_1.StatusIndicator, { status: selectedMonitor?.status ?? "unknown", size: "lg" }), isRefreshing && ((0, jsx_runtime_1.jsx)("div", { className: "site-details-loading-spinner", children: (0, jsx_runtime_1.jsx)("div", { className: "site-details-spinner" }) }))] }), (0, jsx_runtime_1.jsxs)("div", { className: "flex-1 min-w-0", children: [(0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "2xl", weight: "bold", className: "site-details-title truncate", children: site.name || site.identifier }), selectedMonitor?.type === "http" && selectedMonitor?.url && ((0, jsx_runtime_1.jsx)("a", { href: selectedMonitor.url, className: "site-details-url truncate", target: "_blank", rel: "noopener noreferrer", tabIndex: 0, "aria-label": `Open ${selectedMonitor.url} in browser`, onClick: (e) => {
                                                             e.preventDefault();
                                                             const url = selectedMonitor.url || "";
@@ -245,7 +245,7 @@ function HistoryTab({ selectedMonitor, formatResponseTime, formatFullTimestamp, 
     // Helper to render details with label
     function renderDetails(record) {
         if (!record.details)
-            return null;
+            return undefined;
         if (selectedMonitor.type === "port") {
             return (0, jsx_runtime_1.jsxs)(components_1.ThemedText, { size: "xs", variant: "secondary", className: "ml-4", children: ["Port: ", record.details] });
         }
