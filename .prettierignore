@@ -5,11 +5,11 @@ libs/
 node_modules/
 
 # Ignore other common folders that shouldn't be formatted
-dist/
 build/
 coverage/
 *.min.js
 *.min.css
+dist/
 dist-electron/
 
 # Ignore Change Logs
@@ -18,3 +18,5 @@ dist-electron/
 # Ignore package in electron-app
 electron-app/package.json
 electron-app/package-lock.json
+package-lock.json
+package.json
