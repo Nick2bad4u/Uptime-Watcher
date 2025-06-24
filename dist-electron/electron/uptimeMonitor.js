@@ -1,28 +1,34 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.UptimeMonitor = void 0;
 /* eslint-disable perfectionist/sort-imports */
-import { EventEmitter } from "events";
-import path from "path";
-import axios from "axios";
-import { app } from "electron";
-import log from "electron-log/main";
-import isPortReachable from "is-port-reachable";
-import { Database } from "node-sqlite3-wasm";
+const events_1 = require("events");
+const path_1 = __importDefault(require("path"));
+const axios_1 = __importDefault(require("axios"));
+const electron_1 = require("electron");
+const main_1 = __importDefault(require("electron-log/main"));
+const is_port_reachable_1 = __importDefault(require("is-port-reachable"));
+const node_sqlite3_wasm_1 = require("node-sqlite3-wasm");
 // Default timeout for HTTP requests (10 seconds)
 const DEFAULT_REQUEST_TIMEOUT = 10000;
 // Configure logger for uptime monitor
 const logger = {
-    debug: (message, ...args) => log.debug(`[MONITOR] ${message}`, ...args),
+    debug: (message, ...args) => main_1.default.debug(`[MONITOR] ${message}`, ...args),
     error: (message, error, ...args) => {
         if (error instanceof Error) {
-            log.error(`[MONITOR] ${message}`, { message: error.message, stack: error.stack }, ...args);
+            main_1.default.error(`[MONITOR] ${message}`, { message: error.message, stack: error.stack }, ...args);
         }
         else {
-            log.error(`[MONITOR] ${message}`, error, ...args);
+            main_1.default.error(`[MONITOR] ${message}`, error, ...args);
         }
     },
-    info: (message, ...args) => log.info(`[MONITOR] ${message}`, ...args),
-    warn: (message, ...args) => log.warn(`[MONITOR] ${message}`, ...args),
+    info: (message, ...args) => main_1.default.info(`[MONITOR] ${message}`, ...args),
+    warn: (message, ...args) => main_1.default.warn(`[MONITOR] ${message}`, ...args),
 };
-export class UptimeMonitor extends EventEmitter {
+class UptimeMonitor extends events_1.EventEmitter {
     constructor() {
         super();
         Object.defineProperty(this, "db", {
@@ -97,9 +103,9 @@ export class UptimeMonitor extends EventEmitter {
     }
     async initDatabase() {
         try {
-            const dbPath = path.join(app.getPath("userData"), "uptime-watcher.sqlite");
+            const dbPath = path_1.default.join(electron_1.app.getPath("userData"), "uptime-watcher.sqlite");
             logger.info(`[initDatabase] Using SQLite DB at: ${dbPath}`);
-            this.db = new Database(dbPath);
+            this.db = new node_sqlite3_wasm_1.Database(dbPath);
             // Create tables if they don't exist
             await this.db.run(`
                 CREATE TABLE IF NOT EXISTS sites (
@@ -554,7 +560,7 @@ export class UptimeMonitor extends EventEmitter {
             if (monitor.type === "http") {
                 if (!monitor.url)
                     throw new Error("HTTP monitor missing URL");
-                const response = await axios.get(monitor.url, {
+                const response = await axios_1.default.get(monitor.url, {
                     timeout: DEFAULT_REQUEST_TIMEOUT,
                     validateStatus: (status) => status < 500,
                 });
@@ -565,7 +571,7 @@ export class UptimeMonitor extends EventEmitter {
             else if (monitor.type === "port") {
                 if (!monitor.host || !monitor.port)
                     throw new Error("Port monitor missing host or port");
-                const available = await isPortReachable(monitor.port, { host: monitor.host });
+                const available = await (0, is_port_reachable_1.default)(monitor.port, { host: monitor.host });
                 responseTime = Date.now() - startTime;
                 newStatus = available ? "up" : "down";
                 details = monitor.port ? String(monitor.port) : null;
@@ -846,3 +852,4 @@ export class UptimeMonitor extends EventEmitter {
         }
     }
 }
+exports.UptimeMonitor = UptimeMonitor;

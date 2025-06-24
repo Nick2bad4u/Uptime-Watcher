@@ -1,30 +1,35 @@
-import { app, BrowserWindow, ipcMain, Notification } from "electron";
-import { autoUpdater } from "electron-updater";
-import path from "path";
-import { isDev } from "./utils";
-import { UptimeMonitor } from "./uptimeMonitor";
-import log from "electron-log/main";
-import fs from "fs";
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const electron_1 = require("electron");
+const electron_updater_1 = require("electron-updater");
+const path_1 = __importDefault(require("path"));
+const utils_1 = require("./utils");
+const uptimeMonitor_1 = require("./uptimeMonitor");
+const main_1 = __importDefault(require("electron-log/main"));
+const fs_1 = __importDefault(require("fs"));
 // Configure electron-log for main process
-log.initialize({ preload: true });
-log.transports.file.level = "info";
-log.transports.console.level = "debug";
-log.transports.file.fileName = "uptime-watcher-main.log";
-log.transports.file.maxSize = 1024 * 1024 * 5; // 5MB max file size
-log.transports.file.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}";
-log.transports.console.format = "[{h}:{i}:{s}.{ms}] [{level}] {text}";
+main_1.default.initialize({ preload: true });
+main_1.default.transports.file.level = "info";
+main_1.default.transports.console.level = "debug";
+main_1.default.transports.file.fileName = "uptime-watcher-main.log";
+main_1.default.transports.file.maxSize = 1024 * 1024 * 5; // 5MB max file size
+main_1.default.transports.file.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}";
+main_1.default.transports.console.format = "[{h}:{i}:{s}.{ms}] [{level}] {text}";
 const logger = {
-    info: (message, ...args) => log.info(`[MAIN] ${message}`, ...args),
+    info: (message, ...args) => main_1.default.info(`[MAIN] ${message}`, ...args),
     error: (message, error, ...args) => {
         if (error instanceof Error) {
-            log.error(`[MAIN] ${message}`, { message: error.message, stack: error.stack }, ...args);
+            main_1.default.error(`[MAIN] ${message}`, { message: error.message, stack: error.stack }, ...args);
         }
         else {
-            log.error(`[MAIN] ${message}`, error, ...args);
+            main_1.default.error(`[MAIN] ${message}`, error, ...args);
         }
     },
-    debug: (message, ...args) => log.debug(`[MAIN] ${message}`, ...args),
-    warn: (message, ...args) => log.warn(`[MAIN] ${message}`, ...args),
+    debug: (message, ...args) => main_1.default.debug(`[MAIN] ${message}`, ...args),
+    warn: (message, ...args) => main_1.default.warn(`[MAIN] ${message}`, ...args),
 };
 class Main {
     constructor() {
@@ -40,28 +45,28 @@ class Main {
             writable: true,
             value: void 0
         });
-        this.uptimeMonitor = new UptimeMonitor();
+        this.uptimeMonitor = new uptimeMonitor_1.UptimeMonitor();
         this.setupApp();
         this.setupIPC();
     }
     setupApp() {
         logger.info("Setting up Electron app");
-        app.on("ready", () => {
+        electron_1.app.on("ready", () => {
             logger.info("App ready, creating main window");
             this.createMainWindow();
             // Start auto-updater after window is created
             this.setupAutoUpdater();
         });
-        app.on("window-all-closed", () => {
+        electron_1.app.on("window-all-closed", () => {
             logger.info("All windows closed");
             if (process.platform !== "darwin") {
                 logger.info("Quitting app (non-macOS)");
-                app.quit();
+                electron_1.app.quit();
             }
         });
-        app.on("activate", () => {
+        electron_1.app.on("activate", () => {
             logger.info("App activated");
-            if (BrowserWindow.getAllWindows().length === 0) {
+            if (electron_1.BrowserWindow.getAllWindows().length === 0) {
                 logger.info("No windows open, creating main window");
                 this.createMainWindow();
             }
@@ -69,7 +74,7 @@ class Main {
     }
     createMainWindow() {
         logger.info("Creating main window");
-        this.mainWindow = new BrowserWindow({
+        this.mainWindow = new electron_1.BrowserWindow({
             width: 1200,
             height: 800,
             minWidth: 800,
@@ -77,20 +82,20 @@ class Main {
             webPreferences: {
                 nodeIntegration: false,
                 contextIsolation: true,
-                preload: path.join(__dirname, "preload.js"),
+                preload: path_1.default.join(__dirname, "preload.js"),
             },
             titleBarStyle: "default",
             show: false,
         });
         // Load the app
-        if (isDev()) {
+        if ((0, utils_1.isDev)()) {
             logger.debug("Development mode: loading from localhost");
             this.mainWindow.loadURL("http://localhost:5173");
             this.mainWindow.webContents.openDevTools();
         }
         else {
             logger.debug("Production mode: loading from dist");
-            this.mainWindow.loadFile(path.join(__dirname, "../dist/index.html"));
+            this.mainWindow.loadFile(path_1.default.join(__dirname, "../dist/index.html"));
         }
         this.mainWindow.once("ready-to-show", () => {
             logger.info("Main window ready to show");
@@ -103,52 +108,52 @@ class Main {
     }
     setupIPC() {
         // Site management
-        ipcMain.handle("add-site", async (_, site) => {
+        electron_1.ipcMain.handle("add-site", async (_, site) => {
             return this.uptimeMonitor.addSite(site);
         });
-        ipcMain.handle("remove-site", async (_, identifier) => {
+        electron_1.ipcMain.handle("remove-site", async (_, identifier) => {
             return this.uptimeMonitor.removeSite(identifier);
         });
-        ipcMain.handle("get-sites", async () => {
+        electron_1.ipcMain.handle("get-sites", async () => {
             return this.uptimeMonitor.getSites();
         });
-        ipcMain.handle("update-history-limit", async (_, limit) => {
+        electron_1.ipcMain.handle("update-history-limit", async (_, limit) => {
             return this.uptimeMonitor.setHistoryLimit(limit);
         });
-        ipcMain.handle("get-history-limit", async () => {
+        electron_1.ipcMain.handle("get-history-limit", async () => {
             return this.uptimeMonitor.getHistoryLimit();
         });
-        ipcMain.handle("start-monitoring", async () => {
+        electron_1.ipcMain.handle("start-monitoring", async () => {
             this.uptimeMonitor.startMonitoring();
             return true;
         });
-        ipcMain.handle("stop-monitoring", async () => {
+        electron_1.ipcMain.handle("stop-monitoring", async () => {
             this.uptimeMonitor.stopMonitoring();
             return true;
         });
-        ipcMain.handle("check-site-now", async (_, identifier, monitorType) => {
+        electron_1.ipcMain.handle("check-site-now", async (_, identifier, monitorType) => {
             return this.uptimeMonitor.checkSiteManually(identifier, monitorType);
         });
-        ipcMain.handle("export-data", async () => {
+        electron_1.ipcMain.handle("export-data", async () => {
             return this.uptimeMonitor.exportData();
         });
-        ipcMain.handle("import-data", async (_, data) => {
+        electron_1.ipcMain.handle("import-data", async (_, data) => {
             return this.uptimeMonitor.importData(data);
         });
-        ipcMain.handle("update-site", async (_, identifier, updates) => {
+        electron_1.ipcMain.handle("update-site", async (_, identifier, updates) => {
             return this.uptimeMonitor.updateSite(identifier, updates);
         });
-        ipcMain.handle("start-monitoring-for-site", async (_, identifier, monitorType) => {
+        electron_1.ipcMain.handle("start-monitoring-for-site", async (_, identifier, monitorType) => {
             return this.uptimeMonitor.startMonitoringForSite(identifier, monitorType);
         });
-        ipcMain.handle("stop-monitoring-for-site", async (_, identifier, monitorType) => {
+        electron_1.ipcMain.handle("stop-monitoring-for-site", async (_, identifier, monitorType) => {
             return this.uptimeMonitor.stopMonitoringForSite(identifier, monitorType);
         });
         // Direct SQLite backup download
-        const dbPath = path.join(app.getPath("userData"), "uptime-watcher.sqlite");
-        ipcMain.handle("download-sqlite-backup", async () => {
+        const dbPath = path_1.default.join(electron_1.app.getPath("userData"), "uptime-watcher.sqlite");
+        electron_1.ipcMain.handle("download-sqlite-backup", async () => {
             try {
-                const buffer = fs.readFileSync(dbPath);
+                const buffer = fs_1.default.readFileSync(dbPath);
                 return {
                     buffer,
                     fileName: "uptime-watcher-backup.sqlite",
@@ -170,8 +175,8 @@ class Main {
         });
         this.uptimeMonitor.on("site-monitor-down", ({ site, monitorType }) => {
             logger.warn(`Monitor down alert: ${site.name || site.identifier} [${monitorType}]`);
-            if (Notification.isSupported()) {
-                new Notification({
+            if (electron_1.Notification.isSupported()) {
+                new electron_1.Notification({
                     title: "Monitor Down Alert",
                     body: `${site.name || site.identifier} (${monitorType}) is currently down!`,
                     urgency: "critical",
@@ -184,8 +189,8 @@ class Main {
         });
         this.uptimeMonitor.on("site-monitor-up", ({ site, monitorType }) => {
             logger.info(`Monitor restored: ${site.name || site.identifier} [${monitorType}]`);
-            if (Notification.isSupported()) {
-                new Notification({
+            if (electron_1.Notification.isSupported()) {
+                new electron_1.Notification({
                     title: "Monitor Restored",
                     body: `${site.name || site.identifier} (${monitorType}) is back online!`,
                     urgency: "normal",
@@ -196,32 +201,32 @@ class Main {
                 logger.warn("Notifications not supported on this platform");
             }
         });
-        ipcMain.on("quit-and-install", () => {
-            autoUpdater.quitAndInstall();
+        electron_1.ipcMain.on("quit-and-install", () => {
+            electron_updater_1.autoUpdater.quitAndInstall();
         });
     }
     setupAutoUpdater() {
         if (!this.mainWindow)
             return;
-        autoUpdater.on("checking-for-update", () => {
+        electron_updater_1.autoUpdater.on("checking-for-update", () => {
             this.mainWindow?.webContents.send("update-status", { status: "checking" });
         });
-        autoUpdater.on("update-available", () => {
+        electron_updater_1.autoUpdater.on("update-available", () => {
             this.mainWindow?.webContents.send("update-status", { status: "available" });
         });
-        autoUpdater.on("update-not-available", () => {
+        electron_updater_1.autoUpdater.on("update-not-available", () => {
             this.mainWindow?.webContents.send("update-status", { status: "idle" });
         });
-        autoUpdater.on("download-progress", () => {
+        electron_updater_1.autoUpdater.on("download-progress", () => {
             this.mainWindow?.webContents.send("update-status", { status: "downloading" });
         });
-        autoUpdater.on("update-downloaded", () => {
+        electron_updater_1.autoUpdater.on("update-downloaded", () => {
             this.mainWindow?.webContents.send("update-status", { status: "downloaded" });
         });
-        autoUpdater.on("error", (err) => {
+        electron_updater_1.autoUpdater.on("error", (err) => {
             this.mainWindow?.webContents.send("update-status", { status: "error", error: err?.message || String(err) });
         });
-        autoUpdater.checkForUpdatesAndNotify();
+        electron_updater_1.autoUpdater.checkForUpdatesAndNotify();
     }
 }
 new Main();

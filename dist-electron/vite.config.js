@@ -1,10 +1,15 @@
-import path from "path";
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const path_1 = __importDefault(require("path"));
 // eslint-disable-next-line perfectionist/sort-imports
-import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
-import electron from "vite-plugin-electron";
-import { viteStaticCopy } from "vite-plugin-static-copy";
-export default defineConfig({
+const plugin_react_1 = __importDefault(require("@vitejs/plugin-react"));
+const vite_1 = require("vite");
+const vite_plugin_electron_1 = __importDefault(require("vite-plugin-electron"));
+const vite_plugin_static_copy_1 = require("vite-plugin-static-copy");
+exports.default = (0, vite_1.defineConfig)({
     base: "./", // Ensures relative asset paths for Electron
     build: {
         emptyOutDir: true, // Clean output before build
@@ -18,8 +23,8 @@ export default defineConfig({
         target: "esnext", // Modern output for Electron
     },
     plugins: [
-        react(),
-        electron([
+        (0, plugin_react_1.default)(),
+        (0, vite_plugin_electron_1.default)([
             {
                 entry: "electron/main.ts",
                 onstart(options) {
@@ -43,12 +48,9 @@ export default defineConfig({
                 },
             },
         ]),
-        viteStaticCopy({
+        (0, vite_plugin_static_copy_1.viteStaticCopy)({
             targets: [
-                {
-                    dest: "", // Copies to dist/
-                    src: "node_modules/node-sqlite3-wasm/dist/node-sqlite3-wasm.wasm",
-                },
+                // Remove copy to dist/ (frontend) - only needed in dist-electron/
                 {
                     dest: "../dist-electron", // Copies to dist-electron/
                     src: "node_modules/node-sqlite3-wasm/dist/node-sqlite3-wasm.wasm",
@@ -58,7 +60,7 @@ export default defineConfig({
     ],
     resolve: {
         alias: {
-            "@": path.resolve(__dirname, "src"),
+            "@": path_1.default.resolve(__dirname, "src"),
         },
     },
     server: {

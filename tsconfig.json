@@ -4,8 +4,8 @@
         "skipDefaultLibCheck": false,
         "useDefineForClassFields": true,
         "lib": ["ES2020", "DOM", "DOM.Iterable"],
-        "module": "ESNext",
-        "moduleResolution": "bundler",
+        "module": "CommonJS",
+        "moduleResolution": "node",
         "resolveJsonModule": true,
         "skipLibCheck": true,
         "isolatedModules": true,
@@ -20,8 +20,18 @@
         "baseUrl": ".",
         "paths": {
             "@/*": ["src/*"]
-        }
+        },
+        "esModuleInterop": true
     },
-    "include": ["src", "electron", "tests", "*.ts", "*.tsx", "**/*.ts", "**/*.tsx", "vite.config.ts"],
+    "include": [
+        "electron/**/*.ts",
+        "electron/**/*.tsx",
+        "src/**/*.ts",
+        "src/**/*.tsx",
+        "src/**/*.js",
+        "src/**/*.jsx",
+        "vite.config.ts",
+        "tailwind.config.js"
+    ],
     "exclude": ["node_modules", "dist", "release", "out"]
 }

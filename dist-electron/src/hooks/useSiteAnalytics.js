@@ -1,16 +1,21 @@
-import { useMemo } from "react";
-import { CHART_TIME_PERIODS } from "../constants";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SiteAnalyticsUtils = void 0;
+exports.useSiteAnalytics = useSiteAnalytics;
+exports.useChartData = useChartData;
+const react_1 = require("react");
+const constants_1 = require("../constants");
 /**
  * Advanced hook for monitor analytics calculations
  * Memoizes expensive calculations and provides comprehensive metrics
  */
-export function useSiteAnalytics(monitor, timeRange = "24h") {
-    return useMemo(() => {
+function useSiteAnalytics(monitor, timeRange = "24h") {
+    return (0, react_1.useMemo)(() => {
         // Defensive: handle undefined monitor
         const history = monitor?.history ?? [];
         // Filter history based on time range
         const now = Date.now();
-        const cutoff = now - CHART_TIME_PERIODS[timeRange];
+        const cutoff = now - constants_1.CHART_TIME_PERIODS[timeRange];
         const filteredHistory = history.filter((record) => record.timestamp >= cutoff);
         const totalChecks = filteredHistory.length;
         const upCount = filteredHistory.filter((h) => h.status === "up").length;
@@ -84,8 +89,8 @@ export function useSiteAnalytics(monitor, timeRange = "24h") {
  * Hook for generating chart data
  * Separates data preparation from component logic
  */
-export function useChartData(monitor, theme) {
-    return useMemo(() => {
+function useChartData(monitor, theme) {
+    return (0, react_1.useMemo)(() => {
         const sortedHistory = [...monitor.history].sort((a, b) => a.timestamp - b.timestamp);
         const lineChartData = {
             datasets: [
@@ -113,7 +118,7 @@ export function useChartData(monitor, theme) {
 /**
  * Utility functions for common calculations
  */
-export const SiteAnalyticsUtils = {
+exports.SiteAnalyticsUtils = {
     /**
      * Get availability status based on uptime percentage
      */

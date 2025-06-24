@@ -1,34 +1,39 @@
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { useEffect, useState } from "react";
-import { useStore } from "./store";
-import { UI_DELAYS } from "./constants";
-import { useTheme } from "./theme/useTheme";
-import { Header } from "./components/Header";
-import { SiteList } from "./components/SiteList";
-import { AddSiteForm } from "./components/AddSiteForm";
-import { Settings } from "./components/Settings";
-import { SiteDetails } from "./components/SiteDetails";
-import { ThemeProvider, ThemedBox, ThemedText, ThemedButton } from "./theme/components";
-import logger from "./services/logger";
-import { useBackendFocusSync } from "./hooks/useBackendFocusSync";
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const jsx_runtime_1 = require("react/jsx-runtime");
+const react_1 = require("react");
+const store_1 = require("./store");
+const constants_1 = require("./constants");
+const useTheme_1 = require("./theme/useTheme");
+const Header_1 = require("./components/Header");
+const SiteList_1 = require("./components/SiteList");
+const AddSiteForm_1 = require("./components/AddSiteForm");
+const Settings_1 = require("./components/Settings");
+const SiteDetails_1 = require("./components/SiteDetails");
+const components_1 = require("./theme/components");
+const logger_1 = __importDefault(require("./services/logger"));
+const useBackendFocusSync_1 = require("./hooks/useBackendFocusSync");
 function App() {
     const { sites, showSettings, showSiteDetails, lastError, isLoading, updateStatus, updateError, 
     // Store actions - backend integration
     initializeApp, subscribeToStatusUpdates, unsubscribeFromStatusUpdates, clearError, 
     // UI actions
     setShowSettings, setShowSiteDetails, setUpdateStatus, setUpdateError, applyUpdate, getSelectedSite, syncSitesFromBackend, // Add this
-     } = useStore();
-    const { isDark } = useTheme();
+     } = (0, store_1.useStore)();
+    const { isDark } = (0, useTheme_1.useTheme)();
     // Delayed loading state to prevent flash for quick operations
-    const [showLoadingOverlay, setShowLoadingOverlay] = useState(false);
+    const [showLoadingOverlay, setShowLoadingOverlay] = (0, react_1.useState)(false);
     // Only show loading overlay if loading takes more than 100ms
-    useEffect(() => {
+    (0, react_1.useEffect)(() => {
         let timeoutId;
         if (isLoading) {
             // Show loading overlay after 100ms delay
             timeoutId = setTimeout(() => {
                 setShowLoadingOverlay(true);
-            }, UI_DELAYS.LOADING_OVERLAY);
+            }, constants_1.UI_DELAYS.LOADING_OVERLAY);
         }
         else {
             // Hide loading overlay immediately when loading stops
@@ -40,9 +45,9 @@ function App() {
             }
         };
     }, [isLoading]);
-    useEffect(() => {
+    (0, react_1.useEffect)(() => {
         if (process.env.NODE_ENV === "production") {
-            logger.app.started();
+            logger_1.default.app.started();
         }
         initializeApp();
         // Listen for status updates
@@ -57,12 +62,12 @@ function App() {
         };
     }, [initializeApp, syncSitesFromBackend, subscribeToStatusUpdates, unsubscribeFromStatusUpdates]);
     // --- State Sync: Focus only (no polling) ---
-    useBackendFocusSync(false); // Set to true to enable focus-based backend sync
+    (0, useBackendFocusSync_1.useBackendFocusSync)(false); // Set to true to enable focus-based backend sync
     const selectedSite = getSelectedSite();
-    return (_jsx(ThemeProvider, { children: _jsxs("div", { className: `app-container ${isDark ? "dark" : ""}`, children: [showLoadingOverlay && (_jsx("div", { className: "loading-overlay", children: _jsx(ThemedBox, { surface: "elevated", padding: "lg", rounded: "lg", shadow: "xl", children: _jsxs("div", { className: "loading-content", children: [_jsx("div", { className: "loading-spinner" }), _jsx(ThemedText, { size: "base", weight: "medium", children: "Loading..." })] }) }) })), lastError && (_jsx("div", { className: "fixed top-0 left-0 right-0 z-50", children: _jsx(ThemedBox, { surface: "elevated", padding: "md", className: "error-alert", children: _jsxs("div", { className: "flex items-center justify-between", children: [_jsxs("div", { className: "flex items-center space-x-2", children: [_jsx("div", { className: "error-alert__icon", children: "\u26A0\uFE0F" }), _jsx(ThemedText, { size: "sm", variant: "error", children: lastError })] }), _jsx(ThemedButton, { variant: "secondary", size: "sm", onClick: clearError, className: "error-alert__close ml-4", children: "\u2715" })] }) }) })), (updateStatus === "available" ||
+    return ((0, jsx_runtime_1.jsx)(components_1.ThemeProvider, { children: (0, jsx_runtime_1.jsxs)("div", { className: `app-container ${isDark ? "dark" : ""}`, children: [showLoadingOverlay && ((0, jsx_runtime_1.jsx)("div", { className: "loading-overlay", children: (0, jsx_runtime_1.jsx)(components_1.ThemedBox, { surface: "elevated", padding: "lg", rounded: "lg", shadow: "xl", children: (0, jsx_runtime_1.jsxs)("div", { className: "loading-content", children: [(0, jsx_runtime_1.jsx)("div", { className: "loading-spinner" }), (0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "base", weight: "medium", children: "Loading..." })] }) }) })), lastError && ((0, jsx_runtime_1.jsx)("div", { className: "fixed top-0 left-0 right-0 z-50", children: (0, jsx_runtime_1.jsx)(components_1.ThemedBox, { surface: "elevated", padding: "md", className: "error-alert", children: (0, jsx_runtime_1.jsxs)("div", { className: "flex items-center justify-between", children: [(0, jsx_runtime_1.jsxs)("div", { className: "flex items-center space-x-2", children: [(0, jsx_runtime_1.jsx)("div", { className: "error-alert__icon", children: "\u26A0\uFE0F" }), (0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "sm", variant: "error", children: lastError })] }), (0, jsx_runtime_1.jsx)(components_1.ThemedButton, { variant: "secondary", size: "sm", onClick: clearError, className: "error-alert__close ml-4", children: "\u2715" })] }) }) })), (updateStatus === "available" ||
                     updateStatus === "downloading" ||
                     updateStatus === "downloaded" ||
-                    updateStatus === "error") && (_jsx("div", { className: "fixed top-12 left-0 right-0 z-50", children: _jsx(ThemedBox, { surface: "elevated", padding: "md", className: `update-alert update-alert--${updateStatus}`, children: _jsxs("div", { className: "flex items-center justify-between", children: [_jsxs("div", { className: "flex items-center space-x-2", children: [_jsxs("div", { className: "update-alert__icon", children: [updateStatus === "available" && "⬇️", updateStatus === "downloading" && "⏬", updateStatus === "downloaded" && "✅", updateStatus === "error" && "⚠️"] }), _jsxs(ThemedText, { size: "sm", variant: updateStatus === "error" ? "error" : "primary", children: [updateStatus === "available" && "A new update is available. Downloading...", updateStatus === "downloading" && "Update is downloading...", updateStatus === "downloaded" && "Update downloaded! Restart to apply.", updateStatus === "error" && (updateError || "Update failed.")] })] }), (updateStatus === "downloaded" || updateStatus === "error") && (_jsx(ThemedButton, { variant: "secondary", size: "sm", onClick: () => {
+                    updateStatus === "error") && ((0, jsx_runtime_1.jsx)("div", { className: "fixed top-12 left-0 right-0 z-50", children: (0, jsx_runtime_1.jsx)(components_1.ThemedBox, { surface: "elevated", padding: "md", className: `update-alert update-alert--${updateStatus}`, children: (0, jsx_runtime_1.jsxs)("div", { className: "flex items-center justify-between", children: [(0, jsx_runtime_1.jsxs)("div", { className: "flex items-center space-x-2", children: [(0, jsx_runtime_1.jsxs)("div", { className: "update-alert__icon", children: [updateStatus === "available" && "⬇️", updateStatus === "downloading" && "⏬", updateStatus === "downloaded" && "✅", updateStatus === "error" && "⚠️"] }), (0, jsx_runtime_1.jsxs)(components_1.ThemedText, { size: "sm", variant: updateStatus === "error" ? "error" : "primary", children: [updateStatus === "available" && "A new update is available. Downloading...", updateStatus === "downloading" && "Update is downloading...", updateStatus === "downloaded" && "Update downloaded! Restart to apply.", updateStatus === "error" && (updateError || "Update failed.")] })] }), (updateStatus === "downloaded" || updateStatus === "error") && ((0, jsx_runtime_1.jsx)(components_1.ThemedButton, { variant: "secondary", size: "sm", onClick: () => {
                                         if (updateStatus === "downloaded") {
                                             applyUpdate();
                                         }
@@ -70,6 +75,6 @@ function App() {
                                             setUpdateStatus("idle");
                                             setUpdateError(null);
                                         }
-                                    }, className: "update-alert__action ml-4", children: updateStatus === "downloaded" ? "Restart Now" : "Dismiss" }))] }) }) })), _jsx(Header, {}), _jsx("main", { className: "main-container", children: _jsxs("div", { className: "grid-layout", children: [_jsx("div", { children: _jsxs(ThemedBox, { surface: "elevated", padding: "md", shadow: "sm", rounded: "lg", children: [_jsx(ThemedBox, { surface: "base", padding: "md", border: true, className: "border-b", children: _jsxs(ThemedText, { size: "lg", weight: "medium", children: ["Monitored Sites (", sites.length, ")"] }) }), _jsx("div", { className: "p-0", children: _jsx(SiteList, {}) })] }) }), _jsx("div", { children: _jsxs(ThemedBox, { surface: "elevated", padding: "lg", shadow: "sm", rounded: "lg", children: [_jsx(ThemedText, { size: "lg", weight: "medium", className: "mb-4", children: "Add New Site" }), _jsx(AddSiteForm, {})] }) })] }) }), showSettings && _jsx(Settings, { onClose: () => setShowSettings(false) }), showSiteDetails && selectedSite && (_jsx(SiteDetails, { site: selectedSite, onClose: () => setShowSiteDetails(false) }))] }) }));
+                                    }, className: "update-alert__action ml-4", children: updateStatus === "downloaded" ? "Restart Now" : "Dismiss" }))] }) }) })), (0, jsx_runtime_1.jsx)(Header_1.Header, {}), (0, jsx_runtime_1.jsx)("main", { className: "main-container", children: (0, jsx_runtime_1.jsxs)("div", { className: "grid-layout", children: [(0, jsx_runtime_1.jsx)("div", { children: (0, jsx_runtime_1.jsxs)(components_1.ThemedBox, { surface: "elevated", padding: "md", shadow: "sm", rounded: "lg", children: [(0, jsx_runtime_1.jsx)(components_1.ThemedBox, { surface: "base", padding: "md", border: true, className: "border-b", children: (0, jsx_runtime_1.jsxs)(components_1.ThemedText, { size: "lg", weight: "medium", children: ["Monitored Sites (", sites.length, ")"] }) }), (0, jsx_runtime_1.jsx)("div", { className: "p-0", children: (0, jsx_runtime_1.jsx)(SiteList_1.SiteList, {}) })] }) }), (0, jsx_runtime_1.jsx)("div", { children: (0, jsx_runtime_1.jsxs)(components_1.ThemedBox, { surface: "elevated", padding: "lg", shadow: "sm", rounded: "lg", children: [(0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "lg", weight: "medium", className: "mb-4", children: "Add New Site" }), (0, jsx_runtime_1.jsx)(AddSiteForm_1.AddSiteForm, {})] }) })] }) }), showSettings && (0, jsx_runtime_1.jsx)(Settings_1.Settings, { onClose: () => setShowSettings(false) }), showSiteDetails && selectedSite && ((0, jsx_runtime_1.jsx)(SiteDetails_1.SiteDetails, { site: selectedSite, onClose: () => setShowSiteDetails(false) }))] }) }));
 }
-export default App;
+exports.default = App;

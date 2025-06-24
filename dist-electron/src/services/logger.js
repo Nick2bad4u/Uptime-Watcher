@@ -1,3 +1,4 @@
+"use strict";
 /**
  * Centralized logging service using electron-log
  * Provides consistent logging across ma        action: (action: string, details?: unknown) => {
@@ -6,52 +7,56 @@
 
         settingsChange: (setting: string, oldValue: unknown, newValue: unknown) => {d renderer processes
  */
-import log from "electron-log/renderer";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const renderer_1 = __importDefault(require("electron-log/renderer"));
 // Configure electron-log for renderer process
 // The /renderer import handles the connection to main process automatically
-log.transports.console.level = "debug";
-log.transports.console.format = "[{h}:{i}:{s}.{ms}] [{level}] {text}";
+renderer_1.default.transports.console.level = "debug";
+renderer_1.default.transports.console.format = "[{h}:{i}:{s}.{ms}] [{level}] {text}";
 // File logging will be handled by the main process via IPC
-if (log.transports.file) {
-    log.transports.file.level = "info";
+if (renderer_1.default.transports.file) {
+    renderer_1.default.transports.file.level = "info";
 }
 // Create logger with app context
 const logger = {
     // Debug level - for development debugging
     debug: (message, ...args) => {
-        log.debug(`[UPTIME-WATCHER] ${message}`, ...args);
+        renderer_1.default.debug(`[UPTIME-WATCHER] ${message}`, ...args);
     },
     // Info level - general application flow
     info: (message, ...args) => {
-        log.info(`[UPTIME-WATCHER] ${message}`, ...args);
+        renderer_1.default.info(`[UPTIME-WATCHER] ${message}`, ...args);
     },
     // Warn level - something unexpected but not an error
     warn: (message, ...args) => {
-        log.warn(`[UPTIME-WATCHER] ${message}`, ...args);
+        renderer_1.default.warn(`[UPTIME-WATCHER] ${message}`, ...args);
     },
     // Error level - errors that should be investigated
     error: (message, error, ...args) => {
         if (error instanceof Error) {
-            log.error(`[UPTIME-WATCHER] ${message}`, {
+            renderer_1.default.error(`[UPTIME-WATCHER] ${message}`, {
                 message: error.message,
                 stack: error.stack,
                 name: error.name,
             }, ...args);
         }
         else if (error) {
-            log.error(`[UPTIME-WATCHER] ${message}`, error, ...args);
+            renderer_1.default.error(`[UPTIME-WATCHER] ${message}`, error, ...args);
         }
         else {
-            log.error(`[UPTIME-WATCHER] ${message}`, ...args);
+            renderer_1.default.error(`[UPTIME-WATCHER] ${message}`, ...args);
         }
     },
     // Verbose level - very detailed debugging
     verbose: (message, ...args) => {
-        log.verbose(`[UPTIME-WATCHER] ${message}`, ...args);
+        renderer_1.default.verbose(`[UPTIME-WATCHER] ${message}`, ...args);
     },
     // Silly level - extremely detailed debugging
     silly: (message, ...args) => {
-        log.silly(`[UPTIME-WATCHER] ${message}`, ...args);
+        renderer_1.default.silly(`[UPTIME-WATCHER] ${message}`, ...args);
     },
     // Specialized logging methods for common scenarios
     // Log site monitoring events
@@ -114,6 +119,6 @@ const logger = {
         },
     },
     // Raw access to electron-log for special cases
-    raw: log,
+    raw: renderer_1.default,
 };
-export default logger;
+exports.default = logger;

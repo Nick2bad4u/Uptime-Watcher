@@ -1,31 +1,38 @@
-import { useEffect, useState, useCallback } from "react";
-import { useStore } from "../store";
-import { themeManager } from "./ThemeManager";
-export function useTheme() {
-    const { settings, updateSettings } = useStore();
-    const [systemTheme, setSystemTheme] = useState("light");
-    const [themeVersion, setThemeVersion] = useState(0); // Force re-renders
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.useTheme = useTheme;
+exports.useThemeValue = useThemeValue;
+exports.useStatusColors = useStatusColors;
+exports.useThemeClasses = useThemeClasses;
+exports.useAvailabilityColors = useAvailabilityColors;
+const react_1 = require("react");
+const store_1 = require("../store");
+const ThemeManager_1 = require("./ThemeManager");
+function useTheme() {
+    const { settings, updateSettings } = (0, store_1.useStore)();
+    const [systemTheme, setSystemTheme] = (0, react_1.useState)("light");
+    const [themeVersion, setThemeVersion] = (0, react_1.useState)(0); // Force re-renders
     // Memoized getCurrentTheme to satisfy useEffect deps and avoid unnecessary re-renders
-    const getCurrentTheme = useCallback(() => {
+    const getCurrentTheme = (0, react_1.useCallback)(() => {
         const themeName = settings.theme;
-        return themeManager.getTheme(themeName);
+        return ThemeManager_1.themeManager.getTheme(themeName);
     }, [settings.theme]);
-    const [currentTheme, setCurrentTheme] = useState(getCurrentTheme);
+    const [currentTheme, setCurrentTheme] = (0, react_1.useState)(getCurrentTheme);
     // Update theme when settings or systemTheme change
-    useEffect(() => {
+    (0, react_1.useEffect)(() => {
         const newTheme = getCurrentTheme();
         setCurrentTheme(newTheme);
-        themeManager.applyTheme(newTheme);
+        ThemeManager_1.themeManager.applyTheme(newTheme);
         setThemeVersion((prev) => prev + 1); // Force re-render of all themed components
     }, [settings.theme, systemTheme, getCurrentTheme]);
     // Listen for system theme changes
-    useEffect(() => {
-        const cleanup = themeManager.onSystemThemeChange((isDark) => {
+    (0, react_1.useEffect)(() => {
+        const cleanup = ThemeManager_1.themeManager.onSystemThemeChange((isDark) => {
             const newSystemTheme = isDark ? "dark" : "light";
             setSystemTheme(newSystemTheme);
         });
         // Set initial system theme
-        setSystemTheme(themeManager.getSystemThemePreference());
+        setSystemTheme(ThemeManager_1.themeManager.getSystemThemePreference());
         return cleanup;
     }, []);
     // Change theme
@@ -48,7 +55,7 @@ export function useTheme() {
         return currentTheme.colors.status[status];
     };
     // Get available themes
-    const availableThemes = themeManager.getAvailableThemes();
+    const availableThemes = ThemeManager_1.themeManager.getAvailableThemes();
     return {
         availableThemes,
         currentTheme,
@@ -57,19 +64,19 @@ export function useTheme() {
         isDark: currentTheme.isDark,
         setTheme,
         systemTheme,
-        themeManager,
+        themeManager: ThemeManager_1.themeManager,
         themeName: settings.theme,
         themeVersion, // Include for forcing re-renders
         toggleTheme,
     };
 }
 // Utility hook for getting theme values in components
-export function useThemeValue(selector) {
+function useThemeValue(selector) {
     const { currentTheme } = useTheme();
     return selector(currentTheme);
 }
 // Hook for theme-aware status colors
-export function useStatusColors() {
+function useStatusColors() {
     const { currentTheme } = useTheme();
     return {
         down: currentTheme.colors.status.down,
@@ -79,7 +86,7 @@ export function useStatusColors() {
     };
 }
 // Hook for theme-aware CSS classes using CSS custom properties
-export function useThemeClasses() {
+function useThemeClasses() {
     const { getColor } = useTheme();
     const getBackgroundClass = (variant = "primary") => {
         return {
@@ -116,7 +123,7 @@ export function useThemeClasses() {
     };
 }
 // Hook for availability-based colors
-export function useAvailabilityColors() {
+function useAvailabilityColors() {
     const { currentTheme } = useTheme();
     const getAvailabilityColor = (percentage) => {
         // Clamp percentage between 0 and 100

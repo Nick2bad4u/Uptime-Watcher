@@ -52,7 +52,7 @@
         {
             "label": "Build Electron Main (Dev)",
             "type": "shell",
-            "command": "npx tsc -p tsconfig.json",
+            "command": "npx tsc -p tsconfig.json && npm run postbuild",
             "group": "build",
             "presentation": {
                 "echo": true,

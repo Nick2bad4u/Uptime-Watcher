@@ -1,17 +1,20 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import { TIMEOUT_CONSTRAINTS } from "./constants";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.useStore = void 0;
+const zustand_1 = require("zustand");
+const middleware_1 = require("zustand/middleware");
+const constants_1 = require("./constants");
 const defaultSettings = {
     notifications: true,
     autoStart: false,
     minimizeToTray: true,
     theme: "system",
-    timeout: TIMEOUT_CONSTRAINTS.MAX / 10, // 6 seconds (reasonable default)
+    timeout: constants_1.TIMEOUT_CONSTRAINTS.MAX / 10, // 6 seconds (reasonable default)
     maxRetries: 3,
     soundAlerts: false,
     historyLimit: 100,
 };
-export const useStore = create()(persist((set, get) => ({
+exports.useStore = (0, zustand_1.create)()((0, middleware_1.persist)((set, get) => ({
     sites: [],
     // Remove isMonitoring
     darkMode: false,

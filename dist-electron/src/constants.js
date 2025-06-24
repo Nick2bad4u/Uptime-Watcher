@@ -1,5 +1,8 @@
+"use strict";
 // Centralized constants for the application
-export const CHECK_INTERVALS = [
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.TRANSITION_ALL = exports.ARIA_LABEL = exports.CHART_TIME_PERIODS = exports.UI_DELAYS = exports.TIMEOUT_CONSTRAINTS = exports.AUTO_REFRESH_INTERVAL = exports.HISTORY_LIMIT_OPTIONS = exports.DEFAULT_CHECK_INTERVAL = exports.CHECK_INTERVALS = void 0;
+exports.CHECK_INTERVALS = [
     // Seconds
     { value: 5000, label: "5 seconds" },
     { value: 10000, label: "10 seconds" },
@@ -36,9 +39,9 @@ export const CHECK_INTERVALS = [
     { value: 2592000000, label: "30 days" },
 ];
 // Default check interval (1 minute)
-export const DEFAULT_CHECK_INTERVAL = 60000;
+exports.DEFAULT_CHECK_INTERVAL = 60000;
 // History limit options
-export const HISTORY_LIMIT_OPTIONS = [
+exports.HISTORY_LIMIT_OPTIONS = [
     { value: 25, label: "25 records" },
     { value: 50, label: "50 records" },
     { value: 100, label: "100 records" },
@@ -55,25 +58,25 @@ export const HISTORY_LIMIT_OPTIONS = [
     { value: Number.MAX_SAFE_INTEGER, label: "Unlimited" },
 ];
 // Auto-refresh interval for site details (30 seconds)
-export const AUTO_REFRESH_INTERVAL = 30000;
+exports.AUTO_REFRESH_INTERVAL = 30000;
 // Request timeout constraints
-export const TIMEOUT_CONSTRAINTS = {
+exports.TIMEOUT_CONSTRAINTS = {
     MIN: 1000, // 1 second minimum
     MAX: 60000, // 60 seconds maximum
     STEP: 1000, // 1 second increments
 };
 // UI delays and timing
-export const UI_DELAYS = {
+exports.UI_DELAYS = {
     LOADING_BUTTON: 100, // Delay before showing loading spinners (ms)
     LOADING_OVERLAY: 100, // Delay before showing loading overlay (ms)
 };
 // Chart time periods (for analytics components)
-export const CHART_TIME_PERIODS = {
+exports.CHART_TIME_PERIODS = {
     "1h": 60 * 60 * 1000,
     "24h": 24 * 60 * 60 * 1000,
     "7d": 7 * 24 * 60 * 60 * 1000,
     "30d": 30 * 24 * 60 * 60 * 1000,
 };
 // Common ARIA attribute constants
-export const ARIA_LABEL = "aria-label";
-export const TRANSITION_ALL = "all 0.2s ease-in-out";
+exports.ARIA_LABEL = "aria-label";
+exports.TRANSITION_ALL = "all 0.2s ease-in-out";

@@ -1,10 +1,18 @@
+"use strict";
 // Centralized utility functions for time and formatting
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.TIME_PERIOD_LABELS = void 0;
+exports.formatResponseTime = formatResponseTime;
+exports.formatTimestamp = formatTimestamp;
+exports.formatFullTimestamp = formatFullTimestamp;
+exports.formatLastChecked = formatLastChecked;
+exports.formatDuration = formatDuration;
 /**
  * Format response time in a human-readable format
  * @param time - Response time in milliseconds
  * @returns Formatted time string (e.g., "234ms" or "1.23s")
  */
-export function formatResponseTime(time) {
+function formatResponseTime(time) {
     if (!time && time !== 0)
         return "N/A";
     if (time < 1000)
@@ -16,7 +24,7 @@ export function formatResponseTime(time) {
  * @param timestamp - Unix timestamp in milliseconds
  * @returns Formatted timestamp string
  */
-export function formatTimestamp(timestamp) {
+function formatTimestamp(timestamp) {
     const ms = Date.now() - timestamp;
     const seconds = Math.floor(ms / 1000);
     const minutes = Math.floor(seconds / 60);
@@ -37,7 +45,7 @@ export function formatTimestamp(timestamp) {
  * @param timestamp - Unix timestamp in milliseconds
  * @returns Formatted date/time string
  */
-export function formatFullTimestamp(timestamp) {
+function formatFullTimestamp(timestamp) {
     return new Date(timestamp).toLocaleString();
 }
 /**
@@ -45,7 +53,7 @@ export function formatFullTimestamp(timestamp) {
  * @param lastChecked - Unix timestamp in milliseconds, Date object, or undefined
  * @returns Formatted relative time string
  */
-export function formatLastChecked(lastChecked) {
+function formatLastChecked(lastChecked) {
     if (!lastChecked)
         return "Never";
     // Handle both timestamp numbers and Date objects
@@ -74,7 +82,7 @@ export function formatLastChecked(lastChecked) {
  * @param ms - Duration in milliseconds
  * @returns Formatted duration string (e.g., "2h 15m", "45s")
  */
-export function formatDuration(ms) {
+function formatDuration(ms) {
     const seconds = Math.floor(ms / 1000);
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
@@ -87,7 +95,7 @@ export function formatDuration(ms) {
 /**
  * Format time periods for display
  */
-export const TIME_PERIOD_LABELS = {
+exports.TIME_PERIOD_LABELS = {
     "1h": "Last Hour",
     "24h": "Last 24 Hours",
     "7d": "Last 7 Days",

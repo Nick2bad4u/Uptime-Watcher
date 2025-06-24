@@ -1,5 +1,8 @@
-import { themes } from "./themes";
-export class ThemeManager {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.themeManager = exports.ThemeManager = void 0;
+const themes_1 = require("./themes");
+class ThemeManager {
     constructor() { }
     static getInstance() {
         if (!ThemeManager.instance) {
@@ -13,9 +16,9 @@ export class ThemeManager {
     getTheme(name) {
         if (name === "system") {
             const systemPreference = this.getSystemThemePreference();
-            return themes[systemPreference];
+            return themes_1.themes[systemPreference];
         }
-        return themes[name] || themes.light;
+        return themes_1.themes[name] || themes_1.themes.light;
     }
     /**
      * Get system theme preference
@@ -172,4 +175,5 @@ export class ThemeManager {
         return `:root {\n${variables.join("\n")}\n}`;
     }
 }
-export const themeManager = ThemeManager.getInstance();
+exports.ThemeManager = ThemeManager;
+exports.themeManager = ThemeManager.getInstance();

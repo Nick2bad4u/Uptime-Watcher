@@ -1,4 +1,7 @@
-export const lightTheme = {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.themes = exports.highContrastTheme = exports.darkTheme = exports.lightTheme = void 0;
+exports.lightTheme = {
     name: "light",
     isDark: false,
     colors: {
@@ -105,7 +108,7 @@ export const lightTheme = {
         full: "9999px",
     },
 };
-export const darkTheme = {
+exports.darkTheme = {
     name: "dark",
     isDark: true,
     colors: {
@@ -213,7 +216,7 @@ export const darkTheme = {
     },
 };
 // High contrast theme for accessibility
-export const highContrastTheme = {
+exports.highContrastTheme = {
     name: "high-contrast",
     isDark: true,
     colors: {
@@ -320,8 +323,8 @@ export const highContrastTheme = {
         full: "9999px",
     },
 };
-export const themes = {
-    light: lightTheme,
-    dark: darkTheme,
-    "high-contrast": highContrastTheme,
+exports.themes = {
+    light: exports.lightTheme,
+    dark: exports.darkTheme,
+    "high-contrast": exports.highContrastTheme,
 };
