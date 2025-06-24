@@ -8,7 +8,6 @@ import { AddSiteForm } from "./components/AddSiteForm";
 import { Settings } from "./components/Settings";
 import { SiteDetails } from "./components/SiteDetails";
 import { ThemeProvider, ThemedBox, ThemedText, ThemedButton } from "./theme/components";
-import { StatusUpdate } from "./types";
 import logger from "./services/logger";
 import { useBackendFocusSync } from "./hooks/useBackendFocusSync";
 

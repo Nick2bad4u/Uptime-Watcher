@@ -16,12 +16,12 @@
             },
             "isBackground": true,
             "problemMatcher": {
-                "owner": "typescript",
-                "pattern": "$tsc",
+                "owner": "vite",
+                "pattern": { "regexp": ".*" },
                 "background": {
                     "activeOnStart": true,
-                    "beginsPattern": "^\\s*Local:\\s+",
-                    "endsPattern": "ready in \\d+ms"
+                    "beginsPattern": ".*VITE v.*",
+                    "endsPattern": ".*ready in.*"
                 }
             }
         },
@@ -41,6 +41,18 @@
             "label": "Build Application",
             "type": "npm",
             "script": "build",
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Build Electron Main (Dev)",
+            "type": "shell",
+            "command": "npx tsc -p tsconfig.json",
             "group": "build",
             "presentation": {
                 "echo": true,

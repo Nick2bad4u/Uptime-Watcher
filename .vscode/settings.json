@@ -51,5 +51,6 @@
         "tabWidth": 3,
         "trailingComma": "none",
         "useTabs": false
-    }
+    },
+    "debug.defaultCompound": "Dev: Vite + Electron Main"
 }

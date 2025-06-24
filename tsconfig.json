@@ -7,13 +7,16 @@
         "module": "ESNext",
         "moduleResolution": "bundler",
         "resolveJsonModule": true,
+        "skipLibCheck": true,
         "isolatedModules": true,
         "jsx": "react-jsx",
         "strict": true,
+        "types": ["react", "react-dom"],
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "noFallthroughCasesInSwitch": true,
         "forceConsistentCasingInFileNames": true,
+        "outDir": "dist-electron",
         "baseUrl": ".",
         "paths": {
             "@/*": ["src/*"]
