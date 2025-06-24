@@ -248,8 +248,8 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
         setIntervalChanged(false);
     };
 
-    // Only return null after all hooks
-    if (!sites.find((s) => s.identifier === site.identifier)) return null;
+    // Only return undefined after all hooks
+    if (!sites.find((s) => s.identifier === site.identifier)) return undefined;
 
     return (
         <div className="site-details-modal" onClick={onClose}>
@@ -940,7 +940,7 @@ function HistoryTab({
 
     // Helper to render details with label
     function renderDetails(record: any) {
-        if (!record.details) return null;
+        if (!record.details) return undefined;
         if (selectedMonitor.type === "port") {
             return <ThemedText size="xs" variant="secondary" className="ml-4">Port: {record.details}</ThemedText>;
         }

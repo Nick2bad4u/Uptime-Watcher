@@ -31,7 +31,7 @@ function AddSiteForm() {
     const [selectedExistingSite, setSelectedExistingSite] = (0, react_1.useState)("");
     // Delayed loading state for button spinner (100ms delay)
     const [showButtonLoading, setShowButtonLoading] = (0, react_1.useState)(false);
-    const [formError, setFormError] = (0, react_1.useState)(null);
+    const [formError, setFormError] = (0, react_1.useState)(undefined);
     (0, react_1.useEffect)(() => {
         let timeoutId;
         if (isLoading) {
@@ -52,7 +52,7 @@ function AddSiteForm() {
     }, [isLoading]);
     // Reset fields when monitor type changes
     (0, react_1.useEffect)(() => {
-        setFormError(null);
+        setFormError(undefined);
         setTarget("");
         setHost("");
         setPort("");
@@ -66,11 +66,11 @@ function AddSiteForm() {
         else {
             setName("");
         }
-        setFormError(null);
+        setFormError(undefined);
     }, [addMode]);
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setFormError(null);
+        setFormError(undefined);
         if (addMode === "new" && !name.trim()) {
             setFormError("Site name is required");
             return;
@@ -155,6 +155,6 @@ function AddSiteForm() {
                     (monitorType === "port" && (!host.trim() || !port.trim())) ||
                     isLoading, fullWidth: true, loading: showButtonLoading, children: addMode === "new" ? "Add Site" : "Add Monitor" }), (lastError || formError) && ((0, jsx_runtime_1.jsx)(components_1.ThemedBox, { surface: "base", padding: "md", className: `error-alert ${isDark ? "dark" : ""}`, rounded: "md", children: (0, jsx_runtime_1.jsxs)("div", { className: "flex items-center", children: [(0, jsx_runtime_1.jsxs)(components_1.ThemedText, { size: "sm", className: `error-alert__text ${isDark ? "dark" : ""}`, children: ["\u274C ", formError || lastError] }), (0, jsx_runtime_1.jsx)(components_1.ThemedButton, { variant: "secondary", size: "xs", onClick: () => {
                                 clearError();
-                                setFormError(null);
+                                setFormError(undefined);
                             }, className: `error-alert__close ${isDark ? "dark" : ""}`, children: "\u2715" })] }) })), (0, jsx_runtime_1.jsxs)("div", { className: "space-y-1", children: [(0, jsx_runtime_1.jsxs)(components_1.ThemedText, { size: "xs", variant: "tertiary", children: ["\u2022 ", addMode === "new" ? "Site name is required" : "Select a site to add the monitor to"] }), monitorType === "http" && ((0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "xs", variant: "tertiary", children: "\u2022 Enter the full URL including http:// or https://" })), monitorType === "port" && ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "xs", variant: "tertiary", children: "\u2022 Enter a valid host (domain or IP)" }), (0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "xs", variant: "tertiary", children: "\u2022 Enter a port number (1-65535)" })] })), (0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "xs", variant: "tertiary", children: "\u2022 The monitor will be checked according to your monitoring interval" })] })] }));
 }

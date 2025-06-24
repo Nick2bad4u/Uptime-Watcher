@@ -78,7 +78,7 @@ export function useSiteAnalytics(monitor: Monitor | undefined, timeRange: TimePe
 
         // Calculate downtime periods
         const downtimePeriods: DowntimePeriod[] = [];
-        let currentDowntime: DowntimePeriod | null = null;
+        let currentDowntime: DowntimePeriod | undefined = undefined;
 
         // Process in reverse chronological order for proper downtime calculation
         for (const record of [...filteredHistory].reverse()) {
@@ -95,7 +95,7 @@ export function useSiteAnalytics(monitor: Monitor | undefined, timeRange: TimePe
             } else if (currentDowntime) {
                 currentDowntime.duration = currentDowntime.end - currentDowntime.start;
                 downtimePeriods.push(currentDowntime);
-                currentDowntime = null;
+                currentDowntime = undefined;
             }
         }
 

@@ -4,18 +4,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const jsx_runtime_1 = require("react/jsx-runtime");
+/* eslint-disable perfectionist/sort-objects */
 const react_1 = require("react");
-const store_1 = require("./store");
-const constants_1 = require("./constants");
-const useTheme_1 = require("./theme/useTheme");
-const Header_1 = require("./components/Header");
-const SiteList_1 = require("./components/SiteList");
 const AddSiteForm_1 = require("./components/AddSiteForm");
+const Header_1 = require("./components/Header");
 const Settings_1 = require("./components/Settings");
 const SiteDetails_1 = require("./components/SiteDetails");
-const components_1 = require("./theme/components");
-const logger_1 = __importDefault(require("./services/logger"));
+const SiteList_1 = require("./components/SiteList");
+const constants_1 = require("./constants");
 const useBackendFocusSync_1 = require("./hooks/useBackendFocusSync");
+const logger_1 = __importDefault(require("./services/logger"));
+const store_1 = require("./store");
+const components_1 = require("./theme/components");
+const useTheme_1 = require("./theme/useTheme");
 function App() {
     const { sites, showSettings, showSiteDetails, lastError, isLoading, updateStatus, updateError, 
     // Store actions - backend integration
@@ -73,7 +74,7 @@ function App() {
                                         }
                                         else {
                                             setUpdateStatus("idle");
-                                            setUpdateError(null);
+                                            setUpdateError(undefined);
                                         }
                                     }, className: "update-alert__action ml-4", children: updateStatus === "downloaded" ? "Restart Now" : "Dismiss" }))] }) }) })), (0, jsx_runtime_1.jsx)(Header_1.Header, {}), (0, jsx_runtime_1.jsx)("main", { className: "main-container", children: (0, jsx_runtime_1.jsxs)("div", { className: "grid-layout", children: [(0, jsx_runtime_1.jsx)("div", { children: (0, jsx_runtime_1.jsxs)(components_1.ThemedBox, { surface: "elevated", padding: "md", shadow: "sm", rounded: "lg", children: [(0, jsx_runtime_1.jsx)(components_1.ThemedBox, { surface: "base", padding: "md", border: true, className: "border-b", children: (0, jsx_runtime_1.jsxs)(components_1.ThemedText, { size: "lg", weight: "medium", children: ["Monitored Sites (", sites.length, ")"] }) }), (0, jsx_runtime_1.jsx)("div", { className: "p-0", children: (0, jsx_runtime_1.jsx)(SiteList_1.SiteList, {}) })] }) }), (0, jsx_runtime_1.jsx)("div", { children: (0, jsx_runtime_1.jsxs)(components_1.ThemedBox, { surface: "elevated", padding: "lg", shadow: "sm", rounded: "lg", children: [(0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "lg", weight: "medium", className: "mb-4", children: "Add New Site" }), (0, jsx_runtime_1.jsx)(AddSiteForm_1.AddSiteForm, {})] }) })] }) }), showSettings && (0, jsx_runtime_1.jsx)(Settings_1.Settings, { onClose: () => setShowSettings(false) }), showSiteDetails && selectedSite && ((0, jsx_runtime_1.jsx)(SiteDetails_1.SiteDetails, { site: selectedSite, onClose: () => setShowSiteDetails(false) }))] }) }));
 }

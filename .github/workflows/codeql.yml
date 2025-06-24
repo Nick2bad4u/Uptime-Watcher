@@ -74,7 +74,7 @@ jobs:
                       ${{ runner.os }}-.-node-modules-
 
             - name: Install dependencies
-              run: npm install
+              run: npm ci --force
               working-directory: .
 
             # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).

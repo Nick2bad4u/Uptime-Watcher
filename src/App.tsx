@@ -164,7 +164,7 @@ function App() {
                                                 applyUpdate();
                                             } else {
                                                 setUpdateStatus("idle");
-                                                setUpdateError(null);
+                                                setUpdateError(undefined);
                                             }
                                         }}
                                         className="update-alert__action ml-4"

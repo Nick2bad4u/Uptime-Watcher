@@ -61,7 +61,7 @@ export class ThemeManager {
         const root = document.documentElement;
         // Apply CSS custom properties
         Object.entries(theme.colors).forEach(([category, colors]) => {
-            if (typeof colors === "object" && colors !== null) {
+            if (typeof colors === "object" && colors !== undefined) {
                 Object.entries(colors).forEach(([key, value]) => {
                     root.style.setProperty(`--color-${category}-${key}`, String(value));
                 });
@@ -162,7 +162,7 @@ export class ThemeManager {
 
         // Colors
         Object.entries(theme.colors).forEach(([category, colors]) => {
-            if (typeof colors === "object" && colors !== null) {
+            if (typeof colors === "object" && colors !== undefined) {
                 Object.entries(colors).forEach(([key, value]) => {
                     variables.push(`  --color-${category}-${key}: ${value};`);
                 });
