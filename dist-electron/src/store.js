@@ -20,10 +20,10 @@ exports.useStore = (0, zustand_1.create)()((0, middleware_1.persist)((set, get) 
     darkMode: false,
     settings: defaultSettings,
     showSettings: false,
-    selectedSiteId: null,
+    selectedSiteId: undefined,
     showSiteDetails: false,
     // Error handling initial state
-    lastError: null,
+    lastError: undefined,
     isLoading: false,
     // Statistics initial state
     totalUptime: 0,
@@ -36,13 +36,13 @@ exports.useStore = (0, zustand_1.create)()((0, middleware_1.persist)((set, get) 
     selectedMonitorIds: {},
     // Update status initial state
     updateStatus: "idle",
-    updateError: null,
+    updateError: undefined,
     // Derived selector
     getSelectedSite: () => {
         const { sites, selectedSiteId } = get();
         if (!selectedSiteId)
-            return null;
-        return sites.find((s) => s.identifier === selectedSiteId) || null;
+            return undefined;
+        return sites.find((s) => s.identifier === selectedSiteId) || undefined;
     },
     // Backend integration actions
     initializeApp: async () => {
@@ -260,7 +260,7 @@ exports.useStore = (0, zustand_1.create)()((0, middleware_1.persist)((set, get) 
         sites: state.sites.filter((site) => site.identifier !== identifier),
         selectedSiteId: state.selectedSiteId &&
             state.sites.find((s) => s.identifier === identifier && s.identifier === state.selectedSiteId)
-            ? null
+            ? undefined
             : state.selectedSiteId,
         showSiteDetails: state.selectedSiteId &&
             state.sites.find((s) => s.identifier === identifier && s.identifier === state.selectedSiteId)
@@ -299,13 +299,13 @@ exports.useStore = (0, zustand_1.create)()((0, middleware_1.persist)((set, get) 
     }),
     // Site details actions
     setSelectedSite: (site) => {
-        set({ selectedSiteId: site ? site.identifier : null });
+        set({ selectedSiteId: site ? site.identifier : undefined });
     },
     setShowSiteDetails: (show) => set({ showSiteDetails: show }),
     // Error handling actions
     setError: (error) => set({ lastError: error }),
     setLoading: (loading) => set({ isLoading: loading }),
-    clearError: () => set({ lastError: null }),
+    clearError: () => set({ lastError: undefined }),
     // Synchronized UI actions
     setActiveSiteDetailsTab: (tab) => set({ activeSiteDetailsTab: tab }),
     setSiteDetailsChartTimeRange: (range) => set({ siteDetailsChartTimeRange: range }),

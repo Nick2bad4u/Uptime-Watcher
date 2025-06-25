@@ -1260,7 +1260,7 @@ function hasOpenExternal(api: any): api is { openExternal: (url: string) => void
 function ScreenshotThumbnail({ url, siteName }: { url: string; siteName: string }) {
     const [hovered, setHovered] = useState(false);
     const [overlayVars, setOverlayVars] = useState<React.CSSProperties>({});
-    const linkRef = useRef<HTMLAnchorElement>(undefined);
+    const linkRef = useRef<HTMLAnchorElement>(null);
     const { themeName } = useTheme();
     const screenshotUrl = `https://api.microlink.io/?url=${encodeURIComponent(url)}&screenshot=true&meta=false&embed=screenshot.url&colorScheme=auto`;
 
