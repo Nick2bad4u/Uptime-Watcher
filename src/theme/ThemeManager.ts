@@ -1,5 +1,5 @@
-import { Theme, ThemeName } from "./types";
 import { themes } from "./themes";
+import { Theme, ThemeName } from "./types";
 
 export class ThemeManager {
     private static instance: ThemeManager;
@@ -60,43 +60,43 @@ export class ThemeManager {
 
         const root = document.documentElement;
         // Apply CSS custom properties
-        Object.entries(theme.colors).forEach(([category, colors]) => {
+        for (const [category, colors] of Object.entries(theme.colors)) {
             if (typeof colors === "object" && colors !== undefined) {
-                Object.entries(colors).forEach(([key, value]) => {
+                for (const [key, value] of Object.entries(colors)) {
                     root.style.setProperty(`--color-${category}-${key}`, String(value));
-                });
+                }
             } else {
                 root.style.setProperty(`--color-${category}`, String(colors));
             }
-        });
+        }
 
         // Apply typography
-        Object.entries(theme.typography.fontSize).forEach(([size, value]) => {
+        for (const [size, value] of Object.entries(theme.typography.fontSize)) {
             root.style.setProperty(`--font-size-${size}`, value);
-        });
+        }
 
-        Object.entries(theme.typography.fontWeight).forEach(([weight, value]) => {
+        for (const [weight, value] of Object.entries(theme.typography.fontWeight)) {
             root.style.setProperty(`--font-weight-${weight}`, value);
-        });
+        }
 
-        Object.entries(theme.typography.lineHeight).forEach(([height, value]) => {
+        for (const [height, value] of Object.entries(theme.typography.lineHeight)) {
             root.style.setProperty(`--line-height-${height}`, value);
-        });
+        }
 
         // Apply spacing
-        Object.entries(theme.spacing).forEach(([size, value]) => {
+        for (const [size, value] of Object.entries(theme.spacing)) {
             root.style.setProperty(`--spacing-${size}`, value);
-        });
+        }
 
         // Apply shadows
-        Object.entries(theme.shadows).forEach(([size, value]) => {
+        for (const [size, value] of Object.entries(theme.shadows)) {
             root.style.setProperty(`--shadow-${size}`, value);
-        });
+        }
 
         // Apply border radius
-        Object.entries(theme.borderRadius).forEach(([size, value]) => {
+        for (const [size, value] of Object.entries(theme.borderRadius)) {
             root.style.setProperty(`--radius-${size}`, value);
-        });
+        }
 
         // Set theme class on body
         document.body.className = document.body.className.replace(/theme-\w+/g, "").trim();
@@ -117,25 +117,25 @@ export class ThemeManager {
         return {
             ...baseTheme,
             ...overrides,
+            borderRadius: {
+                ...baseTheme.borderRadius,
+                ...overrides.borderRadius,
+            },
             colors: {
                 ...baseTheme.colors,
                 ...overrides.colors,
-            },
-            typography: {
-                ...baseTheme.typography,
-                ...overrides.typography,
-            },
-            spacing: {
-                ...baseTheme.spacing,
-                ...overrides.spacing,
             },
             shadows: {
                 ...baseTheme.shadows,
                 ...overrides.shadows,
             },
-            borderRadius: {
-                ...baseTheme.borderRadius,
-                ...overrides.borderRadius,
+            spacing: {
+                ...baseTheme.spacing,
+                ...overrides.spacing,
+            },
+            typography: {
+                ...baseTheme.typography,
+                ...overrides.typography,
             },
         };
     }
@@ -161,43 +161,43 @@ export class ThemeManager {
         const variables: string[] = [];
 
         // Colors
-        Object.entries(theme.colors).forEach(([category, colors]) => {
+        for (const [category, colors] of Object.entries(theme.colors)) {
             if (typeof colors === "object" && colors !== undefined) {
-                Object.entries(colors).forEach(([key, value]) => {
+                for (const [key, value] of Object.entries(colors)) {
                     variables.push(`  --color-${category}-${key}: ${value};`);
-                });
+                }
             } else {
                 variables.push(`  --color-${category}: ${colors};`);
             }
-        });
+        }
 
         // Typography
-        Object.entries(theme.typography.fontSize).forEach(([size, value]) => {
+        for (const [size, value] of Object.entries(theme.typography.fontSize)) {
             variables.push(`  --font-size-${size}: ${value};`);
-        });
+        }
 
-        Object.entries(theme.typography.fontWeight).forEach(([weight, value]) => {
+        for (const [weight, value] of Object.entries(theme.typography.fontWeight)) {
             variables.push(`  --font-weight-${weight}: ${value};`);
-        });
+        }
 
-        Object.entries(theme.typography.lineHeight).forEach(([height, value]) => {
+        for (const [height, value] of Object.entries(theme.typography.lineHeight)) {
             variables.push(`  --line-height-${height}: ${value};`);
-        });
+        }
 
         // Spacing
-        Object.entries(theme.spacing).forEach(([size, value]) => {
+        for (const [size, value] of Object.entries(theme.spacing)) {
             variables.push(`  --spacing-${size}: ${value};`);
-        });
+        }
 
         // Shadows
-        Object.entries(theme.shadows).forEach(([size, value]) => {
+        for (const [size, value] of Object.entries(theme.shadows)) {
             variables.push(`  --shadow-${size}: ${value};`);
-        });
+        }
 
         // Border radius
-        Object.entries(theme.borderRadius).forEach(([size, value]) => {
+        for (const [size, value] of Object.entries(theme.borderRadius)) {
             variables.push(`  --radius-${size}: ${value};`);
-        });
+        }
 
         return `:root {\n${variables.join("\n")}\n}`;
     }

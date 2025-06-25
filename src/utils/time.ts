@@ -48,6 +48,7 @@ export function formatLastChecked(lastChecked?: number | Date): string {
     if (!lastChecked) return "Never";
 
     // Handle both timestamp numbers and Date objects
+    // eslint-disable-next-line functional/no-let -- timestamp is not assigned at declaration and may be assigned in multiple branches, you must use let here.
     let timestamp: number;
     if (lastChecked instanceof Date) {
         timestamp = lastChecked.getTime();
@@ -94,6 +95,7 @@ export type TimePeriod = keyof typeof CHART_TIME_PERIODS;
 export const TIME_PERIOD_LABELS: Record<TimePeriod, string> = {
     "1h": "Last Hour",
     "24h": "Last 24 Hours",
+    // eslint-disable-next-line perfectionist/sort-objects -- keep in ascending order
     "7d": "Last 7 Days",
     "30d": "Last 30 Days",
 } as const;

@@ -1,8 +1,10 @@
 import { useMemo } from "react";
-import { Monitor, StatusHistory } from "../types";
-import { CHART_TIME_PERIODS } from "../constants";
-import type { TimePeriod } from "../utils/time";
+
 import type { Theme } from "../theme/types";
+import type { TimePeriod } from "../utils/time";
+
+import { CHART_TIME_PERIODS } from "../constants";
+import { Monitor, StatusHistory } from "../types";
 
 // Enhanced types for better IntelliSense and error catching
 export interface DowntimePeriod {
@@ -85,9 +87,9 @@ export function useSiteAnalytics(monitor: Monitor | undefined, timeRange: TimePe
             if (record.status === "down") {
                 if (!currentDowntime) {
                     currentDowntime = {
-                        start: record.timestamp,
-                        end: record.timestamp,
                         duration: 0,
+                        end: record.timestamp,
+                        start: record.timestamp,
                     };
                 } else {
                     currentDowntime.end = record.timestamp;
@@ -109,21 +111,21 @@ export function useSiteAnalytics(monitor: Monitor | undefined, timeRange: TimePe
         const mttr = downtimePeriods.length > 0 ? totalDowntime / downtimePeriods.length : 0;
 
         return {
-            totalChecks,
-            upCount,
-            downCount,
-            uptime,
             avgResponseTime,
+            downCount,
+            downtimePeriods,
             fastestResponse,
-            slowestResponse,
+            filteredHistory,
+            incidentCount: downtimePeriods.length,
+            mttr,
             p50,
             p95,
             p99,
-            downtimePeriods,
+            slowestResponse,
+            totalChecks,
             totalDowntime,
-            mttr,
-            incidentCount: downtimePeriods.length,
-            filteredHistory,
+            upCount,
+            uptime,
         };
     }, [monitor?.history, timeRange]);
 }
@@ -139,24 +141,24 @@ export function useChartData(monitor: Monitor, theme: Theme) {
         const lineChartData = {
             datasets: [
                 {
-                    label: "Response Time",
+                    backgroundColor: `${theme.colors.primary[500]}20`,
+                    borderColor: theme.colors.primary[500],
+                    borderWidth: 2,
                     data: sortedHistory.map((record) => ({
                         x: record.timestamp,
                         y: record.responseTime,
                     })),
-                    borderColor: theme.colors.primary[500],
-                    backgroundColor: `${theme.colors.primary[500]}20`,
-                    borderWidth: 2,
                     fill: true,
-                    tension: 0.1,
+                    label: "Response Time",
                     pointBackgroundColor: sortedHistory.map((record) =>
                         record.status === "up" ? theme.colors.success : theme.colors.error
                     ),
                     pointBorderColor: sortedHistory.map((record) =>
                         record.status === "up" ? theme.colors.success : theme.colors.error
                     ),
-                    pointRadius: 4,
                     pointHoverRadius: 6,
+                    pointRadius: 4,
+                    tension: 0.1,
                 },
             ],
         };
@@ -169,26 +171,6 @@ export function useChartData(monitor: Monitor, theme: Theme) {
  * Utility functions for common calculations
  */
 export const SiteAnalyticsUtils = {
-    /**
-     * Get availability status based on uptime percentage
-     */
-    getAvailabilityStatus(uptime: number): "excellent" | "good" | "warning" | "critical" {
-        if (uptime >= 99.9) return "excellent";
-        if (uptime >= 99) return "good";
-        if (uptime >= 95) return "warning";
-        return "critical";
-    },
-
-    /**
-     * Get performance status based on response time
-     */
-    getPerformanceStatus(responseTime: number): "excellent" | "good" | "warning" | "critical" {
-        if (responseTime <= 200) return "excellent";
-        if (responseTime <= 500) return "good";
-        if (responseTime <= 1000) return "warning";
-        return "critical";
-    },
-
     /**
      * Calculate SLA compliance
      */
@@ -207,10 +189,28 @@ export const SiteAnalyticsUtils = {
         const actualDowntime = (100 - uptime) / 100;
 
         return {
+            actualDowntime,
+            allowedDowntime,
             compliant,
             deficit,
-            allowedDowntime,
-            actualDowntime,
         };
+    },
+    /**
+     * Get availability status based on uptime percentage
+     */
+    getAvailabilityStatus(uptime: number): "excellent" | "good" | "warning" | "critical" {
+        if (uptime >= 99.9) return "excellent";
+        if (uptime >= 99) return "good";
+        if (uptime >= 95) return "warning";
+        return "critical";
+    },
+    /**
+     * Get performance status based on response time
+     */
+    getPerformanceStatus(responseTime: number): "excellent" | "good" | "warning" | "critical" {
+        if (responseTime <= 200) return "excellent";
+        if (responseTime <= 500) return "good";
+        if (responseTime <= 1000) return "warning";
+        return "critical";
     },
 };

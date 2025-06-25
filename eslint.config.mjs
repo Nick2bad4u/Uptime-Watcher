@@ -62,6 +62,8 @@ export default [
             "eslint.config.js",
             "eslint.config.cjs",
             "node_modules/**",
+            "**/dist/**",
+            "**/dist-electron/**",
         ],
     },
 
@@ -138,7 +140,7 @@ export default [
             ...js.configs.recommended.rules,
             // import plugin: enable a few best-practice rules manually
             "import/order": [
-                "warn",
+                "off",
                 {
                     alphabetize: {
                         order: "asc",
@@ -284,7 +286,7 @@ export default [
             ...tseslint.configs.recommended.rules,
             // import plugin: enable a few best-practice rules manually
             "import/order": [
-                "warn",
+                "off",
                 {
                     alphabetize: {
                         order: "asc",
