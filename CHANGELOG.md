@@ -7,9 +7,32 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[73ac430](https://github.com/Nick2bad4u/Uptime-Watcher/commit/73ac43078cf1593f2d1712df6b1bbf93d80d94d6)...
+[73ac430](https://github.com/Nick2bad4u/Uptime-Watcher/commit/73ac43078cf1593f2d1712df6b1bbf93d80d94d6)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/73ac43078cf1593f2d1712df6b1bbf93d80d94d6...73ac43078cf1593f2d1712df6b1bbf93d80d94d6))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 2.5.0 [`(73ac430)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/73ac43078cf1593f2d1712df6b1bbf93d80d94d6)
+
+
+
+
+
+
+## [2.5.0] - 2025-06-24
+
+
 [[b7385f3](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b7385f3983f14e2a79656e6e6736a9f9437578be)...
-[e6627ae](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e6627ae06b36ec4d73429f72be7a99949f65bc98)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/b7385f3983f14e2a79656e6e6736a9f9437578be...e6627ae06b36ec4d73429f72be7a99949f65bc98))
+[190ee58](https://github.com/Nick2bad4u/Uptime-Watcher/commit/190ee58f64409fcca300e3c5b00ba467a93171be)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/b7385f3983f14e2a79656e6e6736a9f9437578be...190ee58f64409fcca300e3c5b00ba467a93171be))
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(2e619f0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2e619f05f6a3b3bb61104b2cf5d941f1e0b410a3)
+
 
 
 ### 🛠️ GitHub Actions
@@ -23,7 +46,43 @@ All notable changes to this project will be documented in this file.
 
 ### 💼 Other
 
+- 🚜 [refactor] Standardize nullable state to use undefined
+
+- Replaces usage of null with undefined for all optional state and function return values across components, hooks, and store
+- Improves type consistency and aligns codebase with TypeScript best practices for representing absence of value
+- Simplifies logic around error states, selected items, and UI resets by unifying handling of uninitialized or cleared values [`(190ee58)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/190ee58f64409fcca300e3c5b00ba467a93171be)
+
+
+- Improves ignore settings and cleans up VSCode config
+
+Updates ignore patterns for Prettier and VSCode to better match project structure, removes redundant .vscodeignore, and tidies import order for consistency. Enhances editor usability and prevents formatting or indexing of unnecessary files. [`(98b2a6b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/98b2a6bc51be5ec93e5d99e2fda1737d45d5d80d)
+
+
+- Refactor code to use CommonJS module syntax and improve strict mode compliance
+
+- Updated main.js to use CommonJS imports and added strict mode.
+- Refactored chartConfig.js to use CommonJS exports and added strict mode.
+- Modified logger.js to utilize CommonJS imports and exports, ensuring consistent logging.
+- Adjusted store.js to implement CommonJS syntax and added strict mode.
+- Refactored ThemeManager.js to use CommonJS exports and added strict mode.
+- Updated components.js to utilize CommonJS imports and exports, enhancing component structure.
+- Refactored themes.js to use CommonJS exports and added strict mode.
+- Updated types.js to include strict mode and CommonJS exports.
+- Refactored useTheme.js to utilize CommonJS imports and exports, improving theme management.
+- Updated status.js to use CommonJS exports and added strict mode.
+- Refactored time.js to utilize CommonJS exports and added strict mode.
+- Modified vite.config.js to use CommonJS imports and exports, ensuring compatibility.
+- Updated tsconfig.json to change module resolution to CommonJS and include additional file types.
+- Adjusted vite.config.ts to remove unnecessary copy to dist/ for frontend assets. [skip-ci] [`(12280c6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/12280c6588b4e93ef278daffb8934e7f3a6f65b2)
+
+
 - Update .markdownlintignore [skip-ci] [`(8e92aa5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8e92aa55e40da0aa48f986c8769d2e992b480df9)
+
+
+
+### ⚙️ Miscellaneous Tasks
+
+- Update changelogs for v2.4.0 [skip ci] [`(d9e7bcc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d9e7bccf8122f08073c7fac7464529ad0448ad05)
 
 
 
