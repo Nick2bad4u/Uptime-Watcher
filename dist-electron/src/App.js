@@ -29,22 +29,15 @@ function App() {
     const [showLoadingOverlay, setShowLoadingOverlay] = (0, react_1.useState)(false);
     // Only show loading overlay if loading takes more than 100ms
     (0, react_1.useEffect)(() => {
-        let timeoutId;
         if (isLoading) {
-            // Show loading overlay after 100ms delay
-            timeoutId = setTimeout(() => {
+            const timeoutId = setTimeout(() => {
                 setShowLoadingOverlay(true);
             }, constants_1.UI_DELAYS.LOADING_OVERLAY);
+            return () => clearTimeout(timeoutId);
         }
         else {
-            // Hide loading overlay immediately when loading stops
             setShowLoadingOverlay(false);
         }
-        return () => {
-            if (timeoutId) {
-                clearTimeout(timeoutId);
-            }
-        };
     }, [isLoading]);
     (0, react_1.useEffect)(() => {
         if (process.env.NODE_ENV === "production") {

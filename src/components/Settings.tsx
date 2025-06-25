@@ -1,5 +1,8 @@
+import { useState, useEffect, useCallback } from "react";
+
+import { HISTORY_LIMIT_OPTIONS, TIMEOUT_CONSTRAINTS, UI_DELAYS } from "../constants";
+import logger from "../services/logger";
 import { useStore } from "../store";
-import { ThemeName } from "../theme/types";
 import {
     ThemedBox,
     ThemedText,
@@ -9,10 +12,8 @@ import {
     ThemedSelect,
     ThemedCheckbox,
 } from "../theme/components";
+import { ThemeName } from "../theme/types";
 import { useTheme } from "../theme/useTheme";
-import { HISTORY_LIMIT_OPTIONS, TIMEOUT_CONSTRAINTS, UI_DELAYS } from "../constants";
-import { useState, useEffect, useCallback } from "react";
-import logger from "../services/logger";
 
 interface SettingsProps {
     onClose: () => void;
@@ -20,19 +21,19 @@ interface SettingsProps {
 
 export function Settings({ onClose }: SettingsProps) {
     const {
-        settings,
-        updateSettings,
-        resetSettings,
-        lastError,
         clearError,
-        isLoading,
-        updateHistoryLimitValue,
-        syncSitesFromBackend,
         downloadSQLiteBackup, // <-- keep this
+        isLoading,
+        lastError,
+        resetSettings,
         setError, // <-- keep this
+        settings,
+        syncSitesFromBackend,
+        updateHistoryLimitValue,
+        updateSettings,
     } = useStore();
 
-    const { setTheme, availableThemes, isDark } = useTheme();
+    const { availableThemes, isDark, setTheme } = useTheme();
 
     // Delayed loading state for button spinners (100ms delay)
     const [showButtonLoading, setShowButtonLoading] = useState(false);
@@ -40,23 +41,16 @@ export function Settings({ onClose }: SettingsProps) {
     const [syncSuccess, setSyncSuccess] = useState(false);
 
     useEffect(() => {
-        let timeoutId: NodeJS.Timeout;
-
         if (isLoading) {
-            // Show button loading after 100ms delay
-            timeoutId = setTimeout(() => {
+            const timeoutId = setTimeout(() => {
                 setShowButtonLoading(true);
             }, UI_DELAYS.LOADING_BUTTON);
+            return () => {
+                clearTimeout(timeoutId);
+            };
         } else {
-            // Hide button loading immediately when loading stops
             setShowButtonLoading(false);
         }
-
-        return () => {
-            if (timeoutId) {
-                clearTimeout(timeoutId);
-            }
-        };
     }, [isLoading]);
 
     const handleSettingChange = (key: keyof typeof settings, value: unknown) => {
@@ -160,12 +154,7 @@ export function Settings({ onClose }: SettingsProps) {
                 )}
                 {/* Sync Success Display */}
                 {syncSuccess && !lastError && (
-                    <ThemedBox
-                        surface="base"
-                        padding="md"
-                        className="success-alert"
-                        rounded="md"
-                    >
+                    <ThemedBox surface="base" padding="md" className="success-alert" rounded="md">
                         <ThemedText variant="success" size="sm">
                             ✅ Data synced from database.
                         </ThemedText>
@@ -383,7 +372,8 @@ export function Settings({ onClose }: SettingsProps) {
                                     Download SQLite Backup
                                 </ThemedButton>
                                 <ThemedText size="xs" variant="tertiary" className="mt-1 block">
-                                    Download a direct backup of the raw SQLite database file for advanced backup or migration.
+                                    Download a direct backup of the raw SQLite database file for advanced backup or
+                                    migration.
                                 </ThemedText>
                             </div>
                         </div>

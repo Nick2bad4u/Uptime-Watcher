@@ -1,3 +1,4 @@
+/* eslint-disable functional/no-let */
 import { useStore } from "../store";
 import { ThemedBox, ThemedText, ThemedButton, StatusIndicator } from "../theme/components";
 import { useTheme } from "../theme/useTheme";
@@ -5,8 +6,8 @@ import { useAvailabilityColors } from "../theme/useTheme";
 import "./Header.css";
 
 export function Header() {
-    const { sites, setShowSettings } = useStore();
-    const { toggleTheme, isDark } = useTheme();
+    const { setShowSettings, sites } = useStore();
+    const { isDark, toggleTheme } = useTheme();
     const { getAvailabilityColor } = useAvailabilityColors();
 
     // Count all monitors across all sites by status
@@ -14,14 +15,15 @@ export function Header() {
     let downMonitors = 0;
     let pendingMonitors = 0;
     let totalMonitors = 0;
-    sites.forEach((site) => {
-        site.monitors?.forEach((monitor) => {
-            totalMonitors++;
-            if (monitor.status === "up") upMonitors++;
-            else if (monitor.status === "down") downMonitors++;
-            else if (monitor.status === "pending") pendingMonitors++;
-        });
-    });
+    for (const site of sites) {
+        if (site.monitors)
+            for (const monitor of site.monitors) {
+                totalMonitors++;
+                if (monitor.status === "up") upMonitors++;
+                else if (monitor.status === "down") downMonitors++;
+                else if (monitor.status === "pending") pendingMonitors++;
+            }
+    }
 
     // Calculate uptime percentage for monitors
     const uptimePercentage = totalMonitors > 0 ? Math.round((upMonitors / totalMonitors) * 100) : 0;
@@ -74,7 +76,7 @@ export function Header() {
                                 </div>
                             )}
 
-                            {totalMonitors > 0 && <div className="w-px h-8 bg-current opacity-20"></div>}
+                            {totalMonitors > 0 && <div className="w-px h-8 bg-current opacity-20" />}
 
                             {/* Up Status */}
                             <div className="flex items-center space-x-2 px-2 py-1 rounded-md transition-all duration-200 group status-up-badge">
@@ -90,7 +92,7 @@ export function Header() {
                             </div>
 
                             {/* Divider */}
-                            <div className="w-px h-8 bg-current opacity-20"></div>
+                            <div className="w-px h-8 bg-current opacity-20" />
 
                             {/* Down Status */}
                             <div className="flex items-center space-x-2 px-2 py-1 rounded-md transition-all duration-200 group status-down-badge">
@@ -106,7 +108,7 @@ export function Header() {
                             </div>
 
                             {/* Divider */}
-                            <div className="w-px h-8 bg-current opacity-20"></div>
+                            <div className="w-px h-8 bg-current opacity-20" />
 
                             {/* Pending Status */}
                             <div className="flex items-center space-x-2 px-2 py-1 rounded-md transition-all duration-200 group status-pending-badge">
@@ -124,9 +126,9 @@ export function Header() {
                             {/* Total Sites Badge */}
                             {totalMonitors > 0 && (
                                 <>
-                                    <div className="w-px h-8 bg-current opacity-20"></div>
+                                    <div className="w-px h-8 bg-current opacity-20" />
                                     <div className="flex items-center space-x-2 px-2 py-1 rounded-md bg-opacity-10 total-sites-badge">
-                                        <div className="w-2 h-2 rounded-full bg-current opacity-50"></div>
+                                        <div className="w-2 h-2 rounded-full bg-current opacity-50" />
                                         <div className="flex flex-col">
                                             <ThemedText size="sm" weight="semibold" variant="primary">
                                                 {totalMonitors}

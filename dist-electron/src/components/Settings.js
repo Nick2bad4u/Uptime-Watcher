@@ -5,38 +5,33 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Settings = Settings;
 const jsx_runtime_1 = require("react/jsx-runtime");
+const react_1 = require("react");
+const constants_1 = require("../constants");
+const logger_1 = __importDefault(require("../services/logger"));
 const store_1 = require("../store");
 const components_1 = require("../theme/components");
 const useTheme_1 = require("../theme/useTheme");
-const constants_1 = require("../constants");
-const react_1 = require("react");
-const logger_1 = __importDefault(require("../services/logger"));
 function Settings({ onClose }) {
-    const { settings, updateSettings, resetSettings, lastError, clearError, isLoading, updateHistoryLimitValue, syncSitesFromBackend, downloadSQLiteBackup, // <-- keep this
-    setError, // <-- keep this
-     } = (0, store_1.useStore)();
-    const { setTheme, availableThemes, isDark } = (0, useTheme_1.useTheme)();
+    const { clearError, downloadSQLiteBackup, // <-- keep this
+    isLoading, lastError, resetSettings, setError, // <-- keep this
+    settings, syncSitesFromBackend, updateHistoryLimitValue, updateSettings, } = (0, store_1.useStore)();
+    const { availableThemes, isDark, setTheme } = (0, useTheme_1.useTheme)();
     // Delayed loading state for button spinners (100ms delay)
     const [showButtonLoading, setShowButtonLoading] = (0, react_1.useState)(false);
     // Local state for sync success message
     const [syncSuccess, setSyncSuccess] = (0, react_1.useState)(false);
     (0, react_1.useEffect)(() => {
-        let timeoutId;
         if (isLoading) {
-            // Show button loading after 100ms delay
-            timeoutId = setTimeout(() => {
+            const timeoutId = setTimeout(() => {
                 setShowButtonLoading(true);
             }, constants_1.UI_DELAYS.LOADING_BUTTON);
+            return () => {
+                clearTimeout(timeoutId);
+            };
         }
         else {
-            // Hide button loading immediately when loading stops
             setShowButtonLoading(false);
         }
-        return () => {
-            if (timeoutId) {
-                clearTimeout(timeoutId);
-            }
-        };
     }, [isLoading]);
     const handleSettingChange = (key, value) => {
         const oldValue = settings[key];

@@ -318,6 +318,7 @@
 }
 
 /* Responsive adjustments */
+/* stylelint-disable-next-line media-feature-range-notation -- messes up postcss */
 @media (max-width: 768px) {
     .site-details-modal {
         padding: var(--spacing-sm);

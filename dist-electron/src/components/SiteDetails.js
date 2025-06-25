@@ -5,38 +5,38 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SiteDetails = SiteDetails;
 const jsx_runtime_1 = require("react/jsx-runtime");
-const react_1 = require("react");
 const chart_js_1 = require("chart.js");
 const chartjs_plugin_zoom_1 = __importDefault(require("chartjs-plugin-zoom"));
+const react_1 = require("react");
 const react_chartjs_2_1 = require("react-chartjs-2");
-const useTheme_1 = require("../theme/useTheme");
-const store_1 = require("../store");
-const status_1 = require("../utils/status");
-const time_1 = require("../utils/time");
-const constants_1 = require("../constants");
-const chartConfig_1 = require("../services/chartConfig");
-const logger_1 = __importDefault(require("../services/logger"));
-const useSiteAnalytics_1 = require("../hooks/useSiteAnalytics");
-const components_1 = require("../theme/components");
-require("chartjs-adapter-date-fns");
-require("./SiteDetails.css");
+const react_dom_1 = require("react-dom");
 const fa_1 = require("react-icons/fa");
 const fi_1 = require("react-icons/fi");
 const md_1 = require("react-icons/md");
-const react_dom_1 = require("react-dom");
+const constants_1 = require("../constants");
+const useSiteAnalytics_1 = require("../hooks/useSiteAnalytics");
+const chartConfig_1 = require("../services/chartConfig");
+const logger_1 = __importDefault(require("../services/logger"));
+const store_1 = require("../store");
+const components_1 = require("../theme/components");
+require("chartjs-adapter-date-fns");
+require("./SiteDetails.css");
+const useTheme_1 = require("../theme/useTheme");
+const status_1 = require("../utils/status");
+const time_1 = require("../utils/time");
 // Register Chart.js components
 chart_js_1.Chart.register(chart_js_1.CategoryScale, chart_js_1.LinearScale, chart_js_1.PointElement, chart_js_1.LineElement, chart_js_1.BarElement, chart_js_1.Title, chart_js_1.Tooltip, chart_js_1.Legend, chart_js_1.TimeScale, chart_js_1.Filler, chart_js_1.DoughnutController, chart_js_1.ArcElement, chartjs_plugin_zoom_1.default);
-function SiteDetails({ site, onClose }) {
+function SiteDetails({ onClose, site }) {
     const { currentTheme } = (0, useTheme_1.useTheme)();
-    const { getAvailabilityColor, getAvailabilityVariant, getAvailabilityDescription } = (0, useTheme_1.useAvailabilityColors)();
-    const { sites, deleteSite, checkSiteNow, isLoading, clearError, startSiteMonitorMonitoring, stopSiteMonitorMonitoring, updateSiteCheckInterval, 
+    const { getAvailabilityColor, getAvailabilityDescription, getAvailabilityVariant } = (0, useTheme_1.useAvailabilityColors)();
+    const { 
     // Synchronized UI state from store
-    activeSiteDetailsTab, setActiveSiteDetailsTab, siteDetailsChartTimeRange, setSiteDetailsChartTimeRange, showAdvancedMetrics, setShowAdvancedMetrics, setSelectedMonitorId, getSelectedMonitorId, } = (0, store_1.useStore)();
+    activeSiteDetailsTab, checkSiteNow, clearError, deleteSite, getSelectedMonitorId, isLoading, setActiveSiteDetailsTab, setSelectedMonitorId, setShowAdvancedMetrics, setSiteDetailsChartTimeRange, showAdvancedMetrics, siteDetailsChartTimeRange, sites, startSiteMonitorMonitoring, stopSiteMonitorMonitoring, updateSiteCheckInterval, } = (0, store_1.useStore)();
     const [isRefreshing, setIsRefreshing] = (0, react_1.useState)(false);
     // Always call hooks first, use fallback for currentSite
     const currentSite = sites.find((s) => s.identifier === site.identifier) || {
-        monitors: [],
         identifier: site.identifier,
+        monitors: [],
     };
     const monitorIds = currentSite.monitors.map((m) => m.id);
     const defaultMonitorId = monitorIds[0] || "";
@@ -87,35 +87,35 @@ function SiteDetails({ site, onClose }) {
     const barChartOptions = (0, react_1.useMemo)(() => chartConfig.getBarChartConfig(), [chartConfig]);
     // Chart data using analytics
     const lineChartData = (0, react_1.useMemo)(() => ({
-        labels: analytics.filteredHistory.map((h) => new Date(h.timestamp)),
         datasets: [
             {
-                label: "Response Time (ms)",
-                data: analytics.filteredHistory.map((h) => h.responseTime),
-                borderColor: currentTheme.colors.primary[500],
                 backgroundColor: currentTheme.colors.primary[500] + "20",
+                borderColor: currentTheme.colors.primary[500],
+                data: analytics.filteredHistory.map((h) => h.responseTime),
                 fill: true,
+                label: "Response Time (ms)",
                 tension: 0.1,
             },
         ],
+        labels: analytics.filteredHistory.map((h) => new Date(h.timestamp)),
     }), [analytics.filteredHistory, currentTheme]);
     const barChartData = (0, react_1.useMemo)(() => ({
-        labels: ["Up", "Down"],
         datasets: [
             {
-                data: [analytics.upCount, analytics.downCount],
                 backgroundColor: [currentTheme.colors.success, currentTheme.colors.error],
+                data: [analytics.upCount, analytics.downCount],
             },
         ],
+        labels: ["Up", "Down"],
     }), [analytics.upCount, analytics.downCount, currentTheme]);
     const doughnutChartData = (0, react_1.useMemo)(() => ({
-        labels: ["Up", "Down"],
         datasets: [
             {
-                data: [analytics.upCount, analytics.downCount],
                 backgroundColor: [currentTheme.colors.success, currentTheme.colors.error],
+                data: [analytics.upCount, analytics.downCount],
             },
         ],
+        labels: ["Up", "Down"],
     }), [analytics.upCount, analytics.downCount, currentTheme]);
     const doughnutOptions = (0, react_1.useMemo)(() => chartConfig.getDoughnutChartConfig(analytics.totalChecks), [chartConfig, analytics.totalChecks]);
     // Handler for monitor selection change (dropdown)
@@ -198,8 +198,8 @@ function SiteDetails({ site, onClose }) {
                                                 }) }), intervalChanged && ((0, jsx_runtime_1.jsx)(components_1.ThemedButton, { variant: "primary", size: "sm", onClick: handleSaveInterval, children: "Save" })), (0, jsx_runtime_1.jsx)(components_1.ThemedButton, { variant: "ghost", size: "sm", onClick: handleCheckNow, className: "min-w-[32px]", "aria-label": "Check Now", disabled: isLoading, children: (0, jsx_runtime_1.jsx)("span", { children: "\uD83D\uDD04" }) }), isMonitoring ? ((0, jsx_runtime_1.jsxs)(components_1.ThemedButton, { variant: "error", size: "sm", onClick: handleStopMonitoring, "aria-label": "Stop Monitoring", className: "flex items-center gap-1", children: [(0, jsx_runtime_1.jsx)("span", { className: "inline-block", children: "\u23F8\uFE0F" }), (0, jsx_runtime_1.jsx)("span", { className: "hidden sm:inline", children: "Stop" })] })) : ((0, jsx_runtime_1.jsxs)(components_1.ThemedButton, { variant: "success", size: "sm", onClick: handleStartMonitoring, "aria-label": "Start Monitoring", className: "flex items-center gap-1", children: [(0, jsx_runtime_1.jsx)("span", { className: "inline-block", children: "\u25B6\uFE0F" }), (0, jsx_runtime_1.jsx)("span", { className: "hidden sm:inline", children: "Start" })] })), (0, jsx_runtime_1.jsx)(components_1.ThemedText, { variant: "secondary", size: "base", children: "Monitor:" }), (0, jsx_runtime_1.jsx)(components_1.ThemedSelect, { value: selectedMonitorId, onChange: handleMonitorIdChange, children: currentSite.monitors.map((monitor) => ((0, jsx_runtime_1.jsx)("option", { value: monitor.id, children: monitor.type.toUpperCase() }, monitor.id))) })] })] }), activeSiteDetailsTab === `${selectedMonitorId}-analytics` &&
                                 (selectedMonitorId === "http" || selectedMonitorId === "port") && ((0, jsx_runtime_1.jsxs)("div", { className: "flex items-center flex-wrap gap-3 mt-4", children: [(0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "sm", variant: "secondary", className: "mr-2", children: "Time Range:" }), (0, jsx_runtime_1.jsx)("div", { className: "flex flex-wrap gap-1", children: ["1h", "24h", "7d", "30d"].map((range) => ((0, jsx_runtime_1.jsx)(components_1.ThemedButton, { variant: siteDetailsChartTimeRange === range ? "primary" : "ghost", size: "xs", onClick: () => setSiteDetailsChartTimeRange(range), children: range }, range))) })] }))] }), (0, jsx_runtime_1.jsxs)(components_1.ThemedBox, { variant: "primary", padding: "lg", className: "max-h-[70vh] overflow-y-auto", children: [activeSiteDetailsTab === "overview" && ((0, jsx_runtime_1.jsx)(OverviewTab, { selectedMonitor: selectedMonitor, uptime: analytics.uptime, avgResponseTime: analytics.avgResponseTime, totalChecks: analytics.totalChecks, fastestResponse: analytics.fastestResponse, slowestResponse: analytics.slowestResponse, formatResponseTime: time_1.formatResponseTime, handleRemoveSite: handleRemoveSite, isLoading: isLoading })), activeSiteDetailsTab === `${selectedMonitorId}-analytics` && ((0, jsx_runtime_1.jsx)(AnalyticsTab, { filteredHistory: analytics.filteredHistory, upCount: analytics.upCount, downCount: analytics.downCount, totalChecks: analytics.totalChecks, uptime: analytics.uptime, avgResponseTime: analytics.avgResponseTime, p50: analytics.p50, p95: analytics.p95, p99: analytics.p99, mttr: analytics.mttr, totalDowntime: analytics.totalDowntime, downtimePeriods: analytics.downtimePeriods, chartTimeRange: siteDetailsChartTimeRange, lineChartData: lineChartData, lineChartOptions: lineChartOptions, barChartData: barChartData, barChartOptions: barChartOptions, uptimeChartData: doughnutChartData, doughnutOptions: doughnutOptions, formatResponseTime: time_1.formatResponseTime, formatDuration: time_1.formatDuration, showAdvancedMetrics: showAdvancedMetrics, setShowAdvancedMetrics: setShowAdvancedMetrics, getAvailabilityColor: getAvailabilityColor, getAvailabilityVariant: getAvailabilityVariant, getAvailabilityDescription: getAvailabilityDescription, monitorType: selectedMonitor?.type })), activeSiteDetailsTab === "history" && ((0, jsx_runtime_1.jsx)(HistoryTab, { selectedMonitor: selectedMonitor, formatResponseTime: time_1.formatResponseTime, formatFullTimestamp: time_1.formatFullTimestamp, formatStatusWithIcon: status_1.formatStatusWithIcon })), activeSiteDetailsTab === "settings" && ((0, jsx_runtime_1.jsx)(SettingsTab, { currentSite: site, selectedMonitor: selectedMonitor, handleRemoveSite: handleRemoveSite, isLoading: isLoading, localCheckInterval: localCheckInterval, intervalChanged: intervalChanged, handleIntervalChange: handleIntervalChange, handleSaveInterval: handleSaveInterval }))] })] }) }) }));
 }
-function OverviewTab({ selectedMonitor, uptime, avgResponseTime, totalChecks, fastestResponse, slowestResponse, formatResponseTime, handleRemoveSite, isLoading, }) {
-    const { getAvailabilityVariant, getAvailabilityColor } = (0, useTheme_1.useAvailabilityColors)();
+function OverviewTab({ avgResponseTime, fastestResponse, formatResponseTime, handleRemoveSite, isLoading, selectedMonitor, slowestResponse, totalChecks, uptime, }) {
+    const { getAvailabilityColor, getAvailabilityVariant } = (0, useTheme_1.useAvailabilityColors)();
     const { currentTheme } = (0, useTheme_1.useTheme)();
     // Map availability variant to progress/badge variant
     const mapAvailabilityToBadgeVariant = (availability) => {
@@ -218,17 +218,17 @@ function OverviewTab({ selectedMonitor, uptime, avgResponseTime, totalChecks, fa
     const quickActionIconColor = currentTheme.colors.error; // Quick action uses theme error
     return ((0, jsx_runtime_1.jsxs)("div", { className: "space-y-6", children: [(0, jsx_runtime_1.jsxs)("div", { className: "grid grid-cols-2 md:grid-cols-4 gap-4", children: [(0, jsx_runtime_1.jsx)(components_1.ThemedCard, { icon: (0, jsx_runtime_1.jsx)(md_1.MdOutlineFactCheck, {}), iconColor: statusIconColor, title: "Status", hoverable: true, className: "text-center flex flex-col items-center", children: (0, jsx_runtime_1.jsx)(components_1.StatusIndicator, { status: selectedMonitor.status, size: "lg", showText: true }) }), (0, jsx_runtime_1.jsxs)(components_1.ThemedCard, { icon: (0, jsx_runtime_1.jsx)(md_1.MdAccessTime, {}), iconColor: uptimeIconColor, title: "Uptime", hoverable: true, className: "text-center flex flex-col items-center", children: [(0, jsx_runtime_1.jsx)(components_1.ThemedProgress, { value: uptimeValue, variant: progressVariant, showLabel: true, className: "flex flex-col items-center" }), (0, jsx_runtime_1.jsxs)(components_1.ThemedBadge, { variant: progressVariant, size: "sm", className: "mt-2", children: [uptime, "%"] })] }), (0, jsx_runtime_1.jsx)(components_1.ThemedCard, { icon: (0, jsx_runtime_1.jsx)(md_1.MdSpeed, {}), iconColor: responseIconColor, title: "Response Time", hoverable: true, className: "text-center flex flex-col items-center", children: (0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "xl", weight: "bold", children: formatResponseTime(avgResponseTime) }) }), (0, jsx_runtime_1.jsx)(components_1.ThemedCard, { icon: (0, jsx_runtime_1.jsx)(fa_1.FaListOl, {}), iconColor: checksIconColor, title: "Total Checks", hoverable: true, className: "text-center flex flex-col items-center", children: (0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "xl", weight: "bold", children: totalChecks }) })] }), (0, jsx_runtime_1.jsx)(components_1.ThemedCard, { icon: (0, jsx_runtime_1.jsx)(md_1.MdBolt, { color: fastestIconColor }), title: "Performance Overview", children: (0, jsx_runtime_1.jsxs)("div", { className: "grid grid-cols-2 gap-6", children: [(0, jsx_runtime_1.jsxs)("div", { children: [(0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "sm", variant: "secondary", children: "Fastest Response" }), (0, jsx_runtime_1.jsx)(components_1.ThemedBadge, { variant: "success", icon: (0, jsx_runtime_1.jsx)(md_1.MdBolt, {}), iconColor: fastestIconColor, className: "ml-4", children: formatResponseTime(fastestResponse) })] }), (0, jsx_runtime_1.jsxs)("div", { children: [(0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "sm", variant: "secondary", children: "Slowest Response" }), (0, jsx_runtime_1.jsx)(components_1.ThemedBadge, { variant: "warning", icon: (0, jsx_runtime_1.jsx)(md_1.MdAccessTime, {}), iconColor: slowestIconColor, className: "ml-4", children: formatResponseTime(slowestResponse) })] })] }) }), (0, jsx_runtime_1.jsx)(components_1.ThemedCard, { icon: (0, jsx_runtime_1.jsx)(md_1.MdBolt, { color: quickActionIconColor }), title: "Quick Actions", children: (0, jsx_runtime_1.jsx)("div", { className: "flex space-x-3", children: (0, jsx_runtime_1.jsx)(components_1.ThemedButton, { variant: "error", size: "sm", onClick: handleRemoveSite, disabled: isLoading, icon: (0, jsx_runtime_1.jsx)(fi_1.FiTrash2, {}), children: "Remove Site" }) }) })] }));
 }
-function AnalyticsTab({ upCount, downCount, totalChecks, uptime, avgResponseTime, p50, p95, p99, mttr, totalDowntime, downtimePeriods, chartTimeRange, lineChartData, lineChartOptions, barChartData, barChartOptions, uptimeChartData, doughnutOptions, formatResponseTime, formatDuration, showAdvancedMetrics, setShowAdvancedMetrics, getAvailabilityColor, getAvailabilityVariant, getAvailabilityDescription, monitorType, }) {
+function AnalyticsTab({ avgResponseTime, barChartData, barChartOptions, chartTimeRange, doughnutOptions, downCount, downtimePeriods, formatDuration, formatResponseTime, getAvailabilityColor, getAvailabilityDescription, getAvailabilityVariant, lineChartData, lineChartOptions, monitorType, mttr, p50, p95, p99, setShowAdvancedMetrics, showAdvancedMetrics, totalChecks, totalDowntime, upCount, uptime, uptimeChartData, }) {
     return ((0, jsx_runtime_1.jsxs)("div", { className: "space-y-6", children: [(0, jsx_runtime_1.jsxs)("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-4", children: [(0, jsx_runtime_1.jsxs)(components_1.ThemedBox, { surface: "base", padding: "lg", border: true, rounded: "lg", className: "text-center flex flex-col items-center", children: [(0, jsx_runtime_1.jsxs)(components_1.ThemedText, { size: "sm", variant: "secondary", children: ["Availability (", chartTimeRange, ")"] }), (0, jsx_runtime_1.jsxs)(components_1.ThemedText, { size: "3xl", weight: "bold", variant: getAvailabilityVariant(parseFloat(uptime)), style: { color: getAvailabilityColor(parseFloat(uptime)) }, children: [uptime, "%"] }), (0, jsx_runtime_1.jsxs)(components_1.ThemedText, { size: "xs", variant: "tertiary", children: [upCount, " up / ", downCount, " down"] }), (0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "xs", variant: "secondary", className: "mt-1", children: getAvailabilityDescription(parseFloat(uptime)) })] }), (monitorType === "http" || monitorType === "port") && ((0, jsx_runtime_1.jsxs)(components_1.ThemedBox, { surface: "base", padding: "lg", border: true, rounded: "lg", className: "text-center flex flex-col items-center", children: [(0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "sm", variant: "secondary", children: "Avg Response Time" }), (0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "3xl", weight: "bold", children: formatResponseTime(avgResponseTime) }), (0, jsx_runtime_1.jsxs)(components_1.ThemedText, { size: "xs", variant: "tertiary", children: ["Based on ", totalChecks, " checks"] })] })), (0, jsx_runtime_1.jsxs)(components_1.ThemedBox, { surface: "base", padding: "lg", border: true, rounded: "lg", className: "text-center flex flex-col items-center", children: [(0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "sm", variant: "secondary", children: "Total Downtime" }), (0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "3xl", weight: "bold", variant: "danger", children: formatDuration(totalDowntime) }), (0, jsx_runtime_1.jsxs)(components_1.ThemedText, { size: "xs", variant: "tertiary", children: [downtimePeriods.length, " incidents"] })] })] }), (monitorType === "http" || monitorType === "port") && ((0, jsx_runtime_1.jsxs)(components_1.ThemedBox, { surface: "base", padding: "lg", border: true, rounded: "lg", children: [(0, jsx_runtime_1.jsxs)("div", { className: "flex items-center justify-between mb-4", children: [(0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "lg", weight: "semibold", children: "Response Time Analysis" }), (0, jsx_runtime_1.jsxs)(components_1.ThemedButton, { variant: "ghost", size: "sm", onClick: () => setShowAdvancedMetrics(!showAdvancedMetrics), children: [showAdvancedMetrics ? "Hide" : "Show", " Advanced"] })] }), (0, jsx_runtime_1.jsxs)("div", { className: "grid grid-cols-3 gap-4 mb-4", children: [(0, jsx_runtime_1.jsxs)("div", { className: "text-center flex flex-col items-center", children: [(0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "sm", variant: "secondary", className: "mb-4", children: "P50" }), (0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "lg", weight: "medium", children: formatResponseTime(p50) })] }), (0, jsx_runtime_1.jsxs)("div", { className: "text-center flex flex-col items-center", children: [(0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "sm", variant: "secondary", className: "mb-4", children: "P95" }), (0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "lg", weight: "medium", children: formatResponseTime(p95) })] }), (0, jsx_runtime_1.jsxs)("div", { className: "text-center flex flex-col items-center", children: [(0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "sm", variant: "secondary", className: "mb-4", children: "P99" }), (0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "lg", weight: "medium", children: formatResponseTime(p99) })] })] }), showAdvancedMetrics && ((0, jsx_runtime_1.jsxs)("div", { className: "grid grid-cols-2 gap-4 pt-4 border-t", children: [(0, jsx_runtime_1.jsxs)("div", { className: "text-center flex flex-col items-center", children: [(0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "sm", variant: "secondary", className: "mb-4", children: "Mean Time To Recovery" }), (0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "lg", weight: "medium", children: formatDuration(mttr) })] }), (0, jsx_runtime_1.jsxs)("div", { className: "text-center flex flex-col items-center", children: [(0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "sm", variant: "secondary", className: "mb-4", children: "Incidents" }), (0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "lg", weight: "medium", children: downtimePeriods.length })] })] }))] })), (0, jsx_runtime_1.jsxs)("div", { className: "grid grid-cols-1 lg:grid-cols-2 gap-6", children: [(monitorType === "http" || monitorType === "port") && ((0, jsx_runtime_1.jsx)(components_1.ThemedBox, { surface: "base", padding: "md", border: true, rounded: "lg", children: (0, jsx_runtime_1.jsx)("div", { className: "h-64", children: (0, jsx_runtime_1.jsx)(react_chartjs_2_1.Line, { data: lineChartData, options: lineChartOptions }) }) })), (0, jsx_runtime_1.jsx)(components_1.ThemedBox, { surface: "base", padding: "md", border: true, rounded: "lg", children: (0, jsx_runtime_1.jsx)("div", { className: "h-64", children: (0, jsx_runtime_1.jsx)(react_chartjs_2_1.Doughnut, { data: uptimeChartData, options: doughnutOptions }) }) }), (0, jsx_runtime_1.jsx)(components_1.ThemedBox, { surface: "base", padding: "md", border: true, rounded: "lg", className: "lg:col-span-2", children: (0, jsx_runtime_1.jsx)("div", { className: "h-64", children: (0, jsx_runtime_1.jsx)(react_chartjs_2_1.Bar, { data: barChartData, options: barChartOptions }) }) })] })] }));
 }
-function HistoryTab({ selectedMonitor, formatResponseTime, formatFullTimestamp, formatStatusWithIcon, }) {
+function HistoryTab({ formatFullTimestamp, formatResponseTime, formatStatusWithIcon, selectedMonitor, }) {
     const { settings } = (0, store_1.useStore)();
     const [historyFilter, setHistoryFilter] = (0, react_1.useState)("all");
     const historyLength = (selectedMonitor.history || []).length;
     const backendLimit = settings.historyLimit || 25;
     // Dropdown options: 25, 50, 100, All (clamped to backendLimit and available history)
     const maxShow = Math.min(backendLimit, historyLength);
-    const showOptions = [10, 25, 50, 100, 250, 500, 1000, 10000].filter(opt => opt <= maxShow);
+    const showOptions = [10, 25, 50, 100, 250, 500, 1000, 10000].filter((opt) => opt <= maxShow);
     // Always include 'All' if there are fewer than backendLimit
     if (historyLength > 0 && historyLength <= backendLimit && !showOptions.includes(historyLength)) {
         showOptions.push(historyLength);
@@ -238,7 +238,7 @@ function HistoryTab({ selectedMonitor, formatResponseTime, formatFullTimestamp, 
     const [historyLimit, setHistoryLimit] = (0, react_1.useState)(defaultHistoryLimit);
     (0, react_1.useEffect)(() => {
         setHistoryLimit(Math.min(50, backendLimit, (selectedMonitor.history || []).length));
-    }, [settings.historyLimit, selectedMonitor.history?.length]);
+    }, [settings.historyLimit, selectedMonitor.history.length, backendLimit, selectedMonitor.history]);
     const filteredHistoryRecords = (selectedMonitor.history || [])
         .filter((record) => historyFilter === "all" || record.status === historyFilter)
         .slice(0, historyLimit);
@@ -247,17 +247,17 @@ function HistoryTab({ selectedMonitor, formatResponseTime, formatFullTimestamp, 
         if (!record.details)
             return undefined;
         if (selectedMonitor.type === "port") {
-            return (0, jsx_runtime_1.jsxs)(components_1.ThemedText, { size: "xs", variant: "secondary", className: "ml-4", children: ["Port: ", record.details] });
+            return ((0, jsx_runtime_1.jsxs)(components_1.ThemedText, { size: "xs", variant: "secondary", className: "ml-4", children: ["Port: ", record.details] }));
         }
         if (selectedMonitor.type === "http") {
-            return (0, jsx_runtime_1.jsxs)(components_1.ThemedText, { size: "xs", variant: "secondary", className: "ml-4", children: ["Response Code: ", record.details] });
+            return ((0, jsx_runtime_1.jsxs)(components_1.ThemedText, { size: "xs", variant: "secondary", className: "ml-4", children: ["Response Code: ", record.details] }));
         }
-        return (0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "xs", variant: "secondary", className: "ml-4", children: record.details });
+        return ((0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "xs", variant: "secondary", className: "ml-4", children: record.details }));
     }
-    return ((0, jsx_runtime_1.jsxs)("div", { className: "space-y-6", children: [(0, jsx_runtime_1.jsxs)("div", { className: "flex items-center justify-between", children: [(0, jsx_runtime_1.jsxs)("div", { className: "flex items-center space-x-3", children: [(0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "lg", weight: "semibold", children: "Check History" }), (0, jsx_runtime_1.jsx)("div", { className: "flex space-x-1", children: ["all", "up", "down"].map((filter) => ((0, jsx_runtime_1.jsx)(components_1.ThemedButton, { variant: historyFilter === filter ? "primary" : "ghost", size: "xs", onClick: () => setHistoryFilter(filter), className: "capitalize ml-4", children: filter === "all" ? "All" : filter === "up" ? "✅ Up" : "❌ Down" }, filter))) })] }), (0, jsx_runtime_1.jsxs)("div", { className: "flex items-center space-x-2", children: [(0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "sm", variant: "secondary", children: "Show:" }), (0, jsx_runtime_1.jsxs)("select", { value: historyLimit, onChange: (e) => setHistoryLimit(Number(e.target.value)), className: "px-2 py-1 border rounded", "aria-label": "History limit", children: [showOptions.map(opt => ((0, jsx_runtime_1.jsx)("option", { value: opt, children: opt }, opt))), historyLength > backendLimit && ((0, jsx_runtime_1.jsxs)("option", { value: historyLength, children: ["All (", historyLength, ")"] }))] }), (0, jsx_runtime_1.jsxs)(components_1.ThemedText, { size: "sm", variant: "secondary", children: ["of ", historyLength, " checks"] })] })] }), (0, jsx_runtime_1.jsx)(components_1.ThemedBox, { surface: "base", padding: "md", border: true, rounded: "lg", className: "max-h-96 overflow-y-auto", children: (0, jsx_runtime_1.jsx)("div", { className: "space-y-2", children: filteredHistoryRecords.map((record, index) => ((0, jsx_runtime_1.jsxs)("div", { className: "flex items-center justify-between p-3 rounded-lg hover:bg-surface-elevated transition-colors", children: [(0, jsx_runtime_1.jsxs)("div", { className: "flex items-center space-x-3", children: [(0, jsx_runtime_1.jsx)(components_1.StatusIndicator, { status: record.status, size: "sm" }), (0, jsx_runtime_1.jsxs)("div", { children: [(0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "sm", weight: "medium", children: formatFullTimestamp(record.timestamp) }), (0, jsx_runtime_1.jsxs)(components_1.ThemedText, { size: "xs", variant: "secondary", className: "ml-4", children: ["Check #", (selectedMonitor.history || []).length - index] }), renderDetails(record)] })] }), (0, jsx_runtime_1.jsxs)("div", { className: "text-right", children: [(0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "sm", weight: "medium", children: formatResponseTime(record.responseTime) }), (0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "xs", variant: "secondary", className: "ml-4", children: formatStatusWithIcon(record.status) })] })] }, index))) }) }), filteredHistoryRecords.length === 0 && ((0, jsx_runtime_1.jsx)("div", { className: "text-center py-8", children: (0, jsx_runtime_1.jsx)(components_1.ThemedText, { variant: "secondary", children: "No records found for the selected filter." }) }))] }));
+    return ((0, jsx_runtime_1.jsxs)("div", { className: "space-y-6", children: [(0, jsx_runtime_1.jsxs)("div", { className: "flex items-center justify-between", children: [(0, jsx_runtime_1.jsxs)("div", { className: "flex items-center space-x-3", children: [(0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "lg", weight: "semibold", children: "Check History" }), (0, jsx_runtime_1.jsx)("div", { className: "flex space-x-1", children: ["all", "up", "down"].map((filter) => ((0, jsx_runtime_1.jsx)(components_1.ThemedButton, { variant: historyFilter === filter ? "primary" : "ghost", size: "xs", onClick: () => setHistoryFilter(filter), className: "capitalize ml-4", children: filter === "all" ? "All" : filter === "up" ? "✅ Up" : "❌ Down" }, filter))) })] }), (0, jsx_runtime_1.jsxs)("div", { className: "flex items-center space-x-2", children: [(0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "sm", variant: "secondary", children: "Show:" }), (0, jsx_runtime_1.jsxs)("select", { value: historyLimit, onChange: (e) => setHistoryLimit(Number(e.target.value)), className: "px-2 py-1 border rounded", "aria-label": "History limit", children: [showOptions.map((opt) => ((0, jsx_runtime_1.jsx)("option", { value: opt, children: opt }, opt))), historyLength > backendLimit && (0, jsx_runtime_1.jsxs)("option", { value: historyLength, children: ["All (", historyLength, ")"] })] }), (0, jsx_runtime_1.jsxs)(components_1.ThemedText, { size: "sm", variant: "secondary", children: ["of ", historyLength, " checks"] })] })] }), (0, jsx_runtime_1.jsx)(components_1.ThemedBox, { surface: "base", padding: "md", border: true, rounded: "lg", className: "max-h-96 overflow-y-auto", children: (0, jsx_runtime_1.jsx)("div", { className: "space-y-2", children: filteredHistoryRecords.map((record, index) => ((0, jsx_runtime_1.jsxs)("div", { className: "flex items-center justify-between p-3 rounded-lg hover:bg-surface-elevated transition-colors", children: [(0, jsx_runtime_1.jsxs)("div", { className: "flex items-center space-x-3", children: [(0, jsx_runtime_1.jsx)(components_1.StatusIndicator, { status: record.status, size: "sm" }), (0, jsx_runtime_1.jsxs)("div", { children: [(0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "sm", weight: "medium", children: formatFullTimestamp(record.timestamp) }), (0, jsx_runtime_1.jsxs)(components_1.ThemedText, { size: "xs", variant: "secondary", className: "ml-4", children: ["Check #", (selectedMonitor.history || []).length - index] }), renderDetails(record)] })] }), (0, jsx_runtime_1.jsxs)("div", { className: "text-right", children: [(0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "sm", weight: "medium", children: formatResponseTime(record.responseTime) }), (0, jsx_runtime_1.jsx)(components_1.ThemedText, { size: "xs", variant: "secondary", className: "ml-4", children: formatStatusWithIcon(record.status) })] })] }, index))) }) }), filteredHistoryRecords.length === 0 && ((0, jsx_runtime_1.jsx)("div", { className: "text-center py-8", children: (0, jsx_runtime_1.jsx)(components_1.ThemedText, { variant: "secondary", children: "No records found for the selected filter." }) }))] }));
 }
-function SettingsTab({ currentSite, selectedMonitor, handleRemoveSite, isLoading, localCheckInterval, intervalChanged, handleIntervalChange, handleSaveInterval, }) {
-    const { modifySite, clearError } = (0, store_1.useStore)();
+function SettingsTab({ currentSite, handleIntervalChange, handleRemoveSite, handleSaveInterval, intervalChanged, isLoading, localCheckInterval, selectedMonitor, }) {
+    const { clearError, modifySite } = (0, store_1.useStore)();
     const [localName, setLocalName] = (0, react_1.useState)(currentSite.name || "");
     const [hasUnsavedChanges, setHasUnsavedChanges] = (0, react_1.useState)(false);
     // Track changes
@@ -303,7 +303,7 @@ function hasOpenExternal(api) {
     return typeof api?.openExternal === "function";
 }
 // Update ScreenshotThumbnail to use only CSS classes for overlay/image
-function ScreenshotThumbnail({ url, siteName }) {
+function ScreenshotThumbnail({ siteName, url }) {
     const [hovered, setHovered] = (0, react_1.useState)(false);
     const [overlayVars, setOverlayVars] = (0, react_1.useState)({});
     const linkRef = (0, react_1.useRef)(null);
@@ -325,9 +325,11 @@ function ScreenshotThumbnail({ url, siteName }) {
             const viewportH = window.innerHeight;
             const maxImgW = Math.min(viewportW * 0.9, 900); // 90vw or 900px max
             const maxImgH = Math.min(viewportH * 0.9, 700); // 90vh or 700px max
-            let overlayW = maxImgW;
-            let overlayH = maxImgH;
+            const overlayW = maxImgW;
+            const overlayH = maxImgH;
+            // eslint-disable-next-line functional/no-let -- top is reassigned if it is above the viewport or too close to the top/bottom.
             let top = rect.top - overlayH - 16; // 16px gap above
+            // eslint-disable-next-line functional/no-let -- left is reassigned if it is too far left or right.
             let left = rect.left + rect.width / 2 - overlayW / 2;
             if (top < 0) {
                 top = rect.bottom + 16;
@@ -341,10 +343,10 @@ function ScreenshotThumbnail({ url, siteName }) {
             if (top + overlayH > viewportH - 8)
                 top = viewportH - overlayH - 8;
             setOverlayVars({
-                "--overlay-top": `${top}px`,
-                "--overlay-left": `${left}px`,
-                "--overlay-width": `${overlayW}px`,
                 "--overlay-height": `${overlayH}px`,
+                "--overlay-left": `${left}px`,
+                "--overlay-top": `${top}px`,
+                "--overlay-width": `${overlayW}px`,
             });
         }
         else if (!hovered) {

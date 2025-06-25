@@ -44,23 +44,14 @@ function App() {
 
     // Only show loading overlay if loading takes more than 100ms
     useEffect(() => {
-        let timeoutId: NodeJS.Timeout;
-
         if (isLoading) {
-            // Show loading overlay after 100ms delay
-            timeoutId = setTimeout(() => {
+            const timeoutId = setTimeout(() => {
                 setShowLoadingOverlay(true);
             }, UI_DELAYS.LOADING_OVERLAY);
+            return () => clearTimeout(timeoutId);
         } else {
-            // Hide loading overlay immediately when loading stops
             setShowLoadingOverlay(false);
         }
-
-        return () => {
-            if (timeoutId) {
-                clearTimeout(timeoutId);
-            }
-        };
     }, [isLoading]);
 
     useEffect(() => {

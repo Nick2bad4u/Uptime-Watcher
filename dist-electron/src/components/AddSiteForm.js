@@ -6,13 +6,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AddSiteForm = AddSiteForm;
 const jsx_runtime_1 = require("react/jsx-runtime");
 const react_1 = require("react");
-const store_1 = require("../store");
 const constants_1 = require("../constants");
-const useTheme_1 = require("../theme/useTheme");
-const components_1 = require("../theme/components");
 const logger_1 = __importDefault(require("../services/logger"));
+const store_1 = require("../store");
+const components_1 = require("../theme/components");
+const useTheme_1 = require("../theme/useTheme");
 function AddSiteForm() {
-    const { createSite, addMonitorToSite, sites, isLoading, lastError, clearError } = (0, store_1.useStore)();
+    const { addMonitorToSite, clearError, createSite, isLoading, lastError, sites } = (0, store_1.useStore)();
     const { isDark } = (0, useTheme_1.useTheme)();
     // Remove identifier state, use only for monitor input
     const [target, setTarget] = (0, react_1.useState)(""); // For HTTP URL
@@ -33,22 +33,15 @@ function AddSiteForm() {
     const [showButtonLoading, setShowButtonLoading] = (0, react_1.useState)(false);
     const [formError, setFormError] = (0, react_1.useState)(undefined);
     (0, react_1.useEffect)(() => {
-        let timeoutId;
         if (isLoading) {
-            // Show button loading after 100ms delay
-            timeoutId = setTimeout(() => {
+            const timeoutId = setTimeout(() => {
                 setShowButtonLoading(true);
             }, constants_1.UI_DELAYS.LOADING_BUTTON);
+            return () => clearTimeout(timeoutId);
         }
         else {
-            // Hide button loading immediately when loading stops
             setShowButtonLoading(false);
         }
-        return () => {
-            if (timeoutId) {
-                clearTimeout(timeoutId);
-            }
-        };
     }, [isLoading]);
     // Reset fields when monitor type changes
     (0, react_1.useEffect)(() => {
@@ -108,10 +101,10 @@ function AddSiteForm() {
         try {
             const identifier = addMode === "new" ? siteId : selectedExistingSite;
             const monitor = {
-                id: generateUUID(), // Always assign a unique string id
-                type: monitorType,
-                status: "pending",
                 history: [],
+                id: generateUUID(), // Always assign a unique string id
+                status: "pending",
+                type: monitorType,
             };
             if (monitorType === "http") {
                 monitor.url = target.trim();
@@ -124,11 +117,11 @@ function AddSiteForm() {
             if (addMode === "new") {
                 const siteData = {
                     identifier,
-                    name: name.trim() || undefined,
                     monitors: [monitor],
+                    name: name.trim() || undefined,
                 };
                 await createSite(siteData);
-                logger_1.default.user.action("Added site", { identifier, name: name.trim(), monitorType, monitorId: monitor.id });
+                logger_1.default.user.action("Added site", { identifier, monitorId: monitor.id, monitorType, name: name.trim() });
             }
             else {
                 await addMonitorToSite(identifier, monitor);

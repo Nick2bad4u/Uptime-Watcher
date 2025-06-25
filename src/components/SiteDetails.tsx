@@ -1,4 +1,3 @@
-import React, { useMemo, useEffect, useState, useRef, useCallback } from "react";
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -15,16 +14,18 @@ import {
     ArcElement,
 } from "chart.js";
 import zoomPlugin from "chartjs-plugin-zoom";
+import React, { useMemo, useEffect, useState, useRef, useCallback } from "react";
 import { Line, Bar, Doughnut } from "react-chartjs-2";
-import { Site, StatusHistory, MonitorType, Monitor } from "../types";
-import { useTheme, useAvailabilityColors } from "../theme/useTheme";
-import { useStore } from "../store";
-import { formatStatusWithIcon } from "../utils/status";
-import { formatResponseTime, formatFullTimestamp, formatDuration } from "../utils/time";
+import { createPortal } from "react-dom";
+import { FaListOl } from "react-icons/fa";
+import { FiTrash2, FiSave } from "react-icons/fi";
+import { MdAccessTime, MdBolt, MdSpeed, MdOutlineFactCheck } from "react-icons/md";
+
 import { AUTO_REFRESH_INTERVAL, CHECK_INTERVALS } from "../constants";
+import { useSiteAnalytics, type DowntimePeriod } from "../hooks/useSiteAnalytics";
 import { ChartConfigService } from "../services/chartConfig";
 import logger from "../services/logger";
-import { useSiteAnalytics, type DowntimePeriod } from "../hooks/useSiteAnalytics";
+import { useStore } from "../store";
 import {
     ThemedBox,
     ThemedText,
@@ -37,11 +38,12 @@ import {
     ThemedSelect,
 } from "../theme/components";
 import "chartjs-adapter-date-fns";
+
 import "./SiteDetails.css";
-import { FaListOl } from "react-icons/fa";
-import { FiTrash2, FiSave } from "react-icons/fi";
-import { MdAccessTime, MdBolt, MdSpeed, MdOutlineFactCheck } from "react-icons/md";
-import { createPortal } from "react-dom";
+import { useTheme, useAvailabilityColors } from "../theme/useTheme";
+import { Site, StatusHistory, MonitorType, Monitor } from "../types";
+import { formatStatusWithIcon } from "../utils/status";
+import { formatResponseTime, formatFullTimestamp, formatDuration } from "../utils/time";
 
 // Register Chart.js components
 ChartJS.register(
@@ -65,34 +67,34 @@ interface SiteDetailsProps {
     onClose: () => void;
 }
 
-export function SiteDetails({ site, onClose }: SiteDetailsProps) {
+export function SiteDetails({ onClose, site }: SiteDetailsProps) {
     const { currentTheme } = useTheme();
-    const { getAvailabilityColor, getAvailabilityVariant, getAvailabilityDescription } = useAvailabilityColors();
+    const { getAvailabilityColor, getAvailabilityDescription, getAvailabilityVariant } = useAvailabilityColors();
     const {
-        sites,
-        deleteSite,
+        // Synchronized UI state from store
+        activeSiteDetailsTab,
         checkSiteNow,
-        isLoading,
         clearError,
+        deleteSite,
+        getSelectedMonitorId,
+        isLoading,
+        setActiveSiteDetailsTab,
+        setSelectedMonitorId,
+        setShowAdvancedMetrics,
+        setSiteDetailsChartTimeRange,
+        showAdvancedMetrics,
+        siteDetailsChartTimeRange,
+        sites,
         startSiteMonitorMonitoring,
         stopSiteMonitorMonitoring,
         updateSiteCheckInterval,
-        // Synchronized UI state from store
-        activeSiteDetailsTab,
-        setActiveSiteDetailsTab,
-        siteDetailsChartTimeRange,
-        setSiteDetailsChartTimeRange,
-        showAdvancedMetrics,
-        setShowAdvancedMetrics,
-        setSelectedMonitorId,
-        getSelectedMonitorId,
     } = useStore();
 
     const [isRefreshing, setIsRefreshing] = useState(false);
     // Always call hooks first, use fallback for currentSite
     const currentSite = sites.find((s) => s.identifier === site.identifier) || {
-        monitors: [],
         identifier: site.identifier,
+        monitors: [],
     };
     const monitorIds = currentSite.monitors.map((m) => m.id);
     const defaultMonitorId = monitorIds[0] || "";
@@ -150,43 +152,43 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
     // Chart data using analytics
     const lineChartData = useMemo(
         () => ({
-            labels: analytics.filteredHistory.map((h) => new Date(h.timestamp)),
             datasets: [
                 {
-                    label: "Response Time (ms)",
-                    data: analytics.filteredHistory.map((h) => h.responseTime),
-                    borderColor: currentTheme.colors.primary[500],
                     backgroundColor: currentTheme.colors.primary[500] + "20",
+                    borderColor: currentTheme.colors.primary[500],
+                    data: analytics.filteredHistory.map((h) => h.responseTime),
                     fill: true,
+                    label: "Response Time (ms)",
                     tension: 0.1,
                 },
             ],
+            labels: analytics.filteredHistory.map((h) => new Date(h.timestamp)),
         }),
         [analytics.filteredHistory, currentTheme]
     );
 
     const barChartData = useMemo(
         () => ({
-            labels: ["Up", "Down"],
             datasets: [
                 {
-                    data: [analytics.upCount, analytics.downCount],
                     backgroundColor: [currentTheme.colors.success, currentTheme.colors.error],
+                    data: [analytics.upCount, analytics.downCount],
                 },
             ],
+            labels: ["Up", "Down"],
         }),
         [analytics.upCount, analytics.downCount, currentTheme]
     );
 
     const doughnutChartData = useMemo(
         () => ({
-            labels: ["Up", "Down"],
             datasets: [
                 {
-                    data: [analytics.upCount, analytics.downCount],
                     backgroundColor: [currentTheme.colors.success, currentTheme.colors.error],
+                    data: [analytics.upCount, analytics.downCount],
                 },
             ],
+            labels: ["Up", "Down"],
         }),
         [analytics.upCount, analytics.downCount, currentTheme]
     );
@@ -263,7 +265,7 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                 >
                     {/* Enhanced Header with Theme-Aware Styling */}
                     <div className="site-details-header">
-                        <div className="site-details-header-overlay"></div>
+                        <div className="site-details-header-overlay" />
                         <div className="site-details-header-content">
                             {/* Left accent bar */}
                             <div className="site-details-header-accent" />
@@ -277,7 +279,7 @@ export function SiteDetails({ site, onClose }: SiteDetailsProps) {
                                     <StatusIndicator status={selectedMonitor?.status ?? "unknown"} size="lg" />
                                     {isRefreshing && (
                                         <div className="site-details-loading-spinner">
-                                            <div className="site-details-spinner"></div>
+                                            <div className="site-details-spinner" />
                                         </div>
                                     )}
                                 </div>
@@ -547,17 +549,17 @@ type OverviewTabProps = {
 };
 
 function OverviewTab({
-    selectedMonitor,
-    uptime,
     avgResponseTime,
-    totalChecks,
     fastestResponse,
-    slowestResponse,
     formatResponseTime,
     handleRemoveSite,
     isLoading,
+    selectedMonitor,
+    slowestResponse,
+    totalChecks,
+    uptime,
 }: OverviewTabProps) {
-    const { getAvailabilityVariant, getAvailabilityColor } = useAvailabilityColors();
+    const { getAvailabilityColor, getAvailabilityVariant } = useAvailabilityColors();
     const { currentTheme } = useTheme();
 
     // Map availability variant to progress/badge variant
@@ -711,32 +713,32 @@ interface AnalyticsTabProps {
 }
 
 function AnalyticsTab({
-    upCount,
-    downCount,
-    totalChecks,
-    uptime,
     avgResponseTime,
+    barChartData,
+    barChartOptions,
+    chartTimeRange,
+    doughnutOptions,
+    downCount,
+    downtimePeriods,
+    formatDuration,
+    formatResponseTime,
+    getAvailabilityColor,
+    getAvailabilityDescription,
+    getAvailabilityVariant,
+    lineChartData,
+    lineChartOptions,
+    monitorType,
+    mttr,
     p50,
     p95,
     p99,
-    mttr,
-    totalDowntime,
-    downtimePeriods,
-    chartTimeRange,
-    lineChartData,
-    lineChartOptions,
-    barChartData,
-    barChartOptions,
-    uptimeChartData,
-    doughnutOptions,
-    formatResponseTime,
-    formatDuration,
-    showAdvancedMetrics,
     setShowAdvancedMetrics,
-    getAvailabilityColor,
-    getAvailabilityVariant,
-    getAvailabilityDescription,
-    monitorType,
+    showAdvancedMetrics,
+    totalChecks,
+    totalDowntime,
+    upCount,
+    uptime,
+    uptimeChartData,
 }: AnalyticsTabProps) {
     return (
         <div className="space-y-6">
@@ -911,10 +913,10 @@ interface HistoryTabProps {
 }
 
 function HistoryTab({
-    selectedMonitor,
-    formatResponseTime,
     formatFullTimestamp,
+    formatResponseTime,
     formatStatusWithIcon,
+    selectedMonitor,
 }: Omit<HistoryTabProps, "site">) {
     const { settings } = useStore();
     const [historyFilter, setHistoryFilter] = useState<"all" | "up" | "down">("all");
@@ -922,7 +924,7 @@ function HistoryTab({
     const backendLimit = settings.historyLimit || 25;
     // Dropdown options: 25, 50, 100, All (clamped to backendLimit and available history)
     const maxShow = Math.min(backendLimit, historyLength);
-    const showOptions = [10, 25, 50, 100, 250, 500, 1000, 10000].filter(opt => opt <= maxShow);
+    const showOptions = [10, 25, 50, 100, 250, 500, 1000, 10000].filter((opt) => opt <= maxShow);
     // Always include 'All' if there are fewer than backendLimit
     if (historyLength > 0 && historyLength <= backendLimit && !showOptions.includes(historyLength)) {
         showOptions.push(historyLength);
@@ -932,7 +934,7 @@ function HistoryTab({
     const [historyLimit, setHistoryLimit] = useState(defaultHistoryLimit);
     useEffect(() => {
         setHistoryLimit(Math.min(50, backendLimit, (selectedMonitor.history || []).length));
-    }, [settings.historyLimit, selectedMonitor.history?.length]);
+    }, [settings.historyLimit, selectedMonitor.history.length, backendLimit, selectedMonitor.history]);
 
     const filteredHistoryRecords = (selectedMonitor.history || [])
         .filter((record: any) => historyFilter === "all" || record.status === historyFilter)
@@ -942,12 +944,24 @@ function HistoryTab({
     function renderDetails(record: any) {
         if (!record.details) return undefined;
         if (selectedMonitor.type === "port") {
-            return <ThemedText size="xs" variant="secondary" className="ml-4">Port: {record.details}</ThemedText>;
+            return (
+                <ThemedText size="xs" variant="secondary" className="ml-4">
+                    Port: {record.details}
+                </ThemedText>
+            );
         }
         if (selectedMonitor.type === "http") {
-            return <ThemedText size="xs" variant="secondary" className="ml-4">Response Code: {record.details}</ThemedText>;
+            return (
+                <ThemedText size="xs" variant="secondary" className="ml-4">
+                    Response Code: {record.details}
+                </ThemedText>
+            );
         }
-        return <ThemedText size="xs" variant="secondary" className="ml-4">{record.details}</ThemedText>;
+        return (
+            <ThemedText size="xs" variant="secondary" className="ml-4">
+                {record.details}
+            </ThemedText>
+        );
     }
 
     return (
@@ -982,12 +996,12 @@ function HistoryTab({
                         className="px-2 py-1 border rounded"
                         aria-label="History limit"
                     >
-                        {showOptions.map(opt => (
-                            <option key={opt} value={opt}>{opt}</option>
+                        {showOptions.map((opt) => (
+                            <option key={opt} value={opt}>
+                                {opt}
+                            </option>
                         ))}
-                        {historyLength > backendLimit && (
-                            <option value={historyLength}>All ({historyLength})</option>
-                        )}
+                        {historyLength > backendLimit && <option value={historyLength}>All ({historyLength})</option>}
                     </select>
                     <ThemedText size="sm" variant="secondary">
                         of {historyLength} checks
@@ -1051,15 +1065,15 @@ interface SettingsTabProps {
 
 function SettingsTab({
     currentSite,
-    selectedMonitor,
+    handleIntervalChange,
     handleRemoveSite,
+    handleSaveInterval,
+    intervalChanged,
     isLoading,
     localCheckInterval,
-    intervalChanged,
-    handleIntervalChange,
-    handleSaveInterval,
+    selectedMonitor,
 }: SettingsTabProps) {
-    const { modifySite, clearError } = useStore();
+    const { clearError, modifySite } = useStore();
     const [localName, setLocalName] = useState(currentSite.name || "");
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
@@ -1257,7 +1271,7 @@ function hasOpenExternal(api: any): api is { openExternal: (url: string) => void
 }
 
 // Update ScreenshotThumbnail to use only CSS classes for overlay/image
-function ScreenshotThumbnail({ url, siteName }: { url: string; siteName: string }) {
+function ScreenshotThumbnail({ siteName, url }: { url: string; siteName: string }) {
     const [hovered, setHovered] = useState(false);
     const [overlayVars, setOverlayVars] = useState<React.CSSProperties>({});
     const linkRef = useRef<HTMLAnchorElement>(null);
@@ -1280,9 +1294,11 @@ function ScreenshotThumbnail({ url, siteName }: { url: string; siteName: string 
             const viewportH = window.innerHeight;
             const maxImgW = Math.min(viewportW * 0.9, 900); // 90vw or 900px max
             const maxImgH = Math.min(viewportH * 0.9, 700); // 90vh or 700px max
-            let overlayW = maxImgW;
-            let overlayH = maxImgH;
+            const overlayW = maxImgW;
+            const overlayH = maxImgH;
+            // eslint-disable-next-line functional/no-let -- top is reassigned if it is above the viewport or too close to the top/bottom.
             let top = rect.top - overlayH - 16; // 16px gap above
+            // eslint-disable-next-line functional/no-let -- left is reassigned if it is too far left or right.
             let left = rect.left + rect.width / 2 - overlayW / 2;
             if (top < 0) {
                 top = rect.bottom + 16;
@@ -1292,10 +1308,10 @@ function ScreenshotThumbnail({ url, siteName }: { url: string; siteName: string 
             if (top < 8) top = 8;
             if (top + overlayH > viewportH - 8) top = viewportH - overlayH - 8;
             setOverlayVars({
-                "--overlay-top": `${top}px`,
-                "--overlay-left": `${left}px`,
-                "--overlay-width": `${overlayW}px`,
                 "--overlay-height": `${overlayH}px`,
+                "--overlay-left": `${left}px`,
+                "--overlay-top": `${top}px`,
+                "--overlay-width": `${overlayW}px`,
             } as React.CSSProperties);
         } else if (!hovered) {
             setOverlayVars({});

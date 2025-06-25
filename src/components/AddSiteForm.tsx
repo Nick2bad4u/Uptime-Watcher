@@ -1,13 +1,16 @@
 import { useState, useEffect } from "react";
-import { useStore } from "../store";
-import { UI_DELAYS, CHECK_INTERVALS } from "../constants";
-import { useTheme } from "../theme/useTheme";
-import { ThemedBox, ThemedText, ThemedButton, ThemedInput, ThemedSelect } from "../theme/components";
-import logger from "../services/logger";
+
+// eslint-disable-next-line import/order -- perfectionist takes precedence over eslint
 import type { Monitor } from "../types";
 
+import { UI_DELAYS, CHECK_INTERVALS } from "../constants";
+import logger from "../services/logger";
+import { useStore } from "../store";
+import { ThemedBox, ThemedText, ThemedButton, ThemedInput, ThemedSelect } from "../theme/components";
+import { useTheme } from "../theme/useTheme";
+
 export function AddSiteForm() {
-    const { createSite, addMonitorToSite, sites, isLoading, lastError, clearError } = useStore();
+    const { addMonitorToSite, clearError, createSite, isLoading, lastError, sites } = useStore();
     const { isDark } = useTheme();
     // Remove identifier state, use only for monitor input
     const [target, setTarget] = useState(""); // For HTTP URL
@@ -32,21 +35,14 @@ export function AddSiteForm() {
     const [formError, setFormError] = useState<string | undefined>(undefined);
 
     useEffect(() => {
-        let timeoutId: NodeJS.Timeout;
         if (isLoading) {
-            // Show button loading after 100ms delay
-            timeoutId = setTimeout(() => {
+            const timeoutId = setTimeout(() => {
                 setShowButtonLoading(true);
             }, UI_DELAYS.LOADING_BUTTON);
+            return () => clearTimeout(timeoutId);
         } else {
-            // Hide button loading immediately when loading stops
             setShowButtonLoading(false);
         }
-        return () => {
-            if (timeoutId) {
-                clearTimeout(timeoutId);
-            }
-        };
     }, [isLoading]);
 
     // Reset fields when monitor type changes
@@ -107,10 +103,10 @@ export function AddSiteForm() {
         try {
             const identifier = addMode === "new" ? siteId : selectedExistingSite;
             const monitor: any = {
-                id: generateUUID(), // Always assign a unique string id
-                type: monitorType,
-                status: "pending" as const,
                 history: [] as Monitor["history"],
+                id: generateUUID(), // Always assign a unique string id
+                status: "pending" as const,
+                type: monitorType,
             };
             if (monitorType === "http") {
                 monitor.url = target.trim();
@@ -122,11 +118,11 @@ export function AddSiteForm() {
             if (addMode === "new") {
                 const siteData = {
                     identifier,
-                    name: name.trim() || undefined,
                     monitors: [monitor],
+                    name: name.trim() || undefined,
                 };
                 await createSite(siteData);
-                logger.user.action("Added site", { identifier, name: name.trim(), monitorType, monitorId: monitor.id });
+                logger.user.action("Added site", { identifier, monitorId: monitor.id, monitorType, name: name.trim() });
             } else {
                 await addMonitorToSite(identifier, monitor);
                 logger.user.action("Added monitor to site", { identifier, monitorType });

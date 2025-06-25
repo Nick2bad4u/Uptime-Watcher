@@ -1,7 +1,7 @@
-import { Site } from "../types";
+import logger from "../services/logger";
 import { useStore } from "../store";
 import { ThemedBox, ThemedText, ThemedButton, ThemedSelect, StatusIndicator, MiniChartBar } from "../theme/components";
-import logger from "../services/logger";
+import { Site } from "../types";
 
 interface SiteCardProps {
     site: Site;
@@ -10,15 +10,15 @@ interface SiteCardProps {
 export function SiteCard({ site }: SiteCardProps) {
     // Always select the latest site from the store by id
     const {
-        sites,
         checkSiteNow,
-        setSelectedSite,
-        setShowSiteDetails,
-        startSiteMonitorMonitoring,
-        stopSiteMonitorMonitoring,
+        getSelectedMonitorId, // updated
         isLoading,
         setSelectedMonitorId, // updated
-        getSelectedMonitorId, // updated
+        setSelectedSite,
+        setShowSiteDetails,
+        sites,
+        startSiteMonitorMonitoring,
+        stopSiteMonitorMonitoring,
     } = useStore();
     const latestSite = sites.find((s) => s.identifier === site.identifier) || site;
     // Use global store for selected monitor id
@@ -98,7 +98,7 @@ export function SiteCard({ site }: SiteCardProps) {
                         >
                             {latestSite.monitors.map((m) => (
                                 <option key={m.id} value={m.id}>
-                                    {m.type.toUpperCase()} {m.port ? `:${m.port}` : m.url ? `: ${m.url}` : ''}
+                                    {m.type.toUpperCase()} {m.port ? `:${m.port}` : m.url ? `: ${m.url}` : ""}
                                 </option>
                             ))}
                         </ThemedSelect>
@@ -193,8 +193,8 @@ export function SiteCard({ site }: SiteCardProps) {
                                     ? monitor.type === "http"
                                         ? `HTTP History${monitor.url ? ` (${monitor.url})` : ""}`
                                         : monitor.type === "port"
-                                            ? `Port History${monitor.port ? ` (${monitor.host}:${monitor.port})` : monitor.host ? ` (${monitor.host})` : ""}`
-                                            : `${monitor.type} History`
+                                          ? `Port History${monitor.port ? ` (${monitor.host}:${monitor.port})` : monitor.host ? ` (${monitor.host})` : ""}`
+                                          : `${monitor.type} History`
                                     : "No Monitor Selected"}
                             </ThemedText>
                         </div>

@@ -144,6 +144,9 @@ export default [
                         order: "asc",
                     },
                     groups: ["builtin", "external", "internal", "parent", "sibling", "index"],
+                    "newlines-between": "always",
+                    distinctGroup: true,
+                    sortTypesGroup: false,
                 },
             ],
             "import/newline-after-import": "warn",
@@ -191,6 +194,8 @@ export default [
                 {
                     type: "natural",
                     order: "asc",
+                    fallbackSort: { type: 'alphabetical', order: 'asc' },
+                    newlinesBetween: 1,
                 },
             ],
             "perfectionist/sort-imports": [
@@ -198,6 +203,8 @@ export default [
                 {
                     type: "natural",
                     order: "asc",
+                    fallbackSort: { type: 'alphabetical', order: 'asc' },
+                    newlinesBetween: 1,
                 },
             ],
             // unicorn
@@ -283,6 +290,9 @@ export default [
                         order: "asc",
                     },
                     groups: ["builtin", "external", "internal", "parent", "sibling", "index"],
+
+                    distinctGroup: true,
+                    sortTypesGroup: false,
                 },
             ],
             "import/newline-after-import": "warn",
@@ -330,6 +340,8 @@ export default [
                 {
                     type: "natural",
                     order: "asc",
+                    fallbackSort: { type: 'alphabetical', order: 'asc' },
+                    newlinesBetween: 1,
                 },
             ],
             "perfectionist/sort-imports": [
@@ -337,6 +349,8 @@ export default [
                 {
                     type: "natural",
                     order: "asc",
+                    fallbackSort: { type: 'alphabetical', order: 'asc' },
+                    newlinesBetween: 1,
                 },
             ],
             // unicorn

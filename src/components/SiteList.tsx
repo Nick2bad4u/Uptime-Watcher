@@ -1,7 +1,7 @@
-import { SiteCard } from "./SiteCard";
 import { useStore } from "../store";
-import { useTheme } from "../theme/useTheme";
 import { ThemedBox, ThemedText } from "../theme/components";
+import { useTheme } from "../theme/useTheme";
+import { SiteCard } from "./SiteCard";
 
 export function SiteList() {
     const { sites } = useStore();
