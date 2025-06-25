@@ -1,7 +1,4 @@
 "use strict";
-var __defProp = Object.defineProperty;
-var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
 const require$$1$6 = require("electron");
 const require$$1$1 = require("fs");
 const require$$0$1 = require("constants");
@@ -2928,7 +2925,7 @@ var hasRequiredBrowser;
 function requireBrowser() {
   if (hasRequiredBrowser) return browser.exports;
   hasRequiredBrowser = 1;
-  (function(module2, exports) {
+  (function(module, exports) {
     exports.formatArgs = formatArgs;
     exports.save = save;
     exports.load = load;
@@ -3036,7 +3033,7 @@ function requireBrowser() {
       typeof navigator !== "undefined" && navigator.userAgent && navigator.userAgent.toLowerCase().match(/applewebkit\/(\d+)/);
     }
     function formatArgs(args) {
-      args[0] = (this.useColors ? "%c" : "") + this.namespace + (this.useColors ? " %c" : " ") + args[0] + (this.useColors ? "%c " : " ") + "+" + module2.exports.humanize(this.diff);
+      args[0] = (this.useColors ? "%c" : "") + this.namespace + (this.useColors ? " %c" : " ") + args[0] + (this.useColors ? "%c " : " ") + "+" + module.exports.humanize(this.diff);
       if (!this.useColors) {
         return;
       }
@@ -3084,8 +3081,8 @@ function requireBrowser() {
       } catch (error2) {
       }
     }
-    module2.exports = requireCommon$1()(exports);
-    const { formatters } = module2.exports;
+    module.exports = requireCommon$1()(exports);
+    const { formatters } = module.exports;
     formatters.j = function(v) {
       try {
         return JSON.stringify(v);
@@ -3228,7 +3225,7 @@ var hasRequiredNode;
 function requireNode() {
   if (hasRequiredNode) return node.exports;
   hasRequiredNode = 1;
-  (function(module2, exports) {
+  (function(module, exports) {
     const tty = require$$1$3;
     const util2 = require$$1;
     exports.init = init;
@@ -3356,7 +3353,7 @@ function requireNode() {
         const colorCode = "\x1B[3" + (c < 8 ? c : "8;5;" + c);
         const prefix = `  ${colorCode};1m${name} \x1B[0m`;
         args[0] = prefix + args[0].split("\n").join("\n" + prefix);
-        args.push(colorCode + "m+" + module2.exports.humanize(this.diff) + "\x1B[0m");
+        args.push(colorCode + "m+" + module.exports.humanize(this.diff) + "\x1B[0m");
       } else {
         args[0] = getDate() + name + " " + args[0];
       }
@@ -3387,8 +3384,8 @@ function requireNode() {
         debug.inspectOpts[keys[i]] = exports.inspectOpts[keys[i]];
       }
     }
-    module2.exports = requireCommon$1()(exports);
-    const { formatters } = module2.exports;
+    module.exports = requireCommon$1()(exports);
+    const { formatters } = module.exports;
     formatters.o = function(v) {
       this.inspectOpts.colors = this.useColors;
       return util2.inspect(v, this.inspectOpts).split("\n").map((str2) => str2.trim()).join(" ");
@@ -8769,14 +8766,14 @@ var hasRequiredRe;
 function requireRe() {
   if (hasRequiredRe) return re.exports;
   hasRequiredRe = 1;
-  (function(module2, exports) {
+  (function(module, exports) {
     const {
       MAX_SAFE_COMPONENT_LENGTH,
       MAX_SAFE_BUILD_LENGTH,
       MAX_LENGTH
     } = requireConstants();
     const debug = requireDebug$1();
-    exports = module2.exports = {};
+    exports = module.exports = {};
     const re2 = exports.re = [];
     const safeRe = exports.safeRe = [];
     const src2 = exports.src = [];
@@ -10639,7 +10636,7 @@ var hasRequiredLodash_isequal;
 function requireLodash_isequal() {
   if (hasRequiredLodash_isequal) return lodash_isequal.exports;
   hasRequiredLodash_isequal = 1;
-  (function(module2, exports) {
+  (function(module, exports) {
     var LARGE_ARRAY_SIZE = 200;
     var HASH_UNDEFINED = "__lodash_hash_undefined__";
     var COMPARE_PARTIAL_FLAG = 1, COMPARE_UNORDERED_FLAG = 2;
@@ -10656,7 +10653,7 @@ function requireLodash_isequal() {
     var freeSelf = typeof self == "object" && self && self.Object === Object && self;
     var root = freeGlobal || freeSelf || Function("return this")();
     var freeExports = exports && !exports.nodeType && exports;
-    var freeModule = freeExports && true && module2 && !module2.nodeType && module2;
+    var freeModule = freeExports && true && module && !module.nodeType && module;
     var moduleExports = freeModule && freeModule.exports === freeExports;
     var freeProcess = moduleExports && freeGlobal.process;
     var nodeUtil = function() {
@@ -11285,7 +11282,7 @@ function requireLodash_isequal() {
     function stubFalse() {
       return false;
     }
-    module2.exports = isEqual;
+    module.exports = isEqual;
   })(lodash_isequal, lodash_isequal.exports);
   return lodash_isequal.exports;
 }
@@ -22761,12 +22758,12 @@ function requirePackageJson() {
         return void 0;
       }
       const json2 = JSON.parse(fs2.readFileSync(fileName, "utf8"));
-      const name = (json2 == null ? void 0 : json2.productName) || (json2 == null ? void 0 : json2.name);
+      const name = json2?.productName || json2?.name;
       if (!name || name.toLowerCase() === "electron") {
         return void 0;
       }
       if (name) {
-        return { name, version: json2 == null ? void 0 : json2.version };
+        return { name, version: json2?.version };
       }
       return void 0;
     } catch (e) {
@@ -22799,9 +22796,8 @@ function requirePackageJson() {
     return userDataDir.replace("--user-data-dir=", "");
   }
   function getMainModulePath() {
-    var _a;
     try {
-      return (_a = require.main) == null ? void 0 : _a.filename;
+      return require.main?.filename;
     } catch {
       return void 0;
     }
@@ -22818,11 +22814,9 @@ function requireNodeExternalApi() {
   const path = require$$1$2;
   const packageJson2 = requirePackageJson();
   class NodeExternalApi {
-    constructor() {
-      __publicField(this, "appName");
-      __publicField(this, "appPackageJson");
-      __publicField(this, "platform", process.platform);
-    }
+    appName = void 0;
+    appPackageJson = void 0;
+    platform = process.platform;
     getAppLogPath(appName = this.getAppName()) {
       if (this.platform === "darwin") {
         return path.join(this.getSystemPathHome(), "Library/Logs", appName);
@@ -22830,8 +22824,7 @@ function requireNodeExternalApi() {
       return path.join(this.getAppUserDataPath(appName), "logs");
     }
     getAppName() {
-      var _a;
-      const appName = this.appName || ((_a = this.getAppPackageJson()) == null ? void 0 : _a.name);
+      const appName = this.appName || this.getAppPackageJson()?.name;
       if (!appName) {
         throw new Error(
           "electron-log can't determine the app name. It tried these methods:\n1. Use `electron.app.name`\n2. Use productName or name from the nearest package.json`\nYou can also set it through log.transports.file.setAppName()"
@@ -22853,8 +22846,7 @@ function requireNodeExternalApi() {
       return appName ? path.join(this.getSystemPathAppData(), appName) : void 0;
     }
     getAppVersion() {
-      var _a;
-      return (_a = this.getAppPackageJson()) == null ? void 0 : _a.version;
+      return this.getAppPackageJson()?.version;
     }
     getElectronLogPath() {
       return this.getAppLogPath();
@@ -22915,8 +22907,7 @@ function requireNodeExternalApi() {
       }
     }
     getSystemPathHome() {
-      var _a;
-      return ((_a = os.homedir) == null ? void 0 : _a.call(os)) || process.env.HOME;
+      return os.homedir?.() || process.env.HOME;
     }
     getSystemPathTemp() {
       return os.tmpdir();
@@ -23000,22 +22991,21 @@ function requireElectronExternalApi() {
   const NodeExternalApi = requireNodeExternalApi();
   class ElectronExternalApi extends NodeExternalApi {
     /**
+     * @type {typeof Electron}
+     */
+    electron = void 0;
+    /**
      * @param {object} options
      * @param {typeof Electron} [options.electron]
      */
     constructor({ electron } = {}) {
       super();
-      /**
-       * @type {typeof Electron}
-       */
-      __publicField(this, "electron");
       this.electron = electron;
     }
     getAppName() {
-      var _a, _b;
       let appName;
       try {
-        appName = this.appName || ((_a = this.electron.app) == null ? void 0 : _a.name) || ((_b = this.electron.app) == null ? void 0 : _b.getName());
+        appName = this.appName || this.electron.app?.name || this.electron.app?.getName();
       } catch {
       }
       return appName || super.getAppName();
@@ -23024,10 +23014,9 @@ function requireElectronExternalApi() {
       return this.getPath("userData") || super.getAppUserDataPath(appName);
     }
     getAppVersion() {
-      var _a;
       let appVersion;
       try {
-        appVersion = (_a = this.electron.app) == null ? void 0 : _a.getVersion();
+        appVersion = this.electron.app?.getVersion();
       } catch {
       }
       return appVersion || super.getAppVersion();
@@ -23041,9 +23030,8 @@ function requireElectronExternalApi() {
      * @returns {string|undefined}
      */
     getPath(name) {
-      var _a;
       try {
-        return (_a = this.electron.app) == null ? void 0 : _a.getPath(name);
+        return this.electron.app?.getPath(name);
       } catch {
         return void 0;
       }
@@ -23059,8 +23047,7 @@ function requireElectronExternalApi() {
       return this.getPath("appData") || super.getSystemPathAppData();
     }
     isDev() {
-      var _a;
-      if (((_a = this.electron.app) == null ? void 0 : _a.isPackaged) !== void 0) {
+      if (this.electron.app?.isPackaged !== void 0) {
         return !this.electron.app.isPackaged;
       }
       if (typeof process.execPath === "string") {
@@ -23070,35 +23057,30 @@ function requireElectronExternalApi() {
       return super.isDev();
     }
     onAppEvent(eventName, handler) {
-      var _a;
-      (_a = this.electron.app) == null ? void 0 : _a.on(eventName, handler);
+      this.electron.app?.on(eventName, handler);
       return () => {
-        var _a2;
-        (_a2 = this.electron.app) == null ? void 0 : _a2.off(eventName, handler);
+        this.electron.app?.off(eventName, handler);
       };
     }
     onAppReady(handler) {
-      var _a, _b, _c;
-      if ((_a = this.electron.app) == null ? void 0 : _a.isReady()) {
+      if (this.electron.app?.isReady()) {
         handler();
-      } else if ((_b = this.electron.app) == null ? void 0 : _b.once) {
-        (_c = this.electron.app) == null ? void 0 : _c.once("ready", handler);
+      } else if (this.electron.app?.once) {
+        this.electron.app?.once("ready", handler);
       } else {
         handler();
       }
     }
     onEveryWebContentsEvent(eventName, handler) {
-      var _a, _b, _c;
-      (_b = (_a = this.electron.webContents) == null ? void 0 : _a.getAllWebContents()) == null ? void 0 : _b.forEach((webContents) => {
+      this.electron.webContents?.getAllWebContents()?.forEach((webContents) => {
         webContents.on(eventName, handler);
       });
-      (_c = this.electron.app) == null ? void 0 : _c.on("web-contents-created", onWebContentsCreated);
+      this.electron.app?.on("web-contents-created", onWebContentsCreated);
       return () => {
-        var _a2, _b2;
-        (_a2 = this.electron.webContents) == null ? void 0 : _a2.getAllWebContents().forEach((webContents) => {
+        this.electron.webContents?.getAllWebContents().forEach((webContents) => {
           webContents.off(eventName, handler);
         });
-        (_b2 = this.electron.app) == null ? void 0 : _b2.off("web-contents-created", onWebContentsCreated);
+        this.electron.app?.off("web-contents-created", onWebContentsCreated);
       };
       function onWebContentsCreated(_, webContents) {
         webContents.on(eventName, handler);
@@ -23110,28 +23092,22 @@ function requireElectronExternalApi() {
      * @param {function} listener
      */
     onIpc(channel, listener) {
-      var _a;
-      (_a = this.electron.ipcMain) == null ? void 0 : _a.on(channel, listener);
+      this.electron.ipcMain?.on(channel, listener);
     }
     onIpcInvoke(channel, listener) {
-      var _a, _b;
-      (_b = (_a = this.electron.ipcMain) == null ? void 0 : _a.handle) == null ? void 0 : _b.call(_a, channel, listener);
+      this.electron.ipcMain?.handle?.(channel, listener);
     }
     /**
      * @param {string} url
      * @param {Function} [logFunction]
      */
     openUrl(url, logFunction = console.error) {
-      var _a;
-      (_a = this.electron.shell) == null ? void 0 : _a.openExternal(url).catch(logFunction);
+      this.electron.shell?.openExternal(url).catch(logFunction);
     }
     setPreloadFileForSessions({
       filePath,
       includeFutureSession = true,
-      getSessions = () => {
-        var _a;
-        return [(_a = this.electron.session) == null ? void 0 : _a.defaultSession];
-      }
+      getSessions = () => [this.electron.session?.defaultSession]
     }) {
       for (const session of getSessions().filter(Boolean)) {
         setPreload(session);
@@ -23159,17 +23135,14 @@ function requireElectronExternalApi() {
      * @param {any} message
      */
     sendIpc(channel, message) {
-      var _a, _b;
-      (_b = (_a = this.electron.BrowserWindow) == null ? void 0 : _a.getAllWindows()) == null ? void 0 : _b.forEach((wnd) => {
-        var _a2, _b2;
-        if (((_a2 = wnd.webContents) == null ? void 0 : _a2.isDestroyed()) === false && ((_b2 = wnd.webContents) == null ? void 0 : _b2.isCrashed()) === false) {
+      this.electron.BrowserWindow?.getAllWindows()?.forEach((wnd) => {
+        if (wnd.webContents?.isDestroyed() === false && wnd.webContents?.isCrashed() === false) {
           wnd.webContents.send(channel, message);
         }
       });
     }
     showErrorBox(title, message) {
-      var _a;
-      (_a = this.electron.dialog) == null ? void 0 : _a.showErrorBox(title, message);
+      this.electron.dialog?.showErrorBox(title, message);
     }
   }
   ElectronExternalApi_1 = ElectronExternalApi;
@@ -23180,7 +23153,7 @@ var hasRequiredElectronLogPreload;
 function requireElectronLogPreload() {
   if (hasRequiredElectronLogPreload) return electronLogPreload.exports;
   hasRequiredElectronLogPreload = 1;
-  (function(module2) {
+  (function(module) {
     let electron = {};
     try {
       electron = require("electron");
@@ -23190,7 +23163,7 @@ function requireElectronLogPreload() {
       initialize2(electron);
     }
     {
-      module2.exports = initialize2;
+      module.exports = initialize2;
     }
     function initialize2({ contextBridge, ipcRenderer }) {
       if (!ipcRenderer) {
@@ -23210,7 +23183,7 @@ function requireElectronLogPreload() {
             console.error("electronLog.sendToMain ", e, "data:", message);
             ipcRenderer.send("__ELECTRON_LOG__", {
               cmd: "errorHandler",
-              error: { message: e == null ? void 0 : e.message, stack: e == null ? void 0 : e.stack },
+              error: { message: e?.message, stack: e?.stack },
               errorName: "sendToMain"
             });
           }
@@ -23402,7 +23375,19 @@ function requireLogger() {
   hasRequiredLogger = 1;
   const scopeFactory = requireScope();
   const Buffering = requireBuffering();
-  const _Logger = class _Logger {
+  class Logger {
+    static instances = {};
+    dependencies = {};
+    errorHandler = null;
+    eventLogger = null;
+    functions = {};
+    hooks = [];
+    isDev = false;
+    levels = null;
+    logId = null;
+    scope = null;
+    transports = {};
+    variables = {};
     constructor({
       allowUnknownLevel = false,
       dependencies = {},
@@ -23415,17 +23400,6 @@ function requireLogger() {
       transportFactories = {},
       variables
     } = {}) {
-      __publicField(this, "dependencies", {});
-      __publicField(this, "errorHandler", null);
-      __publicField(this, "eventLogger", null);
-      __publicField(this, "functions", {});
-      __publicField(this, "hooks", []);
-      __publicField(this, "isDev", false);
-      __publicField(this, "levels", null);
-      __publicField(this, "logId", null);
-      __publicField(this, "scope", null);
-      __publicField(this, "transports", {});
-      __publicField(this, "variables", {});
       this.addLevel = this.addLevel.bind(this);
       this.create = this.create.bind(this);
       this.initialize = this.initialize.bind(this);
@@ -23447,13 +23421,13 @@ function requireLogger() {
       this.log = this.info;
       this.functions.log = this.log;
       this.errorHandler = errorHandler;
-      errorHandler == null ? void 0 : errorHandler.setOptions({ ...dependencies, logFn: this.error });
+      errorHandler?.setOptions({ ...dependencies, logFn: this.error });
       this.eventLogger = eventLogger;
-      eventLogger == null ? void 0 : eventLogger.setOptions({ ...dependencies, logger: this });
+      eventLogger?.setOptions({ ...dependencies, logger: this });
       for (const [name, factory] of Object.entries(transportFactories)) {
         this.transports[name] = factory(this, dependencies);
       }
-      _Logger.instances[logId] = this;
+      Logger.instances[logId] = this;
     }
     static getInstance({ logId }) {
       return this.instances[logId] || this.instances.default;
@@ -23479,7 +23453,7 @@ function requireLogger() {
       if (typeof options === "string") {
         options = { logId: options };
       }
-      return new _Logger({
+      return new Logger({
         dependencies: this.dependencies,
         errorHandler: this.errorHandler,
         initializeFn: this.initializeFn,
@@ -23564,9 +23538,7 @@ function requireLogger() {
         }
       }).filter(Boolean);
     }
-  };
-  __publicField(_Logger, "instances", {});
-  let Logger = _Logger;
+  }
   Logger_1 = Logger;
   return Logger_1;
 }
@@ -23576,17 +23548,17 @@ function requireErrorHandler() {
   if (hasRequiredErrorHandler) return ErrorHandler_1;
   hasRequiredErrorHandler = 1;
   class ErrorHandler {
+    externalApi = void 0;
+    isActive = false;
+    logFn = void 0;
+    onError = void 0;
+    showDialog = true;
     constructor({
       externalApi,
       logFn = void 0,
       onError = void 0,
       showDialog = void 0
     } = {}) {
-      __publicField(this, "externalApi");
-      __publicField(this, "isActive", false);
-      __publicField(this, "logFn");
-      __publicField(this, "onError");
-      __publicField(this, "showDialog", true);
       this.createIssue = this.createIssue.bind(this);
       this.handleError = this.handleError.bind(this);
       this.handleRejection = this.handleRejection.bind(this);
@@ -23601,11 +23573,10 @@ function requireErrorHandler() {
       showDialog = this.showDialog,
       errorName = ""
     } = {}) {
-      var _a;
       error2 = normalizeError(error2);
       try {
         if (typeof onError === "function") {
-          const versions = ((_a = this.externalApi) == null ? void 0 : _a.getVersions()) || {};
+          const versions = this.externalApi?.getVersions() || {};
           const createIssue = this.createIssue;
           const result = onError({
             createIssue,
@@ -23658,8 +23629,7 @@ function requireErrorHandler() {
       process.removeListener("unhandledRejection", this.handleRejection);
     }
     createIssue(pageUrl, queryParams) {
-      var _a;
-      (_a = this.externalApi) == null ? void 0 : _a.openUrl(
+      this.externalApi?.openUrl(
         `${pageUrl}?${new URLSearchParams(queryParams).toString()}`
       );
     }
@@ -23696,78 +23666,78 @@ function requireEventLogger() {
   if (hasRequiredEventLogger) return EventLogger_1;
   hasRequiredEventLogger = 1;
   class EventLogger {
+    disposers = [];
+    format = "{eventSource}#{eventName}:";
+    formatters = {
+      app: {
+        "certificate-error": ({ args }) => {
+          return this.arrayToObject(args.slice(1, 4), [
+            "url",
+            "error",
+            "certificate"
+          ]);
+        },
+        "child-process-gone": ({ args }) => {
+          return args.length === 1 ? args[0] : args;
+        },
+        "render-process-gone": ({ args: [webContents, details] }) => {
+          return details && typeof details === "object" ? { ...details, ...this.getWebContentsDetails(webContents) } : [];
+        }
+      },
+      webContents: {
+        "console-message": ({ args: [level, message, line, sourceId] }) => {
+          if (level < 3) {
+            return void 0;
+          }
+          return { message, source: `${sourceId}:${line}` };
+        },
+        "did-fail-load": ({ args }) => {
+          return this.arrayToObject(args, [
+            "errorCode",
+            "errorDescription",
+            "validatedURL",
+            "isMainFrame",
+            "frameProcessId",
+            "frameRoutingId"
+          ]);
+        },
+        "did-fail-provisional-load": ({ args }) => {
+          return this.arrayToObject(args, [
+            "errorCode",
+            "errorDescription",
+            "validatedURL",
+            "isMainFrame",
+            "frameProcessId",
+            "frameRoutingId"
+          ]);
+        },
+        "plugin-crashed": ({ args }) => {
+          return this.arrayToObject(args, ["name", "version"]);
+        },
+        "preload-error": ({ args }) => {
+          return this.arrayToObject(args, ["preloadPath", "error"]);
+        }
+      }
+    };
+    events = {
+      app: {
+        "certificate-error": true,
+        "child-process-gone": true,
+        "render-process-gone": true
+      },
+      webContents: {
+        // 'console-message': true,
+        "did-fail-load": true,
+        "did-fail-provisional-load": true,
+        "plugin-crashed": true,
+        "preload-error": true,
+        "unresponsive": true
+      }
+    };
+    externalApi = void 0;
+    level = "error";
+    scope = "";
     constructor(options = {}) {
-      __publicField(this, "disposers", []);
-      __publicField(this, "format", "{eventSource}#{eventName}:");
-      __publicField(this, "formatters", {
-        app: {
-          "certificate-error": ({ args }) => {
-            return this.arrayToObject(args.slice(1, 4), [
-              "url",
-              "error",
-              "certificate"
-            ]);
-          },
-          "child-process-gone": ({ args }) => {
-            return args.length === 1 ? args[0] : args;
-          },
-          "render-process-gone": ({ args: [webContents, details] }) => {
-            return details && typeof details === "object" ? { ...details, ...this.getWebContentsDetails(webContents) } : [];
-          }
-        },
-        webContents: {
-          "console-message": ({ args: [level, message, line, sourceId] }) => {
-            if (level < 3) {
-              return void 0;
-            }
-            return { message, source: `${sourceId}:${line}` };
-          },
-          "did-fail-load": ({ args }) => {
-            return this.arrayToObject(args, [
-              "errorCode",
-              "errorDescription",
-              "validatedURL",
-              "isMainFrame",
-              "frameProcessId",
-              "frameRoutingId"
-            ]);
-          },
-          "did-fail-provisional-load": ({ args }) => {
-            return this.arrayToObject(args, [
-              "errorCode",
-              "errorDescription",
-              "validatedURL",
-              "isMainFrame",
-              "frameProcessId",
-              "frameRoutingId"
-            ]);
-          },
-          "plugin-crashed": ({ args }) => {
-            return this.arrayToObject(args, ["name", "version"]);
-          },
-          "preload-error": ({ args }) => {
-            return this.arrayToObject(args, ["preloadPath", "error"]);
-          }
-        }
-      });
-      __publicField(this, "events", {
-        app: {
-          "certificate-error": true,
-          "child-process-gone": true,
-          "render-process-gone": true
-        },
-        webContents: {
-          // 'console-message': true,
-          "did-fail-load": true,
-          "did-fail-provisional-load": true,
-          "plugin-crashed": true,
-          "preload-error": true,
-          "unresponsive": true
-        }
-      });
-      __publicField(this, "externalApi");
-      __publicField(this, "level", "error");
-      __publicField(this, "scope", "");
       this.setOptions(options);
     }
     setOptions({
@@ -23842,12 +23812,11 @@ function requireEventLogger() {
       this.disposers = [];
     }
     formatEventLog({ eventName, eventSource, handlerArgs }) {
-      var _a;
       const [event, ...args] = handlerArgs;
       if (typeof this.format === "function") {
         return this.format({ args, event, eventName, eventSource });
       }
-      const formatter = (_a = this.formatters[eventSource]) == null ? void 0 : _a[eventName];
+      const formatter = this.formatters[eventSource]?.[eventName];
       let formattedArgs = args;
       if (typeof formatter === "function") {
         formattedArgs = formatter({ args, event, eventName, eventSource });
@@ -23862,7 +23831,7 @@ function requireEventLogger() {
         Object.assign(eventData, formattedArgs);
       }
       if (eventSource === "webContents") {
-        Object.assign(eventData, this.getWebContentsDetails(event == null ? void 0 : event.sender));
+        Object.assign(eventData, this.getWebContentsDetails(event?.sender));
       }
       const title = this.format.replace("{eventSource}", eventSource === "app" ? "App" : "WebContents").replace("{eventName}", eventName);
       return [title, eventData];
@@ -23874,7 +23843,7 @@ function requireEventLogger() {
       return Object.entries(eventMap).filter(([_, listen]) => listen).map(([eventName]) => eventName);
     }
     getWebContentsDetails(webContents) {
-      if (!(webContents == null ? void 0 : webContents.loadURL)) {
+      if (!webContents?.loadURL) {
         return {};
       }
       try {
@@ -23889,11 +23858,10 @@ function requireEventLogger() {
       }
     }
     handleEvent({ eventName, eventSource, handlerArgs }) {
-      var _a;
       const log2 = this.formatEventLog({ eventName, eventSource, handlerArgs });
       if (log2) {
         const logFns = this.scope ? this.logger.scope(this.scope) : this.logger;
-        (_a = logFns == null ? void 0 : logFns[this.level]) == null ? void 0 : _a.call(logFns, ...log2);
+        logFns?.[this.level]?.(...log2);
       }
     }
   }
@@ -23910,8 +23878,8 @@ function requireTransform() {
     logger: logger2,
     message,
     transport,
-    initialData = (message == null ? void 0 : message.data) || [],
-    transforms = transport == null ? void 0 : transport.transforms
+    initialData = message?.data || [],
+    transforms = transport?.transforms
   }) {
     return transforms.reduce((data, trans) => {
       if (typeof trans === "function") {
@@ -23934,7 +23902,7 @@ function requireFormat() {
     formatText,
     formatVariables,
     timeZoneFromOffset,
-    format({ message, logger: logger2, transport, data = message == null ? void 0 : message.data }) {
+    format({ message, logger: logger2, transport, data = message?.data }) {
       switch (typeof transport.format) {
         case "string": {
           return transform({
@@ -23948,7 +23916,7 @@ function requireFormat() {
         case "function": {
           return transport.format({
             data,
-            level: (message == null ? void 0 : message.level) || "info",
+            level: message?.level || "info",
             logger: logger2,
             message,
             transport
@@ -23977,7 +23945,7 @@ function requireFormat() {
     return `${sign2}${hours}:${minutes}`;
   }
   function formatScope({ data, logger: logger2, message }) {
-    const { defaultLabel, labelLength } = (logger2 == null ? void 0 : logger2.scope) || {};
+    const { defaultLabel, labelLength } = logger2?.scope || {};
     const template = data[0];
     let label = message.scope;
     if (!label) {
@@ -24002,7 +23970,6 @@ function requireFormat() {
     template = template.replace("{level}]", `${message.level}]`.padEnd(6, " "));
     const date = message.date || /* @__PURE__ */ new Date();
     data[0] = template.replace(/\{(\w+)}/g, (substring, name) => {
-      var _a;
       switch (name) {
         case "level":
           return message.level || "info";
@@ -24027,7 +23994,7 @@ function requireFormat() {
         case "iso":
           return date.toISOString();
         default: {
-          return ((_a = message.variables) == null ? void 0 : _a[name]) || substring;
+          return message.variables?.[name] || substring;
         }
       }
     }).trim();
@@ -24064,11 +24031,11 @@ var hasRequiredObject;
 function requireObject() {
   if (hasRequiredObject) return object.exports;
   hasRequiredObject = 1;
-  (function(module2) {
+  (function(module) {
     const util2 = require$$1;
-    module2.exports = {
+    module.exports = {
       serialize,
-      maxDepth({ data, transport, depth = (transport == null ? void 0 : transport.depth) ?? 6 }) {
+      maxDepth({ data, transport, depth = transport?.depth ?? 6 }) {
         if (!data) {
           return data;
         }
@@ -24078,7 +24045,7 @@ function requireObject() {
           return data;
         }
         if (Array.isArray(data)) {
-          return data.map((child) => module2.exports.maxDepth({
+          return data.map((child) => module.exports.maxDepth({
             data: child,
             depth: depth - 1
           }));
@@ -24098,7 +24065,7 @@ function requireObject() {
         const newJson = {};
         for (const i in data) {
           if (!Object.prototype.hasOwnProperty.call(data, i)) continue;
-          newJson[i] = module2.exports.maxDepth({
+          newJson[i] = module.exports.maxDepth({
             data: data[i],
             depth: depth - 1
           });
@@ -24109,7 +24076,7 @@ function requireObject() {
         return JSON.parse(JSON.stringify(data, createSerializer()));
       },
       toString({ data, transport }) {
-        const inspectOptions = (transport == null ? void 0 : transport.inspectOptions) || {};
+        const inspectOptions = transport?.inspectOptions || {};
         const simplifiedData = data.map((item) => {
           if (item === void 0) {
             return void 0;
@@ -24137,7 +24104,7 @@ function requireObject() {
       };
     }
     function serialize(key, value, options = {}) {
-      const serializeMapAndSet = (options == null ? void 0 : options.serializeMapAndSet) !== false;
+      const serializeMapAndSet = options?.serializeMapAndSet !== false;
       if (value instanceof Error) {
         return value.stack;
       }
@@ -24315,19 +24282,19 @@ function requireFile$1() {
   const fs2 = require$$1$1;
   const os = require$$1$4;
   class File extends EventEmitter {
+    asyncWriteQueue = [];
+    bytesWritten = 0;
+    hasActiveAsyncWriting = false;
+    path = null;
+    initialSize = void 0;
+    writeOptions = null;
+    writeAsync = false;
     constructor({
       path,
       writeOptions = { encoding: "utf8", flag: "a", mode: 438 },
       writeAsync = false
     }) {
       super();
-      __publicField(this, "asyncWriteQueue", []);
-      __publicField(this, "bytesWritten", 0);
-      __publicField(this, "hasActiveAsyncWriting", false);
-      __publicField(this, "path", null);
-      __publicField(this, "initialSize");
-      __publicField(this, "writeOptions", null);
-      __publicField(this, "writeAsync", false);
       this.path = path;
       this.writeOptions = writeOptions;
       this.writeAsync = writeAsync;
@@ -24476,9 +24443,9 @@ function requireFileRegistry() {
   const File = requireFile$1();
   const NullFile = requireNullFile();
   class FileRegistry extends EventEmitter {
+    store = {};
     constructor() {
       super();
-      __publicField(this, "store", {});
       this.emitError = this.emitError.bind(this);
     }
     /**
@@ -24688,13 +24655,12 @@ function requireIpc() {
       level: logger2.isDev ? "silly" : false,
       transforms: [toJSON2, maxDepth]
     });
-    return (externalApi == null ? void 0 : externalApi.isElectron()) ? transport : void 0;
+    return externalApi?.isElectron() ? transport : void 0;
     function transport(message) {
-      var _a;
-      if (((_a = message == null ? void 0 : message.variables) == null ? void 0 : _a.processType) === "renderer") {
+      if (message?.variables?.processType === "renderer") {
         return;
       }
-      externalApi == null ? void 0 : externalApi.sendIpc(transport.eventId, {
+      externalApi?.sendIpc(transport.eventId, {
         ...message,
         data: transform({ logger: logger2, message, transport })
       });
@@ -24794,13 +24760,12 @@ function requireCreateDefaultLogger() {
   const transportRemote = requireRemote();
   createDefaultLogger_1 = createDefaultLogger;
   function createDefaultLogger({ dependencies, initializeFn }) {
-    var _a;
     const defaultLogger = new Logger({
       dependencies,
       errorHandler: new ErrorHandler(),
       eventLogger: new EventLogger(),
       initializeFn,
-      isDev: (_a = dependencies.externalApi) == null ? void 0 : _a.isDev(),
+      isDev: dependencies.externalApi?.isDev(),
       logId: "default",
       transportFactories: {
         console: transportConsole,
@@ -24867,8 +24832,7 @@ function requireMain$1() {
     }
   });
   function processMessage(message) {
-    var _a;
-    (_a = defaultLogger.Logger.getInstance(message)) == null ? void 0 : _a.processMessage(message);
+    defaultLogger.Logger.getInstance(message)?.processMessage(message);
   }
   return main;
 }
@@ -24913,7 +24877,7 @@ var hasRequiredNodeSqlite3Wasm;
 function requireNodeSqlite3Wasm() {
   if (hasRequiredNodeSqlite3Wasm) return nodeSqlite3Wasm.exports;
   hasRequiredNodeSqlite3Wasm = 1;
-  (function(module2, exports) {
+  (function(module, exports) {
     var Module = (/* @__PURE__ */ (() => {
       return function(moduleArg = {}) {
         var moduleRtn;
@@ -25447,14 +25411,12 @@ function requireNodeSqlite3Wasm() {
         var runDependencies = 0;
         var dependenciesFulfilled = null;
         function addRunDependency(id) {
-          var _a;
           runDependencies++;
-          (_a = Module2["monitorRunDependencies"]) == null ? void 0 : _a.call(Module2, runDependencies);
+          Module2["monitorRunDependencies"]?.(runDependencies);
         }
         function removeRunDependency(id) {
-          var _a;
           runDependencies--;
-          (_a = Module2["monitorRunDependencies"]) == null ? void 0 : _a.call(Module2, runDependencies);
+          Module2["monitorRunDependencies"]?.(runDependencies);
           if (runDependencies == 0) {
             if (dependenciesFulfilled) {
               var callback = dependenciesFulfilled;
@@ -25464,8 +25426,7 @@ function requireNodeSqlite3Wasm() {
           }
         }
         function abort(what) {
-          var _a;
-          (_a = Module2["onAbort"]) == null ? void 0 : _a.call(Module2, what);
+          Module2["onAbort"]?.(what);
           what = "Aborted(" + what + ")";
           err(what);
           ABORT = true;
@@ -25487,17 +25448,17 @@ function requireNodeSqlite3Wasm() {
           throw 'sync fetching of the wasm failed: you can preload it to Module["wasmBinary"] manually, or emcc.py will do that for you when generating HTML (but not JS)';
         }
         function instantiateSync(file2, info) {
-          var module3;
+          var module2;
           var binary2 = getBinarySync(file2);
-          module3 = new WebAssembly.Module(binary2);
-          var instance = new WebAssembly.Instance(module3, info);
-          return [instance, module3];
+          module2 = new WebAssembly.Module(binary2);
+          var instance = new WebAssembly.Instance(module2, info);
+          return [instance, module2];
         }
         function getWasmImports() {
           return { a: wasmImports };
         }
         function createWasm() {
-          function receiveInstance(instance, module3) {
+          function receiveInstance(instance, module2) {
             wasmExports = instance.exports;
             wasmMemory = wasmExports["y"];
             updateMemoryViews();
@@ -25515,13 +25476,13 @@ function requireNodeSqlite3Wasm() {
               });
             });
           }
-          wasmBinaryFile ?? (wasmBinaryFile = findWasmBinary());
+          wasmBinaryFile ??= findWasmBinary();
           var result = instantiateSync(wasmBinaryFile, info);
           return receiveInstance(result[0]);
         }
         class ExitStatus {
+          name = "ExitStatus";
           constructor(status) {
-            __publicField(this, "name", "ExitStatus");
             this.message = `Program terminated with exit(${status})`;
             this.status = status;
           }
@@ -25638,10 +25599,9 @@ function requireNodeSqlite3Wasm() {
         };
         var keepRuntimeAlive = () => noExitRuntime || runtimeKeepaliveCounter > 0;
         var _proc_exit = (code) => {
-          var _a;
           EXITSTATUS = code;
           if (!keepRuntimeAlive()) {
-            (_a = Module2["onExit"]) == null ? void 0 : _a.call(Module2, code);
+            Module2["onExit"]?.(code);
             ABORT = true;
           }
           quit_(code, new ExitStatus(code));
@@ -26084,8 +26044,8 @@ function requireNodeSqlite3Wasm() {
           uleb128Encode(typeSectionBody.length, bytes);
           bytes.push(...typeSectionBody);
           bytes.push(2, 7, 1, 1, 101, 1, 102, 0, 0, 7, 5, 1, 1, 102, 0, 0);
-          var module3 = new WebAssembly.Module(new Uint8Array(bytes));
-          var instance = new WebAssembly.Instance(module3, { e: { f: func } });
+          var module2 = new WebAssembly.Module(new Uint8Array(bytes));
+          var instance = new WebAssembly.Instance(module2, { e: { f: func } });
           var wrappedFunc = instance.exports["f"];
           return wrappedFunc;
         };
@@ -26235,11 +26195,10 @@ function requireNodeSqlite3Wasm() {
             return;
           }
           function doRun() {
-            var _a;
             Module2["calledRun"] = true;
             if (ABORT) return;
             initRuntime();
-            (_a = Module2["onRuntimeInitialized"]) == null ? void 0 : _a.call(Module2);
+            Module2["onRuntimeInitialized"]?.();
             postRun();
           }
           if (Module2["setStatus"]) {
@@ -26267,8 +26226,8 @@ function requireNodeSqlite3Wasm() {
       };
     })())();
     {
-      module2.exports = Module;
-      module2.exports.default = Module;
+      module.exports = Module;
+      module.exports.default = Module;
     }
   })(nodeSqlite3Wasm);
   return nodeSqlite3Wasm.exports;
@@ -26288,16 +26247,16 @@ const logger$1 = {
   warn: (message, ...args) => log.warn(`[MONITOR] ${message}`, ...args)
 };
 class UptimeMonitor extends require$$0$2.EventEmitter {
+  db;
+  sites = /* @__PURE__ */ new Map();
+  // key: site.identifier
+  siteIntervals = /* @__PURE__ */ new Map();
+  // Per-site intervals
+  historyLimit = 100;
+  // Default history limit
+  isMonitoring = false;
   constructor() {
     super();
-    __publicField(this, "db");
-    __publicField(this, "sites", /* @__PURE__ */ new Map());
-    // key: site.identifier
-    __publicField(this, "siteIntervals", /* @__PURE__ */ new Map());
-    // Per-site intervals
-    __publicField(this, "historyLimit", 100);
-    // Default history limit
-    __publicField(this, "isMonitoring", false);
     this.initDatabase();
   }
   // Helper: Retry logic for file operations
@@ -26980,7 +26939,7 @@ class UptimeMonitor extends require$$0$2.EventEmitter {
               `SELECT id FROM monitors WHERE site_identifier = ? ORDER BY id DESC LIMIT 1`,
               [site.identifier]
             );
-            const monitorId = (monitorRow == null ? void 0 : monitorRow.id) ? String(monitorRow.id) : void 0;
+            const monitorId = monitorRow?.id ? String(monitorRow.id) : void 0;
             monitor.id = monitorId;
             if (Array.isArray(monitor.history) && monitorId) {
               for (const h of monitor.history) {
@@ -27029,9 +26988,9 @@ const logger = {
   warn: (message, ...args) => log.warn(`[MAIN] ${message}`, ...args)
 };
 class Main {
+  mainWindow = null;
+  uptimeMonitor;
   constructor() {
-    __publicField(this, "mainWindow", null);
-    __publicField(this, "uptimeMonitor");
     this.uptimeMonitor = new UptimeMonitor();
     this.setupApp();
     this.setupIPC();
@@ -27082,9 +27041,8 @@ class Main {
       this.mainWindow.loadFile(require$$1$2.join(__dirname, "../dist/index.html"));
     }
     this.mainWindow.once("ready-to-show", () => {
-      var _a;
       logger.info("Main window ready to show");
-      (_a = this.mainWindow) == null ? void 0 : _a.show();
+      this.mainWindow?.show();
     });
     this.mainWindow.on("closed", () => {
       logger.info("Main window closed");
@@ -27148,10 +27106,9 @@ class Main {
       }
     });
     this.uptimeMonitor.on("status-update", (data) => {
-      var _a;
       const monitorStatuses = data.site.monitors.map((m) => `${m.type}: ${m.status}${m.responseTime ? ` (${m.responseTime}ms)` : ""}`).join(", ");
       logger.debug(`Status update for ${data.site.identifier}: ${monitorStatuses}`);
-      (_a = this.mainWindow) == null ? void 0 : _a.webContents.send("status-update", data);
+      this.mainWindow?.webContents.send("status-update", data);
     });
     this.uptimeMonitor.on("site-monitor-down", ({ site, monitorType }) => {
       logger.warn(`Monitor down alert: ${site.name || site.identifier} [${monitorType}]`);
@@ -27186,28 +27143,22 @@ class Main {
   setupAutoUpdater() {
     if (!this.mainWindow) return;
     mainExports$1.autoUpdater.on("checking-for-update", () => {
-      var _a;
-      (_a = this.mainWindow) == null ? void 0 : _a.webContents.send("update-status", { status: "checking" });
+      this.mainWindow?.webContents.send("update-status", { status: "checking" });
     });
     mainExports$1.autoUpdater.on("update-available", () => {
-      var _a;
-      (_a = this.mainWindow) == null ? void 0 : _a.webContents.send("update-status", { status: "available" });
+      this.mainWindow?.webContents.send("update-status", { status: "available" });
     });
     mainExports$1.autoUpdater.on("update-not-available", () => {
-      var _a;
-      (_a = this.mainWindow) == null ? void 0 : _a.webContents.send("update-status", { status: "idle" });
+      this.mainWindow?.webContents.send("update-status", { status: "idle" });
     });
     mainExports$1.autoUpdater.on("download-progress", () => {
-      var _a;
-      (_a = this.mainWindow) == null ? void 0 : _a.webContents.send("update-status", { status: "downloading" });
+      this.mainWindow?.webContents.send("update-status", { status: "downloading" });
     });
     mainExports$1.autoUpdater.on("update-downloaded", () => {
-      var _a;
-      (_a = this.mainWindow) == null ? void 0 : _a.webContents.send("update-status", { status: "downloaded" });
+      this.mainWindow?.webContents.send("update-status", { status: "downloaded" });
     });
     mainExports$1.autoUpdater.on("error", (err) => {
-      var _a;
-      (_a = this.mainWindow) == null ? void 0 : _a.webContents.send("update-status", { status: "error", error: (err == null ? void 0 : err.message) || String(err) });
+      this.mainWindow?.webContents.send("update-status", { status: "error", error: err?.message || String(err) });
     });
     mainExports$1.autoUpdater.checkForUpdatesAndNotify();
   }
