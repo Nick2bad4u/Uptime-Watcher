@@ -7,9 +7,64 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[56fbb63](https://github.com/Nick2bad4u/Uptime-Watcher/commit/56fbb63557cd02affa5c0fd3c2ddda0c933b0ebb)...
+[4b96451](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4b96451181802a94d3dbc8f9c9daeab92959903d)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/56fbb63557cd02affa5c0fd3c2ddda0c933b0ebb...4b96451181802a94d3dbc8f9c9daeab92959903d))
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(4b96451)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4b96451181802a94d3dbc8f9c9daeab92959903d)
+
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(cea96ea)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cea96eaae6e759aa9159fcc1bfb54d0292c64723)
+
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 2.6.0 [`(56fbb63)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/56fbb63557cd02affa5c0fd3c2ddda0c933b0ebb)
+
+
+
+
+
+
+## [2.6.0] - 2025-06-25
+
+
 [[73ac430](https://github.com/Nick2bad4u/Uptime-Watcher/commit/73ac43078cf1593f2d1712df6b1bbf93d80d94d6)...
-[73ac430](https://github.com/Nick2bad4u/Uptime-Watcher/commit/73ac43078cf1593f2d1712df6b1bbf93d80d94d6)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/73ac43078cf1593f2d1712df6b1bbf93d80d94d6...73ac43078cf1593f2d1712df6b1bbf93d80d94d6))
+[20db2d8](https://github.com/Nick2bad4u/Uptime-Watcher/commit/20db2d8d892b416e3e3f28a2521d19a3144d8025)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/73ac43078cf1593f2d1712df6b1bbf93d80d94d6...20db2d8d892b416e3e3f28a2521d19a3144d8025))
+
+
+### 🛠️ GitHub Actions
+
+- Update codeql.yml [`(6296214)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/629621493cbf467bfdb284b1cf9c9d2a309a38d6)
+
+
+- Update codeql.yml [`(5301aca)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5301acab2d1a868b10417e174bf228c45d5d11fd)
+
+
+
+### 💼 Other
+
+- 🛠️ [fix] Standardize use of undefined instead of null for state
+
+- Unifies usage of `undefined` over `null` for uninitialized or cleared state across components, hooks, and store logic
+- Prevents ambiguity and improves consistency, especially for optional values and reset actions
+- Updates conditional checks and default values to align with this standardization
+- Enhances code clarity and reduces potential bugs from mixed usage [`(20db2d8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/20db2d8d892b416e3e3f28a2521d19a3144d8025)
+
+
+- Update metrics.repository.svg - [Skip GitHub Action] [`(f7e983d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f7e983d27fe5e63127d082c160b9d3b710634eca)
+
+
+
+### ⚙️ Miscellaneous Tasks
+
+- Update changelogs for v2.5.0 [skip ci] [`(3794642)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/379464292e0cd6e519e002a2363105b8178ce3c0)
+
 
 
 ### 📦 Dependencies
@@ -58,6 +113,18 @@ All notable changes to this project will be documented in this file.
 Updates ignore patterns for Prettier and VSCode to better match project structure, removes redundant .vscodeignore, and tidies import order for consistency. Enhances editor usability and prevents formatting or indexing of unnecessary files. [`(98b2a6b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/98b2a6bc51be5ec93e5d99e2fda1737d45d5d80d)
 
 
+- 🚜 [refactor] Standardize nullable state to use undefined
+
+- Replaces usage of null with undefined for all optional state and function return values across components, hooks, and store
+- Improves type consistency and aligns codebase with TypeScript best practices for representing absence of value
+- Simplifies logic around error states, selected items, and UI resets by unifying handling of uninitialized or cleared values [`(2a948dd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2a948dd79b5d2a36f36a175af142852053efd0ce)
+
+
+- Improves ignore settings and cleans up VSCode config
+
+Updates ignore patterns for Prettier and VSCode to better match project structure, removes redundant .vscodeignore, and tidies import order for consistency. Enhances editor usability and prevents formatting or indexing of unnecessary files. [`(75b2e97)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/75b2e97966a3fb5e6d0832d3c21e00ba308b4b91)
+
+
 - Refactor code to use CommonJS module syntax and improve strict mode compliance
 
 - Updated main.js to use CommonJS imports and added strict mode.
@@ -85,6 +152,9 @@ Updates ignore patterns for Prettier and VSCode to better match project structur
 - Update changelogs for v2.4.0 [skip ci] [`(d9e7bcc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d9e7bccf8122f08073c7fac7464529ad0448ad05)
 
 
+- Update changelogs for v2.4.0 [skip ci] [`(55f3541)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/55f35416157299b8163798a79d945f7be35d04a9)
+
+
 
 ### 📦 Dependencies
 
@@ -108,6 +178,25 @@ Updates ignore patterns for Prettier and VSCode to better match project structur
 - Adds full-featured Electron+React frontend with per-site monitoring
 
 Introduces a React-based UI integrated with Electron, enabling per-site and per-monitor interval configuration, detailed site analytics, charting, and flexible theming. Implements robust IPC between renderer and main processes, persistent SQLite storage, direct backup/download, and advanced state management via Zustand. Improves developer experience with enhanced VSCode launch tasks, hot reload, and unified test/build workflow. Lays groundwork for future extensibility and improved monitoring reliability. [skip-ci] [`(776f214)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/776f214be3b319b60e31367766a78400c305cbc5)
+
+
+- 🚜 [refactor] Standardize nullable state to use undefined
+
+- Replaces usage of null with undefined for all optional state and function return values across components, hooks, and store
+- Improves type consistency and aligns codebase with TypeScript best practices for representing absence of value
+- Simplifies logic around error states, selected items, and UI resets by unifying handling of uninitialized or cleared values [`(cf1db5b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cf1db5bd21503eace6931bd434f0768d68a03b1f)
+
+
+- 🚜 [refactor] Standardize nullable state to use undefined
+
+- Replaces usage of null with undefined for all optional state and function return values across components, hooks, and store
+- Improves type consistency and aligns codebase with TypeScript best practices for representing absence of value
+- Simplifies logic around error states, selected items, and UI resets by unifying handling of uninitialized or cleared values [`(762768b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/762768b75e687f0dc5b16474a0b99b388a99a430)
+
+
+- Adds full-featured Electron+React frontend with per-site monitoring
+
+Introduces a React-based UI integrated with Electron, enabling per-site and per-monitor interval configuration, detailed site analytics, charting, and flexible theming. Implements robust IPC between renderer and main processes, persistent SQLite storage, direct backup/download, and advanced state management via Zustand. Improves developer experience with enhanced VSCode launch tasks, hot reload, and unified test/build workflow. Lays groundwork for future extensibility and improved monitoring reliability. [skip-ci] [`(5662f5c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5662f5c3db7d63ff06956a68dc6bdcb32ad7e41a)
 
 
 - Merge pull request #5 from Nick2bad4u/chore/prettier-fix [skip-ci]
