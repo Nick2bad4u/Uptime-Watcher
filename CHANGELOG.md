@@ -7,9 +7,55 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[4d92d5a](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4d92d5a18f0a67f96808baedd98f47c544ae18f9)...
+[04b258c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/04b258cd35fd18f981406e0316d5bccd66bd5829)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/4d92d5a18f0a67f96808baedd98f47c544ae18f9...04b258cd35fd18f981406e0316d5bccd66bd5829))
+
+
+### 💼 Other
+
+- Update metrics.repository.svg - [Skip GitHub Action] [`(04b258c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/04b258cd35fd18f981406e0316d5bccd66bd5829)
+
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 3.0.0 [`(4d92d5a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4d92d5a18f0a67f96808baedd98f47c544ae18f9)
+
+
+
+
+
+
+## [3.0.0] - 2025-06-26
+
+
 [[af928b5](https://github.com/Nick2bad4u/Uptime-Watcher/commit/af928b55aa1c54629483d385289065e64bb7fd5e)...
-[af928b5](https://github.com/Nick2bad4u/Uptime-Watcher/commit/af928b55aa1c54629483d385289065e64bb7fd5e)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/af928b55aa1c54629483d385289065e64bb7fd5e...af928b55aa1c54629483d385289065e64bb7fd5e))
+[0990dce](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0990dce68e70df25663d1200e43abade9b53fd17)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/af928b55aa1c54629483d385289065e64bb7fd5e...0990dce68e70df25663d1200e43abade9b53fd17))
+
+
+### 💼 Other
+
+- 🧹 [chore] Update ignores for typings and dist directories
+
+- Adds support for ignoring downloaded typings and dist folders throughout the project to prevent accidental commits of generated or external files
+- Updates VS Code settings to hide dist and refine .husky exclusions in file and search views, reducing noise and improving focus
+- Improves code style consistency in configuration by formatting multi-line rules for better readability [`(0990dce)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0990dce68e70df25663d1200e43abade9b53fd17)
+
+
+- 👷 [ci] Remove Electron backend build artifacts from source
+
+- Removes previously committed build output and Electron backend files from version control to prevent storing build artifacts in the repository.
+- Updates CI workflow to add a dedicated step for building the Vite frontend and Electron backend, ensuring separation of install and build phases.
+- Improves repository hygiene and reduces potential for merge conflicts and accidental deployment of stale artifacts. [`(8259198)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/82591980852202900bb47d142b5f888eae86555c)
+
+
+
+### ⚙️ Miscellaneous Tasks
+
+- Update changelogs for v2.9.0 [skip ci] [`(95c9849)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/95c9849731e616e9f5064a78c98a9ff1327a7618)
+
 
 
 ### 📦 Dependencies
@@ -618,63 +664,9 @@ robust monitoring operations. [`(30bc1af)`](https://github.com/Nick2bad4u/Uptime
 ## [1.8.11] - 2025-06-22
 
 
-[[2fbba3b](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2fbba3b84d5ac91a8eb5a8deabed10f89de06c64)...
-[69f2b18](https://github.com/Nick2bad4u/Uptime-Watcher/commit/69f2b18ac835418771df6af79c26367056ce284c)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/2fbba3b84d5ac91a8eb5a8deabed10f89de06c64...69f2b18ac835418771df6af79c26367056ce284c))
-
-
-### 🛠️ GitHub Actions
-
-- Update npm-audit.yml [`(5a7a035)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5a7a035edd2b637e554d6d583f606ab573be0000)
-
-
-- Update flatpak-build.yml [`(28205d0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/28205d0f46ea48fcf3db4b74523684ec84343e42)
-
-
-- Update flatpak-build.yml [`(a9154ae)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a9154ae0ae672b9a5d88df69edbb21456de25227)
-
-
-- Update eslint.yml [`(5891ca1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5891ca1db6282484242760d041dcf46198772a86)
-
-
-- Update eslint.yml [`(ec839b0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ec839b09ade2c9ee06b1598540da1b55f90fb572)
-
-
-
-### 💼 Other
-
-- Resumes active monitors after restart and improves history limit
-
-Ensures that monitoring automatically resumes for previously active monitors upon app restart, improving reliability for ongoing uptime checks.
-
-Also replaces the use of Infinity with Number.MAX_SAFE_INTEGER for the unlimited history option to avoid potential issues with serialization and internal calculations. [`(69f2b18)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/69f2b18ac835418771df6af79c26367056ce284c)
-
-
-- Rename eslint.config.js to eslint.config.mjs [`(6e70037)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6e700375ea147aebb01a6156c0ea6fd06220f318)
-
-
-
-### ⚙️ Miscellaneous Tasks
-
-- Update changelogs for v1.8.10 [skip ci] [`(1cbea90)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1cbea90d8062d42263da2ece56f373d74cc439cf)
-
-
-
-### 📦 Dependencies
-
-- [dependency] Update version 1.8.10 [`(2fbba3b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2fbba3b84d5ac91a8eb5a8deabed10f89de06c64)
-
-
-
-
-
-
-## [1.8.10] - 2025-06-22
-
-
 [[26bc4ef](https://github.com/Nick2bad4u/Uptime-Watcher/commit/26bc4ef07e2232af8754ecd2a3a99c3702195b85)...
-[efe1967](https://github.com/Nick2bad4u/Uptime-Watcher/commit/efe19678d1f47839dcdf772c4298cc1d05da6cec)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/26bc4ef07e2232af8754ecd2a3a99c3702195b85...efe19678d1f47839dcdf772c4298cc1d05da6cec))
+[69f2b18](https://github.com/Nick2bad4u/Uptime-Watcher/commit/69f2b18ac835418771df6af79c26367056ce284c)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/26bc4ef07e2232af8754ecd2a3a99c3702195b85...69f2b18ac835418771df6af79c26367056ce284c))
 
 
 ### 🚀 Features
@@ -716,6 +708,21 @@ Improves consistency and accuracy of changelog URLs by removing redundant path s
 
 ### 🛠️ GitHub Actions
 
+- Update npm-audit.yml [`(5a7a035)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5a7a035edd2b637e554d6d583f606ab573be0000)
+
+
+- Update flatpak-build.yml [`(28205d0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/28205d0f46ea48fcf3db4b74523684ec84343e42)
+
+
+- Update flatpak-build.yml [`(a9154ae)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a9154ae0ae672b9a5d88df69edbb21456de25227)
+
+
+- Update eslint.yml [`(5891ca1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5891ca1db6282484242760d041dcf46198772a86)
+
+
+- Update eslint.yml [`(ec839b0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ec839b09ade2c9ee06b1598540da1b55f90fb572)
+
+
 - Update eslint.yml [`(5c3a9fa)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5c3a9fab9bcccc09e2ee33057d163b9fe37eacc7)
 
 
@@ -727,6 +734,16 @@ Improves consistency and accuracy of changelog URLs by removing redundant path s
 
 
 ### 💼 Other
+
+- Resumes active monitors after restart and improves history limit
+
+Ensures that monitoring automatically resumes for previously active monitors upon app restart, improving reliability for ongoing uptime checks.
+
+Also replaces the use of Infinity with Number.MAX_SAFE_INTEGER for the unlimited history option to avoid potential issues with serialization and internal calculations. [`(69f2b18)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/69f2b18ac835418771df6af79c26367056ce284c)
+
+
+- Rename eslint.config.js to eslint.config.mjs [`(6e70037)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6e700375ea147aebb01a6156c0ea6fd06220f318)
+
 
 - Adds typescript-eslint and fixes devDependencies order
 
@@ -787,6 +804,9 @@ Streamlines code formatting by reducing line breaks and consolidating multi-line
 
 ### ⚙️ Miscellaneous Tasks
 
+- Update changelogs for v1.8.10 [skip ci] [`(1cbea90)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1cbea90d8062d42263da2ece56f373d74cc439cf)
+
+
 - Update version to 1.8.9 and adjust markdownlint dependency [`(02c4ee5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/02c4ee54e25645f12e817772ad881485ede5d028)
 
 
@@ -801,6 +821,9 @@ Streamlines code formatting by reducing line breaks and consolidating multi-line
 
 
 ### 📦 Dependencies
+
+- [dependency] Update version 1.8.10 [`(2fbba3b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2fbba3b84d5ac91a8eb5a8deabed10f89de06c64)
+
 
 - [dependency] Update version 1.8.9 [`(534364d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/534364d09cd58223bc556944a844da7bf10590c1)
 
