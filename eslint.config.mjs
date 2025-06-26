@@ -27,9 +27,12 @@ import pluginTsdoc from "eslint-plugin-tsdoc";
 import html from "eslint-plugin-html";
 import eslintPluginYml from "eslint-plugin-yml";
 import eslintPluginToml from "eslint-plugin-toml";
+import tomlEslintParser from "toml-eslint-parser";
+import yamlEslintParser from "yaml-eslint-parser";
 import * as cssPlugin from "eslint-plugin-css";
 import vitest from "@vitest/eslint-plugin";
 import vitestGlobals from "eslint-plugin-vitest-globals";
+import css from "@eslint/css";
 
 // mimic CommonJS variables -- not needed if using CommonJS
 const __filename = fileURLToPath(import.meta.url);
@@ -65,17 +68,24 @@ export default [
             "node_modules/**",
             "**/dist/**",
             "**/dist-electron/**",
+            ".**.json",
+            ".gitleaks.toml",
+            "cliff.toml",
+            "cspell.json",
+            "**/Design-Plan.md",
+            "**/Logging-Migration-Summary.md"
         ],
     },
 
-    // CSS files
-    {
-        files: ["**/*.css"],
-        ...cssPlugin.configs["flat/recommended"],
-        plugins: {
-            css: cssPlugin,
-        },
-    },
+    // Using Stylelint for CSS files, so we don't need to lint CSS here
+    // // CSS files
+    // {
+    //     files: ["**/*.css"],
+    //     ...cssPlugin.configs["flat/recommended"],
+    //     plugins: {
+    //         css: cssPlugin,
+    //     },
+    // },
 
     // Markdown files
     {
@@ -98,16 +108,30 @@ export default [
         },
     },
 
-    // YAML/YML files
-    {
-        files: ["**/*.yaml", "**/*.yml"],
-        ...eslintPluginYml.configs["flat/prettier"][0],
-    },
+    // // YAML/YML files
+    // {
+    //     files: ["**/*.yaml", "**/*.yml"],
+    //     ignores: ["kics.yaml", "flatpak-build.yml"],
+    //     ...eslintPluginYml.configs["flat/prettier"][0],
+    //     languageOptions: {
+    //         parser: yamlEslintParser,
+    //         parserOptions: {
+    //             defaultYAMLVersion: "1.0",
+    //         },
+    //     },
+    // },
 
     // TOML files
     {
         files: ["**/*.toml"],
-        ...eslintPluginToml.configs["flat/recommended"][0],
+        ignores: ["lychee.toml"],
+        ...eslintPluginToml.configs["flat/standard"][0],
+        languageOptions: {
+            parser: tomlEslintParser,
+            parserOptions: {
+                tomlVersion: "1.0.0",
+            },
+        },
     },
 
     // JS files

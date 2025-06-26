@@ -1,6 +1,13 @@
 ---
 extends: default
-
+ignore: |
+    node_modules
+    **/node_modules/*
+    **/node_modules/**
+    Build.yml
+    codeql.yml
+    release-stats.yml
+    updateChangeLogs.yml
 rules:
     braces:
         level: warning

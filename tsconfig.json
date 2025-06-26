@@ -23,16 +23,7 @@
         },
         "esModuleInterop": true
     },
-    "include": [
-        "electron/**/*.ts",
-        "electron/**/*.tsx"
-    ],
-    "exclude": [
-        "node_modules",
-        "dist",
-        "dist-electron",
-        "release",
-        "out"
-    ]
+    "include": ["electron/**/*.ts", "electron/**/*.tsx", "src/**/*.ts", "src/**/*.tsx", "vite.config.ts"],
+    "exclude": ["node_modules", "dist", "dist-electron", "release", "out"]
     // Separate tsconfig should be used for renderer (src/) if needed
 }
