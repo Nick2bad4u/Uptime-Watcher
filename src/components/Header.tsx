@@ -29,11 +29,11 @@ export function Header() {
     const uptimePercentage = totalMonitors > 0 ? Math.round((upMonitors / totalMonitors) * 100) : 0;
 
     return (
-        <ThemedBox surface="elevated" padding="md" className="shadow-sm border-b" border>
+        <ThemedBox surface="elevated" padding="md" className="border-b shadow-sm" border>
             <div className="header-container">
-                <div className="flex items-center justify-between py-4 gap-4 flex-wrap">
+                <div className="flex flex-wrap items-center justify-between gap-4 py-4">
                     {/* Left: App Title & Status Summary */}
-                    <div className="flex items-center gap-6 min-w-0 flex-shrink flex-wrap">
+                    <div className="flex flex-wrap items-center flex-shrink min-w-0 gap-6">
                         {/* App Title with subtle background and border */}
                         <span className="flex items-center gap-2 min-w-[180px] px-4 py-1 header-title-box">
                             <span className="text-2xl select-none">📊</span>
@@ -48,7 +48,7 @@ export function Header() {
                             padding="sm"
                             rounded="lg"
                             shadow="sm"
-                            className="flex items-center sphace-x-3 transition-all duration-300 min-w-[340px] header-status-summary-box"
+                            className="flex items-center space-x-3 transition-all duration-300 min-w-[340px] header-status-summary-box"
                         >
                             {/* Overall Health Badge */}
                             {totalMonitors > 0 && (
@@ -79,7 +79,7 @@ export function Header() {
                             {totalMonitors > 0 && <div className="w-px h-8 bg-current opacity-20" />}
 
                             {/* Up Status */}
-                            <div className="flex items-center space-x-2 px-2 py-1 rounded-md transition-all duration-200 group status-up-badge">
+                            <div className="flex items-center px-2 py-1 space-x-2 transition-all duration-200 rounded-md group status-up-badge">
                                 <StatusIndicator status="up" size="sm" />
                                 <div className="flex flex-col">
                                     <ThemedText size="sm" weight="semibold" variant="primary">
@@ -95,7 +95,7 @@ export function Header() {
                             <div className="w-px h-8 bg-current opacity-20" />
 
                             {/* Down Status */}
-                            <div className="flex items-center space-x-2 px-2 py-1 rounded-md transition-all duration-200 group status-down-badge">
+                            <div className="flex items-center px-2 py-1 space-x-2 transition-all duration-200 rounded-md group status-down-badge">
                                 <StatusIndicator status="down" size="sm" />
                                 <div className="flex flex-col">
                                     <ThemedText size="sm" weight="semibold" variant="primary">
@@ -111,7 +111,7 @@ export function Header() {
                             <div className="w-px h-8 bg-current opacity-20" />
 
                             {/* Pending Status */}
-                            <div className="flex items-center space-x-2 px-2 py-1 rounded-md transition-all duration-200 group status-pending-badge">
+                            <div className="flex items-center px-2 py-1 space-x-2 transition-all duration-200 rounded-md group status-pending-badge">
                                 <StatusIndicator status="pending" size="sm" />
                                 <div className="flex flex-col">
                                     <ThemedText size="sm" weight="semibold" variant="primary">
@@ -127,8 +127,8 @@ export function Header() {
                             {totalMonitors > 0 && (
                                 <>
                                     <div className="w-px h-8 bg-current opacity-20" />
-                                    <div className="flex items-center space-x-2 px-2 py-1 rounded-md bg-opacity-10 total-sites-badge">
-                                        <div className="w-2 h-2 rounded-full bg-current opacity-50" />
+                                    <div className="flex items-center px-2 py-1 space-x-2 rounded-md bg-opacity-10 total-sites-badge">
+                                        <div className="w-2 h-2 bg-current rounded-full opacity-50" />
                                         <div className="flex flex-col">
                                             <ThemedText size="sm" weight="semibold" variant="primary">
                                                 {totalMonitors}
@@ -144,7 +144,7 @@ export function Header() {
                     </div>
 
                     {/* Right: Controls */}
-                    <div className="flex items-center gap-3 flex-wrap">
+                    <div className="flex flex-wrap items-center gap-3">
                         {/* Theme Toggle */}
                         <ThemedBox
                             variant="tertiary"

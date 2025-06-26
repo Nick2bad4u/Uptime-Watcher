@@ -1,2 +1,9 @@
+Avenir
+Cpath
+Csvg
 fadein
+jekyll
+mttr
+partialize
+sonarjs
 styl

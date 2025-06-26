@@ -73,7 +73,7 @@ export default [
             "cliff.toml",
             "cspell.json",
             "**/Design-Plan.md",
-            "**/Logging-Migration-Summary.md"
+            "**/Logging-Migration-Summary.md",
         ],
     },
 
@@ -207,6 +207,12 @@ export default [
             "jsx-a11y/no-autofocus": "warn",
             // prettier
             "prettier/prettier": "warn",
+            "prettier/prettier": [
+                "error",
+                {
+                    usePrettierrc: true
+                },
+            ],
             // sonarjs
             "sonarjs/no-duplicate-string": "warn",
             "sonarjs/no-identical-functions": "warn",

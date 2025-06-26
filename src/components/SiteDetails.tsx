@@ -261,7 +261,7 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
                     padding="lg"
                     rounded="lg"
                     shadow="xl"
-                    className="site-details-content overflow-hidden animate-scale-in"
+                    className="overflow-hidden site-details-content animate-scale-in"
                 >
                     {/* Enhanced Header with Theme-Aware Styling */}
                     <div className="site-details-header">
@@ -269,7 +269,7 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
                         <div className="site-details-header-content">
                             {/* Left accent bar */}
                             <div className="site-details-header-accent" />
-                            <div className="site-details-header-info flex items-center gap-4">
+                            <div className="flex items-center gap-4 site-details-header-info">
                                 {/* Website Screenshot Thumbnail */}
                                 <ScreenshotThumbnail
                                     url={selectedMonitor?.type === "http" ? (selectedMonitor?.url ?? "") : ""}
@@ -284,14 +284,14 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
                                     )}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <ThemedText size="2xl" weight="bold" className="site-details-title truncate">
+                                    <ThemedText size="2xl" weight="bold" className="truncate site-details-title">
                                         {site.name || site.identifier}
                                     </ThemedText>
                                     {/* Show URL for HTTP, host:port for port monitor */}
                                     {selectedMonitor?.type === "http" && selectedMonitor?.url && (
                                         <a
                                             href={selectedMonitor.url}
-                                            className="site-details-url truncate"
+                                            className="truncate site-details-url"
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             tabIndex={0}
@@ -324,7 +324,7 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
                     <ThemedBox variant="secondary" padding="lg" className="border-b">
                         <div className="flex flex-wrap items-center gap-2">
                             {/* Tab navigation buttons (left) */}
-                            <div className="flex flex-wrap gap-2 items-center">
+                            <div className="flex flex-wrap items-center gap-2">
                                 <ThemedButton
                                     variant={activeSiteDetailsTab === "overview" ? "primary" : "secondary"}
                                     onClick={() => setActiveSiteDetailsTab("overview")}
@@ -357,7 +357,7 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
                                 </ThemedButton>
                             </div>
                             {/* Controls (right, before monitor type selector) */}
-                            <div className="ml-auto flex items-center gap-2">
+                            <div className="flex items-center gap-2 ml-auto">
                                 <ThemedText size="sm" variant="secondary">
                                     Interval:
                                 </ThemedText>
@@ -440,7 +440,7 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
                         {/* Time Range Selector for Analytics Tab (show for both http and port) */}
                         {activeSiteDetailsTab === `${selectedMonitorId}-analytics` &&
                             (selectedMonitorId === "http" || selectedMonitorId === "port") && (
-                                <div className="flex items-center flex-wrap gap-3 mt-4">
+                                <div className="flex flex-wrap items-center gap-3 mt-4">
                                     <ThemedText size="sm" variant="secondary" className="mr-2">
                                         Time Range:
                                     </ThemedText>
@@ -583,13 +583,13 @@ function OverviewTab({
     return (
         <div className="space-y-6">
             {/* Key Metrics Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                 <ThemedCard
                     icon={<MdOutlineFactCheck />}
                     iconColor={statusIconColor}
                     title="Status"
                     hoverable
-                    className="text-center flex flex-col items-center"
+                    className="flex flex-col items-center text-center"
                 >
                     <StatusIndicator status={selectedMonitor.status} size="lg" showText />
                 </ThemedCard>
@@ -599,7 +599,7 @@ function OverviewTab({
                     iconColor={uptimeIconColor}
                     title="Uptime"
                     hoverable
-                    className="text-center flex flex-col items-center"
+                    className="flex flex-col items-center text-center"
                 >
                     <ThemedProgress
                         value={uptimeValue}
@@ -617,7 +617,7 @@ function OverviewTab({
                     iconColor={responseIconColor}
                     title="Response Time"
                     hoverable
-                    className="text-center flex flex-col items-center"
+                    className="flex flex-col items-center text-center"
                 >
                     <ThemedText size="xl" weight="bold">
                         {formatResponseTime(avgResponseTime)}
@@ -629,7 +629,7 @@ function OverviewTab({
                     iconColor={checksIconColor}
                     title="Total Checks"
                     hoverable
-                    className="text-center flex flex-col items-center"
+                    className="flex flex-col items-center text-center"
                 >
                     <ThemedText size="xl" weight="bold">
                         {totalChecks}
@@ -743,13 +743,13 @@ function AnalyticsTab({
     return (
         <div className="space-y-6">
             {/* Analytics Summary */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <ThemedBox
                     surface="base"
                     padding="lg"
                     border
                     rounded="lg"
-                    className="text-center flex flex-col items-center"
+                    className="flex flex-col items-center text-center"
                 >
                     <ThemedText size="sm" variant="secondary">
                         Availability ({chartTimeRange})
@@ -777,7 +777,7 @@ function AnalyticsTab({
                         padding="lg"
                         border
                         rounded="lg"
-                        className="text-center flex flex-col items-center"
+                        className="flex flex-col items-center text-center"
                     >
                         <ThemedText size="sm" variant="secondary">
                             Avg Response Time
@@ -796,7 +796,7 @@ function AnalyticsTab({
                     padding="lg"
                     border
                     rounded="lg"
-                    className="text-center flex flex-col items-center"
+                    className="flex flex-col items-center text-center"
                 >
                     <ThemedText size="sm" variant="secondary">
                         Total Downtime
@@ -827,7 +827,7 @@ function AnalyticsTab({
                     </div>
 
                     <div className="grid grid-cols-3 gap-4 mb-4">
-                        <div className="text-center flex flex-col items-center">
+                        <div className="flex flex-col items-center text-center">
                             <ThemedText size="sm" variant="secondary" className="mb-4">
                                 P50
                             </ThemedText>
@@ -835,7 +835,7 @@ function AnalyticsTab({
                                 {formatResponseTime(p50)}
                             </ThemedText>
                         </div>
-                        <div className="text-center flex flex-col items-center">
+                        <div className="flex flex-col items-center text-center">
                             <ThemedText size="sm" variant="secondary" className="mb-4">
                                 P95
                             </ThemedText>
@@ -843,7 +843,7 @@ function AnalyticsTab({
                                 {formatResponseTime(p95)}
                             </ThemedText>
                         </div>
-                        <div className="text-center flex flex-col items-center">
+                        <div className="flex flex-col items-center text-center">
                             <ThemedText size="sm" variant="secondary" className="mb-4">
                                 P99
                             </ThemedText>
@@ -855,7 +855,7 @@ function AnalyticsTab({
 
                     {showAdvancedMetrics && (
                         <div className="grid grid-cols-2 gap-4 pt-4 border-t">
-                            <div className="text-center flex flex-col items-center">
+                            <div className="flex flex-col items-center text-center">
                                 <ThemedText size="sm" variant="secondary" className="mb-4">
                                     Mean Time To Recovery
                                 </ThemedText>
@@ -863,7 +863,7 @@ function AnalyticsTab({
                                     {formatDuration(mttr)}
                                 </ThemedText>
                             </div>
-                            <div className="text-center flex flex-col items-center">
+                            <div className="flex flex-col items-center text-center">
                                 <ThemedText size="sm" variant="secondary" className="mb-4">
                                     Incidents
                                 </ThemedText>
@@ -877,7 +877,7 @@ function AnalyticsTab({
             )}
 
             {/* Charts Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 {/* Response Time Chart */}
                 {(monitorType === "http" || monitorType === "port") && (
                     <ThemedBox surface="base" padding="md" border rounded="lg">
@@ -1007,7 +1007,7 @@ function HistoryTab({
                                 variant={historyFilter === filter ? "primary" : "ghost"}
                                 size="xs"
                                 onClick={() => setHistoryFilter(filter)}
-                                className="capitalize ml-4"
+                                className="ml-4 capitalize"
                             >
                                 {filter === "all" ? "All" : filter === "up" ? "✅ Up" : "❌ Down"}
                             </ThemedButton>
@@ -1038,12 +1038,12 @@ function HistoryTab({
             </div>
 
             {/* History List */}
-            <ThemedBox surface="base" padding="md" border rounded="lg" className="max-h-96 overflow-y-auto">
+            <ThemedBox surface="base" padding="md" border rounded="lg" className="overflow-y-auto max-h-96">
                 <div className="space-y-2">
                     {filteredHistoryRecords.map((record, index: number) => (
                         <div
                             key={index}
-                            className="flex items-center justify-between p-3 rounded-lg hover:bg-surface-elevated transition-colors"
+                            className="flex items-center justify-between p-3 transition-colors rounded-lg hover:bg-surface-elevated"
                         >
                             <div className="flex items-center space-x-3">
                                 <StatusIndicator status={record.status} size="sm" />
@@ -1071,7 +1071,7 @@ function HistoryTab({
             </ThemedBox>
 
             {filteredHistoryRecords.length === 0 && (
-                <div className="text-center py-8">
+                <div className="py-8 text-center">
                     <ThemedText variant="secondary">No records found for the selected filter.</ThemedText>
                 </div>
             )}
@@ -1135,7 +1135,7 @@ function SettingsTab({
                         <ThemedText size="sm" weight="medium" variant="secondary" className="block mb-2">
                             Site Name
                         </ThemedText>
-                        <div className="flex gap-3 items-center">
+                        <div className="flex items-center gap-3">
                             <ThemedInput
                                 type="text"
                                 value={localName}
@@ -1224,7 +1224,7 @@ function SettingsTab({
 
             {/* Site Information */}
             <ThemedCard icon="📊" title="Site Information" padding="xl" rounded="xl" shadow="md" className="mb-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                     <div className="flex flex-col gap-3">
                         <div className="flex items-center justify-between">
                             <ThemedText size="sm" variant="secondary">
@@ -1273,7 +1273,7 @@ function SettingsTab({
                         <ThemedText size="sm" weight="medium" variant="error" className="mb-2">
                             Remove Site
                         </ThemedText>
-                        <ThemedText size="xs" variant="tertiary" className="mb-4 ml-1 block">
+                        <ThemedText size="xs" variant="tertiary" className="block mb-4 ml-1">
                             This action cannot be undone. All history data for this site will be lost.
                         </ThemedText>
                         <ThemedButton
