@@ -7,9 +7,52 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[4f1f8e2](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4f1f8e2407b2230fb34730b2631a9e6bfbc158f4)...
-[4f1f8e2](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4f1f8e2407b2230fb34730b2631a9e6bfbc158f4)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/4f1f8e2407b2230fb34730b2631a9e6bfbc158f4...4f1f8e2407b2230fb34730b2631a9e6bfbc158f4))
+[[af928b5](https://github.com/Nick2bad4u/Uptime-Watcher/commit/af928b55aa1c54629483d385289065e64bb7fd5e)...
+[af928b5](https://github.com/Nick2bad4u/Uptime-Watcher/commit/af928b55aa1c54629483d385289065e64bb7fd5e)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/af928b55aa1c54629483d385289065e64bb7fd5e...af928b55aa1c54629483d385289065e64bb7fd5e))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 2.9.0 [`(af928b5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/af928b55aa1c54629483d385289065e64bb7fd5e)
+
+
+
+
+
+
+## [2.9.0] - 2025-06-26
+
+
+[[4e94c98](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4e94c988797316fc0ae86fcab01142c2f3266c04)...
+[9af10ae](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9af10ae8d8ab17523324e80f2f8faf73625513ce)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/4e94c988797316fc0ae86fcab01142c2f3266c04...9af10ae8d8ab17523324e80f2f8faf73625513ce))
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(9af10ae)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9af10ae8d8ab17523324e80f2f8faf73625513ce)
+
+
+
+### 💼 Other
+
+- ✨ [feat] Add Electron main process, IPC, and uptime monitor backend
+
+Introduces a comprehensive Electron backend, including the main process logic, IPC handlers, and an uptime monitoring engine with persistent SQLite storage.
+
+Enables site and monitor management, status updates, per-site monitoring controls, and direct database backup/export/import via Electron APIs. Integrates auto-update support and notification handling for monitor status changes.
+
+Adjusts ignore and VS Code settings to allow tracking of built Electron output, and improves file/folder exclusions for better workspace usability.
+
+Lays the technical foundation for reliable uptime tracking, flexible data persistence, and robust desktop application functionality. [`(4e94c98)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4e94c988797316fc0ae86fcab01142c2f3266c04)
+
+
+
+### ⚙️ Miscellaneous Tasks
+
+- Update changelogs for v2.8.0 [skip ci] [`(6ba8e9e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6ba8e9ef08eb0a70f688f59890f989e129f07a41)
+
 
 
 ### 📦 Dependencies
@@ -629,9 +672,24 @@ Also replaces the use of Infinity with Number.MAX_SAFE_INTEGER for the unlimited
 ## [1.8.10] - 2025-06-22
 
 
-[[ab20722](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ab20722bb8cc27a69305ef294ea1b134b871ed8f)...
+[[26bc4ef](https://github.com/Nick2bad4u/Uptime-Watcher/commit/26bc4ef07e2232af8754ecd2a3a99c3702195b85)...
 [efe1967](https://github.com/Nick2bad4u/Uptime-Watcher/commit/efe19678d1f47839dcdf772c4298cc1d05da6cec)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/ab20722bb8cc27a69305ef294ea1b134b871ed8f...efe19678d1f47839dcdf772c4298cc1d05da6cec))
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/26bc4ef07e2232af8754ecd2a3a99c3702195b85...efe19678d1f47839dcdf772c4298cc1d05da6cec))
+
+
+### 🚀 Features
+
+- Implement update notification system and enhance app state management [`(9a3a01d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9a3a01d9f14cb3f26a181c321b2de6c3b3ba8a82)
+
+
+
+### 🐛 Bug Fixes
+
+- Add libarchive-tools to Flatpak installation in workflow [`(7fe4d2c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7fe4d2c95c6af4a6bf98cf4fbfc012ea8ced7b4c)
+
+
+- Update package.json to include dist files and refine macOS packaging exclusions [`(26bc4ef)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/26bc4ef07e2232af8754ecd2a3a99c3702195b85)
+
 
 
 ### 🔀 Merge Commits
@@ -641,6 +699,18 @@ Also replaces the use of Infinity with Number.MAX_SAFE_INTEGER for the unlimited
 Updates changelog links and bumps version to 1.8.9
 
 Improves consistency and accuracy of changelog URLs by removing redundant path segments. Updates package version to 1.8.9 and adjusts ESLint workflow for clearer plugin installation, supporting better release management and CI reliability. [`(466c94a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/466c94a2c2d8b2611c56a08ea60faf492c6f32db)
+
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(f4e60df)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f4e60dfc53f32290b9eb99262c8418a6c4d1721f)
+
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(2cef839)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2cef839bd26e541d48a53027d08a7ab363b6a086)
+
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(09fd227)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/09fd2278b525ad3c1c6f95db695e91c7dad02618)
+
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(229bb5e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/229bb5ed2cec6e8eee5ef4319f9a1f52989cc6c8)
 
 
 
@@ -668,65 +738,6 @@ Reorders devDependencies for better organization and consistency, and sets "type
 
 Integrates new dev dependencies for markdown linting, code duplication detection, stylelint, and link checking to improve code quality and maintainability. Updates ESLint config dependencies and refines .gitignore for node_modules backup. No production logic is affected. [`(ab20722)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ab20722bb8cc27a69305ef294ea1b134b871ed8f)
 
-
-
-### ⚙️ Miscellaneous Tasks
-
-- Update version to 1.8.9 and adjust markdownlint dependency [`(02c4ee5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/02c4ee54e25645f12e817772ad881485ede5d028)
-
-
-- Update changelogs for v1.8.9 [skip ci] [`(ca2fdf5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ca2fdf5b1fefda2ba053bf059000d4083110a35d)
-
-
-
-### 📦 Dependencies
-
-- [dependency] Update version 1.8.9 [`(534364d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/534364d09cd58223bc556944a844da7bf10590c1)
-
-
-
-
-
-
-## [1.8.9] - 2025-06-22
-
-
-[[26bc4ef](https://github.com/Nick2bad4u/Uptime-Watcher/commit/26bc4ef07e2232af8754ecd2a3a99c3702195b85)...
-[f4e60df](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f4e60dfc53f32290b9eb99262c8418a6c4d1721f)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/26bc4ef07e2232af8754ecd2a3a99c3702195b85...f4e60dfc53f32290b9eb99262c8418a6c4d1721f))
-
-
-### 🚀 Features
-
-- Implement update notification system and enhance app state management [`(9a3a01d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9a3a01d9f14cb3f26a181c321b2de6c3b3ba8a82)
-
-
-
-### 🐛 Bug Fixes
-
-- Add libarchive-tools to Flatpak installation in workflow [`(7fe4d2c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7fe4d2c95c6af4a6bf98cf4fbfc012ea8ced7b4c)
-
-
-- Update package.json to include dist files and refine macOS packaging exclusions [`(26bc4ef)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/26bc4ef07e2232af8754ecd2a3a99c3702195b85)
-
-
-
-### 🔀 Merge Commits
-
-- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(f4e60df)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f4e60dfc53f32290b9eb99262c8418a6c4d1721f)
-
-
-- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(2cef839)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2cef839bd26e541d48a53027d08a7ab363b6a086)
-
-
-- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(09fd227)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/09fd2278b525ad3c1c6f95db695e91c7dad02618)
-
-
-- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(229bb5e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/229bb5ed2cec6e8eee5ef4319f9a1f52989cc6c8)
-
-
-
-### 💼 Other
 
 - Refactor code for improved readability and consistency across multiple files
 
@@ -776,6 +787,12 @@ Streamlines code formatting by reducing line breaks and consolidating multi-line
 
 ### ⚙️ Miscellaneous Tasks
 
+- Update version to 1.8.9 and adjust markdownlint dependency [`(02c4ee5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/02c4ee54e25645f12e817772ad881485ede5d028)
+
+
+- Update changelogs for v1.8.9 [skip ci] [`(ca2fdf5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ca2fdf5b1fefda2ba053bf059000d4083110a35d)
+
+
 - Update changelogs for v1.8.8 [skip ci] [`(33454ed)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/33454ed211840d1dd96534215b11573ca26c0131)
 
 
@@ -784,6 +801,9 @@ Streamlines code formatting by reducing line breaks and consolidating multi-line
 
 
 ### 📦 Dependencies
+
+- [dependency] Update version 1.8.9 [`(534364d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/534364d09cd58223bc556944a844da7bf10590c1)
+
 
 - [dependency] Update version 1.8.8 [`(ab8c318)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ab8c3181dbd175bd62190b4dff06d1b2a0550ca6)
 
