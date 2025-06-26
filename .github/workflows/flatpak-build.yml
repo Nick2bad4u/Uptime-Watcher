@@ -69,7 +69,7 @@ jobs:
                   cd .
                   ls -l
                   # Always build the dist repo to ensure it exists and is up-to-date
-                  flatpak-builder --repo=dist --force-clean build-dir flatpak-build.yml
+                  flatpak-builder --repo=dist-electron --force-clean build-dir flatpak-build.yml
                   ls -l
                   ls -l dist
               env:
@@ -82,7 +82,7 @@ jobs:
               run: |
                   cd .
                   ls -l
-                  ls -l dist
+                  ls -l dist-electron
                   flatpak build-bundle dist Uptime-Watcher.flatpak com.nick2bad4u.Uptime-Watcher
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
