@@ -49,10 +49,22 @@
             ],
             "prefer-const": "error",
             "prefer-template": "error",
-            "array-bracket-spacing": ["error", "always"],
-            "generator-star-spacing": ["error", "both"],
-            "space-before-function-paren": ["error", "always"],
-            "yield-star-spacing": ["error", "both"]
+            "array-bracket-spacing": [
+                "error",
+                "always"
+            ],
+            "generator-star-spacing": [
+                "error",
+                "both"
+            ],
+            "space-before-function-paren": [
+                "error",
+                "always"
+            ],
+            "yield-star-spacing": [
+                "error",
+                "both"
+            ]
         }
     },
     "prettier-eslint-typescript.prettierOptions": {
@@ -65,5 +77,20 @@
         "trailingComma": "none",
         "useTabs": false
     },
-    "debug.defaultCompound": "Dev: Vite + Electron Main"
+    "debug.defaultCompound": "Dev: Vite + Electron Main",
+    "cSpell.words": [
+        "appimage",
+        "asamuzakjp",
+        "asar",
+        "chartable",
+        "chartjs",
+        "Mesg",
+        "Mesgs",
+        "modelcontextprotocol",
+        "msvc",
+        "nsis",
+        "ossf",
+        "softprops",
+        "Zwift"
+    ]
 }
