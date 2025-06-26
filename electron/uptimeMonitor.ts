@@ -6,7 +6,7 @@ import log from "electron-log/main";
 import { EventEmitter } from "events";
 import isPortReachable from "is-port-reachable";
 import { Database } from "node-sqlite3-wasm";
-import path from "path";
+import * as path from "path";
 
 import { Site, StatusHistory, StatusUpdate, MonitorType } from "./types";
 

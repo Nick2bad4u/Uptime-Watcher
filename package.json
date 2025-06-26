@@ -7,6 +7,8 @@
   "appid": "io.github.uptime-watcher",
   "type": "commonjs",
   "homepage": "https://github.com/Nick2bad4u/Uptime-Watcher",
+  "enableForWorkspaceTypeScriptVersions": true,
+  "enableForWorkspaceJavaScriptVersions": true,
   "maintainers": [
     {
       "name": "Nick2bad4u",
