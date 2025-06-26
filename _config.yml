@@ -1,7 +1,7 @@
 remote_theme: pages-themes/hacker@v0.2.0
 title: Uptime-Watcher
 description: Uptime-Watcher made by Typpi / Nick2bad4u
-url: "https://nick2bad4u.github.io/Uptime-Watcher # the base hostname & protocol for your site
+url: "https://nick2bad4u.github.io/Uptime-Watcher"
 plugins:
     - jekyll-sitemap
     - jekyll-seo-tag

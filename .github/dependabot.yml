@@ -1,6 +1,7 @@
 # This is a Dependabot configuration file for automating dependency updates.
 # The configuration is set to version 2 of the Dependabot schema.
-# It defines update settings for three package ecosystems: GitHub Actions, Bundler, and npm.
+# It defines update settings for three package ecosystems:
+# GitHub Actions, Bundler, and npm.
 # Each ecosystem has its own update configuration, including:
 # - The directory to scan for dependencies (root directory in this case).
 # - The schedule for checking updates (daily).
@@ -24,8 +25,8 @@ updates:
           - "dependabot"
           - "dependencies"
       commit-message:
-          prefix: "[ci]"
-          prefix-development: "[ci]"
+          prefix: "[ci][skip-ci]"
+          prefix-development: "[ci][skip-ci]"
           include: "scope"
       groups:
           github-actions:
@@ -53,7 +54,7 @@ updates:
           - "dependencies"
       commit-message:
           prefix: "[dependency]"
-          prefix-development: "[dev-dependency]"
+          prefix-development: "[dev-dependency][skip-ci]"
           include: "scope"
       groups:
           npm-all:

@@ -148,8 +148,8 @@
     "cross-env": "^7.0.3",
     "cspell": "^9.1.2",
     "electron": "^37.1.0",
-    "electron-builder": "^26.0.17",
-    "electron-builder-squirrel-windows": "^26.0.17",
+    "electron-builder": "^24.13.3",
+    "electron-builder-squirrel-windows": "^24.13.3",
     "electron-publish": "^26.0.11",
     "eslint": "^9.29.0",
     "eslint-plugin-css": "^0.11.0",
@@ -175,6 +175,7 @@
     "eslint-plugin-unicorn": "^59.0.1",
     "eslint-plugin-unused-imports": "^4.1.4",
     "eslint-plugin-yml": "^1.18.0",
+    "git-cliff": "^2.9.1",
     "globals": "^16.2.0",
     "husky": "^9.1.7",
     "jscpd": "^4.0.5",
@@ -262,7 +263,7 @@
         "tar.gz",
         "tar.bz2"
       ],
-      "legalTrademarks": "Fit File Viewer",
+      "legalTrademarks": "Uptime Watcher",
       "requestedExecutionLevel": "asInvoker"
     },
     "nsis": {

@@ -8,6 +8,9 @@ ignore: |
     codeql.yml
     release-stats.yml
     updateChangeLogs.yml
+    .yamllint
+    kics.yaml
+    ActionLint.yml
 rules:
     braces:
         level: warning
