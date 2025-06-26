@@ -5,6 +5,7 @@ import type { TimePeriod } from "../utils/time";
 
 import { CHART_TIME_PERIODS } from "../constants";
 import { Monitor, StatusHistory } from "../types";
+import { TIME_PERIOD_LABELS } from "../utils/time";
 
 // Enhanced types for better IntelliSense and error catching
 export interface DowntimePeriod {
@@ -50,7 +51,11 @@ export function useSiteAnalytics(monitor: Monitor | undefined, timeRange: TimePe
         const history = monitor?.history ?? [];
         // Filter history based on time range
         const now = Date.now();
-        const cutoff = now - CHART_TIME_PERIODS[timeRange];
+        // Sanitize timeRange to prevent object injection
+        const allowedTimeRanges = Object.keys(TIME_PERIOD_LABELS) as TimePeriod[];
+        const safeTimeRange = allowedTimeRanges.includes(timeRange) ? timeRange : "24h";
+        // eslint-disable-next-line security/detect-object-injection -- false positive: safeTimeRange is validated against allowedTimeRanges
+        const cutoff = now - CHART_TIME_PERIODS[safeTimeRange];
         const filteredHistory = history.filter((record) => record.timestamp >= cutoff);
 
         const totalChecks = filteredHistory.length;
@@ -70,8 +75,14 @@ export function useSiteAnalytics(monitor: Monitor | undefined, timeRange: TimePe
         // Calculate percentiles
         const sortedResponseTimes = [...responseTimes].sort((a, b) => a - b);
         const getPercentile = (p: number) => {
-            const index = Math.floor(sortedResponseTimes.length * p);
-            return sortedResponseTimes[index] || 0;
+            // Ensure p is between 0 and 1
+            const safeP = Math.max(0, Math.min(1, p));
+            const arrLen = sortedResponseTimes.length;
+            if (arrLen === 0) return 0;
+            const idx = Math.floor(arrLen * safeP);
+            const safeIdx = Math.max(0, Math.min(idx, arrLen - 1));
+            // eslint-disable-next-line security/detect-object-injection -- safeIdx is validated and sanitized
+            return sortedResponseTimes[safeIdx];
         };
 
         const p50 = getPercentile(0.5);
@@ -80,6 +91,7 @@ export function useSiteAnalytics(monitor: Monitor | undefined, timeRange: TimePe
 
         // Calculate downtime periods
         const downtimePeriods: DowntimePeriod[] = [];
+        // eslint-disable-next-line functional/no-let -- this is necessary for mutable state
         let currentDowntime: DowntimePeriod | undefined = undefined;
 
         // Process in reverse chronological order for proper downtime calculation

@@ -1,4 +1,5 @@
 import { ChartOptions } from "chart.js";
+
 import { Theme } from "../theme/types";
 
 /**
@@ -17,7 +18,6 @@ export class ChartConfigService {
      */
     private getBaseConfig(): Partial<ChartOptions> {
         return {
-            responsive: true,
             maintainAspectRatio: false,
             plugins: {
                 legend: {
@@ -31,12 +31,13 @@ export class ChartConfigService {
                 },
                 tooltip: {
                     backgroundColor: this.theme.colors.surface.elevated,
-                    titleColor: this.theme.colors.text.primary,
                     bodyColor: this.theme.colors.text.secondary,
                     borderColor: this.theme.colors.border.primary,
                     borderWidth: 1,
+                    titleColor: this.theme.colors.text.primary,
                 },
             },
+            responsive: true,
         };
     }
 
@@ -71,49 +72,49 @@ export class ChartConfigService {
             plugins: {
                 ...this.getBaseConfig().plugins,
                 title: {
-                    display: true,
-                    text: "Response Time Over Time",
                     color: this.theme.colors.text.primary,
+                    display: true,
                     font: {
                         family: this.theme.typography.fontFamily.sans.join(", "),
                         size: 16,
                         weight: "bold",
                     },
+                    text: "Response Time Over Time",
                 },
                 zoom: {
-                    zoom: {
-                        wheel: { enabled: true },
-                        pinch: { enabled: true },
-                        mode: "x",
-                    },
                     pan: {
                         enabled: true,
                         mode: "x",
+                    },
+                    zoom: {
+                        mode: "x",
+                        pinch: { enabled: true },
+                        wheel: { enabled: true },
                     },
                 },
             },
             scales: {
                 x: {
-                    type: "time",
                     time: {
                         displayFormats: {
-                            minute: "HH:mm",
-                            hour: "HH:mm",
                             day: "MMM dd",
+                            hour: "HH:mm",
+                            minute: "HH:mm",
                         },
                     },
+                    type: "time",
                     ...this.getBaseScale(),
                 },
                 y: {
                     beginAtZero: true,
                     title: {
-                        display: true,
-                        text: "Response Time (ms)",
                         color: this.theme.colors.text.secondary,
+                        display: true,
                         font: {
                             family: this.theme.typography.fontFamily.sans.join(", "),
                             size: 12,
                         },
+                        text: "Response Time (ms)",
                     },
                     ...this.getBaseScale(),
                 },
@@ -131,14 +132,14 @@ export class ChartConfigService {
                 ...this.getBaseConfig().plugins,
                 legend: { display: false },
                 title: {
-                    display: true,
-                    text: "Status Distribution",
                     color: this.theme.colors.text.primary,
+                    display: true,
                     font: {
                         family: this.theme.typography.fontFamily.sans.join(", "),
                         size: 16,
                         weight: "bold",
                     },
+                    text: "Status Distribution",
                 },
             },
             scales: {
@@ -146,13 +147,13 @@ export class ChartConfigService {
                 y: {
                     beginAtZero: true,
                     title: {
-                        display: true,
-                        text: "Count",
                         color: this.theme.colors.text.secondary,
+                        display: true,
                         font: {
                             family: this.theme.typography.fontFamily.sans.join(", "),
                             size: 12,
                         },
+                        text: "Count",
                     },
                     ...this.getBaseScale(),
                 },
@@ -169,7 +170,6 @@ export class ChartConfigService {
             plugins: {
                 ...this.getBaseConfig().plugins,
                 legend: {
-                    position: "bottom",
                     labels: {
                         color: this.theme.colors.text.primary,
                         font: {
@@ -177,16 +177,17 @@ export class ChartConfigService {
                             size: 12,
                         },
                     },
+                    position: "bottom",
                 },
                 title: {
-                    display: true,
-                    text: "Uptime Distribution",
                     color: this.theme.colors.text.primary,
+                    display: true,
                     font: {
                         family: this.theme.typography.fontFamily.sans.join(", "),
                         size: 16,
                         weight: "bold",
                     },
+                    text: "Uptime Distribution",
                 },
                 tooltip: {
                     ...this.getBaseConfig().plugins?.tooltip,
@@ -210,8 +211,8 @@ export function useChartConfigs(theme: Theme, totalChecks: number = 0) {
     const chartService = new ChartConfigService(theme);
 
     return {
-        lineChartOptions: chartService.getLineChartConfig(),
         barChartOptions: chartService.getBarChartConfig(),
         doughnutOptions: chartService.getDoughnutChartConfig(totalChecks),
+        lineChartOptions: chartService.getLineChartConfig(),
     };
 }

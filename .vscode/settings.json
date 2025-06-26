@@ -16,15 +16,16 @@
         "toml",
         "github-actions-workflow"
     ],
+    "files.associations": {
+        "*.css": "tailwindcss"
+    },
     "files.exclude": {
-        ".husky": true,
-        "release": true,
-        "node_modules": true,
+        "**/node_modules": true,
+        "**/release": true,
+        "**/.husky": true,
     },
     "search.exclude": {
         "**/node_modules": true,
-        "**/dist": true,
-        "**/dist-electron": true,
         "**/release": true,
         "**/.husky": true
     },
@@ -56,5 +57,7 @@
         "trailingComma": "none",
         "useTabs": false
     },
+    "debug.defaultCompound": "Dev: Vite + Electron Main"
+}
     "debug.defaultCompound": "Dev: Vite + Electron Main"
 }

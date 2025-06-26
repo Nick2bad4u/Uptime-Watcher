@@ -1,3 +1,4 @@
+import { FONT_FAMILY_MONO, FONT_FAMILY_SANS } from "../constants";
 import { Theme } from "./types";
 
 export const lightTheme: Theme = {
@@ -81,8 +82,8 @@ export const lightTheme: Theme = {
     },
     typography: {
         fontFamily: {
-            mono: ["SF Mono", "Monaco", "Inconsolata", "Roboto Mono", "monospace"],
-            sans: ["Inter", "system-ui", "Avenir", "Helvetica", "Arial", "sans-serif"],
+            mono: FONT_FAMILY_MONO,
+            sans: FONT_FAMILY_SANS,
         },
         fontSize: {
             "2xl": "1.5rem",
@@ -189,8 +190,8 @@ export const darkTheme: Theme = {
     },
     typography: {
         fontFamily: {
-            mono: ["SF Mono", "Monaco", "Inconsolata", "Roboto Mono", "monospace"],
-            sans: ["Inter", "system-ui", "Avenir", "Helvetica", "Arial", "sans-serif"],
+            mono: FONT_FAMILY_MONO,
+            sans: FONT_FAMILY_SANS,
         },
         fontSize: {
             "2xl": "1.5rem",
@@ -298,8 +299,8 @@ export const highContrastTheme: Theme = {
     },
     typography: {
         fontFamily: {
-            mono: ["SF Mono", "Monaco", "Inconsolata", "Roboto Mono", "monospace"],
-            sans: ["Inter", "system-ui", "Avenir", "Helvetica", "Arial", "sans-serif"],
+            mono: FONT_FAMILY_MONO,
+            sans: FONT_FAMILY_SANS,
         },
         fontSize: {
             "2xl": "1.75rem",

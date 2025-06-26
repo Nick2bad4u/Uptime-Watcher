@@ -94,6 +94,7 @@ export type TimePeriod = keyof typeof CHART_TIME_PERIODS;
  */
 export const TIME_PERIOD_LABELS: Record<TimePeriod, string> = {
     "1h": "Last Hour",
+    "12h": "Last 12 Hours",
     "24h": "Last 24 Hours",
     // eslint-disable-next-line perfectionist/sort-objects -- keep in ascending order
     "7d": "Last 7 Days",

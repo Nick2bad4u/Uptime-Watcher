@@ -53,7 +53,24 @@ export function Settings({ onClose }: SettingsProps) {
         }
     }, [isLoading]);
 
+    // Only allow keys that are part of AppSettings
+    const allowedKeys: Array<keyof typeof settings> = [
+        "notifications",
+        "autoStart",
+        "minimizeToTray",
+        "theme",
+        "timeout",
+        "maxRetries",
+        "soundAlerts",
+        "historyLimit",
+    ];
+
     const handleSettingChange = (key: keyof typeof settings, value: unknown) => {
+        if (!allowedKeys.includes(key)) {
+            logger.warn("Attempted to update invalid settings key", key);
+            return;
+        }
+        // eslint-disable-next-line security/detect-object-injection
         const oldValue = settings[key];
         updateSettings({ [key]: value });
         logger.user.settingsChange(key, oldValue, value);
@@ -90,9 +107,14 @@ export function Settings({ onClose }: SettingsProps) {
             await syncSitesFromBackend();
             setSyncSuccess(true);
             logger.user.action("Synced data from SQLite backend");
-        } catch (error: any) {
+        } catch (error: unknown) {
             logger.error("Failed to sync data from backend", error);
-            setError("Failed to sync data: " + (error && error.message ? error.message : String(error)));
+            setError(
+                "Failed to sync data: " +
+                    (error && typeof error === "object" && "message" in error
+                        ? (error as { message?: string }).message
+                        : String(error))
+            );
         }
     }, [syncSitesFromBackend, setError]);
 
@@ -102,9 +124,14 @@ export function Settings({ onClose }: SettingsProps) {
         try {
             await downloadSQLiteBackup();
             logger.user.action("Downloaded SQLite backup");
-        } catch (error: any) {
+        } catch (error: unknown) {
             logger.error("Failed to download SQLite backup", error);
-            setError("Failed to download SQLite backup: " + (error && error.message ? error.message : String(error)));
+            setError(
+                "Failed to download SQLite backup: " +
+                    (error && typeof error === "object" && "message" in error
+                        ? (error as { message?: string }).message
+                        : String(error))
+            );
         } finally {
             setShowButtonLoading(false);
         }

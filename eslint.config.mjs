@@ -29,6 +29,7 @@ import eslintPluginYml from "eslint-plugin-yml";
 import eslintPluginToml from "eslint-plugin-toml";
 import * as cssPlugin from "eslint-plugin-css";
 import vitest from "@vitest/eslint-plugin";
+import vitestGlobals from "eslint-plugin-vitest-globals";
 
 // mimic CommonJS variables -- not needed if using CommonJS
 const __filename = fileURLToPath(import.meta.url);
@@ -196,7 +197,7 @@ export default [
                 {
                     type: "natural",
                     order: "asc",
-                    fallbackSort: { type: 'alphabetical', order: 'asc' },
+                    fallbackSort: { type: "alphabetical", order: "asc" },
                     newlinesBetween: 1,
                 },
             ],
@@ -205,7 +206,7 @@ export default [
                 {
                     type: "natural",
                     order: "asc",
-                    fallbackSort: { type: 'alphabetical', order: 'asc' },
+                    fallbackSort: { type: "alphabetical", order: "asc" },
                     newlinesBetween: 1,
                 },
             ],
@@ -342,7 +343,7 @@ export default [
                 {
                     type: "natural",
                     order: "asc",
-                    fallbackSort: { type: 'alphabetical', order: 'asc' },
+                    fallbackSort: { type: "alphabetical", order: "asc" },
                     newlinesBetween: 1,
                 },
             ],
@@ -351,7 +352,7 @@ export default [
                 {
                     type: "natural",
                     order: "asc",
-                    fallbackSort: { type: 'alphabetical', order: 'asc' },
+                    fallbackSort: { type: "alphabetical", order: "asc" },
                     newlinesBetween: 1,
                 },
             ],
@@ -393,6 +394,19 @@ export default [
         },
         rules: {
             ...vitest.configs.recommended.rules,
+        },
+    },
+
+    {
+        files: ["**/__tests__/*.{j,t}s?(x)", "**/*.spec.{j,t}s?(x)", "tests/**/*"],
+        plugins: {
+            "vitest-globals": vitestGlobals,
+        },
+        extends: [vitestGlobals.configs.recommended],
+        languageOptions: {
+            env: {
+                "vitest-globals/env": true,
+            },
         },
     },
 

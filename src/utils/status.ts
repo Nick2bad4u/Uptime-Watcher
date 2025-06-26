@@ -2,8 +2,6 @@
  * Status utility functions for consistent status handling across components
  */
 
-export type StatusType = "up" | "down" | "pending" | "unknown";
-
 /**
  * Get the emoji icon for a given status
  */

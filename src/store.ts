@@ -1,8 +1,9 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { Site, StatusUpdate, Monitor, MonitorType } from "./types";
-import { ThemeName } from "./theme/types";
+
 import { TIMEOUT_CONSTRAINTS } from "./constants";
+import { ThemeName } from "./theme/types";
+import { Site, StatusUpdate, Monitor, MonitorType } from "./types";
 
 export type UpdateStatus = "idle" | "checking" | "available" | "downloading" | "downloaded" | "error";
 
@@ -108,100 +109,60 @@ interface AppState {
 }
 
 const defaultSettings: AppSettings = {
-    notifications: true,
     autoStart: false,
+    historyLimit: 100,
+    maxRetries: 3,
     minimizeToTray: true,
+    notifications: true,
+    soundAlerts: false,
     theme: "system",
     timeout: TIMEOUT_CONSTRAINTS.MAX / 10, // 6 seconds (reasonable default)
-    maxRetries: 3,
-    soundAlerts: false,
-    historyLimit: 100,
 };
 
 export const useStore = create<AppState>()(
     persist(
         (set, get) => ({
-            sites: [],
-            // Remove isMonitoring
-            darkMode: false,
-            settings: defaultSettings,
-            showSettings: false,
-            selectedSiteId: undefined,
-            showSiteDetails: false,
-
-            // Error handling initial state
-            lastError: undefined,
-            isLoading: false,
-
-            // Statistics initial state
-            totalUptime: 0,
-            totalDowntime: 0,
-
             // Synchronized UI state for SiteDetails
             activeSiteDetailsTab: "overview",
-            siteDetailsChartTimeRange: "24h",
-            showAdvancedMetrics: false,
-
-            // Selected monitor id per site (UI state, not persisted)
-            selectedMonitorIds: {},
-
-            // Update status initial state
-            updateStatus: "idle",
-            updateError: undefined,
-
-            // Derived selector
-            getSelectedSite: () => {
-                const { sites, selectedSiteId } = get();
-                if (!selectedSiteId) return undefined;
-                return sites.find((s) => s.identifier === selectedSiteId) || undefined;
-            },
-
-            // Backend integration actions
-            initializeApp: async () => {
-                const state = get();
-                state.setLoading(true);
-                state.clearError();
-
-                try {
-                    const [sites, historyLimit] = await Promise.all([
-                        window.electronAPI.getSites(),
-                        window.electronAPI.getHistoryLimit(),
-                    ]);
-
-                    // Ensure every monitor has monitoring property (default true)
-                    const migratedSites = sites.map((site: any) => {
-                        const { monitors = [], ...siteRest } = site;
-                        return {
-                            ...siteRest,
-                            monitors: monitors.map((monitor: any) =>
-                                typeof monitor.monitoring === "undefined" ? { ...monitor, monitoring: true } : monitor
-                            ),
-                        };
-                    });
-
-                    state.setSites(migratedSites);
-                    state.updateSettings({ historyLimit });
-                } catch (error) {
-                    state.setError(`Failed to initialize app: ${(error as Error).message}`);
-                } finally {
-                    state.setLoading(false);
-                }
-            },
-
-            syncSitesFromBackend: async () => {
+            /**
+             * Add a monitor to an existing site
+             */
+            addMonitorToSite: async (siteId, monitor) => {
                 const state = get();
                 state.setLoading(true);
                 state.clearError();
                 try {
-                    const backendSites = await window.electronAPI.getSites();
-                    state.setSites(backendSites);
+                    // Get the current site
+                    const site = state.sites.find((s) => s.identifier === siteId);
+                    if (!site) throw new Error("Site not found");
+                    // Allow multiple monitors of the same type (uniqueness is not enforced)
+                    const updatedMonitors = [...site.monitors, monitor];
+                    await window.electronAPI.updateSite(siteId, { monitors: updatedMonitors });
+                    await state.syncSitesFromBackend();
                 } catch (error) {
-                    state.setError(`Failed to sync sites: ${(error as Error).message}`);
+                    state.setError(`Failed to add monitor: ${error instanceof Error ? error.message : String(error)}`);
+                    throw error;
                 } finally {
                     state.setLoading(false);
                 }
             },
-
+            addSite: (site: Site) => set((state) => ({ sites: [...state.sites, site] })),
+            // Update: apply downloaded update and restart
+            applyUpdate: () => {
+                window.electronAPI.quitAndInstall?.();
+            },
+            checkSiteNow: async (siteId: string, monitorId: string) => {
+                const state = get();
+                state.clearError();
+                try {
+                    await window.electronAPI.checkSiteNow(siteId, monitorId);
+                    // Backend will emit 'status-update', which will trigger syncSitesFromBackend
+                } catch (error) {
+                    state.setError(`Failed to check site: ${(error as Error).message}`);
+                    throw error;
+                }
+            },
+            clearError: () => set({ lastError: undefined }),
             createSite: async (siteData: Omit<Site, "id" | "monitors"> & { monitors?: Monitor[] }) => {
                 const state = get();
                 state.setLoading(true);
@@ -209,23 +170,26 @@ export const useStore = create<AppState>()(
 
                 try {
                     // Default to HTTP monitor if none provided
-                    const monitors: Monitor[] = (siteData.monitors && siteData.monitors.length > 0
-                        ? siteData.monitors
-                        : [{
-                            id: crypto.randomUUID(),
-                            type: "http" as MonitorType,
-                            status: "pending",
-                            history: [],
-                            monitoring: true
-                        }]
+                    const monitors: Monitor[] = (
+                        siteData.monitors && siteData.monitors.length > 0
+                            ? siteData.monitors
+                            : [
+                                  {
+                                      history: [],
+                                      id: crypto.randomUUID(),
+                                      monitoring: true,
+                                      status: "pending",
+                                      type: "http" as MonitorType,
+                                  },
+                              ]
                     ).map((monitor) => ({
                         ...monitor,
                         id: monitor.id || crypto.randomUUID(),
                         monitoring: typeof monitor.monitoring === "undefined" ? true : monitor.monitoring,
-                        type: monitor.type as MonitorType,
                         status: ["pending", "up", "down"].includes(monitor.status)
                             ? (monitor.status as Monitor["status"])
-                            : "pending"
+                            : "pending",
+                        type: monitor.type as MonitorType,
                     }));
                     const newSite = await window.electronAPI.addSite({ ...siteData, monitors });
                     state.addSite(newSite);
@@ -236,7 +200,8 @@ export const useStore = create<AppState>()(
                     state.setLoading(false);
                 }
             },
-
+            // Remove isMonitoring
+            darkMode: false,
             deleteSite: async (identifier: string) => {
                 const state = get();
                 state.setLoading(true);
@@ -252,93 +217,6 @@ export const useStore = create<AppState>()(
                     state.setLoading(false);
                 }
             },
-
-            checkSiteNow: async (siteId: string, monitorId: string) => {
-                const state = get();
-                state.clearError();
-                try {
-                    await window.electronAPI.checkSiteNow(siteId, monitorId);
-                    // Backend will emit 'status-update', which will trigger syncSitesFromBackend
-                } catch (error) {
-                    state.setError(`Failed to check site: ${(error as Error).message}`);
-                    throw error;
-                }
-            },
-
-            modifySite: async (identifier: string, updates: Partial<Site>) => {
-                const state = get();
-                state.setLoading(true);
-                state.clearError();
-
-                try {
-                    await window.electronAPI.updateSite(identifier, updates);
-                    await state.syncSitesFromBackend();
-                } catch (error) {
-                    state.setError(`Failed to update site: ${(error as Error).message}`);
-                    throw error;
-                } finally {
-                    state.setLoading(false);
-                }
-            },
-
-            updateSiteCheckInterval: async (siteId: string, monitorId: string, interval: number) => {
-                const state = get();
-                state.clearError();
-                try {
-                    // Update in backend (update the monitor in the site's monitors array)
-                    const site = get().sites.find((s) => s.identifier === siteId);
-                    if (!site) throw new Error("Site not found");
-                    const updatedMonitors = site.monitors.map((monitor) =>
-                        monitor.id === monitorId ? { ...monitor, checkInterval: interval } : monitor
-                    );
-                    await window.electronAPI.updateSite(siteId, { monitors: updatedMonitors });
-                    await state.syncSitesFromBackend();
-                } catch (error) {
-                    state.setError(`Failed to update monitor check interval: ${(error as Error).message}`);
-                    throw error;
-                }
-            },
-            updateHistoryLimitValue: async (limit: number) => {
-                const state = get();
-                state.clearError();
-                state.setLoading(true);
-                try {
-                    // Call backend to update and prune history
-                    await window.electronAPI.updateHistoryLimit(limit);
-                    // Reload the value from backend to ensure sync
-                    const newLimit = await window.electronAPI.getHistoryLimit();
-                    state.updateSettings({ historyLimit: newLimit });
-                } catch (error) {
-                    state.setError(`Failed to update history limit: ${(error as Error).message}`);
-                    throw error;
-                } finally {
-                    state.setLoading(false);
-                }
-            },
-
-            startSiteMonitorMonitoring: async (siteId: string, monitorId: string) => {
-                const state = get();
-                state.clearError();
-                try {
-                    await window.electronAPI.startMonitoringForSite(siteId, monitorId);
-                    await state.syncSitesFromBackend();
-                } catch (error) {
-                    state.setError(`Failed to start monitoring for monitor: ${(error as Error).message}`);
-                    throw error;
-                }
-            },
-            stopSiteMonitorMonitoring: async (siteId: string, monitorId: string) => {
-                const state = get();
-                state.clearError();
-                try {
-                    await window.electronAPI.stopMonitoringForSite(siteId, monitorId);
-                    await state.syncSitesFromBackend();
-                } catch (error) {
-                    state.setError(`Failed to stop monitoring for monitor: ${(error as Error).message}`);
-                    throw error;
-                }
-            },
-
             downloadSQLiteBackup: async () => {
                 const state = get();
                 state.setLoading(true);
@@ -364,13 +242,60 @@ export const useStore = create<AppState>()(
                     state.setLoading(false);
                 }
             },
+            getSelectedMonitorId: (siteId) => {
+                const ids = get().selectedMonitorIds || {};
+                // Only allow access to own properties with string keys
+                if (typeof siteId === "string" && Object.prototype.hasOwnProperty.call(ids, siteId)) {
+                    // eslint-disable-next-line security/detect-object-injection -- sanitized above
+                    return ids[siteId];
+                }
+                return undefined;
+            },
+            // Derived selector
+            getSelectedSite: () => {
+                const { selectedSiteId, sites } = get();
+                if (!selectedSiteId) return undefined;
+                return sites.find((s) => s.identifier === selectedSiteId) || undefined;
+            },
+            // Backend integration actions
+            initializeApp: async () => {
+                const state = get();
+                state.setLoading(true);
+                state.clearError();
 
-            // Internal state actions (used by backend actions and internal logic)
-            setSites: (sites: Site[]) => set({ sites }),
-            addSite: (site: Site) => set((state) => ({ sites: [...state.sites, site] })),
+                try {
+                    const [sites, historyLimit] = await Promise.all([
+                        window.electronAPI.getSites(),
+                        window.electronAPI.getHistoryLimit(),
+                    ]);
+                    state.setSites(sites);
+                    state.updateSettings({ historyLimit });
+                } catch (error) {
+                    state.setError(`Failed to initialize app: ${(error as Error).message}`);
+                } finally {
+                    state.setLoading(false);
+                }
+            },
+            isLoading: false,
+            // Error handling initial state
+            lastError: undefined,
+            modifySite: async (identifier: string, updates: Partial<Site>) => {
+                const state = get();
+                state.setLoading(true);
+                state.clearError();
+
+                try {
+                    await window.electronAPI.updateSite(identifier, updates);
+                    await state.syncSitesFromBackend();
+                } catch (error) {
+                    state.setError(`Failed to update site: ${(error as Error).message}`);
+                    throw error;
+                } finally {
+                    state.setLoading(false);
+                }
+            },
             removeSite: (identifier: string) =>
                 set((state) => ({
-                    sites: state.sites.filter((site) => site.identifier !== identifier),
                     selectedSiteId:
                         state.selectedSiteId &&
                         state.sites.find((s) => s.identifier === identifier && s.identifier === state.selectedSiteId)
@@ -381,9 +306,92 @@ export const useStore = create<AppState>()(
                         state.sites.find((s) => s.identifier === identifier && s.identifier === state.selectedSiteId)
                             ? false
                             : state.showSiteDetails,
+                    sites: state.sites.filter((site) => site.identifier !== identifier),
                 })),
+            resetSettings: () =>
+                set({
+                    darkMode: false, // Reset to light mode
+                    settings: defaultSettings,
+                }),
+            // Selected monitor id per site (UI state, not persisted)
+            selectedMonitorIds: {},
+            selectedSiteId: undefined,
+            // Synchronized UI actions
+            setActiveSiteDetailsTab: (tab: string) => set({ activeSiteDetailsTab: tab }),
+            // Error handling actions
+            setError: (error: string | undefined) => set({ lastError: error }),
+            setLoading: (loading: boolean) => set({ isLoading: loading }),
+            setSelectedMonitorId: (siteId, monitorId) =>
+                set((state) => ({
+                    selectedMonitorIds: {
+                        ...state.selectedMonitorIds,
+                        [siteId]: monitorId,
+                    },
+                })),
+            // Site details actions
+            setSelectedSite: (site: Site | undefined) => {
+                set({ selectedSiteId: site ? site.identifier : undefined });
+            },
+            setShowAdvancedMetrics: (show: boolean) => set({ showAdvancedMetrics: show }),
+            setShowSettings: (show: boolean) => set({ showSettings: show }),
+            setShowSiteDetails: (show: boolean) => set({ showSiteDetails: show }),
+            setSiteDetailsChartTimeRange: (range: "1h" | "24h" | "7d" | "30d") =>
+                set({ siteDetailsChartTimeRange: range }),
+            // Internal state actions (used by backend actions and internal logic)
+            setSites: (sites: Site[]) => set({ sites }),
+            settings: defaultSettings,
             // updateSiteStatus and updateSite removed: all updates come from backend fetches only
-
+            setUpdateError: (error: string | undefined) => set({ updateError: error }),
+            // Update status actions
+            setUpdateStatus: (status: UpdateStatus) => set({ updateStatus: status }),
+            showAdvancedMetrics: false,
+            showSettings: false,
+            showSiteDetails: false,
+            siteDetailsChartTimeRange: "24h",
+            sites: [],
+            startSiteMonitorMonitoring: async (siteId: string, monitorId: string) => {
+                const state = get();
+                state.clearError();
+                try {
+                    await window.electronAPI.startMonitoringForSite(siteId, monitorId);
+                    await state.syncSitesFromBackend();
+                } catch (error) {
+                    state.setError(`Failed to start monitoring for monitor: ${(error as Error).message}`);
+                    throw error;
+                }
+            },
+            stopSiteMonitorMonitoring: async (siteId: string, monitorId: string) => {
+                const state = get();
+                state.clearError();
+                try {
+                    await window.electronAPI.stopMonitoringForSite(siteId, monitorId);
+                    await state.syncSitesFromBackend();
+                } catch (error) {
+                    state.setError(`Failed to stop monitoring for monitor: ${(error as Error).message}`);
+                    throw error;
+                }
+            },
+            subscribeToStatusUpdates: (callback: (update: StatusUpdate) => void) => {
+                window.electronAPI.onStatusUpdate(async (update) => {
+                    // Always fetch latest sites/monitors/history from backend for live updates
+                    await get().syncSitesFromBackend();
+                    // Optionally, call the provided callback for custom logic
+                    if (callback) callback(update);
+                });
+            },
+            syncSitesFromBackend: async () => {
+                const state = get();
+                state.setLoading(true);
+                state.clearError();
+                try {
+                    const backendSites = await window.electronAPI.getSites();
+                    state.setSites(backendSites);
+                } catch (error) {
+                    state.setError(`Failed to sync sites: ${(error as Error).message}`);
+                } finally {
+                    state.setLoading(false);
+                }
+            },
             toggleDarkMode: () =>
                 set((state) => {
                     const newDarkMode = !state.darkMode;
@@ -394,11 +402,35 @@ export const useStore = create<AppState>()(
                         settings: { ...state.settings, theme: newTheme },
                     };
                 }),
-
+            totalDowntime: 0,
+            // Statistics initial state
+            totalUptime: 0,
+            unsubscribeFromStatusUpdates: () => {
+                window.electronAPI.removeAllListeners("status-update");
+            },
+            updateError: undefined,
+            updateHistoryLimitValue: async (limit: number) => {
+                const state = get();
+                state.clearError();
+                state.setLoading(true);
+                try {
+                    // Call backend to update and prune history
+                    await window.electronAPI.updateHistoryLimit(limit);
+                    // Reload the value from backend to ensure sync
+                    const newLimit = await window.electronAPI.getHistoryLimit();
+                    state.updateSettings({ historyLimit: newLimit });
+                } catch (error) {
+                    state.setError(`Failed to update history limit: ${(error as Error).message}`);
+                    throw error;
+                } finally {
+                    state.setLoading(false);
+                }
+            },
             updateSettings: (newSettings: Partial<AppSettings>) =>
                 set((state) => {
                     const updatedSettings = { ...state.settings, ...newSettings };
                     // Keep darkMode in sync with theme setting for backwards compatibility
+                    // eslint-disable-next-line functional/no-let -- darkMode must be mutable for conditional assignment
                     let darkMode = state.darkMode;
 
                     if (newSettings.theme) {
@@ -409,102 +441,40 @@ export const useStore = create<AppState>()(
                     }
 
                     return {
-                        settings: updatedSettings,
                         darkMode,
+                        settings: updatedSettings,
                     };
                 }),
-
-            setShowSettings: (show: boolean) => set({ showSettings: show }),
-
-            resetSettings: () =>
-                set({
-                    settings: defaultSettings,
-                    darkMode: false, // Reset to light mode
-                }),
-
-            // Site details actions
-            setSelectedSite: (site: Site | undefined) => {
-                set({ selectedSiteId: site ? site.identifier : undefined });
-            },
-
-            setShowSiteDetails: (show: boolean) => set({ showSiteDetails: show }),
-
-            // Error handling actions
-            setError: (error: string | undefined) => set({ lastError: error }),
-
-            setLoading: (loading: boolean) => set({ isLoading: loading }),
-
-            clearError: () => set({ lastError: undefined }),
-
-            // Synchronized UI actions
-            setActiveSiteDetailsTab: (tab: string) => set({ activeSiteDetailsTab: tab }),
-            setSiteDetailsChartTimeRange: (range: "1h" | "24h" | "7d" | "30d") =>
-                set({ siteDetailsChartTimeRange: range }),
-            setShowAdvancedMetrics: (show: boolean) => set({ showAdvancedMetrics: show }),
-
-            // Update status actions
-            setUpdateStatus: (status: UpdateStatus) => set({ updateStatus: status }),
-            setUpdateError: (error: string | undefined) => set({ updateError: error }),
-            // Update: apply downloaded update and restart
-            applyUpdate: () => {
-                window.electronAPI.quitAndInstall?.();
-            },
-            subscribeToStatusUpdates: (callback: (update: StatusUpdate) => void) => {
-                window.electronAPI.onStatusUpdate(async (update) => {
-                    // Always fetch latest sites/monitors/history from backend for live updates
-                    await get().syncSitesFromBackend();
-                    // Optionally, call the provided callback for custom logic
-                    if (callback) callback(update);
-                });
-            },
-            unsubscribeFromStatusUpdates: () => {
-                window.electronAPI.removeAllListeners("status-update");
-            },
-
-            /**
-             * Add a monitor to an existing site
-             */
-            addMonitorToSite: async (siteId, monitor) => {
+            updateSiteCheckInterval: async (siteId: string, monitorId: string, interval: number) => {
                 const state = get();
-                state.setLoading(true);
                 state.clearError();
                 try {
-                    // Get the current site
-                    const site = state.sites.find((s) => s.identifier === siteId);
+                    // Update in backend (update the monitor in the site's monitors array)
+                    const site = get().sites.find((s) => s.identifier === siteId);
                     if (!site) throw new Error("Site not found");
-                    // Allow multiple monitors of the same type (uniqueness is not enforced)
-                    const updatedMonitors = [...site.monitors, monitor];
+                    const updatedMonitors = site.monitors.map((monitor) =>
+                        monitor.id === monitorId ? { ...monitor, checkInterval: interval } : monitor
+                    );
                     await window.electronAPI.updateSite(siteId, { monitors: updatedMonitors });
                     await state.syncSitesFromBackend();
                 } catch (error) {
-                    state.setError(`Failed to add monitor: ${error instanceof Error ? error.message : String(error)}`);
+                    state.setError(`Failed to update monitor check interval: ${(error as Error).message}`);
                     throw error;
-                } finally {
-                    state.setLoading(false);
                 }
             },
-            setSelectedMonitorId: (siteId, monitorId) =>
-                set((state) => ({
-                    selectedMonitorIds: {
-                        ...state.selectedMonitorIds,
-                        [siteId]: monitorId,
-                    },
-                })),
-            getSelectedMonitorId: (siteId) => {
-                const ids = get().selectedMonitorIds || {};
-                return ids[siteId];
-            },
+            // Update status initial state
+            updateStatus: "idle",
         }),
         {
             name: "uptime-watcher-storage",
             partialize: (state) => ({
+                activeSiteDetailsTab: state.activeSiteDetailsTab,
                 darkMode: state.darkMode,
                 settings: state.settings,
-                totalUptime: state.totalUptime,
-                totalDowntime: state.totalDowntime,
-                activeSiteDetailsTab: state.activeSiteDetailsTab,
-                siteDetailsChartTimeRange: state.siteDetailsChartTimeRange,
                 showAdvancedMetrics: state.showAdvancedMetrics,
+                siteDetailsChartTimeRange: state.siteDetailsChartTimeRange,
+                totalDowntime: state.totalDowntime,
+                totalUptime: state.totalUptime,
                 // Don't persist sites, error states, loading states, or UI states
                 // Don't persist selectedMonitorIds
             }),

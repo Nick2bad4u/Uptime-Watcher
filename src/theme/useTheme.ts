@@ -1,5 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 
+import type { StatusType } from "../constants";
+
 import { useStore } from "../store";
 import { themeManager } from "./ThemeManager";
 import { Theme, ThemeName } from "./types";
@@ -54,15 +56,25 @@ export function useTheme() {
         const keys = path.split(".");
         const value = keys.reduce<unknown>(
             (acc, key) =>
-                acc && typeof acc === "object" && key in acc ? (acc as Record<string, unknown>)[key] : undefined,
+                acc && typeof acc === "object" && Object.prototype.hasOwnProperty.call(acc, key)
+                    ? // eslint-disable-next-line security/detect-object-injection -- Object.prototype.hasOwnProperty ensures safety
+                      (acc as Record<string, unknown>)[key]
+                    : undefined,
             currentTheme.colors
         );
         return typeof value === "string" ? value : "#000000";
     };
 
     // Get status color
-    const getStatusColor = (status: "up" | "down" | "pending" | "unknown"): string => {
-        return currentTheme.colors.status[status];
+    const getStatusColor = (status: StatusType): string => {
+        // Only allow known status keys
+        const allowedStatuses: StatusType[] = ["up", "down", "pending", "unknown"];
+        if (allowedStatuses.includes(status)) {
+            // eslint-disable-next-line security/detect-object-injection -- currentTheme.colors.status is validated against allowedStatuses
+            return currentTheme.colors.status[status];
+        }
+        // Fallback to a safe color if status is invalid
+        return "#000000";
     };
 
     // Get available themes

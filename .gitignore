@@ -195,5 +195,5 @@ release/
 node_modules/
 node_modules_backup/
 .husky/
-dist/
-dist-electron/
+!dist/
+!dist-electron/

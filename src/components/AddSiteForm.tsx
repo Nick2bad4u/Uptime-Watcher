@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 
-// eslint-disable-next-line import/order -- perfectionist takes precedence over eslint
 import type { Monitor } from "../types";
 
 import { UI_DELAYS, CHECK_INTERVALS } from "../constants";
@@ -102,7 +101,7 @@ export function AddSiteForm() {
         clearError();
         try {
             const identifier = addMode === "new" ? siteId : selectedExistingSite;
-            const monitor: any = {
+            const monitor: Monitor = {
                 history: [] as Monitor["history"],
                 id: generateUUID(), // Always assign a unique string id
                 status: "pending" as const,

@@ -19,7 +19,13 @@ export class ThemeManager {
     getTheme(name: ThemeName): Theme {
         if (name === "system") {
             const systemPreference = this.getSystemThemePreference();
-            return themes[systemPreference];
+            // Only allow "light" or "dark" as keys
+            if (systemPreference === "light" || systemPreference === "dark") {
+                // eslint-disable-next-line security/detect-object-injection -- always light or dark
+                return themes[systemPreference];
+            }
+            // Fallback to light theme if unexpected value
+            return themes.light;
         }
 
         return themes[name as keyof typeof themes] || themes.light;

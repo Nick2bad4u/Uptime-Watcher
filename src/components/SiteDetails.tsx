@@ -882,7 +882,16 @@ function AnalyticsTab({
                 {(monitorType === "http" || monitorType === "port") && (
                     <ThemedBox surface="base" padding="md" border rounded="lg">
                         <div className="h-64">
-                            <Line data={lineChartData as any} options={lineChartOptions as any} />
+                            <Line
+                                data={
+                                    lineChartData as unknown as import("chart.js").ChartData<
+                                        "line",
+                                        (number | import("chart.js").Point | null)[],
+                                        unknown
+                                    >
+                                }
+                                options={lineChartOptions as unknown as import("chart.js").ChartOptions<"line">}
+                            />
                         </div>
                     </ThemedBox>
                 )}
@@ -890,14 +899,32 @@ function AnalyticsTab({
                 {/* Uptime Doughnut Chart */}
                 <ThemedBox surface="base" padding="md" border rounded="lg">
                     <div className="h-64">
-                        <Doughnut data={uptimeChartData as any} options={doughnutOptions as any} />
+                        <Doughnut
+                            data={
+                                uptimeChartData as unknown as import("chart.js").ChartData<
+                                    "doughnut",
+                                    number[],
+                                    unknown
+                                >
+                            }
+                            options={doughnutOptions as unknown as import("chart.js").ChartOptions<"doughnut">}
+                        />
                     </div>
                 </ThemedBox>
 
                 {/* Status Distribution Bar Chart */}
                 <ThemedBox surface="base" padding="md" border rounded="lg" className="lg:col-span-2">
                     <div className="h-64">
-                        <Bar data={barChartData as any} options={barChartOptions as any} />
+                        <Bar
+                            data={
+                                barChartData as unknown as import("chart.js").ChartData<
+                                    "bar",
+                                    (number | [number, number] | null)[],
+                                    unknown
+                                >
+                            }
+                            options={barChartOptions as unknown as import("chart.js").ChartOptions<"bar">}
+                        />
                     </div>
                 </ThemedBox>
             </div>
@@ -906,7 +933,7 @@ function AnalyticsTab({
 }
 
 interface HistoryTabProps {
-    selectedMonitor: any; // Adjusted type for selectedMonitor
+    selectedMonitor: Monitor;
     formatResponseTime: (time: number) => string;
     formatFullTimestamp: (timestamp: number) => string;
     formatStatusWithIcon: (status: string) => string;
@@ -937,11 +964,12 @@ function HistoryTab({
     }, [settings.historyLimit, selectedMonitor.history.length, backendLimit, selectedMonitor.history]);
 
     const filteredHistoryRecords = (selectedMonitor.history || [])
-        .filter((record: any) => historyFilter === "all" || record.status === historyFilter)
+        .filter((record: StatusHistory) => historyFilter === "all" || record.status === historyFilter)
         .slice(0, historyLimit);
 
     // Helper to render details with label
-    function renderDetails(record: any) {
+    // Use 'details' as optional property for backward compatibility
+    function renderDetails(record: StatusHistory & { details?: string }) {
         if (!record.details) return undefined;
         if (selectedMonitor.type === "port") {
             return (
@@ -1012,7 +1040,7 @@ function HistoryTab({
             {/* History List */}
             <ThemedBox surface="base" padding="md" border rounded="lg" className="max-h-96 overflow-y-auto">
                 <div className="space-y-2">
-                    {filteredHistoryRecords.map((record: any, index: number) => (
+                    {filteredHistoryRecords.map((record, index: number) => (
                         <div
                             key={index}
                             className="flex items-center justify-between p-3 rounded-lg hover:bg-surface-elevated transition-colors"
@@ -1266,8 +1294,9 @@ function SettingsTab({
 }
 
 // Ensure hasOpenExternal is defined at the top (after imports):
-function hasOpenExternal(api: any): api is { openExternal: (url: string) => void } {
-    return typeof api?.openExternal === "function";
+// Accept unknown for runtime type check
+function hasOpenExternal(api: unknown): api is { openExternal: (url: string) => void } {
+    return typeof (api as { openExternal?: unknown })?.openExternal === "function";
 }
 
 // Update ScreenshotThumbnail to use only CSS classes for overlay/image

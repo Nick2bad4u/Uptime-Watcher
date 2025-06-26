@@ -1,3 +1,8 @@
+// Status types for site monitoring
+export type StatusType = "up" | "down" | "pending" | "unknown";
+// Font family constants for theme reuse
+export const FONT_FAMILY_MONO = ["SF Mono", "Monaco", "Inconsolata", "Roboto Mono", "monospace"];
+export const FONT_FAMILY_SANS = ["Inter", "system-ui", "Avenir", "Helvetica", "Arial", "sans-serif"];
 // Centralized constants for the application
 
 export interface IntervalOption {
@@ -84,8 +89,10 @@ export const UI_DELAYS = {
 // Chart time periods (for analytics components)
 export const CHART_TIME_PERIODS = {
     "1h": 60 * 60 * 1000,
-    "7d": 7 * 24 * 60 * 60 * 1000,
+    "12h": 12 * 60 * 60 * 1000,
     "24h": 24 * 60 * 60 * 1000,
+    // eslint-disable-next-line perfectionist/sort-objects -- keep in ascending order
+    "7d": 7 * 24 * 60 * 60 * 1000,
     "30d": 30 * 24 * 60 * 60 * 1000,
 } as const;
 

@@ -14,16 +14,16 @@ const DEFAULT_REQUEST_TIMEOUT = 10000;
 
 // Configure logger for uptime monitor
 const logger = {
-    debug: (message: string, ...args: any[]) => log.debug(`[MONITOR] ${message}`, ...args),
-    error: (message: string, error?: Error | any, ...args: any[]) => {
+    debug: (message: string, ...args: unknown[]) => log.debug(`[MONITOR] ${message}`, ...args),
+    error: (message: string, error?: unknown, ...args: unknown[]) => {
         if (error instanceof Error) {
             log.error(`[MONITOR] ${message}`, { message: error.message, stack: error.stack }, ...args);
         } else {
             log.error(`[MONITOR] ${message}`, error, ...args);
         }
     },
-    info: (message: string, ...args: any[]) => log.info(`[MONITOR] ${message}`, ...args),
-    warn: (message: string, ...args: any[]) => log.warn(`[MONITOR] ${message}`, ...args),
+    info: (message: string, ...args: unknown[]) => log.info(`[MONITOR] ${message}`, ...args),
+    warn: (message: string, ...args: unknown[]) => log.warn(`[MONITOR] ${message}`, ...args),
 };
 
 export class UptimeMonitor extends EventEmitter {
@@ -145,25 +145,25 @@ export class UptimeMonitor extends EventEmitter {
 
     private async loadSites() {
         try {
-            const siteRows = (await this.db.all("SELECT * FROM sites")) as any[];
+            const siteRows = (await this.db.all("SELECT * FROM sites")) as { identifier: string; name?: string }[];
             this.sites.clear();
             for (const siteRow of siteRows) {
                 // Fetch monitors for this site
                 const monitorRows = (await this.db.all("SELECT * FROM monitors WHERE site_identifier = ?", [
-                    siteRow.identifier,
-                ])) as any[];
+                    String(siteRow.identifier),
+                ])) as Record<string, unknown>[];
                 const monitors = [];
                 for (const row of monitorRows) {
                     // Fetch history for this monitor
                     const historyRows = (await this.db.all(
                         "SELECT timestamp, status, responseTime, details FROM history WHERE monitor_id = ? ORDER BY timestamp DESC",
-                        [row.id]
-                    )) as any[];
+                        [String(row.id)]
+                    )) as Record<string, unknown>[];
                     const history = historyRows.map((h) => ({
+                        details: h.details != undefined ? String(h.details) : undefined,
                         responseTime: typeof h.responseTime === "number" ? h.responseTime : Number(h.responseTime),
-                        status: h.status === "up" || h.status === "down" ? h.status : "down",
+                        status: h.status === "up" || h.status === "down" ? (h.status as "up" | "down") : "down",
                         timestamp: typeof h.timestamp === "number" ? h.timestamp : Number(h.timestamp),
-                        details: h.details != null ? String(h.details) : undefined,
                     }));
                     monitors.push({
                         checkInterval:
@@ -195,7 +195,7 @@ export class UptimeMonitor extends EventEmitter {
                 }
                 const site: Site = {
                     identifier: String(siteRow.identifier),
-                    monitors,
+                    monitors: monitors as Site["monitors"],
                     name: siteRow.name ? String(siteRow.name) : undefined,
                 };
                 this.sites.set(site.identifier, site);
@@ -221,23 +221,23 @@ export class UptimeMonitor extends EventEmitter {
 
     public async getSites(): Promise<Site[]> {
         // Always fetch from DB for latest
-        const siteRows = (await this.db.all("SELECT * FROM sites")) as any[];
+        const siteRows = (await this.db.all("SELECT * FROM sites")) as { identifier: string; name?: string }[];
         const sites: Site[] = [];
         for (const siteRow of siteRows) {
             const monitorRows = (await this.db.all("SELECT * FROM monitors WHERE site_identifier = ?", [
-                siteRow.identifier,
-            ])) as any[];
+                String(siteRow.identifier),
+            ])) as Record<string, unknown>[];
             const monitors = [];
             for (const row of monitorRows) {
                 const historyRows = (await this.db.all(
                     "SELECT timestamp, status, responseTime, details FROM history WHERE monitor_id = ? ORDER BY timestamp DESC",
-                    [row.id]
-                )) as any[];
+                    [String(row.id)]
+                )) as Record<string, unknown>[];
                 const history = historyRows.map((h) => ({
+                    details: h.details != undefined ? String(h.details) : undefined,
                     responseTime: typeof h.responseTime === "number" ? h.responseTime : Number(h.responseTime),
-                    status: h.status === "up" || h.status === "down" ? h.status : "down",
+                    status: h.status === "up" || h.status === "down" ? (h.status as "up" | "down") : "down",
                     timestamp: typeof h.timestamp === "number" ? h.timestamp : Number(h.timestamp),
-                    details: h.details != null ? String(h.details) : undefined,
                 }));
                 monitors.push({
                     checkInterval:
@@ -268,7 +268,7 @@ export class UptimeMonitor extends EventEmitter {
             }
             sites.push({
                 identifier: String(siteRow.identifier),
-                monitors,
+                monitors: monitors as Site["monitors"],
                 name: siteRow.name ? String(siteRow.name) : undefined,
             });
         }
@@ -612,13 +612,10 @@ export class UptimeMonitor extends EventEmitter {
             details = monitor.port !== undefined ? String(monitor.port) : null;
         }
         try {
-            await this.db.run(`INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)`, [
-                monitor.id,
-                historyEntry.timestamp,
-                historyEntry.status,
-                historyEntry.responseTime,
-                details,
-            ]);
+            await this.db.run(
+                `INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)`,
+                [monitor.id, historyEntry.timestamp, historyEntry.status, historyEntry.responseTime, details]
+            );
             logger.info(
                 `[checkMonitor] Inserted history row: monitor_id=${monitor.id}, status=${historyEntry.status}, responseTime=${historyEntry.responseTime}, timestamp=${historyEntry.timestamp}, details=${details}`
             );
