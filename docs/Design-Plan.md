@@ -10,7 +10,7 @@ Electron: Electron Forge or Electron Builder for scaffolding & packaging
 
 Backend/API: Node.js with Axios for periodic HTTP checks
 
-Database: SQLite (using better-sqlite3 or lowdb for simplicity)
+Database: SQLite (using better-sqlite3-wasm.wasm)
 
 IPC Layer: Electron's ipcMain/ipcRenderer bridge for background checks
 

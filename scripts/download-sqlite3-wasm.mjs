@@ -9,7 +9,13 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const url = "https://github.com/tndrle/node-sqlite3-wasm/raw/refs/heads/main/dist/node-sqlite3-wasm.wasm";
-const dest = path.resolve(__dirname, "../dist-electron/node-sqlite3-wasm.wasm");
+const destDir = path.resolve(__dirname, "../dist-electron");
+const dest = path.join(destDir, "node-sqlite3-wasm.wasm");
+
+// Ensure dist-electron directory exists
+if (!fs.existsSync(destDir)) {
+  fs.mkdirSync(destDir, { recursive: true });
+}
 
 function download(url, dest, redirectCount = 0) {
   if (redirectCount > 5) {

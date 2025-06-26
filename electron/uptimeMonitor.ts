@@ -1,11 +1,12 @@
-/* eslint-disable perfectionist/sort-imports */
-import { EventEmitter } from "events";
-import path from "path";
+/* eslint-disable functional/no-let */
+/* eslint-disable unicorn/no-null -- null literal needed for backend */
 import axios from "axios";
 import { app } from "electron";
 import log from "electron-log/main";
+import { EventEmitter } from "events";
 import isPortReachable from "is-port-reachable";
 import { Database } from "node-sqlite3-wasm";
+import path from "path";
 
 import { Site, StatusHistory, StatusUpdate, MonitorType } from "./types";
 
@@ -14,6 +15,7 @@ const DEFAULT_REQUEST_TIMEOUT = 10000;
 
 // Configure logger for uptime monitor
 const logger = {
+    // eslint-disable-next-line testing-library/no-debugging-utils
     debug: (message: string, ...args: unknown[]) => log.debug(`[MONITOR] ${message}`, ...args),
     error: (message: string, error?: unknown, ...args: unknown[]) => {
         if (error instanceof Error) {
@@ -40,9 +42,8 @@ export class UptimeMonitor extends EventEmitter {
 
     // Helper: Retry logic for file operations
     private async saveSitesWithRetry(maxRetries = 5, delayMs = 300): Promise<void> {
-        let attempt = 0;
-        let lastError: unknown = null;
-        while (attempt < maxRetries) {
+        let lastError: unknown = undefined;
+        for (let attempt = 0; attempt < maxRetries; attempt++) {
             try {
                 await this.saveSites();
                 return;
@@ -51,7 +52,6 @@ export class UptimeMonitor extends EventEmitter {
                 logger.error(`saveSites failed (attempt ${attempt + 1}/${maxRetries})`, error);
                 await new Promise((resolve) => setTimeout(resolve, delayMs));
             }
-            attempt++;
         }
         logger.error("Persistent DB write failure after retries", lastError);
         this.emit("db-error", { error: lastError, operation: "saveSites" });
@@ -59,9 +59,8 @@ export class UptimeMonitor extends EventEmitter {
 
     // Helper: Retry logic for loading sites (DB read)
     private async loadSitesWithRetry(maxRetries = 5, delayMs = 300): Promise<void> {
-        let attempt = 0;
-        let lastError: unknown = null;
-        while (attempt < maxRetries) {
+        let lastError: unknown = undefined;
+        for (let attempt = 0; attempt < maxRetries; attempt++) {
             try {
                 await this.loadSites();
                 return;
@@ -70,7 +69,6 @@ export class UptimeMonitor extends EventEmitter {
                 logger.error(`loadSites failed (attempt ${attempt + 1}/${maxRetries})`, error);
                 await new Promise((resolve) => setTimeout(resolve, delayMs));
             }
-            attempt++;
         }
         logger.error("Persistent DB read failure after retries", lastError);
         this.emit("db-error", { error: lastError, operation: "loadSites" });
@@ -303,13 +301,13 @@ export class UptimeMonitor extends EventEmitter {
                             [
                                 monitor.url ? String(monitor.url) : null,
                                 monitor.host ? String(monitor.host) : null,
-                                monitor.port !== undefined && monitor.port !== null ? Number(monitor.port) : null,
-                                monitor.checkInterval !== undefined && monitor.checkInterval !== null
+                                monitor.port !== undefined && monitor.port !== undefined ? Number(monitor.port) : null,
+                                monitor.checkInterval !== undefined && monitor.checkInterval !== undefined
                                     ? Number(monitor.checkInterval)
                                     : null,
                                 monitor.monitoring ? 1 : 0,
                                 monitor.status,
-                                monitor.responseTime !== undefined && monitor.responseTime !== null
+                                monitor.responseTime !== undefined && monitor.responseTime !== undefined
                                     ? Number(monitor.responseTime)
                                     : null,
                                 monitor.lastChecked ? monitor.lastChecked.toISOString() : null,
@@ -324,13 +322,13 @@ export class UptimeMonitor extends EventEmitter {
                                 monitor.type,
                                 monitor.url ? String(monitor.url) : null,
                                 monitor.host ? String(monitor.host) : null,
-                                monitor.port !== undefined && monitor.port !== null ? Number(monitor.port) : null,
+                                monitor.port !== undefined && monitor.port !== undefined ? Number(monitor.port) : null,
                                 monitor.checkInterval !== undefined && monitor.checkInterval !== null
                                     ? Number(monitor.checkInterval)
                                     : null,
                                 monitor.monitoring ? 1 : 0,
                                 monitor.status,
-                                monitor.responseTime !== undefined && monitor.responseTime !== null
+                                monitor.responseTime !== undefined && monitor.responseTime !== undefined
                                     ? Number(monitor.responseTime)
                                     : null,
                                 monitor.lastChecked ? monitor.lastChecked.toISOString() : null,
@@ -378,13 +376,13 @@ export class UptimeMonitor extends EventEmitter {
                     monitor.type,
                     monitor.url ? String(monitor.url) : null,
                     monitor.host ? String(monitor.host) : null,
-                    monitor.port !== undefined && monitor.port !== null ? Number(monitor.port) : null,
-                    monitor.checkInterval !== undefined && monitor.checkInterval !== null
+                    monitor.port !== undefined && monitor.port !== undefined ? Number(monitor.port) : null,
+                    monitor.checkInterval !== undefined && monitor.checkInterval !== undefined
                         ? Number(monitor.checkInterval)
                         : null,
                     monitor.monitoring ? 1 : 0,
                     monitor.status,
-                    monitor.responseTime !== undefined && monitor.responseTime !== null
+                    monitor.responseTime !== undefined && monitor.responseTime !== undefined
                         ? Number(monitor.responseTime)
                         : null,
                     monitor.lastChecked ? monitor.lastChecked.toISOString() : null,
@@ -462,6 +460,7 @@ export class UptimeMonitor extends EventEmitter {
 
     public startMonitoring() {
         if (this.isMonitoring) {
+            // eslint-disable-next-line testing-library/no-debugging-utils
             logger.debug("Monitoring already running");
             return;
         }
@@ -700,13 +699,13 @@ export class UptimeMonitor extends EventEmitter {
                             monitor.type,
                             monitor.url ? String(monitor.url) : null,
                             monitor.host ? String(monitor.host) : null,
-                            monitor.port !== undefined && monitor.port !== null ? Number(monitor.port) : null,
-                            monitor.checkInterval !== undefined && monitor.checkInterval !== null
+                            monitor.port !== undefined && monitor.port !== undefined ? Number(monitor.port) : null,
+                            monitor.checkInterval !== undefined && monitor.checkInterval !== undefined
                                 ? Number(monitor.checkInterval)
                                 : null,
                             monitor.monitoring ? 1 : 0,
                             monitor.status,
-                            monitor.responseTime !== undefined && monitor.responseTime !== null
+                            monitor.responseTime !== undefined && monitor.responseTime !== undefined
                                 ? Number(monitor.responseTime)
                                 : null,
                             monitor.lastChecked
@@ -726,13 +725,13 @@ export class UptimeMonitor extends EventEmitter {
                             monitor.type,
                             monitor.url ? String(monitor.url) : null,
                             monitor.host ? String(monitor.host) : null,
-                            monitor.port !== undefined && monitor.port !== null ? Number(monitor.port) : null,
-                            monitor.checkInterval !== undefined && monitor.checkInterval !== null
+                            monitor.port !== undefined && monitor.port !== undefined ? Number(monitor.port) : null,
+                            monitor.checkInterval !== undefined && monitor.checkInterval !== undefined
                                 ? Number(monitor.checkInterval)
                                 : null,
                             monitor.monitoring ? 1 : 0,
                             monitor.status,
-                            monitor.responseTime !== undefined && monitor.responseTime !== null
+                            monitor.responseTime !== undefined && monitor.responseTime !== undefined
                                 ? Number(monitor.responseTime)
                                 : null,
                             monitor.lastChecked
@@ -793,7 +792,7 @@ export class UptimeMonitor extends EventEmitter {
                     name: row.name ? String(row.name) : undefined,
                 })),
             };
-            return JSON.stringify(exportObj, null, 2);
+            return JSON.stringify(exportObj, undefined, 2);
         } catch (error) {
             logger.error("Failed to export data", error);
             this.emit("db-error", { error, operation: "exportData" });
@@ -815,7 +814,7 @@ export class UptimeMonitor extends EventEmitter {
                 for (const site of parsedData.sites) {
                     await this.db.run(`INSERT INTO sites (identifier, name) VALUES (?, ?)`, [
                         site.identifier,
-                        site.name ?? null,
+                        site.name ?? undefined,
                     ]);
                 }
             }
@@ -835,10 +834,10 @@ export class UptimeMonitor extends EventEmitter {
                             [
                                 site.identifier,
                                 monitor.type,
-                                monitor.url ?? null,
-                                monitor.host ?? null,
-                                monitor.port ?? null,
-                                monitor.checkInterval ?? null,
+                                monitor.url ?? undefined,
+                                monitor.host ?? undefined,
+                                monitor.port ?? undefined,
+                                monitor.checkInterval ?? undefined,
                                 monitor.monitoring ? 1 : 0,
                                 monitor.status,
                                 monitor.responseTime,
@@ -846,7 +845,7 @@ export class UptimeMonitor extends EventEmitter {
                                     ? typeof monitor.lastChecked === "string"
                                         ? monitor.lastChecked
                                         : monitor.lastChecked.toISOString()
-                                    : null,
+                                    : undefined,
                             ]
                         );
                         // Always fetch and assign string id
@@ -866,7 +865,7 @@ export class UptimeMonitor extends EventEmitter {
                                         h.timestamp,
                                         h.status === "up" || h.status === "down" ? h.status : "down",
                                         h.responseTime,
-                                        h.details ?? null,
+                                        h.details ?? undefined,
                                     ]
                                 );
                             }
