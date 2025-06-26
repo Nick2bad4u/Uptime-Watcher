@@ -25,13 +25,14 @@
     },
     "include": [
         "electron/**/*.ts",
-        "electron/**/*.tsx",
-        "src/**/*.ts",
-        "src/**/*.tsx",
-        "src/**/*.js",
-        "src/**/*.jsx",
-        "vite.config.ts",
-        "tailwind.config.js"
+        "electron/**/*.tsx"
     ],
-    "exclude": ["node_modules", "dist", "release", "out"]
+    "exclude": [
+        "node_modules",
+        "dist",
+        "dist-electron",
+        "release",
+        "out"
+    ]
+    // Separate tsconfig should be used for renderer (src/) if needed
 }

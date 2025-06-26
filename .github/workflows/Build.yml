@@ -228,13 +228,15 @@ jobs:
                   enableCrossOsArchive: true
               continue-on-error: true
 
-            - name: Install NPM dependencies (. package.json)
+            - name: Install NPM dependencies (.package.json)
               id: install_dependencies
               run: npm install
               continue-on-error: true
 
-            # - name: Install electron-builder
-            #   run: npm install -D electron-builder
+            - name: Build Vite Frontend and Electron Backend
+              id: build_vite_electron
+              run: npm run build
+              continue-on-error: true
 
             - name: Build Electron app (debug)
               id: build_app
