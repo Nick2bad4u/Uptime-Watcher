@@ -1,6 +1,6 @@
 # File created using '.gitignore Generator' for Visual Studio Code: https://bit.ly/vscode-gig
-# Created by https://www.toptal.com/developers/gitignore/api/windows,visualstudiocode,node
-# Edit at https://www.toptal.com/developers/gitignore?templates=windows,visualstudiocode,node
+# Created by https://www.toptal.com/developers/gitignore/api/windows,visualstudiocode,node,typings
+# Edit at https://www.toptal.com/developers/gitignore?templates=windows,visualstudiocode,node,typings
 
 ### Node ###
 # Logs
@@ -142,6 +142,10 @@ dist
 # SvelteKit build / generate output
 .svelte-kit
 
+### Typings ###
+## Ignore downloaded typings
+typings
+
 ### VisualStudioCode ###
 .vscode/*
 !.vscode/settings.json
@@ -187,7 +191,7 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# End of https://www.toptal.com/developers/gitignore/api/windows,visualstudiocode,node
+# End of https://www.toptal.com/developers/gitignore/api/windows,visualstudiocode,node,typings
 
 # Custom rules (everything added below won't be overriden by 'Generate .gitignore File' if you use 'Update' option)
 
@@ -195,5 +199,7 @@ release/
 node_modules/
 node_modules_backup/
 .husky/
-!dist/
-!dist-electron/
+dist/
+dist-electron/
+**/dist/
+**/dist-electron/

@@ -22,12 +22,14 @@
     "files.exclude": {
         "**/node_modules": true,
         "**/release": true,
-        "**/.husky": true,
+        "**/.husky/**": true,
+        "**/dist": true
     },
     "search.exclude": {
         "**/node_modules": true,
         "**/release": true,
-        "**/.husky": true
+        "**/.husky/**": true,
+        "**/dist": true
     },
     "prettier-eslint-typescript.eslintConfig": {
         "rules": {
@@ -38,7 +40,13 @@
             "no-useless-return": "error",
             "no-var": "error",
             "object-shorthand": "error",
-            "one-var": ["error", { "initialized": "never", "uninitialized": "always" }],
+            "one-var": [
+                "error",
+                {
+                    "initialized": "never",
+                    "uninitialized": "always"
+                }
+            ],
             "prefer-const": "error",
             "prefer-template": "error",
             "array-bracket-spacing": ["error", "always"],
@@ -57,7 +65,5 @@
         "trailingComma": "none",
         "useTabs": false
     },
-    "debug.defaultCompound": "Dev: Vite + Electron Main"
-}
     "debug.defaultCompound": "Dev: Vite + Electron Main"
 }
