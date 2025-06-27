@@ -163,8 +163,7 @@ export async function handleSubmit(e: React.FormEvent, props: FormSubmitProps) {
             };
 
             await createSite(siteData);
-            logger.site.added(identifier);
-            logger.user.action("Added site", {
+            logger.info("Site created successfully", {
                 identifier,
                 monitorId: monitor.id,
                 monitorType,
@@ -172,7 +171,7 @@ export async function handleSubmit(e: React.FormEvent, props: FormSubmitProps) {
             });
         } else {
             await addMonitorToSite(identifier, monitor);
-            logger.user.action("Added monitor to site", {
+            logger.info("Monitor added to site successfully", {
                 identifier,
                 monitorId: monitor.id,
                 monitorType,
@@ -184,13 +183,7 @@ export async function handleSubmit(e: React.FormEvent, props: FormSubmitProps) {
         // Call success callback if provided (e.g., to reset form)
         onSuccess?.();
     } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
         logger.error("Failed to add site/monitor from form", error);
-        logger.user.action("Form submission failed", {
-            addMode,
-            error: errorMessage,
-            monitorType,
-        });
         setFormError("Failed to add site/monitor. Please try again.");
     }
 }

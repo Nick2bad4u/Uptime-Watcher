@@ -1,3 +1,4 @@
+<!-- markdownlint-disable -->
 ## 📁 Recommended Folder Structure
 
 ```text

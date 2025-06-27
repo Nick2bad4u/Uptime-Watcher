@@ -16,7 +16,14 @@ export interface FormFieldProps {
     required?: boolean;
 }
 
-export function FormField({ children, error, helpText, id, label, required = false }: FormFieldProps) {
+export const FormField = React.memo(function FormField({
+    children,
+    error,
+    helpText,
+    id,
+    label,
+    required = false,
+}: FormFieldProps) {
     return (
         <div>
             <label className="block mb-1" htmlFor={id}>
@@ -41,7 +48,7 @@ export function FormField({ children, error, helpText, id, label, required = fal
             )}
         </div>
     );
-}
+});
 
 // Text input field with proper accessibility
 export interface TextFieldProps {
@@ -59,7 +66,7 @@ export interface TextFieldProps {
     value: string;
 }
 
-export function TextField({
+export const TextField = React.memo(function TextField({
     disabled = false,
     error,
     helpText,
@@ -90,7 +97,7 @@ export function TextField({
             />
         </FormField>
     );
-}
+});
 
 // Select field with proper accessibility
 export interface SelectOption {
@@ -111,7 +118,7 @@ export interface SelectFieldProps {
     value: string | number;
 }
 
-export function SelectField({
+export const SelectField = React.memo(function SelectField({
     disabled = false,
     error,
     helpText,
@@ -144,7 +151,7 @@ export function SelectField({
             </ThemedSelect>
         </FormField>
     );
-}
+});
 
 // Radio button group with proper accessibility
 export interface RadioOption {
@@ -165,7 +172,7 @@ export interface RadioGroupProps {
     value: string;
 }
 
-export function RadioGroup({
+export const RadioGroup = React.memo(function RadioGroup({
     disabled = false,
     error,
     helpText,
@@ -197,4 +204,4 @@ export function RadioGroup({
             </div>
         </FormField>
     );
-}
+});

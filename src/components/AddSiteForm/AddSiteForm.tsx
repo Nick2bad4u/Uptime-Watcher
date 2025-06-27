@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 import { UI_DELAYS, CHECK_INTERVALS } from "../../constants";
 import logger from "../../services/logger";
@@ -10,7 +10,7 @@ import { TextField, SelectField, RadioGroup } from "./FormFields";
 import { handleSubmit } from "./Submit";
 import { useAddSiteForm } from "./useAddSiteForm";
 
-export function AddSiteForm() {
+export const AddSiteForm = React.memo(function AddSiteForm() {
     const { addMonitorToSite, clearError, createSite, isLoading, lastError, sites } = useStore();
     const { isDark } = useTheme();
 
@@ -68,6 +68,12 @@ export function AddSiteForm() {
             }),
         [formState, addMonitorToSite, clearError, createSite, resetForm]
     );
+
+    // Memoized error clear handler
+    const onClearError = useCallback(() => {
+        clearError();
+        setFormError(undefined);
+    }, [clearError, setFormError]);
 
     return (
         <ThemedBox className="max-w-md mx-auto" padding="lg" rounded="lg" surface="base">
@@ -220,10 +226,7 @@ export function AddSiteForm() {
                             </ThemedText>
                             <ThemedButton
                                 className={`error-alert__close ${isDark ? "dark" : ""}`}
-                                onClick={() => {
-                                    clearError();
-                                    setFormError(undefined);
-                                }}
+                                onClick={onClearError}
                                 size="xs"
                                 variant="secondary"
                             >
@@ -259,4 +262,4 @@ export function AddSiteForm() {
             </form>
         </ThemedBox>
     );
-}
+});
