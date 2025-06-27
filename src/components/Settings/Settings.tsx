@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 
-import { HISTORY_LIMIT_OPTIONS, TIMEOUT_CONSTRAINTS, UI_DELAYS } from "../constants";
-import logger from "../services/logger";
-import { useStore } from "../store";
+import { HISTORY_LIMIT_OPTIONS, TIMEOUT_CONSTRAINTS, UI_DELAYS } from "../../constants";
+import logger from "../../services/logger";
+import { useStore } from "../../store";
 import {
     ThemedBox,
     ThemedText,
@@ -11,9 +11,9 @@ import {
     ThemedInput,
     ThemedSelect,
     ThemedCheckbox,
-} from "../theme/components";
-import { ThemeName } from "../theme/types";
-import { useTheme } from "../theme/useTheme";
+} from "../../theme/components";
+import { ThemeName } from "../../theme/types";
+import { useTheme } from "../../theme/useTheme";
 
 interface SettingsProps {
     onClose: () => void;
@@ -231,7 +231,7 @@ export function Settings({ onClose }: SettingsProps) {
                                     disabled={isLoading}
                                     aria-label="Request timeout in milliseconds"
                                 />
-                                <ThemedText size="xs" variant="tertiary" className="mt-1 block">
+                                <ThemedText size="xs" variant="tertiary" className="block mt-1">
                                     How long to wait for a response before considering a site down
                                 </ThemedText>
                             </div>
@@ -249,7 +249,7 @@ export function Settings({ onClose }: SettingsProps) {
                                     disabled={isLoading}
                                     aria-label="Maximum number of retry attempts"
                                 />
-                                <ThemedText size="xs" variant="tertiary" className="mt-1 block">
+                                <ThemedText size="xs" variant="tertiary" className="block mt-1">
                                     Number of retry attempts before marking a site as down
                                 </ThemedText>
                             </div>
@@ -320,7 +320,7 @@ export function Settings({ onClose }: SettingsProps) {
                                         </option>
                                     ))}
                                 </ThemedSelect>
-                                <div className="mt-2 flex items-center gap-2">
+                                <div className="flex items-center gap-2 mt-2">
                                     <ThemedText size="xs" variant="tertiary">
                                         Current theme preview:
                                     </ThemedText>
@@ -398,7 +398,7 @@ export function Settings({ onClose }: SettingsProps) {
                                 >
                                     Download SQLite Backup
                                 </ThemedButton>
-                                <ThemedText size="xs" variant="tertiary" className="mt-1 block">
+                                <ThemedText size="xs" variant="tertiary" className="block mt-1">
                                     Download a direct backup of the raw SQLite database file for advanced backup or
                                     migration.
                                 </ThemedText>

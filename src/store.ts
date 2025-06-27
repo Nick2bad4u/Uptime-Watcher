@@ -208,6 +208,21 @@ export const useStore = create<AppState>()(
                 state.clearError();
 
                 try {
+                    // Stop monitoring for all monitors of this site before deleting
+                    const site = state.sites.find((s) => s.identifier === identifier);
+                    if (site) {
+                        for (const monitor of site.monitors) {
+                            try {
+                                await window.electronAPI.stopMonitoringForSite(identifier, monitor.id);
+                            } catch (err) {
+                                // Log but do not block deletion if stopping fails
+                                console.warn(
+                                    `Failed to stop monitoring for monitor ${monitor.id} of site ${identifier}:`,
+                                    err
+                                );
+                            }
+                        }
+                    }
                     await window.electronAPI.removeSite(identifier);
                     state.removeSite(identifier);
                 } catch (error) {

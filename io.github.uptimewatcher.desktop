@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Uptime Watcher
 Comment=Monitor website uptime and performance
-Exec=io.github.uptimewatcher %U
+Exec=run-electron.sh %U
 Icon=io.github.uptimewatcher
 Type=Application
 Categories=Network;Monitor;System;

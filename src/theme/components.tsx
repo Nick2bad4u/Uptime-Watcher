@@ -335,15 +335,19 @@ interface ThemedInputProps {
     max?: string | number;
     step?: string | number;
     className?: string;
+    id?: string;
     // eslint-disable-next-line sonarjs/no-duplicate-string -- false positive due to matching ARIA_LABEL constant
     "aria-label"?: string;
+    "aria-describedby"?: string;
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export function ThemedInput({
+    "aria-describedby": ariaDescribedBy,
     [ARIA_LABEL]: ariaLabel,
     className = "",
     disabled = false,
+    id,
     max,
     min,
     onChange,
@@ -373,18 +377,20 @@ export function ThemedInput({
     };
     return (
         <input
+            aria-describedby={ariaDescribedBy}
+            aria-label={ariaLabel}
+            className={`themed-input ${className}`}
+            disabled={disabled}
+            id={id}
+            max={max}
+            min={min}
+            onChange={onChange}
+            placeholder={placeholder}
+            required={required}
+            step={step}
+            style={styles}
             type={type}
             value={inputValue}
-            placeholder={placeholder}
-            disabled={disabled}
-            required={required}
-            min={min}
-            max={max}
-            step={step}
-            className={`themed-input ${className}`}
-            style={styles}
-            aria-label={ariaLabel}
-            onChange={onChange}
         />
     );
 }
@@ -394,18 +400,24 @@ interface ThemedSelectProps {
     disabled?: boolean;
     required?: boolean;
     className?: string;
+    id?: string;
+    title?: string;
     "aria-label"?: string;
+    "aria-describedby"?: string;
     onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
     children: React.ReactNode;
 }
 
 export function ThemedSelect({
+    "aria-describedby": ariaDescribedBy,
     [ARIA_LABEL]: ariaLabel,
     children,
     className = "",
     disabled = false,
+    id,
     onChange,
     required = false,
+    title,
     value,
 }: ThemedSelectProps) {
     const { currentTheme } = useTheme();
@@ -428,13 +440,16 @@ export function ThemedSelect({
     };
     return (
         <select
-            value={selectValue}
-            disabled={disabled}
-            required={required}
-            className={`themed-select ${className}`}
-            style={styles}
+            aria-describedby={ariaDescribedBy}
             aria-label={ariaLabel}
+            className={`themed-select ${className}`}
+            disabled={disabled}
+            id={id}
             onChange={onChange}
+            required={required}
+            style={styles}
+            title={title}
+            value={selectValue}
         >
             {children}
         </select>

@@ -1,6 +1,6 @@
-import { useStore } from "../store";
-import { ThemedBox, ThemedText } from "../theme/components";
-import { useTheme } from "../theme/useTheme";
+import { useStore } from "../../store";
+import { ThemedBox, ThemedText } from "../../theme/components";
+import { useTheme } from "../../theme/useTheme";
 import { SiteCard } from "./SiteCard";
 
 export function SiteList() {

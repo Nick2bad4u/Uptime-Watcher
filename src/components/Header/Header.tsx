@@ -1,8 +1,8 @@
 /* eslint-disable functional/no-let */
-import { useStore } from "../store";
-import { ThemedBox, ThemedText, ThemedButton, StatusIndicator } from "../theme/components";
-import { useTheme } from "../theme/useTheme";
-import { useAvailabilityColors } from "../theme/useTheme";
+import { useStore } from "../../store";
+import { ThemedBox, ThemedText, ThemedButton, StatusIndicator } from "../../theme/components";
+import { useTheme } from "../../theme/useTheme";
+import { useAvailabilityColors } from "../../theme/useTheme";
 import "./Header.css";
 
 export function Header() {

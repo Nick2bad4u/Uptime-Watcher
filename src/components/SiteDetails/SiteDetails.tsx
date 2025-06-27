@@ -21,11 +21,11 @@ import { FaListOl } from "react-icons/fa";
 import { FiTrash2, FiSave } from "react-icons/fi";
 import { MdAccessTime, MdBolt, MdSpeed, MdOutlineFactCheck } from "react-icons/md";
 
-import { AUTO_REFRESH_INTERVAL, CHECK_INTERVALS } from "../constants";
-import { useSiteAnalytics, type DowntimePeriod } from "../hooks/useSiteAnalytics";
-import { ChartConfigService } from "../services/chartConfig";
-import logger from "../services/logger";
-import { useStore } from "../store";
+import { AUTO_REFRESH_INTERVAL, CHECK_INTERVALS } from "../../constants";
+import { useSiteAnalytics, type DowntimePeriod } from "../../hooks/useSiteAnalytics";
+import { ChartConfigService } from "../../services/chartConfig";
+import logger from "../../services/logger";
+import { useStore } from "../../store";
 import {
     ThemedBox,
     ThemedText,
@@ -36,14 +36,14 @@ import {
     ThemedProgress,
     ThemedInput,
     ThemedSelect,
-} from "../theme/components";
+} from "../../theme/components";
 import "chartjs-adapter-date-fns";
 
 import "./SiteDetails.css";
-import { useTheme, useAvailabilityColors } from "../theme/useTheme";
-import { Site, StatusHistory, MonitorType, Monitor } from "../types";
-import { formatStatusWithIcon } from "../utils/status";
-import { formatResponseTime, formatFullTimestamp, formatDuration } from "../utils/time";
+import { useTheme, useAvailabilityColors } from "../../theme/useTheme";
+import { Site, StatusHistory, MonitorType, Monitor } from "../../types";
+import { formatStatusWithIcon } from "../../utils/status";
+import { formatResponseTime, formatFullTimestamp, formatDuration } from "../../utils/time";
 
 // Register Chart.js components
 ChartJS.register(

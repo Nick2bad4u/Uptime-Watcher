@@ -1,11 +1,11 @@
 /* eslint-disable perfectionist/sort-objects */
 import { useEffect, useState } from "react";
 
-import { AddSiteForm } from "./components/AddSiteForm";
-import { Header } from "./components/Header";
-import { Settings } from "./components/Settings";
-import { SiteDetails } from "./components/SiteDetails";
-import { SiteList } from "./components/SiteList";
+import { AddSiteForm } from "./components/AddSiteForm/AddSiteForm";
+import { Header } from "./components/Header/Header";
+import { Settings } from "./components/Settings/Settings";
+import { SiteDetails } from "./components/SiteDetails/SiteDetails";
+import { SiteList } from "./components/Dashboard/SiteList";
 import { UI_DELAYS } from "./constants";
 import { useBackendFocusSync } from "./hooks/useBackendFocusSync";
 import logger from "./services/logger";
@@ -111,7 +111,7 @@ function App() {
                                     variant="secondary"
                                     size="sm"
                                     onClick={clearError}
-                                    className="error-alert__close ml-4"
+                                    className="ml-4 error-alert__close"
                                 >
                                     ✕
                                 </ThemedButton>
@@ -125,7 +125,7 @@ function App() {
                     updateStatus === "downloading" ||
                     updateStatus === "downloaded" ||
                     updateStatus === "error") && (
-                    <div className="fixed top-12 left-0 right-0 z-50">
+                    <div className="fixed left-0 right-0 z-50 top-12">
                         <ThemedBox
                             surface="elevated"
                             padding="md"
@@ -158,7 +158,7 @@ function App() {
                                                 setUpdateError(undefined);
                                             }
                                         }}
-                                        className="update-alert__action ml-4"
+                                        className="ml-4 update-alert__action"
                                     >
                                         {updateStatus === "downloaded" ? "Restart Now" : "Dismiss"}
                                     </ThemedButton>

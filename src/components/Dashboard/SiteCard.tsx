@@ -1,7 +1,7 @@
-import logger from "../services/logger";
-import { useStore } from "../store";
-import { ThemedBox, ThemedText, ThemedButton, ThemedSelect, StatusIndicator, MiniChartBar } from "../theme/components";
-import { Site } from "../types";
+import logger from "../../services/logger";
+import { useStore } from "../../store";
+import { ThemedBox, ThemedText, ThemedButton, ThemedSelect, StatusIndicator, MiniChartBar } from "../../theme/components";
+import { Site } from "../../types";
 
 interface SiteCardProps {
     site: Site;
@@ -82,7 +82,7 @@ export function SiteCard({ site }: SiteCardProps) {
             padding="md"
             rounded="md"
             shadow="sm"
-            className="site-card flex flex-col gap-2 cursor-pointer"
+            className="flex flex-col gap-2 cursor-pointer site-card"
             onClick={handleCardClick}
         >
             <div className="flex items-center justify-between">
@@ -151,7 +151,7 @@ export function SiteCard({ site }: SiteCardProps) {
                 </ThemedText>
             </div>
             <div className="grid grid-cols-4 gap-4 mb-4">
-                <div className="text-center flex flex-col items-center">
+                <div className="flex flex-col items-center text-center">
                     <ThemedText size="xs" variant="secondary" className="block mb-1">
                         Status
                     </ThemedText>
@@ -159,7 +159,7 @@ export function SiteCard({ site }: SiteCardProps) {
                         {status?.toUpperCase() || "UNKNOWN"}
                     </ThemedText>
                 </div>
-                <div className="text-center flex flex-col items-center">
+                <div className="flex flex-col items-center text-center">
                     <ThemedText size="xs" variant="secondary" className="block mb-1">
                         Uptime
                     </ThemedText>
@@ -167,7 +167,7 @@ export function SiteCard({ site }: SiteCardProps) {
                         {calculateUptime()}%
                     </ThemedText>
                 </div>
-                <div className="text-center flex flex-col items-center">
+                <div className="flex flex-col items-center text-center">
                     <ThemedText size="xs" variant="secondary" className="block mb-1">
                         Response
                     </ThemedText>
@@ -175,7 +175,7 @@ export function SiteCard({ site }: SiteCardProps) {
                         {responseTime !== undefined ? `${responseTime} ms` : "-"}
                     </ThemedText>
                 </div>
-                <div className="text-center flex flex-col items-center">
+                <div className="flex flex-col items-center text-center">
                     <ThemedText size="xs" variant="secondary" className="block mb-1">
                         Checks
                     </ThemedText>
@@ -211,11 +211,11 @@ export function SiteCard({ site }: SiteCardProps) {
                     </div>
                 </div>
             )}
-            <div className="border-t pt-2 mt-2">
+            <div className="pt-2 mt-2 border-t">
                 <ThemedText
                     size="xs"
                     variant="tertiary"
-                    className="text-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="text-center transition-opacity opacity-0 group-hover:opacity-100"
                 >
                     Click to view detailed statistics and settings
                 </ThemedText>
