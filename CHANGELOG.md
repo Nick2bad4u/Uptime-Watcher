@@ -7,9 +7,81 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[2197c91](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2197c916b354ef06745f26b5248f1297bbdfcc96)...
-[2197c91](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2197c916b354ef06745f26b5248f1297bbdfcc96)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/2197c916b354ef06745f26b5248f1297bbdfcc96...2197c916b354ef06745f26b5248f1297bbdfcc96))
+[[66fed3e](https://github.com/Nick2bad4u/Uptime-Watcher/commit/66fed3e4d9a917ca24eb592df628f68e9e83151f)...
+[66fed3e](https://github.com/Nick2bad4u/Uptime-Watcher/commit/66fed3e4d9a917ca24eb592df628f68e9e83151f)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/66fed3e4d9a917ca24eb592df628f68e9e83151f...66fed3e4d9a917ca24eb592df628f68e9e83151f))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 3.2.0 [`(66fed3e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/66fed3e4d9a917ca24eb592df628f68e9e83151f)
+
+
+
+
+
+
+## [3.2.0] - 2025-06-27
+
+
+[[4876c9b](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4876c9b7772765edb8e70974a73c32fc15fd7c72)...
+[691aee8](https://github.com/Nick2bad4u/Uptime-Watcher/commit/691aee801a61b1ba80ac2bdad1213b552daa8c63)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/4876c9b7772765edb8e70974a73c32fc15fd7c72...691aee801a61b1ba80ac2bdad1213b552daa8c63))
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(691aee8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/691aee801a61b1ba80ac2bdad1213b552daa8c63)
+
+
+
+### 🛠️ GitHub Actions
+
+- Update _config.yml [`(702408c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/702408cac16645c62df3b39919b5f42f672733d3)
+
+
+
+### 💼 Other
+
+- Update metrics.repository.svg - [Skip GitHub Action] [`(5fc7ce5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5fc7ce5a1b5d7bbbfc843cbf117d8abea58302bf)
+
+
+- 🚜 [refactor] Remove site list/card components and optimize form fields
+
+- Removes dashboard site list and card components to streamline or redesign dashboard UI.
+- Refactors form field components to use memoization for performance gains.
+- Updates form error handling with a memoized callback for cleaner React code.
+- Simplifies logging on site/monitor add actions and form submission failures.
+- Updates accessibility linting settings and custom dictionary entries for better dev experience.
+- Disables markdown linting in refactor documentation for flexibility.
+
+Prepares codebase for improved dashboard UX and more maintainable forms. [`(ad436cb)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ad436cb78c46e245398a52d5a0a370926a1f15ab)
+
+
+- 🛠️ [fix] Improve form validation using validator library
+
+- Replaces custom and built-in URL, host, and port validation with the `validator` library to enhance accuracy and consistency of user input checks
+- Expands custom word list to support new validation-related terminology
+- Adjusts ESLint and markdown configurations for improved test and documentation management
+- Updates dependencies for improved compatibility and developer experience [`(5deb984)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5deb984a1115b0a9cf24a17a6a59d8198dd339ab)
+
+
+- 🚜 [refactor] Restructure components and remove legacy docs
+
+- Removes all legacy documentation and Copilot instructions to reduce maintenance and confusion.
+- Deletes and reorganizes UI components from a flat structure to feature-based folders for better modularity and maintainability.
+- Cleans up unused CSS and TypeScript files tied to the old component structure.
+- Updates imports in the main app to reflect the new component organization.
+- Improves accessibility support for input and select components by adding ARIA attributes.
+- Updates Linux desktop entry to use the wrapper script for launching Electron.
+- Ensures that site deletion stops all monitoring processes before removing the site for improved resource management and reliability. [`(4876c9b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4876c9b7772765edb8e70974a73c32fc15fd7c72)
+
+
+
+### ⚙️ Miscellaneous Tasks
+
+- Update changelogs for v3.1.0 [skip ci] [`(4312c1c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4312c1cc11857ff4775d86e4e72072ba7e799b40)
+
 
 
 ### 📦 Dependencies
