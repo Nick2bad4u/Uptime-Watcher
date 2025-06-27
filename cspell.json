@@ -1,12 +1,26 @@
 {
     "version": "0.2",
-    "ignorePaths": ["node_modules", "dist", "dist-electron", "**CHANGELOG.md", "custom-words.txt"],
+    "ignorePaths": ["node_modules", "dist", "dist-electron", "**CHANGELOG.md", "release"],
     "dictionaryDefinitions": [
         {
             "name": "Uptime-Watcher Project Dictionary",
-            "path": "./custom-words.txt",
+            "path": "custom-words.txt",
             "addWords": true,
             "scope": "workspace",
+            "description": "Words used in the Uptime-Watcher project"
+        },
+        {
+            "name": "Uptime-Watcher User Dictionary",
+            "path": "custom-words.txt",
+            "addWords": true,
+            "scope": "user",
+            "description": "Words used in the Uptime-Watcher project"
+        },
+        {
+            "name": "Uptime-Watcher Folder Dictionary",
+            "path": "custom-words.txt",
+            "addWords": true,
+            "scope": "folder",
             "description": "Words used in the Uptime-Watcher project"
         }
     ],

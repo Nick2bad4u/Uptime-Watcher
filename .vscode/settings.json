@@ -78,19 +78,4 @@
         "useTabs": false
     },
     "debug.defaultCompound": "Dev: Vite + Electron Main",
-    "cSpell.words": [
-        "appimage",
-        "asamuzakjp",
-        "asar",
-        "chartable",
-        "chartjs",
-        "Mesg",
-        "Mesgs",
-        "modelcontextprotocol",
-        "msvc",
-        "nsis",
-        "ossf",
-        "softprops",
-        "Zwift"
-    ]
 }
