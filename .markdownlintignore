@@ -1,3 +1,4 @@
+<!-- markdownlint-disable -->
 .github/instructions/copilot-instructions.md
 SECURITY.md
 copilot-instructions.md
@@ -5,3 +6,5 @@ electron-app/LICENSE.md
 node_modules/
 release/
 dist-electron/
+docs/Validator.md
+.markdownlintignore

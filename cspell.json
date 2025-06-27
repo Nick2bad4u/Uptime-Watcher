@@ -1,12 +1,6 @@
 {
     "version": "0.2",
-    "ignorePaths": [
-        "node_modules",
-        "dist",
-        "dist-electron",
-        "**CHANGELOG.md",
-        "custom-words.txt",
-    ],
+    "ignorePaths": ["node_modules", "dist", "dist-electron", "**CHANGELOG.md", "custom-words.txt"],
     "dictionaryDefinitions": [
         {
             "name": "Uptime-Watcher Project Dictionary",
@@ -43,8 +37,7 @@
         "softwareTerms",
         "typescript"
     ],
-    "words": [
-    ],
+    "words": [],
     "ignoreWords": [],
     "import": []
 }

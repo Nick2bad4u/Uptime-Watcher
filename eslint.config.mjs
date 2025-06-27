@@ -74,6 +74,10 @@ export default [
             "cspell.json",
             "**/Design-Plan.md",
             "**/Logging-Migration-Summary.md",
+            "**/Docs/**",
+            "**/docs/**",
+            "Docs/",
+            "docs/",
         ],
     },
 
@@ -154,7 +158,6 @@ export default [
             "eslint-comments": pluginEslintComments,
             perfectionist: pluginPerfectionist,
             // new plugins
-            "testing-library": pluginTestingLibrary,
             unicorn: pluginUnicorn,
             functional: pluginFunctional,
             filenames: pluginFilenames,
@@ -263,9 +266,6 @@ export default [
             "regexp/no-empty-alternative": "warn",
             // tsdoc
             "tsdoc/syntax": "warn",
-            // testing-library (only for test files, but safe to add as warn)
-            "testing-library/no-debugging-utils": "warn",
-            "testing-library/no-dom-import": "warn",
         },
     },
     // TypeScript files
@@ -306,7 +306,6 @@ export default [
             "eslint-comments": pluginEslintComments,
             perfectionist: pluginPerfectionist,
             // new plugins
-            "testing-library": pluginTestingLibrary,
             unicorn: pluginUnicorn,
             functional: pluginFunctional,
             filenames: pluginFilenames,
@@ -409,21 +408,27 @@ export default [
             "regexp/no-empty-alternative": "warn",
             // tsdoc
             "tsdoc/syntax": "warn",
-            // testing-library (only for test files, but safe to add as warn)
-            "testing-library/no-debugging-utils": "warn",
-            "testing-library/no-dom-import": "warn",
         },
     },
 
     // Testing files
     {
-        files: ["tests/**"],
+        files: ["tests/**", "**/__tests__/**", "**/*.test.{js,ts,jsx,tsx}", "**/*.spec.{js,ts,jsx,tsx}"],
         plugins: {
             vitest,
-            pluginTestingLibrary,
+            "testing-library": pluginTestingLibrary,
         },
         rules: {
             ...vitest.configs.recommended.rules,
+            // testing-library rules
+            "testing-library/await-async-queries": "error",
+            "testing-library/await-async-utils": "error",
+            "testing-library/no-await-sync-queries": "error",
+            "testing-library/no-debugging-utils": "warn",
+            "testing-library/no-dom-import": "warn",
+            "testing-library/prefer-screen-queries": "warn",
+            "testing-library/prefer-user-event": "warn",
+            "testing-library/render-result-naming-convention": "warn",
         },
     },
 

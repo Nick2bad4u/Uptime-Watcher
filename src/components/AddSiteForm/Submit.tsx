@@ -1,3 +1,5 @@
+import validator from "validator";
+
 import type { Logger } from "../../services/logger";
 import type { Monitor } from "../../types";
 import type { AddSiteFormState, AddSiteFormActions } from "./useAddSiteForm";
@@ -72,25 +74,41 @@ export async function handleSubmit(e: React.FormEvent, props: FormSubmitProps) {
             const trimmedUrl = url.trim();
             if (!/^https?:\/\//i.test(trimmedUrl)) {
                 validationErrors.push("HTTP monitor requires a URL starting with http:// or https://");
-            } else {
-                try {
-                    new URL(trimmedUrl);
-                } catch {
-                    validationErrors.push("Please enter a valid URL");
-                }
+            } else if (
+                !validator.isURL(trimmedUrl, {
+                    allow_protocol_relative_urls: false,
+                    allow_trailing_dot: false,
+                    allow_underscores: false,
+                    disallow_auth: false,
+                    protocols: ["http", "https"],
+                    require_protocol: true,
+                    require_valid_protocol: true,
+                })
+            ) {
+                validationErrors.push("Please enter a valid URL with a proper domain");
             }
         }
     } else if (monitorType === "port") {
         if (!host.trim()) {
             validationErrors.push("Host is required for port monitor");
+        } else {
+            const trimmedHost = host.trim();
+            // Check if it's a valid IP address or domain name
+            const isValidIP = validator.isIP(trimmedHost);
+            const isValidDomain = validator.isFQDN(trimmedHost, {
+                allow_trailing_dot: false,
+                allow_underscores: false,
+            });
+
+            if (!isValidIP && !isValidDomain) {
+                validationErrors.push("Host must be a valid IP address or domain name");
+            }
         }
+
         if (!port.trim()) {
             validationErrors.push("Port is required for port monitor");
-        } else {
-            const portNum = Number(port);
-            if (!Number.isInteger(portNum) || portNum < 1 || portNum > 65535) {
-                validationErrors.push("Port must be a number between 1 and 65535");
-            }
+        } else if (!validator.isPort(port.trim())) {
+            validationErrors.push("Port must be a valid port number (1-65535)");
         }
     }
 
