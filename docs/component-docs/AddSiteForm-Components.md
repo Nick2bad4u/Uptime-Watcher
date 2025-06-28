@@ -153,11 +153,15 @@ export const FormField = React.memo(function FormField({
 
 ```typescript
 const INTERVAL_OPTIONS = [
+    { value: 5, label: "5 seconds", performance: "highest" },
+    { value: 10, label: "10 seconds", performance: "highest" },
+    { value: 15, label: "15 seconds", performance: "highest" },
+    { value: 20, label: "20 seconds", performance: "highest" },
     { value: 30, label: "30 seconds", performance: "high" },
     { value: 60, label: "1 minute", performance: "medium" },
     { value: 300, label: "5 minutes", performance: "low" },
     { value: 900, label: "15 minutes", performance: "minimal" },
-    // ... more options
+    // ... more options up to 30 days
 ];
 ```
 

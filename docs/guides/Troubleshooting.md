@@ -337,14 +337,14 @@ rm ~/.local/share/uptime-watcher/settings.json
 ### Self-Help Resources
 
 1. **Search Documentation:** Check [docs](../README.md) first
-2. **Search Issues:** Look in [GitHub Issues](https://github.com/your-repo/issues)
-3. **Check Discussions:** Browse [GitHub Discussions](https://github.com/your-repo/discussions)
+2. **Search Issues:** Look in [GitHub Issues](https://github.com/Nick2bad4u/Uptime-Watcher/issues)
+3. **Check Discussions:** Browse [GitHub Discussions](https://github.com/Nick2bad4u/Uptime-Watcher/discussions)
 
 ### Community Support
 
-1. **Create Issue:** [New Bug Report](https://github.com/your-repo/issues/new?template=bug_report.md)
-2. **Feature Request:** [New Feature Request](https://github.com/your-repo/issues/new?template=feature_request.md)
-3. **Ask Questions:** [Start Discussion](https://github.com/your-repo/discussions)
+1. **Create Issue:** [New Bug Report](https://github.com/Nick2bad4u/Uptime-Watcher/issues/new?template=bug_report.md)
+2. **Feature Request:** [New Feature Request](https://github.com/Nick2bad4u/Uptime-Watcher/issues/new?template=feature_request.md)
+3. **Ask Questions:** [Start Discussion](https://github.com/Nick2bad4u/Uptime-Watcher/discussions)
 
 ### Developer Contact
 

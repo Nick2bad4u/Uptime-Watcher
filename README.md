@@ -34,7 +34,7 @@ An Electron desktop application for monitoring website uptime status with real-t
 1. Clone the repository:
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/Nick2bad4u/Uptime-Watcher.git
 cd Uptime-Watcher
 ```
 

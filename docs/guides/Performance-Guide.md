@@ -85,16 +85,12 @@ const siteGroups = {
 // Example: Optimized site checking
 interface SiteCheckOptions {
   timeout: number;        // 10-30 seconds recommended
-  maxRedirects: number;   // 3-5 redirects maximum
-  method: 'HEAD' | 'GET'; // HEAD for faster checks
   userAgent: string;      // Consistent user agent
 }
 
 const optimizedOptions: SiteCheckOptions = {
   timeout: 15000,         // 15 second timeout
-  maxRedirects: 3,        // Limit redirects
-  method: 'HEAD',         // Faster than GET
-  userAgent: 'UptimeWatcher/3.0'
+  userAgent: 'Uptime-Watcher/1.0'
 };
 ```
 

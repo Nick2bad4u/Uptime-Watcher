@@ -19,7 +19,7 @@ Uptime Watcher is a desktop application that monitors the availability and respo
 
 ### How do I install Uptime Watcher?
 
-1. Download the installer for your platform from [Releases](https://github.com/your-repo/releases)
+1. Download the installer for your platform from [Releases](https://github.com/Nick2bad4u/Uptime-Watcher/releases)
 2. Run the installer and follow the setup wizard
 3. Launch the application from your applications folder or start menu
 
@@ -41,8 +41,8 @@ There's no hard limit, but for optimal performance:
 
 You can set monitoring intervals from:
 
-- **Minimum:** 30 seconds
-- **Maximum:** 30 minutes
+- **Minimum:** 5 seconds
+- **Maximum:** 30 days
 - **Recommended:** 5 minutes for most use cases
 
 ### Does it work with HTTPS sites?
@@ -51,7 +51,7 @@ Yes, Uptime Watcher supports both HTTP and HTTPS protocols. HTTPS sites are full
 
 ### Can I monitor sites behind authentication?
 
-Currently, basic HTTP authentication is supported. OAuth and other complex authentication methods are planned for future releases.
+Authentication support is planned for future releases. Currently, only sites accessible without authentication are supported.
 
 ### Does it monitor localhost/internal sites?
 
@@ -156,9 +156,9 @@ More customization options are planned for future releases.
 
 Absolutely! Contributions are welcome:
 
-1. **Bug reports:** [Create an issue](https://github.com/your-repo/issues)
-2. **Feature requests:** [Start a discussion](https://github.com/your-repo/discussions)
-3. **Code contributions:** [Submit a pull request](https://github.com/your-repo/pulls)
+1. **Bug reports:** [Create an issue](https://github.com/Nick2bad4u/Uptime-Watcher/issues)
+2. **Feature requests:** [Start a discussion](https://github.com/Nick2bad4u/Uptime-Watcher/discussions)
+3. **Code contributions:** [Submit a pull request](https://github.com/Nick2bad4u/Uptime-Watcher/pulls)
 4. **Documentation:** Help improve guides and API docs
 
 See the [Contributing Guide](../guides/Developer-Guide.md#contributing) for details.
@@ -167,7 +167,7 @@ See the [Contributing Guide](../guides/Developer-Guide.md#contributing) for deta
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-repo/uptime-watcher.git
+git clone https://github.com/Nick2bad4u/Uptime-Watcher/uptime-watcher.git
 cd uptime-watcher
 
 # Install dependencies
@@ -343,9 +343,9 @@ chmod +x Uptime-Watcher-*.AppImage
 If your question isn't answered here:
 
 1. **Check the guides:** Browse other [documentation](../README.md)
-2. **Search existing issues:** Look through [GitHub Issues](https://github.com/your-repo/issues)
-3. **Ask the community:** Start a [GitHub Discussion](https://github.com/your-repo/discussions)
-4. **Report a bug:** Create a [new issue](https://github.com/your-repo/issues/new)
+2. **Search existing issues:** Look through [GitHub Issues](https://github.com/Nick2bad4u/Uptime-Watcher/issues)
+3. **Ask the community:** Start a [GitHub Discussion](https://github.com/Nick2bad4u/Uptime-Watcher/discussions)
+4. **Report a bug:** Create a [new issue](https://github.com/Nick2bad4u/Uptime-Watcher/issues/new)
 
 ---
 

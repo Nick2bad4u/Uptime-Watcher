@@ -1,0 +1,88 @@
+remote_theme: pages-themes/hacker@v0.2.0
+title: Uptime Watcher Documentation
+description: >-
+    Comprehensive documentation for Uptime Watcher - A cross-platform desktop
+    application for monitoring website uptime and server availability
+url: "https://nick2bad4u.github.io/Uptime-Watcher"
+baseurl: ""
+
+# Navigation
+navigation:
+    - title: "Home"
+      url: /
+    - title: "API Reference"
+      url: /api/
+    - title: "Guides"
+      url: /guides/
+    - title: "Components"
+      url: /component-docs/
+    - title: "GitHub"
+      url: https://github.com/Nick2bad4u/Uptime-Watcher
+
+# Jekyll settings
+markdown: kramdown
+highlighter: rouge
+kramdown:
+    input: GFM
+    syntax_highlighter: rouge
+
+# Collections for better organization
+collections:
+    guides:
+        output: true
+        permalink: /:collection/:name/
+    api:
+        output: true
+        permalink: /:collection/:name/
+    components:
+        output: true
+        permalink: /:collection/:name/
+
+defaults:
+    - scope:
+          path: ""
+          type: "pages"
+      values:
+          layout: "default"
+    - scope:
+          path: ""
+          type: "guides"
+      values:
+          layout: "default"
+    - scope:
+          path: ""
+          type: "api"
+      values:
+          layout: "default"
+    - scope:
+          path: ""
+          type: "components"
+      values:
+          layout: "default"
+
+plugins:
+    - jekyll-sitemap
+    - jekyll-seo-tag
+    - jekyll-feed
+    - jekyll-paginate
+    - jekyll-relative-links
+    - jekyll-github-metadata
+    - jekyll-mentions
+    - jekyll-gist
+    - jekyll-avatar
+    - jekyll-remote-theme
+    - jekyll-default-layout
+    - jekyll-optional-front-matter
+    - jekyll-titles-from-headings
+    - jekyll-include-cache
+    - jekyll-redirect-from
+    - jemoji
+
+# Plugin settings
+relative_links:
+    enabled: true
+    collections: true
+
+# Pagination settings (for jekyll-paginate)
+paginate: 10
+paginate_path: "/page:num/"

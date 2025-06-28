@@ -1,6 +1,6 @@
 # 🛡️ Security Guide
 
-> **Navigation:** [📖 Docs Home](../README.md) » [📘 Guides](../README.md#guides) » **Security Guide**
+> **Navigation:** [📖 Docs Home](../) » [📘 Guides](../guides/) » **Security Guide**
 
 Security considerations and best practices for Uptime Watcher.
 
@@ -201,16 +201,10 @@ class SecurityUtils {
 const securitySettings = {
   // Limit request exposure
   timeout: 30000,              // Fail fast on suspicious delays
-  maxRedirects: 3,            // Prevent redirect loops
-  userAgent: 'UptimeWatcher', // Identify legitimate requests
+  userAgent: 'Uptime-Watcher/1.0', // Identify legitimate requests
   
-  // Protect against malicious responses
-  maxResponseSize: '1MB',     // Limit response size
-  contentTypeValidation: true, // Validate response types
-  
-  // Network security
-  tlsValidation: true,        // Verify SSL certificates
-  followInsecureRedirects: false // Don't follow HTTP from HTTPS
+  // Note: Advanced features like custom headers, proxy settings,
+  // and certificate validation are planned for future releases
 };
 ```
 
@@ -402,24 +396,18 @@ For security vulnerabilities:
 For organizational use:
 
 ```typescript
-// Enterprise security configuration
+// Enterprise security configuration (planned features)
 const enterpriseConfig = {
-  // Network restrictions
-  allowedNetworks: ['10.0.0.0/8', '192.168.0.0/16'],
-  proxySettings: {
-    enabled: true,
-    url: 'http://corporate-proxy:8080',
-    authentication: 'ntlm'
-  },
+  // Current settings
+  timeout: 30000,
+  userAgent: 'Uptime-Watcher/1.0',
   
-  // Certificate management
-  customCAs: ['corporate-ca.crt'],
-  certificateValidation: 'strict',
-  
-  // Logging and monitoring
-  auditLogging: true,
-  logLevel: 'debug',
-  logRetention: '90 days'
+  // Planned features for future releases:
+  // - Network restrictions
+  // - Proxy settings  
+  // - Certificate management
+  // - Audit logging
+  // - Custom authentication
 };
 ```
 
@@ -461,9 +449,9 @@ For regulated environments:
 - [🔧 Troubleshooting Guide](Troubleshooting.md) - Common issues and solutions
 - [⚡ Performance Guide](Performance-Guide.md) - Optimization strategies
 - [🚀 Developer Guide](Developer-Guide.md) - Development setup
-- [📚 API Reference](../api/README.md) - Technical documentation
+- [📚 API Reference](../api/) - Technical documentation
 - [❓ FAQ](FAQ.md) - Frequently asked questions
 
 ---
 
-> **Related:** [📖 Documentation Home](../README.md) | [📘 All Guides](../README.md#guides)
+> **Related:** [📖 Documentation Home](../) | [📘 All Guides](../guides/)

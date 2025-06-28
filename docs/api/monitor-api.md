@@ -291,18 +291,15 @@ Monitors HTTP/HTTPS endpoints.
 interface HttpMonitorConfig {
     url: string;
     timeout?: number;
-    followRedirects?: boolean;
-    validateCertificate?: boolean;
 }
 ```
 
 **Features:**
 
 - Response time measurement
-- HTTP status code validation
-- SSL certificate validation
-- Redirect following
-- Custom headers support
+- HTTP status code validation (1xx-4xx = up, 5xx = down)
+- Automatic redirect following (max 5 redirects)
+- Network error handling
 
 #### Port Monitor
 
