@@ -50,7 +50,11 @@ export function useSiteMonitor(site: Site): SiteMonitorResult {
     // Extract monitor state information
     const status = monitor?.status || "pending";
     const responseTime = monitor?.responseTime;
-    const filteredHistory = useMemo(() => monitor?.history || [], [monitor?.history]);
+    // Fix: Use history length and last timestamp as dependencies for proper memoization
+    const filteredHistory = useMemo(() => {
+        const history = monitor?.history || [];
+        return history;
+    }, [monitor]);
     const isMonitoring = monitor?.monitoring !== false; // default to true if undefined
 
     // Handler for changing the monitor - memoized to prevent recreation

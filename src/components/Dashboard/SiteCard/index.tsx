@@ -48,7 +48,7 @@ export const SiteCard = React.memo(function SiteCard({ site }: SiteCardProps) {
             padding="md"
             rounded="md"
             shadow="sm"
-            className="flex flex-col gap-2 cursor-pointer site-card"
+            className="flex flex-col gap-2 cursor-pointer site-card w-full"
             onClick={handleCardClick}
         >
             <SiteCardHeader

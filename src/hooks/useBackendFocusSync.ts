@@ -4,18 +4,21 @@ import { useStore } from "../store";
 
 /**
  * useBackendFocusSync
- * Adds a window focus event listener that triggers syncSitesFromBackend when enabled.
+ * Adds a window focus event listener that triggers fullSyncFromBackend when enabled.
+ * This is useful for ensuring data consistency when the user returns to the app.
  * @param enabled - Set to true to enable focus-based backend sync (default: false)
  */
 export function useBackendFocusSync(enabled = false) {
-    const syncSitesFromBackend = useStore((s) => s.syncSitesFromBackend);
+    const fullSyncFromBackend = useStore((s) => s.fullSyncFromBackend);
 
     useEffect(() => {
         if (!enabled) return;
         const handleFocus = () => {
-            syncSitesFromBackend();
+            // Use full sync on focus to ensure complete data consistency
+            // since the user may have been away for a while
+            fullSyncFromBackend();
         };
         window.addEventListener("focus", handleFocus);
         return () => window.removeEventListener("focus", handleFocus);
-    }, [enabled, syncSitesFromBackend]);
+    }, [enabled, fullSyncFromBackend]);
 }

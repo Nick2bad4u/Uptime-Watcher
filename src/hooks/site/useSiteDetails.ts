@@ -74,22 +74,38 @@ export function useSiteDetails({ site }: UseSiteDetailsProps) {
                 clearError();
             }
             try {
+                if (!isAutoRefresh) {
+                    logger.user.action("Manual site check initiated", {
+                        monitorId: selectedMonitorId,
+                        monitorType: currentSite.monitors.find((m) => m.id === selectedMonitorId)?.type,
+                        siteId: currentSite.identifier,
+                        siteName: currentSite.name,
+                    });
+                }
                 await checkSiteNow(currentSite.identifier, selectedMonitorId);
                 if (!isAutoRefresh) {
-                    logger.user.action("Manual site check", {
-                        identifier: currentSite.identifier,
+                    logger.user.action("Manual site check completed successfully", {
                         monitorId: selectedMonitorId,
+                        siteId: currentSite.identifier,
+                        siteName: currentSite.name,
                     });
                 }
             } catch (error) {
                 logger.site.error(currentSite.identifier, error instanceof Error ? error : String(error));
+                if (!isAutoRefresh) {
+                    logger.error("Manual site check failed", error instanceof Error ? error : String(error), {
+                        monitorId: selectedMonitorId,
+                        siteId: currentSite.identifier,
+                        siteName: currentSite.name,
+                    });
+                }
             } finally {
                 if (isAutoRefresh) {
                     setIsRefreshing(false);
                 }
             }
         },
-        [checkSiteNow, clearError, currentSite.identifier, selectedMonitorId]
+        [checkSiteNow, clearError, currentSite.identifier, currentSite.monitors, currentSite.name, selectedMonitorId]
     );
 
     // Auto-refresh interval

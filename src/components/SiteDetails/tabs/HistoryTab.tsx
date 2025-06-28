@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import logger from "../../../services/logger";
 import { useStore } from "../../../store";
@@ -22,6 +22,10 @@ export function HistoryTab({
     const [historyFilter, setHistoryFilter] = useState<"all" | "up" | "down">("all");
     const historyLength = (selectedMonitor.history || []).length;
     const backendLimit = settings.historyLimit || 25;
+
+    // Track the last monitor ID we logged for to prevent duplicate logging
+    const lastLoggedMonitorId = useRef<string | null>(null);
+
     // Dropdown options: 25, 50, 100, All (clamped to backendLimit and available history)
     const maxShow = Math.min(backendLimit, historyLength);
     const showOptions = [10, 25, 50, 100, 250, 500, 1000, 10000].filter((opt) => opt <= maxShow);
@@ -33,14 +37,18 @@ export function HistoryTab({
     const defaultHistoryLimit = Math.min(50, backendLimit, historyLength);
     const [historyLimit, setHistoryLimit] = useState(defaultHistoryLimit);
 
-    // Log when history tab is viewed
+    // Log when history tab is viewed - only when monitor actually changes
     useEffect(() => {
-        logger.user.action("History tab viewed", {
-            monitorId: selectedMonitor.id,
-            monitorType: selectedMonitor.type,
-            totalRecords: historyLength,
-        });
-    }, [selectedMonitor.id, selectedMonitor.type, historyLength]);
+        if (lastLoggedMonitorId.current !== selectedMonitor.id) {
+            logger.user.action("History tab viewed", {
+                monitorId: selectedMonitor.id,
+                monitorType: selectedMonitor.type,
+                totalRecords: (selectedMonitor.history || []).length,
+            });
+            lastLoggedMonitorId.current = selectedMonitor.id;
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally exclude selectedMonitor.history to prevent re-logging on history updates
+    }, [selectedMonitor.id, selectedMonitor.type]);
 
     useEffect(() => {
         setHistoryLimit(Math.min(50, backendLimit, (selectedMonitor.history || []).length));
@@ -142,7 +150,7 @@ export function HistoryTab({
                 <div className="space-y-2">
                     {filteredHistoryRecords.map((record, index: number) => (
                         <div
-                            key={index}
+                            key={record.timestamp}
                             className="flex items-center justify-between p-3 transition-colors rounded-lg hover:bg-surface-elevated"
                         >
                             <div className="flex items-center space-x-3">

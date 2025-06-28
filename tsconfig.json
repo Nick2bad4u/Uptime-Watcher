@@ -3,7 +3,11 @@
         "target": "ES2020",
         "skipDefaultLibCheck": false,
         "useDefineForClassFields": true,
-        "lib": ["ES2020", "DOM", "DOM.Iterable"],
+        "lib": [
+            "ES2020",
+            "DOM",
+            "DOM.Iterable"
+        ],
         "module": "CommonJS",
         "moduleResolution": "node",
         "resolveJsonModule": true,
@@ -11,7 +15,10 @@
         "isolatedModules": true,
         "jsx": "react-jsx",
         "strict": true,
-        "types": ["react", "react-dom"],
+        "types": [
+            "react",
+            "react-dom"
+        ],
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "noFallthroughCasesInSwitch": true,
@@ -19,13 +26,27 @@
         "outDir": "dist-electron",
         "baseUrl": ".",
         "paths": {
-            "@/*": ["src/*"]
+            "@/*": [
+                "src/*"
+            ]
         },
         "esModuleInterop": true,
         "allowJs": true,
-        "allowSyntheticDefaultImports": true,
+        "allowSyntheticDefaultImports": true
     },
-    "include": ["electron/**/*.ts", "electron/**/*.tsx", "src/**/*.ts", "src/**/*.tsx", "vite.config.ts"],
-    "exclude": ["node_modules", "dist", "dist-electron", "release", "out"]
+    "include": [
+        "src/**/*.ts",
+        "src/**/*.tsx",
+        "electron/**/*.ts",
+        "electron/**/*.tsx",
+        "vite.config.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist",
+        "dist-electron",
+        "release",
+        "out"
+    ]
     // Separate tsconfig should be used for renderer (src/) if needed
 }

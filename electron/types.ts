@@ -46,6 +46,7 @@ export interface StatusHistory {
     timestamp: number;
     status: "up" | "down";
     responseTime: number;
+    details?: string;
 }
 
 export interface StatusUpdate {

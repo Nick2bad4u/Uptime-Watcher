@@ -1,3 +1,5 @@
+<!-- markdownlint-disable -->
+
 refactored AddSiteForm components work together now, showcasing the modern React patterns we've implemented.
 
 ## 🏗️ Architecture Overview

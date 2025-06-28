@@ -23,12 +23,12 @@ export function Settings({ onClose }: SettingsProps) {
     const {
         clearError,
         downloadSQLiteBackup, // <-- keep this
+        fullSyncFromBackend,
         isLoading,
         lastError,
         resetSettings,
         setError, // <-- keep this
         settings,
-        syncSitesFromBackend,
         updateHistoryLimitValue,
         updateSettings,
     } = useStore();
@@ -104,7 +104,7 @@ export function Settings({ onClose }: SettingsProps) {
     const handleSyncNow = useCallback(async () => {
         setSyncSuccess(false);
         try {
-            await syncSitesFromBackend();
+            await fullSyncFromBackend();
             setSyncSuccess(true);
             logger.user.action("Synced data from SQLite backend");
         } catch (error: unknown) {
@@ -116,7 +116,7 @@ export function Settings({ onClose }: SettingsProps) {
                         : String(error))
             );
         }
-    }, [syncSitesFromBackend, setError]);
+    }, [fullSyncFromBackend, setError]);
 
     const handleDownloadSQLite = async () => {
         setShowButtonLoading(true);

@@ -1,0 +1,1 @@
+export { IpcService } from "./IpcService";

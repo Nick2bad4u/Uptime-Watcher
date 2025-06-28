@@ -63,6 +63,7 @@ interface AppState {
     startSiteMonitorMonitoring: (siteId: string, monitorId: string) => Promise<void>;
     stopSiteMonitorMonitoring: (siteId: string, monitorId: string) => Promise<void>;
 
+    fullSyncFromBackend: () => Promise<void>;
     syncSitesFromBackend: () => Promise<void>;
 
     // Internal state actions (used by backend actions)
@@ -110,7 +111,7 @@ interface AppState {
 
 const defaultSettings: AppSettings = {
     autoStart: false,
-    historyLimit: 100,
+    historyLimit: 500,
     maxRetries: 3,
     minimizeToTray: true,
     notifications: true,
@@ -156,7 +157,7 @@ export const useStore = create<AppState>()(
                 state.clearError();
                 try {
                     await window.electronAPI.checkSiteNow(siteId, monitorId);
-                    // Backend will emit 'status-update', which will trigger syncSitesFromBackend
+                    // Backend will emit 'status-update', which will trigger optimized incremental update
                 } catch (error) {
                     state.setError(`Failed to check site: ${(error as Error).message}`);
                     throw error;
@@ -256,6 +257,11 @@ export const useStore = create<AppState>()(
                 } finally {
                     state.setLoading(false);
                 }
+            },
+            fullSyncFromBackend: async () => {
+                const state = get();
+                // Use syncSitesFromBackend for full refresh scenarios
+                await state.syncSitesFromBackend();
             },
             getSelectedMonitorId: (siteId) => {
                 const ids = get().selectedMonitorIds || {};
@@ -387,11 +393,47 @@ export const useStore = create<AppState>()(
                 }
             },
             subscribeToStatusUpdates: (callback: (update: StatusUpdate) => void) => {
-                window.electronAPI.onStatusUpdate(async (update) => {
-                    // Always fetch latest sites/monitors/history from backend for live updates
-                    await get().syncSitesFromBackend();
-                    // Optionally, call the provided callback for custom logic
-                    if (callback) callback(update);
+                window.electronAPI.onStatusUpdate((update: StatusUpdate) => {
+                    const state = get();
+
+                    try {
+                        // Smart incremental update - use the payload data directly
+                        // This prevents unnecessary full DB fetches on every status update
+                        const updatedSites = state.sites.map((site) => {
+                            if (site.identifier === update.site.identifier) {
+                                // Use the complete updated site data from the backend
+                                // This ensures we have the latest monitor status, history, and metadata
+                                return { ...update.site };
+                            }
+                            return site; // Keep other sites unchanged
+                        });
+
+                        // Check if the site was actually found and updated
+                        const siteFound = state.sites.some((site) => site.identifier === update.site.identifier);
+
+                        if (siteFound) {
+                            // Update store state efficiently without loading indicator
+                            state.setSites(updatedSites);
+                        } else {
+                            // Site not found in current state - trigger full sync as fallback
+                            // This handles edge cases like new sites added externally
+                            console.warn(`Site ${update.site.identifier} not found in store, triggering full sync`);
+                            state.fullSyncFromBackend().catch((error) => {
+                                console.error("Fallback full sync failed:", error);
+                                state.setError("Failed to sync site data");
+                            });
+                        }
+
+                        // Call the provided callback for custom logic (logging, notifications, etc.)
+                        if (callback) callback(update);
+                    } catch (error) {
+                        console.error("Error processing status update:", error);
+                        // Fallback to full sync on any processing error
+                        state.fullSyncFromBackend().catch((syncError) => {
+                            console.error("Fallback sync after error failed:", syncError);
+                            state.setError("Failed to process status update");
+                        });
+                    }
                 });
             },
             syncSitesFromBackend: async () => {

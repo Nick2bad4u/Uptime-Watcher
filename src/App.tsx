@@ -1,40 +1,39 @@
-/* eslint-disable perfectionist/sort-objects */
 import { useEffect, useState } from "react";
 
 import { AddSiteForm } from "./components/AddSiteForm/AddSiteForm";
+import { SiteList } from "./components/Dashboard/SiteList";
 import { Header } from "./components/Header/Header";
 import { Settings } from "./components/Settings/Settings";
 import { SiteDetails } from "./components/SiteDetails/SiteDetails";
-import { SiteList } from "./components/Dashboard/SiteList";
 import { UI_DELAYS } from "./constants";
 import { useBackendFocusSync } from "./hooks/useBackendFocusSync";
 import logger from "./services/logger";
 import { useStore } from "./store";
 import { ThemeProvider, ThemedBox, ThemedText, ThemedButton } from "./theme/components";
 import { useTheme } from "./theme/useTheme";
+import { StatusUpdate } from "./types";
 
 function App() {
     const {
-        sites,
-        showSettings,
-        showSiteDetails,
-        lastError,
-        isLoading,
-        updateStatus,
-        updateError,
+        applyUpdate,
+        clearError,
+        getSelectedSite,
         // Store actions - backend integration
         initializeApp,
-        subscribeToStatusUpdates,
-        unsubscribeFromStatusUpdates,
-        clearError,
+        isLoading,
+        lastError,
         // UI actions
         setShowSettings,
         setShowSiteDetails,
-        setUpdateStatus,
         setUpdateError,
-        applyUpdate,
-        getSelectedSite,
-        syncSitesFromBackend, // Add this
+        setUpdateStatus,
+        showSettings,
+        showSiteDetails,
+        sites,
+        subscribeToStatusUpdates,
+        unsubscribeFromStatusUpdates,
+        updateError,
+        updateStatus,
     } = useStore();
 
     const { isDark } = useTheme();
@@ -60,10 +59,13 @@ function App() {
         }
         initializeApp();
 
-        // Listen for status updates
-        const handleStatusUpdate = () => {
-            // No need to call updateSiteStatus; just sync from backend
-            syncSitesFromBackend();
+        // Subscribe to status updates with optimized incremental updates
+        // The store's subscribeToStatusUpdates now handles smart incremental updates automatically
+        // No need to manually sync - the store updates efficiently using the status update payload
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const handleStatusUpdate = (_update: StatusUpdate) => {
+            // Optional: Add any app-level status update handling here
+            // The store has already been updated with the new site data
         };
 
         subscribeToStatusUpdates(handleStatusUpdate);
@@ -72,7 +74,7 @@ function App() {
         return () => {
             unsubscribeFromStatusUpdates();
         };
-    }, [initializeApp, syncSitesFromBackend, subscribeToStatusUpdates, unsubscribeFromStatusUpdates]);
+    }, [initializeApp, subscribeToStatusUpdates, unsubscribeFromStatusUpdates]);
 
     // --- State Sync: Focus only (no polling) ---
     useBackendFocusSync(false); // Set to true to enable focus-based backend sync
