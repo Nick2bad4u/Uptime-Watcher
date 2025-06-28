@@ -70,13 +70,13 @@ Dashboard
 
 ```typescript
 const {
-  sites,           // Array of all monitored sites
-  isLoading,       // Global loading state
-  selectedSite,    // Currently selected site for details
-  addSite,         // Action to add new site
-  removeSite,      // Action to remove site
-  selectSite,      // Action to select site for details
-  updateSite       // Action to update site configuration
+ sites, // Array of all monitored sites
+ isLoading, // Global loading state
+ selectedSite, // Currently selected site for details
+ addSite, // Action to add new site
+ removeSite, // Action to remove site
+ selectSite, // Action to select site for details
+ updateSite, // Action to update site configuration
 } = useStore();
 ```
 
@@ -101,10 +101,10 @@ const {
 
 ```css
 .dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1rem;
-  padding: 1rem;
+ display: grid;
+ grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+ gap: 1rem;
+ padding: 1rem;
 }
 ```
 

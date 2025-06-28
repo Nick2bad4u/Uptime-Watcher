@@ -38,12 +38,12 @@ AddSiteForm (main component)
 
 ```typescript
 interface FormFieldProps {
-    children: React.ReactNode;
-    error?: string;
-    helpText?: string;
-    id: string;
-    label: string;
-    required?: boolean;
+ children: React.ReactNode;
+ error?: string;
+ helpText?: string;
+ id: string;
+ label: string;
+ required?: boolean;
 }
 ```
 
@@ -60,7 +60,7 @@ interface FormFieldProps {
 ```typescript
 // ARIA label helper with required suffix
 const REQUIRED_SUFFIX = " (required)";
-const createAriaLabel = (label: string, required: boolean): string => 
+const createAriaLabel = (label: string, required: boolean): string =>
     `${label}${required ? REQUIRED_SUFFIX : ""}`;
 
 // Memoized for performance
@@ -153,11 +153,11 @@ export const FormField = React.memo(function FormField({
 
 ```typescript
 const INTERVAL_OPTIONS = [
-    { value: 30, label: "30 seconds", performance: "high" },
-    { value: 60, label: "1 minute", performance: "medium" },
-    { value: 300, label: "5 minutes", performance: "low" },
-    { value: 900, label: "15 minutes", performance: "minimal" },
-    // ... more options
+ { value: 30, label: "30 seconds", performance: "high" },
+ { value: 60, label: "1 minute", performance: "medium" },
+ { value: 300, label: "5 minutes", performance: "low" },
+ { value: 900, label: "15 minutes", performance: "minimal" },
+ // ... more options
 ];
 ```
 
@@ -214,7 +214,7 @@ export const Submit = React.memo(function Submit({
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (hasErrors(errors)) return;
-        
+
         try {
             await onSubmit(formData);
         } catch (error) {
@@ -258,17 +258,17 @@ The form validation system is distributed across components but centrally coordi
 ```typescript
 // Individual field validation
 const validateUrl = (url: string): string | undefined => {
-    if (!url) return "URL is required";
-    if (!isValidUrl(url)) return "Please enter a valid URL";
-    if (!url.startsWith('http')) return "URL must include protocol (http:// or https://)";
-    return undefined;
+ if (!url) return "URL is required";
+ if (!isValidUrl(url)) return "Please enter a valid URL";
+ if (!url.startsWith("http")) return "URL must include protocol (http:// or https://)";
+ return undefined;
 };
 
 // Real-time validation on change
 const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setFormData(prev => ({ ...prev, url: value }));
-    setErrors(prev => ({ ...prev, url: validateUrl(value) }));
+ const value = e.target.value;
+ setFormData((prev) => ({ ...prev, url: value }));
+ setErrors((prev) => ({ ...prev, url: validateUrl(value) }));
 };
 ```
 
@@ -277,12 +277,12 @@ const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 ```typescript
 // Complete form validation before submission
 const validateForm = (data: SiteFormData): FormErrors => {
-    return {
-        url: validateUrl(data.url),
-        name: validateName(data.name),
-        interval: validateInterval(data.interval),
-        tags: validateTags(data.tags)
-    };
+ return {
+  url: validateUrl(data.url),
+  name: validateName(data.name),
+  interval: validateInterval(data.interval),
+  tags: validateTags(data.tags),
+ };
 };
 ```
 
@@ -344,11 +344,11 @@ const validateForm = (data: SiteFormData): FormErrors => {
 ```typescript
 // All form components are memoized
 export const FormField = React.memo(function FormField(props) {
-    // Component implementation
+ // Component implementation
 });
 
 export const UrlField = React.memo(function UrlField(props) {
-    // Component implementation
+ // Component implementation
 });
 ```
 
@@ -404,18 +404,18 @@ The form components integrate with custom hooks:
 ### Component Testing
 
 ```typescript
-describe('FormField', () => {
-    test('renders label and input correctly', () => {
-        // Test basic rendering
-    });
-    
-    test('displays error messages', () => {
-        // Test error display
-    });
-    
-    test('shows help text when no errors', () => {
-        // Test help text display
-    });
+describe("FormField", () => {
+ test("renders label and input correctly", () => {
+  // Test basic rendering
+ });
+
+ test("displays error messages", () => {
+  // Test error display
+ });
+
+ test("shows help text when no errors", () => {
+  // Test help text display
+ });
 });
 ```
 

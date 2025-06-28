@@ -68,12 +68,12 @@ The custom hook centralizes all form state management:
 
 ```typescript
 const {
-  formState,      // All form field values
-  isFormValid,    // Computed validation state
-  setUrl,         // URL field setter
-  setName,        // Name field setter
-  setMonitorType, // Monitor type setter
-  resetForm       // Form reset function
+ formState, // All form field values
+ isFormValid, // Computed validation state
+ setUrl, // URL field setter
+ setName, // Name field setter
+ setMonitorType, // Monitor type setter
+ resetForm, // Form reset function
 } = useAddSiteForm();
 ```
 

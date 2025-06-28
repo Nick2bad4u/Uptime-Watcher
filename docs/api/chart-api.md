@@ -12,7 +12,7 @@ Service class that provides theme-aware chart configurations for various chart t
 
 ```typescript
 export class ChartConfigService {
-    constructor(theme: Theme)
+ constructor(theme: Theme);
 }
 ```
 
@@ -46,9 +46,9 @@ const lineConfig = chartService.getLineChartConfig();
 
 // Use with Chart.js
 new Chart(ctx, {
-    type: 'line',
-    data: responseTimeData,
-    options: lineConfig
+ type: "line",
+ data: responseTimeData,
+ options: lineConfig,
 });
 ```
 
@@ -71,9 +71,9 @@ Returns configuration for bar charts, typically used for status distribution.
 const barConfig = chartService.getBarChartConfig();
 
 new Chart(ctx, {
-    type: 'bar',
-    data: statusDistributionData,
-    options: barConfig
+ type: "bar",
+ data: statusDistributionData,
+ options: barConfig,
 });
 ```
 
@@ -100,9 +100,9 @@ Returns configuration for doughnut charts, typically used for uptime distributio
 const doughnutConfig = chartService.getDoughnutChartConfig(1000);
 
 new Chart(ctx, {
-    type: 'doughnut',
-    data: uptimeData,
-    options: doughnutConfig
+ type: "doughnut",
+ data: uptimeData,
+ options: doughnutConfig,
 });
 ```
 
@@ -113,7 +113,7 @@ new Chart(ctx, {
 React hook that provides theme-aware chart configurations with automatic theme updates.
 
 ```typescript
-function useChartConfigs(theme: Theme, totalChecks?: number): ChartConfigs
+function useChartConfigs(theme: Theme, totalChecks?: number): ChartConfigs;
 ```
 
 **Parameters:**
@@ -125,9 +125,9 @@ function useChartConfigs(theme: Theme, totalChecks?: number): ChartConfigs
 
 ```typescript
 interface ChartConfigs {
-    lineChartOptions: ChartOptions<'line'>;
-    barChartOptions: ChartOptions<'bar'>;
-    doughnutOptions: ChartOptions<'doughnut'>;
+ lineChartOptions: ChartOptions<"line">;
+ barChartOptions: ChartOptions<"bar">;
+ doughnutOptions: ChartOptions<"doughnut">;
 }
 ```
 
@@ -191,14 +191,14 @@ The chart configurations automatically adapt to theme changes using:
 
 ```typescript
 // Colors
-theme.colors.text.primary        // Legend and title text
-theme.colors.text.secondary      // Axis labels and tooltips
-theme.colors.surface.elevated    // Tooltip background
-theme.colors.border.primary      // Tooltip borders
-theme.colors.border.secondary    // Grid lines
+theme.colors.text.primary; // Legend and title text
+theme.colors.text.secondary; // Axis labels and tooltips
+theme.colors.surface.elevated; // Tooltip background
+theme.colors.border.primary; // Tooltip borders
+theme.colors.border.secondary; // Grid lines
 
 // Typography
-theme.typography.fontFamily.sans // Font family for all text
+theme.typography.fontFamily.sans; // Font family for all text
 ```
 
 ### Color Mapping
@@ -232,24 +232,24 @@ function MonitoringCharts({ responseTimeData, statusDistributionData, uptimeData
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="chart-container">
-                <Line 
-                    data={responseTimeData} 
+                <Line
+                    data={responseTimeData}
                     options={lineChartOptions}
                     height={300}
                 />
             </div>
-            
+
             <div className="chart-container">
-                <Bar 
-                    data={statusDistributionData} 
+                <Bar
+                    data={statusDistributionData}
                     options={barChartOptions}
                     height={300}
                 />
             </div>
-            
+
             <div className="chart-container">
-                <Doughnut 
-                    data={uptimeData} 
+                <Doughnut
+                    data={uptimeData}
                     options={doughnutOptions}
                     height={300}
                 />
@@ -265,10 +265,10 @@ function MonitoringCharts({ responseTimeData, statusDistributionData, uptimeData
 function ThemeAwareChart() {
     const theme = useTheme();
     const [data, setData] = useState(chartData);
-    
+
     // Chart configurations automatically update when theme changes
     const { lineChartOptions } = useChartConfigs(theme);
-    
+
     useEffect(() => {
         // Chart will re-render with new theme colors
     }, [theme]);
@@ -282,20 +282,22 @@ function ThemeAwareChart() {
 ```typescript
 // For non-React usage or custom implementations
 function createCustomChart(canvas: HTMLCanvasElement, theme: Theme) {
-    const chartService = new ChartConfigService(theme);
-    
-    return new Chart(canvas, {
-        type: 'line',
-        data: {
-            datasets: [{
-                label: 'Response Time',
-                data: responseTimeData,
-                borderColor: theme.colors.primary,
-                backgroundColor: theme.colors.primary + '20', // Add transparency
-            }]
-        },
-        options: chartService.getLineChartConfig()
-    });
+ const chartService = new ChartConfigService(theme);
+
+ return new Chart(canvas, {
+  type: "line",
+  data: {
+   datasets: [
+    {
+     label: "Response Time",
+     data: responseTimeData,
+     borderColor: theme.colors.primary,
+     backgroundColor: theme.colors.primary + "20", // Add transparency
+    },
+   ],
+  },
+  options: chartService.getLineChartConfig(),
+ });
 }
 ```
 
@@ -308,7 +310,7 @@ The chart configurations are designed to work seamlessly with the `HistoryChart`
 const { lineChartOptions } = useChartConfigs(theme);
 
 return (
-    <Line 
+    <Line
         data={chartData}
         options={lineChartOptions}
         plugins={[/* custom plugins */]}

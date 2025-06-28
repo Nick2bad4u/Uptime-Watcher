@@ -49,7 +49,7 @@ docs/
 
 - `AddSiteForm.md` - AddSiteForm component structure and best practices
 - `AddSiteForm-Components.md` - AddSiteForm sub-components (FormFields, Submit)
-- `Dashboard.md` - Dashboard component architecture and features  
+- `Dashboard.md` - Dashboard component architecture and features
 - `SiteDetails.md` - SiteDetails modal component system
 - `SiteDetails-Tab-Components.md` - SiteDetails tab components (Overview, History, Analytics, Settings)
 - `SiteCard-Components.md` - SiteCard component system and sub-components

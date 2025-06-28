@@ -48,7 +48,7 @@ Header
 ├── Status Summary Section
 │   ├── Overall Health Badge
 │   ├── Up Monitors Count
-│   ├── Down Monitors Count  
+│   ├── Down Monitors Count
 │   ├── Pending Monitors Count
 │   └── Total Monitors Count
 └── Controls Section
@@ -73,25 +73,23 @@ The Header performs real-time calculations across all sites and monitors:
 ```typescript
 // Count monitors by status across all sites
 let upMonitors = 0;
-let downMonitors = 0; 
+let downMonitors = 0;
 let pendingMonitors = 0;
 let totalMonitors = 0;
 
 for (const site of sites) {
-    if (site.monitors) {
-        for (const monitor of site.monitors) {
-            totalMonitors++;
-            if (monitor.status === "up") upMonitors++;
-            else if (monitor.status === "down") downMonitors++;
-            else if (monitor.status === "pending") pendingMonitors++;
-        }
-    }
+ if (site.monitors) {
+  for (const monitor of site.monitors) {
+   totalMonitors++;
+   if (monitor.status === "up") upMonitors++;
+   else if (monitor.status === "down") downMonitors++;
+   else if (monitor.status === "pending") pendingMonitors++;
+  }
+ }
 }
 
 // Calculate overall uptime percentage
-const uptimePercentage = totalMonitors > 0 
-    ? Math.round((upMonitors / totalMonitors) * 100) 
-    : 0;
+const uptimePercentage = totalMonitors > 0 ? Math.round((upMonitors / totalMonitors) * 100) : 0;
 ```
 
 ---
@@ -148,9 +146,7 @@ const { sites } = useStore();
 const { isDark, toggleTheme } = useTheme();
 
 // Header provides UI for theme switching
-<ThemedButton onClick={toggleTheme}>
-    {isDark ? "☀️" : "🌙"}
-</ThemedButton>
+<ThemedButton onClick={toggleTheme}>{isDark ? "☀️" : "🌙"}</ThemedButton>;
 ```
 
 ---

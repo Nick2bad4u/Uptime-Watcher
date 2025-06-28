@@ -1,4 +1,3 @@
-
 <!-- markdownlint-disable -->
 
 # JSDoc Documentation Implementation Plan
@@ -169,8 +168,9 @@ After systematic review of all 90 TypeScript/JavaScript files:
 ## ACHIEVEMENT: 100% JSDoc Coverage Complete! 🎉
 
 The Uptime Watcher project now has comprehensive JSDoc documentation across:
+
 - **All Core Application Files** - Complete type definitions, store management, and entry points
-- **All React Components** - Every UI component from forms to dashboards with detailed props documentation  
+- **All React Components** - Every UI component from forms to dashboards with detailed props documentation
 - **All Custom Hooks** - Site management, analytics, and backend sync hooks fully documented
 - **All Electron Services** - Database, monitoring, IPC, window, and update services comprehensively documented
 - **All Theme System** - Complete theming infrastructure with manager, hooks, and components
@@ -192,7 +192,7 @@ The Uptime Watcher project now has comprehensive JSDoc documentation across:
 
 ### JSDoc Format
 
-```typescript
+````typescript
 /**
  * Brief description of the function/class/component.
  * More detailed description if needed.
@@ -206,14 +206,14 @@ The Uptime Watcher project now has comprehensive JSDoc documentation across:
  * const result = myFunction(param);
  * ```
  */
-```
+````
 
 ### Component Documentation
 
 ```typescript
 /**
  * Component description and purpose.
- * 
+ *
  * Features:
  * - List key features
  * - Important behaviors
@@ -232,17 +232,17 @@ The Uptime Watcher project now has comprehensive JSDoc documentation across:
  * Explains the class's role in the application architecture.
  */
 export class MyClass {
-    /** Property description */
-    private property: Type;
-    
-    /**
-     * Method description.
-     * @param param - Parameter description
-     * @returns Return description
-     */
-    public method(param: Type): ReturnType {
-        // implementation
-    }
+ /** Property description */
+ private property: Type;
+
+ /**
+  * Method description.
+  * @param param - Parameter description
+  * @returns Return description
+  */
+ public method(param: Type): ReturnType {
+  // implementation
+ }
 }
 ```
 

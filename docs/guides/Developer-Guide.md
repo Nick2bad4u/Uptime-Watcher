@@ -33,30 +33,30 @@ npm run dev:electron   # Terminal 2: Electron app
 
 1. **Clone the repository:**
 
-  ```bash
-  git clone https://github.com/your-username/uptime-watcher.git
-  cd uptime-watcher
-  ```
+```bash
+git clone https://github.com/your-username/uptime-watcher.git
+cd uptime-watcher
+```
 
 2. **Install dependencies:**
 
-  ```bash
-  npm install
-  ```
+```bash
+npm install
+```
 
 3. **Download SQLite WASM:**
 
-  ```bash
-  npm run download-sqlite3-wasm
-  ```
+```bash
+npm run download-sqlite3-wasm
+```
 
 4. **Start development server:**
 
-  ```bash
-  npm run dev
-  ```
+```bash
+npm run dev
+```
 
---------------------------------------------------------------------------------
+---
 
 ## 🏗️ Project Structure
 
@@ -95,7 +95,7 @@ uptime-watcher/
 └── scripts/                 # Build and utility scripts
 ```
 
---------------------------------------------------------------------------------
+---
 
 ## 🛠️ Development Workflow
 
@@ -121,19 +121,19 @@ npm run type-check         # Run TypeScript compiler
 
 1. **Start the renderer process:**
 
-  ```bash
-  npm run dev
-  ```
+```bash
+npm run dev
+```
 
 2. **In another terminal, start Electron:**
 
-  ```bash
-  npm run dev:electron
-  ```
+```bash
+npm run dev:electron
+```
 
 The app will hot-reload when you make changes to the frontend code.
 
---------------------------------------------------------------------------------
+---
 
 ## 🎯 Architecture Overview
 
@@ -163,7 +163,7 @@ User Action → Frontend Component → Store Action → IPC → Backend Service 
 Frontend Component ← Store Update ← IPC Response ← Service Response ← Database Result
 ```
 
---------------------------------------------------------------------------------
+---
 
 ## 🔧 Development Patterns
 
@@ -172,15 +172,15 @@ Frontend Component ← Store Update ← IPC Response ← Service Response ← Da
 ```typescript
 // Example service structure
 export class SiteRepository {
-  constructor(private db: DatabaseService) {}
+ constructor(private db: DatabaseService) {}
 
-  async createSite(site: CreateSiteRequest): Promise<Site> {
-    // Implementation
-  }
+ async createSite(site: CreateSiteRequest): Promise<Site> {
+  // Implementation
+ }
 
-  async updateSite(id: string, updates: UpdateSiteRequest): Promise<Site> {
-    // Implementation
-  }
+ async updateSite(id: string, updates: UpdateSiteRequest): Promise<Site> {
+  // Implementation
+ }
 }
 ```
 
@@ -205,25 +205,25 @@ export const MyComponent: React.FC<MyComponentProps> = ({ prop1, prop2 }) => {
 ```typescript
 // Example custom hook
 export const useMyFeature = () => {
-  const [localState, setLocalState] = useState();
-  const { globalState, globalAction } = useStore();
+ const [localState, setLocalState] = useState();
+ const { globalState, globalAction } = useStore();
 
-  const derivedValue = useMemo(() => {
-    // Computation
-  }, [dependencies]);
+ const derivedValue = useMemo(() => {
+  // Computation
+ }, [dependencies]);
 
-  return {
-    localState,
-    derivedValue,
-    actions: {
-      localAction: setLocalState,
-      globalAction
-    }
-  };
+ return {
+  localState,
+  derivedValue,
+  actions: {
+   localAction: setLocalState,
+   globalAction,
+  },
+ };
 };
 ```
 
---------------------------------------------------------------------------------
+---
 
 ## 🎨 Styling Guidelines
 
@@ -237,9 +237,9 @@ const { theme, isDark, toggleTheme } = useTheme();
 
 // Theme-aware styling
 const styles = {
-  background: theme.colors.background,
-  text: theme.colors.text,
-  border: theme.colors.border
+ background: theme.colors.background,
+ text: theme.colors.text,
+ border: theme.colors.border,
 };
 ```
 
@@ -263,7 +263,7 @@ import { ThemedBox, ThemedText, ThemedButton } from '../theme/components';
 </div>
 ```
 
---------------------------------------------------------------------------------
+---
 
 ## 🧪 Testing
 
@@ -299,7 +299,7 @@ test('creates site successfully', async () => {
 });
 ```
 
---------------------------------------------------------------------------------
+---
 
 ## 📝 Code Standards
 
@@ -313,18 +313,18 @@ test('creates site successfully', async () => {
 ```typescript
 // ✅ Good
 interface CreateSiteRequest {
-  url: string;
-  name?: string;
-  monitorType: MonitorType;
+ url: string;
+ name?: string;
+ monitorType: MonitorType;
 }
 
 async function createSite(request: CreateSiteRequest): Promise<Site> {
-  // Implementation
+ // Implementation
 }
 
 // ❌ Avoid
 async function createSite(request: any): Promise<any> {
-  // Implementation
+ // Implementation
 }
 ```
 
@@ -338,21 +338,21 @@ async function createSite(request: any): Promise<any> {
 ```typescript
 // ✅ Good
 interface MyComponentProps {
-  title: string;
-  onAction: () => void;
+ title: string;
+ onAction: () => void;
 }
 
 export const MyComponent: React.FC<MyComponentProps> = React.memo(({ title, onAction }) => {
-  // Implementation
+ // Implementation
 });
 
 // ❌ Avoid
 export const MyComponent = ({ title, onAction }) => {
-  // Implementation
+ // Implementation
 };
 ```
 
---------------------------------------------------------------------------------
+---
 
 ## 🔍 Debugging
 
@@ -388,7 +388,7 @@ export const MyComponent = ({ title, onAction }) => {
 - Check theme context is provided
 - Verify CSS custom properties
 
---------------------------------------------------------------------------------
+---
 
 ## 🚀 Building & Deployment
 
@@ -396,21 +396,21 @@ export const MyComponent = ({ title, onAction }) => {
 
 1. **Frontend Build:**
 
-  ```bash
-  npm run build
-  ```
+```bash
+npm run build
+```
 
 2. **Backend Build:**
 
-  ```bash
-  npm run build:electron
-  ```
+```bash
+npm run build:electron
+```
 
 3. **Create Distribution:**
 
-  ```bash
-  npm run dist
-  ```
+```bash
+npm run dist
+```
 
 ### Distribution Files
 
@@ -418,7 +418,7 @@ export const MyComponent = ({ title, onAction }) => {
 - **macOS:** `.dmg` and `.app` bundle
 - **Linux:** `.AppImage`, `.deb`, and `.rpm` packages
 
---------------------------------------------------------------------------------
+---
 
 ## 📚 Additional Resources
 
@@ -436,7 +436,7 @@ export const MyComponent = ({ title, onAction }) => {
 - **Zustand Guide:** <https://github.com/pmndrs/zustand>
 - **TypeScript Handbook:** <https://typescriptlang.org/docs>
 
---------------------------------------------------------------------------------
+---
 
 ## 🤝 Contributing
 
@@ -462,7 +462,7 @@ export const MyComponent = ({ title, onAction }) => {
 - [ ] Documentation is updated
 - [ ] Performance impact considered
 
---------------------------------------------------------------------------------
+---
 
 ## 📞 Support
 
@@ -473,7 +473,7 @@ For development questions or issues:
 3. **Create Issue:** Open a new issue with details
 4. **Ask Community:** Use GitHub discussions for general questions
 
---------------------------------------------------------------------------------
+---
 
 _Happy coding! 🎉_
 

@@ -84,11 +84,11 @@ The SiteDetails component integrates with multiple state sources:
 
 ```typescript
 const {
-  selectedSite,     // Currently selected site for details
-  closeSiteDetails, // Action to close the modal
-  updateSite,       // Action to update site settings
-  deleteSite,       // Action to delete a site
-  analytics         // Site analytics data
+ selectedSite, // Currently selected site for details
+ closeSiteDetails, // Action to close the modal
+ updateSite, // Action to update site settings
+ deleteSite, // Action to delete a site
+ analytics, // Site analytics data
 } = useStore();
 ```
 

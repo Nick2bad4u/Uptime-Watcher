@@ -12,16 +12,16 @@ If you discover a security vulnerability, please report it by emailing [20943337
 - Always use the latest version of Uptime Watcher.
 - Keep all dependencies up to date. The current major dependencies and their versions are:
 
-| Dependency       | Version   |
-| ---------------- | --------- |
-| electron         | 36.2.0    |
-| electron-builder | ^26.0.15  |
-| electron-store   | ^10.0.1   |
-| electron-updater | ^6.6.4    |
-| react            | ^18.3.1   |
-| typescript       | ^5.7.2    |
-| vite             | ^6.0.7    |
-| tailwindcss      | ^3.4.17   |
+| Dependency       | Version  |
+| ---------------- | -------- |
+| electron         | 36.2.0   |
+| electron-builder | ^26.0.15 |
+| electron-store   | ^10.0.1  |
+| electron-updater | ^6.6.4   |
+| react            | ^18.3.1  |
+| typescript       | ^5.7.2   |
+| vite             | ^6.0.7   |
+| tailwindcss      | ^3.4.17  |
 
 - Do not monitor sensitive internal URLs that could expose credentials.
 - Be cautious when sharing monitoring configurations that might contain sensitive information.
