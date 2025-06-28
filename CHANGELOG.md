@@ -7,14 +7,115 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[de553f2](https://github.com/Nick2bad4u/Uptime-Watcher/commit/de553f2e025dee562de0d73f63b130c8b32443aa)...
+[ab848a6](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ab848a6e7ca911edda37ecebe136fda8f267efc9)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/de553f2e025dee562de0d73f63b130c8b32443aa...ab848a6e7ca911edda37ecebe136fda8f267efc9))
+
+
+### 🛠️ GitHub Actions
+
+- Update prettier.yml [`(ab848a6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ab848a6e7ca911edda37ecebe136fda8f267efc9)
+
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 3.3.0 [`(de553f2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/de553f2e025dee562de0d73f63b130c8b32443aa)
+
+
+
+
+
+
+## [3.3.0] - 2025-06-28
+
+
 [[66fed3e](https://github.com/Nick2bad4u/Uptime-Watcher/commit/66fed3e4d9a917ca24eb592df628f68e9e83151f)...
-[66fed3e](https://github.com/Nick2bad4u/Uptime-Watcher/commit/66fed3e4d9a917ca24eb592df628f68e9e83151f)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/66fed3e4d9a917ca24eb592df628f68e9e83151f...66fed3e4d9a917ca24eb592df628f68e9e83151f))
+[88a93af](https://github.com/Nick2bad4u/Uptime-Watcher/commit/88a93af0d91097e73f65cd2e8cadf13a5e060aad)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/66fed3e4d9a917ca24eb592df628f68e9e83151f...88a93af0d91097e73f65cd2e8cadf13a5e060aad))
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(88a93af)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/88a93af0d91097e73f65cd2e8cadf13a5e060aad)
+
+
+
+### 💼 Other
+
+- Update metrics.repository.svg - [Skip GitHub Action] [`(0dc5398)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0dc5398cb0a6eaca49cd77b3bfcfb7b2f0e4bbee)
+
+
+- 🚜 [refactor] Modularizes backend architecture and optimizes sync
+
+- Refactors backend codebase to a fully modular service/repository architecture, mirroring frontend patterns for maintainability and testability
+  - Extracts all database, monitoring, notification, updater, window, and IPC logic into dedicated services and repositories with clear separation of concerns
+  - Removes monolithic logic from main process entry point, delegating orchestration to an application service
+  - Centralizes logging and error handling, ensuring consistent and robust diagnostics across all domains
+
+- Optimizes frontend-backend synchronization for real-time UI updates
+  - Implements smart incremental site updates using status event payloads, replacing inefficient full-database fetches on every monitor check
+  - Achieves instant UI responsiveness and drastically reduces backend query load, supporting scalability for large site counts
+  - Adds fallback to full sync for edge cases and error scenarios, ensuring reliability
+
+- Fixes duplicate log entries and standardizes logging behaviors throughout the app, including React component event deduplication
+
+- Enhances code quality and maintainability:
+  - Cleans dead code, unused imports, and applies rigorous lint/formatting standards
+  - Improves type safety, validation, and error resilience in both backend and frontend integration points
+
+- Updates documentation and configuration to reflect new architecture and performance improvements
+
+- Addresses real-time update bug for history and metrics in UI, and ensures all site/monitor changes are reflected instantly
+
+- [dependency] Updates relevant dependencies for compatibility and development experience
+
+Relates to performance, maintainability, and real-time UX improvements [`(750de8e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/750de8e4750000c9898ce23429cf32f6ed31aa50)
+
+
+- 🚜 [refactor] Move site hooks to dedicated subfolder
+
+- Improves project structure by relocating site analytics and details hooks to a dedicated "site" subdirectory
+- Updates imports throughout the codebase to reference new hook locations
+- Enhances code maintainability and discoverability by grouping related hooks
+
+No functional changes introduced; supports better scalability for future site-related features. [`(829150a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/829150adcc38e691f1adfd85a1cff432ba7c8809)
+
+
+- 🚜 [refactor] Modularize and streamline site details UI
+
+- Splits a large, monolithic site details component into modular, focused subcomponents for header, navigation, and tab content, improving readability and maintainability
+- Introduces a custom hook to encapsulate site details state and logic, reducing prop drilling and duplication
+- Moves tab content (overview, analytics, history, settings) to dedicated files with improved cohesion and separation of concerns
+- Removes inline debug code and outdated comments for cleaner production code
+- Ensures all user actions (tab changes, filter changes, key settings) are logged for better analytics and traceability
+- Enhances code organization and paves way for easier future enhancements and testing [`(0c4b982)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0c4b982d131386cbdaabda115efd6f4c0d8a6ff6)
+
+
+
+### ⚙️ Miscellaneous Tasks
+
+- Update changelogs for v3.2.0 [skip ci] [`(3a74493)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3a74493821086ca2ce4417eb1a76c828b73b4e7f)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 3.2.0 [`(66fed3e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/66fed3e4d9a917ca24eb592df628f68e9e83151f)
+
+
+
+### 🛡️ Security
+
+- 🚜 [refactor] Modularize and document SiteDetails; improve project structure
+
+- Refactors the monolithic SiteDetails component by planning and summarizing its decomposition into modular, testable subcomponents and custom hooks, mirroring the SiteCard refactor strategy
+- Documents the refactor in detail, outlining architecture changes, new hooks, component breakdown, and migration notes to guide maintainability and future improvements
+- Adds dedicated markdown documentation for both the refactor summary and migration process, enhancing codebase transparency and onboarding
+- Introduces various chatmode and prompt templates for debugging, documentation, code review, migration, security, and test writing, improving AI assistant usability and project workflows
+- Cleans up obsolete files and wordlists, updates spellcheck dictionaries, and streamlines VSCode and cspell configuration for better development experience
+
+- Lays groundwork for improved maintainability, readability, and testability in large React components, with clear patterns for future modularization across the app [`(0fc01d9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0fc01d993d238c2c2d371c2f747c622aac70da05)
 
 
 
