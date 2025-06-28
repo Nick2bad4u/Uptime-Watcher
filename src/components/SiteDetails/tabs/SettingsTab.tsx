@@ -1,3 +1,8 @@
+/**
+ * Settings tab component for configuring site monitoring parameters.
+ * Provides interface for modifying site settings, intervals, and performing site management actions.
+ */
+
 import React from "react";
 import { FiTrash2, FiSave } from "react-icons/fi";
 
@@ -14,21 +19,50 @@ import {
 } from "../../../theme/components";
 import { Site, Monitor } from "../../../types";
 
+/**
+ * Props for the SettingsTab component.
+ */
 interface SettingsTabProps {
+    /** Current site being configured */
     currentSite: Site;
+    /** Handler for monitor check interval changes */
     handleIntervalChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    /** Handler for removing/deleting the site */
     handleRemoveSite: () => Promise<void>;
+    /** Handler for saving interval changes */
     handleSaveInterval: () => void;
+    /** Handler for saving site name changes */
     handleSaveName: () => Promise<void>;
+    /** Whether there are unsaved changes pending */
     hasUnsavedChanges: boolean;
+    /** Whether the check interval has been modified */
     intervalChanged: boolean;
+    /** Whether any async operation is in progress */
     isLoading: boolean;
+    /** Local state value for check interval */
     localCheckInterval: number;
+    /** Local state value for site name */
     localName: string;
+    /** Currently selected monitor being configured */
     selectedMonitor: Monitor;
+    /** Function to update local site name state */
     setLocalName: (name: string) => void;
 }
 
+/**
+ * Settings tab component providing site configuration interface.
+ *
+ * Features:
+ * - Site name editing with validation
+ * - Monitor check interval configuration
+ * - Monitor status and information display
+ * - Site removal with confirmation
+ * - Unsaved changes tracking and warnings
+ * - Real-time settings validation
+ *
+ * @param props - Component props containing site data and handlers
+ * @returns JSX element displaying settings interface
+ */
 export function SettingsTab({
     currentSite,
     handleIntervalChange,

@@ -1,3 +1,8 @@
+/**
+ * Main App component for Uptime Watcher application.
+ * Manages global state, modals, notifications, and renders the main application layout.
+ */
+
 import { useEffect, useState } from "react";
 
 import { AddSiteForm } from "./components/AddSiteForm/AddSiteForm";
@@ -13,6 +18,20 @@ import { ThemeProvider, ThemedBox, ThemedText, ThemedButton } from "./theme/comp
 import { useTheme } from "./theme/useTheme";
 import { StatusUpdate } from "./types";
 
+/**
+ * Main application component that serves as the root of the Uptime Watcher app.
+ *
+ * Features:
+ * - Global state management via Zustand store
+ * - Theme management with light/dark mode support
+ * - Modal management (Settings, Site Details)
+ * - Error and update notifications
+ * - Loading states with delayed overlay
+ * - Real-time status updates subscription
+ * - Focus-based backend synchronization
+ *
+ * @returns The main App component JSX
+ */
 function App() {
     const {
         applyUpdate,
@@ -41,7 +60,10 @@ function App() {
     // Delayed loading state to prevent flash for quick operations
     const [showLoadingOverlay, setShowLoadingOverlay] = useState(false);
 
-    // Only show loading overlay if loading takes more than 100ms
+    /**
+     * Only show loading overlay if loading takes more than 100ms
+     * This prevents flash for quick operations while still providing feedback for longer ones
+     */
     useEffect(() => {
         if (isLoading) {
             const timeoutId = setTimeout(() => {
@@ -53,6 +75,14 @@ function App() {
         }
     }, [isLoading]);
 
+    /**
+     * Initialize the application and set up status update subscriptions.
+     * This effect handles:
+     * - Development logging
+     * - App initialization
+     * - Status update subscription with smart incremental updates
+     * - Cleanup on component unmount
+     */
     useEffect(() => {
         if (process.env.NODE_ENV === "production") {
             logger.app.started();
@@ -76,7 +106,7 @@ function App() {
         };
     }, [initializeApp, subscribeToStatusUpdates, unsubscribeFromStatusUpdates]);
 
-    // --- State Sync: Focus only (no polling) ---
+    // Focus-based state synchronization (disabled by default for performance)
     useBackendFocusSync(false); // Set to true to enable focus-based backend sync
 
     const selectedSite = getSelectedSite();

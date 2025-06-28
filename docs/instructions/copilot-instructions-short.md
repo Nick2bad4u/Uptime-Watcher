@@ -1,6 +1,7 @@
 # Uptime Watcher: State & Theme Integration Guide (Short Version)
 
 ## State Management (Zustand)
+
 - **Centralized store** in `src/store.ts` with persistence for `sites`, `settings`, `checkInterval`, `darkMode`, `totalUptime`, `totalDowntime`.
 - **State access:** Always use `useStore()` and store actions (e.g., `addSite`, `setError`, `setLoading`).
 - **Error handling:** Use `setError`, `clearError`, and `setLoading` in all async ops. Always clear errors before new actions.
@@ -8,6 +9,7 @@
 - **UI state & errors** are NOT persisted.
 
 ## Theme System
+
 - **ThemeManager** singleton in `src/theme/ThemeManager.ts` manages theme switching, CSS vars, and system preference.
 - **Themes**: Use `settings.theme` in store for theme selection (`light`, `dark`, `high-contrast`, `system`).
 - **Hooks:**
@@ -17,10 +19,12 @@
   - `useStatusColors()` for status-specific colors.
 
 ## Themed Components
+
 - **Use only themed components** (from `../theme/components`): `ThemedBox`, `ThemedText`, `ThemedButton`, `StatusIndicator`, `ThemedInput`, `ThemedSelect`, `ThemedCheckbox`, `MiniChartBar`.
 - **Variants:** Use `variant`, `surface`, and status props for consistent styling. Never hardcode colors or styles.
 
 ## Implementation Checklist
+
 - [ ] Use `useStore()` for all state
 - [ ] Use error/loading actions for async ops
 - [ ] Use only themed components (no custom CSS)
@@ -33,6 +37,7 @@
 - [ ] Clean up listeners/timers
 
 ## Patterns & Best Practices
+
 - **State:**
   - Select only needed state from store
   - Never mutate state directly
@@ -47,6 +52,7 @@
   - Clean up side effects
 
 ## Summary
+
 - Centralized state (Zustand)
 - Themed components only
 - Proper error/loading handling

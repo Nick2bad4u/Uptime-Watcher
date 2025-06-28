@@ -1,3 +1,12 @@
+/**
+ * Themed UI components for the Uptime Watcher application.
+ *
+ * Provides a comprehensive set of themed React components including boxes, buttons,
+ * inputs, selects, badges, and specialized components for status display.
+ * All components support the application's theming system with variants,
+ * surfaces, and responsive design capabilities.
+ */
+
 import React from "react";
 
 import { ARIA_LABEL, TRANSITION_ALL } from "../constants";

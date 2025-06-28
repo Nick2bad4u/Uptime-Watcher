@@ -1,3 +1,14 @@
+/**
+ * Custom hook for managing site details state and operations
+ *
+ * Provides comprehensive state management for the site details view including:
+ * - Site data and monitor information
+ * - UI state (active tab, loading states)
+ * - Site operations (start/stop monitoring, check now, update settings)
+ * - Local state management for editable fields
+ * - Integration with analytics data
+ */
+
 import { useEffect, useState, useCallback } from "react";
 
 import { AUTO_REFRESH_INTERVAL } from "../../constants";
@@ -6,9 +17,38 @@ import { useStore } from "../../store";
 import { Site } from "../../types";
 import { useSiteAnalytics } from "./useSiteAnalytics";
 
+/** Props for the useSiteDetails hook */
 interface UseSiteDetailsProps {
+    /** The site object to manage details for */
     site: Site;
 }
+
+/**
+ * Hook for managing site details state and operations.
+ *
+ * Provides all necessary state and handlers for the site details view,
+ * including monitor selection, monitoring controls, settings management,
+ * and integration with analytics.
+ *
+ * @param props - Hook props containing the site to manage
+ * @returns Object containing all site details state and handlers
+ *
+ * @example
+ * ```tsx
+ * function SiteDetails({ site }) {
+ *   const {
+ *     currentSite,
+ *     selectedMonitor,
+ *     isLoading,
+ *     handleStartMonitoring,
+ *     handleStopMonitoring,
+ *     // ... other state and handlers
+ *   } = useSiteDetails({ site });
+ *
+ *   // Use the state and handlers in your component
+ * }
+ * ```
+ */
 
 export function useSiteDetails({ site }: UseSiteDetailsProps) {
     const {

@@ -1,7 +1,17 @@
+/**
+ * Retry utility for handling transient failures in database and network operations.
+ * Provides configurable retry logic with exponential backoff for robust error handling.
+ */
+
 import { dbLogger } from "./logger";
 
 /**
  * Generic retry utility with configurable parameters
+ *
+ * @param operation - The async operation to retry
+ * @param options - Retry configuration options
+ * @returns Promise that resolves with the operation result
+ * @throws Error if all retry attempts fail
  */
 export async function withRetry<T>(
     operation: () => Promise<T>,
@@ -40,7 +50,12 @@ export async function withRetry<T>(
 }
 
 /**
- * Database-specific retry wrapper
+ * Database-specific retry wrapper with optimized settings for database operations.
+ *
+ * @param operation - Database operation to retry
+ * @param operationName - Name of the operation for logging
+ * @param maxRetries - Maximum number of retry attempts (default: 5)
+ * @returns Promise that resolves with the operation result
  */
 export async function withDbRetry<T>(operation: () => Promise<T>, operationName: string, maxRetries = 5): Promise<T> {
     return withRetry(operation, {

@@ -1,11 +1,28 @@
+/**
+ * ThemeManager class for handling theme selection, system preference detection,
+ * and theme switching throughout the application.
+ */
+
 import { themes } from "./themes";
 import { Theme, ThemeName } from "./types";
 
+/**
+ * Singleton service for managing application themes.
+ * Handles theme selection, system preference detection, and automatic switching.
+ */
 export class ThemeManager {
+    /** Singleton instance */
     private static instance: ThemeManager;
 
+    /** Private constructor to enforce singleton pattern */
     private constructor() {}
 
+    /**
+     * Get the singleton instance of ThemeManager.
+     * Creates the instance if it doesn't exist.
+     *
+     * @returns ThemeManager singleton instance
+     */
     public static getInstance(): ThemeManager {
         if (!ThemeManager.instance) {
             ThemeManager.instance = new ThemeManager();
@@ -14,7 +31,11 @@ export class ThemeManager {
     }
 
     /**
-     * Get theme by name
+     * Get theme by name, with automatic system theme detection.
+     * Handles "system" theme by detecting user's OS preference.
+     *
+     * @param name - Theme name to retrieve
+     * @returns Theme object containing colors, typography, and spacing
      */
     getTheme(name: ThemeName): Theme {
         if (name === "system") {
@@ -32,7 +53,10 @@ export class ThemeManager {
     }
 
     /**
-     * Get system theme preference
+     * Get system theme preference from OS/browser settings.
+     * Uses CSS media query to detect dark mode preference.
+     *
+     * @returns "dark" if user prefers dark mode, "light" otherwise
      */
     getSystemThemePreference(): "light" | "dark" {
         if (typeof window !== "undefined" && window.matchMedia) {
@@ -42,7 +66,11 @@ export class ThemeManager {
     }
 
     /**
-     * Listen for system theme changes
+     * Listen for system theme changes and call callback when detected.
+     * Useful for automatic theme switching when user changes OS settings.
+     *
+     * @param callback - Function to call when system theme changes
+     * @returns Cleanup function to remove the event listener
      */
     onSystemThemeChange(callback: (isDark: boolean) => void): () => void {
         if (typeof window === "undefined" || !window.matchMedia) {

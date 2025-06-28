@@ -1,20 +1,54 @@
+/**
+ * Action button group component for site monitoring operations.
+ * Provides a unified interface for site check, start/stop monitoring actions.
+ */
+
 import React, { useCallback } from "react";
 
 import { ThemedButton } from "../../../../theme/components";
 
+/**
+ * Props for the ActionButtonGroup component.
+ */
 interface ActionButtonGroupProps {
+    /** Callback function to trigger immediate site check */
     onCheckNow: () => void;
+    /** Callback function to start monitoring */
     onStartMonitoring: () => void;
+    /** Callback function to stop monitoring */
     onStopMonitoring: () => void;
+    /** Whether any operation is currently loading */
     isLoading: boolean;
+    /** Whether monitoring is currently active */
     isMonitoring: boolean;
+    /** Whether all buttons should be disabled */
     disabled: boolean;
 }
 
 /**
- * Reusable action button group with proper event handling
- * Eliminates repetitive stopPropagation code by handling it centrally
- * Optimized with useCallback to prevent unnecessary re-renders
+ * Reusable action button group component for site monitoring operations.
+ *
+ * Features:
+ * - Unified interface for check now, start/stop monitoring actions
+ * - Proper event handling with stopPropagation to prevent card click conflicts
+ * - Optimized with React.memo and useCallback to prevent unnecessary re-renders
+ * - Accessibility support with proper ARIA labels
+ * - Visual feedback for loading and disabled states
+ *
+ * @param props - Component props
+ * @returns JSX element containing action buttons
+ *
+ * @example
+ * ```tsx
+ * <ActionButtonGroup
+ *   onCheckNow={handleCheckNow}
+ *   onStartMonitoring={handleStart}
+ *   onStopMonitoring={handleStop}
+ *   isLoading={false}
+ *   isMonitoring={true}
+ *   disabled={false}
+ * />
+ * ```
  */
 export const ActionButtonGroup = React.memo(function ActionButtonGroup({
     disabled,

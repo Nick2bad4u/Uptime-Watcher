@@ -1,23 +1,68 @@
+/**
+ * Form submission handling utilities for the AddSiteForm component.
+ * Provides validation and submission logic for creating new sites or adding monitors to existing sites.
+ */
+
 import validator from "validator";
 
 import type { Logger } from "../../services/logger";
 import type { Monitor } from "../../types";
 import type { AddSiteFormState, AddSiteFormActions } from "./useAddSiteForm";
 
-// Better typed form props using our hook interfaces
+/**
+ * Store actions interface for form submission.
+ */
 type StoreActions = {
+    /** Add a monitor to an existing site */
     addMonitorToSite: (siteId: string, monitor: Monitor) => Promise<void>;
+    /** Clear any existing error state */
     clearError: () => void;
+    /** Create a new site with monitors */
     createSite: (siteData: { identifier: string; monitors: Monitor[]; name?: string }) => Promise<void>;
 };
 
+/**
+ * Props interface for form submission handling.
+ * Combines form state, actions, and store methods.
+ */
 type FormSubmitProps = AddSiteFormState &
     Pick<AddSiteFormActions, "setFormError"> &
     StoreActions & {
+        /** UUID generator function */
         generateUuid: () => string;
-        logger: Logger; // Now properly typed!
-        onSuccess?: () => void; // Optional callback after successful submission
+        /** Logger instance for debugging */
+        logger: Logger;
+        /** Optional callback executed after successful submission */
+        onSuccess?: () => void;
     };
+
+/**
+ * Handles form submission for adding sites or monitors.
+ *
+ * Performs comprehensive validation based on add mode and monitor type:
+ * - For new sites: validates site name and monitor configuration
+ * - For existing sites: validates site selection and monitor configuration
+ * - For HTTP monitors: validates URL format and protocol
+ * - For port monitors: validates host and port number
+ *
+ * @param e - Form submission event
+ * @param props - Form state, actions, and dependencies
+ * @returns Promise that resolves when submission is complete
+ *
+ * @example
+ * ```tsx
+ * const handleFormSubmit = (e: React.FormEvent) => {
+ *   handleSubmit(e, {
+ *     ...formState,
+ *     ...formActions,
+ *     ...storeActions,
+ *     generateUuid,
+ *     logger,
+ *     onSuccess: () => setIsVisible(false)
+ *   });
+ * };
+ * ```
+ */
 
 export async function handleSubmit(e: React.FormEvent, props: FormSubmitProps) {
     const {

@@ -1,16 +1,41 @@
+/**
+ * Site details header component
+ *
+ * Displays the site title, URL, status indicator, and screenshot thumbnail
+ * in a visually appealing header with gradient background and accent styling.
+ */
+
 import logger from "../../services/logger";
 import { ThemedText, StatusIndicator } from "../../theme/components";
 import { Site, Monitor } from "../../types";
 import { ScreenshotThumbnail } from "./ScreenshotThumbnail";
 
+/** Props for the SiteDetailsHeader component */
 interface SiteDetailsHeaderProps {
+    /** The site object to display information for */
     site: Site;
+    /** The currently selected monitor for the site */
     selectedMonitor?: Monitor;
+    /** Whether the site is currently being refreshed/checked */
     isRefreshing: boolean;
 }
 
+/**
+ * Header component for site details view.
+ *
+ * Displays site name, URL (for HTTP monitors), status indicator with loading spinner,
+ * and a screenshot thumbnail. Handles external URL opening with proper fallbacks.
+ *
+ * @param props - Component props
+ * @returns JSX element containing the site details header
+ */
+
 export function SiteDetailsHeader({ isRefreshing, selectedMonitor, site }: SiteDetailsHeaderProps) {
-    // Accept unknown for runtime type check
+    /**
+     * Type guard to check if the window.electronAPI has openExternal method
+     * @param api - The API object to check
+     * @returns True if the API has openExternal method
+     */
     function hasOpenExternal(api: unknown): api is { openExternal: (url: string) => void } {
         return typeof (api as { openExternal?: unknown })?.openExternal === "function";
     }

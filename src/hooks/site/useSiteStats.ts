@@ -1,3 +1,9 @@
+/**
+ * Site statistics calculation hook.
+ * Provides utilities for computing uptime, response time averages,
+ * and check counts from monitor history data.
+ */
+
 import { useMemo } from "react";
 
 import { StatusHistory } from "../../types";

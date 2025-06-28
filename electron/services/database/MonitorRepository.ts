@@ -1,3 +1,8 @@
+/**
+ * Database repository for monitor persistence and management.
+ * Handles CRUD operations for site monitoring configurations.
+ */
+
 import { Database } from "node-sqlite3-wasm";
 
 import { Site } from "../../types";
@@ -5,6 +10,9 @@ import { isDev } from "../../utils";
 import { logger } from "../../utils/logger";
 import { DatabaseService } from "./DatabaseService";
 
+/**
+ * Database row representation of a monitor.
+ */
 export interface MonitorRow {
     id: number;
     site_identifier: string;

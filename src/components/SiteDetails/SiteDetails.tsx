@@ -1,3 +1,16 @@
+/**
+ * Site details view component with tabbed interface
+ *
+ * Provides a comprehensive view of a monitored site including:
+ * - Overview with basic statistics
+ * - History charts and response time data
+ * - Analytics with advanced metrics
+ * - Settings for monitoring configuration
+ *
+ * Uses composition pattern with smaller specialized components for maintainability.
+ * Integrates with Chart.js for visualization and custom hooks for state management.
+ */
+
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -46,14 +59,31 @@ ChartJS.register(
     zoomPlugin
 );
 
+/** Props for the SiteDetails component */
 interface SiteDetailsProps {
+    /** The site object to display details for */
     site: Site;
+    /** Callback function to close the site details view */
     onClose: () => void;
 }
 
 /**
- * Refactored SiteDetails component using composition of smaller components
- * Much cleaner and more maintainable than the original monolithic component
+ * Site details component with tabbed interface for comprehensive site monitoring.
+ * Provides overview, history, analytics, and settings views for a monitored site.
+ *
+ * Uses composition pattern with specialized tab components and custom hooks for
+ * state management and data fetching.
+ *
+ * @param props - Component props
+ * @returns JSX element containing the site details interface
+ *
+ * @example
+ * ```tsx
+ * <SiteDetails
+ *   site={selectedSite}
+ *   onClose={() => setSelectedSite(null)}
+ * />
+ * ```
  */
 export function SiteDetails({ onClose, site }: SiteDetailsProps) {
     const { currentTheme } = useTheme();

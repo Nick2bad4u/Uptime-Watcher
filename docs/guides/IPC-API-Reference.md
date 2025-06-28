@@ -1,4 +1,6 @@
-# IPC API Reference
+# 🔗 IPC API Reference
+
+> **Navigation:** [📖 Docs Home](../README.md) » [📘 Guides](../README.md#guides) » **IPC API Reference**
 
 ## Overview
 
@@ -26,34 +28,37 @@ The IPC API is organized into logical domains:
 Create a new site for monitoring.
 
 **Request:**
+
 ```typescript
 interface CreateSiteRequest {
-  url: string;
-  name?: string;
-  monitorType: 'http' | 'port';
-  interval?: number;
-  timeout?: number;
+ url: string;
+ name?: string;
+ monitorType: "http" | "port";
+ interval?: number;
+ timeout?: number;
 }
 ```
 
 **Response:**
+
 ```typescript
 interface Site {
-  id: string;
-  url: string;
-  name: string;
-  monitors: Monitor[];
-  createdAt: string;
-  updatedAt: string;
+ id: string;
+ url: string;
+ name: string;
+ monitors: Monitor[];
+ createdAt: string;
+ updatedAt: string;
 }
 ```
 
 **Usage:**
+
 ```typescript
 const site = await window.electronAPI.sites.create({
-  url: 'https://example.com',
-  name: 'Example Site',
-  monitorType: 'http'
+ url: "https://example.com",
+ name: "Example Site",
+ monitorType: "http",
 });
 ```
 
@@ -62,17 +67,19 @@ const site = await window.electronAPI.sites.create({
 Update an existing site configuration.
 
 **Request:**
+
 ```typescript
 interface UpdateSiteRequest {
-  id: string;
-  updates: Partial<CreateSiteRequest>;
+ id: string;
+ updates: Partial<CreateSiteRequest>;
 }
 ```
 
 **Response:**
+
 ```typescript
 interface Site {
-  // Same as create response
+ // Same as create response
 }
 ```
 
@@ -81,17 +88,19 @@ interface Site {
 Delete a site and all its monitoring data.
 
 **Request:**
+
 ```typescript
 interface DeleteSiteRequest {
-  id: string;
+ id: string;
 }
 ```
 
 **Response:**
+
 ```typescript
 interface DeleteSiteResponse {
-  success: boolean;
-  deletedId: string;
+ success: boolean;
+ deletedId: string;
 }
 ```
 
@@ -102,6 +111,7 @@ Get all configured sites.
 **Request:** None
 
 **Response:**
+
 ```typescript
 interface Site[] {
   // Array of Site objects
@@ -113,16 +123,18 @@ interface Site[] {
 Get a specific site by ID.
 
 **Request:**
+
 ```typescript
 interface GetSiteRequest {
-  id: string;
+ id: string;
 }
 ```
 
 **Response:**
+
 ```typescript
 interface Site {
-  // Site object or null if not found
+ // Site object or null if not found
 }
 ```
 
@@ -135,19 +147,21 @@ interface Site {
 Start monitoring for a specific site.
 
 **Request:**
+
 ```typescript
 interface StartMonitorRequest {
-  siteId: string;
-  monitorType: 'http' | 'port';
-  config: MonitorConfig;
+ siteId: string;
+ monitorType: "http" | "port";
+ config: MonitorConfig;
 }
 ```
 
 **Response:**
+
 ```typescript
 interface StartMonitorResponse {
-  success: boolean;
-  monitorId: string;
+ success: boolean;
+ monitorId: string;
 }
 ```
 
@@ -156,18 +170,20 @@ interface StartMonitorResponse {
 Stop monitoring for a specific site.
 
 **Request:**
+
 ```typescript
 interface StopMonitorRequest {
-  siteId: string;
-  monitorId: string;
+ siteId: string;
+ monitorId: string;
 }
 ```
 
 **Response:**
+
 ```typescript
 interface StopMonitorResponse {
-  success: boolean;
-  stoppedMonitorId: string;
+ success: boolean;
+ stoppedMonitorId: string;
 }
 ```
 
@@ -176,20 +192,22 @@ interface StopMonitorResponse {
 Get current monitoring status for a site.
 
 **Request:**
+
 ```typescript
 interface MonitorStatusRequest {
-  siteId: string;
+ siteId: string;
 }
 ```
 
 **Response:**
+
 ```typescript
 interface MonitorStatus {
-  siteId: string;
-  status: 'online' | 'offline' | 'unknown';
-  lastCheck: string;
-  responseTime?: number;
-  error?: string;
+ siteId: string;
+ status: "online" | "offline" | "unknown";
+ lastCheck: string;
+ responseTime?: number;
+ error?: string;
 }
 ```
 
@@ -198,32 +216,34 @@ interface MonitorStatus {
 Get monitoring history for a site.
 
 **Request:**
+
 ```typescript
 interface MonitorHistoryRequest {
-  siteId: string;
-  limit?: number;
-  offset?: number;
-  startDate?: string;
-  endDate?: string;
+ siteId: string;
+ limit?: number;
+ offset?: number;
+ startDate?: string;
+ endDate?: string;
 }
 ```
 
 **Response:**
+
 ```typescript
 interface MonitorHistoryResponse {
-  checks: MonitorCheck[];
-  total: number;
-  hasMore: boolean;
+ checks: MonitorCheck[];
+ total: number;
+ hasMore: boolean;
 }
 
 interface MonitorCheck {
-  id: string;
-  siteId: string;
-  timestamp: string;
-  status: 'online' | 'offline' | 'error';
-  responseTime?: number;
-  statusCode?: number;
-  error?: string;
+ id: string;
+ siteId: string;
+ timestamp: string;
+ status: "online" | "offline" | "error";
+ responseTime?: number;
+ statusCode?: number;
+ error?: string;
 }
 ```
 
@@ -236,21 +256,23 @@ interface MonitorCheck {
 Get application settings.
 
 **Request:**
+
 ```typescript
 interface GetSettingsRequest {
-  keys?: string[]; // Optional: specific keys to retrieve
+ keys?: string[]; // Optional: specific keys to retrieve
 }
 ```
 
 **Response:**
+
 ```typescript
 interface AppSettings {
-  theme: 'light' | 'dark' | 'system';
-  notifications: boolean;
-  checkInterval: number;
-  historyRetention: number;
-  autoStart: boolean;
-  minimizeToTray: boolean;
+ theme: "light" | "dark" | "system";
+ notifications: boolean;
+ checkInterval: number;
+ historyRetention: number;
+ autoStart: boolean;
+ minimizeToTray: boolean;
 }
 ```
 
@@ -259,17 +281,19 @@ interface AppSettings {
 Update application settings.
 
 **Request:**
+
 ```typescript
 interface UpdateSettingsRequest {
-  settings: Partial<AppSettings>;
+ settings: Partial<AppSettings>;
 }
 ```
 
 **Response:**
+
 ```typescript
 interface UpdateSettingsResponse {
-  success: boolean;
-  updatedSettings: AppSettings;
+ success: boolean;
+ updatedSettings: AppSettings;
 }
 ```
 
@@ -282,18 +306,20 @@ interface UpdateSettingsResponse {
 Create a backup of the database.
 
 **Request:**
+
 ```typescript
 interface BackupRequest {
-  path?: string; // Optional: custom backup path
+ path?: string; // Optional: custom backup path
 }
 ```
 
 **Response:**
+
 ```typescript
 interface BackupResponse {
-  success: boolean;
-  backupPath: string;
-  timestamp: string;
+ success: boolean;
+ backupPath: string;
+ timestamp: string;
 }
 ```
 
@@ -302,17 +328,19 @@ interface BackupResponse {
 Restore database from backup.
 
 **Request:**
+
 ```typescript
 interface RestoreRequest {
-  backupPath: string;
+ backupPath: string;
 }
 ```
 
 **Response:**
+
 ```typescript
 interface RestoreResponse {
-  success: boolean;
-  restoredFrom: string;
+ success: boolean;
+ restoredFrom: string;
 }
 ```
 
@@ -321,20 +349,22 @@ interface RestoreResponse {
 Export data in various formats.
 
 **Request:**
+
 ```typescript
 interface ExportRequest {
-  format: 'json' | 'csv' | 'xml';
-  path: string;
-  includeHistory?: boolean;
+ format: "json" | "csv" | "xml";
+ path: string;
+ includeHistory?: boolean;
 }
 ```
 
 **Response:**
+
 ```typescript
 interface ExportResponse {
-  success: boolean;
-  exportPath: string;
-  recordCount: number;
+ success: boolean;
+ exportPath: string;
+ recordCount: number;
 }
 ```
 
@@ -349,9 +379,10 @@ Minimize the application window.
 **Request:** None
 
 **Response:**
+
 ```typescript
 interface WindowResponse {
-  success: boolean;
+ success: boolean;
 }
 ```
 
@@ -362,10 +393,11 @@ Maximize or restore the application window.
 **Request:** None
 
 **Response:**
+
 ```typescript
 interface WindowResponse {
-  success: boolean;
-  isMaximized: boolean;
+ success: boolean;
+ isMaximized: boolean;
 }
 ```
 
@@ -384,9 +416,10 @@ Hide the application window to system tray.
 **Request:** None
 
 **Response:**
+
 ```typescript
 interface WindowResponse {
-  success: boolean;
+ success: boolean;
 }
 ```
 
@@ -397,9 +430,10 @@ Show the application window from system tray.
 **Request:** None
 
 **Response:**
+
 ```typescript
 interface WindowResponse {
-  success: boolean;
+ success: boolean;
 }
 ```
 
@@ -412,21 +446,23 @@ interface WindowResponse {
 Show a system notification.
 
 **Request:**
+
 ```typescript
 interface ShowNotificationRequest {
-  title: string;
-  body: string;
-  icon?: string;
-  urgent?: boolean;
-  silent?: boolean;
+ title: string;
+ body: string;
+ icon?: string;
+ urgent?: boolean;
+ silent?: boolean;
 }
 ```
 
 **Response:**
+
 ```typescript
 interface NotificationResponse {
-  success: boolean;
-  notificationId: string;
+ success: boolean;
+ notificationId: string;
 }
 ```
 
@@ -437,10 +473,11 @@ Check notification permission status.
 **Request:** None
 
 **Response:**
+
 ```typescript
 interface NotificationPermission {
-  granted: boolean;
-  canRequest: boolean;
+ granted: boolean;
+ canRequest: boolean;
 }
 ```
 
@@ -455,20 +492,22 @@ The IPC API also includes event channels for real-time updates:
 **Channel:** `site-status-changed`
 
 **Payload:**
+
 ```typescript
 interface SiteStatusEvent {
-  siteId: string;
-  status: 'online' | 'offline' | 'error';
-  timestamp: string;
-  responseTime?: number;
-  previousStatus?: string;
+ siteId: string;
+ status: "online" | "offline" | "error";
+ timestamp: string;
+ responseTime?: number;
+ previousStatus?: string;
 }
 ```
 
 **Usage:**
+
 ```typescript
 window.electronAPI.onSiteStatusChanged((event) => {
-  console.log('Site status changed:', event);
+ console.log("Site status changed:", event);
 });
 ```
 
@@ -477,13 +516,14 @@ window.electronAPI.onSiteStatusChanged((event) => {
 **Channel:** `monitor-event`
 
 **Payload:**
+
 ```typescript
 interface MonitorEvent {
-  type: 'started' | 'stopped' | 'error' | 'check-completed';
-  siteId: string;
-  monitorId: string;
-  timestamp: string;
-  data?: any;
+ type: "started" | "stopped" | "error" | "check-completed";
+ siteId: string;
+ monitorId: string;
+ timestamp: string;
+ data?: any;
 }
 ```
 
@@ -492,10 +532,11 @@ interface MonitorEvent {
 **Channel:** `settings-changed`
 
 **Payload:**
+
 ```typescript
 interface SettingsChangedEvent {
-  changedKeys: string[];
-  newSettings: Partial<AppSettings>;
+ changedKeys: string[];
+ newSettings: Partial<AppSettings>;
 }
 ```
 
@@ -507,12 +548,12 @@ All IPC calls return standardized error responses when failures occur:
 
 ```typescript
 interface IPCError {
-  success: false;
-  error: {
-    code: string;
-    message: string;
-    details?: any;
-  };
+ success: false;
+ error: {
+  code: string;
+  message: string;
+  details?: any;
+ };
 }
 ```
 
@@ -544,32 +585,32 @@ The complete TypeScript type definitions are available in:
 ```typescript
 // Create a new site
 const newSite = await window.electronAPI.sites.create({
-  url: 'https://api.example.com',
-  name: 'Example API',
-  monitorType: 'http'
+ url: "https://api.example.com",
+ name: "Example API",
+ monitorType: "http",
 });
 
 // Start monitoring
 await window.electronAPI.monitors.start({
-  siteId: newSite.id,
-  monitorType: 'http',
-  config: {
-    interval: 60000, // 1 minute
-    timeout: 30000   // 30 seconds
-  }
+ siteId: newSite.id,
+ monitorType: "http",
+ config: {
+  interval: 60000, // 1 minute
+  timeout: 30000, // 30 seconds
+ },
 });
 
 // Listen for status changes
 window.electronAPI.onSiteStatusChanged((event) => {
-  if (event.siteId === newSite.id) {
-    console.log(`${newSite.name} is now ${event.status}`);
-  }
+ if (event.siteId === newSite.id) {
+  console.log(`${newSite.name} is now ${event.status}`);
+ }
 });
 
 // Get monitoring history
 const history = await window.electronAPI.monitors.history({
-  siteId: newSite.id,
-  limit: 100
+ siteId: newSite.id,
+ limit: 100,
 });
 ```
 
@@ -581,15 +622,15 @@ const settings = await window.electronAPI.settings.get();
 
 // Update theme
 await window.electronAPI.settings.update({
-  settings: {
-    theme: 'dark',
-    notifications: true
-  }
+ settings: {
+  theme: "dark",
+  notifications: true,
+ },
 });
 
 // Listen for settings changes
 window.electronAPI.onSettingsChanged((event) => {
-  console.log('Settings updated:', event.newSettings);
+ console.log("Settings updated:", event.newSettings);
 });
 ```
 
@@ -616,6 +657,19 @@ window.electronAPI.onSettingsChanged((event) => {
 ---
 
 For implementation details, see the source files:
+
 - `electron/services/ipc/IpcService.ts`
 - `electron/preload.ts`
 - `src/services/electronAPI.ts`
+
+## See Also
+
+- [🔗 IPC API](../api/ipc-api.md) - Complete IPC module documentation
+- [📋 Types API](../api/types-api.md) - IPC interface definitions
+- [🏪 Store API](../api/store-api.md) - State management integration
+- [🚀 Developer Guide](Developer-Guide.md) - Development setup and patterns
+- [📊 Monitor API](../api/monitor-api.md) - Monitoring service integration
+
+---
+
+> **Related:** [📖 Documentation Home](../README.md) | [📘 All Guides](../README.md#guides)

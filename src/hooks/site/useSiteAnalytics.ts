@@ -1,3 +1,11 @@
+/**
+ * Custom hook for calculating comprehensive site analytics and metrics
+ *
+ * Provides detailed analytics for a monitor including uptime percentages,
+ * response time statistics, downtime analysis, and reliability metrics.
+ * All calculations are memoized for performance optimization.
+ */
+
 import { useMemo } from "react";
 
 import type { Theme } from "../../theme/types";
@@ -7,43 +15,75 @@ import { CHART_TIME_PERIODS } from "../../constants";
 import { Monitor, StatusHistory } from "../../types";
 import { TIME_PERIOD_LABELS } from "../../utils/time";
 
-// Enhanced types for better IntelliSense and error catching
+/** Represents a period of downtime with start, end, and duration */
 export interface DowntimePeriod {
+    /** Timestamp when downtime started */
     start: number;
+    /** Timestamp when downtime ended */
     end: number;
+    /** Duration of downtime in milliseconds */
     duration: number;
 }
 
+/** Comprehensive analytics data for a site monitor */
 export interface SiteAnalytics {
-    // Basic metrics
+    /** Total number of checks performed */
     totalChecks: number;
+    /** Number of successful checks */
     upCount: number;
+    /** Number of failed checks */
     downCount: number;
+    /** Uptime percentage as formatted string */
     uptime: string;
+    /** Average response time in milliseconds */
     avgResponseTime: number;
-
-    // Performance metrics
+    /** Fastest response time recorded */
     fastestResponse: number;
+    /** Slowest response time recorded */
     slowestResponse: number;
-
-    // Percentiles
+    /** 50th percentile response time */
     p50: number;
+    /** 95th percentile response time */
     p95: number;
+    /** 99th percentile response time */
     p99: number;
-
-    // Reliability metrics
+    /** Array of downtime periods */
     downtimePeriods: DowntimePeriod[];
+    /** Total downtime in milliseconds */
     totalDowntime: number;
-    mttr: number; // Mean Time To Recovery
+    /** Mean Time To Recovery in milliseconds */
+    mttr: number;
+    /** Number of separate downtime incidents */
     incidentCount: number;
-
-    // Filtered data
+    /** Status history filtered by time range */
     filteredHistory: StatusHistory[];
 }
 
 /**
- * Advanced hook for monitor analytics calculations
- * Memoizes expensive calculations and provides comprehensive metrics
+ * Hook for calculating comprehensive site analytics and metrics.
+ *
+ * Performs complex calculations on monitor data to provide detailed insights
+ * including uptime statistics, response time analysis, and downtime patterns.
+ * All calculations are memoized for optimal performance.
+ *
+ * @param monitor - The monitor to analyze (can be undefined)
+ * @param timeRange - Time period to analyze (defaults to "24h")
+ * @returns Comprehensive analytics object with all calculated metrics
+ *
+ * @example
+ * ```tsx
+ * function AnalyticsView({ monitor }) {
+ *   const analytics = useSiteAnalytics(monitor, "7d");
+ *
+ *   return (
+ *     <div>
+ *       <p>Uptime: {analytics.uptime}</p>
+ *       <p>Avg Response: {analytics.avgResponseTime}ms</p>
+ *       <p>Incidents: {analytics.incidentCount}</p>
+ *     </div>
+ *   );
+ * }
+ * ```
  */
 export function useSiteAnalytics(monitor: Monitor | undefined, timeRange: TimePeriod = "24h"): SiteAnalytics {
     return useMemo(() => {

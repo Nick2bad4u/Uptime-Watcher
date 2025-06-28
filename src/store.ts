@@ -1,3 +1,8 @@
+/**
+ * Zustand store for managing global application state.
+ * Handles sites, monitors, settings, UI state, and backend synchronization.
+ */
+
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -5,47 +10,81 @@ import { TIMEOUT_CONSTRAINTS } from "./constants";
 import { ThemeName } from "./theme/types";
 import { Site, StatusUpdate, Monitor, MonitorType } from "./types";
 
+/** Application update status types */
 export type UpdateStatus = "idle" | "checking" | "available" | "downloading" | "downloaded" | "error";
 
+/**
+ * Application settings interface.
+ * Contains user preferences and configuration options.
+ */
 interface AppSettings {
+    /** Enable desktop notifications */
     notifications: boolean;
+    /** Auto-start monitoring on app launch */
     autoStart: boolean;
+    /** Minimize to system tray instead of closing */
     minimizeToTray: boolean;
+    /** Current theme name */
     theme: ThemeName;
+    /** Request timeout in milliseconds */
     timeout: number;
+    /** Maximum retry attempts for failed requests */
     maxRetries: number;
+    /** Enable sound alerts for status changes */
     soundAlerts: boolean;
+    /** Maximum number of history records to keep */
     historyLimit: number;
 }
 
+/**
+ * Main application state interface.
+ * Contains all global state including sites, settings, UI state, and actions.
+ */
 interface AppState {
+    // Core data
+    /** Array of monitored sites */
     sites: Site[];
-    // Removed global isMonitoring and checkInterval (per-monitor only)
-    darkMode: boolean; // Keep for backwards compatibility
+    /** Legacy dark mode flag (kept for backwards compatibility) */
+    darkMode: boolean;
+    /** Application settings */
     settings: AppSettings;
+
     // UI state
+    /** Whether settings modal is open */
     showSettings: boolean;
-    selectedSiteId: string | undefined; // Store only the identifier
+    /** Currently selected site identifier */
+    selectedSiteId: string | undefined;
+    /** Whether site details modal is open */
     showSiteDetails: boolean;
 
     // Error handling
+    /** Last error message to display */
     lastError: string | undefined;
+    /** Global loading state */
     isLoading: boolean;
 
-    // Statistics
+    // Statistics (computed from site data)
+    /** Total uptime across all sites */
     totalUptime: number;
+    /** Total downtime across all sites */
     totalDowntime: number;
 
-    // Synchronized UI state for SiteDetails
-    activeSiteDetailsTab: string; // Was: "overview" | "analytics" | "history" | "settings"
+    // Site details UI state (synchronized across components)
+    /** Active tab in site details modal */
+    activeSiteDetailsTab: string;
+    /** Selected time range for charts */
     siteDetailsChartTimeRange: "1h" | "24h" | "7d" | "30d";
+    /** Whether to show advanced metrics */
     showAdvancedMetrics: boolean;
 
-    // Selected monitor id per site (UI state, not persisted)
+    // Per-site selected monitor (UI state, not persisted)
+    /** Map of site ID to selected monitor ID */
     selectedMonitorIds: Record<string, string>;
 
-    // Update status
+    // Application updates
+    /** Current update status */
     updateStatus: UpdateStatus;
+    /** Update error message if any */
     updateError: string | undefined;
 
     // Derived selector

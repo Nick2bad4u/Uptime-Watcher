@@ -1,3 +1,8 @@
+/**
+ * Header component providing global status overview and application controls.
+ * Displays uptime statistics, theme toggle, and settings access.
+ */
+
 /* eslint-disable functional/no-let */
 import { useStore } from "../../store";
 import { ThemedBox, ThemedText, ThemedButton, StatusIndicator } from "../../theme/components";
@@ -5,6 +10,18 @@ import { useTheme } from "../../theme/useTheme";
 import { useAvailabilityColors } from "../../theme/useTheme";
 import "./Header.css";
 
+/**
+ * Main header component for the application.
+ *
+ * Features:
+ * - Global uptime statistics across all monitors
+ * - Status indicator counts (up/down/pending)
+ * - Theme toggle (light/dark mode)
+ * - Settings modal trigger
+ * - Responsive layout with proper text truncation
+ *
+ * @returns JSX element containing the application header
+ */
 export function Header() {
     const { setShowSettings, sites } = useStore();
     const { isDark, toggleTheme } = useTheme();
@@ -15,6 +32,8 @@ export function Header() {
     let downMonitors = 0;
     let pendingMonitors = 0;
     let totalMonitors = 0;
+
+    // Iterate through all sites and their monitors to calculate totals
     for (const site of sites) {
         if (site.monitors)
             for (const monitor of site.monitors) {
@@ -25,7 +44,7 @@ export function Header() {
             }
     }
 
-    // Calculate uptime percentage for monitors
+    // Calculate overall uptime percentage across all monitors
     const uptimePercentage = totalMonitors > 0 ? Math.round((upMonitors / totalMonitors) * 100) : 0;
 
     return (

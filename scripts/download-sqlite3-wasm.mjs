@@ -1,3 +1,9 @@
+/**
+ * Build script to download the SQLite3 WASM binary for Electron distribution.
+ * Downloads the required WASM file from the node-sqlite3-wasm repository
+ * and places it in the dist-electron directory for bundling.
+ */
+
 /* global process */
 
 import fs from "fs";

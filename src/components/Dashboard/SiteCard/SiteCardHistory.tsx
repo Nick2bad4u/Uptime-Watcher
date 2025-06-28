@@ -1,19 +1,45 @@
+/**
+ * Site card history visualization component.
+ * Displays monitor history data using a chart component.
+ */
+
 import React, { useMemo } from "react";
 
 import { Monitor, StatusHistory } from "../../../types";
 import { HistoryChart } from "../../common/HistoryChart";
 
+/**
+ * Props for the SiteCardHistory component.
+ */
 interface SiteCardHistoryProps {
+    /** Monitor data containing type and configuration */
     monitor: Monitor | undefined;
+    /** Filtered history data for visualization */
     filteredHistory: StatusHistory[];
 }
 
 /**
- * History visualization section of the site card
- * Memoized to prevent unnecessary re-renders and calculations
+ * History visualization component for site cards displaying monitor status over time.
  *
- * Data flow: Store -\> useSiteMonitor -\> useSite -\> SiteCard -\> SiteCardHistory
- * Updates automatically when monitor.history changes in the store
+ * Features:
+ * - Dynamic title generation based on monitor type and configuration
+ * - Optimized with React.memo and custom comparison for performance
+ * - Automatic updates when monitor history changes in store
+ * - Supports up to 60 history items for visualization
+ * - Handles HTTP and port monitor types with specific title formatting
+ *
+ * Data flow: Store → useSiteMonitor → useSite → SiteCard → SiteCardHistory
+ *
+ * @param props - Component props
+ * @returns JSX element containing the history chart
+ *
+ * @example
+ * ```tsx
+ * <SiteCardHistory
+ *   monitor={selectedMonitor}
+ *   filteredHistory={recentHistory}
+ * />
+ * ```
  */
 export const SiteCardHistory = React.memo(
     function SiteCardHistory({ filteredHistory, monitor }: SiteCardHistoryProps) {

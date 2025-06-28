@@ -1,10 +1,30 @@
-# Uptime Watcher - Developer Guide
+<!-- markdownlint-disable -->
+
+# 🚀 Uptime Watcher - Developer Guide
+
+> **Navigation:** [📖 Docs Home](../README.md) » [📘 Guides](../README.md#guides) » **Developer Guide**
 
 ## 🚀 Getting Started
 
+### ⚡ Quick Start (5 minutes)
+
+```bash
+# 1. Clone and setup
+git clone https://github.com/your-username/uptime-watcher.git
+cd uptime-watcher
+npm install
+
+# 2. Download dependencies
+npm run download-sqlite3-wasm
+
+# 3. Start development
+npm run dev        # Terminal 1: Frontend
+npm run dev:electron   # Terminal 2: Electron app
+```
+
 ### Prerequisites
 
-- **Node.js** 18+ 
+- **Node.js** 18+
 - **npm** 9+
 - **Git** for version control
 - **TypeScript** knowledge (the project is fully TypeScript)
@@ -12,27 +32,31 @@
 ### Installation
 
 1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/your-username/uptime-watcher.git
-   cd uptime-watcher
-   ```
+
+  ```bash
+  git clone https://github.com/your-username/uptime-watcher.git
+  cd uptime-watcher
+  ```
 
 2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
+
+  ```bash
+  npm install
+  ```
 
 3. **Download SQLite WASM:**
-   ```bash
-   npm run download-sqlite3-wasm
-   ```
+
+  ```bash
+  npm run download-sqlite3-wasm
+  ```
 
 4. **Start development server:**
-   ```bash
-   npm run dev
-   ```
 
----
+  ```bash
+  npm run dev
+  ```
+
+--------------------------------------------------------------------------------
 
 ## 🏗️ Project Structure
 
@@ -71,7 +95,7 @@ uptime-watcher/
 └── scripts/                 # Build and utility scripts
 ```
 
----
+--------------------------------------------------------------------------------
 
 ## 🛠️ Development Workflow
 
@@ -96,18 +120,20 @@ npm run type-check         # Run TypeScript compiler
 ### Development Mode
 
 1. **Start the renderer process:**
-   ```bash
-   npm run dev
-   ```
+
+  ```bash
+  npm run dev
+  ```
 
 2. **In another terminal, start Electron:**
-   ```bash
-   npm run dev:electron
-   ```
+
+  ```bash
+  npm run dev:electron
+  ```
 
 The app will hot-reload when you make changes to the frontend code.
 
----
+--------------------------------------------------------------------------------
 
 ## 🎯 Architecture Overview
 
@@ -137,7 +163,7 @@ User Action → Frontend Component → Store Action → IPC → Backend Service 
 Frontend Component ← Store Update ← IPC Response ← Service Response ← Database Result
 ```
 
----
+--------------------------------------------------------------------------------
 
 ## 🔧 Development Patterns
 
@@ -197,7 +223,7 @@ export const useMyFeature = () => {
 };
 ```
 
----
+--------------------------------------------------------------------------------
 
 ## 🎨 Styling Guidelines
 
@@ -237,7 +263,7 @@ import { ThemedBox, ThemedText, ThemedButton } from '../theme/components';
 </div>
 ```
 
----
+--------------------------------------------------------------------------------
 
 ## 🧪 Testing
 
@@ -273,7 +299,7 @@ test('creates site successfully', async () => {
 });
 ```
 
----
+--------------------------------------------------------------------------------
 
 ## 📝 Code Standards
 
@@ -326,7 +352,7 @@ export const MyComponent = ({ title, onAction }) => {
 };
 ```
 
----
+--------------------------------------------------------------------------------
 
 ## 🔍 Debugging
 
@@ -345,40 +371,46 @@ export const MyComponent = ({ title, onAction }) => {
 ### Common Issues
 
 1. **IPC Communication Errors:**
-   - Check preload script is loaded
-   - Verify IPC channel names match
-   - Ensure proper error handling
+
+- Check preload script is loaded
+- Verify IPC channel names match
+- Ensure proper error handling
 
 2. **Database Issues:**
-   - Check SQLite WASM is downloaded
-   - Verify database file permissions
-   - Monitor SQL query logs
+
+- Check SQLite WASM is downloaded
+- Verify database file permissions
+- Monitor SQL query logs
 
 3. **Theme Issues:**
-   - Ensure components use themed variants
-   - Check theme context is provided
-   - Verify CSS custom properties
 
----
+- Ensure components use themed variants
+- Check theme context is provided
+- Verify CSS custom properties
+
+--------------------------------------------------------------------------------
 
 ## 🚀 Building & Deployment
 
 ### Build Process
 
 1. **Frontend Build:**
-   ```bash
-   npm run build
-   ```
+
+  ```bash
+  npm run build
+  ```
 
 2. **Backend Build:**
-   ```bash
-   npm run build:electron
-   ```
+
+  ```bash
+  npm run build:electron
+  ```
 
 3. **Create Distribution:**
-   ```bash
-   npm run dist
-   ```
+
+  ```bash
+  npm run dist
+  ```
 
 ### Distribution Files
 
@@ -386,24 +418,25 @@ export const MyComponent = ({ title, onAction }) => {
 - **macOS:** `.dmg` and `.app` bundle
 - **Linux:** `.AppImage`, `.deb`, and `.rpm` packages
 
----
+--------------------------------------------------------------------------------
 
 ## 📚 Additional Resources
 
 ### Documentation
 
-- **Architecture Guide:** `docs/architecture/Project-Architecture-Guide.copilotmd`
-- **Component Docs:** `docs/component-docs/`
-- **API Reference:** See TypeScript interfaces and JSDoc comments
+- **[📚 API Reference](../api/README.md):** Complete API documentation for all modules
+- **[🏗️ Architecture Guide](../architecture/Project-Architecture-Guide.copilotmd):** System design and architecture patterns
+- **[🧩 Component Docs](../component-docs/Dashboard.md):** UI component documentation
+- **[📖 User Guides](../README.md#guides):** Additional development guides
 
 ### External Resources
 
-- **Electron Documentation:** https://electronjs.org/docs
-- **React Documentation:** https://reactjs.org/docs
-- **Zustand Guide:** https://github.com/pmndrs/zustand
-- **TypeScript Handbook:** https://typescriptlang.org/docs
+- **Electron Documentation:** <https://electronjs.org/docs>
+- **React Documentation:** <https://reactjs.org/docs>
+- **Zustand Guide:** <https://github.com/pmndrs/zustand>
+- **TypeScript Handbook:** <https://typescriptlang.org/docs>
 
----
+--------------------------------------------------------------------------------
 
 ## 🤝 Contributing
 
@@ -429,7 +462,7 @@ export const MyComponent = ({ title, onAction }) => {
 - [ ] Documentation is updated
 - [ ] Performance impact considered
 
----
+--------------------------------------------------------------------------------
 
 ## 📞 Support
 
@@ -440,6 +473,19 @@ For development questions or issues:
 3. **Create Issue:** Open a new issue with details
 4. **Ask Community:** Use GitHub discussions for general questions
 
+--------------------------------------------------------------------------------
+
+_Happy coding! 🎉_
+
+## See Also
+
+- [📚 API Reference](../api/README.md) - Complete module documentation
+- [🏗️ Architecture Guide](../architecture/Project-Architecture-Guide.copilotmd) - System design patterns
+- [🧩 Component Documentation](../component-docs/README.md) - UI component guides
+- [🔧 Troubleshooting Guide](Troubleshooting.md) - Common issues and solutions
+- [🎨 Theme Usage Guide](Theme-Usage.md) - Theming and styling
+- [✅ Validation Guide](Validator.md) - Input validation patterns
+
 ---
 
-*Happy coding! 🎉*
+> **Related:** [📖 Documentation Home](../README.md) | [📘 All Guides](../README.md#guides)

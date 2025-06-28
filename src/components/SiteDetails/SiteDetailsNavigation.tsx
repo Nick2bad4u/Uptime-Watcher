@@ -1,3 +1,9 @@
+/**
+ * Site details navigation component for managing monitoring controls and tabs.
+ * Provides a comprehensive interface for controlling site monitoring, managing intervals,
+ * and navigating between different detail views.
+ */
+
 import React from "react";
 
 import { CHECK_INTERVALS } from "../../constants";
@@ -5,25 +11,58 @@ import logger from "../../services/logger";
 import { ThemedBox, ThemedButton, ThemedSelect, ThemedText } from "../../theme/components";
 import { Site } from "../../types";
 
+/**
+ * Props for the SiteDetailsNavigation component.
+ * Contains all necessary handlers and state for monitoring control.
+ */
 interface SiteDetailsNavigationProps {
+    /** Currently active tab in the site details view */
     activeSiteDetailsTab: string;
+    /** The site object being displayed */
     currentSite: Site;
+    /** Handler for monitor check interval changes */
     handleIntervalChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    /** Handler for monitor selection changes */
     handleMonitorIdChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    /** Handler for saving interval changes */
     handleSaveInterval: () => Promise<void>;
+    /** Handler for starting monitoring */
     handleStartMonitoring: () => Promise<void>;
+    /** Handler for stopping monitoring */
     handleStopMonitoring: () => Promise<void>;
+    /** Whether the check interval has been changed */
     intervalChanged: boolean;
+    /** Whether any async operation is in progress */
     isLoading: boolean;
+    /** Whether monitoring is currently active */
     isMonitoring: boolean;
+    /** Local state value for check interval */
     localCheckInterval: number;
+    /** Handler for immediate check trigger */
     onCheckNow: () => void;
+    /** Currently selected monitor ID */
     selectedMonitorId: string;
+    /** Function to set the active tab */
     setActiveSiteDetailsTab: (tab: string) => void;
+    /** Function to set the chart time range */
     setSiteDetailsChartTimeRange: (range: string) => void;
+    /** Current chart time range selection */
     siteDetailsChartTimeRange: string;
 }
 
+/**
+ * Navigation and control component for site details page.
+ *
+ * Features:
+ * - Tab navigation for different views (Overview, History, Analytics, Settings)
+ * - Monitor control buttons (Start/Stop monitoring, Check now)
+ * - Monitor selection dropdown
+ * - Check interval configuration
+ * - Time range selection for charts
+ *
+ * @param props - Component props for navigation and control
+ * @returns JSX element containing navigation controls
+ */
 export function SiteDetailsNavigation({
     activeSiteDetailsTab,
     currentSite,

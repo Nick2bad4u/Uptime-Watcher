@@ -1,15 +1,41 @@
+/**
+ * Site card status display component.
+ * Provides visual status indicator for site monitoring state.
+ */
+
 import React from "react";
 
 import { StatusBadge } from "../../common/StatusBadge";
 
+/**
+ * Props for the SiteCardStatus component.
+ */
 interface SiteCardStatusProps {
+    /** ID of the currently selected monitor */
     selectedMonitorId: string;
+    /** Current status of the monitor */
     status: "up" | "down" | "pending";
 }
 
 /**
- * Status section of the site card showing the current monitor status
- * Memoized to prevent unnecessary re-renders
+ * Status section component for site card displaying current monitor status.
+ *
+ * Features:
+ * - Visual status indicator using StatusBadge component
+ * - Monitor type identification in status label
+ * - Optimized with React.memo to prevent unnecessary re-renders
+ * - Consistent styling with theme system
+ *
+ * @param props - Component props
+ * @returns JSX element containing the status badge
+ *
+ * @example
+ * ```tsx
+ * <SiteCardStatus
+ *   selectedMonitorId="http"
+ *   status="up"
+ * />
+ * ```
  */
 export const SiteCardStatus = React.memo(function SiteCardStatus({ selectedMonitorId, status }: SiteCardStatusProps) {
     return <StatusBadge label={`${selectedMonitorId.toUpperCase()} Status`} status={status} size="sm" />;

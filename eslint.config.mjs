@@ -1,3 +1,10 @@
+/**
+ * ESLint configuration for the Uptime Watcher application.
+ * 
+ * Comprehensive linting setup with TypeScript, React, accessibility,
+ * code quality, and security rules for maintaining code standards.
+ */
+
 import globals from "globals";
 import tseslint from "typescript-eslint";
 import js from "@eslint/js";

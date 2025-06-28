@@ -1,3 +1,8 @@
+/**
+ * Analytics tab component providing comprehensive monitoring statistics and visualizations.
+ * Displays advanced metrics, charts, and performance analysis for site monitoring.
+ */
+
 import { Line, Bar, Doughnut } from "react-chartjs-2";
 
 import { DowntimePeriod } from "../../../hooks/site/useSiteAnalytics";
@@ -5,36 +10,85 @@ import logger from "../../../services/logger";
 import { ThemedBox, ThemedText, ThemedButton } from "../../../theme/components";
 import { StatusHistory, MonitorType } from "../../../types";
 
+/**
+ * Props for the AnalyticsTab component.
+ * Contains comprehensive metrics, chart data, and formatting functions.
+ */
+/**
+ * Props for the AnalyticsTab component.
+ * Contains comprehensive metrics, chart data, and formatting functions.
+ */
 interface AnalyticsTabProps {
+    /** Average response time across all checks */
     avgResponseTime: number;
+    /** Chart.js data configuration for bar chart */
     barChartData: Record<string, unknown>;
+    /** Chart.js options configuration for bar chart */
     barChartOptions: Record<string, unknown>;
+    /** Current time range for charts (e.g., "24h", "7d") */
     chartTimeRange: string;
+    /** Chart.js options configuration for doughnut chart */
     doughnutOptions: Record<string, unknown>;
+    /** Number of failed checks */
     downCount: number;
+    /** Array of downtime periods with durations */
     downtimePeriods: DowntimePeriod[];
+    /** Filtered history data for current time range */
     filteredHistory: StatusHistory[];
+    /** Function to format duration values */
     formatDuration: (ms: number) => string;
+    /** Function to format response time values */
     formatResponseTime: (time: number) => string;
+    /** Function to get color based on availability percentage */
     getAvailabilityColor: (percentage: number) => string;
+    /** Function to get description based on availability percentage */
     getAvailabilityDescription: (percentage: number) => string;
+    /** Function to get variant based on availability percentage */
     getAvailabilityVariant: (percentage: number) => "success" | "warning" | "danger";
+    /** Chart.js data configuration for line chart */
     lineChartData: Record<string, unknown>;
+    /** Chart.js options configuration for line chart */
     lineChartOptions: Record<string, unknown>;
+    /** Type of monitor being analyzed */
     monitorType: MonitorType;
+    /** Mean time to recovery in milliseconds */
     mttr: number;
+    /** 50th percentile response time */
     p50: number;
+    /** 95th percentile response time */
     p95: number;
+    /** 99th percentile response time */
     p99: number;
+    /** Function to toggle advanced metrics visibility */
     setShowAdvancedMetrics: (show: boolean) => void;
+    /** Whether advanced metrics are currently shown */
     showAdvancedMetrics: boolean;
+    /** Total number of checks performed */
     totalChecks: number;
+    /** Total downtime in milliseconds */
     totalDowntime: number;
+    /** Number of successful checks */
     upCount: number;
+    /** Uptime percentage as string */
     uptime: string;
+    /** Chart.js data configuration for uptime chart */
     uptimeChartData: Record<string, unknown>;
 }
 
+/**
+ * Analytics tab component displaying comprehensive monitoring analytics and visualizations.
+ *
+ * Features:
+ * - Multiple chart types (line, bar, doughnut) for different metrics
+ * - Key performance indicators (uptime, response time, availability)
+ * - Advanced metrics (percentiles, MTTR, downtime analysis)
+ * - Interactive charts with time range filtering
+ * - Downtime period analysis
+ * - Export capabilities for chart data
+ *
+ * @param props - Component props containing metrics and chart configurations
+ * @returns JSX element displaying analytics interface
+ */
 export function AnalyticsTab({
     avgResponseTime,
     barChartData,

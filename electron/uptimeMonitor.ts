@@ -1,3 +1,8 @@
+/**
+ * Core uptime monitoring service.
+ * Orchestrates site monitoring, data persistence, and event emission for the application.
+ */
+
 /* eslint-disable functional/no-let */
 /* eslint-disable unicorn/no-null -- null literal needed for backend */
 import { EventEmitter } from "events";
@@ -14,11 +19,38 @@ import { Site, StatusHistory, StatusUpdate } from "./types";
 import { monitorLogger as logger } from "./utils/logger";
 import { withDbRetry } from "./utils/retry";
 
-// Default timeout for HTTP requests (10 seconds)
+/** Default timeout for HTTP requests (10 seconds) */
 const DEFAULT_REQUEST_TIMEOUT = 10000;
 
-// Constants
+/** Constants */
 const STATUS_UPDATE_EVENT = "status-update";
+
+/**
+ * Core uptime monitoring service that manages site monitoring operations.
+ *
+ * This class serves as the central orchestrator for:
+ * - Site and monitor management (CRUD operations)
+ * - Scheduled monitoring with customizable intervals
+ * - Data persistence through repository pattern
+ * - Event emission for UI updates and notifications
+ * - History tracking with configurable retention limits
+ *
+ * Extends EventEmitter to provide real-time updates to the renderer process.
+ *
+ * Events emitted:
+ * - status-update: When monitor status changes
+ * - site-monitor-down: When a monitor goes down
+ * - site-monitor-up: When a monitor comes back up
+ * - db-error: When database operations fail
+ *
+ * @example
+ * ```typescript
+ * const monitor = new UptimeMonitor();
+ * monitor.on('status-update', (data) => console.log(data));
+ * await monitor.addSite({ identifier: 'example', monitors: [...] });
+ * monitor.startMonitoring();
+ * ```
+ */
 
 export class UptimeMonitor extends EventEmitter {
     private sites: Map<string, Site> = new Map(); // key: site.identifier

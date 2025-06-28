@@ -1,3 +1,8 @@
+/**
+ * History tab component for displaying monitor check history.
+ * Provides filtering, pagination, and detailed history records view.
+ */
+
 import { useState, useEffect, useRef } from "react";
 
 import logger from "../../../services/logger";
@@ -5,13 +10,33 @@ import { useStore } from "../../../store";
 import { ThemedBox, ThemedText, ThemedButton, StatusIndicator } from "../../../theme/components";
 import { StatusHistory, Monitor } from "../../../types";
 
+/**
+ * Props for the HistoryTab component.
+ */
 interface HistoryTabProps {
+    /** Function to format timestamps for display */
     formatFullTimestamp: (timestamp: number) => string;
+    /** Function to format response times for display */
     formatResponseTime: (time: number) => string;
+    /** Function to format status with appropriate icons */
     formatStatusWithIcon: (status: string) => string;
+    /** Currently selected monitor to display history for */
     selectedMonitor: Monitor;
 }
 
+/**
+ * History tab component displaying paginated monitor check history.
+ *
+ * Features:
+ * - Filterable history by status (all, up, down)
+ * - Configurable display limits with pagination
+ * - Detailed history records with timestamps and response times
+ * - Export functionality for history data
+ * - User action logging for analytics
+ *
+ * @param props - Component props containing formatting functions and monitor data
+ * @returns JSX element displaying history interface
+ */
 export function HistoryTab({
     formatFullTimestamp,
     formatResponseTime,

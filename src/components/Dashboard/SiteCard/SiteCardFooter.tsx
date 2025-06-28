@@ -1,10 +1,27 @@
+/**
+ * Site card footer component.
+ * Provides visual hint for card interaction and navigation.
+ */
+
 import React from "react";
 
 import { ThemedText } from "../../../theme/components";
 
 /**
- * Footer section of the site card with click hint
- * Memoized since it's a static component
+ * Footer section component for site cards with interactive hint text.
+ *
+ * Features:
+ * - Hover-triggered opacity animation for subtle user guidance
+ * - Consistent styling with top border separator
+ * - Static content optimized with React.memo
+ * - Responsive design with themed text components
+ *
+ * @returns JSX element containing the footer with interaction hint
+ *
+ * @example
+ * ```tsx
+ * <SiteCardFooter />
+ * ```
  */
 export const SiteCardFooter = React.memo(function SiteCardFooter() {
     return (

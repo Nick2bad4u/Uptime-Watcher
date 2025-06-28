@@ -1,6 +1,15 @@
+/**
+ * Theme definitions for the application.
+ * Contains predefined light and dark theme configurations with complete styling properties.
+ */
+
 import { FONT_FAMILY_MONO, FONT_FAMILY_SANS } from "../constants";
 import { Theme } from "./types";
 
+/**
+ * Light theme configuration.
+ * Provides a clean, bright appearance suitable for well-lit environments.
+ */
 export const lightTheme: Theme = {
     borderRadius: {
         full: "9999px",
@@ -109,6 +118,10 @@ export const lightTheme: Theme = {
     },
 };
 
+/**
+ * Dark theme configuration.
+ * Provides a modern dark appearance suitable for low-light environments and reduced eye strain.
+ */
 export const darkTheme: Theme = {
     borderRadius: {
         full: "9999px",

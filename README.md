@@ -1,4 +1,5 @@
 # 📊 Uptime Watcher
+<!-- markdownlint-disable -->
 
 An Electron desktop application for monitoring website uptime status with real-time updates, response time tracking, and historical data visualization.
 
@@ -87,11 +88,35 @@ For detailed architecture information, see the [comprehensive documentation](doc
 
 Complete documentation is available in the `docs/` folder:
 
-- **[Documentation Index](docs/README.md)** - Complete documentation navigation
-- **[Developer Guide](docs/guides/Developer-Guide.md)** - Setup and development workflow
-- **[Architecture Guide](docs/architecture/Project-Architecture-Guide.copilotmd)** - Complete system architecture
-- **[Component Documentation](docs/component-docs/)** - Individual component guides
-- **[IPC API Reference](docs/guides/IPC-API-Reference.md)** - Electron IPC communication
+### 📚 Core Documentation
+
+- **[📚 Documentation Index](docs/README.md)** - Complete documentation navigation
+- **[🚀 Developer Guide](docs/guides/Developer-Guide.md)** - Setup and development workflow
+- **[🏗️ Architecture Guide](docs/architecture/Project-Architecture-Guide.copilotmd)** - Complete system architecture
+
+### 📖 API Reference
+
+- **[📖 API Reference](docs/api/README.md)** - Comprehensive API documentation
+  - [Store API](docs/api/store-api.md) - State management interfaces
+  - [IPC API](docs/api/ipc-api.md) - Electron communication
+  - [Types API](docs/api/types-api.md) - TypeScript definitions
+  - [Theme API](docs/api/theme-api.md) - Theming system
+  - [Hook APIs](docs/api/hook-apis.md) - React hooks
+  - [Database API](docs/api/database-api.md) - Data persistence
+  - [Utilities API](docs/api/utilities-api.md) - Helper functions
+
+### 📘 User Guides
+
+- **[❓ FAQ](docs/guides/FAQ.md)** - Frequently asked questions
+- **[🔧 Troubleshooting Guide](docs/guides/Troubleshooting.md)** - Common issues and solutions
+- **[⚡ Performance Guide](docs/guides/Performance-Guide.md)** - Optimization strategies
+- **[🛡️ Security Guide](docs/guides/Security-Guide.md)** - Security considerations
+
+### 🧩 Component Documentation
+
+- **[🧩 Component Docs](docs/component-docs/README.md)** - UI component documentation
+- **[Dashboard](docs/component-docs/Dashboard.md)** - Main dashboard component
+- **[Site Details](docs/component-docs/SiteDetails.md)** - Site detail modal system
 
 ## Contributing
 

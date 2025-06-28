@@ -1,33 +1,43 @@
+/**
+ * Preload script that exposes safe IPC communication to the renderer process.
+ * Creates a secure bridge between the main and renderer processes using Electron's contextBridge.
+ * Organized by domain for better maintainability and type safety.
+ */
+
 import { contextBridge, ipcRenderer } from "electron";
 
 import { Site } from "./types";
 
-/**
- * Preload script that exposes safe IPC communication to the renderer process.
- * Organized by domain for better maintainability and type safety.
- */
-
-// Site management APIs
+/** Site management API methods for CRUD operations */
 const siteAPI = {
+    /** Add a new site with monitors */
     addSite: (site: Site) => ipcRenderer.invoke("add-site", site),
+    /** Trigger an immediate check for a specific site monitor */
     checkSiteNow: (identifier: string, monitorType: string) =>
         ipcRenderer.invoke("check-site-now", identifier, monitorType),
+    /** Retrieve all sites from the database */
     getSites: () => ipcRenderer.invoke("get-sites"),
+    /** Remove a site and all its data */
     removeSite: (identifier: string) => ipcRenderer.invoke("remove-site", identifier),
+    /** Update site properties */
     updateSite: (identifier: string, updates: Partial<Site>) => ipcRenderer.invoke("update-site", identifier, updates),
 };
 
-// Monitoring control APIs
+/** Monitoring control API methods for starting/stopping monitoring */
 const monitoringAPI = {
+    /** Start monitoring for all sites */
     startMonitoring: () => ipcRenderer.invoke("start-monitoring"),
+    /** Start monitoring for a specific site */
     startMonitoringForSite: (identifier: string, monitorType?: string) =>
         ipcRenderer.invoke("start-monitoring-for-site", identifier, monitorType),
+    /** Stop monitoring for all sites */
     stopMonitoring: () => ipcRenderer.invoke("stop-monitoring"),
+    /** Stop monitoring for a specific site */
     stopMonitoringForSite: (identifier: string, monitorType?: string) =>
         ipcRenderer.invoke("stop-monitoring-for-site", identifier, monitorType),
 };
 
-// Data management APIs
+/** Data management API methods for import/export operations */
 const dataAPI = {
     downloadSQLiteBackup: async () => {
         // Returns { buffer: ArrayBuffer, fileName: string }

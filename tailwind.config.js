@@ -1,3 +1,9 @@
+/**
+ * Tailwind CSS configuration for the Uptime Watcher application.
+ *
+ * Defines custom colors for status indicators, extended animations,
+ * and responsive design settings.
+ */
 export default {
     content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
     darkMode: "class",

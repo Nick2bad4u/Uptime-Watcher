@@ -1,18 +1,49 @@
+/**
+ * Monitor selection dropdown component.
+ * Provides interface for selecting between multiple monitors for a site.
+ */
+
 import React, { useCallback } from "react";
 
 import { ThemedSelect } from "../../../../theme/components";
 import { Monitor } from "../../../../types";
 
+/**
+ * Props for the MonitorSelector component.
+ */
 interface MonitorSelectorProps {
+    /** Array of available monitors to choose from */
     monitors: Monitor[];
+    /** ID of the currently selected monitor */
     selectedMonitorId: string;
+    /** Callback function for selection change events */
     onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    /** Optional CSS classes for custom styling */
     className?: string;
 }
 
 /**
- * Reusable monitor selection dropdown
- * Optimized with proper event handling and memoization
+ * Monitor selection dropdown component for switching between site monitors.
+ *
+ * Features:
+ * - Dynamic option formatting based on monitor type and configuration
+ * - Event propagation control to prevent card click conflicts
+ * - Optimized with React.memo and useCallback for performance
+ * - Themed select component integration
+ * - Supports HTTP and port monitor types with descriptive labels
+ *
+ * @param props - Component props
+ * @returns JSX element containing the monitor selector dropdown
+ *
+ * @example
+ * ```tsx
+ * <MonitorSelector
+ *   monitors={site.monitors}
+ *   selectedMonitorId="monitor-1"
+ *   onChange={handleMonitorChange}
+ *   className="w-32"
+ * />
+ * ```
  */
 export const MonitorSelector = React.memo(function MonitorSelector({
     className = "min-w-[80px]",

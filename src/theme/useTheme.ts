@@ -1,3 +1,8 @@
+/**
+ * Theme management hook providing theme state, controls, and utility functions.
+ * Handles theme switching, system theme detection, and provides color/styling utilities.
+ */
+
 import { useEffect, useState, useCallback } from "react";
 
 import type { StatusType } from "../constants";
@@ -6,6 +11,18 @@ import { useStore } from "../store";
 import { themeManager } from "./ThemeManager";
 import { Theme, ThemeName } from "./types";
 
+/**
+ * Main theme hook providing comprehensive theme management functionality.
+ *
+ * Features:
+ * - Current theme state and switching
+ * - System theme detection and synchronization
+ * - Status-based color utilities
+ * - Availability color mapping
+ * - CSS variable management
+ *
+ * @returns Object containing theme state, setters, and utility functions
+ */
 export function useTheme() {
     const { settings, updateSettings } = useStore();
     const [systemTheme, setSystemTheme] = useState<"light" | "dark">("light");
@@ -95,13 +112,20 @@ export function useTheme() {
     };
 }
 
-// Utility hook for getting theme values in components
+/**
+ * Utility hook for accessing specific values from the current theme.
+ * @param selector - Function that extracts a value from the theme
+ * @returns The selected value from the current theme
+ */
 export function useThemeValue<T>(selector: (theme: Theme) => T): T {
     const { currentTheme } = useTheme();
     return selector(currentTheme);
 }
 
-// Hook for theme-aware status colors
+/**
+ * Hook for accessing theme-aware status colors.
+ * @returns Object containing status colors from the current theme
+ */
 export function useStatusColors() {
     const { currentTheme } = useTheme();
 
@@ -113,7 +137,11 @@ export function useStatusColors() {
     };
 }
 
-// Hook for theme-aware CSS classes using CSS custom properties
+/**
+ * Hook for theme-aware CSS classes using CSS custom properties.
+ * Provides utility functions for generating dynamic CSS classes based on the current theme.
+ * @returns Object with methods for generating background, text, and status classes
+ */
 export function useThemeClasses() {
     const { getColor } = useTheme();
 

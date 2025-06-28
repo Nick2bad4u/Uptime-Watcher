@@ -1,3 +1,9 @@
+/**
+ * Chart configuration service for consistent chart styling and behavior.
+ * Provides theme-aware chart configurations for Chart.js components
+ * used throughout the application for data visualization.
+ */
+
 import { ChartOptions } from "chart.js";
 
 import { Theme } from "../theme/types";
@@ -205,7 +211,11 @@ export class ChartConfigService {
 }
 
 /**
- * Hook to get chart configurations with current theme
+ * React hook for getting theme-aware chart configurations.
+ *
+ * @param theme - Current theme object for styling charts
+ * @param totalChecks - Total number of checks for pie chart configuration
+ * @returns Object containing various chart configuration options
  */
 export function useChartConfigs(theme: Theme, totalChecks: number = 0) {
     const chartService = new ChartConfigService(theme);

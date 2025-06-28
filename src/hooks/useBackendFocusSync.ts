@@ -1,3 +1,9 @@
+/**
+ * Hook for synchronizing data when the application window gains focus.
+ * Provides functionality to automatically refresh data from the backend
+ * when users return to the application after being away.
+ */
+
 import { useEffect } from "react";
 
 import { useStore } from "../store";

@@ -1,3 +1,11 @@
+/**
+ * Application settings component
+ *
+ * Provides a comprehensive settings interface for configuring application
+ * behavior, theme preferences, monitoring settings, and data management.
+ * Includes backup/restore functionality and system configuration options.
+ */
+
 import { useState, useEffect, useCallback } from "react";
 
 import { HISTORY_LIMIT_OPTIONS, TIMEOUT_CONSTRAINTS, UI_DELAYS } from "../../constants";
@@ -15,9 +23,26 @@ import {
 import { ThemeName } from "../../theme/types";
 import { useTheme } from "../../theme/useTheme";
 
+/** Props for the Settings component */
 interface SettingsProps {
+    /** Callback function to close the settings modal/view */
     onClose: () => void;
 }
+
+/**
+ * Settings component providing comprehensive application configuration.
+ *
+ * Offers controls for:
+ * - Theme selection and appearance
+ * - Monitoring intervals and timeouts
+ * - History retention settings
+ * - Notification preferences
+ * - Data backup and restore
+ * - System diagnostics and reset options
+ *
+ * @param props - Component props
+ * @returns JSX element containing the settings interface
+ */
 
 export function Settings({ onClose }: SettingsProps) {
     const {

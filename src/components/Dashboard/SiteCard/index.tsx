@@ -1,3 +1,8 @@
+/**
+ * SiteCard component displaying comprehensive monitoring information for a single site.
+ * Composed of multiple sub-components for maintainability and reusability.
+ */
+
 import React from "react";
 
 import { useSite } from "../../../hooks/site";
@@ -9,14 +14,28 @@ import { SiteCardHistory } from "./SiteCardHistory";
 import { SiteCardMetrics } from "./SiteCardMetrics";
 import { SiteCardStatus } from "./SiteCardStatus";
 
+/** Props for the SiteCard component */
 interface SiteCardProps {
+    /** Site data to display */
     site: Site;
 }
 
 /**
- * Refactored SiteCard component using composition of smaller components
- * Much cleaner and more maintainable than the original monolithic component
- * Memoized to prevent unnecessary re-renders when parent updates
+ * Main site card component using composition of smaller, focused sub-components.
+ * Provides a complete overview of site monitoring status, metrics, and controls.
+ *
+ * Features:
+ * - Real-time status indicators
+ * - Historical uptime data visualization
+ * - Monitor management controls
+ * - Performance metrics display
+ * - Click-to-expand details
+ *
+ * Much cleaner and more maintainable than a monolithic component approach.
+ * Memoized to prevent unnecessary re-renders when parent updates.
+ *
+ * @param props - SiteCard component props
+ * @returns JSX element containing the complete site monitoring card
  */
 export const SiteCard = React.memo(function SiteCard({ site }: SiteCardProps) {
     // Use our custom hook to get all the data and functionality we need
@@ -48,7 +67,7 @@ export const SiteCard = React.memo(function SiteCard({ site }: SiteCardProps) {
             padding="md"
             rounded="md"
             shadow="sm"
-            className="flex flex-col gap-2 cursor-pointer site-card w-full"
+            className="flex flex-col w-full gap-2 cursor-pointer site-card"
             onClick={handleCardClick}
         >
             <SiteCardHeader

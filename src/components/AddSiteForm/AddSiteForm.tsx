@@ -1,3 +1,8 @@
+/**
+ * AddSiteForm component for creating new sites and adding monitors to existing sites.
+ * Provides a comprehensive form with validation and flexible configuration options.
+ */
+
 import React, { useState, useEffect, useCallback } from "react";
 
 import { UI_DELAYS, CHECK_INTERVALS } from "../../constants";
@@ -10,6 +15,22 @@ import { TextField, SelectField, RadioGroup } from "./FormFields";
 import { handleSubmit } from "./Submit";
 import { useAddSiteForm } from "./useAddSiteForm";
 
+/**
+ * Main form component for adding new monitoring sites or monitors.
+ *
+ * Features:
+ * - Create new sites with monitors
+ * - Add monitors to existing sites
+ * - Support for HTTP and port monitoring
+ * - Form validation and error handling
+ * - Configurable check intervals
+ * - Responsive design with loading states
+ *
+ * The component uses a custom hook (useAddSiteForm) for state management
+ * and modular sub-components for form fields and submission handling.
+ *
+ * @returns JSX element containing the complete add site form
+ */
 export const AddSiteForm = React.memo(function AddSiteForm() {
     const { addMonitorToSite, clearError, createSite, isLoading, lastError, sites } = useStore();
     const { isDark } = useTheme();

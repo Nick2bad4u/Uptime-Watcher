@@ -1,9 +1,20 @@
+/**
+ * Auto-updater service for the Uptime Watcher application.
+ * Handles automatic application updates using electron-updater.
+ */
+
 import { autoUpdater } from "electron-updater";
 
 import { logger } from "../../utils/logger";
 
+/**
+ * Status of the application update process.
+ */
 export type UpdateStatus = "idle" | "checking" | "available" | "downloading" | "downloaded" | "error";
 
+/**
+ * Data structure for update status information.
+ */
 export interface UpdateStatusData {
     status: UpdateStatus;
     error?: string;

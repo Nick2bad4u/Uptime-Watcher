@@ -1,20 +1,37 @@
+/**
+ * HistoryChart component for visualizing status history as mini chart bars.
+ * Provides a compact, responsive chart for displaying historical uptime/downtime data.
+ */
+
 import React from "react";
 
 import { MiniChartBar, ThemedText } from "../../theme/components";
 import { StatusHistory } from "../../types";
 
+/** Props for the HistoryChart component */
 interface HistoryChartProps {
+    /** Array of historical status records to display */
     history: StatusHistory[];
+    /** Title to display above the chart */
     title: string;
+    /** Maximum number of items to display (default: 120) */
     maxItems?: number;
+    /** Additional CSS classes */
     className?: string;
 }
 
 /**
- * Reusable history chart component for visualizing status history
- * Can be used anywhere we need to show historical data
- * Memoized to prevent unnecessary re-renders when data hasn't changed
- * Uses CSS-based responsive layout instead of complex JavaScript calculations
+ * Reusable history chart component for visualizing status history.
+ * Can be used anywhere we need to show historical data.
+ *
+ * Features:
+ * - Responsive layout using CSS
+ * - Memoized to prevent unnecessary re-renders
+ * - Configurable item limit
+ * - Graceful handling of empty data
+ *
+ * @param props - HistoryChart component props
+ * @returns JSX element containing the history chart or null if no data
  */
 export const HistoryChart = React.memo(function HistoryChart({
     className = "",
@@ -22,6 +39,7 @@ export const HistoryChart = React.memo(function HistoryChart({
     maxItems = 120,
     title,
 }: HistoryChartProps) {
+    // Return null for empty history (React convention for "render nothing")
     if (history.length === 0) {
         // React components, returning null from a render function
         // is actually the correct and idiomatic way to indicate "render nothing."
@@ -30,7 +48,7 @@ export const HistoryChart = React.memo(function HistoryChart({
         return null;
     }
 
-    // Simple approach: show up to maxItems bars, let CSS handle responsive layout
+    // Show up to maxItems bars, most recent first (reverse chronological order)
     const displayedHistory = history.slice(0, maxItems).reverse();
 
     return (

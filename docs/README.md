@@ -1,98 +1,115 @@
 # Uptime Watcher Documentation
 
-This directory contains comprehensive documentation for the Uptime Watcher project, organized by category for easy navigation.
+Welcome to the Uptime Watcher documentation hub! This comprehensive knowledge base provides everything you need to understand, use, and contribute to the project.
 
-## 📁 Directory Structure
+## 📚 Quick Navigation
 
-### 🏗️ Architecture
+### Getting Started
 
-Contains high-level architecture and design documents:
+- [Developer Guide](guides/Developer-Guide.md) - Complete setup and development workflow
+- [FAQ](guides/FAQ.md) - Frequently asked questions
+- [Troubleshooting](guides/Troubleshooting.md) - Common issues and solutions
 
-- **Project-Architecture-Guide.copilotmd** - Complete project architecture overview
+### API Documentation
 
-### 📚 Guides
+- [API Reference Overview](api/README.md) - Complete API documentation index
+- [IPC API Reference](guides/IPC-API-Reference.md) - Inter-process communication
+- [Types API](api/types-api.md) - TypeScript type definitions
+- [Store API](api/store-api.md) - State management
+- [Monitor API](api/monitor-api.md) - Uptime monitoring core
 
-Development guides and integration documentation:
+### Component Documentation
 
-- **AI-State-Theme-Integration-Guide.copilotmd** - AI state and theme integration guide
-- **Developer-Guide.md** - Comprehensive development setup and workflow guide
-- **Theme-Usage.md** - Theme usage and customization guide
-- **Validator.md** - Validation patterns and best practices
+- [Component Documentation](component-docs/README.md) - React component reference
 
-### 🔧 Refactoring
+### Architecture & Design
 
-Documentation related to code refactoring efforts:
+- [Project Architecture](architecture/Project-Architecture-Guide.copilotmd) - System design and structure
+- [Theme System](guides/Theme-Usage.md) - UI theming and customization
+- [Validation System](guides/Validator.md) - Input validation and error handling
 
-- **BackendRafactor.copilotmd** - Backend refactoring summary and frontend review
-- **BackendRafactor.md** - Additional backend refactoring documentation
+### Performance & Security
 
-### 📦 Component Documentation
+- [Performance Guide](guides/Performance-Guide.md) - Optimization best practices
+- [Security Guide](guides/Security-Guide.md) - Security considerations and practices
 
-Detailed documentation for specific components:
+### Development Resources
 
-- **AddSiteForm.md** - AddSiteForm component structure and logic (updated for modular architecture)
-- **AddSiteForm-Components.md** - AddSiteForm sub-components (FormFields, Submit)
-- **Dashboard.md** - Dashboard component architecture and features
-- **SiteDetails.md** - SiteDetails modal component system
-- **SiteDetails-Tab-Components.md** - SiteDetails tab components (Overview, History, Analytics, Settings)
-- **SiteCard-Components.md** - SiteCard component system and sub-components
-- **SiteList-Components.md** - SiteList and EmptyState components
-- **Header.md** - Header component with status overview and global controls
-- **Settings.md** - Settings modal component with configuration management
-- **Common-Components.md** - Reusable components (StatusBadge, HistoryChart)
-- **SiteDetails-Refactoring-Summary.copilotmd** - SiteDetails component refactoring
+- [Documentation Contribution Guide](guides/Documentation-Contribution.md) - How to improve these docs
+- [Migration Summaries](migration-summaries/) - Historical change documentation
+- [Optimization Reports](optimization-summaries/) - Performance improvement records
+- [Health Reports](health-reports/) - Code quality assessments
 
-### 🚀 Migration Summaries
+## 🔍 Documentation Structure
 
-Documentation of major migrations and transitions:
+```text
+docs/
+├── README.md                    # This file - main documentation hub
+├── api/                         # API reference documentation
+│   ├── README.md               # API documentation index
+│   ├── store-api.md            # State management API
+│   ├── monitor-api.md          # Uptime monitoring API
+│   ├── theme-api.md            # Theme system API
+│   ├── database-api.md         # Database operations API
+│   ├── notification-api.md     # Notification system API
+│   ├── logger-api.md           # Logging system API
+│   ├── utilities-api.md        # Utility functions API
+│   ├── validation-utils-api.md # Validation utilities API
+│   ├── chart-api.md            # Chart components API
+│   ├── hook-apis.md            # React hooks API
+│   ├── ipc-api.md              # IPC communication API
+│   └── types-api.md            # TypeScript definitions
+├── guides/                      # User and developer guides
+│   ├── Developer-Guide.md      # Complete development setup
+│   ├── FAQ.md                  # Frequently asked questions
+│   ├── Troubleshooting.md      # Problem solving guide
+│   ├── Performance-Guide.md    # Performance optimization
+│   ├── Security-Guide.md       # Security best practices
+│   ├── Theme-Usage.md          # UI theming guide
+│   ├── Validator.md            # Validation system guide
+│   ├── IPC-API-Reference.md    # IPC communication guide
+│   └── Documentation-Contribution.md # Documentation guidelines
+├── component-docs/             # React component documentation
+├── architecture/               # System architecture documentation
+├── migration-summaries/        # Historical migration records
+├── optimization-summaries/     # Performance optimization records
+├── health-reports/            # Code quality and health reports
+└── instructions/              # Development instructions and guides
+```
 
-- **Backend-Persistence-Migration-SQLite.copilotmd** - SQLite backend migration summary
-- **Logging-Migration-Summary.copilotmd** - Logging system migration summary
+## 🚀 Quick Start
 
-### ⚡ Optimization Summaries
+1. **New Developer?** Start with the [Developer Guide](guides/Developer-Guide.md)
+2. **Looking for APIs?** Check the [API Reference](api/README.md)
+3. **Having Issues?** See [Troubleshooting](guides/Troubleshooting.md) and [FAQ](guides/FAQ.md)
+4. **Want to Contribute?** Read the [Documentation Contribution Guide](guides/Documentation-Contribution.md)
 
-Performance and optimization-related documentation:
+## 🔗 External Resources
 
-- **Future-Proofing-Improvements-Summary.copilotmd** - Future-proofing improvements and patterns
-- **Performance-Optimization-Summary.copilotmd** - General performance optimizations
+- [Main Project README](../README.md) - Project overview and setup
+- [Contributing Guidelines](../CONTRIBUTING.md) - How to contribute to the project
+- [Security Policy](../SECURITY.md) - Security reporting and practices
+- [Changelog](../CHANGELOG.md) - Project version history
 
-### 🏥 Health Reports
+## 📝 Documentation Standards
 
-Code quality and health assessment reports:
+All documentation in this project follows:
 
-- **Codebase-Health-Check.copilotmd** - Updated comprehensive codebase health assessment
+- **Markdown standards** with proper linting
+- **Cross-linking** for easy navigation
+- **GitHub-compatible** formatting and links
+- **Comprehensive coverage** of all APIs and features
+- **Regular updates** with code changes
 
-### 🛠️ Instructions
+## 🆘 Getting Help
 
-Development environment and tooling instructions:
+If you can't find what you're looking for:
 
-- **copilot-instructions.md** - Full Copilot development instructions
-- **copilot-instructions-short.md** - Condensed Copilot instructions
+1. Check the [FAQ](guides/FAQ.md) for common questions
+2. Review [Troubleshooting](guides/Troubleshooting.md) for technical issues
+3. Search through the [API documentation](api/README.md)
+4. Create an issue on GitHub with the `documentation` label
 
-## 📖 Getting Started
+---
 
-1. **New Developers**: Start with `guides/Developer-Guide.md` for complete setup instructions
-2. **Architecture Overview**: Read `architecture/Project-Architecture-Guide.copilotmd` for system understanding
-3. **Component Work**: Check `component-docs/` for specific component documentation
-4. **Refactoring History**: Review `refactoring/BackendRafactor.copilotmd` for architectural changes
-5. **Performance**: Check `optimization-summaries/` for performance best practices
-6. **Code Quality**: Review `health-reports/` for current codebase health status
-
-## 🔄 Document Updates
-
-When adding new documentation:
-
-- Place architecture documents in `architecture/`
-- Place how-to guides in `guides/`
-- Place refactoring docs in `refactoring/`
-- Place component-specific docs in `component-docs/`
-- Place migration docs in `migration-summaries/`
-- Place optimization docs in `optimization-summaries/`
-- Place health reports in `health-reports/`
-
-## 📝 File Naming Convention
-
-- Use descriptive, kebab-case naming: `component-optimization-summary.md`
-- Include the document type in the name when relevant
-- Use `.md` extension for standard markdown files
-- Use `.copilotmd` extension for Copilot-generated documentation
+**Last updated:** December 2024

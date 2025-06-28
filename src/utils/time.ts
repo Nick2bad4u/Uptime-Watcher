@@ -1,7 +1,12 @@
-// Centralized utility functions for time and formatting
+/**
+ * Centralized utility functions for time and formatting.
+ * Provides consistent time formatting throughout the application.
+ */
 
 /**
- * Format response time in a human-readable format
+ * Format response time in a human-readable format.
+ * Automatically chooses between milliseconds and seconds based on magnitude.
+ *
  * @param time - Response time in milliseconds
  * @returns Formatted time string (e.g., "234ms" or "1.23s")
  */
@@ -12,9 +17,11 @@ export function formatResponseTime(time?: number): string {
 }
 
 /**
- * Format timestamp in a human-readable format (relative time)
+ * Format timestamp in a human-readable relative format.
+ * Shows how long ago the timestamp occurred.
+ *
  * @param timestamp - Unix timestamp in milliseconds
- * @returns Formatted timestamp string
+ * @returns Formatted relative timestamp string (e.g., "2 minutes ago")
  */
 export function formatTimestamp(timestamp: number): string {
     const ms = Date.now() - timestamp;

@@ -1,51 +1,88 @@
+/**
+ * Custom hook for managing add site form state and validation.
+ * Provides comprehensive form state management for creating new sites and adding monitors to existing sites.
+ */
+
 import { useState, useEffect, useCallback } from "react";
 
 import { CHECK_INTERVALS } from "../../constants";
 import { generateUuid } from "../../utils/data/generateUuid";
 
+/** Form operation mode */
 export type FormMode = "new" | "existing";
+
+/** Supported monitor types */
 export type MonitorType = "http" | "port";
 
+/**
+ * Form state interface containing all form field values and UI state.
+ */
 export interface AddSiteFormState {
-    // Form fields
+    /** URL field for HTTP monitors */
     url: string;
+    /** Host/IP field for port monitors */
     host: string;
+    /** Port number field for port monitors */
     port: string;
+    /** Display name for the site */
     name: string;
+    /** Selected monitor type */
     monitorType: MonitorType;
+    /** Check interval in milliseconds */
     checkInterval: number;
+    /** Generated site identifier */
     siteId: string;
-
-    // Mode and selection
+    /** Form operation mode (new site vs existing site) */
     addMode: FormMode;
+    /** Selected existing site ID when adding to existing */
     selectedExistingSite: string;
-
-    // UI state
+    /** Current form validation error */
     formError: string | undefined;
 }
 
+/**
+ * Form actions interface containing all form manipulation functions.
+ */
 export interface AddSiteFormActions {
-    // Field setters
+    /** Set URL field value */
     setUrl: (value: string) => void;
+    /** Set host field value */
     setHost: (value: string) => void;
+    /** Set port field value */
     setPort: (value: string) => void;
+    /** Set site name field value */
     setName: (value: string) => void;
+    /** Set monitor type */
     setMonitorType: (value: MonitorType) => void;
+    /** Set check interval */
     setCheckInterval: (value: number) => void;
+    /** Set site ID */
     setSiteId: (value: string) => void;
-
-    // Mode and selection setters
+    /** Set form operation mode */
     setAddMode: (value: FormMode) => void;
+    /** Set selected existing site */
     setSelectedExistingSite: (value: string) => void;
-
-    // UI actions
+    /** Set form error message */
     setFormError: (error: string | undefined) => void;
+    /** Reset form to initial state */
     resetForm: () => void;
-
-    // Validation
+    /** Whether the form is currently valid */
     isFormValid: boolean;
 }
 
+/**
+ * Hook for managing add site form state and operations.
+ *
+ * Features:
+ * - Complete form state management
+ * - Real-time validation
+ * - Support for both new sites and adding monitors to existing sites
+ * - Automatic UUID generation for new sites
+ * - Form reset functionality
+ * - Error handling and display
+ *
+ * @returns Combined form state and action handlers
+ */
 export function useAddSiteForm(): AddSiteFormState & AddSiteFormActions {
     // Form field state
     const [url, setUrl] = useState("");

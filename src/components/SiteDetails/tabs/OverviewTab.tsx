@@ -1,3 +1,8 @@
+/**
+ * Overview tab component for site details page.
+ * Displays key metrics, statistics, and actions for a monitored site.
+ */
+
 import { FaListOl } from "react-icons/fa";
 import { FiTrash2 } from "react-icons/fi";
 import { MdAccessTime, MdBolt, MdSpeed, MdOutlineFactCheck } from "react-icons/md";
@@ -14,18 +19,43 @@ import {
 import { useTheme, useAvailabilityColors } from "../../../theme/useTheme";
 import { Monitor } from "../../../types";
 
+/**
+ * Props for the OverviewTab component.
+ */
 interface OverviewTabProps {
+    /** Average response time across all checks */
     avgResponseTime: number;
+    /** Fastest recorded response time */
     fastestResponse: number;
+    /** Function to format response time for display */
     formatResponseTime: (time: number) => string;
+    /** Handler for removing the site */
     handleRemoveSite: () => Promise<void>;
+    /** Whether any async operation is in progress */
     isLoading: boolean;
+    /** Currently selected monitor */
     selectedMonitor: Monitor;
+    /** Slowest recorded response time */
     slowestResponse: number;
+    /** Total number of checks performed */
     totalChecks: number;
+    /** Uptime percentage as a string */
     uptime: string;
 }
 
+/**
+ * Overview tab component displaying site monitoring statistics and metrics.
+ *
+ * Features:
+ * - Uptime percentage with visual progress indicator
+ * - Response time statistics (average, fastest, slowest)
+ * - Total checks counter
+ * - Monitor status indicator
+ * - Site removal action
+ *
+ * @param props - Component props containing metrics and handlers
+ * @returns JSX element displaying overview information
+ */
 export function OverviewTab({
     avgResponseTime,
     fastestResponse,

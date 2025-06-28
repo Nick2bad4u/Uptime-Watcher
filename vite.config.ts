@@ -1,3 +1,8 @@
+/**
+ * Vite configuration for the Uptime Watcher Electron application.
+ * Configures React frontend build and Electron main/preload process compilation.
+ */
+
 import path from "path";
 // eslint-disable-next-line perfectionist/sort-imports
 import react from "@vitejs/plugin-react";
@@ -5,6 +10,10 @@ import { defineConfig } from "vite";
 import electron from "vite-plugin-electron";
 import { viteStaticCopy } from "vite-plugin-static-copy";
 
+/**
+ * Vite configuration object.
+ * Sets up build settings for both renderer (React) and main/preload processes.
+ */
 export default defineConfig({
     base: "./", // Ensures relative asset paths for Electron
     build: {

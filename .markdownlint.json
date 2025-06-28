@@ -1,4 +1,7 @@
 {
     "default": true,
-    "MD013": false
+    "MD013": false,
+    "MD029": {
+        "style": "one_or_ordered"
+    }
 }

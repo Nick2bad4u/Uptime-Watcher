@@ -1,18 +1,44 @@
+/**
+ * Screenshot thumbnail component with hover preview
+ *
+ * Displays a small thumbnail of a website screenshot that expands into a larger
+ * preview on hover/focus. Uses Microlink API for screenshot generation and
+ * React portals for the overlay positioning.
+ */
+
 import React, { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 
 import logger from "../../services/logger";
 import { useTheme } from "../../theme/useTheme";
 
+/** Props for the ScreenshotThumbnail component */
 interface ScreenshotThumbnailProps {
+    /** The URL to capture a screenshot of */
     url: string;
+    /** The site name for accessibility and alt text */
     siteName: string;
 }
 
-// Accept unknown for runtime type check
+/**
+ * Type guard to check if the window.electronAPI has openExternal method
+ * @param api - The API object to check
+ * @returns True if the API has openExternal method
+ */
 function hasOpenExternal(api: unknown): api is { openExternal: (url: string) => void } {
     return typeof (api as { openExternal?: unknown })?.openExternal === "function";
 }
+
+/**
+ * Screenshot thumbnail component with hover preview overlay.
+ *
+ * Generates a thumbnail using Microlink API and displays a larger preview
+ * when hovered. Handles external URL opening and proper positioning of
+ * the preview overlay within viewport bounds.
+ *
+ * @param props - Component props
+ * @returns JSX element containing the thumbnail and optional preview overlay
+ */
 
 export function ScreenshotThumbnail({ siteName, url }: ScreenshotThumbnailProps) {
     const [hovered, setHovered] = useState(false);

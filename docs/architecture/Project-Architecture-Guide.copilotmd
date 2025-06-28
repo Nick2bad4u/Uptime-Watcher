@@ -1,6 +1,8 @@
 <!-- markdownlint-disable -->
 
-# Uptime Watcher - Complete Project Architecture Guide
+# 🏗️ Uptime Watcher - Complete Project Architecture Guide
+
+> **Navigation:** [📖 Docs Home](../README.md) » [🏗️ Architecture](../README.md#architecture) » **Project Architecture**
 
 ## 📋 Table of Contents
 
@@ -1020,3 +1022,16 @@ This architecture provides a solid foundation for:
 - **User Experience**: Real-time updates and responsive UI
 
 The codebase successfully demonstrates enterprise-grade architecture patterns adapted for desktop application development.
+
+## See Also
+
+- [📚 API Reference](../api/README.md) - Complete module and service documentation
+- [🚀 Developer Guide](../guides/Developer-Guide.md) - Development setup and workflow
+- [🔗 IPC API Reference](../guides/IPC-API-Reference.md) - Inter-process communication details
+- [🎨 Theme Usage Guide](../guides/Theme-Usage.md) - Theme system implementation
+- [🧩 Component Documentation](../component-docs/Dashboard.md) - UI component architecture
+- [🔄 Refactoring Documents](../refactoring/BackendRafactor.copilotmd) - Architecture evolution
+
+---
+
+> **Related:** [📖 Documentation Home](../README.md) | [🏗️ All Architecture Docs](../README.md#architecture)

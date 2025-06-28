@@ -1,15 +1,25 @@
-// Status types for site monitoring
+/**
+ * Centralized constants for the Uptime Watcher application.
+ * Contains configuration values, UI constants, and type definitions.
+ */
+
+/** Status types for site monitoring */
 export type StatusType = "up" | "down" | "pending" | "unknown";
-// Font family constants for theme reuse
+
+/** Font family constants for theme reuse */
 export const FONT_FAMILY_MONO = ["SF Mono", "Monaco", "Inconsolata", "Roboto Mono", "monospace"];
 export const FONT_FAMILY_SANS = ["Inter", "system-ui", "Avenir", "Helvetica", "Arial", "sans-serif"];
-// Centralized constants for the application
 
+/** Interface for interval options used in dropdowns */
 export interface IntervalOption {
     value: number;
     label: string;
 }
 
+/**
+ * Available check intervals for site monitoring.
+ * Ranges from 5 seconds to 30 days with sensible progressions.
+ */
 export const CHECK_INTERVALS: IntervalOption[] = [
     // Seconds
     { label: "5 seconds", value: 5000 },
@@ -49,10 +59,10 @@ export const CHECK_INTERVALS: IntervalOption[] = [
     { label: "30 days", value: 2592000000 },
 ];
 
-// Default check interval (1 minute)
+/** Default check interval (1 minute) */
 export const DEFAULT_CHECK_INTERVAL = 60000;
 
-// History limit options
+/** History limit options for controlling data retention */
 export const HISTORY_LIMIT_OPTIONS: IntervalOption[] = [
     { label: "25 records", value: 25 },
     { label: "50 records", value: 50 },
@@ -70,23 +80,23 @@ export const HISTORY_LIMIT_OPTIONS: IntervalOption[] = [
     { label: "Unlimited", value: Number.MAX_SAFE_INTEGER },
 ];
 
-// Auto-refresh interval for site details (30 seconds)
+/** Auto-refresh interval for site details (30 seconds) */
 export const AUTO_REFRESH_INTERVAL = 30000;
 
-// Request timeout constraints
+/** Request timeout constraints for HTTP monitoring */
 export const TIMEOUT_CONSTRAINTS = {
     MAX: 60000, // 60 seconds maximum
     MIN: 1000, // 1 second minimum
     STEP: 1000, // 1 second increments
 } as const;
 
-// UI delays and timing
+/** UI delays and timing to prevent flashing and improve UX */
 export const UI_DELAYS = {
     LOADING_BUTTON: 100, // Delay before showing loading spinners (ms)
     LOADING_OVERLAY: 100, // Delay before showing loading overlay (ms)
 } as const;
 
-// Chart time periods (for analytics components)
+/** Chart time periods for analytics components (in milliseconds) */
 export const CHART_TIME_PERIODS = {
     "1h": 60 * 60 * 1000,
     "12h": 12 * 60 * 60 * 1000,
@@ -96,7 +106,8 @@ export const CHART_TIME_PERIODS = {
     "30d": 30 * 24 * 60 * 60 * 1000,
 } as const;
 
-// Common ARIA attribute constants
+/** Common ARIA attribute constants for accessibility */
 export const ARIA_LABEL = "aria-label";
 
+/** Standard transition timing for smooth animations */
 export const TRANSITION_ALL = "all 0.2s ease-in-out";

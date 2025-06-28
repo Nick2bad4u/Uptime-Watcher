@@ -1,17 +1,47 @@
+/**
+ * Site card metrics display component.
+ * Provides visual representation of key site monitoring statistics.
+ */
+
 import React, { useMemo } from "react";
 
 import { MetricCard } from "./components/MetricCard";
 
+/**
+ * Props for the SiteCardMetrics component.
+ */
 interface SiteCardMetricsProps {
+    /** Current status of the site */
     status: string;
+    /** Uptime percentage (0-100) */
     uptime: number;
+    /** Average response time in milliseconds */
     responseTime?: number;
+    /** Total number of checks performed */
     checkCount: number;
 }
 
 /**
- * Metrics grid section of the site card showing key statistics
- * Memoized to prevent unnecessary recalculations
+ * Metrics grid component displaying key site monitoring statistics.
+ *
+ * Features:
+ * - Four-column grid layout for status, uptime, response time, and check count
+ * - Optimized with React.memo and useMemo to prevent unnecessary re-renders
+ * - Consistent metric card formatting
+ * - Handles undefined response times gracefully
+ *
+ * @param props - Component props
+ * @returns JSX element containing the metrics grid
+ *
+ * @example
+ * ```tsx
+ * <SiteCardMetrics
+ *   status="up"
+ *   uptime={98.5}
+ *   responseTime={250}
+ *   checkCount={144}
+ * />
+ * ```
  */
 export const SiteCardMetrics = React.memo(function SiteCardMetrics({
     checkCount,
