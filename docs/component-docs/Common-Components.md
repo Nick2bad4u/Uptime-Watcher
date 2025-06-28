@@ -34,11 +34,11 @@ A reusable status display component that combines status indicators with descrip
 
 ```typescript
 interface StatusBadgeProps {
-    label: string;                    // Status description text
-    status: "up" | "down" | "pending"; // Status type
-    size?: "xs" | "sm" | "base" | "lg" | "xl" | "2xl" | "3xl" | "4xl"; // Text size
-    showIcon?: boolean;               // Whether to show status icon (default: true)
-    className?: string;               // Additional CSS classes
+ label: string; // Status description text
+ status: "up" | "down" | "pending"; // Status type
+ size?: "xs" | "sm" | "base" | "lg" | "xl" | "2xl" | "3xl" | "4xl"; // Text size
+ showIcon?: boolean; // Whether to show status icon (default: true)
+ className?: string; // Additional CSS classes
 }
 ```
 
@@ -49,18 +49,18 @@ interface StatusBadgeProps {
 <StatusBadge label="Website Status" status="up" />
 
 // Large size without icon
-<StatusBadge 
-    label="API Status" 
-    status="down" 
-    size="lg" 
-    showIcon={false} 
+<StatusBadge
+    label="API Status"
+    status="down"
+    size="lg"
+    showIcon={false}
 />
 
 // Custom styling
-<StatusBadge 
-    label="Service Health" 
-    status="pending" 
-    className="custom-status-badge" 
+<StatusBadge
+    label="Service Health"
+    status="pending"
+    className="custom-status-badge"
 />
 ```
 
@@ -70,12 +70,16 @@ The component intelligently maps text sizes to appropriate indicator sizes:
 
 ```typescript
 const getIndicatorSize = (textSize) => {
-    switch (textSize) {
-        case "xs", "sm": return "sm";
-        case "base", "lg": return "md";
-        case "xl", "2xl", "3xl", "4xl": return "lg";
-        default: return "sm";
-    }
+ switch (textSize) {
+  case ("xs", "sm"):
+   return "sm";
+  case ("base", "lg"):
+   return "md";
+  case ("xl", "2xl", "3xl", "4xl"):
+   return "lg";
+  default:
+   return "sm";
+ }
 };
 ```
 
@@ -97,10 +101,10 @@ A responsive chart component for visualizing historical status data over time.
 
 ```typescript
 interface HistoryChartProps {
-    history: StatusHistory[];  // Array of historical status records
-    title: string;             // Chart title/description
-    maxItems?: number;         // Maximum data points to display (default: 120)
-    className?: string;        // Additional CSS classes
+ history: StatusHistory[]; // Array of historical status records
+ title: string; // Chart title/description
+ maxItems?: number; // Maximum data points to display (default: 120)
+ className?: string; // Additional CSS classes
 }
 ```
 
@@ -108,23 +112,23 @@ interface HistoryChartProps {
 
 ```tsx
 // Basic usage
-<HistoryChart 
-    history={siteHistory} 
-    title="24 Hour History" 
+<HistoryChart
+    history={siteHistory}
+    title="24 Hour History"
 />
 
 // Limited data points
-<HistoryChart 
-    history={monitorHistory} 
-    title="Recent Activity" 
-    maxItems={50} 
+<HistoryChart
+    history={monitorHistory}
+    title="Recent Activity"
+    maxItems={50}
 />
 
 // Custom styling
-<HistoryChart 
-    history={statusData} 
-    title="Uptime Trend" 
-    className="custom-chart-container" 
+<HistoryChart
+    history={statusData}
+    title="Uptime Trend"
+    className="custom-chart-container"
 />
 ```
 
@@ -134,9 +138,9 @@ Expected `StatusHistory` structure:
 
 ```typescript
 interface StatusHistory {
-    timestamp: number;           // Unix timestamp
-    status: "up" | "down" | "pending"; // Status at that time
-    responseTime?: number;       // Optional response time data
+ timestamp: number; // Unix timestamp
+ status: "up" | "down" | "pending"; // Status at that time
+ responseTime?: number; // Optional response time data
 }
 ```
 
@@ -173,12 +177,12 @@ const displayedHistory = history.slice(0, maxItems).reverse();
 Both components use React.memo for performance optimization:
 
 ```typescript
-export const StatusBadge = React.memo(function StatusBadge({...props}) {
-    // Component implementation
+export const StatusBadge = React.memo(function StatusBadge({ ...props }) {
+ // Component implementation
 });
 
-export const HistoryChart = React.memo(function HistoryChart({...props}) {
-    // Component implementation
+export const HistoryChart = React.memo(function HistoryChart({ ...props }) {
+ // Component implementation
 });
 ```
 
@@ -253,15 +257,15 @@ const displayedHistory = history.slice(0, maxItems).reverse();
 
 ```tsx
 // In SiteCard component
-<StatusBadge 
-    label={site.name} 
-    status={site.currentStatus} 
+<StatusBadge
+    label={site.name}
+    status={site.currentStatus}
     size="base"
 />
 
-<HistoryChart 
-    history={site.statusHistory} 
-    title="24h History" 
+<HistoryChart
+    history={site.statusHistory}
+    title="24h History"
     maxItems={100}
 />
 ```
@@ -270,24 +274,14 @@ const displayedHistory = history.slice(0, maxItems).reverse();
 
 ```tsx
 // Status summary in Header
-<StatusBadge 
-    label="System Health" 
-    status={overallStatus} 
-    size="sm" 
-    showIcon={true}
-/>
+<StatusBadge label="System Health" status={overallStatus} size="sm" showIcon={true} />
 ```
 
 ### SiteDetails Integration
 
 ```tsx
 // Detailed view in modal
-<HistoryChart 
-    history={selectedSite.fullHistory} 
-    title="Complete History" 
-    maxItems={200}
-    className="detailed-chart"
-/>
+<HistoryChart history={selectedSite.fullHistory} title="Complete History" maxItems={200} className="detailed-chart" />
 ```
 
 ---

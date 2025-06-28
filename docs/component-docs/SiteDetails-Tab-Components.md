@@ -14,7 +14,7 @@ SiteDetails (main modal)
 ├── SiteDetailsNavigation (tab navigation)
 ├── Tab Components
 │   ├── OverviewTab
-│   ├── HistoryTab  
+│   ├── HistoryTab
 │   ├── AnalyticsTab
 │   └── SettingsTab
 └── ScreenshotThumbnail (when available)
@@ -33,15 +33,15 @@ SiteDetails (main modal)
 
 ```typescript
 interface OverviewTabProps {
-    avgResponseTime: number;
-    fastestResponse: number;
-    formatResponseTime: (time: number) => string;
-    handleRemoveSite: () => Promise<void>;
-    isLoading: boolean;
-    selectedMonitor: Monitor;
-    slowestResponse: number;
-    totalChecks: number;
-    uptime: string;
+ avgResponseTime: number;
+ fastestResponse: number;
+ formatResponseTime: (time: number) => string;
+ handleRemoveSite: () => Promise<void>;
+ isLoading: boolean;
+ selectedMonitor: Monitor;
+ slowestResponse: number;
+ totalChecks: number;
+ uptime: string;
 }
 ```
 
@@ -271,17 +271,17 @@ interface SettingsTabProps {
 
 ```typescript
 interface TabItem {
-    id: string;
-    label: string;
-    component: React.ComponentType<any>;
-    badge?: number;
+ id: string;
+ label: string;
+ component: React.ComponentType<any>;
+ badge?: number;
 }
 
 const tabs: TabItem[] = [
-    { id: 'overview', label: 'Overview', component: OverviewTab },
-    { id: 'history', label: 'History', component: HistoryTab },
-    { id: 'analytics', label: 'Analytics', component: AnalyticsTab },
-    { id: 'settings', label: 'Settings', component: SettingsTab },
+ { id: "overview", label: "Overview", component: OverviewTab },
+ { id: "history", label: "History", component: HistoryTab },
+ { id: "analytics", label: "Analytics", component: AnalyticsTab },
+ { id: "settings", label: "Settings", component: SettingsTab },
 ];
 ```
 
@@ -348,12 +348,12 @@ const renderTabContent = () => {
 ```typescript
 // Memoized tab components
 export const OverviewTab = React.memo(function OverviewTab(props) {
-    // Component implementation
+ // Component implementation
 });
 
 // Memoized calculations
 const memoizedStats = useMemo(() => {
-    return calculateSiteStatistics(monitor, history);
+ return calculateSiteStatistics(monitor, history);
 }, [monitor, history]);
 ```
 

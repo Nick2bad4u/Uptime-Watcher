@@ -24,8 +24,8 @@ This directory contains comprehensive API documentation for the Uptime Watcher p
 ### Component APIs
 
 - **[Hook APIs](hook-apis.md)** - Custom React hooks reference
-- **[Component Props](component-props.md)** - React component prop interfaces *(Coming Soon)*
-- **[Common Components](common-component-apis.md)** - Reusable component APIs *(Coming Soon)*
+- **[Component Props](component-props.md)** - React component prop interfaces _(Coming Soon)_
+- **[Common Components](common-component-apis.md)** - Reusable component APIs _(Coming Soon)_
 
 ### Utility APIs
 

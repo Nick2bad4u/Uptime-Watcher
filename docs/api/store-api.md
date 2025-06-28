@@ -22,22 +22,22 @@ Application configuration and user preferences.
 
 ```typescript
 interface AppSettings {
-    /** Enable desktop notifications */
-    notifications: boolean;
-    /** Auto-start monitoring on app launch */
-    autoStart: boolean;
-    /** Minimize to system tray instead of closing */
-    minimizeToTray: boolean;
-    /** Current theme name */
-    theme: ThemeName;
-    /** Request timeout in milliseconds */
-    timeout: number;
-    /** Maximum retry attempts for failed requests */
-    maxRetries: number;
-    /** Enable sound alerts for status changes */
-    soundAlerts: boolean;
-    /** Maximum number of history records to keep */
-    historyLimit: number;
+ /** Enable desktop notifications */
+ notifications: boolean;
+ /** Auto-start monitoring on app launch */
+ autoStart: boolean;
+ /** Minimize to system tray instead of closing */
+ minimizeToTray: boolean;
+ /** Current theme name */
+ theme: ThemeName;
+ /** Request timeout in milliseconds */
+ timeout: number;
+ /** Maximum retry attempts for failed requests */
+ maxRetries: number;
+ /** Enable sound alerts for status changes */
+ soundAlerts: boolean;
+ /** Maximum number of history records to keep */
+ historyLimit: number;
 }
 ```
 
@@ -47,37 +47,37 @@ Main application state interface containing all global state and actions.
 
 ```typescript
 interface AppState {
-    // Core data
-    sites: Site[];
-    darkMode: boolean; // Legacy compatibility
-    settings: AppSettings;
-    
-    // UI state
-    showSettings: boolean;
-    selectedSiteId: string | undefined;
-    showSiteDetails: boolean;
-    
-    // Error handling
-    lastError: string | undefined;
-    isLoading: boolean;
-    
-    // Statistics
-    totalUptime: number;
-    totalDowntime: number;
-    
-    // Site details UI state
-    activeSiteDetailsTab: string;
-    siteDetailsChartTimeRange: "1h" | "24h" | "7d" | "30d";
-    showAdvancedMetrics: boolean;
-    
-    // Monitor selection state
-    selectedMonitorIds: Record<string, string>;
-    
-    // Application updates
-    updateStatus: UpdateStatus;
-    updateError: string | undefined;
-    
-    // Actions and selectors...
+ // Core data
+ sites: Site[];
+ darkMode: boolean; // Legacy compatibility
+ settings: AppSettings;
+
+ // UI state
+ showSettings: boolean;
+ selectedSiteId: string | undefined;
+ showSiteDetails: boolean;
+
+ // Error handling
+ lastError: string | undefined;
+ isLoading: boolean;
+
+ // Statistics
+ totalUptime: number;
+ totalDowntime: number;
+
+ // Site details UI state
+ activeSiteDetailsTab: string;
+ siteDetailsChartTimeRange: "1h" | "24h" | "7d" | "30d";
+ showAdvancedMetrics: boolean;
+
+ // Monitor selection state
+ selectedMonitorIds: Record<string, string>;
+
+ // Application updates
+ updateStatus: UpdateStatus;
+ updateError: string | undefined;
+
+ // Actions and selectors...
 }
 ```
 
@@ -93,44 +93,44 @@ type UpdateStatus = "idle" | "checking" | "available" | "downloading" | "downloa
 
 ### Core Data
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `sites` | `Site[]` | Array of monitored sites with their monitors |
-| `darkMode` | `boolean` | Legacy dark mode flag (use `settings.theme` instead) |
-| `settings` | `AppSettings` | Application configuration and preferences |
+| Property   | Type          | Description                                          |
+| ---------- | ------------- | ---------------------------------------------------- |
+| `sites`    | `Site[]`      | Array of monitored sites with their monitors         |
+| `darkMode` | `boolean`     | Legacy dark mode flag (use `settings.theme` instead) |
+| `settings` | `AppSettings` | Application configuration and preferences            |
 
 ### UI State
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `showSettings` | `boolean` | Whether settings modal is open |
-| `selectedSiteId` | `string \| undefined` | Currently selected site identifier |
-| `showSiteDetails` | `boolean` | Whether site details modal is open |
-| `activeSiteDetailsTab` | `string` | Active tab in site details modal |
-| `siteDetailsChartTimeRange` | `"1h" \| "24h" \| "7d" \| "30d"` | Selected time range for charts |
-| `showAdvancedMetrics` | `boolean` | Whether to show advanced metrics |
-| `selectedMonitorIds` | `Record<string, string>` | Map of site ID to selected monitor ID |
+| Property                    | Type                             | Description                           |
+| --------------------------- | -------------------------------- | ------------------------------------- |
+| `showSettings`              | `boolean`                        | Whether settings modal is open        |
+| `selectedSiteId`            | `string \| undefined`            | Currently selected site identifier    |
+| `showSiteDetails`           | `boolean`                        | Whether site details modal is open    |
+| `activeSiteDetailsTab`      | `string`                         | Active tab in site details modal      |
+| `siteDetailsChartTimeRange` | `"1h" \| "24h" \| "7d" \| "30d"` | Selected time range for charts        |
+| `showAdvancedMetrics`       | `boolean`                        | Whether to show advanced metrics      |
+| `selectedMonitorIds`        | `Record<string, string>`         | Map of site ID to selected monitor ID |
 
 ### Error Handling
 
-| Property | Type | Description |
-|----------|------|-------------|
+| Property    | Type                  | Description                   |
+| ----------- | --------------------- | ----------------------------- |
 | `lastError` | `string \| undefined` | Last error message to display |
-| `isLoading` | `boolean` | Global loading state |
+| `isLoading` | `boolean`             | Global loading state          |
 
 ### Statistics
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `totalUptime` | `number` | Total uptime across all sites |
+| Property        | Type     | Description                     |
+| --------------- | -------- | ------------------------------- |
+| `totalUptime`   | `number` | Total uptime across all sites   |
 | `totalDowntime` | `number` | Total downtime across all sites |
 
 ### Application Updates
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `updateStatus` | `UpdateStatus` | Current update status |
-| `updateError` | `string \| undefined` | Update error message if any |
+| Property       | Type                  | Description                 |
+| -------------- | --------------------- | --------------------------- |
+| `updateStatus` | `UpdateStatus`        | Current update status       |
+| `updateError`  | `string \| undefined` | Update error message if any |
 
 ## Actions
 
@@ -155,14 +155,16 @@ Creates a new site with optional monitors.
 const { createSite } = useStore();
 
 await createSite({
-    name: "My Website",
-    monitors: [{
-        id: "monitor-1",
-        type: "http",
-        url: "https://example.com",
-        status: "pending",
-        history: []
-    }]
+ name: "My Website",
+ monitors: [
+  {
+   id: "monitor-1",
+   type: "http",
+   url: "https://example.com",
+   status: "pending",
+   history: [],
+  },
+ ],
 });
 ```
 
@@ -184,7 +186,7 @@ Updates site properties.
 const { modifySite } = useStore();
 
 await modifySite("site-id-123", {
-    name: "Updated Site Name"
+ name: "Updated Site Name",
 });
 ```
 
@@ -252,9 +254,9 @@ Updates application settings.
 const { updateSettings } = useStore();
 
 updateSettings({
-    notifications: true,
-    theme: "dark",
-    timeout: 10000
+ notifications: true,
+ theme: "dark",
+ timeout: 10000,
 });
 ```
 
@@ -435,8 +437,8 @@ function SettingsComponent() {
     };
 
     const handleNotificationsToggle = () => {
-        updateSettings({ 
-            notifications: !settings.notifications 
+        updateSettings({
+            notifications: !settings.notifications
         });
     };
 
@@ -450,8 +452,8 @@ function SettingsComponent() {
                 />
                 Enable notifications
             </label>
-            
-            <select 
+
+            <select
                 value={settings.theme}
                 onChange={(e) => handleThemeChange(e.target.value as ThemeName)}
             >
@@ -501,20 +503,20 @@ function ErrorBoundaryComponent() {
 const { createSite, setError } = useStore();
 
 const createSiteWithRetry = async (siteData: any, maxRetries = 3) => {
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        try {
-            await createSite(siteData);
-            return;
-        } catch (error) {
-            if (attempt === maxRetries) {
-                setError(`Failed to create site after ${maxRetries} attempts`);
-                throw error;
-            }
-            
-            const delay = Math.pow(2, attempt) * 1000;
-            await new Promise(resolve => setTimeout(resolve, delay));
-        }
-    }
+ for (let attempt = 1; attempt <= maxRetries; attempt++) {
+  try {
+   await createSite(siteData);
+   return;
+  } catch (error) {
+   if (attempt === maxRetries) {
+    setError(`Failed to create site after ${maxRetries} attempts`);
+    throw error;
+   }
+
+   const delay = Math.pow(2, attempt) * 1000;
+   await new Promise((resolve) => setTimeout(resolve, delay));
+  }
+ }
 };
 ```
 
@@ -539,24 +541,26 @@ The store has evolved to support multi-monitor sites. When migrating:
 ```typescript
 // Legacy (v1.x)
 const site = {
-    id: "site-1",
-    name: "My Site",
-    url: "https://example.com",
-    monitorType: "http",
-    status: "up"
+ id: "site-1",
+ name: "My Site",
+ url: "https://example.com",
+ monitorType: "http",
+ status: "up",
 };
 
 // Modern (v2.x)
 const site = {
-    identifier: "site-1",
-    name: "My Site",
-    monitors: [{
-        id: "monitor-1",
-        type: "http",
-        url: "https://example.com",
-        status: "up",
-        history: []
-    }]
+ identifier: "site-1",
+ name: "My Site",
+ monitors: [
+  {
+   id: "monitor-1",
+   type: "http",
+   url: "https://example.com",
+   status: "up",
+   history: [],
+  },
+ ],
 };
 ```
 

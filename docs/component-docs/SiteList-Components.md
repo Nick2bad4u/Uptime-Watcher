@@ -84,24 +84,24 @@ export const SiteList = React.memo(function SiteList({
 
 ```css
 .site-list-grid {
-    display: grid;
-    gap: 1rem;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+ display: grid;
+ gap: 1rem;
+ grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
 }
 
 /* Responsive breakpoints */
 @media (max-width: 768px) {
-    .site-list-grid {
-        grid-template-columns: 1fr;
-        gap: 0.75rem;
-    }
+ .site-list-grid {
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+ }
 }
 
 @media (min-width: 1200px) {
-    .site-list-grid {
-        grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-        gap: 1.5rem;
-    }
+ .site-list-grid {
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 1.5rem;
+ }
 }
 ```
 
@@ -206,32 +206,32 @@ export const EmptyState = React.memo(function EmptyState() {
 
 ```css
 .empty-state-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 400px;
-    padding: 2rem;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ min-height: 400px;
+ padding: 2rem;
 }
 
 .empty-state-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    max-width: 500px;
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ text-align: center;
+ max-width: 500px;
 }
 
 .empty-state-icon {
-    margin-bottom: 1.5rem;
-    opacity: 0.8;
+ margin-bottom: 1.5rem;
+ opacity: 0.8;
 }
 
 .add-first-site-button {
-    transition: transform 0.2s ease;
+ transition: transform 0.2s ease;
 }
 
 .add-first-site-button:hover {
-    transform: translateY(-1px);
+ transform: translateY(-1px);
 }
 ```
 
@@ -300,12 +300,12 @@ const setShowAddSiteForm = (show: boolean) => {
 ```typescript
 // SiteList is memoized to prevent unnecessary re-renders
 export const SiteList = React.memo(function SiteList(props) {
-    // Component implementation
+ // Component implementation
 });
 
 // Individual SiteCards are also memoized
 export const SiteCard = React.memo(function SiteCard(props) {
-    // Component implementation
+ // Component implementation
 });
 ```
 
@@ -335,13 +335,13 @@ For applications with many sites, consider:
 ```typescript
 // Cleanup in useEffect hooks
 useEffect(() => {
-    // Set up site monitoring
-    const cleanup = setupSiteMonitoring();
-    
-    return () => {
-        // Clean up subscriptions and timers
-        cleanup();
-    };
+ // Set up site monitoring
+ const cleanup = setupSiteMonitoring();
+
+ return () => {
+  // Clean up subscriptions and timers
+  cleanup();
+ };
 }, []);
 ```
 
@@ -362,25 +362,25 @@ useEffect(() => {
 ```typescript
 // Keyboard event handling
 useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-        switch (e.key) {
-            case 'a':
-                if (e.ctrlKey || e.metaKey) {
-                    e.preventDefault();
-                    setShowAddSiteForm(true);
-                }
-                break;
-            case 'f':
-                if (e.ctrlKey || e.metaKey) {
-                    e.preventDefault();
-                    focusSearchInput();
-                }
-                break;
-        }
-    };
+ const handleKeyDown = (e: KeyboardEvent) => {
+  switch (e.key) {
+   case "a":
+    if (e.ctrlKey || e.metaKey) {
+     e.preventDefault();
+     setShowAddSiteForm(true);
+    }
+    break;
+   case "f":
+    if (e.ctrlKey || e.metaKey) {
+     e.preventDefault();
+     focusSearchInput();
+    }
+    break;
+  }
+ };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+ window.addEventListener("keydown", handleKeyDown);
+ return () => window.removeEventListener("keydown", handleKeyDown);
 }, []);
 ```
 

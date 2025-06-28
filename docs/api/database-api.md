@@ -82,8 +82,8 @@ Get complete site with monitors and history (heavy operation).
 
 ```typescript
 await siteRepo.upsert({
-    identifier: "example-com",
-    name: "Example Website"
+ identifier: "example-com",
+ name: "Example Website",
 });
 ```
 
@@ -103,8 +103,8 @@ Delete site from database. Returns true if deleted.
 
 ```typescript
 await siteRepo.bulkInsert([
-    { identifier: "site1", name: "Site 1" },
-    { identifier: "site2", name: "Site 2" }
+ { identifier: "site1", name: "Site 1" },
+ { identifier: "site2", name: "Site 2" },
 ]);
 ```
 
@@ -134,10 +134,10 @@ Get all monitors for a specific site.
 
 ```typescript
 const newId = await monitorRepo.create("example-com", {
-    type: "http",
-    url: "https://example.com",
-    monitoring: true,
-    checkInterval: 60000
+ type: "http",
+ url: "https://example.com",
+ monitoring: true,
+ checkInterval: 60000,
 });
 ```
 
@@ -147,8 +147,8 @@ Create new monitor and return assigned ID.
 
 ```typescript
 await monitorRepo.update("123", {
-    monitoring: false,
-    checkInterval: 120000
+ monitoring: false,
+ checkInterval: 120000,
 });
 ```
 
@@ -168,8 +168,8 @@ Delete monitor and its history (cascading delete).
 
 ```typescript
 const createdMonitors = await monitorRepo.bulkCreate("example-com", [
-    { type: "http", url: "https://example.com" },
-    { type: "port", host: "example.com", port: 80 }
+ { type: "http", url: "https://example.com" },
+ { type: "port", host: "example.com", port: 80 },
 ]);
 ```
 
@@ -190,11 +190,15 @@ Get all history entries for a monitor (ordered by timestamp DESC).
 #### `addEntry(monitorId: string, entry: StatusHistory, details?: string): Promise<void>`
 
 ```typescript
-await historyRepo.addEntry("123", {
-    timestamp: Date.now(),
-    status: "up",
-    responseTime: 234
-}, "OK");
+await historyRepo.addEntry(
+ "123",
+ {
+  timestamp: Date.now(),
+  status: "up",
+  responseTime: 234,
+ },
+ "OK"
+);
 ```
 
 Add new status history entry.
@@ -221,8 +225,8 @@ Get total history entry count for monitor.
 
 ```typescript
 await historyRepo.bulkInsert("123", [
-    { timestamp: 1640995200000, status: "up", responseTime: 120 },
-    { timestamp: 1640995260000, status: "down", responseTime: 0 }
+ { timestamp: 1640995200000, status: "up", responseTime: 120 },
+ { timestamp: 1640995260000, status: "down", responseTime: 0 },
 ]);
 ```
 
@@ -260,9 +264,9 @@ Get all settings as key-value object.
 
 ```typescript
 await settingsRepo.bulkInsert({
-    "historyLimit": "1000",
-    "checkInterval": "60000",
-    "theme": "dark"
+ historyLimit: "1000",
+ checkInterval: "60000",
+ theme: "dark",
 });
 ```
 
@@ -338,15 +342,15 @@ const monitorRepo = new MonitorRepository();
 
 // Create site with monitor
 await siteRepo.upsert({
-    identifier: "example-com",
-    name: "Example Website"
+ identifier: "example-com",
+ name: "Example Website",
 });
 
 const monitorId = await monitorRepo.create("example-com", {
-    type: "http",
-    url: "https://example.com",
-    monitoring: true,
-    checkInterval: 60000
+ type: "http",
+ url: "https://example.com",
+ monitoring: true,
+ checkInterval: 60000,
 });
 
 // Get complete site data

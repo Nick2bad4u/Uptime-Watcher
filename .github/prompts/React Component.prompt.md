@@ -1,11 +1,13 @@
 ---
-mode: 'agent'
-tools: ['All Tools']
-description: 'Create a React component with TypeScript'
+mode: "agent"
+tools: ["All Tools"]
+description: "Create a React component with TypeScript"
 ---
+
 Generate ${input:componentName}.tsx component:
 
 Requirements:
+
 - TypeScript interface for props
 - Functional component with React.FC
 - useState/useEffect hooks as needed
@@ -15,6 +17,7 @@ Requirements:
 - Unit test boilerplate using Vitest + React Testing Library
 
 Include:
+
 1. Default export component
 2. Named export for Storybook
 3. JSDoc comment with usage example

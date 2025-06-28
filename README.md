@@ -1,4 +1,5 @@
 # 📊 Uptime Watcher
+
 <!-- markdownlint-disable -->
 
 An Electron desktop application for monitoring website uptime status with real-time updates, response time tracking, and historical data visualization.

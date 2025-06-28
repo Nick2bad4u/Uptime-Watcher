@@ -53,26 +53,26 @@ A comprehensive hook that combines all site-related functionality.
 
 ```typescript
 interface UseSiteReturn {
-    // Monitor data
-    monitor: Monitor | undefined;
-    filteredHistory: StatusHistory[];
-    monitoringStatus: boolean;
-    
-    // Statistics
-    uptimePercentage: number;
-    averageResponseTime: number;
-    totalChecks: number;
-    upChecks: number;
-    downChecks: number;
-    
-    // Actions
-    handleStartMonitoring: () => void;
-    handleStopMonitoring: () => void;
-    handleCheckNow: () => void;
-    handleCardClick: () => void;
-    
-    // UI state
-    isLoading: boolean;
+ // Monitor data
+ monitor: Monitor | undefined;
+ filteredHistory: StatusHistory[];
+ monitoringStatus: boolean;
+
+ // Statistics
+ uptimePercentage: number;
+ averageResponseTime: number;
+ totalChecks: number;
+ upChecks: number;
+ downChecks: number;
+
+ // Actions
+ handleStartMonitoring: () => void;
+ handleStopMonitoring: () => void;
+ handleCheckNow: () => void;
+ handleCardClick: () => void;
+
+ // UI state
+ isLoading: boolean;
 }
 ```
 
@@ -102,7 +102,7 @@ function SiteCard({ site }: { site: Site }) {
             <h3>{site.name}</h3>
             <div>Uptime: {uptimePercentage.toFixed(2)}%</div>
             <div>Avg Response: {averageResponseTime}ms</div>
-            
+
             <button onClick={handleStartMonitoring} disabled={isLoading}>
                 Start Monitoring
             </button>
@@ -127,10 +127,10 @@ Provides action handlers for site operations.
 
 ```typescript
 interface SiteActionsResult {
-    handleStartMonitoring: () => void;
-    handleStopMonitoring: () => void;
-    handleCheckNow: () => void;
-    handleCardClick: () => void;
+ handleStartMonitoring: () => void;
+ handleStopMonitoring: () => void;
+ handleCheckNow: () => void;
+ handleCardClick: () => void;
 }
 ```
 
@@ -172,11 +172,11 @@ Manages monitor selection and monitoring state for a site.
 
 ```typescript
 interface SiteMonitorResult {
-    monitor: Monitor | undefined;
-    selectedMonitorId: string | undefined;
-    setSelectedMonitorId: (monitorId: string) => void;
-    filteredHistory: StatusHistory[];
-    monitoringStatus: boolean;
+ monitor: Monitor | undefined;
+ selectedMonitorId: string | undefined;
+ setSelectedMonitorId: (monitorId: string) => void;
+ filteredHistory: StatusHistory[];
+ monitoringStatus: boolean;
 }
 ```
 
@@ -193,7 +193,7 @@ function MonitorSelector({ site }: { site: Site }) {
 
     return (
         <div>
-            <select 
+            <select
                 value={selectedMonitorId || ''}
                 onChange={(e) => setSelectedMonitorId(e.target.value)}
             >
@@ -203,7 +203,7 @@ function MonitorSelector({ site }: { site: Site }) {
                     </option>
                 ))}
             </select>
-            
+
             <div>
                 Status: {monitoringStatus ? 'Monitoring' : 'Stopped'}
             </div>
@@ -225,19 +225,19 @@ Calculates statistics from site monitoring history.
 
 ```typescript
 interface SiteStatsResult {
-    uptimePercentage: number;
-    averageResponseTime: number;
-    totalChecks: number;
-    upChecks: number;
-    downChecks: number;
-    uptimeHours: number;
-    downtimeHours: number;
-    lastCheckTime: Date | undefined;
-    statusCounts: {
-        up: number;
-        down: number;
-        pending: number;
-    };
+ uptimePercentage: number;
+ averageResponseTime: number;
+ totalChecks: number;
+ upChecks: number;
+ downChecks: number;
+ uptimeHours: number;
+ downtimeHours: number;
+ lastCheckTime: Date | undefined;
+ statusCounts: {
+  up: number;
+  down: number;
+  pending: number;
+ };
 }
 ```
 
@@ -279,17 +279,17 @@ Manages site details modal state and navigation.
 
 ```typescript
 interface SiteDetailsResult {
-    selectedSite: Site | undefined;
-    showSiteDetails: boolean;
-    activeSiteDetailsTab: string;
-    siteDetailsChartTimeRange: "1h" | "24h" | "7d" | "30d";
-    showAdvancedMetrics: boolean;
-    
-    setSelectedSite: (site: Site | undefined) => void;
-    setShowSiteDetails: (show: boolean) => void;
-    setActiveSiteDetailsTab: (tab: string) => void;
-    setSiteDetailsChartTimeRange: (range: "1h" | "24h" | "7d" | "30d") => void;
-    setShowAdvancedMetrics: (show: boolean) => void;
+ selectedSite: Site | undefined;
+ showSiteDetails: boolean;
+ activeSiteDetailsTab: string;
+ siteDetailsChartTimeRange: "1h" | "24h" | "7d" | "30d";
+ showAdvancedMetrics: boolean;
+
+ setSelectedSite: (site: Site | undefined) => void;
+ setShowSiteDetails: (show: boolean) => void;
+ setActiveSiteDetailsTab: (tab: string) => void;
+ setSiteDetailsChartTimeRange: (range: "1h" | "24h" | "7d" | "30d") => void;
+ setShowAdvancedMetrics: (show: boolean) => void;
 }
 ```
 
@@ -319,7 +319,7 @@ function SiteDetailsModal() {
                     Close
                 </button>
             </div>
-            
+
             <div className="tabs">
                 {['overview', 'analytics', 'history', 'settings'].map(tab => (
                     <button
@@ -331,7 +331,7 @@ function SiteDetailsModal() {
                     </button>
                 ))}
             </div>
-            
+
             <div className="time-range-selector">
                 {['1h', '24h', '7d', '30d'].map(range => (
                     <button
@@ -343,7 +343,7 @@ function SiteDetailsModal() {
                     </button>
                 ))}
             </div>
-            
+
             {/* Tab content based on activeSiteDetailsTab */}
         </div>
     );
@@ -380,14 +380,14 @@ function App() {
 ```typescript
 function DataProvider({ children }) {
     const { settings } = useStore();
-    
+
     // Only sync if auto-sync is enabled in settings
     useBackendFocusSync(settings.autoSync);
-    
+
     // Or sync conditionally based on time since last sync
     const [lastSync, setLastSync] = useState(Date.now());
     const shouldSync = Date.now() - lastSync > 60000; // 1 minute
-    
+
     useBackendFocusSync(shouldSync);
 
     return <>{children}</>;
@@ -404,15 +404,15 @@ Comprehensive theme management hook.
 
 ```typescript
 interface UseThemeReturn {
-    currentTheme: Theme;
-    themeName: ThemeName;
-    isDark: boolean;
-    systemTheme: "light" | "dark";
-    themeVersion: number;
-    
-    setTheme: (theme: ThemeName) => void;
-    getStatusColor: (status: StatusType) => string;
-    getAvailabilityColor: (percentage: number) => string;
+ currentTheme: Theme;
+ themeName: ThemeName;
+ isDark: boolean;
+ systemTheme: "light" | "dark";
+ themeVersion: number;
+
+ setTheme: (theme: ThemeName) => void;
+ getStatusColor: (status: StatusType) => string;
+ getAvailabilityColor: (percentage: number) => string;
 }
 ```
 
@@ -435,7 +435,7 @@ function ThemedComponent() {
             <button onClick={() => setTheme(isDark ? 'light' : 'dark')}>
                 Switch Theme
             </button>
-            
+
             <div style={{ color: getStatusColor('up') }}>
                 Service is operational
             </div>
@@ -449,83 +449,83 @@ function ThemedComponent() {
 ### Custom Validation Hook
 
 ```typescript
-function useFormValidation<T>(
-    initialValues: T,
-    validationRules: ValidationRules<T>
-) {
-    const [values, setValues] = useState(initialValues);
-    const [errors, setErrors] = useState<Partial<T>>({});
-    const [touched, setTouched] = useState<Partial<Record<keyof T, boolean>>>({});
+function useFormValidation<T>(initialValues: T, validationRules: ValidationRules<T>) {
+ const [values, setValues] = useState(initialValues);
+ const [errors, setErrors] = useState<Partial<T>>({});
+ const [touched, setTouched] = useState<Partial<Record<keyof T, boolean>>>({});
 
-    const validate = useCallback((fieldName: keyof T, value: any) => {
-        const rule = validationRules[fieldName];
-        if (rule) {
-            const error = rule(value);
-            setErrors(prev => ({ ...prev, [fieldName]: error }));
-            return !error;
-        }
-        return true;
-    }, [validationRules]);
+ const validate = useCallback(
+  (fieldName: keyof T, value: any) => {
+   const rule = validationRules[fieldName];
+   if (rule) {
+    const error = rule(value);
+    setErrors((prev) => ({ ...prev, [fieldName]: error }));
+    return !error;
+   }
+   return true;
+  },
+  [validationRules]
+ );
 
-    const handleChange = useCallback((fieldName: keyof T, value: any) => {
-        setValues(prev => ({ ...prev, [fieldName]: value }));
-        validate(fieldName, value);
-    }, [validate]);
+ const handleChange = useCallback(
+  (fieldName: keyof T, value: any) => {
+   setValues((prev) => ({ ...prev, [fieldName]: value }));
+   validate(fieldName, value);
+  },
+  [validate]
+ );
 
-    const handleBlur = useCallback((fieldName: keyof T) => {
-        setTouched(prev => ({ ...prev, [fieldName]: true }));
-    }, []);
+ const handleBlur = useCallback((fieldName: keyof T) => {
+  setTouched((prev) => ({ ...prev, [fieldName]: true }));
+ }, []);
 
-    const isValid = useMemo(() => {
-        return Object.values(errors).every(error => !error);
-    }, [errors]);
+ const isValid = useMemo(() => {
+  return Object.values(errors).every((error) => !error);
+ }, [errors]);
 
-    return {
-        values,
-        errors,
-        touched,
-        isValid,
-        handleChange,
-        handleBlur,
-        validate
-    };
+ return {
+  values,
+  errors,
+  touched,
+  isValid,
+  handleChange,
+  handleBlur,
+  validate,
+ };
 }
 ```
 
 ### Data Fetching Hook
 
 ```typescript
-function useApiData<T>(
-    fetchFn: () => Promise<T>,
-    dependencies: any[] = []
-) {
-    const [data, setData] = useState<T | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+function useApiData<T>(fetchFn: () => Promise<T>, dependencies: any[] = []) {
+ const [data, setData] = useState<T | null>(null);
+ const [loading, setLoading] = useState(true);
+ const [error, setError] = useState<string | null>(null);
 
-    const fetchData = useCallback(async () => {
-        try {
-            setLoading(true);
-            setError(null);
-            const result = await fetchFn();
-            setData(result);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Unknown error');
-        } finally {
-            setLoading(false);
-        }
-    }, dependencies);
+ const fetchData = useCallback(async () => {
+  try {
+   setLoading(true);
+   setError(null);
+   const result = await fetchFn();
+   setData(result);
+  } catch (err) {
+   setError(err instanceof Error ? err.message : "Unknown error");
+  } finally {
+   setLoading(false);
+  }
+ }, dependencies);
 
-    useEffect(() => {
-        fetchData();
-    }, [fetchData]);
+ useEffect(() => {
+  fetchData();
+ }, [fetchData]);
 
-    return {
-        data,
-        loading,
-        error,
-        refetch: fetchData
-    };
+ return {
+  data,
+  loading,
+  error,
+  refetch: fetchData,
+ };
 }
 ```
 
@@ -536,28 +536,28 @@ function useApiData<T>(
 ```typescript
 // Base hooks
 function useMonitorData(siteId: string) {
-    // Monitor-specific data logic
+ // Monitor-specific data logic
 }
 
 function useMonitorActions(siteId: string) {
-    // Monitor-specific actions
+ // Monitor-specific actions
 }
 
 function useMonitorState(siteId: string) {
-    // Monitor UI state
+ // Monitor UI state
 }
 
 // Compound hook combining related functionality
 function useMonitor(siteId: string) {
-    const data = useMonitorData(siteId);
-    const actions = useMonitorActions(siteId);
-    const state = useMonitorState(siteId);
+ const data = useMonitorData(siteId);
+ const actions = useMonitorActions(siteId);
+ const state = useMonitorState(siteId);
 
-    return {
-        ...data,
-        ...actions,
-        ...state
-    };
+ return {
+  ...data,
+  ...actions,
+  ...state,
+ };
 }
 ```
 
@@ -569,7 +569,7 @@ const SiteContext = createContext<UseSiteReturn | null>(null);
 
 export function SiteProvider({ site, children }: { site: Site; children: React.ReactNode }) {
     const siteData = useSite(site);
-    
+
     return (
         <SiteContext.Provider value={siteData}>
             {children}
@@ -590,15 +590,15 @@ export function useSiteContext() {
 
 ```typescript
 function useConditionalData(condition: boolean, fetcher: () => Promise<any>) {
-    const [data, setData] = useState(null);
-    
-    useEffect(() => {
-        if (condition) {
-            fetcher().then(setData);
-        }
-    }, [condition, fetcher]);
-    
-    return condition ? data : null;
+ const [data, setData] = useState(null);
+
+ useEffect(() => {
+  if (condition) {
+   fetcher().then(setData);
+  }
+ }, [condition, fetcher]);
+
+ return condition ? data : null;
 }
 ```
 
@@ -644,7 +644,7 @@ function SiteManagementCard({ site }: { site: Site }) {
     }
 
     return (
-        <div 
+        <div
             className="site-card"
             style={{
                 backgroundColor: currentTheme.colors.background.secondary,
@@ -655,9 +655,9 @@ function SiteManagementCard({ site }: { site: Site }) {
                 <h3 style={{ color: currentTheme.colors.text.primary }}>
                     {site.name}
                 </h3>
-                <span 
+                <span
                     className="status-indicator"
-                    style={{ 
+                    style={{
                         color: getStatusColor(monitor.status),
                         backgroundColor: getStatusColor(monitor.status) + '20'
                     }}
@@ -669,14 +669,14 @@ function SiteManagementCard({ site }: { site: Site }) {
             <div className="site-metrics">
                 <div className="metric">
                     <span className="label">Uptime</span>
-                    <span 
+                    <span
                         className="value"
                         style={{ color: getAvailabilityColor(uptimePercentage) }}
                     >
                         {uptimePercentage.toFixed(2)}%
                     </span>
                 </div>
-                
+
                 <div className="metric">
                     <span className="label">Response Time</span>
                     <span className="value">{averageResponseTime}ms</span>
@@ -684,31 +684,31 @@ function SiteManagementCard({ site }: { site: Site }) {
             </div>
 
             <div className="site-actions">
-                <button 
+                <button
                     onClick={handleStartMonitoring}
                     disabled={isLoading || monitor.monitoring}
                     className="action-btn start"
                 >
                     Start Monitoring
                 </button>
-                
-                <button 
+
+                <button
                     onClick={handleStopMonitoring}
                     disabled={isLoading || !monitor.monitoring}
                     className="action-btn stop"
                 >
                     Stop Monitoring
                 </button>
-                
-                <button 
+
+                <button
                     onClick={handleCheckNow}
                     disabled={isLoading}
                     className="action-btn check"
                 >
                     Check Now
                 </button>
-                
-                <button 
+
+                <button
                     onClick={openDetails}
                     className="action-btn details"
                 >
@@ -726,12 +726,12 @@ function SiteManagementCard({ site }: { site: Site }) {
 function Dashboard() {
     const { sites, isLoading } = useStore();
     const { currentTheme } = useTheme();
-    
+
     // Enable automatic sync when user returns
     useBackendFocusSync(true);
 
     return (
-        <div 
+        <div
             className="dashboard"
             style={{
                 backgroundColor: currentTheme.colors.background.primary,
@@ -762,19 +762,19 @@ function Dashboard() {
 ```typescript
 // ✅ Good - Compose related hooks
 function useSiteManagement(site: Site) {
-    const monitor = useSiteMonitor(site);
-    const stats = useSiteStats(monitor.filteredHistory);
-    const actions = useSiteActions(site, monitor.monitor);
-    
-    return { ...monitor, ...stats, ...actions };
+ const monitor = useSiteMonitor(site);
+ const stats = useSiteStats(monitor.filteredHistory);
+ const actions = useSiteActions(site, monitor.monitor);
+
+ return { ...monitor, ...stats, ...actions };
 }
 
 // ❌ Bad - Use many hooks separately in component
 function SiteComponent({ site }) {
-    const monitor = useSiteMonitor(site);
-    const stats = useSiteStats(monitor.filteredHistory);
-    const actions = useSiteActions(site, monitor.monitor);
-    // ... component logic
+ const monitor = useSiteMonitor(site);
+ const stats = useSiteStats(monitor.filteredHistory);
+ const actions = useSiteActions(site, monitor.monitor);
+ // ... component logic
 }
 ```
 
@@ -783,16 +783,16 @@ function SiteComponent({ site }) {
 ```typescript
 // ✅ Good - Memoize expensive calculations
 function useSiteStats(history: StatusHistory[]) {
-    const stats = useMemo(() => {
-        return calculateStats(history);
-    }, [history]);
-    
-    return stats;
+ const stats = useMemo(() => {
+  return calculateStats(history);
+ }, [history]);
+
+ return stats;
 }
 
 // ❌ Bad - Calculate on every render
 function useSiteStats(history: StatusHistory[]) {
-    return calculateStats(history); // Recalculates every time
+ return calculateStats(history); // Recalculates every time
 }
 ```
 
@@ -801,12 +801,12 @@ function useSiteStats(history: StatusHistory[]) {
 ```typescript
 // ✅ Good - Stable dependencies
 const handleAction = useCallback(() => {
-    performAction(site.id);
+ performAction(site.id);
 }, [site.id]);
 
 // ❌ Bad - Unstable dependencies
 const handleAction = useCallback(() => {
-    performAction(site.id);
+ performAction(site.id);
 }, [site]); // Entire site object changes reference
 ```
 
@@ -814,32 +814,32 @@ const handleAction = useCallback(() => {
 
 ```typescript
 function useSafeApiCall<T>(apiCall: () => Promise<T>) {
-    const [state, setState] = useState<{
-        data: T | null;
-        error: string | null;
-        loading: boolean;
-    }>({
-        data: null,
-        error: null,
-        loading: false
-    });
+ const [state, setState] = useState<{
+  data: T | null;
+  error: string | null;
+  loading: boolean;
+ }>({
+  data: null,
+  error: null,
+  loading: false,
+ });
 
-    const execute = useCallback(async () => {
-        setState(prev => ({ ...prev, loading: true, error: null }));
-        
-        try {
-            const data = await apiCall();
-            setState({ data, error: null, loading: false });
-        } catch (error) {
-            setState({ 
-                data: null, 
-                error: error instanceof Error ? error.message : 'Unknown error',
-                loading: false 
-            });
-        }
-    }, [apiCall]);
+ const execute = useCallback(async () => {
+  setState((prev) => ({ ...prev, loading: true, error: null }));
 
-    return { ...state, execute };
+  try {
+   const data = await apiCall();
+   setState({ data, error: null, loading: false });
+  } catch (error) {
+   setState({
+    data: null,
+    error: error instanceof Error ? error.message : "Unknown error",
+    loading: false,
+   });
+  }
+ }, [apiCall]);
+
+ return { ...state, execute };
 }
 ```
 
@@ -849,43 +849,53 @@ function useSafeApiCall<T>(apiCall: () => Promise<T>) {
 
 ```typescript
 function useCustomHook(
-    // Parameters
-    param1: string,
-    param2?: number
+ // Parameters
+ param1: string,
+ param2?: number
 ) {
-    // State
-    const [state, setState] = useState(initialState);
-    
-    // Store or context usage
-    const { relatedData } = useStore();
-    
-    // Computed values
-    const computedValue = useMemo(() => {
-        return computeValue(state, relatedData);
-    }, [state, relatedData]);
-    
-    // Actions
-    const handleAction = useCallback(() => {
-        // Action logic
-    }, [/* dependencies */]);
-    
-    // Effects
-    useEffect(() => {
-        // Side effects
-    }, [/* dependencies */]);
-    
-    // Return interface
-    return {
-        // Data
-        data: state,
-        computedValue,
-        
-        // Actions
-        handleAction,
-        
-        // Status
-        isLoading: state.loading
-    };
+ // State
+ const [state, setState] = useState(initialState);
+
+ // Store or context usage
+ const { relatedData } = useStore();
+
+ // Computed values
+ const computedValue = useMemo(() => {
+  return computeValue(state, relatedData);
+ }, [state, relatedData]);
+
+ // Actions
+ const handleAction = useCallback(
+  () => {
+   // Action logic
+  },
+  [
+   /* dependencies */
+  ]
+ );
+
+ // Effects
+ useEffect(
+  () => {
+   // Side effects
+  },
+  [
+   /* dependencies */
+  ]
+ );
+
+ // Return interface
+ return {
+  // Data
+  data: state,
+  computedValue,
+
+  // Actions
+  handleAction,
+
+  // Status
+  isLoading: state.loading,
+ };
 }
 ```
 
@@ -901,7 +911,7 @@ function renderHookWithProviders<T>(hook: () => T) {
             </StoreProvider>
         </ThemeProvider>
     );
-    
+
     return renderHook(hook, { wrapper });
 }
 
@@ -912,11 +922,11 @@ test('useSiteStats calculates uptime correctly', () => {
         { timestamp: 2000, status: 'down', responseTime: 0 },
         { timestamp: 3000, status: 'up', responseTime: 150 }
     ];
-    
-    const { result } = renderHookWithProviders(() => 
+
+    const { result } = renderHookWithProviders(() =>
         useSiteStats(mockHistory)
     );
-    
+
     expect(result.current.uptimePercentage).toBe(66.67);
     expect(result.current.totalChecks).toBe(3);
 });
