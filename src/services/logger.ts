@@ -1,4 +1,3 @@
-/* eslint-disable testing-library/no-debugging-utils */
 /**
  * Centralized logging service using electron-log
  * Provides consistent logging across main and renderer processes.

@@ -34,13 +34,5 @@ export const SiteCardHistory = React.memo(function SiteCardHistory({ filteredHis
         }
     }, [monitor]);
 
-    // Debug: Log when history updates (remove in production)
-    if (process.env.NODE_ENV === "development") {
-        console.log(
-            `[SiteCardHistory] Rendering with ${filteredHistory.length} history items for monitor:`,
-            monitor?.id
-        );
-    }
-
     return <HistoryChart history={filteredHistory} title={historyTitle} maxItems={20} />;
 });

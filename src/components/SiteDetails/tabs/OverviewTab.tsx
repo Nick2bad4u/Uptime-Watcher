@@ -1,0 +1,167 @@
+import { FaListOl } from "react-icons/fa";
+import { FiTrash2 } from "react-icons/fi";
+import { MdAccessTime, MdBolt, MdSpeed, MdOutlineFactCheck } from "react-icons/md";
+
+import logger from "../../../services/logger";
+import {
+    ThemedText,
+    ThemedButton,
+    StatusIndicator,
+    ThemedCard,
+    ThemedBadge,
+    ThemedProgress,
+} from "../../../theme/components";
+import { useTheme, useAvailabilityColors } from "../../../theme/useTheme";
+import { Monitor } from "../../../types";
+
+interface OverviewTabProps {
+    avgResponseTime: number;
+    fastestResponse: number;
+    formatResponseTime: (time: number) => string;
+    handleRemoveSite: () => Promise<void>;
+    isLoading: boolean;
+    selectedMonitor: Monitor;
+    slowestResponse: number;
+    totalChecks: number;
+    uptime: string;
+}
+
+export function OverviewTab({
+    avgResponseTime,
+    fastestResponse,
+    formatResponseTime,
+    handleRemoveSite,
+    isLoading,
+    selectedMonitor,
+    slowestResponse,
+    totalChecks,
+    uptime,
+}: OverviewTabProps) {
+    const { getAvailabilityColor, getAvailabilityVariant } = useAvailabilityColors();
+    const { currentTheme } = useTheme();
+
+    // Map availability variant to progress/badge variant
+    const mapAvailabilityToBadgeVariant = (availability: number): "success" | "warning" | "error" => {
+        const variant = getAvailabilityVariant(availability);
+        return variant === "danger" ? "error" : variant;
+    };
+
+    const uptimeValue = parseFloat(uptime);
+    const progressVariant = mapAvailabilityToBadgeVariant(uptimeValue);
+
+    // Icon colors from theme/availability
+    const statusIconColor = getAvailabilityColor(uptimeValue); // Status icon color by availability
+    const uptimeIconColor = getAvailabilityColor(uptimeValue); // Uptime icon color by availability
+    const responseIconColor = currentTheme.colors.warning; // Response time icon uses theme warning
+    const checksIconColor = currentTheme.colors.primary[500]; // Checks icon uses theme primary
+    const fastestIconColor = currentTheme.colors.success; // Fastest uses theme success
+    const slowestIconColor = currentTheme.colors.warning; // Slowest uses theme warning
+    const quickActionIconColor = currentTheme.colors.error; // Quick action uses theme error
+
+    return (
+        <div className="space-y-6">
+            {/* Key Metrics Grid */}
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                <ThemedCard
+                    icon={<MdOutlineFactCheck />}
+                    iconColor={statusIconColor}
+                    title="Status"
+                    hoverable
+                    className="flex flex-col items-center text-center"
+                >
+                    <StatusIndicator status={selectedMonitor.status} size="lg" showText />
+                </ThemedCard>
+
+                <ThemedCard
+                    icon={<MdAccessTime />}
+                    iconColor={uptimeIconColor}
+                    title="Uptime"
+                    hoverable
+                    className="flex flex-col items-center text-center"
+                >
+                    <ThemedProgress
+                        value={uptimeValue}
+                        variant={progressVariant}
+                        showLabel
+                        className="flex flex-col items-center"
+                    />
+                    <ThemedBadge variant={progressVariant} size="sm" className="mt-2">
+                        {uptime}%
+                    </ThemedBadge>
+                </ThemedCard>
+
+                <ThemedCard
+                    icon={<MdSpeed />}
+                    iconColor={responseIconColor}
+                    title="Response Time"
+                    hoverable
+                    className="flex flex-col items-center text-center"
+                >
+                    <ThemedText size="xl" weight="bold">
+                        {formatResponseTime(avgResponseTime)}
+                    </ThemedText>
+                </ThemedCard>
+
+                <ThemedCard
+                    icon={<FaListOl />}
+                    iconColor={checksIconColor}
+                    title="Total Checks"
+                    hoverable
+                    className="flex flex-col items-center text-center"
+                >
+                    <ThemedText size="xl" weight="bold">
+                        {totalChecks}
+                    </ThemedText>
+                </ThemedCard>
+            </div>
+
+            {/* Performance Metrics */}
+            <ThemedCard icon={<MdBolt color={fastestIconColor} />} title="Performance Overview">
+                <div className="grid grid-cols-2 gap-6">
+                    <div>
+                        <ThemedText size="sm" variant="secondary">
+                            Fastest Response
+                        </ThemedText>
+                        <ThemedBadge variant="success" icon={<MdBolt />} iconColor={fastestIconColor} className="ml-4">
+                            {formatResponseTime(fastestResponse)}
+                        </ThemedBadge>
+                    </div>
+                    <div>
+                        <ThemedText size="sm" variant="secondary">
+                            Slowest Response
+                        </ThemedText>
+                        <ThemedBadge
+                            variant="warning"
+                            icon={<MdAccessTime />}
+                            iconColor={slowestIconColor}
+                            className="ml-4"
+                        >
+                            {formatResponseTime(slowestResponse)}
+                        </ThemedBadge>
+                    </div>
+                </div>
+            </ThemedCard>
+
+            {/* Quick Actions */}
+            <ThemedCard icon={<MdBolt color={quickActionIconColor} />} title="Quick Actions">
+                <div className="flex space-x-3">
+                    <ThemedButton
+                        variant="error"
+                        size="sm"
+                        onClick={() => {
+                            logger.user.action("Site removal button clicked from overview tab", {
+                                monitorType: selectedMonitor?.type,
+                                siteId: selectedMonitor?.url || "unknown",
+                            });
+                            handleRemoveSite();
+                        }}
+                        disabled={isLoading}
+                        icon={<FiTrash2 />}
+                    >
+                        Remove Site
+                    </ThemedButton>
+                </div>
+            </ThemedCard>
+        </div>
+    );
+}

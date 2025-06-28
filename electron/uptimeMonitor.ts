@@ -15,7 +15,6 @@ const DEFAULT_REQUEST_TIMEOUT = 10000;
 
 // Configure logger for uptime monitor
 const logger = {
-    // eslint-disable-next-line testing-library/no-debugging-utils
     debug: (message: string, ...args: unknown[]) => log.debug(`[MONITOR] ${message}`, ...args),
     error: (message: string, error?: unknown, ...args: unknown[]) => {
         if (error instanceof Error) {
@@ -460,7 +459,6 @@ export class UptimeMonitor extends EventEmitter {
 
     public startMonitoring() {
         if (this.isMonitoring) {
-            // eslint-disable-next-line testing-library/no-debugging-utils
             logger.debug("Monitoring already running");
             return;
         }
