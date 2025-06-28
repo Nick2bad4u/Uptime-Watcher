@@ -216,11 +216,13 @@ export const useStore = create<AppState>()(
                             try {
                                 await window.electronAPI.stopMonitoringForSite(identifier, monitor.id);
                             } catch (err) {
-                                // Log but do not block deletion if stopping fails
-                                console.warn(
-                                    `Failed to stop monitoring for monitor ${monitor.id} of site ${identifier}:`,
-                                    err
-                                );
+                                // Log but do not block deletion if stopping fails (development only)
+                                if (process.env.NODE_ENV === "development") {
+                                    console.warn(
+                                        `Failed to stop monitoring for monitor ${monitor.id} of site ${identifier}:`,
+                                        err
+                                    );
+                                }
                             }
                         }
                     }
@@ -417,9 +419,13 @@ export const useStore = create<AppState>()(
                         } else {
                             // Site not found in current state - trigger full sync as fallback
                             // This handles edge cases like new sites added externally
-                            console.warn(`Site ${update.site.identifier} not found in store, triggering full sync`);
+                            if (process.env.NODE_ENV === "development") {
+                                console.warn(`Site ${update.site.identifier} not found in store, triggering full sync`);
+                            }
                             state.fullSyncFromBackend().catch((error) => {
-                                console.error("Fallback full sync failed:", error);
+                                if (process.env.NODE_ENV === "development") {
+                                    console.error("Fallback full sync failed:", error);
+                                }
                                 state.setError("Failed to sync site data");
                             });
                         }

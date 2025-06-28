@@ -1,5 +1,6 @@
 import { Database } from "node-sqlite3-wasm";
 
+import { isDev } from "../../utils";
 import { logger } from "../../utils/logger";
 import { DatabaseService } from "./DatabaseService";
 
@@ -42,7 +43,9 @@ export class SettingsRepository {
         try {
             const db = this.getDb();
             await db.run("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)", [key, value]);
-            logger.debug(`[SettingsRepository] Set setting: ${key} = ${value}`);
+            if (isDev()) {
+                logger.debug(`[SettingsRepository] Set setting: ${key} = ${value}`);
+            }
         } catch (error) {
             logger.error(`[SettingsRepository] Failed to set setting: ${key}`, error);
             throw error;
@@ -56,7 +59,9 @@ export class SettingsRepository {
         try {
             const db = this.getDb();
             await db.run("DELETE FROM settings WHERE key = ?", [key]);
-            logger.debug(`[SettingsRepository] Deleted setting: ${key}`);
+            if (isDev()) {
+                logger.debug(`[SettingsRepository] Deleted setting: ${key}`);
+            }
         } catch (error) {
             logger.error(`[SettingsRepository] Failed to delete setting: ${key}`, error);
             throw error;

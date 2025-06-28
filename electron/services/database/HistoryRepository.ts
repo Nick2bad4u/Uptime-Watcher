@@ -1,6 +1,7 @@
 import { Database } from "node-sqlite3-wasm";
 
 import { StatusHistory } from "../../types";
+import { isDev } from "../../utils";
 import { logger } from "../../utils/logger";
 import { DatabaseService } from "./DatabaseService";
 
@@ -72,9 +73,11 @@ export class HistoryRepository {
                 ]
             );
 
-            logger.debug(
-                `[HistoryRepository] Added history entry: monitor_id=${monitorId}, status=${entry.status}, responseTime=${entry.responseTime}, timestamp=${entry.timestamp}`
-            );
+            if (isDev()) {
+                logger.debug(
+                    `[HistoryRepository] Added history entry: monitor_id=${monitorId}, status=${entry.status}, responseTime=${entry.responseTime}, timestamp=${entry.timestamp}`
+                );
+            }
         } catch (error) {
             logger.error(`[HistoryRepository] Failed to add history entry for monitor: ${monitorId}`, error);
             throw error;
@@ -88,7 +91,9 @@ export class HistoryRepository {
         try {
             const db = this.getDb();
             await db.run("DELETE FROM history WHERE monitor_id = ?", [monitorId]);
-            logger.debug(`[HistoryRepository] Deleted history for monitor: ${monitorId}`);
+            if (isDev()) {
+                logger.debug(`[HistoryRepository] Deleted history for monitor: ${monitorId}`);
+            }
         } catch (error) {
             logger.error(`[HistoryRepository] Failed to delete history for monitor: ${monitorId}`, error);
             throw error;
@@ -115,9 +120,11 @@ export class HistoryRepository {
             if (excess.length > 0) {
                 const excessIds = excess.map((row) => row.id);
                 await db.run(`DELETE FROM history WHERE id IN (${excessIds.join(",")})`);
-                logger.debug(
-                    `[HistoryRepository] Pruned ${excess.length} old history entries for monitor: ${monitorId}`
-                );
+                if (isDev()) {
+                    logger.debug(
+                        `[HistoryRepository] Pruned ${excess.length} old history entries for monitor: ${monitorId}`
+                    );
+                }
             }
         } catch (error) {
             logger.error(`[HistoryRepository] Failed to prune history for monitor: ${monitorId}`, error);
@@ -144,7 +151,9 @@ export class HistoryRepository {
                 await this.pruneHistory(String(row.id), limit);
             }
 
-            logger.debug(`[HistoryRepository] Pruned history for all monitors (limit: ${limit})`);
+            if (isDev()) {
+                logger.debug(`[HistoryRepository] Pruned history for all monitors (limit: ${limit})`);
+            }
         } catch (error) {
             logger.error("[HistoryRepository] Failed to prune history for all monitors", error);
             throw error;
@@ -175,7 +184,9 @@ export class HistoryRepository {
         try {
             const db = this.getDb();
             await db.run("DELETE FROM history");
-            logger.debug("[HistoryRepository] Cleared all history");
+            if (isDev()) {
+                logger.debug("[HistoryRepository] Cleared all history");
+            }
         } catch (error) {
             logger.error("[HistoryRepository] Failed to clear all history", error);
             throw error;

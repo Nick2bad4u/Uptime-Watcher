@@ -79,7 +79,19 @@ The application follows a clean separation between:
 - **Main Process**: Handles app lifecycle, uptime monitoring, and notifications
 - **Renderer Process**: React-based UI with real-time updates
 - **IPC Communication**: Secure communication between main and renderer processes
-- **Database Layer**: JSON-based storage for persistence
+- **Database Layer**: SQLite-based storage for persistence
+
+For detailed architecture information, see the [comprehensive documentation](docs/README.md).
+
+## Documentation
+
+Complete documentation is available in the `docs/` folder:
+
+- **[Documentation Index](docs/README.md)** - Complete documentation navigation
+- **[Developer Guide](docs/guides/Developer-Guide.md)** - Setup and development workflow
+- **[Architecture Guide](docs/architecture/Project-Architecture-Guide.copilotmd)** - Complete system architecture
+- **[Component Documentation](docs/component-docs/)** - Individual component guides
+- **[IPC API Reference](docs/guides/IPC-API-Reference.md)** - Electron IPC communication
 
 ## Contributing
 
