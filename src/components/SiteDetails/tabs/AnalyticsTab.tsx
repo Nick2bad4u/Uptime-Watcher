@@ -1,6 +1,6 @@
 import { Line, Bar, Doughnut } from "react-chartjs-2";
 
-import { DowntimePeriod } from "../../../hooks/useSiteAnalytics";
+import { DowntimePeriod } from "../../../hooks/site/useSiteAnalytics";
 import logger from "../../../services/logger";
 import { ThemedBox, ThemedText, ThemedButton } from "../../../theme/components";
 import { StatusHistory, MonitorType } from "../../../types";

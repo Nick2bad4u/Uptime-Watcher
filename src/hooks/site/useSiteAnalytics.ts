@@ -1,11 +1,11 @@
 import { useMemo } from "react";
 
-import type { Theme } from "../theme/types";
-import type { TimePeriod } from "../utils/time";
+import type { Theme } from "../../theme/types";
+import type { TimePeriod } from "../../utils/time";
 
-import { CHART_TIME_PERIODS } from "../constants";
-import { Monitor, StatusHistory } from "../types";
-import { TIME_PERIOD_LABELS } from "../utils/time";
+import { CHART_TIME_PERIODS } from "../../constants";
+import { Monitor, StatusHistory } from "../../types";
+import { TIME_PERIOD_LABELS } from "../../utils/time";
 
 // Enhanced types for better IntelliSense and error catching
 export interface DowntimePeriod {

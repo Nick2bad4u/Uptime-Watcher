@@ -1,9 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
 
-import { AUTO_REFRESH_INTERVAL } from "../constants";
-import logger from "../services/logger";
-import { useStore } from "../store";
-import { Site } from "../types";
+import { AUTO_REFRESH_INTERVAL } from "../../constants";
+import logger from "../../services/logger";
+import { useStore } from "../../store";
+import { Site } from "../../types";
 import { useSiteAnalytics } from "./useSiteAnalytics";
 
 interface UseSiteDetailsProps {

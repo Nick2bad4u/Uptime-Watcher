@@ -17,7 +17,7 @@ import zoomPlugin from "chartjs-plugin-zoom";
 import { useMemo } from "react";
 import "chartjs-adapter-date-fns";
 
-import { useSiteDetails } from "../../hooks/useSiteDetails";
+import { useSiteDetails } from "../../hooks/site/useSiteDetails";
 import { ChartConfigService } from "../../services/chartConfig";
 import { ThemedBox } from "../../theme/components";
 import { useTheme } from "../../theme/useTheme";
