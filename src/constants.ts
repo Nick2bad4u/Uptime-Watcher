@@ -85,7 +85,14 @@ export const AUTO_REFRESH_INTERVAL = 30000;
 
 /** Request timeout constraints for HTTP monitoring */
 export const TIMEOUT_CONSTRAINTS = {
-    MAX: 60000, // 60 seconds maximum
+    MAX: 300, // 300 seconds maximum (displayed to user)
+    MIN: 1, // 1 second minimum (displayed to user)
+    STEP: 1, // 1 second increments (displayed to user)
+} as const;
+
+/** Internal timeout constraints in milliseconds (for backend) */
+export const TIMEOUT_CONSTRAINTS_MS = {
+    MAX: 300000, // 300 seconds maximum
     MIN: 1000, // 1 second minimum
     STEP: 1000, // 1 second increments
 } as const;

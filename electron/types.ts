@@ -33,6 +33,8 @@ export interface Monitor {
     port?: number;
     /** Check interval in milliseconds (per-monitor override) */
     checkInterval?: number;
+    /** Request timeout in milliseconds for this monitor */
+    timeout?: number;
 }
 
 /**

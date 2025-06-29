@@ -103,8 +103,10 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
         handleRemoveSite,
         handleSaveInterval,
         handleSaveName,
+        handleSaveTimeout,
         handleStartMonitoring,
         handleStopMonitoring,
+        handleTimeoutChange,
         // Name state
         hasUnsavedChanges,
         // Interval state
@@ -114,6 +116,7 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
         isRefreshing,
         localCheckInterval,
         localName,
+        localTimeout,
         selectedMonitor,
         selectedMonitorId,
         // Store actions
@@ -124,6 +127,7 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
         showAdvancedMetrics,
         siteDetailsChartTimeRange,
         siteExists,
+        timeoutChanged,
     } = useSiteDetails({ site });
 
     // Create chart config service instance
@@ -206,12 +210,15 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
                         handleIntervalChange={handleIntervalChange}
                         handleMonitorIdChange={handleMonitorIdChange}
                         handleSaveInterval={handleSaveInterval}
+                        handleSaveTimeout={handleSaveTimeout}
                         handleStartMonitoring={handleStartMonitoring}
                         handleStopMonitoring={handleStopMonitoring}
+                        handleTimeoutChange={handleTimeoutChange}
                         intervalChanged={intervalChanged}
                         isLoading={isLoading}
                         isMonitoring={isMonitoring}
                         localCheckInterval={localCheckInterval}
+                        localTimeout={localTimeout}
                         onCheckNow={() => handleCheckNow()}
                         selectedMonitorId={selectedMonitorId}
                         setActiveSiteDetailsTab={setActiveSiteDetailsTab}
@@ -219,6 +226,7 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
                             setSiteDetailsChartTimeRange(range as "1h" | "24h" | "7d" | "30d")
                         }
                         siteDetailsChartTimeRange={siteDetailsChartTimeRange}
+                        timeoutChanged={timeoutChanged}
                     />
 
                     {/* Tab Content */}
@@ -292,10 +300,14 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
                                 intervalChanged={intervalChanged}
                                 handleIntervalChange={handleIntervalChange}
                                 handleSaveInterval={handleSaveInterval}
+                                handleSaveTimeout={handleSaveTimeout}
+                                handleTimeoutChange={handleTimeoutChange}
                                 localName={localName}
+                                localTimeout={localTimeout}
                                 setLocalName={setLocalName}
                                 hasUnsavedChanges={hasUnsavedChanges}
                                 handleSaveName={handleSaveName}
+                                timeoutChanged={timeoutChanged}
                             />
                         )}
                     </ThemedBox>

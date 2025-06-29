@@ -8,7 +8,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 
-import { HISTORY_LIMIT_OPTIONS, TIMEOUT_CONSTRAINTS, UI_DELAYS } from "../../constants";
+import { HISTORY_LIMIT_OPTIONS, UI_DELAYS } from "../../constants";
 import logger from "../../services/logger";
 import { useStore } from "../../store";
 import {
@@ -84,7 +84,6 @@ export function Settings({ onClose }: SettingsProps) {
         "autoStart",
         "minimizeToTray",
         "theme",
-        "timeout",
         "maxRetries",
         "soundAlerts",
         "historyLimit",
@@ -239,25 +238,6 @@ export function Settings({ onClose }: SettingsProps) {
                                 </ThemedSelect>
                                 <ThemedText size="xs" variant="secondary" className="mt-1">
                                     Maximum number of check results to store per site
-                                </ThemedText>
-                            </div>
-
-                            <div>
-                                <ThemedText size="sm" weight="medium" variant="secondary" className="block mb-2">
-                                    Request Timeout (ms)
-                                </ThemedText>
-                                <ThemedInput
-                                    type="number"
-                                    min={TIMEOUT_CONSTRAINTS.MIN}
-                                    max={TIMEOUT_CONSTRAINTS.MAX}
-                                    step={TIMEOUT_CONSTRAINTS.STEP}
-                                    value={settings.timeout}
-                                    onChange={(e) => handleSettingChange("timeout", Number(e.target.value))}
-                                    disabled={isLoading}
-                                    aria-label="Request timeout in milliseconds"
-                                />
-                                <ThemedText size="xs" variant="tertiary" className="block mt-1">
-                                    How long to wait for a response before considering a site down
                                 </ThemedText>
                             </div>
 

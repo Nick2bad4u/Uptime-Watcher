@@ -6,7 +6,7 @@
 
 import React from "react";
 
-import { CHECK_INTERVALS } from "../../constants";
+import { CHECK_INTERVALS, TIMEOUT_CONSTRAINTS } from "../../constants";
 import logger from "../../services/logger";
 import { ThemedBox, ThemedButton, ThemedSelect, ThemedText } from "../../theme/components";
 import { Site } from "../../types";
@@ -26,10 +26,14 @@ interface SiteDetailsNavigationProps {
     handleMonitorIdChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
     /** Handler for saving interval changes */
     handleSaveInterval: () => Promise<void>;
+    /** Handler for saving timeout changes */
+    handleSaveTimeout: () => Promise<void>;
     /** Handler for starting monitoring */
     handleStartMonitoring: () => Promise<void>;
     /** Handler for stopping monitoring */
     handleStopMonitoring: () => Promise<void>;
+    /** Handler for monitor timeout changes */
+    handleTimeoutChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     /** Whether the check interval has been changed */
     intervalChanged: boolean;
     /** Whether any async operation is in progress */
@@ -38,6 +42,8 @@ interface SiteDetailsNavigationProps {
     isMonitoring: boolean;
     /** Local state value for check interval */
     localCheckInterval: number;
+    /** Local state value for timeout */
+    localTimeout: number;
     /** Handler for immediate check trigger */
     onCheckNow: () => void;
     /** Currently selected monitor ID */
@@ -48,6 +54,8 @@ interface SiteDetailsNavigationProps {
     setSiteDetailsChartTimeRange: (range: string) => void;
     /** Current chart time range selection */
     siteDetailsChartTimeRange: string;
+    /** Whether the timeout has been changed */
+    timeoutChanged: boolean;
 }
 
 /**
@@ -69,17 +77,21 @@ export function SiteDetailsNavigation({
     handleIntervalChange,
     handleMonitorIdChange,
     handleSaveInterval,
+    handleSaveTimeout,
     handleStartMonitoring,
     handleStopMonitoring,
+    handleTimeoutChange,
     intervalChanged,
     isLoading,
     isMonitoring,
     localCheckInterval,
+    localTimeout,
     onCheckNow,
     selectedMonitorId,
     setActiveSiteDetailsTab,
     setSiteDetailsChartTimeRange,
     siteDetailsChartTimeRange,
+    timeoutChanged,
 }: SiteDetailsNavigationProps) {
     const logTabChange = (tab: string, additionalData?: Record<string, unknown>) => {
         logger.user.action("Site details tab changed", {
@@ -164,6 +176,26 @@ export function SiteDetailsNavigation({
                     </ThemedSelect>
                     {intervalChanged && (
                         <ThemedButton variant="primary" size="sm" onClick={handleSaveInterval}>
+                            Save
+                        </ThemedButton>
+                    )}
+                    {/* Timeout control */}
+                    <ThemedText variant="secondary" size="base">
+                        Timeout (seconds):
+                    </ThemedText>
+                    <input
+                        type="number"
+                        min={TIMEOUT_CONSTRAINTS.MIN}
+                        max={TIMEOUT_CONSTRAINTS.MAX}
+                        step={TIMEOUT_CONSTRAINTS.STEP}
+                        value={localTimeout}
+                        onChange={handleTimeoutChange}
+                        className="w-20 px-2 py-1 text-sm border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        disabled={isLoading}
+                        aria-label="Monitor timeout in seconds"
+                    />
+                    {timeoutChanged && (
+                        <ThemedButton variant="primary" size="sm" onClick={handleSaveTimeout}>
                             Save
                         </ThemedButton>
                     )}

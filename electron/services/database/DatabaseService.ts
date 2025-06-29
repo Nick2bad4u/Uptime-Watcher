@@ -81,6 +81,7 @@ export class DatabaseService {
                     host TEXT,
                     port INTEGER,
                     checkInterval INTEGER,
+                    timeout INTEGER,
                     monitoring BOOLEAN,
                     status TEXT,
                     responseTime INTEGER,

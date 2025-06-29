@@ -6,7 +6,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-import { TIMEOUT_CONSTRAINTS } from "./constants";
 import { ThemeName } from "./theme/types";
 import { Site, StatusUpdate, Monitor, MonitorType } from "./types";
 
@@ -26,8 +25,6 @@ interface AppSettings {
     minimizeToTray: boolean;
     /** Current theme name */
     theme: ThemeName;
-    /** Request timeout in milliseconds */
-    timeout: number;
     /** Maximum retry attempts for failed requests */
     maxRetries: number;
     /** Enable sound alerts for status changes */
@@ -95,6 +92,7 @@ interface AppState {
     checkSiteNow: (siteId: string, monitorId: string) => Promise<void>;
     modifySite: (identifier: string, updates: Partial<Site>) => Promise<void>;
     updateSiteCheckInterval: (siteId: string, monitorId: string, interval: number) => Promise<void>;
+    updateMonitorTimeout: (siteId: string, monitorId: string, timeout: number | undefined) => Promise<void>;
     updateHistoryLimitValue: (limit: number) => Promise<void>;
     // Per-monitor only: monitorType is required
     startSiteMonitorMonitoring: (siteId: string, monitorId: string) => Promise<void>;
@@ -153,7 +151,6 @@ const defaultSettings: AppSettings = {
     notifications: true,
     soundAlerts: false,
     theme: "system",
-    timeout: TIMEOUT_CONSTRAINTS.MAX / 10, // 6 seconds (reasonable default)
 };
 
 export const useStore = create<AppState>()(
@@ -534,6 +531,23 @@ export const useStore = create<AppState>()(
                     await state.syncSitesFromBackend();
                 } catch (error) {
                     state.setError(`Failed to update monitor check interval: ${(error as Error).message}`);
+                    throw error;
+                }
+            },
+            updateMonitorTimeout: async (siteId: string, monitorId: string, timeout: number | undefined) => {
+                const state = get();
+                state.clearError();
+                try {
+                    // Update in backend (update the monitor in the site's monitors array)
+                    const site = get().sites.find((s) => s.identifier === siteId);
+                    if (!site) throw new Error("Site not found");
+                    const updatedMonitors = site.monitors.map((monitor) =>
+                        monitor.id === monitorId ? { ...monitor, timeout: timeout } : monitor
+                    );
+                    await window.electronAPI.sites.updateSite(siteId, { monitors: updatedMonitors });
+                    await state.syncSitesFromBackend();
+                } catch (error) {
+                    state.setError(`Failed to update monitor timeout: ${(error as Error).message}`);
                     throw error;
                 }
             },

@@ -6,7 +6,7 @@
 import React from "react";
 import { FiTrash2, FiSave } from "react-icons/fi";
 
-import { CHECK_INTERVALS } from "../../../constants";
+import { CHECK_INTERVALS, TIMEOUT_CONSTRAINTS } from "../../../constants";
 import logger from "../../../services/logger";
 import {
     ThemedBox,
@@ -33,6 +33,10 @@ interface SettingsTabProps {
     handleSaveInterval: () => void;
     /** Handler for saving site name changes */
     handleSaveName: () => Promise<void>;
+    /** Handler for saving timeout changes */
+    handleSaveTimeout: () => Promise<void>;
+    /** Handler for monitor timeout changes */
+    handleTimeoutChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     /** Whether there are unsaved changes pending */
     hasUnsavedChanges: boolean;
     /** Whether the check interval has been modified */
@@ -43,10 +47,14 @@ interface SettingsTabProps {
     localCheckInterval: number;
     /** Local state value for site name */
     localName: string;
+    /** Local state value for timeout in seconds (converted to ms when saving) */
+    localTimeout: number;
     /** Currently selected monitor being configured */
     selectedMonitor: Monitor;
     /** Function to update local site name state */
     setLocalName: (name: string) => void;
+    /** Whether the timeout has been changed */
+    timeoutChanged: boolean;
 }
 
 /**
@@ -69,13 +77,17 @@ export function SettingsTab({
     handleRemoveSite,
     handleSaveInterval,
     handleSaveName,
+    handleSaveTimeout,
+    handleTimeoutChange,
     hasUnsavedChanges,
     intervalChanged,
     isLoading,
     localCheckInterval,
     localName,
+    localTimeout,
     selectedMonitor,
     setLocalName,
+    timeoutChanged,
 }: SettingsTabProps) {
     const loggedHandleSaveName = async () => {
         logger.user.action("Settings: Save site name initiated", {
@@ -102,6 +114,16 @@ export function SettingsTab({
             siteName: currentSite.name || "",
         });
         await handleRemoveSite();
+    };
+
+    const loggedHandleSaveTimeout = async () => {
+        logger.user.action("Settings: Save timeout", {
+            monitorId: selectedMonitor?.id,
+            newTimeout: localTimeout,
+            oldTimeout: selectedMonitor?.timeout,
+            siteId: currentSite.identifier,
+        });
+        await handleSaveTimeout();
     };
 
     return (
@@ -198,6 +220,34 @@ export function SettingsTab({
                 </ThemedButton>
                 <ThemedText size="xs" variant="tertiary" className="ml-2">
                     (This monitor checks every {Math.round(localCheckInterval / 1000)}s)
+                </ThemedText>
+            </ThemedBox>
+
+            {/* Timeout configuration */}
+            <ThemedBox variant="secondary" padding="md" className="flex items-center gap-3 mb-4">
+                <ThemedText size="sm" variant="secondary">
+                    Timeout (seconds):
+                </ThemedText>
+                <ThemedInput
+                    type="number"
+                    value={localTimeout} // Now stored in seconds, display directly
+                    onChange={handleTimeoutChange}
+                    placeholder="Enter timeout in seconds"
+                    className="w-32"
+                    min={TIMEOUT_CONSTRAINTS.MIN}
+                    max={TIMEOUT_CONSTRAINTS.MAX}
+                    step={TIMEOUT_CONSTRAINTS.STEP}
+                />
+                <ThemedButton
+                    variant={timeoutChanged ? "primary" : "secondary"}
+                    size="sm"
+                    onClick={loggedHandleSaveTimeout}
+                    disabled={!timeoutChanged}
+                >
+                    Save
+                </ThemedButton>
+                <ThemedText size="xs" variant="tertiary" className="ml-2">
+                    (Request timeout: {localTimeout}s)
                 </ThemedText>
             </ThemedBox>
 

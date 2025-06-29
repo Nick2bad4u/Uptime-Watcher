@@ -50,14 +50,17 @@ export class HttpMonitor implements IMonitorService {
             return this.createErrorResult("HTTP monitor missing URL", 0);
         }
 
+        // Use monitor-specific timeout or default from config
+        const timeout = monitor.timeout ?? this.config.timeout;
+
         const startTime = Date.now();
 
         try {
             if (isDev()) {
-                logger.debug(`[HttpMonitor] Checking URL: ${monitor.url}`);
+                logger.debug(`[HttpMonitor] Checking URL: ${monitor.url} with timeout: ${timeout}ms`);
             }
 
-            const response = await this.makeRequest(monitor.url);
+            const response = await this.makeRequest(monitor.url, timeout);
             const responseTime = Date.now() - startTime;
 
             if (isDev()) {
@@ -80,9 +83,11 @@ export class HttpMonitor implements IMonitorService {
     /**
      * Make the actual HTTP request using Axios.
      */
-    private async makeRequest(url: string) {
-        // Use our configured Axios instance
-        return await this.axiosInstance.get(url);
+    private async makeRequest(url: string, timeout?: number) {
+        // Use our configured Axios instance with optional timeout override
+        return await this.axiosInstance.get(url, {
+            timeout: timeout ?? this.config.timeout,
+        });
     }
 
     /**

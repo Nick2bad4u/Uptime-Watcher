@@ -69,6 +69,7 @@ export function useSiteDetails({ site }: UseSiteDetailsProps) {
         sites,
         startSiteMonitorMonitoring,
         stopSiteMonitorMonitoring,
+        updateMonitorTimeout,
         updateSiteCheckInterval,
     } = useStore();
 
@@ -90,15 +91,23 @@ export function useSiteDetails({ site }: UseSiteDetailsProps) {
     const [localCheckInterval, setLocalCheckInterval] = useState<number>(selectedMonitor?.checkInterval || 60000);
     const [intervalChanged, setIntervalChanged] = useState(false);
 
+    // Timeout state (stored in seconds for UI, converted to ms when saving)
+    const [localTimeout, setLocalTimeout] = useState<number>(
+        selectedMonitor?.timeout ? selectedMonitor.timeout / 1000 : 10
+    );
+    const [timeoutChanged, setTimeoutChanged] = useState(false);
+
     // Site name state for settings
     const [localName, setLocalName] = useState(currentSite.name || "");
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
     // Update local state when monitor changes
     useEffect(() => {
-        setLocalCheckInterval(selectedMonitor?.checkInterval || 60000);
+        setLocalCheckInterval(selectedMonitor?.checkInterval ?? 60000);
         setIntervalChanged(false);
-    }, [selectedMonitor?.checkInterval, selectedMonitor?.type, currentSite.identifier]);
+        setLocalTimeout(selectedMonitor?.timeout ? selectedMonitor.timeout / 1000 : 10);
+        setTimeoutChanged(false);
+    }, [selectedMonitor?.checkInterval, selectedMonitor?.timeout, selectedMonitor?.type, currentSite.identifier]);
 
     // Track name changes
     useEffect(() => {
@@ -239,6 +248,36 @@ export function useSiteDetails({ site }: UseSiteDetailsProps) {
         }
     }, [currentSite.identifier, selectedMonitorId, localCheckInterval, updateSiteCheckInterval, clearError]);
 
+    // Timeout change handlers
+    const handleTimeoutChange = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            // Work directly with seconds in the UI
+            const timeoutInSeconds = Number(e.target.value);
+            setLocalTimeout(timeoutInSeconds);
+            // Compare against the monitor's timeout converted to seconds
+            const currentTimeoutInSeconds = selectedMonitor?.timeout ? selectedMonitor.timeout / 1000 : 10;
+            setTimeoutChanged(timeoutInSeconds !== currentTimeoutInSeconds);
+        },
+        [selectedMonitor?.timeout]
+    );
+
+    const handleSaveTimeout = useCallback(async () => {
+        clearError();
+        try {
+            // Convert seconds to milliseconds when saving to backend
+            const timeoutInMs = localTimeout * 1000;
+            await updateMonitorTimeout(currentSite.identifier, selectedMonitorId, timeoutInMs);
+            setTimeoutChanged(false);
+            logger.user.action("Updated monitor timeout", {
+                monitorId: selectedMonitorId,
+                newTimeout: timeoutInMs,
+                siteId: currentSite.identifier,
+            });
+        } catch (error) {
+            logger.site.error(currentSite.identifier, error instanceof Error ? error : String(error));
+        }
+    }, [currentSite.identifier, selectedMonitorId, localTimeout, updateMonitorTimeout, clearError]);
+
     // Name save handler
     const handleSaveName = useCallback(async () => {
         if (!hasUnsavedChanges) return;
@@ -275,8 +314,10 @@ export function useSiteDetails({ site }: UseSiteDetailsProps) {
         handleRemoveSite,
         handleSaveInterval,
         handleSaveName,
+        handleSaveTimeout,
         handleStartMonitoring,
         handleStopMonitoring,
+        handleTimeoutChange,
         // Name state
         hasUnsavedChanges,
         // Interval state
@@ -286,6 +327,7 @@ export function useSiteDetails({ site }: UseSiteDetailsProps) {
         isRefreshing,
         localCheckInterval,
         localName,
+        localTimeout,
         selectedMonitor,
         selectedMonitorId,
         // Store actions
@@ -296,5 +338,6 @@ export function useSiteDetails({ site }: UseSiteDetailsProps) {
         showAdvancedMetrics,
         siteDetailsChartTimeRange,
         siteExists,
+        timeoutChanged,
     };
 }

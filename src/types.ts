@@ -36,6 +36,8 @@ export interface Monitor {
     monitoring?: boolean;
     /** Per-monitor check interval (ms) */
     checkInterval?: number;
+    /** Request timeout in milliseconds for this monitor */
+    timeout?: number;
 }
 
 /**

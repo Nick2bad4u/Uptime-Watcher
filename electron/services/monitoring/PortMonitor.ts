@@ -46,14 +46,17 @@ export class PortMonitor implements IMonitorService {
 
         const startTime = Date.now();
 
+        // Use monitor-specific timeout or default from config
+        const timeout = monitor.timeout ?? this.config.timeout;
+
         try {
             if (isDev()) {
-                logger.debug(`[PortMonitor] Checking port: ${monitor.host}:${monitor.port}`);
+                logger.debug(`[PortMonitor] Checking port: ${monitor.host}:${monitor.port} with timeout: ${timeout}ms`);
             }
 
             const isReachable = await isPortReachable(monitor.port, {
                 host: monitor.host,
-                timeout: this.config.timeout,
+                timeout: timeout,
             });
 
             const responseTime = Date.now() - startTime;
