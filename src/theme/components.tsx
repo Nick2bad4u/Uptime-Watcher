@@ -35,13 +35,19 @@ interface ThemedBoxProps {
     border?: boolean;
     className?: string;
     style?: React.CSSProperties;
-    onClick?: () => void;
+    onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
     onMouseEnter?: () => void;
     onMouseLeave?: () => void;
     children: React.ReactNode;
+    as?: 'div' | 'button' | 'section' | 'article' | 'aside' | 'header' | 'footer' | 'nav';
+    role?: string;
+    tabIndex?: number;
+    'aria-label'?: string;
 }
 
 export function ThemedBox({
+    "aria-label": ariaLabel,
+    as: Component = "div",
     border = false,
     children,
     className = "",
@@ -49,10 +55,12 @@ export function ThemedBox({
     onMouseEnter,
     onMouseLeave,
     padding = "md",
+    role,
     rounded = "md",
     shadow,
     style = {},
     surface = "base",
+    tabIndex,
     variant = "primary",
 }: ThemedBoxProps) {
     const classNames = [
@@ -68,17 +76,34 @@ export function ThemedBox({
         .filter(Boolean)
         .join(" ");
 
-    return (
-        <div
-            className={classNames}
-            style={style}
-            onClick={onClick}
-            onMouseEnter={onMouseEnter}
-            onMouseLeave={onMouseLeave}
-        >
-            {children}
-        </div>
-    );
+    // For interactive elements, add proper accessibility attributes
+    const isInteractive = Boolean(onClick);
+    const elementProps = {
+        className: classNames,
+        onClick: onClick ? (e: React.MouseEvent<HTMLElement>) => onClick(e) : undefined,
+        onMouseEnter,
+        onMouseLeave,
+        style,
+        ...(isInteractive &&
+            Component === "div" && {
+                "aria-label": ariaLabel,
+                onKeyDown: (e: React.KeyboardEvent) => {
+                    if ((e.key === "Enter" || e.key === " ") && onClick) {
+                        e.preventDefault();
+                        onClick();
+                    }
+                },
+                role: role || "button",
+                tabIndex: tabIndex ?? 0,
+            }),
+        ...(isInteractive &&
+            Component === "button" && {
+                "aria-label": ariaLabel,
+                type: "button" as const,
+            }),
+    };
+
+    return React.createElement(Component, elementProps, children);
 }
 
 interface ThemedTextProps {
@@ -131,7 +156,7 @@ interface ThemedButtonProps {
     className?: string;
     style?: React.CSSProperties;
     title?: string;
-    onClick?: () => void;
+    onClick?: (e?: React.MouseEvent<HTMLButtonElement>) => void;
     children?: React.ReactNode;
 }
 
@@ -240,7 +265,7 @@ export function ThemedButton({
             type={type}
             className={classNames}
             style={style}
-            onClick={onClick}
+            onClick={(e) => onClick?.(e)}
             disabled={disabled || loading}
             title={title}
         >
@@ -414,6 +439,8 @@ interface ThemedSelectProps {
     "aria-label"?: string;
     "aria-describedby"?: string;
     onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    onClick?: (e: React.MouseEvent<HTMLSelectElement>) => void;
+    onMouseDown?: (e: React.MouseEvent<HTMLSelectElement>) => void;
     children: React.ReactNode;
 }
 
@@ -425,6 +452,8 @@ export function ThemedSelect({
     disabled = false,
     id,
     onChange,
+    onClick,
+    onMouseDown,
     required = false,
     title,
     value,
@@ -455,6 +484,8 @@ export function ThemedSelect({
             disabled={disabled}
             id={id}
             onChange={onChange}
+            onClick={onClick}
+            onMouseDown={onMouseDown}
             required={required}
             style={styles}
             title={title}

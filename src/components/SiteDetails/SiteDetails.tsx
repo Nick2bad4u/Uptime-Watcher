@@ -189,7 +189,13 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
     if (!siteExists) return undefined;
 
     return (
-        <div className="site-details-modal" onClick={onClose}>
+        <div 
+            className="site-details-modal" 
+            onClick={onClose}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Site details modal"
+        >
             <div onClick={(e) => e.stopPropagation()}>
                 <ThemedBox
                     surface="overlay"

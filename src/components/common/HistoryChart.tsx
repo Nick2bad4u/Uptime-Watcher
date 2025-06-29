@@ -58,7 +58,7 @@ export const HistoryChart = React.memo(function HistoryChart({
                     {title}
                 </ThemedText>
             </div>
-            <div className="flex items-center justify-end gap-1 overflow-hidden min-w-0 flex-shrink">
+            <div className="flex items-center justify-end flex-shrink min-w-0 gap-1 overflow-hidden">
                 {displayedHistory.map((record) => (
                     <MiniChartBar
                         key={record.timestamp}

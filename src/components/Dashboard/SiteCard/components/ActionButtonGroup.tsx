@@ -30,9 +30,9 @@ interface ActionButtonGroupProps {
  *
  * Features:
  * - Unified interface for check now, start/stop monitoring actions
- * - Proper event handling with stopPropagation to prevent card click conflicts
+ * - Proper event handling with stopPropagation on individual buttons to prevent card click conflicts
  * - Optimized with React.memo and useCallback to prevent unnecessary re-renders
- * - Accessibility support with proper ARIA labels
+ * - Accessibility support with proper ARIA labels and native button elements
  * - Visual feedback for loading and disabled states
  *
  * @param props - Component props
@@ -58,29 +58,33 @@ export const ActionButtonGroup = React.memo(function ActionButtonGroup({
     onStartMonitoring,
     onStopMonitoring,
 }: ActionButtonGroupProps) {
-    // Create individual wrapped handlers for each button
-    const handleCheckNowClick = useCallback(() => {
-        onCheckNow();
-    }, [onCheckNow]);
+    // Create individual wrapped handlers for each button with event propagation control
+    const handleCheckNowClick = useCallback(
+        (e?: React.MouseEvent<HTMLButtonElement>) => {
+            e?.stopPropagation();
+            onCheckNow();
+        },
+        [onCheckNow]
+    );
 
-    const handleStartMonitoringClick = useCallback(() => {
-        onStartMonitoring();
-    }, [onStartMonitoring]);
+    const handleStartMonitoringClick = useCallback(
+        (e?: React.MouseEvent<HTMLButtonElement>) => {
+            e?.stopPropagation();
+            onStartMonitoring();
+        },
+        [onStartMonitoring]
+    );
 
-    const handleStopMonitoringClick = useCallback(() => {
-        onStopMonitoring();
-    }, [onStopMonitoring]);
-
-    const handleContainerClick = useCallback((e: React.MouseEvent) => {
-        e.stopPropagation();
-    }, []);
-
-    const handleMouseDown = useCallback((e: React.MouseEvent) => {
-        e.stopPropagation();
-    }, []);
+    const handleStopMonitoringClick = useCallback(
+        (e?: React.MouseEvent<HTMLButtonElement>) => {
+            e?.stopPropagation();
+            onStopMonitoring();
+        },
+        [onStopMonitoring]
+    );
 
     return (
-        <div className="flex items-center gap-2" onClick={handleContainerClick} onMouseDown={handleMouseDown}>
+        <div className="flex items-center gap-2">
             <ThemedButton
                 variant="ghost"
                 size="sm"

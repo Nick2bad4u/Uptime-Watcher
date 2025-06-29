@@ -68,14 +68,18 @@ export const MonitorSelector = React.memo(function MonitorSelector({
     }, []);
 
     return (
-        <div onClick={handleClick} onMouseDown={handleMouseDown}>
-            <ThemedSelect value={selectedMonitorId} onChange={onChange} className={className}>
-                {monitors.map((monitor) => (
-                    <option key={monitor.id} value={monitor.id}>
-                        {formatMonitorOption(monitor)}
-                    </option>
-                ))}
-            </ThemedSelect>
-        </div>
+        <ThemedSelect
+            value={selectedMonitorId}
+            onChange={onChange}
+            className={className}
+            onClick={handleClick}
+            onMouseDown={handleMouseDown}
+        >
+            {monitors.map((monitor) => (
+                <option key={monitor.id} value={monitor.id}>
+                    {formatMonitorOption(monitor)}
+                </option>
+            ))}
+        </ThemedSelect>
     );
 });
