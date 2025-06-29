@@ -540,6 +540,7 @@ function ThemedButton({ variant, size, children, onClick }: ThemedButtonProps) {
 
 ### Complete Theme Integration
 
+{% raw %}
 ```typescript
 import React from 'react';
 import { useTheme } from '../theme/useTheme';
@@ -654,7 +655,7 @@ function Dashboard() {
     );
 }
 ```
-
+{% endraw %}
 ### CSS Custom Properties Usage
 
 The theme system automatically sets CSS custom properties that can be used in stylesheets:
