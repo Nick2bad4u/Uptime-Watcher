@@ -1,4 +1,4 @@
-remote_theme: pages-themes/hacker@v0.2.0
+theme: jekyll-theme-hacker
 title: Uptime Watcher Documentation
 description: >-
     Comprehensive documentation for Uptime Watcher - A cross-platform desktop
@@ -61,7 +61,6 @@ defaults:
           layout: "default"
 
 plugins:
-    - jekyll-remote-theme
     - jekyll-sitemap
     - jekyll-seo-tag
     - jekyll-feed
