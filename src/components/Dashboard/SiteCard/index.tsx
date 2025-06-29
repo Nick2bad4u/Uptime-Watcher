@@ -63,12 +63,11 @@ export const SiteCard = React.memo(function SiteCard({ site }: SiteCardProps) {
 
     return (
         <ThemedBox
-            as="button"
             variant="secondary"
             padding="md"
             rounded="md"
             shadow="sm"
-            className="flex flex-col w-full gap-2 cursor-pointer site-card text-left"
+            className="flex flex-col w-full gap-2 text-left cursor-pointer site-card"
             onClick={handleCardClick}
             aria-label={`View details for ${latestSite.name ?? latestSite.identifier}`}
         >
