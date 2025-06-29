@@ -230,6 +230,8 @@ const {
 
 ### Basic Usage
 
+{% raw %}
+
 ```typescript
 import { useTheme } from '../theme/useTheme';
 
@@ -255,7 +257,11 @@ function MyComponent() {
 }
 ```
 
+{% endraw %}
+
 ### Advanced Usage with Status Colors
+
+{% raw %}
 
 ```typescript
 function StatusIndicator({ status, children }) {
@@ -271,6 +277,8 @@ function StatusIndicator({ status, children }) {
     );
 }
 ```
+
+{% endraw %}
 
 ## Theme Manager
 
@@ -354,6 +362,8 @@ const badColor = getAvailabilityColor(70.0);       // Red
 
 ### Color Utilities
 
+{% raw %}
+
 ```typescript
 function StatusBadge({ status, uptime }: { status: StatusType; uptime: number }) {
     const { getStatusColor, getAvailabilityColor } = useTheme();
@@ -371,9 +381,13 @@ function StatusBadge({ status, uptime }: { status: StatusType; uptime: number })
 }
 ```
 
+{% endraw %}
+
 ## Typography
 
 ### Font System
+
+{% raw %}
 
 ```typescript
 function TypographyExample() {
@@ -409,9 +423,13 @@ function TypographyExample() {
 }
 ```
 
+{% endraw %}
+
 ## Spacing
 
 ### Spacing System
+
+{% raw %}
 
 ```typescript
 function SpacingExample() {
@@ -430,6 +448,8 @@ function SpacingExample() {
     );
 }
 ```
+
+{% endraw %}
 
 ## Components
 
@@ -461,6 +481,8 @@ export function useThemeContext() {
 ```
 
 ### Themed Components
+
+{% raw %}
 
 ```typescript
 interface ThemedButtonProps {
@@ -536,11 +558,14 @@ function ThemedButton({ variant, size, children, onClick }: ThemedButtonProps) {
 }
 ```
 
+{% endraw %}
+
 ## Usage Examples
 
 ### Complete Theme Integration
 
 {% raw %}
+
 ```typescript
 import React from 'react';
 import { useTheme } from '../theme/useTheme';
@@ -655,7 +680,9 @@ function Dashboard() {
     );
 }
 ```
+
 {% endraw %}
+
 ### CSS Custom Properties Usage
 
 The theme system automatically sets CSS custom properties that can be used in stylesheets:
@@ -799,6 +826,8 @@ const headingStyle = {
 
 ### 5. Theme-Aware Components
 
+{% raw %}
+
 ```typescript
 // ✅ Good - Theme-aware component
 function ThemedCard({ children }) {
@@ -830,6 +859,8 @@ function Card({ children }) {
     );
 }
 ```
+
+{% endraw %}
 
 ## See Also
 

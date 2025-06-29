@@ -418,6 +418,8 @@ interface UseThemeReturn {
 
 #### Usage
 
+{% raw %}
+
 ```typescript
 function ThemedComponent() {
     const {
@@ -443,6 +445,8 @@ function ThemedComponent() {
     );
 }
 ```
+
+{% endraw %}
 
 ## Utility Hooks
 
@@ -606,6 +610,8 @@ function useConditionalData(condition: boolean, fetcher: () => Promise<any>) {
 
 ### Complete Site Management Component
 
+{% raw %}
+
 ```typescript
 import { useSite, useSiteDetails } from '../hooks/site';
 import { useTheme } from '../theme/useTheme';
@@ -719,6 +725,8 @@ function SiteManagementCard({ site }: { site: Site }) {
     );
 }
 ```
+
+{% endraw %}
 
 ### Dashboard with Multiple Hooks
 

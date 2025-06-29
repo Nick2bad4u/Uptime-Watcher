@@ -3,5 +3,8 @@
     "MD013": false,
     "MD029": {
         "style": "one_or_ordered"
+    },
+    "MD046": {
+        "style": "consistent"
     }
 }
