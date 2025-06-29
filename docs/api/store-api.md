@@ -49,7 +49,6 @@ Main application state interface containing all global state and actions.
 interface AppState {
     // Core data
     sites: Site[];
-    darkMode: boolean; // Legacy compatibility
     settings: AppSettings;
     
     // UI state
@@ -96,7 +95,6 @@ type UpdateStatus = "idle" | "checking" | "available" | "downloading" | "downloa
 | Property | Type | Description |
 |----------|------|-------------|
 | `sites` | `Site[]` | Array of monitored sites with their monitors |
-| `darkMode` | `boolean` | Legacy dark mode flag (use `settings.theme` instead) |
 | `settings` | `AppSettings` | Application configuration and preferences |
 
 ### UI State
@@ -147,7 +145,7 @@ const { initializeApp } = useStore();
 await initializeApp();
 ```
 
-#### `createSite(siteData: Omit<Site, "id" | "monitors"> & { monitors?: Monitor[] }): Promise<void>`
+#### `createSite(siteData: Omit<Site, "identifier" | "monitors"> & { monitors?: Monitor[] }): Promise<void>`
 
 Creates a new site with optional monitors.
 
@@ -520,33 +518,24 @@ const createSiteWithRetry = async (siteData: any, maxRetries = 3) => {
 
 ## Migration Guide
 
-### From Legacy Store Structure
+### Store Structure Best Practices
 
-The store has evolved to support multi-monitor sites. When migrating:
+The store supports multi-monitor sites with the following structure:
 
-1. **Legacy site fields**: `url`, `monitorType`, `status` → Use `monitors` array
-2. **Dark mode**: Use `settings.theme` instead of `darkMode`
-3. **Monitor actions**: Now require both `siteId` and `monitorId`
+1. **Site structure**: Each site can have multiple monitors in the `monitors` array
+2. **Theme management**: Use `settings.theme` for theme preferences
+3. **Monitor actions**: Require both `siteId` and `monitorId` for specificity
 
-### Breaking Changes
+### Version History
 
 - **v2.0.0**: Introduced multi-monitor support
-- **v1.5.0**: Added theme system (deprecated `darkMode`)
+- **v1.5.0**: Added theme system
 - **v1.3.0**: Added per-monitor state management
 
-### Migration Example
+### Best Practice Example
 
 ```typescript
-// Legacy (v1.x)
-const site = {
-    id: "site-1",
-    name: "My Site",
-    url: "https://example.com",
-    monitorType: "http",
-    status: "up"
-};
-
-// Modern (v2.x)
+// Current site structure (v2.x+)
 const site = {
     identifier: "site-1",
     name: "My Site",

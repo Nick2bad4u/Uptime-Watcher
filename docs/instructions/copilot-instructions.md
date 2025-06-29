@@ -45,9 +45,6 @@ interface AppState {
  // Statistics
  totalUptime: number;
  totalDowntime: number;
-
- // Legacy compatibility
- darkMode: boolean; // Synced with settings.theme
 }
 ```
 
@@ -128,7 +125,7 @@ The store automatically persists:
 - ✅ `sites` - Maintain site history across sessions
 - ✅ `settings` - User preferences
 - ✅ `checkInterval` - Monitoring configuration
-- ✅ `darkMode` - Legacy theme compatibility
+- ✅ Theme management through `settings.theme`
 - ✅ `totalUptime/totalDowntime` - Statistics
 - ❌ UI states (`showSettings`, `selectedSite`, etc.)
 - ❌ Error/loading states

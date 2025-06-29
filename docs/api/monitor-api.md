@@ -248,16 +248,13 @@ Creates monitor instances based on type.
 ```typescript
 const factory = new MonitorFactory();
 
-// Create HTTP monitor
-const httpChecker = factory.createMonitor("http", {
-    url: "https://example.com",
+// Get HTTP monitor
+const httpChecker = MonitorFactory.getMonitor("http", {
     timeout: 10000
 });
 
-// Create Port monitor  
-const portChecker = factory.createMonitor("port", {
-    host: "localhost",
-    port: 3000,
+// Get Port monitor  
+const portChecker = MonitorFactory.getMonitor("port", {
     timeout: 5000
 });
 ```

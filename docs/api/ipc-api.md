@@ -26,44 +26,42 @@ The IPC API is exposed through `window.electronAPI` in the renderer process usin
 
 ```typescript
 interface ElectronAPI {
-    // Site Management (flat structure for backward compatibility)
-    addSite: (site: Site) => Promise<Site>;
-    getSites: () => Promise<Site[]>;
-    removeSite: (identifier: string) => Promise<boolean>;
-    updateSite: (identifier: string, updates: Partial<Site>) => Promise<Site>;
-    checkSiteNow: (identifier: string, monitorType: string) => Promise<StatusUpdate | null>;
+    // Domain-specific organized APIs
+    sites: {
+        addSite: (site: Site) => Promise<Site>;
+        getSites: () => Promise<Site[]>;
+        removeSite: (identifier: string) => Promise<boolean>;
+        updateSite: (identifier: string, updates: Partial<Site>) => Promise<Site>;
+        checkSiteNow: (identifier: string, monitorType: string) => Promise<StatusUpdate | null>;
+    };
     
-    // Monitoring Control (flat structure for backward compatibility)
-    startMonitoring: () => Promise<boolean>;
-    stopMonitoring: () => Promise<boolean>;
-    startMonitoringForSite: (identifier: string, monitorType?: string) => Promise<boolean>;
-    stopMonitoringForSite: (identifier: string, monitorType?: string) => Promise<boolean>;
+    monitoring: {
+        startMonitoring: () => Promise<boolean>;
+        stopMonitoring: () => Promise<boolean>;
+        startMonitoringForSite: (identifier: string, monitorType?: string) => Promise<boolean>;
+        stopMonitoringForSite: (identifier: string, monitorType?: string) => Promise<boolean>;
+    };
     
-    // Data Management (flat structure for backward compatibility)
-    exportData: () => Promise<string>;
-    importData: (data: string) => Promise<boolean>;
-    downloadSQLiteBackup: () => Promise<{ buffer: ArrayBuffer; fileName: string }>;
+    data: {
+        exportData: () => Promise<string>;
+        importData: (data: string) => Promise<boolean>;
+        downloadSQLiteBackup: () => Promise<{ buffer: ArrayBuffer; fileName: string }>;
+    };
     
-    // Settings (flat structure for backward compatibility)
-    getHistoryLimit: () => Promise<number>;
-    updateHistoryLimit: (limit: number) => Promise<void>;
+    settings: {
+        getHistoryLimit: () => Promise<number>;
+        updateHistoryLimit: (limit: number) => Promise<void>;
+    };
     
-    // Events (flat structure for backward compatibility)
-    onStatusUpdate: (callback: (data: StatusUpdate) => void) => void;
-    onUpdateStatus: (callback: (data: unknown) => void) => void;
-    removeAllListeners: (channel: string) => void;
+    events: {
+        onStatusUpdate: (callback: (data: unknown) => void) => void;
+        onUpdateStatus: (callback: (data: unknown) => void) => void;
+        removeAllListeners: (channel: string) => void;
+    };
     
-    // System (flat structure for backward compatibility)
-    quitAndInstall: () => void;
-    
-    // Organized APIs (new structure for better maintainability)
-    sites: SiteAPI;
-    monitoring: MonitoringAPI;
-    data: DataAPI;
-    settings:
-    settings: SettingsAPI;
-    events: EventsAPI;
-    system: SystemAPI;
+    system: {
+        quitAndInstall: () => void;
+    };
 }
 ```
 
@@ -78,7 +76,7 @@ The Site API handles CRUD operations for monitored sites.
 Creates a new site with its monitors.
 
 ```typescript
-const newSite = await window.electronAPI.addSite({
+const newSite = await window.electronAPI.sites.addSite({
     identifier: crypto.randomUUID(),
     name: "My Website",
     monitors: [{
@@ -106,7 +104,7 @@ const newSite = await window.electronAPI.addSite({
 Retrieves all sites from the database.
 
 ```typescript
-const sites = await window.electronAPI.getSites();
+const sites = await window.electronAPI.sites.getSites();
 console.log(`Found ${sites.length} sites`);
 ```
 
@@ -117,7 +115,7 @@ console.log(`Found ${sites.length} sites`);
 Removes a site and all associated data.
 
 ```typescript
-const removed = await window.electronAPI.removeSite("site-id-123");
+const removed = await window.electronAPI.sites.removeSite("site-id-123");
 if (removed) {
     console.log("Site removed successfully");
 } else {
@@ -140,7 +138,7 @@ if (removed) {
 Updates site properties.
 
 ```typescript
-const updatedSite = await window.electronAPI.updateSite("site-id-123", {
+const updatedSite = await window.electronAPI.sites.updateSite("site-id-123", {
     name: "Updated Site Name"
 });
 console.log("Site updated:", updatedSite);
@@ -158,7 +156,7 @@ console.log("Site updated:", updatedSite);
 Triggers an immediate status check for a specific monitor.
 
 ```typescript
-const result = await window.electronAPI.checkSiteNow("site-id-123", "monitor-id-456");
+const result = await window.electronAPI.sites.checkSiteNow("site-id-123", "monitor-id-456");
 if (result) {
     console.log("Check completed:", result);
     console.log("Site status:", result.site.monitors[0].status);
@@ -183,7 +181,7 @@ The Monitoring API controls the monitoring lifecycle.
 Starts monitoring for all enabled sites.
 
 ```typescript
-const success = await window.electronAPI.startMonitoring();
+const success = await window.electronAPI.monitoring.startMonitoring();
 if (success) {
     console.log("Monitoring started");
 }
@@ -196,7 +194,7 @@ if (success) {
 Stops all monitoring activities.
 
 ```typescript
-const success = await window.electronAPI.stopMonitoring();
+const success = await window.electronAPI.monitoring.stopMonitoring();
 ```
 
 **Returns:** `true` if monitoring stopped successfully
@@ -207,10 +205,10 @@ Starts monitoring for a specific site or monitor.
 
 ```typescript
 // Start all monitors for a site
-await window.electronAPI.startMonitoringForSite("site-id-123");
+await window.electronAPI.monitoring.startMonitoringForSite("site-id-123");
 
 // Start specific monitor
-await window.electronAPI.startMonitoringForSite("site-id-123", "monitor-id-456");
+await window.electronAPI.monitoring.startMonitoringForSite("site-id-123", "monitor-id-456");
 ```
 
 **Parameters:**
@@ -225,7 +223,7 @@ await window.electronAPI.startMonitoringForSite("site-id-123", "monitor-id-456")
 Stops monitoring for a specific site or monitor.
 
 ```typescript
-await window.electronAPI.stopMonitoringForSite("site-id-123", "monitor-id-456");
+await window.electronAPI.monitoring.stopMonitoringForSite("site-id-123", "monitor-id-456");
 ```
 
 **Parameters:**
@@ -244,7 +242,7 @@ The Data API handles import/export and backup operations.
 Exports all application data as JSON.
 
 ```typescript
-const jsonData = await window.electronAPI.exportData();
+const jsonData = await window.electronAPI.data.exportData();
 const blob = new Blob([jsonData], { type: 'application/json' });
 const url = URL.createObjectURL(blob);
 
@@ -270,7 +268,7 @@ fileInput.onchange = async (e) => {
     const file = (e.target as HTMLInputElement).files?.[0];
     if (file) {
         const text = await file.text();
-        const success = await window.electronAPI.importData(text);
+        const success = await window.electronAPI.data.importData(text);
         if (success) {
             console.log("Data imported successfully");
             // Refresh application state
@@ -297,7 +295,7 @@ fileInput.click();
 Downloads the raw SQLite database file.
 
 ```typescript
-const { buffer, fileName } = await window.electronAPI.downloadSQLiteBackup();
+const { buffer, fileName } = await window.electronAPI.data.downloadSQLiteBackup();
 
 const blob = new Blob([buffer], { type: 'application/x-sqlite3' });
 const url = URL.createObjectURL(blob);
@@ -319,7 +317,7 @@ The Settings API manages application configuration.
 Gets the current history retention limit.
 
 ```typescript
-const limit = await window.electronAPI.getHistoryLimit();
+const limit = await window.electronAPI.settings.getHistoryLimit();
 console.log(`Current history limit: ${limit} records`);
 ```
 
@@ -330,7 +328,7 @@ console.log(`Current history limit: ${limit} records`);
 Updates the history retention limit and prunes old data.
 
 ```typescript
-await window.electronAPI.updateHistoryLimit(1000);
+await window.electronAPI.settings.updateHistoryLimit(1000);
 ```
 
 **Parameters:**
@@ -350,7 +348,7 @@ The Events API manages real-time communication from the main process.
 Subscribes to real-time status updates.
 
 ```typescript
-window.electronAPI.onStatusUpdate((statusUpdate) => {
+window.electronAPI.events.onStatusUpdate((statusUpdate) => {
     console.log('Site status changed:', statusUpdate);
     
     // Update UI with new status
@@ -381,7 +379,7 @@ interface StatusUpdate {
 Subscribes to application update status changes (auto-updater events).
 
 ```typescript
-window.electronAPI.onUpdateStatus((updateData) => {
+window.electronAPI.events.onUpdateStatus((updateData) => {
     console.log('Application update status:', updateData);
     // Handle update notifications, download progress, etc.
 });
@@ -399,7 +397,7 @@ Removes all listeners for a specific IPC channel.
 
 ```typescript
 // Cleanup when component unmounts
-window.electronAPI.removeAllListeners("status-update");
+window.electronAPI.events.removeAllListeners("status-update");
 ```
 
 **Parameters:**
@@ -417,7 +415,7 @@ Quits the application and installs a pending update.
 ```typescript
 // Show confirmation dialog
 if (confirm("Install update and restart application?")) {
-    window.electronAPI.quitAndInstall();
+    window.electronAPI.system.quitAndInstall();
 }
 ```
 
@@ -436,12 +434,12 @@ class SiteManager {
         this.sites = await window.electronAPI.getSites();
         
         // Subscribe to updates
-        window.electronAPI.onStatusUpdate((update) => {
+        window.electronAPI.events.onStatusUpdate((update) => {
             this.handleStatusUpdate(update);
         });
         
         // Start monitoring
-        await window.electronAPI.startMonitoring();
+        await window.electronAPI.monitoring.startMonitoring();
     }
 
     async createSite(name: string, url: string) {
@@ -462,7 +460,7 @@ class SiteManager {
             this.sites.push(newSite);
             
             // Start monitoring for new site
-            await window.electronAPI.startMonitoringForSite(newSite.identifier);
+            await window.electronAPI.monitoring.startMonitoringForSite(newSite.identifier);
             
             return newSite;
         } catch (error) {
@@ -474,10 +472,10 @@ class SiteManager {
     async deleteSite(identifier: string) {
         try {
             // Stop monitoring first
-            await window.electronAPI.stopMonitoringForSite(identifier);
+            await window.electronAPI.monitoring.stopMonitoringForSite(identifier);
             
             // Remove from database
-            const removed = await window.electronAPI.removeSite(identifier);
+            const removed = await window.electronAPI.sites.removeSite(identifier);
             
             if (removed) {
                 // Update local state
@@ -511,7 +509,7 @@ class SiteManager {
 class BackupManager {
     async createJSONBackup() {
         try {
-            const data = await window.electronAPI.exportData();
+            const data = await window.electronAPI.data.exportData();
             
             const blob = new Blob([data], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
@@ -530,7 +528,7 @@ class BackupManager {
 
     async createSQLiteBackup() {
         try {
-            const { buffer, fileName } = await window.electronAPI.downloadSQLiteBackup();
+            const { buffer, fileName } = await window.electronAPI.data.downloadSQLiteBackup();
             
             const blob = new Blob([buffer], { type: 'application/x-sqlite3' });
             const url = URL.createObjectURL(blob);
@@ -555,7 +553,7 @@ class BackupManager {
             JSON.parse(text);
             
             // Import data
-            const success = await window.electronAPI.importData(text);
+            const success = await window.electronAPI.data.importData(text);
             
             if (success) {
                 // Refresh application state
@@ -722,7 +720,7 @@ const checkRateLimiter = new RateLimiter(1000); // 1 second minimum
 // Rate-limited status check
 const checkSite = (id: string, monitorId: string) =>
     checkRateLimiter.throttle(() => 
-        window.electronAPI.checkSiteNow(id, monitorId)
+        window.electronAPI.sites.checkSiteNow(id, monitorId)
     );
 ```
 

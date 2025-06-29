@@ -42,8 +42,6 @@ export interface Monitor {
 export interface Site {
     /** Unique identifier for the site (UUID, used as the key everywhere) */
     identifier: string;
-    /** Optional legacy id (for migration only) */
-    id?: string;
     /** Display name for the site */
     name?: string;
     /** Array of monitors associated with this site */

@@ -136,7 +136,7 @@ export class ThemeManager {
         document.body.className = document.body.className.replace(/theme-\w+/g, "").trim();
         document.body.classList.add(`theme-${theme.name}`);
 
-        // Set dark mode class for Tailwind compatibility
+        // Set dark mode class for Tailwind CSS
         if (theme.isDark) {
             root.classList.add("dark");
         } else {

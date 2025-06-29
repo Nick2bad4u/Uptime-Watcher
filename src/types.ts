@@ -51,13 +51,6 @@ export interface Site {
     monitors: Monitor[];
     /** Per-site monitoring state */
     monitoring?: boolean;
-    // Legacy fields for migration only (commented out):
-    // url?: string;
-    // monitorType?: MonitorType;
-    // status?: "up" | "down" | "pending";
-    // responseTime?: number;
-    // lastChecked?: Date;
-    // history?: StatusHistory[];
 }
 
 /**
@@ -90,32 +83,41 @@ export interface StatusUpdate {
 declare global {
     interface Window {
         electronAPI: {
-            // Site management
-            getSites: () => Promise<Site[]>;
-            addSite: (site: Omit<Site, "id">) => Promise<Site>;
-            removeSite: (id: string) => Promise<void>;
-            updateSite: (id: string, updates: Partial<Site>) => Promise<void>;
+            // Domain-specific APIs
+            data: {
+                exportData: () => Promise<string>;
+                importData: (data: string) => Promise<boolean>;
+                downloadSQLiteBackup: () => Promise<{ buffer: ArrayBuffer; fileName: string }>;
+            };
 
-            // Monitoring control
-            checkSiteNow: (siteId: string, monitorId: string) => Promise<void>;
-            startMonitoringForSite: (siteId: string, monitorId: string) => Promise<void>;
-            stopMonitoringForSite: (siteId: string, monitorId: string) => Promise<void>;
+            events: {
+                onStatusUpdate: (callback: (update: StatusUpdate) => void) => void;
+                removeAllListeners: (event: string) => void;
+            };
+            
+            monitoring: {
+                startMonitoring: () => Promise<void>;
+                stopMonitoring: () => Promise<void>;
+                startMonitoringForSite: (siteId: string, monitorId: string) => Promise<void>;
+                stopMonitoringForSite: (siteId: string, monitorId: string) => Promise<void>;
+            };
 
-            // Settings and configuration
-            getHistoryLimit: () => Promise<number>;
-            updateHistoryLimit: (limit: number) => Promise<void>;
+            settings: {
+                getHistoryLimit: () => Promise<number>;
+                updateHistoryLimit: (limit: number) => Promise<void>;
+            };
 
-            // Data management
-            exportData: () => Promise<string>;
-            importData: (data: string) => Promise<boolean>;
-            downloadSQLiteBackup: () => Promise<{ buffer: ArrayBuffer; fileName: string }>;
+            sites: {
+                getSites: () => Promise<Site[]>;
+                addSite: (site: Omit<Site, "id">) => Promise<Site>;
+                removeSite: (id: string) => Promise<void>;
+                updateSite: (id: string, updates: Partial<Site>) => Promise<void>;
+                checkSiteNow: (siteId: string, monitorId: string) => Promise<void>;
+            };
 
-            // Event handling
-            onStatusUpdate: (callback: (update: StatusUpdate) => void) => void;
-            removeAllListeners: (event: string) => void;
-
-            // Application control
-            quitAndInstall: () => void;
+            system: {
+                quitAndInstall: () => void;
+            };
         };
     }
 }

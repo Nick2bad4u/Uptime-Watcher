@@ -78,30 +78,11 @@ const systemAPI = {
 
 // Expose organized API to renderer process
 contextBridge.exposeInMainWorld("electronAPI", {
-    // Backward compatibility - maintain existing flat API structure
-    // TODO: Consider removing these in a future major version
-    addSite: siteAPI.addSite,
-    checkSiteNow: siteAPI.checkSiteNow,
     // Domain-specific APIs
     data: dataAPI,
-    downloadSQLiteBackup: dataAPI.downloadSQLiteBackup,
     events: eventsAPI,
-    exportData: dataAPI.exportData,
-    getHistoryLimit: settingsAPI.getHistoryLimit,
-    getSites: siteAPI.getSites,
-    importData: dataAPI.importData,
     monitoring: monitoringAPI,
-    onStatusUpdate: eventsAPI.onStatusUpdate,
-    quitAndInstall: systemAPI.quitAndInstall,
-    removeAllListeners: eventsAPI.removeAllListeners,
-    removeSite: siteAPI.removeSite,
     settings: settingsAPI,
     sites: siteAPI,
-    startMonitoring: monitoringAPI.startMonitoring,
-    startMonitoringForSite: monitoringAPI.startMonitoringForSite,
-    stopMonitoring: monitoringAPI.stopMonitoring,
-    stopMonitoringForSite: monitoringAPI.stopMonitoringForSite,
     system: systemAPI,
-    updateHistoryLimit: settingsAPI.updateHistoryLimit,
-    updateSite: siteAPI.updateSite,
 });

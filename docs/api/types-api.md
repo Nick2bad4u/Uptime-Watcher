@@ -14,7 +14,6 @@ The Types API defines the core data structures and interfaces used throughout th
 - [Theme Types](#theme-types)
 - [Utility Types](#utility-types)
 - [Type Guards](#type-guards)
-- [Migration Types](#migration-types)
 - [Examples](#examples)
 
 ## Overview
@@ -537,41 +536,13 @@ function getStatusColor(status: string): string {
 }
 ```
 
-## Migration Types
+## Current Site Structure
 
-### Legacy Site Types
-
-```typescript
-// Legacy site structure (pre-v2.0)
-interface LegacySite {
-    id: string;
-    name: string;
-    url: string;
-    monitorType: MonitorType;
-    status: StatusType;
-    responseTime?: number;
-    lastChecked?: Date;
-    history?: StatusHistory[];
-}
-
-// Migration helper type
-type MigrateSite<T> = T extends LegacySite 
-    ? Omit<T, "id" | "url" | "monitorType" | "status" | "responseTime" | "lastChecked" | "history"> & Site
-    : T;
-```
-
-### Version-Specific Types
+### Site Interface
 
 ```typescript
-// Type versioning for backwards compatibility
-interface SiteV1 {
-    id: string;
-    name: string;
-    url: string;
-    // ... v1 fields
-}
-
-interface SiteV2 {
+// Current site structure (v2.x+)
+interface Site {
     identifier: string;
     name?: string;
     monitors: Monitor[];

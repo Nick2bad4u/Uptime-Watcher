@@ -84,7 +84,7 @@ export function HistoryTab({
         .slice(0, historyLimit);
 
     // Helper to render details with label
-    // Use 'details' as optional property for backward compatibility
+    // Use 'details' as optional property to handle records that may not have detail information
     function renderDetails(record: StatusHistory & { details?: string }) {
         if (!record.details) return undefined;
         if (selectedMonitor.type === "port") {

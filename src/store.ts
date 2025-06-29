@@ -44,8 +44,6 @@ interface AppState {
     // Core data
     /** Array of monitored sites */
     sites: Site[];
-    /** Legacy dark mode flag (kept for backwards compatibility) */
-    darkMode: boolean;
     /** Application settings */
     settings: AppSettings;
 
@@ -109,7 +107,6 @@ interface AppState {
     setSites: (sites: Site[]) => void;
     addSite: (site: Site) => void;
     removeSite: (identifier: string) => void;
-    toggleDarkMode: () => void; // Keep for backwards compatibility
     updateSettings: (settings: Partial<AppSettings>) => void;
     setShowSettings: (show: boolean) => void;
     resetSettings: () => void;
@@ -177,7 +174,7 @@ export const useStore = create<AppState>()(
                     if (!site) throw new Error("Site not found");
                     // Allow multiple monitors of the same type (uniqueness is not enforced)
                     const updatedMonitors = [...site.monitors, monitor];
-                    await window.electronAPI.updateSite(siteId, { monitors: updatedMonitors });
+                    await window.electronAPI.sites.updateSite(siteId, { monitors: updatedMonitors });
                     await state.syncSitesFromBackend();
                 } catch (error) {
                     state.setError(`Failed to add monitor: ${error instanceof Error ? error.message : String(error)}`);
@@ -189,13 +186,13 @@ export const useStore = create<AppState>()(
             addSite: (site: Site) => set((state) => ({ sites: [...state.sites, site] })),
             // Update: apply downloaded update and restart
             applyUpdate: () => {
-                window.electronAPI.quitAndInstall?.();
+                window.electronAPI.system.quitAndInstall?.();
             },
             checkSiteNow: async (siteId: string, monitorId: string) => {
                 const state = get();
                 state.clearError();
                 try {
-                    await window.electronAPI.checkSiteNow(siteId, monitorId);
+                    await window.electronAPI.sites.checkSiteNow(siteId, monitorId);
                     // Backend will emit 'status-update', which will trigger optimized incremental update
                 } catch (error) {
                     state.setError(`Failed to check site: ${(error as Error).message}`);
@@ -231,7 +228,7 @@ export const useStore = create<AppState>()(
                             : "pending",
                         type: monitor.type as MonitorType,
                     }));
-                    const newSite = await window.electronAPI.addSite({ ...siteData, monitors });
+                    const newSite = await window.electronAPI.sites.addSite({ ...siteData, monitors });
                     state.addSite(newSite);
                 } catch (error) {
                     state.setError(`Failed to add site: ${(error as Error).message}`);
@@ -241,7 +238,6 @@ export const useStore = create<AppState>()(
                 }
             },
             // Remove isMonitoring
-            darkMode: false,
             deleteSite: async (identifier: string) => {
                 const state = get();
                 state.setLoading(true);
@@ -253,7 +249,7 @@ export const useStore = create<AppState>()(
                     if (site) {
                         for (const monitor of site.monitors) {
                             try {
-                                await window.electronAPI.stopMonitoringForSite(identifier, monitor.id);
+                                await window.electronAPI.monitoring.stopMonitoringForSite(identifier, monitor.id);
                             } catch (err) {
                                 // Log but do not block deletion if stopping fails (development only)
                                 if (process.env.NODE_ENV === "development") {
@@ -265,7 +261,7 @@ export const useStore = create<AppState>()(
                             }
                         }
                     }
-                    await window.electronAPI.removeSite(identifier);
+                    await window.electronAPI.sites.removeSite(identifier);
                     state.removeSite(identifier);
                 } catch (error) {
                     state.setError(`Failed to remove site: ${(error as Error).message}`);
@@ -280,7 +276,7 @@ export const useStore = create<AppState>()(
                 state.clearError();
                 try {
                     // Request SQLite file as ArrayBuffer from preload
-                    const { buffer, fileName } = await window.electronAPI.downloadSQLiteBackup();
+                    const { buffer, fileName } = await window.electronAPI.data.downloadSQLiteBackup();
                     if (!buffer) throw new Error("No backup data received");
                     // Create a Blob and trigger download
                     const blob = new Blob([buffer], { type: "application/x-sqlite3" });
@@ -327,8 +323,8 @@ export const useStore = create<AppState>()(
 
                 try {
                     const [sites, historyLimit] = await Promise.all([
-                        window.electronAPI.getSites(),
-                        window.electronAPI.getHistoryLimit(),
+                        window.electronAPI.sites.getSites(),
+                        window.electronAPI.settings.getHistoryLimit(),
                     ]);
                     state.setSites(sites);
                     state.updateSettings({ historyLimit });
@@ -347,7 +343,7 @@ export const useStore = create<AppState>()(
                 state.clearError();
 
                 try {
-                    await window.electronAPI.updateSite(identifier, updates);
+                    await window.electronAPI.sites.updateSite(identifier, updates);
                     await state.syncSitesFromBackend();
                 } catch (error) {
                     state.setError(`Failed to update site: ${(error as Error).message}`);
@@ -372,7 +368,6 @@ export const useStore = create<AppState>()(
                 })),
             resetSettings: () =>
                 set({
-                    darkMode: false, // Reset to light mode
                     settings: defaultSettings,
                 }),
             // Selected monitor id per site (UI state, not persisted)
@@ -415,7 +410,7 @@ export const useStore = create<AppState>()(
                 const state = get();
                 state.clearError();
                 try {
-                    await window.electronAPI.startMonitoringForSite(siteId, monitorId);
+                    await window.electronAPI.monitoring.startMonitoringForSite(siteId, monitorId);
                     await state.syncSitesFromBackend();
                 } catch (error) {
                     state.setError(`Failed to start monitoring for monitor: ${(error as Error).message}`);
@@ -426,7 +421,7 @@ export const useStore = create<AppState>()(
                 const state = get();
                 state.clearError();
                 try {
-                    await window.electronAPI.stopMonitoringForSite(siteId, monitorId);
+                    await window.electronAPI.monitoring.stopMonitoringForSite(siteId, monitorId);
                     await state.syncSitesFromBackend();
                 } catch (error) {
                     state.setError(`Failed to stop monitoring for monitor: ${(error as Error).message}`);
@@ -434,7 +429,7 @@ export const useStore = create<AppState>()(
                 }
             },
             subscribeToStatusUpdates: (callback: (update: StatusUpdate) => void) => {
-                window.electronAPI.onStatusUpdate((update: StatusUpdate) => {
+                window.electronAPI.events.onStatusUpdate((update: StatusUpdate) => {
                     const state = get();
 
                     try {
@@ -486,7 +481,7 @@ export const useStore = create<AppState>()(
                 state.setLoading(true);
                 state.clearError();
                 try {
-                    const backendSites = await window.electronAPI.getSites();
+                    const backendSites = await window.electronAPI.sites.getSites();
                     state.setSites(backendSites);
                 } catch (error) {
                     state.setError(`Failed to sync sites: ${(error as Error).message}`);
@@ -494,21 +489,11 @@ export const useStore = create<AppState>()(
                     state.setLoading(false);
                 }
             },
-            toggleDarkMode: () =>
-                set((state) => {
-                    const newDarkMode = !state.darkMode;
-                    // Update theme setting to match
-                    const newTheme = newDarkMode ? "dark" : "light";
-                    return {
-                        darkMode: newDarkMode,
-                        settings: { ...state.settings, theme: newTheme },
-                    };
-                }),
             totalDowntime: 0,
             // Statistics initial state
             totalUptime: 0,
             unsubscribeFromStatusUpdates: () => {
-                window.electronAPI.removeAllListeners("status-update");
+                window.electronAPI.events.removeAllListeners("status-update");
             },
             updateError: undefined,
             updateHistoryLimitValue: async (limit: number) => {
@@ -517,9 +502,9 @@ export const useStore = create<AppState>()(
                 state.setLoading(true);
                 try {
                     // Call backend to update and prune history
-                    await window.electronAPI.updateHistoryLimit(limit);
+                    await window.electronAPI.settings.updateHistoryLimit(limit);
                     // Reload the value from backend to ensure sync
-                    const newLimit = await window.electronAPI.getHistoryLimit();
+                    const newLimit = await window.electronAPI.settings.getHistoryLimit();
                     state.updateSettings({ historyLimit: newLimit });
                 } catch (error) {
                     state.setError(`Failed to update history limit: ${(error as Error).message}`);
@@ -531,19 +516,7 @@ export const useStore = create<AppState>()(
             updateSettings: (newSettings: Partial<AppSettings>) =>
                 set((state) => {
                     const updatedSettings = { ...state.settings, ...newSettings };
-                    // Keep darkMode in sync with theme setting for backwards compatibility
-                    // eslint-disable-next-line functional/no-let -- darkMode must be mutable for conditional assignment
-                    let darkMode = state.darkMode;
-
-                    if (newSettings.theme) {
-                        darkMode =
-                            updatedSettings.theme === "dark" ||
-                            (updatedSettings.theme === "system" &&
-                                window.matchMedia?.("(prefers-color-scheme: dark)").matches);
-                    }
-
                     return {
-                        darkMode,
                         settings: updatedSettings,
                     };
                 }),
@@ -557,7 +530,7 @@ export const useStore = create<AppState>()(
                     const updatedMonitors = site.monitors.map((monitor) =>
                         monitor.id === monitorId ? { ...monitor, checkInterval: interval } : monitor
                     );
-                    await window.electronAPI.updateSite(siteId, { monitors: updatedMonitors });
+                    await window.electronAPI.sites.updateSite(siteId, { monitors: updatedMonitors });
                     await state.syncSitesFromBackend();
                 } catch (error) {
                     state.setError(`Failed to update monitor check interval: ${(error as Error).message}`);
@@ -571,7 +544,6 @@ export const useStore = create<AppState>()(
             name: "uptime-watcher-storage",
             partialize: (state) => ({
                 activeSiteDetailsTab: state.activeSiteDetailsTab,
-                darkMode: state.darkMode,
                 settings: state.settings,
                 showAdvancedMetrics: state.showAdvancedMetrics,
                 siteDetailsChartTimeRange: state.siteDetailsChartTimeRange,
@@ -583,25 +555,3 @@ export const useStore = create<AppState>()(
         }
     )
 );
-
-declare global {
-    interface Window {
-        electronAPI: {
-            getSites: () => Promise<Site[]>;
-            getHistoryLimit: () => Promise<number>;
-            updateHistoryLimit: (limit: number) => Promise<void>;
-            addSite: (site: Omit<Site, "id">) => Promise<Site>;
-            removeSite: (id: string) => Promise<void>;
-            updateSite: (id: string, updates: Partial<Site>) => Promise<void>;
-            checkSiteNow: (siteId: string, monitorId: string) => Promise<void>;
-            startMonitoringForSite: (siteId: string, monitorId: string) => Promise<void>;
-            stopMonitoringForSite: (siteId: string, monitorId: string) => Promise<void>;
-            exportData: () => Promise<string>;
-            importData: (data: string) => Promise<boolean>;
-            downloadSQLiteBackup: () => Promise<{ buffer: ArrayBuffer; fileName: string }>;
-            onStatusUpdate: (callback: (update: StatusUpdate) => void) => void;
-            removeAllListeners: (event: string) => void;
-            quitAndInstall: () => void;
-        };
-    }
-}

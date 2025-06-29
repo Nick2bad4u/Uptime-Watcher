@@ -12,7 +12,7 @@ Complete API reference for all Uptime Watcher interfaces and services.
 ### Monitoring Services  
 
 - **[Monitor API](monitor-api)** - HTTP and Port monitoring
-- **[IPC API Reference](../guides/IPC-API-Reference)** - Inter-process communication
+- **[IPC API](ipc-api)** - Inter-process communication
 
 ## Usage Examples
 

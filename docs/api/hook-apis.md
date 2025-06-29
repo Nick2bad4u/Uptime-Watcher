@@ -35,9 +35,10 @@ src/hooks/
 │   ├── useSiteMonitor.ts   # Monitor management
 │   ├── useSiteStats.ts     # Analytics and statistics
 │   ├── useSiteDetails.ts   # Site detail management
-│   └── useSiteAnalytics.ts # Analytics calculations
+│   ├── useSiteAnalytics.ts # Analytics calculations
+│   └── index.ts            # Barrel exports
 ├── useBackendFocusSync.ts  # Backend synchronization
-└── theme/                  # Theme hooks
+└── theme/                  # Theme hooks (in src/theme/)
     └── useTheme.ts         # Theme management
 ```
 
@@ -496,18 +497,17 @@ Comprehensive theme management hook.
 
 ```typescript
 interface UseThemeReturn {
-    currentTheme: Theme;
-    themeName: ThemeName;
-    isDark: boolean;
-    systemTheme: "light" | "dark";
-    themeVersion: number;
     availableThemes: ThemeName[];
-    
-    setTheme: (theme: ThemeName) => void;
-    toggleTheme: () => void;
+    currentTheme: Theme;
     getColor: (path: string) => string;
     getStatusColor: (status: StatusType) => string;
+    isDark: boolean;
+    setTheme: (theme: ThemeName) => void;
+    systemTheme: "light" | "dark";
     themeManager: ThemeManager;
+    themeName: ThemeName;
+    themeVersion: number;
+    toggleTheme: () => void;
 }
 ```
 
@@ -598,6 +598,8 @@ Hook for availability-based color mapping.
 interface AvailabilityColors {
     getAvailabilityColor: (percentage: number) => string;
     getAvailabilityVariant: (percentage: number) => "success" | "warning" | "danger";
+    getAvailabilityDescription: (percentage: number) => string;
+}
     getAvailabilityDescription: (percentage: number) => string;
 }
 ```
