@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosInstance } from "axios";
 
 import { Site } from "../../types";
 import { isDev } from "../../utils";
@@ -11,6 +11,7 @@ import { IMonitorService, MonitorCheckResult, MonitorConfig } from "./types";
  */
 export class HttpMonitor implements IMonitorService {
     private config: MonitorConfig;
+    private axiosInstance: AxiosInstance;
 
     constructor(config: MonitorConfig = {}) {
         this.config = {
@@ -19,6 +20,15 @@ export class HttpMonitor implements IMonitorService {
             userAgent: "Uptime-Watcher/1.0",
             ...config,
         };
+
+        // Create Axios instance with default configuration (best practice)
+        this.axiosInstance = axios.create({
+            headers: {
+                "User-Agent": this.config.userAgent,
+            },
+            maxRedirects: 5,
+            timeout: this.config.timeout,
+        });
     }
 
     /**
@@ -37,12 +47,7 @@ export class HttpMonitor implements IMonitorService {
         }
 
         if (!monitor.url) {
-            return {
-                details: "HTTP monitor missing URL",
-                error: "HTTP monitor missing URL",
-                responseTime: 0,
-                status: "down",
-            };
+            return this.createErrorResult("HTTP monitor missing URL", 0);
         }
 
         const startTime = Date.now();
@@ -52,91 +57,103 @@ export class HttpMonitor implements IMonitorService {
                 logger.debug(`[HttpMonitor] Checking URL: ${monitor.url}`);
             }
 
-            const response = await axios.get(monitor.url, {
-                headers: {
-                    "User-Agent": this.config.userAgent,
-                },
-                // Disable redirects for more accurate response time
-                maxRedirects: 5,
-                timeout: this.config.timeout,
-                validateStatus: (status: number) => status < 500, // Accept 1xx-4xx as "up"
-            });
-
+            const response = await this.makeRequest(monitor.url);
             const responseTime = Date.now() - startTime;
-            const status = response.status;
 
             if (isDev()) {
-                logger.debug(`[HttpMonitor] URL ${monitor.url} responded with status ${status} in ${responseTime}ms`);
+                logger.debug(
+                    `[HttpMonitor] URL ${monitor.url} responded with status ${response.status} in ${responseTime}ms`
+                );
             }
 
             return {
-                details: String(status),
+                details: String(response.status),
                 responseTime,
                 status: "up",
             };
         } catch (error) {
             const responseTime = Date.now() - startTime;
-            const errorMessage = error instanceof Error ? error.message : "Unknown error";
+            return this.handleRequestError(error, monitor.url, responseTime);
+        }
+    }
 
-            // Check if it's a timeout error
-            if (axios.isAxiosError(error)) {
-                if (error.code === "ECONNABORTED") {
-                    if (isDev()) {
-                        logger.debug(`[HttpMonitor] URL ${monitor.url} timed out after ${responseTime}ms`);
-                    }
-                    return {
-                        details: "0",
-                        error: "Timeout",
-                        responseTime,
-                        status: "down",
-                    };
-                }
+    /**
+     * Make the actual HTTP request using Axios.
+     */
+    private async makeRequest(url: string) {
+        // Use our configured Axios instance
+        return await this.axiosInstance.get(url);
+    }
 
-                // Handle specific HTTP errors
-                if (error.response) {
-                    const status = error.response.status;
-                    if (isDev()) {
-                        logger.debug(`[HttpMonitor] URL ${monitor.url} returned HTTP ${status} in ${responseTime}ms`);
-                    }
-
-                    // 5xx errors are considered "down"
-                    if (status >= 500) {
-                        return {
-                            details: String(status),
-                            error: `HTTP ${status}`,
-                            responseTime,
-                            status: "down",
-                        };
-                    }
-
-                    // 4xx errors are considered "up" but with error details
-                    return {
-                        details: String(status),
-                        responseTime,
-                        status: "up",
-                    };
-                }
-
-                // Network errors
+    /**
+     * Handle Axios request errors and convert them to MonitorCheckResult.
+     */
+    private handleRequestError(error: unknown, url: string, responseTime: number): MonitorCheckResult {
+        // Use Axios built-in error detection (simplified approach)
+        if (axios.isAxiosError(error)) {
+            // Handle timeout and cancellation errors
+            if (error.code === "ECONNABORTED" || error.code === "ETIMEDOUT") {
                 if (isDev()) {
-                    logger.debug(`[HttpMonitor] Network error for ${monitor.url}: ${errorMessage}`);
+                    logger.debug(`[HttpMonitor] URL ${url} timed out after ${responseTime}ms`);
                 }
-                return {
-                    details: "0",
-                    error: errorMessage,
-                    responseTime,
-                    status: "down",
-                };
+                return this.createErrorResult("Timeout", responseTime);
             }
 
-            logger.error(`[HttpMonitor] Unexpected error checking ${monitor.url}`, error);
+            // Handle HTTP response errors (5xx are down, 4xx are up with error details)
+            if (error.response) {
+                return this.handleHttpError(error.response.status, url, responseTime);
+            }
+
+            // Network errors (DNS, connection refused, etc.)
+            const errorMessage = error.message || "Network error";
+            if (isDev()) {
+                logger.debug(`[HttpMonitor] Network error for ${url}: ${errorMessage}`);
+            }
+            return this.createErrorResult(errorMessage, responseTime);
+        }
+
+        // Non-Axios errors (shouldn't happen, but just in case)
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        logger.error(`[HttpMonitor] Unexpected error checking ${url}`, error);
+        return this.createErrorResult(errorMessage, responseTime);
+    }
+
+    /**
+     * Handle HTTP status code errors.
+     */
+    private handleHttpError(status: number, url: string, responseTime: number): MonitorCheckResult {
+        if (isDev()) {
+            logger.debug(`[HttpMonitor] URL ${url} returned HTTP ${status} in ${responseTime}ms`);
+        }
+
+        // 5xx server errors are considered "down"
+        if (status >= 500) {
             return {
-                details: "0",
-                error: errorMessage,
+                details: String(status),
+                error: `HTTP ${status}`,
                 responseTime,
                 status: "down",
             };
         }
+
+        // 4xx client errors are considered "up" (site is responding)
+        return {
+            details: String(status),
+            responseTime,
+            status: "up",
+        };
+    }
+
+    /**
+     * Create a standard error result.
+     */
+    private createErrorResult(error: string, responseTime: number): MonitorCheckResult {
+        return {
+            details: "0",
+            error,
+            responseTime,
+            status: "down",
+        };
     }
 
     /**
@@ -144,6 +161,15 @@ export class HttpMonitor implements IMonitorService {
      */
     public updateConfig(config: Partial<MonitorConfig>): void {
         this.config = { ...this.config, ...config };
+        
+        // Recreate Axios instance with updated configuration
+        this.axiosInstance = axios.create({
+            headers: {
+                "User-Agent": this.config.userAgent,
+            },
+            maxRedirects: 5,
+            timeout: this.config.timeout,
+        });
     }
 
     /**
