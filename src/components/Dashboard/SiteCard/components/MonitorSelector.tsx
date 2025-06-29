@@ -63,8 +63,16 @@ export const MonitorSelector = React.memo(function MonitorSelector({
     // Memoize the option formatting to avoid recalculation
     const formatMonitorOption = useCallback((monitor: Monitor) => {
         const typeLabel = monitor.type.toUpperCase();
-        const detail = monitor.port ? `:${monitor.port}` : monitor.url ? `: ${monitor.url}` : "";
-        return `${typeLabel}${detail}`;
+        const getDetail = () => {
+            if (monitor.port) {
+                return `:${monitor.port}`;
+            }
+            if (monitor.url) {
+                return `: ${monitor.url}`;
+            }
+            return "";
+        };
+        return `${typeLabel}${getDetail()}`;
     }, []);
 
     return (
