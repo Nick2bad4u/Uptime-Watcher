@@ -44,7 +44,7 @@ interface SettingsProps {
  * @returns JSX element containing the settings interface
  */
 
-export function Settings({ onClose }: SettingsProps) {
+export function Settings({ onClose }: Readonly<SettingsProps>) {
     const {
         clearError,
         downloadSQLiteBackup, // <-- keep this
