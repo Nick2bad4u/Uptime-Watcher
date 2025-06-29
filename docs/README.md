@@ -6,39 +6,39 @@ Welcome to the Uptime Watcher documentation hub! This comprehensive knowledge ba
 
 ### Getting Started
 
-- [Developer Guide](guides/Developer-Guide/) - Complete setup and development workflow
-- [FAQ](guides/FAQ/) - Frequently asked questions
-- [Troubleshooting](guides/Troubleshooting/) - Common issues and solutions
+- [Developer Guide](guides/Developer-Guide) - Complete setup and development workflow
+- [FAQ](guides/FAQ) - Frequently asked questions
+- [Troubleshooting](guides/Troubleshooting) - Common issues and solutions
 
 ### API Documentation
 
-- [API Reference Overview](api/README/) - Complete API documentation index
-- [IPC API Reference](guides/IPC-API-Reference/) - Inter-process communication
-- [Types API](api/types-api/) - TypeScript type definitions
-- [Store API](api/store-api/) - State management
-- [Monitor API](api/monitor-api/) - Uptime monitoring core
+- [API Reference Overview](api/README) - Complete API documentation index
+- [IPC API Reference](guides/IPC-API-Reference) - Inter-process communication
+- [Types API](api/types-api) - TypeScript type definitions
+- [Store API](api/store-api) - State management
+- [Monitor API](api/monitor-api) - Uptime monitoring core
 
 ### Component Documentation
 
-- [Component Documentation](component-docs/README/) - React component reference
+- [Component Documentation](component-docs/README) - React component reference
 
 ### Architecture & Design
 
 - [Project Architecture](architecture/Project-Architecture-Guide.copilotmd) - System design and structure
-- [Theme System](guides/Theme-Usage/) - UI theming and customization
-- [Validation System](guides/Validator/) - Input validation and error handling
+- [Theme System](guides/Theme-Usage) - UI theming and customization
+- [Validation System](guides/Validator) - Input validation and error handling
 
 ### Performance & Security
 
-- [Performance Guide](guides/Performance-Guide/) - Optimization best practices
-- [Security Guide](guides/Security-Guide/) - Security considerations and practices
+- [Performance Guide](guides/Performance-Guide) - Optimization best practices
+- [Security Guide](guides/Security-Guide) - Security considerations and practices
 
 ### Development Resources
 
-- [Documentation Contribution Guide](guides/Documentation-Contribution/) - How to improve these docs
-- [Migration Summaries](migration-summaries/) - Historical change documentation
-- [Optimization Reports](optimization-summaries/) - Performance improvement records
-- [Health Reports](health-reports/) - Code quality assessments
+- [Documentation Contribution Guide](guides/Documentation-Contribution) - How to improve these docs
+- [Migration Summaries](migration-summaries) - Historical change documentation
+- [Optimization Reports](optimization-summaries) - Performance improvement records
+- [Health Reports](health-reports) - Code quality assessments
 
 ## 🔍 Documentation Structure
 
@@ -79,10 +79,10 @@ docs/
 
 ## 🚀 Quick Start
 
-1. **New Developer?** Start with the [Developer Guide](guides/Developer-Guide/)
-2. **Looking for APIs?** Check the [API Reference](api/README/)
-3. **Having Issues?** See [Troubleshooting](guides/Troubleshooting/) and [FAQ](guides/FAQ/)
-4. **Want to Contribute?** Read the [Documentation Contribution Guide](guides/Documentation-Contribution/)
+1. **New Developer?** Start with the [Developer Guide](guides/Developer-Guide)
+2. **Looking for APIs?** Check the [API Reference](api/README)
+3. **Having Issues?** See [Troubleshooting](guides/Troubleshooting) and [FAQ](guides/FAQ)
+4. **Want to Contribute?** Read the [Documentation Contribution Guide](guides/Documentation-Contribution)
 
 ## 🔗 External Resources
 
@@ -105,9 +105,9 @@ All documentation in this project follows:
 
 If you can't find what you're looking for:
 
-1. Check the [FAQ](guides/FAQ/) for common questions
-2. Review [Troubleshooting](guides/Troubleshooting/) for technical issues
-3. Search through the [API documentation](api/README/)
+1. Check the [FAQ](guides/FAQ) for common questions
+2. Review [Troubleshooting](guides/Troubleshooting) for technical issues
+3. Search through the [API documentation](api/README)
 4. Create an issue on GitHub with the `documentation` label
 
 ---

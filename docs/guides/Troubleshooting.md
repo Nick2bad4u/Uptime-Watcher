@@ -356,11 +356,11 @@ rm ~/.local/share/uptime-watcher/settings.json
 
 ## See Also
 
-- [🚀 Developer Guide](Developer-Guide/) - Development setup and workflow
+- [🚀 Developer Guide](Developer-Guide) - Development setup and workflow
 - [📚 API Reference](../api/README) - Technical API documentation
 - [🏗️ Architecture Guide](../architecture/Project-Architecture-Guide.copilotmd) - System design
-- [🎨 Theme Usage](Theme-Usage/) - Theming and customization
-- [📖 Documentation Guide](Documentation-Contribution/) - Contributing to docs
+- [🎨 Theme Usage](Theme-Usage) - Theming and customization
+- [📖 Documentation Guide](Documentation-Contribution) - Contributing to docs
 
 ---
 

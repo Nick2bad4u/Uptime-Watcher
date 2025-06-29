@@ -8,25 +8,25 @@ Comprehensive documentation for all React components in the Uptime Watcher appli
 
 ### 🏠 Main Components
 
-- **[Dashboard](Dashboard/)** - Main application dashboard with site overview
-- **[Header](Header/)** - Application header with status overview and controls
-- **[Settings](Settings/)** - Settings modal for application configuration
+- **[Dashboard](Dashboard)** - Main application dashboard with site overview
+- **[Header](Header)** - Application header with status overview and controls
+- **[Settings](Settings)** - Settings modal for application configuration
 
 ### 📝 Form Components
 
-- **[AddSiteForm](AddSiteForm/)** - Site creation and editing interface
-- **[AddSiteForm Components](AddSiteForm-Components/)** - Sub-components and form fields
+- **[AddSiteForm](AddSiteForm)** - Site creation and editing interface
+- **[AddSiteForm Components](AddSiteForm-Components)** - Sub-components and form fields
 
 ### 🏢 Site Components
 
-- **[SiteDetails](SiteDetails/)** - Detailed site information modal
-- **[SiteDetails Tab Components](SiteDetails-Tab-Components/)** - Tab system for site details
-- **[SiteCard Components](SiteCard-Components/)** - Site display cards and status
-- **[SiteList Components](SiteList-Components/)** - Site listing and empty states
+- **[SiteDetails](SiteDetails)** - Detailed site information modal
+- **[SiteDetails Tab Components](SiteDetails-Tab-Components)** - Tab system for site details
+- **[SiteCard Components](SiteCard-Components)** - Site display cards and status
+- **[SiteList Components](SiteList-Components)** - Site listing and empty states
 
 ### 🔧 Common Components
 
-- **[Common Components](Common-Components/)** - Reusable components across the app
+- **[Common Components](Common-Components)** - Reusable components across the app
   - StatusBadge
   - HistoryChart
   - Themed components

@@ -1,6 +1,6 @@
 # 🛡️ Security Guide
 
-> **Navigation:** [📖 Docs Home](../) » [📘 Guides](../guides/) » **Security Guide**
+> **Navigation:** [📖 Docs Home](..) » [📘 Guides](../guides) » **Security Guide**
 
 Security considerations and best practices for Uptime Watcher.
 
@@ -446,12 +446,12 @@ For regulated environments:
 
 ## See Also
 
-- [🔧 Troubleshooting Guide](Troubleshooting/) - Common issues and solutions
-- [⚡ Performance Guide](Performance-Guide/) - Optimization strategies
-- [🚀 Developer Guide](Developer-Guide/) - Development setup
-- [📚 API Reference](../api/) - Technical documentation
-- [❓ FAQ](FAQ/) - Frequently asked questions
+- [🔧 Troubleshooting Guide](Troubleshooting) - Common issues and solutions
+- [⚡ Performance Guide](Performance-Guide) - Optimization strategies
+- [🚀 Developer Guide](Developer-Guide) - Development setup
+- [📚 API Reference](../api) - Technical documentation
+- [❓ FAQ](FAQ) - Frequently asked questions
 
 ---
 
-> **Related:** [📖 Documentation Home](../) | [📘 All Guides](../guides/)
+> **Related:** [📖 Documentation Home](..) | [📘 All Guides](../guides)

@@ -667,7 +667,7 @@ For implementation details, see the source files:
 - [🔗 IPC API](../api/ipc-api) - Complete IPC module documentation
 - [📋 Types API](../api/types-api) - IPC interface definitions
 - [🏪 Store API](../api/store-api) - State management integration
-- [🚀 Developer Guide](Developer-Guide/) - Development setup and patterns
+- [🚀 Developer Guide](Developer-Guide) - Development setup and patterns
 - [📊 Monitor API](../api/monitor-api) - Monitoring service integration
 
 ---

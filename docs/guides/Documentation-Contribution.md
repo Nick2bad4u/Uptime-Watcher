@@ -55,8 +55,8 @@ Include "See Also" sections at the end:
 ```markdown
 ## See Also
 
-- [Related Doc 1](link1/) - Brief description
-- [Related Doc 2](link2/) - Brief description
+- [Related Doc 1](link1) - Brief description
+- [Related Doc 2](link2) - Brief description
 
 ---
 
@@ -190,7 +190,7 @@ Track documentation health:
 
 ## See Also
 
-- [🚀 Developer Guide](Developer-Guide/) - Development setup and workflow
+- [🚀 Developer Guide](Developer-Guide) - Development setup and workflow
 - [📚 API Reference](../api/README) - Complete API documentation
 - [🧩 Component Docs](../component-docs/README) - UI component documentation
 

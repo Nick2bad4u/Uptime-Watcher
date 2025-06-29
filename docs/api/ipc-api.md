@@ -1,6 +1,6 @@
 # 🔗 IPC API Reference
 
-> **Navigation:** [📖 Docs Home](../README) » [📚 API Reference](README/) » **IPC API**
+> **Navigation:** [📖 Docs Home](../README) » [📚 API Reference](README) » **IPC API**
 
 The IPC (Inter-Process Communication) API provides secure communication between the Electron main process and renderer process. It handles site management, monitoring control, data operations, and system functions.
 
@@ -669,15 +669,15 @@ const checkSite = (id: string, monitorId: string) =>
 
 ## See Also
 
-- [🏪 Store API](store-api/) - Frontend state management integration
-- [📋 Types API](types-api/) - TypeScript interface definitions
-- [📊 Monitor API](monitor-api/) - Backend monitoring services
-- [💾 Database API](database-api/) - Data persistence layer
-- [🔔 Notification API](notification-api/) - System notifications
-- [📝 Logger API](logger-api/) - Logging and debugging
+- [🏪 Store API](store-api) - Frontend state management integration
+- [📋 Types API](types-api) - TypeScript interface definitions
+- [📊 Monitor API](monitor-api) - Backend monitoring services
+- [💾 Database API](database-api) - Data persistence layer
+- [🔔 Notification API](notification-api) - System notifications
+- [📝 Logger API](logger-api) - Logging and debugging
 
 ---
 
-> **Related:** [📚 API Reference](README/) | [📖 Documentation Home](../README)
+> **Related:** [📚 API Reference](README) | [📖 Documentation Home](../README)
 
-- [Monitor API](monitor-api/) - Monitoring services
+- [Monitor API](monitor-api) - Monitoring services

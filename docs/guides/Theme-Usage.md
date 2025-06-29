@@ -103,7 +103,7 @@ export default function ExampleUsage() {
 ## See Also
 
 - [🎨 Theme API](../api/theme-api) - Complete theme API reference
-- [🚀 Developer Guide](Developer-Guide/) - Development setup and patterns
+- [🚀 Developer Guide](Developer-Guide) - Development setup and patterns
 - [🧩 Hook APIs](../api/hook-apis) - useTheme hook documentation
 - [📋 Types API](../api/types-api) - Theme type definitions
 

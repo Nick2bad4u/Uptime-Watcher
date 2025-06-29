@@ -11,48 +11,48 @@ Welcome to the comprehensive documentation for **Uptime Watcher** - a powerful, 
 ### For Users
 
 - **[Download & Installation](https://github.com/Nick2bad4u/Uptime-Watcher/releases)** - Get started with Uptime Watcher
-- **[User Guide](guides/FAQ/)** - Learn how to use all features
-- **[Troubleshooting](guides/Troubleshooting/)** - Solve common issues
+- **[User Guide](guides/FAQ)** - Learn how to use all features
+- **[Troubleshooting](guides/Troubleshooting)** - Solve common issues
 
 ### For Developers
 
-- **[Vite & MCP Configuration](Vite-MCP-Configuration/)** - Build system and MCP integration
-- **[Developer Guide](guides/Developer-Guide/)** - Complete setup and development workflow
-- **[API Reference](api/)** - Complete API documentation
-- **[Architecture Guide](architecture/Project-Architecture-Guide/)** - System design and structure
+- **[Vite & MCP Configuration](Vite-MCP-Configuration)** - Build system and MCP integration
+- **[Developer Guide](guides/Developer-Guide)** - Complete setup and development workflow
+- **[API Reference](api)** - Complete API documentation
+- **[Architecture Guide](architecture/Project-Architecture-Guide)** - System design and structure
 
 ## 📚 Documentation Sections
 
 ### 🔧 API Reference
 
-- **[IPC API Reference](guides/IPC-API-Reference/)** - Inter-process communication
-- **[Types API](api/types-api/)** - TypeScript type definitions  
-- **[Store API](api/store-api/)** - State management with Zustand
-- **[Monitor API](api/monitor-api/)** - Core monitoring functionality
+- **[IPC API Reference](guides/IPC-API-Reference)** - Inter-process communication
+- **[Types API](api/types-api)** - TypeScript type definitions  
+- **[Store API](api/store-api)** - State management with Zustand
+- **[Monitor API](api/monitor-api)** - Core monitoring functionality
 
 ### 🛠 Build & Development
 
-- **[Vite & MCP Configuration](Vite-MCP-Configuration/)** - Build system and MCP integration
-- **[Developer Guide](guides/Developer-Guide/)** - Complete setup and development workflow
-- **[Architecture Guide](architecture/Project-Architecture-Guide/)** - System design and structure
+- **[Vite & MCP Configuration](Vite-MCP-Configuration)** - Build system and MCP integration
+- **[Developer Guide](guides/Developer-Guide)** - Complete setup and development workflow
+- **[Architecture Guide](architecture/Project-Architecture-Guide)** - System design and structure
 
 ### 🎨 Component Documentation
 
-- **[React Components](component-docs/)** - UI component reference
-- **[Theme System](guides/Theme-Usage/)** - Customization and theming
-- **[Validation System](guides/Validator/)** - Input validation patterns
+- **[React Components](component-docs)** - UI component reference
+- **[Theme System](guides/Theme-Usage)** - Customization and theming
+- **[Validation System](guides/Validator)** - Input validation patterns
 
 ### ⚡ Performance & Security
 
-- **[Performance Guide](guides/Performance-Guide/)** - Optimization best practices
-- **[Security Guide](guides/Security-Guide/)** - Security considerations
-- **[Feature Development](guides/Feature-Development-Guide/)** - Adding new features
+- **[Performance Guide](guides/Performance-Guide)** - Optimization best practices
+- **[Security Guide](guides/Security-Guide)** - Security considerations
+- **[Feature Development](guides/Feature-Development-Guide)** - Adding new features
 
 ### 📊 Project Health
 
-- **[Documentation Review](Documentation-Review-Complete/)** - Documentation accuracy status
-- **[Migration Summaries](migration-summaries/)** - Change history
-- **[Health Reports](health-reports/)** - Code quality assessments
+- **[Documentation Review](Documentation-Review-Complete)** - Documentation accuracy status
+- **[Migration Summaries](migration-summaries)** - Change history
+- **[Health Reports](health-reports)** - Code quality assessments
 
 ## 🛠 What is Uptime Watcher?
 
@@ -85,14 +85,14 @@ Uptime Watcher is a feature-rich desktop application that helps you monitor the 
 
 ### Documentation
 
-- **[FAQ](guides/FAQ/)** - Frequently asked questions
-- **[Troubleshooting](guides/Troubleshooting/)** - Common issues and solutions
-- **[Documentation Contribution](guides/Documentation-Contribution/)** - Improve these docs
+- **[FAQ](guides/FAQ)** - Frequently asked questions
+- **[Troubleshooting](guides/Troubleshooting)** - Common issues and solutions
+- **[Documentation Contribution](guides/Documentation-Contribution)** - Improve these docs
 
 ## 🔄 Recent Updates
 
-The documentation has been systematically reviewed and updated for accuracy. All examples and configuration options now reflect the actual implementation. See the [Documentation Review Summary](Documentation-Review-Complete/) for details.
+The documentation has been systematically reviewed and updated for accuracy. All examples and configuration options now reflect the actual implementation. See the [Documentation Review Summary](Documentation-Review-Complete) for details.
 
 ---
 
-**Ready to get started?** Check out the [Developer Guide](guides/Developer-Guide/) for development setup or download the latest release to start monitoring your services!
+**Ready to get started?** Check out the [Developer Guide](guides/Developer-Guide) for development setup or download the latest release to start monitoring your services!

@@ -1,6 +1,6 @@
 # 🗄️ Database API Reference
 
-> **Navigation:** [📖 Docs Home](../README) » [📚 API Reference](README/) » **Database API**
+> **Navigation:** [📖 Docs Home](../README) » [📚 API Reference](README) » **Database API**
 
 Comprehensive documentation for SQLite-based data persistence using the repository pattern.
 
@@ -363,13 +363,13 @@ const completeSite = await siteRepo.getByIdentifier("example-com");
 
 ## See Also
 
-- [📋 Types API](types-api/) - Site, monitor, and history type definitions
-- [🏪 Store API](store-api/) - State management and data flow
-- [📊 Monitor API](monitor-api/) - Monitoring service integration
-- [🔔 Notification API](notification-api/) - Status change notifications
-- [📊 Chart API](chart-api/) - History data visualization
-- [🛠️ Utilities API](utilities-api/) - Database helper utilities
+- [📋 Types API](types-api) - Site, monitor, and history type definitions
+- [🏪 Store API](store-api) - State management and data flow
+- [📊 Monitor API](monitor-api) - Monitoring service integration
+- [🔔 Notification API](notification-api) - Status change notifications
+- [📊 Chart API](chart-api) - History data visualization
+- [🛠️ Utilities API](utilities-api) - Database helper utilities
 
 ---
 
-> **Related:** [📚 API Reference](README/) | [📖 Documentation Home](../README)
+> **Related:** [📚 API Reference](README) | [📖 Documentation Home](../README)

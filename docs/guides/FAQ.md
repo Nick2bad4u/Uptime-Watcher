@@ -351,11 +351,11 @@ If your question isn't answered here:
 
 ## See Also
 
-- [🚀 Developer Guide](Developer-Guide/) - Setup and development workflow
-- [🔧 Troubleshooting Guide](Troubleshooting/) - Common issues and solutions
+- [🚀 Developer Guide](Developer-Guide) - Setup and development workflow
+- [🔧 Troubleshooting Guide](Troubleshooting) - Common issues and solutions
 - [📚 API Reference](../api/README) - Technical documentation
 - [🏗️ Architecture Guide](../architecture/Project-Architecture-Guide.copilotmd) - System design
-- [📖 Documentation Guide](Documentation-Contribution/) - Contributing to docs
+- [📖 Documentation Guide](Documentation-Contribution) - Contributing to docs
 
 ---
 

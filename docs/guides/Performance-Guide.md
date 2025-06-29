@@ -489,11 +489,11 @@ If you experience persistent performance issues:
 
 ## See Also
 
-- [🔧 Troubleshooting Guide](Troubleshooting/) - Common issues and solutions
-- [🚀 Developer Guide](Developer-Guide/) - Development setup and workflow
+- [🔧 Troubleshooting Guide](Troubleshooting) - Common issues and solutions
+- [🚀 Developer Guide](Developer-Guide) - Development setup and workflow
 - [📚 API Reference](../api/README) - Technical documentation
 - [🏗️ Architecture Guide](../architecture/Project-Architecture-Guide.copilotmd) - System design
-- [❓ FAQ](FAQ/) - Frequently asked questions
+- [❓ FAQ](FAQ) - Frequently asked questions
 
 ---
 

@@ -1,6 +1,6 @@
 # 🏪 Store API Reference
 
-> **Navigation:** [📖 Docs Home](../README) » [📚 API Reference](README/) » **Store API**
+> **Navigation:** [📖 Docs Home](../README) » [📚 API Reference](README) » **Store API**
 
 The Store API provides centralized state management for the Uptime Watcher application using Zustand. This API manages sites, monitors, settings, UI state, and backend synchronization.
 
@@ -562,14 +562,14 @@ const site = {
 
 ## See Also
 
-- [📋 Types API](types-api/) - Core type definitions and interfaces
-- [🔗 IPC API](ipc-api/) - Electron backend communication
-- [🧩 Hook APIs](hook-apis/) - React hooks that use the store
-- [🎨 Theme API](theme-api/) - Theme system integration
-- [📊 Monitor API](monitor-api/) - Monitoring service integration
+- [📋 Types API](types-api) - Core type definitions and interfaces
+- [🔗 IPC API](ipc-api) - Electron backend communication
+- [🧩 Hook APIs](hook-apis) - React hooks that use the store
+- [🎨 Theme API](theme-api) - Theme system integration
+- [📊 Monitor API](monitor-api) - Monitoring service integration
 
 ---
 
-> **Related:** [📚 API Reference](README/) | [📖 Documentation Home](../README)
+> **Related:** [📚 API Reference](README) | [📖 Documentation Home](../README)
 
-- [Hook APIs](hook-apis/) - React hooks for store integration
+- [Hook APIs](hook-apis) - React hooks for store integration

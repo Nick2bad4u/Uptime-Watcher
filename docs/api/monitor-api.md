@@ -1,6 +1,6 @@
 # 🔍 Monitor API Reference
 
-> **Navigation:** [📖 Docs Home](../README) » [📚 API Reference](README/) » **Monitor API**
+> **Navigation:** [📖 Docs Home](../README) » [📚 API Reference](README) » **Monitor API**
 
 The Monitor API provides the core monitoring services for the Uptime Watcher application, including site monitoring, status checking, and data persistence.
 
@@ -750,7 +750,7 @@ for (const entry of entries) {
 
 ## See Also
 
-- [IPC API](ipc-api/) - Communication with frontend
-- [Types API](types-api/) - Monitor and site type definitions  
-- [Store API](store-api/) - Frontend state management
-- [Hook APIs](hook-apis/) - React hooks for monitor data
+- [IPC API](ipc-api) - Communication with frontend
+- [Types API](types-api) - Monitor and site type definitions  
+- [Store API](store-api) - Frontend state management
+- [Hook APIs](hook-apis) - React hooks for monitor data

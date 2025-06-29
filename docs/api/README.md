@@ -8,39 +8,39 @@ This directory contains comprehensive API documentation for the Uptime Watcher p
 
 ### Core APIs
 
-- **[Store API](store-api/)** - Zustand store interfaces and state management
-- **[IPC API](ipc-api/)** - Electron IPC communication channels
-- **[Theme API](theme-api/)** - Theme system and theming utilities
-- **[Monitor API](monitor-api/)** - Monitoring services and factories
-- **[Types API](types-api/)** - TypeScript type definitions and interfaces
+- **[Store API](store-api)** - Zustand store interfaces and state management
+- **[IPC API](ipc-api)** - Electron IPC communication channels
+- **[Theme API](theme-api)** - Theme system and theming utilities
+- **[Monitor API](monitor-api)** - Monitoring services and factories
+- **[Types API](types-api)** - TypeScript type definitions and interfaces
 
 ### Service APIs
 
-- **[Database API](database-api/)** - Database services and repositories
-- **[Notification API](notification-api/)** - System notification management
-- **[Logger API](logger-api/)** - Logging utilities and configurations
-- **[Chart API](chart-api/)** - Chart configuration and visualization
+- **[Database API](database-api)** - Database services and repositories
+- **[Notification API](notification-api)** - System notification management
+- **[Logger API](logger-api)** - Logging utilities and configurations
+- **[Chart API](chart-api)** - Chart configuration and visualization
 
 ### Component APIs
 
-- **[Hook APIs](hook-apis/)** - Custom React hooks reference
-- **[Component Props](component-props/)** - React component prop interfaces *(Coming Soon)*
-- **[Common Components](common-component-apis/)** - Reusable component APIs *(Coming Soon)*
+- **[Hook APIs](hook-apis)** - Custom React hooks reference
+- **[Component Props](component-props)** - React component prop interfaces *(Coming Soon)*
+- **[Common Components](common-component-apis)** - Reusable component APIs *(Coming Soon)*
 
 ### Utility APIs
 
-- **[Utilities API](utilities-api/)** - Time formatting, status utilities, and common helpers
-- **[Validation Utilities](validation-utils-api/)** - Input validation and constraint checking
+- **[Utilities API](utilities-api)** - Time formatting, status utilities, and common helpers
+- **[Validation Utilities](validation-utils-api)** - Input validation and constraint checking
 
 ## 🚀 Quick Start
 
 For developers new to the API:
 
-1. **State Management**: Start with [Store API](store-api/) to understand global state
-2. **Backend Communication**: Check [IPC API](ipc-api/) for Electron communication
-3. **UI Development**: Review [Hook APIs](hook-apis/) and [Component Props](component-props/)
-4. **Theming**: Explore [Theme API](theme-api/) for UI customization
-5. **Data Persistence**: Study [Database API](database-api/) for data operations
+1. **State Management**: Start with [Store API](store-api) to understand global state
+2. **Backend Communication**: Check [IPC API](ipc-api) for Electron communication
+3. **UI Development**: Review [Hook APIs](hook-apis) and [Component Props](component-props)
+4. **Theming**: Explore [Theme API](theme-api) for UI customization
+5. **Data Persistence**: Study [Database API](database-api) for data operations
 
 ## 📖 Conventions
 

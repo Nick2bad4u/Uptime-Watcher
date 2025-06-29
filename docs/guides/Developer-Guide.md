@@ -482,9 +482,9 @@ _Happy coding! 🎉_
 - [📚 API Reference](../api/README) - Complete module documentation
 - [🏗️ Architecture Guide](../architecture/Project-Architecture-Guide.copilotmd) - System design patterns
 - [🧩 Component Documentation](../component-docs/README) - UI component guides
-- [🔧 Troubleshooting Guide](Troubleshooting/) - Common issues and solutions
-- [🎨 Theme Usage Guide](Theme-Usage/) - Theming and styling
-- [✅ Validation Guide](Validator/) - Input validation patterns
+- [🔧 Troubleshooting Guide](Troubleshooting) - Common issues and solutions
+- [🎨 Theme Usage Guide](Theme-Usage) - Theming and styling
+- [✅ Validation Guide](Validator) - Input validation patterns
 
 ---
 
