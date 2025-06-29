@@ -27,36 +27,39 @@ The component follows a modular architecture pattern:
 - Handles theme integration and styling
 - Manages error display and loading states
 
-### 2. **FormFields.tsx** - Input Fields
+### 2. **FormFields.tsx** - Reusable Input Components
 
-- Renders all form input fields (URL, name, monitor type, etc.)
-- Handles field-specific validation and user interaction
-- Integrates with the custom hook for state management
+- Provides reusable form components (TextField, SelectField, RadioGroup, FormField)
+- Handles consistent styling and accessibility for form inputs
+- Integrates with themed components for visual consistency
 
-### 3. **Submit.tsx** - Form Submission
+### 3. **Submit.tsx** - Form Submission Logic
 
-- Handles form submission logic and validation
-- Manages loading states and user feedback
-- Integrates with the global store for site creation
+- Contains the `handleSubmit` function for form processing
+- Implements comprehensive validation logic
+- Handles error messaging and success callbacks
 
 ### 4. **useAddSiteForm.ts** - State Management Hook
 
 - Centralizes all form state in a custom hook
-- Provides form validation logic
-- Handles form reset and field clearing
+- Provides form field setters and validation state
+- Handles form reset and field clearing logic
 
 ---
 
 ## Key Features
 
-- **Modular Architecture:** Separated into focused components and custom hooks
+- **Dual Mode Operation:** Support for creating new sites or adding monitors to existing sites
+- **Multiple Monitor Types:** HTTP/HTTPS monitoring and port monitoring
+- **Modular Architecture:** Separated into focused components and utility functions
 - **State Management:** Uses Zustand store actions and custom hooks for form state
 - **Theming:** Full integration with the app's theme system
 - **Accessibility:** All form fields have proper labels and ARIA attributes
 - **Error Handling:** Comprehensive error display and validation
-- **Loading Feedback:** Visual feedback during form submission
+- **Loading Feedback:** Visual feedback during form submission with delayed spinner
 - **Form Reset:** Automatic field clearing after successful submission
 - **Type Safety:** Full TypeScript integration with proper interfaces
+- **UUID Generation:** Automatic site identifier generation for new sites
 
 ---
 
@@ -64,40 +67,55 @@ The component follows a modular architecture pattern:
 
 ### useAddSiteForm Hook
 
-The custom hook centralizes all form state management:
+The custom hook provides direct access to all form state and actions:
 
 ```typescript
 const {
-  formState,      // All form field values
-  isFormValid,    // Computed validation state
-  setUrl,         // URL field setter
-  setName,        // Name field setter
-  setMonitorType, // Monitor type setter
-  resetForm       // Form reset function
+  url,              // URL field value
+  host,             // Host field value  
+  port,             // Port field value
+  name,             // Site name field value
+  monitorType,      // Selected monitor type
+  checkInterval,    // Check interval value
+  addMode,          // Form mode (new/existing)
+  selectedExistingSite, // Selected existing site ID
+  isFormValid,      // Computed validation state
+  setUrl,           // URL field setter
+  setHost,          // Host field setter
+  setPort,          // Port field setter
+  setName,          // Name field setter
+  setMonitorType,   // Monitor type setter
+  setCheckInterval, // Check interval setter
+  setAddMode,       // Add mode setter
+  resetForm         // Form reset function
 } = useAddSiteForm();
 ```
 
 ### Form Validation
 
-- **URL Validation:** Ensures valid URL format and accessibility
-- **Monitor Type:** Validates monitor configuration based on type
-- **Real-time Feedback:** Immediate validation feedback as user types
-- **Submit Validation:** Comprehensive checks before form submission
+- **URL Validation:** Comprehensive URL format validation using validator.js
+- **Host/IP Validation:** Validates IP addresses and domain names for port monitors
+- **Port Validation:** Ensures valid port numbers (1-65535)
+- **Mode-based Validation:** Different validation rules for new vs existing sites
+- **Submit-time Validation:** Comprehensive validation before form submission
+- **Basic Form State:** Simple validation for submit button enablement
 
 ### Integration Points
 
-- **Store Integration:** `useStore` for site creation and error handling
-- **Theme Integration:** `useTheme` for consistent styling
+- **Store Integration:** `useStore` for site creation, monitor addition, and error handling
+- **Theme Integration:** `useTheme` for consistent styling and dark mode support
 - **Logger Integration:** Comprehensive logging for debugging and analytics
+- **Constants Integration:** Uses `CHECK_INTERVALS` and `UI_DELAYS` for configuration
+- **UUID Generation:** Uses `generateUuid` utility for unique site identifiers
 
 ---
 
 ## Usage Example
 
-The AddSiteForm is typically used in modals or dedicated pages:
+The AddSiteForm is typically used as a standalone component:
 
 ```typescript
-import { AddSiteForm } from './components/AddSiteForm';
+import { AddSiteForm } from '../components/AddSiteForm/AddSiteForm';
 
 function App() {
   return (
@@ -134,11 +152,12 @@ function App() {
 
 ## Future Enhancements
 
-- **Advanced Validation:** Extended URL and port validation
-- **Bulk Import:** Support for importing multiple sites
-- **Template System:** Pre-configured monitor templates
-- **Validation Feedback:** Real-time validation with visual feedback
-- **Auto-suggestions:** URL completion and common port suggestions
+- **Enhanced Validation:** Extended URL validation and real-time feedback
+- **Bulk Import:** Support for importing multiple sites from files
+- **Template System:** Pre-configured monitor templates for common services
+- **Auto-completion:** URL completion and common port suggestions
+- **Import/Export:** Backup and restore form configurations
+- **Custom Headers:** Support for custom HTTP headers in monitoring requests
 
 ---
 
@@ -146,11 +165,13 @@ function App() {
 
 For developers working on this component:
 
-1. **State Management:** Use the custom hook for all form state
-2. **Styling:** Follow the theme system for consistent appearance
-3. **Validation:** Add new validation rules in the custom hook
-4. **Testing:** Test each module independently for better coverage
-5. **Accessibility:** Maintain ARIA attributes for screen readers
+1. **State Management:** Use the `useAddSiteForm` hook for all form state management
+2. **Styling:** Follow the theme system and use ThemedBox, ThemedText, ThemedButton components
+3. **Validation:** Add new validation rules in the `handleSubmit` function in Submit.tsx
+4. **Form Fields:** Use the reusable components from FormFields.tsx (TextField, SelectField, RadioGroup)
+5. **Testing:** Test each module independently for better coverage
+6. **Accessibility:** Maintain ARIA attributes and proper form labeling
+7. **Error Handling:** Use both form-level and store-level error handling
 
 ---
 

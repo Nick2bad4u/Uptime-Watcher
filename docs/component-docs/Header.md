@@ -106,9 +106,11 @@ const uptimePercentage = totalMonitors > 0
 
 ### Interactive Elements
 
-- **Hover Effects**: Subtle hover states on buttons and status badges
-- **Animations**: Pulsing health indicator dots
-- **Transitions**: Smooth color and size transitions
+- **Hover Effects**: Sophisticated hover states with transform, shadow, and color changes
+- **Animations**: Pulsing health indicator dots using CSS `animate-pulse`
+- **Transitions**: Smooth transitions with specific cubic-bezier timing functions
+- **Scale Effects**: Hover transforms include scale and translateY for depth
+- **Focus States**: Comprehensive focus-visible states for accessibility
 
 ---
 
@@ -134,11 +136,13 @@ The Header fully supports the application's theme system:
 ### Status Monitoring
 
 ```tsx
-// Access header status from store
-const { sites } = useStore();
+// Header component directly accesses store data
+const { setShowSettings, sites } = useStore();
+const { isDark, toggleTheme } = useTheme();
+const { getAvailabilityColor } = useAvailabilityColors();
 
-// Monitor changes through header display
-// Header automatically recalculates on site updates
+// Header performs calculations on render
+// No memoization - recalculates on every render when sites change
 ```
 
 ### Theme Control
@@ -159,9 +163,10 @@ const { isDark, toggleTheme } = useTheme();
 
 ### Optimizations
 
-- **Real-time Calculations**: Efficient iteration through sites/monitors
-- **Memoization**: Status calculations only when sites data changes
-- **CSS Animations**: Hardware-accelerated animations for smooth performance
+- **Direct calculations**: Performs real-time iteration through sites/monitors on each render
+- **No memoization**: Status calculations happen on every render (could be optimized)
+- **CSS Animations**: Hardware-accelerated animations for smooth hover effects and transitions
+- **Theme-aware styling**: Efficient theme switching with CSS custom properties
 
 ### Update Frequency
 
@@ -176,20 +181,22 @@ const { isDark, toggleTheme } = useTheme();
 ### Key CSS Classes
 
 - `.header-container`: Main container styling
-- `.header-title-box`: App title styling container
-- `.header-title-accent`: Title text styling
+- `.header-title-box`: App title styling container with hover effects
+- `.header-title-accent`: Title text styling  
 - `.header-status-summary-box`: Status summary container
-- `.health-badge`: Overall health indicator
-- `.health-dot`: Animated status dot
-- `.health-text`: Health percentage text
-- `.status-*-badge`: Individual status counters
-- `.header-controls-box`: Control buttons container
+- `.health-badge`: Overall health indicator with hover animations
+- `.health-dot`: Animated pulsing status dot
+- `.health-text`: Health percentage text with theme color attributes
+- `.status-up-badge`, `.status-down-badge`, `.status-pending-badge`: Individual status counters
+- `.total-sites-badge`: Total monitor count display
+- `.header-controls-box`: Control buttons container with hover effects
 
 ### Responsive Breakpoints
 
-- Uses Tailwind CSS responsive utilities
+- Uses Tailwind CSS responsive utilities (`flex-wrap`, `gap-4`, `min-w-*`)
 - Flexbox-based layout for automatic adaptation
-- Min-width constraints for critical elements
+- Min-width constraints for critical elements (180px for title, 340px for status summary)
+- No specific CSS breakpoints - relies on Flexbox wrapping behavior
 
 ---
 
@@ -197,9 +204,10 @@ const { isDark, toggleTheme } = useTheme();
 
 ### Store Integration
 
-- **Sites Data**: Real-time access to all monitored sites
-- **Settings Modal**: Triggers settings display
-- **Error States**: Could integrate error notifications (future enhancement)
+- **Sites Data**: Direct access to all monitored sites array via `useStore()`
+- **Settings Modal**: Triggers settings display via `setShowSettings(true)`
+- **Theme State**: Accesses theme state through `useTheme()` hook
+- **Color System**: Uses `useAvailabilityColors()` for health status coloring
 
 ### Theme System Integration
 
@@ -226,6 +234,7 @@ const { isDark, toggleTheme } = useTheme();
 
 ### Accessibility
 
-- **ARIA Labels**: Already includes basic accessibility
-- **Keyboard Navigation**: Could be enhanced for full keyboard control
-- **Screen Reader**: Semantic markup for status announcements
+- **ARIA Labels**: Includes `aria-label` attributes on toggle and settings buttons
+- **Focus Management**: Comprehensive focus-visible states with clear visual indicators  
+- **Reduced Motion**: CSS `prefers-reduced-motion` support to disable animations
+- **Semantic Structure**: Uses proper ThemedText components for consistent typography hierarchy

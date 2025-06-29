@@ -135,8 +135,8 @@ Expected `StatusHistory` structure:
 ```typescript
 interface StatusHistory {
     timestamp: number;           // Unix timestamp
-    status: "up" | "down" | "pending"; // Status at that time
-    responseTime?: number;       // Optional response time data
+    status: "up" | "down";      // Status at that time (no "pending" in history)
+    responseTime: number;        // Response time data (required, not optional)
 }
 ```
 
@@ -148,10 +148,10 @@ if (history.length === 0) {
     return null; // React convention for "render nothing"
 }
 
-// Data processing
+// Data processing - show up to maxItems bars, most recent first (reverse chronological order)
 const displayedHistory = history.slice(0, maxItems).reverse();
 
-// Responsive rendering with CSS Grid/Flexbox
+// Responsive rendering with CSS Flexbox
 <div className="flex items-center justify-end gap-1 overflow-hidden min-w-0 flex-shrink">
     {displayedHistory.map((record) => (
         <MiniChartBar
@@ -195,13 +195,14 @@ Components integrate seamlessly with the application theme system:
 
 - **Flexbox Layout**: `flex items-center gap-3`
 - **Icon Scaling**: Automatic size mapping for different text sizes
-- **Text Wrapping**: Proper text handling for different screen sizes
+- **Text Format**: Displays as "{label}: {status}" format
 
 #### HistoryChart Responsive Behavior
 
-- **CSS Grid/Flexbox**: `flex items-center justify-end gap-1`
+- **CSS Flexbox**: `flex items-center justify-end gap-1`
 - **Overflow Handling**: `overflow-hidden min-w-0 flex-shrink`
 - **Data Limiting**: Client-side limitation prevents performance issues
+- **Reverse Chronological**: Newest data appears on the right
 
 ---
 
@@ -219,8 +220,11 @@ Components integrate seamlessly with the application theme system:
 // HistoryChart: Efficient data processing
 const displayedHistory = history.slice(0, maxItems).reverse();
 
-// StatusBadge: Conditional rendering
+// StatusBadge: Conditional rendering and text formatting
 {showIcon && <StatusIndicator status={status} size={getIndicatorSize(size)} />}
+<ThemedText variant="secondary" size={size}>
+    {label}: {status}
+</ThemedText>
 ```
 
 ### CSS Performance
@@ -236,14 +240,14 @@ const displayedHistory = history.slice(0, maxItems).reverse();
 ### StatusBadge Accessibility
 
 - **Semantic HTML**: Proper div structure with meaningful content
-- **Color Independence**: Status communicated through text and icons
-- **Screen Reader**: Descriptive text for status information
+- **Color Independence**: Status communicated through text, icons, and descriptive text format
+- **Screen Reader**: Descriptive text includes both label and status ("{label}: {status}")
 
 ### HistoryChart Accessibility
 
-- **Chart Description**: Title text for chart context
-- **Data Access**: Individual data points accessible
-- **Keyboard Navigation**: Standard focus behavior
+- **Chart Description**: Title text provides chart context
+- **Data Access**: Individual data points accessible through MiniChartBar components
+- **Keyboard Navigation**: Standard focus behavior for chart elements
 
 ---
 

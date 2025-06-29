@@ -2,17 +2,18 @@
 
 ## Overview
 
-The `Dashboard` is the main view component of the Uptime Watcher application, responsible for displaying and managing the list of monitored sites. It serves as the primary interface where users can view site statuses, add new sites, and access detailed site information.
+The Dashboard represents the main application interface of the Uptime Watcher, implemented primarily through the `App.tsx` component. It orchestrates the display and management of monitored sites through a coordinated system of components including the Header, SiteList, AddSiteForm sidebar, and modal dialogs. This serves as the primary interface where users can view site statuses, add new sites, and access detailed site information.
 
 ---
 
 ## Location & Structure
 
-The Dashboard is organized as a component system:
+The Dashboard functionality is distributed across multiple components:
 
-- **Main Component:** `src/components/Dashboard/` (main dashboard logic)
+- **Main Application:** `src/App.tsx` (main dashboard logic and layout)
 - **Site Cards:** `src/components/Dashboard/SiteCard/` (individual site displays)
 - **Site List:** `src/components/Dashboard/SiteList/` (site list container)
+- **Form Component:** `src/components/AddSiteForm/` (new site creation)
 
 ---
 
@@ -21,12 +22,14 @@ The Dashboard is organized as a component system:
 ### Component Hierarchy
 
 ```text
-Dashboard
-├── SiteList
-│   ├── SiteCard (for each site)
-│   └── AddSiteForm (when adding new sites)
+App (Main Dashboard Logic)
 ├── Header (global app header)
-└── SiteDetails (modal, when site is selected)
+├── Main Content Grid
+│   ├── SiteList Container
+│   │   └── SiteCard (for each site)
+│   └── AddSiteForm Sidebar
+├── SiteDetails (modal, when site is selected)
+└── Settings (modal, when settings opened)
 ```
 
 ### Key Responsibilities
@@ -57,10 +60,10 @@ Dashboard
 
 ### Interaction Features
 
-- **Site Selection:** Click to view detailed site information
-- **Quick Add:** Streamlined process for adding new sites
-- **Bulk Operations:** Multi-site actions and management
-- **Search/Filter:** Find specific sites in large lists
+- **Site Selection:** Click on any site card to view detailed site information in modal
+- **Form Sidebar:** Fixed sidebar with AddSiteForm for streamlined new site addition
+- **Real-time Actions:** Monitor control buttons in each site card header
+- **Modal Management:** Overlay dialogs for Settings and SiteDetails without page navigation
 
 ---
 
@@ -70,22 +73,27 @@ Dashboard
 
 ```typescript
 const {
-  sites,           // Array of all monitored sites
-  isLoading,       // Global loading state
-  selectedSite,    // Currently selected site for details
-  addSite,         // Action to add new site
-  removeSite,      // Action to remove site
-  selectSite,      // Action to select site for details
-  updateSite       // Action to update site configuration
+  sites,                    // Array of all monitored sites
+  isLoading,               // Global loading state
+  selectedSite,            // Currently selected site for details
+  showSettings,            // Settings modal visibility state
+  showSiteDetails,         // Site details modal visibility state
+  setShowSettings,         // Action to toggle settings modal
+  setShowSiteDetails,      // Action to toggle site details modal
+  getSelectedSite,         // Function to get currently selected site
+  lastError,               // Global error state
+  clearError,              // Action to clear global errors
+  updateStatus,            // App update status
+  updateError              // Update error messages
 } = useStore();
 ```
 
 ### Local State
 
-- Search/filter criteria
-- Layout preferences
-- User interface state (modals, dialogs)
-- Loading states for individual operations
+- **Loading overlay state:** Delayed loading indicator to prevent flash for quick operations
+- **Modal visibility:** Local state management for modal open/close
+- **Theme integration:** Theme-aware styling and dark/light mode support
+- **Focus synchronization:** Optional backend sync when window gains focus
 
 ---
 
@@ -93,29 +101,40 @@ const {
 
 ### Responsive Grid
 
-- **Desktop:** Multi-column grid with optimal spacing
-- **Tablet:** Adjusted columns for medium screens
-- **Mobile:** Single-column layout for small screens
+- **Desktop:** Two-column grid with main content area and fixed sidebar
+- **Tablet:** Single-column layout with stacked content sections  
+- **Mobile:** Full-width single column with responsive card sizing
 
 ### CSS Grid Implementation
 
+The main layout uses CSS Grid with a two-column structure:
+
 ```css
-.dashboard-grid {
+.grid-layout {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1rem;
-  padding: 1rem;
+  grid-template-columns: 1fr 400px;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+/* Responsive behavior for smaller screens */
+@media (max-width: 1024px) {
+  .grid-layout {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
 }
 ```
 
 ### Site Card Layout
 
-Each site is displayed in a standardized card format:
+Each site is displayed in a standardized card format within the SiteList:
 
-- **Header:** Site name and URL
-- **Status:** Current monitoring status with visual indicators
-- **Metrics:** Key performance indicators (uptime, response time)
-- **Actions:** Quick action buttons (view details, pause, delete)
+- **Header:** Site name and monitor selector with action buttons
+- **Status:** Current monitoring status with visual indicators  
+- **Metrics:** Key performance indicators (uptime, response time, check count)
+- **History:** Mini chart showing recent status history
+- **Footer:** Additional card spacing and future expansion area
 
 ---
 
@@ -124,18 +143,18 @@ Each site is displayed in a standardized card format:
 ### Real-time Updates
 
 1. **Monitor Services** → Check site status
-2. **Backend Services** → Process and store results
-3. **IPC Communication** → Send updates to frontend
-4. **Store Updates** → Update global state
-5. **Component Re-render** → Reflect changes in UI
+2. **Backend Services** → Process and store results  
+3. **IPC Communication** → Send status updates to frontend
+4. **Store Subscription** → useStore subscribes to status updates
+5. **Component Re-render** → SiteCard components automatically reflect changes
 
 ### User Actions
 
-1. **User Interaction** → Trigger action in component
-2. **Store Dispatch** → Send action to global store
-3. **Backend Operation** → Execute operation via IPC
-4. **State Update** → Update store with results
-5. **UI Feedback** → Show success/error feedback
+1. **User Interaction** → Click/action in SiteCard or AddSiteForm
+2. **Store Action** → Trigger appropriate store action (addSite, etc.)
+3. **IPC Request** → Send request to backend via Electron IPC
+4. **Backend Operation** → Execute monitoring or database operation
+5. **State Update** → Update store with results and refresh UI
 
 ---
 
@@ -143,17 +162,17 @@ Each site is displayed in a standardized card format:
 
 ### Rendering Efficiency
 
-- **React.memo** for SiteCard components
-- **Virtual scrolling** for large site lists
-- **Lazy loading** of site details
-- **Debounced search** for filtering
+- **React.memo** for SiteCard components to prevent unnecessary re-renders
+- **Delayed loading overlay** only shows after 100ms to prevent flash
+- **Optimized status subscriptions** with smart incremental updates
+- **Theme-aware rendering** with efficient dark/light mode switching
 
 ### Data Management
 
-- **Selective updates** only for changed sites
-- **Cached calculations** for performance metrics
-- **Optimized re-renders** with proper dependency arrays
-- **Background processing** for non-critical updates
+- **Smart subscriptions** to status updates with automatic cleanup
+- **Focus-based sync** available for backend state synchronization
+- **Global error handling** with user-friendly error notifications
+- **Update management** for app version updates with download progress
 
 ---
 
@@ -161,10 +180,10 @@ Each site is displayed in a standardized card format:
 
 ### Progressive Loading
 
-- **Skeleton screens** during initial load
-- **Incremental loading** for large datasets
-- **Smooth transitions** between states
-- **Optimistic updates** for immediate feedback
+- **Delayed loading indicators** with 100ms threshold to prevent flash
+- **ThemeProvider integration** for consistent loading state styling
+- **Modal-based workflows** for detailed views without page reload
+- **Optimistic error recovery** with retry mechanisms and user feedback
 
 ### Accessibility
 
@@ -186,17 +205,17 @@ Each site is displayed in a standardized card format:
 
 ### Core Services
 
-- **Monitoring Service:** Real-time site status updates
-- **Database Service:** Site configuration and history
-- **Notification Service:** Status change alerts
-- **Theme Service:** UI appearance and preferences
+- **App Initialization Service:** Handles initial app startup and backend connection
+- **Status Update Subscription:** Real-time monitoring status updates via IPC
+- **Theme Service:** Light/dark mode management and consistent theming
+- **Modal Management:** Centralized Settings and SiteDetails modal handling
 
 ### External Dependencies
 
-- **Chart Libraries:** For analytics visualization
-- **Icon Libraries:** Status indicators and UI icons
-- **Animation Libraries:** Smooth transitions and feedback
-- **Utility Libraries:** Date formatting, validation, etc.
+- **React:** Core framework with hooks for state management
+- **Zustand:** Lightweight state management for global app state
+- **Electron IPC:** Communication bridge between frontend and backend
+- **Theme System:** Custom theming with ThemedBox, ThemedText, ThemedButton components
 
 ---
 
@@ -222,29 +241,29 @@ Each site is displayed in a standardized card format:
 
 ### Layout Preferences
 
-- Grid vs. list view options
-- Card size and density settings
-- Sort order preferences
-- Column configuration for list view
+- **Grid-based layout:** Two-column desktop, single-column mobile
+- **Fixed sidebar:** Consistent AddSiteForm placement  
+- **Modal overlays:** Settings and site details as overlay dialogs
+- **Responsive breakpoints:** Automatic layout adaptation by screen size
 
 ### Display Options
 
-- Status indicator styles
-- Metric display preferences
-- Color scheme customization
-- Animation settings
+- **Theme integration:** Automatic light/dark mode support throughout
+- **Status indicators:** Color-coded status badges and real-time updates
+- **Global notifications:** Error alerts and update notifications  
+- **Loading states:** Consistent loading indicators with intelligent timing
 
 ---
 
 ## Best Practices Demonstrated
 
-- **Component Composition:** Modular, reusable components
-- **State Management:** Centralized state with local optimizations
-- **Performance First:** Optimized rendering and data handling
-- **Accessibility:** Comprehensive accessibility features
-- **Responsive Design:** Mobile-first, adaptive layouts
-- **Error Handling:** Robust error boundaries and user feedback
-- **Type Safety:** Full TypeScript coverage
+- **Component Composition:** App.tsx orchestrates specialized components rather than monolithic design
+- **State Management:** Zustand for global state with local state for UI-specific concerns
+- **Performance First:** React.memo, delayed loading, and optimized subscriptions
+- **Error Boundaries:** Global error handling with user-friendly notifications
+- **Theme Integration:** Comprehensive theming system with automatic mode switching
+- **Modal Management:** Centralized modal state without complex routing
+- **Type Safety:** Full TypeScript coverage throughout the application stack
 
 ---
 
@@ -252,29 +271,31 @@ Each site is displayed in a standardized card format:
 
 ### Advanced Features
 
-- **Customizable dashboards** with widget system
-- **Advanced filtering** with saved filter sets
-- **Bulk operations** for site management
-- **Export functionality** for site configurations
-- **Real-time collaboration** for team environments
+- **Enhanced notification system** with customizable alerts and persistence
+- **Bulk site operations** for efficient management of multiple sites
+- **Workspace management** with site grouping and categorization
+- **Export/import functionality** for site configurations and backup
+- **Plugin system** for extensible monitoring capabilities
 
 ### User Experience
 
-- **Drag-and-drop** site organization
-- **Custom grouping** and categorization
-- **Advanced search** with multiple criteria
-- **Keyboard shortcuts** for power users
-- **Offline mode** with sync capabilities
+- **Improved sidebar functionality** with collapsible form and quick actions
+- **Enhanced search and filtering** across site lists with saved criteria
+- **Keyboard shortcuts** for efficient navigation and site management
+- **Drag-and-drop** site reordering and organization
+- **Offline functionality** with intelligent sync when connection restored
 
 ---
 
 ## Related Components
 
-- `SiteCard` - Individual site display component
-- `SiteList` - Site collection container
-- `AddSiteForm` - New site creation interface
-- `SiteDetails` - Detailed site information modal
-- `Header` - Global navigation and controls
+- `App.tsx` - Main dashboard container and layout orchestration
+- `SiteCard` - Individual site display component within the SiteList
+- `SiteList` - Site collection container with empty state handling
+- `AddSiteForm` - New site creation interface in the sidebar
+- `SiteDetails` - Detailed site information modal with tabbed interface
+- `Header` - Global navigation and system status overview
+- `Settings` - Application configuration modal
 
 ---
 
@@ -300,4 +321,4 @@ Each site is displayed in a standardized card format:
 
 ## Contact
 
-For questions or improvements regarding the Dashboard component, see the project README or open an issue on GitHub.
+For questions or improvements regarding the Dashboard functionality or the main App component, see the project README or open an issue on GitHub.

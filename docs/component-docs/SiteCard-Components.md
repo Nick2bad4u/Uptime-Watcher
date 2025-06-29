@@ -2,7 +2,21 @@
 
 ## Overview
 
-The SiteCard component system is a modular, composable set of components that work together to display individual site monitoring information in the Dashboard. This system breaks down the complex site card into smaller, focused components for better maintainability and reusability.
+The SiteCard component system is a modular, composable set of components that work together to display individual site monitoring information in the Dashboard. This system breaks down the complex site card into smaller, focused### Accessibility Features
+
+### Keyboard Navigation
+
+- **Tab Order**: Logical tab sequence through MonitorSelector and ActionButtonGroup
+- **Enter/Space**: Proper activation for buttons and selects
+- **Event Propagation**: Controlled event handling to prevent conflicts
+
+### Screen Reader Support
+
+- **ARIA Labels**: Descriptive labels for all interactive elements
+  - "Check Now", "Start Monitoring", "Stop Monitoring" button labels
+  - Monitor selector with proper labeling
+- **Semantic HTML**: Proper heading structure and form labels
+- **Status Communication**: StatusBadge provides status information better maintainability and reusability.
 
 ---
 
@@ -11,11 +25,12 @@ The SiteCard component system is a modular, composable set of components that wo
 ```text
 SiteCard (main container)
 ├── SiteCardHeader
+│   ├── Site Name Display
 │   ├── MonitorSelector
 │   └── ActionButtonGroup
 ├── SiteCardStatus
 ├── SiteCardMetrics
-│   └── MetricCard (multiple instances)
+│   └── MetricCard (four instances)
 ├── SiteCardHistory
 └── SiteCardFooter
 ```
@@ -34,7 +49,7 @@ SiteCard (main container)
 - **Composition Pattern**: Uses smaller components for clean architecture
 - **Custom Hook Integration**: Leverages `useSite()` hook for all site logic
 - **Performance Optimized**: React.memo prevents unnecessary re-renders
-- **Event Handling**: Click handling for site details modal
+- **Event Handling**: Click handling for site details modal via handleCardClick
 - **Themed Integration**: Uses ThemedBox for consistent styling
 
 ### Architecture
@@ -72,10 +87,10 @@ interface SiteCardHeaderProps {
 
 ### SiteCardHeader Features
 
-- **Site Identification**: Displays site name or identifier
+- **Site Identification**: Displays site name or identifier (fallback)
 - **Monitor Selection**: Dropdown for selecting different monitors
-- **Action Controls**: Buttons for monitoring operations
-- **Responsive Layout**: Flexbox layout with proper spacing
+- **Action Controls**: Buttons for monitoring operations (check now, start/stop)
+- **Responsive Layout**: Flexbox layout with proper spacing and minimum widths
 
 ### Sub-components
 
@@ -84,19 +99,23 @@ interface SiteCardHeaderProps {
 - **Purpose**: Dropdown for selecting between different monitors for a site
 - **Location**: `src/components/Dashboard/SiteCard/components/MonitorSelector.tsx`
 - **Features**:
-  - Displays monitor list from site data
-  - Handles monitor selection changes
+  - Displays monitor list from site.monitors data
+  - Handles monitor selection changes with event propagation control
   - Disabled state when no monitors available
+  - Dynamic option formatting (TYPE: detail format)
+  - Click event stopping to prevent card click conflicts
 
 #### ActionButtonGroup
 
 - **Purpose**: Group of action buttons for monitoring operations
 - **Location**: `src/components/Dashboard/SiteCard/components/ActionButtonGroup.tsx`
 - **Features**:
-  - Check Now button for immediate status check
-  - Start/Stop monitoring toggle buttons
+  - Check Now button (🔄) for immediate status check
+  - Start/Stop monitoring toggle buttons (▶️/⏸️)
   - Loading states for ongoing operations
-  - Conditional rendering based on monitoring state
+  - Conditional rendering based on monitoring state (isMonitoring)
+  - Event propagation control to prevent card click conflicts
+  - ARIA labels for accessibility
 
 ---
 
@@ -108,10 +127,10 @@ interface SiteCardHeaderProps {
 
 ### SiteCardStatus Features
 
-- **Status Display**: Shows current monitoring status (up/down/pending)
-- **Visual Indicators**: Color-coded status with icons
-- **Monitor Integration**: Displays status for selected monitor
-- **Theme Support**: Adapts to current theme colors
+- **Status Display**: Shows current monitoring status using StatusBadge component
+- **Visual Indicators**: Color-coded status with icons (up/down/pending)
+- **Monitor Integration**: Displays status for selected monitor with formatted label
+- **Theme Support**: Adapts to current theme colors automatically
 
 ---
 
@@ -123,20 +142,22 @@ interface SiteCardHeaderProps {
 
 ### SiteCardMetrics Features
 
-- **Multiple Metrics**: Displays uptime, response time, and check count
-- **MetricCard Integration**: Uses reusable MetricCard sub-components
-- **Responsive Grid**: Grid layout that adapts to screen size
-- **Performance Stats**: Real-time metrics display
+- **Four Metrics Display**: Shows status, uptime percentage, response time, and check count
+- **MetricCard Integration**: Uses reusable MetricCard sub-components in 4-column grid
+- **Responsive Grid**: CSS Grid layout (grid-cols-4) that adapts to screen size
+- **Performance Stats**: Real-time metrics display with memoized calculations
+- **Graceful Handling**: Handles undefined response times with "-" fallback
 
 ### Sub-component: MetricCard
 
 - **Purpose**: Reusable card for displaying individual metrics
 - **Location**: `src/components/Dashboard/SiteCard/components/MetricCard.tsx`
 - **Features**:
-  - Icon + label + value display pattern
-  - Themed styling and colors
-  - Tooltip support for additional information
-  - Consistent spacing and typography
+  - Vertical layout with label above value (flex-col items-center)
+  - Themed text components for unified styling
+  - Flexible value types (string or number)
+  - Optimized with React.memo to prevent unnecessary re-renders
+  - Center-aligned text layout
 
 ---
 
@@ -148,9 +169,10 @@ interface SiteCardHeaderProps {
 
 ### SiteCardHistory Features
 
-- **Historical Visualization**: Displays status history as mini chart
-- **Timeline View**: Shows recent status changes over time
-- **HistoryChart Integration**: Uses the common HistoryChart component
+- **Historical Visualization**: Displays status history using HistoryChart component
+- **Dynamic Titles**: Generates titles based on monitor type (HTTP/Port with details)
+- **HistoryChart Integration**: Uses the common HistoryChart component with maxItems=60
+- **Performance Optimized**: Custom comparison function for selective re-rendering
 - **Responsive Display**: Adapts chart size to card width
 
 ---
@@ -163,9 +185,10 @@ interface SiteCardHeaderProps {
 
 ### SiteCardFooter Features
 
-- **Additional Actions**: Space for footer-level actions
-- **Consistent Spacing**: Maintains proper card footer spacing
-- **Extensible**: Can be expanded for future footer content
+- **Interactive Hint**: Displays "Click to view detailed statistics and settings" message
+- **Visual Feedback**: Hover-triggered opacity animation for user guidance
+- **Consistent Spacing**: Maintains proper card footer spacing with top border
+- **Static Content**: Optimized with React.memo for static content
 
 ---
 
@@ -199,18 +222,20 @@ const {
 ### Event Handling
 
 ```typescript
-// Events bubble up from child components to useSite hook
-MonitorSelector onChange -> handleMonitorIdChange -> useSite
-ActionButtonGroup onCheckNow -> handleCheckNow -> useSite
-ActionButtonGroup onStartMonitoring -> handleStartMonitoring -> useSite
+// Events bubble up from child components through props to useSite hook
+MonitorSelector onChange -> handleMonitorIdChange -> useSiteActions
+ActionButtonGroup onCheckNow -> handleCheckNow -> useSiteActions
+ActionButtonGroup onStartMonitoring -> handleStartMonitoring -> useSiteActions
+ActionButtonGroup onStopMonitoring -> handleStopMonitoring -> useSiteActions
+SiteCard onClick -> handleCardClick -> useSiteActions
 ```
 
 ### State Management
 
-- **Local State**: Managed by `useSite()` hook
+- **Composite Hook**: Managed by `useSite()` hook which combines useSiteMonitor, useSiteStats, and useSiteActions
 - **Global State**: Site data from Zustand store
 - **Derived State**: Calculated values (uptime percentage, filtered history)
-- **UI State**: Loading states, selection state
+- **UI State**: Loading states from store, selection state from hooks
 
 ---
 
@@ -257,11 +282,14 @@ All components use the themed component system:
 
 Key CSS classes used throughout the SiteCard system:
 
-- `.site-card`: Main card container styling
-- `.site-card-header`: Header section styling
-- `.site-card-metrics`: Metrics grid container
-- `.site-card-history`: History chart container
-- `.metric-card`: Individual metric card styling
+- `.site-card`: Main card container styling (applied to ThemedBox)
+- `.flex`, `.flex-col`: Flexbox layout classes
+- `.grid`, `.grid-cols-4`: CSS Grid for metrics layout
+- `.gap-2`, `.gap-4`: Spacing utilities
+- `.min-w-[180px]`, `.min-w-[80px]`, `.min-w-[32px]`: Minimum width constraints
+- `.cursor-pointer`: Pointer cursor for clickable card
+- `.pt-2`, `.mt-2`, `.mb-4`: Padding and margin utilities
+- `.border-t`: Top border styling
 
 ---
 

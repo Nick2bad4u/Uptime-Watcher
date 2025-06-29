@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `Settings` component provides a comprehensive modal interface for configuring all application preferences and options. It serves as the central hub for user customization, system configuration, and application management within the Uptime Watcher application.
+The `Settings` component provides a comprehensive modal interface for configuring all application preferences and options. It serves as the central hub for user customization, system configuration, and data management within the Uptime Watcher application. The component is structured as a modal overlay with organized sections for different types of settings.
 
 ---
 
@@ -17,9 +17,9 @@ The `Settings` component provides a comprehensive modal interface for configurin
 
 ### ⚙️ Application Configuration
 
-- **Monitoring Settings**: Timeout, retry limits, and check intervals
+- **Monitoring Settings**: Timeout, retry limits, and history limits
 - **Notification Preferences**: Desktop notifications, sound alerts
-- **System Behavior**: Auto-start, minimize to tray, history limits
+- **System Behavior**: Auto-start, minimize to tray
 - **Theme Management**: Full theme selection and preview
 
 ### 💾 Data Management
@@ -44,24 +44,25 @@ The `Settings` component provides a comprehensive modal interface for configurin
 
 ```tsx
 Settings
-├── Theme Selection Section
+├── Header Section (Title + Close Button)
+├── Error/Success Display
 ├── Monitoring Configuration
-│   ├── Timeout Settings
-│   ├── Retry Limits
-│   └── History Retention
+│   ├── History Limit Settings
+│   ├── Request Timeout Settings
+│   └── Max Retries Settings
 ├── Notification Settings
 │   ├── Desktop Notifications
 │   └── Sound Alerts
-├── System Behavior
+├── Application Settings
+│   ├── Theme Selection
 │   ├── Auto-start
 │   └── Minimize to Tray
 ├── Data Management
-│   ├── Backup Controls
-│   ├── Sync Operations
-│   └── Settings Reset
-└── Action Buttons
-    ├── Save/Close
-    └── Reset to Defaults
+│   ├── Sync Data Button
+│   └── SQLite Backup Download
+└── Footer Section
+    ├── Reset to Defaults
+    └── Cancel/Save Buttons
 ```
 
 ### State Management
@@ -147,9 +148,9 @@ clearError()
 
 ### Form Handling
 
-- **Real-time Updates**: Changes apply immediately where appropriate
-- **Validation**: Input constraints enforced with user feedback
-- **Confirmation**: Destructive actions require user confirmation
+- **Real-time Updates**: Most settings apply immediately on change
+- **Validation**: Input constraints enforced (timeout ranges, retry limits)
+- **Confirmation**: Destructive actions require user confirmation (settings reset)
 
 ### Loading States
 
@@ -200,12 +201,25 @@ const handleThemeChange = (themeName: string) => {
 
 Uses the full range of themed components:
 
-- `ThemedBox` - Container styling
-- `ThemedText` - Text styling
-- `ThemedButton` - Interactive elements
-- `ThemedInput` - Form inputs
-- `ThemedSelect` - Dropdown selections
-- `ThemedCheckbox` - Boolean options
+- `ThemedBox` - Container styling with surface variants (overlay, elevated, base)
+- `ThemedText` - Text styling with size, weight, and variant options
+- `ThemedButton` - Interactive elements with variant, size, and loading states
+- `ThemedInput` - Form inputs with validation styling
+- `ThemedSelect` - Dropdown selections with themed styling
+- `ThemedCheckbox` - Boolean options with accessible design
+- `StatusIndicator` - Theme preview indicators for status states
+
+### CSS Classes
+
+Key CSS classes used for layout and styling:
+
+- `modal-overlay` - Full-screen modal backdrop
+- `modal-container` - Centered modal content container
+- `space-y-6`, `space-y-4` - Vertical spacing utilities
+- `setting-item` - Individual setting row layout
+- `setting-info` - Setting label and description container
+- `error-alert`, `success-alert` - Alert message styling
+- `hover-opacity` - Hover interaction states
 
 ---
 
@@ -253,15 +267,15 @@ const handleReset = () => {
 
 ### Optimizations
 
-- **Delayed Loading**: 100ms delay prevents loading flicker
-- **Memoization**: Prevents unnecessary re-renders
-- **Efficient Updates**: Targeted setting updates rather than full refreshes
+- **Delayed Loading**: 100ms delay prevents loading flicker for better UX
+- **Event Handling**: Efficient change handlers for settings updates
+- **Targeted Updates**: Individual setting updates rather than bulk operations
 
 ### Resource Management
 
 - **Cleanup**: Proper cleanup of timeouts and effects
 - **State Management**: Minimal local state with store integration
-- **Event Handling**: Debounced or throttled where appropriate
+- **Async Operations**: Proper error handling for data operations
 
 ---
 
@@ -325,14 +339,14 @@ logger.user.action("Reset settings to defaults");
 ### Opening/Closing
 
 - **Trigger**: Opened via Header settings button
-- **Backdrop Click**: Configurable close behavior
-- **Escape Key**: Standard modal close behavior
+- **Close Button**: Header close button (✕)
+- **Footer Actions**: Cancel and Save Changes buttons
 
 ### State Persistence
 
-- **Auto-save**: Most settings save automatically
-- **Form State**: Maintains form state during session
-- **Error Recovery**: Preserves state through errors
+- **Auto-save**: Settings save automatically on change
+- **Error Recovery**: Displays and manages errors from store state
+- **Success Feedback**: Shows success messages for sync operations
 
 ---
 

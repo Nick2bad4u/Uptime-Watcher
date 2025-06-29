@@ -11,13 +11,13 @@ The SiteDetails modal includes several specialized tab components that provide d
 ```text
 SiteDetails (main modal)
 ├── SiteDetailsHeader
-├── SiteDetailsNavigation (tab navigation)
-├── Tab Components
+├── SiteDetailsNavigation (tab navigation & controls)
+├── Tab Content
 │   ├── OverviewTab
 │   ├── HistoryTab  
-│   ├── AnalyticsTab
+│   ├── AnalyticsTab (when monitor has analytics data)
 │   └── SettingsTab
-└── ScreenshotThumbnail (when available)
+└── ScreenshotThumbnail (integrated in header)
 ```
 
 ---
@@ -50,29 +50,28 @@ interface OverviewTabProps {
 #### Performance Metrics Display
 
 - **Response Time Statistics**: Average, fastest, and slowest response times
-- **Uptime Percentage**: Visual uptime display with color coding
+- **Uptime Percentage**: Visual uptime display with color coding and progress bar
 - **Check Count**: Total number of monitoring checks performed
-- **Visual Progress Bars**: Themed progress indicators for uptime
+- **Status Indicator**: Monitor status with visual indicator
+- **Theme-aware Colors**: Availability-based coloring for metrics
 
 #### Statistics Cards
 
-The OverviewTab uses a card-based layout for metrics:
+The OverviewTab uses a card-based layout for metrics in a 2x2 grid (4 cards total):
 
 ```typescript
-// Metric cards with icons and themed styling
-<ThemedCard variant="secondary" padding="md">
-    <div className="flex items-center gap-3">
-        <MdSpeed className="text-2xl" />
-        <div>
-            <ThemedText size="sm" variant="secondary">
-                Avg Response Time
-            </ThemedText>
-            <ThemedText size="lg" weight="semibold">
-                {formatResponseTime(avgResponseTime)}
-            </ThemedText>
-        </div>
-    </div>
-</ThemedCard>
+// Four main metric cards with icons and themed styling
+1. Status Card - Shows monitor status with StatusIndicator
+2. Uptime Card - Progress bar and badge with percentage
+3. Response Time Card - Average response time display
+4. Total Checks Card - Count of total monitoring checks
+
+// Performance Overview Card - Additional metrics
+- Fastest Response with success badge
+- Slowest Response with warning badge
+
+// Quick Actions Card - Site management
+- Remove Site button with confirmation
 ```
 
 #### Site Management Actions
@@ -83,10 +82,12 @@ The OverviewTab uses a card-based layout for metrics:
 
 ### Visual Components
 
-- **Progress Bars**: Uptime visualization with theme-aware colors
-- **Metric Cards**: Responsive card layout for statistics
-- **Action Buttons**: Themed buttons with loading states
-- **Icons**: React Icons integration for visual enhancement
+- **ThemedCard**: Grid layout for metrics with icon, title, and hoverable states
+- **StatusIndicator**: Large status display with text
+- **ThemedProgress**: Uptime visualization with theme-aware colors and labels
+- **ThemedBadge**: Colored badges for uptime percentage and performance metrics
+- **Action Buttons**: Remove site button with trash icon and loading states
+- **Icons**: React Icons (MdSpeed, MdAccessTime, etc.) for visual enhancement
 
 ---
 
@@ -101,45 +102,42 @@ The OverviewTab uses a card-based layout for metrics:
 
 #### Historical Data Visualization
 
-- **Timeline Charts**: Complete monitoring history over time
-- **Status Indicators**: Visual status change timeline
-- **Response Time Graphs**: Performance trends over time
-- **Filtering Options**: Time range and status filtering
+- **Paginated History List**: Scrollable list of check records with timestamps
+- **Status Filtering**: Filter by all, up, or down status with button controls
+- **Configurable Display Limits**: Dropdown to show 10, 25, 50, 100+ records
+- **Detailed Records**: Each record shows timestamp, status, response time, and check number
+- **Monitor Type Details**: Shows response codes for HTTP, port info for port monitors
 
 #### Data Analysis
 
-- **Trend Analysis**: Uptime trends and patterns
-- **Incident Timeline**: Downtime incidents and recovery
-- **Performance Metrics**: Historical response time analysis
-- **Export Functionality**: Data export options for analysis
+- **Status Analysis**: Filter and count up/down status records
+- **Check Numbering**: Sequential numbering of checks for reference
+- **Response Time Display**: Formatted response times with units
+- **User Action Logging**: Tracks filter changes and display limit modifications
 
 ### Implementation Patterns
 
 ```typescript
-// Historical data rendering with HistoryChart integration
-<HistoryChart
-    history={fullHistoryData}
-    title="Complete History"
-    maxItems={500}
-    className="detailed-history-chart"
-/>
+// Historical data filtering and display
+const filteredHistoryRecords = (selectedMonitor.history || [])
+    .filter((record: StatusHistory) => historyFilter === "all" || record.status === historyFilter)
+    .slice(0, historyLimit);
 
-// Status filter controls
-<div className="flex gap-2 mb-4">
-    <ThemedButton
-        variant={filter === 'all' ? 'primary' : 'secondary'}
-        size="sm"
-        onClick={() => setFilter('all')}
-    >
-        All Status
-    </ThemedButton>
-    <ThemedButton
-        variant={filter === 'incidents' ? 'primary' : 'secondary'}
-        size="sm"
-        onClick={() => setFilter('incidents')}
-    >
-        Incidents Only
-    </ThemedButton>
+// Status filter controls with logging
+<div className="flex space-x-1">
+    {(["all", "up", "down"] as const).map((filter) => (
+        <ThemedButton
+            key={filter}
+            variant={historyFilter === filter ? "primary" : "ghost"}
+            size="xs"
+            onClick={() => {
+                setHistoryFilter(filter);
+                logger.user.action("History filter changed", { filter, monitorId, monitorType });
+            }}
+        >
+            {filter === "all" ? "All" : filter === "up" ? "✅ Up" : "❌ Down"}
+        </ThemedButton>
+    ))}
 </div>
 ```
 
@@ -156,36 +154,45 @@ The OverviewTab uses a card-based layout for metrics:
 
 #### Advanced Metrics
 
-- **Availability Trends**: Long-term availability analysis
-- **Performance Analytics**: Response time distribution and trends
-- **Incident Analysis**: Downtime pattern analysis
-- **Comparative Metrics**: Performance comparison over time periods
+- **Availability Summary**: Large percentage display with availability rating
+- **Response Time Analysis**: Average response times (HTTP/Port monitors only)
+- **Downtime Tracking**: Total downtime and incident count
+- **Performance Percentiles**: P50, P95, P99 response time percentiles
+- **Interactive Charts**: Line, bar, and doughnut charts with Chart.js
 
 #### Visualization Components
 
-- **Chart Integration**: Advanced charts for data visualization
-- **Metric Summaries**: Statistical summaries and insights
-- **Trend Indicators**: Visual trend arrows and percentage changes
-- **Time Range Selection**: Configurable analysis periods
+- **Chart.js Integration**: Line charts for response time trends, bar charts for up/down counts
+- **Metric Summary Cards**: 3-column grid with availability, response time, and downtime
+- **Advanced Metrics Toggle**: Show/hide detailed percentile and MTTR data
+- **Responsive Charts**: Chart sizing adapts to container and time range
 
 ### Analytics Features
 
 ```typescript
-// Analytics calculations and display
-const performanceScore = calculatePerformanceScore(monitor);
-const availabilityTrend = calculateAvailabilityTrend(history);
-const incidentFrequency = calculateIncidentFrequency(incidents);
+// Analytics summary display with conditional rendering
+{(monitorType === "http" || monitorType === "port") && (
+    <ThemedBox surface="base" padding="lg" border rounded="lg">
+        <ThemedText size="sm" variant="secondary">
+            Avg Response Time
+        </ThemedText>
+        <ThemedText size="3xl" weight="bold">
+            {formatResponseTime(avgResponseTime)}
+        </ThemedText>
+    </ThemedBox>
+)}
 
-// Insight generation
-<ThemedCard variant="info" padding="md">
-    <div className="flex items-center gap-2 mb-2">
-        <MdTrendingUp className="text-success" />
-        <ThemedText weight="semibold">Performance Insight</ThemedText>
-    </div>
-    <ThemedText size="sm" variant="secondary">
-        {generatePerformanceInsight(performanceScore, availabilityTrend)}
-    </ThemedText>
-</ThemedCard>
+// Advanced metrics toggle
+<ThemedButton
+    variant="ghost"
+    size="sm"
+    onClick={() => {
+        setShowAdvancedMetrics(!showAdvancedMetrics);
+        logger.user.action("Advanced metrics toggled", { shown: !showAdvancedMetrics });
+    }}
+>
+    {showAdvancedMetrics ? "Hide" : "Show"} Advanced Metrics
+</ThemedButton>
 ```
 
 ---
@@ -199,19 +206,19 @@ const incidentFrequency = calculateIncidentFrequency(incidents);
 
 ### SettingsTab Features
 
-#### Monitoring Configuration
+#### Site Configuration
 
-- **Check Interval**: Adjustable monitoring frequency
-- **Timeout Settings**: Request timeout configuration
-- **Retry Logic**: Retry attempt configuration
-- **Notification Settings**: Site-specific alert preferences
+- **Site Name Editing**: Editable site name with save/validation
+- **Monitor Information**: Display of monitor type, URL/host details
+- **Check Interval**: Adjustable monitoring frequency from predefined options
+- **Unsaved Changes Tracking**: Visual indicators for pending changes
 
 #### Site Management
 
-- **Site Information**: Editable site name and URL
-- **Tag Management**: Add/remove organizational tags
-- **Monitor Management**: Add/remove monitoring endpoints
-- **Threshold Configuration**: Custom alert thresholds
+- **Site Removal**: Destructive action with confirmation and logging
+- **Settings Persistence**: Save name and interval changes separately
+- **Monitor Status Display**: Current monitor configuration and status
+- **Change Detection**: Tracks local vs. saved state for both name and interval
 
 ### Configuration Interface
 
@@ -249,10 +256,11 @@ interface SettingsTabProps {
 
 #### SiteDetailsHeader Features
 
-- **Site Title**: Prominent site name display
-- **Status Indicator**: Real-time status display
-- **Quick Actions**: Header-level action buttons
-- **Close Control**: Modal close functionality
+- **Site Title**: Prominent site name display with truncation
+- **URL Display**: Clickable URL for HTTP monitors (opens externally)
+- **Status Indicator**: Large status display with loading spinner during refresh
+- **Screenshot Integration**: Embedded ScreenshotThumbnail component
+- **Gradient Header**: Styled header with overlay and accent bar
 
 ### SiteDetailsNavigation Component
 
@@ -262,27 +270,24 @@ interface SettingsTabProps {
 
 #### SiteDetailsNavigation Features
 
-- **Tab Navigation**: Switch between different tab views
-- **Active State**: Visual indication of current tab
-- **Keyboard Support**: Arrow key navigation between tabs
-- **Badge Indicators**: Notification badges on tabs (if applicable)
+- **Tab Navigation**: Switch between Overview, History, Analytics (monitor-specific), and Settings
+- **Monitor Controls**: Start/Stop monitoring, Check Now buttons
+- **Monitor Selection**: Dropdown for multi-monitor sites
+- **Interval Configuration**: Check interval selector with save functionality
+- **Chart Time Range**: Time range selection for analytics charts
+- **User Action Logging**: Comprehensive logging of all navigation and control actions
 
 #### Navigation Implementation
 
 ```typescript
-interface TabItem {
-    id: string;
-    label: string;
-    component: React.ComponentType<any>;
-    badge?: number;
-}
+// Tab rendering with conditional analytics tab
+{activeSiteDetailsTab === "overview" && <OverviewTab {...props} />}
+{activeSiteDetailsTab === `${selectedMonitorId}-analytics` && <AnalyticsTab {...props} />}
+{activeSiteDetailsTab === "history" && <HistoryTab {...props} />}
+{activeSiteDetailsTab === "settings" && <SettingsTab {...props} />}
 
-const tabs: TabItem[] = [
-    { id: 'overview', label: 'Overview', component: OverviewTab },
-    { id: 'history', label: 'History', component: HistoryTab },
-    { id: 'analytics', label: 'Analytics', component: AnalyticsTab },
-    { id: 'settings', label: 'Settings', component: SettingsTab },
-];
+// Monitor-specific analytics tab ID
+const analyticsTabId = `${selectedMonitorId}-analytics`;
 ```
 
 ### ScreenshotThumbnail Component
@@ -293,10 +298,11 @@ const tabs: TabItem[] = [
 
 #### ScreenshotThumbnail Features
 
-- **Visual Preview**: Thumbnail preview of site screenshots
-- **Lazy Loading**: Efficient image loading and caching
-- **Error Handling**: Graceful handling of missing screenshots
-- **Click to Expand**: Full-size screenshot view
+- **Microlink API Integration**: Generates screenshots using Microlink service
+- **Hover Preview**: Expandable preview overlay with portal rendering
+- **External URL Opening**: Handles both Electron and browser contexts
+- **Viewport Positioning**: Smart positioning to keep preview within viewport bounds
+- **Theme Awareness**: Adapts to current theme for overlay styling
 
 ---
 
@@ -305,18 +311,18 @@ const tabs: TabItem[] = [
 ### Tab State Management
 
 ```typescript
-// Tab state management in parent component
-const [activeTab, setActiveTab] = useState<string>('overview');
+// Tab state management with useSiteDetails hook
+const { activeSiteDetailsTab, setActiveSiteDetailsTab } = useSiteDetails({ site });
 
-// Tab content rendering
+// Conditional tab content rendering based on active tab
 const renderTabContent = () => {
-    switch (activeTab) {
+    switch (activeSiteDetailsTab) {
         case 'overview':
             return <OverviewTab {...overviewProps} />;
+        case `${selectedMonitorId}-analytics`:
+            return <AnalyticsTab {...analyticsProps} />;
         case 'history':
             return <HistoryTab {...historyProps} />;
-        case 'analytics':
-            return <AnalyticsTab {...analyticsProps} />;
         case 'settings':
             return <SettingsTab {...settingsProps} />;
         default:
@@ -327,10 +333,11 @@ const renderTabContent = () => {
 
 ### Data Flow
 
-- **Props Down**: Data flows from parent SiteDetails to tabs
-- **Events Up**: User actions bubble up through event handlers
-- **State Synchronization**: Tab state synchronized with modal state
-- **Loading Coordination**: Loading states coordinated across tabs
+- **useSiteDetails Hook**: Central hook manages all state and provides data to tabs
+- **Props Down**: Data flows from SiteDetails through tab props
+- **Events Up**: User actions bubble up through event handlers with logging
+- **Chart Configuration**: ChartConfigService provides theme-aware chart configurations
+- **Loading Coordination**: Loading states coordinated across tabs and navigation
 
 ---
 
@@ -338,23 +345,26 @@ const renderTabContent = () => {
 
 ### Tab Optimization
 
-- **Lazy Loading**: Tab content loaded only when activated
-- **Data Memoization**: Expensive calculations memoized
-- **Component Memoization**: React.memo for tab components
-- **Virtual Scrolling**: For large datasets in history/analytics
+- **Conditional Rendering**: Tab content rendered only when active
+- **Chart.js Optimization**: Chart configurations memoized with theme changes
+- **User Action Logging**: Comprehensive logging prevents duplicate actions
+- **State Persistence**: Tab state persisted in global store
 
 ### Memory Management
 
 ```typescript
-// Memoized tab components
-export const OverviewTab = React.memo(function OverviewTab(props) {
-    // Component implementation
-});
+// Chart configuration memoization
+const chartConfig = useMemo(() => new ChartConfigService(currentTheme), [currentTheme]);
+const lineChartOptions = useMemo(() => chartConfig.getLineChartConfig(), [chartConfig]);
 
-// Memoized calculations
-const memoizedStats = useMemo(() => {
-    return calculateSiteStatistics(monitor, history);
-}, [monitor, history]);
+// Chart data memoization
+const lineChartData = useMemo(() => ({
+    datasets: [{
+        data: analytics.filteredHistory.map((h) => h.responseTime),
+        // ... other config
+    }],
+    labels: analytics.filteredHistory.map((h) => new Date(h.timestamp)),
+}), [analytics.filteredHistory, currentTheme]);
 ```
 
 ---
@@ -363,36 +373,33 @@ const memoizedStats = useMemo(() => {
 
 ### Tab Navigation
 
-- **ARIA Roles**: Proper tab and tabpanel roles
-- **Keyboard Navigation**: Arrow keys for tab switching
-- **Focus Management**: Focus moved to tab content on selection
-- **Screen Reader**: Tab announcements and content descriptions
+- **Click Navigation**: Tab buttons for switching between views
+- **Tab State Persistence**: Active tab stored in global state
+- **Conditional Tabs**: Analytics tab ID includes monitor ID for specificity
+- **User Action Logging**: All tab changes logged for analytics
 
 ### Content Accessibility
 
 ```typescript
-// ARIA attributes for tab navigation
-<div role="tablist" aria-label="Site details">
-    {tabs.map((tab) => (
-        <button
-            key={tab.id}
-            role="tab"
-            aria-selected={activeTab === tab.id}
-            aria-controls={`${tab.id}-panel`}
-            onClick={() => setActiveTab(tab.id)}
-        >
-            {tab.label}
-        </button>
-    ))}
-</div>
+// Accessible tab content with proper ARIA
+<ThemedBox variant="primary" padding="lg" className="max-h-[70vh] overflow-y-auto">
+    {activeSiteDetailsTab === "overview" && (
+        <OverviewTab {...overviewProps} />
+    )}
+    {/* Other conditional tab content */}
+</ThemedBox>
 
-<div
-    role="tabpanel"
-    id={`${activeTab}-panel`}
-    aria-labelledby={`${activeTab}-tab`}
+// External URL handling with accessibility
+<a
+    href={url}
+    target="_blank"
+    rel="noopener noreferrer"
+    tabIndex={0}
+    aria-label={`Open ${url} in browser`}
+    onClick={handleExternalOpen}
 >
-    {renderTabContent()}
-</div>
+    {url}
+</a>
 ```
 
 ---

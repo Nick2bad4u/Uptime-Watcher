@@ -34,9 +34,11 @@ src/hooks/
 │   ├── useSiteActions.ts   # Site action handlers
 │   ├── useSiteMonitor.ts   # Monitor management
 │   ├── useSiteStats.ts     # Analytics and statistics
-│   └── useSiteDetails.ts   # Site detail views
+│   ├── useSiteDetails.ts   # Site detail management
+│   └── useSiteAnalytics.ts # Analytics calculations
 ├── useBackendFocusSync.ts  # Backend synchronization
-└── ...                     # Other utility hooks
+└── theme/                  # Theme hooks
+    └── useTheme.ts         # Theme management
 ```
 
 ## Site Hooks
@@ -53,19 +55,23 @@ A comprehensive hook that combines all site-related functionality.
 
 ```typescript
 interface UseSiteReturn {
-    // Monitor data
+    // Monitor data (from useSiteMonitor)
+    latestSite: Site;
+    selectedMonitorId: string;
     monitor: Monitor | undefined;
+    status: "up" | "down" | "pending";
+    responseTime?: number;
+    isMonitoring: boolean;
+    monitorIds: string[];
     filteredHistory: StatusHistory[];
-    monitoringStatus: boolean;
+    handleMonitorIdChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
     
-    // Statistics
-    uptimePercentage: number;
+    // Statistics (from useSiteStats)
+    uptime: number;
+    checkCount: number;
     averageResponseTime: number;
-    totalChecks: number;
-    upChecks: number;
-    downChecks: number;
     
-    // Actions
+    // Actions (from useSiteActions)
     handleStartMonitoring: () => void;
     handleStopMonitoring: () => void;
     handleCheckNow: () => void;
@@ -84,7 +90,7 @@ import { useSite } from '../hooks/site';
 function SiteCard({ site }: { site: Site }) {
     const {
         monitor,
-        uptimePercentage,
+        uptime,
         averageResponseTime,
         handleStartMonitoring,
         handleStopMonitoring,
@@ -100,7 +106,7 @@ function SiteCard({ site }: { site: Site }) {
     return (
         <div className="site-card" onClick={handleCardClick}>
             <h3>{site.name}</h3>
-            <div>Uptime: {uptimePercentage.toFixed(2)}%</div>
+            <div>Uptime: {uptime.toFixed(2)}%</div>
             <div>Avg Response: {averageResponseTime}ms</div>
             
             <button onClick={handleStartMonitoring} disabled={isLoading}>
@@ -172,11 +178,15 @@ Manages monitor selection and monitoring state for a site.
 
 ```typescript
 interface SiteMonitorResult {
+    latestSite: Site;
+    selectedMonitorId: string;
     monitor: Monitor | undefined;
-    selectedMonitorId: string | undefined;
-    setSelectedMonitorId: (monitorId: string) => void;
+    status: "up" | "down" | "pending";
+    responseTime?: number;
+    isMonitoring: boolean;
+    monitorIds: string[];
     filteredHistory: StatusHistory[];
-    monitoringStatus: boolean;
+    handleMonitorIdChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }
 ```
 
@@ -187,15 +197,15 @@ function MonitorSelector({ site }: { site: Site }) {
     const {
         monitor,
         selectedMonitorId,
-        setSelectedMonitorId,
-        monitoringStatus
+        handleMonitorIdChange,
+        isMonitoring
     } = useSiteMonitor(site);
 
     return (
         <div>
             <select 
                 value={selectedMonitorId || ''}
-                onChange={(e) => setSelectedMonitorId(e.target.value)}
+                onChange={handleMonitorIdChange}
             >
                 {site.monitors.map(m => (
                     <option key={m.id} value={m.id}>
@@ -205,39 +215,28 @@ function MonitorSelector({ site }: { site: Site }) {
             </select>
             
             <div>
-                Status: {monitoringStatus ? 'Monitoring' : 'Stopped'}
+                Status: {isMonitoring ? 'Monitoring' : 'Stopped'}
             </div>
         </div>
     );
 }
 ```
 
-### `useSiteStats(history: StatusHistory[], timeRange?: string)`
+### `useSiteStats(history: StatusHistory[]): SiteStats`
 
 Calculates statistics from site monitoring history.
 
 #### Parameters
 
 - `history`: Array of status history records
-- `timeRange`: Optional time range filter ("1h", "24h", "7d", "30d")
 
 #### Returns
 
 ```typescript
-interface SiteStatsResult {
-    uptimePercentage: number;
+interface SiteStats {
+    uptime: number;
+    checkCount: number;
     averageResponseTime: number;
-    totalChecks: number;
-    upChecks: number;
-    downChecks: number;
-    uptimeHours: number;
-    downtimeHours: number;
-    lastCheckTime: Date | undefined;
-    statusCounts: {
-        up: number;
-        down: number;
-        pending: number;
-    };
 }
 ```
 
@@ -247,46 +246,121 @@ interface SiteStatsResult {
 function SiteAnalytics({ site }: { site: Site }) {
     const monitor = site.monitors[0]; // Example: use first monitor
     const {
-        uptimePercentage,
+        uptime,
         averageResponseTime,
-        totalChecks,
-        upChecks,
-        downChecks,
-        lastCheckTime
+        checkCount
     } = useSiteStats(monitor?.history || []);
 
     return (
         <div className="site-analytics">
             <h3>Site Statistics</h3>
-            <div>Uptime: {uptimePercentage.toFixed(2)}%</div>
+            <div>Uptime: {uptime.toFixed(2)}%</div>
             <div>Average Response Time: {averageResponseTime}ms</div>
-            <div>Total Checks: {totalChecks}</div>
-            <div>Successful Checks: {upChecks}</div>
-            <div>Failed Checks: {downChecks}</div>
-            {lastCheckTime && (
-                <div>Last Check: {lastCheckTime.toLocaleString()}</div>
-            )}
+            <div>Total Checks: {checkCount}</div>
         </div>
     );
 }
 ```
 
-### `useSiteDetails()`
+### `useSiteAnalytics(monitor: Monitor | undefined, timeRange: "1h" | "24h" | "7d" | "30d")`
 
-Manages site details modal state and navigation.
+Calculates comprehensive site analytics and metrics with time-based filtering.
+
+#### Parameters
+
+- `monitor`: Monitor object to analyze
+- `timeRange`: Time range for filtering data
 
 #### Returns
 
 ```typescript
-interface SiteDetailsResult {
-    selectedSite: Site | undefined;
-    showSiteDetails: boolean;
+interface SiteAnalytics {
+    totalChecks: number;
+    upCount: number;
+    downCount: number;
+    uptime: string;
+    avgResponseTime: number;
+    fastestResponse: number;
+    slowestResponse: number;
+    p50: number;
+    p95: number;
+    p99: number;
+    downtimePeriods: DowntimePeriod[];
+    filteredHistory: StatusHistory[];
+    timeRangeLabel: string;
+    formatResponseTime: (time: number) => string;
+    formatDuration: (duration: number) => string;
+}
+```
+
+#### Usage
+
+```typescript
+function SiteAnalyticsDisplay({ monitor }: { monitor: Monitor }) {
+    const analytics = useSiteAnalytics(monitor, "24h");
+
+    return (
+        <div className="analytics">
+            <h3>Analytics - {analytics.timeRangeLabel}</h3>
+            <div>Uptime: {analytics.uptime}</div>
+            <div>Avg Response: {analytics.avgResponseTime}ms</div>
+            <div>P95: {analytics.p95}ms</div>
+            <div>P99: {analytics.p99}ms</div>
+            <div>Total Checks: {analytics.totalChecks}</div>
+        </div>
+    );
+}
+```
+
+### `useSiteDetails({ site: Site })`
+
+Manages comprehensive site details state and operations for the SiteDetails component.
+
+#### Parameters
+
+- `site`: Site object to manage details for
+
+#### Returns
+
+```typescript
+interface UseSiteDetailsReturn {
+    // UI state
     activeSiteDetailsTab: string;
-    siteDetailsChartTimeRange: "1h" | "24h" | "7d" | "30d";
     showAdvancedMetrics: boolean;
+    siteDetailsChartTimeRange: "1h" | "24h" | "7d" | "30d";
     
-    setSelectedSite: (site: Site | undefined) => void;
-    setShowSiteDetails: (show: boolean) => void;
+    // Site data
+    currentSite: Site;
+    selectedMonitor: Monitor | undefined;
+    selectedMonitorId: string;
+    siteExists: boolean;
+    
+    // Form state
+    localName: string;
+    localCheckInterval: number;
+    hasUnsavedChanges: boolean;
+    intervalChanged: boolean;
+    
+    // Loading states
+    isLoading: boolean;
+    isMonitoring: boolean;
+    isRefreshing: boolean;
+    
+    // Analytics
+    analytics: SiteAnalytics;
+    
+    // Event handlers
+    handleCheckNow: (isAutoRefresh?: boolean) => Promise<void>;
+    handleStartMonitoring: () => Promise<void>;
+    handleStopMonitoring: () => Promise<void>;
+    handleMonitorIdChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    handleIntervalChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    handleSaveInterval: () => Promise<void>;
+    handleSaveName: () => Promise<void>;
+    handleRemoveSite: () => Promise<void>;
+    
+    // State setters
+    setLocalName: (name: string) => void;
     setActiveSiteDetailsTab: (tab: string) => void;
     setSiteDetailsChartTimeRange: (range: "1h" | "24h" | "7d" | "30d") => void;
     setShowAdvancedMetrics: (show: boolean) => void;
@@ -296,30 +370,30 @@ interface SiteDetailsResult {
 #### Usage
 
 ```typescript
-function SiteDetailsModal() {
+import { useSiteDetails } from '../hooks/site';
+
+function SiteDetails({ site, onClose }: { site: Site; onClose: () => void }) {
     const {
-        selectedSite,
-        showSiteDetails,
+        currentSite,
+        selectedMonitor,
         activeSiteDetailsTab,
         siteDetailsChartTimeRange,
-        setShowSiteDetails,
+        isLoading,
+        isMonitoring,
+        analytics,
+        handleStartMonitoring,
+        handleStopMonitoring,
+        handleCheckNow,
         setActiveSiteDetailsTab,
         setSiteDetailsChartTimeRange
-    } = useSiteDetails();
+    } = useSiteDetails({ site });
 
-    if (!showSiteDetails || !selectedSite) {
+    if (!currentSite) {
         return null;
     }
 
     return (
-        <div className="modal">
-            <div className="modal-header">
-                <h2>{selectedSite.name}</h2>
-                <button onClick={() => setShowSiteDetails(false)}>
-                    Close
-                </button>
-            </div>
-            
+        <div className="site-details">
             <div className="tabs">
                 {['overview', 'analytics', 'history', 'settings'].map(tab => (
                     <button
@@ -342,6 +416,24 @@ function SiteDetailsModal() {
                         {range}
                     </button>
                 ))}
+            </div>
+            
+            <div className="controls">
+                <button 
+                    onClick={handleStartMonitoring}
+                    disabled={isLoading || isMonitoring}
+                >
+                    Start Monitoring
+                </button>
+                <button 
+                    onClick={handleStopMonitoring}
+                    disabled={isLoading || !isMonitoring}
+                >
+                    Stop Monitoring
+                </button>
+                <button onClick={() => handleCheckNow()}>
+                    Check Now
+                </button>
             </div>
             
             {/* Tab content based on activeSiteDetailsTab */}
@@ -409,10 +501,13 @@ interface UseThemeReturn {
     isDark: boolean;
     systemTheme: "light" | "dark";
     themeVersion: number;
+    availableThemes: ThemeName[];
     
     setTheme: (theme: ThemeName) => void;
+    toggleTheme: () => void;
+    getColor: (path: string) => string;
     getStatusColor: (status: StatusType) => string;
-    getAvailabilityColor: (percentage: number) => string;
+    themeManager: ThemeManager;
 }
 ```
 
@@ -447,6 +542,65 @@ function ThemedComponent() {
 ```
 
 {% endraw %}
+
+### `useThemeValue<T>(selector: (theme: Theme) => T): T`
+
+Utility hook for accessing specific values from the current theme.
+
+#### Usage
+
+```typescript
+function Component() {
+    const primaryColor = useThemeValue(theme => theme.colors.primary[500]);
+    return <div style={{ color: primaryColor }}>Themed text</div>;
+}
+```
+
+### `useStatusColors()`
+
+Hook for accessing theme-aware status colors.
+
+#### Returns
+
+```typescript
+interface StatusColors {
+    up: string;
+    down: string;
+    pending: string;
+    unknown: string;
+}
+```
+
+### `useThemeClasses()`
+
+Hook for theme-aware CSS classes using CSS custom properties.
+
+#### Returns
+
+```typescript
+interface ThemeClasses {
+    getBackgroundClass: (variant?: "primary" | "secondary" | "tertiary") => CSSProperties;
+    getTextClass: (variant?: "primary" | "secondary" | "tertiary" | "inverse") => CSSProperties;
+    getBorderClass: (variant?: "primary" | "secondary" | "focus") => CSSProperties;
+    getSurfaceClass: (variant?: "base" | "elevated" | "overlay") => CSSProperties;
+    getStatusClass: (status: "up" | "down" | "pending" | "unknown") => CSSProperties;
+    getColor: (path: string) => string;
+}
+```
+
+### `useAvailabilityColors()`
+
+Hook for availability-based color mapping.
+
+#### Returns
+
+```typescript
+interface AvailabilityColors {
+    getAvailabilityColor: (percentage: number) => string;
+    getAvailabilityVariant: (percentage: number) => "success" | "warning" | "danger";
+    getAvailabilityDescription: (percentage: number) => string;
+}
+```
 
 ## Utility Hooks
 
@@ -620,7 +774,7 @@ function SiteManagementCard({ site }: { site: Site }) {
     // Get all site functionality
     const {
         monitor,
-        uptimePercentage,
+        uptime,
         averageResponseTime,
         handleStartMonitoring,
         handleStopMonitoring,
@@ -630,10 +784,10 @@ function SiteManagementCard({ site }: { site: Site }) {
     } = useSite(site);
 
     // Get theme for styling
-    const { currentTheme, getStatusColor, getAvailabilityColor } = useTheme();
+    const { currentTheme, getStatusColor } = useTheme();
 
-    // Get site details management
-    const { setSelectedSite, setShowSiteDetails } = useSiteDetails();
+    // Get site details management from store
+    const { setSelectedSite, setShowSiteDetails } = useStore();
 
     const openDetails = () => {
         setSelectedSite(site);
@@ -677,9 +831,9 @@ function SiteManagementCard({ site }: { site: Site }) {
                     <span className="label">Uptime</span>
                     <span 
                         className="value"
-                        style={{ color: getAvailabilityColor(uptimePercentage) }}
+                        style={{ color: getStatusColor(monitor.status) }}
                     >
-                        {uptimePercentage.toFixed(2)}%
+                        {uptime.toFixed(2)}%
                     </span>
                 </div>
                 
@@ -758,8 +912,6 @@ function Dashboard() {
                     <SiteManagementCard key={site.identifier} site={site} />
                 ))}
             </div>
-
-            <SiteDetailsModal />
         </div>
     );
 }

@@ -70,6 +70,14 @@ const sites = await siteRepo.findAll();
 
 Get all sites without monitor data (lightweight).
 
+#### `findByIdentifier(identifier: string): Promise<{identifier: string, name?: string} | undefined>`
+
+```typescript
+const site = await siteRepo.findByIdentifier("example-com");
+```
+
+Find a site by its identifier (without monitors/history).
+
 #### `getByIdentifier(identifier: string): Promise<Site | undefined>`
 
 ```typescript
@@ -98,6 +106,22 @@ const deleted = await siteRepo.delete("example-com");
 Delete site from database. Returns true if deleted.
 
 ### Bulk Operations
+
+#### `exists(identifier: string): Promise<boolean>`
+
+```typescript
+const siteExists = await siteRepo.exists("example-com");
+```
+
+Check if a site exists by identifier.
+
+#### `exportAll(): Promise<Array<{identifier: string, name?: string}>>`
+
+```typescript
+const allSites = await siteRepo.exportAll();
+```
+
+Export all sites for backup/import functionality.
 
 #### `bulkInsert(sites: Array<{identifier: string, name?: string}>): Promise<void>`
 
@@ -129,6 +153,14 @@ const monitors = await monitorRepo.findBySiteIdentifier("example-com");
 ```
 
 Get all monitors for a specific site.
+
+#### `findById(monitorId: string): Promise<Site["monitors"][0] | undefined>`
+
+```typescript
+const monitor = await monitorRepo.findById("123");
+```
+
+Find a monitor by its ID.
 
 #### `create(siteIdentifier: string, monitor: Omit<Site["monitors"][0], "id">): Promise<string>`
 
@@ -163,6 +195,30 @@ const deleted = await monitorRepo.delete("123");
 Delete monitor and its history (cascading delete).
 
 ### Monitor Bulk Operations
+
+#### `deleteBySiteIdentifier(siteIdentifier: string): Promise<void>`
+
+```typescript
+await monitorRepo.deleteBySiteIdentifier("example-com");
+```
+
+Delete all monitors for a specific site.
+
+#### `getAllMonitorIds(): Promise<Array<{id: number}>>`
+
+```typescript
+const monitorIds = await monitorRepo.getAllMonitorIds();
+```
+
+Get all monitor IDs from database.
+
+#### `deleteAll(): Promise<void>`
+
+```typescript
+await monitorRepo.deleteAll();
+```
+
+Clear all monitors from database.
 
 #### `bulkCreate(siteIdentifier: string, monitors: Array<Site["monitors"][0]>): Promise<Array<Site["monitors"][0]>>`
 
@@ -217,6 +273,38 @@ Get total history entry count for monitor.
 
 ### History Bulk Operations
 
+#### `deleteByMonitorId(monitorId: string): Promise<void>`
+
+```typescript
+await historyRepo.deleteByMonitorId("123");
+```
+
+Delete all history entries for a specific monitor.
+
+#### `pruneAllHistory(limit: number): Promise<void>`
+
+```typescript
+await historyRepo.pruneAllHistory(1000);
+```
+
+Prune history for all monitors to keep only the most recent N entries.
+
+#### `deleteAll(): Promise<void>`
+
+```typescript
+await historyRepo.deleteAll();
+```
+
+Clear all history from database.
+
+#### `getLatestEntry(monitorId: string): Promise<StatusHistory | undefined>`
+
+```typescript
+const latestEntry = await historyRepo.getLatestEntry("123");
+```
+
+Get the most recent history entry for a monitor.
+
 #### `bulkInsert(monitorId: string, historyEntries: Array<StatusHistory & {details?: string}>): Promise<void>`
 
 ```typescript
@@ -248,6 +336,14 @@ await settingsRepo.set("historyLimit", "1000");
 
 Set setting value (INSERT OR REPLACE).
 
+#### `delete(key: string): Promise<void>`
+
+```typescript
+await settingsRepo.delete("historyLimit");
+```
+
+Delete a setting by key.
+
 #### `getAll(): Promise<Record<string, string>>`
 
 ```typescript
@@ -255,6 +351,14 @@ const allSettings = await settingsRepo.getAll();
 ```
 
 Get all settings as key-value object.
+
+#### `deleteAll(): Promise<void>`
+
+```typescript
+await settingsRepo.deleteAll();
+```
+
+Clear all settings from database.
 
 #### `bulkInsert(settings: Record<string, string>): Promise<void>`
 
@@ -323,6 +427,27 @@ CREATE TABLE settings (
 );
 ```
 
+#### stats
+
+```sql
+CREATE TABLE stats (
+    key TEXT PRIMARY KEY,
+    value TEXT
+);
+```
+
+#### logs
+
+```sql
+CREATE TABLE logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    level TEXT,
+    message TEXT,
+    data TEXT
+);
+```
+
 ## 🚀 Usage Example
 
 ```typescript
@@ -346,7 +471,8 @@ const monitorId = await monitorRepo.create("example-com", {
     type: "http",
     url: "https://example.com",
     monitoring: true,
-    checkInterval: 60000
+    checkInterval: 60000,
+    status: "pending"
 });
 
 // Get complete site data

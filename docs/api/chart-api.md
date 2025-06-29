@@ -37,6 +37,7 @@ Returns configuration for line charts, typically used for response time over tim
 - Interactive tooltips and legends
 - Zoom and pan functionality
 - Theme-aware colors and fonts
+- Title: "Response Time Over Time"
 
 **Example:**
 
@@ -44,12 +45,13 @@ Returns configuration for line charts, typically used for response time over tim
 const chartService = new ChartConfigService(currentTheme);
 const lineConfig = chartService.getLineChartConfig();
 
-// Use with Chart.js
-new Chart(ctx, {
-    type: 'line',
-    data: responseTimeData,
-    options: lineConfig
-});
+// Use with react-chartjs-2
+import { Line } from 'react-chartjs-2';
+
+<Line 
+    data={responseTimeData} 
+    options={lineConfig}
+/>
 ```
 
 ##### getBarChartConfig(): ChartOptions&lt;'bar'&gt;
@@ -63,18 +65,20 @@ Returns configuration for bar charts, typically used for status distribution.
 - No legend display (suitable for single data series)
 - Count-based y-axis starting from zero
 - Theme-aware styling
-- Status distribution title
+- Title: "Status Distribution"
 
 **Example:**
 
 ```typescript
 const barConfig = chartService.getBarChartConfig();
 
-new Chart(ctx, {
-    type: 'bar',
-    data: statusDistributionData,
-    options: barConfig
-});
+// Use with react-chartjs-2
+import { Bar } from 'react-chartjs-2';
+
+<Bar 
+    data={statusDistributionData} 
+    options={barConfig}
+/>
 ```
 
 ##### getDoughnutChartConfig(totalChecks: number): ChartOptions&lt;'doughnut'&gt;
@@ -91,7 +95,7 @@ Returns configuration for doughnut charts, typically used for uptime distributio
 
 - Bottom-positioned legend
 - Custom tooltip with percentage calculations
-- Uptime distribution title
+- Title: "Uptime Distribution"
 - Theme-aware colors
 
 **Example:**
@@ -99,11 +103,13 @@ Returns configuration for doughnut charts, typically used for uptime distributio
 ```typescript
 const doughnutConfig = chartService.getDoughnutChartConfig(1000);
 
-new Chart(ctx, {
-    type: 'doughnut',
-    data: uptimeData,
-    options: doughnutConfig
-});
+// Use with react-chartjs-2
+import { Doughnut } from 'react-chartjs-2';
+
+<Doughnut 
+    data={uptimeData} 
+    options={doughnutConfig}
+/>
 ```
 
 ## React Hook
@@ -130,6 +136,8 @@ interface ChartConfigs {
     doughnutOptions: ChartOptions<'doughnut'>;
 }
 ```
+
+**Note:** This hook is available in the service but not currently used in the main application. The primary usage pattern is direct instantiation of `ChartConfigService`.
 
 **Example:**
 
@@ -210,111 +218,157 @@ theme.typography.fontFamily.sans // Font family for all text
 
 ## Usage Examples
 
-### Complete Chart Implementation
+### Actual Implementation Pattern (SiteDetails)
+
+The primary usage pattern in the application follows this approach:
 
 ```typescript
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
-import { useChartConfigs } from '../services/chartConfig';
+import { ChartConfigService } from '../services/chartConfig';
 import { useTheme } from '../hooks/useTheme';
 
-interface ChartData {
-    responseTimeData: any;
-    statusDistributionData: any;
-    uptimeData: any;
-    totalChecks: number;
-}
+function SiteDetailsComponent({ analytics, currentTheme }) {
+    // Create chart config service instance
+    const chartConfig = useMemo(() => new ChartConfigService(currentTheme), [currentTheme]);
 
-function MonitoringCharts({ responseTimeData, statusDistributionData, uptimeData, totalChecks }: ChartData) {
-    const theme = useTheme();
-    const { lineChartOptions, barChartOptions, doughnutOptions } = useChartConfigs(theme, totalChecks);
+    // Chart configurations using the service
+    const lineChartOptions = useMemo(() => chartConfig.getLineChartConfig(), [chartConfig]);
+    const barChartOptions = useMemo(() => chartConfig.getBarChartConfig(), [chartConfig]);
+    const doughnutOptions = useMemo(
+        () => chartConfig.getDoughnutChartConfig(analytics.totalChecks),
+        [chartConfig, analytics.totalChecks]
+    );
+
+    // Chart data preparation
+    const lineChartData = useMemo(
+        () => ({
+            datasets: [
+                {
+                    backgroundColor: currentTheme.colors.primary[500] + "20",
+                    borderColor: currentTheme.colors.primary[500],
+                    data: analytics.filteredHistory.map((h) => h.responseTime),
+                    fill: true,
+                    label: "Response Time (ms)",
+                    tension: 0.1,
+                },
+            ],
+            labels: analytics.filteredHistory.map((h) => new Date(h.timestamp)),
+        }),
+        [analytics.filteredHistory, currentTheme]
+    );
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="chart-container">
-                <Line 
-                    data={responseTimeData} 
-                    options={lineChartOptions}
-                    height={300}
-                />
-            </div>
-            
-            <div className="chart-container">
-                <Bar 
-                    data={statusDistributionData} 
-                    options={barChartOptions}
-                    height={300}
-                />
-            </div>
-            
-            <div className="chart-container">
-                <Doughnut 
-                    data={uptimeData} 
-                    options={doughnutOptions}
-                    height={300}
-                />
-            </div>
+        <div>
+            <Line data={lineChartData} options={lineChartOptions} />
+            <Bar data={barChartData} options={barChartOptions} />
+            <Doughnut data={doughnutChartData} options={doughnutOptions} />
         </div>
     );
 }
 ```
 
-### Dynamic Theme Updates
+### Alternative Pattern with useChartConfigs Hook
 
 ```typescript
-function ThemeAwareChart() {
+function AlternativeChartComponent() {
     const theme = useTheme();
-    const [data, setData] = useState(chartData);
+    const { lineChartOptions, barChartOptions, doughnutOptions } = useChartConfigs(theme, totalChecks);
     
-    // Chart configurations automatically update when theme changes
-    const { lineChartOptions } = useChartConfigs(theme);
-    
-    useEffect(() => {
-        // Chart will re-render with new theme colors
-    }, [theme]);
-
-    return <Line data={data} options={lineChartOptions} />;
+    return (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Line data={responseTimeData} options={lineChartOptions} />
+            <Bar data={statusDistributionData} options={barChartOptions} />
+            <Doughnut data={uptimeData} options={doughnutOptions} />
+        </div>
+    );
 }
 ```
 
-### Custom Chart Service Usage
+### Chart Data Preparation
+
+The application follows specific patterns for preparing chart data:
 
 ```typescript
-// For non-React usage or custom implementations
-function createCustomChart(canvas: HTMLCanvasElement, theme: Theme) {
-    const chartService = new ChartConfigService(theme);
-    
-    return new Chart(canvas, {
-        type: 'line',
-        data: {
-            datasets: [{
-                label: 'Response Time',
-                data: responseTimeData,
-                borderColor: theme.colors.primary,
-                backgroundColor: theme.colors.primary + '20', // Add transparency
-            }]
-        },
-        options: chartService.getLineChartConfig()
-    });
-}
+// Line chart data for response times
+const lineChartData = useMemo(
+    () => ({
+        datasets: [
+            {
+                backgroundColor: currentTheme.colors.primary[500] + "20",
+                borderColor: currentTheme.colors.primary[500],
+                data: analytics.filteredHistory.map((h) => h.responseTime),
+                fill: true,
+                label: "Response Time (ms)",
+                tension: 0.1,
+            },
+        ],
+        labels: analytics.filteredHistory.map((h) => new Date(h.timestamp)),
+    }),
+    [analytics.filteredHistory, currentTheme]
+);
+
+// Bar chart data for status distribution  
+const barChartData = useMemo(
+    () => ({
+        datasets: [
+            {
+                backgroundColor: [currentTheme.colors.success, currentTheme.colors.error],
+                data: [analytics.upCount, analytics.downCount],
+            },
+        ],
+        labels: ["Up", "Down"],
+    }),
+    [analytics.upCount, analytics.downCount, currentTheme]
+);
+
+// Doughnut chart data for uptime visualization
+const doughnutChartData = useMemo(
+    () => ({
+        datasets: [
+            {
+                backgroundColor: [currentTheme.colors.success, currentTheme.colors.error],
+                data: [analytics.upCount, analytics.downCount],
+            },
+        ],
+        labels: ["Up", "Down"],
+    }),
+    [analytics.upCount, analytics.downCount, currentTheme]
+);
 ```
 
 ## Integration with HistoryChart Component
 
-The chart configurations are designed to work seamlessly with the `HistoryChart` component:
+**Note:** The `HistoryChart` component does not use `ChartConfigService`. Instead, it uses a custom `MiniChartBar` component for lightweight historical visualization:
 
 ```typescript
-// In HistoryChart.tsx
-const { lineChartOptions } = useChartConfigs(theme);
+// HistoryChart.tsx - Uses custom mini bars, not Chart.js
+import { MiniChartBar } from "../../theme/components";
 
-return (
-    <Line 
-        data={chartData}
-        options={lineChartOptions}
-        plugins={[/* custom plugins */]}
-    />
-);
+export const HistoryChart = React.memo(function HistoryChart({ history, title, maxItems = 120 }) {
+    const displayedHistory = history.slice(0, maxItems).reverse();
+
+    return (
+        <div className="mb-3 w-full">
+            <ThemedText size="xs" variant="secondary">
+                {title}
+            </ThemedText>
+            <div className="flex items-center justify-end gap-1">
+                {displayedHistory.map((record) => (
+                    <MiniChartBar
+                        key={record.timestamp}
+                        status={record.status}
+                        responseTime={record.responseTime}
+                        timestamp={record.timestamp}
+                    />
+                ))}
+            </div>
+        </div>
+    );
+});
 ```
+
+The `ChartConfigService` is specifically used for full Chart.js implementations in the SiteDetails analytics tab.
 
 ## Performance Considerations
 

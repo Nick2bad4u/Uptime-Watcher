@@ -26,40 +26,44 @@ The IPC API is exposed through `window.electronAPI` in the renderer process usin
 
 ```typescript
 interface ElectronAPI {
-    // Site Management
-    sites: SiteAPI;
+    // Site Management (flat structure for backward compatibility)
     addSite: (site: Site) => Promise<Site>;
     getSites: () => Promise<Site[]>;
-    removeSite: (identifier: string) => Promise<void>;
-    updateSite: (identifier: string, updates: Partial<Site>) => Promise<void>;
-    checkSiteNow: (identifier: string, monitorType: string) => Promise<void>;
+    removeSite: (identifier: string) => Promise<boolean>;
+    updateSite: (identifier: string, updates: Partial<Site>) => Promise<Site>;
+    checkSiteNow: (identifier: string, monitorType: string) => Promise<StatusUpdate | null>;
     
-    // Monitoring Control
-    monitoring: MonitoringAPI;
+    // Monitoring Control (flat structure for backward compatibility)
     startMonitoring: () => Promise<boolean>;
     stopMonitoring: () => Promise<boolean>;
     startMonitoringForSite: (identifier: string, monitorType?: string) => Promise<boolean>;
     stopMonitoringForSite: (identifier: string, monitorType?: string) => Promise<boolean>;
     
-    // Data Management
-    data: DataAPI;
+    // Data Management (flat structure for backward compatibility)
     exportData: () => Promise<string>;
-    importData: (data: string) => Promise<void>;
+    importData: (data: string) => Promise<boolean>;
     downloadSQLiteBackup: () => Promise<{ buffer: ArrayBuffer; fileName: string }>;
     
-    // Settings
-    settings: SettingsAPI;
+    // Settings (flat structure for backward compatibility)
     getHistoryLimit: () => Promise<number>;
     updateHistoryLimit: (limit: number) => Promise<void>;
     
-    // Events
-    events: EventsAPI;
+    // Events (flat structure for backward compatibility)
     onStatusUpdate: (callback: (data: StatusUpdate) => void) => void;
+    onUpdateStatus: (callback: (data: unknown) => void) => void;
     removeAllListeners: (channel: string) => void;
     
-    // System
-    system: SystemAPI;
+    // System (flat structure for backward compatibility)
     quitAndInstall: () => void;
+    
+    // Organized APIs (new structure for better maintainability)
+    sites: SiteAPI;
+    monitoring: MonitoringAPI;
+    data: DataAPI;
+    settings:
+    settings: SettingsAPI;
+    events: EventsAPI;
+    system: SystemAPI;
 }
 ```
 
@@ -89,14 +93,13 @@ const newSite = await window.electronAPI.addSite({
 
 **Parameters:**
 
-- `site`: Site object without auto-generated fields
+- `site`: Site object containing identifier, name, and monitors array
 
-**Returns:** Complete site object with generated fields
+**Returns:** Complete site object with any auto-generated fields
 
 **Throws:**
 
-- `ValidationError` - Invalid site data
-- `DatabaseError` - Database operation failed
+- `Error` - Invalid site data or database operation failed
 
 #### `getSites(): Promise<Site[]>`
 
@@ -109,31 +112,38 @@ console.log(`Found ${sites.length} sites`);
 
 **Returns:** Array of all sites with their monitors
 
-#### `removeSite(identifier: string): Promise<void>`
+#### `removeSite(identifier: string): Promise<boolean>`
 
 Removes a site and all associated data.
 
 ```typescript
-await window.electronAPI.removeSite("site-id-123");
+const removed = await window.electronAPI.removeSite("site-id-123");
+if (removed) {
+    console.log("Site removed successfully");
+} else {
+    console.log("Site not found");
+}
 ```
 
 **Parameters:**
 
 - `identifier`: Unique site identifier
 
+**Returns:** `true` if site was found and removed, `false` if not found
+
 **Throws:**
 
-- `NotFoundError` - Site not found
-- `DatabaseError` - Database operation failed
+- `Error` - Database operation failed
 
-#### `updateSite(identifier: string, updates: Partial<Site>): Promise<void>`
+#### `updateSite(identifier: string, updates: Partial<Site>): Promise<Site>`
 
 Updates site properties.
 
 ```typescript
-await window.electronAPI.updateSite("site-id-123", {
+const updatedSite = await window.electronAPI.updateSite("site-id-123", {
     name: "Updated Site Name"
 });
+console.log("Site updated:", updatedSite);
 ```
 
 **Parameters:**
@@ -141,18 +151,28 @@ await window.electronAPI.updateSite("site-id-123", {
 - `identifier`: Unique site identifier
 - `updates`: Partial site object with updates
 
-#### `checkSiteNow(identifier: string, monitorType: string): Promise<void>`
+**Returns:** Updated site object
+
+#### `checkSiteNow(identifier: string, monitorType: string): Promise<StatusUpdate | null>`
 
 Triggers an immediate status check for a specific monitor.
 
 ```typescript
-await window.electronAPI.checkSiteNow("site-id-123", "monitor-id-456");
+const result = await window.electronAPI.checkSiteNow("site-id-123", "monitor-id-456");
+if (result) {
+    console.log("Check completed:", result);
+    console.log("Site status:", result.site.monitors[0].status);
+} else {
+    console.log("Check completed but no status update generated");
+}
 ```
 
 **Parameters:**
 
 - `identifier`: Site identifier
-- `monitorType`: Monitor identifier to check
+- `monitorType`: Monitor identifier (monitor ID) to check
+
+**Returns:** StatusUpdate object if status changed, null if no change occurred
 
 ### Monitoring Control
 
@@ -198,6 +218,8 @@ await window.electronAPI.startMonitoringForSite("site-id-123", "monitor-id-456")
 - `identifier`: Site identifier
 - `monitorType`: Optional monitor identifier (all monitors if omitted)
 
+**Returns:** `true` if monitoring started successfully
+
 #### `stopMonitoringForSite(identifier: string, monitorType?: string): Promise<boolean>`
 
 Stops monitoring for a specific site or monitor.
@@ -210,6 +232,8 @@ await window.electronAPI.stopMonitoringForSite("site-id-123", "monitor-id-456");
 
 - `identifier`: Site identifier  
 - `monitorType`: Optional monitor identifier
+
+**Returns:** `true` if monitoring stopped successfully
 
 ### Data Management
 
@@ -233,7 +257,7 @@ a.click();
 
 **Returns:** JSON string containing all application data
 
-#### `importData(data: string): Promise<void>`
+#### `importData(data: string): Promise<boolean>`
 
 Imports data from JSON backup.
 
@@ -246,7 +270,12 @@ fileInput.onchange = async (e) => {
     const file = (e.target as HTMLInputElement).files?.[0];
     if (file) {
         const text = await file.text();
-        await window.electronAPI.importData(text);
+        const success = await window.electronAPI.importData(text);
+        if (success) {
+            console.log("Data imported successfully");
+            // Refresh application state
+            window.location.reload();
+        }
     }
 };
 
@@ -257,10 +286,11 @@ fileInput.click();
 
 - `data`: JSON string with backup data
 
+**Returns:** `true` if import was successful
+
 **Throws:**
 
-- `ValidationError` - Invalid data format
-- `DatabaseError` - Import operation failed
+- `Error` - Invalid data format or import operation failed
 
 #### `downloadSQLiteBackup(): Promise<{ buffer: ArrayBuffer; fileName: string }>`
 
@@ -309,8 +339,7 @@ await window.electronAPI.updateHistoryLimit(1000);
 
 **Throws:**
 
-- `ValidationError` - Invalid limit value
-- `DatabaseError` - Update operation failed
+- `Error` - Invalid limit value or update operation failed
 
 ### Event Handling
 
@@ -346,6 +375,23 @@ interface StatusUpdate {
     previousStatus?: "up" | "down" | "pending";
 }
 ```
+
+#### `onUpdateStatus(callback: (data: unknown) => void): void`
+
+Subscribes to application update status changes (auto-updater events).
+
+```typescript
+window.electronAPI.onUpdateStatus((updateData) => {
+    console.log('Application update status:', updateData);
+    // Handle update notifications, download progress, etc.
+});
+```
+
+**Parameters:**
+
+- `callback`: Function to handle update status events
+
+**Note:** This event is used for application auto-updater notifications, separate from site monitoring status updates.
 
 #### `removeAllListeners(channel: string): void`
 
@@ -431,10 +477,15 @@ class SiteManager {
             await window.electronAPI.stopMonitoringForSite(identifier);
             
             // Remove from database
-            await window.electronAPI.removeSite(identifier);
+            const removed = await window.electronAPI.removeSite(identifier);
             
-            // Update local state
-            this.sites = this.sites.filter(site => site.identifier !== identifier);
+            if (removed) {
+                // Update local state
+                this.sites = this.sites.filter(site => site.identifier !== identifier);
+                console.log("Site removed successfully");
+            } else {
+                console.log("Site not found");
+            }
         } catch (error) {
             console.error("Failed to delete site:", error);
             throw error;
@@ -504,10 +555,14 @@ class BackupManager {
             JSON.parse(text);
             
             // Import data
-            await window.electronAPI.importData(text);
+            const success = await window.electronAPI.importData(text);
             
-            // Refresh application state
-            window.location.reload();
+            if (success) {
+                // Refresh application state
+                window.location.reload();
+            } else {
+                throw new Error("Import operation returned false");
+            }
         } catch (error) {
             console.error("Restore failed:", error);
             throw new Error("Failed to restore from backup");
@@ -521,19 +576,21 @@ class BackupManager {
 ### Common Error Types
 
 ```typescript
+// Standard JavaScript Error is thrown by IPC handlers
 interface IpcError extends Error {
-    code: string;
-    details?: unknown;
+    name: string;
+    message: string;
+    stack?: string;
 }
 ```
 
 ### Error Categories
 
-1. **ValidationError**: Invalid input data
-2. **DatabaseError**: Database operation failures
-3. **NotFoundError**: Resource not found
-4. **NetworkError**: Connectivity issues
-5. **TimeoutError**: Operation timeout
+1. **Error**: General errors from validation, database operations, or network issues
+2. **TypeError**: Type-related errors from invalid input
+3. **RangeError**: Out-of-range values (e.g., invalid history limits)
+
+**Note:** The IPC layer throws standard JavaScript Error objects rather than custom error types. Error categorization is based on the error message and context.
 
 ### Error Handling Pattern
 
@@ -548,19 +605,15 @@ async function safeIpcCall<T>(
         console.error("IPC operation failed:", error);
         
         if (error instanceof Error) {
-            // Handle specific error types
-            switch (error.name) {
-                case "ValidationError":
-                    showUserError("Invalid data provided");
-                    break;
-                case "NetworkError":
-                    showUserError("Network connection failed");
-                    break;
-                case "DatabaseError":
-                    showUserError("Database operation failed");
-                    break;
-                default:
-                    showUserError("An unexpected error occurred");
+            // Handle based on error message patterns since specific error types aren't used
+            if (error.message.includes("identifier is required")) {
+                showUserError("Site identifier is required");
+            } else if (error.message.includes("monitors must be an array")) {
+                showUserError("Invalid monitor configuration");
+            } else if (error.message.includes("not found")) {
+                showUserError("Resource not found");
+            } else {
+                showUserError("An unexpected error occurred: " + error.message);
             }
         }
         
@@ -618,17 +671,23 @@ All IPC handlers validate input data on the main process side:
 // Example validation in main process
 ipcMain.handle("add-site", async (_, site) => {
     // Validate site structure
-    if (!site || typeof site !== 'object') {
-        throw new ValidationError("Invalid site data");
+    if (!site?.identifier) {
+        throw new Error("Site identifier is required");
     }
     
-    if (!site.name || typeof site.name !== 'string') {
-        throw new ValidationError("Site name is required");
+    if (!Array.isArray(site.monitors)) {
+        throw new Error("Site monitors must be an array");
     }
     
     // Continue with validated data...
 });
 ```
+
+### Security Notes
+
+- **No openExternal API**: External URL opening is handled through type guards in components, not exposed through IPC
+- **Limited API Surface**: Only essential monitoring and data operations are exposed
+- **Context Isolation**: Renderer process cannot access Node.js APIs directly
 
 ### Rate Limiting
 

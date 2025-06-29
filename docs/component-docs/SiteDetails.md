@@ -2,287 +2,304 @@
 
 ## Overview
 
-`SiteDetails` is a comprehensive modal component system for displaying detailed information about monitored sites in the Uptime Watcher application. It provides tabbed navigation for different views of site data including overview, analytics, history, and settings.
-
----
+The `SiteDetails` component is a comprehensive modal interface that provides detailed information about monitored sites in the Uptime Watcher application. It features a tabbed navigation system offering overview, analytics, history, and settings views for individual sites.
 
 ## Location & Structure
 
-The SiteDetails is organized as a modular component system:
+The SiteDetails component follows a modular architecture:
 
 - **Main Component:** `src/components/SiteDetails/SiteDetails.tsx`
 - **Header Component:** `src/components/SiteDetails/SiteDetailsHeader.tsx`
 - **Navigation:** `src/components/SiteDetails/SiteDetailsNavigation.tsx`
 - **Screenshot:** `src/components/SiteDetails/ScreenshotThumbnail.tsx`
-- **Tabs:** `src/components/SiteDetails/tabs/` (multiple tab components)
+- **Tab Components:** `src/components/SiteDetails/tabs/` (OverviewTab, AnalyticsTab, HistoryTab, SettingsTab)
 - **Styles:** `src/components/SiteDetails/SiteDetails.css`
 - **Index:** `src/components/SiteDetails/index.ts`
 
----
+## Props Interface
+
+```typescript
+interface SiteDetailsProps {
+    /** The site object to display details for */
+    site: Site;
+    /** Callback function to close the site details view */
+    onClose: () => void;
+}
+```
+
+## Key Dependencies
+
+The component integrates with several Chart.js components and plugins:
+
+- **Chart.js Components:** CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, TimeScale, Filler, DoughnutController, ArcElement
+- **Chart.js Plugins:** zoomPlugin for interactive chart features
+- **Chart.js Adapters:** chartjs-adapter-date-fns for time-based charts
 
 ## Architecture
 
-The component follows a modular, tab-based architecture:
+### Main Component Structure
 
-### 1. **SiteDetails.tsx** - Main Container
+The `SiteDetails` component serves as the primary container that:
 
-- Modal wrapper with backdrop and positioning
-- Manages overall layout and structure
-- Handles modal open/close state
-- Integrates theme system for consistent styling
+- Renders a modal overlay with backdrop functionality
+- Uses the `useSiteDetails` custom hook for comprehensive state management
+- Integrates with `ChartConfigService` for theme-aware chart configurations
+- Manages Chart.js component registration and configuration
+- Handles modal click-outside-to-close behavior
 
-### 2. **SiteDetailsHeader.tsx** - Header Section
+### Component Composition
 
-- Displays site name, URL, and status
-- Shows current monitor information
-- Provides close button functionality
-- Integrates with screenshot thumbnail
-
-### 3. **SiteDetailsNavigation.tsx** - Tab Navigation
-
-- Renders tab navigation buttons
-- Manages active tab state
-- Provides smooth transitions between tabs
-- Theme-aware styling and interactions
-
-### 4. **Tab Components** - Content Sections
-
-Multiple specialized tab components for different data views:
-
-- **OverviewTab:** General site information and current status
-- **AnalyticsTab:** Charts and performance metrics
-- **HistoryTab:** Historical monitoring data
-- **SettingsTab:** Site-specific configuration options
-
-### 5. **ScreenshotThumbnail.tsx** - Visual Preview
-
-- Displays site screenshot when available
-- Handles loading and error states
-- Provides fallback for missing images
-- Optimized image loading and caching
-
----
-
-## Key Features
-
-- **Modal Interface:** Full-screen modal with backdrop and animations
-- **Tabbed Navigation:** Organized content in logical sections
-- **Real-time Data:** Live updates of monitoring status and metrics
-- **Responsive Design:** Adapts to different screen sizes and orientations
-- **Theme Integration:** Full support for light/dark themes
-- **Performance Optimized:** Efficient rendering and data loading
-- **Accessibility:** ARIA labels, keyboard navigation, and screen reader support
-- **Error Handling:** Graceful handling of missing data or errors
-
----
+1. **SiteDetailsHeader** - Displays site information, status, and close button
+2. **SiteDetailsNavigation** - Provides tab navigation and monitoring controls
+3. **Tab Components** - Renders content based on active tab selection
+4. **ThemedBox** - Provides consistent theming and layout structure
 
 ## State Management
 
-The SiteDetails component integrates with multiple state sources:
+The component uses the `useSiteDetails` custom hook which provides comprehensive state management:
 
-### Store Integration
+### Core State
+
+- `currentSite` - The current site being displayed
+- `selectedMonitor` - Currently selected monitor for the site
+- `selectedMonitorId` - ID of the selected monitor
+- `siteExists` - Boolean indicating if the site exists
+
+### UI State
+
+- `activeSiteDetailsTab` - Currently active tab ("overview", "analytics", "history", "settings")
+- `isLoading` - Loading state for various operations
+- `isRefreshing` - State indicating data refresh in progress
+- `isMonitoring` - Boolean indicating if monitoring is active
+- `showAdvancedMetrics` - Toggle for advanced analytics display
+- `siteDetailsChartTimeRange` - Selected time range for charts ("1h", "24h", "7d", "30d")
+
+### Form State
+
+- `localName` - Local state for site name editing
+- `localCheckInterval` - Local state for check interval editing
+- `hasUnsavedChanges` - Boolean indicating unsaved changes
+- `intervalChanged` - Boolean indicating interval has been modified
+
+### Analytics State
+
+- `analytics` - Comprehensive analytics data from `useSiteAnalytics` hook
+
+### Event Handlers
+
+- `handleCheckNow` - Triggers immediate site check
+- `handleStartMonitoring` / `handleStopMonitoring` - Monitor control
+- `handleSaveName` / `handleSaveInterval` - Save form changes
+- `handleRemoveSite` - Site deletion
+- `handleIntervalChange` / `handleMonitorIdChange` - Form updates
+- `setActiveSiteDetailsTab` - Tab navigation
+- `setSiteDetailsChartTimeRange` - Chart time range updates
+
+## Chart Integration
+
+The component integrates Chart.js through the `ChartConfigService` for consistent, theme-aware visualizations:
+
+### Chart Configuration Service
 
 ```typescript
-const {
-  selectedSite,     // Currently selected site for details
-  closeSiteDetails, // Action to close the modal
-  updateSite,       // Action to update site settings
-  deleteSite,       // Action to delete a site
-  analytics         // Site analytics data
-} = useStore();
+const chartConfig = useMemo(() => new ChartConfigService(currentTheme), [currentTheme]);
 ```
 
-### Theme Integration
+### Chart Types
+
+- **Line Chart:** Response time over time with area fill
+- **Bar Chart:** Up/down status distribution
+- **Doughnut Chart:** Uptime/downtime percentage visualization
+
+### Chart Data
+
+Charts use analytics data processed through `useMemo` hooks:
 
 ```typescript
-const { theme, toggleTheme } = useTheme();
+const lineChartData = useMemo(
+    () => ({
+        datasets: [{
+            backgroundColor: currentTheme.colors.primary[500] + "20",
+            borderColor: currentTheme.colors.primary[500],
+            data: analytics.filteredHistory.map((h) => h.responseTime),
+            fill: true,
+            label: "Response Time (ms)",
+            tension: 0.1,
+        }],
+        labels: analytics.filteredHistory.map((h) => new Date(h.timestamp)),
+    }),
+    [analytics.filteredHistory, currentTheme]
+);
 ```
-
-### Local State
-
-- Active tab selection
-- Modal animation states
-- Loading states for individual tabs
-- Form states for settings modifications
-
----
 
 ## Tab System
 
-### Overview Tab
+The component renders different tabs based on `activeSiteDetailsTab` state:
 
-- Current status and uptime percentage
-- Response time information
-- Monitor configuration details
-- Recent check history
+### Overview Tab (`"overview"`)
 
-### Analytics Tab
+- Displays basic site metrics and status information
+- Shows uptime percentage and response time statistics
+- Provides monitor selection and basic controls
 
-- Response time charts (line graph)
-- Uptime/downtime bar charts
-- Performance metrics over time
-- Configurable time ranges
+### Analytics Tab (`${selectedMonitorId}-analytics`)
 
-### History Tab
+- Comprehensive charts and performance metrics
+- Configurable time ranges and advanced metrics toggle
+- Interactive charts with zoom and pan capabilities
 
-- Chronological list of all checks
-- Detailed status change information
-- Filtering and search capabilities
-- Export functionality for historical data
+### History Tab (`"history"`)
 
-### Settings Tab
+- Historical monitoring data display
+- Detailed check history with timestamps and status
 
-- Monitor type configuration
-- Check interval settings
-- Notification preferences
-- Site-specific options
+### Settings Tab (`"settings"`)
 
----
+- Site configuration options
+- Monitor settings and interval configuration
+- Site management actions (delete, rename)
 
 ## Usage Example
 
-The SiteDetails modal is typically triggered from site cards:
-
-```typescript
+```tsx
 import { SiteDetails } from './components/SiteDetails';
 
 function Dashboard() {
-  const { selectedSite } = useStore();
+  const [selectedSite, setSelectedSite] = useState<Site | null>(null);
 
   return (
     <div>
-      {/* Site cards */}
-      {selectedSite && <SiteDetails />}
+      {/* Site cards or list */}
+      <SiteCard 
+        site={site} 
+        onClick={() => setSelectedSite(site)} 
+      />
+      
+      {/* Site details modal */}
+      {selectedSite && (
+        <SiteDetails
+          site={selectedSite}
+          onClose={() => setSelectedSite(null)}
+        />
+      )}
     </div>
   );
 }
 ```
 
----
+## Key Features
+
+- **Modal Interface:** Fixed overlay with backdrop click-to-close functionality
+- **Tabbed Navigation:** Organized content sections with smooth transitions
+- **Real-time Data:** Live updates through analytics hooks and monitoring state
+- **Interactive Charts:** Chart.js integration with zoom, pan, and theme awareness
+- **Form Management:** Local state handling for editable fields with unsaved changes tracking
+- **Responsive Design:** Adaptive layout for different screen sizes
+- **Theme Integration:** Full support for light/dark themes through theming system
+- **Performance Optimized:** Memoized chart configurations and efficient re-rendering
+
+## Styling & CSS
+
+### Modal Structure
+
+The component uses a fixed overlay approach:
+
+```css
+.site-details-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-md);
+    background-color: var(--color-background-modal);
+    backdrop-filter: blur(4px);
+}
+```
+
+### Responsive Design
+
+- Maximum width of 1200px for optimal reading
+- Maximum height of 90vh to prevent viewport overflow
+- Adaptive padding and spacing for mobile devices
+
+### CSS Classes
+
+- `.site-details-modal` - Main modal overlay
+- `.site-details-content` - Modal content container with `animate-scale-in` animation
+- `.site-details-header` - Header section with gradient background and hover effects
+- Tab content uses `max-h-[70vh] overflow-y-auto` for scrollable areas
 
 ## Performance Considerations
 
-### Lazy Loading
+### Memoization Strategy
 
-- Tab content is loaded only when accessed
-- Charts are rendered on-demand
-- Historical data is paginated
+- Chart configurations memoized with `useMemo` and dependency on theme changes
+- Chart data memoized with dependencies on analytics and theme
+- Chart config service instance memoized to prevent unnecessary recreations
 
-### Memoization
+### Conditional Rendering
 
-- React.memo for tab components
-- useMemo for expensive calculations
-- useCallback for event handlers
+- Component returns `undefined` if `siteExists` is false
+- Tab content only renders when the specific tab is active
+- Charts only initialize when their respective tabs are displayed
 
-### Optimized Rendering
+### Event Handling
 
-- Virtual scrolling for large history lists
-- Efficient chart updates
-- Minimal re-renders with proper state management
-
----
-
-## Accessibility Features
-
-- **Keyboard Navigation:** Full keyboard support for tabs and interactions
-- **ARIA Labels:** Comprehensive labeling for screen readers
-- **Focus Management:** Proper focus handling in modal context
-- **Color Contrast:** High contrast modes for better visibility
-- **Screen Reader Support:** Descriptive text for all visual elements
-
----
-
-## Styling & Theming
-
-### CSS Organization
-
-- Component-specific styles in `SiteDetails.css`
-- Theme variables for consistent coloring
-- Responsive breakpoints for mobile compatibility
-- Animation transitions for smooth interactions
-
-### Theme Variables
-
-- Automatic light/dark mode switching
-- Consistent color schemes across all tabs
-- Theme-aware chart styling
-- Responsive design patterns
-
----
+- Click outside modal handled through event propagation stopping
+- Form changes tracked locally to minimize unnecessary re-renders
 
 ## Integration Points
 
-- **Global Store:** Site data, analytics, and actions
-- **Theme System:** Consistent styling and user preferences
-- **Chart Library:** Chart.js integration for analytics
-- **Logger Service:** Comprehensive logging for debugging
-- **Screenshot Service:** Image loading and caching
+### Custom Hooks
 
----
+- **`useSiteDetails`** - Primary state management hook providing all component functionality
+- **`useSiteAnalytics`** - Analytics data processing and filtering
+- **`useTheme`** - Theme context for consistent styling
 
-## Best Practices Demonstrated
+### Services
 
-- **Modular Architecture:** Clear separation of concerns
-- **Performance Optimization:** Lazy loading and memoization
-- **Accessibility First:** Comprehensive accessibility features
-- **Type Safety:** Full TypeScript coverage
-- **Error Boundaries:** Graceful error handling
-- **Responsive Design:** Mobile-first approach
-- **Theme Consistency:** Integrated theming system
+- **`ChartConfigService`** - Centralized chart configuration management
+- **Theme system** - Consistent theming across all components
 
----
+### Component Dependencies
 
-## Testing Strategy
+- **`ThemedBox`** - Themed container components for consistent UI
+- **`SiteDetailsHeader`** - Site information and controls
+- **`SiteDetailsNavigation`** - Tab navigation and monitoring controls
+- **Tab components** - Specialized content components for each view
 
-### Unit Tests
+### External Libraries
 
-- Individual tab component testing
-- State management integration tests
-- Accessibility compliance tests
-- Theme switching functionality
+- **Chart.js** - Data visualization with full theme integration
+- **chartjs-plugin-zoom** - Interactive chart features
+- **chartjs-adapter-date-fns** - Time-based chart axis formatting
 
-### Integration Tests
+## Technical Implementation Details
 
-- Full modal workflow testing
-- Tab navigation and content loading
-- Data flow between tabs
-- Error handling scenarios
+### Component Flow
 
----
+1. Component receives `site` prop and `onClose` callback
+2. `useSiteDetails` hook initializes with site data and provides comprehensive state
+3. Chart.js components are registered and configured
+4. Chart configurations created using `ChartConfigService` with current theme
+5. Chart data computed from analytics with memoization
+6. Conditional rendering based on `siteExists` state
+7. Modal overlay renders with backdrop click-to-close behavior
+8. Active tab content renders based on `activeSiteDetailsTab` state
 
-## Future Enhancements
+### State Synchronization
 
-- **Export Functionality:** Data export in multiple formats
-- **Comparison Mode:** Side-by-side site comparisons
-- **Advanced Filtering:** Enhanced search and filter options
-- **Customizable Tabs:** User-configurable tab layout
-- **Real-time Collaboration:** Multi-user editing support
-
----
+- Local form state (name, interval) synchronized with global site data
+- Unsaved changes tracking prevents data loss
+- Real-time monitoring state updates reflected in UI
+- Chart time range and advanced metrics preferences preserved
 
 ## Related Components
 
-- `SiteCard` - Triggers SiteDetails modal
-- `Dashboard` - Container for site management
-- `Header` - Global navigation and actions
-- `Chart components` - Analytics visualization
-- `Themed components` - UI consistency
-
----
-
-## Development Notes
-
-For developers working on SiteDetails:
-
-1. **Tab Development:** Follow the existing tab pattern for consistency
-2. **Performance:** Always consider lazy loading for new features
-3. **Accessibility:** Test with screen readers and keyboard navigation
-4. **Theming:** Use theme variables for all styling
-5. **State Management:** Keep local state minimal, prefer global store
-6. **Testing:** Maintain test coverage for all tab components
-
----
-
-## Contact
-
-For questions or improvements regarding the SiteDetails component, see the project README or open an issue on GitHub.
+- **SiteCard** - Triggers SiteDetails modal from dashboard
+- **SiteDetailsHeader** - Header section with site info and controls
+- **SiteDetailsNavigation** - Tab navigation and monitoring controls
+- **Tab components** - OverviewTab, AnalyticsTab, HistoryTab, SettingsTab
+- **ScreenshotThumbnail** - Site preview image handling
