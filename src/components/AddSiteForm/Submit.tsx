@@ -37,6 +37,193 @@ type FormSubmitProps = AddSiteFormState &
     };
 
 /**
+ * Validates the add mode selection and site information.
+ */
+function validateAddMode(addMode: string, name: string, selectedExistingSite: string): string[] {
+    const errors: string[] = [];
+
+    if (addMode === "new" && !name.trim()) {
+        errors.push("Site name is required");
+    }
+
+    if (addMode === "existing" && !selectedExistingSite) {
+        errors.push("Please select a site to add the monitor to");
+    }
+
+    return errors;
+}
+
+/**
+ * Validates HTTP monitor configuration.
+ */
+function validateHttpMonitor(url: string): string[] {
+    const errors: string[] = [];
+
+    if (!url.trim()) {
+        errors.push("Website URL is required for HTTP monitor");
+        return errors;
+    }
+
+    const trimmedUrl = url.trim();
+
+    if (!/^https?:\/\//i.test(trimmedUrl)) {
+        errors.push("HTTP monitor requires a URL starting with http:// or https://");
+        return errors;
+    }
+
+    if (
+        !validator.isURL(trimmedUrl, {
+            allow_protocol_relative_urls: false,
+            allow_trailing_dot: false,
+            allow_underscores: false,
+            disallow_auth: false,
+            protocols: ["http", "https"],
+            require_protocol: true,
+            require_valid_protocol: true,
+        })
+    ) {
+        errors.push("Please enter a valid URL with a proper domain");
+    }
+
+    return errors;
+}
+
+/**
+ * Validates port monitor configuration.
+ */
+function validatePortMonitor(host: string, port: string): string[] {
+    const errors: string[] = [];
+
+    if (!host.trim()) {
+        errors.push("Host is required for port monitor");
+    } else {
+        const trimmedHost = host.trim();
+        const isValidIP = validator.isIP(trimmedHost);
+        const isValidDomain = validator.isFQDN(trimmedHost, {
+            allow_trailing_dot: false,
+            allow_underscores: false,
+        });
+
+        if (!isValidIP && !isValidDomain) {
+            errors.push("Host must be a valid IP address or domain name");
+        }
+    }
+
+    if (!port.trim()) {
+        errors.push("Port is required for port monitor");
+    } else if (!validator.isPort(port.trim())) {
+        errors.push("Port must be a valid port number (1-65535)");
+    }
+
+    return errors;
+}
+
+/**
+ * Validates monitor type-specific configuration.
+ */
+function validateMonitorType(monitorType: string, url: string, host: string, port: string): string[] {
+    if (monitorType === "http") {
+        return validateHttpMonitor(url);
+    }
+
+    if (monitorType === "port") {
+        return validatePortMonitor(host, port);
+    }
+
+    return [];
+}
+
+/**
+ * Validates check interval configuration.
+ */
+function validateCheckInterval(checkInterval: number): string[] {
+    const errors: string[] = [];
+
+    if (!checkInterval || checkInterval <= 0) {
+        errors.push("Check interval must be a positive number");
+    }
+
+    return errors;
+}
+
+/**
+ * Creates a monitor object based on the form data.
+ */
+function createMonitor(props: FormSubmitProps): Monitor {
+    const { checkInterval, generateUuid, host, monitorType, port, url } = props;
+
+    const monitor: Monitor = {
+        checkInterval,
+        history: [] as Monitor["history"],
+        id: generateUuid(),
+        status: "pending" as const,
+        type: monitorType,
+    };
+
+    if (monitorType === "http") {
+        monitor.url = url.trim();
+    } else if (monitorType === "port") {
+        monitor.host = host.trim();
+        monitor.port = Number(port);
+    }
+
+    return monitor;
+}
+
+/**
+ * Submits a new site with monitor.
+ */
+async function submitNewSite(props: FormSubmitProps, monitor: Monitor): Promise<void> {
+    const { createSite, logger, name, siteId } = props;
+
+    const siteData = {
+        identifier: siteId,
+        monitors: [monitor],
+        name: name.trim() || undefined,
+    };
+
+    await createSite(siteData);
+
+    logger.info("Site created successfully", {
+        identifier: siteId,
+        monitorId: monitor.id,
+        monitorType: monitor.type,
+        name: name.trim(),
+    });
+}
+
+/**
+ * Adds monitor to existing site.
+ */
+async function addToExistingSite(props: FormSubmitProps, monitor: Monitor): Promise<void> {
+    const { addMonitorToSite, logger, selectedExistingSite } = props;
+
+    await addMonitorToSite(selectedExistingSite, monitor);
+
+    logger.info("Monitor added to site successfully", {
+        identifier: selectedExistingSite,
+        monitorId: monitor.id,
+        monitorType: monitor.type,
+    });
+}
+
+/**
+ * Performs the actual submission based on add mode.
+ */
+async function performSubmission(props: FormSubmitProps, monitor: Monitor): Promise<void> {
+    const { addMode, logger } = props;
+
+    if (addMode === "new") {
+        await submitNewSite(props, monitor);
+    } else {
+        await addToExistingSite(props, monitor);
+    }
+
+    const identifier = addMode === "new" ? props.siteId : props.selectedExistingSite;
+    logger.info(`Successfully ${addMode === "new" ? "created site" : "added monitor"}: ${identifier}`);
+}
+
+/**
  * Handles form submission for adding sites or monitors.
  *
  * Performs comprehensive validation based on add mode and monitor type:
@@ -63,15 +250,11 @@ type FormSubmitProps = AddSiteFormState &
  * };
  * ```
  */
-
 export async function handleSubmit(e: React.FormEvent, props: FormSubmitProps) {
     const {
         addMode,
-        addMonitorToSite,
         checkInterval,
         clearError,
-        createSite,
-        generateUuid,
         host,
         logger,
         monitorType,
@@ -80,16 +263,13 @@ export async function handleSubmit(e: React.FormEvent, props: FormSubmitProps) {
         port,
         selectedExistingSite,
         setFormError,
-        siteId,
         url,
     } = props;
 
     e.preventDefault();
     setFormError(undefined);
 
-    // Comprehensive validation with logging
-    const validationErrors: string[] = [];
-
+    // Log submission start
     logger.debug("Form submission started", {
         addMode,
         hasHost: !!host.trim(),
@@ -100,69 +280,14 @@ export async function handleSubmit(e: React.FormEvent, props: FormSubmitProps) {
         selectedExistingSite: !!selectedExistingSite,
     });
 
-    // Validate based on add mode
-    if (addMode === "new") {
-        if (!name.trim()) {
-            validationErrors.push("Site name is required");
-        }
-    } else if (addMode === "existing") {
-        if (!selectedExistingSite) {
-            validationErrors.push("Please select a site to add the monitor to");
-        }
-    }
+    // Collect all validation errors
+    const validationErrors: string[] = [
+        ...validateAddMode(addMode, name, selectedExistingSite),
+        ...validateMonitorType(monitorType, url, host, port),
+        ...validateCheckInterval(checkInterval),
+    ];
 
-    // Validate based on monitor type
-    if (monitorType === "http") {
-        if (!url.trim()) {
-            validationErrors.push("Website URL is required for HTTP monitor");
-        } else {
-            const trimmedUrl = url.trim();
-            if (!/^https?:\/\//i.test(trimmedUrl)) {
-                validationErrors.push("HTTP monitor requires a URL starting with http:// or https://");
-            } else if (
-                !validator.isURL(trimmedUrl, {
-                    allow_protocol_relative_urls: false,
-                    allow_trailing_dot: false,
-                    allow_underscores: false,
-                    disallow_auth: false,
-                    protocols: ["http", "https"],
-                    require_protocol: true,
-                    require_valid_protocol: true,
-                })
-            ) {
-                validationErrors.push("Please enter a valid URL with a proper domain");
-            }
-        }
-    } else if (monitorType === "port") {
-        if (!host.trim()) {
-            validationErrors.push("Host is required for port monitor");
-        } else {
-            const trimmedHost = host.trim();
-            // Check if it's a valid IP address or domain name
-            const isValidIP = validator.isIP(trimmedHost);
-            const isValidDomain = validator.isFQDN(trimmedHost, {
-                allow_trailing_dot: false,
-                allow_underscores: false,
-            });
-
-            if (!isValidIP && !isValidDomain) {
-                validationErrors.push("Host must be a valid IP address or domain name");
-            }
-        }
-
-        if (!port.trim()) {
-            validationErrors.push("Port is required for port monitor");
-        } else if (!validator.isPort(port.trim())) {
-            validationErrors.push("Port must be a valid port number (1-65535)");
-        }
-    }
-
-    // Validate check interval
-    if (!checkInterval || checkInterval <= 0) {
-        validationErrors.push("Check interval must be a positive number");
-    }
-
-    // If validation fails, log and show errors
+    // Handle validation failures
     if (validationErrors.length > 0) {
         logger.debug("Form validation failed", {
             errors: validationErrors,
@@ -184,48 +309,8 @@ export async function handleSubmit(e: React.FormEvent, props: FormSubmitProps) {
     clearError();
 
     try {
-        const identifier = addMode === "new" ? siteId : selectedExistingSite;
-        const monitor: Monitor = {
-            checkInterval,
-            history: [] as Monitor["history"],
-            id: generateUuid(),
-            status: "pending" as const,
-            type: monitorType,
-        };
-
-        if (monitorType === "http") {
-            monitor.url = url.trim();
-        } else if (monitorType === "port") {
-            monitor.host = host.trim();
-            monitor.port = Number(port);
-        }
-
-        if (addMode === "new") {
-            const siteData = {
-                identifier,
-                monitors: [monitor],
-                name: name.trim() || undefined,
-            };
-
-            await createSite(siteData);
-            logger.info("Site created successfully", {
-                identifier,
-                monitorId: monitor.id,
-                monitorType,
-                name: name.trim(),
-            });
-        } else {
-            await addMonitorToSite(identifier, monitor);
-            logger.info("Monitor added to site successfully", {
-                identifier,
-                monitorId: monitor.id,
-                monitorType,
-            });
-        }
-
-        logger.info(`Successfully ${addMode === "new" ? "created site" : "added monitor"}: ${identifier}`);
-
-        // Call success callback if provided (e.g., to reset form)
+        const monitor = createMonitor(props);
+        await performSubmission(props, monitor);
         onSuccess?.();
     } catch (error) {
         logger.error("Failed to add site/monitor from form", error);

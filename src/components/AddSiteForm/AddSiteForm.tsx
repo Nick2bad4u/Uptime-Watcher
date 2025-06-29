@@ -121,7 +121,7 @@ export const AddSiteForm = React.memo(function AddSiteForm() {
                         label="Select Site"
                         onChange={setSelectedExistingSite}
                         options={sites.map((site) => ({
-                            label: site.name || site.identifier,
+                            label: site.name ?? site.identifier,
                             value: site.identifier,
                         }))}
                         placeholder="-- Select a site --"
@@ -243,7 +243,7 @@ export const AddSiteForm = React.memo(function AddSiteForm() {
                     >
                         <div className="flex items-center">
                             <ThemedText className={`error-alert__text ${isDark ? "dark" : ""}`} size="sm">
-                                ❌ {formError || lastError}
+                                ❌ {formError ?? lastError}
                             </ThemedText>
                             <ThemedButton
                                 className={`error-alert__close ${isDark ? "dark" : ""}`}

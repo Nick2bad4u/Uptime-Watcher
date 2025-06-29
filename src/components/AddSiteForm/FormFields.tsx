@@ -18,6 +18,19 @@ const REQUIRED_SUFFIX = " (required)";
  */
 const createAriaLabel = (label: string, required: boolean): string => `${label}${required ? REQUIRED_SUFFIX : ""}`;
 
+/**
+ * Determine the appropriate aria-describedby value based on error and help text.
+ * @param id - The field ID for generating the describedby value
+ * @param error - Error message if present
+ * @param helpText - Help text if present
+ * @returns The aria-describedby value or undefined
+ */
+const getAriaDescribedBy = (id: string, error?: string, helpText?: string): string | undefined => {
+    if (error) return `${id}-error`;
+    if (helpText) return `${id}-help`;
+    return undefined;
+};
+
 /** Props for the base FormField wrapper component */
 export interface FormFieldProps {
     /** Form input element(s) to wrap */
@@ -127,7 +140,7 @@ export const TextField = React.memo(function TextField({
     return (
         <FormField error={error} helpText={helpText} id={id} label={label} required={required}>
             <ThemedInput
-                aria-describedby={error ? `${id}-error` : helpText ? `${id}-help` : undefined}
+                aria-describedby={getAriaDescribedBy(id, error, helpText)}
                 aria-label={createAriaLabel(label, required)}
                 disabled={disabled}
                 id={id}
@@ -188,7 +201,7 @@ export const SelectField = React.memo(function SelectField({
     return (
         <FormField error={error} helpText={helpText} id={id} label={label} required={required}>
             <ThemedSelect
-                aria-describedby={error ? `${id}-error` : helpText ? `${id}-help` : undefined}
+                aria-describedby={getAriaDescribedBy(id, error, helpText)}
                 aria-label={createAriaLabel(label, required)}
                 disabled={disabled}
                 id={id}
