@@ -7,9 +7,32 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[cba3c1b](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cba3c1b56c1fcb91c52080e6247f00b533bda144)...
+[32a139c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/32a139cf6c764d0884fb602fa485c6bb743a2278)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/cba3c1b56c1fcb91c52080e6247f00b533bda144...32a139cf6c764d0884fb602fa485c6bb743a2278))
+
+
+### 🛠️ GitHub Actions
+
+- Update prettier.yml [`(32a139c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/32a139cf6c764d0884fb602fa485c6bb743a2278)
+
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 3.4.0 [`(cba3c1b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cba3c1b56c1fcb91c52080e6247f00b533bda144)
+
+
+
+
+
+
+## [3.4.0] - 2025-06-28
+
+
 [[de553f2](https://github.com/Nick2bad4u/Uptime-Watcher/commit/de553f2e025dee562de0d73f63b130c8b32443aa)...
-[ab848a6](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ab848a6e7ca911edda37ecebe136fda8f267efc9)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/de553f2e025dee562de0d73f63b130c8b32443aa...ab848a6e7ca911edda37ecebe136fda8f267efc9))
+[28d3918](https://github.com/Nick2bad4u/Uptime-Watcher/commit/28d3918a0786eaf7e0e8a7953ce6a674c22b253e)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/de553f2e025dee562de0d73f63b130c8b32443aa...28d3918a0786eaf7e0e8a7953ce6a674c22b253e))
 
 
 ### 🛠️ GitHub Actions
@@ -18,9 +41,42 @@ All notable changes to this project will be documented in this file.
 
 
 
+### 💼 Other
+
+- ⚡ [perf] Make debug logging conditional on development mode
+
+- Reduces log volume and noise in production by wrapping all non-essential debug and verbose logs in a development mode condition across backend services and frontend state management.
+- Maintains always-on logging for errors, warnings, and critical state changes, ensuring production logs focus on actionable information.
+- Improves log clarity, performance, and maintainability while preserving full debug detail for development and troubleshooting.
+- Addresses prior issues with log spam from routine operations (IPC, monitor checks, database CRUD) and ensures cleaner log files in production environments. [`(9e0e7b1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9e0e7b1f59c71d13abd1dca76bd7d0040227bcc3)
+
+
+
+### ⚙️ Miscellaneous Tasks
+
+- Update changelogs for v3.3.0 [skip ci] [`(8f6d1c9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8f6d1c9aad248ca1e4761d060bc22bced82dae22)
+
+
+
 ### 📦 Dependencies
 
 - [dependency] Update version 3.3.0 [`(de553f2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/de553f2e025dee562de0d73f63b130c8b32443aa)
+
+
+
+### 🛡️ Security
+
+- 📝 [docs] Add comprehensive codebase documentation and cleanup
+
+- Adds detailed JSDoc-style documentation to all major modules, React components, hooks, and utility functions for improved maintainability and onboarding
+- Refactors and enhances all documentation files, including README, guides, and API references, for improved clarity, navigation, and cross-linking
+- Updates and reorganizes documentation structure to highlight core, API, user, and component docs with navigation improvements
+- Removes a large third-party validator library doc, focusing documentation on project-relevant content
+- Cleans up, annotates, and standardizes code comments and export barrels across backend and frontend for better code understanding
+- Improves markdownlint and commitlint configs for more consistent documentation and commit practices
+- Updates security policy and related docs to accurately reflect project naming and dependencies
+
+Aims to make the codebase significantly easier to navigate and contribute to, while raising the bar for documentation quality. [`(28d3918)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/28d3918a0786eaf7e0e8a7953ce6a674c22b253e)
 
 
 
