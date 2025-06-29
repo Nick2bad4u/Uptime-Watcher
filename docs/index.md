@@ -16,6 +16,7 @@ Welcome to the comprehensive documentation for **Uptime Watcher** - a powerful, 
 
 ### For Developers
 
+- **[Vite & MCP Configuration](Vite-MCP-Configuration.md)** - Build system and MCP integration
 - **[Developer Guide](guides/Developer-Guide.md)** - Complete setup and development workflow
 - **[API Reference](api/)** - Complete API documentation
 - **[Architecture Guide](architecture/Project-Architecture-Guide.md)** - System design and structure
@@ -28,6 +29,12 @@ Welcome to the comprehensive documentation for **Uptime Watcher** - a powerful, 
 - **[Types API](api/types-api.md)** - TypeScript type definitions  
 - **[Store API](api/store-api.md)** - State management with Zustand
 - **[Monitor API](api/monitor-api.md)** - Core monitoring functionality
+
+### 🛠 Build & Development
+
+- **[Vite & MCP Configuration](Vite-MCP-Configuration.md)** - Build system and MCP integration
+- **[Developer Guide](guides/Developer-Guide.md)** - Complete setup and development workflow
+- **[Architecture Guide](architecture/Project-Architecture-Guide.md)** - System design and structure
 
 ### 🎨 Component Documentation
 

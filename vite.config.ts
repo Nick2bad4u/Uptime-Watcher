@@ -9,6 +9,8 @@ import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import electron from "vite-plugin-electron";
 import { viteStaticCopy } from "vite-plugin-static-copy";
+import { ViteMcp } from "vite-plugin-mcp";
+
 
 /**
  * Vite configuration object.
@@ -29,6 +31,7 @@ export default defineConfig({
     },
     plugins: [
         react(),
+        ViteMcp(),
         electron([
             {
                 entry: "electron/main.ts",

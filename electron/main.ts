@@ -23,7 +23,7 @@ log.transports.console.format = "[{h}:{i}:{s}.{ms}] [{level}] {text}";
  */
 class Main {
     /** Application service instance for managing app lifecycle and features */
-    private applicationService: ApplicationService;
+    private readonly applicationService: ApplicationService;
 
     /**
      * Initialize the main application.
@@ -41,4 +41,7 @@ class Main {
 }
 
 // Start the application
+// TypeScript is warning that the variable is declared but never read, 
+// which is intentional in this case since we just need to keep the reference 
+// alive to prevent garbage collection.
 new Main();
