@@ -1,6 +1,6 @@
 # 🎨 Theme API Reference
 
-> **Navigation:** [📖 Docs Home](../README.md) » [📚 API Reference](README.md) » **Theme API**
+> **Navigation:** [📖 Docs Home](../README) » [📚 API Reference](README/) » **Theme API**
 
 The Theme API provides a comprehensive theming system for the Uptime Watcher application, including theme management, color utilities, and responsive design tokens.
 
@@ -864,6 +864,6 @@ function Card({ children }) {
 
 ## See Also
 
-- [Component Props](component-props.md) - Themed component interfaces
-- [Hook APIs](hook-apis.md) - Other React hooks
-- [Store API](store-api.md) - Settings integration
+- [Component Props](component-props/) - Themed component interfaces
+- [Hook APIs](hook-apis/) - Other React hooks
+- [Store API](store-api/) - Settings integration

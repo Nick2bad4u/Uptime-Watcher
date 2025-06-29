@@ -1,6 +1,6 @@
 # 📊 Chart API Reference
 
-> **Navigation:** [📖 Docs Home](../README.md) » [📚 API Reference](README.md) » **Chart API**
+> **Navigation:** [📖 Docs Home](../README) » [📚 API Reference](README/) » **Chart API**
 
 The Chart API provides theme-aware chart configurations for consistent data visualization throughout the application using Chart.js.
 
@@ -339,13 +339,13 @@ return (
 
 ## See Also
 
-- [🎨 Theme API](theme-api.md) - Theme system and color schemes
-- [🧩 Hook APIs](hook-apis.md) - Chart configuration hooks
-- [📋 Types API](types-api.md) - Chart data type definitions
-- [💾 Database API](database-api.md) - Historical data sources
-- [📊 Monitor API](monitor-api.md) - Real-time monitoring data
-- [🛠️ Utilities API](utilities-api.md) - Data transformation utilities
+- [🎨 Theme API](theme-api/) - Theme system and color schemes
+- [🧩 Hook APIs](hook-apis/) - Chart configuration hooks
+- [📋 Types API](types-api/) - Chart data type definitions
+- [💾 Database API](database-api/) - Historical data sources
+- [📊 Monitor API](monitor-api/) - Real-time monitoring data
+- [🛠️ Utilities API](utilities-api/) - Data transformation utilities
 
 ---
 
-> **Related:** [📚 API Reference](README.md) | [📖 Documentation Home](../README.md)
+> **Related:** [📚 API Reference](README/) | [📖 Documentation Home](../README)

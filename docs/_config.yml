@@ -3,8 +3,8 @@ title: Uptime Watcher Documentation
 description: >-
     Comprehensive documentation for Uptime Watcher - A cross-platform desktop
     application for monitoring website uptime and server availability
-url: "https://nick2bad4u.github.io/Uptime-Watcher"
-baseurl: ""
+url: "https://nick2bad4u.github.io"
+baseurl: "/Uptime-Watcher"
 
 # Navigation
 navigation:
@@ -61,6 +61,7 @@ defaults:
           layout: "default"
 
 plugins:
+    - jekyll-remote-theme
     - jekyll-sitemap
     - jekyll-seo-tag
     - jekyll-feed
@@ -70,7 +71,6 @@ plugins:
     - jekyll-mentions
     - jekyll-gist
     - jekyll-avatar
-    - jekyll-remote-theme
     - jekyll-default-layout
     - jekyll-optional-front-matter
     - jekyll-titles-from-headings

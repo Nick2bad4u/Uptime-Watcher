@@ -1,6 +1,6 @@
 # 📝 Logger API Reference
 
-> **Navigation:** [📖 Docs Home](../README.md) » [📚 API Reference](README.md) » **Logger API**
+> **Navigation:** [📖 Docs Home](../README) » [📚 API Reference](README/) » **Logger API**
 
 The Logger API provides centralized logging functionality with structured formatting and categorization for both frontend and backend components.
 
@@ -339,13 +339,13 @@ logger.error('Check failed', error);
 
 ## See Also
 
-- [🔔 Notification API](notification-api.md) - System notification logging
-- [📊 Monitor API](monitor-api.md) - Monitoring event logging
-- [🏪 Store API](store-api.md) - State change logging
-- [💾 Database API](database-api.md) - Database operation logging
-- [🔗 IPC API](ipc-api.md) - Inter-process communication logging
-- [🛠️ Utilities API](utilities-api.md) - Utility function logging
+- [🔔 Notification API](notification-api/) - System notification logging
+- [📊 Monitor API](monitor-api/) - Monitoring event logging
+- [🏪 Store API](store-api/) - State change logging
+- [💾 Database API](database-api/) - Database operation logging
+- [🔗 IPC API](ipc-api/) - Inter-process communication logging
+- [🛠️ Utilities API](utilities-api/) - Utility function logging
 
 ---
 
-> **Related:** [📚 API Reference](README.md) | [📖 Documentation Home](../README.md)
+> **Related:** [📚 API Reference](README/) | [📖 Documentation Home](../README)

@@ -1,6 +1,6 @@
 # ❓ Frequently Asked Questions (FAQ)
 
-> **Navigation:** [📖 Docs Home](../README.md) » [📘 Guides](../README.md#guides) » **FAQ**
+> **Navigation:** [📖 Docs Home](../README) » [📘 Guides](../README.md#guides) » **FAQ**
 
 Common questions and answers about Uptime Watcher.
 
@@ -342,7 +342,7 @@ chmod +x Uptime-Watcher-*.AppImage
 
 If your question isn't answered here:
 
-1. **Check the guides:** Browse other [documentation](../README.md)
+1. **Check the guides:** Browse other [documentation](../README)
 2. **Search existing issues:** Look through [GitHub Issues](https://github.com/Nick2bad4u/Uptime-Watcher/issues)
 3. **Ask the community:** Start a [GitHub Discussion](https://github.com/Nick2bad4u/Uptime-Watcher/discussions)
 4. **Report a bug:** Create a [new issue](https://github.com/Nick2bad4u/Uptime-Watcher/issues/new)
@@ -351,12 +351,12 @@ If your question isn't answered here:
 
 ## See Also
 
-- [🚀 Developer Guide](Developer-Guide.md) - Setup and development workflow
-- [🔧 Troubleshooting Guide](Troubleshooting.md) - Common issues and solutions
-- [📚 API Reference](../api/README.md) - Technical documentation
+- [🚀 Developer Guide](Developer-Guide/) - Setup and development workflow
+- [🔧 Troubleshooting Guide](Troubleshooting/) - Common issues and solutions
+- [📚 API Reference](../api/README) - Technical documentation
 - [🏗️ Architecture Guide](../architecture/Project-Architecture-Guide.copilotmd) - System design
-- [📖 Documentation Guide](Documentation-Contribution.md) - Contributing to docs
+- [📖 Documentation Guide](Documentation-Contribution/) - Contributing to docs
 
 ---
 
-> **Related:** [📖 Documentation Home](../README.md) | [📘 All Guides](../README.md#guides)
+> **Related:** [📖 Documentation Home](../README) | [📘 All Guides](../README.md#guides)

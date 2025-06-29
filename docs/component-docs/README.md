@@ -1,6 +1,6 @@
 # 🧩 Component Documentation
 
-> **Navigation:** [📖 Docs Home](../README.md) » **Component Documentation**
+> **Navigation:** [📖 Docs Home](../README) » **Component Documentation**
 
 Comprehensive documentation for all React components in the Uptime Watcher application.
 
@@ -8,25 +8,25 @@ Comprehensive documentation for all React components in the Uptime Watcher appli
 
 ### 🏠 Main Components
 
-- **[Dashboard](Dashboard.md)** - Main application dashboard with site overview
-- **[Header](Header.md)** - Application header with status overview and controls
-- **[Settings](Settings.md)** - Settings modal for application configuration
+- **[Dashboard](Dashboard/)** - Main application dashboard with site overview
+- **[Header](Header/)** - Application header with status overview and controls
+- **[Settings](Settings/)** - Settings modal for application configuration
 
 ### 📝 Form Components
 
-- **[AddSiteForm](AddSiteForm.md)** - Site creation and editing interface
-- **[AddSiteForm Components](AddSiteForm-Components.md)** - Sub-components and form fields
+- **[AddSiteForm](AddSiteForm/)** - Site creation and editing interface
+- **[AddSiteForm Components](AddSiteForm-Components/)** - Sub-components and form fields
 
 ### 🏢 Site Components
 
-- **[SiteDetails](SiteDetails.md)** - Detailed site information modal
-- **[SiteDetails Tab Components](SiteDetails-Tab-Components.md)** - Tab system for site details
-- **[SiteCard Components](SiteCard-Components.md)** - Site display cards and status
-- **[SiteList Components](SiteList-Components.md)** - Site listing and empty states
+- **[SiteDetails](SiteDetails/)** - Detailed site information modal
+- **[SiteDetails Tab Components](SiteDetails-Tab-Components/)** - Tab system for site details
+- **[SiteCard Components](SiteCard-Components/)** - Site display cards and status
+- **[SiteList Components](SiteList-Components/)** - Site listing and empty states
 
 ### 🔧 Common Components
 
-- **[Common Components](Common-Components.md)** - Reusable components across the app
+- **[Common Components](Common-Components/)** - Reusable components across the app
   - StatusBadge
   - HistoryChart
   - Themed components
@@ -80,11 +80,11 @@ Component testing follows these patterns:
 
 ## See Also
 
-- [🎨 Theme API](../api/theme-api.md) - Theme system documentation
-- [🧩 Hook APIs](../api/hook-apis.md) - Custom hooks used by components
-- [🚀 Developer Guide](../guides/Developer-Guide.md) - Development setup and patterns
-- [📋 Types API](../api/types-api.md) - Component prop type definitions
+- [🎨 Theme API](../api/theme-api) - Theme system documentation
+- [🧩 Hook APIs](../api/hook-apis) - Custom hooks used by components
+- [🚀 Developer Guide](../guides/Developer-Guide) - Development setup and patterns
+- [📋 Types API](../api/types-api) - Component prop type definitions
 
 ---
 
-> **Related:** [📖 Documentation Home](../README.md) | [📚 API Reference](../api/README.md)
+> **Related:** [📖 Documentation Home](../README) | [📚 API Reference](../api/README)

@@ -1,6 +1,6 @@
 # 🔔 Notification API Reference
 
-> **Navigation:** [📖 Docs Home](../README.md) » [📚 API Reference](README.md) » **Notification API**
+> **Navigation:** [📖 Docs Home](../README) » [📚 API Reference](README/) » **Notification API**
 
 The Notification API provides system notification functionality for monitoring status changes with configurable alert settings.
 
@@ -208,13 +208,13 @@ The NotificationService handles errors gracefully:
 
 ## See Also
 
-- [📊 Monitor API](monitor-api.md) - Monitoring service integration
-- [📋 Types API](types-api.md) - Site and monitor type definitions
-- [📝 Logger API](logger-api.md) - Event logging integration
-- [🏪 Store API](store-api.md) - Configuration state management
-- [🔗 IPC API](ipc-api.md) - Electron main/renderer communication
-- [💾 Database API](database-api.md) - Settings persistence
+- [📊 Monitor API](monitor-api/) - Monitoring service integration
+- [📋 Types API](types-api/) - Site and monitor type definitions
+- [📝 Logger API](logger-api/) - Event logging integration
+- [🏪 Store API](store-api/) - Configuration state management
+- [🔗 IPC API](ipc-api/) - Electron main/renderer communication
+- [💾 Database API](database-api/) - Settings persistence
 
 ---
 
-> **Related:** [📚 API Reference](README.md) | [📖 Documentation Home](../README.md)
+> **Related:** [📚 API Reference](README/) | [📖 Documentation Home](../README)

@@ -446,11 +446,11 @@ For regulated environments:
 
 ## See Also
 
-- [🔧 Troubleshooting Guide](Troubleshooting.md) - Common issues and solutions
-- [⚡ Performance Guide](Performance-Guide.md) - Optimization strategies
-- [🚀 Developer Guide](Developer-Guide.md) - Development setup
+- [🔧 Troubleshooting Guide](Troubleshooting/) - Common issues and solutions
+- [⚡ Performance Guide](Performance-Guide/) - Optimization strategies
+- [🚀 Developer Guide](Developer-Guide/) - Development setup
 - [📚 API Reference](../api/) - Technical documentation
-- [❓ FAQ](FAQ.md) - Frequently asked questions
+- [❓ FAQ](FAQ/) - Frequently asked questions
 
 ---
 

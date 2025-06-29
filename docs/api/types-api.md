@@ -1,6 +1,6 @@
 # 📋 Types API Reference
 
-> **Navigation:** [📖 Docs Home](../README.md) » [📚 API Reference](README.md) » **Types API**
+> **Navigation:** [📖 Docs Home](../README) » [📚 API Reference](README/) » **Types API**
 
 The Types API defines the core data structures and interfaces used throughout the Uptime Watcher application. This comprehensive type system ensures type safety and provides clear contracts for data models.
 
@@ -696,14 +696,14 @@ const portMonitor = createMonitor("port", {
 
 ## See Also
 
-- [🏪 Store API](store-api.md) - State management types and interfaces
-- [🔗 IPC API](ipc-api.md) - Electron communication type definitions
-- [🎨 Theme API](theme-api.md) - Theme system types and structures
-- [🧩 Hook APIs](hook-apis.md) - Hook parameter and return types
-- [📊 Monitor API](monitor-api.md) - Monitoring service types
-- [💾 Database API](database-api.md) - Database entity types
-- [🛠️ Utilities API](utilities-api.md) - Helper function types
+- [🏪 Store API](store-api/) - State management types and interfaces
+- [🔗 IPC API](ipc-api/) - Electron communication type definitions
+- [🎨 Theme API](theme-api/) - Theme system types and structures
+- [🧩 Hook APIs](hook-apis/) - Hook parameter and return types
+- [📊 Monitor API](monitor-api/) - Monitoring service types
+- [💾 Database API](database-api/) - Database entity types
+- [🛠️ Utilities API](utilities-api/) - Helper function types
 
 ---
 
-> **Related:** [📚 API Reference](README.md) | [📖 Documentation Home](../README.md)
+> **Related:** [📚 API Reference](README/) | [📖 Documentation Home](../README)

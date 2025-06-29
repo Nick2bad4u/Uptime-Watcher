@@ -1,6 +1,6 @@
 # 🔧 Troubleshooting Guide
 
-> **Navigation:** [📖 Docs Home](../README.md) » [📘 Guides](../README.md#guides) » **Troubleshooting**
+> **Navigation:** [📖 Docs Home](../README) » [📘 Guides](../README.md#guides) » **Troubleshooting**
 
 Common issues and their solutions for Uptime Watcher.
 
@@ -336,7 +336,7 @@ rm ~/.local/share/uptime-watcher/settings.json
 
 ### Self-Help Resources
 
-1. **Search Documentation:** Check [docs](../README.md) first
+1. **Search Documentation:** Check [docs](../README) first
 2. **Search Issues:** Look in [GitHub Issues](https://github.com/Nick2bad4u/Uptime-Watcher/issues)
 3. **Check Discussions:** Browse [GitHub Discussions](https://github.com/Nick2bad4u/Uptime-Watcher/discussions)
 
@@ -356,12 +356,12 @@ rm ~/.local/share/uptime-watcher/settings.json
 
 ## See Also
 
-- [🚀 Developer Guide](Developer-Guide.md) - Development setup and workflow
-- [📚 API Reference](../api/README.md) - Technical API documentation
+- [🚀 Developer Guide](Developer-Guide/) - Development setup and workflow
+- [📚 API Reference](../api/README) - Technical API documentation
 - [🏗️ Architecture Guide](../architecture/Project-Architecture-Guide.copilotmd) - System design
-- [🎨 Theme Usage](Theme-Usage.md) - Theming and customization
-- [📖 Documentation Guide](Documentation-Contribution.md) - Contributing to docs
+- [🎨 Theme Usage](Theme-Usage/) - Theming and customization
+- [📖 Documentation Guide](Documentation-Contribution/) - Contributing to docs
 
 ---
 
-> **Related:** [📖 Documentation Home](../README.md) | [📘 All Guides](../README.md#guides)
+> **Related:** [📖 Documentation Home](../README) | [📘 All Guides](../README.md#guides)

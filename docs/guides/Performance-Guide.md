@@ -1,6 +1,6 @@
 # ⚡ Performance Optimization Guide
 
-> **Navigation:** [📖 Docs Home](../README.md) » [📘 Guides](../README.md#guides) » **Performance Guide**
+> **Navigation:** [📖 Docs Home](../README) » [📘 Guides](../README.md#guides) » **Performance Guide**
 
 Tips and best practices for optimizing Uptime Watcher performance.
 
@@ -489,12 +489,12 @@ If you experience persistent performance issues:
 
 ## See Also
 
-- [🔧 Troubleshooting Guide](Troubleshooting.md) - Common issues and solutions
-- [🚀 Developer Guide](Developer-Guide.md) - Development setup and workflow
-- [📚 API Reference](../api/README.md) - Technical documentation
+- [🔧 Troubleshooting Guide](Troubleshooting/) - Common issues and solutions
+- [🚀 Developer Guide](Developer-Guide/) - Development setup and workflow
+- [📚 API Reference](../api/README) - Technical documentation
 - [🏗️ Architecture Guide](../architecture/Project-Architecture-Guide.copilotmd) - System design
-- [❓ FAQ](FAQ.md) - Frequently asked questions
+- [❓ FAQ](FAQ/) - Frequently asked questions
 
 ---
 
-> **Related:** [📖 Documentation Home](../README.md) | [📘 All Guides](../README.md#guides)
+> **Related:** [📖 Documentation Home](../README) | [📘 All Guides](../README.md#guides)

@@ -1,6 +1,6 @@
 # 🎨 Theme Usage Guide
 
-> **Navigation:** [📖 Docs Home](../README.md) » [📘 Guides](../README.md#guides) » **Theme Usage**
+> **Navigation:** [📖 Docs Home](../README) » [📘 Guides](../README.md#guides) » **Theme Usage**
 
 This guide demonstrates how to use the theme system throughout the Uptime Watcher application.
 
@@ -13,6 +13,8 @@ The theme system provides consistent colors, typography, and styling across all 
 ### Method 1: Using the useTheme Hook
 
 Access theme values directly in React components:
+
+{% raw %}
 
 ```typescript
 import React from 'react';
@@ -28,6 +30,8 @@ function ExampleWithHook() {
     );
 }
 ```
+
+{% endraw %}
 
 ### Method 2: Using CSS Classes (RECOMMENDED)
 
@@ -47,6 +51,8 @@ function ExampleWithCSS() {
 
 Use pre-built themed components:
 
+{% raw %}
+
 ```typescript
 import { ThemedText } from './src/theme/components';
 
@@ -61,6 +67,8 @@ function ExampleWithThemedComponent() {
     );
 }
 ```
+
+{% endraw %}
 
 ### Method 4: Creating Reusable Components
 
@@ -94,11 +102,11 @@ export default function ExampleUsage() {
 
 ## See Also
 
-- [🎨 Theme API](../api/theme-api.md) - Complete theme API reference
-- [🚀 Developer Guide](Developer-Guide.md) - Development setup and patterns
-- [🧩 Hook APIs](../api/hook-apis.md) - useTheme hook documentation
-- [📋 Types API](../api/types-api.md) - Theme type definitions
+- [🎨 Theme API](../api/theme-api) - Complete theme API reference
+- [🚀 Developer Guide](Developer-Guide/) - Development setup and patterns
+- [🧩 Hook APIs](../api/hook-apis) - useTheme hook documentation
+- [📋 Types API](../api/types-api) - Theme type definitions
 
 ---
 
-> **Related:** [📖 Documentation Home](../README.md) | [📘 All Guides](../README.md#guides)
+> **Related:** [📖 Documentation Home](../README) | [📘 All Guides](../README.md#guides)

@@ -1,6 +1,6 @@
 # ✅ Validation Utilities API Reference
 
-> **Navigation:** [📖 Docs Home](../README.md) » [📚 API Reference](README.md) » **Validation Utils API**
+> **Navigation:** [📖 Docs Home](../README) » [📚 API Reference](README/) » **Validation Utils API**
 
 The Validation Utilities API provides input validation and constraint checking using the validator.js library, primarily used in form handling and data validation throughout the application.
 
@@ -532,13 +532,13 @@ Validate in stages from basic to complex:
 
 ## See Also
 
-- [📋 Types API](types-api.md) - Site and monitor type definitions
-- [🧩 Hook APIs](hook-apis.md) - Form validation hooks
-- [🏪 Store API](store-api.md) - Form state management
-- [🛠️ Utilities API](utilities-api.md) - General utility functions
-- [💾 Database API](database-api.md) - Data persistence validation
-- [📝 Logger API](logger-api.md) - Validation error logging
+- [📋 Types API](types-api/) - Site and monitor type definitions
+- [🧩 Hook APIs](hook-apis/) - Form validation hooks
+- [🏪 Store API](store-api/) - Form state management
+- [🛠️ Utilities API](utilities-api/) - General utility functions
+- [💾 Database API](database-api/) - Data persistence validation
+- [📝 Logger API](logger-api/) - Validation error logging
 
 ---
 
-> **Related:** [📚 API Reference](README.md) | [📖 Documentation Home](../README.md)
+> **Related:** [📚 API Reference](README/) | [📖 Documentation Home](../README)

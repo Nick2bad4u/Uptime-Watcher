@@ -1,6 +1,6 @@
 # 🔗 IPC API Reference
 
-> **Navigation:** [📖 Docs Home](../README.md) » [📘 Guides](../README.md#guides) » **IPC API Reference**
+> **Navigation:** [📖 Docs Home](../README) » [📘 Guides](../README.md#guides) » **IPC API Reference**
 
 ## Overview
 
@@ -664,12 +664,12 @@ For implementation details, see the source files:
 
 ## See Also
 
-- [🔗 IPC API](../api/ipc-api.md) - Complete IPC module documentation
-- [📋 Types API](../api/types-api.md) - IPC interface definitions
-- [🏪 Store API](../api/store-api.md) - State management integration
-- [🚀 Developer Guide](Developer-Guide.md) - Development setup and patterns
-- [📊 Monitor API](../api/monitor-api.md) - Monitoring service integration
+- [🔗 IPC API](../api/ipc-api) - Complete IPC module documentation
+- [📋 Types API](../api/types-api) - IPC interface definitions
+- [🏪 Store API](../api/store-api) - State management integration
+- [🚀 Developer Guide](Developer-Guide/) - Development setup and patterns
+- [📊 Monitor API](../api/monitor-api) - Monitoring service integration
 
 ---
 
-> **Related:** [📖 Documentation Home](../README.md) | [📘 All Guides](../README.md#guides)
+> **Related:** [📖 Documentation Home](../README) | [📘 All Guides](../README.md#guides)

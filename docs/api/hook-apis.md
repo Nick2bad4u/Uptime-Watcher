@@ -1,6 +1,6 @@
 # 🪝 Hook APIs Reference
 
-> **Navigation:** [📖 Docs Home](../README.md) » [📚 API Reference](README.md) » **Hook APIs**
+> **Navigation:** [📖 Docs Home](../README) » [📚 API Reference](README/) » **Hook APIs**
 
 The Hook APIs provide a comprehensive set of custom React hooks for managing site monitoring, state synchronization, analytics, and user interactions in the Uptime Watcher application.
 
@@ -730,6 +730,8 @@ function SiteManagementCard({ site }: { site: Site }) {
 
 ### Dashboard with Multiple Hooks
 
+{% raw %}
+
 ```typescript
 function Dashboard() {
     const { sites, isLoading } = useStore();
@@ -762,6 +764,8 @@ function Dashboard() {
     );
 }
 ```
+
+{% endraw %}
 
 ## Best Practices
 
@@ -932,6 +936,6 @@ test('useSiteStats calculates uptime correctly', () => {
 
 ## See Also
 
-- [Store API](store-api.md) - State management integration
-- [Component Props](component-props.md) - Component interfaces
-- [Theme API](theme-api.md) - Theming system hooks
+- [Store API](store-api/) - State management integration
+- [Component Props](component-props/) - Component interfaces
+- [Theme API](theme-api/) - Theming system hooks

@@ -2,7 +2,7 @@
 
 # 🚀 Uptime Watcher - Developer Guide
 
-> **Navigation:** [📖 Docs Home](../README.md) » [📘 Guides](../README.md#guides) » **Developer Guide**
+> **Navigation:** [📖 Docs Home](../README) » [📘 Guides](../README.md#guides) » **Developer Guide**
 
 ## 🚀 Getting Started
 
@@ -424,9 +424,9 @@ export const MyComponent = ({ title, onAction }) => {
 
 ### Documentation
 
-- **[📚 API Reference](../api/README.md):** Complete API documentation for all modules
+- **[📚 API Reference](../api/README):** Complete API documentation for all modules
 - **[🏗️ Architecture Guide](../architecture/Project-Architecture-Guide.copilotmd):** System design and architecture patterns
-- **[🧩 Component Docs](../component-docs/Dashboard.md):** UI component documentation
+- **[🧩 Component Docs](../component-docs/Dashboard):** UI component documentation
 - **[📖 User Guides](../README.md#guides):** Additional development guides
 
 ### External Resources
@@ -479,13 +479,13 @@ _Happy coding! 🎉_
 
 ## See Also
 
-- [📚 API Reference](../api/README.md) - Complete module documentation
+- [📚 API Reference](../api/README) - Complete module documentation
 - [🏗️ Architecture Guide](../architecture/Project-Architecture-Guide.copilotmd) - System design patterns
-- [🧩 Component Documentation](../component-docs/README.md) - UI component guides
-- [🔧 Troubleshooting Guide](Troubleshooting.md) - Common issues and solutions
-- [🎨 Theme Usage Guide](Theme-Usage.md) - Theming and styling
-- [✅ Validation Guide](Validator.md) - Input validation patterns
+- [🧩 Component Documentation](../component-docs/README) - UI component guides
+- [🔧 Troubleshooting Guide](Troubleshooting/) - Common issues and solutions
+- [🎨 Theme Usage Guide](Theme-Usage/) - Theming and styling
+- [✅ Validation Guide](Validator/) - Input validation patterns
 
 ---
 
-> **Related:** [📖 Documentation Home](../README.md) | [📘 All Guides](../README.md#guides)
+> **Related:** [📖 Documentation Home](../README) | [📘 All Guides](../README.md#guides)

@@ -1,6 +1,6 @@
 # 📖 Documentation Contribution Guide
 
-> **Navigation:** [📖 Docs Home](../README.md) » [📘 Guides](../README.md#guides) » **Documentation Contribution**
+> **Navigation:** [📖 Docs Home](../README) » [📘 Guides](../README.md#guides) » **Documentation Contribution**
 
 Guidelines for contributing to and maintaining the Uptime Watcher documentation.
 
@@ -34,10 +34,10 @@ Use descriptive link text:
 
 ```markdown
 <!-- ✅ Good -->
-See the [Theme API documentation](../api/theme-api.md) for details.
+See the [Theme API documentation](../api/theme-api) for details.
 
 <!-- ❌ Avoid -->
-See [here](../api/theme-api.md) for details.
+See [here](../api/theme-api) for details.
 ```
 
 #### Navigation Breadcrumbs
@@ -45,7 +45,7 @@ See [here](../api/theme-api.md) for details.
 Include breadcrumbs at the top of every page:
 
 ```markdown
-> **Navigation:** [📖 Docs Home](../README.md) » [📘 Guides](../README.md#guides) » **Page Title**
+> **Navigation:** [📖 Docs Home](../README) » [📘 Guides](../README.md#guides) » **Page Title**
 ```
 
 #### Cross-References
@@ -55,12 +55,12 @@ Include "See Also" sections at the end:
 ```markdown
 ## See Also
 
-- [Related Doc 1](link1.md) - Brief description
-- [Related Doc 2](link2.md) - Brief description
+- [Related Doc 1](link1/) - Brief description
+- [Related Doc 2](link2/) - Brief description
 
 ---
 
-> **Related:** [📖 Documentation Home](../README.md) | [📘 All Guides](../README.md#guides)
+> **Related:** [📖 Documentation Home](../README) | [📘 All Guides](../README.md#guides)
 ```
 
 ## 📁 File Organization
@@ -190,10 +190,10 @@ Track documentation health:
 
 ## See Also
 
-- [🚀 Developer Guide](Developer-Guide.md) - Development setup and workflow
-- [📚 API Reference](../api/README.md) - Complete API documentation
-- [🧩 Component Docs](../component-docs/README.md) - UI component documentation
+- [🚀 Developer Guide](Developer-Guide/) - Development setup and workflow
+- [📚 API Reference](../api/README) - Complete API documentation
+- [🧩 Component Docs](../component-docs/README) - UI component documentation
 
 ---
 
-> **Related:** [📖 Documentation Home](../README.md) | [📘 All Guides](../README.md#guides)
+> **Related:** [📖 Documentation Home](../README) | [📘 All Guides](../README.md#guides)

@@ -1,6 +1,6 @@
 # 🛠️ Utilities API Reference
 
-> **Navigation:** [📖 Docs Home](../README.md) » [📚 API Reference](README.md) » **Utilities API**
+> **Navigation:** [📖 Docs Home](../README) » [📚 API Reference](README/) » **Utilities API**
 
 The Utilities API provides helper functions for common operations including time formatting, status handling, and various utility operations throughout the application.
 
@@ -367,13 +367,13 @@ function isValidPeriod(period: string): period is TimePeriod {
 
 ## See Also
 
-- [📋 Types API](types-api.md) - Type definitions used by utilities
-- [🎨 Theme API](theme-api.md) - Theme-aware utility functions
-- [📊 Chart API](chart-api.md) - Data transformation for charts
-- [🏪 Store API](store-api.md) - State utility functions
-- [💾 Database API](database-api.md) - Database helper utilities
-- [📝 Logger API](logger-api.md) - Logging utility functions
+- [📋 Types API](types-api/) - Type definitions used by utilities
+- [🎨 Theme API](theme-api/) - Theme-aware utility functions
+- [📊 Chart API](chart-api/) - Data transformation for charts
+- [🏪 Store API](store-api/) - State utility functions
+- [💾 Database API](database-api/) - Database helper utilities
+- [📝 Logger API](logger-api/) - Logging utility functions
 
 ---
 
-> **Related:** [📚 API Reference](README.md) | [📖 Documentation Home](../README.md)
+> **Related:** [📚 API Reference](README/) | [📖 Documentation Home](../README)

@@ -1,3 +1,9 @@
+---
+layout: default
+title: AI Assistant Guide
+description: State Management & Theme Integration instructions for AI assistants
+---
+
 # AI Assistant Guide: State Management & Theme Integration in Uptime Watcher
 
 ## Overview
@@ -241,6 +247,7 @@ function MyComponent() {
 
 #### ❌ Incorrect: Direct Styling
 
+{% raw %}
 ```typescript
 // DON'T DO THIS - Hardcoded colors and styles
 function MyComponent() {
@@ -253,6 +260,7 @@ function MyComponent() {
   );
 }
 ```
+{% endraw %}
 
 ### Available Themed Components
 

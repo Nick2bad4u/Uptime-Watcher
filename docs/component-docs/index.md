@@ -12,10 +12,10 @@ Explore the individual component documentation files in this directory for detai
 
 ## Development
 
-- **[Theme System](../guides/Theme-Usage.md)** - UI theming and customization
-- **[Developer Guide](../guides/Developer-Guide.md)** - Setup and development workflow  
-- **[Feature Development](../guides/Feature-Development-Guide.md)** - Adding new components
+- **[Theme System](../guides/Theme-Usage)** - UI theming and customization
+- **[Developer Guide](../guides/Developer-Guide)** - Setup and development workflow  
+- **[Feature Development](../guides/Feature-Development-Guide)** - Adding new components
 
 ## Contributing
 
-See the **[Documentation Contribution Guide](../guides/Documentation-Contribution.md)** for information on improving component documentation.
+See the **[Documentation Contribution Guide](../guides/Documentation-Contribution)** for information on improving component documentation.
