@@ -14,14 +14,14 @@ The Uptime Watcher application uses SQLite as its database engine to store monit
 
 ## Tables Overview
 
-| Table | Purpose | Records | Key Features |
-|-------|---------|---------|--------------|
-| `sites` | Site definitions and metadata | User-defined | Primary site configuration |
+| Table      | Purpose                         | Records          | Key Features                   |
+| ---------- | ------------------------------- | ---------------- | ------------------------------ |
+| `sites`    | Site definitions and metadata   | User-defined     | Primary site configuration     |
 | `monitors` | Monitor configurations per site | Per monitor type | **Includes timeout column** ✅ |
-| `history` | Historical monitoring data | High volume | Performance tracking |
-| `settings` | Application configuration | Key-value pairs | User preferences |
-| `stats` | Application statistics | Key-value pairs | Usage analytics |
-| `logs` | Application logging | High volume | Debugging and audit |
+| `history`  | Historical monitoring data      | High volume      | Performance tracking           |
+| `settings` | Application configuration       | Key-value pairs  | User preferences               |
+| `stats`    | Application statistics          | Key-value pairs  | Usage analytics                |
+| `logs`     | Application logging             | High volume      | Debugging and audit            |
 
 ---
 
@@ -38,10 +38,10 @@ CREATE TABLE IF NOT EXISTS sites (
 );
 ```
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `identifier` | TEXT | PRIMARY KEY | Unique UUID identifier for the site |
-| `name` | TEXT | NULLABLE | Human-readable display name for the site |
+| Column       | Type | Constraints | Description                              |
+| ------------ | ---- | ----------- | ---------------------------------------- |
+| `identifier` | TEXT | PRIMARY KEY | Unique UUID identifier for the site      |
+| `name`       | TEXT | NULLABLE    | Human-readable display name for the site |
 
 **Relationships:**
 
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS sites (
 **Sample Data:**
 
 ```sql
-INSERT INTO sites (identifier, name) VALUES 
+INSERT INTO sites (identifier, name) VALUES
 ('26888fe8-73d7-45e9-b873-a5785ed5ae31', 'My Website');
 ```
 
@@ -78,20 +78,20 @@ CREATE TABLE IF NOT EXISTS monitors (
 );
 ```
 
-| Column | Type | Constraints | Default | Description |
-|--------|------|-------------|---------|-------------|
-| `id` | INTEGER | PRIMARY KEY AUTOINCREMENT | - | Unique monitor identifier |
-| `site_identifier` | TEXT | FOREIGN KEY | - | Reference to parent site |
-| `type` | TEXT | - | - | Monitor type: 'http' or 'port' |
-| `url` | TEXT | NULLABLE | - | Target URL for HTTP monitors |
-| `host` | TEXT | NULLABLE | - | Target hostname for port monitors |
-| `port` | INTEGER | NULLABLE | - | Target port number for port monitors |
-| `checkInterval` | INTEGER | NULLABLE | - | Check frequency in milliseconds |
-| **`timeout`** | **INTEGER** | **NULLABLE** | **10000** | **Request timeout in milliseconds** ⭐ |
-| `monitoring` | BOOLEAN | - | - | Whether monitoring is active |
-| `status` | TEXT | - | - | Current status: 'up', 'down', 'pending' |
-| `responseTime` | INTEGER | NULLABLE | - | Last response time in milliseconds |
-| `lastChecked` | DATETIME | NULLABLE | - | Timestamp of last check |
+| Column            | Type        | Constraints               | Default   | Description                             |
+| ----------------- | ----------- | ------------------------- | --------- | --------------------------------------- |
+| `id`              | INTEGER     | PRIMARY KEY AUTOINCREMENT | -         | Unique monitor identifier               |
+| `site_identifier` | TEXT        | FOREIGN KEY               | -         | Reference to parent site                |
+| `type`            | TEXT        | -                         | -         | Monitor type: 'http' or 'port'          |
+| `url`             | TEXT        | NULLABLE                  | -         | Target URL for HTTP monitors            |
+| `host`            | TEXT        | NULLABLE                  | -         | Target hostname for port monitors       |
+| `port`            | INTEGER     | NULLABLE                  | -         | Target port number for port monitors    |
+| `checkInterval`   | INTEGER     | NULLABLE                  | -         | Check frequency in milliseconds         |
+| **`timeout`**     | **INTEGER** | **NULLABLE**              | **10000** | **Request timeout in milliseconds** ⭐  |
+| `monitoring`      | BOOLEAN     | -                         | -         | Whether monitoring is active            |
+| `status`          | TEXT        | -                         | -         | Current status: 'up', 'down', 'pending' |
+| `responseTime`    | INTEGER     | NULLABLE                  | -         | Last response time in milliseconds      |
+| `lastChecked`     | DATETIME    | NULLABLE                  | -         | Timestamp of last check                 |
 
 **Key Features:**
 
@@ -109,11 +109,11 @@ CREATE TABLE IF NOT EXISTS monitors (
 
 ```sql
 -- HTTP Monitor with custom timeout
-INSERT INTO monitors (site_identifier, type, url, timeout, status) VALUES 
+INSERT INTO monitors (site_identifier, type, url, timeout, status) VALUES
 ('26888fe8-73d7-45e9-b873-a5785ed5ae31', 'http', 'https://example.com', 5000, 'up');
 
 -- Port Monitor with default timeout
-INSERT INTO monitors (site_identifier, type, host, port, status) VALUES 
+INSERT INTO monitors (site_identifier, type, host, port, status) VALUES
 ('26888fe8-73d7-45e9-b873-a5785ed5ae31', 'port', 'example.com', 443, 'up');
 ```
 
@@ -135,14 +135,14 @@ CREATE TABLE IF NOT EXISTS history (
 );
 ```
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | INTEGER | PRIMARY KEY AUTOINCREMENT | Unique history record identifier |
-| `monitor_id` | INTEGER | FOREIGN KEY | Reference to monitor that was checked |
-| `timestamp` | INTEGER | - | Unix timestamp of the check |
-| `status` | TEXT | - | Result status: 'up' or 'down' |
-| `responseTime` | INTEGER | - | Response time in milliseconds |
-| `details` | TEXT | NULLABLE | Additional details (HTTP status, error message) |
+| Column         | Type    | Constraints               | Description                                     |
+| -------------- | ------- | ------------------------- | ----------------------------------------------- |
+| `id`           | INTEGER | PRIMARY KEY AUTOINCREMENT | Unique history record identifier                |
+| `monitor_id`   | INTEGER | FOREIGN KEY               | Reference to monitor that was checked           |
+| `timestamp`    | INTEGER | -                         | Unix timestamp of the check                     |
+| `status`       | TEXT    | -                         | Result status: 'up' or 'down'                   |
+| `responseTime` | INTEGER | -                         | Response time in milliseconds                   |
+| `details`      | TEXT    | NULLABLE                  | Additional details (HTTP status, error message) |
 
 **Relationships:**
 
@@ -166,10 +166,10 @@ CREATE TABLE IF NOT EXISTS settings (
 );
 ```
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `key` | TEXT | PRIMARY KEY | Setting identifier |
-| `value` | TEXT | - | Setting value (serialized as needed) |
+| Column  | Type | Constraints | Description                          |
+| ------- | ---- | ----------- | ------------------------------------ |
+| `key`   | TEXT | PRIMARY KEY | Setting identifier                   |
+| `value` | TEXT | -           | Setting value (serialized as needed) |
 
 **Common Settings:**
 
@@ -180,7 +180,7 @@ CREATE TABLE IF NOT EXISTS settings (
 **Sample Data:**
 
 ```sql
-INSERT INTO settings (key, value) VALUES 
+INSERT INTO settings (key, value) VALUES
 ('historyLimit', '1000'),
 ('theme', 'dark');
 ```
@@ -198,10 +198,10 @@ CREATE TABLE IF NOT EXISTS stats (
 );
 ```
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `key` | TEXT | PRIMARY KEY | Statistic identifier |
-| `value` | TEXT | - | Statistic value (JSON or simple value) |
+| Column  | Type | Constraints | Description                            |
+| ------- | ---- | ----------- | -------------------------------------- |
+| `key`   | TEXT | PRIMARY KEY | Statistic identifier                   |
+| `value` | TEXT | -           | Statistic value (JSON or simple value) |
 
 **Common Statistics:**
 
@@ -224,13 +224,13 @@ CREATE TABLE IF NOT EXISTS logs (
 );
 ```
 
-| Column | Type | Constraints | Default | Description |
-|--------|------|-------------|---------|-------------|
-| `id` | INTEGER | PRIMARY KEY AUTOINCREMENT | - | Unique log entry identifier |
-| `timestamp` | DATETIME | - | CURRENT_TIMESTAMP | When the log was created |
-| `level` | TEXT | - | - | Log level: 'info', 'warn', 'error', 'debug' |
-| `message` | TEXT | - | - | Log message |
-| `data` | TEXT | NULLABLE | - | Additional structured data (JSON) |
+| Column      | Type     | Constraints               | Default           | Description                                 |
+| ----------- | -------- | ------------------------- | ----------------- | ------------------------------------------- |
+| `id`        | INTEGER  | PRIMARY KEY AUTOINCREMENT | -                 | Unique log entry identifier                 |
+| `timestamp` | DATETIME | -                         | CURRENT_TIMESTAMP | When the log was created                    |
+| `level`     | TEXT     | -                         | -                 | Log level: 'info', 'warn', 'error', 'debug' |
+| `message`   | TEXT     | -                         | -                 | Log message                                 |
+| `data`      | TEXT     | NULLABLE                  | -                 | Additional structured data (JSON)           |
 
 ---
 
@@ -243,17 +243,19 @@ sites (1) ----< monitors (M)
     |         history (M)
     |
     |-- settings (K-V)
-    |-- stats (K-V)  
+    |-- stats (K-V)
     |-- logs (M)
 ```
 
 ### Relationship Details
 
 1. **Sites → Monitors**: One-to-Many
+
    - Each site can have multiple monitors (HTTP, port, etc.)
    - Foreign key: `monitors.site_identifier → sites.identifier`
 
 2. **Monitors → History**: One-to-Many
+
    - Each monitor generates multiple history records
    - Foreign key: `history.monitor_id → monitors.id`
 
@@ -277,7 +279,7 @@ The timeout feature is fully integrated into the database schema:
 ### Timeout Data Flow
 
 ```flow
-UI (seconds) → Hook (conversion) → Store (milliseconds) → 
+UI (seconds) → Hook (conversion) → Store (milliseconds) →
 Database (INTEGER milliseconds) → Repository → Services (milliseconds)
 ```
 
@@ -298,7 +300,7 @@ Database (INTEGER milliseconds) → Repository → Services (milliseconds)
 CREATE INDEX idx_monitors_site_identifier ON monitors(site_identifier);
 CREATE INDEX idx_history_monitor_id ON history(monitor_id);
 
--- Analytics queries  
+-- Analytics queries
 CREATE INDEX idx_history_timestamp ON history(timestamp);
 CREATE INDEX idx_history_monitor_timestamp ON history(monitor_id, timestamp);
 
@@ -358,14 +360,14 @@ const backup = await DatabaseService.getInstance().downloadBackup();
 
 ### Current Status: ✅ ALL SYSTEMS OPERATIONAL
 
-| Component | Status | Notes |
-|-----------|--------|--------|
-| Sites table | ✅ Correct | Proper structure and relationships |
+| Component      | Status     | Notes                                         |
+| -------------- | ---------- | --------------------------------------------- |
+| Sites table    | ✅ Correct | Proper structure and relationships            |
 | Monitors table | ✅ Correct | **Timeout column present with default value** |
-| History table | ✅ Correct | Proper foreign key relationships |
-| Settings table | ✅ Correct | Key-value structure working |
-| Stats table | ✅ Correct | Analytics data storage ready |
-| Logs table | ✅ Correct | Audit trail functionality active |
+| History table  | ✅ Correct | Proper foreign key relationships              |
+| Settings table | ✅ Correct | Key-value structure working                   |
+| Stats table    | ✅ Correct | Analytics data storage ready                  |
+| Logs table     | ✅ Correct | Audit trail functionality active              |
 
 ### Data Integrity Checks
 
@@ -395,15 +397,15 @@ When adding new monitor properties, follow the established pattern:
 -- Test timeout functionality
 SELECT id, type, url, host, port, timeout, status FROM monitors;
 
--- Verify foreign key relationships  
-SELECT s.name, m.type, m.timeout 
-FROM sites s 
+-- Verify foreign key relationships
+SELECT s.name, m.type, m.timeout
+FROM sites s
 JOIN monitors m ON s.identifier = m.site_identifier;
 
 -- Check history data integrity
-SELECT m.type, h.status, h.responseTime 
-FROM monitors m 
-JOIN history h ON m.id = h.monitor_id 
+SELECT m.type, h.status, h.responseTime
+FROM monitors m
+JOIN history h ON m.id = h.monitor_id
 ORDER BY h.timestamp DESC LIMIT 10;
 ```
 

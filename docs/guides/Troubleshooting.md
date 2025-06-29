@@ -269,12 +269,14 @@ SELECT * FROM sites LIMIT 5;
 
 ```markdown
 **Environment:**
+
 - OS: [Windows 11/macOS 14/Ubuntu 22.04]
 - Node.js: [version]
 - Electron: [version]
 - App version: [version]
 
 **Steps to Reproduce:**
+
 1. Step one
 2. Step two
 3. Error occurs

@@ -48,7 +48,7 @@ Header
 ├── Status Summary Section
 │   ├── Overall Health Badge
 │   ├── Up Monitors Count
-│   ├── Down Monitors Count  
+│   ├── Down Monitors Count
 │   ├── Pending Monitors Count
 │   └── Total Monitors Count
 └── Controls Section
@@ -73,25 +73,23 @@ The Header performs real-time calculations across all sites and monitors:
 ```typescript
 // Count monitors by status across all sites
 let upMonitors = 0;
-let downMonitors = 0; 
+let downMonitors = 0;
 let pendingMonitors = 0;
 let totalMonitors = 0;
 
 for (const site of sites) {
-    if (site.monitors) {
-        for (const monitor of site.monitors) {
-            totalMonitors++;
-            if (monitor.status === "up") upMonitors++;
-            else if (monitor.status === "down") downMonitors++;
-            else if (monitor.status === "pending") pendingMonitors++;
-        }
-    }
+ if (site.monitors) {
+  for (const monitor of site.monitors) {
+   totalMonitors++;
+   if (monitor.status === "up") upMonitors++;
+   else if (monitor.status === "down") downMonitors++;
+   else if (monitor.status === "pending") pendingMonitors++;
+  }
+ }
 }
 
 // Calculate overall uptime percentage
-const uptimePercentage = totalMonitors > 0 
-    ? Math.round((upMonitors / totalMonitors) * 100) 
-    : 0;
+const uptimePercentage = totalMonitors > 0 ? Math.round((upMonitors / totalMonitors) * 100) : 0;
 ```
 
 ---
@@ -152,9 +150,7 @@ const { getAvailabilityColor } = useAvailabilityColors();
 const { isDark, toggleTheme } = useTheme();
 
 // Header provides UI for theme switching
-<ThemedButton onClick={toggleTheme}>
-    {isDark ? "☀️" : "🌙"}
-</ThemedButton>
+<ThemedButton onClick={toggleTheme}>{isDark ? "☀️" : "🌙"}</ThemedButton>;
 ```
 
 ---
@@ -182,7 +178,7 @@ const { isDark, toggleTheme } = useTheme();
 
 - `.header-container`: Main container styling
 - `.header-title-box`: App title styling container with hover effects
-- `.header-title-accent`: Title text styling  
+- `.header-title-accent`: Title text styling
 - `.header-status-summary-box`: Status summary container
 - `.health-badge`: Overall health indicator with hover animations
 - `.health-dot`: Animated pulsing status dot
@@ -235,6 +231,6 @@ const { isDark, toggleTheme } = useTheme();
 ### Accessibility
 
 - **ARIA Labels**: Includes `aria-label` attributes on toggle and settings buttons
-- **Focus Management**: Comprehensive focus-visible states with clear visual indicators  
+- **Focus Management**: Comprehensive focus-visible states with clear visual indicators
 - **Reduced Motion**: CSS `prefers-reduced-motion` support to disable animations
 - **Semantic Structure**: Uses proper ThemedText components for consistent typography hierarchy

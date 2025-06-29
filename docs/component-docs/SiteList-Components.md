@@ -29,9 +29,9 @@ The SiteList component takes no props and manages its own data through store int
 
 ```typescript
 export function SiteList() {
-    const { sites } = useStore();
-    const { isDark } = useTheme();
-    // Implementation...
+ const { sites } = useStore();
+ const { isDark } = useTheme();
+ // Implementation...
 }
 ```
 
@@ -84,7 +84,7 @@ The EmptyState component takes no props and is self-contained:
 
 ```typescript
 export function EmptyState() {
-    // Simple implementation with themed components
+ // Simple implementation with themed components
 }
 ```
 
@@ -143,7 +143,7 @@ The SiteList is integrated into the main application layout in `App.tsx`:
                 </div>
             </ThemedBox>
         </div>
-        
+
         {/* Sidebar with AddSiteForm */}
         <div>
             <AddSiteForm />
@@ -222,11 +222,11 @@ The component relies on CSS classes for layout and theming:
 ```css
 /* Theme-aware divider styling */
 .divider-y {
-    /* Divider styling between cards */
+ /* Divider styling between cards */
 }
 
 .divider-y.dark {
-    /* Dark mode divider colors */
+ /* Dark mode divider colors */
 }
 ```
 
@@ -234,7 +234,7 @@ The component relies on CSS classes for layout and theming:
 
 ```css
 .empty-state-icon {
-    /* Custom icon styling for emoji display */
+ /* Custom icon styling for emoji display */
 }
 ```
 

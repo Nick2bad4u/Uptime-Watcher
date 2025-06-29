@@ -1,11 +1,13 @@
 ---
-mode: 'agent'
-tools: ['All Tools']
-description: 'Create custom hook with Zustand integration'
+mode: "agent"
+tools: ["All Tools"]
+description: "Create custom hook with Zustand integration"
 ---
+
 Generate use${input:hookName} hook:
 
 Requirements:
+
 - Uses Zustand store: `use${input:storeName}Store`
 - Memoizes derived state with `useMemo`
 - Handles async operations via `useEffect`
@@ -15,16 +17,18 @@ Requirements:
 - Storybook interaction test
 
 Pattern:
+
 ```typescript
 export function useCustomHook() {
-  const { data, fetch } = useStore();
-  const [loading, setLoading] = useState(false);
+ const { data, fetch } = useStore();
+ const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const controller = new AbortController();
-    fetch(controller.signal);
-    return () => controller.abort();
-  }, [fetch]);
+ useEffect(() => {
+  const controller = new AbortController();
+  fetch(controller.signal);
+  return () => controller.abort();
+ }, [fetch]);
 
-  return { data, loading };
+ return { data, loading };
 }
+```
