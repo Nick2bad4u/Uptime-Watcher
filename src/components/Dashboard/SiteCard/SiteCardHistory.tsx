@@ -19,6 +19,30 @@ interface SiteCardHistoryProps {
 }
 
 /**
+ * Formats the suffix for HTTP monitor titles.
+ * @param monitor - The monitor object
+ * @returns Formatted suffix string or empty string
+ */
+function getHttpSuffix(monitor: Monitor): string {
+    return monitor.url ? ` (${monitor.url})` : "";
+}
+
+/**
+ * Formats the suffix for port monitor titles.
+ * @param monitor - The monitor object
+ * @returns Formatted suffix string or empty string
+ */
+function getPortSuffix(monitor: Monitor): string {
+    if (monitor.port) {
+        return ` (${monitor.host}:${monitor.port})`;
+    }
+    if (monitor.host) {
+        return ` (${monitor.host})`;
+    }
+    return "";
+}
+
+/**
  * History visualization component for site cards displaying monitor status over time.
  *
  * Features:
@@ -51,11 +75,9 @@ export const SiteCardHistory = React.memo(
 
             switch (monitor.type) {
                 case "http":
-                    return `HTTP History${monitor.url ? ` (${monitor.url})` : ""}`;
+                    return "HTTP History" + getHttpSuffix(monitor);
                 case "port":
-                    return `Port History${
-                        monitor.port ? ` (${monitor.host}:${monitor.port})` : monitor.host ? ` (${monitor.host})` : ""
-                    }`;
+                    return "Port History" + getPortSuffix(monitor);
                 default:
                     return `${monitor.type} History`;
             }
