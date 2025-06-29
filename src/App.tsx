@@ -16,7 +16,6 @@ import logger from "./services/logger";
 import { useStore } from "./store";
 import { ThemeProvider, ThemedBox, ThemedText, ThemedButton } from "./theme/components";
 import { useTheme } from "./theme/useTheme";
-import { StatusUpdate } from "./types";
 
 /**
  * Main application component that serves as the root of the Uptime Watcher app.
@@ -91,14 +90,9 @@ function App() {
 
         // Subscribe to status updates with optimized incremental updates
         // The store's subscribeToStatusUpdates now handles smart incremental updates automatically
-        // No need to manually sync - the store updates efficiently using the status update payload
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const handleStatusUpdate = (_update: StatusUpdate) => {
-            // Optional: Add any app-level status update handling here
+        subscribeToStatusUpdates(() => {
             // The store has already been updated with the new site data
-        };
-
-        subscribeToStatusUpdates(handleStatusUpdate);
+        });
 
         // Cleanup
         return () => {

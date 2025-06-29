@@ -94,7 +94,7 @@ declare global {
                 onStatusUpdate: (callback: (update: StatusUpdate) => void) => void;
                 removeAllListeners: (event: string) => void;
             };
-            
+
             monitoring: {
                 startMonitoring: () => Promise<void>;
                 stopMonitoring: () => Promise<void>;
