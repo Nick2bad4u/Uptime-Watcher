@@ -39,6 +39,7 @@ npm run test:ui
 ### Coverage Reports
 
 Coverage reports are generated in the `./coverage` directory:
+
 - `lcov.info` - For Codecov integration
 - `coverage-final.json` - JSON coverage data
 - `lcov-report/` - HTML coverage report
@@ -46,10 +47,12 @@ Coverage reports are generated in the `./coverage` directory:
 ### GitHub Actions
 
 The workflow runs on:
+
 - Push to main/master branches
 - Pull requests to main/master branches
 
 The workflow:
+
 1. Installs dependencies
 2. Runs tests with coverage
 3. Uploads coverage to Codecov
@@ -63,6 +66,7 @@ The workflow:
 ### Next Steps
 
 To improve coverage, add more test files for:
+
 - React components
 - Custom hooks
 - Store/state management
