@@ -34,10 +34,10 @@ Uptime Watcher is designed to be lightweight and efficient, but monitoring many 
 ```typescript
 // Recommended intervals by use case
 const intervals = {
-  critical: "1 minute",     // Payment systems, core APIs
-  important: "5 minutes",   // Main websites, services
-  monitoring: "15 minutes", // Status pages, dashboards
-  development: "30 minutes" // Dev/staging environments
+ critical: "1 minute", // Payment systems, core APIs
+ important: "5 minutes", // Main websites, services
+ monitoring: "15 minutes", // Status pages, dashboards
+ development: "30 minutes", // Dev/staging environments
 };
 ```
 
@@ -46,18 +46,18 @@ const intervals = {
 ```typescript
 // Group sites by priority and adjust intervals accordingly
 const siteGroups = {
-  production: {
-    interval: "2 minutes",
-    sites: ["api.example.com", "app.example.com"]
-  },
-  staging: {
-    interval: "10 minutes", 
-    sites: ["staging.example.com", "test.example.com"]
-  },
-  monitoring: {
-    interval: "30 minutes",
-    sites: ["status.example.com", "docs.example.com"]
-  }
+ production: {
+  interval: "2 minutes",
+  sites: ["api.example.com", "app.example.com"],
+ },
+ staging: {
+  interval: "10 minutes",
+  sites: ["staging.example.com", "test.example.com"],
+ },
+ monitoring: {
+  interval: "30 minutes",
+  sites: ["status.example.com", "docs.example.com"],
+ },
 };
 ```
 
@@ -84,13 +84,13 @@ const siteGroups = {
 ```typescript
 // Example: Optimized site checking
 interface SiteCheckOptions {
-  timeout: number;        // 10-30 seconds recommended
-  userAgent: string;      // Consistent user agent
+ timeout: number; // 10-30 seconds recommended
+ userAgent: string; // Consistent user agent
 }
 
 const optimizedOptions: SiteCheckOptions = {
-  timeout: 15000,         // 15 second timeout
-  userAgent: 'Uptime-Watcher/1.0'
+ timeout: 15000, // 15 second timeout
+ userAgent: "Uptime-Watcher/1.0",
 };
 ```
 
@@ -99,10 +99,10 @@ const optimizedOptions: SiteCheckOptions = {
 ```typescript
 // Limit concurrent requests to prevent overwhelming
 const performanceConfig = {
-  maxConcurrentChecks: 10,     // Max simultaneous requests
-  requestDelay: 100,           // Delay between requests (ms)
-  retryDelay: 5000,           // Delay before retry (ms)
-  maxRetries: 2               // Maximum retry attempts
+ maxConcurrentChecks: 10, // Max simultaneous requests
+ requestDelay: 100, // Delay between requests (ms)
+ retryDelay: 5000, // Delay before retry (ms)
+ maxRetries: 2, // Maximum retry attempts
 };
 ```
 
@@ -112,14 +112,14 @@ const performanceConfig = {
 
 ```sql
 -- Example: Automatic data cleanup
-DELETE FROM response_times 
+DELETE FROM response_times
 WHERE timestamp < datetime('now', '-30 days');
 
-DELETE FROM status_changes 
+DELETE FROM status_changes
 WHERE timestamp < datetime('now', '-90 days');
 
 -- Keep only essential historical data
-DELETE FROM detailed_logs 
+DELETE FROM detailed_logs
 WHERE timestamp < datetime('now', '-7 days');
 ```
 
@@ -127,10 +127,10 @@ WHERE timestamp < datetime('now', '-7 days');
 
 ```sql
 -- Ensure proper indexes for performance
-CREATE INDEX IF NOT EXISTS idx_response_times_site_timestamp 
+CREATE INDEX IF NOT EXISTS idx_response_times_site_timestamp
 ON response_times(site_id, timestamp);
 
-CREATE INDEX IF NOT EXISTS idx_status_changes_site_timestamp 
+CREATE INDEX IF NOT EXISTS idx_status_changes_site_timestamp
 ON status_changes(site_id, timestamp);
 ```
 
@@ -142,20 +142,20 @@ For minimal resource usage:
 
 ```json
 {
-  "monitoring": {
-    "defaultInterval": "15 minutes",
-    "maxConcurrentChecks": 5,
-    "timeout": 10000
-  },
-  "data": {
-    "retentionDays": 14,
-    "maxResponseTimeEntries": 1000
-  },
-  "ui": {
-    "updateFrequency": "30 seconds",
-    "chartAnimations": false,
-    "autoRefresh": false
-  }
+ "monitoring": {
+  "defaultInterval": "15 minutes",
+  "maxConcurrentChecks": 5,
+  "timeout": 10000
+ },
+ "data": {
+  "retentionDays": 14,
+  "maxResponseTimeEntries": 1000
+ },
+ "ui": {
+  "updateFrequency": "30 seconds",
+  "chartAnimations": false,
+  "autoRefresh": false
+ }
 }
 ```
 
@@ -165,20 +165,20 @@ For general use:
 
 ```json
 {
-  "monitoring": {
-    "defaultInterval": "5 minutes",
-    "maxConcurrentChecks": 10,
-    "timeout": 15000
-  },
-  "data": {
-    "retentionDays": 30,
-    "maxResponseTimeEntries": 5000
-  },
-  "ui": {
-    "updateFrequency": "10 seconds",
-    "chartAnimations": true,
-    "autoRefresh": true
-  }
+ "monitoring": {
+  "defaultInterval": "5 minutes",
+  "maxConcurrentChecks": 10,
+  "timeout": 15000
+ },
+ "data": {
+  "retentionDays": 30,
+  "maxResponseTimeEntries": 5000
+ },
+ "ui": {
+  "updateFrequency": "10 seconds",
+  "chartAnimations": true,
+  "autoRefresh": true
+ }
 }
 ```
 
@@ -188,23 +188,23 @@ For monitoring many sites:
 
 ```json
 {
-  "monitoring": {
-    "defaultInterval": "2 minutes",
-    "maxConcurrentChecks": 20,
-    "timeout": 20000,
-    "staggeredChecks": true
-  },
-  "data": {
-    "retentionDays": 60,
-    "maxResponseTimeEntries": 10000,
-    "compressionEnabled": true
-  },
-  "ui": {
-    "updateFrequency": "5 seconds",
-    "chartAnimations": true,
-    "autoRefresh": true,
-    "virtualScrolling": true
-  }
+ "monitoring": {
+  "defaultInterval": "2 minutes",
+  "maxConcurrentChecks": 20,
+  "timeout": 20000,
+  "staggeredChecks": true
+ },
+ "data": {
+  "retentionDays": 60,
+  "maxResponseTimeEntries": 10000,
+  "compressionEnabled": true
+ },
+ "ui": {
+  "updateFrequency": "5 seconds",
+  "chartAnimations": true,
+  "autoRefresh": true,
+  "virtualScrolling": true
+ }
 }
 ```
 
@@ -216,20 +216,20 @@ Monitor these performance indicators:
 
 ```typescript
 interface PerformanceMetrics {
-  // System metrics
-  memoryUsage: number;        // MB
-  cpuUsage: number;          // Percentage
-  responseTime: number;       // Average response time
-  
-  // Application metrics
-  activeSites: number;        // Currently monitored
-  checksPerMinute: number;    // Request frequency
-  errorRate: number;         // Failed checks percentage
-  
-  // Database metrics
-  databaseSize: number;       // MB
-  queryTime: number;         // Average query time
-  recordCount: number;       // Total records
+ // System metrics
+ memoryUsage: number; // MB
+ cpuUsage: number; // Percentage
+ responseTime: number; // Average response time
+
+ // Application metrics
+ activeSites: number; // Currently monitored
+ checksPerMinute: number; // Request frequency
+ errorRate: number; // Failed checks percentage
+
+ // Database metrics
+ databaseSize: number; // MB
+ queryTime: number; // Average query time
+ recordCount: number; // Total records
 }
 ```
 
@@ -239,11 +239,11 @@ Set up alerts for performance issues:
 
 ```typescript
 const performanceThresholds = {
-  memoryUsage: 500,          // MB - Alert if over 500MB
-  cpuUsage: 80,             // % - Alert if over 80%
-  avgResponseTime: 10000,    // ms - Alert if over 10s
-  errorRate: 20,            // % - Alert if over 20% errors
-  databaseSize: 1000        // MB - Alert if over 1GB
+ memoryUsage: 500, // MB - Alert if over 500MB
+ cpuUsage: 80, // % - Alert if over 80%
+ avgResponseTime: 10000, // ms - Alert if over 10s
+ errorRate: 20, // % - Alert if over 20% errors
+ databaseSize: 1000, // MB - Alert if over 1GB
 };
 ```
 
@@ -366,17 +366,17 @@ const performanceThresholds = {
 ```typescript
 // Adjust intervals based on site reliability
 class AdaptiveMonitoring {
-  calculateInterval(site: Site): number {
-    const reliability = site.uptimePercentage;
-    
-    if (reliability > 99.9) {
-      return 15 * 60; // 15 minutes for very reliable sites
-    } else if (reliability > 99.0) {
-      return 5 * 60;  // 5 minutes for reliable sites
-    } else {
-      return 2 * 60;  // 2 minutes for unreliable sites
-    }
+ calculateInterval(site: Site): number {
+  const reliability = site.uptimePercentage;
+
+  if (reliability > 99.9) {
+   return 15 * 60; // 15 minutes for very reliable sites
+  } else if (reliability > 99.0) {
+   return 5 * 60; // 5 minutes for reliable sites
+  } else {
+   return 2 * 60; // 2 minutes for unreliable sites
   }
+ }
 }
 ```
 
@@ -385,14 +385,14 @@ class AdaptiveMonitoring {
 ```typescript
 // Distribute checks across time to avoid spikes
 class LoadDistribution {
-  staggerChecks(sites: Site[]): Site[] {
-    const delayPerSite = 1000; // 1 second between sites
-    
-    return sites.map((site, index) => ({
-      ...site,
-      nextCheck: Date.now() + (index * delayPerSite)
-    }));
-  }
+ staggerChecks(sites: Site[]): Site[] {
+  const delayPerSite = 1000; // 1 second between sites
+
+  return sites.map((site, index) => ({
+   ...site,
+   nextCheck: Date.now() + index * delayPerSite,
+  }));
+ }
 }
 ```
 
@@ -401,15 +401,15 @@ class LoadDistribution {
 ```typescript
 // Cache responses to reduce redundant requests
 interface CacheConfig {
-  ttl: number;              // Time to live (seconds)
-  maxSize: number;          // Maximum cache entries
-  strategy: 'lru' | 'fifo'; // Eviction strategy
+ ttl: number; // Time to live (seconds)
+ maxSize: number; // Maximum cache entries
+ strategy: "lru" | "fifo"; // Eviction strategy
 }
 
 const cacheConfig: CacheConfig = {
-  ttl: 300,        // 5 minutes
-  maxSize: 1000,   // 1000 entries
-  strategy: 'lru'  // Least recently used
+ ttl: 300, // 5 minutes
+ maxSize: 1000, // 1000 entries
+ strategy: "lru", // Least recently used
 };
 ```
 
@@ -418,7 +418,7 @@ const cacheConfig: CacheConfig = {
 ### Typical Performance Characteristics
 
 | Sites | Interval | Memory | CPU | Network |
-|-------|----------|--------|-----|---------|
+| ----- | -------- | ------ | --- | ------- |
 | 10    | 5 min    | 150MB  | 2%  | Low     |
 | 50    | 5 min    | 250MB  | 5%  | Medium  |
 | 100   | 5 min    | 400MB  | 10% | Medium  |
@@ -430,26 +430,30 @@ const cacheConfig: CacheConfig = {
 ```typescript
 // Recommended configurations by scale
 const scalingGuide = {
-  small: {        // 1-25 sites
-    interval: "5 minutes",
-    concurrent: 5,
-    retention: "30 days"
-  },
-  medium: {       // 25-100 sites
-    interval: "10 minutes", 
-    concurrent: 10,
-    retention: "30 days"
-  },
-  large: {        // 100-500 sites
-    interval: "15 minutes",
-    concurrent: 20,
-    retention: "14 days"
-  },
-  enterprise: {   // 500+ sites
-    interval: "30 minutes",
-    concurrent: 50,
-    retention: "7 days"
-  }
+ small: {
+  // 1-25 sites
+  interval: "5 minutes",
+  concurrent: 5,
+  retention: "30 days",
+ },
+ medium: {
+  // 25-100 sites
+  interval: "10 minutes",
+  concurrent: 10,
+  retention: "30 days",
+ },
+ large: {
+  // 100-500 sites
+  interval: "15 minutes",
+  concurrent: 20,
+  retention: "14 days",
+ },
+ enterprise: {
+  // 500+ sites
+  interval: "30 minutes",
+  concurrent: 50,
+  retention: "7 days",
+ },
 };
 ```
 

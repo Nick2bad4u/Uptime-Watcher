@@ -73,15 +73,15 @@ The main SiteCard acts as a container that:
 
 ```typescript
 interface SiteCardHeaderProps {
-    site: Site;
-    selectedMonitorId: string;
-    onMonitorIdChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-    onCheckNow: () => void;
-    onStartMonitoring: () => void;
-    onStopMonitoring: () => void;
-    isLoading: boolean;
-    isMonitoring: boolean;
-    hasMonitor: boolean;
+ site: Site;
+ selectedMonitorId: string;
+ onMonitorIdChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+ onCheckNow: () => void;
+ onStartMonitoring: () => void;
+ onStopMonitoring: () => void;
+ isLoading: boolean;
+ isMonitoring: boolean;
+ hasMonitor: boolean;
 }
 ```
 
@@ -323,18 +323,18 @@ Key CSS classes used throughout the SiteCard system:
 
 ```typescript
 // Example test structure
-describe('SiteCard', () => {
-    test('renders site information correctly', () => {
-        // Test basic rendering
-    });
-    
-    test('handles monitor selection', () => {
-        // Test MonitorSelector integration
-    });
-    
-    test('manages loading states', () => {
-        // Test ActionButtonGroup loading states
-    });
+describe("SiteCard", () => {
+ test("renders site information correctly", () => {
+  // Test basic rendering
+ });
+
+ test("handles monitor selection", () => {
+  // Test MonitorSelector integration
+ });
+
+ test("manages loading states", () => {
+  // Test ActionButtonGroup loading states
+ });
 });
 ```
 

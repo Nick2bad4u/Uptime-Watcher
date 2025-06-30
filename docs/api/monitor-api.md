@@ -46,7 +46,7 @@ The monitoring system is built around several key components:
 
 ```typescript
 class UptimeMonitor extends EventEmitter {
-    constructor()
+ constructor();
 }
 ```
 
@@ -62,11 +62,11 @@ Creates a new UptimeMonitor instance with initialized repositories and services.
 
 ### Properties
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `sites` | `Map<string, Site>` | Cache of all sites (private) |
-| `historyLimit` | `number` | Maximum history records per monitor |
-| `isMonitoring` | `boolean` | Global monitoring state |
+| Property       | Type                | Description                         |
+| -------------- | ------------------- | ----------------------------------- |
+| `sites`        | `Map<string, Site>` | Cache of all sites (private)        |
+| `historyLimit` | `number`            | Maximum history records per monitor |
+| `isMonitoring` | `boolean`           | Global monitoring state             |
 
 ### Core Methods
 
@@ -87,15 +87,17 @@ Adds a new site with its monitors to the system.
 
 ```typescript
 const newSite = await uptimeMonitor.addSite({
-    identifier: crypto.randomUUID(),
-    name: "My Website",
-    monitors: [{
-        id: crypto.randomUUID(),
-        type: "http",
-        url: "https://example.com",
-        status: "pending",
-        history: []
-    }]
+ identifier: crypto.randomUUID(),
+ name: "My Website",
+ monitors: [
+  {
+   id: crypto.randomUUID(),
+   type: "http",
+   url: "https://example.com",
+   status: "pending",
+   history: [],
+  },
+ ],
 });
 ```
 
@@ -133,7 +135,7 @@ Updates site properties.
 
 ```typescript
 await uptimeMonitor.updateSite("site-123", {
-    name: "Updated Site Name"
+ name: "Updated Site Name",
 });
 ```
 
@@ -250,12 +252,12 @@ const factory = new MonitorFactory();
 
 // Get HTTP monitor
 const httpChecker = MonitorFactory.getMonitor("http", {
-    timeout: 10000
+ timeout: 10000,
 });
 
-// Get Port monitor  
+// Get Port monitor
 const portChecker = MonitorFactory.getMonitor("port", {
-    timeout: 5000
+ timeout: 5000,
 });
 ```
 
@@ -268,7 +270,7 @@ const scheduler = new MonitorScheduler();
 
 // Set callback for scheduled checks
 scheduler.setCheckCallback(async (siteId, monitorId) => {
-    await performCheck(siteId, monitorId);
+ await performCheck(siteId, monitorId);
 });
 
 // Schedule a monitor
@@ -286,8 +288,8 @@ Monitors HTTP/HTTPS endpoints.
 
 ```typescript
 interface HttpMonitorConfig {
-    url: string;
-    timeout?: number;
+ url: string;
+ timeout?: number;
 }
 ```
 
@@ -304,9 +306,9 @@ Monitors TCP port connectivity.
 
 ```typescript
 interface PortMonitorConfig {
-    host: string;
-    port: number;
-    timeout?: number;
+ host: string;
+ port: number;
+ timeout?: number;
 }
 ```
 
@@ -328,11 +330,11 @@ The UptimeMonitor extends EventEmitter and provides real-time updates.
 Emitted when a monitor status changes.
 
 ```typescript
-uptimeMonitor.on('status-update', (data: StatusUpdate) => {
-    console.log(`Monitor ${data.site.identifier} status: ${data.site.monitors[0].status}`);
-    
-    // Send to renderer process
-    mainWindow.webContents.send('status-update', data);
+uptimeMonitor.on("status-update", (data: StatusUpdate) => {
+ console.log(`Monitor ${data.site.identifier} status: ${data.site.monitors[0].status}`);
+
+ // Send to renderer process
+ mainWindow.webContents.send("status-update", data);
 });
 ```
 
@@ -343,16 +345,12 @@ uptimeMonitor.on('status-update', (data: StatusUpdate) => {
 Emitted when a monitor goes down.
 
 ```typescript
-uptimeMonitor.on('site-monitor-down', (data: {
-    site: Site;
-    monitor: Monitor;
-    timestamp: number;
-}) => {
-    // Show notification
-    showNotification(`${data.site.name} is down`);
-    
-    // Log incident
-    logger.warn('Monitor down', { siteId: data.site.identifier, monitorId: data.monitor.id });
+uptimeMonitor.on("site-monitor-down", (data: { site: Site; monitor: Monitor; timestamp: number }) => {
+ // Show notification
+ showNotification(`${data.site.name} is down`);
+
+ // Log incident
+ logger.warn("Monitor down", { siteId: data.site.identifier, monitorId: data.monitor.id });
 });
 ```
 
@@ -361,16 +359,12 @@ uptimeMonitor.on('site-monitor-down', (data: {
 Emitted when a monitor comes back up.
 
 ```typescript
-uptimeMonitor.on('site-monitor-up', (data: {
-    site: Site;
-    monitor: Monitor;
-    downtime: number;
-}) => {
-    // Show recovery notification
-    showNotification(`${data.site.name} is back up (downtime: ${data.downtime}ms)`);
-    
-    // Log recovery
-    logger.info('Monitor recovered', { siteId: data.site.identifier, downtime: data.downtime });
+uptimeMonitor.on("site-monitor-up", (data: { site: Site; monitor: Monitor; downtime: number }) => {
+ // Show recovery notification
+ showNotification(`${data.site.name} is back up (downtime: ${data.downtime}ms)`);
+
+ // Log recovery
+ logger.info("Monitor recovered", { siteId: data.site.identifier, downtime: data.downtime });
 });
 ```
 
@@ -379,14 +373,11 @@ uptimeMonitor.on('site-monitor-up', (data: {
 Emitted when database operations fail.
 
 ```typescript
-uptimeMonitor.on('db-error', (data: {
-    error: Error;
-    operation: string;
-}) => {
-    logger.error(`Database error in ${data.operation}`, data.error);
-    
-    // Show error to user
-    showErrorDialog(`Database error: ${data.error.message}`);
+uptimeMonitor.on("db-error", (data: { error: Error; operation: string }) => {
+ logger.error(`Database error in ${data.operation}`, data.error);
+
+ // Show error to user
+ showErrorDialog(`Database error: ${data.error.message}`);
 });
 ```
 
@@ -409,9 +400,9 @@ uptimeMonitor.on('db-error', (data: {
 ```typescript
 // Status determination logic
 if (response.status >= 200 && response.status < 400) {
-    status = "up";
+ status = "up";
 } else {
-    status = "down";
+ status = "down";
 }
 ```
 
@@ -433,18 +424,18 @@ if (response.status >= 200 && response.status < 400) {
 ```typescript
 // Port connection test
 try {
-    const socket = new net.Socket();
-    socket.setTimeout(timeout);
-    
-    const connected = await new Promise((resolve) => {
-        socket.connect(port, host, () => resolve(true));
-        socket.on('error', () => resolve(false));
-        socket.on('timeout', () => resolve(false));
-    });
-    
-    status = connected ? "up" : "down";
+ const socket = new net.Socket();
+ socket.setTimeout(timeout);
+
+ const connected = await new Promise((resolve) => {
+  socket.connect(port, host, () => resolve(true));
+  socket.on("error", () => resolve(false));
+  socket.on("timeout", () => resolve(false));
+ });
+
+ status = connected ? "up" : "down";
 } catch (error) {
-    status = "down";
+ status = "down";
 }
 ```
 
@@ -474,7 +465,7 @@ await siteRepository.findById(identifier);
 await siteRepository.update(identifier, updates);
 await siteRepository.delete(identifier);
 
-// Monitor operations  
+// Monitor operations
 const monitorRepository = new MonitorRepository();
 await monitorRepository.create(monitor);
 await monitorRepository.findBySiteIdentifier(siteId);
@@ -537,26 +528,26 @@ CREATE TABLE history (
 
 ```typescript
 class MonitorError extends Error {
-    constructor(
-        message: string,
-        public code: string,
-        public monitorId?: string,
-        public siteId?: string
-    ) {
-        super(message);
-        this.name = 'MonitorError';
-    }
+ constructor(
+  message: string,
+  public code: string,
+  public monitorId?: string,
+  public siteId?: string
+ ) {
+  super(message);
+  this.name = "MonitorError";
+ }
 }
 
 class DatabaseError extends Error {
-    constructor(
-        message: string,
-        public operation: string,
-        public originalError?: Error
-    ) {
-        super(message);
-        this.name = 'DatabaseError';
-    }
+ constructor(
+  message: string,
+  public operation: string,
+  public originalError?: Error
+ ) {
+  super(message);
+  this.name = "DatabaseError";
+ }
 }
 ```
 
@@ -564,27 +555,19 @@ class DatabaseError extends Error {
 
 ```typescript
 // Retry logic for database operations
-async function withDbRetry<T>(
-    operation: () => Promise<T>,
-    operationName: string,
-    maxRetries = 3
-): Promise<T> {
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        try {
-            return await operation();
-        } catch (error) {
-            if (attempt === maxRetries) {
-                throw new DatabaseError(
-                    `Failed after ${maxRetries} attempts: ${operationName}`,
-                    operationName,
-                    error
-                );
-            }
-            
-            const delay = Math.pow(2, attempt) * 1000;
-            await new Promise(resolve => setTimeout(resolve, delay));
-        }
-    }
+async function withDbRetry<T>(operation: () => Promise<T>, operationName: string, maxRetries = 3): Promise<T> {
+ for (let attempt = 1; attempt <= maxRetries; attempt++) {
+  try {
+   return await operation();
+  } catch (error) {
+   if (attempt === maxRetries) {
+    throw new DatabaseError(`Failed after ${maxRetries} attempts: ${operationName}`, operationName, error);
+   }
+
+   const delay = Math.pow(2, attempt) * 1000;
+   await new Promise((resolve) => setTimeout(resolve, delay));
+  }
+ }
 }
 ```
 
@@ -593,52 +576,52 @@ async function withDbRetry<T>(
 ### Complete Monitoring Setup
 
 ```typescript
-import { UptimeMonitor } from './uptimeMonitor';
+import { UptimeMonitor } from "./uptimeMonitor";
 
 // Initialize monitor
 const uptimeMonitor = new UptimeMonitor();
 
 // Set up event handlers
-uptimeMonitor.on('status-update', (update) => {
-    // Send to frontend
-    mainWindow.webContents.send('status-update', update);
+uptimeMonitor.on("status-update", (update) => {
+ // Send to frontend
+ mainWindow.webContents.send("status-update", update);
 });
 
-uptimeMonitor.on('site-monitor-down', (data) => {
-    // Show system notification
-    new Notification(`${data.site.name} is down`, {
-        body: `Monitor ${data.monitor.id} failed`,
-        icon: path.join(__dirname, 'assets', 'icon-error.png')
-    });
+uptimeMonitor.on("site-monitor-down", (data) => {
+ // Show system notification
+ new Notification(`${data.site.name} is down`, {
+  body: `Monitor ${data.monitor.id} failed`,
+  icon: path.join(__dirname, "assets", "icon-error.png"),
+ });
 });
 
-uptimeMonitor.on('db-error', (data) => {
-    logger.error('Database error', data.error);
+uptimeMonitor.on("db-error", (data) => {
+ logger.error("Database error", data.error);
 });
 
 // Add a site with multiple monitors
 await uptimeMonitor.addSite({
-    identifier: crypto.randomUUID(),
-    name: "My Service",
-    monitors: [
-        {
-            id: crypto.randomUUID(),
-            type: "http",
-            url: "https://api.myservice.com/health",
-            status: "pending",
-            history: [],
-            checkInterval: 60000 // 1 minute
-        },
-        {
-            id: crypto.randomUUID(),
-            type: "port",
-            host: "database.myservice.com",
-            port: 5432,
-            status: "pending", 
-            history: [],
-            checkInterval: 30000 // 30 seconds
-        }
-    ]
+ identifier: crypto.randomUUID(),
+ name: "My Service",
+ monitors: [
+  {
+   id: crypto.randomUUID(),
+   type: "http",
+   url: "https://api.myservice.com/health",
+   status: "pending",
+   history: [],
+   checkInterval: 60000, // 1 minute
+  },
+  {
+   id: crypto.randomUUID(),
+   type: "port",
+   host: "database.myservice.com",
+   port: 5432,
+   status: "pending",
+   history: [],
+   checkInterval: 30000, // 30 seconds
+  },
+ ],
 });
 
 // Start monitoring
@@ -650,35 +633,35 @@ uptimeMonitor.startMonitoring();
 ```typescript
 // Custom monitor for GraphQL endpoints
 class GraphQLMonitor {
-    async check(config: { url: string; query: string; timeout: number }) {
-        const startTime = Date.now();
-        
-        try {
-            const response = await fetch(config.url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ query: config.query }),
-                signal: AbortSignal.timeout(config.timeout)
-            });
-            
-            const responseTime = Date.now() - startTime;
-            const data = await response.json();
-            
-            // Check for GraphQL errors
-            const status = (!data.errors && response.ok) ? "up" : "down";
-            
-            return { status, responseTime };
-        } catch (error) {
-            return { 
-                status: "down" as const, 
-                responseTime: Date.now() - startTime 
-            };
-        }
-    }
+ async check(config: { url: string; query: string; timeout: number }) {
+  const startTime = Date.now();
+
+  try {
+   const response = await fetch(config.url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ query: config.query }),
+    signal: AbortSignal.timeout(config.timeout),
+   });
+
+   const responseTime = Date.now() - startTime;
+   const data = await response.json();
+
+   // Check for GraphQL errors
+   const status = !data.errors && response.ok ? "up" : "down";
+
+   return { status, responseTime };
+  } catch (error) {
+   return {
+    status: "down" as const,
+    responseTime: Date.now() - startTime,
+   };
+  }
+ }
 }
 
 // Register custom monitor type
-MonitorFactory.registerMonitorType('graphql', GraphQLMonitor);
+MonitorFactory.registerMonitorType("graphql", GraphQLMonitor);
 ```
 
 ## Best Practices
@@ -687,12 +670,12 @@ MonitorFactory.registerMonitorType('graphql', GraphQLMonitor);
 
 ```typescript
 // ✅ Good - Reasonable intervals
-const webSiteInterval = 60000;   // 1 minute for websites
-const apiInterval = 30000;       // 30 seconds for APIs  
-const databaseInterval = 15000;  // 15 seconds for critical services
+const webSiteInterval = 60000; // 1 minute for websites
+const apiInterval = 30000; // 30 seconds for APIs
+const databaseInterval = 15000; // 15 seconds for critical services
 
 // ❌ Bad - Too frequent
-const tooFrequent = 1000;        // 1 second - too aggressive
+const tooFrequent = 1000; // 1 second - too aggressive
 ```
 
 ### 2. Error Handling
@@ -700,18 +683,18 @@ const tooFrequent = 1000;        // 1 second - too aggressive
 ```typescript
 // ✅ Good - Comprehensive error handling
 try {
-    await uptimeMonitor.checkSiteManually(siteId, monitorId);
+ await uptimeMonitor.checkSiteManually(siteId, monitorId);
 } catch (error) {
-    if (error instanceof MonitorError) {
-        logger.warn('Monitor check failed', { 
-            siteId: error.siteId, 
-            monitorId: error.monitorId 
-        });
-    } else if (error instanceof DatabaseError) {
-        logger.error('Database error during check', error);
-    } else {
-        logger.error('Unexpected error', error);
-    }
+ if (error instanceof MonitorError) {
+  logger.warn("Monitor check failed", {
+   siteId: error.siteId,
+   monitorId: error.monitorId,
+  });
+ } else if (error instanceof DatabaseError) {
+  logger.error("Database error during check", error);
+ } else {
+  logger.error("Unexpected error", error);
+ }
 }
 ```
 
@@ -719,11 +702,11 @@ try {
 
 ```typescript
 // ✅ Good - Cleanup on shutdown
-process.on('SIGTERM', async () => {
-    logger.info('Shutting down monitor...');
-    uptimeMonitor.stopMonitoring();
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Grace period
-    process.exit(0);
+process.on("SIGTERM", async () => {
+ logger.info("Shutting down monitor...");
+ uptimeMonitor.stopMonitoring();
+ await new Promise((resolve) => setTimeout(resolve, 1000)); // Grace period
+ process.exit(0);
 });
 ```
 
@@ -732,22 +715,22 @@ process.on('SIGTERM', async () => {
 ```typescript
 // ✅ Good - Batch database operations
 const batchUpdateHistory = async (entries: StatusHistory[]) => {
-    await database.transaction(async (tx) => {
-        for (const entry of entries) {
-            await historyRepository.create(entry, tx);
-        }
-    });
+ await database.transaction(async (tx) => {
+  for (const entry of entries) {
+   await historyRepository.create(entry, tx);
+  }
+ });
 };
 
 // ❌ Bad - Individual database calls
 for (const entry of entries) {
-    await historyRepository.create(entry); // Creates many transactions
+ await historyRepository.create(entry); // Creates many transactions
 }
 ```
 
 ## See Also
 
 - [IPC API](ipc-api) - Communication with frontend
-- [Types API](types-api) - Monitor and site type definitions  
+- [Types API](types-api) - Monitor and site type definitions
 - [Store API](store-api) - Frontend state management
 - [Hook APIs](hook-apis) - React hooks for monitor data

@@ -245,6 +245,7 @@ function MyComponent() {
 #### ❌ Incorrect: Direct Styling
 
 {% raw %}
+
 ```typescript
 // DON'T DO THIS - Hardcoded colors and styles
 function MyComponent() {
@@ -257,6 +258,7 @@ function MyComponent() {
   );
 }
 ```
+
 {% endraw %}
 
 ### Available Themed Components

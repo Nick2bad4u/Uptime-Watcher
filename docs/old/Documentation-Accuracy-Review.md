@@ -30,8 +30,8 @@ This document summarizes the systematic review and correction of all documentati
 
 ```typescript
 export const INTERVAL_CONSTRAINTS = {
-    MIN: 5000,    // 5 seconds (not 30 seconds as documented)
-    MAX: 2592000000  // 30 days (not 30 minutes as documented)
+ MIN: 5000, // 5 seconds (not 30 seconds as documented)
+ MAX: 2592000000, // 30 days (not 30 minutes as documented)
 };
 ```
 
@@ -48,7 +48,7 @@ export const INTERVAL_CONSTRAINTS = {
 **Actual Value (from `electron/services/monitoring/HttpMonitor.ts`):**
 
 ```typescript
-userAgent: "Uptime-Watcher/1.0"
+userAgent: "Uptime-Watcher/1.0";
 ```
 
 **Corrected Files:**
@@ -75,9 +75,9 @@ userAgent: "Uptime-Watcher/1.0"
 
 ```typescript
 export interface MonitorConfig {
-    timeout?: number;
-    retries?: number;
-    userAgent?: string;
+ timeout?: number;
+ retries?: number;
+ userAgent?: string;
 }
 ```
 
@@ -131,15 +131,18 @@ export interface MonitorConfig {
 #### 📝 AFFECTED DOCUMENTATION FILES
 
 1. **`docs/guides/FAQ.md`** ✅ **CORRECTED**
+
    - **Line 54:** Removed claim about basic HTTP authentication support
    - **Updated to:** "Authentication support is planned for future releases"
 
 2. **`docs/api/monitor-api.md`** ✅ **CORRECTED**
+
    - **Lines 290-305:** Updated HttpMonitorConfig interface to reflect actual implementation
    - **Removed:** followRedirects, validateCertificate, custom headers claims
    - **Updated features list:** Removed unimplemented features
 
 3. **`docs/guides/Performance-Guide.md`** ✅ **CORRECTED**
+
    - **Lines 85-95:** Updated SiteCheckOptions interface
    - **Removed:** method selection, maxRedirects configuration
    - **Kept only:** timeout and userAgent (actually implemented)
@@ -177,7 +180,7 @@ The `docs/guides/New-Monitor-Types-Implementation-Plan.md` correctly identifies 
 // Minimum interval: 5 seconds (5000ms)
 { label: "5 seconds", value: 5000 }
 
-// Maximum interval: 30 days (2592000000ms)  
+// Maximum interval: 30 days (2592000000ms)
 { label: "30 days", value: 2592000000 }
 
 // Default interval: 1 minute (60000ms)
@@ -187,7 +190,7 @@ export const DEFAULT_CHECK_INTERVAL = 60000;
 **Available Options Verified:**
 
 - 5, 10, 15, 20, 30 seconds
-- 1, 2, 3, 4, 5, 10, 15, 30 minutes  
+- 1, 2, 3, 4, 5, 10, 15, 30 minutes
 - 1, 2, 6, 12 hours
 - 1, 7, 30 days
 
@@ -216,10 +219,10 @@ export const DEFAULT_CHECK_INTERVAL = 60000;
 
 ```typescript
 export const TIMEOUT_CONSTRAINTS = {
-    MIN: 5000,     // 5 seconds
-    MAX: 300000,   // 5 minutes
-    DEFAULT: 30000, // 30 seconds
-    STEP: 1000     // 1 second increments
+ MIN: 5000, // 5 seconds
+ MAX: 300000, // 5 minutes
+ DEFAULT: 30000, // 30 seconds
+ STEP: 1000, // 1 second increments
 };
 ```
 
@@ -237,7 +240,7 @@ export const TIMEOUT_CONSTRAINTS = {
 ### Phase 2: Completed ✅
 
 1. **Fixed All HTTP Monitoring Documentation** - Removed claims about unimplemented features
-2. **Updated Configuration Examples** - All examples now reflect actual capabilities  
+2. **Updated Configuration Examples** - All examples now reflect actual capabilities
 3. **Ensured Cross-File Consistency** - All HTTP monitoring references are now accurate
 4. **Added Implementation Status Indicators** - Clear distinction between current and planned features
 
@@ -311,12 +314,13 @@ export const TIMEOUT_CONSTRAINTS = {
 **Status:** All Phases Complete ✅ - Documentation Accuracy Fully Restored
 
 ```typescript
-userAgent: "Uptime-Watcher/1.0"
+userAgent: "Uptime-Watcher/1.0";
 ```
 
 **Files Corrected:**
 
 1. **`docs/guides/Security-Guide.md`**
+
    - ❌ **Before:** `userAgent: 'UptimeWatcher'`
    - ✅ **After:** `userAgent: 'Uptime-Watcher/1.0'`
 
@@ -371,7 +375,7 @@ HISTORY_LIMIT_OPTIONS: 25 to Number.MAX_SAFE_INTEGER ✅
 // HttpMonitor default config ✅
 { retries: 1, timeout: 10000, userAgent: "Uptime-Watcher/1.0" }
 
-// PortMonitor default config ✅  
+// PortMonitor default config ✅
 { retries: 1, timeout: 5000 }
 ```
 
@@ -389,7 +393,7 @@ All corrected files maintain:
 
 **Documentation Accuracy:** Now 100% verified against codebase  
 **User Experience:** Corrected misleading information about monitoring capabilities  
-**Developer Experience:** Accurate examples and configuration references  
+**Developer Experience:** Accurate examples and configuration references
 
 **Critical Corrections:**
 
@@ -410,4 +414,4 @@ All corrected files maintain:
 
 ---
 
-*This review ensures that all user-facing documentation accurately represents the current implementation and capabilities of Uptime Watcher.*
+_This review ensures that all user-facing documentation accurately represents the current implementation and capabilities of Uptime Watcher._

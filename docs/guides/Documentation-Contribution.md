@@ -23,8 +23,8 @@ Always specify language for syntax highlighting:
 ```typescript
 // ✅ Good
 export interface Site {
-  identifier: string;
-  name?: string;
+ identifier: string;
+ name?: string;
 }
 ```
 
@@ -34,9 +34,11 @@ Use descriptive link text:
 
 ```markdown
 <!-- ✅ Good -->
+
 See the [Theme API documentation](../api/theme-api) for details.
 
 <!-- ❌ Avoid -->
+
 See [here](../api/theme-api) for details.
 ```
 

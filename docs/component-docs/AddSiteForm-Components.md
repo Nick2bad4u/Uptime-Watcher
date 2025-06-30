@@ -86,25 +86,25 @@ AddSiteForm (main component)
 
 ```typescript
 interface FormFieldProps {
-    /** Form input element(s) to wrap */
-    children: React.ReactNode;
-    /** Error message to display */
-    error?: string;
-    /** Help text to show below the field */
-    helpText?: string;
-    /** Unique ID for the form field */
-    id: string;
-    /** Label text to display */
-    label: string;
-    /** Whether the field is required */
-    required?: boolean;
+ /** Form input element(s) to wrap */
+ children: React.ReactNode;
+ /** Error message to display */
+ error?: string;
+ /** Help text to show below the field */
+ helpText?: string;
+ /** Unique ID for the form field */
+ id: string;
+ /** Label text to display */
+ label: string;
+ /** Whether the field is required */
+ required?: boolean;
 }
 ```
 
 **Key Features**:
 
 - **Consistent Layout**: Standardized label, input, and error message positioning
-- **Accessibility**: Proper label association and ARIA attributes  
+- **Accessibility**: Proper label association and ARIA attributes
 - **Error Display**: Integrated error message display with styling
 - **Help Text**: Optional help text for user guidance
 - **Required Indicators**: Visual indicators for required fields
@@ -114,7 +114,7 @@ interface FormFieldProps {
 ```typescript
 // ARIA label helper with required suffix
 const REQUIRED_SUFFIX = " (required)";
-const createAriaLabel = (label: string, required: boolean): string => 
+const createAriaLabel = (label: string, required: boolean): string =>
     `${label}${required ? REQUIRED_SUFFIX : ""}`;
 
 // Memoized for performance
@@ -156,30 +156,30 @@ export const FormField = React.memo(function FormField({
 
 ```typescript
 interface TextFieldProps {
-    /** Whether the field is disabled */
-    disabled?: boolean;
-    /** Error message to display */
-    error?: string;
-    /** Help text to show below the field */
-    helpText?: string;
-    /** Unique ID for the input field */
-    id: string;
-    /** Label text to display */
-    label: string;
-    /** Maximum value for number inputs */
-    max?: number;
-    /** Minimum value for number inputs */
-    min?: number;
-    /** Callback when value changes */
-    onChange: (value: string) => void;
-    /** Placeholder text for the input */
-    placeholder?: string;
-    /** Whether the field is required */
-    required?: boolean;
-    /** Input type (text, url, or number) */
-    type?: "text" | "url" | "number";
-    /** Current field value */
-    value: string;
+ /** Whether the field is disabled */
+ disabled?: boolean;
+ /** Error message to display */
+ error?: string;
+ /** Help text to show below the field */
+ helpText?: string;
+ /** Unique ID for the input field */
+ id: string;
+ /** Label text to display */
+ label: string;
+ /** Maximum value for number inputs */
+ max?: number;
+ /** Minimum value for number inputs */
+ min?: number;
+ /** Callback when value changes */
+ onChange: (value: string) => void;
+ /** Placeholder text for the input */
+ placeholder?: string;
+ /** Whether the field is required */
+ required?: boolean;
+ /** Input type (text, url, or number) */
+ type?: "text" | "url" | "number";
+ /** Current field value */
+ value: string;
 }
 ```
 
@@ -239,33 +239,33 @@ interface TextFieldProps {
 
 ```typescript
 interface SelectFieldProps {
-    /** Whether the field is disabled */
-    disabled?: boolean;
-    /** Error message to display */
-    error?: string;
-    /** Help text to show below the field */
-    helpText?: string;
-    /** Unique ID for the select field */
-    id: string;
-    /** Label text to display */
-    label: string;
-    /** Callback when selection changes */
-    onChange: (value: string) => void;
-    /** Array of options to display in dropdown */
-    options: SelectOption[];
-    /** Placeholder text for empty selection */
-    placeholder?: string;
-    /** Whether selection is required */
-    required?: boolean;
-    /** Currently selected value */
-    value: string | number;
+ /** Whether the field is disabled */
+ disabled?: boolean;
+ /** Error message to display */
+ error?: string;
+ /** Help text to show below the field */
+ helpText?: string;
+ /** Unique ID for the select field */
+ id: string;
+ /** Label text to display */
+ label: string;
+ /** Callback when selection changes */
+ onChange: (value: string) => void;
+ /** Array of options to display in dropdown */
+ options: SelectOption[];
+ /** Placeholder text for empty selection */
+ placeholder?: string;
+ /** Whether selection is required */
+ required?: boolean;
+ /** Currently selected value */
+ value: string | number;
 }
 
 interface SelectOption {
-    /** Display text for the option */
-    label: string;
-    /** Value to be selected */
-    value: string | number;
+ /** Display text for the option */
+ label: string;
+ /** Value to be selected */
+ value: string | number;
 }
 ```
 
@@ -326,33 +326,33 @@ interface SelectOption {
 
 ```typescript
 interface RadioGroupProps {
-    /** Whether the radio group is disabled */
-    disabled?: boolean;
-    /** Error message to display */
-    error?: string;
-    /** Help text to show below the field */
-    helpText?: string;
-    /** Unique ID for the radio group */
-    id: string;
-    /** Label text to display */
-    label: string;
-    /** Name attribute for radio inputs (should be unique) */
-    name: string;
-    /** Callback when selection changes */
-    onChange: (value: string) => void;
-    /** Array of radio options to display */
-    options: RadioOption[];
-    /** Whether a selection is required */
-    required?: boolean;
-    /** Currently selected value */
-    value: string;
+ /** Whether the radio group is disabled */
+ disabled?: boolean;
+ /** Error message to display */
+ error?: string;
+ /** Help text to show below the field */
+ helpText?: string;
+ /** Unique ID for the radio group */
+ id: string;
+ /** Label text to display */
+ label: string;
+ /** Name attribute for radio inputs (should be unique) */
+ name: string;
+ /** Callback when selection changes */
+ onChange: (value: string) => void;
+ /** Array of radio options to display */
+ options: RadioOption[];
+ /** Whether a selection is required */
+ required?: boolean;
+ /** Currently selected value */
+ value: string;
 }
 
 interface RadioOption {
-    /** Display text for the radio option */
-    label: string;
-    /** Value to be selected */
-    value: string;
+ /** Display text for the radio option */
+ label: string;
+ /** Value to be selected */
+ value: string;
 }
 ```
 
@@ -394,26 +394,26 @@ interface RadioOption {
 
 ```typescript
 export interface AddSiteFormState {
-    /** URL field for HTTP monitors */
-    url: string;
-    /** Host/IP field for port monitors */
-    host: string;
-    /** Port number field for port monitors */
-    port: string;
-    /** Display name for the site */
-    name: string;
-    /** Selected monitor type */
-    monitorType: MonitorType;
-    /** Check interval in milliseconds */
-    checkInterval: number;
-    /** Generated site identifier */
-    siteId: string;
-    /** Form operation mode (new site vs existing site) */
-    addMode: FormMode;
-    /** Selected existing site ID when adding to existing */
-    selectedExistingSite: string;
-    /** Current form validation error */
-    formError: string | undefined;
+ /** URL field for HTTP monitors */
+ url: string;
+ /** Host/IP field for port monitors */
+ host: string;
+ /** Port number field for port monitors */
+ port: string;
+ /** Display name for the site */
+ name: string;
+ /** Selected monitor type */
+ monitorType: MonitorType;
+ /** Check interval in milliseconds */
+ checkInterval: number;
+ /** Generated site identifier */
+ siteId: string;
+ /** Form operation mode (new site vs existing site) */
+ addMode: FormMode;
+ /** Selected existing site ID when adding to existing */
+ selectedExistingSite: string;
+ /** Current form validation error */
+ formError: string | undefined;
 }
 ```
 
@@ -421,30 +421,30 @@ export interface AddSiteFormState {
 
 ```typescript
 export interface AddSiteFormActions {
-    /** Set URL field value */
-    setUrl: (value: string) => void;
-    /** Set host field value */
-    setHost: (value: string) => void;
-    /** Set port field value */
-    setPort: (value: string) => void;
-    /** Set site name field value */
-    setName: (value: string) => void;
-    /** Set monitor type */
-    setMonitorType: (value: MonitorType) => void;
-    /** Set check interval */
-    setCheckInterval: (value: number) => void;
-    /** Set site ID */
-    setSiteId: (value: string) => void;
-    /** Set form operation mode */
-    setAddMode: (value: FormMode) => void;
-    /** Set selected existing site */
-    setSelectedExistingSite: (value: string) => void;
-    /** Set form error message */
-    setFormError: (error: string | undefined) => void;
-    /** Reset form to initial state */
-    resetForm: () => void;
-    /** Whether the form is currently valid */
-    isFormValid: boolean;
+ /** Set URL field value */
+ setUrl: (value: string) => void;
+ /** Set host field value */
+ setHost: (value: string) => void;
+ /** Set port field value */
+ setPort: (value: string) => void;
+ /** Set site name field value */
+ setName: (value: string) => void;
+ /** Set monitor type */
+ setMonitorType: (value: MonitorType) => void;
+ /** Set check interval */
+ setCheckInterval: (value: number) => void;
+ /** Set site ID */
+ setSiteId: (value: string) => void;
+ /** Set form operation mode */
+ setAddMode: (value: FormMode) => void;
+ /** Set selected existing site */
+ setSelectedExistingSite: (value: string) => void;
+ /** Set form error message */
+ setFormError: (error: string | undefined) => void;
+ /** Reset form to initial state */
+ resetForm: () => void;
+ /** Whether the form is currently valid */
+ isFormValid: boolean;
 }
 ```
 
@@ -468,22 +468,22 @@ export interface AddSiteFormActions {
 #### Function Signature
 
 ```typescript
-export async function handleSubmit(e: React.FormEvent, props: FormSubmitProps)
+export async function handleSubmit(e: React.FormEvent, props: FormSubmitProps);
 ```
 
 #### Props Interface
 
 ```typescript
 type FormSubmitProps = AddSiteFormState &
-    Pick<AddSiteFormActions, "setFormError"> &
-    StoreActions & {
-        /** UUID generator function */
-        generateUuid: () => string;
-        /** Logger instance for debugging */
-        logger: Logger;
-        /** Optional callback executed after successful submission */
-        onSuccess?: () => void;
-    };
+ Pick<AddSiteFormActions, "setFormError"> &
+ StoreActions & {
+  /** UUID generator function */
+  generateUuid: () => string;
+  /** Logger instance for debugging */
+  logger: Logger;
+  /** Optional callback executed after successful submission */
+  onSuccess?: () => void;
+ };
 ```
 
 #### Validation Features
@@ -540,12 +540,12 @@ The validation system operates at multiple levels:
 
 ```typescript
 const isFormValid = useCallback(() => {
-    // Basic check for submit button enablement only
-    if (addMode === "new" && !name.trim()) return false;
-    if (addMode === "existing" && !selectedExistingSite) return false;
-    if (monitorType === "http" && !url.trim()) return false;
-    if (monitorType === "port" && (!host.trim() || !port.trim())) return false;
-    return true;
+ // Basic check for submit button enablement only
+ if (addMode === "new" && !name.trim()) return false;
+ if (addMode === "existing" && !selectedExistingSite) return false;
+ if (monitorType === "http" && !url.trim()) return false;
+ if (monitorType === "port" && (!host.trim() || !port.trim())) return false;
+ return true;
 }, [addMode, name, selectedExistingSite, monitorType, url, host, port]);
 ```
 
@@ -569,7 +569,7 @@ const isFormValid = useCallback(() => {
 
 ```typescript
 // Proper ARIA labeling
-const createAriaLabel = (label: string, required: boolean): string => 
+const createAriaLabel = (label: string, required: boolean): string =>
     `${label}${required ? REQUIRED_SUFFIX : ""}`;
 
 // Error association
@@ -604,11 +604,11 @@ const createAriaLabel = (label: string, required: boolean): string =>
 ```typescript
 // All form components are memoized for performance
 export const FormField = React.memo(function FormField(props) {
-    // Component implementation
+ // Component implementation
 });
 
 export const TextField = React.memo(function TextField(props) {
-    // Component implementation
+ // Component implementation
 });
 ```
 

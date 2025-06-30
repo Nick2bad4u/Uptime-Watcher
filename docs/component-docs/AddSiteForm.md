@@ -71,23 +71,23 @@ The custom hook provides direct access to all form state and actions:
 
 ```typescript
 const {
-  url,              // URL field value
-  host,             // Host field value  
-  port,             // Port field value
-  name,             // Site name field value
-  monitorType,      // Selected monitor type
-  checkInterval,    // Check interval value
-  addMode,          // Form mode (new/existing)
-  selectedExistingSite, // Selected existing site ID
-  isFormValid,      // Computed validation state
-  setUrl,           // URL field setter
-  setHost,          // Host field setter
-  setPort,          // Port field setter
-  setName,          // Name field setter
-  setMonitorType,   // Monitor type setter
-  setCheckInterval, // Check interval setter
-  setAddMode,       // Add mode setter
-  resetForm         // Form reset function
+ url, // URL field value
+ host, // Host field value
+ port, // Port field value
+ name, // Site name field value
+ monitorType, // Selected monitor type
+ checkInterval, // Check interval value
+ addMode, // Form mode (new/existing)
+ selectedExistingSite, // Selected existing site ID
+ isFormValid, // Computed validation state
+ setUrl, // URL field setter
+ setHost, // Host field setter
+ setPort, // Port field setter
+ setName, // Name field setter
+ setMonitorType, // Monitor type setter
+ setCheckInterval, // Check interval setter
+ setAddMode, // Add mode setter
+ resetForm, // Form reset function
 } = useAddSiteForm();
 ```
 

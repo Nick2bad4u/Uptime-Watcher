@@ -12,7 +12,7 @@ Main service class for handling system notifications.
 
 ```typescript
 export class NotificationService {
-    constructor(config?: NotificationConfig)
+ constructor(config?: NotificationConfig);
 }
 ```
 
@@ -43,7 +43,7 @@ Shows a notification when a monitor goes down.
 
 ```typescript
 const notificationService = new NotificationService();
-notificationService.notifyMonitorDown(site, 'monitor-123');
+notificationService.notifyMonitorDown(site, "monitor-123");
 ```
 
 ##### notifyMonitorUp(site: Site, monitorId: string): void
@@ -65,7 +65,7 @@ Shows a notification when a monitor comes back up.
 **Example:**
 
 ```typescript
-notificationService.notifyMonitorUp(site, 'monitor-123');
+notificationService.notifyMonitorUp(site, "monitor-123");
 ```
 
 ##### updateConfig(config: Partial&lt;NotificationConfig&gt;): void
@@ -105,7 +105,7 @@ Checks if notifications are supported on the current platform.
 
 ```typescript
 if (notificationService.isSupported()) {
-    // Safe to show notifications
+ // Safe to show notifications
 }
 ```
 
@@ -117,8 +117,8 @@ Configuration interface for notification settings.
 
 ```typescript
 export interface NotificationConfig {
-    showDownAlerts: boolean;
-    showUpAlerts: boolean;
+ showDownAlerts: boolean;
+ showUpAlerts: boolean;
 }
 ```
 
@@ -132,15 +132,15 @@ export interface NotificationConfig {
 ### Basic Setup
 
 ```typescript
-import { NotificationService } from './services/notifications/NotificationService';
+import { NotificationService } from "./services/notifications/NotificationService";
 
 // Create with default settings
 const notifications = new NotificationService();
 
 // Create with custom settings
 const customNotifications = new NotificationService({
-    showDownAlerts: true,
-    showUpAlerts: false // Only show down alerts
+ showDownAlerts: true,
+ showUpAlerts: false, // Only show down alerts
 });
 ```
 
@@ -149,19 +149,19 @@ const customNotifications = new NotificationService({
 ```typescript
 // In monitoring service
 class MonitoringService {
-    private notifications: NotificationService;
+ private notifications: NotificationService;
 
-    constructor() {
-        this.notifications = new NotificationService();
-    }
+ constructor() {
+  this.notifications = new NotificationService();
+ }
 
-    private handleStatusChange(site: Site, monitorId: string, newStatus: string) {
-        if (newStatus === 'down') {
-            this.notifications.notifyMonitorDown(site, monitorId);
-        } else if (newStatus === 'up') {
-            this.notifications.notifyMonitorUp(site, monitorId);
-        }
-    }
+ private handleStatusChange(site: Site, monitorId: string, newStatus: string) {
+  if (newStatus === "down") {
+   this.notifications.notifyMonitorDown(site, monitorId);
+  } else if (newStatus === "up") {
+   this.notifications.notifyMonitorUp(site, monitorId);
+  }
+ }
 }
 ```
 
@@ -170,17 +170,17 @@ class MonitoringService {
 ```typescript
 // Toggle notifications based on user preferences
 function updateNotificationSettings(preferences: UserPreferences) {
-    notifications.updateConfig({
-        showDownAlerts: preferences.enableDownAlerts,
-        showUpAlerts: preferences.enableUpAlerts
-    });
+ notifications.updateConfig({
+  showDownAlerts: preferences.enableDownAlerts,
+  showUpAlerts: preferences.enableUpAlerts,
+ });
 }
 
 // Check platform support before enabling
 if (notifications.isSupported()) {
-    updateNotificationSettings(userPrefs);
+ updateNotificationSettings(userPrefs);
 } else {
-    console.warn('Notifications not supported on this platform');
+ console.warn("Notifications not supported on this platform");
 }
 ```
 

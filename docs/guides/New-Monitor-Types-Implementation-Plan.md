@@ -5,7 +5,7 @@
 **Document Version:** 1.0  
 **Created:** December 28, 2024  
 **Last Updated:** December 28, 2024  
-**Status:** Planning Phase  
+**Status:** Planning Phase
 
 ---
 
@@ -14,6 +14,7 @@
 ### Existing Monitor Types
 
 1. **HTTP Monitor** (`HttpMonitor.ts`)
+
    - Uses: `axios` for HTTP requests
    - Features: URL health checks, timeout handling, retry logic
    - Configuration: timeout, retries, userAgent
@@ -1221,16 +1222,19 @@ This section covers multiple network monitoring capabilities that can be impleme
 **Focus:** Essential network monitoring capabilities
 
 1. **DNS Monitor**
+
    - Package: `dns2` (5.3M weekly downloads)
    - Features: DNS resolution monitoring, response time tracking
    - Configuration: DNS servers, record types, timeout settings
 
 2. **Advanced Ping Monitor**
+
    - Package: `net-ping` (130K weekly downloads)
    - Features: ICMP ping, raw socket implementation, detailed statistics
    - Configuration: Ping count, interval, timeout, packet size
 
 3. **SSL Certificate Monitor**
+
    - Package: `ssl-checker` (12K weekly downloads)
    - Features: Certificate expiration, chain validation, security assessment
    - Configuration: Certificate validity checking, expiration alerts
@@ -1246,16 +1250,19 @@ This section covers multiple network monitoring capabilities that can be impleme
 **Focus:** Security scanning and network discovery
 
 1. **Network Security Scanner**
+
    - Package: `evilscan` + `libnmap` for comprehensive scanning
    - Features: Port scanning, service detection, vulnerability assessment
    - Configuration: Scan profiles, target ranges, detection rules
 
 2. **Network Discovery Monitor**
+
    - Package: `lan-discovery` + `arpping`
    - Features: Device discovery, ARP monitoring, network mapping
    - Configuration: Subnet ranges, discovery methods, update intervals
 
 3. **Traceroute Monitor**
+
    - Package: `nodejs-traceroute`
    - Features: Network path analysis, hop-by-hop latency
    - Configuration: Max hops, timeout, probe methods
@@ -1271,16 +1278,19 @@ This section covers multiple network monitoring capabilities that can be impleme
 **Focus:** Advanced monitoring and analytics
 
 1. **SNMP Monitor**
+
    - Package: `net-snmp`
    - Features: SNMP polling, trap handling, MIB parsing
    - Configuration: Community strings, OIDs, polling intervals
 
 2. **Network Interface Monitor**
+
    - Package: `systeminformation`
    - Features: Interface statistics, utilization monitoring
    - Configuration: Interface selection, metric collection
 
 3. **Geolocation Monitor**
+
    - Package: `@maxmind/geoip2-node`
    - Features: IP geolocation, ISP identification, threat intelligence
    - Configuration: Database updates, lookup caching
@@ -1296,11 +1306,13 @@ This section covers multiple network monitoring capabilities that can be impleme
 **Focus:** IoT and industrial network monitoring
 
 1. **MQTT Monitor**
+
    - Package: `mqtt`
    - Features: IoT device monitoring, topic subscription
    - Configuration: Broker settings, topic filters, QoS levels
 
 2. **Industrial Protocol Monitor**
+
    - Package: `modbus-serial` + `node-opcua`
    - Features: Modbus and OPC UA monitoring
    - Configuration: Device addresses, register maps, polling schedules
@@ -1316,11 +1328,13 @@ This section covers multiple network monitoring capabilities that can be impleme
 **Focus:** Advanced automation and compliance
 
 1. **Network Configuration Monitor**
+
    - Package: `netconf-client`
    - Features: Configuration change tracking, compliance validation
    - Configuration: Device credentials, configuration templates
 
 2. **Network Threat Detection**
+
    - Package: `honeypot-detector` + custom threat detection
    - Features: Real-time threat detection, anomaly analysis
    - Configuration: Threat feeds, detection rules, response actions
@@ -1340,16 +1354,19 @@ This section covers multiple network monitoring capabilities that can be impleme
 **Focus:** Application Performance Monitoring (APM) and distributed tracing
 
 1. **OpenTelemetry Trace Monitor**
+
    - Package: `@opentelemetry/api`, `@opentelemetry/sdk-node`, `@opentelemetry/auto-instrumentations-node`
    - Features: Distributed tracing, span collection, trace correlation
    - Configuration: OTLP endpoints, sampling rates, instrumentations
 
 2. **Jaeger Monitor**
+
    - Package: `@opentelemetry/exporter-jaeger`
    - Features: Jaeger trace export, trace visualization integration
    - Configuration: Jaeger endpoints, trace collection settings
 
 3. **Zipkin Monitor**
+
    - Package: `zipkin`, `zipkin-transport-http`
    - Features: Zipkin-compatible tracing, span correlation
    - Configuration: Zipkin endpoints, trace sampling
@@ -1365,16 +1382,19 @@ This section covers multiple network monitoring capabilities that can be impleme
 **Focus:** Centralized logging and event-driven monitoring
 
 1. **ELK Stack Monitor**
+
    - Package: `@elastic/elasticsearch`, `winston`, `winston-elasticsearch`
    - Features: Elasticsearch log ingestion, structured logging, log analysis
    - Configuration: Elasticsearch endpoints, index patterns, log formatting
 
 2. **Fluentd Monitor**
+
    - Package: `@fluent-org/logger`, `fluent-ffmpeg`
    - Features: Log forwarding, log parsing, multi-destination shipping
    - Configuration: Fluentd endpoints, log routing rules, output plugins
 
 3. **Syslog Monitor**
+
    - Package: `modern-syslog`, `syslog-pro`
    - Features: System log collection, syslog protocol support, log aggregation
    - Configuration: Syslog facilities, severity levels, remote servers
@@ -1390,16 +1410,19 @@ This section covers multiple network monitoring capabilities that can be impleme
 **Focus:** Proactive monitoring and user experience validation
 
 1. **Synthetic Transaction Monitor**
+
    - Package: `playwright`, `puppeteer`
    - Features: Browser automation, user journey simulation, performance testing
    - Configuration: Test scripts, performance thresholds, screenshot capture
 
 2. **API Performance Monitor**
+
    - Package: `k6`, `artillery`
    - Features: Load testing, API performance validation, stress testing
    - Configuration: Test scenarios, load patterns, performance baselines
 
 3. **Real User Monitoring (RUM)**
+
    - Package: `@opentelemetry/instrumentation-user-interaction`, `web-vitals`
    - Features: Client-side performance, user interaction tracking, core web vitals
    - Configuration: Client instrumentation, metric collection, aggregation rules
@@ -1415,16 +1438,19 @@ This section covers multiple network monitoring capabilities that can be impleme
 **Focus:** Modern containerized and cloud-native infrastructure
 
 1. **Container Resource Monitor**
+
    - Package: `dockerode`, `kubernetes-client`
    - Features: Container metrics, resource usage, health checking
    - Configuration: Container filters, resource thresholds, orchestrator integration
 
 2. **Kubernetes Monitor**
+
    - Package: `@kubernetes/client-node`, `k8s-node-label-monitor`
    - Features: Pod status, node health, service discovery, cluster events
    - Configuration: Namespace filters, resource types, event correlation
 
 3. **Service Mesh Monitor**
+
    - Package: `istio-client`, `envoy-admin-api`
    - Features: Service-to-service communication, traffic metrics, security policies
    - Configuration: Mesh endpoints, traffic analysis, policy validation
@@ -1440,16 +1466,19 @@ This section covers multiple network monitoring capabilities that can be impleme
 **Focus:** Security event monitoring and compliance validation
 
 1. **Security Event Monitor**
+
    - Package: `node-suricata`, `security-audit`
    - Features: Intrusion detection, anomaly detection, threat intelligence
    - Configuration: Threat feeds, detection rules, response actions
 
 2. **Certificate Lifecycle Monitor**
+
    - Package: `ssl-checker`, `certificate-monitor`, `x509`
    - Features: Certificate expiration, chain validation, renewal tracking
    - Configuration: Certificate sources, expiration thresholds, renewal automation
 
 3. **Compliance Audit Monitor**
+
    - Package: `compliance-checker`, `audit-log-parser`
    - Features: Regulatory compliance, audit trail analysis, policy validation
    - Configuration: Compliance frameworks, audit rules, reporting schedules
@@ -1608,7 +1637,7 @@ This section covers multiple network monitoring capabilities that can be impleme
 ### Total Implementation Scope - Extended
 
 - **Network Monitor Types:** 25+ comprehensive network monitoring capabilities
-- **Observability Monitor Types:** 12+ APM and tracing capabilities  
+- **Observability Monitor Types:** 12+ APM and tracing capabilities
 - **Logging Monitor Types:** 8+ log processing and event monitoring
 - **Synthetic Monitor Types:** 6+ user experience and performance testing
 - **Container Monitor Types:** 8+ cloud-native and orchestration monitoring
@@ -2119,172 +2148,172 @@ npm install --save-dev @types/node # for net and dgram modules
 **Update `src/types.ts`:**
 
 ```typescript
-export type MonitorType = 
-  | "http" 
-  | "port" 
-  // Network Monitoring
-  | "ping" 
-  | "dns" 
-  | "traceroute"
-  | "network-scan"
-  | "arp-table"
-  | "speed-test"
-  | "snmp"
-  | "wake-on-lan"
-  | "whois"
-  | "geolocation"
-  | "raw-socket"
-  | "network-security"
-  // Security & SSL
-  | "ssl" 
-  | "certificate"
-  // Application Monitoring
-  | "api" 
-  | "database" 
-  | "email" 
-  | "websocket" 
-  | "ftp" 
-  // Infrastructure
-  | "hardware" 
-  | "docker" 
-  | "tcp-custom" 
-  | "udp-custom" 
-  | "filesystem";
+export type MonitorType =
+ | "http"
+ | "port"
+ // Network Monitoring
+ | "ping"
+ | "dns"
+ | "traceroute"
+ | "network-scan"
+ | "arp-table"
+ | "speed-test"
+ | "snmp"
+ | "wake-on-lan"
+ | "whois"
+ | "geolocation"
+ | "raw-socket"
+ | "network-security"
+ // Security & SSL
+ | "ssl"
+ | "certificate"
+ // Application Monitoring
+ | "api"
+ | "database"
+ | "email"
+ | "websocket"
+ | "ftp"
+ // Infrastructure
+ | "hardware"
+ | "docker"
+ | "tcp-custom"
+ | "udp-custom"
+ | "filesystem";
 
 export interface Monitor {
-  // ... existing fields
-  
-  // Network specific
-  pingConfig?: {
-    packetCount?: number;
-    packetSize?: number;
-    timeout?: number;
-    jitterThreshold?: number;
-  };
-  
-  // DNS specific
-  dnsQuery?: string;
-  dnsRecordType?: 'A' | 'AAAA' | 'MX' | 'TXT' | 'CNAME' | 'SOA' | 'NS';
-  dnsServer?: string;
-  dnsTimeout?: number;
-  
-  // Traceroute specific
-  tracerouteMaxHops?: number;
-  tracerouteTimeout?: number;
-  tracerouteProtocol?: 'icmp' | 'udp' | 'tcp';
-  
-  // Network scanning
-  scanTarget?: string; // IP range or single IP
-  scanPorts?: string; // Port range
-  scanTimeout?: number;
-  
-  // ARP table monitoring
-  arpInterface?: string;
-  arpVendorLookup?: boolean;
-  
-  // Speed test configuration
-  speedTestType?: 'download' | 'upload' | 'both';
-  speedTestServer?: string;
-  speedTestDuration?: number;
-  
-  // SNMP configuration
-  snmpCommunity?: string;
-  snmpVersion?: '1' | '2c' | '3';
-  snmpOid?: string;
-  snmpPort?: number;
-  
-  // WHOIS configuration
-  whoisDomain?: string;
-  whoisServer?: string;
-  
-  // Geolocation
-  geolocationIP?: string;
-  geolocationProvider?: 'maxmind' | 'ipapi' | 'geoip2';
-  
-  // Database specific
-  dbType?: 'postgresql' | 'mysql' | 'mongodb' | 'redis';
-  dbHost?: string;
-  dbPort?: number;
-  dbName?: string;
-  dbUsername?: string;
-  dbPassword?: string;
-  dbQuery?: string;
-  
-  // API specific
-  httpMethod?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
-  requestBody?: string;
-  requestHeaders?: Record<string, string>;
-  expectedStatusCode?: number;
-  responseValidation?: string; // JSON schema
-  
-  // Email specific
-  emailType?: 'smtp' | 'imap' | 'pop3';
-  emailHost?: string;
-  emailPort?: number;
-  emailUsername?: string;
-  emailPassword?: string;
-  emailSecure?: boolean;
-  
-  // Custom protocol specific
-  customPayload?: string;
-  expectedResponse?: string;
-  protocolType?: 'tcp' | 'udp';
-  
-  // File system specific
-  filePath?: string;
-  fileCheckType?: 'exists' | 'modified' | 'size';
-  expectedSize?: number;
-  
-  // Hardware specific
-  hardwareMetric?: 'cpu' | 'memory' | 'disk' | 'network' | 'temperature';
-  threshold?: number;
-  
-  // Docker specific
-  containerName?: string;
-  containerHealthCheck?: boolean;
-  dockerSocket?: string;
-  
-  // SSL specific
-  sslCertificateCheck?: 'expiration' | 'validity' | 'chain' | 'all';
-  sslExpirationWarningDays?: number;
-  sslValidateChain?: boolean;
-  
-  // Extended Observability & APM
-  tracingConfig?: {
-    serviceName?: string;
-    endpoint?: string;
-    protocol?: 'jaeger' | 'zipkin' | 'otlp';
-    samplingRate?: number;
-  };
-  
-  // Logging & Event Monitoring
-  logConfig?: {
-    logLevel?: 'debug' | 'info' | 'warn' | 'error';
-    logFormat?: 'json' | 'plain' | 'structured';
-    endpoint?: string;
-    index?: string;
-  };
-  
-  // Synthetic Monitoring
-  syntheticConfig?: {
-    scriptPath?: string;
-    testType?: 'performance' | 'functional' | 'accessibility';
-    thresholds?: Record<string, number>;
-  };
-  
-  // Container & Cloud-Native
-  containerConfig?: {
-    namespace?: string;
-    selector?: Record<string, string>;
-    resourceType?: 'pod' | 'service' | 'deployment' | 'node';
-  };
-  
-  // Security & Compliance
-  securityConfig?: {
-    scanType?: 'vulnerability' | 'compliance' | 'configuration';
-    standards?: string[];
-    riskLevel?: 'low' | 'medium' | 'high' | 'critical';
-  };
+ // ... existing fields
+
+ // Network specific
+ pingConfig?: {
+  packetCount?: number;
+  packetSize?: number;
+  timeout?: number;
+  jitterThreshold?: number;
+ };
+
+ // DNS specific
+ dnsQuery?: string;
+ dnsRecordType?: "A" | "AAAA" | "MX" | "TXT" | "CNAME" | "SOA" | "NS";
+ dnsServer?: string;
+ dnsTimeout?: number;
+
+ // Traceroute specific
+ tracerouteMaxHops?: number;
+ tracerouteTimeout?: number;
+ tracerouteProtocol?: "icmp" | "udp" | "tcp";
+
+ // Network scanning
+ scanTarget?: string; // IP range or single IP
+ scanPorts?: string; // Port range
+ scanTimeout?: number;
+
+ // ARP table monitoring
+ arpInterface?: string;
+ arpVendorLookup?: boolean;
+
+ // Speed test configuration
+ speedTestType?: "download" | "upload" | "both";
+ speedTestServer?: string;
+ speedTestDuration?: number;
+
+ // SNMP configuration
+ snmpCommunity?: string;
+ snmpVersion?: "1" | "2c" | "3";
+ snmpOid?: string;
+ snmpPort?: number;
+
+ // WHOIS configuration
+ whoisDomain?: string;
+ whoisServer?: string;
+
+ // Geolocation
+ geolocationIP?: string;
+ geolocationProvider?: "maxmind" | "ipapi" | "geoip2";
+
+ // Database specific
+ dbType?: "postgresql" | "mysql" | "mongodb" | "redis";
+ dbHost?: string;
+ dbPort?: number;
+ dbName?: string;
+ dbUsername?: string;
+ dbPassword?: string;
+ dbQuery?: string;
+
+ // API specific
+ httpMethod?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+ requestBody?: string;
+ requestHeaders?: Record<string, string>;
+ expectedStatusCode?: number;
+ responseValidation?: string; // JSON schema
+
+ // Email specific
+ emailType?: "smtp" | "imap" | "pop3";
+ emailHost?: string;
+ emailPort?: number;
+ emailUsername?: string;
+ emailPassword?: string;
+ emailSecure?: boolean;
+
+ // Custom protocol specific
+ customPayload?: string;
+ expectedResponse?: string;
+ protocolType?: "tcp" | "udp";
+
+ // File system specific
+ filePath?: string;
+ fileCheckType?: "exists" | "modified" | "size";
+ expectedSize?: number;
+
+ // Hardware specific
+ hardwareMetric?: "cpu" | "memory" | "disk" | "network" | "temperature";
+ threshold?: number;
+
+ // Docker specific
+ containerName?: string;
+ containerHealthCheck?: boolean;
+ dockerSocket?: string;
+
+ // SSL specific
+ sslCertificateCheck?: "expiration" | "validity" | "chain" | "all";
+ sslExpirationWarningDays?: number;
+ sslValidateChain?: boolean;
+
+ // Extended Observability & APM
+ tracingConfig?: {
+  serviceName?: string;
+  endpoint?: string;
+  protocol?: "jaeger" | "zipkin" | "otlp";
+  samplingRate?: number;
+ };
+
+ // Logging & Event Monitoring
+ logConfig?: {
+  logLevel?: "debug" | "info" | "warn" | "error";
+  logFormat?: "json" | "plain" | "structured";
+  endpoint?: string;
+  index?: string;
+ };
+
+ // Synthetic Monitoring
+ syntheticConfig?: {
+  scriptPath?: string;
+  testType?: "performance" | "functional" | "accessibility";
+  thresholds?: Record<string, number>;
+ };
+
+ // Container & Cloud-Native
+ containerConfig?: {
+  namespace?: string;
+  selector?: Record<string, string>;
+  resourceType?: "pod" | "service" | "deployment" | "node";
+ };
+
+ // Security & Compliance
+ securityConfig?: {
+  scanType?: "vulnerability" | "compliance" | "configuration";
+  standards?: string[];
+  riskLevel?: "low" | "medium" | "high" | "critical";
+ };
 }
 ```
 
@@ -2300,7 +2329,7 @@ export interface Monitor {
 electron/services/monitoring/
 ├── core/
 │   ├── BaseMonitor.ts              # Abstract base class for all monitors
-│   ├── MonitorFactory.ts           # Extended factory with all monitor types  
+│   ├── MonitorFactory.ts           # Extended factory with all monitor types
 │   ├── MonitorScheduler.ts         # Scheduling and execution logic
 │   └── MonitorRegistry.ts          # Monitor type registration and discovery
 ├── network/
@@ -2555,39 +2584,39 @@ tests/
 ```markdown
 docs/
 ├── monitors/
-│   ├── network/
-│   │   ├── DNS-Monitor-Guide.md
-│   │   ├── Ping-Monitor-Guide.md
-│   │   ├── Network-Security-Guide.md
-│   │   └── ... (one guide per monitor type)
-│   ├── observability/
-│   │   ├── OpenTelemetry-Integration.md
-│   │   ├── Distributed-Tracing-Setup.md
-│   │   ├── Metrics-Collection-Guide.md
-│   │   └── Logging-Integration.md
-│   ├── security/
-│   │   ├── Vulnerability-Scanning.md
-│   │   ├── Compliance-Monitoring.md
-│   │   └── Security-Event-Handling.md
-│   └── cloudnative/
-│       ├── Kubernetes-Monitoring.md
-│       ├── Container-Monitoring.md
-│       └── Service-Mesh-Integration.md
+│ ├── network/
+│ │ ├── DNS-Monitor-Guide.md
+│ │ ├── Ping-Monitor-Guide.md
+│ │ ├── Network-Security-Guide.md
+│ │ └── ... (one guide per monitor type)
+│ ├── observability/
+│ │ ├── OpenTelemetry-Integration.md
+│ │ ├── Distributed-Tracing-Setup.md
+│ │ ├── Metrics-Collection-Guide.md
+│ │ └── Logging-Integration.md
+│ ├── security/
+│ │ ├── Vulnerability-Scanning.md
+│ │ ├── Compliance-Monitoring.md
+│ │ └── Security-Event-Handling.md
+│ └── cloudnative/
+│ ├── Kubernetes-Monitoring.md
+│ ├── Container-Monitoring.md
+│ └── Service-Mesh-Integration.md
 ├── api/
-│   ├── Monitor-Factory-API.md
-│   ├── Configuration-API.md
-│   ├── Results-API.md
-│   └── Template-API.md
+│ ├── Monitor-Factory-API.md
+│ ├── Configuration-API.md
+│ ├── Results-API.md
+│ └── Template-API.md
 ├── deployment/
-│   ├── Production-Deployment.md
-│   ├── Scaling-Guidelines.md
-│   ├── Performance-Tuning.md
-│   └── Security-Hardening.md
+│ ├── Production-Deployment.md
+│ ├── Scaling-Guidelines.md
+│ ├── Performance-Tuning.md
+│ └── Security-Hardening.md
 └── troubleshooting/
-    ├── Network-Monitor-Issues.md
-    ├── Performance-Problems.md
-    ├── Configuration-Errors.md
-    └── Integration-Problems.md
+├── Network-Monitor-Issues.md
+├── Performance-Problems.md
+├── Configuration-Errors.md
+└── Integration-Problems.md
 ```
 
 ### 2. Monitor Service Structure

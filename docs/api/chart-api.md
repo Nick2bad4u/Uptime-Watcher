@@ -12,7 +12,7 @@ Service class that provides theme-aware chart configurations for various chart t
 
 ```typescript
 export class ChartConfigService {
-    constructor(theme: Theme)
+ constructor(theme: Theme);
 }
 ```
 
@@ -48,8 +48,8 @@ const lineConfig = chartService.getLineChartConfig();
 // Use with react-chartjs-2
 import { Line } from 'react-chartjs-2';
 
-<Line 
-    data={responseTimeData} 
+<Line
+    data={responseTimeData}
     options={lineConfig}
 />
 ```
@@ -75,8 +75,8 @@ const barConfig = chartService.getBarChartConfig();
 // Use with react-chartjs-2
 import { Bar } from 'react-chartjs-2';
 
-<Bar 
-    data={statusDistributionData} 
+<Bar
+    data={statusDistributionData}
     options={barConfig}
 />
 ```
@@ -106,8 +106,8 @@ const doughnutConfig = chartService.getDoughnutChartConfig(1000);
 // Use with react-chartjs-2
 import { Doughnut } from 'react-chartjs-2';
 
-<Doughnut 
-    data={uptimeData} 
+<Doughnut
+    data={uptimeData}
     options={doughnutConfig}
 />
 ```
@@ -119,7 +119,7 @@ import { Doughnut } from 'react-chartjs-2';
 React hook that provides theme-aware chart configurations with automatic theme updates.
 
 ```typescript
-function useChartConfigs(theme: Theme, totalChecks?: number): ChartConfigs
+function useChartConfigs(theme: Theme, totalChecks?: number): ChartConfigs;
 ```
 
 **Parameters:**
@@ -131,9 +131,9 @@ function useChartConfigs(theme: Theme, totalChecks?: number): ChartConfigs
 
 ```typescript
 interface ChartConfigs {
-    lineChartOptions: ChartOptions<'line'>;
-    barChartOptions: ChartOptions<'bar'>;
-    doughnutOptions: ChartOptions<'doughnut'>;
+ lineChartOptions: ChartOptions<"line">;
+ barChartOptions: ChartOptions<"bar">;
+ doughnutOptions: ChartOptions<"doughnut">;
 }
 ```
 
@@ -199,14 +199,14 @@ The chart configurations automatically adapt to theme changes using:
 
 ```typescript
 // Colors
-theme.colors.text.primary        // Legend and title text
-theme.colors.text.secondary      // Axis labels and tooltips
-theme.colors.surface.elevated    // Tooltip background
-theme.colors.border.primary      // Tooltip borders
-theme.colors.border.secondary    // Grid lines
+theme.colors.text.primary; // Legend and title text
+theme.colors.text.secondary; // Axis labels and tooltips
+theme.colors.surface.elevated; // Tooltip background
+theme.colors.border.primary; // Tooltip borders
+theme.colors.border.secondary; // Grid lines
 
 // Typography
-theme.typography.fontFamily.sans // Font family for all text
+theme.typography.fontFamily.sans; // Font family for all text
 ```
 
 ### Color Mapping
@@ -274,7 +274,7 @@ function SiteDetailsComponent({ analytics, currentTheme }) {
 function AlternativeChartComponent() {
     const theme = useTheme();
     const { lineChartOptions, barChartOptions, doughnutOptions } = useChartConfigs(theme, totalChecks);
-    
+
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <Line data={responseTimeData} options={lineChartOptions} />
@@ -292,48 +292,48 @@ The application follows specific patterns for preparing chart data:
 ```typescript
 // Line chart data for response times
 const lineChartData = useMemo(
-    () => ({
-        datasets: [
-            {
-                backgroundColor: currentTheme.colors.primary[500] + "20",
-                borderColor: currentTheme.colors.primary[500],
-                data: analytics.filteredHistory.map((h) => h.responseTime),
-                fill: true,
-                label: "Response Time (ms)",
-                tension: 0.1,
-            },
-        ],
-        labels: analytics.filteredHistory.map((h) => new Date(h.timestamp)),
-    }),
-    [analytics.filteredHistory, currentTheme]
+ () => ({
+  datasets: [
+   {
+    backgroundColor: currentTheme.colors.primary[500] + "20",
+    borderColor: currentTheme.colors.primary[500],
+    data: analytics.filteredHistory.map((h) => h.responseTime),
+    fill: true,
+    label: "Response Time (ms)",
+    tension: 0.1,
+   },
+  ],
+  labels: analytics.filteredHistory.map((h) => new Date(h.timestamp)),
+ }),
+ [analytics.filteredHistory, currentTheme]
 );
 
-// Bar chart data for status distribution  
+// Bar chart data for status distribution
 const barChartData = useMemo(
-    () => ({
-        datasets: [
-            {
-                backgroundColor: [currentTheme.colors.success, currentTheme.colors.error],
-                data: [analytics.upCount, analytics.downCount],
-            },
-        ],
-        labels: ["Up", "Down"],
-    }),
-    [analytics.upCount, analytics.downCount, currentTheme]
+ () => ({
+  datasets: [
+   {
+    backgroundColor: [currentTheme.colors.success, currentTheme.colors.error],
+    data: [analytics.upCount, analytics.downCount],
+   },
+  ],
+  labels: ["Up", "Down"],
+ }),
+ [analytics.upCount, analytics.downCount, currentTheme]
 );
 
 // Doughnut chart data for uptime visualization
 const doughnutChartData = useMemo(
-    () => ({
-        datasets: [
-            {
-                backgroundColor: [currentTheme.colors.success, currentTheme.colors.error],
-                data: [analytics.upCount, analytics.downCount],
-            },
-        ],
-        labels: ["Up", "Down"],
-    }),
-    [analytics.upCount, analytics.downCount, currentTheme]
+ () => ({
+  datasets: [
+   {
+    backgroundColor: [currentTheme.colors.success, currentTheme.colors.error],
+    data: [analytics.upCount, analytics.downCount],
+   },
+  ],
+  labels: ["Up", "Down"],
+ }),
+ [analytics.upCount, analytics.downCount, currentTheme]
 );
 ```
 
