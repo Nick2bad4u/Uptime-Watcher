@@ -7,9 +7,32 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[cba3c1b](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cba3c1b56c1fcb91c52080e6247f00b533bda144)...
-[32a139c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/32a139cf6c764d0884fb602fa485c6bb743a2278)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/cba3c1b56c1fcb91c52080e6247f00b533bda144...32a139cf6c764d0884fb602fa485c6bb743a2278))
+[[cc93b21](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cc93b2140503a2aed16f8126498f80b44b3d05cd)...
+[cc93b21](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cc93b2140503a2aed16f8126498f80b44b3d05cd)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/cc93b2140503a2aed16f8126498f80b44b3d05cd...cc93b2140503a2aed16f8126498f80b44b3d05cd))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 3.5.0 [`(cc93b21)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cc93b2140503a2aed16f8126498f80b44b3d05cd)
+
+
+
+
+
+
+## [3.5.0] - 2025-06-29
+
+
+[[111ed86](https://github.com/Nick2bad4u/Uptime-Watcher/commit/111ed86d4800f1d7e469ac8127f83ab5ba560fc8)...
+[ec6a570](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ec6a5704c77b7bca0e0107d6c9d55495070ecf7f)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/111ed86d4800f1d7e469ac8127f83ab5ba560fc8...ec6a5704c77b7bca0e0107d6c9d55495070ecf7f))
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(9c27776)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9c27776c4656f4177d3b7397ff24d1e3b254e321)
+
 
 
 ### 🛠️ GitHub Actions
@@ -18,9 +41,191 @@ All notable changes to this project will be documented in this file.
 
 
 
+### 💼 Other
+
+- 🎨 [style] Enforce immutability on component props
+
+- Updates component props to use a readonly type for better type safety
+- Prevents accidental mutation of props, aligning with best practices [`(ec6a570)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ec6a5704c77b7bca0e0107d6c9d55495070ecf7f)
+
+
+- 🎨 [style] Clean up imports and className order in UI components
+
+- Merges theme-related imports and removes redundancy for improved clarity.
+- Adjusts className property order for better readability and consistency. [`(9b628a7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9b628a70d2805c3d7c9af6ad5a68340c2dff9681)
+
+
+- 🚜 [refactor] Extracts monitor history suffix formatting to helpers
+
+- Moves logic for formatting HTTP and port monitor history suffixes into dedicated helper functions
+- Improves readability and maintainability by reducing inline logic in the component
+- Prepares for easier extension or modification of monitor title formatting in the future [`(af39bf2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/af39bf29d44513fa507dfa6d93dd7f33d548d411)
+
+
+- 🛠️ [fix] Use nullish coalescing for site name fallback
+
+- Replaces logical OR with nullish coalescing to ensure the identifier is only used when the name is null or undefined, not when it is an empty string or other falsy value
+- Improves display accuracy for site names that may be intentionally set as empty strings [`(c302bc3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c302bc3de0cc3b4ac3fb754837d344b0e83de39e)
+
+
+- 🚜 [refactor] Refactor monitor option formatting logic
+
+- Extracts the detail construction logic for monitor options into a dedicated helper function within the memoized callback.
+- Improves readability and maintainability by isolating conditional formatting, making the code easier to extend and debug. [`(94211ab)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/94211abd5ea6fbc1479c3812440279e381d47c9c)
+
+
+- ✨ [feat] Improve accessibility and event handling in UI components
+
+- Enhances accessibility by adding ARIA attributes, native button semantics, and role assignments to interactive components.
+- Refactors event handling to stop propagation at the button level instead of container level, preventing unintended card clicks and improving user experience.
+- Updates reusable components to support flexible element types, extended event props, and better keyboard accessibility, enabling more consistent UI behavior. [`(ce52495)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ce52495055708a6e614f8ac3acd65cac53443223)
+
+
+- 🚜 [refactor] Extract and modularize form validation and submission logic
+
+- Modularizes form validation and monitor creation by extracting them into dedicated helper functions for clarity and maintainability
+- Centralizes error handling and user feedback, reducing repeated code and improving validation consistency
+- Improves accessibility logic in form fields by introducing a utility for determining aria-describedby values
+- Enhances code readability and paves the way for future extensibility of form validation and submission workflows [`(52c7652)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/52c76521354342d4e962cc4cdaf57714967a6978)
+
+
+- 📝 [docs] Remove AI-generated and migration docs, update architecture guide
+
+- Cleans up the documentation folder by deleting AI assistant guides, health reports, migration summaries, optimization summaries, refactoring logs, and PowerShell utility scripts, reducing clutter and focusing the docs on core reference material
+- Replaces the project architecture guide with a standard Markdown version, removing the Copilot-specific file and ensuring consistency for general users and contributors
+- Streamlines the documentation set for maintainability and lowers overhead for future documentation updates [`(0f037eb)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0f037eb8d7a5920b7fb27a30e1e38033878333bb)
+
+
+- ✨ [feat] Add per-monitor request timeout configuration
+
+- Enables setting custom request timeouts for individual monitors, overriding the global/default timeout value
+- Updates backend schema, frontend UI, and business logic to support per-monitor timeout input, persistence, and usage during monitoring
+- Removes deprecated global timeout setting from app settings, making timeout a monitor-specific property for improved flexibility
+- Improves user control over monitoring behavior, especially for sites or ports with varying response expectations [`(47f479b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/47f479b1802ff2ed39a27956ab8a69e834b2fd8b)
+
+
+- 🚜 [refactor] Use dedicated Axios instance and improve error handling
+
+- Switches to a dedicated Axios instance with configurable defaults to improve code maintainability and reduce duplication
+- Centralizes and simplifies error handling for HTTP monitoring, offering clearer distinctions between network errors, timeouts, and HTTP status responses
+- Updates config logic to ensure Axios instance stays in sync with runtime changes
+- Adds comprehensive documentation for Axios usage in the project
+
+Enhances reliability and clarity of HTTP monitoring while making future maintenance easier. [`(66b2201)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/66b22010811825a82207cc6e4f5ab87a2390ba5d)
+
+
+- 📝 [docs] Remove legacy documentation and update review status
+
+- Deletes outdated and redundant documentation summary, review, and implementation plan files to reflect the removal of all legacy and backward compatibility code.
+- Updates the documentation review progress file to indicate 100% accuracy and completion across API, component, and guide docs, with a summary of the verification process.
+- Cleans up unused utility functions related to timestamp formatting, as they are no longer referenced in the codebase.
+- Improves maintainability by ensuring only current, relevant documentation remains and removing risk of confusion from obsolete docs. [`(9d36057)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9d360578c59be496bcef334ed421c9498fc3d033)
+
+
+- 🚜 [refactor] Remove legacy dark mode, flatten API, update docs
+
+- Streamlines codebase by removing legacy dark mode state and migration fields,
+  consolidating theme management under settings for consistency.
+- Refactors API surface to use organized, domain-specific namespaces
+  instead of a flat structure, improving maintainability and clarity.
+- Updates documentation and type definitions to reflect new API structure,
+  eliminates outdated migration guides, and aligns examples with current best practices.
+- Cleans up interfaces and comments for clarity, removing legacy code and references.
+
+Relates to ongoing modernization and API consistency efforts. [`(3554271)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3554271e1b0239553929c19f16bf7898cc087c59)
+
+
+- 📝 [docs] Revamps and expands component and API documentation
+
+- Updates documentation for major components including Dashboard, SiteCard, SiteDetails, AddSiteForm, Settings, and SiteList to reflect current architecture, internal structure, and accessibility features.
+- Expands and clarifies API docs for chart configuration, database operations, hooks, and IPC, including new methods, improved usage examples, error handling, and data flow explanations.
+- Refines explanations of styling, theming, and testing strategies to improve developer onboarding and maintainability.
+- Removes outdated or redundant docs and ensures all files use consistent formatting, terminology, and hierarchy for easier navigation and comprehension. [`(a5726a5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a5726a59fab098497582d08e9479bf1dbf3f43f8)
+
+
+- 📝 [docs] Replace custom 404 HTML with Markdown version
+
+- Switches the 404 error page from a static HTML file to a Markdown-based version for improved maintainability and consistency with the documentation site.
+- Leverages site-wide styles and layouts, making updates and theming easier.
+- Retains helpful links, error imagery, and assistance options in a more concise, maintainable format. [`(2d3c3f2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2d3c3f2f2c77e9e8803605de576b3f648414fa5d)
+
+
+- 📝 [docs] Remove custom 404 page and update markdownlint config
+
+- Removes the custom documentation 404 page to simplify the docs directory or align with new site error handling.
+- Updates markdownlint rules to allow specific HTML elements, supporting richer markdown formatting flexibility. [`(486ae82)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/486ae82fc41068b5a641a1992aaa887db8c3eec3)
+
+
+- 📝 [docs] Update all docs for consistent, extensionless internal links
+
+- Replaces all Markdown links to internal documentation by removing trailing slashes and file extensions, ensuring consistency and preventing potential broken links with static site generators.
+- Refactors the 404 page with enhanced visuals and improved navigation, aligning quick links and help sections with updated URLs.
+- Updates the documentation index, API references, component docs, and all guides to use uniform, extensionless links for a cleaner, more reliable user experience.
+- Adjusts navigation breadcrumbs and "See Also" sections site-wide for clarity and maintainability.
+- [dependency] Updates package version to 3.4.0 and corrects misplaced dependencies in the lockfile for improved build reliability. [`(15bb4b4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/15bb4b4e69b6d3053e3e5b6443dbf2353b030ef5)
+
+
+- 🔧 [build] Switch to local Jekyll theme and remove remote plugin
+
+- Replaces the remote theme with the standard Jekyll theme to simplify configuration and reduce reliance on external plugins
+- Removes the now-unnecessary remote theme plugin for improved build stability and maintainability [`(63ff127)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/63ff127c8e254d592ec8a74cbe96f8d66cf8b863)
+
+
+- 📝 [docs] Update all docs to use directory-style links
+
+- Replaces .md file links with trailing-slash directory-style links throughout documentation for improved compatibility with static site generators and cleaner URLs
+- Updates navigation, breadcrumbs, cross-references, and "See Also" sections for consistency
+- Adjusts config for correct site URL and baseurl, and corrects Jekyll remote theme plugin ordering
+- Adds frontmatter to guide and instruction index files for better integration with site layouts
+- Enhances code block rendering in some guides with {% raw %} tags to prevent Jekyll/Liquid parsing issues
+- Improves maintainability and reduces risk of broken links due to file renaming or restructuring [`(b8642e9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b8642e9fbf1a36b69cb2b2965fd59e336fb652f7)
+
+
+- 📝 [docs] Add raw blocks and enforce code fence style in docs
+
+- Wraps code examples in documentation with raw blocks to prevent unwanted Markdown processing and rendering issues.
+- Updates linting configuration to enforce consistent fenced code block style across Markdown files.
+- Improves readability and reliability of code snippets for users and contributors. [`(6de4d28)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6de4d2848957ac613b12a3017c1ed3f121a35939)
+
+
+- Update metrics.repository.svg - [Skip GitHub Action] [`(d813054)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d813054dd83065b82e740af0719a86c0043505a5)
+
+
+- Update theme-api.md [`(04ea615)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/04ea6150ecc11ff0153c688ca9f06b2f6cb341d8)
+
+
+- ⭐ feat: update dependencies and integrate Vite MCP plugin
+
+- Added @executeautomation/database-server and @playwright/test to package.json
+- Updated @typescript/native-preview and eslint versions
+- Introduced vite-plugin-mcp in vite.config.ts for Model Context Protocol integration
+- Created Vite-MCP-Configuration.md for detailed MCP setup and usage instructions
+- Updated @types/node version in dependencies
+- Added zod and zod-to-json-schema to dependencies [`(15272a9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/15272a9139a6579025be87d8d69eafcb07b07d6c)
+
+
+
+### ⚙️ Miscellaneous Tasks
+
+- Update changelogs for v3.4.0 [skip ci] [`(32c75ef)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/32c75efb81366bee486ad1c7df84589cb11b1952)
+
+
+
 ### 📦 Dependencies
 
 - [dependency] Update version 3.4.0 [`(cba3c1b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cba3c1b56c1fcb91c52080e6247f00b533bda144)
+
+
+
+### 🛡️ Security
+
+- 📝 [docs] Update docs for repo URLs, interval options, and security details
+
+- Updates all documentation links to use the correct GitHub repository URL for consistency and accuracy
+- Documents expanded monitoring interval options, lowering the minimum to 5 seconds and raising the maximum to 30 days
+- Clarifies authentication support and planned features in the FAQ
+- Refines API and security documentation to reflect current and planned feature sets, removing obsolete configuration examples and aligning descriptions with actual and upcoming capabilities
+- Improves navigation links and usage examples for better user guidance [`(111ed86)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/111ed86d4800f1d7e469ac8127f83ab5ba560fc8)
 
 
 
