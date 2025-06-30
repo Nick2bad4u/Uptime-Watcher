@@ -136,7 +136,7 @@ export class PortMonitor implements IMonitorService {
         const errorMessage = error instanceof Error ? error.message : "Unknown error";
         // Extract response time from custom error if available
         const responseTime = error instanceof PortCheckError ? error.responseTime : 0;
-        
+
         if (isDev()) {
             logger.debug(`[PortMonitor] Final error for ${host}:${port}: ${errorMessage}`);
         }

@@ -8,7 +8,7 @@ import { logger } from "../../utils/logger";
  * Handles per-monitor interval timers and scheduling logic.
  */
 export class MonitorScheduler {
-    private intervals: Map<string, NodeJS.Timeout> = new Map();
+    private readonly intervals: Map<string, NodeJS.Timeout> = new Map();
     private onCheckCallback?: (siteIdentifier: string, monitorId: string) => Promise<void>;
 
     /**
@@ -44,7 +44,7 @@ export class MonitorScheduler {
         const interval = setInterval(async () => {
             if (this.onCheckCallback) {
                 try {
-                    await this.onCheckCallback(siteIdentifier, monitor.id!);
+                    await this.onCheckCallback(siteIdentifier, monitor.id);
                 } catch (error) {
                     logger.error(`[MonitorScheduler] Error during scheduled check for ${intervalKey}`, error);
                 }
