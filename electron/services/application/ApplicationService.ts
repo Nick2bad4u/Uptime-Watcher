@@ -13,11 +13,11 @@ import { WindowService } from "../window";
  * Handles application lifecycle and service coordination.
  */
 export class ApplicationService {
-    private windowService: WindowService;
-    private ipcService: IpcService;
-    private notificationService: NotificationService;
-    private autoUpdaterService: AutoUpdaterService;
-    private uptimeMonitor: UptimeMonitor;
+    private readonly windowService: WindowService;
+    private readonly ipcService: IpcService;
+    private readonly notificationService: NotificationService;
+    private readonly autoUpdaterService: AutoUpdaterService;
+    private readonly uptimeMonitor: UptimeMonitor;
 
     constructor() {
         logger.info("[ApplicationService] Initializing application services");
@@ -38,8 +38,12 @@ export class ApplicationService {
      * Setup application-level event handlers.
      */
     private setupApplication(): void {
-        app.on("ready", () => {
-            this.onAppReady();
+        app.on("ready", async () => {
+            try {
+                await this.onAppReady();
+            } catch (error) {
+                logger.error("[ApplicationService] Error during app initialization", error);
+            }
         });
 
         app.on("window-all-closed", () => {
@@ -62,7 +66,10 @@ export class ApplicationService {
     /**
      * Handle app ready event.
      */
-    private onAppReady(): void {
+    private async onAppReady(): Promise<void> {
+        // Initialize the uptime monitor with database
+        await this.uptimeMonitor.initialize();
+
         // Create main window
         this.windowService.createMainWindow();
 
@@ -95,7 +102,10 @@ export class ApplicationService {
         // Status updates
         this.uptimeMonitor.on("status-update", (data: StatusUpdate) => {
             const monitorStatuses = data.site.monitors
-                .map((m) => `${m.type}: ${m.status}${m.responseTime ? ` (${m.responseTime}ms)` : ""}`)
+                .map((m) => {
+                    const responseTimeInfo = m.responseTime ? ` (${m.responseTime}ms)` : "";
+                    return `${m.type}: ${m.status}${responseTimeInfo}`;
+                })
                 .join(", ");
             logger.debug(`[ApplicationService] Status update for ${data.site.identifier}: ${monitorStatuses}`);
             this.windowService.sendToRenderer("status-update", data);

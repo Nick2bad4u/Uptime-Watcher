@@ -54,19 +54,19 @@ import { withDbRetry } from "./utils/retry";
  */
 
 export class UptimeMonitor extends EventEmitter {
-    private sites: Map<string, Site> = new Map(); // key: site.identifier
+    private readonly sites: Map<string, Site> = new Map(); // key: site.identifier
     private historyLimit: number = DEFAULT_HISTORY_LIMIT; // Default history limit - generous for good UX
     private isMonitoring: boolean = false;
 
     // Repository instances
-    private databaseService: DatabaseService;
-    private siteRepository: SiteRepository;
-    private monitorRepository: MonitorRepository;
-    private historyRepository: HistoryRepository;
-    private settingsRepository: SettingsRepository;
+    private readonly databaseService: DatabaseService;
+    private readonly siteRepository: SiteRepository;
+    private readonly monitorRepository: MonitorRepository;
+    private readonly historyRepository: HistoryRepository;
+    private readonly settingsRepository: SettingsRepository;
 
     // Service instances
-    private monitorScheduler: MonitorScheduler;
+    private readonly monitorScheduler: MonitorScheduler;
 
     constructor() {
         super();
@@ -81,8 +81,13 @@ export class UptimeMonitor extends EventEmitter {
         // Initialize services
         this.monitorScheduler = new MonitorScheduler();
         this.monitorScheduler.setCheckCallback(this.handleScheduledCheck.bind(this));
+    }
 
-        this.initDatabase();
+    /**
+     * Initialize the database and load sites. Must be called after construction.
+     */
+    public async initialize(): Promise<void> {
+        await this.initDatabase();
     }
 
     private async initDatabase() {
@@ -224,7 +229,7 @@ export class UptimeMonitor extends EventEmitter {
             }
         }
 
-        logger.info(`Site added successfully: ${site.identifier} (${site.name || "unnamed"})`);
+        logger.info(`Site added successfully: ${site.identifier} (${site.name ?? "unnamed"})`);
         return site;
     }
 
@@ -355,9 +360,9 @@ export class UptimeMonitor extends EventEmitter {
             const monitorsWithIds = site.monitors.filter((monitor) => monitor.id);
             const stopPromises = monitorsWithIds.map(async (monitor) => {
                 try {
-                    return await this.stopMonitoringForSite(identifier, monitor.id!);
+                    return await this.stopMonitoringForSite(identifier, monitor.id);
                 } catch (error) {
-                    logger.error(`Failed to stop monitoring for monitor ${monitor.id || "unknown"}`, error);
+                    logger.error(`Failed to stop monitoring for monitor ${monitor.id ?? "unknown"}`, error);
                     return false;
                 }
             });
@@ -416,7 +421,7 @@ export class UptimeMonitor extends EventEmitter {
             // Add history entry using repository
             await this.historyRepository.addEntry(monitor.id, historyEntry, checkResult.details);
             logger.info(
-                `[checkMonitor] Inserted history row: monitor_id=${monitor.id}, status=${historyEntry.status}, responseTime=${historyEntry.responseTime}, timestamp=${historyEntry.timestamp}, details=${checkResult.details || "undefined"}`
+                `[checkMonitor] Inserted history row: monitor_id=${monitor.id}, status=${historyEntry.status}, responseTime=${historyEntry.responseTime}, timestamp=${historyEntry.timestamp}, details=${checkResult.details ?? "undefined"}`
             );
         } catch (err) {
             logger.error(`[checkMonitor] Failed to insert history row: monitor_id=${monitor.id}`, err);
