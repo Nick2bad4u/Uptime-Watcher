@@ -113,39 +113,57 @@ commit_preprocessors = [
 # regex for parsing and grouping commits
 # Commit parsers use emojis and HTML comments for categorization.
 # This convention helps in visually distinguishing commit groups.
+# Updated to match the project's commit emoji conventions:
+# 🔧 [build], 🧹 [chore], 👷 [ci], 📝 [docs], ✨ [feat], 🛠️ [fix], ⚡ [perf], 🚜 [refactor], ⏪ [revert], 🎨 [style], 🧪 [test]
 commit_parsers = [
-  { message = "^feat", group = "<!-- 0 -->🚀 Features" },
-  { message = "^fix", group = "<!-- 1 -->🐛 Bug Fixes" },
+  # Project-specific emoji-based commit types
+  { message = "^✨.*\\[feat\\]", group = "<!-- 0 -->✨ Features" },
+  { message = "^🛠️.*\\[fix\\]", group = "<!-- 1 -->�️ Bug Fixes" },
+  { message = "^🚜.*\\[refactor\\]", group = "<!-- 2 -->🚜 Refactor" },
+  { message = "^📝.*\\[docs\\]", group = "<!-- 3 -->� Documentation" },
+  { message = "^⚡.*\\[perf\\]", group = "<!-- 4 -->⚡ Performance" },
+  { message = "^🎨.*\\[style\\]", group = "<!-- 5 -->🎨 Styling" },
+  { message = "^🧪.*\\[test\\]", group = "<!-- 6 -->🧪 Testing" },
+  { message = "^🧹.*\\[chore\\]", group = "<!-- 7 -->🧹 Chores" },
+  { message = "^👷.*\\[ci\\]", group = "<!-- 8 -->👷 CI/CD" },
+  { message = "^🔧.*\\[build\\]", group = "<!-- 9 -->🔧 Build System" },
+  { message = "^⏪.*\\[revert\\]", group = "<!-- 10 -->⏪ Reverts" },
+  
+  # Fallback patterns for conventional commits without emojis
+  { message = "^feat", group = "<!-- 0 -->✨ Features" },
+  { message = "^fix", group = "<!-- 1 -->🛠️ Bug Fixes" },
   { message = "^refactor", group = "<!-- 2 -->🚜 Refactor" },
-  { message = "^doc", group = "<!-- 3 -->📚 Documentation" },
+  { message = "^docs?", group = "<!-- 3 -->📝 Documentation" },
   { message = "^perf", group = "<!-- 4 -->⚡ Performance" },
   { message = "^style", group = "<!-- 5 -->🎨 Styling" },
   { message = "^test", group = "<!-- 6 -->🧪 Testing" },
-  { message = "^chore\\(release\\): prepare for", group = "<!-- 7 -->⚙️ Miscellaneous Tasks" },
-  { message = "^chore\\(deps.*\\)", group = "<!-- 8 -->📦 Dependencies" },
-  { message = "^chore\\(pr\\)", group = "<!-- 7 -->⚙️ Miscellaneous Tasks" },
-  { message = "^chore\\(pull\\)", group = "<!-- 7 -->⚙️ Miscellaneous Tasks" },
-  { message = "^chore|^ci", group = "<!-- 7 -->⚙️ Miscellaneous Tasks" },
+  { message = "^build", group = "<!-- 9 -->🔧 Build System" },
+  { message = "^ci", group = "<!-- 8 -->👷 CI/CD" },
+  { message = "^chore\\(release\\): prepare for", group = "<!-- 7 -->🧹 Chores" },
+  { message = "^chore\\(deps.*\\)", group = "<!-- 11 -->📦 Dependencies" },
+  { message = "^chore\\(pr\\)", group = "<!-- 7 -->🧹 Chores" },
+  { message = "^chore\\(pull\\)", group = "<!-- 7 -->🧹 Chores" },
+  { message = "^chore", group = "<!-- 7 -->🧹 Chores" },
   
   # Dependency-related commits
-  { message = "^\\[dependency\\]", group = "<!-- 8 -->📦 Dependencies" },
-  { message = "^bump the.*group", group = "<!-- 8 -->📦 Dependencies" },
-  { message = "^Bump the.*group", group = "<!-- 8 -->📦 Dependencies" },
-  { message = "^Bumps.*", group = "<!-- 8 -->📦 Dependencies" },
-  { message = "^Bump [a-zA-Z0-9@\\-\\/]+", group = "<!-- 8 -->📦 Dependencies" },
-  { message = ".*npm-all.*", group = "<!-- 8 -->📦 Dependencies" },
-  { message = ".*dependabot.*", group = "<!-- 8 -->📦 Dependencies" },
+  { message = "^\\[dependency\\]", group = "<!-- 11 -->📦 Dependencies" },
+  { message = "^bump the.*group", group = "<!-- 11 -->📦 Dependencies" },
+  { message = "^Bump the.*group", group = "<!-- 11 -->📦 Dependencies" },
+  { message = "^Bumps.*", group = "<!-- 11 -->📦 Dependencies" },
+  { message = "^Bump [a-zA-Z0-9@\\-\\/]+", group = "<!-- 11 -->📦 Dependencies" },
+  { message = ".*npm-all.*", group = "<!-- 11 -->📦 Dependencies" },
+  { message = ".*dependabot.*", group = "<!-- 11 -->📦 Dependencies" },
   
   # Security-related (keep separate from general dependencies)
-  { body = ".*security.*", group = "<!-- 9 -->🛡️ Security" },
-  { message = ".*security.*", group = "<!-- 9 -->🛡️ Security" },
+  { body = ".*security.*", group = "<!-- 12 -->🛡️ Security" },
+  { message = ".*security.*", group = "<!-- 12 -->🛡️ Security" },
   
-  { message = "^revert", group = "<!-- 10 -->◀️ Revert" },
-  { message = "^Merge branch", group = "<!-- 11 -->🔀 Merge Commits" },
-  { message = "^merge branch", group = "<!-- 11 -->🔀 Merge Commits" },
-  { message = ".*\\.yml", group = "<!-- 12 -->🛠️ GitHub Actions" },
-  { message = ".*", group = "<!-- 13 -->💼 Other", body = ".*" },
-  { message = ".*", group = "<!-- 13 -->💼 Other" },
+  { message = "^revert", group = "<!-- 10 -->⏪ Reverts" },
+  { message = "^Merge branch", group = "<!-- 13 -->🔀 Merge Commits" },
+  { message = "^merge branch", group = "<!-- 13 -->🔀 Merge Commits" },
+  { message = ".*\\.yml", group = "<!-- 8 -->� CI/CD" },
+  { message = ".*", group = "<!-- 14 -->💼 Other", body = ".*" },
+  { message = ".*", group = "<!-- 14 -->💼 Other" },
 ]
 # filter out the commits that are not matched by commit parsers
 filter_commits = false
