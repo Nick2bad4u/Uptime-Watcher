@@ -10,7 +10,7 @@ import { DatabaseService } from "./DatabaseService";
  * Handles CRUD operations for monitor history in the database.
  */
 export class HistoryRepository {
-    private databaseService: DatabaseService;
+    private readonly databaseService: DatabaseService;
 
     constructor() {
         this.databaseService = DatabaseService.getInstance();
@@ -30,7 +30,7 @@ export class HistoryRepository {
         return {
             details: row.details !== undefined ? String(row.details) : undefined,
             responseTime: typeof row.responseTime === "number" ? row.responseTime : Number(row.responseTime),
-            status: row.status === "up" || row.status === "down" ? (row.status as "up" | "down") : "down",
+            status: row.status === "up" || row.status === "down" ? row.status : "down",
             timestamp: typeof row.timestamp === "number" ? row.timestamp : Number(row.timestamp),
         };
     }
@@ -41,10 +41,10 @@ export class HistoryRepository {
     public async findByMonitorId(monitorId: string): Promise<StatusHistory[]> {
         try {
             const db = this.getDb();
-            const historyRows = (await db.all(
+            const historyRows = db.all(
                 "SELECT timestamp, status, responseTime, details FROM history WHERE monitor_id = ? ORDER BY timestamp DESC",
                 [monitorId]
-            )) as Record<string, unknown>[];
+            ) as Record<string, unknown>[];
 
             const result = historyRows.map((row) => this.rowToHistoryEntry(row));
 
@@ -61,7 +61,7 @@ export class HistoryRepository {
     public async addEntry(monitorId: string, entry: StatusHistory, details?: string): Promise<void> {
         try {
             const db = this.getDb();
-            await db.run(
+            db.run(
                 "INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)",
                 [
                     monitorId,
@@ -69,7 +69,7 @@ export class HistoryRepository {
                     entry.status,
                     entry.responseTime,
                     // eslint-disable-next-line unicorn/no-null
-                    details || null,
+                    details ?? null,
                 ]
             );
 
@@ -90,7 +90,7 @@ export class HistoryRepository {
     public async deleteByMonitorId(monitorId: string): Promise<void> {
         try {
             const db = this.getDb();
-            await db.run("DELETE FROM history WHERE monitor_id = ?", [monitorId]);
+            db.run("DELETE FROM history WHERE monitor_id = ?", [monitorId]);
             if (isDev()) {
                 logger.debug(`[HistoryRepository] Deleted history for monitor: ${monitorId}`);
             }
@@ -112,14 +112,14 @@ export class HistoryRepository {
             const db = this.getDb();
 
             // Get entries to delete (keep only the most recent 'limit' entries)
-            const excess = (await db.all(
+            const excess = db.all(
                 "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?",
                 [monitorId, limit]
-            )) as Array<{ id: number }>;
+            ) as Array<{ id: number }>;
 
             if (excess.length > 0) {
                 const excessIds = excess.map((row) => row.id);
-                await db.run(`DELETE FROM history WHERE id IN (${excessIds.join(",")})`);
+                db.run(`DELETE FROM history WHERE id IN (${excessIds.join(",")})`);
                 if (isDev()) {
                     logger.debug(
                         `[HistoryRepository] Pruned ${excess.length} old history entries for monitor: ${monitorId}`
@@ -144,7 +144,7 @@ export class HistoryRepository {
             const db = this.getDb();
 
             // Get all monitor IDs
-            const monitorRows = (await db.all("SELECT id FROM monitors")) as Array<{ id: number }>;
+            const monitorRows = db.all("SELECT id FROM monitors") as Array<{ id: number }>;
 
             // Prune history for each monitor
             for (const row of monitorRows) {
@@ -166,11 +166,11 @@ export class HistoryRepository {
     public async getHistoryCount(monitorId: string): Promise<number> {
         try {
             const db = this.getDb();
-            const result = (await db.get("SELECT COUNT(*) as count FROM history WHERE monitor_id = ?", [monitorId])) as
+            const result = db.get("SELECT COUNT(*) as count FROM history WHERE monitor_id = ?", [monitorId]) as
                 | { count: number }
                 | undefined;
 
-            return result?.count || 0;
+            return result?.count ?? 0;
         } catch (error) {
             logger.error(`[HistoryRepository] Failed to get history count for monitor: ${monitorId}`, error);
             throw error;
@@ -183,7 +183,7 @@ export class HistoryRepository {
     public async deleteAll(): Promise<void> {
         try {
             const db = this.getDb();
-            await db.run("DELETE FROM history");
+            db.run("DELETE FROM history");
             if (isDev()) {
                 logger.debug("[HistoryRepository] Cleared all history");
             }
@@ -199,10 +199,10 @@ export class HistoryRepository {
     public async getLatestEntry(monitorId: string): Promise<StatusHistory | undefined> {
         try {
             const db = this.getDb();
-            const row = (await db.get(
+            const row = db.get(
                 "SELECT timestamp, status, responseTime, details FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT 1",
                 [monitorId]
-            )) as Record<string, unknown> | undefined;
+            ) as Record<string, unknown> | undefined;
 
             if (!row) {
                 return undefined;
@@ -226,7 +226,7 @@ export class HistoryRepository {
             const db = this.getDb();
 
             for (const entry of historyEntries) {
-                await db.run(
+                db.run(
                     "INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)",
                     [
                         monitorId,
@@ -234,7 +234,7 @@ export class HistoryRepository {
                         entry.status === "up" || entry.status === "down" ? entry.status : "down",
                         entry.responseTime,
                         // eslint-disable-next-line unicorn/no-null
-                        entry.details || null,
+                        entry.details ?? null,
                     ]
                 );
             }

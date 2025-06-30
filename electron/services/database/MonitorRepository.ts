@@ -11,6 +11,11 @@ import { logger } from "../../utils/logger";
 import { DatabaseService } from "./DatabaseService";
 
 /**
+ * Type for database parameter values.
+ */
+type DbValue = string | number | null;
+
+/**
  * Database row representation of a monitor.
  */
 export interface MonitorRow {
@@ -34,7 +39,10 @@ export interface MonitorRow {
  * Handles CRUD operations for monitors in the database.
  */
 export class MonitorRepository {
-    private databaseService: DatabaseService;
+    private readonly databaseService: DatabaseService;
+
+    private static readonly GET_LATEST_MONITOR_ID_SQL =
+        "SELECT id FROM monitors WHERE site_identifier = ? ORDER BY id DESC LIMIT 1";
 
     constructor() {
         this.databaseService = DatabaseService.getInstance();
@@ -48,16 +56,129 @@ export class MonitorRepository {
     }
 
     /**
+     * Safely convert a value to number or return undefined.
+     */
+    private safeNumberConvert(value: unknown): number | undefined {
+        if (typeof value === "number") {
+            return value;
+        }
+        if (value) {
+            return Number(value);
+        }
+        return undefined;
+    }
+
+    /**
+     * Convert a date-like value to ISO string or null for database storage.
+     */
+    private convertDateForDb(value: Date | string | null | undefined): string | null {
+        if (!value) {
+            // eslint-disable-next-line unicorn/no-null -- required for SQLite
+            return null;
+        }
+        if (value instanceof Date) {
+            return value.toISOString();
+        }
+        return String(value);
+    }
+
+    /**
+     * Add a string field to update arrays if the value is defined.
+     */
+    private addStringField(
+        fieldName: string,
+        value: string | undefined,
+        updateFields: string[],
+        updateValues: DbValue[]
+    ): void {
+        if (value !== undefined) {
+            updateFields.push(`${fieldName} = ?`);
+            // eslint-disable-next-line unicorn/no-null -- required for SQLite
+            updateValues.push(value ? String(value) : null);
+        }
+    }
+
+    /**
+     * Add a number field to update arrays if the value is defined.
+     */
+    private addNumberField(
+        fieldName: string,
+        value: number | undefined,
+        updateFields: string[],
+        updateValues: DbValue[]
+    ): void {
+        if (value !== undefined) {
+            updateFields.push(`${fieldName} = ?`);
+            // eslint-disable-next-line unicorn/no-null -- required for SQLite
+            updateValues.push(value !== undefined ? Number(value) : null);
+        }
+    }
+
+    /**
+     * Add a boolean field to update arrays if the value is defined.
+     */
+    private addBooleanField(
+        fieldName: string,
+        value: boolean | undefined,
+        updateFields: string[],
+        updateValues: DbValue[]
+    ): void {
+        if (value !== undefined) {
+            updateFields.push(`${fieldName} = ?`);
+            updateValues.push(value ? 1 : 0);
+        }
+    }
+
+    /**
+     * Build parameter array for monitor insertion.
+     */
+    private buildMonitorParameters(siteIdentifier: string, monitor: Site["monitors"][0]): DbValue[] {
+        return [
+            siteIdentifier,
+            monitor.type,
+            // eslint-disable-next-line unicorn/no-null
+            monitor.url ? String(monitor.url) : null,
+            // eslint-disable-next-line unicorn/no-null
+            monitor.host ? String(monitor.host) : null,
+            // eslint-disable-next-line unicorn/no-null
+            monitor.port !== undefined ? Number(monitor.port) : null,
+            // eslint-disable-next-line unicorn/no-null
+            monitor.checkInterval !== undefined ? Number(monitor.checkInterval) : null,
+            // eslint-disable-next-line unicorn/no-null
+            monitor.timeout !== undefined ? Number(monitor.timeout) : null,
+            // eslint-disable-next-line unicorn/no-null
+            monitor.retryAttempts !== undefined ? Number(monitor.retryAttempts) : null,
+            monitor.monitoring ? 1 : 0,
+            monitor.status || "down",
+            // eslint-disable-next-line unicorn/no-null
+            monitor.responseTime !== undefined ? Number(monitor.responseTime) : null,
+            this.convertDateForDb(monitor.lastChecked),
+        ];
+    }
+
+    /**
+     * Insert a single monitor and return its new ID.
+     */
+    private insertSingleMonitor(siteIdentifier: string, monitor: Site["monitors"][0], db: Database): string {
+        const parameters = this.buildMonitorParameters(siteIdentifier, monitor);
+
+        db.run(
+            `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, timeout, retryAttempts, monitoring, status, responseTime, lastChecked) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            parameters
+        );
+
+        // Get the created monitor ID
+        const result = db.get(MonitorRepository.GET_LATEST_MONITOR_ID_SQL, [siteIdentifier]);
+
+        return result?.id ? String(result.id) : "";
+    }
+
+    /**
      * Convert database row to monitor object.
      */
     private rowToMonitor(row: Record<string, unknown>): Site["monitors"][0] {
         return {
-            checkInterval:
-                typeof row.checkInterval === "number"
-                    ? row.checkInterval
-                    : row.checkInterval
-                      ? Number(row.checkInterval)
-                      : undefined,
+            checkInterval: this.safeNumberConvert(row.checkInterval),
             history: [], // History will be loaded separately
             host: row.host !== undefined ? String(row.host) : undefined,
             id: row.id !== undefined ? String(row.id) : "-1",
@@ -66,21 +187,11 @@ export class MonitorRepository {
                     ? new Date(row.lastChecked)
                     : undefined,
             monitoring: Boolean(row.monitoring),
-            port: typeof row.port === "number" ? row.port : row.port ? Number(row.port) : undefined,
-            responseTime:
-                typeof row.responseTime === "number"
-                    ? row.responseTime
-                    : row.responseTime
-                      ? Number(row.responseTime)
-                      : undefined,
-            retryAttempts:
-                typeof row.retryAttempts === "number"
-                    ? row.retryAttempts
-                    : row.retryAttempts
-                      ? Number(row.retryAttempts)
-                      : undefined,
+            port: this.safeNumberConvert(row.port),
+            responseTime: this.safeNumberConvert(row.responseTime),
+            retryAttempts: this.safeNumberConvert(row.retryAttempts),
             status: typeof row.status === "string" ? (row.status as "up" | "down" | "pending") : "down",
-            timeout: typeof row.timeout === "number" ? row.timeout : row.timeout ? Number(row.timeout) : undefined,
+            timeout: this.safeNumberConvert(row.timeout),
             type: typeof row.type === "string" ? (row.type as Site["monitors"][0]["type"]) : "http",
             url: row.url !== undefined ? String(row.url) : undefined,
         };
@@ -92,9 +203,10 @@ export class MonitorRepository {
     public async findBySiteIdentifier(siteIdentifier: string): Promise<Site["monitors"]> {
         try {
             const db = this.getDb();
-            const monitorRows = (await db.all("SELECT * FROM monitors WHERE site_identifier = ?", [
-                siteIdentifier,
-            ])) as Record<string, unknown>[];
+            const monitorRows = db.all("SELECT * FROM monitors WHERE site_identifier = ?", [siteIdentifier]) as Record<
+                string,
+                unknown
+            >[];
 
             return monitorRows.map((row) => this.rowToMonitor(row));
         } catch (error) {
@@ -109,7 +221,7 @@ export class MonitorRepository {
     public async findById(monitorId: string): Promise<Site["monitors"][0] | undefined> {
         try {
             const db = this.getDb();
-            const row = (await db.get("SELECT * FROM monitors WHERE id = ?", [monitorId])) as
+            const row = db.get("SELECT * FROM monitors WHERE id = ?", [monitorId]) as
                 | Record<string, unknown>
                 | undefined;
 
@@ -130,7 +242,7 @@ export class MonitorRepository {
     public async create(siteIdentifier: string, monitor: Omit<Site["monitors"][0], "id">): Promise<string> {
         try {
             const db = this.getDb();
-            await db.run(
+            db.run(
                 `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, timeout, retryAttempts, monitoring, status, responseTime, lastChecked) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                 [
                     siteIdentifier,
@@ -157,9 +269,9 @@ export class MonitorRepository {
             );
 
             // Fetch the ID of the last inserted monitor
-            const row = (await db.get("SELECT id FROM monitors WHERE site_identifier = ? ORDER BY id DESC LIMIT 1", [
-                siteIdentifier,
-            ])) as { id: number } | undefined;
+            const row = db.get(MonitorRepository.GET_LATEST_MONITOR_ID_SQL, [siteIdentifier]) as
+                | { id: number }
+                | undefined;
 
             if (!row || typeof row.id !== "number") {
                 throw new Error(`Failed to fetch monitor id after insert for site ${siteIdentifier}`);
@@ -185,75 +297,33 @@ export class MonitorRepository {
 
             // Build dynamic SQL based on provided fields to avoid overwriting with defaults
             const updateFields: string[] = [];
-            const updateValues: (string | number | null)[] = [];
+            const updateValues: DbValue[] = [];
 
+            // Add fields using helper methods
             if (monitor.type !== undefined) {
                 updateFields.push("type = ?");
                 updateValues.push(monitor.type);
             }
 
-            if (monitor.url !== undefined) {
-                updateFields.push("url = ?");
-                // eslint-disable-next-line unicorn/no-null -- required for SQLite
-                updateValues.push(monitor.url ? String(monitor.url) : null);
-            }
-
-            if (monitor.host !== undefined) {
-                updateFields.push("host = ?");
-                // eslint-disable-next-line unicorn/no-null -- required for SQLite
-                updateValues.push(monitor.host ? String(monitor.host) : null);
-            }
-
-            if (monitor.port !== undefined) {
-                updateFields.push("port = ?");
-                // eslint-disable-next-line unicorn/no-null -- required for SQLite
-                updateValues.push(monitor.port !== undefined ? Number(monitor.port) : null);
-            }
-
-            if (monitor.checkInterval !== undefined) {
-                updateFields.push("checkInterval = ?");
-                // eslint-disable-next-line unicorn/no-null -- required for SQLite
-                updateValues.push(monitor.checkInterval !== undefined ? Number(monitor.checkInterval) : null);
-            }
-
-            if (monitor.timeout !== undefined) {
-                updateFields.push("timeout = ?");
-                // eslint-disable-next-line unicorn/no-null -- required for SQLite
-                updateValues.push(monitor.timeout !== undefined ? Number(monitor.timeout) : null);
-            }
-
-            if (monitor.retryAttempts !== undefined) {
-                updateFields.push("retryAttempts = ?");
-                // eslint-disable-next-line unicorn/no-null -- required for SQLite
-                updateValues.push(monitor.retryAttempts !== undefined ? Number(monitor.retryAttempts) : null);
-            }
-
-            if (monitor.monitoring !== undefined) {
-                updateFields.push("monitoring = ?");
-                updateValues.push(monitor.monitoring ? 1 : 0);
-            }
+            this.addStringField("url", monitor.url, updateFields, updateValues);
+            this.addStringField("host", monitor.host, updateFields, updateValues);
+            this.addNumberField("port", monitor.port, updateFields, updateValues);
+            this.addNumberField("checkInterval", monitor.checkInterval, updateFields, updateValues);
+            this.addNumberField("timeout", monitor.timeout, updateFields, updateValues);
+            this.addNumberField("retryAttempts", monitor.retryAttempts, updateFields, updateValues);
+            this.addBooleanField("monitoring", monitor.monitoring, updateFields, updateValues);
 
             if (monitor.status !== undefined) {
                 updateFields.push("status = ?");
                 updateValues.push(monitor.status);
             }
 
-            if (monitor.responseTime !== undefined) {
-                updateFields.push("responseTime = ?");
-                // eslint-disable-next-line unicorn/no-null -- required for SQLite
-                updateValues.push(monitor.responseTime !== undefined ? Number(monitor.responseTime) : null);
-            }
+            this.addNumberField("responseTime", monitor.responseTime, updateFields, updateValues);
 
             if (monitor.lastChecked !== undefined) {
                 updateFields.push("lastChecked = ?");
-                updateValues.push(
-                    monitor.lastChecked
-                        ? monitor.lastChecked instanceof Date
-                            ? monitor.lastChecked.toISOString()
-                            : monitor.lastChecked
-                        : // eslint-disable-next-line unicorn/no-null -- required for SQLite
-                          null
-                );
+                const lastCheckedValue = this.convertDateForDb(monitor.lastChecked);
+                updateValues.push(lastCheckedValue);
             }
 
             if (updateFields.length === 0) {
@@ -266,7 +336,7 @@ export class MonitorRepository {
             updateValues.push(monitorId);
 
             const sql = `UPDATE monitors SET ${updateFields.join(", ")} WHERE id = ?`;
-            await db.run(sql, updateValues);
+            db.run(sql, updateValues);
 
             if (isDev()) {
                 logger.debug(`[MonitorRepository] Updated monitor with id: ${monitorId}`);
@@ -285,10 +355,10 @@ export class MonitorRepository {
             const db = this.getDb();
 
             // Delete history first (foreign key constraint)
-            await db.run("DELETE FROM history WHERE monitor_id = ?", [monitorId]);
+            db.run("DELETE FROM history WHERE monitor_id = ?", [monitorId]);
 
             // Delete the monitor
-            const result = await db.run("DELETE FROM monitors WHERE id = ?", [monitorId]);
+            const result = db.run("DELETE FROM monitors WHERE id = ?", [monitorId]);
             const deleted = (result.changes ?? 0) > 0;
 
             if (deleted) {
@@ -314,17 +384,17 @@ export class MonitorRepository {
             const db = this.getDb();
 
             // Get all monitor IDs for this site
-            const monitorRows = (await db.all("SELECT id FROM monitors WHERE site_identifier = ?", [
-                siteIdentifier,
-            ])) as Array<{ id: number }>;
+            const monitorRows = db.all("SELECT id FROM monitors WHERE site_identifier = ?", [siteIdentifier]) as Array<{
+                id: number;
+            }>;
 
             // Delete history for all monitors
             for (const row of monitorRows) {
-                await db.run("DELETE FROM history WHERE monitor_id = ?", [row.id]);
+                db.run("DELETE FROM history WHERE monitor_id = ?", [row.id]);
             }
 
             // Delete all monitors for this site
-            await db.run("DELETE FROM monitors WHERE site_identifier = ?", [siteIdentifier]);
+            db.run("DELETE FROM monitors WHERE site_identifier = ?", [siteIdentifier]);
 
             if (isDev()) {
                 logger.debug(`[MonitorRepository] Deleted all monitors for site: ${siteIdentifier}`);
@@ -341,7 +411,7 @@ export class MonitorRepository {
     public async getAllMonitorIds(): Promise<Array<{ id: number }>> {
         try {
             const db = this.getDb();
-            const rows = (await db.all("SELECT id FROM monitors")) as Array<{ id: number }>;
+            const rows = db.all("SELECT id FROM monitors") as Array<{ id: number }>;
             return rows;
         } catch (error) {
             logger.error("[MonitorRepository] Failed to fetch all monitor IDs", error);
@@ -355,7 +425,7 @@ export class MonitorRepository {
     public async deleteAll(): Promise<void> {
         try {
             const db = this.getDb();
-            await db.run("DELETE FROM monitors");
+            db.run("DELETE FROM monitors");
             if (isDev()) {
                 logger.debug("[MonitorRepository] Cleared all monitors");
             }
@@ -378,48 +448,13 @@ export class MonitorRepository {
             const createdMonitors: Array<Site["monitors"][0]> = [];
 
             for (const monitor of monitors) {
-                await db.run(
-                    `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, timeout, retryAttempts, monitoring, status, responseTime, lastChecked) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                    [
-                        siteIdentifier,
-                        monitor.type,
-                        // eslint-disable-next-line unicorn/no-null
-                        monitor.url ? String(monitor.url) : null,
-                        // eslint-disable-next-line unicorn/no-null
-                        monitor.host ? String(monitor.host) : null,
-                        // eslint-disable-next-line unicorn/no-null
-                        monitor.port !== undefined ? Number(monitor.port) : null,
-                        // eslint-disable-next-line unicorn/no-null
-                        monitor.checkInterval !== undefined ? Number(monitor.checkInterval) : null,
-                        // eslint-disable-next-line unicorn/no-null
-                        monitor.timeout !== undefined ? Number(monitor.timeout) : null,
-                        // eslint-disable-next-line unicorn/no-null
-                        monitor.retryAttempts !== undefined ? Number(monitor.retryAttempts) : null,
-                        monitor.monitoring ? 1 : 0,
-                        monitor.status || "down",
-                        // eslint-disable-next-line unicorn/no-null
-                        monitor.responseTime !== undefined ? Number(monitor.responseTime) : null,
-                        monitor.lastChecked
-                            ? monitor.lastChecked instanceof Date
-                                ? monitor.lastChecked.toISOString()
-                                : monitor.lastChecked
-                            : // eslint-disable-next-line unicorn/no-null -- required for SQLite
-                              null,
-                    ]
-                );
+                const newId = this.insertSingleMonitor(siteIdentifier, monitor, db);
 
-                // Get the created monitor ID
-                const result = await db.get(
-                    "SELECT id FROM monitors WHERE site_identifier = ? ORDER BY id DESC LIMIT 1",
-                    [siteIdentifier]
-                );
-
-                const newMonitor = {
-                    ...monitor,
-                    id: result?.id ? String(result.id) : "",
-                };
-
-                if (newMonitor.id) {
+                if (newId) {
+                    const newMonitor = {
+                        ...monitor,
+                        id: newId,
+                    };
                     createdMonitors.push(newMonitor);
                 }
             }
