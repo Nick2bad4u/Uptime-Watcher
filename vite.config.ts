@@ -6,10 +6,10 @@
 import path from "path";
 // eslint-disable-next-line perfectionist/sort-imports
 import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
 import electron from "vite-plugin-electron";
 import { ViteMcp } from "vite-plugin-mcp";
 import { viteStaticCopy } from "vite-plugin-static-copy";
+import { defineConfig } from "vitest/config";
 
 /**
  * Vite configuration object.
@@ -74,5 +74,26 @@ export default defineConfig({
         open: false, // Don't auto-open browser (Electron only)
         port: 5173,
         strictPort: true, // Fail if port is taken (prevents silent port changes)
+    },
+    test: {
+        coverage: {
+            exclude: [
+                "coverage/**",
+                "dist/**",
+                "dist-electron/**",
+                "**/*.d.ts",
+                "**/*.config.*",
+                "**/node_modules/**",
+                "release/**",
+                "scripts/**",
+                "electron/test/dist/**", // Exclude compiled electron test files
+            ],
+            provider: "v8",
+            reporter: ["text", "json", "lcov"],
+            reportsDirectory: "./coverage",
+        },
+        environment: "jsdom", // Default for React components
+        globals: true, // Enable global test functions (describe, it, expect)
+        setupFiles: ["./src/test/setup.ts"], // Setup file for testing
     },
 });

@@ -11,7 +11,7 @@
         "isolatedModules": true,
         "jsx": "react-jsx",
         "strict": true,
-        "types": ["react", "react-dom"],
+        "types": ["react", "react-dom", "vitest/globals", "@testing-library/jest-dom"],
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "noFallthroughCasesInSwitch": true,
@@ -25,7 +25,16 @@
         "allowJs": true,
         "allowSyntheticDefaultImports": true
     },
-    "include": ["src/**/*.ts", "src/**/*.tsx", "electron/**/*.ts", "electron/**/*.tsx", "vite.config.ts"],
+    "include": [
+        "src/**/*.ts", 
+        "src/**/*.tsx", 
+        "src/**/*.test.ts", 
+        "src/**/*.test.tsx",
+        "electron/**/*.ts", 
+        "electron/**/*.tsx", 
+        "electron/**/*.test.ts",
+        "vite.config.ts"
+    ],
     "exclude": ["node_modules", "dist", "dist-electron", "release", "out"]
     // Separate tsconfig should be used for renderer (src/) if needed
 }

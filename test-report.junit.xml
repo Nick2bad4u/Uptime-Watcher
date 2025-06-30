@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="6" failures="0" errors="0" time="0.0072426">
+    <testsuite name="src/App.test.tsx" timestamp="2025-06-30T22:50:42.053Z" hostname="Nick2bad4u2" tests="2" failures="0" errors="0" skipped="0" time="0.0023991">
+        <testcase classname="src/App.test.tsx" name="Constants &gt; exports font families" time="0.0010478">
+        </testcase>
+        <testcase classname="src/App.test.tsx" name="Constants &gt; exports sans serif font family" time="0.00023">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/constants.test.ts" timestamp="2025-06-30T22:50:42.056Z" hostname="Nick2bad4u2" tests="2" failures="0" errors="0" skipped="0" time="0.003144">
+        <testcase classname="src/constants.test.ts" name="Constants &gt; exports font families" time="0.0015987">
+        </testcase>
+        <testcase classname="src/constants.test.ts" name="Constants &gt; exports sans serif font family" time="0.0003035">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/utils/time.test.ts" timestamp="2025-06-30T22:50:42.061Z" hostname="Nick2bad4u2" tests="2" failures="0" errors="0" skipped="0" time="0.0016995">
+        <testcase classname="src/utils/time.test.ts" name="Time Utils &gt; formats response time correctly" time="0.0007463">
+        </testcase>
+        <testcase classname="src/utils/time.test.ts" name="Time Utils &gt; handles undefined response time" time="0.0001401">
+        </testcase>
+    </testsuite>
+</testsuites>

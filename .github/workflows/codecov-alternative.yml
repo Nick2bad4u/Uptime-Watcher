@@ -1,0 +1,54 @@
+# Alternative codecov.yml approach with separate test runs
+
+name: Run tests and upload coverage
+
+on:
+    workflow_dispatch:
+
+jobs:
+  test:
+    name: Run tests and collect coverage
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    # Run frontend tests with jsdom environment
+    - name: Run frontend tests
+      run: npx vitest run src/**/*.test.{ts,tsx} --coverage --environment=jsdom --reporter=verbose
+
+    # Run electron tests with node environment  
+    - name: Run electron tests
+      run: npx vitest run electron/**/*.test.ts --coverage --environment=node --reporter=verbose
+
+    # Generate combined JUnit report
+    - name: Run all tests for JUnit report
+      run: |
+        npx vitest run --reporter=junit \
+          --outputFile=coverage/test-report.junit.xml
+
+    - name: Upload results to Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        slug: Nick2bad4u/Uptime-Watcher
+        fail_ci_if_error: true
+
+    - name: Upload results to Codecov
+      if: ${{ !cancelled() }}
+      uses: codecov/test-results-action@v1
+      with:
+        files: coverage/test-report.junit.xml
+        token: ${{ secrets.CODECOV_TOKEN }}
