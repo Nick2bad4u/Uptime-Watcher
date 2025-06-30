@@ -30,6 +30,5 @@ export interface IMonitorService {
  */
 export interface MonitorConfig {
     timeout?: number;
-    retries?: number;
     userAgent?: string;
 }

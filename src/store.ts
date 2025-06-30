@@ -25,8 +25,6 @@ interface AppSettings {
     minimizeToTray: boolean;
     /** Current theme name */
     theme: ThemeName;
-    /** Maximum retry attempts for failed requests */
-    maxRetries: number;
     /** Enable sound alerts for status changes */
     soundAlerts: boolean;
     /** Maximum number of history records to keep */
@@ -92,6 +90,7 @@ interface AppState {
     checkSiteNow: (siteId: string, monitorId: string) => Promise<void>;
     modifySite: (identifier: string, updates: Partial<Site>) => Promise<void>;
     updateSiteCheckInterval: (siteId: string, monitorId: string, interval: number) => Promise<void>;
+    updateMonitorRetryAttempts: (siteId: string, monitorId: string, retryAttempts: number | undefined) => Promise<void>;
     updateMonitorTimeout: (siteId: string, monitorId: string, timeout: number | undefined) => Promise<void>;
     updateHistoryLimitValue: (limit: number) => Promise<void>;
     // Per-monitor only: monitorType is required
@@ -146,7 +145,6 @@ interface AppState {
 const defaultSettings: AppSettings = {
     autoStart: false,
     historyLimit: 500,
-    maxRetries: 3,
     minimizeToTray: true,
     notifications: true,
     soundAlerts: false,
@@ -531,6 +529,27 @@ export const useStore = create<AppState>()(
                     await state.syncSitesFromBackend();
                 } catch (error) {
                     state.setError(`Failed to update monitor check interval: ${(error as Error).message}`);
+                    throw error;
+                }
+            },
+            updateMonitorRetryAttempts: async (
+                siteId: string,
+                monitorId: string,
+                retryAttempts: number | undefined
+            ) => {
+                const state = get();
+                state.clearError();
+                try {
+                    // Update in backend (update the monitor in the site's monitors array)
+                    const site = get().sites.find((s) => s.identifier === siteId);
+                    if (!site) throw new Error("Site not found");
+                    const updatedMonitors = site.monitors.map((monitor) =>
+                        monitor.id === monitorId ? { ...monitor, retryAttempts: retryAttempts } : monitor
+                    );
+                    await window.electronAPI.sites.updateSite(siteId, { monitors: updatedMonitors });
+                    await state.syncSitesFromBackend();
+                } catch (error) {
+                    state.setError(`Failed to update monitor retry attempts: ${(error as Error).message}`);
                     throw error;
                 }
             },

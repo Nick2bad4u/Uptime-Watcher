@@ -32,7 +32,13 @@ export class MonitorScheduler {
         this.stopMonitor(siteIdentifier, monitor.id);
 
         // Use monitor-specific checkInterval, fallback to default (60 seconds)
-        const checkInterval = monitor.checkInterval || 60000;
+        const checkInterval = monitor.checkInterval ?? 60000;
+
+        if (isDev()) {
+            logger.debug(
+                `[MonitorScheduler] Monitor checkInterval: ${monitor.checkInterval}, using: ${checkInterval}ms for ${siteIdentifier}|${monitor.id}`
+            );
+        }
 
         const interval = setInterval(async () => {
             if (this.onCheckCallback) {

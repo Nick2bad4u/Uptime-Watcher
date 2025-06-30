@@ -6,7 +6,7 @@
 import React from "react";
 import { FiTrash2, FiSave } from "react-icons/fi";
 
-import { CHECK_INTERVALS, TIMEOUT_CONSTRAINTS } from "../../../constants";
+import { CHECK_INTERVALS, RETRY_CONSTRAINTS, TIMEOUT_CONSTRAINTS } from "../../../constants";
 import logger from "../../../services/logger";
 import {
     ThemedBox,
@@ -33,8 +33,12 @@ interface SettingsTabProps {
     handleSaveInterval: () => void;
     /** Handler for saving site name changes */
     handleSaveName: () => Promise<void>;
+    /** Handler for saving retry attempts changes */
+    handleSaveRetryAttempts: () => Promise<void>;
     /** Handler for saving timeout changes */
     handleSaveTimeout: () => Promise<void>;
+    /** Handler for monitor retry attempts changes */
+    handleRetryAttemptsChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     /** Handler for monitor timeout changes */
     handleTimeoutChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     /** Whether there are unsaved changes pending */
@@ -47,12 +51,16 @@ interface SettingsTabProps {
     localCheckInterval: number;
     /** Local state value for site name */
     localName: string;
+    /** Local state value for retry attempts */
+    localRetryAttempts: number;
     /** Local state value for timeout in seconds (converted to ms when saving) */
     localTimeout: number;
     /** Currently selected monitor being configured */
     selectedMonitor: Monitor;
     /** Function to update local site name state */
     setLocalName: (name: string) => void;
+    /** Whether the retry attempts have been changed */
+    retryAttemptsChanged: boolean;
     /** Whether the timeout has been changed */
     timeoutChanged: boolean;
 }
@@ -75,8 +83,10 @@ export function SettingsTab({
     currentSite,
     handleIntervalChange,
     handleRemoveSite,
+    handleRetryAttemptsChange,
     handleSaveInterval,
     handleSaveName,
+    handleSaveRetryAttempts,
     handleSaveTimeout,
     handleTimeoutChange,
     hasUnsavedChanges,
@@ -84,11 +94,28 @@ export function SettingsTab({
     isLoading,
     localCheckInterval,
     localName,
+    localRetryAttempts,
     localTimeout,
+    retryAttemptsChanged,
     selectedMonitor,
     setLocalName,
     timeoutChanged,
 }: SettingsTabProps) {
+    // Helper function to calculate total monitoring time
+    const calculateMaxDuration = (timeout: number, retryAttempts: number): string => {
+        const totalAttempts = retryAttempts + 1;
+        const timeoutTime = timeout * totalAttempts;
+        const backoffTime =
+            retryAttempts > 0
+                ? Array.from({ length: retryAttempts }, (_, i) => Math.min(0.5 * Math.pow(2, i), 5)).reduce(
+                      (a, b) => a + b,
+                      0
+                  )
+                : 0;
+        const totalTime = Math.ceil(timeoutTime + backoffTime);
+        return totalTime < 60 ? `${totalTime}s` : `${Math.ceil(totalTime / 60)}m`;
+    };
+
     const loggedHandleSaveName = async () => {
         logger.user.action("Settings: Save site name initiated", {
             newName: localName.trim(),
@@ -124,6 +151,16 @@ export function SettingsTab({
             siteId: currentSite.identifier,
         });
         await handleSaveTimeout();
+    };
+
+    const loggedHandleSaveRetryAttempts = async () => {
+        logger.user.action("Settings: Save retry attempts", {
+            monitorId: selectedMonitor?.id,
+            newRetryAttempts: localRetryAttempts,
+            oldRetryAttempts: selectedMonitor?.retryAttempts,
+            siteId: currentSite.identifier,
+        });
+        await handleSaveRetryAttempts();
     };
 
     return (
@@ -250,6 +287,47 @@ export function SettingsTab({
                     (Request timeout: {localTimeout}s)
                 </ThemedText>
             </ThemedBox>
+
+            {/* Retry attempts configuration */}
+            <ThemedBox variant="secondary" padding="md" className="flex items-center gap-3 mb-4">
+                <ThemedText size="sm" variant="secondary">
+                    Retry Attempts:
+                </ThemedText>
+                <ThemedInput
+                    type="number"
+                    value={localRetryAttempts}
+                    onChange={handleRetryAttemptsChange}
+                    placeholder="Enter retry attempts"
+                    className="w-32"
+                    min={RETRY_CONSTRAINTS.MIN}
+                    max={RETRY_CONSTRAINTS.MAX}
+                    step={RETRY_CONSTRAINTS.STEP}
+                />
+                <ThemedButton
+                    variant={retryAttemptsChanged ? "primary" : "secondary"}
+                    size="sm"
+                    onClick={loggedHandleSaveRetryAttempts}
+                    disabled={!retryAttemptsChanged}
+                >
+                    Save
+                </ThemedButton>
+                <ThemedText size="xs" variant="tertiary" className="ml-2">
+                    {localRetryAttempts === 0
+                        ? "(Retry disabled - immediate failure detection)"
+                        : `(Retry ${localRetryAttempts} time${localRetryAttempts !== 1 ? "s" : ""} before marking down)`}
+                </ThemedText>
+            </ThemedBox>
+
+            {/* Total monitoring time indicator */}
+            {localRetryAttempts > 0 && (
+                <ThemedBox variant="tertiary" padding="sm" className="mb-4">
+                    <ThemedText size="xs" variant="secondary">
+                        💡 <strong>Maximum check duration:</strong> ~
+                        {calculateMaxDuration(localTimeout, localRetryAttempts)} ({localTimeout}s per attempt ×{" "}
+                        {localRetryAttempts + 1} attempts + backoff delays)
+                    </ThemedText>
+                </ThemedBox>
+            )}
 
             {/* Site Information */}
             <ThemedCard icon="📊" title="Site Information" padding="xl" rounded="xl" shadow="md" className="mb-6">

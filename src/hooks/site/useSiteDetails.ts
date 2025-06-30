@@ -11,7 +11,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 
-import { AUTO_REFRESH_INTERVAL } from "../../constants";
+import { DEFAULT_CHECK_INTERVAL } from "../../constants";
 import logger from "../../services/logger";
 import { useStore } from "../../store";
 import { Site } from "../../types";
@@ -69,11 +69,10 @@ export function useSiteDetails({ site }: UseSiteDetailsProps) {
         sites,
         startSiteMonitorMonitoring,
         stopSiteMonitorMonitoring,
+        updateMonitorRetryAttempts,
         updateMonitorTimeout,
         updateSiteCheckInterval,
     } = useStore();
-
-    const [isRefreshing, setIsRefreshing] = useState(false);
 
     // Always call hooks first, use fallback for currentSite
     const currentSite = sites.find((s) => s.identifier === site.identifier) || {
@@ -83,12 +82,14 @@ export function useSiteDetails({ site }: UseSiteDetailsProps) {
 
     const monitorIds = currentSite.monitors.map((m) => m.id);
     const defaultMonitorId = monitorIds[0] || "";
-    const selectedMonitorId = getSelectedMonitorId(currentSite.identifier) || defaultMonitorId;
+    const selectedMonitorId = getSelectedMonitorId(currentSite.identifier) ?? defaultMonitorId;
     const selectedMonitor = currentSite.monitors.find((m) => m.id === selectedMonitorId) || currentSite.monitors[0];
     const isMonitoring = selectedMonitor?.monitoring !== false;
 
     // Check interval state
-    const [localCheckInterval, setLocalCheckInterval] = useState<number>(selectedMonitor?.checkInterval || 60000);
+    const [localCheckInterval, setLocalCheckInterval] = useState<number>(
+        selectedMonitor?.checkInterval ?? DEFAULT_CHECK_INTERVAL
+    );
     const [intervalChanged, setIntervalChanged] = useState(false);
 
     // Timeout state (stored in seconds for UI, converted to ms when saving)
@@ -97,76 +98,63 @@ export function useSiteDetails({ site }: UseSiteDetailsProps) {
     );
     const [timeoutChanged, setTimeoutChanged] = useState(false);
 
+    // Retry attempts state
+    const [localRetryAttempts, setLocalRetryAttempts] = useState<number>(selectedMonitor?.retryAttempts ?? 0);
+    const [retryAttemptsChanged, setRetryAttemptsChanged] = useState(false);
+
     // Site name state for settings
-    const [localName, setLocalName] = useState(currentSite.name || "");
+    const [localName, setLocalName] = useState(currentSite.name ?? "");
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
     // Update local state when monitor changes
     useEffect(() => {
-        setLocalCheckInterval(selectedMonitor?.checkInterval ?? 60000);
+        setLocalCheckInterval(selectedMonitor?.checkInterval ?? DEFAULT_CHECK_INTERVAL);
         setIntervalChanged(false);
         setLocalTimeout(selectedMonitor?.timeout ? selectedMonitor.timeout / 1000 : 10);
         setTimeoutChanged(false);
-    }, [selectedMonitor?.checkInterval, selectedMonitor?.timeout, selectedMonitor?.type, currentSite.identifier]);
+        setLocalRetryAttempts(selectedMonitor?.retryAttempts ?? 0);
+        setRetryAttemptsChanged(false);
+    }, [
+        selectedMonitor?.checkInterval,
+        selectedMonitor?.timeout,
+        selectedMonitor?.retryAttempts,
+        selectedMonitor?.type,
+        currentSite.identifier,
+    ]);
 
     // Track name changes
     useEffect(() => {
-        setHasUnsavedChanges(localName !== (currentSite.name || ""));
+        setHasUnsavedChanges(localName !== (currentSite.name ?? ""));
     }, [localName, currentSite.name]);
 
     // Handler for check now
-    const handleCheckNow = useCallback(
-        async (isAutoRefresh = false) => {
-            if (isAutoRefresh) {
-                setIsRefreshing(true);
-            } else {
-                clearError();
-            }
-            try {
-                if (!isAutoRefresh) {
-                    logger.user.action("Manual site check initiated", {
-                        monitorId: selectedMonitorId,
-                        monitorType: currentSite.monitors.find((m) => m.id === selectedMonitorId)?.type,
-                        siteId: currentSite.identifier,
-                        siteName: currentSite.name,
-                    });
-                }
-                await checkSiteNow(currentSite.identifier, selectedMonitorId);
-                if (!isAutoRefresh) {
-                    logger.user.action("Manual site check completed successfully", {
-                        monitorId: selectedMonitorId,
-                        siteId: currentSite.identifier,
-                        siteName: currentSite.name,
-                    });
-                }
-            } catch (error) {
-                logger.site.error(currentSite.identifier, error instanceof Error ? error : String(error));
-                if (!isAutoRefresh) {
-                    logger.error("Manual site check failed", error instanceof Error ? error : String(error), {
-                        monitorId: selectedMonitorId,
-                        siteId: currentSite.identifier,
-                        siteName: currentSite.name,
-                    });
-                }
-            } finally {
-                if (isAutoRefresh) {
-                    setIsRefreshing(false);
-                }
-            }
-        },
-        [checkSiteNow, clearError, currentSite.identifier, currentSite.monitors, currentSite.name, selectedMonitorId]
-    );
+    const handleCheckNow = useCallback(async () => {
+        clearError();
+        try {
+            logger.user.action("Manual site check initiated", {
+                monitorId: selectedMonitorId,
+                monitorType: currentSite.monitors.find((m) => m.id === selectedMonitorId)?.type,
+                siteId: currentSite.identifier,
+                siteName: currentSite.name,
+            });
+            await checkSiteNow(currentSite.identifier, selectedMonitorId);
+            logger.user.action("Manual site check completed successfully", {
+                monitorId: selectedMonitorId,
+                siteId: currentSite.identifier,
+                siteName: currentSite.name,
+            });
+        } catch (error) {
+            logger.site.error(currentSite.identifier, error instanceof Error ? error : String(error));
+            logger.error("Manual site check failed", error instanceof Error ? error : String(error), {
+                monitorId: selectedMonitorId,
+                siteId: currentSite.identifier,
+                siteName: currentSite.name,
+            });
+        }
+    }, [checkSiteNow, clearError, currentSite.identifier, currentSite.monitors, currentSite.name, selectedMonitorId]);
 
-    // Auto-refresh interval
-    useEffect(() => {
-        const interval = setInterval(async () => {
-            if (isMonitoring && !isLoading && !isRefreshing) {
-                await handleCheckNow(true);
-            }
-        }, AUTO_REFRESH_INTERVAL);
-
-        return () => clearInterval(interval);
-    }, [isMonitoring, isLoading, isRefreshing, selectedMonitorId, handleCheckNow]);
+    // No auto-refresh - respect the monitor's configured interval
+    // Users can manually click "Check Now" if they want immediate updates
 
     // Handler for monitor selection change
     const handleMonitorIdChange = useCallback(
@@ -183,7 +171,7 @@ export function useSiteDetails({ site }: UseSiteDetailsProps) {
 
     // Handler for site removal
     const handleRemoveSite = useCallback(async () => {
-        if (!window.confirm(`Are you sure you want to remove ${currentSite.name || currentSite.identifier}?`)) {
+        if (!window.confirm(`Are you sure you want to remove ${currentSite.name ?? currentSite.identifier}?`)) {
             return;
         }
 
@@ -278,6 +266,32 @@ export function useSiteDetails({ site }: UseSiteDetailsProps) {
         }
     }, [currentSite.identifier, selectedMonitorId, localTimeout, updateMonitorTimeout, clearError]);
 
+    // Retry attempts change handlers
+    const handleRetryAttemptsChange = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            const retryAttempts = Number(e.target.value);
+            setLocalRetryAttempts(retryAttempts);
+            const currentRetryAttempts = selectedMonitor?.retryAttempts ?? 0;
+            setRetryAttemptsChanged(retryAttempts !== currentRetryAttempts);
+        },
+        [selectedMonitor?.retryAttempts]
+    );
+
+    const handleSaveRetryAttempts = useCallback(async () => {
+        clearError();
+        try {
+            await updateMonitorRetryAttempts(currentSite.identifier, selectedMonitorId, localRetryAttempts);
+            setRetryAttemptsChanged(false);
+            logger.user.action("Updated monitor retry attempts", {
+                monitorId: selectedMonitorId,
+                newRetryAttempts: localRetryAttempts,
+                siteId: currentSite.identifier,
+            });
+        } catch (error) {
+            logger.site.error(currentSite.identifier, error instanceof Error ? error : String(error));
+        }
+    }, [currentSite.identifier, selectedMonitorId, localRetryAttempts, updateMonitorRetryAttempts, clearError]);
+
     // Name save handler
     const handleSaveName = useCallback(async () => {
         if (!hasUnsavedChanges) return;
@@ -312,8 +326,10 @@ export function useSiteDetails({ site }: UseSiteDetailsProps) {
         handleIntervalChange,
         handleMonitorIdChange,
         handleRemoveSite,
+        handleRetryAttemptsChange,
         handleSaveInterval,
         handleSaveName,
+        handleSaveRetryAttempts,
         handleSaveTimeout,
         handleStartMonitoring,
         handleStopMonitoring,
@@ -324,10 +340,11 @@ export function useSiteDetails({ site }: UseSiteDetailsProps) {
         intervalChanged,
         isLoading,
         isMonitoring,
-        isRefreshing,
         localCheckInterval,
         localName,
+        localRetryAttempts,
         localTimeout,
+        retryAttemptsChanged,
         selectedMonitor,
         selectedMonitorId,
         // Store actions

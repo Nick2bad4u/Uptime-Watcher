@@ -38,6 +38,8 @@ export interface Monitor {
     checkInterval?: number;
     /** Request timeout in milliseconds for this monitor */
     timeout?: number;
+    /** Number of retry attempts before marking as down for this monitor */
+    retryAttempts?: number;
 }
 
 /**

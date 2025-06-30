@@ -30,10 +30,6 @@ interface AppSettings {
     minimizeToTray: boolean;
     /** Current theme name */
     theme: ThemeName;
-    /** Request timeout in milliseconds */
-    timeout: number;
-    /** Maximum retry attempts for failed requests */
-    maxRetries: number;
     /** Enable sound alerts for status changes */
     soundAlerts: boolean;
     /** Maximum number of history records to keep */

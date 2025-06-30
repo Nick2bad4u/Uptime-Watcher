@@ -56,8 +56,6 @@ interface AppSettings {
  autoStart: boolean;
  minimizeToTray: boolean;
  theme: ThemeName; // "light" | "dark" | "high-contrast" | "system"
- timeout: number;
- maxRetries: number;
  soundAlerts: boolean;
  historyLimit: number;
 }

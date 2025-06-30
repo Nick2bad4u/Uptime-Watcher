@@ -64,7 +64,7 @@ export class DatabaseService {
 
         try {
             // Sites table
-            await this._db.run(`
+            this._db.run(`
                 CREATE TABLE IF NOT EXISTS sites (
                     identifier TEXT PRIMARY KEY,
                     name TEXT
@@ -72,7 +72,7 @@ export class DatabaseService {
             `);
 
             // Monitors table
-            await this._db.run(`
+            this._db.run(`
                 CREATE TABLE IF NOT EXISTS monitors (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     site_identifier TEXT,
@@ -82,6 +82,7 @@ export class DatabaseService {
                     port INTEGER,
                     checkInterval INTEGER,
                     timeout INTEGER,
+                    retryAttempts INTEGER DEFAULT 0,
                     monitoring BOOLEAN,
                     status TEXT,
                     responseTime INTEGER,
@@ -91,7 +92,7 @@ export class DatabaseService {
             `);
 
             // History table
-            await this._db.run(`
+            this._db.run(`
                 CREATE TABLE IF NOT EXISTS history (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     monitor_id INTEGER,
@@ -104,7 +105,7 @@ export class DatabaseService {
             `);
 
             // Settings table
-            await this._db.run(`
+            this._db.run(`
                 CREATE TABLE IF NOT EXISTS settings (
                     key TEXT PRIMARY KEY,
                     value TEXT
@@ -112,7 +113,7 @@ export class DatabaseService {
             `);
 
             // Stats table
-            await this._db.run(`
+            this._db.run(`
                 CREATE TABLE IF NOT EXISTS stats (
                     key TEXT PRIMARY KEY,
                     value TEXT
@@ -120,7 +121,7 @@ export class DatabaseService {
             `);
 
             // Logs table
-            await this._db.run(`
+            this._db.run(`
                 CREATE TABLE IF NOT EXISTS logs (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -143,7 +144,7 @@ export class DatabaseService {
     public async close(): Promise<void> {
         if (this._db) {
             try {
-                await this._db.close();
+                this._db.close();
                 this._db = undefined;
                 logger.info("[DatabaseService] Database connection closed");
             } catch (error) {

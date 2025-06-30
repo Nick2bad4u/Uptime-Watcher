@@ -171,16 +171,6 @@
     margin: 0;
 }
 
-.site-details-auto-refresh {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-    font-size: var(--font-size-base);
-    color: var(--color-success);
-    font-weight: var(--font-weight-bold);
-    opacity: 1;
-}
-
 .site-details-refresh-indicator {
     width: 8px;
     height: 8px;

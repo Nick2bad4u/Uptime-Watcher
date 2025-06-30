@@ -3,7 +3,7 @@
  *
  * Provides a comprehensive settings interface for configuring application
  * behavior, theme preferences, monitoring settings, and data management.
- * Includes backup/restore functionality and system configuration options.
+ * Includes data synchronization and SQLite backup functionality.
  */
 
 import { useState, useEffect, useCallback } from "react";
@@ -16,7 +16,6 @@ import {
     ThemedText,
     ThemedButton,
     StatusIndicator,
-    ThemedInput,
     ThemedSelect,
     ThemedCheckbox,
 } from "../../theme/components";
@@ -32,13 +31,16 @@ interface SettingsProps {
 /**
  * Settings component providing comprehensive application configuration.
  *
- * Offers controls for:
- * - Theme selection and appearance
- * - Monitoring intervals and timeouts
- * - History retention settings
- * - Notification preferences
- * - Data backup and restore
- * - System diagnostics and reset options
+ * Actual features available:
+ * - Theme selection (light/dark/system)
+ * - History retention limits (25-unlimited records)
+ * - Desktop notifications (on/off)
+ * - Sound alerts (on/off)
+ * - Auto-start with system (on/off)
+ * - Minimize to system tray (on/off)
+ * - Data synchronization from SQLite backend
+ * - SQLite database backup export
+ * - Reset all settings to defaults
  *
  * @param props - Component props
  * @returns JSX element containing the settings interface
@@ -84,7 +86,6 @@ export function Settings({ onClose }: Readonly<SettingsProps>) {
         "autoStart",
         "minimizeToTray",
         "theme",
-        "maxRetries",
         "soundAlerts",
         "historyLimit",
     ];
@@ -238,24 +239,6 @@ export function Settings({ onClose }: Readonly<SettingsProps>) {
                                 </ThemedSelect>
                                 <ThemedText size="xs" variant="secondary" className="mt-1">
                                     Maximum number of check results to store per site
-                                </ThemedText>
-                            </div>
-
-                            <div>
-                                <ThemedText size="sm" weight="medium" variant="secondary" className="block mb-2">
-                                    Max Retries
-                                </ThemedText>
-                                <ThemedInput
-                                    type="number"
-                                    min="1"
-                                    max="10"
-                                    value={settings.maxRetries}
-                                    onChange={(e) => handleSettingChange("maxRetries", Number(e.target.value))}
-                                    disabled={isLoading}
-                                    aria-label="Maximum number of retry attempts"
-                                />
-                                <ThemedText size="xs" variant="tertiary" className="block mt-1">
-                                    Number of retry attempts before marking a site as down
                                 </ThemedText>
                             </div>
                         </div>

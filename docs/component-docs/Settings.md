@@ -82,7 +82,6 @@ The Settings component integrates with multiple state systems:
 ```typescript
 // Timeout settings with validation
 timeout: number (TIMEOUT_CONSTRAINTS.MIN to TIMEOUT_CONSTRAINTS.MAX)
-maxRetries: number (configurable retry attempts)
 historyLimit: number (HISTORY_LIMIT_OPTIONS array)
 ```
 
@@ -231,7 +230,7 @@ Key CSS classes used for layout and styling:
 // Settings key validation
 const allowedKeys: Array<keyof typeof settings> = [
     "notifications", "autoStart", "minimizeToTray", 
-    "theme", "timeout", "maxRetries", "soundAlerts", "historyLimit"
+    "theme", "soundAlerts", "historyLimit"
 ];
 
 const handleSettingChange = (key: keyof typeof settings, value: unknown) => {

@@ -22,6 +22,7 @@ export interface MonitorRow {
     port?: number;
     checkInterval?: number;
     timeout?: number;
+    retryAttempts?: number;
     monitoring: boolean;
     status: string;
     responseTime?: number;
@@ -72,13 +73,14 @@ export class MonitorRepository {
                     : row.responseTime
                       ? Number(row.responseTime)
                       : undefined,
-            status: typeof row.status === "string" ? (row.status as "up" | "down" | "pending") : "down",
-            timeout:
-                typeof row.timeout === "number"
-                    ? row.timeout
-                    : row.timeout
-                      ? Number(row.timeout)
+            retryAttempts:
+                typeof row.retryAttempts === "number"
+                    ? row.retryAttempts
+                    : row.retryAttempts
+                      ? Number(row.retryAttempts)
                       : undefined,
+            status: typeof row.status === "string" ? (row.status as "up" | "down" | "pending") : "down",
+            timeout: typeof row.timeout === "number" ? row.timeout : row.timeout ? Number(row.timeout) : undefined,
             type: typeof row.type === "string" ? (row.type as Site["monitors"][0]["type"]) : "http",
             url: row.url !== undefined ? String(row.url) : undefined,
         };
@@ -129,7 +131,7 @@ export class MonitorRepository {
         try {
             const db = this.getDb();
             await db.run(
-                `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, timeout, monitoring, status, responseTime, lastChecked) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, timeout, retryAttempts, monitoring, status, responseTime, lastChecked) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                 [
                     siteIdentifier,
                     monitor.type,
@@ -143,6 +145,8 @@ export class MonitorRepository {
                     monitor.checkInterval !== undefined ? Number(monitor.checkInterval) : null,
                     // eslint-disable-next-line unicorn/no-null
                     monitor.timeout !== undefined ? Number(monitor.timeout) : null,
+                    // eslint-disable-next-line unicorn/no-null
+                    monitor.retryAttempts !== undefined ? Number(monitor.retryAttempts) : null,
                     monitor.monitoring ? 1 : 0,
                     monitor.status,
                     // eslint-disable-next-line unicorn/no-null
@@ -216,6 +220,12 @@ export class MonitorRepository {
                 updateFields.push("timeout = ?");
                 // eslint-disable-next-line unicorn/no-null -- required for SQLite
                 updateValues.push(monitor.timeout !== undefined ? Number(monitor.timeout) : null);
+            }
+
+            if (monitor.retryAttempts !== undefined) {
+                updateFields.push("retryAttempts = ?");
+                // eslint-disable-next-line unicorn/no-null -- required for SQLite
+                updateValues.push(monitor.retryAttempts !== undefined ? Number(monitor.retryAttempts) : null);
             }
 
             if (monitor.monitoring !== undefined) {
@@ -369,7 +379,7 @@ export class MonitorRepository {
 
             for (const monitor of monitors) {
                 await db.run(
-                    `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, timeout, monitoring, status, responseTime, lastChecked) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                    `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, timeout, retryAttempts, monitoring, status, responseTime, lastChecked) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                     [
                         siteIdentifier,
                         monitor.type,
@@ -383,6 +393,8 @@ export class MonitorRepository {
                         monitor.checkInterval !== undefined ? Number(monitor.checkInterval) : null,
                         // eslint-disable-next-line unicorn/no-null
                         monitor.timeout !== undefined ? Number(monitor.timeout) : null,
+                        // eslint-disable-next-line unicorn/no-null
+                        monitor.retryAttempts !== undefined ? Number(monitor.retryAttempts) : null,
                         monitor.monitoring ? 1 : 0,
                         monitor.status || "down",
                         // eslint-disable-next-line unicorn/no-null

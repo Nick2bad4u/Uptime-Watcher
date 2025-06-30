@@ -16,8 +16,6 @@ interface SiteDetailsHeaderProps {
     site: Site;
     /** The currently selected monitor for the site */
     selectedMonitor?: Monitor;
-    /** Whether the site is currently being refreshed/checked */
-    isRefreshing: boolean;
 }
 
 /**
@@ -30,7 +28,7 @@ interface SiteDetailsHeaderProps {
  * @returns JSX element containing the site details header
  */
 
-export function SiteDetailsHeader({ isRefreshing, selectedMonitor, site }: SiteDetailsHeaderProps) {
+export function SiteDetailsHeader({ selectedMonitor, site }: SiteDetailsHeaderProps) {
     /**
      * Type guard to check if the window.electronAPI has openExternal method
      * @param api - The API object to check
@@ -50,19 +48,14 @@ export function SiteDetailsHeader({ isRefreshing, selectedMonitor, site }: SiteD
                     {/* Website Screenshot Thumbnail */}
                     <ScreenshotThumbnail
                         url={selectedMonitor?.type === "http" ? (selectedMonitor?.url ?? "") : ""}
-                        siteName={site.name || site.identifier}
+                        siteName={site.name ?? site.identifier}
                     />
                     <div className="site-details-status-indicator">
                         <StatusIndicator status={selectedMonitor?.status ?? "unknown"} size="lg" />
-                        {isRefreshing && (
-                            <div className="site-details-loading-spinner">
-                                <div className="site-details-spinner" />
-                            </div>
-                        )}
                     </div>
                     <div className="flex-1 min-w-0">
                         <ThemedText size="2xl" weight="bold" className="truncate site-details-title">
-                            {site.name || site.identifier}
+                            {site.name ?? site.identifier}
                         </ThemedText>
                         {/* Show URL for HTTP, host:port for port monitor */}
                         {selectedMonitor?.type === "http" && selectedMonitor?.url && (
@@ -75,7 +68,7 @@ export function SiteDetailsHeader({ isRefreshing, selectedMonitor, site }: SiteD
                                 aria-label={`Open ${selectedMonitor.url} in browser`}
                                 onClick={(e) => {
                                     e.preventDefault();
-                                    const url = selectedMonitor.url || "";
+                                    const url = selectedMonitor.url ?? "";
                                     logger.user.action("External URL opened from site details", {
                                         siteId: site.identifier,
                                         siteName: site.name,

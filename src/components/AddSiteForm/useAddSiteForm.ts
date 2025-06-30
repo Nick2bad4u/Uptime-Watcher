@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 
-import { CHECK_INTERVALS } from "../../constants";
+import { DEFAULT_CHECK_INTERVAL } from "../../constants";
 import { generateUuid } from "../../utils/data/generateUuid";
 
 /** Form operation mode */
@@ -90,7 +90,7 @@ export function useAddSiteForm(): AddSiteFormState & AddSiteFormActions {
     const [port, setPort] = useState("");
     const [name, setName] = useState("");
     const [monitorType, setMonitorType] = useState<MonitorType>("http");
-    const [checkInterval, setCheckInterval] = useState(CHECK_INTERVALS[6]?.value || 60000);
+    const [checkInterval, setCheckInterval] = useState(DEFAULT_CHECK_INTERVAL);
     const [siteId, setSiteId] = useState<string>(generateUuid());
 
     // Mode and selection state
@@ -137,7 +137,7 @@ export function useAddSiteForm(): AddSiteFormState & AddSiteFormActions {
         setPort("");
         setName("");
         setMonitorType("http");
-        setCheckInterval(CHECK_INTERVALS[6]?.value || 60000);
+        setCheckInterval(DEFAULT_CHECK_INTERVAL);
         setSiteId(generateUuid());
         setAddMode("new");
         setSelectedExistingSite("");

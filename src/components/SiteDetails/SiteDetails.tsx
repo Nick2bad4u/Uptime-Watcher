@@ -103,9 +103,11 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
         handleRemoveSite,
         handleSaveInterval,
         handleSaveName,
+        handleSaveRetryAttempts,
         handleSaveTimeout,
         handleStartMonitoring,
         handleStopMonitoring,
+        handleRetryAttemptsChange,
         handleTimeoutChange,
         // Name state
         hasUnsavedChanges,
@@ -113,9 +115,9 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
         intervalChanged,
         isLoading,
         isMonitoring,
-        isRefreshing,
         localCheckInterval,
         localName,
+        localRetryAttempts,
         localTimeout,
         selectedMonitor,
         selectedMonitorId,
@@ -127,6 +129,7 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
         showAdvancedMetrics,
         siteDetailsChartTimeRange,
         siteExists,
+        retryAttemptsChanged,
         timeoutChanged,
     } = useSiteDetails({ site });
 
@@ -189,8 +192,8 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
     if (!siteExists) return undefined;
 
     return (
-        <div 
-            className="site-details-modal" 
+        <div
+            className="site-details-modal"
             onClick={onClose}
             role="dialog"
             aria-modal="true"
@@ -204,11 +207,7 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
                     shadow="xl"
                     className="overflow-hidden site-details-content animate-scale-in"
                 >
-                    <SiteDetailsHeader
-                        site={currentSite}
-                        selectedMonitor={selectedMonitor}
-                        isRefreshing={isRefreshing}
-                    />
+                    <SiteDetailsHeader site={currentSite} selectedMonitor={selectedMonitor} />
 
                     <SiteDetailsNavigation
                         activeSiteDetailsTab={activeSiteDetailsTab}
@@ -306,13 +305,17 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
                                 intervalChanged={intervalChanged}
                                 handleIntervalChange={handleIntervalChange}
                                 handleSaveInterval={handleSaveInterval}
+                                handleRetryAttemptsChange={handleRetryAttemptsChange}
+                                handleSaveRetryAttempts={handleSaveRetryAttempts}
                                 handleSaveTimeout={handleSaveTimeout}
                                 handleTimeoutChange={handleTimeoutChange}
                                 localName={localName}
+                                localRetryAttempts={localRetryAttempts}
                                 localTimeout={localTimeout}
                                 setLocalName={setLocalName}
                                 hasUnsavedChanges={hasUnsavedChanges}
                                 handleSaveName={handleSaveName}
+                                retryAttemptsChanged={retryAttemptsChanged}
                                 timeoutChanged={timeoutChanged}
                             />
                         )}

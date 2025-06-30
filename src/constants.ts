@@ -59,8 +59,8 @@ export const CHECK_INTERVALS: IntervalOption[] = [
     { label: "30 days", value: 2592000000 },
 ];
 
-/** Default check interval (1 minute) */
-export const DEFAULT_CHECK_INTERVAL = 60000;
+/** Default check interval (5 minutes) */
+export const DEFAULT_CHECK_INTERVAL = 300000;
 
 /** History limit options for controlling data retention */
 export const HISTORY_LIMIT_OPTIONS: IntervalOption[] = [
@@ -80,9 +80,6 @@ export const HISTORY_LIMIT_OPTIONS: IntervalOption[] = [
     { label: "Unlimited", value: Number.MAX_SAFE_INTEGER },
 ];
 
-/** Auto-refresh interval for site details (30 seconds) */
-export const AUTO_REFRESH_INTERVAL = 30000;
-
 /** Request timeout constraints for HTTP monitoring */
 export const TIMEOUT_CONSTRAINTS = {
     MAX: 300, // 300 seconds maximum (displayed to user)
@@ -95,6 +92,14 @@ export const TIMEOUT_CONSTRAINTS_MS = {
     MAX: 300000, // 300 seconds maximum
     MIN: 1000, // 1 second minimum
     STEP: 1000, // 1 second increments
+} as const;
+
+/** Retry attempt constraints for per-monitor retry configuration */
+export const RETRY_CONSTRAINTS = {
+    DEFAULT: 0, // Default retry attempts (disabled)
+    MAX: 10, // 10 retry attempts maximum
+    MIN: 0, // 0 retries minimum (immediate failure)
+    STEP: 1, // 1 retry increment
 } as const;
 
 /** UI delays and timing to prevent flashing and improve UX */

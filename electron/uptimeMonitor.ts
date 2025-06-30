@@ -16,11 +16,15 @@ import {
 } from "./services/database";
 import { MonitorFactory, MonitorScheduler } from "./services/monitoring";
 import { Site, StatusHistory, StatusUpdate } from "./types";
+import { isDev } from "./utils";
 import { monitorLogger as logger } from "./utils/logger";
 import { withDbRetry } from "./utils/retry";
 
 /** Default timeout for HTTP requests (10 seconds) */
 const DEFAULT_REQUEST_TIMEOUT = 10000;
+
+/** Default check interval for new monitors (5 minutes) */
+const DEFAULT_CHECK_INTERVAL = 300000;
 
 /** Constants */
 const STATUS_UPDATE_EVENT = "status-update";
@@ -201,6 +205,26 @@ export class UptimeMonitor extends EventEmitter {
         // Initial check for all monitors
         for (const monitor of site.monitors) {
             await this.checkMonitor(site, String(monitor.id));
+        }
+
+        // Auto-start monitoring for all new monitors with default checkInterval
+        for (const monitor of site.monitors) {
+            if (monitor.id) {
+                // Set default checkInterval if not specified (5 minutes = 300000ms)
+                if (!monitor.checkInterval) {
+                    monitor.checkInterval = DEFAULT_CHECK_INTERVAL; // 5 minutes default
+                    await this.monitorRepository.update(monitor.id, { checkInterval: monitor.checkInterval });
+                }
+
+                // Start monitoring automatically for new monitors
+                await this.startMonitoringForSite(site.identifier, String(monitor.id));
+
+                if (isDev()) {
+                    logger.debug(
+                        `[addSite] Auto-started monitoring for new monitor ${monitor.id} with interval ${monitor.checkInterval}ms`
+                    );
+                }
+            }
         }
 
         logger.info(`Site added successfully: ${site.identifier} (${site.name || "unnamed"})`);
@@ -537,8 +561,23 @@ export class UptimeMonitor extends EventEmitter {
                     typeof updatedMonitor.checkInterval === "number" &&
                     updatedMonitor.checkInterval !== prevMonitor.checkInterval
                 ) {
+                    if (isDev()) {
+                        logger.debug(
+                            `[updateSite] Restarting monitor ${updatedMonitor.id}: interval changed from ${prevMonitor.checkInterval}ms to ${updatedMonitor.checkInterval}ms`
+                        );
+                    }
+
+                    // Check if the monitor was previously monitoring before stopping
+                    const wasMonitoring = prevMonitor.monitoring ?? false;
+
+                    // Stop the old monitoring
                     await this.stopMonitoringForSite(identifier, String(updatedMonitor.id));
-                    await this.startMonitoringForSite(identifier, String(updatedMonitor.id));
+
+                    // Only restart monitoring if it was previously monitoring
+                    if (wasMonitoring) {
+                        // Use the proper startMonitoringForSite method which handles persistence
+                        await this.startMonitoringForSite(identifier, String(updatedMonitor.id));
+                    }
                 }
             }
         }
