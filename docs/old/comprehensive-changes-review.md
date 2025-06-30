@@ -12,9 +12,9 @@ This document provides a comprehensive review of all changes made for the per-mo
 
 ```typescript
 export interface Monitor {
-  // ...existing properties...
-  /** Request timeout in milliseconds for this monitor */
-  timeout?: number;
+ // ...existing properties...
+ /** Request timeout in milliseconds for this monitor */
+ timeout?: number;
 }
 ```
 
@@ -24,9 +24,9 @@ export interface Monitor {
 
 ```typescript
 export interface Monitor {
-  // ...existing properties...
-  /** Request timeout in milliseconds for this monitor */
-  timeout?: number;
+ // ...existing properties...
+ /** Request timeout in milliseconds for this monitor */
+ timeout?: number;
 }
 ```
 
@@ -50,8 +50,8 @@ CREATE TABLE IF NOT EXISTS monitors (
 
 ```typescript
 export interface MonitorRow {
-  // ...existing properties...
-  timeout?: number;
+ // ...existing properties...
+ timeout?: number;
 }
 ```
 
@@ -71,7 +71,7 @@ export interface MonitorRow {
 #### Store Action (`src/store.ts`)
 
 ```typescript
-updateMonitorTimeout: (siteId: string, monitorId: string, timeout: number | undefined) => Promise<void>
+updateMonitorTimeout: (siteId: string, monitorId: string, timeout: number | undefined) => Promise<void>;
 ```
 
 **Review:** ✅ Proper type signature accepting undefined, consistent with other store actions
@@ -129,15 +129,15 @@ const timeout = monitor.timeout ?? this.config.timeout;
 
 ```typescript
 export const TIMEOUT_CONSTRAINTS = {
-    MAX: 300, // 300 seconds (user-facing)
-    MIN: 1,   // 1 second (user-facing)
-    STEP: 1,  // 1 second (user-facing)
+ MAX: 300, // 300 seconds (user-facing)
+ MIN: 1, // 1 second (user-facing)
+ STEP: 1, // 1 second (user-facing)
 } as const;
 
 export const TIMEOUT_CONSTRAINTS_MS = {
-    MAX: 300000, // 300 seconds in milliseconds (backend)
-    MIN: 1000,   // 1 second in milliseconds (backend)
-    STEP: 1000,  // 1 second in milliseconds (backend)
+ MAX: 300000, // 300 seconds in milliseconds (backend)
+ MIN: 1000, // 1 second in milliseconds (backend)
+ STEP: 1000, // 1 second in milliseconds (backend)
 } as const;
 ```
 

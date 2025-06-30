@@ -38,14 +38,14 @@
 ```typescript
 // ✅ Optimistic updates with fallback
 const newAction = async () => {
-    set(state => ({ optimisticChange: true }));
-    try {
-        await window.electronAPI.newOperation();
-        await state.syncSitesFromBackend(); // Sync truth from backend
-    } catch (error) {
-        state.setError("Operation failed");
-        await state.syncSitesFromBackend(); // Revert optimistic changes
-    }
+ set((state) => ({ optimisticChange: true }));
+ try {
+  await window.electronAPI.newOperation();
+  await state.syncSitesFromBackend(); // Sync truth from backend
+ } catch (error) {
+  state.setError("Operation failed");
+  await state.syncSitesFromBackend(); // Revert optimistic changes
+ }
 };
 ```
 
@@ -101,9 +101,9 @@ logger.app.error("Frontend feature error", error);
 
 ```typescript
 // ✅ Use store selectors for reactive data
-const { newFeatureData, newFeatureAction } = useStore(state => ({
-    newFeatureData: state.newFeatureData,
-    newFeatureAction: state.newFeatureAction
+const { newFeatureData, newFeatureAction } = useStore((state) => ({
+ newFeatureData: state.newFeatureData,
+ newFeatureAction: state.newFeatureAction,
 }));
 ```
 
@@ -157,23 +157,23 @@ const { newFeatureData, newFeatureAction } = useStore(state => ({
 ```typescript
 // ✅ Backend services
 try {
-    const result = await newOperation();
-    return result;
+ const result = await newOperation();
+ return result;
 } catch (error) {
-    logger.error("Operation failed", error, { context });
-    throw new Error("User-friendly error message");
+ logger.error("Operation failed", error, { context });
+ throw new Error("User-friendly error message");
 }
 
 // ✅ Frontend components
 const [error, setError] = useState<string | null>(null);
 
 const handleAction = async () => {
-    setError(null);
-    try {
-        await action();
-    } catch (err) {
-        setError(err instanceof Error ? err.message : "Unknown error");
-    }
+ setError(null);
+ try {
+  await action();
+ } catch (err) {
+  setError(err instanceof Error ? err.message : "Unknown error");
+ }
 };
 ```
 
@@ -239,7 +239,7 @@ const handleAction = async () => {
 **Core Architecture:**
 
 - `src/types.ts` - Frontend types
-- `electron/types.ts` - Backend types  
+- `electron/types.ts` - Backend types
 - `src/store.ts` - State management
 - `electron/preload.ts` - IPC definitions
 

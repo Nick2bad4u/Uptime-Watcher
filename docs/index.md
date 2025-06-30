@@ -26,7 +26,7 @@ Welcome to the comprehensive documentation for **Uptime Watcher** - a powerful, 
 ### 🔧 API Reference
 
 - **[IPC API Reference](guides/IPC-API-Reference)** - Inter-process communication
-- **[Types API](api/types-api)** - TypeScript type definitions  
+- **[Types API](api/types-api)** - TypeScript type definitions
 - **[Store API](api/store-api)** - State management with Zustand
 - **[Monitor API](api/monitor-api)** - Core monitoring functionality
 
@@ -61,7 +61,7 @@ Uptime Watcher is a feature-rich desktop application that helps you monitor the 
 ### ✨ Key Features
 
 - **HTTP/HTTPS Monitoring** - Website uptime and response time tracking
-- **Port Monitoring** - TCP port availability checking  
+- **Port Monitoring** - TCP port availability checking
 - **Real-time Alerts** - Desktop notifications for status changes
 - **Historical Data** - SQLite database with performance history
 - **Cross-platform** - Windows, macOS, and Linux support

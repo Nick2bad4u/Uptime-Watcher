@@ -29,10 +29,10 @@ Formats response time in a human-readable format with automatic unit selection.
 **Examples:**
 
 ```typescript
-formatResponseTime(234);     // "234ms"
-formatResponseTime(1500);    // "1.50s"
+formatResponseTime(234); // "234ms"
+formatResponseTime(1500); // "1.50s"
 formatResponseTime(undefined); // "N/A"
-formatResponseTime(0);       // "0ms"
+formatResponseTime(0); // "0ms"
 ```
 
 #### formatTimestamp(timestamp: number): string
@@ -49,11 +49,11 @@ Formats timestamp as relative time (e.g., "2 minutes ago").
 
 ```typescript
 const now = Date.now();
-formatTimestamp(now - 30000);        // "30 seconds ago"
-formatTimestamp(now - 120000);       // "2 minutes ago"
-formatTimestamp(now - 7200000);      // "2 hours ago"
-formatTimestamp(now - 86400000);     // "1 day ago"
-formatTimestamp(now);                // "Just now"
+formatTimestamp(now - 30000); // "30 seconds ago"
+formatTimestamp(now - 120000); // "2 minutes ago"
+formatTimestamp(now - 7200000); // "2 hours ago"
+formatTimestamp(now - 86400000); // "1 day ago"
+formatTimestamp(now); // "Just now"
 ```
 
 #### formatFullTimestamp(timestamp: number): string
@@ -92,11 +92,11 @@ Formats last checked time for site cards with compact notation.
 
 ```typescript
 const now = Date.now();
-formatLastChecked(now - 60000);     // "1m ago"
-formatLastChecked(now - 3600000);   // "1h ago"
-formatLastChecked(now - 86400000);  // "1d ago"
-formatLastChecked(undefined);        // "Never"
-formatLastChecked(new Date());       // "Just now"
+formatLastChecked(now - 60000); // "1m ago"
+formatLastChecked(now - 3600000); // "1h ago"
+formatLastChecked(now - 86400000); // "1d ago"
+formatLastChecked(undefined); // "Never"
+formatLastChecked(new Date()); // "Just now"
 ```
 
 #### formatDuration(ms: number): string
@@ -112,9 +112,9 @@ Formats duration in a human-readable format.
 **Examples:**
 
 ```typescript
-formatDuration(45000);     // "45s"
-formatDuration(150000);    // "2m 30s"
-formatDuration(7200000);   // "2h 0m"
+formatDuration(45000); // "45s"
+formatDuration(150000); // "2m 30s"
+formatDuration(7200000); // "2h 0m"
 ```
 
 ### Time Period Types and Constants
@@ -134,11 +134,11 @@ Human-readable labels for time periods.
 
 ```typescript
 export const TIME_PERIOD_LABELS: Record<TimePeriod, string> = {
-    "1h": "Last Hour",
-    "12h": "Last 12 Hours", 
-    "24h": "Last 24 Hours",
-    "7d": "Last 7 Days",
-    "30d": "Last 30 Days",
+ "1h": "Last Hour",
+ "12h": "Last 12 Hours",
+ "24h": "Last 24 Hours",
+ "7d": "Last 7 Days",
+ "30d": "Last 30 Days",
 };
 ```
 
@@ -171,7 +171,7 @@ Returns emoji icon for a given status.
 **Status Mappings:**
 
 - `"up"` → "✅"
-- `"down"` → "❌"  
+- `"down"` → "❌"
 - `"pending"` → "⏳"
 - `"unknown"` → "❓"
 - other → "⚪"
@@ -179,10 +179,10 @@ Returns emoji icon for a given status.
 **Examples:**
 
 ```typescript
-getStatusIcon("up");      // "✅"
-getStatusIcon("DOWN");    // "❌" (case-insensitive)
+getStatusIcon("up"); // "✅"
+getStatusIcon("DOWN"); // "❌" (case-insensitive)
 getStatusIcon("pending"); // "⏳"
-getStatusIcon("custom");  // "⚪" (fallback)
+getStatusIcon("custom"); // "⚪" (fallback)
 ```
 
 #### formatStatusWithIcon(status: string): string
@@ -198,8 +198,8 @@ Formats status with emoji icon and properly capitalized text.
 **Examples:**
 
 ```typescript
-formatStatusWithIcon("up");      // "✅ Up"
-formatStatusWithIcon("DOWN");    // "❌ Down"
+formatStatusWithIcon("up"); // "✅ Up"
+formatStatusWithIcon("DOWN"); // "❌ Down"
 formatStatusWithIcon("pending"); // "⏳ Pending"
 formatStatusWithIcon("unknown"); // "❓ Unknown"
 ```
@@ -233,10 +233,10 @@ function SiteCard({ site }: { site: Site }) {
 ```typescript
 import { TIME_PERIOD_LABELS, TimePeriod } from './utils/time';
 
-function ChartPeriodSelector({ 
-    selectedPeriod, 
-    onPeriodChange 
-}: { 
+function ChartPeriodSelector({
+    selectedPeriod,
+    onPeriodChange
+}: {
     selectedPeriod: TimePeriod;
     onPeriodChange: (period: TimePeriod) => void;
 }) {
@@ -287,14 +287,14 @@ function MonitoringSummary({ checks }: { checks: Check[] }) {
 ### Notification Messages
 
 ```typescript
-import { formatFullTimestamp } from './utils/time';
-import { getStatusIcon } from './utils/status';
+import { formatFullTimestamp } from "./utils/time";
+import { getStatusIcon } from "./utils/status";
 
 function createNotificationMessage(site: Site, status: string): string {
-    const icon = getStatusIcon(status);
-    const time = formatFullTimestamp(Date.now());
-    
-    return `${icon} ${site.name} is now ${status} as of ${time}`;
+ const icon = getStatusIcon(status);
+ const time = formatFullTimestamp(Date.now());
+
+ return `${icon} ${site.name} is now ${status} as of ${time}`;
 }
 ```
 
@@ -303,7 +303,7 @@ function createNotificationMessage(site: Site, status: string): string {
 The time utilities integrate with application constants defined in `src/constants.ts`:
 
 ```typescript
-import { CHART_TIME_PERIODS } from '../constants';
+import { CHART_TIME_PERIODS } from "../constants";
 
 // CHART_TIME_PERIODS provides the actual millisecond values
 // TIME_PERIOD_LABELS provides human-readable names
@@ -336,7 +336,7 @@ const icon = getStatusIcon(site.status);
 const fullStatus = formatStatusWithIcon(site.status);
 
 // Avoid - hardcoded icons or text
-const icon = site.status === 'up' ? '✅' : '❌';
+const icon = site.status === "up" ? "✅" : "❌";
 ```
 
 ### Type Safety
@@ -344,10 +344,10 @@ const icon = site.status === 'up' ? '✅' : '❌';
 Use the provided types for better development experience:
 
 ```typescript
-import { TimePeriod, TIME_PERIOD_LABELS } from './utils/time';
+import { TimePeriod, TIME_PERIOD_LABELS } from "./utils/time";
 
 function isValidPeriod(period: string): period is TimePeriod {
-    return period in TIME_PERIOD_LABELS;
+ return period in TIME_PERIOD_LABELS;
 }
 ```
 

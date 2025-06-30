@@ -1,16 +1,15 @@
 <!-- markdownlint-disable -->
 <!-- eslint-disable markdown/no-missing-label-refs -->
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-
 [[9d36057](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9d360578c59be496bcef334ed421c9498fc3d033)...
 [9d36057](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9d360578c59be496bcef334ed421c9498fc3d033)]
 ([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9d360578c59be496bcef334ed421c9498fc3d033...9d360578c59be496bcef334ed421c9498fc3d033))
-
 
 ### � Documentation
 
@@ -21,18 +20,11 @@ All notable changes to this project will be documented in this file.
 - Cleans up unused utility functions related to timestamp formatting, as they are no longer referenced in the codebase.
 - Improves maintainability by ensuring only current, relevant documentation remains and removing risk of confusion from obsolete docs. [`(9d36057)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9d360578c59be496bcef334ed421c9498fc3d033)
 
-
-
-
-
-
 ## [3.4.0] - 2025-06-28
-
 
 [[06a6fbf](https://github.com/Nick2bad4u/Uptime-Watcher/commit/06a6fbf99665974e6ea38926d7c15ed65be49750)...
 [28d3918](https://github.com/Nick2bad4u/Uptime-Watcher/commit/28d3918a0786eaf7e0e8a7953ce6a674c22b253e)]
 ([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/06a6fbf99665974e6ea38926d7c15ed65be49750...28d3918a0786eaf7e0e8a7953ce6a674c22b253e))
-
 
 ### ✨ Features
 
@@ -46,17 +38,13 @@ Adjusts ignore and VS Code settings to allow tracking of built Electron output, 
 
 Lays the technical foundation for reliable uptime tracking, flexible data persistence, and robust desktop application functionality. [`(4e94c98)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4e94c988797316fc0ae86fcab01142c2f3266c04)
 
-
 - Implement availability color utility and enhance themed components with new status variants [`(50b2260)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/50b226067cb7937fdfa5dfebf50ecde976683f05)
-
-
 
 ### 💼 Other
 
 - Unifies uptime quality logic and cleans up constants
 
 Refactors uptime color mapping to use a centralized theme utility instead of scattered thresholds. Cleans up and removes unused constants, types, and configuration blocks to improve maintainability and reduce duplication. Enhances type safety for time periods and streamlines related imports. [`(398a536)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/398a5369561404bbf6ee5f49c482623064c0ff47)
-
 
 - Refactor code for improved readability and consistency
 
@@ -69,23 +57,18 @@ Refactors uptime color mapping to use a centralized theme utility instead of sca
 - Improved time formatting utility functions for consistency.
 - Removed unnecessary whitespace and comments in various files. [`(6e75286)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6e75286ce8d9f7eccf287f3dbfb5cbb17c19be20)
 
-
 - Centralizes time period constants for analytics
 
 Eliminates duplicate time period definitions by introducing a single source of truth for analytics-related time intervals. Updates relevant modules to use the new centralized constants, improving maintainability and reducing risk of inconsistencies. Also replaces a magic number for timeout with a derived constant to enhance configuration clarity. [`(361601f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/361601f52824d2fff76e2ffce017b69efc3a053f)
-
 
 - Centralizes timing logic and UI thresholds
 
 Moves time formatting utilities and UI delay values into shared modules for improved consistency and maintainability.
 Unifies response time and timestamp formatting, uptime thresholds, and timeout constraints, reducing code duplication and easing future updates to timing logic across the app. [`(d174393)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d174393e816e391634730a83cd6dcccc937561ae)
 
-
 - Refines UI and improves error/status handling
 
 Modernizes the application's theme by introducing error text styling, consistent spacing, and improved component classnames. Unifies status icon logic and enhances site status display for clarity. Updates product branding and streamlines the start script for development. Removes legacy site-saving script and polishes quick actions and input layouts for a more professional, accessible user experience. [`(06a6fbf)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/06a6fbf99665974e6ea38926d7c15ed65be49750)
-
-
 
 ### 🚜 Refactor
 
@@ -98,8 +81,6 @@ Modernizes the application's theme by introducing error text styling, consistent
 - Improves accessibility support for input and select components by adding ARIA attributes.
 - Updates Linux desktop entry to use the wrapper script for launching Electron.
 - Ensures that site deletion stops all monitoring processes before removing the site for improved resource management and reliability. [`(4876c9b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4876c9b7772765edb8e70974a73c32fc15fd7c72)
-
-
 
 ### � Documentation
 
@@ -115,8 +96,6 @@ Modernizes the application's theme by introducing error text styling, consistent
 
 Aims to make the codebase significantly easier to navigate and contribute to, while raising the bar for documentation quality. [`(28d3918)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/28d3918a0786eaf7e0e8a7953ce6a674c22b253e)
 
-
-
 ### 🎨 Styling
 
 - 🎨 [style] Refactor theme structure and update ESLint config
@@ -127,8 +106,6 @@ Aims to make the codebase significantly easier to navigate and contribute to, wh
 - Adds explanatory inline ESLint disable comments for clarity
 - Optimizes Tailwind config by reorganizing color and animation declarations for improved maintainability [`(d51c32f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d51c32f97ea910f8c97c8537e85b39390108e241)
 
-
-
 ### 👷 CI/CD
 
 - 👷 [ci] Remove Electron backend build artifacts from source
@@ -137,13 +114,11 @@ Aims to make the codebase significantly easier to navigate and contribute to, wh
 - Updates CI workflow to add a dedicated step for building the Vite frontend and Electron backend, ensuring separation of install and build phases.
 - Improves repository hygiene and reduces potential for merge conflicts and accidental deployment of stale artifacts. [`(8259198)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/82591980852202900bb47d142b5f888eae86555c)
 
-
-
-
-
-
 ## Contributors
+
 Thanks to all the [contributors](https://github.com/Nick2bad4u/Uptime-Watcher/graphs/contributors) for their hard work!
+
 ## License
+
 This project is licensed under the [MIT License](https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/LICENSE.md)
-*This changelog was automatically generated with [git-cliff](https://github.com/orhun/git-cliff).*
+_This changelog was automatically generated with [git-cliff](https://github.com/orhun/git-cliff)._

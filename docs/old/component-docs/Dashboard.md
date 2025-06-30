@@ -73,18 +73,18 @@ App (Main Dashboard Logic)
 
 ```typescript
 const {
-  sites,                    // Array of all monitored sites
-  isLoading,               // Global loading state
-  selectedSite,            // Currently selected site for details
-  showSettings,            // Settings modal visibility state
-  showSiteDetails,         // Site details modal visibility state
-  setShowSettings,         // Action to toggle settings modal
-  setShowSiteDetails,      // Action to toggle site details modal
-  getSelectedSite,         // Function to get currently selected site
-  lastError,               // Global error state
-  clearError,              // Action to clear global errors
-  updateStatus,            // App update status
-  updateError              // Update error messages
+ sites, // Array of all monitored sites
+ isLoading, // Global loading state
+ selectedSite, // Currently selected site for details
+ showSettings, // Settings modal visibility state
+ showSiteDetails, // Site details modal visibility state
+ setShowSettings, // Action to toggle settings modal
+ setShowSiteDetails, // Action to toggle site details modal
+ getSelectedSite, // Function to get currently selected site
+ lastError, // Global error state
+ clearError, // Action to clear global errors
+ updateStatus, // App update status
+ updateError, // Update error messages
 } = useStore();
 ```
 
@@ -102,7 +102,7 @@ const {
 ### Responsive Grid
 
 - **Desktop:** Two-column grid with main content area and fixed sidebar
-- **Tablet:** Single-column layout with stacked content sections  
+- **Tablet:** Single-column layout with stacked content sections
 - **Mobile:** Full-width single column with responsive card sizing
 
 ### CSS Grid Implementation
@@ -111,18 +111,18 @@ The main layout uses CSS Grid with a two-column structure:
 
 ```css
 .grid-layout {
-  display: grid;
-  grid-template-columns: 1fr 400px;
-  gap: 2rem;
-  padding: 2rem;
+ display: grid;
+ grid-template-columns: 1fr 400px;
+ gap: 2rem;
+ padding: 2rem;
 }
 
 /* Responsive behavior for smaller screens */
 @media (max-width: 1024px) {
-  .grid-layout {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
+ .grid-layout {
+  grid-template-columns: 1fr;
+  gap: 1rem;
+ }
 }
 ```
 
@@ -131,7 +131,7 @@ The main layout uses CSS Grid with a two-column structure:
 Each site is displayed in a standardized card format within the SiteList:
 
 - **Header:** Site name and monitor selector with action buttons
-- **Status:** Current monitoring status with visual indicators  
+- **Status:** Current monitoring status with visual indicators
 - **Metrics:** Key performance indicators (uptime, response time, check count)
 - **History:** Mini chart showing recent status history
 - **Footer:** Additional card spacing and future expansion area
@@ -143,7 +143,7 @@ Each site is displayed in a standardized card format within the SiteList:
 ### Real-time Updates
 
 1. **Monitor Services** → Check site status
-2. **Backend Services** → Process and store results  
+2. **Backend Services** → Process and store results
 3. **IPC Communication** → Send status updates to frontend
 4. **Store Subscription** → useStore subscribes to status updates
 5. **Component Re-render** → SiteCard components automatically reflect changes
@@ -242,7 +242,7 @@ Each site is displayed in a standardized card format within the SiteList:
 ### Layout Preferences
 
 - **Grid-based layout:** Two-column desktop, single-column mobile
-- **Fixed sidebar:** Consistent AddSiteForm placement  
+- **Fixed sidebar:** Consistent AddSiteForm placement
 - **Modal overlays:** Settings and site details as overlay dialogs
 - **Responsive breakpoints:** Automatic layout adaptation by screen size
 
@@ -250,7 +250,7 @@ Each site is displayed in a standardized card format within the SiteList:
 
 - **Theme integration:** Automatic light/dark mode support throughout
 - **Status indicators:** Color-coded status badges and real-time updates
-- **Global notifications:** Error alerts and update notifications  
+- **Global notifications:** Error alerts and update notifications
 - **Loading states:** Consistent loading indicators with intelligent timing
 
 ---

@@ -20,10 +20,10 @@ The SiteDetails component follows a modular architecture:
 
 ```typescript
 interface SiteDetailsProps {
-    /** The site object to display details for */
-    site: Site;
-    /** Callback function to close the site details view */
-    onClose: () => void;
+ /** The site object to display details for */
+ site: Site;
+ /** Callback function to close the site details view */
+ onClose: () => void;
 }
 ```
 
@@ -117,18 +117,20 @@ Charts use analytics data processed through `useMemo` hooks:
 
 ```typescript
 const lineChartData = useMemo(
-    () => ({
-        datasets: [{
-            backgroundColor: currentTheme.colors.primary[500] + "20",
-            borderColor: currentTheme.colors.primary[500],
-            data: analytics.filteredHistory.map((h) => h.responseTime),
-            fill: true,
-            label: "Response Time (ms)",
-            tension: 0.1,
-        }],
-        labels: analytics.filteredHistory.map((h) => new Date(h.timestamp)),
-    }),
-    [analytics.filteredHistory, currentTheme]
+ () => ({
+  datasets: [
+   {
+    backgroundColor: currentTheme.colors.primary[500] + "20",
+    borderColor: currentTheme.colors.primary[500],
+    data: analytics.filteredHistory.map((h) => h.responseTime),
+    fill: true,
+    label: "Response Time (ms)",
+    tension: 0.1,
+   },
+  ],
+  labels: analytics.filteredHistory.map((h) => new Date(h.timestamp)),
+ }),
+ [analytics.filteredHistory, currentTheme]
 );
 ```
 
@@ -162,28 +164,20 @@ The component renders different tabs based on `activeSiteDetailsTab` state:
 ## Usage Example
 
 ```tsx
-import { SiteDetails } from './components/SiteDetails';
+import { SiteDetails } from "./components/SiteDetails";
 
 function Dashboard() {
-  const [selectedSite, setSelectedSite] = useState<Site | null>(null);
+ const [selectedSite, setSelectedSite] = useState<Site | null>(null);
 
-  return (
-    <div>
-      {/* Site cards or list */}
-      <SiteCard 
-        site={site} 
-        onClick={() => setSelectedSite(site)} 
-      />
-      
-      {/* Site details modal */}
-      {selectedSite && (
-        <SiteDetails
-          site={selectedSite}
-          onClose={() => setSelectedSite(null)}
-        />
-      )}
-    </div>
-  );
+ return (
+  <div>
+   {/* Site cards or list */}
+   <SiteCard site={site} onClick={() => setSelectedSite(site)} />
+
+   {/* Site details modal */}
+   {selectedSite && <SiteDetails site={selectedSite} onClose={() => setSelectedSite(null)} />}
+  </div>
+ );
 }
 ```
 
@@ -206,15 +200,15 @@ The component uses a fixed overlay approach:
 
 ```css
 .site-details-modal {
-    position: fixed;
-    inset: 0;
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--spacing-md);
-    background-color: var(--color-background-modal);
-    backdrop-filter: blur(4px);
+ position: fixed;
+ inset: 0;
+ z-index: 1000;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ padding: var(--spacing-md);
+ background-color: var(--color-background-modal);
+ backdrop-filter: blur(4px);
 }
 ```
 

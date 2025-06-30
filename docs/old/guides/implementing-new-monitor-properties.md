@@ -23,9 +23,9 @@ Add the new property to the Monitor interface:
 
 ```typescript
 export interface Monitor {
-    // ...existing properties...
-    /** New property description */
-    newProperty?: PropertyType;
+ // ...existing properties...
+ /** New property description */
+ newProperty?: PropertyType;
 }
 ```
 
@@ -44,9 +44,9 @@ Mirror the frontend Monitor interface:
 
 ```typescript
 export interface Monitor {
-    // ...existing properties...
-    /** New property description */
-    newProperty?: PropertyType;
+ // ...existing properties...
+ /** New property description */
+ newProperty?: PropertyType;
 }
 ```
 
@@ -76,12 +76,12 @@ ALTER TABLE monitors ADD COLUMN newProperty INTEGER DEFAULT defaultValue;
 
 ```typescript
 await db.run(
-    `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, timeout, newProperty, monitoring, status, responseTime, lastChecked) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [
-        // ...existing parameters...
-        monitor.newProperty !== undefined ? processValue(monitor.newProperty) : null,
-        // ...remaining parameters...
-    ]
+ `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, timeout, newProperty, monitoring, status, responseTime, lastChecked) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+ [
+  // ...existing parameters...
+  monitor.newProperty !== undefined ? processValue(monitor.newProperty) : null,
+  // ...remaining parameters...
+ ]
 );
 ```
 
@@ -89,8 +89,8 @@ await db.run(
 
 ```typescript
 if (monitor.newProperty !== undefined) {
-    updateFields.push("newProperty = ?");
-    updateValues.push(monitor.newProperty !== undefined ? processValue(monitor.newProperty) : null);
+ updateFields.push("newProperty = ?");
+ updateValues.push(monitor.newProperty !== undefined ? processValue(monitor.newProperty) : null);
 }
 ```
 
@@ -100,10 +100,10 @@ if (monitor.newProperty !== undefined) {
 private rowToMonitor(row: Record<string, unknown>): Site["monitors"][0] {
     return {
         // ...existing properties...
-        newProperty: typeof row.newProperty === "expectedType" 
-            ? row.newProperty 
-            : row.newProperty 
-              ? convertValue(row.newProperty) 
+        newProperty: typeof row.newProperty === "expectedType"
+            ? row.newProperty
+            : row.newProperty
+              ? convertValue(row.newProperty)
               : undefined,
         // ...remaining properties...
     };
@@ -122,8 +122,8 @@ Add the new property to the bulk insert SQL and parameters array.
 
 ```typescript
 interface AppState {
-    // ...existing actions...
-    updateMonitorNewProperty: (siteId: string, monitorId: string, newProperty: PropertyType) => Promise<void>;
+ // ...existing actions...
+ updateMonitorNewProperty: (siteId: string, monitorId: string, newProperty: PropertyType) => Promise<void>;
 }
 ```
 
@@ -163,42 +163,42 @@ const [newPropertyChanged, setNewPropertyChanged] = useState(false);
 
 // Update effect
 useEffect(() => {
-    setLocalNewProperty(selectedMonitor?.newProperty ?? defaultValue);
-    setNewPropertyChanged(false);
+ setLocalNewProperty(selectedMonitor?.newProperty ?? defaultValue);
+ setNewPropertyChanged(false);
 }, [selectedMonitor?.newProperty, selectedMonitor?.type, currentSite.identifier]);
 
 // Change handler
 const handleNewPropertyChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-        setLocalNewProperty(convertInputValue(e.target.value));
-        setNewPropertyChanged(convertInputValue(e.target.value) !== selectedMonitor?.newProperty);
-    },
-    [selectedMonitor?.newProperty]
+ (e: React.ChangeEvent<HTMLInputElement>) => {
+  setLocalNewProperty(convertInputValue(e.target.value));
+  setNewPropertyChanged(convertInputValue(e.target.value) !== selectedMonitor?.newProperty);
+ },
+ [selectedMonitor?.newProperty]
 );
 
 // Save handler
 const handleSaveNewProperty = useCallback(async () => {
-    clearError();
-    try {
-        await updateMonitorNewProperty(currentSite.identifier, selectedMonitorId, localNewProperty);
-        setNewPropertyChanged(false);
-        logger.user.action("Updated monitor new property", {
-            monitorId: selectedMonitorId,
-            newValue: localNewProperty,
-            siteId: currentSite.identifier,
-        });
-    } catch (error) {
-        logger.site.error(currentSite.identifier, error instanceof Error ? error : String(error));
-    }
+ clearError();
+ try {
+  await updateMonitorNewProperty(currentSite.identifier, selectedMonitorId, localNewProperty);
+  setNewPropertyChanged(false);
+  logger.user.action("Updated monitor new property", {
+   monitorId: selectedMonitorId,
+   newValue: localNewProperty,
+   siteId: currentSite.identifier,
+  });
+ } catch (error) {
+  logger.site.error(currentSite.identifier, error instanceof Error ? error : String(error));
+ }
 }, [currentSite.identifier, selectedMonitorId, localNewProperty, updateMonitorNewProperty, clearError]);
 
 // Return values
 return {
-    // ...existing values...
-    localNewProperty,
-    newPropertyChanged,
-    handleNewPropertyChange,
-    handleSaveNewProperty,
+ // ...existing values...
+ localNewProperty,
+ newPropertyChanged,
+ handleNewPropertyChange,
+ handleSaveNewProperty,
 };
 ```
 
@@ -210,11 +210,11 @@ Add props to interface:
 
 ```typescript
 interface SiteDetailsNavigationProps {
-    // ...existing props...
-    localNewProperty: PropertyType;
-    newPropertyChanged: boolean;
-    handleNewPropertyChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    handleSaveNewProperty: () => Promise<void>;
+ // ...existing props...
+ localNewProperty: PropertyType;
+ newPropertyChanged: boolean;
+ handleNewPropertyChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+ handleSaveNewProperty: () => Promise<void>;
 }
 ```
 
@@ -282,7 +282,7 @@ If the new property affects monitoring behavior, update the services:
 public async check(monitor: Site["monitors"][0]): Promise<MonitorCheckResult> {
     // Use monitor-specific property with fallback
     const newPropertyValue = monitor.newProperty ?? this.config.defaultNewProperty;
-    
+
     // Apply the property in monitoring logic
     // ...
 }
@@ -296,8 +296,8 @@ If needed, add to MonitorConfig interface:
 
 ```typescript
 export interface MonitorConfig {
-    // ...existing properties...
-    defaultNewProperty?: PropertyType;
+ // ...existing properties...
+ defaultNewProperty?: PropertyType;
 }
 ```
 
@@ -309,16 +309,16 @@ Add validation constraints if needed:
 
 ```typescript
 export const NEW_PROPERTY_CONSTRAINTS = {
-    MIN: minimumValue,
-    MAX: maximumValue,
-    STEP: stepValue,
+ MIN: minimumValue,
+ MAX: maximumValue,
+ STEP: stepValue,
 } as const;
 ```
 
 ### 9. Testing Considerations
 
 - **Database Migration:** Test with existing data
-- **UI Validation:** Test edge cases and invalid inputs  
+- **UI Validation:** Test edge cases and invalid inputs
 - **State Management:** Test save/load/reset cycles
 - **Backend Integration:** Test API calls and error handling
 - **Cross-Component:** Test data flow between components
@@ -335,7 +335,7 @@ export const NEW_PROPERTY_CONSTRAINTS = {
 **Problem:** Complex types not properly stored/retrieved
 **Solution:** Use proper serialization in repository methods
 
-#### 10.3 State Reset Issues  
+#### 10.3 State Reset Issues
 
 **Problem:** Local state resets unexpectedly
 **Solution:** Careful effect dependencies and reset logic

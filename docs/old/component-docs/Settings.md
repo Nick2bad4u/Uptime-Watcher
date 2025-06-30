@@ -119,26 +119,26 @@ The Settings component provides access to data management operations:
 
 ```typescript
 // SQLite backup download
-await downloadSQLiteBackup()
+await downloadSQLiteBackup();
 
 // Full data synchronization
-await fullSyncFromBackend()
+await fullSyncFromBackend();
 
 // History limit updates with validation
-await updateHistoryLimitValue(limit)
+await updateHistoryLimitValue(limit);
 ```
 
 ### Settings Management
 
 ```typescript
 // Update individual settings
-updateSettings({ [key]: value })
+updateSettings({ [key]: value });
 
 // Reset all settings to defaults
-resetSettings()
+resetSettings();
 
 // Clear application errors
-clearError()
+clearError();
 ```
 
 ---
@@ -160,13 +160,13 @@ The component implements sophisticated loading state management:
 const [showButtonLoading, setShowButtonLoading] = useState(false);
 
 useEffect(() => {
-    if (isLoading) {
-        const timeoutId = setTimeout(() => {
-            setShowButtonLoading(true);
-        }, UI_DELAYS.LOADING_BUTTON);
-        return () => clearTimeout(timeoutId);
-    }
-    setShowButtonLoading(false);
+ if (isLoading) {
+  const timeoutId = setTimeout(() => {
+   setShowButtonLoading(true);
+  }, UI_DELAYS.LOADING_BUTTON);
+  return () => clearTimeout(timeoutId);
+ }
+ setShowButtonLoading(false);
 }, [isLoading]);
 ```
 
@@ -190,9 +190,9 @@ const { availableThemes, setTheme } = useTheme();
 
 // Theme change handler with logging
 const handleThemeChange = (themeName: string) => {
-    const oldTheme = settings.theme;
-    setTheme(themeName as ThemeName);
-    logger.user.settingsChange("theme", oldTheme, themeName);
+ const oldTheme = settings.theme;
+ setTheme(themeName as ThemeName);
+ logger.user.settingsChange("theme", oldTheme, themeName);
 };
 ```
 
@@ -229,16 +229,20 @@ Key CSS classes used for layout and styling:
 ```typescript
 // Settings key validation
 const allowedKeys: Array<keyof typeof settings> = [
-    "notifications", "autoStart", "minimizeToTray", 
-    "theme", "soundAlerts", "historyLimit"
+ "notifications",
+ "autoStart",
+ "minimizeToTray",
+ "theme",
+ "soundAlerts",
+ "historyLimit",
 ];
 
 const handleSettingChange = (key: keyof typeof settings, value: unknown) => {
-    if (!allowedKeys.includes(key)) {
-        logger.warn("Attempted to update invalid settings key", key);
-        return;
-    }
-    // Safe to update setting
+ if (!allowedKeys.includes(key)) {
+  logger.warn("Attempted to update invalid settings key", key);
+  return;
+ }
+ // Safe to update setting
 };
 ```
 
@@ -252,11 +256,11 @@ const handleSettingChange = (key: keyof typeof settings, value: unknown) => {
 
 ```typescript
 const handleReset = () => {
-    if (window.confirm("Are you sure you want to reset all settings to defaults?")) {
-        resetSettings();
-        clearError();
-        logger.user.action("Reset settings to defaults");
-    }
+ if (window.confirm("Are you sure you want to reset all settings to defaults?")) {
+  resetSettings();
+  clearError();
+  logger.user.action("Reset settings to defaults");
+ }
 };
 ```
 
@@ -308,9 +312,16 @@ Direct integration with application state:
 
 ```typescript
 const {
-    clearError, downloadSQLiteBackup, fullSyncFromBackend,
-    isLoading, lastError, resetSettings, setError,
-    settings, updateHistoryLimitValue, updateSettings
+ clearError,
+ downloadSQLiteBackup,
+ fullSyncFromBackend,
+ isLoading,
+ lastError,
+ resetSettings,
+ setError,
+ settings,
+ updateHistoryLimitValue,
+ updateSettings,
 } = useStore();
 ```
 

@@ -1,16 +1,15 @@
 <!-- markdownlint-disable -->
 <!-- eslint-disable markdown/no-missing-label-refs -->
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-
 [[66b2201](https://github.com/Nick2bad4u/Uptime-Watcher/commit/66b22010811825a82207cc6e4f5ab87a2390ba5d)...
 [b6134be](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b6134be75a6250204c9cc3c9f5fb4340231ded0e)]
 ([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/66b22010811825a82207cc6e4f5ab87a2390ba5d...b6134be75a6250204c9cc3c9f5fb4340231ded0e))
-
 
 ### ✨ Features
 
@@ -24,7 +23,6 @@ All notable changes to this project will be documented in this file.
 - Removes redundant inline default values, relying on shared configuration.
 - Fixes minor style and type issues for improved code clarity. [`(b6134be)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b6134be75a6250204c9cc3c9f5fb4340231ded0e)
 
-
 - ✨ [feat] Add per-monitor retry attempts with UI and persistence
 
 - Introduces configurable retry attempts for individual monitors, allowing fine-grained control over failure detection sensitivity.
@@ -36,15 +34,12 @@ All notable changes to this project will be documented in this file.
 
 Relates to #213 [`(a59c50d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a59c50d3c0e0e5196792b4e927a9a4db4781e914)
 
-
 - ✨ [feat] Add per-monitor request timeout configuration
 
 - Enables setting custom request timeouts for individual monitors, overriding the global/default timeout value
 - Updates backend schema, frontend UI, and business logic to support per-monitor timeout input, persistence, and usage during monitoring
 - Removes deprecated global timeout setting from app settings, making timeout a monitor-specific property for improved flexibility
 - Improves user control over monitoring behavior, especially for sites or ports with varying response expectations [`(47f479b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/47f479b1802ff2ed39a27956ab8a69e834b2fd8b)
-
-
 
 ### 🚜 Refactor
 
@@ -57,29 +52,24 @@ Relates to #213 [`(a59c50d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commi
 
 Enhances reliability and clarity of HTTP monitoring while making future maintenance easier. [`(66b2201)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/66b22010811825a82207cc6e4f5ab87a2390ba5d)
 
-
-
-
-
-
 ## [3.4.0] - 2025-06-28
-
 
 [[750de8e](https://github.com/Nick2bad4u/Uptime-Watcher/commit/750de8e4750000c9898ce23429cf32f6ed31aa50)...
 [28d3918](https://github.com/Nick2bad4u/Uptime-Watcher/commit/28d3918a0786eaf7e0e8a7953ce6a674c22b253e)]
 ([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/750de8e4750000c9898ce23429cf32f6ed31aa50...28d3918a0786eaf7e0e8a7953ce6a674c22b253e))
-
 
 ### 🚜 Refactor
 
 - 🚜 [refactor] Modularizes backend architecture and optimizes sync
 
 - Refactors backend codebase to a fully modular service/repository architecture, mirroring frontend patterns for maintainability and testability
+
   - Extracts all database, monitoring, notification, updater, window, and IPC logic into dedicated services and repositories with clear separation of concerns
   - Removes monolithic logic from main process entry point, delegating orchestration to an application service
   - Centralizes logging and error handling, ensuring consistent and robust diagnostics across all domains
 
 - Optimizes frontend-backend synchronization for real-time UI updates
+
   - Implements smart incremental site updates using status event payloads, replacing inefficient full-database fetches on every monitor check
   - Achieves instant UI responsiveness and drastically reduces backend query load, supporting scalability for large site counts
   - Adds fallback to full sync for edge cases and error scenarios, ensuring reliability
@@ -87,6 +77,7 @@ Enhances reliability and clarity of HTTP monitoring while making future maintena
 - Fixes duplicate log entries and standardizes logging behaviors throughout the app, including React component event deduplication
 
 - Enhances code quality and maintainability:
+
   - Cleans dead code, unused imports, and applies rigorous lint/formatting standards
   - Improves type safety, validation, and error resilience in both backend and frontend integration points
 
@@ -97,8 +88,6 @@ Enhances reliability and clarity of HTTP monitoring while making future maintena
 - [dependency] Updates relevant dependencies for compatibility and development experience
 
 Relates to performance, maintainability, and real-time UX improvements [`(750de8e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/750de8e4750000c9898ce23429cf32f6ed31aa50)
-
-
 
 ### � Documentation
 
@@ -114,8 +103,6 @@ Relates to performance, maintainability, and real-time UX improvements [`(750de8
 
 Aims to make the codebase significantly easier to navigate and contribute to, while raising the bar for documentation quality. [`(28d3918)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/28d3918a0786eaf7e0e8a7953ce6a674c22b253e)
 
-
-
 ### ⚡ Performance
 
 - ⚡ [perf] Make debug logging conditional on development mode
@@ -125,13 +112,11 @@ Aims to make the codebase significantly easier to navigate and contribute to, wh
 - Improves log clarity, performance, and maintainability while preserving full debug detail for development and troubleshooting.
 - Addresses prior issues with log spam from routine operations (IPC, monitor checks, database CRUD) and ensures cleaner log files in production environments. [`(9e0e7b1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9e0e7b1f59c71d13abd1dca76bd7d0040227bcc3)
 
-
-
-
-
-
 ## Contributors
+
 Thanks to all the [contributors](https://github.com/Nick2bad4u/Uptime-Watcher/graphs/contributors) for their hard work!
+
 ## License
+
 This project is licensed under the [MIT License](https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/LICENSE.md)
-*This changelog was automatically generated with [git-cliff](https://github.com/orhun/git-cliff).*
+_This changelog was automatically generated with [git-cliff](https://github.com/orhun/git-cliff)._

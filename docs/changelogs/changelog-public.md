@@ -1,16 +1,15 @@
 <!-- markdownlint-disable -->
 <!-- eslint-disable markdown/no-missing-label-refs -->
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-
 [[197f637](https://github.com/Nick2bad4u/Uptime-Watcher/commit/197f63786d00b9d174331c0ad4ff8b95cc8aa25c)...
 [197f637](https://github.com/Nick2bad4u/Uptime-Watcher/commit/197f63786d00b9d174331c0ad4ff8b95cc8aa25c)]
 ([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/197f63786d00b9d174331c0ad4ff8b95cc8aa25c...197f63786d00b9d174331c0ad4ff8b95cc8aa25c))
-
 
 ### 🚜 Refactor
 
@@ -26,13 +25,11 @@ All notable changes to this project will be documented in this file.
 
 These improvements enhance code maintainability, readability, and enforce a stricter, more logical import and configuration structure. [`(197f637)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/197f63786d00b9d174331c0ad4ff8b95cc8aa25c)
 
-
-
-
-
-
 ## Contributors
+
 Thanks to all the [contributors](https://github.com/Nick2bad4u/Uptime-Watcher/graphs/contributors) for their hard work!
+
 ## License
+
 This project is licensed under the [MIT License](https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/LICENSE.md)
-*This changelog was automatically generated with [git-cliff](https://github.com/orhun/git-cliff).*
+_This changelog was automatically generated with [git-cliff](https://github.com/orhun/git-cliff)._

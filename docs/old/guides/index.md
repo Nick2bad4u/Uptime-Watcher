@@ -9,7 +9,7 @@ Comprehensive guides for using and developing with Uptime Watcher.
 ## Getting Started
 
 - **[Developer Guide](/guides/Developer-Guide)** - Complete development setup and workflow
-- **[FAQ](/guides/FAQ)** - Frequently asked questions and common issues  
+- **[FAQ](/guides/FAQ)** - Frequently asked questions and common issues
 - **[Troubleshooting](/guides/Troubleshooting)** - Solutions to common problems
 
 ## Development Guides

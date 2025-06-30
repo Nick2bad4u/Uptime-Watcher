@@ -1,6 +1,6 @@
 /**
  * ESLint configuration for the Uptime Watcher application.
- * 
+ *
  * Comprehensive linting setup with TypeScript, React, accessibility,
  * code quality, and security rules for maintaining code standards.
  */
@@ -219,7 +219,7 @@ export default [
             "prettier/prettier": [
                 "error",
                 {
-                    usePrettierrc: true
+                    usePrettierrc: true,
                 },
             ],
             // sonarjs
@@ -366,7 +366,7 @@ export default [
             "prettier/prettier": [
                 "error",
                 {
-                    usePrettierrc: true
+                    usePrettierrc: true,
                 },
             ],
             // sonarjs

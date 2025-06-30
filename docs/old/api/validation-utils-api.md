@@ -19,17 +19,17 @@ The application primarily uses these validator.js functions:
 #### URL Validation
 
 ```typescript
-import validator from 'validator';
+import validator from "validator";
 
 // Validate HTTP/HTTPS URLs
 validator.isURL(url, {
-    allow_protocol_relative_urls: false,
-    allow_trailing_dot: false, 
-    allow_underscores: false,
-    disallow_auth: false,
-    protocols: ["http", "https"],
-    require_protocol: true,
-    require_valid_protocol: true,
+ allow_protocol_relative_urls: false,
+ allow_trailing_dot: false,
+ allow_underscores: false,
+ disallow_auth: false,
+ protocols: ["http", "https"],
+ require_protocol: true,
+ require_valid_protocol: true,
 });
 ```
 
@@ -48,10 +48,10 @@ validator.isURL(url, {
 // Validate IP addresses (IPv4 and IPv6)
 validator.isIP(host); // Returns true for valid IP addresses
 
-// Validate Fully Qualified Domain Names  
+// Validate Fully Qualified Domain Names
 validator.isFQDN(host, {
-    allow_trailing_dot: false,
-    allow_underscores: false,
+ allow_trailing_dot: false,
+ allow_underscores: false,
 });
 ```
 
@@ -77,30 +77,32 @@ validator.isPort(port); // Returns true for valid port numbers
 
 ```typescript
 function validateHttpMonitor(url: string): string[] {
-    const errors: string[] = [];
-    
-    if (!url.trim()) {
-        errors.push("Website URL is required for HTTP monitor");
-    } else {
-        const trimmedUrl = url.trim();
-        
-        // Check protocol requirement
-        if (!/^https?:\/\//i.test(trimmedUrl)) {
-            errors.push("HTTP monitor requires a URL starting with http:// or https://");
-        } else if (!validator.isURL(trimmedUrl, {
-            allow_protocol_relative_urls: false,
-            allow_trailing_dot: false,
-            allow_underscores: false,
-            disallow_auth: false,
-            protocols: ["http", "https"],
-            require_protocol: true,
-            require_valid_protocol: true,
-        })) {
-            errors.push("Please enter a valid URL with a proper domain");
-        }
-    }
-    
-    return errors;
+ const errors: string[] = [];
+
+ if (!url.trim()) {
+  errors.push("Website URL is required for HTTP monitor");
+ } else {
+  const trimmedUrl = url.trim();
+
+  // Check protocol requirement
+  if (!/^https?:\/\//i.test(trimmedUrl)) {
+   errors.push("HTTP monitor requires a URL starting with http:// or https://");
+  } else if (
+   !validator.isURL(trimmedUrl, {
+    allow_protocol_relative_urls: false,
+    allow_trailing_dot: false,
+    allow_underscores: false,
+    disallow_auth: false,
+    protocols: ["http", "https"],
+    require_protocol: true,
+    require_valid_protocol: true,
+   })
+  ) {
+   errors.push("Please enter a valid URL with a proper domain");
+  }
+ }
+
+ return errors;
 }
 ```
 
@@ -108,32 +110,32 @@ function validateHttpMonitor(url: string): string[] {
 
 ```typescript
 function validatePortMonitor(host: string, port: string): string[] {
-    const errors: string[] = [];
-    
-    // Validate host
-    if (!host.trim()) {
-        errors.push("Host is required for port monitor");
-    } else {
-        const trimmedHost = host.trim();
-        const isValidIP = validator.isIP(trimmedHost);
-        const isValidDomain = validator.isFQDN(trimmedHost, {
-            allow_trailing_dot: false,
-            allow_underscores: false,
-        });
+ const errors: string[] = [];
 
-        if (!isValidIP && !isValidDomain) {
-            errors.push("Host must be a valid IP address or domain name");
-        }
-    }
-    
-    // Validate port
-    if (!port.trim()) {
-        errors.push("Port is required for port monitor");
-    } else if (!validator.isPort(port.trim())) {
-        errors.push("Port must be a valid port number (1-65535)");
-    }
-    
-    return errors;
+ // Validate host
+ if (!host.trim()) {
+  errors.push("Host is required for port monitor");
+ } else {
+  const trimmedHost = host.trim();
+  const isValidIP = validator.isIP(trimmedHost);
+  const isValidDomain = validator.isFQDN(trimmedHost, {
+   allow_trailing_dot: false,
+   allow_underscores: false,
+  });
+
+  if (!isValidIP && !isValidDomain) {
+   errors.push("Host must be a valid IP address or domain name");
+  }
+ }
+
+ // Validate port
+ if (!port.trim()) {
+  errors.push("Port is required for port monitor");
+ } else if (!validator.isPort(port.trim())) {
+  errors.push("Port must be a valid port number (1-65535)");
+ }
+
+ return errors;
 }
 ```
 
@@ -141,13 +143,13 @@ function validatePortMonitor(host: string, port: string): string[] {
 
 ```typescript
 function validateCheckInterval(interval: number): string[] {
-    const errors: string[] = [];
-    
-    if (!interval || interval <= 0) {
-        errors.push("Check interval must be a positive number");
-    }
-    
-    return errors;
+ const errors: string[] = [];
+
+ if (!interval || interval <= 0) {
+  errors.push("Check interval must be a positive number");
+ }
+
+ return errors;
 }
 ```
 
@@ -191,45 +193,47 @@ The application has access to the full validator.js library. Here are commonly u
 ### Real-time Validation
 
 ```typescript
-import { useState } from 'react';
-import validator from 'validator';
+import { useState } from "react";
+import validator from "validator";
 
 function useFormValidation() {
-    const [errors, setErrors] = useState<Record<string, string>>({});
-    
-    const validateField = (name: string, value: string) => {
-        let error = '';
-        
-        switch (name) {
-            case 'url':
-                if (!value.trim()) {
-                    error = 'URL is required';
-                } else if (!validator.isURL(value, { 
-                    protocols: ['http', 'https'],
-                    require_protocol: true 
-                })) {
-                    error = 'Please enter a valid URL';
-                }
-                break;
-                
-            case 'email':
-                if (value && !validator.isEmail(value)) {
-                    error = 'Please enter a valid email address';
-                }
-                break;
-                
-            case 'port':
-                if (value && !validator.isPort(value)) {
-                    error = 'Please enter a valid port number (1-65535)';
-                }
-                break;
-        }
-        
-        setErrors(prev => ({ ...prev, [name]: error }));
-        return error === '';
-    };
-    
-    return { errors, validateField };
+ const [errors, setErrors] = useState<Record<string, string>>({});
+
+ const validateField = (name: string, value: string) => {
+  let error = "";
+
+  switch (name) {
+   case "url":
+    if (!value.trim()) {
+     error = "URL is required";
+    } else if (
+     !validator.isURL(value, {
+      protocols: ["http", "https"],
+      require_protocol: true,
+     })
+    ) {
+     error = "Please enter a valid URL";
+    }
+    break;
+
+   case "email":
+    if (value && !validator.isEmail(value)) {
+     error = "Please enter a valid email address";
+    }
+    break;
+
+   case "port":
+    if (value && !validator.isPort(value)) {
+     error = "Please enter a valid port number (1-65535)";
+    }
+    break;
+  }
+
+  setErrors((prev) => ({ ...prev, [name]: error }));
+  return error === "";
+ };
+
+ return { errors, validateField };
 }
 ```
 
@@ -237,29 +241,32 @@ function useFormValidation() {
 
 ```typescript
 function validateFormSubmission(formData: FormData): ValidationResult {
-    const errors: string[] = [];
-    
-    // Validate required fields
-    if (!formData.url.trim()) {
-        errors.push("URL is required");
-    }
-    
-    // Validate formats
-    if (formData.url && !validator.isURL(formData.url, {
-        protocols: ['http', 'https'],
-        require_protocol: true
-    })) {
-        errors.push("Invalid URL format");
-    }
-    
-    if (formData.checkInterval <= 0) {
-        errors.push("Check interval must be positive");
-    }
-    
-    return {
-        isValid: errors.length === 0,
-        errors
-    };
+ const errors: string[] = [];
+
+ // Validate required fields
+ if (!formData.url.trim()) {
+  errors.push("URL is required");
+ }
+
+ // Validate formats
+ if (
+  formData.url &&
+  !validator.isURL(formData.url, {
+   protocols: ["http", "https"],
+   require_protocol: true,
+  })
+ ) {
+  errors.push("Invalid URL format");
+ }
+
+ if (formData.checkInterval <= 0) {
+  errors.push("Check interval must be positive");
+ }
+
+ return {
+  isValid: errors.length === 0,
+  errors,
+ };
 }
 ```
 
@@ -272,30 +279,32 @@ function validateFormSubmission(formData: FormData): ValidationResult {
  * Check if URL starts with required protocol
  */
 function hasRequiredProtocol(url: string): boolean {
-    return /^https?:\/\//i.test(url.trim());
+ return /^https?:\/\//i.test(url.trim());
 }
 
 /**
  * Validate URL with custom error messages
  */
 function validateUrlWithMessages(url: string): string | null {
-    if (!url.trim()) {
-        return "URL is required";
-    }
-    
-    if (!hasRequiredProtocol(url)) {
-        return "URL must start with http:// or https://";
-    }
-    
-    if (!validator.isURL(url, {
-        protocols: ['http', 'https'],
-        require_protocol: true,
-        require_valid_protocol: true
-    })) {
-        return "Please enter a valid URL with proper domain";
-    }
-    
-    return null; // Valid
+ if (!url.trim()) {
+  return "URL is required";
+ }
+
+ if (!hasRequiredProtocol(url)) {
+  return "URL must start with http:// or https://";
+ }
+
+ if (
+  !validator.isURL(url, {
+   protocols: ["http", "https"],
+   require_protocol: true,
+   require_valid_protocol: true,
+  })
+ ) {
+  return "Please enter a valid URL with proper domain";
+ }
+
+ return null; // Valid
 }
 ```
 
@@ -306,22 +315,22 @@ function validateUrlWithMessages(url: string): string | null {
  * Validate host (IP address or domain name)
  */
 function validateHost(host: string): string | null {
-    if (!host.trim()) {
-        return "Host is required";
-    }
-    
-    const trimmedHost = host.trim();
-    const isValidIP = validator.isIP(trimmedHost);
-    const isValidDomain = validator.isFQDN(trimmedHost, {
-        allow_trailing_dot: false,
-        allow_underscores: false,
-    });
-    
-    if (!isValidIP && !isValidDomain) {
-        return "Host must be a valid IP address or domain name";
-    }
-    
-    return null; // Valid
+ if (!host.trim()) {
+  return "Host is required";
+ }
+
+ const trimmedHost = host.trim();
+ const isValidIP = validator.isIP(trimmedHost);
+ const isValidDomain = validator.isFQDN(trimmedHost, {
+  allow_trailing_dot: false,
+  allow_underscores: false,
+ });
+
+ if (!isValidIP && !isValidDomain) {
+  return "Host must be a valid IP address or domain name";
+ }
+
+ return null; // Valid
 }
 ```
 
@@ -331,51 +340,51 @@ function validateHost(host: string): string | null {
 
 ```typescript
 interface ValidationError {
-    field: string;
-    message: string;
-    value: string;
+ field: string;
+ message: string;
+ value: string;
 }
 
 class ValidationErrorCollector {
-    private errors: ValidationError[] = [];
-    
-    addError(field: string, message: string, value: string): void {
-        this.errors.push({ field, message, value });
-    }
-    
-    validateUrl(field: string, url: string): boolean {
-        const error = validateUrlWithMessages(url);
-        if (error) {
-            this.addError(field, error, url);
-            return false;
-        }
-        return true;
-    }
-    
-    validateHost(field: string, host: string): boolean {
-        const error = validateHost(host);
-        if (error) {
-            this.addError(field, error, host);
-            return false;
-        }
-        return true;
-    }
-    
-    getErrors(): ValidationError[] {
-        return [...this.errors];
-    }
-    
-    hasErrors(): boolean {
-        return this.errors.length > 0;
-    }
-    
-    getFirstError(): string | null {
-        return this.errors.length > 0 ? this.errors[0].message : null;
-    }
-    
-    clear(): void {
-        this.errors = [];
-    }
+ private errors: ValidationError[] = [];
+
+ addError(field: string, message: string, value: string): void {
+  this.errors.push({ field, message, value });
+ }
+
+ validateUrl(field: string, url: string): boolean {
+  const error = validateUrlWithMessages(url);
+  if (error) {
+   this.addError(field, error, url);
+   return false;
+  }
+  return true;
+ }
+
+ validateHost(field: string, host: string): boolean {
+  const error = validateHost(host);
+  if (error) {
+   this.addError(field, error, host);
+   return false;
+  }
+  return true;
+ }
+
+ getErrors(): ValidationError[] {
+  return [...this.errors];
+ }
+
+ hasErrors(): boolean {
+  return this.errors.length > 0;
+ }
+
+ getFirstError(): string | null {
+  return this.errors.length > 0 ? this.errors[0].message : null;
+ }
+
+ clear(): void {
+  this.errors = [];
+ }
 }
 ```
 
@@ -384,58 +393,58 @@ class ValidationErrorCollector {
 ### Complete Form Validation
 
 ```typescript
-import validator from 'validator';
+import validator from "validator";
 
 interface MonitorFormData {
-    type: 'http' | 'port';
-    url?: string;
-    host?: string;
-    port?: string;
-    name: string;
-    checkInterval: number;
+ type: "http" | "port";
+ url?: string;
+ host?: string;
+ port?: string;
+ name: string;
+ checkInterval: number;
 }
 
 function validateMonitorForm(data: MonitorFormData): ValidationResult {
-    const collector = new ValidationErrorCollector();
-    
-    // Validate name
-    if (!data.name.trim()) {
-        collector.addError('name', 'Monitor name is required', data.name);
-    }
-    
-    // Validate by type
-    if (data.type === 'http') {
-        if (data.url) {
-            collector.validateUrl('url', data.url);
-        } else {
-            collector.addError('url', 'URL is required for HTTP monitor', '');
-        }
-    } else if (data.type === 'port') {
-        if (data.host) {
-            collector.validateHost('host', data.host);
-        } else {
-            collector.addError('host', 'Host is required for port monitor', '');
-        }
-        
-        if (data.port) {
-            if (!validator.isPort(data.port)) {
-                collector.addError('port', 'Invalid port number', data.port);
-            }
-        } else {
-            collector.addError('port', 'Port is required for port monitor', '');
-        }
-    }
-    
-    // Validate interval
-    if (data.checkInterval <= 0) {
-        collector.addError('checkInterval', 'Check interval must be positive', String(data.checkInterval));
-    }
-    
-    return {
-        isValid: !collector.hasErrors(),
-        errors: collector.getErrors(),
-        firstError: collector.getFirstError()
-    };
+ const collector = new ValidationErrorCollector();
+
+ // Validate name
+ if (!data.name.trim()) {
+  collector.addError("name", "Monitor name is required", data.name);
+ }
+
+ // Validate by type
+ if (data.type === "http") {
+  if (data.url) {
+   collector.validateUrl("url", data.url);
+  } else {
+   collector.addError("url", "URL is required for HTTP monitor", "");
+  }
+ } else if (data.type === "port") {
+  if (data.host) {
+   collector.validateHost("host", data.host);
+  } else {
+   collector.addError("host", "Host is required for port monitor", "");
+  }
+
+  if (data.port) {
+   if (!validator.isPort(data.port)) {
+    collector.addError("port", "Invalid port number", data.port);
+   }
+  } else {
+   collector.addError("port", "Port is required for port monitor", "");
+  }
+ }
+
+ // Validate interval
+ if (data.checkInterval <= 0) {
+  collector.addError("checkInterval", "Check interval must be positive", String(data.checkInterval));
+ }
+
+ return {
+  isValid: !collector.hasErrors(),
+  errors: collector.getErrors(),
+  firstError: collector.getFirstError(),
+ };
 }
 ```
 
@@ -443,40 +452,40 @@ function validateMonitorForm(data: MonitorFormData): ValidationResult {
 
 ```typescript
 function useMonitorFormValidation() {
-    const [errors, setErrors] = useState<Record<string, string>>({});
-    
-    const validate = useCallback((data: MonitorFormData) => {
-        const result = validateMonitorForm(data);
-        
-        // Convert to field-keyed errors
-        const fieldErrors: Record<string, string> = {};
-        result.errors.forEach(error => {
-            fieldErrors[error.field] = error.message;
-        });
-        
-        setErrors(fieldErrors);
-        return result.isValid;
-    }, []);
-    
-    const clearError = useCallback((field: string) => {
-        setErrors(prev => {
-            const updated = { ...prev };
-            delete updated[field];
-            return updated;
-        });
-    }, []);
-    
-    const clearAllErrors = useCallback(() => {
-        setErrors({});
-    }, []);
-    
-    return {
-        errors,
-        validate,
-        clearError,
-        clearAllErrors,
-        hasErrors: Object.keys(errors).length > 0
-    };
+ const [errors, setErrors] = useState<Record<string, string>>({});
+
+ const validate = useCallback((data: MonitorFormData) => {
+  const result = validateMonitorForm(data);
+
+  // Convert to field-keyed errors
+  const fieldErrors: Record<string, string> = {};
+  result.errors.forEach((error) => {
+   fieldErrors[error.field] = error.message;
+  });
+
+  setErrors(fieldErrors);
+  return result.isValid;
+ }, []);
+
+ const clearError = useCallback((field: string) => {
+  setErrors((prev) => {
+   const updated = { ...prev };
+   delete updated[field];
+   return updated;
+  });
+ }, []);
+
+ const clearAllErrors = useCallback(() => {
+  setErrors({});
+ }, []);
+
+ return {
+  errors,
+  validate,
+  clearError,
+  clearAllErrors,
+  hasErrors: Object.keys(errors).length > 0,
+ };
 }
 ```
 
@@ -497,12 +506,12 @@ Use consistent error message patterns:
 
 ```typescript
 const ERROR_MESSAGES = {
-    REQUIRED: (field: string) => `${field} is required`,
-    INVALID_FORMAT: (field: string) => `Please enter a valid ${field}`,
-    INVALID_URL: 'Please enter a valid URL with http:// or https://',
-    INVALID_HOST: 'Host must be a valid IP address or domain name',
-    INVALID_PORT: 'Port must be a valid port number (1-65535)',
-    POSITIVE_NUMBER: (field: string) => `${field} must be a positive number`
+ REQUIRED: (field: string) => `${field} is required`,
+ INVALID_FORMAT: (field: string) => `Please enter a valid ${field}`,
+ INVALID_URL: "Please enter a valid URL with http:// or https://",
+ INVALID_HOST: "Host must be a valid IP address or domain name",
+ INVALID_PORT: "Port must be a valid port number (1-65535)",
+ POSITIVE_NUMBER: (field: string) => `${field} must be a positive number`,
 };
 ```
 

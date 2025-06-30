@@ -9,7 +9,7 @@ Complete API reference for all Uptime Watcher interfaces and services.
 - **[Store API](store-api)** - Zustand state management
 - **[Types API](types-api)** - TypeScript type definitions
 
-### Monitoring Services  
+### Monitoring Services
 
 - **[Monitor API](monitor-api)** - HTTP and Port monitoring
 - **[IPC API](ipc-api)** - Inter-process communication

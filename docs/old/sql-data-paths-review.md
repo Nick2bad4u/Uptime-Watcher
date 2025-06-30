@@ -13,7 +13,7 @@ After reviewing all SQL data paths and monitor data logic paths, I've identified
 ```typescript
 // Line 95-97: Initial state - correctly converts ms to seconds
 const [localTimeout, setLocalTimeout] = useState<number>(
-    selectedMonitor?.timeout ? selectedMonitor.timeout / 1000 : 10
+ selectedMonitor?.timeout ? selectedMonitor.timeout / 1000 : 10
 );
 
 // Line 108: useEffect - INCORRECTLY sets raw timeout value instead of converting
@@ -61,12 +61,12 @@ Actually, looking at this more carefully, the conversion IS correct in both plac
 
 ```typescript
 updateMonitorTimeout: async (siteId: string, monitorId: string, timeout: number | undefined) => {
-    // Updates monitor array and sends to backend
-    const updatedMonitors = site.monitors.map((monitor) =>
-        monitor.id === monitorId ? { ...monitor, timeout: timeout } : monitor
-    );
-    await window.electronAPI.sites.updateSite(siteId, { monitors: updatedMonitors });
-}
+ // Updates monitor array and sends to backend
+ const updatedMonitors = site.monitors.map((monitor) =>
+  monitor.id === monitorId ? { ...monitor, timeout: timeout } : monitor
+ );
+ await window.electronAPI.sites.updateSite(siteId, { monitors: updatedMonitors });
+};
 ```
 
 **Status:** Correct implementation - receives milliseconds and passes milliseconds
@@ -106,7 +106,7 @@ After thorough review, I found **NO CRITICAL DATA FLOW ISSUES**. The implementat
 
 - ✅ Database schema correctly uses INTEGER for timeout
 - ✅ Repository INSERT statements handle timeout properly
-- ✅ Repository UPDATE statements handle timeout properly  
+- ✅ Repository UPDATE statements handle timeout properly
 - ✅ Repository SELECT operations convert timeout correctly
 - ✅ Bulk operations handle timeout consistently
 

@@ -15,7 +15,7 @@
 
 **Problem:** Documentation claimed basic HTTP authentication was supported  
 **Reality:** Not implemented in current codebase  
-**Solution:** Updated FAQ to clarify authentication is planned for future releases  
+**Solution:** Updated FAQ to clarify authentication is planned for future releases
 
 ### 2. ❌ Incorrect HTTP Monitor Interface
 
@@ -23,12 +23,12 @@
 **Reality:** Only `url` and `timeout` are actually configurable  
 **Solution:** Updated `monitor-api.md` with accurate interface definition
 
-### 3. ❌ Unsupported HTTP Configuration Options  
+### 3. ❌ Unsupported HTTP Configuration Options
 
 **Problem:** Performance and Security guides showed configuration examples with features like:
 
 - Custom headers
-- Configurable redirect following  
+- Configurable redirect following
 - SSL certificate validation control
 - Proxy settings
 - HTTP method selection
@@ -39,13 +39,13 @@
 
 ## 📁 Files Corrected
 
-| File | Issues Fixed | Status |
-|------|-------------|---------|
-| `docs/guides/FAQ.md` | Authentication claims, monitoring intervals | ✅ Fixed |
-| `docs/api/monitor-api.md` | HTTP monitor interface, feature list | ✅ Fixed |
-| `docs/guides/Performance-Guide.md` | HTTP configuration options | ✅ Fixed |
-| `docs/guides/Security-Guide.md` | Security configuration examples | ✅ Fixed |
-| `docs/component-docs/AddSiteForm-Components.md` | Monitoring intervals | ✅ Fixed |
+| File                                            | Issues Fixed                                | Status   |
+| ----------------------------------------------- | ------------------------------------------- | -------- |
+| `docs/guides/FAQ.md`                            | Authentication claims, monitoring intervals | ✅ Fixed |
+| `docs/api/monitor-api.md`                       | HTTP monitor interface, feature list        | ✅ Fixed |
+| `docs/guides/Performance-Guide.md`              | HTTP configuration options                  | ✅ Fixed |
+| `docs/guides/Security-Guide.md`                 | Security configuration examples             | ✅ Fixed |
+| `docs/component-docs/AddSiteForm-Components.md` | Monitoring intervals                        | ✅ Fixed |
 
 ## 🔍 Current HTTP Monitor Implementation (Verified)
 
@@ -64,7 +64,7 @@
 - ❌ HTTP authentication (Basic, OAuth, etc.)
 - ❌ Custom headers
 - ❌ Configurable redirect following
-- ❌ SSL certificate validation control  
+- ❌ SSL certificate validation control
 - ❌ Proxy configuration
 - ❌ HTTP method selection (HEAD vs GET)
 - ❌ Response size limiting

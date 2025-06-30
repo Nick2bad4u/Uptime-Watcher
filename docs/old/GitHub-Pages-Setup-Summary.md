@@ -13,7 +13,7 @@
 - Created `docs/_config.yml` - Jekyll configuration optimized for documentation
 - Added index pages for major sections:
   - `docs/api/index.md` - API documentation hub
-  - `docs/guides/index.md` - User and developer guides hub  
+  - `docs/guides/index.md` - User and developer guides hub
   - `docs/component-docs/index.md` - Component documentation hub
 - Created `docs/404.md` - Custom 404 page
 

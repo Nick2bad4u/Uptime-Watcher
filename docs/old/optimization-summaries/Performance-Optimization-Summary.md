@@ -1,4 +1,5 @@
 <!-- markdownlint-disable -->
+
 # Performance Optimization Summary
 
 ## 🚀 Phase 4: Performance Optimizations Applied
@@ -6,18 +7,22 @@
 ### Components Optimized with React.memo
 
 1. **SiteCard** - Main site card component
+
    - Prevents re-renders when parent components update
    - Only re-renders when site prop changes
 
 2. **MetricCard** - Individual metric display
+
    - Prevents re-renders when label/value haven't changed
    - Used in grid layout, significant savings with multiple cards
 
 3. **ActionButtonGroup** - Button group for site actions
+
    - Prevents re-renders when parent state changes
    - Uses useCallback for event handlers
 
 4. **StatusBadge** - Status display component
+
    - Prevents re-renders when status hasn't changed
    - Reusable across the application
 
@@ -28,10 +33,12 @@
 ### Memoization Strategies Applied
 
 #### useMemo Usage:
+
 - **SiteCardMetrics**: Memoizes the metrics array to prevent recalculation
 - **Custom Hooks**: Site monitor and stats calculations are memoized
 
 #### useCallback Usage:
+
 - **ActionButtonGroup**: Event handlers are memoized to prevent function recreation
 - **useSiteActions**: All action handlers use useCallback for stability
 
@@ -68,6 +75,7 @@
 ## 🎯 Performance Impact
 
 The refactored components now perform significantly better, especially in scenarios with:
+
 - Multiple sites in the list
 - Frequent status updates
 - User interactions (button clicks, selections)

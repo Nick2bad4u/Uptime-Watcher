@@ -48,7 +48,7 @@ The following file extensions are supported:
 - **`@`** → `src/` directory for clean imports
 
   ```typescript
-  import { Component } from '@/components/Component';
+  import { Component } from "@/components/Component";
   ```
 
 ### Active Plugins
@@ -111,7 +111,7 @@ Model Context Protocol (MCP) is a standardized protocol that enables AI assistan
 The `vite-plugin-mcp` is configured with default settings:
 
 ```typescript
-ViteMcp()
+ViteMcp();
 ```
 
 This enables the MCP server at:
@@ -130,12 +130,12 @@ The MCP server configuration is managed in `.vscode/mcp.json`. To avoid connecti
 
 ```json
 {
-  "servers": {
-    "vite": {
-      "type": "sse",
-      "url": "http://localhost:5173/__mcp/sse"
-    }
+ "servers": {
+  "vite": {
+   "type": "sse",
+   "url": "http://localhost:5173/__mcp/sse"
   }
+ }
 }
 ```
 
@@ -143,7 +143,7 @@ The MCP server configuration is managed in `.vscode/mcp.json`. To avoid connecti
 
 ```json
 {
-  "servers": {}
+ "servers": {}
 }
 ```
 
@@ -154,15 +154,18 @@ The MCP server configuration is managed in `.vscode/mcp.json`. To avoid connecti
 The following MCP servers are configured in `.vscode/settings.json`:
 
 1. **GitHub Server** (`@modelcontextprotocol/server-github`)
+
    - Repository operations
    - Issue and PR management
    - Code search and analysis
 
 2. **Memory Server** (`@modelcontextprotocol/server-memory`)
+
    - Knowledge graph management
    - Persistent context storage
 
 3. **Everything Server** (`@modelcontextprotocol/server-everything`)
+
    - Comprehensive tool collection
    - Multiple service integrations
 
@@ -307,5 +310,5 @@ If you experience plugin conflicts:
 
 ---
 
-*Last updated: June 28, 2025*
-*Project: Uptime Watcher v1.3.0*
+_Last updated: June 28, 2025_
+_Project: Uptime Watcher v1.3.0_

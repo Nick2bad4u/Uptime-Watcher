@@ -62,17 +62,17 @@ temp/            # Temporary files
 ```typescript
 // What is stored vs what is not
 interface StoredData {
-  // ✅ Stored locally
-  siteUrl: string;           // Monitored site URLs
-  responseTime: number;      // Performance metrics
-  statusHistory: Status[];   // Uptime history
-  userSettings: Settings;    // App preferences
-  
-  // ❌ NOT stored
-  userCredentials: never;    // No passwords stored
-  personalInfo: never;       // No user data collected
-  analyticsData: never;      // No usage tracking
-  browserCookies: never;     // No session data
+ // ✅ Stored locally
+ siteUrl: string; // Monitored site URLs
+ responseTime: number; // Performance metrics
+ statusHistory: Status[]; // Uptime history
+ userSettings: Settings; // App preferences
+
+ // ❌ NOT stored
+ userCredentials: never; // No passwords stored
+ personalInfo: never; // No user data collected
+ analyticsData: never; // No usage tracking
+ browserCookies: never; // No session data
 }
 ```
 
@@ -90,18 +90,18 @@ Uptime Watcher only makes network requests to:
 ```typescript
 // Security implications by protocol
 const protocolSecurity = {
-  https: {
-    encryption: "✅ TLS encrypted",
-    integrity: "✅ Data integrity verified", 
-    privacy: "✅ URLs and data protected",
-    recommendation: "Preferred for all sites"
-  },
-  http: {
-    encryption: "❌ Unencrypted",
-    integrity: "❌ No integrity verification",
-    privacy: "❌ URLs visible to network observers", 
-    recommendation: "Avoid when possible"
-  }
+ https: {
+  encryption: "✅ TLS encrypted",
+  integrity: "✅ Data integrity verified",
+  privacy: "✅ URLs and data protected",
+  recommendation: "Preferred for all sites",
+ },
+ http: {
+  encryption: "❌ Unencrypted",
+  integrity: "❌ No integrity verification",
+  privacy: "❌ URLs visible to network observers",
+  recommendation: "Avoid when possible",
+ },
 };
 ```
 
@@ -126,12 +126,12 @@ const protocolSecurity = {
 ```typescript
 // Security configuration in main process
 const securityConfig = {
-  webSecurity: true,           // Enable web security
-  nodeIntegration: false,      // Disable Node.js in renderer
-  contextIsolation: true,      // Isolate contexts
-  sandbox: true,              // Enable sandbox mode
-  allowRunningInsecureContent: false,
-  experimentalFeatures: false
+ webSecurity: true, // Enable web security
+ nodeIntegration: false, // Disable Node.js in renderer
+ contextIsolation: true, // Isolate contexts
+ sandbox: true, // Enable sandbox mode
+ allowRunningInsecureContent: false,
+ experimentalFeatures: false,
 };
 ```
 
@@ -140,20 +140,13 @@ const securityConfig = {
 ```typescript
 // Secure IPC implementation
 export const secureAPI = {
-  // ✅ Whitelisted IPC channels
-  allowedChannels: [
-    'get-sites',
-    'add-site', 
-    'update-site',
-    'delete-site',
-    'get-settings',
-    'update-settings'
-  ],
-  
-  // ✅ Input validation on all channels
-  validateInput: (channel: string, data: any) => {
-    // Sanitize and validate all inputs
-  }
+ // ✅ Whitelisted IPC channels
+ allowedChannels: ["get-sites", "add-site", "update-site", "delete-site", "get-settings", "update-settings"],
+
+ // ✅ Input validation on all channels
+ validateInput: (channel: string, data: any) => {
+  // Sanitize and validate all inputs
+ },
 };
 ```
 
@@ -162,21 +155,21 @@ export const secureAPI = {
 ```typescript
 // Input sanitization examples
 class SecurityUtils {
-  static sanitizeUrl(url: string): string {
-    // Remove dangerous characters and validate format
-    const sanitized = url.trim().toLowerCase();
-    
-    if (!sanitized.match(/^https?:\/\/.+/)) {
-      throw new Error('Invalid URL format');
-    }
-    
-    return sanitized;
+ static sanitizeUrl(url: string): string {
+  // Remove dangerous characters and validate format
+  const sanitized = url.trim().toLowerCase();
+
+  if (!sanitized.match(/^https?:\/\/.+/)) {
+   throw new Error("Invalid URL format");
   }
-  
-  static validateSiteName(name: string): string {
-    // Prevent XSS in site names
-    return name.replace(/<[^>]*>/g, '').trim();
-  }
+
+  return sanitized;
+ }
+
+ static validateSiteName(name: string): string {
+  // Prevent XSS in site names
+  return name.replace(/<[^>]*>/g, "").trim();
+ }
 }
 ```
 
@@ -199,12 +192,12 @@ class SecurityUtils {
 ```typescript
 // Risk mitigation configuration
 const securitySettings = {
-  // Limit request exposure
-  timeout: 30000,              // Fail fast on suspicious delays
-  userAgent: 'Uptime-Watcher/1.0', // Identify legitimate requests
-  
-  // Note: Advanced features like custom headers, proxy settings,
-  // and certificate validation are planned for future releases
+ // Limit request exposure
+ timeout: 30000, // Fail fast on suspicious delays
+ userAgent: "Uptime-Watcher/1.0", // Identify legitimate requests
+
+ // Note: Advanced features like custom headers, proxy settings,
+ // and certificate validation are planned for future releases
 };
 ```
 
@@ -217,17 +210,17 @@ const securitySettings = {
 ```typescript
 // Secure site monitoring practices
 const bestPractices = {
-  preferred: [
-    "https://api.example.com/health",    // HTTPS API endpoints
-    "https://example.com/status",        // HTTPS status pages
-    "https://example.com"                // HTTPS websites
-  ],
-  
-  avoid: [
-    "http://internal.company.com",       // HTTP over public internet
-    "https://example.com/admin",         // Admin interfaces
-    "https://example.com?token=secret"   // URLs with sensitive data
-  ]
+ preferred: [
+  "https://api.example.com/health", // HTTPS API endpoints
+  "https://example.com/status", // HTTPS status pages
+  "https://example.com", // HTTPS websites
+ ],
+
+ avoid: [
+  "http://internal.company.com", // HTTP over public internet
+  "https://example.com/admin", // Admin interfaces
+  "https://example.com?token=secret", // URLs with sensitive data
+ ],
 };
 ```
 
@@ -252,24 +245,24 @@ const bestPractices = {
 ```typescript
 // Secure coding practices
 class SecureDevelopment {
-  // Always validate inputs
-  static validateSiteData(site: any): Site {
-    if (!site.url || typeof site.url !== 'string') {
-      throw new Error('Invalid site URL');
-    }
-    
-    return {
-      id: this.generateSecureId(),
-      url: this.sanitizeUrl(site.url),
-      name: this.sanitizeName(site.name),
-      interval: this.validateInterval(site.interval)
-    };
+ // Always validate inputs
+ static validateSiteData(site: any): Site {
+  if (!site.url || typeof site.url !== "string") {
+   throw new Error("Invalid site URL");
   }
-  
-  // Use secure random generation
-  static generateSecureId(): string {
-    return crypto.randomUUID();
-  }
+
+  return {
+   id: this.generateSecureId(),
+   url: this.sanitizeUrl(site.url),
+   name: this.sanitizeName(site.name),
+   interval: this.validateInterval(site.interval),
+  };
+ }
+
+ // Use secure random generation
+ static generateSecureId(): string {
+  return crypto.randomUUID();
+ }
 }
 ```
 
@@ -277,18 +270,18 @@ class SecureDevelopment {
 
 ```typescript
 // Security test examples
-describe('Security Tests', () => {
-  test('prevents XSS in site names', () => {
-    const maliciousName = '<script>alert("xss")</script>';
-    const sanitized = SecurityUtils.validateSiteName(maliciousName);
-    expect(sanitized).not.toContain('<script>');
-  });
-  
-  test('validates URL format', () => {
-    expect(() => {
-      SecurityUtils.sanitizeUrl('javascript:alert("xss")');
-    }).toThrow('Invalid URL format');
-  });
+describe("Security Tests", () => {
+ test("prevents XSS in site names", () => {
+  const maliciousName = '<script>alert("xss")</script>';
+  const sanitized = SecurityUtils.validateSiteName(maliciousName);
+  expect(sanitized).not.toContain("<script>");
+ });
+
+ test("validates URL format", () => {
+  expect(() => {
+   SecurityUtils.sanitizeUrl('javascript:alert("xss")');
+  }).toThrow("Invalid URL format");
+ });
 });
 ```
 
@@ -299,27 +292,27 @@ describe('Security Tests', () => {
 ```typescript
 // Security-relevant events to log
 interface SecurityEvent {
-  timestamp: Date;
-  type: 'auth' | 'network' | 'data' | 'error';
-  severity: 'low' | 'medium' | 'high';
-  message: string;
-  metadata?: Record<string, any>;
+ timestamp: Date;
+ type: "auth" | "network" | "data" | "error";
+ severity: "low" | "medium" | "high";
+ message: string;
+ metadata?: Record<string, any>;
 }
 
 // Examples
 const securityEvents = [
-  {
-    type: 'network',
-    severity: 'medium',
-    message: 'SSL certificate validation failed',
-    metadata: { url: 'https://expired.example.com' }
-  },
-  {
-    type: 'data', 
-    severity: 'low',
-    message: 'Database file accessed',
-    metadata: { operation: 'read', table: 'sites' }
-  }
+ {
+  type: "network",
+  severity: "medium",
+  message: "SSL certificate validation failed",
+  metadata: { url: "https://expired.example.com" },
+ },
+ {
+  type: "data",
+  severity: "low",
+  message: "Database file accessed",
+  metadata: { operation: "read", table: "sites" },
+ },
 ];
 ```
 
@@ -328,29 +321,29 @@ const securityEvents = [
 ```typescript
 // Monitor for suspicious activity
 class SecurityMonitor {
-  static detectAnomalies(events: SecurityEvent[]): Alert[] {
-    const alerts = [];
-    
-    // Detect unusual network patterns
-    const failureRate = this.calculateFailureRate(events);
-    if (failureRate > 0.5) {
-      alerts.push({
-        type: 'high_failure_rate',
-        message: 'Unusually high failure rate detected'
-      });
-    }
-    
-    // Detect potential scanning
-    const rapidRequests = this.detectRapidRequests(events);
-    if (rapidRequests) {
-      alerts.push({
-        type: 'rapid_requests',
-        message: 'Potential automated scanning detected'
-      });
-    }
-    
-    return alerts;
+ static detectAnomalies(events: SecurityEvent[]): Alert[] {
+  const alerts = [];
+
+  // Detect unusual network patterns
+  const failureRate = this.calculateFailureRate(events);
+  if (failureRate > 0.5) {
+   alerts.push({
+    type: "high_failure_rate",
+    message: "Unusually high failure rate detected",
+   });
   }
+
+  // Detect potential scanning
+  const rapidRequests = this.detectRapidRequests(events);
+  if (rapidRequests) {
+   alerts.push({
+    type: "rapid_requests",
+    message: "Potential automated scanning detected",
+   });
+  }
+
+  return alerts;
+ }
 }
 ```
 
@@ -361,16 +354,19 @@ class SecurityMonitor {
 If you suspect data compromise:
 
 1. **Immediate Actions:**
+
    - Stop the application
    - Disconnect from network if needed
    - Document what happened
 
 2. **Assessment:**
+
    - Check what data might be affected
    - Review logs for suspicious activity
    - Determine scope of potential access
 
 3. **Recovery:**
+
    - Reset database if needed
    - Change any exposed credentials
    - Update site configurations
@@ -398,16 +394,16 @@ For organizational use:
 ```typescript
 // Enterprise security configuration (planned features)
 const enterpriseConfig = {
-  // Current settings
-  timeout: 30000,
-  userAgent: 'Uptime-Watcher/1.0',
-  
-  // Planned features for future releases:
-  // - Network restrictions
-  // - Proxy settings  
-  // - Certificate management
-  // - Audit logging
-  // - Custom authentication
+ // Current settings
+ timeout: 30000,
+ userAgent: "Uptime-Watcher/1.0",
+
+ // Planned features for future releases:
+ // - Network restrictions
+ // - Proxy settings
+ // - Certificate management
+ // - Audit logging
+ // - Custom authentication
 };
 ```
 

@@ -25,7 +25,7 @@ This document provides a final summary of the completed per-monitor timeout feat
 - **Schema**: `monitors` table includes `timeout` column (INTEGER, default NULL)
 - **Repository (`MonitorRepository.ts`)**: Full CRUD support for timeout
   - `create()`: Handles timeout in INSERT operations
-  - `update()`: Handles timeout in UPDATE operations  
+  - `update()`: Handles timeout in UPDATE operations
   - `rowToMonitor()`: Properly deserializes timeout from database
   - `bulkCreate()`: Handles timeout in bulk operations
 
@@ -103,7 +103,7 @@ UI Layer (seconds) → Hook Layer (conversion) → Store Layer (ms) → Backend 
 ### Validation Approach
 
 - **UI Constraints**: `TIMEOUT_CONSTRAINTS` (1-300 seconds)
-- **Backend Constraints**: `TIMEOUT_CONSTRAINTS_MS` (1000-300000 ms)  
+- **Backend Constraints**: `TIMEOUT_CONSTRAINTS_MS` (1000-300000 ms)
 - **Real-time Validation**: Immediate feedback on input changes
 - **Save Validation**: Final validation before backend submission
 
@@ -155,7 +155,7 @@ UI Layer (seconds) → Hook Layer (conversion) → Store Layer (ms) → Backend 
 ### Core Implementation Files
 
 - `src/types.ts` - Added timeout to Monitor interface
-- `electron/types.ts` - Added timeout to Monitor interface  
+- `electron/types.ts` - Added timeout to Monitor interface
 - `src/store.ts` - Added updateMonitorTimeout action
 - `src/constants.ts` - Timeout constraints properly defined
 - `src/hooks/site/useSiteDetails.ts` - Complete timeout state management
@@ -222,7 +222,7 @@ The per-monitor timeout feature has been successfully implemented with:
 
 - **Complete Architecture Integration**: All layers properly updated
 - **Consistent User Experience**: Seconds-based UI with millisecond backend
-- **Robust Error Handling**: Comprehensive validation and user feedback  
+- **Robust Error Handling**: Comprehensive validation and user feedback
 - **Future-Proof Design**: Documented patterns for similar features
 - **Standards Compliance**: TypeScript typing, accessibility, and code quality
 

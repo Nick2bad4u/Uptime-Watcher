@@ -17,7 +17,7 @@ During the comprehensive review of the per-monitor timeout implementation, I dis
 - Added ALTER TABLE migration for existing databases
 - Updated DatabaseService.ts schema creation
 
-### 2. ✅ CRITICAL: Missing MonitorRow Interface Field  
+### 2. ✅ CRITICAL: Missing MonitorRow Interface Field
 
 **Severity:** High - Type safety violation
 **Problem:** MonitorRow interface didn't include timeout field
@@ -62,7 +62,7 @@ During the comprehensive review of the per-monitor timeout implementation, I dis
 ### UI Layer (Seconds) → Internal Storage (Milliseconds) → Backend (Milliseconds)
 
 1. **User Input:** User enters timeout in seconds (e.g., 30)
-2. **Conversion:** UI converts to milliseconds (30 * 1000 = 30000)
+2. **Conversion:** UI converts to milliseconds (30 \* 1000 = 30000)
 3. **Storage:** Database stores 30000 as INTEGER
 4. **Backend:** Monitoring services receive 30000ms directly
 5. **Display:** UI converts back to seconds for display (30000 / 1000 = 30)
@@ -74,7 +74,7 @@ During the comprehensive review of the per-monitor timeout implementation, I dis
 - `electron/services/database/DatabaseService.ts` - Added timeout column and migration
 - `electron/services/database/MonitorRepository.ts` - Added timeout to MonitorRow interface
 
-### Frontend Layer  
+### Frontend Layer
 
 - `src/constants.ts` - Separated user-facing and internal timeout constraints
 - `src/hooks/site/useSiteDetails.ts` - Fixed unit conversion in handleTimeoutChange
@@ -87,7 +87,7 @@ During the comprehensive review of the per-monitor timeout implementation, I dis
 
 - CREATE: timeout column exists and accepts values
 - READ: timeout values retrieved correctly
-- UPDATE: timeout values update properly  
+- UPDATE: timeout values update properly
 - DELETE: timeout values cascade correctly
 
 ### ✅ Type Safety
@@ -118,7 +118,7 @@ During the comprehensive review of the per-monitor timeout implementation, I dis
 - ❌ Missing timeout in bulk operations
 - ❌ Cannot clear timeout values
 
-### After Fixes  
+### After Fixes
 
 - ✅ All database operations work correctly
 - ✅ Complete type safety throughout
@@ -131,7 +131,7 @@ During the comprehensive review of the per-monitor timeout implementation, I dis
 The timeout implementation is now **fully functional and production-ready**. All critical issues have been identified and resolved. The feature provides:
 
 1. **User-friendly interface** - timeout in seconds with clear labeling
-2. **Robust data handling** - proper conversion and storage in milliseconds  
+2. **Robust data handling** - proper conversion and storage in milliseconds
 3. **Type safety** - complete TypeScript coverage
 4. **Backwards compatibility** - existing monitors continue to work
 5. **Database integrity** - proper schema with migration support

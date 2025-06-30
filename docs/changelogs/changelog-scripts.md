@@ -1,16 +1,15 @@
 <!-- markdownlint-disable -->
 <!-- eslint-disable markdown/no-missing-label-refs -->
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-
 [[0f037eb](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0f037eb8d7a5920b7fb27a30e1e38033878333bb)...
 [0f037eb](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0f037eb8d7a5920b7fb27a30e1e38033878333bb)]
 ([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/0f037eb8d7a5920b7fb27a30e1e38033878333bb...0f037eb8d7a5920b7fb27a30e1e38033878333bb))
-
 
 ### � Documentation
 
@@ -20,18 +19,11 @@ All notable changes to this project will be documented in this file.
 - Replaces the project architecture guide with a standard Markdown version, removing the Copilot-specific file and ensuring consistency for general users and contributors
 - Streamlines the documentation set for maintainability and lowers overhead for future documentation updates [`(0f037eb)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0f037eb8d7a5920b7fb27a30e1e38033878333bb)
 
-
-
-
-
-
 ## [3.4.0] - 2025-06-28
-
 
 [[8d0976d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8d0976dc9bc9333a004db4d72f0d443cb95d21a7)...
 [28d3918](https://github.com/Nick2bad4u/Uptime-Watcher/commit/28d3918a0786eaf7e0e8a7953ce6a674c22b253e)]
 ([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/8d0976dc9bc9333a004db4d72f0d443cb95d21a7...28d3918a0786eaf7e0e8a7953ce6a674c22b253e))
-
 
 ### 🚜 Refactor
 
@@ -41,8 +33,6 @@ All notable changes to this project will be documented in this file.
 - Refactors retry logic loops for site DB operations for clarity and code style consistency
 - Updates documentation and download script to explicitly reference and set up the WASM-based SQLite driver, ensuring required directories exist before download
 - Adds minor linter rule suppressions and logging clarifications for better maintainability [`(2d4ff4c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2d4ff4c1d90999296d9d336b8b601029c086dd80)
-
-
 
 ### � Documentation
 
@@ -58,8 +48,6 @@ All notable changes to this project will be documented in this file.
 
 Aims to make the codebase significantly easier to navigate and contribute to, while raising the bar for documentation quality. [`(28d3918)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/28d3918a0786eaf7e0e8a7953ce6a674c22b253e)
 
-
-
 ### 🔧 Build System
 
 - 🔧 [build] Update dependencies and modernize Electron main code
@@ -71,13 +59,11 @@ Aims to make the codebase significantly easier to navigate and contribute to, wh
 - Removes redundant variable assignments and cleans up error-prone legacy patterns for more robust runtime behavior.
 - Keeps package-lock.json in sync with new dependency versions and ensures reproducible builds. [`(8d0976d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8d0976dc9bc9333a004db4d72f0d443cb95d21a7)
 
-
-
-
-
-
 ## Contributors
+
 Thanks to all the [contributors](https://github.com/Nick2bad4u/Uptime-Watcher/graphs/contributors) for their hard work!
+
 ## License
+
 This project is licensed under the [MIT License](https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/LICENSE.md)
-*This changelog was automatically generated with [git-cliff](https://github.com/orhun/git-cliff).*
+_This changelog was automatically generated with [git-cliff](https://github.com/orhun/git-cliff)._

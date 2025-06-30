@@ -14,7 +14,7 @@ SiteDetails (main modal)
 ├── SiteDetailsNavigation (tab navigation & controls)
 ├── Tab Content
 │   ├── OverviewTab
-│   ├── HistoryTab  
+│   ├── HistoryTab
 │   ├── AnalyticsTab (when monitor has analytics data)
 │   └── SettingsTab
 └── ScreenshotThumbnail (integrated in header)
@@ -33,15 +33,15 @@ SiteDetails (main modal)
 
 ```typescript
 interface OverviewTabProps {
-    avgResponseTime: number;
-    fastestResponse: number;
-    formatResponseTime: (time: number) => string;
-    handleRemoveSite: () => Promise<void>;
-    isLoading: boolean;
-    selectedMonitor: Monitor;
-    slowestResponse: number;
-    totalChecks: number;
-    uptime: string;
+ avgResponseTime: number;
+ fastestResponse: number;
+ formatResponseTime: (time: number) => string;
+ handleRemoveSite: () => Promise<void>;
+ isLoading: boolean;
+ selectedMonitor: Monitor;
+ slowestResponse: number;
+ totalChecks: number;
+ uptime: string;
 }
 ```
 
@@ -358,13 +358,18 @@ const chartConfig = useMemo(() => new ChartConfigService(currentTheme), [current
 const lineChartOptions = useMemo(() => chartConfig.getLineChartConfig(), [chartConfig]);
 
 // Chart data memoization
-const lineChartData = useMemo(() => ({
-    datasets: [{
-        data: analytics.filteredHistory.map((h) => h.responseTime),
-        // ... other config
-    }],
-    labels: analytics.filteredHistory.map((h) => new Date(h.timestamp)),
-}), [analytics.filteredHistory, currentTheme]);
+const lineChartData = useMemo(
+ () => ({
+  datasets: [
+   {
+    data: analytics.filteredHistory.map((h) => h.responseTime),
+    // ... other config
+   },
+  ],
+  labels: analytics.filteredHistory.map((h) => new Date(h.timestamp)),
+ }),
+ [analytics.filteredHistory, currentTheme]
+);
 ```
 
 ---

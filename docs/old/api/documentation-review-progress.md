@@ -125,11 +125,13 @@
 ## Issues Found and Fixed
 
 1. **hook-apis.md**:
+
    - Fixed hook organization directory structure (theme hooks in src/theme/, not src/hooks/theme/)
    - Corrected useTheme return type property order
    - Added missing getAvailabilityDescription method
 
 2. **monitor-api.md**:
+
    - Fixed MonitorFactory method name from `createMonitor` to `getMonitor`
    - Corrected static method usage pattern
 
