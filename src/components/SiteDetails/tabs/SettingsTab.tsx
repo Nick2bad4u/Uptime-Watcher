@@ -20,6 +20,52 @@ import {
 import { Site, Monitor } from "../../../types";
 
 /**
+ * Helper function to format time duration into human readable format.
+ * @param milliseconds - Time duration in milliseconds
+ * @returns Formatted time string (e.g., "30s", "5m", "1h")
+ */
+function formatDuration(milliseconds: number): string {
+    if (milliseconds < 60000) {
+        return `${milliseconds / 1000}s`;
+    }
+    if (milliseconds < 3600000) {
+        return `${milliseconds / 60000}m`;
+    }
+    return `${milliseconds / 3600000}h`;
+}
+
+/**
+ * Helper function to get display label for interval value.
+ * @param interval - Interval configuration (number or object with value/label)
+ * @returns Human readable label for the interval
+ */
+function getIntervalLabel(interval: number | { value: number; label?: string }): string {
+    if (typeof interval === "number") {
+        return formatDuration(interval);
+    }
+
+    if (interval.label) {
+        return interval.label;
+    }
+
+    return formatDuration(interval.value);
+}
+
+/**
+ * Helper function to format retry attempts text.
+ * @param attempts - Number of retry attempts
+ * @returns Formatted retry attempts description
+ */
+function formatRetryAttemptsText(attempts: number): string {
+    if (attempts === 0) {
+        return "(Retry disabled - immediate failure detection)";
+    }
+
+    const timesText = attempts === 1 ? "time" : "times";
+    return `(Retry ${attempts} ${timesText} before marking down)`;
+}
+
+/**
  * Generate a display label for the identifier field based on monitor type.
  */
 function getIdentifierLabel(selectedMonitor: Monitor): string {
@@ -58,45 +104,45 @@ function getDisplayIdentifier(currentSite: Site, selectedMonitor: Monitor): stri
  */
 interface SettingsTabProps {
     /** Current site being configured */
-    currentSite: Site;
+    readonly currentSite: Site;
     /** Handler for monitor check interval changes */
-    handleIntervalChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    readonly handleIntervalChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
     /** Handler for removing/deleting the site */
-    handleRemoveSite: () => Promise<void>;
+    readonly handleRemoveSite: () => Promise<void>;
     /** Handler for saving interval changes */
-    handleSaveInterval: () => void;
+    readonly handleSaveInterval: () => void;
     /** Handler for saving site name changes */
-    handleSaveName: () => Promise<void>;
+    readonly handleSaveName: () => Promise<void>;
     /** Handler for saving retry attempts changes */
-    handleSaveRetryAttempts: () => Promise<void>;
+    readonly handleSaveRetryAttempts: () => Promise<void>;
     /** Handler for saving timeout changes */
-    handleSaveTimeout: () => Promise<void>;
+    readonly handleSaveTimeout: () => Promise<void>;
     /** Handler for monitor retry attempts changes */
-    handleRetryAttemptsChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    readonly handleRetryAttemptsChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     /** Handler for monitor timeout changes */
-    handleTimeoutChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    readonly handleTimeoutChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     /** Whether there are unsaved changes pending */
-    hasUnsavedChanges: boolean;
+    readonly hasUnsavedChanges: boolean;
     /** Whether the check interval has been modified */
-    intervalChanged: boolean;
+    readonly intervalChanged: boolean;
     /** Whether any async operation is in progress */
-    isLoading: boolean;
+    readonly isLoading: boolean;
     /** Local state value for check interval */
-    localCheckInterval: number;
+    readonly localCheckInterval: number;
     /** Local state value for site name */
-    localName: string;
+    readonly localName: string;
     /** Local state value for retry attempts */
-    localRetryAttempts: number;
+    readonly localRetryAttempts: number;
     /** Local state value for timeout in seconds (converted to ms when saving) */
-    localTimeout: number;
+    readonly localTimeout: number;
     /** Currently selected monitor being configured */
-    selectedMonitor: Monitor;
+    readonly selectedMonitor: Monitor;
     /** Function to update local site name state */
-    setLocalName: (name: string) => void;
+    readonly setLocalName: (name: string) => void;
     /** Whether the retry attempts have been changed */
-    retryAttemptsChanged: boolean;
+    readonly retryAttemptsChanged: boolean;
     /** Whether the timeout has been changed */
-    timeoutChanged: boolean;
+    readonly timeoutChanged: boolean;
 }
 
 /**
@@ -153,7 +199,7 @@ export function SettingsTab({
     const loggedHandleSaveName = async () => {
         logger.user.action("Settings: Save site name initiated", {
             newName: localName.trim(),
-            oldName: currentSite.name || "",
+            oldName: currentSite.name ?? "",
             siteId: currentSite.identifier,
         });
         await handleSaveName();
@@ -172,7 +218,7 @@ export function SettingsTab({
     const loggedHandleRemoveSite = async () => {
         logger.user.action("Settings: Remove site initiated", {
             siteId: currentSite.identifier,
-            siteName: currentSite.name || "",
+            siteName: currentSite.name ?? "",
         });
         await handleRemoveSite();
     };
@@ -261,19 +307,7 @@ export function SettingsTab({
                     {CHECK_INTERVALS.map((interval) => {
                         // Support both number and object forms
                         const value = typeof interval === "number" ? interval : interval.value;
-                        const label =
-                            typeof interval === "number"
-                                ? value < 60000
-                                    ? `${value / 1000}s`
-                                    : value < 3600000
-                                      ? `${value / 60000}m`
-                                      : `${value / 3600000}h`
-                                : interval.label ||
-                                  (interval.value < 60000
-                                      ? `${interval.value / 1000}s`
-                                      : interval.value < 3600000
-                                        ? `${interval.value / 60000}m`
-                                        : `${interval.value / 3600000}h`);
+                        const label = getIntervalLabel(interval);
                         return (
                             <option key={value} value={value}>
                                 {label}
@@ -346,9 +380,7 @@ export function SettingsTab({
                     Save
                 </ThemedButton>
                 <ThemedText size="xs" variant="tertiary" className="ml-2">
-                    {localRetryAttempts === 0
-                        ? "(Retry disabled - immediate failure detection)"
-                        : `(Retry ${localRetryAttempts} time${localRetryAttempts !== 1 ? "s" : ""} before marking down)`}
+                    {formatRetryAttemptsText(localRetryAttempts)}
                 </ThemedText>
             </ThemedBox>
 
