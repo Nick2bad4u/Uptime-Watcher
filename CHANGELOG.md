@@ -7,9 +7,76 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[cc93b21](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cc93b2140503a2aed16f8126498f80b44b3d05cd)...
-[cc93b21](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cc93b2140503a2aed16f8126498f80b44b3d05cd)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/cc93b2140503a2aed16f8126498f80b44b3d05cd...cc93b2140503a2aed16f8126498f80b44b3d05cd))
+[[cd4aad4](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cd4aad40d930471cf85974e2dcbe34ca6865b54a)...
+[cd4aad4](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cd4aad40d930471cf85974e2dcbe34ca6865b54a)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/cd4aad40d930471cf85974e2dcbe34ca6865b54a...cd4aad40d930471cf85974e2dcbe34ca6865b54a))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 3.6.0 [`(cd4aad4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cd4aad40d930471cf85974e2dcbe34ca6865b54a)
+
+
+
+
+
+
+## [3.6.0] - 2025-06-30
+
+
+[[a59c50d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a59c50d3c0e0e5196792b4e927a9a4db4781e914)...
+[c59a185](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c59a1853cf723f1c767a3645999e3960eb604e44)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/a59c50d3c0e0e5196792b4e927a9a4db4781e914...c59a1853cf723f1c767a3645999e3960eb604e44))
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(c59a185)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c59a1853cf723f1c767a3645999e3960eb604e44)
+
+
+
+### 💼 Other
+
+- Update metrics.repository.svg - [Skip GitHub Action] [`(52164aa)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/52164aaa3e909d16015bbfdac79ac2180334eb9f)
+
+
+- ✨ [feat] Centralize monitor defaults and improve identifier display
+
+- Centralizes default configuration values (timeouts, intervals, retry/backoff, history limits) into shared constants for consistency across backend and frontend.
+- Updates monitor creation and settings logic to use these constants, ensuring unified and explicit default values.
+- Refactors identifier display logic in the settings UI to show human-friendly labels and values based on monitor type (URL for HTTP, host:port for port monitors).
+- Simplifies retry/backoff logic and ensures exponential backoff is consistently applied using constants.
+- Cleans up and reorders store update functions for better maintainability.
+- Removes redundant inline default values, relying on shared configuration.
+- Fixes minor style and type issues for improved code clarity. [`(b6134be)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b6134be75a6250204c9cc3c9f5fb4340231ded0e)
+
+
+- 📝 [docs] Remove all architecture and API documentation
+
+- Deletes all markdown documentation for architecture, components, API reference, guides, and type definitions
+- Removes internal docs for forms, settings, dashboard, hooks, validation, and backend structure
+- Cleans up the codebase, likely in preparation for major restructuring, documentation migration, or to eliminate outdated and potentially misleading technical docs
+
+No logic or application code is affected; only documentation is impacted. [`(3d87674)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3d876748208640ca8fcb8fff49bb811a98efcc02)
+
+
+- ✨ [feat] Add per-monitor retry attempts with UI and persistence
+
+- Introduces configurable retry attempts for individual monitors, allowing fine-grained control over failure detection sensitivity.
+- Updates backend, database schema, and repository logic to store and process retry attempts per monitor.
+- Refactors monitoring logic to use per-monitor retry and timeout, applying exponential backoff between attempts for reliability.
+- Enhances UI: adds retry attempts configuration to site details, calculates max check duration, and removes global maxRetries from settings and docs.
+- Sets default check interval to 5 minutes, removes auto-refresh, and improves advanced error/status handling for HTTP and port monitors.
+- Cleans up related documentation and code for consistency.
+
+Relates to #213 [`(a59c50d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a59c50d3c0e0e5196792b4e927a9a4db4781e914)
+
+
+
+### ⚙️ Miscellaneous Tasks
+
+- Update changelogs for v3.5.0 [skip ci] [`(06036b1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/06036b1e21713b5869fc850242a67b4c6a9339b5)
+
 
 
 ### 📦 Dependencies
