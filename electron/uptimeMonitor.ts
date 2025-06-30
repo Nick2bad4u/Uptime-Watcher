@@ -27,6 +27,15 @@ import { monitorLogger as logger } from "./utils/logger";
 import { withDbRetry } from "./utils/retry";
 
 /**
+ * Type for imported site data structure.
+ */
+type ImportSite = {
+    identifier: string;
+    name?: string;
+    monitors?: Site["monitors"];
+};
+
+/**
  * Core uptime monitoring service that manages site monitoring operations.
  *
  * This class serves as the central orchestrator for:
@@ -506,7 +515,23 @@ export class UptimeMonitor extends EventEmitter {
     }
 
     public async updateSite(identifier: string, updates: Partial<Site>): Promise<Site> {
-        // Input validation
+        const site = this.validateUpdateSiteInput(identifier);
+        const updatedSite = this.createUpdatedSite(site, updates);
+
+        await this.siteRepository.upsert(updatedSite);
+
+        if (updates.monitors) {
+            await this.updateSiteMonitors(identifier, updates.monitors);
+            await this.handleMonitorIntervalChanges(identifier, site, updates.monitors);
+        }
+
+        return updatedSite;
+    }
+
+    /**
+     * Validate input parameters for updateSite operation.
+     */
+    private validateUpdateSiteInput(identifier: string): Site {
         if (!identifier) {
             throw new Error("Site identifier is required");
         }
@@ -515,76 +540,109 @@ export class UptimeMonitor extends EventEmitter {
         if (!site) {
             throw new Error(`Site not found: ${identifier}`);
         }
-        // Only update allowed fields
+
+        return site;
+    }
+
+    /**
+     * Create updated site object with new values.
+     */
+    private createUpdatedSite(site: Site, updates: Partial<Site>): Site {
         const updatedSite: Site = {
             ...site,
             ...updates,
             monitors: updates.monitors || site.monitors,
         };
-        this.sites.set(identifier, updatedSite);
-
-        // Persist site to DB using repository
-        await this.siteRepository.upsert(updatedSite);
-
-        // Handle monitor updates if provided
-        if (updates.monitors) {
-            // Get current monitors in DB for this site
-            const dbMonitors = await this.monitorRepository.findBySiteIdentifier(identifier);
-
-            // Remove monitors from DB that are not in the new array
-            const toDelete = dbMonitors.filter(
-                (dbm) => !updates.monitors!.some((m) => String(m.id) === String(dbm.id))
-            );
-            for (const del of toDelete) {
-                if (del.id) {
-                    await this.monitorRepository.delete(del.id);
-                }
-            }
-
-            // Upsert all current monitors
-            for (const monitor of updates.monitors) {
-                if (monitor.id && !isNaN(Number(monitor.id))) {
-                    // Update existing monitor
-                    await this.monitorRepository.update(monitor.id, monitor);
-                } else {
-                    // Create new monitor
-                    const newId = await this.monitorRepository.create(identifier, monitor);
-                    monitor.id = newId;
-                }
-            }
-        }
-
-        // If monitors were updated, check for interval changes and restart timers as needed
-        if (updates.monitors) {
-            for (const updatedMonitor of updates.monitors) {
-                const prevMonitor = site.monitors.find((m) => String(m.id) === String(updatedMonitor.id));
-                if (!prevMonitor) continue;
-                // If checkInterval changed, restart timer for this monitor
-                if (
-                    typeof updatedMonitor.checkInterval === "number" &&
-                    updatedMonitor.checkInterval !== prevMonitor.checkInterval
-                ) {
-                    if (isDev()) {
-                        logger.debug(
-                            `[updateSite] Restarting monitor ${updatedMonitor.id}: interval changed from ${prevMonitor.checkInterval}ms to ${updatedMonitor.checkInterval}ms`
-                        );
-                    }
-
-                    // Check if the monitor was previously monitoring before stopping
-                    const wasMonitoring = prevMonitor.monitoring ?? false;
-
-                    // Stop the old monitoring
-                    await this.stopMonitoringForSite(identifier, String(updatedMonitor.id));
-
-                    // Only restart monitoring if it was previously monitoring
-                    if (wasMonitoring) {
-                        // Use the proper startMonitoringForSite method which handles persistence
-                        await this.startMonitoringForSite(identifier, String(updatedMonitor.id));
-                    }
-                }
-            }
-        }
+        this.sites.set(site.identifier, updatedSite);
         return updatedSite;
+    }
+
+    /**
+     * Update monitors in the database for a site.
+     */
+    private async updateSiteMonitors(identifier: string, newMonitors: Site["monitors"]): Promise<void> {
+        const dbMonitors = await this.monitorRepository.findBySiteIdentifier(identifier);
+
+        await this.deleteObsoleteMonitors(dbMonitors, newMonitors);
+        await this.upsertSiteMonitors(identifier, newMonitors);
+    }
+
+    /**
+     * Delete monitors that are no longer in the updated monitors array.
+     */
+    private async deleteObsoleteMonitors(dbMonitors: Site["monitors"], newMonitors: Site["monitors"]): Promise<void> {
+        const toDelete = dbMonitors.filter((dbm) => !newMonitors.some((m) => String(m.id) === String(dbm.id)));
+
+        for (const monitor of toDelete) {
+            if (monitor.id) {
+                await this.monitorRepository.delete(monitor.id);
+            }
+        }
+    }
+
+    /**
+     * Create or update monitors in the database.
+     */
+    private async upsertSiteMonitors(identifier: string, monitors: Site["monitors"]): Promise<void> {
+        for (const monitor of monitors) {
+            if (monitor.id && !isNaN(Number(monitor.id))) {
+                await this.monitorRepository.update(monitor.id, monitor);
+            } else {
+                const newId = await this.monitorRepository.create(identifier, monitor);
+                monitor.id = newId;
+            }
+        }
+    }
+
+    /**
+     * Handle monitor interval changes and restart monitoring if needed.
+     */
+    private async handleMonitorIntervalChanges(
+        identifier: string,
+        originalSite: Site,
+        updatedMonitors: Site["monitors"]
+    ): Promise<void> {
+        for (const updatedMonitor of updatedMonitors) {
+            const prevMonitor = originalSite.monitors.find((m) => String(m.id) === String(updatedMonitor.id));
+            if (!prevMonitor) continue;
+
+            const intervalChanged = this.hasIntervalChanged(updatedMonitor, prevMonitor);
+            if (intervalChanged) {
+                await this.restartMonitorForIntervalChange(identifier, updatedMonitor, prevMonitor);
+            }
+        }
+    }
+
+    /**
+     * Check if the monitor's check interval has changed.
+     */
+    private hasIntervalChanged(updatedMonitor: Site["monitors"][0], prevMonitor: Site["monitors"][0]): boolean {
+        return (
+            typeof updatedMonitor.checkInterval === "number" &&
+            updatedMonitor.checkInterval !== prevMonitor.checkInterval
+        );
+    }
+
+    /**
+     * Restart monitoring for a monitor with changed interval.
+     */
+    private async restartMonitorForIntervalChange(
+        identifier: string,
+        updatedMonitor: Site["monitors"][0],
+        prevMonitor: Site["monitors"][0]
+    ): Promise<void> {
+        if (isDev()) {
+            logger.debug(
+                `[updateSite] Restarting monitor ${updatedMonitor.id}: interval changed from ${prevMonitor.checkInterval}ms to ${updatedMonitor.checkInterval}ms`
+            );
+        }
+
+        const wasMonitoring = prevMonitor.monitoring ?? false;
+        await this.stopMonitoringForSite(identifier, String(updatedMonitor.id));
+
+        if (wasMonitoring) {
+            await this.startMonitoringForSite(identifier, String(updatedMonitor.id));
+        }
     }
 
     /**
@@ -635,65 +693,16 @@ export class UptimeMonitor extends EventEmitter {
     public async importData(data: string): Promise<boolean> {
         logger.info("Importing data");
         try {
-            // Input validation
-            if (!data || typeof data !== "string") {
-                throw new Error("Invalid import data: must be a non-empty string");
-            }
+            const parsedData = this.validateImportData(data);
+            await this.clearExistingData();
+            await this.importSitesAndSettings(parsedData);
 
-            const parsedData = JSON.parse(data);
-
-            // Validate parsed data structure
-            if (!parsedData || typeof parsedData !== "object") {
-                throw new Error("Invalid import data: must be a valid JSON object");
-            }
-
-            // Clear existing data using repositories
-            await this.siteRepository.deleteAll();
-            await this.settingsRepository.deleteAll();
-            await this.monitorRepository.deleteAll();
-            await this.historyRepository.deleteAll();
-
-            // Insert sites using repository
-            if (Array.isArray(parsedData.sites)) {
-                const sitesToInsert = parsedData.sites.map((site: { identifier: string; name?: string }) => ({
-                    identifier: site.identifier,
-                    name: site.name,
-                }));
-                await this.siteRepository.bulkInsert(sitesToInsert);
-            }
-
-            // Insert settings using repository
-            if (parsedData.settings && typeof parsedData.settings === "object") {
-                await this.settingsRepository.bulkInsert(parsedData.settings);
-            }
-
-            // Insert monitors and their history using repositories
-            for (const site of parsedData.sites) {
-                if (Array.isArray(site.monitors)) {
-                    const createdMonitors = await this.monitorRepository.bulkCreate(site.identifier, site.monitors);
-
-                    // Insert history for each monitor by matching identifiers
-                    const originalMonitors = site.monitors;
-                    for (const createdMonitor of createdMonitors) {
-                        // Find the corresponding original monitor
-                        const originalMonitor = originalMonitors.find(
-                            (original: Site["monitors"][0]) =>
-                                original.url === createdMonitor.url && original.type === createdMonitor.type
-                        );
-
-                        if (
-                            createdMonitor &&
-                            originalMonitor &&
-                            Array.isArray(originalMonitor.history) &&
-                            createdMonitor.id
-                        ) {
-                            await this.historyRepository.bulkInsert(createdMonitor.id, originalMonitor.history);
-                        }
-                    }
-                }
+            if (parsedData.sites) {
+                await this.importMonitorsWithHistory(parsedData.sites);
             }
 
             await this.loadSites();
+
             logger.info("Data imported successfully");
             return true;
         } catch (error) {
@@ -701,6 +710,100 @@ export class UptimeMonitor extends EventEmitter {
             this.emit("db-error", { error, operation: "importData" });
             return false;
         }
+    }
+
+    /**
+     * Validate and parse import data.
+     */
+    private validateImportData(data: string): { sites?: ImportSite[]; settings?: Record<string, string> } {
+        if (!data || typeof data !== "string") {
+            throw new Error("Invalid import data: must be a non-empty string");
+        }
+
+        const parsedData = JSON.parse(data);
+        if (!parsedData || typeof parsedData !== "object") {
+            throw new Error("Invalid import data: must be a valid JSON object");
+        }
+
+        return parsedData;
+    }
+
+    /**
+     * Clear all existing data from repositories.
+     */
+    private async clearExistingData(): Promise<void> {
+        await this.siteRepository.deleteAll();
+        await this.settingsRepository.deleteAll();
+        await this.monitorRepository.deleteAll();
+        await this.historyRepository.deleteAll();
+    }
+
+    /**
+     * Import sites and settings data.
+     */
+    private async importSitesAndSettings(parsedData: {
+        sites?: ImportSite[];
+        settings?: Record<string, string>;
+    }): Promise<void> {
+        if (Array.isArray(parsedData.sites)) {
+            const sitesToInsert = parsedData.sites.map((site: { identifier: string; name?: string }) => ({
+                identifier: site.identifier,
+                name: site.name,
+            }));
+            await this.siteRepository.bulkInsert(sitesToInsert);
+        }
+
+        if (parsedData.settings && typeof parsedData.settings === "object") {
+            await this.settingsRepository.bulkInsert(parsedData.settings);
+        }
+    }
+
+    /**
+     * Import monitors and their associated history.
+     */
+    private async importMonitorsWithHistory(sites: ImportSite[]): Promise<void> {
+        for (const site of sites) {
+            if (Array.isArray(site.monitors)) {
+                const createdMonitors = await this.monitorRepository.bulkCreate(site.identifier, site.monitors);
+                await this.importHistoryForMonitors(createdMonitors, site.monitors);
+            }
+        }
+    }
+
+    /**
+     * Import history for created monitors by matching with original monitors.
+     */
+    private async importHistoryForMonitors(
+        createdMonitors: Site["monitors"],
+        originalMonitors: Site["monitors"]
+    ): Promise<void> {
+        for (const createdMonitor of createdMonitors) {
+            const originalMonitor = this.findMatchingOriginalMonitor(createdMonitor, originalMonitors);
+
+            if (this.shouldImportHistory(createdMonitor, originalMonitor)) {
+                await this.historyRepository.bulkInsert(createdMonitor.id, originalMonitor?.history ?? []);
+            }
+        }
+    }
+
+    /**
+     * Find the original monitor that matches the created monitor.
+     */
+    private findMatchingOriginalMonitor(
+        createdMonitor: Site["monitors"][0],
+        originalMonitors: Site["monitors"]
+    ): Site["monitors"][0] | undefined {
+        return originalMonitors.find(
+            (original: Site["monitors"][0]) =>
+                original.url === createdMonitor.url && original.type === createdMonitor.type
+        );
+    }
+
+    /**
+     * Check if history should be imported for a monitor.
+     */
+    private shouldImportHistory(createdMonitor: Site["monitors"][0], originalMonitor?: Site["monitors"][0]): boolean {
+        return !!(createdMonitor && originalMonitor && Array.isArray(originalMonitor.history) && createdMonitor.id);
     }
 
     /**
