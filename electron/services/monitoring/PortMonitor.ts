@@ -1,5 +1,6 @@
 import isPortReachable from "is-port-reachable";
 
+import { DEFAULT_REQUEST_TIMEOUT, RETRY_BACKOFF } from "../../constants";
 import { Site } from "../../types";
 import { isDev } from "../../utils";
 import { logger } from "../../utils/logger";
@@ -14,7 +15,7 @@ export class PortMonitor implements IMonitorService {
 
     constructor(config: MonitorConfig = {}) {
         this.config = {
-            timeout: 5000, // 5 seconds default for port checks
+            timeout: DEFAULT_REQUEST_TIMEOUT, // Use consistent default timeout
             ...config,
         };
     }
@@ -44,7 +45,7 @@ export class PortMonitor implements IMonitorService {
             };
         }
 
-        const timeout = monitor.timeout ?? this.config.timeout ?? 10000;
+        const timeout = monitor.timeout ?? this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT;
         const retryAttempts = monitor.retryAttempts ?? 0;
 
         return await this.performPortCheckWithRetry(monitor.host, monitor.port, timeout, retryAttempts);
@@ -59,17 +60,15 @@ export class PortMonitor implements IMonitorService {
         timeout: number,
         maxRetries: number
     ): Promise<MonitorCheckResult> {
-        let lastError: unknown;
-        let attempts = 0;
         const totalAttempts = maxRetries + 1; // Initial attempt + retries
 
-        while (attempts < totalAttempts) {
+        for (const attempt of Array.from({ length: totalAttempts }, (_, i) => i)) {
             const startTime = performance.now();
 
             try {
                 if (isDev()) {
                     logger.debug(
-                        `[PortMonitor] Checking port: ${host}:${port} with timeout: ${timeout}ms (attempt ${attempts + 1}/${totalAttempts})`
+                        `[PortMonitor] Checking port: ${host}:${port} with timeout: ${timeout}ms (attempt ${attempt + 1}/${totalAttempts})`
                     );
                 }
 
@@ -81,9 +80,9 @@ export class PortMonitor implements IMonitorService {
                 const responseTime = Math.round(performance.now() - startTime);
 
                 if (isReachable) {
-                    if (isDev() && attempts > 0) {
+                    if (isDev() && attempt > 0) {
                         logger.debug(
-                            `[PortMonitor] Port ${host}:${port} succeeded on attempt ${attempts + 1}/${totalAttempts}`
+                            `[PortMonitor] Port ${host}:${port} succeeded on attempt ${attempt + 1}/${totalAttempts}`
                         );
                     }
                     if (isDev()) {
@@ -96,20 +95,20 @@ export class PortMonitor implements IMonitorService {
                     };
                 } else {
                     const responseTime = Math.round(performance.now() - startTime);
-                    lastError = new Error("Port not reachable");
 
                     if (isDev()) {
                         logger.debug(
-                            `[PortMonitor] Port ${host}:${port} not reachable on attempt ${attempts + 1}/${totalAttempts}`
+                            `[PortMonitor] Port ${host}:${port} not reachable on attempt ${attempt + 1}/${totalAttempts}`
                         );
                     }
 
-                    attempts++;
-
                     // If this wasn't the last attempt, wait before retrying
-                    if (attempts < totalAttempts) {
+                    if (attempt < totalAttempts - 1) {
                         // Simple exponential backoff: 500ms, 1s, 2s, 4s, etc.
-                        const delayMs = Math.min(500 * Math.pow(2, attempts - 1), 5000);
+                        const delayMs = Math.min(
+                            RETRY_BACKOFF.INITIAL_DELAY * Math.pow(2, attempt),
+                            RETRY_BACKOFF.MAX_DELAY
+                        );
                         await new Promise((resolve) => setTimeout(resolve, delayMs));
                     } else {
                         // Return the final failure result
@@ -123,20 +122,21 @@ export class PortMonitor implements IMonitorService {
                 }
             } catch (error) {
                 const responseTime = Math.round(performance.now() - startTime);
-                lastError = error;
-                attempts++;
 
                 if (isDev()) {
                     const errorMessage = error instanceof Error ? error.message : "Unknown error";
                     logger.debug(
-                        `[PortMonitor] Error checking port ${host}:${port} on attempt ${attempts}/${totalAttempts}: ${errorMessage}`
+                        `[PortMonitor] Error checking port ${host}:${port} on attempt ${attempt + 1}/${totalAttempts}: ${errorMessage}`
                     );
                 }
 
                 // If this wasn't the last attempt, wait before retrying
-                if (attempts < totalAttempts) {
+                if (attempt < totalAttempts - 1) {
                     // Simple exponential backoff: 500ms, 1s, 2s, 4s, etc.
-                    const delayMs = Math.min(500 * Math.pow(2, attempts - 1), 5000);
+                    const delayMs = Math.min(
+                        RETRY_BACKOFF.INITIAL_DELAY * Math.pow(2, attempt),
+                        RETRY_BACKOFF.MAX_DELAY
+                    );
                     await new Promise((resolve) => setTimeout(resolve, delayMs));
                 } else {
                     // Return the final error result
@@ -151,14 +151,8 @@ export class PortMonitor implements IMonitorService {
             }
         }
 
-        // Fallback (should not reach here)
-        const errorMessage = lastError instanceof Error ? lastError.message : "Unknown error";
-        return {
-            details: String(port),
-            error: errorMessage,
-            responseTime: 0,
-            status: "down",
-        };
+        // This should never be reached, but TypeScript needs it
+        throw new Error("Unexpected end of retry loop");
     }
 
     /**

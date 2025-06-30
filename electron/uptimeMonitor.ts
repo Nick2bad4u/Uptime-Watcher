@@ -8,6 +8,12 @@
 import { EventEmitter } from "events";
 
 import {
+    DEFAULT_REQUEST_TIMEOUT,
+    DEFAULT_CHECK_INTERVAL,
+    STATUS_UPDATE_EVENT,
+    DEFAULT_HISTORY_LIMIT,
+} from "./constants";
+import {
     DatabaseService,
     SiteRepository,
     MonitorRepository,
@@ -19,15 +25,6 @@ import { Site, StatusHistory, StatusUpdate } from "./types";
 import { isDev } from "./utils";
 import { monitorLogger as logger } from "./utils/logger";
 import { withDbRetry } from "./utils/retry";
-
-/** Default timeout for HTTP requests (10 seconds) */
-const DEFAULT_REQUEST_TIMEOUT = 10000;
-
-/** Default check interval for new monitors (5 minutes) */
-const DEFAULT_CHECK_INTERVAL = 300000;
-
-/** Constants */
-const STATUS_UPDATE_EVENT = "status-update";
 
 /**
  * Core uptime monitoring service that manages site monitoring operations.
@@ -58,7 +55,7 @@ const STATUS_UPDATE_EVENT = "status-update";
 
 export class UptimeMonitor extends EventEmitter {
     private sites: Map<string, Site> = new Map(); // key: site.identifier
-    private historyLimit: number = 500; // Default history limit - generous for good UX
+    private historyLimit: number = DEFAULT_HISTORY_LIMIT; // Default history limit - generous for good UX
     private isMonitoring: boolean = false;
 
     // Repository instances

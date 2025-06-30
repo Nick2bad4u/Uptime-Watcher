@@ -39,10 +39,10 @@ interface ThemedBoxProps {
     onMouseEnter?: () => void;
     onMouseLeave?: () => void;
     children: React.ReactNode;
-    as?: 'div' | 'button' | 'section' | 'article' | 'aside' | 'header' | 'footer' | 'nav';
+    as?: "div" | "button" | "section" | "article" | "aside" | "header" | "footer" | "nav";
     role?: string;
     tabIndex?: number;
-    'aria-label'?: string;
+    "aria-label"?: string;
 }
 
 export function ThemedBox({

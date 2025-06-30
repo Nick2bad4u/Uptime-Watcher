@@ -1,3 +1,4 @@
+import { DEFAULT_CHECK_INTERVAL } from "../../constants";
 import { Site } from "../../types";
 import { isDev } from "../../utils";
 import { logger } from "../../utils/logger";
@@ -31,8 +32,8 @@ export class MonitorScheduler {
         // Stop existing interval if any
         this.stopMonitor(siteIdentifier, monitor.id);
 
-        // Use monitor-specific checkInterval, fallback to default (60 seconds)
-        const checkInterval = monitor.checkInterval ?? 60000;
+        // Use monitor-specific checkInterval, fallback to default (5 minutes)
+        const checkInterval = monitor.checkInterval ?? DEFAULT_CHECK_INTERVAL;
 
         if (isDev()) {
             logger.debug(

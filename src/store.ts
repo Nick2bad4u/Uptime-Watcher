@@ -6,6 +6,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+import { DEFAULT_HISTORY_LIMIT } from "./constants";
 import { ThemeName } from "./theme/types";
 import { Site, StatusUpdate, Monitor, MonitorType } from "./types";
 
@@ -144,7 +145,7 @@ interface AppState {
 
 const defaultSettings: AppSettings = {
     autoStart: false,
-    historyLimit: 500,
+    historyLimit: DEFAULT_HISTORY_LIMIT,
     minimizeToTray: true,
     notifications: true,
     soundAlerts: false,
@@ -508,30 +509,6 @@ export const useStore = create<AppState>()(
                     state.setLoading(false);
                 }
             },
-            updateSettings: (newSettings: Partial<AppSettings>) =>
-                set((state) => {
-                    const updatedSettings = { ...state.settings, ...newSettings };
-                    return {
-                        settings: updatedSettings,
-                    };
-                }),
-            updateSiteCheckInterval: async (siteId: string, monitorId: string, interval: number) => {
-                const state = get();
-                state.clearError();
-                try {
-                    // Update in backend (update the monitor in the site's monitors array)
-                    const site = get().sites.find((s) => s.identifier === siteId);
-                    if (!site) throw new Error("Site not found");
-                    const updatedMonitors = site.monitors.map((monitor) =>
-                        monitor.id === monitorId ? { ...monitor, checkInterval: interval } : monitor
-                    );
-                    await window.electronAPI.sites.updateSite(siteId, { monitors: updatedMonitors });
-                    await state.syncSitesFromBackend();
-                } catch (error) {
-                    state.setError(`Failed to update monitor check interval: ${(error as Error).message}`);
-                    throw error;
-                }
-            },
             updateMonitorRetryAttempts: async (
                 siteId: string,
                 monitorId: string,
@@ -567,6 +544,30 @@ export const useStore = create<AppState>()(
                     await state.syncSitesFromBackend();
                 } catch (error) {
                     state.setError(`Failed to update monitor timeout: ${(error as Error).message}`);
+                    throw error;
+                }
+            },
+            updateSettings: (newSettings: Partial<AppSettings>) =>
+                set((state) => {
+                    const updatedSettings = { ...state.settings, ...newSettings };
+                    return {
+                        settings: updatedSettings,
+                    };
+                }),
+            updateSiteCheckInterval: async (siteId: string, monitorId: string, interval: number) => {
+                const state = get();
+                state.clearError();
+                try {
+                    // Update in backend (update the monitor in the site's monitors array)
+                    const site = get().sites.find((s) => s.identifier === siteId);
+                    if (!site) throw new Error("Site not found");
+                    const updatedMonitors = site.monitors.map((monitor) =>
+                        monitor.id === monitorId ? { ...monitor, checkInterval: interval } : monitor
+                    );
+                    await window.electronAPI.sites.updateSite(siteId, { monitors: updatedMonitors });
+                    await state.syncSitesFromBackend();
+                } catch (error) {
+                    state.setError(`Failed to update monitor check interval: ${(error as Error).message}`);
                     throw error;
                 }
             },

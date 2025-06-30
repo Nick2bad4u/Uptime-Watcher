@@ -62,6 +62,15 @@ export const CHECK_INTERVALS: IntervalOption[] = [
 /** Default check interval (5 minutes) */
 export const DEFAULT_CHECK_INTERVAL = 300000;
 
+/** Default request timeout (10 seconds) */
+export const DEFAULT_REQUEST_TIMEOUT = 10000;
+
+/** Default request timeout in seconds for UI display (10 seconds) */
+export const DEFAULT_REQUEST_TIMEOUT_SECONDS = 10;
+
+/** Default history limit (500 records) */
+export const DEFAULT_HISTORY_LIMIT = 500;
+
 /** History limit options for controlling data retention */
 export const HISTORY_LIMIT_OPTIONS: IntervalOption[] = [
     { label: "25 records", value: 25 },

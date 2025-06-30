@@ -41,7 +41,7 @@ class Main {
 }
 
 // Start the application
-// TypeScript is warning that the variable is declared but never read, 
-// which is intentional in this case since we just need to keep the reference 
+// TypeScript is warning that the variable is declared but never read,
+// which is intentional in this case since we just need to keep the reference
 // alive to prevent garbage collection.
 new Main();

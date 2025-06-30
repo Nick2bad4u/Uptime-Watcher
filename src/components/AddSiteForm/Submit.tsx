@@ -9,6 +9,8 @@ import type { Logger } from "../../services/logger";
 import type { Monitor } from "../../types";
 import type { AddSiteFormState, AddSiteFormActions } from "./useAddSiteForm";
 
+import { DEFAULT_REQUEST_TIMEOUT, RETRY_CONSTRAINTS } from "../../constants";
+
 /**
  * Store actions interface for form submission.
  */
@@ -156,7 +158,9 @@ function createMonitor(props: FormSubmitProps): Monitor {
         checkInterval,
         history: [] as Monitor["history"],
         id: generateUuid(),
+        retryAttempts: RETRY_CONSTRAINTS.DEFAULT, // Explicit default retry attempts
         status: "pending" as const,
+        timeout: DEFAULT_REQUEST_TIMEOUT, // Explicit default timeout
         type: monitorType,
     };
 

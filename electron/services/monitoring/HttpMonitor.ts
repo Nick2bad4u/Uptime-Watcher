@@ -2,6 +2,7 @@ import axios, { AxiosInstance, AxiosError } from "axios";
 import http from "http";
 import https from "https";
 
+import { DEFAULT_REQUEST_TIMEOUT, RETRY_BACKOFF, USER_AGENT } from "../../constants";
 import { Site } from "../../types";
 import { isDev } from "../../utils";
 import { logger } from "../../utils/logger";
@@ -43,8 +44,8 @@ export class HttpMonitor implements IMonitorService {
 
     constructor(config: MonitorConfig = {}) {
         this.config = {
-            timeout: 10000, // 10 seconds default
-            userAgent: "Uptime-Watcher/1.0",
+            timeout: DEFAULT_REQUEST_TIMEOUT,
+            userAgent: USER_AGENT,
             ...config,
         };
 
@@ -94,7 +95,7 @@ export class HttpMonitor implements IMonitorService {
             return this.createErrorResult("HTTP monitor missing URL", 0);
         }
 
-        const timeout = monitor.timeout ?? this.config.timeout ?? 10000;
+        const timeout = monitor.timeout ?? this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT;
         const retryAttempts = monitor.retryAttempts ?? 0;
 
         return await this.performHealthCheckWithRetry(monitor.url, timeout, retryAttempts);
@@ -129,7 +130,10 @@ export class HttpMonitor implements IMonitorService {
                 // If this wasn't the last attempt, wait before retrying
                 if (attempt < totalAttempts - 1) {
                     // Simple exponential backoff: 500ms, 1s, 2s, 4s, etc.
-                    const delayMs = Math.min(500 * Math.pow(2, attempt), 5000);
+                    const delayMs = Math.min(
+                        RETRY_BACKOFF.INITIAL_DELAY * Math.pow(2, attempt),
+                        RETRY_BACKOFF.MAX_DELAY
+                    );
                     await new Promise((resolve) => setTimeout(resolve, delayMs));
                 } else {
                     // Return the error from the last attempt

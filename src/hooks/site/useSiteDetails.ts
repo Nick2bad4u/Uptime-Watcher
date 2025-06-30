@@ -11,7 +11,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 
-import { DEFAULT_CHECK_INTERVAL } from "../../constants";
+import { DEFAULT_CHECK_INTERVAL, DEFAULT_REQUEST_TIMEOUT_SECONDS } from "../../constants";
 import logger from "../../services/logger";
 import { useStore } from "../../store";
 import { Site } from "../../types";
@@ -94,7 +94,7 @@ export function useSiteDetails({ site }: UseSiteDetailsProps) {
 
     // Timeout state (stored in seconds for UI, converted to ms when saving)
     const [localTimeout, setLocalTimeout] = useState<number>(
-        selectedMonitor?.timeout ? selectedMonitor.timeout / 1000 : 10
+        selectedMonitor?.timeout ? selectedMonitor.timeout / 1000 : DEFAULT_REQUEST_TIMEOUT_SECONDS
     );
     const [timeoutChanged, setTimeoutChanged] = useState(false);
 
@@ -110,7 +110,7 @@ export function useSiteDetails({ site }: UseSiteDetailsProps) {
     useEffect(() => {
         setLocalCheckInterval(selectedMonitor?.checkInterval ?? DEFAULT_CHECK_INTERVAL);
         setIntervalChanged(false);
-        setLocalTimeout(selectedMonitor?.timeout ? selectedMonitor.timeout / 1000 : 10);
+        setLocalTimeout(selectedMonitor?.timeout ? selectedMonitor.timeout / 1000 : DEFAULT_REQUEST_TIMEOUT_SECONDS);
         setTimeoutChanged(false);
         setLocalRetryAttempts(selectedMonitor?.retryAttempts ?? 0);
         setRetryAttemptsChanged(false);
@@ -243,7 +243,9 @@ export function useSiteDetails({ site }: UseSiteDetailsProps) {
             const timeoutInSeconds = Number(e.target.value);
             setLocalTimeout(timeoutInSeconds);
             // Compare against the monitor's timeout converted to seconds
-            const currentTimeoutInSeconds = selectedMonitor?.timeout ? selectedMonitor.timeout / 1000 : 10;
+            const currentTimeoutInSeconds = selectedMonitor?.timeout
+                ? selectedMonitor.timeout / 1000
+                : DEFAULT_REQUEST_TIMEOUT_SECONDS;
             setTimeoutChanged(timeoutInSeconds !== currentTimeoutInSeconds);
         },
         [selectedMonitor?.timeout]

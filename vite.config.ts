@@ -8,9 +8,8 @@ import path from "path";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import electron from "vite-plugin-electron";
-import { viteStaticCopy } from "vite-plugin-static-copy";
 import { ViteMcp } from "vite-plugin-mcp";
-
+import { viteStaticCopy } from "vite-plugin-static-copy";
 
 /**
  * Vite configuration object.

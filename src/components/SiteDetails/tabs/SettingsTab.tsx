@@ -20,6 +20,40 @@ import {
 import { Site, Monitor } from "../../../types";
 
 /**
+ * Generate a display label for the identifier field based on monitor type.
+ */
+function getIdentifierLabel(selectedMonitor: Monitor): string {
+    if (selectedMonitor.type === "http") {
+        return "Website URL";
+    }
+
+    if (selectedMonitor.type === "port") {
+        return "Host & Port";
+    }
+
+    return "Internal Site ID";
+}
+
+/**
+ * Generate a display identifier based on the monitor type.
+ * For HTTP monitors: shows the URL
+ * For port monitors: shows host:port
+ * Fallback: shows the site identifier
+ */
+function getDisplayIdentifier(currentSite: Site, selectedMonitor: Monitor): string {
+    if (selectedMonitor.type === "http" && selectedMonitor.url) {
+        return selectedMonitor.url;
+    }
+
+    if (selectedMonitor.type === "port" && selectedMonitor.host && selectedMonitor.port) {
+        return `${selectedMonitor.host}:${selectedMonitor.port}`;
+    }
+
+    // Fallback to site identifier
+    return currentSite.identifier;
+}
+
+/**
  * Props for the SettingsTab component.
  */
 interface SettingsTabProps {
@@ -200,14 +234,14 @@ export function SettingsTab({
                         )}
                     </div>
 
-                    {/* Site URL */}
+                    {/* Site Identifier */}
                     <div>
                         <ThemedText size="sm" weight="medium" variant="secondary" className="block mb-2">
-                            Site Identifier
+                            {getIdentifierLabel(selectedMonitor)}
                         </ThemedText>
                         <ThemedInput
                             type="text"
-                            value={selectedMonitor?.url ?? currentSite.identifier}
+                            value={getDisplayIdentifier(currentSite, selectedMonitor)}
                             disabled
                             className="opacity-70"
                         />
@@ -335,10 +369,10 @@ export function SettingsTab({
                     <div className="flex flex-col gap-3">
                         <div className="flex items-center justify-between">
                             <ThemedText size="sm" variant="secondary">
-                                Site Identifier:
+                                {getIdentifierLabel(selectedMonitor)}:
                             </ThemedText>
                             <ThemedBadge variant="secondary" size="xs">
-                                {currentSite.identifier}
+                                {getDisplayIdentifier(currentSite, selectedMonitor)}
                             </ThemedBadge>
                         </div>
                         <div className="flex items-center justify-between">
