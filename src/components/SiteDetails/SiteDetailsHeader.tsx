@@ -13,9 +13,9 @@ import { ScreenshotThumbnail } from "./ScreenshotThumbnail";
 /** Props for the SiteDetailsHeader component */
 interface SiteDetailsHeaderProps {
     /** The site object to display information for */
-    site: Site;
+    readonly site: Site;
     /** The currently selected monitor for the site */
-    selectedMonitor?: Monitor;
+    readonly selectedMonitor?: Monitor;
 }
 
 /**

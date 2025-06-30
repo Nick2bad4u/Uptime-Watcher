@@ -11,9 +11,9 @@ import { MonitorRepository } from "./MonitorRepository";
  * Handles CRUD operations for sites in the database.
  */
 export class SiteRepository {
-    private databaseService: DatabaseService;
-    private monitorRepository: MonitorRepository;
-    private historyRepository: HistoryRepository;
+    private readonly databaseService: DatabaseService;
+    private readonly monitorRepository: MonitorRepository;
+    private readonly historyRepository: HistoryRepository;
 
     constructor() {
         this.databaseService = DatabaseService.getInstance();
@@ -34,7 +34,7 @@ export class SiteRepository {
     public async findAll(): Promise<Array<{ identifier: string; name?: string }>> {
         try {
             const db = this.getDb();
-            const siteRows = (await db.all("SELECT * FROM sites")) as Array<{ identifier: string; name?: string }>;
+            const siteRows = db.all("SELECT * FROM sites") as Array<{ identifier: string; name?: string }>;
             return siteRows.map((row) => ({
                 identifier: String(row.identifier),
                 name: row.name ? String(row.name) : undefined,
@@ -51,7 +51,7 @@ export class SiteRepository {
     public async findByIdentifier(identifier: string): Promise<{ identifier: string; name?: string } | undefined> {
         try {
             const db = this.getDb();
-            const siteRow = (await db.get("SELECT * FROM sites WHERE identifier = ?", [identifier])) as
+            const siteRow = db.get("SELECT * FROM sites WHERE identifier = ?", [identifier]) as
                 | { identifier: string; name?: string }
                 | undefined;
 
@@ -109,10 +109,10 @@ export class SiteRepository {
     public async upsert(site: Pick<Site, "identifier" | "name">): Promise<void> {
         try {
             const db = this.getDb();
-            await db.run("INSERT OR REPLACE INTO sites (identifier, name) VALUES (?, ?)", [
+            db.run("INSERT OR REPLACE INTO sites (identifier, name) VALUES (?, ?)", [
                 site.identifier,
                 // eslint-disable-next-line unicorn/no-null
-                site.name || null,
+                site.name ?? null,
             ]);
             logger.debug(`[SiteRepository] Upserted site: ${site.identifier}`);
         } catch (error) {
@@ -127,7 +127,7 @@ export class SiteRepository {
     public async delete(identifier: string): Promise<boolean> {
         try {
             const db = this.getDb();
-            const result = await db.run("DELETE FROM sites WHERE identifier = ?", [identifier]);
+            const result = db.run("DELETE FROM sites WHERE identifier = ?", [identifier]);
             const deleted = (result.changes ?? 0) > 0;
 
             if (deleted) {
@@ -162,7 +162,7 @@ export class SiteRepository {
     public async exportAll(): Promise<Array<{ identifier: string; name?: string }>> {
         try {
             const db = this.getDb();
-            const sites = await db.all("SELECT * FROM sites");
+            const sites = db.all("SELECT * FROM sites");
             return sites.map((row) => ({
                 identifier: row.identifier ? String(row.identifier) : "",
                 name: row.name ? String(row.name) : undefined,
@@ -179,7 +179,7 @@ export class SiteRepository {
     public async deleteAll(): Promise<void> {
         try {
             const db = this.getDb();
-            await db.run("DELETE FROM sites");
+            db.run("DELETE FROM sites");
             logger.info("[SiteRepository] All sites deleted");
         } catch (error) {
             logger.error("[SiteRepository] Failed to delete all sites", error);
@@ -194,10 +194,10 @@ export class SiteRepository {
         try {
             const db = this.getDb();
             for (const site of sites) {
-                await db.run(`INSERT INTO sites (identifier, name) VALUES (?, ?)`, [
+                db.run(`INSERT INTO sites (identifier, name) VALUES (?, ?)`, [
                     site.identifier,
                     // eslint-disable-next-line unicorn/no-null
-                    site.name || null,
+                    site.name ?? null,
                 ]);
             }
             logger.info(`[SiteRepository] Bulk inserted ${sites.length} sites`);

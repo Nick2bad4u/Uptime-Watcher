@@ -9,7 +9,7 @@ import { DatabaseService } from "./DatabaseService";
  * Handles CRUD operations for settings in the database.
  */
 export class SettingsRepository {
-    private databaseService: DatabaseService;
+    private readonly databaseService: DatabaseService;
 
     constructor() {
         this.databaseService = DatabaseService.getInstance();
@@ -28,7 +28,7 @@ export class SettingsRepository {
     public async get(key: string): Promise<string | undefined> {
         try {
             const db = this.getDb();
-            const result = await db.get("SELECT value FROM settings WHERE key = ?", [key]);
+            const result = db.get("SELECT value FROM settings WHERE key = ?", [key]);
             return result?.value ? String(result.value) : undefined;
         } catch (error) {
             logger.error(`[SettingsRepository] Failed to get setting: ${key}`, error);
@@ -42,7 +42,7 @@ export class SettingsRepository {
     public async set(key: string, value: string): Promise<void> {
         try {
             const db = this.getDb();
-            await db.run("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)", [key, value]);
+            db.run("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)", [key, value]);
             if (isDev()) {
                 logger.debug(`[SettingsRepository] Set setting: ${key} = ${value}`);
             }
@@ -58,7 +58,7 @@ export class SettingsRepository {
     public async delete(key: string): Promise<void> {
         try {
             const db = this.getDb();
-            await db.run("DELETE FROM settings WHERE key = ?", [key]);
+            db.run("DELETE FROM settings WHERE key = ?", [key]);
             if (isDev()) {
                 logger.debug(`[SettingsRepository] Deleted setting: ${key}`);
             }
@@ -74,7 +74,7 @@ export class SettingsRepository {
     public async getAll(): Promise<Record<string, string>> {
         try {
             const db = this.getDb();
-            const settings = (await db.all("SELECT * FROM settings")) as Array<{ key: string; value: string }>;
+            const settings = db.all("SELECT * FROM settings") as Array<{ key: string; value: string }>;
             return settings.reduce(
                 (acc, row) => {
                     if (typeof row.key === "string") {
@@ -96,7 +96,7 @@ export class SettingsRepository {
     public async deleteAll(): Promise<void> {
         try {
             const db = this.getDb();
-            await db.run("DELETE FROM settings");
+            db.run("DELETE FROM settings");
             logger.info("[SettingsRepository] All settings deleted");
         } catch (error) {
             logger.error("[SettingsRepository] Failed to delete all settings", error);
@@ -111,7 +111,7 @@ export class SettingsRepository {
         try {
             const db = this.getDb();
             for (const [key, value] of Object.entries(settings)) {
-                await db.run("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)", [key, String(value)]);
+                db.run("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)", [key, String(value)]);
             }
             logger.info(`[SettingsRepository] Bulk inserted ${Object.keys(settings).length} settings`);
         } catch (error) {

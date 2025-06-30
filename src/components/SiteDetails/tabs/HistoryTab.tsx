@@ -15,13 +15,13 @@ import { StatusHistory, Monitor } from "../../../types";
  */
 interface HistoryTabProps {
     /** Function to format timestamps for display */
-    formatFullTimestamp: (timestamp: number) => string;
+    readonly formatFullTimestamp: (timestamp: number) => string;
     /** Function to format response times for display */
-    formatResponseTime: (time: number) => string;
+    readonly formatResponseTime: (time: number) => string;
     /** Function to format status with appropriate icons */
-    formatStatusWithIcon: (status: string) => string;
+    readonly formatStatusWithIcon: (status: string) => string;
     /** Currently selected monitor to display history for */
-    selectedMonitor: Monitor;
+    readonly selectedMonitor: Monitor;
 }
 
 /**
@@ -50,6 +50,17 @@ export function HistoryTab({
 
     // Track the last monitor ID we logged for to prevent duplicate logging
     const lastLoggedMonitorId = useRef<string | null>(null);
+
+    /**
+     * Get the display label for filter buttons
+     * @param filter - The filter type
+     * @returns The formatted label for the filter button
+     */
+    function getFilterButtonLabel(filter: "all" | "up" | "down"): string {
+        if (filter === "all") return "All";
+        if (filter === "up") return "✅ Up";
+        return "❌ Down";
+    }
 
     // Dropdown options: 25, 50, 100, All (clamped to backendLimit and available history)
     const maxShow = Math.min(backendLimit, historyLength);
@@ -87,23 +98,16 @@ export function HistoryTab({
     // Use 'details' as optional property to handle records that may not have detail information
     function renderDetails(record: StatusHistory & { details?: string }) {
         if (!record.details) return undefined;
-        if (selectedMonitor.type === "port") {
-            return (
-                <ThemedText size="xs" variant="secondary" className="ml-4">
-                    Port: {record.details}
-                </ThemedText>
-            );
-        }
-        if (selectedMonitor.type === "http") {
-            return (
-                <ThemedText size="xs" variant="secondary" className="ml-4">
-                    Response Code: {record.details}
-                </ThemedText>
-            );
-        }
+
+        const getDetailLabel = (): string => {
+            if (selectedMonitor.type === "port") return `Port: ${record.details}`;
+            if (selectedMonitor.type === "http") return `Response Code: ${record.details}`;
+            return record.details ?? "";
+        };
+
         return (
             <ThemedText size="xs" variant="secondary" className="ml-4">
-                {record.details}
+                {getDetailLabel()}
             </ThemedText>
         );
     }
@@ -133,7 +137,7 @@ export function HistoryTab({
                                 }}
                                 className="ml-4 capitalize"
                             >
-                                {filter === "all" ? "All" : filter === "up" ? "✅ Up" : "❌ Down"}
+                                {getFilterButtonLabel(filter)}
                             </ThemedButton>
                         ))}
                     </div>

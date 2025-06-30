@@ -15,9 +15,9 @@ import { useTheme } from "../../theme/useTheme";
 /** Props for the ScreenshotThumbnail component */
 interface ScreenshotThumbnailProps {
     /** The URL to capture a screenshot of */
-    url: string;
+    readonly url: string;
     /** The site name for accessibility and alt text */
-    siteName: string;
+    readonly siteName: string;
 }
 
 /**
@@ -122,7 +122,6 @@ export function ScreenshotThumbnail({ siteName, url }: ScreenshotThumbnailProps)
                                 alt={`Large screenshot of ${siteName}`}
                                 className="site-details-thumbnail-img-portal"
                                 loading="lazy"
-                                tabIndex={0}
                             />
                         </div>
                     </div>,

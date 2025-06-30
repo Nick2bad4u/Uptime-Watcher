@@ -62,9 +62,9 @@ ChartJS.register(
 /** Props for the SiteDetails component */
 interface SiteDetailsProps {
     /** The site object to display details for */
-    site: Site;
+    readonly site: Site;
     /** Callback function to close the site details view */
-    onClose: () => void;
+    readonly onClose: () => void;
 }
 
 /**
@@ -88,6 +88,28 @@ interface SiteDetailsProps {
 export function SiteDetails({ onClose, site }: SiteDetailsProps) {
     const { currentTheme } = useTheme();
 
+    /**
+     * Get availability variant based on percentage
+     * @param percentage - Availability percentage
+     * @returns Variant type for theming
+     */
+    const getAvailabilityVariant = (percentage: number): "success" | "warning" | "danger" => {
+        if (percentage >= 99) return "success";
+        if (percentage >= 95) return "warning";
+        return "danger";
+    };
+
+    /**
+     * Get availability description based on percentage
+     * @param percentage - Availability percentage
+     * @returns Human-readable description
+     */
+    const getAvailabilityDescription = (percentage: number): string => {
+        if (percentage >= 99) return "Excellent";
+        if (percentage >= 95) return "Good";
+        return "Poor";
+    };
+
     // Use our custom hook to get all the data and functionality we need
     const {
         // UI state
@@ -101,13 +123,13 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
         handleIntervalChange,
         handleMonitorIdChange,
         handleRemoveSite,
+        handleRetryAttemptsChange,
         handleSaveInterval,
         handleSaveName,
         handleSaveRetryAttempts,
         handleSaveTimeout,
         handleStartMonitoring,
         handleStopMonitoring,
-        handleRetryAttemptsChange,
         handleTimeoutChange,
         // Name state
         hasUnsavedChanges,
@@ -119,6 +141,7 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
         localName,
         localRetryAttempts,
         localTimeout,
+        retryAttemptsChanged,
         selectedMonitor,
         selectedMonitorId,
         // Store actions
@@ -129,7 +152,6 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
         showAdvancedMetrics,
         siteDetailsChartTimeRange,
         siteExists,
-        retryAttemptsChanged,
         timeoutChanged,
     } = useSiteDetails({ site });
 
@@ -188,18 +210,30 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
         [analytics.upCount, analytics.downCount, currentTheme]
     );
 
+    /**
+     * Handle keyboard events for modal accessibility
+     * @param event - Keyboard event
+     */
+    const handleKeyDown = (event: React.KeyboardEvent) => {
+        if (event.key === "Escape") {
+            onClose();
+        }
+    };
+
     // Don't render if site doesn't exist
     if (!siteExists) return undefined;
 
     return (
-        <div
-            className="site-details-modal"
-            onClick={onClose}
-            role="dialog"
-            aria-modal="true"
-            aria-label="Site details modal"
-        >
-            <div onClick={(e) => e.stopPropagation()}>
+        <div className="site-details-modal">
+            <button
+                type="button"
+                className="modal-backdrop"
+                onClick={onClose}
+                onKeyDown={handleKeyDown}
+                aria-label="Close modal"
+                style={{ background: "none", border: "none", inset: "0", position: "absolute" }}
+            />
+            <dialog open className="modal-dialog" aria-label="Site details">
                 <ThemedBox
                     surface="overlay"
                     padding="lg"
@@ -252,7 +286,6 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
 
                         {activeSiteDetailsTab === `${selectedMonitorId}-analytics` && (
                             <AnalyticsTab
-                                filteredHistory={analytics.filteredHistory}
                                 upCount={analytics.upCount}
                                 downCount={analytics.downCount}
                                 totalChecks={analytics.totalChecks}
@@ -276,12 +309,8 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
                                 showAdvancedMetrics={showAdvancedMetrics}
                                 setShowAdvancedMetrics={setShowAdvancedMetrics}
                                 getAvailabilityColor={() => currentTheme.colors.primary[500]}
-                                getAvailabilityVariant={(percentage: number) =>
-                                    percentage >= 99 ? "success" : percentage >= 95 ? "warning" : "danger"
-                                }
-                                getAvailabilityDescription={(percentage: number) =>
-                                    percentage >= 99 ? "Excellent" : percentage >= 95 ? "Good" : "Poor"
-                                }
+                                getAvailabilityVariant={getAvailabilityVariant}
+                                getAvailabilityDescription={getAvailabilityDescription}
                                 monitorType={selectedMonitor?.type}
                             />
                         )}
@@ -321,7 +350,7 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
                         )}
                     </ThemedBox>
                 </ThemedBox>
-            </div>
+            </dialog>
         </div>
     );
 }

@@ -24,23 +24,23 @@ import { Monitor } from "../../../types";
  */
 interface OverviewTabProps {
     /** Average response time across all checks */
-    avgResponseTime: number;
+    readonly avgResponseTime: number;
     /** Fastest recorded response time */
-    fastestResponse: number;
+    readonly fastestResponse: number;
     /** Function to format response time for display */
-    formatResponseTime: (time: number) => string;
+    readonly formatResponseTime: (time: number) => string;
     /** Handler for removing the site */
-    handleRemoveSite: () => Promise<void>;
+    readonly handleRemoveSite: () => Promise<void>;
     /** Whether any async operation is in progress */
-    isLoading: boolean;
+    readonly isLoading: boolean;
     /** Currently selected monitor */
-    selectedMonitor: Monitor;
+    readonly selectedMonitor: Monitor;
     /** Slowest recorded response time */
-    slowestResponse: number;
+    readonly slowestResponse: number;
     /** Total number of checks performed */
-    totalChecks: number;
+    readonly totalChecks: number;
     /** Uptime percentage as a string */
-    uptime: string;
+    readonly uptime: string;
 }
 
 /**
@@ -79,14 +79,21 @@ export function OverviewTab({
     const uptimeValue = parseFloat(uptime);
     const progressVariant = mapAvailabilityToBadgeVariant(uptimeValue);
 
-    // Icon colors from theme/availability
-    const statusIconColor = getAvailabilityColor(uptimeValue); // Status icon color by availability
-    const uptimeIconColor = getAvailabilityColor(uptimeValue); // Uptime icon color by availability
-    const responseIconColor = currentTheme.colors.warning; // Response time icon uses theme warning
-    const checksIconColor = currentTheme.colors.primary[500]; // Checks icon uses theme primary
-    const fastestIconColor = currentTheme.colors.success; // Fastest uses theme success
-    const slowestIconColor = currentTheme.colors.warning; // Slowest uses theme warning
-    const quickActionIconColor = currentTheme.colors.error; // Quick action uses theme error
+    // Icon colors configuration
+    const getIconColors = () => {
+        const availabilityColor = getAvailabilityColor(uptimeValue);
+        return {
+            checks: currentTheme.colors.primary[500],
+            fastest: currentTheme.colors.success,
+            quickAction: currentTheme.colors.error,
+            response: currentTheme.colors.warning,
+            slowest: currentTheme.colors.warning,
+            status: availabilityColor,
+            uptime: availabilityColor,
+        };
+    };
+
+    const iconColors = getIconColors();
 
     return (
         <div className="space-y-6">
@@ -94,7 +101,7 @@ export function OverviewTab({
             <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                 <ThemedCard
                     icon={<MdOutlineFactCheck />}
-                    iconColor={statusIconColor}
+                    iconColor={iconColors.status}
                     title="Status"
                     hoverable
                     className="flex flex-col items-center text-center"
@@ -104,7 +111,7 @@ export function OverviewTab({
 
                 <ThemedCard
                     icon={<MdAccessTime />}
-                    iconColor={uptimeIconColor}
+                    iconColor={iconColors.uptime}
                     title="Uptime"
                     hoverable
                     className="flex flex-col items-center text-center"
@@ -122,7 +129,7 @@ export function OverviewTab({
 
                 <ThemedCard
                     icon={<MdSpeed />}
-                    iconColor={responseIconColor}
+                    iconColor={iconColors.response}
                     title="Response Time"
                     hoverable
                     className="flex flex-col items-center text-center"
@@ -134,7 +141,7 @@ export function OverviewTab({
 
                 <ThemedCard
                     icon={<FaListOl />}
-                    iconColor={checksIconColor}
+                    iconColor={iconColors.checks}
                     title="Total Checks"
                     hoverable
                     className="flex flex-col items-center text-center"
@@ -146,13 +153,18 @@ export function OverviewTab({
             </div>
 
             {/* Performance Metrics */}
-            <ThemedCard icon={<MdBolt color={fastestIconColor} />} title="Performance Overview">
+            <ThemedCard icon={<MdBolt color={iconColors.fastest} />} title="Performance Overview">
                 <div className="grid grid-cols-2 gap-6">
                     <div>
                         <ThemedText size="sm" variant="secondary">
                             Fastest Response
                         </ThemedText>
-                        <ThemedBadge variant="success" icon={<MdBolt />} iconColor={fastestIconColor} className="ml-4">
+                        <ThemedBadge
+                            variant="success"
+                            icon={<MdBolt />}
+                            iconColor={iconColors.fastest}
+                            className="ml-4"
+                        >
                             {formatResponseTime(fastestResponse)}
                         </ThemedBadge>
                     </div>
@@ -163,7 +175,7 @@ export function OverviewTab({
                         <ThemedBadge
                             variant="warning"
                             icon={<MdAccessTime />}
-                            iconColor={slowestIconColor}
+                            iconColor={iconColors.slowest}
                             className="ml-4"
                         >
                             {formatResponseTime(slowestResponse)}
@@ -173,7 +185,7 @@ export function OverviewTab({
             </ThemedCard>
 
             {/* Quick Actions */}
-            <ThemedCard icon={<MdBolt color={quickActionIconColor} />} title="Quick Actions">
+            <ThemedCard icon={<MdBolt color={iconColors.quickAction} />} title="Quick Actions">
                 <div className="flex space-x-3">
                     <ThemedButton
                         variant="error"
@@ -181,7 +193,7 @@ export function OverviewTab({
                         onClick={() => {
                             logger.user.action("Site removal button clicked from overview tab", {
                                 monitorType: selectedMonitor?.type,
-                                siteId: selectedMonitor?.url || "unknown",
+                                siteId: selectedMonitor?.url ?? "unknown",
                             });
                             handleRemoveSite();
                         }}

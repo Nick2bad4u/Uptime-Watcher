@@ -12,50 +12,82 @@ import { ThemedBox, ThemedButton, ThemedSelect, ThemedText } from "../../theme/c
 import { Site } from "../../types";
 
 /**
+ * Helper function to format time duration into human readable format.
+ * @param milliseconds - Time duration in milliseconds
+ * @returns Formatted time string (e.g., "30s", "5m", "1h")
+ */
+function formatDuration(milliseconds: number): string {
+    if (milliseconds < 60000) {
+        return `${milliseconds / 1000}s`;
+    }
+    if (milliseconds < 3600000) {
+        return `${milliseconds / 60000}m`;
+    }
+    return `${milliseconds / 3600000}h`;
+}
+
+/**
+ * Helper function to get display label for interval value.
+ * @param interval - Interval configuration (number or object with value/label)
+ * @returns Human readable label for the interval
+ */
+function getIntervalLabel(interval: number | { value: number; label?: string }): string {
+    if (typeof interval === "number") {
+        return formatDuration(interval);
+    }
+
+    if (interval.label) {
+        return interval.label;
+    }
+
+    return formatDuration(interval.value);
+}
+
+/**
  * Props for the SiteDetailsNavigation component.
  * Contains all necessary handlers and state for monitoring control.
  */
 interface SiteDetailsNavigationProps {
     /** Currently active tab in the site details view */
-    activeSiteDetailsTab: string;
+    readonly activeSiteDetailsTab: string;
     /** The site object being displayed */
-    currentSite: Site;
+    readonly currentSite: Site;
     /** Handler for monitor check interval changes */
-    handleIntervalChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    readonly handleIntervalChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
     /** Handler for monitor selection changes */
-    handleMonitorIdChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    readonly handleMonitorIdChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
     /** Handler for saving interval changes */
-    handleSaveInterval: () => Promise<void>;
+    readonly handleSaveInterval: () => Promise<void>;
     /** Handler for saving timeout changes */
-    handleSaveTimeout: () => Promise<void>;
+    readonly handleSaveTimeout: () => Promise<void>;
     /** Handler for starting monitoring */
-    handleStartMonitoring: () => Promise<void>;
+    readonly handleStartMonitoring: () => Promise<void>;
     /** Handler for stopping monitoring */
-    handleStopMonitoring: () => Promise<void>;
+    readonly handleStopMonitoring: () => Promise<void>;
     /** Handler for monitor timeout changes */
-    handleTimeoutChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    readonly handleTimeoutChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     /** Whether the check interval has been changed */
-    intervalChanged: boolean;
+    readonly intervalChanged: boolean;
     /** Whether any async operation is in progress */
-    isLoading: boolean;
+    readonly isLoading: boolean;
     /** Whether monitoring is currently active */
-    isMonitoring: boolean;
+    readonly isMonitoring: boolean;
     /** Local state value for check interval */
-    localCheckInterval: number;
+    readonly localCheckInterval: number;
     /** Local state value for timeout */
-    localTimeout: number;
+    readonly localTimeout: number;
     /** Handler for immediate check trigger */
-    onCheckNow: () => void;
+    readonly onCheckNow: () => void;
     /** Currently selected monitor ID */
-    selectedMonitorId: string;
+    readonly selectedMonitorId: string;
     /** Function to set the active tab */
-    setActiveSiteDetailsTab: (tab: string) => void;
+    readonly setActiveSiteDetailsTab: (tab: string) => void;
     /** Function to set the chart time range */
-    setSiteDetailsChartTimeRange: (range: string) => void;
+    readonly setSiteDetailsChartTimeRange: (range: string) => void;
     /** Current chart time range selection */
-    siteDetailsChartTimeRange: string;
+    readonly siteDetailsChartTimeRange: string;
     /** Whether the timeout has been changed */
-    timeoutChanged: boolean;
+    readonly timeoutChanged: boolean;
 }
 
 /**
@@ -154,19 +186,7 @@ export function SiteDetailsNavigation({
                         {CHECK_INTERVALS.map((interval) => {
                             // Support both number and object forms
                             const value = typeof interval === "number" ? interval : interval.value;
-                            const label =
-                                typeof interval === "number"
-                                    ? value < 60000
-                                        ? `${value / 1000}s`
-                                        : value < 3600000
-                                          ? `${value / 60000}m`
-                                          : `${value / 3600000}h`
-                                    : interval.label ||
-                                      (interval.value < 60000
-                                          ? `${interval.value / 1000}s`
-                                          : interval.value < 3600000
-                                            ? `${interval.value / 60000}m`
-                                            : `${interval.value / 3600000}h`);
+                            const label = getIntervalLabel(interval);
                             return (
                                 <option key={value} value={value}>
                                     {label}
