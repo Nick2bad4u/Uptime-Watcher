@@ -15,8 +15,44 @@ import { getStatusIcon } from "../utils/status";
 import { formatResponseTime } from "../utils/time";
 import "./components.css";
 
+// Type aliases for commonly used union types
+type BoxVariant = "primary" | "secondary" | "tertiary";
+type BoxSurface = "base" | "elevated" | "overlay";
+type BoxPadding = "xs" | "sm" | "md" | "lg" | "xl";
+type BoxRounded = "none" | "sm" | "md" | "lg" | "xl" | "full";
+type BoxShadow = "sm" | "md" | "lg" | "xl" | "inner";
+type BoxElement = "div" | "button" | "section" | "article" | "aside" | "header" | "footer" | "nav";
+
+type TextVariant =
+    | "primary"
+    | "secondary"
+    | "tertiary"
+    | "inverse"
+    | "error"
+    | "success"
+    | "warning"
+    | "danger"
+    | "info";
+type TextSize = "xs" | "sm" | "md" | "base" | "lg" | "xl" | "2xl" | "3xl" | "4xl";
+type TextWeight = "normal" | "medium" | "semibold" | "bold";
+type TextAlign = "left" | "center" | "right" | "justify";
+
+type ButtonVariant = "primary" | "secondary" | "tertiary" | "success" | "warning" | "error" | "ghost" | "outline";
+type ButtonSize = "xs" | "sm" | "md" | "lg" | "xl";
+
+type BadgeVariant = "primary" | "secondary" | "success" | "warning" | "error" | "info";
+type BadgeSize = "xs" | "sm" | "md" | "lg";
+
+// Constants for commonly duplicated strings
+const CSS_CLASSES = {
+    THEMED_BADGE: "themed-badge",
+    THEMED_BOX: "themed-box",
+    THEMED_BUTTON: "themed-button",
+    THEMED_TEXT: "themed-text",
+} as const;
+
 interface ThemeProviderProps {
-    children: React.ReactNode;
+    readonly children: React.ReactNode;
 }
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
@@ -27,22 +63,23 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
 }
 
 interface ThemedBoxProps {
-    variant?: "primary" | "secondary" | "tertiary";
-    surface?: "base" | "elevated" | "overlay";
-    padding?: "xs" | "sm" | "md" | "lg" | "xl";
-    rounded?: "none" | "sm" | "md" | "lg" | "xl" | "full";
-    shadow?: "sm" | "md" | "lg" | "xl" | "inner";
-    border?: boolean;
-    className?: string;
-    style?: React.CSSProperties;
-    onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
-    onMouseEnter?: () => void;
-    onMouseLeave?: () => void;
-    children: React.ReactNode;
-    as?: "div" | "button" | "section" | "article" | "aside" | "header" | "footer" | "nav";
-    role?: string;
-    tabIndex?: number;
-    "aria-label"?: string;
+    readonly variant?: BoxVariant;
+    readonly surface?: BoxSurface;
+    readonly padding?: BoxPadding;
+    readonly rounded?: BoxRounded;
+    readonly shadow?: BoxShadow;
+    readonly border?: boolean;
+    readonly className?: string;
+    readonly style?: React.CSSProperties;
+    readonly onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
+    readonly onMouseEnter?: () => void;
+    readonly onMouseLeave?: () => void;
+    readonly children: React.ReactNode;
+    readonly as?: BoxElement;
+    readonly role?: string;
+    readonly tabIndex?: number;
+    // eslint-disable-next-line sonarjs/no-duplicate-string -- Standard ARIA attribute name
+    readonly "aria-label"?: string;
 }
 
 export function ThemedBox({
@@ -64,7 +101,7 @@ export function ThemedBox({
     variant = "primary",
 }: ThemedBoxProps) {
     const classNames = [
-        "themed-box",
+        CSS_CLASSES.THEMED_BOX,
         `themed-box--background-${variant}`,
         `themed-box--surface-${surface}`,
         `themed-box--padding-${padding}`,
@@ -93,7 +130,7 @@ export function ThemedBox({
                         onClick();
                     }
                 },
-                role: role || "button",
+                role: role ?? "button",
                 tabIndex: tabIndex ?? 0,
             }),
         ...(isInteractive &&
@@ -107,13 +144,13 @@ export function ThemedBox({
 }
 
 interface ThemedTextProps {
-    variant?: "primary" | "secondary" | "tertiary" | "inverse" | "error" | "success" | "warning" | "danger";
-    size?: "xs" | "sm" | "base" | "lg" | "xl" | "2xl" | "3xl" | "4xl";
-    weight?: "normal" | "medium" | "semibold" | "bold";
-    align?: "left" | "center" | "right";
-    className?: string;
-    style?: React.CSSProperties;
-    children: React.ReactNode;
+    readonly variant?: TextVariant;
+    readonly size?: TextSize;
+    readonly weight?: TextWeight;
+    readonly align?: TextAlign;
+    readonly className?: string;
+    readonly style?: React.CSSProperties;
+    readonly children: React.ReactNode;
 }
 
 export function ThemedText({
@@ -126,7 +163,7 @@ export function ThemedText({
     weight = "normal",
 }: ThemedTextProps) {
     const classNames = [
-        "themed-text",
+        CSS_CLASSES.THEMED_TEXT,
         `themed-text--${variant}`,
         `themed-text--size-${size}`,
         `themed-text--weight-${weight}`,
@@ -144,20 +181,20 @@ export function ThemedText({
 }
 
 interface ThemedButtonProps {
-    variant?: "primary" | "secondary" | "success" | "warning" | "error" | "ghost";
-    size?: "xs" | "sm" | "md" | "lg";
-    type?: "button" | "submit" | "reset";
-    disabled?: boolean;
-    loading?: boolean;
-    fullWidth?: boolean;
-    icon?: React.ReactNode;
-    iconColor?: string;
-    iconPosition?: "left" | "right";
-    className?: string;
-    style?: React.CSSProperties;
-    title?: string;
-    onClick?: (e?: React.MouseEvent<HTMLButtonElement>) => void;
-    children?: React.ReactNode;
+    readonly variant?: ButtonVariant;
+    readonly size?: ButtonSize;
+    readonly type?: "button" | "submit" | "reset";
+    readonly disabled?: boolean;
+    readonly loading?: boolean;
+    readonly fullWidth?: boolean;
+    readonly icon?: React.ReactNode;
+    readonly iconColor?: string;
+    readonly iconPosition?: "left" | "right";
+    readonly className?: string;
+    readonly style?: React.CSSProperties;
+    readonly title?: string;
+    readonly onClick?: (e?: React.MouseEvent<HTMLButtonElement>) => void;
+    readonly children?: React.ReactNode;
 }
 
 // Utility: map color name to CSS class for icon coloring
@@ -213,7 +250,7 @@ export function ThemedButton({
     variant = "primary",
 }: ThemedButtonProps) {
     const classNames = [
-        "themed-button",
+        CSS_CLASSES.THEMED_BUTTON,
         `themed-button--${variant}`,
         `themed-button--size-${size}`,
         fullWidth && "themed-button--full-width",
@@ -275,10 +312,10 @@ export function ThemedButton({
 }
 
 interface StatusIndicatorProps {
-    status: "up" | "down" | "pending" | "unknown";
-    size?: "sm" | "md" | "lg";
-    showText?: boolean;
-    className?: string;
+    readonly status: "up" | "down" | "pending" | "unknown";
+    readonly size?: "sm" | "md" | "lg";
+    readonly showText?: boolean;
+    readonly className?: string;
 }
 
 export function StatusIndicator({ className = "", showText = false, size = "md", status }: StatusIndicatorProps) {
@@ -360,20 +397,19 @@ export function StatusIndicator({ className = "", showText = false, size = "md",
 }
 
 interface ThemedInputProps {
-    type?: "text" | "number" | "email" | "password" | "url";
-    value?: string | number;
-    placeholder?: string;
-    disabled?: boolean;
-    required?: boolean;
-    min?: string | number;
-    max?: string | number;
-    step?: string | number;
-    className?: string;
-    id?: string;
-    // eslint-disable-next-line sonarjs/no-duplicate-string -- false positive due to matching ARIA_LABEL constant
-    "aria-label"?: string;
-    "aria-describedby"?: string;
-    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    readonly type?: "text" | "number" | "email" | "password" | "url";
+    readonly value?: string | number;
+    readonly placeholder?: string;
+    readonly disabled?: boolean;
+    readonly required?: boolean;
+    readonly min?: string | number;
+    readonly max?: string | number;
+    readonly step?: string | number;
+    readonly className?: string;
+    readonly id?: string;
+    readonly "aria-label"?: string;
+    readonly "aria-describedby"?: string;
+    readonly onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export function ThemedInput({
@@ -430,18 +466,18 @@ export function ThemedInput({
 }
 
 interface ThemedSelectProps {
-    value?: string | number;
-    disabled?: boolean;
-    required?: boolean;
-    className?: string;
-    id?: string;
-    title?: string;
-    "aria-label"?: string;
-    "aria-describedby"?: string;
-    onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-    onClick?: (e: React.MouseEvent<HTMLSelectElement>) => void;
-    onMouseDown?: (e: React.MouseEvent<HTMLSelectElement>) => void;
-    children: React.ReactNode;
+    readonly value?: string | number;
+    readonly disabled?: boolean;
+    readonly required?: boolean;
+    readonly className?: string;
+    readonly id?: string;
+    readonly title?: string;
+    readonly "aria-label"?: string;
+    readonly "aria-describedby"?: string;
+    readonly onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    readonly onClick?: (e: React.MouseEvent<HTMLSelectElement>) => void;
+    readonly onMouseDown?: (e: React.MouseEvent<HTMLSelectElement>) => void;
+    readonly children: React.ReactNode;
 }
 
 export function ThemedSelect({
@@ -497,12 +533,12 @@ export function ThemedSelect({
 }
 
 interface ThemedCheckboxProps {
-    checked?: boolean;
-    disabled?: boolean;
-    required?: boolean;
-    className?: string;
-    "aria-label"?: string;
-    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    readonly checked?: boolean;
+    readonly disabled?: boolean;
+    readonly required?: boolean;
+    readonly className?: string;
+    readonly "aria-label"?: string;
+    readonly onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export function ThemedCheckbox({
@@ -527,10 +563,10 @@ export function ThemedCheckbox({
 }
 
 interface MiniChartBarProps {
-    status: "up" | "down" | "pending" | "unknown";
-    responseTime?: number;
-    timestamp: string | number | Date;
-    className?: string;
+    readonly status: "up" | "down" | "pending" | "unknown";
+    readonly responseTime?: number;
+    readonly timestamp: string | number | Date;
+    readonly className?: string;
 }
 
 export function MiniChartBar({ className = "", responseTime, status, timestamp }: MiniChartBarProps) {
@@ -555,15 +591,15 @@ export function MiniChartBar({ className = "", responseTime, status, timestamp }
 // Enhanced components with better visual feedback and icons
 
 interface ThemedIconButtonProps {
-    icon: React.ReactNode;
-    iconColor?: string;
-    variant?: "primary" | "secondary" | "success" | "warning" | "error" | "ghost";
-    size?: "xs" | "sm" | "md" | "lg";
-    disabled?: boolean;
-    loading?: boolean;
-    tooltip?: string;
-    className?: string;
-    onClick?: () => void;
+    readonly icon: React.ReactNode;
+    readonly iconColor?: string;
+    readonly variant?: ButtonVariant;
+    readonly size?: ButtonSize;
+    readonly disabled?: boolean;
+    readonly loading?: boolean;
+    readonly tooltip?: string;
+    readonly className?: string;
+    readonly onClick?: () => void;
 }
 
 export function ThemedIconButton({
@@ -616,21 +652,21 @@ export function ThemedIconButton({
 }
 
 interface ThemedCardProps {
-    title?: string;
-    subtitle?: string;
-    icon?: React.ReactNode;
-    iconColor?: string;
-    variant?: "primary" | "secondary" | "tertiary";
-    padding?: "xs" | "sm" | "md" | "lg" | "xl";
-    rounded?: "none" | "sm" | "md" | "lg" | "xl";
-    shadow?: "sm" | "md" | "lg" | "xl";
-    hoverable?: boolean;
-    clickable?: boolean;
-    className?: string;
-    onClick?: () => void;
-    onMouseEnter?: () => void;
-    onMouseLeave?: () => void;
-    children: React.ReactNode;
+    readonly title?: string;
+    readonly subtitle?: string;
+    readonly icon?: React.ReactNode;
+    readonly iconColor?: string;
+    readonly variant?: BoxVariant;
+    readonly padding?: BoxPadding;
+    readonly rounded?: BoxRounded;
+    readonly shadow?: BoxShadow;
+    readonly hoverable?: boolean;
+    readonly clickable?: boolean;
+    readonly className?: string;
+    readonly onClick?: () => void;
+    readonly onMouseEnter?: () => void;
+    readonly onMouseLeave?: () => void;
+    readonly children: React.ReactNode;
 }
 
 export function ThemedCard({
@@ -691,7 +727,7 @@ export function ThemedCard({
                                 lineHeight: "1",
                             }}
                         >
-                            {renderColoredIcon(icon, iconColor || "primary")}
+                            {renderColoredIcon(icon, iconColor ?? "primary")}
                         </span>
                     )}
                     <div style={{ flex: 1 }}>
@@ -714,12 +750,12 @@ export function ThemedCard({
 }
 
 interface ThemedBadgeProps {
-    variant?: "primary" | "secondary" | "success" | "warning" | "error" | "info";
-    size?: "xs" | "sm" | "md";
-    icon?: React.ReactNode;
-    iconColor?: string;
-    className?: string;
-    children: React.ReactNode;
+    readonly variant?: BadgeVariant;
+    readonly size?: BadgeSize;
+    readonly icon?: React.ReactNode;
+    readonly iconColor?: string;
+    readonly className?: string;
+    readonly children: React.ReactNode;
 }
 
 export function ThemedBadge({
@@ -818,7 +854,7 @@ export function ThemedBadge({
         >
             {icon && (
                 <span style={{ fontSize: "0.9em", lineHeight: "1" }}>
-                    {renderColoredIcon(icon, iconColor || variant)}
+                    {renderColoredIcon(icon, iconColor ?? variant)}
                 </span>
             )}
             {children}
@@ -827,13 +863,13 @@ export function ThemedBadge({
 }
 
 interface ThemedProgressProps {
-    value: number;
-    max?: number;
-    variant?: "primary" | "success" | "warning" | "error";
-    size?: "xs" | "sm" | "md" | "lg";
-    showLabel?: boolean;
-    label?: string;
-    className?: string;
+    readonly value: number;
+    readonly max?: number;
+    readonly variant?: "primary" | "success" | "warning" | "error";
+    readonly size?: "xs" | "sm" | "md" | "lg";
+    readonly showLabel?: boolean;
+    readonly label?: string;
+    readonly className?: string;
 }
 
 export function ThemedProgress({
@@ -927,10 +963,9 @@ export function ThemedProgress({
 }
 
 interface ThemedTooltipProps {
-    content: string;
-    position?: "top" | "bottom" | "left" | "right";
-    className?: string;
-    children: React.ReactNode;
+    readonly content: string;
+    readonly className?: string;
+    readonly children: React.ReactNode;
 }
 
 export function ThemedTooltip({ children, className = "", content }: ThemedTooltipProps) {

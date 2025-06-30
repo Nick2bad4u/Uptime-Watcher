@@ -13,6 +13,20 @@ import { Site, StatusUpdate, Monitor, MonitorType } from "./types";
 /** Application update status types */
 export type UpdateStatus = "idle" | "checking" | "available" | "downloading" | "downloaded" | "error";
 
+/** Chart time range options */
+export type ChartTimeRange = "1h" | "24h" | "7d" | "30d";
+
+/** Error messages */
+const ERROR_MESSAGES = {
+    FAILED_TO_ADD_MONITOR: "Failed to add monitor",
+    FAILED_TO_ADD_SITE: "Failed to add site",
+    FAILED_TO_CHECK_SITE: "Failed to check site",
+    FAILED_TO_DELETE_SITE: "Failed to delete site",
+    FAILED_TO_UPDATE_INTERVAL: "Failed to update check interval",
+    FAILED_TO_UPDATE_SITE: "Failed to update site",
+    SITE_NOT_FOUND: "Site not found",
+} as const;
+
 /**
  * Application settings interface.
  * Contains user preferences and configuration options.
@@ -67,7 +81,7 @@ interface AppState {
     /** Active tab in site details modal */
     activeSiteDetailsTab: string;
     /** Selected time range for charts */
-    siteDetailsChartTimeRange: "1h" | "24h" | "7d" | "30d";
+    siteDetailsChartTimeRange: ChartTimeRange;
     /** Whether to show advanced metrics */
     showAdvancedMetrics: boolean;
 
@@ -167,7 +181,7 @@ export const useStore = create<AppState>()(
                 try {
                     // Get the current site
                     const site = state.sites.find((s) => s.identifier === siteId);
-                    if (!site) throw new Error("Site not found");
+                    if (!site) throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
                     // Allow multiple monitors of the same type (uniqueness is not enforced)
                     const updatedMonitors = [...site.monitors, monitor];
                     await window.electronAPI.sites.updateSite(siteId, { monitors: updatedMonitors });
@@ -222,7 +236,7 @@ export const useStore = create<AppState>()(
                         status: ["pending", "up", "down"].includes(monitor.status)
                             ? (monitor.status as Monitor["status"])
                             : "pending",
-                        type: monitor.type as MonitorType,
+                        type: monitor.type,
                     }));
                     const newSite = await window.electronAPI.sites.addSite({ ...siteData, monitors });
                     state.addSite(newSite);
@@ -519,7 +533,7 @@ export const useStore = create<AppState>()(
                 try {
                     // Update in backend (update the monitor in the site's monitors array)
                     const site = get().sites.find((s) => s.identifier === siteId);
-                    if (!site) throw new Error("Site not found");
+                    if (!site) throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
                     const updatedMonitors = site.monitors.map((monitor) =>
                         monitor.id === monitorId ? { ...monitor, retryAttempts: retryAttempts } : monitor
                     );
@@ -536,7 +550,7 @@ export const useStore = create<AppState>()(
                 try {
                     // Update in backend (update the monitor in the site's monitors array)
                     const site = get().sites.find((s) => s.identifier === siteId);
-                    if (!site) throw new Error("Site not found");
+                    if (!site) throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
                     const updatedMonitors = site.monitors.map((monitor) =>
                         monitor.id === monitorId ? { ...monitor, timeout: timeout } : monitor
                     );
@@ -560,7 +574,7 @@ export const useStore = create<AppState>()(
                 try {
                     // Update in backend (update the monitor in the site's monitors array)
                     const site = get().sites.find((s) => s.identifier === siteId);
-                    if (!site) throw new Error("Site not found");
+                    if (!site) throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
                     const updatedMonitors = site.monitors.map((monitor) =>
                         monitor.id === monitorId ? { ...monitor, checkInterval: interval } : monitor
                     );
