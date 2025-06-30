@@ -480,14 +480,15 @@ export class UptimeMonitor extends EventEmitter {
         }
 
         // If no monitorId provided, use the first monitor's ID
-        let targetMonitorId = monitorId;
-        if (!targetMonitorId) {
-            const firstMonitor = site.monitors[0];
-            if (!firstMonitor?.id) {
-                throw new Error(`No monitors found for site ${identifier}`);
-            }
-            targetMonitorId = String(firstMonitor.id);
-        }
+        const targetMonitorId =
+            monitorId ??
+            (() => {
+                const firstMonitor = site.monitors[0];
+                if (!firstMonitor?.id) {
+                    throw new Error(`No monitors found for site ${identifier}`);
+                }
+                return String(firstMonitor.id);
+            })();
 
         // Validate the monitor exists
         const monitor = site.monitors.find((m) => String(m.id) === String(targetMonitorId));

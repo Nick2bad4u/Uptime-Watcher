@@ -3,7 +3,6 @@
  * Displays uptime statistics, theme toggle, and settings access.
  */
 
-/* eslint-disable functional/no-let */
 import { useStore } from "../../store";
 import { ThemedBox, ThemedText, ThemedButton, StatusIndicator } from "../../theme/components";
 import { useTheme, useAvailabilityColors } from "../../theme/useTheme";
@@ -26,22 +25,23 @@ export function Header() {
     const { isDark, toggleTheme } = useTheme();
     const { getAvailabilityColor } = useAvailabilityColors();
 
-    // Count all monitors across all sites by status
-    let upMonitors = 0;
-    let downMonitors = 0;
-    let pendingMonitors = 0;
-    let totalMonitors = 0;
-
-    // Iterate through all sites and their monitors to calculate totals
-    for (const site of sites) {
-        if (site.monitors)
-            for (const monitor of site.monitors) {
-                totalMonitors++;
-                if (monitor.status === "up") upMonitors++;
-                else if (monitor.status === "down") downMonitors++;
-                else if (monitor.status === "pending") pendingMonitors++;
+    // Count all monitors across all sites by status using functional approach
+    const monitorCounts = sites.reduce(
+        (counts, site) => {
+            if (site.monitors) {
+                for (const monitor of site.monitors) {
+                    counts.total++;
+                    if (monitor.status === "up") counts.up++;
+                    else if (monitor.status === "down") counts.down++;
+                    else if (monitor.status === "pending") counts.pending++;
+                }
             }
-    }
+            return counts;
+        },
+        { down: 0, pending: 0, total: 0, up: 0 }
+    );
+
+    const { down: downMonitors, pending: pendingMonitors, total: totalMonitors, up: upMonitors } = monitorCounts;
 
     // Calculate overall uptime percentage across all monitors
     const uptimePercentage = totalMonitors > 0 ? Math.round((upMonitors / totalMonitors) * 100) : 0;
