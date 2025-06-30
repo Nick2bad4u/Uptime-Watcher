@@ -10,8 +10,8 @@ import { AutoUpdaterService } from "../updater/AutoUpdaterService";
  * Groups IPC handlers by domain for better maintainability.
  */
 export class IpcService {
-    private uptimeMonitor: UptimeMonitor;
-    private autoUpdaterService: AutoUpdaterService;
+    private readonly uptimeMonitor: UptimeMonitor;
+    private readonly autoUpdaterService: AutoUpdaterService;
 
     constructor(uptimeMonitor: UptimeMonitor, autoUpdaterService: AutoUpdaterService) {
         this.uptimeMonitor = uptimeMonitor;
