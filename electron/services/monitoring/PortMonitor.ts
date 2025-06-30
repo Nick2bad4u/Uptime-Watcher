@@ -4,7 +4,26 @@ import { DEFAULT_REQUEST_TIMEOUT, RETRY_BACKOFF } from "../../constants";
 import { Site } from "../../types";
 import { isDev } from "../../utils";
 import { logger } from "../../utils/logger";
+import { withRetry } from "../../utils/retry";
 import { IMonitorService, MonitorCheckResult, MonitorConfig } from "./types";
+
+/**
+ * Constants for port monitor error messages.
+ */
+const PORT_NOT_REACHABLE = "Port not reachable";
+
+/**
+ * Custom error class that preserves response time information from failed port checks.
+ */
+class PortCheckError extends Error {
+    public readonly responseTime: number;
+
+    constructor(message: string, responseTime: number) {
+        super(message);
+        this.name = "PortCheckError";
+        this.responseTime = responseTime;
+    }
+}
 
 /**
  * Service for performing port monitoring checks.
@@ -60,99 +79,74 @@ export class PortMonitor implements IMonitorService {
         timeout: number,
         maxRetries: number
     ): Promise<MonitorCheckResult> {
-        const totalAttempts = maxRetries + 1; // Initial attempt + retries
+        // Convert maxRetries (additional attempts) to totalAttempts for withRetry utility
+        const totalAttempts = maxRetries + 1;
 
-        for (const attempt of Array.from({ length: totalAttempts }, (_, i) => i)) {
-            const startTime = performance.now();
-
-            try {
+        return await withRetry(() => this.performSinglePortCheck(host, port, timeout), {
+            delayMs: RETRY_BACKOFF.INITIAL_DELAY,
+            maxRetries: totalAttempts,
+            onError: (error, attempt) => {
                 if (isDev()) {
+                    const errorMessage = error instanceof Error ? error.message : String(error);
                     logger.debug(
-                        `[PortMonitor] Checking port: ${host}:${port} with timeout: ${timeout}ms (attempt ${attempt + 1}/${totalAttempts})`
+                        `[PortMonitor] Port ${host}:${port} failed attempt ${attempt}/${totalAttempts}: ${errorMessage}`
                     );
                 }
+            },
+            operationName: `Port check for ${host}:${port}`,
+        }).catch((error) => this.handlePortCheckError(error, host, port));
+    }
 
-                const isReachable = await isPortReachable(port, {
-                    host: host,
-                    timeout: timeout,
-                });
+    /**
+     * Perform a single port check attempt without retry logic.
+     */
+    private async performSinglePortCheck(host: string, port: number, timeout: number): Promise<MonitorCheckResult> {
+        const startTime = performance.now();
 
-                const responseTime = Math.round(performance.now() - startTime);
-
-                if (isReachable) {
-                    if (isDev() && attempt > 0) {
-                        logger.debug(
-                            `[PortMonitor] Port ${host}:${port} succeeded on attempt ${attempt + 1}/${totalAttempts}`
-                        );
-                    }
-                    if (isDev()) {
-                        logger.debug(`[PortMonitor] Port ${host}:${port} is reachable in ${responseTime}ms`);
-                    }
-                    return {
-                        details: String(port),
-                        responseTime,
-                        status: "up",
-                    };
-                } else {
-                    const responseTime = Math.round(performance.now() - startTime);
-
-                    if (isDev()) {
-                        logger.debug(
-                            `[PortMonitor] Port ${host}:${port} not reachable on attempt ${attempt + 1}/${totalAttempts}`
-                        );
-                    }
-
-                    // If this wasn't the last attempt, wait before retrying
-                    if (attempt < totalAttempts - 1) {
-                        // Simple exponential backoff: 500ms, 1s, 2s, 4s, etc.
-                        const delayMs = Math.min(
-                            RETRY_BACKOFF.INITIAL_DELAY * Math.pow(2, attempt),
-                            RETRY_BACKOFF.MAX_DELAY
-                        );
-                        await new Promise((resolve) => setTimeout(resolve, delayMs));
-                    } else {
-                        // Return the final failure result
-                        return {
-                            details: String(port),
-                            error: "Port not reachable",
-                            responseTime,
-                            status: "down",
-                        };
-                    }
-                }
-            } catch (error) {
-                const responseTime = Math.round(performance.now() - startTime);
-
-                if (isDev()) {
-                    const errorMessage = error instanceof Error ? error.message : "Unknown error";
-                    logger.debug(
-                        `[PortMonitor] Error checking port ${host}:${port} on attempt ${attempt + 1}/${totalAttempts}: ${errorMessage}`
-                    );
-                }
-
-                // If this wasn't the last attempt, wait before retrying
-                if (attempt < totalAttempts - 1) {
-                    // Simple exponential backoff: 500ms, 1s, 2s, 4s, etc.
-                    const delayMs = Math.min(
-                        RETRY_BACKOFF.INITIAL_DELAY * Math.pow(2, attempt),
-                        RETRY_BACKOFF.MAX_DELAY
-                    );
-                    await new Promise((resolve) => setTimeout(resolve, delayMs));
-                } else {
-                    // Return the final error result
-                    const errorMessage = error instanceof Error ? error.message : "Unknown error";
-                    return {
-                        details: String(port),
-                        error: errorMessage,
-                        responseTime,
-                        status: "down",
-                    };
-                }
-            }
+        if (isDev()) {
+            logger.debug(`[PortMonitor] Checking port: ${host}:${port} with timeout: ${timeout}ms`);
         }
 
-        // This should never be reached, but TypeScript needs it
-        throw new Error("Unexpected end of retry loop");
+        const isReachable = await isPortReachable(port, {
+            host: host,
+            timeout: timeout,
+        });
+
+        const responseTime = Math.round(performance.now() - startTime);
+
+        if (isReachable) {
+            if (isDev()) {
+                logger.debug(`[PortMonitor] Port ${host}:${port} is reachable in ${responseTime}ms`);
+            }
+            return {
+                details: String(port),
+                responseTime,
+                status: "up",
+            };
+        } else {
+            // Port not reachable - throw error with response time to trigger retry
+            throw new PortCheckError(PORT_NOT_REACHABLE, responseTime);
+        }
+    }
+
+    /**
+     * Handle errors that occur during port checks.
+     */
+    private handlePortCheckError(error: unknown, host: string, port: number): MonitorCheckResult {
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        // Extract response time from custom error if available
+        const responseTime = error instanceof PortCheckError ? error.responseTime : 0;
+        
+        if (isDev()) {
+            logger.debug(`[PortMonitor] Final error for ${host}:${port}: ${errorMessage}`);
+        }
+
+        return {
+            details: String(port),
+            error: errorMessage === PORT_NOT_REACHABLE ? PORT_NOT_REACHABLE : errorMessage,
+            responseTime,
+            status: "down",
+        };
     }
 
     /**

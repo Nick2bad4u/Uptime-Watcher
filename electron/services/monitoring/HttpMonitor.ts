@@ -6,6 +6,7 @@ import { DEFAULT_REQUEST_TIMEOUT, RETRY_BACKOFF, USER_AGENT } from "../../consta
 import { Site } from "../../types";
 import { isDev } from "../../utils";
 import { logger } from "../../utils/logger";
+import { withRetry } from "../../utils/retry";
 import { IMonitorService, MonitorCheckResult, MonitorConfig } from "./types";
 
 /**
@@ -109,47 +110,28 @@ export class HttpMonitor implements IMonitorService {
         timeout: number,
         maxRetries: number
     ): Promise<MonitorCheckResult> {
-        const totalAttempts = maxRetries + 1; // Initial attempt + retries
+        // Convert maxRetries (additional attempts) to totalAttempts for withRetry utility
+        const totalAttempts = maxRetries + 1;
 
-        for (const attempt of Array.from({ length: totalAttempts }, (_, i) => i)) {
-            try {
-                const result = await this.performHealthCheck(url, timeout);
-
-                if (isDev() && attempt > 0) {
-                    logger.debug(`[HttpMonitor] URL ${url} succeeded on attempt ${attempt + 1}/${totalAttempts}`);
-                }
-
-                return result;
-            } catch (error) {
+        return await withRetry(() => this.performSingleHealthCheck(url, timeout), {
+            delayMs: RETRY_BACKOFF.INITIAL_DELAY,
+            maxRetries: totalAttempts,
+            onError: (error, attempt) => {
                 if (isDev()) {
+                    const errorMessage = error instanceof Error ? error.message : String(error);
                     logger.debug(
-                        `[HttpMonitor] URL ${url} failed attempt ${attempt + 1}/${totalAttempts}: ${error instanceof Error ? error.message : String(error)}`
+                        `[HttpMonitor] URL ${url} failed attempt ${attempt}/${totalAttempts}: ${errorMessage}`
                     );
                 }
-
-                // If this wasn't the last attempt, wait before retrying
-                if (attempt < totalAttempts - 1) {
-                    // Simple exponential backoff: 500ms, 1s, 2s, 4s, etc.
-                    const delayMs = Math.min(
-                        RETRY_BACKOFF.INITIAL_DELAY * Math.pow(2, attempt),
-                        RETRY_BACKOFF.MAX_DELAY
-                    );
-                    await new Promise((resolve) => setTimeout(resolve, delayMs));
-                } else {
-                    // Return the error from the last attempt
-                    return this.handleCheckError(error, url);
-                }
-            }
-        }
-
-        // This should never be reached, but TypeScript needs it
-        throw new Error("Unexpected end of retry loop");
+            },
+            operationName: `HTTP check for ${url}`,
+        }).catch((error) => this.handleCheckError(error, url));
     }
 
     /**
-     * Perform the actual health check request.
+     * Perform a single health check attempt without retry logic.
      */
-    private async performHealthCheck(url: string, timeout: number): Promise<MonitorCheckResult> {
+    private async performSingleHealthCheck(url: string, timeout: number): Promise<MonitorCheckResult> {
         if (isDev()) {
             logger.debug(`[HttpMonitor] Checking URL: ${url} with timeout: ${timeout}ms`);
         }
