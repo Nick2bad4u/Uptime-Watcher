@@ -463,4 +463,106 @@ describe("MonitorRepository", () => {
             );
         });
     });
+
+    describe("Edge Cases and Error Handling", () => {
+        it("should handle update with no fields to update", async () => {
+            (isDev as any).mockReturnValue(true);
+            
+            // Mock monitor with no fields to update (empty partial)
+            const monitorUpdate = {};
+            
+            const result = await monitorRepository.update("monitor-1", monitorUpdate);
+            
+            expect(result).toBeUndefined();
+            expect(logger.debug).toHaveBeenCalledWith(
+                "[MonitorRepository] No fields to update for monitor: monitor-1"
+            );
+        });
+
+        it("should handle string date values in convertDateForDb", async () => {
+            const monitor = {
+                type: "http" as const,
+                url: "https://example.com",
+                status: "pending" as const,
+                history: [],
+                lastChecked: "2024-01-01T00:00:00.000Z" as any, // String instead of Date
+            };
+
+            mockDatabase.get.mockReturnValue({ id: 123 });
+
+            await monitorRepository.create("site-1", monitor);
+            
+            // Verify that the string date was handled properly
+            expect(mockDatabase.run).toHaveBeenCalled();
+        });
+
+        it("should handle database error during get latest monitor ID", async () => {
+            const monitor = {
+                type: "http" as const,
+                url: "https://example.com",
+                status: "pending" as const,
+                history: [],
+            };
+
+            // Mock successful insert but failing ID fetch
+            mockDatabase.run.mockImplementation(() => {});
+            mockDatabase.get.mockReturnValue(undefined); // Simulate failure to get ID
+
+            await expect(monitorRepository.create("site-1", monitor)).rejects.toThrow(
+                "Failed to fetch monitor id after insert for site site-1"
+            );
+        });
+
+        it("should handle database error with invalid ID type", async () => {
+            const monitor = {
+                type: "http" as const,
+                url: "https://example.com",
+                status: "pending" as const,
+                history: [],
+            };
+
+            // Mock successful insert but invalid ID type
+            mockDatabase.run.mockImplementation(() => {});
+            mockDatabase.get.mockReturnValue({ id: "invalid" }); // String instead of number
+
+            await expect(monitorRepository.create("site-1", monitor)).rejects.toThrow(
+                "Failed to fetch monitor id after insert for site site-1"
+            );
+        });
+
+        it("should handle null values in safeNumberConvert", async () => {
+            const monitor = {
+                type: "http" as const,
+                url: "https://example.com",
+                status: "pending" as const,
+                history: [],
+                port: null as any, // Test null value
+                timeout: 0, // Test zero value
+                checkInterval: undefined, // Test undefined
+            };
+
+            mockDatabase.get.mockReturnValue({ id: 123 });
+
+            await monitorRepository.create("site-1", monitor);
+            
+            expect(mockDatabase.run).toHaveBeenCalled();
+        });
+
+        it("should handle truthy but non-number values in safeNumberConvert", async () => {
+            const monitor = {
+                type: "http" as const, 
+                url: "https://example.com",
+                status: "pending" as const,
+                history: [],
+                port: "8080" as any, // String number
+                timeout: "5000" as any, // String number
+            };
+
+            mockDatabase.get.mockReturnValue({ id: 123 });
+
+            await monitorRepository.create("site-1", monitor);
+            
+            expect(mockDatabase.run).toHaveBeenCalled();
+        });
+    });
 });
