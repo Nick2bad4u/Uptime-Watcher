@@ -100,9 +100,13 @@
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:ui": "vitest --ui",
-    "test:electron": "vitest run electron/test/utils.test.ts --environment=node",
+    "test:electron": "vitest run --config vitest.electron.config.ts",
+    "test:electron:watch": "vitest --config vitest.electron.config.ts",
+    "test:electron:coverage": "vitest run --config vitest.electron.config.ts --coverage",
+    "test:electron:ui": "vitest --config vitest.electron.config.ts --ui",
     "test:src": "vitest run src/App.test.tsx src/constants.test.ts src/utils/time.test.ts --environment=jsdom",
     "test:all": "npm run test:src && npm run test:electron",
+    "test:all:coverage": "npm run test:coverage && npm run test:electron:coverage",
     "prepare": "husky"
   },
   "keywords": [

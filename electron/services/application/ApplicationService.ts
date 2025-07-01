@@ -13,6 +13,9 @@ import { WindowService } from "../window";
  * Handles application lifecycle and service coordination.
  */
 export class ApplicationService {
+    static mockImplementation(arg0: () => never) {
+        throw new Error("Method not implemented.");
+    }
     private readonly windowService: WindowService;
     private readonly ipcService: IpcService;
     private readonly notificationService: NotificationService;

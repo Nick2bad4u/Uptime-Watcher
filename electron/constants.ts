@@ -13,10 +13,10 @@ export const DEFAULT_CHECK_INTERVAL = 300000;
 export const USER_AGENT = "Uptime-Watcher/1.0";
 
 /** Retry backoff configuration */
-export const RETRY_BACKOFF = {
+export const RETRY_BACKOFF = Object.freeze({
     INITIAL_DELAY: 500, // Initial delay in milliseconds
     MAX_DELAY: 5000, // Maximum delay in milliseconds
-} as const;
+});
 
 /** Status update event name */
 export const STATUS_UPDATE_EVENT = "status-update";
