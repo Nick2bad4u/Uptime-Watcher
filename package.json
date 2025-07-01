@@ -1,7 +1,7 @@
 {
   "name": "uptime-watcher",
   "packageManager": "npm@11.4.2",
-  "version": "3.7.0",
+  "version": "3.8.0",
   "description": "An Electron app to monitor website uptime status",
   "main": "dist-electron/main.js",
   "appid": "io.github.uptime-watcher",
