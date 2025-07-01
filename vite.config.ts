@@ -83,6 +83,7 @@ export default defineConfig({
                 "dist-electron/**",
                 "**/dist/**", // Exclude any dist folder anywhere
                 "electron/dist/**", // Explicitly exclude electron/dist
+                "electron/**", // Exclude all electron files from frontend coverage
                 "**/*.d.ts",
                 "**/*.config.*",
                 "**/node_modules/**",
@@ -95,7 +96,10 @@ export default defineConfig({
             reportsDirectory: "./coverage",
         },
         environment: "jsdom", // Default for React components
+        // Test file patterns - exclude electron tests as they have their own config
+        exclude: ["**/node_modules/**", "**/dist/**", "**/dist-electron/**", "electron/**", "**/coverage/**"],
         globals: true, // Enable global test functions (describe, it, expect)
+        include: ["src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
         setupFiles: ["./src/test/setup.ts"], // Setup file for testing
     },
 });

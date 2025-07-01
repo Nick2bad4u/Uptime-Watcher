@@ -3,7 +3,7 @@
  * Configures Node.js environment with Electron-specific mocking and setup.
  */
 
-import path from "node:path";
+import * as path from "node:path";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
