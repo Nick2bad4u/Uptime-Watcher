@@ -1,0 +1,45 @@
+codecov:
+  require_ci_to_pass: yes
+  notify:
+    after_n_builds: 2  # Wait for both frontend and electron builds
+
+coverage:
+  precision: 2
+  round: down
+  range: "70...100"
+  
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 1%
+        base: auto
+      frontend:
+        flags:
+          - frontend
+        target: auto
+        threshold: 1%
+      electron:
+        flags:
+          - electron
+        target: auto
+        threshold: 1%
+    patch:
+      default:
+        target: 70%
+        threshold: 5%
+
+flags:
+  frontend:
+    paths:
+      - src/
+    carryforward: false
+  electron:
+    paths:
+      - electron/
+    carryforward: false
+
+comment:
+  layout: "reach,diff,flags,tree,reach"
+  behavior: default
+  require_changes: false

@@ -112,6 +112,7 @@
     "test:src": "vitest run src/App.test.tsx src/constants.test.ts src/utils/time.test.ts --environment=jsdom",
     "test:all": "npm run test:src && npm run test:electron",
     "test:all:coverage": "npm run test:coverage && npm run test:electron:coverage",
+    "test:codecov": "npm run test:coverage && npm run test:electron:coverage",
     "prepare": "husky"
   },
   "keywords": [

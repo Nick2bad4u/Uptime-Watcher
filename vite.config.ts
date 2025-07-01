@@ -92,7 +92,7 @@ export default defineConfig({
                 "electron/test/dist/**", // Exclude compiled electron test files
             ],
             provider: "v8",
-            reporter: ["text", "json", "lcov"],
+            reporter: ["text", "json", "lcov", "html"],
             reportsDirectory: "./coverage",
         },
         environment: "jsdom", // Default for React components
