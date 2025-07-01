@@ -29,6 +29,9 @@ jobs:
             - name: Run tests
               run: npx vitest run --coverage --reporter=verbose
 
+            - name: Run tests
+              run: npx vitest run --config vitest.electron.config.ts --reporter=verbose
+
             - name: Run Vitest with Junit reporter
               run: |
                   npx vitest run --reporter=junit \
