@@ -81,6 +81,8 @@ export default defineConfig({
                 "coverage/**",
                 "dist/**",
                 "dist-electron/**",
+                "**/dist/**", // Exclude any dist folder anywhere
+                "electron/dist/**", // Explicitly exclude electron/dist
                 "**/*.d.ts",
                 "**/*.config.*",
                 "**/node_modules/**",

@@ -1,0 +1,58 @@
+# Codecov configuration for Uptime Watcher
+# See: https://docs.codecov.com/docs/codecov-yaml
+
+codecov:
+    require_ci_to_pass: true
+    notify:
+        wait_for_ci: true
+
+coverage:
+    precision: 2
+    round: down
+    range: "70...100"
+
+    status:
+        project:
+            default:
+                target: auto
+                threshold: 1%
+        patch:
+            default:
+                target: auto
+                threshold: 1%
+
+    ignore:
+        # Build outputs and compiled files
+        - "dist/**/*"
+        - "dist-electron/**/*"
+        - "**/dist/**/*"
+        - "electron/dist/**/*"
+
+        # Development and configuration files
+        - "coverage/**/*"
+        - "release/**/*"
+        - "scripts/**/*"
+        - "docs/**/*"
+        - "**/*.config.*"
+        - "**/*.d.ts"
+        - "**/node_modules/**/*"
+
+        # Test files
+        - "**/*.test.*"
+        - "**/*.spec.*"
+        - "**/test/**/*"
+        - "src/test/**/*"
+        - "electron/test/**/*"
+
+        # Static assets
+        - "public/**/*"
+        - "icons/**/*"
+        - "**/*.md"
+        - "**/*.yml"
+        - "**/*.yaml"
+        - "**/*.json"
+
+comment:
+    layout: "reach,diff,flags,tree"
+    behavior: default
+    require_changes: false
