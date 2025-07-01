@@ -282,12 +282,28 @@ describe("SiteRepository", () => {
             expect(mockLogger.warn).toHaveBeenCalledWith("[SiteRepository] Site not found for deletion: nonexistent");
         });
 
-        it("should handle undefined changes", async () => {
-            mockDatabase.run.mockReturnValue({ changes: 0 });
+        it("should handle null changes property (line 131 nullish coalescing)", async () => {
+            mockDatabase.run.mockReturnValue({ changes: null as any });
 
             const result = await siteRepository.delete("site1");
 
-            expect(result).toBe(false);
+            expect(result).toBe(false); // (null ?? 0) > 0 = false
+        });
+
+        it("should handle undefined changes property (line 131 nullish coalescing)", async () => {
+            mockDatabase.run.mockReturnValue({ changes: undefined as any });
+
+            const result = await siteRepository.delete("site1");
+
+            expect(result).toBe(false); // (undefined ?? 0) > 0 = false
+        });
+
+        it("should handle result object without changes property (line 131 nullish coalescing)", async () => {
+            mockDatabase.run.mockReturnValue({} as any); // No changes property
+
+            const result = await siteRepository.delete("site1");
+
+            expect(result).toBe(false); // (undefined ?? 0) > 0 = false
         });
 
         it("should handle database errors", async () => {
@@ -358,6 +374,29 @@ describe("SiteRepository", () => {
 
             await expect(siteRepository.exportAll()).rejects.toThrow("Database error");
             expect(mockLogger.error).toHaveBeenCalledWith("[SiteRepository] Failed to export sites", error);
+        });
+
+        it("should handle falsy identifier in exportAll (line 167)", async () => {
+            const mockSites = [
+                { identifier: "site1", name: "Site 1" },
+                { identifier: "", name: "Empty identifier" }, // Empty string - falsy
+                { identifier: null, name: "Null identifier" }, // Null - falsy
+                { identifier: undefined, name: "Undefined identifier" }, // Undefined - falsy
+                { identifier: 0, name: "Zero identifier" }, // 0 - falsy
+                { identifier: false, name: "False identifier" }, // false - falsy
+            ];
+            mockDatabase.all.mockReturnValue(mockSites);
+
+            const result = await siteRepository.exportAll();
+
+            expect(result).toEqual([
+                { identifier: "site1", name: "Site 1" },
+                { identifier: "", name: "Empty identifier" }, // Empty string stays empty
+                { identifier: "", name: "Null identifier" }, // Null becomes ""
+                { identifier: "", name: "Undefined identifier" }, // Undefined becomes ""
+                { identifier: "", name: "Zero identifier" }, // 0 becomes ""
+                { identifier: "", name: "False identifier" }, // false becomes ""
+            ]);
         });
     });
 

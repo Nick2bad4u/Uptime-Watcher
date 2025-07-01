@@ -131,6 +131,25 @@ describe("WindowService", () => {
             expect(mockBrowserWindow.loadURL).toHaveBeenCalledWith("http://localhost:5173");
             expect(mockWebContents.openDevTools).toHaveBeenCalled();
         });
+
+        it("should return early when mainWindow is null (line 43)", () => {
+            // Test the guard clause on line 43: if (!this.mainWindow) return;
+            
+            // Clear existing mocks
+            vi.clearAllMocks();
+            
+            // Create service and manually call loadContent when mainWindow is null
+            const testService = new WindowService();
+            
+            // Call loadContent directly when mainWindow is null (this tests line 43)
+            // We access the private method through bracket notation for testing
+            (testService as any).loadContent();
+            
+            // Since mainWindow is null, loadContent should return early
+            // and not call any loadURL or loadFile methods
+            expect(mockBrowserWindow.loadURL).not.toHaveBeenCalled();
+            expect(mockBrowserWindow.loadFile).not.toHaveBeenCalled();
+        });
     });
 
     describe("setupWindowEvents", () => {
@@ -162,6 +181,25 @@ describe("WindowService", () => {
             closedHandler();
 
             expect(windowService.getMainWindow()).toBeNull();
+        });
+
+        it("should return early when mainWindow is null in setupWindowEvents (line 59)", () => {
+            // Test the guard clause on line 59: if (!this.mainWindow) return;
+            
+            // Clear existing mocks
+            vi.clearAllMocks();
+            
+            // Create service and manually call setupWindowEvents when mainWindow is null
+            const testService = new WindowService();
+            
+            // Call setupWindowEvents directly when mainWindow is null (this tests line 59)
+            // We access the private method through bracket notation for testing
+            (testService as any).setupWindowEvents();
+            
+            // Since mainWindow is null, setupWindowEvents should return early
+            // and not call any event setup methods
+            expect(mockBrowserWindow.once).not.toHaveBeenCalled();
+            expect(mockBrowserWindow.on).not.toHaveBeenCalled();
         });
     });
 

@@ -94,6 +94,7 @@ export default defineConfig({
             provider: "v8",
             reporter: ["text", "json", "lcov", "html"],
             reportsDirectory: "./coverage",
+            ignoreEmptyLines: true, // Ignore empty lines in coverage reports
         },
         environment: "jsdom", // Default for React components
         // Test file patterns - exclude electron tests as they have their own config

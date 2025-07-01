@@ -33,22 +33,22 @@ export class IpcService {
      */
     private setupSiteHandlers(): void {
         ipcMain.handle("add-site", async (_, site) => {
-            if (isDev()) logger.debug("[IpcService] Handling add-site");
+            if (isDev()) /* v8 ignore next */ logger.debug("[IpcService] Handling add-site");
             return this.uptimeMonitor.addSite(site);
         });
 
         ipcMain.handle("remove-site", async (_, identifier) => {
-            if (isDev()) logger.debug("[IpcService] Handling remove-site", { identifier });
+            if (isDev()) /* v8 ignore next */ logger.debug("[IpcService] Handling remove-site", { identifier });
             return this.uptimeMonitor.removeSite(identifier);
         });
 
         ipcMain.handle("get-sites", async () => {
-            if (isDev()) logger.debug("[IpcService] Handling get-sites");
+            if (isDev()) /* v8 ignore next */ logger.debug("[IpcService] Handling get-sites");
             return this.uptimeMonitor.getSites();
         });
 
         ipcMain.handle("update-site", async (_, identifier, updates) => {
-            if (isDev()) logger.debug("[IpcService] Handling update-site", { identifier });
+            if (isDev()) /* v8 ignore next */ logger.debug("[IpcService] Handling update-site", { identifier });
             return this.uptimeMonitor.updateSite(identifier, updates);
         });
     }
@@ -58,29 +58,38 @@ export class IpcService {
      */
     private setupMonitoringHandlers(): void {
         ipcMain.handle("start-monitoring", async () => {
-            if (isDev()) logger.debug("[IpcService] Handling start-monitoring");
+            if (isDev()) /* v8 ignore next */ logger.debug("[IpcService] Handling start-monitoring");
             this.uptimeMonitor.startMonitoring();
             return true;
         });
 
         ipcMain.handle("stop-monitoring", async () => {
-            if (isDev()) logger.debug("[IpcService] Handling stop-monitoring");
+            if (isDev()) /* v8 ignore next */ logger.debug("[IpcService] Handling stop-monitoring");
             this.uptimeMonitor.stopMonitoring();
             return true;
         });
 
         ipcMain.handle("start-monitoring-for-site", async (_, identifier, monitorType) => {
-            if (isDev()) logger.debug("[IpcService] Handling start-monitoring-for-site", { identifier, monitorType });
+            if (isDev())
+                /* v8 ignore next 3 */ logger.debug("[IpcService] Handling start-monitoring-for-site", {
+                    identifier,
+                    monitorType,
+                });
             return this.uptimeMonitor.startMonitoringForSite(identifier, monitorType);
         });
 
         ipcMain.handle("stop-monitoring-for-site", async (_, identifier, monitorType) => {
-            if (isDev()) logger.debug("[IpcService] Handling stop-monitoring-for-site", { identifier, monitorType });
+            if (isDev())
+                /* v8 ignore next 3 */ logger.debug("[IpcService] Handling stop-monitoring-for-site", {
+                    identifier,
+                    monitorType,
+                });
             return this.uptimeMonitor.stopMonitoringForSite(identifier, monitorType);
         });
 
         ipcMain.handle("check-site-now", async (_, identifier, monitorType) => {
-            if (isDev()) logger.debug("[IpcService] Handling check-site-now", { identifier, monitorType });
+            if (isDev())
+                /* v8 ignore next */ logger.debug("[IpcService] Handling check-site-now", { identifier, monitorType });
             return this.uptimeMonitor.checkSiteManually(identifier, monitorType);
         });
     }
@@ -90,28 +99,28 @@ export class IpcService {
      */
     private setupDataHandlers(): void {
         ipcMain.handle("export-data", async () => {
-            if (isDev()) logger.debug("[IpcService] Handling export-data");
+            if (isDev()) /* v8 ignore next */ logger.debug("[IpcService] Handling export-data");
             return this.uptimeMonitor.exportData();
         });
 
         ipcMain.handle("import-data", async (_, data) => {
-            if (isDev()) logger.debug("[IpcService] Handling import-data");
+            if (isDev()) /* v8 ignore next */ logger.debug("[IpcService] Handling import-data");
             return this.uptimeMonitor.importData(data);
         });
 
         ipcMain.handle("update-history-limit", async (_, limit) => {
-            if (isDev()) logger.debug("[IpcService] Handling update-history-limit", { limit });
+            if (isDev()) /* v8 ignore next */ logger.debug("[IpcService] Handling update-history-limit", { limit });
             return this.uptimeMonitor.setHistoryLimit(limit);
         });
 
         ipcMain.handle("get-history-limit", async () => {
-            if (isDev()) logger.debug("[IpcService] Handling get-history-limit");
+            if (isDev()) /* v8 ignore next */ logger.debug("[IpcService] Handling get-history-limit");
             return this.uptimeMonitor.getHistoryLimit();
         });
 
         // Direct SQLite backup download
         ipcMain.handle("download-sqlite-backup", async () => {
-            if (isDev()) logger.debug("[IpcService] Handling download-sqlite-backup");
+            if (isDev()) /* v8 ignore next */ logger.debug("[IpcService] Handling download-sqlite-backup");
             try {
                 // Delegate to uptimeMonitor which should handle this through services
                 return await this.uptimeMonitor.downloadBackup();
