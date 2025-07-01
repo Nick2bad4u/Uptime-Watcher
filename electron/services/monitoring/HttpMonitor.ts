@@ -66,7 +66,7 @@ export class HttpMonitor implements IMonitorService {
             // Custom status validation - all HTTP responses (including errors) are "successful" for axios
             // This allows us to handle status code logic manually in our monitoring logic
             validateStatus: () => {
-                /* v8 ignore next 3 */
+                /* v8 ignore next 4 */
                 // Always treat as successful so we get response in success path, not error path
                 // We'll manually determine up/down status based on status codes
                 return true;

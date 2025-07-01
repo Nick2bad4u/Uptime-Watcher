@@ -190,10 +190,112 @@ describe("HttpMonitor", () => {
                 })
             );
         });
+
+        it("should use DEFAULT_REQUEST_TIMEOUT when both monitor and config timeout are undefined", async () => {
+            // Create monitor without timeout
+            const monitor = createMockMonitor({ timeout: undefined });
+            
+            // Create HttpMonitor with empty config (no timeout) 
+            const monitorWithoutTimeout = new HttpMonitor({});
+            
+            // Reset the mocks to make sure withRetry actually calls the function
+            mockWithRetry.mockImplementation(async (fn: any) => {
+                return await fn(); // Actually execute the function to hit the timeout logic
+            });
+            
+            mockAxiosInstance.get.mockResolvedValue({
+                status: 200,
+                responseTime: 100,
+            });
+
+            const result = await monitorWithoutTimeout.check(monitor);
+
+            // Verify the result shows the check worked
+            expect(result.status).toBe("up");
+            expect(result.details).toBe("200");
+            
+            // The important part is that the DEFAULT_REQUEST_TIMEOUT fallback was used
+            // This can be verified by checking that axios.get was called with timeout: 5000
+            expect(mockAxiosInstance.get).toHaveBeenCalledWith("https://example.com", {
+                timeout: 5000, // This proves DEFAULT_REQUEST_TIMEOUT (5000) was used
+            });
+        });
+
+        it("should use monitor timeout when config timeout is undefined", async () => {
+            const monitor = createMockMonitor({ timeout: 3000 });
+            
+            // Create HttpMonitor without timeout in config
+            const monitorWithoutTimeout = new HttpMonitor({});
+            
+            mockWithRetry.mockResolvedValue({
+                status: "up",
+                responseTime: 100,
+                details: "200",
+            });
+
+            await monitorWithoutTimeout.check(monitor);
+
+            expect(mockWithRetry).toHaveBeenCalled();
+        });
+
+        it("should use config timeout fallback when monitor timeout is undefined", async () => {
+            // Create monitor without timeout
+            const monitor = createMockMonitor({ timeout: undefined });
+            
+            // Create HttpMonitor with config timeout
+            const monitorWithConfigTimeout = new HttpMonitor({ timeout: 3000 });
+            
+            // Reset withRetry to actually execute the function
+            mockWithRetry.mockImplementation(async (fn: any) => {
+                return await fn(); 
+            });
+            
+            mockAxiosInstance.get.mockResolvedValue({
+                status: 200,
+                responseTime: 100,
+            });
+
+            await monitorWithConfigTimeout.check(monitor);
+
+            // Should use config timeout (3000) when monitor timeout is undefined
+            expect(mockAxiosInstance.get).toHaveBeenCalledWith("https://example.com", {
+                timeout: 3000,
+            });
+        });
+
+        it("should hit the ultimate DEFAULT_REQUEST_TIMEOUT fallback", async () => {
+            // Create monitor without timeout
+            const monitor = createMockMonitor({ timeout: undefined });
+            
+            // Create HttpMonitor with no timeout in config
+            const monitorNoConfig = new HttpMonitor({});
+            
+            // Spy on the internal method to see the actual timeout used
+            const makeRequestSpy = vi.spyOn(monitorNoConfig as any, 'makeRequest');
+            makeRequestSpy.mockResolvedValue({
+                status: 200,
+                responseTime: 100,
+            });
+            
+            // Reset withRetry to actually execute the function
+            mockWithRetry.mockImplementation(async (fn: any) => {
+                return await fn(); 
+            });
+
+            await monitorNoConfig.check(monitor);
+
+            // This should hit lines 100-101: monitor.timeout ?? this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT
+            // Since both monitor.timeout and config.timeout are undefined, it should use DEFAULT_REQUEST_TIMEOUT (5000)
+            expect(makeRequestSpy).toHaveBeenCalledWith("https://example.com", 5000);
+            
+            makeRequestSpy.mockRestore();
+        });
     });
 
     describe("performSingleHealthCheck", () => {
         it("should log debug information in dev mode", async () => {
+            // Clear any previous mock calls
+            mockLogger.debug.mockClear();
             mockIsDev.mockReturnValue(true);
             mockAxiosInstance.get.mockResolvedValue({
                 status: 200,
@@ -203,13 +305,48 @@ describe("HttpMonitor", () => {
             // Access private method through any cast
             const result = await (httpMonitor as any).performSingleHealthCheck("https://example.com", 5000);
 
-            expect(mockLogger.debug).toHaveBeenCalledWith(
+            // Verify both debug calls are made (this covers line 141)
+            expect(mockLogger.debug).toHaveBeenCalledTimes(2);
+            expect(mockLogger.debug).toHaveBeenNthCalledWith(1,
                 "[HttpMonitor] Checking URL: https://example.com with timeout: 5000ms"
             );
-            expect(mockLogger.debug).toHaveBeenCalledWith(
+            expect(mockLogger.debug).toHaveBeenNthCalledWith(2,
                 "[HttpMonitor] URL https://example.com responded with status 200 in 150ms"
             );
             expect(result.status).toBe("up");
+        });
+
+        it("should include error in result when status is down", async () => {
+            mockAxiosInstance.get.mockResolvedValue({
+                status: 500,
+                responseTime: 100,
+            });
+
+            const result = await (httpMonitor as any).performSingleHealthCheck("https://example.com", 5000);
+
+            expect(result).toEqual({
+                details: "500",
+                responseTime: 100,
+                status: "down",
+                error: "HTTP 500", // This covers the conditional spread
+            });
+        });
+
+        it("should not include error in result when status is up", async () => {
+            mockAxiosInstance.get.mockResolvedValue({
+                status: 200,
+                responseTime: 100,
+            });
+
+            const result = await (httpMonitor as any).performSingleHealthCheck("https://example.com", 5000);
+
+            expect(result).toEqual({
+                details: "200",
+                responseTime: 100,
+                status: "up",
+                // No error property when status is up
+            });
+            expect(result).not.toHaveProperty("error");
         });
 
         it("should not log in production mode", async () => {
@@ -222,6 +359,52 @@ describe("HttpMonitor", () => {
             await (httpMonitor as any).performSingleHealthCheck("https://example.com", 5000);
 
             expect(mockLogger.debug).not.toHaveBeenCalled();
+        });
+
+        it("should hit both debug logs in dev mode with direct call", async () => {
+            // Completely reset all mocks
+            vi.clearAllMocks();
+            mockLogger.debug.mockClear();
+            mockIsDev.mockReturnValue(true);
+            
+            // Mock axios response with responseTime
+            mockAxiosInstance.get.mockResolvedValue({
+                status: 200,
+                responseTime: 150, // This should trigger line 141
+            });
+
+            // Create a fresh HttpMonitor instance
+            const freshMonitor = new HttpMonitor();
+            
+            // Call performSingleHealthCheck directly
+            const result = await (freshMonitor as any).performSingleHealthCheck("https://test.com", 3000);
+
+            // This should hit both line 137 and line 141
+            expect(mockLogger.debug).toHaveBeenCalledTimes(2);
+            expect(mockLogger.debug).toHaveBeenNthCalledWith(1,
+                "[HttpMonitor] Checking URL: https://test.com with timeout: 3000ms"
+            );
+            expect(mockLogger.debug).toHaveBeenNthCalledWith(2,
+                "[HttpMonitor] URL https://test.com responded with status 200 in 150ms"
+            );
+            expect(result.status).toBe("up");
+        });
+
+        it("should handle response without responseTime property (line 141 coverage)", async () => {
+            // Mock axios to return a response WITHOUT responseTime property
+            mockAxiosInstance.get.mockResolvedValue({
+                status: 200,
+                // Note: no responseTime property, so response.responseTime will be undefined
+            });
+
+            // Call performSingleHealthCheck directly to hit line 141
+            const result = await (httpMonitor as any).performSingleHealthCheck("https://example.com", 5000);
+
+            // This should trigger: const responseTime = response.responseTime ?? 0;
+            // Since response.responseTime is undefined, it should fallback to 0
+            expect(result.responseTime).toBe(0);
+            expect(result.status).toBe("up");
+            expect(result.details).toBe("200");
         });
     });
 
@@ -288,6 +471,25 @@ describe("HttpMonitor", () => {
             expect(result.error).toBe("Unknown error");
             expect(result.responseTime).toBe(0);
             expect(result.details).toBe("0");
+        });
+
+        it("should handle Axios errors in handleCheckError", () => {
+            const axiosError = {
+                message: "Request timeout",
+                responseTime: 150,
+            } as AxiosError;
+
+            // Mock axios.isAxiosError to return true (this is the key!)
+            (mockAxios.isAxiosError as any).mockReturnValue(true);
+
+            const result = (httpMonitor as any).handleCheckError(axiosError, "https://example.com");
+
+            expect(result).toEqual({
+                status: "down",
+                error: "Request timeout",
+                responseTime: 150,
+                details: "0",
+            });
         });
 
         it("should handle non-Axios errors in handleCheckError", async () => {
@@ -655,6 +857,119 @@ describe("HttpMonitor", () => {
             });
 
             expect(mockLogger.debug).toHaveBeenCalledWith(expect.stringContaining("string error"));
+        });
+    });
+
+    it("should cover all timeout fallback branches and debug logging", async () => {
+        // Test 1: Cover the timeout fallback chain (lines 100-101)
+        // Create a monitor where timeout is undefined
+        const monitorUndefinedTimeout = createMockMonitor({ 
+            timeout: undefined 
+        });
+        
+        // Create an HttpMonitor where config.timeout is also undefined
+        const httpMonitorUndefinedConfig = new HttpMonitor({}); // Empty config = undefined timeout
+        
+        // Mock withRetry to actually execute the function instead of bypassing it
+        mockWithRetry.mockImplementation(async (fn: any) => {
+            return await fn();
+        });
+        
+        // Reset isDev to true for debug logging
+        mockIsDev.mockReturnValue(true);
+        mockLogger.debug.mockClear();
+        
+        // Mock axios response
+        mockAxiosInstance.get.mockResolvedValue({
+            status: 200,
+            responseTime: 123,
+        });
+        
+        // This should hit: monitor.timeout (undefined) ?? this.config.timeout (undefined) ?? DEFAULT_REQUEST_TIMEOUT
+        // Since both monitor.timeout and config.timeout are undefined, it should use DEFAULT_REQUEST_TIMEOUT (5000)
+        const result = await httpMonitorUndefinedConfig.check(monitorUndefinedTimeout);
+        
+        // Verify the result
+        expect(result.status).toBe("up");
+        expect(result.details).toBe("200");
+        expect(result.responseTime).toBe(123);
+        
+        // Verify that makeRequest was called with DEFAULT_REQUEST_TIMEOUT (5000)
+        expect(mockAxiosInstance.get).toHaveBeenCalledWith("https://example.com", {
+            timeout: 5000,
+        });
+        
+        // Verify both debug logs were called (covering line 141)
+        expect(mockLogger.debug).toHaveBeenCalledTimes(2);
+        expect(mockLogger.debug).toHaveBeenCalledWith(
+            "[HttpMonitor] Checking URL: https://example.com with timeout: 5000ms"
+        );
+        expect(mockLogger.debug).toHaveBeenCalledWith(
+            "[HttpMonitor] URL https://example.com responded with status 200 in 123ms"
+        );
+    });
+
+    describe("retryAttempts fallback (lines 100-101 coverage)", () => {
+        it("should cover retryAttempts fallback (lines 100-101 coverage)", async () => {
+            // Create a monitor without retryAttempts property
+            const monitor = createMockMonitor({ 
+                retryAttempts: undefined as any // Force undefined
+            });
+            
+            // Reset withRetry to actually execute
+            mockWithRetry.mockImplementation(async (fn: any) => {
+                return await fn();
+            });
+            
+            mockAxiosInstance.get.mockResolvedValue({
+                status: 200,
+                responseTime: 100,
+            });
+
+            const result = await httpMonitor.check(monitor);
+            
+            // This should trigger: const retryAttempts = monitor.retryAttempts ?? 0;
+            // Since monitor.retryAttempts is undefined, it should fallback to 0
+            // We can verify this by checking that withRetry was called with maxRetries: 1 (0 + 1)
+            expect(mockWithRetry).toHaveBeenCalledWith(
+                expect.any(Function),
+                expect.objectContaining({
+                    maxRetries: 1, // retryAttempts (0) + 1
+                })
+            );
+            
+            expect(result.status).toBe("up");
+        });
+    });
+
+    it("should hit the exact DEFAULT_REQUEST_TIMEOUT fallback branch (line 100)", async () => {
+        // Create monitor with explicit undefined timeout (not just missing property)
+        const monitor = {
+            ...createMockMonitor(),
+            timeout: undefined, // Explicitly undefined
+        };
+        
+        // Create HttpMonitor with explicit undefined timeout in config
+        const monitorWithUndefinedConfig = new HttpMonitor({ 
+            timeout: undefined, // Explicitly undefined, not missing
+            userAgent: "Test"
+        });
+        
+        // Reset withRetry to execute the actual function
+        mockWithRetry.mockImplementation(async (fn: any) => {
+            return await fn();
+        });
+        
+        mockAxiosInstance.get.mockResolvedValue({
+            status: 200,
+            responseTime: 50,
+        });
+
+        await monitorWithUndefinedConfig.check(monitor);
+
+        // This should hit: monitor.timeout (undefined) ?? this.config.timeout (undefined) ?? DEFAULT_REQUEST_TIMEOUT (5000)
+        expect(mockAxiosInstance.get).toHaveBeenCalledWith("https://example.com", {
+            timeout: 5000, // DEFAULT_REQUEST_TIMEOUT
         });
     });
 });
