@@ -176,9 +176,9 @@ describe("Electron Main Process", () => {
 
     describe("Error Handling", () => {
         it("should handle ApplicationService initialization errors", async () => {
-            const { ApplicationService } = await import("../services/application");
             const mockError = new Error("Service initialization failed");
 
+            // Use the mock that was set up in beforeEach
             ApplicationService.mockImplementation(() => {
                 throw mockError;
             });
@@ -188,7 +188,7 @@ describe("Electron Main Process", () => {
         });
 
         it("should handle logger errors gracefully", async () => {
-            const { logger } = await import("../utils/logger");
+            // Use the mock that was set up in beforeEach
             logger.info.mockImplementation(() => {
                 throw new Error("Logger failed");
             });

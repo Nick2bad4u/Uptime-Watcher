@@ -133,27 +133,23 @@ const mockMonitorSchedulerInstance = {
 const mockMonitorScheduler = vi.fn(() => mockMonitorSchedulerInstance);
 
 const mockMonitorFactory = {
-    createMonitor: vi.fn(() => ({
-        check: vi.fn(() =>
-            Promise.resolve({
-                status: "up" as const,
-                responseTime: 100,
-                timestamp: Date.now(),
-                details: "200",
-                error: undefined,
-            })
-        ),
+    createMonitor: vi.fn().mockImplementation(() => ({
+        check: vi.fn().mockResolvedValue({
+            status: "up" as const,
+            responseTime: 100,
+            timestamp: Date.now(),
+            details: "200",
+            error: undefined,
+        }),
     })),
-    getMonitor: vi.fn(() => ({
-        check: vi.fn(() =>
-            Promise.resolve({
-                status: "up" as const,
-                responseTime: 100,
-                timestamp: Date.now(),
-                details: "200",
-                error: undefined,
-            })
-        ),
+    getMonitor: vi.fn().mockImplementation(() => ({
+        check: vi.fn().mockResolvedValue({
+            status: "up" as const,
+            responseTime: 100,
+            timestamp: Date.now(),
+            details: "200",
+            error: undefined,
+        }),
     })),
 };
 
@@ -1212,6 +1208,12 @@ describe("UptimeMonitor", () => {
 
             await uptimeMonitor.addSite(site);
 
+            // Manually set the monitor status in the cache to 'up' to simulate the correct initial state.
+            const cachedSite = uptimeMonitor.sites.get(identifier);
+            if (cachedSite?.monitors[0]) {
+                cachedSite.monitors[0].status = "up";
+            }
+
             // Mock the site repository to return the site with updated data
             siteRepoInstance.getByIdentifier.mockResolvedValue({
                 ...site,
@@ -1234,7 +1236,7 @@ describe("UptimeMonitor", () => {
                         error: undefined,
                     })
                 ),
-            });
+            } as any);
 
             await uptimeMonitor.checkSiteManually(identifier);
 
@@ -1306,7 +1308,7 @@ describe("UptimeMonitor", () => {
 
             // This should handle the case gracefully
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const result = await (uptimeMonitor as any).checkMonitor(site, "undefined");
+            const result = await (uptimeMonitor).checkMonitor(site, "undefined");
             expect(result).toBeUndefined();
         });
 
@@ -1329,7 +1331,7 @@ describe("UptimeMonitor", () => {
 
             // This should handle the case gracefully
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const result = await (uptimeMonitor as any).checkMonitor(site, "non-existent");
+            const result = await (uptimeMonitor).checkMonitor(site, "non-existent");
             expect(result).toBeUndefined();
         });
 
@@ -1455,7 +1457,7 @@ describe("UptimeMonitor", () => {
 
             // Call the private handleScheduledCheck method
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            await (uptimeMonitor as any).handleScheduledCheck(identifier, "monitor1");
+            await (uptimeMonitor).handleScheduledCheck(identifier, "monitor1");
 
             // Should have called checkMonitor internally
             expect(siteRepoInstance.getByIdentifier).toHaveBeenCalled();
@@ -1464,7 +1466,7 @@ describe("UptimeMonitor", () => {
         it("should handle scheduled checks for non-existent site", async () => {
             // Call the private handleScheduledCheck method with non-existent site
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            await (uptimeMonitor as any).handleScheduledCheck("non-existent", "monitor1");
+            await (uptimeMonitor).handleScheduledCheck("non-existent", "monitor1");
 
             // Should handle gracefully without throwing
         });
