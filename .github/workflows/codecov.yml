@@ -38,11 +38,13 @@ jobs:
             # Generate JUnit reports for both test suites
             - name: Generate frontend JUnit report
               run: |
+                  mkdir -p coverage
                   npx vitest run --reporter=junit \
                     --outputFile=coverage/frontend-test-report.junit.xml
 
             - name: Generate electron JUnit report
               run: |
+                  mkdir -p coverage/electron
                   npx vitest run --config vitest.electron.config.ts --reporter=junit \
                     --outputFile=coverage/electron/electron-test-report.junit.xml
 
@@ -73,7 +75,7 @@ jobs:
               if: ${{ !cancelled() }}
               uses: codecov/test-results-action@v1
               with:
-                  files: coverage/frontend-test-report.junit.xml
+                  file: ./coverage/frontend-test-report.junit.xml
                   token: ${{ secrets.CODECOV_TOKEN }}
                   flags: frontend
 
@@ -81,6 +83,6 @@ jobs:
               if: ${{ !cancelled() }}
               uses: codecov/test-results-action@v1
               with:
-                  files: coverage/electron/electron-test-report.junit.xml
+                  file: ./coverage/electron/electron-test-report.junit.xml
                   token: ${{ secrets.CODECOV_TOKEN }}
                   flags: electron
