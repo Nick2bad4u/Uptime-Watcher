@@ -37,13 +37,15 @@ export function useSiteStats(history: StatusHistory[]): SiteStats {
         const upCount = history.filter((record) => record.status === "up").length;
         const uptime = Math.round((upCount / checkCount) * 100);
 
-        // Calculate average response time
-        const validResponseTimes = history.filter((record) => typeof record.responseTime === "number");
+        // Calculate average response time (only for successful "up" checks)
+        const upRecordsWithResponseTime = history.filter(
+            (record) => record.status === "up" && typeof record.responseTime === "number" && record.responseTime > 0
+        );
         const averageResponseTime =
-            validResponseTimes.length > 0
+            upRecordsWithResponseTime.length > 0
                 ? Math.round(
-                      validResponseTimes.reduce((sum, record) => sum + (record.responseTime || 0), 0) /
-                          validResponseTimes.length
+                      upRecordsWithResponseTime.reduce((sum, record) => sum + (record.responseTime || 0), 0) /
+                          upRecordsWithResponseTime.length
                   )
                 : 0;
 

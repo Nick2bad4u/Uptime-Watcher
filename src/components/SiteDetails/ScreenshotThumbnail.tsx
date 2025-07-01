@@ -6,7 +6,7 @@
  * React portals for the overlay positioning.
  */
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 
 import logger from "../../services/logger";
@@ -44,8 +44,28 @@ export function ScreenshotThumbnail({ siteName, url }: ScreenshotThumbnailProps)
     const [hovered, setHovered] = useState(false);
     const [overlayVars, setOverlayVars] = useState<React.CSSProperties>({});
     const linkRef = useRef<HTMLAnchorElement>(null);
+    const portalRef = useRef<HTMLDivElement | null>(null);
+    const hoverTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
     const { themeName } = useTheme();
     const screenshotUrl = `https://api.microlink.io/?url=${encodeURIComponent(url)}&screenshot=true&meta=false&embed=screenshot.url&colorScheme=auto`;
+
+    // Clean up portal overlay on unmount and state changes
+    useEffect(() => {
+        const currentPortal = portalRef.current;
+        const currentTimeout = hoverTimeoutRef.current;
+        return () => {
+            // Clear any pending timeouts
+            if (currentTimeout) {
+                clearTimeout(currentTimeout);
+            }
+            setHovered(false);
+            setOverlayVars({});
+            // Clean up any portal element that might still be in the DOM
+            if (currentPortal?.parentNode) {
+                currentPortal.parentNode.removeChild(currentPortal);
+            }
+        };
+    }, []);
 
     function handleClick(e: React.MouseEvent) {
         e.preventDefault();
@@ -87,9 +107,56 @@ export function ScreenshotThumbnail({ siteName, url }: ScreenshotThumbnailProps)
                 "--overlay-width": `${overlayW}px`,
             } as React.CSSProperties);
         } else if (!hovered) {
+            // Clear any pending timeouts when hiding overlay
+            if (hoverTimeoutRef.current) {
+                clearTimeout(hoverTimeoutRef.current);
+                hoverTimeoutRef.current = undefined;
+            }
             setOverlayVars({});
         }
     }, [hovered, url, siteName]);
+
+    // Debounced hover handlers to prevent rapid state changes
+    const handleMouseEnter = useCallback(() => {
+        // Clear any existing timeout
+        if (hoverTimeoutRef.current) {
+            clearTimeout(hoverTimeoutRef.current);
+            hoverTimeoutRef.current = undefined;
+        }
+        setHovered(true);
+    }, []);
+
+    const handleMouseLeave = useCallback(() => {
+        // Clear any existing timeout
+        if (hoverTimeoutRef.current) {
+            clearTimeout(hoverTimeoutRef.current);
+        }
+        // Add a small delay to prevent flickering on rapid mouse movements
+        hoverTimeoutRef.current = setTimeout(() => {
+            setHovered(false);
+        }, 100);
+    }, []);
+
+    const handleFocus = useCallback(() => {
+        // Clear any existing timeout
+        if (hoverTimeoutRef.current) {
+            clearTimeout(hoverTimeoutRef.current);
+            hoverTimeoutRef.current = undefined;
+        }
+        setHovered(true);
+    }, []);
+
+    const handleBlur = useCallback(() => {
+        // Clear any existing timeout
+        if (hoverTimeoutRef.current) {
+            clearTimeout(hoverTimeoutRef.current);
+            hoverTimeoutRef.current = undefined;
+        }
+        setHovered(false);
+    }, []);
+
+    // Generate accessible aria-label, handling empty URLs
+    const ariaLabel = url.trim() ? `Open ${url} in browser` : "Open in browser";
 
     return (
         <>
@@ -97,13 +164,13 @@ export function ScreenshotThumbnail({ siteName, url }: ScreenshotThumbnailProps)
                 ref={linkRef}
                 href={url}
                 tabIndex={0}
-                aria-label={`Open ${url} in browser`}
+                aria-label={ariaLabel}
                 onClick={handleClick}
                 className="site-details-thumbnail-link"
-                onMouseEnter={() => setHovered(true)}
-                onMouseLeave={() => setHovered(false)}
-                onFocus={() => setHovered(true)}
-                onBlur={() => setHovered(false)}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
             >
                 <img
                     src={screenshotUrl}
@@ -115,7 +182,11 @@ export function ScreenshotThumbnail({ siteName, url }: ScreenshotThumbnailProps)
             </a>
             {hovered &&
                 createPortal(
-                    <div className={`site-details-thumbnail-portal-overlay theme-${themeName}`} style={overlayVars}>
+                    <div
+                        ref={portalRef}
+                        className={`site-details-thumbnail-portal-overlay theme-${themeName}`}
+                        style={overlayVars}
+                    >
                         <div className="site-details-thumbnail-portal-img-wrapper">
                             <img
                                 src={screenshotUrl}

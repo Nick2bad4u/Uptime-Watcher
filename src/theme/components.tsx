@@ -195,6 +195,7 @@ interface ThemedButtonProps {
     readonly title?: string;
     readonly onClick?: (e?: React.MouseEvent<HTMLButtonElement>) => void;
     readonly children?: React.ReactNode;
+    readonly "aria-label"?: string;
 }
 
 // Utility: map color name to CSS class for icon coloring
@@ -234,6 +235,7 @@ function renderColoredIcon(icon: React.ReactNode, color?: string) {
 }
 
 export function ThemedButton({
+    "aria-label": ariaLabel,
     children,
     className = "",
     disabled = false,
@@ -305,6 +307,7 @@ export function ThemedButton({
             onClick={(e) => onClick?.(e)}
             disabled={disabled || loading}
             title={title}
+            aria-label={ariaLabel}
         >
             {renderContent()}
         </button>

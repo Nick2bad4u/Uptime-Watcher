@@ -90,11 +90,15 @@ export default defineConfig({
                 "release/**",
                 "scripts/**",
                 "electron/test/dist/**", // Exclude compiled electron test files
+                "**/types.ts", // Exclude type definition files
+                "**/types.tsx", // Exclude type definition files with JSX
+                "src/types.ts", // Explicitly exclude main types file
+                "src/theme/types.ts", // Exclude theme types
             ],
+            ignoreEmptyLines: true, // Ignore empty lines in coverage reports
             provider: "v8",
             reporter: ["text", "json", "lcov", "html"],
             reportsDirectory: "./coverage",
-            ignoreEmptyLines: true, // Ignore empty lines in coverage reports
         },
         environment: "jsdom", // Default for React components
         // Test file patterns - exclude electron tests as they have their own config
