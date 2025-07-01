@@ -109,8 +109,7 @@ export class MonitorRepository {
     ): void {
         if (value !== undefined) {
             updateFields.push(`${fieldName} = ?`);
-            // eslint-disable-next-line unicorn/no-null -- required for SQLite
-            updateValues.push(value !== undefined ? Number(value) : null);
+            updateValues.push(Number(value));
         }
     }
 

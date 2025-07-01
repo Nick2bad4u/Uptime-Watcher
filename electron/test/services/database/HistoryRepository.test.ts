@@ -481,4 +481,65 @@ describe("HistoryRepository", () => {
             );
         });
     });
+
+    describe("rowToHistoryEntry type conversion (lines 32,34 coverage)", () => {
+        it("should convert string responseTime and timestamp to numbers", async () => {
+            // Mock database rows with string values (common in SQLite)
+            const mockRows = [
+                {
+                    timestamp: "1640995200000", // String timestamp
+                    status: "up",
+                    responseTime: "150", // String responseTime
+                    details: "OK",
+                },
+                {
+                    timestamp: "1640995100000", // String timestamp
+                    status: "down",
+                    responseTime: "0", // String responseTime
+                    details: "Connection failed",
+                },
+            ];
+
+            mockDatabase.all.mockReturnValue(mockRows);
+
+            const result = await historyRepository.findByMonitorId("monitor-1");
+
+            // Verify that string values were converted to numbers
+            expect(result).toEqual([
+                {
+                    timestamp: 1640995200000, // Converted to number
+                    status: "up",
+                    responseTime: 150, // Converted to number
+                    details: "OK",
+                },
+                {
+                    timestamp: 1640995100000, // Converted to number
+                    status: "down",
+                    responseTime: 0, // Converted to number
+                    details: "Connection failed",
+                },
+            ]);
+        });
+
+        it("should handle mixed number and string types from database", async () => {
+            // Mock a single row for getLatestEntry
+            const mockRow = {
+                timestamp: "1640995200000", // String
+                status: "up",
+                responseTime: 150, // Already a number
+                details: "Mixed types test",
+            };
+
+            mockDatabase.get.mockReturnValue(mockRow);
+
+            const result = await historyRepository.getLatestEntry("monitor-1");
+
+            expect(result).toEqual({
+                timestamp: 1640995200000, // String converted to number
+                status: "up",
+                responseTime: 150, // Number stays as number
+                details: "Mixed types test",
+            });
+        });
+    });
 });
