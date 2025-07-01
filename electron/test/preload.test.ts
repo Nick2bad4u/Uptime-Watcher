@@ -319,7 +319,9 @@ describe("Electron Preload Script", () => {
 
             // Get the listener function that was registered
             const listenerCall = mockIpcRenderer.on.mock.calls.find((call) => call[0] === "status-update");
-            const listener = listenerCall[1];
+            expect(listenerCall).toBeDefined();
+
+            const listener = listenerCall![1];
 
             // Simulate IPC event
             const testData = { site: { identifier: "test" } };

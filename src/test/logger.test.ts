@@ -234,8 +234,9 @@ describe("Frontend Logger Service", () => {
 
     describe("Type exports", () => {
         it("should export Logger type", async () => {
-            const { Logger } = await import("../services/logger");
-            expect(Logger).toBeUndefined(); // Type exports don't exist at runtime
+            const loggerModule = await import("../services/logger");
+            // Type exports exist only at compile time, not runtime
+            expect(loggerModule.default).toBeDefined();
         });
     });
 });

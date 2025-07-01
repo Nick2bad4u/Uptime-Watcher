@@ -188,7 +188,8 @@ describe("MonitorRepository", () => {
                 timeout: 5000,
                 retryAttempts: 3,
                 monitoring: true,
-                status: "unknown",
+                status: "pending",
+                history: [],
             };
 
             const result = await monitorRepository.create("site-1", monitor);
@@ -219,7 +220,8 @@ describe("MonitorRepository", () => {
                 timeout: 10000,
                 retryAttempts: 5,
                 monitoring: false,
-                status: "unknown",
+                status: "pending",
+                history: [],
             };
 
             const result = await monitorRepository.create("site-2", monitor);
@@ -242,7 +244,8 @@ describe("MonitorRepository", () => {
                 type: "http",
                 url: "https://example.com",
                 monitoring: true,
-                status: "unknown",
+                status: "pending",
+                history: [],
             };
 
             await expect(monitorRepository.create("site-1", monitor)).rejects.toThrow("Create failed");

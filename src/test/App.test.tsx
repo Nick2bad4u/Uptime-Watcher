@@ -7,6 +7,8 @@ import { render, screen, act } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
+import type { Site, UpdateStatus } from "../types";
+
 // Mock all the child components
 vi.mock("../components/AddSiteForm/AddSiteForm", () => ({
     AddSiteForm: () => <div data-testid="add-site-form">Add Site Form</div>,
@@ -82,7 +84,7 @@ vi.mock("../theme/components", () => ({
         weight?: string;
         className?: string;
     }) => (
-        <span data-testid="themed-text" className={`${variant || ""} ${size || ""} ${weight || ""} ${className || ""}`}>
+        <span data-testid="themed-text" className={`${variant ?? ""} ${size ?? ""} ${weight ?? ""} ${className ?? ""}`}>
             {children}
         </span>
     ),
@@ -102,7 +104,7 @@ vi.mock("../theme/components", () => ({
         <button
             data-testid="themed-button"
             onClick={onClick}
-            className={`${variant || ""} ${size || ""} ${className || ""}`}
+            className={`${variant ?? ""} ${size ?? ""} ${className ?? ""}`}
         >
             {children}
         </button>
@@ -117,21 +119,21 @@ vi.mock("../theme/useTheme", () => ({
 const mockStore = {
     applyUpdate: vi.fn(),
     clearError: vi.fn(),
-    getSelectedSite: vi.fn(() => null),
+    getSelectedSite: vi.fn(() => null as Site | null),
     initializeApp: vi.fn(),
     isLoading: false,
-    lastError: null,
+    lastError: null as string | null,
     setShowSettings: vi.fn(),
     setShowSiteDetails: vi.fn(),
     setUpdateError: vi.fn(),
     setUpdateStatus: vi.fn(),
     showSettings: false,
     showSiteDetails: false,
-    sites: [],
+    sites: [] as Site[],
     subscribeToStatusUpdates: vi.fn(),
     unsubscribeFromStatusUpdates: vi.fn(),
-    updateError: null,
-    updateStatus: "idle",
+    updateError: null as string | null,
+    updateStatus: "idle" as UpdateStatus,
 };
 
 vi.mock("../store", () => ({
@@ -195,8 +197,8 @@ describe("App Component", () => {
 
         it("displays correct site count", () => {
             mockStore.sites = [
-                { id: "1", name: "Test Site" },
-                { id: "2", name: "Another Site" },
+                { identifier: "1", name: "Test Site", monitors: [] },
+                { identifier: "2", name: "Another Site", monitors: [] },
             ];
             render(<App />);
             expect(screen.getByText("Monitored Sites (2)")).toBeInTheDocument();
@@ -392,7 +394,7 @@ describe("App Component", () => {
 
         it("shows site details modal when showSiteDetails is true and site is selected", () => {
             mockStore.showSiteDetails = true;
-            mockStore.getSelectedSite.mockReturnValue({ id: "1", name: "Test Site" });
+            mockStore.getSelectedSite.mockReturnValue({ identifier: "1", name: "Test Site", monitors: [] });
             render(<App />);
 
             expect(screen.getByTestId("site-details-modal")).toBeInTheDocument();
@@ -401,7 +403,7 @@ describe("App Component", () => {
 
         it("can close site details modal", async () => {
             mockStore.showSiteDetails = true;
-            mockStore.getSelectedSite.mockReturnValue({ id: "1", name: "Test Site" });
+            mockStore.getSelectedSite.mockReturnValue({ identifier: "1", name: "Test Site", monitors: [] });
             render(<App />);
 
             const closeButton = screen.getByTestId("close-site-details");

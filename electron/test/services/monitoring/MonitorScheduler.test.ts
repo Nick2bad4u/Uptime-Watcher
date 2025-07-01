@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 
 import { DEFAULT_CHECK_INTERVAL } from "../../../constants";
 import { MonitorScheduler } from "../../../services/monitoring/MonitorScheduler";
@@ -34,7 +34,7 @@ vi.unmock("../../../services/monitoring/MonitorScheduler");
 
 describe("MonitorScheduler", () => {
     let scheduler: MonitorScheduler;
-    let mockCheckCallback: vi.Mock;
+    let mockCheckCallback: Mock;
 
     const mockMonitor: Site["monitors"][0] = {
         id: "monitor-1",

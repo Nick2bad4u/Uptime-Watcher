@@ -52,7 +52,7 @@ describe("WindowService", () => {
             webContents: mockWebContents,
         };
 
-        (BrowserWindow as MockedFunction<any>).mockImplementation(() => mockBrowserWindow);
+        (BrowserWindow as unknown as MockedFunction<any>).mockImplementation(() => mockBrowserWindow);
         (BrowserWindow as any).getAllWindows = vi.fn(() => [mockBrowserWindow]);
 
         windowService = new WindowService();

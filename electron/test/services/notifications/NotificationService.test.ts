@@ -87,8 +87,6 @@ describe("NotificationService", () => {
                     history: [],
                 },
             ],
-            createdAt: new Date(),
-            updatedAt: new Date(),
         };
 
         it("should show notification when alerts are enabled", () => {

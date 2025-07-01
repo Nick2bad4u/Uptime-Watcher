@@ -4,8 +4,8 @@
  */
 
 import { describe, expect, it } from "vitest";
-import type { MonitorCheckResult, IMonitorService, MonitorConfig } from "../../services/monitoring/types";
-import type { Site } from "../../types";
+import type { MonitorCheckResult, IMonitorService, MonitorConfig } from "../services/monitoring/types";
+import type { Site } from "../types";
 
 describe("Monitoring Types", () => {
     describe("MonitorCheckResult interface", () => {
@@ -82,7 +82,7 @@ describe("Monitoring Types", () => {
                     return {
                         status: monitor.url ? "up" : "down",
                         responseTime: 150,
-                        details: monitor.url || "No URL provided",
+                        details: monitor.url ?? "No URL provided",
                     };
                 },
                 getType(): Site["monitors"][0]["type"] {
