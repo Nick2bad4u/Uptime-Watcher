@@ -2433,7 +2433,6 @@ describe("UptimeMonitor", () => {
 
     describe("Final edge case coverage tests", () => {
         it("should handle prevMonitor with undefined monitoring during interval change", async () => {
-            const monitorRepoInstance = mockMonitorRepository.mock.results[0].value;
             const schedulerInstance = mockMonitorScheduler.mock.results[0].value;
             const identifier = "test-site";
 

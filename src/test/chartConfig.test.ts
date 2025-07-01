@@ -49,12 +49,17 @@ const mockTheme: Theme = {
         border: {
             primary: "#e2e8f0",
             secondary: "#f1f5f9",
-            tertiary: "#f8fafc",
+            focus: "#f8fafc",
         },
         surface: {
+            base: "#f8fafc",
             elevated: "#ffffff",
-            primary: "#f8fafc",
-            secondary: "#f1f5f9",
+            overlay: "#f1f5f9",
+        },
+        hover: {
+            light: "#f8fafc",
+            medium: "#f1f5f9",
+            dark: "#e2e8f0",
         },
     },
     typography: {
@@ -99,7 +104,6 @@ const mockTheme: Theme = {
         md: "0.375rem",
         lg: "0.5rem",
         xl: "0.75rem",
-        "2xl": "1rem",
         full: "9999px",
     },
     shadows: {
@@ -107,15 +111,9 @@ const mockTheme: Theme = {
         md: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
         lg: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
         xl: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+        inner: "inset 0 2px 4px 0 rgb(0 0 0 / 0.05)",
     },
-    zIndex: {
-        dropdown: 1000,
-        sticky: 1020,
-        fixed: 1030,
-        modal: 1040,
-        popover: 1050,
-        tooltip: 1060,
-    },
+    isDark: false,
 };
 
 describe("ChartConfigService", () => {
@@ -167,10 +165,11 @@ describe("ChartConfigService", () => {
             const config = chartService.getLineChartConfig();
 
             expect(config.scales?.x?.type).toBe("time");
-            expect(config.scales?.x?.time?.displayFormats?.day).toBe("MMM dd");
-            expect(config.scales?.x?.time?.displayFormats?.hour).toBe("HH:mm");
-            expect(config.scales?.x?.time?.displayFormats?.minute).toBe("HH:mm");
-            expect(config.scales?.y?.beginAtZero).toBe(true);
+            // TypeScript has overly strict Chart.js types, so we use assertions for deep nested properties
+            expect((config.scales?.x as any)?.time?.displayFormats?.day).toBe("MMM dd");
+            expect((config.scales?.x as any)?.time?.displayFormats?.hour).toBe("HH:mm");
+            expect((config.scales?.x as any)?.time?.displayFormats?.minute).toBe("HH:mm");
+            expect((config.scales?.y as any)?.beginAtZero).toBe(true);
             expect(config.scales?.y?.title?.text).toBe("Response Time (ms)");
         });
 
@@ -195,11 +194,12 @@ describe("ChartConfigService", () => {
         it("should apply theme typography", () => {
             const config = chartService.getLineChartConfig();
 
-            expect(config.plugins?.title?.font?.family).toBe(mockTheme.typography.fontFamily.sans.join(", "));
-            expect(config.plugins?.title?.font?.size).toBe(16);
-            expect(config.plugins?.title?.font?.weight).toBe("bold");
-            expect(config.plugins?.legend?.labels?.font?.family).toBe(mockTheme.typography.fontFamily.sans.join(", "));
-            expect(config.plugins?.legend?.labels?.font?.size).toBe(12);
+            // TypeScript has overly strict Chart.js types, so we use assertions for deep nested properties
+            expect((config.plugins?.title?.font as any)?.family).toBe(mockTheme.typography.fontFamily.sans.join(", "));
+            expect((config.plugins?.title?.font as any)?.size).toBe(16);
+            expect((config.plugins?.title?.font as any)?.weight).toBe("bold");
+            expect((config.plugins?.legend?.labels?.font as any)?.family).toBe(mockTheme.typography.fontFamily.sans.join(", "));
+            expect((config.plugins?.legend?.labels?.font as any)?.size).toBe(12);
         });
     });
 
@@ -228,7 +228,7 @@ describe("ChartConfigService", () => {
         it("should have correct scale configuration", () => {
             const config = chartService.getBarChartConfig();
 
-            expect(config.scales?.y?.beginAtZero).toBe(true);
+            expect((config.scales?.y as any)?.beginAtZero).toBe(true);
             expect(config.scales?.y?.title?.text).toBe("Count");
             expect(config.scales?.y?.title?.display).toBe(true);
         });
@@ -243,8 +243,8 @@ describe("ChartConfigService", () => {
         it("should apply theme typography", () => {
             const config = chartService.getBarChartConfig();
 
-            expect(config.plugins?.title?.font?.family).toBe(mockTheme.typography.fontFamily.sans.join(", "));
-            expect(config.scales?.y?.title?.font?.family).toBe(mockTheme.typography.fontFamily.sans.join(", "));
+            expect((config.plugins?.title?.font as any)?.family).toBe(mockTheme.typography.fontFamily.sans.join(", "));
+            expect((config.scales?.y?.title?.font as any)?.family).toBe(mockTheme.typography.fontFamily.sans.join(", "));
         });
     });
 
@@ -286,7 +286,7 @@ describe("ChartConfigService", () => {
                     parsed: 25,
                     label: "Up",
                 };
-                const result = labelCallback(mockContext as any);
+                const result = labelCallback.call({} as any, mockContext as any);
                 expect(result).toBe("Up: 25 (25.0%)");
             }
         });
@@ -300,7 +300,7 @@ describe("ChartConfigService", () => {
                     parsed: 25,
                     label: "Up",
                 };
-                const result = labelCallback(mockContext as any);
+                const result = labelCallback.call({} as any, mockContext as any);
                 expect(result).toBe("Up: 25 (0%)");
             }
         });
@@ -315,8 +315,8 @@ describe("ChartConfigService", () => {
         it("should apply theme typography", () => {
             const config = chartService.getDoughnutChartConfig(100);
 
-            expect(config.plugins?.title?.font?.family).toBe(mockTheme.typography.fontFamily.sans.join(", "));
-            expect(config.plugins?.legend?.labels?.font?.family).toBe(mockTheme.typography.fontFamily.sans.join(", "));
+            expect((config.plugins?.title?.font as any)?.family).toBe(mockTheme.typography.fontFamily.sans.join(", "));
+            expect((config.plugins?.legend?.labels?.font as any)?.family).toBe(mockTheme.typography.fontFamily.sans.join(", "));
         });
     });
 
@@ -392,7 +392,7 @@ describe("useChartConfigs", () => {
                 parsed: 75,
                 label: "Up",
             };
-            const result = labelCallback(mockContext as any);
+            const result = labelCallback.call({} as any, mockContext as any);
             expect(result).toBe("Up: 75 (50.0%)");
         }
     });
@@ -406,7 +406,7 @@ describe("useChartConfigs", () => {
                 parsed: 25,
                 label: "Up",
             };
-            const result = labelCallback(mockContext as any);
+            const result = labelCallback.call({} as any, mockContext as any);
             expect(result).toBe("Up: 25 (0%)");
         }
     });
