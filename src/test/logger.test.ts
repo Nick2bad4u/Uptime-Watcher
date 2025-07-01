@@ -239,4 +239,18 @@ describe("Frontend Logger Service", () => {
             expect(loggerModule.default).toBeDefined();
         });
     });
+
+    describe("Silly and Verbose logging", () => {
+        it("should call silly logging method", () => {
+            logger.silly("Silly message", "arg1", { data: "test" });
+
+            expect(mockLog.silly).toHaveBeenCalledWith("[UPTIME-WATCHER] Silly message", "arg1", { data: "test" });
+        });
+
+        it("should call verbose logging method", () => {
+            logger.verbose("Verbose message", "arg1", { data: "test" });
+
+            expect(mockLog.verbose).toHaveBeenCalledWith("[UPTIME-WATCHER] Verbose message", "arg1", { data: "test" });
+        });
+    });
 });

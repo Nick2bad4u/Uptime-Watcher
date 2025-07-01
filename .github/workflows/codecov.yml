@@ -29,11 +29,15 @@ jobs:
 
             # Run frontend tests with coverage
             - name: Run frontend tests
-              run: npx vitest run --coverage --reporter=verbose
+              run: |
+                  mkdir -p coverage
+                  npx vitest run --coverage --reporter=verbose
 
             # Run electron tests with coverage
-            - name: Run electron tests  
-              run: npx vitest run --config vitest.electron.config.ts --coverage --reporter=verbose
+            - name: Run electron tests
+              run: |
+                  mkdir -p coverage
+                  npx vitest run --config vitest.electron.config.ts --coverage --reporter=verbose
 
             # Generate JUnit reports for both test suites
             - name: Generate frontend JUnit report
