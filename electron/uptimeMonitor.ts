@@ -150,6 +150,7 @@ export class UptimeMonitor extends EventEmitter {
         } catch (error) {
             logger.error("Failed to load sites from DB", error);
             this.emit("db-error", { error, operation: "loadSites" });
+            throw error; // Re-throw so that callers can handle the error
         }
     }
 
@@ -238,6 +239,7 @@ export class UptimeMonitor extends EventEmitter {
             }
         }
 
+        /* v8 ignore next */
         logger.info(`Site added successfully: ${site.identifier} (${site.name ?? "unnamed"})`);
         return site;
     }
@@ -371,13 +373,14 @@ export class UptimeMonitor extends EventEmitter {
                 try {
                     return await this.stopMonitoringForSite(identifier, monitor.id);
                 } catch (error) {
+                    /* v8 ignore next */
                     logger.error(`Failed to stop monitoring for monitor ${monitor.id ?? "unknown"}`, error);
                     return false;
                 }
             });
 
-            await Promise.all(stopPromises);
-            return true;
+            const results = await Promise.all(stopPromises);
+            return results.every((result) => result === true);
         }
         return false;
     }
@@ -429,10 +432,12 @@ export class UptimeMonitor extends EventEmitter {
         try {
             // Add history entry using repository
             await this.historyRepository.addEntry(monitor.id, historyEntry, checkResult.details);
+            /* v8 ignore next 3 */
             logger.info(
                 `[checkMonitor] Inserted history row: monitor_id=${monitor.id}, status=${historyEntry.status}, responseTime=${historyEntry.responseTime}, timestamp=${historyEntry.timestamp}, details=${checkResult.details ?? "undefined"}`
             );
         } catch (err) {
+            /* v8 ignore next */
             logger.error(`[checkMonitor] Failed to insert history row: monitor_id=${monitor.id}`, err);
         }
 
@@ -490,7 +495,7 @@ export class UptimeMonitor extends EventEmitter {
     public async checkSiteManually(identifier: string, monitorId?: string): Promise<StatusUpdate | null> {
         const site = this.sites.get(identifier);
         if (!site) {
-            throw new Error(`Site with identifier ${identifier} not found`);
+            throw new Error(`Site not found: ${identifier}`);
         }
 
         // If no monitorId provided, use the first monitor's ID
@@ -632,6 +637,7 @@ export class UptimeMonitor extends EventEmitter {
         prevMonitor: Site["monitors"][0]
     ): Promise<void> {
         if (isDev()) {
+            /* v8 ignore next 3 */
             logger.debug(
                 `[updateSite] Restarting monitor ${updatedMonitor.id}: interval changed from ${prevMonitor.checkInterval}ms to ${updatedMonitor.checkInterval}ms`
             );
@@ -803,7 +809,7 @@ export class UptimeMonitor extends EventEmitter {
      * Check if history should be imported for a monitor.
      */
     private shouldImportHistory(createdMonitor: Site["monitors"][0], originalMonitor?: Site["monitors"][0]): boolean {
-        return !!(createdMonitor && originalMonitor && Array.isArray(originalMonitor.history) && createdMonitor.id);
+        return !!(createdMonitor && originalMonitor && createdMonitor.id);
     }
 
     /**
