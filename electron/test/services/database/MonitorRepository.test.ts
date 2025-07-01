@@ -294,6 +294,16 @@ describe("MonitorRepository", () => {
             expect(mockDatabase.run).not.toHaveBeenCalled();
         });
 
+        it("should handle updating monitor type", async () => {
+            const updates: Partial<Site["monitors"][0]> = {
+                type: "port",
+            };
+
+            await monitorRepository.update("1", updates);
+
+            expect(mockDatabase.run).toHaveBeenCalledWith("UPDATE monitors SET type = ? WHERE id = ?", ["port", "1"]);
+        });
+
         it("should handle database errors", async () => {
             const error = new Error("Update failed");
             mockDatabase.run.mockImplementation(() => {
@@ -462,21 +472,102 @@ describe("MonitorRepository", () => {
                 error
             );
         });
+
+        it("should handle case where insertSingleMonitor returns empty ID", async () => {
+            const monitors = [
+                {
+                    id: "temp-1",
+                    type: "http" as const,
+                    url: "https://example.com",
+                    monitoring: true,
+                    status: "pending" as const,
+                    history: [],
+                },
+                {
+                    id: "temp-2",
+                    type: "port" as const,
+                    host: "example.com",
+                    port: 80,
+                    monitoring: false,
+                    status: "pending" as const,
+                    history: [],
+                },
+            ];
+
+            // Mock insertSingleMonitor to return empty string for first, valid ID for second
+            const repository = monitorRepository as any;
+            const originalInsertSingle = repository.insertSingleMonitor;
+            repository.insertSingleMonitor = vi
+                .fn()
+                .mockReturnValueOnce("") // First call returns empty
+                .mockReturnValueOnce("2"); // Second call returns valid ID
+
+            const result = await monitorRepository.bulkCreate("site-1", monitors);
+
+            // Should only contain the monitor with valid ID
+            expect(result).toHaveLength(1);
+            expect(result[0].id).toBe("2");
+
+            // Restore original method
+            repository.insertSingleMonitor = originalInsertSingle;
+        });
+    });
+
+    describe("Private helper methods", () => {
+        it("should test safeNumberConvert with different value types", () => {
+            const repository = new MonitorRepository();
+            // Access private method for testing
+            const safeNumberConvert = (repository as any).safeNumberConvert;
+
+            // Test number input
+            expect(safeNumberConvert(42)).toBe(42);
+
+            // Test string input (value branch)
+            expect(safeNumberConvert("123")).toBe(123);
+
+            // Test empty string (no value branch)
+            expect(safeNumberConvert("")).toBeUndefined();
+
+            // Test null (no value branch)
+            expect(safeNumberConvert(null)).toBeUndefined();
+
+            // Test undefined (no value branch)
+            expect(safeNumberConvert(undefined)).toBeUndefined();
+
+            // Test zero (value branch)
+            expect(safeNumberConvert(0)).toBe(0);
+        });
+
+        it("should test convertDateForDb with different inputs", () => {
+            const repository = new MonitorRepository();
+            const convertDateForDb = (repository as any).convertDateForDb;
+
+            // Test null input
+            expect(convertDateForDb(null)).toBeNull();
+
+            // Test undefined input
+            expect(convertDateForDb(undefined)).toBeNull();
+
+            // Test Date object
+            const date = new Date("2024-01-01T00:00:00.000Z");
+            expect(convertDateForDb(date)).toBe("2024-01-01T00:00:00.000Z");
+
+            // Test string input
+            expect(convertDateForDb("2024-01-01")).toBe("2024-01-01");
+        });
     });
 
     describe("Edge Cases and Error Handling", () => {
         it("should handle update with no fields to update", async () => {
             (isDev as any).mockReturnValue(true);
-            
+
             // Mock monitor with no fields to update (empty partial)
             const monitorUpdate = {};
-            
+
             const result = await monitorRepository.update("monitor-1", monitorUpdate);
-            
+
             expect(result).toBeUndefined();
-            expect(logger.debug).toHaveBeenCalledWith(
-                "[MonitorRepository] No fields to update for monitor: monitor-1"
-            );
+            expect(logger.debug).toHaveBeenCalledWith("[MonitorRepository] No fields to update for monitor: monitor-1");
         });
 
         it("should handle string date values in convertDateForDb", async () => {
@@ -491,7 +582,7 @@ describe("MonitorRepository", () => {
             mockDatabase.get.mockReturnValue({ id: 123 });
 
             await monitorRepository.create("site-1", monitor);
-            
+
             // Verify that the string date was handled properly
             expect(mockDatabase.run).toHaveBeenCalled();
         });
@@ -544,13 +635,13 @@ describe("MonitorRepository", () => {
             mockDatabase.get.mockReturnValue({ id: 123 });
 
             await monitorRepository.create("site-1", monitor);
-            
+
             expect(mockDatabase.run).toHaveBeenCalled();
         });
 
         it("should handle truthy but non-number values in safeNumberConvert", async () => {
             const monitor = {
-                type: "http" as const, 
+                type: "http" as const,
                 url: "https://example.com",
                 status: "pending" as const,
                 history: [],
@@ -561,7 +652,7 @@ describe("MonitorRepository", () => {
             mockDatabase.get.mockReturnValue({ id: 123 });
 
             await monitorRepository.create("site-1", monitor);
-            
+
             expect(mockDatabase.run).toHaveBeenCalled();
         });
     });

@@ -1308,7 +1308,7 @@ describe("UptimeMonitor", () => {
 
             // This should handle the case gracefully
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const result = await (uptimeMonitor).checkMonitor(site, "undefined");
+            const result = await uptimeMonitor.checkMonitor(site, "undefined");
             expect(result).toBeUndefined();
         });
 
@@ -1331,7 +1331,7 @@ describe("UptimeMonitor", () => {
 
             // This should handle the case gracefully
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const result = await (uptimeMonitor).checkMonitor(site, "non-existent");
+            const result = await uptimeMonitor.checkMonitor(site, "non-existent");
             expect(result).toBeUndefined();
         });
 
@@ -1457,7 +1457,7 @@ describe("UptimeMonitor", () => {
 
             // Call the private handleScheduledCheck method
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            await (uptimeMonitor).handleScheduledCheck(identifier, "monitor1");
+            await uptimeMonitor.handleScheduledCheck(identifier, "monitor1");
 
             // Should have called checkMonitor internally
             expect(siteRepoInstance.getByIdentifier).toHaveBeenCalled();
@@ -1466,7 +1466,7 @@ describe("UptimeMonitor", () => {
         it("should handle scheduled checks for non-existent site", async () => {
             // Call the private handleScheduledCheck method with non-existent site
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            await (uptimeMonitor).handleScheduledCheck("non-existent", "monitor1");
+            await uptimeMonitor.handleScheduledCheck("non-existent", "monitor1");
 
             // Should handle gracefully without throwing
         });

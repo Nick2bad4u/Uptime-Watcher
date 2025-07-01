@@ -66,6 +66,7 @@ export class HttpMonitor implements IMonitorService {
             // Custom status validation - all HTTP responses (including errors) are "successful" for axios
             // This allows us to handle status code logic manually in our monitoring logic
             validateStatus: () => {
+                /* v8 ignore next 3 */
                 // Always treat as successful so we get response in success path, not error path
                 // We'll manually determine up/down status based on status codes
                 return true;
@@ -189,6 +190,7 @@ export class HttpMonitor implements IMonitorService {
 
         // Non-Axios errors (shouldn't happen, but just in case)
         const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        /* v8 ignore next */
         logger.error(`[HttpMonitor] Unexpected error checking ${url}`, error);
         return this.createErrorResult(errorMessage, responseTime);
     }

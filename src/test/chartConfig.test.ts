@@ -198,7 +198,9 @@ describe("ChartConfigService", () => {
             expect((config.plugins?.title?.font as any)?.family).toBe(mockTheme.typography.fontFamily.sans.join(", "));
             expect((config.plugins?.title?.font as any)?.size).toBe(16);
             expect((config.plugins?.title?.font as any)?.weight).toBe("bold");
-            expect((config.plugins?.legend?.labels?.font as any)?.family).toBe(mockTheme.typography.fontFamily.sans.join(", "));
+            expect((config.plugins?.legend?.labels?.font as any)?.family).toBe(
+                mockTheme.typography.fontFamily.sans.join(", ")
+            );
             expect((config.plugins?.legend?.labels?.font as any)?.size).toBe(12);
         });
     });
@@ -244,7 +246,9 @@ describe("ChartConfigService", () => {
             const config = chartService.getBarChartConfig();
 
             expect((config.plugins?.title?.font as any)?.family).toBe(mockTheme.typography.fontFamily.sans.join(", "));
-            expect((config.scales?.y?.title?.font as any)?.family).toBe(mockTheme.typography.fontFamily.sans.join(", "));
+            expect((config.scales?.y?.title?.font as any)?.family).toBe(
+                mockTheme.typography.fontFamily.sans.join(", ")
+            );
         });
     });
 
@@ -316,7 +320,9 @@ describe("ChartConfigService", () => {
             const config = chartService.getDoughnutChartConfig(100);
 
             expect((config.plugins?.title?.font as any)?.family).toBe(mockTheme.typography.fontFamily.sans.join(", "));
-            expect((config.plugins?.legend?.labels?.font as any)?.family).toBe(mockTheme.typography.fontFamily.sans.join(", "));
+            expect((config.plugins?.legend?.labels?.font as any)?.family).toBe(
+                mockTheme.typography.fontFamily.sans.join(", ")
+            );
         });
     });
 

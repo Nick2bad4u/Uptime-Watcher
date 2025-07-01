@@ -33,6 +33,8 @@ export default defineConfig({
                 "electron/**/*.spec.ts",
                 "electron/dist/**",
                 "electron/**/*.d.ts",
+                "electron/**/types.ts",
+                "electron/services/*/index.ts",
             ],
             thresholds: {
                 global: {

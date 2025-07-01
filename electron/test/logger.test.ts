@@ -115,6 +115,14 @@ describe("Logger Utilities", () => {
 
             expect(log.debug).toHaveBeenCalledWith("[DB] SQL query executed", { query: "SELECT * FROM sites" });
         });
+
+        it("should handle non-Error objects in dbLogger.error", () => {
+            const nonError = { message: "Not an error object", code: 500 };
+
+            dbLogger.error("Database operation failed", nonError);
+
+            expect(log.error).toHaveBeenCalledWith("[DB] Database operation failed", nonError);
+        });
     });
 
     describe("Monitor Logger", () => {
@@ -146,6 +154,14 @@ describe("Logger Utilities", () => {
             monitorLogger.warn("Slow response time detected", { responseTime: 5000 });
 
             expect(log.warn).toHaveBeenCalledWith("[MONITOR] Slow response time detected", { responseTime: 5000 });
+        });
+
+        it("should handle non-Error objects in monitorLogger.error", () => {
+            const nonError = { status: "timeout", details: "Request timed out" };
+
+            monitorLogger.error("Monitor check failed", nonError);
+
+            expect(log.error).toHaveBeenCalledWith("[MONITOR] Monitor check failed", nonError);
         });
     });
 

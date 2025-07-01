@@ -13,7 +13,7 @@ describe("Monitoring Types", () => {
             const result: MonitorCheckResult = {
                 status: "up",
                 responseTime: 150,
-                details: "Connection successful"
+                details: "Connection successful",
             };
 
             expect(result.status).toBe("up");
@@ -25,7 +25,7 @@ describe("Monitoring Types", () => {
             const result: MonitorCheckResult = {
                 status: "down",
                 responseTime: 0,
-                error: "Connection timeout"
+                error: "Connection timeout",
             };
 
             expect(result.status).toBe("down");
@@ -36,7 +36,7 @@ describe("Monitoring Types", () => {
         it("should allow minimal check result", () => {
             const result: MonitorCheckResult = {
                 status: "up",
-                responseTime: 100
+                responseTime: 100,
             };
 
             expect(result.status).toBe("up");
@@ -50,7 +50,7 @@ describe("Monitoring Types", () => {
         it("should validate config with all properties", () => {
             const config: MonitorConfig = {
                 timeout: 5000,
-                userAgent: "UptimeWatcher/1.0"
+                userAgent: "UptimeWatcher/1.0",
             };
 
             expect(config.timeout).toBe(5000);
@@ -72,12 +72,12 @@ describe("Monitoring Types", () => {
                 async check(monitor) {
                     return {
                         status: "up",
-                        responseTime: 100
+                        responseTime: 100,
                     };
                 },
                 getType() {
                     return "http";
-                }
+                },
             };
 
             expect(typeof mockService.check).toBe("function");
@@ -90,19 +90,19 @@ describe("Monitoring Types", () => {
                 async check(monitor) {
                     return {
                         status: "up",
-                        responseTime: 150
+                        responseTime: 150,
                     };
                 },
                 getType() {
                     return "port";
-                }
+                },
             };
 
             const mockMonitor = {
                 id: "test",
                 type: "port" as const,
                 status: "pending" as const,
-                history: []
+                history: [],
             };
 
             const result = await mockService.check(mockMonitor);
