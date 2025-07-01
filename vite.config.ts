@@ -3,9 +3,9 @@
  * Configures React frontend build and Electron main/preload process compilation.
  */
 
-import path from "path";
-// eslint-disable-next-line perfectionist/sort-imports
+import { codecovVitePlugin } from "@codecov/vite-plugin";
 import react from "@vitejs/plugin-react";
+import path from "path";
 import electron from "vite-plugin-electron";
 import { ViteMcp } from "vite-plugin-mcp";
 import { viteStaticCopy } from "vite-plugin-static-copy";
@@ -63,6 +63,12 @@ export default defineConfig({
                     src: "node_modules/node-sqlite3-wasm/dist/node-sqlite3-wasm.wasm",
                 },
             ],
+        }),
+        // Put the Codecov vite plugin after all other plugins
+        codecovVitePlugin({
+            bundleName: "uptime-watcher",
+            enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
+            uploadToken: process.env.CODECOV_TOKEN,
         }),
     ],
     resolve: {
