@@ -20,6 +20,7 @@ Requirements:
 - Test keyboard navigation and focus management
 
 Testing Patterns:
+
 - Use screen queries (getByRole, getByLabelText, etc.)
 - Test user behavior, not implementation details
 - Use userEvent for realistic user interactions
@@ -28,6 +29,7 @@ Testing Patterns:
 - Test theme and styling variations
 
 Focus Areas:
+
 - Component mounting and unmounting
 - Props validation and default values
 - State management and updates
@@ -39,6 +41,7 @@ Focus Areas:
 - Accessibility compliance (ARIA labels, roles)
 
 Mock Strategy:
+
 - Mock custom hooks (useSite, useSiteActions, etc.)
 - Mock Electron IPC calls
 - Mock router navigation
@@ -47,6 +50,7 @@ Mock Strategy:
 - Use MSW for API mocking if needed
 
 Accessibility Testing:
+
 - Test keyboard navigation
 - Verify ARIA attributes
 - Test screen reader compatibility
@@ -54,6 +58,7 @@ Accessibility Testing:
 - Test focus management
 
 Follow project conventions:
+
 - Use existing test setup from src/test/
 - Import testing utilities from project setup
 - Match component file structure

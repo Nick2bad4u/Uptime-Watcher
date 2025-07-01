@@ -11,7 +11,7 @@ describe("Electron Types", () => {
     describe("MonitorType", () => {
         it("should only allow valid monitor types", () => {
             const validTypes: MonitorType[] = ["http", "port"];
-            
+
             for (const type of validTypes) {
                 expect(["http", "port"]).toContain(type);
             }
@@ -80,7 +80,7 @@ describe("Electron Types", () => {
 
         it("should validate monitor status values", () => {
             const validStatuses = ["up", "down", "pending"];
-            
+
             for (const status of validStatuses) {
                 const monitor: Monitor = {
                     id: "status-test",
@@ -88,7 +88,7 @@ describe("Electron Types", () => {
                     status: status as Monitor["status"],
                     history: [],
                 };
-                
+
                 expect(["up", "down", "pending"]).toContain(monitor.status);
             }
         });
@@ -177,14 +177,14 @@ describe("Electron Types", () => {
 
         it("should validate status history status values", () => {
             const validStatuses = ["up", "down"];
-            
+
             for (const status of validStatuses) {
                 const history: StatusHistory = {
                     timestamp: Date.now(),
                     status: status as StatusHistory["status"],
                     responseTime: 100,
                 };
-                
+
                 expect(["up", "down"]).toContain(history.status);
             }
         });
@@ -228,7 +228,7 @@ describe("Electron Types", () => {
                 history: [],
                 url: "https://example.com",
             };
-            
+
             expect(httpMonitor.type).toBe("http");
             expect(httpMonitor.url).toBeDefined();
 
@@ -241,7 +241,7 @@ describe("Electron Types", () => {
                 host: "example.com",
                 port: 80,
             };
-            
+
             expect(portMonitor.type).toBe("port");
             expect(portMonitor.host).toBeDefined();
             expect(portMonitor.port).toBeDefined();

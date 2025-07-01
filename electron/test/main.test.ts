@@ -23,7 +23,7 @@ describe("Electron Main Process", () => {
 
     beforeEach(() => {
         vi.resetModules();
-        
+
         // Create fresh mocks
         ApplicationService = vi.fn(() => ({
             cleanup: vi.fn(),
@@ -73,13 +73,13 @@ describe("Electron Main Process", () => {
     describe("Application Initialization", () => {
         it("should initialize electron-log configuration", async () => {
             await import("../main");
-            
+
             expect(log.initialize).toHaveBeenCalledWith({ preload: true });
         });
 
         it("should configure log transports correctly", async () => {
             await import("../main");
-            
+
             expect(log.transports.file.level).toBe("info");
             expect(log.transports.console.level).toBe("debug");
             expect(log.transports.file.fileName).toBe("uptime-watcher-main.log");
@@ -88,21 +88,21 @@ describe("Electron Main Process", () => {
 
         it("should set correct log formats", async () => {
             await import("../main");
-            
+
             expect(log.transports.file.format).toBe("[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}");
             expect(log.transports.console.format).toBe("[{h}:{i}:{s}.{ms}] [{level}] {text}");
         });
 
         it("should create ApplicationService instance", async () => {
             await import("../main");
-            
+
             expect(ApplicationService).toHaveBeenCalledTimes(1);
             expect(ApplicationService).toHaveBeenCalledWith();
         });
 
         it("should log application startup", async () => {
             await import("../main");
-            
+
             expect(logger.info).toHaveBeenCalledWith("Starting Uptime Watcher application");
         });
     });
@@ -110,39 +110,41 @@ describe("Electron Main Process", () => {
     describe("Process Event Handlers", () => {
         it("should setup before-exit event handler", async () => {
             const mockOn = vi.spyOn(process, "on");
-            
+
             await import("../main");
-            
+
             expect(mockOn).toHaveBeenCalledWith("before-exit", expect.any(Function));
-            
+
             mockOn.mockRestore();
         });
 
         it("should call cleanup on before-exit", async () => {
             const mockCleanup = vi.fn();
-            
+
             // Update ApplicationService mock to return cleanup function
             ApplicationService.mockReturnValue({
                 cleanup: mockCleanup,
                 initialize: vi.fn(() => Promise.resolve()),
             });
-            
+
             // Setup process event spy
-            const mockOn = vi.spyOn(process, "on").mockImplementation((event: string | symbol, callback: (...args: unknown[]) => void) => {
-                if (event === "before-exit") {
-                    // Simulate the event being fired
-                    setImmediate(() => callback());
-                }
-                return process;
-            });
-            
+            const mockOn = vi
+                .spyOn(process, "on")
+                .mockImplementation((event: string | symbol, callback: (...args: unknown[]) => void) => {
+                    if (event === "before-exit") {
+                        // Simulate the event being fired
+                        setImmediate(() => callback());
+                    }
+                    return process;
+                });
+
             await import("../main");
-            
+
             // Wait for the callback to be executed
-            await new Promise(resolve => setImmediate(resolve));
-            
+            await new Promise((resolve) => setImmediate(resolve));
+
             expect(mockCleanup).toHaveBeenCalledTimes(1);
-            
+
             mockOn.mockRestore();
         });
     });
@@ -153,9 +155,9 @@ describe("Electron Main Process", () => {
             // by checking that its dependencies are called
             const { ApplicationService } = await import("../services/application");
             const { logger } = await import("../utils/logger");
-            
+
             await import("../main");
-            
+
             expect(ApplicationService).toHaveBeenCalled();
             expect(logger.info).toHaveBeenCalled();
         });
@@ -164,9 +166,9 @@ describe("Electron Main Process", () => {
             // The Main class instance should be created and kept alive
             // This is important to prevent garbage collection
             const { ApplicationService } = await import("../services/application");
-            
+
             await import("../main");
-            
+
             // Verify the constructor was called (instance was created)
             expect(ApplicationService).toHaveBeenCalledTimes(1);
         });
@@ -176,11 +178,11 @@ describe("Electron Main Process", () => {
         it("should handle ApplicationService initialization errors", async () => {
             const { ApplicationService } = await import("../services/application");
             const mockError = new Error("Service initialization failed");
-            
+
             ApplicationService.mockImplementation(() => {
                 throw mockError;
             });
-            
+
             // The main module will throw when ApplicationService fails
             await expect(import("../main")).rejects.toThrow("Service initialization failed");
         });
@@ -190,7 +192,7 @@ describe("Electron Main Process", () => {
             logger.info.mockImplementation(() => {
                 throw new Error("Logger failed");
             });
-            
+
             // The main module will throw when logger fails
             await expect(import("../main")).rejects.toThrow("Logger failed");
         });
@@ -201,9 +203,9 @@ describe("Electron Main Process", () => {
             const log = await import("electron-log/main");
             const { ApplicationService } = await import("../services/application");
             const { logger } = await import("../utils/logger");
-            
+
             await import("../main");
-            
+
             // Verify initialization order
             expect(log.default.initialize).toHaveBeenCalled();
             expect(logger.info).toHaveBeenCalledWith("Starting Uptime Watcher application");
@@ -212,9 +214,9 @@ describe("Electron Main Process", () => {
 
         it("should have proper dependency relationships", async () => {
             const { ApplicationService } = await import("../services/application");
-            
+
             await import("../main");
-            
+
             // ApplicationService should be instantiated with no arguments
             expect(ApplicationService).toHaveBeenCalledWith();
         });
@@ -223,9 +225,9 @@ describe("Electron Main Process", () => {
     describe("Configuration Values", () => {
         it("should use production-ready log file size limit", async () => {
             const log = await import("electron-log/main");
-            
+
             await import("../main");
-            
+
             // 5MB should be reasonable for production
             expect(log.default.transports.file.maxSize).toBe(5 * 1024 * 1024);
             expect(log.default.transports.file.maxSize).toBeGreaterThan(1024 * 1024); // At least 1MB
@@ -234,9 +236,9 @@ describe("Electron Main Process", () => {
 
         it("should use appropriate log levels", async () => {
             const log = await import("electron-log/main");
-            
+
             await import("../main");
-            
+
             expect(log.default.transports.file.level).toBe("info");
             expect(log.default.transports.console.level).toBe("debug");
         });

@@ -10,7 +10,7 @@ describe("Electron Utils", () => {
         it("should detect development mode from NODE_ENV", async () => {
             // Mock NODE_ENV as development
             vi.stubEnv("NODE_ENV", "development");
-            
+
             // Mock electron app.isPackaged as true (but NODE_ENV should take precedence)
             vi.doMock("electron", () => ({
                 app: { isPackaged: true },
@@ -23,7 +23,7 @@ describe("Electron Utils", () => {
         it("should detect production mode from NODE_ENV", async () => {
             // Mock NODE_ENV as production
             vi.stubEnv("NODE_ENV", "production");
-            
+
             // Mock electron app.isPackaged as false (but NODE_ENV should take precedence)
             vi.doMock("electron", () => ({
                 app: { isPackaged: false },
@@ -38,7 +38,7 @@ describe("Electron Utils", () => {
         it("should detect development mode from app.isPackaged when NODE_ENV is undefined", async () => {
             // Clear NODE_ENV
             vi.stubEnv("NODE_ENV", undefined);
-            
+
             // Mock electron app.isPackaged as false (development)
             vi.doMock("electron", () => ({
                 app: { isPackaged: false },
@@ -52,7 +52,7 @@ describe("Electron Utils", () => {
         it("should detect production mode from app.isPackaged when NODE_ENV is undefined", async () => {
             // Clear NODE_ENV
             vi.stubEnv("NODE_ENV", undefined);
-            
+
             // Mock electron app.isPackaged as true (production)
             vi.doMock("electron", () => ({
                 app: { isPackaged: true },
@@ -94,7 +94,7 @@ describe("Electron Utils", () => {
             vi.resetModules();
             const { isDev } = await import("../utils");
             const result = isDev();
-            
+
             expect(typeof result).toBe("boolean");
             expect(result === true || result === false).toBe(true);
         });
@@ -107,11 +107,11 @@ describe("Electron Utils", () => {
 
             vi.resetModules();
             const { isDev } = await import("../utils");
-            
+
             const firstCall = isDev();
             const secondCall = isDev();
             const thirdCall = isDev();
-            
+
             expect(firstCall).toBe(secondCall);
             expect(secondCall).toBe(thirdCall);
         });
@@ -126,7 +126,7 @@ describe("Electron Utils", () => {
 
             vi.resetModules();
             const { isDev } = await import("../utils");
-            
+
             // Test the example from the documentation
             if (isDev()) {
                 expect(true).toBe(true); // Development mode detected
@@ -144,7 +144,7 @@ describe("Electron Utils", () => {
             }));
 
             vi.resetModules();
-            
+
             // Should not throw an error
             expect(async () => {
                 const { isDev } = await import("../utils");
@@ -159,7 +159,7 @@ describe("Electron Utils", () => {
             }));
 
             vi.resetModules();
-            
+
             // Should not throw an error and default to development
             const { isDev } = await import("../utils");
             expect(isDev()).toBe(true); // Should default to development when isPackaged is undefined
@@ -180,7 +180,7 @@ describe("Electron Utils", () => {
 
             vi.resetModules();
             const { isDev } = await import("../utils");
-            
+
             expect(typeof isDev).toBe("function");
             expect(typeof isDev()).toBe("boolean");
         });

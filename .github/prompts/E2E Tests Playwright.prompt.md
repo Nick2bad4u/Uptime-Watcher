@@ -20,6 +20,7 @@ Requirements:
 - Test data persistence across sessions
 
 User Workflows to Test:
+
 - Site creation and management
 - Monitor configuration and monitoring
 - Dashboard navigation and interactions
@@ -30,6 +31,7 @@ User Workflows to Test:
 - Search and filtering operations
 
 Focus Areas:
+
 - Page load and navigation
 - Form interactions and validation
 - Modal dialogs and overlays
@@ -40,6 +42,7 @@ Focus Areas:
 - Context menus and tooltips
 
 Test Structure:
+
 - Group tests by user journey
 - Use Page Object Model pattern
 - Include setup and cleanup procedures
@@ -49,6 +52,7 @@ Test Structure:
 - Test offline/network error scenarios
 
 Performance Testing:
+
 - Page load times
 - Large dataset handling
 - Memory usage monitoring
@@ -56,6 +60,7 @@ Performance Testing:
 - Chart rendering performance
 
 Visual Testing:
+
 - Screenshot comparisons
 - Layout consistency
 - Theme switching
@@ -63,6 +68,7 @@ Visual Testing:
 - Dark/light mode variations
 
 Environment Setup:
+
 - Test against built Electron app
 - Include database seeding
 - Mock external services

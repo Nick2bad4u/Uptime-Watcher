@@ -18,6 +18,7 @@ Requirements:
 - Follow project hook conventions
 
 Hook Structure:
+
 - Return object with clear property names
 - Include loading, error, and data states
 - Provide methods for actions (refresh, reset, etc.)
@@ -26,6 +27,7 @@ Hook Structure:
 - Use useCallback and useMemo for optimization
 
 Features to Include:
+
 - Input validation and sanitization
 - Error boundary integration
 - Retry mechanisms for failed operations
@@ -35,6 +37,7 @@ Features to Include:
 - TypeScript generics for reusability
 
 Testing Requirements:
+
 - Test hook in isolation using @testing-library/react-hooks
 - Test all return values and their updates
 - Test error scenarios and recovery
@@ -45,6 +48,7 @@ Testing Requirements:
 - Test concurrent usage scenarios
 
 Integration:
+
 - Work with existing Zustand store
 - Compatible with project's Electron IPC
 - Follow theme and styling patterns
@@ -52,6 +56,7 @@ Integration:
 - Support project's logging system
 
 Documentation:
+
 - Include usage examples in JSDoc
 - Document all parameters and return values
 - Explain error handling approach
@@ -59,6 +64,7 @@ Documentation:
 - Document performance considerations
 
 File Structure:
+
 - Place in appropriate hooks directory
 - Include index.ts export
 - Create accompanying test file

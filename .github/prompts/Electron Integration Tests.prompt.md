@@ -1,6 +1,6 @@
 ---
 mode: "agent"
-tools: ["All Tools"]  
+tools: ["All Tools"]
 description: "Generate integration tests for Electron main process"
 ---
 
@@ -20,6 +20,7 @@ Requirements:
 - Include performance and memory leak tests
 
 Focus Areas:
+
 - Service initialization and configuration
 - Database operations (CRUD, transactions)
 - IPC message handling and responses
@@ -30,6 +31,7 @@ Focus Areas:
 - Cross-platform compatibility
 
 Mock Requirements:
+
 - Mock Electron BrowserWindow and app modules
 - Mock database connections and queries
 - Mock network requests and responses
@@ -37,6 +39,7 @@ Mock Requirements:
 - Create realistic test data fixtures
 
 Test Structure:
+
 - Group tests by service functionality
 - Use descriptive test suite names
 - Include setup/teardown for each test group

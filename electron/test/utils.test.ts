@@ -63,7 +63,7 @@ describe("Electron Main Process", () => {
     it("should create browser window", async () => {
         const { BrowserWindow } = await import("electron");
         const window = new BrowserWindow();
-        
+
         expect(window).toBeDefined();
         expect(window.loadFile).toBeDefined();
         expect(window.webContents.send).toBeDefined();

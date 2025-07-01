@@ -149,13 +149,13 @@ export default [
     {
         files: ["**/*.js"],
         ignores: [
-            "tests/**", 
-            "**/__tests__/**", 
-            "**/*.test.js", 
+            "tests/**",
+            "**/__tests__/**",
+            "**/*.test.js",
             "**/*.spec.js",
             "vitest*.js",
             "electron/test/**/*.js",
-            "src/test/**/*.js"
+            "src/test/**/*.js",
         ],
         languageOptions: {
             sourceType: "script",
@@ -287,13 +287,13 @@ export default [
     {
         files: ["**/*.ts", "**/*.tsx"],
         ignores: [
-            "tests/**", 
-            "**/__tests__/**", 
-            "**/*.test.{ts,tsx}", 
+            "tests/**",
+            "**/__tests__/**",
+            "**/*.test.{ts,tsx}",
             "**/*.spec.{ts,tsx}",
             "vitest*.ts",
             "electron/test/**/*.ts",
-            "src/test/**/*.ts"
+            "src/test/**/*.ts",
         ],
         languageOptions: {
             parser: tseslint.parser,
@@ -443,13 +443,13 @@ export default [
     // Testing files
     {
         files: [
-            "tests/**", 
-            "**/__tests__/**", 
-            "**/*.test.{js,ts,jsx,tsx}", 
+            "tests/**",
+            "**/__tests__/**",
+            "**/*.test.{js,ts,jsx,tsx}",
             "**/*.spec.{js,ts,jsx,tsx}",
             "vitest*.{js,ts}",
             "electron/test/**/*.ts",
-            "src/test/**/*.ts"
+            "src/test/**/*.ts",
         ],
         plugins: {
             vitest,
@@ -471,12 +471,12 @@ export default [
 
     {
         files: [
-            "**/__tests__/*.{j,t}s?(x)", 
-            "**/*.spec.{j,t}s?(x)", 
+            "**/__tests__/*.{j,t}s?(x)",
+            "**/*.spec.{j,t}s?(x)",
             "tests/**/*",
             "vitest*.{j,t}s",
             "electron/test/**/*.{j,t}s",
-            "src/test/**/*.{j,t}s"
+            "src/test/**/*.{j,t}s",
         ],
         plugins: {
             "vitest-globals": vitestGlobals,

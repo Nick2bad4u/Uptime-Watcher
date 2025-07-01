@@ -22,8 +22,9 @@ Requirements:
 - Include JSDoc comments explaining complex test scenarios
 
 Test Categories:
+
 - Happy path scenarios
-- Error conditions and edge cases  
+- Error conditions and edge cases
 - Input validation
 - State management
 - Event handling
@@ -32,6 +33,7 @@ Test Categories:
 - Performance considerations
 
 Mock Strategy:
+
 - Use vi.mock() for external modules
 - Create reusable mock instances
 - Mock only what's necessary
@@ -39,6 +41,7 @@ Mock Strategy:
 - Reset mocks between tests
 
 Follow project conventions:
+
 - Use existing test utilities and setup files
 - Match the project's assertion style
 - Include proper TypeScript types for test data

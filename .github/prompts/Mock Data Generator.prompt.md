@@ -18,6 +18,7 @@ Requirements:
 - Include internationalization test data
 
 Data Categories:
+
 - Site monitoring data (uptime, response times, history)
 - User interface states and configurations
 - Network monitoring results and errors
@@ -27,6 +28,7 @@ Data Categories:
 - Error scenarios and edge cases
 
 Mock Data Features:
+
 - Realistic domain names and URLs
 - Varied response times and status codes
 - Historical data with trends
@@ -36,6 +38,7 @@ Mock Data Features:
 - Error conditions and recovery scenarios
 
 Factory Functions:
+
 - createMockSite(overrides?: Partial<Site>)
 - createMockMonitor(type: MonitorType, overrides?)
 - createMockHistory(count: number, trend?: 'up' | 'down' | 'mixed')
@@ -43,6 +46,7 @@ Factory Functions:
 - createMockError(type: ErrorType, details?)
 
 Data Validation:
+
 - Ensure data follows project schemas
 - Include proper TypeScript types
 - Validate against real API contracts
@@ -50,6 +54,7 @@ Data Validation:
 - Include proper error object structures
 
 File Organization:
+
 - Group by domain/feature area
 - Create index files for easy imports
 - Include data seeding utilities
@@ -57,6 +62,7 @@ File Organization:
 - Include documentation and examples
 
 Integration:
+
 - Compatible with Vitest testing framework
 - Work with MSW for API mocking
 - Support database seeding
@@ -64,6 +70,7 @@ Integration:
 - Support component prop mocking
 
 Performance:
+
 - Lazy loading for large datasets
 - Memory-efficient data generation
 - Support streaming for large volumes

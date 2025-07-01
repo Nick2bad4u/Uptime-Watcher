@@ -7,6 +7,7 @@ description: "Fix failing tests and improve test coverage"
 Fix failing tests and improve coverage for: ${input:testFile}
 
 Current Issues to Address:
+
 - Failing test cases and error messages
 - Low test coverage areas
 - Flaky or unreliable tests
@@ -15,6 +16,7 @@ Current Issues to Address:
 - Performance issues in test execution
 
 Analysis Required:
+
 - Review test failure logs and error messages
 - Identify missing test scenarios
 - Check mock accuracy against real implementations
@@ -23,6 +25,7 @@ Analysis Required:
 - Identify brittle test patterns
 
 Fixes to Implement:
+
 - Update failing assertions and expectations
 - Fix mock configurations and return values
 - Add missing test cases for uncovered code paths
@@ -32,6 +35,7 @@ Fixes to Implement:
 - Improve error handling test coverage
 
 Coverage Improvements:
+
 - Add tests for error conditions
 - Test edge cases and boundary values
 - Include integration test scenarios
@@ -41,6 +45,7 @@ Coverage Improvements:
 - Test cross-browser compatibility
 
 Mock Improvements:
+
 - Ensure mocks match real API responses
 - Add realistic error scenarios
 - Include proper async behavior simulation
@@ -49,6 +54,7 @@ Mock Improvements:
 - Add proper cleanup procedures
 
 Test Quality:
+
 - Make tests deterministic and reliable
 - Improve test isolation
 - Add proper setup and teardown
@@ -57,6 +63,7 @@ Test Quality:
 - Add documentation for complex test scenarios
 
 Performance Optimization:
+
 - Reduce test execution time
 - Optimize mock creation
 - Minimize test data setup
@@ -64,6 +71,7 @@ Performance Optimization:
 - Reduce memory usage in tests
 
 Debugging Support:
+
 - Add detailed error messages
 - Include test debugging utilities
 - Improve test failure reporting
