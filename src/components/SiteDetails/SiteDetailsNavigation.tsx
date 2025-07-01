@@ -267,26 +267,25 @@ export function SiteDetailsNavigation({
                 </div>
             </div>
             {/* Time Range Selector for Analytics Tab */}
-            {activeSiteDetailsTab === `${selectedMonitorId}-analytics` &&
-                (selectedMonitorId === "http" || selectedMonitorId === "port") && (
-                    <div className="flex flex-wrap items-center gap-3 mt-4">
-                        <ThemedText size="sm" variant="secondary" className="mr-2">
-                            Time Range:
-                        </ThemedText>
-                        <div className="flex flex-wrap gap-1">
-                            {(["1h", "24h", "7d", "30d"] as const).map((range) => (
-                                <ThemedButton
-                                    key={range}
-                                    variant={siteDetailsChartTimeRange === range ? "primary" : "ghost"}
-                                    size="xs"
-                                    onClick={() => setSiteDetailsChartTimeRange(range)}
-                                >
-                                    {range}
-                                </ThemedButton>
-                            ))}
-                        </div>
+            {activeSiteDetailsTab === `${selectedMonitorId}-analytics` && (
+                <div className="flex flex-wrap items-center gap-3 mt-4">
+                    <ThemedText size="sm" variant="secondary" className="mr-2">
+                        Time Range:
+                    </ThemedText>
+                    <div className="flex flex-wrap gap-1">
+                        {(["1h", "24h", "7d", "30d"] as const).map((range) => (
+                            <ThemedButton
+                                key={range}
+                                variant={siteDetailsChartTimeRange === range ? "primary" : "ghost"}
+                                size="xs"
+                                onClick={() => setSiteDetailsChartTimeRange(range)}
+                            >
+                                {range}
+                            </ThemedButton>
+                        ))}
                     </div>
-                )}
+                </div>
+            )}
         </ThemedBox>
     );
 }
