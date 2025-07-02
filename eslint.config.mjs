@@ -85,6 +85,10 @@ export default [
             "**/docs/**",
             "Docs/",
             "docs/",
+            "Coverage/",
+            "coverage/",
+            "coverage",
+            "coverage/**",
         ],
     },
 
@@ -466,6 +470,8 @@ export default [
             "testing-library/prefer-screen-queries": "warn",
             "testing-library/prefer-user-event": "warn",
             "testing-library/render-result-naming-convention": "warn",
+
+            ...(vitestGlobals.configs.recommended.rules || {}),
         },
     },
 
@@ -481,12 +487,12 @@ export default [
         plugins: {
             "vitest-globals": vitestGlobals,
         },
-        extends: [vitestGlobals.configs.recommended],
         languageOptions: {
-            env: {
-                "vitest-globals/env": true,
-            },
+            // Removed 'env' key as it's not allowed here
+            // If you need globals, set them directly:
+            // globals: { ... }
         },
+        // Remove 'extends' and spread the recommended config directly
     },
 
     // Global browser variables
