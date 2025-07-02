@@ -239,10 +239,10 @@ describe("SiteDetails Tabs Index Module", () => {
             
             // Test that components can be called (they're functions)
             expect(() => {
-                const result1 = (AnalyticsTab as () => string)();
-                const result2 = (HistoryTab as () => string)();
-                const result3 = (OverviewTab as () => string)();
-                const result4 = (SettingsTab as () => string)();
+                const result1 = (AnalyticsTab as unknown as () => string)();
+                const result2 = (HistoryTab as unknown as () => string)();
+                const result3 = (OverviewTab as unknown as () => string)();
+                const result4 = (SettingsTab as unknown as () => string)();
                 
                 expect(result1).toBe("AnalyticsTab");
                 expect(result2).toBe("HistoryTab");
