@@ -9,12 +9,13 @@ This project uses Vitest for testing with separate configurations for frontend (
 The project has two separate Vitest configurations:
 
 1. **Frontend Tests** (`vite.config.ts`):
+
    - Tests React components in `src/` directory
    - Uses jsdom environment
    - Coverage reports to `./coverage/`
 
 2. **Backend Tests** (`vitest.electron.config.ts`):
-   - Tests Electron main process code in `electron/` directory  
+   - Tests Electron main process code in `electron/` directory
    - Uses Node.js environment
    - Coverage reports to `./coverage/electron/`
 
@@ -51,7 +52,7 @@ npm run test
 # Run frontend tests with coverage
 npm run test:coverage
 
-# Run electron tests only  
+# Run electron tests only
 npm run test:electron
 
 # Run electron tests with coverage
@@ -66,7 +67,7 @@ npm run test:codecov
 
 # Interactive testing
 npm run test:ui                    # Frontend tests UI
-npm run test:electron:ui           # Electron tests UI  
+npm run test:electron:ui           # Electron tests UI
 npm run test:watch                 # Frontend tests in watch mode
 npm run test:electron:watch        # Electron tests in watch mode
 ```
