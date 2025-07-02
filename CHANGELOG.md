@@ -7,14 +7,146 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[d18778a](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d18778a5d7752d9b13ba2131e7f2bd5d276a6327)...
-[d18778a](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d18778a5d7752d9b13ba2131e7f2bd5d276a6327)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/d18778a5d7752d9b13ba2131e7f2bd5d276a6327...d18778a5d7752d9b13ba2131e7f2bd5d276a6327))
+[[b68a3e7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b68a3e7b6cf85c578d20bc3d531ecd9d2321e115)...
+[0c2e4a0](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0c2e4a02b4fd173c624f0c60978c4b6c3e3422e7)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/b68a3e7b6cf85c578d20bc3d531ecd9d2321e115...0c2e4a02b4fd173c624f0c60978c4b6c3e3422e7))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 4.2.0 [`(559383d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/559383df8c7ef68381de8d7177f7078ed450f329)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(0c2e4a0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0c2e4a02b4fd173c624f0c60978c4b6c3e3422e7)
+
+
+
+### 👷 CI/CD
+
+- 👷 [ci] Simplify Codecov upload and test result steps
+
+- Removes unnecessary 'directory', 'exclude', and 'disable_search' parameters from Codecov actions to streamline workflow configuration
+- Ensures clearer and more maintainable CI setup by relying on default Codecov behaviors [`(b68a3e7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b68a3e7b6cf85c578d20bc3d531ecd9d2321e115)
+
+
+
+
+
+
+## [4.2.0] - 2025-07-02
+
+
+[[5af2c21](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5af2c21dfa51c163c31a0232af8cc195ef192812)...
+[cdfe9a7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cdfe9a7050dc795a6c291b3726dbb10463c140b7)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/5af2c21dfa51c163c31a0232af8cc195ef192812...cdfe9a7050dc795a6c291b3726dbb10463c140b7))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 4.1.0 [`(1fd0cdb)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1fd0cdb931ab91879d28ffe2a506467258486253)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(cdfe9a7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cdfe9a7050dc795a6c291b3726dbb10463c140b7)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Improve test coverage for settings and site details
+
+- Expands test coverage for settings validation, loading state cleanup, and edge cases in site details logic.
+- Adds tests for non-Error exception handling, input sanitization, and conversion logic to ensure robustness.
+- Removes redundant option from code coverage configuration for cleaner CI output. [`(5af2c21)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5af2c21dfa51c163c31a0232af8cc195ef192812)
+
+
+
+
+
+
+## [4.1.0] - 2025-07-02
+
+
+[[222632a](https://github.com/Nick2bad4u/Uptime-Watcher/commit/222632a6ff1348845dc5b73e6ce201642afb56f9)...
+[d9b3bc3](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d9b3bc33baea0b5784a38d7fd666302897a16788)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/222632a6ff1348845dc5b73e6ce201642afb56f9...d9b3bc33baea0b5784a38d7fd666302897a16788))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 4.0.0 [`(d18778a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d18778a5d7752d9b13ba2131e7f2bd5d276a6327)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(d9b3bc3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d9b3bc33baea0b5784a38d7fd666302897a16788)
+
+
+
+### 💼 Other
+
+- Update metrics.repository.svg - [Skip GitHub Action] [`(79f648b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/79f648b43905d49f70c8f32d0400d2c526f99ae4)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Extract duration calculation to shared utility
+
+- Moves monitoring duration logic from component to a reusable utility module to improve code reuse and maintainability.
+- Updates workflow steps to continue on error and consistently use Codecov token as an environment variable for more robust CI reporting. [`(222632a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/222632a6ff1348845dc5b73e6ce201642afb56f9)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Increase settings and interval formatting test coverage
+
+- Adds targeted tests for settings cleanup logic, settings key validation, and interval duration formatting to improve branch and line coverage.
+- Ensures coverage of unmount cleanup with timeouts, invalid settings warnings, and all branches of the duration formatting utility.
+- Removes stale test report artifact to keep the repository clean. [`(0f23393)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0f2339389fa95c12a58e8719372ca552d4476a98)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v4.0.0 [skip ci] [`(5a0746b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5a0746b1d600dc055af44ce34d27d4e0439f08b5)
+
+
+
+### � CI/CD
+
+- Update codecov.yml [`(50e8070)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/50e80702a987087435fd8fb7e43a71b981d9894c)
+
+
+
+### 👷 CI/CD
+
+- 👷 [ci] Enhance Codecov config for frontend/electron splits
+
+- Improves Codecov configuration to support separate coverage targets and flags for frontend and electron codebases, enabling more granular reporting and thresholds.
+- Adds stricter report age limits, branch targeting, and adjusts notification settings for improved reliability.
+- Expands comment layout for richer PR feedback and enables advanced parser and branch detection options.
+- Updates CI workflow to provide verbose output for easier diagnostics.
+- Adds 'gcov' to custom words list to prevent false spelling errors. [`(73341e9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/73341e900fafd12541526a2976105506fd153ace)
+
+
+- 👷 [ci] Improve test coverage workflow and reporting
+
+- Updates Node.js version to 22 and limits git fetch depth for faster CI runs
+- Simplifies test and coverage steps by generating JUnit reports during test execution, removing redundant report generation steps
+- Adds environment variable configuration for coverage upload steps
+- Adds coverage file verification and enhances verbosity for debugging
+- Updates Codecov actions to use explicit file paths, disables auto-search, and sets descriptive flags and names for uploads
+- Removes obsolete coverage output artifact
+
+Improves CI reliability, clarity, and integration with Codecov for more actionable feedback on test coverage. [`(87dd444)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/87dd44442a73d7628b3481865c247b5724c73a94)
 
 
 
