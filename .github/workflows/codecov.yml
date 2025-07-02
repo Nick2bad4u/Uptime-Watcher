@@ -17,13 +17,13 @@ jobs:
               id: checkout
               uses: actions/checkout@v4
               with:
-                  fetch-depth: 0
+                  fetch-depth: 5
 
             - name: Set up Node
               id: setup-node
               uses: actions/setup-node@v4
               with:
-                  node-version: "20"
+                  node-version: "22"
                   cache: "npm"
 
             - name: Install dependencies
@@ -35,38 +35,41 @@ jobs:
               run: |
                   npm run build
               continue-on-error: true
+              env:
+                  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
             # Run frontend tests with coverage
             - name: Run frontend tests
               id: test-frontend
               run: |
                   mkdir -p coverage
-                  npx vitest run --coverage --reporter=verbose
+                  npx vitest run --coverage --reporter=verbose --reporter=junit --outputFile=coverage/frontend-test-report.junit.xml
               continue-on-error: true
+              env:
+                  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
             # Run electron tests with coverage
             - name: Run electron tests
               id: test-electron
               run: |
-                  mkdir -p coverage
-                  npx vitest run --config vitest.electron.config.ts --coverage --reporter=verbose
-              continue-on-error: true
-
-            # Generate JUnit reports for both test suites
-            - name: Generate frontend JUnit report
-              id: junit-frontend
-              run: |
-                  mkdir -p coverage
-                  npx vitest run --reporter=junit \
-                    --outputFile=coverage/frontend-test-report.junit.xml
-              continue-on-error: true
-
-            - name: Generate electron JUnit report
-              id: junit-electron
-              run: |
                   mkdir -p coverage/electron
-                  npx vitest run --config vitest.electron.config.ts --reporter=junit \
-                    --outputFile=coverage/electron/electron-test-report.junit.xml
+                  npx vitest run --config vitest.electron.config.ts --coverage --reporter=verbose --reporter=junit --outputFile=coverage/electron/electron-test-report.junit.xml
+              continue-on-error: true
+              env:
+                  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+            # Verify coverage files exist
+            - name: Verify coverage files
+              run: |
+                  echo "=== Checking coverage files ==="
+                  ls -la coverage/ || echo "No coverage directory"
+                  ls -la coverage/electron/ || echo "No electron coverage directory"
+                  echo "=== Frontend coverage files ==="
+                  find coverage/ -name "*.info" -o -name "lcov.info" || echo "No lcov files found in coverage/"
+                  echo "=== Electron coverage files ==="
+                  find coverage/electron/ -name "*.info" -o -name "lcov.info" || echo "No lcov files found in coverage/electron/"
+                  echo "=== Test report files ==="
+                  find coverage/ -name "*.junit.xml" || echo "No junit files"
               continue-on-error: true
 
             # Upload frontend coverage to Codecov
@@ -77,8 +80,11 @@ jobs:
                   token: ${{ secrets.CODECOV_TOKEN }}
                   slug: Nick2bad4u/Uptime-Watcher
                   files: ./coverage/lcov.info
+                  directory: ./coverage
+                  exclude: ./coverage/electron
                   flags: frontend
                   name: frontend-coverage
+                  verbose: true
                   fail_ci_if_error: false
               env:
                   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
@@ -91,8 +97,11 @@ jobs:
                   token: ${{ secrets.CODECOV_TOKEN }}
                   slug: Nick2bad4u/Uptime-Watcher
                   files: ./coverage/electron/lcov.info
+                  directory: ./coverage/electron
+                  exclude: ./coverage
                   flags: electron
                   name: electron-coverage
+                  verbose: true
                   fail_ci_if_error: false
               env:
                   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
@@ -102,9 +111,12 @@ jobs:
               id: upload-frontend-test-results
               uses: codecov/test-results-action@v1
               with:
-                  file: ./coverage/frontend-test-report.junit.xml
+                  files: ./coverage/frontend-test-report.junit.xml
+                  disable_search: true
                   token: ${{ secrets.CODECOV_TOKEN }}
-                  flags: frontend
+                  flags: frontend-tests
+                  name: frontend-test-results
+                  verbose: true
               continue-on-error: true
               env:
                   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
@@ -113,9 +125,12 @@ jobs:
               id: upload-electron-test-results
               uses: codecov/test-results-action@v1
               with:
-                  file: ./coverage/electron/electron-test-report.junit.xml
+                  files: ./coverage/electron/electron-test-report.junit.xml
+                  disable_search: true
                   token: ${{ secrets.CODECOV_TOKEN }}
-                  flags: electron
+                  flags: electron-tests
+                  name: electron-test-results
+                  verbose: true
               continue-on-error: true
               env:
                   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
