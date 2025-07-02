@@ -3,7 +3,6 @@
  * Tests rendering, memoization, title generation, and re-render optimization.
  */
 
-import React from "react";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
@@ -146,9 +145,9 @@ describe("SiteCardHistory", () => {
 
             expect(screen.getByTestId("chart-history-length")).toHaveTextContent("3");
 
-            const newHistory = [
+            const newHistory: StatusHistory[] = [
                 ...mockHistory,
-                { timestamp: 1640998800000, status: "up", responseTime: 180 },
+                { timestamp: 1640998800000, status: "up" as const, responseTime: 180 },
             ];
 
             rerender(<SiteCardHistory monitor={httpMonitor} filteredHistory={newHistory} />);
@@ -162,8 +161,8 @@ describe("SiteCardHistory", () => {
             );
 
             // Change the latest timestamp (first item since sorted DESC)
-            const newHistory = [
-                { timestamp: 1640999000000, status: "up", responseTime: 220 },
+            const newHistory: StatusHistory[] = [
+                { timestamp: 1640999000000, status: "up" as const, responseTime: 220 },
                 ...mockHistory.slice(1),
             ];
 
@@ -230,7 +229,7 @@ describe("SiteCardHistory", () => {
         });
 
         it("should handle history with single item", () => {
-            const singleHistory = [{ timestamp: 1640995200000, status: "up", responseTime: 200 }];
+            const singleHistory: StatusHistory[] = [{ timestamp: 1640995200000, status: "up" as const, responseTime: 200 }];
 
             render(<SiteCardHistory monitor={httpMonitor} filteredHistory={singleHistory} />);
 

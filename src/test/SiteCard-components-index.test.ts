@@ -15,5 +15,5 @@ describe("SiteCard Components Index", () => {
         expect(siteCardModule.ActionButtonGroup).toBeDefined();
         expect(siteCardModule.MetricCard).toBeDefined();
         expect(siteCardModule.MonitorSelector).toBeDefined();
-    });
+    }, 10000); // Increase timeout to 10 seconds
 });

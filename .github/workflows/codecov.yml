@@ -2,9 +2,9 @@ name: Run tests and upload coverage
 
 on:
     push:
-        branches: [main, master]
+        branches: [main]
     pull_request:
-        branches: [main, master]
+        branches: [main]
     workflow_dispatch:
 
 jobs:
@@ -14,39 +14,51 @@ jobs:
 
         steps:
             - name: Checkout
+              id: checkout
               uses: actions/checkout@v4
               with:
                   fetch-depth: 0
 
             - name: Set up Node
+              id: setup-node
               uses: actions/setup-node@v4
               with:
                   node-version: "20"
                   cache: "npm"
 
             - name: Install dependencies
+              id: install-deps
               run: npm ci
+
+            - name: Build Frontend and Backend
+              id: build
+              run: |
+                  npm run build
 
             # Run frontend tests with coverage
             - name: Run frontend tests
+              id: test-frontend
               run: |
                   mkdir -p coverage
                   npx vitest run --coverage --reporter=verbose
 
             # Run electron tests with coverage
             - name: Run electron tests
+              id: test-electron
               run: |
                   mkdir -p coverage
                   npx vitest run --config vitest.electron.config.ts --coverage --reporter=verbose
 
             # Generate JUnit reports for both test suites
             - name: Generate frontend JUnit report
+              id: junit-frontend
               run: |
                   mkdir -p coverage
                   npx vitest run --reporter=junit \
                     --outputFile=coverage/frontend-test-report.junit.xml
 
             - name: Generate electron JUnit report
+              id: junit-electron
               run: |
                   mkdir -p coverage/electron
                   npx vitest run --config vitest.electron.config.ts --reporter=junit \
@@ -54,6 +66,7 @@ jobs:
 
             # Upload frontend coverage to Codecov
             - name: Upload frontend coverage to Codecov
+              id: upload-frontend-coverage
               uses: codecov/codecov-action@v5
               with:
                   token: ${{ secrets.CODECOV_TOKEN }}
@@ -63,8 +76,9 @@ jobs:
                   name: frontend-coverage
                   fail_ci_if_error: false
 
-            # Upload electron coverage to Codecov  
+            # Upload electron coverage to Codecov
             - name: Upload electron coverage to Codecov
+              id: upload-electron-coverage
               uses: codecov/codecov-action@v5
               with:
                   token: ${{ secrets.CODECOV_TOKEN }}
@@ -76,6 +90,7 @@ jobs:
 
             # Upload test results
             - name: Upload frontend test results to Codecov
+              id: upload-frontend-test-results
               if: ${{ !cancelled() }}
               uses: codecov/test-results-action@v1
               with:
@@ -84,6 +99,7 @@ jobs:
                   flags: frontend
 
             - name: Upload electron test results to Codecov
+              id: upload-electron-test-results
               if: ${{ !cancelled() }}
               uses: codecov/test-results-action@v1
               with:

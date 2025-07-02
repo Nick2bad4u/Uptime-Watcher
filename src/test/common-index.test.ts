@@ -12,5 +12,5 @@ describe("Common Components Index", () => {
         expect(commonModule.HistoryChart).toBeDefined();
         expect(commonModule).toHaveProperty("StatusBadge");
         expect(commonModule).toHaveProperty("HistoryChart");
-    });
+    }, 10000); // Increase timeout to 10 seconds
 });

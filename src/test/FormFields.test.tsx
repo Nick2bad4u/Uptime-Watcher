@@ -29,8 +29,8 @@ describe("FormFields", () => {
     describe("FormField", () => {
         it("should render with label and children", () => {
             render(
-                <FormField id="test-field" label="Test Label">
-                    <input type="text" />
+                <FormField id="test-field-1" label="Test Label">
+                    <input type="text" id="test-field-1" title="Test Label" />
                 </FormField>
             );
 
@@ -40,8 +40,8 @@ describe("FormFields", () => {
 
         it("should show required indicator when required", () => {
             render(
-                <FormField id="test-field" label="Test Label" required>
-                    <input type="text" />
+                <FormField id="test-field-2" label="Test Label" required>
+                    <input type="text" id="test-field-2" title="Test Label (required)" />
                 </FormField>
             );
 
@@ -50,8 +50,8 @@ describe("FormFields", () => {
 
         it("should display error message", () => {
             render(
-                <FormField id="test-field" label="Test Label" error="This field is required">
-                    <input type="text" />
+                <FormField id="test-field-3" label="Test Label" error="This field is required">
+                    <input type="text" id="test-field-3" title="Test Label" />
                 </FormField>
             );
 
@@ -61,8 +61,8 @@ describe("FormFields", () => {
 
         it("should display help text when no error", () => {
             render(
-                <FormField id="test-field" label="Test Label" helpText="This is help text">
-                    <input type="text" />
+                <FormField id="test-field-4" label="Test Label" helpText="This is help text">
+                    <input type="text" id="test-field-4" title="Test Label" />
                 </FormField>
             );
 
@@ -73,12 +73,12 @@ describe("FormFields", () => {
         it("should prioritize error over help text", () => {
             render(
                 <FormField 
-                    id="test-field" 
+                    id="test-field-5" 
                     label="Test Label" 
                     error="Error message"
                     helpText="Help text"
                 >
-                    <input type="text" />
+                    <input type="text" id="test-field-5" title="Test Label" />
                 </FormField>
             );
 
@@ -88,13 +88,13 @@ describe("FormFields", () => {
 
         it("should have proper label association", () => {
             render(
-                <FormField id="test-field" label="Test Label">
-                    <input type="text" id="test-field" />
+                <FormField id="test-field-6" label="Test Label">
+                    <input type="text" id="test-field-6" title="Test Label" />
                 </FormField>
             );
 
             const label = screen.getByText(/Test Label/).closest("label");
-            expect(label).toHaveAttribute("for", "test-field");
+            expect(label).toHaveAttribute("for", "test-field-6");
         });
     });
 

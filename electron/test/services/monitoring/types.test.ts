@@ -69,7 +69,7 @@ describe("Monitoring Types", () => {
         it("should validate interface structure", () => {
             // Mock implementation to test interface
             const mockService: IMonitorService = {
-                async check(monitor) {
+                async check(_monitor) {
                     return {
                         status: "up",
                         responseTime: 100,
@@ -87,7 +87,7 @@ describe("Monitoring Types", () => {
 
         it("should work with async check method", async () => {
             const mockService: IMonitorService = {
-                async check(monitor) {
+                async check(_monitor) {
                     return {
                         status: "up",
                         responseTime: 150,
