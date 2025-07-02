@@ -443,6 +443,11 @@ export const useStore = create<AppState>()(
                     const state = get();
 
                     try {
+                        // Validate update payload
+                        if (!update?.site) {
+                            throw new Error("Invalid status update: update or update.site is null/undefined");
+                        }
+
                         // Smart incremental update - use the payload data directly
                         // This prevents unnecessary full DB fetches on every status update
                         const updatedSites = state.sites.map((site) => {

@@ -958,7 +958,8 @@ export function ThemedProgress({
                     )}
                 </div>
             )}
-            <div style={containerStyles}>
+            <progress value={value} max={max} style={{ left: "-9999px", position: "absolute", top: "-9999px" }} />
+            <div style={containerStyles} aria-hidden="true">
                 <div style={progressStyles} />
             </div>
         </div>
