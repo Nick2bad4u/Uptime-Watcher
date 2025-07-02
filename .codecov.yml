@@ -95,7 +95,6 @@ flags:
 
 github_checks:
     annotations: true
-    summary: true
 
 parsers:
     javascript:

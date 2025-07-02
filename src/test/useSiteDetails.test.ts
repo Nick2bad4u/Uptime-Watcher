@@ -684,6 +684,28 @@ describe("useSiteDetails", () => {
                 expect(result.current.retryAttemptsChanged).toBe(false);
             });
 
+            it("should handle retry attempts change when monitor has undefined retry attempts", () => {
+                const site = createSite("test-site", {
+                    monitors: [createMonitor("monitor-1", "http", { retryAttempts: undefined })],
+                });
+                mockStore.sites = [site];
+                mockStore.getSelectedMonitorId.mockReturnValue(site.monitors[0].id);
+
+                const { result } = renderHook(() => useSiteDetails({ site }));
+
+                const mockEvent = {
+                    target: { value: "5" },
+                } as React.ChangeEvent<HTMLInputElement>;
+
+                act(() => {
+                    result.current.handleRetryAttemptsChange(mockEvent);
+                });
+
+                expect(result.current.localRetryAttempts).toBe(5);
+                // Should mark as changed since current is undefined (0) and new is 5
+                expect(result.current.retryAttemptsChanged).toBe(true);
+            });
+
             it("should save retry attempts successfully", async () => {
                 const site = createSite("test-site");
                 mockStore.sites = [site];
@@ -945,6 +967,236 @@ describe("useSiteDetails", () => {
             const { result } = renderHook(() => useSiteDetails({ site }));
 
             expect(result.current.isMonitoring).toBe(false);
+        });
+    });
+
+    describe("Error Handling Edge Cases", () => {
+        describe("Non-Error objects thrown", () => {
+            it("should handle non-Error objects in handleCheckNow", async () => {
+                const site = createSite("test-site");
+                mockStore.sites = [site];
+                mockStore.getSelectedMonitorId.mockReturnValue(site.monitors[0].id);
+                // Throw a non-Error object (string)
+                mockStore.checkSiteNow.mockRejectedValue("Check failed string");
+
+                const { result } = renderHook(() => useSiteDetails({ site }));
+
+                await act(async () => {
+                    await result.current.handleCheckNow();
+                });
+
+                expect(mockStore.clearError).toHaveBeenCalled();
+                expect(mockStore.checkSiteNow).toHaveBeenCalledWith("test-site", site.monitors[0].id);
+            });
+
+            it("should handle non-Error objects in deleteSite", async () => {
+                const site = createSite("test-site");
+                mockStore.sites = [site];
+                mockStore.getSelectedMonitorId.mockReturnValue(site.monitors[0].id);
+                // Throw a non-Error object (number)
+                mockStore.deleteSite.mockRejectedValue(404);
+                window.confirm = vi.fn(() => true);
+
+                const { result } = renderHook(() => useSiteDetails({ site }));
+
+                await act(async () => {
+                    await result.current.handleRemoveSite();
+                });
+
+                expect(mockStore.clearError).toHaveBeenCalled();
+                expect(mockStore.deleteSite).toHaveBeenCalledWith("test-site");
+            });
+
+            it("should handle non-Error objects in handleStartMonitoring", async () => {
+                const site = createSite("test-site");
+                mockStore.sites = [site];
+                mockStore.getSelectedMonitorId.mockReturnValue(site.monitors[0].id);
+                // Throw a non-Error object (object)
+                mockStore.startSiteMonitorMonitoring.mockRejectedValue({ code: "FAILED" });
+
+                const { result } = renderHook(() => useSiteDetails({ site }));
+
+                await act(async () => {
+                    await result.current.handleStartMonitoring();
+                });
+
+                expect(mockStore.clearError).toHaveBeenCalled();
+                expect(mockStore.startSiteMonitorMonitoring).toHaveBeenCalledWith("test-site", site.monitors[0].id);
+            });
+
+            it("should handle non-Error objects in handleStopMonitoring", async () => {
+                const site = createSite("test-site");
+                mockStore.sites = [site];
+                mockStore.getSelectedMonitorId.mockReturnValue(site.monitors[0].id);
+                // Throw a non-Error object (null)
+                mockStore.stopSiteMonitorMonitoring.mockRejectedValue(null);
+
+                const { result } = renderHook(() => useSiteDetails({ site }));
+
+                await act(async () => {
+                    await result.current.handleStopMonitoring();
+                });
+
+                expect(mockStore.clearError).toHaveBeenCalled();
+                expect(mockStore.stopSiteMonitorMonitoring).toHaveBeenCalledWith("test-site", site.monitors[0].id);
+            });
+
+            it("should handle non-Error objects in handleSaveInterval", async () => {
+                const site = createSite("test-site");
+                mockStore.sites = [site];
+                mockStore.getSelectedMonitorId.mockReturnValue(site.monitors[0].id);
+                // Throw a non-Error object (undefined)
+                mockStore.updateSiteCheckInterval.mockRejectedValue(undefined);
+
+                const { result } = renderHook(() => useSiteDetails({ site }));
+
+                // Change interval first
+                act(() => {
+                    result.current.handleIntervalChange({
+                        target: { value: "120000" },
+                    } as React.ChangeEvent<HTMLSelectElement>);
+                });
+
+                await act(async () => {
+                    await result.current.handleSaveInterval();
+                });
+
+                expect(mockStore.clearError).toHaveBeenCalled();
+                expect(mockStore.updateSiteCheckInterval).toHaveBeenCalledWith("test-site", site.monitors[0].id, 120000);
+            });
+
+            it("should handle non-Error objects in handleSaveTimeout", async () => {
+                const site = createSite("test-site");
+                mockStore.sites = [site];
+                mockStore.getSelectedMonitorId.mockReturnValue(site.monitors[0].id);
+                // Throw a non-Error object (boolean)
+                mockStore.updateMonitorTimeout.mockRejectedValue(false);
+
+                const { result } = renderHook(() => useSiteDetails({ site }));
+
+                // Change timeout first
+                act(() => {
+                    result.current.handleTimeoutChange({
+                        target: { value: "20" },
+                    } as React.ChangeEvent<HTMLInputElement>);
+                });
+
+                await act(async () => {
+                    await result.current.handleSaveTimeout();
+                });
+
+                expect(mockStore.clearError).toHaveBeenCalled();
+                expect(mockStore.updateMonitorTimeout).toHaveBeenCalledWith("test-site", site.monitors[0].id, 20000);
+            });
+
+            it("should handle non-Error objects in handleSaveRetryAttempts", async () => {
+                const site = createSite("test-site");
+                mockStore.sites = [site];
+                mockStore.getSelectedMonitorId.mockReturnValue(site.monitors[0].id);
+                // Throw a non-Error object (array)
+                mockStore.updateMonitorRetryAttempts.mockRejectedValue([]);
+
+                const { result } = renderHook(() => useSiteDetails({ site }));
+
+                // Change retry attempts first
+                act(() => {
+                    result.current.handleRetryAttemptsChange({
+                        target: { value: "5" },
+                    } as React.ChangeEvent<HTMLInputElement>);
+                });
+
+                await act(async () => {
+                    await result.current.handleSaveRetryAttempts();
+                });
+
+                expect(mockStore.clearError).toHaveBeenCalled();
+                expect(mockStore.updateMonitorRetryAttempts).toHaveBeenCalledWith("test-site", site.monitors[0].id, 5);
+            });
+
+            it("should handle non-Error objects in handleSaveName", async () => {
+                const site = createSite("test-site", { name: "Original Name" });
+                mockStore.sites = [site];
+                mockStore.getSelectedMonitorId.mockReturnValue(site.monitors[0].id);
+                // Throw a non-Error object (symbol)
+                mockStore.modifySite.mockRejectedValue(Symbol('test-error'));
+
+                const { result } = renderHook(() => useSiteDetails({ site }));
+
+                // Change name first
+                act(() => {
+                    result.current.setLocalName("New Name");
+                });
+
+                await act(async () => {
+                    await result.current.handleSaveName();
+                });
+
+                expect(mockStore.clearError).toHaveBeenCalled();
+                expect(mockStore.modifySite).toHaveBeenCalledWith("test-site", { name: "New Name" });
+            });
+        });
+
+        describe("Edge cases for error conditions", () => {
+            it("should handle deleteSite cancellation", async () => {
+                const site = createSite("test-site");
+                mockStore.sites = [site];
+                mockStore.getSelectedMonitorId.mockReturnValue(site.monitors[0].id);
+                // User cancels deletion
+                window.confirm = vi.fn(() => false);
+
+                const { result } = renderHook(() => useSiteDetails({ site }));
+
+                await act(async () => {
+                    await result.current.handleRemoveSite();
+                });
+
+                // deleteSite should not be called when user cancels
+                expect(mockStore.deleteSite).not.toHaveBeenCalled();
+            });
+
+            it("should handle empty/whitespace name trimming", async () => {
+                const site = createSite("test-site", { name: "Original Name" });
+                mockStore.sites = [site];
+                mockStore.getSelectedMonitorId.mockReturnValue(site.monitors[0].id);
+                mockStore.modifySite.mockResolvedValue(undefined);
+
+                const { result } = renderHook(() => useSiteDetails({ site }));
+
+                // Set name to whitespace-only string
+                act(() => {
+                    result.current.setLocalName("   \t\n   ");
+                });
+
+                await act(async () => {
+                    await result.current.handleSaveName();
+                });
+
+                // Should save as undefined when trimmed string is empty
+                expect(mockStore.modifySite).toHaveBeenCalledWith("test-site", { name: undefined });
+            });
+
+            it("should handle timeout conversion to milliseconds", async () => {
+                const site = createSite("test-site");
+                mockStore.sites = [site];
+                mockStore.getSelectedMonitorId.mockReturnValue(site.monitors[0].id);
+                mockStore.updateMonitorTimeout.mockResolvedValue(undefined);
+
+                const { result } = renderHook(() => useSiteDetails({ site }));
+
+                // Set timeout to 25 seconds
+                act(() => {
+                    result.current.handleTimeoutChange({
+                        target: { value: "25" },
+                    } as React.ChangeEvent<HTMLInputElement>);
+                });
+
+                await act(async () => {
+                    await result.current.handleSaveTimeout();
+                });
+
+                // Should convert seconds to milliseconds (25 * 1000 = 25000)
+                expect(mockStore.updateMonitorTimeout).toHaveBeenCalledWith("test-site", site.monitors[0].id, 25000);
+            });
         });
     });
 });
