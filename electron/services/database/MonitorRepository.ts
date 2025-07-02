@@ -278,7 +278,6 @@ export class MonitorRepository {
 
             const newId = String(row.id);
             if (isDev()) {
-                /* v8 ignore next */
                 logger.debug(`[MonitorRepository] Created monitor with id: ${newId} for site: ${siteIdentifier}`);
             }
             return newId;
@@ -328,7 +327,6 @@ export class MonitorRepository {
 
             if (updateFields.length === 0) {
                 if (isDev()) {
-                    /* v8 ignore next */
                     logger.debug(`[MonitorRepository] No fields to update for monitor: ${monitorId}`);
                 }
                 return;
@@ -340,7 +338,6 @@ export class MonitorRepository {
             db.run(sql, updateValues);
 
             if (isDev()) {
-                /* v8 ignore next */
                 logger.debug(`[MonitorRepository] Updated monitor with id: ${monitorId}`);
             }
         } catch (error) {
@@ -365,7 +362,6 @@ export class MonitorRepository {
 
             if (deleted) {
                 if (isDev()) {
-                    /* v8 ignore next */
                     logger.debug(`[MonitorRepository] Deleted monitor with id: ${monitorId}`);
                 }
             } else {
@@ -400,7 +396,6 @@ export class MonitorRepository {
             db.run("DELETE FROM monitors WHERE site_identifier = ?", [siteIdentifier]);
 
             if (isDev()) {
-                /* v8 ignore next */
                 logger.debug(`[MonitorRepository] Deleted all monitors for site: ${siteIdentifier}`);
             }
         } catch (error) {
@@ -431,7 +426,6 @@ export class MonitorRepository {
             const db = this.getDb();
             db.run("DELETE FROM monitors");
             if (isDev()) {
-                /* v8 ignore next */
                 logger.debug("[MonitorRepository] Cleared all monitors");
             }
         } catch (error) {
@@ -464,7 +458,6 @@ export class MonitorRepository {
                 }
             }
 
-            /* v8 ignore next */
             logger.info(`[MonitorRepository] Bulk created ${monitors.length} monitors for site: ${siteIdentifier}`);
             return createdMonitors;
         } catch (error) {

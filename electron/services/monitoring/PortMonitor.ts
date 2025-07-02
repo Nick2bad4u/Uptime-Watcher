@@ -87,7 +87,6 @@ export class PortMonitor implements IMonitorService {
             maxRetries: totalAttempts,
             onError: (error, attempt) => {
                 if (isDev()) {
-                    /* v8 ignore next */
                     const errorMessage = error instanceof Error ? error.message : String(error);
                     logger.debug(
                         `[PortMonitor] Port ${host}:${port} failed attempt ${attempt}/${totalAttempts}: ${errorMessage}`

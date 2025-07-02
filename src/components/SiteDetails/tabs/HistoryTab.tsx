@@ -46,6 +46,7 @@ export function HistoryTab({
     const { settings } = useStore();
     const [historyFilter, setHistoryFilter] = useState<"all" | "up" | "down">("all");
     const historyLength = (selectedMonitor.history || []).length;
+
     const backendLimit = settings.historyLimit || 25;
 
     // Track the last monitor ID we logged for to prevent duplicate logging
@@ -87,8 +88,9 @@ export function HistoryTab({
     }, [selectedMonitor.id, selectedMonitor.type]);
 
     useEffect(() => {
-        setHistoryLimit(Math.min(50, backendLimit, (selectedMonitor.history || []).length));
-    }, [settings.historyLimit, selectedMonitor.history.length, backendLimit, selectedMonitor.history]);
+        const safeHistoryLength = (selectedMonitor.history || []).length;
+        setHistoryLimit(Math.min(50, backendLimit, safeHistoryLength));
+    }, [settings.historyLimit, backendLimit, selectedMonitor.history]);
 
     const filteredHistoryRecords = (selectedMonitor.history || [])
         .filter((record: StatusHistory) => historyFilter === "all" || record.status === historyFilter)
@@ -102,6 +104,7 @@ export function HistoryTab({
         const getDetailLabel = (): string => {
             if (selectedMonitor.type === "port") return `Port: ${record.details}`;
             if (selectedMonitor.type === "http") return `Response Code: ${record.details}`;
+
             return record.details ?? "";
         };
 

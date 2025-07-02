@@ -20,7 +20,6 @@ export class ApplicationService {
     private readonly uptimeMonitor: UptimeMonitor;
 
     constructor() {
-        /* v8 ignore next */
         logger.info("[ApplicationService] Initializing application services");
 
         // Initialize core services
@@ -43,26 +42,21 @@ export class ApplicationService {
             try {
                 await this.onAppReady();
             } catch (error) {
-                /* v8 ignore next */
                 logger.error("[ApplicationService] Error during app initialization", error);
             }
         });
 
         app.on("window-all-closed", () => {
-            /* v8 ignore next */
             logger.info("[ApplicationService] All windows closed");
             if (process.platform !== "darwin") {
-                /* v8 ignore next */
                 logger.info("[ApplicationService] Quitting app (non-macOS)");
                 app.quit();
             }
         });
 
         app.on("activate", () => {
-            /* v8 ignore next */
             logger.info("[ApplicationService] App activated");
             if (this.windowService.getAllWindows().length === 0) {
-                /* v8 ignore next */
                 logger.info("[ApplicationService] No windows open, creating main window");
                 this.windowService.createMainWindow();
             }
@@ -113,7 +107,7 @@ export class ApplicationService {
                     return `${m.type}: ${m.status}${responseTimeInfo}`;
                 })
                 .join(", ");
-            /* v8 ignore next */
+
             logger.debug(`[ApplicationService] Status update for ${data.site.identifier}: ${monitorStatuses}`);
             this.windowService.sendToRenderer("status-update", data);
         });
@@ -130,7 +124,6 @@ export class ApplicationService {
 
         // Database errors
         this.uptimeMonitor.on("db-error", ({ error, operation }) => {
-            /* v8 ignore next */
             logger.error(`[ApplicationService] Database error during ${operation}`, error);
             // Could add error notifications here if needed
         });
@@ -140,7 +133,6 @@ export class ApplicationService {
      * Cleanup all services (called on app quit).
      */
     public cleanup(): void {
-        /* v8 ignore next */
         logger.info("[ApplicationService] Cleaning up services");
 
         try {
@@ -148,7 +140,6 @@ export class ApplicationService {
             this.uptimeMonitor.stopMonitoring();
             this.windowService.closeMainWindow();
         } catch (error) {
-            /* v8 ignore next */
             logger.error("[ApplicationService] Error during cleanup", error);
         }
     }

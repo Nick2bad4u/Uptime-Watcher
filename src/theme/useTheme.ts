@@ -30,8 +30,7 @@ export function useTheme() {
 
     // Memoized getCurrentTheme to satisfy useEffect deps and avoid unnecessary re-renders
     const getCurrentTheme = useCallback((): Theme => {
-        const themeName = settings.theme as ThemeName;
-        return themeManager.getTheme(themeName);
+        return themeManager.getTheme(settings.theme);
     }, [settings.theme]);
 
     const [currentTheme, setCurrentTheme] = useState<Theme>(getCurrentTheme);
@@ -52,6 +51,7 @@ export function useTheme() {
         });
 
         // Set initial system theme
+
         setSystemTheme(themeManager.getSystemThemePreference());
 
         return cleanup;
@@ -106,7 +106,7 @@ export function useTheme() {
         setTheme,
         systemTheme,
         themeManager,
-        themeName: settings.theme as ThemeName,
+        themeName: settings.theme,
         themeVersion, // Include for forcing re-renders
         toggleTheme,
     };

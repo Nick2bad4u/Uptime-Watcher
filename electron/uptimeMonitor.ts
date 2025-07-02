@@ -239,7 +239,6 @@ export class UptimeMonitor extends EventEmitter {
             }
         }
 
-        /* v8 ignore next */
         logger.info(`Site added successfully: ${site.identifier} (${site.name ?? "unnamed"})`);
         return site;
     }
@@ -373,7 +372,6 @@ export class UptimeMonitor extends EventEmitter {
                 try {
                     return await this.stopMonitoringForSite(identifier, monitor.id);
                 } catch (error) {
-                    /* v8 ignore next */
                     logger.error(`Failed to stop monitoring for monitor ${monitor.id ?? "unknown"}`, error);
                     return false;
                 }
@@ -432,12 +430,11 @@ export class UptimeMonitor extends EventEmitter {
         try {
             // Add history entry using repository
             await this.historyRepository.addEntry(monitor.id, historyEntry, checkResult.details);
-            /* v8 ignore next 3 */
+
             logger.info(
                 `[checkMonitor] Inserted history row: monitor_id=${monitor.id}, status=${historyEntry.status}, responseTime=${historyEntry.responseTime}, timestamp=${historyEntry.timestamp}, details=${checkResult.details ?? "undefined"}`
             );
         } catch (err) {
-            /* v8 ignore next */
             logger.error(`[checkMonitor] Failed to insert history row: monitor_id=${monitor.id}`, err);
         }
 
@@ -637,7 +634,6 @@ export class UptimeMonitor extends EventEmitter {
         prevMonitor: Site["monitors"][0]
     ): Promise<void> {
         if (isDev()) {
-            /* v8 ignore next 3 */
             logger.debug(
                 `[updateSite] Restarting monitor ${updatedMonitor.id}: interval changed from ${prevMonitor.checkInterval}ms to ${updatedMonitor.checkInterval}ms`
             );

@@ -55,12 +55,14 @@ export function ScreenshotThumbnail({ siteName, url }: ScreenshotThumbnailProps)
         const currentTimeout = hoverTimeoutRef.current;
         return () => {
             // Clear any pending timeouts
+
             if (currentTimeout) {
                 clearTimeout(currentTimeout);
             }
             setHovered(false);
             setOverlayVars({});
             // Clean up any portal element that might still be in the DOM
+
             if (currentPortal?.parentNode) {
                 currentPortal.parentNode.removeChild(currentPortal);
             }
@@ -98,6 +100,7 @@ export function ScreenshotThumbnail({ siteName, url }: ScreenshotThumbnailProps)
             }
             if (left < 8) left = 8;
             if (left + overlayW > viewportW - 8) left = viewportW - overlayW - 8;
+
             if (top < 8) top = 8;
             if (top + overlayH > viewportH - 8) top = viewportH - overlayH - 8;
             setOverlayVars({

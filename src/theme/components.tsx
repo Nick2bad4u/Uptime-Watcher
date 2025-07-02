@@ -463,7 +463,7 @@ export function ThemedInput({
             step={step}
             style={styles}
             type={type}
-            value={inputValue}
+            {...(value !== undefined ? { value: inputValue } : {})}
         />
     );
 }
@@ -528,7 +528,7 @@ export function ThemedSelect({
             required={required}
             style={styles}
             title={title}
-            value={selectValue}
+            {...(value !== undefined ? { value: selectValue } : {})}
         >
             {children}
         </select>
@@ -546,7 +546,7 @@ interface ThemedCheckboxProps {
 
 export function ThemedCheckbox({
     [ARIA_LABEL]: ariaLabel,
-    checked = false,
+    checked,
     className = "",
     disabled = false,
     onChange,
@@ -555,7 +555,7 @@ export function ThemedCheckbox({
     return (
         <input
             type="checkbox"
-            checked={checked}
+            {...(checked !== undefined ? { checked } : {})}
             disabled={disabled}
             required={required}
             className={`themed-checkbox ${className}`}
@@ -626,6 +626,7 @@ export function ThemedIconButton({
                 return "40px";
             case "lg":
                 return "48px";
+
             default:
                 return "40px";
         }
