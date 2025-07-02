@@ -7,17 +7,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { HistoryTab } from './HistoryTab';
-import { Monitor, StatusHistory } from '../../../types';
-import logger from '../../../services/logger';
-import { useStore } from '../../../store';
+import { HistoryTab } from '../components/SiteDetails/tabs/HistoryTab';
+import { Monitor, StatusHistory } from '../types';
+import logger from '../services/logger';
+import { useStore } from '../store';
 
 // Get typed mocks
 const mockLogger = vi.mocked(logger);
 const mockUseStore = vi.mocked(useStore);
 
 // Mock the logger service
-vi.mock('../../../services/logger', () => ({
+vi.mock('../services/logger', () => ({
     default: {
         user: {
             action: vi.fn(),
@@ -26,7 +26,7 @@ vi.mock('../../../services/logger', () => ({
 }));
 
 // Mock the store
-vi.mock('../../../store', () => ({
+vi.mock('../store.ts', () => ({
     useStore: vi.fn(() => ({
         settings: {
             historyLimit: 25,
@@ -35,7 +35,7 @@ vi.mock('../../../store', () => ({
 }));
 
 // Mock themed components
-vi.mock('../../../theme/components', () => ({
+vi.mock('../theme/components', () => ({
     ThemedBox: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => 
         <div data-testid="themed-box" {...props}>{children}</div>,
     ThemedButton: ({ children, onClick, variant, size, disabled, className, ...props }: React.PropsWithChildren<{

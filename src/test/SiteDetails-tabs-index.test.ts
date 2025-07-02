@@ -6,24 +6,24 @@
 import { describe, expect, it, vi } from "vitest";
 
 // Mock all the tab components to avoid dependency issues
-vi.mock("./AnalyticsTab", () => ({
+vi.mock("../components/SiteDetails/tabs/AnalyticsTab", () => ({
     AnalyticsTab: vi.fn(() => "AnalyticsTab"),
 }));
 
-vi.mock("./HistoryTab", () => ({
+vi.mock("../components/SiteDetails/tabs/HistoryTab", () => ({
     HistoryTab: vi.fn(() => "HistoryTab"),
 }));
 
-vi.mock("./OverviewTab", () => ({
+vi.mock("../components/SiteDetails/tabs/OverviewTab", () => ({
     OverviewTab: vi.fn(() => "OverviewTab"),
 }));
 
-vi.mock("./SettingsTab", () => ({
+vi.mock("../components/SiteDetails/tabs/SettingsTab", () => ({
     SettingsTab: vi.fn(() => "SettingsTab"),
 }));
 
 // Import everything from the index module after mocking
-import * as SiteDetailsTabsIndex from "./index";
+import * as SiteDetailsTabsIndex from "../components/SiteDetails/tabs/index";
 
 describe("SiteDetails Tabs Index Module", () => {
     describe("Module Structure", () => {

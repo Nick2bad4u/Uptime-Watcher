@@ -7,24 +7,24 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock all individual component modules to avoid dependency issues
-vi.mock('./SiteDetails', () => ({
+vi.mock('../components/SiteDetails/SiteDetails', () => ({
     SiteDetails: vi.fn(() => 'SiteDetails'),
 }));
 
-vi.mock('./SiteDetailsHeader', () => ({
+vi.mock('../components/SiteDetails/SiteDetailsHeader', () => ({
     SiteDetailsHeader: vi.fn(() => 'SiteDetailsHeader'),
 }));
 
-vi.mock('./SiteDetailsNavigation', () => ({
+vi.mock('../components/SiteDetails/SiteDetailsNavigation', () => ({
     SiteDetailsNavigation: vi.fn(() => 'SiteDetailsNavigation'),
 }));
 
-vi.mock('./ScreenshotThumbnail', () => ({
+vi.mock('../components/SiteDetails/ScreenshotThumbnail', () => ({
     ScreenshotThumbnail: vi.fn(() => 'ScreenshotThumbnail'),
 }));
 
 // Import the barrel export module after mocking
-import * as SiteDetailsIndex from './index';
+import * as SiteDetailsIndex from '../components/SiteDetails/index';
 
 describe('SiteDetails Index Module', () => {
     beforeEach(() => {

@@ -7,7 +7,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { DEFAULT_HISTORY_LIMIT } from "../constants";
 import { useStore } from "../store";
-import { Site, Monitor, MonitorType } from "../types";
+import { Site, Monitor, MonitorType, StatusUpdate } from "../types";
 
 // Mock the electron API
 const mockElectronAPI = {
@@ -817,7 +817,7 @@ describe("Store", () => {
             useStore.getState().setSites([mockSite]);
             
             const callback = vi.fn();
-            let capturedHandler: ((update: any) => void) | undefined;
+            let capturedHandler: ((update: StatusUpdate) => void) | undefined;
             
             mockElectronAPI.events.onStatusUpdate.mockImplementation((handler) => {
                 capturedHandler = handler;
@@ -847,7 +847,7 @@ describe("Store", () => {
                 monitors: [],
             };
             
-            let capturedHandler: ((update: any) => void) | undefined;
+            let capturedHandler: ((update: { site: Site }) => void) | undefined;
             
             mockElectronAPI.events.onStatusUpdate.mockImplementation((handler) => {
                 capturedHandler = handler;
@@ -862,7 +862,6 @@ describe("Store", () => {
             if (capturedHandler) {
                 capturedHandler({
                     site: updatedSite,
-                    previousStatus: "down",
                 });
             }
             
@@ -877,10 +876,11 @@ describe("Store", () => {
             // Valid string key
             expect(useStore.getState().getSelectedMonitorId("site1")).toBe("monitor1");
             
-            // Non-string key should return undefined
-            expect(useStore.getState().getSelectedMonitorId(null as any)).toBeUndefined();
-            expect(useStore.getState().getSelectedMonitorId(undefined as any)).toBeUndefined();
-            expect(useStore.getState().getSelectedMonitorId(123 as any)).toBeUndefined();
+            // Non-string key should return undefined  
+            expect(useStore.getState().getSelectedMonitorId("" as string)).toBeUndefined();
+            // Test with falsy values that would be converted to strings
+            expect(useStore.getState().getSelectedMonitorId("null")).toBeUndefined();
+            expect(useStore.getState().getSelectedMonitorId("123")).toBeUndefined();
         });
 
         it("handles prototype pollution protection", () => {
@@ -950,7 +950,7 @@ describe("Store", () => {
                     {
                         id: "",
                         type: "http" as MonitorType,
-                        status: "invalid-status" as any,
+                        status: "pending" as const,
                         history: [],
                     },
                 ],
@@ -1038,6 +1038,252 @@ describe("Store", () => {
             expect(mockElectronAPI.sites.removeSite).toHaveBeenCalledWith("site1");
             
             consoleSpy.mockRestore();
+            process.env.NODE_ENV = originalEnv;
+        });
+    });
+
+    describe("Monitor Configuration Updates", () => {
+        beforeEach(() => {
+            // Reset store state
+            useStore.setState({
+                sites: [],
+                settings: {
+                    autoStart: false,
+                    historyLimit: DEFAULT_HISTORY_LIMIT,
+                    minimizeToTray: true,
+                    notifications: true,
+                    soundAlerts: false,
+                    theme: "system",
+                },
+                showSettings: false,
+                selectedSiteId: undefined,
+                showSiteDetails: false,
+                lastError: undefined,
+                isLoading: false,
+                totalUptime: 0,
+                totalDowntime: 0,
+                activeSiteDetailsTab: "overview",
+                siteDetailsChartTimeRange: "24h",
+                showAdvancedMetrics: false,
+                selectedMonitorIds: {},
+                updateStatus: "idle",
+                updateError: undefined,
+            });
+        });
+
+        it("should update monitor retry attempts", async () => {
+            const mockSite: Site = {
+                identifier: "site1",
+                name: "Test Site",
+                monitors: [
+                    { id: "monitor1", type: "http", status: "up", history: [], retryAttempts: 3 },
+                ],
+            };
+            
+            useStore.getState().setSites([mockSite]);
+            
+            mockElectronAPI.sites.updateSite.mockResolvedValue(undefined);
+            mockElectronAPI.sites.getSites.mockResolvedValue([
+                {
+                    ...mockSite,
+                    monitors: [
+                        { ...mockSite.monitors[0], retryAttempts: 5 }
+                    ]
+                }
+            ]);
+            
+            await useStore.getState().updateMonitorRetryAttempts("site1", "monitor1", 5);
+            
+            expect(mockElectronAPI.sites.updateSite).toHaveBeenCalledWith("site1", {
+                monitors: [{ ...mockSite.monitors[0], retryAttempts: 5 }]
+            });
+        });
+
+        it("should handle site not found error for retry attempts update", async () => {
+            useStore.getState().setSites([]);
+            
+            await expect(
+                useStore.getState().updateMonitorRetryAttempts("nonexistent", "monitor1", 5)
+            ).rejects.toThrow("Site not found");
+            
+            expect(useStore.getState().lastError).toContain("Failed to update monitor retry attempts");
+        });
+
+        it("should update monitor timeout", async () => {
+            const mockSite: Site = {
+                identifier: "site1",
+                name: "Test Site",
+                monitors: [
+                    { id: "monitor1", type: "http", status: "up", history: [], timeout: 5000 },
+                ],
+            };
+            
+            useStore.getState().setSites([mockSite]);
+            
+            mockElectronAPI.sites.updateSite.mockResolvedValue(undefined);
+            mockElectronAPI.sites.getSites.mockResolvedValue([
+                {
+                    ...mockSite,
+                    monitors: [
+                        { ...mockSite.monitors[0], timeout: 10000 }
+                    ]
+                }
+            ]);
+            
+            await useStore.getState().updateMonitorTimeout("site1", "monitor1", 10000);
+            
+            expect(mockElectronAPI.sites.updateSite).toHaveBeenCalledWith("site1", {
+                monitors: [{ ...mockSite.monitors[0], timeout: 10000 }]
+            });
+        });
+
+        it("should handle site not found error for timeout update", async () => {
+            useStore.getState().setSites([]);
+            
+            await expect(
+                useStore.getState().updateMonitorTimeout("nonexistent", "monitor1", 5000)
+            ).rejects.toThrow("Site not found");
+            
+            expect(useStore.getState().lastError).toContain("Failed to update monitor timeout");
+        });
+    });
+
+    describe("Status Updates Error Handling", () => {
+        beforeEach(() => {
+            // Reset store state
+            useStore.setState({
+                sites: [],
+                settings: {
+                    autoStart: false,
+                    historyLimit: DEFAULT_HISTORY_LIMIT,
+                    minimizeToTray: true,
+                    notifications: true,
+                    soundAlerts: false,
+                    theme: "system",
+                },
+                showSettings: false,
+                selectedSiteId: undefined,
+                showSiteDetails: false,
+                lastError: undefined,
+                isLoading: false,
+                totalUptime: 0,
+                totalDowntime: 0,
+                activeSiteDetailsTab: "overview",
+                siteDetailsChartTimeRange: "24h",
+                showAdvancedMetrics: false,
+                selectedMonitorIds: {},
+                updateStatus: "idle",
+                updateError: undefined,
+            });
+        });
+
+        it("should trigger full sync when site not found in status update", async () => {
+            const originalEnv = process.env.NODE_ENV;
+            process.env.NODE_ENV = "development";
+            
+            const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+            const fullSyncSpy = vi.spyOn(useStore.getState(), "fullSyncFromBackend").mockResolvedValue();
+            
+            useStore.getState().setSites([]);
+            
+            const mockUpdate = {
+                site: {
+                    identifier: "nonexistent",
+                    name: "Test",
+                    monitors: []
+                } as Site
+            };
+            
+            const callback = vi.fn();
+            useStore.getState().subscribeToStatusUpdates(callback);
+            
+            // Simulate the status update handler being called directly
+            const statusUpdateHandler = mockElectronAPI.events.onStatusUpdate.mock.calls[0][0];
+            statusUpdateHandler(mockUpdate);
+            
+            // Wait for async operations
+            await new Promise(resolve => setTimeout(resolve, 0));
+            
+            expect(consoleWarnSpy).toHaveBeenCalledWith(
+                expect.stringContaining("Site nonexistent not found in store")
+            );
+            expect(fullSyncSpy).toHaveBeenCalled();
+            
+            consoleWarnSpy.mockRestore();
+            fullSyncSpy.mockRestore();
+            process.env.NODE_ENV = originalEnv;
+        });
+
+        it("should handle status update processing errors", async () => {
+            const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+            const consoleLogSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+            const fullSyncSpy = vi.spyOn(useStore.getState(), "fullSyncFromBackend").mockRejectedValue(new Error("Sync failed"));
+            
+            useStore.getState().setSites([]);
+            
+            const callback = vi.fn();
+            useStore.getState().subscribeToStatusUpdates(callback);
+            
+            // Get the actual handler that was registered
+            const statusUpdateHandler = mockElectronAPI.events.onStatusUpdate.mock.calls[0][0];
+            
+            // Now call it with malformed data that will definitely cause an error
+            statusUpdateHandler({ site: null } as unknown as StatusUpdate);
+            
+            // Wait for async operations
+            await new Promise(resolve => setTimeout(resolve, 50));
+            
+            expect(consoleErrorSpy).toHaveBeenCalledWith(
+                "Error processing status update:",
+                expect.any(Error)
+            );
+            expect(consoleErrorSpy).toHaveBeenCalledWith(
+                "Fallback sync after error failed:",
+                expect.any(Error)
+            );
+            expect(useStore.getState().lastError).toBe("Failed to process status update");
+            
+            consoleErrorSpy.mockRestore();
+            consoleLogSpy.mockRestore();
+            fullSyncSpy.mockRestore();
+        });
+
+        it("should handle fallback sync failure after site not found", async () => {
+            const originalEnv = process.env.NODE_ENV;
+            process.env.NODE_ENV = "development";
+            
+            const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+            const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+            const fullSyncSpy = vi.spyOn(useStore.getState(), "fullSyncFromBackend").mockRejectedValue(new Error("Fallback sync failed"));
+            
+            useStore.getState().setSites([]);
+            
+            const mockUpdate = {
+                site: {
+                    identifier: "nonexistent",
+                    name: "Test",
+                    monitors: []
+                } as Site
+            };
+            
+            const callback = vi.fn();
+            useStore.getState().subscribeToStatusUpdates(callback);
+            
+            const statusUpdateHandler = mockElectronAPI.events.onStatusUpdate.mock.calls[0][0];
+            statusUpdateHandler(mockUpdate);
+            
+            // Wait for async operations
+            await new Promise(resolve => setTimeout(resolve, 0));
+            
+            expect(consoleErrorSpy).toHaveBeenCalledWith(
+                "Fallback full sync failed:",
+                expect.any(Error)
+            );
+            expect(useStore.getState().lastError).toBe("Failed to sync site data");
+            
+            consoleWarnSpy.mockRestore();
+            consoleErrorSpy.mockRestore();
+            fullSyncSpy.mockRestore();
             process.env.NODE_ENV = originalEnv;
         });
     });

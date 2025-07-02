@@ -7,11 +7,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { SiteDetailsNavigation } from './SiteDetailsNavigation';
-import { Site } from '../../types';
+import { SiteDetailsNavigation } from '../components/SiteDetails/SiteDetailsNavigation';
+import { Site } from '../types';
 
 // Mock the logger service
-vi.mock('../../services/logger', () => ({
+vi.mock('../services/logger', () => ({
     default: {
         user: {
             action: vi.fn(),
@@ -20,7 +20,7 @@ vi.mock('../../services/logger', () => ({
 }));
 
 // Mock the constants
-vi.mock('../../constants', () => ({
+vi.mock('../constants', () => ({
     CHECK_INTERVALS: [
         30000,
         { value: 60000, label: '1 minute' },
@@ -36,7 +36,7 @@ vi.mock('../../constants', () => ({
 }));
 
 // Mock themed components with minimal functionality
-vi.mock('../../theme/components', () => ({
+vi.mock('../theme/components', () => ({
     ThemedBox: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => 
         <div data-testid="themed-box" {...props}>{children}</div>,
     ThemedButton: ({ children, onClick, variant, size, disabled, className, ...props }: React.PropsWithChildren<{

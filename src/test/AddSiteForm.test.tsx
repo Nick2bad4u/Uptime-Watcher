@@ -4,9 +4,9 @@
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
 import { AddSiteForm } from "../components/AddSiteForm/AddSiteForm";
 
@@ -339,6 +339,422 @@ describe("AddSiteForm", () => {
 
             // Should show formError first (formError ?? lastError)
             expect(screen.getByText("❌ Form error")).toBeInTheDocument();
+        });
+    });
+
+    describe("Port Monitor Type", () => {
+        beforeEach(() => {
+            mockUseAddSiteForm.mockReturnValue({
+                ...defaultFormState,
+                monitorType: "port",
+            });
+        });
+
+        it("should show host and port fields for port monitor type", () => {
+            render(<AddSiteForm />);
+
+            expect(screen.getByLabelText("Host (required)")).toBeInTheDocument();
+            expect(screen.getByText("Enter a valid host (domain or IP)")).toBeInTheDocument();
+            expect(screen.getByLabelText("Port (required)")).toBeInTheDocument();
+            expect(screen.getByText("Enter a port number (1-65535)")).toBeInTheDocument();
+        });
+
+        it("should show port-specific help text", () => {
+            render(<AddSiteForm />);
+
+            expect(screen.getByText("• Enter a valid host (domain or IP)")).toBeInTheDocument();
+            expect(screen.getByText("• Enter a port number (1-65535)")).toBeInTheDocument();
+        });
+
+        it("should not show URL field for port monitor type", () => {
+            render(<AddSiteForm />);
+
+            expect(screen.queryByText(/Website URL/)).not.toBeInTheDocument();
+            expect(screen.queryByText("Enter the full URL including http:// or https://")).not.toBeInTheDocument();
+        });
+
+        it("should call setHost when host field changes", async () => {
+            const mockSetHost = vi.fn();
+            const mockSetMonitorType = vi.fn();
+            const user = userEvent.setup();
+
+            mockUseAddSiteForm.mockReturnValue({
+                ...defaultFormState,
+                monitorType: "port",
+                setHost: mockSetHost,
+                setMonitorType: mockSetMonitorType,
+            });
+
+            render(<AddSiteForm />);
+
+            // First, make sure we're in port monitor mode
+            const monitorTypeSelect = screen.getByLabelText("Monitor Type");
+            await user.selectOptions(monitorTypeSelect, "port");
+
+            const hostInput = screen.getByPlaceholderText("example.com or 192.168.1.1");
+            await user.clear(hostInput);
+            await user.type(hostInput, "example.com");
+
+            // Check that setHost was called for each character (11 characters in "example.com")
+            expect(mockSetHost).toHaveBeenCalledTimes(11);
+            // The last call should be with "m" (the last character)
+            expect(mockSetHost.mock.calls[mockSetHost.mock.calls.length - 1][0]).toBe("m");
+        });
+
+        it("should call setPort when port field changes", async () => {
+            const mockSetPort = vi.fn();
+            const user = userEvent.setup();
+
+            mockUseAddSiteForm.mockReturnValue({
+                ...defaultFormState,
+                monitorType: "port",
+                setPort: mockSetPort,
+            });
+
+            render(<AddSiteForm />);
+
+            const portInput = screen.getByPlaceholderText("80");
+            await user.clear(portInput);
+            await user.type(portInput, "8080");
+
+            expect(mockSetPort).toHaveBeenCalledTimes(4); // "8080" has 4 characters
+            expect(mockSetPort).toHaveBeenLastCalledWith("0"); // Last character is "0"
+        });
+    });
+
+    describe("Existing Site Mode", () => {
+        beforeEach(() => {
+            mockUseAddSiteForm.mockReturnValue({
+                ...defaultFormState,
+                addMode: "existing",
+            });
+        });
+
+        it("should show site selector for existing mode", () => {
+            render(<AddSiteForm />);
+
+            expect(screen.getByLabelText("Select Site (required)")).toBeInTheDocument();
+            expect(screen.getByText("-- Select a site --")).toBeInTheDocument();
+            expect(screen.getByText("Test Site 1")).toBeInTheDocument();
+            expect(screen.getByText("Test Site 2")).toBeInTheDocument();
+        });
+
+        it("should not show site name field for existing mode", () => {
+            render(<AddSiteForm />);
+
+            expect(screen.queryByText(/Site Name/)).not.toBeInTheDocument();
+        });
+
+        it("should not show site identifier for existing mode", () => {
+            render(<AddSiteForm />);
+
+            expect(screen.queryByText("Site Identifier:")).not.toBeInTheDocument();
+            expect(screen.queryByText("test-uuid-123")).not.toBeInTheDocument();
+        });
+
+        it("should show 'Add Monitor' button text for existing mode", () => {
+            render(<AddSiteForm />);
+
+            expect(screen.getByText("Add Monitor")).toBeInTheDocument();
+            expect(screen.queryByText("Add Site")).not.toBeInTheDocument();
+        });
+
+        it("should show appropriate help text for existing mode", () => {
+            render(<AddSiteForm />);
+
+            expect(screen.getByText("• Select a site to add the monitor to")).toBeInTheDocument();
+            expect(screen.queryByText("• Site name is required")).not.toBeInTheDocument();
+        });
+
+        it("should call setSelectedExistingSite when site is selected", async () => {
+            const mockSetSelectedExistingSite = vi.fn();
+            const user = userEvent.setup();
+
+            mockUseAddSiteForm.mockReturnValue({
+                ...defaultFormState,
+                addMode: "existing",
+                setSelectedExistingSite: mockSetSelectedExistingSite,
+            });
+
+            render(<AddSiteForm />);
+
+            const siteSelect = screen.getByDisplayValue("-- Select a site --");
+            await user.selectOptions(siteSelect, "site1");
+
+            expect(mockSetSelectedExistingSite).toHaveBeenCalledWith("site1");
+        });
+
+        it("should handle sites with missing name (use identifier)", () => {
+            mockUseStore.mockReturnValue({
+                ...defaultStoreState,
+                sites: [
+                    { identifier: "site1", name: undefined },
+                    { identifier: "site2", name: null },
+                ],
+            });
+
+            mockUseAddSiteForm.mockReturnValue({
+                ...defaultFormState,
+                addMode: "existing",
+            });
+
+            render(<AddSiteForm />);
+
+            expect(screen.getByText("site1")).toBeInTheDocument();
+            expect(screen.getByText("site2")).toBeInTheDocument();
+        });
+    });
+
+    describe("Mode Switching", () => {
+        it("should call setAddMode when mode is changed", async () => {
+            const mockSetAddMode = vi.fn();
+            const user = userEvent.setup();
+
+            mockUseAddSiteForm.mockReturnValue({
+                ...defaultFormState,
+                setAddMode: mockSetAddMode,
+            });
+
+            render(<AddSiteForm />);
+
+            const existingModeRadio = screen.getByLabelText("Add to Existing Site");
+            await user.click(existingModeRadio);
+
+            expect(mockSetAddMode).toHaveBeenCalledWith("existing");
+        });
+
+        it("should call setMonitorType when monitor type is changed", async () => {
+            const mockSetMonitorType = vi.fn();
+            const user = userEvent.setup();
+
+            mockUseAddSiteForm.mockReturnValue({
+                ...defaultFormState,
+                setMonitorType: mockSetMonitorType,
+            });
+
+            render(<AddSiteForm />);
+
+            const monitorTypeSelect = screen.getByDisplayValue("HTTP (Website/API)");
+            await user.selectOptions(monitorTypeSelect, "port");
+
+            expect(mockSetMonitorType).toHaveBeenCalledWith("port");
+        });
+
+        it("should call setCheckInterval when interval is changed", async () => {
+            const mockSetCheckInterval = vi.fn();
+            const user = userEvent.setup();
+
+            mockUseAddSiteForm.mockReturnValue({
+                ...defaultFormState,
+                setCheckInterval: mockSetCheckInterval,
+            });
+
+            render(<AddSiteForm />);
+
+            const intervalSelect = screen.getByDisplayValue(/5 minutes/); // Assuming 300000 ms = 5 minutes
+            await user.selectOptions(intervalSelect, "60000"); // 1 minute
+
+            expect(mockSetCheckInterval).toHaveBeenCalledWith(60000);
+        });
+    });
+
+    describe("Input Field Interactions", () => {
+        it("should call setName when site name changes", async () => {
+            const mockSetName = vi.fn();
+            const user = userEvent.setup();
+
+            mockUseAddSiteForm.mockReturnValue({
+                ...defaultFormState,
+                setName: mockSetName,
+            });
+
+            render(<AddSiteForm />);
+
+            const nameInput = screen.getByPlaceholderText("My Website");
+            await user.clear(nameInput);
+            await user.type(nameInput, "New Site");
+
+            expect(mockSetName).toHaveBeenCalledTimes(8); // "New Site" has 8 characters
+            expect(mockSetName).toHaveBeenLastCalledWith("e"); // Last character is "e"
+        });
+
+        it("should call setUrl when URL changes", async () => {
+            const mockSetUrl = vi.fn();
+            const user = userEvent.setup();
+
+            mockUseAddSiteForm.mockReturnValue({
+                ...defaultFormState,
+                setUrl: mockSetUrl,
+            });
+
+            render(<AddSiteForm />);
+
+            const urlInput = screen.getByPlaceholderText("https://example.com");
+            await user.clear(urlInput);
+            await user.type(urlInput, "https://test.com");
+
+            expect(mockSetUrl).toHaveBeenCalledTimes(16); // "https://test.com" has 16 characters
+            expect(mockSetUrl).toHaveBeenLastCalledWith("m"); // Last character is "m"
+        });
+    });
+
+    describe("Loading Button Delay Effect", () => {
+        beforeEach(() => {
+            vi.useFakeTimers();
+        });
+
+        afterEach(() => {
+            vi.useRealTimers();
+        });
+
+        it("should show loading button with delay", () => {
+            mockUseStore.mockReturnValue({
+                ...defaultStoreState,
+                isLoading: true,
+            });
+
+            render(<AddSiteForm />);
+
+            // Initially should not show loading spinner
+            const submitButton = screen.getByText("Add Site");
+            expect(submitButton).toBeInTheDocument();
+            expect(submitButton.querySelector('.themed-button__spinner')).toBeFalsy();
+
+            // After 100ms delay, should show loading state
+            act(() => {
+                vi.advanceTimersByTime(100);
+            });
+            
+            // Note: There appears to be a potential bug where the button text changes to "Loading..."
+            // but no spinner elements are rendered. For now, we test the actual behavior.
+            const loadingButtonText = screen.queryByText("Loading...");
+            expect(loadingButtonText).toBeInTheDocument();
+            
+            // The button should be disabled when loading
+            const buttonElement = loadingButtonText?.closest('button');
+            expect(buttonElement).toBeInTheDocument();
+            expect(buttonElement).toBeDisabled();
+        });
+
+        it("should not show loading if loading stops before delay", () => {
+            mockUseStore.mockReturnValue({
+                ...defaultStoreState,
+                isLoading: true,
+            });
+
+            const { rerender } = render(<AddSiteForm />);
+
+            // Stop loading before delay
+            mockUseStore.mockReturnValue({
+                ...defaultStoreState,
+                isLoading: false,
+            });
+
+            rerender(<AddSiteForm />);
+
+            // Advance timers past delay
+            vi.advanceTimersByTime(100);
+
+            expect(screen.queryByText("Loading...")).not.toBeInTheDocument();
+            expect(screen.getByText("Add Site")).toBeInTheDocument();
+        });
+
+        it("should clean up timeout on unmount", () => {
+            mockUseStore.mockReturnValue({
+                ...defaultStoreState,
+                isLoading: true,
+            });
+
+            const { unmount } = render(<AddSiteForm />);
+
+            // Unmount before timeout
+            unmount();
+
+            // Should not cause any errors when timer tries to fire
+            expect(() => {
+                vi.advanceTimersByTime(100);
+            }).not.toThrow();
+        });
+    });
+
+    describe("Form Field Disabled States", () => {
+        it("should disable all fields when loading", () => {
+            mockUseStore.mockReturnValue({
+                ...defaultStoreState,
+                isLoading: true,
+            });
+
+            render(<AddSiteForm />);
+
+            // Check various input types are disabled
+            const nameInput = screen.getByPlaceholderText("My Website");
+            const urlInput = screen.getByPlaceholderText("https://example.com");
+            const submitButton = screen.getByText("Add Site");
+
+            expect(nameInput).toBeDisabled();
+            expect(urlInput).toBeDisabled();
+            expect(submitButton).toBeDisabled();
+        });
+
+        it("should disable fields in existing site mode when loading", () => {
+            mockUseStore.mockReturnValue({
+                ...defaultStoreState,
+                isLoading: true,
+            });
+
+            mockUseAddSiteForm.mockReturnValue({
+                ...defaultFormState,
+                addMode: "existing",
+            });
+
+            render(<AddSiteForm />);
+
+            const siteSelect = screen.getByDisplayValue("-- Select a site --");
+            expect(siteSelect).toBeDisabled();
+        });
+
+        it("should disable port fields when loading", () => {
+            mockUseStore.mockReturnValue({
+                ...defaultStoreState,
+                isLoading: true,
+            });
+
+            mockUseAddSiteForm.mockReturnValue({
+                ...defaultFormState,
+                monitorType: "port",
+            });
+
+            render(<AddSiteForm />);
+
+            const hostInput = screen.getByPlaceholderText("example.com or 192.168.1.1");
+            const portInput = screen.getByPlaceholderText("80");
+
+            expect(hostInput).toBeDisabled();
+            expect(portInput).toBeDisabled();
+        });
+    });
+
+    describe("Form Reset Integration", () => {
+        it("should call resetForm on successful submission", () => {
+            const mockResetForm = vi.fn();
+
+            mockUseAddSiteForm.mockReturnValue({
+                ...defaultFormState,
+                resetForm: mockResetForm,
+            });
+
+            render(<AddSiteForm />);
+
+            const form = screen.getByText("Add Site").closest("form");
+            fireEvent.submit(form!);
+
+            // Verify handleSubmit was called with the resetForm callback
+            expect(vi.mocked(handleSubmit)).toHaveBeenCalledWith(
+                expect.any(Object),
+                expect.objectContaining({
+                    onSuccess: mockResetForm,
+                })
+            );
         });
     });
 });
