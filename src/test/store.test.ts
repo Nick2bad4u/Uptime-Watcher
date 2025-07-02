@@ -368,6 +368,38 @@ describe("Store", () => {
             expect(mockElectronAPI.sites.addSite).toHaveBeenCalledWith(siteData);
         });
 
+        it("creates site with monitor having invalid status - defaults to pending", async () => {
+            const monitorWithInvalidStatus = {
+                id: "test-monitor",
+                type: "http" as MonitorType,
+                status: "invalid-status" as Monitor["status"], // Invalid status to test the fallback
+                monitoring: true,
+                history: [],
+            };
+            
+            const siteData = {
+                identifier: "test-site",
+                name: "Test Site",
+                url: "https://test-site.com",
+                monitors: [monitorWithInvalidStatus],
+            };
+            
+            const expectedSite = { ...siteData, id: "test-site" };
+            mockElectronAPI.sites.addSite.mockResolvedValue(expectedSite);
+            
+            await useStore.getState().createSite(siteData);
+            
+            // Verify that the invalid status was converted to "pending"
+            expect(mockElectronAPI.sites.addSite).toHaveBeenCalledWith({
+                ...siteData,
+                monitors: expect.arrayContaining([
+                    expect.objectContaining({
+                        status: "pending", // Should be converted from invalid to pending
+                    }),
+                ]),
+            });
+        });
+
         it("handles create site error", async () => {
             const siteData = {
                 identifier: "error-site",
@@ -378,6 +410,21 @@ describe("Store", () => {
             mockElectronAPI.sites.addSite.mockRejectedValue(new Error("Creation failed"));
             
             await expect(useStore.getState().createSite(siteData)).rejects.toThrow("Creation failed");
+            expect(useStore.getState().lastError).toContain("Failed to add site");
+            expect(useStore.getState().isLoading).toBe(false);
+        });
+
+        it("handles create site error with non-Error thrown", async () => {
+            const siteData = {
+                identifier: "error-site",
+                name: "Error Site",
+                url: "https://error-site.com",
+            };
+            
+            // Throw a string instead of an Error object to test the type casting branch
+            mockElectronAPI.sites.addSite.mockRejectedValue("String error message");
+            
+            await expect(useStore.getState().createSite(siteData)).rejects.toBe("String error message");
             expect(useStore.getState().lastError).toContain("Failed to add site");
             expect(useStore.getState().isLoading).toBe(false);
         });
@@ -866,6 +913,134 @@ describe("Store", () => {
             }
             
             expect(fullSyncSpy).toHaveBeenCalled();
+        });
+
+        it("triggers full sync when status update is for site not in current store", () => {
+            // Ensure store starts empty
+            useStore.setState({ sites: [] });
+            
+            const nonExistentSite: Site = {
+                identifier: "missing-site",
+                name: "Missing Site",
+                monitors: [{
+                    id: "monitor-1",
+                    type: "http",
+                    status: "up",
+                    monitoring: true,
+                    history: [],
+                }],
+            };
+            
+            let capturedHandler: ((update: StatusUpdate) => void) | undefined;
+            
+            mockElectronAPI.events.onStatusUpdate.mockImplementation((handler) => {
+                capturedHandler = handler;
+            });
+            
+            const fullSyncSpy = vi.spyOn(useStore.getState(), "fullSyncFromBackend")
+                .mockResolvedValue();
+            
+            const callback = vi.fn();
+            useStore.getState().subscribeToStatusUpdates(callback);
+            
+            // Verify store is empty
+            expect(useStore.getState().sites).toHaveLength(0);
+            
+            // Simulate status update for non-existent site
+            if (capturedHandler) {
+                capturedHandler({
+                    site: nonExistentSite,
+                    previousStatus: "down",
+                });
+            }
+            
+            // Should trigger full sync because site not found
+            expect(fullSyncSpy).toHaveBeenCalled();
+            // Should still call the callback
+            expect(callback).toHaveBeenCalledWith({
+                site: nonExistentSite,
+                previousStatus: "down",
+            });
+        });
+
+        it("processes status update with multiple sites - keeps other sites unchanged", () => {
+            const site1: Site = {
+                identifier: "site1",
+                name: "Site 1",
+                monitors: [{
+                    id: "monitor1",
+                    type: "http",
+                    status: "down",
+                    monitoring: true,
+                    history: [],
+                }],
+            };
+            
+            const site2: Site = {
+                identifier: "site2", 
+                name: "Site 2",
+                monitors: [{
+                    id: "monitor2",
+                    type: "http",
+                    status: "up",
+                    monitoring: true,
+                    history: [],
+                }],
+            };
+            
+            const site3: Site = {
+                identifier: "site3",
+                name: "Site 3", 
+                monitors: [{
+                    id: "monitor3",
+                    type: "http",
+                    status: "pending",
+                    monitoring: true,
+                    history: [],
+                }],
+            };
+            
+            // Set up store with multiple sites
+            useStore.getState().setSites([site1, site2, site3]);
+            
+            const updatedSite1: Site = {
+                ...site1,
+                monitors: [{
+                    ...site1.monitors[0],
+                    status: "up", // Change from down to up
+                }],
+            };
+            
+            let capturedHandler: ((update: StatusUpdate) => void) | undefined;
+            
+            mockElectronAPI.events.onStatusUpdate.mockImplementation((handler) => {
+                capturedHandler = handler;
+            });
+            
+            const callback = vi.fn();
+            useStore.getState().subscribeToStatusUpdates(callback);
+            
+            // Simulate status update for site1 only
+            if (capturedHandler) {
+                capturedHandler({
+                    site: updatedSite1,
+                    previousStatus: "down",
+                });
+            }
+            
+            const finalSites = useStore.getState().sites;
+            
+            // Site 1 should be updated
+            expect(finalSites.find(s => s.identifier === "site1")?.monitors[0].status).toBe("up");
+            
+            // Sites 2 and 3 should remain unchanged (this triggers the 'return site' branch)
+            expect(finalSites.find(s => s.identifier === "site2")?.monitors[0].status).toBe("up");
+            expect(finalSites.find(s => s.identifier === "site3")?.monitors[0].status).toBe("pending");
+            
+            expect(callback).toHaveBeenCalledWith({
+                site: updatedSite1,
+                previousStatus: "down",
+            });
         });
     });
 

@@ -2,10 +2,10 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { SettingsTab } from '../components/SiteDetails/tabs/SettingsTab';
-import { Site, Monitor } from '../types';
+import { Site, Monitor, StatusHistory } from '../types';
 import { CHECK_INTERVALS, RETRY_CONSTRAINTS, TIMEOUT_CONSTRAINTS } from '../constants';
 
-// Mock logger
+// Mock the logger service
 vi.mock('../services/logger', () => ({
   default: {
     user: {
@@ -13,6 +13,10 @@ vi.mock('../services/logger', () => ({
     },
   },
 }));
+
+// Import the mocked logger for use in tests
+import logger from '../services/logger';
+const mockedLogger = vi.mocked(logger);
 
 // Mock theme components
 vi.mock('../theme/components', () => ({
@@ -688,6 +692,169 @@ describe('SettingsTab', () => {
 
       // Check for remove button with icon
       expect(screen.getByRole('button', { name: /Remove Site/i })).toBeInTheDocument();
+    });
+  });
+
+  describe('Branch Coverage Tests', () => {
+    it('should handle site with undefined name (line 188, 207)', async () => {
+      const siteWithoutName: Site = {
+        ...mockSite,
+        name: undefined, // This will trigger the nullish coalescing fallback
+      };
+
+      const propsWithoutName = {
+        ...defaultProps,
+        currentSite: siteWithoutName,
+        hasUnsavedChanges: true, // Enable the save button
+      };
+
+      render(<SettingsTab {...propsWithoutName} />);
+
+      // Trigger the save name action to test line 188
+      const saveButtons = screen.getAllByText('Save');
+      const saveNameButton = saveButtons[0]; // First save button is for name
+      await userEvent.click(saveNameButton);
+
+      // Trigger the remove site action to test line 207
+      const removeButton = screen.getByRole('button', { name: /Remove Site/i });
+      await userEvent.click(removeButton);
+
+      // Verify the logger was called with empty string fallback
+      expect(mockedLogger.user.action).toHaveBeenCalledWith(
+        'Settings: Save site name initiated',
+        expect.objectContaining({
+          oldName: '', // Should use empty string fallback
+        })
+      );
+
+      expect(mockedLogger.user.action).toHaveBeenCalledWith(
+        'Settings: Remove site initiated',
+        expect.objectContaining({
+          siteName: '', // Should use empty string fallback
+        })
+      );
+    });
+
+    it('should handle monitor with undefined history (line 401)', () => {
+      const monitorWithoutHistory: Monitor = {
+        ...mockMonitor,
+        history: undefined as unknown as StatusHistory[], // This will trigger the fallback to []
+      };
+
+      const siteWithoutHistory: Site = {
+        ...mockSite,
+        monitors: [monitorWithoutHistory],
+      };
+
+      const propsWithoutHistory = {
+        ...defaultProps,
+        currentSite: siteWithoutHistory,
+        selectedMonitor: monitorWithoutHistory,
+      };
+
+      render(<SettingsTab {...propsWithoutHistory} />);
+
+      // Find the history count display
+      const historyBadge = screen.getByText('0'); // Should show 0 for undefined history
+      expect(historyBadge).toBeInTheDocument();
+    });
+
+    it('should handle monitor with null history (line 401)', () => {
+      const monitorWithNullHistory: Monitor = {
+        ...mockMonitor,
+        history: null as unknown as StatusHistory[], // This will trigger the fallback to []
+      };
+
+      const siteWithNullHistory: Site = {
+        ...mockSite,
+        monitors: [monitorWithNullHistory],
+      };
+
+      const propsWithNullHistory = {
+        ...defaultProps,
+        currentSite: siteWithNullHistory,
+        selectedMonitor: monitorWithNullHistory,
+      };
+
+      render(<SettingsTab {...propsWithNullHistory} />);
+
+      // Find the history count display
+      const historyBadge = screen.getByText('0'); // Should show 0 for null history
+      expect(historyBadge).toBeInTheDocument();
+    });
+
+    it('should handle monitor with undefined lastChecked (line 411-412)', () => {
+      const monitorWithoutLastChecked: Monitor = {
+        ...mockMonitor,
+        lastChecked: undefined as unknown as Date, // This will trigger the "Never" fallback
+      };
+
+      const siteWithoutLastChecked: Site = {
+        ...mockSite,
+        monitors: [monitorWithoutLastChecked],
+      };
+
+      const propsWithoutLastChecked = {
+        ...defaultProps,
+        currentSite: siteWithoutLastChecked,
+        selectedMonitor: monitorWithoutLastChecked,
+      };
+
+      render(<SettingsTab {...propsWithoutLastChecked} />);
+
+      // Find the "Never" text for lastChecked
+      expect(screen.getByText('Never')).toBeInTheDocument();
+    });
+
+    it('should handle monitor with null lastChecked (line 411-412)', () => {
+      const monitorWithNullLastChecked: Monitor = {
+        ...mockMonitor,
+        lastChecked: null as unknown as Date, // This will trigger the "Never" fallback
+      };
+
+      const siteWithNullLastChecked: Site = {
+        ...mockSite,
+        monitors: [monitorWithNullLastChecked],
+      };
+
+      const propsWithNullLastChecked = {
+        ...defaultProps,
+        currentSite: siteWithNullLastChecked,
+        selectedMonitor: monitorWithNullLastChecked,
+      };
+
+      render(<SettingsTab {...propsWithNullLastChecked} />);
+
+      // Find the "Never" text for lastChecked
+      expect(screen.getByText('Never')).toBeInTheDocument();
+    });
+
+    it('should handle site with null name (line 188, 207)', async () => {
+      const siteWithNullName: Site = {
+        ...mockSite,
+        name: null as unknown as string, // This will trigger the nullish coalescing fallback
+      };
+
+      const propsWithNullName = {
+        ...defaultProps,
+        currentSite: siteWithNullName,
+        hasUnsavedChanges: true, // Enable the save button
+      };
+
+      render(<SettingsTab {...propsWithNullName} />);
+
+      // Trigger the save name action to test line 188
+      const saveButtons = screen.getAllByText('Save');
+      const saveNameButton = saveButtons[0]; // First save button is for name
+      await userEvent.click(saveNameButton);
+
+      // Verify the logger was called with empty string fallback
+      expect(mockedLogger.user.action).toHaveBeenCalledWith(
+        'Settings: Save site name initiated',
+        expect.objectContaining({
+          oldName: '', // Should use empty string fallback
+        })
+      );
     });
   });
 });

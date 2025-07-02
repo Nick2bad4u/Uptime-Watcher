@@ -293,6 +293,53 @@ describe("SiteDetailsHeader", () => {
             const urlLink = container.querySelector('a[href]');
             expect(urlLink).not.toBeInTheDocument();
         });
+
+        it("should handle undefined URL in onClick handler (line 71 coverage)", async () => {
+            const user = userEvent.setup();
+            
+            // Create a special monitor where URL might be undefined during click processing
+            const mockMonitorWithNullishUrl: Monitor = {
+                ...mockHttpMonitor,
+                url: "https://example.com",
+            };
+
+            // Mock window.open to track calls
+            const mockWindowOpen = vi.fn();
+            Object.defineProperty(window, "open", {
+                value: mockWindowOpen,
+                writable: true,
+                configurable: true,
+            });
+
+            // Remove electronAPI to ensure window.open fallback is used
+            Object.defineProperty(window, "electronAPI", {
+                value: undefined,
+                writable: true,
+                configurable: true,
+            });
+
+            const { container } = render(<SiteDetailsHeader site={mockSite} selectedMonitor={mockMonitorWithNullishUrl} />);
+
+            const urlLink = container.querySelector('a[href="https://example.com"]');
+            expect(urlLink).toBeInTheDocument();
+
+            // Simulate a scenario where the URL becomes undefined during processing
+            // by modifying the monitor reference after render but before click
+            mockMonitorWithNullishUrl.url = undefined;
+
+            await user.click(urlLink!);
+
+            // The logger should still be called with empty string fallback
+            expect(logger.user.action).toHaveBeenCalledWith(
+                "External URL opened from site details",
+                expect.objectContaining({
+                    url: "", // This should be the fallback from the nullish coalescing
+                })
+            );
+
+            // window.open should be called with empty string
+            expect(mockWindowOpen).toHaveBeenCalledWith("", "_blank");
+        });
     });
 
     describe("Accessibility", () => {

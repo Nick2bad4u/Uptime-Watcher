@@ -302,6 +302,79 @@ describe('HistoryTab', () => {
             expect(screen.queryByText(/Response Code:/)).not.toBeInTheDocument();
             expect(screen.queryByText(/Port:/)).not.toBeInTheDocument();
         });
+
+        it('should handle records with undefined details (line 105 coverage)', () => {
+            // This test specifically targets the early return in renderDetails function
+            const monitorWithMixedDetails = {
+                ...mockMonitor,
+                type: 'http' as const,
+                history: [
+                    // Record with details
+                    { timestamp: 1640995200000, status: 'up' as const, responseTime: 150, details: '200' },
+                    // Record without details - should trigger the early return in renderDetails
+                    { timestamp: 1640995100000, status: 'down' as const, responseTime: 0 },
+                    // Record with empty string details 
+                    { timestamp: 1640995000000, status: 'up' as const, responseTime: 120, details: '' },
+                    // Record with explicit undefined details
+                    { timestamp: 1640994900000, status: 'down' as const, responseTime: 0, details: undefined },
+                ]
+            };
+            
+            render(<HistoryTab {...defaultProps} selectedMonitor={monitorWithMixedDetails} />);
+            
+            // Should render details for records that have them
+            expect(screen.getByText('Response Code: 200')).toBeInTheDocument();
+            
+            // Should not render details for records without them (this tests the early return)
+            const detailElements = screen.queryAllByText(/Response Code:/);
+            expect(detailElements).toHaveLength(1); // Only one record has details
+        });
+
+        it('should handle monitor with mixed nullish and defined details', () => {
+            const monitorWithMixedNullishDetails = {
+                ...mockMonitor,
+                type: 'http' as const,
+                history: [
+                    { timestamp: 1640995200000, status: 'up' as const, responseTime: 150, details: '200' },
+                    { timestamp: 1640995100000, status: 'down' as const, responseTime: 0, details: null },
+                    { timestamp: 1640995000000, status: 'up' as const, responseTime: 120, details: undefined },
+                ]
+            };
+            
+            render(<HistoryTab {...defaultProps} selectedMonitor={monitorWithMixedNullishDetails} />);
+            
+            // Should render details for records that have them
+            expect(screen.getByText('Response Code: 200')).toBeInTheDocument();
+            
+            // Should not render details for records without them (null or undefined)
+            const detailElements = screen.queryAllByText(/Response Code:/);
+            expect(detailElements).toHaveLength(1); // Only one record has details
+        });
+
+        it('should cover the exact early return condition in renderDetails (line 105)', () => {
+            // This test specifically targets line 105: if (!record.details) return undefined;
+            // We need to ensure records with falsy details trigger this condition
+            const monitorWithFalsyDetails = {
+                ...mockMonitor,
+                type: 'http' as const,
+                history: [
+                    // This record should definitely trigger the early return
+                    { timestamp: 1640995200000, status: 'down' as const, responseTime: 0 },
+                    // This record with empty string should also trigger early return  
+                    { timestamp: 1640995100000, status: 'up' as const, responseTime: 150, details: '' },
+                    // This record with explicit undefined should trigger early return
+                    { timestamp: 1640995000000, status: 'down' as const, responseTime: 0, details: undefined },
+                ]
+            };
+            
+            render(<HistoryTab {...defaultProps} selectedMonitor={monitorWithFalsyDetails} />);
+            
+            // Verify that no response code details are rendered for any of the falsy detail records
+            expect(screen.queryByText(/Response Code:/)).not.toBeInTheDocument();
+            
+            // Verify the component renders (check for one of the expected elements)
+            expect(screen.getByText('All')).toBeInTheDocument(); // Filter button should be present
+        });
     });
 
     describe('Empty State', () => {

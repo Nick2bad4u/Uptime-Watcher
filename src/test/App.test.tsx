@@ -112,7 +112,7 @@ vi.mock("../theme/components", () => ({
 }));
 
 vi.mock("../theme/useTheme", () => ({
-    useTheme: () => ({ isDark: false }),
+    useTheme: vi.fn(() => ({ isDark: false })),
 }));
 
 // Mock the store
@@ -142,6 +142,9 @@ vi.mock("../store", () => ({
 
 import App from "../App";
 
+// Import the mocked module so we can modify it in tests
+import * as themeModule from "../theme/useTheme";
+
 describe("App Component", () => {
     const user = userEvent.setup();
 
@@ -166,6 +169,21 @@ describe("App Component", () => {
             unsubscribeFromStatusUpdates: vi.fn(),
             updateError: null,
             updateStatus: "idle",
+        });
+        
+        // Reset useTheme mock to default
+        vi.mocked(themeModule.useTheme).mockReturnValue({ 
+            isDark: false,
+            availableThemes: [],
+            currentTheme: { isDark: false, colors: {} } as never,
+            getColor: vi.fn(),
+            getStatusColor: vi.fn(),
+            setTheme: vi.fn(),
+            systemTheme: "light",
+            themeManager: {} as never,
+            themeName: "light",
+            themeVersion: 1,
+            toggleTheme: vi.fn(),
         });
     });
 
@@ -193,6 +211,27 @@ describe("App Component", () => {
             const { container } = render(<App />);
             const appContainer = container.querySelector(".app-container");
             expect(appContainer).not.toHaveClass("dark");
+        });
+
+        it("applies dark CSS class when dark theme is enabled", () => {
+            // Temporarily override the useTheme mock to return isDark: true
+            vi.mocked(themeModule.useTheme).mockReturnValueOnce({ 
+                isDark: true,
+                availableThemes: [],
+                currentTheme: { isDark: true, colors: {} } as never,
+                getColor: vi.fn(),
+                getStatusColor: vi.fn(),
+                setTheme: vi.fn(),
+                systemTheme: "dark",
+                themeManager: {} as never,
+                themeName: "dark",
+                themeVersion: 1,
+                toggleTheme: vi.fn(),
+            });
+            
+            const { container } = render(<App />);
+            const appContainer = container.querySelector(".app-container");
+            expect(appContainer).toHaveClass("dark");
         });
 
         it("displays correct site count", () => {
@@ -250,6 +289,24 @@ describe("App Component", () => {
             });
 
             expect(screen.getByText("Loading...")).toBeInTheDocument();
+            
+            // Verify all the loading overlay elements are present to cover line 110 branch
+            const loadingOverlay = document.querySelector('.loading-overlay');
+            expect(loadingOverlay).toBeInTheDocument();
+            
+            const loadingContent = document.querySelector('.loading-content');
+            expect(loadingContent).toBeInTheDocument();
+            
+            const loadingSpinner = document.querySelector('.loading-spinner');
+            expect(loadingSpinner).toBeInTheDocument();
+            
+            // Verify the loading overlay contains the themed components
+            const loadingText = screen.getByText("Loading...");
+            expect(loadingText).toHaveAttribute('data-testid', 'themed-text');
+            
+            // Verify the loading overlay ThemedBox is present within the loading-overlay
+            const themedBoxInLoading = loadingOverlay?.querySelector('[data-testid="themed-box"]');
+            expect(themedBoxInLoading).toBeInTheDocument();
         });
 
         it("hides loading overlay when not loading", () => {

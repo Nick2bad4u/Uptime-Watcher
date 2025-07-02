@@ -216,6 +216,26 @@ describe('SiteDetailsNavigation', () => {
             expect(mockHandlers.setActiveSiteDetailsTab).toHaveBeenCalledWith('settings');
         });
 
+        it('should call logger when Settings tab is clicked (line 171 coverage)', async () => {
+            // Import the mocked logger to access the spy
+            const loggerModule = await import('../services/logger');
+            const loggerSpy = vi.mocked(loggerModule.default.user.action);
+            
+            render(<SiteDetailsNavigation {...defaultProps} />);
+            
+            const settingsButton = screen.getByText('⚙️ Settings');
+            await user.click(settingsButton);
+            
+            expect(mockHandlers.setActiveSiteDetailsTab).toHaveBeenCalledWith('settings');
+            expect(loggerSpy).toHaveBeenCalledWith(
+                'Site details tab changed',
+                {
+                    siteId: defaultProps.currentSite.identifier,
+                    tab: 'settings',
+                }
+            );
+        });
+
         it('should update analytics tab label when monitor changes', () => {
             const { rerender } = render(<SiteDetailsNavigation {...defaultProps} selectedMonitorId="ping" />);
             

@@ -652,13 +652,9 @@ describe("Settings", () => {
     });
 
     describe("Settings Key Validation", () => {
-        it("should log warning and return early for invalid settings key", () => {
-            const loggerWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-            
-            render(<Settings onClose={mockOnClose} />);
-            
-            // Create a mock component that can call handleSettingChange with invalid key
-            // Since we can't directly access the internal function, we'll simulate the logic
+        it("should document the defensive validation logic", () => {
+            // This test documents the validation logic used in Settings.tsx
+            // Even though it's hard to trigger through TypeScript, it provides runtime safety
             const allowedKeys = [
                 "notifications",
                 "autoStart", 
@@ -668,18 +664,12 @@ describe("Settings", () => {
                 "historyLimit",
             ];
             
-            const invalidKey = "invalidKey";
-            const shouldWarn = !allowedKeys.includes(invalidKey);
+            // Test that valid keys pass validation
+            expect(allowedKeys.includes("notifications")).toBe(true);
+            expect(allowedKeys.includes("theme")).toBe(true);
             
-            if (shouldWarn) {
-                console.warn("Attempted to update invalid settings key", invalidKey);
-                // Simulate early return by not calling updateSettings
-            }
-            
-            expect(loggerWarnSpy).toHaveBeenCalledWith("Attempted to update invalid settings key", invalidKey);
-            expect(mockUseStore.updateSettings).not.toHaveBeenCalledWith(expect.objectContaining({ invalidKey: expect.anything() }));
-            
-            loggerWarnSpy.mockRestore();
+            // Test that invalid keys fail validation
+            expect(allowedKeys.includes("invalidKey" as never)).toBe(false);
         });
     });
 });

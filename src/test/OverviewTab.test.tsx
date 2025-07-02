@@ -7,6 +7,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { OverviewTab } from "../components/SiteDetails/tabs/OverviewTab";
 import { Monitor } from "../types";
+import logger from "../services/logger";
 
 // Mock the theme hooks
 const mockUseTheme = {
@@ -190,6 +191,62 @@ describe("OverviewTab", () => {
 
             const removeButton = screen.getByRole("button", { name: /remove/i });
             expect(removeButton).toBeDisabled();
+        });
+
+        it("should handle remove site logging with undefined URL (line 196 coverage)", async () => {
+            const user = userEvent.setup();
+            
+            // Create a monitor without a URL to trigger the nullish coalescing on line 196
+            const monitorWithoutUrl: Monitor = {
+                ...mockMonitor,
+                url: undefined, // This should trigger the ?? "unknown" fallback
+            };
+            
+            const loggerSpy = vi.spyOn(logger.user, 'action');
+            
+            render(<OverviewTab {...defaultProps} selectedMonitor={monitorWithoutUrl} />);
+
+            const removeButton = screen.getByRole("button", { name: /remove/i });
+            await user.click(removeButton);
+
+            // Check that the logger was called with "unknown" when URL is undefined
+            expect(loggerSpy).toHaveBeenCalledWith(
+                "Site removal button clicked from overview tab",
+                {
+                    monitorType: monitorWithoutUrl.type,
+                    siteId: "unknown", // This should be the fallback value
+                }
+            );
+            
+            loggerSpy.mockRestore();
+        });
+
+        it("should handle remove site logging with undefined URL", async () => {
+            const user = userEvent.setup();
+            
+            // Create a monitor with undefined URL to test another undefined case
+            const monitorWithNullUrl: Monitor = {
+                ...mockMonitor,
+                url: undefined, // This should also trigger the ?? "unknown" fallback
+            };
+            
+            const loggerSpy = vi.spyOn(logger.user, 'action');
+            
+            render(<OverviewTab {...defaultProps} selectedMonitor={monitorWithNullUrl} />);
+
+            const removeButton = screen.getByRole("button", { name: /remove/i });
+            await user.click(removeButton);
+
+            // Check that the logger was called with "unknown" when URL is undefined
+            expect(loggerSpy).toHaveBeenCalledWith(
+                "Site removal button clicked from overview tab",
+                {
+                    monitorType: monitorWithNullUrl.type,
+                    siteId: "unknown", // This should be the fallback value
+                }
+            );
+            
+            loggerSpy.mockRestore();
         });
     });
 
