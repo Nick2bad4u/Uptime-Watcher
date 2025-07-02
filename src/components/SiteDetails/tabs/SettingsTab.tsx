@@ -18,6 +18,7 @@ import {
     ThemedSelect,
 } from "../../../theme/components";
 import { Site, Monitor } from "../../../types";
+import { calculateMaxDuration } from "../../../utils/duration";
 
 /**
  * Helper function to format time duration into human readable format.
@@ -181,21 +182,6 @@ export function SettingsTab({
     setLocalName,
     timeoutChanged,
 }: SettingsTabProps) {
-    // Helper function to calculate total monitoring time
-    const calculateMaxDuration = (timeout: number, retryAttempts: number): string => {
-        const totalAttempts = retryAttempts + 1;
-        const timeoutTime = timeout * totalAttempts;
-        const backoffTime =
-            retryAttempts > 0
-                ? Array.from({ length: retryAttempts }, (_, i) => Math.min(0.5 * Math.pow(2, i), 5)).reduce(
-                      (a, b) => a + b,
-                      0
-                  )
-                : 0;
-        const totalTime = Math.ceil(timeoutTime + backoffTime);
-        return totalTime < 60 ? `${totalTime}s` : `${Math.ceil(totalTime / 60)}m`;
-    };
-
     const loggedHandleSaveName = async () => {
         logger.user.action("Settings: Save site name initiated", {
             newName: localName.trim(),

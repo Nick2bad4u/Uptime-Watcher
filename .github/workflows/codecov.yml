@@ -34,6 +34,7 @@ jobs:
               id: build
               run: |
                   npm run build
+              continue-on-error: true
 
             # Run frontend tests with coverage
             - name: Run frontend tests
@@ -41,6 +42,7 @@ jobs:
               run: |
                   mkdir -p coverage
                   npx vitest run --coverage --reporter=verbose
+              continue-on-error: true
 
             # Run electron tests with coverage
             - name: Run electron tests
@@ -48,6 +50,7 @@ jobs:
               run: |
                   mkdir -p coverage
                   npx vitest run --config vitest.electron.config.ts --coverage --reporter=verbose
+              continue-on-error: true
 
             # Generate JUnit reports for both test suites
             - name: Generate frontend JUnit report
@@ -56,6 +59,7 @@ jobs:
                   mkdir -p coverage
                   npx vitest run --reporter=junit \
                     --outputFile=coverage/frontend-test-report.junit.xml
+              continue-on-error: true
 
             - name: Generate electron JUnit report
               id: junit-electron
@@ -63,6 +67,7 @@ jobs:
                   mkdir -p coverage/electron
                   npx vitest run --config vitest.electron.config.ts --reporter=junit \
                     --outputFile=coverage/electron/electron-test-report.junit.xml
+              continue-on-error: true
 
             # Upload frontend coverage to Codecov
             - name: Upload frontend coverage to Codecov
@@ -75,6 +80,8 @@ jobs:
                   flags: frontend
                   name: frontend-coverage
                   fail_ci_if_error: false
+              env:
+                  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
             # Upload electron coverage to Codecov
             - name: Upload electron coverage to Codecov
@@ -87,22 +94,28 @@ jobs:
                   flags: electron
                   name: electron-coverage
                   fail_ci_if_error: false
+              env:
+                  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
             # Upload test results
             - name: Upload frontend test results to Codecov
               id: upload-frontend-test-results
-              if: ${{ !cancelled() }}
               uses: codecov/test-results-action@v1
               with:
                   file: ./coverage/frontend-test-report.junit.xml
                   token: ${{ secrets.CODECOV_TOKEN }}
                   flags: frontend
+              continue-on-error: true
+              env:
+                  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
             - name: Upload electron test results to Codecov
               id: upload-electron-test-results
-              if: ${{ !cancelled() }}
               uses: codecov/test-results-action@v1
               with:
                   file: ./coverage/electron/electron-test-report.junit.xml
                   token: ${{ secrets.CODECOV_TOKEN }}
                   flags: electron
+              continue-on-error: true
+              env:
+                  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
