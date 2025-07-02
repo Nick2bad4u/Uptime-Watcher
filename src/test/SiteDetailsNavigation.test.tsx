@@ -198,6 +198,24 @@ describe('SiteDetailsNavigation', () => {
             expect(mockHandlers.setActiveSiteDetailsTab).toHaveBeenCalledWith('http-analytics');
         });
 
+        it('should call setActiveSiteDetailsTab when History tab is clicked', async () => {
+            render(<SiteDetailsNavigation {...defaultProps} />);
+            
+            const historyButton = screen.getByText('📜 History');
+            await user.click(historyButton);
+            
+            expect(mockHandlers.setActiveSiteDetailsTab).toHaveBeenCalledWith('history');
+        });
+
+        it('should call setActiveSiteDetailsTab when Settings tab is clicked', async () => {
+            render(<SiteDetailsNavigation {...defaultProps} />);
+            
+            const settingsButton = screen.getByText('⚙️ Settings');
+            await user.click(settingsButton);
+            
+            expect(mockHandlers.setActiveSiteDetailsTab).toHaveBeenCalledWith('settings');
+        });
+
         it('should update analytics tab label when monitor changes', () => {
             const { rerender } = render(<SiteDetailsNavigation {...defaultProps} selectedMonitorId="ping" />);
             

@@ -573,4 +573,18 @@ describe("AddSiteForm Submit", () => {
             });
         });
     });
+
+    describe("Monitor Type Validation", () => {
+        it("should handle unknown monitor type gracefully", async () => {
+            await handleSubmit(mockEvent, {
+                ...baseProps,
+                monitorType: "unknown" as any,
+                url: "https://example.com",
+            });
+
+            // Should not throw an error and proceed with validation
+            // The validateMonitorType function should return an empty array for unknown types
+            expect(mockCreateSite).toHaveBeenCalled();
+        });
+    });
 });

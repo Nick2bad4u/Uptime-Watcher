@@ -82,6 +82,25 @@ describe("StatusBadge - Simple Tests", () => {
             // Default should be 'sm'
             expect(document.querySelector(".themed-text--size-sm")).toBeInTheDocument();
         });
+
+        it("should handle unknown/unsupported size by falling back to default", () => {
+            // Use a size that's not explicitly handled in the switch statement
+            const unknownSize = "unknown" as "xs"; // Force type for test
+            render(<StatusBadge label="Website" status="up" size={unknownSize} />);
+            
+            expect(screen.getByText("Website: up")).toBeInTheDocument();
+            // Should not crash and should render successfully
+            expect(document.querySelector(".themed-status-indicator")).toBeInTheDocument();
+        });
+
+        it("should handle null/undefined size by falling back to default", () => {
+            // Test with undefined size
+            const undefinedSize = undefined as unknown as "xs"; // Force type for test
+            render(<StatusBadge label="Website" status="up" size={undefinedSize} />);
+            
+            expect(screen.getByText("Website: up")).toBeInTheDocument();
+            expect(document.querySelector(".themed-status-indicator")).toBeInTheDocument();
+        });
     });
 
     describe("Integration", () => {
