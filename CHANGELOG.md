@@ -7,14 +7,87 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[594621f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/594621f3d1dbf960608df05dd053f5cc574e2d16)...
-[594621f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/594621f3d1dbf960608df05dd053f5cc574e2d16)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/594621f3d1dbf960608df05dd053f5cc574e2d16...594621f3d1dbf960608df05dd053f5cc574e2d16))
+[[d18778a](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d18778a5d7752d9b13ba2131e7f2bd5d276a6327)...
+[d18778a](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d18778a5d7752d9b13ba2131e7f2bd5d276a6327)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/d18778a5d7752d9b13ba2131e7f2bd5d276a6327...d18778a5d7752d9b13ba2131e7f2bd5d276a6327))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 4.0.0 [`(d18778a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d18778a5d7752d9b13ba2131e7f2bd5d276a6327)
+
+
+
+
+
+
+## [4.0.0] - 2025-07-02
+
+
+[[c24fa68](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c24fa68b82587714446f6b3e89ac29a099379ff3)...
+[2bd9e54](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2bd9e54468d7e37c623953e18293e81255abdbed)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/c24fa68b82587714446f6b3e89ac29a099379ff3...2bd9e54468d7e37c623953e18293e81255abdbed))
+
+
+### �️ Bug Fixes
+
+- 🛠️ [fix] Add update payload validation and improve progress accessibility
+
+- Prevents runtime errors by validating status update payloads before processing, ensuring update and its site property are defined.
+- Improves accessibility for progress components by adding a visually hidden native progress element and marking decorative divs as hidden from assistive technologies. [`(ee1de00)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ee1de00dabc88f20eba1b6357fbe2c1139287e12)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 3.9.0 [`(594621f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/594621f3d1dbf960608df05dd053f5cc574e2d16)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(2bd9e54)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2bd9e54468d7e37c623953e18293e81255abdbed)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Update type assertions in tab component tests
+
+- Changes type assertions from direct casting to use 'unknown as' for component functions during test execution.
+- Improves type safety and reduces potential type errors in test cases by ensuring more robust casting for function calls. [`(f062b78)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f062b7887c2969e5d0c706b4d1d4505857faf9e9)
+
+
+- 🧪 [test] Remove obsolete unit tests for tab components
+
+- Deletes outdated or unnecessary test files for tab components to streamline the test suite.
+ - Reduces maintenance overhead and potential confusion from legacy tests no longer aligned with current implementation. [`(98c2020)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/98c202011b6d9e5e76b6ff05c3e74a1b0e7a7afc)
+
+
+- 🧪 [test] Expand coverage for theme, store, and component tests
+
+- Adds extensive test cases for theme management, custom theme creation, CSS variable generation, and system theme edge cases to ensure robust theming.
+- Increases test coverage for UI components, including badges, buttons, cards, boxes, progress bars, and status indicators, targeting edge cases and interactive behaviors.
+- Introduces new tests for various monitor configuration updates and error handling in the application store, including fallback syncing and error scenarios.
+- Refactors test file structure by relocating and renaming test files for clarity and consistency.
+- Improves test coverage for keyboard and accessibility interactions, as well as variant and size permutations.
+- Ensures all logical branches and utility functions are exercised, aiming for near 100% test coverage. [`(c4b09ca)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c4b09caf4d3cc167bb1de994e78a85d2c918fbbd)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v3.9.0 [skip ci] [`(2ea8e19)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2ea8e196eeda9692ed6e3d12959511d67bd47779)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Replace ts-prune with knip and ts-morph-helpers
+
+- Updates dev dependencies to remove ts-prune and add knip and ts-morph-helpers for improved dead code analysis and codebase maintenance.
+- Removes related dependencies no longer needed by ts-prune and adds new dependencies required by knip and ts-morph-helpers.
+- Enables more modern and accurate unused code detection tooling, which should help maintain code quality and streamline dependency management. [`(c24fa68)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c24fa68b82587714446f6b3e89ac29a099379ff3)
 
 
 
