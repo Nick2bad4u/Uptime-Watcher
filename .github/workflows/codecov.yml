@@ -80,8 +80,6 @@ jobs:
                   token: ${{ secrets.CODECOV_TOKEN }}
                   slug: Nick2bad4u/Uptime-Watcher
                   files: ./coverage/lcov.info
-                  directory: ./coverage
-                  exclude: ./coverage/electron
                   flags: frontend
                   name: frontend-coverage
                   verbose: true
@@ -97,8 +95,6 @@ jobs:
                   token: ${{ secrets.CODECOV_TOKEN }}
                   slug: Nick2bad4u/Uptime-Watcher
                   files: ./coverage/electron/lcov.info
-                  directory: ./coverage/electron
-                  exclude: ./coverage
                   flags: electron
                   name: electron-coverage
                   verbose: true
@@ -112,7 +108,6 @@ jobs:
               uses: codecov/test-results-action@v1
               with:
                   files: ./coverage/frontend-test-report.junit.xml
-                  disable_search: true
                   token: ${{ secrets.CODECOV_TOKEN }}
                   flags: frontend-tests
                   name: frontend-test-results
@@ -127,7 +122,6 @@ jobs:
               uses: codecov/test-results-action@v1
               with:
                   files: ./coverage/electron/electron-test-report.junit.xml
-                  disable_search: true
                   token: ${{ secrets.CODECOV_TOKEN }}
                   flags: electron-tests
                   name: electron-test-results
