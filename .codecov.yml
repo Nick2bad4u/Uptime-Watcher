@@ -5,6 +5,9 @@ codecov:
     require_ci_to_pass: true
     notify:
         wait_for_ci: true
+        after_n_builds: 2 # Wait for both frontend and electron uploads
+    branch: main
+    max_report_age: 24 # Reject reports older than 24 hours
 
 coverage:
     precision: 2
@@ -16,10 +19,31 @@ coverage:
             default:
                 target: auto
                 threshold: 1%
-        patch:
-            default:
+                base: auto
+            frontend:
+                flags:
+                    - frontend
                 target: auto
                 threshold: 1%
+            electron:
+                flags:
+                    - electron
+                target: auto
+                threshold: 1%
+        patch:
+            default:
+                target: 70%
+                threshold: 5%
+            frontend:
+                flags:
+                    - frontend
+                target: 70%
+                threshold: 5%
+            electron:
+                flags:
+                    - electron
+                target: 70%
+                threshold: 5%
 
     ignore:
         # Build outputs and compiled files
@@ -53,6 +77,34 @@ coverage:
         - "**/*.json"
 
 comment:
-    layout: "reach,diff,flags,tree"
+    layout: "header, flags, diff, tree, files, reach, betaprofiling, components, footer, feedback"
     behavior: default
     require_changes: false
+    require_base: false # Allow comments on first PR
+    require_head: true # Require head report to comment
+
+flags:
+    frontend:
+        paths:
+            - src/
+        carryforward: false
+    electron:
+        paths:
+            - electron/
+        carryforward: false
+
+github_checks:
+    annotations: true
+    summary: true
+
+parsers:
+    javascript:
+        enable_partials: yes # default yes
+    v1:
+        include_full_missed_files: true # Show files with 0% coverage
+    gcov:
+        branch_detection:
+            conditional: yes # Track if/else branches
+            loop: yes # Track loop branches
+            method: no # Don't track method entry/exit
+            macro: no # Don't track macro expansions

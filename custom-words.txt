@@ -57,3 +57,4 @@ MMM
 mts
 unhover
 Sarif
+gcov

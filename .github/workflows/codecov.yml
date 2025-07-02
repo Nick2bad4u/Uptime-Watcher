@@ -120,6 +120,7 @@ jobs:
               continue-on-error: true
               env:
                   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+                  CODECOV_VERBOSE: true
 
             - name: Upload electron test results to Codecov
               id: upload-electron-test-results
@@ -134,3 +135,4 @@ jobs:
               continue-on-error: true
               env:
                   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+                  CODECOV_VERBOSE: true
