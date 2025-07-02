@@ -7,14 +7,126 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[7b9f516](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7b9f516d1e1a9729a0b003022025dff78e732b60)...
-[b319768](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b3197687162e1173c97a75aaeb7ff1bb3a253676)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/7b9f516d1e1a9729a0b003022025dff78e732b60...b3197687162e1173c97a75aaeb7ff1bb3a253676))
+[[594621f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/594621f3d1dbf960608df05dd053f5cc574e2d16)...
+[594621f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/594621f3d1dbf960608df05dd053f5cc574e2d16)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/594621f3d1dbf960608df05dd053f5cc574e2d16...594621f3d1dbf960608df05dd053f5cc574e2d16))
 
 
 ### 📦 Dependencies
 
+- [dependency] Update version 3.9.0 [`(594621f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/594621f3d1dbf960608df05dd053f5cc574e2d16)
+
+
+
+
+
+
+## [3.9.0] - 2025-07-02
+
+
+[[18cb442](https://github.com/Nick2bad4u/Uptime-Watcher/commit/18cb4429a2b88939bc8fa94404788314a8e5714f)...
+[45fd6d0](https://github.com/Nick2bad4u/Uptime-Watcher/commit/45fd6d033a06f68d802a05727a7aca0cfeafc49b)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/18cb4429a2b88939bc8fa94404788314a8e5714f...45fd6d033a06f68d802a05727a7aca0cfeafc49b))
+
+
+### ✨ Features
+
+- ✨ [feat] Improve screenshot overlay UX and test UI integration
+
+- Enhances screenshot overlay with debounced hover/focus handling, preventing flickering and ensuring cleanup of portal and timeouts for better accessibility and stability
+- Updates button component to support accessible aria-labels
+- Restricts test coverage reporting to exclude type definition files and ignore empty lines
+- Adds @vitest/ui and related dependencies for improved test UI workflows
+- Refines average response time calculation to consider only successful checks
+- Expands custom dictionary with new domain-specific terms [`(475d2b2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/475d2b29f6ca09224003d5aa0daa3da48c16dbd2)
+
+
+
+### 📦 Dependencies
+
+- *(deps)* [dependency] Update dependency group [`(0e19d08)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0e19d08deef4201d90e32631111cd8f1a3069d0c)
+
+
 - [dependency] Update version 3.8.0 [`(7b9f516)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7b9f516d1e1a9729a0b003022025dff78e732b60)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(b40c8e5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b40c8e525dab6fc15d9c4a76f6736bf2bb823b6f)
+
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(77dc94d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/77dc94dae2e7d0f66644c29c42d9093213af8499)
+
+
+
+### 💼 Other
+
+- Merge PR #20
+
+[ci][skip-ci](deps): [dependency] Update dependency group [`(a6073d8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a6073d83341eeb0f1ee31b82b423b6fb55525570)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Simplify conditional rendering for time range selector in SiteDetailsNavigation
+ - Removed redundant checks for selectedMonitorId in the analytics tab rendering logic
+ - Improved readability by restructuring JSX layout [`(123cc6d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/123cc6ddcf2cf106a12a801293e1934da1662a08)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Add comprehensive unit tests for components, hooks, and store
+
+- Introduces detailed test suites covering major UI components, hooks, and state management, significantly improving automated test coverage
+- Validates rendering, user interactions, accessibility, memoization, and error handling across forms, dashboard, theming, and store logic
+- Adds tests for validation scenarios, edge cases, and Redux/Zustand store side effects to ensure robustness and reliability
+- Updates CI config to ensure coverage output folder exists before running frontend and Electron tests, making CI more stable
+
+Relates to improved code quality and maintainability through thorough testing. [`(968dbe0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/968dbe0be0eec3e391fe694b9a7f661664966a75)
+
+
+- 🧪 [test] Expand test coverage for edge cases and nullish behavior
+
+- Adds comprehensive tests for null, undefined, and falsy values in deletion and export logic, ensuring robust handling of edge cases in repositories.
+- Improves monitoring service test coverage for nullish coalescing, error handling (including non-Error types), and configuration fallbacks.
+- Verifies guard clauses and early returns in window management logic, preventing unintended side effects when main objects are missing.
+- Marks logger debug statements and test-only branches with v8 coverage ignore comments to ensure accurate code coverage reporting.
+- Updates coverage configuration to ignore empty lines for more accurate metrics. [`(347291e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/347291e1a9f989b3dfb9badfa5ba2e9c3b0db7ed)
+
+
+- 🧪 [test] Achieve full branch coverage for monitor DB logic
+
+- Expands unit tests to cover all edge cases and branches in monitor and history repository database logic, including null, undefined, falsy, and mixed-type field handling
+- Verifies correct SQL parameterization and conversion for all field types, especially for undefined and falsy values
+- Ensures robust type conversion, error handling, and fallback logic for monitor creation, updating, fetching, and deletion
+- Improves confidence in handling SQLite's dynamic typing and database result edge cases [`(5e263bf)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5e263bff01034335c14ba1f036421a2f4568cae4)
+
+
+- 🧪 [test] Expand HttpMonitor test coverage for timeouts and logging
+
+- Adds comprehensive tests to cover all timeout fallback branches, retry attempts, and debug logging scenarios in HTTP monitoring logic
+- Verifies correct use of default, config, and monitor-specific timeout values, along with error handling and logging in both dev and production modes
+- Improves reliability of monitoring logic by ensuring edge cases and conditional branches are thoroughly tested [`(104234e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/104234e02b478a634676dfe71334ca78497e4b7c)
+
+
+
+### 🧹 Chores
+
+- 🧹 [chore] Remove outdated changelogs and unused devDependency
+
+- Deletes all auto-generated changelog markdown files from the documentation,
+  cleaning up the repo and reducing maintenance overhead for obsolete or redundant logs.
+- Removes the unused TypeScript CLI devDependency to streamline the dependency tree.
+- Updates test IDs in form field tests for consistency and future-proofing.
+- Adds a custom spelling entry for "Sarif" and minor code style tweaks in test mocks.
+
+Helps reduce clutter, improve test clarity, and maintain an up-to-date codebase. [`(535c3df)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/535c3df642310de57c9fa23b67cc6634795c97cb)
+
+
+- Update changelogs for v3.8.0 [skip ci] [`(34a3abd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/34a3abd399770aeb377e55e4ccfe2a9eb38f8bf2)
 
 
 
@@ -27,6 +139,44 @@ All notable changes to this project will be documented in this file.
 
 
 - Update codecov.yml [`(d18fd8e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d18fd8e811dc5e7d2305937be293183ffa46c247)
+
+
+
+### 👷 CI/CD
+
+- 👷 [ci] Ensure coverage directories exist and fix test report upload paths
+
+- Creates necessary directories before generating JUnit test reports to prevent errors if they do not exist.
+- Updates test report upload parameters to use the correct key for single files, aligning with codecov action requirements.
+- Improves CI reliability and ensures test results are properly uploaded for both frontend and electron suites. [`(fd9e38a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fd9e38a376605353b4c75e9dd93a31e1fb4d4446)
+
+
+- 👷 [ci] Add separate CI steps for frontend and electron coverage
+
+- Separates test and coverage workflows for frontend and electron code, generating distinct reports and using Codecov flags for clearer tracking.
+- Updates documentation to clarify dual test setup, coverage locations, and recommended commands for each environment.
+- Adds a unified script for both coverage runs and improves report formats with HTML output for local review.
+
+Relates to improved multi-environment coverage reporting and CI transparency. [`(18cb442)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/18cb4429a2b88939bc8fa94404788314a8e5714f)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update test config and lint ignores for coverage and bail
+
+- Adds coverage directories to lint ignore patterns to prevent unnecessary linting of coverage outputs.
+- Updates test scripts to use bail mode for faster feedback on failures.
+- Integrates recommended Vitest globals directly in lint config for better compatibility.
+- Sets a 10-second timeout for Vitest tests to avoid hanging during slow runs. [`(45fd6d0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/45fd6d033a06f68d802a05727a7aca0cfeafc49b)
+
+
+- 🔧 [build] Add Codecov Vite plugin, update dependencies
+
+- Integrates Codecov Vite plugin for improved coverage reporting and bundle analysis, enabling analysis when a token is present.
+- Updates several devDependencies to latest versions for better compatibility, security, and type coverage.
+- Removes obsolete Electron type definitions and updates type stubs for sqlite3.
+- Adds package overrides and lockfile entries to ensure consistent build and CI behavior. [`(0bc88f4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0bc88f4e23c76b339fc39df1134e2d4527063478)
 
 
 
