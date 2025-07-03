@@ -58,3 +58,7 @@ mts
 unhover
 Sarif
 gcov
+hmr
+upserted
+IUI
+cascadingly
