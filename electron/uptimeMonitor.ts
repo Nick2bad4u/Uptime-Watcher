@@ -3,16 +3,10 @@
  * Orchestrates site monitoring, data persistence, and event emission for the application.
  */
 
-/* eslint-disable functional/no-let */
 /* eslint-disable unicorn/no-null -- null literal needed for backend */
 import { EventEmitter } from "events";
 
-import {
-    DEFAULT_REQUEST_TIMEOUT,
-    DEFAULT_CHECK_INTERVAL,
-    STATUS_UPDATE_EVENT,
-    DEFAULT_HISTORY_LIMIT,
-} from "./constants";
+import { DEFAULT_CHECK_INTERVAL, STATUS_UPDATE_EVENT, DEFAULT_HISTORY_LIMIT } from "./constants";
 import {
     DatabaseService,
     SiteRepository,
@@ -20,8 +14,8 @@ import {
     HistoryRepository,
     SettingsRepository,
 } from "./services/database";
-import { MonitorFactory, MonitorScheduler } from "./services/monitoring";
-import { Site, StatusHistory, StatusUpdate } from "./types";
+import { MonitorScheduler } from "./services/monitoring";
+import { Site, StatusUpdate } from "./types";
 import { isDev } from "./utils";
 import { initDatabase } from "./utils/database/databaseInitializer";
 import {
@@ -36,6 +30,9 @@ import { monitorLogger as logger } from "./utils/logger";
 import { autoStartMonitoring } from "./utils/monitoring/autoStarter";
 import { setDefaultMonitorIntervals } from "./utils/monitoring/intervalSetter";
 import { performInitialMonitorChecks } from "./utils/monitoring/monitorChecker";
+import { startAllMonitoring, startMonitoringForSite } from "./utils/monitoring/monitoringStarter";
+import { stopAllMonitoring, stopMonitoringForSite } from "./utils/monitoring/monitoringStopper";
+import { checkMonitor, checkSiteManually } from "./utils/monitoring/monitorStatusChecker";
 
 /**
  * Type for imported site data structure.
@@ -207,240 +204,99 @@ export class UptimeMonitor extends EventEmitter {
     }
 
     public async startMonitoring() {
-        if (this.isMonitoring) {
-            logger.debug("Monitoring already running");
-            return;
-        }
-        logger.info(`Starting monitoring with ${this.sites.size} sites (per-site intervals)`);
-        this.isMonitoring = true;
-        // Start monitoring for each site using scheduler
-        for (const site of this.sites.values()) {
-            await this.startMonitoringForSite(site.identifier);
-        }
+        this.isMonitoring = await startAllMonitoring(
+            {
+                eventEmitter: this,
+                logger,
+                monitorRepository: this.monitorRepository,
+                monitorScheduler: this.monitorScheduler,
+                sites: this.sites,
+                statusUpdateEvent: STATUS_UPDATE_EVENT,
+            },
+            this.isMonitoring
+        );
     }
 
     public stopMonitoring() {
-        this.monitorScheduler.stopAll();
-        this.isMonitoring = false;
-        logger.info("Stopped all site monitoring intervals");
+        this.isMonitoring = stopAllMonitoring({
+            eventEmitter: this,
+            logger,
+            monitorRepository: this.monitorRepository,
+            monitorScheduler: this.monitorScheduler,
+            sites: this.sites,
+            statusUpdateEvent: STATUS_UPDATE_EVENT,
+        });
     }
 
     public async startMonitoringForSite(identifier: string, monitorId?: string): Promise<boolean> {
-        const site = this.sites.get(identifier);
-        if (site) {
-            if (monitorId) {
-                // Start monitoring for specific monitor
-                const monitor = site.monitors.find((m) => String(m.id) === String(monitorId));
-                if (!monitor) return false;
-
-                // Start using scheduler
-                const started = this.monitorScheduler.startMonitor(identifier, monitor);
-                if (started) {
-                    // Set monitoring=true for this monitor and persist
-                    monitor.monitoring = true;
-                    if (monitor.id) {
-                        await this.monitorRepository.update(monitor.id, { monitoring: true });
-                    }
-                    // Emit status-update for this monitorId
-                    const statusUpdate = {
-                        previousStatus: undefined,
-                        site: { ...site, monitors: site.monitors.map((m) => ({ ...m })) },
-                    };
-                    this.emit(STATUS_UPDATE_EVENT, statusUpdate);
-                }
-                return started;
-            }
-            // If no monitorId is provided, start all monitors for this site
-            const monitors = site.monitors.filter((monitor) => monitor.id);
-            const results = await Promise.allSettled(
-                monitors.map(async (monitor) => {
-                    try {
-                        return await this.startMonitoringForSite(identifier, String(monitor.id));
-                    } catch (error) {
-                        logger.error(`Failed to start monitoring for monitor ${monitor.id}`, error);
-                        return false;
-                    }
-                })
-            );
-
-            // Return true if at least one monitor started successfully
-            return results.some((result) => result.status === "fulfilled" && result.value === true);
-        }
-        return false;
+        return startMonitoringForSite(
+            {
+                eventEmitter: this,
+                logger,
+                monitorRepository: this.monitorRepository,
+                monitorScheduler: this.monitorScheduler,
+                sites: this.sites,
+                statusUpdateEvent: STATUS_UPDATE_EVENT,
+            },
+            identifier,
+            monitorId,
+            (id, mid) => this.startMonitoringForSite(id, mid) // Pass callback for recursive calls
+        );
     }
 
     public async stopMonitoringForSite(identifier: string, monitorId?: string): Promise<boolean> {
-        const site = this.sites.get(identifier);
-        if (site) {
-            if (monitorId) {
-                // Stop monitoring for specific monitor using scheduler
-                const stopped = this.monitorScheduler.stopMonitor(identifier, monitorId);
-                if (stopped) {
-                    // Set monitoring=false for this monitor and persist
-                    const monitor = site.monitors.find((m) => String(m.id) === String(monitorId));
-                    if (monitor) {
-                        monitor.monitoring = false;
-                        if (monitor.id) {
-                            await this.monitorRepository.update(monitor.id, { monitoring: false });
-                        }
-                    }
-                    // Emit status-update for this monitorId
-                    const statusUpdate = {
-                        previousStatus: undefined,
-                        site: { ...site, monitors: site.monitors.map((m) => ({ ...m })) },
-                    };
-                    this.emit(STATUS_UPDATE_EVENT, statusUpdate);
-                }
-                return stopped;
-            }
-            // If no monitorId is provided, stop all monitors for this site
-            const monitorsWithIds = site.monitors.filter((monitor) => monitor.id);
-            const stopPromises = monitorsWithIds.map(async (monitor) => {
-                try {
-                    return await this.stopMonitoringForSite(identifier, monitor.id);
-                } catch (error) {
-                    logger.error(`Failed to stop monitoring for monitor ${monitor.id ?? "unknown"}`, error);
-                    return false;
-                }
-            });
-
-            const results = await Promise.all(stopPromises);
-            return results.every((result) => result === true);
-        }
-        return false;
+        return stopMonitoringForSite(
+            {
+                eventEmitter: this,
+                logger,
+                monitorRepository: this.monitorRepository,
+                monitorScheduler: this.monitorScheduler,
+                sites: this.sites,
+                statusUpdateEvent: STATUS_UPDATE_EVENT,
+            },
+            identifier,
+            monitorId,
+            (id, mid) => this.stopMonitoringForSite(id, mid) // Pass callback for recursive calls
+        );
     }
 
     private async checkMonitor(site: Site, monitorId: string) {
-        const monitor = site.monitors.find((m) => String(m.id) === String(monitorId));
-        if (!monitor) {
-            logger.error(`[checkMonitor] Monitor not found for id: ${monitorId} on site: ${site.identifier}`);
-            return;
-        }
-        // Ensure monitor.id is present and valid before proceeding
-        if (!monitor.id) {
-            logger.error(`[checkMonitor] Monitor missing id for ${site.identifier}, skipping history insert.`);
-            return;
-        }
-        logger.info(`[checkMonitor] Checking monitor: site=${site.identifier}, id=${monitor.id}`);
-
-        // Use the monitoring service to perform the check
-        let checkResult;
-        try {
-            const monitorService = MonitorFactory.getMonitor(monitor.type, {
-                timeout: DEFAULT_REQUEST_TIMEOUT,
-            });
-            checkResult = await monitorService.check(monitor);
-        } catch (error) {
-            logger.error(`[checkMonitor] Error using monitor service for type ${monitor.type}`, error);
-            checkResult = {
-                details: "0",
-                error: "Monitor service error",
-                responseTime: 0,
-                status: "down" as const,
-            };
-        }
-
-        const previousStatus = monitor.status;
-        const now = new Date();
-
-        // Update monitor with results
-        monitor.status = checkResult.status;
-        monitor.responseTime = checkResult.responseTime;
-        monitor.lastChecked = now;
-        // Add to history
-        const historyEntry: StatusHistory = {
-            responseTime: checkResult.responseTime,
-            status: checkResult.status,
-            timestamp: now.getTime(),
-        };
-
-        try {
-            // Add history entry using repository
-            await this.historyRepository.addEntry(monitor.id, historyEntry, checkResult.details);
-
-            logger.info(
-                `[checkMonitor] Inserted history row: monitor_id=${monitor.id}, status=${historyEntry.status}, responseTime=${historyEntry.responseTime}, timestamp=${historyEntry.timestamp}, details=${checkResult.details ?? "undefined"}`
-            );
-        } catch (err) {
-            logger.error(`[checkMonitor] Failed to insert history row: monitor_id=${monitor.id}`, err);
-        }
-
-        // Trim history if needed using repository
-        // Use smart history management for optimal UI experience
-        if (this.historyLimit > 0) {
-            // Calculate effective limit: ensure we always keep enough for large screen displays
-            // This prevents premature pruning that would leave charts looking sparse
-            const minRequiredForUI = 60; // Enough for large screens with high DPI
-            const effectiveLimit = Math.max(this.historyLimit, minRequiredForUI);
-            await this.historyRepository.pruneHistory(monitor.id, effectiveLimit);
-        }
-
-        // Update monitor with new status using repository
-        await this.monitorRepository.update(monitor.id, {
-            lastChecked: monitor.lastChecked,
-            responseTime: monitor.responseTime,
-            status: monitor.status,
-        });
-
-        // Fetch fresh site data from database to ensure we have the latest history and monitor state
-        const freshSiteData = await this.siteRepository.getByIdentifier(site.identifier);
-        if (!freshSiteData) {
-            logger.error(`[checkMonitor] Failed to fetch updated site data for ${site.identifier}`);
-            return;
-        }
-
-        // Update the in-memory cache with fresh data
-        this.sites.set(site.identifier, freshSiteData);
-
-        // Emit StatusUpdate with fresh site data including updated history
-        const statusUpdate: StatusUpdate = {
-            previousStatus,
-            site: freshSiteData,
-        };
-        this.emit(STATUS_UPDATE_EVENT, statusUpdate);
-
-        // Emit monitor state change events with consistent payload
-        if (previousStatus === "up" && checkResult.status === "down") {
-            this.emit("site-monitor-down", {
-                monitor: { ...monitor },
-                monitorId: monitor.id,
-                site: { ...site, monitors: site.monitors.map((m) => ({ ...m })) },
-            });
-        } else if (previousStatus === "down" && checkResult.status === "up") {
-            this.emit("site-monitor-up", {
-                monitor: { ...monitor },
-                monitorId: monitor.id,
-                site: { ...site, monitors: site.monitors.map((m) => ({ ...m })) },
-            });
-        }
-        return statusUpdate;
+        return checkMonitor(
+            {
+                eventEmitter: this,
+                historyLimit: this.historyLimit,
+                logger,
+                repositories: {
+                    history: this.historyRepository,
+                    monitor: this.monitorRepository,
+                    site: this.siteRepository,
+                },
+                sites: this.sites,
+                statusUpdateEvent: STATUS_UPDATE_EVENT,
+            },
+            site,
+            monitorId
+        );
     }
 
     public async checkSiteManually(identifier: string, monitorId?: string): Promise<StatusUpdate | null> {
-        const site = this.sites.get(identifier);
-        if (!site) {
-            throw new Error(`Site not found: ${identifier}`);
-        }
-
-        // If no monitorId provided, use the first monitor's ID
-        const targetMonitorId =
-            monitorId ??
-            (() => {
-                const firstMonitor = site.monitors[0];
-                if (!firstMonitor?.id) {
-                    throw new Error(`No monitors found for site ${identifier}`);
-                }
-                return String(firstMonitor.id);
-            })();
-
-        // Validate the monitor exists
-        const monitor = site.monitors.find((m) => String(m.id) === String(targetMonitorId));
-        if (!monitor) {
-            throw new Error(`Monitor with ID ${targetMonitorId} not found for site ${identifier}`);
-        }
-
-        const result = await this.checkMonitor(site, targetMonitorId);
-        return result || null;
+        const result = await checkSiteManually(
+            {
+                eventEmitter: this,
+                historyLimit: this.historyLimit,
+                logger,
+                repositories: {
+                    history: this.historyRepository,
+                    monitor: this.monitorRepository,
+                    site: this.siteRepository,
+                },
+                sites: this.sites,
+                statusUpdateEvent: STATUS_UPDATE_EVENT,
+            },
+            identifier,
+            monitorId
+        );
+        return result ?? null;
     }
 
     public async updateSite(identifier: string, updates: Partial<Site>): Promise<Site> {
