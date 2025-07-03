@@ -25,7 +25,7 @@ vi.mock("../constants", () => ({
 vi.mock("../utils/time", () => ({
     TIME_PERIOD_LABELS: {
         "1h": "Last Hour",
-        "12h": "Last 12 Hours", 
+        "12h": "Last 12 Hours",
         "24h": "Last 24 Hours",
         "7d": "Last 7 Days",
         "30d": "Last 30 Days",
@@ -34,9 +34,9 @@ vi.mock("../utils/time", () => ({
 
 describe("useSiteAnalytics", () => {
     const now = Date.now();
-    const twoHoursAgo = now - (2 * 60 * 60 * 1000);
-    const threeDaysAgo = now - (3 * 24 * 60 * 60 * 1000);
-    const oneWeekAgo = now - (7 * 24 * 60 * 60 * 1000);
+    const twoHoursAgo = now - 2 * 60 * 60 * 1000;
+    const threeDaysAgo = now - 3 * 24 * 60 * 60 * 1000;
+    const oneWeekAgo = now - 7 * 24 * 60 * 60 * 1000;
 
     const createStatusRecord = (timestamp: number, status: "up" | "down", responseTime: number): StatusHistory => ({
         timestamp,
@@ -91,7 +91,7 @@ describe("useSiteAnalytics", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         // Mock Date.now() to ensure consistent test results
-        vi.spyOn(Date, 'now').mockReturnValue(now);
+        vi.spyOn(Date, "now").mockReturnValue(now);
     });
 
     describe("Hook Initialization", () => {
@@ -388,7 +388,7 @@ describe("useSiteAnalytics", () => {
             expect(result.current.totalChecks).toBeGreaterThan(0);
             expect(result.current.filteredHistory).toEqual(
                 expect.arrayContaining([
-                    expect.objectContaining({ status: expect.any(String), responseTime: expect.any(Number) })
+                    expect.objectContaining({ status: expect.any(String), responseTime: expect.any(Number) }),
                 ])
             );
         });
@@ -405,12 +405,9 @@ describe("useSiteAnalytics", () => {
 
     describe("Memoization", () => {
         it("should memoize results when dependencies don't change", () => {
-            const { result, rerender } = renderHook(
-                ({ monitor, timeRange }) => useSiteAnalytics(monitor, timeRange),
-                {
-                    initialProps: { monitor: mockMonitorWithHistory, timeRange: "24h" as TimePeriod },
-                }
-            );
+            const { result, rerender } = renderHook(({ monitor, timeRange }) => useSiteAnalytics(monitor, timeRange), {
+                initialProps: { monitor: mockMonitorWithHistory, timeRange: "24h" as TimePeriod },
+            });
 
             const firstResult = result.current;
 
@@ -421,12 +418,9 @@ describe("useSiteAnalytics", () => {
         });
 
         it("should recalculate when monitor history changes", () => {
-            const { result, rerender } = renderHook(
-                ({ monitor, timeRange }) => useSiteAnalytics(monitor, timeRange),
-                {
-                    initialProps: { monitor: mockMonitorWithHistory, timeRange: "24h" as TimePeriod },
-                }
-            );
+            const { result, rerender } = renderHook(({ monitor, timeRange }) => useSiteAnalytics(monitor, timeRange), {
+                initialProps: { monitor: mockMonitorWithHistory, timeRange: "24h" as TimePeriod },
+            });
 
             const firstResult = result.current;
 
@@ -442,12 +436,9 @@ describe("useSiteAnalytics", () => {
         });
 
         it("should recalculate when time range changes", () => {
-            const { result, rerender } = renderHook(
-                ({ monitor, timeRange }) => useSiteAnalytics(monitor, timeRange),
-                {
-                    initialProps: { monitor: mockMonitorWithHistory, timeRange: "24h" as TimePeriod },
-                }
-            );
+            const { result, rerender } = renderHook(({ monitor, timeRange }) => useSiteAnalytics(monitor, timeRange), {
+                initialProps: { monitor: mockMonitorWithHistory, timeRange: "24h" as TimePeriod },
+            });
 
             const firstResult = result.current;
 
@@ -477,10 +468,7 @@ describe("useSiteAnalytics", () => {
         it("should handle very large response times", () => {
             const largeResponseMonitor: Monitor = {
                 ...mockMonitorEmpty,
-                history: [
-                    createStatusRecord(now - 1000, "up", 999999),
-                    createStatusRecord(now - 2000, "up", 1000000),
-                ],
+                history: [createStatusRecord(now - 1000, "up", 999999), createStatusRecord(now - 2000, "up", 1000000)],
             };
 
             const { result } = renderHook(() => useSiteAnalytics(largeResponseMonitor, "24h"));
@@ -492,10 +480,7 @@ describe("useSiteAnalytics", () => {
         it("should handle zero response times", () => {
             const zeroResponseMonitor: Monitor = {
                 ...mockMonitorEmpty,
-                history: [
-                    createStatusRecord(now - 1000, "up", 0),
-                    createStatusRecord(now - 2000, "down", 0),
-                ],
+                history: [createStatusRecord(now - 1000, "up", 0), createStatusRecord(now - 2000, "down", 0)],
             };
 
             const { result } = renderHook(() => useSiteAnalytics(zeroResponseMonitor, "24h"));
@@ -573,14 +558,10 @@ describe("useChartData", () => {
         const dataset = result.current.lineChartData.datasets[0];
         expect(dataset.pointBackgroundColor).toEqual([
             "#10b981", // up - success color
-            "#ef4444", // down - error color  
+            "#ef4444", // down - error color
             "#10b981", // up - success color
         ]);
-        expect(dataset.pointBorderColor).toEqual([
-            "#10b981",
-            "#ef4444",
-            "#10b981",
-        ]);
+        expect(dataset.pointBorderColor).toEqual(["#10b981", "#ef4444", "#10b981"]);
     });
 
     it("should handle empty history", () => {
@@ -617,12 +598,9 @@ describe("useChartData", () => {
     });
 
     it("should memoize chart data correctly", () => {
-        const { result, rerender } = renderHook(
-            ({ monitor, theme }) => useChartData(monitor, theme),
-            {
-                initialProps: { monitor: mockMonitor, theme: mockTheme },
-            }
-        );
+        const { result, rerender } = renderHook(({ monitor, theme }) => useChartData(monitor, theme), {
+            initialProps: { monitor: mockMonitor, theme: mockTheme },
+        });
 
         const firstResult = result.current;
 
@@ -633,12 +611,9 @@ describe("useChartData", () => {
     });
 
     it("should recalculate when monitor history changes", () => {
-        const { result, rerender } = renderHook(
-            ({ monitor, theme }) => useChartData(monitor, theme),
-            {
-                initialProps: { monitor: mockMonitor, theme: mockTheme },
-            }
-        );
+        const { result, rerender } = renderHook(({ monitor, theme }) => useChartData(monitor, theme), {
+            initialProps: { monitor: mockMonitor, theme: mockTheme },
+        });
 
         const firstResult = result.current;
 

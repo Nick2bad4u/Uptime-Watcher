@@ -81,15 +81,15 @@ describe("AddSiteForm Submit", () => {
         siteId: "test-site-id",
         url: "https://example.com",
         formError: undefined,
-        
+
         // Form actions
         setFormError: mockSetFormError,
-        
+
         // Store actions
         addMonitorToSite: mockAddMonitorToSite,
         clearError: mockClearError,
         createSite: mockCreateSite,
-        
+
         // Dependencies
         generateUuid: mockGenerateUuid,
         logger: mockLogger,
@@ -103,13 +103,13 @@ describe("AddSiteForm Submit", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockGenerateUuid.mockReturnValue("mock-monitor-id");
-        
+
         // Setup validator mocks with defaults
         mockValidator.isURL.mockReturnValue(true);
         mockValidator.isIP.mockReturnValue(false);
         mockValidator.isFQDN.mockReturnValue(true);
         mockValidator.isPort.mockReturnValue(true);
-        
+
         // Ensure store actions resolve successfully
         mockCreateSite.mockResolvedValue(undefined);
         mockAddMonitorToSite.mockResolvedValue(undefined);
@@ -124,16 +124,18 @@ describe("AddSiteForm Submit", () => {
             expect(mockClearError).toHaveBeenCalled();
             expect(mockCreateSite).toHaveBeenCalledWith({
                 identifier: "test-site-id",
-                monitors: [expect.objectContaining({
-                    id: "mock-monitor-id",
-                    type: "http",
-                    url: "https://example.com",
-                    status: "pending",
-                    checkInterval: 300000,
-                    timeout: 5000,
-                    retryAttempts: 3,
-                    history: [],
-                })],
+                monitors: [
+                    expect.objectContaining({
+                        id: "mock-monitor-id",
+                        type: "http",
+                        url: "https://example.com",
+                        status: "pending",
+                        checkInterval: 300000,
+                        timeout: 5000,
+                        retryAttempts: 3,
+                        history: [],
+                    }),
+                ],
                 name: "Test Site",
             });
             expect(mockOnSuccess).toHaveBeenCalled();
@@ -155,7 +157,9 @@ describe("AddSiteForm Submit", () => {
                 url: "example.com",
             });
 
-            expect(mockSetFormError).toHaveBeenCalledWith("HTTP monitor requires a URL starting with http:// or https://");
+            expect(mockSetFormError).toHaveBeenCalledWith(
+                "HTTP monitor requires a URL starting with http:// or https://"
+            );
             expect(mockCreateSite).not.toHaveBeenCalled();
         });
 
@@ -196,13 +200,15 @@ describe("AddSiteForm Submit", () => {
 
             expect(mockCreateSite).toHaveBeenCalledWith({
                 identifier: "test-site-id",
-                monitors: [expect.objectContaining({
-                    id: "mock-monitor-id",
-                    type: "port",
-                    host: "example.com",
-                    port: 80,
-                    status: "pending",
-                })],
+                monitors: [
+                    expect.objectContaining({
+                        id: "mock-monitor-id",
+                        type: "port",
+                        host: "example.com",
+                        port: 80,
+                        status: "pending",
+                    }),
+                ],
                 name: "Test Site",
             });
         });
@@ -423,7 +429,7 @@ describe("AddSiteForm Submit", () => {
                 monitorType: "http",
                 name: "Test Site",
             });
-            
+
             expect(mockLogger.info).toHaveBeenCalledWith("Successfully created site: test-site-id");
         });
 
@@ -439,7 +445,7 @@ describe("AddSiteForm Submit", () => {
                 monitorId: "mock-monitor-id",
                 monitorType: "http",
             });
-            
+
             expect(mockLogger.info).toHaveBeenCalledWith("Successfully added monitor: existing-site-id");
         });
     });
@@ -454,9 +460,11 @@ describe("AddSiteForm Submit", () => {
 
             expect(mockCreateSite).toHaveBeenCalledWith({
                 identifier: "test-site-id",
-                monitors: [expect.objectContaining({
-                    url: "https://example.com", // trimmed
-                })],
+                monitors: [
+                    expect.objectContaining({
+                        url: "https://example.com", // trimmed
+                    }),
+                ],
                 name: "Test Site", // trimmed
             });
         });
@@ -481,10 +489,12 @@ describe("AddSiteForm Submit", () => {
 
             expect(mockCreateSite).toHaveBeenCalledWith({
                 identifier: "test-site-id",
-                monitors: [expect.objectContaining({
-                    host: "example.com",
-                    port: 8080, // converted to number
-                })],
+                monitors: [
+                    expect.objectContaining({
+                        host: "example.com",
+                        port: 8080, // converted to number
+                    }),
+                ],
                 name: "Test Site",
             });
         });
@@ -496,15 +506,17 @@ describe("AddSiteForm Submit", () => {
 
             expect(mockCreateSite).toHaveBeenCalledWith({
                 identifier: "test-site-id",
-                monitors: [expect.objectContaining({
-                    id: "mock-monitor-id",
-                    type: "http",
-                    status: "pending",
-                    checkInterval: 300000,
-                    timeout: 5000,
-                    retryAttempts: 3,
-                    history: [],
-                })],
+                monitors: [
+                    expect.objectContaining({
+                        id: "mock-monitor-id",
+                        type: "http",
+                        status: "pending",
+                        checkInterval: 300000,
+                        timeout: 5000,
+                        retryAttempts: 3,
+                        history: [],
+                    }),
+                ],
                 name: "Test Site",
             });
         });
@@ -558,7 +570,7 @@ describe("AddSiteForm Submit", () => {
 
         it("should truncate long values in debug logs", async () => {
             const longValue = "https://example.com/" + "a".repeat(100);
-            
+
             await handleSubmit(mockEvent, {
                 ...baseProps,
                 name: "",

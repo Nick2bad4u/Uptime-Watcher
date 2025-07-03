@@ -87,7 +87,7 @@ describe("StatusBadge - Simple Tests", () => {
             // Use a size that's not explicitly handled in the switch statement
             const unknownSize = "unknown" as "xs"; // Force type for test
             render(<StatusBadge label="Website" status="up" size={unknownSize} />);
-            
+
             expect(screen.getByText("Website: up")).toBeInTheDocument();
             // Should not crash and should render successfully
             expect(document.querySelector(".themed-status-indicator")).toBeInTheDocument();
@@ -97,7 +97,7 @@ describe("StatusBadge - Simple Tests", () => {
             // Test with undefined size
             const undefinedSize = undefined as unknown as "xs"; // Force type for test
             render(<StatusBadge label="Website" status="up" size={undefinedSize} />);
-            
+
             expect(screen.getByText("Website: up")).toBeInTheDocument();
             expect(document.querySelector(".themed-status-indicator")).toBeInTheDocument();
         });

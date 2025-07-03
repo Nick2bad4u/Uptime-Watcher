@@ -38,13 +38,16 @@ vi.mock("../components/Dashboard/SiteCard/SiteCardStatus", () => ({
 
 // Mock ThemedBox
 vi.mock("../theme/components", () => ({
-    ThemedBox: ({ children, onClick, ...props }: { children: React.ReactNode; onClick?: () => void; [key: string]: unknown }) => (
-        <button 
-            data-testid="themed-box" 
-            onClick={onClick} 
-            type="button" 
-            {...props}
-        >
+    ThemedBox: ({
+        children,
+        onClick,
+        ...props
+    }: {
+        children: React.ReactNode;
+        onClick?: () => void;
+        [key: string]: unknown;
+    }) => (
+        <button data-testid="themed-box" onClick={onClick} type="button" {...props}>
             {children}
         </button>
     ),

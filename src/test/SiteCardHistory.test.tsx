@@ -73,9 +73,7 @@ describe("SiteCardHistory", () => {
         it("should generate HTTP history title with URL", () => {
             render(<SiteCardHistory monitor={httpMonitor} filteredHistory={mockHistory} />);
 
-            expect(screen.getByTestId("chart-title")).toHaveTextContent(
-                "HTTP History (https://example.com)"
-            );
+            expect(screen.getByTestId("chart-title")).toHaveTextContent("HTTP History (https://example.com)");
         });
 
         it("should generate HTTP history title without URL", () => {
@@ -88,18 +86,14 @@ describe("SiteCardHistory", () => {
         it("should generate port history title with host and port", () => {
             render(<SiteCardHistory monitor={portMonitor} filteredHistory={mockHistory} />);
 
-            expect(screen.getByTestId("chart-title")).toHaveTextContent(
-                "Port History (example.com:80)"
-            );
+            expect(screen.getByTestId("chart-title")).toHaveTextContent("Port History (example.com:80)");
         });
 
         it("should generate port history title with host only", () => {
             const portMonitorNoPort = { ...portMonitor, port: undefined };
             render(<SiteCardHistory monitor={portMonitorNoPort} filteredHistory={mockHistory} />);
 
-            expect(screen.getByTestId("chart-title")).toHaveTextContent(
-                "Port History (example.com)"
-            );
+            expect(screen.getByTestId("chart-title")).toHaveTextContent("Port History (example.com)");
         });
 
         it("should generate port history title without host or port", () => {
@@ -125,9 +119,7 @@ describe("SiteCardHistory", () => {
 
     describe("Memoization", () => {
         it("should not re-render when props are the same", () => {
-            const { rerender } = render(
-                <SiteCardHistory monitor={httpMonitor} filteredHistory={mockHistory} />
-            );
+            const { rerender } = render(<SiteCardHistory monitor={httpMonitor} filteredHistory={mockHistory} />);
 
             const firstRender = screen.getByTestId("history-chart");
 
@@ -139,9 +131,7 @@ describe("SiteCardHistory", () => {
         });
 
         it("should re-render when history length changes", () => {
-            const { rerender } = render(
-                <SiteCardHistory monitor={httpMonitor} filteredHistory={mockHistory} />
-            );
+            const { rerender } = render(<SiteCardHistory monitor={httpMonitor} filteredHistory={mockHistory} />);
 
             expect(screen.getByTestId("chart-history-length")).toHaveTextContent("3");
 
@@ -156,9 +146,7 @@ describe("SiteCardHistory", () => {
         });
 
         it("should re-render when latest timestamp changes", () => {
-            const { rerender } = render(
-                <SiteCardHistory monitor={httpMonitor} filteredHistory={mockHistory} />
-            );
+            const { rerender } = render(<SiteCardHistory monitor={httpMonitor} filteredHistory={mockHistory} />);
 
             // Change the latest timestamp (first item since sorted DESC)
             const newHistory: StatusHistory[] = [
@@ -173,9 +161,7 @@ describe("SiteCardHistory", () => {
         });
 
         it("should re-render when monitor ID changes", () => {
-            const { rerender } = render(
-                <SiteCardHistory monitor={httpMonitor} filteredHistory={mockHistory} />
-            );
+            const { rerender } = render(<SiteCardHistory monitor={httpMonitor} filteredHistory={mockHistory} />);
 
             const newMonitor = { ...httpMonitor, id: "monitor-changed" };
 
@@ -186,9 +172,7 @@ describe("SiteCardHistory", () => {
         });
 
         it("should handle empty history arrays in comparison", () => {
-            const { rerender } = render(
-                <SiteCardHistory monitor={httpMonitor} filteredHistory={[]} />
-            );
+            const { rerender } = render(<SiteCardHistory monitor={httpMonitor} filteredHistory={[]} />);
 
             expect(screen.getByTestId("chart-history-length")).toHaveTextContent("0");
 
@@ -201,13 +185,9 @@ describe("SiteCardHistory", () => {
 
     describe("Edge Cases", () => {
         it("should handle monitor change from defined to undefined", () => {
-            const { rerender } = render(
-                <SiteCardHistory monitor={httpMonitor} filteredHistory={mockHistory} />
-            );
+            const { rerender } = render(<SiteCardHistory monitor={httpMonitor} filteredHistory={mockHistory} />);
 
-            expect(screen.getByTestId("chart-title")).toHaveTextContent(
-                "HTTP History (https://example.com)"
-            );
+            expect(screen.getByTestId("chart-title")).toHaveTextContent("HTTP History (https://example.com)");
 
             rerender(<SiteCardHistory monitor={undefined} filteredHistory={mockHistory} />);
 
@@ -215,21 +195,19 @@ describe("SiteCardHistory", () => {
         });
 
         it("should handle monitor change from undefined to defined", () => {
-            const { rerender } = render(
-                <SiteCardHistory monitor={undefined} filteredHistory={mockHistory} />
-            );
+            const { rerender } = render(<SiteCardHistory monitor={undefined} filteredHistory={mockHistory} />);
 
             expect(screen.getByTestId("chart-title")).toHaveTextContent("No Monitor Selected");
 
             rerender(<SiteCardHistory monitor={httpMonitor} filteredHistory={mockHistory} />);
 
-            expect(screen.getByTestId("chart-title")).toHaveTextContent(
-                "HTTP History (https://example.com)"
-            );
+            expect(screen.getByTestId("chart-title")).toHaveTextContent("HTTP History (https://example.com)");
         });
 
         it("should handle history with single item", () => {
-            const singleHistory: StatusHistory[] = [{ timestamp: 1640995200000, status: "up" as const, responseTime: 200 }];
+            const singleHistory: StatusHistory[] = [
+                { timestamp: 1640995200000, status: "up" as const, responseTime: 200 },
+            ];
 
             render(<SiteCardHistory monitor={httpMonitor} filteredHistory={singleHistory} />);
 

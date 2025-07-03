@@ -124,10 +124,7 @@ describe("useSiteActions", () => {
                 result.current.handleStartMonitoring();
             });
 
-            expect(mockStore.startSiteMonitorMonitoring).toHaveBeenCalledWith(
-                "test-site-id",
-                "monitor-1"
-            );
+            expect(mockStore.startSiteMonitorMonitoring).toHaveBeenCalledWith("test-site-id", "monitor-1");
 
             expect(logger.user.action).toHaveBeenCalledWith("Started site monitoring", {
                 monitorId: "monitor-1",
@@ -144,10 +141,7 @@ describe("useSiteActions", () => {
                 result.current.handleStartMonitoring();
             });
 
-            expect(mockStore.startSiteMonitorMonitoring).toHaveBeenCalledWith(
-                "test-site-id",
-                "monitor-2"
-            );
+            expect(mockStore.startSiteMonitorMonitoring).toHaveBeenCalledWith("test-site-id", "monitor-2");
 
             expect(logger.user.action).toHaveBeenCalledWith("Started site monitoring", {
                 monitorId: "monitor-2",
@@ -237,10 +231,7 @@ describe("useSiteActions", () => {
                 result.current.handleStopMonitoring();
             });
 
-            expect(mockStore.stopSiteMonitorMonitoring).toHaveBeenCalledWith(
-                "test-site-id",
-                "monitor-1"
-            );
+            expect(mockStore.stopSiteMonitorMonitoring).toHaveBeenCalledWith("test-site-id", "monitor-1");
 
             expect(logger.user.action).toHaveBeenCalledWith("Stopped site monitoring", {
                 monitorId: "monitor-1",
@@ -257,10 +248,7 @@ describe("useSiteActions", () => {
                 result.current.handleStopMonitoring();
             });
 
-            expect(mockStore.stopSiteMonitorMonitoring).toHaveBeenCalledWith(
-                "test-site-id",
-                "monitor-2"
-            );
+            expect(mockStore.stopSiteMonitorMonitoring).toHaveBeenCalledWith("test-site-id", "monitor-2");
 
             expect(logger.user.action).toHaveBeenCalledWith("Stopped site monitoring", {
                 monitorId: "monitor-2",
@@ -278,14 +266,10 @@ describe("useSiteActions", () => {
             });
 
             expect(mockStore.stopSiteMonitorMonitoring).not.toHaveBeenCalled();
-            expect(logger.error).toHaveBeenCalledWith(
-                "Attempted to stop monitoring without valid monitor",
-                undefined,
-                {
-                    siteId: "test-site-id",
-                    siteName: "Test Site",
-                }
-            );
+            expect(logger.error).toHaveBeenCalledWith("Attempted to stop monitoring without valid monitor", undefined, {
+                siteId: "test-site-id",
+                siteName: "Test Site",
+            });
         });
 
         it("should handle site without name when monitor is undefined", () => {
@@ -301,14 +285,10 @@ describe("useSiteActions", () => {
                 result.current.handleStopMonitoring();
             });
 
-            expect(logger.error).toHaveBeenCalledWith(
-                "Attempted to stop monitoring without valid monitor",
-                undefined,
-                {
-                    siteId: "test-site-id",
-                    siteName: undefined,
-                }
-            );
+            expect(logger.error).toHaveBeenCalledWith("Attempted to stop monitoring without valid monitor", undefined, {
+                siteId: "test-site-id",
+                siteName: undefined,
+            });
         });
 
         it("should handle store errors and log them", () => {
@@ -362,7 +342,7 @@ describe("useSiteActions", () => {
             expect(mockStore.checkSiteNow).toHaveBeenCalledWith("test-site-id", "monitor-1");
 
             // Wait for the promise to resolve
-            await new Promise(resolve => setTimeout(resolve, 0));
+            await new Promise((resolve) => setTimeout(resolve, 0));
 
             expect(logger.user.action).toHaveBeenCalledWith("Manual site check completed successfully", {
                 monitorId: "monitor-1",
@@ -398,14 +378,10 @@ describe("useSiteActions", () => {
             });
 
             expect(mockStore.checkSiteNow).not.toHaveBeenCalled();
-            expect(logger.error).toHaveBeenCalledWith(
-                "Attempted to check site without valid monitor",
-                undefined,
-                {
-                    siteId: "test-site-id",
-                    siteName: "Test Site",
-                }
-            );
+            expect(logger.error).toHaveBeenCalledWith("Attempted to check site without valid monitor", undefined, {
+                siteId: "test-site-id",
+                siteName: "Test Site",
+            });
         });
 
         it("should handle site without name when monitor is undefined", () => {
@@ -421,14 +397,10 @@ describe("useSiteActions", () => {
                 result.current.handleCheckNow();
             });
 
-            expect(logger.error).toHaveBeenCalledWith(
-                "Attempted to check site without valid monitor",
-                undefined,
-                {
-                    siteId: "test-site-id",
-                    siteName: undefined,
-                }
-            );
+            expect(logger.error).toHaveBeenCalledWith("Attempted to check site without valid monitor", undefined, {
+                siteId: "test-site-id",
+                siteName: undefined,
+            });
         });
 
         it("should handle checkSiteNow errors with Error objects", async () => {
@@ -442,18 +414,14 @@ describe("useSiteActions", () => {
             });
 
             // Wait for the promise to reject
-            await new Promise(resolve => setTimeout(resolve, 0));
+            await new Promise((resolve) => setTimeout(resolve, 0));
 
             expect(logger.site.error).toHaveBeenCalledWith("test-site-id", error);
-            expect(logger.error).toHaveBeenCalledWith(
-                "Manual site check failed",
-                error,
-                {
-                    monitorId: "monitor-1",
-                    siteId: "test-site-id",
-                    siteName: "Test Site",
-                }
-            );
+            expect(logger.error).toHaveBeenCalledWith("Manual site check failed", error, {
+                monitorId: "monitor-1",
+                siteId: "test-site-id",
+                siteName: "Test Site",
+            });
         });
 
         it("should handle checkSiteNow errors with non-Error objects", async () => {
@@ -467,18 +435,14 @@ describe("useSiteActions", () => {
             });
 
             // Wait for the promise to reject
-            await new Promise(resolve => setTimeout(resolve, 0));
+            await new Promise((resolve) => setTimeout(resolve, 0));
 
             expect(logger.site.error).toHaveBeenCalledWith("test-site-id", "String error");
-            expect(logger.error).toHaveBeenCalledWith(
-                "Manual site check failed",
-                "String error",
-                {
-                    monitorId: "monitor-1",
-                    siteId: "test-site-id",
-                    siteName: "Test Site",
-                }
-            );
+            expect(logger.error).toHaveBeenCalledWith("Manual site check failed", "String error", {
+                monitorId: "monitor-1",
+                siteId: "test-site-id",
+                siteName: "Test Site",
+            });
         });
     });
 
@@ -490,15 +454,12 @@ describe("useSiteActions", () => {
                 result.current.handleCardClick();
             });
 
-            expect(logger.user.action).toHaveBeenCalledWith(
-                "Site card clicked - navigating to details",
-                {
-                    monitorId: "monitor-1",
-                    monitorType: "http",
-                    siteId: "test-site-id",
-                    siteName: "Test Site",
-                }
-            );
+            expect(logger.user.action).toHaveBeenCalledWith("Site card clicked - navigating to details", {
+                monitorId: "monitor-1",
+                monitorType: "http",
+                siteId: "test-site-id",
+                siteName: "Test Site",
+            });
 
             expect(mockStore.setSelectedSite).toHaveBeenCalledWith(mockSite);
             expect(mockStore.setSelectedMonitorId).toHaveBeenCalledWith("test-site-id", "monitor-1");
@@ -512,15 +473,12 @@ describe("useSiteActions", () => {
                 result.current.handleCardClick();
             });
 
-            expect(logger.user.action).toHaveBeenCalledWith(
-                "Site card clicked - navigating to details",
-                {
-                    monitorId: "monitor-2",
-                    monitorType: "port",
-                    siteId: "test-site-id",
-                    siteName: "Test Site",
-                }
-            );
+            expect(logger.user.action).toHaveBeenCalledWith("Site card clicked - navigating to details", {
+                monitorId: "monitor-2",
+                monitorType: "port",
+                siteId: "test-site-id",
+                siteName: "Test Site",
+            });
 
             expect(mockStore.setSelectedSite).toHaveBeenCalledWith(mockSite);
             expect(mockStore.setSelectedMonitorId).toHaveBeenCalledWith("test-site-id", "monitor-2");
@@ -534,15 +492,12 @@ describe("useSiteActions", () => {
                 result.current.handleCardClick();
             });
 
-            expect(logger.user.action).toHaveBeenCalledWith(
-                "Site card clicked - navigating to details",
-                {
-                    monitorId: undefined,
-                    monitorType: undefined,
-                    siteId: "test-site-id",
-                    siteName: "Test Site",
-                }
-            );
+            expect(logger.user.action).toHaveBeenCalledWith("Site card clicked - navigating to details", {
+                monitorId: undefined,
+                monitorType: undefined,
+                siteId: "test-site-id",
+                siteName: "Test Site",
+            });
 
             expect(mockStore.setSelectedSite).toHaveBeenCalledWith(mockSite);
             expect(mockStore.setSelectedMonitorId).not.toHaveBeenCalled();
@@ -562,15 +517,12 @@ describe("useSiteActions", () => {
                 result.current.handleCardClick();
             });
 
-            expect(logger.user.action).toHaveBeenCalledWith(
-                "Site card clicked - navigating to details",
-                {
-                    monitorId: "monitor-1",
-                    monitorType: "http",
-                    siteId: "test-site-id",
-                    siteName: undefined,
-                }
-            );
+            expect(logger.user.action).toHaveBeenCalledWith("Site card clicked - navigating to details", {
+                monitorId: "monitor-1",
+                monitorType: "http",
+                siteId: "test-site-id",
+                siteName: undefined,
+            });
 
             expect(mockStore.setSelectedSite).toHaveBeenCalledWith(siteWithoutName);
             expect(mockStore.setSelectedMonitorId).toHaveBeenCalledWith("test-site-id", "monitor-1");
@@ -580,12 +532,9 @@ describe("useSiteActions", () => {
 
     describe("Callback Stability", () => {
         it("should have stable callback references when dependencies don't change", () => {
-            const { result, rerender } = renderHook(
-                ({ site, monitor }) => useSiteActions(site, monitor),
-                {
-                    initialProps: { site: mockSite, monitor: mockHttpMonitor },
-                }
-            );
+            const { result, rerender } = renderHook(({ site, monitor }) => useSiteActions(site, monitor), {
+                initialProps: { site: mockSite, monitor: mockHttpMonitor },
+            });
 
             const firstRender = result.current;
 
@@ -601,12 +550,9 @@ describe("useSiteActions", () => {
         });
 
         it("should update callbacks when site changes", () => {
-            const { result, rerender } = renderHook(
-                ({ site, monitor }) => useSiteActions(site, monitor),
-                {
-                    initialProps: { site: mockSite, monitor: mockHttpMonitor },
-                }
-            );
+            const { result, rerender } = renderHook(({ site, monitor }) => useSiteActions(site, monitor), {
+                initialProps: { site: mockSite, monitor: mockHttpMonitor },
+            });
 
             const firstRender = result.current;
 
@@ -629,12 +575,9 @@ describe("useSiteActions", () => {
         });
 
         it("should update callbacks when monitor changes", () => {
-            const { result, rerender } = renderHook(
-                ({ site, monitor }) => useSiteActions(site, monitor),
-                {
-                    initialProps: { site: mockSite, monitor: mockHttpMonitor },
-                }
-            );
+            const { result, rerender } = renderHook(({ site, monitor }) => useSiteActions(site, monitor), {
+                initialProps: { site: mockSite, monitor: mockHttpMonitor },
+            });
 
             const firstRender = result.current;
 
@@ -661,10 +604,7 @@ describe("useSiteActions", () => {
                 result.current.handleStartMonitoring();
             });
 
-            expect(mockStore.startSiteMonitorMonitoring).toHaveBeenCalledWith(
-                "test-site-id",
-                "monitor-1"
-            );
+            expect(mockStore.startSiteMonitorMonitoring).toHaveBeenCalledWith("test-site-id", "monitor-1");
 
             // Check now
             await act(async () => {
@@ -678,10 +618,7 @@ describe("useSiteActions", () => {
                 result.current.handleStopMonitoring();
             });
 
-            expect(mockStore.stopSiteMonitorMonitoring).toHaveBeenCalledWith(
-                "test-site-id",
-                "monitor-1"
-            );
+            expect(mockStore.stopSiteMonitorMonitoring).toHaveBeenCalledWith("test-site-id", "monitor-1");
 
             // Verify all logging calls
             expect(logger.user.action).toHaveBeenCalledWith("Started site monitoring", expect.any(Object));

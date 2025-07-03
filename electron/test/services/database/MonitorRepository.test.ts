@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { MonitorRepository, MonitorRow } from "../../../services/database/MonitorRepository";
 import { DatabaseService } from "../../../services/database/DatabaseService";
@@ -19,10 +20,36 @@ vi.mock("../../../utils", () => ({
     isDev: vi.fn(),
 }));
 
+// Define interfaces for better type safety
+interface MockDatabase {
+    all: ReturnType<typeof vi.fn>;
+    get: ReturnType<typeof vi.fn>;
+    run: ReturnType<typeof vi.fn>;
+}
+
+interface MockDatabaseService {
+    getDatabase: ReturnType<typeof vi.fn>;
+}
+
+interface MonitorRepositoryWithPrivates {
+    safeNumberConvert: (value: unknown) => number | undefined;
+    convertDateForDb: (value: unknown) => string | null;
+    insertSingleMonitor: ReturnType<typeof vi.fn>;
+    getDb: ReturnType<typeof vi.fn>;
+    buildMonitorParameters: (monitor: Partial<Site["monitors"][0]>) => unknown[];
+    addNumberField: (
+        field: string,
+        value: unknown,
+        updateFields: string[],
+        updateValues: (string | number | null)[]
+    ) => void;
+    rowToMonitor: (row: MonitorRow) => Site["monitors"][0];
+}
+
 describe("MonitorRepository", () => {
     let monitorRepository: MonitorRepository;
-    let mockDatabase: any;
-    let mockDatabaseService: any;
+    let mockDatabase: MockDatabase;
+    let mockDatabaseService: MockDatabaseService;
 
     beforeEach(() => {
         vi.clearAllMocks();
@@ -40,7 +67,7 @@ describe("MonitorRepository", () => {
         };
 
         // Mock the static getInstance method
-        (DatabaseService.getInstance as any).mockReturnValue(mockDatabaseService);
+        (DatabaseService.getInstance as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockDatabaseService);
 
         monitorRepository = new MonitorRepository();
     });
@@ -178,7 +205,7 @@ describe("MonitorRepository", () => {
 
     describe("create", () => {
         it("should create a new monitor and return its ID", async () => {
-            (isDev as any).mockReturnValue(true);
+            (isDev as unknown as ReturnType<typeof vi.fn>).mockReturnValue(true);
             mockDatabase.get.mockReturnValue({ id: 1 });
 
             const monitor: Omit<Site["monitors"][0], "id"> = {
@@ -209,7 +236,7 @@ describe("MonitorRepository", () => {
         });
 
         it("should handle port monitor creation", async () => {
-            (isDev as any).mockReturnValue(false);
+            (isDev as unknown as ReturnType<typeof vi.fn>).mockReturnValue(false);
             mockDatabase.get.mockReturnValue({ id: 2 });
 
             const monitor: Omit<Site["monitors"][0], "id"> = {
@@ -258,7 +285,7 @@ describe("MonitorRepository", () => {
 
     describe("update", () => {
         it("should update monitor fields", async () => {
-            (isDev as any).mockReturnValue(true);
+            (isDev as unknown as ReturnType<typeof vi.fn>).mockReturnValue(true);
 
             const updates: Partial<Site["monitors"][0]> = {
                 url: "https://newurl.com",
@@ -363,23 +390,20 @@ describe("MonitorRepository", () => {
             await monitorRepository.create("site-1", monitor);
 
             // Should insert null for undefined numeric fields
-            expect(mockDatabase.run).toHaveBeenCalledWith(
-                expect.stringContaining("INSERT INTO monitors"),
-                [
-                    "site-1",
-                    "http",
-                    "https://example.com",
-                    null, // host
-                    null, // port
-                    null, // checkInterval
-                    null, // timeout
-                    null, // retryAttempts
-                    1, // monitoring
-                    "up",
-                    null, // responseTime
-                    expect.any(String), // lastChecked
-                ]
-            );
+            expect(mockDatabase.run).toHaveBeenCalledWith(expect.stringContaining("INSERT INTO monitors"), [
+                "site-1",
+                "http",
+                "https://example.com",
+                null, // host
+                null, // port
+                null, // checkInterval
+                null, // timeout
+                null, // retryAttempts
+                1, // monitoring
+                "up",
+                null, // responseTime
+                expect.any(String), // lastChecked
+            ]);
         });
 
         it("should throw error when createMonitor result has no id", async () => {
@@ -442,7 +466,7 @@ describe("MonitorRepository", () => {
             });
         });
 
-        it("should handle lastChecked as null in updateMonitor", async () => {
+        it("should handle lastChecked when explicitly set to undefined in updateMonitor", async () => {
             const monitor = {
                 type: "http" as const,
                 url: "https://example.com",
@@ -452,7 +476,7 @@ describe("MonitorRepository", () => {
                 monitoring: true,
                 status: "up" as const,
                 responseTime: 150,
-                lastChecked: null as any, // Explicitly null
+                lastChecked: undefined, // Explicitly undefined
                 history: [],
             };
 
@@ -460,13 +484,15 @@ describe("MonitorRepository", () => {
 
             await monitorRepository.update("monitor-1", monitor);
 
+            // Verify that lastChecked is omitted from the SQL when it's explicitly undefined
+            // (The SQL doesn't include lastChecked field at all)
             expect(mockDatabase.run).toHaveBeenCalledWith(
-                expect.stringContaining("UPDATE monitors SET"),
-                expect.arrayContaining([null]) // lastChecked should be null
+                "UPDATE monitors SET type = ?, url = ?, checkInterval = ?, timeout = ?, retryAttempts = ?, monitoring = ?, status = ?, responseTime = ? WHERE id = ?",
+                ["http", "https://example.com", 60000, 5000, 0, 1, "up", 150, "monitor-1"]
             );
         });
 
-        it("should handle lastChecked as undefined in updateMonitor", async () => {
+        it("should handle lastChecked when property is omitted entirely in updateMonitor", async () => {
             const monitor = {
                 type: "http" as const,
                 url: "https://example.com",
@@ -484,25 +510,22 @@ describe("MonitorRepository", () => {
 
             await monitorRepository.update("monitor-1", monitor);
 
-            // lastChecked should not appear in SQL when undefined
-            expect(mockDatabase.run).toHaveBeenCalledWith(
-                expect.stringContaining("UPDATE monitors SET"),
-                [
-                    "http",
-                    "https://example.com",
-                    60000,
-                    5000,
-                    0,
-                    1,
-                    "up",
-                    150,
-                    "monitor-1",
-                ]
-            );
+            // lastChecked should not appear in SQL when the property is omitted
+            expect(mockDatabase.run).toHaveBeenCalledWith(expect.stringContaining("UPDATE monitors SET"), [
+                "http",
+                "https://example.com",
+                60000,
+                5000,
+                0,
+                1,
+                "up",
+                150,
+                "monitor-1",
+            ]);
         });
 
         it("should log debug message when deleting monitor in dev mode", async () => {
-            (isDev as any).mockReturnValue(true);
+            (isDev as unknown as ReturnType<typeof vi.fn>).mockReturnValue(true);
             mockDatabase.run
                 .mockReturnValueOnce({ changes: 1 }) // DELETE history
                 .mockReturnValueOnce({ changes: 1 }); // DELETE monitor
@@ -510,9 +533,7 @@ describe("MonitorRepository", () => {
             const result = await monitorRepository.delete("monitor-1");
 
             expect(result).toBe(true);
-            expect(logger.debug).toHaveBeenCalledWith(
-                "[MonitorRepository] Deleted monitor with id: monitor-1"
-            );
+            expect(logger.debug).toHaveBeenCalledWith("[MonitorRepository] Deleted monitor with id: monitor-1");
         });
 
         it("should handle numeric value with undefined check", async () => {
@@ -568,7 +589,7 @@ describe("MonitorRepository", () => {
 
     describe("delete", () => {
         it("should delete a monitor and return true on success", async () => {
-            (isDev as any).mockReturnValue(true);
+            (isDev as unknown as ReturnType<typeof vi.fn>).mockReturnValue(true);
             // Mock that the deletion affected one row
             mockDatabase.run.mockReturnValue({ changes: 1 });
 
@@ -600,7 +621,7 @@ describe("MonitorRepository", () => {
 
     describe("deleteBySiteIdentifier", () => {
         it("should delete all monitors for a site", async () => {
-            (isDev as any).mockReturnValue(true);
+            (isDev as unknown as ReturnType<typeof vi.fn>).mockReturnValue(true);
             const mockMonitorIds = [{ id: 1 }, { id: 2 }];
             mockDatabase.all.mockReturnValue(mockMonitorIds);
 
@@ -653,7 +674,7 @@ describe("MonitorRepository", () => {
 
     describe("deleteAll", () => {
         it("should delete all monitors", async () => {
-            (isDev as any).mockReturnValue(true);
+            (isDev as unknown as ReturnType<typeof vi.fn>).mockReturnValue(true);
 
             await monitorRepository.deleteAll();
 
@@ -746,7 +767,9 @@ describe("MonitorRepository", () => {
             ];
 
             // Mock insertSingleMonitor to return empty string for first, valid ID for second
-            const repository = monitorRepository as any;
+            const repository = monitorRepository as unknown as {
+                insertSingleMonitor: ReturnType<typeof vi.fn>;
+            };
             const originalInsertSingle = repository.insertSingleMonitor;
             repository.insertSingleMonitor = vi
                 .fn()
@@ -768,7 +791,9 @@ describe("MonitorRepository", () => {
         it("should test safeNumberConvert with different value types", () => {
             const repository = new MonitorRepository();
             // Access private method for testing
-            const safeNumberConvert = (repository as any).safeNumberConvert;
+            const safeNumberConvert = (
+                repository as unknown as { safeNumberConvert: (value: unknown) => number | undefined }
+            ).safeNumberConvert;
 
             // Test number input
             expect(safeNumberConvert(42)).toBe(42);
@@ -791,7 +816,8 @@ describe("MonitorRepository", () => {
 
         it("should test convertDateForDb with different inputs", () => {
             const repository = new MonitorRepository();
-            const convertDateForDb = (repository as any).convertDateForDb;
+            const convertDateForDb = (repository as unknown as { convertDateForDb: (value: unknown) => string | null })
+                .convertDateForDb;
 
             // Test null input
             expect(convertDateForDb(null)).toBeNull();
@@ -810,7 +836,7 @@ describe("MonitorRepository", () => {
 
     describe("Edge Cases and Error Handling", () => {
         it("should handle update with no fields to update", async () => {
-            (isDev as any).mockReturnValue(true);
+            (isDev as unknown as ReturnType<typeof vi.fn>).mockReturnValue(true);
 
             // Mock monitor with no fields to update (empty partial)
             const monitorUpdate = {};
@@ -827,7 +853,7 @@ describe("MonitorRepository", () => {
                 url: "https://example.com",
                 status: "pending" as const,
                 history: [],
-                lastChecked: "2024-01-01T00:00:00.000Z" as any, // String instead of Date
+                lastChecked: "2024-01-01T00:00:00.000Z" as unknown as Date, // String instead of Date
             };
 
             mockDatabase.get.mockReturnValue({ id: 123 });
@@ -878,7 +904,7 @@ describe("MonitorRepository", () => {
                 url: "https://example.com",
                 status: "pending" as const,
                 history: [],
-                port: null as any, // Test null value
+                port: null as unknown as number, // Test null value
                 timeout: 0, // Test zero value
                 checkInterval: undefined, // Test undefined
             };
@@ -896,8 +922,8 @@ describe("MonitorRepository", () => {
                 url: "https://example.com",
                 status: "pending" as const,
                 history: [],
-                port: "8080" as any, // String number
-                timeout: "5000" as any, // String number
+                port: "8080" as unknown as number, // String number
+                timeout: "5000" as unknown as number, // String number
             };
 
             mockDatabase.get.mockReturnValue({ id: 123 });
@@ -955,7 +981,7 @@ describe("MonitorRepository", () => {
                 const monitor = {
                     type: "http" as const,
                     url: "", // Empty string - triggers null branch (line 146)
-                    host: null as any, // Null - triggers null branch (line 147)
+                    host: null as unknown as string, // Null - triggers null branch (line 147)
                     port: undefined, // Undefined - triggers null branch (line 148)
                     checkInterval: undefined, // Undefined - triggers null branch (line 149)
                     timeout: undefined, // Undefined - triggers null branch (line 150)
@@ -972,23 +998,20 @@ describe("MonitorRepository", () => {
 
                 await monitorRepository.create("site-1", monitor);
 
-                expect(mockDatabase.run).toHaveBeenCalledWith(
-                    expect.stringContaining("INSERT INTO monitors"),
-                    [
-                        "site-1",
-                        "http",
-                        null, // url (falsy)
-                        null, // host (null)
-                        null, // port (undefined)
-                        null, // checkInterval (undefined)
-                        null, // timeout (undefined)
-                        null, // retryAttempts (undefined)
-                        1, // monitoring
-                        "up",
-                        null, // responseTime (undefined)
-                        null, // lastChecked (undefined)
-                    ]
-                );
+                expect(mockDatabase.run).toHaveBeenCalledWith(expect.stringContaining("INSERT INTO monitors"), [
+                    "site-1",
+                    "http",
+                    null, // url (falsy)
+                    null, // host (null)
+                    null, // port (undefined)
+                    null, // checkInterval (undefined)
+                    null, // timeout (undefined)
+                    null, // retryAttempts (undefined)
+                    1, // monitoring
+                    "up",
+                    null, // responseTime (undefined)
+                    null, // lastChecked (undefined)
+                ]);
             });
         });
 
@@ -1034,6 +1057,7 @@ describe("MonitorRepository", () => {
             it("should handle undefined host in rowToMonitor", async () => {
                 const row = {
                     id: 123,
+                    site_identifier: "site-1",
                     type: "http",
                     url: "https://example.com",
                     host: undefined, // triggers undefined branch (line 184)
@@ -1106,7 +1130,7 @@ describe("MonitorRepository", () => {
         describe("delete method branch coverage (line 365)", () => {
             it("should not log debug when monitor not found in delete", async () => {
                 const consoleDebugSpy = vi.spyOn(logger, "debug");
-                (isDev as any).mockReturnValue(true);
+                (isDev as unknown as ReturnType<typeof vi.fn>).mockReturnValue(true);
 
                 mockDatabase.run
                     .mockReturnValueOnce({ changes: 1 }) // DELETE history
@@ -1115,9 +1139,7 @@ describe("MonitorRepository", () => {
                 const result = await monitorRepository.delete("nonexistent-id");
 
                 expect(result).toBe(false);
-                expect(consoleDebugSpy).not.toHaveBeenCalledWith(
-                    expect.stringContaining("Deleted monitor with id")
-                );
+                expect(consoleDebugSpy).not.toHaveBeenCalledWith(expect.stringContaining("Deleted monitor with id"));
             });
         });
 
@@ -1193,9 +1215,9 @@ describe("MonitorRepository", () => {
                 run: vi.fn(),
                 get: vi.fn().mockReturnValue({ id: null }), // id is null
             };
-            
+
             const monitorRepo = new MonitorRepository();
-            (monitorRepo as any).getDb = vi.fn().mockReturnValue(db);
+            (monitorRepo as unknown as MonitorRepositoryWithPrivates).getDb = vi.fn().mockReturnValue(db);
 
             const monitor = {
                 type: "http" as const,
@@ -1205,8 +1227,12 @@ describe("MonitorRepository", () => {
                 history: [],
             };
 
-            const result = (monitorRepo as any).insertSingleMonitor("site-1", monitor, db);
-            
+            const result = (monitorRepo as unknown as MonitorRepositoryWithPrivates).insertSingleMonitor(
+                "site-1",
+                monitor,
+                db
+            );
+
             expect(result).toBe(""); // null id should trigger empty string branch
         });
     });
@@ -1215,20 +1241,20 @@ describe("MonitorRepository", () => {
         describe("Line 113: addNumberField null branch", () => {
             it("should test the specific null branch in addNumberField (line 113)", async () => {
                 // Create a custom test to access the private method directly
-                const repository = monitorRepository as any;
+                const repository = monitorRepository as unknown as MonitorRepositoryWithPrivates;
                 const updateFields: string[] = [];
                 const updateValues: (string | number | null)[] = [];
-                
+
                 // Test undefined value - should not add field at all
                 repository.addNumberField("testField", undefined, updateFields, updateValues);
                 expect(updateFields).toHaveLength(0);
                 expect(updateValues).toHaveLength(0);
-                
+
                 // Test defined value - should add field with Number conversion
                 repository.addNumberField("testField", 42, updateFields, updateValues);
                 expect(updateFields).toContain("testField = ?");
                 expect(updateValues).toContain(42);
-                
+
                 // Test the actual conditional that creates the null branch - undefined should convert to null
                 const testValue = undefined;
                 const result = testValue !== undefined ? Number(testValue) : null;
@@ -1241,13 +1267,13 @@ describe("MonitorRepository", () => {
                 const monitor = {
                     type: "http" as const,
                     url: "", // Falsy string - line 146 null branch
-                    host: null as any, // Null value - line 147 null branch  
+                    host: null as unknown as string, // Null value - line 147 null branch
                     port: undefined, // Undefined - line 148 null branch
                     checkInterval: undefined, // Undefined - line 149 null branch
                     timeout: undefined, // Undefined - line 150 null branch
                     retryAttempts: undefined, // Undefined - line 152 null branch
                     monitoring: false, // Test false monitoring
-                    status: undefined as any, // Test undefined status (should become "down")
+                    status: undefined as unknown as "up" | "down" | "pending", // Test undefined status (should become "down")
                     responseTime: undefined, // Undefined - line 153 null branch
                     lastChecked: undefined, // Undefined - should become null
                     history: [],
@@ -1258,23 +1284,20 @@ describe("MonitorRepository", () => {
 
                 await monitorRepository.create("site-1", monitor);
 
-                expect(mockDatabase.run).toHaveBeenCalledWith(
-                    expect.stringContaining("INSERT INTO monitors"),
-                    [
-                        "site-1", 
-                        "http",
-                        null, // url empty string becomes null
-                        null, // host null becomes null
-                        null, // port undefined becomes null
-                        null, // checkInterval undefined becomes null
-                        null, // timeout undefined becomes null
-                        null, // retryAttempts undefined becomes null
-                        0, // monitoring false becomes 0
-                        undefined, // status undefined preserved
-                        null, // responseTime undefined becomes null
-                        null, // lastChecked undefined becomes null
-                    ]
-                );
+                expect(mockDatabase.run).toHaveBeenCalledWith(expect.stringContaining("INSERT INTO monitors"), [
+                    "site-1",
+                    "http",
+                    null, // url empty string becomes null
+                    null, // host null becomes null
+                    null, // port undefined becomes null
+                    null, // checkInterval undefined becomes null
+                    null, // timeout undefined becomes null
+                    null, // retryAttempts undefined becomes null
+                    0, // monitoring false becomes 0
+                    undefined, // status undefined preserved
+                    null, // responseTime undefined becomes null
+                    null, // lastChecked undefined becomes null
+                ]);
             });
         });
 
@@ -1323,7 +1346,7 @@ describe("MonitorRepository", () => {
                 // Test with host defined (non-undefined)
                 const rowDefinedHost: MonitorRow = {
                     id: 2,
-                    site_identifier: "site-1", 
+                    site_identifier: "site-1",
                     type: "http",
                     url: "https://example.com",
                     host: "localhost", // defined host - line 183 defined branch
@@ -1347,10 +1370,8 @@ describe("MonitorRepository", () => {
         });
 
         describe("Line 364: delete method dev mode logging", () => {
-            // Note: The debug line in delete method has /* v8 ignore next */ so it's excluded from coverage
-
             it("should trigger warning when monitor not found", async () => {
-                (isDev as any).mockReturnValue(false);
+                (isDev as unknown as ReturnType<typeof vi.fn>).mockReturnValue(false);
 
                 mockDatabase.run
                     .mockReturnValueOnce({ changes: 1 }) // DELETE history
@@ -1368,26 +1389,20 @@ describe("MonitorRepository", () => {
     describe("delete method", () => {
         it("should successfully delete an existing monitor", async () => {
             const monitorId = "monitor-1";
-            
+
             // Mock successful deletion (changes > 0)
             mockDatabase.run.mockReturnValue({ changes: 1 });
 
             const result = await monitorRepository.delete(monitorId);
 
             expect(result).toBe(true);
-            expect(mockDatabase.run).toHaveBeenCalledWith(
-                "DELETE FROM history WHERE monitor_id = ?",
-                [monitorId]
-            );
-            expect(mockDatabase.run).toHaveBeenCalledWith(
-                "DELETE FROM monitors WHERE id = ?",
-                [monitorId]
-            );
+            expect(mockDatabase.run).toHaveBeenCalledWith("DELETE FROM history WHERE monitor_id = ?", [monitorId]);
+            expect(mockDatabase.run).toHaveBeenCalledWith("DELETE FROM monitors WHERE id = ?", [monitorId]);
         });
 
         it("should return false when monitor does not exist", async () => {
             const monitorId = "nonexistent-monitor";
-            
+
             // Mock no changes (monitor doesn't exist)
             mockDatabase.run.mockReturnValue({ changes: 0 });
 
@@ -1398,7 +1413,7 @@ describe("MonitorRepository", () => {
 
         it("should handle null changes property (line 364 edge case)", async () => {
             const monitorId = "monitor-1";
-            
+
             // Mock result with null changes (triggers ?? 0 fallback)
             mockDatabase.run.mockReturnValue({ changes: null });
 
@@ -1409,7 +1424,7 @@ describe("MonitorRepository", () => {
 
         it("should handle undefined changes property (line 364 edge case)", async () => {
             const monitorId = "monitor-1";
-            
+
             // Mock result with undefined changes (triggers ?? 0 fallback)
             mockDatabase.run.mockReturnValue({ changes: undefined });
 
@@ -1420,7 +1435,7 @@ describe("MonitorRepository", () => {
 
         it("should handle result object without changes property", async () => {
             const monitorId = "monitor-1";
-            
+
             // Mock result without changes property
             mockDatabase.run.mockReturnValue({});
 
@@ -1432,7 +1447,7 @@ describe("MonitorRepository", () => {
         it("should handle database error during deletion", async () => {
             const monitorId = "monitor-1";
             const error = new Error("Database error");
-            
+
             mockDatabase.run.mockImplementation(() => {
                 throw error;
             });
@@ -1461,11 +1476,11 @@ describe("MonitorRepository", () => {
 
             await monitorRepository.create("site-1", monitor);
 
-            const insertCall = mockDatabase.run.mock.calls.find((call: any) => 
+            const insertCall = mockDatabase.run.mock.calls.find((call: any) =>
                 call[0].includes("INSERT INTO monitors")
             );
-            // host should be null when falsy
-            expect(insertCall[1][3]).toBeNull();
+            expect(insertCall).toBeDefined();
+            expect(insertCall?.[1]?.[3]).toBeNull();
         });
 
         it("should handle monitor creation with undefined host", async () => {
@@ -1487,11 +1502,11 @@ describe("MonitorRepository", () => {
 
             await monitorRepository.create("site-1", monitor);
 
-            const insertCall = mockDatabase.run.mock.calls.find((call: any) => 
+            const insertCall = mockDatabase.run.mock.calls.find((call: any) =>
                 call[0].includes("INSERT INTO monitors")
             );
-            // host should be null when falsy
-            expect(insertCall[1][3]).toBeNull();
+            expect(insertCall).toBeDefined();
+            expect(insertCall?.[1]?.[3]).toBeNull();
         });
 
         it("should handle database result with falsy id (line 172)", async () => {

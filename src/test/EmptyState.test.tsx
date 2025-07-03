@@ -10,31 +10,37 @@ import { EmptyState } from "../components/Dashboard/SiteList/EmptyState";
 
 // Mock themed components
 vi.mock("../theme/components", () => ({
-    ThemedBox: ({ children, surface, padding, className }: { 
-        children: React.ReactNode; 
-        surface: string; 
-        padding: string; 
-        className: string; 
+    ThemedBox: ({
+        children,
+        surface,
+        padding,
+        className,
+    }: {
+        children: React.ReactNode;
+        surface: string;
+        padding: string;
+        className: string;
     }) => (
-        <div 
-            data-testid="themed-box" 
-            data-surface={surface} 
-            data-padding={padding} 
-            className={className}
-        >
+        <div data-testid="themed-box" data-surface={surface} data-padding={padding} className={className}>
             {children}
         </div>
     ),
-    ThemedText: ({ children, size, weight, variant, className }: { 
-        children: React.ReactNode; 
-        size?: string; 
-        weight?: string; 
-        variant?: string; 
-        className?: string; 
+    ThemedText: ({
+        children,
+        size,
+        weight,
+        variant,
+        className,
+    }: {
+        children: React.ReactNode;
+        size?: string;
+        weight?: string;
+        variant?: string;
+        className?: string;
     }) => (
-        <div 
-            data-testid="themed-text" 
-            data-size={size} 
+        <div
+            data-testid="themed-text"
+            data-size={size}
             data-weight={weight}
             data-variant={variant}
             className={className}
@@ -70,7 +76,7 @@ describe("EmptyState Component", () => {
     describe("Component Structure", () => {
         it("uses ThemedBox with correct props", () => {
             render(<EmptyState />);
-            
+
             const themedBox = screen.getByTestId("themed-box");
             expect(themedBox).toHaveAttribute("data-surface", "base");
             expect(themedBox).toHaveAttribute("data-padding", "xl");
@@ -79,10 +85,10 @@ describe("EmptyState Component", () => {
 
         it("uses ThemedText components with correct props for heading", () => {
             render(<EmptyState />);
-            
+
             const themedTexts = screen.getAllByTestId("themed-text");
-            const headingText = themedTexts.find(el => el.textContent === "No sites to monitor");
-            
+            const headingText = themedTexts.find((el) => el.textContent === "No sites to monitor");
+
             expect(headingText).toHaveAttribute("data-size", "lg");
             expect(headingText).toHaveAttribute("data-weight", "medium");
             expect(headingText).toHaveClass("mb-2");
@@ -90,12 +96,12 @@ describe("EmptyState Component", () => {
 
         it("uses ThemedText component with correct props for description", () => {
             render(<EmptyState />);
-            
+
             const themedTexts = screen.getAllByTestId("themed-text");
-            const descText = themedTexts.find(el => 
-                el.textContent === "Add your first website to start monitoring its uptime."
+            const descText = themedTexts.find(
+                (el) => el.textContent === "Add your first website to start monitoring its uptime."
             );
-            
+
             expect(descText).toHaveAttribute("data-variant", "secondary");
         });
     });
@@ -103,10 +109,10 @@ describe("EmptyState Component", () => {
     describe("Content Hierarchy", () => {
         it("renders elements in correct order", () => {
             const { container } = render(<EmptyState />);
-            
+
             const themedBox = container.querySelector('[data-testid="themed-box"]');
             const children = themedBox?.children;
-            
+
             expect(children).toHaveLength(3);
             expect(children?.[0]).toHaveClass("empty-state-icon");
             expect(children?.[0]).toHaveTextContent("🌐");
@@ -116,8 +122,8 @@ describe("EmptyState Component", () => {
 
         it("icon has correct CSS class", () => {
             render(<EmptyState />);
-            
-            const iconDiv = screen.getByText("🌐").closest('.empty-state-icon');
+
+            const iconDiv = screen.getByText("🌐").closest(".empty-state-icon");
             expect(iconDiv).toBeInTheDocument();
         });
     });
@@ -125,7 +131,7 @@ describe("EmptyState Component", () => {
     describe("Accessibility", () => {
         it("has proper semantic structure", () => {
             render(<EmptyState />);
-            
+
             // Should have meaningful text content
             expect(screen.getByText("No sites to monitor")).toBeInTheDocument();
             expect(screen.getByText("Add your first website to start monitoring its uptime.")).toBeInTheDocument();
@@ -133,7 +139,7 @@ describe("EmptyState Component", () => {
 
         it("uses centered layout for better visual hierarchy", () => {
             render(<EmptyState />);
-            
+
             const container = screen.getByTestId("themed-box");
             expect(container).toHaveClass("text-center");
         });
@@ -142,21 +148,21 @@ describe("EmptyState Component", () => {
     describe("Visual Design", () => {
         it("applies appropriate spacing", () => {
             render(<EmptyState />);
-            
+
             const container = screen.getByTestId("themed-box");
             expect(container).toHaveAttribute("data-padding", "xl");
-            
+
             const heading = screen.getByText("No sites to monitor");
             expect(heading).toHaveClass("mb-2");
         });
 
         it("uses appropriate text sizes and weights", () => {
             render(<EmptyState />);
-            
+
             const heading = screen.getByText("No sites to monitor");
             expect(heading).toHaveAttribute("data-size", "lg");
             expect(heading).toHaveAttribute("data-weight", "medium");
-            
+
             const description = screen.getByText("Add your first website to start monitoring its uptime.");
             expect(description).toHaveAttribute("data-variant", "secondary");
         });
@@ -165,7 +171,7 @@ describe("EmptyState Component", () => {
     describe("Theme Integration", () => {
         it("integrates properly with themed components", () => {
             render(<EmptyState />);
-            
+
             // Should use ThemedBox and ThemedText
             expect(screen.getByTestId("themed-box")).toBeInTheDocument();
             expect(screen.getAllByTestId("themed-text")).toHaveLength(2);
@@ -173,10 +179,10 @@ describe("EmptyState Component", () => {
 
         it("passes through theme properties correctly", () => {
             render(<EmptyState />);
-            
+
             const box = screen.getByTestId("themed-box");
             expect(box).toHaveAttribute("data-surface", "base");
-            
+
             const texts = screen.getAllByTestId("themed-text");
             expect(texts[0]).toHaveAttribute("data-size", "lg");
             expect(texts[1]).toHaveAttribute("data-variant", "secondary");

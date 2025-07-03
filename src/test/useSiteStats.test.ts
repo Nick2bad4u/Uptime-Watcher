@@ -28,9 +28,7 @@ describe("useSiteStats", () => {
         });
 
         it("should calculate stats for single record", () => {
-            const history: StatusHistory[] = [
-                { timestamp: 1640995200000, status: "up", responseTime: 200 },
-            ];
+            const history: StatusHistory[] = [{ timestamp: 1640995200000, status: "up", responseTime: 200 }];
 
             const { result } = renderHook(() => useSiteStats(history));
 
@@ -195,9 +193,7 @@ describe("useSiteStats", () => {
         });
 
         it("should handle single record", () => {
-            const history: StatusHistory[] = [
-                { timestamp: 1640995200000, status: "up", responseTime: 200 },
-            ];
+            const history: StatusHistory[] = [{ timestamp: 1640995200000, status: "up", responseTime: 200 }];
 
             const { result } = renderHook(() => useSiteStats(history));
 
@@ -226,9 +222,7 @@ describe("useSiteStats", () => {
         });
 
         it("should recalculate when history changes", () => {
-            const history1: StatusHistory[] = [
-                { timestamp: 1640995200000, status: "up", responseTime: 200 },
-            ];
+            const history1: StatusHistory[] = [{ timestamp: 1640995200000, status: "up", responseTime: 200 }];
 
             const history2: StatusHistory[] = [
                 { timestamp: 1640995200000, status: "up", responseTime: 200 },
@@ -302,7 +296,7 @@ describe("useSiteStats", () => {
             expect(result.current.averageResponseTime).toBe(250);
             expect(result.current.checkCount).toBe(2);
             expect(result.current.uptime).toBe(100);
-            
+
             // Also test that the useMemo dependency works correctly
             expect(result.current).toBeDefined();
         });

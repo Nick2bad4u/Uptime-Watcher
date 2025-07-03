@@ -41,7 +41,13 @@ vi.mock("../components/SiteDetails/ScreenshotThumbnail", () => ({
 
 // Mock ThemedText and StatusIndicator components
 vi.mock("../theme/components", () => ({
-    ThemedText: ({ children, className, size, weight, variant }: {
+    ThemedText: ({
+        children,
+        className,
+        size,
+        weight,
+        variant,
+    }: {
         children: React.ReactNode;
         className?: string;
         size?: string;
@@ -100,10 +106,10 @@ describe("SiteDetailsHeader", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        
+
         // Clean up the DOM
-        document.body.innerHTML = '';
-        
+        document.body.innerHTML = "";
+
         // Mock window properties
         Object.defineProperty(window, "open", {
             value: mockWindowOpen,
@@ -114,12 +120,12 @@ describe("SiteDetailsHeader", () => {
 
     afterEach(() => {
         // Clean up any modifications to window object
-        if ('electronAPI' in window) {
+        if ("electronAPI" in window) {
             (window as unknown as Record<string, unknown>).electronAPI = undefined;
         }
-        
+
         // Clean up the DOM
-        document.body.innerHTML = '';
+        document.body.innerHTML = "";
     });
 
     describe("Basic Rendering", () => {
@@ -210,14 +216,11 @@ describe("SiteDetailsHeader", () => {
             const urlLink = screen.getByRole("link", { name: "Open https://example.com in browser" });
             await user.click(urlLink);
 
-            expect(logger.user.action).toHaveBeenCalledWith(
-                "External URL opened from site details",
-                {
-                    siteId: "test-site-id",
-                    siteName: "Test Site",
-                    url: "https://example.com",
-                }
-            );
+            expect(logger.user.action).toHaveBeenCalledWith("External URL opened from site details", {
+                siteId: "test-site-id",
+                siteName: "Test Site",
+                url: "https://example.com",
+            });
 
             expect(mockWindowOpen).toHaveBeenCalledWith("https://example.com", "_blank");
         });
@@ -236,14 +239,11 @@ describe("SiteDetailsHeader", () => {
             const urlLink = screen.getByRole("link", { name: "Open https://example.com in browser" });
             await user.click(urlLink);
 
-            expect(logger.user.action).toHaveBeenCalledWith(
-                "External URL opened from site details",
-                {
-                    siteId: "test-site-id",
-                    siteName: "Test Site",
-                    url: "https://example.com",
-                }
-            );
+            expect(logger.user.action).toHaveBeenCalledWith("External URL opened from site details", {
+                siteId: "test-site-id",
+                siteName: "Test Site",
+                url: "https://example.com",
+            });
 
             expect(mockElectronAPI.openExternal).toHaveBeenCalledWith("https://example.com");
             expect(mockWindowOpen).not.toHaveBeenCalled();
@@ -254,11 +254,11 @@ describe("SiteDetailsHeader", () => {
 
             const urlLink = container.querySelector('a[href="https://example.com"]');
             expect(urlLink).toBeInTheDocument();
-            
+
             // Use userEvent instead of fireEvent for better simulation
             const user = userEvent.setup();
             await user.click(urlLink!);
-            
+
             // Verify the click was handled properly by checking logger was called
             expect(logger.user.action).toHaveBeenCalled();
         });
@@ -290,13 +290,13 @@ describe("SiteDetailsHeader", () => {
             const { container } = render(<SiteDetailsHeader site={mockSite} selectedMonitor={monitorWithEmptyUrl} />);
 
             // Should not render URL link when URL is empty
-            const urlLink = container.querySelector('a[href]');
+            const urlLink = container.querySelector("a[href]");
             expect(urlLink).not.toBeInTheDocument();
         });
 
         it("should handle undefined URL in onClick handler (line 71 coverage)", async () => {
             const user = userEvent.setup();
-            
+
             // Create a special monitor where URL might be undefined during click processing
             const mockMonitorWithNullishUrl: Monitor = {
                 ...mockHttpMonitor,
@@ -318,7 +318,9 @@ describe("SiteDetailsHeader", () => {
                 configurable: true,
             });
 
-            const { container } = render(<SiteDetailsHeader site={mockSite} selectedMonitor={mockMonitorWithNullishUrl} />);
+            const { container } = render(
+                <SiteDetailsHeader site={mockSite} selectedMonitor={mockMonitorWithNullishUrl} />
+            );
 
             const urlLink = container.querySelector('a[href="https://example.com"]');
             expect(urlLink).toBeInTheDocument();
@@ -389,10 +391,10 @@ describe("SiteDetailsHeader", () => {
         it("should apply truncate class to title and URL", () => {
             const { container } = render(<SiteDetailsHeader site={mockSite} selectedMonitor={mockHttpMonitor} />);
 
-            const title = container.querySelector('.site-details-title');
+            const title = container.querySelector(".site-details-title");
             expect(title).toHaveClass("truncate");
 
-            const urlLink = container.querySelector('.site-details-url');
+            const urlLink = container.querySelector(".site-details-url");
             expect(urlLink).toHaveClass("truncate");
         });
     });
@@ -455,7 +457,9 @@ describe("SiteDetailsHeader", () => {
                 monitoring: true,
             };
 
-            const { container } = render(<SiteDetailsHeader site={siteWithoutName} selectedMonitor={mockHttpMonitor} />);
+            const { container } = render(
+                <SiteDetailsHeader site={siteWithoutName} selectedMonitor={mockHttpMonitor} />
+            );
 
             expect(container.textContent).toContain("test-id");
         });
@@ -468,7 +472,7 @@ describe("SiteDetailsHeader", () => {
 
             const { container } = render(<SiteDetailsHeader site={mockSite} selectedMonitor={monitorWithoutUrl} />);
 
-            const linkElement = container.querySelector('a[href]');
+            const linkElement = container.querySelector("a[href]");
             expect(linkElement).not.toBeInTheDocument();
         });
 
@@ -486,11 +490,13 @@ describe("SiteDetailsHeader", () => {
                 name: "",
             };
 
-            const { container } = render(<SiteDetailsHeader site={siteWithEmptyName} selectedMonitor={mockHttpMonitor} />);
+            const { container } = render(
+                <SiteDetailsHeader site={siteWithEmptyName} selectedMonitor={mockHttpMonitor} />
+            );
 
             // Should show empty string when name is explicitly set to empty (component behavior)
             // Component uses site.name ?? site.identifier, so empty string is shown
-            const titleElement = container.querySelector('.site-details-title');
+            const titleElement = container.querySelector(".site-details-title");
             expect(titleElement).toBeInTheDocument();
         });
     });

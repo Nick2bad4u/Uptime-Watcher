@@ -5,6 +5,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import React from "react";
 import { OverviewTab } from "../components/SiteDetails/tabs/OverviewTab";
 import { Monitor } from "../types";
 import logger from "../services/logger";
@@ -43,18 +44,58 @@ vi.mock("../theme/useTheme", () => ({
 
 // Mock themed components
 vi.mock("../theme/components", () => ({
-    ThemedText: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => 
-        <span {...props}>{children}</span>,
-    ThemedButton: ({ children, onClick, ...props }: { children?: React.ReactNode; onClick?: () => void; [key: string]: unknown }) => 
-        <button onClick={onClick} {...props}>{children}</button>,
-    StatusIndicator: ({ status, ...props }: { status: string; [key: string]: unknown }) => 
-        <div data-testid="status-indicator" {...props}>Status: {status}</div>,
-    ThemedCard: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => 
-        <div {...props}>{children}</div>,
-    ThemedBadge: ({ children, variant, ...props }: { children?: React.ReactNode; variant?: string; [key: string]: unknown }) => 
-        <span data-testid="themed-badge" data-variant={variant} {...props}>{children}</span>,
-    ThemedProgress: ({ value, variant, ...props }: { value: number; variant?: string; [key: string]: unknown }) => 
-        <div data-testid="themed-progress" data-value={value} data-variant={variant} {...props}>Progress: {value}%</div>,
+    ThemedText: ({ children, ...props }: { children: React.ReactNode; [key: string]: unknown }) => (
+        <span {...props}>{children}</span>
+    ),
+    ThemedButton: ({
+        children,
+        onClick,
+        ...props
+    }: {
+        children: React.ReactNode;
+        onClick?: () => void;
+        [key: string]: unknown;
+    }) => (
+        <button onClick={onClick} {...props}>
+            {children}
+        </button>
+    ),
+    StatusIndicator: ({ status, ...props }: { status: string; [key: string]: unknown }) => {
+        // Only allow DOM-safe props to be spread!
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { showText, $iconColor, iconColor, size, ...domProps } = props;
+        return (
+            <div data-testid="status-indicator" {...domProps}>
+                Status: {status}
+            </div>
+        );
+    },
+    ThemedCard: ({ children, ...props }: { children: React.ReactNode; [key: string]: unknown }) => {
+        // Remove non-DOM props before spreading
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { icon, iconColor, hoverable, showLabel, title, ...domProps } = props;
+        return <div {...domProps}>{children}</div>;
+    },
+    ThemedBadge: ({ children, ...props }: { children: React.ReactNode; [key: string]: unknown }) => {
+        // Remove non-DOM props before spreading
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { variant, icon, iconColor, size, ...domProps } = props;
+        return (
+            <span data-testid="themed-badge" data-variant={variant} {...domProps}>
+                {children}
+            </span>
+        );
+    },
+    ThemedProgress: ({ value, variant, ...props }: { value: number; variant: string; [key: string]: unknown }) => {
+        // Remove non-DOM props before spreading
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { showLabel, ...domProps } = props;
+        return (
+            <div data-testid="themed-progress" data-value={value} data-variant={variant} {...domProps}>
+                Progress: {value}%
+            </div>
+        );
+    },
 }));
 
 // Mock logger
@@ -195,57 +236,51 @@ describe("OverviewTab", () => {
 
         it("should handle remove site logging with undefined URL (line 196 coverage)", async () => {
             const user = userEvent.setup();
-            
+
             // Create a monitor without a URL to trigger the nullish coalescing on line 196
             const monitorWithoutUrl: Monitor = {
                 ...mockMonitor,
                 url: undefined, // This should trigger the ?? "unknown" fallback
             };
-            
-            const loggerSpy = vi.spyOn(logger.user, 'action');
-            
+
+            const loggerSpy = vi.spyOn(logger.user, "action");
+
             render(<OverviewTab {...defaultProps} selectedMonitor={monitorWithoutUrl} />);
 
             const removeButton = screen.getByRole("button", { name: /remove/i });
             await user.click(removeButton);
 
             // Check that the logger was called with "unknown" when URL is undefined
-            expect(loggerSpy).toHaveBeenCalledWith(
-                "Site removal button clicked from overview tab",
-                {
-                    monitorType: monitorWithoutUrl.type,
-                    siteId: "unknown", // This should be the fallback value
-                }
-            );
-            
+            expect(loggerSpy).toHaveBeenCalledWith("Site removal button clicked from overview tab", {
+                monitorType: monitorWithoutUrl.type,
+                siteId: "unknown", // This should be the fallback value
+            });
+
             loggerSpy.mockRestore();
         });
 
         it("should handle remove site logging with undefined URL", async () => {
             const user = userEvent.setup();
-            
+
             // Create a monitor with undefined URL to test another undefined case
             const monitorWithNullUrl: Monitor = {
                 ...mockMonitor,
                 url: undefined, // This should also trigger the ?? "unknown" fallback
             };
-            
-            const loggerSpy = vi.spyOn(logger.user, 'action');
-            
+
+            const loggerSpy = vi.spyOn(logger.user, "action");
+
             render(<OverviewTab {...defaultProps} selectedMonitor={monitorWithNullUrl} />);
 
             const removeButton = screen.getByRole("button", { name: /remove/i });
             await user.click(removeButton);
 
             // Check that the logger was called with "unknown" when URL is undefined
-            expect(loggerSpy).toHaveBeenCalledWith(
-                "Site removal button clicked from overview tab",
-                {
-                    monitorType: monitorWithNullUrl.type,
-                    siteId: "unknown", // This should be the fallback value
-                }
-            );
-            
+            expect(loggerSpy).toHaveBeenCalledWith("Site removal button clicked from overview tab", {
+                monitorType: monitorWithNullUrl.type,
+                siteId: "unknown", // This should be the fallback value
+            });
+
             loggerSpy.mockRestore();
         });
     });
@@ -269,14 +304,16 @@ describe("OverviewTab", () => {
 
     describe("Edge Cases", () => {
         it("should handle zero values", () => {
-            render(<OverviewTab 
-                {...defaultProps} 
-                avgResponseTime={0}
-                fastestResponse={0}
-                slowestResponse={0}
-                totalChecks={0}
-                uptime="0"
-            />);
+            render(
+                <OverviewTab
+                    {...defaultProps}
+                    avgResponseTime={0}
+                    fastestResponse={0}
+                    slowestResponse={0}
+                    totalChecks={0}
+                    uptime="0"
+                />
+            );
 
             expect(screen.getByText("0%")).toBeInTheDocument();
             expect(screen.getByText("0")).toBeInTheDocument();
@@ -298,12 +335,14 @@ describe("OverviewTab", () => {
 
         it("should handle very large response times", () => {
             const largeTime = 10000;
-            render(<OverviewTab 
-                {...defaultProps} 
-                avgResponseTime={largeTime}
-                fastestResponse={largeTime}
-                slowestResponse={largeTime}
-            />);
+            render(
+                <OverviewTab
+                    {...defaultProps}
+                    avgResponseTime={largeTime}
+                    fastestResponse={largeTime}
+                    slowestResponse={largeTime}
+                />
+            );
 
             expect(defaultProps.formatResponseTime).toHaveBeenCalledWith(largeTime);
         });

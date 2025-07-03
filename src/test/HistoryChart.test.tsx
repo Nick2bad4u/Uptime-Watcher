@@ -45,16 +45,16 @@ describe("HistoryChart Component", () => {
     describe("Basic Rendering", () => {
         it("renders with valid history data", () => {
             render(<HistoryChart history={mockHistory} title="Test Chart" />);
-            
+
             expect(screen.getByText("Test Chart")).toBeInTheDocument();
             expect(screen.getAllByTestId("mini-chart-bar")).toHaveLength(3);
         });
 
         it("displays bars in reverse chronological order (most recent first)", () => {
             render(<HistoryChart history={mockHistory} title="Test Chart" />);
-            
+
             const bars = screen.getAllByTestId("mini-chart-bar");
-            
+
             // Should be reversed: 3000, 2000, 1000
             expect(bars[0]).toHaveAttribute("data-timestamp", "3000");
             expect(bars[1]).toHaveAttribute("data-timestamp", "2000");
@@ -63,9 +63,9 @@ describe("HistoryChart Component", () => {
 
         it("passes correct props to MiniChartBar components", () => {
             render(<HistoryChart history={mockHistory} title="Test Chart" />);
-            
+
             const bars = screen.getAllByTestId("mini-chart-bar");
-            
+
             expect(bars[0]).toHaveAttribute("data-status", "up");
             expect(bars[1]).toHaveAttribute("data-status", "down");
             expect(bars[2]).toHaveAttribute("data-status", "up");
@@ -75,7 +75,7 @@ describe("HistoryChart Component", () => {
             const { container } = render(
                 <HistoryChart history={mockHistory} title="Test Chart" className="custom-class" />
             );
-            
+
             expect(container.firstChild).toHaveClass("custom-class");
         });
     });
@@ -83,7 +83,7 @@ describe("HistoryChart Component", () => {
     describe("Edge Cases", () => {
         it("returns null for empty history", () => {
             const { container } = render(<HistoryChart history={[]} title="Empty Chart" />);
-            
+
             expect(container.firstChild).toBeNull();
         });
 
@@ -95,9 +95,9 @@ describe("HistoryChart Component", () => {
                     responseTime: 200,
                 },
             ];
-            
+
             render(<HistoryChart history={singleHistory} title="Single Item" />);
-            
+
             expect(screen.getByText("Single Item")).toBeInTheDocument();
             expect(screen.getAllByTestId("mini-chart-bar")).toHaveLength(1);
         });
@@ -110,9 +110,9 @@ describe("HistoryChart Component", () => {
                 status: i % 2 === 0 ? "up" : "down",
                 responseTime: i % 2 === 0 ? 200 : 0,
             }));
-            
+
             render(<HistoryChart history={largeHistory} title="Large Chart" maxItems={50} />);
-            
+
             expect(screen.getAllByTestId("mini-chart-bar")).toHaveLength(50);
         });
 
@@ -122,15 +122,15 @@ describe("HistoryChart Component", () => {
                 status: i % 2 === 0 ? "up" : "down",
                 responseTime: i % 2 === 0 ? 200 : 0,
             }));
-            
+
             render(<HistoryChart history={largeHistory} title="Default Max" />);
-            
+
             expect(screen.getAllByTestId("mini-chart-bar")).toHaveLength(120);
         });
 
         it("shows all items when history is smaller than maxItems", () => {
             render(<HistoryChart history={mockHistory} title="Small Chart" maxItems={100} />);
-            
+
             expect(screen.getAllByTestId("mini-chart-bar")).toHaveLength(3);
         });
     });
@@ -138,20 +138,22 @@ describe("HistoryChart Component", () => {
     describe("Component Structure", () => {
         it("has correct CSS classes and structure", () => {
             const { container } = render(<HistoryChart history={mockHistory} title="Structure Test" />);
-            
+
             const chartContainer = container.firstChild as HTMLElement;
             expect(chartContainer).toHaveClass("mb-3", "w-full");
-            
+
             const titleContainer = chartContainer.querySelector(".flex.items-center.justify-end.mb-2");
             expect(titleContainer).toBeInTheDocument();
-            
-            const barsContainer = chartContainer.querySelector(".flex.items-center.justify-end.flex-shrink.min-w-0.gap-1.overflow-hidden");
+
+            const barsContainer = chartContainer.querySelector(
+                ".flex.items-center.justify-end.flex-shrink.min-w-0.gap-1.overflow-hidden"
+            );
             expect(barsContainer).toBeInTheDocument();
         });
 
         it("renders ThemedText with correct props", () => {
             render(<HistoryChart history={mockHistory} title="Theme Test" />);
-            
+
             const themedText = screen.getByTestId("themed-text");
             expect(themedText).toHaveAttribute("data-size", "xs");
             expect(themedText).toHaveAttribute("data-variant", "secondary");

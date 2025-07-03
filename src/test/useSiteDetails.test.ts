@@ -1,6 +1,6 @@
 /**
  * Comprehensive test suite for useSiteDetails hook
- * 
+ *
  * Tests all functionality including:
  * - Hook initialization and state management
  * - Monitor selection and switching
@@ -85,17 +85,13 @@ vi.mock("../hooks/site/useSiteAnalytics", () => ({
 }));
 
 // Mock window.confirm
-Object.defineProperty(window, 'confirm', {
+Object.defineProperty(window, "confirm", {
     writable: true,
     value: vi.fn(() => true),
 });
 
 describe("useSiteDetails", () => {
-    const createMonitor = (
-        id: string,
-        type: "http" | "port" = "http",
-        overrides: Partial<Monitor> = {}
-    ): Monitor => ({
+    const createMonitor = (id: string, type: "http" | "port" = "http", overrides: Partial<Monitor> = {}): Monitor => ({
         id,
         type,
         url: type === "http" ? "https://example.com" : undefined,
@@ -168,10 +164,7 @@ describe("useSiteDetails", () => {
 
         it("should initialize with first monitor when no monitor is selected", () => {
             const site = createSite("test-site", {
-                monitors: [
-                    createMonitor("monitor-1"),
-                    createMonitor("monitor-2"),
-                ],
+                monitors: [createMonitor("monitor-1"), createMonitor("monitor-2")],
             });
             mockStore.sites = [site];
             mockStore.getSelectedMonitorId.mockReturnValue(null);
@@ -207,10 +200,7 @@ describe("useSiteDetails", () => {
     describe("Monitor Selection", () => {
         it("should handle monitor selection change", () => {
             const site = createSite("test-site", {
-                monitors: [
-                    createMonitor("monitor-1"),
-                    createMonitor("monitor-2"),
-                ],
+                monitors: [createMonitor("monitor-1"), createMonitor("monitor-2")],
             });
             mockStore.sites = [site];
             mockStore.getSelectedMonitorId.mockReturnValue("monitor-1");
@@ -230,10 +220,7 @@ describe("useSiteDetails", () => {
 
         it("should switch to analytics tab when monitor changes and current tab is analytics", () => {
             const site = createSite("test-site", {
-                monitors: [
-                    createMonitor("monitor-1"),
-                    createMonitor("monitor-2"),
-                ],
+                monitors: [createMonitor("monitor-1"), createMonitor("monitor-2")],
             });
             mockStore.sites = [site];
             mockStore.activeSiteDetailsTab = "monitor-1-analytics";
@@ -254,10 +241,7 @@ describe("useSiteDetails", () => {
 
         it("should not switch tab when monitor changes and current tab is not analytics", () => {
             const site = createSite("test-site", {
-                monitors: [
-                    createMonitor("monitor-1"),
-                    createMonitor("monitor-2"),
-                ],
+                monitors: [createMonitor("monitor-1"), createMonitor("monitor-2")],
             });
             mockStore.sites = [site];
             mockStore.activeSiteDetailsTab = "overview";
@@ -517,7 +501,11 @@ describe("useSiteDetails", () => {
                 });
 
                 expect(mockStore.clearError).toHaveBeenCalled();
-                expect(mockStore.updateSiteCheckInterval).toHaveBeenCalledWith("test-site", site.monitors[0].id, 120000);
+                expect(mockStore.updateSiteCheckInterval).toHaveBeenCalledWith(
+                    "test-site",
+                    site.monitors[0].id,
+                    120000
+                );
                 expect(result.current.intervalChanged).toBe(false);
             });
 
@@ -535,7 +523,11 @@ describe("useSiteDetails", () => {
                 });
 
                 expect(mockStore.clearError).toHaveBeenCalled();
-                expect(mockStore.updateSiteCheckInterval).toHaveBeenCalledWith("test-site", site.monitors[0].id, DEFAULT_CHECK_INTERVAL);
+                expect(mockStore.updateSiteCheckInterval).toHaveBeenCalledWith(
+                    "test-site",
+                    site.monitors[0].id,
+                    DEFAULT_CHECK_INTERVAL
+                );
             });
         });
 
@@ -639,7 +631,11 @@ describe("useSiteDetails", () => {
                 });
 
                 expect(mockStore.clearError).toHaveBeenCalled();
-                expect(mockStore.updateMonitorTimeout).toHaveBeenCalledWith("test-site", site.monitors[0].id, DEFAULT_REQUEST_TIMEOUT_SECONDS * 1000);
+                expect(mockStore.updateMonitorTimeout).toHaveBeenCalledWith(
+                    "test-site",
+                    site.monitors[0].id,
+                    DEFAULT_REQUEST_TIMEOUT_SECONDS * 1000
+                );
             });
         });
 
@@ -866,7 +862,11 @@ describe("useSiteDetails", () => {
 
             // Change selected monitor
             mockStore.getSelectedMonitorId.mockReturnValue("monitor-2");
-            site.monitors[1] = createMonitor("monitor-2", "http", { checkInterval: 120000, timeout: 30000, retryAttempts: 5 });
+            site.monitors[1] = createMonitor("monitor-2", "http", {
+                checkInterval: 120000,
+                timeout: 30000,
+                retryAttempts: 5,
+            });
             mockStore.sites = [site];
 
             rerender();
@@ -1062,7 +1062,11 @@ describe("useSiteDetails", () => {
                 });
 
                 expect(mockStore.clearError).toHaveBeenCalled();
-                expect(mockStore.updateSiteCheckInterval).toHaveBeenCalledWith("test-site", site.monitors[0].id, 120000);
+                expect(mockStore.updateSiteCheckInterval).toHaveBeenCalledWith(
+                    "test-site",
+                    site.monitors[0].id,
+                    120000
+                );
             });
 
             it("should handle non-Error objects in handleSaveTimeout", async () => {
@@ -1118,7 +1122,7 @@ describe("useSiteDetails", () => {
                 mockStore.sites = [site];
                 mockStore.getSelectedMonitorId.mockReturnValue(site.monitors[0].id);
                 // Throw a non-Error object (symbol)
-                mockStore.modifySite.mockRejectedValue(Symbol('test-error'));
+                mockStore.modifySite.mockRejectedValue(Symbol("test-error"));
 
                 const { result } = renderHook(() => useSiteDetails({ site }));
 

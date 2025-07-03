@@ -12,14 +12,14 @@ import type { Monitor } from "../types";
 
 // Mock ThemedSelect component
 vi.mock("../theme/components", () => ({
-    ThemedSelect: ({ 
-        children, 
-        onChange, 
-        onClick, 
-        onMouseDown, 
-        value, 
-        className, 
-        ...props 
+    ThemedSelect: ({
+        children,
+        onChange,
+        onClick,
+        onMouseDown,
+        value,
+        className,
+        ...props
     }: {
         children: React.ReactNode;
         onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
@@ -95,7 +95,7 @@ describe("MonitorSelector", () => {
     describe("Basic Rendering", () => {
         it("should render ThemedSelect with monitors", () => {
             render(<MonitorSelector {...defaultProps} />);
-            
+
             const select = screen.getByTestId("themed-select");
             expect(select).toBeInTheDocument();
             expect(select).toHaveValue("http-monitor");
@@ -103,28 +103,28 @@ describe("MonitorSelector", () => {
 
         it("should render all monitor options", () => {
             render(<MonitorSelector {...defaultProps} />);
-            
+
             const options = screen.getAllByRole("option");
             expect(options).toHaveLength(2);
-            
+
             // Check by text content instead of display value
             const httpOption = screen.getByText("HTTP: https://example.com");
             const portOption = screen.getByText("PORT:8080");
-            
+
             expect(httpOption).toBeInTheDocument();
             expect(portOption).toBeInTheDocument();
         });
 
         it("should use default className when not provided", () => {
             render(<MonitorSelector {...defaultProps} />);
-            
+
             const select = screen.getByTestId("themed-select");
             expect(select).toHaveClass("min-w-[80px]");
         });
 
         it("should use custom className when provided", () => {
             render(<MonitorSelector {...defaultProps} className="custom-class" />);
-            
+
             const select = screen.getByTestId("themed-select");
             expect(select).toHaveClass("custom-class");
         });
@@ -133,14 +133,14 @@ describe("MonitorSelector", () => {
     describe("Monitor Option Formatting", () => {
         it("should format HTTP monitor with URL correctly", () => {
             render(<MonitorSelector {...defaultProps} />);
-            
+
             const httpOption = screen.getByText("HTTP: https://example.com");
             expect(httpOption).toBeInTheDocument();
         });
 
         it("should format port monitor with port correctly", () => {
             render(<MonitorSelector {...defaultProps} />);
-            
+
             const portOption = screen.getByText("PORT:8080");
             expect(portOption).toBeInTheDocument();
         });
@@ -151,9 +151,9 @@ describe("MonitorSelector", () => {
                 monitors: [mockMinimalMonitor],
                 selectedMonitorId: "minimal-monitor",
             };
-            
+
             render(<MonitorSelector {...propsWithMinimal} />);
-            
+
             const minimalOption = screen.getByText("HTTP");
             expect(minimalOption).toBeInTheDocument();
         });
@@ -163,15 +163,15 @@ describe("MonitorSelector", () => {
                 ...mockHttpMonitor,
                 port: 9000,
             };
-            
+
             const propsWithBoth = {
                 ...defaultProps,
                 monitors: [monitorWithBoth],
                 selectedMonitorId: "http-monitor",
             };
-            
+
             render(<MonitorSelector {...propsWithBoth} />);
-            
+
             // Port should take precedence over URL
             const option = screen.getByText("HTTP:9000");
             expect(option).toBeInTheDocument();
@@ -190,15 +190,15 @@ describe("MonitorSelector", () => {
                 timeout: 30000,
                 retryAttempts: 3,
             };
-            
+
             const propsWithPortOnly = {
                 ...defaultProps,
                 monitors: [portTypeMonitor],
                 selectedMonitorId: "port-only-monitor",
             };
-            
+
             render(<MonitorSelector {...propsWithPortOnly} />);
-            
+
             const portOption = screen.getByText("PORT:3000");
             expect(portOption).toBeInTheDocument();
         });
@@ -208,12 +208,12 @@ describe("MonitorSelector", () => {
         it("should call onChange when selection changes", async () => {
             const user = userEvent.setup();
             render(<MonitorSelector {...defaultProps} />);
-            
+
             const select = screen.getByTestId("themed-select");
             await user.selectOptions(select, "port-monitor");
-            
+
             expect(mockOnChange).toHaveBeenCalledTimes(1);
-            
+
             // Check that the callback received an event
             const call = mockOnChange.mock.calls[0][0];
             expect(call).toBeDefined();
@@ -224,19 +224,19 @@ describe("MonitorSelector", () => {
         it("should stop propagation on click", async () => {
             const user = userEvent.setup();
             const mockClick = vi.fn();
-            
+
             // Create a wrapper to test event propagation
             const TestWrapper = () => (
-                <button type="button" onClick={mockClick}>
+                <button type="button" onClick={mockClick} title="Monitor Selector Button">
                     <MonitorSelector {...defaultProps} />
                 </button>
             );
-            
+
             render(<TestWrapper />);
-            
+
             const select = screen.getByTestId("themed-select");
             await user.click(select);
-            
+
             // The parent button click should not be called due to stopPropagation
             // This tests that the onClick handler in MonitorSelector calls stopPropagation
             expect(mockClick).not.toHaveBeenCalled();
@@ -245,21 +245,21 @@ describe("MonitorSelector", () => {
         it("should stop propagation on mouse down", async () => {
             const user = userEvent.setup();
             const mockMouseDown = vi.fn();
-            
-            // Create a wrapper to test event propagation  
+
+            // Create a wrapper to test event propagation
             const TestWrapper = () => (
-                <button type="button" onMouseDown={mockMouseDown}>
+                <button type="button" onMouseDown={mockMouseDown} title="Monitor Selector MouseDown Button">
                     <MonitorSelector {...defaultProps} />
                 </button>
             );
-            
+
             render(<TestWrapper />);
-            
+
             const select = screen.getByTestId("themed-select");
-            
+
             // Focus and then use pointer events to simulate mouse down
             await user.click(select);
-            
+
             // The component should handle the interaction properly
             expect(select).toBeInTheDocument();
         });
@@ -271,9 +271,9 @@ describe("MonitorSelector", () => {
                 ...defaultProps,
                 monitors: [],
             };
-            
+
             render(<MonitorSelector {...emptyProps} />);
-            
+
             const select = screen.getByTestId("themed-select");
             expect(select).toBeInTheDocument();
             expect(select.children).toHaveLength(0);
@@ -284,15 +284,15 @@ describe("MonitorSelector", () => {
                 ...mockHttpMonitor,
                 id: "",
             };
-            
+
             const propsWithoutId = {
                 ...defaultProps,
                 monitors: [monitorWithoutId],
                 selectedMonitorId: "",
             };
-            
+
             render(<MonitorSelector {...propsWithoutId} />);
-            
+
             const option = screen.getByText("HTTP: https://example.com");
             expect(option).toBeInTheDocument();
             expect(option).toHaveValue("");
@@ -303,16 +303,18 @@ describe("MonitorSelector", () => {
                 ...mockHttpMonitor,
                 url: "https://very-long-domain-name-that-might-cause-layout-issues.example.com/path/to/resource",
             };
-            
+
             const propsWithLongUrl = {
                 ...defaultProps,
                 monitors: [longUrlMonitor],
                 selectedMonitorId: "http-monitor",
             };
-            
+
             render(<MonitorSelector {...propsWithLongUrl} />);
-            
-            const option = screen.getByText("HTTP: https://very-long-domain-name-that-might-cause-layout-issues.example.com/path/to/resource");
+
+            const option = screen.getByText(
+                "HTTP: https://very-long-domain-name-that-might-cause-layout-issues.example.com/path/to/resource"
+            );
             expect(option).toBeInTheDocument();
         });
 
@@ -321,15 +323,15 @@ describe("MonitorSelector", () => {
                 ...mockPortMonitor,
                 port: 65535,
             };
-            
+
             const propsWithHighPort = {
                 ...defaultProps,
                 monitors: [highPortMonitor],
                 selectedMonitorId: "port-monitor",
             };
-            
+
             render(<MonitorSelector {...propsWithHighPort} />);
-            
+
             const option = screen.getByText("PORT:65535");
             expect(option).toBeInTheDocument();
         });
@@ -338,10 +340,10 @@ describe("MonitorSelector", () => {
     describe("Performance and Memoization", () => {
         it("should not recreate handlers on re-render with same props", () => {
             const { rerender } = render(<MonitorSelector {...defaultProps} />);
-            
+
             // Re-render with same props
             rerender(<MonitorSelector {...defaultProps} />);
-            
+
             // Component should still be rendered properly (memo working)
             const select = screen.getByTestId("themed-select");
             expect(select).toBeInTheDocument();
@@ -349,7 +351,7 @@ describe("MonitorSelector", () => {
 
         it("should update when monitors change", () => {
             const { rerender } = render(<MonitorSelector {...defaultProps} />);
-            
+
             const newMonitor: Monitor = {
                 id: "new-monitor",
                 type: "http",
@@ -361,28 +363,28 @@ describe("MonitorSelector", () => {
                 timeout: 30000,
                 retryAttempts: 3,
             };
-            
+
             const newProps = {
                 ...defaultProps,
                 monitors: [...defaultProps.monitors, newMonitor],
             };
-            
+
             rerender(<MonitorSelector {...newProps} />);
-            
+
             const newOption = screen.getByText("HTTP: https://newsite.com");
             expect(newOption).toBeInTheDocument();
         });
 
         it("should update when selectedMonitorId changes", () => {
             const { rerender } = render(<MonitorSelector {...defaultProps} />);
-            
+
             const updatedProps = {
                 ...defaultProps,
                 selectedMonitorId: "port-monitor",
             };
-            
+
             rerender(<MonitorSelector {...updatedProps} />);
-            
+
             const select = screen.getByTestId("themed-select");
             expect(select).toHaveValue("port-monitor");
         });
@@ -392,13 +394,13 @@ describe("MonitorSelector", () => {
         it("should be keyboard accessible", async () => {
             const user = userEvent.setup();
             render(<MonitorSelector {...defaultProps} />);
-            
+
             const select = screen.getByTestId("themed-select");
-            
+
             // Should be focusable
             await user.tab();
             expect(select).toHaveFocus();
-            
+
             // Should be operable with keyboard
             await user.keyboard("[ArrowDown]");
             expect(select).toHaveFocus();
@@ -406,13 +408,13 @@ describe("MonitorSelector", () => {
 
         it("should maintain proper option values and labels", () => {
             render(<MonitorSelector {...defaultProps} />);
-            
+
             const options = screen.getAllByRole("option");
             expect(options).toHaveLength(2);
-            
-            const httpOption = options.find(option => option.textContent === "HTTP: https://example.com");
-            const portOption = options.find(option => option.textContent === "PORT:8080");
-            
+
+            const httpOption = options.find((option) => option.textContent === "HTTP: https://example.com");
+            const portOption = options.find((option) => option.textContent === "PORT:8080");
+
             expect(httpOption).toHaveAttribute("value", "http-monitor");
             expect(portOption).toHaveAttribute("value", "port-monitor");
         });
@@ -421,10 +423,10 @@ describe("MonitorSelector", () => {
     describe("Component Integration", () => {
         it("should integrate properly with ThemedSelect", () => {
             render(<MonitorSelector {...defaultProps} />);
-            
+
             const select = screen.getByTestId("themed-select");
             expect(select).toBeInTheDocument();
-            
+
             // Should pass through all necessary props
             expect(select).toHaveValue("http-monitor");
             expect(select).toHaveClass("min-w-[80px]");
@@ -433,10 +435,10 @@ describe("MonitorSelector", () => {
         it("should handle change events from ThemedSelect", async () => {
             const user = userEvent.setup();
             render(<MonitorSelector {...defaultProps} />);
-            
+
             const select = screen.getByTestId("themed-select");
             await user.selectOptions(select, "port-monitor");
-            
+
             expect(mockOnChange).toHaveBeenCalled();
         });
     });

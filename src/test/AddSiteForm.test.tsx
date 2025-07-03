@@ -181,7 +181,9 @@ describe("AddSiteForm", () => {
 
         it("should show monitoring interval help text", () => {
             render(<AddSiteForm />);
-            expect(screen.getByText("• The monitor will be checked according to your monitoring interval")).toBeInTheDocument();
+            expect(
+                screen.getByText("• The monitor will be checked according to your monitoring interval")
+            ).toBeInTheDocument();
         });
     });
 
@@ -618,20 +620,20 @@ describe("AddSiteForm", () => {
             // Initially should not show loading spinner
             const submitButton = screen.getByText("Add Site");
             expect(submitButton).toBeInTheDocument();
-            expect(submitButton.querySelector('.themed-button__spinner')).toBeFalsy();
+            expect(submitButton.querySelector(".themed-button__spinner")).toBeFalsy();
 
             // After 100ms delay, should show loading state
             act(() => {
                 vi.advanceTimersByTime(100);
             });
-            
+
             // Note: There appears to be a potential bug where the button text changes to "Loading..."
             // but no spinner elements are rendered. For now, we test the actual behavior.
             const loadingButtonText = screen.queryByText("Loading...");
             expect(loadingButtonText).toBeInTheDocument();
-            
+
             // The button should be disabled when loading
-            const buttonElement = loadingButtonText?.closest('button');
+            const buttonElement = loadingButtonText?.closest("button");
             expect(buttonElement).toBeInTheDocument();
             expect(buttonElement).toBeDisabled();
         });
@@ -644,16 +646,19 @@ describe("AddSiteForm", () => {
 
             const { rerender } = render(<AddSiteForm />);
 
-            // Stop loading before delay
-            mockUseStore.mockReturnValue({
-                ...defaultStoreState,
-                isLoading: false,
+            // Stop loading before delay - wrap in act to handle React state updates
+            act(() => {
+                mockUseStore.mockReturnValue({
+                    ...defaultStoreState,
+                    isLoading: false,
+                });
+                rerender(<AddSiteForm />);
             });
 
-            rerender(<AddSiteForm />);
-
-            // Advance timers past delay
-            vi.advanceTimersByTime(100);
+            // Advance timers past delay - wrap in act since it affects React state
+            act(() => {
+                vi.advanceTimersByTime(100);
+            });
 
             expect(screen.queryByText("Loading...")).not.toBeInTheDocument();
             expect(screen.getByText("Add Site")).toBeInTheDocument();

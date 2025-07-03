@@ -215,7 +215,7 @@ describe("useAddSiteForm Hook", () => {
     describe("Add Mode Effects", () => {
         it("should generate new UUID when switching to new mode", () => {
             const { result } = renderHook(() => useAddSiteForm());
-            
+
             // First verify the initial state
             expect(result.current.siteId).toBe("mock-uuid-123");
 

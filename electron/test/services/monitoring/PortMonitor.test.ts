@@ -191,7 +191,7 @@ describe("PortMonitor", () => {
         it("should use DEFAULT_REQUEST_TIMEOUT when both monitor and config timeout are undefined", async () => {
             // Line 67: testing all three parts of the nullish coalescing chain
             const portMonitorWithoutConfigTimeout = new PortMonitor({}); // No timeout in config
-            
+
             const monitorWithoutTimeout: Site["monitors"][0] = {
                 ...mockPortMonitor,
                 timeout: undefined, // No timeout in monitor either
@@ -217,7 +217,7 @@ describe("PortMonitor", () => {
 
         it("should handle non-Error instances in retry onError callback (line 90)", async () => {
             (isDev as any).mockReturnValue(true);
-            
+
             // Mock withRetry to call the onError callback with a non-Error object
             (withRetry as any).mockImplementation(async (fn: any, options: any) => {
                 // Simulate the onError callback being called with a string instead of Error
@@ -230,9 +230,7 @@ describe("PortMonitor", () => {
             await portMonitor.check(mockPortMonitor);
 
             // Verify the logger was called with String(error) conversion
-            expect(logger.debug).toHaveBeenCalledWith(
-                expect.stringContaining("String error message")
-            );
+            expect(logger.debug).toHaveBeenCalledWith(expect.stringContaining("String error message"));
         });
 
         it("should handle non-Error instances in handlePortCheckError method (line 136)", async () => {
@@ -253,10 +251,10 @@ describe("PortMonitor", () => {
             // Line 138: testing error instanceof PortCheckError ? error.responseTime : 0
             // We need to create an error that looks like PortCheckError from the PortMonitor's perspective
             // Since PortCheckError is a private class, we need to trigger it through the actual port check flow
-            
+
             (isDev as any).mockReturnValue(false);
             (isPortReachable as any).mockResolvedValue(false); // Port not reachable
-            
+
             // Mock withRetry to actually call the function and let it create the PortCheckError internally
             (withRetry as any).mockImplementation(async (fn: any) => {
                 try {
@@ -288,9 +286,7 @@ describe("PortMonitor", () => {
             const result = await portMonitor.check(mockPortMonitor);
 
             // Verify logger.debug was NOT called when not in dev mode
-            expect(logger.debug).not.toHaveBeenCalledWith(
-                expect.stringContaining("Final error for example.com:80")
-            );
+            expect(logger.debug).not.toHaveBeenCalledWith(expect.stringContaining("Final error for example.com:80"));
             expect(result.status).toBe("down");
         });
 
@@ -327,7 +323,7 @@ describe("PortMonitor", () => {
         it("should handle config timeout being null/undefined for line 67", async () => {
             // Line 67: testing the specific case where config.timeout is null/undefined
             const portMonitorWithNullConfig = new PortMonitor({ timeout: null as any });
-            
+
             const monitorWithNullTimeout: Site["monitors"][0] = {
                 ...mockPortMonitor,
                 timeout: null as any, // Explicitly null instead of undefined
@@ -401,20 +397,20 @@ describe("PortMonitor", () => {
         it("should trigger line 90 with non-Error object in onError callback", async () => {
             // Line 90: Force the onError callback to be triggered with a non-Error object
             (isDev as any).mockReturnValue(true);
-            
+
             let onErrorCallback: any;
-            
+
             // Mock withRetry to capture the onError callback and call it with a non-Error
             (withRetry as any).mockImplementation(async (_fn: any, options: any) => {
                 onErrorCallback = options.onError;
-                
+
                 // Simulate calling onError with various non-Error types to test line 90
                 onErrorCallback("string error", 1); // String error
-                onErrorCallback(123, 1); // Number error  
+                onErrorCallback(123, 1); // Number error
                 onErrorCallback({ message: "object error" }, 1); // Object error
                 onErrorCallback(null, 1); // Null error
                 onErrorCallback(undefined, 1); // Undefined error
-                
+
                 // Then return a successful result
                 return {
                     status: "up",
@@ -426,39 +422,31 @@ describe("PortMonitor", () => {
             await portMonitor.check(mockPortMonitor);
 
             // Verify that String() was called on non-Error objects (line 90)
-            expect(logger.debug).toHaveBeenCalledWith(
-                expect.stringContaining("string error")
-            );
-            expect(logger.debug).toHaveBeenCalledWith(
-                expect.stringContaining("123")
-            );
+            expect(logger.debug).toHaveBeenCalledWith(expect.stringContaining("string error"));
+            expect(logger.debug).toHaveBeenCalledWith(expect.stringContaining("123"));
             expect(logger.debug).toHaveBeenCalledWith(
                 expect.stringContaining("[object Object]") // Object gets converted to "[object Object]"
             );
-            expect(logger.debug).toHaveBeenCalledWith(
-                expect.stringContaining("null")
-            );
-            expect(logger.debug).toHaveBeenCalledWith(
-                expect.stringContaining("undefined")
-            );
+            expect(logger.debug).toHaveBeenCalledWith(expect.stringContaining("null"));
+            expect(logger.debug).toHaveBeenCalledWith(expect.stringContaining("undefined"));
         });
 
         it("should cover edge case for line 90 - Symbol and other exotic types", async () => {
             // Line 90: Test more exotic types that might not be covered
             (isDev as any).mockReturnValue(true);
-            
+
             let onErrorCallback: any;
-            
+
             (withRetry as any).mockImplementation(async (_fn: any, options: any) => {
                 onErrorCallback = options.onError;
-                
+
                 // Test more exotic types for complete line 90 coverage
-                onErrorCallback(Symbol('test'), 1); // Symbol
+                onErrorCallback(Symbol("test"), 1); // Symbol
                 onErrorCallback(false, 1); // Boolean false
                 onErrorCallback(true, 1); // Boolean true
                 onErrorCallback(0, 1); // Number 0
                 onErrorCallback(BigInt(123), 1); // BigInt
-                
+
                 return {
                     status: "up",
                     responseTime: 100,
@@ -469,21 +457,11 @@ describe("PortMonitor", () => {
             await portMonitor.check(mockPortMonitor);
 
             // Verify conversion to string happened
-            expect(logger.debug).toHaveBeenCalledWith(
-                expect.stringContaining("Symbol(test)")
-            );
-            expect(logger.debug).toHaveBeenCalledWith(
-                expect.stringContaining("false")
-            );
-            expect(logger.debug).toHaveBeenCalledWith(
-                expect.stringContaining("true")
-            );
-            expect(logger.debug).toHaveBeenCalledWith(
-                expect.stringContaining("0")
-            );
-            expect(logger.debug).toHaveBeenCalledWith(
-                expect.stringContaining("123")
-            );
+            expect(logger.debug).toHaveBeenCalledWith(expect.stringContaining("Symbol(test)"));
+            expect(logger.debug).toHaveBeenCalledWith(expect.stringContaining("false"));
+            expect(logger.debug).toHaveBeenCalledWith(expect.stringContaining("true"));
+            expect(logger.debug).toHaveBeenCalledWith(expect.stringContaining("0"));
+            expect(logger.debug).toHaveBeenCalledWith(expect.stringContaining("123"));
         });
     });
 

@@ -23,9 +23,7 @@ vi.mock("../theme/useTheme", () => ({
 // Mock the child components
 vi.mock("../components/Dashboard/SiteCard", () => ({
     SiteCard: ({ site }: { site: { identifier: string; name: string } }) => (
-        <div data-testid={`site-card-${site.identifier}`}>
-            Site Card: {site.name}
-        </div>
+        <div data-testid={`site-card-${site.identifier}`}>Site Card: {site.name}</div>
     ),
 }));
 
@@ -41,7 +39,7 @@ describe("SiteList", () => {
             url: "https://example1.com",
         },
         {
-            identifier: "site-2", 
+            identifier: "site-2",
             name: "Test Site 2",
             url: "https://example2.com",
         },

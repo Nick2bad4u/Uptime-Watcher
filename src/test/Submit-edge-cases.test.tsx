@@ -3,12 +3,12 @@
  * Tests for edge cases and error scenarios in Submit handleSubmit function
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { handleSubmit } from '../components/AddSiteForm/Submit';
-import logger from '../services/logger';
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { handleSubmit } from "../components/AddSiteForm/Submit";
+import logger from "../services/logger";
 
 // Mock the logger
-vi.mock('../services/logger', () => ({
+vi.mock("../services/logger", () => ({
     default: {
         app: {
             error: vi.fn(),
@@ -42,13 +42,13 @@ vi.mock('../services/logger', () => ({
     },
 }));
 
-describe('Submit Edge Cases', () => {
+describe("Submit Edge Cases", () => {
     const mockCreateSite = vi.fn();
     const mockAddMonitorToSite = vi.fn();
     const mockOnSuccess = vi.fn();
     const mockSetFormError = vi.fn();
     const mockClearError = vi.fn();
-    const mockGenerateUuid = vi.fn(() => 'test-uuid');
+    const mockGenerateUuid = vi.fn(() => "test-uuid");
 
     const mockEvent = {
         preventDefault: vi.fn(),
@@ -58,68 +58,68 @@ describe('Submit Edge Cases', () => {
         vi.clearAllMocks();
     });
 
-    describe('handleSubmit edge cases', () => {
-        it('should handle error during site creation', async () => {
+    describe("handleSubmit edge cases", () => {
+        it("should handle error during site creation", async () => {
             const props = {
                 // Form state
-                url: 'https://example.com',
-                host: 'example.com',
-                port: '443',
-                name: 'Test Site',
-                monitorType: 'http' as const,
+                url: "https://example.com",
+                host: "example.com",
+                port: "443",
+                name: "Test Site",
+                monitorType: "http" as const,
                 checkInterval: 60000,
-                siteId: 'test-site-id',
-                addMode: 'new' as const,
-                selectedExistingSite: '',
+                siteId: "test-site-id",
+                addMode: "new" as const,
+                selectedExistingSite: "",
                 formError: undefined,
-                
+
                 // Actions
                 setFormError: mockSetFormError,
-                
+
                 // Store actions
                 createSite: mockCreateSite,
                 addMonitorToSite: mockAddMonitorToSite,
                 clearError: mockClearError,
-                
+
                 // Dependencies
                 generateUuid: mockGenerateUuid,
                 logger: logger,
                 onSuccess: mockOnSuccess,
             };
 
-            const error = new Error('Network error');
+            const error = new Error("Network error");
             mockCreateSite.mockRejectedValue(error);
 
             await handleSubmit(mockEvent, props);
 
             expect(mockEvent.preventDefault).toHaveBeenCalled();
             expect(mockClearError).toHaveBeenCalled();
-            expect(logger.error).toHaveBeenCalledWith('Failed to add site/monitor from form', error);
-            expect(mockSetFormError).toHaveBeenCalledWith('Failed to add site/monitor. Please try again.');
+            expect(logger.error).toHaveBeenCalledWith("Failed to add site/monitor from form", error);
+            expect(mockSetFormError).toHaveBeenCalledWith("Failed to add site/monitor. Please try again.");
         });
 
-        it('should handle adding monitor to existing site', async () => {
+        it("should handle adding monitor to existing site", async () => {
             const props = {
                 // Form state
-                url: 'https://example.com',
-                host: 'example.com',
-                port: '80',
-                name: 'Test Site',
-                monitorType: 'http' as const,
+                url: "https://example.com",
+                host: "example.com",
+                port: "80",
+                name: "Test Site",
+                monitorType: "http" as const,
                 checkInterval: 30000,
-                siteId: 'new-site-id',
-                addMode: 'existing' as const,
-                selectedExistingSite: 'existing-site-id',
+                siteId: "new-site-id",
+                addMode: "existing" as const,
+                selectedExistingSite: "existing-site-id",
                 formError: undefined,
-                
+
                 // Actions
                 setFormError: mockSetFormError,
-                
+
                 // Store actions
                 createSite: mockCreateSite,
                 addMonitorToSite: mockAddMonitorToSite,
                 clearError: mockClearError,
-                
+
                 // Dependencies
                 generateUuid: mockGenerateUuid,
                 logger: logger,
@@ -133,19 +133,19 @@ describe('Submit Edge Cases', () => {
             expect(mockEvent.preventDefault).toHaveBeenCalled();
             expect(mockClearError).toHaveBeenCalled();
             expect(mockAddMonitorToSite).toHaveBeenCalledWith(
-                'existing-site-id',
+                "existing-site-id",
                 expect.objectContaining({
-                    type: 'http',
-                    url: 'https://example.com',
+                    type: "http",
+                    url: "https://example.com",
                     checkInterval: 30000,
                 })
             );
 
             expect(logger.info).toHaveBeenCalledWith(
-                'Monitor added to site successfully',
+                "Monitor added to site successfully",
                 expect.objectContaining({
-                    identifier: 'existing-site-id',
-                    monitorType: 'http',
+                    identifier: "existing-site-id",
+                    monitorType: "http",
                 })
             );
 

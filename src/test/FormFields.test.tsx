@@ -72,12 +72,7 @@ describe("FormFields", () => {
 
         it("should prioritize error over help text", () => {
             render(
-                <FormField 
-                    id="test-field-5" 
-                    label="Test Label" 
-                    error="Error message"
-                    helpText="Help text"
-                >
+                <FormField id="test-field-5" label="Test Label" error="Error message" helpText="Help text">
                     <input type="text" id="test-field-5" title="Test Label" />
                 </FormField>
             );
@@ -106,14 +101,7 @@ describe("FormFields", () => {
         });
 
         it("should render with basic props", () => {
-            render(
-                <TextField
-                    id="test-input"
-                    label="Test Input"
-                    onChange={mockOnChange}
-                    value=""
-                />
-            );
+            render(<TextField id="test-input" label="Test Input" onChange={mockOnChange} value="" />);
 
             expect(screen.getByLabelText("Test Input")).toBeInTheDocument();
             expect(screen.getByRole("textbox")).toBeInTheDocument();
@@ -121,14 +109,7 @@ describe("FormFields", () => {
 
         it("should handle text input", async () => {
             const user = userEvent.setup();
-            render(
-                <TextField
-                    id="test-input"
-                    label="Test Input"
-                    onChange={mockOnChange}
-                    value=""
-                />
-            );
+            render(<TextField id="test-input" label="Test Input" onChange={mockOnChange} value="" />);
 
             const input = screen.getByRole("textbox");
             await user.type(input, "test value");
@@ -153,15 +134,7 @@ describe("FormFields", () => {
         });
 
         it("should be disabled when specified", () => {
-            render(
-                <TextField
-                    id="test-input"
-                    label="Test Input"
-                    onChange={mockOnChange}
-                    disabled
-                    value=""
-                />
-            );
+            render(<TextField id="test-input" label="Test Input" onChange={mockOnChange} disabled value="" />);
 
             expect(screen.getByRole("textbox")).toBeDisabled();
         });
@@ -187,28 +160,14 @@ describe("FormFields", () => {
 
         it("should show error state", () => {
             render(
-                <TextField
-                    id="test-input"
-                    label="Test Input"
-                    onChange={mockOnChange}
-                    error="Invalid input"
-                    value=""
-                />
+                <TextField id="test-input" label="Test Input" onChange={mockOnChange} error="Invalid input" value="" />
             );
 
             expect(screen.getByText("Invalid input")).toBeInTheDocument();
         });
 
         it("should have proper aria attributes for required field", () => {
-            render(
-                <TextField
-                    id="test-input"
-                    label="Test Input"
-                    onChange={mockOnChange}
-                    required
-                    value=""
-                />
-            );
+            render(<TextField id="test-input" label="Test Input" onChange={mockOnChange} required value="" />);
 
             const input = screen.getByRole("textbox");
             expect(input).toHaveAttribute("aria-label", "Test Input (required)");
@@ -230,13 +189,7 @@ describe("FormFields", () => {
 
         it("should render with options", () => {
             render(
-                <SelectField
-                    id="test-select"
-                    label="Test Select"
-                    onChange={mockOnChange}
-                    options={options}
-                    value=""
-                />
+                <SelectField id="test-select" label="Test Select" onChange={mockOnChange} options={options} value="" />
             );
 
             expect(screen.getByLabelText("Test Select")).toBeInTheDocument();

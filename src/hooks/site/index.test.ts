@@ -93,12 +93,12 @@ describe("Site Hooks Index Module", () => {
         it("should export all expected properties", () => {
             const expectedExports = [
                 "useSiteStats",
-                "calculateSiteStats", 
+                "calculateSiteStats",
                 "mockUseSiteStatsExport",
                 "useSiteMonitor",
                 "startMonitoring",
                 "mockUseSiteMonitorExport",
-                "useSiteActions", 
+                "useSiteActions",
                 "performSiteAction",
                 "mockUseSiteActionsExport",
                 "useSite",
@@ -106,7 +106,7 @@ describe("Site Hooks Index Module", () => {
                 "mockUseSiteExport",
             ];
 
-            expectedExports.forEach(exportName => {
+            expectedExports.forEach((exportName) => {
                 expect(SiteHooksIndex).toHaveProperty(exportName);
             });
         });
@@ -131,11 +131,11 @@ describe("Site Hooks Index Module", () => {
         it("should provide consistent access to exports", () => {
             const exportNames = Object.keys(SiteHooksIndex);
             const siteHooks = SiteHooksIndex as Record<string, unknown>;
-            
-            exportNames.forEach(exportName => {
+
+            exportNames.forEach((exportName) => {
                 const staticAccess = siteHooks[exportName];
                 const dynamicAccess = siteHooks[exportName];
-                
+
                 expect(staticAccess).toBe(dynamicAccess);
                 expect(staticAccess).toBeDefined();
             });
@@ -152,7 +152,7 @@ describe("Site Hooks Index Module", () => {
 
         it("should maintain export references", () => {
             // All exports should be defined (not undefined)
-            Object.values(SiteHooksIndex).forEach(exportValue => {
+            Object.values(SiteHooksIndex).forEach((exportValue) => {
                 expect(exportValue).toBeDefined();
             });
         });
@@ -160,13 +160,13 @@ describe("Site Hooks Index Module", () => {
         it("should not modify exported values", () => {
             const originalValues = Object.values(SiteHooksIndex);
             const siteHooks = SiteHooksIndex as Record<string, unknown>;
-            
+
             // Access all exports multiple times
-            Object.keys(SiteHooksIndex).forEach(key => {
+            Object.keys(SiteHooksIndex).forEach((key) => {
                 const _export = siteHooks[key];
                 expect(_export).toBeDefined();
             });
-            
+
             // Values should remain the same
             const currentValues = Object.values(SiteHooksIndex);
             expect(currentValues).toEqual(originalValues);
@@ -177,13 +177,13 @@ describe("Site Hooks Index Module", () => {
         it("should work with TypeScript type checking", () => {
             // This test passing means TypeScript compilation succeeded
             expect(SiteHooksIndex).toBeDefined();
-            
+
             // Should be able to access properties without type errors
             const hasUseSiteStats = "useSiteStats" in SiteHooksIndex;
             const hasUseSiteMonitor = "useSiteMonitor" in SiteHooksIndex;
             const hasUseSiteActions = "useSiteActions" in SiteHooksIndex;
             const hasUseSite = "useSite" in SiteHooksIndex;
-            
+
             expect(hasUseSiteStats).toBe(true);
             expect(hasUseSiteMonitor).toBe(true);
             expect(hasUseSiteActions).toBe(true);
@@ -211,8 +211,8 @@ describe("Site Hooks Index Module", () => {
 
         it("should handle property descriptor access", () => {
             const exportNames = Object.keys(SiteHooksIndex);
-            
-            exportNames.forEach(exportName => {
+
+            exportNames.forEach((exportName) => {
                 const descriptor = Object.getOwnPropertyDescriptor(SiteHooksIndex, exportName);
                 expect(descriptor).toBeDefined();
                 expect(descriptor?.enumerable).toBe(true);
@@ -231,12 +231,12 @@ describe("Site Hooks Index Module", () => {
         it("should follow proper barrel export conventions", () => {
             // Barrel exports should only re-export, not define new functionality
             const exports = Object.keys(SiteHooksIndex);
-            
+
             // Should have exports from multiple modules
             expect(exports.length).toBeGreaterThan(4);
-            
+
             // Each export should be accessible
-            exports.forEach(exportName => {
+            exports.forEach((exportName) => {
                 const exportValue = (SiteHooksIndex as Record<string, unknown>)[exportName];
                 expect(exportValue).toBeDefined();
             });
@@ -248,7 +248,7 @@ describe("Site Hooks Index Module", () => {
             const hasMonitorHooks = "useSiteMonitor" in SiteHooksIndex;
             const hasActionHooks = "useSiteActions" in SiteHooksIndex;
             const hasSiteHooks = "useSite" in SiteHooksIndex;
-            
+
             expect(hasStatsHooks && hasMonitorHooks && hasActionHooks && hasSiteHooks).toBe(true);
         });
     });
@@ -271,8 +271,8 @@ describe("Site Hooks Index Module", () => {
             const keys = Object.keys(SiteHooksIndex);
             expect(Array.isArray(keys)).toBe(true);
             expect(keys.length).toBeGreaterThan(0);
-            
-            keys.forEach(key => {
+
+            keys.forEach((key) => {
                 expect(typeof key).toBe("string");
                 expect(key.length).toBeGreaterThan(0);
             });

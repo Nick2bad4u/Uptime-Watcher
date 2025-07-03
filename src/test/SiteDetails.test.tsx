@@ -127,21 +127,26 @@ vi.mock("../theme/useTheme", () => ({
 
 // Mock themed components
 vi.mock("../theme/components", () => ({
-    ThemedBox: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => <div {...props}>{children}</div>,
+    ThemedBox: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => (
+        <div {...props}>{children}</div>
+    ),
 }));
 
 // Mock all the tab components
 vi.mock("../components/SiteDetails/tabs", () => ({
     OverviewTab: () => <div data-testid="overview-tab">Overview Tab</div>,
     HistoryTab: () => <div data-testid="history-tab">History Tab</div>,
-    AnalyticsTab: ({ getAvailabilityVariant, getAvailabilityDescription }: { 
+    AnalyticsTab: ({
+        getAvailabilityVariant,
+        getAvailabilityDescription,
+    }: {
         getAvailabilityVariant: (percentage: number) => string;
         getAvailabilityDescription: (percentage: number) => string;
         [key: string]: unknown;
     }) => {
         // Call the functions to ensure they're exercised for coverage
         const testPercentages = [99.5, 97, 90, 88];
-        testPercentages.forEach(percentage => {
+        testPercentages.forEach((percentage) => {
             getAvailabilityVariant?.(percentage);
             getAvailabilityDescription?.(percentage);
         });
@@ -161,16 +166,29 @@ vi.mock("../components/SiteDetails/SiteDetailsHeader", () => ({
 }));
 
 vi.mock("../components/SiteDetails/SiteDetailsNavigation", () => ({
-    SiteDetailsNavigation: ({ setActiveSiteDetailsTab, setSiteDetailsChartTimeRange }: { 
+    SiteDetailsNavigation: ({
+        setActiveSiteDetailsTab,
+        setSiteDetailsChartTimeRange,
+    }: {
         setActiveSiteDetailsTab: (tab: string) => void;
         setSiteDetailsChartTimeRange: (range: string) => void;
     }) => (
         <div data-testid="site-details-navigation">
-            <button onClick={() => setActiveSiteDetailsTab("overview")} data-testid="overview-tab-button">Overview</button>
-            <button onClick={() => setActiveSiteDetailsTab("history")} data-testid="history-tab-button">History</button>
-            <button onClick={() => setActiveSiteDetailsTab("analytics")} data-testid="analytics-tab-button">Analytics</button>
-            <button onClick={() => setActiveSiteDetailsTab("settings")} data-testid="settings-tab-button">Settings</button>
-            <button onClick={() => setSiteDetailsChartTimeRange("1h")} data-testid="chart-range-button">1h</button>
+            <button onClick={() => setActiveSiteDetailsTab("overview")} data-testid="overview-tab-button">
+                Overview
+            </button>
+            <button onClick={() => setActiveSiteDetailsTab("history")} data-testid="history-tab-button">
+                History
+            </button>
+            <button onClick={() => setActiveSiteDetailsTab("analytics")} data-testid="analytics-tab-button">
+                Analytics
+            </button>
+            <button onClick={() => setActiveSiteDetailsTab("settings")} data-testid="settings-tab-button">
+                Settings
+            </button>
+            <button onClick={() => setSiteDetailsChartTimeRange("1h")} data-testid="chart-range-button">
+                1h
+            </button>
         </div>
     ),
 }));
@@ -182,19 +200,21 @@ describe("SiteDetails", () => {
     const mockSite: Site = {
         identifier: "test-site-id",
         name: "Test Site",
-        monitors: [{
-            id: "monitor-1",
-            type: "http",
-            status: "up",
-            url: "https://example.com",
-            responseTime: 250,
-            lastChecked: new Date(),
-            history: [],
-            monitoring: true,
-            checkInterval: 60000,
-            timeout: 30000,
-            retryAttempts: 3,
-        }],
+        monitors: [
+            {
+                id: "monitor-1",
+                type: "http",
+                status: "up",
+                url: "https://example.com",
+                responseTime: 250,
+                lastChecked: new Date(),
+                history: [],
+                monitoring: true,
+                checkInterval: 60000,
+                timeout: 30000,
+                retryAttempts: 3,
+            },
+        ],
         monitoring: true,
     };
 
@@ -337,20 +357,20 @@ describe("SiteDetails", () => {
 
     describe("Internal Helper Functions", () => {
         it("should handle different availability percentages for variant calculation", () => {
-            // Instead of testing the internal function directly, we test that 
+            // Instead of testing the internal function directly, we test that
             // the component renders correctly with different availability values
             // which internally exercises getAvailabilityVariant function
-            
+
             // Test excellent availability (>=99%) - success variant
             mockUseSiteDetails.analytics.availability = 99.5;
             const { rerender } = render(<SiteDetails site={mockSite} onClose={mockOnClose} />);
             expect(screen.getByTestId("overview-tab")).toBeInTheDocument();
-            
+
             // Test good availability (95-99%) - warning variant
             mockUseSiteDetails.analytics.availability = 97;
             rerender(<SiteDetails site={mockSite} onClose={mockOnClose} />);
             expect(screen.getByTestId("overview-tab")).toBeInTheDocument();
-            
+
             // Test poor availability (<95%) - danger variant
             mockUseSiteDetails.analytics.availability = 90;
             rerender(<SiteDetails site={mockSite} onClose={mockOnClose} />);
@@ -360,17 +380,17 @@ describe("SiteDetails", () => {
         it("should handle different availability percentages for description calculation", () => {
             // Test that the component can handle different availability values
             // which internally exercises getAvailabilityDescription function
-            
+
             // Test "Excellent" description (>=99%)
             mockUseSiteDetails.analytics.availability = 99.8;
             const { rerender } = render(<SiteDetails site={mockSite} onClose={mockOnClose} />);
             expect(screen.getByTestId("overview-tab")).toBeInTheDocument();
-            
-            // Test "Good" description (95-99%)  
+
+            // Test "Good" description (95-99%)
             mockUseSiteDetails.analytics.availability = 96.5;
             rerender(<SiteDetails site={mockSite} onClose={mockOnClose} />);
             expect(screen.getByTestId("overview-tab")).toBeInTheDocument();
-            
+
             // Test "Poor" description (<95%)
             mockUseSiteDetails.analytics.availability = 88;
             rerender(<SiteDetails site={mockSite} onClose={mockOnClose} />);
@@ -380,12 +400,12 @@ describe("SiteDetails", () => {
         it("should test availability functions through analytics tab when properly configured", () => {
             // Reset to ensure proper state
             mockUseSiteDetails.selectedMonitorId = "monitor-1";
-            mockUseSiteDetails.activeSiteDetailsTab = "monitor-1-analytics"; 
+            mockUseSiteDetails.activeSiteDetailsTab = "monitor-1-analytics";
             // @ts-expect-error - Mock assignment for testing
             mockUseSiteDetails.selectedMonitor = mockSite.monitors[0];
-            
+
             render(<SiteDetails site={mockSite} onClose={mockOnClose} />);
-            
+
             // Verify that when analytics tab is active, component renders
             expect(screen.getByTestId("analytics-tab")).toBeInTheDocument();
         });
@@ -403,7 +423,7 @@ describe("SiteDetails", () => {
             // Focus the modal backdrop and simulate Escape key press
             modalBackdrop.focus();
             await user.keyboard("{Escape}");
-            
+
             // The onClose should be called when Escape is pressed
             expect(mockOnClose).toHaveBeenCalled();
         });
@@ -415,23 +435,23 @@ describe("SiteDetails", () => {
             mockOnClose.mockClear();
 
             const modalBackdrop = screen.getByLabelText("Close modal");
-            
+
             // Test that other keys don't trigger close by firing keydown events directly
             // We need to avoid user.keyboard as it can trigger click events
             const fireKeyDown = (key: string) => {
                 modalBackdrop.dispatchEvent(
-                    new KeyboardEvent('keydown', {
+                    new KeyboardEvent("keydown", {
                         key,
                         bubbles: true,
                     })
                 );
             };
-            
-            fireKeyDown('Enter');
-            fireKeyDown('Space');
-            fireKeyDown('a');
-            fireKeyDown('Tab');
-            
+
+            fireKeyDown("Enter");
+            fireKeyDown("Space");
+            fireKeyDown("a");
+            fireKeyDown("Tab");
+
             // onClose should not be called for non-Escape keys
             expect(mockOnClose).not.toHaveBeenCalled();
         });
@@ -444,11 +464,11 @@ describe("SiteDetails", () => {
 
             // The navigation component should receive the setSiteDetailsChartTimeRange function
             expect(screen.getByTestId("site-details-navigation")).toBeInTheDocument();
-            
+
             // Test the chart range button which triggers the setSiteDetailsChartTimeRange function
             const chartRangeButton = screen.getByTestId("chart-range-button");
             await user.click(chartRangeButton);
-            
+
             // This should call the mock function, testing the arrow function on line 265
             expect(mockUseSiteDetails.setSiteDetailsChartTimeRange).toHaveBeenCalledWith("1h");
         });

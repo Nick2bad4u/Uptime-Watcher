@@ -153,9 +153,7 @@ describe("useSite", () => {
 
     describe("Data Flow", () => {
         it("should pass filtered history from monitor to stats", () => {
-            const customHistory = [
-                { timestamp: 1640995200000, status: "up" as const, responseTime: 300 },
-            ];
+            const customHistory = [{ timestamp: 1640995200000, status: "up" as const, responseTime: 300 }];
 
             // Mock different filtered history
             vi.mocked(useSiteMonitor).mockReturnValue({

@@ -66,11 +66,15 @@ vi.mock("../theme/components", () => ({
         children?: React.ReactNode;
         className?: string;
         [key: string]: unknown;
-    }) => (
-        <div data-testid="themed-box" className={className} {...props}>
-            {children}
-        </div>
-    ),
+    }) => {
+        const filteredProps = { ...props };
+        delete filteredProps.border;
+        return (
+            <div data-testid="themed-box" className={className} {...filteredProps}>
+                {children}
+            </div>
+        );
+    },
     ThemedText: ({
         children,
         variant,
@@ -170,9 +174,9 @@ describe("App Component", () => {
             updateError: null,
             updateStatus: "idle",
         });
-        
+
         // Reset useTheme mock to default
-        vi.mocked(themeModule.useTheme).mockReturnValue({ 
+        vi.mocked(themeModule.useTheme).mockReturnValue({
             isDark: false,
             availableThemes: [],
             currentTheme: { isDark: false, colors: {} } as never,
@@ -215,7 +219,7 @@ describe("App Component", () => {
 
         it("applies dark CSS class when dark theme is enabled", () => {
             // Temporarily override the useTheme mock to return isDark: true
-            vi.mocked(themeModule.useTheme).mockReturnValueOnce({ 
+            vi.mocked(themeModule.useTheme).mockReturnValueOnce({
                 isDark: true,
                 availableThemes: [],
                 currentTheme: { isDark: true, colors: {} } as never,
@@ -228,7 +232,7 @@ describe("App Component", () => {
                 themeVersion: 1,
                 toggleTheme: vi.fn(),
             });
-            
+
             const { container } = render(<App />);
             const appContainer = container.querySelector(".app-container");
             expect(appContainer).toHaveClass("dark");
@@ -289,21 +293,21 @@ describe("App Component", () => {
             });
 
             expect(screen.getByText("Loading...")).toBeInTheDocument();
-            
+
             // Verify all the loading overlay elements are present to cover line 110 branch
-            const loadingOverlay = document.querySelector('.loading-overlay');
+            const loadingOverlay = document.querySelector(".loading-overlay");
             expect(loadingOverlay).toBeInTheDocument();
-            
-            const loadingContent = document.querySelector('.loading-content');
+
+            const loadingContent = document.querySelector(".loading-content");
             expect(loadingContent).toBeInTheDocument();
-            
-            const loadingSpinner = document.querySelector('.loading-spinner');
+
+            const loadingSpinner = document.querySelector(".loading-spinner");
             expect(loadingSpinner).toBeInTheDocument();
-            
+
             // Verify the loading overlay contains the themed components
             const loadingText = screen.getByText("Loading...");
-            expect(loadingText).toHaveAttribute('data-testid', 'themed-text');
-            
+            expect(loadingText).toHaveAttribute("data-testid", "themed-text");
+
             // Verify the loading overlay ThemedBox is present within the loading-overlay
             const themedBoxInLoading = loadingOverlay?.querySelector('[data-testid="themed-box"]');
             expect(themedBoxInLoading).toBeInTheDocument();

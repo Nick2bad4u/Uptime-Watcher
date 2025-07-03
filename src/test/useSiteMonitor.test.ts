@@ -45,9 +45,7 @@ describe("useSiteMonitor", () => {
                 host: "example.com",
                 port: 80,
                 responseTime: 0,
-                history: [
-                    { timestamp: 1640995200000, status: "down", responseTime: 0 },
-                ],
+                history: [{ timestamp: 1640995200000, status: "down", responseTime: 0 }],
                 monitoring: false,
             },
         ] as Monitor[],
@@ -283,10 +281,9 @@ describe("useSiteMonitor", () => {
         });
 
         it("should recalculate when site monitors change", () => {
-            const { result, rerender } = renderHook(
-                (props) => useSiteMonitor(props.site),
-                { initialProps: { site: mockSite } }
-            );
+            const { result, rerender } = renderHook((props) => useSiteMonitor(props.site), {
+                initialProps: { site: mockSite },
+            });
 
             const firstMonitorIds = result.current.monitorIds;
 
@@ -339,10 +336,9 @@ describe("useSiteMonitor", () => {
                 identifier: "different-site",
             };
 
-            const { rerender } = renderHook(
-                (props) => useSiteMonitor(props.site),
-                { initialProps: { site: mockSite } }
-            );
+            const { rerender } = renderHook((props) => useSiteMonitor(props.site), {
+                initialProps: { site: mockSite },
+            });
 
             expect(mockStore.getSelectedMonitorId).toHaveBeenCalledWith("site-1");
 

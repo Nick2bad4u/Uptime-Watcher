@@ -24,10 +24,26 @@ vi.mock("../theme/useTheme", () => ({
 
 // Mock the themed components
 vi.mock("../theme/components", () => ({
-    ThemedBox: ({ children, ...props }: any) => <div data-testid="themed-box" {...props}>{children}</div>,
-    ThemedText: ({ children, ...props }: any) => <span data-testid="themed-text" {...props}>{children}</span>,
+    ThemedBox: ({ children, border, ...props }: any) => {
+        const filteredProps = { ...props };
+        // Remove non-DOM props
+        delete filteredProps.border;
+        if (border !== undefined) filteredProps["data-border"] = border.toString();
+        return (
+            <div data-testid="themed-box" {...filteredProps}>
+                {children}
+            </div>
+        );
+    },
+    ThemedText: ({ children, ...props }: any) => (
+        <span data-testid="themed-text" {...props}>
+            {children}
+        </span>
+    ),
     ThemedButton: ({ children, onClick, ...props }: any) => (
-        <button data-testid="themed-button" onClick={onClick} {...props}>{children}</button>
+        <button data-testid="themed-button" onClick={onClick} {...props}>
+            {children}
+        </button>
     ),
     StatusIndicator: ({ status, ...props }: any) => {
         let icon = "🟡";
@@ -105,15 +121,15 @@ describe("Header", () => {
         // 3 up monitors (2 from site-1, 1 from site-2)
         const upBadge = screen.getByText("Up").closest("div");
         expect(upBadge).toHaveTextContent("3");
-        
+
         // 1 down monitor
         const downBadge = screen.getByText("Down").closest("div");
         expect(downBadge).toHaveTextContent("1");
-        
+
         // 1 pending monitor
         const pendingBadge = screen.getByText("Pending").closest("div");
         expect(pendingBadge).toHaveTextContent("1");
-        
+
         // Total monitors should be 5
         const totalBadge = screen.getByText("Total").closest("div");
         expect(totalBadge).toHaveTextContent("5");
@@ -195,14 +211,14 @@ describe("Header", () => {
         render(<Header />);
 
         expect(screen.getByText("Uptime Watcher")).toBeInTheDocument();
-        
+
         // Check that all status counters show 0
         const upBadge = screen.getByText("Up").closest("div");
         expect(upBadge).toHaveTextContent("0");
-        
+
         const downBadge = screen.getByText("Down").closest("div");
         expect(downBadge).toHaveTextContent("0");
-        
+
         const pendingBadge = screen.getByText("Pending").closest("div");
         expect(pendingBadge).toHaveTextContent("0");
     });
@@ -237,7 +253,7 @@ describe("Header", () => {
 
         // Check that all status labels are present
         expect(screen.getByText("Up")).toBeInTheDocument();
-        expect(screen.getByText("Down")).toBeInTheDocument(); 
+        expect(screen.getByText("Down")).toBeInTheDocument();
         expect(screen.getByText("Pending")).toBeInTheDocument();
         expect(screen.getByText("Total")).toBeInTheDocument();
     });

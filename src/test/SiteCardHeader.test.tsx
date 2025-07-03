@@ -48,7 +48,7 @@ describe("SiteCardHeader", () => {
 
     it("renders site name correctly", () => {
         render(<SiteCardHeader {...defaultProps} />);
-        
+
         expect(screen.getByText("Test Site")).toBeInTheDocument();
     });
 
@@ -57,15 +57,15 @@ describe("SiteCardHeader", () => {
             ...mockSite,
             name: undefined,
         };
-        
+
         render(<SiteCardHeader {...defaultProps} site={siteWithoutName} />);
-        
+
         expect(screen.getByText("test-site")).toBeInTheDocument();
     });
 
     it("renders monitor selector with correct options", () => {
         render(<SiteCardHeader {...defaultProps} />);
-        
+
         // MonitorSelector should be rendered
         const selector = screen.getByRole("combobox");
         expect(selector).toBeInTheDocument();
@@ -74,16 +74,16 @@ describe("SiteCardHeader", () => {
     it("calls onMonitorIdChange when monitor selection changes", async () => {
         const user = userEvent.setup();
         render(<SiteCardHeader {...defaultProps} />);
-        
+
         const selector = screen.getByRole("combobox");
         await user.selectOptions(selector, "monitor2");
-        
+
         expect(defaultProps.onMonitorIdChange).toHaveBeenCalled();
     });
 
     it("renders action button group", () => {
         render(<SiteCardHeader {...defaultProps} />);
-        
+
         // Look for action buttons (these would be rendered by ActionButtonGroup)
         // The actual button text depends on the ActionButtonGroup implementation
         // Just check that the container is rendered
@@ -93,7 +93,7 @@ describe("SiteCardHeader", () => {
 
     it("passes correct props to ActionButtonGroup when monitoring", () => {
         render(<SiteCardHeader {...defaultProps} isMonitoring={true} />);
-        
+
         // Verify buttons are present (ActionButtonGroup should render them)
         const buttons = screen.getAllByRole("button");
         expect(buttons.length).toBeGreaterThan(0);
@@ -101,7 +101,7 @@ describe("SiteCardHeader", () => {
 
     it("passes correct props to ActionButtonGroup when loading", () => {
         render(<SiteCardHeader {...defaultProps} isLoading={true} />);
-        
+
         // When loading, buttons might be disabled
         const buttons = screen.getAllByRole("button");
         expect(buttons.length).toBeGreaterThan(0);
@@ -109,10 +109,10 @@ describe("SiteCardHeader", () => {
 
     it("disables action buttons when hasMonitor is false", () => {
         render(<SiteCardHeader {...defaultProps} hasMonitor={false} />);
-        
+
         // ActionButtonGroup should receive disabled=true
         const buttons = screen.getAllByRole("button");
-        buttons.forEach(button => {
+        buttons.forEach((button) => {
             expect(button).toBeDisabled();
         });
     });
@@ -122,18 +122,18 @@ describe("SiteCardHeader", () => {
             ...mockSite,
             monitors: [],
         };
-        
+
         render(<SiteCardHeader {...defaultProps} site={siteWithNoMonitors} />);
-        
+
         expect(screen.getByText("Test Site")).toBeInTheDocument();
     });
 
     it("memoizes component to prevent unnecessary re-renders", () => {
         const { rerender } = render(<SiteCardHeader {...defaultProps} />);
-        
+
         // Rerender with same props
         rerender(<SiteCardHeader {...defaultProps} />);
-        
+
         // Component should still be present
         expect(screen.getByText("Test Site")).toBeInTheDocument();
     });
@@ -143,15 +143,17 @@ describe("SiteCardHeader", () => {
             ...mockSite,
             name: "This is a very long site name that might overflow the header layout",
         };
-        
+
         render(<SiteCardHeader {...defaultProps} site={siteWithLongName} />);
-        
-        expect(screen.getByText("This is a very long site name that might overflow the header layout")).toBeInTheDocument();
+
+        expect(
+            screen.getByText("This is a very long site name that might overflow the header layout")
+        ).toBeInTheDocument();
     });
 
     it("passes all callback props correctly", () => {
         render(<SiteCardHeader {...defaultProps} />);
-        
+
         // Test that callbacks can be triggered
         // The actual button triggering depends on ActionButtonGroup implementation
         // But we can verify the props structure is correct

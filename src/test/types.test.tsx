@@ -5,14 +5,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import type {
-    UpdateStatus,
-    MonitorType,
-    Monitor,
-    Site,
-    StatusHistory,
-    StatusUpdate,
-} from "../types";
+import type { UpdateStatus, MonitorType, Monitor, Site, StatusHistory, StatusUpdate } from "../types";
 
 describe("Types Module", () => {
     describe("Type Definitions", () => {
@@ -269,8 +262,7 @@ describe("Types Module", () => {
                 data: {
                     exportData: () => Promise.resolve("data"),
                     importData: () => Promise.resolve(true),
-                    downloadSQLiteBackup: () =>
-                        Promise.resolve({ buffer: new ArrayBuffer(0), fileName: "backup.db" }),
+                    downloadSQLiteBackup: () => Promise.resolve({ buffer: new ArrayBuffer(0), fileName: "backup.db" }),
                 },
                 events: {
                     onStatusUpdate: () => {},
@@ -288,8 +280,7 @@ describe("Types Module", () => {
                 },
                 sites: {
                     getSites: () => Promise.resolve([]),
-                    addSite: (site: Omit<Site, "id">) =>
-                        Promise.resolve({ ...site, identifier: "new-id" } as Site),
+                    addSite: (site: Omit<Site, "id">) => Promise.resolve({ ...site, identifier: "new-id" } as Site),
                     removeSite: () => Promise.resolve(),
                     updateSite: () => Promise.resolve(),
                     checkSiteNow: () => Promise.resolve(),

@@ -9,22 +9,73 @@ import { AnalyticsTab } from "../components/SiteDetails/tabs/AnalyticsTab";
 
 // Mock Chart.js components
 vi.mock("react-chartjs-2", () => ({
-    Line: ({ data, options, ...props }: { data: unknown; options: unknown; [key: string]: unknown }) => 
-        <div data-testid="line-chart" data-chart-data={JSON.stringify(data)} data-chart-options={JSON.stringify(options)} {...props}>Line Chart</div>,
-    Bar: ({ data, options, ...props }: { data: unknown; options: unknown; [key: string]: unknown }) => 
-        <div data-testid="bar-chart" data-chart-data={JSON.stringify(data)} data-chart-options={JSON.stringify(options)} {...props}>Bar Chart</div>,
-    Doughnut: ({ data, options, ...props }: { data: unknown; options: unknown; [key: string]: unknown }) => 
-        <div data-testid="doughnut-chart" data-chart-data={JSON.stringify(data)} data-chart-options={JSON.stringify(options)} {...props}>Doughnut Chart</div>,
+    Line: ({ data, options, ...props }: { data: unknown; options: unknown; [key: string]: unknown }) => (
+        <div
+            data-testid="line-chart"
+            data-chart-data={JSON.stringify(data)}
+            data-chart-options={JSON.stringify(options)}
+            {...props}
+        >
+            Line Chart
+        </div>
+    ),
+    Bar: ({ data, options, ...props }: { data: unknown; options: unknown; [key: string]: unknown }) => (
+        <div
+            data-testid="bar-chart"
+            data-chart-data={JSON.stringify(data)}
+            data-chart-options={JSON.stringify(options)}
+            {...props}
+        >
+            Bar Chart
+        </div>
+    ),
+    Doughnut: ({ data, options, ...props }: { data: unknown; options: unknown; [key: string]: unknown }) => (
+        <div
+            data-testid="doughnut-chart"
+            data-chart-data={JSON.stringify(data)}
+            data-chart-options={JSON.stringify(options)}
+            {...props}
+        >
+            Doughnut Chart
+        </div>
+    ),
 }));
 
 // Mock themed components
 vi.mock("../theme/components", () => ({
-    ThemedBox: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => 
-        <div data-testid="themed-box" {...props}>{children}</div>,
-    ThemedText: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => 
-        <span data-testid="themed-text" {...props}>{children}</span>,
-    ThemedButton: ({ children, onClick, ...props }: { children?: React.ReactNode; onClick?: () => void; [key: string]: unknown }) => 
-        <button data-testid="themed-button" onClick={onClick} {...props}>{children}</button>,
+    ThemedBox: ({
+        children,
+        border,
+        ...props
+    }: {
+        children?: React.ReactNode;
+        border?: boolean;
+        [key: string]: unknown;
+    }) => {
+        return (
+            <div data-testid="themed-box" {...props}>
+                {children}
+            </div>
+        );
+    },
+    ThemedText: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => (
+        <span data-testid="themed-text" {...props}>
+            {children}
+        </span>
+    ),
+    ThemedButton: ({
+        children,
+        onClick,
+        ...props
+    }: {
+        children?: React.ReactNode;
+        onClick?: () => void;
+        [key: string]: unknown;
+    }) => (
+        <button data-testid="themed-button" onClick={onClick} {...props}>
+            {children}
+        </button>
+    ),
 }));
 
 // Mock logger
@@ -42,8 +93,16 @@ vi.mock("../services/logger", () => ({
 
 describe("AnalyticsTab", () => {
     const mockDowntimePeriods = [
-        { start: new Date("2024-01-01T10:00:00Z").getTime(), end: new Date("2024-01-01T10:30:00Z").getTime(), duration: 1800000 },
-        { start: new Date("2024-01-02T15:00:00Z").getTime(), end: new Date("2024-01-02T15:15:00Z").getTime(), duration: 900000 },
+        {
+            start: new Date("2024-01-01T10:00:00Z").getTime(),
+            end: new Date("2024-01-01T10:30:00Z").getTime(),
+            duration: 1800000,
+        },
+        {
+            start: new Date("2024-01-02T15:00:00Z").getTime(),
+            end: new Date("2024-01-02T15:15:00Z").getTime(),
+            duration: 900000,
+        },
     ];
 
     const defaultProps = {
@@ -123,10 +182,10 @@ describe("AnalyticsTab", () => {
 
             // Should still show availability
             expect(screen.getByText("Availability (24h)")).toBeInTheDocument();
-            
+
             // Should show avg response time for port monitors (based on code)
             expect(screen.getByText("Avg Response Time")).toBeInTheDocument();
-            
+
             // Should show response time analysis for port monitors
             expect(screen.getByText("Response Time Analysis")).toBeInTheDocument();
         });

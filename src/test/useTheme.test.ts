@@ -56,7 +56,7 @@ describe("Theme Hooks", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        
+
         // Setup store mock
         (useStore as any).mockReturnValue({
             settings: { theme: "light" },
