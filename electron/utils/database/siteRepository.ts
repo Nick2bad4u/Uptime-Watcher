@@ -74,6 +74,118 @@ export async function getSitesFromDatabase(config: GetSitesConfig): Promise<Site
 }
 
 /**
+ * Load monitors and their history for a specific site.
+ */
+async function loadSiteMonitors(
+    siteIdentifier: string,
+    repositories: SitesLoaderConfig["repositories"]
+): Promise<Site["monitors"]> {
+    const monitors = await repositories.monitor.findBySiteIdentifier(siteIdentifier);
+
+    // Load history for each monitor
+    for (const monitor of monitors) {
+        if (monitor.id) {
+            monitor.history = await repositories.history.findByMonitorId(monitor.id);
+        }
+    }
+
+    return monitors;
+}
+
+/**
+ * Load and apply history limit setting.
+ */
+async function loadHistoryLimitSetting(
+    repositories: SitesLoaderConfig["repositories"],
+    setHistoryLimit: (limit: number) => void
+): Promise<void> {
+    try {
+        const historyLimitSetting = await repositories.settings.get("historyLimit");
+        if (!historyLimitSetting) {
+            return;
+        }
+
+        const limit = parseInt(historyLimitSetting, 10);
+        if (!isNaN(limit) && limit > 0) {
+            setHistoryLimit(limit);
+            logger.info(`History limit loaded from settings: ${limit}`);
+        }
+    } catch (error) {
+        logger.warn("Could not load history limit from settings:", error);
+    }
+}
+
+/**
+ * Start monitoring for all monitors in a site.
+ */
+async function startSiteMonitoring(
+    site: Site,
+    startMonitoring: (identifier: string, monitorId: string) => Promise<boolean>
+): Promise<void> {
+    logger.debug(`Auto-starting monitoring for site: ${site.identifier}`);
+    for (const monitor of site.monitors) {
+        if (monitor.id) {
+            await startMonitoring(site.identifier, monitor.id);
+        }
+    }
+}
+
+/**
+ * Start monitoring for individual monitors that have monitoring enabled.
+ */
+async function startIndividualMonitors(
+    site: Site,
+    startMonitoring: (identifier: string, monitorId: string) => Promise<boolean>
+): Promise<void> {
+    for (const monitor of site.monitors) {
+        if (monitor.id && monitor.monitoring) {
+            logger.debug(`Auto-starting monitoring for monitor: ${site.identifier}:${monitor.id}`);
+            await startMonitoring(site.identifier, monitor.id);
+        }
+    }
+}
+
+/**
+ * Start monitoring for sites based on their monitoring configuration.
+ */
+async function startMonitoringForSites(
+    sites: Map<string, Site>,
+    startMonitoring: (identifier: string, monitorId: string) => Promise<boolean>
+): Promise<void> {
+    for (const [, site] of sites) {
+        if (site.monitoring) {
+            // Site-level monitoring enabled
+            await startSiteMonitoring(site, startMonitoring);
+        } else {
+            // Check individual monitor flags
+            await startIndividualMonitors(site, startMonitoring);
+        }
+    }
+}
+
+/**
+ * Load all sites from database and populate the sites cache.
+ */
+async function loadSitesData(repositories: SitesLoaderConfig["repositories"], sites: Map<string, Site>): Promise<void> {
+    const siteRows = await repositories.site.findAll();
+    sites.clear();
+
+    for (const siteRow of siteRows) {
+        const monitors = await loadSiteMonitors(siteRow.identifier, repositories);
+
+        const site: Site = {
+            identifier: siteRow.identifier,
+            monitors: monitors,
+            name: siteRow.name,
+        };
+
+        sites.set(site.identifier, site);
+    }
+
+    logger.info(`Loaded ${sites.size} sites from database`);
+}
+
+/**
  * Load sites from database repositories into memory.
  * Handles error reporting and database operations.
  *
@@ -84,65 +196,14 @@ export async function loadSitesFromDatabase(config: SitesLoaderConfig): Promise<
     const { eventEmitter, repositories, setHistoryLimit, sites, startMonitoring } = config;
 
     try {
-        const siteRows = await repositories.site.findAll();
-        sites.clear();
+        // Load all sites and their data
+        await loadSitesData(repositories, sites);
 
-        for (const siteRow of siteRows) {
-            // Fetch monitors for this site using repository
-            const monitors = await repositories.monitor.findBySiteIdentifier(siteRow.identifier);
+        // Load and apply settings
+        await loadHistoryLimitSetting(repositories, setHistoryLimit);
 
-            // Load history for each monitor using repository
-            for (const monitor of monitors) {
-                if (monitor.id) {
-                    monitor.history = await repositories.history.findByMonitorId(monitor.id);
-                }
-            }
-
-            const site: Site = {
-                identifier: siteRow.identifier,
-                monitors: monitors,
-                name: siteRow.name,
-            };
-
-            sites.set(site.identifier, site);
-        }
-
-        logger.info(`Loaded ${sites.size} sites from database`);
-
-        // Load settings after sites to get history limit
-        try {
-            const historyLimitSetting = await repositories.settings.get("historyLimit");
-            if (historyLimitSetting) {
-                const limit = parseInt(historyLimitSetting, 10);
-                if (!isNaN(limit) && limit > 0) {
-                    setHistoryLimit(limit);
-                    logger.info(`History limit loaded from settings: ${limit}`);
-                }
-            }
-        } catch (error) {
-            logger.warn("Could not load history limit from settings:", error);
-        }
-
-        // Start monitoring for sites that have the monitoring flag set to true
-        for (const [, site] of sites) {
-            // Check site-level monitoring flag first
-            if (site.monitoring) {
-                logger.debug(`Auto-starting monitoring for site: ${site.identifier}`);
-                for (const monitor of site.monitors) {
-                    if (monitor.id) {
-                        await startMonitoring(site.identifier, monitor.id);
-                    }
-                }
-            } else {
-                // Check individual monitor monitoring flags
-                for (const monitor of site.monitors) {
-                    if (monitor.id && monitor.monitoring) {
-                        logger.debug(`Auto-starting monitoring for monitor: ${site.identifier}:${monitor.id}`);
-                        await startMonitoring(site.identifier, monitor.id);
-                    }
-                }
-            }
-        }
+        // Start monitoring for configured sites
+        await startMonitoringForSites(sites, startMonitoring);
     } catch (error) {
         const errorMessage = `Failed to load sites from database: ${error instanceof Error ? error.message : String(error)}`;
         logger.error(errorMessage, error);
