@@ -6,11 +6,11 @@
 import { EventEmitter } from "events";
 
 import { STATUS_UPDATE_EVENT, DEFAULT_CHECK_INTERVAL } from "../constants";
+import { isDev } from "../electronUtils";
 import { MONITOR_EVENTS, MonitorEventData } from "../events";
 import { MonitorRepository, HistoryRepository, SiteRepository } from "../services/database";
 import { MonitorScheduler } from "../services/monitoring";
 import { Site, StatusUpdate } from "../types";
-import { isDev } from "../utils";
 import { monitorLogger as logger } from "../utils/logger";
 import {
     performInitialMonitorChecks,

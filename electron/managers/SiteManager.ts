@@ -9,8 +9,8 @@ import { SITE_EVENTS, SiteEventData } from "../events";
 import { SiteRepository, MonitorRepository, HistoryRepository } from "../services/database";
 import { Site } from "../types";
 import {
-    addSiteToDatabase,
-    removeSiteFromDatabase,
+    createSite,
+    deleteSite,
     getSitesFromDatabase,
     updateSite,
     SiteUpdateDependencies,
@@ -80,7 +80,7 @@ export class SiteManager extends EventEmitter {
         this.validateSite(siteData);
 
         // Use the utility function to add site to database
-        const site = await addSiteToDatabase({
+        const site = await createSite({
             repositories: {
                 monitor: this.repositories.monitorRepository,
                 site: this.repositories.siteRepository,
@@ -118,7 +118,7 @@ export class SiteManager extends EventEmitter {
      * Remove a site from the database and cache.
      */
     public async removeSite(identifier: string): Promise<boolean> {
-        const result = await removeSiteFromDatabase({
+        const result = await deleteSite({
             identifier,
             logger,
             repositories: {

@@ -3,12 +3,17 @@
  * Exports all monitoring utility functions for easy importing.
  */
 
-// Monitor checking
-export * from "./monitorChecker";
+// Monitor lifecycle management - consolidated
+export * from "./monitorLifecycle";
 
-// Monitoring control
-export * from "./monitoringStarter";
-export * from "./monitoringStopper";
+// Monitor validation and checks
+export * from "./monitorValidator";
 
-// Status checking
+// Monitor status checking
 export * from "./monitorStatusChecker";
+
+// Auto-monitoring management
+export * from "./autoMonitorManager";
+
+// Interval management
+export * from "./intervalManager";

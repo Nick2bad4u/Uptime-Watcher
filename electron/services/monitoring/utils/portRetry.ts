@@ -1,5 +1,5 @@
 import { RETRY_BACKOFF } from "../../../constants";
-import { isDev } from "../../../utils";
+import { isDev } from "../../../electronUtils";
 import { logger } from "../../../utils/logger";
 import { withRetry } from "../../../utils/retry";
 import { MonitorCheckResult } from "../types";

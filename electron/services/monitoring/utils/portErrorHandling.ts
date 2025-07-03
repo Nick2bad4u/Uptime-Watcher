@@ -2,7 +2,7 @@
  * Port monitoring error classes and constants.
  */
 
-import { isDev } from "../../../utils";
+import { isDev } from "../../../electronUtils";
 import { logger } from "../../../utils/logger";
 
 /**

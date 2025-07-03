@@ -1,7 +1,7 @@
 import { ipcMain } from "electron";
 
+import { isDev } from "../../electronUtils";
 import { UptimeOrchestrator } from "../../UptimeOrchestrator";
-import { isDev } from "../../utils";
 import { logger } from "../../utils/logger";
 import { AutoUpdaterService } from "../updater/AutoUpdaterService";
 

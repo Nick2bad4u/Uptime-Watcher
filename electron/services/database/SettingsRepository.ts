@@ -1,6 +1,6 @@
 import { Database } from "node-sqlite3-wasm";
 
-import { isDev } from "../../utils";
+import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
 import { DatabaseService } from "./DatabaseService";
 

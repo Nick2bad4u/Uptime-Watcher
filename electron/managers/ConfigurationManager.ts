@@ -4,8 +4,9 @@
  */
 
 import { DEFAULT_CHECK_INTERVAL } from "../constants";
+import { isDev } from "../electronUtils";
 import { Site } from "../types";
-import { isDev } from "../utils";
+import { SiteValidator, MonitorValidator } from "./validators";
 
 export interface ValidationResult {
     isValid: boolean;
@@ -21,8 +22,17 @@ export interface HistoryRetentionConfig {
 /**
  * Manages business configuration and policies.
  * Centralizes business rules that were previously scattered across utilities.
+ * Uses composition pattern with specialized validators to reduce complexity.
  */
 export class ConfigurationManager {
+    private readonly siteValidator: SiteValidator;
+    private readonly monitorValidator: MonitorValidator;
+
+    constructor() {
+        this.siteValidator = new SiteValidator();
+        this.monitorValidator = new MonitorValidator();
+    }
+
     /**
      * Get the default monitor check interval according to business rules.
      */
@@ -57,7 +67,7 @@ export class ConfigurationManager {
      * Business rule: Determine if a monitor should receive a default interval.
      */
     public shouldApplyDefaultInterval(monitor: Site["monitors"][0]): boolean {
-        return !monitor.checkInterval;
+        return this.monitorValidator.shouldApplyDefaultInterval(monitor);
     }
 
     /**
@@ -73,79 +83,18 @@ export class ConfigurationManager {
 
     /**
      * Validate site configuration according to business rules.
+     * Delegates to specialized site validator.
      */
     public validateSiteConfiguration(site: Site): ValidationResult {
-        const errors: string[] = [];
-
-        // Validate site identifier
-        if (!site?.identifier && site?.identifier !== "") {
-            errors.push("Site identifier is required");
-        } else if (site.identifier.trim().length === 0) {
-            errors.push("Site identifier cannot be empty");
-        }
-
-        // Validate monitors array
-        if (!Array.isArray(site.monitors)) {
-            errors.push("Site monitors must be an array");
-        } else {
-            // Validate each monitor
-            for (const [index, monitor] of site.monitors.entries()) {
-                const monitorValidation = this.validateMonitorConfiguration(monitor);
-                if (!monitorValidation.isValid) {
-                    errors.push(...monitorValidation.errors.map((error) => `Monitor ${index + 1}: ${error}`));
-                }
-            }
-        }
-
-        return {
-            errors,
-            isValid: errors.length === 0,
-        };
+        return this.siteValidator.validateSiteConfiguration(site);
     }
 
     /**
      * Validate monitor configuration according to business rules.
+     * Delegates to specialized monitor validator.
      */
     public validateMonitorConfiguration(monitor: Site["monitors"][0]): ValidationResult {
-        const errors: string[] = [];
-
-        // Validate monitor type
-        if (!monitor.type) {
-            errors.push("Monitor type is required");
-        }
-
-        // Type-specific validation
-        if (monitor.type === "http" && !monitor.url) {
-            errors.push("HTTP monitors must have a URL");
-        }
-
-        if (monitor.type === "port") {
-            if (!monitor.host) {
-                errors.push("Port monitors must have a host");
-            }
-            if (!monitor.port || monitor.port <= 0 || monitor.port > 65535) {
-                errors.push("Port monitors must have a valid port number (1-65535)");
-            }
-        }
-
-        // Validate timing constraints
-        if (monitor.checkInterval !== undefined && monitor.checkInterval < 1000) {
-            errors.push("Monitor check interval must be at least 1000ms");
-        }
-
-        if (monitor.timeout !== undefined && monitor.timeout < 1000) {
-            errors.push("Monitor timeout must be at least 1000ms");
-        }
-
-        // Validate retry attempts
-        if (monitor.retryAttempts !== undefined && monitor.retryAttempts < 0) {
-            errors.push("Monitor retry attempts cannot be negative");
-        }
-
-        return {
-            errors,
-            isValid: errors.length === 0,
-        };
+        return this.monitorValidator.validateMonitorConfiguration(monitor);
     }
 
     /**
@@ -171,10 +120,10 @@ export class ConfigurationManager {
 
     /**
      * Business rule: Determine if a site should be included in exports.
+     * Delegates to site validator for consistency.
      */
     public shouldIncludeInExport(site: Site): boolean {
-        // Business rule: Include all sites with valid identifiers
-        return Boolean(site.identifier && site.identifier.trim().length > 0);
+        return this.siteValidator.shouldIncludeInExport(site);
     }
 }
 

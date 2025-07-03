@@ -15,9 +15,6 @@ export * from "./dataImportExport";
 // History limit management
 export * from "./historyLimitManager";
 
-// Site management utilities
-export * from "./siteAdder";
-export * from "./siteRemover";
-export * from "./sitesGetter";
-export * from "./sitesLoader";
-export * from "./siteUpdater";
+// Site management utilities - consolidated
+export * from "./siteRepository";
+export * from "./siteWriter";

@@ -232,7 +232,7 @@ export class UptimeOrchestrator extends EventEmitter {
     }
 
     public getHistoryLimit(): number {
-        return this.databaseManager.getHistoryLimit();
+        return this.historyLimit;
     }
 
     // Status Information

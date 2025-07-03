@@ -1,6 +1,6 @@
 import isPortReachable from "is-port-reachable";
 
-import { isDev } from "../../../utils";
+import { isDev } from "../../../electronUtils";
 import { logger } from "../../../utils/logger";
 import { MonitorCheckResult } from "../types";
 import { PORT_NOT_REACHABLE, PortCheckError } from "./portErrorHandling";

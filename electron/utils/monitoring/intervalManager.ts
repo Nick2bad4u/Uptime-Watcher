@@ -1,3 +1,8 @@
+/**
+ * Interval management utilities for monitors.
+ * Handles setting and managing monitor check intervals.
+ */
+
 import type { Site } from "../../types";
 
 type Logger = {
@@ -10,6 +15,11 @@ type Logger = {
 /**
  * Sets default check intervals for monitors that don't have one specified.
  * This utility function ensures all monitors have a check interval set.
+ *
+ * @param site - Site object with monitors to process
+ * @param defaultInterval - Default interval to apply in milliseconds
+ * @param updateMonitorCallback - Callback to update monitor in database
+ * @param logger - Logger instance for debug/info messages
  */
 export async function setDefaultMonitorIntervals(
     site: Site,

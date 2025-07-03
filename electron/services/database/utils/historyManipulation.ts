@@ -1,7 +1,7 @@
 import { Database } from "node-sqlite3-wasm";
 
+import { isDev } from "../../../electronUtils";
 import { StatusHistory } from "../../../types";
-import { isDev } from "../../../utils";
 import { logger } from "../../../utils/logger";
 
 /**

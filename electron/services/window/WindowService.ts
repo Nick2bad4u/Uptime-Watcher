@@ -1,7 +1,7 @@
 import { BrowserWindow } from "electron";
 import path from "path";
 
-import { isDev } from "../../utils";
+import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
 
 /**

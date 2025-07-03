@@ -1,6 +1,6 @@
 import { DEFAULT_CHECK_INTERVAL } from "../../constants";
+import { isDev } from "../../electronUtils";
 import { Site } from "../../types";
-import { isDev } from "../../utils";
 import { logger } from "../../utils/logger";
 
 /**

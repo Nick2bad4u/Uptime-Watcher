@@ -1,3 +1,8 @@
+/**
+ * Auto-monitor management utilities.
+ * Handles automatic monitoring startup for sites and monitors.
+ */
+
 import type { Site } from "../../types";
 
 type Logger = {
@@ -10,6 +15,11 @@ type Logger = {
 /**
  * Automatically starts monitoring for all monitors in a site.
  * This utility function starts monitoring for new monitors that have been added.
+ *
+ * @param site - Site object with monitors to start
+ * @param startMonitoringCallback - Callback function to start monitoring
+ * @param logger - Logger instance for debug/info messages
+ * @param isDev - Function to check if in development mode
  */
 export async function autoStartMonitoring(
     site: Site,

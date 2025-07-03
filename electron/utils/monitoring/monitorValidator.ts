@@ -1,3 +1,8 @@
+/**
+ * Monitor validation utilities.
+ * Handles initial monitor checks and validation operations.
+ */
+
 import type { Site } from "../../types";
 
 type Logger = {
@@ -10,6 +15,10 @@ type Logger = {
 /**
  * Performs initial monitor checks for all monitors in a site.
  * This utility function runs an initial check on all monitors when a site is added.
+ *
+ * @param site - Site object with monitors to check
+ * @param checkMonitorCallback - Callback function to perform monitor checks
+ * @param logger - Logger instance for debug/info messages
  */
 export async function performInitialMonitorChecks(
     site: Site,

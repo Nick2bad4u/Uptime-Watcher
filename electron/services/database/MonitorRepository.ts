@@ -5,8 +5,8 @@
 
 import { Database } from "node-sqlite3-wasm";
 
+import { isDev } from "../../electronUtils";
 import { Site } from "../../types";
-import { isDev } from "../../utils";
 import { logger } from "../../utils/logger";
 import { DatabaseService } from "./DatabaseService";
 import {
