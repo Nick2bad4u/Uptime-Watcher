@@ -18,7 +18,9 @@ Successfully completed a comprehensive modular refactoring of the UptimeMonitor 
 ## Architecture After Refactoring
 
 ### 1. **UptimeOrchestrator** (`electron/UptimeOrchestrator.ts`)
+
 **Role**: Lightweight coordinator that provides a unified API
+
 - Delegates operations to specialized managers
 - Manages inter-manager communication through callbacks
 - Provides the same public API as original UptimeMonitor
@@ -26,14 +28,18 @@ Successfully completed a comprehensive modular refactoring of the UptimeMonitor 
 - **~200 lines of clean orchestration code**
 
 ### 2. **SiteManager** (`electron/managers/SiteManager.ts`)
+
 **Role**: Site operations and cache management
+
 - Site CRUD operations (add, remove, update, get)
 - In-memory cache synchronization
 - Site data persistence coordination
 - **~120 lines focused on site management**
 
 ### 3. **MonitorManager** (`electron/managers/MonitorManager.ts`)
+
 **Role**: Monitoring operations and scheduling
+
 - Start/stop monitoring for sites and individual monitors
 - Manual status checking
 - Monitoring setup for new sites (initial checks, intervals, auto-start)
@@ -41,7 +47,9 @@ Successfully completed a comprehensive modular refactoring of the UptimeMonitor 
 - **~180 lines focused on monitoring logic**
 
 ### 4. **DatabaseManager** (`electron/managers/DatabaseManager.ts`)
+
 **Role**: Database operations and data management
+
 - Database initialization and site loading
 - Data import/export operations
 - Database backup and restore
@@ -51,26 +59,31 @@ Successfully completed a comprehensive modular refactoring of the UptimeMonitor 
 ## Key Benefits Achieved
 
 ### ✅ **Single Responsibility Principle**
+
 - Each manager has a single, well-defined responsibility
 - Clear separation of concerns across the architecture
 - Easier to understand, test, and maintain individual components
 
 ### ✅ **Improved Testability**
+
 - Each manager can be tested independently with mocked dependencies
 - Dependency injection pattern allows for easy mocking
 - All 684 tests pass, including 100 UptimeMonitor tests
 
 ### ✅ **Enhanced Maintainability**
+
 - Changes to specific functionality are isolated to relevant managers
 - Reduced risk of side effects when modifying code
 - Clear interfaces and contracts between components
 
 ### ✅ **Better Modularity**
+
 - Managers can be reused in other parts of the application
 - Easy to add new functionality by extending existing managers
 - Clean abstractions that hide implementation details
 
 ### ✅ **Dependency Injection Pattern**
+
 - Clean separation between dependencies and business logic
 - Callbacks used for cross-manager communication
 - Easy to swap implementations for testing or different environments
@@ -78,46 +91,49 @@ Successfully completed a comprehensive modular refactoring of the UptimeMonitor 
 ## Implementation Details
 
 ### **Manager Coordination**
+
 The UptimeOrchestrator sets up callbacks between managers to enable cross-manager operations:
 
 ```typescript
 // Site manager needs monitoring operations
 this.siteManager.setCallbacks({
-    startMonitoringForSite: (identifier, monitorId) =>
-        this.monitorManager.startMonitoringForSite(identifier, monitorId),
-    stopMonitoringForSite: (identifier, monitorId) =>
-        this.monitorManager.stopMonitoringForSite(identifier, monitorId),
+ startMonitoringForSite: (identifier, monitorId) => this.monitorManager.startMonitoringForSite(identifier, monitorId),
+ stopMonitoringForSite: (identifier, monitorId) => this.monitorManager.stopMonitoringForSite(identifier, monitorId),
 });
 
 // Database manager needs cache and state management
 this.databaseManager.setCallbacks({
-    getSitesFromCache: () => this.siteManager.getSitesFromCache(),
-    updateSitesCache: (sites) => this.siteManager.updateSitesCache(sites),
-    startMonitoringForSite: (identifier, monitorId) =>
-        this.monitorManager.startMonitoringForSite(identifier, monitorId),
-    setHistoryLimit: (limit) => { this.historyLimit = limit; },
+ getSitesFromCache: () => this.siteManager.getSitesFromCache(),
+ updateSitesCache: (sites) => this.siteManager.updateSitesCache(sites),
+ startMonitoringForSite: (identifier, monitorId) => this.monitorManager.startMonitoringForSite(identifier, monitorId),
+ setHistoryLimit: (limit) => {
+  this.historyLimit = limit;
+ },
 });
 ```
 
 ### **Dependency Management**
+
 Each manager receives its dependencies through constructor injection:
 
 ```typescript
 // Example: MonitorManager dependencies
 const monitorManager = new MonitorManager({
-    eventEmitter: this,
-    getSitesCache: () => this.siteManager.getSitesCache(),
-    historyLimit: this.historyLimit,
-    repositories: {
-        history: historyRepository,
-        monitor: monitorRepository,
-        site: siteRepository,
-    },
+ eventEmitter: this,
+ getSitesCache: () => this.siteManager.getSitesCache(),
+ historyLimit: this.historyLimit,
+ repositories: {
+  history: historyRepository,
+  monitor: monitorRepository,
+  site: siteRepository,
+ },
 });
 ```
 
 ### **Service Integration**
+
 Updated application services to use the new architecture:
+
 - **ApplicationService**: Uses UptimeOrchestrator instead of UptimeMonitor
 - **IpcService**: Updated to work with UptimeOrchestrator
 - All tests updated and passing
@@ -125,16 +141,19 @@ Updated application services to use the new architecture:
 ## Validation Results
 
 ### ✅ **All Tests Pass**
+
 - **684 total tests** pass across the entire application
 - **100 UptimeMonitor tests** continue to pass (backwards compatibility)
 - **15 ApplicationService tests** pass with updated architecture
 
 ### ✅ **Build Success**
+
 - Application builds successfully with no TypeScript compilation errors
 - No linting errors in refactored files
 - Production build completes without issues
 
 ### ✅ **Backwards Compatibility**
+
 - Public API remains unchanged - existing code continues to work
 - Event emission patterns preserved
 - All existing functionality maintained
@@ -160,11 +179,13 @@ electron/
 ## Migration Notes
 
 ### **For New Development**
+
 - Use `UptimeOrchestrator` for new features
 - Import individual managers when needed for specific operations
 - Follow the dependency injection pattern for new components
 
 ### **For Existing Code**
+
 - Original `UptimeMonitor` class remains available for backwards compatibility
 - Gradually migrate to `UptimeOrchestrator` when convenient
 - All existing tests and functionality preserved

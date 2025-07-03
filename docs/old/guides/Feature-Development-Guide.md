@@ -1,4 +1,5 @@
 # 🚀 Feature Development Guide
+
 <!-- markdownlint-disable -->
 
 **Quick reference for adding new features to Uptime Watcher**

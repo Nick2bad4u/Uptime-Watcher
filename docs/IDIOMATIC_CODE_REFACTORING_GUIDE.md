@@ -64,46 +64,46 @@ export class DatabaseService implements IDatabaseService {
 import { ApplicationService } from "./services/application/ApplicationService";
 
 async function main() {
-    try {
-        const applicationService = new ApplicationService();
-        await applicationService.initialize();
-    } catch (error) {
-        console.error("Failed to initialize application:", error);
-        process.exit(1);
-    }
+ try {
+  const applicationService = new ApplicationService();
+  await applicationService.initialize();
+ } catch (error) {
+  console.error("Failed to initialize application:", error);
+  process.exit(1);
+ }
 }
 ```
 
 **Replace With:**
 
 ```typescript
-import { Container } from './container/Container';
-import { ApplicationBootstrap } from './bootstrap/ApplicationBootstrap';
-import { configureDependencies } from './container/dependencies';
+import { Container } from "./container/Container";
+import { ApplicationBootstrap } from "./bootstrap/ApplicationBootstrap";
+import { configureDependencies } from "./container/dependencies";
 
 async function main() {
-    const container = new Container();
-    configureDependencies(container);
-    
-    const bootstrap = container.resolve<ApplicationBootstrap>('ApplicationBootstrap');
-    
-    try {
-        await bootstrap.initialize();
-        
-        // Graceful shutdown handling
-        process.on('SIGTERM', async () => {
-            await bootstrap.shutdown();
-            process.exit(0);
-        });
-        
-        process.on('SIGINT', async () => {
-            await bootstrap.shutdown();
-            process.exit(0);
-        });
-    } catch (error) {
-        logger.error('Application startup failed', error);
-        process.exit(1);
-    }
+ const container = new Container();
+ configureDependencies(container);
+
+ const bootstrap = container.resolve<ApplicationBootstrap>("ApplicationBootstrap");
+
+ try {
+  await bootstrap.initialize();
+
+  // Graceful shutdown handling
+  process.on("SIGTERM", async () => {
+   await bootstrap.shutdown();
+   process.exit(0);
+  });
+
+  process.on("SIGINT", async () => {
+   await bootstrap.shutdown();
+   process.exit(0);
+  });
+ } catch (error) {
+  logger.error("Application startup failed", error);
+  process.exit(1);
+ }
 }
 ```
 
@@ -150,57 +150,57 @@ public async startMonitoringForSite(identifier: string, monitorId?: string): Pro
 ```typescript
 // Create new file: electron/commands/StartMonitoringCommand.ts
 export class StartMonitoringCommand implements ICommand {
-    constructor(
-        private siteService: ISiteService,
-        private monitorScheduler: IMonitorScheduler,
-        private eventEmitter: EventEmitter,
-        private siteId: string,
-        private monitorId: string
-    ) {}
+ constructor(
+  private siteService: ISiteService,
+  private monitorScheduler: IMonitorScheduler,
+  private eventEmitter: EventEmitter,
+  private siteId: string,
+  private monitorId: string
+ ) {}
 
-    async execute(): Promise<boolean> {
-        const site = await this.siteService.findById(this.siteId);
-        if (!site) {
-            throw new SiteNotFoundError(this.siteId);
-        }
+ async execute(): Promise<boolean> {
+  const site = await this.siteService.findById(this.siteId);
+  if (!site) {
+   throw new SiteNotFoundError(this.siteId);
+  }
 
-        const monitor = site.monitors.find(m => m.id === this.monitorId);
-        if (!monitor) {
-            throw new MonitorNotFoundError(this.monitorId);
-        }
+  const monitor = site.monitors.find((m) => m.id === this.monitorId);
+  if (!monitor) {
+   throw new MonitorNotFoundError(this.monitorId);
+  }
 
-        const started = await this.monitorScheduler.startMonitor(this.siteId, monitor);
-        
-        if (started) {
-            await this.siteService.updateMonitorStatus(this.siteId, this.monitorId, { monitoring: true });
-            this.eventEmitter.emit(STATUS_UPDATE_EVENT, {
-                site: await this.siteService.findById(this.siteId),
-                previousStatus: undefined
-            });
-        }
+  const started = await this.monitorScheduler.startMonitor(this.siteId, monitor);
 
-        return started;
-    }
+  if (started) {
+   await this.siteService.updateMonitorStatus(this.siteId, this.monitorId, { monitoring: true });
+   this.eventEmitter.emit(STATUS_UPDATE_EVENT, {
+    site: await this.siteService.findById(this.siteId),
+    previousStatus: undefined,
+   });
+  }
+
+  return started;
+ }
 }
 
 // In UptimeOrchestrator (new simplified class):
 export class UptimeOrchestrator {
-    constructor(
-        private commandBus: ICommandBus,
-        private queryBus: IQueryBus
-    ) {}
+ constructor(
+  private commandBus: ICommandBus,
+  private queryBus: IQueryBus
+ ) {}
 
-    async startMonitoringForSite(siteId: string, monitorId: string): Promise<boolean> {
-        const command = new StartMonitoringCommand(
-            this.container.resolve('SiteService'),
-            this.container.resolve('MonitorScheduler'),
-            this.container.resolve('EventEmitter'),
-            siteId,
-            monitorId
-        );
-        
-        return await this.commandBus.execute(command);
-    }
+ async startMonitoringForSite(siteId: string, monitorId: string): Promise<boolean> {
+  const command = new StartMonitoringCommand(
+   this.container.resolve("SiteService"),
+   this.container.resolve("MonitorScheduler"),
+   this.container.resolve("EventEmitter"),
+   siteId,
+   monitorId
+  );
+
+  return await this.commandBus.execute(command);
+ }
 }
 ```
 
@@ -251,72 +251,54 @@ public async delete(identifier: string): Promise<boolean> {
 ```typescript
 // Create base repository
 export abstract class BaseRepository<T, TId> {
-    constructor(
-        protected db: IDatabaseService,
-        protected queryBuilder: IQueryBuilder,
-        protected logger: ILogger
-    ) {}
+ constructor(
+  protected db: IDatabaseService,
+  protected queryBuilder: IQueryBuilder,
+  protected logger: ILogger
+ ) {}
 
-    protected async executeQuery<R>(
-        query: string,
-        params: any[],
-        operation: string
-    ): Promise<R> {
-        try {
-            const db = this.db.getDatabase();
-            return db.prepare(query).all(...params) as R;
-        } catch (error) {
-            this.logger.error(`${this.constructor.name}: ${operation} failed`, {
-                query,
-                params,
-                error
-            });
-            throw new RepositoryError(`${operation} failed`, error);
-        }
-    }
+ protected async executeQuery<R>(query: string, params: any[], operation: string): Promise<R> {
+  try {
+   const db = this.db.getDatabase();
+   return db.prepare(query).all(...params) as R;
+  } catch (error) {
+   this.logger.error(`${this.constructor.name}: ${operation} failed`, {
+    query,
+    params,
+    error,
+   });
+   throw new RepositoryError(`${operation} failed`, error);
+  }
+ }
 
-    abstract findById(id: TId): Promise<T | null>;
-    abstract create(entity: Omit<T, 'id'>): Promise<T>;
-    abstract update(id: TId, updates: Partial<T>): Promise<T>;
-    abstract delete(id: TId): Promise<boolean>;
+ abstract findById(id: TId): Promise<T | null>;
+ abstract create(entity: Omit<T, "id">): Promise<T>;
+ abstract update(id: TId, updates: Partial<T>): Promise<T>;
+ abstract delete(id: TId): Promise<boolean>;
 }
 
 export class SiteRepository extends BaseRepository<Site, string> implements ISiteRepository {
-    async upsert(site: Pick<Site, "identifier" | "name">): Promise<void> {
-        const query = this.queryBuilder
-            .insertOrReplace('sites')
-            .values(['identifier', 'name'])
-            .build();
+ async upsert(site: Pick<Site, "identifier" | "name">): Promise<void> {
+  const query = this.queryBuilder.insertOrReplace("sites").values(["identifier", "name"]).build();
 
-        await this.executeQuery(
-            query.sql,
-            [site.identifier, site.name ?? null],
-            'upsert site'
-        );
+  await this.executeQuery(query.sql, [site.identifier, site.name ?? null], "upsert site");
 
-        this.logger.debug('Site upserted successfully', { siteId: site.identifier });
-    }
+  this.logger.debug("Site upserted successfully", { siteId: site.identifier });
+ }
 
-    async delete(identifier: string): Promise<boolean> {
-        const query = this.queryBuilder
-            .delete('sites')
-            .where('identifier = ?')
-            .build();
+ async delete(identifier: string): Promise<boolean> {
+  const query = this.queryBuilder.delete("sites").where("identifier = ?").build();
 
-        const result = await this.executeQuery<{changes: number}>(
-            query.sql,
-            [identifier],
-            'delete site'
-        );
+  const result = await this.executeQuery<{ changes: number }>(query.sql, [identifier], "delete site");
 
-        const deleted = result.changes > 0;
-        this.logger.debug('Site deletion completed', { 
-            siteId: identifier, 
-            deleted 
-        });
+  const deleted = result.changes > 0;
+  this.logger.debug("Site deletion completed", {
+   siteId: identifier,
+   deleted,
+  });
 
-        return deleted;
-    }
+  return deleted;
+ }
 }
 ```
 
@@ -328,71 +310,74 @@ export class SiteRepository extends BaseRepository<Site, string> implements ISit
 
 ```typescript
 export enum ErrorCode {
-    SITE_NOT_FOUND = 'SITE_NOT_FOUND',
-    MONITOR_NOT_FOUND = 'MONITOR_NOT_FOUND',
-    DATABASE_ERROR = 'DATABASE_ERROR',
-    VALIDATION_ERROR = 'VALIDATION_ERROR',
-    NETWORK_ERROR = 'NETWORK_ERROR',
-    MONITORING_ERROR = 'MONITORING_ERROR'
+ SITE_NOT_FOUND = "SITE_NOT_FOUND",
+ MONITOR_NOT_FOUND = "MONITOR_NOT_FOUND",
+ DATABASE_ERROR = "DATABASE_ERROR",
+ VALIDATION_ERROR = "VALIDATION_ERROR",
+ NETWORK_ERROR = "NETWORK_ERROR",
+ MONITORING_ERROR = "MONITORING_ERROR",
 }
 
 export abstract class AppError extends Error {
-    abstract readonly code: ErrorCode;
-    abstract readonly statusCode: number;
-    abstract readonly isOperational: boolean;
+ abstract readonly code: ErrorCode;
+ abstract readonly statusCode: number;
+ abstract readonly isOperational: boolean;
 
-    constructor(message: string, public readonly context?: Record<string, any>) {
-        super(message);
-        this.name = this.constructor.name;
-        Error.captureStackTrace(this, this.constructor);
-    }
+ constructor(
+  message: string,
+  public readonly context?: Record<string, any>
+ ) {
+  super(message);
+  this.name = this.constructor.name;
+  Error.captureStackTrace(this, this.constructor);
+ }
 }
 
 export class SiteNotFoundError extends AppError {
-    readonly code = ErrorCode.SITE_NOT_FOUND;
-    readonly statusCode = 404;
-    readonly isOperational = true;
+ readonly code = ErrorCode.SITE_NOT_FOUND;
+ readonly statusCode = 404;
+ readonly isOperational = true;
 
-    constructor(siteId: string) {
-        super(`Site with ID '${siteId}' not found`, { siteId });
-    }
+ constructor(siteId: string) {
+  super(`Site with ID '${siteId}' not found`, { siteId });
+ }
 }
 
 export class MonitorNotFoundError extends AppError {
-    readonly code = ErrorCode.MONITOR_NOT_FOUND;
-    readonly statusCode = 404;
-    readonly isOperational = true;
+ readonly code = ErrorCode.MONITOR_NOT_FOUND;
+ readonly statusCode = 404;
+ readonly isOperational = true;
 
-    constructor(monitorId: string) {
-        super(`Monitor with ID '${monitorId}' not found`, { monitorId });
-    }
+ constructor(monitorId: string) {
+  super(`Monitor with ID '${monitorId}' not found`, { monitorId });
+ }
 }
 
 export class RepositoryError extends AppError {
-    readonly code = ErrorCode.DATABASE_ERROR;
-    readonly statusCode = 500;
-    readonly isOperational = true;
+ readonly code = ErrorCode.DATABASE_ERROR;
+ readonly statusCode = 500;
+ readonly isOperational = true;
 
-    constructor(operation: string, originalError: Error) {
-        super(`Repository operation failed: ${operation}`, {
-            operation,
-            originalError: originalError.message
-        });
-    }
+ constructor(operation: string, originalError: Error) {
+  super(`Repository operation failed: ${operation}`, {
+   operation,
+   originalError: originalError.message,
+  });
+ }
 }
 
 export class ValidationError extends AppError {
-    readonly code = ErrorCode.VALIDATION_ERROR;
-    readonly statusCode = 400;
-    readonly isOperational = true;
+ readonly code = ErrorCode.VALIDATION_ERROR;
+ readonly statusCode = 400;
+ readonly isOperational = true;
 
-    constructor(field: string, reason: string, value?: any) {
-        super(`Validation failed for field '${field}': ${reason}`, {
-            field,
-            reason,
-            value
-        });
-    }
+ constructor(field: string, reason: string, value?: any) {
+  super(`Validation failed for field '${field}': ${reason}`, {
+   field,
+   reason,
+   value,
+  });
+ }
 }
 ```
 
@@ -408,35 +393,33 @@ export class ValidationError extends AppError {
 
 ```typescript
 export const useStore = create<AppState>()(
-    persist(
-        (set, get) => ({
-            // Synchronized UI state for SiteDetails
-            activeSiteDetailsTab: "overview",
-            /**
-             * Add a monitor to an existing site
-             */
-            addMonitorToSite: async (siteId, monitor) => {
-                const state = get();
-                state.setLoading(true);
-                state.clearError();
-                try {
-                    // Get the current site
-                    const site = state.sites.find((s) => s.identifier === siteId);
-                    if (!site) throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
-                    // Allow multiple monitors of the same type (uniqueness is not enforced)
-                    const updatedMonitors = [...site.monitors, monitor];
-                    await window.electronAPI.sites.updateSite(siteId, { monitors: updatedMonitors });
-                    await state.syncSitesFromBackend();
-                } catch (error) {
-                    state.setError(`Failed to add monitor: ${error instanceof Error ? error.message : String(error)}`);
-                    throw error;
-                } finally {
-                    state.setLoading(false);
-                }
-            },
-            // ... more mixed concerns
-        })
-    )
+ persist((set, get) => ({
+  // Synchronized UI state for SiteDetails
+  activeSiteDetailsTab: "overview",
+  /**
+   * Add a monitor to an existing site
+   */
+  addMonitorToSite: async (siteId, monitor) => {
+   const state = get();
+   state.setLoading(true);
+   state.clearError();
+   try {
+    // Get the current site
+    const site = state.sites.find((s) => s.identifier === siteId);
+    if (!site) throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
+    // Allow multiple monitors of the same type (uniqueness is not enforced)
+    const updatedMonitors = [...site.monitors, monitor];
+    await window.electronAPI.sites.updateSite(siteId, { monitors: updatedMonitors });
+    await state.syncSitesFromBackend();
+   } catch (error) {
+    state.setError(`Failed to add monitor: ${error instanceof Error ? error.message : String(error)}`);
+    throw error;
+   } finally {
+    state.setLoading(false);
+   }
+  },
+  // ... more mixed concerns
+ }))
 );
 ```
 
@@ -445,121 +428,125 @@ export const useStore = create<AppState>()(
 ```typescript
 // Create src/stores/siteStore.ts
 interface SiteState {
-    sites: Site[];
-    selectedSiteId: string | null;
-    loading: boolean;
-    error: string | null;
+ sites: Site[];
+ selectedSiteId: string | null;
+ loading: boolean;
+ error: string | null;
 }
 
 interface SiteActions {
-    setSites: (sites: Site[]) => void;
-    addSite: (site: Site) => void;
-    removeSite: (id: string) => void;
-    setSelectedSite: (id: string | null) => void;
-    setLoading: (loading: boolean) => void;
-    setError: (error: string | null) => void;
-    clearError: () => void;
+ setSites: (sites: Site[]) => void;
+ addSite: (site: Site) => void;
+ removeSite: (id: string) => void;
+ setSelectedSite: (id: string | null) => void;
+ setLoading: (loading: boolean) => void;
+ setError: (error: string | null) => void;
+ clearError: () => void;
 }
 
 export const useSiteStore = create<SiteState & SiteActions>()((set, get) => ({
-    // State
-    sites: [],
-    selectedSiteId: null,
-    loading: false,
-    error: null,
+ // State
+ sites: [],
+ selectedSiteId: null,
+ loading: false,
+ error: null,
 
-    // Actions
-    setSites: (sites) => set({ sites }),
-    addSite: (site) => set((state) => ({ sites: [...state.sites, site] })),
-    removeSite: (id) => set((state) => ({
-        sites: state.sites.filter(s => s.identifier !== id),
-        selectedSiteId: state.selectedSiteId === id ? null : state.selectedSiteId
-    })),
-    setSelectedSite: (id) => set({ selectedSiteId: id }),
-    setLoading: (loading) => set({ loading }),
-    setError: (error) => set({ error }),
-    clearError: () => set({ error: null })
+ // Actions
+ setSites: (sites) => set({ sites }),
+ addSite: (site) => set((state) => ({ sites: [...state.sites, site] })),
+ removeSite: (id) =>
+  set((state) => ({
+   sites: state.sites.filter((s) => s.identifier !== id),
+   selectedSiteId: state.selectedSiteId === id ? null : state.selectedSiteId,
+  })),
+ setSelectedSite: (id) => set({ selectedSiteId: id }),
+ setLoading: (loading) => set({ loading }),
+ setError: (error) => set({ error }),
+ clearError: () => set({ error: null }),
 }));
 
 // Create src/stores/uiStore.ts
 interface UIState {
-    showSettings: boolean;
-    showSiteDetails: boolean;
-    activeSiteDetailsTab: string;
-    siteDetailsChartTimeRange: ChartTimeRange;
-    showAdvancedMetrics: boolean;
+ showSettings: boolean;
+ showSiteDetails: boolean;
+ activeSiteDetailsTab: string;
+ siteDetailsChartTimeRange: ChartTimeRange;
+ showAdvancedMetrics: boolean;
 }
 
 interface UIActions {
-    setShowSettings: (show: boolean) => void;
-    setShowSiteDetails: (show: boolean) => void;
-    setActiveSiteDetailsTab: (tab: string) => void;
-    setSiteDetailsChartTimeRange: (range: ChartTimeRange) => void;
-    setShowAdvancedMetrics: (show: boolean) => void;
+ setShowSettings: (show: boolean) => void;
+ setShowSiteDetails: (show: boolean) => void;
+ setActiveSiteDetailsTab: (tab: string) => void;
+ setSiteDetailsChartTimeRange: (range: ChartTimeRange) => void;
+ setShowAdvancedMetrics: (show: boolean) => void;
 }
 
 export const useUIStore = create<UIState & UIActions>()(
-    persist(
-        (set) => ({
-            // State
-            showSettings: false,
-            showSiteDetails: false,
-            activeSiteDetailsTab: 'overview',
-            siteDetailsChartTimeRange: '24h',
-            showAdvancedMetrics: false,
+ persist(
+  (set) => ({
+   // State
+   showSettings: false,
+   showSiteDetails: false,
+   activeSiteDetailsTab: "overview",
+   siteDetailsChartTimeRange: "24h",
+   showAdvancedMetrics: false,
 
-            // Actions
-            setShowSettings: (show) => set({ showSettings: show }),
-            setShowSiteDetails: (show) => set({ showSiteDetails: show }),
-            setActiveSiteDetailsTab: (tab) => set({ activeSiteDetailsTab: tab }),
-            setSiteDetailsChartTimeRange: (range) => set({ siteDetailsChartTimeRange: range }),
-            setShowAdvancedMetrics: (show) => set({ showAdvancedMetrics: show })
-        }),
-        {
-            name: 'uptime-watcher-ui',
-            partialize: (state) => ({
-                activeSiteDetailsTab: state.activeSiteDetailsTab,
-                siteDetailsChartTimeRange: state.siteDetailsChartTimeRange,
-                showAdvancedMetrics: state.showAdvancedMetrics
-            })
-        }
-    )
+   // Actions
+   setShowSettings: (show) => set({ showSettings: show }),
+   setShowSiteDetails: (show) => set({ showSiteDetails: show }),
+   setActiveSiteDetailsTab: (tab) => set({ activeSiteDetailsTab: tab }),
+   setSiteDetailsChartTimeRange: (range) => set({ siteDetailsChartTimeRange: range }),
+   setShowAdvancedMetrics: (show) => set({ showAdvancedMetrics: show }),
+  }),
+  {
+   name: "uptime-watcher-ui",
+   partialize: (state) => ({
+    activeSiteDetailsTab: state.activeSiteDetailsTab,
+    siteDetailsChartTimeRange: state.siteDetailsChartTimeRange,
+    showAdvancedMetrics: state.showAdvancedMetrics,
+   }),
+  }
+ )
 );
 
 // Create src/hooks/useSiteOperations.ts
 export const useSiteOperations = () => {
-    const { setLoading, setError, clearError, setSites } = useSiteStore();
+ const { setLoading, setError, clearError, setSites } = useSiteStore();
 
-    const addMonitorToSite = useCallback(async (siteId: string, monitor: Monitor) => {
-        setLoading(true);
-        clearError();
-        
-        try {
-            const sites = useSiteStore.getState().sites;
-            const site = sites.find(s => s.identifier === siteId);
-            
-            if (!site) {
-                throw new Error('Site not found');
-            }
+ const addMonitorToSite = useCallback(
+  async (siteId: string, monitor: Monitor) => {
+   setLoading(true);
+   clearError();
 
-            const updatedMonitors = [...site.monitors, monitor];
-            await window.electronAPI.sites.updateSite(siteId, { monitors: updatedMonitors });
-            
-            // Refresh sites from backend
-            const updatedSites = await window.electronAPI.sites.getSites();
-            setSites(updatedSites);
-        } catch (error) {
-            const message = error instanceof Error ? error.message : String(error);
-            setError(`Failed to add monitor: ${message}`);
-            throw error;
-        } finally {
-            setLoading(false);
-        }
-    }, [setLoading, clearError, setError, setSites]);
+   try {
+    const sites = useSiteStore.getState().sites;
+    const site = sites.find((s) => s.identifier === siteId);
 
-    return {
-        addMonitorToSite
-    };
+    if (!site) {
+     throw new Error("Site not found");
+    }
+
+    const updatedMonitors = [...site.monitors, monitor];
+    await window.electronAPI.sites.updateSite(siteId, { monitors: updatedMonitors });
+
+    // Refresh sites from backend
+    const updatedSites = await window.electronAPI.sites.getSites();
+    setSites(updatedSites);
+   } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    setError(`Failed to add monitor: ${message}`);
+    throw error;
+   } finally {
+    setLoading(false);
+   }
+  },
+  [setLoading, clearError, setError, setSites]
+ );
+
+ return {
+  addMonitorToSite,
+ };
 };
 ```
 
@@ -639,10 +626,10 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
         // Log error to monitoring service
         console.error('ErrorBoundary caught an error:', error, errorInfo);
-        
+
         // Call custom error handler if provided
         this.props.onError?.(error, errorInfo);
-        
+
         // In production, send to error monitoring service
         if (process.env.NODE_ENV === 'production') {
             // errorReporter.captureException(error, { extra: errorInfo });
@@ -907,7 +894,7 @@ export const AddSiteForm: React.FC = () => {
     const { sites } = useSiteStore();
     const { loading } = useSiteStore();
     const { addMonitorToSite } = useSiteOperations();
-    
+
     const {
         control,
         handleSubmit,
@@ -945,9 +932,9 @@ export const AddSiteForm: React.FC = () => {
                         timeout: data.timeout,
                         retryAttempts: data.retryAttempts,
                         ...(data.monitorType === 'http' && { url: data.url }),
-                        ...(data.monitorType === 'port' && { 
-                            host: data.host, 
-                            port: data.port 
+                        ...(data.monitorType === 'port' && {
+                            host: data.host,
+                            port: data.port
                         })
                     }]
                 };
@@ -964,9 +951,9 @@ export const AddSiteForm: React.FC = () => {
                     timeout: data.timeout,
                     retryAttempts: data.retryAttempts,
                     ...(data.monitorType === 'http' && { url: data.url }),
-                    ...(data.monitorType === 'port' && { 
-                        host: data.host, 
-                        port: data.port 
+                    ...(data.monitorType === 'port' && {
+                        host: data.host,
+                        port: data.port
                     })
                 };
 
@@ -1138,7 +1125,7 @@ export const AddSiteForm: React.FC = () => {
                     >
                         {addMode === 'new' ? 'Create Site' : 'Add Monitor'}
                     </ThemedButton>
-                    
+
                     <ThemedButton
                         type="button"
                         variant="ghost"
@@ -1172,12 +1159,12 @@ export const SiteCard: React.FC<SiteCardProps> = ({ site }) => {
 
     const monitors = site.monitors || [];
     const hasMonitors = monitors.length > 0;
-    
-    const overallStatus = hasMonitors 
-        ? monitors.some(m => m.status === 'down') 
-            ? 'down' 
-            : monitors.some(m => m.status === 'up') 
-                ? 'up' 
+
+    const overallStatus = hasMonitors
+        ? monitors.some(m => m.status === 'down')
+            ? 'down'
+            : monitors.some(m => m.status === 'up')
+                ? 'up'
                 : 'pending'
         : 'pending';
 
@@ -1197,7 +1184,7 @@ export const SiteCard: React.FC<SiteCardProps> = ({ site }) => {
             rounded="lg"
         >
             <SiteCardHeader site={site} status={overallStatus} />
-            <SiteCardMetrics 
+            <SiteCardMetrics
                 monitors={monitors}
                 avgResponseTime={avgResponseTime}
             />
@@ -1221,12 +1208,12 @@ const useSiteMetrics = (site: Site) => {
     return useMemo(() => {
         const monitors = site.monitors || [];
         const hasMonitors = monitors.length > 0;
-        
-        const overallStatus = hasMonitors 
-            ? monitors.some(m => m.status === 'down') 
-                ? 'down' 
-                : monitors.some(m => m.status === 'up') 
-                    ? 'up' 
+
+        const overallStatus = hasMonitors
+            ? monitors.some(m => m.status === 'down')
+                ? 'down'
+                : monitors.some(m => m.status === 'up')
+                    ? 'up'
                     : 'pending'
             : 'pending';
 
@@ -1242,7 +1229,7 @@ const useSiteMetrics = (site: Site) => {
             ? monitors.reduce((sum, monitor) => {
                 const history = monitor.history || [];
                 if (history.length === 0) return sum;
-                
+
                 const upCount = history.filter(h => h.status === 'up').length;
                 return sum + (upCount / history.length);
             }, 0) / monitors.length * 100
@@ -1270,7 +1257,7 @@ export const SiteCard = React.memo<SiteCardProps>(({ site, onViewDetails }) => {
 
     const handleQuickAction = useCallback((action: string, event: React.MouseEvent) => {
         event.stopPropagation(); // Prevent card click
-        
+
         switch (action) {
             case 'check-now':
                 // Handle immediate check
@@ -1289,19 +1276,19 @@ export const SiteCard = React.memo<SiteCardProps>(({ site, onViewDetails }) => {
             rounded="lg"
             data-testid={`site-card-${site.identifier}`}
         >
-            <SiteCardHeader 
-                site={site} 
+            <SiteCardHeader
+                site={site}
                 status={metrics.overallStatus}
                 onQuickAction={handleQuickAction}
             />
-            <SiteCardMetrics 
+            <SiteCardMetrics
                 monitors={metrics.monitors}
                 avgResponseTime={metrics.avgResponseTime}
                 uptimePercentage={metrics.uptimePercentage}
             />
             <SiteCardHistory monitors={metrics.monitors} />
-            <SiteCardFooter 
-                site={site} 
+            <SiteCardFooter
+                site={site}
                 monitorCount={metrics.monitors.length}
             />
         </ThemedBox>
@@ -1310,22 +1297,22 @@ export const SiteCard = React.memo<SiteCardProps>(({ site, onViewDetails }) => {
     // Custom comparison for optimal re-rendering
     const prevSite = prevProps.site;
     const nextSite = nextProps.site;
-    
+
     // Compare site identity
     if (prevSite.identifier !== nextSite.identifier) {
         return false;
     }
-    
+
     // Compare monitor count
     if (prevSite.monitors.length !== nextSite.monitors.length) {
         return false;
     }
-    
+
     // Compare monitor statuses and response times
     for (let i = 0; i < prevSite.monitors.length; i++) {
         const prevMonitor = prevSite.monitors[i];
         const nextMonitor = nextSite.monitors[i];
-        
+
         if (
             prevMonitor.status !== nextMonitor.status ||
             prevMonitor.responseTime !== nextMonitor.responseTime ||
@@ -1335,7 +1322,7 @@ export const SiteCard = React.memo<SiteCardProps>(({ site, onViewDetails }) => {
             return false;
         }
     }
-    
+
     return true; // Props are equal, skip re-render
 });
 
@@ -1350,158 +1337,155 @@ SiteCard.displayName = 'SiteCard';
 
 ```typescript
 interface UseAsyncOperationOptions<T> {
-    onSuccess?: (data: T) => void;
-    onError?: (error: Error) => void;
-    retryAttempts?: number;
-    retryDelay?: number;
-    immediate?: boolean;
+ onSuccess?: (data: T) => void;
+ onError?: (error: Error) => void;
+ retryAttempts?: number;
+ retryDelay?: number;
+ immediate?: boolean;
 }
 
 interface UseAsyncOperationResult<T> {
-    data: T | null;
-    loading: boolean;
-    error: Error | null;
-    execute: (...args: any[]) => Promise<T>;
-    retry: () => Promise<T>;
-    reset: () => void;
+ data: T | null;
+ loading: boolean;
+ error: Error | null;
+ execute: (...args: any[]) => Promise<T>;
+ retry: () => Promise<T>;
+ reset: () => void;
 }
 
 export const useAsyncOperation = <T>(
-    asyncFunction: (...args: any[]) => Promise<T>,
-    options: UseAsyncOperationOptions<T> = {}
+ asyncFunction: (...args: any[]) => Promise<T>,
+ options: UseAsyncOperationOptions<T> = {}
 ): UseAsyncOperationResult<T> => {
-    const [data, setData] = useState<T | null>(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<Error | null>(null);
-    const lastArgsRef = useRef<any[]>([]);
+ const [data, setData] = useState<T | null>(null);
+ const [loading, setLoading] = useState(false);
+ const [error, setError] = useState<Error | null>(null);
+ const lastArgsRef = useRef<any[]>([]);
 
-    const {
-        onSuccess,
-        onError,
-        retryAttempts = 0,
-        retryDelay = 1000,
-        immediate = false
-    } = options;
+ const { onSuccess, onError, retryAttempts = 0, retryDelay = 1000, immediate = false } = options;
 
-    const execute = useCallback(async (...args: any[]): Promise<T> => {
-        lastArgsRef.current = args;
-        setLoading(true);
-        setError(null);
+ const execute = useCallback(
+  async (...args: any[]): Promise<T> => {
+   lastArgsRef.current = args;
+   setLoading(true);
+   setError(null);
 
-        let lastError: Error | null = null;
-        
-        for (let attempt = 0; attempt <= retryAttempts; attempt++) {
-            try {
-                const result = await asyncFunction(...args);
-                setData(result);
-                setLoading(false);
-                onSuccess?.(result);
-                return result;
-            } catch (err) {
-                lastError = err instanceof Error ? err : new Error(String(err));
-                
-                if (attempt < retryAttempts) {
-                    await new Promise(resolve => setTimeout(resolve, retryDelay));
-                    continue;
-                }
-                
-                setError(lastError);
-                setLoading(false);
-                onError?.(lastError);
-                throw lastError;
-            }
-        }
-        
-        throw lastError!;
-    }, [asyncFunction, onSuccess, onError, retryAttempts, retryDelay]);
+   let lastError: Error | null = null;
 
-    const retry = useCallback(() => {
-        return execute(...lastArgsRef.current);
-    }, [execute]);
+   for (let attempt = 0; attempt <= retryAttempts; attempt++) {
+    try {
+     const result = await asyncFunction(...args);
+     setData(result);
+     setLoading(false);
+     onSuccess?.(result);
+     return result;
+    } catch (err) {
+     lastError = err instanceof Error ? err : new Error(String(err));
 
-    const reset = useCallback(() => {
-        setData(null);
-        setError(null);
-        setLoading(false);
-    }, []);
+     if (attempt < retryAttempts) {
+      await new Promise((resolve) => setTimeout(resolve, retryDelay));
+      continue;
+     }
 
-    useEffect(() => {
-        if (immediate) {
-            execute();
-        }
-    }, [immediate, execute]);
+     setError(lastError);
+     setLoading(false);
+     onError?.(lastError);
+     throw lastError;
+    }
+   }
 
-    return {
-        data,
-        loading,
-        error,
-        execute,
-        retry,
-        reset
-    };
+   throw lastError!;
+  },
+  [asyncFunction, onSuccess, onError, retryAttempts, retryDelay]
+ );
+
+ const retry = useCallback(() => {
+  return execute(...lastArgsRef.current);
+ }, [execute]);
+
+ const reset = useCallback(() => {
+  setData(null);
+  setError(null);
+  setLoading(false);
+ }, []);
+
+ useEffect(() => {
+  if (immediate) {
+   execute();
+  }
+ }, [immediate, execute]);
+
+ return {
+  data,
+  loading,
+  error,
+  execute,
+  retry,
+  reset,
+ };
 };
 
 // Usage example in components:
 export const useSiteOperations = () => {
-    const { setSites } = useSiteStore();
+ const { setSites } = useSiteStore();
 
-    const {
-        execute: createSite,
-        loading: creatingSite,
-        error: createSiteError
-    } = useAsyncOperation(
-        async (siteData: Omit<Site, 'id'>) => {
-            const newSite = await window.electronAPI.sites.addSite(siteData);
-            
-            // Refresh sites list
-            const updatedSites = await window.electronAPI.sites.getSites();
-            setSites(updatedSites);
-            
-            return newSite;
-        },
-        {
-            onSuccess: () => {
-                console.log('Site created successfully');
-            },
-            onError: (error) => {
-                console.error('Failed to create site:', error);
-            },
-            retryAttempts: 2,
-            retryDelay: 1000
-        }
-    );
+ const {
+  execute: createSite,
+  loading: creatingSite,
+  error: createSiteError,
+ } = useAsyncOperation(
+  async (siteData: Omit<Site, "id">) => {
+   const newSite = await window.electronAPI.sites.addSite(siteData);
 
-    const {
-        execute: deleteSite,
-        loading: deletingSite,
-        error: deleteSiteError
-    } = useAsyncOperation(
-        async (siteId: string) => {
-            await window.electronAPI.sites.removeSite(siteId);
-            
-            // Refresh sites list
-            const updatedSites = await window.electronAPI.sites.getSites();
-            setSites(updatedSites);
-        },
-        {
-            onSuccess: () => {
-                console.log('Site deleted successfully');
-            }
-        }
-    );
+   // Refresh sites list
+   const updatedSites = await window.electronAPI.sites.getSites();
+   setSites(updatedSites);
 
-    return {
-        createSite: {
-            execute: createSite,
-            loading: creatingSite,
-            error: createSiteError
-        },
-        deleteSite: {
-            execute: deleteSite,
-            loading: deletingSite,
-            error: deleteSiteError
-        }
-    };
+   return newSite;
+  },
+  {
+   onSuccess: () => {
+    console.log("Site created successfully");
+   },
+   onError: (error) => {
+    console.error("Failed to create site:", error);
+   },
+   retryAttempts: 2,
+   retryDelay: 1000,
+  }
+ );
+
+ const {
+  execute: deleteSite,
+  loading: deletingSite,
+  error: deleteSiteError,
+ } = useAsyncOperation(
+  async (siteId: string) => {
+   await window.electronAPI.sites.removeSite(siteId);
+
+   // Refresh sites list
+   const updatedSites = await window.electronAPI.sites.getSites();
+   setSites(updatedSites);
+  },
+  {
+   onSuccess: () => {
+    console.log("Site deleted successfully");
+   },
+  }
+ );
+
+ return {
+  createSite: {
+   execute: createSite,
+   loading: creatingSite,
+   error: createSiteError,
+  },
+  deleteSite: {
+   execute: deleteSite,
+   loading: deletingSite,
+   error: deleteSiteError,
+  },
+ };
 };
 ```
 
@@ -1517,32 +1501,32 @@ export const useSiteOperations = () => {
 
 ```json
 {
-    "compilerOptions": {
-        "target": "ES2020",
-        "skipDefaultLibCheck": false,
-        "useDefineForClassFields": true,
-        "lib": ["ES2020", "DOM", "DOM.Iterable"],
-        "module": "CommonJS",
-        "moduleResolution": "node",
-        "resolveJsonModule": true,
-        "skipLibCheck": true,
-        "isolatedModules": true,
-        "jsx": "react-jsx",
-        "strict": true,
-        "types": ["react", "react-dom", "vitest/globals", "@testing-library/jest-dom", "vite/client"],
-        "noUnusedLocals": true,
-        "noUnusedParameters": true,
-        "noFallthroughCasesInSwitch": true,
-        "forceConsistentCasingInFileNames": true,
-        "outDir": "dist-electron",
-        "baseUrl": ".",
-        "paths": {
-            "@/*": ["src/*"]
-        },
-        "esModuleInterop": true,
-        "allowJs": true,
-        "allowSyntheticDefaultImports": true
-    }
+ "compilerOptions": {
+  "target": "ES2020",
+  "skipDefaultLibCheck": false,
+  "useDefineForClassFields": true,
+  "lib": ["ES2020", "DOM", "DOM.Iterable"],
+  "module": "CommonJS",
+  "moduleResolution": "node",
+  "resolveJsonModule": true,
+  "skipLibCheck": true,
+  "isolatedModules": true,
+  "jsx": "react-jsx",
+  "strict": true,
+  "types": ["react", "react-dom", "vitest/globals", "@testing-library/jest-dom", "vite/client"],
+  "noUnusedLocals": true,
+  "noUnusedParameters": true,
+  "noFallthroughCasesInSwitch": true,
+  "forceConsistentCasingInFileNames": true,
+  "outDir": "dist-electron",
+  "baseUrl": ".",
+  "paths": {
+   "@/*": ["src/*"]
+  },
+  "esModuleInterop": true,
+  "allowJs": true,
+  "allowSyntheticDefaultImports": true
+ }
 }
 ```
 
@@ -1550,64 +1534,50 @@ export const useSiteOperations = () => {
 
 ```json
 {
-    "compilerOptions": {
-        "target": "ES2022",
-        "lib": ["ES2022", "DOM", "DOM.Iterable"],
-        "module": "ESNext",
-        "moduleResolution": "bundler",
-        "allowImportingTsExtensions": true,
-        "resolveJsonModule": true,
-        "isolatedModules": true,
-        "noEmit": true,
-        "jsx": "react-jsx",
-        
-        // Strict type checking
-        "strict": true,
-        "noUnusedLocals": true,
-        "noUnusedParameters": true,
-        "noFallthroughCasesInSwitch": true,
-        "noImplicitReturns": true,
-        "noImplicitOverride": true,
-        "noPropertyAccessFromIndexSignature": true,
-        "noUncheckedIndexedAccess": true,
-        "exactOptionalPropertyTypes": true,
-        
-        // Module resolution
-        "baseUrl": ".",
-        "paths": {
-            "@/*": ["src/*"],
-            "@/components/*": ["src/components/*"],
-            "@/hooks/*": ["src/hooks/*"],
-            "@/stores/*": ["src/stores/*"],
-            "@/utils/*": ["src/utils/*"],
-            "@/types/*": ["src/types/*"],
-            "@/services/*": ["src/services/*"]
-        },
-        
-        // Build optimization
-        "skipLibCheck": true,
-        "forceConsistentCasingInFileNames": true,
-        "verbatimModuleSyntax": true,
-        
-        // Types
-        "types": [
-            "vite/client",
-            "vitest/globals",
-            "@testing-library/jest-dom"
-        ]
-    },
-    "include": [
-        "src/**/*.ts",
-        "src/**/*.tsx",
-        "src/**/*.test.ts",
-        "src/**/*.test.tsx"
-    ],
-    "exclude": [
-        "node_modules",
-        "dist",
-        "dist-electron",
-        "release"
-    ]
+ "compilerOptions": {
+  "target": "ES2022",
+  "lib": ["ES2022", "DOM", "DOM.Iterable"],
+  "module": "ESNext",
+  "moduleResolution": "bundler",
+  "allowImportingTsExtensions": true,
+  "resolveJsonModule": true,
+  "isolatedModules": true,
+  "noEmit": true,
+  "jsx": "react-jsx",
+
+  // Strict type checking
+  "strict": true,
+  "noUnusedLocals": true,
+  "noUnusedParameters": true,
+  "noFallthroughCasesInSwitch": true,
+  "noImplicitReturns": true,
+  "noImplicitOverride": true,
+  "noPropertyAccessFromIndexSignature": true,
+  "noUncheckedIndexedAccess": true,
+  "exactOptionalPropertyTypes": true,
+
+  // Module resolution
+  "baseUrl": ".",
+  "paths": {
+   "@/*": ["src/*"],
+   "@/components/*": ["src/components/*"],
+   "@/hooks/*": ["src/hooks/*"],
+   "@/stores/*": ["src/stores/*"],
+   "@/utils/*": ["src/utils/*"],
+   "@/types/*": ["src/types/*"],
+   "@/services/*": ["src/services/*"]
+  },
+
+  // Build optimization
+  "skipLibCheck": true,
+  "forceConsistentCasingInFileNames": true,
+  "verbatimModuleSyntax": true,
+
+  // Types
+  "types": ["vite/client", "vitest/globals", "@testing-library/jest-dom"]
+ },
+ "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.test.ts", "src/**/*.test.tsx"],
+ "exclude": ["node_modules", "dist", "dist-electron", "release"]
 }
 ```
 
@@ -1617,42 +1587,32 @@ export const useSiteOperations = () => {
 
 ```json
 {
-    "extends": "../tsconfig.json",
-    "compilerOptions": {
-        "target": "ES2022",
-        "module": "CommonJS",
-        "moduleResolution": "node",
-        "outDir": "../dist-electron",
-        "noEmit": false,
-        "declaration": true,
-        "declarationMap": true,
-        "sourceMap": true,
-        "composite": true,
-        "incremental": true,
-        "tsBuildInfoFile": "../.tsbuildinfo-electron",
-        
-        // Node.js specific
-        "types": [
-            "node",
-            "electron"
-        ],
-        
-        // Path mapping for electron
-        "baseUrl": ".",
-        "paths": {
-            "@electron/*": ["./*"],
-            "@shared/*": ["../src/types/*"]
-        }
-    },
-    "include": [
-        "**/*.ts",
-        "**/*.tsx"
-    ],
-    "exclude": [
-        "node_modules",
-        "**/*.test.ts",
-        "**/*.test.tsx"
-    ]
+ "extends": "../tsconfig.json",
+ "compilerOptions": {
+  "target": "ES2022",
+  "module": "CommonJS",
+  "moduleResolution": "node",
+  "outDir": "../dist-electron",
+  "noEmit": false,
+  "declaration": true,
+  "declarationMap": true,
+  "sourceMap": true,
+  "composite": true,
+  "incremental": true,
+  "tsBuildInfoFile": "../.tsbuildinfo-electron",
+
+  // Node.js specific
+  "types": ["node", "electron"],
+
+  // Path mapping for electron
+  "baseUrl": ".",
+  "paths": {
+   "@electron/*": ["./*"],
+   "@shared/*": ["../src/types/*"]
+  }
+ },
+ "include": ["**/*.ts", "**/*.tsx"],
+ "exclude": ["node_modules", "**/*.test.ts", "**/*.test.tsx"]
 }
 ```
 
@@ -1664,146 +1624,140 @@ export const useSiteOperations = () => {
 
 ```typescript
 export default defineConfig({
-  plugins: [react()],
-  // Basic configuration
+ plugins: [react()],
+ // Basic configuration
 });
 ```
 
 **Replace With:**
 
 ```typescript
-import { defineConfig, loadEnv } from 'vite';
-import react from '@vitejs/plugin-react';
-import { resolve } from 'path';
+import { defineConfig, loadEnv } from "vite";
+import react from "@vitejs/plugin-react";
+import { resolve } from "path";
 
 export default defineConfig(({ command, mode }) => {
-  const env = loadEnv(mode, process.cwd(), '');
-  const isDev = command === 'serve';
-  const isProd = mode === 'production';
+ const env = loadEnv(mode, process.cwd(), "");
+ const isDev = command === "serve";
+ const isProd = mode === "production";
 
-  return {
-    plugins: [
-      react({
-        // Enable React Fast Refresh
-        fastRefresh: isDev,
-        // Optimize React in production
-        babel: isProd ? {
-          plugins: [
-            ['babel-plugin-react-remove-properties', { properties: ['data-testid'] }]
-          ]
-        } : undefined
-      })
-    ],
+ return {
+  plugins: [
+   react({
+    // Enable React Fast Refresh
+    fastRefresh: isDev,
+    // Optimize React in production
+    babel: isProd
+     ? {
+        plugins: [["babel-plugin-react-remove-properties", { properties: ["data-testid"] }]],
+       }
+     : undefined,
+   }),
+  ],
 
-    // Path resolution
-    resolve: {
-      alias: {
-        '@': resolve(__dirname, 'src'),
-        '@/components': resolve(__dirname, 'src/components'),
-        '@/hooks': resolve(__dirname, 'src/hooks'),
-        '@/stores': resolve(__dirname, 'src/stores'),
-        '@/utils': resolve(__dirname, 'src/utils'),
-        '@/types': resolve(__dirname, 'src/types'),
-        '@/services': resolve(__dirname, 'src/services')
+  // Path resolution
+  resolve: {
+   alias: {
+    "@": resolve(__dirname, "src"),
+    "@/components": resolve(__dirname, "src/components"),
+    "@/hooks": resolve(__dirname, "src/hooks"),
+    "@/stores": resolve(__dirname, "src/stores"),
+    "@/utils": resolve(__dirname, "src/utils"),
+    "@/types": resolve(__dirname, "src/types"),
+    "@/services": resolve(__dirname, "src/services"),
+   },
+  },
+
+  // Build optimization
+  build: {
+   target: "ES2022",
+   sourcemap: isDev,
+   minify: isProd ? "terser" : false,
+
+   // Rollup options
+   rollupOptions: {
+    output: {
+     // Manual chunks for better caching
+     manualChunks: {
+      // Vendor chunks
+      "react-vendor": ["react", "react-dom"],
+      "state-vendor": ["zustand"],
+      "ui-vendor": ["@radix-ui/react-dialog", "@radix-ui/react-select"],
+
+      // Feature chunks
+      dashboard: ["./src/components/Dashboard/SiteCard/index.tsx", "./src/components/Dashboard/SiteList/index.tsx"],
+      "site-details": [
+       "./src/components/SiteDetails/SiteDetails.tsx",
+       "./src/components/SiteDetails/tabs/OverviewTab.tsx",
+      ],
+     },
+
+     // Asset naming
+     chunkFileNames: isDev ? "[name].js" : "[name]-[hash].js",
+     entryFileNames: isDev ? "[name].js" : "[name]-[hash].js",
+     assetFileNames: isDev ? "[name].[ext]" : "[name]-[hash].[ext]",
+    },
+   },
+
+   // Terser options for production
+   terserOptions: isProd
+    ? {
+       compress: {
+        drop_console: true,
+        drop_debugger: true,
+        pure_funcs: ["console.log", "console.debug"],
+       },
+       mangle: {
+        safari10: true,
+       },
       }
+    : undefined,
+
+   // Chunk size warnings
+   chunkSizeWarningLimit: 1000,
+  },
+
+  // Development server
+  server: {
+   port: 5173,
+   strictPort: true,
+   open: false, // Electron will handle opening
+   hmr: {
+    port: 5174,
+   },
+  },
+
+  // Environment variables
+  define: {
+   __DEV__: isDev,
+   __VERSION__: JSON.stringify(process.env.npm_package_version),
+   __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+  },
+
+  // CSS options
+  css: {
+   modules: {
+    generateScopedName: isDev ? "[name]__[local]___[hash:base64:5]" : "[hash:base64:5]",
+   },
+   preprocessorOptions: {
+    scss: {
+     additionalData: `@import "@/styles/variables.scss";`,
     },
+   },
+  },
 
-    // Build optimization
-    build: {
-      target: 'ES2022',
-      sourcemap: isDev,
-      minify: isProd ? 'terser' : false,
-      
-      // Rollup options
-      rollupOptions: {
-        output: {
-          // Manual chunks for better caching
-          manualChunks: {
-            // Vendor chunks
-            'react-vendor': ['react', 'react-dom'],
-            'state-vendor': ['zustand'],
-            'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-select'],
-            
-            // Feature chunks
-            'dashboard': [
-              './src/components/Dashboard/SiteCard/index.tsx',
-              './src/components/Dashboard/SiteList/index.tsx'
-            ],
-            'site-details': [
-              './src/components/SiteDetails/SiteDetails.tsx',
-              './src/components/SiteDetails/tabs/OverviewTab.tsx'
-            ]
-          },
-          
-          // Asset naming
-          chunkFileNames: isDev ? '[name].js' : '[name]-[hash].js',
-          entryFileNames: isDev ? '[name].js' : '[name]-[hash].js',
-          assetFileNames: isDev ? '[name].[ext]' : '[name]-[hash].[ext]'
-        }
-      },
-
-      // Terser options for production
-      terserOptions: isProd ? {
-        compress: {
-          drop_console: true,
-          drop_debugger: true,
-          pure_funcs: ['console.log', 'console.debug']
-        },
-        mangle: {
-          safari10: true
-        }
-      } : undefined,
-
-      // Chunk size warnings
-      chunkSizeWarningLimit: 1000
-    },
-
-    // Development server
-    server: {
-      port: 5173,
-      strictPort: true,
-      open: false, // Electron will handle opening
-      hmr: {
-        port: 5174
-      }
-    },
-
-    // Environment variables
-    define: {
-      __DEV__: isDev,
-      __VERSION__: JSON.stringify(process.env.npm_package_version),
-      __BUILD_TIME__: JSON.stringify(new Date().toISOString())
-    },
-
-    // CSS options
-    css: {
-      modules: {
-        generateScopedName: isDev ? '[name]__[local]___[hash:base64:5]' : '[hash:base64:5]'
-      },
-      preprocessorOptions: {
-        scss: {
-          additionalData: `@import "@/styles/variables.scss";`
-        }
-      }
-    },
-
-    // Testing configuration
-    test: {
-      globals: true,
-      environment: 'jsdom',
-      setupFiles: ['./src/test/setup.ts'],
-      coverage: {
-        provider: 'v8',
-        reporter: ['text', 'json', 'html'],
-        exclude: [
-          'node_modules/',
-          'src/test/',
-          '**/*.test.{ts,tsx}',
-          '**/*.spec.{ts,tsx}'
-        ]
-      }
-    }
-  };
+  // Testing configuration
+  test: {
+   globals: true,
+   environment: "jsdom",
+   setupFiles: ["./src/test/setup.ts"],
+   coverage: {
+    provider: "v8",
+    reporter: ["text", "json", "html"],
+    exclude: ["node_modules/", "src/test/", "**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}"],
+   },
+  },
+ };
 });
 ```
 

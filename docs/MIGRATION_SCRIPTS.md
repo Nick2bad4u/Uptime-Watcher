@@ -15,14 +15,14 @@ This document contains practical scripts and tools to automate the refactoring p
 param(
     [Parameter(Mandatory=$true)]
     [string]$SourceFile,
-    
+
     [Parameter(Mandatory=$true)]
     [string]$TargetDirectory,
-    
+
     [switch]$DryRun = $false,
-    
+
     [switch]$CreateTests = $true,
-    
+
     [switch]$UpdateImports = $true
 )
 
@@ -45,21 +45,21 @@ function Extract-Component {
         [string]$ComponentCode,
         [string]$TargetPath
     )
-    
+
     if ($DryRun) {
         Write-Log "DRY RUN: Would create $TargetPath/$ComponentName/" -Level "INFO"
         return
     }
-    
+
     # Create component directory
     $componentDir = Join-Path $TargetPath $ComponentName
     New-Item -ItemType Directory -Path $componentDir -Force | Out-Null
-    
+
     # Create component file
-    $componentFile = Join-Path $componentDir "$ComponentName.tsx" 
+    $componentFile = Join-Path $componentDir "$ComponentName.tsx"
     Set-Content -Path $componentFile -Value $ComponentCode
     Write-Log "Created component: $componentFile" -Level "SUCCESS"
-    
+
     # Create types file
     $typesContent = @"
 import { ReactNode } from 'react';
@@ -73,7 +73,7 @@ export interface ${ComponentName}Props {
     $typesFile = Join-Path $componentDir "$ComponentName.types.ts"
     Set-Content -Path $typesFile -Value $typesContent
     Write-Log "Created types: $typesFile" -Level "SUCCESS"
-    
+
     # Create test file if requested
     if ($CreateTests) {
         $testContent = @"
@@ -85,7 +85,7 @@ describe('$ComponentName', () => {
     render(<$ComponentName data-testid="$($ComponentName.ToLower())" />);
     expect(screen.getByTestId('$($ComponentName.ToLower())')).toBeInTheDocument();
   });
-  
+
   it('applies custom className', () => {
     render(<$ComponentName className="custom-class" data-testid="$($ComponentName.ToLower())" />);
     expect(screen.getByTestId('$($ComponentName.ToLower())')).toHaveClass('custom-class');
@@ -100,25 +100,25 @@ describe('$ComponentName', () => {
 
 function Update-ImportStatements {
     param([string]$ProjectRoot)
-    
+
     if (-not $UpdateImports) {
         Write-Log "Skipping import updates" -Level "INFO"
         return
     }
-    
+
     Write-Log "Updating import statements..." -Level "INFO"
-    
+
     # Find all TypeScript/TSX files
-    $files = Get-ChildItem -Path $ProjectRoot -Recurse -Include "*.ts", "*.tsx" | 
+    $files = Get-ChildItem -Path $ProjectRoot -Recurse -Include "*.ts", "*.tsx" |
               Where-Object { $_.Name -notlike "*.test.*" -and $_.Name -notlike "*.spec.*" }
-    
+
     foreach ($file in $files) {
         $content = Get-Content -Path $file.FullName -Raw
         $originalContent = $content
-        
+
         # Update theme component imports
         $content = $content -replace "from '@/theme/components'", "from '@/theme/components'"
-        
+
         # Add specific component imports
         $content = $content -replace "import { (.+) } from '@/theme/components'", {
             param($match)
@@ -128,7 +128,7 @@ function Update-ImportStatements {
             }
             $newImports -join "`n"
         }
-        
+
         if ($content -ne $originalContent) {
             if (-not $DryRun) {
                 Set-Content -Path $file.FullName -Value $content
@@ -144,28 +144,28 @@ try {
     Write-Log "Source file: $SourceFile" -Level "INFO"
     Write-Log "Target directory: $TargetDirectory" -Level "INFO"
     Write-Log "Dry run: $DryRun" -Level "INFO"
-    
+
     if (-not (Test-Path $SourceFile)) {
         throw "Source file not found: $SourceFile"
     }
-    
+
     # Create target directory
     if (-not $DryRun) {
         New-Item -ItemType Directory -Path $TargetDirectory -Force | Out-Null
     }
-    
+
     # Read source file
     $sourceContent = Get-Content -Path $SourceFile -Raw
-    
+
     # Extract components (simplified - would need actual parsing logic)
     Write-Log "Extracting components from source file..." -Level "INFO"
-    
+
     # Update imports in project
     $projectRoot = Split-Path $SourceFile -Parent | Split-Path -Parent
     Update-ImportStatements -ProjectRoot $projectRoot
-    
+
     Write-Log "Migration completed successfully!" -Level "SUCCESS"
-    
+
 } catch {
     Write-Log "Migration failed: $($_.Exception.Message)" -Level "ERROR"
     exit 1
@@ -188,7 +188,7 @@ function Create-StoreSlice {
         [string]$SliceContent,
         [string]$OutputPath
     )
-    
+
     $sliceTemplate = @"
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
@@ -259,16 +259,16 @@ param(
 
 function Create-ServiceStructure {
     param([string]$BaseDir)
-    
+
     $directories = @(
         "monitoring",
-        "database", 
+        "database",
         "notifications",
         "analytics",
         "http",
         "utils"
     )
-    
+
     foreach ($dir in $directories) {
         $fullPath = Join-Path $BaseDir $dir
         if (-not $DryRun) {
@@ -285,7 +285,7 @@ function Create-ServiceInterface {
         [string]$ServiceName,
         [string]$OutputPath
     )
-    
+
     $interfaceContent = @"
 // ${ServiceName} Service Interface
 export interface I${ServiceName}Service {
@@ -343,18 +343,18 @@ param(
 
 function Measure-FileComplexity {
     param([string]$FilePath)
-    
+
     $content = Get-Content -Path $FilePath -Raw
     $lines = ($content -split "`n").Count
-    
+
     # Simple complexity metrics
     $ifStatements = ([regex]::Matches($content, '\bif\s*\(')).Count
     $forLoops = ([regex]::Matches($content, '\b(for|while)\s*\(')).Count
     $switches = ([regex]::Matches($content, '\bswitch\s*\(')).Count
     $functions = ([regex]::Matches($content, '\b(function|const .* =|.*\(.*\)\s*=>')).Count
-    
+
     $complexity = $ifStatements + $forLoops + $switches + ($functions * 0.5)
-    
+
     return @{
         File = $FilePath
         Lines = $lines
@@ -368,7 +368,7 @@ function Measure-FileComplexity {
 }
 
 # Analyze all TypeScript files
-$files = Get-ChildItem -Path $ProjectPath -Recurse -Include "*.ts", "*.tsx" | 
+$files = Get-ChildItem -Path $ProjectPath -Recurse -Include "*.ts", "*.tsx" |
           Where-Object { $_.Name -notlike "*.test.*" -and $_.Name -notlike "*.spec.*" }
 
 $results = @()
@@ -380,11 +380,11 @@ Write-Host "🔍 Analyzing $totalFiles files..." -ForegroundColor Cyan
 foreach ($file in $files) {
     $current++
     Write-Progress -Activity "Analyzing complexity" -Status "Processing $($file.Name)" -PercentComplete (($current / $totalFiles) * 100)
-    
+
     try {
         $analysis = Measure-FileComplexity -FilePath $file.FullName
         $results += $analysis
-        
+
         if ($analysis.NeedsRefactoring) {
             Write-Host "⚠️  High complexity: $($file.Name) (Complexity: $($analysis.Complexity), Lines: $($analysis.Lines))" -ForegroundColor Yellow
         }
@@ -425,23 +425,23 @@ param(
 
 function Extract-Imports {
     param([string]$FilePath)
-    
+
     $content = Get-Content -Path $FilePath -Raw
-    $imports = [regex]::Matches($content, "import.*from\s+['\"]([^'\"]+)['\"]") | 
+    $imports = [regex]::Matches($content, "import.*from\s+['\"]([^'\"]+)['\"]") |
                ForEach-Object { $_.Groups[1].Value }
-    
+
     return $imports
 }
 
 function Build-DependencyGraph {
     param([array]$Files)
-    
+
     $graph = @{}
-    
+
     foreach ($file in $Files) {
         $relativePath = $file.FullName.Replace($PWD.Path, "").Replace("\", "/").TrimStart("/")
         $imports = Extract-Imports -FilePath $file.FullName
-        
+
         $graph[$relativePath] = @{
             Path = $relativePath
             Size = (Get-Item $file.FullName).Length
@@ -449,12 +449,12 @@ function Build-DependencyGraph {
             ImportCount = $imports.Count
         }
     }
-    
+
     return $graph
 }
 
 # Analyze dependencies
-$files = Get-ChildItem -Path $ProjectPath -Recurse -Include "*.ts", "*.tsx" | 
+$files = Get-ChildItem -Path $ProjectPath -Recurse -Include "*.ts", "*.tsx" |
          Where-Object { $_.Name -notlike "*.test.*" }
 
 Write-Host "🔍 Building dependency graph for $($files.Count) files..." -ForegroundColor Cyan
@@ -508,34 +508,34 @@ param(
 
 function Analyze-Coverage {
     param([string]$CoverageFilePath)
-    
+
     if (-not (Test-Path $CoverageFilePath)) {
         Write-Host "❌ Coverage file not found: $CoverageFilePath" -ForegroundColor Red
         Write-Host "💡 Run 'npm test -- --coverage' first" -ForegroundColor Yellow
         return
     }
-    
+
     $coverageData = Get-Content -Path $CoverageFilePath | ConvertFrom-Json
-    
+
     $results = @()
-    
+
     foreach ($file in $coverageData.PSObject.Properties) {
         $fileData = $file.Value
-        
-        $lineCoverage = if ($fileData.l.total -gt 0) { 
-            ($fileData.l.covered / $fileData.l.total) * 100 
+
+        $lineCoverage = if ($fileData.l.total -gt 0) {
+            ($fileData.l.covered / $fileData.l.total) * 100
         } else { 0 }
-        
-        $branchCoverage = if ($fileData.b.total -gt 0) { 
-            ($fileData.b.covered / $fileData.b.total) * 100 
+
+        $branchCoverage = if ($fileData.b.total -gt 0) {
+            ($fileData.b.covered / $fileData.b.total) * 100
         } else { 0 }
-        
-        $functionCoverage = if ($fileData.f.total -gt 0) { 
-            ($fileData.f.covered / $fileData.f.total) * 100 
+
+        $functionCoverage = if ($fileData.f.total -gt 0) {
+            ($fileData.f.covered / $fileData.f.total) * 100
         } else { 0 }
-        
+
         $overall = ($lineCoverage + $branchCoverage + $functionCoverage) / 3
-        
+
         $results += @{
             File = $file.Name
             LineCoverage = [math]::Round($lineCoverage, 2)
@@ -545,7 +545,7 @@ function Analyze-Coverage {
             NeedsImprovement = $overall -lt $TargetCoverage
         }
     }
-    
+
     return $results
 }
 
@@ -557,12 +557,12 @@ $coverageResults = Analyze-Coverage -CoverageFilePath $CoverageFile
 if ($coverageResults) {
     $lowCoverageFiles = $coverageResults | Where-Object { $_.NeedsImprovement }
     $averageCoverage = ($coverageResults | Measure-Object -Property OverallCoverage -Average).Average
-    
+
     Write-Host "📊 Coverage Analysis Results:" -ForegroundColor Green
     Write-Host "📁 Total files: $($coverageResults.Count)" -ForegroundColor Blue
     Write-Host "📈 Average coverage: $([math]::Round($averageCoverage, 2))%" -ForegroundColor Blue
     Write-Host "⚠️  Files below target ($TargetCoverage%): $($lowCoverageFiles.Count)" -ForegroundColor Yellow
-    
+
     if ($lowCoverageFiles.Count -gt 0) {
         Write-Host "`n🔍 Files needing test improvement:" -ForegroundColor Yellow
         $lowCoverageFiles | Sort-Object OverallCoverage | ForEach-Object {
@@ -589,10 +589,10 @@ param(
 
 function Install-Dependencies {
     Write-Host "📦 Installing refactoring dependencies..." -ForegroundColor Cyan
-    
+
     $packages = @(
         "@reduxjs/toolkit",
-        "react-redux", 
+        "react-redux",
         "@testing-library/react",
         "@testing-library/jest-dom",
         "@testing-library/user-event",
@@ -601,7 +601,7 @@ function Install-Dependencies {
         "eslint",
         "prettier"
     )
-    
+
     foreach ($package in $packages) {
         Write-Host "📥 Installing $package..." -ForegroundColor Blue
         npm install $package --save-dev
@@ -610,15 +610,15 @@ function Install-Dependencies {
 
 function Create-Directories {
     Write-Host "📁 Creating project structure..." -ForegroundColor Cyan
-    
+
     $directories = @(
         "src/store/slices",
-        "src/store/selectors", 
+        "src/store/selectors",
         "src/store/middleware",
         "src/store/api",
         "src/theme/components/base",
         "src/theme/components/form",
-        "src/theme/components/status",  
+        "src/theme/components/status",
         "src/theme/components/layout",
         "src/theme/components/feedback",
         "src/services/monitoring",
@@ -634,7 +634,7 @@ function Create-Directories {
         "electron/types",
         "electron/errors"
     )
-    
+
     foreach ($dir in $directories) {
         New-Item -ItemType Directory -Path $dir -Force | Out-Null
         Write-Host "✅ Created: $dir" -ForegroundColor Green
@@ -643,7 +643,7 @@ function Create-Directories {
 
 function Setup-Linting {
     Write-Host "🔍 Setting up linting configuration..." -ForegroundColor Cyan
-    
+
     $eslintConfig = @{
         extends = @(
             "@typescript-eslint/recommended",
@@ -656,14 +656,14 @@ function Setup-Linting {
             "react-hooks/exhaustive-deps" = "warn"
         }
     }
-    
+
     $eslintConfig | ConvertTo-Json -Depth 3 | Set-Content -Path ".eslintrc.json"
     Write-Host "✅ Created .eslintrc.json" -ForegroundColor Green
 }
 
 function Setup-Testing {
     Write-Host "🧪 Setting up testing configuration..." -ForegroundColor Cyan
-    
+
     $jestConfig = @{
         testEnvironment = "jsdom"
         setupFilesAfterEnv = @("<rootDir>/src/setupTests.ts")
@@ -684,7 +684,7 @@ function Setup-Testing {
             }
         }
     }
-    
+
     $jestConfig | ConvertTo-Json -Depth 3 | Set-Content -Path "jest.config.json"
     Write-Host "✅ Created jest.config.json" -ForegroundColor Green
 }
@@ -714,7 +714,7 @@ Write-Host "   3. Start with theme component extraction using './scripts/migrate
 # 1. Setup refactoring environment
 .\scripts\setup-refactoring.ps1
 
-# 2. Analyze current code complexity  
+# 2. Analyze current code complexity
 .\scripts\analyze-complexity.ps1 -ProjectPath "." -MaxComplexity 10
 
 # 3. Extract theme components

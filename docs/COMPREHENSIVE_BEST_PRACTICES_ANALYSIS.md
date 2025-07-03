@@ -37,32 +37,32 @@ This document provides an exhaustive, file-by-file analysis of the Uptime Watche
 ```typescript
 // Implement IoC container pattern
 class Container {
-  private services = new Map<string, any>();
-  
-  register<T>(key: string, factory: () => T): void {
-    this.services.set(key, factory);
-  }
-  
-  resolve<T>(key: string): T {
-    const factory = this.services.get(key);
-    if (!factory) throw new Error(`Service ${key} not registered`);
-    return factory();
-  }
+ private services = new Map<string, any>();
+
+ register<T>(key: string, factory: () => T): void {
+  this.services.set(key, factory);
+ }
+
+ resolve<T>(key: string): T {
+  const factory = this.services.get(key);
+  if (!factory) throw new Error(`Service ${key} not registered`);
+  return factory();
+ }
 }
 
 // Add structured startup sequence
 class ApplicationBootstrap {
-  constructor(private container: Container) {}
-  
-  async initialize(): Promise<void> {
-    await this.initializeDatabase();
-    await this.initializeServices();
-    await this.setupEventHandlers();
-  }
-  
-  async shutdown(): Promise<void> {
-    // Graceful shutdown logic
-  }
+ constructor(private container: Container) {}
+
+ async initialize(): Promise<void> {
+  await this.initializeDatabase();
+  await this.initializeServices();
+  await this.setupEventHandlers();
+ }
+
+ async shutdown(): Promise<void> {
+  // Graceful shutdown logic
+ }
 }
 ```
 
@@ -110,39 +110,41 @@ class ApplicationBootstrap {
 ```typescript
 // Split into multiple focused services
 interface IUptimeOrchestrator {
-  startMonitoring(siteId: string): Promise<void>;
-  stopMonitoring(siteId: string): Promise<void>;
+ startMonitoring(siteId: string): Promise<void>;
+ stopMonitoring(siteId: string): Promise<void>;
 }
 
 interface IMonitoringScheduler {
-  schedule(monitor: Monitor): void;
-  unschedule(monitorId: string): void;
+ schedule(monitor: Monitor): void;
+ unschedule(monitorId: string): void;
 }
 
 interface ISiteService {
-  createSite(site: Site): Promise<Site>;
-  updateSite(id: string, updates: Partial<Site>): Promise<Site>;
-  deleteSite(id: string): Promise<boolean>;
+ createSite(site: Site): Promise<Site>;
+ updateSite(id: string, updates: Partial<Site>): Promise<Site>;
+ deleteSite(id: string): Promise<boolean>;
 }
 
 interface IMonitoringEngine {
-  checkMonitor(monitor: Monitor): Promise<MonitorResult>;
+ checkMonitor(monitor: Monitor): Promise<MonitorResult>;
 }
 
 // Use Command Pattern for operations
 abstract class Command {
-  abstract execute(): Promise<void>;
+ abstract execute(): Promise<void>;
 }
 
 class StartMonitoringCommand extends Command {
-  constructor(
-    private orchestrator: IUptimeOrchestrator,
-    private siteId: string
-  ) { super(); }
-  
-  async execute(): Promise<void> {
-    await this.orchestrator.startMonitoring(this.siteId);
-  }
+ constructor(
+  private orchestrator: IUptimeOrchestrator,
+  private siteId: string
+ ) {
+  super();
+ }
+
+ async execute(): Promise<void> {
+  await this.orchestrator.startMonitoring(this.siteId);
+ }
 }
 ```
 
@@ -169,29 +171,29 @@ class StartMonitoringCommand extends Command {
 ```typescript
 // Replace singleton with proper DI
 interface IDatabaseService {
-  getConnection(): Promise<Connection>;
-  migrate(): Promise<void>;
-  healthCheck(): Promise<boolean>;
+ getConnection(): Promise<Connection>;
+ migrate(): Promise<void>;
+ healthCheck(): Promise<boolean>;
 }
 
 class DatabaseService implements IDatabaseService {
-  constructor(
-    private config: DatabaseConfig,
-    private migrationService: IMigrationService
-  ) {}
+ constructor(
+  private config: DatabaseConfig,
+  private migrationService: IMigrationService
+ ) {}
 }
 
 // Add query builder
 interface IQueryBuilder {
-  select(columns: string[]): IQueryBuilder;
-  from(table: string): IQueryBuilder;
-  where(condition: string, value: any): IQueryBuilder;
-  build(): { query: string; params: any[] };
+ select(columns: string[]): IQueryBuilder;
+ from(table: string): IQueryBuilder;
+ where(condition: string, value: any): IQueryBuilder;
+ build(): { query: string; params: any[] };
 }
 
 // Add transaction support
 interface ITransactionContext {
-  execute<T>(fn: (tx: Transaction) => Promise<T>): Promise<T>;
+ execute<T>(fn: (tx: Transaction) => Promise<T>): Promise<T>;
 }
 ```
 
@@ -215,26 +217,24 @@ interface ITransactionContext {
 ```typescript
 // Base repository with common patterns
 abstract class BaseRepository<T, TId> {
-  constructor(protected db: IDatabaseService) {}
-  
-  abstract findById(id: TId): Promise<T | null>;
-  abstract create(entity: Omit<T, 'id'>): Promise<T>;
-  abstract update(id: TId, updates: Partial<T>): Promise<T>;
-  abstract delete(id: TId): Promise<boolean>;
-  
-  protected async withTransaction<R>(
-    fn: (tx: Transaction) => Promise<R>
-  ): Promise<R> {
-    return await this.db.transaction(fn);
-  }
+ constructor(protected db: IDatabaseService) {}
+
+ abstract findById(id: TId): Promise<T | null>;
+ abstract create(entity: Omit<T, "id">): Promise<T>;
+ abstract update(id: TId, updates: Partial<T>): Promise<T>;
+ abstract delete(id: TId): Promise<boolean>;
+
+ protected async withTransaction<R>(fn: (tx: Transaction) => Promise<R>): Promise<R> {
+  return await this.db.transaction(fn);
+ }
 }
 
 // Unit of Work pattern
 interface IUnitOfWork {
-  sites: ISiteRepository;
-  monitors: IMonitorRepository;
-  commit(): Promise<void>;
-  rollback(): Promise<void>;
+ sites: ISiteRepository;
+ monitors: IMonitorRepository;
+ commit(): Promise<void>;
+ rollback(): Promise<void>;
 }
 ```
 
@@ -258,21 +258,21 @@ interface IUnitOfWork {
 
 ```typescript
 interface IHttpMonitorConfig {
-  timeout: number;
-  userAgent: string;
-  retryPolicy: RetryPolicy;
-  metrics: IMetricsCollector;
+ timeout: number;
+ userAgent: string;
+ retryPolicy: RetryPolicy;
+ metrics: IMetricsCollector;
 }
 
 interface RetryPolicy {
-  maxAttempts: number;
-  backoffStrategy: 'linear' | 'exponential';
-  initialDelay: number;
+ maxAttempts: number;
+ backoffStrategy: "linear" | "exponential";
+ initialDelay: number;
 }
 
 interface IMetricsCollector {
-  recordCheckDuration(monitorId: string, duration: number): void;
-  recordCheckResult(monitorId: string, result: CheckResult): void;
+ recordCheckDuration(monitorId: string, duration: number): void;
+ recordCheckResult(monitorId: string, result: CheckResult): void;
 }
 ```
 
@@ -294,21 +294,19 @@ interface IMetricsCollector {
 
 ```typescript
 interface ISchedulerStrategy {
-  schedule(monitor: Monitor): void;
-  unschedule(monitorId: string): void;
-  getQueueStatus(): QueueStatus;
+ schedule(monitor: Monitor): void;
+ unschedule(monitorId: string): void;
+ getQueueStatus(): QueueStatus;
 }
 
 class PriorityScheduler implements ISchedulerStrategy {
-  private highPriorityQueue = new Map<string, ScheduledMonitor>();
-  private normalPriorityQueue = new Map<string, ScheduledMonitor>();
-  
-  schedule(monitor: Monitor): void {
-    const queue = monitor.priority === 'high' 
-      ? this.highPriorityQueue 
-      : this.normalPriorityQueue;
-    // Implementation
-  }
+ private highPriorityQueue = new Map<string, ScheduledMonitor>();
+ private normalPriorityQueue = new Map<string, ScheduledMonitor>();
+
+ schedule(monitor: Monitor): void {
+  const queue = monitor.priority === "high" ? this.highPriorityQueue : this.normalPriorityQueue;
+  // Implementation
+ }
 }
 ```
 
@@ -332,31 +330,31 @@ class PriorityScheduler implements ISchedulerStrategy {
 
 ```typescript
 interface IIpcMiddleware {
-  handle(request: IpcRequest, next: () => Promise<any>): Promise<any>;
+ handle(request: IpcRequest, next: () => Promise<any>): Promise<any>;
 }
 
 class ValidationMiddleware implements IIpcMiddleware {
-  async handle(request: IpcRequest, next: () => Promise<any>): Promise<any> {
-    this.validateRequest(request);
-    return await next();
-  }
+ async handle(request: IpcRequest, next: () => Promise<any>): Promise<any> {
+  this.validateRequest(request);
+  return await next();
+ }
 }
 
 class RateLimitMiddleware implements IIpcMiddleware {
-  async handle(request: IpcRequest, next: () => Promise<any>): Promise<any> {
-    if (!this.checkRateLimit(request.channel)) {
-      throw new Error('Rate limit exceeded');
-    }
-    return await next();
+ async handle(request: IpcRequest, next: () => Promise<any>): Promise<any> {
+  if (!this.checkRateLimit(request.channel)) {
+   throw new Error("Rate limit exceeded");
   }
+  return await next();
+ }
 }
 
 class IpcService {
-  private middlewares: IIpcMiddleware[] = [];
-  
-  use(middleware: IIpcMiddleware): void {
-    this.middlewares.push(middleware);
-  }
+ private middlewares: IIpcMiddleware[] = [];
+
+ use(middleware: IIpcMiddleware): void {
+  this.middlewares.push(middleware);
+ }
 }
 ```
 
@@ -388,42 +386,42 @@ class IpcService {
 ```typescript
 // Split into domain-specific stores
 interface ISiteStore {
-  sites: Site[];
-  selectedSite: Site | null;
-  // Site-specific actions
+ sites: Site[];
+ selectedSite: Site | null;
+ // Site-specific actions
 }
 
 interface IUIStore {
-  modals: ModalState;
-  loading: LoadingState;
-  errors: ErrorState;
-  // UI-specific actions
+ modals: ModalState;
+ loading: LoadingState;
+ errors: ErrorState;
+ // UI-specific actions
 }
 
 interface ISettingsStore {
-  preferences: UserPreferences;
-  // Settings-specific actions
+ preferences: UserPreferences;
+ // Settings-specific actions
 }
 
 // Implement state normalization
 interface INormalizedState {
-  sites: {
-    byId: Record<string, Site>;
-    allIds: string[];
-  };
-  monitors: {
-    byId: Record<string, Monitor>;
-    bySiteId: Record<string, string[]>;
-  };
+ sites: {
+  byId: Record<string, Site>;
+  allIds: string[];
+ };
+ monitors: {
+  byId: Record<string, Monitor>;
+  bySiteId: Record<string, string[]>;
+ };
 }
 
 // Add middleware for cross-cutting concerns
 const errorMiddleware: StateCreator<AppState> = (set, get) => ({
-  // Error handling middleware
+ // Error handling middleware
 });
 
 const optimisticUpdateMiddleware: StateCreator<AppState> = (set, get) => ({
-  // Optimistic update logic
+ // Optimistic update logic
 });
 ```
 
@@ -449,37 +447,37 @@ const optimisticUpdateMiddleware: StateCreator<AppState> = (set, get) => ({
 ```tsx
 // Implement Error Boundaries
 class ErrorBoundary extends Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
+ constructor(props: Props) {
+  super(props);
+  this.state = { hasError: false, error: null };
+ }
 
-  static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error };
-  }
+ static getDerivedStateFromError(error: Error): State {
+  return { hasError: true, error };
+ }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // Log error to monitoring service
-    errorReporter.captureException(error, errorInfo);
-  }
+ componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  // Log error to monitoring service
+  errorReporter.captureException(error, errorInfo);
+ }
 
-  render() {
-    if (this.state.hasError) {
-      return <ErrorFallback error={this.state.error} />;
-    }
-    return this.props.children;
+ render() {
+  if (this.state.hasError) {
+   return <ErrorFallback error={this.state.error} />;
   }
+  return this.props.children;
+ }
 }
 
 // Split App into smaller components
 const AppLayout: React.FC = () => (
-  <ErrorBoundary>
-    <Suspense fallback={<AppLoadingSpinner />}>
-      <Header />
-      <MainContent />
-      <GlobalModals />
-    </Suspense>
-  </ErrorBoundary>
+ <ErrorBoundary>
+  <Suspense fallback={<AppLoadingSpinner />}>
+   <Header />
+   <MainContent />
+   <GlobalModals />
+  </Suspense>
+ </ErrorBoundary>
 );
 ```
 
@@ -527,37 +525,37 @@ src/
 ```typescript
 // Standardize hook patterns
 interface UseAsyncResult<T> {
-  data: T | null;
-  loading: boolean;
-  error: Error | null;
-  refetch: () => Promise<void>;
+ data: T | null;
+ loading: boolean;
+ error: Error | null;
+ refetch: () => Promise<void>;
 }
 
 const useAsyncOperation = <T>(
-  operation: () => Promise<T>,
-  options?: {
-    onSuccess?: (data: T) => void;
-    onError?: (error: Error) => void;
-    retry?: boolean;
-  }
+ operation: () => Promise<T>,
+ options?: {
+  onSuccess?: (data: T) => void;
+  onError?: (error: Error) => void;
+  retry?: boolean;
+ }
 ): UseAsyncResult<T> => {
-  // Standardized async hook implementation
+ // Standardized async hook implementation
 };
 
 // Implement optimistic updates
 const useOptimisticSites = () => {
-  const [optimisticSites, setOptimistic] = useState<Site[]>([]);
-  const [actualSites, setActual] = useState<Site[]>([]);
-  
-  const addSiteOptimistically = (site: Site) => {
-    setOptimistic(prev => [...prev, site]);
-    // Make API call and update actual state
-  };
-  
-  return {
-    sites: optimisticSites.length > 0 ? optimisticSites : actualSites,
-    addSite: addSiteOptimistically
-  };
+ const [optimisticSites, setOptimistic] = useState<Site[]>([]);
+ const [actualSites, setActual] = useState<Site[]>([]);
+
+ const addSiteOptimistically = (site: Site) => {
+  setOptimistic((prev) => [...prev, site]);
+  // Make API call and update actual state
+ };
+
+ return {
+  sites: optimisticSites.length > 0 ? optimisticSites : actualSites,
+  addSite: addSiteOptimistically,
+ };
 };
 ```
 
@@ -642,46 +640,46 @@ const AddSiteForm: React.FC = () => {
 ```typescript
 // Implement design tokens
 const designTokens = {
-  spacing: {
-    xs: '4px',
-    sm: '8px',
-    md: '16px',
-    lg: '24px',
-    xl: '32px',
+ spacing: {
+  xs: "4px",
+  sm: "8px",
+  md: "16px",
+  lg: "24px",
+  xl: "32px",
+ },
+ breakpoints: {
+  mobile: "480px",
+  tablet: "768px",
+  desktop: "1024px",
+  wide: "1200px",
+ },
+ typography: {
+  scale: {
+   xs: "0.75rem",
+   sm: "0.875rem",
+   base: "1rem",
+   lg: "1.125rem",
+   xl: "1.25rem",
   },
-  breakpoints: {
-    mobile: '480px',
-    tablet: '768px',
-    desktop: '1024px',
-    wide: '1200px',
-  },
-  typography: {
-    scale: {
-      xs: '0.75rem',
-      sm: '0.875rem',
-      base: '1rem',
-      lg: '1.125rem',
-      xl: '1.25rem',
-    }
-  }
+ },
 } as const;
 
 // Add responsive utilities
 const useBreakpoint = () => {
-  const [breakpoint, setBreakpoint] = useState<keyof typeof designTokens.breakpoints>('mobile');
-  
-  useEffect(() => {
-    const updateBreakpoint = () => {
-      // Logic to determine current breakpoint
-    };
-    
-    window.addEventListener('resize', updateBreakpoint);
-    updateBreakpoint();
-    
-    return () => window.removeEventListener('resize', updateBreakpoint);
-  }, []);
-  
-  return breakpoint;
+ const [breakpoint, setBreakpoint] = useState<keyof typeof designTokens.breakpoints>("mobile");
+
+ useEffect(() => {
+  const updateBreakpoint = () => {
+   // Logic to determine current breakpoint
+  };
+
+  window.addEventListener("resize", updateBreakpoint);
+  updateBreakpoint();
+
+  return () => window.removeEventListener("resize", updateBreakpoint);
+ }, []);
+
+ return breakpoint;
 };
 ```
 
@@ -708,17 +706,14 @@ const useBreakpoint = () => {
 
 ```json
 {
-  "compilerOptions": {
-    "composite": true,
-    "declaration": true,
-    "declarationMap": true,
-    "incremental": true,
-    "tsBuildInfoFile": ".tsbuildinfo"
-  },
-  "references": [
-    { "path": "./src" },
-    { "path": "./electron" }
-  ]
+ "compilerOptions": {
+  "composite": true,
+  "declaration": true,
+  "declarationMap": true,
+  "incremental": true,
+  "tsBuildInfoFile": ".tsbuildinfo"
+ },
+ "references": [{ "path": "./src" }, { "path": "./electron" }]
 }
 ```
 
@@ -833,7 +828,7 @@ class ErrorHandler {
       this.handleUnknownError(error);
     }
   }
-  
+
   private static handleAppError(error: AppError): void {
     // Log to monitoring service
     // Show user-friendly message
@@ -874,35 +869,35 @@ const GlobalErrorBoundary: React.FC<{ children: React.ReactNode }> = ({ children
 
 ```typescript
 interface ILogger {
-  debug(message: string, context?: Record<string, any>): void;
-  info(message: string, context?: Record<string, any>): void;
-  warn(message: string, context?: Record<string, any>): void;
-  error(message: string, error?: Error, context?: Record<string, any>): void;
+ debug(message: string, context?: Record<string, any>): void;
+ info(message: string, context?: Record<string, any>): void;
+ warn(message: string, context?: Record<string, any>): void;
+ error(message: string, error?: Error, context?: Record<string, any>): void;
 }
 
 class StructuredLogger implements ILogger {
-  constructor(
-    private serviceName: string,
-    private correlationId: string
-  ) {}
-  
-  info(message: string, context: Record<string, any> = {}): void {
-    const logEntry = {
-      timestamp: new Date().toISOString(),
-      level: 'INFO',
-      service: this.serviceName,
-      correlationId: this.correlationId,
-      message,
-      ...context
-    };
-    
-    console.log(JSON.stringify(logEntry));
-    
-    // Also send to external logging service in production
-    if (process.env.NODE_ENV === 'production') {
-      this.sendToExternalLogger(logEntry);
-    }
+ constructor(
+  private serviceName: string,
+  private correlationId: string
+ ) {}
+
+ info(message: string, context: Record<string, any> = {}): void {
+  const logEntry = {
+   timestamp: new Date().toISOString(),
+   level: "INFO",
+   service: this.serviceName,
+   correlationId: this.correlationId,
+   message,
+   ...context,
+  };
+
+  console.log(JSON.stringify(logEntry));
+
+  // Also send to external logging service in production
+  if (process.env.NODE_ENV === "production") {
+   this.sendToExternalLogger(logEntry);
   }
+ }
 }
 ```
 
@@ -919,40 +914,40 @@ class StructuredLogger implements ILogger {
 
 ```typescript
 // Implement testing pyramid
-describe('SiteService Integration Tests', () => {
-  let service: SiteService;
-  let testDb: Database;
-  
-  beforeEach(async () => {
-    testDb = await setupTestDatabase();
-    service = new SiteService(testDb);
+describe("SiteService Integration Tests", () => {
+ let service: SiteService;
+ let testDb: Database;
+
+ beforeEach(async () => {
+  testDb = await setupTestDatabase();
+  service = new SiteService(testDb);
+ });
+
+ afterEach(async () => {
+  await cleanupTestDatabase(testDb);
+ });
+
+ it("should create site with monitors", async () => {
+  const site = await service.createSite({
+   name: "Test Site",
+   monitors: [{ type: "http", url: "https://example.com" }],
   });
-  
-  afterEach(async () => {
-    await cleanupTestDatabase(testDb);
-  });
-  
-  it('should create site with monitors', async () => {
-    const site = await service.createSite({
-      name: 'Test Site',
-      monitors: [{ type: 'http', url: 'https://example.com' }]
-    });
-    
-    expect(site.monitors).toHaveLength(1);
-    expect(site.monitors[0].type).toBe('http');
-  });
+
+  expect(site.monitors).toHaveLength(1);
+  expect(site.monitors[0].type).toBe("http");
+ });
 });
 
 // Add E2E tests with Playwright
 // tests/e2e/site-management.spec.ts
-test('user can create and monitor a site', async ({ page }) => {
-  await page.goto('/');
-  await page.click('[data-testid="add-site-button"]');
-  await page.fill('[data-testid="site-name-input"]', 'Test Site');
-  await page.fill('[data-testid="site-url-input"]', 'https://example.com');
-  await page.click('[data-testid="submit-button"]');
-  
-  await expect(page.locator('[data-testid="site-card"]')).toContainText('Test Site');
+test("user can create and monitor a site", async ({ page }) => {
+ await page.goto("/");
+ await page.click('[data-testid="add-site-button"]');
+ await page.fill('[data-testid="site-name-input"]', "Test Site");
+ await page.fill('[data-testid="site-url-input"]', "https://example.com");
+ await page.click('[data-testid="submit-button"]');
+
+ await expect(page.locator('[data-testid="site-card"]')).toContainText("Test Site");
 });
 ```
 
@@ -973,7 +968,7 @@ const SiteCard = React.memo<SiteCardProps>(({ site, onUpdate }) => {
   const handleUpdate = useCallback((updates: Partial<Site>) => {
     onUpdate(site.id, updates);
   }, [site.id, onUpdate]);
-  
+
   return (
     <Card>
       {/* Component content */}
@@ -997,7 +992,7 @@ const SiteList: React.FC<{ sites: Site[] }> = ({ sites }) => {
       <SiteCard site={sites[index]} />
     </div>
   );
-  
+
   return (
     <List
       height={600}

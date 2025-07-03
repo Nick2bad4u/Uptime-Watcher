@@ -11,11 +11,9 @@ This document summarizes the successful refactoring of core logic from the `Upti
 - **File:** `electron/utils/monitoring/monitoringStarter.ts`
   - `startAllMonitoring()` - Starts monitoring for all sites
   - `startMonitoringForSite()` - Starts monitoring for a specific site
-  
 - **File:** `electron/utils/monitoring/monitoringStopper.ts`
   - `stopAllMonitoring()` - Stops all monitoring
   - `stopMonitoringForSite()` - Stops monitoring for a specific site
-  
 - **File:** `electron/utils/monitoring/monitorStatusChecker.ts`
   - `checkMonitor()` - Performs monitor checks
   - `checkSiteManually()` - Manual site checking
@@ -39,10 +37,10 @@ All utility functions accept dependencies as parameters instead of accessing the
 
 ```typescript
 interface SiteUpdateDependencies {
-    monitorRepository: MonitorRepository;
-    siteRepository: SiteRepository;
-    sites: Map<string, Site>;
-    logger: typeof logger;
+ monitorRepository: MonitorRepository;
+ siteRepository: SiteRepository;
+ sites: Map<string, Site>;
+ logger: typeof logger;
 }
 ```
 
@@ -52,8 +50,8 @@ To maintain testability and support mocking, recursive operations use callback f
 
 ```typescript
 interface SiteUpdateCallbacks {
-    stopMonitoringForSite: (identifier: string, monitorId?: string) => Promise<boolean>;
-    startMonitoringForSite: (identifier: string, monitorId?: string) => Promise<boolean>;
+ stopMonitoringForSite: (identifier: string, monitorId?: string) => Promise<boolean>;
+ startMonitoringForSite: (identifier: string, monitorId?: string) => Promise<boolean>;
 }
 ```
 
