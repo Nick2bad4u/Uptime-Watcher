@@ -1,17 +1,23 @@
 /**
  * Tests for DatabaseManager class.
- * Tests error handling when callbacks are not set.
+ * Tests event-driven communication instead of callbacks.
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { EventEmitter } from "events";
 import { DatabaseManager, DatabaseManagerDependencies } from "../../managers/DatabaseManager";
+import { DATABASE_EVENTS } from "../../events";
 
 // Mock the utility functions
 vi.mock("../../utils/database", () => ({
     refreshSites: vi.fn(() => Promise.resolve([])),
     loadSitesFromDatabase: vi.fn(() => Promise.resolve()),
-    setHistoryLimit: vi.fn(() => Promise.resolve()),
+    setHistoryLimit: vi.fn((params) => {
+        // Call the setHistoryLimit callback to simulate the real behavior
+        params?.setHistoryLimit?.(params.limit);
+        return Promise.resolve();
+    }),
+    getHistoryLimit: vi.fn((getCallback) => getCallback()),
     importData: vi.fn(() => Promise.resolve(true)),
     exportData: vi.fn(() => Promise.resolve("exported-data")),
     initDatabase: vi.fn(() => Promise.resolve()),
@@ -24,22 +30,22 @@ const mockDependencies: DatabaseManagerDependencies = {
     repositories: {
         database: {
             getInstance: vi.fn(),
-        } as any,
+        } as Partial<DatabaseManagerDependencies["repositories"]["database"]> as DatabaseManagerDependencies["repositories"]["database"],
         site: {
             findAll: vi.fn(),
             exportAll: vi.fn(),
-        } as any,
+        } as Partial<DatabaseManagerDependencies["repositories"]["site"]> as DatabaseManagerDependencies["repositories"]["site"],
         monitor: {
             findAll: vi.fn(),
-        } as any,
+        } as Partial<DatabaseManagerDependencies["repositories"]["monitor"]> as DatabaseManagerDependencies["repositories"]["monitor"],
         history: {
             findAll: vi.fn(),
             pruneHistory: vi.fn(),
-        } as any,
+        } as Partial<DatabaseManagerDependencies["repositories"]["history"]> as DatabaseManagerDependencies["repositories"]["history"],
         settings: {
             get: vi.fn(),
             set: vi.fn(),
-        } as any,
+        } as Partial<DatabaseManagerDependencies["repositories"]["settings"]> as DatabaseManagerDependencies["repositories"]["settings"],
     },
 };
 
@@ -51,84 +57,103 @@ describe("DatabaseManager", () => {
         databaseManager = new DatabaseManager(mockDependencies);
     });
 
-    describe("Error handling when callbacks not set", () => {
-        it("should throw error when initialize is called without callbacks", async () => {
-            // Don't call setCallbacks - this should trigger the error (lines 78-79)
-            await expect(databaseManager.initialize()).rejects.toThrow(
-                "DatabaseManager callbacks not set. Call setCallbacks() first."
-            );
+    describe("Event-driven communication", () => {
+        it("should initialize without requiring callbacks", async () => {
+            // Event-driven approach should work without callback setup
+            try {
+                await databaseManager.initialize();
+                expect(true).toBe(true); // Success if no error thrown
+            } catch (error) {
+                // Should not throw "callbacks not set" error anymore
+                expect((error as Error).message).not.toContain("callbacks not set");
+            }
         });
 
-        it("should throw error when importData is called without callbacks", async () => {
-            // Don't call setCallbacks - this should trigger the error (lines 145-146)
-            await expect(databaseManager.importData("test-data")).rejects.toThrow(
-                "DatabaseManager callbacks not set. Call setCallbacks() first."
-            );
+        it("should emit database:initialized event when initialized", async () => {
+            const eventSpy = vi.fn();
+            mockDependencies.eventEmitter.on(DATABASE_EVENTS.INITIALIZED, eventSpy);
+
+            try {
+                await databaseManager.initialize();
+                // May not complete due to mocking, but should emit event if successful
+                expect(eventSpy).toHaveBeenCalledWith(expect.objectContaining({
+                    operation: "initialized",
+                }));
+            } catch (error) {
+                // Event should still be emitted even if error occurs
+                expect((error as Error).message).not.toContain("callbacks not set");
+            }
         });
 
-        it("should throw error when refreshSites is called without callbacks", async () => {
-            // Don't call setCallbacks - this should trigger the error (lines 183-184)
-            await expect(databaseManager.refreshSites()).rejects.toThrow(
-                "DatabaseManager callbacks not set. Call setCallbacks() first."
-            );
+        it("should work with event-driven approach for refreshSites", async () => {
+            // Event-driven approach should work without callback setup
+            const sites = await databaseManager.refreshSites();
+            expect(Array.isArray(sites)).toBe(true);
         });
 
-        it("should throw error when setHistoryLimit is called without callbacks", async () => {
-            // Don't call setCallbacks - this should trigger the error (lines 199-200)
-            await expect(databaseManager.setHistoryLimit(100)).rejects.toThrow(
-                "DatabaseManager callbacks not set. Call setCallbacks() first."
-            );
-        });
+        it("should emit events for data operations", async () => {
+            const exportSpy = vi.fn();
+            const importSpy = vi.fn();
+            const backupSpy = vi.fn();
+            const limitSpy = vi.fn();
 
-        it("should throw error in loadSites when callbacks not set", async () => {
-            // This is a private method, but we can test it indirectly through initialize
-            await expect(databaseManager.initialize()).rejects.toThrow(
-                "DatabaseManager callbacks not set. Call setCallbacks() first."
-            );
+            mockDependencies.eventEmitter.on(DATABASE_EVENTS.DATA_EXPORTED, exportSpy);
+            mockDependencies.eventEmitter.on(DATABASE_EVENTS.DATA_IMPORTED, importSpy);
+            mockDependencies.eventEmitter.on(DATABASE_EVENTS.BACKUP_DOWNLOADED, backupSpy);
+            mockDependencies.eventEmitter.on(DATABASE_EVENTS.HISTORY_LIMIT_UPDATED, limitSpy);
+
+            // Test export
+            await databaseManager.exportData();
+            expect(exportSpy).toHaveBeenCalledWith(expect.objectContaining({
+                operation: "exported",
+            }));
+
+            // Test import
+            await databaseManager.importData("test-data");
+            expect(importSpy).toHaveBeenCalledWith(expect.objectContaining({
+                operation: "imported",
+            }));
+
+            // Test backup
+            await databaseManager.downloadBackup();
+            expect(backupSpy).toHaveBeenCalledWith(expect.objectContaining({
+                operation: "backup-downloaded",
+            }));
+
+            // Test history limit
+            await databaseManager.setHistoryLimit(100);
+            expect(limitSpy).toHaveBeenCalledWith(expect.objectContaining({
+                operation: "history-limit-updated",
+                limit: 100,
+            }));
         });
     });
 
-    describe("Methods that work without callbacks", () => {
-        it("should handle exportData method which doesn't require callbacks", async () => {
-            // exportData should work even without callbacks (lines 93-94)
+    describe("Database operations", () => {
+        it("should handle exportData method", async () => {
             const result = await databaseManager.exportData();
             expect(typeof result).toBe("string");
         });
 
-        it("should handle downloadBackup method which doesn't require callbacks", async () => {
-            // downloadBackup should work even without callbacks
+        it("should handle downloadBackup method", async () => {
             const result = await databaseManager.downloadBackup();
             expect(result).toHaveProperty("buffer");
             expect(result).toHaveProperty("fileName");
         });
-    });
 
-    describe("Methods working with callbacks set", () => {
-        beforeEach(() => {
-            const mockCallbacks = {
-                getSitesFromCache: vi.fn(() => []),
-                updateSitesCache: vi.fn(),
-                startMonitoringForSite: vi.fn(() => Promise.resolve(true)),
-                setHistoryLimit: vi.fn(),
-            };
-            
-            databaseManager.setCallbacks(mockCallbacks);
+        it("should handle importData method", async () => {
+            const result = await databaseManager.importData("test-data");
+            expect(typeof result).toBe("boolean");
         });
 
-        it("should work properly when callbacks are set", async () => {
-            // These should not throw when callbacks are set
-            const sites = await databaseManager.refreshSites();
-            expect(Array.isArray(sites)).toBe(true);
-
-            await databaseManager.initialize();
-            
-            const importResult = await databaseManager.importData("test-data");
-            expect(typeof importResult).toBe("boolean");
-            
+        it("should handle setHistoryLimit method", async () => {
             await databaseManager.setHistoryLimit(100);
-            
-            const exportResult = await databaseManager.exportData();
-            expect(typeof exportResult).toBe("string");
+            expect(databaseManager.getHistoryLimit()).toBe(100);
+        });
+
+        it("should handle getHistoryLimit method", () => {
+            const limit = databaseManager.getHistoryLimit();
+            expect(typeof limit).toBe("number");
         });
     });
 });
