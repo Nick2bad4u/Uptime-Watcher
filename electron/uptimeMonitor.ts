@@ -23,8 +23,8 @@ import {
 import { MonitorFactory, MonitorScheduler } from "./services/monitoring";
 import { Site, StatusHistory, StatusUpdate } from "./types";
 import { isDev } from "./utils";
+import { initDatabase } from "./utils/database/databaseInitializer";
 import { monitorLogger as logger } from "./utils/logger";
-import { withDbRetry } from "./utils/retry";
 
 /**
  * Type for imported site data structure.
@@ -96,17 +96,7 @@ export class UptimeMonitor extends EventEmitter {
      * Initialize the database and load sites. Must be called after construction.
      */
     public async initialize(): Promise<void> {
-        await this.initDatabase();
-    }
-
-    private async initDatabase() {
-        try {
-            await this.databaseService.initialize();
-            await withDbRetry(() => this.loadSites(), "loadSites");
-        } catch (error) {
-            logger.error("Failed to initialize database", error);
-            this.emit("db-error", { error, operation: "initDatabase" });
-        }
+        await initDatabase(this.databaseService, () => this.loadSites(), this);
     }
 
     private async loadSites() {
