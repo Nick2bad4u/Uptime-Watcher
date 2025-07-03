@@ -18,7 +18,7 @@ interface SetHistoryLimitParams {
      * The limit to set
      */
     limit: number;
-    
+
     /**
      * Repository instances
      */
@@ -26,12 +26,12 @@ interface SetHistoryLimitParams {
         settings: SettingsRepository;
         history: HistoryRepository;
     };
-    
+
     /**
      * Callback to update the internal history limit
      */
     setHistoryLimit: (limit: number) => void;
-    
+
     /**
      * Logger instance
      */
@@ -45,20 +45,20 @@ interface SetHistoryLimitParams {
  */
 export async function setHistoryLimit(params: SetHistoryLimitParams): Promise<void> {
     const { limit, logger, repositories, setHistoryLimit } = params;
-    
+
     // Determine the appropriate limit value
     const finalLimit = limit <= 0 ? 0 : Math.max(10, limit);
-    
+
     // Update the internal limit
     setHistoryLimit(finalLimit);
-    
+
     // Save to settings using repository
     await repositories.settings.set("historyLimit", finalLimit.toString());
-    
+
     if (logger) {
         logger.debug(`History limit set to ${finalLimit}`);
     }
-    
+
     // Prune history for all monitors using repository if limit > 0
     if (finalLimit > 0) {
         await repositories.history.pruneAllHistory(finalLimit);
