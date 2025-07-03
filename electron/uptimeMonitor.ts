@@ -26,6 +26,7 @@ import { addSiteToDatabase } from "./utils/database/siteAdder";
 import { removeSiteFromDatabase } from "./utils/database/siteRemover";
 import { getSitesFromDatabase } from "./utils/database/sitesGetter";
 import { loadSitesFromDatabase } from "./utils/database/sitesLoader";
+import { updateSite, SiteUpdateDependencies, SiteUpdateCallbacks } from "./utils/database/siteUpdater";
 import { monitorLogger as logger } from "./utils/logger";
 import { autoStartMonitoring } from "./utils/monitoring/autoStarter";
 import { setDefaultMonitorIntervals } from "./utils/monitoring/intervalSetter";
@@ -300,134 +301,19 @@ export class UptimeMonitor extends EventEmitter {
     }
 
     public async updateSite(identifier: string, updates: Partial<Site>): Promise<Site> {
-        const site = this.validateUpdateSiteInput(identifier);
-        const updatedSite = this.createUpdatedSite(site, updates);
-
-        await this.siteRepository.upsert(updatedSite);
-
-        if (updates.monitors) {
-            await this.updateSiteMonitors(identifier, updates.monitors);
-            await this.handleMonitorIntervalChanges(identifier, site, updates.monitors);
-        }
-
-        return updatedSite;
-    }
-
-    /**
-     * Validate input parameters for updateSite operation.
-     */
-    private validateUpdateSiteInput(identifier: string): Site {
-        if (!identifier) {
-            throw new Error("Site identifier is required");
-        }
-
-        const site = this.sites.get(identifier);
-        if (!site) {
-            throw new Error(`Site not found: ${identifier}`);
-        }
-
-        return site;
-    }
-
-    /**
-     * Create updated site object with new values.
-     */
-    private createUpdatedSite(site: Site, updates: Partial<Site>): Site {
-        const updatedSite: Site = {
-            ...site,
-            ...updates,
-            monitors: updates.monitors || site.monitors,
+        const dependencies: SiteUpdateDependencies = {
+            logger,
+            monitorRepository: this.monitorRepository,
+            siteRepository: this.siteRepository,
+            sites: this.sites,
         };
-        this.sites.set(site.identifier, updatedSite);
-        return updatedSite;
-    }
 
-    /**
-     * Update monitors in the database for a site.
-     */
-    private async updateSiteMonitors(identifier: string, newMonitors: Site["monitors"]): Promise<void> {
-        const dbMonitors = await this.monitorRepository.findBySiteIdentifier(identifier);
+        const callbacks: SiteUpdateCallbacks = {
+            startMonitoringForSite: (id, monitorId) => this.startMonitoringForSite(id, monitorId),
+            stopMonitoringForSite: (id, monitorId) => this.stopMonitoringForSite(id, monitorId),
+        };
 
-        await this.deleteObsoleteMonitors(dbMonitors, newMonitors);
-        await this.upsertSiteMonitors(identifier, newMonitors);
-    }
-
-    /**
-     * Delete monitors that are no longer in the updated monitors array.
-     */
-    private async deleteObsoleteMonitors(dbMonitors: Site["monitors"], newMonitors: Site["monitors"]): Promise<void> {
-        const toDelete = dbMonitors.filter((dbm) => !newMonitors.some((m) => String(m.id) === String(dbm.id)));
-
-        for (const monitor of toDelete) {
-            if (monitor.id) {
-                await this.monitorRepository.delete(monitor.id);
-            }
-        }
-    }
-
-    /**
-     * Create or update monitors in the database.
-     */
-    private async upsertSiteMonitors(identifier: string, monitors: Site["monitors"]): Promise<void> {
-        for (const monitor of monitors) {
-            if (monitor.id && !isNaN(Number(monitor.id))) {
-                await this.monitorRepository.update(monitor.id, monitor);
-            } else {
-                const newId = await this.monitorRepository.create(identifier, monitor);
-                monitor.id = newId;
-            }
-        }
-    }
-
-    /**
-     * Handle monitor interval changes and restart monitoring if needed.
-     */
-    private async handleMonitorIntervalChanges(
-        identifier: string,
-        originalSite: Site,
-        updatedMonitors: Site["monitors"]
-    ): Promise<void> {
-        for (const updatedMonitor of updatedMonitors) {
-            const prevMonitor = originalSite.monitors.find((m) => String(m.id) === String(updatedMonitor.id));
-            if (!prevMonitor) continue;
-
-            const intervalChanged = this.hasIntervalChanged(updatedMonitor, prevMonitor);
-            if (intervalChanged) {
-                await this.restartMonitorForIntervalChange(identifier, updatedMonitor, prevMonitor);
-            }
-        }
-    }
-
-    /**
-     * Check if the monitor's check interval has changed.
-     */
-    private hasIntervalChanged(updatedMonitor: Site["monitors"][0], prevMonitor: Site["monitors"][0]): boolean {
-        return (
-            typeof updatedMonitor.checkInterval === "number" &&
-            updatedMonitor.checkInterval !== prevMonitor.checkInterval
-        );
-    }
-
-    /**
-     * Restart monitoring for a monitor with changed interval.
-     */
-    private async restartMonitorForIntervalChange(
-        identifier: string,
-        updatedMonitor: Site["monitors"][0],
-        prevMonitor: Site["monitors"][0]
-    ): Promise<void> {
-        if (isDev()) {
-            logger.debug(
-                `[updateSite] Restarting monitor ${updatedMonitor.id}: interval changed from ${prevMonitor.checkInterval}ms to ${updatedMonitor.checkInterval}ms`
-            );
-        }
-
-        const wasMonitoring = prevMonitor.monitoring ?? false;
-        await this.stopMonitoringForSite(identifier, String(updatedMonitor.id));
-
-        if (wasMonitoring) {
-            await this.startMonitoringForSite(identifier, String(updatedMonitor.id));
-        }
+        return updateSite(dependencies, callbacks, identifier, updates);
     }
 
     /**
