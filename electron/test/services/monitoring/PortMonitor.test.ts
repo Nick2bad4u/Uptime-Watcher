@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { PortMonitor } from "../../../services/monitoring/PortMonitor";
 import { MonitorCheckResult, MonitorConfig } from "../../../services/monitoring/types";
 import { Site } from "../../../types";
+import { DEFAULT_REQUEST_TIMEOUT } from "../../../constants";
 
 // Mock dependencies
 vi.mock("../../../services/monitoring/utils", () => ({
@@ -199,11 +200,16 @@ describe("PortMonitor", () => {
             );
         });
         it("should use DEFAULT_REQUEST_TIMEOUT when both monitor and config timeout are undefined", async () => {
-            // Line 67: testing all three parts of the nullish coalescing chain
-            const portMonitorWithoutConfigTimeout = new PortMonitor({}); // No timeout in config
+            // Create a new port monitor without timeout in config
+            const configWithoutTimeout: MonitorConfig = {
+                userAgent: "Test Agent",
+                // No timeout property
+            };
+            const portMonitorNoTimeout = new PortMonitor(configWithoutTimeout);
+
             const monitorWithoutTimeout: Site["monitors"][0] = {
                 ...mockPortMonitor,
-                timeout: undefined, // No timeout in monitor either
+                timeout: undefined, // This should fallback to config.timeout, then DEFAULT_REQUEST_TIMEOUT
             };
 
             const mockResult: MonitorCheckResult = {
@@ -216,12 +222,13 @@ describe("PortMonitor", () => {
             const { performPortCheckWithRetry } = await import("../../../services/monitoring/utils");
             vi.mocked(performPortCheckWithRetry).mockResolvedValue(mockResult);
 
-            await portMonitorWithoutConfigTimeout.check(monitorWithoutTimeout);
+            await portMonitorNoTimeout.check(monitorWithoutTimeout);
 
+            // Verify that the DEFAULT_REQUEST_TIMEOUT was used in the function call
             expect(performPortCheckWithRetry).toHaveBeenCalledWith(
                 "example.com",
                 80,
-                10000, // Should use DEFAULT_REQUEST_TIMEOUT
+                DEFAULT_REQUEST_TIMEOUT, // Should use default when both are undefined
                 3 // retryAttempts
             );
         });

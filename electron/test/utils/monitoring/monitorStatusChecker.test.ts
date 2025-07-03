@@ -154,4 +154,70 @@ describe("monitorStatusChecker", () => {
             });
         });
     });
+
+    describe("checkMonitor error conditions", () => {
+        it("should handle monitor not found", async () => {
+            const nonExistentMonitorId = "999";
+
+            const result = await checkMonitor(mockConfig, mockSite, nonExistentMonitorId);
+
+            expect(result).toBeUndefined();
+            expect(mockConfig.logger.error).toHaveBeenCalledWith(
+                `[checkMonitor] Monitor not found for id: ${nonExistentMonitorId} on site: ${mockSite.identifier}`
+            );
+        });
+
+        it("should handle monitor with missing id", async () => {
+            const monitorId = "undefined"; // This will match String(undefined)
+            
+            // Create a monitor without an id
+            mockSite.monitors[0] = {
+                ...mockSite.monitors[0],
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                id: undefined as any,
+            };
+
+            const result = await checkMonitor(mockConfig, mockSite, monitorId);
+
+            expect(result).toBeUndefined();
+            expect(mockConfig.logger.error).toHaveBeenCalledWith(
+                `[checkMonitor] Monitor missing id for ${mockSite.identifier}, skipping history insert.`
+            );
+        });
+
+        it("should handle monitor with null id", async () => {
+            const monitorId = "null"; // This will match String(null)
+            
+            // Create a monitor with null id
+            mockSite.monitors[0] = {
+                ...mockSite.monitors[0],
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                id: null as any,
+            };
+
+            const result = await checkMonitor(mockConfig, mockSite, monitorId);
+
+            expect(result).toBeUndefined();
+            expect(mockConfig.logger.error).toHaveBeenCalledWith(
+                `[checkMonitor] Monitor missing id for ${mockSite.identifier}, skipping history insert.`
+            );
+        });
+
+        it("should handle monitor with empty string id", async () => {
+            const monitorId = ""; // This will match String("")
+            
+            // Create a monitor with empty string id
+            mockSite.monitors[0] = {
+                ...mockSite.monitors[0],
+                id: "",
+            };
+
+            const result = await checkMonitor(mockConfig, mockSite, monitorId);
+
+            expect(result).toBeUndefined();
+            expect(mockConfig.logger.error).toHaveBeenCalledWith(
+                `[checkMonitor] Monitor missing id for ${mockSite.identifier}, skipping history insert.`
+            );
+        });
+    });
 });

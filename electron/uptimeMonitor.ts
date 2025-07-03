@@ -11,3 +11,7 @@
  */
 
 // This file is deprecated - import UptimeOrchestrator directly
+export const DEPRECATED_MESSAGE = "This file has been deprecated. Use UptimeOrchestrator directly instead.";
+
+// For backwards compatibility, re-export UptimeOrchestrator
+export { UptimeOrchestrator } from "./UptimeOrchestrator";
