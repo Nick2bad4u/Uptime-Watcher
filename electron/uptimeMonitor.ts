@@ -24,7 +24,18 @@ import { MonitorFactory, MonitorScheduler } from "./services/monitoring";
 import { Site, StatusHistory, StatusUpdate } from "./types";
 import { isDev } from "./utils";
 import { initDatabase } from "./utils/database/databaseInitializer";
+import {
+    getHistoryLimit as getHistoryLimitUtil,
+    setHistoryLimit as setHistoryLimitUtil,
+} from "./utils/database/historyLimitManager";
+import { addSiteToDatabase } from "./utils/database/siteAdder";
+import { removeSiteFromDatabase } from "./utils/database/siteRemover";
+import { getSitesFromDatabase } from "./utils/database/sitesGetter";
+import { loadSitesFromDatabase } from "./utils/database/sitesLoader";
 import { monitorLogger as logger } from "./utils/logger";
+import { autoStartMonitoring } from "./utils/monitoring/autoStarter";
+import { setDefaultMonitorIntervals } from "./utils/monitoring/intervalSetter";
+import { performInitialMonitorChecks } from "./utils/monitoring/monitorChecker";
 
 /**
  * Type for imported site data structure.
@@ -100,73 +111,30 @@ export class UptimeMonitor extends EventEmitter {
     }
 
     private async loadSites() {
-        try {
-            const siteRows = await this.siteRepository.findAll();
-            this.sites.clear();
-
-            for (const siteRow of siteRows) {
-                // Fetch monitors for this site using repository
-                const monitors = await this.monitorRepository.findBySiteIdentifier(siteRow.identifier);
-
-                // Load history for each monitor using repository
-                for (const monitor of monitors) {
-                    if (monitor.id) {
-                        monitor.history = await this.historyRepository.findByMonitorId(monitor.id);
-                    }
-                }
-
-                const site: Site = {
-                    identifier: siteRow.identifier,
-                    monitors: monitors,
-                    name: siteRow.name,
-                };
-                this.sites.set(site.identifier, site);
-            }
-
-            // Load historyLimit from settings using repository
-            const historyLimitStr = await this.settingsRepository.get("historyLimit");
-            if (historyLimitStr) {
-                this.historyLimit = parseInt(historyLimitStr, 10);
-            }
-
-            // Resume monitoring for all monitors that were running before restart
-            for (const site of this.sites.values()) {
-                for (const monitor of site.monitors) {
-                    if (monitor.monitoring) {
-                        await this.startMonitoringForSite(site.identifier, String(monitor.id));
-                    }
-                }
-            }
-        } catch (error) {
-            logger.error("Failed to load sites from DB", error);
-            this.emit("db-error", { error, operation: "loadSites" });
-            throw error; // Re-throw so that callers can handle the error
-        }
+        await loadSitesFromDatabase({
+            eventEmitter: this,
+            repositories: {
+                history: this.historyRepository,
+                monitor: this.monitorRepository,
+                settings: this.settingsRepository,
+                site: this.siteRepository,
+            },
+            setHistoryLimit: (limit) => {
+                this.historyLimit = limit;
+            },
+            sites: this.sites,
+            startMonitoring: this.startMonitoringForSite.bind(this),
+        });
     }
 
     public async getSites(): Promise<Site[]> {
-        // Always fetch from DB for latest data (needed for frontend sync)
-        const siteRows = await this.siteRepository.findAll();
-        const sites: Site[] = [];
-
-        for (const siteRow of siteRows) {
-            // Fetch monitors for this site using repository
-            const monitors = await this.monitorRepository.findBySiteIdentifier(siteRow.identifier);
-
-            // Load history for each monitor using repository
-            for (const monitor of monitors) {
-                if (monitor.id) {
-                    monitor.history = await this.historyRepository.findByMonitorId(monitor.id);
-                }
-            }
-
-            sites.push({
-                identifier: siteRow.identifier,
-                monitors: monitors,
-                name: siteRow.name,
-            });
-        }
-        return sites;
+        return getSitesFromDatabase({
+            repositories: {
+                history: this.historyRepository,
+                monitor: this.monitorRepository,
+                site: this.siteRepository,
+            },
+        });
     }
 
     /**
@@ -178,95 +146,64 @@ export class UptimeMonitor extends EventEmitter {
     }
 
     public async addSite(siteData: Site): Promise<Site> {
-        // Input validation
-        if (!siteData?.identifier) {
-            throw new Error("Site identifier is required");
-        }
-        if (!Array.isArray(siteData.monitors)) {
-            throw new Error("Site monitors must be an array");
-        }
+        // Use the utility function to add site to database
+        const site = await addSiteToDatabase({
+            repositories: {
+                monitor: this.monitorRepository,
+                site: this.siteRepository,
+            },
+            siteData,
+        });
 
-        logger.info(`Adding new site: ${siteData.identifier}`);
-        const site: Site = {
-            ...siteData,
-        };
+        // Add to in-memory cache
         this.sites.set(site.identifier, site); // Use identifier as key
 
-        // Persist site to DB using repository
-        await this.siteRepository.upsert(site);
-
-        // Remove all existing monitors for this site, then insert new ones using repository
-        await this.monitorRepository.deleteBySiteIdentifier(site.identifier);
-
-        for (const monitor of site.monitors) {
-            // Create monitor using repository and get the new ID
-            const newId = await this.monitorRepository.create(site.identifier, monitor);
-            monitor.id = newId;
-        }
-
         // Initial check for all monitors
-        for (const monitor of site.monitors) {
-            await this.checkMonitor(site, String(monitor.id));
-        }
+        await performInitialMonitorChecks(site, this.checkMonitor.bind(this), logger);
 
-        // Auto-start monitoring for all new monitors with default checkInterval
-        for (const monitor of site.monitors) {
-            if (monitor.id) {
-                // Set default checkInterval if not specified (5 minutes = 300000ms)
-                if (!monitor.checkInterval) {
-                    monitor.checkInterval = DEFAULT_CHECK_INTERVAL; // 5 minutes default
-                    await this.monitorRepository.update(monitor.id, { checkInterval: monitor.checkInterval });
-                }
+        // Set default checkInterval for monitors that don't have one
+        await setDefaultMonitorIntervals(
+            site,
+            DEFAULT_CHECK_INTERVAL,
+            this.monitorRepository.update.bind(this.monitorRepository),
+            logger
+        );
 
-                // Start monitoring automatically for new monitors
-                await this.startMonitoringForSite(site.identifier, String(monitor.id));
-
-                if (isDev()) {
-                    logger.debug(
-                        `[addSite] Auto-started monitoring for new monitor ${monitor.id} with interval ${monitor.checkInterval}ms`
-                    );
-                }
-            }
-        }
+        // Auto-start monitoring for all new monitors
+        await autoStartMonitoring(site, this.startMonitoringForSite.bind(this), logger, isDev);
 
         logger.info(`Site added successfully: ${site.identifier} (${site.name ?? "unnamed"})`);
         return site;
     }
 
     public async removeSite(identifier: string): Promise<boolean> {
-        logger.info(`Removing site: ${identifier}`);
-        const removed = this.sites.delete(identifier);
-
-        // Remove all monitors and their history for this site using repositories
-        await this.monitorRepository.deleteBySiteIdentifier(identifier);
-
-        // Remove the site using repository
-        await this.siteRepository.delete(identifier);
-
-        if (removed) {
-            logger.info(`Site removed successfully: ${identifier}`);
-        } else {
-            logger.warn(`Site not found for removal: ${identifier}`);
-        }
-        return removed;
+        return removeSiteFromDatabase({
+            identifier,
+            logger,
+            repositories: {
+                monitor: this.monitorRepository,
+                site: this.siteRepository,
+            },
+            sites: this.sites,
+        });
     }
 
-    public async setHistoryLimit(limit: number) {
-        if (limit <= 0) {
-            this.historyLimit = 0;
-        } else {
-            this.historyLimit = Math.max(10, limit);
-        }
-        // Save to settings using repository
-        await this.settingsRepository.set("historyLimit", this.historyLimit.toString());
-        // Prune history for all monitors using repository if limit > 0
-        if (this.historyLimit > 0) {
-            await this.historyRepository.pruneAllHistory(this.historyLimit);
-        }
+    public async setHistoryLimit(limit: number): Promise<void> {
+        await setHistoryLimitUtil({
+            limit,
+            logger,
+            repositories: {
+                history: this.historyRepository,
+                settings: this.settingsRepository,
+            },
+            setHistoryLimit: (newLimit) => {
+                this.historyLimit = newLimit;
+            },
+        });
     }
 
     public getHistoryLimit(): number {
-        return this.historyLimit;
+        return getHistoryLimitUtil(() => this.historyLimit);
     }
 
     public async startMonitoring() {

@@ -1307,7 +1307,7 @@ describe("UptimeMonitor", () => {
             };
 
             // This should handle the case gracefully
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
             const result = await uptimeMonitor.checkMonitor(site, "undefined");
             expect(result).toBeUndefined();
         });
@@ -1330,7 +1330,7 @@ describe("UptimeMonitor", () => {
             };
 
             // This should handle the case gracefully
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
             const result = await uptimeMonitor.checkMonitor(site, "non-existent");
             expect(result).toBeUndefined();
         });
@@ -1456,7 +1456,6 @@ describe("UptimeMonitor", () => {
             siteRepoInstance.getByIdentifier.mockResolvedValue(site);
 
             // Call the private handleScheduledCheck method
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             await uptimeMonitor.handleScheduledCheck(identifier, "monitor1");
 
             // Should have called checkMonitor internally
@@ -1465,7 +1464,6 @@ describe("UptimeMonitor", () => {
 
         it("should handle scheduled checks for non-existent site", async () => {
             // Call the private handleScheduledCheck method with non-existent site
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             await uptimeMonitor.handleScheduledCheck("non-existent", "monitor1");
 
             // Should handle gracefully without throwing
@@ -1937,7 +1935,7 @@ describe("UptimeMonitor", () => {
                 // Should have logged debug message for new monitor
                 const { monitorLogger } = await import("../utils/logger");
                 expect(monitorLogger.debug).toHaveBeenCalledWith(
-                    expect.stringContaining("[addSite] Auto-started monitoring for new monitor")
+                    expect.stringContaining("[autoStartMonitoring] Auto-started monitoring for monitor")
                 );
             });
 
