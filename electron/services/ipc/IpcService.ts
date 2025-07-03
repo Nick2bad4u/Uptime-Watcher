@@ -1,6 +1,6 @@
 import { ipcMain } from "electron";
 
-import { UptimeMonitor } from "../../uptimeMonitor";
+import { UptimeOrchestrator } from "../../UptimeOrchestrator";
 import { isDev } from "../../utils";
 import { logger } from "../../utils/logger";
 import { AutoUpdaterService } from "../updater/AutoUpdaterService";
@@ -10,11 +10,11 @@ import { AutoUpdaterService } from "../updater/AutoUpdaterService";
  * Groups IPC handlers by domain for better maintainability.
  */
 export class IpcService {
-    private readonly uptimeMonitor: UptimeMonitor;
+    private readonly uptimeOrchestrator: UptimeOrchestrator;
     private readonly autoUpdaterService: AutoUpdaterService;
 
-    constructor(uptimeMonitor: UptimeMonitor, autoUpdaterService: AutoUpdaterService) {
-        this.uptimeMonitor = uptimeMonitor;
+    constructor(uptimeOrchestrator: UptimeOrchestrator, autoUpdaterService: AutoUpdaterService) {
+        this.uptimeOrchestrator = uptimeOrchestrator;
         this.autoUpdaterService = autoUpdaterService;
     }
 
@@ -34,22 +34,22 @@ export class IpcService {
     private setupSiteHandlers(): void {
         ipcMain.handle("add-site", async (_, site) => {
             if (isDev()) logger.debug("[IpcService] Handling add-site");
-            return this.uptimeMonitor.addSite(site);
+            return this.uptimeOrchestrator.addSite(site);
         });
 
         ipcMain.handle("remove-site", async (_, identifier) => {
             if (isDev()) logger.debug("[IpcService] Handling remove-site", { identifier });
-            return this.uptimeMonitor.removeSite(identifier);
+            return this.uptimeOrchestrator.removeSite(identifier);
         });
 
         ipcMain.handle("get-sites", async () => {
             if (isDev()) logger.debug("[IpcService] Handling get-sites");
-            return this.uptimeMonitor.getSites();
+            return this.uptimeOrchestrator.getSites();
         });
 
         ipcMain.handle("update-site", async (_, identifier, updates) => {
             if (isDev()) logger.debug("[IpcService] Handling update-site", { identifier });
-            return this.uptimeMonitor.updateSite(identifier, updates);
+            return this.uptimeOrchestrator.updateSite(identifier, updates);
         });
     }
 
@@ -59,13 +59,13 @@ export class IpcService {
     private setupMonitoringHandlers(): void {
         ipcMain.handle("start-monitoring", async () => {
             if (isDev()) logger.debug("[IpcService] Handling start-monitoring");
-            this.uptimeMonitor.startMonitoring();
+            this.uptimeOrchestrator.startMonitoring();
             return true;
         });
 
         ipcMain.handle("stop-monitoring", async () => {
             if (isDev()) logger.debug("[IpcService] Handling stop-monitoring");
-            this.uptimeMonitor.stopMonitoring();
+            this.uptimeOrchestrator.stopMonitoring();
             return true;
         });
 
@@ -75,7 +75,7 @@ export class IpcService {
                     identifier,
                     monitorType,
                 });
-            return this.uptimeMonitor.startMonitoringForSite(identifier, monitorType);
+            return this.uptimeOrchestrator.startMonitoringForSite(identifier, monitorType);
         });
 
         ipcMain.handle("stop-monitoring-for-site", async (_, identifier, monitorType) => {
@@ -84,12 +84,12 @@ export class IpcService {
                     identifier,
                     monitorType,
                 });
-            return this.uptimeMonitor.stopMonitoringForSite(identifier, monitorType);
+            return this.uptimeOrchestrator.stopMonitoringForSite(identifier, monitorType);
         });
 
         ipcMain.handle("check-site-now", async (_, identifier, monitorType) => {
             if (isDev()) logger.debug("[IpcService] Handling check-site-now", { identifier, monitorType });
-            return this.uptimeMonitor.checkSiteManually(identifier, monitorType);
+            return this.uptimeOrchestrator.checkSiteManually(identifier, monitorType);
         });
     }
 
@@ -99,30 +99,30 @@ export class IpcService {
     private setupDataHandlers(): void {
         ipcMain.handle("export-data", async () => {
             if (isDev()) logger.debug("[IpcService] Handling export-data");
-            return this.uptimeMonitor.exportData();
+            return this.uptimeOrchestrator.exportData();
         });
 
         ipcMain.handle("import-data", async (_, data) => {
             if (isDev()) logger.debug("[IpcService] Handling import-data");
-            return this.uptimeMonitor.importData(data);
+            return this.uptimeOrchestrator.importData(data);
         });
 
         ipcMain.handle("update-history-limit", async (_, limit) => {
             if (isDev()) logger.debug("[IpcService] Handling update-history-limit", { limit });
-            return this.uptimeMonitor.setHistoryLimit(limit);
+            return this.uptimeOrchestrator.setHistoryLimit(limit);
         });
 
         ipcMain.handle("get-history-limit", async () => {
             if (isDev()) logger.debug("[IpcService] Handling get-history-limit");
-            return this.uptimeMonitor.getHistoryLimit();
+            return this.uptimeOrchestrator.getHistoryLimit();
         });
 
         // Direct SQLite backup download
         ipcMain.handle("download-sqlite-backup", async () => {
             if (isDev()) logger.debug("[IpcService] Handling download-sqlite-backup");
             try {
-                // Delegate to uptimeMonitor which should handle this through services
-                return await this.uptimeMonitor.downloadBackup();
+                // Delegate to uptimeOrchestrator which should handle this through services
+                return await this.uptimeOrchestrator.downloadBackup();
             } catch (error) {
                 logger.error("[IpcService] Failed to download SQLite backup", error);
                 const message = error instanceof Error ? error.message : String(error);

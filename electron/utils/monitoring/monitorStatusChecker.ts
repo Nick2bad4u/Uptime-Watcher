@@ -62,7 +62,7 @@ export async function checkMonitor(
     const getCheckResult = async () => {
         try {
             const monitorService = MonitorFactory.getMonitor(monitor.type, {
-                timeout: DEFAULT_REQUEST_TIMEOUT,
+                timeout: monitor.timeout ?? DEFAULT_REQUEST_TIMEOUT,
             });
             return await monitorService.check(monitor);
         } catch (error) {

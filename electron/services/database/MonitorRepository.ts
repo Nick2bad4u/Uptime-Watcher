@@ -9,30 +9,15 @@ import { Site } from "../../types";
 import { isDev } from "../../utils";
 import { logger } from "../../utils/logger";
 import { DatabaseService } from "./DatabaseService";
-
-/**
- * Type for database parameter values.
- */
-type DbValue = string | number | null;
-
-/**
- * Database row representation of a monitor.
- */
-export interface MonitorRow {
-    id: number;
-    site_identifier: string;
-    type: string;
-    url?: string;
-    host?: string;
-    port?: number;
-    checkInterval?: number;
-    timeout?: number;
-    retryAttempts?: number;
-    monitoring: boolean;
-    status: string;
-    responseTime?: number;
-    lastChecked?: string;
-}
+import {
+    addBooleanField,
+    addNumberField,
+    addStringField,
+    buildMonitorParameters,
+    convertDateForDb,
+    DbValue,
+    rowToMonitor,
+} from "./utils";
 
 /**
  * Repository for managing monitor data persistence.
@@ -56,110 +41,10 @@ export class MonitorRepository {
     }
 
     /**
-     * Safely convert a value to number or return undefined.
-     */
-    private safeNumberConvert(value: unknown): number | undefined {
-        if (typeof value === "number") {
-            return value;
-        }
-        if (value) {
-            return Number(value);
-        }
-        return undefined;
-    }
-
-    /**
-     * Convert a date-like value to ISO string or null for database storage.
-     */
-    private convertDateForDb(value: Date | string | null | undefined): string | null {
-        if (!value) {
-            // eslint-disable-next-line unicorn/no-null -- required for SQLite
-            return null;
-        }
-        if (value instanceof Date) {
-            return value.toISOString();
-        }
-        return String(value);
-    }
-
-    /**
-     * Add a string field to update arrays if the value is defined.
-     */
-    private addStringField(
-        fieldName: string,
-        value: string | undefined,
-        updateFields: string[],
-        updateValues: DbValue[]
-    ): void {
-        if (value !== undefined) {
-            updateFields.push(`${fieldName} = ?`);
-            // eslint-disable-next-line unicorn/no-null -- required for SQLite
-            updateValues.push(value ? String(value) : null);
-        }
-    }
-
-    /**
-     * Add a number field to update arrays if the value is defined.
-     */
-    private addNumberField(
-        fieldName: string,
-        value: number | undefined,
-        updateFields: string[],
-        updateValues: DbValue[]
-    ): void {
-        if (value !== undefined) {
-            updateFields.push(`${fieldName} = ?`);
-            updateValues.push(Number(value));
-        }
-    }
-
-    /**
-     * Add a boolean field to update arrays if the value is defined.
-     */
-    private addBooleanField(
-        fieldName: string,
-        value: boolean | undefined,
-        updateFields: string[],
-        updateValues: DbValue[]
-    ): void {
-        if (value !== undefined) {
-            updateFields.push(`${fieldName} = ?`);
-            updateValues.push(value ? 1 : 0);
-        }
-    }
-
-    /**
-     * Build parameter array for monitor insertion.
-     */
-    private buildMonitorParameters(siteIdentifier: string, monitor: Site["monitors"][0]): DbValue[] {
-        return [
-            siteIdentifier,
-            monitor.type,
-            // eslint-disable-next-line unicorn/no-null
-            monitor.url ? String(monitor.url) : null,
-            // eslint-disable-next-line unicorn/no-null
-            monitor.host ? String(monitor.host) : null,
-            // eslint-disable-next-line unicorn/no-null
-            monitor.port !== undefined ? Number(monitor.port) : null,
-            // eslint-disable-next-line unicorn/no-null
-            monitor.checkInterval !== undefined ? Number(monitor.checkInterval) : null,
-            // eslint-disable-next-line unicorn/no-null
-            monitor.timeout !== undefined ? Number(monitor.timeout) : null,
-            // eslint-disable-next-line unicorn/no-null
-            monitor.retryAttempts !== undefined ? Number(monitor.retryAttempts) : null,
-            monitor.monitoring ? 1 : 0,
-            monitor.status || "down",
-            // eslint-disable-next-line unicorn/no-null
-            monitor.responseTime !== undefined ? Number(monitor.responseTime) : null,
-            this.convertDateForDb(monitor.lastChecked),
-        ];
-    }
-
-    /**
      * Insert a single monitor and return its new ID.
      */
     private insertSingleMonitor(siteIdentifier: string, monitor: Site["monitors"][0], db: Database): string {
-        const parameters = this.buildMonitorParameters(siteIdentifier, monitor);
+        const parameters = buildMonitorParameters(siteIdentifier, monitor);
 
         db.run(
             `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, timeout, retryAttempts, monitoring, status, responseTime, lastChecked) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -173,30 +58,6 @@ export class MonitorRepository {
     }
 
     /**
-     * Convert database row to monitor object.
-     */
-    private rowToMonitor(row: Record<string, unknown>): Site["monitors"][0] {
-        return {
-            checkInterval: this.safeNumberConvert(row.checkInterval),
-            history: [], // History will be loaded separately
-            host: row.host !== undefined ? String(row.host) : undefined,
-            id: row.id !== undefined ? String(row.id) : "-1",
-            lastChecked:
-                row.lastChecked && (typeof row.lastChecked === "string" || typeof row.lastChecked === "number")
-                    ? new Date(row.lastChecked)
-                    : undefined,
-            monitoring: Boolean(row.monitoring),
-            port: this.safeNumberConvert(row.port),
-            responseTime: this.safeNumberConvert(row.responseTime),
-            retryAttempts: this.safeNumberConvert(row.retryAttempts),
-            status: typeof row.status === "string" ? (row.status as "up" | "down" | "pending") : "down",
-            timeout: this.safeNumberConvert(row.timeout),
-            type: typeof row.type === "string" ? (row.type as Site["monitors"][0]["type"]) : "http",
-            url: row.url !== undefined ? String(row.url) : undefined,
-        };
-    }
-
-    /**
      * Find all monitors for a specific site.
      */
     public async findBySiteIdentifier(siteIdentifier: string): Promise<Site["monitors"]> {
@@ -207,7 +68,7 @@ export class MonitorRepository {
                 unknown
             >[];
 
-            return monitorRows.map((row) => this.rowToMonitor(row));
+            return monitorRows.map((row) => rowToMonitor(row));
         } catch (error) {
             logger.error(`[MonitorRepository] Failed to fetch monitors for site: ${siteIdentifier}`, error);
             throw error;
@@ -228,7 +89,7 @@ export class MonitorRepository {
                 return undefined;
             }
 
-            return this.rowToMonitor(row);
+            return rowToMonitor(row);
         } catch (error) {
             logger.error(`[MonitorRepository] Failed to fetch monitor with id: ${monitorId}`, error);
             throw error;
@@ -263,7 +124,7 @@ export class MonitorRepository {
                     // eslint-disable-next-line unicorn/no-null
                     monitor.responseTime !== undefined ? Number(monitor.responseTime) : null,
                     // eslint-disable-next-line unicorn/no-null
-                    monitor.lastChecked ? this.convertDateForDb(monitor.lastChecked) : null,
+                    monitor.lastChecked ? convertDateForDb(monitor.lastChecked) : null,
                 ]
             );
 
@@ -304,24 +165,24 @@ export class MonitorRepository {
                 updateValues.push(monitor.type);
             }
 
-            this.addStringField("url", monitor.url, updateFields, updateValues);
-            this.addStringField("host", monitor.host, updateFields, updateValues);
-            this.addNumberField("port", monitor.port, updateFields, updateValues);
-            this.addNumberField("checkInterval", monitor.checkInterval, updateFields, updateValues);
-            this.addNumberField("timeout", monitor.timeout, updateFields, updateValues);
-            this.addNumberField("retryAttempts", monitor.retryAttempts, updateFields, updateValues);
-            this.addBooleanField("monitoring", monitor.monitoring, updateFields, updateValues);
+            addStringField("url", monitor.url, updateFields, updateValues);
+            addStringField("host", monitor.host, updateFields, updateValues);
+            addNumberField("port", monitor.port, updateFields, updateValues);
+            addNumberField("checkInterval", monitor.checkInterval, updateFields, updateValues);
+            addNumberField("timeout", monitor.timeout, updateFields, updateValues);
+            addNumberField("retryAttempts", monitor.retryAttempts, updateFields, updateValues);
+            addBooleanField("monitoring", monitor.monitoring, updateFields, updateValues);
 
             if (monitor.status !== undefined) {
                 updateFields.push("status = ?");
                 updateValues.push(monitor.status);
             }
 
-            this.addNumberField("responseTime", monitor.responseTime, updateFields, updateValues);
+            addNumberField("responseTime", monitor.responseTime, updateFields, updateValues);
 
             if (monitor.lastChecked !== undefined) {
                 updateFields.push("lastChecked = ?");
-                const lastCheckedValue = this.convertDateForDb(monitor.lastChecked);
+                const lastCheckedValue = convertDateForDb(monitor.lastChecked);
                 updateValues.push(lastCheckedValue);
             }
 

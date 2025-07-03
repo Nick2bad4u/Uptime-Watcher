@@ -1,7 +1,7 @@
 import { app } from "electron";
 
-import { StatusUpdate } from "../../types";
-import { UptimeMonitor } from "../../uptimeMonitor";
+import { StatusUpdate, Site } from "../../types";
+import { UptimeOrchestrator } from "../../UptimeOrchestrator";
 import { logger } from "../../utils/logger";
 import { IpcService } from "../ipc";
 import { NotificationService } from "../notifications";
@@ -17,7 +17,7 @@ export class ApplicationService {
     private readonly ipcService: IpcService;
     private readonly notificationService: NotificationService;
     private readonly autoUpdaterService: AutoUpdaterService;
-    private readonly uptimeMonitor: UptimeMonitor;
+    private readonly uptimeOrchestrator: UptimeOrchestrator;
 
     constructor() {
         logger.info("[ApplicationService] Initializing application services");
@@ -26,10 +26,10 @@ export class ApplicationService {
         this.windowService = new WindowService();
         this.notificationService = new NotificationService();
         this.autoUpdaterService = new AutoUpdaterService();
-        this.uptimeMonitor = new UptimeMonitor();
+        this.uptimeOrchestrator = new UptimeOrchestrator();
 
         // Initialize IPC with dependencies
-        this.ipcService = new IpcService(this.uptimeMonitor, this.autoUpdaterService);
+        this.ipcService = new IpcService(this.uptimeOrchestrator, this.autoUpdaterService);
 
         this.setupApplication();
     }
@@ -68,7 +68,7 @@ export class ApplicationService {
      */
     private async onAppReady(): Promise<void> {
         // Initialize the uptime monitor with database
-        await this.uptimeMonitor.initialize();
+        await this.uptimeOrchestrator.initialize();
 
         // Create main window
         this.windowService.createMainWindow();
@@ -100,7 +100,7 @@ export class ApplicationService {
      */
     private setupMonitorEvents(): void {
         // Status updates
-        this.uptimeMonitor.on("status-update", (data: StatusUpdate) => {
+        this.uptimeOrchestrator.on("status-update", (data: StatusUpdate) => {
             const monitorStatuses = data.site.monitors
                 .map((m) => {
                     const responseTimeInfo = m.responseTime ? ` (${m.responseTime}ms)` : "";
@@ -113,17 +113,17 @@ export class ApplicationService {
         });
 
         // Monitor down alerts
-        this.uptimeMonitor.on("site-monitor-down", ({ monitorId, site }) => {
+        this.uptimeOrchestrator.on("site-monitor-down", ({ monitorId, site }: { monitorId: string; site: Site }) => {
             this.notificationService.notifyMonitorDown(site, monitorId);
         });
 
         // Monitor up alerts
-        this.uptimeMonitor.on("site-monitor-up", ({ monitorId, site }) => {
+        this.uptimeOrchestrator.on("site-monitor-up", ({ monitorId, site }: { monitorId: string; site: Site }) => {
             this.notificationService.notifyMonitorUp(site, monitorId);
         });
 
         // Database errors
-        this.uptimeMonitor.on("db-error", ({ error, operation }) => {
+        this.uptimeOrchestrator.on("db-error", ({ error, operation }: { error: Error; operation: string }) => {
             logger.error(`[ApplicationService] Database error during ${operation}`, error);
             // Could add error notifications here if needed
         });
@@ -137,7 +137,7 @@ export class ApplicationService {
 
         try {
             this.ipcService.cleanup();
-            this.uptimeMonitor.stopMonitoring();
+            this.uptimeOrchestrator.stopMonitoring();
             this.windowService.closeMainWindow();
         } catch (error) {
             logger.error("[ApplicationService] Error during cleanup", error);

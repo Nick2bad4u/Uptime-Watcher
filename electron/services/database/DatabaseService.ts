@@ -3,6 +3,7 @@ import { Database } from "node-sqlite3-wasm";
 import * as path from "path";
 
 import { logger } from "../../utils/logger";
+import { createDatabaseBackup, createDatabaseTables } from "./utils";
 
 /**
  * Service responsible for database initialization and schema management.
@@ -34,7 +35,7 @@ export class DatabaseService {
             logger.info(`[DatabaseService] Initializing SQLite DB at: ${dbPath}`);
 
             this._db = new Database(dbPath);
-            await this.createTables();
+            await createDatabaseTables(this._db);
 
             logger.info("[DatabaseService] Database initialized successfully");
             return this._db;
@@ -55,87 +56,13 @@ export class DatabaseService {
     }
 
     /**
-     * Create all required database tables if they don't exist.
+     * Download database backup as buffer.
      */
-    private async createTables(): Promise<void> {
-        if (!this._db) {
-            throw new Error("Database not initialized");
-        }
-
-        try {
-            // Sites table
-            this._db.run(`
-                CREATE TABLE IF NOT EXISTS sites (
-                    identifier TEXT PRIMARY KEY,
-                    name TEXT
-                );
-            `);
-
-            // Monitors table
-            this._db.run(`
-                CREATE TABLE IF NOT EXISTS monitors (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    site_identifier TEXT,
-                    type TEXT,
-                    url TEXT,
-                    host TEXT,
-                    port INTEGER,
-                    checkInterval INTEGER,
-                    timeout INTEGER,
-                    retryAttempts INTEGER DEFAULT 0,
-                    monitoring BOOLEAN,
-                    status TEXT,
-                    responseTime INTEGER,
-                    lastChecked DATETIME,
-                    FOREIGN KEY(site_identifier) REFERENCES sites(identifier)
-                );
-            `);
-
-            // History table
-            this._db.run(`
-                CREATE TABLE IF NOT EXISTS history (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    monitor_id INTEGER,
-                    timestamp INTEGER,
-                    status TEXT,
-                    responseTime INTEGER,
-                    details TEXT,
-                    FOREIGN KEY(monitor_id) REFERENCES monitors(id)
-                );
-            `);
-
-            // Settings table
-            this._db.run(`
-                CREATE TABLE IF NOT EXISTS settings (
-                    key TEXT PRIMARY KEY,
-                    value TEXT
-                );
-            `);
-
-            // Stats table
-            this._db.run(`
-                CREATE TABLE IF NOT EXISTS stats (
-                    key TEXT PRIMARY KEY,
-                    value TEXT
-                );
-            `);
-
-            // Logs table
-            this._db.run(`
-                CREATE TABLE IF NOT EXISTS logs (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    level TEXT,
-                    message TEXT,
-                    data TEXT
-                );
-            `);
-
-            logger.info("[DatabaseService] All tables created successfully");
-        } catch (error) {
-            logger.error("[DatabaseService] Failed to create tables", error);
-            throw error;
-        }
+    public async downloadBackup(): Promise<{ buffer: Buffer; fileName: string }> {
+        const { app } = await import("electron");
+        const path = await import("path");
+        const dbPath = path.join(app.getPath("userData"), "uptime-watcher.sqlite");
+        return createDatabaseBackup(dbPath);
     }
 
     /**
@@ -151,29 +78,6 @@ export class DatabaseService {
                 logger.error("[DatabaseService] Failed to close database", error);
                 throw error;
             }
-        }
-    }
-
-    /**
-     * Download database backup as buffer.
-     */
-    public async downloadBackup(): Promise<{ buffer: Buffer; fileName: string }> {
-        try {
-            const { app } = await import("electron");
-            const fs = await import("fs");
-            const path = await import("path");
-
-            const dbPath = path.join(app.getPath("userData"), "uptime-watcher.sqlite");
-            const buffer = fs.readFileSync(dbPath);
-
-            logger.info("[DatabaseService] Database backup created successfully");
-            return {
-                buffer,
-                fileName: "uptime-watcher-backup.sqlite",
-            };
-        } catch (error) {
-            logger.error("[DatabaseService] Failed to create database backup", error);
-            throw error;
         }
     }
 }
