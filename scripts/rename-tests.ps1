@@ -1,9 +1,10 @@
 param (
-    [switch]$DryRun
+    [switch]$DryRun,
+    [string]$Directory = "."
 )
 
 $culture = Get-Culture
-$files = Get-ChildItem -Path . -Recurse -Include @("*.ts", "*.tsx") -Exclude "*node_modules*" | Where-Object { $_.DirectoryName -match '\\test($|\\)' }
+$files = Get-ChildItem -Path $Directory -Recurse -Include @("*.ts", "*.tsx") -Exclude "*node_modules*" | Where-Object { $_.DirectoryName -match '\\test($|\\)' }
 
 foreach ($file in $files) {
     $baseNameWithTest = $file.BaseName
