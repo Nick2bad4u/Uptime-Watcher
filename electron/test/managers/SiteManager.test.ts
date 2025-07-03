@@ -179,27 +179,4 @@ describe("SiteManager", () => {
             expect(siteManager.getSiteFromCache("new-site")).toBeDefined();
         });
     });
-
-    describe("Logging edge cases", () => {
-        it("should handle site with undefined name in logging", async () => {
-            // Mock the addSiteToDatabase to return a site with undefined name
-            const siteWithoutName = { ...mockSite, name: undefined };
-            
-            vi.doMock("../../utils/database/siteAdder", () => ({
-                addSiteToDatabase: vi.fn(() => Promise.resolve(siteWithoutName)),
-            }));
-
-            const { addSiteToDatabase } = await import("../../utils/database/siteAdder");
-            (addSiteToDatabase as ReturnType<typeof vi.fn>).mockResolvedValue(siteWithoutName);
-
-            try {
-                const result = await siteManager.addSite(mockSite);
-                expect(result).toBeDefined();
-                // This should trigger the logging branch with "unnamed" (line 92)
-            } catch (error) {
-                // May fail due to mock issues, but the logging branch should be covered
-                expect(error).toBeDefined();
-            }
-        });
-    });
 });

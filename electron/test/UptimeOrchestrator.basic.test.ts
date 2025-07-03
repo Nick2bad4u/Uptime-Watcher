@@ -6,7 +6,6 @@
 
 import { describe, expect, it, beforeEach, afterEach, vi } from "vitest";
 import { EventEmitter } from "events";
-import type { Site } from "../types";
 
 // Mock dependencies
 vi.mock("../constants", () => ({
