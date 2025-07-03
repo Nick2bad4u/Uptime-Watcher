@@ -1,5 +1,5 @@
 /**
- * Tests for UptimeMonitor core service.
+ * Tests for UptimeOrchestrator core service.
  * Validates the main monitoring orchestration and business logic.
  */
 
@@ -161,31 +161,31 @@ vi.mock("../services/monitoring", () => ({
     MonitorFactory: mockMonitorFactory,
 }));
 
-describe("UptimeMonitor", () => {
-    let uptimeMonitor: any;
+describe("UptimeOrchestrator", () => {
+    let uptimeOrchestrator: any;
 
     beforeEach(async () => {
         vi.clearAllMocks();
 
         // Import after mocks are set up
-        const { UptimeMonitor } = await import("../uptimeMonitor");
-        uptimeMonitor = new UptimeMonitor();
+        const { UptimeOrchestrator } = await import("../UptimeOrchestrator");
+        uptimeOrchestrator = new UptimeOrchestrator();
     });
 
     afterEach(() => {
-        if (uptimeMonitor) {
-            uptimeMonitor.removeAllListeners();
+        if (uptimeOrchestrator) {
+            uptimeOrchestrator.removeAllListeners();
         }
     });
 
     describe("Constructor", () => {
         it("should extend EventEmitter", () => {
-            expect(uptimeMonitor).toBeInstanceOf(EventEmitter);
+            expect(uptimeOrchestrator).toBeInstanceOf(EventEmitter);
         });
 
         it("should initialize with default values", () => {
-            expect(uptimeMonitor.getHistoryLimit()).toBe(500);
-            expect(uptimeMonitor.getSitesFromCache()).toEqual([]);
+            expect(uptimeOrchestrator.getHistoryLimit()).toBe(500);
+            expect(uptimeOrchestrator.getSitesFromCache()).toEqual([]);
         });
 
         it("should initialize database service singleton", () => {
@@ -211,13 +211,13 @@ describe("UptimeMonitor", () => {
 
     describe("Initialization", () => {
         it("should initialize database on init", async () => {
-            await uptimeMonitor.initialize();
+            await uptimeOrchestrator.initialize();
 
             expect(mockDatabaseInstance.initialize).toHaveBeenCalled();
         });
 
         it("should load sites from database", async () => {
-            await uptimeMonitor.initialize();
+            await uptimeOrchestrator.initialize();
 
             expect(mockSiteRepositoryInstance.findAll).toHaveBeenCalled();
         });
@@ -225,19 +225,19 @@ describe("UptimeMonitor", () => {
         it("should load history limit from settings", async () => {
             mockSettingsRepositoryInstance.get.mockResolvedValue("1000");
 
-            await uptimeMonitor.initialize();
+            await uptimeOrchestrator.initialize();
 
             expect(mockSettingsRepositoryInstance.get).toHaveBeenCalledWith("historyLimit");
-            expect(uptimeMonitor.getHistoryLimit()).toBe(1000);
+            expect(uptimeOrchestrator.getHistoryLimit()).toBe(1000);
         });
 
         it("should use default history limit when setting not found", async () => {
             const settingsRepoInstance = mockSettingsRepository.mock.results[0].value;
             settingsRepoInstance.get.mockResolvedValue(null);
 
-            await uptimeMonitor.initialize();
+            await uptimeOrchestrator.initialize();
 
-            expect(uptimeMonitor.getHistoryLimit()).toBe(500);
+            expect(uptimeOrchestrator.getHistoryLimit()).toBe(500);
         });
 
         it("should handle database initialization errors", async () => {
@@ -245,7 +245,7 @@ describe("UptimeMonitor", () => {
             mockDatabaseInstance.initialize.mockRejectedValue(error);
 
             // Since the error is caught and emitted as an event, we expect no throw
-            await expect(uptimeMonitor.initialize()).resolves.toBeUndefined();
+            await expect(uptimeOrchestrator.initialize()).resolves.toBeUndefined();
         });
     });
 
@@ -259,7 +259,7 @@ describe("UptimeMonitor", () => {
                 ];
                 siteRepoInstance.findAll.mockResolvedValue(mockSites);
 
-                const result = await uptimeMonitor.getSites();
+                const result = await uptimeOrchestrator.getSites();
 
                 expect(siteRepoInstance.findAll).toHaveBeenCalled();
                 expect(result).toHaveLength(2);
@@ -275,7 +275,7 @@ describe("UptimeMonitor", () => {
                     { id: "monitor1", type: "http", status: "up" },
                 ]);
 
-                const result = await uptimeMonitor.getSites();
+                const result = await uptimeOrchestrator.getSites();
 
                 expect(monitorRepoInstance.findBySiteIdentifier).toHaveBeenCalledWith("site1");
                 expect(result[0].monitors).toHaveLength(1);
@@ -291,7 +291,7 @@ describe("UptimeMonitor", () => {
                     monitors: [],
                 };
 
-                const result = await uptimeMonitor.addSite(site);
+                const result = await uptimeOrchestrator.addSite(site);
 
                 expect(siteRepoInstance.upsert).toHaveBeenCalledWith(
                     expect.objectContaining({
@@ -318,7 +318,7 @@ describe("UptimeMonitor", () => {
                     ],
                 };
 
-                await uptimeMonitor.addSite(site);
+                await uptimeOrchestrator.addSite(site);
 
                 expect(monitorRepoInstance.create).toHaveBeenCalledWith(
                     "new-site",
@@ -336,9 +336,9 @@ describe("UptimeMonitor", () => {
                     monitors: [],
                 };
 
-                await uptimeMonitor.addSite(site);
+                await uptimeOrchestrator.addSite(site);
 
-                const cachedSites = uptimeMonitor.getSitesFromCache();
+                const cachedSites = uptimeOrchestrator.getSitesFromCache();
                 expect(cachedSites).toContainEqual(expect.objectContaining(site));
             });
         });
@@ -355,9 +355,9 @@ describe("UptimeMonitor", () => {
                     name: "Site to Remove",
                     monitors: [],
                 };
-                await uptimeMonitor.addSite(site);
+                await uptimeOrchestrator.addSite(site);
 
-                const result = await uptimeMonitor.removeSite(identifier);
+                const result = await uptimeOrchestrator.removeSite(identifier);
 
                 expect(monitorRepoInstance.deleteBySiteIdentifier).toHaveBeenCalledWith(identifier);
                 expect(siteRepoInstance.delete).toHaveBeenCalledWith(identifier);
@@ -375,9 +375,9 @@ describe("UptimeMonitor", () => {
                     name: "Site to Remove",
                     monitors: [{ id: "monitor1", siteIdentifier: identifier }],
                 };
-                await uptimeMonitor.addSite(site);
+                await uptimeOrchestrator.addSite(site);
 
-                await uptimeMonitor.removeSite(identifier);
+                await uptimeOrchestrator.removeSite(identifier);
 
                 expect(monitorRepoInstance.deleteBySiteIdentifier).toHaveBeenCalledWith(identifier);
                 expect(siteRepoInstance.delete).toHaveBeenCalledWith(identifier);
@@ -387,7 +387,7 @@ describe("UptimeMonitor", () => {
                 const siteRepoInstance = mockSiteRepository.mock.results[0].value;
                 siteRepoInstance.findByIdentifier.mockResolvedValue(null);
 
-                const result = await uptimeMonitor.removeSite("non-existent");
+                const result = await uptimeOrchestrator.removeSite("non-existent");
 
                 expect(result).toBe(false);
             });
@@ -397,15 +397,15 @@ describe("UptimeMonitor", () => {
                 const site = { identifier, name: "Site", monitors: [] };
 
                 // Add to cache first
-                await uptimeMonitor.addSite(site);
+                await uptimeOrchestrator.addSite(site);
 
                 // Mock database operations
                 const siteRepoInstance = mockSiteRepository.mock.results[0].value;
                 siteRepoInstance.findByIdentifier.mockResolvedValue(site);
 
-                await uptimeMonitor.removeSite(identifier);
+                await uptimeOrchestrator.removeSite(identifier);
 
-                const cachedSites = uptimeMonitor.getSitesFromCache();
+                const cachedSites = uptimeOrchestrator.getSitesFromCache();
                 expect(cachedSites).not.toContainEqual(expect.objectContaining({ identifier }));
             });
         });
@@ -417,7 +417,7 @@ describe("UptimeMonitor", () => {
                 const schedulerInstance = mockMonitorScheduler.mock.results[0].value;
 
                 // Add a site with monitors
-                await uptimeMonitor.addSite({
+                await uptimeOrchestrator.addSite({
                     identifier: "test-site",
                     name: "Test Site",
                     monitors: [
@@ -431,7 +431,7 @@ describe("UptimeMonitor", () => {
                     ],
                 });
 
-                await uptimeMonitor.startMonitoring();
+                await uptimeOrchestrator.startMonitoring();
 
                 expect(schedulerInstance.startMonitor).toHaveBeenCalled();
             });
@@ -440,7 +440,7 @@ describe("UptimeMonitor", () => {
                 const schedulerInstance = mockMonitorScheduler.mock.results[0].value;
 
                 // Add a site with monitors
-                await uptimeMonitor.addSite({
+                await uptimeOrchestrator.addSite({
                     identifier: "test-site",
                     name: "Test Site",
                     monitors: [
@@ -454,7 +454,7 @@ describe("UptimeMonitor", () => {
                     ],
                 });
 
-                await uptimeMonitor.startMonitoring();
+                await uptimeOrchestrator.startMonitoring();
 
                 // We would need to expose isMonitoring or check via another method
                 // For now, we can check that the scheduler was called
@@ -466,7 +466,7 @@ describe("UptimeMonitor", () => {
             it("should stop all scheduled monitoring", () => {
                 const schedulerInstance = mockMonitorScheduler.mock.results[0].value;
 
-                uptimeMonitor.stopMonitoring();
+                uptimeOrchestrator.stopMonitoring();
 
                 expect(schedulerInstance.stopAll).toHaveBeenCalled();
             });
@@ -478,7 +478,7 @@ describe("UptimeMonitor", () => {
                 const identifier = "test-site";
 
                 // Add a site first
-                await uptimeMonitor.addSite({
+                await uptimeOrchestrator.addSite({
                     identifier,
                     name: "Test Site",
                     monitors: [
@@ -492,14 +492,14 @@ describe("UptimeMonitor", () => {
                     ],
                 });
 
-                const result = await uptimeMonitor.startMonitoringForSite(identifier);
+                const result = await uptimeOrchestrator.startMonitoringForSite(identifier);
 
                 expect(result).toBe(true);
                 expect(schedulerInstance.startMonitor).toHaveBeenCalled();
             });
 
             it("should return false for non-existent site", async () => {
-                const result = await uptimeMonitor.startMonitoringForSite("non-existent");
+                const result = await uptimeOrchestrator.startMonitoringForSite("non-existent");
 
                 expect(result).toBe(false);
             });
@@ -510,7 +510,7 @@ describe("UptimeMonitor", () => {
                 const originalMonitorId = "monitor1";
 
                 // Add a site first
-                await uptimeMonitor.addSite({
+                await uptimeOrchestrator.addSite({
                     identifier,
                     name: "Test Site",
                     monitors: [
@@ -525,7 +525,7 @@ describe("UptimeMonitor", () => {
                 });
 
                 // The monitor ID will be replaced with the mock ID from the repository
-                const result = await uptimeMonitor.startMonitoringForSite(identifier, "mock-monitor-id");
+                const result = await uptimeOrchestrator.startMonitoringForSite(identifier, "mock-monitor-id");
 
                 expect(result).toBe(true);
                 expect(schedulerInstance.startMonitor).toHaveBeenCalled();
@@ -535,7 +535,7 @@ describe("UptimeMonitor", () => {
                 const identifier = "test-site";
 
                 // Add a site first
-                await uptimeMonitor.addSite({
+                await uptimeOrchestrator.addSite({
                     identifier,
                     name: "Test Site",
                     monitors: [
@@ -549,7 +549,7 @@ describe("UptimeMonitor", () => {
                     ],
                 });
 
-                const result = await uptimeMonitor.startMonitoringForSite(identifier, "non-existent-monitor");
+                const result = await uptimeOrchestrator.startMonitoringForSite(identifier, "non-existent-monitor");
 
                 expect(result).toBe(false);
             });
@@ -562,7 +562,7 @@ describe("UptimeMonitor", () => {
                 schedulerInstance.startMonitor.mockReturnValueOnce(true).mockReturnValueOnce(false); // Instead of rejecting, return false
 
                 // Add a site with multiple monitors
-                await uptimeMonitor.addSite({
+                await uptimeOrchestrator.addSite({
                     identifier,
                     name: "Test Site",
                     monitors: [
@@ -584,7 +584,7 @@ describe("UptimeMonitor", () => {
                 });
 
                 // This should return true because at least one monitor started successfully
-                const result = await uptimeMonitor.startMonitoringForSite(identifier);
+                const result = await uptimeOrchestrator.startMonitoringForSite(identifier);
 
                 expect(result).toBe(true);
             });
@@ -596,7 +596,7 @@ describe("UptimeMonitor", () => {
                 const identifier = "test-site";
 
                 // Add a site first
-                await uptimeMonitor.addSite({
+                await uptimeOrchestrator.addSite({
                     identifier,
                     name: "Test Site",
                     monitors: [
@@ -610,14 +610,14 @@ describe("UptimeMonitor", () => {
                     ],
                 });
 
-                const result = await uptimeMonitor.stopMonitoringForSite(identifier);
+                const result = await uptimeOrchestrator.stopMonitoringForSite(identifier);
 
                 expect(result).toBe(true);
                 expect(schedulerInstance.stopMonitor).toHaveBeenCalled();
             });
 
             it("should return false for non-existent site", async () => {
-                const result = await uptimeMonitor.stopMonitoringForSite("non-existent");
+                const result = await uptimeOrchestrator.stopMonitoringForSite("non-existent");
 
                 expect(result).toBe(false);
             });
@@ -628,7 +628,7 @@ describe("UptimeMonitor", () => {
                 const monitorId = "monitor1";
 
                 // Add a site first
-                await uptimeMonitor.addSite({
+                await uptimeOrchestrator.addSite({
                     identifier,
                     name: "Test Site",
                     monitors: [
@@ -642,7 +642,7 @@ describe("UptimeMonitor", () => {
                     ],
                 });
 
-                const result = await uptimeMonitor.stopMonitoringForSite(identifier, monitorId);
+                const result = await uptimeOrchestrator.stopMonitoringForSite(identifier, monitorId);
 
                 expect(result).toBe(true);
                 expect(schedulerInstance.stopMonitor).toHaveBeenCalled();
@@ -656,7 +656,7 @@ describe("UptimeMonitor", () => {
                 schedulerInstance.stopMonitor.mockReturnValue(false);
 
                 // Add a site first
-                await uptimeMonitor.addSite({
+                await uptimeOrchestrator.addSite({
                     identifier,
                     name: "Test Site",
                     monitors: [
@@ -670,7 +670,7 @@ describe("UptimeMonitor", () => {
                     ],
                 });
 
-                const result = await uptimeMonitor.stopMonitoringForSite(identifier, "non-existent-monitor");
+                const result = await uptimeOrchestrator.stopMonitoringForSite(identifier, "non-existent-monitor");
 
                 expect(result).toBe(false);
             });
@@ -680,7 +680,7 @@ describe("UptimeMonitor", () => {
                 const identifier = "test-site";
 
                 // Add a site with multiple monitors
-                await uptimeMonitor.addSite({
+                await uptimeOrchestrator.addSite({
                     identifier,
                     name: "Test Site",
                     monitors: [
@@ -701,7 +701,7 @@ describe("UptimeMonitor", () => {
                     ],
                 });
 
-                const result = await uptimeMonitor.stopMonitoringForSite(identifier);
+                const result = await uptimeOrchestrator.stopMonitoringForSite(identifier);
 
                 expect(result).toBe(true);
                 expect(schedulerInstance.stopMonitor).toHaveBeenCalledTimes(2);
@@ -729,7 +729,7 @@ describe("UptimeMonitor", () => {
                 };
 
                 // Add a site with monitor
-                await uptimeMonitor.addSite(site);
+                await uptimeOrchestrator.addSite(site);
 
                 // Mock the site repository to return the site with updated data
                 siteRepoInstance.getByIdentifier.mockResolvedValue(site);
@@ -747,14 +747,14 @@ describe("UptimeMonitor", () => {
                     ),
                 });
 
-                const result = await uptimeMonitor.checkSiteManually(identifier);
+                const result = await uptimeOrchestrator.checkSiteManually(identifier);
 
                 expect(result).toBeDefined();
                 expect(result?.site.identifier).toBe(identifier);
             });
 
             it("should throw error for non-existent site", async () => {
-                await expect(uptimeMonitor.checkSiteManually("non-existent")).rejects.toThrow(
+                await expect(uptimeOrchestrator.checkSiteManually("non-existent")).rejects.toThrow(
                     "Site not found: non-existent"
                 );
             });
@@ -763,13 +763,13 @@ describe("UptimeMonitor", () => {
                 const identifier = "test-site";
 
                 // Add a site without monitors
-                await uptimeMonitor.addSite({
+                await uptimeOrchestrator.addSite({
                     identifier,
                     name: "Test Site",
                     monitors: [],
                 });
 
-                await expect(uptimeMonitor.checkSiteManually(identifier)).rejects.toThrow(
+                await expect(uptimeOrchestrator.checkSiteManually(identifier)).rejects.toThrow(
                     "No monitors found for site test-site"
                 );
             });
@@ -778,7 +778,7 @@ describe("UptimeMonitor", () => {
                 const identifier = "test-site";
 
                 // Add a site with monitors
-                await uptimeMonitor.addSite({
+                await uptimeOrchestrator.addSite({
                     identifier,
                     name: "Test Site",
                     monitors: [
@@ -792,7 +792,7 @@ describe("UptimeMonitor", () => {
                     ],
                 });
 
-                await expect(uptimeMonitor.checkSiteManually(identifier, "invalid-monitor")).rejects.toThrow(
+                await expect(uptimeOrchestrator.checkSiteManually(identifier, "invalid-monitor")).rejects.toThrow(
                     "Monitor with ID invalid-monitor not found for site test-site"
                 );
             });
@@ -802,7 +802,7 @@ describe("UptimeMonitor", () => {
                 const eventListener = vi.fn();
                 const siteRepoInstance = mockSiteRepository.mock.results[0].value;
 
-                uptimeMonitor.on("status-update", eventListener);
+                uptimeOrchestrator.on("status-update", eventListener);
 
                 // Add a site with monitor
                 const site = {
@@ -819,12 +819,12 @@ describe("UptimeMonitor", () => {
                     ],
                 };
 
-                await uptimeMonitor.addSite(site);
+                await uptimeOrchestrator.addSite(site);
 
                 // Mock the site repository to return the site with updated data
                 siteRepoInstance.getByIdentifier.mockResolvedValue(site);
 
-                await uptimeMonitor.checkSiteManually(identifier);
+                await uptimeOrchestrator.checkSiteManually(identifier);
 
                 expect(eventListener).toHaveBeenCalled();
             });
@@ -854,11 +854,11 @@ describe("UptimeMonitor", () => {
                     ],
                 };
 
-                await uptimeMonitor.addSite(site);
+                await uptimeOrchestrator.addSite(site);
 
                 // After adding the site, all monitor IDs will be replaced with mock IDs
                 // We need to use the mock ID to test the specific monitor
-                const result = await uptimeMonitor.checkSiteManually(identifier, "mock-monitor-id");
+                const result = await uptimeOrchestrator.checkSiteManually(identifier, "mock-monitor-id");
 
                 expect(result).toBeDefined();
             });
@@ -872,7 +872,7 @@ describe("UptimeMonitor", () => {
                 const siteRepoInstance = mockSiteRepository.mock.results[0].value;
 
                 // Add a site first
-                await uptimeMonitor.addSite({
+                await uptimeOrchestrator.addSite({
                     identifier,
                     name: "Original Name",
                     monitors: [],
@@ -882,7 +882,7 @@ describe("UptimeMonitor", () => {
                     name: "Updated Name",
                 };
 
-                const result = await uptimeMonitor.updateSite(identifier, updates);
+                const result = await uptimeOrchestrator.updateSite(identifier, updates);
 
                 expect(result.name).toBe("Updated Name");
                 expect(siteRepoInstance.upsert).toHaveBeenCalledWith(
@@ -893,11 +893,11 @@ describe("UptimeMonitor", () => {
             });
 
             it("should throw error for missing identifier", async () => {
-                await expect(uptimeMonitor.updateSite("", {})).rejects.toThrow("Site identifier is required");
+                await expect(uptimeOrchestrator.updateSite("", {})).rejects.toThrow("Site identifier is required");
             });
 
             it("should throw error for non-existent site", async () => {
-                await expect(uptimeMonitor.updateSite("non-existent", {})).rejects.toThrow(
+                await expect(uptimeOrchestrator.updateSite("non-existent", {})).rejects.toThrow(
                     "Site not found: non-existent"
                 );
             });
@@ -907,7 +907,7 @@ describe("UptimeMonitor", () => {
                 const monitorRepoInstance = mockMonitorRepository.mock.results[0].value;
 
                 // Add a site first
-                await uptimeMonitor.addSite({
+                await uptimeOrchestrator.addSite({
                     identifier,
                     name: "Test Site",
                     monitors: [
@@ -944,7 +944,7 @@ describe("UptimeMonitor", () => {
                     ],
                 };
 
-                const result = await uptimeMonitor.updateSite(identifier, updates);
+                const result = await uptimeOrchestrator.updateSite(identifier, updates);
 
                 expect(result.monitors).toEqual(updates.monitors);
                 expect(monitorRepoInstance.update).toHaveBeenCalled();
@@ -955,7 +955,7 @@ describe("UptimeMonitor", () => {
                 const monitorRepoInstance = mockMonitorRepository.mock.results[0].value;
 
                 // Add a site first with a monitor
-                await uptimeMonitor.addSite({
+                await uptimeOrchestrator.addSite({
                     identifier,
                     name: "Test Site",
                     monitors: [
@@ -995,7 +995,7 @@ describe("UptimeMonitor", () => {
                     ],
                 };
 
-                await uptimeMonitor.updateSite(identifier, updates);
+                await uptimeOrchestrator.updateSite(identifier, updates);
 
                 expect(monitorRepoInstance.update).toHaveBeenCalled();
             });
@@ -1005,7 +1005,7 @@ describe("UptimeMonitor", () => {
                 const monitorRepoInstance = mockMonitorRepository.mock.results[0].value;
 
                 // Add a site first with multiple monitors
-                await uptimeMonitor.addSite({
+                await uptimeOrchestrator.addSite({
                     identifier,
                     name: "Test Site",
                     monitors: [
@@ -1057,7 +1057,7 @@ describe("UptimeMonitor", () => {
                     ],
                 };
 
-                await uptimeMonitor.updateSite(identifier, updates);
+                await uptimeOrchestrator.updateSite(identifier, updates);
 
                 expect(monitorRepoInstance.delete).toHaveBeenCalledWith("monitor2");
             });
@@ -1067,7 +1067,7 @@ describe("UptimeMonitor", () => {
                 const monitorRepoInstance = mockMonitorRepository.mock.results[0].value;
 
                 // Add a site first
-                await uptimeMonitor.addSite({
+                await uptimeOrchestrator.addSite({
                     identifier,
                     name: "Test Site",
                     monitors: [],
@@ -1088,7 +1088,7 @@ describe("UptimeMonitor", () => {
                     ],
                 };
 
-                await uptimeMonitor.updateSite(identifier, updates);
+                await uptimeOrchestrator.updateSite(identifier, updates);
 
                 expect(monitorRepoInstance.create).toHaveBeenCalled();
             });
@@ -1101,17 +1101,17 @@ describe("UptimeMonitor", () => {
                 const settingsRepoInstance = mockSettingsRepository.mock.results[0].value;
                 const newLimit = 1000;
 
-                await uptimeMonitor.setHistoryLimit(newLimit);
+                await uptimeOrchestrator.setHistoryLimit(newLimit);
 
                 expect(settingsRepoInstance.set).toHaveBeenCalledWith("historyLimit", "1000");
-                expect(uptimeMonitor.getHistoryLimit()).toBe(newLimit);
+                expect(uptimeOrchestrator.getHistoryLimit()).toBe(newLimit);
             });
 
             it("should prune old history entries", async () => {
                 const historyRepoInstance = mockHistoryRepository.mock.results[0].value;
                 const newLimit = 100;
 
-                await uptimeMonitor.setHistoryLimit(newLimit);
+                await uptimeOrchestrator.setHistoryLimit(newLimit);
 
                 expect(historyRepoInstance.pruneAllHistory).toHaveBeenCalledWith(newLimit);
             });
@@ -1119,25 +1119,25 @@ describe("UptimeMonitor", () => {
             it("should handle zero limit by setting to 0", async () => {
                 const settingsRepoInstance = mockSettingsRepository.mock.results[0].value;
 
-                await uptimeMonitor.setHistoryLimit(0);
+                await uptimeOrchestrator.setHistoryLimit(0);
 
                 expect(settingsRepoInstance.set).toHaveBeenCalledWith("historyLimit", "0");
-                expect(uptimeMonitor.getHistoryLimit()).toBe(0);
+                expect(uptimeOrchestrator.getHistoryLimit()).toBe(0);
             });
 
             it("should handle negative limit by setting to 0", async () => {
                 const settingsRepoInstance = mockSettingsRepository.mock.results[0].value;
 
-                await uptimeMonitor.setHistoryLimit(-5);
+                await uptimeOrchestrator.setHistoryLimit(-5);
 
                 expect(settingsRepoInstance.set).toHaveBeenCalledWith("historyLimit", "0");
-                expect(uptimeMonitor.getHistoryLimit()).toBe(0);
+                expect(uptimeOrchestrator.getHistoryLimit()).toBe(0);
             });
 
             it("should not prune when limit is 0", async () => {
                 const historyRepoInstance = mockHistoryRepository.mock.results[0].value;
 
-                await uptimeMonitor.setHistoryLimit(0);
+                await uptimeOrchestrator.setHistoryLimit(0);
 
                 expect(historyRepoInstance.pruneAllHistory).not.toHaveBeenCalled();
             });
@@ -1145,7 +1145,7 @@ describe("UptimeMonitor", () => {
 
         describe("getHistoryLimit", () => {
             it("should return current history limit", () => {
-                const limit = uptimeMonitor.getHistoryLimit();
+                const limit = uptimeOrchestrator.getHistoryLimit();
                 expect(typeof limit).toBe("number");
                 expect(limit).toBeGreaterThan(0);
             });
@@ -1172,7 +1172,7 @@ describe("UptimeMonitor", () => {
                 ],
             };
 
-            await uptimeMonitor.addSite(site);
+            await uptimeOrchestrator.addSite(site);
 
             // Mock the site repository to return the site with updated data
             siteRepoInstance.getByIdentifier.mockResolvedValue(site);
@@ -1183,7 +1183,7 @@ describe("UptimeMonitor", () => {
             });
 
             // Should not throw, should handle error gracefully
-            const result = await uptimeMonitor.checkSiteManually(identifier);
+            const result = await uptimeOrchestrator.checkSiteManually(identifier);
             expect(result).toBeDefined();
         });
 
@@ -1192,7 +1192,7 @@ describe("UptimeMonitor", () => {
             const eventListener = vi.fn();
             const siteRepoInstance = mockSiteRepository.mock.results[0].value;
 
-            uptimeMonitor.on("site-monitor-down", eventListener);
+            uptimeOrchestrator.on("site-monitor-down", eventListener);
 
             // Add a site with monitor that's currently up
             const site = {
@@ -1209,7 +1209,7 @@ describe("UptimeMonitor", () => {
                 ],
             };
 
-            await uptimeMonitor.addSite(site);
+            await uptimeOrchestrator.addSite(site);
 
             // First, simulate a successful check to set the monitor to "up" status
             mockMonitorFactory.getMonitor.mockReturnValue({
@@ -1236,7 +1236,7 @@ describe("UptimeMonitor", () => {
             });
 
             // Do the first check to set status to "up"
-            await uptimeMonitor.checkSiteManually(identifier);
+            await uptimeOrchestrator.checkSiteManually(identifier);
 
             // Now simulate the monitor going down
             mockMonitorFactory.getMonitor.mockReturnValue({
@@ -1263,7 +1263,7 @@ describe("UptimeMonitor", () => {
             });
 
             // Check again to trigger the down event
-            await uptimeMonitor.checkSiteManually(identifier);
+            await uptimeOrchestrator.checkSiteManually(identifier);
 
             expect(eventListener).toHaveBeenCalled();
         });
@@ -1272,7 +1272,7 @@ describe("UptimeMonitor", () => {
             const identifier = "test-site";
             const statusUpdateListener = vi.fn();
 
-            uptimeMonitor.on("status-update", statusUpdateListener);
+            uptimeOrchestrator.on("status-update", statusUpdateListener);
 
             // Add a site with monitor
             const site = {
@@ -1302,13 +1302,13 @@ describe("UptimeMonitor", () => {
                 ),
             } as any);
 
-            await uptimeMonitor.addSite(site);
+            await uptimeOrchestrator.addSite(site);
 
             // The status-update event should have been emitted during the check
             expect(statusUpdateListener).toHaveBeenCalled();
 
             // Verify the status was updated to "up"
-            const sites = uptimeMonitor.getSitesFromCache();
+            const sites = uptimeOrchestrator.getSitesFromCache();
             const addedSite = sites.find((s: any) => s.identifier === identifier);
             expect(addedSite?.monitors[0]?.status).toBe("up");
         });
@@ -1332,10 +1332,10 @@ describe("UptimeMonitor", () => {
             };
 
             // Add the site first
-            await uptimeMonitor.addSite(site);
+            await uptimeOrchestrator.addSite(site);
 
             // This should handle the case gracefully - monitors without IDs are not valid
-            await expect(uptimeMonitor.checkSiteManually(identifier, "undefined")).rejects.toThrow(
+            await expect(uptimeOrchestrator.checkSiteManually(identifier, "undefined")).rejects.toThrow(
                 "Monitor with ID undefined not found"
             );
         });
@@ -1358,10 +1358,10 @@ describe("UptimeMonitor", () => {
             };
 
             // Add the site first
-            await uptimeMonitor.addSite(site);
+            await uptimeOrchestrator.addSite(site);
 
             // This should handle the case gracefully by throwing an error for non-existent monitor
-            await expect(uptimeMonitor.checkSiteManually(identifier, "non-existent")).rejects.toThrow(
+            await expect(uptimeOrchestrator.checkSiteManually(identifier, "non-existent")).rejects.toThrow(
                 "Monitor with ID non-existent not found"
             );
         });
@@ -1389,13 +1389,13 @@ describe("UptimeMonitor", () => {
                 ],
             };
 
-            await uptimeMonitor.addSite(site);
+            await uptimeOrchestrator.addSite(site);
 
             // Mock the site repository to return the site with updated data
             siteRepoInstance.getByIdentifier.mockResolvedValue(site);
 
             // Should not throw, should handle error gracefully
-            const result = await uptimeMonitor.checkSiteManually(identifier);
+            const result = await uptimeOrchestrator.checkSiteManually(identifier);
             expect(result).toBeDefined();
         });
 
@@ -1405,7 +1405,7 @@ describe("UptimeMonitor", () => {
             const siteRepoInstance = mockSiteRepository.mock.results[0].value;
 
             // Set a small history limit
-            await uptimeMonitor.setHistoryLimit(5);
+            await uptimeOrchestrator.setHistoryLimit(5);
 
             // Add a site with monitor
             const site = {
@@ -1422,12 +1422,12 @@ describe("UptimeMonitor", () => {
                 ],
             };
 
-            await uptimeMonitor.addSite(site);
+            await uptimeOrchestrator.addSite(site);
 
             // Mock the site repository to return the site with updated data
             siteRepoInstance.getByIdentifier.mockResolvedValue(site);
 
-            await uptimeMonitor.checkSiteManually(identifier);
+            await uptimeOrchestrator.checkSiteManually(identifier);
 
             expect(historyRepoInstance.pruneHistory).toHaveBeenCalled();
         });
@@ -1451,12 +1451,12 @@ describe("UptimeMonitor", () => {
                 ],
             };
 
-            await uptimeMonitor.addSite(site);
+            await uptimeOrchestrator.addSite(site);
 
             // Mock the site repository to return null for fresh data fetch
             siteRepoInstance.getByIdentifier.mockResolvedValue(null);
 
-            const result = await uptimeMonitor.checkSiteManually(identifier);
+            const result = await uptimeOrchestrator.checkSiteManually(identifier);
             expect(result).toBeNull();
         });
     });
@@ -1482,14 +1482,14 @@ describe("UptimeMonitor", () => {
                 ],
             };
 
-            await uptimeMonitor.addSite(site);
+            await uptimeOrchestrator.addSite(site);
 
             // Mock the site repository to return the site with updated data
             siteRepoInstance.getByIdentifier.mockResolvedValue(site);
 
             // Instead of calling handleScheduledCheck directly, test that monitoring can be started
             // and verify that the scheduler was set up correctly
-            await uptimeMonitor.startMonitoringForSite(identifier, "monitor1");
+            await uptimeOrchestrator.startMonitoringForSite(identifier, "monitor1");
 
             // Verify scheduler was called with monitor
             expect(schedulerInstance.startMonitor).toHaveBeenCalled();
@@ -1499,8 +1499,8 @@ describe("UptimeMonitor", () => {
         it("should handle scheduled checks for non-existent site gracefully", async () => {
             // Instead of calling handleScheduledCheck directly, test that the system handles
             // non-existent sites gracefully when trying to start monitoring
-            const result = await uptimeMonitor.startMonitoringForSite("non-existent", "monitor1");
-            
+            const result = await uptimeOrchestrator.startMonitoringForSite("non-existent", "monitor1");
+
             // Should return false for non-existent site
             expect(result).toBe(false);
         });
@@ -1511,12 +1511,12 @@ describe("UptimeMonitor", () => {
             const siteRepoInstance = mockSiteRepository.mock.results[0].value;
             const dbErrorListener = vi.fn();
 
-            uptimeMonitor.on("db-error", dbErrorListener);
+            uptimeOrchestrator.on("db-error", dbErrorListener);
 
             // Mock loadSites to throw an error
             siteRepoInstance.findAll.mockRejectedValue(new Error("Database connection failed"));
 
-            await uptimeMonitor.initialize();
+            await uptimeOrchestrator.initialize();
 
             expect(dbErrorListener).toHaveBeenCalled();
         });
@@ -1543,7 +1543,7 @@ describe("UptimeMonitor", () => {
             ]);
 
             // Call initialize which should trigger loadSites and resume monitoring
-            await uptimeMonitor.initialize();
+            await uptimeOrchestrator.initialize();
 
             // Verify that start monitoring was called during site loading
             // Since the initialize call includes loading sites and resuming monitoring,
@@ -1571,7 +1571,7 @@ describe("UptimeMonitor", () => {
                     historyLimit: "500",
                 });
 
-                const result = await uptimeMonitor.exportData();
+                const result = await uptimeOrchestrator.exportData();
 
                 expect(typeof result).toBe("string");
 
@@ -1587,7 +1587,7 @@ describe("UptimeMonitor", () => {
                 // Mock export to throw error
                 siteRepoInstance.exportAll.mockRejectedValue(new Error("Export failed"));
 
-                await expect(uptimeMonitor.exportData()).rejects.toThrow("Export failed");
+                await expect(uptimeOrchestrator.exportData()).rejects.toThrow("Export failed");
             });
         });
 
@@ -1639,7 +1639,7 @@ describe("UptimeMonitor", () => {
                     },
                 ]);
 
-                const result = await uptimeMonitor.importData(importData);
+                const result = await uptimeOrchestrator.importData(importData);
 
                 expect(result).toBe(true);
                 expect(siteRepoInstance.deleteAll).toHaveBeenCalled();
@@ -1650,13 +1650,13 @@ describe("UptimeMonitor", () => {
             it("should reject invalid JSON", async () => {
                 const invalidData = "invalid json";
 
-                const result = await uptimeMonitor.importData(invalidData);
+                const result = await uptimeOrchestrator.importData(invalidData);
 
                 expect(result).toBe(false);
             });
 
             it("should reject empty data", async () => {
-                const result = await uptimeMonitor.importData("");
+                const result = await uptimeOrchestrator.importData("");
 
                 expect(result).toBe(false);
             });
@@ -1664,7 +1664,7 @@ describe("UptimeMonitor", () => {
             it("should reject non-object data", async () => {
                 const invalidData = JSON.stringify("not an object");
 
-                const result = await uptimeMonitor.importData(invalidData);
+                const result = await uptimeOrchestrator.importData(invalidData);
 
                 expect(result).toBe(false);
             });
@@ -1676,7 +1676,7 @@ describe("UptimeMonitor", () => {
                     },
                 });
 
-                const result = await uptimeMonitor.importData(importData);
+                const result = await uptimeOrchestrator.importData(importData);
 
                 expect(result).toBe(true);
             });
@@ -1686,7 +1686,7 @@ describe("UptimeMonitor", () => {
                     sites: [],
                 });
 
-                const result = await uptimeMonitor.importData(importData);
+                const result = await uptimeOrchestrator.importData(importData);
 
                 expect(result).toBe(true);
             });
@@ -1702,7 +1702,7 @@ describe("UptimeMonitor", () => {
                     settings: {},
                 });
 
-                const result = await uptimeMonitor.importData(importData);
+                const result = await uptimeOrchestrator.importData(importData);
 
                 expect(result).toBe(false);
             });
@@ -1751,7 +1751,7 @@ describe("UptimeMonitor", () => {
                 historyRepoInstance.deleteAll.mockResolvedValue();
                 historyRepoInstance.bulkInsert.mockResolvedValue();
 
-                const result = await uptimeMonitor.importData(importData);
+                const result = await uptimeOrchestrator.importData(importData);
 
                 expect(result).toBe(true);
                 expect(historyRepoInstance.bulkInsert).toHaveBeenCalled();
@@ -1762,13 +1762,13 @@ describe("UptimeMonitor", () => {
             it("should create database backup", async () => {
                 // Skip this test as it requires file system mocking that's complex
                 // The method exists and would work in real scenarios
-                expect(uptimeMonitor.downloadBackup).toBeDefined();
+                expect(uptimeOrchestrator.downloadBackup).toBeDefined();
             });
 
             it("should handle backup errors", async () => {
                 // Skip this test as it requires file system mocking that's complex
                 // The error handling exists and would work in real scenarios
-                expect(uptimeMonitor.downloadBackup).toBeDefined();
+                expect(uptimeOrchestrator.downloadBackup).toBeDefined();
             });
         });
 
@@ -1790,7 +1790,7 @@ describe("UptimeMonitor", () => {
                     },
                 ]);
 
-                const result = await uptimeMonitor.refreshSites();
+                const result = await uptimeOrchestrator.refreshSites();
 
                 expect(Array.isArray(result)).toBe(true);
                 expect(result).toHaveLength(1);
@@ -1803,7 +1803,7 @@ describe("UptimeMonitor", () => {
                 // Mock refresh to throw error
                 siteRepoInstance.findAll.mockRejectedValue(new Error("Refresh failed"));
 
-                await expect(uptimeMonitor.refreshSites()).rejects.toThrow("Refresh failed");
+                await expect(uptimeOrchestrator.refreshSites()).rejects.toThrow("Refresh failed");
             });
         });
     });
@@ -1812,7 +1812,7 @@ describe("UptimeMonitor", () => {
         describe("addSite validation", () => {
             it("should throw error for missing identifier", async () => {
                 await expect(
-                    uptimeMonitor.addSite({
+                    uptimeOrchestrator.addSite({
                         name: "Test Site",
                         monitors: [],
                     })
@@ -1821,7 +1821,7 @@ describe("UptimeMonitor", () => {
 
             it("should throw error for invalid monitors", async () => {
                 await expect(
-                    uptimeMonitor.addSite({
+                    uptimeOrchestrator.addSite({
                         identifier: "test-site",
                         name: "Test Site",
                         monitors: "invalid", // Should be array
@@ -1834,7 +1834,7 @@ describe("UptimeMonitor", () => {
     describe("Event Emission", () => {
         it("should emit status-update events when monitor status changes", async () => {
             const eventListener = vi.fn();
-            uptimeMonitor.on("status-update", eventListener);
+            uptimeOrchestrator.on("status-update", eventListener);
 
             // This would be called internally during monitoring
             // We can test it by manually triggering a status update simulation
@@ -1847,7 +1847,7 @@ describe("UptimeMonitor", () => {
                 previousStatus: "down" as const,
             };
 
-            uptimeMonitor.emit("status-update", mockUpdate);
+            uptimeOrchestrator.emit("status-update", mockUpdate);
 
             expect(eventListener).toHaveBeenCalledWith(mockUpdate);
         });
@@ -1859,15 +1859,15 @@ describe("UptimeMonitor", () => {
             const error = new Error("Database error");
             siteRepoInstance.findAll.mockRejectedValue(error);
 
-            await expect(uptimeMonitor.getSites()).rejects.toThrow("Database error");
+            await expect(uptimeOrchestrator.getSites()).rejects.toThrow("Database error");
         });
 
         it("should emit db-error events on database failures", async () => {
             const errorListener = vi.fn();
-            uptimeMonitor.on("db-error", errorListener);
+            uptimeOrchestrator.on("db-error", errorListener);
 
             // Simulate a database error
-            uptimeMonitor.emit("db-error", new Error("Database connection lost"));
+            uptimeOrchestrator.emit("db-error", new Error("Database connection lost"));
 
             expect(errorListener).toHaveBeenCalled();
         });
@@ -1876,10 +1876,10 @@ describe("UptimeMonitor", () => {
     describe("Advanced Monitoring Features", () => {
         it("should handle startMonitoring when already monitoring", async () => {
             // Start monitoring first time
-            await uptimeMonitor.startMonitoring();
+            await uptimeOrchestrator.startMonitoring();
 
             // Try to start again (should handle gracefully)
-            await uptimeMonitor.startMonitoring();
+            await uptimeOrchestrator.startMonitoring();
 
             // Should not cause issues
         });
@@ -1902,7 +1902,7 @@ describe("UptimeMonitor", () => {
                 ],
             };
 
-            await uptimeMonitor.addSite(site);
+            await uptimeOrchestrator.addSite(site);
 
             // Should have updated monitor with default interval
             expect(monitorRepoInstance.update).toHaveBeenCalledWith(
@@ -1937,13 +1937,13 @@ describe("UptimeMonitor", () => {
                 ],
             };
 
-            await uptimeMonitor.addSite(site);
+            await uptimeOrchestrator.addSite(site);
 
             // Mock the site repository to return the site with updated data
             siteRepoInstance.getByIdentifier.mockResolvedValue(site);
 
             // Should handle the error gracefully and return a result with "down" status
-            const result = await uptimeMonitor.checkSiteManually(identifier);
+            const result = await uptimeOrchestrator.checkSiteManually(identifier);
             expect(result).toBeDefined();
         });
     });
@@ -1968,7 +1968,7 @@ describe("UptimeMonitor", () => {
                     ],
                 };
 
-                await uptimeMonitor.addSite(site);
+                await uptimeOrchestrator.addSite(site);
 
                 // Should have logged debug message for new monitor
                 const { monitorLogger } = await import("../utils/logger");
@@ -1999,10 +1999,10 @@ describe("UptimeMonitor", () => {
                     ],
                 };
 
-                await uptimeMonitor.addSite(site);
+                await uptimeOrchestrator.addSite(site);
 
                 // Update the site with different interval
-                await uptimeMonitor.updateSite(identifier, {
+                await uptimeOrchestrator.updateSite(identifier, {
                     monitors: [
                         {
                             ...site.monitors[0],
@@ -2043,7 +2043,7 @@ describe("UptimeMonitor", () => {
                     ],
                 };
 
-                await uptimeMonitor.addSite(site);
+                await uptimeOrchestrator.addSite(site);
 
                 // Now test the error handling in startMonitoringForSite when calling without monitorId
                 const schedulerInstance = mockMonitorScheduler.mock.results[0].value;
@@ -2059,7 +2059,7 @@ describe("UptimeMonitor", () => {
                 });
 
                 // Call startMonitoringForSite without monitor ID to trigger multi-monitor logic
-                const result = await uptimeMonitor.startMonitoringForSite(identifier);
+                const result = await uptimeOrchestrator.startMonitoringForSite(identifier);
                 expect(result).toBe(true); // Should return true if at least one monitor started successfully
             });
 
@@ -2098,10 +2098,10 @@ describe("UptimeMonitor", () => {
                     ],
                 };
 
-                await uptimeMonitor.addSite(site);
+                await uptimeOrchestrator.addSite(site);
 
                 // Should complete without throwing even if some monitors fail to stop
-                const result = await uptimeMonitor.stopMonitoringForSite(identifier);
+                const result = await uptimeOrchestrator.stopMonitoringForSite(identifier);
                 expect(result).toBe(false); // Now correctly returns false when any monitor fails
             });
         });
@@ -2124,10 +2124,10 @@ describe("UptimeMonitor", () => {
                     ],
                 };
 
-                await uptimeMonitor.addSite(site);
+                await uptimeOrchestrator.addSite(site);
 
                 // Set up the site to have status "down" in memory
-                const sites = uptimeMonitor.getSitesFromCache();
+                const sites = uptimeOrchestrator.getSitesFromCache();
                 const testSite = sites.find((s: any) => s.identifier === identifier);
                 if (testSite) {
                     testSite.monitors[0].status = "down";
@@ -2160,10 +2160,10 @@ describe("UptimeMonitor", () => {
 
                 // Set up event listener
                 const upEventSpy = vi.fn();
-                uptimeMonitor.on("site-monitor-up", upEventSpy);
+                uptimeOrchestrator.on("site-monitor-up", upEventSpy);
 
                 // Trigger manual check to change status from down to up
-                await uptimeMonitor.checkSiteManually(identifier);
+                await uptimeOrchestrator.checkSiteManually(identifier);
 
                 // Should emit site-monitor-up event
                 expect(upEventSpy).toHaveBeenCalledWith({
@@ -2199,7 +2199,7 @@ describe("UptimeMonitor", () => {
                 ],
             };
 
-            await uptimeMonitor.addSite(site);
+            await uptimeOrchestrator.addSite(site);
 
             // Clear calls from addSite
             monitorRepoInstance.create.mockClear();
@@ -2216,7 +2216,7 @@ describe("UptimeMonitor", () => {
                 },
             ];
 
-            await uptimeMonitor.updateSite(identifier, { monitors: updatedMonitors });
+            await uptimeOrchestrator.updateSite(identifier, { monitors: updatedMonitors });
 
             // Should call create for non-numeric ID (because isNaN("non-numeric-id") is true)
             expect(monitorRepoInstance.create).toHaveBeenCalledWith(
@@ -2255,14 +2255,14 @@ describe("UptimeMonitor", () => {
             // Override startMonitor to not start automatically for this test
             schedulerInstance.startMonitor.mockReturnValue(false);
 
-            await uptimeMonitor.addSite(site);
+            await uptimeOrchestrator.addSite(site);
 
             // Clear calls from addSite
             schedulerInstance.startMonitor.mockClear();
             schedulerInstance.stopMonitor.mockClear();
 
             // Update with different interval
-            await uptimeMonitor.updateSite(identifier, {
+            await uptimeOrchestrator.updateSite(identifier, {
                 monitors: [
                     {
                         ...site.monitors[0],
@@ -2303,7 +2303,7 @@ describe("UptimeMonitor", () => {
             historyRepoInstance.findByMonitorId.mockResolvedValue(mockHistory);
             settingsRepoInstance.getAll.mockResolvedValue(mockSettings);
 
-            const result = await uptimeMonitor.exportData();
+            const result = await uptimeOrchestrator.exportData();
 
             const exportedData = JSON.parse(result);
             expect(exportedData.sites[0].monitors[0]).toHaveProperty("history", mockHistory);
@@ -2331,7 +2331,7 @@ describe("UptimeMonitor", () => {
                 ],
             };
 
-            await uptimeMonitor.addSite(site);
+            await uptimeOrchestrator.addSite(site);
 
             // Clear calls from addSite
             monitorRepoInstance.update.mockClear();
@@ -2347,7 +2347,7 @@ describe("UptimeMonitor", () => {
                 },
             ];
 
-            await uptimeMonitor.updateSite(identifier, { monitors: updatedMonitors });
+            await uptimeOrchestrator.updateSite(identifier, { monitors: updatedMonitors });
 
             // Should call update for numeric ID
             expect(monitorRepoInstance.update).toHaveBeenCalledWith(
@@ -2364,9 +2364,9 @@ describe("UptimeMonitor", () => {
             databaseInstance.downloadBackup.mockRejectedValue(error);
 
             const errorSpy = vi.fn();
-            uptimeMonitor.on("db-error", errorSpy);
+            uptimeOrchestrator.on("db-error", errorSpy);
 
-            await expect(uptimeMonitor.downloadBackup()).rejects.toThrow("Backup failed");
+            await expect(uptimeOrchestrator.downloadBackup()).rejects.toThrow("Backup failed");
 
             expect(errorSpy).toHaveBeenCalledWith({
                 error,
@@ -2411,7 +2411,7 @@ describe("UptimeMonitor", () => {
                 return Promise.resolve(`mock-monitor-id-${callCount}`);
             });
 
-            await uptimeMonitor.addSite(site);
+            await uptimeOrchestrator.addSite(site);
 
             // Mock stopMonitoringForSite to return false for the first monitor
             const schedulerInstance = mockMonitorScheduler.mock.results[0].value;
@@ -2423,7 +2423,7 @@ describe("UptimeMonitor", () => {
             });
 
             // This should trigger the logger.error and return false
-            const result = await uptimeMonitor.stopMonitoringForSite("test-site");
+            const result = await uptimeOrchestrator.stopMonitoringForSite("test-site");
             expect(result).toBe(false); // At least one monitor failed
         });
     });

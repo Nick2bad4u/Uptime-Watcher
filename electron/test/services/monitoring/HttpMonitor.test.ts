@@ -10,6 +10,12 @@ import { AxiosError } from "axios";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
 import { HttpMonitor } from "../../../services/monitoring/HttpMonitor";
+import {
+    determineMonitorStatus,
+    handleCheckError,
+    handleAxiosError,
+    createErrorResult,
+} from "../../../services/monitoring/utils";
 import type { Site } from "../../../types";
 
 // Define mock instance first
@@ -415,42 +421,42 @@ describe("HttpMonitor", () => {
         });
     });
 
-    describe("determineMonitorStatus", () => {
+    describe("determineMonitorStatus utility", () => {
         it("should return up for 2xx status codes", () => {
-            expect((httpMonitor as any).determineMonitorStatus(200)).toBe("up");
-            expect((httpMonitor as any).determineMonitorStatus(201)).toBe("up");
-            expect((httpMonitor as any).determineMonitorStatus(299)).toBe("up");
+            expect(determineMonitorStatus(200)).toBe("up");
+            expect(determineMonitorStatus(201)).toBe("up");
+            expect(determineMonitorStatus(299)).toBe("up");
         });
 
         it("should return up for 4xx status codes", () => {
-            expect((httpMonitor as any).determineMonitorStatus(400)).toBe("up");
-            expect((httpMonitor as any).determineMonitorStatus(404)).toBe("up");
-            expect((httpMonitor as any).determineMonitorStatus(499)).toBe("up");
+            expect(determineMonitorStatus(400)).toBe("up");
+            expect(determineMonitorStatus(404)).toBe("up");
+            expect(determineMonitorStatus(499)).toBe("up");
         });
 
         it("should return down for 5xx status codes", () => {
-            expect((httpMonitor as any).determineMonitorStatus(500)).toBe("down");
-            expect((httpMonitor as any).determineMonitorStatus(503)).toBe("down");
-            expect((httpMonitor as any).determineMonitorStatus(599)).toBe("down");
+            expect(determineMonitorStatus(500)).toBe("down");
+            expect(determineMonitorStatus(503)).toBe("down");
+            expect(determineMonitorStatus(599)).toBe("down");
         });
 
         it("should return up for 3xx status codes", () => {
-            expect((httpMonitor as any).determineMonitorStatus(300)).toBe("up");
-            expect((httpMonitor as any).determineMonitorStatus(301)).toBe("up");
-            expect((httpMonitor as any).determineMonitorStatus(399)).toBe("up");
+            expect(determineMonitorStatus(300)).toBe("up");
+            expect(determineMonitorStatus(301)).toBe("up");
+            expect(determineMonitorStatus(399)).toBe("up");
         });
 
         it("should return up for other unexpected codes", () => {
-            expect((httpMonitor as any).determineMonitorStatus(100)).toBe("up");
-            expect((httpMonitor as any).determineMonitorStatus(600)).toBe("down"); // >= 500 is down
+            expect(determineMonitorStatus(100)).toBe("up");
+            expect(determineMonitorStatus(600)).toBe("down"); // >= 500 is down
         });
     });
 
-    describe("handleCheckError", () => {
+    describe("handleCheckError utility", () => {
         it("should handle Error objects", () => {
             const error = new Error("Network error");
 
-            const result = (httpMonitor as any).handleCheckError(error, "https://example.com");
+            const result = handleCheckError(error, "https://example.com");
 
             expect(result.status).toBe("down");
             expect(result.error).toBe("Network error");
@@ -463,7 +469,7 @@ describe("HttpMonitor", () => {
         });
 
         it("should handle string errors", () => {
-            const result = (httpMonitor as any).handleCheckError("string error", "https://example.com");
+            const result = handleCheckError("string error", "https://example.com");
 
             expect(result.status).toBe("down");
             expect(result.error).toBe("Unknown error");
@@ -472,7 +478,7 @@ describe("HttpMonitor", () => {
         });
 
         it("should handle null/undefined errors", () => {
-            const result = (httpMonitor as any).handleCheckError(null, "https://example.com");
+            const result = handleCheckError(null, "https://example.com");
 
             expect(result.status).toBe("down");
             expect(result.error).toBe("Unknown error");
@@ -489,7 +495,7 @@ describe("HttpMonitor", () => {
             // Mock axios.isAxiosError to return true (this is the key!)
             (mockAxios.isAxiosError as any).mockReturnValue(true);
 
-            const result = (httpMonitor as any).handleCheckError(axiosError, "https://example.com");
+            const result = handleCheckError(axiosError, "https://example.com");
 
             expect(result).toEqual({
                 status: "down",
@@ -511,7 +517,7 @@ describe("HttpMonitor", () => {
                     await fn();
                 } catch (error) {
                     // Simulate the error being passed to handleCheckError
-                    const result = (httpMonitor as any).handleCheckError(error, "https://example.com");
+                    const result = handleCheckError(error, "https://example.com");
                     return result;
                 }
             });
@@ -542,7 +548,7 @@ describe("HttpMonitor", () => {
                     await fn();
                 } catch (error) {
                     // Simulate the error being passed to handleCheckError
-                    const result = (httpMonitor as any).handleCheckError(error, "https://example.com");
+                    const result = handleCheckError(error, "https://example.com");
                     return result;
                 }
             });
@@ -568,7 +574,7 @@ describe("HttpMonitor", () => {
                 message: "Network error occurred",
             } as AxiosError;
 
-            const result = (httpMonitor as any).handleAxiosError(axiosError, "https://example.com", 100);
+            const result = handleAxiosError(axiosError, "https://example.com", 100);
 
             expect(result).toEqual({
                 status: "down",
@@ -581,7 +587,7 @@ describe("HttpMonitor", () => {
         it("should handle errors without message", () => {
             const axiosError = {} as AxiosError;
 
-            const result = (httpMonitor as any).handleAxiosError(axiosError, "https://example.com", 0);
+            const result = handleAxiosError(axiosError, "https://example.com", 0);
 
             expect(result).toEqual({
                 status: "down",
@@ -597,7 +603,7 @@ describe("HttpMonitor", () => {
                 message: "Connection failed",
             } as AxiosError;
 
-            (httpMonitor as any).handleAxiosError(axiosError, "https://example.com", 0);
+            handleAxiosError(axiosError, "https://example.com", 0);
 
             expect(mockLogger.debug).toHaveBeenCalledWith(
                 "[HttpMonitor] Network error for https://example.com: Connection failed"
@@ -607,7 +613,7 @@ describe("HttpMonitor", () => {
 
     describe("createErrorResult", () => {
         it("should create error result with given message and response time", () => {
-            const result = (httpMonitor as any).createErrorResult("Test error", 500);
+            const result = createErrorResult("Test error", 500);
 
             expect(result).toEqual({
                 status: "down",

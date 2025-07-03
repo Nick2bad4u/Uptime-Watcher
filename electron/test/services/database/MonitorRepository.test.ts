@@ -1,10 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { MonitorRepository, MonitorRow } from "../../../services/database/MonitorRepository";
+import { MonitorRepository } from "../../../services/database/MonitorRepository";
 import { DatabaseService } from "../../../services/database/DatabaseService";
 import { Site } from "../../../types";
 import { logger } from "../../../utils/logger";
 import { isDev } from "../../../utils";
+import {
+    safeNumberConvert,
+    convertDateForDb,
+    buildMonitorParameters,
+    rowToMonitor,
+    addNumberField,
+    MonitorRow,
+} from "../../../services/database/utils";
 
 // Mock dependencies
 vi.mock("../../../services/database/DatabaseService");
@@ -787,14 +795,8 @@ describe("MonitorRepository", () => {
         });
     });
 
-    describe("Private helper methods", () => {
+    describe("Utility helper methods", () => {
         it("should test safeNumberConvert with different value types", () => {
-            const repository = new MonitorRepository();
-            // Access private method for testing
-            const safeNumberConvert = (
-                repository as unknown as { safeNumberConvert: (value: unknown) => number | undefined }
-            ).safeNumberConvert;
-
             // Test number input
             expect(safeNumberConvert(42)).toBe(42);
 
@@ -815,10 +817,6 @@ describe("MonitorRepository", () => {
         });
 
         it("should test convertDateForDb with different inputs", () => {
-            const repository = new MonitorRepository();
-            const convertDateForDb = (repository as unknown as { convertDateForDb: (value: unknown) => string | null })
-                .convertDateForDb;
-
             // Test null input
             expect(convertDateForDb(null)).toBeNull();
 
@@ -1239,19 +1237,18 @@ describe("MonitorRepository", () => {
 
     describe("Specific Branch Coverage Tests", () => {
         describe("Line 113: addNumberField null branch", () => {
-            it("should test the specific null branch in addNumberField (line 113)", async () => {
-                // Create a custom test to access the private method directly
-                const repository = monitorRepository as unknown as MonitorRepositoryWithPrivates;
+            it("should test the addNumberField utility function behavior", async () => {
+                // Test the addNumberField utility function directly
                 const updateFields: string[] = [];
                 const updateValues: (string | number | null)[] = [];
 
                 // Test undefined value - should not add field at all
-                repository.addNumberField("testField", undefined, updateFields, updateValues);
+                addNumberField("testField", undefined, updateFields, updateValues);
                 expect(updateFields).toHaveLength(0);
                 expect(updateValues).toHaveLength(0);
 
                 // Test defined value - should add field with Number conversion
-                repository.addNumberField("testField", 42, updateFields, updateValues);
+                addNumberField("testField", 42, updateFields, updateValues);
                 expect(updateFields).toContain("testField = ?");
                 expect(updateValues).toContain(42);
 
@@ -1556,9 +1553,6 @@ describe("MonitorRepository", () => {
         });
 
         it("should handle rowToMonitor with undefined host (line 183)", () => {
-            const repository = new MonitorRepository();
-            const rowToMonitor = (repository as any).rowToMonitor.bind(repository);
-
             const row = {
                 id: "1",
                 type: "http",
@@ -1635,10 +1629,8 @@ describe("MonitorRepository", () => {
     describe("Direct method tests for precise branch coverage", () => {
         describe("Status fallback branch (line 151)", () => {
             it("should handle falsy status values in buildMonitorParameters", async () => {
-                const repository = new MonitorRepository();
-                const buildMonitorParameters = (repository as any).buildMonitorParameters.bind(repository);
-
                 const monitor = {
+                    id: "test-id",
                     type: "http" as const,
                     url: "https://example.com",
                     monitoring: true,
@@ -1651,10 +1643,8 @@ describe("MonitorRepository", () => {
             });
 
             it("should handle undefined status in buildMonitorParameters", async () => {
-                const repository = new MonitorRepository();
-                const buildMonitorParameters = (repository as any).buildMonitorParameters.bind(repository);
-
                 const monitor = {
+                    id: "test-id",
                     type: "http" as const,
                     url: "https://example.com",
                     monitoring: true,
@@ -1667,10 +1657,8 @@ describe("MonitorRepository", () => {
             });
 
             it("should handle null status in buildMonitorParameters", async () => {
-                const repository = new MonitorRepository();
-                const buildMonitorParameters = (repository as any).buildMonitorParameters.bind(repository);
-
                 const monitor = {
+                    id: "test-id",
                     type: "http" as const,
                     url: "https://example.com",
                     monitoring: true,
@@ -1685,10 +1673,8 @@ describe("MonitorRepository", () => {
 
         describe("ResponseTime undefined branch (line 152)", () => {
             it("should handle undefined responseTime in buildMonitorParameters", async () => {
-                const repository = new MonitorRepository();
-                const buildMonitorParameters = (repository as any).buildMonitorParameters.bind(repository);
-
                 const monitor = {
+                    id: "test-id",
                     type: "http" as const,
                     url: "https://example.com",
                     monitoring: true,
@@ -1702,10 +1688,8 @@ describe("MonitorRepository", () => {
             });
 
             it("should handle defined responseTime in buildMonitorParameters", async () => {
-                const repository = new MonitorRepository();
-                const buildMonitorParameters = (repository as any).buildMonitorParameters.bind(repository);
-
                 const monitor = {
+                    id: "test-id",
                     type: "http" as const,
                     url: "https://example.com",
                     monitoring: true,
@@ -1758,9 +1742,6 @@ describe("MonitorRepository", () => {
 
         describe("Row id undefined branch (line 183)", () => {
             it("should return -1 when row.id is undefined in rowToMonitor", () => {
-                const repository = new MonitorRepository();
-                const rowToMonitor = (repository as any).rowToMonitor.bind(repository);
-
                 // Test defined id - should convert to string
                 const row1 = {
                     id: 123, // Defined

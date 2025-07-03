@@ -130,7 +130,7 @@ describe("DatabaseService", () => {
             });
 
             await expect(databaseService.initialize()).rejects.toThrow("Table creation failed");
-            expect(mockLogger.error).toHaveBeenCalledWith("[DatabaseService] Failed to create tables", error);
+            expect(mockLogger.error).toHaveBeenCalledWith("[DatabaseSchema] Failed to create tables", error);
         });
     });
 
@@ -163,17 +163,16 @@ describe("DatabaseService", () => {
             expect(createTableCalls[4][0]).toContain("CREATE TABLE IF NOT EXISTS stats");
             expect(createTableCalls[5][0]).toContain("CREATE TABLE IF NOT EXISTS logs");
 
-            expect(mockLogger.info).toHaveBeenCalledWith("[DatabaseService] All tables created successfully");
+            expect(mockLogger.info).toHaveBeenCalledWith("[DatabaseSchema] All tables created successfully");
         });
 
         it("should handle database not initialized error during table creation", async () => {
-            // Manually call createTables without initializing database
-            const databaseServiceAny = databaseService as any;
-            databaseServiceAny._db = undefined;
-
-            await expect(async () => {
-                await databaseServiceAny.createTables();
-            }).rejects.toThrow("Database not initialized");
+            // This test is no longer relevant as createTables is now part of the utility module
+            // and the database service ensures the database is initialized before calling it.
+            // Instead, we'll test that getDatabase throws when not initialized
+            expect(() => {
+                databaseService.getDatabase();
+            }).toThrow("Database not initialized");
         });
     });
 
@@ -220,7 +219,7 @@ describe("DatabaseService", () => {
                 buffer: mockBuffer,
                 fileName: "uptime-watcher-backup.sqlite",
             });
-            expect(mockLogger.info).toHaveBeenCalledWith("[DatabaseService] Database backup created successfully");
+            expect(mockLogger.info).toHaveBeenCalledWith("[DatabaseBackup] Database backup created successfully");
         });
 
         it("should handle backup errors", async () => {
@@ -231,7 +230,7 @@ describe("DatabaseService", () => {
             });
 
             await expect(databaseService.downloadBackup()).rejects.toThrow("Backup failed");
-            expect(mockLogger.error).toHaveBeenCalledWith("[DatabaseService] Failed to create database backup", error);
+            expect(mockLogger.error).toHaveBeenCalledWith("[DatabaseBackup] Failed to create database backup", error);
         });
     });
 });

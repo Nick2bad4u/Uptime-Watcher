@@ -20,8 +20,8 @@ vi.mock("electron", () => ({
     },
 }));
 
-vi.mock("../../../uptimeMonitor", () => ({
-    UptimeMonitor: vi.fn(),
+vi.mock("../../../UptimeOrchestrator", () => ({
+    UptimeOrchestrator: vi.fn(),
 }));
 
 vi.mock("../../../utils", () => ({
@@ -43,7 +43,7 @@ vi.mock("../../updater/AutoUpdaterService", () => ({
 
 describe("IpcService", () => {
     let ipcService: IpcService;
-    let mockUptimeMonitor: any;
+    let mockUptimeOrchestrator: any;
     let mockAutoUpdaterService: any;
     let mockIpcMain: any;
     let logger: any;
@@ -53,7 +53,7 @@ describe("IpcService", () => {
 
         logger = (await import("../../../utils/logger")).logger;
 
-        mockUptimeMonitor = {
+        mockUptimeOrchestrator = {
             addSite: vi.fn(),
             removeSite: vi.fn(),
             getSites: vi.fn(),
@@ -76,7 +76,7 @@ describe("IpcService", () => {
 
         mockIpcMain = ipcMain;
 
-        ipcService = new IpcService(mockUptimeMonitor, mockAutoUpdaterService);
+        ipcService = new IpcService(mockUptimeOrchestrator, mockAutoUpdaterService);
     });
 
     afterEach(() => {
@@ -129,46 +129,46 @@ describe("IpcService", () => {
 
         it("should handle add-site", async () => {
             const mockSite = { identifier: "example.com", url: "https://example.com" };
-            mockUptimeMonitor.addSite.mockResolvedValue(mockSite);
+            mockUptimeOrchestrator.addSite.mockResolvedValue(mockSite);
 
             const addSiteHandler = getHandlerForChannel("add-site");
             const result = await addSiteHandler(null, mockSite);
 
-            expect(mockUptimeMonitor.addSite).toHaveBeenCalledWith(mockSite);
+            expect(mockUptimeOrchestrator.addSite).toHaveBeenCalledWith(mockSite);
             expect(result).toBe(mockSite);
         });
 
         it("should handle remove-site", async () => {
             const identifier = "example.com";
-            mockUptimeMonitor.removeSite.mockResolvedValue(true);
+            mockUptimeOrchestrator.removeSite.mockResolvedValue(true);
 
             const removeSiteHandler = getHandlerForChannel("remove-site");
             const result = await removeSiteHandler(null, identifier);
 
-            expect(mockUptimeMonitor.removeSite).toHaveBeenCalledWith(identifier);
+            expect(mockUptimeOrchestrator.removeSite).toHaveBeenCalledWith(identifier);
             expect(result).toBe(true);
         });
 
         it("should handle get-sites", async () => {
             const mockSites = [{ identifier: "example.com" }];
-            mockUptimeMonitor.getSites.mockResolvedValue(mockSites);
+            mockUptimeOrchestrator.getSites.mockResolvedValue(mockSites);
 
             const getSitesHandler = getHandlerForChannel("get-sites");
             const result = await getSitesHandler();
 
-            expect(mockUptimeMonitor.getSites).toHaveBeenCalled();
+            expect(mockUptimeOrchestrator.getSites).toHaveBeenCalled();
             expect(result).toBe(mockSites);
         });
 
         it("should handle update-site", async () => {
             const identifier = "example.com";
             const updates = { name: "Updated Site" };
-            mockUptimeMonitor.updateSite.mockResolvedValue(true);
+            mockUptimeOrchestrator.updateSite.mockResolvedValue(true);
 
             const updateSiteHandler = getHandlerForChannel("update-site");
             const result = await updateSiteHandler(null, identifier, updates);
 
-            expect(mockUptimeMonitor.updateSite).toHaveBeenCalledWith(identifier, updates);
+            expect(mockUptimeOrchestrator.updateSite).toHaveBeenCalledWith(identifier, updates);
             expect(result).toBe(true);
         });
     });
@@ -182,7 +182,7 @@ describe("IpcService", () => {
             const startMonitoringHandler = getHandlerForChannel("start-monitoring");
             const result = await startMonitoringHandler();
 
-            expect(mockUptimeMonitor.startMonitoring).toHaveBeenCalled();
+            expect(mockUptimeOrchestrator.startMonitoring).toHaveBeenCalled();
             expect(result).toBe(true);
         });
 
@@ -190,31 +190,31 @@ describe("IpcService", () => {
             const stopMonitoringHandler = getHandlerForChannel("stop-monitoring");
             const result = await stopMonitoringHandler();
 
-            expect(mockUptimeMonitor.stopMonitoring).toHaveBeenCalled();
+            expect(mockUptimeOrchestrator.stopMonitoring).toHaveBeenCalled();
             expect(result).toBe(true);
         });
 
         it("should handle start-monitoring-for-site", async () => {
             const identifier = "example.com";
             const monitorType = "http";
-            mockUptimeMonitor.startMonitoringForSite.mockResolvedValue(true);
+            mockUptimeOrchestrator.startMonitoringForSite.mockResolvedValue(true);
 
             const startMonitoringForSiteHandler = getHandlerForChannel("start-monitoring-for-site");
             const result = await startMonitoringForSiteHandler(null, identifier, monitorType);
 
-            expect(mockUptimeMonitor.startMonitoringForSite).toHaveBeenCalledWith(identifier, monitorType);
+            expect(mockUptimeOrchestrator.startMonitoringForSite).toHaveBeenCalledWith(identifier, monitorType);
             expect(result).toBe(true);
         });
 
         it("should handle stop-monitoring-for-site", async () => {
             const identifier = "example.com";
             const monitorType = "http";
-            mockUptimeMonitor.stopMonitoringForSite.mockResolvedValue(true);
+            mockUptimeOrchestrator.stopMonitoringForSite.mockResolvedValue(true);
 
             const stopMonitoringForSiteHandler = getHandlerForChannel("stop-monitoring-for-site");
             const result = await stopMonitoringForSiteHandler(null, identifier, monitorType);
 
-            expect(mockUptimeMonitor.stopMonitoringForSite).toHaveBeenCalledWith(identifier, monitorType);
+            expect(mockUptimeOrchestrator.stopMonitoringForSite).toHaveBeenCalledWith(identifier, monitorType);
             expect(result).toBe(true);
         });
 
@@ -222,12 +222,12 @@ describe("IpcService", () => {
             const identifier = "example.com";
             const monitorType = "http";
             const mockResult = { status: "up", responseTime: 250 };
-            mockUptimeMonitor.checkSiteManually.mockResolvedValue(mockResult);
+            mockUptimeOrchestrator.checkSiteManually.mockResolvedValue(mockResult);
 
             const checkSiteNowHandler = getHandlerForChannel("check-site-now");
             const result = await checkSiteNowHandler(null, identifier, monitorType);
 
-            expect(mockUptimeMonitor.checkSiteManually).toHaveBeenCalledWith(identifier, monitorType);
+            expect(mockUptimeOrchestrator.checkSiteManually).toHaveBeenCalledWith(identifier, monitorType);
             expect(result).toBe(mockResult);
         });
     });
@@ -239,62 +239,62 @@ describe("IpcService", () => {
 
         it("should handle export-data", async () => {
             const mockExportData = { sites: [], history: [] };
-            mockUptimeMonitor.exportData.mockResolvedValue(mockExportData);
+            mockUptimeOrchestrator.exportData.mockResolvedValue(mockExportData);
 
             const exportDataHandler = getHandlerForChannel("export-data");
             const result = await exportDataHandler();
 
-            expect(mockUptimeMonitor.exportData).toHaveBeenCalled();
+            expect(mockUptimeOrchestrator.exportData).toHaveBeenCalled();
             expect(result).toBe(mockExportData);
         });
 
         it("should handle import-data", async () => {
             const mockImportData = { sites: [], history: [] };
-            mockUptimeMonitor.importData.mockResolvedValue(true);
+            mockUptimeOrchestrator.importData.mockResolvedValue(true);
 
             const importDataHandler = getHandlerForChannel("import-data");
             const result = await importDataHandler(null, mockImportData);
 
-            expect(mockUptimeMonitor.importData).toHaveBeenCalledWith(mockImportData);
+            expect(mockUptimeOrchestrator.importData).toHaveBeenCalledWith(mockImportData);
             expect(result).toBe(true);
         });
 
         it("should handle update-history-limit", async () => {
             const limit = 30;
-            mockUptimeMonitor.setHistoryLimit.mockResolvedValue(true);
+            mockUptimeOrchestrator.setHistoryLimit.mockResolvedValue(true);
 
             const updateHistoryLimitHandler = getHandlerForChannel("update-history-limit");
             const result = await updateHistoryLimitHandler(null, limit);
 
-            expect(mockUptimeMonitor.setHistoryLimit).toHaveBeenCalledWith(limit);
+            expect(mockUptimeOrchestrator.setHistoryLimit).toHaveBeenCalledWith(limit);
             expect(result).toBe(true);
         });
 
         it("should handle get-history-limit", async () => {
             const limit = 30;
-            mockUptimeMonitor.getHistoryLimit.mockResolvedValue(limit);
+            mockUptimeOrchestrator.getHistoryLimit.mockResolvedValue(limit);
 
             const getHistoryLimitHandler = getHandlerForChannel("get-history-limit");
             const result = await getHistoryLimitHandler();
 
-            expect(mockUptimeMonitor.getHistoryLimit).toHaveBeenCalled();
+            expect(mockUptimeOrchestrator.getHistoryLimit).toHaveBeenCalled();
             expect(result).toBe(limit);
         });
 
         it("should handle download-sqlite-backup successfully", async () => {
             const mockBackupData = { path: "/path/to/backup" };
-            mockUptimeMonitor.downloadBackup.mockResolvedValue(mockBackupData);
+            mockUptimeOrchestrator.downloadBackup.mockResolvedValue(mockBackupData);
 
             const downloadBackupHandler = getHandlerForChannel("download-sqlite-backup");
             const result = await downloadBackupHandler();
 
-            expect(mockUptimeMonitor.downloadBackup).toHaveBeenCalled();
+            expect(mockUptimeOrchestrator.downloadBackup).toHaveBeenCalled();
             expect(result).toBe(mockBackupData);
         });
 
         it("should handle download-sqlite-backup errors", async () => {
             const error = new Error("Backup failed");
-            mockUptimeMonitor.downloadBackup.mockRejectedValue(error);
+            mockUptimeOrchestrator.downloadBackup.mockRejectedValue(error);
 
             const downloadBackupHandler = getHandlerForChannel("download-sqlite-backup");
 
@@ -304,7 +304,7 @@ describe("IpcService", () => {
 
         it("should handle download-sqlite-backup with non-Error objects", async () => {
             const error = "String error";
-            mockUptimeMonitor.downloadBackup.mockRejectedValue(error);
+            mockUptimeOrchestrator.downloadBackup.mockRejectedValue(error);
 
             const downloadBackupHandler = getHandlerForChannel("download-sqlite-backup");
 

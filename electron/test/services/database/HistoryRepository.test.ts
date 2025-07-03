@@ -108,7 +108,7 @@ describe("HistoryRepository", () => {
 
             await expect(historyRepository.findByMonitorId("monitor-1")).rejects.toThrow("Database error");
             expect(logger.error).toHaveBeenCalledWith(
-                "[HistoryRepository] Failed to fetch history for monitor: monitor-1",
+                "[HistoryQuery] Failed to fetch history for monitor: monitor-1",
                 error
             );
         });
@@ -165,7 +165,7 @@ describe("HistoryRepository", () => {
                 ["monitor-1", 1640995200000, "up", 150, "Success"]
             );
             expect(logger.debug).toHaveBeenCalledWith(
-                "[HistoryRepository] Added history entry: monitor_id=monitor-1, status=up, responseTime=150, timestamp=1640995200000"
+                "[HistoryManipulation] Added history entry: monitor_id=monitor-1, status=up, responseTime=150, timestamp=1640995200000"
             );
         });
 
@@ -189,7 +189,7 @@ describe("HistoryRepository", () => {
 
             await expect(historyRepository.addEntry("monitor-1", mockEntry)).rejects.toThrow("Insert failed");
             expect(logger.error).toHaveBeenCalledWith(
-                "[HistoryRepository] Failed to add history entry for monitor: monitor-1",
+                "[HistoryManipulation] Failed to add history entry for monitor: monitor-1",
                 error
             );
         });
@@ -202,7 +202,7 @@ describe("HistoryRepository", () => {
             await historyRepository.deleteByMonitorId("monitor-1");
 
             expect(mockDatabase.run).toHaveBeenCalledWith("DELETE FROM history WHERE monitor_id = ?", ["monitor-1"]);
-            expect(logger.debug).toHaveBeenCalledWith("[HistoryRepository] Deleted history for monitor: monitor-1");
+            expect(logger.debug).toHaveBeenCalledWith("[HistoryManipulation] Deleted history for monitor: monitor-1");
         });
 
         it("should handle database errors", async () => {
@@ -213,7 +213,7 @@ describe("HistoryRepository", () => {
 
             await expect(historyRepository.deleteByMonitorId("monitor-1")).rejects.toThrow("Delete failed");
             expect(logger.error).toHaveBeenCalledWith(
-                "[HistoryRepository] Failed to delete history for monitor: monitor-1",
+                "[HistoryManipulation] Failed to delete history for monitor: monitor-1",
                 error
             );
         });
@@ -233,7 +233,7 @@ describe("HistoryRepository", () => {
             );
             expect(mockDatabase.run).toHaveBeenCalledWith("DELETE FROM history WHERE id IN (1,2,3)");
             expect(logger.debug).toHaveBeenCalledWith(
-                "[HistoryRepository] Pruned 3 old history entries for monitor: monitor-1"
+                "[HistoryManipulation] Pruned 3 old history entries for monitor: monitor-1"
             );
         });
 
@@ -261,7 +261,7 @@ describe("HistoryRepository", () => {
 
             await expect(historyRepository.pruneHistory("monitor-1", 5)).rejects.toThrow("Prune failed");
             expect(logger.error).toHaveBeenCalledWith(
-                "[HistoryRepository] Failed to prune history for monitor: monitor-1",
+                "[HistoryManipulation] Failed to prune history for monitor: monitor-1",
                 error
             );
         });
@@ -336,7 +336,7 @@ describe("HistoryRepository", () => {
 
             await expect(historyRepository.getHistoryCount("monitor-1")).rejects.toThrow("Count failed");
             expect(logger.error).toHaveBeenCalledWith(
-                "[HistoryRepository] Failed to get history count for monitor: monitor-1",
+                "[HistoryQuery] Failed to get history count for monitor: monitor-1",
                 error
             );
         });
@@ -349,7 +349,7 @@ describe("HistoryRepository", () => {
             await historyRepository.deleteAll();
 
             expect(mockDatabase.run).toHaveBeenCalledWith("DELETE FROM history");
-            expect(logger.debug).toHaveBeenCalledWith("[HistoryRepository] Cleared all history");
+            expect(logger.debug).toHaveBeenCalledWith("[HistoryManipulation] Cleared all history");
         });
 
         it("should handle database errors", async () => {
@@ -359,7 +359,7 @@ describe("HistoryRepository", () => {
             });
 
             await expect(historyRepository.deleteAll()).rejects.toThrow("Delete all failed");
-            expect(logger.error).toHaveBeenCalledWith("[HistoryRepository] Failed to clear all history", error);
+            expect(logger.error).toHaveBeenCalledWith("[HistoryManipulation] Failed to clear all history", error);
         });
     });
 
@@ -403,7 +403,7 @@ describe("HistoryRepository", () => {
 
             await expect(historyRepository.getLatestEntry("monitor-1")).rejects.toThrow("Get latest failed");
             expect(logger.error).toHaveBeenCalledWith(
-                "[HistoryRepository] Failed to get latest history entry for monitor: monitor-1",
+                "[HistoryQuery] Failed to get latest history entry for monitor: monitor-1",
                 error
             );
         });
@@ -439,7 +439,7 @@ describe("HistoryRepository", () => {
                 ["monitor-1", 1640995100000, "down", 0, null]
             );
             expect(logger.info).toHaveBeenCalledWith(
-                "[HistoryRepository] Bulk inserted 2 history entries for monitor: monitor-1"
+                "[HistoryManipulation] Bulk inserted 2 history entries for monitor: monitor-1"
             );
         });
 
@@ -478,13 +478,13 @@ describe("HistoryRepository", () => {
                 "Bulk insert failed"
             );
             expect(logger.error).toHaveBeenCalledWith(
-                "[HistoryRepository] Failed to bulk insert history for monitor: monitor-1",
+                "[HistoryManipulation] Failed to bulk insert history for monitor: monitor-1",
                 error
             );
         });
     });
 
-    describe("rowToHistoryEntry type conversion (lines 32,34 coverage)", () => {
+    describe("Database row to history entry conversion (utility function integration)", () => {
         it("should convert string responseTime and timestamp to numbers", async () => {
             // Mock database rows with string values (common in SQLite)
             const mockRows = [
