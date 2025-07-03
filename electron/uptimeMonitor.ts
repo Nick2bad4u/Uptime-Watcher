@@ -17,7 +17,14 @@ import {
 import { MonitorScheduler } from "./services/monitoring";
 import { Site, StatusUpdate } from "./types";
 import { isDev } from "./utils";
+import { downloadBackup, refreshSites, DataBackupDependencies, DataBackupCallbacks } from "./utils/database/dataBackup";
 import { initDatabase } from "./utils/database/databaseInitializer";
+import {
+    exportData,
+    importData,
+    DataImportExportDependencies,
+    DataImportExportCallbacks,
+} from "./utils/database/dataImportExport";
 import {
     getHistoryLimit as getHistoryLimitUtil,
     setHistoryLimit as setHistoryLimitUtil,
@@ -34,15 +41,6 @@ import { performInitialMonitorChecks } from "./utils/monitoring/monitorChecker";
 import { startAllMonitoring, startMonitoringForSite } from "./utils/monitoring/monitoringStarter";
 import { stopAllMonitoring, stopMonitoringForSite } from "./utils/monitoring/monitoringStopper";
 import { checkMonitor, checkSiteManually } from "./utils/monitoring/monitorStatusChecker";
-
-/**
- * Type for imported site data structure.
- */
-type ImportSite = {
-    identifier: string;
-    name?: string;
-    monitors?: Site["monitors"];
-};
 
 /**
  * Core uptime monitoring service that manages site monitoring operations.
@@ -328,166 +326,48 @@ export class UptimeMonitor extends EventEmitter {
 
     // Export/Import functionality
     public async exportData(): Promise<string> {
-        try {
-            // Export all sites and settings using repositories
-            const sites = await this.siteRepository.exportAll();
-            const settings = await this.settingsRepository.getAll();
+        const dependencies: DataImportExportDependencies = {
+            eventEmitter: this,
+            repositories: {
+                history: this.historyRepository,
+                monitor: this.monitorRepository,
+                settings: this.settingsRepository,
+                site: this.siteRepository,
+            },
+        };
 
-            const exportObj = {
-                settings,
-                sites: sites.map((site) => ({
-                    identifier: site.identifier,
-                    monitors: [] as Site["monitors"],
-                    name: site.name,
-                })),
-            };
-
-            // Export monitors and history for each site
-            for (const site of exportObj.sites) {
-                const monitors = await this.monitorRepository.findBySiteIdentifier(site.identifier);
-                for (const monitor of monitors) {
-                    if (monitor.id) {
-                        monitor.history = await this.historyRepository.findByMonitorId(monitor.id);
-                    }
-                }
-                site.monitors = monitors;
-            }
-
-            return JSON.stringify(exportObj, undefined, 2);
-        } catch (error) {
-            logger.error("Failed to export data", error);
-            this.emit("db-error", { error, operation: "exportData" });
-            throw error;
-        }
+        return exportData(dependencies);
     }
 
     public async importData(data: string): Promise<boolean> {
-        logger.info("Importing data");
-        try {
-            const parsedData = this.validateImportData(data);
-            await this.clearExistingData();
-            await this.importSitesAndSettings(parsedData);
+        const dependencies: DataImportExportDependencies = {
+            eventEmitter: this,
+            repositories: {
+                history: this.historyRepository,
+                monitor: this.monitorRepository,
+                settings: this.settingsRepository,
+                site: this.siteRepository,
+            },
+        };
 
-            if (parsedData.sites) {
-                await this.importMonitorsWithHistory(parsedData.sites);
-            }
+        const callbacks: DataImportExportCallbacks = {
+            getSitesFromCache: () => this.getSitesFromCache(),
+            loadSites: () => this.loadSites(),
+        };
 
-            await this.loadSites();
-
-            logger.info("Data imported successfully");
-            return true;
-        } catch (error) {
-            logger.error("Failed to import data", error);
-            this.emit("db-error", { error, operation: "importData" });
-            return false;
-        }
-    }
-
-    /**
-     * Validate and parse import data.
-     */
-    private validateImportData(data: string): { sites?: ImportSite[]; settings?: Record<string, string> } {
-        if (!data || typeof data !== "string") {
-            throw new Error("Invalid import data: must be a non-empty string");
-        }
-
-        const parsedData = JSON.parse(data);
-        if (!parsedData || typeof parsedData !== "object") {
-            throw new Error("Invalid import data: must be a valid JSON object");
-        }
-
-        return parsedData;
-    }
-
-    /**
-     * Clear all existing data from repositories.
-     */
-    private async clearExistingData(): Promise<void> {
-        await this.siteRepository.deleteAll();
-        await this.settingsRepository.deleteAll();
-        await this.monitorRepository.deleteAll();
-        await this.historyRepository.deleteAll();
-    }
-
-    /**
-     * Import sites and settings data.
-     */
-    private async importSitesAndSettings(parsedData: {
-        sites?: ImportSite[];
-        settings?: Record<string, string>;
-    }): Promise<void> {
-        if (Array.isArray(parsedData.sites)) {
-            const sitesToInsert = parsedData.sites.map((site: { identifier: string; name?: string }) => ({
-                identifier: site.identifier,
-                name: site.name,
-            }));
-            await this.siteRepository.bulkInsert(sitesToInsert);
-        }
-
-        if (parsedData.settings && typeof parsedData.settings === "object") {
-            await this.settingsRepository.bulkInsert(parsedData.settings);
-        }
-    }
-
-    /**
-     * Import monitors and their associated history.
-     */
-    private async importMonitorsWithHistory(sites: ImportSite[]): Promise<void> {
-        for (const site of sites) {
-            if (Array.isArray(site.monitors)) {
-                const createdMonitors = await this.monitorRepository.bulkCreate(site.identifier, site.monitors);
-                await this.importHistoryForMonitors(createdMonitors, site.monitors);
-            }
-        }
-    }
-
-    /**
-     * Import history for created monitors by matching with original monitors.
-     */
-    private async importHistoryForMonitors(
-        createdMonitors: Site["monitors"],
-        originalMonitors: Site["monitors"]
-    ): Promise<void> {
-        for (const createdMonitor of createdMonitors) {
-            const originalMonitor = this.findMatchingOriginalMonitor(createdMonitor, originalMonitors);
-
-            if (this.shouldImportHistory(createdMonitor, originalMonitor)) {
-                await this.historyRepository.bulkInsert(createdMonitor.id, originalMonitor?.history ?? []);
-            }
-        }
-    }
-
-    /**
-     * Find the original monitor that matches the created monitor.
-     */
-    private findMatchingOriginalMonitor(
-        createdMonitor: Site["monitors"][0],
-        originalMonitors: Site["monitors"]
-    ): Site["monitors"][0] | undefined {
-        return originalMonitors.find(
-            (original: Site["monitors"][0]) =>
-                original.url === createdMonitor.url && original.type === createdMonitor.type
-        );
-    }
-
-    /**
-     * Check if history should be imported for a monitor.
-     */
-    private shouldImportHistory(createdMonitor: Site["monitors"][0], originalMonitor?: Site["monitors"][0]): boolean {
-        return !!(createdMonitor && originalMonitor && createdMonitor.id);
+        return importData(dependencies, callbacks, data);
     }
 
     /**
      * Download SQLite database backup.
      */
     public async downloadBackup(): Promise<{ buffer: Buffer; fileName: string }> {
-        try {
-            return await this.databaseService.downloadBackup();
-        } catch (error) {
-            logger.error("Failed to download backup", error);
-            this.emit("db-error", { error, operation: "downloadBackup" });
-            throw error;
-        }
+        const dependencies: DataBackupDependencies = {
+            databaseService: this.databaseService,
+            eventEmitter: this,
+        };
+
+        return downloadBackup(dependencies);
     }
 
     /**
@@ -495,12 +375,11 @@ export class UptimeMonitor extends EventEmitter {
      * Use this when you need to reload the in-memory cache from database.
      */
     public async refreshSites(): Promise<Site[]> {
-        try {
-            await this.loadSites();
-            return this.getSitesFromCache();
-        } catch (error) {
-            logger.error("Failed to refresh sites from database", error);
-            throw error;
-        }
+        const callbacks: DataBackupCallbacks = {
+            getSitesFromCache: () => this.getSitesFromCache(),
+            loadSites: () => this.loadSites(),
+        };
+
+        return refreshSites(callbacks);
     }
 }
