@@ -7,6 +7,7 @@
 import { EventEmitter } from "events";
 
 import { DEFAULT_HISTORY_LIMIT } from "./constants";
+import { DATABASE_EVENTS, SITE_EVENTS, MONITOR_EVENTS } from "./events";
 import { DatabaseManager } from "./managers/DatabaseManager";
 import { MonitorManager } from "./managers/MonitorManager";
 import { SiteManager } from "./managers/SiteManager";
@@ -61,8 +62,9 @@ export class UptimeOrchestrator extends EventEmitter {
         const historyRepository = new HistoryRepository();
         const settingsRepository = new SettingsRepository();
 
-        // Initialize managers
+        // Initialize managers with event-driven dependencies
         this.siteManager = new SiteManager({
+            eventEmitter: this,
             historyRepository,
             monitorRepository,
             siteRepository,
@@ -90,31 +92,65 @@ export class UptimeOrchestrator extends EventEmitter {
             },
         });
 
-        // Set up callbacks between managers
-        this.setupManagerCallbacks();
+        // Set up event-driven communication between managers
+        this.setupEventHandlers();
     }
 
     /**
-     * Set up callbacks between managers for cross-manager operations.
+     * Set up event handlers for inter-manager communication.
      */
-    private setupManagerCallbacks(): void {
-        // Site manager callbacks for monitoring operations
-        this.siteManager.setCallbacks({
-            startMonitoringForSite: (identifier, monitorId) =>
-                this.monitorManager.startMonitoringForSite(identifier, monitorId),
-            stopMonitoringForSite: (identifier, monitorId) =>
-                this.monitorManager.stopMonitoringForSite(identifier, monitorId),
+    private setupEventHandlers(): void {
+        // Handle site manager events
+        this.on(SITE_EVENTS.START_MONITORING_REQUESTED, (data) => {
+            this.monitorManager.startMonitoringForSite(data.identifier, data.monitorId);
         });
 
-        // Database manager callbacks for cache and state management
-        this.databaseManager.setCallbacks({
-            getSitesFromCache: () => this.siteManager.getSitesFromCache(),
-            setHistoryLimit: (limit) => {
-                this.historyLimit = limit;
-            },
-            startMonitoringForSite: (identifier, monitorId) =>
-                this.monitorManager.startMonitoringForSite(identifier, monitorId),
-            updateSitesCache: (sites) => this.siteManager.updateSitesCache(sites),
+        this.on(SITE_EVENTS.STOP_MONITORING_REQUESTED, (data) => {
+            this.monitorManager.stopMonitoringForSite(data.identifier, data.monitorId);
+        });
+
+        // Handle database manager events
+        this.on(DATABASE_EVENTS.UPDATE_SITES_CACHE_REQUESTED, (data) => {
+            if (data.sites) {
+                this.siteManager.updateSitesCache(data.sites);
+            }
+        });
+
+        this.on(DATABASE_EVENTS.GET_SITES_FROM_CACHE_REQUESTED, () => {
+            // Respond with sites from cache
+            const sites = this.siteManager.getSitesFromCache();
+            this.emit(DATABASE_EVENTS.GET_SITES_FROM_CACHE_REQUESTED, { sites });
+        });
+
+        this.on(DATABASE_EVENTS.HISTORY_LIMIT_UPDATED, (data) => {
+            if (data.limit !== undefined) {
+                this.historyLimit = data.limit;
+            }
+        });
+
+        // Forward manager events to renderer process
+        this.siteManager.on(SITE_EVENTS.SITE_ADDED, (data) => {
+            this.emit(SITE_EVENTS.SITE_ADDED, data);
+        });
+
+        this.siteManager.on(SITE_EVENTS.SITE_REMOVED, (data) => {
+            this.emit(SITE_EVENTS.SITE_REMOVED, data);
+        });
+
+        this.siteManager.on(SITE_EVENTS.SITE_UPDATED, (data) => {
+            this.emit(SITE_EVENTS.SITE_UPDATED, data);
+        });
+
+        this.monitorManager.on(MONITOR_EVENTS.MONITORING_STARTED, (data) => {
+            this.emit(MONITOR_EVENTS.MONITORING_STARTED, data);
+        });
+
+        this.monitorManager.on(MONITOR_EVENTS.MONITORING_STOPPED, (data) => {
+            this.emit(MONITOR_EVENTS.MONITORING_STOPPED, data);
+        });
+
+        this.databaseManager.on(DATABASE_EVENTS.INITIALIZED, (data) => {
+            this.emit(DATABASE_EVENTS.INITIALIZED, data);
         });
     }
 

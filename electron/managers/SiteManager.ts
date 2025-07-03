@@ -3,6 +3,9 @@
  * Responsible for site data persistence and in-memory cache synchronization.
  */
 
+import { EventEmitter } from "events";
+
+import { SITE_EVENTS, SiteEventData } from "../events";
 import { SiteRepository, MonitorRepository, HistoryRepository } from "../services/database";
 import { Site } from "../types";
 import {
@@ -14,36 +17,32 @@ import {
     SiteUpdateCallbacks,
 } from "../utils/database";
 import { monitorLogger as logger } from "../utils/logger";
+import { configurationManager } from "./ConfigurationManager";
 
 export interface SiteManagerDependencies {
     siteRepository: SiteRepository;
     monitorRepository: MonitorRepository;
     historyRepository: HistoryRepository;
-}
-
-export interface SiteManagerCallbacks {
-    startMonitoringForSite: (identifier: string, monitorId?: string) => Promise<boolean>;
-    stopMonitoringForSite: (identifier: string, monitorId?: string) => Promise<boolean>;
+    eventEmitter: EventEmitter;
 }
 
 /**
  * Manages site operations and maintains in-memory cache.
  * Handles site CRUD operations and cache synchronization.
  */
-export class SiteManager {
+export class SiteManager extends EventEmitter {
     private readonly sites: Map<string, Site> = new Map();
-    private readonly repositories: SiteManagerDependencies;
-    private callbacks?: SiteManagerCallbacks;
+    private readonly repositories: Omit<SiteManagerDependencies, "eventEmitter">;
+    private readonly eventEmitter: EventEmitter;
 
-    constructor(repositories: SiteManagerDependencies) {
-        this.repositories = repositories;
-    }
-
-    /**
-     * Set callback functions for monitoring operations.
-     */
-    public setCallbacks(callbacks: SiteManagerCallbacks): void {
-        this.callbacks = callbacks;
+    constructor(dependencies: SiteManagerDependencies) {
+        super();
+        this.repositories = {
+            historyRepository: dependencies.historyRepository,
+            monitorRepository: dependencies.monitorRepository,
+            siteRepository: dependencies.siteRepository,
+        };
+        this.eventEmitter = dependencies.eventEmitter;
     }
 
     /**
@@ -77,6 +76,9 @@ export class SiteManager {
      * Add a new site to the database and cache.
      */
     public async addSite(siteData: Site): Promise<Site> {
+        // Business validation
+        this.validateSite(siteData);
+
         // Use the utility function to add site to database
         const site = await addSiteToDatabase({
             repositories: {
@@ -89,15 +91,34 @@ export class SiteManager {
         // Add to in-memory cache
         this.sites.set(site.identifier, site);
 
+        // Emit site added event
+        const eventData: SiteEventData = {
+            identifier: site.identifier,
+            operation: "added",
+            site,
+        };
+        this.eventEmitter.emit(SITE_EVENTS.SITE_ADDED, eventData);
+
         logger.info(`Site added successfully: ${site.identifier} (${site.name ?? "unnamed"})`);
         return site;
+    }
+
+    /**
+     * Business logic: Validate site data according to business rules.
+     */
+    private validateSite(site: Site): void {
+        const validationResult = configurationManager.validateSiteConfiguration(site);
+
+        if (!validationResult.isValid) {
+            throw new Error(`Site validation failed: ${validationResult.errors.join(", ")}`);
+        }
     }
 
     /**
      * Remove a site from the database and cache.
      */
     public async removeSite(identifier: string): Promise<boolean> {
-        return removeSiteFromDatabase({
+        const result = await removeSiteFromDatabase({
             identifier,
             logger,
             repositories: {
@@ -106,16 +127,23 @@ export class SiteManager {
             },
             sites: this.sites,
         });
+
+        if (result) {
+            // Emit site removed event
+            const eventData: SiteEventData = {
+                identifier,
+                operation: "removed",
+            };
+            this.eventEmitter.emit(SITE_EVENTS.SITE_REMOVED, eventData);
+        }
+
+        return result;
     }
 
     /**
      * Update a site in the database and cache.
      */
     public async updateSite(identifier: string, updates: Partial<Site>): Promise<Site> {
-        if (!this.callbacks) {
-            throw new Error("SiteManager callbacks not set. Call setCallbacks() first.");
-        }
-
         const dependencies: SiteUpdateDependencies = {
             logger,
             monitorRepository: this.repositories.monitorRepository,
@@ -124,11 +152,37 @@ export class SiteManager {
         };
 
         const callbacks: SiteUpdateCallbacks = {
-            startMonitoringForSite: this.callbacks.startMonitoringForSite,
-            stopMonitoringForSite: this.callbacks.stopMonitoringForSite,
+            startMonitoringForSite: async (id: string, monitorId?: string) => {
+                const eventData: SiteEventData = {
+                    identifier: id,
+                    monitorId,
+                    operation: "start-monitoring",
+                };
+                this.eventEmitter.emit(SITE_EVENTS.START_MONITORING_REQUESTED, eventData);
+                return true; // Assume success for now, actual result will be handled via events
+            },
+            stopMonitoringForSite: async (id: string, monitorId?: string) => {
+                const eventData: SiteEventData = {
+                    identifier: id,
+                    monitorId,
+                    operation: "stop-monitoring",
+                };
+                this.eventEmitter.emit(SITE_EVENTS.STOP_MONITORING_REQUESTED, eventData);
+                return true; // Assume success for now, actual result will be handled via events
+            },
         };
 
-        return updateSite(dependencies, callbacks, identifier, updates);
+        const updatedSite = await updateSite(dependencies, callbacks, identifier, updates);
+
+        // Emit site updated event
+        const eventData: SiteEventData = {
+            identifier,
+            operation: "updated",
+            site: updatedSite,
+        };
+        this.eventEmitter.emit(SITE_EVENTS.SITE_UPDATED, eventData);
+
+        return updatedSite;
     }
 
     /**
@@ -139,6 +193,13 @@ export class SiteManager {
         for (const site of sites) {
             this.sites.set(site.identifier, site);
         }
+
+        // Emit cache updated event
+        const eventData: SiteEventData = {
+            identifier: "all",
+            operation: "cache-updated",
+        };
+        this.eventEmitter.emit(SITE_EVENTS.CACHE_UPDATED, eventData);
     }
 
     /**

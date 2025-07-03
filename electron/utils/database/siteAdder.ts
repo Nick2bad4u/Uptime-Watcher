@@ -20,6 +20,7 @@ export interface AddSiteConfig {
 
 /**
  * Add a new site to the database with its monitors.
+ * This is a pure technical operation - validation should be done by the caller.
  *
  * @param config - Configuration object with repository instances and site data
  * @returns Promise with the site including monitors with IDs assigned
@@ -27,15 +28,7 @@ export interface AddSiteConfig {
 export async function addSiteToDatabase(config: AddSiteConfig): Promise<Site> {
     const { repositories, siteData } = config;
 
-    // Input validation
-    if (!siteData?.identifier) {
-        throw new Error("Site identifier is required");
-    }
-    if (!Array.isArray(siteData.monitors)) {
-        throw new Error("Site monitors must be an array");
-    }
-
-    logger.info(`Adding new site: ${siteData.identifier}`);
+    logger.info(`Adding new site to database: ${siteData.identifier}`);
 
     const site: Site = {
         ...siteData,
@@ -53,6 +46,6 @@ export async function addSiteToDatabase(config: AddSiteConfig): Promise<Site> {
         monitor.id = newId;
     }
 
-    logger.info(`Site added successfully to database: ${site.identifier} (${site.name ?? "unnamed"})`);
+    logger.info(`Site persisted successfully to database: ${site.identifier} (${site.name ?? "unnamed"})`);
     return site;
 }
