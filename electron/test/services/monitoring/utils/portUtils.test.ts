@@ -15,7 +15,7 @@ vi.mock("is-port-reachable", () => ({
     default: vi.fn(),
 }));
 
-vi.mock("../../../../utils", () => ({
+vi.mock("../../../../electronUtils", () => ({
     isDev: vi.fn(),
 }));
 
@@ -46,7 +46,7 @@ describe("Port Monitoring Utils", () => {
         vi.useFakeTimers();
         
         mockIsPortReachable = vi.mocked((await import("is-port-reachable")).default);
-        mockIsDev = vi.mocked((await import("../../../../utils")).isDev);
+        mockIsDev = vi.mocked((await import("../../../../electronUtils")).isDev);
         mockLogger = vi.mocked((await import("../../../../utils/logger")).logger);
         mockWithRetry = vi.mocked((await import("../../../../utils/retry")).withRetry);
         

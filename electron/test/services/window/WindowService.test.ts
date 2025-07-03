@@ -13,9 +13,12 @@ import { WindowService } from "../../../services/window/WindowService";
 // Mock Electron modules
 vi.mock("electron", () => ({
     BrowserWindow: vi.fn(),
+    app: {
+        isPackaged: false,
+    },
 }));
 
-vi.mock("../../../utils", () => ({
+vi.mock("../../../electronUtils", () => ({
     isDev: vi.fn(() => false),
 }));
 
@@ -115,7 +118,7 @@ describe("WindowService", () => {
 
     describe("loadContent", () => {
         it("should load from file in production mode", async () => {
-            const { isDev } = await import("../../../utils");
+            const { isDev } = await import("../../../electronUtils");
             vi.mocked(isDev).mockReturnValue(false);
 
             windowService.createMainWindow();
@@ -123,7 +126,7 @@ describe("WindowService", () => {
         });
 
         it("should load from localhost in development mode", async () => {
-            const { isDev } = await import("../../../utils");
+            const { isDev } = await import("../../../electronUtils");
             vi.mocked(isDev).mockReturnValue(true);
 
             // Create a new service instance to test dev mode

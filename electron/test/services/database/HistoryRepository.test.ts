@@ -5,7 +5,7 @@ import { HistoryRepository } from "../../../services/database/HistoryRepository"
 import { DatabaseService } from "../../../services/database/DatabaseService";
 import { StatusHistory } from "../../../types";
 import { logger } from "../../../utils/logger";
-import { isDev } from "../../../utils";
+import { isDev } from "../../../electronUtils";
 
 // Mock dependencies
 vi.mock("../../../services/database/DatabaseService");
@@ -17,7 +17,7 @@ vi.mock("../../../utils/logger", () => ({
         debug: vi.fn(),
     },
 }));
-vi.mock("../../../utils", () => ({
+vi.mock("../../../electronUtils", () => ({
     isDev: vi.fn(),
 }));
 

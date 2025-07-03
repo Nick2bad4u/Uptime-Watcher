@@ -5,11 +5,11 @@ import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from "vite
 import { DEFAULT_CHECK_INTERVAL } from "../../../constants";
 import { MonitorScheduler } from "../../../services/monitoring/MonitorScheduler";
 import { Site } from "../../../types";
-import { isDev } from "../../../utils";
+import { isDev } from "../../../electronUtils";
 import { logger } from "../../../utils/logger";
 
 // Mock dependencies - logger is mocked globally in setup.ts
-vi.mock("../../../utils");
+vi.mock("../../../electronUtils");
 vi.mock("../../../utils/logger", () => ({
     logger: {
         debug: vi.fn(),
@@ -215,7 +215,7 @@ describe("MonitorScheduler", () => {
         });
     });
 
-    describe("stopSite", () => {
+    describe("stopSiteMonitoring", () => {
         it("should stop all monitors for a site", () => {
             scheduler.setCheckCallback(mockCheckCallback);
 
@@ -329,7 +329,7 @@ describe("MonitorScheduler", () => {
         });
     });
 
-    describe("startSite", () => {
+    describe("startSiteMonitoring", () => {
         it("should start monitoring for all active monitors in a site", () => {
             const mockSite: Site = {
                 identifier: "site-1",

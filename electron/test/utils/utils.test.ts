@@ -7,7 +7,7 @@
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
-import { isDev } from "../../utils";
+import { isDev } from "../../electronUtils";
 
 // Mock dependencies
 vi.mock("electron", () => ({

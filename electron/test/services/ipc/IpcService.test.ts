@@ -18,13 +18,16 @@ vi.mock("electron", () => ({
         on: vi.fn(),
         removeAllListeners: vi.fn(),
     },
+    app: {
+        isPackaged: false,
+    },
 }));
 
 vi.mock("../../../UptimeOrchestrator", () => ({
     UptimeOrchestrator: vi.fn(),
 }));
 
-vi.mock("../../../utils", () => ({
+vi.mock("../../../electronUtils", () => ({
     isDev: vi.fn(() => false),
 }));
 
@@ -328,7 +331,7 @@ describe("IpcService", () => {
 
     describe("Debug Logging", () => {
         beforeEach(async () => {
-            const { isDev } = await import("../../../utils");
+            const { isDev } = await import("../../../electronUtils");
             vi.mocked(isDev).mockReturnValue(true);
             ipcService.setupHandlers();
         });

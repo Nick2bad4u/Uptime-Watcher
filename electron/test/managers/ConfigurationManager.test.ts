@@ -8,7 +8,7 @@ import { ConfigurationManager, configurationManager } from "../../managers/Confi
 import type { Site } from "../../types";
 
 // Mock isDev utility
-vi.mock("../../utils", () => ({
+vi.mock("../../electronUtils", () => ({
     isDev: vi.fn(() => false),
 }));
 
@@ -57,7 +57,7 @@ describe("ConfigurationManager", () => {
 
     describe("Auto-start monitoring business rules", () => {
         it("should not auto-start in development mode", async () => {
-            const { isDev } = await import("../../utils");
+            const { isDev } = await import("../../electronUtils");
             vi.mocked(isDev).mockReturnValue(true);
 
             const site: Site = {

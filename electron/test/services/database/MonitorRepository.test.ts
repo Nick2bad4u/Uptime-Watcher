@@ -4,7 +4,7 @@ import { MonitorRepository } from "../../../services/database/MonitorRepository"
 import { DatabaseService } from "../../../services/database/DatabaseService";
 import { Site } from "../../../types";
 import { logger } from "../../../utils/logger";
-import { isDev } from "../../../utils";
+import { isDev } from "../../../electronUtils";
 import {
     safeNumberConvert,
     convertDateForDb,
@@ -24,7 +24,7 @@ vi.mock("../../../utils/logger", () => ({
         debug: vi.fn(),
     },
 }));
-vi.mock("../../../utils", () => ({
+vi.mock("../../../electronUtils", () => ({
     isDev: vi.fn(),
 }));
 

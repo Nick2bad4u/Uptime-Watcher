@@ -60,7 +60,7 @@ vi.mock("../../../constants", () => ({
     USER_AGENT: "Uptime-Watcher/1.0.0",
 }));
 
-vi.mock("../../../utils", () => ({
+vi.mock("../../../electronUtils", () => ({
     isDev: vi.fn(() => false),
 }));
 
@@ -103,7 +103,7 @@ describe("HttpMonitor", () => {
         vi.clearAllMocks();
 
         mockLogger = await import("../../../utils/logger").then((m) => m.logger);
-        mockIsDev = await import("../../../utils").then((m) => m.isDev);
+        mockIsDev = await import("../../../electronUtils").then((m) => m.isDev);
         mockWithRetry = await import("../../../utils/retry").then((m) => m.withRetry);
         mockAxios = await import("axios").then((m) => m.default);
 

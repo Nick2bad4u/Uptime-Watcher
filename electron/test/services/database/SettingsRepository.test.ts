@@ -4,7 +4,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { SettingsRepository } from "../../../services/database/SettingsRepository";
 import { DatabaseService } from "../../../services/database/DatabaseService";
 import { logger } from "../../../utils/logger";
-import { isDev } from "../../../utils";
+import { isDev } from "../../../electronUtils";
 
 // Mock dependencies
 vi.mock("../../../services/database/DatabaseService");
@@ -16,7 +16,7 @@ vi.mock("../../../utils/logger", () => ({
         debug: vi.fn(),
     },
 }));
-vi.mock("../../../utils", () => ({
+vi.mock("../../../electronUtils", () => ({
     isDev: vi.fn(),
 }));
 
