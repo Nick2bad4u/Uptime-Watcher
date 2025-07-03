@@ -2,6 +2,8 @@
  * @vitest-environment jsdom
  */
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useTheme, useThemeValue, useStatusColors, useThemeClasses, useAvailabilityColors } from "../theme/useTheme";

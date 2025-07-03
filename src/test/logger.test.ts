@@ -2,6 +2,9 @@
  * Tests for frontend logger service.
  */
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable testing-library/no-debugging-utils */
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock electron-log/renderer

@@ -3,7 +3,6 @@
  * Validates form state management, validation, and user interactions.
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 

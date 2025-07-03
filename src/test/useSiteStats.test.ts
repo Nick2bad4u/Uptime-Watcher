@@ -3,6 +3,8 @@
  * Tests statistics calculation for site monitoring data.
  */
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 

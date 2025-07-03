@@ -6,15 +6,15 @@
 import { describe, expect, it, vi, beforeEach, MockedFunction } from "vitest";
 
 describe("Electron Main Process", () => {
-    let ApplicationService: MockedFunction<any>;
+    let ApplicationService: MockedFunction<() => unknown>;
     let logger: {
-        info: MockedFunction<any>;
-        error: MockedFunction<any>;
-        debug: MockedFunction<any>;
-        warn: MockedFunction<any>;
+        info: MockedFunction<(...args: unknown[]) => void>;
+        error: MockedFunction<(...args: unknown[]) => void>;
+        debug: MockedFunction<(...args: unknown[]) => void>;
+        warn: MockedFunction<(...args: unknown[]) => void>;
     };
     let log: {
-        initialize: MockedFunction<any>;
+        initialize: MockedFunction<() => void>;
         transports: {
             file: Record<string, unknown>;
             console: Record<string, unknown>;

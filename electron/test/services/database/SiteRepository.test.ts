@@ -3,6 +3,9 @@
  * Validates site data persistence and CRUD operations.
  */
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable testing-library/no-await-sync-queries */
+
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
 import { SiteRepository } from "../../../services/database/SiteRepository";

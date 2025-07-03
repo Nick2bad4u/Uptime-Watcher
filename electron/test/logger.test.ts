@@ -3,6 +3,8 @@
  * Validates logging functionality and proper error handling.
  */
 
+/* eslint-disable testing-library/no-debugging-utils */
+
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 // Mock electron-log/main - must be done before any imports that use it
@@ -216,7 +218,7 @@ describe("Logger Utilities", () => {
 
     describe("Error Handling Edge Cases", () => {
         it("should handle circular references in error objects", () => {
-            const circularError: any = { message: "Circular error" };
+            const circularError: Record<string, unknown> = { message: "Circular error" };
             circularError.self = circularError;
 
             // Should not throw when handling circular references
@@ -229,7 +231,8 @@ describe("Logger Utilities", () => {
             const weirdError = {
                 message: 123,
                 stack: "weird stack trace",
-            } as any;
+                name: "WeirdError",
+            } as unknown as Error;
 
             logger.error("Weird error", weirdError);
 

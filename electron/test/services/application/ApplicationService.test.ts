@@ -3,6 +3,8 @@
  * Validates main application service orchestration and lifecycle management.
  */
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { app } from "electron";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
@@ -45,8 +47,8 @@ vi.mock("../../../services/updater/AutoUpdaterService", () => ({
     })),
 }));
 
-vi.mock("../../../uptimeMonitor", () => ({
-    UptimeMonitor: vi.fn(() => ({
+vi.mock("../../../UptimeOrchestrator", () => ({
+    UptimeOrchestrator: vi.fn(() => ({
         initialize: vi.fn(() => Promise.resolve()),
         on: vi.fn(),
         stopMonitoring: vi.fn(),
@@ -104,14 +106,14 @@ describe("ApplicationService", () => {
 
             await readyHandler();
 
-            expect(applicationService.uptimeMonitor.initialize).toHaveBeenCalled();
+            expect(applicationService.uptimeOrchestrator.initialize).toHaveBeenCalled();
             expect(applicationService.windowService.createMainWindow).toHaveBeenCalled();
             expect(applicationService.ipcService.setupHandlers).toHaveBeenCalled();
         });
 
         it("should handle app ready event errors", async () => {
             // Mock initialize to throw error
-            applicationService.uptimeMonitor.initialize.mockRejectedValue(new Error("Init failed"));
+            applicationService.uptimeOrchestrator.initialize.mockRejectedValue(new Error("Init failed"));
 
             const readyHandler = mockApp.on.mock.calls.find((call: any) => call[0] === "ready")[1];
 
@@ -176,7 +178,7 @@ describe("ApplicationService", () => {
         });
     });
 
-    describe("UptimeMonitor Event Handlers", () => {
+    describe("UptimeOrchestrator Event Handlers", () => {
         beforeEach(async () => {
             // Reset the constructor call to get fresh event handlers
             vi.clearAllMocks();
@@ -190,9 +192,9 @@ describe("ApplicationService", () => {
         });
 
         it("should handle status-update events", () => {
-            // Find the call to uptimeMonitor.on with 'status-update'
-            const mockUptimeMonitor = applicationService.uptimeMonitor;
-            const onCalls = mockUptimeMonitor.on.mock.calls;
+            // Find the call to uptimeOrchestrator.on with 'status-update'
+            const mockUptimeOrchestrator = applicationService.uptimeOrchestrator;
+            const onCalls = mockUptimeOrchestrator.on.mock.calls;
             const statusUpdateCall = onCalls.find((call: any) => call[0] === "status-update");
 
             expect(statusUpdateCall).toBeDefined();
@@ -218,8 +220,8 @@ describe("ApplicationService", () => {
         });
 
         it("should handle site-monitor-down events", () => {
-            const mockUptimeMonitor = applicationService.uptimeMonitor;
-            const onCalls = mockUptimeMonitor.on.mock.calls;
+            const mockUptimeOrchestrator = applicationService.uptimeOrchestrator;
+            const onCalls = mockUptimeOrchestrator.on.mock.calls;
             const monitorDownCall = onCalls.find((call: any) => call[0] === "site-monitor-down");
 
             expect(monitorDownCall).toBeDefined();
@@ -237,8 +239,8 @@ describe("ApplicationService", () => {
         });
 
         it("should handle site-monitor-up events", () => {
-            const mockUptimeMonitor = applicationService.uptimeMonitor;
-            const onCalls = mockUptimeMonitor.on.mock.calls;
+            const mockUptimeOrchestrator = applicationService.uptimeOrchestrator;
+            const onCalls = mockUptimeOrchestrator.on.mock.calls;
             const monitorUpCall = onCalls.find((call: any) => call[0] === "site-monitor-up");
 
             expect(monitorUpCall).toBeDefined();
@@ -256,8 +258,8 @@ describe("ApplicationService", () => {
         });
 
         it("should handle db-error events", () => {
-            const mockUptimeMonitor = applicationService.uptimeMonitor;
-            const onCalls = mockUptimeMonitor.on.mock.calls;
+            const mockUptimeOrchestrator = applicationService.uptimeOrchestrator;
+            const onCalls = mockUptimeOrchestrator.on.mock.calls;
             const dbErrorCall = onCalls.find((call: any) => call[0] === "db-error");
 
             expect(dbErrorCall).toBeDefined();
@@ -310,7 +312,7 @@ describe("ApplicationService", () => {
                     throw mockError;
                 }),
             };
-            applicationService.uptimeMonitor = { stopMonitoring: vi.fn() };
+            applicationService.uptimeOrchestrator = { stopMonitoring: vi.fn() };
             applicationService.windowService = { closeMainWindow: vi.fn() };
 
             applicationService.cleanup();

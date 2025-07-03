@@ -4,6 +4,9 @@
  */
 
 import { autoUpdater } from "electron-updater";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
+
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
 import { AutoUpdaterService } from "../../../services/updater/AutoUpdaterService";

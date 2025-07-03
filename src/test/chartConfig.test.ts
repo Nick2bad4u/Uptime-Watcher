@@ -2,6 +2,8 @@
  * @vitest-environment jsdom
  */
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { describe, expect, it } from "vitest";
 
 import { ChartConfigService, useChartConfigs } from "../services/chartConfig";
