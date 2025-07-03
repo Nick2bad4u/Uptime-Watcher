@@ -7,9 +7,26 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[323250c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/323250c996216ccdfa683cda99a340a12e1fa4f1)...
+[323250c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/323250c996216ccdfa683cda99a340a12e1fa4f1)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/323250c996216ccdfa683cda99a340a12e1fa4f1...323250c996216ccdfa683cda99a340a12e1fa4f1))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 4.3.0 [`(323250c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/323250c996216ccdfa683cda99a340a12e1fa4f1)
+
+
+
+
+
+
+## [4.3.0] - 2025-07-03
+
+
 [[b68a3e7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b68a3e7b6cf85c578d20bc3d531ecd9d2321e115)...
-[0c2e4a0](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0c2e4a02b4fd173c624f0c60978c4b6c3e3422e7)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/b68a3e7b6cf85c578d20bc3d531ecd9d2321e115...0c2e4a02b4fd173c624f0c60978c4b6c3e3422e7))
+[7084242](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7084242977d3597d7763c178bc1e39549d419fb4)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/b68a3e7b6cf85c578d20bc3d531ecd9d2321e115...7084242977d3597d7763c178bc1e39549d419fb4))
 
 
 ### 📦 Dependencies
@@ -20,16 +37,100 @@ All notable changes to this project will be documented in this file.
 
 ### 🔀 Merge Commits
 
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(7084242)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7084242977d3597d7763c178bc1e39549d419fb4)
+
+
 - [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(0c2e4a0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0c2e4a02b4fd173c624f0c60978c4b6c3e3422e7)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Remove unnecessary v8 ignore comments and improve controlled input handling
+
+- Cleans up redundant `/* v8 ignore next */` coverage comments throughout backend and frontend code, reducing noise and improving readability.
+ - Refactors controlled component handling in UI inputs, checkboxes, and selects to avoid uncontrolled-to-controlled warnings and ensure proper value propagation only when explicitly set.
+ - Minor code formatting and dependency cleanup for better maintainability. [`(0a8ec42)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0a8ec42890124c90dab0a643b09d0935ed6d5e36)
+
+
+
+### � Documentation
+
+- 📝 [docs] Add AI refactor prompt templates and update test doc location
+
+- Introduces detailed AI prompt templates for code refactoring and review, tailored for Electron, TypeScript, React, and modern tech stack conventions
+- Moves and updates the testing documentation to a new test directory for clearer project organization
+- Enhances clarity on testing setup, frontend/backend separation, and usage instructions [`(37ceed7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/37ceed70e621458e7cfa36253686c24cce771059)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Achieve full branch coverage for UI components
+
+- Improves test suites for several UI components to cover edge cases, all conditional branches, and defensive code paths, especially around falsy/null/undefined values and cleanup logic
+- Refactors and expands tests for history, settings, site hooks, and dashboard components, ensuring all branches (including nullish coalescing and fallback logic) are tested
+- Updates mocks and interaction patterns to prevent JSDOM navigation errors and improve reliability in simulated browser/Electron environments
+- Enhances clarity and maintainability of tests with consistent formatting and more explicit assertions
+- Motivated by the goal to guarantee robust, predictable behavior and facilitate confident refactoring [`(5ef2ead)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5ef2ead74f8923b9479ae910bec207d4dcca000f)
+
+
+- 🧪 [test] Add defensive and branch coverage for nullish, edge, and fallback cases
+
+- Expands unit tests to cover null, undefined, and edge cases in theme, site, monitor, and history logic, increasing branch and line coverage.
+- Adds explicit tests for fallback handling in UI components (e.g., missing names, URLs, settings keys, or monitor history/lastChecked).
+- Ensures logger calls and UI displays are validated for all nullish input scenarios.
+- Covers error branches and unexpected values in store actions, status updates, and statistics logic.
+- Documents defensive code paths and validates runtime safety against type or data corruption. [`(3637d05)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3637d053220a80ee8675fb0f71d714d97ccd697d)
+
+
+- 🧪 [test] Add edge case and cleanup tests for UI components
+
+- Improves test coverage for UI components by adding tests for event-driven timeout cleanup, edge-case overlay positioning, invalid settings key handling, and unknown prop values
+- Documents closure issues in certain cleanup logic and validates graceful handling of unexpected states or inputs
+- Ensures components behave robustly during unmount, prop changes, and user interaction sequences [`(40e2191)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/40e2191545ec4c8cbf5eb2158acf6de8b189a2e3)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v4.2.0 [skip ci] [`(91646b8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/91646b8dd97ef25bf9de908a995c29ab554c7e75)
+
+
+- 🧹 [chore] Add script to standardize test file naming
+
+Introduces a PowerShell script that converts test file names in test directories to camelCase and ensures proper .test suffix usage, improving consistency and discoverability across the codebase.
+
+ - Helps enforce a predictable naming convention for TypeScript test files.
+ - Offers a dry-run mode to preview changes before applying. [`(04203f8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/04203f8dd551a45ca09e9eef311727597fbaf078)
 
 
 
 ### 👷 CI/CD
 
+- 👷 [ci] Reformat codecov config for consistent YAML indentation
+
+- Ensures consistent 4-space indentation across all sections for improved readability and maintainability
+- Prevents potential parsing issues caused by inconsistent YAML structure [`(cb00786)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cb00786db7622cb92339d81027b36944040715a8)
+
+
 - 👷 [ci] Simplify Codecov upload and test result steps
 
 - Removes unnecessary 'directory', 'exclude', and 'disable_search' parameters from Codecov actions to streamline workflow configuration
 - Ensures clearer and more maintainable CI setup by relying on default Codecov behaviors [`(b68a3e7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b68a3e7b6cf85c578d20bc3d531ecd9d2321e115)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update dependencies for Electron, Zod, and TypeScript
+
+- Upgrades Electron to 37.2.0 for latest features and fixes
+- Updates Zod to 3.25.69 for improved validation support
+- Advances @typescript/native-preview and related platform packages to 7.0.0-dev.20250702.1 for enhanced compatibility
+- Adjusts devDependencies to move zod-to-json-schema to devDeps, clarifying its usage
+
+Keeps tooling and runtime environments current to maintain stability and leverage upstream improvements. [`(dd63491)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/dd6349137895e786f0e16ab7c5b28ec439f1f705)
 
 
 
