@@ -87,10 +87,6 @@
                 "command": "npx",
                 "args": ["-y", "@modelcontextprotocol/server-memory"]
             },
-            "everything": {
-                "command": "npx",
-                "args": ["-y", "@modelcontextprotocol/server-everything"]
-            }
         }
     },
     "sonarlint.connectedMode.project": {
