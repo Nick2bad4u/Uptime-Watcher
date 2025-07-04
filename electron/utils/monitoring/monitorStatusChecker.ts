@@ -49,12 +49,12 @@ export async function checkMonitor(
     const monitor = site.monitors.find((m) => String(m.id) === String(monitorId));
     if (!monitor) {
         config.logger.error(`[checkMonitor] Monitor not found for id: ${monitorId} on site: ${site.identifier}`);
-        return;
+        return undefined;
     }
     // Ensure monitor.id is present and valid before proceeding
     if (!monitor.id) {
         config.logger.error(`[checkMonitor] Monitor missing id for ${site.identifier}, skipping history insert.`);
-        return;
+        return undefined;
     }
     config.logger.info(`[checkMonitor] Checking monitor: site=${site.identifier}, id=${monitor.id}`);
 
@@ -124,7 +124,7 @@ export async function checkMonitor(
     const freshSiteData = await config.repositories.site.getByIdentifier(site.identifier);
     if (!freshSiteData) {
         config.logger.error(`[checkMonitor] Failed to fetch updated site data for ${site.identifier}`);
-        return;
+        return undefined;
     }
 
     // Update the in-memory cache with fresh data

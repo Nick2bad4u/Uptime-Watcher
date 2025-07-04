@@ -333,6 +333,7 @@ describe("HttpMonitor", () => {
                     const result = handleCheckError(error, "https://example.com");
                     return result;
                 }
+                return undefined;
             });
 
             // Mock axios.get to throw a non-Axios error
@@ -364,6 +365,7 @@ describe("HttpMonitor", () => {
                     const result = handleCheckError(error, "https://example.com");
                     return result;
                 }
+                return undefined;
             });
 
             // Mock axios.get to throw an unknown error object

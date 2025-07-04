@@ -64,6 +64,7 @@ function App() {
             return () => clearTimeout(timeoutId);
         } else {
             setShowLoadingOverlay(false);
+            return undefined;
         }
     }, [isLoading]);
 

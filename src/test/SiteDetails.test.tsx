@@ -401,7 +401,6 @@ describe("SiteDetails", () => {
             // Reset to ensure proper state
             mockUseSiteDetails.selectedMonitorId = "monitor-1";
             mockUseSiteDetails.activeSiteDetailsTab = "monitor-1-analytics";
-            // @ts-expect-error - Mock assignment for testing
             mockUseSiteDetails.selectedMonitor = mockSite.monitors[0];
 
             render(<SiteDetails site={mockSite} onClose={mockOnClose} />);

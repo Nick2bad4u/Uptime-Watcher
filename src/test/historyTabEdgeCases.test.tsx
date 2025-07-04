@@ -268,7 +268,6 @@ describe("HistoryTab Edge Cases", () => {
                 checkInterval: 60000,
                 timeout: 5000,
                 retryAttempts: 3,
-                // @ts-expect-error - Testing edge case with undefined history
                 history: undefined,
             };
 
@@ -287,7 +286,6 @@ describe("HistoryTab Edge Cases", () => {
                 checkInterval: 60000,
                 timeout: 5000,
                 retryAttempts: 3,
-                // @ts-expect-error - Testing edge case with null history
                 history: null,
             };
 
@@ -306,7 +304,6 @@ describe("HistoryTab Edge Cases", () => {
                 checkInterval: 60000,
                 timeout: 5000,
                 retryAttempts: 3,
-                // @ts-expect-error - Testing edge case with undefined history
                 history: undefined,
             };
 

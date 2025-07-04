@@ -68,6 +68,7 @@ export function Settings({ onClose }: Readonly<SettingsProps>) {
             };
         } else {
             setShowButtonLoading(false);
+            return undefined;
         }
     }, [isLoading]);
 
