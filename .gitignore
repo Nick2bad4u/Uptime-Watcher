@@ -216,3 +216,4 @@ dist/
 dist-electron/
 **/dist/
 **/dist-electron/
+.agentic-tools*

@@ -3,30 +3,23 @@
         "target": "ES2020",
         "skipDefaultLibCheck": false,
         "useDefineForClassFields": true,
-        "lib": [
-            "ES2020",
-            "DOM",
-            "DOM.Iterable"
-        ],
+        "lib": ["ES2020", "DOM", "DOM.Iterable"],
         "module": "CommonJS",
         "moduleResolution": "node",
         "resolveJsonModule": true,
         "skipLibCheck": true,
         "isolatedModules": true,
-        "jsx": "react-jsx",
-        "types": [
-            "react",
-            "react-dom",
-            "vitest/globals",
-            "@testing-library/jest-dom",
-            "vite/client"
+        "plugins": [
+            {
+                "name": "typescript-eslint-language-service"
+            }
         ],
+        "jsx": "react-jsx",
+        "types": ["react", "react-dom", "vitest/globals", "@testing-library/jest-dom", "vite/client"],
         "outDir": "dist-electron",
         "baseUrl": ".",
         "paths": {
-            "@/*": [
-                "src/*"
-            ]
+            "@/*": ["src/*"]
         },
         "esModuleInterop": true,
         "allowJs": true,
@@ -47,11 +40,10 @@
         "allowUnusedLabels": false,
         "allowUnreachableCode": false,
         "forceConsistentCasingInFileNames": true,
-        "noPropertyAccessFromIndexSignature" : false,
+        "noPropertyAccessFromIndexSignature": false,
         "strictBindCallApply": true,
         "strictFunctionTypes": true,
-        "useUnknownInCatchVariables": true,
-        
+        "useUnknownInCatchVariables": true
     },
     "include": [
         "src/**/*.ts",
