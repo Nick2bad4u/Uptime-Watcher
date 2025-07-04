@@ -76,19 +76,22 @@ describe("waitForElectronAPI - Complete Coverage", () => {
     });
 
     it("should throw error after maximum attempts", async () => {
+        // Use real timers for this test since it involves setTimeout
+        vi.useRealTimers();
+        
         // Never make electronAPI available
         (global.window as MockWindow).electronAPI = undefined;
 
         const promise = waitForElectronAPI(2, 50); // 2 attempts, 50ms base delay
 
-        // Run all pending timers to complete the async function
-        await vi.runAllTimersAsync();
-
-        // Now the function should throw since it exceeded max attempts
+        // Wait for the promise to complete naturally
         await expect(promise).rejects.toThrow(
             "ElectronAPI not available after maximum attempts. The application may not be running in an Electron environment."
         );
-    });
+        
+        // Restore fake timers
+        vi.useFakeTimers();
+    }, 5000); // 5 second timeout should be enough
 
     it("should handle exponential backoff with maximum delay", async () => {
         (global.window as MockWindow).electronAPI = undefined;

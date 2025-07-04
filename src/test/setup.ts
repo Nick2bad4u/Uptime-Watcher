@@ -12,61 +12,45 @@ expect.extend(matchers);
 
 // Global test configuration and mocks
 const mockElectronAPI = {
+    data: {
+        exportData: vi.fn().mockResolvedValue("mock-data"),
+        importData: vi.fn().mockResolvedValue(true),
+        downloadSQLiteBackup: vi.fn().mockResolvedValue({
+            buffer: new ArrayBuffer(8),
+            fileName: "test-backup.sqlite",
+        }),
+    },
     events: {
         onStatusUpdate: vi.fn((callback) => {
             // Mock implementation - just store the callback but don't call it
             // In real usage, this would be called by the backend
             return callback;
         }),
-        onSiteAdded: vi.fn(),
-        onSiteUpdated: vi.fn(),
-        onSiteRemoved: vi.fn(),
-        onError: vi.fn(),
-        removeAllListeners: vi.fn(), // Add missing method
+        removeAllListeners: vi.fn(),
     },
-    sites: {
-        addSite: vi.fn(),
-        updateSite: vi.fn(),
-        removeSite: vi.fn(),
-        getSites: vi.fn().mockResolvedValue([]),
-        checkSiteNow: vi.fn(),
-        updateCheckInterval: vi.fn(),
-    },
-    monitors: {
-        addMonitor: vi.fn(),
-        updateMonitor: vi.fn(),
-        removeMonitor: vi.fn(),
-        getMonitors: vi.fn().mockResolvedValue([]),
-        startMonitoring: vi.fn(),
-        stopMonitoring: vi.fn(),
-        updateTimeout: vi.fn(),
-        updateRetryAttempts: vi.fn(),
+    monitoring: {
+        startMonitoring: vi.fn().mockResolvedValue(undefined),
+        stopMonitoring: vi.fn().mockResolvedValue(undefined),
+        startMonitoringForSite: vi.fn().mockResolvedValue(undefined),
+        stopMonitoringForSite: vi.fn().mockResolvedValue(undefined),
     },
     settings: {
-        getSettings: vi.fn().mockResolvedValue({
-            notifications: true,
-            autoStart: false,
-            minimizeToTray: false,
-            theme: "system",
-            soundAlerts: false,
-            historyLimit: 1000,
+        getHistoryLimit: vi.fn().mockResolvedValue(1000),
+        updateHistoryLimit: vi.fn().mockResolvedValue(undefined),
+    },
+    sites: {
+        getSites: vi.fn().mockResolvedValue([]),
+        addSite: vi.fn().mockResolvedValue({
+            identifier: "test-site",
+            name: "Test Site",
+            monitors: [],
         }),
-        getHistoryLimit: vi.fn().mockResolvedValue(1000), // Add missing method
-        updateSettings: vi.fn(),
-        resetSettings: vi.fn(),
+        removeSite: vi.fn().mockResolvedValue(undefined),
+        updateSite: vi.fn().mockResolvedValue(undefined),
+        checkSiteNow: vi.fn().mockResolvedValue(undefined),
     },
-    update: {
-        checkForUpdates: vi.fn(),
-        installUpdate: vi.fn(),
-        onUpdateAvailable: vi.fn(),
-        onUpdateDownloaded: vi.fn(),
-        onUpdateError: vi.fn(),
-    },
-    app: {
-        getVersion: vi.fn().mockResolvedValue("1.0.0"),
-        quit: vi.fn(),
-        minimize: vi.fn(),
-        close: vi.fn(),
+    system: {
+        quitAndInstall: vi.fn(),
     },
 };
 

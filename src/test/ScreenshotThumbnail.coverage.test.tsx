@@ -3,7 +3,6 @@
  * Targeting missing lines 60-61, 67-68
  */
 
-import React from "react";
 import { render, screen, act } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 

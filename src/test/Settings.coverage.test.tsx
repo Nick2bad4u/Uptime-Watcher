@@ -3,7 +3,6 @@
  * Focusing on missing lines 87-89 (invalid settings key warning)
  */
 
-import React from "react";
 import { render, screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi, beforeEach } from "vitest";
