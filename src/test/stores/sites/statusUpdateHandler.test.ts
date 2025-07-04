@@ -4,10 +4,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Site, StatusUpdate } from "../../../types";
-import {
-    StatusUpdateManager,
-    createStatusUpdateHandler,
-} from "../../../stores/sites/utils/statusUpdateHandler";
+import { StatusUpdateManager, createStatusUpdateHandler } from "../../../stores/sites/utils/statusUpdateHandler";
 
 // Mock the waitForElectronAPI utility
 vi.mock("../../../stores/utils", () => ({
@@ -223,7 +220,7 @@ describe("StatusUpdateHandler", () => {
         it("should handle errors during update processing", async () => {
             // Mock console.error to suppress expected error messages
             const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-            
+
             const handler = createStatusUpdateHandler({
                 getSites: mockGetSites,
                 setSites: mockSetSites,
@@ -242,7 +239,7 @@ describe("StatusUpdateHandler", () => {
             // Should not throw but handle error gracefully
             await expect(handler(statusUpdate)).resolves.not.toThrow();
             expect(mockOnUpdate).toHaveBeenCalledWith(statusUpdate);
-            
+
             // Restore console.error
             consoleSpy.mockRestore();
         });
@@ -271,7 +268,7 @@ describe("StatusUpdateHandler", () => {
         it("should handle invalid status updates", async () => {
             // Mock console.error to suppress expected error messages
             const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-            
+
             const handler = createStatusUpdateHandler({
                 getSites: mockGetSites,
                 setSites: mockSetSites,
@@ -286,7 +283,7 @@ describe("StatusUpdateHandler", () => {
             await handler(statusUpdate);
 
             expect(mockFullSyncFromBackend).toHaveBeenCalled();
-            
+
             // Restore console.error
             consoleSpy.mockRestore();
         });
@@ -296,7 +293,7 @@ describe("StatusUpdateHandler", () => {
         it("should handle missing window.electronAPI", async () => {
             // Mock console.error to suppress expected error messages
             const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-            
+
             const originalElectronAPI = window.electronAPI;
             // @ts-expect-error - Testing undefined case
             window.electronAPI = undefined;
@@ -311,10 +308,10 @@ describe("StatusUpdateHandler", () => {
 
             // Restore the original electronAPI
             window.electronAPI = originalElectronAPI;
-            
+
             // Reset the mock
             mockWaitForElectronAPI.mockResolvedValue(undefined);
-            
+
             // Restore console.error
             consoleSpy.mockRestore();
         }, 1000); // 1 second timeout
@@ -322,7 +319,7 @@ describe("StatusUpdateHandler", () => {
         it("should handle callback errors gracefully", async () => {
             // Mock console.error to suppress expected error messages
             const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-            
+
             const handler = createStatusUpdateHandler({
                 getSites: vi.fn().mockReturnValue([]),
                 setSites: vi.fn(),
@@ -342,7 +339,7 @@ describe("StatusUpdateHandler", () => {
 
             // Should not throw but handle error gracefully
             await expect(handler(statusUpdate)).resolves.not.toThrow();
-            
+
             // Restore console.error
             consoleSpy.mockRestore();
         });
@@ -350,7 +347,7 @@ describe("StatusUpdateHandler", () => {
         it("should handle fullSyncFromBackend errors", async () => {
             // Mock console.error to suppress expected error messages
             const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-            
+
             const handler = createStatusUpdateHandler({
                 getSites: vi.fn().mockReturnValue([]),
                 setSites: vi.fn(),
@@ -368,7 +365,7 @@ describe("StatusUpdateHandler", () => {
 
             // Should not throw but handle error gracefully
             await expect(handler(statusUpdate)).resolves.not.toThrow();
-            
+
             // Restore console.error
             consoleSpy.mockRestore();
         });

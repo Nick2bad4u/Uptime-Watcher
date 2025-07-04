@@ -37,7 +37,7 @@ describe("New Store Structure", () => {
 
     it("should import all stores successfully", async () => {
         const stores = await import("../stores");
-        
+
         expect(stores.useSitesStore).toBeDefined();
         expect(stores.useSettingsStore).toBeDefined();
         expect(stores.useUIStore).toBeDefined();
@@ -48,7 +48,7 @@ describe("New Store Structure", () => {
 
     it("should export store types", async () => {
         const stores = await import("../stores");
-        
+
         // Just check that types are available in TypeScript
         expect(typeof stores.useSitesStore).toBe("function");
         expect(typeof stores.useSettingsStore).toBe("function");

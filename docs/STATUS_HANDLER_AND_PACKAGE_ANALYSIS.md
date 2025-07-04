@@ -24,6 +24,7 @@ The Uptime-Watcher project implements a sophisticated status update handler patt
 #### Key Components
 
 1. **createStatusUpdateHandler Function**
+
    - Creates a reusable status update handler
    - Implements incremental updates for performance
    - Provides fallback to full sync when needed
@@ -33,23 +34,23 @@ The Uptime-Watcher project implements a sophisticated status update handler patt
 
    ```typescript
    function createStatusUpdateHandler(get: () => SitesStore, callback: (update: StatusUpdate) => void) {
-       return (update: StatusUpdate) => {
-           // Validate update payload
-           if (!update?.site) {
-               throw new Error("Invalid status update: update or update.site is null/undefined");
-           }
+    return (update: StatusUpdate) => {
+     // Validate update payload
+     if (!update?.site) {
+      throw new Error("Invalid status update: update or update.site is null/undefined");
+     }
 
-           // Smart incremental update - use the payload data directly
-           const state = get();
-           const updatedSites = state.sites.map((site) => {
-               if (site.identifier === update.site.identifier) {
-                   return { ...update.site };
-               }
-               return site; // Keep other sites unchanged
-           });
-           
-           // ... rest of implementation
-       };
+     // Smart incremental update - use the payload data directly
+     const state = get();
+     const updatedSites = state.sites.map((site) => {
+      if (site.identifier === update.site.identifier) {
+       return { ...update.site };
+      }
+      return site; // Keep other sites unchanged
+     });
+
+     // ... rest of implementation
+    };
    }
    ```
 
@@ -61,16 +62,19 @@ The Uptime-Watcher project implements a sophisticated status update handler patt
 #### Strengths
 
 1. **Performance Optimization**
+
    - Uses incremental updates instead of full data refresh
    - Only updates changed sites, preserving unchanged data
    - Minimizes DOM re-renders through efficient state updates
 
 2. **Error Resilience**
+
    - Validates incoming update payloads
    - Implements fallback to full sync when updates fail
    - Provides comprehensive error logging
 
 3. **Real-time Updates**
+
    - Integrates with Electron IPC for instant status updates
    - Handles asynchronous operations properly
    - Maintains state consistency across UI updates
@@ -83,10 +87,12 @@ The Uptime-Watcher project implements a sophisticated status update handler patt
 #### Areas for Improvement
 
 1. **Type Safety**
+
    - Could benefit from stronger typing for StatusUpdate interface
    - Consider using discriminated unions for different update types
 
 2. **Performance Monitoring**
+
    - Add metrics for update frequency and processing time
    - Monitor for potential memory leaks in long-running sessions
 
@@ -111,21 +117,21 @@ The project uses **119 npm packages** with the following distribution:
 
 ```json
 {
-  "axios": "^1.10.0",                    // HTTP client
-  "chart.js": "^4.5.0",                 // Charting library
-  "chartjs-adapter-date-fns": "^3.0.0", // Date handling for charts
-  "chartjs-plugin-zoom": "^2.2.0",      // Chart zoom functionality
-  "electron-log": "^5.4.1",             // Logging
-  "electron-updater": "^6.6.2",         // Auto-updater
-  "is-port-reachable": "^4.0.0",        // Port checking
-  "node-sqlite3-wasm": "^0.8.45",       // SQLite database
-  "react": "^19.1.0",                   // UI framework
-  "react-chartjs-2": "^5.3.0",          // React Chart.js integration
-  "react-dom": "^19.1.0",               // React DOM
-  "react-icons": "^5.5.0",              // Icon library
-  "validator": "^13.15.15",             // Data validation
-  "zod": "^3.25.69",                    // Schema validation
-  "zustand": "^5.0.6"                   // State management
+ "axios": "^1.10.0", // HTTP client
+ "chart.js": "^4.5.0", // Charting library
+ "chartjs-adapter-date-fns": "^3.0.0", // Date handling for charts
+ "chartjs-plugin-zoom": "^2.2.0", // Chart zoom functionality
+ "electron-log": "^5.4.1", // Logging
+ "electron-updater": "^6.6.2", // Auto-updater
+ "is-port-reachable": "^4.0.0", // Port checking
+ "node-sqlite3-wasm": "^0.8.45", // SQLite database
+ "react": "^19.1.0", // UI framework
+ "react-chartjs-2": "^5.3.0", // React Chart.js integration
+ "react-dom": "^19.1.0", // React DOM
+ "react-icons": "^5.5.0", // Icon library
+ "validator": "^13.15.15", // Data validation
+ "zod": "^3.25.69", // Schema validation
+ "zustand": "^5.0.6" // State management
 }
 ```
 
@@ -154,18 +160,22 @@ The project uses **119 npm packages** with the following distribution:
 #### Categories Breakdown
 
 1. **TypeScript & Compilation (8 packages)**
-   - typescript, @types/*, tslib, ts-morph
+
+   - typescript, @types/\*, tslib, ts-morph
    - **Status**: ✅ Appropriate for TypeScript project
 
 2. **ESLint Ecosystem (20 packages)**
+
    - eslint core + 19 plugins
    - **Status**: ⚠️ Potentially over-configured
 
 3. **Testing & Coverage (12 packages)**
-   - vitest, @testing-library/*, msw, playwright
+
+   - vitest, @testing-library/\*, msw, playwright
    - **Status**: ✅ Comprehensive testing setup
 
 4. **Build Tools (15 packages)**
+
    - vite, electron-builder, webpack-related
    - **Status**: ✅ Modern build toolchain
 
@@ -179,25 +189,25 @@ The project uses **119 npm packages** with the following distribution:
 
 ```json
 {
-  "eslint-plugin-css": "^0.11.0",
-  "eslint-plugin-eslint-comments": "^3.2.0",
-  "eslint-plugin-filenames": "^1.3.2",
-  "eslint-plugin-functional": "^9.0.2",
-  "eslint-plugin-html": "^8.1.3",
-  "eslint-plugin-import": "^2.32.0",
-  "eslint-plugin-json": "^4.0.1",
-  "eslint-plugin-jsx-a11y": "^6.10.2",
-  "eslint-plugin-markdown": "^5.1.0",
-  "eslint-plugin-perfectionist": "^4.15.0",
-  "eslint-plugin-prettier": "5.5.1",
-  "eslint-plugin-promise": "^7.2.1",
-  "eslint-plugin-react": "^7.37.5",
-  "eslint-plugin-react-hooks": "^5.2.0",
-  "eslint-plugin-regexp": "^2.9.0",
-  "eslint-plugin-security": "^3.0.1",
-  "eslint-plugin-sonarjs": "^3.0.4",
-  "eslint-plugin-testing-library": "^7.5.3",
-  "eslint-plugin-unicorn": "^59.0.1"
+ "eslint-plugin-css": "^0.11.0",
+ "eslint-plugin-eslint-comments": "^3.2.0",
+ "eslint-plugin-filenames": "^1.3.2",
+ "eslint-plugin-functional": "^9.0.2",
+ "eslint-plugin-html": "^8.1.3",
+ "eslint-plugin-import": "^2.32.0",
+ "eslint-plugin-json": "^4.0.1",
+ "eslint-plugin-jsx-a11y": "^6.10.2",
+ "eslint-plugin-markdown": "^5.1.0",
+ "eslint-plugin-perfectionist": "^4.15.0",
+ "eslint-plugin-prettier": "5.5.1",
+ "eslint-plugin-promise": "^7.2.1",
+ "eslint-plugin-react": "^7.37.5",
+ "eslint-plugin-react-hooks": "^5.2.0",
+ "eslint-plugin-regexp": "^2.9.0",
+ "eslint-plugin-security": "^3.0.1",
+ "eslint-plugin-sonarjs": "^3.0.4",
+ "eslint-plugin-testing-library": "^7.5.3",
+ "eslint-plugin-unicorn": "^59.0.1"
 }
 ```
 
@@ -227,12 +237,13 @@ The project uses **119 npm packages** with the following distribution:
    ```bash
    # Remove if Zod handles all validation
    npm uninstall validator
-   
+
    # Remove if causing conflicts
    npm uninstall eslint-plugin-prettier
    ```
 
 2. **Consolidate Chart Dependencies**
+
    - Evaluate if all chart.js plugins are necessary
    - Consider lighter alternatives like Recharts or Victory
 
@@ -252,6 +263,7 @@ The project uses **119 npm packages** with the following distribution:
    ```
 
 2. **Build Tool Optimization**
+
    - Review if all electron-builder targets are needed
    - Consider removing unused build configurations
 
@@ -264,14 +276,17 @@ The project uses **119 npm packages** with the following distribution:
 #### Potential Upgrades
 
 1. **HTTP Client**
+
    - Consider **ky** or **ofetch** as lighter alternatives to axios
    - Better TypeScript support and modern API
 
 2. **State Management**
+
    - Current Zustand choice is excellent ✅
    - Alternative: Valtio for proxy-based state
 
 3. **Validation**
+
    - Current Zod choice is excellent ✅
    - Alternative: Yup or Joi (but Zod is preferred)
 
@@ -310,10 +325,12 @@ The project uses **119 npm packages** with the following distribution:
 ### Integration Points
 
 1. **Electron IPC Bridge**
+
    - `window.electronAPI.events.onStatusUpdate`
    - Handles bidirectional communication
 
 2. **Error Handling**
+
    - `withErrorHandling` utility wrapper
    - Centralized error logging and recovery
 
@@ -328,11 +345,13 @@ The project uses **119 npm packages** with the following distribution:
 ### Current Performance Characteristics
 
 1. **Update Efficiency**
+
    - ✅ Incremental updates (only changed sites)
    - ✅ Efficient array mapping with identity preservation
    - ✅ Minimal DOM re-renders
 
 2. **Memory Usage**
+
    - ✅ No memory leaks in status handler
    - ✅ Proper cleanup of event listeners
    - ⚠️ Large dependency bundle (119 packages)
@@ -345,6 +364,7 @@ The project uses **119 npm packages** with the following distribution:
 ### Performance Optimization Opportunities
 
 1. **Bundle Size Reduction**
+
    - Remove unused ESLint plugins: **~20MB savings**
    - Optimize icon usage: **~5MB savings**
    - Chart.js alternatives: **~3MB savings**
@@ -365,13 +385,14 @@ The project uses **119 npm packages** with the following distribution:
    ```bash
    # Remove redundant packages
    npm uninstall validator eslint-plugin-prettier
-   
+
    # Remove unused ESLint plugins
    npm uninstall eslint-plugin-css eslint-plugin-html eslint-plugin-markdown
    npm uninstall eslint-plugin-perfectionist eslint-plugin-functional
    ```
 
 2. **Status Handler Improvements**
+
    - Add TypeScript discriminated unions for update types
    - Implement update batching for performance
    - Add metrics collection for monitoring
@@ -383,11 +404,13 @@ The project uses **119 npm packages** with the following distribution:
 ### Medium-Term Improvements
 
 1. **Architecture Enhancements**
+
    - Add status handler unit tests
    - Implement update queuing for high-frequency updates
    - Add performance monitoring dashboard
 
 2. **Package Modernization**
+
    - Consider ky/ofetch instead of axios
    - Evaluate Recharts vs Chart.js
    - Implement proper tree-shaking
@@ -400,6 +423,7 @@ The project uses **119 npm packages** with the following distribution:
 ### Long-Term Considerations
 
 1. **Monitoring & Observability**
+
    - Add application performance monitoring
    - Implement error tracking and analytics
    - Monitor bundle size over time
@@ -418,34 +442,33 @@ The project uses **119 npm packages** with the following distribution:
 ```typescript
 // Enhanced with performance monitoring
 function createStatusUpdateHandler(
-    get: () => SitesStore, 
-    callback: (update: StatusUpdate) => void,
-    options: { enableMetrics?: boolean } = {}
+ get: () => SitesStore,
+ callback: (update: StatusUpdate) => void,
+ options: { enableMetrics?: boolean } = {}
 ) {
-    return (update: StatusUpdate) => {
-        const startTime = options.enableMetrics ? performance.now() : 0;
-        
-        try {
-            // Validate with discriminated union
-            if (!isValidStatusUpdate(update)) {
-                throw new Error(`Invalid status update: ${JSON.stringify(update)}`);
-            }
+ return (update: StatusUpdate) => {
+  const startTime = options.enableMetrics ? performance.now() : 0;
 
-            // Batch updates for performance
-            const batchedUpdate = batchStatusUpdates([update]);
-            
-            // Process update...
-            
-            if (options.enableMetrics) {
-                const duration = performance.now() - startTime;
-                logMetric('status_update_duration', duration);
-            }
-            
-        } catch (error) {
-            logError('status_update_error', error);
-            // Fallback logic...
-        }
-    };
+  try {
+   // Validate with discriminated union
+   if (!isValidStatusUpdate(update)) {
+    throw new Error(`Invalid status update: ${JSON.stringify(update)}`);
+   }
+
+   // Batch updates for performance
+   const batchedUpdate = batchStatusUpdates([update]);
+
+   // Process update...
+
+   if (options.enableMetrics) {
+    const duration = performance.now() - startTime;
+    logMetric("status_update_duration", duration);
+   }
+  } catch (error) {
+   logError("status_update_error", error);
+   // Fallback logic...
+  }
+ };
 }
 ```
 
@@ -453,31 +476,31 @@ function createStatusUpdateHandler(
 
 ```json
 {
-  "dependencies": {
-    "axios": "^1.10.0",
-    "chart.js": "^4.5.0",
-    "electron-log": "^5.4.1",
-    "electron-updater": "^6.6.2",
-    "is-port-reachable": "^4.0.0",
-    "node-sqlite3-wasm": "^0.8.45",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "lucide-react": "^0.263.1",
-    "zod": "^3.25.69",
-    "zustand": "^5.0.6"
-  },
-  "devDependencies": {
-    "typescript": "^5.8.3",
-    "vite": "^7.0.0",
-    "vitest": "^3.2.4",
-    "eslint": "^9.30.1",
-    "@typescript-eslint/eslint-plugin": "^8.35.1",
-    "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "prettier": "^3.6.2",
-    "electron": "^37.2.0",
-    "electron-builder": "^24.13.3"
-  }
+ "dependencies": {
+  "axios": "^1.10.0",
+  "chart.js": "^4.5.0",
+  "electron-log": "^5.4.1",
+  "electron-updater": "^6.6.2",
+  "is-port-reachable": "^4.0.0",
+  "node-sqlite3-wasm": "^0.8.45",
+  "react": "^19.1.0",
+  "react-dom": "^19.1.0",
+  "lucide-react": "^0.263.1",
+  "zod": "^3.25.69",
+  "zustand": "^5.0.6"
+ },
+ "devDependencies": {
+  "typescript": "^5.8.3",
+  "vite": "^7.0.0",
+  "vitest": "^3.2.4",
+  "eslint": "^9.30.1",
+  "@typescript-eslint/eslint-plugin": "^8.35.1",
+  "eslint-plugin-react": "^7.37.5",
+  "eslint-plugin-react-hooks": "^5.2.0",
+  "prettier": "^3.6.2",
+  "electron": "^37.2.0",
+  "electron-builder": "^24.13.3"
+ }
 }
 ```
 
@@ -497,7 +520,7 @@ The current implementation is production-ready but would benefit from the recomm
 
 ---
 
-*Analysis completed on: $(date)*
-*Project version: 4.5.0*
-*Total packages analyzed: 119*
-*Codebase status: All tests passing, TypeScript errors resolved*
+_Analysis completed on: $(date)_
+_Project version: 4.5.0_
+_Total packages analyzed: 119_
+_Codebase status: All tests passing, TypeScript errors resolved_

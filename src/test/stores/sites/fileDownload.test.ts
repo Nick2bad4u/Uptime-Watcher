@@ -3,11 +3,11 @@
  */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { 
-    handleSQLiteBackupDownload, 
-    downloadFile, 
+import {
+    handleSQLiteBackupDownload,
+    downloadFile,
     generateBackupFileName,
-    type FileDownloadOptions 
+    type FileDownloadOptions,
 } from "../../../stores/sites/utils/fileDownload";
 
 describe("fileDownload", () => {
@@ -273,7 +273,7 @@ describe("fileDownload", () => {
 
         it("should download file with default MIME type", () => {
             const { mockCreateObjectURL, mockRevokeObjectURL, mockAnchor, mockBody } = setupDownloadMocks();
-            
+
             const buffer = new ArrayBuffer(8);
             const options: FileDownloadOptions = {
                 buffer,
@@ -294,7 +294,7 @@ describe("fileDownload", () => {
 
         it("should download file with custom MIME type", () => {
             const { mockCreateObjectURL, mockAnchor } = setupDownloadMocks();
-            
+
             const buffer = new ArrayBuffer(8);
             const options: FileDownloadOptions = {
                 buffer,
@@ -306,7 +306,7 @@ describe("fileDownload", () => {
 
             expect(mockCreateObjectURL).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    type: "application/json"
+                    type: "application/json",
                 })
             );
             expect(mockAnchor.download).toBe("test.json");
@@ -314,7 +314,7 @@ describe("fileDownload", () => {
 
         it("should handle empty buffer", () => {
             const { mockCreateObjectURL, mockAnchor } = setupDownloadMocks();
-            
+
             const buffer = new ArrayBuffer(0);
             const options: FileDownloadOptions = {
                 buffer,
@@ -329,7 +329,7 @@ describe("fileDownload", () => {
 
         it("should handle missing document.body", () => {
             const { mockCreateObjectURL, mockRevokeObjectURL, mockAnchor } = setupDownloadMocks();
-            
+
             // Remove document.body
             Object.defineProperty(document, "body", {
                 value: null,
@@ -352,7 +352,7 @@ describe("fileDownload", () => {
 
         it("should handle DOM manipulation errors with fallback", () => {
             const { mockCreateObjectURL, mockRevokeObjectURL, mockAnchor, mockBody } = setupDownloadMocks();
-            
+
             // Mock appendChild to throw
             mockBody.appendChild.mockImplementation(() => {
                 throw new Error("appendChild failed");
@@ -372,14 +372,17 @@ describe("fileDownload", () => {
             expect(mockCreateObjectURL).toHaveBeenCalledWith(expect.any(Blob));
             expect(mockAnchor.click).toHaveBeenCalledTimes(1); // Fallback click only
             expect(mockRevokeObjectURL).toHaveBeenCalledWith("blob:mock-url");
-            expect(consoleWarnSpy).toHaveBeenCalledWith("DOM manipulation failed, using fallback click", expect.any(Error));
+            expect(consoleWarnSpy).toHaveBeenCalledWith(
+                "DOM manipulation failed, using fallback click",
+                expect.any(Error)
+            );
 
             consoleWarnSpy.mockRestore();
         });
 
         it("should throw error when createObjectURL fails", () => {
             setupDownloadMocks();
-            
+
             // Mock createObjectURL to throw
             global.URL.createObjectURL = vi.fn().mockImplementation(() => {
                 throw new Error("createObjectURL failed");
@@ -396,7 +399,7 @@ describe("fileDownload", () => {
 
         it("should throw error when createElement fails", () => {
             setupDownloadMocks();
-            
+
             // Mock createElement to throw
             const mockCreateElement = vi.fn().mockImplementation(() => {
                 throw new Error("createElement not available");
@@ -418,7 +421,7 @@ describe("fileDownload", () => {
 
         it("should throw error when click fails", () => {
             const { mockAnchor } = setupDownloadMocks();
-            
+
             // Mock click to throw
             mockAnchor.click.mockImplementation(() => {
                 throw new Error("Click failed");
@@ -435,7 +438,7 @@ describe("fileDownload", () => {
 
         it("should handle appendChild error with fallback failure", () => {
             const { mockAnchor, mockBody } = setupDownloadMocks();
-            
+
             // Mock appendChild to throw
             mockBody.appendChild.mockImplementation(() => {
                 throw new Error("appendChild failed");
@@ -464,7 +467,7 @@ describe("fileDownload", () => {
 
         it("should handle generic errors", () => {
             setupDownloadMocks();
-            
+
             // Mock Blob constructor to throw
             const originalBlob = global.Blob;
             global.Blob = vi.fn().mockImplementation(() => {
@@ -490,7 +493,7 @@ describe("fileDownload", () => {
 
         it("should handle large files", () => {
             const { mockCreateObjectURL, mockAnchor } = setupDownloadMocks();
-            
+
             const buffer = new ArrayBuffer(1024 * 1024 * 10); // 10MB
             const options: FileDownloadOptions = {
                 buffer,
@@ -506,7 +509,7 @@ describe("fileDownload", () => {
 
         it("should handle special characters in filename", () => {
             const { mockAnchor } = setupDownloadMocks();
-            
+
             const buffer = new ArrayBuffer(8);
             const options: FileDownloadOptions = {
                 buffer,
@@ -524,7 +527,7 @@ describe("fileDownload", () => {
             vi.clearAllMocks();
             // Mock Date to return consistent timestamp
             vi.useFakeTimers();
-            vi.setSystemTime(new Date('2023-12-15T10:30:00Z'));
+            vi.setSystemTime(new Date("2023-12-15T10:30:00Z"));
         });
 
         afterEach(() => {
@@ -533,72 +536,72 @@ describe("fileDownload", () => {
 
         it("should generate filename with default parameters", () => {
             const fileName = generateBackupFileName();
-            
+
             expect(fileName).toBe("backup-2023-12-15.sqlite");
         });
 
         it("should generate filename with custom prefix", () => {
             const fileName = generateBackupFileName("database");
-            
+
             expect(fileName).toBe("database-2023-12-15.sqlite");
         });
 
         it("should generate filename with custom extension", () => {
             const fileName = generateBackupFileName("backup", "db");
-            
+
             expect(fileName).toBe("backup-2023-12-15.db");
         });
 
         it("should generate filename with custom prefix and extension", () => {
             const fileName = generateBackupFileName("myapp", "json");
-            
+
             expect(fileName).toBe("myapp-2023-12-15.json");
         });
 
         it("should handle empty prefix", () => {
             const fileName = generateBackupFileName("");
-            
+
             expect(fileName).toBe("-2023-12-15.sqlite");
         });
 
         it("should handle empty extension", () => {
             const fileName = generateBackupFileName("backup", "");
-            
+
             expect(fileName).toBe("backup-2023-12-15.");
         });
 
         it("should handle special characters in prefix", () => {
             const fileName = generateBackupFileName("my-app_backup");
-            
+
             expect(fileName).toBe("my-app_backup-2023-12-15.sqlite");
         });
 
         it("should generate different filenames for different dates", () => {
             const fileName1 = generateBackupFileName();
-            
+
             // Change date
-            vi.setSystemTime(new Date('2023-12-16T10:30:00Z'));
-            
+            vi.setSystemTime(new Date("2023-12-16T10:30:00Z"));
+
             const fileName2 = generateBackupFileName();
-            
+
             expect(fileName1).toBe("backup-2023-12-15.sqlite");
             expect(fileName2).toBe("backup-2023-12-16.sqlite");
             expect(fileName1).not.toBe(fileName2);
         });
 
         it("should handle leap year date", () => {
-            vi.setSystemTime(new Date('2024-02-29T10:30:00Z'));
-            
+            vi.setSystemTime(new Date("2024-02-29T10:30:00Z"));
+
             const fileName = generateBackupFileName();
-            
+
             expect(fileName).toBe("backup-2024-02-29.sqlite");
         });
 
         it("should handle year boundary", () => {
-            vi.setSystemTime(new Date('2023-12-31T23:59:59Z'));
-            
+            vi.setSystemTime(new Date("2023-12-31T23:59:59Z"));
+
             const fileName = generateBackupFileName();
-            
+
             expect(fileName).toBe("backup-2023-12-31.sqlite");
         });
     });
@@ -680,6 +683,5 @@ describe("fileDownload", () => {
                 configurable: true,
             });
         });
-
     });
 });

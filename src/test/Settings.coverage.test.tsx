@@ -52,7 +52,7 @@ const mockUseTheme = {
         colors: {
             primary: {
                 50: "#f8fafc",
-                100: "#f1f5f9", 
+                100: "#f1f5f9",
                 200: "#e2e8f0",
                 300: "#cbd5e1",
                 400: "#94a3b8",
@@ -60,13 +60,13 @@ const mockUseTheme = {
                 600: "#475569",
                 700: "#334155",
                 800: "#1e293b",
-                900: "#0f172a"
+                900: "#0f172a",
             },
             status: {
                 up: "#22c55e",
-                down: "#ef4444", 
+                down: "#ef4444",
                 pending: "#f59e0b",
-                unknown: "#6b7280"
+                unknown: "#6b7280",
             },
             success: "#22c55e",
             warning: "#f59e0b",
@@ -77,29 +77,29 @@ const mockUseTheme = {
                 primary: "#ffffff",
                 secondary: "#f8fafc",
                 tertiary: "#f1f5f9",
-                modal: "#ffffff"
+                modal: "#ffffff",
             },
             text: {
                 primary: "#0f172a",
                 secondary: "#475569",
                 tertiary: "#64748b",
-                inverse: "#ffffff"
+                inverse: "#ffffff",
             },
             border: {
                 primary: "#e2e8f0",
                 secondary: "#cbd5e1",
-                focus: "#3b82f6"
+                focus: "#3b82f6",
             },
             surface: {
                 base: "#ffffff",
                 elevated: "#f8fafc",
-                overlay: "#000000"
+                overlay: "#000000",
             },
             hover: {
                 light: "#f8fafc",
                 medium: "#f1f5f9",
-                dark: "#e2e8f0"
-            }
+                dark: "#e2e8f0",
+            },
         },
         borderRadius: {
             none: "0px",
@@ -107,12 +107,12 @@ const mockUseTheme = {
             md: "8px",
             lg: "12px",
             xl: "16px",
-            full: "9999px"
+            full: "9999px",
         },
         typography: {
             fontFamily: {
                 sans: ["Inter", "sans-serif"],
-                mono: ["JetBrains Mono", "monospace"]
+                mono: ["JetBrains Mono", "monospace"],
             },
             fontSize: {
                 xs: "12px",
@@ -122,19 +122,19 @@ const mockUseTheme = {
                 xl: "20px",
                 "2xl": "24px",
                 "3xl": "30px",
-                "4xl": "36px"
+                "4xl": "36px",
             },
             fontWeight: {
                 normal: "400",
                 medium: "500",
                 semibold: "600",
-                bold: "700"
+                bold: "700",
             },
             lineHeight: {
                 tight: "1.25",
                 normal: "1.5",
-                relaxed: "1.75"
-            }
+                relaxed: "1.75",
+            },
         },
         spacing: {
             xs: "4px",
@@ -143,15 +143,15 @@ const mockUseTheme = {
             lg: "24px",
             xl: "32px",
             "2xl": "48px",
-            "3xl": "64px"
+            "3xl": "64px",
         },
         shadows: {
             sm: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
             md: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
             lg: "0 10px 15px -3px rgb(0 0 0 / 0.1)",
             xl: "0 20px 25px -5px rgb(0 0 0 / 0.1)",
-            inner: "inset 0 2px 4px 0 rgb(0 0 0 / 0.06)"
-        }
+            inner: "inset 0 2px 4px 0 rgb(0 0 0 / 0.06)",
+        },
     },
     getColor: vi.fn(() => "#000000"),
     getStatusColor: vi.fn(() => "#22c55e"),
@@ -198,15 +198,15 @@ describe("Settings Component - Complete Coverage", () => {
         await act(async () => {
             const allowedKeys = [
                 "notifications",
-                "autoStart", 
+                "autoStart",
                 "minimizeToTray",
                 "theme",
                 "soundAlerts",
                 "historyLimit",
             ];
-            
+
             const invalidKey = "invalidKey";
-            
+
             // Simulate the condition that should trigger the warning (lines 87-89)
             if (!allowedKeys.includes(invalidKey)) {
                 logger.warn("Attempted to update invalid settings key", invalidKey);
@@ -216,19 +216,19 @@ describe("Settings Component - Complete Coverage", () => {
 
         // Verify the warning was logged
         expect(logger.warn).toHaveBeenCalledWith("Attempted to update invalid settings key", "invalidKey");
-        
+
         // Verify updateSettings was NOT called for invalid key
         expect(mockUpdateSettings).not.toHaveBeenCalled();
     });
 
     it("should handle valid settings changes correctly", async () => {
         const user = userEvent.setup();
-        
+
         render(<Settings onClose={vi.fn()} />);
 
         // Test a valid settings change
         const notificationsCheckbox = screen.getByRole("checkbox", { name: /notifications/i });
-        
+
         await act(async () => {
             await user.click(notificationsCheckbox);
         });
@@ -238,28 +238,21 @@ describe("Settings Component - Complete Coverage", () => {
         expect(logger.user.settingsChange).toHaveBeenCalled();
     });
 
-    it("should test all allowed settings keys", async () => {        
+    it("should test all allowed settings keys", async () => {
         render(<Settings onClose={vi.fn()} />);
 
-        const allowedKeys = [
-            "notifications",
-            "autoStart", 
-            "minimizeToTray",
-            "theme",
-            "soundAlerts",
-            "historyLimit",
-        ];
+        const allowedKeys = ["notifications", "autoStart", "minimizeToTray", "theme", "soundAlerts", "historyLimit"];
 
         // Test that each allowed key works correctly
         for (const key of allowedKeys) {
             mockUpdateSettings.mockClear();
-            
+
             // Simulate updating each valid key
             await act(async () => {
                 // Mock the handleSettingChange call for each valid key
                 const oldValue = mockUseStore.settings[key as keyof typeof mockUseStore.settings];
                 const newValue = typeof oldValue === "boolean" ? !oldValue : oldValue;
-                
+
                 // This simulates the internal handleSettingChange logic
                 mockUpdateSettings({ [key]: newValue });
                 logger.user.settingsChange(key, oldValue, newValue);

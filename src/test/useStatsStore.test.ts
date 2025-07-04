@@ -26,7 +26,7 @@ const mockGetState = vi.mocked(useSitesStore.getState);
 // Helper function to create mock sites state
 const createMockSitesState = (sites: Partial<Site>[] = []) => {
     return {
-        sites: sites.map(site => ({
+        sites: sites.map((site) => ({
             identifier: site.identifier ?? "test-site",
             name: site.name ?? "Test Site",
             monitors: site.monitors ?? [],
@@ -68,7 +68,7 @@ describe("useStatsStore", () => {
             totalUptime: 0,
             totalDowntime: 0,
         });
-        
+
         // Reset mocks
         vi.clearAllMocks();
     });
@@ -76,46 +76,46 @@ describe("useStatsStore", () => {
     describe("basic state management", () => {
         it("should initialize with zero values", () => {
             const { result } = renderHook(() => useStatsStore());
-            
+
             expect(result.current.totalUptime).toBe(0);
             expect(result.current.totalDowntime).toBe(0);
         });
 
         it("should set total uptime", () => {
             const { result } = renderHook(() => useStatsStore());
-            
+
             act(() => {
                 result.current.setTotalUptime(1000);
             });
-            
+
             expect(result.current.totalUptime).toBe(1000);
         });
 
         it("should set total downtime", () => {
             const { result } = renderHook(() => useStatsStore());
-            
+
             act(() => {
                 result.current.setTotalDowntime(500);
             });
-            
+
             expect(result.current.totalDowntime).toBe(500);
         });
 
         it("should reset stats", () => {
             const { result } = renderHook(() => useStatsStore());
-            
+
             act(() => {
                 result.current.setTotalUptime(1000);
                 result.current.setTotalDowntime(500);
             });
-            
+
             expect(result.current.totalUptime).toBe(1000);
             expect(result.current.totalDowntime).toBe(500);
-            
+
             act(() => {
                 result.current.resetStats();
             });
-            
+
             expect(result.current.totalUptime).toBe(0);
             expect(result.current.totalDowntime).toBe(0);
         });
@@ -124,15 +124,15 @@ describe("useStatsStore", () => {
     describe("computeStats", () => {
         it("should compute stats from empty sites", () => {
             const mockSitesState = createMockSitesState([]);
-            
+
             mockGetState.mockReturnValue(mockSitesState);
-            
+
             const { result } = renderHook(() => useStatsStore());
-            
+
             act(() => {
                 result.current.computeStats();
             });
-            
+
             expect(result.current.totalUptime).toBe(0);
             expect(result.current.totalDowntime).toBe(0);
         });
@@ -154,15 +154,15 @@ describe("useStatsStore", () => {
                     ],
                 },
             ]);
-            
+
             mockGetState.mockReturnValue(mockSitesState);
-            
+
             const { result } = renderHook(() => useStatsStore());
-            
+
             act(() => {
                 result.current.computeStats();
             });
-            
+
             expect(result.current.totalUptime).toBe(300);
             expect(result.current.totalDowntime).toBe(0);
         });
@@ -184,15 +184,15 @@ describe("useStatsStore", () => {
                     ],
                 },
             ]);
-            
+
             mockGetState.mockReturnValue(mockSitesState);
-            
+
             const { result } = renderHook(() => useStatsStore());
-            
+
             act(() => {
                 result.current.computeStats();
             });
-            
+
             expect(result.current.totalUptime).toBe(0);
             expect(result.current.totalDowntime).toBe(400);
         });
@@ -229,15 +229,15 @@ describe("useStatsStore", () => {
                     ],
                 },
             ]);
-            
+
             mockGetState.mockReturnValue(mockSitesState);
-            
+
             const { result } = renderHook(() => useStatsStore());
-            
+
             act(() => {
                 result.current.computeStats();
             });
-            
+
             expect(result.current.totalUptime).toBe(650); // 100 + 300 + 250
             expect(result.current.totalDowntime).toBe(350); // 200 + 150
         });
@@ -260,15 +260,15 @@ describe("useStatsStore", () => {
                     ],
                 },
             ]);
-            
+
             mockGetState.mockReturnValue(mockSitesState);
-            
+
             const { result } = renderHook(() => useStatsStore());
-            
+
             act(() => {
                 result.current.computeStats();
             });
-            
+
             expect(result.current.totalUptime).toBe(100); // Only the entry with responseTime
             expect(result.current.totalDowntime).toBe(0);
         });
@@ -290,15 +290,15 @@ describe("useStatsStore", () => {
                     ],
                 },
             ]);
-            
+
             mockGetState.mockReturnValue(mockSitesState);
-            
+
             const { result } = renderHook(() => useStatsStore());
-            
+
             act(() => {
                 result.current.computeStats();
             });
-            
+
             expect(result.current.totalUptime).toBe(200); // Only up status
             expect(result.current.totalDowntime).toBe(300); // Only down status
         });
@@ -312,30 +312,26 @@ describe("useStatsStore", () => {
                             id: "monitor1",
                             type: "http",
                             status: "up",
-                            history: [
-                                { status: "up", responseTime: 100, timestamp: 1234567890 },
-                            ],
+                            history: [{ status: "up", responseTime: 100, timestamp: 1234567890 }],
                         },
                         {
                             id: "monitor2",
                             type: "http",
                             status: "down",
-                            history: [
-                                { status: "down", responseTime: 200, timestamp: 1234567890 },
-                            ],
+                            history: [{ status: "down", responseTime: 200, timestamp: 1234567890 }],
                         },
                     ],
                 },
             ]);
-            
+
             mockGetState.mockReturnValue(mockSitesState);
-            
+
             const { result } = renderHook(() => useStatsStore());
-            
+
             act(() => {
                 result.current.computeStats();
             });
-            
+
             expect(result.current.totalUptime).toBe(100);
             expect(result.current.totalDowntime).toBe(200);
         });

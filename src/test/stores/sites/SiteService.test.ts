@@ -330,7 +330,7 @@ describe("SiteService", () => {
         it("should handle undefined window.electronAPI gracefully", async () => {
             // Import the mock so we can control it
             const { waitForElectronAPI } = await import("../../../stores/utils");
-            
+
             // Make waitForElectronAPI reject for all calls in this test
             const mockWaitForElectronAPI = vi.mocked(waitForElectronAPI);
             mockWaitForElectronAPI.mockRejectedValue(new Error("ElectronAPI not available"));

@@ -19,12 +19,12 @@ vi.mock("../stores", () => ({
 const mockAddEventListener = vi.fn();
 const mockRemoveEventListener = vi.fn();
 
-Object.defineProperty(window, 'addEventListener', {
+Object.defineProperty(window, "addEventListener", {
     value: mockAddEventListener,
     writable: true,
 });
 
-Object.defineProperty(window, 'removeEventListener', {
+Object.defineProperty(window, "removeEventListener", {
     value: mockRemoveEventListener,
     writable: true,
 });
@@ -41,20 +41,20 @@ describe("useBackendFocusSync", () => {
 
     it("should handle hook lifecycle", () => {
         const { unmount } = renderHook(() => useBackendFocusSync());
-        
+
         // Should not throw when unmounting
         expect(() => unmount()).not.toThrow();
     });
 
     it("should register event listeners when enabled", () => {
         renderHook(() => useBackendFocusSync(true));
-        
+
         expect(mockAddEventListener).toHaveBeenCalledWith("focus", expect.any(Function));
     });
 
     it("should not register event listeners when disabled", () => {
         renderHook(() => useBackendFocusSync(false));
-        
+
         expect(mockAddEventListener).not.toHaveBeenCalled();
     });
 });

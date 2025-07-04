@@ -374,7 +374,7 @@ describe("useSitesStore", () => {
 
             mockElectronAPI.sites.updateSite.mockResolvedValue(undefined);
             const mockSyncSitesFromBackend = vi.fn().mockResolvedValue(undefined);
-            
+
             // Mock the syncSitesFromBackend method
             useSitesStore.setState({
                 ...useSitesStore.getState(),
@@ -401,9 +401,7 @@ describe("useSitesStore", () => {
                 monitoring: true,
             };
 
-            await expect(
-                useSitesStore.getState().addMonitorToSite("non-existent", newMonitor)
-            ).rejects.toThrow();
+            await expect(useSitesStore.getState().addMonitorToSite("non-existent", newMonitor)).rejects.toThrow();
         });
     });
 
@@ -419,9 +417,7 @@ describe("useSitesStore", () => {
         it("should handle checkSiteNow errors", async () => {
             mockElectronAPI.sites.checkSiteNow.mockRejectedValue(new Error("Check failed"));
 
-            await expect(
-                useSitesStore.getState().checkSiteNow("site-1", "monitor-1")
-            ).rejects.toThrow("Check failed");
+            await expect(useSitesStore.getState().checkSiteNow("site-1", "monitor-1")).rejects.toThrow("Check failed");
         });
     });
 
@@ -429,7 +425,7 @@ describe("useSitesStore", () => {
         it("should download SQLite backup", async () => {
             const mockBuffer = new ArrayBuffer(100);
             const mockFileName = "backup.sqlite";
-            
+
             mockElectronAPI.data.downloadSQLiteBackup.mockResolvedValue({
                 buffer: mockBuffer,
                 fileName: mockFileName,
@@ -501,7 +497,7 @@ describe("useSitesStore", () => {
 
         it("should set selected site", () => {
             const site = useSitesStore.getState().sites[0]!;
-            
+
             useSitesStore.getState().setSelectedSite(site);
 
             const state = useSitesStore.getState();
@@ -510,7 +506,7 @@ describe("useSitesStore", () => {
 
         it("should clear selected site", () => {
             useSitesStore.setState({ ...useSitesStore.getState(), selectedSiteId: "site-1" });
-            
+
             useSitesStore.getState().setSelectedSite(undefined);
 
             const state = useSitesStore.getState();
@@ -519,7 +515,7 @@ describe("useSitesStore", () => {
 
         it("should get selected site", () => {
             useSitesStore.setState({ ...useSitesStore.getState(), selectedSiteId: "site-1" });
-            
+
             const selectedSite = useSitesStore.getState().getSelectedSite();
 
             expect(selectedSite?.identifier).toBe("site-1");
@@ -527,7 +523,7 @@ describe("useSitesStore", () => {
 
         it("should return undefined for non-existent selected site", () => {
             useSitesStore.setState({ ...useSitesStore.getState(), selectedSiteId: "non-existent" });
-            
+
             const selectedSite = useSitesStore.getState().getSelectedSite();
 
             expect(selectedSite).toBeUndefined();

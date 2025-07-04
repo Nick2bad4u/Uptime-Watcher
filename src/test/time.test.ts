@@ -4,7 +4,13 @@
 
 import { describe, expect, it } from "vitest";
 
-import { formatResponseTime, formatFullTimestamp, formatDuration, TIME_PERIOD_LABELS, type TimePeriod } from "../utils/time";
+import {
+    formatResponseTime,
+    formatFullTimestamp,
+    formatDuration,
+    TIME_PERIOD_LABELS,
+    type TimePeriod,
+} from "../utils/time";
 
 describe("Time Utils", () => {
     describe("formatResponseTime", () => {

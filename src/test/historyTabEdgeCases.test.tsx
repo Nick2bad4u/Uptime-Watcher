@@ -106,10 +106,7 @@ describe("HistoryTab Edge Cases", () => {
     const mockFormatResponseTime = vi.fn((time: number) => `${time}ms`);
     const mockFormatStatusWithIcon = vi.fn((status: string) => (status === "up" ? "✅ Up" : "❌ Down"));
 
-    const createMockMonitor = (
-        type: "http" | "port",
-        history: StatusHistory[] = []
-    ): Monitor => ({
+    const createMockMonitor = (type: "http" | "port", history: StatusHistory[] = []): Monitor => ({
         id: "monitor-1",
         type,
         status: "up",

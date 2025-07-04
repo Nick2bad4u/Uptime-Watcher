@@ -62,7 +62,7 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
 
         // Trigger hover to create timeout and portal
         act(() => {
-            thumbnail.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+            thumbnail.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
         });
 
         // Advance time to allow state changes
@@ -81,7 +81,7 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
         // The cleanup should have handled:
         // - Clearing timeout if it exists (lines 60-61)
         // - Removing portal if it exists (lines 67-68)
-        
+
         expect(true).toBe(true); // If we get here without errors, cleanup worked
     });
 
@@ -97,8 +97,8 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
 
         // Test the timeout creation path
         act(() => {
-            thumbnail.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
-            
+            thumbnail.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
+
             // This should create a timeout (stored in hoverTimeoutRef.current)
             // When component unmounts, it should clear this timeout (lines 60-61)
         });
@@ -119,7 +119,7 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
 
         // Trigger hover to potentially create portal
         act(() => {
-            thumbnail.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+            thumbnail.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
             vi.advanceTimersByTime(500); // Advance past hover delay
         });
 
@@ -135,7 +135,7 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
 
     it("should handle click event and log user action", () => {
         const props = {
-            url: "https://test.com", 
+            url: "https://test.com",
             siteName: "Test Site",
         };
 
@@ -148,13 +148,10 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
         });
 
         // Verify logger was called with correct action
-        expect(logger.user.action).toHaveBeenCalledWith(
-            "External URL opened from screenshot thumbnail",
-            {
-                siteName: "Test Site",
-                url: "https://test.com",
-            }
-        );
+        expect(logger.user.action).toHaveBeenCalledWith("External URL opened from screenshot thumbnail", {
+            siteName: "Test Site",
+            url: "https://test.com",
+        });
 
         // Verify electronAPI was called
         expect(mockElectronAPI.openExternal).toHaveBeenCalledWith("https://test.com");
@@ -172,11 +169,11 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
 
         // Rapid hover/unhover to test timeout handling
         act(() => {
-            thumbnail.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
-            thumbnail.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
-            thumbnail.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
-            thumbnail.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
-            
+            thumbnail.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
+            thumbnail.dispatchEvent(new MouseEvent("mouseleave", { bubbles: true }));
+            thumbnail.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
+            thumbnail.dispatchEvent(new MouseEvent("mouseleave", { bubbles: true }));
+
             // Advance timers to trigger any pending timeouts
             vi.advanceTimersByTime(1000);
         });

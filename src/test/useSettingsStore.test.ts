@@ -208,7 +208,7 @@ describe("useSettingsStore", () => {
     describe("Persistence", () => {
         it("should persist settings changes", () => {
             const originalSettings = useSettingsStore.getState().settings;
-            
+
             useSettingsStore.getState().updateSettings({
                 theme: "dark",
                 notifications: false,
@@ -226,7 +226,7 @@ describe("useSettingsStore", () => {
     describe("Edge Cases", () => {
         it("should handle partial updates", () => {
             const originalSettings = useSettingsStore.getState().settings;
-            
+
             useSettingsStore.getState().updateSettings({
                 notifications: false,
             });
@@ -243,7 +243,7 @@ describe("useSettingsStore", () => {
 
         it("should handle empty updates", () => {
             const originalSettings = useSettingsStore.getState().settings;
-            
+
             useSettingsStore.getState().updateSettings({});
 
             const state = useSettingsStore.getState();
@@ -296,7 +296,7 @@ describe("useSettingsStore", () => {
 
         it("should allow chaining updates", () => {
             const store = useSettingsStore.getState();
-            
+
             store.updateSettings({ autoStart: true });
             store.updateSettings({ notifications: false });
             store.updateSettings({ theme: "light" });
@@ -313,7 +313,7 @@ describe("useSettingsStore", () => {
     describe("Type Safety", () => {
         it("should accept valid theme values", () => {
             const validThemes = ["system", "light", "dark"] as const;
-            
+
             validThemes.forEach((theme) => {
                 useSettingsStore.getState().updateSettings({ theme });
                 const state = useSettingsStore.getState();

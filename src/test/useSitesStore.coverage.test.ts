@@ -8,11 +8,13 @@ import { waitForElectronAPI } from "../stores/utils";
 
 // Mock window and setTimeout
 interface MockWindow {
-    electronAPI?: {
-        sites?: {
-            getSites?: (() => void) | string;
-        };
-    } | undefined;
+    electronAPI?:
+        | {
+              sites?: {
+                  getSites?: (() => void) | string;
+              };
+          }
+        | undefined;
 }
 
 Object.defineProperty(global, "window", {
@@ -40,7 +42,7 @@ describe("waitForElectronAPI - Complete Coverage", () => {
         };
 
         const promise = waitForElectronAPI();
-        
+
         // Should resolve immediately
         await expect(promise).resolves.toBeUndefined();
     });
@@ -68,7 +70,7 @@ describe("waitForElectronAPI - Complete Coverage", () => {
 
         // Advance timers to trigger the setTimeout
         vi.advanceTimersByTime(150);
-        
+
         // Advance for the next polling attempt
         vi.advanceTimersByTime(200); // exponential backoff
 
@@ -78,7 +80,7 @@ describe("waitForElectronAPI - Complete Coverage", () => {
     it("should throw error after maximum attempts", async () => {
         // Use real timers for this test since it involves setTimeout
         vi.useRealTimers();
-        
+
         // Never make electronAPI available
         (global.window as MockWindow).electronAPI = undefined;
 
@@ -88,7 +90,7 @@ describe("waitForElectronAPI - Complete Coverage", () => {
         await expect(promise).rejects.toThrow(
             "ElectronAPI not available after maximum attempts. The application may not be running in an Electron environment."
         );
-        
+
         // Restore fake timers
         vi.useFakeTimers();
     }, 5000); // 5 second timeout should be enough
@@ -100,7 +102,7 @@ describe("waitForElectronAPI - Complete Coverage", () => {
 
         // Test that delay doesn't exceed 2000ms
         // After several attempts, delay should be capped at 2000ms
-        
+
         for (let i = 0; i < 4; i++) {
             const expectedDelay = Math.min(100 * Math.pow(1.5, i), 2000);
             vi.advanceTimersByTime(expectedDelay);
@@ -126,9 +128,7 @@ describe("waitForElectronAPI - Complete Coverage", () => {
 
         vi.advanceTimersByTime(50);
 
-        await expect(promise).rejects.toThrow(
-            "ElectronAPI not available after maximum attempts"
-        );
+        await expect(promise).rejects.toThrow("ElectronAPI not available after maximum attempts");
 
         // Restore window
         (global as { window?: MockWindow | undefined }).window = {} as MockWindow;
@@ -143,9 +143,7 @@ describe("waitForElectronAPI - Complete Coverage", () => {
 
         vi.advanceTimersByTime(50);
 
-        await expect(promise).rejects.toThrow(
-            "ElectronAPI not available after maximum attempts"
-        );
+        await expect(promise).rejects.toThrow("ElectronAPI not available after maximum attempts");
     });
 
     it("should handle electronAPI.sites.getSites not being a function", async () => {
@@ -159,8 +157,6 @@ describe("waitForElectronAPI - Complete Coverage", () => {
 
         vi.advanceTimersByTime(50);
 
-        await expect(promise).rejects.toThrow(
-            "ElectronAPI not available after maximum attempts"
-        );
+        await expect(promise).rejects.toThrow("ElectronAPI not available after maximum attempts");
     });
 });

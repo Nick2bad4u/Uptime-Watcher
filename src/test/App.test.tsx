@@ -220,7 +220,7 @@ describe("App Component", () => {
             setStoreError: vi.fn(),
             storeErrors: {},
         });
-        
+
         Object.assign(mockSitesStore, {
             addMonitorToSite: vi.fn(),
             addSite: vi.fn(),
@@ -235,7 +235,7 @@ describe("App Component", () => {
             updateSite: vi.fn(),
             updateSiteStatus: vi.fn(),
         });
-        
+
         Object.assign(mockSettingsStore, {
             initializeSettings: vi.fn(),
             settings: {
@@ -249,7 +249,7 @@ describe("App Component", () => {
             updateSettings: vi.fn(),
             resetSettings: vi.fn(),
         });
-        
+
         Object.assign(mockUIStore, {
             getSelectedSite: vi.fn(() => null),
             selectedSiteId: null,
@@ -259,7 +259,7 @@ describe("App Component", () => {
             showSettings: false,
             showSiteDetails: false,
         });
-        
+
         Object.assign(mockUpdatesStore, {
             applyUpdate: vi.fn(),
             checkForUpdates: vi.fn(),

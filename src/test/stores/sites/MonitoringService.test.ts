@@ -175,12 +175,14 @@ describe("MonitoringService", () => {
         it("should handle undefined window.electronAPI gracefully", async () => {
             // Import the mock so we can control it
             const { waitForElectronAPI } = await import("../../../stores/utils");
-            
+
             // Make waitForElectronAPI reject for all calls in this test
             const mockWaitForElectronAPI = vi.mocked(waitForElectronAPI);
             mockWaitForElectronAPI.mockRejectedValue(new Error("ElectronAPI not available"));
 
-            await expect(MonitoringService.startMonitoring("test", "test")).rejects.toThrow("ElectronAPI not available");
+            await expect(MonitoringService.startMonitoring("test", "test")).rejects.toThrow(
+                "ElectronAPI not available"
+            );
             await expect(MonitoringService.stopMonitoring("test", "test")).rejects.toThrow("ElectronAPI not available");
 
             // Reset the mock for other tests
@@ -260,13 +262,15 @@ describe("MonitoringService", () => {
             const serviceError = new Error("Monitoring service unavailable");
             mockElectronAPI.monitoring.stopMonitoringForSite.mockRejectedValueOnce(serviceError);
 
-            await expect(MonitoringService.stopMonitoring("test", "test")).rejects.toThrow("Monitoring service unavailable");
+            await expect(MonitoringService.stopMonitoring("test", "test")).rejects.toThrow(
+                "Monitoring service unavailable"
+            );
         });
     });
 
     describe("Concurrent operations", () => {
         it("should handle multiple concurrent start operations", async () => {
-            const operations = Array.from({ length: 5 }, (_, i) => 
+            const operations = Array.from({ length: 5 }, (_, i) =>
                 MonitoringService.startMonitoring(`site-${i}`, `monitor-${i}`)
             );
 
@@ -278,7 +282,7 @@ describe("MonitoringService", () => {
         });
 
         it("should handle multiple concurrent stop operations", async () => {
-            const operations = Array.from({ length: 5 }, (_, i) => 
+            const operations = Array.from({ length: 5 }, (_, i) =>
                 MonitoringService.stopMonitoring(`site-${i}`, `monitor-${i}`)
             );
 
@@ -290,10 +294,10 @@ describe("MonitoringService", () => {
         });
 
         it("should handle mixed concurrent operations", async () => {
-            const startOps = Array.from({ length: 3 }, (_, i) => 
+            const startOps = Array.from({ length: 3 }, (_, i) =>
                 MonitoringService.startMonitoring(`site-${i}`, `monitor-${i}`)
             );
-            const stopOps = Array.from({ length: 3 }, (_, i) => 
+            const stopOps = Array.from({ length: 3 }, (_, i) =>
                 MonitoringService.stopMonitoring(`site-${i + 3}`, `monitor-${i + 3}`)
             );
 

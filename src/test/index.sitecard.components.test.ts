@@ -14,7 +14,7 @@ vi.mock("../components/Dashboard/SiteCard/components/ActionButtonGroup", () => (
     __esModule: true,
     default: vi.fn(() => "ActionButtonGroup"),
 }));
-    
+
 vi.mock("../components/Dashboard/SiteCard/components/MetricCard", () => ({
     MetricCard: vi.fn(() => "MetricCard"),
     MetricCardProps: {},

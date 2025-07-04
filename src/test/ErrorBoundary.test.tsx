@@ -9,7 +9,10 @@ import userEvent from "@testing-library/user-event";
 import { ErrorBoundary, withErrorBoundary } from "../stores/error/ErrorBoundary";
 
 // Component that throws an error
-const ThrowError: React.FC<{ shouldThrow?: boolean; message?: string }> = ({ shouldThrow = true, message = "Test error" }) => {
+const ThrowError: React.FC<{ shouldThrow?: boolean; message?: string }> = ({
+    shouldThrow = true,
+    message = "Test error",
+}) => {
     if (shouldThrow) {
         throw new Error(message);
     }
@@ -168,9 +171,9 @@ describe("ErrorBoundary", () => {
             );
 
             expect(screen.getByText("Retry without error")).toBeInTheDocument();
-            
+
             await user.click(screen.getByText("Retry without error"));
-            
+
             // Should not throw - testing that retry works even without error prop
             expect(() => {
                 user.click(screen.getByText("Retry without error"));

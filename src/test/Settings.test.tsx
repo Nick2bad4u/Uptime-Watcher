@@ -158,7 +158,7 @@ describe("Settings", () => {
         mockSettingsStore.isLoading = false;
         mockErrorStore.isLoading = false;
         mockErrorStore.lastError = null;
-        
+
         // Clear mock functions
         mockSettingsStore.resetSettings.mockClear();
         mockErrorStore.clearError.mockClear();
@@ -167,7 +167,7 @@ describe("Settings", () => {
         mockSettingsStore.updateHistoryLimitValue.mockClear();
         mockSitesStore.fullSyncFromBackend.mockClear();
         mockSitesStore.downloadSQLiteBackup.mockClear();
-        
+
         global.confirm = vi.fn();
     });
 
@@ -210,7 +210,7 @@ describe("Settings", () => {
         it("should display error message when lastError is present", () => {
             // Set error state
             mockErrorStore.lastError = "Test error message";
-            
+
             render(<Settings onClose={mockOnClose} />);
 
             expect(screen.getByText("⚠️ Test error message")).toBeInTheDocument();
@@ -410,7 +410,9 @@ describe("Settings", () => {
             await user.click(downloadButton);
 
             await waitFor(() => {
-                expect(mockErrorStore.setError).toHaveBeenCalledWith("Failed to download SQLite backup: Download failed");
+                expect(mockErrorStore.setError).toHaveBeenCalledWith(
+                    "Failed to download SQLite backup: Download failed"
+                );
             });
         });
     });
@@ -522,7 +524,8 @@ describe("Settings", () => {
     });
 
     describe("Loading state edge cases", () => {
-        it("should handle loading timeout scenario", async () => {            // Test that when isLoading is true, the component handles the timeout correctly
+        it("should handle loading timeout scenario", async () => {
+            // Test that when isLoading is true, the component handles the timeout correctly
             mockErrorStore.isLoading = true;
             const { unmount } = render(<Settings onClose={mockOnClose} />);
 

@@ -59,9 +59,9 @@ describe("Store Utils", () => {
 
         it("should handle successful operations", async () => {
             const operation = vi.fn().mockResolvedValue("success");
-            
+
             const result = await withErrorHandling(operation, mockStore);
-            
+
             expect(result).toBe("success");
             expect(mockStore.setLoading).toHaveBeenCalledWith(true);
             expect(mockStore.clearError).toHaveBeenCalled();
@@ -72,9 +72,9 @@ describe("Store Utils", () => {
         it("should handle operations that throw Error instances", async () => {
             const error = new Error("Test error");
             const operation = vi.fn().mockRejectedValue(error);
-            
+
             await expect(withErrorHandling(operation, mockStore)).rejects.toThrow("Test error");
-            
+
             expect(mockStore.setLoading).toHaveBeenCalledWith(true);
             expect(mockStore.clearError).toHaveBeenCalled();
             expect(mockStore.setError).toHaveBeenCalledWith("Test error");
@@ -83,29 +83,29 @@ describe("Store Utils", () => {
 
         it("should handle operations that throw non-Error values", async () => {
             const operation = vi.fn().mockRejectedValue("string error");
-            
+
             await expect(withErrorHandling(operation, mockStore)).rejects.toThrow("string error");
-            
+
             expect(mockStore.setError).toHaveBeenCalledWith("string error");
         });
 
         it("should handle operations that throw objects", async () => {
             const operation = vi.fn().mockRejectedValue({ message: "object error" });
-            
+
             await expect(withErrorHandling(operation, mockStore)).rejects.toThrow();
-            
+
             expect(mockStore.setError).toHaveBeenCalledWith("[object Object]");
         });
 
         it("should always call setLoading(false) in finally block", async () => {
             const operation = vi.fn().mockRejectedValue(new Error("Test error"));
-            
+
             try {
                 await withErrorHandling(operation, mockStore);
             } catch {
                 // Expected to throw
             }
-            
+
             expect(mockStore.setLoading).toHaveBeenCalledWith(false);
         });
     });
@@ -113,7 +113,7 @@ describe("Store Utils", () => {
     describe("createPersistConfig", () => {
         it("should create persist config with correct name", () => {
             const config = createPersistConfig("test-store");
-            
+
             expect(config).toEqual({
                 name: "uptime-watcher-test-store",
                 partialize: undefined,
@@ -123,7 +123,7 @@ describe("Store Utils", () => {
         it("should create persist config with partialize function", () => {
             const partialize = (state: Record<string, unknown>) => ({ field: state.field });
             const config = createPersistConfig("test-store", partialize);
-            
+
             expect(config).toEqual({
                 name: "uptime-watcher-test-store",
                 partialize,
@@ -143,15 +143,15 @@ describe("Store Utils", () => {
         it("should debounce function calls", () => {
             const func = vi.fn();
             const debouncedFunc = debounce(func, 100);
-            
+
             debouncedFunc("arg1", "arg2");
             debouncedFunc("arg1", "arg2");
             debouncedFunc("arg1", "arg2");
-            
+
             expect(func).not.toHaveBeenCalled();
-            
+
             vi.advanceTimersByTime(100);
-            
+
             expect(func).toHaveBeenCalledTimes(1);
             expect(func).toHaveBeenCalledWith("arg1", "arg2");
         });
@@ -159,12 +159,12 @@ describe("Store Utils", () => {
         it("should handle different argument sets separately", () => {
             const func = vi.fn();
             const debouncedFunc = debounce(func, 100);
-            
+
             debouncedFunc("arg1");
             debouncedFunc("arg2");
-            
+
             vi.advanceTimersByTime(100);
-            
+
             expect(func).toHaveBeenCalledTimes(2);
             expect(func).toHaveBeenCalledWith("arg1");
             expect(func).toHaveBeenCalledWith("arg2");
@@ -173,14 +173,14 @@ describe("Store Utils", () => {
         it("should clear previous timeout when called again with same arguments", () => {
             const func = vi.fn();
             const debouncedFunc = debounce(func, 100);
-            
+
             debouncedFunc("arg1");
             vi.advanceTimersByTime(50);
             debouncedFunc("arg1"); // Should clear previous timeout
-            
+
             vi.advanceTimersByTime(50);
             expect(func).not.toHaveBeenCalled();
-            
+
             vi.advanceTimersByTime(50);
             expect(func).toHaveBeenCalledTimes(1);
         });
@@ -188,16 +188,16 @@ describe("Store Utils", () => {
         it("should clean up timeout map after execution", () => {
             const func = vi.fn();
             const debouncedFunc = debounce(func, 100);
-            
+
             debouncedFunc("arg1");
             vi.advanceTimersByTime(100);
-            
+
             expect(func).toHaveBeenCalledTimes(1);
-            
+
             // Call again with same args - should work normally
             debouncedFunc("arg1");
             vi.advanceTimersByTime(100);
-            
+
             expect(func).toHaveBeenCalledTimes(2);
         });
     });
@@ -216,33 +216,33 @@ describe("Store Utils", () => {
         it("should log in development environment", () => {
             const originalEnv = process.env.NODE_ENV;
             process.env.NODE_ENV = "development";
-            
+
             logStoreAction("TestStore", "testAction", { data: "test" });
-            
+
             expect(consoleSpy).toHaveBeenCalledWith("[TestStore] testAction", { data: "test" });
-            
+
             process.env.NODE_ENV = originalEnv;
         });
 
         it("should not log in production environment", () => {
             const originalEnv = process.env.NODE_ENV;
             process.env.NODE_ENV = "production";
-            
+
             logStoreAction("TestStore", "testAction", { data: "test" });
-            
+
             expect(consoleSpy).not.toHaveBeenCalled();
-            
+
             process.env.NODE_ENV = originalEnv;
         });
 
         it("should log without data parameter", () => {
             const originalEnv = process.env.NODE_ENV;
             process.env.NODE_ENV = "development";
-            
+
             logStoreAction("TestStore", "testAction");
-            
+
             expect(consoleSpy).toHaveBeenCalledWith("[TestStore] testAction", undefined);
-            
+
             process.env.NODE_ENV = originalEnv;
         });
     });

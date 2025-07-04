@@ -11,7 +11,7 @@ import logger from "../services/logger";
 import { Site, Monitor } from "../types";
 
 // Mock window.electronAPI
-Object.defineProperty(window, 'electronAPI', {
+Object.defineProperty(window, "electronAPI", {
     value: {
         monitoring: {
             startMonitoringForSite: vi.fn(),

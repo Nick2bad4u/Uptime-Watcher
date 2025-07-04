@@ -42,7 +42,7 @@ import logger from "../services/logger";
 
 // Create mock global confirm
 const mockConfirm = vi.fn();
-Object.defineProperty(global, 'confirm', {
+Object.defineProperty(global, "confirm", {
     value: mockConfirm,
     writable: true,
 });
@@ -124,11 +124,7 @@ describe("useSiteDetails comprehensive coverage", () => {
             });
 
             expect(mockClearError).toHaveBeenCalled();
-            expect(mockUpdateSiteCheckInterval).toHaveBeenCalledWith(
-                "test-site-id",
-                "monitor-1",
-                30000
-            );
+            expect(mockUpdateSiteCheckInterval).toHaveBeenCalledWith("test-site-id", "monitor-1", 30000);
         });
 
         it("should handle interval save error with Error object", async () => {
@@ -344,11 +340,7 @@ describe("useSiteDetails comprehensive coverage", () => {
             });
 
             expect(mockClearError).toHaveBeenCalled();
-            expect(mockUpdateMonitorRetryAttempts).toHaveBeenCalledWith(
-                "test-site-id",
-                "monitor-1",
-                5
-            );
+            expect(mockUpdateMonitorRetryAttempts).toHaveBeenCalledWith("test-site-id", "monitor-1", 5);
         });
 
         it("should handle retry attempts save error with Error object", async () => {
