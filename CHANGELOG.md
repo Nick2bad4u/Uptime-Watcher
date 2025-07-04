@@ -7,14 +7,200 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[e2824a3](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e2824a3267ee9126dac3d69a27e5853db5dab25a)...
-[e2824a3](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e2824a3267ee9126dac3d69a27e5853db5dab25a)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/e2824a3267ee9126dac3d69a27e5853db5dab25a...e2824a3267ee9126dac3d69a27e5853db5dab25a))
+[[7c6c4bc](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7c6c4bc2af066b59450d892b56f88033eaea2e94)...
+[7c6c4bc](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7c6c4bc2af066b59450d892b56f88033eaea2e94)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/7c6c4bc2af066b59450d892b56f88033eaea2e94...7c6c4bc2af066b59450d892b56f88033eaea2e94))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 4.6.0 [`(7c6c4bc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7c6c4bc2af066b59450d892b56f88033eaea2e94)
+
+
+
+
+
+
+## [4.6.0] - 2025-07-04
+
+
+[[81c7499](https://github.com/Nick2bad4u/Uptime-Watcher/commit/81c749998e3e4f26262cc505bdbee9801e89841c)...
+[6db8eb9](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6db8eb94ece4a9c14e46d56df9f5744ba9245dba)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/81c749998e3e4f26262cc505bdbee9801e89841c...6db8eb94ece4a9c14e46d56df9f5744ba9245dba))
+
+
+### ✨ Features
+
+- ✨ [feat] Add robust Electron API polling and form field tests
+
+- Introduces a utility to reliably wait for the Electron API using exponential backoff, reducing race conditions during initialization and API access.
+ - Refactors site status update handling to ensure incremental updates are resilient, trigger full sync fallback as needed, and gracefully handle missing API at subscription time.
+ - Adds comprehensive unit tests for form field components, improving test coverage and regression safety.
+ - Enhances update store typing with structured update info and progress tracking for clearer update state management.
+ - Replaces Tailwind's @apply with explicit CSS for key components, and modernizes media queries for better browser compatibility. [`(3b45238)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3b45238ca4693394f6f1f6f9ad8eb1bebdd1d22b)
+
+
+
+### �️ Bug Fixes
+
+- 🛠️ [fix] Allow monitor ID override and mock console error in tests
+
+- Enables overriding the monitor ID during creation to support custom identifiers, improving flexibility for testing and data handling.
+- Mocks and asserts console error output in file download tests to suppress unwanted logs and verify error handling, enhancing test reliability and clarity. [`(a731602)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a731602e561eb7dda178f79564d98d21dc873ece)
+
+
+- 🛠️ [fix] Enforce strict optional typing and improve prop handling
+
+- Enables strict TypeScript settings with exact optional property types for better type safety and null handling.
+- Refactors object creation and React prop spreading to only include optional properties when defined, reducing risk of undefined/null bugs.
+- Updates form fields and UI components to conditionally spread props and attributes, improving accessibility and flexibility.
+- Improves logic in data parsing, event emission, and DB mapping, ensuring optional fields are only present when valid.
+- Adds explicit checks for monitor and site properties throughout the app, preventing runtime errors and enhancing reliability.
+- Enhances testability and clarity in tab content rendering and error boundaries by handling optional props more defensively.
+- Improves percentile calculation fallback in analytics for empty datasets.
+
+Relates to improved robustness and maintainability in strict typing environments. [`(f36bd14)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f36bd140da481bba2020cc6ccd3c983042937ab4)
+
+
+- 🛠️ [fix] Ensure explicit undefined returns in effect cleanups
+
+- Prevents potential issues with effect cleanup functions by explicitly returning `undefined` where no cleanup is needed, aligning with React's expectations for effect return values.
+- Removes unnecessary TypeScript error comments in test mocks, improving test code clarity.
+- Enhances code consistency and future maintainability by standardizing return practices across hooks, components, and utility functions. [`(81c7499)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/81c749998e3e4f26262cc505bdbee9801e89841c)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 4.5.0 [`(e2824a3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e2824a3267ee9126dac3d69a27e5853db5dab25a)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(937ecee)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/937eceecd44be642e8aa8366f597e4836c8aca68)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Modularize sites store with service and utility layers
+
+- Refactors the sites store to use dedicated service and utility modules, improving separation of concerns and maintainability
+- Extracts monitoring and site operations to service classes that encapsulate electron API calls, enabling easier testing and future extension
+- Centralizes common logic for status updates, file downloads, and monitor operations into reusable utilities
+- Simplifies the store logic, reduces repetition, and enhances clarity by delegating responsibilities to new modules
+- Lays groundwork for scaling and future feature development by adopting a modular architecture [`(685aee0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/685aee0e8868bfc660b27c7b0030deb48bd560a0)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Standardize quote usage and formatting in tests/docs
+
+- Unifies single and double quote usage to consistently use double quotes in test files for environment variables and DOM event names, improving code style consistency.
+- Refactors code formatting for improved readability, such as condensing multi-line props, aligning JSON and TypeScript snippets, and cleaning up indentation and spacing in test cases and documentation.
+- Enhances maintainability by reducing unnecessary line breaks and harmonizing style patterns across various test and markdown documentation files. [`(c1ad054)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c1ad0544de6375adec17ef7e4012d9388a2d3687)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Expand update store tests and improve mocks
+
+- Adds comprehensive tests for update applying and error clearing, ensuring robustness against missing API objects
+- Refines mocking of global objects for reliability and avoids property redefinition issues
+- Enhances coverage of store action logging and update lifecycle handling for better regression protection [`(6db8eb9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6db8eb94ece4a9c14e46d56df9f5744ba9245dba)
+
+
+- 🧪 [test] Expand file download and filename generation tests
+
+- Adds comprehensive unit tests for file download logic, covering edge cases such as error handling, large files, special characters, and browser API unavailability
+- Refactors and extends filename generation tests for various prefixes, extensions, and date scenarios
+- Improves reliability and code coverage of the file download utility by ensuring robust handling of browser environment quirks and potential failures
+- Relocates and updates import paths for improved test organization and maintainability [`(50fc38c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/50fc38c76a9137c2dc1957b1be5a12ea6313393c)
+
+
+- 🧪 [test] Remove redundant and barrel export tests for UI components
+
+- Cleans up the codebase by deleting comprehensive unit test suites for form fields, dashboard site card components, and common component barrel exports
+- Reduces maintenance overhead associated with testing re-export patterns and mock component structures
+- Focuses test coverage on component logic rather than export aggregation
+
+No functional or production code is affected; only test files related to internal module organization are removed. [`(cbccd91)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cbccd91d34ea92e5cbf4c362539f10d23f3880a4)
+
+
+- 🧪 [test] Refactors test mocks and improves timer handling
+
+- Updates global Electron API mocks for better alignment with app modules, consolidating and simplifying mock implementations.
+- Removes unnecessary React imports from test files for cleaner dependencies.
+- Switches to real timers in specific async tests to ensure reliable timeout handling, then restores fake timers for consistency.
+- Aims to improve test reliability, maintainability, and coverage fidelity. [`(6384922)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/638492298deba7233cc04cd8ce4a2c12bccc06cd)
+
+
+- 🧪 [test] Add comprehensive unit tests for untested logic
+
+- Increases test coverage for previously uncovered logic in several components and utility functions, focusing on warning conditions, effect cleanup, and error handling paths.
+- Targets missing branches and lines, especially for invalid settings key handling, asynchronous API readiness checks, and portal/timeout cleanup in UI components.
+- Adds new test files with thorough mocking and simulation of real-world scenarios to ensure robustness and prevent regressions.
+- Updates ignore rules and modernizes project config for improved maintainability and dev experience. [`(580c1bb)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/580c1bb6b0acf4dff54e9dc8d938780a21f236b8)
+
+
+- 🧪 [test] Remove redundant useSiteDetails hook test files
+
+- Deletes duplicated or unnecessary test files for the useSiteDetails hook to reduce maintenance overhead and avoid confusion.
+- Streamlines the test suite by eliminating overlap and ensuring only relevant tests remain. [`(193db2a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/193db2a2736250d20cd05b587c3db62159289623)
+
+
+- 🧪 [test] Improve test strictness and mock usage; update deps
+
+- Adopts stricter TypeScript compiler options for improved code safety and type checking in tests.
+- Refactors environment variable access in tests to use consistent bracket notation, reducing property access issues.
+- Switches to a more robust mocking utility for improved type inference in test mocks.
+- Adds a language service dependency and updates config to include/exclude relevant test and config files.
+- Enhances maintainability and reliability of the test suite by enforcing stricter rules and updating dependencies. [`(784da2d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/784da2dfcc5d14a25e17b423e6f34f626ed72b8c)
+
+
+- 🧪 [test] Add comprehensive unit tests and update test structure
+
+- Adds extensive unit tests for error, stats, UI, and updates stores to ensure full coverage of business and edge cases
+- Expands test coverage for site details, backend focus sync, and core logic, emphasizing error handling and state transitions
+- Refactors test directory structure for clarity and better separation of concerns
+- Updates test mocks and dependencies to align with new coverage needs
+- Enhances reliability and maintainability of the codebase by ensuring critical logic is well-tested [`(8b3ac86)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8b3ac865750d264aeb2e6512f3a146e8280eeeff)
+
+
+- 🧪 [test] Remove redundant and placeholder test files
+
+- Cleans up unnecessary and duplicate test files, including simple, placeholder, and edge case tests that added no real test coverage.
+- Reduces clutter and potential confusion in the test suite by eliminating files referenced by TypeScript but not providing meaningful validation.
+- Streamlines the codebase for better maintainability and clarity. [`(30449dd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/30449ddb8379a3cd767be8b94559387618edee29)
+
+
+- 🧪 [test] Improve robustness and edge coverage in tests
+
+- Updates tests to use optional chaining and length checks, preventing runtime errors from undefined or missing values
+- Adds new tests for settings and site stores to ensure full coverage of store logic, persistence, and error handling
+- Refactors tests for history, monitor, and analytics features to handle empty arrays and undefined properties safely
+- Enhances test reliability by checking existence before accessing or interacting with UI elements
+- Adds comprehensive ErrorBoundary and useSiteDetails hook test suites for better component and hook reliability
+- Motivated by a desire to eliminate test flakiness, improve coverage, and support future code changes with safer, more resilient tests [`(b2071d9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b2071d966b486f7f491922af9a1c46bb131483fd)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v4.5.0 [skip ci] [`(65c2bcb)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/65c2bcb9c154f4c3903b86665588edb69a84dcf0)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update config to respect .gitignore and exclude node_modules
+
+- Adds node_modules to exclusion globs to prevent scanning dependencies.
+- Enables respect for .gitignore, ensuring ignored files are not analyzed.
+- Improves scan performance and avoids unnecessary alerts on third-party or ignored files. [`(ff7dab1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ff7dab19f0d27912b36560ffff444594332f9a7f)
 
 
 
