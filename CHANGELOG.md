@@ -7,14 +7,186 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[323250c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/323250c996216ccdfa683cda99a340a12e1fa4f1)...
-[323250c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/323250c996216ccdfa683cda99a340a12e1fa4f1)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/323250c996216ccdfa683cda99a340a12e1fa4f1...323250c996216ccdfa683cda99a340a12e1fa4f1))
+[[3703e59](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3703e5916f1f77a684023676e3bdfe5aed10608b)...
+[3703e59](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3703e5916f1f77a684023676e3bdfe5aed10608b)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/3703e5916f1f77a684023676e3bdfe5aed10608b...3703e5916f1f77a684023676e3bdfe5aed10608b))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 4.4.0 [`(3703e59)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3703e5916f1f77a684023676e3bdfe5aed10608b)
+
+
+
+
+
+
+## [4.4.0] - 2025-07-03
+
+
+[[cefb68d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cefb68d2a3a59d4edad348dde6f8946a4685498f)...
+[1bc1129](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1bc112951bf8bf5b295b6b92af665d9b2970222a)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/cefb68d2a3a59d4edad348dde6f8946a4685498f...1bc112951bf8bf5b295b6b92af665d9b2970222a))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 4.3.0 [`(323250c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/323250c996216ccdfa683cda99a340a12e1fa4f1)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(1bc1129)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1bc112951bf8bf5b295b6b92af665d9b2970222a)
+
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(09030ca)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/09030cab3bbbef1ec65f7fc087f8c2b9ec955a6e)
+
+
+
+### 💼 Other
+
+- Update metrics.repository.svg - [Skip GitHub Action] [`(f24ea09)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f24ea090d9c523fb9cdfbf65db60635fe6e59d16)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Modularize uptime monitor into orchestrator and managers
+
+- Splits the monolithic uptime monitor logic into distinct orchestrator and manager classes, enabling clearer separation of concerns and improved maintainability.
+- Introduces new orchestrator and manager classes for site, monitor, and database operations, each with focused responsibilities and clean interfaces.
+- Moves utility logic and low-level operations into dedicated utility modules for database and monitoring, reducing duplication and simplifying dependencies.
+- Replaces direct data manipulation with repository and utility functions, decoupling data access from business logic.
+- Updates all dependent services and IPC handlers to use the orchestrator pattern, removing references to the old implementation.
+- Deprecates the old uptime monitor file and directs usage to the orchestrator-based system.
+- Lays groundwork for improved extensibility and testing of monitoring and data layers. [`(e56d1d5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e56d1d51d553da3538e4d57fa4d334889204d76d)
+
+
+- 🚜 [refactor] Delegate data import/export/backup to utility modules
+
+- Simplifies the core monitoring service by moving data import, export, backup, and site refresh logic to dedicated utility modules.
+- Enhances maintainability and separation of concerns by using dependency injection and standardized callbacks for database operations.
+- Reduces code duplication and improves error handling consistency. [`(f29e01d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f29e01db5abf11fdd60a08159e480d2ab016a4b6)
+
+
+- 🚜 [refactor] Delegate site update logic to shared utility
+
+Moves complex site update logic into a shared utility function, reducing duplication and centralizing update behavior.
+ - Simplifies the main class by removing in-place logic for validation, monitor updates, and interval handling.
+ - Enhances maintainability by leveraging dependency injection and callbacks for monitoring control.
+ - Prepares codebase for easier testing and future enhancements. [`(3e6fd7e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3e6fd7e5ebaee51ddc85ec6c1715720be2a2d2d1)
+
+
+- 🚜 [refactor] Extract monitoring logic to utility modules
+
+- Modularizes site and monitor start/stop, check, and manual check logic into dedicated utility functions for improved maintainability and reuse
+- Simplifies the main orchestration class by delegating complex operations, reducing code duplication and clarifying responsibilities
+- Enables easier testing and future extension by decoupling orchestration from monitoring details [`(5e963a1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5e963a1bbb89488c9371d552fd69a45c5bb98e66)
+
+
+- 🚜 [refactor] Modularize site and monitor database logic
+
+- Extracts site and monitor-related database operations into dedicated utility modules for improved modularity and maintainability
+- Simplifies core class by delegating add, remove, load, and history limit logic to reusable helpers
+- Enhances testability and separation of concerns by isolating data access patterns
+- Updates logging and test expectations to align with new modular approach [`(9864749)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/986474922925140445f80a178c26fc509c5670f9)
+
+
+- 🚜 [refactor] Simplifies DB initialization with shared utility
+
+- Refactors database setup to use a common initialization helper, reducing redundancy and improving error handling consistency.
+- Centralizes site loading and error emission logic, making future maintenance easier. [`(f743618)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f7436185f9f42edfd1f85e7d18c8e33200718c2e)
+
+
+
+### � Documentation
+
+- 📝 [docs] Modernize and standardize all refactoring guides
+
+- Updates all documentation files to use modern TypeScript and React patterns, including improved formatting, consistent code style, and clearer before/after examples
+- Refactors code snippets to prefer dependency injection, custom error classes, modular Zustand stores, and async hooks for better maintainability and testability
+- Unifies TypeScript config and Vite config examples, emphasizing stricter type checking, optimized build outputs, and explicit path aliasing for clarity
+- Details advanced migration and script automation steps to support large-scale refactoring with PowerShell/AST scripts
+- Improves markdown tables and formatting for better readability and actionability
+- Addresses previously identified documentation inconsistencies, incomplete examples, and technical debt annotations
+- Prepares codebase and guides for further modularization and scalability [`(8b9cac2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8b9cac2d9b1e9f594f6a431bad0cf6f4cb8c4ea4)
+
+
+- 📝 [docs] Add comprehensive refactoring and modernization guides
+
+- Introduces detailed documentation for refactoring, best practices, and modernization, including actionable step-by-step guides, exact before/after code replacements, and automated migration scripts
+- Outlines architectural improvements, error handling, design system patterns, state management splitting, and testing strategies to address technical debt and codebase complexity
+- Adds analysis and validation scripts for complexity, dependency, and coverage, while providing a prioritized roadmap for incremental implementation
+- Updates custom word list for spellchecking with new technical terms and acronyms
+
+Relates to the ongoing codebase modernization and maintainability initiative [`(cefb68d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cefb68d2a3a59d4edad348dde6f8946a4685498f)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Normalize whitespace in history limit manager
+
+- Updates spacing and blank lines for improved code readability and consistency
+- No functional or logic changes introduced [`(4e7097c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4e7097c636e36cb1ae411f1dec188f86b9e442d3)
+
+
+- 🎨 [style] Standardize test file naming for consistency
+
+- Renames test files to use camelCase, aligning with project naming conventions
+- Improves codebase consistency and eases file discovery in the test suite [`(a8b4b50)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a8b4b509ef9a8d11f5a541900f7ea5a1a537aa47)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Refactors tests for new orchestrator, logging, and utils
+
+- Updates all test suites to reflect the renaming of the core monitoring orchestrator and adjusts mock imports and usages accordingly
+- Refactors logger label expectations in database and repository tests to match new logging conventions
+- Moves and tests monitoring utility helpers separately, including status determination and error handling logic
+- Centralizes database and monitor utility function tests, directly testing shared helpers rather than through service internals
+- Adds focused tests for monitor status checker utility, ensuring correct timeout handling and monitor instantiation logic
+- Improves clarity and maintainability by decoupling test logic from private internals, favoring public/shared utilities [`(76d912e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/76d912e5d2482d546690335590483fcad1ca96f6)
+
+
+- 🧪 [test] Add ESLint disables and improve monitoring edge tests
+
+- Disables specific ESLint rules across test files for better DX and to reduce TypeScript/ESLint noise in test code
+- Refactors uptime monitoring tests to improve simulation of state transitions, error handling, and scheduling, ensuring more accurate coverage of real-world edge cases
+- Skips a non-critical edge case test that was difficult to maintain due to complex mocks and limited value
+- Clarifies test intent and comments, making future maintenance easier [`(94244cf)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/94244cf0fded12beb7661c361d9e28231d330d7d)
+
+
+- 🧪 [test] Remove edge case and coverage tests for improved maintainability
+
+Removes a large set of unit and integration test files targeting edge cases,
+coverage gaps, and defensive code paths throughout the codebase.
+
+The motivation is to streamline the test suite, reduce maintenance overhead,
+and possibly re-evaluate the necessity of exhaustive branch coverage for
+defensive and utility code. This may also be in preparation for a revised
+testing strategy or for codebase cleanup.
+
+- Cleans up tests for rarely hit branches, error guards, and component edge cases.
+- Reduces noise and complexity in the test directory. [`(e7526cb)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e7526cb3fef0bbd4880ad876ddde13a0486f7a7d)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v4.3.0 [skip ci] [`(2467d35)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2467d35b30c24df241d8379e9b3bf2e58a162245)
+
+
+
+### 👷 CI/CD
+
+- 👷 [ci] Update test scripts for Electron integration
+
+- Adds Electron-specific Vitest configuration to test scripts to improve coverage for both standard and Electron environments
+- [dependency] Updates package version to 4.3.0 to reflect enhanced test support
+- Facilitates easier cross-environment test execution and maintenance [`(f71142c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f71142c746196fe7c69fd9816c5a98604fb51e4d)
 
 
 
