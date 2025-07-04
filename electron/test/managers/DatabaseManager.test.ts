@@ -30,22 +30,32 @@ const mockDependencies: DatabaseManagerDependencies = {
     repositories: {
         database: {
             getInstance: vi.fn(),
-        } as Partial<DatabaseManagerDependencies["repositories"]["database"]> as DatabaseManagerDependencies["repositories"]["database"],
+        } as Partial<
+            DatabaseManagerDependencies["repositories"]["database"]
+        > as DatabaseManagerDependencies["repositories"]["database"],
         site: {
             findAll: vi.fn(),
             exportAll: vi.fn(),
-        } as Partial<DatabaseManagerDependencies["repositories"]["site"]> as DatabaseManagerDependencies["repositories"]["site"],
+        } as Partial<
+            DatabaseManagerDependencies["repositories"]["site"]
+        > as DatabaseManagerDependencies["repositories"]["site"],
         monitor: {
             findAll: vi.fn(),
-        } as Partial<DatabaseManagerDependencies["repositories"]["monitor"]> as DatabaseManagerDependencies["repositories"]["monitor"],
+        } as Partial<
+            DatabaseManagerDependencies["repositories"]["monitor"]
+        > as DatabaseManagerDependencies["repositories"]["monitor"],
         history: {
             findAll: vi.fn(),
             pruneHistory: vi.fn(),
-        } as Partial<DatabaseManagerDependencies["repositories"]["history"]> as DatabaseManagerDependencies["repositories"]["history"],
+        } as Partial<
+            DatabaseManagerDependencies["repositories"]["history"]
+        > as DatabaseManagerDependencies["repositories"]["history"],
         settings: {
             get: vi.fn(),
             set: vi.fn(),
-        } as Partial<DatabaseManagerDependencies["repositories"]["settings"]> as DatabaseManagerDependencies["repositories"]["settings"],
+        } as Partial<
+            DatabaseManagerDependencies["repositories"]["settings"]
+        > as DatabaseManagerDependencies["repositories"]["settings"],
     },
 };
 
@@ -76,9 +86,11 @@ describe("DatabaseManager", () => {
             try {
                 await databaseManager.initialize();
                 // May not complete due to mocking, but should emit event if successful
-                expect(eventSpy).toHaveBeenCalledWith(expect.objectContaining({
-                    operation: "initialized",
-                }));
+                expect(eventSpy).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        operation: "initialized",
+                    })
+                );
             } catch (error) {
                 // Event should still be emitted even if error occurs
                 expect((error as Error).message).not.toContain("callbacks not set");
@@ -104,28 +116,36 @@ describe("DatabaseManager", () => {
 
             // Test export
             await databaseManager.exportData();
-            expect(exportSpy).toHaveBeenCalledWith(expect.objectContaining({
-                operation: "exported",
-            }));
+            expect(exportSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    operation: "exported",
+                })
+            );
 
             // Test import
             await databaseManager.importData("test-data");
-            expect(importSpy).toHaveBeenCalledWith(expect.objectContaining({
-                operation: "imported",
-            }));
+            expect(importSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    operation: "imported",
+                })
+            );
 
             // Test backup
             await databaseManager.downloadBackup();
-            expect(backupSpy).toHaveBeenCalledWith(expect.objectContaining({
-                operation: "backup-downloaded",
-            }));
+            expect(backupSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    operation: "backup-downloaded",
+                })
+            );
 
             // Test history limit
             await databaseManager.setHistoryLimit(100);
-            expect(limitSpy).toHaveBeenCalledWith(expect.objectContaining({
-                operation: "history-limit-updated",
-                limit: 100,
-            }));
+            expect(limitSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    operation: "history-limit-updated",
+                    limit: 100,
+                })
+            );
         });
     });
 

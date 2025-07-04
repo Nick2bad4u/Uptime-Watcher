@@ -7,7 +7,11 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { performSinglePortCheck } from "../../../../services/monitoring/utils/portChecker";
-import { handlePortCheckError, PortCheckError, PORT_NOT_REACHABLE } from "../../../../services/monitoring/utils/portErrorHandling";
+import {
+    handlePortCheckError,
+    PortCheckError,
+    PORT_NOT_REACHABLE,
+} from "../../../../services/monitoring/utils/portErrorHandling";
 import { performPortCheckWithRetry } from "../../../../services/monitoring/utils/portRetry";
 
 // Mock dependencies
@@ -44,12 +48,12 @@ describe("Port Monitoring Utils", () => {
     beforeEach(async () => {
         vi.clearAllMocks();
         vi.useFakeTimers();
-        
+
         mockIsPortReachable = vi.mocked((await import("is-port-reachable")).default);
         mockIsDev = vi.mocked((await import("../../../../electronUtils")).isDev);
         mockLogger = vi.mocked((await import("../../../../utils/logger")).logger);
         mockWithRetry = vi.mocked((await import("../../../../utils/retry")).withRetry);
-        
+
         mockIsDev.mockReturnValue(false);
     });
 
@@ -263,15 +267,12 @@ describe("Port Monitoring Utils", () => {
 
             // Assert
             expect(result).toEqual(expectedResult);
-            expect(mockWithRetry).toHaveBeenCalledWith(
-                expect.any(Function),
-                {
-                    delayMs: 1000,
-                    maxRetries: 3, // maxRetries + 1
-                    onError: expect.any(Function),
-                    operationName: `Port check for ${host}:${port}`,
-                }
-            );
+            expect(mockWithRetry).toHaveBeenCalledWith(expect.any(Function), {
+                delayMs: 1000,
+                maxRetries: 3, // maxRetries + 1
+                onError: expect.any(Function),
+                operationName: `Port check for ${host}:${port}`,
+            });
         });
 
         it("should handle retry failure", async () => {

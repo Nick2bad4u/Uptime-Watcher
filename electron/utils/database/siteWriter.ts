@@ -252,7 +252,7 @@ async function handleMonitorIntervalChanges(
             if (newMonitor.id) {
                 // Always stop to clean up any existing scheduling
                 await callbacks.stopMonitoringForSite(identifier, newMonitor.id);
-                
+
                 // Only restart if the monitor was actually monitoring
                 if (originalMonitor?.monitoring) {
                     await callbacks.startMonitoringForSite(identifier, newMonitor.id);

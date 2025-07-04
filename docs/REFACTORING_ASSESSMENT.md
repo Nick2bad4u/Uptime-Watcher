@@ -1,4 +1,5 @@
 # Uptime Watcher Backend Refactoring Assessment
+
 <!-- markdownlint-disable -->
 
 ## Executive Summary
@@ -77,10 +78,10 @@ The backend refactoring has been **successfully completed** with a fully event-d
 ```typescript
 // Managers receive repository dependencies
 export interface SiteManagerDependencies {
-    siteRepository: SiteRepository;
-    monitorRepository: MonitorRepository;
-    historyRepository: HistoryRepository;
-    eventEmitter: EventEmitter;
+ siteRepository: SiteRepository;
+ monitorRepository: MonitorRepository;
+ historyRepository: HistoryRepository;
+ eventEmitter: EventEmitter;
 }
 ```
 

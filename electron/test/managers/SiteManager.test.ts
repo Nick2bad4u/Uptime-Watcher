@@ -66,7 +66,7 @@ describe("SiteManager", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockEventEmitter = new EventEmitter();
-        
+
         const mockRepositories: SiteManagerDependencies = {
             eventEmitter: mockEventEmitter,
             siteRepository: {
@@ -156,7 +156,7 @@ describe("SiteManager", () => {
 
         it("should update sites cache correctly", () => {
             const sites = [mockSite, { ...mockSite, identifier: "another-site", name: "Another Site" }];
-            
+
             // Update the cache
             siteManager.updateSitesCache(sites);
 

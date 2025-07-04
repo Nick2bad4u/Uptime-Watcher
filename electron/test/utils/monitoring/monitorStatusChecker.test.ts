@@ -169,7 +169,7 @@ describe("monitorStatusChecker", () => {
 
         it("should handle monitor with missing id", async () => {
             const monitorId = "undefined"; // This will match String(undefined)
-            
+
             // Create a monitor without an id
             mockSite.monitors[0] = {
                 ...mockSite.monitors[0],
@@ -187,7 +187,7 @@ describe("monitorStatusChecker", () => {
 
         it("should handle monitor with null id", async () => {
             const monitorId = "null"; // This will match String(null)
-            
+
             // Create a monitor with null id
             mockSite.monitors[0] = {
                 ...mockSite.monitors[0],
@@ -205,7 +205,7 @@ describe("monitorStatusChecker", () => {
 
         it("should handle monitor with empty string id", async () => {
             const monitorId = ""; // This will match String("")
-            
+
             // Create a monitor with empty string id
             mockSite.monitors[0] = {
                 ...mockSite.monitors[0],

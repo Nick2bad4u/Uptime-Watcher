@@ -198,7 +198,7 @@ async function processAllSiteMonitors(
     if (!callback) {
         return false;
     }
-    
+
     const results = await Promise.all(
         site.monitors
             .filter((monitor) => monitor.id) // Only include monitors with valid IDs
@@ -209,7 +209,7 @@ async function processAllSiteMonitors(
                 return false;
             })
     );
-    
+
     // For starting monitors, use optimistic logic (succeed if ANY monitor starts)
     // For stopping monitors, use pessimistic logic (fail if ANY monitor fails to stop)
     return useOptimisticLogic ? results.some((result) => result) : results.every((result) => result);

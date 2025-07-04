@@ -163,7 +163,7 @@ vi.mock("../services/monitoring", () => ({
 // Helper functions
 function resetAllMocks(): void {
     vi.clearAllMocks();
-    
+
     // Reset specific mock implementations to default
     mockSiteRepositoryInstance.findAll.mockResolvedValue([]);
     mockMonitorRepositoryInstance.findBySiteIdentifier.mockResolvedValue([]);
@@ -314,14 +314,16 @@ describe("UptimeOrchestrator - Site Management", () => {
                 const site = {
                     identifier,
                     name: "Site to Remove",
-                    monitors: [{ 
-                        id: "monitor1", 
-                        siteIdentifier: identifier, 
-                        type: "http", 
-                        url: "https://example.com", 
-                        status: "pending", 
-                        history: [] 
-                    }],
+                    monitors: [
+                        {
+                            id: "monitor1",
+                            siteIdentifier: identifier,
+                            type: "http",
+                            url: "https://example.com",
+                            status: "pending",
+                            history: [],
+                        },
+                    ],
                 };
                 await uptimeOrchestrator.addSite(site);
 

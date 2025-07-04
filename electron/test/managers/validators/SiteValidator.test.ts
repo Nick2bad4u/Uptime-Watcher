@@ -61,7 +61,7 @@ describe("SiteValidator", () => {
             const result = validator.validateSiteConfiguration(site);
             expect(result.isValid).toBe(false);
             expect(result.errors).toContain("Site identifier cannot be empty");
-            expect(result.errors.some(error => error.includes("Monitor 1:"))).toBe(true);
+            expect(result.errors.some((error) => error.includes("Monitor 1:"))).toBe(true);
         });
 
         it("should validate site with empty identifier", () => {
@@ -160,8 +160,8 @@ describe("SiteValidator", () => {
 
             const result = validator.validateSiteConfiguration(site);
             expect(result.isValid).toBe(false);
-            expect(result.errors.some(error => error.includes("Monitor 1:"))).toBe(true);
-            expect(result.errors.some(error => error.includes("Monitor 2:"))).toBe(true);
+            expect(result.errors.some((error) => error.includes("Monitor 1:"))).toBe(true);
+            expect(result.errors.some((error) => error.includes("Monitor 2:"))).toBe(true);
         });
     });
 
@@ -309,9 +309,9 @@ describe("SiteValidator", () => {
 
             const result = validator.validateSiteConfiguration(site);
             expect(result.isValid).toBe(false);
-            expect(result.errors.some(error => error.includes("Monitor 2:"))).toBe(true);
-            expect(result.errors.some(error => error.includes("Monitor 1:"))).toBe(false);
-            expect(result.errors.some(error => error.includes("Monitor 3:"))).toBe(false);
+            expect(result.errors.some((error) => error.includes("Monitor 2:"))).toBe(true);
+            expect(result.errors.some((error) => error.includes("Monitor 1:"))).toBe(false);
+            expect(result.errors.some((error) => error.includes("Monitor 3:"))).toBe(false);
         });
     });
 });

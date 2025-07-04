@@ -280,7 +280,7 @@ describe("HTTP Client Utils", () => {
             const requestError = new Error("Request error");
             await expect(requestErrorHandler(requestError)).rejects.toThrow("Request error");
 
-            // Test response error handler 
+            // Test response error handler
             const responseError = new Error("Response error");
             await expect(responseErrorHandler(responseError)).rejects.toThrow("Response error");
 

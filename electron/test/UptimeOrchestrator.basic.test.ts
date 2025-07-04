@@ -147,7 +147,7 @@ vi.mock("../services/monitoring", () => ({
 // Helper functions
 function resetAllMocks(): void {
     vi.clearAllMocks();
-    
+
     // Reset specific mock implementations to default
     mockSiteRepositoryInstance.findAll.mockResolvedValue([]);
     mockMonitorRepositoryInstance.findBySiteIdentifier.mockResolvedValue([]);

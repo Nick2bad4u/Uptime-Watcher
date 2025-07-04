@@ -38,11 +38,12 @@ The Uptime Watcher project demonstrates a well-architected separation of concern
 ```typescript
 // DatabaseManager requires callbacks from other managers
 this.databaseManager.setCallbacks({
-    getSitesFromCache: () => this.siteManager.getSitesFromCache(),
-    updateSitesCache: (sites) => this.siteManager.updateSitesCache(sites),
-    startMonitoringForSite: (identifier, monitorId) =>
-        this.monitorManager.startMonitoringForSite(identifier, monitorId),
-    setHistoryLimit: (limit) => { this.historyLimit = limit; },
+ getSitesFromCache: () => this.siteManager.getSitesFromCache(),
+ updateSitesCache: (sites) => this.siteManager.updateSitesCache(sites),
+ startMonitoringForSite: (identifier, monitorId) => this.monitorManager.startMonitoringForSite(identifier, monitorId),
+ setHistoryLimit: (limit) => {
+  this.historyLimit = limit;
+ },
 });
 ```
 
@@ -52,9 +53,9 @@ Create a shared event bus or mediator pattern to reduce direct dependencies:
 ```typescript
 // Event-driven approach
 class EventBus extends EventEmitter {
-    emitSitesCacheUpdate(sites: Site[]): void
-    emitStartMonitoring(identifier: string, monitorId?: string): void
-    emitHistoryLimitChange(limit: number): void
+ emitSitesCacheUpdate(sites: Site[]): void;
+ emitStartMonitoring(identifier: string, monitorId?: string): void;
+ emitHistoryLimitChange(limit: number): void;
 }
 ```
 
@@ -78,7 +79,7 @@ public async setupNewSite(site: Site): Promise<void> {
     if (this.shouldAutoStart(site)) {
         await this.startMonitoringForSite(site.identifier);
     }
-    
+
     // Business logic: default interval rules
     this.applyDefaultIntervals(site);
 }
@@ -98,7 +99,7 @@ private shouldAutoStart(site: Site): boolean {
 ```typescript
 // Business validation mixed with technical operation
 if (!siteData?.identifier) {
-    throw new Error("Site identifier is required"); // Business rule
+ throw new Error("Site identifier is required"); // Business rule
 }
 await repositories.site.upsert(site); // Technical operation
 ```
@@ -138,10 +139,10 @@ Create a configuration manager:
 
 ```typescript
 class ConfigurationManager {
-    public getDefaultMonitorInterval(): number
-    public shouldAutoStartMonitoring(site: Site): boolean
-    public getHistoryRetentionRules(): HistoryRetentionConfig
-    public validateSiteConfiguration(site: Site): ValidationResult
+ public getDefaultMonitorInterval(): number;
+ public shouldAutoStartMonitoring(site: Site): boolean;
+ public getHistoryRetentionRules(): HistoryRetentionConfig;
+ public validateSiteConfiguration(site: Site): ValidationResult;
 }
 ```
 
