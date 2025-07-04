@@ -31,13 +31,13 @@ export class SiteRepository {
     /**
      * Get all sites from the database (without monitors).
      */
-    public async findAll(): Promise<Array<{ identifier: string; name?: string }>> {
+    public async findAll(): Promise<Array<{ identifier: string; name?: string | undefined }>> {
         try {
             const db = this.getDb();
             const siteRows = db.all("SELECT * FROM sites") as Array<{ identifier: string; name?: string }>;
             return siteRows.map((row) => ({
                 identifier: String(row.identifier),
-                name: row.name ? String(row.name) : undefined,
+                ...(row.name !== undefined && row.name !== null && { name: String(row.name) }),
             }));
         } catch (error) {
             logger.error("[SiteRepository] Failed to fetch all sites", error);
@@ -48,7 +48,9 @@ export class SiteRepository {
     /**
      * Find a site by its identifier.
      */
-    public async findByIdentifier(identifier: string): Promise<{ identifier: string; name?: string } | undefined> {
+    public async findByIdentifier(
+        identifier: string
+    ): Promise<{ identifier: string; name?: string | undefined } | undefined> {
         try {
             const db = this.getDb();
             const siteRow = db.get("SELECT * FROM sites WHERE identifier = ?", [identifier]) as
@@ -61,7 +63,7 @@ export class SiteRepository {
 
             return {
                 identifier: String(siteRow.identifier),
-                name: siteRow.name ? String(siteRow.name) : undefined,
+                ...(siteRow.name !== undefined && siteRow.name !== null && { name: String(siteRow.name) }),
             };
         } catch (error) {
             logger.error(`[SiteRepository] Failed to fetch site with identifier: ${identifier}`, error);
@@ -93,7 +95,7 @@ export class SiteRepository {
             const site: Site = {
                 identifier: siteRow.identifier,
                 monitors: monitors,
-                name: siteRow.name,
+                ...(siteRow.name !== undefined && siteRow.name !== null && { name: siteRow.name }),
             };
 
             return site;
@@ -159,13 +161,13 @@ export class SiteRepository {
     /**
      * Export all sites for backup/import functionality.
      */
-    public async exportAll(): Promise<Array<{ identifier: string; name?: string }>> {
+    public async exportAll(): Promise<Array<{ identifier: string; name?: string | undefined }>> {
         try {
             const db = this.getDb();
             const sites = db.all("SELECT * FROM sites");
             return sites.map((row) => ({
                 identifier: row.identifier ? String(row.identifier) : "",
-                name: row.name ? String(row.name) : undefined,
+                ...(row.name !== undefined && row.name !== null && { name: String(row.name) }),
             }));
         } catch (error) {
             logger.error("[SiteRepository] Failed to export sites", error);
@@ -190,7 +192,7 @@ export class SiteRepository {
     /**
      * Bulk insert sites (for import functionality).
      */
-    public async bulkInsert(sites: Array<{ identifier: string; name?: string }>): Promise<void> {
+    public async bulkInsert(sites: Array<{ identifier: string; name?: string | undefined }>): Promise<void> {
         try {
             const db = this.getDb();
             for (const site of sites) {

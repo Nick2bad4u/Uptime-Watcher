@@ -96,7 +96,11 @@ export function OverviewTab({
     const iconColors = getIconColors();
 
     return (
-        <div className="space-y-6">
+        <div data-testid="overview-tab" className="space-y-6">
+            {/* Overview Tab */}
+            <ThemedText variant="primary" weight="bold">
+                Overview Tab
+            </ThemedText>
             {/* Key Metrics Grid */}
             <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                 <ThemedCard

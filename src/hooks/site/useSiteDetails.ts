@@ -86,7 +86,7 @@ export function useSiteDetails({ site }: UseSiteDetailsProps) {
     const defaultMonitorId = monitorIds[0] ?? "";
     const selectedMonitorId = getSelectedMonitorId(currentSite.identifier) ?? defaultMonitorId;
     const selectedMonitor = currentSite.monitors.find((m) => m.id === selectedMonitorId) || currentSite.monitors[0];
-    const isMonitoring = selectedMonitor?.monitoring !== false;
+    const isMonitoring = selectedMonitor ? selectedMonitor.monitoring !== false : false;
 
     // Check interval state
     const [localCheckInterval, setLocalCheckInterval] = useState<number>(

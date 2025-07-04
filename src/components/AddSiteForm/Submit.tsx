@@ -180,10 +180,11 @@ function createMonitor(props: FormSubmitProps): Monitor {
 async function submitNewSite(props: FormSubmitProps, monitor: Monitor): Promise<void> {
     const { createSite, logger, name, siteId } = props;
 
+    const trimmedName = name.trim();
     const siteData = {
         identifier: siteId,
         monitors: [monitor],
-        name: name.trim() || undefined,
+        ...(trimmedName && { name: trimmedName }),
     };
 
     await createSite(siteData);

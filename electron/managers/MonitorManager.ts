@@ -116,7 +116,7 @@ export class MonitorManager extends EventEmitter {
             // Emit monitoring started event
             const eventData: MonitorEventData = {
                 identifier,
-                monitorId,
+                ...(monitorId !== undefined && { monitorId }),
             };
             this.eventEmitter.emit(MONITOR_EVENTS.MONITORING_STARTED, eventData);
         }
@@ -146,7 +146,7 @@ export class MonitorManager extends EventEmitter {
             // Emit monitoring stopped event
             const eventData: MonitorEventData = {
                 identifier,
-                monitorId,
+                ...(monitorId !== undefined && { monitorId }),
             };
             this.eventEmitter.emit(MONITOR_EVENTS.MONITORING_STOPPED, eventData);
         }
@@ -174,8 +174,8 @@ export class MonitorManager extends EventEmitter {
         // Emit manual check completed event
         const eventData: MonitorEventData = {
             identifier,
-            monitorId,
-            result,
+            ...(monitorId !== undefined && { monitorId }),
+            ...(result !== undefined && { result }),
         };
         this.eventEmitter.emit(MONITOR_EVENTS.MANUAL_CHECK_COMPLETED, eventData);
 

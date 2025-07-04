@@ -85,7 +85,12 @@ export const SiteCard = React.memo(function SiteCard({ site }: SiteCardProps) {
 
             <SiteCardStatus selectedMonitorId={selectedMonitorId} status={status} />
 
-            <SiteCardMetrics status={status} uptime={uptime} responseTime={responseTime} checkCount={checkCount} />
+            <SiteCardMetrics
+                status={status}
+                uptime={uptime}
+                {...(responseTime !== undefined && { responseTime })}
+                checkCount={checkCount}
+            />
 
             <SiteCardHistory monitor={monitor} filteredHistory={filteredHistory} />
 

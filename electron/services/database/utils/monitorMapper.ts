@@ -29,24 +29,56 @@ export interface MonitorRow {
  * Convert database row to monitor object.
  */
 export function rowToMonitor(row: Record<string, unknown>): Site["monitors"][0] {
-    return {
-        checkInterval: safeNumberConvert(row.checkInterval),
+    const monitor: Site["monitors"][0] = {
         history: [], // History will be loaded separately
-        host: row.host !== undefined ? String(row.host) : undefined,
         id: row.id !== undefined ? String(row.id) : "-1",
-        lastChecked:
-            row.lastChecked && (typeof row.lastChecked === "string" || typeof row.lastChecked === "number")
-                ? new Date(row.lastChecked)
-                : undefined,
-        monitoring: Boolean(row.monitoring),
-        port: safeNumberConvert(row.port),
-        responseTime: safeNumberConvert(row.responseTime),
-        retryAttempts: safeNumberConvert(row.retryAttempts),
         status: typeof row.status === "string" ? (row.status as "up" | "down" | "pending") : "down",
-        timeout: safeNumberConvert(row.timeout),
         type: typeof row.type === "string" ? (row.type as Site["monitors"][0]["type"]) : "http",
-        url: row.url !== undefined ? String(row.url) : undefined,
     };
+
+    // Add optional properties only if they have valid values
+    const checkInterval = safeNumberConvert(row.checkInterval);
+    if (checkInterval !== undefined) {
+        monitor.checkInterval = checkInterval;
+    }
+
+    if (row.host !== undefined && row.host !== null) {
+        monitor.host = String(row.host);
+    }
+
+    if (row.lastChecked && (typeof row.lastChecked === "string" || typeof row.lastChecked === "number")) {
+        monitor.lastChecked = new Date(row.lastChecked);
+    }
+
+    if (row.monitoring !== undefined) {
+        monitor.monitoring = Boolean(row.monitoring);
+    }
+
+    const port = safeNumberConvert(row.port);
+    if (port !== undefined) {
+        monitor.port = port;
+    }
+
+    const responseTime = safeNumberConvert(row.responseTime);
+    if (responseTime !== undefined) {
+        monitor.responseTime = responseTime;
+    }
+
+    const retryAttempts = safeNumberConvert(row.retryAttempts);
+    if (retryAttempts !== undefined) {
+        monitor.retryAttempts = retryAttempts;
+    }
+
+    const timeout = safeNumberConvert(row.timeout);
+    if (timeout !== undefined) {
+        monitor.timeout = timeout;
+    }
+
+    if (row.url !== undefined && row.url !== null) {
+        monitor.url = String(row.url);
+    }
+
+    return monitor;
 }
 
 /**

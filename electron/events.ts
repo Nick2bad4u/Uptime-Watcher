@@ -94,17 +94,17 @@ export const STATUS_EVENTS = Object.freeze({
  */
 export interface SiteEventData {
     identifier: string;
-    site?: Site;
-    monitorId?: string;
-    operation?: string;
-    error?: string;
+    site?: Site | undefined;
+    monitorId?: string | undefined;
+    operation?: string | undefined;
+    error?: string | undefined;
 }
 
 export interface MonitorEventData {
     identifier: string;
-    monitorId?: string;
-    result?: StatusUpdate;
-    error?: string;
+    monitorId?: string | undefined;
+    result?: StatusUpdate | undefined;
+    error?: string | undefined;
 }
 
 export interface DatabaseEventData {

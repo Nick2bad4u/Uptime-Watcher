@@ -241,7 +241,7 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
                     shadow="xl"
                     className="overflow-hidden site-details-content animate-scale-in"
                 >
-                    <SiteDetailsHeader site={currentSite} selectedMonitor={selectedMonitor} />
+                    <SiteDetailsHeader site={currentSite} {...(selectedMonitor ? { selectedMonitor } : {})} />
 
                     <SiteDetailsNavigation
                         activeSiteDetailsTab={activeSiteDetailsTab}
@@ -270,7 +270,7 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
 
                     {/* Tab Content */}
                     <ThemedBox variant="primary" padding="lg" className="max-h-[70vh] overflow-y-auto">
-                        {activeSiteDetailsTab === "overview" && (
+                        {activeSiteDetailsTab === "overview" && selectedMonitor && (
                             <OverviewTab
                                 selectedMonitor={selectedMonitor}
                                 uptime={analytics.uptime}
@@ -284,7 +284,7 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
                             />
                         )}
 
-                        {activeSiteDetailsTab === `${selectedMonitorId}-analytics` && (
+                        {activeSiteDetailsTab === `${selectedMonitorId}-analytics` && selectedMonitor && (
                             <AnalyticsTab
                                 upCount={analytics.upCount}
                                 downCount={analytics.downCount}
@@ -311,11 +311,11 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
                                 getAvailabilityColor={() => currentTheme.colors.primary[500]}
                                 getAvailabilityVariant={getAvailabilityVariant}
                                 getAvailabilityDescription={getAvailabilityDescription}
-                                monitorType={selectedMonitor?.type}
+                                monitorType={selectedMonitor.type}
                             />
                         )}
 
-                        {activeSiteDetailsTab === "history" && (
+                        {activeSiteDetailsTab === "history" && selectedMonitor && (
                             <HistoryTab
                                 selectedMonitor={selectedMonitor}
                                 formatResponseTime={formatResponseTime}
@@ -324,7 +324,7 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
                             />
                         )}
 
-                        {activeSiteDetailsTab === "settings" && (
+                        {activeSiteDetailsTab === "settings" && selectedMonitor && (
                             <SettingsTab
                                 currentSite={currentSite}
                                 selectedMonitor={selectedMonitor}

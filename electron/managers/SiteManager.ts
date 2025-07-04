@@ -155,7 +155,7 @@ export class SiteManager extends EventEmitter {
             startMonitoringForSite: async (id: string, monitorId?: string) => {
                 const eventData: SiteEventData = {
                     identifier: id,
-                    monitorId,
+                    ...(monitorId !== undefined && { monitorId }),
                     operation: "start-monitoring",
                 };
                 this.eventEmitter.emit(SITE_EVENTS.START_MONITORING_REQUESTED, eventData);
@@ -164,7 +164,7 @@ export class SiteManager extends EventEmitter {
             stopMonitoringForSite: async (id: string, monitorId?: string) => {
                 const eventData: SiteEventData = {
                     identifier: id,
-                    monitorId,
+                    ...(monitorId !== undefined && { monitorId }),
                     operation: "stop-monitoring",
                 };
                 this.eventEmitter.emit(SITE_EVENTS.STOP_MONITORING_REQUESTED, eventData);

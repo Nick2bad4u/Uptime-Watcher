@@ -98,7 +98,7 @@ export function HistoryTab({
 
     // Helper to render details with label
     // Use 'details' as optional property to handle records that may not have detail information
-    function renderDetails(record: StatusHistory & { details?: string }) {
+    function renderDetails(record: StatusHistory) {
         if (!record.details) return undefined;
 
         const getDetailLabel = (): string => {
@@ -116,7 +116,11 @@ export function HistoryTab({
     }
 
     return (
-        <div className="space-y-6">
+        <div data-testid="history-tab" className="space-y-6">
+            {/* History Tab */}
+            <ThemedText variant="primary" weight="bold">
+                History Tab
+            </ThemedText>
             {/* History Controls */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">

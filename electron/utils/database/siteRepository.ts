@@ -63,11 +63,16 @@ export async function getSitesFromDatabase(config: GetSitesConfig): Promise<Site
             }
         }
 
-        sites.push({
+        const siteData: Site = {
             identifier: siteRow.identifier,
             monitors: monitors,
-            name: siteRow.name,
-        });
+        };
+
+        if (siteRow.name !== undefined) {
+            siteData.name = siteRow.name;
+        }
+
+        sites.push(siteData);
     }
 
     return sites;
@@ -176,8 +181,11 @@ async function loadSitesData(repositories: SitesLoaderConfig["repositories"], si
         const site: Site = {
             identifier: siteRow.identifier,
             monitors: monitors,
-            name: siteRow.name,
         };
+
+        if (siteRow.name !== undefined) {
+            site.name = siteRow.name;
+        }
 
         sites.set(site.identifier, site);
     }

@@ -18,25 +18,25 @@ export interface Monitor {
     /** Current status of the monitor */
     status: "up" | "down" | "pending";
     /** Last recorded response time in milliseconds */
-    responseTime?: number;
+    responseTime?: number | undefined;
     /** Timestamp of last check */
-    lastChecked?: Date;
+    lastChecked?: Date | undefined;
     /** Historical check results */
     history: StatusHistory[];
     /** Whether this specific monitor is actively being monitored */
-    monitoring?: boolean;
+    monitoring?: boolean | undefined;
     /** URL to monitor (HTTP monitors only) */
-    url?: string;
+    url?: string | undefined;
     /** Hostname or IP for port monitors */
-    host?: string;
+    host?: string | undefined;
     /** Port number for port monitors */
-    port?: number;
+    port?: number | undefined;
     /** Check interval in milliseconds (per-monitor override) */
-    checkInterval?: number;
+    checkInterval?: number | undefined;
     /** Request timeout in milliseconds for this monitor */
-    timeout?: number;
+    timeout?: number | undefined;
     /** Number of retry attempts before marking as down for this monitor */
-    retryAttempts?: number;
+    retryAttempts?: number | undefined;
 }
 
 /**
@@ -47,11 +47,11 @@ export interface Site {
     /** Unique identifier for the site (UUID, used as the key everywhere) */
     identifier: string;
     /** Display name for the site */
-    name?: string;
+    name?: string | undefined;
     /** Array of monitors associated with this site */
     monitors: Monitor[];
     /** Whether monitoring is active for this site */
-    monitoring?: boolean;
+    monitoring?: boolean | undefined;
 }
 
 /**
@@ -66,10 +66,10 @@ export interface StatusHistory {
     /** Response time in milliseconds */
     responseTime: number;
     /** Optional additional details about the check */
-    details?: string;
+    details?: string | undefined;
 }
 
 export interface StatusUpdate {
     site: Site;
-    previousStatus?: "up" | "down" | "pending";
+    previousStatus?: "up" | "down" | "pending" | undefined;
 }

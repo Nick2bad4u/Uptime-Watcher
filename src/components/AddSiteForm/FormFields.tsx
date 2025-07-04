@@ -138,16 +138,25 @@ export const TextField = React.memo(function TextField({
     value,
 }: TextFieldProps) {
     return (
-        <FormField error={error} helpText={helpText} id={id} label={label} required={required}>
+        <FormField
+            {...(error !== undefined && { error })}
+            {...(helpText !== undefined && { helpText })}
+            id={id}
+            label={label}
+            required={required}
+        >
             <ThemedInput
-                aria-describedby={getAriaDescribedBy(id, error, helpText)}
+                {...(() => {
+                    const ariaDescribedBy = getAriaDescribedBy(id, error, helpText);
+                    return ariaDescribedBy ? { "aria-describedby": ariaDescribedBy } : {};
+                })()}
                 aria-label={createAriaLabel(label, required)}
                 disabled={disabled}
                 id={id}
-                max={max}
-                min={min}
+                {...(max !== undefined && { max })}
+                {...(min !== undefined && { min })}
                 onChange={(e) => onChange(e.target.value)}
-                placeholder={placeholder}
+                {...(placeholder !== undefined && { placeholder })}
                 required={required}
                 type={type}
                 value={value}
@@ -199,9 +208,18 @@ export const SelectField = React.memo(function SelectField({
     value,
 }: SelectFieldProps) {
     return (
-        <FormField error={error} helpText={helpText} id={id} label={label} required={required}>
+        <FormField
+            {...(error !== undefined && { error })}
+            {...(helpText !== undefined && { helpText })}
+            id={id}
+            label={label}
+            required={required}
+        >
             <ThemedSelect
-                aria-describedby={getAriaDescribedBy(id, error, helpText)}
+                {...(() => {
+                    const ariaDescribedBy = getAriaDescribedBy(id, error, helpText);
+                    return ariaDescribedBy ? { "aria-describedby": ariaDescribedBy } : {};
+                })()}
                 aria-label={createAriaLabel(label, required)}
                 disabled={disabled}
                 id={id}
@@ -286,7 +304,13 @@ export const RadioGroup = React.memo(function RadioGroup({
     value,
 }: RadioGroupProps) {
     return (
-        <FormField error={error} helpText={helpText} id={id} label={label} required={required}>
+        <FormField
+            {...(error !== undefined && { error })}
+            {...(helpText !== undefined && { helpText })}
+            id={id}
+            label={label}
+            required={required}
+        >
             <div className="flex items-center gap-4" role="radiogroup">
                 {options.map((option) => (
                     <label className="flex items-center gap-1" key={option.value}>

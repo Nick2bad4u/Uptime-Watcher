@@ -116,7 +116,11 @@ export function AnalyticsTab({
     uptimeChartData,
 }: AnalyticsTabProps) {
     return (
-        <div className="space-y-6">
+        <div data-testid="analytics-tab" className="space-y-6">
+            {/* Analytics Tab */}
+            <ThemedText variant="primary" weight="bold">
+                Analytics Tab
+            </ThemedText>
             {/* Analytics Summary */}
             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <ThemedBox

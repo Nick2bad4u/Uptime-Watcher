@@ -114,7 +114,7 @@ export function useSiteAnalytics(monitor: Monitor | undefined, timeRange: TimePe
 
         // Calculate percentiles
         const sortedResponseTimes = [...responseTimes].sort((a, b) => a - b);
-        const getPercentile = (p: number) => {
+        const getPercentile = (p: number): number => {
             // Ensure p is between 0 and 1
             const safeP = Math.max(0, Math.min(1, p));
             const arrLen = sortedResponseTimes.length;
@@ -122,7 +122,7 @@ export function useSiteAnalytics(monitor: Monitor | undefined, timeRange: TimePe
             const idx = Math.floor(arrLen * safeP);
             const safeIdx = Math.max(0, Math.min(idx, arrLen - 1));
             // eslint-disable-next-line security/detect-object-injection -- safeIdx is validated and sanitized
-            return sortedResponseTimes[safeIdx];
+            return sortedResponseTimes[safeIdx] ?? 0;
         };
 
         const p50 = getPercentile(0.5);

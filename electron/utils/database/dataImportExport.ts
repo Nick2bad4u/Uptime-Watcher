@@ -4,7 +4,7 @@ import { HistoryRepository } from "../../services/database/HistoryRepository";
 import { MonitorRepository } from "../../services/database/MonitorRepository";
 import { SettingsRepository } from "../../services/database/SettingsRepository";
 import { SiteRepository } from "../../services/database/SiteRepository";
-import { Site } from "../../types";
+import { Site, StatusHistory } from "../../types";
 import { monitorLogger as logger } from "../logger";
 
 /**
@@ -140,10 +140,15 @@ export async function importSitesAndSettings(
     }
 ): Promise<void> {
     if (Array.isArray(parsedData.sites)) {
-        const sitesToInsert = parsedData.sites.map((site: { identifier: string; name?: string }) => ({
-            identifier: site.identifier,
-            name: site.name,
-        }));
+        const sitesToInsert = parsedData.sites.map((site: { identifier: string; name?: string }) => {
+            const siteData: { identifier: string; name?: string | undefined } = {
+                identifier: site.identifier,
+            };
+            if (site.name !== undefined) {
+                siteData.name = site.name;
+            }
+            return siteData;
+        });
         await deps.repositories.site.bulkInsert(sitesToInsert);
     }
 
@@ -179,7 +184,18 @@ export async function importHistoryForMonitors(
         const originalMonitor = findMatchingOriginalMonitor(createdMonitor, originalMonitors);
 
         if (shouldImportHistory(createdMonitor, originalMonitor)) {
-            await deps.repositories.history.bulkInsert(createdMonitor.id, originalMonitor?.history ?? []);
+            const historyToImport = (originalMonitor?.history ?? []).map((historyEntry) => {
+                const entry: StatusHistory & { details?: string } = {
+                    responseTime: historyEntry.responseTime,
+                    status: historyEntry.status,
+                    timestamp: historyEntry.timestamp,
+                };
+                if (historyEntry.details !== undefined) {
+                    entry.details = historyEntry.details;
+                }
+                return entry;
+            });
+            await deps.repositories.history.bulkInsert(createdMonitor.id, historyToImport);
         }
     }
 }

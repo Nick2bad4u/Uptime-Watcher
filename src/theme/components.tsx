@@ -641,16 +641,16 @@ export function ThemedIconButton({
             disabled={disabled}
             loading={loading}
             className={`themed-icon-button ${className}`}
-            onClick={onClick}
+            {...(onClick && { onClick })}
             icon={icon}
-            iconColor={iconColor}
+            {...(iconColor && { iconColor })}
             style={{
                 height: buttonSize,
                 minWidth: "unset",
                 padding: "0",
                 width: buttonSize,
             }}
-            title={tooltip}
+            {...(tooltip && { title: tooltip })}
         />
     );
 }
@@ -708,9 +708,9 @@ export function ThemedCard({
             shadow={shadow}
             className={`themed-card ${hoverable ? "themed-card--hoverable" : ""} ${clickable ? "themed-card--clickable" : ""} ${className}`}
             style={cardStyles}
-            onClick={clickable ? onClick : undefined}
-            onMouseEnter={onMouseEnter}
-            onMouseLeave={onMouseLeave}
+            {...(clickable && onClick && { onClick })}
+            {...(onMouseEnter && { onMouseEnter })}
+            {...(onMouseLeave && { onMouseLeave })}
         >
             {(title || subtitle || icon) && (
                 <div

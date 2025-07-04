@@ -105,7 +105,9 @@ export class MonitorScheduler {
             );
             for (const intervalKey of siteIntervals) {
                 const [, monitorId] = intervalKey.split("|");
-                this.stopMonitor(siteIdentifier, monitorId);
+                if (monitorId) {
+                    this.stopMonitor(siteIdentifier, monitorId);
+                }
             }
         }
     }

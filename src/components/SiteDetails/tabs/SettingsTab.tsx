@@ -230,7 +230,11 @@ export function SettingsTab({
     };
 
     return (
-        <div className="space-y-10">
+        <div data-testid="settings-tab" className="space-y-10">
+            {/* Settings Tab */}
+            <ThemedText variant="primary" weight="bold">
+                Settings Tab
+            </ThemedText>
             {/* Site Configuration */}
             <ThemedCard icon="⚙️" title="Site Configuration" padding="xl" rounded="xl" shadow="lg" className="mb-6">
                 <div className="space-y-8">

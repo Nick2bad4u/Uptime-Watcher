@@ -21,9 +21,7 @@ export default defineConfig({
         emptyOutDir: true, // Clean output before build
         outDir: "dist",
         rollupOptions: {
-            output: {
-                manualChunks: undefined, // Avoids code splitting for Electron main/preload
-            },
+            // No manual chunks configuration for Electron builds
         },
         sourcemap: true, // Recommended for Electron debugging
         target: "esnext", // Modern output for Electron
@@ -68,7 +66,7 @@ export default defineConfig({
         codecovVitePlugin({
             bundleName: "uptime-watcher",
             enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
-            uploadToken: process.env.CODECOV_TOKEN,
+            ...(process.env.CODECOV_TOKEN && { uploadToken: process.env.CODECOV_TOKEN }),
         }),
     ],
     resolve: {
@@ -84,17 +82,17 @@ export default defineConfig({
     test: {
         coverage: {
             exclude: [
-                "coverage/**",
-                "dist/**",
-                "dist-electron/**",
+                "coverage/**", // Exclude coverage reports
+                "dist/**", // Exclude frontend build output
+                "dist-electron/**", // Exclude Electron build output
                 "**/dist/**", // Exclude any dist folder anywhere
                 "electron/dist/**", // Explicitly exclude electron/dist
                 "electron/**", // Exclude all electron files from frontend coverage
-                "**/*.d.ts",
-                "**/*.config.*",
-                "**/node_modules/**",
-                "release/**",
-                "scripts/**",
+                "**/*.d.ts", // Exclude TypeScript declaration files
+                "**/*.config.*", // Exclude configuration files
+                "**/node_modules/**", // Exclude node_modules
+                "release/**", // Exclude release files
+                "scripts/**", // Exclude scripts
                 "electron/test/dist/**", // Exclude compiled electron test files
                 "**/types.ts", // Exclude type definition files
                 "**/types.tsx", // Exclude type definition files with JSX

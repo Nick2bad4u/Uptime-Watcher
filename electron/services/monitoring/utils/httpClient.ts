@@ -13,10 +13,13 @@ import { MonitorConfig } from "../types";
  * Create a configured Axios instance for HTTP monitoring.
  */
 export function createHttpClient(config: MonitorConfig): AxiosInstance {
-    const axiosInstance = axios.create({
-        headers: {
-            "User-Agent": config.userAgent,
-        },
+    const headers: Record<string, string> = {};
+    if (config.userAgent !== undefined) {
+        headers["User-Agent"] = config.userAgent;
+    }
+
+    const createConfig: Record<string, unknown> = {
+        headers,
         // Connection pooling for better performance
         httpAgent: new http.Agent({ keepAlive: true }),
         httpsAgent: new https.Agent({ keepAlive: true }),
@@ -24,7 +27,6 @@ export function createHttpClient(config: MonitorConfig): AxiosInstance {
         maxContentLength: 10 * 1024 * 1024, // 10MB response limit
         maxRedirects: 5,
         responseType: "text", // We only need status codes, not parsed data
-        timeout: config.timeout,
         // Custom status validation - all HTTP responses (including errors) are "successful" for axios
         // This allows us to handle status code logic manually in our monitoring logic
         validateStatus: () => {
@@ -32,7 +34,13 @@ export function createHttpClient(config: MonitorConfig): AxiosInstance {
             // We'll manually determine up/down status based on status codes
             return true;
         },
-    });
+    };
+
+    if (config.timeout !== undefined) {
+        createConfig.timeout = config.timeout;
+    }
+
+    const axiosInstance = axios.create(createConfig);
 
     // Set up interceptors for timing measurement
     setupTimingInterceptors(axiosInstance);
