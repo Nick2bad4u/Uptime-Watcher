@@ -9,7 +9,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 import { SiteDetails } from "../components/SiteDetails/SiteDetails";
-import { Site } from "../types";
+import { Site, Monitor } from "../types";
 
 // Mock Chart.js
 vi.mock("chart.js", () => ({
@@ -74,7 +74,7 @@ const mockUseSiteDetails = {
     localRetryAttempts: 3,
     localTimeout: 30,
     retryAttemptsChanged: false,
-    selectedMonitor: null,
+    selectedMonitor: undefined as Monitor | undefined,
     selectedMonitorId: "",
     setActiveSiteDetailsTab: vi.fn(),
     setLocalName: vi.fn(),
@@ -224,8 +224,8 @@ describe("SiteDetails", () => {
         vi.clearAllMocks();
         mockUseSiteDetails.currentSite = mockSite;
         mockUseSiteDetails.activeSiteDetailsTab = "overview";
-        mockUseSiteDetails.selectedMonitorId = "";
-        mockUseSiteDetails.selectedMonitor = null;
+        mockUseSiteDetails.selectedMonitorId = "monitor-1";
+        mockUseSiteDetails.selectedMonitor = mockSite.monitors[0];
         mockUseSiteDetails.siteExists = true;
     });
 

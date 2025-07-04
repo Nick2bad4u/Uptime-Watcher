@@ -506,10 +506,12 @@ describe("ThemeManager", () => {
             themeManager.onSystemThemeChange(mockCallback);
 
             // Get the handler that was registered
-            const handler = mockAddEventListener.mock.calls[0][1];
+            const handler = mockAddEventListener.mock.calls[0]?.[1];
 
             // Simulate a theme change event
-            handler({ matches: true });
+            if (handler) {
+                handler({ matches: true });
+            }
 
             expect(mockCallback).toHaveBeenCalledWith(true);
         });

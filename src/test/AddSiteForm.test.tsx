@@ -422,7 +422,8 @@ describe("AddSiteForm", () => {
             // Check that setHost was called for each character (11 characters in "example.com")
             expect(mockSetHost).toHaveBeenCalledTimes(11);
             // The last call should be with "m" (the last character)
-            expect(mockSetHost.mock.calls[mockSetHost.mock.calls.length - 1][0]).toBe("m");
+            const lastCall = mockSetHost.mock.calls[mockSetHost.mock.calls.length - 1];
+            expect(lastCall?.[0]).toBe("m");
         });
 
         it("should call setPort when port field changes", async () => {

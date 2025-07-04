@@ -149,8 +149,8 @@ describe("Type Definitions", () => {
             };
 
             expect(site.monitors).toHaveLength(2);
-            expect(site.monitors[0].type).toBe("http");
-            expect(site.monitors[1].type).toBe("port");
+            expect(site.monitors[0]?.type).toBe("http");
+            expect(site.monitors[1]?.type).toBe("port");
         });
     });
 
@@ -254,7 +254,7 @@ describe("Type Definitions", () => {
             };
 
             expect(site.monitors).toHaveLength(1);
-            expect(site.monitors[0].id).toBe("child-monitor");
+            expect(site.monitors[0]?.id).toBe("child-monitor");
         });
 
         it("should ensure status update contains valid site", () => {

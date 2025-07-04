@@ -92,8 +92,6 @@ describe("MonitorRepository", () => {
                     site_identifier: "site-1",
                     type: "http",
                     url: "https://example.com",
-                    host: undefined,
-                    port: undefined,
                     checkInterval: 300,
                     timeout: 5000,
                     retryAttempts: 3,
@@ -158,7 +156,6 @@ describe("MonitorRepository", () => {
                 id: 1,
                 site_identifier: "site-1",
                 type: "port",
-                url: undefined,
                 host: "example.com",
                 port: 80,
                 checkInterval: 300,
@@ -166,8 +163,6 @@ describe("MonitorRepository", () => {
                 retryAttempts: 3,
                 monitoring: false,
                 status: "down",
-                responseTime: undefined,
-                lastChecked: undefined,
             };
 
             mockDatabase.get.mockReturnValue(mockRow);
@@ -788,7 +783,7 @@ describe("MonitorRepository", () => {
 
             // Should only contain the monitor with valid ID
             expect(result).toHaveLength(1);
-            expect(result[0].id).toBe("2");
+            expect(result[0]?.id).toBe("2");
 
             // Restore original method
             repository.insertSingleMonitor = originalInsertSingle;
@@ -1329,8 +1324,8 @@ describe("MonitorRepository", () => {
                     site_identifier: "site-1",
                     type: "http",
                     url: "https://example.com",
-                    host: undefined, // undefined host - line 183 undefined branch
-                    port: undefined,
+                    // host: undefined, - omitted when undefined
+                    // port: undefined, - omitted when undefined
                     checkInterval: 300,
                     timeout: 5000,
                     retryAttempts: 3,
@@ -1347,7 +1342,7 @@ describe("MonitorRepository", () => {
                     type: "http",
                     url: "https://example.com",
                     host: "localhost", // defined host - line 183 defined branch
-                    port: undefined,
+                    // port: undefined, - omitted when undefined
                     checkInterval: 300,
                     timeout: 5000,
                     retryAttempts: 3,
@@ -1361,8 +1356,9 @@ describe("MonitorRepository", () => {
 
                 const result = await monitorRepository.findBySiteIdentifier("site-1");
 
-                expect(result[0].host).toBe(undefined); // undefined host
-                expect(result[1].host).toBe("localhost"); // defined host converted to string
+                expect(result).toHaveLength(2);
+                expect(result[0]?.host).toBe(undefined); // undefined host
+                expect(result[1]?.host).toBe("localhost"); // defined host converted to string
             });
         });
 

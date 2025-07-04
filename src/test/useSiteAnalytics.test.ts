@@ -535,17 +535,19 @@ describe("useChartData", () => {
         expect(result.current.lineChartData.datasets).toHaveLength(1);
 
         const dataset = result.current.lineChartData.datasets[0];
-        expect(dataset.label).toBe("Response Time");
-        expect(dataset.borderColor).toBe("#3b82f6");
-        expect(dataset.backgroundColor).toBe("#3b82f620");
-        expect(dataset.data).toHaveLength(3);
+        expect(dataset).toBeDefined();
+        expect(dataset?.label).toBe("Response Time");
+        expect(dataset?.borderColor).toBe("#3b82f6");
+        expect(dataset?.backgroundColor).toBe("#3b82f620");
+        expect(dataset?.data).toHaveLength(3);
     });
 
     it("should map data points correctly", () => {
         const { result } = renderHook(() => useChartData(mockMonitor, mockTheme));
 
         const dataset = result.current.lineChartData.datasets[0];
-        expect(dataset.data).toEqual([
+        expect(dataset).toBeDefined();
+        expect(dataset?.data).toEqual([
             { x: 1000, y: 200 },
             { x: 2000, y: 0 },
             { x: 3000, y: 150 },
@@ -556,12 +558,13 @@ describe("useChartData", () => {
         const { result } = renderHook(() => useChartData(mockMonitor, mockTheme));
 
         const dataset = result.current.lineChartData.datasets[0];
-        expect(dataset.pointBackgroundColor).toEqual([
+        expect(dataset).toBeDefined();
+        expect(dataset?.pointBackgroundColor).toEqual([
             "#10b981", // up - success color
             "#ef4444", // down - error color
             "#10b981", // up - success color
         ]);
-        expect(dataset.pointBorderColor).toEqual(["#10b981", "#ef4444", "#10b981"]);
+        expect(dataset?.pointBorderColor).toEqual(["#10b981", "#ef4444", "#10b981"]);
     });
 
     it("should handle empty history", () => {
@@ -573,8 +576,9 @@ describe("useChartData", () => {
         const { result } = renderHook(() => useChartData(emptyMonitor, mockTheme));
 
         const dataset = result.current.lineChartData.datasets[0];
-        expect(dataset.data).toHaveLength(0);
-        expect(dataset.pointBackgroundColor).toHaveLength(0);
+        expect(dataset).toBeDefined();
+        expect(dataset?.data).toHaveLength(0);
+        expect(dataset?.pointBackgroundColor).toHaveLength(0);
     });
 
     it("should sort history by timestamp", () => {
@@ -590,7 +594,8 @@ describe("useChartData", () => {
         const { result } = renderHook(() => useChartData(unsortedMonitor, mockTheme));
 
         const dataset = result.current.lineChartData.datasets[0];
-        expect(dataset.data).toEqual([
+        expect(dataset).toBeDefined();
+        expect(dataset?.data).toEqual([
             { x: 1000, y: 200 },
             { x: 2000, y: 0 },
             { x: 3000, y: 150 },
@@ -625,7 +630,7 @@ describe("useChartData", () => {
         rerender({ monitor: newMonitor, theme: mockTheme });
 
         expect(result.current).not.toBe(firstResult);
-        expect(result.current.lineChartData.datasets[0].data).toHaveLength(4);
+        expect(result.current.lineChartData.datasets[0]?.data).toHaveLength(4);
     });
 });
 

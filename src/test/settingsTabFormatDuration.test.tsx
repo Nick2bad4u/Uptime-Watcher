@@ -49,7 +49,7 @@ vi.mock("../theme/components", () => ({
         <button
             data-testid="themed-button"
             onClick={onClick}
-            disabled={disabled || loading}
+            disabled={disabled ?? loading}
             className={className}
             data-variant={variant}
             data-size={size}
@@ -78,7 +78,7 @@ vi.mock("../theme/components", () => ({
     ThemedInput: vi.fn(({ onChange, value, disabled, className, type, min, max, step, placeholder, ...props }) => (
         <input
             data-testid="themed-input"
-            type={type || "text"}
+            type={type ?? "text"}
             value={value}
             onChange={onChange}
             disabled={disabled}
@@ -159,17 +159,17 @@ describe("SettingsTab formatDuration Coverage", () => {
 
         // Check that options exist for the mocked intervals
         // Raw numbers (5000, 30000) should trigger lines 44-45: getIntervalLabel -> formatDuration
-        expect(intervalSelect.querySelector('option[value="5000"]')).toBeInTheDocument();
-        expect(intervalSelect.querySelector('option[value="30000"]')).toBeInTheDocument();
+        expect(intervalSelect?.querySelector('option[value="5000"]')).toBeInTheDocument();
+        expect(intervalSelect?.querySelector('option[value="30000"]')).toBeInTheDocument();
 
         // Objects without labels should trigger line 51: formatDuration(interval.value)
-        expect(intervalSelect.querySelector('option[value="120000"]')).toBeInTheDocument();
-        expect(intervalSelect.querySelector('option[value="300000"]')).toBeInTheDocument();
-        expect(intervalSelect.querySelector('option[value="3600000"]')).toBeInTheDocument();
-        expect(intervalSelect.querySelector('option[value="7200000"]')).toBeInTheDocument();
+        expect(intervalSelect?.querySelector('option[value="120000"]')).toBeInTheDocument();
+        expect(intervalSelect?.querySelector('option[value="300000"]')).toBeInTheDocument();
+        expect(intervalSelect?.querySelector('option[value="3600000"]')).toBeInTheDocument();
+        expect(intervalSelect?.querySelector('option[value="7200000"]')).toBeInTheDocument();
 
         // This interval has a label, so it should use the label directly
-        expect(intervalSelect.querySelector('option[value="60000"]')).toBeInTheDocument();
+        expect(intervalSelect?.querySelector('option[value="60000"]')).toBeInTheDocument();
 
         // The formatDuration function should now be called for:
         // 1. Raw numbers (lines 44-45): 5000ms, 30000ms -> "5s", "30s"
@@ -190,26 +190,26 @@ describe("SettingsTab formatDuration Coverage", () => {
         // and the option text should reflect the formatDuration output
 
         // Check that the options render correctly - the text content should be the result of formatDuration
-        const option5s = intervalSelect.querySelector('option[value="5000"]');
+        const option5s = intervalSelect?.querySelector('option[value="5000"]');
         expect(option5s).toBeInTheDocument();
 
-        const option30s = intervalSelect.querySelector('option[value="30000"]');
+        const option30s = intervalSelect?.querySelector('option[value="30000"]');
         expect(option30s).toBeInTheDocument();
 
-        const option2m = intervalSelect.querySelector('option[value="120000"]');
+        const option2m = intervalSelect?.querySelector('option[value="120000"]');
         expect(option2m).toBeInTheDocument();
 
-        const option5m = intervalSelect.querySelector('option[value="300000"]');
+        const option5m = intervalSelect?.querySelector('option[value="300000"]');
         expect(option5m).toBeInTheDocument();
 
-        const option1h = intervalSelect.querySelector('option[value="3600000"]');
+        const option1h = intervalSelect?.querySelector('option[value="3600000"]');
         expect(option1h).toBeInTheDocument();
 
-        const option2h = intervalSelect.querySelector('option[value="7200000"]');
+        const option2h = intervalSelect?.querySelector('option[value="7200000"]');
         expect(option2h).toBeInTheDocument();
 
         // The option with a label should use the label
-        const optionWithLabel = intervalSelect.querySelector('option[value="60000"]');
+        const optionWithLabel = intervalSelect?.querySelector('option[value="60000"]');
         expect(optionWithLabel).toBeInTheDocument();
     });
 
@@ -231,7 +231,7 @@ describe("SettingsTab formatDuration Coverage", () => {
         // This happens when getIntervalLabel receives a number directly
 
         // The component should render correctly with all interval options
-        expect(intervalSelect.querySelectorAll("option")).toHaveLength(7); // 6 without labels + 1 with label
+        expect(intervalSelect?.querySelectorAll("option")).toHaveLength(7); // 6 without labels + 1 with label
     });
 
     it("should cover calculateMaxDuration with zero retry attempts (line 194)", () => {

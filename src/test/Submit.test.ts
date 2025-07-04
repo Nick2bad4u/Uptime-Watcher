@@ -524,7 +524,7 @@ describe("AddSiteForm Submit", () => {
         it("should create HTTP monitor with URL", async () => {
             await handleSubmit(mockEvent, baseProps);
 
-            const monitor = mockCreateSite.mock.calls[0][0].monitors[0];
+            const monitor = mockCreateSite.mock.calls[0]?.[0]?.monitors[0];
             expect(monitor).toHaveProperty("url", "https://example.com");
             expect(monitor).not.toHaveProperty("host");
             expect(monitor).not.toHaveProperty("port");
@@ -539,7 +539,7 @@ describe("AddSiteForm Submit", () => {
                 url: "",
             });
 
-            const monitor = mockCreateSite.mock.calls[0][0].monitors[0];
+            const monitor = mockCreateSite.mock.calls[0]?.[0]?.monitors[0];
             expect(monitor).toHaveProperty("host", "api.example.com");
             expect(monitor).toHaveProperty("port", 3000);
             expect(monitor).not.toHaveProperty("url");
@@ -548,10 +548,9 @@ describe("AddSiteForm Submit", () => {
 
     describe("Edge Cases", () => {
         it("should handle missing onSuccess callback", async () => {
-            await handleSubmit(mockEvent, {
-                ...baseProps,
-                onSuccess: undefined,
-            });
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { onSuccess, ...propsWithoutOnSuccess } = baseProps;
+            await handleSubmit(mockEvent, propsWithoutOnSuccess);
 
             expect(mockCreateSite).toHaveBeenCalled();
             // Should not throw error when onSuccess is not provided

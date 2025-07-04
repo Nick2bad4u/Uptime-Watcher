@@ -532,21 +532,22 @@ describe("HttpMonitor", () => {
             const mockConfig = { metadata: undefined };
 
             // Get the request interceptor success callback
-            const requestSuccessCallback = mockAxiosInstance.interceptors.request.use.mock.calls[0][0];
-            const result = requestSuccessCallback(mockConfig);
+            const requestSuccessCallback = mockAxiosInstance.interceptors.request.use.mock.calls[0]?.[0];
+            expect(requestSuccessCallback).toBeDefined();
+            const result = requestSuccessCallback?.(mockConfig);
 
             expect(result.metadata.startTime).toBeTypeOf("number");
         });
 
         it("should handle request interceptor error", () => {
-            const requestErrorCallback = mockAxiosInstance.interceptors.request.use.mock.calls[0][1];
+            const requestErrorCallback = mockAxiosInstance.interceptors.request.use.mock.calls[0]?.[1];
             const error = new Error("Request setup failed");
 
             expect(() => requestErrorCallback(error)).rejects.toThrow("Request setup failed");
         });
 
         it("should handle request interceptor with non-Error", () => {
-            const requestErrorCallback = mockAxiosInstance.interceptors.request.use.mock.calls[0][1];
+            const requestErrorCallback = mockAxiosInstance.interceptors.request.use.mock.calls[0]?.[1];
 
             expect(() => requestErrorCallback("string error")).rejects.toThrow("string error");
         });
@@ -560,7 +561,7 @@ describe("HttpMonitor", () => {
             // Mock performance.now to return predictable values
             const mockPerformanceNow = vi.spyOn(performance, "now").mockReturnValue(1150);
 
-            const responseSuccessCallback = mockAxiosInstance.interceptors.response.use.mock.calls[0][0];
+            const responseSuccessCallback = mockAxiosInstance.interceptors.response.use.mock.calls[0]?.[0];
             const result = responseSuccessCallback(mockResponse);
 
             expect(result.responseTime).toBe(150); // 1150 - 1000 = 150
@@ -571,7 +572,7 @@ describe("HttpMonitor", () => {
         it("should handle response interceptor success without metadata", () => {
             const mockResponse = { config: {}, responseTime: undefined };
 
-            const responseSuccessCallback = mockAxiosInstance.interceptors.response.use.mock.calls[0][0];
+            const responseSuccessCallback = mockAxiosInstance.interceptors.response.use.mock.calls[0]?.[0];
             const result = responseSuccessCallback(mockResponse);
 
             expect(result.responseTime).toBeUndefined();
@@ -585,7 +586,7 @@ describe("HttpMonitor", () => {
 
             const mockPerformanceNow = vi.spyOn(performance, "now").mockReturnValue(1200);
 
-            const responseErrorCallback = mockAxiosInstance.interceptors.response.use.mock.calls[0][1];
+            const responseErrorCallback = mockAxiosInstance.interceptors.response.use.mock.calls[0]?.[1];
 
             try {
                 await responseErrorCallback(mockError);
@@ -599,13 +600,13 @@ describe("HttpMonitor", () => {
         it("should handle response interceptor error without metadata", async () => {
             const mockError = { config: {}, responseTime: undefined };
 
-            const responseErrorCallback = mockAxiosInstance.interceptors.response.use.mock.calls[0][1];
+            const responseErrorCallback = mockAxiosInstance.interceptors.response.use.mock.calls[0]?.[1];
 
             await expect(responseErrorCallback(mockError)).rejects.toThrow("[object Object]");
         });
 
         it("should handle response interceptor with non-Error", () => {
-            const responseErrorCallback = mockAxiosInstance.interceptors.response.use.mock.calls[0][1];
+            const responseErrorCallback = mockAxiosInstance.interceptors.response.use.mock.calls[0]?.[1];
 
             expect(() => responseErrorCallback("string error")).rejects.toThrow("string error");
         });
@@ -777,9 +778,8 @@ describe("HttpMonitor", () => {
             timeout: undefined, // Explicitly undefined
         };
 
-        // Create HttpMonitor with explicit undefined timeout in config
+        // Create HttpMonitor with timeout omitted (effectively undefined)
         const monitorWithUndefinedConfig = new HttpMonitor({
-            timeout: undefined, // Explicitly undefined, not missing
             userAgent: "Test",
         });
 

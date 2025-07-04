@@ -75,7 +75,7 @@ describe("SiteCardMetrics", () => {
 
     describe("Edge Cases", () => {
         it("should handle undefined response time", () => {
-            render(<SiteCardMetrics status="up" uptime={98.5} responseTime={undefined} checkCount={144} />);
+            render(<SiteCardMetrics status="up" uptime={98.5} checkCount={144} />);
 
             expect(screen.getByTestId("metric-value-response")).toHaveTextContent("-");
         });
@@ -106,13 +106,13 @@ describe("SiteCardMetrics", () => {
         });
 
         it("should handle zero uptime", () => {
-            render(<SiteCardMetrics status="down" uptime={0} responseTime={undefined} checkCount={50} />);
+            render(<SiteCardMetrics status="down" uptime={0} checkCount={50} />);
 
             expect(screen.getByTestId("metric-value-uptime")).toHaveTextContent("0%");
         });
 
         it("should handle zero check count", () => {
-            render(<SiteCardMetrics status="pending" uptime={0} responseTime={undefined} checkCount={0} />);
+            render(<SiteCardMetrics status="pending" uptime={0} checkCount={0} />);
 
             expect(screen.getByTestId("metric-value-checks")).toHaveTextContent("0");
         });

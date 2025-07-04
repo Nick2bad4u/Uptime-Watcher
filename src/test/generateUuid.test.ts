@@ -53,11 +53,11 @@ describe("UUID Generation", () => {
             const uuid = generateUuid();
             const afterTime = Date.now();
 
-            const timestampMatch = uuid.match(/(\d+)$/);
+            const timestampMatch = /(\d+)$/.exec(uuid);
             expect(timestampMatch).toBeTruthy();
 
             if (timestampMatch) {
-                const timestamp = parseInt(timestampMatch[1]);
+                const timestamp = parseInt(timestampMatch[1] ?? "");
                 expect(timestamp).toBeGreaterThanOrEqual(beforeTime);
                 expect(timestamp).toBeLessThanOrEqual(afterTime);
             }

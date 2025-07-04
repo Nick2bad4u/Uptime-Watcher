@@ -108,7 +108,7 @@ describe("HistoryTab Edge Cases", () => {
 
     const createMockMonitor = (
         type: "http" | "port",
-        history: (StatusHistory & { details?: string })[] = []
+        history: StatusHistory[] = []
     ): Monitor => ({
         id: "monitor-1",
         type,
@@ -119,7 +119,7 @@ describe("HistoryTab Edge Cases", () => {
         url: type === "http" ? "https://example.com" : undefined,
         host: type === "port" ? "example.com" : undefined,
         port: type === "port" ? 80 : undefined,
-        history: history as StatusHistory[], // Cast back to StatusHistory[] for the Monitor interface
+        history: history,
     });
 
     const defaultProps = {
@@ -131,8 +131,8 @@ describe("HistoryTab Edge Cases", () => {
 
     describe("details rendering logic (line 105)", () => {
         it("should render nothing when details are null for HTTP monitor", () => {
-            const historyWithNullDetails: (StatusHistory & { details?: string })[] = [
-                { timestamp: 1640995200000, status: "up", responseTime: 150, details: undefined },
+            const historyWithNullDetails: StatusHistory[] = [
+                { timestamp: 1640995200000, status: "up", responseTime: 150 },
             ];
             const monitor = createMockMonitor("http", historyWithNullDetails);
 
@@ -143,8 +143,8 @@ describe("HistoryTab Edge Cases", () => {
         });
 
         it("should render nothing when details are undefined for HTTP monitor", () => {
-            const historyWithUndefinedDetails: (StatusHistory & { details?: string })[] = [
-                { timestamp: 1640995200000, status: "up", responseTime: 150, details: undefined },
+            const historyWithUndefinedDetails: StatusHistory[] = [
+                { timestamp: 1640995200000, status: "up", responseTime: 150 },
             ];
             const monitor = createMockMonitor("http", historyWithUndefinedDetails);
 
@@ -192,7 +192,7 @@ describe("HistoryTab Edge Cases", () => {
 
         it("should render nothing for null details on port monitor", () => {
             const historyWithNullDetails: (StatusHistory & { details?: string })[] = [
-                { timestamp: 1640995200000, status: "up", responseTime: 150, details: undefined },
+                { timestamp: 1640995200000, status: "up", responseTime: 150 },
             ];
             const monitor = createMockMonitor("port", historyWithNullDetails);
 
@@ -204,7 +204,7 @@ describe("HistoryTab Edge Cases", () => {
 
         it("should render nothing for undefined details on port monitor", () => {
             const historyWithUndefinedDetails: (StatusHistory & { details?: string })[] = [
-                { timestamp: 1640995200000, status: "up", responseTime: 150, details: undefined },
+                { timestamp: 1640995200000, status: "up", responseTime: 150 },
             ];
             const monitor = createMockMonitor("port", historyWithUndefinedDetails);
 
@@ -268,7 +268,7 @@ describe("HistoryTab Edge Cases", () => {
                 checkInterval: 60000,
                 timeout: 5000,
                 retryAttempts: 3,
-                history: undefined,
+                history: [],
             };
 
             render(<HistoryTab {...defaultProps} selectedMonitor={monitorWithUndefinedHistory} />);
@@ -286,7 +286,7 @@ describe("HistoryTab Edge Cases", () => {
                 checkInterval: 60000,
                 timeout: 5000,
                 retryAttempts: 3,
-                history: null,
+                history: [],
             };
 
             render(<HistoryTab {...defaultProps} selectedMonitor={monitorWithNullHistory} />);
@@ -304,7 +304,7 @@ describe("HistoryTab Edge Cases", () => {
                 checkInterval: 60000,
                 timeout: 5000,
                 retryAttempts: 3,
-                history: undefined,
+                history: [],
             };
 
             // This should not crash and should handle the || [] fallback

@@ -193,7 +193,7 @@ describe("UptimeOrchestrator - Monitoring Control", () => {
     describe("Monitoring Control", () => {
         describe("startMonitoring", () => {
             it("should start scheduler for all sites", async () => {
-                const schedulerInstance = mockMonitorScheduler.mock.results[0].value;
+                const schedulerInstance = mockMonitorScheduler.mock.results[0]?.value;
 
                 // Add a site with monitors
                 await uptimeOrchestrator.addSite({
@@ -217,7 +217,7 @@ describe("UptimeOrchestrator - Monitoring Control", () => {
             });
 
             it("should set monitoring flag", async () => {
-                const schedulerInstance = mockMonitorScheduler.mock.results[0].value;
+                const schedulerInstance = mockMonitorScheduler.mock.results[0]?.value;
 
                 // Add a site with monitors
                 await uptimeOrchestrator.addSite({
@@ -244,7 +244,7 @@ describe("UptimeOrchestrator - Monitoring Control", () => {
 
         describe("stopMonitoring", () => {
             it("should stop all scheduled monitoring", () => {
-                const schedulerInstance = mockMonitorScheduler.mock.results[0].value;
+                const schedulerInstance = mockMonitorScheduler.mock.results[0]?.value;
 
                 uptimeOrchestrator.stopMonitoring();
 
@@ -254,7 +254,7 @@ describe("UptimeOrchestrator - Monitoring Control", () => {
 
         describe("startMonitoringForSite", () => {
             it("should start monitoring for specific site", async () => {
-                const schedulerInstance = mockMonitorScheduler.mock.results[0].value;
+                const schedulerInstance = mockMonitorScheduler.mock.results[0]?.value;
                 const identifier = "test-site";
 
                 // Add a site first
@@ -285,7 +285,7 @@ describe("UptimeOrchestrator - Monitoring Control", () => {
             });
 
             it("should start monitoring for specific monitor", async () => {
-                const schedulerInstance = mockMonitorScheduler.mock.results[0].value;
+                const schedulerInstance = mockMonitorScheduler.mock.results[0]?.value;
                 const identifier = "test-site";
                 const originalMonitorId = "monitor1";
 
@@ -335,7 +335,7 @@ describe("UptimeOrchestrator - Monitoring Control", () => {
             });
 
             it("should handle errors when starting multiple monitors", async () => {
-                const schedulerInstance = mockMonitorScheduler.mock.results[0].value;
+                const schedulerInstance = mockMonitorScheduler.mock.results[0]?.value;
                 const identifier = "test-site";
 
                 // Mock the first call to succeed and subsequent calls to fail
@@ -372,7 +372,7 @@ describe("UptimeOrchestrator - Monitoring Control", () => {
 
         describe("stopMonitoringForSite", () => {
             it("should stop monitoring for specific site", async () => {
-                const schedulerInstance = mockMonitorScheduler.mock.results[0].value;
+                const schedulerInstance = mockMonitorScheduler.mock.results[0]?.value;
                 const identifier = "test-site";
 
                 // Add a site first
@@ -403,8 +403,8 @@ describe("UptimeOrchestrator - Monitoring Control", () => {
             });
 
             it("should stop monitoring for specific monitor", async () => {
-                const schedulerInstance = mockMonitorScheduler.mock.results[0].value;
-                const monitorRepoInstance = mockMonitorRepository.mock.results[0].value;
+                const schedulerInstance = mockMonitorScheduler.mock.results[0]?.value;
+                const monitorRepoInstance = mockMonitorRepository.mock.results[0]?.value;
                 const identifier = "test-site";
                 const monitorId = "mock-monitor-id"; // Use the ID that will be assigned by the mock repository
 
@@ -437,7 +437,7 @@ describe("UptimeOrchestrator - Monitoring Control", () => {
             });
 
             it("should return false for non-existent monitor", async () => {
-                const schedulerInstance = mockMonitorScheduler.mock.results[0].value;
+                const schedulerInstance = mockMonitorScheduler.mock.results[0]?.value;
                 const identifier = "test-site";
 
                 // Mock scheduler to return false for non-existent monitor
@@ -464,7 +464,7 @@ describe("UptimeOrchestrator - Monitoring Control", () => {
             });
 
             it("should stop monitoring for all monitors when no monitorId provided", async () => {
-                const schedulerInstance = mockMonitorScheduler.mock.results[0].value;
+                const schedulerInstance = mockMonitorScheduler.mock.results[0]?.value;
                 const identifier = "test-site";
 
                 // Add a site with multiple monitors

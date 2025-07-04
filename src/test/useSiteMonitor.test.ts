@@ -73,7 +73,7 @@ describe("useSiteMonitor", () => {
             expect(result.current.responseTime).toBe(200);
             expect(result.current.isMonitoring).toBe(true);
             expect(result.current.monitorIds).toEqual(["monitor-1", "monitor-2"]);
-            expect(result.current.filteredHistory).toEqual(mockSite.monitors[0].history);
+            expect(result.current.filteredHistory).toEqual(mockSite.monitors[0]?.history ?? []);
         });
 
         it("should use store sites when available", () => {
@@ -202,7 +202,7 @@ describe("useSiteMonitor", () => {
         it("should return monitor history", () => {
             const { result } = renderHook(() => useSiteMonitor(mockSite));
 
-            expect(result.current.filteredHistory).toEqual(mockSite.monitors[0].history);
+            expect(result.current.filteredHistory).toEqual(mockSite.monitors[0]?.history ?? []);
         });
 
         it("should return empty array for undefined monitor", () => {
@@ -295,7 +295,7 @@ describe("useSiteMonitor", () => {
             const updatedSite = {
                 ...mockSite,
                 monitors: [
-                    mockSite.monitors[0],
+                    ...(mockSite.monitors[0] ? [mockSite.monitors[0]] : []),
                     {
                         id: "monitor-3",
                         type: "http",
@@ -355,7 +355,7 @@ describe("useSiteMonitor", () => {
         it("should handle site with single monitor", () => {
             const singleMonitorSite: Site = {
                 identifier: "single-site",
-                monitors: [mockSite.monitors[0]],
+                monitors: mockSite.monitors[0] ? [mockSite.monitors[0]] : [],
             };
 
             mockStore.sites = [singleMonitorSite];

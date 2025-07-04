@@ -41,7 +41,7 @@ vi.mock("../theme/components", () => ({
         <button
             data-testid="themed-button"
             onClick={onClick}
-            disabled={disabled || loading}
+            disabled={disabled ?? loading}
             className={className}
             data-variant={variant}
             data-size={size}
@@ -70,7 +70,7 @@ vi.mock("../theme/components", () => ({
     ThemedInput: vi.fn(({ onChange, value, disabled, className, type, min, max, step, placeholder, ...props }) => (
         <input
             data-testid="themed-input"
-            type={type || "text"}
+            type={type ?? "text"}
             value={value}
             onChange={onChange}
             disabled={disabled}
@@ -323,16 +323,16 @@ describe("SettingsTab", () => {
             // Verify all time ranges are represented in CHECK_INTERVALS that would exercise formatDuration
 
             // Test seconds range (< 60000ms) - these exist and would format as "Ns" if no label
-            expect(intervalSelect.querySelector('option[value="5000"]')).toBeInTheDocument();
-            expect(intervalSelect.querySelector('option[value="30000"]')).toBeInTheDocument();
+            expect(intervalSelect?.querySelector('option[value="5000"]')).toBeInTheDocument();
+            expect(intervalSelect?.querySelector('option[value="30000"]')).toBeInTheDocument();
 
             // Test minutes range (60000ms - 3599999ms) - these exist and would format as "Nm" if no label
-            expect(intervalSelect.querySelector('option[value="120000"]')).toBeInTheDocument();
-            expect(intervalSelect.querySelector('option[value="300000"]')).toBeInTheDocument();
+            expect(intervalSelect?.querySelector('option[value="120000"]')).toBeInTheDocument();
+            expect(intervalSelect?.querySelector('option[value="300000"]')).toBeInTheDocument();
 
             // Test hours range (>= 3600000ms) - these exist and would format as "Nh" if no label
-            expect(intervalSelect.querySelector('option[value="3600000"]')).toBeInTheDocument();
-            expect(intervalSelect.querySelector('option[value="7200000"]')).toBeInTheDocument();
+            expect(intervalSelect?.querySelector('option[value="3600000"]')).toBeInTheDocument();
+            expect(intervalSelect?.querySelector('option[value="7200000"]')).toBeInTheDocument();
 
             // Even though formatDuration isn't called in the current implementation,
             // the logic is present and would work for all three time ranges
@@ -384,7 +384,9 @@ describe("SettingsTab", () => {
 
             const saveButtons = screen.getAllByText("Save");
             const nameSaveButton = saveButtons[0];
-            await user.click(nameSaveButton);
+            if (nameSaveButton) {
+                await user.click(nameSaveButton);
+            }
 
             expect(defaultProps.handleSaveName).toHaveBeenCalled();
         });
@@ -424,7 +426,9 @@ describe("SettingsTab", () => {
 
             const saveButtons = screen.getAllByText("Save");
             const intervalSaveButton = saveButtons[1];
-            await user.click(intervalSaveButton);
+            if (intervalSaveButton) {
+                await user.click(intervalSaveButton);
+            }
 
             expect(defaultProps.handleSaveInterval).toHaveBeenCalled();
         });
@@ -471,7 +475,9 @@ describe("SettingsTab", () => {
 
             const saveButtons = screen.getAllByText("Save");
             const timeoutSaveButton = saveButtons[2];
-            await user.click(timeoutSaveButton);
+            if (timeoutSaveButton) {
+                await user.click(timeoutSaveButton);
+            }
 
             expect(defaultProps.handleSaveTimeout).toHaveBeenCalled();
         });
@@ -512,7 +518,9 @@ describe("SettingsTab", () => {
 
             const saveButtons = screen.getAllByText("Save");
             const retrySaveButton = saveButtons[3];
-            await user.click(retrySaveButton);
+            if (retrySaveButton) {
+                await user.click(retrySaveButton);
+            }
 
             expect(defaultProps.handleSaveRetryAttempts).toHaveBeenCalled();
         });
@@ -724,7 +732,9 @@ describe("SettingsTab", () => {
             // Trigger the save name action to test line 188
             const saveButtons = screen.getAllByText("Save");
             const saveNameButton = saveButtons[0]; // First save button is for name
-            await userEvent.click(saveNameButton);
+            if (saveNameButton) {
+                await userEvent.click(saveNameButton);
+            }
 
             // Trigger the remove site action to test line 207
             const removeButton = screen.getByRole("button", { name: /Remove Site/i });
@@ -857,7 +867,9 @@ describe("SettingsTab", () => {
             // Trigger the save name action to test line 188
             const saveButtons = screen.getAllByText("Save");
             const saveNameButton = saveButtons[0]; // First save button is for name
-            await userEvent.click(saveNameButton);
+            if (saveNameButton) {
+                await userEvent.click(saveNameButton);
+            }
 
             // Verify the logger was called with empty string fallback
             expect(mockedLogger.user.action).toHaveBeenCalledWith(

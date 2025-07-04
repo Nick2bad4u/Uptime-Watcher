@@ -14,6 +14,13 @@ describe("Electron Preload Script", () => {
         send: ReturnType<typeof vi.fn>;
     };
 
+    // Helper function to safely get exposed API
+    const getExposedAPI = () => {
+        const exposedAPI = mockContextBridge.exposeInMainWorld.mock.calls[0]?.[1];
+        expect(exposedAPI).toBeDefined();
+        return exposedAPI;
+    };
+
     beforeEach(() => {
         // Reset mocks before each test
         vi.resetModules();
@@ -62,7 +69,7 @@ describe("Electron Preload Script", () => {
         it("should expose all site management methods", async () => {
             await import("../preload");
 
-            const exposedAPI = mockContextBridge.exposeInMainWorld.mock.calls[0][1];
+            const exposedAPI = getExposedAPI();
             const siteAPI = exposedAPI.sites;
 
             expect(siteAPI).toHaveProperty("addSite");
@@ -75,7 +82,7 @@ describe("Electron Preload Script", () => {
         it("should properly invoke IPC for addSite", async () => {
             await import("../preload");
 
-            const exposedAPI = mockContextBridge.exposeInMainWorld.mock.calls[0][1];
+            const exposedAPI = getExposedAPI();
             const mockSite = { identifier: "test", name: "Test Site", monitors: [] };
 
             await exposedAPI.sites.addSite(mockSite);
@@ -86,7 +93,7 @@ describe("Electron Preload Script", () => {
         it("should properly invoke IPC for getSites", async () => {
             await import("../preload");
 
-            const exposedAPI = mockContextBridge.exposeInMainWorld.mock.calls[0][1];
+            const exposedAPI = getExposedAPI();
 
             await exposedAPI.sites.getSites();
 
@@ -96,7 +103,7 @@ describe("Electron Preload Script", () => {
         it("should properly invoke IPC for removeSite", async () => {
             await import("../preload");
 
-            const exposedAPI = mockContextBridge.exposeInMainWorld.mock.calls[0][1];
+            const exposedAPI = getExposedAPI();
             const identifier = "test-site-123";
 
             await exposedAPI.sites.removeSite(identifier);
@@ -107,7 +114,7 @@ describe("Electron Preload Script", () => {
         it("should properly invoke IPC for updateSite", async () => {
             await import("../preload");
 
-            const exposedAPI = mockContextBridge.exposeInMainWorld.mock.calls[0][1];
+            const exposedAPI = getExposedAPI();
             const identifier = "test-site-123";
             const updates = { name: "Updated Name" };
 
@@ -119,7 +126,7 @@ describe("Electron Preload Script", () => {
         it("should properly invoke IPC for checkSiteNow", async () => {
             await import("../preload");
 
-            const exposedAPI = mockContextBridge.exposeInMainWorld.mock.calls[0][1];
+            const exposedAPI = getExposedAPI();
             const identifier = "test-site-123";
             const monitorType = "http";
 
@@ -133,7 +140,7 @@ describe("Electron Preload Script", () => {
         it("should expose all monitoring control methods", async () => {
             await import("../preload");
 
-            const exposedAPI = mockContextBridge.exposeInMainWorld.mock.calls[0][1];
+            const exposedAPI = getExposedAPI();
             const monitoringAPI = exposedAPI.monitoring;
 
             expect(monitoringAPI).toHaveProperty("startMonitoring");
@@ -145,7 +152,7 @@ describe("Electron Preload Script", () => {
         it("should properly invoke IPC for startMonitoring", async () => {
             await import("../preload");
 
-            const exposedAPI = mockContextBridge.exposeInMainWorld.mock.calls[0][1];
+            const exposedAPI = getExposedAPI();
 
             await exposedAPI.monitoring.startMonitoring();
 
@@ -155,7 +162,7 @@ describe("Electron Preload Script", () => {
         it("should properly invoke IPC for stopMonitoring", async () => {
             await import("../preload");
 
-            const exposedAPI = mockContextBridge.exposeInMainWorld.mock.calls[0][1];
+            const exposedAPI = getExposedAPI();
 
             await exposedAPI.monitoring.stopMonitoring();
 
@@ -165,7 +172,7 @@ describe("Electron Preload Script", () => {
         it("should properly invoke IPC for startMonitoringForSite", async () => {
             await import("../preload");
 
-            const exposedAPI = mockContextBridge.exposeInMainWorld.mock.calls[0][1];
+            const exposedAPI = getExposedAPI();
             const identifier = "test-site";
             const monitorType = "http";
 
@@ -177,7 +184,7 @@ describe("Electron Preload Script", () => {
         it("should properly invoke IPC for stopMonitoringForSite", async () => {
             await import("../preload");
 
-            const exposedAPI = mockContextBridge.exposeInMainWorld.mock.calls[0][1];
+            const exposedAPI = getExposedAPI();
             const identifier = "test-site";
             const monitorType = "port";
 
@@ -191,7 +198,7 @@ describe("Electron Preload Script", () => {
         it("should expose all data management methods", async () => {
             await import("../preload");
 
-            const exposedAPI = mockContextBridge.exposeInMainWorld.mock.calls[0][1];
+            const exposedAPI = getExposedAPI();
             const dataAPI = exposedAPI.data;
 
             expect(dataAPI).toHaveProperty("exportData");
@@ -202,7 +209,7 @@ describe("Electron Preload Script", () => {
         it("should properly invoke IPC for exportData", async () => {
             await import("../preload");
 
-            const exposedAPI = mockContextBridge.exposeInMainWorld.mock.calls[0][1];
+            const exposedAPI = getExposedAPI();
 
             await exposedAPI.data.exportData();
 
@@ -212,7 +219,7 @@ describe("Electron Preload Script", () => {
         it("should properly invoke IPC for importData", async () => {
             await import("../preload");
 
-            const exposedAPI = mockContextBridge.exposeInMainWorld.mock.calls[0][1];
+            const exposedAPI = getExposedAPI();
             const data = '{"sites": []}';
 
             await exposedAPI.data.importData(data);
@@ -223,7 +230,7 @@ describe("Electron Preload Script", () => {
         it("should properly invoke IPC for downloadSQLiteBackup", async () => {
             await import("../preload");
 
-            const exposedAPI = mockContextBridge.exposeInMainWorld.mock.calls[0][1];
+            const exposedAPI = getExposedAPI();
 
             await exposedAPI.data.downloadSQLiteBackup();
 
@@ -235,7 +242,7 @@ describe("Electron Preload Script", () => {
         it("should expose all settings methods", async () => {
             await import("../preload");
 
-            const exposedAPI = mockContextBridge.exposeInMainWorld.mock.calls[0][1];
+            const exposedAPI = getExposedAPI();
             const settingsAPI = exposedAPI.settings;
 
             expect(settingsAPI).toHaveProperty("getHistoryLimit");
@@ -245,7 +252,7 @@ describe("Electron Preload Script", () => {
         it("should properly invoke IPC for getHistoryLimit", async () => {
             await import("../preload");
 
-            const exposedAPI = mockContextBridge.exposeInMainWorld.mock.calls[0][1];
+            const exposedAPI = getExposedAPI();
 
             await exposedAPI.settings.getHistoryLimit();
 
@@ -255,7 +262,7 @@ describe("Electron Preload Script", () => {
         it("should properly invoke IPC for updateHistoryLimit", async () => {
             await import("../preload");
 
-            const exposedAPI = mockContextBridge.exposeInMainWorld.mock.calls[0][1];
+            const exposedAPI = getExposedAPI();
             const limit = 1000;
 
             await exposedAPI.settings.updateHistoryLimit(limit);
@@ -268,7 +275,7 @@ describe("Electron Preload Script", () => {
         it("should expose all event handling methods", async () => {
             await import("../preload");
 
-            const exposedAPI = mockContextBridge.exposeInMainWorld.mock.calls[0][1];
+            const exposedAPI = getExposedAPI();
             const eventsAPI = exposedAPI.events;
 
             expect(eventsAPI).toHaveProperty("onStatusUpdate");
@@ -279,7 +286,7 @@ describe("Electron Preload Script", () => {
         it("should properly setup IPC listener for onStatusUpdate", async () => {
             await import("../preload");
 
-            const exposedAPI = mockContextBridge.exposeInMainWorld.mock.calls[0][1];
+            const exposedAPI = getExposedAPI();
             const callback = vi.fn();
 
             exposedAPI.events.onStatusUpdate(callback);
@@ -290,7 +297,7 @@ describe("Electron Preload Script", () => {
         it("should properly setup IPC listener for onUpdateStatus", async () => {
             await import("../preload");
 
-            const exposedAPI = mockContextBridge.exposeInMainWorld.mock.calls[0][1];
+            const exposedAPI = getExposedAPI();
             const callback = vi.fn();
 
             exposedAPI.events.onUpdateStatus(callback);
@@ -301,7 +308,7 @@ describe("Electron Preload Script", () => {
         it("should properly remove listeners", async () => {
             await import("../preload");
 
-            const exposedAPI = mockContextBridge.exposeInMainWorld.mock.calls[0][1];
+            const exposedAPI = getExposedAPI();
             const channel = "status-update";
 
             exposedAPI.events.removeAllListeners(channel);
@@ -312,7 +319,7 @@ describe("Electron Preload Script", () => {
         it("should call callback with data when IPC event is received", async () => {
             await import("../preload");
 
-            const exposedAPI = mockContextBridge.exposeInMainWorld.mock.calls[0][1];
+            const exposedAPI = getExposedAPI();
             const callback = vi.fn();
 
             exposedAPI.events.onStatusUpdate(callback);
@@ -335,7 +342,7 @@ describe("Electron Preload Script", () => {
         it("should expose system methods", async () => {
             await import("../preload");
 
-            const exposedAPI = mockContextBridge.exposeInMainWorld.mock.calls[0][1];
+            const exposedAPI = getExposedAPI();
             const systemAPI = exposedAPI.system;
 
             expect(systemAPI).toHaveProperty("quitAndInstall");
@@ -348,7 +355,7 @@ describe("Electron Preload Script", () => {
 
             await import("../preload");
 
-            const exposedAPI = mockContextBridge.exposeInMainWorld.mock.calls[0][1];
+            const exposedAPI = getExposedAPI();
 
             exposedAPI.system.quitAndInstall();
 
@@ -360,7 +367,7 @@ describe("Electron Preload Script", () => {
         it("should only expose safe IPC communication methods", async () => {
             await import("../preload");
 
-            const exposedAPI = mockContextBridge.exposeInMainWorld.mock.calls[0][1];
+            const exposedAPI = getExposedAPI();
 
             // Should not expose dangerous methods
             expect(exposedAPI).not.toHaveProperty("require");
@@ -379,7 +386,7 @@ describe("Electron Preload Script", () => {
         it("should validate that all API methods return promises or are synchronous", async () => {
             await import("../preload");
 
-            const exposedAPI = mockContextBridge.exposeInMainWorld.mock.calls[0][1];
+            const exposedAPI = getExposedAPI();
 
             // Check that IPC invoke methods are async
             const result1 = exposedAPI.sites.getSites();
@@ -397,7 +404,7 @@ describe("Electron Preload Script", () => {
         it("should properly type the Site parameter in addSite", async () => {
             await import("../preload");
 
-            const exposedAPI = mockContextBridge.exposeInMainWorld.mock.calls[0][1];
+            const exposedAPI = getExposedAPI();
 
             // This should not throw type errors when called with proper Site object
             const site = {
@@ -413,7 +420,7 @@ describe("Electron Preload Script", () => {
         it("should properly handle partial Site updates in updateSite", async () => {
             await import("../preload");
 
-            const exposedAPI = mockContextBridge.exposeInMainWorld.mock.calls[0][1];
+            const exposedAPI = getExposedAPI();
 
             const partialUpdate = { name: "New Name" };
 

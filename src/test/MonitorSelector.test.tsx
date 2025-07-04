@@ -215,7 +215,7 @@ describe("MonitorSelector", () => {
             expect(mockOnChange).toHaveBeenCalledTimes(1);
 
             // Check that the callback received an event
-            const call = mockOnChange.mock.calls[0][0];
+            const call = mockOnChange.mock.calls[0]?.[0];
             expect(call).toBeDefined();
             expect(call.target).toBeDefined();
             expect(call.type).toBe("change");

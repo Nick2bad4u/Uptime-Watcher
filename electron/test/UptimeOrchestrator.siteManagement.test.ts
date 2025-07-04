@@ -193,7 +193,7 @@ describe("UptimeOrchestrator - Site Management", () => {
     describe("Site Management", () => {
         describe("getSites", () => {
             it("should return sites from database", async () => {
-                const siteRepoInstance = mockSiteRepository.mock.results[0].value;
+                const siteRepoInstance = mockSiteRepository.mock.results[0]?.value;
                 const mockSites = [
                     { identifier: "site1", name: "Site 1" },
                     { identifier: "site2", name: "Site 2" },
@@ -207,8 +207,8 @@ describe("UptimeOrchestrator - Site Management", () => {
             });
 
             it("should populate monitors for each site", async () => {
-                const siteRepoInstance = mockSiteRepository.mock.results[0].value;
-                const monitorRepoInstance = mockMonitorRepository.mock.results[0].value;
+                const siteRepoInstance = mockSiteRepository.mock.results[0]?.value;
+                const monitorRepoInstance = mockMonitorRepository.mock.results[0]?.value;
 
                 siteRepoInstance.findAll.mockResolvedValue([{ identifier: "site1", name: "Site 1" }]);
 
@@ -225,7 +225,7 @@ describe("UptimeOrchestrator - Site Management", () => {
 
         describe("addSite", () => {
             it("should add site to database", async () => {
-                const siteRepoInstance = mockSiteRepository.mock.results[0].value;
+                const siteRepoInstance = mockSiteRepository.mock.results[0]?.value;
                 const site = {
                     identifier: "new-site",
                     name: "New Site",
@@ -244,7 +244,7 @@ describe("UptimeOrchestrator - Site Management", () => {
             });
 
             it("should create monitors for the site", async () => {
-                const monitorRepoInstance = mockMonitorRepository.mock.results[0].value;
+                const monitorRepoInstance = mockMonitorRepository.mock.results[0]?.value;
                 const site = {
                     identifier: "new-site",
                     name: "New Site",
@@ -286,8 +286,8 @@ describe("UptimeOrchestrator - Site Management", () => {
 
         describe("removeSite", () => {
             it("should remove site from database", async () => {
-                const siteRepoInstance = mockSiteRepository.mock.results[0].value;
-                const monitorRepoInstance = mockMonitorRepository.mock.results[0].value;
+                const siteRepoInstance = mockSiteRepository.mock.results[0]?.value;
+                const monitorRepoInstance = mockMonitorRepository.mock.results[0]?.value;
                 const identifier = "site-to-remove";
 
                 // First add the site to in-memory cache so it can be removed
@@ -306,8 +306,8 @@ describe("UptimeOrchestrator - Site Management", () => {
             });
 
             it("should remove monitors and history", async () => {
-                const siteRepoInstance = mockSiteRepository.mock.results[0].value;
-                const monitorRepoInstance = mockMonitorRepository.mock.results[0].value;
+                const siteRepoInstance = mockSiteRepository.mock.results[0]?.value;
+                const monitorRepoInstance = mockMonitorRepository.mock.results[0]?.value;
                 const identifier = "site-to-remove";
 
                 // First add the site to in-memory cache so it can be removed
@@ -334,7 +334,7 @@ describe("UptimeOrchestrator - Site Management", () => {
             });
 
             it("should return false when site does not exist", async () => {
-                const siteRepoInstance = mockSiteRepository.mock.results[0].value;
+                const siteRepoInstance = mockSiteRepository.mock.results[0]?.value;
                 siteRepoInstance.findByIdentifier.mockResolvedValue(null);
 
                 const result = await uptimeOrchestrator.removeSite("non-existent");
@@ -350,7 +350,7 @@ describe("UptimeOrchestrator - Site Management", () => {
                 await uptimeOrchestrator.addSite(site);
 
                 // Mock database operations
-                const siteRepoInstance = mockSiteRepository.mock.results[0].value;
+                const siteRepoInstance = mockSiteRepository.mock.results[0]?.value;
                 siteRepoInstance.findByIdentifier.mockResolvedValue(site);
 
                 await uptimeOrchestrator.removeSite(identifier);

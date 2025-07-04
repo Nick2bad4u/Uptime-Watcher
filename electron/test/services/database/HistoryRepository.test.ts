@@ -127,7 +127,8 @@ describe("HistoryRepository", () => {
 
             const result = await historyRepository.findByMonitorId("monitor-1");
 
-            expect(result[0].status).toBe("down"); // Should default to "down"
+            expect(result).toHaveLength(1);
+            expect(result[0]?.status).toBe("down"); // Should default to "down"
         });
 
         it("should handle undefined details", async () => {
@@ -144,7 +145,8 @@ describe("HistoryRepository", () => {
 
             const result = await historyRepository.findByMonitorId("monitor-1");
 
-            expect(result[0].details).toBeUndefined();
+            expect(result).toHaveLength(1);
+            expect(result[0]?.details).toBeUndefined();
         });
     });
 

@@ -224,7 +224,9 @@ describe("Settings", () => {
             // Get all close buttons and find the error close button (second one)
             const closeButtons = screen.getAllByRole("button", { name: /✕/i });
             const errorCloseButton = closeButtons[1]; // Error close button is the second one
-            await user.click(errorCloseButton);
+            if (errorCloseButton) {
+                await user.click(errorCloseButton);
+            }
 
             expect(mockErrorStore.clearError).toHaveBeenCalledTimes(1);
         });

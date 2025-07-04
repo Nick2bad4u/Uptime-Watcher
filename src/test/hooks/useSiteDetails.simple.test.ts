@@ -4,8 +4,8 @@
 
 import { renderHook } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { useSiteDetails } from "../hooks/site/useSiteDetails";
-import type { Site } from "../types";
+import { useSiteDetails } from "../../hooks/site/useSiteDetails";
+import type { Site } from "../../types";
 
 // Mock the stores
 const mockUseSitesStore = {
@@ -52,7 +52,7 @@ vi.mock("../stores", () => ({
     useUIStore: () => mockUseUIStore,
 }));
 
-vi.mock("../hooks/site/useSiteAnalytics", () => ({
+vi.mock("./useSiteAnalytics", () => ({
     useSiteAnalytics: () => mockUseSiteAnalytics,
 }));
 
@@ -67,13 +67,6 @@ vi.mock("../services/logger", () => ({
 vi.mock("../constants", () => ({
     DEFAULT_CHECK_INTERVAL: 300000,
     DEFAULT_REQUEST_TIMEOUT_SECONDS: 30,
-    CHART_TIME_PERIODS: {
-        "1h": 60 * 60 * 1000,
-        "12h": 12 * 60 * 60 * 1000,
-        "24h": 24 * 60 * 60 * 1000,
-        "7d": 7 * 24 * 60 * 60 * 1000,
-        "30d": 30 * 24 * 60 * 60 * 1000,
-    },
 }));
 
 describe("useSiteDetails", () => {

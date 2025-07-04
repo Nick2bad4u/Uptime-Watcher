@@ -362,8 +362,8 @@ describe("HistoryTab", () => {
                 type: "http" as const,
                 history: [
                     { timestamp: 1640995200000, status: "up" as const, responseTime: 150, details: "200" },
-                    { timestamp: 1640995100000, status: "down" as const, responseTime: 0, details: null },
-                    { timestamp: 1640995000000, status: "up" as const, responseTime: 120, details: undefined },
+                    { timestamp: 1640995100000, status: "down" as const, responseTime: 0 },
+                    { timestamp: 1640995000000, status: "up" as const, responseTime: 120 },
                 ],
             };
 

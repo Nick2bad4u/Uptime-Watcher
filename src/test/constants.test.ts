@@ -64,7 +64,9 @@ describe("Constants", () => {
 
         it("has intervals in ascending order", () => {
             for (let i = 1; i < CHECK_INTERVALS.length; i++) {
-                expect(CHECK_INTERVALS[i].value).toBeGreaterThan(CHECK_INTERVALS[i - 1].value);
+                const current = CHECK_INTERVALS[i];
+                const previous = CHECK_INTERVALS[i - 1];
+                expect(current?.value).toBeGreaterThan(previous?.value ?? 0);
             }
         });
 
@@ -198,7 +200,9 @@ describe("Constants", () => {
         it("has periods in ascending order", () => {
             const periods = Object.values(CHART_TIME_PERIODS);
             for (let i = 1; i < periods.length; i++) {
-                expect(periods[i]).toBeGreaterThan(periods[i - 1]);
+                const current = periods[i];
+                const previous = periods[i - 1];
+                expect(current).toBeGreaterThan(previous ?? 0);
             }
         });
 

@@ -200,7 +200,8 @@ describe("UptimeOrchestrator - Basic", () => {
         });
 
         it("should set scheduler callback", () => {
-            const schedulerInstance = mockMonitorScheduler.mock.results[0].value;
+            const schedulerInstance = mockMonitorScheduler.mock.results[0]?.value;
+            expect(schedulerInstance).toBeDefined();
             expect(schedulerInstance.setCheckCallback).toHaveBeenCalledWith(expect.any(Function));
         });
     });
@@ -228,7 +229,8 @@ describe("UptimeOrchestrator - Basic", () => {
         });
 
         it("should use default history limit when setting not found", async () => {
-            const settingsRepoInstance = mockSettingsRepository.mock.results[0].value;
+            const settingsRepoInstance = mockSettingsRepository.mock.results[0]?.value;
+            expect(settingsRepoInstance).toBeDefined();
             settingsRepoInstance.get.mockResolvedValue(null);
 
             await uptimeOrchestrator.initialize();

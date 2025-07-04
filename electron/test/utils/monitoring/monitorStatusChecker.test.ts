@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach, Mock } from "vitest";
 import { DEFAULT_REQUEST_TIMEOUT } from "../../../constants";
 import { MonitorFactory } from "../../../services/monitoring/MonitorFactory";
 import { IMonitorService } from "../../../services/monitoring/types";
-import { Site } from "../../../types";
+import { Site, Monitor } from "../../../types";
 import { checkMonitor, MonitorCheckConfig } from "../../../utils/monitoring/monitorStatusChecker";
 
 // Mock the MonitorFactory
@@ -96,7 +96,9 @@ describe("monitorStatusChecker", () => {
             const customTimeout = 5000;
 
             // Set custom timeout on monitor
-            mockSite.monitors[0].timeout = customTimeout;
+            if (mockSite.monitors[0]) {
+                mockSite.monitors[0].timeout = customTimeout;
+            }
 
             await checkMonitor(mockConfig, mockSite, monitorId);
 
@@ -109,7 +111,9 @@ describe("monitorStatusChecker", () => {
             const monitorId = "1";
 
             // Remove custom timeout
-            delete mockSite.monitors[0].timeout;
+            if (mockSite.monitors[0]) {
+                delete mockSite.monitors[0].timeout;
+            }
 
             await checkMonitor(mockConfig, mockSite, monitorId);
 
@@ -122,7 +126,9 @@ describe("monitorStatusChecker", () => {
             const monitorId = "1";
 
             // Set undefined timeout
-            mockSite.monitors[0].timeout = undefined;
+            if (mockSite.monitors[0]) {
+                mockSite.monitors[0].timeout = undefined;
+            }
 
             await checkMonitor(mockConfig, mockSite, monitorId);
 
@@ -171,11 +177,14 @@ describe("monitorStatusChecker", () => {
             const monitorId = "undefined"; // This will match String(undefined)
 
             // Create a monitor without an id
-            mockSite.monitors[0] = {
-                ...mockSite.monitors[0],
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                id: undefined as any,
-            };
+            const originalMonitor = mockSite.monitors[0];
+            if (originalMonitor) {
+                mockSite.monitors[0] = {
+                    ...originalMonitor,
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    id: undefined as any,
+                } as Monitor;
+            }
 
             const result = await checkMonitor(mockConfig, mockSite, monitorId);
 
@@ -189,11 +198,14 @@ describe("monitorStatusChecker", () => {
             const monitorId = "null"; // This will match String(null)
 
             // Create a monitor with null id
-            mockSite.monitors[0] = {
-                ...mockSite.monitors[0],
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                id: null as any,
-            };
+            const originalMonitor = mockSite.monitors[0];
+            if (originalMonitor) {
+                mockSite.monitors[0] = {
+                    ...originalMonitor,
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    id: null as any,
+                } as Monitor;
+            }
 
             const result = await checkMonitor(mockConfig, mockSite, monitorId);
 
@@ -207,10 +219,13 @@ describe("monitorStatusChecker", () => {
             const monitorId = ""; // This will match String("")
 
             // Create a monitor with empty string id
-            mockSite.monitors[0] = {
-                ...mockSite.monitors[0],
-                id: "",
-            };
+            const originalMonitor = mockSite.monitors[0];
+            if (originalMonitor) {
+                mockSite.monitors[0] = {
+                    ...originalMonitor,
+                    id: "",
+                } as Monitor;
+            }
 
             const result = await checkMonitor(mockConfig, mockSite, monitorId);
 

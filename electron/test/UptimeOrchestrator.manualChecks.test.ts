@@ -203,7 +203,7 @@ describe("UptimeOrchestrator - Manual Checks", () => {
         describe("checkSiteManually", () => {
             it("should perform manual check for site", async () => {
                 const identifier = "test-site";
-                const siteRepoInstance = mockSiteRepository.mock.results[0].value;
+                const siteRepoInstance = mockSiteRepository.mock.results[0]?.value;
                 const site = {
                     identifier,
                     name: "Test Site",
@@ -283,7 +283,7 @@ describe("UptimeOrchestrator - Manual Checks", () => {
             it("should emit status-update event", async () => {
                 const identifier = "test-site";
                 const eventListener = vi.fn();
-                const siteRepoInstance = mockSiteRepository.mock.results[0].value;
+                const siteRepoInstance = mockSiteRepository.mock.results[0]?.value;
 
                 uptimeOrchestrator.on("status-update", eventListener);
 
