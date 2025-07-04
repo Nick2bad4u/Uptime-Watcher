@@ -10,7 +10,7 @@
     "OutputFileFormat": "",
     "Severities": ["Critical", "Important", "Moderate", "BestPractice", "ManualReview"],
     "Confidences": ["High", "Medium"],
-    "Globs": ["**/.git/**", "**/megalinter-reports/**", "**/libs/**"],
+    "Globs": ["**/.git/**", "**/megalinter-reports/**", "**/libs/**", "**/node_modules/**"],
     "Suppressions": [
         {
             "Justification": "False positive: localhost redirect URI is required for OAuth dev flow (only present in development builds, not production)",
@@ -44,7 +44,7 @@
     "ExitCodeIsNumIssues": false,
     "BasePath": "",
     "AbsolutePaths": false,
-    "RespectGitIgnore": false,
+    "RespectGitIgnore": true,
     "SkipExcerpts": false,
     "ConsoleVerbosityLevel": "Information",
     "DisableConsoleOutput": false,
