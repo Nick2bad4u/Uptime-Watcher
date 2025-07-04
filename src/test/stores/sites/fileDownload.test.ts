@@ -177,6 +177,9 @@ describe("fileDownload", () => {
             const mockBackupData = new Uint8Array([1, 2, 3, 4, 5]);
             const mockDownloadFn = vi.fn().mockResolvedValue(mockBackupData);
 
+            // Mock console.error to suppress expected error logging
+            const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
             // Mock URL.createObjectURL and URL.revokeObjectURL
             const mockObjectURL = "blob:mock-url";
             const mockCreateObjectURL = vi.fn().mockReturnValue(mockObjectURL);
@@ -201,6 +204,12 @@ describe("fileDownload", () => {
 
             await expect(handleSQLiteBackupDownload(mockDownloadFn)).rejects.toThrow("Click failed");
             expect(mockRevokeObjectURL).toHaveBeenCalledWith(mockObjectURL);
+
+            // Verify that the error was logged (optional assertion)
+            expect(consoleErrorSpy).toHaveBeenCalledWith("Failed to trigger download click:", expect.any(Error));
+
+            // Restore console.error
+            consoleErrorSpy.mockRestore();
         });
 
         it("should handle large backup data", async () => {

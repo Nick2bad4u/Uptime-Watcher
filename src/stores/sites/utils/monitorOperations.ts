@@ -14,7 +14,7 @@ export function createDefaultMonitor(overrides: Partial<Monitor> = {}): Monitor 
     return {
         checkInterval: 300000, // 5 minutes default
         history: [],
-        id: crypto.randomUUID(),
+        id: overrides.id ?? crypto.randomUUID(),
         monitoring: true,
         status: "pending",
         type: "http" as MonitorType,
