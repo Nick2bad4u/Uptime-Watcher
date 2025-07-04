@@ -13,7 +13,7 @@ vi.mock("../stores", () => ({
     useSitesStore: vi.fn(),
 }));
 
-const mockUseSitesStore = useSitesStore as ReturnType<typeof vi.fn>;
+const mockUseSitesStore = vi.mocked(useSitesStore);
 
 describe("useBackendFocusSync", () => {
     const mockFullSyncFromBackend = vi.fn();

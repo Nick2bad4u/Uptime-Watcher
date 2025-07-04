@@ -254,6 +254,7 @@
     "type-fest": "^4.41.0",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.35.1",
+    "typescript-eslint-language-service": "^5.0.5",
     "typestat": "^0.8.18",
     "vite": "^7.0.0",
     "vite-bundle-visualizer": "^1.2.1",

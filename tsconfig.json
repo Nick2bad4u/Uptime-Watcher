@@ -32,16 +32,26 @@
         "allowJs": true,
         "allowSyntheticDefaultImports": true,
         "strict": true,
+        "alwaysStrict": true,
+        "strictNullChecks": true,
+        "strictPropertyInitialization": true,
         "exactOptionalPropertyTypes": true,
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,
         "noUncheckedIndexedAccess": true,
         "noImplicitOverride": true,
+        "noImplicitAny": true,
+        "noImplicitThis": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "allowUnusedLabels": false,
         "allowUnreachableCode": false,
-        "forceConsistentCasingInFileNames": true
+        "forceConsistentCasingInFileNames": true,
+        "noPropertyAccessFromIndexSignature" : false,
+        "strictBindCallApply": true,
+        "strictFunctionTypes": true,
+        "useUnknownInCatchVariables": true,
+        
     },
     "include": [
         "src/**/*.ts",
@@ -59,7 +69,9 @@
         "dist",
         "dist-electron",
         "release",
-        "out"
+        "out",
+        "vite.config.ts",
+        "electron/**/*.test.ts"
     ]
     // Separate tsconfig should be used for renderer (src/) if needed
 }
