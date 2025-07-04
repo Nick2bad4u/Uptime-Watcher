@@ -1,6 +1,8 @@
 /**
  * Sites store for managing site data and operations.
  * Handles CRUD operations, monitoring, and status updates for all sites.
+ *
+ * Refactored to use modular architecture with separate services and utilities.
  */
 
 import { create } from "zustand";
@@ -9,78 +11,32 @@ import type { Monitor, MonitorType, Site, StatusUpdate } from "../../types";
 import type { SitesStore } from "./types";
 
 import { ERROR_MESSAGES } from "../types";
-import { logStoreAction, withErrorHandling, waitForElectronAPI } from "../utils";
+import { logStoreAction, withErrorHandling } from "../utils";
+import { MonitoringService, SiteService } from "./services";
+import {
+    StatusUpdateManager,
+    createStatusUpdateHandler,
+    handleSQLiteBackupDownload,
+    normalizeMonitor,
+    updateMonitorInSite,
+} from "./utils";
 
-/**
- * Helper function to handle status updates
- */
-function createStatusUpdateHandler(get: () => SitesStore, callback: (update: StatusUpdate) => void) {
-    return (update: StatusUpdate) => {
-        try {
-            // Validate update payload
-            if (!update?.site) {
-                throw new Error("Invalid status update: update or update.site is null/undefined");
-            }
-
-            // Smart incremental update - use the payload data directly
-            const state = get();
-            const updatedSites = state.sites.map((site) => {
-                if (site.identifier === update.site.identifier) {
-                    // Use the complete updated site data from the backend
-                    return { ...update.site };
-                }
-                return site; // Keep other sites unchanged
-            });
-
-            // Check if the site was actually found and updated
-            const siteFound = state.sites.some((site) => site.identifier === update.site.identifier);
-
-            if (siteFound) {
-                // Update store state efficiently
-                get().setSites(updatedSites);
-            } else {
-                // Site not found in current state - trigger full sync as fallback
-                if (process.env.NODE_ENV === "development") {
-                    console.warn(`Site ${update.site.identifier} not found in store, triggering full sync`);
-                }
-                get()
-                    .fullSyncFromBackend()
-                    .catch((error) => {
-                        if (process.env.NODE_ENV === "development") {
-                            console.error("Fallback full sync failed:", error);
-                        }
-                    });
-            }
-
-            // Call the provided callback
-            if (callback) callback(update);
-        } catch (error) {
-            console.error("Error processing status update:", error);
-            // Fallback to full sync on any processing error
-            get()
-                .fullSyncFromBackend()
-                .catch((syncError) => {
-                    console.error("Fallback sync after error failed:", syncError);
-                });
-        }
-    };
-}
+// Create a shared status update manager instance
+const statusUpdateManager = new StatusUpdateManager();
 
 export const useSitesStore = create<SitesStore>((set, get) => ({
-    // Actions
     addMonitorToSite: async (siteId, monitor) => {
         logStoreAction("SitesStore", "addMonitorToSite", { monitor, siteId });
 
         await withErrorHandling(
             async () => {
-                await waitForElectronAPI();
                 // Get the current site
                 const site = get().sites.find((s) => s.identifier === siteId);
                 if (!site) throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
 
                 // Allow multiple monitors of the same type
                 const updatedMonitors = [...site.monitors, monitor];
-                await window.electronAPI.sites.updateSite(siteId, { monitors: updatedMonitors });
+                await SiteService.updateSite(siteId, { monitors: updatedMonitors });
                 await get().syncSitesFromBackend();
             },
             {
@@ -99,8 +55,7 @@ export const useSitesStore = create<SitesStore>((set, get) => ({
 
         await withErrorHandling(
             async () => {
-                await waitForElectronAPI();
-                await window.electronAPI.sites.checkSiteNow(siteId, monitorId);
+                await SiteService.checkSiteNow(siteId, monitorId);
                 // Backend will emit 'status-update', which will trigger incremental update
             },
             {
@@ -115,7 +70,6 @@ export const useSitesStore = create<SitesStore>((set, get) => ({
 
         await withErrorHandling(
             async () => {
-                await waitForElectronAPI();
                 // Default to HTTP monitor if none provided
                 const monitors: Monitor[] = (
                     siteData.monitors && siteData.monitors.length > 0
@@ -125,21 +79,13 @@ export const useSitesStore = create<SitesStore>((set, get) => ({
                                   history: [],
                                   id: crypto.randomUUID(),
                                   monitoring: true,
-                                  status: "pending",
+                                  status: "pending" as const,
                                   type: "http" as MonitorType,
                               },
                           ]
-                ).map((monitor) => ({
-                    ...monitor,
-                    id: monitor.id || crypto.randomUUID(),
-                    monitoring: typeof monitor.monitoring === "undefined" ? true : monitor.monitoring,
-                    status: ["pending", "up", "down"].includes(monitor.status)
-                        ? (monitor.status as Monitor["status"])
-                        : "pending",
-                    type: monitor.type,
-                }));
+                ).map((monitor) => normalizeMonitor(monitor));
 
-                const newSite = await window.electronAPI.sites.addSite({ ...siteData, monitors });
+                const newSite = await SiteService.addSite({ ...siteData, monitors });
                 get().addSite(newSite);
             },
             {
@@ -159,7 +105,7 @@ export const useSitesStore = create<SitesStore>((set, get) => ({
                 if (site) {
                     for (const monitor of site.monitors) {
                         try {
-                            await window.electronAPI.monitoring.stopMonitoringForSite(identifier, monitor.id);
+                            await MonitoringService.stopMonitoring(identifier, monitor.id);
                         } catch (err) {
                             // Log but do not block deletion if stopping fails
                             if (process.env.NODE_ENV === "development") {
@@ -171,7 +117,7 @@ export const useSitesStore = create<SitesStore>((set, get) => ({
                         }
                     }
                 }
-                await window.electronAPI.sites.removeSite(identifier);
+                await SiteService.removeSite(identifier);
                 get().removeSite(identifier);
             },
             {
@@ -186,20 +132,13 @@ export const useSitesStore = create<SitesStore>((set, get) => ({
 
         await withErrorHandling(
             async () => {
-                // Request SQLite file as ArrayBuffer from preload
-                const { buffer, fileName } = await window.electronAPI.data.downloadSQLiteBackup();
-                if (!buffer) throw new Error("No backup data received");
-
-                // Create a Blob and trigger download
-                const blob = new Blob([buffer], { type: "application/x-sqlite3" });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement("a");
-                a.href = url;
-                a.download = fileName || `uptime-watcher-backup-${new Date().toISOString().split("T")[0]}.sqlite`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
+                await handleSQLiteBackupDownload(async () => {
+                    const result = await SiteService.downloadSQLiteBackup();
+                    if (!result.buffer) {
+                        throw new Error("No backup data received");
+                    }
+                    return new Uint8Array(result.buffer);
+                });
             },
             {
                 clearError: () => {},
@@ -227,9 +166,7 @@ export const useSitesStore = create<SitesStore>((set, get) => ({
 
         await withErrorHandling(
             async () => {
-                // Wait for electronAPI to be available with timeout
-                await waitForElectronAPI();
-                const sites = await window.electronAPI.sites.getSites();
+                const sites = await SiteService.getSites();
                 get().setSites(sites);
             },
             {
@@ -244,7 +181,7 @@ export const useSitesStore = create<SitesStore>((set, get) => ({
 
         await withErrorHandling(
             async () => {
-                await window.electronAPI.sites.updateSite(identifier, updates);
+                await SiteService.updateSite(identifier, updates);
                 await get().syncSitesFromBackend();
             },
             {
@@ -265,7 +202,6 @@ export const useSitesStore = create<SitesStore>((set, get) => ({
             sites: state.sites.filter((site) => site.identifier !== identifier),
         }));
     },
-    // State
     selectedMonitorIds: {},
     selectedSiteId: undefined,
     setSelectedMonitorId: (siteId, monitorId) => {
@@ -291,7 +227,7 @@ export const useSitesStore = create<SitesStore>((set, get) => ({
 
         await withErrorHandling(
             async () => {
-                await window.electronAPI.monitoring.startMonitoringForSite(siteId, monitorId);
+                await MonitoringService.startMonitoring(siteId, monitorId);
                 await get().syncSitesFromBackend();
             },
             {
@@ -306,7 +242,7 @@ export const useSitesStore = create<SitesStore>((set, get) => ({
 
         await withErrorHandling(
             async () => {
-                await window.electronAPI.monitoring.stopMonitoringForSite(siteId, monitorId);
+                await MonitoringService.stopMonitoring(siteId, monitorId);
                 await get().syncSitesFromBackend();
             },
             {
@@ -319,31 +255,23 @@ export const useSitesStore = create<SitesStore>((set, get) => ({
     subscribeToStatusUpdates: (callback: (update: StatusUpdate) => void) => {
         logStoreAction("SitesStore", "subscribeToStatusUpdates");
 
-        const handleStatusUpdate = createStatusUpdateHandler(get, callback);
+        const handler = createStatusUpdateHandler({
+            fullSyncFromBackend: get().fullSyncFromBackend,
+            getSites: () => get().sites,
+            onUpdate: callback,
+            setSites: get().setSites,
+        });
 
-        // Check if electronAPI is available before subscribing
-        if (!window.electronAPI?.events?.onStatusUpdate) {
-            // If electronAPI is not ready, wait for it and retry
-            waitForElectronAPI()
-                .then(() => {
-                    window.electronAPI.events.onStatusUpdate(handleStatusUpdate);
-                    return undefined;
-                })
-                .catch((error) => {
-                    console.error("Failed to initialize status update subscription:", error);
-                });
-            return;
-        }
-
-        window.electronAPI.events.onStatusUpdate(handleStatusUpdate);
+        statusUpdateManager.subscribe(handler).catch((error) => {
+            console.error("Failed to subscribe to status updates:", error);
+        });
     },
     syncSitesFromBackend: async () => {
         logStoreAction("SitesStore", "syncSitesFromBackend");
 
         await withErrorHandling(
             async () => {
-                await waitForElectronAPI();
-                const backendSites = await window.electronAPI.sites.getSites();
+                const backendSites = await SiteService.getSites();
                 get().setSites(backendSites);
             },
             {
@@ -355,9 +283,7 @@ export const useSitesStore = create<SitesStore>((set, get) => ({
     },
     unsubscribeFromStatusUpdates: () => {
         logStoreAction("SitesStore", "unsubscribeFromStatusUpdates");
-        if (window.electronAPI?.events?.removeAllListeners) {
-            window.electronAPI.events.removeAllListeners("status-update");
-        }
+        statusUpdateManager.unsubscribe();
     },
     updateMonitorRetryAttempts: async (siteId: string, monitorId: string, retryAttempts: number | undefined) => {
         logStoreAction("SitesStore", "updateMonitorRetryAttempts", { monitorId, retryAttempts, siteId });
@@ -367,10 +293,8 @@ export const useSitesStore = create<SitesStore>((set, get) => ({
                 const site = get().sites.find((s) => s.identifier === siteId);
                 if (!site) throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
 
-                const updatedMonitors = site.monitors.map((monitor) =>
-                    monitor.id === monitorId ? { ...monitor, retryAttempts: retryAttempts } : monitor
-                );
-                await window.electronAPI.sites.updateSite(siteId, { monitors: updatedMonitors });
+                const updatedSite = updateMonitorInSite(site, monitorId, { retryAttempts });
+                await SiteService.updateSite(siteId, { monitors: updatedSite.monitors });
                 await get().syncSitesFromBackend();
             },
             {
@@ -388,10 +312,8 @@ export const useSitesStore = create<SitesStore>((set, get) => ({
                 const site = get().sites.find((s) => s.identifier === siteId);
                 if (!site) throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
 
-                const updatedMonitors = site.monitors.map((monitor) =>
-                    monitor.id === monitorId ? { ...monitor, timeout: timeout } : monitor
-                );
-                await window.electronAPI.sites.updateSite(siteId, { monitors: updatedMonitors });
+                const updatedSite = updateMonitorInSite(site, monitorId, { timeout });
+                await SiteService.updateSite(siteId, { monitors: updatedSite.monitors });
                 await get().syncSitesFromBackend();
             },
             {
@@ -409,10 +331,8 @@ export const useSitesStore = create<SitesStore>((set, get) => ({
                 const site = get().sites.find((s) => s.identifier === siteId);
                 if (!site) throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
 
-                const updatedMonitors = site.monitors.map((monitor) =>
-                    monitor.id === monitorId ? { ...monitor, checkInterval: interval } : monitor
-                );
-                await window.electronAPI.sites.updateSite(siteId, { monitors: updatedMonitors });
+                const updatedSite = updateMonitorInSite(site, monitorId, { checkInterval: interval });
+                await SiteService.updateSite(siteId, { monitors: updatedSite.monitors });
                 await get().syncSitesFromBackend();
             },
             {
