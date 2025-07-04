@@ -23,13 +23,18 @@
         "**/node_modules": true,
         "**/release": true,
         "**/.husky/**": true,
-        "**/dist": true
+        "**/dist": true,
+        "**/test/**": true,
+        "**/coverage/**": true,
+        "**/dist-electron/**": true
     },
     "search.exclude": {
         "**/node_modules": true,
         "**/release": true,
         "**/.husky/**": true,
-        "**/dist": true
+        "**/dist": true,
+        "**/dist-electron/**": true,
+        "**/coverage/**": true
     },
     "prettier-eslint-typescript.eslintConfig": {
         "rules": {
@@ -49,10 +54,22 @@
             ],
             "prefer-const": "error",
             "prefer-template": "error",
-            "array-bracket-spacing": ["error", "always"],
-            "generator-star-spacing": ["error", "both"],
-            "space-before-function-paren": ["error", "always"],
-            "yield-star-spacing": ["error", "both"]
+            "array-bracket-spacing": [
+                "error",
+                "always"
+            ],
+            "generator-star-spacing": [
+                "error",
+                "both"
+            ],
+            "space-before-function-paren": [
+                "error",
+                "always"
+            ],
+            "yield-star-spacing": [
+                "error",
+                "both"
+            ]
         }
     },
     "prettier-eslint-typescript.prettierOptions": {
@@ -78,15 +95,21 @@
             },
             "github": {
                 "command": "npx",
-                "args": ["-y", "@modelcontextprotocol/server-github"],
+                "args": [
+                    "-y",
+                    "@modelcontextprotocol/server-github"
+                ],
                 "env": {
                     "GITHUB_PERSONAL_ACCESS_TOKEN": "${env:GITHUB_TOKEN}"
                 }
             },
             "memory": {
                 "command": "npx",
-                "args": ["-y", "@modelcontextprotocol/server-memory"]
-            },
+                "args": [
+                    "-y",
+                    "@modelcontextprotocol/server-memory"
+                ]
+            }
         }
     },
     "sonarlint.connectedMode.project": {
