@@ -1,5 +1,5 @@
 codecov:
-    require_ci_to_pass: yes
+    require_ci_to_pass: true
     notify:
         after_n_builds: 2 # Wait for both frontend and electron builds
 

@@ -8,3 +8,4 @@ release/
 dist-electron/
 docs/Validator.md
 .markdownlintignore
+.github/prompts/*

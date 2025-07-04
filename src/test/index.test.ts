@@ -6,32 +6,32 @@
 import { describe, expect, it, vi } from "vitest";
 
 // Mock all the hook modules to avoid dependency issues
-vi.mock("./useSiteStats", () => ({
+vi.mock("../hooks/site/useSiteStats", () => ({
     useSiteStats: vi.fn(),
     calculateSiteStats: vi.fn(),
     mockUseSiteStatsExport: "useSiteStatsTest",
 }));
 
-vi.mock("./useSiteMonitor", () => ({
+vi.mock("../hooks/site/useSiteMonitor", () => ({
     useSiteMonitor: vi.fn(),
     startMonitoring: vi.fn(),
     mockUseSiteMonitorExport: "useSiteMonitorTest",
 }));
 
-vi.mock("./useSiteActions", () => ({
+vi.mock("../hooks/site/useSiteActions", () => ({
     useSiteActions: vi.fn(),
     performSiteAction: vi.fn(),
     mockUseSiteActionsExport: "useSiteActionsTest",
 }));
 
-vi.mock("./useSite", () => ({
+vi.mock("../hooks/site/useSite", () => ({
     useSite: vi.fn(),
     getSiteData: vi.fn(),
     mockUseSiteExport: "useSiteTest",
 }));
 
 // Import everything from the index module after mocking
-import * as SiteHooksIndex from "./index";
+import * as SiteHooksIndex from "../hooks/site/index";
 
 describe("Site Hooks Index Module", () => {
     describe("Module Structure", () => {

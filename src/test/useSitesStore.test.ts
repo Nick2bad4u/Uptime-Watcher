@@ -10,17 +10,33 @@ import type { Site, Monitor } from "../types";
 // Mock electron API
 const mockElectronAPI = {
     sites: {
+        getSites: vi.fn(),
         addSite: vi.fn(),
         removeSite: vi.fn(),
         updateSite: vi.fn(),
-        getAllSites: vi.fn(),
         checkSiteNow: vi.fn(),
     },
     monitoring: {
+        startMonitoring: vi.fn(),
+        stopMonitoring: vi.fn(),
+        startMonitoringForSite: vi.fn(),
         stopMonitoringForSite: vi.fn(),
     },
     data: {
+        exportData: vi.fn(),
+        importData: vi.fn(),
         downloadSQLiteBackup: vi.fn(),
+    },
+    events: {
+        onStatusUpdate: vi.fn(),
+        removeAllListeners: vi.fn(),
+    },
+    settings: {
+        getHistoryLimit: vi.fn(),
+        updateHistoryLimit: vi.fn(),
+    },
+    system: {
+        quitAndInstall: vi.fn(),
     },
 };
 
@@ -44,6 +60,7 @@ vi.mock("../stores/utils", () => ({
             throw error;
         });
     }),
+    waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
 }));
 
 describe("useSitesStore", () => {
