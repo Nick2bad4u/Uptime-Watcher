@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 
 import logger from "../../services/logger";
-import { useStore } from "../../store";
+import { useSitesStore, useUIStore } from "../../stores";
 import { Monitor, Site } from "../../types";
 
 interface SiteActionsResult {
@@ -21,14 +21,9 @@ interface SiteActionsResult {
  * @returns Object containing action handler functions
  */
 export function useSiteActions(site: Site, monitor: Monitor | undefined): SiteActionsResult {
-    const {
-        checkSiteNow,
-        setSelectedMonitorId,
-        setSelectedSite,
-        setShowSiteDetails,
-        startSiteMonitorMonitoring,
-        stopSiteMonitorMonitoring,
-    } = useStore();
+    const { checkSiteNow, setSelectedMonitorId, startSiteMonitorMonitoring, stopSiteMonitorMonitoring } =
+        useSitesStore();
+    const { setSelectedSite, setShowSiteDetails } = useUIStore();
 
     // Start monitoring the site with proper logging
     const handleStartMonitoring = useCallback(() => {

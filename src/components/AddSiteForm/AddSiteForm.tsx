@@ -7,7 +7,7 @@ import React, { useState, useEffect, useCallback } from "react";
 
 import { UI_DELAYS, CHECK_INTERVALS } from "../../constants";
 import logger from "../../services/logger";
-import { useStore } from "../../store";
+import { useErrorStore, useSitesStore } from "../../stores";
 import { ThemedBox, ThemedText, ThemedButton } from "../../theme/components";
 import { useTheme } from "../../theme/useTheme";
 import { generateUuid } from "../../utils/data/generateUuid";
@@ -32,7 +32,9 @@ import { useAddSiteForm } from "./useAddSiteForm";
  * @returns JSX element containing the complete add site form
  */
 export const AddSiteForm = React.memo(function AddSiteForm() {
-    const { addMonitorToSite, clearError, createSite, isLoading, lastError, sites } = useStore();
+    const { clearError, lastError } = useErrorStore();
+    const { addMonitorToSite, createSite, sites } = useSitesStore();
+    const { isLoading } = useErrorStore();
     const { isDark } = useTheme();
 
     // Use our custom hook for form state management

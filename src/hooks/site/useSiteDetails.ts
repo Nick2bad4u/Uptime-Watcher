@@ -13,7 +13,7 @@ import { useEffect, useState, useCallback } from "react";
 
 import { DEFAULT_CHECK_INTERVAL, DEFAULT_REQUEST_TIMEOUT_SECONDS } from "../../constants";
 import logger from "../../services/logger";
-import { useStore } from "../../store";
+import { useErrorStore, useSitesStore, useUIStore } from "../../stores";
 import { Site } from "../../types";
 import { useSiteAnalytics } from "./useSiteAnalytics";
 
@@ -52,27 +52,29 @@ interface UseSiteDetailsProps {
 
 export function useSiteDetails({ site }: UseSiteDetailsProps) {
     const {
-        // Synchronized UI state from store
-        activeSiteDetailsTab,
         checkSiteNow,
-        clearError,
         deleteSite,
         getSelectedMonitorId,
-        isLoading,
         modifySite,
-        setActiveSiteDetailsTab,
         setSelectedMonitorId,
-        setShowAdvancedMetrics,
-        setSiteDetailsChartTimeRange,
-        showAdvancedMetrics,
-        siteDetailsChartTimeRange,
         sites,
         startSiteMonitorMonitoring,
         stopSiteMonitorMonitoring,
         updateMonitorRetryAttempts,
         updateMonitorTimeout,
         updateSiteCheckInterval,
-    } = useStore();
+    } = useSitesStore();
+
+    const { clearError, isLoading } = useErrorStore();
+
+    const {
+        activeSiteDetailsTab,
+        setActiveSiteDetailsTab,
+        setShowAdvancedMetrics,
+        setSiteDetailsChartTimeRange,
+        showAdvancedMetrics,
+        siteDetailsChartTimeRange,
+    } = useUIStore();
 
     // Always call hooks first, use fallback for currentSite
     const currentSite = sites.find((s) => s.identifier === site.identifier) || {
@@ -81,7 +83,7 @@ export function useSiteDetails({ site }: UseSiteDetailsProps) {
     };
 
     const monitorIds = currentSite.monitors.map((m) => m.id);
-    const defaultMonitorId = monitorIds[0] || "";
+    const defaultMonitorId = monitorIds[0] ?? "";
     const selectedMonitorId = getSelectedMonitorId(currentSite.identifier) ?? defaultMonitorId;
     const selectedMonitor = currentSite.monitors.find((m) => m.id === selectedMonitorId) || currentSite.monitors[0];
     const isMonitoring = selectedMonitor?.monitoring !== false;
@@ -301,8 +303,11 @@ export function useSiteDetails({ site }: UseSiteDetailsProps) {
         clearError();
 
         try {
-            const updates = { name: localName.trim() || undefined };
-            await modifySite(currentSite.identifier, updates);
+            const trimmedName = localName.trim();
+            if (trimmedName) {
+                const updates = { name: trimmedName };
+                await modifySite(currentSite.identifier, updates);
+            }
             setHasUnsavedChanges(false);
             logger.user.action("Updated site name", { identifier: currentSite.identifier, name: localName.trim() });
         } catch (error) {

@@ -7,7 +7,7 @@ import { useEffect, useState, useCallback } from "react";
 
 import type { StatusType } from "../constants";
 
-import { useStore } from "../store";
+import { useSettingsStore } from "../stores";
 import { themeManager } from "./ThemeManager";
 import { Theme, ThemeName } from "./types";
 
@@ -24,7 +24,7 @@ import { Theme, ThemeName } from "./types";
  * @returns Object containing theme state, setters, and utility functions
  */
 export function useTheme() {
-    const { settings, updateSettings } = useStore();
+    const { settings, updateSettings } = useSettingsStore();
     const [systemTheme, setSystemTheme] = useState<"light" | "dark">("light");
     const [themeVersion, setThemeVersion] = useState(0); // Force re-renders
 

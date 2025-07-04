@@ -3,7 +3,7 @@
  * Displays uptime statistics, theme toggle, and settings access.
  */
 
-import { useStore } from "../../store";
+import { useSitesStore, useUIStore } from "../../stores";
 import { ThemedBox, ThemedText, ThemedButton, StatusIndicator } from "../../theme/components";
 import { useTheme, useAvailabilityColors } from "../../theme/useTheme";
 import "./Header.css";
@@ -21,7 +21,8 @@ import "./Header.css";
  * @returns JSX element containing the application header
  */
 export function Header() {
-    const { setShowSettings, sites } = useStore();
+    const { sites } = useSitesStore();
+    const { setShowSettings } = useUIStore();
     const { isDark, toggleTheme } = useTheme();
     const { getAvailabilityColor } = useAvailabilityColors();
 

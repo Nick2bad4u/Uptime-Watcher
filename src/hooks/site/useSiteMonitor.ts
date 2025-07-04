@@ -5,7 +5,7 @@
 
 import { useMemo, useCallback } from "react";
 
-import { useStore } from "../../store";
+import { useSitesStore } from "../../stores";
 import { Monitor, Site, StatusHistory } from "../../types";
 
 /**
@@ -22,7 +22,7 @@ interface SiteMonitorResult {
     /** Current status of the selected monitor */
     status: "up" | "down" | "pending";
     /** Response time of the selected monitor */
-    responseTime?: number;
+    responseTime: number | undefined;
     /** Whether the selected monitor is actively being monitored */
     isMonitoring: boolean;
 
@@ -44,7 +44,7 @@ interface SiteMonitorResult {
  * @returns Monitor data and helper functions
  */
 export function useSiteMonitor(site: Site): SiteMonitorResult {
-    const { getSelectedMonitorId, setSelectedMonitorId, sites } = useStore();
+    const { getSelectedMonitorId, setSelectedMonitorId, sites } = useSitesStore();
 
     // Always select the latest site from the store by id to ensure we have the most updated data
     const latestSite = useMemo(() => {
@@ -56,7 +56,7 @@ export function useSiteMonitor(site: Site): SiteMonitorResult {
         return latestSite.monitors.map((m) => m.id);
     }, [latestSite]);
 
-    const defaultMonitorId = monitorIds[0] || "";
+    const defaultMonitorId = monitorIds[0] ?? "";
     const selectedMonitorId = getSelectedMonitorId(latestSite.identifier) || defaultMonitorId;
 
     // Get the currently selected monitor
@@ -69,7 +69,7 @@ export function useSiteMonitor(site: Site): SiteMonitorResult {
     const responseTime = monitor?.responseTime;
     // Fix: Use history length and last timestamp as dependencies for proper memoization
     const filteredHistory = useMemo(() => {
-        const history = monitor?.history || [];
+        const history = monitor?.history ?? [];
         return history;
     }, [monitor]);
     const isMonitoring = monitor?.monitoring !== false; // default to true if undefined

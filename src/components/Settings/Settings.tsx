@@ -10,7 +10,7 @@ import { useState, useEffect, useCallback } from "react";
 
 import { HISTORY_LIMIT_OPTIONS, UI_DELAYS } from "../../constants";
 import logger from "../../services/logger";
-import { useStore } from "../../store";
+import { useErrorStore, useSettingsStore, useSitesStore } from "../../stores";
 import {
     ThemedBox,
     ThemedText,
@@ -47,18 +47,9 @@ interface SettingsProps {
  */
 
 export function Settings({ onClose }: Readonly<SettingsProps>) {
-    const {
-        clearError,
-        downloadSQLiteBackup, // <-- keep this
-        fullSyncFromBackend,
-        isLoading,
-        lastError,
-        resetSettings,
-        setError, // <-- keep this
-        settings,
-        updateHistoryLimitValue,
-        updateSettings,
-    } = useStore();
+    const { clearError, isLoading, lastError, setError } = useErrorStore();
+    const { resetSettings, settings, updateHistoryLimitValue, updateSettings } = useSettingsStore();
+    const { downloadSQLiteBackup, fullSyncFromBackend } = useSitesStore();
 
     const { availableThemes, isDark, setTheme } = useTheme();
 

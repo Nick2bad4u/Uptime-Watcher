@@ -1,4 +1,4 @@
-import { useStore } from "../../store";
+import { useErrorStore } from "../../stores";
 import { Site } from "../../types";
 import { useSiteActions } from "./useSiteActions";
 import { useSiteMonitor } from "./useSiteMonitor";
@@ -22,7 +22,7 @@ export function useSite(site: Site) {
     const actions = useSiteActions(site, monitor);
 
     // Get UI state from store for consistency
-    const { isLoading } = useStore();
+    const { isLoading } = useErrorStore();
 
     // Return everything together
     return {

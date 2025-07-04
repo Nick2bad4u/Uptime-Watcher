@@ -6,7 +6,7 @@
 import { useState, useEffect, useRef } from "react";
 
 import logger from "../../../services/logger";
-import { useStore } from "../../../store";
+import { useSettingsStore } from "../../../stores";
 import { ThemedBox, ThemedText, ThemedButton, StatusIndicator } from "../../../theme/components";
 import { StatusHistory, Monitor } from "../../../types";
 
@@ -43,7 +43,7 @@ export function HistoryTab({
     formatStatusWithIcon,
     selectedMonitor,
 }: HistoryTabProps) {
-    const { settings } = useStore();
+    const { settings } = useSettingsStore();
     const [historyFilter, setHistoryFilter] = useState<"all" | "up" | "down">("all");
     const historyLength = (selectedMonitor.history || []).length;
 

@@ -5,7 +5,7 @@
  * when no sites have been added. Applies theme-aware styling with dividers.
  */
 
-import { useStore } from "../../../store";
+import { useSitesStore } from "../../../stores";
 import { useTheme } from "../../../theme/useTheme";
 import { SiteCard } from "../SiteCard";
 import { EmptyState } from "./EmptyState";
@@ -32,7 +32,7 @@ import { EmptyState } from "./EmptyState";
  * ```
  */
 export function SiteList() {
-    const { sites } = useStore();
+    const { sites } = useSitesStore();
     const { isDark } = useTheme();
 
     if (sites.length === 0) {

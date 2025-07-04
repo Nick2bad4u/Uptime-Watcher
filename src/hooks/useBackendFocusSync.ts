@@ -6,7 +6,7 @@
 
 import { useEffect } from "react";
 
-import { useStore } from "../store";
+import { useSitesStore } from "../stores";
 
 /**
  * useBackendFocusSync
@@ -15,7 +15,7 @@ import { useStore } from "../store";
  * @param enabled - Set to true to enable focus-based backend sync (default: false)
  */
 export function useBackendFocusSync(enabled = false) {
-    const fullSyncFromBackend = useStore((s) => s.fullSyncFromBackend);
+    const { fullSyncFromBackend } = useSitesStore();
 
     useEffect(() => {
         if (!enabled) return;
