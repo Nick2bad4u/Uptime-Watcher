@@ -14,7 +14,7 @@ export const useUpdatesStore = create<UpdatesStore>((set) => ({
     // Actions
     applyUpdate: () => {
         logStoreAction("UpdatesStore", "applyUpdate");
-        window.electronAPI.system.quitAndInstall?.();
+        window.electronAPI?.system?.quitAndInstall?.();
     },
     clearUpdateError: () => {
         logStoreAction("UpdatesStore", "clearUpdateError");

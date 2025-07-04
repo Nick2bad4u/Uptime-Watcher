@@ -9,9 +9,26 @@ import { useUpdatesStore } from "../stores/updates/useUpdatesStore";
 import type { UpdateStatus } from "../stores/types";
 
 // Mock the logger
-vi.mock("../utils", () => ({
+vi.mock("../stores/utils", () => ({
     logStoreAction: vi.fn(),
 }));
+
+// Mock window.electronAPI
+const mockQuitAndInstall = vi.fn();
+
+// Helper to setup electronAPI mock
+const setupElectronAPIMock = (mockAPI: unknown) => {
+    // Use a different approach to avoid property redefinition
+    const win = window as unknown as Record<string, unknown>;
+    win.electronAPI = mockAPI;
+};
+
+// Setup default mock
+setupElectronAPIMock({
+    system: {
+        quitAndInstall: mockQuitAndInstall,
+    },
+});
 
 describe("useUpdatesStore", () => {
     beforeEach(() => {
@@ -22,6 +39,21 @@ describe("useUpdatesStore", () => {
             updateError: undefined,
             updateInfo: undefined,
         });
+
+        // Reset mocks
+        vi.clearAllMocks();
+
+        // Reset the electronAPI mock
+        setupElectronAPIMock({
+            system: {
+                quitAndInstall: mockQuitAndInstall,
+            },
+        });
+    });
+
+    afterEach(() => {
+        // Clean up mocks after each test
+        vi.clearAllMocks();
     });
 
     describe("update status management", () => {
@@ -107,6 +139,38 @@ describe("useUpdatesStore", () => {
 
             act(() => {
                 result.current.setUpdateError(undefined);
+            });
+
+            expect(result.current.updateError).toBeUndefined();
+        });
+
+        it("should clear update error using clearUpdateError method", () => {
+            const { result } = renderHook(() => useUpdatesStore());
+
+            // Set an error first
+            act(() => {
+                result.current.setUpdateError("Update failed");
+            });
+
+            expect(result.current.updateError).toBe("Update failed");
+
+            // Clear the error using the dedicated method
+            act(() => {
+                result.current.clearUpdateError();
+            });
+
+            expect(result.current.updateError).toBeUndefined();
+        });
+
+        it("should handle clearing error when no error exists", () => {
+            const { result } = renderHook(() => useUpdatesStore());
+
+            // Ensure no error exists
+            expect(result.current.updateError).toBeUndefined();
+
+            // Clear error should not throw
+            act(() => {
+                result.current.clearUpdateError();
             });
 
             expect(result.current.updateError).toBeUndefined();
@@ -264,6 +328,117 @@ describe("useUpdatesStore", () => {
             expect(result.current.updateProgress).toBe(75); // Should remain unchanged
             expect(result.current.updateInfo).toEqual(updateInfo); // Should remain unchanged
             expect(result.current.updateError).toBe("Connection timeout"); // Should remain unchanged
+        });
+    });
+
+    describe("apply update functionality", () => {
+        it("should call electronAPI.system.quitAndInstall when applying update", () => {
+            const { result } = renderHook(() => useUpdatesStore());
+
+            act(() => {
+                result.current.applyUpdate();
+            });
+
+            expect(mockQuitAndInstall).toHaveBeenCalledTimes(1);
+        });
+
+        it("should handle missing electronAPI gracefully", () => {
+            // Mock electronAPI to be undefined
+            setupElectronAPIMock({
+                system: {
+                    quitAndInstall: undefined,
+                },
+            });
+
+            const { result } = renderHook(() => useUpdatesStore());
+
+            // Should not throw when electronAPI is undefined
+            expect(() => {
+                act(() => {
+                    result.current.applyUpdate();
+                });
+            }).not.toThrow();
+        });
+
+        it("should handle missing electronAPI.system gracefully", () => {
+            // Mock electronAPI.system to be undefined
+            setupElectronAPIMock({
+                system: undefined,
+            });
+
+            const { result } = renderHook(() => useUpdatesStore());
+
+            // Should not throw when electronAPI.system is undefined
+            expect(() => {
+                act(() => {
+                    result.current.applyUpdate();
+                });
+            }).not.toThrow();
+        });
+
+        it("should handle completely missing electronAPI", () => {
+            // Remove electronAPI completely
+            setupElectronAPIMock(undefined);
+
+            const { result } = renderHook(() => useUpdatesStore());
+
+            // Should not throw when electronAPI is completely missing
+            expect(() => {
+                act(() => {
+                    result.current.applyUpdate();
+                });
+            }).not.toThrow();
+        });
+
+        it("should apply update in downloaded state", () => {
+            const { result } = renderHook(() => useUpdatesStore());
+
+            // Set state to downloaded
+            act(() => {
+                result.current.setUpdateStatus("downloaded");
+                result.current.setUpdateProgress(100);
+            });
+
+            expect(result.current.updateStatus).toBe("downloaded");
+            expect(result.current.updateProgress).toBe(100);
+
+            // Apply update
+            act(() => {
+                result.current.applyUpdate();
+            });
+
+            expect(mockQuitAndInstall).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe("store action logging", () => {
+        it("should log all store actions", async () => {
+            const { logStoreAction } = await import("../stores/utils");
+            const { result } = renderHook(() => useUpdatesStore());
+
+            const updateInfo = {
+                version: "1.0.0",
+                releaseNotes: "Test update",
+                releaseName: "v1.0.0",
+                releaseDate: "2023-01-01",
+            };
+
+            // Test all actions that should log
+            act(() => {
+                result.current.setUpdateStatus("checking");
+                result.current.setUpdateProgress(50);
+                result.current.setUpdateError("Test error");
+                result.current.setUpdateInfo(updateInfo);
+                result.current.clearUpdateError();
+                result.current.applyUpdate();
+            });
+
+            expect(logStoreAction).toHaveBeenCalledWith("UpdatesStore", "setUpdateStatus", { status: "checking" });
+            expect(logStoreAction).toHaveBeenCalledWith("UpdatesStore", "setUpdateProgress", { progress: 50 });
+            expect(logStoreAction).toHaveBeenCalledWith("UpdatesStore", "setUpdateError", { error: "Test error" });
+            expect(logStoreAction).toHaveBeenCalledWith("UpdatesStore", "setUpdateInfo", { info: updateInfo });
+            expect(logStoreAction).toHaveBeenCalledWith("UpdatesStore", "clearUpdateError");
+            expect(logStoreAction).toHaveBeenCalledWith("UpdatesStore", "applyUpdate");
         });
     });
 });
