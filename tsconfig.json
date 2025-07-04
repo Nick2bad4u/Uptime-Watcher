@@ -3,27 +3,48 @@
         "target": "ES2020",
         "skipDefaultLibCheck": false,
         "useDefineForClassFields": true,
-        "lib": ["ES2020", "DOM", "DOM.Iterable"],
+        "lib": [
+            "ES2020",
+            "DOM",
+            "DOM.Iterable"
+        ],
         "module": "CommonJS",
         "moduleResolution": "node",
         "resolveJsonModule": true,
         "skipLibCheck": true,
         "isolatedModules": true,
         "jsx": "react-jsx",
-        "strict": true,
-        "types": ["react", "react-dom", "vitest/globals", "@testing-library/jest-dom", "vite/client"],
-        "noUnusedLocals": true,
-        "noUnusedParameters": true,
-        "noFallthroughCasesInSwitch": true,
-        "forceConsistentCasingInFileNames": true,
+        "types": [
+            "react",
+            "react-dom",
+            "vitest/globals",
+            "@testing-library/jest-dom",
+            "vite/client"
+        ],
         "outDir": "dist-electron",
         "baseUrl": ".",
         "paths": {
-            "@/*": ["src/*"]
+            "@/*": [
+                "src/*"
+            ]
         },
         "esModuleInterop": true,
         "allowJs": true,
-        "allowSyntheticDefaultImports": true
+        "allowSyntheticDefaultImports": true,
+        // Strict type checking
+        "strict": true,
+        "exactOptionalPropertyTypes": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "noUncheckedIndexedAccess": true,
+        "noImplicitOverride": true,
+        // Unused code detection
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "allowUnusedLabels": false,
+        "allowUnreachableCode": false,
+        // Additional checks
+        "forceConsistentCasingInFileNames": true
     },
     "include": [
         "src/**/*.ts",
@@ -35,6 +56,13 @@
         "electron/**/*.test.ts",
         "vite.config.ts"
     ],
-    "exclude": ["node_modules", "**/node_modules", "dist", "dist-electron", "release", "out"]
+    "exclude": [
+        "node_modules",
+        "**/node_modules",
+        "dist",
+        "dist-electron",
+        "release",
+        "out"
+    ]
     // Separate tsconfig should be used for renderer (src/) if needed
 }
