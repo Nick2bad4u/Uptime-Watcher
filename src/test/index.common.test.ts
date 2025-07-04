@@ -7,7 +7,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // Mock all individual component modules to avoid dependency issues
-vi.mock("./StatusBadge", () => ({
+vi.mock("../components/common/StatusBadge", () => ({
     StatusBadge: vi.fn(() => "StatusBadge"),
     StatusBadgeVariant: {
         SUCCESS: "success",
@@ -20,7 +20,7 @@ vi.mock("./StatusBadge", () => ({
     default: vi.fn(() => "StatusBadge"),
 }));
 
-vi.mock("./HistoryChart", () => ({
+vi.mock("../components/common/HistoryChart", () => ({
     HistoryChart: vi.fn(() => "HistoryChart"),
     HistoryChartProps: {},
     // Export all to match export * pattern
@@ -29,7 +29,7 @@ vi.mock("./HistoryChart", () => ({
 }));
 
 // Import the barrel export module after mocking
-import * as CommonComponentsIndex from "./index";
+import * as CommonComponentsIndex from "../components/common/index";
 
 describe("Common Components Index Module", () => {
     beforeEach(() => {

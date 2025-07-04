@@ -7,15 +7,15 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // Mock all individual component modules to avoid dependency issues
-vi.mock("./ActionButtonGroup", () => ({
+vi.mock("../components/Dashboard/SiteCard/components/ActionButtonGroup", () => ({
     ActionButtonGroup: vi.fn(() => "ActionButtonGroup"),
     ActionButtonGroupProps: {},
     // Export all to match export * pattern
     __esModule: true,
     default: vi.fn(() => "ActionButtonGroup"),
 }));
-
-vi.mock("./MetricCard", () => ({
+    
+vi.mock("../components/Dashboard/SiteCard/components/MetricCard", () => ({
     MetricCard: vi.fn(() => "MetricCard"),
     MetricCardProps: {},
     MetricCardVariant: {
@@ -27,7 +27,7 @@ vi.mock("./MetricCard", () => ({
     default: vi.fn(() => "MetricCard"),
 }));
 
-vi.mock("./MonitorSelector", () => ({
+vi.mock("../components/Dashboard/SiteCard/components/MonitorSelector", () => ({
     MonitorSelector: vi.fn(() => "MonitorSelector"),
     MonitorSelectorProps: {},
     // Export all to match export * pattern
@@ -36,7 +36,7 @@ vi.mock("./MonitorSelector", () => ({
 }));
 
 // Import the barrel export module after mocking
-import * as SiteCardComponentsIndex from "./index";
+import * as SiteCardComponentsIndex from "../components/Dashboard/SiteCard/components/index";
 
 describe("SiteCard Components Index Module", () => {
     beforeEach(() => {

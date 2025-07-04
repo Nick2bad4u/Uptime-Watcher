@@ -6,8 +6,8 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { SelectField, RadioGroup } from "./FormFields";
-import type { SelectFieldProps, RadioGroupProps } from "./FormFields";
+import { SelectField, RadioGroup } from "../components/AddSiteForm/FormFields";
+import type { SelectFieldProps, RadioGroupProps } from "../components/AddSiteForm/FormFields";
 
 // Mock the theme components
 vi.mock("../../theme/components", () => ({
