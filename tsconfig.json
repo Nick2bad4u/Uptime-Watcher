@@ -31,19 +31,16 @@
         "esModuleInterop": true,
         "allowJs": true,
         "allowSyntheticDefaultImports": true,
-        // Strict type checking
         "strict": true,
         "exactOptionalPropertyTypes": true,
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,
         "noUncheckedIndexedAccess": true,
         "noImplicitOverride": true,
-        // Unused code detection
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "allowUnusedLabels": false,
         "allowUnreachableCode": false,
-        // Additional checks
         "forceConsistentCasingInFileNames": true
     },
     "include": [

@@ -1217,13 +1217,13 @@
     padding: 2rem 1rem;
 }
 
-@media (min-width: 640px) {
+@media (width >= 640px) {
     .main-container {
         padding: 2rem 1.5rem;
     }
 }
 
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
     .main-container {
         padding: 2rem;
     }
@@ -1235,13 +1235,13 @@
     padding: 0 1rem;
 }
 
-@media (min-width: 640px) {
+@media (width >= 640px) {
     .header-container {
         padding: 0 1.5rem;
     }
 }
 
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
     .header-container {
         padding: 0 2rem;
     }
@@ -1255,44 +1255,44 @@
     margin: 0 auto;
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
     .grid-layout {
         max-width: 48rem; /* ~768px */
     }
 }
 
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
     .grid-layout {
         grid-template-columns: 2fr 1fr;
         max-width: 64rem; /* ~1024px */
     }
 }
 
-@media (min-width: 1280px) {
+@media (width >= 1280px) {
     .grid-layout {
         max-width: 80rem; /* ~1280px */
     }
 }
 
-@media (min-width: 1536px) {
+@media (width >= 1536px) {
     .grid-layout {
         max-width: 96rem; /* ~1536px */
     }
 }
 
-@media (min-width: 1920px) {
+@media (width >= 1920px) {
     .grid-layout {
         max-width: 120rem; /* ~1920px */
     }
 }
 
-@media (min-width: 2560px) {
+@media (width >= 2560px) {
     .grid-layout {
         max-width: 160rem; /* ~2560px - 4K support */
     }
 }
 
-@media (min-width: 3840px) {
+@media (width >= 3840px) {
     .grid-layout {
         max-width: 240rem; /* ~3840px - 4K support */
     }
@@ -1717,7 +1717,7 @@
 }
 
 /* Responsive Design Helpers */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .themed-button {
         padding: 0.5rem 1rem;
         font-size: 0.875rem;
@@ -1770,7 +1770,7 @@
 }
 
 /* High Contrast Mode Support */
-@media (prefers-contrast: high) {
+@media (prefers-contrast: more) {
     .themed-button {
         border-width: 2px;
     }

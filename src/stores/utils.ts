@@ -75,3 +75,31 @@ export const logStoreAction = (storeName: string, actionName: string, data?: unk
         console.log(`[${storeName}] ${actionName}`, data);
     }
 };
+
+/**
+ * Utility function to wait for electronAPI to be available.
+ * Polls for the API with exponential backoff to handle timing issues.
+ *
+ * @param maxAttempts - Maximum number of polling attempts (default: 50)
+ * @param baseDelay - Base delay in milliseconds for exponential backoff (default: 100)
+ * @throws Error when electronAPI is not available after maximum attempts
+ */
+export async function waitForElectronAPI(maxAttempts: number = 50, baseDelay: number = 100): Promise<void> {
+    for (const attempt of Array.from({ length: maxAttempts }, (_, i) => i)) {
+        if (
+            typeof window !== "undefined" &&
+            window.electronAPI?.sites?.getSites &&
+            typeof window.electronAPI.sites.getSites === "function"
+        ) {
+            return; // API is ready
+        }
+
+        // Wait with exponential backoff
+        const delay = Math.min(baseDelay * Math.pow(1.5, attempt), 2000);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+
+    throw new Error(
+        "ElectronAPI not available after maximum attempts. The application may not be running in an Electron environment."
+    );
+}

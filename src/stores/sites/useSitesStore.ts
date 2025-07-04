@@ -9,7 +9,62 @@ import type { Monitor, MonitorType, Site, StatusUpdate } from "../../types";
 import type { SitesStore } from "./types";
 
 import { ERROR_MESSAGES } from "../types";
-import { logStoreAction, withErrorHandling } from "../utils";
+import { logStoreAction, withErrorHandling, waitForElectronAPI } from "../utils";
+
+/**
+ * Helper function to handle status updates
+ */
+function createStatusUpdateHandler(get: () => SitesStore, callback: (update: StatusUpdate) => void) {
+    return (update: StatusUpdate) => {
+        try {
+            // Validate update payload
+            if (!update?.site) {
+                throw new Error("Invalid status update: update or update.site is null/undefined");
+            }
+
+            // Smart incremental update - use the payload data directly
+            const state = get();
+            const updatedSites = state.sites.map((site) => {
+                if (site.identifier === update.site.identifier) {
+                    // Use the complete updated site data from the backend
+                    return { ...update.site };
+                }
+                return site; // Keep other sites unchanged
+            });
+
+            // Check if the site was actually found and updated
+            const siteFound = state.sites.some((site) => site.identifier === update.site.identifier);
+
+            if (siteFound) {
+                // Update store state efficiently
+                get().setSites(updatedSites);
+            } else {
+                // Site not found in current state - trigger full sync as fallback
+                if (process.env.NODE_ENV === "development") {
+                    console.warn(`Site ${update.site.identifier} not found in store, triggering full sync`);
+                }
+                get()
+                    .fullSyncFromBackend()
+                    .catch((error) => {
+                        if (process.env.NODE_ENV === "development") {
+                            console.error("Fallback full sync failed:", error);
+                        }
+                    });
+            }
+
+            // Call the provided callback
+            if (callback) callback(update);
+        } catch (error) {
+            console.error("Error processing status update:", error);
+            // Fallback to full sync on any processing error
+            get()
+                .fullSyncFromBackend()
+                .catch((syncError) => {
+                    console.error("Fallback sync after error failed:", syncError);
+                });
+        }
+    };
+}
 
 export const useSitesStore = create<SitesStore>((set, get) => ({
     // Actions
@@ -18,6 +73,7 @@ export const useSitesStore = create<SitesStore>((set, get) => ({
 
         await withErrorHandling(
             async () => {
+                await waitForElectronAPI();
                 // Get the current site
                 const site = get().sites.find((s) => s.identifier === siteId);
                 if (!site) throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
@@ -43,6 +99,7 @@ export const useSitesStore = create<SitesStore>((set, get) => ({
 
         await withErrorHandling(
             async () => {
+                await waitForElectronAPI();
                 await window.electronAPI.sites.checkSiteNow(siteId, monitorId);
                 // Backend will emit 'status-update', which will trigger incremental update
             },
@@ -58,6 +115,7 @@ export const useSitesStore = create<SitesStore>((set, get) => ({
 
         await withErrorHandling(
             async () => {
+                await waitForElectronAPI();
                 // Default to HTTP monitor if none provided
                 const monitors: Monitor[] = (
                     siteData.monitors && siteData.monitors.length > 0
@@ -169,6 +227,8 @@ export const useSitesStore = create<SitesStore>((set, get) => ({
 
         await withErrorHandling(
             async () => {
+                // Wait for electronAPI to be available with timeout
+                await waitForElectronAPI();
                 const sites = await window.electronAPI.sites.getSites();
                 get().setSites(sites);
             },
@@ -259,61 +319,30 @@ export const useSitesStore = create<SitesStore>((set, get) => ({
     subscribeToStatusUpdates: (callback: (update: StatusUpdate) => void) => {
         logStoreAction("SitesStore", "subscribeToStatusUpdates");
 
-        window.electronAPI.events.onStatusUpdate((update: StatusUpdate) => {
-            try {
-                // Validate update payload
-                if (!update?.site) {
-                    throw new Error("Invalid status update: update or update.site is null/undefined");
-                }
+        const handleStatusUpdate = createStatusUpdateHandler(get, callback);
 
-                // Smart incremental update - use the payload data directly
-                const state = get();
-                const updatedSites = state.sites.map((site) => {
-                    if (site.identifier === update.site.identifier) {
-                        // Use the complete updated site data from the backend
-                        return { ...update.site };
-                    }
-                    return site; // Keep other sites unchanged
+        // Check if electronAPI is available before subscribing
+        if (!window.electronAPI?.events?.onStatusUpdate) {
+            // If electronAPI is not ready, wait for it and retry
+            waitForElectronAPI()
+                .then(() => {
+                    window.electronAPI.events.onStatusUpdate(handleStatusUpdate);
+                    return undefined;
+                })
+                .catch((error) => {
+                    console.error("Failed to initialize status update subscription:", error);
                 });
+            return;
+        }
 
-                // Check if the site was actually found and updated
-                const siteFound = state.sites.some((site) => site.identifier === update.site.identifier);
-
-                if (siteFound) {
-                    // Update store state efficiently
-                    get().setSites(updatedSites);
-                } else {
-                    // Site not found in current state - trigger full sync as fallback
-                    if (process.env.NODE_ENV === "development") {
-                        console.warn(`Site ${update.site.identifier} not found in store, triggering full sync`);
-                    }
-                    get()
-                        .fullSyncFromBackend()
-                        .catch((error) => {
-                            if (process.env.NODE_ENV === "development") {
-                                console.error("Fallback full sync failed:", error);
-                            }
-                        });
-                }
-
-                // Call the provided callback
-                if (callback) callback(update);
-            } catch (error) {
-                console.error("Error processing status update:", error);
-                // Fallback to full sync on any processing error
-                get()
-                    .fullSyncFromBackend()
-                    .catch((syncError) => {
-                        console.error("Fallback sync after error failed:", syncError);
-                    });
-            }
-        });
+        window.electronAPI.events.onStatusUpdate(handleStatusUpdate);
     },
     syncSitesFromBackend: async () => {
         logStoreAction("SitesStore", "syncSitesFromBackend");
 
         await withErrorHandling(
             async () => {
+                await waitForElectronAPI();
                 const backendSites = await window.electronAPI.sites.getSites();
                 get().setSites(backendSites);
             },
@@ -326,7 +355,9 @@ export const useSitesStore = create<SitesStore>((set, get) => ({
     },
     unsubscribeFromStatusUpdates: () => {
         logStoreAction("SitesStore", "unsubscribeFromStatusUpdates");
-        window.electronAPI.events.removeAllListeners("status-update");
+        if (window.electronAPI?.events?.removeAllListeners) {
+            window.electronAPI.events.removeAllListeners("status-update");
+        }
     },
     updateMonitorRetryAttempts: async (siteId: string, monitorId: string, retryAttempts: number | undefined) => {
         logStoreAction("SitesStore", "updateMonitorRetryAttempts", { monitorId, retryAttempts, siteId });

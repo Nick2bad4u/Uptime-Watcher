@@ -24,7 +24,6 @@
         "**/release": true,
         "**/.husky/**": true,
         "**/dist": true,
-        "**/test/**": true,
         "**/coverage/**": true,
         "**/dist-electron/**": true
     },

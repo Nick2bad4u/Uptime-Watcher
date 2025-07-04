@@ -24,11 +24,21 @@ export const useUpdatesStore = create<UpdatesStore>((set) => ({
         logStoreAction("UpdatesStore", "setUpdateError", { error });
         set({ updateError: error });
     },
+    setUpdateInfo: (info) => {
+        logStoreAction("UpdatesStore", "setUpdateInfo", { info });
+        set({ updateInfo: info });
+    },
+    setUpdateProgress: (progress: number) => {
+        logStoreAction("UpdatesStore", "setUpdateProgress", { progress });
+        set({ updateProgress: progress });
+    },
     setUpdateStatus: (status: UpdateStatus) => {
         logStoreAction("UpdatesStore", "setUpdateStatus", { status });
         set({ updateStatus: status });
     },
     // State
     updateError: undefined,
+    updateInfo: undefined,
+    updateProgress: 0,
     updateStatus: "idle",
 }));
