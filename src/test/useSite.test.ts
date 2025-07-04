@@ -10,6 +10,7 @@ import { useSite } from "../hooks/site/useSite";
 import { useSiteMonitor } from "../hooks/site/useSiteMonitor";
 import { useSiteStats } from "../hooks/site/useSiteStats";
 import { useSiteActions } from "../hooks/site/useSiteActions";
+import { useErrorStore } from "../stores";
 import { Site, Monitor } from "../types";
 
 // Mock all the sub-hooks
@@ -46,10 +47,6 @@ const mockSiteActionsResult = {
     handleCardClick: vi.fn(),
 };
 
-const mockStore = {
-    isLoading: false,
-};
-
 vi.mock("../hooks/site/useSiteMonitor", () => ({
     useSiteMonitor: vi.fn(() => mockSiteMonitorResult),
 }));
@@ -62,9 +59,12 @@ vi.mock("../hooks/site/useSiteActions", () => ({
     useSiteActions: vi.fn(() => mockSiteActionsResult),
 }));
 
-vi.mock("../store", () => ({
-    useStore: () => mockStore,
+vi.mock("../stores", () => ({
+    useErrorStore: vi.fn(),
 }));
+
+// Get mocked functions for type safety
+const mockUseErrorStore = vi.mocked(useErrorStore);
 
 describe("useSite", () => {
     const mockSite: Site = {
@@ -80,8 +80,13 @@ describe("useSite", () => {
         ],
     };
 
+    const mockErrorStore = {
+        isLoading: false,
+    };
+
     beforeEach(() => {
         vi.clearAllMocks();
+        mockUseErrorStore.mockReturnValue(mockErrorStore);
     });
 
     describe("Integration", () => {
@@ -111,7 +116,7 @@ describe("useSite", () => {
             expect(result.current.handleStopMonitoring).toBe(mockSiteActionsResult.handleStopMonitoring);
 
             // Should include store state
-            expect(result.current.isLoading).toBe(mockStore.isLoading);
+            expect(result.current.isLoading).toBe(mockErrorStore.isLoading);
         });
 
         it("should pass correct parameters to sub-hooks", () => {
@@ -130,7 +135,7 @@ describe("useSite", () => {
 
     describe("Loading State", () => {
         it("should reflect store loading state", () => {
-            mockStore.isLoading = true;
+            mockErrorStore.isLoading = true;
 
             const { result } = renderHook(() => useSite(mockSite));
 
@@ -138,13 +143,13 @@ describe("useSite", () => {
         });
 
         it("should update when loading state changes", () => {
-            mockStore.isLoading = false;
+            mockErrorStore.isLoading = false;
 
             const { result, rerender } = renderHook(() => useSite(mockSite));
 
             expect(result.current.isLoading).toBe(false);
 
-            mockStore.isLoading = true;
+            mockErrorStore.isLoading = true;
             rerender();
 
             expect(result.current.isLoading).toBe(true);

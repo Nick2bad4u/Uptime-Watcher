@@ -5,16 +5,18 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { useStore } from "../store";
+import { useErrorStore, useSettingsStore, useSitesStore } from "../stores";
 import { Settings } from "../components/Settings/Settings";
 import { ScreenshotThumbnail } from "../components/SiteDetails/ScreenshotThumbnail";
 import { HistoryTab } from "../components/SiteDetails/tabs/HistoryTab";
 import { ThemedIconButton } from "../theme/components";
 import type { Monitor, StatusHistory } from "../types";
 
-// Mock the store and other dependencies
-vi.mock("../store", () => ({
-    useStore: vi.fn(),
+// Mock the stores and other dependencies
+vi.mock("../stores", () => ({
+    useErrorStore: vi.fn(),
+    useSettingsStore: vi.fn(),
+    useSitesStore: vi.fn(),
 }));
 
 vi.mock("../services/logger", () => ({
@@ -38,7 +40,7 @@ describe("Remaining Coverage Tests", () => {
         it("should render settings component", () => {
             const mockUpdateSettings = vi.fn();
 
-            (useStore as unknown as { mockReturnValue: (value: unknown) => void }).mockReturnValue({
+            (useSettingsStore as unknown as { mockReturnValue: (value: unknown) => void }).mockReturnValue({
                 settings: {
                     theme: "system",
                     autostart: false,
@@ -46,6 +48,15 @@ describe("Remaining Coverage Tests", () => {
                     historyLimit: 50,
                 },
                 updateSettings: mockUpdateSettings,
+            });
+
+            (useErrorStore as unknown as { mockReturnValue: (value: unknown) => void }).mockReturnValue({
+                lastError: null,
+                clearError: vi.fn(),
+            });
+
+            (useSitesStore as unknown as { mockReturnValue: (value: unknown) => void }).mockReturnValue({
+                sites: [],
             });
 
             render(<Settings onClose={() => {}} />);
@@ -108,7 +119,7 @@ describe("Remaining Coverage Tests", () => {
                 ] as StatusHistory[],
             };
 
-            (useStore as unknown as { mockReturnValue: (value: unknown) => void }).mockReturnValue({
+            (useSettingsStore as unknown as { mockReturnValue: (value: unknown) => void }).mockReturnValue({
                 settings: { historyLimit: 25 },
             });
 

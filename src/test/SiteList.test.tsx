@@ -7,18 +7,22 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { SiteList } from "../components/Dashboard/SiteList";
-import { useStore } from "../store";
 import { useTheme } from "../theme/useTheme";
+import { useSitesStore } from "../stores/sites/useSitesStore";
 
-// Mock the store
-vi.mock("../store", () => ({
-    useStore: vi.fn(),
+// Mock the sites store with proper variable hoisting
+vi.mock("../stores/sites/useSitesStore", () => ({
+    useSitesStore: vi.fn(),
 }));
 
 // Mock the theme hook
 vi.mock("../theme/useTheme", () => ({
     useTheme: vi.fn(),
 }));
+
+// Get the mocked function for type safety
+const mockUseSitesStore = vi.mocked(useSitesStore);
+const mockUseTheme = vi.mocked(useTheme);
 
 // Mock the child components
 vi.mock("../components/Dashboard/SiteCard", () => ({
@@ -49,13 +53,13 @@ describe("SiteList", () => {
         vi.clearAllMocks();
     });
 
-    it("should render EmptyState when no sites exist", () => {
-        (useStore as any).mockReturnValue({
+    it("should render empty state when no sites exist", () => {
+        mockUseSitesStore.mockReturnValue({
             sites: [],
         });
-        (useTheme as any).mockReturnValue({
+        mockUseTheme.mockReturnValue({
             isDark: false,
-        });
+        } as any);
 
         render(<SiteList />);
 
@@ -64,12 +68,12 @@ describe("SiteList", () => {
     });
 
     it("should render site cards when sites exist", () => {
-        (useStore as any).mockReturnValue({
+        mockUseSitesStore.mockReturnValue({
             sites: mockSites,
         });
-        (useTheme as any).mockReturnValue({
+        mockUseTheme.mockReturnValue({
             isDark: false,
-        });
+        } as any);
 
         render(<SiteList />);
 
@@ -80,12 +84,12 @@ describe("SiteList", () => {
     });
 
     it("should apply light theme classes", () => {
-        (useStore as any).mockReturnValue({
+        mockUseSitesStore.mockReturnValue({
             sites: mockSites,
         });
-        (useTheme as any).mockReturnValue({
+        mockUseTheme.mockReturnValue({
             isDark: false,
-        });
+        } as any);
 
         const { container } = render(<SiteList />);
         const dividerElement = container.querySelector(".divider-y");
@@ -95,12 +99,12 @@ describe("SiteList", () => {
     });
 
     it("should apply dark theme classes", () => {
-        (useStore as any).mockReturnValue({
+        mockUseSitesStore.mockReturnValue({
             sites: mockSites,
         });
-        (useTheme as any).mockReturnValue({
+        mockUseTheme.mockReturnValue({
             isDark: true,
-        });
+        } as any);
 
         const { container } = render(<SiteList />);
         const dividerElement = container.querySelector(".divider-y");
@@ -110,12 +114,12 @@ describe("SiteList", () => {
     });
 
     it("should render correct number of site cards", () => {
-        (useStore as any).mockReturnValue({
+        mockUseSitesStore.mockReturnValue({
             sites: mockSites,
         });
-        (useTheme as any).mockReturnValue({
+        mockUseTheme.mockReturnValue({
             isDark: false,
-        });
+        } as any);
 
         render(<SiteList />);
 
@@ -125,12 +129,12 @@ describe("SiteList", () => {
 
     it("should handle single site", () => {
         const singleSite = [mockSites[0]];
-        (useStore as any).mockReturnValue({
+        mockUseSitesStore.mockReturnValue({
             sites: singleSite,
         });
-        (useTheme as any).mockReturnValue({
+        mockUseTheme.mockReturnValue({
             isDark: false,
-        });
+        } as any);
 
         render(<SiteList />);
 

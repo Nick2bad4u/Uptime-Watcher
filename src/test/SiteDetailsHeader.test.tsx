@@ -120,7 +120,12 @@ describe("SiteDetailsHeader", () => {
 
     afterEach(() => {
         // Clean up any modifications to window object
-        if ("electronAPI" in window) {
+        try {
+            if ("electronAPI" in window) {
+                delete (window as unknown as Record<string, unknown>).electronAPI;
+            }
+        } catch {
+            // If we can't delete it, just set it to undefined
             (window as unknown as Record<string, unknown>).electronAPI = undefined;
         }
 
@@ -226,12 +231,11 @@ describe("SiteDetailsHeader", () => {
         });
 
         it("should call electronAPI.openExternal when available", async () => {
-            // Mock electronAPI with openExternal method
-            Object.defineProperty(window, "electronAPI", {
-                value: mockElectronAPI,
-                writable: true,
-                configurable: true,
-            });
+            // Store original electronAPI if it exists
+            const originalElectronAPI = (window as unknown as Record<string, unknown>).electronAPI;
+
+            // Set the mock electronAPI directly
+            (window as unknown as Record<string, unknown>).electronAPI = mockElectronAPI;
 
             const user = userEvent.setup();
             render(<SiteDetailsHeader site={mockSite} selectedMonitor={mockHttpMonitor} />);
@@ -247,6 +251,9 @@ describe("SiteDetailsHeader", () => {
 
             expect(mockElectronAPI.openExternal).toHaveBeenCalledWith("https://example.com");
             expect(mockWindowOpen).not.toHaveBeenCalled();
+
+            // Restore original electronAPI
+            (window as unknown as Record<string, unknown>).electronAPI = originalElectronAPI;
         });
 
         it("should prevent default link behavior", async () => {
@@ -264,12 +271,11 @@ describe("SiteDetailsHeader", () => {
         });
 
         it("should handle electronAPI without openExternal method", async () => {
-            // Mock electronAPI without openExternal
-            Object.defineProperty(window, "electronAPI", {
-                value: {},
-                writable: true,
-                configurable: true,
-            });
+            // Store original electronAPI if it exists
+            const originalElectronAPI = (window as unknown as Record<string, unknown>).electronAPI;
+
+            // Set the mock electronAPI directly
+            (window as unknown as Record<string, unknown>).electronAPI = {};
 
             const user = userEvent.setup();
             const { container } = render(<SiteDetailsHeader site={mockSite} selectedMonitor={mockHttpMonitor} />);
@@ -279,6 +285,9 @@ describe("SiteDetailsHeader", () => {
             await user.click(urlLink!);
 
             expect(mockWindowOpen).toHaveBeenCalledWith("https://example.com", "_blank");
+
+            // Restore original electronAPI
+            (window as unknown as Record<string, unknown>).electronAPI = originalElectronAPI;
         });
 
         it("should handle empty URL gracefully", async () => {
@@ -312,11 +321,11 @@ describe("SiteDetailsHeader", () => {
             });
 
             // Remove electronAPI to ensure window.open fallback is used
-            Object.defineProperty(window, "electronAPI", {
-                value: undefined,
-                writable: true,
-                configurable: true,
-            });
+            // Store original electronAPI if it exists
+            const originalElectronAPI = (window as unknown as Record<string, unknown>).electronAPI;
+
+            // Set the mock electronAPI directly
+            (window as unknown as Record<string, unknown>).electronAPI = undefined;
 
             const { container } = render(
                 <SiteDetailsHeader site={mockSite} selectedMonitor={mockMonitorWithNullishUrl} />
@@ -338,6 +347,9 @@ describe("SiteDetailsHeader", () => {
                     url: "", // This should be the fallback from the nullish coalescing
                 })
             );
+
+            // Restore original electronAPI
+            (window as unknown as Record<string, unknown>).electronAPI = originalElectronAPI;
 
             // window.open should be called with empty string
             expect(mockWindowOpen).toHaveBeenCalledWith("", "_blank");
@@ -401,11 +413,11 @@ describe("SiteDetailsHeader", () => {
 
     describe("Type Guard Functionality", () => {
         it("should use electronAPI when openExternal is available", async () => {
-            Object.defineProperty(window, "electronAPI", {
-                value: mockElectronAPI,
-                writable: true,
-                configurable: true,
-            });
+            // Store original electronAPI if it exists
+            const originalElectronAPI = (window as unknown as Record<string, unknown>).electronAPI;
+
+            // Set the mock electronAPI directly
+            (window as unknown as Record<string, unknown>).electronAPI = mockElectronAPI;
 
             const user = userEvent.setup();
             const { container } = render(<SiteDetailsHeader site={mockSite} selectedMonitor={mockHttpMonitor} />);
@@ -414,14 +426,17 @@ describe("SiteDetailsHeader", () => {
             await user.click(urlLink!);
 
             expect(mockElectronAPI.openExternal).toHaveBeenCalledWith("https://example.com");
+
+            // Restore original electronAPI
+            (window as unknown as Record<string, unknown>).electronAPI = originalElectronAPI;
         });
 
         it("should fallback to window.open when openExternal is not available", async () => {
-            Object.defineProperty(window, "electronAPI", {
-                value: { someOtherMethod: vi.fn() },
-                writable: true,
-                configurable: true,
-            });
+            // Store original electronAPI if it exists
+            const originalElectronAPI = (window as unknown as Record<string, unknown>).electronAPI;
+
+            // Set the mock electronAPI directly
+            (window as unknown as Record<string, unknown>).electronAPI = { someOtherMethod: vi.fn() };
 
             const user = userEvent.setup();
             const { container } = render(<SiteDetailsHeader site={mockSite} selectedMonitor={mockHttpMonitor} />);
@@ -430,14 +445,17 @@ describe("SiteDetailsHeader", () => {
             await user.click(urlLink!);
 
             expect(mockWindowOpen).toHaveBeenCalledWith("https://example.com", "_blank");
+
+            // Restore original electronAPI
+            (window as unknown as Record<string, unknown>).electronAPI = originalElectronAPI;
         });
 
         it("should fallback to window.open when electronAPI is null", async () => {
-            Object.defineProperty(window, "electronAPI", {
-                value: null,
-                writable: true,
-                configurable: true,
-            });
+            // Store original electronAPI if it exists
+            const originalElectronAPI = (window as unknown as Record<string, unknown>).electronAPI;
+
+            // Set the mock electronAPI directly
+            (window as unknown as Record<string, unknown>).electronAPI = null;
 
             const user = userEvent.setup();
             const { container } = render(<SiteDetailsHeader site={mockSite} selectedMonitor={mockHttpMonitor} />);
@@ -446,6 +464,9 @@ describe("SiteDetailsHeader", () => {
             await user.click(urlLink!);
 
             expect(mockWindowOpen).toHaveBeenCalledWith("https://example.com", "_blank");
+
+            // Restore original electronAPI
+            (window as unknown as Record<string, unknown>).electronAPI = originalElectronAPI;
         });
     });
 

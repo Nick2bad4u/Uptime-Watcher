@@ -56,8 +56,38 @@ const mockUseTheme = {
 // Mock window.confirm
 global.confirm = vi.fn();
 
-vi.mock("../store", () => ({
-    useStore: () => mockUseStore,
+// Mock the new store structure
+const mockErrorStore = {
+    lastError: null as string | null,
+    setError: vi.fn(),
+    clearError: vi.fn(),
+    isLoading: false,
+};
+
+const mockSettingsStore = {
+    settings: {
+        notifications: true,
+        autoStart: false,
+        minimizeToTray: true,
+        theme: "dark" as ThemeName,
+        soundAlerts: false,
+        historyLimit: 100,
+    },
+    updateSettings: vi.fn(),
+    resetSettings: vi.fn(),
+    isLoading: false,
+    updateHistoryLimitValue: vi.fn().mockResolvedValue(undefined),
+};
+
+const mockSitesStore = {
+    fullSyncFromBackend: vi.fn().mockResolvedValue(undefined),
+    downloadSQLiteBackup: vi.fn().mockResolvedValue(undefined),
+};
+
+vi.mock("../stores", () => ({
+    useSettingsStore: vi.fn(() => mockSettingsStore),
+    useErrorStore: vi.fn(() => mockErrorStore),
+    useSitesStore: vi.fn(() => mockSitesStore),
 }));
 
 vi.mock("../theme/useTheme", () => ({
@@ -125,8 +155,19 @@ describe("Settings", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        mockUseStore.isLoading = false;
-        mockUseStore.lastError = null;
+        mockSettingsStore.isLoading = false;
+        mockErrorStore.isLoading = false;
+        mockErrorStore.lastError = null;
+        
+        // Clear mock functions
+        mockSettingsStore.resetSettings.mockClear();
+        mockErrorStore.clearError.mockClear();
+        mockErrorStore.setError.mockClear();
+        mockSettingsStore.updateSettings.mockClear();
+        mockSettingsStore.updateHistoryLimitValue.mockClear();
+        mockSitesStore.fullSyncFromBackend.mockClear();
+        mockSitesStore.downloadSQLiteBackup.mockClear();
+        
         global.confirm = vi.fn();
     });
 
@@ -167,14 +208,16 @@ describe("Settings", () => {
 
     describe("Error Handling", () => {
         it("should display error message when lastError is present", () => {
-            mockUseStore.lastError = "Test error message";
+            // Set error state
+            mockErrorStore.lastError = "Test error message";
+            
             render(<Settings onClose={mockOnClose} />);
 
             expect(screen.getByText("⚠️ Test error message")).toBeInTheDocument();
         });
 
         it("should allow clearing error", async () => {
-            mockUseStore.lastError = "Test error message";
+            mockErrorStore.lastError = "Test error message";
             const user = userEvent.setup();
             render(<Settings onClose={mockOnClose} />);
 
@@ -183,7 +226,7 @@ describe("Settings", () => {
             const errorCloseButton = closeButtons[1]; // Error close button is the second one
             await user.click(errorCloseButton);
 
-            expect(mockUseStore.clearError).toHaveBeenCalledTimes(1);
+            expect(mockErrorStore.clearError).toHaveBeenCalledTimes(1);
         });
     });
 
@@ -203,11 +246,11 @@ describe("Settings", () => {
             const historySelect = screen.getByLabelText("Maximum number of history records to keep per site");
             await user.selectOptions(historySelect, "50");
 
-            expect(mockUseStore.updateHistoryLimitValue).toHaveBeenCalledWith(50);
+            expect(mockSettingsStore.updateHistoryLimitValue).toHaveBeenCalledWith(50);
         });
 
         it("should handle history limit change error", async () => {
-            mockUseStore.updateHistoryLimitValue.mockRejectedValueOnce(new Error("Update failed"));
+            mockSettingsStore.updateHistoryLimitValue.mockRejectedValueOnce(new Error("Update failed"));
             const user = userEvent.setup();
             render(<Settings onClose={mockOnClose} />);
 
@@ -215,7 +258,7 @@ describe("Settings", () => {
             await user.selectOptions(historySelect, "50");
 
             await waitFor(() => {
-                expect(mockUseStore.updateHistoryLimitValue).toHaveBeenCalledWith(50);
+                expect(mockSettingsStore.updateHistoryLimitValue).toHaveBeenCalledWith(50);
             });
         });
     });
@@ -235,7 +278,7 @@ describe("Settings", () => {
             const notificationsCheckbox = screen.getByLabelText("Enable desktop notifications");
             await user.click(notificationsCheckbox);
 
-            expect(mockUseStore.updateSettings).toHaveBeenCalledWith({ notifications: false });
+            expect(mockSettingsStore.updateSettings).toHaveBeenCalledWith({ notifications: false });
         });
 
         it("should handle sound alerts toggle", async () => {
@@ -245,7 +288,7 @@ describe("Settings", () => {
             const soundAlertsCheckbox = screen.getByLabelText("Enable sound alerts");
             await user.click(soundAlertsCheckbox);
 
-            expect(mockUseStore.updateSettings).toHaveBeenCalledWith({ soundAlerts: true });
+            expect(mockSettingsStore.updateSettings).toHaveBeenCalledWith({ soundAlerts: true });
         });
     });
 
@@ -282,7 +325,7 @@ describe("Settings", () => {
             const autoStartCheckbox = screen.getByLabelText("Enable auto-start with system");
             await user.click(autoStartCheckbox);
 
-            expect(mockUseStore.updateSettings).toHaveBeenCalledWith({ autoStart: true });
+            expect(mockSettingsStore.updateSettings).toHaveBeenCalledWith({ autoStart: true });
         });
 
         it("should handle minimize to tray toggle", async () => {
@@ -292,7 +335,7 @@ describe("Settings", () => {
             const minimizeToTrayCheckbox = screen.getByLabelText("Enable minimize to system tray");
             await user.click(minimizeToTrayCheckbox);
 
-            expect(mockUseStore.updateSettings).toHaveBeenCalledWith({ minimizeToTray: false });
+            expect(mockSettingsStore.updateSettings).toHaveBeenCalledWith({ minimizeToTray: false });
         });
     });
 
@@ -310,7 +353,7 @@ describe("Settings", () => {
             const syncButton = screen.getByText("🔄 Sync Data");
             await user.click(syncButton);
 
-            expect(mockUseStore.fullSyncFromBackend).toHaveBeenCalledTimes(1);
+            expect(mockSitesStore.fullSyncFromBackend).toHaveBeenCalledTimes(1);
         });
 
         it("should show success message after sync", async () => {
@@ -327,7 +370,7 @@ describe("Settings", () => {
 
         it("should handle sync error", async () => {
             const error = new Error("Sync failed");
-            mockUseStore.fullSyncFromBackend.mockRejectedValueOnce(error);
+            mockSitesStore.fullSyncFromBackend.mockRejectedValueOnce(error);
             const user = userEvent.setup();
             render(<Settings onClose={mockOnClose} />);
 
@@ -335,7 +378,7 @@ describe("Settings", () => {
             await user.click(syncButton);
 
             await waitFor(() => {
-                expect(mockUseStore.setError).toHaveBeenCalledWith("Failed to sync data: Sync failed");
+                expect(mockErrorStore.setError).toHaveBeenCalledWith("Failed to sync data: Sync failed");
             });
         });
 
@@ -352,12 +395,12 @@ describe("Settings", () => {
             const downloadButton = screen.getByText("Download SQLite Backup");
             await user.click(downloadButton);
 
-            expect(mockUseStore.downloadSQLiteBackup).toHaveBeenCalledTimes(1);
+            expect(mockSitesStore.downloadSQLiteBackup).toHaveBeenCalledTimes(1);
         });
 
         it("should handle download sqlite error", async () => {
             const error = new Error("Download failed");
-            mockUseStore.downloadSQLiteBackup.mockRejectedValueOnce(error);
+            mockSitesStore.downloadSQLiteBackup.mockRejectedValueOnce(error);
             const user = userEvent.setup();
             render(<Settings onClose={mockOnClose} />);
 
@@ -365,7 +408,7 @@ describe("Settings", () => {
             await user.click(downloadButton);
 
             await waitFor(() => {
-                expect(mockUseStore.setError).toHaveBeenCalledWith("Failed to download SQLite backup: Download failed");
+                expect(mockErrorStore.setError).toHaveBeenCalledWith("Failed to download SQLite backup: Download failed");
             });
         });
     });
@@ -388,8 +431,8 @@ describe("Settings", () => {
             await user.click(resetButton);
 
             expect(global.confirm).toHaveBeenCalledWith("Are you sure you want to reset all settings to defaults?");
-            expect(mockUseStore.resetSettings).toHaveBeenCalledTimes(1);
-            expect(mockUseStore.clearError).toHaveBeenCalledTimes(1);
+            expect(mockSettingsStore.resetSettings).toHaveBeenCalledTimes(1);
+            expect(mockErrorStore.clearError).toHaveBeenCalledTimes(1);
         });
 
         it("should not reset if user cancels confirmation", async () => {
@@ -401,7 +444,7 @@ describe("Settings", () => {
             await user.click(resetButton);
 
             expect(global.confirm).toHaveBeenCalledWith("Are you sure you want to reset all settings to defaults?");
-            expect(mockUseStore.resetSettings).not.toHaveBeenCalled();
+            expect(mockSettingsStore.resetSettings).not.toHaveBeenCalled();
         });
 
         it("should handle cancel button click", async () => {
@@ -427,7 +470,7 @@ describe("Settings", () => {
 
     describe("Loading States", () => {
         it("should disable controls when loading", () => {
-            mockUseStore.isLoading = true;
+            mockErrorStore.isLoading = true;
             render(<Settings onClose={mockOnClose} />);
 
             const historySelect = screen.getByLabelText("Maximum number of history records to keep per site");
@@ -450,7 +493,7 @@ describe("Settings", () => {
         });
 
         it("should handle sync error with non-Error object", async () => {
-            mockUseStore.fullSyncFromBackend.mockRejectedValueOnce("String error");
+            mockSitesStore.fullSyncFromBackend.mockRejectedValueOnce("String error");
             const user = userEvent.setup();
             render(<Settings onClose={mockOnClose} />);
 
@@ -458,12 +501,12 @@ describe("Settings", () => {
             await user.click(syncButton);
 
             await waitFor(() => {
-                expect(mockUseStore.setError).toHaveBeenCalledWith("Failed to sync data: String error");
+                expect(mockErrorStore.setError).toHaveBeenCalledWith("Failed to sync data: String error");
             });
         });
 
         it("should handle download error with non-Error object", async () => {
-            mockUseStore.downloadSQLiteBackup.mockRejectedValueOnce("String error");
+            mockSitesStore.downloadSQLiteBackup.mockRejectedValueOnce("String error");
             const user = userEvent.setup();
             render(<Settings onClose={mockOnClose} />);
 
@@ -471,15 +514,14 @@ describe("Settings", () => {
             await user.click(downloadButton);
 
             await waitFor(() => {
-                expect(mockUseStore.setError).toHaveBeenCalledWith("Failed to download SQLite backup: String error");
+                expect(mockErrorStore.setError).toHaveBeenCalledWith("Failed to download SQLite backup: String error");
             });
         });
     });
 
     describe("Loading state edge cases", () => {
-        it("should handle loading timeout scenario", async () => {
-            // Test that when isLoading is true, the component handles the timeout correctly
-            mockUseStore.isLoading = true;
+        it("should handle loading timeout scenario", async () => {            // Test that when isLoading is true, the component handles the timeout correctly
+            mockErrorStore.isLoading = true;
             const { unmount } = render(<Settings onClose={mockOnClose} />);
 
             // Unmount immediately to test the cleanup function
@@ -487,8 +529,7 @@ describe("Settings", () => {
 
             // This tests the cleanup logic in the useEffect
             expect(true).toBe(true); // Basic assertion to avoid empty test
-
-            mockUseStore.isLoading = false; // Reset for other tests
+            mockErrorStore.isLoading = false; // Reset for other tests
         });
     });
 
@@ -515,7 +556,7 @@ describe("Settings", () => {
             const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
 
             // Set loading state to true to trigger the timeout setup
-            mockUseStore.isLoading = true;
+            mockErrorStore.isLoading = true;
 
             const { unmount } = render(<Settings onClose={mockOnClose} />);
 
@@ -528,7 +569,7 @@ describe("Settings", () => {
 
             clearTimeoutSpy.mockRestore();
             vi.useRealTimers();
-            mockUseStore.isLoading = false; // Reset for other tests
+            mockErrorStore.isLoading = false; // Reset for other tests
         });
 
         it("should trigger clearTimeout cleanup when isLoading changes from true to false (line 73)", () => {
@@ -536,7 +577,7 @@ describe("Settings", () => {
             const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
 
             // Set initial loading state to true
-            mockUseStore.isLoading = true;
+            mockErrorStore.isLoading = true;
 
             const { rerender } = render(<Settings onClose={mockOnClose} />);
 
@@ -546,7 +587,7 @@ describe("Settings", () => {
             });
 
             // Change loading state from true to false
-            mockUseStore.isLoading = false;
+            mockErrorStore.isLoading = false;
 
             // Rerender with the new loading state
             act(() => {
@@ -597,7 +638,7 @@ describe("Settings", () => {
             expect(result2).toBe(true);
 
             // Verify that updateSettings was not called with invalid data
-            expect(mockUseStore.updateSettings).not.toHaveBeenCalledWith({ invalidKey: "value" });
+            expect(mockSettingsStore.updateSettings).not.toHaveBeenCalledWith({ invalidKey: "value" });
 
             consoleWarnSpy.mockRestore();
         });
@@ -638,7 +679,7 @@ describe("Settings", () => {
     describe("Loading Timeout Cleanup", () => {
         it("should clear timeout on component unmount during loading", async () => {
             const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
-            mockUseStore.isLoading = true;
+            mockErrorStore.isLoading = true;
 
             const { unmount } = render(<Settings onClose={mockOnClose} />);
 
@@ -649,7 +690,7 @@ describe("Settings", () => {
             clearTimeoutSpy.mockRestore();
 
             // Reset loading state
-            mockUseStore.isLoading = false;
+            mockErrorStore.isLoading = false;
         });
 
         it("should handle loading state changes and cleanup", async () => {
@@ -661,13 +702,13 @@ describe("Settings", () => {
 
             // Change to loading = true - wrap in act to handle React state updates
             act(() => {
-                mockUseStore.isLoading = true;
+                mockErrorStore.isLoading = true;
                 rerender(<Settings onClose={mockOnClose} />);
             });
 
             // Change back to loading = false - wrap in act to handle React state updates
             act(() => {
-                mockUseStore.isLoading = false;
+                mockErrorStore.isLoading = false;
                 rerender(<Settings onClose={mockOnClose} />);
             });
 

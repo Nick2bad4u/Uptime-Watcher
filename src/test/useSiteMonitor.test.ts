@@ -8,6 +8,7 @@ import { renderHook, act } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 import { useSiteMonitor } from "../hooks/site/useSiteMonitor";
+import { useSitesStore } from "../stores";
 import { Site, Monitor } from "../types";
 
 // Mock the store
@@ -17,9 +18,12 @@ const mockStore = {
     sites: [] as Site[],
 };
 
-vi.mock("../store", () => ({
-    useStore: () => mockStore,
+vi.mock("../stores", () => ({
+    useSitesStore: vi.fn(),
 }));
+
+// Get mocked function for type safety
+const mockUseSitesStore = vi.mocked(useSitesStore);
 
 describe("useSiteMonitor", () => {
     const mockSite: Site = {
@@ -55,6 +59,7 @@ describe("useSiteMonitor", () => {
         vi.clearAllMocks();
         mockStore.sites = [mockSite];
         mockStore.getSelectedMonitorId.mockReturnValue("monitor-1");
+        mockUseSitesStore.mockReturnValue(mockStore);
     });
 
     describe("Basic Functionality", () => {

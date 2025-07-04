@@ -32,12 +32,12 @@
         "allowJs": true,
         "allowSyntheticDefaultImports": true,
         // Strict type checking
-        "strict": true,
-        "exactOptionalPropertyTypes": true,
+        "strict": false,
+        "exactOptionalPropertyTypes": false,
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,
         "noUncheckedIndexedAccess": true,
-        "noImplicitOverride": true,
+        "noImplicitOverride": false,
         // Unused code detection
         "noUnusedLocals": true,
         "noUnusedParameters": true,

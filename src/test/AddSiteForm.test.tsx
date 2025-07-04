@@ -10,10 +10,12 @@ import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
 import { AddSiteForm } from "../components/AddSiteForm/AddSiteForm";
 
-// Mock the store
-const mockUseStore = vi.fn();
-vi.mock("../store", () => ({
-    useStore: () => mockUseStore(),
+// Mock the stores
+const mockUseErrorStore = vi.fn();
+const mockUseSitesStore = vi.fn();
+vi.mock("../stores", () => ({
+    useErrorStore: () => mockUseErrorStore(),
+    useSitesStore: () => mockUseSitesStore(),
 }));
 
 // Mock the theme hook
@@ -66,7 +68,7 @@ vi.mock("../theme/components", () => ({
     ThemedButton: ({ children, className, disabled, loading, type, variant, fullWidth, ...props }: any) => (
         <button
             className={`${className} ${variant} ${fullWidth ? "w-full" : ""}`}
-            disabled={disabled || loading}
+            disabled={disabled ?? loading}
             type={type}
             {...props}
         >
@@ -82,16 +84,35 @@ vi.mock("../theme/components", () => ({
 }));
 
 describe("AddSiteForm", () => {
-    const defaultStoreState = {
-        addMonitorToSite: vi.fn(),
+    const defaultErrorStoreState = {
         clearError: vi.fn(),
-        createSite: vi.fn(),
         isLoading: false,
-        lastError: null,
+        lastError: undefined,
+        setError: vi.fn(),
+        clearAllErrors: vi.fn(),
+        clearStoreError: vi.fn(),
+        getOperationLoading: vi.fn(),
+        getStoreError: vi.fn(),
+        operationLoading: {},
+        setLoading: vi.fn(),
+        setOperationLoading: vi.fn(),
+        setStoreError: vi.fn(),
+        storeErrors: {},
+    };
+
+    const defaultSitesStoreState = {
+        addMonitorToSite: vi.fn(),
+        addSite: vi.fn(),
+        checkSiteNow: vi.fn(),
+        createSite: vi.fn(),
+        removeSite: vi.fn(),
         sites: [
-            { identifier: "site1", name: "Test Site 1" },
-            { identifier: "site2", name: "Test Site 2" },
+            { identifier: "site1", name: "Test Site 1", monitors: [] },
+            { identifier: "site2", name: "Test Site 2", monitors: [] },
         ],
+        syncSitesFromBackend: vi.fn(),
+        updateSite: vi.fn(),
+        updateSiteStatus: vi.fn(),
     };
 
     const defaultFormState = {
@@ -124,7 +145,8 @@ describe("AddSiteForm", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        mockUseStore.mockReturnValue(defaultStoreState);
+        mockUseErrorStore.mockReturnValue(defaultErrorStoreState);
+        mockUseSitesStore.mockReturnValue(defaultSitesStoreState);
         mockUseAddSiteForm.mockReturnValue(defaultFormState);
         mockUseTheme.mockReturnValue(defaultThemeState);
         vi.mocked(handleSubmit).mockImplementation((e: any) => e.preventDefault());
@@ -189,8 +211,8 @@ describe("AddSiteForm", () => {
 
     describe("Loading States", () => {
         it("should handle loading state from store", () => {
-            mockUseStore.mockReturnValue({
-                ...defaultStoreState,
+            mockUseErrorStore.mockReturnValue({
+                ...defaultErrorStoreState,
                 isLoading: true,
             });
 
@@ -204,8 +226,8 @@ describe("AddSiteForm", () => {
 
     describe("Error Handling", () => {
         it("should display error from store", () => {
-            mockUseStore.mockReturnValue({
-                ...defaultStoreState,
+            mockUseErrorStore.mockReturnValue({
+                ...defaultErrorStoreState,
                 lastError: "Network error occurred",
             });
 
@@ -232,8 +254,8 @@ describe("AddSiteForm", () => {
             const mockSetFormError = vi.fn();
             const user = userEvent.setup();
 
-            mockUseStore.mockReturnValue({
-                ...defaultStoreState,
+            mockUseErrorStore.mockReturnValue({
+                ...defaultErrorStoreState,
                 clearError: mockClearError,
                 lastError: "Test error",
             });
@@ -282,8 +304,8 @@ describe("AddSiteForm", () => {
                 isDark: true,
             });
 
-            mockUseStore.mockReturnValue({
-                ...defaultStoreState,
+            mockUseErrorStore.mockReturnValue({
+                ...defaultErrorStoreState,
                 lastError: "Test error",
             });
 
@@ -315,8 +337,8 @@ describe("AddSiteForm", () => {
 
     describe("Edge Cases", () => {
         it("should handle empty sites list", () => {
-            mockUseStore.mockReturnValue({
-                ...defaultStoreState,
+            mockUseSitesStore.mockReturnValue({
+                ...defaultSitesStoreState,
                 sites: [],
             });
 
@@ -327,8 +349,8 @@ describe("AddSiteForm", () => {
         });
 
         it("should handle both lastError and formError present", () => {
-            mockUseStore.mockReturnValue({
-                ...defaultStoreState,
+            mockUseErrorStore.mockReturnValue({
+                ...defaultErrorStoreState,
                 lastError: "Store error",
             });
 
@@ -487,11 +509,11 @@ describe("AddSiteForm", () => {
         });
 
         it("should handle sites with missing name (use identifier)", () => {
-            mockUseStore.mockReturnValue({
-                ...defaultStoreState,
+            mockUseSitesStore.mockReturnValue({
+                ...defaultSitesStoreState,
                 sites: [
-                    { identifier: "site1", name: undefined },
-                    { identifier: "site2", name: null },
+                    { identifier: "site1", name: undefined, monitors: [] },
+                    { identifier: "site2", name: null, monitors: [] },
                 ],
             });
 
@@ -610,8 +632,8 @@ describe("AddSiteForm", () => {
         });
 
         it("should show loading button with delay", () => {
-            mockUseStore.mockReturnValue({
-                ...defaultStoreState,
+            mockUseErrorStore.mockReturnValue({
+                ...defaultErrorStoreState,
                 isLoading: true,
             });
 
@@ -639,8 +661,8 @@ describe("AddSiteForm", () => {
         });
 
         it("should not show loading if loading stops before delay", () => {
-            mockUseStore.mockReturnValue({
-                ...defaultStoreState,
+            mockUseErrorStore.mockReturnValue({
+                ...defaultErrorStoreState,
                 isLoading: true,
             });
 
@@ -648,8 +670,8 @@ describe("AddSiteForm", () => {
 
             // Stop loading before delay - wrap in act to handle React state updates
             act(() => {
-                mockUseStore.mockReturnValue({
-                    ...defaultStoreState,
+                mockUseErrorStore.mockReturnValue({
+                    ...defaultErrorStoreState,
                     isLoading: false,
                 });
                 rerender(<AddSiteForm />);
@@ -665,8 +687,8 @@ describe("AddSiteForm", () => {
         });
 
         it("should clean up timeout on unmount", () => {
-            mockUseStore.mockReturnValue({
-                ...defaultStoreState,
+            mockUseErrorStore.mockReturnValue({
+                ...defaultErrorStoreState,
                 isLoading: true,
             });
 
@@ -684,8 +706,8 @@ describe("AddSiteForm", () => {
 
     describe("Form Field Disabled States", () => {
         it("should disable all fields when loading", () => {
-            mockUseStore.mockReturnValue({
-                ...defaultStoreState,
+            mockUseErrorStore.mockReturnValue({
+                ...defaultErrorStoreState,
                 isLoading: true,
             });
 
@@ -702,8 +724,8 @@ describe("AddSiteForm", () => {
         });
 
         it("should disable fields in existing site mode when loading", () => {
-            mockUseStore.mockReturnValue({
-                ...defaultStoreState,
+            mockUseErrorStore.mockReturnValue({
+                ...defaultErrorStoreState,
                 isLoading: true,
             });
 
@@ -719,8 +741,8 @@ describe("AddSiteForm", () => {
         });
 
         it("should disable port fields when loading", () => {
-            mockUseStore.mockReturnValue({
-                ...defaultStoreState,
+            mockUseErrorStore.mockReturnValue({
+                ...defaultErrorStoreState,
                 isLoading: true,
             });
 

@@ -12,11 +12,10 @@ import userEvent from "@testing-library/user-event";
 import { HistoryTab } from "../components/SiteDetails/tabs/HistoryTab";
 import { Monitor, StatusHistory, MonitorType } from "../types";
 import logger from "../services/logger";
-import { useStore } from "../store";
+import { useSettingsStore } from "../stores/settings/useSettingsStore";
 
 // Get typed mocks
 const mockLogger = vi.mocked(logger);
-const mockUseStore = vi.mocked(useStore);
 
 // Mock the logger service
 vi.mock("../services/logger", () => ({
@@ -27,14 +26,17 @@ vi.mock("../services/logger", () => ({
     },
 }));
 
-// Mock the store
-vi.mock("../store.ts", () => ({
-    useStore: vi.fn(() => ({
+// Mock the settings store
+vi.mock("../stores/settings/useSettingsStore", () => ({
+    useSettingsStore: vi.fn(() => ({
         settings: {
             historyLimit: 25,
         },
     })),
 }));
+
+// Create a reference to the mock so we can modify it in tests
+const mockUseSettingsStore = vi.mocked(useSettingsStore);
 
 // Mock themed components
 vi.mock("../theme/components", () => ({
@@ -437,7 +439,7 @@ describe("HistoryTab", () => {
 
     describe("Settings Integration", () => {
         it("should respect historyLimit from settings", () => {
-            mockUseStore.mockReturnValue({
+            mockUseSettingsStore.mockReturnValue({
                 settings: { historyLimit: 10 },
             });
 
@@ -448,7 +450,7 @@ describe("HistoryTab", () => {
         });
 
         it("should handle unlimited history when available history is less than backend limit", () => {
-            mockUseStore.mockReturnValue({
+            mockUseSettingsStore.mockReturnValue({
                 settings: { historyLimit: 100 },
             });
 

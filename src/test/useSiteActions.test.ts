@@ -10,6 +10,21 @@ import { useSiteActions } from "../hooks/site/useSiteActions";
 import logger from "../services/logger";
 import { Site, Monitor } from "../types";
 
+// Mock window.electronAPI
+Object.defineProperty(window, 'electronAPI', {
+    value: {
+        monitoring: {
+            startMonitoringForSite: vi.fn(),
+            stopMonitoringForSite: vi.fn(),
+        },
+        sites: {
+            getSites: vi.fn().mockResolvedValue([]),
+            checkSiteNow: vi.fn().mockResolvedValue(undefined),
+        },
+    },
+    writable: true,
+});
+
 // Mock the logger
 vi.mock("../services/logger", () => ({
     default: {
@@ -24,17 +39,21 @@ vi.mock("../services/logger", () => ({
 }));
 
 // Mock the store
-const mockStore = {
-    checkSiteNow: vi.fn(),
+const mockSitesStore = {
+    checkSiteNow: vi.fn().mockResolvedValue(undefined),
     setSelectedMonitorId: vi.fn(),
-    setSelectedSite: vi.fn(),
-    setShowSiteDetails: vi.fn(),
-    startSiteMonitorMonitoring: vi.fn(),
-    stopSiteMonitorMonitoring: vi.fn(),
+    startSiteMonitorMonitoring: vi.fn().mockResolvedValue(undefined),
+    stopSiteMonitorMonitoring: vi.fn().mockResolvedValue(undefined),
 };
 
-vi.mock("../store", () => ({
-    useStore: () => mockStore,
+const mockUIStore = {
+    setSelectedSite: vi.fn(),
+    setShowSiteDetails: vi.fn(),
+};
+
+vi.mock("../stores", () => ({
+    useSitesStore: () => mockSitesStore,
+    useUIStore: () => mockUIStore,
 }));
 
 describe("useSiteActions", () => {
@@ -124,7 +143,7 @@ describe("useSiteActions", () => {
                 result.current.handleStartMonitoring();
             });
 
-            expect(mockStore.startSiteMonitorMonitoring).toHaveBeenCalledWith("test-site-id", "monitor-1");
+            expect(mockSitesStore.startSiteMonitorMonitoring).toHaveBeenCalledWith("test-site-id", "monitor-1");
 
             expect(logger.user.action).toHaveBeenCalledWith("Started site monitoring", {
                 monitorId: "monitor-1",
@@ -141,7 +160,7 @@ describe("useSiteActions", () => {
                 result.current.handleStartMonitoring();
             });
 
-            expect(mockStore.startSiteMonitorMonitoring).toHaveBeenCalledWith("test-site-id", "monitor-2");
+            expect(mockSitesStore.startSiteMonitorMonitoring).toHaveBeenCalledWith("test-site-id", "monitor-2");
 
             expect(logger.user.action).toHaveBeenCalledWith("Started site monitoring", {
                 monitorId: "monitor-2",
@@ -158,7 +177,7 @@ describe("useSiteActions", () => {
                 result.current.handleStartMonitoring();
             });
 
-            expect(mockStore.startSiteMonitorMonitoring).not.toHaveBeenCalled();
+            expect(mockSitesStore.startSiteMonitorMonitoring).not.toHaveBeenCalled();
             expect(logger.error).toHaveBeenCalledWith(
                 "Attempted to start monitoring without valid monitor",
                 undefined,
@@ -194,7 +213,7 @@ describe("useSiteActions", () => {
 
         it("should handle store errors and log them", () => {
             const error = new Error("Store operation failed");
-            mockStore.startSiteMonitorMonitoring.mockImplementation(() => {
+            mockSitesStore.startSiteMonitorMonitoring.mockImplementation(() => {
                 throw error;
             });
 
@@ -209,7 +228,7 @@ describe("useSiteActions", () => {
 
         it("should handle non-Error exceptions", () => {
             const error = "String error";
-            mockStore.startSiteMonitorMonitoring.mockImplementation(() => {
+            mockSitesStore.startSiteMonitorMonitoring.mockImplementation(() => {
                 throw error;
             });
 
@@ -231,7 +250,7 @@ describe("useSiteActions", () => {
                 result.current.handleStopMonitoring();
             });
 
-            expect(mockStore.stopSiteMonitorMonitoring).toHaveBeenCalledWith("test-site-id", "monitor-1");
+            expect(mockSitesStore.stopSiteMonitorMonitoring).toHaveBeenCalledWith("test-site-id", "monitor-1");
 
             expect(logger.user.action).toHaveBeenCalledWith("Stopped site monitoring", {
                 monitorId: "monitor-1",
@@ -248,7 +267,7 @@ describe("useSiteActions", () => {
                 result.current.handleStopMonitoring();
             });
 
-            expect(mockStore.stopSiteMonitorMonitoring).toHaveBeenCalledWith("test-site-id", "monitor-2");
+            expect(mockSitesStore.stopSiteMonitorMonitoring).toHaveBeenCalledWith("test-site-id", "monitor-2");
 
             expect(logger.user.action).toHaveBeenCalledWith("Stopped site monitoring", {
                 monitorId: "monitor-2",
@@ -265,7 +284,7 @@ describe("useSiteActions", () => {
                 result.current.handleStopMonitoring();
             });
 
-            expect(mockStore.stopSiteMonitorMonitoring).not.toHaveBeenCalled();
+            expect(mockSitesStore.stopSiteMonitorMonitoring).not.toHaveBeenCalled();
             expect(logger.error).toHaveBeenCalledWith("Attempted to stop monitoring without valid monitor", undefined, {
                 siteId: "test-site-id",
                 siteName: "Test Site",
@@ -293,7 +312,7 @@ describe("useSiteActions", () => {
 
         it("should handle store errors and log them", () => {
             const error = new Error("Store operation failed");
-            mockStore.stopSiteMonitorMonitoring.mockImplementation(() => {
+            mockSitesStore.stopSiteMonitorMonitoring.mockImplementation(() => {
                 throw error;
             });
 
@@ -308,7 +327,7 @@ describe("useSiteActions", () => {
 
         it("should handle non-Error exceptions", () => {
             const error = "String error";
-            mockStore.stopSiteMonitorMonitoring.mockImplementation(() => {
+            mockSitesStore.stopSiteMonitorMonitoring.mockImplementation(() => {
                 throw error;
             });
 
@@ -324,7 +343,7 @@ describe("useSiteActions", () => {
 
     describe("handleCheckNow", () => {
         it("should perform immediate check successfully", async () => {
-            mockStore.checkSiteNow.mockResolvedValue(undefined);
+            mockSitesStore.checkSiteNow.mockResolvedValue(undefined);
 
             const { result } = renderHook(() => useSiteActions(mockSite, mockHttpMonitor));
 
@@ -339,7 +358,7 @@ describe("useSiteActions", () => {
                 siteName: "Test Site",
             });
 
-            expect(mockStore.checkSiteNow).toHaveBeenCalledWith("test-site-id", "monitor-1");
+            expect(mockSitesStore.checkSiteNow).toHaveBeenCalledWith("test-site-id", "monitor-1");
 
             // Wait for the promise to resolve
             await new Promise((resolve) => setTimeout(resolve, 0));
@@ -352,7 +371,7 @@ describe("useSiteActions", () => {
         });
 
         it("should perform immediate check with port monitor", async () => {
-            mockStore.checkSiteNow.mockResolvedValue(undefined);
+            mockSitesStore.checkSiteNow.mockResolvedValue(undefined);
 
             const { result } = renderHook(() => useSiteActions(mockSite, mockPortMonitor));
 
@@ -367,7 +386,7 @@ describe("useSiteActions", () => {
                 siteName: "Test Site",
             });
 
-            expect(mockStore.checkSiteNow).toHaveBeenCalledWith("test-site-id", "monitor-2");
+            expect(mockSitesStore.checkSiteNow).toHaveBeenCalledWith("test-site-id", "monitor-2");
         });
 
         it("should handle undefined monitor gracefully", () => {
@@ -377,7 +396,7 @@ describe("useSiteActions", () => {
                 result.current.handleCheckNow();
             });
 
-            expect(mockStore.checkSiteNow).not.toHaveBeenCalled();
+            expect(mockSitesStore.checkSiteNow).not.toHaveBeenCalled();
             expect(logger.error).toHaveBeenCalledWith("Attempted to check site without valid monitor", undefined, {
                 siteId: "test-site-id",
                 siteName: "Test Site",
@@ -405,7 +424,7 @@ describe("useSiteActions", () => {
 
         it("should handle checkSiteNow errors with Error objects", async () => {
             const error = new Error("Check failed");
-            mockStore.checkSiteNow.mockRejectedValue(error);
+            mockSitesStore.checkSiteNow.mockRejectedValue(error);
 
             const { result } = renderHook(() => useSiteActions(mockSite, mockHttpMonitor));
 
@@ -426,7 +445,7 @@ describe("useSiteActions", () => {
 
         it("should handle checkSiteNow errors with non-Error objects", async () => {
             const error = "String error";
-            mockStore.checkSiteNow.mockRejectedValue(error);
+            mockSitesStore.checkSiteNow.mockRejectedValue(error);
 
             const { result } = renderHook(() => useSiteActions(mockSite, mockHttpMonitor));
 
@@ -461,9 +480,9 @@ describe("useSiteActions", () => {
                 siteName: "Test Site",
             });
 
-            expect(mockStore.setSelectedSite).toHaveBeenCalledWith(mockSite);
-            expect(mockStore.setSelectedMonitorId).toHaveBeenCalledWith("test-site-id", "monitor-1");
-            expect(mockStore.setShowSiteDetails).toHaveBeenCalledWith(true);
+            expect(mockUIStore.setSelectedSite).toHaveBeenCalledWith(mockSite);
+            expect(mockSitesStore.setSelectedMonitorId).toHaveBeenCalledWith("test-site-id", "monitor-1");
+            expect(mockUIStore.setShowSiteDetails).toHaveBeenCalledWith(true);
         });
 
         it("should handle card click with port monitor", () => {
@@ -480,9 +499,9 @@ describe("useSiteActions", () => {
                 siteName: "Test Site",
             });
 
-            expect(mockStore.setSelectedSite).toHaveBeenCalledWith(mockSite);
-            expect(mockStore.setSelectedMonitorId).toHaveBeenCalledWith("test-site-id", "monitor-2");
-            expect(mockStore.setShowSiteDetails).toHaveBeenCalledWith(true);
+            expect(mockUIStore.setSelectedSite).toHaveBeenCalledWith(mockSite);
+            expect(mockSitesStore.setSelectedMonitorId).toHaveBeenCalledWith("test-site-id", "monitor-2");
+            expect(mockUIStore.setShowSiteDetails).toHaveBeenCalledWith(true);
         });
 
         it("should handle card click without monitor", () => {
@@ -499,9 +518,9 @@ describe("useSiteActions", () => {
                 siteName: "Test Site",
             });
 
-            expect(mockStore.setSelectedSite).toHaveBeenCalledWith(mockSite);
-            expect(mockStore.setSelectedMonitorId).not.toHaveBeenCalled();
-            expect(mockStore.setShowSiteDetails).toHaveBeenCalledWith(true);
+            expect(mockUIStore.setSelectedSite).toHaveBeenCalledWith(mockSite);
+            expect(mockSitesStore.setSelectedMonitorId).not.toHaveBeenCalled();
+            expect(mockUIStore.setShowSiteDetails).toHaveBeenCalledWith(true);
         });
 
         it("should handle card click with site without name", () => {
@@ -524,9 +543,9 @@ describe("useSiteActions", () => {
                 siteName: undefined,
             });
 
-            expect(mockStore.setSelectedSite).toHaveBeenCalledWith(siteWithoutName);
-            expect(mockStore.setSelectedMonitorId).toHaveBeenCalledWith("test-site-id", "monitor-1");
-            expect(mockStore.setShowSiteDetails).toHaveBeenCalledWith(true);
+            expect(mockUIStore.setSelectedSite).toHaveBeenCalledWith(siteWithoutName);
+            expect(mockSitesStore.setSelectedMonitorId).toHaveBeenCalledWith("test-site-id", "monitor-1");
+            expect(mockUIStore.setShowSiteDetails).toHaveBeenCalledWith(true);
         });
     });
 
@@ -595,7 +614,7 @@ describe("useSiteActions", () => {
 
     describe("Integration Scenarios", () => {
         it("should handle complete workflow: start monitoring, check now, stop monitoring", async () => {
-            mockStore.checkSiteNow.mockResolvedValue(undefined);
+            mockSitesStore.checkSiteNow.mockResolvedValue(undefined);
 
             const { result } = renderHook(() => useSiteActions(mockSite, mockHttpMonitor));
 
@@ -604,21 +623,21 @@ describe("useSiteActions", () => {
                 result.current.handleStartMonitoring();
             });
 
-            expect(mockStore.startSiteMonitorMonitoring).toHaveBeenCalledWith("test-site-id", "monitor-1");
+            expect(mockSitesStore.startSiteMonitorMonitoring).toHaveBeenCalledWith("test-site-id", "monitor-1");
 
             // Check now
             await act(async () => {
                 result.current.handleCheckNow();
             });
 
-            expect(mockStore.checkSiteNow).toHaveBeenCalledWith("test-site-id", "monitor-1");
+            expect(mockSitesStore.checkSiteNow).toHaveBeenCalledWith("test-site-id", "monitor-1");
 
             // Stop monitoring
             act(() => {
                 result.current.handleStopMonitoring();
             });
 
-            expect(mockStore.stopSiteMonitorMonitoring).toHaveBeenCalledWith("test-site-id", "monitor-1");
+            expect(mockSitesStore.stopSiteMonitorMonitoring).toHaveBeenCalledWith("test-site-id", "monitor-1");
 
             // Verify all logging calls
             expect(logger.user.action).toHaveBeenCalledWith("Started site monitoring", expect.any(Object));
@@ -637,13 +656,13 @@ describe("useSiteActions", () => {
             });
 
             // Verify store methods were not called for monitoring actions
-            expect(mockStore.startSiteMonitorMonitoring).not.toHaveBeenCalled();
-            expect(mockStore.stopSiteMonitorMonitoring).not.toHaveBeenCalled();
-            expect(mockStore.checkSiteNow).not.toHaveBeenCalled();
+            expect(mockSitesStore.startSiteMonitorMonitoring).not.toHaveBeenCalled();
+            expect(mockSitesStore.stopSiteMonitorMonitoring).not.toHaveBeenCalled();
+            expect(mockSitesStore.checkSiteNow).not.toHaveBeenCalled();
 
             // But card click should still work
-            expect(mockStore.setSelectedSite).toHaveBeenCalledWith(mockSite);
-            expect(mockStore.setShowSiteDetails).toHaveBeenCalledWith(true);
+            expect(mockUIStore.setSelectedSite).toHaveBeenCalledWith(mockSite);
+            expect(mockUIStore.setShowSiteDetails).toHaveBeenCalledWith(true);
 
             // Verify error logging for invalid operations
             expect(logger.error).toHaveBeenCalledTimes(3); // Start, stop, check now

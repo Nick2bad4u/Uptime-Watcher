@@ -7,12 +7,12 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useTheme, useThemeValue, useStatusColors, useThemeClasses, useAvailabilityColors } from "../theme/useTheme";
-import { useStore } from "../store";
 import { themeManager } from "../theme/ThemeManager";
+import { useSettingsStore } from "../stores";
 
-// Mock the store
-vi.mock("../store", () => ({
-    useStore: vi.fn(),
+// Mock the settings store
+vi.mock("../stores", () => ({
+    useSettingsStore: vi.fn(),
 }));
 
 // Mock the theme manager
@@ -59,8 +59,8 @@ describe("Theme Hooks", () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
-        // Setup store mock
-        (useStore as any).mockReturnValue({
+        // Setup settings store mock
+        vi.mocked(useSettingsStore).mockReturnValue({
             settings: { theme: "light" },
             updateSettings: mockUpdateSettings,
         });

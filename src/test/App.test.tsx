@@ -119,29 +119,79 @@ vi.mock("../theme/useTheme", () => ({
     useTheme: vi.fn(() => ({ isDark: false })),
 }));
 
-// Mock the store
-const mockStore = {
-    applyUpdate: vi.fn(),
+// Mock the stores with the new focused structure
+const mockErrorStore = {
     clearError: vi.fn(),
-    getSelectedSite: vi.fn(() => null as Site | null),
-    initializeApp: vi.fn(),
     isLoading: false,
     lastError: null as string | null,
-    setShowSettings: vi.fn(),
-    setShowSiteDetails: vi.fn(),
-    setUpdateError: vi.fn(),
-    setUpdateStatus: vi.fn(),
-    showSettings: false,
-    showSiteDetails: false,
+    setError: vi.fn(),
+    clearAllErrors: vi.fn(),
+    clearStoreError: vi.fn(),
+    getOperationLoading: vi.fn(),
+    getStoreError: vi.fn(),
+    operationLoading: {},
+    setLoading: vi.fn(),
+    setOperationLoading: vi.fn(),
+    setStoreError: vi.fn(),
+    storeErrors: {},
+};
+
+const mockSitesStore = {
+    addMonitorToSite: vi.fn(),
+    addSite: vi.fn(),
+    checkSiteNow: vi.fn(),
+    createSite: vi.fn(),
+    fullSyncFromBackend: vi.fn(),
+    initializeSites: vi.fn(),
+    removeSite: vi.fn(),
     sites: [] as Site[],
     subscribeToStatusUpdates: vi.fn(),
+    syncSitesFromBackend: vi.fn(),
     unsubscribeFromStatusUpdates: vi.fn(),
+    updateSite: vi.fn(),
+    updateSiteStatus: vi.fn(),
+};
+
+const mockSettingsStore = {
+    initializeSettings: vi.fn(),
+    settings: {
+        notifications: true,
+        autoStart: false,
+        minimizeToTray: false,
+        theme: "system" as const,
+        soundAlerts: false,
+        historyLimit: 1000,
+    },
+    updateSettings: vi.fn(),
+    resetSettings: vi.fn(),
+};
+
+const mockUIStore = {
+    getSelectedSite: vi.fn(() => null as Site | null),
+    selectedSiteId: null,
+    setSelectedSite: vi.fn(),
+    setShowSettings: vi.fn(),
+    setShowSiteDetails: vi.fn(),
+    showSettings: false,
+    showSiteDetails: false,
+};
+
+const mockUpdatesStore = {
+    applyUpdate: vi.fn(),
+    checkForUpdates: vi.fn(),
+    setUpdateError: vi.fn(),
+    setUpdateStatus: vi.fn(),
     updateError: null as string | null,
     updateStatus: "idle" as UpdateStatus,
 };
 
-vi.mock("../store", () => ({
-    useStore: () => mockStore,
+vi.mock("../stores", () => ({
+    ErrorBoundary: ({ children }: { children: React.ReactNode }) => <div data-testid="error-boundary">{children}</div>,
+    useErrorStore: () => mockErrorStore,
+    useSitesStore: () => mockSitesStore,
+    useSettingsStore: () => mockSettingsStore,
+    useUIStore: () => mockUIStore,
+    useUpdatesStore: () => mockUpdatesStore,
 }));
 
 import App from "../App";
@@ -154,25 +204,69 @@ describe("App Component", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        // Reset mock store to defaults
-        Object.assign(mockStore, {
-            applyUpdate: vi.fn(),
+        // Reset mock stores to defaults
+        Object.assign(mockErrorStore, {
             clearError: vi.fn(),
-            getSelectedSite: vi.fn(() => null),
-            initializeApp: vi.fn(),
             isLoading: false,
             lastError: null,
-            setShowSettings: vi.fn(),
-            setShowSiteDetails: vi.fn(),
-            setUpdateError: vi.fn(),
-            setUpdateStatus: vi.fn(),
-            showSettings: false,
-            showSiteDetails: false,
+            setError: vi.fn(),
+            clearAllErrors: vi.fn(),
+            clearStoreError: vi.fn(),
+            getOperationLoading: vi.fn(),
+            getStoreError: vi.fn(),
+            operationLoading: {},
+            setLoading: vi.fn(),
+            setOperationLoading: vi.fn(),
+            setStoreError: vi.fn(),
+            storeErrors: {},
+        });
+        
+        Object.assign(mockSitesStore, {
+            addMonitorToSite: vi.fn(),
+            addSite: vi.fn(),
+            checkSiteNow: vi.fn(),
+            createSite: vi.fn(),
+            initializeSites: vi.fn(),
+            removeSite: vi.fn(),
             sites: [],
             subscribeToStatusUpdates: vi.fn(),
+            syncSitesFromBackend: vi.fn(),
             unsubscribeFromStatusUpdates: vi.fn(),
+            updateSite: vi.fn(),
+            updateSiteStatus: vi.fn(),
+        });
+        
+        Object.assign(mockSettingsStore, {
+            initializeSettings: vi.fn(),
+            settings: {
+                notifications: true,
+                autoStart: false,
+                minimizeToTray: false,
+                theme: "system" as const,
+                soundAlerts: false,
+                historyLimit: 1000,
+            },
+            updateSettings: vi.fn(),
+            resetSettings: vi.fn(),
+        });
+        
+        Object.assign(mockUIStore, {
+            getSelectedSite: vi.fn(() => null),
+            selectedSiteId: null,
+            setSelectedSite: vi.fn(),
+            setShowSettings: vi.fn(),
+            setShowSiteDetails: vi.fn(),
+            showSettings: false,
+            showSiteDetails: false,
+        });
+        
+        Object.assign(mockUpdatesStore, {
+            applyUpdate: vi.fn(),
+            checkForUpdates: vi.fn(),
+            setUpdateError: vi.fn(),
+            setUpdateStatus: vi.fn(),
             updateError: null,
-            updateStatus: "idle",
+            updateStatus: "idle" as UpdateStatus,
         });
 
         // Reset useTheme mock to default
@@ -239,7 +333,7 @@ describe("App Component", () => {
         });
 
         it("displays correct site count", () => {
-            mockStore.sites = [
+            mockSitesStore.sites = [
                 { identifier: "1", name: "Test Site", monitors: [] },
                 { identifier: "2", name: "Another Site", monitors: [] },
             ];
@@ -251,18 +345,19 @@ describe("App Component", () => {
     describe("Initialization", () => {
         it("calls initializeApp on mount", () => {
             render(<App />);
-            expect(mockStore.initializeApp).toHaveBeenCalled();
+            expect(mockSitesStore.initializeSites).toHaveBeenCalled();
+            expect(mockSettingsStore.initializeSettings).toHaveBeenCalled();
         });
 
         it("subscribes to status updates on mount", () => {
             render(<App />);
-            expect(mockStore.subscribeToStatusUpdates).toHaveBeenCalled();
+            expect(mockSitesStore.subscribeToStatusUpdates).toHaveBeenCalled();
         });
 
         it("unsubscribes from status updates on unmount", () => {
             const { unmount } = render(<App />);
             unmount();
-            expect(mockStore.unsubscribeFromStatusUpdates).toHaveBeenCalled();
+            expect(mockSitesStore.unsubscribeFromStatusUpdates).toHaveBeenCalled();
         });
     });
 
@@ -276,7 +371,7 @@ describe("App Component", () => {
         });
 
         it("does not show loading overlay immediately when loading", () => {
-            mockStore.isLoading = true;
+            mockErrorStore.isLoading = true;
             render(<App />);
 
             // Should not show loading overlay immediately
@@ -284,7 +379,7 @@ describe("App Component", () => {
         });
 
         it("shows loading overlay after delay when loading", async () => {
-            mockStore.isLoading = true;
+            mockErrorStore.isLoading = true;
             render(<App />);
 
             // Fast-forward past the delay
@@ -314,7 +409,7 @@ describe("App Component", () => {
         });
 
         it("hides loading overlay when not loading", () => {
-            mockStore.isLoading = false;
+            mockErrorStore.isLoading = false;
             render(<App />);
 
             act(() => {
@@ -325,11 +420,11 @@ describe("App Component", () => {
         });
 
         it("clears loading timeout when loading stops", () => {
-            mockStore.isLoading = true;
+            mockErrorStore.isLoading = true;
             const { rerender } = render(<App />);
 
             // Change to not loading before timeout
-            mockStore.isLoading = false;
+            mockErrorStore.isLoading = false;
             rerender(<App />);
 
             act(() => {
@@ -342,7 +437,7 @@ describe("App Component", () => {
 
     describe("Error Handling", () => {
         it("displays error notification when there is an error", () => {
-            mockStore.lastError = "Test error message";
+            mockErrorStore.lastError = "Test error message";
             render(<App />);
 
             expect(screen.getByText("Test error message")).toBeInTheDocument();
@@ -350,17 +445,17 @@ describe("App Component", () => {
         });
 
         it("can dismiss error notification", async () => {
-            mockStore.lastError = "Test error message";
+            mockErrorStore.lastError = "Test error message";
             render(<App />);
 
             const closeButton = screen.getByText("✕");
             await user.click(closeButton);
 
-            expect(mockStore.clearError).toHaveBeenCalled();
+            expect(mockErrorStore.clearError).toHaveBeenCalled();
         });
 
         it("does not display error notification when no error", () => {
-            mockStore.lastError = null;
+            mockErrorStore.lastError = null;
             render(<App />);
 
             expect(screen.queryByText("⚠️")).not.toBeInTheDocument();
@@ -369,7 +464,7 @@ describe("App Component", () => {
 
     describe("Update Notifications", () => {
         it("shows update available notification", () => {
-            mockStore.updateStatus = "available";
+            mockUpdatesStore.updateStatus = "available";
             render(<App />);
 
             expect(screen.getByText("A new update is available. Downloading...")).toBeInTheDocument();
@@ -377,7 +472,7 @@ describe("App Component", () => {
         });
 
         it("shows downloading notification", () => {
-            mockStore.updateStatus = "downloading";
+            mockUpdatesStore.updateStatus = "downloading";
             render(<App />);
 
             expect(screen.getByText("Update is downloading...")).toBeInTheDocument();
@@ -385,7 +480,7 @@ describe("App Component", () => {
         });
 
         it("shows downloaded notification with restart button", async () => {
-            mockStore.updateStatus = "downloaded";
+            mockUpdatesStore.updateStatus = "downloaded";
             render(<App />);
 
             expect(screen.getByText("Update downloaded! Restart to apply.")).toBeInTheDocument();
@@ -394,12 +489,12 @@ describe("App Component", () => {
             const restartButton = screen.getByText("Restart Now");
             await user.click(restartButton);
 
-            expect(mockStore.applyUpdate).toHaveBeenCalled();
+            expect(mockUpdatesStore.applyUpdate).toHaveBeenCalled();
         });
 
         it("shows error notification with dismiss button", async () => {
-            mockStore.updateStatus = "error";
-            mockStore.updateError = "Update failed due to network error";
+            mockUpdatesStore.updateStatus = "error";
+            mockUpdatesStore.updateError = "Update failed due to network error";
             render(<App />);
 
             expect(screen.getByText("Update failed due to network error")).toBeInTheDocument();
@@ -408,20 +503,20 @@ describe("App Component", () => {
             const dismissButton = screen.getByText("Dismiss");
             await user.click(dismissButton);
 
-            expect(mockStore.setUpdateStatus).toHaveBeenCalledWith("idle");
-            expect(mockStore.setUpdateError).toHaveBeenCalledWith(undefined);
+            expect(mockUpdatesStore.setUpdateStatus).toHaveBeenCalledWith("idle");
+            expect(mockUpdatesStore.setUpdateError).toHaveBeenCalledWith(undefined);
         });
 
         it("shows generic error message when no specific error", () => {
-            mockStore.updateStatus = "error";
-            mockStore.updateError = null;
+            mockUpdatesStore.updateStatus = "error";
+            mockUpdatesStore.updateError = null;
             render(<App />);
 
             expect(screen.getByText("Update failed.")).toBeInTheDocument();
         });
 
         it("does not show update notification for idle status", () => {
-            mockStore.updateStatus = "idle";
+            mockUpdatesStore.updateStatus = "idle";
             render(<App />);
 
             expect(screen.queryByText(/update/i)).not.toBeInTheDocument();
@@ -430,32 +525,32 @@ describe("App Component", () => {
 
     describe("Modals", () => {
         it("shows settings modal when showSettings is true", () => {
-            mockStore.showSettings = true;
+            mockUIStore.showSettings = true;
             render(<App />);
 
             expect(screen.getByTestId("settings-modal")).toBeInTheDocument();
         });
 
         it("can close settings modal", async () => {
-            mockStore.showSettings = true;
+            mockUIStore.showSettings = true;
             render(<App />);
 
             const closeButton = screen.getByTestId("close-settings");
             await user.click(closeButton);
 
-            expect(mockStore.setShowSettings).toHaveBeenCalledWith(false);
+            expect(mockUIStore.setShowSettings).toHaveBeenCalledWith(false);
         });
 
         it("does not show settings modal when showSettings is false", () => {
-            mockStore.showSettings = false;
+            mockUIStore.showSettings = false;
             render(<App />);
 
             expect(screen.queryByTestId("settings-modal")).not.toBeInTheDocument();
         });
 
         it("shows site details modal when showSiteDetails is true and site is selected", () => {
-            mockStore.showSiteDetails = true;
-            mockStore.getSelectedSite.mockReturnValue({ identifier: "1", name: "Test Site", monitors: [] });
+            mockUIStore.showSiteDetails = true;
+            mockUIStore.getSelectedSite.mockReturnValue({ identifier: "1", name: "Test Site", monitors: [] });
             render(<App />);
 
             expect(screen.getByTestId("site-details-modal")).toBeInTheDocument();
@@ -463,19 +558,19 @@ describe("App Component", () => {
         });
 
         it("can close site details modal", async () => {
-            mockStore.showSiteDetails = true;
-            mockStore.getSelectedSite.mockReturnValue({ identifier: "1", name: "Test Site", monitors: [] });
+            mockUIStore.showSiteDetails = true;
+            mockUIStore.getSelectedSite.mockReturnValue({ identifier: "1", name: "Test Site", monitors: [] });
             render(<App />);
 
             const closeButton = screen.getByTestId("close-site-details");
             await user.click(closeButton);
 
-            expect(mockStore.setShowSiteDetails).toHaveBeenCalledWith(false);
+            expect(mockUIStore.setShowSiteDetails).toHaveBeenCalledWith(false);
         });
 
         it("does not show site details modal when no site is selected", () => {
-            mockStore.showSiteDetails = true;
-            mockStore.getSelectedSite.mockReturnValue(null);
+            mockUIStore.showSiteDetails = true;
+            mockUIStore.getSelectedSite.mockReturnValue(null);
             render(<App />);
 
             expect(screen.queryByTestId("site-details-modal")).not.toBeInTheDocument();
