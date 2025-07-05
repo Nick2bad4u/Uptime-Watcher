@@ -7,14 +7,123 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[7c6c4bc](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7c6c4bc2af066b59450d892b56f88033eaea2e94)...
-[7c6c4bc](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7c6c4bc2af066b59450d892b56f88033eaea2e94)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/7c6c4bc2af066b59450d892b56f88033eaea2e94...7c6c4bc2af066b59450d892b56f88033eaea2e94))
+[[4e582ab](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4e582ab01f338cb50082f8ba902b4a0f1eab09ea)...
+[04fbfe9](https://github.com/Nick2bad4u/Uptime-Watcher/commit/04fbfe92b2bb07fe9c6a8d519885811e50fc1e23)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/4e582ab01f338cb50082f8ba902b4a0f1eab09ea...04fbfe92b2bb07fe9c6a8d519885811e50fc1e23))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 4.7.0 [`(4e582ab)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4e582ab01f338cb50082f8ba902b4a0f1eab09ea)
+
+
+
+### � CI/CD
+
+- Update repo-stats.yml [`(04fbfe9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/04fbfe92b2bb07fe9c6a8d519885811e50fc1e23)
+
+
+
+
+
+
+## [4.7.0] - 2025-07-05
+
+
+[[e3329e9](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e3329e9c09b2a33eca22be615ffce65445c260a6)...
+[db56dac](https://github.com/Nick2bad4u/Uptime-Watcher/commit/db56dacd2cd72d47fce3edb813d07fe9c32a37c5)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/e3329e9c09b2a33eca22be615ffce65445c260a6...db56dacd2cd72d47fce3edb813d07fe9c32a37c5))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 4.6.0 [`(7c6c4bc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7c6c4bc2af066b59450d892b56f88033eaea2e94)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(db56dac)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/db56dacd2cd72d47fce3edb813d07fe9c32a37c5)
+
+
+
+### 💼 Other
+
+- Update metrics.repository.svg - [Skip GitHub Action] [`(fea5443)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fea5443bff6687e7dc4b51cd057505e0aef6836c)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Remove redundant refactored sites store implementation
+
+- Eliminates the modular version of the sites store to reduce duplication and potential maintenance overhead
+- Consolidates store logic to a single source, promoting clarity and preventing confusion between alternative implementations [`(cfa7de3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cfa7de3a5a755a0d05e523da51f768d83db52f0a)
+
+
+- 🚜 [refactor] Modularize sites store into focused submodules
+
+- Refactors the site management store into separate modules for state, CRUD operations, monitoring, and synchronization, improving maintainability and testability
+- Replaces a large monolithic store with a composition-based approach, delegating concerns to smaller, focused files
+- Enhances error handling by ensuring errors passed to loggers are always Error objects
+- Reduces duplication and clarifies responsibilities, making future updates and testing easier [`(a645f40)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a645f402ca76890ad65c99bf74f4342f82b50755)
+
+
+
+### � Documentation
+
+- 📝 [docs] Add comprehensive docs for Sites Store refactor
+
+- Introduces detailed analysis and summary documentation for the modularization of the Sites Store, outlining the migration from a monolithic to a modular architecture
+- Documents architectural decisions, module responsibilities, test strategy, performance impact, and migration steps, emphasizing maintainability, testability, and backward compatibility
+- Facilitates onboarding and future maintenance by providing clear rationale, benefits, and lessons learned from the refactor [`(2505ea2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2505ea2553ada8fea927289922611eb46b2b82d9)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Add comprehensive tests for refactored sites store
+
+- Introduces thorough unit, edge case, and integration tests for newly modularized sites store logic, covering site state, sync, operations, and monitoring modules
+- Removes obsolete portal cleanup test and updates logger error assertions for consistency
+- Ensures backend sync and state mutation are validated after site and monitor modifications
+- Strengthens reliability by addressing boundary conditions, error handling, and concurrent operations
+- Facilitates future maintenance and refactoring by improving test coverage and separation of concerns [`(93179ac)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/93179ac57315ba87a1e7eaa44dda794d13864a7e)
+
+
+- 🧪 [test] Improve test coverage and consistency in UI tests
+
+- Expands unit test coverage for UI components by adding missing logger mocks and simplifying iteration logic in tests.
+- Refactors test loops for readability and consistent test behavior across size and status combinations.
+- Updates ignore rules to exclude project-specific artifacts.
+- Enhances maintainability and reliability of test suite. [`(e3329e9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e3329e9c09b2a33eca22be615ffce65445c260a6)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v4.6.0 [skip ci] [`(3cb37e0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3cb37e0e6153b7a9d04702e1460e8efcccef1bc5)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Add Electron ESLint config, improve test/cov setup
+
+- Introduces dedicated ESLint configuration for Electron (main process) files with appropriate parser, plugins, and rules, and disables React-specific linting for Node.js contexts
+ - Refines TypeScript and test config patterns for better separation of renderer and Electron code, including improved file includes/excludes and alias consistency
+ - Ensures more maintainable and DRY site store logic by sharing the getSites function
+ - Adds missing ESLint type definitions to dependencies for enhanced type safety
+ - Optimizes Vitest configs for both renderer and Electron by improving output, coverage, and performance settings, and clarifies test include/exclude patterns
+ - Minor improvements for code immutability and maintainability in chart config and store modules [`(d88d310)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d88d31056662f9fb62527c237831a56f15817ce7)
+
+
+- 🔧 [build] Update TypeScript settings and comment out MCP configs
+
+- Enables stricter TypeScript integration in the editor for improved code validation and auto-imports.
+- Excludes node_modules from TypeScript server and file watching to boost performance.
+- Comments out MCP server configuration blocks, possibly to disable local development dependencies or reduce noise.
+- Enhances project maintainability and reduces unnecessary resource usage during development. [`(8f3a286)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8f3a286b472fc3a7a3b1ecfefe2794b193b63486)
 
 
 
