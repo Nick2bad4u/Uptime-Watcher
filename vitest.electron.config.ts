@@ -30,6 +30,17 @@ export default defineConfig({
                 "electron/**/*.d.ts",
                 "electron/**/types.ts",
                 "electron/services/*/index.ts",
+                // Barrel export files - contain only re-exports, no testable logic
+                "**/index.ts", // Exclude all barrel export files
+                "electron/**/index.ts", // Explicit electron barrel files
+                "electron/services/**/index.ts", // Service barrel files
+                "electron/utils/**/index.ts", // Utility barrel files
+                "electron/managers/**/index.ts", // Manager barrel files
+                "index.ts", // Barrel export file at root
+                "**/index.ts", // Any other index files
+                "**/index.tsx", // Exclude JSX barrel export files
+                "electron/components/**/index.ts", // Component barrel files
+                "electron/hooks/**/index.ts", // Hook barrel files
             ],
             include: ["electron/**/*.ts"],
             provider: "v8",

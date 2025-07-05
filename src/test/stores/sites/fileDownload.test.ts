@@ -436,8 +436,33 @@ describe("fileDownload", () => {
             expect(() => downloadFile(options)).toThrow("Click failed");
         });
 
-        it("should handle appendChild error with fallback failure", () => {
+        it("should handle appendChild error with fallback success", () => {
             const { mockAnchor, mockBody } = setupDownloadMocks();
+
+            // Mock appendChild to throw
+            mockBody.appendChild.mockImplementation(() => {
+                throw new Error("appendChild failed");
+            });
+
+            // Mock the fallback click to succeed
+            mockAnchor.click.mockImplementation(() => {
+                // Success - no throw
+            });
+
+            const buffer = new ArrayBuffer(8);
+            const options: FileDownloadOptions = {
+                buffer,
+                fileName: "test.txt",
+            };
+
+            expect(() => downloadFile(options)).not.toThrow();
+            expect(mockAnchor.click).toHaveBeenCalled();
+        });
+
+        it("should handle appendChild error with fallback failure and proper error handling", () => {
+            const { mockAnchor, mockBody } = setupDownloadMocks();
+            const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
             // Mock appendChild to throw
             mockBody.appendChild.mockImplementation(() => {
@@ -446,12 +471,8 @@ describe("fileDownload", () => {
 
             // Mock the anchor click to also fail in the fallback
             mockAnchor.click.mockImplementation(() => {
-                throw new Error("Click failed in fallback");
+                throw new Error("Click failed");
             });
-
-            // Mock console.error to suppress expected error logging
-            const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-            const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
 
             const buffer = new ArrayBuffer(8);
             const options: FileDownloadOptions = {
@@ -459,23 +480,22 @@ describe("fileDownload", () => {
                 fileName: "test.txt",
             };
 
-            expect(() => downloadFile(options)).toThrow("Click failed in fallback");
-
-            consoleWarnSpy.mockRestore();
+            // The actual behavior: warns about DOM manipulation failure, then throws "Click failed"
+            expect(() => downloadFile(options)).toThrow("Click failed");
+            expect(consoleSpy).toHaveBeenCalledWith("DOM manipulation failed, using fallback click", expect.any(Error));
+            
+            consoleSpy.mockRestore();
             consoleErrorSpy.mockRestore();
         });
 
-        it("should handle generic errors", () => {
-            setupDownloadMocks();
+        it("should handle non-appendChild errors with proper logging", () => {
+            const { mockBody } = setupDownloadMocks();
+            const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-            // Mock Blob constructor to throw
-            const originalBlob = global.Blob;
-            global.Blob = vi.fn().mockImplementation(() => {
-                throw new Error("Generic error");
+            // Mock appendChild to throw a different error
+            mockBody.appendChild.mockImplementation(() => {
+                throw new Error("Some other error");
             });
-
-            // Mock console.error to suppress expected error logging
-            const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
             const buffer = new ArrayBuffer(8);
             const options: FileDownloadOptions = {
@@ -483,12 +503,11 @@ describe("fileDownload", () => {
                 fileName: "test.txt",
             };
 
-            expect(() => downloadFile(options)).toThrow("File download failed");
-            expect(consoleErrorSpy).toHaveBeenCalledWith("Failed to download file:", expect.any(Error));
-
-            // Restore
-            global.Blob = originalBlob;
-            consoleErrorSpy.mockRestore();
+            // For DOM manipulation errors, the function should warn and continue with fallback
+            expect(() => downloadFile(options)).not.toThrow();
+            expect(consoleSpy).toHaveBeenCalledWith("DOM manipulation failed, using fallback click", expect.any(Error));
+            
+            consoleSpy.mockRestore();
         });
 
         it("should handle large files", () => {

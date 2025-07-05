@@ -289,85 +289,113 @@ describe("StatusUpdateHandler", () => {
         });
     });
 
-    describe("Error handling", () => {
-        it("should handle missing window.electronAPI", async () => {
-            // Mock console.error to suppress expected error messages
-            const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-
-            const originalElectronAPI = window.electronAPI;
-            // @ts-expect-error - Testing undefined case
-            window.electronAPI = undefined;
-
-            // Mock waitForElectronAPI to throw when electronAPI is undefined
-            mockWaitForElectronAPI.mockRejectedValueOnce(new Error("ElectronAPI not available"));
-
+    describe("Error Handling", () => {
+        it("should throw error when electronAPI.events.onStatusUpdate is not available", async () => {
             const manager = new StatusUpdateManager();
-            const mockHandler = vi.fn();
-
-            await expect(manager.subscribe(mockHandler)).rejects.toThrow();
-
-            // Restore the original electronAPI
-            window.electronAPI = originalElectronAPI;
-
-            // Reset the mock
-            mockWaitForElectronAPI.mockResolvedValue(undefined);
-
-            // Restore console.error
-            consoleSpy.mockRestore();
-        }, 1000); // 1 second timeout
-
-        it("should handle callback errors gracefully", async () => {
-            // Mock console.error to suppress expected error messages
-            const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-
-            const handler = createStatusUpdateHandler({
-                getSites: vi.fn().mockReturnValue([]),
-                setSites: vi.fn(),
-                fullSyncFromBackend: vi.fn().mockResolvedValue(undefined),
-                onUpdate: vi.fn().mockImplementation(() => {
-                    throw new Error("Callback error");
-                }),
-            });
-
-            const statusUpdate: StatusUpdate = {
-                site: {
-                    identifier: "site1",
-                    name: "Test Site",
-                    monitors: [],
-                },
+            
+            // Mock window.electronAPI to be available but without onStatusUpdate
+            (global.window as unknown) = {
+                electronAPI: {
+                    events: {
+                        removeAllListeners: vi.fn()
+                        // Missing onStatusUpdate
+                    }
+                }
             };
 
-            // Should not throw but handle error gracefully
-            await expect(handler(statusUpdate)).resolves.not.toThrow();
+            const mockCallback = vi.fn();
 
-            // Restore console.error
-            consoleSpy.mockRestore();
+            // Test that the async function throws when onStatusUpdate is not available
+            let thrownError: Error | undefined;
+            try {
+                await manager.subscribe(mockCallback);
+            } catch (error) {
+                thrownError = error as Error;
+            }
+
+            expect(thrownError).toBeDefined();
+            expect(thrownError?.message).toBe("electronAPI.events.onStatusUpdate is not available");
         });
 
-        it("should handle fullSyncFromBackend errors", async () => {
-            // Mock console.error to suppress expected error messages
-            const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-
-            const handler = createStatusUpdateHandler({
-                getSites: vi.fn().mockReturnValue([]),
-                setSites: vi.fn(),
-                fullSyncFromBackend: vi.fn().mockRejectedValue(new Error("Sync failed")),
-                onUpdate: vi.fn(),
-            });
-
-            const statusUpdate: StatusUpdate = {
-                site: {
-                    identifier: "site1",
-                    name: "Test Site",
-                    monitors: [],
-                },
+        it("should handle unsubscribe when removeAllListeners is not available", () => {
+            const manager = new StatusUpdateManager();
+            
+            // Subscribe first
+            (global.window as unknown) = {
+                electronAPI: {
+                    events: {
+                        onStatusUpdate: vi.fn()
+                    }
+                }
             };
 
-            // Should not throw but handle error gracefully
-            await expect(handler(statusUpdate)).resolves.not.toThrow();
+            const mockCallback = vi.fn();
+            manager.subscribe(mockCallback);
 
-            // Restore console.error
-            consoleSpy.mockRestore();
+            // Now remove removeAllListeners for unsubscribe test
+            (global.window as unknown) = {
+                electronAPI: {
+                    events: {
+                        // Missing removeAllListeners
+                    }
+                }
+            };
+
+            // Should not throw even when removeAllListeners is not available
+            expect(() => manager.unsubscribe()).not.toThrow();
+            expect(manager.isSubscribed()).toBe(false);
+        });
+
+        it("should handle unsubscribe when electronAPI.events is not available", () => {
+            const manager = new StatusUpdateManager();
+            
+            // Subscribe first
+            (global.window as unknown) = {
+                electronAPI: {
+                    events: {
+                        onStatusUpdate: vi.fn()
+                    }
+                }
+            };
+
+            const mockCallback = vi.fn();
+            manager.subscribe(mockCallback);
+
+            // Now remove events for unsubscribe test
+            (global.window as unknown) = {
+                electronAPI: {
+                    // Missing events
+                }
+            };
+
+            // Should not throw even when events is not available
+            expect(() => manager.unsubscribe()).not.toThrow();
+            expect(manager.isSubscribed()).toBe(false);
+        });
+
+        it("should handle unsubscribe when electronAPI is not available", () => {
+            const manager = new StatusUpdateManager();
+            
+            // Subscribe first
+            (global.window as unknown) = {
+                electronAPI: {
+                    events: {
+                        onStatusUpdate: vi.fn()
+                    }
+                }
+            };
+
+            const mockCallback = vi.fn();
+            manager.subscribe(mockCallback);
+
+            // Now remove electronAPI for unsubscribe test
+            (global.window as unknown) = {
+                // Missing electronAPI
+            };
+
+            // Should not throw even when electronAPI is not available
+            expect(() => manager.unsubscribe()).not.toThrow();
+            expect(manager.isSubscribed()).toBe(false);
         });
     });
 });

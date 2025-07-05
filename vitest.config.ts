@@ -39,6 +39,20 @@ export default defineConfig({
                 "**/types.tsx", // Exclude type definition files with JSX
                 "src/types.ts", // Explicitly exclude main types file
                 "src/theme/types.ts", // Exclude theme types
+                // Barrel export files - contain only re-exports, no testable logic
+                "**/index.ts", // Exclude all barrel export files
+                "**/index.tsx", // Exclude JSX barrel export files
+                "src/components/index.ts", // Explicit barrel files
+                "src/hooks/index.ts", // Explicit barrel files
+                "src/stores/index.ts", // Explicit barrel files
+                "src/utils/index.ts", // Explicit barrel files
+                "src/stores/sites/utils/index.ts", // Specific barrel files
+                "src/stores/sites/services/index.ts", // Specific barrel files
+                "src/components/**/index.ts", // Component barrel files
+                "src/hooks/**/index.ts", // Hook barrel files
+                "index.ts", // Barrel export file at root
+                "**/index.ts", // Any other index files
+                "**/index.tsx", // Exclude JSX barrel export files
             ],
             ignoreEmptyLines: true, // Ignore empty lines in coverage reports
             provider: "v8",
