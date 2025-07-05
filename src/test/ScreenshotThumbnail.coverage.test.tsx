@@ -1,6 +1,5 @@
 /**
- * Additional coverage tests for ScreenshotThumbnail component
- * Targeting missing lines 60-61, 67-68
+ * Test to cover remaining uncovered lines in ScreenshotThumbnail component
  */
 
 import { render, screen, act } from "@testing-library/react";
@@ -12,6 +11,8 @@ import logger from "../services/logger";
 // Mock logger
 vi.mock("../services/logger", () => ({
     default: {
+        warn: vi.fn(),
+        error: vi.fn(),
         user: {
             action: vi.fn(),
         },

@@ -38,7 +38,7 @@ const logger = {
         log.debug(`[UPTIME-WATCHER] ${message}`, ...args);
     },
     // Error level - errors that should be investigated
-    error: (message: string, error?: Error | unknown, ...args: unknown[]) => {
+    error: (message: string, error?: Error, ...args: unknown[]) => {
         if (error instanceof Error) {
             log.error(
                 `[UPTIME-WATCHER] ${message}`,
@@ -72,7 +72,8 @@ const logger = {
             logger.info(`Site added: ${identifier}`);
         },
         check: (identifier: string, status: string, responseTime?: number) => {
-            logger.info(`Site check: ${identifier} - Status: ${status}${responseTime ? ` (${responseTime}ms)` : ""}`);
+            const timeInfo = responseTime ? ` (${responseTime}ms)` : "";
+            logger.info(`Site check: ${identifier} - Status: ${status}${timeInfo}`);
         },
         error: (identifier: string, error: Error | string) => {
             if (typeof error === "string") {
@@ -97,7 +98,8 @@ const logger = {
             logger.debug(`Tray action: ${action}`);
         },
         window: (action: string, windowName?: string) => {
-            logger.debug(`Window ${action}${windowName ? ` (${windowName})` : ""}`);
+            const nameInfo = windowName ? ` (${windowName})` : "";
+            logger.debug(`Window ${action}${nameInfo}`);
         },
     },
     // Log user actions

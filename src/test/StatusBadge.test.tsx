@@ -69,12 +69,12 @@ describe("StatusBadge - Simple Tests", () => {
         it("applies different text sizes", () => {
             const sizes = ["xs", "sm", "base", "lg", "xl"] as const;
 
-            sizes.forEach((size) => {
+            for (const size of sizes) {
                 const { unmount } = render(<StatusBadge label="Website" status="up" size={size} />);
                 // Check that text with correct size class exists
                 expect(document.querySelector(`.themed-text--size-${size}`)).toBeInTheDocument();
                 unmount();
-            });
+            }
         });
 
         it("uses default size when not specified", () => {
@@ -165,16 +165,17 @@ describe("StatusBadge - Simple Tests", () => {
             const statuses = ["up", "down", "pending"] as const;
             const sizes = ["xs", "sm", "base"] as const;
 
-            statuses.forEach((status) => {
-                sizes.forEach((size) => {
+            // Test all combinations using flat iteration
+            for (const status of statuses) {
+                for (const size of sizes) {
                     const { unmount } = render(<StatusBadge label="Test" status={status} size={size} />);
 
                     expect(screen.getByText(`Test: ${status}`)).toBeInTheDocument();
                     expect(document.querySelector(`.themed-text--size-${size}`)).toBeInTheDocument();
 
                     unmount();
-                });
-            });
+                }
+            }
         });
     });
 
@@ -187,11 +188,11 @@ describe("StatusBadge - Simple Tests", () => {
         it("displays correct status variants", () => {
             const statuses = ["up", "down", "pending"] as const;
 
-            statuses.forEach((status) => {
+            for (const status of statuses) {
                 const { unmount } = render(<StatusBadge label="Test" status={status} />);
                 expect(screen.getByText(`Test: ${status}`)).toBeInTheDocument();
                 unmount();
-            });
+            }
         });
     });
 });
