@@ -59,6 +59,3 @@ export const useSitesStore = create<SitesStore>((set, get) => {
         ...syncActions,
     };
 });
-
-// Export the store for backward compatibility
-export default useSitesStore;
