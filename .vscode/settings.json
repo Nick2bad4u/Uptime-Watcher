@@ -1,4 +1,11 @@
 {
+    "typescript.validate.enable": true,
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "typescript.preferences.includePackageJsonAutoImports": "true",
+    "typescript.disableAutomaticTypeAcquisition": true,
+    "typescript.suggest.autoImports": true,
+    "typescript.tsserver.experimental.enableProjectDiagnostics": true,
+    "typescript.tsserver.exclude": ["**/node_modules"],
     "http.proxySupport": "off",
     "eslint.validate": [
         "javascript",
@@ -16,6 +23,9 @@
         "toml",
         "github-actions-workflow"
     ],
+    "files.watcherExclude": {
+        "**/node_modules/*": true
+    },
     "files.associations": {
         "*.css": "tailwindcss"
     },
@@ -70,29 +80,29 @@
         "useTabs": false
     },
     "debug.defaultCompound": "Dev: Vite + Electron Main",
-    "mcp": {
-        "servers": {
-            "uptime-watcher-sqlite": {
-                "command": "npx",
-                "args": [
-                    "-y",
-                    "@executeautomation/database-server",
-                    "C:\\Users\\Nick\\AppData\\Roaming\\uptime-watcher\\uptime-watcher.sqlite"
-                ]
-            },
-            "github": {
-                "command": "npx",
-                "args": ["-y", "@modelcontextprotocol/server-github"],
-                "env": {
-                    "GITHUB_PERSONAL_ACCESS_TOKEN": "${env:GITHUB_TOKEN}"
-                }
-            },
-            "memory": {
-                "command": "npx",
-                "args": ["-y", "@modelcontextprotocol/server-memory"]
-            }
-        }
-    },
+    // "mcp": {
+    //     "servers": {
+    //         "uptime-watcher-sqlite": {
+    //             "command": "npx",
+    //             "args": [
+    //                 "-y",
+    //                 "@executeautomation/database-server",
+    //                 "C:\\Users\\Nick\\AppData\\Roaming\\uptime-watcher\\uptime-watcher.sqlite"
+    //             ]
+    //         },
+    //         "github": {
+    //             "command": "npx",
+    //             "args": ["-y", "@modelcontextprotocol/server-github"],
+    //             "env": {
+    //                 "GITHUB_PERSONAL_ACCESS_TOKEN": ""
+    //             }
+    //         },
+    //         "memory": {
+    //             "command": "npx",
+    //             "args": ["-y", "@modelcontextprotocol/server-memory"]
+    //         }
+    //     }
+    // },
     "sonarlint.connectedMode.project": {
         "connectionId": "nick2bad4u",
         "projectKey": "Nick2bad4u_Uptime-Watcher"
