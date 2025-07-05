@@ -5,7 +5,7 @@
 
 import { codecovVitePlugin } from "@codecov/vite-plugin";
 import react from "@vitejs/plugin-react";
-import path from "path";
+import * as path from "node:path";
 import electron from "vite-plugin-electron";
 import { ViteMcp } from "vite-plugin-mcp";
 import { viteStaticCopy } from "vite-plugin-static-copy";
@@ -19,12 +19,15 @@ export default defineConfig({
     base: "./", // Ensures relative asset paths for Electron
     build: {
         emptyOutDir: true, // Clean output before build
+        modulePreload: {
+            polyfill: false, // Modern browsers don't need polyfill
+        },
         outDir: "dist",
         rollupOptions: {
             // No manual chunks configuration for Electron builds
         },
         sourcemap: true, // Recommended for Electron debugging
-        target: "esnext", // Modern output for Electron
+        target: "es2024", // Match TypeScript target for consistency
     },
     plugins: [
         react(),
@@ -67,6 +70,7 @@ export default defineConfig({
             bundleName: "uptime-watcher",
             enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
             ...(process.env.CODECOV_TOKEN && { uploadToken: process.env.CODECOV_TOKEN }),
+            telemetry: false, // Disable telemetry for faster builds
         }),
     ],
     resolve: {
@@ -75,6 +79,9 @@ export default defineConfig({
         },
     },
     server: {
+        hmr: {
+            port: 5174, // Use different port for HMR to avoid conflicts
+        },
         open: false, // Don't auto-open browser (Electron only)
         port: 5173,
         strictPort: true, // Fail if port is taken (prevents silent port changes)

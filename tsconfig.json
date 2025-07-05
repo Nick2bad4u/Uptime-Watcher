@@ -1,11 +1,10 @@
 {
     "compilerOptions": {
-        "target": "ES2020",
-        "skipDefaultLibCheck": false,
+        "target": "ES2024",
         "useDefineForClassFields": true,
-        "lib": ["ES2020", "DOM", "DOM.Iterable"],
-        "module": "CommonJS",
-        "moduleResolution": "node",
+        "lib": ["ES2024", "DOM", "DOM.Iterable"],
+        "module": "esnext",
+        "moduleResolution": "bundler",
         "resolveJsonModule": true,
         "skipLibCheck": true,
         "isolatedModules": true,
@@ -15,8 +14,8 @@
             }
         ],
         "jsx": "react-jsx",
-        "types": ["react", "react-dom", "vitest/globals", "@testing-library/jest-dom", "vite/client"],
-        "outDir": "dist-electron",
+        "types": ["node", "react", "react-dom", "vitest/globals", "@testing-library/jest-dom", "vite/client", "jest", "electron"],
+        "outDir": "dist",
         "baseUrl": ".",
         "paths": {
             "@/*": ["src/*"]
@@ -43,27 +42,28 @@
         "noPropertyAccessFromIndexSignature": false,
         "strictBindCallApply": true,
         "strictFunctionTypes": true,
-        "useUnknownInCatchVariables": true
+        "useUnknownInCatchVariables": true,
+        "sourceMap": true
     },
     "include": [
         "src/**/*.ts",
         "src/**/*.tsx",
         "src/**/*.test.ts",
         "src/**/*.test.tsx",
-        "electron/**/*.ts",
-        "electron/**/*.tsx",
-        "electron/**/*.test.ts",
-        "vite.config.ts"
+        "vite.config.ts",
+        "vitest.config.ts"
     ],
     "exclude": [
         "node_modules",
         "**/node_modules",
+        "**/node_modules/**",
         "dist",
         "dist-electron",
+        "electron",
         "release",
         "out",
-        "vite.config.ts",
-        "electron/**/*.test.ts"
+        "node_modules/@codecov/**",
+        "node_modules/unplugin/**"
     ]
     // Separate tsconfig should be used for renderer (src/) if needed
 }

@@ -4,7 +4,7 @@
  * Settings match the test configuration from vite.config.ts.
  */
 
-import * as path from "path";
+import * as path from "node:path";
 import { defineConfig } from "vitest/config";
 
 /**
@@ -12,6 +12,9 @@ import { defineConfig } from "vitest/config";
  * Mirrors the test settings from the main vite.config.ts file.
  */
 export default defineConfig({
+    esbuild: {
+        target: "es2024", // Match TypeScript target for consistency
+    },
     resolve: {
         alias: {
             "@": path.resolve(__dirname, "src"),
@@ -41,6 +44,12 @@ export default defineConfig({
             provider: "v8",
             reporter: ["text", "json", "lcov", "html"],
             reportsDirectory: "./coverage",
+            thresholds: {
+                lines: 80, // Minimum 80% line coverage
+                functions: 80, // Minimum 80% function coverage
+                branches: 70, // Minimum 70% branch coverage
+                statements: 80, // Minimum 80% statement coverage
+            },
         },
         environment: "jsdom", // Default for React components
         // Test file patterns - exclude electron tests as they have their own config
@@ -49,5 +58,18 @@ export default defineConfig({
         include: ["src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
         setupFiles: ["./src/test/setup.ts"], // Setup file for testing
         testTimeout: 10000, // Set Vitest timeout to 10 seconds
+        // Modern performance optimizations
+        pool: "threads", // Use worker threads for better performance
+        poolOptions: {
+            threads: {
+                singleThread: false, // Enable multi-threading
+                isolate: true, // Isolate tests for better reliability
+            },
+        },
+        // Improve test output
+        reporters: ["default", "json"],
+        outputFile: {
+            json: "./coverage/test-results.json",
+        },
     },
 });

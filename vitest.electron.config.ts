@@ -1,12 +1,16 @@
 /**
  * Vitest configuration for Electron backend tests.
- * Configures Node.js environment with Electron-specific mocking and setup.
+ * Configures Node.js environment with Electron-specific mocking, modern performance
+ * optimizations, and ES2024 target for consistency with TypeScript config.
  */
 
 import * as path from "node:path";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
+    esbuild: {
+        target: "es2024", // Match TypeScript target for consistency
+    },
     test: {
         // Node.js environment for Electron main process testing
         environment: "node",
@@ -49,6 +53,21 @@ export default defineConfig({
         // Test timeout
         testTimeout: 10000,
 
+        // Modern performance optimizations
+        pool: "threads", // Use worker threads for better performance
+        poolOptions: {
+            threads: {
+                singleThread: false, // Enable multi-threading
+                isolate: true, // Isolate tests for better reliability
+            },
+        },
+
+        // Improve test output
+        reporters: ["default", "json"],
+        outputFile: {
+            json: "./coverage/electron/test-results.json",
+        },
+
         // Mock handling
         clearMocks: true,
         restoreMocks: true,
@@ -56,7 +75,8 @@ export default defineConfig({
 
     resolve: {
         alias: {
-            "@electron": path.resolve(__dirname, "electron"),
+            "@": path.resolve(__dirname, "electron"), // Standardize alias pattern
+            "@electron": path.resolve(__dirname, "electron"), // Keep for backward compatibility
         },
     },
 });
