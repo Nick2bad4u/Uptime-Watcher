@@ -12,6 +12,22 @@ export type { ErrorStore } from "./error/types";
 export { useSitesStore } from "./sites/useSitesStore";
 export type { SitesStore } from "./sites/types";
 
+// Site monitoring actions
+export type { SiteMonitoringActions, SiteMonitoringDependencies } from "./sites/useSiteMonitoring";
+export { createSiteMonitoringActions } from "./sites/useSiteMonitoring";
+
+// Site operations actions
+export type { SiteOperationsActions, SiteOperationsDependencies } from "./sites/useSiteOperations";
+export { createSiteOperationsActions } from "./sites/useSiteOperations";
+
+// Sites state management
+export type { SitesState, SitesStateActions, SitesStateStore } from "./sites/useSitesState";
+export { createSitesStateActions, initialSitesState } from "./sites/useSitesState";
+
+// Site sync actions
+export type { SiteSyncActions, SiteSyncDependencies } from "./sites/useSiteSync";
+export { createSiteSyncActions } from "./sites/useSiteSync";
+
 // Application settings
 export { useSettingsStore } from "./settings/useSettingsStore";
 export type { SettingsStore } from "./settings/types";
