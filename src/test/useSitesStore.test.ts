@@ -373,13 +373,20 @@ describe("useSitesStore", () => {
             };
 
             mockElectronAPI.sites.updateSite.mockResolvedValue(undefined);
-            const mockSyncSitesFromBackend = vi.fn().mockResolvedValue(undefined);
-
-            // Mock the syncSitesFromBackend method
-            useSitesStore.setState({
-                ...useSitesStore.getState(),
-                syncSitesFromBackend: mockSyncSitesFromBackend,
-            });
+            
+            // Mock the getSites method that syncSitesFromBackend calls
+            const currentSites = useSitesStore.getState().sites;
+            const existingSite = currentSites.find(s => s.identifier === "site-1");
+            if (!existingSite) throw new Error("Site not found in test setup");
+            
+            const updatedSite = {
+                ...existingSite,
+                monitors: [
+                    ...existingSite.monitors,
+                    newMonitor,
+                ],
+            };
+            mockElectronAPI.sites.getSites.mockResolvedValue([updatedSite]);
 
             await useSitesStore.getState().addMonitorToSite("site-1", newMonitor);
 
@@ -389,7 +396,7 @@ describe("useSitesStore", () => {
                     expect.objectContaining({ id: "new-monitor" }),
                 ],
             });
-            expect(mockSyncSitesFromBackend).toHaveBeenCalled();
+            expect(mockElectronAPI.sites.getSites).toHaveBeenCalled();
         });
 
         it("should handle adding monitor to non-existent site", async () => {

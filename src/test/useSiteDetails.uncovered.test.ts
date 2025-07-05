@@ -177,7 +177,7 @@ describe("useSiteDetails uncovered lines", () => {
             });
 
             expect(logger.site.error).toHaveBeenCalledWith("test-site-id", testError);
-            expect(logger.error).toHaveBeenCalledWith("Manual site check failed", testError, {
+            expect(logger.error).toHaveBeenCalledWith("Manual site check failed", new Error(testError), {
                 monitorId: "monitor-1",
                 siteId: "test-site-id",
                 siteName: "Test Site",

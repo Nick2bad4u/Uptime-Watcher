@@ -457,7 +457,7 @@ describe("useSiteActions", () => {
             await new Promise((resolve) => setTimeout(resolve, 0));
 
             expect(logger.site.error).toHaveBeenCalledWith("test-site-id", "String error");
-            expect(logger.error).toHaveBeenCalledWith("Manual site check failed", "String error", {
+            expect(logger.error).toHaveBeenCalledWith("Manual site check failed", new Error("String error"), {
                 monitorId: "monitor-1",
                 siteId: "test-site-id",
                 siteName: "Test Site",

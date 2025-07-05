@@ -14,6 +14,7 @@ import type { Site, Monitor } from "../types";
 vi.mock("../stores/sites/services", () => ({
     SiteService: {
         updateSite: vi.fn(),
+        getSites: vi.fn(),
     },
 }));
 
@@ -87,6 +88,9 @@ describe("useSitesStore - Uncovered Functions", () => {
             ...mockSite,
             monitors: [{ ...mockMonitor, timeout: 10000 }]
         });
+        
+        // Mock SiteService.getSites for sync operations
+        (SiteService.getSites as ReturnType<typeof vi.fn>).mockResolvedValue([mockSite]);
     });
 
     describe("updateMonitorTimeout", () => {
@@ -273,30 +277,28 @@ describe("useSitesStore - Uncovered Functions", () => {
     describe("synchronization with backend", () => {
         it("should call syncSitesFromBackend after successful updateMonitorTimeout", async () => {
             const store = useSitesStore.getState();
-            const syncSitesFromBackend = vi.fn();
             
             useSitesStore.setState({ 
                 sites: [mockSite],
-                syncSitesFromBackend 
             });
 
             await store.updateMonitorTimeout("test-site-id", "monitor-1", 10000);
 
-            expect(syncSitesFromBackend).toHaveBeenCalled();
+            // Since syncSitesFromBackend calls SiteService.getSites, verify that was called
+            expect(SiteService.getSites).toHaveBeenCalled();
         });
 
         it("should call syncSitesFromBackend after successful updateSiteCheckInterval", async () => {
             const store = useSitesStore.getState();
-            const syncSitesFromBackend = vi.fn();
             
             useSitesStore.setState({ 
                 sites: [mockSite],
-                syncSitesFromBackend 
             });
 
             await store.updateSiteCheckInterval("test-site-id", "monitor-1", 30000);
 
-            expect(syncSitesFromBackend).toHaveBeenCalled();
+            // Since syncSitesFromBackend calls SiteService.getSites, verify that was called
+            expect(SiteService.getSites).toHaveBeenCalled();
         });
     });
 
