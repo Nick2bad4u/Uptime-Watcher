@@ -3,23 +3,14 @@ name: Metrics - Repository Stats
 on:
     workflow_dispatch:
     schedule:
-        - cron: "53 4 * * 1" # Runs daily at 4:53 AM (UTC)
+        - cron: "53 4 * * 1" # Runs weekly on Monday at 4:53 AM (UTC)
     push:
-        branches: [repo-stats]
-        paths-ignore:
-            - "*"
-            - "*/**"
-            - "!src/**"
-            - "**/CHANGELOG.md"
-            - "CHANGELOG.md"
-    pull_request:
-        branches: [repo-stats]
-        paths-ignore:
-            - "*"
-            - "*/**"
-            - "!src/**"
-            - "**/CHANGELOG.md"
-            - "CHANGELOG.md"
+        branches: [main] # Trigger when main branch is updated
+        paths:
+            - "src/**"
+            - "electron/**"
+            - "package.json"
+            - "*.md"
 
 jobs:
     metrics:
@@ -36,37 +27,64 @@ jobs:
             - name: Generate repository metrics
               uses: lowlighter/metrics@65836723097537a54cd8eb90f61839426b4266b6 # latest
               with:
+                  # === Core Configuration ===
                   template: repository
                   filename: metrics.repository.svg
                   token: ${{ secrets.GITHUB_TOKEN }}
-                  # user: nick2bad4u
-                  repo: Uptime-Watcher
-                  # The 'repo' input is not supported in this context and causes 'Unsupported context repository' error. Remove or comment out this line.
+                  committer_branch: metrics
+                  committer_message: "Update repository metrics [skip ci]"
+                  
+                  # === Display & Output Settings ===
+                  config_display: large                    # Large display for desktop viewing
+                  config_output: svg                       # SVG format for crisp rendering
+                  config_timezone: America/Detroit         # Your timezone
+                  config_twemoji: yes                      # Consistent emoji rendering
+                  config_gemoji: yes                       # GitHub custom emojis
+                  config_octicon: yes                      # GitHub octicons
+                  config_animations: yes                   # Enable animations
+                  config_base64: yes                       # Self-contained images
+                  config_padding: 0, 8 + 11%              # Optimal padding
+                  
+                  # === Optimization ===
+                  optimize: css, xml                       # Optimize CSS and XML
+                  use_prebuilt_image: yes                  # Faster execution
+                  
+                  # === Retry Configuration ===
+                  retries: 3                               # Retry on failures
+                  retries_delay: 300                       # 5 minutes between retries
+                  retries_output_action: 5                 # Retry output action
+                  retries_delay_output_action: 120         # 2 minutes between output retries
+                  
+                  # === Base Sections ===
                   base: header, activity, community, repositories, metadata
-                  base_indepth: yes
-                  commits_authoring: nick2bad4u
-                  config_display: large
-                  config_octicon: yes
-                  config_timezone: America/Detroit
-                  config_twemoji: yes
-                  plugin_followup: yes
-                  plugin_lines: yes
-                  plugin_languages: yes
-                  plugin_languages_analysis_timeout: 30
+                  base_indepth: yes                        # Deep analysis
+                  commits_authoring: nick2bad4u           # Your GitHub username
+                  
+                  # === Plugin Configuration ===
+                  plugin_followup: yes                     # Follow-up issues
+                  plugin_lines: yes                        # Lines of code metrics
+                  plugin_lines_history_limit: 40          # Historical data depth
+                  plugin_lines_repositories_limit: 8      # Repository limit
+                  plugin_lines_sections: base             # Base sections only
+                  
+                  # === Language Analytics ===
+                  plugin_languages: yes                   # Language statistics
+                  plugin_languages_analysis_timeout: 30   # Analysis timeout
                   plugin_languages_analysis_timeout_repositories: 40
                   plugin_languages_categories: markup, programming
-                  plugin_languages_colors: github
-                  plugin_languages_indepth: yes
-                  plugin_languages_limit: 30
+                  plugin_languages_colors: github         # GitHub color scheme
+                  plugin_languages_indepth: yes           # Deep language analysis
+                  plugin_languages_limit: 30              # Show top 30 languages
                   plugin_languages_recent_categories: markup, programming
-                  plugin_languages_recent_days: 30
-                  plugin_languages_recent_load: 600
-                  plugin_languages_sections: most-used
-                  plugin_languages_threshold: 0%
-                  plugin_lines_history_limit: 40
-                  plugin_lines_repositories_limit: 8
-                  plugin_lines_sections: base
-                  plugin_repositories: yes
+                  plugin_languages_recent_days: 30        # Recent activity window
+                  plugin_languages_recent_load: 600       # Data load limit
+                  plugin_languages_sections: most-used    # Focus on most used
+                  plugin_languages_threshold: 0%          # Include all languages
+                  
+                  # === Repository Metrics ===
+                  plugin_repositories: yes                 # Repository analytics
                   plugin_repositories_order: featured, pinned, starred, random
-                  repositories_forks: yes
-                  users_ignored: none
+                  repositories_forks: yes                 # Include forks
+                  
+                  # === User Filtering ===
+                  users_ignored: none                     # Don't ignore any users
