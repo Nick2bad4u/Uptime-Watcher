@@ -116,7 +116,7 @@ export class MonitorScheduler {
      * Stop all monitoring intervals.
      */
     public stopAll(): void {
-        for (const interval of this.intervals.values()) {
+        for (const interval of Array.from(this.intervals.values())) {
             clearInterval(interval);
         }
         this.intervals.clear();
