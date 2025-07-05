@@ -7,14 +7,114 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[e6fe1ab](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e6fe1ab37d6337c45bd4cfaf80794ebfd076f7d7)...
-[e6fe1ab](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e6fe1ab37d6337c45bd4cfaf80794ebfd076f7d7)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/e6fe1ab37d6337c45bd4cfaf80794ebfd076f7d7...e6fe1ab37d6337c45bd4cfaf80794ebfd076f7d7))
+[[de4d92e](https://github.com/Nick2bad4u/Uptime-Watcher/commit/de4d92ef3dd3e2fb4ae638841424d71a7b050458)...
+[de4d92e](https://github.com/Nick2bad4u/Uptime-Watcher/commit/de4d92ef3dd3e2fb4ae638841424d71a7b050458)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/de4d92ef3dd3e2fb4ae638841424d71a7b050458...de4d92ef3dd3e2fb4ae638841424d71a7b050458))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 4.9.0 [`(de4d92e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/de4d92ef3dd3e2fb4ae638841424d71a7b050458)
+
+
+
+
+
+
+## [4.9.0] - 2025-07-05
+
+
+[[7c0a987](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7c0a9879111d7e6259b9b485473eff4bceff7a58)...
+[760f6bf](https://github.com/Nick2bad4u/Uptime-Watcher/commit/760f6bf46a0f6afc1355792407c4907103863877)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/7c0a9879111d7e6259b9b485473eff4bceff7a58...760f6bf46a0f6afc1355792407c4907103863877))
+
+
+### �️ Bug Fixes
+
+- 🛠️ [fix] Prevents issues with mutated interval and key collections
+
+- Converts interval and key collections to arrays before iteration to avoid potential mutation issues during loop execution.
+- Ensures stability when stopping all intervals or deleting keys, particularly if the underlying collections are modified within the loop. [`(7c0a987)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7c0a9879111d7e6259b9b485473eff4bceff7a58)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 4.8.0 [`(e6fe1ab)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e6fe1ab37d6337c45bd4cfaf80794ebfd076f7d7)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(760f6bf)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/760f6bf46a0f6afc1355792407c4907103863877)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Redesign site data logic for testability & clarity
+
+- Refactors site repository and writer logic into service-based, dependency-injected architecture for improved modularity, testability, and maintainability
+- Introduces interface abstractions, adapter layers, orchestrators, and factory functions, separating pure data operations from side effects
+- Fixes legacy monitor ID bug by correctly handling string-based UUIDs, improving reliability
+- Updates function signatures and store actions to consistently return detailed status objects instead of void, enhancing state management and logging
+- Expands unit test coverage for all new services and orchestrators, ensuring robust and isolated testing
+- Modernizes error handling with custom error classes for clearer diagnostics
+- Maintains backward compatibility with legacy wrapper functions and unchanged public APIs
+
+Relates to the goal of adopting modern software engineering best practices and supporting future scalabilitynpm [`(dfa9b48)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/dfa9b481feb8034ed70796e1edb4b3424e377e36)
+
+
+- 🚜 [refactor] Align history retention and iteration logic with UI and standards
+
+- Updates history retention defaults to match UI options, improving consistency for user-configurable limits.
+- Refactors iteration over Maps and arrays to use Array.from, ensuring compatibility and more predictable iteration, especially in environments with potential non-standard Map behavior.
+- Changes logging calls to omit unused empty objects, streamlining code and reducing noise.
+- Switches to namespace imports for HTTP modules for consistency with project import style.
+
+These changes enhance maintainability, ensure UI and backend alignment, and improve code clarity. [`(438cb70)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/438cb70610f6b9f298e88824ba31595ca5d8ed91)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Update store action logging tests with detailed payloads
+
+- Expands tests for store action logging to verify that log calls include detailed payload objects, reflecting recent improvements to log data.
+- Ensures tests accurately check for updated logStoreAction invocations with explicit messages, success flags, and relevant metadata.
+- Improves reliability and clarity of test assertions, reducing risk of regressions when logging behavior changes. [`(4c78d42)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4c78d42b526ab6e5f6c10b750ec5ea17897104a9)
+
+
+- 🧪 [test] Improve coverage reporting and barrel export testing
+
+- Adds targeted test files for barrel export modules to ensure all exports are exercised, addressing indirect coverage and circular dependency issues
+- Updates coverage configuration to explicitly exclude barrel export files from coverage metrics, improving accuracy and reducing noise from non-testable files
+- Expands tests for complex error and edge cases in file download and status update handlers to better document defensive paths and error handling
+- Introduces comprehensive documentation analyzing current test coverage, remaining gaps, and practical recommendations for future improvements
+- Includes new test for settings component edge cases
+- Ensures LICENSE and generated docs are properly ignored by markdown lint tools
+
+These improvements clarify true code coverage, strengthen test reliability, and document both strengths and minor remaining limitations for future maintainability. [`(09cf8f3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/09cf8f31140243dd0e7a47b170eff8e096c4e472)
+
+
+- 🧪 [test] Expand site hooks index tests and update mocks
+
+- Expands unit tests to cover new analytics and details hooks, ensuring centralized access to all site-related hooks.
+- Updates mocks and export checks for increased modularity and future scalability.
+- Simplifies agent mocking in HTTP monitor tests for accuracy and maintainability.
+- Adjusts configuration manager test to reflect updated retention limits and boundaries. [`(504f5ee)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/504f5ee3c38c92ff20f873f2a4afc7d558e0eaa3)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v4.8.0 [skip ci] [`(ec0e5db)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ec0e5dbadb40aca990e3a57382c2fb5b353742b5)
+
+
+- 🧹 [chore] Expand ignore globs and enable MCP server configs
+
+- Broadens ignored directories for security scanning to include build, coverage, and release outputs, reducing noise from generated files.
+- Reactivates previously commented-out MCP server configurations in the development environment to streamline local server management and testing. [`(a6cc8d9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a6cc8d961a0ceb0ca8363d60283226aa168768ad)
 
 
 
