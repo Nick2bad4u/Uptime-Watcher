@@ -80,29 +80,29 @@
         "useTabs": false
     },
     "debug.defaultCompound": "Dev: Vite + Electron Main",
-    // "mcp": {
-    //     "servers": {
-    //         "uptime-watcher-sqlite": {
-    //             "command": "npx",
-    //             "args": [
-    //                 "-y",
-    //                 "@executeautomation/database-server",
-    //                 "C:\\Users\\Nick\\AppData\\Roaming\\uptime-watcher\\uptime-watcher.sqlite"
-    //             ]
-    //         },
-    //         "github": {
-    //             "command": "npx",
-    //             "args": ["-y", "@modelcontextprotocol/server-github"],
-    //             "env": {
-    //                 "GITHUB_PERSONAL_ACCESS_TOKEN": ""
-    //             }
-    //         },
-    //         "memory": {
-    //             "command": "npx",
-    //             "args": ["-y", "@modelcontextprotocol/server-memory"]
-    //         }
-    //     }
-    // },
+    "mcp": {
+        "servers": {
+            "uptime-watcher-sqlite": {
+                "command": "npx",
+                "args": [
+                    "-y",
+                    "@executeautomation/database-server",
+                    "C:\\Users\\Nick\\AppData\\Roaming\\uptime-watcher\\uptime-watcher.sqlite"
+                ]
+            },
+            "github": {
+                "command": "npx",
+                "args": ["-y", "@modelcontextprotocol/server-github"],
+                "env": {
+                    "GITHUB_PERSONAL_ACCESS_TOKEN": ""
+                }
+            },
+            "memory": {
+                "command": "npx",
+                "args": ["-y", "@modelcontextprotocol/server-memory"]
+            }
+        }
+    },
     "sonarlint.connectedMode.project": {
         "connectionId": "nick2bad4u",
         "projectKey": "Nick2bad4u_Uptime-Watcher"
