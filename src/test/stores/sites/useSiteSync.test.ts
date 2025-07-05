@@ -82,7 +82,11 @@ describe("useSiteSync", () => {
 
             expect(SiteService.getSites).toHaveBeenCalledTimes(1);
             expect(mockDependencies.setSites).toHaveBeenCalledWith(mockSites);
-            expect(logStoreAction).toHaveBeenCalledWith("SitesStore", "syncSitesFromBackend");
+            expect(logStoreAction).toHaveBeenCalledWith("SitesStore", "syncSitesFromBackend", {
+                message: "Sites synchronized from backend",
+                sitesCount: 1,
+                success: true,
+            });
         });
 
         it("should handle errors during sync", async () => {
@@ -94,7 +98,7 @@ describe("useSiteSync", () => {
 
             expect(SiteService.getSites).toHaveBeenCalledTimes(1);
             expect(mockDependencies.setSites).not.toHaveBeenCalled();
-            expect(logStoreAction).toHaveBeenCalledWith("SitesStore", "syncSitesFromBackend");
+            expect(logStoreAction).toHaveBeenCalledWith("SitesStore", "error", { error: "Sync failed" });
         });
 
         it("should handle empty sites array", async () => {
@@ -117,8 +121,15 @@ describe("useSiteSync", () => {
 
             expect(SiteService.getSites).toHaveBeenCalledTimes(1);
             expect(mockDependencies.setSites).toHaveBeenCalledWith(mockSites);
-            expect(logStoreAction).toHaveBeenCalledWith("SitesStore", "fullSyncFromBackend");
-            expect(logStoreAction).toHaveBeenCalledWith("SitesStore", "syncSitesFromBackend");
+            expect(logStoreAction).toHaveBeenCalledWith("SitesStore", "fullSyncFromBackend", {
+                message: "Full backend synchronization completed",
+                success: true,
+            });
+            expect(logStoreAction).toHaveBeenCalledWith("SitesStore", "syncSitesFromBackend", {
+                message: "Sites synchronized from backend",
+                sitesCount: 1,
+                success: true,
+            });
         });
 
         it("should handle errors during full sync", async () => {
@@ -141,7 +152,11 @@ describe("useSiteSync", () => {
 
             syncActions.subscribeToStatusUpdates(mockCallback);
 
-            expect(logStoreAction).toHaveBeenCalledWith("SitesStore", "subscribeToStatusUpdates");
+            expect(logStoreAction).toHaveBeenCalledWith("SitesStore", "subscribeToStatusUpdates", {
+                message: "Successfully subscribed to status updates",
+                subscribed: true,
+                success: true,
+            });
             expect(createStatusUpdateHandler).toHaveBeenCalledWith({
                 fullSyncFromBackend: syncActions.fullSyncFromBackend,
                 getSites: mockDependencies.getSites,
@@ -155,7 +170,11 @@ describe("useSiteSync", () => {
         it("should unsubscribe from status updates", () => {
             syncActions.unsubscribeFromStatusUpdates();
 
-            expect(logStoreAction).toHaveBeenCalledWith("SitesStore", "unsubscribeFromStatusUpdates");
+            expect(logStoreAction).toHaveBeenCalledWith("SitesStore", "unsubscribeFromStatusUpdates", {
+                message: "Successfully unsubscribed from status updates",
+                success: true,
+                unsubscribed: true,
+            });
         });
     });
 
@@ -208,11 +227,30 @@ describe("useSiteSync", () => {
             syncActions.unsubscribeFromStatusUpdates();
 
             expect(logStoreAction).toHaveBeenCalledTimes(5);
-            expect(logStoreAction).toHaveBeenNthCalledWith(1, "SitesStore", "syncSitesFromBackend");
-            expect(logStoreAction).toHaveBeenNthCalledWith(2, "SitesStore", "fullSyncFromBackend");
-            expect(logStoreAction).toHaveBeenNthCalledWith(3, "SitesStore", "syncSitesFromBackend"); // Called again by fullSyncFromBackend
-            expect(logStoreAction).toHaveBeenNthCalledWith(4, "SitesStore", "subscribeToStatusUpdates");
-            expect(logStoreAction).toHaveBeenNthCalledWith(5, "SitesStore", "unsubscribeFromStatusUpdates");
+            expect(logStoreAction).toHaveBeenNthCalledWith(1, "SitesStore", "syncSitesFromBackend", {
+                message: "Sites synchronized from backend",
+                sitesCount: 1,
+                success: true,
+            });
+            expect(logStoreAction).toHaveBeenNthCalledWith(2, "SitesStore", "syncSitesFromBackend", {
+                message: "Sites synchronized from backend",
+                sitesCount: 1,
+                success: true,
+            }); // Called again by fullSyncFromBackend
+            expect(logStoreAction).toHaveBeenNthCalledWith(3, "SitesStore", "fullSyncFromBackend", {
+                message: "Full backend synchronization completed",
+                success: true,
+            });
+            expect(logStoreAction).toHaveBeenNthCalledWith(4, "SitesStore", "subscribeToStatusUpdates", {
+                message: "Successfully subscribed to status updates",
+                subscribed: true,
+                success: true,
+            });
+            expect(logStoreAction).toHaveBeenNthCalledWith(5, "SitesStore", "unsubscribeFromStatusUpdates", {
+                message: "Successfully unsubscribed from status updates",
+                success: true,
+                unsubscribed: true,
+            });
         });
     });
 

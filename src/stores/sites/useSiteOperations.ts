@@ -147,7 +147,7 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                 setLoading: () => {},
             }
         );
-        
+
         logStoreAction("SitesStore", "downloadSQLiteBackup", {
             message: "SQLite backup download completed",
             success: true,
@@ -170,13 +170,13 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                 setLoading: () => {},
             }
         );
-        
+
         logStoreAction("SitesStore", "initializeSites", {
             message: result.message,
             sitesLoaded: result.sitesLoaded,
             success: result.success,
         });
-        
+
         return result;
     },
     modifySite: async (identifier: string, updates: Partial<Site>) => {

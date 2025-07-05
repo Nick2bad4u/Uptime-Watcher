@@ -59,7 +59,7 @@ export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActio
 
             const result = { message: "Successfully subscribed to status updates", subscribed: true, success: true };
             logStoreAction("SitesStore", "subscribeToStatusUpdates", result);
-            
+
             return result;
         },
         syncSitesFromBackend: async () => {
@@ -68,6 +68,12 @@ export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActio
                     const backendSites = await SiteService.getSites();
                     // Handle null/undefined responses from backend by defaulting to empty array
                     deps.setSites(backendSites || []);
+
+                    logStoreAction("SitesStore", "syncSitesFromBackend", {
+                        message: "Sites synchronized from backend",
+                        sitesCount: deps.getSites().length,
+                        success: true,
+                    });
                 },
                 {
                     clearError: () => {},
@@ -75,12 +81,6 @@ export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActio
                     setLoading: () => {},
                 }
             );
-            
-            logStoreAction("SitesStore", "syncSitesFromBackend", {
-                message: "Sites synchronized from backend",
-                sitesCount: deps.getSites().length,
-                success: true,
-            });
         },
         unsubscribeFromStatusUpdates: () => {
             statusUpdateManager.unsubscribe();
@@ -90,7 +90,7 @@ export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActio
                 unsubscribed: true,
             };
             logStoreAction("SitesStore", "unsubscribeFromStatusUpdates", result);
-            
+
             return result;
         },
     };

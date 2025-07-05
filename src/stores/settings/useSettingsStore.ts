@@ -44,13 +44,13 @@ export const useSettingsStore = create<SettingsStore>()(
                         setLoading: (loading) => errorStore.setOperationLoading("initializeSettings", loading),
                     }
                 );
-                
+
                 logStoreAction("SettingsStore", "initializeSettings", {
                     message: result.message,
                     settingsLoaded: result.settingsLoaded,
                     success: result.success,
                 });
-                
+
                 return result;
             },
             resetSettings: () => {

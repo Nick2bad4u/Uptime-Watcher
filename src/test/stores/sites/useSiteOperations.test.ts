@@ -118,7 +118,11 @@ describe("useSiteOperations", () => {
 
             expect(SiteService.getSites).toHaveBeenCalledTimes(1);
             expect(mockDependencies.setSites).toHaveBeenCalledWith(mockSites);
-            expect(logStoreAction).toHaveBeenCalledWith("SitesStore", "initializeSites");
+            expect(logStoreAction).toHaveBeenCalledWith("SitesStore", "initializeSites", {
+                message: "Successfully loaded 1 sites",
+                sitesLoaded: 1,
+                success: true,
+            });
         });
     });
 
@@ -350,7 +354,10 @@ describe("useSiteOperations", () => {
 
             await operations.downloadSQLiteBackup();
 
-            expect(logStoreAction).toHaveBeenCalledWith("SitesStore", "downloadSQLiteBackup");
+            expect(logStoreAction).toHaveBeenCalledWith("SitesStore", "downloadSQLiteBackup", {
+                message: "SQLite backup download completed",
+                success: true,
+            });
             expect(handleSQLiteBackupDownload).toHaveBeenCalledWith(expect.any(Function));
             expect(SiteService.downloadSQLiteBackup).toHaveBeenCalledTimes(1);
         });

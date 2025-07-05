@@ -437,8 +437,14 @@ describe("useUpdatesStore", () => {
             expect(logStoreAction).toHaveBeenCalledWith("UpdatesStore", "setUpdateProgress", { progress: 50 });
             expect(logStoreAction).toHaveBeenCalledWith("UpdatesStore", "setUpdateError", { error: "Test error" });
             expect(logStoreAction).toHaveBeenCalledWith("UpdatesStore", "setUpdateInfo", { info: updateInfo });
-            expect(logStoreAction).toHaveBeenCalledWith("UpdatesStore", "clearUpdateError");
-            expect(logStoreAction).toHaveBeenCalledWith("UpdatesStore", "applyUpdate");
+            expect(logStoreAction).toHaveBeenCalledWith("UpdatesStore", "clearUpdateError", {
+                message: "Update error cleared",
+                success: true,
+            });
+            expect(logStoreAction).toHaveBeenCalledWith("UpdatesStore", "applyUpdate", {
+                message: "Applying update and restarting application",
+                success: true,
+            });
         });
     });
 });
