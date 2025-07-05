@@ -84,6 +84,7 @@
     "sqlite:verify-wasm": "node ./scripts/verify-sqlite3-wasm.js || echo 'Verification script not implemented yet.'",
     "sqlite:clean-wasm": "rm -f dist-electron/node-sqlite3-wasm.wasm",
     "sqlite:reinstall-wasm": "npm run sqlite:clean-wasm && npm run sqlite:download-wasm",
+    "validate:components": "node ./scripts/validate-components.js",
     "start-both": "concurrently \"npm run dev\" \"npm run electron-dev\"",
     "dev:sqlite3": "npx cpy node_modules/node-sqlite3-wasm/dist/node-sqlite3-wasm.wasm dist-electron/ --flat",
     "postbuild": "npx cpy node_modules/node-sqlite3-wasm/dist/node-sqlite3-wasm.wasm dist-electron/ --flat",

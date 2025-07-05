@@ -107,3 +107,259 @@ parsers:
             loop: yes # Track loop branches
             method: no # Don't track method entry/exit
             macro: no # Don't track macro expansions
+
+# Components configuration for logical domain separation
+component_management:
+    default_rules:
+        statuses:
+            - type: project
+              target: auto
+              threshold: 1%
+              branches:
+                  - "!main"
+    individual_components:
+        # Frontend Architecture Components
+        - component_id: frontend_ui_components
+          name: "UI Components"
+          paths:
+              - src/components/**
+          statuses:
+              - type: project
+                target: 80%
+                threshold: 2%
+              - type: patch
+                target: 75%
+                threshold: 5%
+
+        - component_id: frontend_state_management
+          name: "State Management (Stores)"
+          paths:
+              - src/stores/**
+          statuses:
+              - type: project
+                target: 85%
+                threshold: 2%
+              - type: patch
+                target: 80%
+                threshold: 5%
+
+        - component_id: frontend_services
+          name: "Frontend Services"
+          paths:
+              - src/services/**
+          statuses:
+              - type: project
+                target: 80%
+                threshold: 2%
+              - type: patch
+                target: 75%
+                threshold: 5%
+
+        - component_id: frontend_hooks
+          name: "React Hooks"
+          paths:
+              - src/hooks/**
+          statuses:
+              - type: project
+                target: 80%
+                threshold: 2%
+              - type: patch
+                target: 75%
+                threshold: 5%
+
+        - component_id: frontend_utils
+          name: "Frontend Utils"
+          paths:
+              - src/utils/**
+          statuses:
+              - type: project
+                target: 85%
+                threshold: 2%
+              - type: patch
+                target: 80%
+                threshold: 5%
+
+        # Backend Architecture Components
+        - component_id: backend_core_services
+          name: "Core Backend Services"
+          paths:
+              - electron/services/**
+          statuses:
+              - type: project
+                target: 90%
+                threshold: 2%
+              - type: patch
+                target: 85%
+                threshold: 5%
+
+        - component_id: backend_managers
+          name: "Domain Managers"
+          paths:
+              - electron/managers/**
+          statuses:
+              - type: project
+                target: 90%
+                threshold: 2%
+              - type: patch
+                target: 85%
+                threshold: 5%
+
+        - component_id: backend_orchestrator
+          name: "Uptime Orchestrator"
+          paths:
+              - electron/UptimeOrchestrator.ts
+          statuses:
+              - type: project
+                target: 95%
+                threshold: 2%
+              - type: patch
+                target: 90%
+                threshold: 5%
+
+        - component_id: backend_utils
+          name: "Backend Utils"
+          paths:
+              - electron/utils/**
+              - electron/electronUtils.ts
+          statuses:
+              - type: project
+                target: 85%
+                threshold: 2%
+              - type: patch
+                target: 80%
+                threshold: 5%
+
+        # Domain-Specific Components
+        - component_id: database_layer
+          name: "Database Layer"
+          paths:
+              - electron/services/database/**
+              - electron/managers/DatabaseManager.ts
+          statuses:
+              - type: project
+                target: 95%
+                threshold: 1%
+              - type: patch
+                target: 90%
+                threshold: 3%
+
+        - component_id: monitoring_engine
+          name: "Monitoring Engine"
+          paths:
+              - electron/services/monitoring/**
+              - electron/managers/MonitorManager.ts
+          statuses:
+              - type: project
+                target: 90%
+                threshold: 2%
+              - type: patch
+                target: 85%
+                threshold: 5%
+
+        - component_id: ipc_communication
+          name: "IPC Communication"
+          paths:
+              - electron/services/ipc/**
+              - electron/preload.ts
+          statuses:
+              - type: project
+                target: 90%
+                threshold: 2%
+              - type: patch
+                target: 85%
+                threshold: 5%
+
+        - component_id: site_management
+          name: "Site Management"
+          paths:
+              - electron/managers/SiteManager.ts
+              - src/stores/sites/**
+              - src/components/AddSiteForm/**
+              - src/components/SiteDetails/**
+          statuses:
+              - type: project
+                target: 85%
+                threshold: 2%
+              - type: patch
+                target: 80%
+                threshold: 5%
+
+        - component_id: settings_configuration
+          name: "Settings & Configuration"
+          paths:
+              - electron/managers/ConfigurationManager.ts
+              - src/stores/settings/**
+              - src/components/Settings/**
+          statuses:
+              - type: project
+                target: 85%
+                threshold: 2%
+              - type: patch
+                target: 80%
+                threshold: 5%
+
+        - component_id: dashboard_analytics
+          name: "Dashboard & Analytics"
+          paths:
+              - src/components/Dashboard/**
+              - src/stores/stats/**
+              - src/stores/ui/**
+          statuses:
+              - type: project
+                target: 80%
+                threshold: 2%
+              - type: patch
+                target: 75%
+                threshold: 5%
+
+        - component_id: error_handling
+          name: "Error Handling"
+          paths:
+              - src/stores/error/**
+          statuses:
+              - type: project
+                target: 90%
+                threshold: 2%
+              - type: patch
+                target: 85%
+                threshold: 5%
+
+        - component_id: theme_system
+          name: "Theme System"
+          paths:
+              - src/theme/**
+          statuses:
+              - type: project
+                target: 75%
+                threshold: 3%
+              - type: patch
+                target: 70%
+                threshold: 5%
+
+        # Cross-Cutting Components
+        - component_id: type_definitions
+          name: "Type Definitions"
+          paths:
+              - src/types.ts
+              - electron/types.ts
+              - src/stores/types.ts
+          statuses:
+              - type: project
+                target: 70%
+                threshold: 5%
+              - type: patch
+                target: 65%
+                threshold: 10%
+
+        - component_id: constants
+          name: "Constants"
+          paths:
+              - src/constants.ts
+              - electron/constants.ts
+          statuses:
+              - type: project
+                target: 70%
+                threshold: 5%
+              - type: patch
+                target: 65%
+                threshold: 10%
