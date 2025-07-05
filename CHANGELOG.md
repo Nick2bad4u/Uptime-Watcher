@@ -7,14 +7,53 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[4e582ab](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4e582ab01f338cb50082f8ba902b4a0f1eab09ea)...
-[04fbfe9](https://github.com/Nick2bad4u/Uptime-Watcher/commit/04fbfe92b2bb07fe9c6a8d519885811e50fc1e23)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/4e582ab01f338cb50082f8ba902b4a0f1eab09ea...04fbfe92b2bb07fe9c6a8d519885811e50fc1e23))
+[[e6fe1ab](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e6fe1ab37d6337c45bd4cfaf80794ebfd076f7d7)...
+[e6fe1ab](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e6fe1ab37d6337c45bd4cfaf80794ebfd076f7d7)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/e6fe1ab37d6337c45bd4cfaf80794ebfd076f7d7...e6fe1ab37d6337c45bd4cfaf80794ebfd076f7d7))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 4.8.0 [`(e6fe1ab)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e6fe1ab37d6337c45bd4cfaf80794ebfd076f7d7)
+
+
+
+
+
+
+## [4.8.0] - 2025-07-05
+
+
+[[2fa7607](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2fa76074740c24491b7cd8a288304e2c50480077)...
+[5310836](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5310836cf0f9ce209d1ca9a1bc928927549d3641)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/2fa76074740c24491b7cd8a288304e2c50480077...5310836cf0f9ce209d1ca9a1bc928927549d3641))
+
+
+### ✨ Features
+
+- ✨ [feat] Expose site management actions and add new hooks
+
+- Expands exports to provide site monitoring, operations, sync, and state management actions for broader access across the app
+- Adds new site-related hooks and reorganizes existing ones for improved modularity and discoverability
+- Facilitates easier integration and testing of site functionality by centralizing exports [`(2fa7607)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2fa76074740c24491b7cd8a288304e2c50480077)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 4.7.0 [`(4e582ab)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4e582ab01f338cb50082f8ba902b4a0f1eab09ea)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(5310836)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5310836cf0f9ce209d1ca9a1bc928927549d3641)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v4.7.0 [skip ci] [`(62af4b3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/62af4b3da6edd91ec8110b307e1db6e9e6ba5323)
 
 
 
