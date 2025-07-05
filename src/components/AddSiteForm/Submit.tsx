@@ -318,7 +318,7 @@ export async function handleSubmit(e: React.FormEvent, props: FormSubmitProps) {
         await performSubmission(props, monitor);
         onSuccess?.();
     } catch (error) {
-        logger.error("Failed to add site/monitor from form", error);
+        logger.error("Failed to add site/monitor from form", error instanceof Error ? error : new Error(String(error)));
         setFormError("Failed to add site/monitor. Please try again.");
     }
 }

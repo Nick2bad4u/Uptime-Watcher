@@ -99,7 +99,7 @@ export function useSiteActions(site: Site, monitor: Monitor | undefined): SiteAc
             })
             .catch((error) => {
                 logger.site.error(site.identifier, error instanceof Error ? error : String(error));
-                logger.error("Manual site check failed", error instanceof Error ? error : String(error), {
+                logger.error("Manual site check failed", error instanceof Error ? error : new Error(String(error)), {
                     monitorId: monitor.id,
                     siteId: site.identifier,
                     siteName: site.name,

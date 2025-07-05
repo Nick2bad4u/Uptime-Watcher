@@ -98,7 +98,10 @@ export function Settings({ onClose }: Readonly<SettingsProps>) {
             await updateHistoryLimitValue(limit);
             logger.user.settingsChange("historyLimit", settings.historyLimit, limit);
         } catch (error) {
-            logger.error("Failed to update history limit from settings", error);
+            logger.error(
+                "Failed to update history limit from settings",
+                error instanceof Error ? error : new Error(String(error))
+            );
             // Error is already handled by the store action
         }
     };
@@ -125,7 +128,7 @@ export function Settings({ onClose }: Readonly<SettingsProps>) {
             setSyncSuccess(true);
             logger.user.action("Synced data from SQLite backend");
         } catch (error: unknown) {
-            logger.error("Failed to sync data from backend", error);
+            logger.error("Failed to sync data from backend", error instanceof Error ? error : new Error(String(error)));
             setError(
                 "Failed to sync data: " +
                     (error && typeof error === "object" && "message" in error
@@ -142,7 +145,7 @@ export function Settings({ onClose }: Readonly<SettingsProps>) {
             await downloadSQLiteBackup();
             logger.user.action("Downloaded SQLite backup");
         } catch (error: unknown) {
-            logger.error("Failed to download SQLite backup", error);
+            logger.error("Failed to download SQLite backup", error instanceof Error ? error : new Error(String(error)));
             setError(
                 "Failed to download SQLite backup: " +
                     (error && typeof error === "object" && "message" in error

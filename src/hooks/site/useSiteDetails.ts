@@ -147,7 +147,7 @@ export function useSiteDetails({ site }: UseSiteDetailsProps) {
             });
         } catch (error) {
             logger.site.error(currentSite.identifier, error instanceof Error ? error : String(error));
-            logger.error("Manual site check failed", error instanceof Error ? error : String(error), {
+            logger.error("Manual site check failed", error instanceof Error ? error : new Error(String(error)), {
                 monitorId: selectedMonitorId,
                 siteId: currentSite.identifier,
                 siteName: currentSite.name,
