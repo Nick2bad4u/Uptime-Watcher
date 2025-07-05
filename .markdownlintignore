@@ -10,3 +10,4 @@ docs/Validator.md
 .markdownlintignore
 .github/prompts/*
 LICENSE
+.github/instructions/*
