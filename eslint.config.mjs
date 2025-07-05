@@ -95,6 +95,9 @@ export default [
             "coverage/",
             "coverage",
             "coverage/**",
+            ".agentic-tools*",
+            "_ZENTASKS*",
+            "_ZENTANKS*"
         ],
     },
 
@@ -293,16 +296,14 @@ export default [
             "tsdoc/syntax": "warn",
         },
     },
-    // TypeScript files
+    // TypeScript files - Source (renderer) files
     {
-        files: ["**/*.ts", "**/*.tsx"],
+        files: ["src/**/*.ts", "src/**/*.tsx", "vitest*.ts", "vite.config.ts"],
         ignores: [
             "tests/**",
             "**/__tests__/**",
             "**/*.test.{ts,tsx}",
             "**/*.spec.{ts,tsx}",
-            "vitest*.ts",
-            "electron/test/**/*.ts",
             "src/test/**/*.ts",
         ],
         languageOptions: {
@@ -447,6 +448,153 @@ export default [
             "regexp/no-empty-alternative": "warn",
             // tsdoc
             "tsdoc/syntax": "warn",
+        },
+    },
+
+    // TypeScript files - Electron (main process) files
+    {
+        files: ["electron/**/*.ts", "electron/**/*.tsx", "vitest.electron.config.ts"],
+        ignores: [
+            "electron/test/**/*.ts",
+            "electron/**/*.test.{ts,tsx}",
+            "electron/**/*.spec.{ts,tsx}",
+        ],
+        languageOptions: {
+            parser: tseslint.parser,
+            parserOptions: {
+                project: "./tsconfig.electron.json",
+                sourceType: "module",
+                ecmaVersion: "latest",
+                tsconfigRootDir: __dirname,
+            },
+            globals: {
+                ...globals.node,
+                __dirname: "readonly",
+                __filename: "readonly",
+                process: "readonly",
+                Buffer: "readonly",
+                global: "readonly",
+                require: "readonly",
+                module: "readonly",
+            },
+        },
+        plugins: {
+            "@typescript-eslint": tseslint.plugin,
+            import: pluginImport,
+            promise: pluginPromise,
+            "unused-imports": pluginUnusedImports,
+            prettier: pluginPrettier,
+            sonarjs: pluginSonarjs,
+            security: pluginSecurity,
+            "eslint-comments": pluginEslintComments,
+            perfectionist: pluginPerfectionist,
+            // new plugins
+            unicorn: pluginUnicorn,
+            functional: pluginFunctional,
+            filenames: pluginFilenames,
+            regexp: pluginRegexp,
+            tsdoc: pluginTsdoc,
+        },
+        rules: {
+            ...tseslint.configs.recommended.rules,
+            // import plugin: enable a few best-practice rules manually
+            "import/order": [
+                "off",
+                {
+                    alphabetize: {
+                        order: "asc",
+                    },
+                    groups: ["builtin", "external", "internal", "parent", "sibling", "index"],
+
+                    distinctGroup: true,
+                    sortTypesGroup: false,
+                },
+            ],
+            "import/newline-after-import": "warn",
+            // promise plugin: enable a few best-practice rules manually
+            "promise/always-return": "warn",
+            "promise/no-return-wrap": "warn",
+            "promise/param-names": "warn",
+            // unused-imports plugin
+            "unused-imports/no-unused-imports": "error",
+            "unused-imports/no-unused-vars": [
+                "warn",
+                {
+                    vars: "all",
+                    varsIgnorePattern: "^_",
+                    args: "after-used",
+                    argsIgnorePattern: "^_",
+                },
+            ],
+            // prettier
+            "prettier/prettier": [
+                "error",
+                {
+                    usePrettierrc: true,
+                },
+            ],
+            // sonarjs
+            "sonarjs/no-duplicate-string": "warn",
+            "sonarjs/no-identical-functions": "warn",
+            // security
+            "security/detect-object-injection": "warn",
+            // eslint-comments
+            "eslint-comments/no-unused-disable": "warn",
+            "eslint-comments/no-unlimited-disable": "warn",
+            // perfectionist
+            "perfectionist/sort-objects": [
+                "warn",
+                {
+                    type: "natural",
+                    order: "asc",
+                    fallbackSort: { type: "alphabetical", order: "asc" },
+                    newlinesBetween: 1,
+                },
+            ],
+            "perfectionist/sort-imports": [
+                "warn",
+                {
+                    type: "natural",
+                    order: "asc",
+                    fallbackSort: { type: "alphabetical", order: "asc" },
+                    newlinesBetween: 1,
+                },
+            ],
+            // unicorn
+            "unicorn/filename-case": [
+                "warn",
+                {
+                    cases: {
+                        kebabCase: true,
+                        camelCase: true,
+                        pascalCase: true,
+                    },
+                },
+            ],
+            "unicorn/no-abusive-eslint-disable": "warn",
+            "unicorn/no-array-callback-reference": "warn",
+            "unicorn/no-array-for-each": "warn",
+            "unicorn/no-null": "warn",
+            // functional
+            "functional/immutable-data": "off",
+            "functional/no-let": "warn",
+            // regexp
+            "regexp/no-dupe-characters-character-class": "warn",
+            "regexp/no-empty-alternative": "warn",
+            // tsdoc
+            "tsdoc/syntax": "warn",
+            
+            // Disable React-specific rules for electron (Node.js) files
+            "react/jsx-uses-react": "off",
+            "react/react-in-jsx-scope": "off", 
+            "react/prop-types": "off",
+            "react/jsx-boolean-value": "off",
+            "react/self-closing-comp": "off",
+            "react-hooks/rules-of-hooks": "off",
+            "react-hooks/exhaustive-deps": "off",
+            "jsx-a11y/alt-text": "off",
+            "jsx-a11y/anchor-is-valid": "off",
+            "jsx-a11y/no-autofocus": "off",
         },
     },
 

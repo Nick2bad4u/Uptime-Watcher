@@ -13,7 +13,7 @@ import { Theme } from "../theme/types";
  * Centralizes all chart configurations for consistency and maintainability
  */
 export class ChartConfigService {
-    private theme: Theme;
+    private readonly theme: Theme;
 
     constructor(theme: Theme) {
         this.theme = theme;

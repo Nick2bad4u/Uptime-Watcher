@@ -45,9 +45,9 @@ export default defineConfig({
             reporter: ["text", "json", "lcov", "html"],
             reportsDirectory: "./coverage",
             thresholds: {
-                lines: 80, // Minimum 80% line coverage
-                functions: 80, // Minimum 80% function coverage
                 branches: 70, // Minimum 70% branch coverage
+                functions: 80, // Minimum 80% function coverage
+                lines: 80, // Minimum 80% line coverage
                 statements: 80, // Minimum 80% statement coverage
             },
         },
@@ -56,20 +56,20 @@ export default defineConfig({
         exclude: ["**/node_modules/**", "**/dist/**", "**/dist-electron/**", "electron/**", "**/coverage/**"],
         globals: true, // Enable global test functions (describe, it, expect)
         include: ["src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
-        setupFiles: ["./src/test/setup.ts"], // Setup file for testing
-        testTimeout: 10000, // Set Vitest timeout to 10 seconds
+        outputFile: {
+            json: "./coverage/test-results.json",
+        },
         // Modern performance optimizations
         pool: "threads", // Use worker threads for better performance
         poolOptions: {
             threads: {
-                singleThread: false, // Enable multi-threading
                 isolate: true, // Isolate tests for better reliability
+                singleThread: false, // Enable multi-threading
             },
         },
         // Improve test output
         reporters: ["default", "json"],
-        outputFile: {
-            json: "./coverage/test-results.json",
-        },
+        setupFiles: ["./src/test/setup.ts"], // Setup file for testing
+        testTimeout: 10000, // Set Vitest timeout to 10 seconds
     },
 });

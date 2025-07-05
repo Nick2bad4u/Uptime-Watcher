@@ -13,7 +13,8 @@
     },
     "include": [
         "electron/**/*.ts",
-        "electron/**/*.tsx"
+        "electron/**/*.tsx",
+        "vitest.electron.config.ts"
     ],
     "exclude": [
         "electron/**/*.test.ts",

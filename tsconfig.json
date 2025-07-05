@@ -3,16 +3,12 @@
         "target": "ES2024",
         "useDefineForClassFields": true,
         "lib": ["ES2024", "DOM", "DOM.Iterable"],
-        "module": "esnext",
+        "module": "ESNext",
         "moduleResolution": "bundler",
         "resolveJsonModule": true,
         "skipLibCheck": true,
+        "skipDefaultLibCheck": true,
         "isolatedModules": true,
-        "plugins": [
-            {
-                "name": "typescript-eslint-language-service"
-            }
-        ],
         "jsx": "react-jsx",
         "types": ["node", "react", "react-dom", "vitest/globals", "@testing-library/jest-dom", "vite/client", "jest", "electron"],
         "outDir": "dist",
@@ -63,7 +59,8 @@
         "release",
         "out",
         "node_modules/@codecov/**",
-        "node_modules/unplugin/**"
+        "node_modules/unplugin/**",
+        "node_modules/@eslint/**"
     ]
     // Separate tsconfig should be used for renderer (src/) if needed
 }

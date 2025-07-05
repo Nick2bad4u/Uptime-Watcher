@@ -22,9 +22,12 @@ export const useSitesStore = create<SitesStore>((set, get) => {
     // Create state actions
     const stateActions = createSitesStateActions(set, get);
 
+    // Shared getSites function - eliminates duplication and improves testability
+    const getSites = () => get().sites;
+
     // Create sync actions (needed by other modules)
     const syncActions = createSiteSyncActions({
-        getSites: () => get().sites,
+        getSites,
         setSites: stateActions.setSites,
     });
 
@@ -36,7 +39,7 @@ export const useSitesStore = create<SitesStore>((set, get) => {
     // Create operations actions
     const operationsActions = createSiteOperationsActions({
         addSite: stateActions.addSite,
-        getSites: () => get().sites,
+        getSites,
         removeSite: stateActions.removeSite,
         setSites: stateActions.setSites,
         syncSitesFromBackend: syncActions.syncSitesFromBackend,

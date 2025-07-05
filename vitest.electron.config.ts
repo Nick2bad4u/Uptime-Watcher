@@ -11,26 +11,17 @@ export default defineConfig({
     esbuild: {
         target: "es2024", // Match TypeScript target for consistency
     },
+    resolve: {
+        alias: {
+            "@": path.resolve(__dirname, "electron"), // Standardize alias pattern
+            "@electron": path.resolve(__dirname, "electron"), // Keep for backward compatibility
+        },
+    },
     test: {
-        // Node.js environment for Electron main process testing
-        environment: "node",
-
-        // Global test functions
-        globals: true,
-
-        // Test file patterns
-        include: ["electron/**/*.test.ts", "electron/**/*.spec.ts"],
-        exclude: ["**/node_modules/**", "**/dist/**", "**/dist-electron/**", "**/coverage/**"],
-
-        // Setup files for Electron testing
-        setupFiles: ["./electron/test/setup.ts"],
-
+        // Mock handling
+        clearMocks: true,
         // Coverage configuration for backend
         coverage: {
-            provider: "v8",
-            reporter: ["text", "json", "lcov", "html"],
-            reportsDirectory: "./coverage/electron",
-            include: ["electron/**/*.ts"],
             exclude: [
                 "electron/test/**",
                 "electron/**/*.test.ts",
@@ -40,6 +31,10 @@ export default defineConfig({
                 "electron/**/types.ts",
                 "electron/services/*/index.ts",
             ],
+            include: ["electron/**/*.ts"],
+            provider: "v8",
+            reporter: ["text", "json", "lcov", "html"],
+            reportsDirectory: "./coverage/electron",
             thresholds: {
                 global: {
                     branches: 80,
@@ -49,34 +44,30 @@ export default defineConfig({
                 },
             },
         },
-
-        // Test timeout
-        testTimeout: 10000,
-
+        // Node.js environment for Electron main process testing
+        environment: "node",
+        exclude: ["**/node_modules/**", "**/dist/**", "**/dist-electron/**", "**/coverage/**"],
+        // Global test functions
+        globals: true,
+        // Test file patterns
+        include: ["electron/**/*.test.ts", "electron/**/*.spec.ts"],
+        outputFile: {
+            json: "./coverage/electron/test-results.json",
+        },
         // Modern performance optimizations
         pool: "threads", // Use worker threads for better performance
         poolOptions: {
             threads: {
-                singleThread: false, // Enable multi-threading
                 isolate: true, // Isolate tests for better reliability
+                singleThread: false, // Enable multi-threading
             },
         },
-
         // Improve test output
         reporters: ["default", "json"],
-        outputFile: {
-            json: "./coverage/electron/test-results.json",
-        },
-
-        // Mock handling
-        clearMocks: true,
         restoreMocks: true,
-    },
-
-    resolve: {
-        alias: {
-            "@": path.resolve(__dirname, "electron"), // Standardize alias pattern
-            "@electron": path.resolve(__dirname, "electron"), // Keep for backward compatibility
-        },
+        // Setup files for Electron testing
+        setupFiles: ["./electron/test/setup.ts"],
+        // Test timeout
+        testTimeout: 10000,
     },
 });
