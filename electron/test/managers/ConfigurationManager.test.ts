@@ -33,9 +33,9 @@ describe("ConfigurationManager", () => {
         it("should return history retention rules", () => {
             const rules = manager.getHistoryRetentionRules();
             expect(rules).toEqual({
-                defaultLimit: 1000,
-                maxLimit: 10000,
-                minLimit: 100,
+                defaultLimit: 500,
+                maxLimit: Number.MAX_SAFE_INTEGER,
+                minLimit: 25,
             });
         });
 

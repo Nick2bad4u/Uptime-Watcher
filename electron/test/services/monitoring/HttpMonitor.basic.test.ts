@@ -33,15 +33,11 @@ vi.mock("axios", () => ({
 }));
 
 vi.mock("http", () => ({
-    default: {
-        Agent: vi.fn(() => ({})),
-    },
+    Agent: vi.fn(() => ({})),
 }));
 
 vi.mock("https", () => ({
-    default: {
-        Agent: vi.fn(() => ({})),
-    },
+    Agent: vi.fn(() => ({})),
 }));
 
 vi.mock("../../../constants", () => ({

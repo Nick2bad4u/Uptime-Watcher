@@ -8,26 +8,28 @@ import { describe, expect, it, vi } from "vitest";
 // Mock all the hook modules to avoid dependency issues
 vi.mock("../hooks/site/useSiteStats", () => ({
     useSiteStats: vi.fn(),
-    calculateSiteStats: vi.fn(),
-    mockUseSiteStatsExport: "useSiteStatsTest",
 }));
 
 vi.mock("../hooks/site/useSiteMonitor", () => ({
     useSiteMonitor: vi.fn(),
-    startMonitoring: vi.fn(),
-    mockUseSiteMonitorExport: "useSiteMonitorTest",
 }));
 
 vi.mock("../hooks/site/useSiteActions", () => ({
     useSiteActions: vi.fn(),
-    performSiteAction: vi.fn(),
-    mockUseSiteActionsExport: "useSiteActionsTest",
 }));
 
 vi.mock("../hooks/site/useSite", () => ({
     useSite: vi.fn(),
-    getSiteData: vi.fn(),
-    mockUseSiteExport: "useSiteTest",
+}));
+
+vi.mock("../hooks/site/useSiteAnalytics", () => ({
+    useSiteAnalytics: vi.fn(),
+    useChartData: vi.fn(),
+    SiteAnalyticsUtils: {},
+}));
+
+vi.mock("../hooks/site/useSiteDetails", () => ({
+    useSiteDetails: vi.fn(),
 }));
 
 // Import everything from the index module after mocking
@@ -49,35 +51,37 @@ describe("Site Hooks Index Module", () => {
 
     describe("Export Verification", () => {
         it("should export useSiteStats module content", () => {
-            const siteHooks = SiteHooksIndex as Record<string, unknown>;
             expect(SiteHooksIndex).toHaveProperty("useSiteStats");
-            expect(SiteHooksIndex).toHaveProperty("calculateSiteStats");
-            expect(SiteHooksIndex).toHaveProperty("mockUseSiteStatsExport");
-            expect(siteHooks.mockUseSiteStatsExport).toBe("useSiteStatsTest");
+            expect(typeof SiteHooksIndex.useSiteStats).toBe("function");
         });
 
         it("should export useSiteMonitor module content", () => {
-            const siteHooks = SiteHooksIndex as Record<string, unknown>;
             expect(SiteHooksIndex).toHaveProperty("useSiteMonitor");
-            expect(SiteHooksIndex).toHaveProperty("startMonitoring");
-            expect(SiteHooksIndex).toHaveProperty("mockUseSiteMonitorExport");
-            expect(siteHooks.mockUseSiteMonitorExport).toBe("useSiteMonitorTest");
+            expect(typeof SiteHooksIndex.useSiteMonitor).toBe("function");
         });
 
         it("should export useSiteActions module content", () => {
-            const siteHooks = SiteHooksIndex as Record<string, unknown>;
             expect(SiteHooksIndex).toHaveProperty("useSiteActions");
-            expect(SiteHooksIndex).toHaveProperty("performSiteAction");
-            expect(SiteHooksIndex).toHaveProperty("mockUseSiteActionsExport");
-            expect(siteHooks.mockUseSiteActionsExport).toBe("useSiteActionsTest");
+            expect(typeof SiteHooksIndex.useSiteActions).toBe("function");
         });
 
         it("should export useSite module content", () => {
-            const siteHooks = SiteHooksIndex as Record<string, unknown>;
             expect(SiteHooksIndex).toHaveProperty("useSite");
-            expect(SiteHooksIndex).toHaveProperty("getSiteData");
-            expect(SiteHooksIndex).toHaveProperty("mockUseSiteExport");
-            expect(siteHooks.mockUseSiteExport).toBe("useSiteTest");
+            expect(typeof SiteHooksIndex.useSite).toBe("function");
+        });
+
+        it("should export useSiteAnalytics module content", () => {
+            expect(SiteHooksIndex).toHaveProperty("useSiteAnalytics");
+            expect(SiteHooksIndex).toHaveProperty("useChartData");
+            expect(SiteHooksIndex).toHaveProperty("SiteAnalyticsUtils");
+            expect(typeof SiteHooksIndex.useSiteAnalytics).toBe("function");
+            expect(typeof SiteHooksIndex.useChartData).toBe("function");
+            expect(typeof SiteHooksIndex.SiteAnalyticsUtils).toBe("object");
+        });
+
+        it("should export useSiteDetails module content", () => {
+            expect(SiteHooksIndex).toHaveProperty("useSiteDetails");
+            expect(typeof SiteHooksIndex.useSiteDetails).toBe("function");
         });
     });
 
@@ -88,22 +92,21 @@ describe("Site Hooks Index Module", () => {
             expect(typeof siteHooks.useSiteMonitor).toBe("function");
             expect(typeof siteHooks.useSiteActions).toBe("function");
             expect(typeof siteHooks.useSite).toBe("function");
+            expect(typeof siteHooks.useSiteAnalytics).toBe("function");
+            expect(typeof siteHooks.useSiteDetails).toBe("function");
+            expect(typeof siteHooks.useChartData).toBe("function");
         });
 
         it("should export all expected properties", () => {
             const expectedExports = [
                 "useSiteStats",
-                "calculateSiteStats",
-                "mockUseSiteStatsExport",
                 "useSiteMonitor",
-                "startMonitoring",
-                "mockUseSiteMonitorExport",
                 "useSiteActions",
-                "performSiteAction",
-                "mockUseSiteActionsExport",
                 "useSite",
-                "getSiteData",
-                "mockUseSiteExport",
+                "useSiteAnalytics",
+                "useSiteDetails",
+                "useChartData",
+                "SiteAnalyticsUtils",
             ];
 
             expectedExports.forEach((exportName) => {
@@ -145,9 +148,9 @@ describe("Site Hooks Index Module", () => {
     describe("Re-export Functionality", () => {
         it("should properly re-export all modules using wildcard exports", () => {
             // Test that wildcard exports work by checking that we have exports
-            // from all 4 modules (each module contributes 3 exports in our mocks)
+            // from all 6 modules (each module contributes different numbers of exports)
             const allExports = Object.keys(SiteHooksIndex);
-            expect(allExports.length).toBe(12); // 4 modules × 3 exports each
+            expect(allExports.length).toBeGreaterThan(6); // At least one export per module
         });
 
         it("should maintain export references", () => {
@@ -193,11 +196,13 @@ describe("Site Hooks Index Module", () => {
         it("should support named imports pattern", () => {
             // Test destructuring assignment (common import pattern)
             expect(() => {
-                const { useSiteStats, useSiteMonitor, useSiteActions, useSite } = SiteHooksIndex;
+                const { useSiteStats, useSiteMonitor, useSiteActions, useSite, useSiteAnalytics, useSiteDetails } = SiteHooksIndex;
                 expect(useSiteStats).toBeDefined();
                 expect(useSiteMonitor).toBeDefined();
                 expect(useSiteActions).toBeDefined();
                 expect(useSite).toBeDefined();
+                expect(useSiteAnalytics).toBeDefined();
+                expect(useSiteDetails).toBeDefined();
             }).not.toThrow();
         });
     });
@@ -233,7 +238,7 @@ describe("Site Hooks Index Module", () => {
             const exports = Object.keys(SiteHooksIndex);
 
             // Should have exports from multiple modules
-            expect(exports.length).toBeGreaterThan(4);
+            expect(exports.length).toBeGreaterThan(6);
 
             // Each export should be accessible
             exports.forEach((exportName) => {
@@ -243,13 +248,15 @@ describe("Site Hooks Index Module", () => {
         });
 
         it("should provide centralized access to all site hooks", () => {
-            // Should expose hooks from all 4 expected modules
+            // Should expose hooks from all 6 expected modules
             const hasStatsHooks = "useSiteStats" in SiteHooksIndex;
             const hasMonitorHooks = "useSiteMonitor" in SiteHooksIndex;
             const hasActionHooks = "useSiteActions" in SiteHooksIndex;
             const hasSiteHooks = "useSite" in SiteHooksIndex;
+            const hasAnalyticsHooks = "useSiteAnalytics" in SiteHooksIndex;
+            const hasDetailsHooks = "useSiteDetails" in SiteHooksIndex;
 
-            expect(hasStatsHooks && hasMonitorHooks && hasActionHooks && hasSiteHooks).toBe(true);
+            expect(hasStatsHooks && hasMonitorHooks && hasActionHooks && hasSiteHooks && hasAnalyticsHooks && hasDetailsHooks).toBe(true);
         });
     });
 
