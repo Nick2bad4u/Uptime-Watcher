@@ -48,7 +48,7 @@ export async function startAllMonitoring(config: MonitoringLifecycleConfig, isMo
 
     config.logger.info(`Starting monitoring with ${config.sites.size} sites (per-site intervals)`);
 
-    for (const [, site] of config.sites) {
+    for (const [, site] of Array.from(config.sites)) {
         config.monitorScheduler.startSite(site);
     }
 

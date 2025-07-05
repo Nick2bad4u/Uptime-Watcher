@@ -65,7 +65,7 @@ export class SiteValidator {
         }
 
         // Validate each monitor
-        for (const [index, monitor] of site.monitors.entries()) {
+        for (const [index, monitor] of Array.from(site.monitors.entries())) {
             const monitorValidation = this.monitorValidator.validateMonitorConfiguration(monitor);
             if (!monitorValidation.isValid) {
                 errors.push(...monitorValidation.errors.map((error: string) => `Monitor ${index + 1}: ${error}`));

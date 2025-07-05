@@ -157,7 +157,7 @@ async function startMonitoringForSites(
     sites: Map<string, Site>,
     startMonitoring: (identifier: string, monitorId: string) => Promise<boolean>
 ): Promise<void> {
-    for (const [, site] of sites) {
+    for (const [, site] of Array.from(sites)) {
         if (site.monitoring) {
             // Site-level monitoring enabled
             await startSiteMonitoring(site, startMonitoring);

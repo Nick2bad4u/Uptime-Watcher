@@ -72,12 +72,13 @@ export class ConfigurationManager {
 
     /**
      * Get history retention configuration according to business rules.
+     * These limits align with the HISTORY_LIMIT_OPTIONS available in the UI.
      */
     public getHistoryRetentionRules(): HistoryRetentionConfig {
         return {
-            defaultLimit: 1000,
-            maxLimit: 10000,
-            minLimit: 100,
+            defaultLimit: 500, // Matches DEFAULT_HISTORY_LIMIT constant
+            maxLimit: Number.MAX_SAFE_INTEGER, // Matches "Unlimited" option in HISTORY_LIMIT_OPTIONS
+            minLimit: 25, // Matches lowest option in HISTORY_LIMIT_OPTIONS
         };
     }
 

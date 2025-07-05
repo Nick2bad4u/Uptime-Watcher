@@ -104,7 +104,7 @@ export class StatusUpdateManager {
         }
 
         window.electronAPI.events.onStatusUpdate(this.handler);
-        logStoreAction("StatusUpdateManager", "subscribed", {});
+        logStoreAction("StatusUpdateManager", "subscribed");
     }
 
     /**
@@ -115,7 +115,7 @@ export class StatusUpdateManager {
             window.electronAPI.events.removeAllListeners("status-update");
         }
         this.handler = undefined;
-        logStoreAction("StatusUpdateManager", "unsubscribed", {});
+        logStoreAction("StatusUpdateManager", "unsubscribed");
     }
 
     /**
