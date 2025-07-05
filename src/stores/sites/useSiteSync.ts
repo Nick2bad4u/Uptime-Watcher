@@ -15,9 +15,17 @@ export interface SiteSyncActions {
     /** Full sync from backend */
     fullSyncFromBackend: () => Promise<void>;
     /** Subscribe to status updates */
-    subscribeToStatusUpdates: (callback: (update: StatusUpdate) => void) => void;
+    subscribeToStatusUpdates: (callback: (update: StatusUpdate) => void) => {
+        success: boolean;
+        subscribed: boolean;
+        message: string;
+    };
     /** Unsubscribe from status updates */
-    unsubscribeFromStatusUpdates: () => void;
+    unsubscribeFromStatusUpdates: () => {
+        success: boolean;
+        unsubscribed: boolean;
+        message: string;
+    };
 }
 
 export interface SiteSyncDependencies {
@@ -31,12 +39,13 @@ const statusUpdateManager = new StatusUpdateManager();
 export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActions => {
     const actions: SiteSyncActions = {
         fullSyncFromBackend: async () => {
-            logStoreAction("SitesStore", "fullSyncFromBackend");
             await actions.syncSitesFromBackend();
+            logStoreAction("SitesStore", "fullSyncFromBackend", {
+                message: "Full backend synchronization completed",
+                success: true,
+            });
         },
         subscribeToStatusUpdates: (callback: (update: StatusUpdate) => void) => {
-            logStoreAction("SitesStore", "subscribeToStatusUpdates");
-
             const handler = createStatusUpdateHandler({
                 fullSyncFromBackend: actions.fullSyncFromBackend,
                 getSites: deps.getSites,
@@ -47,10 +56,13 @@ export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActio
             statusUpdateManager.subscribe(handler).catch((error) => {
                 console.error("Failed to subscribe to status updates:", error);
             });
+
+            const result = { message: "Successfully subscribed to status updates", subscribed: true, success: true };
+            logStoreAction("SitesStore", "subscribeToStatusUpdates", result);
+            
+            return result;
         },
         syncSitesFromBackend: async () => {
-            logStoreAction("SitesStore", "syncSitesFromBackend");
-
             await withErrorHandling(
                 async () => {
                     const backendSites = await SiteService.getSites();
@@ -63,10 +75,23 @@ export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActio
                     setLoading: () => {},
                 }
             );
+            
+            logStoreAction("SitesStore", "syncSitesFromBackend", {
+                message: "Sites synchronized from backend",
+                sitesCount: deps.getSites().length,
+                success: true,
+            });
         },
         unsubscribeFromStatusUpdates: () => {
-            logStoreAction("SitesStore", "unsubscribeFromStatusUpdates");
             statusUpdateManager.unsubscribe();
+            const result = {
+                message: "Successfully unsubscribed from status updates",
+                success: true,
+                unsubscribed: true,
+            };
+            logStoreAction("SitesStore", "unsubscribeFromStatusUpdates", result);
+            
+            return result;
         },
     };
 

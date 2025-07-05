@@ -16,8 +16,6 @@ export const useStatsStore = create<StatsStore>()(
         (set) => ({
             // Actions
             computeStats: () => {
-                logStoreAction("StatsStore", "computeStats");
-
                 const sitesStore = useSitesStore.getState();
                 const sites = sitesStore.sites;
 
@@ -36,10 +34,19 @@ export const useStatsStore = create<StatsStore>()(
                 }
 
                 set(stats);
+                logStoreAction("StatsStore", "computeStats", {
+                    message: "Statistics computed from site data",
+                    sitesCount: sites.length,
+                    totalDowntime: stats.totalDowntime,
+                    totalUptime: stats.totalUptime,
+                });
             },
             resetStats: () => {
-                logStoreAction("StatsStore", "resetStats");
                 set({ totalDowntime: 0, totalUptime: 0 });
+                logStoreAction("StatsStore", "resetStats", {
+                    message: "Statistics reset",
+                    success: true,
+                });
             },
             setTotalDowntime: (downtime: number) => {
                 logStoreAction("StatsStore", "setTotalDowntime", { downtime });

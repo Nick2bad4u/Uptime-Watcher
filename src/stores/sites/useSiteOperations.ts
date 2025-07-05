@@ -12,7 +12,7 @@ import { normalizeMonitor, updateMonitorInSite, handleSQLiteBackupDownload } fro
 
 export interface SiteOperationsActions {
     /** Initialize sites data from backend */
-    initializeSites: () => Promise<void>;
+    initializeSites: () => Promise<{ success: boolean; sitesLoaded: number; message: string }>;
     /** Create a new site */
     createSite: (siteData: Omit<Site, "id" | "monitors"> & { monitors?: Monitor[] }) => Promise<void>;
     /** Delete a site */
@@ -131,8 +131,6 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
         );
     },
     downloadSQLiteBackup: async () => {
-        logStoreAction("SitesStore", "downloadSQLiteBackup");
-
         await withErrorHandling(
             async () => {
                 await handleSQLiteBackupDownload(async () => {
@@ -149,14 +147,22 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                 setLoading: () => {},
             }
         );
+        
+        logStoreAction("SitesStore", "downloadSQLiteBackup", {
+            message: "SQLite backup download completed",
+            success: true,
+        });
     },
     initializeSites: async () => {
-        logStoreAction("SitesStore", "initializeSites");
-
-        await withErrorHandling(
+        const result = await withErrorHandling(
             async () => {
                 const sites = await SiteService.getSites();
                 deps.setSites(sites);
+                return {
+                    message: `Successfully loaded ${sites.length} sites`,
+                    sitesLoaded: sites.length,
+                    success: true,
+                };
             },
             {
                 clearError: () => {},
@@ -164,6 +170,14 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                 setLoading: () => {},
             }
         );
+        
+        logStoreAction("SitesStore", "initializeSites", {
+            message: result.message,
+            sitesLoaded: result.sitesLoaded,
+            success: result.success,
+        });
+        
+        return result;
     },
     modifySite: async (identifier: string, updates: Partial<Site>) => {
         logStoreAction("SitesStore", "modifySite", { identifier, updates });

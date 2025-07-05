@@ -200,7 +200,9 @@ async function loadSitesData(repositories: SitesLoaderConfig["repositories"], si
  * @param config - Configuration object with repositories and callbacks
  * @returns Promise that resolves when sites are loaded
  */
-export async function loadSitesFromDatabase(config: SitesLoaderConfig): Promise<void> {
+export async function loadSitesFromDatabase(
+    config: SitesLoaderConfig
+): Promise<{ success: boolean; sitesLoaded: number; message: string }> {
     const { eventEmitter, repositories, setHistoryLimit, sites, startMonitoring } = config;
 
     try {
@@ -212,10 +214,21 @@ export async function loadSitesFromDatabase(config: SitesLoaderConfig): Promise<
 
         // Start monitoring for configured sites
         await startMonitoringForSites(sites, startMonitoring);
+
+        const sitesLoaded = sites.size;
+        return {
+            message: `Successfully loaded ${sitesLoaded} sites and started monitoring`,
+            sitesLoaded,
+            success: true,
+        };
     } catch (error) {
         const errorMessage = `Failed to load sites from database: ${error instanceof Error ? error.message : String(error)}`;
         logger.error(errorMessage, error);
         eventEmitter.emit("error", new Error(errorMessage));
-        throw error;
+        return {
+            message: errorMessage,
+            sitesLoaded: 0,
+            success: false,
+        };
     }
 }

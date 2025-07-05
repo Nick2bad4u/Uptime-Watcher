@@ -13,12 +13,18 @@ import { logStoreAction } from "../utils";
 export const useUpdatesStore = create<UpdatesStore>((set) => ({
     // Actions
     applyUpdate: () => {
-        logStoreAction("UpdatesStore", "applyUpdate");
         window.electronAPI?.system?.quitAndInstall?.();
+        logStoreAction("UpdatesStore", "applyUpdate", {
+            message: "Applying update and restarting application",
+            success: true,
+        });
     },
     clearUpdateError: () => {
-        logStoreAction("UpdatesStore", "clearUpdateError");
         set({ updateError: undefined });
+        logStoreAction("UpdatesStore", "clearUpdateError", {
+            message: "Update error cleared",
+            success: true,
+        });
     },
     setUpdateError: (error: string | undefined) => {
         logStoreAction("UpdatesStore", "setUpdateError", { error });

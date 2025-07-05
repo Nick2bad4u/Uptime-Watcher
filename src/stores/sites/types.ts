@@ -15,7 +15,7 @@ export interface SitesState {
 
 export interface SitesActions {
     /** Initialize sites data from backend */
-    initializeSites: () => Promise<void>;
+    initializeSites: () => Promise<{ success: boolean; sitesLoaded: number; message: string }>;
     /** Create a new site */
     createSite: (siteData: Omit<Site, "id" | "monitors"> & { monitors?: Monitor[] }) => Promise<void>;
     /** Delete a site */

@@ -18,3 +18,16 @@ export * from "./historyLimitManager";
 // Site management utilities - consolidated
 export * from "./siteRepository";
 export * from "./siteWriter";
+
+// New service-based architecture
+export * from "./interfaces";
+export * from "./repositoryAdapters";
+export * from "./SiteRepositoryService";
+export * from "./SiteWriterService";
+export {
+    createSiteRepositoryService,
+    createSiteWriterService,
+    createSiteLoadingOrchestrator,
+    createSiteWritingOrchestrator,
+    createSiteCache,
+} from "./serviceFactory";

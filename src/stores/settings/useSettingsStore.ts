@@ -27,13 +27,16 @@ export const useSettingsStore = create<SettingsStore>()(
         (set, get) => ({
             // Actions
             initializeSettings: async () => {
-                logStoreAction("SettingsStore", "initializeSettings");
-
                 const errorStore = useErrorStore.getState();
-                await withErrorHandling(
+                const result = await withErrorHandling(
                     async () => {
                         const historyLimit = await window.electronAPI.settings.getHistoryLimit();
                         get().updateSettings({ historyLimit });
+                        return {
+                            message: "Successfully loaded settings",
+                            settingsLoaded: true,
+                            success: true,
+                        };
                     },
                     {
                         clearError: () => errorStore.clearStoreError("settings"),
@@ -41,10 +44,21 @@ export const useSettingsStore = create<SettingsStore>()(
                         setLoading: (loading) => errorStore.setOperationLoading("initializeSettings", loading),
                     }
                 );
+                
+                logStoreAction("SettingsStore", "initializeSettings", {
+                    message: result.message,
+                    settingsLoaded: result.settingsLoaded,
+                    success: result.success,
+                });
+                
+                return result;
             },
             resetSettings: () => {
-                logStoreAction("SettingsStore", "resetSettings");
                 set({ settings: defaultSettings });
+                logStoreAction("SettingsStore", "resetSettings", {
+                    message: "Settings reset to defaults",
+                    success: true,
+                });
             },
             // State
             settings: defaultSettings,

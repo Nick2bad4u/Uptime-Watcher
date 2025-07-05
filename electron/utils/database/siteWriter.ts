@@ -218,7 +218,7 @@ export async function upsertSiteMonitors(
     monitors: Site["monitors"]
 ): Promise<void> {
     for (const monitor of monitors) {
-        if (monitor.id && !isNaN(Number(monitor.id))) {
+        if (monitor.id && monitor.id.trim() !== "") {
             await deps.monitorRepository.update(monitor.id, monitor);
         } else {
             const newId = await deps.monitorRepository.create(identifier, monitor);

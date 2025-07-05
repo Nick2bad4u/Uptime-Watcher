@@ -25,5 +25,5 @@ export interface SettingsStore {
     updateHistoryLimitValue: (limit: number) => Promise<void>;
 
     /** Initialize settings from backend */
-    initializeSettings: () => Promise<void>;
+    initializeSettings: () => Promise<{ success: boolean; settingsLoaded: boolean; message: string }>;
 }
