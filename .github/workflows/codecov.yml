@@ -13,15 +13,20 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
+            - name: Harden the runner (Audit all outbound calls)
+              uses: step-security/harden-runner@6c439dc8bdf85cadbbce9ed30d1c7b959517bc49 # v2.12.2
+              with:
+                egress-policy: audit
+
             - name: Checkout
               id: checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
               with:
                   fetch-depth: 5
 
             - name: Set up Node
               id: setup-node
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
               with:
                   node-version: "22"
                   cache: "npm"
@@ -75,7 +80,7 @@ jobs:
             # Upload frontend coverage to Codecov
             - name: Upload frontend coverage to Codecov
               id: upload-frontend-coverage
-              uses: codecov/codecov-action@v5
+              uses: codecov/codecov-action@18283e04ce6e62d37312384ff67231eb8fd56d24 # v5.4.3
               with:
                   token: ${{ secrets.CODECOV_TOKEN }}
                   slug: Nick2bad4u/Uptime-Watcher
@@ -90,7 +95,7 @@ jobs:
             # Upload electron coverage to Codecov
             - name: Upload electron coverage to Codecov
               id: upload-electron-coverage
-              uses: codecov/codecov-action@v5
+              uses: codecov/codecov-action@18283e04ce6e62d37312384ff67231eb8fd56d24 # v5.4.3
               with:
                   token: ${{ secrets.CODECOV_TOKEN }}
                   slug: Nick2bad4u/Uptime-Watcher
@@ -105,7 +110,7 @@ jobs:
             # Upload test results
             - name: Upload frontend test results to Codecov
               id: upload-frontend-test-results
-              uses: codecov/test-results-action@v1
+              uses: codecov/test-results-action@47f89e9acb64b76debcd5ea40642d25a4adced9f # v1.1.1
               with:
                   files: ./coverage/frontend-test-report.junit.xml
                   token: ${{ secrets.CODECOV_TOKEN }}
@@ -119,7 +124,7 @@ jobs:
 
             - name: Upload electron test results to Codecov
               id: upload-electron-test-results
-              uses: codecov/test-results-action@v1
+              uses: codecov/test-results-action@47f89e9acb64b76debcd5ea40642d25a4adced9f # v1.1.1
               with:
                   files: ./coverage/electron/electron-test-report.junit.xml
                   token: ${{ secrets.CODECOV_TOKEN }}
