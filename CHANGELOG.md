@@ -7,14 +7,84 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[455c922](https://github.com/Nick2bad4u/Uptime-Watcher/commit/455c922ac9a910617dac6dc0bbbe9364842d2a13)...
-[455c922](https://github.com/Nick2bad4u/Uptime-Watcher/commit/455c922ac9a910617dac6dc0bbbe9364842d2a13)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/455c922ac9a910617dac6dc0bbbe9364842d2a13...455c922ac9a910617dac6dc0bbbe9364842d2a13))
+[[e3f2ca7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e3f2ca7664fb2320f2f90e374b6e85dd7cd32ac1)...
+[e3f2ca7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e3f2ca7664fb2320f2f90e374b6e85dd7cd32ac1)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/e3f2ca7664fb2320f2f90e374b6e85dd7cd32ac1...e3f2ca7664fb2320f2f90e374b6e85dd7cd32ac1))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 5.2.0 [`(e3f2ca7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e3f2ca7664fb2320f2f90e374b6e85dd7cd32ac1)
+
+
+
+
+
+
+## [5.2.0] - 2025-07-06
+
+
+[[af98089](https://github.com/Nick2bad4u/Uptime-Watcher/commit/af98089a6d8ef3104fbb43d8d29739284149b124)...
+[c38d792](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c38d792bdd510f1b795efd60cf2a1226cdd81696)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/af98089a6d8ef3104fbb43d8d29739284149b124...c38d792bdd510f1b795efd60cf2a1226cdd81696))
+
+
+### ✨ Features
+
+- ✨ [feat] Add transactional site DB ops and race-free monitor inserts
+
+- Adds database transaction support to site creation, update, and deletion operations to ensure atomicity and consistency, reducing the risk of partial writes or data corruption.
+- Refactors monitor insert logic to use SQL RETURNING clauses, eliminating race conditions and ensuring monitor IDs are reliably retrieved directly on insert.
+- Updates interfaces and dependencies to propagate the database service where transactional context is required.
+- Improves SQL safety in history pruning by switching to parameterized queries.
+- Removes a redundant test file to reflect updated transactional design.
+- Introduces a PowerShell script for listing project files by directory, aiding development and documentation.
+
+These changes improve reliability, maintainability, and operational safety for data management across the app. [`(af98089)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/af98089a6d8ef3104fbb43d8d29739284149b124)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 5.1.0 [`(455c922)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/455c922ac9a910617dac6dc0bbbe9364842d2a13)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(c38d792)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c38d792bdd510f1b795efd60cf2a1226cdd81696)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Decouples cross-store dependencies and optimizes bulk DB inserts
+
+- Refactors state management to decouple cross-store dependencies by introducing a dedicated hook for selected site logic and updating selectors to avoid direct store access.
+- Refactors statistics and UI state to require explicit data flow, preventing tight coupling between stores.
+- Optimizes bulk insert operations for settings, sites, and monitor history by using prepared statements and database transactions, improving performance and reliability.
+- Adds user-facing feedback for missing site data and improves null/undefined guard handling in UI components.
+- Cleans up minor style and import issues for consistency and maintainability. [`(d92afd8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d92afd88dbce27fbefa09612f802c8122ba11083)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Add comprehensive tests for SiteDetails and hooks
+
+- Adds thorough unit and integration tests for SiteDetails, including basic, simple, and comprehensive scenarios to ensure robust coverage and prevent regressions.
+- Enhances tests for custom hooks, especially theme-related logic, covering both dark and light modes and various state transitions.
+- Refactors existing tests to improve mock accuracy and selector handling, addressing edge cases and null/undefined handling.
+- Updates test configurations to increase timeouts and add custom reporters for improved reliability and detection of hanging processes.
+- Improves test output clarity by increasing verbosity and ensuring all utility exports are covered.
+
+Motivated by the need to guarantee UI reliability, catch edge case failures, and support future refactoring with a strong safety net. [`(a31cb8d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a31cb8d3925c6418b0668a7810ac36311341baab)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v5.1.0 [skip ci] [`(bc8059e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bc8059ebc9ded18b3a3bfbbae318dfdf2c907eb1)
 
 
 
