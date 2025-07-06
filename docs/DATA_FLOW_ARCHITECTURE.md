@@ -14,19 +14,19 @@ graph TB
         Hooks[Custom Hooks]
         Services[Frontend Services]
     end
-    
+
     subgraph "IPC Bridge"
         Preload[Preload Script]
         Bridge[Context Bridge]
     end
-    
+
     subgraph "Backend (Main Process)"
         IPC[IPC Service]
         Orchestrator[Uptime Orchestrator]
         Managers[Domain Managers]
         Database[SQLite Database]
     end
-    
+
     UI --> Stores
     Stores --> Hooks
     Hooks --> Services
@@ -51,7 +51,7 @@ sequenceDiagram
     participant Orc as UptimeOrchestrator
     participant SM as SiteManager
     participant DB as Database
-    
+
     UI->>Store: addSite(siteData)
     Store->>API: window.electronAPI.sites.addSite()
     API->>IPC: ipcRenderer.invoke("add-site")
@@ -77,7 +77,7 @@ sequenceDiagram
     participant Handler as Status Handler
     participant Store as Sites Store
     participant UI as React Components
-    
+
     Monitor->>Orc: status change detected
     Orc->>Orc: emit("status-update", data)
     Orc->>Window: sendToRenderer("status-update")
@@ -98,7 +98,7 @@ sequenceDiagram
     participant Orc as UptimeOrchestrator
     participant Config as ConfigurationManager
     participant DB as Database
-    
+
     UI->>SettingsStore: updateHistoryLimitValue(limit)
     SettingsStore->>API: window.electronAPI.settings.updateHistoryLimit()
     API->>IPC: ipcRenderer.invoke("update-history-limit")
@@ -146,29 +146,29 @@ graph TB
     subgraph "Application Layer"
         App[ApplicationService]
     end
-    
+
     subgraph "Orchestration Layer"
         Orc[UptimeOrchestrator]
     end
-    
+
     subgraph "Manager Layer"
         SM[SiteManager]
         MM[MonitorManager]
         CM[ConfigurationManager]
         DM[DatabaseManager]
     end
-    
+
     subgraph "Service Layer"
         WS[WindowService]
         IS[IpcService]
         NS[NotificationService]
         AS[AutoUpdaterService]
     end
-    
+
     subgraph "Database Layer"
         DB[(SQLite Database)]
     end
-    
+
     App --> Orc
     Orc --> SM
     Orc --> MM
@@ -200,7 +200,7 @@ window.electronAPI = {
         updateSite: (id: string, updates: Partial<Site>) => Promise<Site>
         checkSiteNow: (siteId: string, monitorId: string) => Promise<StatusUpdate>
     },
-    
+
     monitoring: {
         // Monitoring control
         startMonitoring: () => Promise<boolean>
@@ -208,27 +208,27 @@ window.electronAPI = {
         startMonitoringForSite: (siteId: string, type?: string) => Promise<boolean>
         stopMonitoringForSite: (siteId: string, type?: string) => Promise<boolean>
     },
-    
+
     data: {
         // Data operations
         exportData: () => Promise<string>
         importData: (data: string) => Promise<boolean>
         downloadSQLiteBackup: () => Promise<{buffer: ArrayBuffer, fileName: string}>
     },
-    
+
     settings: {
         // Settings management
         getHistoryLimit: () => Promise<number>
         updateHistoryLimit: (limit: number) => Promise<void>
     },
-    
+
     events: {
         // Event handling
         onStatusUpdate: (callback: (data: StatusUpdate) => void) => void
         onUpdateStatus: (callback: (data: UpdateStatus) => void) => void
         removeAllListeners: (channel: string) => void
     },
-    
+
     system: {
         // System operations
         quitAndInstall: () => void
@@ -243,18 +243,18 @@ graph LR
     subgraph "Renderer Process"
         Comp[React Component]
     end
-    
+
     subgraph "IPC Bridge (Secure)"
         CB[Context Bridge]
         PL[Preload Script]
     end
-    
+
     subgraph "Main Process"
         IPC[IPC Service]
         Val[Input Validation]
         Bus[Business Logic]
     end
-    
+
     Comp --> CB
     CB --> PL
     PL --> IPC
@@ -274,7 +274,7 @@ erDiagram
         timestamp created_at
         timestamp updated_at
     }
-    
+
     monitors {
         string id PK
         string site_identifier FK
@@ -284,7 +284,7 @@ erDiagram
         number interval
         boolean enabled
     }
-    
+
     status_history {
         string id PK
         string monitor_id FK
@@ -293,13 +293,13 @@ erDiagram
         timestamp checked_at
         string error_message
     }
-    
+
     settings {
         string key PK
         string value
         timestamp updated_at
     }
-    
+
     sites ||--o{ monitors : "contains"
     monitors ||--o{ status_history : "generates"
 ```
@@ -322,10 +322,10 @@ sequenceDiagram
     participant Util as withErrorHandling
     participant EStore as Error Store
     participant Logger as Logger Service
-    
+
     Comp->>Store: performAction()
     Store->>Util: withErrorHandling(operation)
-    
+
     alt Success Path
         Util->>Store: operation()
         Store-->>Comp: Success result
@@ -357,13 +357,13 @@ graph TB
         Emit[Emit Event]
         Wait[Wait Interval]
     end
-    
+
     subgraph "Data Flow"
         DB[(Database)]
         Frontend[Frontend Update]
         Notifications[User Notifications]
     end
-    
+
     Start --> Check
     Check --> Store
     Store --> DB
@@ -381,14 +381,15 @@ The application uses intelligent incremental updates to minimize re-renders:
 ```typescript
 // Optimized Status Update Handler
 const statusUpdateHandler = (update: StatusUpdate) => {
-    // Only update the specific site that changed
-    setSites(currentSites => 
-        currentSites.map(site => 
-            site.identifier === update.site.identifier 
-                ? { ...update.site }  // Fresh data from backend
-                : site                // Keep unchanged
-        )
-    );
+ // Only update the specific site that changed
+ setSites((currentSites) =>
+  currentSites.map(
+   (site) =>
+    site.identifier === update.site.identifier
+     ? { ...update.site } // Fresh data from backend
+     : site // Keep unchanged
+  )
+ );
 };
 ```
 
@@ -426,7 +427,7 @@ sequenceDiagram
     participant Orc as UptimeOrchestrator
     participant DB as Database
     participant FS as File System
-    
+
     Note over UI,FS: Export Process
     UI->>API: exportData()
     API->>Orc: exportData()
@@ -434,7 +435,7 @@ sequenceDiagram
     DB-->>Orc: JSON data
     Orc-->>API: JSON string
     API->>FS: trigger download
-    
+
     Note over UI,FS: Import Process
     UI->>API: importData(jsonString)
     API->>Orc: importData(data)
@@ -455,7 +456,7 @@ sequenceDiagram
     participant Orc as UptimeOrchestrator
     participant DB as DatabaseManager
     participant Buffer as File Buffer
-    
+
     UI->>API: downloadSQLiteBackup()
     API->>Orc: downloadBackup()
     Orc->>DB: createBackup()

@@ -16,6 +16,7 @@ Always keep in mind the following when making changes:
 # Uptime Watcher - AI Context Instructions
 
 ## Project Overview
+
 Uptime Watcher is a production-ready Electron + React desktop application for website monitoring with comprehensive test coverage and enterprise-level architecture.
 
 Always update this document at ./.github/instructions/copilot-instructions.md if you make changes to the architecture or key components.
@@ -23,12 +24,14 @@ Always update this document at ./.github/instructions/copilot-instructions.md if
 ## Core Architecture
 
 ### Technology Stack
+
 - **Frontend**: React + TypeScript + Zustand + TailwindCSS + Vite
 - **Backend**: Electron main process + Node.js + SQLite
 - **Communication**: IPC with contextBridge security
 - **Testing**: Vitest with extensive frontend and backend test suites
 
 ### Directory Structure
+
 ```
 src/                    # Frontend (React)
 ├── components/         # React components (PascalCase)
@@ -48,41 +51,46 @@ electron/              # Backend (Electron main process)
 ### Key Design Patterns
 
 #### 1. Store Architecture (Zustand)
+
 ```typescript
 // Domain-separated stores with centralized error handling
-useSitesStore     // Site data + monitoring state
-useSettingsStore  // App preferences + backend sync
-useErrorStore     // Global error handling
-useUiStore        // Modal states + view preferences
-useStatsStore     // Computed metrics
-useUpdatesStore   // Application updates
+useSitesStore; // Site data + monitoring state
+useSettingsStore; // App preferences + backend sync
+useErrorStore; // Global error handling
+useUiStore; // Modal states + view preferences
+useStatsStore; // Computed metrics
+useUpdatesStore; // Application updates
 ```
 
 #### 2. IPC Communication Pattern
+
 ```typescript
 // Secure, domain-organized API
 window.electronAPI = {
-  sites: { getSites, addSite, removeSite, updateSite, checkSiteNow },
-  monitoring: { startMonitoring, stopMonitoring, startMonitoringForSite },
-  data: { exportData, importData, downloadSQLiteBackup },
-  settings: { getHistoryLimit, updateHistoryLimit },
-  events: { onStatusUpdate, onUpdateStatus, removeAllListeners }
-}
+ sites: { getSites, addSite, removeSite, updateSite, checkSiteNow },
+ monitoring: { startMonitoring, stopMonitoring, startMonitoringForSite },
+ data: { exportData, importData, downloadSQLiteBackup },
+ settings: { getHistoryLimit, updateHistoryLimit },
+ events: { onStatusUpdate, onUpdateStatus, removeAllListeners },
+};
 ```
 
 #### 3. Data Flow Pattern
+
 ```
-User Action → Store → IPC → Backend Service → Database → 
+User Action → Store → IPC → Backend Service → Database →
 Response → Store Update → Component Re-render
 ```
 
 #### 4. Real-Time Updates
+
 ```
-Monitor Service → UptimeOrchestrator → emit("status-update") → 
+Monitor Service → UptimeOrchestrator → emit("status-update") →
 Window Service → Frontend Handler → Store → UI Update
 ```
 
 ## File Naming Conventions
+
 - **Components**: PascalCase (`SiteCard.tsx`, `AddSiteForm.tsx`)
 - **Utilities**: camelCase (`electronUtils.ts`, `fileDownload.ts`)
 - **Managers**: PascalCase + Manager suffix (`ConfigurationManager.ts`)
@@ -92,6 +100,7 @@ Window Service → Frontend Handler → Store → UI Update
 ## Key Components
 
 ### Frontend Components
+
 - **Dashboard**: Site overview with SiteCard grid
 - **SiteDetails**: Modal with tabs (Overview, Analytics, History, Settings)
 - **AddSiteForm**: Site creation with validation
@@ -99,6 +108,7 @@ Window Service → Frontend Handler → Store → UI Update
 - **Header**: Global controls + status overview
 
 ### Backend Services
+
 - **ApplicationService**: App lifecycle coordination
 - **IpcService**: Domain-organized IPC handlers
 - **UptimeOrchestrator**: Central coordinator for monitoring
@@ -106,12 +116,14 @@ Window Service → Frontend Handler → Store → UI Update
 - **WindowService**: Window management
 
 ### Stores & State
+
 - **Sites**: Real-time site data, monitoring control, status updates
 - **Settings**: Theme, preferences, history limits (synced with backend)
 - **Error**: Centralized error handling with user notifications
 - **UI**: Modal states, selected items, loading indicators
 
 ## Database Schema
+
 ```sql
 sites (identifier PK, name, created_at, updated_at)
 monitors (id PK, site_identifier FK, type, url, port, interval, enabled)
@@ -120,12 +132,14 @@ settings (key PK, value, updated_at)
 ```
 
 ## Security & Performance
+
 - **Security**: Context isolation, input validation, no direct DOM manipulation
 - **Performance**: Incremental updates, domain-separated stores, intelligent caching
 - **Error Handling**: Centralized with graceful degradation
 - **Testing**: High coverage across frontend and backend with comprehensive test suites
 
 ## Key Behaviors
+
 1. **No Direct DOM**: All UI updates flow through React state
 2. **Type Safety**: Full TypeScript with strict configuration
 3. **Real-Time**: Event-driven status updates with optimized re-renders
@@ -133,6 +147,7 @@ settings (key PK, value, updated_at)
 5. **Production Ready**: Comprehensive error handling, logging, backup/recovery
 
 ## Common Patterns to Follow
+
 - Use domain-specific stores, never global state
 - All backend communication via `window.electronAPI`
 - Error handling via `withErrorHandling` wrapper
@@ -141,6 +156,7 @@ settings (key PK, value, updated_at)
 - Incremental updates for real-time data
 
 ## When Making Changes
+
 1. **Frontend**: Update store → component will auto-update
 2. **Backend**: Add IPC handler → update preload → update frontend
 3. **Database**: Use existing repositories, maintain transaction safety
