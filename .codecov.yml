@@ -5,7 +5,6 @@ codecov:
     require_ci_to_pass: true
     notify:
         wait_for_ci: true
-        after_n_builds: 2 # Wait for both frontend and electron uploads
     branch: main
     max_report_age: 24 # Reject reports older than 24 hours
     # Flag collision resolution - prioritize explicit flags over defaults
