@@ -7,14 +7,129 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[de4d92e](https://github.com/Nick2bad4u/Uptime-Watcher/commit/de4d92ef3dd3e2fb4ae638841424d71a7b050458)...
-[de4d92e](https://github.com/Nick2bad4u/Uptime-Watcher/commit/de4d92ef3dd3e2fb4ae638841424d71a7b050458)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/de4d92ef3dd3e2fb4ae638841424d71a7b050458...de4d92ef3dd3e2fb4ae638841424d71a7b050458))
+[[d04e73c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d04e73cc518da820e0bcf6e95d399908e9c9eaba)...
+[d04e73c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d04e73cc518da820e0bcf6e95d399908e9c9eaba)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/d04e73cc518da820e0bcf6e95d399908e9c9eaba...d04e73cc518da820e0bcf6e95d399908e9c9eaba))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 5.0.0 [`(d04e73c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d04e73cc518da820e0bcf6e95d399908e9c9eaba)
+
+
+
+
+
+
+## [5.0.0] - 2025-07-06
+
+
+[[e2d3ec8](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e2d3ec806b87b51a1d4205c7de40149038f909fb)...
+[1109a83](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1109a836087874e561278141c6bce11c80994033)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/e2d3ec806b87b51a1d4205c7de40149038f909fb...1109a836087874e561278141c6bce11c80994033))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 4.9.0 [`(de4d92e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/de4d92ef3dd3e2fb4ae638841424d71a7b050458)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(d6bf784)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d6bf7848ec7226b84be1b42da29aa109a4c64d7a)
+
+
+
+### � Documentation
+
+- 📝 [docs] Clarify form field component coverage in docs
+
+- Expands documentation to specify inclusion of text inputs, dropdowns, and radio groups in provided form field components
+- Improves clarity for future maintainers and users seeking reusable UI elements [`(31f8549)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/31f8549250a0117015110c0ccdcd0ff2c79e202e)
+
+
+- 📝 [docs] Add Codecov components docs & coverage breakdown
+
+- Introduces detailed documentation and quick reference for Codecov component-based coverage, outlining coverage targets and rationale for each architectural area.
+- Updates project documentation to guide contributors on using and monitoring coverage components.
+- Replaces legacy flag-based codecov configuration with a granular component-based setup for better coverage tracking and CI feedback.
+- Adds validation and analysis scripts for coverage configuration and project file metrics, improving maintainability.
+- Updates CI workflow to use the latest SonarQube scan action for better code analysis integration.
+
+Relates to ongoing coverage and code quality improvements. [`(2f07b66)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2f07b66e633eb4cea54075cf4bb3c33577327afa)
+
+
+- 📝 [docs] Add comprehensive architecture and analysis docs
+
+- Introduces detailed project documentation covering architecture, data flow, and analysis summary to support maintainability and onboarding
+ - Documents core patterns, IPC communication, state management, naming conventions, and test coverage to ensure consistency and clarity for contributors
+ - Updates existing instructions and markdownlint settings to reflect new documentation standards and include essential AI context guidance [`(e2d3ec8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e2d3ec806b87b51a1d4205c7de40149038f909fb)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Add full unit coverage for database adapters and service factories
+
+- Adds comprehensive tests for database repository adapters, service factory utilities, and data import/export helpers in the Electron main process.
+- Ensures all logic branches, dependency injections, and interface contracts are validated, improving maintainability and refactor safety.
+- Increases backend code coverage and documents previously uncovered scenarios, supporting the project's production-ready test standards. [`(1109a83)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1109a836087874e561278141c6bce11c80994033)
+
+
+- 🧪 [test] Remove obsolete test covering themed uncovered lines
+
+- Cleans up unused or redundant test file related to themed rendering of uncovered lines
+- Reduces clutter and simplifies the test suite by eliminating outdated test cases [`(d729f6c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d729f6c30627d0f2461a44e31e2475a926033d6e)
+
+
+- 🧪 [test] Achieve 99.5%+ test coverage and document untestable code
+
+- Adds comprehensive test suites targeting remaining uncovered lines and edge cases across components, utilities, hooks, and error handlers
+- Documents all intentionally untestable code with explanations and rationale for exclusion, covering defensive programming guards, browser API edge cases, and rare cleanup scenarios
+- Updates documentation with detailed summaries of test coverage achievements, remaining gaps, and compliance with naming and project structure standards
+- Refines CI workflow to amend version bumps and changelogs into existing commits for clearer history
+- Simplifies and clarifies user-facing README and documentation index for improved navigation and maintenance
+- Introduces scripts and workflow updates for automated metrics branch management
+
+Improves code reliability, test maintainability, and transparency around coverage limits while aligning the repository with best practices for quality assurance and documentation. [`(21a4d6e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/21a4d6e2dae98303a29621ad3eb683d34823264b)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v4.9.0 [skip ci] [`(d717d5e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d717d5e81d5ab4376aaec278c561a4d6cb4b3bc8)
+
+
+
+### 👷 CI/CD
+
+- 👷 [ci] Replace commit amend with standard commit in release workflow
+
+- Updates release workflow to use standard commits and pushes for version bumps and changelog updates instead of amending and force-pushing commits.
+- Improves transparency and traceability in the commit history, aligning with best practices and reducing risks associated with force pushes. [`(dc9a49d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/dc9a49deff0c0f35b0106b8b1c7cebfb3c468c99)
+
+
+- 👷 [ci] Simplifies Codecov config by removing flag management
+
+- Removes flag collision resolution and carryforward settings to streamline Codecov configuration.
+- Reduces complexity by eliminating path-based flag priority and ignore_no_changes options.
+- Aims to rely on default Codecov behavior for report handling and status checks. [`(64f6c28)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/64f6c28fa50128e2b19841f3a1e16f6505d6c503)
+
+
+- 👷 [ci] Remove redundant after_n_builds setting from config
+
+- Eliminates the after_n_builds parameter to simplify CI configuration
+- Relies on other mechanisms to ensure both frontend and electron uploads are handled
+- Reduces maintenance by removing an unnecessary setting [`(1c507f1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1c507f1cc2acbc256b80a8fdf79301b9a0743a51)
+
+
+- 👷 [ci] Refines Codecov config, CI coverage upload, and removes validation script
+
+- Updates Codecov YAML to improve flag handling, path prioritization, and ignore patterns, preventing flag overlap and refining status checks.
+- Enhances CI workflow by cleaning coverage files before test runs and specifying directory parameters for coverage uploads, ensuring accurate and isolated reports.
+- Removes the obsolete component validation script to streamline project maintenance.
+- Improves maintainability and reliability of coverage reporting in the CI pipeline. [`(2a831b0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2a831b018bb87e6e3d3016398280a2d61f959a6b)
 
 
 
