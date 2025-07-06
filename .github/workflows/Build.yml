@@ -78,21 +78,24 @@ jobs:
                   jq --arg v "$NEW_VERSION" '.version = $v' package.json > tmp.json && mv tmp.json package.json
                   echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
 
-            - name: Create new Tag for new version of app
-              id: tag_version
+            - name: Amend original commit with version bump and create tag
+              id: amend_and_tag
               if: steps.bump.outputs.new_version != ''
               run: |
                   git config user.name "github-actions"
                   git config user.email "github-actions@github.com"
+                  
+                  # Add the version bump to the original commit
+                  git add package.json
+                  git commit --amend --no-edit
+                  
+                  # Create and push the tag
                   git tag -a "v${{ steps.bump.outputs.new_version }}" -m "Release v${{ steps.bump.outputs.new_version }}"
+                  
+                  # Force push the amended commit and tag
+                  git push --force-with-lease origin HEAD
                   git push origin "v${{ steps.bump.outputs.new_version }}"
               working-directory: .
-            - name: Commit and push version bump to repo
-              uses: EndBug/add-and-commit@a94899bca583c204427a224a7af87c02f9b325d5 # v9.1.4
-              with:
-                  message: "Bump version to ${{ steps.bump.outputs.new_version }}"
-                  add: "package.json"
-                  cwd: .
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -841,7 +844,7 @@ jobs:
                   echo "Final directory listing:"
                   find . -name "CHANGELOG.md" -exec echo "Found: {}" \; -exec wc -l {} \;
 
-            - name: Commit and push changelog updates
+            - name: Amend changelogs to existing commit
               run: |
                   git config user.name "github-actions[bot]"
                   git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -852,9 +855,11 @@ jobs:
                   if git diff --staged --quiet; then
                     echo "No changelog changes to commit"
                   else
-                    git commit -m "chore: update changelogs for v${{ needs.bump-version.outputs.new_version }} [skip ci]"
-                    git push origin ${{ github.event.inputs.branch || github.ref_name }}
-                    echo "Changelogs updated and pushed to repository"
+                    # Amend the changelogs to the existing commit instead of creating a new one
+                    git commit --amend --no-edit
+                    # Force push the amended commit
+                    git push --force-with-lease origin ${{ github.event.inputs.branch || github.ref_name }}
+                    echo "Changelogs amended to existing commit and pushed to repository"
                   fi
 
             - name: Update Check Run - Changelogs Generated
@@ -866,7 +871,7 @@ jobs:
                     "status": "in_progress",
                     "output": {
                       "title": "Update ChangeLogs",
-                      "summary": "Changelogs generated for v${{ needs.bump-version.outputs.new_version }} and committed to repository"
+                      "summary": "Changelogs generated for v${{ needs.bump-version.outputs.new_version }} and amended to existing commit"
                     }
                   }' | gh api -X PATCH -H "Accept: application/vnd.github+json" \
                     -H "X-GitHub-Api-Version: 2022-11-28" \
@@ -898,7 +903,7 @@ jobs:
                     echo "## 📝 Changelog Update Summary"
                     echo "- **Version**: v${{ needs.bump-version.outputs.new_version }}"
                     echo "- **CHANGELOG.md files** generated for root and all subdirectories"
-                    echo "- **Changes committed** directly to repository (no PR required)"
+                    echo "- **Changes amended** to existing commit (no additional commits created)"
                     echo "- **Status**: ${{ job.status }}"
                     echo ""
                     echo "### Files Updated:"
