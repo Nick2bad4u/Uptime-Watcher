@@ -46,8 +46,8 @@ Object.defineProperty(global, "window", {
     configurable: true,
 });
 
-// Mock global setTimeout
-global.setTimeout = vi.fn((callback: () => void, delay: number) => {
+// Mock global setTimeout using vi.stubGlobal
+vi.stubGlobal('setTimeout', vi.fn((callback: () => void, delay: number) => {
     if (delay > 5000) {
         // Don't actually wait for long timeouts, just call the callback immediately
         callback();
@@ -55,7 +55,7 @@ global.setTimeout = vi.fn((callback: () => void, delay: number) => {
         setTimeout(callback, delay);
     }
     return 1 as unknown as NodeJS.Timeout;
-});
+}));
 
 describe("Additional Uncovered Lines Tests", () => {
     beforeEach(() => {

@@ -8,11 +8,23 @@ codecov:
         after_n_builds: 2 # Wait for both frontend and electron uploads
     branch: main
     max_report_age: 24 # Reject reports older than 24 hours
+    # Flag collision resolution - prioritize explicit flags over defaults
+    flag_management:
+        default_rules:
+            carryforward: false
+        individual_flags:
+            - name: frontend
+              carryforward: false
+            - name: electron
+              carryforward: false
 
 coverage:
     precision: 2
     round: down
     range: "70...100"
+
+    # Prevent flag overlap by giving priority to path-based flags
+    ignore_no_changes: true
 
     status:
         project:
@@ -20,30 +32,41 @@ coverage:
                 target: auto
                 threshold: 1%
                 base: auto
+                # Only count files that don't have specific flag coverage
+                only_pulls: false
             frontend:
                 flags:
                     - frontend
                 target: auto
                 threshold: 1%
+                paths:
+                    - "src/"
             electron:
                 flags:
                     - electron
                 target: auto
                 threshold: 1%
+                paths:
+                    - "electron/"
         patch:
             default:
                 target: 70%
                 threshold: 5%
+                only_pulls: false
             frontend:
                 flags:
                     - frontend
                 target: 70%
                 threshold: 5%
+                paths:
+                    - "src/"
             electron:
                 flags:
                     - electron
                 target: 70%
                 threshold: 5%
+                paths:
+                    - "electron/"
 
     ignore:
         # Build outputs and compiled files
@@ -88,10 +111,18 @@ flags:
         paths:
             - src/
         carryforward: false
+        ignore:
+            - "src/**/*.test.*"
+            - "src/**/*.spec.*"
+            - "src/test/**/*"
     electron:
         paths:
             - electron/
         carryforward: false
+        ignore:
+            - "electron/**/*.test.*"
+            - "electron/**/*.spec.*"
+            - "electron/test/**/*"
 
 github_checks:
     annotations: true

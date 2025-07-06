@@ -43,6 +43,8 @@ jobs:
               id: test-frontend
               run: |
                   mkdir -p coverage
+                  # Clean any existing coverage to avoid conflicts
+                  rm -f coverage/lcov.info
                   npx vitest run --coverage --reporter=verbose --reporter=junit --outputFile=coverage/frontend-test-report.junit.xml
               continue-on-error: true
               env:
@@ -53,6 +55,8 @@ jobs:
               id: test-electron
               run: |
                   mkdir -p coverage/electron
+                  # Clean any existing coverage to avoid conflicts
+                  rm -f coverage/electron/lcov.info
                   npx vitest run --config vitest.electron.config.ts --coverage --reporter=verbose --reporter=junit --outputFile=coverage/electron/electron-test-report.junit.xml
               continue-on-error: true
               env:
@@ -84,6 +88,10 @@ jobs:
                   name: frontend-coverage
                   verbose: true
                   fail_ci_if_error: false
+                  disable_search: true
+                  directory: ./coverage
+                  root_dir: ./
+                  working-directory: ./
               env:
                   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
@@ -99,6 +107,10 @@ jobs:
                   name: electron-coverage
                   verbose: true
                   fail_ci_if_error: false
+                  disable_search: true
+                  directory: ./coverage/electron
+                  root_dir: ./
+                  working-directory: ./
               env:
                   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
