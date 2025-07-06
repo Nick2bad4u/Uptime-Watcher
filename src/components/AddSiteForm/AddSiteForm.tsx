@@ -1,6 +1,7 @@
 /**
  * AddSiteForm component for creating new sites and adding monitors to existing sites.
  * Provides a comprehensive form with validation and flexible configuration options.
+ * Supports both HTTP and port monitoring types, with customizable check intervals.
  */
 
 import React, { useState, useEffect, useCallback } from "react";
