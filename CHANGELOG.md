@@ -7,14 +7,94 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[d04e73c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d04e73cc518da820e0bcf6e95d399908e9c9eaba)...
-[d04e73c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d04e73cc518da820e0bcf6e95d399908e9c9eaba)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/d04e73cc518da820e0bcf6e95d399908e9c9eaba...d04e73cc518da820e0bcf6e95d399908e9c9eaba))
+[[455c922](https://github.com/Nick2bad4u/Uptime-Watcher/commit/455c922ac9a910617dac6dc0bbbe9364842d2a13)...
+[455c922](https://github.com/Nick2bad4u/Uptime-Watcher/commit/455c922ac9a910617dac6dc0bbbe9364842d2a13)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/455c922ac9a910617dac6dc0bbbe9364842d2a13...455c922ac9a910617dac6dc0bbbe9364842d2a13))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 5.1.0 [`(455c922)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/455c922ac9a910617dac6dc0bbbe9364842d2a13)
+
+
+
+
+
+
+## [5.1.0] - 2025-07-06
+
+
+[[611447f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/611447f810fd90d8b6fc47d09c9d1ae6ad28a267)...
+[3486a4a](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3486a4a77cb7724bd4125c911ab8735e8a9c264d)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/611447f810fd90d8b6fc47d09c9d1ae6ad28a267...3486a4a77cb7724bd4125c911ab8735e8a9c264d))
+
+
+### ✨ Features
+
+- ✨ [feat] Add per-monitor removal, site-level controls & UI overhaul
+
+- Implements the ability to remove individual monitors from sites, including full UI, backend, and IPC support.
+- Adds site-wide monitoring controls and refactors navigation to support both site and monitor-level actions.
+- Overhauls the Site Details UI for better responsiveness, accessibility, and theme consistency.
+- Modernizes analytics, history, and settings tabs with improved layout, badge/progress displays, and action feedback.
+- Updates state management, hooks, and service layers for new monitor operations and site-level monitoring.
+- Cleans up and streamlines tests, removing legacy tests for outdated tab structures.
+- Improves CSS structure for modals and headers, making components mobile-friendly and more maintainable.
+- Documents new best practices in contributor guidelines.
+
+Relates to improved UX, maintainability, and granularity of site/monitor management. [`(7ca9ff7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7ca9ff7da4a4c2d950346636b80d29ff90ab1e05)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 5.0.0 [`(d04e73c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d04e73cc518da820e0bcf6e95d399908e9c9eaba)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(14a45ac)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/14a45acc23eff080112adb7d501152854563a284)
+
+
+
+### � Documentation
+
+- 📝 [docs] Update component docstring for clarity
+
+- Removes outdated information about supported monitoring types from the component docstring.
+- Keeps documentation aligned with current and intended functionality. [`(9daaa9a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9daaa9ac6206611b55fa2d1b9c34c72b20b8845c)
+
+
+- 📝 [docs] Update form docs to mention HTTP and port monitoring
+
+- Clarifies in the component documentation that both HTTP and port monitoring types are supported, including customizable check intervals
+- Helps users understand available monitoring options and configuration flexibility [`(7e2c64e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7e2c64e1405b156497b00fa1e80b775b0dadcff9)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v5.0.0 [skip ci] [`(c8d35f7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c8d35f74de71a8e7a92b6c4899d9ae4113b2a4bb)
+
+
+
+### 👷 CI/CD
+
+- 👷 [ci] Update workflow to use separate commits for version and changelog
+
+- Switches version bump and changelog updates from amending existing commits and force-pushing to creating new commits and pushing normally
+- Utilizes a dedicated GitHub Action for committing version bumps, improving workflow reliability and traceability
+- Clarifies workflow step naming and status messages to accurately reflect the commit process
+- Reduces risk of overwriting history and enhances CI/CD transparency by avoiding force pushes [`(3486a4a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3486a4a77cb7724bd4125c911ab8735e8a9c264d)
+
+
+- 👷 [ci] Amend commits for version bumps and changelogs
+
+- Switches to amending version bumps and changelog updates into the existing commit rather than creating new commits.
+- Uses force push to update the branch, ensuring a linear commit history and avoiding redundant commit noise.
+- Updates workflow messaging to clarify that changes are amended, not separately committed.
+- Improves release automation by reducing unnecessary commits and keeping history cleaner. [`(611447f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/611447f810fd90d8b6fc47d09c9d1ae6ad28a267)
 
 
 
