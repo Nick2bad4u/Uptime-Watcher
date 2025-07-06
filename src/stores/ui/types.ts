@@ -39,6 +39,6 @@ export interface UIStore {
     setShowAdvancedMetrics: (show: boolean) => void;
 
     // Derived selectors
-    /** Get currently selected site */
+    /** Get currently selected site - Deprecated: Use useSelectedSite hook instead */
     getSelectedSite: () => Site | undefined;
 }

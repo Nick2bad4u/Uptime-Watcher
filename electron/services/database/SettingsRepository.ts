@@ -106,14 +106,36 @@ export class SettingsRepository {
 
     /**
      * Bulk insert settings (for import functionality).
+     * Uses a prepared statement and transaction for better performance.
      */
     public async bulkInsert(settings: Record<string, string>): Promise<void> {
+        const entries = Object.entries(settings);
+        if (entries.length === 0) {
+            return;
+        }
+
         try {
             const db = this.getDb();
-            for (const [key, value] of Object.entries(settings)) {
-                db.run("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)", [key, String(value)]);
+
+            // Use a transaction for bulk operations
+            db.run("BEGIN TRANSACTION");
+
+            // Prepare the statement once for better performance
+            const stmt = db.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)");
+
+            try {
+                for (const [key, value] of entries) {
+                    stmt.run([key, String(value)]);
+                }
+
+                db.run("COMMIT");
+                logger.info(`[SettingsRepository] Bulk inserted ${entries.length} settings`);
+            } catch (error) {
+                db.run("ROLLBACK");
+                throw error;
+            } finally {
+                stmt.finalize();
             }
-            logger.info(`[SettingsRepository] Bulk inserted ${Object.keys(settings).length} settings`);
         } catch (error) {
             logger.error("[SettingsRepository] Failed to bulk insert settings", error);
             throw error;

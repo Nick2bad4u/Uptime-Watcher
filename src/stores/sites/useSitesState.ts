@@ -62,11 +62,7 @@ export const createSitesStateActions = (
             const { [identifier]: _removedMonitorId, ...remainingMonitorIds } = currentMonitorIds;
             return {
                 selectedMonitorIds: remainingMonitorIds,
-                selectedSiteId:
-                    state.selectedSiteId &&
-                    state.sites.find((s) => s.identifier === identifier && s.identifier === state.selectedSiteId)
-                        ? undefined
-                        : state.selectedSiteId,
+                selectedSiteId: state.selectedSiteId === identifier ? undefined : state.selectedSiteId,
                 sites: state.sites.filter((site) => site.identifier !== identifier),
             };
         });

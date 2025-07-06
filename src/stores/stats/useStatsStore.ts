@@ -6,18 +6,25 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+import type { Site } from "../../types";
 import type { StatsStore } from "./types";
 
-import { useSitesStore } from "../sites/useSitesStore";
 import { logStoreAction } from "../utils";
 
 export const useStatsStore = create<StatsStore>()(
     persist(
         (set) => ({
             // Actions
-            computeStats: () => {
-                const sitesStore = useSitesStore.getState();
-                const sites = sitesStore.sites;
+            computeStats: (sites?: Site[]) => {
+                // Accept sites as parameter to avoid cross-store dependency
+                // If not provided, return early - components should pass the sites data
+                if (!sites) {
+                    logStoreAction("StatsStore", "computeStats", {
+                        message: "No sites provided for computation",
+                        sitesCount: 0,
+                    });
+                    return;
+                }
 
                 // Calculate stats from site data
                 const stats = { totalDowntime: 0, totalUptime: 0 };
@@ -25,9 +32,9 @@ export const useStatsStore = create<StatsStore>()(
                     for (const monitor of site.monitors) {
                         for (const entry of monitor.history) {
                             if (entry.status === "up") {
-                                stats.totalUptime += entry.responseTime || 0;
+                                stats.totalUptime += entry.responseTime ?? 0;
                             } else if (entry.status === "down") {
-                                stats.totalDowntime += entry.responseTime || 0;
+                                stats.totalDowntime += entry.responseTime ?? 0;
                             }
                         }
                     }

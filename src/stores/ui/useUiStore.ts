@@ -9,7 +9,6 @@ import { persist } from "zustand/middleware";
 import type { ChartTimeRange, Site } from "../types";
 import type { UIStore } from "./types";
 
-import { useSitesStore } from "../sites/useSitesStore";
 import { logStoreAction } from "../utils";
 
 export const useUIStore = create<UIStore>()(
@@ -22,8 +21,9 @@ export const useUIStore = create<UIStore>()(
                 const { selectedSiteId } = get();
                 if (!selectedSiteId) return undefined;
 
-                const sitesStore = useSitesStore.getState();
-                return sitesStore.sites.find((s) => s.identifier === selectedSiteId) || undefined;
+                // Use subscription pattern instead of direct store access
+                // The component should handle this logic by subscribing to both stores
+                return undefined; // Components should derive this from their own subscriptions
             },
             selectedSiteId: undefined,
             setActiveSiteDetailsTab: (tab: string) => {

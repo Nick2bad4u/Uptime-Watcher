@@ -48,6 +48,20 @@ export function SiteDetailsHeader({ isCollapsed, onToggleCollapse, selectedMonit
     // Use theme-aware styles
     const styles = useThemeStyles(isCollapsed);
 
+    // Guard clause for null/undefined site
+    if (!site) {
+        return (
+            <div style={styles.headerStyle}>
+                <div style={styles.overlayStyle} />
+                <div style={styles.contentStyle}>
+                    <ThemedText size="2xl" weight="bold">
+                        No site data
+                    </ThemedText>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div style={styles.headerStyle}>
             <div style={styles.overlayStyle} />

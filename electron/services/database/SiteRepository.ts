@@ -191,18 +191,39 @@ export class SiteRepository {
 
     /**
      * Bulk insert sites (for import functionality).
+     * Uses a prepared statement and transaction for better performance.
      */
     public async bulkInsert(sites: Array<{ identifier: string; name?: string | undefined }>): Promise<void> {
+        if (sites.length === 0) {
+            return;
+        }
+
         try {
             const db = this.getDb();
-            for (const site of sites) {
-                db.run(`INSERT INTO sites (identifier, name) VALUES (?, ?)`, [
-                    site.identifier,
-                    // eslint-disable-next-line unicorn/no-null
-                    site.name ?? null,
-                ]);
+
+            // Use a transaction for bulk operations
+            db.run("BEGIN TRANSACTION");
+
+            // Prepare the statement once for better performance
+            const stmt = db.prepare("INSERT INTO sites (identifier, name) VALUES (?, ?)");
+
+            try {
+                for (const site of sites) {
+                    stmt.run([
+                        site.identifier,
+                        // eslint-disable-next-line unicorn/no-null
+                        site.name ?? null,
+                    ]);
+                }
+
+                db.run("COMMIT");
+                logger.info(`[SiteRepository] Bulk inserted ${sites.length} sites`);
+            } catch (error) {
+                db.run("ROLLBACK");
+                throw error;
+            } finally {
+                stmt.finalize();
             }
-            logger.info(`[SiteRepository] Bulk inserted ${sites.length} sites`);
         } catch (error) {
             logger.error("[SiteRepository] Failed to bulk insert sites", error);
             throw error;

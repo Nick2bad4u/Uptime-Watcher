@@ -222,7 +222,7 @@ export async function updateSiteMonitors(
 
     await deleteObsoleteMonitors(deps, dbMonitors, newMonitors);
     const updatedMonitors = await upsertSiteMonitors(deps, identifier, newMonitors);
-    
+
     return updatedMonitors;
 }
 
@@ -253,7 +253,7 @@ export async function upsertSiteMonitors(
     monitors: Site["monitors"]
 ): Promise<Site["monitors"]> {
     const updatedMonitors: Site["monitors"] = [];
-    
+
     for (const monitor of monitors) {
         // Check if monitor exists in database (handles case where frontend assigns UUID but DB uses integers)
         if (monitor.id && monitor.id.trim() !== "") {
@@ -277,7 +277,7 @@ export async function upsertSiteMonitors(
             updatedMonitors.push(updatedMonitor);
         }
     }
-    
+
     return updatedMonitors;
 }
 

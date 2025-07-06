@@ -12,6 +12,7 @@ import { Settings } from "./components/Settings/Settings";
 import { SiteDetails } from "./components/SiteDetails/SiteDetails";
 import { UI_DELAYS } from "./constants";
 import { useBackendFocusSync } from "./hooks/useBackendFocusSync";
+import { useSelectedSite } from "./hooks/useSelectedSite";
 import logger from "./services/logger";
 import { ErrorBoundary, useErrorStore, useSettingsStore, useSitesStore, useUIStore, useUpdatesStore } from "./stores";
 import { ThemeProvider, ThemedBox, ThemedText, ThemedButton } from "./theme/components";
@@ -42,7 +43,7 @@ function App() {
     const { initializeSettings } = useSettingsStore();
 
     // UI store
-    const { getSelectedSite, setShowSettings, setShowSiteDetails, showSettings, showSiteDetails } = useUIStore();
+    const { setShowSettings, setShowSiteDetails, showSettings, showSiteDetails } = useUIStore();
 
     // Updates store
     const { applyUpdate, setUpdateError, setUpdateStatus, updateError, updateStatus } = useUpdatesStore();
@@ -103,7 +104,7 @@ function App() {
     // Focus-based state synchronization (disabled by default for performance)
     useBackendFocusSync(false); // Set to true to enable focus-based backend sync
 
-    const selectedSite = getSelectedSite();
+    const selectedSite = useSelectedSite();
 
     return (
         <ErrorBoundary>

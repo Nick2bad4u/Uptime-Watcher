@@ -71,7 +71,7 @@ export class DatabaseService {
      */
     public async executeTransaction<T>(operation: (db: Database) => Promise<T>): Promise<T> {
         const db = this.getDatabase();
-        
+
         try {
             db.run("BEGIN TRANSACTION");
             const result = await operation(db);

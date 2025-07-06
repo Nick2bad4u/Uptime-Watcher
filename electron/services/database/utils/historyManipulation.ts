@@ -102,30 +102,48 @@ export async function pruneHistoryForMonitor(db: Database, monitorId: string, li
 
 /**
  * Bulk insert history entries (for import functionality).
+ * Uses a prepared statement and transaction for better performance.
  */
 export async function bulkInsertHistory(
     db: Database,
     monitorId: string,
     historyEntries: Array<StatusHistory & { details?: string }>
 ): Promise<void> {
+    if (historyEntries.length === 0) {
+        return;
+    }
+
     try {
-        for (const entry of historyEntries) {
-            db.run(
-                "INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)",
-                [
+        // Use a transaction for bulk operations
+        db.run("BEGIN TRANSACTION");
+
+        // Prepare the statement once for better performance
+        const stmt = db.prepare(
+            "INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)"
+        );
+
+        try {
+            for (const entry of historyEntries) {
+                stmt.run([
                     monitorId,
                     entry.timestamp,
                     entry.status === "up" || entry.status === "down" ? entry.status : "down",
                     entry.responseTime,
                     // eslint-disable-next-line unicorn/no-null
                     entry.details ?? null,
-                ]
-            );
-        }
+                ]);
+            }
 
-        logger.info(
-            `[HistoryManipulation] Bulk inserted ${historyEntries.length} history entries for monitor: ${monitorId}`
-        );
+            db.run("COMMIT");
+            logger.info(
+                `[HistoryManipulation] Bulk inserted ${historyEntries.length} history entries for monitor: ${monitorId}`
+            );
+        } catch (error) {
+            db.run("ROLLBACK");
+            throw error;
+        } finally {
+            stmt.finalize();
+        }
     } catch (error) {
         logger.error(`[HistoryManipulation] Failed to bulk insert history for monitor: ${monitorId}`, error);
         throw error;

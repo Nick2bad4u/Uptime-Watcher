@@ -83,7 +83,7 @@ export class MonitorRepository {
     public async create(siteIdentifier: string, monitor: Omit<Site["monitors"][0], "id">): Promise<string> {
         try {
             const db = this.getDb();
-            
+
             // Use RETURNING clause to get the ID directly from the insert
             const result = db.get(
                 `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, timeout, retryAttempts, monitoring, status, responseTime, lastChecked) 
