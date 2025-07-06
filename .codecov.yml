@@ -7,23 +7,11 @@ codecov:
         wait_for_ci: true
     branch: main
     max_report_age: 24 # Reject reports older than 24 hours
-    # Flag collision resolution - prioritize explicit flags over defaults
-    flag_management:
-        default_rules:
-            carryforward: false
-        individual_flags:
-            - name: frontend
-              carryforward: false
-            - name: electron
-              carryforward: false
 
 coverage:
     precision: 2
     round: down
     range: "70...100"
-
-    # Prevent flag overlap by giving priority to path-based flags
-    ignore_no_changes: true
 
     status:
         project:
