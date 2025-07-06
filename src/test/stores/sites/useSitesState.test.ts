@@ -21,17 +21,19 @@ describe("useSitesState", () => {
     beforeEach(() => {
         mockSet = vi.fn();
         mockGet = vi.fn();
-        
+
         mockSite = {
             identifier: "test-site",
             name: "Test Site",
-            monitors: [{
-                id: "monitor-1",
-                type: "http" as const,
-                status: "up" as const,
-                history: [],
-                monitoring: true,
-            }],
+            monitors: [
+                {
+                    id: "monitor-1",
+                    type: "http" as const,
+                    status: "up" as const,
+                    history: [],
+                    monitoring: true,
+                },
+            ],
         };
 
         // Setup initial state
@@ -57,15 +59,15 @@ describe("useSitesState", () => {
     describe("setSites", () => {
         it("should set sites correctly", () => {
             const newSites = [mockSite];
-            
+
             stateActions.setSites(newSites);
-            
+
             expect(mockSet).toHaveBeenCalledWith(expect.any(Function));
-            
+
             // Test the function passed to set
             const setFunction = mockSet.mock.calls[0]?.[0];
             expect(setFunction).toBeDefined();
-            
+
             if (setFunction) {
                 const result = setFunction({ sites: [], selectedSiteId: undefined, selectedMonitorIds: {} });
                 expect(result).toEqual({ sites: newSites });
@@ -74,16 +76,16 @@ describe("useSitesState", () => {
 
         it("should handle empty sites array", () => {
             stateActions.setSites([]);
-            
+
             expect(mockSet).toHaveBeenCalledWith(expect.any(Function));
         });
 
         it("should handle undefined sites safely", () => {
             // @ts-expect-error - Testing edge case with undefined
             stateActions.setSites(undefined);
-            
+
             expect(mockSet).toHaveBeenCalledWith(expect.any(Function));
-            
+
             const setFunction = mockSet.mock.calls[0]?.[0];
             if (setFunction) {
                 const result = setFunction({ sites: [], selectedSiteId: undefined, selectedMonitorIds: {} });
@@ -101,13 +103,13 @@ describe("useSitesState", () => {
             };
 
             stateActions.addSite(newSite);
-            
+
             expect(mockSet).toHaveBeenCalledWith(expect.any(Function));
-            
+
             // Test the function passed to set
             const setFunction = mockSet.mock.calls[0]?.[0];
             expect(setFunction).toBeDefined();
-            
+
             if (setFunction) {
                 const result = setFunction({ sites: [mockSite] });
                 expect(result.sites).toHaveLength(2);
@@ -118,11 +120,11 @@ describe("useSitesState", () => {
 
         it("should add site to empty sites array", () => {
             mockGet.mockReturnValue({ sites: [] });
-            
+
             stateActions.addSite(mockSite);
-            
+
             expect(mockSet).toHaveBeenCalledWith(expect.any(Function));
-            
+
             const setFunction = mockSet.mock.calls[0]?.[0];
             if (setFunction) {
                 const result = setFunction({ sites: [] });
@@ -134,14 +136,14 @@ describe("useSitesState", () => {
     describe("removeSite", () => {
         it("should remove site by identifier", () => {
             stateActions.removeSite("test-site");
-            
+
             expect(mockSet).toHaveBeenCalledWith(expect.any(Function));
-            
+
             const setFunction = mockSet.mock.calls[0]?.[0];
             expect(setFunction).toBeDefined();
-            
+
             if (setFunction) {
-                const result = setFunction({ 
+                const result = setFunction({
                     sites: [mockSite],
                     selectedSiteId: undefined,
                 });
@@ -151,7 +153,7 @@ describe("useSitesState", () => {
 
         it("should handle non-existent site removal", () => {
             stateActions.removeSite("non-existent");
-            
+
             const setFunction = mockSet.mock.calls[0]?.[0];
             if (setFunction) {
                 const result = setFunction({ sites: [mockSite] });
@@ -167,13 +169,13 @@ describe("useSitesState", () => {
             });
 
             stateActions.removeSite("test-site");
-            
+
             const setFunction = mockSet.mock.calls[0]?.[0];
             expect(setFunction).toBeDefined();
-            
+
             if (setFunction) {
-                const result = setFunction({ 
-                    sites: [mockSite], 
+                const result = setFunction({
+                    sites: [mockSite],
                     selectedSiteId: "test-site",
                     selectedMonitorIds: {},
                 });
@@ -185,9 +187,9 @@ describe("useSitesState", () => {
     describe("setSelectedSite", () => {
         it("should set selected site", () => {
             stateActions.setSelectedSite(mockSite);
-            
+
             expect(mockSet).toHaveBeenCalledWith(expect.any(Function));
-            
+
             const setFunction = mockSet.mock.calls[0]?.[0];
             if (setFunction) {
                 const result = setFunction({});
@@ -197,9 +199,9 @@ describe("useSitesState", () => {
 
         it("should clear selected site", () => {
             stateActions.setSelectedSite(undefined);
-            
+
             expect(mockSet).toHaveBeenCalledWith(expect.any(Function));
-            
+
             const setFunction = mockSet.mock.calls[0]?.[0];
             if (setFunction) {
                 const result = setFunction({});
@@ -216,7 +218,7 @@ describe("useSitesState", () => {
             });
 
             const result = stateActions.getSelectedSite();
-            
+
             expect(result).toEqual(mockSite);
         });
 
@@ -227,7 +229,7 @@ describe("useSitesState", () => {
             });
 
             const result = stateActions.getSelectedSite();
-            
+
             expect(result).toBeUndefined();
         });
 
@@ -238,7 +240,7 @@ describe("useSitesState", () => {
             });
 
             const result = stateActions.getSelectedSite();
-            
+
             expect(result).toBeUndefined();
         });
     });
@@ -246,12 +248,12 @@ describe("useSitesState", () => {
     describe("setSelectedMonitorId", () => {
         it("should set selected monitor ID for site", () => {
             stateActions.setSelectedMonitorId("test-site", "monitor-1");
-            
+
             expect(mockSet).toHaveBeenCalledWith(expect.any(Function));
-            
+
             const setFunction = mockSet.mock.calls[0]?.[0];
             expect(setFunction).toBeDefined();
-            
+
             if (setFunction) {
                 const result = setFunction({ selectedMonitorIds: {} });
                 expect(result.selectedMonitorIds?.["test-site"]).toBe("monitor-1");
@@ -260,11 +262,11 @@ describe("useSitesState", () => {
 
         it("should update existing selected monitor ID", () => {
             stateActions.setSelectedMonitorId("test-site", "monitor-2");
-            
+
             const setFunction = mockSet.mock.calls[0]?.[0];
             if (setFunction) {
-                const result = setFunction({ 
-                    selectedMonitorIds: { "test-site": "monitor-1" } 
+                const result = setFunction({
+                    selectedMonitorIds: { "test-site": "monitor-1" },
                 });
                 expect(result.selectedMonitorIds?.["test-site"]).toBe("monitor-2");
             }
@@ -278,7 +280,7 @@ describe("useSitesState", () => {
             });
 
             const result = stateActions.getSelectedMonitorId("test-site");
-            
+
             expect(result).toBe("monitor-1");
         });
 
@@ -288,7 +290,7 @@ describe("useSitesState", () => {
             });
 
             const result = stateActions.getSelectedMonitorId("test-site");
-            
+
             expect(result).toBeUndefined();
         });
     });
@@ -298,16 +300,16 @@ describe("useSitesState", () => {
             const originalSites = [mockSite];
             const newSite: Site = {
                 identifier: "new-site",
-                name: "New Site", 
+                name: "New Site",
                 monitors: [],
             };
 
             stateActions.addSite(newSite);
-            
+
             const setFunction = mockSet.mock.calls[0]?.[0];
             if (setFunction) {
                 setFunction({ sites: originalSites });
-                
+
                 // Original array should be unchanged
                 expect(originalSites).toHaveLength(1);
                 expect(originalSites[0]).toBe(mockSite);
@@ -316,13 +318,13 @@ describe("useSitesState", () => {
 
         it("should not mutate original selectedMonitorIds in setSelectedMonitorId", () => {
             const originalIds = { "existing-site": "existing-monitor" };
-            
+
             stateActions.setSelectedMonitorId("test-site", "monitor-1");
-            
+
             const setFunction = mockSet.mock.calls[0]?.[0];
             if (setFunction) {
                 setFunction({ selectedMonitorIds: originalIds });
-                
+
                 // Original object should be unchanged
                 expect(originalIds).toEqual({ "existing-site": "existing-monitor" });
                 expect(originalIds).not.toHaveProperty("test-site");

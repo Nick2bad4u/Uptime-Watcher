@@ -17,15 +17,20 @@ vi.mock("../../../stores/sites/services", () => ({
 
 vi.mock("../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
-    withErrorHandling: vi.fn(async (fn: () => Promise<void>, store: { setError: (error: string) => void; setLoading: (loading: boolean) => void; clearError: () => void }) => {
-        try {
-            return await fn();
-        } catch (error) {
-            store.setError(error instanceof Error ? error.message : String(error));
-            // Don't rethrow in tests to allow testing error handling
-            return undefined;
+    withErrorHandling: vi.fn(
+        async (
+            fn: () => Promise<void>,
+            store: { setError: (error: string) => void; setLoading: (loading: boolean) => void; clearError: () => void }
+        ) => {
+            try {
+                return await fn();
+            } catch (error) {
+                store.setError(error instanceof Error ? error.message : String(error));
+                // Don't rethrow in tests to allow testing error handling
+                return undefined;
+            }
         }
-    }),
+    ),
 }));
 
 vi.mock("../../../stores/sites/utils", () => ({
@@ -63,7 +68,7 @@ describe("useSiteSync", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        
+
         // Setup mock dependencies
         mockDependencies = {
             getSites: vi.fn(() => [mockSite]),
@@ -197,7 +202,7 @@ describe("useSiteSync", () => {
 
         it("should pass the callback function correctly", () => {
             const mockCallback = vi.fn();
-            
+
             syncActions.subscribeToStatusUpdates(mockCallback);
 
             const handlerArgs = vi.mocked(createStatusUpdateHandler).mock.calls[0]?.[0];
@@ -206,7 +211,7 @@ describe("useSiteSync", () => {
 
         it("should pass dependency functions correctly", () => {
             const mockCallback = vi.fn();
-            
+
             syncActions.subscribeToStatusUpdates(mockCallback);
 
             const handlerArgs = vi.mocked(createStatusUpdateHandler).mock.calls[0]?.[0];
@@ -257,12 +262,12 @@ describe("useSiteSync", () => {
     describe("dependency integration", () => {
         it("should use getSites dependency correctly", () => {
             const mockCallback = vi.fn();
-            
+
             syncActions.subscribeToStatusUpdates(mockCallback);
 
             const handlerArgs = vi.mocked(createStatusUpdateHandler).mock.calls[0]?.[0];
             const result = handlerArgs?.getSites();
-            
+
             expect(result).toEqual([mockSite]);
             expect(mockDependencies.getSites).toHaveBeenCalledTimes(1);
         });

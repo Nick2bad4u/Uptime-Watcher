@@ -43,15 +43,15 @@ describe("autoMonitorManager", () => {
     describe("autoStartMonitoring", () => {
         it("should start monitoring for all monitors in a site", async () => {
             const monitors: Monitor[] = [
-                createTestMonitor({ 
-                    id: "1", 
-                    url: "https://example.com", 
-                    checkInterval: 5000 
+                createTestMonitor({
+                    id: "1",
+                    url: "https://example.com",
+                    checkInterval: 5000,
                 }),
-                createTestMonitor({ 
-                    id: "2", 
-                    url: "https://test.com", 
-                    checkInterval: 10000 
+                createTestMonitor({
+                    id: "2",
+                    url: "https://test.com",
+                    checkInterval: 10000,
                 }),
             ];
 
@@ -79,10 +79,10 @@ describe("autoMonitorManager", () => {
 
         it("should include debug messages when in development mode", async () => {
             const monitors: Monitor[] = [
-                createTestMonitor({ 
-                    id: "1", 
-                    url: "https://example.com", 
-                    checkInterval: 5000 
+                createTestMonitor({
+                    id: "1",
+                    url: "https://example.com",
+                    checkInterval: 5000,
                 }),
             ];
 
@@ -131,20 +131,20 @@ describe("autoMonitorManager", () => {
 
         it("should skip monitors without id", async () => {
             const monitors: Monitor[] = [
-                createTestMonitor({ 
-                    id: "1", 
-                    url: "https://example.com", 
-                    checkInterval: 5000 
+                createTestMonitor({
+                    id: "1",
+                    url: "https://example.com",
+                    checkInterval: 5000,
                 }),
-                createTestMonitor({ 
+                createTestMonitor({
                     id: "", // Empty id
-                    url: "https://test.com", 
-                    checkInterval: 10000 
+                    url: "https://test.com",
+                    checkInterval: 10000,
                 }),
-                createTestMonitor({ 
-                    id: "3", 
-                    url: "https://valid.com", 
-                    checkInterval: 3000 
+                createTestMonitor({
+                    id: "3",
+                    url: "https://valid.com",
+                    checkInterval: 3000,
                 }),
             ];
 
@@ -167,10 +167,10 @@ describe("autoMonitorManager", () => {
 
         it("should handle monitors with string ids", async () => {
             const monitors: Monitor[] = [
-                createTestMonitor({ 
-                    id: "123", 
-                    url: "https://example.com", 
-                    checkInterval: 5000 
+                createTestMonitor({
+                    id: "123",
+                    url: "https://example.com",
+                    checkInterval: 5000,
                 }),
             ];
 
@@ -190,15 +190,15 @@ describe("autoMonitorManager", () => {
 
         it("should handle start monitoring callback errors", async () => {
             const monitors: Monitor[] = [
-                createTestMonitor({ 
-                    id: "1", 
-                    url: "https://example.com", 
-                    checkInterval: 5000 
+                createTestMonitor({
+                    id: "1",
+                    url: "https://example.com",
+                    checkInterval: 5000,
                 }),
-                createTestMonitor({ 
-                    id: "2", 
-                    url: "https://test.com", 
-                    checkInterval: 10000 
+                createTestMonitor({
+                    id: "2",
+                    url: "https://test.com",
+                    checkInterval: 10000,
                 }),
             ];
 
@@ -213,8 +213,9 @@ describe("autoMonitorManager", () => {
                 .mockResolvedValueOnce(undefined)
                 .mockRejectedValueOnce(new Error("Failed to start monitoring"));
 
-            await expect(autoStartMonitoring(site, mockStartMonitoringCallback, mockLogger, mockIsDev))
-                .rejects.toThrow("Failed to start monitoring");
+            await expect(autoStartMonitoring(site, mockStartMonitoringCallback, mockLogger, mockIsDev)).rejects.toThrow(
+                "Failed to start monitoring"
+            );
 
             expect(mockStartMonitoringCallback).toHaveBeenCalledTimes(2);
             expect(mockStartMonitoringCallback).toHaveBeenCalledWith("error-site", "1");
@@ -223,10 +224,10 @@ describe("autoMonitorManager", () => {
 
         it("should handle site with empty string identifier", async () => {
             const monitors: Monitor[] = [
-                createTestMonitor({ 
-                    id: "1", 
-                    url: "https://example.com", 
-                    checkInterval: 5000 
+                createTestMonitor({
+                    id: "1",
+                    url: "https://example.com",
+                    checkInterval: 5000,
                 }),
             ];
 
@@ -241,9 +242,7 @@ describe("autoMonitorManager", () => {
 
             await autoStartMonitoring(site, mockStartMonitoringCallback, mockLogger, mockIsDev);
 
-            expect(mockLogger.debug).toHaveBeenCalledWith(
-                "[autoStartMonitoring] Starting monitoring for site: "
-            );
+            expect(mockLogger.debug).toHaveBeenCalledWith("[autoStartMonitoring] Starting monitoring for site: ");
             expect(mockStartMonitoringCallback).toHaveBeenCalledWith("", "1");
             expect(mockLogger.info).toHaveBeenCalledWith(
                 "[autoStartMonitoring] Completed starting monitoring for all monitors in site: "
@@ -252,15 +251,15 @@ describe("autoMonitorManager", () => {
 
         it("should work with null id values", async () => {
             const monitors: Monitor[] = [
-                createTestMonitor({ 
+                createTestMonitor({
                     id: "", // Empty id, simulating null
-                    url: "https://example.com", 
-                    checkInterval: 5000 
+                    url: "https://example.com",
+                    checkInterval: 5000,
                 }),
-                createTestMonitor({ 
-                    id: "2", 
-                    url: "https://test.com", 
-                    checkInterval: 10000 
+                createTestMonitor({
+                    id: "2",
+                    url: "https://test.com",
+                    checkInterval: 10000,
                 }),
             ];
 
@@ -281,10 +280,10 @@ describe("autoMonitorManager", () => {
 
         it("should handle callback that returns a value", async () => {
             const monitors: Monitor[] = [
-                createTestMonitor({ 
-                    id: "1", 
-                    url: "https://example.com", 
-                    checkInterval: 5000 
+                createTestMonitor({
+                    id: "1",
+                    url: "https://example.com",
+                    checkInterval: 5000,
                 }),
             ];
 

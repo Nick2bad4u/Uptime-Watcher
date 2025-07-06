@@ -33,58 +33,58 @@ jobs:
                   token: ${{ secrets.GITHUB_TOKEN }}
                   committer_branch: metrics
                   committer_message: "Update repository metrics [skip ci]"
-                  
+
                   # === Display & Output Settings ===
-                  config_display: large                    # Large display for desktop viewing
-                  config_output: svg                       # SVG format for crisp rendering
-                  config_timezone: America/Detroit         # Your timezone
-                  config_twemoji: yes                      # Consistent emoji rendering
-                  config_gemoji: yes                       # GitHub custom emojis
-                  config_octicon: yes                      # GitHub octicons
-                  config_animations: yes                   # Enable animations
-                  config_base64: yes                       # Self-contained images
-                  config_padding: 0, 8 + 11%              # Optimal padding
-                  
+                  config_display: large # Large display for desktop viewing
+                  config_output: svg # SVG format for crisp rendering
+                  config_timezone: America/Detroit # Your timezone
+                  config_twemoji: yes # Consistent emoji rendering
+                  config_gemoji: yes # GitHub custom emojis
+                  config_octicon: yes # GitHub octicons
+                  config_animations: yes # Enable animations
+                  config_base64: yes # Self-contained images
+                  config_padding: 0, 8 + 11% # Optimal padding
+
                   # === Optimization ===
-                  optimize: css, xml                       # Optimize CSS and XML
-                  use_prebuilt_image: yes                  # Faster execution
-                  
+                  optimize: css, xml # Optimize CSS and XML
+                  use_prebuilt_image: yes # Faster execution
+
                   # === Retry Configuration ===
-                  retries: 3                               # Retry on failures
-                  retries_delay: 300                       # 5 minutes between retries
-                  retries_output_action: 5                 # Retry output action
-                  retries_delay_output_action: 120         # 2 minutes between output retries
-                  
+                  retries: 3 # Retry on failures
+                  retries_delay: 300 # 5 minutes between retries
+                  retries_output_action: 5 # Retry output action
+                  retries_delay_output_action: 120 # 2 minutes between output retries
+
                   # === Base Sections ===
                   base: header, activity, community, repositories, metadata
-                  base_indepth: yes                        # Deep analysis
-                  commits_authoring: nick2bad4u           # Your GitHub username
-                  
+                  base_indepth: yes # Deep analysis
+                  commits_authoring: nick2bad4u # Your GitHub username
+
                   # === Plugin Configuration ===
-                  plugin_followup: yes                     # Follow-up issues
-                  plugin_lines: yes                        # Lines of code metrics
-                  plugin_lines_history_limit: 40          # Historical data depth
-                  plugin_lines_repositories_limit: 8      # Repository limit
-                  plugin_lines_sections: base             # Base sections only
-                  
+                  plugin_followup: yes # Follow-up issues
+                  plugin_lines: yes # Lines of code metrics
+                  plugin_lines_history_limit: 40 # Historical data depth
+                  plugin_lines_repositories_limit: 8 # Repository limit
+                  plugin_lines_sections: base # Base sections only
+
                   # === Language Analytics ===
-                  plugin_languages: yes                   # Language statistics
-                  plugin_languages_analysis_timeout: 30   # Analysis timeout
+                  plugin_languages: yes # Language statistics
+                  plugin_languages_analysis_timeout: 30 # Analysis timeout
                   plugin_languages_analysis_timeout_repositories: 40
                   plugin_languages_categories: markup, programming
-                  plugin_languages_colors: github         # GitHub color scheme
-                  plugin_languages_indepth: yes           # Deep language analysis
-                  plugin_languages_limit: 30              # Show top 30 languages
+                  plugin_languages_colors: github # GitHub color scheme
+                  plugin_languages_indepth: yes # Deep language analysis
+                  plugin_languages_limit: 30 # Show top 30 languages
                   plugin_languages_recent_categories: markup, programming
-                  plugin_languages_recent_days: 30        # Recent activity window
-                  plugin_languages_recent_load: 600       # Data load limit
-                  plugin_languages_sections: most-used    # Focus on most used
-                  plugin_languages_threshold: 0%          # Include all languages
-                  
+                  plugin_languages_recent_days: 30 # Recent activity window
+                  plugin_languages_recent_load: 600 # Data load limit
+                  plugin_languages_sections: most-used # Focus on most used
+                  plugin_languages_threshold: 0% # Include all languages
+
                   # === Repository Metrics ===
-                  plugin_repositories: yes                 # Repository analytics
+                  plugin_repositories: yes # Repository analytics
                   plugin_repositories_order: featured, pinned, starred, random
-                  repositories_forks: yes                 # Include forks
-                  
+                  repositories_forks: yes # Include forks
+
                   # === User Filtering ===
-                  users_ignored: none                     # Don't ignore any users
+                  users_ignored: none # Don't ignore any users

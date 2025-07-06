@@ -46,7 +46,7 @@ describe("Sites Store Modules Integration Tests", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        
+
         mockMonitor = {
             id: "monitor-1",
             type: "http" as const,
@@ -67,7 +67,7 @@ describe("Sites Store Modules Integration Tests", () => {
         mockState = {
             sites: [],
             selectedMonitorIds: {},
-        } as { sites: Site[]; selectedSiteId?: string; selectedMonitorIds: Record<string, string>; };
+        } as { sites: Site[]; selectedSiteId?: string; selectedMonitorIds: Record<string, string> };
 
         mockSet = vi.fn((updater) => {
             if (typeof updater === "function") {
@@ -77,21 +77,21 @@ describe("Sites Store Modules Integration Tests", () => {
                 Object.assign(mockState, updater);
             }
         });
-        
+
         mockGet = vi.fn(() => mockState);
 
         // Create all action modules
         stateActions = createSitesStateActions(mockSet, mockGet);
-        
+
         syncActions = createSiteSyncActions({
             getSites: () => mockState.sites,
             setSites: stateActions.setSites,
         });
-        
+
         monitoringActions = createSiteMonitoringActions({
             syncSitesFromBackend: syncActions.syncSitesFromBackend,
         });
-        
+
         operationsActions = createSiteOperationsActions({
             addSite: stateActions.addSite,
             getSites: () => mockState.sites,
@@ -150,7 +150,7 @@ describe("Sites Store Modules Integration Tests", () => {
 
         it("should handle complete site lifecycle through modules", async () => {
             const { SiteService, MonitoringService } = await import("../../../stores/sites/services");
-            
+
             // Setup mocks
             vi.mocked(SiteService.addSite).mockResolvedValue(mockSite);
             vi.mocked(SiteService.updateSite).mockResolvedValue(undefined);
@@ -177,7 +177,7 @@ describe("Sites Store Modules Integration Tests", () => {
             // 4. Delete site (should stop monitoring first)
             mockState.sites = [mockSite]; // Simulate site exists
             await operationsActions.deleteSite("example.com");
-            
+
             expect(MonitoringService.stopMonitoring).toHaveBeenCalledWith("example.com", "monitor-1");
             expect(SiteService.removeSite).toHaveBeenCalledWith("example.com");
         });
@@ -202,7 +202,9 @@ describe("Sites Store Modules Integration Tests", () => {
             const { MonitoringService } = await import("../../../stores/sites/services");
             vi.mocked(MonitoringService.startMonitoring).mockRejectedValue(new Error("Monitoring failed"));
 
-            await expect(monitoringActions.startSiteMonitorMonitoring("test.com", "monitor-1")).rejects.toThrow("Monitoring failed");
+            await expect(monitoringActions.startSiteMonitorMonitoring("test.com", "monitor-1")).rejects.toThrow(
+                "Monitoring failed"
+            );
         });
     });
 
@@ -215,7 +217,7 @@ describe("Sites Store Modules Integration Tests", () => {
             // Simulate concurrent state updates
             const site1 = { ...mockSite, identifier: "site1.com" };
             const site2 = { ...mockSite, identifier: "site2.com" };
-            
+
             mockState.sites = [site1, site2];
 
             // Concurrent operations
@@ -234,7 +236,7 @@ describe("Sites Store Modules Integration Tests", () => {
         it("should handle state access during operations", () => {
             // Add sites to state
             stateActions.setSites([mockSite]);
-            
+
             // Select site and monitor
             stateActions.setSelectedSite(mockSite);
             stateActions.setSelectedMonitorId(mockSite.identifier, mockMonitor.id);
@@ -245,7 +247,7 @@ describe("Sites Store Modules Integration Tests", () => {
 
             // Remove site should clear selections
             stateActions.removeSite(mockSite.identifier);
-            
+
             expect(mockState.sites).toHaveLength(0);
             expect(mockState.selectedSiteId).toBeUndefined();
             expect(mockState.selectedMonitorIds[mockSite.identifier]).toBeUndefined();
@@ -265,13 +267,13 @@ describe("Sites Store Modules Integration Tests", () => {
             expect(stateActions).toHaveProperty("addSite");
             expect(stateActions).toHaveProperty("removeSite");
             expect(stateActions).toHaveProperty("setSites");
-            
+
             expect(syncActions).toHaveProperty("syncSitesFromBackend");
-            
+
             expect(monitoringActions).toHaveProperty("startSiteMonitorMonitoring");
             expect(monitoringActions).toHaveProperty("stopSiteMonitorMonitoring");
             expect(monitoringActions).toHaveProperty("checkSiteNow");
-            
+
             expect(operationsActions).toHaveProperty("createSite");
             expect(operationsActions).toHaveProperty("deleteSite");
             expect(operationsActions).toHaveProperty("modifySite");

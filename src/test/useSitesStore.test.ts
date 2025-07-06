@@ -373,18 +373,15 @@ describe("useSitesStore", () => {
             };
 
             mockElectronAPI.sites.updateSite.mockResolvedValue(undefined);
-            
+
             // Mock the getSites method that syncSitesFromBackend calls
             const currentSites = useSitesStore.getState().sites;
-            const existingSite = currentSites.find(s => s.identifier === "site-1");
+            const existingSite = currentSites.find((s) => s.identifier === "site-1");
             if (!existingSite) throw new Error("Site not found in test setup");
-            
+
             const updatedSite = {
                 ...existingSite,
-                monitors: [
-                    ...existingSite.monitors,
-                    newMonitor,
-                ],
+                monitors: [...existingSite.monitors, newMonitor],
             };
             mockElectronAPI.sites.getSites.mockResolvedValue([updatedSite]);
 

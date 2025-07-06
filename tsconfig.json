@@ -10,7 +10,16 @@
         "skipDefaultLibCheck": true,
         "isolatedModules": true,
         "jsx": "react-jsx",
-        "types": ["node", "react", "react-dom", "vitest/globals", "@testing-library/jest-dom", "vite/client", "jest", "electron"],
+        "types": [
+            "node",
+            "react",
+            "react-dom",
+            "vitest/globals",
+            "@testing-library/jest-dom",
+            "vite/client",
+            "jest",
+            "electron"
+        ],
         "outDir": "dist",
         "baseUrl": ".",
         "paths": {

@@ -2,27 +2,27 @@
 
 ## Component ID Reference
 
-| Component ID | Display Name | Coverage Target | Main Focus |
-|-------------|-------------|----------------|------------|
-| `frontend_ui_components` | UI Components | 80%/75% | React components |
-| `frontend_state_management` | State Management | 85%/80% | Zustand stores |
-| `frontend_services` | Frontend Services | 80%/75% | Business logic |
-| `frontend_hooks` | React Hooks | 80%/75% | Custom hooks |
-| `frontend_utils` | Frontend Utils | 85%/80% | Pure functions |
-| `backend_core_services` | Core Backend Services | 90%/85% | Backend services |
-| `backend_managers` | Domain Managers | 90%/85% | High-level managers |
-| `backend_orchestrator` | Uptime Orchestrator | 95%/90% | Core monitoring |
-| `backend_utils` | Backend Utils | 85%/80% | Backend utilities |
-| `database_layer` | Database Layer | 95%/90% | Database operations |
-| `monitoring_engine` | Monitoring Engine | 90%/85% | Monitoring logic |
-| `ipc_communication` | IPC Communication | 90%/85% | Frontend-backend comm |
-| `site_management` | Site Management | 85%/80% | Site CRUD operations |
-| `settings_configuration` | Settings & Configuration | 85%/80% | App configuration |
-| `dashboard_analytics` | Dashboard & Analytics | 80%/75% | Dashboard & stats |
-| `error_handling` | Error Handling | 90%/85% | Error management |
-| `theme_system` | Theme System | 75%/70% | App theming |
-| `type_definitions` | Type Definitions | 70%/65% | TypeScript types |
-| `constants` | Constants | 70%/65% | Application constants |
+| Component ID                | Display Name             | Coverage Target | Main Focus            |
+| --------------------------- | ------------------------ | --------------- | --------------------- |
+| `frontend_ui_components`    | UI Components            | 80%/75%         | React components      |
+| `frontend_state_management` | State Management         | 85%/80%         | Zustand stores        |
+| `frontend_services`         | Frontend Services        | 80%/75%         | Business logic        |
+| `frontend_hooks`            | React Hooks              | 80%/75%         | Custom hooks          |
+| `frontend_utils`            | Frontend Utils           | 85%/80%         | Pure functions        |
+| `backend_core_services`     | Core Backend Services    | 90%/85%         | Backend services      |
+| `backend_managers`          | Domain Managers          | 90%/85%         | High-level managers   |
+| `backend_orchestrator`      | Uptime Orchestrator      | 95%/90%         | Core monitoring       |
+| `backend_utils`             | Backend Utils            | 85%/80%         | Backend utilities     |
+| `database_layer`            | Database Layer           | 95%/90%         | Database operations   |
+| `monitoring_engine`         | Monitoring Engine        | 90%/85%         | Monitoring logic      |
+| `ipc_communication`         | IPC Communication        | 90%/85%         | Frontend-backend comm |
+| `site_management`           | Site Management          | 85%/80%         | Site CRUD operations  |
+| `settings_configuration`    | Settings & Configuration | 85%/80%         | App configuration     |
+| `dashboard_analytics`       | Dashboard & Analytics    | 80%/75%         | Dashboard & stats     |
+| `error_handling`            | Error Handling           | 90%/85%         | Error management      |
+| `theme_system`              | Theme System             | 75%/70%         | App theming           |
+| `type_definitions`          | Type Definitions         | 70%/65%         | TypeScript types      |
+| `constants`                 | Constants                | 70%/65%         | Application constants |
 
 ## Path Patterns
 

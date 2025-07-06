@@ -39,7 +39,7 @@ const mockSites: Site[] = [
         monitoring: false,
     },
     {
-        identifier: "site-2", 
+        identifier: "site-2",
         name: "Test Site 2",
         monitors: [],
         monitoring: false,
@@ -57,10 +57,10 @@ describe("dataBackup utilities", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        
+
         // Create fresh EventEmitter instance for each test
         mockEventEmitter = new EventEmitter();
-        
+
         // Set up dependencies
         dependencies = {
             databaseService: mockDatabaseService as any,
@@ -163,7 +163,7 @@ describe("dataBackup utilities", () => {
         });
 
         it("should work with different buffer sizes and file names", async () => {
-            const largeBuffer = Buffer.alloc(1024 * 1024, 'a'); // 1MB buffer
+            const largeBuffer = Buffer.alloc(1024 * 1024, "a"); // 1MB buffer
             const expectedResult = {
                 buffer: largeBuffer,
                 fileName: "large-backup-with-long-filename-2024-12-31-23-59-59.sqlite",
@@ -208,12 +208,12 @@ describe("dataBackup utilities", () => {
 
         it("should call loadSites before getSitesFromCache to ensure proper order", async () => {
             const callOrder: string[] = [];
-            
+
             callbacks.loadSites = vi.fn().mockImplementation(async () => {
                 callOrder.push("loadSites");
                 return undefined;
             });
-            
+
             callbacks.getSitesFromCache = vi.fn().mockImplementation(() => {
                 callOrder.push("getSitesFromCache");
                 return mockSites;
@@ -235,7 +235,7 @@ describe("dataBackup utilities", () => {
 
             expect(monitorLogger.error).toHaveBeenCalledTimes(1);
             expect(monitorLogger.error).toHaveBeenCalledWith("Failed to refresh sites from database", mockError);
-            
+
             expect(callbacks.loadSites).toHaveBeenCalledTimes(1);
             // getSitesFromCache should not be called if loadSites fails
             expect(callbacks.getSitesFromCache).not.toHaveBeenCalled();
@@ -254,7 +254,7 @@ describe("dataBackup utilities", () => {
 
             expect(monitorLogger.error).toHaveBeenCalledTimes(1);
             expect(monitorLogger.error).toHaveBeenCalledWith("Failed to refresh sites from database", mockError);
-            
+
             expect(callbacks.loadSites).toHaveBeenCalledTimes(1);
             expect(callbacks.getSitesFromCache).toHaveBeenCalledTimes(1);
         });
@@ -304,14 +304,14 @@ describe("dataBackup utilities", () => {
 
         it("should handle async loadSites with delay", async () => {
             let loadCompleted = false;
-            
+
             const delayedLoadSites = async (): Promise<void> => {
                 await delay(100);
                 loadCompleted = true;
             };
-            
+
             callbacks.loadSites = vi.fn().mockImplementation(delayedLoadSites);
-            
+
             callbacks.getSitesFromCache = vi.fn().mockImplementation(() => {
                 // This should only be called after loadSites completes
                 expect(loadCompleted).toBe(true);
@@ -386,7 +386,9 @@ describe("dataBackup utilities", () => {
         it("should work with proper DataBackupCallbacks interface", () => {
             const typedCallbacks: DataBackupCallbacks = {
                 getSitesFromCache: () => mockSites,
-                loadSites: async () => { /* no-op */ },
+                loadSites: async () => {
+                    /* no-op */
+                },
             };
 
             expect(typeof typedCallbacks.getSitesFromCache).toBe("function");
@@ -399,11 +401,11 @@ describe("dataBackup utilities", () => {
             callbacks.getSitesFromCache = vi.fn().mockReturnValue(mockSites);
 
             const result: Promise<Site[]> = refreshSites(callbacks);
-            
+
             expect(result).toBeInstanceOf(Promise);
             const sites = await result;
             expect(Array.isArray(sites)).toBe(true);
-            expect(sites.every(site => typeof site.identifier === 'string')).toBe(true);
+            expect(sites.every((site) => typeof site.identifier === "string")).toBe(true);
         });
 
         it("should return Promise<{buffer: Buffer, fileName: string}> from downloadBackup", async () => {
@@ -414,11 +416,11 @@ describe("dataBackup utilities", () => {
             mockDatabaseService.downloadBackup.mockResolvedValue(expectedResult);
 
             const result: Promise<{ buffer: Buffer; fileName: string }> = downloadBackup(dependencies);
-            
+
             expect(result).toBeInstanceOf(Promise);
             const backup = await result;
             expect(backup.buffer).toBeInstanceOf(Buffer);
-            expect(typeof backup.fileName).toBe('string');
+            expect(typeof backup.fileName).toBe("string");
         });
     });
 });

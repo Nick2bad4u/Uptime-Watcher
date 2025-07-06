@@ -118,10 +118,7 @@ describe("SiteWriterService", () => {
             vi.mocked(mockSiteRepository.upsert).mockRejectedValue(error);
 
             await expect(siteWriterService.createSite(siteData)).rejects.toThrow(SiteCreationError);
-            expect(mockLogger.error).toHaveBeenCalledWith(
-                "Failed to create site site1: Database error",
-                error
-            );
+            expect(mockLogger.error).toHaveBeenCalledWith("Failed to create site site1: Database error", error);
         });
     });
 
@@ -131,9 +128,7 @@ describe("SiteWriterService", () => {
             const existingSite: Site = {
                 identifier: "site1",
                 name: "Old Name",
-                monitors: [
-                    { id: "monitor1", type: "http", status: "up", history: [] },
-                ],
+                monitors: [{ id: "monitor1", type: "http", status: "up", history: [] }],
             };
             siteCache.set("site1", existingSite);
 
@@ -173,9 +168,7 @@ describe("SiteWriterService", () => {
             const siteCache = new SiteCache();
             const updates: Partial<Site> = { name: "New Name" };
 
-            await expect(siteWriterService.updateSite(siteCache, "", updates)).rejects.toThrow(
-                SiteNotFoundError
-            );
+            await expect(siteWriterService.updateSite(siteCache, "", updates)).rejects.toThrow(SiteNotFoundError);
         });
 
         it("should handle database errors and wrap them in SiteUpdateError", async () => {
@@ -188,10 +181,7 @@ describe("SiteWriterService", () => {
             vi.mocked(mockSiteRepository.upsert).mockRejectedValue(error);
 
             await expect(siteWriterService.updateSite(siteCache, "site1", updates)).rejects.toThrow(SiteUpdateError);
-            expect(mockLogger.error).toHaveBeenCalledWith(
-                "Failed to update site site1: Database error",
-                error
-            );
+            expect(mockLogger.error).toHaveBeenCalledWith("Failed to update site site1: Database error", error);
         });
     });
 
@@ -232,10 +222,7 @@ describe("SiteWriterService", () => {
             vi.mocked(mockMonitorRepository.deleteBySiteIdentifier).mockRejectedValue(error);
 
             await expect(siteWriterService.deleteSite(siteCache, "site1")).rejects.toThrow(SiteDeletionError);
-            expect(mockLogger.error).toHaveBeenCalledWith(
-                "Failed to delete site site1: Database error",
-                error
-            );
+            expect(mockLogger.error).toHaveBeenCalledWith("Failed to delete site site1: Database error", error);
         });
     });
 
@@ -245,7 +232,14 @@ describe("SiteWriterService", () => {
                 identifier: "site1",
                 monitors: [
                     { id: "monitor1", type: "http", status: "up", history: [], checkInterval: 10000, monitoring: true },
-                    { id: "monitor2", type: "http", status: "up", history: [], checkInterval: 20000, monitoring: false },
+                    {
+                        id: "monitor2",
+                        type: "http",
+                        status: "up",
+                        history: [],
+                        checkInterval: 20000,
+                        monitoring: false,
+                    },
                 ],
             };
 
@@ -271,12 +265,8 @@ describe("SiteWriterService", () => {
             expect(mockMonitoringConfig.startMonitoring).toHaveBeenCalledWith("site1", "monitor1");
             expect(mockMonitoringConfig.stopMonitoring).toHaveBeenCalledWith("site1", "monitor2");
             expect(mockMonitoringConfig.startMonitoring).not.toHaveBeenCalledWith("site1", "monitor2");
-            expect(mockLogger.debug).toHaveBeenCalledWith(
-                "Monitor monitor1 interval changed from 10000 to 15000"
-            );
-            expect(mockLogger.debug).toHaveBeenCalledWith(
-                "Monitor monitor2 interval changed from 20000 to 25000"
-            );
+            expect(mockLogger.debug).toHaveBeenCalledWith("Monitor monitor1 interval changed from 10000 to 15000");
+            expect(mockLogger.debug).toHaveBeenCalledWith("Monitor monitor2 interval changed from 20000 to 25000");
         });
 
         it("should not restart monitoring for monitors with unchanged intervals", async () => {
@@ -343,9 +333,7 @@ describe("SiteWriterService", () => {
             const siteCache = new SiteCache();
             const existingSite: Site = {
                 identifier: "site1",
-                monitors: [
-                    { id: "monitor1", type: "http", status: "up", history: [] },
-                ],
+                monitors: [{ id: "monitor1", type: "http", status: "up", history: [] }],
             };
             siteCache.set("site1", existingSite);
 
@@ -403,23 +391,17 @@ describe("SiteWritingOrchestrator", () => {
             const siteCache = new SiteCache();
             const originalSite: Site = {
                 identifier: "site1",
-                monitors: [
-                    { id: "monitor1", type: "http", status: "up", history: [], checkInterval: 10000 },
-                ],
+                monitors: [{ id: "monitor1", type: "http", status: "up", history: [], checkInterval: 10000 }],
             };
             siteCache.set("site1", originalSite);
 
             const updatedSite: Site = {
                 identifier: "site1",
-                monitors: [
-                    { id: "monitor1", type: "http", status: "up", history: [], checkInterval: 15000 },
-                ],
+                monitors: [{ id: "monitor1", type: "http", status: "up", history: [], checkInterval: 15000 }],
             };
 
             const updates: Partial<Site> = {
-                monitors: [
-                    { id: "monitor1", type: "http", status: "up", history: [], checkInterval: 15000 },
-                ],
+                monitors: [{ id: "monitor1", type: "http", status: "up", history: [], checkInterval: 15000 }],
             };
 
             const mockMonitoringConfig: MonitoringConfig = {
@@ -495,7 +477,12 @@ describe("SiteWritingOrchestrator", () => {
             };
 
             await expect(
-                siteWritingOrchestrator.updateSiteWithMonitoring(siteCache, "non-existent", updates, mockMonitoringConfig)
+                siteWritingOrchestrator.updateSiteWithMonitoring(
+                    siteCache,
+                    "non-existent",
+                    updates,
+                    mockMonitoringConfig
+                )
             ).rejects.toThrow(SiteNotFoundError);
         });
     });

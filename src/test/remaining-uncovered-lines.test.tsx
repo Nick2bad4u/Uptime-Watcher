@@ -94,7 +94,15 @@ vi.mock("../theme/useTheme", () => ({
             typography: {
                 fontFamily: {
                     sans: ["-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
-                    mono: ["SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", "monospace"],
+                    mono: [
+                        "SFMono-Regular",
+                        "Menlo",
+                        "Monaco",
+                        "Consolas",
+                        "Liberation Mono",
+                        "Courier New",
+                        "monospace",
+                    ],
                 },
                 fontSize: {
                     xs: "0.75rem",
@@ -182,7 +190,14 @@ describe("Remaining Uncovered Lines Tests", () => {
             render(<Settings onClose={() => {}} />);
 
             // Get the Settings component instance and directly test the guard logic
-            const allowedKeys = ["notifications", "autostart", "minimizeToTray", "theme", "soundAlerts", "historyLimit"];
+            const allowedKeys = [
+                "notifications",
+                "autostart",
+                "minimizeToTray",
+                "theme",
+                "soundAlerts",
+                "historyLimit",
+            ];
             const invalidKey = "invalidKey";
 
             // Simulate the condition that would trigger lines 87-89
@@ -218,7 +233,7 @@ describe("Remaining Uncovered Lines Tests", () => {
                 monitorType: "http" as const,
                 host: "",
                 name: "Test Site",
-                
+
                 // Site data
                 siteId: "new-site-id",
                 addMode: "new" as const,
@@ -244,10 +259,7 @@ describe("Remaining Uncovered Lines Tests", () => {
 
             expect(mockEvent.preventDefault).toHaveBeenCalled();
             expect(mockCreateSite).toHaveBeenCalled();
-            expect(logger.error).toHaveBeenCalledWith(
-                "Failed to add site/monitor from form",
-                expect.any(Error)
-            );
+            expect(logger.error).toHaveBeenCalledWith("Failed to add site/monitor from form", expect.any(Error));
             expect(mockSetFormError).toHaveBeenCalledWith("Failed to add site/monitor. Please try again.");
             expect(mockOnSuccess).not.toHaveBeenCalled();
         });
@@ -273,7 +285,7 @@ describe("Remaining Uncovered Lines Tests", () => {
             // Create a mock portal element
             mockPortal = document.createElement("div");
             mockPortal.id = "screenshot-overlay-portal";
-            
+
             // Mock document.getElementById to return our mock portal
             const originalGetElementById = document.getElementById;
             document.getElementById = vi.fn((id) => {
@@ -297,7 +309,7 @@ describe("Remaining Uncovered Lines Tests", () => {
 
         it("should handle cleanup when portal exists and has parent node", async () => {
             const user = userEvent.setup();
-            
+
             render(<ScreenshotThumbnail url="https://test.com" siteName="Test Site" />);
 
             const thumbnail = screen.getByRole("link");
@@ -307,7 +319,7 @@ describe("Remaining Uncovered Lines Tests", () => {
 
             // Wait a bit for any async operations
             await act(async () => {
-                await new Promise(resolve => {
+                await new Promise((resolve) => {
                     setTimeout(resolve, 100);
                 });
             });
@@ -324,7 +336,7 @@ describe("Remaining Uncovered Lines Tests", () => {
 
         it("should handle timeout cleanup on unmount", async () => {
             const user = userEvent.setup();
-            
+
             const { unmount } = render(<ScreenshotThumbnail url="https://test.com" siteName="Test Site" />);
 
             const thumbnail = screen.getByRole("link");
@@ -348,17 +360,14 @@ describe("Remaining Uncovered Lines Tests", () => {
             render(<ScreenshotThumbnail url="https://test.com" siteName="Test Site" />);
 
             const thumbnail = screen.getByRole("link");
-            
+
             // Click the thumbnail
             await user.click(thumbnail);
 
-            expect(logger.user.action).toHaveBeenCalledWith(
-                "External URL opened from screenshot thumbnail",
-                {
-                    siteName: "Test Site",
-                    url: "https://test.com",
-                }
-            );
+            expect(logger.user.action).toHaveBeenCalledWith("External URL opened from screenshot thumbnail", {
+                siteName: "Test Site",
+                url: "https://test.com",
+            });
         });
     });
 });

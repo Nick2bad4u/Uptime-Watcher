@@ -113,7 +113,15 @@ vi.mock("../theme/useTheme", () => ({
             typography: {
                 fontFamily: {
                     sans: ["-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
-                    mono: ["SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", "monospace"],
+                    mono: [
+                        "SFMono-Regular",
+                        "Menlo",
+                        "Monaco",
+                        "Consolas",
+                        "Liberation Mono",
+                        "Courier New",
+                        "monospace",
+                    ],
                 },
                 fontSize: {
                     xs: "0.75rem",
@@ -175,7 +183,7 @@ describe("Final Coverage Tests", () => {
         vi.clearAllMocks();
         // Reset DOM
         document.body.innerHTML = "";
-        
+
         // Reset portal element
         const existingPortal = document.getElementById("screenshot-overlay-portal");
         if (existingPortal) {
@@ -187,7 +195,7 @@ describe("Final Coverage Tests", () => {
         it("should handle invalid settings key", async () => {
             const { useSettingsStore } = await import("../stores");
             const mockUpdateSettings = vi.fn();
-            
+
             (useSettingsStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
                 settings: {
                     theme: "dark",
@@ -232,7 +240,7 @@ describe("Final Coverage Tests", () => {
                 addMode: "new" as const,
                 selectedExistingSite: "",
                 formError: undefined,
-                
+
                 // Actions and store methods
                 setFormError: mockSetFormError,
                 clearError: vi.fn(),
@@ -254,10 +262,7 @@ describe("Final Coverage Tests", () => {
         it("should handle cleanup on unmount", () => {
             const { unmount } = render(
                 <ThemeProvider>
-                    <ScreenshotThumbnail
-                        siteName="Test Site"
-                        url="https://test.com"
-                    />
+                    <ScreenshotThumbnail siteName="Test Site" url="https://test.com" />
                 </ThemeProvider>
             );
 
@@ -275,13 +280,10 @@ describe("Final Coverage Tests", () => {
 
         it("should handle click and prevent default", async () => {
             const user = userEvent.setup();
-            
+
             render(
                 <ThemeProvider>
-                    <ScreenshotThumbnail
-                        siteName="Test Site"
-                        url="https://test.com"
-                    />
+                    <ScreenshotThumbnail siteName="Test Site" url="https://test.com" />
                 </ThemeProvider>
             );
 

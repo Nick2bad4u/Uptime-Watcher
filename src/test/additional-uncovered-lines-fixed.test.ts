@@ -33,11 +33,13 @@ vi.mock("../services/logger", () => ({
 
 // Mock window and setTimeout
 interface MockWindow {
-    electronAPI?: {
-        sites?: {
-            getSites?: (() => void) | string;
-        };
-    } | undefined;
+    electronAPI?:
+        | {
+              sites?: {
+                  getSites?: (() => void) | string;
+              };
+          }
+        | undefined;
 }
 
 Object.defineProperty(global, "window", {
@@ -47,22 +49,25 @@ Object.defineProperty(global, "window", {
 });
 
 // Mock global setTimeout using vi.stubGlobal
-vi.stubGlobal('setTimeout', vi.fn((callback: () => void, delay: number) => {
-    if (delay > 5000) {
-        // Don't actually wait for long timeouts, just call the callback immediately
-        callback();
-    } else {
-        setTimeout(callback, delay);
-    }
-    return 1 as unknown as NodeJS.Timeout;
-}));
+vi.stubGlobal(
+    "setTimeout",
+    vi.fn((callback: () => void, delay: number) => {
+        if (delay > 5000) {
+            // Don't actually wait for long timeouts, just call the callback immediately
+            callback();
+        } else {
+            setTimeout(callback, delay);
+        }
+        return 1 as unknown as NodeJS.Timeout;
+    })
+);
 
 describe("Additional Uncovered Lines Tests", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         // Reset DOM state
         document.body.innerHTML = "";
-        
+
         // Mock global URL methods
         global.URL.createObjectURL = vi.fn(() => "blob:test");
         global.URL.revokeObjectURL = vi.fn();
@@ -75,18 +80,20 @@ describe("Additional Uncovered Lines Tests", () => {
             const mockSite: Site = {
                 identifier: "test-site",
                 name: "Test Site",
-                monitors: [{
-                    id: "monitor-1",
-                    type: "http",
-                    status: "up",
-                    url: "https://test.com",
-                    port: undefined,
-                    timeout: undefined, // This will trigger line 250
-                    retryAttempts: 0,
-                    lastChecked: new Date("2023-01-01T00:00:00.000Z"),
-                    responseTime: 100,
-                    history: [],
-                }],
+                monitors: [
+                    {
+                        id: "monitor-1",
+                        type: "http",
+                        status: "up",
+                        url: "https://test.com",
+                        port: undefined,
+                        timeout: undefined, // This will trigger line 250
+                        retryAttempts: 0,
+                        lastChecked: new Date("2023-01-01T00:00:00.000Z"),
+                        responseTime: 100,
+                        history: [],
+                    },
+                ],
             };
 
             // This test demonstrates the edge case handling in the hook
@@ -109,7 +116,7 @@ describe("Additional Uncovered Lines Tests", () => {
 
             const buffer = new ArrayBuffer(8);
             const fileName = "test.txt";
-            
+
             // This should trigger the error handling path in lines 61-63
             await expect(async () => {
                 const { downloadFile } = await import("../stores/sites/utils/fileDownload");
@@ -138,11 +145,11 @@ describe("Additional Uncovered Lines Tests", () => {
 
             const buffer = new ArrayBuffer(8);
             const fileName = "test.txt";
-            
+
             // This should trigger the fallback logic in lines 71-82
             const { downloadFile } = await import("../stores/sites/utils/fileDownload");
             downloadFile({ buffer, fileName });
-            
+
             expect(mockClick).toHaveBeenCalled();
         });
 
@@ -159,7 +166,7 @@ describe("Additional Uncovered Lines Tests", () => {
 
             const buffer = new ArrayBuffer(8);
             const fileName = "test.txt";
-            
+
             // This should trigger the error handling path in lines 80-82
             await expect(async () => {
                 const { downloadFile } = await import("../stores/sites/utils/fileDownload");
@@ -235,7 +242,7 @@ describe("Additional Uncovered Lines Tests", () => {
 
             // This should trigger the exponential backoff logic in line 38
             await waitForElectronAPI();
-            
+
             expect(mockSetTimeout).toHaveBeenCalled();
             expect(attemptCount).toBeGreaterThan(0);
         });

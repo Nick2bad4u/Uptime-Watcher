@@ -9,6 +9,7 @@ After a comprehensive review of the codebase, I found that the project follows c
 ## ✅ Components (All Following PascalCase)
 
 **Well-Named Components:**
+
 - `AddSiteForm.tsx`, `FormFields.tsx`, `Submit.tsx`
 - `SiteCard/`, `SiteDetails/`, `SiteList/`
 - `ActionButtonGroup.tsx`, `MonitorSelector.tsx`, `MetricCard.tsx`
@@ -17,6 +18,7 @@ After a comprehensive review of the codebase, I found that the project follows c
 - `AnalyticsTab.tsx`, `OverviewTab.tsx`, `HistoryTab.tsx`, `SettingsTab.tsx`
 
 **Structure Analysis:**
+
 - Proper component hierarchy with domain-specific folders
 - Consistent use of `index.tsx` for barrel exports
 - Clean separation between components and their sub-components
@@ -24,10 +26,12 @@ After a comprehensive review of the codebase, I found that the project follows c
 ## ✅ Stores (All Following camelCase + Store suffix)
 
 **Well-Named Stores:**
+
 - `useSitesStore.ts`, `useSettingsStore.ts`, `useErrorStore.ts`
 - `useUiStore.ts`, `useStatsStore.ts`, `useUpdatesStore.ts`
 
 **Store Architecture:**
+
 - Domain-separated stores following the documented pattern
 - Clean utility separation in `stores/*/utils/`
 - Proper type definitions in `stores/*/types.ts`
@@ -35,22 +39,26 @@ After a comprehensive review of the codebase, I found that the project follows c
 ## ✅ Utilities (All Following camelCase)
 
 **Frontend Utilities:**
+
 - `fileDownload.ts`, `monitorOperations.ts`, `statusUpdateHandler.ts`
 - `time.ts`, `status.ts`, `duration.ts`, `generateUuid.ts`
 
 **Backend Utilities:**
+
 - `electronUtils.ts`, `retry.ts`, `logger.ts`
 - Monitoring utilities following consistent patterns
 
 ## ✅ Managers (All Following PascalCase + Manager suffix)
 
 **Backend Managers:**
+
 - `DatabaseManager.ts`, `ConfigurationManager.ts`
 - `SiteManager.ts`, `MonitorManager.ts`
 
 ## ✅ Hooks (All Following camelCase with use prefix)
 
 **Hook Organization:**
+
 - Domain-specific hooks in `hooks/site/`
 - General hooks in `hooks/`
 - Consistent naming: `useSite.ts`, `useSiteDetails.ts`, `useSiteAnalytics.ts`
@@ -58,15 +66,18 @@ After a comprehensive review of the codebase, I found that the project follows c
 ## ✅ Services (All Following PascalCase + Service suffix where applicable)
 
 **Frontend Services:**
+
 - `logger.ts`, `chartConfig.ts`
 
 **Backend Services:**
+
 - `HttpMonitor.ts`, `PortMonitor.ts`, `MonitorScheduler.ts`
 - `WindowService.ts`, `NotificationService.ts`, `AutoUpdaterService.ts`
 
 ## ✅ Theme System
 
 **Theme Components:**
+
 - `ThemeManager.ts` (follows Manager convention)
 - `useTheme.ts` (follows hook convention)
 - `components.tsx`, `themes.ts`, `types.ts` (appropriate for module content)
@@ -94,6 +105,7 @@ electron/              ✅ Backend (Electron main process)
 ## ✅ Test Files
 
 **Test Naming:**
+
 - All test files follow `.test.ts` or `.test.tsx` convention
 - Descriptive names like `useSitesStore.test.ts`, `SiteCard.test.tsx`
 - Coverage-specific tests clearly labeled
@@ -113,6 +125,7 @@ electron/              ✅ Backend (Electron main process)
 **✅ PASSED: The codebase demonstrates excellent adherence to naming conventions and project structure standards.**
 
 Key strengths:
+
 - 100% compliance with documented naming conventions
 - Clean domain separation in stores and services
 - Logical component hierarchy

@@ -32,25 +32,37 @@ vi.mock("../../../stores/sites/utils/monitorOperations", () => ({
 
 vi.mock("../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
-    withErrorHandling: vi.fn(async (fn: () => Promise<unknown>, store?: { setLoading: (loading: boolean) => void; clearError: () => void; setError: (error: string) => void }) => {
-        if (store) {
-            store.setLoading(true);
-            store.clearError();
-        }
-        try {
-            return await fn();
-        } catch (error) {
-            if (store) {
-                store.setError(error instanceof Error ? error.message : String(error));
-                console.error("Error in withErrorHandling:", error instanceof Error ? error.message : String(error));
+    withErrorHandling: vi.fn(
+        async (
+            fn: () => Promise<unknown>,
+            store?: {
+                setLoading: (loading: boolean) => void;
+                clearError: () => void;
+                setError: (error: string) => void;
             }
-            throw error;
-        } finally {
+        ) => {
             if (store) {
-                store.setLoading(false);
+                store.setLoading(true);
+                store.clearError();
+            }
+            try {
+                return await fn();
+            } catch (error) {
+                if (store) {
+                    store.setError(error instanceof Error ? error.message : String(error));
+                    console.error(
+                        "Error in withErrorHandling:",
+                        error instanceof Error ? error.message : String(error)
+                    );
+                }
+                throw error;
+            } finally {
+                if (store) {
+                    store.setLoading(false);
+                }
             }
         }
-    }),
+    ),
 }));
 
 describe("Sites Store Modules - Edge Cases and Error Scenarios", () => {
@@ -122,7 +134,7 @@ describe("Sites Store Modules - Edge Cases and Error Scenarios", () => {
                 null, // null site
                 undefined, // undefined site
             ];
-            
+
             // @ts-expect-error - Testing edge case
             vi.mocked(SiteService.getSites).mockResolvedValue(malformedSites);
 
@@ -195,9 +207,15 @@ describe("Sites Store Modules - Edge Cases and Error Scenarios", () => {
             const operations = createSiteOperationsActions(mockDependencies);
 
             // Should throw errors when trying to update monitors on non-existent sites
-            await expect(operations.updateSiteCheckInterval("non-existent-site", "monitor-1", 60000)).rejects.toThrow("Site not found");
-            await expect(operations.updateMonitorRetryAttempts("non-existent-site", "monitor-1", 3)).rejects.toThrow("Site not found");
-            await expect(operations.updateMonitorTimeout("non-existent-site", "monitor-1", 15000)).rejects.toThrow("Site not found");
+            await expect(operations.updateSiteCheckInterval("non-existent-site", "monitor-1", 60000)).rejects.toThrow(
+                "Site not found"
+            );
+            await expect(operations.updateMonitorRetryAttempts("non-existent-site", "monitor-1", 3)).rejects.toThrow(
+                "Site not found"
+            );
+            await expect(operations.updateMonitorTimeout("non-existent-site", "monitor-1", 15000)).rejects.toThrow(
+                "Site not found"
+            );
 
             // Should not sync since operations failed
             expect(mockDependencies.syncSitesFromBackend).not.toHaveBeenCalled();
@@ -247,7 +265,9 @@ describe("Sites Store Modules - Edge Cases and Error Scenarios", () => {
             vi.mocked(MonitoringService.startMonitoring).mockRejectedValue(new Error("Monitoring service unavailable"));
 
             // Should handle errors gracefully
-            await expect(monitoringActions.startSiteMonitorMonitoring("test-site", "monitor-1")).rejects.toThrow("Monitoring service unavailable");
+            await expect(monitoringActions.startSiteMonitorMonitoring("test-site", "monitor-1")).rejects.toThrow(
+                "Monitoring service unavailable"
+            );
         });
 
         it("should handle stop monitoring for non-existent monitors", async () => {
@@ -271,18 +291,22 @@ describe("Sites Store Modules - Edge Cases and Error Scenarios", () => {
             });
 
             const { SiteService } = await import("../../../stores/sites/services");
-            
+
             // Test network timeout
             vi.mocked(SiteService.checkSiteNow).mockRejectedValueOnce(new Error("Network timeout"));
             await expect(monitoringActions.checkSiteNow("test-site", "monitor-1")).rejects.toThrow("Network timeout");
 
             // Test malformed response
             vi.mocked(SiteService.checkSiteNow).mockRejectedValueOnce(new Error("Malformed response"));
-            await expect(monitoringActions.checkSiteNow("test-site", "monitor-1")).rejects.toThrow("Malformed response");
+            await expect(monitoringActions.checkSiteNow("test-site", "monitor-1")).rejects.toThrow(
+                "Malformed response"
+            );
 
             // Test service unavailable
             vi.mocked(SiteService.checkSiteNow).mockRejectedValueOnce(new Error("Service unavailable"));
-            await expect(monitoringActions.checkSiteNow("test-site", "monitor-1")).rejects.toThrow("Service unavailable");
+            await expect(monitoringActions.checkSiteNow("test-site", "monitor-1")).rejects.toThrow(
+                "Service unavailable"
+            );
         });
     });
 
@@ -341,7 +365,7 @@ describe("Sites Store Modules - Edge Cases and Error Scenarios", () => {
                 name: "Circular Site",
                 monitors: [],
             };
-            
+
             // Create circular reference
             circularSite.self = circularSite;
             circularSite.monitors = [

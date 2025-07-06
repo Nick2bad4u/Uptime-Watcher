@@ -292,15 +292,15 @@ describe("StatusUpdateHandler", () => {
     describe("Error Handling", () => {
         it("should throw error when electronAPI.events.onStatusUpdate is not available", async () => {
             const manager = new StatusUpdateManager();
-            
+
             // Mock window.electronAPI to be available but without onStatusUpdate
             (global.window as unknown) = {
                 electronAPI: {
                     events: {
-                        removeAllListeners: vi.fn()
+                        removeAllListeners: vi.fn(),
                         // Missing onStatusUpdate
-                    }
-                }
+                    },
+                },
             };
 
             const mockCallback = vi.fn();
@@ -319,14 +319,14 @@ describe("StatusUpdateHandler", () => {
 
         it("should handle unsubscribe when removeAllListeners is not available", () => {
             const manager = new StatusUpdateManager();
-            
+
             // Subscribe first
             (global.window as unknown) = {
                 electronAPI: {
                     events: {
-                        onStatusUpdate: vi.fn()
-                    }
-                }
+                        onStatusUpdate: vi.fn(),
+                    },
+                },
             };
 
             const mockCallback = vi.fn();
@@ -337,8 +337,8 @@ describe("StatusUpdateHandler", () => {
                 electronAPI: {
                     events: {
                         // Missing removeAllListeners
-                    }
-                }
+                    },
+                },
             };
 
             // Should not throw even when removeAllListeners is not available
@@ -348,14 +348,14 @@ describe("StatusUpdateHandler", () => {
 
         it("should handle unsubscribe when electronAPI.events is not available", () => {
             const manager = new StatusUpdateManager();
-            
+
             // Subscribe first
             (global.window as unknown) = {
                 electronAPI: {
                     events: {
-                        onStatusUpdate: vi.fn()
-                    }
-                }
+                        onStatusUpdate: vi.fn(),
+                    },
+                },
             };
 
             const mockCallback = vi.fn();
@@ -365,7 +365,7 @@ describe("StatusUpdateHandler", () => {
             (global.window as unknown) = {
                 electronAPI: {
                     // Missing events
-                }
+                },
             };
 
             // Should not throw even when events is not available
@@ -375,14 +375,14 @@ describe("StatusUpdateHandler", () => {
 
         it("should handle unsubscribe when electronAPI is not available", () => {
             const manager = new StatusUpdateManager();
-            
+
             // Subscribe first
             (global.window as unknown) = {
                 electronAPI: {
                     events: {
-                        onStatusUpdate: vi.fn()
-                    }
-                }
+                        onStatusUpdate: vi.fn(),
+                    },
+                },
             };
 
             const mockCallback = vi.fn();

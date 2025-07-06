@@ -97,7 +97,7 @@ export default [
             "coverage/**",
             ".agentic-tools*",
             "_ZENTASKS*",
-            "_ZENTANKS*"
+            "_ZENTANKS*",
         ],
     },
 
@@ -299,13 +299,7 @@ export default [
     // TypeScript files - Source (renderer) files
     {
         files: ["src/**/*.ts", "src/**/*.tsx", "vitest*.ts", "vite.config.ts"],
-        ignores: [
-            "tests/**",
-            "**/__tests__/**",
-            "**/*.test.{ts,tsx}",
-            "**/*.spec.{ts,tsx}",
-            "src/test/**/*.ts",
-        ],
+        ignores: ["tests/**", "**/__tests__/**", "**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}", "src/test/**/*.ts"],
         languageOptions: {
             parser: tseslint.parser,
             parserOptions: {
@@ -454,11 +448,7 @@ export default [
     // TypeScript files - Electron (main process) files
     {
         files: ["electron/**/*.ts", "electron/**/*.tsx", "vitest.electron.config.ts"],
-        ignores: [
-            "electron/test/**/*.ts",
-            "electron/**/*.test.{ts,tsx}",
-            "electron/**/*.spec.{ts,tsx}",
-        ],
+        ignores: ["electron/test/**/*.ts", "electron/**/*.test.{ts,tsx}", "electron/**/*.spec.{ts,tsx}"],
         languageOptions: {
             parser: tseslint.parser,
             parserOptions: {
@@ -583,10 +573,10 @@ export default [
             "regexp/no-empty-alternative": "warn",
             // tsdoc
             "tsdoc/syntax": "warn",
-            
+
             // Disable React-specific rules for electron (Node.js) files
             "react/jsx-uses-react": "off",
-            "react/react-in-jsx-scope": "off", 
+            "react/react-in-jsx-scope": "off",
             "react/prop-types": "off",
             "react/jsx-boolean-value": "off",
             "react/self-closing-comp": "off",

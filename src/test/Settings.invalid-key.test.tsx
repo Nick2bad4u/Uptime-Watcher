@@ -1,7 +1,7 @@
 /**
  * Additional Settings component tests to achieve 100% coverage
  * Focus on missing lines 87-89 (invalid settings key warning)
- * 
+ *
  * This test uses a creative approach to trigger the untested path by
  * temporarily modifying the component's allowedKeys to force the invalid key condition.
  */
@@ -230,46 +230,46 @@ describe("Settings Component - Invalid Key Coverage", () => {
         // We need to access the component instance to call handleSettingChange with invalid key
         // Since the method is private, we'll need to trigger it through reflection or by
         // modifying the component to expose it for testing
-        
+
         // Get the Settings component from the render result
-        const settingsComponent = screen.getByRole("button", { name: /save changes/i }).closest('.modal-container');
+        const settingsComponent = screen.getByRole("button", { name: /save changes/i }).closest(".modal-container");
         expect(settingsComponent).toBeTruthy();
 
         // We need to simulate the internal handleSettingChange call
         // Since we can't directly access the method, we'll test it by creating a scenario
         // where the method would be called with an invalid key
-        
+
         // The key insight is that the component's handleSettingChange method is called
         // from the onChange handlers. We need to modify the component to allow testing
         // of invalid keys, or use a different approach.
-        
+
         // For now, let's test by directly calling the logic that would be in handleSettingChange
         await act(async () => {
             const allowedKeys = [
                 "notifications",
-                "autoStart", 
+                "autoStart",
                 "minimizeToTray",
                 "theme",
                 "soundAlerts",
                 "historyLimit",
             ];
-            
+
             const invalidKey = "invalidKey";
-            
+
             // Simulate the exact logic from handleSettingChange (lines 86-89)
             if (!allowedKeys.includes(invalidKey as keyof typeof mockUseStore.settings)) {
                 logger.warn("Attempted to update invalid settings key", invalidKey);
                 // The return statement would prevent updateSettings from being called
                 return;
             }
-            
+
             // This should not be reached
             mockUpdateSettings({ [invalidKey]: true });
         });
 
         // Verify the warning was logged (line 87)
         expect(logger.warn).toHaveBeenCalledWith("Attempted to update invalid settings key", "invalidKey");
-        
+
         // Verify updateSettings was NOT called (because of return on line 88)
         expect(mockUpdateSettings).not.toHaveBeenCalled();
     });
@@ -281,20 +281,20 @@ describe("Settings Component - Invalid Key Coverage", () => {
             const allowedKeys = [
                 "notifications",
                 "autoStart",
-                "minimizeToTray", 
+                "minimizeToTray",
                 "theme",
                 "soundAlerts",
                 "historyLimit",
             ];
-            
+
             const validKey = "notifications";
-            
+
             // Simulate the logic from handleSettingChange with valid key
             if (!allowedKeys.includes(validKey as keyof typeof mockUseStore.settings)) {
                 logger.warn("Attempted to update invalid settings key", validKey);
                 return;
             }
-            
+
             // This should be reached for valid keys
             const oldValue = mockUseStore.settings[validKey as keyof typeof mockUseStore.settings];
             mockUpdateSettings({ [validKey]: !oldValue });
@@ -303,7 +303,7 @@ describe("Settings Component - Invalid Key Coverage", () => {
 
         // Verify no warning was logged for valid key
         expect(logger.warn).not.toHaveBeenCalled();
-        
+
         // Verify updateSettings WAS called for valid key
         expect(mockUpdateSettings).toHaveBeenCalledWith({ notifications: false });
         expect(logger.user.settingsChange).toHaveBeenCalledWith("notifications", true, false);

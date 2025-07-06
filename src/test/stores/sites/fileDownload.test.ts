@@ -461,8 +461,8 @@ describe("fileDownload", () => {
 
         it("should handle appendChild error with fallback failure and proper error handling", () => {
             const { mockAnchor, mockBody } = setupDownloadMocks();
-            const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-            const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+            const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+            const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
             // Mock appendChild to throw
             mockBody.appendChild.mockImplementation(() => {
@@ -483,14 +483,14 @@ describe("fileDownload", () => {
             // The actual behavior: warns about DOM manipulation failure, then throws "Click failed"
             expect(() => downloadFile(options)).toThrow("Click failed");
             expect(consoleSpy).toHaveBeenCalledWith("DOM manipulation failed, using fallback click", expect.any(Error));
-            
+
             consoleSpy.mockRestore();
             consoleErrorSpy.mockRestore();
         });
 
         it("should handle non-appendChild errors with proper logging", () => {
             const { mockBody } = setupDownloadMocks();
-            const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
 
             // Mock appendChild to throw a different error
             mockBody.appendChild.mockImplementation(() => {
@@ -506,7 +506,7 @@ describe("fileDownload", () => {
             // For DOM manipulation errors, the function should warn and continue with fallback
             expect(() => downloadFile(options)).not.toThrow();
             expect(consoleSpy).toHaveBeenCalledWith("DOM manipulation failed, using fallback click", expect.any(Error));
-            
+
             consoleSpy.mockRestore();
         });
 

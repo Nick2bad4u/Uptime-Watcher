@@ -40,19 +40,19 @@ describe("intervalManager", () => {
     describe("setDefaultMonitorIntervals", () => {
         it("should set default intervals for monitors without checkInterval", async () => {
             const monitors: Monitor[] = [
-                createTestMonitor({ 
-                    id: "1", 
-                    url: "https://example.com"
+                createTestMonitor({
+                    id: "1",
+                    url: "https://example.com",
                     // No checkInterval
                 }),
-                createTestMonitor({ 
-                    id: "2", 
-                    url: "https://test.com", 
-                    checkInterval: 10000 // Already has interval
+                createTestMonitor({
+                    id: "2",
+                    url: "https://test.com",
+                    checkInterval: 10000, // Already has interval
                 }),
-                createTestMonitor({ 
-                    id: "3", 
-                    url: "https://another.com"
+                createTestMonitor({
+                    id: "3",
+                    url: "https://another.com",
                     // No checkInterval
                 }),
             ];
@@ -113,18 +113,18 @@ describe("intervalManager", () => {
 
         it("should skip monitors without id", async () => {
             const monitors: Monitor[] = [
-                createTestMonitor({ 
-                    id: "1", 
-                    url: "https://example.com"
+                createTestMonitor({
+                    id: "1",
+                    url: "https://example.com",
                     // No checkInterval
                 }),
-                createTestMonitor({ 
+                createTestMonitor({
                     id: "", // Empty id
-                    url: "https://test.com"
+                    url: "https://test.com",
                 }),
-                createTestMonitor({ 
-                    id: "3", 
-                    url: "https://another.com"
+                createTestMonitor({
+                    id: "3",
+                    url: "https://another.com",
                     // No checkInterval
                 }),
             ];
@@ -151,15 +151,15 @@ describe("intervalManager", () => {
 
         it("should skip monitors that already have checkInterval set", async () => {
             const monitors: Monitor[] = [
-                createTestMonitor({ 
-                    id: "1", 
-                    url: "https://example.com", 
-                    checkInterval: 5000 
+                createTestMonitor({
+                    id: "1",
+                    url: "https://example.com",
+                    checkInterval: 5000,
                 }),
-                createTestMonitor({ 
-                    id: "2", 
-                    url: "https://test.com", 
-                    checkInterval: 10000 
+                createTestMonitor({
+                    id: "2",
+                    url: "https://test.com",
+                    checkInterval: 10000,
                 }),
             ];
 
@@ -188,14 +188,14 @@ describe("intervalManager", () => {
 
         it("should handle monitors with checkInterval of 0", async () => {
             const monitors: Monitor[] = [
-                createTestMonitor({ 
-                    id: "1", 
-                    url: "https://example.com", 
-                    checkInterval: 0 
+                createTestMonitor({
+                    id: "1",
+                    url: "https://example.com",
+                    checkInterval: 0,
                 }),
-                createTestMonitor({ 
-                    id: "2", 
-                    url: "https://test.com"
+                createTestMonitor({
+                    id: "2",
+                    url: "https://test.com",
                     // No checkInterval
                 }),
             ];
@@ -222,13 +222,13 @@ describe("intervalManager", () => {
 
         it("should handle update callback errors", async () => {
             const monitors: Monitor[] = [
-                createTestMonitor({ 
-                    id: "1", 
-                    url: "https://example.com"
+                createTestMonitor({
+                    id: "1",
+                    url: "https://example.com",
                 }),
-                createTestMonitor({ 
-                    id: "2", 
-                    url: "https://test.com"
+                createTestMonitor({
+                    id: "2",
+                    url: "https://test.com",
                 }),
             ];
 
@@ -243,8 +243,9 @@ describe("intervalManager", () => {
                 .mockResolvedValueOnce(undefined)
                 .mockRejectedValueOnce(new Error("Database update failed"));
 
-            await expect(setDefaultMonitorIntervals(site, defaultInterval, mockUpdateMonitorCallback, mockLogger))
-                .rejects.toThrow("Database update failed");
+            await expect(
+                setDefaultMonitorIntervals(site, defaultInterval, mockUpdateMonitorCallback, mockLogger)
+            ).rejects.toThrow("Database update failed");
 
             expect(mockUpdateMonitorCallback).toHaveBeenCalledTimes(2);
             expect(monitors[0].checkInterval).toBe(20000); // First one should be set
@@ -253,9 +254,9 @@ describe("intervalManager", () => {
 
         it("should handle different default interval values", async () => {
             const monitors: Monitor[] = [
-                createTestMonitor({ 
-                    id: "1", 
-                    url: "https://example.com"
+                createTestMonitor({
+                    id: "1",
+                    url: "https://example.com",
                 }),
             ];
 
@@ -279,9 +280,9 @@ describe("intervalManager", () => {
 
         it("should handle empty string site identifier", async () => {
             const monitors: Monitor[] = [
-                createTestMonitor({ 
-                    id: "1", 
-                    url: "https://example.com"
+                createTestMonitor({
+                    id: "1",
+                    url: "https://example.com",
                 }),
             ];
 
@@ -306,9 +307,9 @@ describe("intervalManager", () => {
 
         it("should handle monitors with string ids", async () => {
             const monitors: Monitor[] = [
-                createTestMonitor({ 
-                    id: "123", 
-                    url: "https://example.com"
+                createTestMonitor({
+                    id: "123",
+                    url: "https://example.com",
                 }),
             ];
 

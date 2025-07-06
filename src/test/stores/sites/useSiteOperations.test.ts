@@ -26,18 +26,23 @@ vi.mock("../../../stores/sites/services", () => ({
 
 vi.mock("../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
-    withErrorHandling: vi.fn(async (fn: () => Promise<unknown>, store: { setLoading: (loading: boolean) => void; clearError: () => void; setError: (error: string) => void }) => {
-        store.setLoading(true);
-        store.clearError();
-        try {
-            return await fn();
-        } catch (error) {
-            store.setError(error instanceof Error ? error.message : String(error));
-            throw error;
-        } finally {
-            store.setLoading(false);
+    withErrorHandling: vi.fn(
+        async (
+            fn: () => Promise<unknown>,
+            store: { setLoading: (loading: boolean) => void; clearError: () => void; setError: (error: string) => void }
+        ) => {
+            store.setLoading(true);
+            store.clearError();
+            try {
+                return await fn();
+            } catch (error) {
+                store.setError(error instanceof Error ? error.message : String(error));
+                throw error;
+            } finally {
+                store.setLoading(false);
+            }
         }
-    }),
+    ),
 }));
 
 // Mock dynamic imports
@@ -96,7 +101,7 @@ describe("useSiteOperations", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        
+
         // Setup mock dependencies
         mockDependencies = {
             getSites: vi.fn(() => [mockSite]),
@@ -133,7 +138,7 @@ describe("useSiteOperations", () => {
                 name: "New Site",
             };
             const createdSite = { ...siteData, monitors: [mockMonitor] };
-            
+
             vi.mocked(SiteService.addSite).mockResolvedValue(createdSite);
             vi.mocked(normalizeMonitor).mockImplementation((monitor: Partial<Monitor>) => monitor as Monitor);
 
@@ -160,7 +165,7 @@ describe("useSiteOperations", () => {
                 monitors: [mockMonitor],
             };
             const createdSite = { ...siteData };
-            
+
             vi.mocked(SiteService.addSite).mockResolvedValue(createdSite);
             vi.mocked(normalizeMonitor).mockImplementation((monitor: Partial<Monitor>) => monitor as Monitor);
 
@@ -205,7 +210,7 @@ describe("useSiteOperations", () => {
         it("should modify an existing site", async () => {
             const siteId = "example.com";
             const updates = { name: "Updated Site Name" };
-            
+
             vi.mocked(SiteService.updateSite).mockResolvedValue(undefined);
 
             await operations.modifySite(siteId, updates);
@@ -220,7 +225,7 @@ describe("useSiteOperations", () => {
         it("should add a monitor to an existing site", async () => {
             const siteId = "example.com";
             const newMonitor = { ...mockMonitor, id: "monitor-3" };
-            
+
             vi.mocked(SiteService.updateSite).mockResolvedValue(undefined);
 
             await operations.addMonitorToSite(siteId, newMonitor);
@@ -232,9 +237,9 @@ describe("useSiteOperations", () => {
                 ]),
             });
             expect(mockDependencies.syncSitesFromBackend).toHaveBeenCalledTimes(1);
-            expect(logStoreAction).toHaveBeenCalledWith("SitesStore", "addMonitorToSite", { 
-                monitor: newMonitor, 
-                siteId 
+            expect(logStoreAction).toHaveBeenCalledWith("SitesStore", "addMonitorToSite", {
+                monitor: newMonitor,
+                siteId,
             });
         });
     });
@@ -244,20 +249,20 @@ describe("useSiteOperations", () => {
             const siteId = "example.com";
             const monitorId = "monitor-1";
             const interval = 60000;
-            
+
             vi.mocked(SiteService.updateSite).mockResolvedValue(undefined);
 
             await operations.updateSiteCheckInterval(siteId, monitorId, interval);
 
             expect(updateMonitorInSite).toHaveBeenCalledWith(mockSite, monitorId, { checkInterval: interval });
-            expect(SiteService.updateSite).toHaveBeenCalledWith(siteId, { 
-                monitors: expect.any(Array) 
+            expect(SiteService.updateSite).toHaveBeenCalledWith(siteId, {
+                monitors: expect.any(Array),
             });
             expect(mockDependencies.syncSitesFromBackend).toHaveBeenCalledTimes(1);
-            expect(logStoreAction).toHaveBeenCalledWith("SitesStore", "updateSiteCheckInterval", { 
-                interval, 
-                monitorId, 
-                siteId 
+            expect(logStoreAction).toHaveBeenCalledWith("SitesStore", "updateSiteCheckInterval", {
+                interval,
+                monitorId,
+                siteId,
             });
         });
     });
@@ -267,20 +272,20 @@ describe("useSiteOperations", () => {
             const siteId = "example.com";
             const monitorId = "monitor-1";
             const retryAttempts = 5;
-            
+
             vi.mocked(SiteService.updateSite).mockResolvedValue(undefined);
 
             await operations.updateMonitorRetryAttempts(siteId, monitorId, retryAttempts);
 
             expect(updateMonitorInSite).toHaveBeenCalledWith(mockSite, monitorId, { retryAttempts });
-            expect(SiteService.updateSite).toHaveBeenCalledWith(siteId, { 
-                monitors: expect.any(Array) 
+            expect(SiteService.updateSite).toHaveBeenCalledWith(siteId, {
+                monitors: expect.any(Array),
             });
             expect(mockDependencies.syncSitesFromBackend).toHaveBeenCalledTimes(1);
-            expect(logStoreAction).toHaveBeenCalledWith("SitesStore", "updateMonitorRetryAttempts", { 
-                retryAttempts, 
-                monitorId, 
-                siteId 
+            expect(logStoreAction).toHaveBeenCalledWith("SitesStore", "updateMonitorRetryAttempts", {
+                retryAttempts,
+                monitorId,
+                siteId,
             });
         });
 
@@ -288,14 +293,14 @@ describe("useSiteOperations", () => {
             const siteId = "example.com";
             const monitorId = "monitor-1";
             const retryAttempts = undefined;
-            
+
             vi.mocked(SiteService.updateSite).mockResolvedValue(undefined);
 
             await operations.updateMonitorRetryAttempts(siteId, monitorId, retryAttempts);
 
             expect(updateMonitorInSite).toHaveBeenCalledWith(mockSite, monitorId, { retryAttempts: undefined });
-            expect(SiteService.updateSite).toHaveBeenCalledWith(siteId, { 
-                monitors: expect.any(Array) 
+            expect(SiteService.updateSite).toHaveBeenCalledWith(siteId, {
+                monitors: expect.any(Array),
             });
             expect(mockDependencies.syncSitesFromBackend).toHaveBeenCalledTimes(1);
         });
@@ -306,20 +311,20 @@ describe("useSiteOperations", () => {
             const siteId = "example.com";
             const monitorId = "monitor-1";
             const timeout = 15000;
-            
+
             vi.mocked(SiteService.updateSite).mockResolvedValue(undefined);
 
             await operations.updateMonitorTimeout(siteId, monitorId, timeout);
 
             expect(updateMonitorInSite).toHaveBeenCalledWith(mockSite, monitorId, { timeout });
-            expect(SiteService.updateSite).toHaveBeenCalledWith(siteId, { 
-                monitors: expect.any(Array) 
+            expect(SiteService.updateSite).toHaveBeenCalledWith(siteId, {
+                monitors: expect.any(Array),
             });
             expect(mockDependencies.syncSitesFromBackend).toHaveBeenCalledTimes(1);
-            expect(logStoreAction).toHaveBeenCalledWith("SitesStore", "updateMonitorTimeout", { 
-                timeout, 
-                monitorId, 
-                siteId 
+            expect(logStoreAction).toHaveBeenCalledWith("SitesStore", "updateMonitorTimeout", {
+                timeout,
+                monitorId,
+                siteId,
             });
         });
 
@@ -327,14 +332,14 @@ describe("useSiteOperations", () => {
             const siteId = "example.com";
             const monitorId = "monitor-1";
             const timeout = undefined;
-            
+
             vi.mocked(SiteService.updateSite).mockResolvedValue(undefined);
 
             await operations.updateMonitorTimeout(siteId, monitorId, timeout);
 
             expect(updateMonitorInSite).toHaveBeenCalledWith(mockSite, monitorId, { timeout: undefined });
-            expect(SiteService.updateSite).toHaveBeenCalledWith(siteId, { 
-                monitors: expect.any(Array) 
+            expect(SiteService.updateSite).toHaveBeenCalledWith(siteId, {
+                monitors: expect.any(Array),
             });
             expect(mockDependencies.syncSitesFromBackend).toHaveBeenCalledTimes(1);
         });
@@ -344,9 +349,9 @@ describe("useSiteOperations", () => {
         it("should download SQLite backup", async () => {
             const mockBuffer = new ArrayBuffer(1024);
             const mockBackupData = { buffer: mockBuffer, fileName: "backup.db" };
-            
+
             vi.mocked(SiteService.downloadSQLiteBackup).mockResolvedValue(mockBackupData);
-            
+
             // Mock handleSQLiteBackupDownload to call its function parameter
             vi.mocked(handleSQLiteBackupDownload).mockImplementation(async (fn) => {
                 await fn();

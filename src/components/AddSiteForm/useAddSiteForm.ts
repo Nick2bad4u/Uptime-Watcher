@@ -1,6 +1,7 @@
 /**
  * Custom hook for managing add site form state and validation.
  * Provides comprehensive form state management for creating new sites and adding monitors to existing sites.
+ * Supports real-time validation, automatic UUID generation, and error handling.
  */
 
 import { useState, useEffect, useCallback } from "react";

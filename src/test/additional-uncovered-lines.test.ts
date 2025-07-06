@@ -33,11 +33,13 @@ vi.mock("../services/logger", () => ({
 
 // Mock window and setTimeout
 interface MockWindow {
-    electronAPI?: {
-        sites?: {
-            getSites?: (() => void) | string;
-        };
-    } | undefined;
+    electronAPI?:
+        | {
+              sites?: {
+                  getSites?: (() => void) | string;
+              };
+          }
+        | undefined;
 }
 
 Object.defineProperty(global, "window", {
@@ -49,10 +51,10 @@ describe("Additional Uncovered Lines Tests", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         vi.useFakeTimers();
-        
+
         // Reset DOM state
         document.body.innerHTML = "";
-        
+
         // Mock global URL methods
         global.URL.createObjectURL = vi.fn(() => "blob:test");
         global.URL.revokeObjectURL = vi.fn();
@@ -100,7 +102,7 @@ describe("Additional Uncovered Lines Tests", () => {
 
             const buffer = new ArrayBuffer(8);
             const fileName = "test.txt";
-            
+
             await expect(async () => {
                 const { downloadFile } = await import("../stores/sites/utils/fileDownload");
                 downloadFile({ buffer, fileName });
@@ -124,10 +126,10 @@ describe("Additional Uncovered Lines Tests", () => {
 
             const buffer = new ArrayBuffer(8);
             const fileName = "test.txt";
-            
+
             const { downloadFile } = await import("../stores/sites/utils/fileDownload");
             downloadFile({ buffer, fileName });
-            
+
             expect(mockClick).toHaveBeenCalled();
         });
 
@@ -142,7 +144,7 @@ describe("Additional Uncovered Lines Tests", () => {
 
             const buffer = new ArrayBuffer(8);
             const fileName = "test.txt";
-            
+
             await expect(async () => {
                 const { downloadFile } = await import("../stores/sites/utils/fileDownload");
                 downloadFile({ buffer, fileName });
@@ -207,7 +209,7 @@ describe("Additional Uncovered Lines Tests", () => {
             });
 
             await waitForElectronAPI();
-            
+
             expect(mockSetTimeout).toHaveBeenCalled();
             expect(attemptCount).toBeGreaterThan(0);
         });

@@ -146,15 +146,17 @@ describe("historyLimitManager", () => {
 
             mockSettingsRepository.set = vi.fn().mockRejectedValue(settingsError);
 
-            await expect(setHistoryLimit({
-                limit,
-                repositories: {
-                    history: mockHistoryRepository,
-                    settings: mockSettingsRepository,
-                },
-                setHistoryLimit: setHistoryLimitCallback,
-                logger: mockLogger,
-            })).rejects.toThrow(settingsError);
+            await expect(
+                setHistoryLimit({
+                    limit,
+                    repositories: {
+                        history: mockHistoryRepository,
+                        settings: mockSettingsRepository,
+                    },
+                    setHistoryLimit: setHistoryLimitCallback,
+                    logger: mockLogger,
+                })
+            ).rejects.toThrow(settingsError);
 
             expect(setHistoryLimitCallback).toHaveBeenCalledWith(limit);
             expect(mockSettingsRepository.set).toHaveBeenCalledWith("historyLimit", limit.toString());
@@ -167,15 +169,17 @@ describe("historyLimitManager", () => {
 
             mockHistoryRepository.pruneAllHistory = vi.fn().mockRejectedValue(historyError);
 
-            await expect(setHistoryLimit({
-                limit,
-                repositories: {
-                    history: mockHistoryRepository,
-                    settings: mockSettingsRepository,
-                },
-                setHistoryLimit: setHistoryLimitCallback,
-                logger: mockLogger,
-            })).rejects.toThrow(historyError);
+            await expect(
+                setHistoryLimit({
+                    limit,
+                    repositories: {
+                        history: mockHistoryRepository,
+                        settings: mockSettingsRepository,
+                    },
+                    setHistoryLimit: setHistoryLimitCallback,
+                    logger: mockLogger,
+                })
+            ).rejects.toThrow(historyError);
 
             expect(setHistoryLimitCallback).toHaveBeenCalledWith(limit);
             expect(mockSettingsRepository.set).toHaveBeenCalledWith("historyLimit", limit.toString());

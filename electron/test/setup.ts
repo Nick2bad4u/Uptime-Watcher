@@ -184,7 +184,7 @@ vi.mock("../services/monitoring/MonitorScheduler", () => ({
                     // Stop all monitors for the site
                     const keysToDelete = [];
                     for (const key of Array.from(this.intervals.keys())) {
-                        if (typeof key === 'string' && key.startsWith(`${siteId}|`)) {
+                        if (typeof key === "string" && key.startsWith(`${siteId}|`)) {
                             keysToDelete.push(key);
                         }
                     }

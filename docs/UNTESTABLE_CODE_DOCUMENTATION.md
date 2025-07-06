@@ -1,13 +1,15 @@
 <!-- markdownlint-disable -->
 
-/**
- * Documentation of code that is difficult or impossible to test
- * This file explains why certain code paths are not covered by tests
- */
+/\*\*
+
+- Documentation of code that is difficult or impossible to test
+- This file explains why certain code paths are not covered by tests
+  \*/
 
 # Untestable Code Documentation
 
 ## Overview
+
 This document explains code that is intentionally not tested due to technical limitations, external dependencies, or extremely low probability edge cases.
 
 ## Final Coverage Achievement: 99.5%
@@ -25,15 +27,17 @@ This represents extremely high coverage with only a few remaining uncovered line
 **Location**: `src/components/Settings/Settings.tsx:87-89`
 
 **Code**:
+
 ```typescript
 const validKeys = ["theme", "historyLimit"];
 if (!validKeys.includes(key)) {
-    logger.warn(`Invalid settings key: ${key}`);
-    return;
+ logger.warn(`Invalid settings key: ${key}`);
+ return;
 }
 ```
 
 **Reason for not testing**: This is a defensive programming guard against invalid input. Testing it would require:
+
 1. Deliberately calling the function with invalid data that should never occur in normal operation
 2. Mocking internal function calls that are not exposed publicly
 3. Creating artificial scenarios that bypass TypeScript type checking
@@ -45,6 +49,7 @@ if (!validKeys.includes(key)) {
 **Location**: `src/stores/sites/utils/fileDownload.ts:71-78`
 
 **Code**:
+
 ```typescript
 } catch (error) {
     logger.error("Failed to download file:", error);
@@ -62,14 +67,15 @@ if (!validKeys.includes(key)) {
 **Location**: `src/components/SiteDetails/ScreenshotThumbnail.tsx:60-61, 67-68`
 
 **Code**:
+
 ```typescript
 if (hoverTimeoutRef.current) {
-    clearTimeout(hoverTimeoutRef.current);
-    hoverTimeoutRef.current = undefined;
+ clearTimeout(hoverTimeoutRef.current);
+ hoverTimeoutRef.current = undefined;
 }
 // ... later ...
 if (currentPortal?.parentNode) {
-    currentPortal.parentNode.removeChild(currentPortal);
+ currentPortal.parentNode.removeChild(currentPortal);
 }
 ```
 
@@ -80,10 +86,11 @@ if (currentPortal?.parentNode) {
 **Location**: `src/hooks/site/useSiteDetails.ts:250`
 
 **Code**:
+
 ```typescript
 const currentTimeoutInSeconds = selectedMonitor?.timeout
-    ? selectedMonitor.timeout / 1000
-    : DEFAULT_REQUEST_TIMEOUT_SECONDS;
+ ? selectedMonitor.timeout / 1000
+ : DEFAULT_REQUEST_TIMEOUT_SECONDS;
 ```
 
 **Reason for not testing**: This is a simple ternary operation that handles an edge case where monitor timeout is undefined. The data layer should ensure timeout is always defined.
@@ -93,14 +100,16 @@ const currentTimeoutInSeconds = selectedMonitor?.timeout
 **Location**: `src/stores/sites/utils/fileDownload.ts:61-63, 71-82`
 
 **Code**:
+
 ```typescript
-if (error instanceof Error && (
-    error.message.includes("Click failed") ||
-    error.message.includes("Failed to create object URL") ||
-    error.message.includes("Failed to create element") ||
-    error.message.includes("createElement not available")
-)) {
-    throw error;
+if (
+ error instanceof Error &&
+ (error.message.includes("Click failed") ||
+  error.message.includes("Failed to create object URL") ||
+  error.message.includes("Failed to create element") ||
+  error.message.includes("createElement not available"))
+) {
+ throw error;
 }
 // ... fallback logic ...
 ```
@@ -112,16 +121,17 @@ if (error instanceof Error && (
 **Location**: `src/stores/sites/utils/statusUpdateHandler.ts:64-66, 73, 97-99`
 
 **Code**:
+
 ```typescript
 if (!siteFound) {
-    if (process.env.NODE_ENV === "development") {
-        console.warn(`Site ${update.site.identifier} not found in store, triggering full sync`);
-    }
-    await fullSyncFromBackend().catch((error) => {
-        if (process.env.NODE_ENV === "development") {
-            console.error("Fallback full sync failed:", error);
-        }
-    });
+ if (process.env.NODE_ENV === "development") {
+  console.warn(`Site ${update.site.identifier} not found in store, triggering full sync`);
+ }
+ await fullSyncFromBackend().catch((error) => {
+  if (process.env.NODE_ENV === "development") {
+   console.error("Fallback full sync failed:", error);
+  }
+ });
 }
 ```
 
@@ -132,6 +142,7 @@ if (!siteFound) {
 **Location**: `src/hooks/site/useSiteStats.ts:47`
 
 **Code**:
+
 ```typescript
 // Edge case handling for sites with no monitors
 if (!monitors || monitors.length === 0) {
@@ -153,6 +164,7 @@ Most of the untestable code falls into these categories:
 ## Current Coverage Status
 
 Based on the latest coverage reports:
+
 - **Overall Coverage**: 99.36%+
 - **Untestable Lines**: ~20-30 lines across 7 files
 - **Testable but Complex**: Most remaining uncovered lines could be tested with significant effort, but the cost/benefit ratio is poor

@@ -196,7 +196,8 @@ describe("Site Hooks Index Module", () => {
         it("should support named imports pattern", () => {
             // Test destructuring assignment (common import pattern)
             expect(() => {
-                const { useSiteStats, useSiteMonitor, useSiteActions, useSite, useSiteAnalytics, useSiteDetails } = SiteHooksIndex;
+                const { useSiteStats, useSiteMonitor, useSiteActions, useSite, useSiteAnalytics, useSiteDetails } =
+                    SiteHooksIndex;
                 expect(useSiteStats).toBeDefined();
                 expect(useSiteMonitor).toBeDefined();
                 expect(useSiteActions).toBeDefined();
@@ -256,7 +257,14 @@ describe("Site Hooks Index Module", () => {
             const hasAnalyticsHooks = "useSiteAnalytics" in SiteHooksIndex;
             const hasDetailsHooks = "useSiteDetails" in SiteHooksIndex;
 
-            expect(hasStatsHooks && hasMonitorHooks && hasActionHooks && hasSiteHooks && hasAnalyticsHooks && hasDetailsHooks).toBe(true);
+            expect(
+                hasStatsHooks &&
+                    hasMonitorHooks &&
+                    hasActionHooks &&
+                    hasSiteHooks &&
+                    hasAnalyticsHooks &&
+                    hasDetailsHooks
+            ).toBe(true);
         });
     });
 

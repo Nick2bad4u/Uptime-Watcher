@@ -91,9 +91,7 @@ describe("SiteRepositoryService", () => {
                 history: [],
                 url: "https://example.com",
             };
-            const history: StatusHistory[] = [
-                { timestamp: Date.now(), status: "up", responseTime: 100 },
-            ];
+            const history: StatusHistory[] = [{ timestamp: Date.now(), status: "up", responseTime: 100 }];
 
             vi.mocked(mockSiteRepository.findAll).mockResolvedValue([siteData]);
             vi.mocked(mockMonitorRepository.findBySiteIdentifier).mockResolvedValue([monitor]);
@@ -125,10 +123,7 @@ describe("SiteRepositoryService", () => {
             vi.mocked(mockSiteRepository.findAll).mockRejectedValue(error);
 
             await expect(siteRepositoryService.getSitesFromDatabase()).rejects.toThrow(SiteLoadingError);
-            expect(mockLogger.error).toHaveBeenCalledWith(
-                "Failed to fetch sites from database: Database error",
-                error
-            );
+            expect(mockLogger.error).toHaveBeenCalledWith("Failed to fetch sites from database: Database error", error);
         });
 
         it("should handle sites without names", async () => {
@@ -335,9 +330,9 @@ describe("SiteRepositoryService", () => {
                 stopMonitoring: vi.fn(),
             };
 
-            await expect(siteRepositoryService.startMonitoringForSites(siteCache, mockMonitoringConfig)).rejects.toThrow(
-                SiteLoadingError
-            );
+            await expect(
+                siteRepositoryService.startMonitoringForSites(siteCache, mockMonitoringConfig)
+            ).rejects.toThrow(SiteLoadingError);
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Failed to start monitoring for sites: Monitoring error",
                 error
@@ -379,7 +374,10 @@ describe("SiteLoadingOrchestrator", () => {
 
             expect(mockSiteRepositoryService.loadSitesIntoCache).toHaveBeenCalledWith(siteCache);
             expect(mockSiteRepositoryService.applyHistoryLimitSetting).toHaveBeenCalledWith(mockMonitoringConfig);
-            expect(mockSiteRepositoryService.startMonitoringForSites).toHaveBeenCalledWith(siteCache, mockMonitoringConfig);
+            expect(mockSiteRepositoryService.startMonitoringForSites).toHaveBeenCalledWith(
+                siteCache,
+                mockMonitoringConfig
+            );
             expect(result).toEqual({
                 message: "Successfully loaded 0 sites and started monitoring",
                 sitesLoaded: 0,
