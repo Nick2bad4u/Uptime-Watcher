@@ -26,9 +26,6 @@ import {
 export class MonitorRepository {
     private readonly databaseService: DatabaseService;
 
-    private static readonly GET_LATEST_MONITOR_ID_SQL =
-        "SELECT id FROM monitors WHERE site_identifier = ? ORDER BY id DESC LIMIT 1";
-
     constructor() {
         this.databaseService = DatabaseService.getInstance();
     }
@@ -38,23 +35,6 @@ export class MonitorRepository {
      */
     private getDb(): Database {
         return this.databaseService.getDatabase();
-    }
-
-    /**
-     * Insert a single monitor and return its new ID.
-     */
-    private insertSingleMonitor(siteIdentifier: string, monitor: Site["monitors"][0], db: Database): string {
-        const parameters = buildMonitorParameters(siteIdentifier, monitor);
-
-        db.run(
-            `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, timeout, retryAttempts, monitoring, status, responseTime, lastChecked) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            parameters
-        );
-
-        // Get the created monitor ID
-        const result = db.get(MonitorRepository.GET_LATEST_MONITOR_ID_SQL, [siteIdentifier]);
-
-        return result?.id ? String(result.id) : "";
     }
 
     /**
@@ -98,12 +78,17 @@ export class MonitorRepository {
 
     /**
      * Create a new monitor and return its ID.
+     * Fixed to use RETURNING clause to avoid race conditions.
      */
     public async create(siteIdentifier: string, monitor: Omit<Site["monitors"][0], "id">): Promise<string> {
         try {
             const db = this.getDb();
-            db.run(
-                `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, timeout, retryAttempts, monitoring, status, responseTime, lastChecked) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            
+            // Use RETURNING clause to get the ID directly from the insert
+            const result = db.get(
+                `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, timeout, retryAttempts, monitoring, status, responseTime, lastChecked) 
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
+                 RETURNING id`,
                 [
                     siteIdentifier,
                     monitor.type,
@@ -126,18 +111,13 @@ export class MonitorRepository {
                     // eslint-disable-next-line unicorn/no-null
                     monitor.lastChecked ? convertDateForDb(monitor.lastChecked) : null,
                 ]
-            );
+            ) as { id: number } | undefined;
 
-            // Fetch the ID of the last inserted monitor
-            const row = db.get(MonitorRepository.GET_LATEST_MONITOR_ID_SQL, [siteIdentifier]) as
-                | { id: number }
-                | undefined;
-
-            if (!row || typeof row.id !== "number") {
-                throw new Error(`Failed to fetch monitor id after insert for site ${siteIdentifier}`);
+            if (!result || typeof result.id !== "number") {
+                throw new Error(`Failed to create monitor for site ${siteIdentifier} - no ID returned`);
             }
 
-            const newId = String(row.id);
+            const newId = String(result.id);
             if (isDev()) {
                 logger.debug(`[MonitorRepository] Created monitor with id: ${newId} for site: ${siteIdentifier}`);
             }
@@ -298,6 +278,7 @@ export class MonitorRepository {
     /**
      * Bulk create monitors (for import functionality).
      * Returns the created monitor with their new IDs.
+     * Fixed to use RETURNING clause to avoid race conditions.
      */
     public async bulkCreate(
         siteIdentifier: string,
@@ -308,12 +289,18 @@ export class MonitorRepository {
             const createdMonitors: Array<Site["monitors"][0]> = [];
 
             for (const monitor of monitors) {
-                const newId = this.insertSingleMonitor(siteIdentifier, monitor, db);
+                // Use RETURNING clause to get the ID directly from the insert
+                const result = db.get(
+                    `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, timeout, retryAttempts, monitoring, status, responseTime, lastChecked) 
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
+                     RETURNING id`,
+                    buildMonitorParameters(siteIdentifier, monitor)
+                ) as { id: number } | undefined;
 
-                if (newId) {
+                if (result && typeof result.id === "number") {
                     const newMonitor = {
                         ...monitor,
-                        id: newId,
+                        id: String(result.id),
                     };
                     createdMonitors.push(newMonitor);
                 }

@@ -121,6 +121,13 @@ describe("SiteManager", () => {
                 getLatestEntry: vi.fn(),
                 bulkInsert: vi.fn(),
             } as Partial<SiteManagerDependencies["historyRepository"]> as SiteManagerDependencies["historyRepository"],
+            databaseService: {
+                initialize: vi.fn(),
+                getDatabase: vi.fn(),
+                executeTransaction: vi.fn(),
+                downloadBackup: vi.fn(),
+                close: vi.fn(),
+            } as Partial<SiteManagerDependencies["databaseService"]> as SiteManagerDependencies["databaseService"],
         };
 
         siteManager = new SiteManager(mockRepositories);
@@ -190,6 +197,7 @@ describe("SiteManager", () => {
             expect(result).toEqual(mockSite);
             expect(mockConfigurationManager.validateSiteConfiguration).toHaveBeenCalledWith(mockSite);
             expect(mockCreateSite).toHaveBeenCalledWith({
+                databaseService: expect.any(Object),
                 repositories: {
                     monitor: expect.any(Object),
                     site: expect.any(Object),

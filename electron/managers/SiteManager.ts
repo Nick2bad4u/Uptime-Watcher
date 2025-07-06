@@ -6,7 +6,7 @@
 import { EventEmitter } from "events";
 
 import { SITE_EVENTS, SiteEventData } from "../events";
-import { SiteRepository, MonitorRepository, HistoryRepository } from "../services/database";
+import { SiteRepository, MonitorRepository, HistoryRepository, DatabaseService } from "../services/database";
 import { Site } from "../types";
 import {
     createSite,
@@ -23,6 +23,7 @@ export interface SiteManagerDependencies {
     siteRepository: SiteRepository;
     monitorRepository: MonitorRepository;
     historyRepository: HistoryRepository;
+    databaseService: DatabaseService;
     eventEmitter: EventEmitter;
 }
 
@@ -38,6 +39,7 @@ export class SiteManager extends EventEmitter {
     constructor(dependencies: SiteManagerDependencies) {
         super();
         this.repositories = {
+            databaseService: dependencies.databaseService,
             historyRepository: dependencies.historyRepository,
             monitorRepository: dependencies.monitorRepository,
             siteRepository: dependencies.siteRepository,
@@ -81,6 +83,7 @@ export class SiteManager extends EventEmitter {
 
         // Use the utility function to add site to database
         const site = await createSite({
+            databaseService: this.repositories.databaseService,
             repositories: {
                 monitor: this.repositories.monitorRepository,
                 site: this.repositories.siteRepository,
@@ -119,6 +122,7 @@ export class SiteManager extends EventEmitter {
      */
     public async removeSite(identifier: string): Promise<boolean> {
         const result = await deleteSite({
+            databaseService: this.repositories.databaseService,
             identifier,
             logger,
             repositories: {
@@ -145,6 +149,7 @@ export class SiteManager extends EventEmitter {
      */
     public async updateSite(identifier: string, updates: Partial<Site>): Promise<Site> {
         const dependencies: SiteUpdateDependencies = {
+            databaseService: this.repositories.databaseService,
             logger,
             monitorRepository: this.repositories.monitorRepository,
             siteRepository: this.repositories.siteRepository,

@@ -64,6 +64,7 @@ export class UptimeOrchestrator extends EventEmitter {
 
         // Initialize managers with event-driven dependencies
         this.siteManager = new SiteManager({
+            databaseService,
             eventEmitter: this,
             historyRepository,
             monitorRepository,

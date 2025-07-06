@@ -66,6 +66,28 @@ export class DatabaseService {
     }
 
     /**
+     * Execute a function within a database transaction.
+     * If the function throws an error, the transaction will be rolled back.
+     */
+    public async executeTransaction<T>(operation: (db: Database) => Promise<T>): Promise<T> {
+        const db = this.getDatabase();
+        
+        try {
+            db.run("BEGIN TRANSACTION");
+            const result = await operation(db);
+            db.run("COMMIT");
+            return result;
+        } catch (error) {
+            try {
+                db.run("ROLLBACK");
+            } catch (rollbackError) {
+                logger.error("[DatabaseService] Failed to rollback transaction", rollbackError);
+            }
+            throw error;
+        }
+    }
+
+    /**
      * Close the database connection.
      */
     public async close(): Promise<void> {

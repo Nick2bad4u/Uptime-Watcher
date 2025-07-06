@@ -85,7 +85,9 @@ export async function pruneHistoryForMonitor(db: Database, monitorId: string, li
 
         if (excess.length > 0) {
             const excessIds = excess.map((row) => row.id);
-            db.run(`DELETE FROM history WHERE id IN (${excessIds.join(",")})`);
+            // Use parameterized query to avoid SQL injection
+            const placeholders = excessIds.map(() => "?").join(",");
+            db.run(`DELETE FROM history WHERE id IN (${placeholders})`, excessIds);
             if (isDev()) {
                 logger.debug(
                     `[HistoryManipulation] Pruned ${excess.length} old history entries for monitor: ${monitorId}`
