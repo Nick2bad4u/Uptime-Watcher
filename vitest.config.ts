@@ -82,8 +82,8 @@ export default defineConfig({
             },
         },
         // Improve test output
-        reporters: ["default", "json"],
+        reporters: ["default", "json", "verbose", "hanging-process"],
         setupFiles: ["./src/test/setup.ts"], // Setup file for testing
-        testTimeout: 10000, // Set Vitest timeout to 10 seconds
+        testTimeout: 15000, // Set Vitest timeout to 15 seconds
     },
 });

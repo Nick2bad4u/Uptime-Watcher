@@ -254,6 +254,7 @@ describe("SiteManager", () => {
 
             expect(result).toBe(true);
             expect(mockDeleteSite).toHaveBeenCalledWith({
+                databaseService: expect.any(Object),
                 identifier: "test-site",
                 logger: mockLogger,
                 repositories: {

@@ -38,6 +38,7 @@ const mockDatabaseInstance = {
     close: vi.fn(() => Promise.resolve()),
     getDatabasePath: vi.fn(() => "/path/to/database.db"),
     downloadBackup: vi.fn(() => Promise.resolve({ buffer: Buffer.from("backup"), fileName: "backup.db" })),
+    executeTransaction: vi.fn(async (callback) => await callback()),
 };
 
 const mockDatabaseService = {

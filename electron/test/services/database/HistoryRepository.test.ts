@@ -30,10 +30,16 @@ describe("HistoryRepository", () => {
         vi.clearAllMocks();
 
         // Mock database methods
+        const mockStatement = {
+            run: vi.fn(),
+            finalize: vi.fn(),
+        };
+        
         mockDatabase = {
             all: vi.fn(),
             get: vi.fn(),
             run: vi.fn(),
+            prepare: vi.fn().mockReturnValue(mockStatement),
         };
 
         // Mock DatabaseService
@@ -233,7 +239,10 @@ describe("HistoryRepository", () => {
                 "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?",
                 ["monitor-1", 5]
             );
-            expect(mockDatabase.run).toHaveBeenCalledWith("DELETE FROM history WHERE id IN (1,2,3)");
+            expect(mockDatabase.run).toHaveBeenCalledWith(
+                "DELETE FROM history WHERE id IN (?,?,?)",
+                [1, 2, 3]
+            );
             expect(logger.debug).toHaveBeenCalledWith(
                 "[HistoryManipulation] Pruned 3 old history entries for monitor: monitor-1"
             );
@@ -429,17 +438,32 @@ describe("HistoryRepository", () => {
 
             await historyRepository.bulkInsert("monitor-1", historyEntries);
 
-            expect(mockDatabase.run).toHaveBeenCalledTimes(2);
-            expect(mockDatabase.run).toHaveBeenNthCalledWith(
+            // Should start transaction
+            expect(mockDatabase.run).toHaveBeenCalledWith("BEGIN TRANSACTION");
+            
+            // Should prepare statement
+            expect(mockDatabase.prepare).toHaveBeenCalledWith(
+                "INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)"
+            );
+            
+            // Should run statements for each entry
+            const mockStatement = mockDatabase.prepare.mock.results[0].value;
+            expect(mockStatement.run).toHaveBeenCalledTimes(2);
+            expect(mockStatement.run).toHaveBeenNthCalledWith(
                 1,
-                "INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)",
                 ["monitor-1", 1640995200000, "up", 150, "Success"]
             );
-            expect(mockDatabase.run).toHaveBeenNthCalledWith(
+            expect(mockStatement.run).toHaveBeenNthCalledWith(
                 2,
-                "INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)",
                 ["monitor-1", 1640995100000, "down", 0, null]
             );
+            
+            // Should commit transaction
+            expect(mockDatabase.run).toHaveBeenCalledWith("COMMIT");
+            
+            // Should finalize statement
+            expect(mockStatement.finalize).toHaveBeenCalled();
+            
             expect(logger.info).toHaveBeenCalledWith(
                 "[HistoryManipulation] Bulk inserted 2 history entries for monitor: monitor-1"
             );
@@ -456,10 +480,25 @@ describe("HistoryRepository", () => {
 
             await historyRepository.bulkInsert("monitor-1", historyEntries);
 
-            expect(mockDatabase.run).toHaveBeenCalledWith(
-                "INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)",
+            // Should start transaction
+            expect(mockDatabase.run).toHaveBeenCalledWith("BEGIN TRANSACTION");
+            
+            // Should prepare statement
+            expect(mockDatabase.prepare).toHaveBeenCalledWith(
+                "INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)"
+            );
+            
+            // Should run statement with corrected status (invalid -> down)
+            const mockStatement = mockDatabase.prepare.mock.results[0].value;
+            expect(mockStatement.run).toHaveBeenCalledWith(
                 ["monitor-1", 1640995200000, "down", 150, null]
             );
+            
+            // Should commit transaction
+            expect(mockDatabase.run).toHaveBeenCalledWith("COMMIT");
+            
+            // Should finalize statement
+            expect(mockStatement.finalize).toHaveBeenCalled();
         });
 
         it("should handle database errors", async () => {

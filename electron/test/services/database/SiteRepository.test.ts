@@ -40,10 +40,16 @@ vi.mock("../../../utils/logger", () => ({
     },
 }));
 
+const mockPreparedStatement = {
+    run: vi.fn(() => ({ changes: 1, lastInsertRowid: 1 })),
+    finalize: vi.fn(),
+};
+
 const mockDatabase = {
     all: vi.fn(),
     get: vi.fn(),
     run: vi.fn(() => ({ changes: 1 })),
+    prepare: vi.fn(() => mockPreparedStatement),
 };
 
 describe("SiteRepository", () => {
@@ -431,15 +437,16 @@ describe("SiteRepository", () => {
 
             await siteRepository.bulkInsert(sites);
 
-            expect(mockDatabase.run).toHaveBeenCalledTimes(2);
-            expect(mockDatabase.run).toHaveBeenNthCalledWith(1, "INSERT INTO sites (identifier, name) VALUES (?, ?)", [
-                "site1",
-                "Site 1",
-            ]);
-            expect(mockDatabase.run).toHaveBeenNthCalledWith(2, "INSERT INTO sites (identifier, name) VALUES (?, ?)", [
-                "site2",
-                "Site 2",
-            ]);
+            // Check transaction calls
+            expect(mockDatabase.run).toHaveBeenCalledWith("BEGIN TRANSACTION");
+            expect(mockDatabase.run).toHaveBeenCalledWith("COMMIT");
+            expect(mockDatabase.prepare).toHaveBeenCalledWith("INSERT INTO sites (identifier, name) VALUES (?, ?)");
+            
+            // Check prepared statement calls
+            expect(mockPreparedStatement.run).toHaveBeenCalledWith(["site1", "Site 1"]);
+            expect(mockPreparedStatement.run).toHaveBeenCalledWith(["site2", "Site 2"]);
+            expect(mockPreparedStatement.finalize).toHaveBeenCalled();
+            
             expect(mockLogger.info).toHaveBeenCalledWith("[SiteRepository] Bulk inserted 2 sites");
         });
 
@@ -448,10 +455,9 @@ describe("SiteRepository", () => {
 
             await siteRepository.bulkInsert(sites);
 
-            expect(mockDatabase.run).toHaveBeenCalledWith("INSERT INTO sites (identifier, name) VALUES (?, ?)", [
-                "site1",
-                null,
-            ]);
+            expect(mockDatabase.run).toHaveBeenCalledWith("BEGIN TRANSACTION");
+            expect(mockDatabase.run).toHaveBeenCalledWith("COMMIT");
+            expect(mockPreparedStatement.run).toHaveBeenCalledWith(["site1", null]);
         });
 
         it("should handle database errors", async () => {

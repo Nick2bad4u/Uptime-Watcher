@@ -29,10 +29,16 @@ describe("SettingsRepository", () => {
         vi.clearAllMocks();
 
         // Mock database methods
+        const mockStatement = {
+            run: vi.fn(),
+            finalize: vi.fn(),
+        };
+        
         mockDatabase = {
             all: vi.fn(),
             get: vi.fn(),
             run: vi.fn(),
+            prepare: vi.fn().mockReturnValue(mockStatement),
         };
 
         // Mock DatabaseService
@@ -263,30 +269,34 @@ describe("SettingsRepository", () => {
 
             await settingsRepository.bulkInsert(settings);
 
-            expect(mockDatabase.run).toHaveBeenCalledTimes(3);
-            expect(mockDatabase.run).toHaveBeenNthCalledWith(
-                1,
-                "INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)",
-                ["key1", "value1"]
+            // Should start transaction
+            expect(mockDatabase.run).toHaveBeenCalledWith("BEGIN TRANSACTION");
+            
+            // Should prepare statement
+            expect(mockDatabase.prepare).toHaveBeenCalledWith(
+                "INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)"
             );
-            expect(mockDatabase.run).toHaveBeenNthCalledWith(
-                2,
-                "INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)",
-                ["key2", "value2"]
-            );
-            expect(mockDatabase.run).toHaveBeenNthCalledWith(
-                3,
-                "INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)",
-                ["key3", "value3"]
-            );
-            expect(logger.info).toHaveBeenCalledWith("[SettingsRepository] Bulk inserted 3 settings");
+            
+            // Should run statements for each setting
+            const mockStatement = mockDatabase.prepare.mock.results[0].value;
+            expect(mockStatement.run).toHaveBeenCalledTimes(3);
+            expect(mockStatement.run).toHaveBeenNthCalledWith(1, ["key1", "value1"]);
+            expect(mockStatement.run).toHaveBeenNthCalledWith(2, ["key2", "value2"]);
+            expect(mockStatement.run).toHaveBeenNthCalledWith(3, ["key3", "value3"]);
+            
+            // Should commit transaction
+            expect(mockDatabase.run).toHaveBeenCalledWith("COMMIT");
+            
+            // Should finalize statement
+            expect(mockStatement.finalize).toHaveBeenCalled();
         });
 
         it("should handle empty settings object", async () => {
             await settingsRepository.bulkInsert({});
 
             expect(mockDatabase.run).not.toHaveBeenCalled();
-            expect(logger.info).toHaveBeenCalledWith("[SettingsRepository] Bulk inserted 0 settings");
+            expect(mockDatabase.prepare).not.toHaveBeenCalled();
+            expect(logger.info).not.toHaveBeenCalled();
         });
 
         it("should convert values to strings", async () => {
@@ -299,22 +309,27 @@ describe("SettingsRepository", () => {
 
             await settingsRepository.bulkInsert(settings as any);
 
-            expect(mockDatabase.run).toHaveBeenCalledWith(
-                "INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)",
-                ["string", "text"]
+            // Should start transaction
+            expect(mockDatabase.run).toHaveBeenCalledWith("BEGIN TRANSACTION");
+            
+            // Should prepare statement
+            expect(mockDatabase.prepare).toHaveBeenCalledWith(
+                "INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)"
             );
-            expect(mockDatabase.run).toHaveBeenCalledWith(
-                "INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)",
-                ["number", "42"]
-            );
-            expect(mockDatabase.run).toHaveBeenCalledWith(
-                "INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)",
-                ["boolean", "true"]
-            );
-            expect(mockDatabase.run).toHaveBeenCalledWith(
-                "INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)",
-                ["object", "[object Object]"]
-            );
+            
+            // Should run statements for each setting (order may vary)
+            const mockStatement = mockDatabase.prepare.mock.results[0].value;
+            expect(mockStatement.run).toHaveBeenCalledTimes(4);
+            expect(mockStatement.run).toHaveBeenCalledWith(["string", "text"]);
+            expect(mockStatement.run).toHaveBeenCalledWith(["number", "42"]);
+            expect(mockStatement.run).toHaveBeenCalledWith(["boolean", "true"]);
+            expect(mockStatement.run).toHaveBeenCalledWith(["object", "[object Object]"]);
+            
+            // Should commit transaction
+            expect(mockDatabase.run).toHaveBeenCalledWith("COMMIT");
+            
+            // Should finalize statement
+            expect(mockStatement.finalize).toHaveBeenCalled();
         });
 
         it("should handle database errors", async () => {

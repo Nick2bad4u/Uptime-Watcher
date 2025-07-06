@@ -39,21 +39,6 @@ interface MockDatabaseService {
     getDatabase: ReturnType<typeof vi.fn>;
 }
 
-interface MonitorRepositoryWithPrivates {
-    safeNumberConvert: (value: unknown) => number | undefined;
-    convertDateForDb: (value: unknown) => string | null;
-    insertSingleMonitor: ReturnType<typeof vi.fn>;
-    getDb: ReturnType<typeof vi.fn>;
-    buildMonitorParameters: (monitor: Partial<Site["monitors"][0]>) => unknown[];
-    addNumberField: (
-        field: string,
-        value: unknown,
-        updateFields: string[],
-        updateValues: (string | number | null)[]
-    ) => void;
-    rowToMonitor: (row: MonitorRow) => Site["monitors"][0];
-}
-
 describe("MonitorRepository", () => {
     let monitorRepository: MonitorRepository;
     let mockDatabase: MockDatabase;
@@ -224,13 +209,9 @@ describe("MonitorRepository", () => {
 
             const result = await monitorRepository.create("site-1", monitor);
 
-            expect(mockDatabase.run).toHaveBeenCalledWith(
+            expect(mockDatabase.get).toHaveBeenCalledWith(
                 expect.stringContaining("INSERT INTO monitors"),
                 expect.arrayContaining(["site-1", "http", "https://example.com"])
-            );
-            expect(mockDatabase.get).toHaveBeenCalledWith(
-                "SELECT id FROM monitors WHERE site_identifier = ? ORDER BY id DESC LIMIT 1",
-                ["site-1"]
             );
             expect(result).toBe("1");
             expect(logger.debug).toHaveBeenCalledWith(
@@ -256,7 +237,7 @@ describe("MonitorRepository", () => {
 
             const result = await monitorRepository.create("site-2", monitor);
 
-            expect(mockDatabase.run).toHaveBeenCalledWith(
+            expect(mockDatabase.get).toHaveBeenCalledWith(
                 expect.stringContaining("INSERT INTO monitors"),
                 expect.arrayContaining(["site-2", "port", null, "example.com", 80])
             );
@@ -266,7 +247,7 @@ describe("MonitorRepository", () => {
 
         it("should handle database errors", async () => {
             const error = new Error("Create failed");
-            mockDatabase.run.mockImplementation(() => {
+            mockDatabase.get.mockImplementation(() => {
                 throw error;
             });
 
@@ -393,7 +374,7 @@ describe("MonitorRepository", () => {
             await monitorRepository.create("site-1", monitor);
 
             // Should insert null for undefined numeric fields
-            expect(mockDatabase.run).toHaveBeenCalledWith(expect.stringContaining("INSERT INTO monitors"), [
+            expect(mockDatabase.get).toHaveBeenCalledWith(expect.stringContaining("INSERT INTO monitors"), [
                 "site-1",
                 "http",
                 "https://example.com",
@@ -427,7 +408,7 @@ describe("MonitorRepository", () => {
             mockDatabase.get.mockReturnValue({}); // No id property
 
             await expect(monitorRepository.create("site-1", monitor)).rejects.toThrow(
-                "Failed to fetch monitor id after insert for site site-1"
+                "Failed to create monitor for site site-1 - no ID returned"
             );
         });
 
@@ -720,13 +701,13 @@ describe("MonitorRepository", () => {
 
             await monitorRepository.bulkCreate("site-1", monitors);
 
-            expect(mockDatabase.run).toHaveBeenCalledTimes(2);
+            expect(mockDatabase.get).toHaveBeenCalledTimes(2);
             expect(logger.info).toHaveBeenCalledWith("[MonitorRepository] Bulk created 2 monitors for site: site-1");
         });
 
         it("should handle database errors in bulk create", async () => {
             const error = new Error("Bulk create failed");
-            mockDatabase.run.mockImplementation(() => {
+            mockDatabase.get.mockImplementation(() => {
                 throw error;
             });
 
@@ -748,7 +729,7 @@ describe("MonitorRepository", () => {
             );
         });
 
-        it("should handle case where insertSingleMonitor returns empty ID", async () => {
+        it("should handle case where database insert returns undefined ID", async () => {
             const monitors = [
                 {
                     id: "temp-1",
@@ -769,24 +750,16 @@ describe("MonitorRepository", () => {
                 },
             ];
 
-            // Mock insertSingleMonitor to return empty string for first, valid ID for second
-            const repository = monitorRepository as unknown as {
-                insertSingleMonitor: ReturnType<typeof vi.fn>;
-            };
-            const originalInsertSingle = repository.insertSingleMonitor;
-            repository.insertSingleMonitor = vi
-                .fn()
-                .mockReturnValueOnce("") // First call returns empty
-                .mockReturnValueOnce("2"); // Second call returns valid ID
+            // Mock database.get to return undefined for first call, valid result for second
+            mockDatabase.get
+                .mockReturnValueOnce(undefined) // First call returns undefined
+                .mockReturnValueOnce({ id: 2 }); // Second call returns valid ID
 
             const result = await monitorRepository.bulkCreate("site-1", monitors);
 
             // Should only contain the monitor with valid ID
             expect(result).toHaveLength(1);
             expect(result[0]?.id).toBe("2");
-
-            // Restore original method
-            repository.insertSingleMonitor = originalInsertSingle;
         });
     });
 
@@ -854,7 +827,7 @@ describe("MonitorRepository", () => {
             await monitorRepository.create("site-1", monitor);
 
             // Verify that the string date was handled properly
-            expect(mockDatabase.run).toHaveBeenCalled();
+            expect(mockDatabase.get).toHaveBeenCalled();
         });
 
         it("should handle database error during get latest monitor ID", async () => {
@@ -865,12 +838,11 @@ describe("MonitorRepository", () => {
                 history: [],
             };
 
-            // Mock successful insert but failing ID fetch
-            mockDatabase.run.mockImplementation(() => {});
-            mockDatabase.get.mockReturnValue(undefined); // Simulate failure to get ID
+            // Mock the database.get to return undefined (no ID returned)
+            mockDatabase.get.mockReturnValue(undefined);
 
             await expect(monitorRepository.create("site-1", monitor)).rejects.toThrow(
-                "Failed to fetch monitor id after insert for site site-1"
+                "Failed to create monitor for site site-1 - no ID returned"
             );
         });
 
@@ -882,12 +854,11 @@ describe("MonitorRepository", () => {
                 history: [],
             };
 
-            // Mock successful insert but invalid ID type
-            mockDatabase.run.mockImplementation(() => {});
+            // Mock the database.get to return invalid ID type
             mockDatabase.get.mockReturnValue({ id: "invalid" }); // String instead of number
 
             await expect(monitorRepository.create("site-1", monitor)).rejects.toThrow(
-                "Failed to fetch monitor id after insert for site site-1"
+                "Failed to create monitor for site site-1 - no ID returned"
             );
         });
 
@@ -906,7 +877,7 @@ describe("MonitorRepository", () => {
 
             await monitorRepository.create("site-1", monitor);
 
-            expect(mockDatabase.run).toHaveBeenCalled();
+            expect(mockDatabase.get).toHaveBeenCalled();
         });
 
         it("should handle truthy but non-number values in safeNumberConvert", async () => {
@@ -923,7 +894,7 @@ describe("MonitorRepository", () => {
 
             await monitorRepository.create("site-1", monitor);
 
-            expect(mockDatabase.run).toHaveBeenCalled();
+            expect(mockDatabase.get).toHaveBeenCalled();
         });
     });
 
@@ -991,7 +962,7 @@ describe("MonitorRepository", () => {
 
                 await monitorRepository.create("site-1", monitor);
 
-                expect(mockDatabase.run).toHaveBeenCalledWith(expect.stringContaining("INSERT INTO monitors"), [
+                expect(mockDatabase.get).toHaveBeenCalledWith(expect.stringContaining("INSERT INTO monitors"), [
                     "site-1",
                     "http",
                     null, // url (falsy)
@@ -1022,7 +993,7 @@ describe("MonitorRepository", () => {
                 mockDatabase.get.mockReturnValue({ notId: "something" }); // No id property
 
                 await expect(monitorRepository.create("site-1", monitor)).rejects.toThrow(
-                    "Failed to fetch monitor id after insert for site site-1"
+                    "Failed to create monitor for site site-1 - no ID returned"
                 );
             });
 
@@ -1151,7 +1122,7 @@ describe("MonitorRepository", () => {
 
                 await monitorRepository.create("site-1", monitor);
 
-                expect(mockDatabase.run).toHaveBeenCalledWith(
+                expect(mockDatabase.get).toHaveBeenCalledWith(
                     expect.stringContaining("INSERT INTO monitors"),
                     expect.arrayContaining([0]) // monitoring: false becomes 0
                 );
@@ -1201,35 +1172,6 @@ describe("MonitorRepository", () => {
         });
     });
 
-    describe("Final edge case coverage attempts", () => {
-        it("should test edge case where result?.id is exactly null (line 173)", async () => {
-            // Specific test for line 173: result?.id ? String(result.id) : ""
-            const db = {
-                run: vi.fn(),
-                get: vi.fn().mockReturnValue({ id: null }), // id is null
-            };
-
-            const monitorRepo = new MonitorRepository();
-            (monitorRepo as unknown as MonitorRepositoryWithPrivates).getDb = vi.fn().mockReturnValue(db);
-
-            const monitor = {
-                type: "http" as const,
-                url: "https://example.com",
-                monitoring: true,
-                status: "up" as const,
-                history: [],
-            };
-
-            const result = (monitorRepo as unknown as MonitorRepositoryWithPrivates).insertSingleMonitor(
-                "site-1",
-                monitor,
-                db
-            );
-
-            expect(result).toBe(""); // null id should trigger empty string branch
-        });
-    });
-
     describe("Specific Branch Coverage Tests", () => {
         describe("Line 113: addNumberField null branch", () => {
             it("should test the addNumberField utility function behavior", async () => {
@@ -1276,7 +1218,7 @@ describe("MonitorRepository", () => {
 
                 await monitorRepository.create("site-1", monitor);
 
-                expect(mockDatabase.run).toHaveBeenCalledWith(expect.stringContaining("INSERT INTO monitors"), [
+                expect(mockDatabase.get).toHaveBeenCalledWith(expect.stringContaining("INSERT INTO monitors"), [
                     "site-1",
                     "http",
                     null, // url empty string becomes null
@@ -1311,7 +1253,7 @@ describe("MonitorRepository", () => {
                     // Should either return "" or throw error
                     expect(result === "" || result === undefined).toBe(true);
                 } catch (error) {
-                    expect((error as Error).message).toContain("Failed to fetch monitor id");
+                    expect((error as Error).message).toContain("Failed to create monitor for site");
                 }
             });
         });
@@ -1469,7 +1411,7 @@ describe("MonitorRepository", () => {
 
             await monitorRepository.create("site-1", monitor);
 
-            const insertCall = mockDatabase.run.mock.calls.find((call: any) =>
+            const insertCall = mockDatabase.get.mock.calls.find((call: any) =>
                 call[0].includes("INSERT INTO monitors")
             );
             expect(insertCall).toBeDefined();
@@ -1495,7 +1437,7 @@ describe("MonitorRepository", () => {
 
             await monitorRepository.create("site-1", monitor);
 
-            const insertCall = mockDatabase.run.mock.calls.find((call: any) =>
+            const insertCall = mockDatabase.get.mock.calls.find((call: any) =>
                 call[0].includes("INSERT INTO monitors")
             );
             expect(insertCall).toBeDefined();
@@ -1544,7 +1486,7 @@ describe("MonitorRepository", () => {
             mockDatabase.get.mockReturnValue({ id: null });
 
             await expect(monitorRepository.create("site-1", monitor)).rejects.toThrow(
-                "Failed to fetch monitor id after insert for site site-1"
+                "Failed to create monitor for site site-1 - no ID returned"
             );
         });
 
@@ -1567,58 +1509,6 @@ describe("MonitorRepository", () => {
             const monitor = rowToMonitor(row);
 
             expect(monitor.host).toBeUndefined(); // Should be undefined when row.host is undefined
-        });
-
-        it("should handle database get returning null (line 172)", async () => {
-            const monitor = {
-                type: "http" as const,
-                url: "https://test.com",
-                host: "example.com",
-                port: 80,
-                checkInterval: 300,
-                timeout: 5000,
-                retryAttempts: 3,
-                monitoring: true,
-                status: "up" as const,
-                history: [],
-            };
-
-            const repository = new MonitorRepository();
-            const insertSingleMonitor = (repository as any).insertSingleMonitor.bind(repository);
-
-            mockDatabase.run.mockReturnValue({ changes: 1, lastInsertRowid: 1 });
-            // Mock database get returning null - this should trigger the "" fallback
-            mockDatabase.get.mockReturnValue(null);
-
-            const result = insertSingleMonitor("site-1", monitor, mockDatabase);
-
-            expect(result).toBe(""); // Should return empty string when get returns null
-        });
-
-        it("should handle database get returning undefined (line 172)", async () => {
-            const monitor = {
-                type: "http" as const,
-                url: "https://test.com",
-                host: "example.com",
-                port: 80,
-                checkInterval: 300,
-                timeout: 5000,
-                retryAttempts: 3,
-                monitoring: true,
-                status: "up" as const,
-                history: [],
-            };
-
-            const repository = new MonitorRepository();
-            const insertSingleMonitor = (repository as any).insertSingleMonitor.bind(repository);
-
-            mockDatabase.run.mockReturnValue({ changes: 1, lastInsertRowid: 1 });
-            // Mock database get returning undefined - this should trigger the "" fallback
-            mockDatabase.get.mockReturnValue(undefined);
-
-            const result = insertSingleMonitor("site-1", monitor, mockDatabase);
-
-            expect(result).toBe(""); // Should return empty string when get returns undefined
         });
     });
 
@@ -1699,42 +1589,7 @@ describe("MonitorRepository", () => {
             });
         });
 
-        describe("Result id falsy branch (line 172)", () => {
-            it("should return empty string when result.id is falsy in insertSingleMonitor", () => {
-                const repository = new MonitorRepository();
-                const insertSingleMonitor = (repository as any).insertSingleMonitor.bind(repository);
 
-                const monitor = {
-                    type: "http" as const,
-                    url: "https://example.com",
-                    monitoring: true,
-                    status: "up" as const,
-                    history: [],
-                };
-
-                mockDatabase.run.mockReturnValue({ changes: 1, lastInsertRowid: 1 });
-
-                // Test truthy id - should convert to string
-                mockDatabase.get.mockReturnValue({ id: 123 });
-                let result = insertSingleMonitor("site-1", monitor, mockDatabase);
-                expect(result).toBe("123"); // Should convert truthy id to string
-
-                // Test falsy id (0) - should return empty string
-                mockDatabase.get.mockReturnValue({ id: 0 });
-                result = insertSingleMonitor("site-1", monitor, mockDatabase);
-                expect(result).toBe(""); // Should return empty string for falsy id
-
-                // Test falsy id (empty string) - should return empty string
-                mockDatabase.get.mockReturnValue({ id: "" });
-                result = insertSingleMonitor("site-1", monitor, mockDatabase);
-                expect(result).toBe(""); // Should return empty string for falsy id
-
-                // Test falsy id (false) - should return empty string
-                mockDatabase.get.mockReturnValue({ id: false });
-                result = insertSingleMonitor("site-1", monitor, mockDatabase);
-                expect(result).toBe(""); // Should return empty string for falsy id
-            });
-        });
 
         describe("Row id undefined branch (line 183)", () => {
             it("should return -1 when row.id is undefined in rowToMonitor", () => {

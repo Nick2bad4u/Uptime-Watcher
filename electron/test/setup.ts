@@ -83,19 +83,23 @@ vi.mock("electron", () => ({
 // Mock node-sqlite3-wasm with comprehensive Database interface
 vi.mock("node-sqlite3-wasm", () => ({
     default: vi.fn(),
-    Database: vi.fn(() => ({
-        run: vi.fn(() => ({ changes: 1, lastInsertRowid: 1 })),
-        get: vi.fn(() => undefined),
-        all: vi.fn(() => []),
-        exec: vi.fn(),
-        prepare: vi.fn(() => ({
-            run: vi.fn(),
-            get: vi.fn(),
-            all: vi.fn(),
+    Database: vi.fn(() => {
+        const preparedStatement = {
+            run: vi.fn(() => ({ changes: 1, lastInsertRowid: 1 })),
+            get: vi.fn(() => undefined),
+            all: vi.fn(() => []),
             finalize: vi.fn(),
-        })),
-        close: vi.fn(),
-    })),
+        };
+        
+        return {
+            run: vi.fn(() => ({ changes: 1, lastInsertRowid: 1 })),
+            get: vi.fn(() => undefined),
+            all: vi.fn(() => []),
+            exec: vi.fn(),
+            prepare: vi.fn(() => preparedStatement),
+            close: vi.fn(),
+        };
+    }),
 }));
 
 // Mock fs for file system operations

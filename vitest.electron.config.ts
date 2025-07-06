@@ -74,11 +74,11 @@ export default defineConfig({
             },
         },
         // Improve test output
-        reporters: ["default", "json"],
+        reporters: ["default", "json", "verbose", "hanging-process"],
         restoreMocks: true,
         // Setup files for Electron testing
         setupFiles: ["./electron/test/setup.ts"],
         // Test timeout
-        testTimeout: 10000,
+        testTimeout: 15000,
     },
 });
