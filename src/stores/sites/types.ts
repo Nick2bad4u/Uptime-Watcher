@@ -32,10 +32,16 @@ export interface SitesActions {
     updateMonitorTimeout: (siteId: string, monitorId: string, timeout: number | undefined) => Promise<void>;
     /** Start monitoring for a site monitor */
     startSiteMonitorMonitoring: (siteId: string, monitorId: string) => Promise<void>;
+    /** Start monitoring for all monitors of a site */
+    startSiteMonitoring: (siteId: string) => Promise<void>;
     /** Stop monitoring for a site monitor */
     stopSiteMonitorMonitoring: (siteId: string, monitorId: string) => Promise<void>;
+    /** Stop monitoring for all monitors of a site */
+    stopSiteMonitoring: (siteId: string) => Promise<void>;
     /** Add a monitor to an existing site */
     addMonitorToSite: (siteId: string, monitor: Monitor) => Promise<void>;
+    /** Remove a monitor from a site */
+    removeMonitorFromSite: (siteId: string, monitorId: string) => Promise<void>;
     /** Sync sites from backend */
     syncSitesFromBackend: () => Promise<void>;
     /** Full sync from backend */

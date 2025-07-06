@@ -56,9 +56,12 @@ export function useSiteDetails({ site }: UseSiteDetailsProps) {
         deleteSite,
         getSelectedMonitorId,
         modifySite,
+        removeMonitorFromSite,
         setSelectedMonitorId,
         sites,
+        startSiteMonitoring,
         startSiteMonitorMonitoring,
+        stopSiteMonitoring,
         stopSiteMonitorMonitoring,
         updateMonitorRetryAttempts,
         updateMonitorTimeout,
@@ -186,6 +189,63 @@ export function useSiteDetails({ site }: UseSiteDetailsProps) {
             logger.site.error(currentSite.identifier, error instanceof Error ? error : String(error));
         }
     }, [currentSite.identifier, currentSite.name, clearError, deleteSite]);
+
+    // Handler for monitor removal
+    const handleRemoveMonitor = useCallback(async () => {
+        if (!selectedMonitor) {
+            logger.site.error(currentSite.identifier, "No monitor selected for removal");
+            return;
+        }
+
+        const monitorName = selectedMonitor.url ?? selectedMonitor.host ?? selectedMonitor.type;
+        if (
+            !window.confirm(
+                `Are you sure you want to remove the monitor "${monitorName}" from ${currentSite.name ?? currentSite.identifier}?`
+            )
+        ) {
+            return;
+        }
+
+        clearError();
+
+        try {
+            await removeMonitorFromSite(currentSite.identifier, selectedMonitor.id);
+            logger.user.action("Monitor removed successfully", {
+                monitorId: selectedMonitor.id,
+                monitorType: selectedMonitor.type,
+                siteId: currentSite.identifier,
+            });
+        } catch (error) {
+            logger.site.error(currentSite.identifier, error instanceof Error ? error : String(error));
+        }
+    }, [currentSite.identifier, currentSite.name, selectedMonitor, clearError, removeMonitorFromSite]);
+
+    // Site-level monitoring handlers
+    const handleStartSiteMonitoring = useCallback(async () => {
+        clearError();
+        try {
+            await startSiteMonitoring(currentSite.identifier);
+            logger.user.action("Started site monitoring", {
+                monitorCount: currentSite.monitors.length,
+                siteId: currentSite.identifier,
+            });
+        } catch (error) {
+            logger.site.error(currentSite.identifier, error instanceof Error ? error : String(error));
+        }
+    }, [currentSite.identifier, currentSite.monitors.length, startSiteMonitoring, clearError]);
+
+    const handleStopSiteMonitoring = useCallback(async () => {
+        clearError();
+        try {
+            await stopSiteMonitoring(currentSite.identifier);
+            logger.user.action("Stopped site monitoring", {
+                monitorCount: currentSite.monitors.length,
+                siteId: currentSite.identifier,
+            });
+        } catch (error) {
+            logger.site.error(currentSite.identifier, error instanceof Error ? error : String(error));
+        }
+    }, [currentSite.identifier, currentSite.monitors.length, stopSiteMonitoring, clearError]);
 
     // Monitoring handlers
     const handleStartMonitoring = useCallback(async () => {
@@ -332,6 +392,7 @@ export function useSiteDetails({ site }: UseSiteDetailsProps) {
         handleCheckNow,
         handleIntervalChange,
         handleMonitorIdChange,
+        handleRemoveMonitor,
         handleRemoveSite,
         handleRetryAttemptsChange,
         handleSaveInterval,
@@ -339,7 +400,9 @@ export function useSiteDetails({ site }: UseSiteDetailsProps) {
         handleSaveRetryAttempts,
         handleSaveTimeout,
         handleStartMonitoring,
+        handleStartSiteMonitoring,
         handleStopMonitoring,
+        handleStopSiteMonitoring,
         handleTimeoutChange,
         // Name state
         hasUnsavedChanges,

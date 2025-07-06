@@ -16,7 +16,7 @@ export const useUIStore = create<UIStore>()(
     persist(
         (set, get) => ({
             // State
-            activeSiteDetailsTab: "overview",
+            activeSiteDetailsTab: "site-overview",
             // Actions
             getSelectedSite: () => {
                 const { selectedSiteId } = get();

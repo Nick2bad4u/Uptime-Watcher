@@ -28,4 +28,20 @@ export class MonitoringService {
         await this.initialize();
         return window.electronAPI.monitoring.stopMonitoringForSite(siteId, monitorId);
     }
+
+    /**
+     * Start monitoring for all monitors of a site
+     */
+    static async startSiteMonitoring(siteId: string): Promise<void> {
+        await this.initialize();
+        return window.electronAPI.monitoring.startMonitoringForSite(siteId);
+    }
+
+    /**
+     * Stop monitoring for all monitors of a site
+     */
+    static async stopSiteMonitoring(siteId: string): Promise<void> {
+        await this.initialize();
+        return window.electronAPI.monitoring.stopMonitoringForSite(siteId);
+    }
 }

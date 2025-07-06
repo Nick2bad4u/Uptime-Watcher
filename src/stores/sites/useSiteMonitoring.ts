@@ -7,12 +7,16 @@ import { logStoreAction, withErrorHandling } from "../utils";
 import { MonitoringService, SiteService } from "./services";
 
 export interface SiteMonitoringActions {
-    /** Start monitoring for a site monitor */
-    startSiteMonitorMonitoring: (siteId: string, monitorId: string) => Promise<void>;
-    /** Stop monitoring for a site monitor */
-    stopSiteMonitorMonitoring: (siteId: string, monitorId: string) => Promise<void>;
     /** Check a site now */
     checkSiteNow: (siteId: string, monitorId: string) => Promise<void>;
+    /** Start monitoring for all monitors of a site */
+    startSiteMonitoring: (siteId: string) => Promise<void>;
+    /** Start monitoring for a site monitor */
+    startSiteMonitorMonitoring: (siteId: string, monitorId: string) => Promise<void>;
+    /** Stop monitoring for all monitors of a site */
+    stopSiteMonitoring: (siteId: string) => Promise<void>;
+    /** Stop monitoring for a site monitor */
+    stopSiteMonitorMonitoring: (siteId: string, monitorId: string) => Promise<void>;
 }
 
 export interface SiteMonitoringDependencies {
@@ -35,12 +39,42 @@ export const createSiteMonitoringActions = (deps: SiteMonitoringDependencies): S
             }
         );
     },
+    startSiteMonitoring: async (siteId: string) => {
+        logStoreAction("SitesStore", "startSiteMonitoring", { siteId });
+
+        await withErrorHandling(
+            async () => {
+                await MonitoringService.startSiteMonitoring(siteId);
+                await deps.syncSitesFromBackend();
+            },
+            {
+                clearError: () => {},
+                setError: (error) => logStoreAction("SitesStore", "error", { error }),
+                setLoading: () => {},
+            }
+        );
+    },
     startSiteMonitorMonitoring: async (siteId: string, monitorId: string) => {
         logStoreAction("SitesStore", "startSiteMonitorMonitoring", { monitorId, siteId });
 
         await withErrorHandling(
             async () => {
                 await MonitoringService.startMonitoring(siteId, monitorId);
+                await deps.syncSitesFromBackend();
+            },
+            {
+                clearError: () => {},
+                setError: (error) => logStoreAction("SitesStore", "error", { error }),
+                setLoading: () => {},
+            }
+        );
+    },
+    stopSiteMonitoring: async (siteId: string) => {
+        logStoreAction("SitesStore", "stopSiteMonitoring", { siteId });
+
+        await withErrorHandling(
+            async () => {
+                await MonitoringService.stopSiteMonitoring(siteId);
                 await deps.syncSitesFromBackend();
             },
             {

@@ -1,14 +1,12 @@
 /**
  * Tests for SiteManager class.
- * Tests error handling when callbacks are not set and other edge cases.
+ * Tests all methods and edge cases for comprehensive coverage.
  */
 
 import { EventEmitter } from "events";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { SiteManager, SiteManagerDependencies } from "../../managers/SiteManager";
-import type { Site } from "../../types";
 
-// Mock the logger
+// Mock the logger with factory function
 vi.mock("../../utils/logger", () => ({
     monitorLogger: {
         info: vi.fn(),
@@ -18,15 +16,15 @@ vi.mock("../../utils/logger", () => ({
     },
 }));
 
-// Mock the database utilities
+// Mock the database utilities with factory functions
 vi.mock("../../utils/database", () => ({
-    addSiteToDatabase: vi.fn(),
-    removeSiteFromDatabase: vi.fn(),
     getSitesFromDatabase: vi.fn(),
+    createSite: vi.fn(),
+    deleteSite: vi.fn(),
     updateSite: vi.fn(),
 }));
 
-// Mock the ConfigurationManager
+// Mock the ConfigurationManager with factory function
 vi.mock("../../managers/ConfigurationManager", () => ({
     configurationManager: {
         validateSiteConfiguration: vi.fn(() => ({ isValid: true, errors: [] })),
@@ -41,6 +39,22 @@ vi.mock("../../managers/ConfigurationManager", () => ({
         shouldIncludeInExport: vi.fn(() => true),
     },
 }));
+
+// Import after mocks are set up
+import { SiteManager, SiteManagerDependencies } from "../../managers/SiteManager";
+import { SITE_EVENTS } from "../../events";
+import type { Site } from "../../types";
+import { getSitesFromDatabase, createSite, deleteSite, updateSite } from "../../utils/database";
+import { configurationManager } from "../../managers/ConfigurationManager";
+import { monitorLogger } from "../../utils/logger";
+
+// Get the mocked functions
+const mockGetSitesFromDatabase = vi.mocked(getSitesFromDatabase);
+const mockCreateSite = vi.mocked(createSite);
+const mockDeleteSite = vi.mocked(deleteSite);
+const mockUpdateSite = vi.mocked(updateSite);
+const mockConfigurationManager = vi.mocked(configurationManager);
+const mockLogger = vi.mocked(monitorLogger);
 
 describe("SiteManager", () => {
     let siteManager: SiteManager;
@@ -61,6 +75,11 @@ describe("SiteManager", () => {
                 retryAttempts: 3,
             },
         ],
+    };
+
+    const mockSiteWithoutName: Site = {
+        identifier: "test-site-no-name",
+        monitors: [],
     };
 
     beforeEach(() => {
@@ -107,62 +126,319 @@ describe("SiteManager", () => {
         siteManager = new SiteManager(mockRepositories);
     });
 
-    describe("Event-driven communication", () => {
-        it("should use events instead of callbacks for updateSite", async () => {
-            const eventSpy = vi.fn();
-            mockEventEmitter.on("site:start-monitoring-requested", eventSpy);
+    describe("getSites", () => {
+        it("should return sites from database", async () => {
+            const expectedSites = [mockSite];
+            mockGetSitesFromDatabase.mockResolvedValue(expectedSites);
 
-            // This should not throw "callbacks not set" error anymore
-            try {
-                await siteManager.updateSite("test-site", { name: "Updated Site" });
-            } catch (error) {
-                // Expected since we're not fully mocking the utility functions
-                // The important thing is that it doesn't throw the "callbacks not set" error
-                expect((error as Error).message).not.toContain("callbacks not set");
-            }
+            const result = await siteManager.getSites();
+
+            expect(result).toEqual(expectedSites);
+            expect(mockGetSitesFromDatabase).toHaveBeenCalledWith({
+                repositories: {
+                    history: expect.any(Object),
+                    monitor: expect.any(Object),
+                    site: expect.any(Object),
+                },
+            });
         });
 
-        it("should work properly with event-driven approach", async () => {
-            // This test ensures the event-driven approach doesn't require callbacks
-            const eventSpy = vi.fn();
-            mockEventEmitter.on("site:updated", eventSpy);
+        it("should handle database errors", async () => {
+            const error = new Error("Database error");
+            mockGetSitesFromDatabase.mockRejectedValue(error);
 
-            // This should not throw when using events
-            try {
-                await siteManager.updateSite("test-site", { name: "Updated Site" });
-            } catch (error) {
-                // Expected since we're not fully mocking the utility functions
-                // The important thing is that it doesn't throw the "callbacks not set" error
-                expect((error as Error).message).not.toContain("callbacks not set");
-            }
+            await expect(siteManager.getSites()).rejects.toThrow("Database error");
         });
     });
 
-    describe("Cache management", () => {
-        it("should handle getSiteFromCache when site exists", () => {
-            // Add a site to the cache
+    describe("getSitesFromCache", () => {
+        it("should return sites from cache", () => {
             siteManager.updateSitesCache([mockSite]);
 
-            // Test getting the site from cache
-            const cachedSite = siteManager.getSiteFromCache("test-site");
-            expect(cachedSite).toEqual(mockSite);
+            const result = siteManager.getSitesFromCache();
+
+            expect(result).toEqual([mockSite]);
         });
 
-        it("should handle getSiteFromCache when site does not exist", () => {
-            // Test getting a non-existent site from cache (lines 148-149 should be covered)
-            const cachedSite = siteManager.getSiteFromCache("non-existent-site");
-            expect(cachedSite).toBeUndefined();
+        it("should return empty array when cache is empty", () => {
+            const result = siteManager.getSitesFromCache();
+
+            expect(result).toEqual([]);
+        });
+    });
+
+    describe("getSitesCache", () => {
+        it("should return the sites cache map", () => {
+            siteManager.updateSitesCache([mockSite]);
+
+            const result = siteManager.getSitesCache();
+
+            expect(result).toBeInstanceOf(Map);
+            expect(result.get("test-site")).toEqual(mockSite);
+        });
+    });
+
+    describe("addSite", () => {
+        it("should add a site successfully", async () => {
+            mockCreateSite.mockResolvedValue(mockSite);
+            
+            const eventSpy = vi.fn();
+            mockEventEmitter.on(SITE_EVENTS.SITE_ADDED, eventSpy);
+
+            const result = await siteManager.addSite(mockSite);
+
+            expect(result).toEqual(mockSite);
+            expect(mockConfigurationManager.validateSiteConfiguration).toHaveBeenCalledWith(mockSite);
+            expect(mockCreateSite).toHaveBeenCalledWith({
+                repositories: {
+                    monitor: expect.any(Object),
+                    site: expect.any(Object),
+                },
+                siteData: mockSite,
+            });
+            expect(siteManager.getSiteFromCache("test-site")).toEqual(mockSite);
+            expect(eventSpy).toHaveBeenCalledWith({
+                identifier: "test-site",
+                operation: "added",
+                site: mockSite,
+            });
+            expect(mockLogger.info).toHaveBeenCalledWith("Site added successfully: test-site (Test Site)");
         });
 
-        it("should update sites cache correctly", () => {
+        it("should add a site without name successfully", async () => {
+            mockCreateSite.mockResolvedValue(mockSiteWithoutName);
+
+            const result = await siteManager.addSite(mockSiteWithoutName);
+
+            expect(result).toEqual(mockSiteWithoutName);
+            expect(mockLogger.info).toHaveBeenCalledWith("Site added successfully: test-site-no-name (unnamed)");
+        });
+
+        it("should throw error when site validation fails", async () => {
+            mockConfigurationManager.validateSiteConfiguration.mockReturnValue({
+                isValid: false,
+                errors: ["Invalid URL", "Missing monitors"],
+            });
+
+            await expect(siteManager.addSite(mockSite)).rejects.toThrow(
+                "Site validation failed: Invalid URL, Missing monitors"
+            );
+
+            expect(mockCreateSite).not.toHaveBeenCalled();
+        });
+
+        it("should handle database creation errors", async () => {
+            const error = new Error("Database creation error");
+            mockCreateSite.mockRejectedValue(error);
+
+            await expect(siteManager.addSite(mockSite)).rejects.toThrow("Database creation error");
+        });
+    });
+
+    describe("removeSite", () => {
+        it("should remove a site successfully", async () => {
+            mockDeleteSite.mockResolvedValue(true);
+            
+            const eventSpy = vi.fn();
+            mockEventEmitter.on(SITE_EVENTS.SITE_REMOVED, eventSpy);
+
+            const result = await siteManager.removeSite("test-site");
+
+            expect(result).toBe(true);
+            expect(mockDeleteSite).toHaveBeenCalledWith({
+                identifier: "test-site",
+                logger: mockLogger,
+                repositories: {
+                    monitor: expect.any(Object),
+                    site: expect.any(Object),
+                },
+                sites: expect.any(Map),
+            });
+            expect(eventSpy).toHaveBeenCalledWith({
+                identifier: "test-site",
+                operation: "removed",
+            });
+        });
+
+        it("should return false when site removal fails", async () => {
+            mockDeleteSite.mockResolvedValue(false);
+            
+            const eventSpy = vi.fn();
+            mockEventEmitter.on(SITE_EVENTS.SITE_REMOVED, eventSpy);
+
+            const result = await siteManager.removeSite("test-site");
+
+            expect(result).toBe(false);
+            expect(eventSpy).not.toHaveBeenCalled();
+        });
+
+        it("should handle database deletion errors", async () => {
+            const error = new Error("Database deletion error");
+            mockDeleteSite.mockRejectedValue(error);
+
+            await expect(siteManager.removeSite("test-site")).rejects.toThrow("Database deletion error");
+        });
+    });
+
+    describe("updateSite", () => {
+        it("should update a site successfully", async () => {
+            const updatedSite = { ...mockSite, name: "Updated Site" };
+            mockUpdateSite.mockResolvedValue(updatedSite);
+            
+            const eventSpy = vi.fn();
+            mockEventEmitter.on(SITE_EVENTS.SITE_UPDATED, eventSpy);
+
+            const result = await siteManager.updateSite("test-site", { name: "Updated Site" });
+
+            expect(result).toEqual(updatedSite);
+            expect(mockUpdateSite).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    logger: mockLogger,
+                    monitorRepository: expect.any(Object),
+                    siteRepository: expect.any(Object),
+                    sites: expect.any(Map),
+                }),
+                expect.objectContaining({
+                    startMonitoringForSite: expect.any(Function),
+                    stopMonitoringForSite: expect.any(Function),
+                }),
+                "test-site",
+                { name: "Updated Site" }
+            );
+            expect(eventSpy).toHaveBeenCalledWith({
+                identifier: "test-site",
+                operation: "updated",
+                site: updatedSite,
+            });
+        });
+
+        it("should emit start monitoring event when callback is called", async () => {
+            const updatedSite = { ...mockSite, name: "Updated Site" };
+            let startMonitoringCallback: ((id: string, monitorId?: string) => Promise<boolean>) | undefined;
+            
+            mockUpdateSite.mockImplementation((deps, callbacks) => {
+                startMonitoringCallback = callbacks.startMonitoringForSite;
+                return Promise.resolve(updatedSite);
+            });
+            
+            const eventSpy = vi.fn();
+            mockEventEmitter.on(SITE_EVENTS.START_MONITORING_REQUESTED, eventSpy);
+
+            await siteManager.updateSite("test-site", { name: "Updated Site" });
+
+            // Call the callback to test event emission
+            if (startMonitoringCallback) {
+                const result = await startMonitoringCallback("test-site", "monitor-1");
+                expect(result).toBe(true);
+                expect(eventSpy).toHaveBeenCalledWith({
+                    identifier: "test-site",
+                    monitorId: "monitor-1",
+                    operation: "start-monitoring",
+                });
+            }
+        });
+
+        it("should emit start monitoring event without monitorId when callback is called", async () => {
+            const updatedSite = { ...mockSite, name: "Updated Site" };
+            let startMonitoringCallback: ((id: string, monitorId?: string) => Promise<boolean>) | undefined;
+            
+            mockUpdateSite.mockImplementation((deps, callbacks) => {
+                startMonitoringCallback = callbacks.startMonitoringForSite;
+                return Promise.resolve(updatedSite);
+            });
+            
+            const eventSpy = vi.fn();
+            mockEventEmitter.on(SITE_EVENTS.START_MONITORING_REQUESTED, eventSpy);
+
+            await siteManager.updateSite("test-site", { name: "Updated Site" });
+
+            // Call the callback without monitorId to test event emission
+            if (startMonitoringCallback) {
+                const result = await startMonitoringCallback("test-site");
+                expect(result).toBe(true);
+                expect(eventSpy).toHaveBeenCalledWith({
+                    identifier: "test-site",
+                    operation: "start-monitoring",
+                });
+            }
+        });
+
+        it("should emit stop monitoring event when callback is called", async () => {
+            const updatedSite = { ...mockSite, name: "Updated Site" };
+            let stopMonitoringCallback: ((id: string, monitorId?: string) => Promise<boolean>) | undefined;
+            
+            mockUpdateSite.mockImplementation((deps, callbacks) => {
+                stopMonitoringCallback = callbacks.stopMonitoringForSite;
+                return Promise.resolve(updatedSite);
+            });
+            
+            const eventSpy = vi.fn();
+            mockEventEmitter.on(SITE_EVENTS.STOP_MONITORING_REQUESTED, eventSpy);
+
+            await siteManager.updateSite("test-site", { name: "Updated Site" });
+
+            // Call the callback to test event emission
+            if (stopMonitoringCallback) {
+                const result = await stopMonitoringCallback("test-site", "monitor-1");
+                expect(result).toBe(true);
+                expect(eventSpy).toHaveBeenCalledWith({
+                    identifier: "test-site",
+                    monitorId: "monitor-1",
+                    operation: "stop-monitoring",
+                });
+            }
+        });
+
+        it("should emit stop monitoring event without monitorId when callback is called", async () => {
+            const updatedSite = { ...mockSite, name: "Updated Site" };
+            let stopMonitoringCallback: ((id: string, monitorId?: string) => Promise<boolean>) | undefined;
+            
+            mockUpdateSite.mockImplementation((deps, callbacks) => {
+                stopMonitoringCallback = callbacks.stopMonitoringForSite;
+                return Promise.resolve(updatedSite);
+            });
+            
+            const eventSpy = vi.fn();
+            mockEventEmitter.on(SITE_EVENTS.STOP_MONITORING_REQUESTED, eventSpy);
+
+            await siteManager.updateSite("test-site", { name: "Updated Site" });
+
+            // Call the callback without monitorId to test event emission
+            if (stopMonitoringCallback) {
+                const result = await stopMonitoringCallback("test-site");
+                expect(result).toBe(true);
+                expect(eventSpy).toHaveBeenCalledWith({
+                    identifier: "test-site",
+                    operation: "stop-monitoring",
+                });
+            }
+        });
+
+        it("should handle database update errors", async () => {
+            const error = new Error("Database update error");
+            mockUpdateSite.mockRejectedValue(error);
+
+            await expect(siteManager.updateSite("test-site", { name: "Updated Site" })).rejects.toThrow(
+                "Database update error"
+            );
+        });
+    });
+
+    describe("updateSitesCache", () => {
+        it("should update sites cache and emit event", () => {
             const sites = [mockSite, { ...mockSite, identifier: "another-site", name: "Another Site" }];
+            
+            const eventSpy = vi.fn();
+            mockEventEmitter.on(SITE_EVENTS.CACHE_UPDATED, eventSpy);
 
-            // Update the cache
             siteManager.updateSitesCache(sites);
 
-            // Verify both sites are in the cache
             expect(siteManager.getSiteFromCache("test-site")).toEqual(mockSite);
             expect(siteManager.getSiteFromCache("another-site")).toBeDefined();
+            expect(eventSpy).toHaveBeenCalledWith({
+                identifier: "all",
+                operation: "cache-updated",
+            });
         });
 
         it("should clear existing cache when updating", () => {
@@ -177,6 +453,59 @@ describe("SiteManager", () => {
             // Original site should no longer be in cache
             expect(siteManager.getSiteFromCache("test-site")).toBeUndefined();
             expect(siteManager.getSiteFromCache("new-site")).toBeDefined();
+        });
+
+        it("should handle empty sites array", () => {
+            // Add initial site
+            siteManager.updateSitesCache([mockSite]);
+            expect(siteManager.getSiteFromCache("test-site")).toBeDefined();
+
+            // Update with empty array
+            siteManager.updateSitesCache([]);
+
+            // Cache should be empty
+            expect(siteManager.getSiteFromCache("test-site")).toBeUndefined();
+            expect(siteManager.getSitesFromCache()).toEqual([]);
+        });
+    });
+
+    describe("getSiteFromCache", () => {
+        it("should return site when it exists in cache", () => {
+            siteManager.updateSitesCache([mockSite]);
+
+            const result = siteManager.getSiteFromCache("test-site");
+
+            expect(result).toEqual(mockSite);
+        });
+
+        it("should return undefined when site does not exist in cache", () => {
+            const result = siteManager.getSiteFromCache("non-existent-site");
+
+            expect(result).toBeUndefined();
+        });
+    });
+
+    describe("validation edge cases", () => {
+        it("should handle single validation error", async () => {
+            mockConfigurationManager.validateSiteConfiguration.mockReturnValue({
+                isValid: false,
+                errors: ["Single error"],
+            });
+
+            await expect(siteManager.addSite(mockSite)).rejects.toThrow(
+                "Site validation failed: Single error"
+            );
+        });
+
+        it("should handle empty validation errors array", async () => {
+            mockConfigurationManager.validateSiteConfiguration.mockReturnValue({
+                isValid: false,
+                errors: [],
+            });
+
+            await expect(siteManager.addSite(mockSite)).rejects.toThrow(
+                "Site validation failed: "
+            );
         });
     });
 });

@@ -27,7 +27,7 @@ import {
     ArcElement,
 } from "chart.js";
 import zoomPlugin from "chartjs-plugin-zoom";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import "chartjs-adapter-date-fns";
 
 import { useSiteDetails } from "../../hooks/site/useSiteDetails";
@@ -40,7 +40,7 @@ import { formatResponseTime, formatFullTimestamp, formatDuration } from "../../u
 import "./SiteDetails.css";
 import { SiteDetailsHeader } from "./SiteDetailsHeader";
 import { SiteDetailsNavigation } from "./SiteDetailsNavigation";
-import { AnalyticsTab, HistoryTab, OverviewTab, SettingsTab } from "./tabs";
+import { AnalyticsTab, HistoryTab, OverviewTab, SettingsTab, SiteOverviewTab } from "./tabs";
 
 // Register Chart.js components
 ChartJS.register(
@@ -87,17 +87,7 @@ interface SiteDetailsProps {
  */
 export function SiteDetails({ onClose, site }: SiteDetailsProps) {
     const { currentTheme } = useTheme();
-
-    /**
-     * Get availability variant based on percentage
-     * @param percentage - Availability percentage
-     * @returns Variant type for theming
-     */
-    const getAvailabilityVariant = (percentage: number): "success" | "warning" | "danger" => {
-        if (percentage >= 99) return "success";
-        if (percentage >= 95) return "warning";
-        return "danger";
-    };
+    const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
 
     /**
      * Get availability description based on percentage
@@ -122,6 +112,7 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
         handleCheckNow,
         handleIntervalChange,
         handleMonitorIdChange,
+        handleRemoveMonitor,
         handleRemoveSite,
         handleRetryAttemptsChange,
         handleSaveInterval,
@@ -129,7 +120,9 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
         handleSaveRetryAttempts,
         handleSaveTimeout,
         handleStartMonitoring,
+        handleStartSiteMonitoring,
         handleStopMonitoring,
+        handleStopSiteMonitoring,
         handleTimeoutChange,
         // Name state
         hasUnsavedChanges,
@@ -224,53 +217,67 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
     if (!siteExists) return undefined;
 
     return (
-        <div className="site-details-modal">
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 md:p-8 bg-black/50 backdrop-blur-sm">
             <button
                 type="button"
-                className="modal-backdrop"
+                className="absolute inset-0 bg-transparent border-none cursor-pointer"
                 onClick={onClose}
                 onKeyDown={handleKeyDown}
                 aria-label="Close modal"
-                style={{ background: "none", border: "none", inset: "0", position: "absolute" }}
             />
-            <dialog open className="modal-dialog" aria-label="Site details">
+            <dialog
+                open
+                className="relative w-full max-w-[1400px] max-h-[90vh] mx-auto flex flex-col sm:max-w-[calc(100vw-2rem)] md:max-w-[calc(100vw-4rem)] lg:max-w-[1400px]"
+                aria-label="Site details"
+            >
                 <ThemedBox
                     surface="overlay"
                     padding="lg"
                     rounded="lg"
                     shadow="xl"
-                    className="overflow-hidden site-details-content animate-scale-in"
+                    className="flex flex-col h-[90vh] overflow-hidden"
                 >
-                    <SiteDetailsHeader site={currentSite} {...(selectedMonitor ? { selectedMonitor } : {})} />
+                    <SiteDetailsHeader
+                        site={currentSite}
+                        {...(selectedMonitor ? { selectedMonitor } : {})}
+                        isCollapsed={isHeaderCollapsed}
+                        onToggleCollapse={() => setIsHeaderCollapsed(!isHeaderCollapsed)}
+                    />
 
                     <SiteDetailsNavigation
                         activeSiteDetailsTab={activeSiteDetailsTab}
                         currentSite={currentSite}
-                        handleIntervalChange={handleIntervalChange}
                         handleMonitorIdChange={handleMonitorIdChange}
-                        handleSaveInterval={handleSaveInterval}
-                        handleSaveTimeout={handleSaveTimeout}
                         handleStartMonitoring={handleStartMonitoring}
+                        handleStartSiteMonitoring={handleStartSiteMonitoring}
                         handleStopMonitoring={handleStopMonitoring}
-                        handleTimeoutChange={handleTimeoutChange}
-                        intervalChanged={intervalChanged}
+                        handleStopSiteMonitoring={handleStopSiteMonitoring}
                         isLoading={isLoading}
                         isMonitoring={isMonitoring}
-                        localCheckInterval={localCheckInterval}
-                        localTimeout={localTimeout}
-                        onCheckNow={() => handleCheckNow()}
                         selectedMonitorId={selectedMonitorId}
                         setActiveSiteDetailsTab={setActiveSiteDetailsTab}
-                        setSiteDetailsChartTimeRange={(range: string) =>
-                            setSiteDetailsChartTimeRange(range as "1h" | "24h" | "7d" | "30d")
-                        }
-                        siteDetailsChartTimeRange={siteDetailsChartTimeRange}
-                        timeoutChanged={timeoutChanged}
                     />
 
                     {/* Tab Content */}
-                    <ThemedBox variant="primary" padding="lg" className="max-h-[70vh] overflow-y-auto">
-                        {activeSiteDetailsTab === "overview" && selectedMonitor && (
+                    <ThemedBox
+                        variant="primary"
+                        padding="lg"
+                        className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800"
+                    >
+                        {activeSiteDetailsTab === "site-overview" && (
+                            <SiteOverviewTab
+                                site={currentSite}
+                                uptime={parseFloat(analytics.uptime)}
+                                avgResponseTime={analytics.avgResponseTime}
+                                totalChecks={analytics.totalChecks}
+                                handleRemoveSite={handleRemoveSite}
+                                isLoading={isLoading}
+                                handleStartSiteMonitoring={handleStartSiteMonitoring}
+                                handleStopSiteMonitoring={handleStopSiteMonitoring}
+                            />
+                        )}
+
+                        {activeSiteDetailsTab === "monitor-overview" && selectedMonitor && (
                             <OverviewTab
                                 selectedMonitor={selectedMonitor}
                                 uptime={analytics.uptime}
@@ -279,7 +286,16 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
                                 fastestResponse={analytics.fastestResponse}
                                 slowestResponse={analytics.slowestResponse}
                                 formatResponseTime={formatResponseTime}
-                                handleRemoveSite={handleRemoveSite}
+                                handleRemoveMonitor={handleRemoveMonitor}
+                                handleIntervalChange={handleIntervalChange}
+                                handleSaveInterval={handleSaveInterval}
+                                handleSaveTimeout={handleSaveTimeout}
+                                handleTimeoutChange={handleTimeoutChange}
+                                intervalChanged={intervalChanged}
+                                localCheckInterval={localCheckInterval}
+                                localTimeout={localTimeout}
+                                onCheckNow={() => handleCheckNow()}
+                                timeoutChanged={timeoutChanged}
                                 isLoading={isLoading}
                             />
                         )}
@@ -297,7 +313,6 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
                                 mttr={analytics.mttr}
                                 totalDowntime={analytics.totalDowntime}
                                 downtimePeriods={analytics.downtimePeriods}
-                                chartTimeRange={siteDetailsChartTimeRange}
                                 lineChartData={lineChartData}
                                 lineChartOptions={lineChartOptions}
                                 barChartData={barChartData}
@@ -308,8 +323,8 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
                                 formatDuration={formatDuration}
                                 showAdvancedMetrics={showAdvancedMetrics}
                                 setShowAdvancedMetrics={setShowAdvancedMetrics}
-                                getAvailabilityColor={() => currentTheme.colors.primary[500]}
-                                getAvailabilityVariant={getAvailabilityVariant}
+                                setSiteDetailsChartTimeRange={setSiteDetailsChartTimeRange}
+                                siteDetailsChartTimeRange={siteDetailsChartTimeRange}
                                 getAvailabilityDescription={getAvailabilityDescription}
                                 monitorType={selectedMonitor.type}
                             />

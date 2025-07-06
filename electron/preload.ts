@@ -17,6 +17,9 @@ const siteAPI = {
         ipcRenderer.invoke("check-site-now", identifier, monitorType),
     /** Retrieve all sites from the database */
     getSites: () => ipcRenderer.invoke("get-sites"),
+    /** Remove a monitor from a site */
+    removeMonitor: (siteIdentifier: string, monitorId: string) =>
+        ipcRenderer.invoke("remove-monitor", siteIdentifier, monitorId),
     /** Remove a site and all its data */
     removeSite: (identifier: string) => ipcRenderer.invoke("remove-site", identifier),
     /** Update site properties */

@@ -5,8 +5,11 @@
  * in a visually appealing header with gradient background and accent styling.
  */
 
+import { MdExpandLess, MdExpandMore } from "react-icons/md";
+
+import { useThemeStyles } from "../../hooks/useThemeStyles";
 import logger from "../../services/logger";
-import { ThemedText, StatusIndicator } from "../../theme/components";
+import { ThemedText, StatusIndicator, ThemedBox, ThemedBadge } from "../../theme/components";
 import { Site, Monitor } from "../../types";
 import { ScreenshotThumbnail } from "./ScreenshotThumbnail";
 
@@ -16,6 +19,10 @@ interface SiteDetailsHeaderProps {
     readonly site: Site;
     /** The currently selected monitor for the site */
     readonly selectedMonitor?: Monitor;
+    /** Whether the header is collapsed */
+    readonly isCollapsed?: boolean;
+    /** Callback to toggle the header collapse state */
+    readonly onToggleCollapse?: () => void;
 }
 
 /**
@@ -28,7 +35,7 @@ interface SiteDetailsHeaderProps {
  * @returns JSX element containing the site details header
  */
 
-export function SiteDetailsHeader({ selectedMonitor, site }: SiteDetailsHeaderProps) {
+export function SiteDetailsHeader({ isCollapsed, onToggleCollapse, selectedMonitor, site }: SiteDetailsHeaderProps) {
     /**
      * Type guard to check if the window.electronAPI has openExternal method
      * @param api - The API object to check
@@ -38,61 +45,165 @@ export function SiteDetailsHeader({ selectedMonitor, site }: SiteDetailsHeaderPr
         return typeof (api as { openExternal?: unknown })?.openExternal === "function";
     }
 
+    // Use theme-aware styles
+    const styles = useThemeStyles(isCollapsed);
+
     return (
-        <div className="site-details-header">
-            <div className="site-details-header-overlay" />
-            <div className="site-details-header-content">
+        <div style={styles.headerStyle}>
+            <div style={styles.overlayStyle} />
+            <div style={styles.contentStyle}>
                 {/* Left accent bar */}
                 <div className="site-details-header-accent" />
-                <div className="flex items-center gap-4 site-details-header-info">
-                    {/* Website Screenshot Thumbnail */}
-                    <ScreenshotThumbnail
-                        url={selectedMonitor?.type === "http" ? (selectedMonitor?.url ?? "") : ""}
-                        siteName={site.name ?? site.identifier}
-                    />
-                    <div className="site-details-status-indicator">
-                        <StatusIndicator status={selectedMonitor?.status ?? "unknown"} size="lg" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                        <ThemedText size="2xl" weight="bold" className="truncate site-details-title">
-                            {site.name ?? site.identifier}
-                        </ThemedText>
-                        {/* Show URL for HTTP, host:port for port monitor */}
-                        {selectedMonitor?.type === "http" && selectedMonitor?.url && (
-                            <a
-                                href={selectedMonitor.url}
-                                className="truncate site-details-url"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                tabIndex={0}
-                                aria-label={`Open ${selectedMonitor.url} in browser`}
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    const url = selectedMonitor.url ?? "";
-                                    logger.user.action("External URL opened from site details", {
-                                        siteId: site.identifier,
-                                        siteName: site.name,
-                                        url: url,
-                                    });
-                                    if (hasOpenExternal(window.electronAPI)) {
-                                        window.electronAPI.openExternal(url);
-                                    } else {
-                                        window.open(url, "_blank");
-                                    }
-                                }}
-                            >
-                                {selectedMonitor.url}
-                            </a>
+                <div className="flex items-start justify-between gap-6 site-details-header-info w-full">
+                    {/* Left side: Screenshot, Status, and Site Info */}
+                    <div className="flex items-center gap-4 flex-1 min-w-0">
+                        {/* Website Screenshot Thumbnail */}
+                        {!isCollapsed && (
+                            <ScreenshotThumbnail
+                                url={selectedMonitor?.type === "http" ? (selectedMonitor?.url ?? "") : ""}
+                                siteName={site.name ?? site.identifier}
+                            />
                         )}
-                        {/* Fallback if no monitor is available */}
-                        {!selectedMonitor && (
-                            <ThemedText variant="warning" size="base">
-                                No monitor data available for this site.
+                        <div className="site-details-status-indicator">
+                            <StatusIndicator status={selectedMonitor?.status ?? "unknown"} size="lg" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <ThemedText size="2xl" weight="bold" className="truncate site-details-title">
+                                {site.name ?? site.identifier}
                             </ThemedText>
+                            {/* Show URL for HTTP, host:port for port monitor */}
+                            {!isCollapsed && selectedMonitor?.type === "http" && selectedMonitor?.url && (
+                                <a
+                                    href={selectedMonitor.url}
+                                    className="truncate site-details-url"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    tabIndex={0}
+                                    aria-label={`Open ${selectedMonitor.url} in browser`}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        const url = selectedMonitor.url ?? "";
+                                        logger.user.action("External URL opened from site details", {
+                                            siteId: site.identifier,
+                                            siteName: site.name,
+                                            url: url,
+                                        });
+                                        if (hasOpenExternal(window.electronAPI)) {
+                                            window.electronAPI.openExternal(url);
+                                        } else {
+                                            window.open(url, "_blank");
+                                        }
+                                    }}
+                                >
+                                    {selectedMonitor.url}
+                                </a>
+                            )}
+                            {/* Fallback if no monitor is available */}
+                            {!isCollapsed && !selectedMonitor && (
+                                <ThemedText variant="warning" size="base">
+                                    No monitor data available for this site.
+                                </ThemedText>
+                            )}
+                        </div>
+                    </div>
+                    {/* Right side: Monitoring Status Display and Collapse Button */}
+                    <div className="flex items-center gap-2 flex-shrink-0 self-start">
+                        {!isCollapsed && <MonitoringStatusDisplay monitors={site.monitors} />}
+                        {onToggleCollapse && (
+                            <button
+                                type="button"
+                                onClick={onToggleCollapse}
+                                style={styles.collapseButtonStyle}
+                                aria-label={isCollapsed ? "Expand header" : "Collapse header"}
+                                title={isCollapsed ? "Expand header" : "Collapse header"}
+                            >
+                                {isCollapsed ? (
+                                    <MdExpandMore className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                                ) : (
+                                    <MdExpandLess className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                                )}
+                            </button>
                         )}
                     </div>
                 </div>
             </div>
         </div>
+    );
+}
+
+/**
+ * Enhanced monitoring status display component for the site details header.
+ * Shows larger indicators with monitor names and types using the theme system.
+ * @param monitors - Array of monitors to display status for
+ * @returns JSX element with enhanced monitoring status indicators
+ */
+function MonitoringStatusDisplay({ monitors }: { readonly monitors: Monitor[] }) {
+    if (monitors.length === 0) {
+        return (
+            <ThemedBox variant="secondary" padding="sm" rounded="md" data-testid="monitoring-status-display">
+                <ThemedText size="sm" variant="secondary">
+                    No monitors configured
+                </ThemedText>
+            </ThemedBox>
+        );
+    }
+
+    const runningCount = monitors.filter((monitor) => monitor.monitoring === true).length;
+    const totalCount = monitors.length;
+
+    return (
+        <ThemedBox
+            variant="primary"
+            surface="elevated"
+            padding="md"
+            rounded="lg"
+            shadow="sm"
+            data-testid="monitoring-status-display"
+            className="min-w-0"
+        >
+            <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2">
+                    <ThemedText size="sm" weight="semibold" variant="primary">
+                        Monitor Status
+                    </ThemedText>
+                    <ThemedBadge variant={runningCount > 0 ? "success" : "secondary"} size="sm">
+                        {runningCount}/{totalCount} active
+                    </ThemedBadge>
+                </div>
+                <div className="flex flex-col gap-1 max-h-32 overflow-y-auto">
+                    {monitors.map((monitor) => (
+                        <div
+                            key={monitor.id}
+                            className="flex items-center gap-2"
+                            data-testid={`monitor-status-${monitor.id}`}
+                        >
+                            <ThemedBadge variant={monitor.monitoring ? "success" : "secondary"} size="xs">
+                                <div className="flex items-center gap-1">
+                                    <div
+                                        className={`w-2 h-2 rounded-full ${
+                                            monitor.monitoring ? "bg-green-500" : "bg-gray-400"
+                                        }`}
+                                        title={`${monitor.type.toUpperCase()}: ${monitor.monitoring ? "Running" : "Stopped"}`}
+                                    />
+                                    <ThemedText size="xs" weight="medium">
+                                        {monitor.type.toUpperCase()}
+                                    </ThemedText>
+                                </div>
+                            </ThemedBadge>
+                            <ThemedText size="xs" variant="secondary" className="min-w-0 flex-1">
+                                {monitor.type === "http" && monitor.url && (
+                                    <span className="truncate block">{new URL(monitor.url).hostname}</span>
+                                )}
+                                {monitor.type === "port" && monitor.host && monitor.port && (
+                                    <span className="truncate block">
+                                        {monitor.host}:{monitor.port}
+                                    </span>
+                                )}
+                            </ThemedText>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </ThemedBox>
     );
 }

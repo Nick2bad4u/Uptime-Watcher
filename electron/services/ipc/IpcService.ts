@@ -51,6 +51,11 @@ export class IpcService {
             if (isDev()) logger.debug("[IpcService] Handling update-site", { identifier });
             return this.uptimeOrchestrator.updateSite(identifier, updates);
         });
+
+        ipcMain.handle("remove-monitor", async (_, siteIdentifier, monitorId) => {
+            if (isDev()) logger.debug("[IpcService] Handling remove-monitor", { monitorId, siteIdentifier });
+            return this.uptimeOrchestrator.removeMonitor(siteIdentifier, monitorId);
+        });
     }
 
     /**

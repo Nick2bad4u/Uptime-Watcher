@@ -1,23 +1,3 @@
-/* SiteDetails Modal Styles */
-.site-details-modal {
-    position: fixed;
-    inset: 0;
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--spacing-md);
-    background-color: var(--color-background-modal);
-    backdrop-filter: blur(4px);
-}
-
-.site-details-modal > div {
-    width: 100%;
-    max-width: 1200px;
-    max-height: 90vh;
-    overflow-y: auto;
-}
-
 /* Site Details Header */
 .site-details-header {
     position: relative;
@@ -86,6 +66,43 @@
     align-items: center;
     gap: var(--spacing-2xl);
     transition: background 0.3s var(--ease-in-out);
+    flex-wrap: wrap;
+}
+
+/* Responsive header adjustments */
+@media (max-width: 1024px) {
+    .site-details-header-content {
+        gap: var(--spacing-lg);
+        padding-left: var(--spacing-lg);
+        padding-right: var(--spacing-lg);
+    }
+}
+
+@media (max-width: 768px) {
+    .site-details-header-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-md);
+        padding: var(--spacing-md);
+    }
+    
+    .site-details-header-info {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: var(--spacing-md) !important;
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .site-details-header {
+        padding: var(--spacing-lg);
+    }
+    
+    .site-details-header-content {
+        padding: var(--spacing-sm);
+        gap: var(--spacing-sm);
+    }
 }
 
 .site-details-title {
@@ -230,7 +247,7 @@
 }
 
 /* Chart containers */
-.site-details-modal .h-64 {
+.h-64 {
     height: 16rem;
     position: relative;
 }
@@ -310,14 +327,6 @@
 /* Responsive adjustments */
 /* stylelint-disable-next-line media-feature-range-notation -- messes up postcss */
 @media (max-width: 768px) {
-    .site-details-modal {
-        padding: var(--spacing-sm);
-    }
-
-    .site-details-modal > div {
-        max-height: 95vh;
-    }
-
     .site-details-header {
         padding: var(--spacing-md);
     }

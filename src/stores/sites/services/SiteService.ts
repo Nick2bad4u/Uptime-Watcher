@@ -62,4 +62,12 @@ export class SiteService {
         await this.initialize();
         return window.electronAPI.data.downloadSQLiteBackup();
     }
+
+    /**
+     * Remove a monitor from a site
+     */
+    static async removeMonitor(siteIdentifier: string, monitorId: string): Promise<void> {
+        await this.initialize();
+        return window.electronAPI.sites.removeMonitor(siteIdentifier, monitorId);
+    }
 }

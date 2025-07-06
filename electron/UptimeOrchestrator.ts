@@ -183,6 +183,14 @@ export class UptimeOrchestrator extends EventEmitter {
         return this.siteManager.removeSite(identifier);
     }
 
+    public async removeMonitor(siteIdentifier: string, monitorId: string): Promise<boolean> {
+        // Stop monitoring for this specific monitor first
+        await this.monitorManager.stopMonitoringForSite(siteIdentifier, monitorId);
+
+        // Remove the monitor through the site manager
+        return this.siteManager.removeMonitor(siteIdentifier, monitorId);
+    }
+
     public async updateSite(identifier: string, updates: Partial<Site>): Promise<Site> {
         return this.siteManager.updateSite(identifier, updates);
     }

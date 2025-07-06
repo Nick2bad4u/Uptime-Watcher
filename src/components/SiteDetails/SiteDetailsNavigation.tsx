@@ -6,42 +6,9 @@
 
 import React from "react";
 
-import { CHECK_INTERVALS, TIMEOUT_CONSTRAINTS } from "../../constants";
 import logger from "../../services/logger";
 import { ThemedBox, ThemedButton, ThemedSelect, ThemedText } from "../../theme/components";
 import { Site } from "../../types";
-
-/**
- * Helper function to format time duration into human readable format.
- * @param milliseconds - Time duration in milliseconds
- * @returns Formatted time string (e.g., "30s", "5m", "1h")
- */
-function formatDuration(milliseconds: number): string {
-    if (milliseconds < 60000) {
-        return `${milliseconds / 1000}s`;
-    }
-    if (milliseconds < 3600000) {
-        return `${milliseconds / 60000}m`;
-    }
-    return `${milliseconds / 3600000}h`;
-}
-
-/**
- * Helper function to get display label for interval value.
- * @param interval - Interval configuration (number or object with value/label)
- * @returns Human readable label for the interval
- */
-function getIntervalLabel(interval: number | { value: number; label?: string }): string {
-    if (typeof interval === "number") {
-        return formatDuration(interval);
-    }
-
-    if (interval.label) {
-        return interval.label;
-    }
-
-    return formatDuration(interval.value);
-}
 
 /**
  * Props for the SiteDetailsNavigation component.
@@ -52,42 +19,24 @@ interface SiteDetailsNavigationProps {
     readonly activeSiteDetailsTab: string;
     /** The site object being displayed */
     readonly currentSite: Site;
-    /** Handler for monitor check interval changes */
-    readonly handleIntervalChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
     /** Handler for monitor selection changes */
     readonly handleMonitorIdChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-    /** Handler for saving interval changes */
-    readonly handleSaveInterval: () => Promise<void>;
-    /** Handler for saving timeout changes */
-    readonly handleSaveTimeout: () => Promise<void>;
     /** Handler for starting monitoring */
     readonly handleStartMonitoring: () => Promise<void>;
+    /** Handler for starting site-level monitoring */
+    readonly handleStartSiteMonitoring: () => Promise<void>;
     /** Handler for stopping monitoring */
     readonly handleStopMonitoring: () => Promise<void>;
-    /** Handler for monitor timeout changes */
-    readonly handleTimeoutChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    /** Whether the check interval has been changed */
-    readonly intervalChanged: boolean;
+    /** Handler for stopping site-level monitoring */
+    readonly handleStopSiteMonitoring: () => Promise<void>;
     /** Whether any async operation is in progress */
     readonly isLoading: boolean;
     /** Whether monitoring is currently active */
     readonly isMonitoring: boolean;
-    /** Local state value for check interval */
-    readonly localCheckInterval: number;
-    /** Local state value for timeout */
-    readonly localTimeout: number;
-    /** Handler for immediate check trigger */
-    readonly onCheckNow: () => void;
     /** Currently selected monitor ID */
     readonly selectedMonitorId: string;
     /** Function to set the active tab */
     readonly setActiveSiteDetailsTab: (tab: string) => void;
-    /** Function to set the chart time range */
-    readonly setSiteDetailsChartTimeRange: (range: string) => void;
-    /** Current chart time range selection */
-    readonly siteDetailsChartTimeRange: string;
-    /** Whether the timeout has been changed */
-    readonly timeoutChanged: boolean;
 }
 
 /**
@@ -106,24 +55,15 @@ interface SiteDetailsNavigationProps {
 export function SiteDetailsNavigation({
     activeSiteDetailsTab,
     currentSite,
-    handleIntervalChange,
     handleMonitorIdChange,
-    handleSaveInterval,
-    handleSaveTimeout,
     handleStartMonitoring,
+    handleStartSiteMonitoring,
     handleStopMonitoring,
-    handleTimeoutChange,
-    intervalChanged,
+    handleStopSiteMonitoring,
     isLoading,
     isMonitoring,
-    localCheckInterval,
-    localTimeout,
-    onCheckNow,
     selectedMonitorId,
     setActiveSiteDetailsTab,
-    setSiteDetailsChartTimeRange,
-    siteDetailsChartTimeRange,
-    timeoutChanged,
 }: SiteDetailsNavigationProps) {
     const logTabChange = (tab: string, additionalData?: Record<string, unknown>) => {
         logger.user.action("Site details tab changed", {
@@ -133,24 +73,55 @@ export function SiteDetailsNavigation({
         });
     };
 
+    // Site-level monitoring state calculation
+    const allMonitorsRunning =
+        currentSite.monitors.length > 0 && currentSite.monitors.every((monitor) => monitor.monitoring === true);
+
+    // Button variant constants
+    const BUTTON_VARIANT_PRIMARY = "primary";
+    const BUTTON_VARIANT_SECONDARY = "secondary";
+
     return (
-        <ThemedBox variant="secondary" padding="lg" className="border-b">
-            <div className="flex flex-wrap items-center gap-2">
+        <ThemedBox variant="secondary" padding="lg" className="space-y-4 border-b">
+            {/* Tab Navigation and Monitor Selection */}
+            <div className="flex flex-wrap items-center justify-between gap-4">
                 {/* Tab navigation buttons (left) */}
                 <div className="flex flex-wrap items-center gap-2">
                     <ThemedButton
-                        variant={activeSiteDetailsTab === "overview" ? "primary" : "secondary"}
+                        variant={
+                            activeSiteDetailsTab === "site-overview" ? BUTTON_VARIANT_PRIMARY : BUTTON_VARIANT_SECONDARY
+                        }
+                        size="sm"
                         onClick={() => {
-                            setActiveSiteDetailsTab("overview");
-                            logTabChange("overview");
+                            setActiveSiteDetailsTab("site-overview");
+                            logTabChange("site-overview");
                         }}
                     >
-                        📊 Overview
+                        🏠 Site Overview
+                    </ThemedButton>
+                    <ThemedButton
+                        variant={
+                            activeSiteDetailsTab === "monitor-overview"
+                                ? BUTTON_VARIANT_PRIMARY
+                                : BUTTON_VARIANT_SECONDARY
+                        }
+                        size="sm"
+                        onClick={() => {
+                            setActiveSiteDetailsTab("monitor-overview");
+                            logTabChange("monitor-overview");
+                        }}
+                    >
+                        📊 Monitor Overview
                     </ThemedButton>
                     {/* Render analytics tab for selected monitor type only */}
                     <ThemedButton
                         key={selectedMonitorId}
-                        variant={activeSiteDetailsTab === `${selectedMonitorId}-analytics` ? "primary" : "secondary"}
+                        variant={
+                            activeSiteDetailsTab === `${selectedMonitorId}-analytics`
+                                ? BUTTON_VARIANT_PRIMARY
+                                : BUTTON_VARIANT_SECONDARY
+                        }
+                        size="sm"
                         onClick={() => {
                             setActiveSiteDetailsTab(`${selectedMonitorId}-analytics`);
                             logTabChange("analytics", { monitorId: selectedMonitorId });
@@ -159,7 +130,8 @@ export function SiteDetailsNavigation({
                         {`📈 ${selectedMonitorId.toUpperCase()}`}
                     </ThemedButton>
                     <ThemedButton
-                        variant={activeSiteDetailsTab === "history" ? "primary" : "secondary"}
+                        variant={activeSiteDetailsTab === "history" ? BUTTON_VARIANT_PRIMARY : BUTTON_VARIANT_SECONDARY}
+                        size="sm"
                         onClick={() => {
                             setActiveSiteDetailsTab("history");
                             logTabChange("history");
@@ -168,7 +140,10 @@ export function SiteDetailsNavigation({
                         📜 History
                     </ThemedButton>
                     <ThemedButton
-                        variant={activeSiteDetailsTab === "settings" ? "primary" : "secondary"}
+                        variant={
+                            activeSiteDetailsTab === "settings" ? BUTTON_VARIANT_PRIMARY : BUTTON_VARIANT_SECONDARY
+                        }
+                        size="sm"
                         onClick={() => {
                             setActiveSiteDetailsTab("settings");
                             logTabChange("settings");
@@ -177,115 +152,78 @@ export function SiteDetailsNavigation({
                         ⚙️ Settings
                     </ThemedButton>
                 </div>
-                {/* Controls (right, before monitor type selector) */}
-                <div className="flex items-center gap-2 ml-auto">
-                    <ThemedText size="sm" variant="secondary">
-                        Interval:
-                    </ThemedText>
-                    <ThemedSelect value={localCheckInterval} onChange={handleIntervalChange}>
-                        {CHECK_INTERVALS.map((interval) => {
-                            // Support both number and object forms
-                            const value = typeof interval === "number" ? interval : interval.value;
-                            const label = getIntervalLabel(interval);
-                            return (
-                                <option key={value} value={value}>
-                                    {label}
-                                </option>
-                            );
-                        })}
-                    </ThemedSelect>
-                    {intervalChanged && (
-                        <ThemedButton variant="primary" size="sm" onClick={handleSaveInterval}>
-                            Save
-                        </ThemedButton>
-                    )}
-                    {/* Timeout control */}
-                    <ThemedText variant="secondary" size="base">
-                        Timeout (seconds):
-                    </ThemedText>
-                    <input
-                        type="number"
-                        min={TIMEOUT_CONSTRAINTS.MIN}
-                        max={TIMEOUT_CONSTRAINTS.MAX}
-                        step={TIMEOUT_CONSTRAINTS.STEP}
-                        value={localTimeout}
-                        onChange={handleTimeoutChange}
-                        className="w-20 px-2 py-1 text-sm border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        disabled={isLoading}
-                        aria-label="Monitor timeout in seconds"
-                    />
-                    {timeoutChanged && (
-                        <ThemedButton variant="primary" size="sm" onClick={handleSaveTimeout}>
-                            Save
-                        </ThemedButton>
-                    )}
-                    {/* Check now button */}
-                    <ThemedButton
-                        variant="ghost"
-                        size="sm"
-                        onClick={onCheckNow}
-                        className="min-w-[32px]"
-                        aria-label="Check Now"
-                        disabled={isLoading}
-                    >
-                        <span>🔄</span>
-                    </ThemedButton>
-                    {isMonitoring ? (
-                        <ThemedButton
-                            variant="error"
-                            size="sm"
-                            onClick={handleStopMonitoring}
-                            aria-label="Stop Monitoring"
-                            className="flex items-center gap-1"
-                        >
-                            <span className="inline-block">⏸️</span>
-                            <span className="hidden sm:inline">Stop</span>
-                        </ThemedButton>
-                    ) : (
-                        <ThemedButton
-                            variant="success"
-                            size="sm"
-                            onClick={handleStartMonitoring}
-                            aria-label="Start Monitoring"
-                            className="flex items-center gap-1"
-                        >
-                            <span className="inline-block">▶️</span>
-                            <span className="hidden sm:inline">Start</span>
-                        </ThemedButton>
-                    )}
-                    {/* Monitor type selector (far right) */}
-                    <ThemedText variant="secondary" size="base">
-                        Monitor:
-                    </ThemedText>
-                    <ThemedSelect value={selectedMonitorId} onChange={handleMonitorIdChange}>
-                        {currentSite.monitors.map((monitor) => (
-                            <option key={monitor.id} value={monitor.id}>
-                                {monitor.type.toUpperCase()}
-                            </option>
-                        ))}
-                    </ThemedSelect>
-                </div>
-            </div>
-            {/* Time Range Selector for Analytics Tab */}
-            {activeSiteDetailsTab === `${selectedMonitorId}-analytics` && (
-                <div className="flex flex-wrap items-center gap-3 mt-4">
-                    <ThemedText size="sm" variant="secondary" className="mr-2">
-                        Time Range:
-                    </ThemedText>
-                    <div className="flex flex-wrap gap-1">
-                        {(["1h", "24h", "7d", "30d"] as const).map((range) => (
+
+                {/* Monitor Selection and Site-level Controls (right) */}
+                <div className="flex items-center gap-4">
+                    {/* Site-level monitoring controls */}
+                    <div className="flex items-center gap-2">
+                        {allMonitorsRunning ? (
                             <ThemedButton
-                                key={range}
-                                variant={siteDetailsChartTimeRange === range ? "primary" : "ghost"}
-                                size="xs"
-                                onClick={() => setSiteDetailsChartTimeRange(range)}
+                                variant="error"
+                                size="sm"
+                                onClick={handleStopSiteMonitoring}
+                                aria-label="Stop All Monitoring"
+                                className="flex items-center gap-1"
+                                disabled={isLoading}
                             >
-                                {range}
+                                <span>⏹️</span>
+                                <span className="hidden text-xs sm:inline">Stop All</span>
                             </ThemedButton>
-                        ))}
+                        ) : (
+                            <ThemedButton
+                                variant="success"
+                                size="sm"
+                                onClick={handleStartSiteMonitoring}
+                                aria-label="Start All Monitoring"
+                                className="flex items-center gap-1"
+                                disabled={isLoading}
+                            >
+                                <span>▶️</span>
+                                <span className="hidden text-xs sm:inline">Start All</span>
+                            </ThemedButton>
+                        )}
+
+                        {/* Individual monitor controls */}
+                        {isMonitoring ? (
+                            <ThemedButton
+                                variant="warning"
+                                size="sm"
+                                onClick={handleStopMonitoring}
+                                aria-label="Stop Monitoring"
+                                className="flex items-center gap-1"
+                            >
+                                <span>⏸️</span>
+                                <span className="hidden text-xs sm:inline">Stop</span>
+                            </ThemedButton>
+                        ) : (
+                            <ThemedButton
+                                variant="success"
+                                size="sm"
+                                onClick={handleStartMonitoring}
+                                aria-label="Start Monitoring"
+                                className="flex items-center gap-1"
+                            >
+                                <span>▶️</span>
+                                <span className="hidden text-xs sm:inline">Start</span>
+                            </ThemedButton>
+                        )}
+                    </div>
+
+                    {/* Monitor Selection */}
+                    <div className="flex items-center gap-2">
+                        <ThemedText variant="secondary" size="sm">
+                            Monitor:
+                        </ThemedText>
+                        <ThemedSelect value={selectedMonitorId} onChange={handleMonitorIdChange}>
+                            {currentSite.monitors.map((monitor) => (
+                                <option key={monitor.id} value={monitor.id}>
+                                    {monitor.type.toUpperCase()}
+                                </option>
+                            ))}
+                        </ThemedSelect>
                     </div>
                 </div>
-            )}
+            </div>
         </ThemedBox>
     );
 }

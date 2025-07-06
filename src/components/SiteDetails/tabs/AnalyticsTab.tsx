@@ -4,10 +4,13 @@
  */
 
 import { Line, Bar, Doughnut } from "react-chartjs-2";
+import { FiActivity, FiTrendingUp, FiBarChart2 } from "react-icons/fi";
+import { MdAnalytics, MdTrendingUp, MdSpeed, MdPieChart } from "react-icons/md";
 
 import { DowntimePeriod } from "../../../hooks/site/useSiteAnalytics";
 import logger from "../../../services/logger";
-import { ThemedBox, ThemedText, ThemedButton } from "../../../theme/components";
+import { ThemedText, ThemedButton, ThemedCard, ThemedBadge, ThemedProgress } from "../../../theme/components";
+import { useTheme, useAvailabilityColors } from "../../../theme/useTheme";
 import { MonitorType } from "../../../types";
 
 /**
@@ -25,8 +28,6 @@ interface AnalyticsTabProps {
     readonly barChartData: Record<string, unknown>;
     /** Chart.js options configuration for bar chart */
     readonly barChartOptions: Record<string, unknown>;
-    /** Current time range for charts (e.g., "24h", "7d") */
-    readonly chartTimeRange: string;
     /** Chart.js options configuration for doughnut chart */
     readonly doughnutOptions: Record<string, unknown>;
     /** Number of failed checks */
@@ -37,12 +38,8 @@ interface AnalyticsTabProps {
     readonly formatDuration: (ms: number) => string;
     /** Function to format response time values */
     readonly formatResponseTime: (time: number) => string;
-    /** Function to get color based on availability percentage */
-    readonly getAvailabilityColor: (percentage: number) => string;
     /** Function to get description based on availability percentage */
     readonly getAvailabilityDescription: (percentage: number) => string;
-    /** Function to get variant based on availability percentage */
-    readonly getAvailabilityVariant: (percentage: number) => "success" | "warning" | "danger";
     /** Chart.js data configuration for line chart */
     readonly lineChartData: Record<string, unknown>;
     /** Chart.js options configuration for line chart */
@@ -59,8 +56,12 @@ interface AnalyticsTabProps {
     readonly p99: number;
     /** Function to toggle advanced metrics visibility */
     readonly setShowAdvancedMetrics: (show: boolean) => void;
+    /** Function to set the chart time range */
+    readonly setSiteDetailsChartTimeRange: (range: "1h" | "24h" | "7d" | "30d") => void;
     /** Whether advanced metrics are currently shown */
     readonly showAdvancedMetrics: boolean;
+    /** Current chart time range selection */
+    readonly siteDetailsChartTimeRange: "1h" | "24h" | "7d" | "30d";
     /** Total number of checks performed */
     readonly totalChecks: number;
     /** Total downtime in milliseconds */
@@ -91,15 +92,12 @@ export function AnalyticsTab({
     avgResponseTime,
     barChartData,
     barChartOptions,
-    chartTimeRange,
     doughnutOptions,
     downCount,
     downtimePeriods,
     formatDuration,
     formatResponseTime,
-    getAvailabilityColor,
     getAvailabilityDescription,
-    getAvailabilityVariant,
     lineChartData,
     lineChartOptions,
     monitorType,
@@ -108,165 +106,246 @@ export function AnalyticsTab({
     p95,
     p99,
     setShowAdvancedMetrics,
+    setSiteDetailsChartTimeRange,
     showAdvancedMetrics,
+    siteDetailsChartTimeRange,
     totalChecks,
     totalDowntime,
     upCount,
     uptime,
     uptimeChartData,
 }: AnalyticsTabProps) {
+    const { getAvailabilityColor: getColor, getAvailabilityVariant: getVariant } = useAvailabilityColors();
+    const { currentTheme } = useTheme();
+
+    // Function to get response time color based on performance
+    const getResponseTimeColor = (responseTime: number): string => {
+        if (responseTime <= 100) return currentTheme.colors.success; // Green for excellent (≤100ms)
+        if (responseTime <= 500) return currentTheme.colors.warning; // Yellow for good (≤500ms)
+        return currentTheme.colors.error; // Red for poor (>500ms)
+    };
+
+    // Icon colors configuration
+    const getIconColors = () => {
+        const availabilityColor = getColor(parseFloat(uptime));
+        const responseTimeColor = getResponseTimeColor(avgResponseTime);
+        return {
+            analytics: currentTheme.colors.primary[500],
+            charts: currentTheme.colors.primary[600],
+            downtime: currentTheme.colors.error,
+            performance: responseTimeColor,
+            uptime: availabilityColor,
+        };
+    };
+
+    const iconColors = getIconColors();
+    const uptimeValue = parseFloat(uptime);
+    const variant = getVariant(uptimeValue);
+    const progressVariant = variant === "danger" ? "error" : variant;
+
     return (
         <div data-testid="analytics-tab" className="space-y-6">
-            {/* Analytics Tab */}
-            <ThemedText variant="primary" weight="bold">
-                Analytics Tab
-            </ThemedText>
-            {/* Analytics Summary */}
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                <ThemedBox
-                    surface="base"
-                    padding="lg"
-                    border
-                    rounded="lg"
+            {/* Time Range Selector */}
+            <ThemedCard icon={<MdAnalytics />} title="Analytics Time Range">
+                <div className="flex items-center justify-between">
+                    <ThemedText size="sm" variant="secondary">
+                        Select time range for analytics data:
+                    </ThemedText>
+                    <div className="flex gap-2">
+                        {(["1h", "24h", "7d", "30d"] as const).map((range) => (
+                            <ThemedButton
+                                key={range}
+                                variant={siteDetailsChartTimeRange === range ? "primary" : "ghost"}
+                                size="sm"
+                                onClick={() => {
+                                    logger.user.action("Chart time range changed", {
+                                        monitorType: monitorType,
+                                        newRange: range,
+                                    });
+                                    setSiteDetailsChartTimeRange(range);
+                                }}
+                            >
+                                {range}
+                            </ThemedButton>
+                        ))}
+                    </div>
+                </div>
+            </ThemedCard>
+
+            {/* Key Metrics Grid */}
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                <ThemedCard
+                    icon={<MdAnalytics />}
+                    iconColor={iconColors.uptime}
+                    title="Availability"
+                    hoverable
                     className="flex flex-col items-center text-center"
                 >
-                    <ThemedText size="sm" variant="secondary">
-                        Availability ({chartTimeRange})
-                    </ThemedText>
-                    <ThemedText
-                        size="3xl"
-                        weight="bold"
-                        variant={getAvailabilityVariant(parseFloat(uptime))}
-                        style={{ color: getAvailabilityColor(parseFloat(uptime)) }}
-                    >
-                        {uptime}%
-                    </ThemedText>
-                    <ThemedText size="xs" variant="tertiary">
-                        {upCount} up / {downCount} down
-                    </ThemedText>
-                    <ThemedText size="xs" variant="secondary" className="mt-1">
-                        {getAvailabilityDescription(parseFloat(uptime))}
-                    </ThemedText>
-                </ThemedBox>
+                    <div className="flex flex-col items-center space-y-2">
+                        <ThemedProgress
+                            value={uptimeValue}
+                            variant={progressVariant}
+                            showLabel
+                            className="flex flex-col items-center"
+                        />
+                        <ThemedBadge variant={progressVariant} size="sm">
+                            {uptime}%
+                        </ThemedBadge>
+                        <ThemedText size="xs" variant="secondary">
+                            {getAvailabilityDescription(uptimeValue)}
+                        </ThemedText>
+                    </div>
+                </ThemedCard>
 
-                {/* Hide avg response time for port monitors */}
                 {(monitorType === "http" || monitorType === "port") && (
-                    <ThemedBox
-                        surface="base"
-                        padding="lg"
-                        border
-                        rounded="lg"
+                    <ThemedCard
+                        icon={<MdTrendingUp />}
+                        iconColor={iconColors.performance}
+                        title="Avg Response"
+                        hoverable
                         className="flex flex-col items-center text-center"
                     >
-                        <ThemedText size="sm" variant="secondary">
-                            Avg Response Time
-                        </ThemedText>
-                        <ThemedText size="3xl" weight="bold">
-                            {formatResponseTime(avgResponseTime)}
-                        </ThemedText>
-                        <ThemedText size="xs" variant="tertiary">
-                            Based on {totalChecks} checks
-                        </ThemedText>
-                    </ThemedBox>
+                        <div className="flex flex-col items-center space-y-1">
+                            <ThemedText size="xl" weight="bold">
+                                {formatResponseTime(avgResponseTime)}
+                            </ThemedText>
+                            <ThemedText size="xs" variant="secondary">
+                                {totalChecks} checks
+                            </ThemedText>
+                        </div>
+                    </ThemedCard>
                 )}
 
-                <ThemedBox
-                    surface="base"
-                    padding="lg"
-                    border
-                    rounded="lg"
+                <ThemedCard
+                    icon={<FiActivity />}
+                    iconColor={iconColors.downtime}
+                    title="Downtime"
+                    hoverable
                     className="flex flex-col items-center text-center"
                 >
-                    <ThemedText size="sm" variant="secondary">
-                        Total Downtime
-                    </ThemedText>
-                    <ThemedText size="3xl" weight="bold" variant="danger">
-                        {formatDuration(totalDowntime)}
-                    </ThemedText>
-                    <ThemedText size="xs" variant="tertiary">
-                        {downtimePeriods.length} incidents
-                    </ThemedText>
-                </ThemedBox>
+                    <div className="flex flex-col items-center space-y-1">
+                        <ThemedText size="xl" weight="bold" variant="error">
+                            {formatDuration(totalDowntime)}
+                        </ThemedText>
+                        <ThemedText size="xs" variant="secondary">
+                            {downtimePeriods.length} incidents
+                        </ThemedText>
+                    </div>
+                </ThemedCard>
+
+                <ThemedCard
+                    icon={<FiTrendingUp />}
+                    iconColor={iconColors.analytics}
+                    title="Total Checks"
+                    hoverable
+                    className="flex flex-col items-center text-center"
+                >
+                    <div className="flex flex-col items-center space-y-1">
+                        <ThemedText size="xl" weight="bold">
+                            {totalChecks.toLocaleString()}
+                        </ThemedText>
+                        <ThemedText size="xs" variant="secondary">
+                            Up: {upCount} / Down: {downCount}
+                        </ThemedText>
+                    </div>
+                </ThemedCard>
             </div>
 
             {/* Response Time Percentiles */}
             {(monitorType === "http" || monitorType === "port") && (
-                <ThemedBox surface="base" padding="lg" border rounded="lg">
-                    <div className="flex items-center justify-between mb-4">
-                        <ThemedText size="lg" weight="semibold">
-                            Response Time Analysis
-                        </ThemedText>
-                        <ThemedButton
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                                const newValue = !showAdvancedMetrics;
-                                logger.user.action("Advanced metrics toggle", {
-                                    monitorType: monitorType,
-                                    newValue: newValue,
-                                });
-                                setShowAdvancedMetrics(newValue);
-                            }}
-                        >
-                            {showAdvancedMetrics ? "Hide" : "Show"} Advanced
-                        </ThemedButton>
-                    </div>
+                <ThemedCard icon={<MdSpeed color={iconColors.performance} />} title="Response Time Analysis">
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                            <ThemedText size="lg" weight="semibold">
+                                Percentile Analysis
+                            </ThemedText>
+                            <ThemedButton
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                    const newValue = !showAdvancedMetrics;
+                                    logger.user.action("Advanced metrics toggle", {
+                                        monitorType: monitorType,
+                                        newValue: newValue,
+                                    });
+                                    setShowAdvancedMetrics(newValue);
+                                }}
+                            >
+                                {showAdvancedMetrics ? "Hide" : "Show"} Advanced
+                            </ThemedButton>
+                        </div>
 
-                    <div className="grid grid-cols-3 gap-4 mb-4">
-                        <div className="flex flex-col items-center text-center">
-                            <ThemedText size="sm" variant="secondary" className="mb-4">
-                                P50
-                            </ThemedText>
-                            <ThemedText size="lg" weight="medium">
-                                {formatResponseTime(p50)}
-                            </ThemedText>
-                        </div>
-                        <div className="flex flex-col items-center text-center">
-                            <ThemedText size="sm" variant="secondary" className="mb-4">
-                                P95
-                            </ThemedText>
-                            <ThemedText size="lg" weight="medium">
-                                {formatResponseTime(p95)}
-                            </ThemedText>
-                        </div>
-                        <div className="flex flex-col items-center text-center">
-                            <ThemedText size="sm" variant="secondary" className="mb-4">
-                                P99
-                            </ThemedText>
-                            <ThemedText size="lg" weight="medium">
-                                {formatResponseTime(p99)}
-                            </ThemedText>
-                        </div>
-                    </div>
-
-                    {showAdvancedMetrics && (
-                        <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+                        <div className="grid grid-cols-3 gap-4">
                             <div className="flex flex-col items-center text-center">
-                                <ThemedText size="sm" variant="secondary" className="mb-4">
-                                    Mean Time To Recovery
+                                <ThemedText size="sm" variant="secondary" className="mb-2">
+                                    P50
                                 </ThemedText>
-                                <ThemedText size="lg" weight="medium">
-                                    {formatDuration(mttr)}
+                                <ThemedText size="lg" weight="medium" style={{ color: getResponseTimeColor(p50) }}>
+                                    {formatResponseTime(p50)}
                                 </ThemedText>
                             </div>
                             <div className="flex flex-col items-center text-center">
-                                <ThemedText size="sm" variant="secondary" className="mb-4">
-                                    Incidents
+                                <ThemedText size="sm" variant="secondary" className="mb-2">
+                                    P95
                                 </ThemedText>
-                                <ThemedText size="lg" weight="medium">
-                                    {downtimePeriods.length}
+                                <ThemedText size="lg" weight="medium" style={{ color: getResponseTimeColor(p95) }}>
+                                    {formatResponseTime(p95)}
+                                </ThemedText>
+                            </div>
+                            <div className="flex flex-col items-center text-center">
+                                <ThemedText size="sm" variant="secondary" className="mb-2">
+                                    P99
+                                </ThemedText>
+                                <ThemedText size="lg" weight="medium" style={{ color: getResponseTimeColor(p99) }}>
+                                    {formatResponseTime(p99)}
                                 </ThemedText>
                             </div>
                         </div>
-                    )}
-                </ThemedBox>
+
+                        {showAdvancedMetrics && (
+                            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                <div className="flex flex-col items-center text-center">
+                                    <ThemedText size="sm" variant="secondary" className="mb-2">
+                                        Mean Time To Recovery
+                                    </ThemedText>
+                                    <ThemedText
+                                        size="lg"
+                                        weight="medium"
+                                        style={{
+                                            color: mttr === 0 ? currentTheme.colors.success : iconColors.downtime,
+                                        }}
+                                    >
+                                        {formatDuration(mttr)}
+                                    </ThemedText>
+                                </div>
+                                <div className="flex flex-col items-center text-center">
+                                    <ThemedText size="sm" variant="secondary" className="mb-2">
+                                        Incidents
+                                    </ThemedText>
+                                    <ThemedText
+                                        size="lg"
+                                        weight="medium"
+                                        style={{
+                                            color:
+                                                downtimePeriods.length === 0
+                                                    ? currentTheme.colors.success
+                                                    : iconColors.downtime,
+                                        }}
+                                    >
+                                        {downtimePeriods.length}
+                                    </ThemedText>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </ThemedCard>
             )}
 
             {/* Charts Grid */}
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 {/* Response Time Chart */}
                 {(monitorType === "http" || monitorType === "port") && (
-                    <ThemedBox surface="base" padding="md" border rounded="lg">
+                    <ThemedCard icon={<FiTrendingUp color={iconColors.performance} />} title="Response Time Trends">
                         <div className="h-64">
                             <Line
                                 data={
@@ -279,11 +358,11 @@ export function AnalyticsTab({
                                 options={lineChartOptions as unknown as import("chart.js").ChartOptions<"line">}
                             />
                         </div>
-                    </ThemedBox>
+                    </ThemedCard>
                 )}
 
                 {/* Uptime Doughnut Chart */}
-                <ThemedBox surface="base" padding="md" border rounded="lg">
+                <ThemedCard icon={<MdPieChart color={iconColors.uptime} />} title="Uptime Distribution">
                     <div className="h-64">
                         <Doughnut
                             data={
@@ -296,10 +375,14 @@ export function AnalyticsTab({
                             options={doughnutOptions as unknown as import("chart.js").ChartOptions<"doughnut">}
                         />
                     </div>
-                </ThemedBox>
+                </ThemedCard>
 
                 {/* Status Distribution Bar Chart */}
-                <ThemedBox surface="base" padding="md" border rounded="lg" className="lg:col-span-2">
+                <ThemedCard
+                    icon={<FiBarChart2 color={iconColors.charts} />}
+                    title="Status Distribution"
+                    className="lg:col-span-2"
+                >
                     <div className="h-64">
                         <Bar
                             data={
@@ -312,7 +395,7 @@ export function AnalyticsTab({
                             options={barChartOptions as unknown as import("chart.js").ChartOptions<"bar">}
                         />
                     </div>
-                </ThemedBox>
+                </ThemedCard>
             </div>
         </div>
     );

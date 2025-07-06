@@ -4,10 +4,13 @@
  */
 
 import { useState, useEffect, useRef } from "react";
+import { FiFilter } from "react-icons/fi";
+import { MdHistory } from "react-icons/md";
 
 import logger from "../../../services/logger";
 import { useSettingsStore } from "../../../stores";
-import { ThemedBox, ThemedText, ThemedButton, StatusIndicator } from "../../../theme/components";
+import { ThemedText, ThemedButton, StatusIndicator, ThemedCard, ThemedSelect } from "../../../theme/components";
+import { useTheme } from "../../../theme/useTheme";
 import { StatusHistory, Monitor } from "../../../types";
 
 /**
@@ -44,6 +47,7 @@ export function HistoryTab({
     selectedMonitor,
 }: HistoryTabProps) {
     const { settings } = useSettingsStore();
+    const { currentTheme } = useTheme();
     const [historyFilter, setHistoryFilter] = useState<"all" | "up" | "down">("all");
     const historyLength = (selectedMonitor.history || []).length;
 
@@ -51,6 +55,15 @@ export function HistoryTab({
 
     // Track the last monitor ID we logged for to prevent duplicate logging
     const lastLoggedMonitorId = useRef<string | null>(null);
+
+    // Icon colors configuration
+    const getIconColors = () => ({
+        filters: currentTheme.colors.primary[600],
+        history: currentTheme.colors.primary[500],
+        timeline: currentTheme.colors.warning,
+    });
+
+    const iconColors = getIconColors();
 
     /**
      * Get the display label for filter buttons
@@ -117,73 +130,68 @@ export function HistoryTab({
 
     return (
         <div data-testid="history-tab" className="space-y-6">
-            {/* History Tab */}
-            <ThemedText variant="primary" weight="bold">
-                History Tab
-            </ThemedText>
             {/* History Controls */}
-            <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                    <ThemedText size="lg" weight="semibold">
-                        Check History
-                    </ThemedText>
-                    <div className="flex space-x-1">
-                        {(["all", "up", "down"] as const).map((filter) => (
-                            <ThemedButton
-                                key={filter}
-                                variant={historyFilter === filter ? "primary" : "ghost"}
-                                size="xs"
-                                onClick={() => {
-                                    setHistoryFilter(filter);
-                                    logger.user.action("History filter changed", {
-                                        filter: filter,
-                                        monitorId: selectedMonitor.id,
-                                        monitorType: selectedMonitor.type,
-                                        totalRecords: historyLength,
-                                    });
-                                }}
-                                className="ml-4 capitalize"
-                            >
-                                {getFilterButtonLabel(filter)}
-                            </ThemedButton>
-                        ))}
+            <ThemedCard icon={<FiFilter color={iconColors.filters} />} title="History Filters">
+                <div className="flex flex-wrap items-center gap-4">
+                    <div className="flex items-center space-x-3">
+                        <ThemedText size="sm" variant="secondary">
+                            Filter by status:
+                        </ThemedText>
+                        <div className="flex space-x-1">
+                            {(["all", "up", "down"] as const).map((filter) => (
+                                <ThemedButton
+                                    key={filter}
+                                    variant={historyFilter === filter ? "primary" : "ghost"}
+                                    size="xs"
+                                    onClick={() => {
+                                        setHistoryFilter(filter);
+                                        logger.user.action("History filter changed", {
+                                            filter: filter,
+                                            monitorId: selectedMonitor.id,
+                                            monitorType: selectedMonitor.type,
+                                            totalRecords: historyLength,
+                                        });
+                                    }}
+                                    className="capitalize"
+                                >
+                                    {getFilterButtonLabel(filter)}
+                                </ThemedButton>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="flex items-center space-x-3">
+                        <ThemedText size="sm" variant="secondary">
+                            Show:
+                        </ThemedText>
+                        <ThemedSelect
+                            value={historyLimit}
+                            onChange={(e) => {
+                                const newLimit = Math.min(parseInt(e.target.value, 10), backendLimit, historyLength);
+                                setHistoryLimit(newLimit);
+                                logger.user.action("History limit changed", {
+                                    monitorId: selectedMonitor.id,
+                                    newLimit: newLimit,
+                                    totalRecords: historyLength,
+                                });
+                            }}
+                        >
+                            {showOptions.map((option) => (
+                                <option key={option} value={option}>
+                                    {option === historyLength ? `All (${option})` : option}
+                                </option>
+                            ))}
+                        </ThemedSelect>
+                        <ThemedText size="xs" variant="secondary">
+                            of {filteredHistoryRecords.length} records
+                        </ThemedText>
                     </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                    <ThemedText size="sm" variant="secondary">
-                        Show:
-                    </ThemedText>
-                    <select
-                        value={historyLimit}
-                        onChange={(e) => {
-                            const newLimit = Number(e.target.value);
-                            setHistoryLimit(newLimit);
-                            logger.user.action("History display limit changed", {
-                                limit: newLimit,
-                                monitorId: selectedMonitor.id,
-                                monitorType: selectedMonitor.type,
-                                totalRecords: historyLength,
-                            });
-                        }}
-                        className="px-2 py-1 border rounded"
-                        aria-label="History limit"
-                    >
-                        {showOptions.map((opt) => (
-                            <option key={opt} value={opt}>
-                                {opt}
-                            </option>
-                        ))}
-                        {historyLength > backendLimit && <option value={historyLength}>All ({historyLength})</option>}
-                    </select>
-                    <ThemedText size="sm" variant="secondary">
-                        of {historyLength} checks
-                    </ThemedText>
-                </div>
-            </div>
+            </ThemedCard>
 
             {/* History List */}
-            <ThemedBox surface="base" padding="md" border rounded="lg" className="overflow-y-auto max-h-96">
-                <div className="space-y-2">
+            <ThemedCard icon={<MdHistory color={iconColors.history} />} title="Check History">
+                <div className="space-y-2 overflow-y-auto max-h-96">
                     {filteredHistoryRecords.map((record, index: number) => (
                         <div
                             key={record.timestamp}
@@ -211,14 +219,14 @@ export function HistoryTab({
                             </div>
                         </div>
                     ))}
-                </div>
-            </ThemedBox>
 
-            {filteredHistoryRecords.length === 0 && (
-                <div className="py-8 text-center">
-                    <ThemedText variant="secondary">No records found for the selected filter.</ThemedText>
+                    {filteredHistoryRecords.length === 0 && (
+                        <div className="py-8 text-center">
+                            <ThemedText variant="secondary">No records found for the selected filter.</ThemedText>
+                        </div>
+                    )}
                 </div>
-            )}
+            </ThemedCard>
         </div>
     );
 }

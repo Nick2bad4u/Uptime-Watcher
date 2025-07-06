@@ -208,4 +208,48 @@ export class SiteManager extends EventEmitter {
     public getSiteFromCache(identifier: string): Site | undefined {
         return this.sites.get(identifier);
     }
+
+    /**
+     * Remove a monitor from a site.
+     */
+    public async removeMonitor(siteIdentifier: string, monitorId: string): Promise<boolean> {
+        try {
+            // Remove the monitor from the database
+            const success = await this.repositories.monitorRepository.delete(monitorId);
+
+            if (success) {
+                // Refresh the cache by getting all sites (to ensure proper site structure)
+                const allSites = await getSitesFromDatabase({
+                    repositories: {
+                        history: this.repositories.historyRepository,
+                        monitor: this.repositories.monitorRepository,
+                        site: this.repositories.siteRepository,
+                    },
+                });
+
+                // Update cache
+                this.updateSitesCache(allSites);
+
+                // Find the updated site for the event
+                const updatedSite = this.sites.get(siteIdentifier);
+                if (updatedSite) {
+                    // Emit monitor removed event
+                    const eventData: SiteEventData = {
+                        identifier: siteIdentifier,
+                        monitorId,
+                        operation: "monitor-removed",
+                        site: updatedSite,
+                    };
+                    this.eventEmitter.emit(SITE_EVENTS.SITE_UPDATED, eventData);
+
+                    logger.info(`[SiteManager] Monitor ${monitorId} removed from site ${siteIdentifier}`);
+                }
+            }
+
+            return success;
+        } catch (error) {
+            logger.error(`[SiteManager] Failed to remove monitor ${monitorId} from site ${siteIdentifier}`, error);
+            throw error;
+        }
+    }
 }

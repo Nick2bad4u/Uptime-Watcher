@@ -218,9 +218,19 @@ export async function upsertSiteMonitors(
     monitors: Site["monitors"]
 ): Promise<void> {
     for (const monitor of monitors) {
+        // Check if monitor exists in database (handles case where frontend assigns UUID but DB uses integers)
         if (monitor.id && monitor.id.trim() !== "") {
-            await deps.monitorRepository.update(monitor.id, monitor);
+            const existingMonitor = await deps.monitorRepository.findById(monitor.id);
+            if (existingMonitor) {
+                // Monitor exists, update it
+                await deps.monitorRepository.update(monitor.id, monitor);
+            } else {
+                // Monitor doesn't exist in DB (likely has frontend-assigned UUID), create new one
+                const newId = await deps.monitorRepository.create(identifier, monitor);
+                monitor.id = newId;
+            }
         } else {
+            // No ID, definitely create new
             const newId = await deps.monitorRepository.create(identifier, monitor);
             monitor.id = newId;
         }

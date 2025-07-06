@@ -21,6 +21,8 @@ export interface SiteOperationsActions {
     modifySite: (identifier: string, updates: Partial<Site>) => Promise<void>;
     /** Add a monitor to an existing site */
     addMonitorToSite: (siteId: string, monitor: Monitor) => Promise<void>;
+    /** Remove a monitor from a site */
+    removeMonitorFromSite: (siteId: string, monitorId: string) => Promise<void>;
     /** Update site check interval */
     updateSiteCheckInterval: (siteId: string, monitorId: string, interval: number) => Promise<void>;
     /** Update monitor retry attempts */
@@ -185,6 +187,46 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
         await withErrorHandling(
             async () => {
                 await SiteService.updateSite(identifier, updates);
+                await deps.syncSitesFromBackend();
+            },
+            {
+                clearError: () => {},
+                setError: (error) => logStoreAction("SitesStore", "error", { error }),
+                setLoading: () => {},
+            }
+        );
+    },
+    removeMonitorFromSite: async (siteId, monitorId) => {
+        logStoreAction("SitesStore", "removeMonitorFromSite", { monitorId, siteId });
+
+        await withErrorHandling(
+            async () => {
+                // Get the current site
+                const site = deps
+                    .getSites()
+                    .filter((s) => s !== null && s !== undefined)
+                    .find((s) => s.identifier === siteId);
+                if (!site) throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
+
+                // Check if this is the only monitor - prevent removal if so
+                if (site.monitors.length <= 1) {
+                    throw new Error("Cannot remove the last monitor from a site. Use site removal instead.");
+                }
+
+                // Stop monitoring for this specific monitor first
+                try {
+                    await MonitoringService.stopMonitoring(siteId, monitorId);
+                } catch (err) {
+                    // Log but do not block removal if stopping fails
+                    if (process.env.NODE_ENV === "development") {
+                        console.warn(`Failed to stop monitoring for monitor ${monitorId} of site ${siteId}:`, err);
+                    }
+                }
+
+                // Remove the monitor via backend
+                await SiteService.removeMonitor(siteId, monitorId);
+
+                // Refresh site data from backend
                 await deps.syncSitesFromBackend();
             },
             {

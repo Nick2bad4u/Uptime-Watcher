@@ -154,6 +154,12 @@ settings (key PK, value, updated_at)
 - Component composition over inheritance
 - Memoization for expensive computations
 - Incremental updates for real-time data
+- Always use the theme system for styling
+- Use `useEffect` for side effects, never in render
+- Use `useMemo` and `useCallback` to optimize performance
+- Use the proper state management patterns for your components
+- Never do any direct DOM manipulation in the frontend; always use React state to manage UI updates
+- Always use the API provided by the backend for any data operations
 
 ## When Making Changes
 

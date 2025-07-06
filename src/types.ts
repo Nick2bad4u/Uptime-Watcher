@@ -104,8 +104,8 @@ declare global {
             monitoring: {
                 startMonitoring: () => Promise<void>;
                 stopMonitoring: () => Promise<void>;
-                startMonitoringForSite: (siteId: string, monitorId: string) => Promise<void>;
-                stopMonitoringForSite: (siteId: string, monitorId: string) => Promise<void>;
+                startMonitoringForSite: (siteId: string, monitorId?: string) => Promise<void>;
+                stopMonitoringForSite: (siteId: string, monitorId?: string) => Promise<void>;
             };
 
             settings: {
@@ -119,6 +119,7 @@ declare global {
                 removeSite: (id: string) => Promise<void>;
                 updateSite: (id: string, updates: Partial<Site>) => Promise<void>;
                 checkSiteNow: (siteId: string, monitorId: string) => Promise<void>;
+                removeMonitor: (siteIdentifier: string, monitorId: string) => Promise<void>;
             };
 
             system: {

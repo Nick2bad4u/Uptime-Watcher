@@ -187,6 +187,11 @@ async function loadSitesData(repositories: SitesLoaderConfig["repositories"], si
             site.name = siteRow.name;
         }
 
+        // Preserve monitoring property if it exists (may be set by application logic)
+        if ("monitoring" in siteRow && siteRow.monitoring !== undefined) {
+            site.monitoring = Boolean(siteRow.monitoring);
+        }
+
         sites.set(site.identifier, site);
     }
 

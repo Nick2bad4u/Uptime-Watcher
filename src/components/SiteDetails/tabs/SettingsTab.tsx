@@ -5,11 +5,11 @@
 
 import React from "react";
 import { FiTrash2, FiSave } from "react-icons/fi";
+import { MdSettings, MdTimer, MdInfoOutline, MdDangerous } from "react-icons/md";
 
 import { CHECK_INTERVALS, RETRY_CONSTRAINTS, TIMEOUT_CONSTRAINTS } from "../../../constants";
 import logger from "../../../services/logger";
 import {
-    ThemedBox,
     ThemedText,
     ThemedButton,
     ThemedCard,
@@ -17,6 +17,7 @@ import {
     ThemedInput,
     ThemedSelect,
 } from "../../../theme/components";
+import { useTheme } from "../../../theme/useTheme";
 import { Site, Monitor } from "../../../types";
 import { calculateMaxDuration } from "../../../utils/duration";
 
@@ -182,6 +183,19 @@ export function SettingsTab({
     setLocalName,
     timeoutChanged,
 }: SettingsTabProps) {
+    const { currentTheme } = useTheme();
+
+    // Icon colors configuration
+    const getIconColors = () => ({
+        danger: currentTheme.colors.error,
+        info: currentTheme.colors.info,
+        monitoring: currentTheme.colors.primary[600],
+        settings: currentTheme.colors.primary[500],
+        timing: currentTheme.colors.warning,
+    });
+
+    const iconColors = getIconColors();
+
     const loggedHandleSaveName = async () => {
         logger.user.action("Settings: Save site name initiated", {
             newName: localName.trim(),
@@ -230,17 +244,13 @@ export function SettingsTab({
     };
 
     return (
-        <div data-testid="settings-tab" className="space-y-10">
-            {/* Settings Tab */}
-            <ThemedText variant="primary" weight="bold">
-                Settings Tab
-            </ThemedText>
+        <div data-testid="settings-tab" className="space-y-6">
             {/* Site Configuration */}
-            <ThemedCard icon="⚙️" title="Site Configuration" padding="xl" rounded="xl" shadow="lg" className="mb-6">
-                <div className="space-y-8">
+            <ThemedCard icon={<MdSettings color={iconColors.settings} />} title="Site Configuration">
+                <div className="space-y-6">
                     {/* Site Name */}
-                    <div>
-                        <ThemedText size="sm" weight="medium" variant="secondary" className="block mb-2">
+                    <div className="space-y-2">
+                        <ThemedText size="sm" weight="medium" variant="secondary">
                             Site Name
                         </ThemedText>
                         <div className="flex items-center gap-3">
@@ -258,21 +268,20 @@ export function SettingsTab({
                                 disabled={!hasUnsavedChanges || isLoading}
                                 loading={isLoading}
                                 icon={<FiSave />}
-                                className="min-w-[90px]"
                             >
                                 Save
                             </ThemedButton>
                         </div>
                         {hasUnsavedChanges && (
-                            <ThemedBadge variant="warning" size="xs" className="mt-2">
+                            <ThemedBadge variant="warning" size="sm">
                                 ⚠️ Unsaved changes
                             </ThemedBadge>
                         )}
                     </div>
 
                     {/* Site Identifier */}
-                    <div>
-                        <ThemedText size="sm" weight="medium" variant="secondary" className="block mb-2">
+                    <div className="space-y-2">
+                        <ThemedText size="sm" weight="medium" variant="secondary">
                             {getIdentifierLabel(selectedMonitor)}
                         </ThemedText>
                         <ThemedInput
@@ -281,132 +290,145 @@ export function SettingsTab({
                             disabled
                             className="opacity-70"
                         />
-                        <ThemedText size="xs" variant="tertiary" className="mt-1">
+                        <ThemedText size="xs" variant="tertiary">
                             Identifier cannot be changed
                         </ThemedText>
                     </div>
                 </div>
             </ThemedCard>
 
-            {/* Per-site check interval control */}
-            <ThemedBox variant="secondary" padding="md" className="flex items-center gap-3 mb-4">
-                <ThemedText size="sm" variant="secondary">
-                    Check every:
-                </ThemedText>
-                <ThemedSelect value={localCheckInterval} onChange={handleIntervalChange}>
-                    {CHECK_INTERVALS.map((interval) => {
-                        // Support both number and object forms
-                        const value = typeof interval === "number" ? interval : interval.value;
-                        const label = getIntervalLabel(interval);
-                        return (
-                            <option key={value} value={value}>
-                                {label}
-                            </option>
-                        );
-                    })}
-                </ThemedSelect>
-                <ThemedButton
-                    variant={intervalChanged ? "primary" : "secondary"}
-                    size="sm"
-                    onClick={loggedHandleSaveInterval}
-                    disabled={!intervalChanged}
-                >
-                    Save
-                </ThemedButton>
-                <ThemedText size="xs" variant="tertiary" className="ml-2">
-                    (This monitor checks every {Math.round(localCheckInterval / 1000)}s)
-                </ThemedText>
-            </ThemedBox>
+            {/* Monitoring Configuration */}
+            <ThemedCard icon={<MdTimer color={iconColors.timing} />} title="Monitoring Configuration">
+                <div className="space-y-6">
+                    {/* Check Interval */}
+                    <div className="space-y-2">
+                        <ThemedText size="sm" weight="medium" variant="secondary">
+                            Check Interval
+                        </ThemedText>
+                        <div className="flex items-center gap-3">
+                            <ThemedSelect value={localCheckInterval} onChange={handleIntervalChange} className="flex-1">
+                                {CHECK_INTERVALS.map((interval) => {
+                                    const value = typeof interval === "number" ? interval : interval.value;
+                                    const label = getIntervalLabel(interval);
+                                    return (
+                                        <option key={value} value={value}>
+                                            {label}
+                                        </option>
+                                    );
+                                })}
+                            </ThemedSelect>
+                            <ThemedButton
+                                variant={intervalChanged ? "primary" : "secondary"}
+                                size="sm"
+                                onClick={loggedHandleSaveInterval}
+                                disabled={!intervalChanged}
+                                icon={<FiSave />}
+                            >
+                                Save
+                            </ThemedButton>
+                        </div>
+                        <ThemedText size="xs" variant="tertiary">
+                            Monitor checks every {Math.round(localCheckInterval / 1000)} seconds
+                        </ThemedText>
+                    </div>
 
-            {/* Timeout configuration */}
-            <ThemedBox variant="secondary" padding="md" className="flex items-center gap-3 mb-4">
-                <ThemedText size="sm" variant="secondary">
-                    Timeout (seconds):
-                </ThemedText>
-                <ThemedInput
-                    type="number"
-                    value={localTimeout} // Now stored in seconds, display directly
-                    onChange={handleTimeoutChange}
-                    placeholder="Enter timeout in seconds"
-                    className="w-32"
-                    min={TIMEOUT_CONSTRAINTS.MIN}
-                    max={TIMEOUT_CONSTRAINTS.MAX}
-                    step={TIMEOUT_CONSTRAINTS.STEP}
-                />
-                <ThemedButton
-                    variant={timeoutChanged ? "primary" : "secondary"}
-                    size="sm"
-                    onClick={loggedHandleSaveTimeout}
-                    disabled={!timeoutChanged}
-                >
-                    Save
-                </ThemedButton>
-                <ThemedText size="xs" variant="tertiary" className="ml-2">
-                    (Request timeout: {localTimeout}s)
-                </ThemedText>
-            </ThemedBox>
+                    {/* Timeout Configuration */}
+                    <div className="space-y-2">
+                        <ThemedText size="sm" weight="medium" variant="secondary">
+                            Timeout (seconds)
+                        </ThemedText>
+                        <div className="flex items-center gap-3">
+                            <ThemedInput
+                                type="number"
+                                value={localTimeout}
+                                onChange={handleTimeoutChange}
+                                placeholder="Enter timeout in seconds"
+                                className="flex-1"
+                                min={TIMEOUT_CONSTRAINTS.MIN}
+                                max={TIMEOUT_CONSTRAINTS.MAX}
+                                step={TIMEOUT_CONSTRAINTS.STEP}
+                            />
+                            <ThemedButton
+                                variant={timeoutChanged ? "primary" : "secondary"}
+                                size="sm"
+                                onClick={loggedHandleSaveTimeout}
+                                disabled={!timeoutChanged}
+                                icon={<FiSave />}
+                            >
+                                Save
+                            </ThemedButton>
+                        </div>
+                        <ThemedText size="xs" variant="tertiary">
+                            Request timeout: {localTimeout} seconds
+                        </ThemedText>
+                    </div>
 
-            {/* Retry attempts configuration */}
-            <ThemedBox variant="secondary" padding="md" className="flex items-center gap-3 mb-4">
-                <ThemedText size="sm" variant="secondary">
-                    Retry Attempts:
-                </ThemedText>
-                <ThemedInput
-                    type="number"
-                    value={localRetryAttempts}
-                    onChange={handleRetryAttemptsChange}
-                    placeholder="Enter retry attempts"
-                    className="w-32"
-                    min={RETRY_CONSTRAINTS.MIN}
-                    max={RETRY_CONSTRAINTS.MAX}
-                    step={RETRY_CONSTRAINTS.STEP}
-                />
-                <ThemedButton
-                    variant={retryAttemptsChanged ? "primary" : "secondary"}
-                    size="sm"
-                    onClick={loggedHandleSaveRetryAttempts}
-                    disabled={!retryAttemptsChanged}
-                >
-                    Save
-                </ThemedButton>
-                <ThemedText size="xs" variant="tertiary" className="ml-2">
-                    {formatRetryAttemptsText(localRetryAttempts)}
-                </ThemedText>
-            </ThemedBox>
+                    {/* Retry Attempts Configuration */}
+                    <div className="space-y-2">
+                        <ThemedText size="sm" weight="medium" variant="secondary">
+                            Retry Attempts
+                        </ThemedText>
+                        <div className="flex items-center gap-3">
+                            <ThemedInput
+                                type="number"
+                                value={localRetryAttempts}
+                                onChange={handleRetryAttemptsChange}
+                                placeholder="Enter retry attempts"
+                                className="flex-1"
+                                min={RETRY_CONSTRAINTS.MIN}
+                                max={RETRY_CONSTRAINTS.MAX}
+                                step={RETRY_CONSTRAINTS.STEP}
+                            />
+                            <ThemedButton
+                                variant={retryAttemptsChanged ? "primary" : "secondary"}
+                                size="sm"
+                                onClick={loggedHandleSaveRetryAttempts}
+                                disabled={!retryAttemptsChanged}
+                                icon={<FiSave />}
+                            >
+                                Save
+                            </ThemedButton>
+                        </div>
+                        <ThemedText size="xs" variant="tertiary">
+                            {formatRetryAttemptsText(localRetryAttempts)}
+                        </ThemedText>
+                    </div>
 
-            {/* Total monitoring time indicator */}
-            {localRetryAttempts > 0 && (
-                <ThemedBox variant="tertiary" padding="sm" className="mb-4">
-                    <ThemedText size="xs" variant="secondary">
-                        💡 <strong>Maximum check duration:</strong> ~
-                        {calculateMaxDuration(localTimeout, localRetryAttempts)} ({localTimeout}s per attempt ×{" "}
-                        {localRetryAttempts + 1} attempts + backoff delays)
-                    </ThemedText>
-                </ThemedBox>
-            )}
+                    {/* Total monitoring time indicator */}
+                    {localRetryAttempts > 0 && (
+                        <div className="p-3 bg-info/10 border border-info/20 rounded-lg">
+                            <ThemedText size="xs" variant="info">
+                                💡 <strong>Maximum check duration:</strong> ~
+                                {calculateMaxDuration(localTimeout, localRetryAttempts)} ({localTimeout}s per attempt ×{" "}
+                                {localRetryAttempts + 1} attempts + backoff delays)
+                            </ThemedText>
+                        </div>
+                    )}
+                </div>
+            </ThemedCard>
 
             {/* Site Information */}
-            <ThemedCard icon="📊" title="Site Information" padding="xl" rounded="xl" shadow="md" className="mb-6">
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                    <div className="flex flex-col gap-3">
+            <ThemedCard icon={<MdInfoOutline color={iconColors.info} />} title="Site Information">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div className="space-y-3">
                         <div className="flex items-center justify-between">
                             <ThemedText size="sm" variant="secondary">
                                 {getIdentifierLabel(selectedMonitor)}:
                             </ThemedText>
-                            <ThemedBadge variant="secondary" size="xs">
+                            <ThemedBadge variant="secondary" size="sm">
                                 {getDisplayIdentifier(currentSite, selectedMonitor)}
                             </ThemedBadge>
                         </div>
                         <div className="flex items-center justify-between">
                             <ThemedText size="sm" variant="secondary">
-                                Total Monitor History Records:
+                                History Records:
                             </ThemedText>
-                            <ThemedBadge variant="info" size="xs">
+                            <ThemedBadge variant="info" size="sm">
                                 {(selectedMonitor.history || []).length}
                             </ThemedBadge>
                         </div>
                     </div>
-                    <div className="flex flex-col gap-3">
+                    <div className="space-y-3">
                         <div className="flex items-center justify-between">
                             <ThemedText size="sm" variant="secondary">
                                 Last Checked:
@@ -423,20 +445,16 @@ export function SettingsTab({
 
             {/* Danger Zone */}
             <ThemedCard
-                icon="⚠️"
+                icon={<MdDangerous color={iconColors.danger} />}
                 title="Danger Zone"
-                variant="tertiary"
-                padding="xl"
-                rounded="xl"
-                shadow="md"
-                className="border-2 border-error/30"
+                className="border-2 border-error/30 bg-error/5"
             >
-                <div className="space-y-6">
+                <div className="space-y-4">
                     <div>
                         <ThemedText size="sm" weight="medium" variant="error" className="mb-2">
                             Remove Site
                         </ThemedText>
-                        <ThemedText size="xs" variant="tertiary" className="block mb-4 ml-1">
+                        <ThemedText size="xs" variant="tertiary" className="mb-4">
                             This action cannot be undone. All history data for this site will be lost.
                         </ThemedText>
                         <ThemedButton
