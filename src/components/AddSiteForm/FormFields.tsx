@@ -1,6 +1,7 @@
 /**
  * Form field components for the AddSiteForm.
  * Provides reusable, accessible form inputs with consistent styling and validation.
+ * Includes text inputs, select dropdowns, and radio groups.
  */
 
 import React from "react";
