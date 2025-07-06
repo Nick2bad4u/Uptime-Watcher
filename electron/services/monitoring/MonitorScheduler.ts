@@ -19,6 +19,22 @@ export class MonitorScheduler {
     }
 
     /**
+     * Perform an immediate check for a monitor (used when starting monitoring).
+     */
+    public async performImmediateCheck(siteIdentifier: string, monitorId: string): Promise<void> {
+        if (this.onCheckCallback) {
+            try {
+                await this.onCheckCallback(siteIdentifier, monitorId);
+            } catch (error) {
+                logger.error(
+                    `[MonitorScheduler] Error during immediate check for ${siteIdentifier}|${monitorId}`,
+                    error
+                );
+            }
+        }
+    }
+
+    /**
      * Start monitoring for a specific monitor with its own interval.
      */
     public startMonitor(siteIdentifier: string, monitor: Site["monitors"][0]): boolean {
@@ -41,6 +57,7 @@ export class MonitorScheduler {
             );
         }
 
+        // Start interval immediately
         const interval = setInterval(async () => {
             if (this.onCheckCallback) {
                 try {
@@ -53,8 +70,17 @@ export class MonitorScheduler {
 
         this.intervals.set(intervalKey, interval);
 
+        // Perform immediate check when starting (without waiting for interval)
+        if (this.onCheckCallback) {
+            this.performImmediateCheck(siteIdentifier, monitor.id).catch((error) => {
+                logger.error(`[MonitorScheduler] Error during immediate check for ${intervalKey}`, error);
+            });
+        }
+
         if (isDev()) {
-            logger.debug(`[MonitorScheduler] Started monitoring for ${intervalKey} with interval ${checkInterval}ms`);
+            logger.debug(
+                `[MonitorScheduler] Started monitoring for ${intervalKey} with interval ${checkInterval}ms (immediate check triggered)`
+            );
         }
         return true;
     }

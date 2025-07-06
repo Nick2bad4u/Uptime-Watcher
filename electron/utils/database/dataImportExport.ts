@@ -1,5 +1,6 @@
 import { EventEmitter } from "events";
 
+import { DatabaseService } from "../../services/database/DatabaseService";
 import { HistoryRepository } from "../../services/database/HistoryRepository";
 import { MonitorRepository } from "../../services/database/MonitorRepository";
 import { SettingsRepository } from "../../services/database/SettingsRepository";
@@ -21,6 +22,7 @@ export type ImportSite = {
  */
 export interface DataImportExportDependencies {
     eventEmitter: EventEmitter;
+    databaseService: DatabaseService;
     repositories: {
         history: HistoryRepository;
         monitor: MonitorRepository;
@@ -76,6 +78,7 @@ export async function exportData(deps: DataImportExportDependencies): Promise<st
 
 /**
  * Import data from JSON string.
+ * Uses a transaction to ensure data consistency.
  */
 export async function importData(
     deps: DataImportExportDependencies,
@@ -85,12 +88,16 @@ export async function importData(
     logger.info("Importing data");
     try {
         const parsedData = validateImportData(data);
-        await clearExistingData(deps);
-        await importSitesAndSettings(deps, parsedData);
 
-        if (parsedData.sites) {
-            await importMonitorsWithHistory(deps, parsedData.sites);
-        }
+        // Use a transaction to ensure all import operations are atomic
+        await deps.databaseService.executeTransaction(async () => {
+            await clearExistingData(deps);
+            await importSitesAndSettings(deps, parsedData);
+
+            if (parsedData.sites) {
+                await importMonitorsWithHistory(deps, parsedData.sites);
+            }
+        });
 
         await callbacks.loadSites();
 

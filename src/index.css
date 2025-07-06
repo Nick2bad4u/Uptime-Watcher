@@ -35,6 +35,8 @@
     --color-status-down: #ef4444;
     --color-status-pending-bg: #fff7e6;
     --color-status-pending: #f59e0b;
+    --color-status-paused-bg: #f3f4f6;
+    --color-status-paused: #6b7280;
 
     /* Font and general styling */
     font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -107,5 +109,10 @@ body {
     .status-pending {
         background-color: var(--color-status-pending-bg, #fff7e6);
         color: var(--color-status-pending, #f59e0b);
+    }
+
+    .status-paused {
+        background-color: var(--color-status-paused-bg, #f3f4f6);
+        color: var(--color-status-paused, #6b7280);
     }
 }

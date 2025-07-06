@@ -106,7 +106,7 @@ describe("monitorLifecycle", () => {
             expect(mockMonitorScheduler.startSite).toHaveBeenCalledTimes(2);
             expect(mockMonitorScheduler.startSite).toHaveBeenCalledWith(sites[0]);
             expect(mockMonitorScheduler.startSite).toHaveBeenCalledWith(sites[1]);
-            expect(mockLogger.info).toHaveBeenCalledWith("Started all monitoring operations");
+            expect(mockLogger.info).toHaveBeenCalledWith("Started all monitoring operations and set monitors to pending");
         });
 
         it("should handle empty sites map", async () => {
@@ -117,19 +117,19 @@ describe("monitorLifecycle", () => {
             expect(result).toBe(true);
             expect(mockLogger.info).toHaveBeenCalledWith("Starting monitoring with 0 sites (per-site intervals)");
             expect(mockMonitorScheduler.startSite).not.toHaveBeenCalled();
-            expect(mockLogger.info).toHaveBeenCalledWith("Started all monitoring operations");
+            expect(mockLogger.info).toHaveBeenCalledWith("Started all monitoring operations and set monitors to pending");
         });
     });
 
     describe("stopAllMonitoring", () => {
-        it("should stop all monitoring and return false", () => {
+        it("should stop all monitoring and return false", async () => {
             const config = createTestConfig([]);
             
-            const result = stopAllMonitoring(config);
+            const result = await stopAllMonitoring(config);
             
             expect(result).toBe(false);
             expect(mockMonitorScheduler.stopAll).toHaveBeenCalledTimes(1);
-            expect(mockLogger.info).toHaveBeenCalledWith("Stopped all site monitoring intervals");
+            expect(mockLogger.info).toHaveBeenCalledWith("Stopped all site monitoring intervals and set monitors to paused");
         });
     });
 
@@ -156,9 +156,12 @@ describe("monitorLifecycle", () => {
             const result = await startMonitoringForSite(config, "test-site", "monitor-1");
             
             expect(result).toBe(true);
-            expect(mockMonitorRepository.update).toHaveBeenCalledWith("monitor-1", { monitoring: true });
+            expect(mockMonitorRepository.update).toHaveBeenCalledWith("monitor-1", { 
+                monitoring: true, 
+                status: "pending" 
+            });
             expect(mockMonitorScheduler.startMonitor).toHaveBeenCalledWith("test-site", site.monitors[0]);
-            expect(mockLogger.debug).toHaveBeenCalledWith("Started monitoring for test-site:monitor-1");
+            expect(mockLogger.debug).toHaveBeenCalledWith("Started monitoring for test-site:monitor-1 - status set to pending");
         });
 
         it("should return false if monitor is not found", async () => {
@@ -299,9 +302,12 @@ describe("monitorLifecycle", () => {
             const result = await stopMonitoringForSite(config, "test-site", "monitor-1");
             
             expect(result).toBe(true);
-            expect(mockMonitorRepository.update).toHaveBeenCalledWith("monitor-1", { monitoring: false });
+            expect(mockMonitorRepository.update).toHaveBeenCalledWith("monitor-1", { 
+                monitoring: false, 
+                status: "paused" 
+            });
             expect(mockMonitorScheduler.stopMonitor).toHaveBeenCalledWith("test-site", "monitor-1");
-            expect(mockLogger.debug).toHaveBeenCalledWith("Stopped monitoring for test-site:monitor-1");
+            expect(mockLogger.debug).toHaveBeenCalledWith("Stopped monitoring for test-site:monitor-1 - status set to paused");
         });
 
         it("should return false if monitor is not found", async () => {
@@ -416,9 +422,12 @@ describe("monitorLifecycle", () => {
             const result = await startMonitoringForSite(config, "test-site", "monitor-1");
             
             expect(result).toBe(false);
-            expect(mockMonitorRepository.update).toHaveBeenCalledWith("monitor-1", { monitoring: true });
+            expect(mockMonitorRepository.update).toHaveBeenCalledWith("monitor-1", { 
+                monitoring: true, 
+                status: "pending" 
+            });
             expect(mockMonitorScheduler.startMonitor).toHaveBeenCalledWith("test-site", site.monitors[0]);
-            expect(mockLogger.debug).not.toHaveBeenCalledWith("Started monitoring for test-site:monitor-1");
+            expect(mockLogger.debug).not.toHaveBeenCalledWith("Started monitoring for test-site:monitor-1 - status set to pending");
         });
 
         it("should handle scheduler returning false for stop monitor", async () => {
@@ -434,9 +443,12 @@ describe("monitorLifecycle", () => {
             const result = await stopMonitoringForSite(config, "test-site", "monitor-1");
             
             expect(result).toBe(false);
-            expect(mockMonitorRepository.update).toHaveBeenCalledWith("monitor-1", { monitoring: false });
+            expect(mockMonitorRepository.update).toHaveBeenCalledWith("monitor-1", { 
+                monitoring: false, 
+                status: "paused" 
+            });
             expect(mockMonitorScheduler.stopMonitor).toHaveBeenCalledWith("test-site", "monitor-1");
-            expect(mockLogger.debug).not.toHaveBeenCalledWith("Stopped monitoring for test-site:monitor-1");
+            expect(mockLogger.debug).not.toHaveBeenCalledWith("Stopped monitoring for test-site:monitor-1 - status set to paused");
         });
 
         it("should handle empty monitors array", async () => {

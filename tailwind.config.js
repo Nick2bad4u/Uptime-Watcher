@@ -16,6 +16,7 @@ export default {
             },
             colors: {
                 "status-down": "#ef4444",
+                "status-paused": "#6b7280",
                 "status-pending": "#f59e0b",
                 "status-up": "#10b981",
             },

@@ -414,7 +414,7 @@ describe("UptimeOrchestrator - Monitoring Control", () => {
                 // Ensure the monitor repository update succeeds
                 monitorRepoInstance.update.mockResolvedValue(undefined);
 
-                // Add a site first
+                // Add a site first (this will trigger initial checks)
                 await uptimeOrchestrator.addSite({
                     identifier,
                     name: "Test Site",
@@ -430,11 +430,17 @@ describe("UptimeOrchestrator - Monitoring Control", () => {
                     ],
                 });
 
+                // Clear the mock calls from the site setup
+                monitorRepoInstance.update.mockClear();
+
                 const result = await uptimeOrchestrator.stopMonitoringForSite(identifier, monitorId);
 
                 expect(result).toBe(true);
                 expect(schedulerInstance.stopMonitor).toHaveBeenCalled();
-                expect(monitorRepoInstance.update).toHaveBeenCalledWith(monitorId, { monitoring: false });
+                expect(monitorRepoInstance.update).toHaveBeenCalledWith(monitorId, { 
+                    monitoring: false,
+                    status: "paused" 
+                });
             });
 
             it("should return false for non-existent monitor", async () => {

@@ -157,7 +157,7 @@ describe("DatabaseManager", () => {
         it("should call loadSites during initialization", async () => {
             let loadSitesCallback: (() => Promise<void>) | undefined;
             
-            mockInitDatabase.mockImplementation(async (db, callback, emitter) => {
+            mockInitDatabase.mockImplementation(async (db, callback) => {
                 loadSitesCallback = callback;
                 return Promise.resolve();
             });
@@ -236,6 +236,7 @@ describe("DatabaseManager", () => {
 
             expect(result).toBe(mockExportResult);
             expect(mockExportData).toHaveBeenCalledWith({
+                  databaseService: mockDependencies.repositories.database,
                 eventEmitter: mockEventEmitter,
                 repositories: {
                     history: mockDependencies.repositories.history,
@@ -277,6 +278,7 @@ describe("DatabaseManager", () => {
             expect(result).toBe(true);
             expect(mockImportData).toHaveBeenCalledWith(
                 {
+                    databaseService: mockDependencies.repositories.database,
                     eventEmitter: mockEventEmitter,
                     repositories: {
                         history: mockDependencies.repositories.history,

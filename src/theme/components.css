@@ -319,6 +319,10 @@
     color: var(--color-status-pending);
 }
 
+.themed-status-paused {
+    color: var(--color-status-paused);
+}
+
 .themed-status-unknown {
     color: var(--color-status-unknown);
 }

@@ -122,6 +122,7 @@ export class DatabaseManager extends EventEmitter {
      */
     public async exportData(): Promise<string> {
         const dependencies: DataImportExportDependencies = {
+            databaseService: this.dependencies.repositories.database,
             eventEmitter: this.eventEmitter,
             repositories: {
                 history: this.dependencies.repositories.history,
@@ -148,6 +149,7 @@ export class DatabaseManager extends EventEmitter {
      */
     public async importData(data: string): Promise<boolean> {
         const dependencies: DataImportExportDependencies = {
+            databaseService: this.dependencies.repositories.database,
             eventEmitter: this.eventEmitter,
             repositories: {
                 history: this.dependencies.repositories.history,

@@ -19,7 +19,7 @@ export interface Monitor {
     /** Type of monitoring to perform */
     type: MonitorType;
     /** Current status of the monitor */
-    status: "up" | "down" | "pending";
+    status: "up" | "down" | "pending" | "paused";
     /** Optional URL for HTTP monitors. For other types (e.g., port, IP), this is undefined. */
     url?: string | undefined;
     /** Hostname or IP for port monitors. */
@@ -64,7 +64,7 @@ export interface StatusHistory {
     /** Unix timestamp of when this status was recorded */
     timestamp: number;
     /** Status at this point in time */
-    status: "up" | "down";
+    status: "up" | "down" | "paused";
     /** Response time in milliseconds */
     responseTime: number;
     /** Optional additional details about the check */
@@ -79,7 +79,7 @@ export interface StatusUpdate {
     /** Updated site data */
     site: Site;
     /** Previous status for change detection */
-    previousStatus?: "up" | "down" | "pending" | undefined;
+    previousStatus?: "up" | "down" | "pending" | "paused" | undefined;
 }
 
 /**

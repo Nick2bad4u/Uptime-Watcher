@@ -85,7 +85,7 @@ export function useTheme() {
     // Get status color
     const getStatusColor = (status: StatusType): string => {
         // Only allow known status keys
-        const allowedStatuses: StatusType[] = ["up", "down", "pending", "unknown"];
+        const allowedStatuses: StatusType[] = ["up", "down", "pending", "unknown", "paused", "mixed"];
         if (allowedStatuses.includes(status)) {
             // eslint-disable-next-line security/detect-object-injection -- currentTheme.colors.status is validated against allowedStatuses
             return currentTheme.colors.status[status];
@@ -169,7 +169,7 @@ export function useThemeClasses() {
         };
     };
 
-    const getStatusClass = (status: "up" | "down" | "pending" | "unknown") => {
+    const getStatusClass = (status: "up" | "down" | "pending" | "unknown" | "paused") => {
         return {
             color: `var(--color-status-${status})`,
         };

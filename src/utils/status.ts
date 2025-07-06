@@ -18,6 +18,10 @@ export function getStatusIcon(status: string): string {
             return "❌";
         case "pending":
             return "⏳";
+        case "paused":
+            return "⏸️";
+        case "mixed":
+            return "🔄";
         case "unknown":
             return "❓";
         default:

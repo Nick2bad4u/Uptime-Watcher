@@ -14,7 +14,7 @@ interface SiteCardStatusProps {
     /** ID of the currently selected monitor */
     selectedMonitorId: string;
     /** Current status of the monitor */
-    status: "up" | "down" | "pending";
+    status: "up" | "down" | "pending" | "paused";
 }
 
 /**

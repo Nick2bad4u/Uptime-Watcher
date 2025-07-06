@@ -17,6 +17,7 @@ import {
 } from "../../../theme/components";
 import { useTheme, useAvailabilityColors } from "../../../theme/useTheme";
 import { Site, Monitor } from "../../../types";
+import { getSiteDisplayStatus } from "../../../utils/siteStatus";
 import { formatResponseTime, formatDuration } from "../../../utils/time";
 
 /**
@@ -68,6 +69,7 @@ export function SiteOverviewTab({
     const { currentTheme } = useTheme();
 
     // Calculate site-level statistics
+    const siteDisplayStatus = getSiteDisplayStatus(site);
     const allMonitorsRunning =
         site.monitors.length > 0 && site.monitors.every((monitor) => monitor.monitoring === true);
     const runningMonitors = site.monitors.filter((monitor) => monitor.monitoring === true);
@@ -99,7 +101,25 @@ export function SiteOverviewTab({
     const getIconColors = () => {
         const availabilityColor = getAvailabilityColor(uptime);
         const responseColor = getResponseTimeColor(avgResponseTime);
-        const siteStatusColor = allMonitorsRunning ? currentTheme.colors.success : currentTheme.colors.error;
+        // Use getColor to safely access theme colors with proper validation
+        const siteStatusColor = (() => {
+            switch (siteDisplayStatus) {
+                case "up":
+                    return currentTheme.colors.status.up;
+                case "down":
+                    return currentTheme.colors.status.down;
+                case "pending":
+                    return currentTheme.colors.status.pending;
+                case "paused":
+                    return currentTheme.colors.status.paused;
+                case "mixed":
+                    return currentTheme.colors.status.mixed;
+                case "unknown":
+                    return currentTheme.colors.status.unknown;
+                default:
+                    return currentTheme.colors.error;
+            }
+        })();
 
         return {
             actions: currentTheme.colors.error,
@@ -142,7 +162,7 @@ export function SiteOverviewTab({
                     hoverable
                     className="flex flex-col items-center justify-center text-center"
                 >
-                    <StatusIndicator status={allMonitorsRunning ? "up" : "down"} size="lg" showText />
+                    <StatusIndicator status={siteDisplayStatus} size="lg" showText />
                 </ThemedCard>
 
                 <ThemedCard

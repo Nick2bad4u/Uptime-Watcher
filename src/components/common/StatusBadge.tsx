@@ -12,7 +12,7 @@ interface StatusBadgeProps {
     /** Label text to display */
     label: string;
     /** Current status to display */
-    status: "up" | "down" | "pending";
+    status: "up" | "down" | "pending" | "paused";
     /** Text size (affects both text and icon sizing) */
     size?: "xs" | "sm" | "base" | "lg" | "xl" | "2xl" | "3xl" | "4xl";
     /** Whether to show the status icon */

@@ -30,6 +30,8 @@ const mockTheme: Theme = {
             down: "#ef4444",
             pending: "#f59e0b",
             unknown: "#6b7280",
+            paused: "#9ca3af",
+            mixed: "#8b5cf6",
         },
         success: "#10b981",
         warning: "#f59e0b",

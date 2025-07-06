@@ -64,13 +64,13 @@ export class IpcService {
     private setupMonitoringHandlers(): void {
         ipcMain.handle("start-monitoring", async () => {
             if (isDev()) logger.debug("[IpcService] Handling start-monitoring");
-            this.uptimeOrchestrator.startMonitoring();
+            await this.uptimeOrchestrator.startMonitoring();
             return true;
         });
 
         ipcMain.handle("stop-monitoring", async () => {
             if (isDev()) logger.debug("[IpcService] Handling stop-monitoring");
-            this.uptimeOrchestrator.stopMonitoring();
+            await this.uptimeOrchestrator.stopMonitoring();
             return true;
         });
 

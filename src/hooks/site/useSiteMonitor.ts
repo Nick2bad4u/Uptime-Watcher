@@ -20,7 +20,7 @@ interface SiteMonitorResult {
     /** Currently selected monitor object */
     monitor: Monitor | undefined;
     /** Current status of the selected monitor */
-    status: "up" | "down" | "pending";
+    status: "up" | "down" | "pending" | "paused";
     /** Response time of the selected monitor */
     responseTime: number | undefined;
     /** Whether the selected monitor is actively being monitored */
@@ -57,7 +57,7 @@ export function useSiteMonitor(site: Site): SiteMonitorResult {
     }, [latestSite]);
 
     const defaultMonitorId = monitorIds[0] ?? "";
-    const selectedMonitorId = getSelectedMonitorId(latestSite.identifier) || defaultMonitorId;
+    const selectedMonitorId = getSelectedMonitorId(latestSite.identifier) ?? defaultMonitorId;
 
     // Get the currently selected monitor
     const monitor = useMemo(() => {
@@ -65,7 +65,7 @@ export function useSiteMonitor(site: Site): SiteMonitorResult {
     }, [latestSite, selectedMonitorId]);
 
     // Extract monitor state information
-    const status = monitor?.status || "pending";
+    const status = monitor?.status ?? "pending";
     const responseTime = monitor?.responseTime;
     // Fix: Use history length and last timestamp as dependencies for proper memoization
     const filteredHistory = useMemo(() => {

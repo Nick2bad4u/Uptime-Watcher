@@ -16,7 +16,7 @@ export interface Monitor {
     /** Type of monitor (HTTP or port check) */
     type: MonitorType;
     /** Current status of the monitor */
-    status: "up" | "down" | "pending";
+    status: "up" | "down" | "pending" | "paused";
     /** Last recorded response time in milliseconds */
     responseTime?: number | undefined;
     /** Timestamp of last check */
@@ -62,7 +62,7 @@ export interface StatusHistory {
     /** Timestamp when the check was performed */
     timestamp: number;
     /** Result status of the check */
-    status: "up" | "down";
+    status: "up" | "down" | "paused";
     /** Response time in milliseconds */
     responseTime: number;
     /** Optional additional details about the check */
@@ -71,5 +71,5 @@ export interface StatusHistory {
 
 export interface StatusUpdate {
     site: Site;
-    previousStatus?: "up" | "down" | "pending" | undefined;
+    previousStatus?: "up" | "down" | "pending" | "paused" | undefined;
 }

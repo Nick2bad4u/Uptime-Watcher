@@ -201,8 +201,8 @@ export class UptimeOrchestrator extends EventEmitter {
         await this.monitorManager.startMonitoring();
     }
 
-    public stopMonitoring(): void {
-        this.monitorManager.stopMonitoring();
+    public async stopMonitoring(): Promise<void> {
+        await this.monitorManager.stopMonitoring();
     }
 
     public async startMonitoringForSite(identifier: string, monitorId?: string): Promise<boolean> {

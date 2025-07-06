@@ -61,6 +61,10 @@ const mockSiteRepository = {
     bulkInsert: vi.fn(),
 } as any;
 
+const mockDatabaseService = {
+    executeTransaction: vi.fn(),
+} as any;
+
 // Mock EventEmitter
 let mockEventEmitter: EventEmitter;
 
@@ -151,6 +155,7 @@ describe("dataImportExport", () => {
         mockEventEmitter = new EventEmitter();
         mockDependencies = {
             eventEmitter: mockEventEmitter,
+            databaseService: mockDatabaseService,
             repositories: {
                 history: mockHistoryRepository,
                 monitor: mockMonitorRepository,
@@ -165,6 +170,11 @@ describe("dataImportExport", () => {
 
         // Reset all mocks
         vi.clearAllMocks();
+        
+        // Setup default mock for executeTransaction
+        mockDatabaseService.executeTransaction.mockImplementation(async (callback: () => Promise<void>) => {
+            await callback();
+        });
     });
 
     afterEach(() => {

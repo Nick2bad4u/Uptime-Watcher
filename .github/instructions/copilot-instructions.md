@@ -15,112 +15,14 @@ Always keep in mind the following when making changes:
 
 # Uptime Watcher - AI Context Instructions
 
-## Project Overview
-
-Uptime Watcher is a production-ready Electron + React desktop application for website monitoring with comprehensive test coverage and enterprise-level architecture.
-
-Always update this document at ./.github/instructions/copilot-instructions.md if you make changes to the architecture or key components.
-
-## Core Architecture
-
 ### Technology Stack
 
 - **Frontend**: React + TypeScript + Zustand + TailwindCSS + Vite
 - **Backend**: Electron main process + Node.js + SQLite
 - **Communication**: IPC with contextBridge security
 - **Testing**: Vitest with extensive frontend and backend test suites
-
-### Directory Structure
-
-```
-src/                    # Frontend (React)
-├── components/         # React components (PascalCase)
-├── stores/            # Zustand stores (domain-separated)
-├── hooks/             # Custom React hooks
-├── services/          # Frontend business logic
-├── utils/             # Pure utility functions
-└── theme/             # Theme system + styled components
-
-electron/              # Backend (Electron main process)
-├── services/          # Domain services (application/, database/, ipc/, monitoring/)
-├── managers/          # Domain managers (ConfigurationManager, DatabaseManager, etc.)
-├── utils/             # Backend utilities
-└── main.ts           # Entry point
-```
-
-### Key Design Patterns
-
-#### 1. Store Architecture (Zustand)
-
-```typescript
-// Domain-separated stores with centralized error handling
-useSitesStore; // Site data + monitoring state
-useSettingsStore; // App preferences + backend sync
-useErrorStore; // Global error handling
-useUiStore; // Modal states + view preferences
-useStatsStore; // Computed metrics
-useUpdatesStore; // Application updates
-```
-
-#### 2. IPC Communication Pattern
-
-```typescript
-// Secure, domain-organized API
-window.electronAPI = {
- sites: { getSites, addSite, removeSite, updateSite, checkSiteNow },
- monitoring: { startMonitoring, stopMonitoring, startMonitoringForSite },
- data: { exportData, importData, downloadSQLiteBackup },
- settings: { getHistoryLimit, updateHistoryLimit },
- events: { onStatusUpdate, onUpdateStatus, removeAllListeners },
-};
-```
-
-#### 3. Data Flow Pattern
-
-```
-User Action → Store → IPC → Backend Service → Database →
-Response → Store Update → Component Re-render
-```
-
-#### 4. Real-Time Updates
-
-```
-Monitor Service → UptimeOrchestrator → emit("status-update") →
-Window Service → Frontend Handler → Store → UI Update
-```
-
-## File Naming Conventions
-
-- **Components**: PascalCase (`SiteCard.tsx`, `AddSiteForm.tsx`)
-- **Utilities**: camelCase (`electronUtils.ts`, `fileDownload.ts`)
-- **Managers**: PascalCase + Manager suffix (`ConfigurationManager.ts`)
-- **Stores**: camelCase + Store suffix (`useSitesStore.ts`)
-- **Documentation**: kebab-case (`data-flow-architecture.md`)
-
-## Key Components
-
-### Frontend Components
-
-- **Dashboard**: Site overview with SiteCard grid
-- **SiteDetails**: Modal with tabs (Overview, Analytics, History, Settings)
-- **AddSiteForm**: Site creation with validation
-- **Settings**: App configuration modal
-- **Header**: Global controls + status overview
-
-### Backend Services
-
-- **ApplicationService**: App lifecycle coordination
-- **IpcService**: Domain-organized IPC handlers
-- **UptimeOrchestrator**: Central coordinator for monitoring
-- **DatabaseManager**: SQLite operations
-- **WindowService**: Window management
-
-### Stores & State
-
-- **Sites**: Real-time site data, monitoring control, status updates
-- **Settings**: Theme, preferences, history limits (synced with backend)
-- **Error**: Centralized error handling with user notifications
-- **UI**: Modal states, selected items, loading indicators
+- **State Management**: Zustand for domain-specific stores
+- **Styling**: TailwindCSS for utility-first design
 
 ## Database Schema
 
@@ -138,28 +40,32 @@ settings (key PK, value, updated_at)
 - **Error Handling**: Centralized with graceful degradation
 - **Testing**: High coverage across frontend and backend with comprehensive test suites
 
-## Key Behaviors
+## Key App Behaviors
 
 1. **No Direct DOM**: All UI updates flow through React state
 2. **Type Safety**: Full TypeScript with strict configuration
 3. **Real-Time**: Event-driven status updates with optimized re-renders
 4. **Modular**: Clean domain separation, dependency injection ready
 5. **Production Ready**: Comprehensive error handling, logging, backup/recovery
-
-## Common Patterns to Follow
-
-- Use domain-specific stores, never global state
-- All backend communication via `window.electronAPI`
-- Error handling via `withErrorHandling` wrapper
-- Component composition over inheritance
-- Memoization for expensive computations
-- Incremental updates for real-time data
-- Always use the theme system for styling
-- Use `useEffect` for side effects, never in render
-- Use `useMemo` and `useCallback` to optimize performance
-- Use the proper state management patterns for your components
-- Never do any direct DOM manipulation in the frontend; always use React state to manage UI updates
-- Always use the API provided by the backend for any data operations
+6. **IPC Communication**: All backend interactions via `window.electronAPI` for security and maintainability
+7. **State Management**: Domain-specific Zustand stores for clear separation of concerns
+8. **Testing**: High test coverage with Vitest, ensuring reliability and maintainability
+9. **Styling**: TailwindCSS for consistent, responsive design
+10. **Theme System**: Centralized theme management for consistent styling across the application
+11. **Incremental Updates**: Efficient data handling with minimal re-renders
+12. **Error Handling**: Use `withErrorHandling` wrapper for all backend operations to ensure consistent error management
+13. **Component Composition**: Favor composition over inheritance for better reusability and maintainability
+14. **Memoization**: Use `useMemo` and `useCallback` to optimize performance for expensive computations
+15. **Side Effects**: Use `useEffect` for side effects, never in render methods
+16. **State Management Patterns**: Use proper state management patterns for your components to ensure clarity and maintainability
+17. **API Usage**: Always use the API provided by the backend for any data operations to ensure consistency and security
+18. **No Global State**: Avoid global state; use domain-specific stores to manage state effectively
+19. **Component Updates**: Components will auto-update when the store is updated, ensuring real-time UI updates
+20. **Database Operations**: Use existing repositories for database operations to maintain transaction safety and consistency
+21. **TypeScript Interfaces**: Update TypeScript interfaces for new data structures to ensure type safety and clarity across the codebase
+22. **Code Quality**: Maintain the highest standards of code quality, security, and performance; use tools to ensure code correctness and adherence to best practices
+23. **Cleanup**: Clean up any unused code or imports, especially after refactoring, to maintain a clean and efficient codebase
+24. **Incremental Development**: Break down tasks into smaller, manageable pieces; focus on completing each task thoroughly before moving on to the next
 
 ## When Making Changes
 
@@ -168,7 +74,7 @@ settings (key PK, value, updated_at)
 3. **Database**: Use existing repositories, maintain transaction safety
 4. **Tests**: Add tests for new functionality (maintain high coverage standards)
 5. **Types**: Update TypeScript interfaces for new data structures
+6. **Code Quality**: Use tools to ensure code correctness and adherence to best practices
 
-Always keep this document up-to-date with any architectural changes or key component updates to ensure consistency and clarity for all contributors.
-Always maintain the highest standards of code quality, security, and performance. Use the tools available to you to ensure the code is correct and follows best practices. Always test your changes thoroughly before finalizing, and aim for 100% test coverage.
-Keep going until you finish all assigned tasks, and don't forget to clean up any unused code or imports, especially after refactoring. Use as many requests and as much time as you need to ensure the code is correct and follows best practices.
+Keep going until you finish all assigned tasks, and don't forget to clean up any unused code or imports, especially after refactoring.
+Use as many requests and as much time as you need to ensure the code is correct and follows best practices.

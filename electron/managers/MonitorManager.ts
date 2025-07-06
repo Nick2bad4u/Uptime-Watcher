@@ -77,8 +77,8 @@ export class MonitorManager extends EventEmitter {
     /**
      * Stop monitoring for all sites.
      */
-    public stopMonitoring(): void {
-        this.isMonitoring = stopAllMonitoring({
+    public async stopMonitoring(): Promise<void> {
+        this.isMonitoring = await stopAllMonitoring({
             eventEmitter: this.dependencies.eventEmitter,
             logger,
             monitorRepository: this.dependencies.repositories.monitor,

@@ -315,7 +315,7 @@ export function ThemedButton({
 }
 
 interface StatusIndicatorProps {
-    readonly status: "up" | "down" | "pending" | "unknown";
+    readonly status: "up" | "down" | "pending" | "unknown" | "paused" | "mixed";
     readonly size?: "sm" | "md" | "lg";
     readonly showText?: boolean;
     readonly className?: string;
@@ -566,7 +566,7 @@ export function ThemedCheckbox({
 }
 
 interface MiniChartBarProps {
-    readonly status: "up" | "down" | "pending" | "unknown";
+    readonly status: "up" | "down" | "pending" | "unknown" | "paused";
     readonly responseTime?: number;
     readonly timestamp: string | number | Date;
     readonly className?: string;

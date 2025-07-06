@@ -28,6 +28,8 @@ export interface ThemeColors {
         down: string;
         pending: string;
         unknown: string;
+        paused: string;
+        mixed: string;
     };
 
     // Semantic colors

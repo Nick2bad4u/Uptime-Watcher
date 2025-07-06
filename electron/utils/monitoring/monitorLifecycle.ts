@@ -48,11 +48,24 @@ export async function startAllMonitoring(config: MonitoringLifecycleConfig, isMo
 
     config.logger.info(`Starting monitoring with ${config.sites.size} sites (per-site intervals)`);
 
+    // Set all monitors to pending status and enable monitoring
     for (const [, site] of Array.from(config.sites)) {
+        for (const monitor of site.monitors) {
+            if (monitor.id) {
+                try {
+                    await config.monitorRepository.update(monitor.id, {
+                        monitoring: true,
+                        status: "pending",
+                    });
+                } catch (error) {
+                    config.logger.error(`Failed to update monitor ${monitor.id} to pending status`, error);
+                }
+            }
+        }
         config.monitorScheduler.startSite(site);
     }
 
-    config.logger.info("Started all monitoring operations");
+    config.logger.info("Started all monitoring operations and set monitors to pending");
     return true;
 }
 
@@ -62,9 +75,26 @@ export async function startAllMonitoring(config: MonitoringLifecycleConfig, isMo
  * @param config - Configuration object with required dependencies
  * @returns boolean - New monitoring state (always false)
  */
-export function stopAllMonitoring(config: MonitoringLifecycleConfig): boolean {
+export async function stopAllMonitoring(config: MonitoringLifecycleConfig): Promise<boolean> {
     config.monitorScheduler.stopAll();
-    config.logger.info("Stopped all site monitoring intervals");
+
+    // Set all monitors to paused status
+    for (const [, site] of Array.from(config.sites)) {
+        for (const monitor of site.monitors) {
+            if (monitor.id && monitor.monitoring !== false) {
+                try {
+                    await config.monitorRepository.update(monitor.id, {
+                        monitoring: false,
+                        status: "paused",
+                    });
+                } catch (error) {
+                    config.logger.error(`Failed to update monitor ${monitor.id} to paused status`, error);
+                }
+            }
+        }
+    }
+
+    config.logger.info("Stopped all site monitoring intervals and set monitors to paused");
     return false;
 }
 
@@ -145,10 +175,13 @@ async function startSpecificMonitor(
     }
 
     try {
-        await config.monitorRepository.update(monitorId, { monitoring: true });
+        await config.monitorRepository.update(monitorId, {
+            monitoring: true,
+            status: "pending",
+        });
         const started = config.monitorScheduler.startMonitor(identifier, monitor);
         if (started) {
-            config.logger.debug(`Started monitoring for ${identifier}:${monitorId}`);
+            config.logger.debug(`Started monitoring for ${identifier}:${monitorId} - status set to pending`);
         }
         return started;
     } catch (error) {
@@ -173,10 +206,13 @@ async function stopSpecificMonitor(
     }
 
     try {
-        await config.monitorRepository.update(monitorId, { monitoring: false });
+        await config.monitorRepository.update(monitorId, {
+            monitoring: false,
+            status: "paused",
+        });
         const stopped = config.monitorScheduler.stopMonitor(identifier, monitorId);
         if (stopped) {
-            config.logger.debug(`Stopped monitoring for ${identifier}:${monitorId}`);
+            config.logger.debug(`Stopped monitoring for ${identifier}:${monitorId} - status set to paused`);
         }
         return stopped;
     } catch (error) {

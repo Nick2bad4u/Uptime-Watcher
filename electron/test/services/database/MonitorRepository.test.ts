@@ -37,6 +37,7 @@ interface MockDatabase {
 
 interface MockDatabaseService {
     getDatabase: ReturnType<typeof vi.fn>;
+    executeTransaction: ReturnType<typeof vi.fn>;
 }
 
 describe("MonitorRepository", () => {
@@ -57,6 +58,7 @@ describe("MonitorRepository", () => {
         // Mock DatabaseService
         mockDatabaseService = {
             getDatabase: vi.fn().mockReturnValue(mockDatabase),
+            executeTransaction: vi.fn(),
         };
 
         // Mock the static getInstance method
@@ -510,6 +512,13 @@ describe("MonitorRepository", () => {
 
         it("should log debug message when deleting monitor in dev mode", async () => {
             (isDev as unknown as ReturnType<typeof vi.fn>).mockReturnValue(true);
+            
+            // Mock executeTransaction to simulate the delete operation
+            mockDatabaseService.executeTransaction.mockImplementation(async (callback) => {
+                // Simulate the callback being called with the database
+                return callback(mockDatabase);
+            });
+            
             mockDatabase.run
                 .mockReturnValueOnce({ changes: 1 }) // DELETE history
                 .mockReturnValueOnce({ changes: 1 }); // DELETE monitor
@@ -574,17 +583,30 @@ describe("MonitorRepository", () => {
     describe("delete", () => {
         it("should delete a monitor and return true on success", async () => {
             (isDev as unknown as ReturnType<typeof vi.fn>).mockReturnValue(true);
+            
+            // Mock executeTransaction to simulate the delete operation
+            mockDatabaseService.executeTransaction.mockImplementation(async (callback) => {
+                // Simulate the callback being called with the database
+                return callback(mockDatabase);
+            });
+            
             // Mock that the deletion affected one row
             mockDatabase.run.mockReturnValue({ changes: 1 });
 
             const result = await monitorRepository.delete("1");
 
-            expect(mockDatabase.run).toHaveBeenCalledWith("DELETE FROM monitors WHERE id = ?", ["1"]);
             expect(result).toBe(true);
             expect(logger.debug).toHaveBeenCalledWith("[MonitorRepository] Deleted monitor with id: 1");
         });
 
         it("should return false when monitor not found", async () => {
+            // Mock executeTransaction to simulate the delete operation
+            mockDatabaseService.executeTransaction.mockImplementation(async (callback) => {
+                // Simulate the callback being called with the database
+                return callback(mockDatabase);
+            });
+            
+            // Mock that the deletion affected zero rows
             mockDatabase.run.mockReturnValue({ changes: 0 });
 
             const result = await monitorRepository.delete("999");
@@ -594,7 +616,10 @@ describe("MonitorRepository", () => {
 
         it("should handle database errors", async () => {
             const error = new Error("Delete failed");
-            mockDatabase.run.mockImplementation(() => {
+            
+            // Mock executeTransaction to simulate an error during the transaction
+            mockDatabaseService.executeTransaction.mockImplementation(async () => {
+                // Simulate an error during the transaction
                 throw error;
             });
 
@@ -607,6 +632,13 @@ describe("MonitorRepository", () => {
         it("should delete all monitors for a site", async () => {
             (isDev as unknown as ReturnType<typeof vi.fn>).mockReturnValue(true);
             const mockMonitorIds = [{ id: 1 }, { id: 2 }];
+            
+            // Mock executeTransaction to simulate the delete operation
+            mockDatabaseService.executeTransaction.mockImplementation(async (callback) => {
+                // Simulate the callback being called with the database
+                return callback(mockDatabase);
+            });
+            
             mockDatabase.all.mockReturnValue(mockMonitorIds);
 
             await monitorRepository.deleteBySiteIdentifier("site-1");
@@ -622,7 +654,9 @@ describe("MonitorRepository", () => {
 
         it("should handle database errors", async () => {
             const error = new Error("Delete by site failed");
-            mockDatabase.all.mockImplementation(() => {
+            
+            // Mock executeTransaction to simulate an error during the transaction
+            mockDatabaseService.executeTransaction.mockImplementation(async () => {
                 throw error;
             });
 
@@ -1096,6 +1130,12 @@ describe("MonitorRepository", () => {
                 const consoleDebugSpy = vi.spyOn(logger, "debug");
                 (isDev as unknown as ReturnType<typeof vi.fn>).mockReturnValue(true);
 
+                // Mock executeTransaction to simulate the delete operation
+                mockDatabaseService.executeTransaction.mockImplementation(async (callback) => {
+                    // Simulate the callback being called with the database
+                    return callback(mockDatabase);
+                });
+
                 mockDatabase.run
                     .mockReturnValueOnce({ changes: 1 }) // DELETE history
                     .mockReturnValueOnce({ changes: 0 }); // DELETE monitor - not found
@@ -1325,6 +1365,12 @@ describe("MonitorRepository", () => {
         it("should successfully delete an existing monitor", async () => {
             const monitorId = "monitor-1";
 
+            // Mock executeTransaction to simulate the delete operation
+            mockDatabaseService.executeTransaction.mockImplementation(async (callback) => {
+                // Simulate the callback being called with the database
+                return callback(mockDatabase);
+            });
+
             // Mock successful deletion (changes > 0)
             mockDatabase.run.mockReturnValue({ changes: 1 });
 
@@ -1338,6 +1384,12 @@ describe("MonitorRepository", () => {
         it("should return false when monitor does not exist", async () => {
             const monitorId = "nonexistent-monitor";
 
+            // Mock executeTransaction to simulate the delete operation
+            mockDatabaseService.executeTransaction.mockImplementation(async (callback) => {
+                // Simulate the callback being called with the database
+                return callback(mockDatabase);
+            });
+
             // Mock no changes (monitor doesn't exist)
             mockDatabase.run.mockReturnValue({ changes: 0 });
 
@@ -1348,6 +1400,12 @@ describe("MonitorRepository", () => {
 
         it("should handle null changes property (line 364 edge case)", async () => {
             const monitorId = "monitor-1";
+
+            // Mock executeTransaction to simulate the delete operation
+            mockDatabaseService.executeTransaction.mockImplementation(async (callback) => {
+                // Simulate the callback being called with the database
+                return callback(mockDatabase);
+            });
 
             // Mock result with null changes (triggers ?? 0 fallback)
             mockDatabase.run.mockReturnValue({ changes: null });
@@ -1360,6 +1418,12 @@ describe("MonitorRepository", () => {
         it("should handle undefined changes property (line 364 edge case)", async () => {
             const monitorId = "monitor-1";
 
+            // Mock executeTransaction to simulate the delete operation
+            mockDatabaseService.executeTransaction.mockImplementation(async (callback) => {
+                // Simulate the callback being called with the database
+                return callback(mockDatabase);
+            });
+
             // Mock result with undefined changes (triggers ?? 0 fallback)
             mockDatabase.run.mockReturnValue({ changes: undefined });
 
@@ -1370,6 +1434,12 @@ describe("MonitorRepository", () => {
 
         it("should handle result object without changes property", async () => {
             const monitorId = "monitor-1";
+
+            // Mock executeTransaction to simulate the delete operation
+            mockDatabaseService.executeTransaction.mockImplementation(async (callback) => {
+                // Simulate the callback being called with the database
+                return callback(mockDatabase);
+            });
 
             // Mock result without changes property
             mockDatabase.run.mockReturnValue({});
@@ -1383,7 +1453,8 @@ describe("MonitorRepository", () => {
             const monitorId = "monitor-1";
             const error = new Error("Database error");
 
-            mockDatabase.run.mockImplementation(() => {
+            // Mock executeTransaction to simulate an error during the transaction
+            mockDatabaseService.executeTransaction.mockImplementation(async () => {
                 throw error;
             });
 

@@ -189,19 +189,20 @@ export class MonitorRepository {
 
     /**
      * Delete a monitor and its history.
+     * Uses a transaction to ensure atomicity.
      */
     public async delete(monitorId: string): Promise<boolean> {
         try {
-            const db = this.getDb();
+            const result = await this.databaseService.executeTransaction(async (db) => {
+                // Delete history first (foreign key constraint)
+                db.run("DELETE FROM history WHERE monitor_id = ?", [monitorId]);
 
-            // Delete history first (foreign key constraint)
-            db.run("DELETE FROM history WHERE monitor_id = ?", [monitorId]);
+                // Delete the monitor
+                const deleteResult = db.run("DELETE FROM monitors WHERE id = ?", [monitorId]);
+                return (deleteResult.changes ?? 0) > 0;
+            });
 
-            // Delete the monitor
-            const result = db.run("DELETE FROM monitors WHERE id = ?", [monitorId]);
-            const deleted = (result.changes ?? 0) > 0;
-
-            if (deleted) {
+            if (result) {
                 if (isDev()) {
                     logger.debug(`[MonitorRepository] Deleted monitor with id: ${monitorId}`);
                 }
@@ -209,7 +210,7 @@ export class MonitorRepository {
                 logger.warn(`[MonitorRepository] Monitor not found for deletion: ${monitorId}`);
             }
 
-            return deleted;
+            return result;
         } catch (error) {
             logger.error(`[MonitorRepository] Failed to delete monitor with id: ${monitorId}`, error);
             throw error;
@@ -218,23 +219,26 @@ export class MonitorRepository {
 
     /**
      * Delete all monitors for a specific site.
+     * Uses a transaction to ensure atomicity.
      */
     public async deleteBySiteIdentifier(siteIdentifier: string): Promise<void> {
         try {
-            const db = this.getDb();
+            await this.databaseService.executeTransaction(async (db) => {
+                // Get all monitor IDs for this site
+                const monitorRows = db.all("SELECT id FROM monitors WHERE site_identifier = ?", [
+                    siteIdentifier,
+                ]) as Array<{
+                    id: number;
+                }>;
 
-            // Get all monitor IDs for this site
-            const monitorRows = db.all("SELECT id FROM monitors WHERE site_identifier = ?", [siteIdentifier]) as Array<{
-                id: number;
-            }>;
+                // Delete history for all monitors
+                for (const row of monitorRows) {
+                    db.run("DELETE FROM history WHERE monitor_id = ?", [row.id]);
+                }
 
-            // Delete history for all monitors
-            for (const row of monitorRows) {
-                db.run("DELETE FROM history WHERE monitor_id = ?", [row.id]);
-            }
-
-            // Delete all monitors for this site
-            db.run("DELETE FROM monitors WHERE site_identifier = ?", [siteIdentifier]);
+                // Delete all monitors for this site
+                db.run("DELETE FROM monitors WHERE site_identifier = ?", [siteIdentifier]);
+            });
 
             if (isDev()) {
                 logger.debug(`[MonitorRepository] Deleted all monitors for site: ${siteIdentifier}`);
