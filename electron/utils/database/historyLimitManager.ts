@@ -1,14 +1,14 @@
 /**
  * Utility for managing history limits in the database.
  */
-import type { HistoryRepository, SettingsRepository } from "../../services/database";
+import type { HistoryRepository, SettingsRepository, DatabaseService } from "../../services/database";
 
-type Logger = {
+interface Logger {
     debug: (message: string, ...args: unknown[]) => void;
     error: (message: string, error?: unknown, ...args: unknown[]) => void;
     info: (message: string, ...args: unknown[]) => void;
     warn: (message: string, ...args: unknown[]) => void;
-};
+}
 
 /**
  * Parameters for setting history limit
@@ -28,6 +28,11 @@ interface SetHistoryLimitParams {
     };
 
     /**
+     * Database service for transactions
+     */
+    databaseService: DatabaseService;
+
+    /**
      * Callback to update the internal history limit
      */
     setHistoryLimit: (limit: number) => void;
@@ -44,7 +49,7 @@ interface SetHistoryLimitParams {
  * @param params - Parameters for setting history limit
  */
 export async function setHistoryLimit(params: SetHistoryLimitParams): Promise<void> {
-    const { limit, logger, repositories, setHistoryLimit } = params;
+    const { databaseService, limit, logger, repositories, setHistoryLimit } = params;
 
     // Determine the appropriate limit value
     const finalLimit = limit <= 0 ? 0 : Math.max(10, limit);
@@ -52,16 +57,20 @@ export async function setHistoryLimit(params: SetHistoryLimitParams): Promise<vo
     // Update the internal limit
     setHistoryLimit(finalLimit);
 
-    // Save to settings using repository
-    await repositories.settings.set("historyLimit", finalLimit.toString());
+    // Save to settings using repository - Use transaction for consistency
+    await databaseService.executeTransaction(async () => {
+        await repositories.settings.set("historyLimit", finalLimit.toString());
+    });
 
     if (logger) {
         logger.debug(`History limit set to ${finalLimit}`);
     }
 
-    // Prune history for all monitors using repository if limit > 0
+    // Prune history for all monitors using repository if limit > 0 - Use transaction
     if (finalLimit > 0) {
-        await repositories.history.pruneAllHistory(finalLimit);
+        await databaseService.executeTransaction(async () => {
+            await repositories.history.pruneAllHistory(finalLimit);
+        });
         if (logger) {
             logger.debug(`Pruned history to ${finalLimit} entries per monitor`);
         }

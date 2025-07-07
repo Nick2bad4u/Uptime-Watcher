@@ -3,6 +3,8 @@
  * These adapters make the existing concrete classes compatible with the new interfaces.
  */
 
+import { Database } from "node-sqlite3-wasm";
+
 import { SiteRepository, MonitorRepository, HistoryRepository, SettingsRepository } from "../../services/database";
 import { Monitor, Site, StatusHistory } from "../../types";
 import { monitorLogger } from "../logger";
@@ -18,7 +20,7 @@ export class SiteRepositoryAdapter implements ISiteRepository {
         this.repository = repository;
     }
 
-    async findAll(): Promise<Array<{ identifier: string; name?: string | undefined }>> {
+    async findAll(): Promise<{ identifier: string; name?: string | undefined }[]> {
         return this.repository.findAll();
     }
 
@@ -63,6 +65,14 @@ export class MonitorRepositoryAdapter implements IMonitorRepository {
 
     async deleteBySiteIdentifier(siteIdentifier: string): Promise<void> {
         return this.repository.deleteBySiteIdentifier(siteIdentifier);
+    }
+
+    deleteBySiteIdentifierInternal(db: Database, siteIdentifier: string): void {
+        return this.repository.deleteBySiteIdentifierInternal(db, siteIdentifier);
+    }
+
+    deleteMonitorInternal(db: Database, monitorId: string): boolean {
+        return this.repository.deleteMonitorInternal(db, monitorId);
     }
 }
 

@@ -26,6 +26,12 @@ vi.mock("../utils/logger", () => ({
         debug: vi.fn(),
         warn: vi.fn(),
     },
+    logger: {
+        info: vi.fn(),
+        error: vi.fn(),
+        debug: vi.fn(),
+        warn: vi.fn(),
+    },
 }));
 
 vi.mock("../utils/retry", () => ({
@@ -71,6 +77,7 @@ const mockMonitorRepositoryInstance = {
     update: vi.fn(() => Promise.resolve()),
     deleteByIds: vi.fn(() => Promise.resolve()),
     deleteBySiteIdentifier: vi.fn(() => Promise.resolve()),
+    deleteBySiteIdentifierInternal: vi.fn(),
     updateStatus: vi.fn(() => Promise.resolve()),
     bulkCreate: vi.fn(() => Promise.resolve([])),
     deleteAll: vi.fn(() => Promise.resolve()),

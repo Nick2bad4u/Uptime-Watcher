@@ -5,16 +5,16 @@
 
 import { EventEmitter } from "events";
 
-import { MonitorRepository } from "../../services/database";
+import { MonitorRepository, DatabaseService } from "../../services/database";
 import { MonitorScheduler } from "../../services/monitoring";
 import { Site } from "../../types";
 
-type Logger = {
+interface Logger {
     debug: (message: string, ...args: unknown[]) => void;
     error: (message: string, error?: unknown, ...args: unknown[]) => void;
     info: (message: string, ...args: unknown[]) => void;
     warn: (message: string, ...args: unknown[]) => void;
-};
+}
 
 /**
  * Configuration object for monitoring lifecycle functions.
@@ -23,6 +23,7 @@ export interface MonitoringLifecycleConfig {
     sites: Map<string, Site>;
     monitorScheduler: MonitorScheduler;
     monitorRepository: MonitorRepository;
+    databaseService: DatabaseService;
     eventEmitter: EventEmitter;
     logger: Logger;
     statusUpdateEvent: string;
@@ -53,9 +54,14 @@ export async function startAllMonitoring(config: MonitoringLifecycleConfig, isMo
         for (const monitor of site.monitors) {
             if (monitor.id) {
                 try {
-                    await config.monitorRepository.update(monitor.id, {
-                        monitoring: true,
-                        status: "pending",
+                    // Use transaction for database update
+                    await config.databaseService.executeTransaction(async () => {
+                        if (monitor.id) {
+                            await config.monitorRepository.update(monitor.id, {
+                                monitoring: true,
+                                status: "pending",
+                            });
+                        }
                     });
                 } catch (error) {
                     config.logger.error(`Failed to update monitor ${monitor.id} to pending status`, error);
@@ -83,9 +89,14 @@ export async function stopAllMonitoring(config: MonitoringLifecycleConfig): Prom
         for (const monitor of site.monitors) {
             if (monitor.id && monitor.monitoring !== false) {
                 try {
-                    await config.monitorRepository.update(monitor.id, {
-                        monitoring: false,
-                        status: "paused",
+                    // Use transaction for database update
+                    await config.databaseService.executeTransaction(async () => {
+                        if (monitor.id) {
+                            await config.monitorRepository.update(monitor.id, {
+                                monitoring: false,
+                                status: "paused",
+                            });
+                        }
                     });
                 } catch (error) {
                     config.logger.error(`Failed to update monitor ${monitor.id} to paused status`, error);
@@ -175,9 +186,12 @@ async function startSpecificMonitor(
     }
 
     try {
-        await config.monitorRepository.update(monitorId, {
-            monitoring: true,
-            status: "pending",
+        // Use transaction for database update
+        await config.databaseService.executeTransaction(async () => {
+            await config.monitorRepository.update(monitorId, {
+                monitoring: true,
+                status: "pending",
+            });
         });
         const started = config.monitorScheduler.startMonitor(identifier, monitor);
         if (started) {
@@ -206,9 +220,12 @@ async function stopSpecificMonitor(
     }
 
     try {
-        await config.monitorRepository.update(monitorId, {
-            monitoring: false,
-            status: "paused",
+        // Use transaction for database update
+        await config.databaseService.executeTransaction(async () => {
+            await config.monitorRepository.update(monitorId, {
+                monitoring: false,
+                status: "paused",
+            });
         });
         const stopped = config.monitorScheduler.stopMonitor(identifier, monitorId);
         if (stopped) {
@@ -228,23 +245,29 @@ async function processAllSiteMonitors(
     site: Site,
     identifier: string,
     callback?: MonitoringCallback,
-    useOptimisticLogic: boolean = true
+    useOptimisticLogic = true
 ): Promise<boolean> {
     // If no callback is provided, we can't perform any operations
     if (!callback) {
         return false;
     }
 
-    const results = await Promise.all(
-        site.monitors
-            .filter((monitor) => monitor.id) // Only include monitors with valid IDs
-            .map(async (monitor) => {
-                if (monitor.id) {
-                    return await callback(identifier, monitor.id);
-                }
-                return false;
-            })
-    );
+    // Process monitors sequentially to avoid database transaction conflicts
+    const results: boolean[] = [];
+    const validMonitors = site.monitors.filter((monitor) => monitor.id);
+
+    for (const monitor of validMonitors) {
+        if (monitor.id) {
+            try {
+                const result = await callback(identifier, monitor.id);
+                results.push(result);
+            } catch (error) {
+                // Log error but continue processing other monitors
+                console.error(`Failed to process monitor ${monitor.id}:`, error);
+                results.push(false);
+            }
+        }
+    }
 
     // For starting monitors, use optimistic logic (succeed if ANY monitor starts)
     // For stopping monitors, use pessimistic logic (fail if ANY monitor fails to stop)

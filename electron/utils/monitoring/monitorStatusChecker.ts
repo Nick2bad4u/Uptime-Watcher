@@ -6,16 +6,16 @@
 import { EventEmitter } from "events";
 
 import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
-import { HistoryRepository, MonitorRepository, SiteRepository } from "../../services/database";
+import { HistoryRepository, MonitorRepository, SiteRepository, DatabaseService } from "../../services/database";
 import { MonitorFactory } from "../../services/monitoring";
 import { Site, StatusHistory, StatusUpdate } from "../../types";
 
-type Logger = {
+interface Logger {
     debug: (message: string, ...args: unknown[]) => void;
     error: (message: string, error?: unknown, ...args: unknown[]) => void;
     info: (message: string, ...args: unknown[]) => void;
     warn: (message: string, ...args: unknown[]) => void;
-};
+}
 
 /**
  * Configuration object for monitor checking functions.
@@ -26,8 +26,9 @@ export interface MonitorCheckConfig {
         monitor: MonitorRepository;
         site: SiteRepository;
     };
+    databaseService: DatabaseService;
     sites: Map<string, Site>;
-    eventEmitter: EventEmitter;
+    eventEmitter: EventEmitter; // Basic EventEmitter for low-level utility events
     logger: Logger;
     historyLimit: number;
     statusUpdateEvent: string;
@@ -93,32 +94,36 @@ export async function checkMonitor(
     };
 
     try {
-        // Add history entry using repository
-        await config.repositories.history.addEntry(monitor.id, historyEntry, checkResult.details);
+        // Use transaction for atomicity of all database operations
+        await config.databaseService.executeTransaction(async () => {
+            // Add history entry using repository
+            await config.repositories.history.addEntry(monitor.id, historyEntry, checkResult.details);
+
+            // Trim history if needed using repository
+            // Use smart history management for optimal UI experience
+            if (config.historyLimit > 0) {
+                // Calculate effective limit: ensure we always keep enough for large screen displays
+                // This prevents premature pruning that would leave charts looking sparse
+                const minRequiredForUI = 60; // Enough for large screens with high DPI
+                const effectiveLimit = Math.max(config.historyLimit, minRequiredForUI);
+                await config.repositories.history.pruneHistory(monitor.id, effectiveLimit);
+            }
+
+            // Update monitor with new status using repository
+            await config.repositories.monitor.update(monitor.id, {
+                lastChecked: monitor.lastChecked,
+                responseTime: monitor.responseTime,
+                status: monitor.status,
+            });
+        });
 
         config.logger.info(
-            `[checkMonitor] Inserted history row: monitor_id=${monitor.id}, status=${historyEntry.status}, responseTime=${historyEntry.responseTime}, timestamp=${historyEntry.timestamp}, details=${checkResult.details ?? "undefined"}`
+            `[checkMonitor] Database operations completed: monitor_id=${monitor.id}, status=${historyEntry.status}, responseTime=${historyEntry.responseTime}, timestamp=${historyEntry.timestamp}, details=${checkResult.details ?? "undefined"}`
         );
     } catch (err) {
-        config.logger.error(`[checkMonitor] Failed to insert history row: monitor_id=${monitor.id}`, err);
+        config.logger.error(`[checkMonitor] Failed to complete database operations: monitor_id=${monitor.id}`, err);
+        return undefined; // Return early if database operations fail
     }
-
-    // Trim history if needed using repository
-    // Use smart history management for optimal UI experience
-    if (config.historyLimit > 0) {
-        // Calculate effective limit: ensure we always keep enough for large screen displays
-        // This prevents premature pruning that would leave charts looking sparse
-        const minRequiredForUI = 60; // Enough for large screens with high DPI
-        const effectiveLimit = Math.max(config.historyLimit, minRequiredForUI);
-        await config.repositories.history.pruneHistory(monitor.id, effectiveLimit);
-    }
-
-    // Update monitor with new status using repository
-    await config.repositories.monitor.update(monitor.id, {
-        lastChecked: monitor.lastChecked,
-        responseTime: monitor.responseTime,
-        status: monitor.status,
-    });
 
     // Fetch fresh site data from database to ensure we have the latest history and monitor state
     const freshSiteData = await config.repositories.site.getByIdentifier(site.identifier);

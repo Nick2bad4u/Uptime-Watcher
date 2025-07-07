@@ -31,10 +31,10 @@ export class SiteRepository {
     /**
      * Get all sites from the database (without monitors).
      */
-    public async findAll(): Promise<Array<{ identifier: string; name?: string | undefined }>> {
+    public async findAll(): Promise<{ identifier: string; name?: string | undefined }[]> {
         try {
             const db = this.getDb();
-            const siteRows = db.all("SELECT * FROM sites") as Array<{ identifier: string; name?: string }>;
+            const siteRows = db.all("SELECT * FROM sites") as { identifier: string; name?: string }[];
             return siteRows.map((row) => ({
                 identifier: String(row.identifier),
                 ...(row.name !== undefined && row.name !== null && { name: String(row.name) }),
@@ -161,7 +161,7 @@ export class SiteRepository {
     /**
      * Export all sites for backup/import functionality.
      */
-    public async exportAll(): Promise<Array<{ identifier: string; name?: string | undefined }>> {
+    public async exportAll(): Promise<{ identifier: string; name?: string | undefined }[]> {
         try {
             const db = this.getDb();
             const sites = db.all("SELECT * FROM sites");
@@ -193,7 +193,7 @@ export class SiteRepository {
      * Bulk insert sites (for import functionality).
      * Uses a prepared statement and transaction for better performance.
      */
-    public async bulkInsert(sites: Array<{ identifier: string; name?: string | undefined }>): Promise<void> {
+    public async bulkInsert(sites: { identifier: string; name?: string | undefined }[]): Promise<void> {
         if (sites.length === 0) {
             return;
         }

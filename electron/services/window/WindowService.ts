@@ -89,7 +89,10 @@ export class WindowService {
      */
     public sendToRenderer(channel: string, data?: unknown): void {
         if (this.hasMainWindow()) {
+            logger.debug(`[WindowService] Sending to renderer: ${channel}`);
             this.mainWindow?.webContents.send(channel, data);
+        } else {
+            logger.warn(`[WindowService] Cannot send to renderer (no main window): ${channel}`);
         }
     }
 

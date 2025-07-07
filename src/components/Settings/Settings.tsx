@@ -73,7 +73,7 @@ export function Settings({ onClose }: Readonly<SettingsProps>) {
     }, [isLoading]);
 
     // Only allow keys that are part of AppSettings
-    const allowedKeys: Array<keyof typeof settings> = [
+    const allowedKeys: (keyof typeof settings)[] = [
         "notifications",
         "autoStart",
         "minimizeToTray",

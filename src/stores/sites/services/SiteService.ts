@@ -26,7 +26,7 @@ export class SiteService {
     /**
      * Add a new site
      */
-    static async addSite(site: Omit<Site, "id">): Promise<Site> {
+    static async addSite(site: Site): Promise<Site> {
         await this.initialize();
         return window.electronAPI.sites.addSite(site);
     }

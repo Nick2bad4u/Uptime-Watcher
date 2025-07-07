@@ -217,7 +217,7 @@ export class ChartConfigService {
  * @param totalChecks - Total number of checks for pie chart configuration
  * @returns Object containing various chart configuration options
  */
-export function useChartConfigs(theme: Theme, totalChecks: number = 0) {
+export function useChartConfigs(theme: Theme, totalChecks = 0) {
     const chartService = new ChartConfigService(theme);
 
     return {

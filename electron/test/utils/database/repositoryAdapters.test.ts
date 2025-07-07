@@ -28,6 +28,7 @@ vi.mock("../../../services/database", () => ({
         update: vi.fn(),
         delete: vi.fn(),
         deleteBySiteIdentifier: vi.fn(),
+        deleteBySiteIdentifierInternal: vi.fn(),
     })),
     HistoryRepository: vi.fn().mockImplementation(() => ({
         findByMonitorId: vi.fn(),
@@ -132,6 +133,7 @@ describe("repositoryAdapters", () => {
             update: ReturnType<typeof vi.fn>;
             delete: ReturnType<typeof vi.fn>;
             deleteBySiteIdentifier: ReturnType<typeof vi.fn>;
+            deleteBySiteIdentifierInternal: ReturnType<typeof vi.fn>;
         };
         let adapter: MonitorRepositoryAdapter;
 
@@ -142,6 +144,7 @@ describe("repositoryAdapters", () => {
                 update: vi.fn(),
                 delete: vi.fn(),
                 deleteBySiteIdentifier: vi.fn(),
+                deleteBySiteIdentifierInternal: vi.fn(),
             };
             adapter = new MonitorRepositoryAdapter(mockRepository as never);
         });

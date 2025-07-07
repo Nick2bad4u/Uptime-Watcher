@@ -13,7 +13,9 @@ export class DatabaseService {
     private static instance: DatabaseService;
     private _db: Database | undefined = undefined;
 
-    private constructor() {}
+    private constructor() {
+        // Private constructor for singleton pattern
+    }
 
     public static getInstance(): DatabaseService {
         if (!DatabaseService.instance) {

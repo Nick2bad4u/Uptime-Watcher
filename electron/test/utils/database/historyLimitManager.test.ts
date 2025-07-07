@@ -1,11 +1,25 @@
 /**
  * @file Test suite for historyLimitManager.ts
- * @description Tests for history limit management utilities
+ * @description Tests for history         it("should set limit to 0 for negative values without pruning", async () => {
+            const setHistoryLimitCallback = vi.fn();
+            const limit = -10;
+            const expectedLimit = 0;
+
+            await setHistoryLimit({
+                limit,
+                databaseService: mockDatabaseService,
+                repositories: {
+                    history: mockHistoryRepository,
+                    settings: mockSettingsRepository,
+                },
+                setHistoryLimit: setHistoryLimitCallback,
+                logger: mockLogger,
+            });nt utilities
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { setHistoryLimit, getHistoryLimit } from "../../../utils/database/historyLimitManager";
-import type { HistoryRepository, SettingsRepository } from "../../../services/database";
+import type { HistoryRepository, SettingsRepository, DatabaseService } from "../../../services/database";
 
 // Mock repositories
 const mockHistoryRepository = {
@@ -15,6 +29,13 @@ const mockHistoryRepository = {
 const mockSettingsRepository = {
     set: vi.fn(),
 } as unknown as SettingsRepository;
+
+// Mock database service
+const mockDatabaseService = {
+    executeTransaction: vi.fn(async (callback) => {
+        return await callback();
+    }),
+} as unknown as DatabaseService;
 
 // Mock logger
 const mockLogger = {
@@ -39,6 +60,7 @@ describe("historyLimitManager", () => {
             const limit = 100;
 
             await setHistoryLimit({
+                databaseService: mockDatabaseService,
                 limit,
                 repositories: {
                     history: mockHistoryRepository,
@@ -62,6 +84,7 @@ describe("historyLimitManager", () => {
 
             await setHistoryLimit({
                 limit,
+                databaseService: mockDatabaseService,
                 repositories: {
                     history: mockHistoryRepository,
                     settings: mockSettingsRepository,
@@ -83,6 +106,7 @@ describe("historyLimitManager", () => {
 
             await setHistoryLimit({
                 limit,
+                databaseService: mockDatabaseService,
                 repositories: {
                     history: mockHistoryRepository,
                     settings: mockSettingsRepository,
@@ -105,6 +129,7 @@ describe("historyLimitManager", () => {
 
             await setHistoryLimit({
                 limit,
+                databaseService: mockDatabaseService,
                 repositories: {
                     history: mockHistoryRepository,
                     settings: mockSettingsRepository,
@@ -126,6 +151,7 @@ describe("historyLimitManager", () => {
 
             await setHistoryLimit({
                 limit,
+                databaseService: mockDatabaseService,
                 repositories: {
                     history: mockHistoryRepository,
                     settings: mockSettingsRepository,
@@ -149,6 +175,7 @@ describe("historyLimitManager", () => {
             await expect(
                 setHistoryLimit({
                     limit,
+                    databaseService: mockDatabaseService,
                     repositories: {
                         history: mockHistoryRepository,
                         settings: mockSettingsRepository,
@@ -172,6 +199,7 @@ describe("historyLimitManager", () => {
             await expect(
                 setHistoryLimit({
                     limit,
+                    databaseService: mockDatabaseService,
                     repositories: {
                         history: mockHistoryRepository,
                         settings: mockSettingsRepository,
@@ -192,6 +220,7 @@ describe("historyLimitManager", () => {
 
             await setHistoryLimit({
                 limit,
+                databaseService: mockDatabaseService,
                 repositories: {
                     history: mockHistoryRepository,
                     settings: mockSettingsRepository,
@@ -211,6 +240,7 @@ describe("historyLimitManager", () => {
 
             await setHistoryLimit({
                 limit,
+                databaseService: mockDatabaseService,
                 repositories: {
                     history: mockHistoryRepository,
                     settings: mockSettingsRepository,
@@ -285,6 +315,7 @@ describe("historyLimitManager", () => {
             // Set the limit
             await setHistoryLimit({
                 limit,
+                databaseService: mockDatabaseService,
                 repositories: {
                     history: mockHistoryRepository,
                     settings: mockSettingsRepository,
@@ -314,6 +345,7 @@ describe("historyLimitManager", () => {
             // Set the limit
             await setHistoryLimit({
                 limit,
+                databaseService: mockDatabaseService,
                 repositories: {
                     history: mockHistoryRepository,
                     settings: mockSettingsRepository,

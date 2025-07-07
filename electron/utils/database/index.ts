@@ -15,9 +15,9 @@ export * from "./dataImportExport";
 // History limit management
 export * from "./historyLimitManager";
 
-// Site management utilities - consolidated
+// Site management utilities - legacy functions for specialized operations (import/export/backup)
+// TODO: Migrate these to use the new service-based architecture
 export * from "./siteRepository";
-export * from "./siteWriter";
 
 // New service-based architecture
 export * from "./interfaces";

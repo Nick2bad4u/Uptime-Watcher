@@ -85,7 +85,7 @@ export function downloadFile(options: FileDownloadOptions): void {
 /**
  * Generates a default backup filename with timestamp
  */
-export function generateBackupFileName(prefix: string = "backup", extension: string = "sqlite"): string {
+export function generateBackupFileName(prefix = "backup", extension = "sqlite"): string {
     const timestamp = new Date().toISOString().split("T")[0];
     return `${prefix}-${timestamp}.${extension}`;
 }

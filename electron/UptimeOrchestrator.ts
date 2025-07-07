@@ -1,13 +1,20 @@
 /**
  * Core uptime monitoring orchestrator.
  * Coordinates between specialized managers to provide a unified API for uptime monitoring.
+ * Manager instances
+    private readonly siteManager: SiteManager;
+    private readonly monitorManager: MonitorManager;
+    // TODO: DatabaseManager still has specialized import/export/backup functions that should
+    // eventually be converted to the new service-based architecture for consistency
+    private readonly databaseManager: DatabaseManager;
  */
 
 /* eslint-disable unicorn/no-null -- null literal needed for backend */
-import { EventEmitter } from "events";
+
+import type { UptimeEvents } from "./events/eventTypes";
 
 import { DEFAULT_HISTORY_LIMIT } from "./constants";
-import { DATABASE_EVENTS, SITE_EVENTS, MONITOR_EVENTS } from "./events";
+import { TypedEventBus, createLoggingMiddleware, createErrorHandlingMiddleware } from "./events/index";
 import { DatabaseManager } from "./managers/DatabaseManager";
 import { MonitorManager } from "./managers/MonitorManager";
 import { SiteManager } from "./managers/SiteManager";
@@ -19,6 +26,13 @@ import {
     SettingsRepository,
 } from "./services/database";
 import { Site, StatusUpdate } from "./types";
+import { logger } from "./utils/logger";
+
+/**
+ * Combined event interface for the orchestrator.
+ * Supports both internal manager events and public frontend events.
+ */
+type OrchestratorEvents = UptimeEvents;
 
 /**
  * Core uptime monitoring orchestrator that coordinates specialized managers.
@@ -28,7 +42,7 @@ import { Site, StatusUpdate } from "./types";
  * - MonitorManager: Monitoring operations and scheduling
  * - DatabaseManager: Database operations and data management
  *
- * Extends EventEmitter to provide real-time updates to the renderer process.
+ * Uses TypedEventBus to provide real-time updates to the renderer process with type safety.
  *
  * Events emitted:
  * - status-update: When monitor status changes
@@ -44,16 +58,22 @@ import { Site, StatusUpdate } from "./types";
  * orchestrator.startMonitoring();
  * ```
  */
-export class UptimeOrchestrator extends EventEmitter {
+export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     private historyLimit: number = DEFAULT_HISTORY_LIMIT;
 
     // Manager instances
     private readonly siteManager: SiteManager;
     private readonly monitorManager: MonitorManager;
+    // TODO: DatabaseManager still has specialized import/export/backup functions that should
+    // TODO: eventually be converted to the new service-based architecture for consistency
     private readonly databaseManager: DatabaseManager;
 
     constructor() {
-        super();
+        super("UptimeOrchestrator");
+
+        // Set up middleware for the event bus
+        this.use(createErrorHandlingMiddleware({ continueOnError: true }));
+        this.use(createLoggingMiddleware({ includeData: false, level: "info" }));
 
         // Initialize repositories
         const databaseService = DatabaseService.getInstance();
@@ -72,6 +92,7 @@ export class UptimeOrchestrator extends EventEmitter {
         });
 
         this.monitorManager = new MonitorManager({
+            databaseService,
             eventEmitter: this,
             getHistoryLimit: () => this.historyLimit,
             getSitesCache: () => this.siteManager.getSitesCache(),
@@ -80,6 +101,26 @@ export class UptimeOrchestrator extends EventEmitter {
                 monitor: monitorRepository,
                 site: siteRepository,
             },
+        });
+
+        // Now update SiteManager with MonitorManager integration
+        this.siteManager = new SiteManager({
+            databaseService,
+            eventEmitter: this,
+            historyRepository,
+            monitoringOperations: {
+                setHistoryLimit: async (limit: number) => {
+                    await this.setHistoryLimit(limit);
+                },
+                startMonitoringForSite: async (identifier: string, monitorId: string) => {
+                    return await this.monitorManager.startMonitoringForSite(identifier, monitorId);
+                },
+                stopMonitoringForSite: async (identifier: string, monitorId: string) => {
+                    return await this.monitorManager.stopMonitoringForSite(identifier, monitorId);
+                },
+            },
+            monitorRepository,
+            siteRepository,
         });
 
         this.databaseManager = new DatabaseManager({
@@ -101,57 +142,187 @@ export class UptimeOrchestrator extends EventEmitter {
      * Set up event handlers for inter-manager communication.
      */
     private setupEventHandlers(): void {
-        // Handle site manager events
-        this.on(SITE_EVENTS.START_MONITORING_REQUESTED, (data) => {
-            this.monitorManager.startMonitoringForSite(data.identifier, data.monitorId);
-        });
-
-        this.on(SITE_EVENTS.STOP_MONITORING_REQUESTED, (data) => {
-            this.monitorManager.stopMonitoringForSite(data.identifier, data.monitorId);
-        });
-
-        // Handle database manager events
-        this.on(DATABASE_EVENTS.UPDATE_SITES_CACHE_REQUESTED, (data) => {
-            if (data.sites) {
-                this.siteManager.updateSitesCache(data.sites);
+        // Handle site manager internal events
+        this.on("internal:site:start-monitoring-requested", (data) => {
+            try {
+                const success = this.monitorManager.startMonitoringForSite(data.identifier, data.monitorId);
+                // Emit response event with the result
+                this.emitTyped("internal:site:start-monitoring-response", {
+                    identifier: data.identifier,
+                    monitorId: data.monitorId,
+                    operation: "start-monitoring-response",
+                    success,
+                    timestamp: Date.now(),
+                });
+            } catch (error) {
+                logger.error(`[UptimeOrchestrator] Error starting monitoring for site ${data.identifier}:`, error);
+                this.emitTyped("internal:site:start-monitoring-response", {
+                    identifier: data.identifier,
+                    monitorId: data.monitorId,
+                    operation: "start-monitoring-response",
+                    success: false,
+                    timestamp: Date.now(),
+                });
             }
         });
 
-        this.on(DATABASE_EVENTS.GET_SITES_FROM_CACHE_REQUESTED, () => {
-            // Respond with sites from cache
-            const sites = this.siteManager.getSitesFromCache();
-            this.emit(DATABASE_EVENTS.GET_SITES_FROM_CACHE_REQUESTED, { sites });
+        this.on("internal:site:stop-monitoring-requested", (data) => {
+            try {
+                const success = this.monitorManager.stopMonitoringForSite(data.identifier, data.monitorId);
+                // Emit response event with the result
+                this.emitTyped("internal:site:stop-monitoring-response", {
+                    identifier: data.identifier,
+                    monitorId: data.monitorId,
+                    operation: "stop-monitoring-response",
+                    success,
+                    timestamp: Date.now(),
+                });
+            } catch (error) {
+                logger.error(`[UptimeOrchestrator] Error stopping monitoring for site ${data.identifier}:`, error);
+                this.emitTyped("internal:site:stop-monitoring-response", {
+                    identifier: data.identifier,
+                    monitorId: data.monitorId,
+                    operation: "stop-monitoring-response",
+                    success: false,
+                    timestamp: Date.now(),
+                });
+            }
         });
 
-        this.on(DATABASE_EVENTS.HISTORY_LIMIT_UPDATED, (data) => {
+        this.on("internal:site:is-monitoring-active-requested", (data) => {
+            // Check if the monitor is actively running in the scheduler
+            const isActive = this.monitorManager.isMonitorActiveInScheduler(data.identifier, data.monitorId);
+            // For this implementation, we'll emit the response event with the result
+            this.emitTyped("internal:site:is-monitoring-active-response", {
+                identifier: data.identifier,
+                isActive,
+                monitorId: data.monitorId,
+                operation: "is-monitoring-active-response",
+                timestamp: Date.now(),
+            });
+        });
+
+        this.on("internal:site:restart-monitoring-requested", (data) => {
+            // Use the MonitorScheduler's restartMonitor method which is designed for this exact use case
+            const success = this.monitorManager.restartMonitorWithNewConfig(data.identifier, data.monitor);
+            // Emit response event with the result
+            this.emitTyped("internal:site:restart-monitoring-response", {
+                identifier: data.identifier,
+                monitorId: data.monitor.id || "",
+                operation: "restart-monitoring-response",
+                success,
+                timestamp: Date.now(),
+            });
+        });
+
+        // Handle database manager internal events
+        this.on("internal:database:update-sites-cache-requested", async (data) => {
+            if (data.sites) {
+                await this.siteManager.updateSitesCache(data.sites);
+            }
+        });
+
+        this.on("internal:database:get-sites-from-cache-requested", () => {
+            // Respond with sites from cache
+            const sites = this.siteManager.getSitesFromCache();
+            this.emitTyped("internal:database:get-sites-from-cache-requested", {
+                operation: "get-sites-from-cache-requested",
+                sites,
+                timestamp: Date.now(),
+            });
+        });
+
+        this.on("internal:database:history-limit-updated", (data) => {
             if (data.limit !== undefined) {
                 this.historyLimit = data.limit;
             }
         });
 
-        // Forward manager events to renderer process
-        this.siteManager.on(SITE_EVENTS.SITE_ADDED, (data) => {
-            this.emit(SITE_EVENTS.SITE_ADDED, data);
+        // Forward internal manager events to public typed events for renderer process
+        this.on("internal:site:added", (data) => {
+            this.emitTyped("site:added", {
+                site: data.site,
+                source: "user" as const,
+                timestamp: data.timestamp,
+            });
         });
 
-        this.siteManager.on(SITE_EVENTS.SITE_REMOVED, (data) => {
-            this.emit(SITE_EVENTS.SITE_REMOVED, data);
+        this.on("internal:site:removed", (data) => {
+            this.emitTyped("site:removed", {
+                cascade: true,
+                siteId: data.identifier,
+                siteName: data.identifier,
+                timestamp: data.timestamp,
+            });
         });
 
-        this.siteManager.on(SITE_EVENTS.SITE_UPDATED, (data) => {
-            this.emit(SITE_EVENTS.SITE_UPDATED, data);
+        this.on("internal:site:updated", (data) => {
+            this.emitTyped("site:updated", {
+                previousSite: data.site,
+                site: data.site,
+                timestamp: data.timestamp,
+                updatedFields: data.updatedFields || [],
+            });
         });
 
-        this.monitorManager.on(MONITOR_EVENTS.MONITORING_STARTED, (data) => {
-            this.emit(MONITOR_EVENTS.MONITORING_STARTED, data);
+        // Transform typed events to simple events for ApplicationService
+        this.on("monitor:status-changed", (data) => {
+            logger.debug(`[UptimeOrchestrator] Received monitor:status-changed event for site: ${data.siteId}`);
+
+            // Emit the simple status-update event that ApplicationService expects
+            this.emit("status-update", {
+                monitor: data.monitor,
+                newStatus: data.newStatus,
+                previousStatus: data.previousStatus,
+                site: data.site, // Use complete site data from the event
+                timestamp: data.timestamp,
+            });
+
+            // Also emit monitor up/down events
+            if (data.previousStatus !== "down" && data.newStatus === "down") {
+                this.emit("site-monitor-down", {
+                    monitorId: data.monitor.id?.toString() || "",
+                    site: data.site, // Use complete site data from the event
+                });
+            } else if (data.previousStatus === "down" && data.newStatus === "up") {
+                this.emit("site-monitor-up", {
+                    monitorId: data.monitor.id?.toString() || "",
+                    site: data.site, // Use complete site data from the event
+                });
+            }
         });
 
-        this.monitorManager.on(MONITOR_EVENTS.MONITORING_STOPPED, (data) => {
-            this.emit(MONITOR_EVENTS.MONITORING_STOPPED, data);
+        // Transform system error events
+        this.on("system:error", (data) => {
+            this.emit("db-error", {
+                error: data.error,
+                operation: data.context,
+            });
         });
 
-        this.databaseManager.on(DATABASE_EVENTS.INITIALIZED, (data) => {
-            this.emit(DATABASE_EVENTS.INITIALIZED, data);
+        this.on("internal:monitor:started", () => {
+            this.emitTyped("monitoring:started", {
+                monitorCount: 0,
+                siteCount: 0,
+                timestamp: Date.now(),
+            });
+        });
+
+        this.on("internal:monitor:stopped", () => {
+            this.emitTyped("monitoring:stopped", {
+                activeMonitors: 0,
+                reason: "user" as const,
+                timestamp: Date.now(),
+            });
+        });
+
+        this.on("internal:database:initialized", () => {
+            this.emitTyped("database:transaction-completed", {
+                duration: 0,
+                operation: "initialize",
+                success: true,
+                timestamp: Date.now(),
+            });
         });
     }
 

@@ -147,7 +147,7 @@ vi.mock("../theme/components", () => ({
         React.createElement("div", props, children),
     ThemedSelect: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) =>
         React.createElement("select", props, children),
-    ThemedCheckbox: (props: { [key: string]: unknown }) => React.createElement("input", { type: "checkbox", ...props }),
+    ThemedCheckbox: (props: Record<string, unknown>) => React.createElement("input", { type: "checkbox", ...props }),
 }));
 
 describe("Settings", () => {

@@ -42,6 +42,7 @@ describe("SiteRepositoryService", () => {
             update: vi.fn(),
             delete: vi.fn(),
             deleteBySiteIdentifier: vi.fn(),
+            deleteBySiteIdentifierInternal: vi.fn(),
         };
 
         mockHistoryRepository = {

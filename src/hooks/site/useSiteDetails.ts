@@ -88,7 +88,16 @@ export function useSiteDetails({ site }: UseSiteDetailsProps) {
     const monitorIds = currentSite.monitors.map((m) => m.id);
     const defaultMonitorId = monitorIds[0] ?? "";
     const selectedMonitorId = getSelectedMonitorId(currentSite.identifier) ?? defaultMonitorId;
-    const selectedMonitor = currentSite.monitors.find((m) => m.id === selectedMonitorId) || currentSite.monitors[0];
+
+    // Find the selected monitor, and if it doesn't exist, update the selection to the first monitor
+    const foundMonitor = currentSite.monitors.find((m) => m.id === selectedMonitorId);
+    const selectedMonitor = foundMonitor || currentSite.monitors[0];
+
+    // If the selected monitor ID is stale (doesn't exist), update it to match the actual selected monitor
+    if (!foundMonitor && selectedMonitor) {
+        setSelectedMonitorId(currentSite.identifier, selectedMonitor.id);
+    }
+
     const isMonitoring = selectedMonitor ? selectedMonitor.monitoring !== false : false;
 
     // Check interval state

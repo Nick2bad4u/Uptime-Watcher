@@ -64,7 +64,14 @@ const settingsAPI = {
 // Event handling APIs
 const eventsAPI = {
     onStatusUpdate: (callback: (data: unknown) => void) => {
-        ipcRenderer.on("status-update", (_, data) => callback(data));
+        ipcRenderer.on("status-update", (_, data) => {
+            callback(data);
+        });
+    },
+    onTestEvent: (callback: (data: unknown) => void) => {
+        ipcRenderer.on("test-event", (_, data) => {
+            callback(data);
+        });
     },
     onUpdateStatus: (callback: (data: unknown) => void) => {
         ipcRenderer.on("update-status", (_, data) => callback(data));

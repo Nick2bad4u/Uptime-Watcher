@@ -14,14 +14,14 @@ import { DEFAULT_REQUEST_TIMEOUT, RETRY_CONSTRAINTS } from "../../constants";
 /**
  * Store actions interface for form submission.
  */
-type StoreActions = {
+interface StoreActions {
     /** Add a monitor to an existing site */
     addMonitorToSite: (siteId: string, monitor: Monitor) => Promise<void>;
     /** Clear any existing error state */
     clearError: () => void;
     /** Create a new site with monitors */
     createSite: (siteData: { identifier: string; monitors: Monitor[]; name?: string }) => Promise<void>;
-};
+}
 
 /**
  * Props interface for form submission handling.

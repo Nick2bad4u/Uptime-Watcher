@@ -11,11 +11,11 @@ import { monitorLogger as logger } from "../logger";
 /**
  * Type for imported site data structure.
  */
-export type ImportSite = {
+export interface ImportSite {
     identifier: string;
     name?: string;
     monitors?: Site["monitors"];
-};
+}
 
 /**
  * Dependencies required for data import/export operations.

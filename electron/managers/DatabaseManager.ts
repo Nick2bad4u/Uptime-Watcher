@@ -3,10 +3,14 @@
  * Handles database initialization, import/export, and backup operations.
  */
 
-import { EventEmitter } from "events";
-
 import { DEFAULT_HISTORY_LIMIT } from "../constants";
-import { DATABASE_EVENTS, SITE_EVENTS, DatabaseEventData, SiteEventData } from "../events";
+import { UptimeEvents } from "../events/eventTypes";
+import { TypedEventBus } from "../events/TypedEventBus";
+
+/**
+ * Combined events interface for DatabaseManager.
+ */
+type DatabaseManagerEvents = UptimeEvents;
 import {
     DatabaseService,
     SiteRepository,
@@ -32,7 +36,7 @@ import {
 import { monitorLogger as logger } from "../utils/logger";
 
 export interface DatabaseManagerDependencies {
-    eventEmitter: EventEmitter;
+    eventEmitter: TypedEventBus<DatabaseManagerEvents>;
     repositories: {
         database: DatabaseService;
         site: SiteRepository;
@@ -45,14 +49,18 @@ export interface DatabaseManagerDependencies {
 /**
  * Manages database operations and data management.
  * Handles initialization, import/export, backup, and history management.
+ *
+ * TODO: Convert remaining legacy functions (Import/Export/Backup Functions)
+ * to use the new service-based architecture for consistency. These functions are currently
+ * only used for specialized import/export/backup operations but should follow the same
+ * patterns as the rest of the codebase.
  */
-export class DatabaseManager extends EventEmitter {
+export class DatabaseManager {
     private historyLimit: number = DEFAULT_HISTORY_LIMIT;
     private readonly dependencies: DatabaseManagerDependencies;
-    private readonly eventEmitter: EventEmitter;
+    private readonly eventEmitter: TypedEventBus<DatabaseManagerEvents>;
 
     constructor(dependencies: DatabaseManagerDependencies) {
-        super();
         this.dependencies = dependencies;
         this.eventEmitter = dependencies.eventEmitter;
     }
@@ -63,11 +71,19 @@ export class DatabaseManager extends EventEmitter {
     public async initialize(): Promise<void> {
         await initDatabase(this.dependencies.repositories.database, () => this.loadSites(), this.eventEmitter);
 
-        // Emit database initialized event
-        const initEventData: DatabaseEventData = {
-            operation: "initialized",
-        };
-        this.eventEmitter.emit(DATABASE_EVENTS.INITIALIZED, initEventData);
+        try {
+            // Emit typed database initialized event
+            await this.eventEmitter.emitTyped("database:transaction-completed", {
+                duration: 0, // Database initialization duration not tracked yet
+                operation: "database:initialize",
+                recordsAffected: 0,
+                success: true,
+                timestamp: Date.now(),
+            });
+        } catch (error) {
+            logger.error("[DatabaseManager] Error emitting database initialized event:", error);
+            // Don't throw here as the database initialization itself succeeded
+        }
     }
 
     /**
@@ -84,36 +100,40 @@ export class DatabaseManager extends EventEmitter {
                 settings: this.dependencies.repositories.settings,
                 site: this.dependencies.repositories.site,
             },
-            setHistoryLimit: (limit) => {
+            setHistoryLimit: async (limit) => {
                 this.historyLimit = limit;
                 // Emit history limit updated event
-                const eventData: DatabaseEventData = {
+                await this.eventEmitter.emitTyped("internal:database:history-limit-updated", {
                     limit,
                     operation: "history-limit-updated",
-                };
-                this.eventEmitter.emit(DATABASE_EVENTS.HISTORY_LIMIT_UPDATED, eventData);
+                    timestamp: Date.now(),
+                });
             },
             sites: sitesMap,
             startMonitoring: async (identifier: string, monitorId: string) => {
                 // First update the cache so monitoring can find the sites
-                this.eventEmitter.emit(DATABASE_EVENTS.UPDATE_SITES_CACHE_REQUESTED, {
+                await this.eventEmitter.emitTyped("internal:database:update-sites-cache-requested", {
+                    operation: "update-sites-cache-requested",
                     sites: Array.from(sitesMap.values()),
+                    timestamp: Date.now(),
                 });
 
                 // Then request monitoring start via events
-                const eventData: SiteEventData = {
+                await this.eventEmitter.emitTyped("internal:site:start-monitoring-requested", {
                     identifier,
                     monitorId,
-                    operation: "start-monitoring",
-                };
-                this.eventEmitter.emit(SITE_EVENTS.START_MONITORING_REQUESTED, eventData);
+                    operation: "start-monitoring-requested",
+                    timestamp: Date.now(),
+                });
                 return true;
             },
         });
 
         // Update the cache with loaded sites (final update to ensure consistency)
-        this.eventEmitter.emit(DATABASE_EVENTS.UPDATE_SITES_CACHE_REQUESTED, {
+        await this.eventEmitter.emitTyped("internal:database:update-sites-cache-requested", {
+            operation: "update-sites-cache-requested",
             sites: Array.from(sitesMap.values()),
+            timestamp: Date.now(),
         });
     }
 
@@ -134,12 +154,13 @@ export class DatabaseManager extends EventEmitter {
 
         const result = await exportData(dependencies);
 
-        // Emit data exported event
-        const eventData: DatabaseEventData = {
-            operation: "exported",
-            result,
-        };
-        this.eventEmitter.emit(DATABASE_EVENTS.DATA_EXPORTED, eventData);
+        // Emit typed data exported event
+        await this.eventEmitter.emitTyped("internal:database:data-exported", {
+            fileName: `export-${Date.now()}.json`,
+            operation: "data-exported",
+            success: true,
+            timestamp: Date.now(),
+        });
 
         return result;
     }
@@ -169,12 +190,12 @@ export class DatabaseManager extends EventEmitter {
 
         const result = await importData(dependencies, callbacks, data);
 
-        // Emit data imported event
-        const eventData: DatabaseEventData = {
-            operation: "imported",
-            result,
-        };
-        this.eventEmitter.emit(DATABASE_EVENTS.DATA_IMPORTED, eventData);
+        // Emit typed data imported event
+        await this.eventEmitter.emitTyped("internal:database:data-imported", {
+            operation: "data-imported",
+            success: result,
+            timestamp: Date.now(),
+        });
 
         return result;
     }
@@ -190,12 +211,13 @@ export class DatabaseManager extends EventEmitter {
 
         const result = await downloadBackup(dependencies);
 
-        // Emit backup downloaded event
-        const eventData: DatabaseEventData = {
+        // Emit typed backup downloaded event
+        await this.eventEmitter.emitTyped("internal:database:backup-downloaded", {
+            fileName: result.fileName,
             operation: "backup-downloaded",
-            result,
-        };
-        this.eventEmitter.emit(DATABASE_EVENTS.BACKUP_DOWNLOADED, eventData);
+            success: true,
+            timestamp: Date.now(),
+        });
 
         return result;
     }
@@ -214,13 +236,12 @@ export class DatabaseManager extends EventEmitter {
 
         const result = await refreshSites(callbacks);
 
-        // Emit sites refreshed event
-        const eventData: DatabaseEventData = {
+        // Emit typed sites refreshed event
+        await this.eventEmitter.emitTyped("internal:database:sites-refreshed", {
             operation: "sites-refreshed",
-            result,
-            sites: result,
-        };
-        this.eventEmitter.emit(DATABASE_EVENTS.SITES_REFRESHED, eventData);
+            siteCount: result.length,
+            timestamp: Date.now(),
+        });
 
         return result;
     }
@@ -230,20 +251,21 @@ export class DatabaseManager extends EventEmitter {
      */
     public async setHistoryLimit(limit: number): Promise<void> {
         await setHistoryLimitUtil({
+            databaseService: this.dependencies.repositories.database,
             limit,
             logger,
             repositories: {
                 history: this.dependencies.repositories.history,
                 settings: this.dependencies.repositories.settings,
             },
-            setHistoryLimit: (newLimit) => {
+            setHistoryLimit: async (newLimit) => {
                 this.historyLimit = newLimit;
-                // Emit history limit updated event
-                const eventData: DatabaseEventData = {
+                // Emit typed history limit updated event
+                await this.eventEmitter.emitTyped("internal:database:history-limit-updated", {
                     limit: newLimit,
                     operation: "history-limit-updated",
-                };
-                this.eventEmitter.emit(DATABASE_EVENTS.HISTORY_LIMIT_UPDATED, eventData);
+                    timestamp: Date.now(),
+                });
             },
         });
     }

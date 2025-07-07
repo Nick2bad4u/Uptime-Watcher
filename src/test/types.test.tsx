@@ -99,7 +99,7 @@ describe("Types Module", () => {
         });
 
         it("should support all status values", () => {
-            const statuses: Array<"up" | "down" | "pending"> = ["up", "down", "pending"];
+            const statuses: ("up" | "down" | "pending")[] = ["up", "down", "pending"];
 
             statuses.forEach((status) => {
                 const monitor: Monitor = {
@@ -185,7 +185,7 @@ describe("Types Module", () => {
         });
 
         it("should support all status values", () => {
-            const statuses: Array<"up" | "down"> = ["up", "down"];
+            const statuses: ("up" | "down")[] = ["up", "down"];
 
             statuses.forEach((status) => {
                 const history: StatusHistory = {
@@ -240,7 +240,7 @@ describe("Types Module", () => {
         });
 
         it("should support all previous status values", () => {
-            const statuses: Array<"up" | "down" | "pending"> = ["up", "down", "pending"];
+            const statuses: ("up" | "down" | "pending")[] = ["up", "down", "pending"];
             const site: Site = { identifier: "test", monitors: [] };
 
             statuses.forEach((status) => {

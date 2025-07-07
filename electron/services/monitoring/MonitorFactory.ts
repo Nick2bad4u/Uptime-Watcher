@@ -48,7 +48,7 @@ export class MonitorFactory {
     /**
      * Get all available monitor types.
      */
-    public static getAvailableTypes(): Array<Site["monitors"][0]["type"]> {
+    public static getAvailableTypes(): Site["monitors"][0]["type"][] {
         return ["http", "port"];
     }
 }

@@ -81,7 +81,7 @@ export async function pruneHistoryForMonitor(db: Database, monitorId: string, li
         const excess = db.all("SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?", [
             monitorId,
             limit,
-        ]) as Array<{ id: number }>;
+        ]) as { id: number }[];
 
         if (excess.length > 0) {
             const excessIds = excess.map((row) => row.id);
@@ -107,7 +107,7 @@ export async function pruneHistoryForMonitor(db: Database, monitorId: string, li
 export async function bulkInsertHistory(
     db: Database,
     monitorId: string,
-    historyEntries: Array<StatusHistory & { details?: string }>
+    historyEntries: (StatusHistory & { details?: string })[]
 ): Promise<void> {
     if (historyEntries.length === 0) {
         return;

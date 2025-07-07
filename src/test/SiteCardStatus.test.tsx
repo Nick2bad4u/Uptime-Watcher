@@ -105,7 +105,7 @@ describe("SiteCardStatus", () => {
     });
 
     it("handles all valid status values", () => {
-        const statuses: Array<"up" | "down" | "pending"> = ["up", "down", "pending"];
+        const statuses: ("up" | "down" | "pending")[] = ["up", "down", "pending"];
 
         statuses.forEach((status) => {
             const { unmount } = render(<SiteCardStatus selectedMonitorId="test" status={status} />);

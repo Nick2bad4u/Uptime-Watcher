@@ -18,8 +18,8 @@ export const RETRY_BACKOFF = Object.freeze({
     MAX_DELAY: 5000, // Maximum delay in milliseconds
 });
 
-/** Status update event name */
-export const STATUS_UPDATE_EVENT = "status-update";
-
 /** Default history limit (500 records) */
 export const DEFAULT_HISTORY_LIMIT = 500;
+
+/** Event name for status updates (kept for backwards compatibility) */
+export const STATUS_UPDATE_EVENT = "status-update";

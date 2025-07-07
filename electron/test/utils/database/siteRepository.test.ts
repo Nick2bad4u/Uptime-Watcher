@@ -38,6 +38,7 @@ const mockMonitorRepository = {
     update: vi.fn(),
     delete: vi.fn(),
     deleteBySiteIdentifier: vi.fn(),
+    deleteBySiteIdentifierInternal: vi.fn(),
 } as const;
 
 const mockHistoryRepository = {

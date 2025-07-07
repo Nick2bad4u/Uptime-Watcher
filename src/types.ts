@@ -98,6 +98,7 @@ declare global {
 
             events: {
                 onStatusUpdate: (callback: (update: StatusUpdate) => void) => void;
+                onTestEvent: (callback: (data: unknown) => void) => void;
                 removeAllListeners: (event: string) => void;
             };
 
@@ -115,7 +116,7 @@ declare global {
 
             sites: {
                 getSites: () => Promise<Site[]>;
-                addSite: (site: Omit<Site, "id">) => Promise<Site>;
+                addSite: (site: Site) => Promise<Site>;
                 removeSite: (id: string) => Promise<void>;
                 updateSite: (id: string, updates: Partial<Site>) => Promise<void>;
                 checkSiteNow: (siteId: string, monitorId: string) => Promise<void>;

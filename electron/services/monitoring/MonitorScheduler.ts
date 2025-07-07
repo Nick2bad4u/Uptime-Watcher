@@ -8,7 +8,7 @@ import { logger } from "../../utils/logger";
  * Handles per-monitor interval timers and scheduling logic.
  */
 export class MonitorScheduler {
-    private readonly intervals: Map<string, NodeJS.Timeout> = new Map();
+    private readonly intervals = new Map<string, NodeJS.Timeout>();
     private onCheckCallback?: (siteIdentifier: string, monitorId: string) => Promise<void>;
 
     /**

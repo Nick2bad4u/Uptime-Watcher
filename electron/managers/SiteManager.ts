@@ -5,39 +5,56 @@
 
 import { EventEmitter } from "events";
 
-import { SITE_EVENTS, SiteEventData } from "../events";
+import { UptimeEvents } from "../events/eventTypes";
+import { TypedEventBus } from "../events/TypedEventBus";
 import { SiteRepository, MonitorRepository, HistoryRepository, DatabaseService } from "../services/database";
 import { Site } from "../types";
 import {
-    createSite,
-    deleteSite,
-    getSitesFromDatabase,
-    updateSite,
-    SiteUpdateDependencies,
-    SiteUpdateCallbacks,
+    SiteWritingOrchestrator,
+    createSiteWritingOrchestrator,
+    createSiteRepositoryService,
+    SiteRepositoryService,
 } from "../utils/database";
 import { monitorLogger as logger } from "../utils/logger";
 import { configurationManager } from "./ConfigurationManager";
+
+/**
+ * Combined events interface for SiteManager.
+ */
+type SiteManagerEvents = UptimeEvents;
+
+/**
+ * Interface for monitoring operations.
+ */
+export interface IMonitoringOperations {
+    startMonitoringForSite: (identifier: string, monitorId: string) => Promise<boolean>;
+    stopMonitoringForSite: (identifier: string, monitorId: string) => Promise<boolean>;
+    setHistoryLimit: (limit: number) => Promise<void>;
+}
 
 export interface SiteManagerDependencies {
     siteRepository: SiteRepository;
     monitorRepository: MonitorRepository;
     historyRepository: HistoryRepository;
     databaseService: DatabaseService;
-    eventEmitter: EventEmitter;
+    eventEmitter: TypedEventBus<SiteManagerEvents>;
+    // Optional MonitorManager dependency for proper monitoring integration
+    monitoringOperations?: IMonitoringOperations;
 }
 
 /**
  * Manages site operations and maintains in-memory cache.
  * Handles site CRUD operations and cache synchronization.
  */
-export class SiteManager extends EventEmitter {
-    private readonly sites: Map<string, Site> = new Map();
-    private readonly repositories: Omit<SiteManagerDependencies, "eventEmitter">;
-    private readonly eventEmitter: EventEmitter;
+export class SiteManager {
+    private readonly sites = new Map<string, Site>();
+    private readonly repositories: Omit<SiteManagerDependencies, "eventEmitter" | "monitoringOperations">;
+    private readonly eventEmitter: TypedEventBus<SiteManagerEvents>;
+    private readonly siteWritingOrchestrator: SiteWritingOrchestrator;
+    private readonly siteRepositoryService: SiteRepositoryService;
+    private readonly monitoringOperations: IMonitoringOperations | undefined;
 
     constructor(dependencies: SiteManagerDependencies) {
-        super();
         this.repositories = {
             databaseService: dependencies.databaseService,
             historyRepository: dependencies.historyRepository,
@@ -45,19 +62,18 @@ export class SiteManager extends EventEmitter {
             siteRepository: dependencies.siteRepository,
         };
         this.eventEmitter = dependencies.eventEmitter;
+        this.monitoringOperations = dependencies.monitoringOperations;
+
+        // Create the new service-based orchestrators
+        this.siteWritingOrchestrator = createSiteWritingOrchestrator();
+        this.siteRepositoryService = createSiteRepositoryService(this.eventEmitter as EventEmitter);
     }
 
     /**
      * Get all sites from database.
      */
     public async getSites(): Promise<Site[]> {
-        return getSitesFromDatabase({
-            repositories: {
-                history: this.repositories.historyRepository,
-                monitor: this.repositories.monitorRepository,
-                site: this.repositories.siteRepository,
-            },
-        });
+        return this.siteRepositoryService.getSitesFromDatabase();
     }
 
     /**
@@ -81,26 +97,18 @@ export class SiteManager extends EventEmitter {
         // Business validation
         this.validateSite(siteData);
 
-        // Use the utility function to add site to database
-        const site = await createSite({
-            databaseService: this.repositories.databaseService,
-            repositories: {
-                monitor: this.repositories.monitorRepository,
-                site: this.repositories.siteRepository,
-            },
-            siteData,
-        });
+        // Use the new service-based approach to add site to database
+        const site = await this.siteWritingOrchestrator.createSite(siteData);
 
         // Add to in-memory cache
         this.sites.set(site.identifier, site);
 
-        // Emit site added event
-        const eventData: SiteEventData = {
-            identifier: site.identifier,
-            operation: "added",
+        // Emit typed site added event
+        await this.eventEmitter.emitTyped("site:added", {
             site,
-        };
-        this.eventEmitter.emit(SITE_EVENTS.SITE_ADDED, eventData);
+            source: "user" as const,
+            timestamp: Date.now(),
+        });
 
         logger.info(`Site added successfully: ${site.identifier} (${site.name ?? "unnamed"})`);
         return site;
@@ -118,74 +126,106 @@ export class SiteManager extends EventEmitter {
     }
 
     /**
+     * Create adapter for ISiteCache interface from internal Map.
+     */
+    private createSiteCacheAdapter() {
+        return {
+            clear: () => this.sites.clear(),
+            delete: (id: string) => this.sites.delete(id),
+            entries: () => this.sites.entries(),
+            get: (id: string) => this.sites.get(id),
+            set: (id: string, site: Site) => {
+                this.sites.set(id, site);
+            },
+            size: () => this.sites.size,
+        };
+    }
+
+    /**
      * Remove a site from the database and cache.
      */
     public async removeSite(identifier: string): Promise<boolean> {
-        const result = await deleteSite({
-            databaseService: this.repositories.databaseService,
-            identifier,
-            logger,
-            repositories: {
-                monitor: this.repositories.monitorRepository,
-                site: this.repositories.siteRepository,
-            },
-            sites: this.sites,
-        });
+        const siteCache = this.createSiteCacheAdapter();
+        const result = await this.siteWritingOrchestrator.deleteSite(siteCache, identifier);
 
         if (result) {
-            // Emit site removed event
-            const eventData: SiteEventData = {
-                identifier,
-                operation: "removed",
-            };
-            this.eventEmitter.emit(SITE_EVENTS.SITE_REMOVED, eventData);
+            // Get site name before removal for event (already removed from cache by service)
+            const removedSite = this.sites.get(identifier);
+
+            // Emit typed site removed event
+            await this.eventEmitter.emitTyped("site:removed", {
+                cascade: true,
+                siteId: identifier,
+                siteName: removedSite?.name || "Unknown",
+                timestamp: Date.now(),
+            });
         }
 
         return result;
     }
 
     /**
+     * Create monitoring configuration for site operations.
+     */
+    private createMonitoringConfig() {
+        return {
+            setHistoryLimit: async (limit: number) => {
+                if (this.monitoringOperations) {
+                    await this.monitoringOperations.setHistoryLimit(limit);
+                } else {
+                    logger.warn("MonitoringOperations not available for setHistoryLimit");
+                }
+            },
+            startMonitoring: async (identifier: string, monitorId: string) => {
+                if (this.monitoringOperations) {
+                    return await this.monitoringOperations.startMonitoringForSite(identifier, monitorId);
+                } else {
+                    logger.warn("MonitoringOperations not available for startMonitoring");
+                    return false;
+                }
+            },
+            stopMonitoring: async (identifier: string, monitorId: string) => {
+                if (this.monitoringOperations) {
+                    return await this.monitoringOperations.stopMonitoringForSite(identifier, monitorId);
+                } else {
+                    logger.warn("MonitoringOperations not available for stopMonitoring");
+                    return false;
+                }
+            },
+        };
+    }
+
+    /**
      * Update a site in the database and cache.
      */
     public async updateSite(identifier: string, updates: Partial<Site>): Promise<Site> {
-        const dependencies: SiteUpdateDependencies = {
-            databaseService: this.repositories.databaseService,
-            logger,
-            monitorRepository: this.repositories.monitorRepository,
-            siteRepository: this.repositories.siteRepository,
-            sites: this.sites,
-        };
+        // Get the current site before updating for event data
+        const previousSite = this.sites.get(identifier);
+        if (!previousSite) {
+            throw new Error(`Site with identifier ${identifier} not found`);
+        }
 
-        const callbacks: SiteUpdateCallbacks = {
-            startMonitoringForSite: async (id: string, monitorId?: string) => {
-                const eventData: SiteEventData = {
-                    identifier: id,
-                    ...(monitorId !== undefined && { monitorId }),
-                    operation: "start-monitoring",
-                };
-                this.eventEmitter.emit(SITE_EVENTS.START_MONITORING_REQUESTED, eventData);
-                return true; // Assume success for now, actual result will be handled via events
-            },
-            stopMonitoringForSite: async (id: string, monitorId?: string) => {
-                const eventData: SiteEventData = {
-                    identifier: id,
-                    ...(monitorId !== undefined && { monitorId }),
-                    operation: "stop-monitoring",
-                };
-                this.eventEmitter.emit(SITE_EVENTS.STOP_MONITORING_REQUESTED, eventData);
-                return true; // Assume success for now, actual result will be handled via events
-            },
-        };
+        // Create site cache adapter
+        const siteCache = this.createSiteCacheAdapter();
 
-        const updatedSite = await updateSite(dependencies, callbacks, identifier, updates);
+        // Create full monitoring configuration
+        const monitoringConfig = this.createMonitoringConfig();
 
-        // Emit site updated event
-        const eventData: SiteEventData = {
+        // Use the service with proper monitoring integration
+        const updatedSite = await this.siteWritingOrchestrator.updateSiteWithMonitoring(
+            siteCache,
             identifier,
-            operation: "updated",
+            updates,
+            monitoringConfig
+        );
+
+        // Emit typed site updated event
+        await this.eventEmitter.emitTyped("site:updated", {
+            previousSite,
             site: updatedSite,
-        };
-        this.eventEmitter.emit(SITE_EVENTS.SITE_UPDATED, eventData);
+            timestamp: Date.now(),
+            updatedFields: Object.keys(updates),
+        });
 
         return updatedSite;
     }
@@ -193,18 +233,18 @@ export class SiteManager extends EventEmitter {
     /**
      * Update the sites cache with new data.
      */
-    public updateSitesCache(sites: Site[]): void {
+    public async updateSitesCache(sites: Site[]): Promise<void> {
         this.sites.clear();
         for (const site of sites) {
             this.sites.set(site.identifier, site);
         }
 
         // Emit cache updated event
-        const eventData: SiteEventData = {
+        await this.eventEmitter.emitTyped("internal:site:cache-updated", {
             identifier: "all",
             operation: "cache-updated",
-        };
-        this.eventEmitter.emit(SITE_EVENTS.CACHE_UPDATED, eventData);
+            timestamp: Date.now(),
+        });
     }
 
     /**
@@ -219,33 +259,27 @@ export class SiteManager extends EventEmitter {
      */
     public async removeMonitor(siteIdentifier: string, monitorId: string): Promise<boolean> {
         try {
-            // Remove the monitor from the database
-            const success = await this.repositories.monitorRepository.delete(monitorId);
+            // Remove the monitor from the database using transaction
+            const success = await this.executeMonitorDeletion(monitorId);
 
             if (success) {
                 // Refresh the cache by getting all sites (to ensure proper site structure)
-                const allSites = await getSitesFromDatabase({
-                    repositories: {
-                        history: this.repositories.historyRepository,
-                        monitor: this.repositories.monitorRepository,
-                        site: this.repositories.siteRepository,
-                    },
-                });
+                const allSites = await this.siteRepositoryService.getSitesFromDatabase();
 
                 // Update cache
-                this.updateSitesCache(allSites);
+                await this.updateSitesCache(allSites);
 
                 // Find the updated site for the event
                 const updatedSite = this.sites.get(siteIdentifier);
                 if (updatedSite) {
-                    // Emit monitor removed event
-                    const eventData: SiteEventData = {
+                    // Emit internal site updated event
+                    await this.eventEmitter.emitTyped("internal:site:updated", {
                         identifier: siteIdentifier,
-                        monitorId,
-                        operation: "monitor-removed",
+                        operation: "updated",
                         site: updatedSite,
-                    };
-                    this.eventEmitter.emit(SITE_EVENTS.SITE_UPDATED, eventData);
+                        timestamp: Date.now(),
+                        updatedFields: ["monitors"],
+                    });
 
                     logger.info(`[SiteManager] Monitor ${monitorId} removed from site ${siteIdentifier}`);
                 }
@@ -256,5 +290,14 @@ export class SiteManager extends EventEmitter {
             logger.error(`[SiteManager] Failed to remove monitor ${monitorId} from site ${siteIdentifier}`, error);
             throw error;
         }
+    }
+
+    /**
+     * Execute monitor deletion.
+     */
+    private async executeMonitorDeletion(monitorId: string): Promise<boolean> {
+        // MonitorRepository.delete() already handles its own transaction,
+        // so we don't need to wrap it in another transaction
+        return await this.repositories.monitorRepository.delete(monitorId);
     }
 }

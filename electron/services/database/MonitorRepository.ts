@@ -194,12 +194,7 @@ export class MonitorRepository {
     public async delete(monitorId: string): Promise<boolean> {
         try {
             const result = await this.databaseService.executeTransaction(async (db) => {
-                // Delete history first (foreign key constraint)
-                db.run("DELETE FROM history WHERE monitor_id = ?", [monitorId]);
-
-                // Delete the monitor
-                const deleteResult = db.run("DELETE FROM monitors WHERE id = ?", [monitorId]);
-                return (deleteResult.changes ?? 0) > 0;
+                return this.deleteInternal(db, monitorId);
             });
 
             if (result) {
@@ -218,26 +213,34 @@ export class MonitorRepository {
     }
 
     /**
+     * Internal method to delete a monitor and its history within an existing transaction.
+     * This method should be called from within a database transaction.
+     */
+    private deleteInternal(db: Database, monitorId: string): boolean {
+        // Delete history first (foreign key constraint)
+        db.run("DELETE FROM history WHERE monitor_id = ?", [monitorId]);
+
+        // Delete the monitor
+        const deleteResult = db.run("DELETE FROM monitors WHERE id = ?", [monitorId]);
+        return (deleteResult.changes ?? 0) > 0;
+    }
+
+    /**
+     * Public internal method to delete a monitor within an existing transaction.
+     * This method should be called from within a database transaction.
+     */
+    public deleteMonitorInternal(db: Database, monitorId: string): boolean {
+        return this.deleteInternal(db, monitorId);
+    }
+
+    /**
      * Delete all monitors for a specific site.
      * Uses a transaction to ensure atomicity.
      */
     public async deleteBySiteIdentifier(siteIdentifier: string): Promise<void> {
         try {
             await this.databaseService.executeTransaction(async (db) => {
-                // Get all monitor IDs for this site
-                const monitorRows = db.all("SELECT id FROM monitors WHERE site_identifier = ?", [
-                    siteIdentifier,
-                ]) as Array<{
-                    id: number;
-                }>;
-
-                // Delete history for all monitors
-                for (const row of monitorRows) {
-                    db.run("DELETE FROM history WHERE monitor_id = ?", [row.id]);
-                }
-
-                // Delete all monitors for this site
-                db.run("DELETE FROM monitors WHERE site_identifier = ?", [siteIdentifier]);
+                this.deleteBySiteIdentifierInternal(db, siteIdentifier);
             });
 
             if (isDev()) {
@@ -250,12 +253,31 @@ export class MonitorRepository {
     }
 
     /**
+     * Internal method to delete all monitors for a specific site within an existing transaction.
+     * This method should be called from within a database transaction.
+     */
+    public deleteBySiteIdentifierInternal(db: Database, siteIdentifier: string): void {
+        // Get all monitor IDs for this site
+        const monitorRows = db.all("SELECT id FROM monitors WHERE site_identifier = ?", [siteIdentifier]) as {
+            id: number;
+        }[];
+
+        // Delete history for all monitors
+        for (const row of monitorRows) {
+            db.run("DELETE FROM history WHERE monitor_id = ?", [row.id]);
+        }
+
+        // Delete all monitors for this site
+        db.run("DELETE FROM monitors WHERE site_identifier = ?", [siteIdentifier]);
+    }
+
+    /**
      * Get all monitor IDs.
      */
-    public async getAllMonitorIds(): Promise<Array<{ id: number }>> {
+    public async getAllMonitorIds(): Promise<{ id: number }[]> {
         try {
             const db = this.getDb();
-            const rows = db.all("SELECT id FROM monitors") as Array<{ id: number }>;
+            const rows = db.all("SELECT id FROM monitors") as { id: number }[];
             return rows;
         } catch (error) {
             logger.error("[MonitorRepository] Failed to fetch all monitor IDs", error);
@@ -284,13 +306,10 @@ export class MonitorRepository {
      * Returns the created monitor with their new IDs.
      * Fixed to use RETURNING clause to avoid race conditions.
      */
-    public async bulkCreate(
-        siteIdentifier: string,
-        monitors: Array<Site["monitors"][0]>
-    ): Promise<Array<Site["monitors"][0]>> {
+    public async bulkCreate(siteIdentifier: string, monitors: Site["monitors"][0][]): Promise<Site["monitors"][0][]> {
         try {
             const db = this.getDb();
-            const createdMonitors: Array<Site["monitors"][0]> = [];
+            const createdMonitors: Site["monitors"][0][] = [];
 
             for (const monitor of monitors) {
                 // Use RETURNING clause to get the ID directly from the insert

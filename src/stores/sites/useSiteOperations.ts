@@ -14,7 +14,7 @@ export interface SiteOperationsActions {
     /** Initialize sites data from backend */
     initializeSites: () => Promise<{ success: boolean; sitesLoaded: number; message: string }>;
     /** Create a new site */
-    createSite: (siteData: Omit<Site, "id" | "monitors"> & { monitors?: Monitor[] }) => Promise<void>;
+    createSite: (siteData: { identifier: string; name?: string; monitors?: Monitor[] }) => Promise<void>;
     /** Delete a site */
     deleteSite: (identifier: string) => Promise<void>;
     /** Modify an existing site */
@@ -86,7 +86,14 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                           ]
                 ).map((monitor) => normalizeMonitor(monitor));
 
-                const newSite = await SiteService.addSite({ ...siteData, monitors });
+                // Construct a complete Site object
+                const completeSite: Site = {
+                    identifier: siteData.identifier,
+                    monitors,
+                    name: siteData.name,
+                };
+
+                const newSite = await SiteService.addSite(completeSite);
                 deps.addSite(newSite);
             },
             {

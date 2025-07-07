@@ -4,7 +4,13 @@
 
 import { EventEmitter } from "events";
 
-import { SiteRepository, MonitorRepository, HistoryRepository, SettingsRepository } from "../../services/database";
+import {
+    SiteRepository,
+    MonitorRepository,
+    HistoryRepository,
+    SettingsRepository,
+    DatabaseService,
+} from "../../services/database";
 import { monitorLogger } from "../logger";
 import { SiteCache } from "./interfaces";
 import {
@@ -42,12 +48,14 @@ export function createSiteRepositoryService(eventEmitter: EventEmitter): SiteRep
 /**
  * Factory function to create a properly configured SiteWriterService.
  */
-export function createSiteWriterService(): SiteWriterService {
+export function createSiteWriterService(mockConfig: any): SiteWriterService {
     const siteRepository = new SiteRepositoryAdapter(new SiteRepository());
     const monitorRepository = new MonitorRepositoryAdapter(new MonitorRepository());
     const logger = new LoggerAdapter(monitorLogger);
+    const databaseService = DatabaseService.getInstance();
 
     return new SiteWriterService({
+        databaseService,
         logger,
         repositories: {
             monitor: monitorRepository,
@@ -79,69 +87,5 @@ export function createSiteCache(): SiteCache {
     return new SiteCache();
 }
 
-/**
- * Legacy compatibility functions that match the original function signatures.
- * These functions provide backwards compatibility during the transition period.
- */
-
-/**
- * Legacy wrapper for getSitesFromDatabase.
- */
-export async function getSitesFromDatabase(_config: {
-    repositories: {
-        site: SiteRepository;
-        monitor: MonitorRepository;
-        history: HistoryRepository;
-    };
-}): Promise<import("../../types").Site[]> {
-    const eventEmitter = new EventEmitter();
-    const siteRepositoryService = createSiteRepositoryService(eventEmitter);
-    return siteRepositoryService.getSitesFromDatabase();
-}
-
-/**
- * Legacy wrapper for loadSitesFromDatabase.
- */
-export async function loadSitesFromDatabase(config: {
-    repositories: {
-        site: SiteRepository;
-        monitor: MonitorRepository;
-        history: HistoryRepository;
-        settings: SettingsRepository;
-    };
-    sites: Map<string, import("../../types").Site>;
-    setHistoryLimit: (limit: number) => void;
-    startMonitoring: (identifier: string, monitorId: string) => Promise<boolean>;
-    eventEmitter: EventEmitter;
-}): Promise<{ success: boolean; sitesLoaded: number; message: string }> {
-    const siteLoadingOrchestrator = createSiteLoadingOrchestrator(config.eventEmitter);
-    const siteCache = new SiteCache();
-
-    try {
-        // Load sites into our cache
-        await siteLoadingOrchestrator.loadSitesFromDatabase(siteCache, {
-            setHistoryLimit: config.setHistoryLimit,
-            startMonitoring: config.startMonitoring,
-            stopMonitoring: async () => true, // Not used in loading
-        });
-
-        // Transfer from our cache to the provided map
-        config.sites.clear();
-        for (const [key, site] of Array.from(siteCache.entries())) {
-            config.sites.set(key, site);
-        }
-
-        const sitesLoaded = siteCache.size();
-        return {
-            message: `Successfully loaded ${sitesLoaded} sites`,
-            sitesLoaded,
-            success: true,
-        };
-    } catch (error) {
-        return {
-            message: `Failed to load sites: ${error instanceof Error ? error.message : "Unknown error"}`,
-            sitesLoaded: 0,
-            success: false,
-        };
-    }
-}
+// Legacy exports for backward compatibility with existing tests
+export { getSitesFromDatabase, loadSitesFromDatabase } from "./siteRepository";

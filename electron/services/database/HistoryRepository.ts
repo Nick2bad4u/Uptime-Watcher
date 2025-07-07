@@ -77,7 +77,7 @@ export class HistoryRepository {
             const db = this.getDb();
 
             // Get all monitor IDs
-            const monitorRows = db.all("SELECT id FROM monitors") as Array<{ id: number }>;
+            const monitorRows = db.all("SELECT id FROM monitors") as { id: number }[];
 
             // Prune history for each monitor
             for (const row of monitorRows) {
@@ -122,7 +122,7 @@ export class HistoryRepository {
      */
     public async bulkInsert(
         monitorId: string,
-        historyEntries: Array<StatusHistory & { details?: string }>
+        historyEntries: (StatusHistory & { details?: string })[]
     ): Promise<void> {
         const db = this.getDb();
         return bulkInsertHistory(db, monitorId, historyEntries);

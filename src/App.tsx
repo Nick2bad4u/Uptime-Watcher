@@ -5,6 +5,8 @@
 
 import { useEffect, useState } from "react";
 
+import type { StatusUpdate } from "./types";
+
 import { AddSiteForm } from "./components/AddSiteForm/AddSiteForm";
 import { SiteList } from "./components/Dashboard/SiteList";
 import { Header } from "./components/Header/Header";
@@ -91,8 +93,11 @@ function App() {
 
         // Subscribe to status updates with optimized incremental updates
         // The store's subscribeToStatusUpdates now handles smart incremental updates automatically
-        subscribeToStatusUpdates(() => {
-            // The store has already been updated with the new site data
+        subscribeToStatusUpdates((update: StatusUpdate) => {
+            // Optional callback for additional processing if needed
+            if (process.env.NODE_ENV === "development") {
+                console.log("Status update received:", update.site.identifier);
+            }
         });
 
         // Cleanup

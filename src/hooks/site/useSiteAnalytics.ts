@@ -228,7 +228,7 @@ export const SiteAnalyticsUtils = {
      */
     calculateSLA(
         uptime: number,
-        targetSLA: number = 99.9
+        targetSLA = 99.9
     ): {
         compliant: boolean;
         deficit: number;

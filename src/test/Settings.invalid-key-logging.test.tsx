@@ -53,7 +53,7 @@ describe("Settings - Invalid Key Logging", () => {
     it("should log warning when attempting to update invalid settings key", async () => {
         // Create a component that will trigger the invalid key scenario
         const TestComponent = () => {
-            type SettingsType = {
+            interface SettingsType {
                 theme: string;
                 autoStart: boolean;
                 autoUpdate: boolean;
@@ -67,9 +67,9 @@ describe("Settings - Invalid Key Logging", () => {
                 logLevel: string;
                 soundAlerts: boolean;
                 historyLimit: number;
-            };
+            }
 
-            const allowedKeys: Array<keyof SettingsType> = [
+            const allowedKeys: (keyof SettingsType)[] = [
                 "notifications",
                 "autoStart",
                 "minimizeToTray",

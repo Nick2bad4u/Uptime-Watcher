@@ -3,6 +3,7 @@
  */
 
 import { EventEmitter } from "events";
+import { Database } from "node-sqlite3-wasm";
 
 import { Monitor, Site, StatusHistory } from "../../types";
 
@@ -20,7 +21,7 @@ export interface ILogger {
  * Site repository interface.
  */
 export interface ISiteRepository {
-    findAll(): Promise<Array<{ identifier: string; name?: string | undefined }>>;
+    findAll(): Promise<{ identifier: string; name?: string | undefined }[]>;
     findByIdentifier(identifier: string): Promise<{ identifier: string; name?: string | undefined } | undefined>;
     upsert(site: Pick<Site, "identifier" | "name">): Promise<void>;
     delete(identifier: string): Promise<boolean>;
@@ -32,9 +33,11 @@ export interface ISiteRepository {
 export interface IMonitorRepository {
     findBySiteIdentifier(siteIdentifier: string): Promise<Monitor[]>;
     create(siteIdentifier: string, monitor: Monitor): Promise<string>;
-    update(monitorId: string, monitor: Monitor): Promise<void>;
+    update(monitorId: string, monitor: Partial<Monitor>): Promise<void>;
     delete(monitorId: string): Promise<boolean>;
     deleteBySiteIdentifier(siteIdentifier: string): Promise<void>;
+    deleteBySiteIdentifierInternal(db: Database, siteIdentifier: string): void;
+    deleteMonitorInternal(db: Database, monitorId: string): boolean;
 }
 
 /**

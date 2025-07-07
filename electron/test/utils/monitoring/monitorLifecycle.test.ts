@@ -27,6 +27,13 @@ const mockMonitorRepository = {
     update: vi.fn(),
 } as const;
 
+// Mock DatabaseService
+const mockDatabaseService = {
+    executeTransaction: vi.fn(async (callback) => {
+        return await callback();
+    }),
+};
+
 // Mock MonitorScheduler
 const mockMonitorScheduler = {
     startSite: vi.fn(),
@@ -67,6 +74,7 @@ const createTestConfig = (sites: Site[] = []): MonitoringLifecycleConfig => {
         sites: sitesMap,
         monitorScheduler: mockMonitorScheduler as unknown as MonitoringLifecycleConfig["monitorScheduler"],
         monitorRepository: mockMonitorRepository as unknown as MonitoringLifecycleConfig["monitorRepository"],
+        databaseService: mockDatabaseService as any,
         eventEmitter: mockEventEmitter,
         logger: mockLogger,
         statusUpdateEvent: "status-update",

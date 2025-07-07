@@ -15,7 +15,7 @@ interface ThemeStyles {
     metaStyle: React.CSSProperties;
 }
 
-export function useThemeStyles(isCollapsed: boolean = false): ThemeStyles {
+export function useThemeStyles(isCollapsed = false): ThemeStyles {
     const styles = useMemo<ThemeStyles>(() => {
         const isDarkMode =
             typeof window !== "undefined" && window.matchMedia

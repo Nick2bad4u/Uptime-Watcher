@@ -109,16 +109,19 @@ export class ApplicationService {
                 .join(", ");
 
             logger.debug(`[ApplicationService] Status update for ${data.site.identifier}: ${monitorStatuses}`);
+            logger.debug(`[ApplicationService] Sending status-update to renderer`);
             this.windowService.sendToRenderer("status-update", data);
         });
 
         // Monitor down alerts
         this.uptimeOrchestrator.on("site-monitor-down", ({ monitorId, site }: { monitorId: string; site: Site }) => {
+            logger.debug(`[ApplicationService] Monitor down alert for ${site.identifier}, monitor: ${monitorId}`);
             this.notificationService.notifyMonitorDown(site, monitorId);
         });
 
         // Monitor up alerts
         this.uptimeOrchestrator.on("site-monitor-up", ({ monitorId, site }: { monitorId: string; site: Site }) => {
+            logger.debug(`[ApplicationService] Monitor up alert for ${site.identifier}, monitor: ${monitorId}`);
             this.notificationService.notifyMonitorUp(site, monitorId);
         });
 

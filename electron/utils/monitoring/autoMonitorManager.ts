@@ -5,12 +5,12 @@
 
 import type { Site } from "../../types";
 
-type Logger = {
+interface Logger {
     debug: (message: string, ...args: unknown[]) => void;
     error: (message: string, error?: unknown, ...args: unknown[]) => void;
     info: (message: string, ...args: unknown[]) => void;
     warn: (message: string, ...args: unknown[]) => void;
-};
+}
 
 /**
  * Automatically starts monitoring for all monitors in a site.

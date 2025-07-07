@@ -5,12 +5,34 @@
 
 import { EventEmitter } from "events";
 
-import { STATUS_UPDATE_EVENT, DEFAULT_CHECK_INTERVAL } from "../constants";
+import { DEFAULT_CHECK_INTERVAL } from "../constants";
 import { isDev } from "../electronUtils";
-import { MONITOR_EVENTS, MonitorEventData } from "../events";
-import { MonitorRepository, HistoryRepository, SiteRepository } from "../services/database";
+import { UptimeEvents } from "../events/eventTypes";
+import { TypedEventBus } from "../events/TypedEventBus";
+
+/**
+ * Combined events interface for MonitorManager.
+ */
+type MonitorManagerEvents = UptimeEvents;
+
+/**
+ * Constants for utility event names.
+ */
+const UTILITY_EVENTS = {
+    SITE_MONITOR_DOWN: "site-monitor-down",
+    SITE_MONITOR_UP: "site-monitor-up",
+    STATUS_UPDATE: "status-update",
+} as const;
+
+/**
+ * Constants for typed event names.
+ */
+const TYPED_EVENTS = {
+    MONITOR_STATUS_CHANGED: "monitor:status-changed",
+} as const;
+import { MonitorRepository, HistoryRepository, SiteRepository, DatabaseService } from "../services/database";
 import { MonitorScheduler } from "../services/monitoring";
-import { Site, StatusUpdate } from "../types";
+import { Site, Monitor, StatusUpdate } from "../types";
 import { monitorLogger as logger } from "../utils/logger";
 import {
     performInitialMonitorChecks,
@@ -23,12 +45,13 @@ import {
 } from "../utils/monitoring";
 
 export interface MonitorManagerDependencies {
-    eventEmitter: EventEmitter;
+    eventEmitter: TypedEventBus<MonitorManagerEvents>;
     repositories: {
         monitor: MonitorRepository;
         history: HistoryRepository;
         site: SiteRepository;
     };
+    databaseService: DatabaseService;
     getHistoryLimit: () => number;
     getSitesCache: () => Map<string, Site>;
 }
@@ -37,18 +60,139 @@ export interface MonitorManagerDependencies {
  * Manages monitoring operations and scheduling.
  * Handles monitoring lifecycle and status checks.
  */
-export class MonitorManager extends EventEmitter {
-    private isMonitoring: boolean = false;
+export class MonitorManager {
+    private isMonitoring = false;
     private readonly monitorScheduler: MonitorScheduler;
     private readonly dependencies: MonitorManagerDependencies;
-    private readonly eventEmitter: EventEmitter;
+    private readonly eventEmitter: TypedEventBus<MonitorManagerEvents>;
+    private readonly utilityEventEmitter: EventEmitter; // For low-level utility events
 
     constructor(dependencies: MonitorManagerDependencies) {
-        super();
         this.dependencies = dependencies;
         this.eventEmitter = dependencies.eventEmitter;
+        this.utilityEventEmitter = new EventEmitter(); // Create wrapper for utility events
         this.monitorScheduler = new MonitorScheduler();
         this.monitorScheduler.setCheckCallback(this.handleScheduledCheck.bind(this));
+
+        // Set up event transformation from utility events to typed events
+        this.setupEventTransformation();
+    }
+
+    /**
+     * Set up event transformation from utility events to typed events.
+     */
+    private setupEventTransformation(): void {
+        // Transform status-update events to typed events
+        this.utilityEventEmitter.on(UTILITY_EVENTS.STATUS_UPDATE, (statusUpdate: StatusUpdate) => {
+            try {
+                // Validate the status update data
+                if (!statusUpdate || !statusUpdate.site || !statusUpdate.site.identifier) {
+                    logger.error("[MonitorManager] Invalid status update received - missing required fields");
+                    return;
+                }
+
+                logger.debug(
+                    `[MonitorManager] Processing status-update event for site: ${statusUpdate.site.identifier}`
+                );
+
+                // Find the monitor that was checked
+                const updatedMonitor = statusUpdate.site.monitors.find((m) => m.lastChecked);
+                if (updatedMonitor) {
+                    logger.debug(
+                        `[MonitorManager] Emitting monitor:status-changed event for monitor: ${updatedMonitor.id}`
+                    );
+
+                    // Emit status-changed event for the monitor
+                    const eventData: {
+                        monitor: Monitor;
+                        newStatus: string;
+                        previousStatus: string;
+                        responseTime?: number;
+                        site: Site; // Add complete site data
+                        siteId: string;
+                        timestamp: number;
+                    } = {
+                        monitor: updatedMonitor,
+                        newStatus: updatedMonitor.status,
+                        previousStatus: statusUpdate.previousStatus || "unknown",
+                        site: statusUpdate.site, // Include complete site data
+                        siteId: statusUpdate.site.identifier,
+                        timestamp: Date.now(),
+                    };
+                    if (updatedMonitor.responseTime !== undefined) {
+                        eventData.responseTime = updatedMonitor.responseTime;
+                    }
+                    this.eventEmitter.emitTyped(TYPED_EVENTS.MONITOR_STATUS_CHANGED, eventData);
+
+                    // Also emit check-completed event for completeness
+                    this.eventEmitter.emitTyped("monitor:check-completed", {
+                        checkType: "scheduled" as const,
+                        monitorId: updatedMonitor.id?.toString() || "",
+                        result: statusUpdate,
+                        siteId: statusUpdate.site.identifier,
+                        timestamp: Date.now(),
+                    });
+                } else {
+                    logger.warn(`[MonitorManager] No updated monitor found for site: ${statusUpdate.site.identifier}`);
+                }
+            } catch (error) {
+                logger.error("[MonitorManager] Error processing status update event:", error);
+            }
+        });
+
+        // Transform site-monitor-down events to typed events
+        this.utilityEventEmitter.on(
+            UTILITY_EVENTS.SITE_MONITOR_DOWN,
+            (data: { monitor: Site["monitors"][0]; monitorId: string; site: Site }) => {
+                const eventData: {
+                    monitor: Monitor;
+                    newStatus: string;
+                    previousStatus: string;
+                    responseTime?: number;
+                    site: Site;
+                    siteId: string;
+                    timestamp: number;
+                } = {
+                    monitor: data.monitor,
+                    newStatus: "down",
+                    previousStatus: "up",
+                    site: data.site,
+                    siteId: data.site.identifier,
+                    timestamp: Date.now(),
+                };
+                if (data.monitor.responseTime !== undefined) {
+                    eventData.responseTime = data.monitor.responseTime;
+                }
+                this.eventEmitter.emitTyped(TYPED_EVENTS.MONITOR_STATUS_CHANGED, eventData);
+            }
+        );
+
+        // Transform site-monitor-up events to typed events
+        this.utilityEventEmitter.on(
+            UTILITY_EVENTS.SITE_MONITOR_UP,
+            (data: { monitor: Site["monitors"][0]; monitorId: string; site: Site }) => {
+                const eventData: {
+                    monitor: Monitor;
+                    newStatus: string;
+                    previousStatus: string;
+                    responseTime?: number;
+                    site: Site;
+                    siteId: string;
+                    timestamp: number;
+                } = {
+                    monitor: data.monitor,
+                    newStatus: "up",
+                    previousStatus: "down",
+                    site: data.site,
+                    siteId: data.site.identifier,
+                    timestamp: Date.now(),
+                };
+                if (data.monitor.responseTime !== undefined) {
+                    eventData.responseTime = data.monitor.responseTime;
+                }
+                this.eventEmitter.emitTyped(TYPED_EVENTS.MONITOR_STATUS_CHANGED, eventData);
+            }
+        );
     }
 
     /**
@@ -57,21 +201,25 @@ export class MonitorManager extends EventEmitter {
     public async startMonitoring(): Promise<void> {
         this.isMonitoring = await startAllMonitoring(
             {
-                eventEmitter: this.dependencies.eventEmitter,
+                databaseService: this.dependencies.databaseService,
+                eventEmitter: this.utilityEventEmitter,
                 logger,
                 monitorRepository: this.dependencies.repositories.monitor,
                 monitorScheduler: this.monitorScheduler,
                 sites: this.dependencies.getSitesCache(),
-                statusUpdateEvent: STATUS_UPDATE_EVENT,
+                statusUpdateEvent: UTILITY_EVENTS.STATUS_UPDATE,
             },
             this.isMonitoring
         );
 
-        // Emit all monitoring started event
-        const eventData: MonitorEventData = {
-            identifier: "all",
-        };
-        this.eventEmitter.emit(MONITOR_EVENTS.ALL_MONITORING_STARTED, eventData);
+        // Emit typed monitoring started event
+        const sitesCache = this.dependencies.getSitesCache();
+        const sites = Array.from(sitesCache.values());
+        await this.eventEmitter.emitTyped("monitoring:started", {
+            monitorCount: sites.reduce((total, site) => total + site.monitors.length, 0),
+            siteCount: sites.length,
+            timestamp: Date.now(),
+        });
     }
 
     /**
@@ -79,19 +227,21 @@ export class MonitorManager extends EventEmitter {
      */
     public async stopMonitoring(): Promise<void> {
         this.isMonitoring = await stopAllMonitoring({
-            eventEmitter: this.dependencies.eventEmitter,
+            databaseService: this.dependencies.databaseService,
+            eventEmitter: this.utilityEventEmitter,
             logger,
             monitorRepository: this.dependencies.repositories.monitor,
             monitorScheduler: this.monitorScheduler,
             sites: this.dependencies.getSitesCache(),
-            statusUpdateEvent: STATUS_UPDATE_EVENT,
+            statusUpdateEvent: UTILITY_EVENTS.STATUS_UPDATE,
         });
 
-        // Emit all monitoring stopped event
-        const eventData: MonitorEventData = {
-            identifier: "all",
-        };
-        this.eventEmitter.emit(MONITOR_EVENTS.ALL_MONITORING_STOPPED, eventData);
+        // Emit typed monitoring stopped event
+        await this.eventEmitter.emitTyped("monitoring:stopped", {
+            activeMonitors: 0, // All monitoring stopped
+            reason: "user" as const,
+            timestamp: Date.now(),
+        });
     }
 
     /**
@@ -100,12 +250,13 @@ export class MonitorManager extends EventEmitter {
     public async startMonitoringForSite(identifier: string, monitorId?: string): Promise<boolean> {
         const result = await startMonitoringForSite(
             {
-                eventEmitter: this.dependencies.eventEmitter,
+                databaseService: this.dependencies.databaseService,
+                eventEmitter: this.utilityEventEmitter,
                 logger,
                 monitorRepository: this.dependencies.repositories.monitor,
                 monitorScheduler: this.monitorScheduler,
                 sites: this.dependencies.getSitesCache(),
-                statusUpdateEvent: STATUS_UPDATE_EVENT,
+                statusUpdateEvent: UTILITY_EVENTS.STATUS_UPDATE,
             },
             identifier,
             monitorId,
@@ -114,11 +265,12 @@ export class MonitorManager extends EventEmitter {
 
         if (result) {
             // Emit monitoring started event
-            const eventData: MonitorEventData = {
+            await this.eventEmitter.emitTyped("internal:monitor:started", {
                 identifier,
-                ...(monitorId !== undefined && { monitorId }),
-            };
-            this.eventEmitter.emit(MONITOR_EVENTS.MONITORING_STARTED, eventData);
+                ...(monitorId && { monitorId }),
+                operation: "started",
+                timestamp: Date.now(),
+            });
         }
 
         return result;
@@ -130,12 +282,13 @@ export class MonitorManager extends EventEmitter {
     public async stopMonitoringForSite(identifier: string, monitorId?: string): Promise<boolean> {
         const result = await stopMonitoringForSite(
             {
-                eventEmitter: this.dependencies.eventEmitter,
+                databaseService: this.dependencies.databaseService,
+                eventEmitter: this.utilityEventEmitter,
                 logger,
                 monitorRepository: this.dependencies.repositories.monitor,
                 monitorScheduler: this.monitorScheduler,
                 sites: this.dependencies.getSitesCache(),
-                statusUpdateEvent: STATUS_UPDATE_EVENT,
+                statusUpdateEvent: UTILITY_EVENTS.STATUS_UPDATE,
             },
             identifier,
             monitorId,
@@ -144,11 +297,13 @@ export class MonitorManager extends EventEmitter {
 
         if (result) {
             // Emit monitoring stopped event
-            const eventData: MonitorEventData = {
+            await this.eventEmitter.emitTyped("internal:monitor:stopped", {
                 identifier,
-                ...(monitorId !== undefined && { monitorId }),
-            };
-            this.eventEmitter.emit(MONITOR_EVENTS.MONITORING_STOPPED, eventData);
+                ...(monitorId && { monitorId }),
+                operation: "stopped",
+                reason: "user",
+                timestamp: Date.now(),
+            });
         }
 
         return result;
@@ -160,24 +315,26 @@ export class MonitorManager extends EventEmitter {
     public async checkSiteManually(identifier: string, monitorId?: string): Promise<StatusUpdate | undefined> {
         const result = await checkSiteManually(
             {
-                eventEmitter: this.dependencies.eventEmitter,
+                databaseService: this.dependencies.databaseService,
+                eventEmitter: this.utilityEventEmitter,
                 historyLimit: this.dependencies.getHistoryLimit(),
                 logger,
                 repositories: this.dependencies.repositories,
                 sites: this.dependencies.getSitesCache(),
-                statusUpdateEvent: STATUS_UPDATE_EVENT,
+                statusUpdateEvent: UTILITY_EVENTS.STATUS_UPDATE,
             },
             identifier,
             monitorId
         );
 
         // Emit manual check completed event
-        const eventData: MonitorEventData = {
+        await this.eventEmitter.emitTyped("internal:monitor:manual-check-completed", {
             identifier,
-            ...(monitorId !== undefined && { monitorId }),
-            ...(result !== undefined && { result }),
-        };
-        this.eventEmitter.emit(MONITOR_EVENTS.MANUAL_CHECK_COMPLETED, eventData);
+            ...(monitorId && { monitorId }),
+            operation: "manual-check-completed",
+            result: result as StatusUpdate,
+            timestamp: Date.now(),
+        });
 
         return result ?? undefined;
     }
@@ -196,10 +353,11 @@ export class MonitorManager extends EventEmitter {
         await this.autoStartMonitoringIfAppropriate(site);
 
         // Emit site setup completed event
-        const eventData: MonitorEventData = {
+        await this.eventEmitter.emitTyped("internal:monitor:site-setup-completed", {
             identifier: site.identifier,
-        };
-        this.eventEmitter.emit(MONITOR_EVENTS.SITE_SETUP_COMPLETED, eventData);
+            operation: "site-setup-completed",
+            timestamp: Date.now(),
+        });
     }
 
     /**
@@ -212,8 +370,14 @@ export class MonitorManager extends EventEmitter {
         for (const monitor of site.monitors) {
             if (monitor.id && this.shouldApplyDefaultInterval(monitor)) {
                 monitor.checkInterval = DEFAULT_CHECK_INTERVAL;
-                await this.dependencies.repositories.monitor.update(monitor.id, {
-                    checkInterval: monitor.checkInterval,
+
+                // Use transaction for database update
+                await this.dependencies.databaseService.executeTransaction(async () => {
+                    if (monitor.id) {
+                        await this.dependencies.repositories.monitor.update(monitor.id, {
+                            checkInterval: monitor.checkInterval,
+                        });
+                    }
                 });
 
                 logger.debug(
@@ -288,12 +452,13 @@ export class MonitorManager extends EventEmitter {
     private async checkMonitor(site: Site, monitorId: string): Promise<StatusUpdate | undefined> {
         return checkMonitor(
             {
-                eventEmitter: this.dependencies.eventEmitter,
+                databaseService: this.dependencies.databaseService,
+                eventEmitter: this.utilityEventEmitter,
                 historyLimit: this.dependencies.getHistoryLimit(),
                 logger,
                 repositories: this.dependencies.repositories,
                 sites: this.dependencies.getSitesCache(),
-                statusUpdateEvent: STATUS_UPDATE_EVENT,
+                statusUpdateEvent: UTILITY_EVENTS.STATUS_UPDATE,
             },
             site,
             monitorId
@@ -315,5 +480,20 @@ export class MonitorManager extends EventEmitter {
      */
     public isMonitoringActive(): boolean {
         return this.isMonitoring;
+    }
+
+    /**
+     * Check if a specific monitor is actively being monitored by the scheduler.
+     */
+    public isMonitorActiveInScheduler(siteIdentifier: string, monitorId: string): boolean {
+        return this.monitorScheduler.isMonitoring(siteIdentifier, monitorId);
+    }
+
+    /**
+     * Restart monitoring for a specific monitor with updated configuration.
+     * This is useful when monitor intervals change and need to be applied immediately.
+     */
+    public restartMonitorWithNewConfig(siteIdentifier: string, monitor: Site["monitors"][0]): boolean {
+        return this.monitorScheduler.restartMonitor(siteIdentifier, monitor);
     }
 }

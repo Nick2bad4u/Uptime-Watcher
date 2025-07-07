@@ -713,7 +713,7 @@ describe("MonitorRepository", () => {
 
     describe("bulkCreate", () => {
         it("should bulk create monitors", async () => {
-            const monitors: Array<Site["monitors"][0]> = [
+            const monitors: Site["monitors"][0][] = [
                 {
                     id: "temp-1",
                     type: "http",
@@ -745,7 +745,7 @@ describe("MonitorRepository", () => {
                 throw error;
             });
 
-            const monitors: Array<Site["monitors"][0]> = [
+            const monitors: Site["monitors"][0][] = [
                 {
                     id: "temp-1",
                     type: "http",

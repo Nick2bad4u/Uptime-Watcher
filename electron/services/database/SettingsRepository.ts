@@ -74,7 +74,7 @@ export class SettingsRepository {
     public async getAll(): Promise<Record<string, string>> {
         try {
             const db = this.getDb();
-            const settings = db.all("SELECT * FROM settings") as Array<{ key: string; value: string }>;
+            const settings = db.all("SELECT * FROM settings") as { key: string; value: string }[];
             return settings.reduce(
                 (acc, row) => {
                     if (typeof row.key === "string") {

@@ -84,7 +84,7 @@ export const logStoreAction = (storeName: string, actionName: string, data?: unk
  * @param baseDelay - Base delay in milliseconds for exponential backoff (default: 100)
  * @throws Error when electronAPI is not available after maximum attempts
  */
-export async function waitForElectronAPI(maxAttempts: number = 50, baseDelay: number = 100): Promise<void> {
+export async function waitForElectronAPI(maxAttempts = 50, baseDelay = 100): Promise<void> {
     for (const attempt of Array.from({ length: maxAttempts }, (_, i) => i)) {
         if (
             typeof window !== "undefined" &&

@@ -4,7 +4,28 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { EventEmitter } from "events";
+
+// Mock the logger - combine all logger exports
+vi.mock("../../utils/logger", () => ({
+    logger: {
+        info: vi.fn(),
+        error: vi.fn(),
+        warn: vi.fn(),
+        debug: vi.fn(),
+    },
+    monitorLogger: {
+        info: vi.fn(),
+        debug: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn(),
+    },
+    dbLogger: {
+        info: vi.fn(),
+        debug: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn(),
+    },
+}));
 
 // Mock the utility functions first using factory
 vi.mock("../../utils/database", () => ({
@@ -16,21 +37,22 @@ vi.mock("../../utils/database", () => ({
     exportData: vi.fn(),
     initDatabase: vi.fn(),
     downloadBackup: vi.fn(),
-}));
-
-// Mock the logger
-vi.mock("../../utils/logger", () => ({
-    monitorLogger: {
-        info: vi.fn(),
-        debug: vi.fn(),
-        warn: vi.fn(),
-        error: vi.fn(),
-    },
+    createSiteWritingOrchestrator: vi.fn(() => ({
+        createSite: vi.fn(),
+        updateSite: vi.fn(),
+        deleteSite: vi.fn(),
+    })),
+    createSiteRepositoryService: vi.fn(() => ({
+        getSitesFromDatabase: vi.fn(),
+        loadSitesFromDatabase: vi.fn(),
+    })),
+    getSitesFromDatabase: vi.fn(),
 }));
 
 // Import after mocks
 import { DatabaseManager, DatabaseManagerDependencies } from "../../managers/DatabaseManager";
-import { DATABASE_EVENTS } from "../../events";
+import { TypedEventBus } from "../../events/TypedEventBus";
+import type { UptimeEvents } from "../../events/eventTypes";
 import type { Site } from "../../types";
 import * as dbUtils from "../../utils/database";
 
@@ -53,12 +75,42 @@ const createMockSite = (identifier: string): Site => ({
 
 describe("DatabaseManager", () => {
     let databaseManager: DatabaseManager;
-    let mockEventEmitter: EventEmitter;
+    let mockEventEmitter: TypedEventBus<UptimeEvents>;
     let mockDependencies: DatabaseManagerDependencies;
 
     beforeEach(() => {
         vi.clearAllMocks();
-        mockEventEmitter = new EventEmitter();
+        
+        // Create a mock TypedEventBus
+        mockEventEmitter = {
+            emitTyped: vi.fn().mockResolvedValue(undefined),
+            onTyped: vi.fn(),
+            onceTyped: vi.fn(),
+            offTyped: vi.fn(),
+            use: vi.fn(),
+            removeMiddleware: vi.fn(),
+            clearMiddleware: vi.fn(),
+            processMiddleware: vi.fn(),
+            getDiagnostics: vi.fn(),
+            middlewares: [],
+            busId: "test-bus",
+            // EventEmitter methods
+            on: vi.fn(),
+            off: vi.fn(),
+            once: vi.fn(),
+            emit: vi.fn(),
+            removeAllListeners: vi.fn(),
+            setMaxListeners: vi.fn(),
+            listeners: vi.fn(),
+            eventNames: vi.fn(),
+            getMaxListeners: vi.fn(),
+            listenerCount: vi.fn(),
+            prependListener: vi.fn(),
+            prependOnceListener: vi.fn(),
+            removeListener: vi.fn(),
+            addListener: vi.fn(),
+            rawListeners: vi.fn(),
+        } as unknown as TypedEventBus<UptimeEvents>;
 
         mockDependencies = {
             eventEmitter: mockEventEmitter,
@@ -86,6 +138,7 @@ describe("DatabaseManager", () => {
                     update: vi.fn(),
                     delete: vi.fn(),
                     deleteBySiteIdentifier: vi.fn(),
+                    deleteBySiteIdentifierInternal: vi.fn(),
                     getAllMonitorIds: vi.fn(),
                     deleteAll: vi.fn(),
                     bulkCreate: vi.fn(),
@@ -119,7 +172,8 @@ describe("DatabaseManager", () => {
     describe("constructor", () => {
         it("should create a DatabaseManager instance", () => {
             expect(databaseManager).toBeInstanceOf(DatabaseManager);
-            expect(databaseManager).toBeInstanceOf(EventEmitter);
+            // DatabaseManager no longer extends EventEmitter directly, it uses the provided TypedEventBus
+            expect(databaseManager).toHaveProperty("eventEmitter");
         });
 
         it("should store dependencies correctly", () => {
@@ -132,8 +186,7 @@ describe("DatabaseManager", () => {
         it("should initialize database and emit event", async () => {
             mockInitDatabase.mockResolvedValue(undefined);
             
-            const eventSpy = vi.fn();
-            mockEventEmitter.on(DATABASE_EVENTS.INITIALIZED, eventSpy);
+            mockEventEmitter.emitTyped = vi.fn();
 
             await databaseManager.initialize();
 
@@ -142,9 +195,13 @@ describe("DatabaseManager", () => {
                 expect.any(Function),
                 mockEventEmitter
             );
-            expect(eventSpy).toHaveBeenCalledWith({
-                operation: "initialized",
-            });
+            expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
+                expect.stringContaining("database:transaction-completed"),
+                expect.objectContaining({
+                    operation: "database:initialize",
+                    success: true,
+                })
+            );
         });
 
         it("should handle initialization errors", async () => {
@@ -229,8 +286,7 @@ describe("DatabaseManager", () => {
             const mockExportResult = '{"sites":[],"monitors":[],"settings":{}}';
             mockExportData.mockResolvedValue(mockExportResult);
             
-            const eventSpy = vi.fn();
-            mockEventEmitter.on(DATABASE_EVENTS.DATA_EXPORTED, eventSpy);
+            mockEventEmitter.emitTyped = vi.fn();
 
             const result = await databaseManager.exportData();
 
@@ -245,10 +301,13 @@ describe("DatabaseManager", () => {
                     site: mockDependencies.repositories.site,
                 },
             });
-            expect(eventSpy).toHaveBeenCalledWith({
-                operation: "exported",
-                result: mockExportResult,
-            });
+            expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
+                expect.stringContaining("database:data-exported"),
+                expect.objectContaining({
+                    fileName: expect.stringMatching(/^export-\d+\.json$/),
+                    success: true,
+                })
+            );
         });
 
         it("should handle export errors", async () => {
@@ -270,8 +329,7 @@ describe("DatabaseManager", () => {
                 return true;
             });
             
-            const eventSpy = vi.fn();
-            mockEventEmitter.on(DATABASE_EVENTS.DATA_IMPORTED, eventSpy);
+            mockEventEmitter.emitTyped = vi.fn();
 
             const result = await databaseManager.importData(testData);
 
@@ -293,10 +351,12 @@ describe("DatabaseManager", () => {
                 },
                 testData
             );
-            expect(eventSpy).toHaveBeenCalledWith({
-                operation: "imported",
-                result: true,
-            });
+            expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
+                expect.stringContaining("database:data-imported"),
+                expect.objectContaining({
+                    success: true,
+                })
+            );
 
             // Test loadSites callback
             if (loadSitesCallback) {
@@ -336,8 +396,7 @@ describe("DatabaseManager", () => {
             const mockBackupResult = { buffer: Buffer.from("test backup"), fileName: "backup.db" };
             mockDownloadBackup.mockResolvedValue(mockBackupResult);
             
-            const eventSpy = vi.fn();
-            mockEventEmitter.on(DATABASE_EVENTS.BACKUP_DOWNLOADED, eventSpy);
+            mockEventEmitter.emitTyped = vi.fn();
 
             const result = await databaseManager.downloadBackup();
 
@@ -346,10 +405,13 @@ describe("DatabaseManager", () => {
                 databaseService: mockDependencies.repositories.database,
                 eventEmitter: mockEventEmitter,
             });
-            expect(eventSpy).toHaveBeenCalledWith({
-                operation: "backup-downloaded",
-                result: mockBackupResult,
-            });
+            expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
+                expect.stringContaining("database:backup-downloaded"),
+                expect.objectContaining({
+                    fileName: "backup.db",
+                    success: true,
+                })
+            );
         });
 
         it("should handle backup download errors", async () => {
@@ -370,8 +432,7 @@ describe("DatabaseManager", () => {
                 return mockSites;
             });
             
-            const eventSpy = vi.fn();
-            mockEventEmitter.on(DATABASE_EVENTS.SITES_REFRESHED, eventSpy);
+            mockEventEmitter.emitTyped = vi.fn();
 
             const result = await databaseManager.refreshSites();
 
@@ -380,11 +441,14 @@ describe("DatabaseManager", () => {
                 getSitesFromCache: expect.any(Function),
                 loadSites: expect.any(Function),
             });
-            expect(eventSpy).toHaveBeenCalledWith({
-                operation: "sites-refreshed",
-                result: mockSites,
-                sites: mockSites,
-            });
+            expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
+                "internal:database:sites-refreshed",
+                {
+                    operation: "sites-refreshed",
+                    siteCount: 2,
+                    timestamp: expect.any(Number),
+                }
+            );
 
             // Test loadSites callback
             if (loadSitesCallback) {
@@ -430,24 +494,24 @@ describe("DatabaseManager", () => {
                 return Promise.resolve();
             });
             
-            const eventSpy = vi.fn();
-            mockEventEmitter.on(DATABASE_EVENTS.HISTORY_LIMIT_UPDATED, eventSpy);
+            mockEventEmitter.emitTyped = vi.fn();
 
             await databaseManager.setHistoryLimit(500);
 
-            expect(mockSetHistoryLimit).toHaveBeenCalledWith({
-                limit: 500,
-                logger: expect.any(Object),
-                repositories: {
-                    history: mockDependencies.repositories.history,
-                    settings: mockDependencies.repositories.settings,
-                },
-                setHistoryLimit: expect.any(Function),
-            });
-            expect(eventSpy).toHaveBeenCalledWith({
-                limit: 500,
-                operation: "history-limit-updated",
-            });
+            expect(mockSetHistoryLimit).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    limit: 500,
+                    setHistoryLimit: expect.any(Function),
+                })
+            );
+            expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
+                "internal:database:history-limit-updated",
+                {
+                    operation: "history-limit-updated",
+                    limit: 500,
+                    timestamp: expect.any(Number),
+                }
+            );
         });
 
         it("should handle set history limit errors", async () => {
