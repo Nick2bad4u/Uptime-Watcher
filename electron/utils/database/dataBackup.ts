@@ -1,5 +1,5 @@
-import { EventEmitter } from "events";
-
+import { UptimeEvents } from "../../events/eventTypes";
+import { TypedEventBus } from "../../events/TypedEventBus";
 import { DatabaseService } from "../../services/database/DatabaseService";
 import { Site } from "../../types";
 import { monitorLogger as logger } from "../logger";
@@ -9,7 +9,7 @@ import { monitorLogger as logger } from "../logger";
  */
 export interface DataBackupDependencies {
     databaseService: DatabaseService;
-    eventEmitter: EventEmitter;
+    eventEmitter: TypedEventBus<UptimeEvents>;
 }
 
 /**
@@ -28,7 +28,12 @@ export async function downloadBackup(deps: DataBackupDependencies): Promise<{ bu
         return await deps.databaseService.downloadBackup();
     } catch (error) {
         logger.error("Failed to download backup", error);
-        deps.eventEmitter.emit("db-error", { error, operation: "downloadBackup" });
+        await deps.eventEmitter.emitTyped("database:error", {
+            details: "Failed to download backup",
+            error: error instanceof Error ? error : new Error(String(error)),
+            operation: "download-backup",
+            timestamp: Date.now(),
+        });
         throw error;
     }
 }

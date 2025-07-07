@@ -2,8 +2,8 @@
  * Factory functions to create services with proper dependency injection.
  */
 
-import { EventEmitter } from "events";
-
+import { UptimeEvents } from "../../events/eventTypes";
+import { TypedEventBus } from "../../events/TypedEventBus";
 import {
     SiteRepository,
     MonitorRepository,
@@ -26,7 +26,7 @@ import { SiteWriterService, SiteWritingOrchestrator } from "./SiteWriterService"
 /**
  * Factory function to create a properly configured SiteRepositoryService.
  */
-export function createSiteRepositoryService(eventEmitter: EventEmitter): SiteRepositoryService {
+export function createSiteRepositoryService(eventEmitter: TypedEventBus<UptimeEvents>): SiteRepositoryService {
     const siteRepository = new SiteRepositoryAdapter(new SiteRepository());
     const monitorRepository = new MonitorRepositoryAdapter(new MonitorRepository());
     const historyRepository = new HistoryRepositoryAdapter(new HistoryRepository());
@@ -67,7 +67,7 @@ export function createSiteWriterService(): SiteWriterService {
 /**
  * Factory function to create a properly configured SiteLoadingOrchestrator.
  */
-export function createSiteLoadingOrchestrator(eventEmitter: EventEmitter): SiteLoadingOrchestrator {
+export function createSiteLoadingOrchestrator(eventEmitter: TypedEventBus<UptimeEvents>): SiteLoadingOrchestrator {
     const siteRepositoryService = createSiteRepositoryService(eventEmitter);
     return new SiteLoadingOrchestrator(siteRepositoryService);
 }

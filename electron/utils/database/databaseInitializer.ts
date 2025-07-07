@@ -3,8 +3,8 @@
  * Handles database setup and site loading with proper error handling.
  */
 
-import { EventEmitter } from "events";
-
+import { UptimeEvents } from "../../events/eventTypes";
+import { TypedEventBus } from "../../events/TypedEventBus";
 import { DatabaseService } from "../../services/database";
 import { monitorLogger as logger } from "../logger";
 import { withDbRetry } from "../retry";
@@ -18,14 +18,19 @@ import { withDbRetry } from "../retry";
 export async function initDatabase(
     databaseService: DatabaseService,
     loadSitesCallback: () => Promise<void>,
-    eventEmitter: EventEmitter
+    eventEmitter: TypedEventBus<UptimeEvents>
 ): Promise<void> {
     try {
         await databaseService.initialize();
         await withDbRetry(loadSitesCallback, "loadSites");
     } catch (error) {
         logger.error("Failed to initialize database", error);
-        eventEmitter.emit("db-error", { error, operation: "initDatabase" });
+        await eventEmitter.emitTyped("database:error", {
+            details: "Failed to initialize database",
+            error: error instanceof Error ? error : new Error(String(error)),
+            operation: "initialize-database",
+            timestamp: Date.now(),
+        });
         // Don't re-throw the error - let it be handled via the event system
     }
 }

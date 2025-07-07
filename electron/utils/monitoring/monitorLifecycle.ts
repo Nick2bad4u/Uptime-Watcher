@@ -3,8 +3,8 @@
  * Consolidates monitor starting and stopping operations for better organization.
  */
 
-import { EventEmitter } from "events";
-
+import { UptimeEvents } from "../../events/eventTypes";
+import { TypedEventBus } from "../../events/TypedEventBus";
 import { MonitorRepository, DatabaseService } from "../../services/database";
 import { MonitorScheduler } from "../../services/monitoring";
 import { Site } from "../../types";
@@ -24,9 +24,8 @@ export interface MonitoringLifecycleConfig {
     monitorScheduler: MonitorScheduler;
     monitorRepository: MonitorRepository;
     databaseService: DatabaseService;
-    eventEmitter: EventEmitter;
+    eventEmitter: TypedEventBus<UptimeEvents>;
     logger: Logger;
-    statusUpdateEvent: string;
 }
 
 /**

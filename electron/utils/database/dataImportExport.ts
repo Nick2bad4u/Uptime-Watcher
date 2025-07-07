@@ -1,5 +1,5 @@
-import { EventEmitter } from "events";
-
+import { UptimeEvents } from "../../events/eventTypes";
+import { TypedEventBus } from "../../events/TypedEventBus";
 import { DatabaseService } from "../../services/database/DatabaseService";
 import { HistoryRepository } from "../../services/database/HistoryRepository";
 import { MonitorRepository } from "../../services/database/MonitorRepository";
@@ -21,7 +21,7 @@ export interface ImportSite {
  * Dependencies required for data import/export operations.
  */
 export interface DataImportExportDependencies {
-    eventEmitter: EventEmitter;
+    eventEmitter: TypedEventBus<UptimeEvents>;
     databaseService: DatabaseService;
     repositories: {
         history: HistoryRepository;
@@ -71,7 +71,12 @@ export async function exportData(deps: DataImportExportDependencies): Promise<st
         return JSON.stringify(exportObj, undefined, 2);
     } catch (error) {
         logger.error("Failed to export data", error);
-        deps.eventEmitter.emit("db-error", { error, operation: "exportData" });
+        await deps.eventEmitter.emitTyped("database:error", {
+            details: "Failed to export data",
+            error: error instanceof Error ? error : new Error(String(error)),
+            operation: "export-data",
+            timestamp: Date.now(),
+        });
         throw error;
     }
 }
@@ -105,7 +110,12 @@ export async function importData(
         return true;
     } catch (error) {
         logger.error("Failed to import data", error);
-        deps.eventEmitter.emit("db-error", { error, operation: "importData" });
+        await deps.eventEmitter.emitTyped("database:error", {
+            details: "Failed to import data",
+            error: error instanceof Error ? error : new Error(String(error)),
+            operation: "import-data",
+            timestamp: Date.now(),
+        });
         return false;
     }
 }

@@ -3,8 +3,6 @@
  * Responsible for site data persistence and in-memory cache synchronization.
  */
 
-import { EventEmitter } from "events";
-
 import { UptimeEvents } from "../events/eventTypes";
 import { TypedEventBus } from "../events/TypedEventBus";
 import { SiteRepository, MonitorRepository, HistoryRepository, DatabaseService } from "../services/database";
@@ -66,7 +64,7 @@ export class SiteManager {
 
         // Create the new service-based orchestrators
         this.siteWritingOrchestrator = createSiteWritingOrchestrator();
-        this.siteRepositoryService = createSiteRepositoryService(this.eventEmitter as EventEmitter);
+        this.siteRepositoryService = createSiteRepositoryService(this.eventEmitter);
     }
 
     /**
@@ -219,15 +217,23 @@ export class SiteManager {
             monitoringConfig
         );
 
+        // Refresh the entire cache from database to ensure we have the latest monitor IDs
+        // This is especially important when monitors are added/updated
+        const freshSites = await this.siteRepositoryService.getSitesFromDatabase();
+        await this.updateSitesCache(freshSites);
+
+        // Get the refreshed site for the event
+        const refreshedSite = this.sites.get(identifier) || updatedSite;
+
         // Emit typed site updated event
         await this.eventEmitter.emitTyped("site:updated", {
             previousSite,
-            site: updatedSite,
+            site: refreshedSite,
             timestamp: Date.now(),
             updatedFields: Object.keys(updates),
         });
 
-        return updatedSite;
+        return refreshedSite;
     }
 
     /**

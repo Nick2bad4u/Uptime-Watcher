@@ -3,8 +3,8 @@
  * Consolidates site data access operations for better organization.
  */
 
-import { EventEmitter } from "events";
-
+import { UptimeEvents } from "../../events/eventTypes";
+import { TypedEventBus } from "../../events/TypedEventBus";
 import { SiteRepository, MonitorRepository, HistoryRepository, SettingsRepository } from "../../services/database";
 import { Site } from "../../types";
 import { monitorLogger as logger } from "../logger";
@@ -38,7 +38,7 @@ export interface SitesLoaderConfig {
     /** Callback to start monitoring for a site */
     startMonitoring: (identifier: string, monitorId: string) => Promise<boolean>;
     /** Event emitter for error handling */
-    eventEmitter: EventEmitter;
+    eventEmitter: TypedEventBus<UptimeEvents>;
 }
 
 /**
@@ -229,7 +229,12 @@ export async function loadSitesFromDatabase(
     } catch (error) {
         const errorMessage = `Failed to load sites from database: ${error instanceof Error ? error.message : String(error)}`;
         logger.error(errorMessage, error);
-        eventEmitter.emit("error", new Error(errorMessage));
+        await eventEmitter.emitTyped("database:error", {
+            details: errorMessage,
+            error: error instanceof Error ? error : new Error(String(error)),
+            operation: "load-sites-from-database",
+            timestamp: Date.now(),
+        });
         return {
             message: errorMessage,
             sitesLoaded: 0,

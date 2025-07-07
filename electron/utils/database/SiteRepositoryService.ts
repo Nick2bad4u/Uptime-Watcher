@@ -3,8 +3,8 @@
  * Provides a testable, dependency-injected service for site data operations.
  */
 
-import { EventEmitter } from "events";
-
+import { UptimeEvents } from "../../events/eventTypes";
+import { TypedEventBus } from "../../events/TypedEventBus";
 import { Site } from "../../types";
 import {
     ILogger,
@@ -30,7 +30,7 @@ export class SiteRepositoryService {
         settings: ISettingsRepository;
     };
     private readonly logger: ILogger;
-    private readonly eventEmitter: EventEmitter;
+    private readonly eventEmitter: TypedEventBus<UptimeEvents>;
 
     constructor(config: SiteLoadingConfig) {
         this.repositories = config.repositories;
@@ -77,7 +77,15 @@ export class SiteRepositoryService {
         } catch (error) {
             const message = `Failed to load sites into cache: ${error instanceof Error ? error.message : String(error)}`;
             this.logger.error(message, error);
-            this.eventEmitter.emit("error", new SiteLoadingError(message, error instanceof Error ? error : undefined));
+            
+            // Emit typed error event
+            await this.eventEmitter.emitTyped("database:error", {
+                details: message,
+                error: error instanceof Error ? error : new Error(String(error)),
+                operation: "load-sites-into-cache",
+                timestamp: Date.now(),
+            });
+            
             throw error;
         }
     }

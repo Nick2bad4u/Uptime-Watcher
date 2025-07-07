@@ -2,9 +2,10 @@
  * Interfaces for database utilities to support dependency injection and testing.
  */
 
-import { EventEmitter } from "events";
 import { Database } from "node-sqlite3-wasm";
 
+import { UptimeEvents } from "../../events/eventTypes";
+import { TypedEventBus } from "../../events/TypedEventBus";
 import { Monitor, Site, StatusHistory } from "../../types";
 
 /**
@@ -71,8 +72,8 @@ export interface SiteLoadingConfig {
     };
     /** Logger instance */
     logger: ILogger;
-    /** Event emitter for error handling */
-    eventEmitter: EventEmitter;
+    /** Typed event emitter for error handling */
+    eventEmitter: TypedEventBus<UptimeEvents>;
 }
 
 /**

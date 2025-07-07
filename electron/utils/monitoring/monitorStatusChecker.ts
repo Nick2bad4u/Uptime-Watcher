@@ -3,9 +3,9 @@
  * This is extracted from UptimeMonitor to improve modularity and maintainability.
  */
 
-import { EventEmitter } from "events";
-
 import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
+import { UptimeEvents } from "../../events/eventTypes";
+import { TypedEventBus } from "../../events/TypedEventBus";
 import { HistoryRepository, MonitorRepository, SiteRepository, DatabaseService } from "../../services/database";
 import { MonitorFactory } from "../../services/monitoring";
 import { Site, StatusHistory, StatusUpdate } from "../../types";
@@ -28,10 +28,9 @@ export interface MonitorCheckConfig {
     };
     databaseService: DatabaseService;
     sites: Map<string, Site>;
-    eventEmitter: EventEmitter; // Basic EventEmitter for low-level utility events
+    eventEmitter: TypedEventBus<UptimeEvents>; // Typed event bus for high-level events
     logger: Logger;
     historyLimit: number;
-    statusUpdateEvent: string;
 }
 
 /**
@@ -135,27 +134,40 @@ export async function checkMonitor(
     // Update the in-memory cache with fresh data
     config.sites.set(site.identifier, freshSiteData);
 
-    // Emit StatusUpdate with fresh site data including updated history
+    // Emit StatusUpdate as a typed event instead of old emit pattern
     const statusUpdate: StatusUpdate = {
         previousStatus,
         site: freshSiteData,
     };
-    config.eventEmitter.emit(config.statusUpdateEvent, statusUpdate);
+    
+    // Emit typed monitor status changed event
+    await config.eventEmitter.emitTyped("monitor:status-changed", {
+        monitor: freshSiteData.monitors.find((m) => m.id === monitor.id) || monitor,
+        newStatus: checkResult.status,
+        previousStatus,
+        responseTime: checkResult.responseTime,
+        site: freshSiteData,
+        siteId: site.identifier,
+        timestamp: Date.now(),
+    });
 
-    // Emit monitor state change events with consistent payload
+    // Emit monitor state change events with proper typing
     if (previousStatus === "up" && checkResult.status === "down") {
-        config.eventEmitter.emit("site-monitor-down", {
+        await config.eventEmitter.emitTyped("monitor:down", {
             monitor: { ...monitor },
-            monitorId: monitor.id,
-            site: { ...site, monitors: site.monitors.map((m) => ({ ...m })) },
+            site: freshSiteData,
+            siteId: site.identifier,
+            timestamp: Date.now(),
         });
     } else if (previousStatus === "down" && checkResult.status === "up") {
-        config.eventEmitter.emit("site-monitor-up", {
+        await config.eventEmitter.emitTyped("monitor:up", {
             monitor: { ...monitor },
-            monitorId: monitor.id,
-            site: { ...site, monitors: site.monitors.map((m) => ({ ...m })) },
+            site: freshSiteData,
+            siteId: site.identifier,
+            timestamp: Date.now(),
         });
     }
+    
     return statusUpdate;
 }
 
