@@ -3,7 +3,7 @@
  * Validates system notification management and configuration.
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 import { Notification } from "electron";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";

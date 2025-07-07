@@ -3,7 +3,7 @@
  * Validates main application service orchestration and lifecycle management.
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 import { app } from "electron";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";

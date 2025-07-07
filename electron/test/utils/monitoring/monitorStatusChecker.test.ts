@@ -63,21 +63,21 @@ describe("monitorStatusChecker", () => {
                 history: {
                     addEntry: vi.fn().mockResolvedValue(undefined),
                     pruneHistory: vi.fn().mockResolvedValue(undefined),
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                     
                 } as any,
                 monitor: {
                     update: vi.fn().mockResolvedValue(undefined),
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                     
                 } as any,
                 site: {
                     getByIdentifier: vi.fn().mockImplementation(() => Promise.resolve(mockSite)),
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                     
                 } as any,
             },
             sites: new Map(),
             eventEmitter: {
                 emit: vi.fn(),
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                 
             } as any,
             logger: {
                 info: vi.fn(),
@@ -181,7 +181,7 @@ describe("monitorStatusChecker", () => {
             if (originalMonitor) {
                 mockSite.monitors[0] = {
                     ...originalMonitor,
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                     
                     id: undefined as any,
                 } as Monitor;
             }
@@ -202,7 +202,7 @@ describe("monitorStatusChecker", () => {
             if (originalMonitor) {
                 mockSite.monitors[0] = {
                     ...originalMonitor,
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                     
                     id: null as any,
                 } as Monitor;
             }

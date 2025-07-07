@@ -3,7 +3,7 @@
  * Validates type definitions and interfaces for monitoring functionality.
  */
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
+ 
 
 import { describe, expect, it } from "vitest";
 

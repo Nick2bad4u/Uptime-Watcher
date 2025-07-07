@@ -3,7 +3,7 @@
  * Tests the Axios configuration and timing interceptors.
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import axios, { AxiosInstance } from "axios";

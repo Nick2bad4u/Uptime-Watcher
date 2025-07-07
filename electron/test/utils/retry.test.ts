@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { withRetry, withDbRetry } from "../../utils/retry";

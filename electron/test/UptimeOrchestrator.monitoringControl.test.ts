@@ -2,7 +2,7 @@
  * Tests for UptimeOrchestrator - Monitoring Control functionality.
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 import { describe, expect, it, beforeEach, afterEach, vi } from "vitest";
 

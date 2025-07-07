@@ -3,7 +3,7 @@
  * Validates HTTP/HTTPS monitoring core functionality.
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 

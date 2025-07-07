@@ -3,7 +3,7 @@
  * Comprehensive tests for port checking, error handling, and retry logic.
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { performSinglePortCheck } from "../../../../services/monitoring/utils/portChecker";

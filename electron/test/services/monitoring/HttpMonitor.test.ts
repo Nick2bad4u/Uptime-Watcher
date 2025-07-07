@@ -3,7 +3,7 @@
  * Validates HTTP/HTTPS monitoring functionality and error handling.
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 /* eslint-disable vitest/valid-expect */
 
 import { AxiosError } from "axios";

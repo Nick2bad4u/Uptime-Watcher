@@ -3,7 +3,7 @@
  * Validates database initialization, schema management, and operations.
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import * as path from "path";

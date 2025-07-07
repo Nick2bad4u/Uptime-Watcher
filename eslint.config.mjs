@@ -386,7 +386,13 @@ export default [
     // TypeScript files - Source (renderer) files
     {
         files: ["src/**/*.ts", "src/**/*.tsx", "vitest*.ts", "vite.config.ts"],
-        ignores: ["tests/**", "**/__tests__/**"],
+        ignores: [
+            "tests/**", 
+            "**/__tests__/**", 
+            "**/*.test.{ts,tsx}", 
+            "**/*.spec.{ts,tsx}",
+            "src/test/**/*.{ts,tsx}"
+        ],
         languageOptions: {
             parser: tseslint.parser,
             parserOptions: {
@@ -686,7 +692,68 @@ export default [
         },
     },
 
-    // Testing files
+    // Electron Testing files - separate config to use different tsconfig
+    {
+        files: [
+            "electron/test/**/*.{ts,tsx}",
+            "electron/**/*.test.{ts,tsx}",
+            "electron/**/*.spec.{ts,tsx}",
+        ],
+        languageOptions: {
+            parser: tseslint.parser,
+            parserOptions: {
+                project: "./tsconfig.electron.test.json",
+                sourceType: "module",
+                ecmaVersion: "latest",
+                tsconfigRootDir: __dirname,
+            },
+            globals: {
+                ...globals.node,
+                vi: "readonly",
+                describe: "readonly",
+                it: "readonly",
+                test: "readonly",
+                expect: "readonly",
+                beforeEach: "readonly",
+                afterEach: "readonly",
+                beforeAll: "readonly",
+                afterAll: "readonly",
+            },
+        },
+        plugins: {
+            "@typescript-eslint": tseslint.plugin,
+            vitest,
+            "testing-library": pluginTestingLibrary,
+            import: pluginImport,
+            "unused-imports": pluginUnusedImports,
+        },
+        rules: {
+            ...tseslint.configs.recommended.rules,
+            ...vitest.configs.recommended.rules,
+            "testing-library/await-async-queries": "error",
+            "testing-library/await-async-utils": "error",
+            "testing-library/no-await-sync-queries": "error",
+            "testing-library/no-debugging-utils": "warn",
+            "testing-library/no-dom-import": "warn",
+            "testing-library/prefer-screen-queries": "warn",
+            "testing-library/prefer-user-event": "warn",
+            "testing-library/render-result-naming-convention": "warn",
+            "@typescript-eslint/no-explicit-any": "off",
+            "@typescript-eslint/no-non-null-assertion": "off",
+            "unused-imports/no-unused-imports": "error",
+            "unused-imports/no-unused-vars": [
+                "warn",
+                {
+                    vars: "all",
+                    varsIgnorePattern: "^_",
+                    args: "after-used",
+                    argsIgnorePattern: "^_",
+                },
+            ],
+        },
+    },
+
+    // Testing files (excluding electron tests which are handled separately)
     {
         files: [
             "tests/**",
@@ -694,16 +761,18 @@ export default [
             "**/*.test.{js,ts,jsx,tsx}",
             "**/*.spec.{js,ts,jsx,tsx}",
             "vitest*.{js,ts}",
-            "electron/test/**/*.{ts,tsx}",
             "src/test/**/*.{ts,tsx}",
+        ],
+        ignores: [
+            "electron/test/**/*.{ts,tsx}",
+            "electron/**/*.test.{ts,tsx}",
+            "electron/**/*.spec.{ts,tsx}",
         ],
         languageOptions: {
             parser: tseslint.parser,
             parserOptions: {
-                project: true,
                 sourceType: "module",
                 ecmaVersion: "latest",
-                tsconfigRootDir: __dirname,
             },
             globals: {
                 ...globals.node,

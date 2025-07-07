@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 

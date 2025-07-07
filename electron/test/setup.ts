@@ -3,7 +3,7 @@
  * Provides global mocks and utilities for consistent testing environment.
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 import { vi } from "vitest";
 

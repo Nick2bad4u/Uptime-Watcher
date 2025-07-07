@@ -333,7 +333,7 @@ describe("DatabaseManager", () => {
             const testData = '{"sites":[],"monitors":[],"settings":{}}';
             let loadSitesCallback: (() => Promise<void>) | undefined;
 
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+             
             mockImportData.mockImplementation(async (deps, callbacks, _data) => {
                 loadSitesCallback = callbacks.loadSites;
                 return true;
@@ -378,7 +378,7 @@ describe("DatabaseManager", () => {
         it("should return empty array for getSitesFromCache callback", async () => {
             let getSitesCacheCallback: (() => Site[]) | undefined;
 
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+             
             mockImportData.mockImplementation(async (deps, callbacks, data) => {
                 getSitesCacheCallback = callbacks.getSitesFromCache;
                 return true;
@@ -549,7 +549,7 @@ describe("DatabaseManager", () => {
             });
 
             // Mock getHistoryLimit to return the internal limit
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+             
             mockGetHistoryLimit.mockImplementation((getCallback) => {
                 // getCallback should return the current internal limit
                 // We simulate this by just returning the current internalLimit

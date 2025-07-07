@@ -1,0 +1,30 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "outDir": "dist-electron",
+        "module": "ESNext",
+        "target": "ES2024",
+        "moduleResolution": "bundler",
+        "baseUrl": ".",
+        "paths": {
+            "@/*": ["electron/*"],
+            "@electron/*": ["electron/*"]
+        },
+        "types": [
+            "node",
+            "vitest/globals",
+            "@testing-library/jest-dom",
+            "jest",
+            "electron"
+        ]
+    },
+    "include": [
+        "electron/**/*.ts", 
+        "electron/**/*.tsx", 
+        "electron/**/*.test.ts", 
+        "electron/**/*.spec.ts", 
+        "electron/test/**/*",
+        "vitest.electron.config.ts"
+    ],
+    "exclude": ["node_modules"]
+}

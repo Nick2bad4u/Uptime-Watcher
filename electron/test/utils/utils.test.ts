@@ -3,7 +3,7 @@
  * Validates development mode detection and other utility functions.
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
