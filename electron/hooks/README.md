@@ -1,4 +1,5 @@
 <!-- markdownlint-disable -->
+
 # Backend Operational Hooks
 
 This implementation provides a set of reusable hooks for common backend operation patterns, promoting consistency and reliability across the application.
@@ -14,6 +15,7 @@ The Backend Operational Hooks pattern introduces server-side hooks similar to Re
 Provides automatic transaction management with correlation IDs and comprehensive logging.
 
 **Features:**
+
 - Automatic transaction wrapping
 - Correlation ID generation for tracing
 - Start/completion timing
@@ -21,14 +23,15 @@ Provides automatic transaction management with correlation IDs and comprehensive
 - Automatic rollback on failure
 
 **Usage:**
+
 ```typescript
 import { useTransaction } from "../hooks";
 
 const transaction = useTransaction();
 
 const result = await transaction(async (db) => {
-    // All database operations here are wrapped in a transaction
-    return await someDbOperation(db);
+ // All database operations here are wrapped in a transaction
+ return await someDbOperation(db);
 });
 ```
 
@@ -37,6 +40,7 @@ const result = await transaction(async (db) => {
 Provides intelligent retry logic with exponential/linear backoff strategies.
 
 **Features:**
+
 - Configurable max attempts
 - Linear or exponential backoff
 - Detailed logging of retry attempts
@@ -44,21 +48,22 @@ Provides intelligent retry logic with exponential/linear backoff strategies.
 - Customizable delay patterns
 
 **Usage:**
+
 ```typescript
 import { useRetry } from "../hooks";
 
 const retry = useRetry();
 
 const result = await retry(
-    async () => {
-        // Operation that might fail
-        return await unreliableOperation();
-    },
-    {
-        maxAttempts: 3,
-        delay: 1000,
-        backoff: "exponential"
-    }
+ async () => {
+  // Operation that might fail
+  return await unreliableOperation();
+ },
+ {
+  maxAttempts: 3,
+  delay: 1000,
+  backoff: "exponential",
+ }
 );
 ```
 
@@ -67,6 +72,7 @@ const result = await retry(
 Provides consistent validation patterns with integration to the existing configuration manager.
 
 **Features:**
+
 - Site validation integration
 - Monitor validation integration
 - Streamlined validation + operation pattern
@@ -74,6 +80,7 @@ Provides consistent validation patterns with integration to the existing configu
 - Type-safe validation functions
 
 **Usage:**
+
 ```typescript
 import { useValidation, ValidationError } from "../hooks";
 
@@ -82,17 +89,17 @@ const validation = useValidation();
 // Direct validation
 const siteResult = validation.validateSite(siteData);
 if (!siteResult.isValid) {
-    throw new ValidationError(siteResult.errors);
+ throw new ValidationError(siteResult.errors);
 }
 
 // Validation + operation pattern
 const result = await validation.withValidation(
-    data,
-    (data) => validation.validateSite(data as Site),
-    async () => {
-        // Operation only runs if validation passes
-        return await processValidatedData(data);
-    }
+ data,
+ (data) => validation.validateSite(data as Site),
+ async () => {
+  // Operation only runs if validation passes
+  return await processValidatedData(data);
+ }
 );
 ```
 
@@ -130,6 +137,7 @@ All hooks are thoroughly tested with comprehensive test suites:
 - **index.test.ts**: Module exports and consistency
 
 Run tests with:
+
 ```bash
 npm test -- electron/test/hooks
 ```
@@ -146,35 +154,45 @@ See `electron/hooks/examples.ts` for comprehensive usage examples demonstrating:
 ## Benefits
 
 ### 1. Consistency
+
 All operations use standardized patterns for:
+
 - Error handling and logging
 - Transaction management
 - Retry logic
 - Validation
 
 ### 2. Observability
+
 Built-in features for monitoring:
+
 - Correlation IDs for request tracing
 - Structured logging with timing
 - Operation success/failure tracking
 - Performance metrics
 
 ### 3. Reliability
+
 Improved application reliability through:
+
 - Automatic transaction rollback
 - Intelligent retry strategies
 - Comprehensive error handling
 - Input validation
 
 ### 4. Maintainability
+
 Better code organization with:
+
 - Reusable operation patterns
 - Centralized error handling
 - Testable components
 - Clear separation of concerns
 
 ### 5. Developer Experience
+
 Enhanced development workflow:
+
 - Consistent APIs across operations
 - Comprehensive error messages
 - Easy testing and mocking
@@ -186,20 +204,23 @@ The hooks are designed to integrate seamlessly with existing managers and servic
 
 ```typescript
 export class SiteManager extends EventEmitter {
-    private readonly transaction = useTransaction();
-    private readonly validation = useValidation();
-    private readonly retry = useRetry();
+ private readonly transaction = useTransaction();
+ private readonly validation = useValidation();
+ private readonly retry = useRetry();
 
-    public async addSite(siteData: Site): Promise<Site> {
-        return this.validation.withValidation(
-            siteData,
-            (data) => this.validation.validateSite(data as Site),
-            () => this.transaction(async (db) => {
-                // Existing site creation logic here
-                return createSite({ /* existing params */ });
-            })
-        );
-    }
+ public async addSite(siteData: Site): Promise<Site> {
+  return this.validation.withValidation(
+   siteData,
+   (data) => this.validation.validateSite(data as Site),
+   () =>
+    this.transaction(async (db) => {
+     // Existing site creation logic here
+     return createSite({
+      /* existing params */
+     });
+    })
+  );
+ }
 }
 ```
 

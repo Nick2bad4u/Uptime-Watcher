@@ -85,7 +85,7 @@
         gap: var(--spacing-md);
         padding: var(--spacing-md);
     }
-    
+
     .site-details-header-info {
         flex-direction: column !important;
         align-items: flex-start !important;
@@ -98,7 +98,7 @@
     .site-details-header {
         padding: var(--spacing-lg);
     }
-    
+
     .site-details-header-content {
         padding: var(--spacing-sm);
         gap: var(--spacing-sm);
