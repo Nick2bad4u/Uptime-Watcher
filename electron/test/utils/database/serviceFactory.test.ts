@@ -76,9 +76,9 @@ describe("serviceFactory", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        
+
         mockSitesMap = new Map();
-        
+
         mockConfig = {
             repositories: {
                 site: {
@@ -117,7 +117,7 @@ describe("serviceFactory", () => {
     describe("createSiteRepositoryService", () => {
         it("should create a SiteRepositoryService with the provided dependencies", () => {
             const service = createSiteRepositoryService(mockConfig);
-            
+
             expect(service).toBeInstanceOf(SiteRepositoryService);
         });
     });
@@ -125,7 +125,7 @@ describe("serviceFactory", () => {
     describe("createSiteWriterService", () => {
         it("should create a SiteWriterService with the provided dependencies", () => {
             const service = createSiteWriterService(mockConfig);
-            
+
             expect(service).toBeInstanceOf(SiteWriterService);
         });
     });
@@ -133,7 +133,7 @@ describe("serviceFactory", () => {
     describe("createSiteLoadingOrchestrator", () => {
         it("should create a SiteLoadingOrchestrator with the provided dependencies", () => {
             const orchestrator = createSiteLoadingOrchestrator(mockConfig);
-            
+
             expect(orchestrator).toBeInstanceOf(SiteLoadingOrchestrator);
         });
     });
@@ -141,7 +141,7 @@ describe("serviceFactory", () => {
     describe("createSiteWritingOrchestrator", () => {
         it("should create a SiteWritingOrchestrator with the provided dependencies", () => {
             const orchestrator = createSiteWritingOrchestrator();
-            
+
             expect(orchestrator).toBeInstanceOf(SiteWritingOrchestrator);
         });
     });
@@ -149,7 +149,7 @@ describe("serviceFactory", () => {
     describe("createSiteCache", () => {
         it("should create a SiteCache instance", () => {
             const cache = createSiteCache();
-            
+
             expect(cache).toBeInstanceOf(SiteCache);
         });
     });
@@ -163,11 +163,11 @@ describe("serviceFactory", () => {
                     monitors: [],
                 },
             ];
-            
+
             mockConfig.repositories.site.findAll.mockResolvedValue(mockSites);
-            
+
             const result = await getSitesFromDatabase(mockConfig);
-            
+
             expect(result).toEqual(mockSites);
             expect(mockConfig.repositories.site.findAll).toHaveBeenCalled();
         });
@@ -175,7 +175,7 @@ describe("serviceFactory", () => {
         it("should handle errors and wrap them in SiteLoadingError", async () => {
             const error = new Error("Database error");
             mockConfig.repositories.site.findAll.mockRejectedValue(error);
-            
+
             await expect(getSitesFromDatabase(mockConfig)).rejects.toThrow("Database error");
         });
     });
@@ -189,11 +189,11 @@ describe("serviceFactory", () => {
                     monitors: [],
                 },
             ];
-            
+
             mockConfig.repositories.site.findAll.mockResolvedValue(mockSites);
-            
+
             const result = await loadSitesFromDatabase(mockConfig);
-            
+
             expect(result.success).toBe(true);
             expect(result.sitesLoaded).toBe(1);
             expect(result.message).toContain("Successfully loaded 1 sites");
@@ -202,9 +202,9 @@ describe("serviceFactory", () => {
 
         it("should handle empty sites result", async () => {
             mockConfig.repositories.site.findAll.mockResolvedValue([]);
-            
+
             const result = await loadSitesFromDatabase(mockConfig);
-            
+
             expect(result.success).toBe(true);
             expect(result.sitesLoaded).toBe(0);
             expect(result.message).toContain("Successfully loaded 0 sites");
@@ -214,13 +214,13 @@ describe("serviceFactory", () => {
         it("should handle database errors", async () => {
             const error = new Error("Database error");
             mockConfig.repositories.site.findAll.mockRejectedValue(error);
-            
+
             // Mock the event emitter error listener to prevent unhandled errors
             const errorListener = vi.fn();
             mockConfig.eventEmitter.on("error", errorListener);
-            
+
             const result = await loadSitesFromDatabase(mockConfig);
-            
+
             expect(result.success).toBe(false);
             expect(result.sitesLoaded).toBe(0);
             expect(result.message).toContain("Failed to load sites");

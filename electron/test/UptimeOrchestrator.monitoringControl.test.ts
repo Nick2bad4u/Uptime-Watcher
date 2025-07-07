@@ -444,9 +444,9 @@ describe("UptimeOrchestrator - Monitoring Control", () => {
 
                 expect(result).toBe(true);
                 expect(schedulerInstance.stopMonitor).toHaveBeenCalled();
-                expect(monitorRepoInstance.update).toHaveBeenCalledWith(monitorId, { 
+                expect(monitorRepoInstance.update).toHaveBeenCalledWith(monitorId, {
                     monitoring: false,
-                    status: "paused" 
+                    status: "paused",
                 });
             });
 

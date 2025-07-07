@@ -146,7 +146,7 @@ describe("useValidation", () => {
             const validation = useValidation();
             const mockData = { test: "data" };
             const mockValidator = vi.fn().mockReturnValue({ isValid: true, errors: [] });
-            
+
             const mockOperation = vi.fn().mockImplementation(async () => {
                 await delay(10);
                 return "async-result";
@@ -161,7 +161,7 @@ describe("useValidation", () => {
 
         it("should work with complex validation scenarios", async () => {
             const validation = useValidation();
-            
+
             // Test with site validation
             const mockSite = { identifier: "test", name: "Test Site" } as Site;
             const siteValidator = (data: unknown) => validation.validateSite(data as Site);

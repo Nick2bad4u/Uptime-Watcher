@@ -90,7 +90,7 @@ vi.mock("node-sqlite3-wasm", () => ({
             all: vi.fn(() => []),
             finalize: vi.fn(),
         };
-        
+
         return {
             run: vi.fn(() => ({ changes: 1, lastInsertRowid: 1 })),
             get: vi.fn(() => undefined),

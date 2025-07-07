@@ -512,13 +512,13 @@ describe("MonitorRepository", () => {
 
         it("should log debug message when deleting monitor in dev mode", async () => {
             (isDev as unknown as ReturnType<typeof vi.fn>).mockReturnValue(true);
-            
+
             // Mock executeTransaction to simulate the delete operation
             mockDatabaseService.executeTransaction.mockImplementation(async (callback) => {
                 // Simulate the callback being called with the database
                 return callback(mockDatabase);
             });
-            
+
             mockDatabase.run
                 .mockReturnValueOnce({ changes: 1 }) // DELETE history
                 .mockReturnValueOnce({ changes: 1 }); // DELETE monitor
@@ -583,13 +583,13 @@ describe("MonitorRepository", () => {
     describe("delete", () => {
         it("should delete a monitor and return true on success", async () => {
             (isDev as unknown as ReturnType<typeof vi.fn>).mockReturnValue(true);
-            
+
             // Mock executeTransaction to simulate the delete operation
             mockDatabaseService.executeTransaction.mockImplementation(async (callback) => {
                 // Simulate the callback being called with the database
                 return callback(mockDatabase);
             });
-            
+
             // Mock that the deletion affected one row
             mockDatabase.run.mockReturnValue({ changes: 1 });
 
@@ -605,7 +605,7 @@ describe("MonitorRepository", () => {
                 // Simulate the callback being called with the database
                 return callback(mockDatabase);
             });
-            
+
             // Mock that the deletion affected zero rows
             mockDatabase.run.mockReturnValue({ changes: 0 });
 
@@ -616,7 +616,7 @@ describe("MonitorRepository", () => {
 
         it("should handle database errors", async () => {
             const error = new Error("Delete failed");
-            
+
             // Mock executeTransaction to simulate an error during the transaction
             mockDatabaseService.executeTransaction.mockImplementation(async () => {
                 // Simulate an error during the transaction
@@ -632,13 +632,13 @@ describe("MonitorRepository", () => {
         it("should delete all monitors for a site", async () => {
             (isDev as unknown as ReturnType<typeof vi.fn>).mockReturnValue(true);
             const mockMonitorIds = [{ id: 1 }, { id: 2 }];
-            
+
             // Mock executeTransaction to simulate the delete operation
             mockDatabaseService.executeTransaction.mockImplementation(async (callback) => {
                 // Simulate the callback being called with the database
                 return callback(mockDatabase);
             });
-            
+
             mockDatabase.all.mockReturnValue(mockMonitorIds);
 
             await monitorRepository.deleteBySiteIdentifier("site-1");
@@ -654,7 +654,7 @@ describe("MonitorRepository", () => {
 
         it("should handle database errors", async () => {
             const error = new Error("Delete by site failed");
-            
+
             // Mock executeTransaction to simulate an error during the transaction
             mockDatabaseService.executeTransaction.mockImplementation(async () => {
                 throw error;
@@ -1659,8 +1659,6 @@ describe("MonitorRepository", () => {
                 expect(params[10]).toBe(150); // responseTime should be converted to number when defined
             });
         });
-
-
 
         describe("Row id undefined branch (line 183)", () => {
             it("should return -1 when row.id is undefined in rowToMonitor", () => {

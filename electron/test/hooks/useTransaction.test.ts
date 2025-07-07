@@ -128,9 +128,7 @@ describe("useTransaction", () => {
         );
 
         // Extract the duration from the log call
-        const logCall = mockDbLogger.info.mock.calls.find((call) =>
-            call[0].includes("Completed in")
-        );
+        const logCall = mockDbLogger.info.mock.calls.find((call) => call[0].includes("Completed in"));
         expect(logCall).toBeDefined();
         const duration = parseInt(logCall![0].match(/(\d+)ms/)?.[1] || "0");
         expect(duration).toBeGreaterThanOrEqual(10);

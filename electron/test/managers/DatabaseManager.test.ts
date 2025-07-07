@@ -80,7 +80,7 @@ describe("DatabaseManager", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        
+
         // Create a mock TypedEventBus
         mockEventEmitter = {
             emitTyped: vi.fn().mockResolvedValue(undefined),
@@ -120,7 +120,9 @@ describe("DatabaseManager", () => {
                     init: vi.fn(),
                     close: vi.fn(),
                     backup: vi.fn(),
-                } as Partial<DatabaseManagerDependencies["repositories"]["database"]> as DatabaseManagerDependencies["repositories"]["database"],
+                } as Partial<
+                    DatabaseManagerDependencies["repositories"]["database"]
+                > as DatabaseManagerDependencies["repositories"]["database"],
                 site: {
                     findAll: vi.fn(),
                     exportAll: vi.fn(),
@@ -130,7 +132,9 @@ describe("DatabaseManager", () => {
                     exists: vi.fn(),
                     deleteAll: vi.fn(),
                     bulkInsert: vi.fn(),
-                } as Partial<DatabaseManagerDependencies["repositories"]["site"]> as DatabaseManagerDependencies["repositories"]["site"],
+                } as Partial<
+                    DatabaseManagerDependencies["repositories"]["site"]
+                > as DatabaseManagerDependencies["repositories"]["site"],
                 monitor: {
                     findAll: vi.fn(),
                     findBySiteIdentifier: vi.fn(),
@@ -142,7 +146,9 @@ describe("DatabaseManager", () => {
                     getAllMonitorIds: vi.fn(),
                     deleteAll: vi.fn(),
                     bulkCreate: vi.fn(),
-                } as Partial<DatabaseManagerDependencies["repositories"]["monitor"]> as DatabaseManagerDependencies["repositories"]["monitor"],
+                } as Partial<
+                    DatabaseManagerDependencies["repositories"]["monitor"]
+                > as DatabaseManagerDependencies["repositories"]["monitor"],
                 history: {
                     findAll: vi.fn(),
                     pruneHistory: vi.fn(),
@@ -154,7 +160,9 @@ describe("DatabaseManager", () => {
                     deleteAll: vi.fn(),
                     getLatestEntry: vi.fn(),
                     bulkInsert: vi.fn(),
-                } as Partial<DatabaseManagerDependencies["repositories"]["history"]> as DatabaseManagerDependencies["repositories"]["history"],
+                } as Partial<
+                    DatabaseManagerDependencies["repositories"]["history"]
+                > as DatabaseManagerDependencies["repositories"]["history"],
                 settings: {
                     get: vi.fn(),
                     set: vi.fn(),
@@ -162,7 +170,9 @@ describe("DatabaseManager", () => {
                     delete: vi.fn(),
                     deleteAll: vi.fn(),
                     bulkInsert: vi.fn(),
-                } as Partial<DatabaseManagerDependencies["repositories"]["settings"]> as DatabaseManagerDependencies["repositories"]["settings"],
+                } as Partial<
+                    DatabaseManagerDependencies["repositories"]["settings"]
+                > as DatabaseManagerDependencies["repositories"]["settings"],
             },
         };
 
@@ -185,7 +195,7 @@ describe("DatabaseManager", () => {
     describe("initialize", () => {
         it("should initialize database and emit event", async () => {
             mockInitDatabase.mockResolvedValue(undefined);
-            
+
             mockEventEmitter.emitTyped = vi.fn();
 
             await databaseManager.initialize();
@@ -213,7 +223,7 @@ describe("DatabaseManager", () => {
 
         it("should call loadSites during initialization", async () => {
             let loadSitesCallback: (() => Promise<void>) | undefined;
-            
+
             mockInitDatabase.mockImplementation(async (db, callback) => {
                 loadSitesCallback = callback;
                 return Promise.resolve();
@@ -236,16 +246,16 @@ describe("DatabaseManager", () => {
             const mockSites = [createMockSite("site1"), createMockSite("site2")];
             let setHistoryLimitCallback: ((limit: number) => void) | undefined;
             let startMonitoringCallback: ((identifier: string, monitorId: string) => Promise<boolean>) | undefined;
-            
+
             mockLoadSitesFromDatabase.mockImplementation(async (params) => {
                 setHistoryLimitCallback = params.setHistoryLimit;
                 startMonitoringCallback = params.startMonitoring;
-                
+
                 // Simulate adding sites to the map
                 for (const site of mockSites) {
                     params.sites.set(site.identifier, site);
                 }
-                
+
                 return {
                     success: true,
                     sitesLoaded: mockSites.length,
@@ -285,14 +295,14 @@ describe("DatabaseManager", () => {
         it("should export data and emit event", async () => {
             const mockExportResult = '{"sites":[],"monitors":[],"settings":{}}';
             mockExportData.mockResolvedValue(mockExportResult);
-            
+
             mockEventEmitter.emitTyped = vi.fn();
 
             const result = await databaseManager.exportData();
 
             expect(result).toBe(mockExportResult);
             expect(mockExportData).toHaveBeenCalledWith({
-                  databaseService: mockDependencies.repositories.database,
+                databaseService: mockDependencies.repositories.database,
                 eventEmitter: mockEventEmitter,
                 repositories: {
                     history: mockDependencies.repositories.history,
@@ -322,13 +332,13 @@ describe("DatabaseManager", () => {
         it("should import data and emit event", async () => {
             const testData = '{"sites":[],"monitors":[],"settings":{}}';
             let loadSitesCallback: (() => Promise<void>) | undefined;
-            
+
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             mockImportData.mockImplementation(async (deps, callbacks, _data) => {
                 loadSitesCallback = callbacks.loadSites;
                 return true;
             });
-            
+
             mockEventEmitter.emitTyped = vi.fn();
 
             const result = await databaseManager.importData(testData);
@@ -367,7 +377,7 @@ describe("DatabaseManager", () => {
 
         it("should return empty array for getSitesFromCache callback", async () => {
             let getSitesCacheCallback: (() => Site[]) | undefined;
-            
+
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             mockImportData.mockImplementation(async (deps, callbacks, data) => {
                 getSitesCacheCallback = callbacks.getSitesFromCache;
@@ -395,7 +405,7 @@ describe("DatabaseManager", () => {
         it("should download backup and emit event", async () => {
             const mockBackupResult = { buffer: Buffer.from("test backup"), fileName: "backup.db" };
             mockDownloadBackup.mockResolvedValue(mockBackupResult);
-            
+
             mockEventEmitter.emitTyped = vi.fn();
 
             const result = await databaseManager.downloadBackup();
@@ -426,12 +436,12 @@ describe("DatabaseManager", () => {
         it("should refresh sites and emit event", async () => {
             const mockSites = [createMockSite("site1"), createMockSite("site2")];
             let loadSitesCallback: (() => Promise<void>) | undefined;
-            
+
             mockRefreshSites.mockImplementation(async (callbacks) => {
                 loadSitesCallback = callbacks.loadSites;
                 return mockSites;
             });
-            
+
             mockEventEmitter.emitTyped = vi.fn();
 
             const result = await databaseManager.refreshSites();
@@ -441,14 +451,11 @@ describe("DatabaseManager", () => {
                 getSitesFromCache: expect.any(Function),
                 loadSites: expect.any(Function),
             });
-            expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
-                "internal:database:sites-refreshed",
-                {
-                    operation: "sites-refreshed",
-                    siteCount: 2,
-                    timestamp: expect.any(Number),
-                }
-            );
+            expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith("internal:database:sites-refreshed", {
+                operation: "sites-refreshed",
+                siteCount: 2,
+                timestamp: expect.any(Number),
+            });
 
             // Test loadSites callback
             if (loadSitesCallback) {
@@ -459,7 +466,7 @@ describe("DatabaseManager", () => {
 
         it("should return empty array for getSitesFromCache callback", async () => {
             let getSitesCacheCallback: (() => Site[]) | undefined;
-            
+
             mockRefreshSites.mockImplementation(async (callbacks) => {
                 getSitesCacheCallback = callbacks.getSitesFromCache;
                 return [];
@@ -485,7 +492,7 @@ describe("DatabaseManager", () => {
     describe("setHistoryLimit", () => {
         it("should set history limit and emit event", async () => {
             let setHistoryLimitCallback: ((limit: number) => void) | undefined;
-            
+
             mockSetHistoryLimit.mockImplementation(async (params) => {
                 setHistoryLimitCallback = params.setHistoryLimit;
                 if (setHistoryLimitCallback) {
@@ -493,7 +500,7 @@ describe("DatabaseManager", () => {
                 }
                 return Promise.resolve();
             });
-            
+
             mockEventEmitter.emitTyped = vi.fn();
 
             await databaseManager.setHistoryLimit(500);
@@ -504,14 +511,11 @@ describe("DatabaseManager", () => {
                     setHistoryLimit: expect.any(Function),
                 })
             );
-            expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
-                "internal:database:history-limit-updated",
-                {
-                    operation: "history-limit-updated",
-                    limit: 500,
-                    timestamp: expect.any(Number),
-                }
-            );
+            expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith("internal:database:history-limit-updated", {
+                operation: "history-limit-updated",
+                limit: 500,
+                timestamp: expect.any(Number),
+            });
         });
 
         it("should handle set history limit errors", async () => {
@@ -525,7 +529,7 @@ describe("DatabaseManager", () => {
     describe("getHistoryLimit", () => {
         it("should get current history limit", () => {
             mockGetHistoryLimit.mockImplementation((getCallback) => getCallback());
-            
+
             // Initially should return default limit
             const initialLimit = databaseManager.getHistoryLimit();
             expect(typeof initialLimit).toBe("number");
@@ -534,7 +538,7 @@ describe("DatabaseManager", () => {
 
         it("should return updated limit after setHistoryLimit", async () => {
             let internalLimit = 1000; // Default value
-            
+
             // Mock setHistoryLimit to update internal state
             mockSetHistoryLimit.mockImplementation(async (params) => {
                 internalLimit = params.limit;
@@ -543,7 +547,7 @@ describe("DatabaseManager", () => {
                 }
                 return Promise.resolve();
             });
-            
+
             // Mock getHistoryLimit to return the internal limit
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             mockGetHistoryLimit.mockImplementation((getCallback) => {
@@ -565,7 +569,7 @@ describe("DatabaseManager", () => {
     describe("edge cases and error handling", () => {
         it("should handle empty data in importData", async () => {
             mockImportData.mockResolvedValue(false);
-            
+
             const result = await databaseManager.importData("");
             expect(result).toBe(false);
         });

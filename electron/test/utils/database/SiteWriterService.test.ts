@@ -38,7 +38,7 @@ describe("SiteWriterService", () => {
             upsert: vi.fn(),
             delete: vi.fn(),
         };
-        
+
         mockDatabaseService = {
             executeTransaction: vi.fn(async (callback) => {
                 return await callback();

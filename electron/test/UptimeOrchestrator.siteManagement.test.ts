@@ -308,7 +308,10 @@ describe("UptimeOrchestrator - Site Management", () => {
 
                 const result = await uptimeOrchestrator.removeSite(identifier);
 
-                expect(monitorRepoInstance.deleteBySiteIdentifierInternal).toHaveBeenCalledWith(expect.anything(), identifier);
+                expect(monitorRepoInstance.deleteBySiteIdentifierInternal).toHaveBeenCalledWith(
+                    expect.anything(),
+                    identifier
+                );
                 expect(siteRepoInstance.delete).toHaveBeenCalledWith(identifier);
                 expect(result).toBe(true);
             });
@@ -337,7 +340,10 @@ describe("UptimeOrchestrator - Site Management", () => {
 
                 await uptimeOrchestrator.removeSite(identifier);
 
-                expect(monitorRepoInstance.deleteBySiteIdentifierInternal).toHaveBeenCalledWith(expect.anything(), identifier);
+                expect(monitorRepoInstance.deleteBySiteIdentifierInternal).toHaveBeenCalledWith(
+                    expect.anything(),
+                    identifier
+                );
                 expect(siteRepoInstance.delete).toHaveBeenCalledWith(identifier);
             });
 

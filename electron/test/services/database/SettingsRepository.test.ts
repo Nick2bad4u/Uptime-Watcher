@@ -33,7 +33,7 @@ describe("SettingsRepository", () => {
             run: vi.fn(),
             finalize: vi.fn(),
         };
-        
+
         mockDatabase = {
             all: vi.fn(),
             get: vi.fn(),
@@ -271,22 +271,22 @@ describe("SettingsRepository", () => {
 
             // Should start transaction
             expect(mockDatabase.run).toHaveBeenCalledWith("BEGIN TRANSACTION");
-            
+
             // Should prepare statement
             expect(mockDatabase.prepare).toHaveBeenCalledWith(
                 "INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)"
             );
-            
+
             // Should run statements for each setting
             const mockStatement = mockDatabase.prepare.mock.results[0].value;
             expect(mockStatement.run).toHaveBeenCalledTimes(3);
             expect(mockStatement.run).toHaveBeenNthCalledWith(1, ["key1", "value1"]);
             expect(mockStatement.run).toHaveBeenNthCalledWith(2, ["key2", "value2"]);
             expect(mockStatement.run).toHaveBeenNthCalledWith(3, ["key3", "value3"]);
-            
+
             // Should commit transaction
             expect(mockDatabase.run).toHaveBeenCalledWith("COMMIT");
-            
+
             // Should finalize statement
             expect(mockStatement.finalize).toHaveBeenCalled();
         });
@@ -311,12 +311,12 @@ describe("SettingsRepository", () => {
 
             // Should start transaction
             expect(mockDatabase.run).toHaveBeenCalledWith("BEGIN TRANSACTION");
-            
+
             // Should prepare statement
             expect(mockDatabase.prepare).toHaveBeenCalledWith(
                 "INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)"
             );
-            
+
             // Should run statements for each setting (order may vary)
             const mockStatement = mockDatabase.prepare.mock.results[0].value;
             expect(mockStatement.run).toHaveBeenCalledTimes(4);
@@ -324,10 +324,10 @@ describe("SettingsRepository", () => {
             expect(mockStatement.run).toHaveBeenCalledWith(["number", "42"]);
             expect(mockStatement.run).toHaveBeenCalledWith(["boolean", "true"]);
             expect(mockStatement.run).toHaveBeenCalledWith(["object", "[object Object]"]);
-            
+
             // Should commit transaction
             expect(mockDatabase.run).toHaveBeenCalledWith("COMMIT");
-            
+
             // Should finalize statement
             expect(mockStatement.finalize).toHaveBeenCalled();
         });

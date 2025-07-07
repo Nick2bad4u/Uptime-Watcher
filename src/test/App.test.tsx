@@ -187,15 +187,12 @@ const mockUpdatesStore = {
 
 vi.mock("../stores", () => ({
     ErrorBoundary: ({ children }: { children: React.ReactNode }) => <div data-testid="error-boundary">{children}</div>,
-    useErrorStore: (selector?: (state: unknown) => unknown) => 
-        selector ? selector(mockErrorStore) : mockErrorStore,
-    useSitesStore: (selector?: (state: unknown) => unknown) => 
-        selector ? selector(mockSitesStore) : mockSitesStore,
-    useSettingsStore: (selector?: (state: unknown) => unknown) => 
+    useErrorStore: (selector?: (state: unknown) => unknown) => (selector ? selector(mockErrorStore) : mockErrorStore),
+    useSitesStore: (selector?: (state: unknown) => unknown) => (selector ? selector(mockSitesStore) : mockSitesStore),
+    useSettingsStore: (selector?: (state: unknown) => unknown) =>
         selector ? selector(mockSettingsStore) : mockSettingsStore,
-    useUIStore: (selector?: (state: unknown) => unknown) => 
-        selector ? selector(mockUIStore) : mockUIStore,
-    useUpdatesStore: (selector?: (state: unknown) => unknown) => 
+    useUIStore: (selector?: (state: unknown) => unknown) => (selector ? selector(mockUIStore) : mockUIStore),
+    useUpdatesStore: (selector?: (state: unknown) => unknown) =>
         selector ? selector(mockUpdatesStore) : mockUpdatesStore,
 }));
 
@@ -555,7 +552,7 @@ describe("App Component", () => {
 
         it("shows site details modal when showSiteDetails is true and site is selected", () => {
             const testSite = { identifier: "1", name: "Test Site", monitors: [] };
-            
+
             // Update mock store values
             Object.assign(mockUIStore, {
                 showSiteDetails: true,
@@ -565,7 +562,7 @@ describe("App Component", () => {
             Object.assign(mockSitesStore, {
                 sites: [testSite],
             });
-            
+
             render(<App />);
 
             expect(screen.getByTestId("site-details-modal")).toBeInTheDocument();
@@ -574,7 +571,7 @@ describe("App Component", () => {
 
         it("can close site details modal", async () => {
             const testSite = { identifier: "1", name: "Test Site", monitors: [] };
-            
+
             // Update mock store values
             Object.assign(mockUIStore, {
                 showSiteDetails: true,
@@ -584,7 +581,7 @@ describe("App Component", () => {
             Object.assign(mockSitesStore, {
                 sites: [testSite],
             });
-            
+
             render(<App />);
 
             const closeButton = screen.getByTestId("close-site-details");

@@ -43,50 +43,35 @@ describe("Site Status Utilities", () => {
 
         it("should return 'up' when all monitors are up", () => {
             const site = createTestSite({
-                monitors: [
-                    createTestMonitor({ status: "up" }),
-                    createTestMonitor({ status: "up" }),
-                ],
+                monitors: [createTestMonitor({ status: "up" }), createTestMonitor({ status: "up" })],
             });
             expect(calculateSiteStatus(site)).toBe("up");
         });
 
         it("should return 'down' when all monitors are down", () => {
             const site = createTestSite({
-                monitors: [
-                    createTestMonitor({ status: "down" }),
-                    createTestMonitor({ status: "down" }),
-                ],
+                monitors: [createTestMonitor({ status: "down" }), createTestMonitor({ status: "down" })],
             });
             expect(calculateSiteStatus(site)).toBe("down");
         });
 
         it("should return 'pending' when all monitors are pending", () => {
             const site = createTestSite({
-                monitors: [
-                    createTestMonitor({ status: "pending" }),
-                    createTestMonitor({ status: "pending" }),
-                ],
+                monitors: [createTestMonitor({ status: "pending" }), createTestMonitor({ status: "pending" })],
             });
             expect(calculateSiteStatus(site)).toBe("pending");
         });
 
         it("should return 'paused' when all monitors are paused", () => {
             const site = createTestSite({
-                monitors: [
-                    createTestMonitor({ status: "paused" }),
-                    createTestMonitor({ status: "paused" }),
-                ],
+                monitors: [createTestMonitor({ status: "paused" }), createTestMonitor({ status: "paused" })],
             });
             expect(calculateSiteStatus(site)).toBe("paused");
         });
 
         it("should return 'mixed' when monitors have different statuses", () => {
             const site = createTestSite({
-                monitors: [
-                    createTestMonitor({ status: "up" }),
-                    createTestMonitor({ status: "down" }),
-                ],
+                monitors: [createTestMonitor({ status: "up" }), createTestMonitor({ status: "down" })],
             });
             expect(calculateSiteStatus(site)).toBe("mixed");
         });
@@ -112,30 +97,21 @@ describe("Site Status Utilities", () => {
 
         it("should return 'stopped' when no monitors are monitoring", () => {
             const site = createTestSite({
-                monitors: [
-                    createTestMonitor({ monitoring: false }),
-                    createTestMonitor({ monitoring: false }),
-                ],
+                monitors: [createTestMonitor({ monitoring: false }), createTestMonitor({ monitoring: false })],
             });
             expect(calculateSiteMonitoringStatus(site)).toBe("stopped");
         });
 
         it("should return 'running' when all monitors are monitoring", () => {
             const site = createTestSite({
-                monitors: [
-                    createTestMonitor({ monitoring: true }),
-                    createTestMonitor({ monitoring: true }),
-                ],
+                monitors: [createTestMonitor({ monitoring: true }), createTestMonitor({ monitoring: true })],
             });
             expect(calculateSiteMonitoringStatus(site)).toBe("running");
         });
 
         it("should return 'partial' when some monitors are monitoring", () => {
             const site = createTestSite({
-                monitors: [
-                    createTestMonitor({ monitoring: true }),
-                    createTestMonitor({ monitoring: false }),
-                ],
+                monitors: [createTestMonitor({ monitoring: true }), createTestMonitor({ monitoring: false })],
             });
             expect(calculateSiteMonitoringStatus(site)).toBe("partial");
         });

@@ -441,12 +441,12 @@ describe("SiteRepository", () => {
             expect(mockDatabase.run).toHaveBeenCalledWith("BEGIN TRANSACTION");
             expect(mockDatabase.run).toHaveBeenCalledWith("COMMIT");
             expect(mockDatabase.prepare).toHaveBeenCalledWith("INSERT INTO sites (identifier, name) VALUES (?, ?)");
-            
+
             // Check prepared statement calls
             expect(mockPreparedStatement.run).toHaveBeenCalledWith(["site1", "Site 1"]);
             expect(mockPreparedStatement.run).toHaveBeenCalledWith(["site2", "Site 2"]);
             expect(mockPreparedStatement.finalize).toHaveBeenCalled();
-            
+
             expect(mockLogger.info).toHaveBeenCalledWith("[SiteRepository] Bulk inserted 2 sites");
         });
 

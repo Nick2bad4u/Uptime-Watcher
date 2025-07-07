@@ -119,7 +119,7 @@ describe("MonitoringService - Site-level monitoring", () => {
     describe("Error handling consistency", () => {
         it("should handle network errors", async () => {
             const siteId = "example.com";
-            
+
             mockElectronAPI.monitoring.startMonitoringForSite.mockRejectedValue(new Error("Network error"));
 
             await expect(MonitoringService.startSiteMonitoring(siteId)).rejects.toThrow("Network error");
@@ -127,7 +127,7 @@ describe("MonitoringService - Site-level monitoring", () => {
 
         it("should handle timeout errors", async () => {
             const siteId = "example.com";
-            
+
             mockElectronAPI.monitoring.stopMonitoringForSite.mockRejectedValue(new Error("Request timeout"));
 
             await expect(MonitoringService.stopSiteMonitoring(siteId)).rejects.toThrow("Request timeout");

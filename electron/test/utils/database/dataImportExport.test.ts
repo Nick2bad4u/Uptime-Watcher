@@ -170,7 +170,7 @@ describe("dataImportExport", () => {
 
         // Reset all mocks
         vi.clearAllMocks();
-        
+
         // Setup default mock for executeTransaction
         mockDatabaseService.executeTransaction.mockImplementation(async (callback: () => Promise<void>) => {
             await callback();

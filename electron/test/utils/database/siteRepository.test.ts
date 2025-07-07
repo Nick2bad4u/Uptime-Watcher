@@ -244,7 +244,7 @@ describe("siteRepository", () => {
         it("should handle sites with site-level monitoring enabled", async () => {
             const siteWithMonitoring = [{ identifier: "site-1", name: "Site 1", monitoring: true }];
             const monitorForSite = { ...mockMonitors[0], id: "monitor-1" };
-            
+
             mockSiteRepository.findAll.mockResolvedValue(siteWithMonitoring);
             mockMonitorRepository.findBySiteIdentifier.mockResolvedValue([monitorForSite]);
             mockHistoryRepository.findByMonitorId.mockResolvedValue([]);
@@ -266,7 +266,7 @@ describe("siteRepository", () => {
             const siteWithMonitoring = [{ identifier: "site-1", name: "Site 1", monitoring: true }];
             const monitorWithoutId = { ...mockMonitors[0] };
             delete monitorWithoutId.id;
-            
+
             mockSiteRepository.findAll.mockResolvedValue(siteWithMonitoring);
             mockMonitorRepository.findBySiteIdentifier.mockResolvedValue([monitorWithoutId]);
             mockHistoryRepository.findByMonitorId.mockResolvedValue([]);
@@ -286,10 +286,10 @@ describe("siteRepository", () => {
             ];
             const monitorsForSite1 = [{ ...mockMonitors[0], id: "monitor-1" }];
             const monitorsForSite2 = [{ ...mockMonitors[1], id: "monitor-2", monitoring: true }];
-            
+
             mockSiteRepository.findAll.mockResolvedValue(sites);
             mockMonitorRepository.findBySiteIdentifier
-                .mockResolvedValueOnce(monitorsForSite1)  // For site-1
+                .mockResolvedValueOnce(monitorsForSite1) // For site-1
                 .mockResolvedValueOnce(monitorsForSite2); // For site-2
             mockHistoryRepository.findByMonitorId.mockResolvedValue([]);
             mockSettingsRepository.get.mockResolvedValue(null);
@@ -355,7 +355,7 @@ describe("siteRepository", () => {
             const siteData = [{ identifier: "site-1", name: "Site 1" }];
             const monitorWithoutId = { ...mockMonitors[0], monitoring: true };
             delete monitorWithoutId.id;
-            
+
             mockSiteRepository.findAll.mockResolvedValue(siteData);
             mockMonitorRepository.findBySiteIdentifier.mockResolvedValue([monitorWithoutId]);
             mockSettingsRepository.get.mockResolvedValue(null);
