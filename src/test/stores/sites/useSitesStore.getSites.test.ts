@@ -1,11 +1,12 @@
-import { useSitesStore } from "../../../stores/sites/useSitesStore";
 import type { Site } from "../../../types";
+
+import { useSitesStore } from "../../../stores/sites/useSitesStore";
 
 // Mock the SiteService and other dependencies
 vi.mock("../../../stores/sites/services", () => ({
     SiteService: {
-        getSites: vi.fn(),
         addSite: vi.fn(),
+        getSites: vi.fn(),
         updateSite: vi.fn(),
     },
 }));
@@ -22,31 +23,31 @@ describe("useSitesStore - getSites Functions (Internal Arrow Functions)", () => 
         const sites: Site[] = [
             {
                 identifier: "site-1",
-                name: "Site 1",
                 monitors: [
                     {
+                        history: [],
                         id: "monitor-1",
+                        monitoring: true,
+                        status: "up",
                         type: "http",
                         url: "https://site1.com",
-                        status: "up",
-                        history: [],
-                        monitoring: true,
                     },
                 ],
+                name: "Site 1",
             },
             {
                 identifier: "site-2",
-                name: "Site 2",
                 monitors: [
                     {
+                        history: [],
                         id: "monitor-2",
+                        monitoring: true,
+                        status: "down",
                         type: "http",
                         url: "https://site2.com",
-                        status: "down",
-                        history: [],
-                        monitoring: true,
                     },
                 ],
+                name: "Site 2",
             },
         ];
         useSitesStore.setState({ sites });
@@ -80,12 +81,12 @@ describe("useSitesStore - getSites Functions (Internal Arrow Functions)", () => 
 
         // Call addMonitorToSite which uses the second getSites function (line 50 in useSiteOperations.ts)
         const newMonitor = {
+            history: [],
             id: "monitor-3",
+            monitoring: true,
+            status: "up" as const,
             type: "http" as const,
             url: "https://site1-test.com",
-            status: "up" as const,
-            history: [],
-            monitoring: true,
         };
 
         // This will internally call deps.getSites() through the operationsActions
@@ -109,8 +110,8 @@ describe("useSitesStore - getSites Functions (Internal Arrow Functions)", () => 
         (SiteService.updateSite as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({});
         (SiteService.addSite as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({
             identifier: "test-create",
-            name: "Test Create Site",
             monitors: [],
+            name: "Test Create Site",
         });
 
         // Test the first getSites function through subscription
@@ -124,8 +125,8 @@ describe("useSitesStore - getSites Functions (Internal Arrow Functions)", () => 
         // Test the second getSites function through createSite
         const newSiteData = {
             identifier: "test-create",
-            name: "Test Create Site",
             monitors: [],
+            name: "Test Create Site",
         };
 
         await useSitesStore.getState().createSite(newSiteData);

@@ -107,12 +107,12 @@ describe("SiteCardStatus", () => {
     it("handles all valid status values", () => {
         const statuses: ("up" | "down" | "pending")[] = ["up", "down", "pending"];
 
-        statuses.forEach((status) => {
+        for (const status of statuses) {
             const { unmount } = render(<SiteCardStatus selectedMonitorId="test" status={status} />);
 
             expect(screen.getByText(new RegExp(`TEST Status.*:.*${status}`))).toBeInTheDocument();
 
             unmount();
-        });
+        }
     });
 });

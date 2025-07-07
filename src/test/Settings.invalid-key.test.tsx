@@ -6,8 +6,8 @@
  * temporarily modifying the component's allowedKeys to force the invalid key condition.
  */
 
-import React from "react";
 import { render, screen, act } from "@testing-library/react";
+import React from "react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 import { Settings } from "../components/Settings/Settings";
@@ -17,12 +17,12 @@ import { ThemeName } from "../theme/types";
 // Mock logger
 vi.mock("../services/logger", () => ({
     default: {
-        warn: vi.fn(),
         error: vi.fn(),
         user: {
-            settingsChange: vi.fn(),
             action: vi.fn(),
+            settingsChange: vi.fn(),
         },
+        warn: vi.fn(),
     },
 }));
 
@@ -37,12 +37,12 @@ const mockUseStore = {
     resetSettings: vi.fn(),
     setError: vi.fn(),
     settings: {
-        notifications: true,
         autoStart: false,
-        minimizeToTray: true,
-        theme: "dark" as ThemeName,
-        soundAlerts: false,
         historyLimit: 100,
+        minimizeToTray: true,
+        notifications: true,
+        soundAlerts: false,
+        theme: "dark" as ThemeName,
     },
     updateHistoryLimitValue: vi.fn().mockResolvedValue(undefined),
     updateSettings: mockUpdateSettings,
@@ -52,9 +52,25 @@ const mockUseStore = {
 const mockUseTheme = {
     availableThemes: ["light", "dark", "system"] as ThemeName[],
     currentTheme: {
-        name: "dark",
-        isDark: true,
         colors: {
+            background: {
+                modal: "#ffffff",
+                primary: "#ffffff",
+                secondary: "#f8fafc",
+                tertiary: "#f1f5f9",
+            },
+            border: {
+                focus: "#3b82f6",
+                primary: "#e2e8f0",
+                secondary: "#cbd5e1",
+            },
+            error: "#ef4444",
+            errorAlert: "#dc2626",
+            hover: {
+                light: "#f8fafc",
+                medium: "#f1f5f9",
+            },
+            info: "#3b82f6",
             primary: {
                 50: "#f8fafc",
                 100: "#f1f5f9",
@@ -68,78 +84,62 @@ const mockUseTheme = {
                 900: "#0f172a",
             },
             status: {
-                up: "#22c55e",
                 down: "#ef4444",
                 pending: "#f59e0b",
                 unknown: "#6b7280",
+                up: "#22c55e",
             },
             success: "#22c55e",
-            warning: "#f59e0b",
-            error: "#ef4444",
-            errorAlert: "#dc2626",
-            info: "#3b82f6",
-            background: {
-                primary: "#ffffff",
-                secondary: "#f8fafc",
-                tertiary: "#f1f5f9",
-                modal: "#ffffff",
-            },
-            text: {
-                primary: "#0f172a",
-                secondary: "#475569",
-                tertiary: "#64748b",
-                inverse: "#ffffff",
-            },
-            border: {
-                primary: "#e2e8f0",
-                secondary: "#cbd5e1",
-                focus: "#3b82f6",
-            },
             surface: {
                 base: "#ffffff",
                 elevated: "#f8fafc",
                 overlay: "#000000",
             },
-            hover: {
-                light: "#f8fafc",
-                medium: "#f1f5f9",
+            text: {
+                inverse: "#ffffff",
+                primary: "#0f172a",
+                secondary: "#475569",
+                tertiary: "#64748b",
             },
+            warning: "#f59e0b",
         },
+        isDark: true,
+        name: "dark",
         spacing: {
-            xs: "0.25rem",
-            sm: "0.5rem",
-            md: "1rem",
-            lg: "1.5rem",
-            xl: "2rem",
             "2xl": "3rem",
             "3xl": "4rem",
+            lg: "1.5rem",
+            md: "1rem",
+            sm: "0.5rem",
+            xl: "2rem",
+            xs: "0.25rem",
         },
         typography: {
             fontFamily: {
-                sans: ["Inter", "sans-serif"],
                 mono: ["Fira Code", "monospace"],
+                sans: ["Inter", "sans-serif"],
             },
             fontSize: {
-                xs: "0.75rem",
-                sm: "0.875rem",
-                md: "1rem",
-                base: "1rem",
-                lg: "1.125rem",
-                xl: "1.25rem",
                 "2xl": "1.5rem",
                 "3xl": "1.875rem",
                 "4xl": "2.25rem",
+                base: "1rem",
+                lg: "1.125rem",
+                md: "1rem",
+                sm: "0.875rem",
+                xl: "1.25rem",
+                xs: "0.75rem",
             },
             fontWeight: {
-                normal: "400",
-                medium: "500",
-                semibold: "600",
                 bold: "700",
+                medium: "500",
+                normal: "400",
+                semibold: "600",
             },
             lineHeight: {
-                tight: "1.25",
                 normal: "1.5",
                 relaxed: "1.75",
+                tight: "1.25",
             },
         },
     },
@@ -153,9 +153,11 @@ const mockUseTheme = {
 
 // Mock themed components
 vi.mock("../theme/components", () => ({
+    StatusIndicator: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) =>
+        React.createElement("div", props, children),
     ThemedBox: ({
-        children,
         border,
+        children,
         loading,
         ...props
     }: {
@@ -172,8 +174,6 @@ vi.mock("../theme/components", () => ({
         if (loading !== undefined) filteredProps["data-loading"] = loading.toString();
         return React.createElement("div", filteredProps, children);
     },
-    ThemedText: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) =>
-        React.createElement("span", props, children),
     ThemedButton: ({
         children,
         loading,
@@ -189,11 +189,11 @@ vi.mock("../theme/components", () => ({
         if (loading !== undefined) filteredProps["data-loading"] = loading.toString();
         return React.createElement("button", filteredProps, children);
     },
-    StatusIndicator: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) =>
-        React.createElement("div", props, children),
+    ThemedCheckbox: (props: Record<string, unknown>) => React.createElement("input", { type: "checkbox", ...props }),
     ThemedSelect: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) =>
         React.createElement("select", props, children),
-    ThemedCheckbox: (props: Record<string, unknown>) => React.createElement("input", { type: "checkbox", ...props }),
+    ThemedText: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) =>
+        React.createElement("span", props, children),
 }));
 
 // Mock the stores
@@ -209,8 +209,8 @@ vi.mock("../theme/useTheme", () => ({
     useThemeClasses: () => ({
         getBackgroundClass: vi.fn(),
         getBorderClass: vi.fn(),
-        getSurfaceClass: vi.fn(),
         getStatusClass: vi.fn(),
+        getSurfaceClass: vi.fn(),
         getTextClass: vi.fn(),
     }),
 }));

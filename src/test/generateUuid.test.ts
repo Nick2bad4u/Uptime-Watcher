@@ -11,10 +11,10 @@ describe("UUID Generation", () => {
         beforeEach(() => {
             // Mock crypto.randomUUID
             Object.defineProperty(global, "crypto", {
+                configurable: true,
                 value: {
                     randomUUID: vi.fn(() => "123e4567-e89b-12d3-a456-426614174000"),
                 },
-                configurable: true,
             });
         });
 
@@ -37,8 +37,8 @@ describe("UUID Generation", () => {
         beforeEach(() => {
             // Remove crypto or make randomUUID unavailable
             Object.defineProperty(global, "crypto", {
-                value: undefined,
                 configurable: true,
+                value: undefined,
             });
         });
 
@@ -80,10 +80,10 @@ describe("UUID Generation", () => {
         beforeEach(() => {
             // Mock crypto without randomUUID
             Object.defineProperty(global, "crypto", {
+                configurable: true,
                 value: {
                     // randomUUID is not defined
                 },
-                configurable: true,
             });
         });
 
@@ -98,6 +98,7 @@ describe("UUID Generation", () => {
         it("should handle consecutive calls", () => {
             // Mock crypto to ensure we test the function directly
             Object.defineProperty(global, "crypto", {
+                configurable: true,
                 value: {
                     randomUUID: vi
                         .fn()
@@ -105,7 +106,6 @@ describe("UUID Generation", () => {
                         .mockReturnValueOnce("uuid-2")
                         .mockReturnValueOnce("uuid-3"),
                 },
-                configurable: true,
             });
 
             const uuid1 = generateUuid();
@@ -121,8 +121,8 @@ describe("UUID Generation", () => {
         it("should work with fallback in tight loops", () => {
             // Remove crypto to force fallback
             Object.defineProperty(global, "crypto", {
-                value: undefined,
                 configurable: true,
+                value: undefined,
             });
 
             const ids = [];
@@ -131,9 +131,9 @@ describe("UUID Generation", () => {
             }
 
             // All should be valid and different
-            ids.forEach((id) => {
+            for (const id of ids) {
                 expect(id).toMatch(/^site-[a-z0-9]+-\d+$/);
-            });
+            }
 
             // Should have different random parts (high probability)
             const randomParts = ids.map((id) => id.split("-")[1]);

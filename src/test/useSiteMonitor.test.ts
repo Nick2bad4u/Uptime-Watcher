@@ -3,8 +3,8 @@
  * Tests monitor selection, state management, and site data handling.
  */
 
-import React from "react";
 import { renderHook, act } from "@testing-library/react";
+import React from "react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 import { useSiteMonitor } from "../hooks/site/useSiteMonitor";
@@ -28,31 +28,31 @@ const mockUseSitesStore = vi.mocked(useSitesStore);
 describe("useSiteMonitor", () => {
     const mockSite: Site = {
         identifier: "site-1",
-        name: "Test Site",
         monitors: [
             {
-                id: "monitor-1",
-                type: "http",
-                status: "up",
-                url: "https://example.com",
-                responseTime: 200,
                 history: [
-                    { timestamp: 1640995200000, status: "up", responseTime: 200 },
-                    { timestamp: 1640991600000, status: "down", responseTime: 0 },
+                    { responseTime: 200, status: "up", timestamp: 1640995200000 },
+                    { responseTime: 0, status: "down", timestamp: 1640991600000 },
                 ],
+                id: "monitor-1",
                 monitoring: true,
+                responseTime: 200,
+                status: "up",
+                type: "http",
+                url: "https://example.com",
             },
             {
-                id: "monitor-2",
-                type: "port",
-                status: "down",
+                history: [{ responseTime: 0, status: "down", timestamp: 1640995200000 }],
                 host: "example.com",
+                id: "monitor-2",
+                monitoring: false,
                 port: 80,
                 responseTime: 0,
-                history: [{ timestamp: 1640995200000, status: "down", responseTime: 0 }],
-                monitoring: false,
+                status: "down",
+                type: "port",
             },
         ] as Monitor[],
+        name: "Test Site",
     };
 
     beforeEach(() => {
@@ -79,15 +79,15 @@ describe("useSiteMonitor", () => {
         it("should use store sites when available", () => {
             const updatedSite = {
                 ...mockSite,
-                name: "Updated Site",
                 monitors: [
                     {
                         ...mockSite.monitors[0],
-                        status: "down" as const,
                         responseTime: 500,
+                        status: "down" as const,
                     },
                     mockSite.monitors[1],
                 ] as Monitor[],
+                name: "Updated Site",
             };
 
             mockStore.sites = [updatedSite];
@@ -173,10 +173,10 @@ describe("useSiteMonitor", () => {
                 identifier: "site-1",
                 monitors: [
                     {
-                        id: "monitor-1",
-                        type: "http",
-                        status: "up",
                         history: [],
+                        id: "monitor-1",
+                        status: "up",
+                        type: "http",
                         // monitoring is undefined
                     } as Monitor,
                 ],
@@ -219,8 +219,8 @@ describe("useSiteMonitor", () => {
                 monitors: [
                     {
                         id: "monitor-1",
-                        type: "http",
                         status: "up",
+                        type: "http",
                         // history is undefined
                     } as Monitor,
                 ],
@@ -264,7 +264,7 @@ describe("useSiteMonitor", () => {
         });
 
         it("should be memoized and not change on re-renders", () => {
-            const { result, rerender } = renderHook(() => useSiteMonitor(mockSite));
+            const { rerender, result } = renderHook(() => useSiteMonitor(mockSite));
 
             const firstHandler = result.current.handleMonitorIdChange;
 
@@ -276,7 +276,7 @@ describe("useSiteMonitor", () => {
 
     describe("Memoization", () => {
         it("should memoize monitor IDs", () => {
-            const { result, rerender } = renderHook(() => useSiteMonitor(mockSite));
+            const { rerender, result } = renderHook(() => useSiteMonitor(mockSite));
 
             const firstMonitorIds = result.current.monitorIds;
 
@@ -286,7 +286,7 @@ describe("useSiteMonitor", () => {
         });
 
         it("should recalculate when site monitors change", () => {
-            const { result, rerender } = renderHook((props) => useSiteMonitor(props.site), {
+            const { rerender, result } = renderHook((props) => useSiteMonitor(props.site), {
                 initialProps: { site: mockSite },
             });
 
@@ -297,10 +297,10 @@ describe("useSiteMonitor", () => {
                 monitors: [
                     ...(mockSite.monitors[0] ? [mockSite.monitors[0]] : []),
                     {
-                        id: "monitor-3",
-                        type: "http",
-                        status: "up",
                         history: [],
+                        id: "monitor-3",
+                        status: "up",
+                        type: "http",
                     } as Monitor,
                 ],
             };
@@ -314,7 +314,7 @@ describe("useSiteMonitor", () => {
         });
 
         it("should memoize selected monitor", () => {
-            const { result, rerender } = renderHook(() => useSiteMonitor(mockSite));
+            const { rerender, result } = renderHook(() => useSiteMonitor(mockSite));
 
             const firstMonitor = result.current.monitor;
 
@@ -324,7 +324,7 @@ describe("useSiteMonitor", () => {
         });
 
         it("should memoize filtered history", () => {
-            const { result, rerender } = renderHook(() => useSiteMonitor(mockSite));
+            const { rerender, result } = renderHook(() => useSiteMonitor(mockSite));
 
             const firstHistory = result.current.filteredHistory;
 
@@ -369,10 +369,10 @@ describe("useSiteMonitor", () => {
 
         it("should handle monitor with all optional fields undefined", () => {
             const minimalMonitor: Monitor = {
-                id: "minimal-monitor",
-                type: "http",
-                status: "pending",
                 history: [],
+                id: "minimal-monitor",
+                status: "pending",
+                type: "http",
             };
 
             const minimalSite: Site = {

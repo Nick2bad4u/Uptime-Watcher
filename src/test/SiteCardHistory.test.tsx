@@ -11,7 +11,7 @@ import { Monitor, StatusHistory } from "../types";
 
 // Mock the HistoryChart component
 vi.mock("../components/common/HistoryChart", () => ({
-    HistoryChart: vi.fn(({ title, history, maxItems }) => (
+    HistoryChart: vi.fn(({ history, maxItems, title }) => (
         <div data-testid="history-chart">
             <div data-testid="chart-title">{title}</div>
             <div data-testid="chart-history-length">{history.length}</div>
@@ -22,30 +22,30 @@ vi.mock("../components/common/HistoryChart", () => ({
 
 describe("SiteCardHistory", () => {
     const mockHistory: StatusHistory[] = [
-        { timestamp: 1640995200000, status: "up", responseTime: 200 },
-        { timestamp: 1640991600000, status: "down", responseTime: 0 },
-        { timestamp: 1640988000000, status: "up", responseTime: 150 },
+        { responseTime: 200, status: "up", timestamp: 1640995200000 },
+        { responseTime: 0, status: "down", timestamp: 1640991600000 },
+        { responseTime: 150, status: "up", timestamp: 1640988000000 },
     ];
 
     const httpMonitor: Monitor = {
-        id: "monitor-1",
-        type: "http",
-        status: "up",
-        url: "https://example.com",
         history: [],
-        responseTime: 200,
+        id: "monitor-1",
         lastChecked: new Date(),
+        responseTime: 200,
+        status: "up",
+        type: "http",
+        url: "https://example.com",
     };
 
     const portMonitor: Monitor = {
-        id: "monitor-2",
-        type: "port",
-        status: "up",
-        host: "example.com",
-        port: 80,
         history: [],
-        responseTime: 100,
+        host: "example.com",
+        id: "monitor-2",
         lastChecked: new Date(),
+        port: 80,
+        responseTime: 100,
+        status: "up",
+        type: "port",
     };
 
     beforeEach(() => {
@@ -137,7 +137,7 @@ describe("SiteCardHistory", () => {
 
             const newHistory: StatusHistory[] = [
                 ...mockHistory,
-                { timestamp: 1640998800000, status: "up" as const, responseTime: 180 },
+                { responseTime: 180, status: "up" as const, timestamp: 1640998800000 },
             ];
 
             rerender(<SiteCardHistory monitor={httpMonitor} filteredHistory={newHistory} />);
@@ -150,7 +150,7 @@ describe("SiteCardHistory", () => {
 
             // Change the latest timestamp (first item since sorted DESC)
             const newHistory: StatusHistory[] = [
-                { timestamp: 1640999000000, status: "up" as const, responseTime: 220 },
+                { responseTime: 220, status: "up" as const, timestamp: 1640999000000 },
                 ...mockHistory.slice(1),
             ];
 
@@ -206,7 +206,7 @@ describe("SiteCardHistory", () => {
 
         it("should handle history with single item", () => {
             const singleHistory: StatusHistory[] = [
-                { timestamp: 1640995200000, status: "up" as const, responseTime: 200 },
+                { responseTime: 200, status: "up" as const, timestamp: 1640995200000 },
             ];
 
             render(<SiteCardHistory monitor={httpMonitor} filteredHistory={singleHistory} />);

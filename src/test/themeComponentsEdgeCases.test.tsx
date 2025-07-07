@@ -3,8 +3,9 @@
  * Tests for edge cases and error scenarios in theme components
  */
 
-import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
+import { describe, it, expect } from "vitest";
+
 import { ThemedButton, ThemedProgress, ThemedIconButton, ThemedBadge } from "../theme/components";
 
 describe("Theme Components Edge Cases", () => {

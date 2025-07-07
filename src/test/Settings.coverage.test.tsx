@@ -14,10 +14,10 @@ import { ThemeName } from "../theme/types";
 // Mock logger
 vi.mock("../services/logger", () => ({
     default: {
-        warn: vi.fn(),
         user: {
             settingsChange: vi.fn(),
         },
+        warn: vi.fn(),
     },
 }));
 
@@ -32,12 +32,12 @@ const mockUseStore = {
     resetSettings: vi.fn(),
     setError: vi.fn(),
     settings: {
-        notifications: true,
         autoStart: false,
-        minimizeToTray: true,
-        theme: "dark" as ThemeName,
-        soundAlerts: false,
         historyLimit: 100,
+        minimizeToTray: true,
+        notifications: true,
+        soundAlerts: false,
+        theme: "dark" as ThemeName,
     },
     updateHistoryLimitValue: vi.fn().mockResolvedValue(undefined),
     updateSettings: mockUpdateSettings,
@@ -47,9 +47,34 @@ const mockUseStore = {
 const mockUseTheme = {
     availableThemes: ["light", "dark", "system"] as ThemeName[],
     currentTheme: {
-        name: "dark",
-        isDark: true,
+        borderRadius: {
+            full: "9999px",
+            lg: "12px",
+            md: "8px",
+            none: "0px",
+            sm: "4px",
+            xl: "16px",
+        },
         colors: {
+            background: {
+                modal: "#ffffff",
+                primary: "#ffffff",
+                secondary: "#f8fafc",
+                tertiary: "#f1f5f9",
+            },
+            border: {
+                focus: "#3b82f6",
+                primary: "#e2e8f0",
+                secondary: "#cbd5e1",
+            },
+            error: "#ef4444",
+            errorAlert: "#dc2626",
+            hover: {
+                dark: "#e2e8f0",
+                light: "#f8fafc",
+                medium: "#f1f5f9",
+            },
+            info: "#3b82f6",
             primary: {
                 50: "#f8fafc",
                 100: "#f1f5f9",
@@ -63,94 +88,69 @@ const mockUseTheme = {
                 900: "#0f172a",
             },
             status: {
-                up: "#22c55e",
                 down: "#ef4444",
                 pending: "#f59e0b",
                 unknown: "#6b7280",
+                up: "#22c55e",
             },
             success: "#22c55e",
-            warning: "#f59e0b",
-            error: "#ef4444",
-            errorAlert: "#dc2626",
-            info: "#3b82f6",
-            background: {
-                primary: "#ffffff",
-                secondary: "#f8fafc",
-                tertiary: "#f1f5f9",
-                modal: "#ffffff",
-            },
-            text: {
-                primary: "#0f172a",
-                secondary: "#475569",
-                tertiary: "#64748b",
-                inverse: "#ffffff",
-            },
-            border: {
-                primary: "#e2e8f0",
-                secondary: "#cbd5e1",
-                focus: "#3b82f6",
-            },
             surface: {
                 base: "#ffffff",
                 elevated: "#f8fafc",
                 overlay: "#000000",
             },
-            hover: {
-                light: "#f8fafc",
-                medium: "#f1f5f9",
-                dark: "#e2e8f0",
+            text: {
+                inverse: "#ffffff",
+                primary: "#0f172a",
+                secondary: "#475569",
+                tertiary: "#64748b",
             },
+            warning: "#f59e0b",
         },
-        borderRadius: {
-            none: "0px",
-            sm: "4px",
-            md: "8px",
-            lg: "12px",
-            xl: "16px",
-            full: "9999px",
+        isDark: true,
+        name: "dark",
+        shadows: {
+            inner: "inset 0 2px 4px 0 rgb(0 0 0 / 0.06)",
+            lg: "0 10px 15px -3px rgb(0 0 0 / 0.1)",
+            md: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+            sm: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+            xl: "0 20px 25px -5px rgb(0 0 0 / 0.1)",
+        },
+        spacing: {
+            "2xl": "48px",
+            "3xl": "64px",
+            lg: "24px",
+            md: "16px",
+            sm: "8px",
+            xl: "32px",
+            xs: "4px",
         },
         typography: {
             fontFamily: {
-                sans: ["Inter", "sans-serif"],
                 mono: ["JetBrains Mono", "monospace"],
+                sans: ["Inter", "sans-serif"],
             },
             fontSize: {
-                xs: "12px",
-                sm: "14px",
-                base: "16px",
-                lg: "18px",
-                xl: "20px",
                 "2xl": "24px",
                 "3xl": "30px",
                 "4xl": "36px",
+                base: "16px",
+                lg: "18px",
+                sm: "14px",
+                xl: "20px",
+                xs: "12px",
             },
             fontWeight: {
-                normal: "400",
-                medium: "500",
-                semibold: "600",
                 bold: "700",
+                medium: "500",
+                normal: "400",
+                semibold: "600",
             },
             lineHeight: {
-                tight: "1.25",
                 normal: "1.5",
                 relaxed: "1.75",
+                tight: "1.25",
             },
-        },
-        spacing: {
-            xs: "4px",
-            sm: "8px",
-            md: "16px",
-            lg: "24px",
-            xl: "32px",
-            "2xl": "48px",
-            "3xl": "64px",
-        },
-        shadows: {
-            sm: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
-            md: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
-            lg: "0 10px 15px -3px rgb(0 0 0 / 0.1)",
-            xl: "0 20px 25px -5px rgb(0 0 0 / 0.1)",
-            inner: "inset 0 2px 4px 0 rgb(0 0 0 / 0.06)",
         },
     },
     getColor: vi.fn(() => "#000000"),
@@ -163,9 +163,9 @@ const mockUseTheme = {
 
 // Mock hooks
 vi.mock("../stores", () => ({
+    useErrorStore: () => mockUseStore,
     useSettingsStore: () => mockUseStore,
     useSitesStore: () => mockUseStore,
-    useErrorStore: () => mockUseStore,
 }));
 
 vi.mock("../theme/useTheme", () => ({

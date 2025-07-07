@@ -4,74 +4,74 @@
  */
 
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it, vi, beforeEach } from "vitest";
 import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi, beforeEach } from "vitest";
 
 // Mock the theme utilities first
 vi.mock("../theme/useTheme", () => ({
     useTheme: () => ({
-        getColor: vi.fn().mockReturnValue("#000000"),
-        getStatusColor: vi.fn().mockReturnValue("#28a745"),
-        getBackgroundClass: vi.fn().mockReturnValue({}),
-        getTextClass: vi.fn().mockReturnValue({}),
-        getBorderClass: vi.fn().mockReturnValue({}),
-        isDark: false,
         currentTheme: {
+            borderRadius: {
+                full: "9999px",
+                lg: "0.5rem",
+                md: "0.375rem",
+                sm: "0.25rem",
+            },
             colors: {
-                primary: "#007bff",
-                secondary: "#6c757d",
+                accent: "#007bff",
                 background: {
                     primary: "#ffffff",
                     secondary: "#f8f9fa",
                 },
+                border: "#dee2e6",
+                error: "#dc3545",
+                primary: "#007bff",
+                secondary: "#6c757d",
+                success: "#28a745",
                 text: {
                     primary: "#000000",
                     secondary: "#6c757d",
                 },
-                border: "#dee2e6",
-                accent: "#007bff",
-                success: "#28a745",
                 warning: "#ffc107",
-                error: "#dc3545",
+            },
+            spacing: {
+                lg: "1.5rem",
+                md: "1rem",
+                sm: "0.5rem",
+                xl: "2rem",
+                xs: "0.25rem",
             },
             typography: {
                 fontSize: {
-                    xs: "0.75rem",
-                    sm: "0.875rem",
                     base: "1rem",
                     lg: "1.125rem",
+                    sm: "0.875rem",
                     xl: "1.25rem",
+                    xs: "0.75rem",
                 },
                 fontWeight: {
-                    light: "300",
-                    normal: "400",
-                    medium: "500",
-                    semibold: "600",
                     bold: "700",
+                    light: "300",
+                    medium: "500",
+                    normal: "400",
+                    semibold: "600",
                 },
             },
-            spacing: {
-                xs: "0.25rem",
-                sm: "0.5rem",
-                md: "1rem",
-                lg: "1.5rem",
-                xl: "2rem",
-            },
-            borderRadius: {
-                sm: "0.25rem",
-                md: "0.375rem",
-                lg: "0.5rem",
-                full: "9999px",
-            },
         },
+        getBackgroundClass: vi.fn().mockReturnValue({}),
+        getBorderClass: vi.fn().mockReturnValue({}),
+        getColor: vi.fn().mockReturnValue("#000000"),
+        getStatusColor: vi.fn().mockReturnValue("#28a745"),
+        getTextClass: vi.fn().mockReturnValue({}),
+        isDark: false,
     }),
     useThemeClasses: () => ({
         box: "mock-box-class",
-        text: "mock-text-class",
         button: "mock-button-class",
         getBackgroundClass: vi.fn().mockReturnValue({}),
-        getTextClass: vi.fn().mockReturnValue({}),
         getBorderClass: vi.fn().mockReturnValue({}),
+        getTextClass: vi.fn().mockReturnValue({}),
+        text: "mock-text-class",
     }),
 }));
 
@@ -182,7 +182,7 @@ describe("Theme Components", () => {
         });
 
         it("should render with border", () => {
-            render(<ThemedBox border={true}>Bordered box</ThemedBox>);
+            render(<ThemedBox border>Bordered box</ThemedBox>);
 
             const box = screen.getByText("Bordered box");
             expect(box).toBeInTheDocument();
@@ -432,7 +432,7 @@ describe("Theme Components", () => {
                 { color: "info", icon: "ℹ️" },
             ];
 
-            colorMappings.forEach(({ color, icon }) => {
+            for (const { color, icon } of colorMappings) {
                 const { unmount } = render(
                     <ThemedButton icon={<span>{icon}</span>} iconColor={color}>
                         {color} Button
@@ -444,7 +444,7 @@ describe("Theme Components", () => {
                 expect(screen.getByText(icon)).toBeInTheDocument();
 
                 unmount();
-            });
+            }
         });
 
         it("should render with fullWidth", () => {
@@ -688,14 +688,14 @@ describe("Theme Components", () => {
         });
 
         it("should render with checked state", () => {
-            render(<ThemedCheckbox checked={true} onChange={() => {}} aria-label="Checked checkbox" />);
+            render(<ThemedCheckbox checked onChange={() => {}} aria-label="Checked checkbox" />);
 
             const checkbox = screen.getByRole("checkbox");
             expect(checkbox).toBeChecked();
         });
 
         it("should render with disabled state", () => {
-            render(<ThemedCheckbox disabled={true} aria-label="Disabled checkbox" />);
+            render(<ThemedCheckbox disabled aria-label="Disabled checkbox" />);
 
             const checkbox = screen.getByRole("checkbox");
             expect(checkbox).toBeDisabled();
@@ -778,19 +778,19 @@ describe("Theme Components", () => {
         it("should render with showText and different statuses", () => {
             const statuses = ["up", "down", "pending", "unknown"] as const;
 
-            statuses.forEach((status) => {
-                const { unmount } = render(<StatusIndicator status={status} showText={true} />);
+            for (const status of statuses) {
+                const { unmount } = render(<StatusIndicator status={status} showText />);
 
                 const indicator = document.querySelector(".themed-status-indicator");
                 expect(indicator).toBeInTheDocument();
 
                 unmount();
-            });
+            }
         });
 
         it("should handle default case in getSizeStyles", () => {
             // Create a custom status indicator that would trigger the default case
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
             render(<StatusIndicator status="up" size={"invalid" as any} />);
 
             const indicator = document.querySelector(".themed-status-indicator");
@@ -994,7 +994,7 @@ describe("Theme Components", () => {
         });
 
         it("should render with showLabel", () => {
-            render(<ThemedProgress value={65} showLabel={true} />);
+            render(<ThemedProgress value={65} showLabel />);
 
             const progress = document.querySelector(".themed-progress");
             expect(progress).toBeInTheDocument();
@@ -1010,7 +1010,7 @@ describe("Theme Components", () => {
         });
 
         it("should render with both label and showLabel", () => {
-            render(<ThemedProgress value={90} label="Download" showLabel={true} />);
+            render(<ThemedProgress value={90} label="Download" showLabel />);
 
             const progress = document.querySelector(".themed-progress");
             expect(progress).toBeInTheDocument();
@@ -1019,7 +1019,7 @@ describe("Theme Components", () => {
         });
 
         it("should handle value exceeding max", () => {
-            render(<ThemedProgress value={150} max={100} showLabel={true} />);
+            render(<ThemedProgress value={150} max={100} showLabel />);
 
             const progress = document.querySelector(".themed-progress");
             expect(progress).toBeInTheDocument();
@@ -1028,7 +1028,7 @@ describe("Theme Components", () => {
         });
 
         it("should handle negative values", () => {
-            render(<ThemedProgress value={-10} showLabel={true} />);
+            render(<ThemedProgress value={-10} showLabel />);
 
             const progress = document.querySelector(".themed-progress");
             expect(progress).toBeInTheDocument();

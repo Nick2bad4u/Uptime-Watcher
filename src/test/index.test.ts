@@ -23,9 +23,9 @@ vi.mock("../hooks/site/useSite", () => ({
 }));
 
 vi.mock("../hooks/site/useSiteAnalytics", () => ({
-    useSiteAnalytics: vi.fn(),
-    useChartData: vi.fn(),
     SiteAnalyticsUtils: {},
+    useChartData: vi.fn(),
+    useSiteAnalytics: vi.fn(),
 }));
 
 vi.mock("../hooks/site/useSiteDetails", () => ({
@@ -109,9 +109,9 @@ describe("Site Hooks Index Module", () => {
                 "SiteAnalyticsUtils",
             ];
 
-            expectedExports.forEach((exportName) => {
+            for (const exportName of expectedExports) {
                 expect(SiteHooksIndex).toHaveProperty(exportName);
-            });
+            }
         });
     });
 
@@ -125,23 +125,23 @@ describe("Site Hooks Index Module", () => {
             expect(values.length).toBe(keys.length);
             expect(entries.length).toBe(keys.length);
 
-            entries.forEach(([key, value]) => {
+            for (const [key, value] of entries) {
                 expect(keys).toContain(key);
                 expect(values).toContain(value);
-            });
+            }
         });
 
         it("should provide consistent access to exports", () => {
             const exportNames = Object.keys(SiteHooksIndex);
             const siteHooks = SiteHooksIndex as Record<string, unknown>;
 
-            exportNames.forEach((exportName) => {
+            for (const exportName of exportNames) {
                 const staticAccess = siteHooks[exportName];
                 const dynamicAccess = siteHooks[exportName];
 
                 expect(staticAccess).toBe(dynamicAccess);
                 expect(staticAccess).toBeDefined();
-            });
+            }
         });
     });
 
@@ -155,9 +155,9 @@ describe("Site Hooks Index Module", () => {
 
         it("should maintain export references", () => {
             // All exports should be defined (not undefined)
-            Object.values(SiteHooksIndex).forEach((exportValue) => {
+            for (const exportValue of Object.values(SiteHooksIndex)) {
                 expect(exportValue).toBeDefined();
-            });
+            }
         });
 
         it("should not modify exported values", () => {
@@ -165,10 +165,10 @@ describe("Site Hooks Index Module", () => {
             const siteHooks = SiteHooksIndex as Record<string, unknown>;
 
             // Access all exports multiple times
-            Object.keys(SiteHooksIndex).forEach((key) => {
+            for (const key of Object.keys(SiteHooksIndex)) {
                 const _export = siteHooks[key];
                 expect(_export).toBeDefined();
-            });
+            }
 
             // Values should remain the same
             const currentValues = Object.values(SiteHooksIndex);
@@ -196,7 +196,7 @@ describe("Site Hooks Index Module", () => {
         it("should support named imports pattern", () => {
             // Test destructuring assignment (common import pattern)
             expect(() => {
-                const { useSiteStats, useSiteMonitor, useSiteActions, useSite, useSiteAnalytics, useSiteDetails } =
+                const { useSite, useSiteActions, useSiteAnalytics, useSiteDetails, useSiteMonitor, useSiteStats } =
                     SiteHooksIndex;
                 expect(useSiteStats).toBeDefined();
                 expect(useSiteMonitor).toBeDefined();
@@ -218,11 +218,11 @@ describe("Site Hooks Index Module", () => {
         it("should handle property descriptor access", () => {
             const exportNames = Object.keys(SiteHooksIndex);
 
-            exportNames.forEach((exportName) => {
+            for (const exportName of exportNames) {
                 const descriptor = Object.getOwnPropertyDescriptor(SiteHooksIndex, exportName);
                 expect(descriptor).toBeDefined();
                 expect(descriptor?.enumerable).toBe(true);
-            });
+            }
         });
 
         it("should be serializable", () => {
@@ -242,10 +242,10 @@ describe("Site Hooks Index Module", () => {
             expect(exports.length).toBeGreaterThan(6);
 
             // Each export should be accessible
-            exports.forEach((exportName) => {
+            for (const exportName of exports) {
                 const exportValue = (SiteHooksIndex as Record<string, unknown>)[exportName];
                 expect(exportValue).toBeDefined();
-            });
+            }
         });
 
         it("should provide centralized access to all site hooks", () => {
@@ -287,10 +287,10 @@ describe("Site Hooks Index Module", () => {
             expect(Array.isArray(keys)).toBe(true);
             expect(keys.length).toBeGreaterThan(0);
 
-            keys.forEach((key) => {
+            for (const key of keys) {
                 expect(typeof key).toBe("string");
                 expect(key.length).toBeGreaterThan(0);
-            });
+            }
         });
     });
 });

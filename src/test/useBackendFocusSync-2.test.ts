@@ -3,8 +3,9 @@
  * Comprehensive tests for backend focus sync functionality.
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { renderHook } from "@testing-library/react";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+
 import { useBackendFocusSync } from "../hooks/useBackendFocusSync";
 import { useSitesStore } from "../stores";
 

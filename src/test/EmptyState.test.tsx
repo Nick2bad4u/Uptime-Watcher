@@ -12,9 +12,9 @@ import { EmptyState } from "../components/Dashboard/SiteList/EmptyState";
 vi.mock("../theme/components", () => ({
     ThemedBox: ({
         children,
-        surface,
-        padding,
         className,
+        padding,
+        surface,
     }: {
         children: React.ReactNode;
         surface: string;
@@ -27,10 +27,10 @@ vi.mock("../theme/components", () => ({
     ),
     ThemedText: ({
         children,
-        size,
-        weight,
-        variant,
         className,
+        size,
+        variant,
+        weight,
     }: {
         children: React.ReactNode;
         size?: string;

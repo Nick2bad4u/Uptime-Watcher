@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+
 import type { Monitor, MonitorType, Site } from "../stores/types";
-import { ERROR_MESSAGES } from "../stores/types";
+
 import {
     createDefaultMonitor,
     validateMonitor,
@@ -12,6 +13,7 @@ import {
     validateMonitorExists,
     monitorOperations,
 } from "../stores/sites/utils/monitorOperations";
+import { ERROR_MESSAGES } from "../stores/types";
 
 // Mock crypto.randomUUID
 const mockUUID = "mock-uuid-123";
@@ -52,19 +54,18 @@ describe("monitorOperations", () => {
 
         it("should create a monitor with overrides", () => {
             const overrides: Partial<Monitor> = {
-                id: "custom-id",
-                type: "port" as MonitorType,
-                status: "up",
-                monitoring: false,
                 checkInterval: 60000,
-
+                history: [{ responseTime: 250, status: "up", timestamp: Date.now() }],
                 host: "example.com",
-                port: 443,
-                timeout: 5000,
-                retryAttempts: 3,
-                responseTime: 250,
+                id: "custom-id",
                 lastChecked: new Date(),
-                history: [{ timestamp: Date.now(), status: "up", responseTime: 250 }],
+                monitoring: false,
+                port: 443,
+                responseTime: 250,
+                retryAttempts: 3,
+                status: "up",
+                timeout: 5000,
+                type: "port" as MonitorType,
             };
 
             const monitor = createDefaultMonitor(overrides);
@@ -72,17 +73,16 @@ describe("monitorOperations", () => {
             expect(monitor).toEqual({
                 checkInterval: 60000,
                 history: overrides.history,
-                id: "custom-id",
-                monitoring: false,
-                status: "up",
-                type: "port",
-
                 host: "example.com",
-                port: 443,
-                timeout: 5000,
-                retryAttempts: 3,
-                responseTime: 250,
+                id: "custom-id",
                 lastChecked: overrides.lastChecked,
+                monitoring: false,
+                port: 443,
+                responseTime: 250,
+                retryAttempts: 3,
+                status: "up",
+                timeout: 5000,
+                type: "port",
             });
             expect(mockCrypto.randomUUID).not.toHaveBeenCalled();
         });
@@ -108,11 +108,11 @@ describe("monitorOperations", () => {
     describe("validateMonitor", () => {
         it("should return true for valid monitor", () => {
             const validMonitor: Monitor = {
-                id: "test-id",
-                type: "http",
-                status: "up",
-                monitoring: true,
                 history: [],
+                id: "test-id",
+                monitoring: true,
+                status: "up",
+                type: "http",
             };
 
             expect(validateMonitor(validMonitor)).toBe(true);
@@ -120,10 +120,10 @@ describe("monitorOperations", () => {
 
         it("should return false for missing id", () => {
             const invalidMonitor = {
-                type: "http",
-                status: "up",
-                monitoring: true,
                 history: [],
+                monitoring: true,
+                status: "up",
+                type: "http",
             };
 
             expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(false);
@@ -131,11 +131,11 @@ describe("monitorOperations", () => {
 
         it("should return false for invalid id type", () => {
             const invalidMonitor = {
-                id: 123,
-                type: "http" as MonitorType,
-                status: "up" as const,
-                monitoring: true,
                 history: [],
+                id: 123,
+                monitoring: true,
+                status: "up" as const,
+                type: "http" as MonitorType,
             };
 
             expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(false);
@@ -143,10 +143,10 @@ describe("monitorOperations", () => {
 
         it("should return false for missing type", () => {
             const invalidMonitor = {
-                id: "test-id",
-                status: "up" as const,
-                monitoring: true,
                 history: [],
+                id: "test-id",
+                monitoring: true,
+                status: "up" as const,
             };
 
             expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(false);
@@ -154,11 +154,11 @@ describe("monitorOperations", () => {
 
         it("should return false for invalid type", () => {
             const invalidMonitor = {
-                id: "test-id",
-                type: 123,
-                status: "up" as const,
-                monitoring: true,
                 history: [],
+                id: "test-id",
+                monitoring: true,
+                status: "up" as const,
+                type: 123,
             };
 
             expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(false);
@@ -166,10 +166,10 @@ describe("monitorOperations", () => {
 
         it("should return false for missing status", () => {
             const invalidMonitor = {
-                id: "test-id",
-                type: "http",
-                monitoring: true,
                 history: [],
+                id: "test-id",
+                monitoring: true,
+                type: "http",
             };
 
             expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(false);
@@ -177,11 +177,11 @@ describe("monitorOperations", () => {
 
         it("should return false for invalid status value", () => {
             const invalidMonitor = {
-                id: "test-id",
-                type: "http" as MonitorType,
-                status: "invalid-status",
-                monitoring: true,
                 history: [],
+                id: "test-id",
+                monitoring: true,
+                status: "invalid-status",
+                type: "http" as MonitorType,
             };
 
             expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(false);
@@ -189,11 +189,11 @@ describe("monitorOperations", () => {
 
         it("should return false for invalid status type", () => {
             const invalidMonitor = {
-                id: "test-id",
-                type: "http" as MonitorType,
-                status: 123,
-                monitoring: true,
                 history: [],
+                id: "test-id",
+                monitoring: true,
+                status: 123,
+                type: "http" as MonitorType,
             };
 
             expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(false);
@@ -201,10 +201,10 @@ describe("monitorOperations", () => {
 
         it("should return false for missing monitoring", () => {
             const invalidMonitor = {
-                id: "test-id",
-                type: "http",
-                status: "up",
                 history: [],
+                id: "test-id",
+                status: "up",
+                type: "http",
             };
 
             expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(false);
@@ -212,11 +212,11 @@ describe("monitorOperations", () => {
 
         it("should return false for invalid monitoring type", () => {
             const invalidMonitor = {
-                id: "test-id",
-                type: "http" as MonitorType,
-                status: "up",
-                monitoring: "true",
                 history: [],
+                id: "test-id",
+                monitoring: "true",
+                status: "up",
+                type: "http" as MonitorType,
             };
 
             expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(false);
@@ -225,9 +225,9 @@ describe("monitorOperations", () => {
         it("should return false for missing history", () => {
             const invalidMonitor = {
                 id: "test-id",
-                type: "http",
-                status: "up",
                 monitoring: true,
+                status: "up",
+                type: "http",
             };
 
             expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(false);
@@ -235,11 +235,11 @@ describe("monitorOperations", () => {
 
         it("should return false for invalid history type", () => {
             const invalidMonitor = {
-                id: "test-id",
-                type: "http" as MonitorType,
-                status: "up",
-                monitoring: true,
                 history: "not-an-array",
+                id: "test-id",
+                monitoring: true,
+                status: "up",
+                type: "http" as MonitorType,
             };
 
             expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(false);
@@ -248,16 +248,16 @@ describe("monitorOperations", () => {
         it("should validate all valid status values", () => {
             const statusValues = ["pending", "up", "down"];
 
-            statusValues.forEach((status) => {
+            for (const status of statusValues) {
                 const monitor = {
-                    id: "test-id",
-                    type: "http" as MonitorType,
-                    status,
-                    monitoring: true,
                     history: [],
+                    id: "test-id",
+                    monitoring: true,
+                    status,
+                    type: "http" as MonitorType,
                 };
                 expect(validateMonitor(monitor as unknown as Monitor)).toBe(true);
-            });
+            }
         });
     });
 
@@ -276,10 +276,10 @@ describe("monitorOperations", () => {
         it("should preserve valid status values", () => {
             const statusValues = ["pending", "up", "down"] as const;
 
-            statusValues.forEach((status) => {
+            for (const status of statusValues) {
                 const result = normalizeMonitor({ status });
                 expect(result.status).toBe(status);
-            });
+            }
         });
 
         it("should default invalid status to pending", () => {
@@ -300,7 +300,7 @@ describe("monitorOperations", () => {
         });
 
         it("should preserve existing history", () => {
-            const history = [{ timestamp: Date.now(), status: "up" as const, responseTime: 250 }];
+            const history = [{ responseTime: 250, status: "up" as const, timestamp: Date.now() }];
             const result = normalizeMonitor({ history });
             expect(result.history).toBe(history);
         });
@@ -308,46 +308,45 @@ describe("monitorOperations", () => {
         it("should include optional fields when provided", () => {
             const lastChecked = new Date();
             const partialMonitor: Partial<Monitor> = {
+                checkInterval: 60000,
                 host: "example.com",
-                port: 443,
-                responseTime: 250,
                 lastChecked,
                 monitoring: true,
-                checkInterval: 60000,
-                timeout: 5000,
+                port: 443,
+                responseTime: 250,
                 retryAttempts: 3,
+                timeout: 5000,
             };
 
             const result = normalizeMonitor(partialMonitor);
 
             expect(result).toEqual({
+                checkInterval: 60000,
                 history: [],
-                id: mockUUID,
-                status: "pending",
-                type: "http",
-
                 host: "example.com",
-                port: 443,
-                responseTime: 250,
+                id: mockUUID,
                 lastChecked,
                 monitoring: true,
-                checkInterval: 60000,
-                timeout: 5000,
+                port: 443,
+                responseTime: 250,
                 retryAttempts: 3,
+                status: "pending",
+                timeout: 5000,
+                type: "http",
             });
         });
 
         it("should exclude optional fields when undefined", () => {
             const partialMonitor: Partial<Monitor> = {
-                url: undefined,
+                checkInterval: undefined,
                 host: undefined,
-                port: undefined,
-                responseTime: undefined,
                 lastChecked: undefined,
                 monitoring: undefined,
-                checkInterval: undefined,
-                timeout: undefined,
+                port: undefined,
+                responseTime: undefined,
                 retryAttempts: undefined,
+                timeout: undefined,
+                url: undefined,
             };
 
             const result = normalizeMonitor(partialMonitor);
@@ -362,11 +361,11 @@ describe("monitorOperations", () => {
 
         it("should handle mixed defined and undefined optional fields", () => {
             const partialMonitor: Partial<Monitor> = {
+                checkInterval: undefined,
                 host: undefined,
+                monitoring: true,
                 port: 443,
                 responseTime: undefined,
-                monitoring: true,
-                checkInterval: undefined,
             };
 
             const result = normalizeMonitor(partialMonitor);
@@ -374,11 +373,10 @@ describe("monitorOperations", () => {
             expect(result).toEqual({
                 history: [],
                 id: mockUUID,
+                monitoring: true,
+                port: 443,
                 status: "pending",
                 type: "http",
-
-                port: 443,
-                monitoring: true,
             });
         });
     });
@@ -386,24 +384,23 @@ describe("monitorOperations", () => {
     describe("findMonitorInSite", () => {
         const mockSite: Site = {
             identifier: "site-1",
-            name: "Test Site",
-
             monitors: [
                 {
-                    id: "monitor-1",
-                    type: "http",
-                    status: "up",
-                    monitoring: true,
                     history: [],
+                    id: "monitor-1",
+                    monitoring: true,
+                    status: "up",
+                    type: "http",
                 },
                 {
-                    id: "monitor-2",
-                    type: "port",
-                    status: "down",
-                    monitoring: false,
                     history: [],
+                    id: "monitor-2",
+                    monitoring: false,
+                    status: "down",
+                    type: "port",
                 },
             ],
+            name: "Test Site",
         };
 
         it("should find existing monitor by id", () => {
@@ -434,33 +431,32 @@ describe("monitorOperations", () => {
     describe("updateMonitorInSite", () => {
         const mockSite: Site = {
             identifier: "site-1",
-            name: "Test Site",
-
             monitors: [
                 {
-                    id: "monitor-1",
-                    type: "http",
-                    status: "up",
-                    monitoring: true,
-                    history: [],
                     checkInterval: 300000,
+                    history: [],
+                    id: "monitor-1",
+                    monitoring: true,
+                    status: "up",
+                    type: "http",
                 },
                 {
-                    id: "monitor-2",
-                    type: "port",
-                    status: "down",
-                    monitoring: false,
-                    history: [],
                     checkInterval: 60000,
+                    history: [],
+                    id: "monitor-2",
+                    monitoring: false,
+                    status: "down",
+                    type: "port",
                 },
             ],
+            name: "Test Site",
         };
 
         it("should update existing monitor", () => {
             const updates = {
-                status: "down" as const,
                 monitoring: false,
                 responseTime: 500,
+                status: "down" as const,
             };
 
             const result = updateMonitorInSite(mockSite, "monitor-1", updates);
@@ -512,26 +508,25 @@ describe("monitorOperations", () => {
     describe("addMonitorToSite", () => {
         const mockSite: Site = {
             identifier: "site-1",
-            name: "Test Site",
-
             monitors: [
                 {
-                    id: "monitor-1",
-                    type: "http",
-                    status: "up",
-                    monitoring: true,
                     history: [],
+                    id: "monitor-1",
+                    monitoring: true,
+                    status: "up",
+                    type: "http",
                 },
             ],
+            name: "Test Site",
         };
 
         it("should add monitor to site", () => {
             const newMonitor: Monitor = {
-                id: "monitor-2",
-                type: "port",
-                status: "pending",
-                monitoring: false,
                 history: [],
+                id: "monitor-2",
+                monitoring: false,
+                status: "pending",
+                type: "port",
             };
 
             const result = addMonitorToSite(mockSite, newMonitor);
@@ -543,11 +538,11 @@ describe("monitorOperations", () => {
 
         it("should not mutate original site", () => {
             const newMonitor: Monitor = {
-                id: "monitor-2",
-                type: "port",
-                status: "pending",
-                monitoring: false,
                 history: [],
+                id: "monitor-2",
+                monitoring: false,
+                status: "pending",
+                type: "port",
             };
             const originalSite = { ...mockSite };
 
@@ -564,11 +559,11 @@ describe("monitorOperations", () => {
                 monitors: [],
             };
             const newMonitor: Monitor = {
-                id: "monitor-1",
-                type: "http",
-                status: "pending",
-                monitoring: true,
                 history: [],
+                id: "monitor-1",
+                monitoring: true,
+                status: "pending",
+                type: "http",
             };
 
             const result = addMonitorToSite(siteWithNoMonitors, newMonitor);
@@ -581,24 +576,23 @@ describe("monitorOperations", () => {
     describe("removeMonitorFromSite", () => {
         const mockSite: Site = {
             identifier: "site-1",
-            name: "Test Site",
-
             monitors: [
                 {
-                    id: "monitor-1",
-                    type: "http",
-                    status: "up",
-                    monitoring: true,
                     history: [],
+                    id: "monitor-1",
+                    monitoring: true,
+                    status: "up",
+                    type: "http",
                 },
                 {
-                    id: "monitor-2",
-                    type: "port",
-                    status: "down",
-                    monitoring: false,
                     history: [],
+                    id: "monitor-2",
+                    monitoring: false,
+                    status: "down",
+                    type: "port",
                 },
             ],
+            name: "Test Site",
         };
 
         it("should remove existing monitor", () => {
@@ -651,17 +645,16 @@ describe("monitorOperations", () => {
     describe("validateMonitorExists", () => {
         const mockSite: Site = {
             identifier: "site-1",
-            name: "Test Site",
-
             monitors: [
                 {
-                    id: "monitor-1",
-                    type: "http",
-                    status: "up",
-                    monitoring: true,
                     history: [],
+                    id: "monitor-1",
+                    monitoring: true,
+                    status: "up",
+                    type: "http",
                 },
             ],
+            name: "Test Site",
         };
 
         it("should not throw for existing monitor", () => {
@@ -696,14 +689,14 @@ describe("monitorOperations", () => {
 
     describe("monitorOperations", () => {
         const mockMonitor: Monitor = {
-            id: "monitor-1",
-            type: "http",
-            status: "up",
-            monitoring: true,
-            history: [],
             checkInterval: 300000,
-            timeout: 5000,
+            history: [],
+            id: "monitor-1",
+            monitoring: true,
             retryAttempts: 3,
+            status: "up",
+            timeout: 5000,
+            type: "http",
         };
 
         describe("toggleMonitoring", () => {

@@ -3,7 +3,6 @@
  * Validates form rendering, validation, submission, and interaction behavior.
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { fireEvent, render, screen, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
@@ -28,9 +27,9 @@ vi.mock("../theme/useTheme", () => ({
 vi.mock("../services/logger", () => ({
     default: {
         debug: vi.fn(),
+        error: vi.fn(),
         info: vi.fn(),
         warn: vi.fn(),
-        error: vi.fn(),
     },
 }));
 
@@ -60,12 +59,7 @@ vi.mock("../theme/components", () => ({
             {children}
         </div>
     ),
-    ThemedText: ({ children, className, size, variant, weight, ...props }: any) => (
-        <span className={`${className} ${size} ${variant} ${weight}`} {...props}>
-            {children}
-        </span>
-    ),
-    ThemedButton: ({ children, className, disabled, loading, type, variant, fullWidth, ...props }: any) => (
+    ThemedButton: ({ children, className, disabled, fullWidth, loading, type, variant, ...props }: any) => (
         <button
             className={`${className} ${variant} ${fullWidth ? "w-full" : ""}`}
             disabled={disabled ?? loading}
@@ -81,19 +75,24 @@ vi.mock("../theme/components", () => ({
             {children}
         </select>
     ),
+    ThemedText: ({ children, className, size, variant, weight, ...props }: any) => (
+        <span className={`${className} ${size} ${variant} ${weight}`} {...props}>
+            {children}
+        </span>
+    ),
 }));
 
 describe("AddSiteForm", () => {
     const defaultErrorStoreState = {
-        clearError: vi.fn(),
-        isLoading: false,
-        lastError: undefined,
-        setError: vi.fn(),
         clearAllErrors: vi.fn(),
+        clearError: vi.fn(),
         clearStoreError: vi.fn(),
         getOperationLoading: vi.fn(),
         getStoreError: vi.fn(),
+        isLoading: false,
+        lastError: undefined,
         operationLoading: {},
+        setError: vi.fn(),
         setLoading: vi.fn(),
         setOperationLoading: vi.fn(),
         setStoreError: vi.fn(),
@@ -107,8 +106,8 @@ describe("AddSiteForm", () => {
         createSite: vi.fn(),
         removeSite: vi.fn(),
         sites: [
-            { identifier: "site1", name: "Test Site 1", monitors: [] },
-            { identifier: "site2", name: "Test Site 2", monitors: [] },
+            { identifier: "site1", monitors: [], name: "Test Site 1" },
+            { identifier: "site2", monitors: [], name: "Test Site 2" },
         ],
         syncSitesFromBackend: vi.fn(),
         updateSite: vi.fn(),
@@ -513,8 +512,8 @@ describe("AddSiteForm", () => {
             mockUseSitesStore.mockReturnValue({
                 ...defaultSitesStoreState,
                 sites: [
-                    { identifier: "site1", name: undefined, monitors: [] },
-                    { identifier: "site2", name: null, monitors: [] },
+                    { identifier: "site1", monitors: [], name: undefined },
+                    { identifier: "site2", monitors: [], name: null },
                 ],
             });
 

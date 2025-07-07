@@ -13,11 +13,11 @@ import logger from "../services/logger";
 // Mock the logger
 vi.mock("../services/logger", () => ({
     default: {
+        error: vi.fn(),
         user: {
             action: vi.fn(),
         },
         warn: vi.fn(),
-        error: vi.fn(),
     },
 }));
 
@@ -49,22 +49,22 @@ const mockElectronAPI = {
 
 // Create a mock for getBoundingClientRect
 const createMockBoundingClientRect = (overrides = {}) => ({
-    top: 100,
-    left: 200,
     bottom: 150,
-    right: 250,
-    width: 50,
     height: 50,
+    left: 200,
+    right: 250,
+    toJSON: () => ({}),
+    top: 100,
+    width: 50,
     x: 200,
     y: 100,
-    toJSON: () => ({}),
     ...overrides,
 });
 
 describe("ScreenshotThumbnail", () => {
     const defaultProps = {
-        url: "https://example.com",
         siteName: "Example Site",
+        url: "https://example.com",
     };
 
     beforeEach(() => {
@@ -83,10 +83,10 @@ describe("ScreenshotThumbnail", () => {
         Object.defineProperty(window, "location", {
             configurable: true,
             value: {
-                href: "http://localhost/",
                 assign: vi.fn(),
-                replace: vi.fn(),
+                href: "http://localhost/",
                 reload: vi.fn(),
+                replace: vi.fn(),
             },
         });
 
@@ -146,8 +146,8 @@ describe("ScreenshotThumbnail", () => {
 
         it("should handle special characters in URL encoding", () => {
             const propsWithSpecialChars = {
-                url: "https://example.com/path?query=test&value=123",
                 siteName: "Test Site",
+                url: "https://example.com/path?query=test&value=123",
             };
 
             render(<ScreenshotThumbnail {...propsWithSpecialChars} />);
@@ -560,8 +560,8 @@ describe("ScreenshotThumbnail", () => {
     describe("Edge Cases", () => {
         it("should handle empty siteName", () => {
             const propsWithEmptyName = {
-                url: "https://example.com",
                 siteName: "",
+                url: "https://example.com",
             };
 
             render(<ScreenshotThumbnail {...propsWithEmptyName} />);
@@ -576,8 +576,8 @@ describe("ScreenshotThumbnail", () => {
 
         it("should handle empty URL", () => {
             const propsWithEmptyUrl = {
-                url: "",
                 siteName: "Test Site",
+                url: "",
             };
 
             render(<ScreenshotThumbnail {...propsWithEmptyUrl} />);
@@ -947,17 +947,17 @@ describe("ScreenshotThumbnail", () => {
         it("should test overlay positioning with various edge cases", () => {
             // Test case 1: Element near top-left corner
             const mockRect1 = {
-                top: 10,
-                left: 10,
                 bottom: 60,
-                right: 60,
-                width: 50,
                 height: 50,
-                x: 10,
-                y: 10,
+                left: 10,
+                right: 60,
                 toJSON() {
                     return {};
                 },
+                top: 10,
+                width: 50,
+                x: 10,
+                y: 10,
             };
             Element.prototype.getBoundingClientRect = vi.fn(() => mockRect1);
 
@@ -978,17 +978,17 @@ describe("ScreenshotThumbnail", () => {
 
             // Test case 2: Element near bottom-right corner
             const mockRect2 = {
-                top: 1000,
-                left: 1800,
                 bottom: 1050,
-                right: 1850,
-                width: 50,
                 height: 50,
-                x: 1800,
-                y: 1000,
+                left: 1800,
+                right: 1850,
                 toJSON() {
                     return {};
                 },
+                top: 1000,
+                width: 50,
+                x: 1800,
+                y: 1000,
             };
             Element.prototype.getBoundingClientRect = vi.fn(() => mockRect2);
 

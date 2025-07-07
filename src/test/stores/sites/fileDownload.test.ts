@@ -27,16 +27,16 @@ describe("fileDownload", () => {
 
         // Mock document.createElement with complete anchor element
         const mockAnchor = {
-            href: "",
-            download: "",
-            style: { display: "" },
             click: vi.fn(),
+            download: "",
+            href: "",
+            style: { display: "" },
         };
         const mockCreateElement = vi.fn().mockReturnValue(mockAnchor);
         Object.defineProperty(document, "createElement", {
+            configurable: true,
             value: mockCreateElement,
             writable: true,
-            configurable: true,
         });
 
         // Mock document.body
@@ -45,18 +45,18 @@ describe("fileDownload", () => {
             removeChild: vi.fn(),
         };
         Object.defineProperty(document, "body", {
+            configurable: true,
             value: mockBody,
             writable: true,
-            configurable: true,
         });
 
         return {
-            mockObjectURL,
-            mockCreateObjectURL,
-            mockRevokeObjectURL,
             mockAnchor,
-            mockCreateElement,
             mockBody,
+            mockCreateElement,
+            mockCreateObjectURL,
+            mockObjectURL,
+            mockRevokeObjectURL,
         };
     };
 
@@ -65,7 +65,7 @@ describe("fileDownload", () => {
             const mockBackupData = new Uint8Array([1, 2, 3, 4, 5]);
             const mockDownloadFn = vi.fn().mockResolvedValue(mockBackupData);
 
-            const { mockObjectURL, mockCreateObjectURL, mockRevokeObjectURL, mockAnchor, mockCreateElement } =
+            const { mockAnchor, mockCreateElement, mockCreateObjectURL, mockObjectURL, mockRevokeObjectURL } =
                 setupDownloadMocks();
 
             await handleSQLiteBackupDownload(mockDownloadFn);
@@ -83,7 +83,7 @@ describe("fileDownload", () => {
             const mockBackupData = new Uint8Array([]);
             const mockDownloadFn = vi.fn().mockResolvedValue(mockBackupData);
 
-            const { mockObjectURL, mockCreateObjectURL, mockRevokeObjectURL, mockAnchor } = setupDownloadMocks();
+            const { mockAnchor, mockCreateObjectURL, mockObjectURL, mockRevokeObjectURL } = setupDownloadMocks();
 
             await handleSQLiteBackupDownload(mockDownloadFn);
 
@@ -149,11 +149,11 @@ describe("fileDownload", () => {
 
             // Mock document.createElement with click that throws
             const mockAnchor = {
-                href: "",
-                download: "",
                 click: vi.fn().mockImplementation(() => {
                     throw new Error("Click failed");
                 }),
+                download: "",
+                href: "",
             };
             const mockCreateElement = vi.fn().mockReturnValue(mockAnchor);
             Object.defineProperty(document, "createElement", {
@@ -168,7 +168,7 @@ describe("fileDownload", () => {
             const mockBackupData = new Uint8Array([1, 2, 3, 4, 5]);
             const mockDownloadFn = vi.fn().mockResolvedValue(mockBackupData);
 
-            const { mockObjectURL, mockCreateObjectURL, mockRevokeObjectURL, mockAnchor } = setupDownloadMocks();
+            const { mockAnchor, mockCreateObjectURL, mockObjectURL, mockRevokeObjectURL } = setupDownloadMocks();
 
             await handleSQLiteBackupDownload(mockDownloadFn);
 
@@ -195,11 +195,11 @@ describe("fileDownload", () => {
 
             // Mock document.createElement with click that throws
             const mockAnchor = {
-                href: "",
-                download: "",
                 click: vi.fn().mockImplementation(() => {
                     throw new Error("Click failed");
                 }),
+                download: "",
+                href: "",
             };
             const mockCreateElement = vi.fn().mockReturnValue(mockAnchor);
             Object.defineProperty(document, "createElement", {
@@ -222,7 +222,7 @@ describe("fileDownload", () => {
             mockBackupData.fill(42);
             const mockDownloadFn = vi.fn().mockResolvedValue(mockBackupData);
 
-            const { mockObjectURL, mockCreateObjectURL, mockRevokeObjectURL, mockAnchor } = setupDownloadMocks();
+            const { mockAnchor, mockCreateObjectURL, mockObjectURL, mockRevokeObjectURL } = setupDownloadMocks();
 
             await handleSQLiteBackupDownload(mockDownloadFn);
 
@@ -272,7 +272,7 @@ describe("fileDownload", () => {
         });
 
         it("should download file with default MIME type", () => {
-            const { mockCreateObjectURL, mockRevokeObjectURL, mockAnchor, mockBody } = setupDownloadMocks();
+            const { mockAnchor, mockBody, mockCreateObjectURL, mockRevokeObjectURL } = setupDownloadMocks();
 
             const buffer = new ArrayBuffer(8);
             const options: FileDownloadOptions = {
@@ -293,7 +293,7 @@ describe("fileDownload", () => {
         });
 
         it("should download file with custom MIME type", () => {
-            const { mockCreateObjectURL, mockAnchor } = setupDownloadMocks();
+            const { mockAnchor, mockCreateObjectURL } = setupDownloadMocks();
 
             const buffer = new ArrayBuffer(8);
             const options: FileDownloadOptions = {
@@ -313,7 +313,7 @@ describe("fileDownload", () => {
         });
 
         it("should handle empty buffer", () => {
-            const { mockCreateObjectURL, mockAnchor } = setupDownloadMocks();
+            const { mockAnchor, mockCreateObjectURL } = setupDownloadMocks();
 
             const buffer = new ArrayBuffer(0);
             const options: FileDownloadOptions = {
@@ -328,13 +328,13 @@ describe("fileDownload", () => {
         });
 
         it("should handle missing document.body", () => {
-            const { mockCreateObjectURL, mockRevokeObjectURL, mockAnchor } = setupDownloadMocks();
+            const { mockAnchor, mockCreateObjectURL, mockRevokeObjectURL } = setupDownloadMocks();
 
             // Remove document.body
             Object.defineProperty(document, "body", {
+                configurable: true,
                 value: null,
                 writable: true,
-                configurable: true,
             });
 
             const buffer = new ArrayBuffer(8);
@@ -351,7 +351,7 @@ describe("fileDownload", () => {
         });
 
         it("should handle DOM manipulation errors with fallback", () => {
-            const { mockCreateObjectURL, mockRevokeObjectURL, mockAnchor, mockBody } = setupDownloadMocks();
+            const { mockAnchor, mockBody, mockCreateObjectURL, mockRevokeObjectURL } = setupDownloadMocks();
 
             // Mock appendChild to throw
             mockBody.appendChild.mockImplementation(() => {
@@ -405,9 +405,9 @@ describe("fileDownload", () => {
                 throw new Error("createElement not available");
             });
             Object.defineProperty(document, "createElement", {
+                configurable: true,
                 value: mockCreateElement,
                 writable: true,
-                configurable: true,
             });
 
             const buffer = new ArrayBuffer(8);
@@ -511,7 +511,7 @@ describe("fileDownload", () => {
         });
 
         it("should handle large files", () => {
-            const { mockCreateObjectURL, mockAnchor } = setupDownloadMocks();
+            const { mockAnchor, mockCreateObjectURL } = setupDownloadMocks();
 
             const buffer = new ArrayBuffer(1024 * 1024 * 10); // 10MB
             const options: FileDownloadOptions = {
@@ -656,9 +656,9 @@ describe("fileDownload", () => {
 
             // Mock document.createElement and click
             const mockAnchor = {
-                href: "",
-                download: "",
                 click: vi.fn(),
+                download: "",
+                href: "",
             };
             const mockCreateElement = vi.fn().mockReturnValue(mockAnchor);
             Object.defineProperty(document, "createElement", {
@@ -688,18 +688,18 @@ describe("fileDownload", () => {
                 throw new Error("createElement not available");
             });
             Object.defineProperty(document, "createElement", {
+                configurable: true,
                 value: mockCreateElement,
                 writable: true,
-                configurable: true,
             });
 
             await expect(handleSQLiteBackupDownload(mockDownloadFn)).rejects.toThrow();
 
             // Restore
             Object.defineProperty(document, "createElement", {
+                configurable: true,
                 value: originalCreateElement,
                 writable: true,
-                configurable: true,
             });
         });
     });

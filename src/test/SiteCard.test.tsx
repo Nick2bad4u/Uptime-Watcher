@@ -3,12 +3,13 @@
  * Validates site monitoring card display and interactions.
  */
 
+import { render, screen } from "@testing-library/react";
 import React from "react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+
+import type { Site } from "../types";
 
 import { SiteCard } from "../components/Dashboard/SiteCard";
-import type { Site } from "../types";
 
 // Mock the useSite hook with minimal required return
 vi.mock("../hooks/site", () => ({
@@ -61,11 +62,13 @@ describe("SiteCard Component", () => {
 
     const mockSite: Site = {
         identifier: "https://example.com",
-        name: "Test Site",
         monitors: [],
+        name: "Test Site",
     };
 
     const mockUseSiteReturn = {
+        // Add additional required properties based on what the hook actually returns
+        averageResponseTime: 150,
         checkCount: 100,
         filteredHistory: [],
         handleCardClick: vi.fn(),
@@ -77,13 +80,11 @@ describe("SiteCard Component", () => {
         isMonitoring: true,
         latestSite: mockSite,
         monitor: undefined,
+        monitorIds: ["monitor-1"],
         responseTime: 150,
         selectedMonitorId: "monitor-1",
         status: "up" as const,
         uptime: 99.5,
-        // Add additional required properties based on what the hook actually returns
-        averageResponseTime: 150,
-        monitorIds: ["monitor-1"],
     };
 
     beforeEach(() => {

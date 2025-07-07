@@ -3,10 +3,12 @@
  * Tests for edge cases and error scenarios in useSiteStats hook
  */
 
-import { describe, it, expect } from "vitest";
 import { renderHook } from "@testing-library/react";
-import { useSiteStats } from "../hooks/site/useSiteStats";
+import { describe, it, expect } from "vitest";
+
 import type { StatusHistory } from "../types";
+
+import { useSiteStats } from "../hooks/site/useSiteStats";
 
 describe("useSiteStats Edge Cases", () => {
     describe("Basic edge cases", () => {
@@ -37,8 +39,8 @@ describe("useSiteStats Edge Cases", () => {
             let proxyAccessCount = 0;
 
             const baseHistory: StatusHistory[] = [
-                { timestamp: 1640995200000, status: "up", responseTime: 100 },
-                { timestamp: 1640991600000, status: "up", responseTime: 200 },
+                { responseTime: 100, status: "up", timestamp: 1640995200000 },
+                { responseTime: 200, status: "up", timestamp: 1640991600000 },
             ];
 
             // Create a Proxy that intercepts responseTime access
@@ -70,8 +72,8 @@ describe("useSiteStats Edge Cases", () => {
         it("should handle Object.freeze edge case that could affect responseTime access", () => {
             // Test another potential edge case where responseTime access might be affected
             const history: StatusHistory[] = [
-                { timestamp: 1640995200000, status: "up", responseTime: 150 },
-                { timestamp: 1640991600000, status: "up", responseTime: 250 },
+                { responseTime: 150, status: "up", timestamp: 1640995200000 },
+                { responseTime: 250, status: "up", timestamp: 1640991600000 },
             ];
 
             // Freeze objects to test defensive programming
@@ -87,8 +89,8 @@ describe("useSiteStats Edge Cases", () => {
         it("should handle potential numeric edge cases during reduce", () => {
             // Test with very specific numeric values that might trigger edge cases
             const history: StatusHistory[] = [
-                { timestamp: 1640995200000, status: "up", responseTime: 1 },
-                { timestamp: 1640991600000, status: "up", responseTime: 1 },
+                { responseTime: 1, status: "up", timestamp: 1640995200000 },
+                { responseTime: 1, status: "up", timestamp: 1640991600000 },
             ];
 
             const { result } = renderHook(() => useSiteStats(history));
@@ -102,9 +104,9 @@ describe("useSiteStats Edge Cases", () => {
         it("should handle empty upRecordsWithResponseTime array correctly", () => {
             // Test when no records pass the filter (targets the ternary operator)
             const history: StatusHistory[] = [
-                { timestamp: 1640995200000, status: "down", responseTime: 100 },
-                { timestamp: 1640991600000, status: "up", responseTime: 0 }, // filtered out
-                { timestamp: 1640988000000, status: "up", responseTime: -1 }, // filtered out
+                { responseTime: 100, status: "down", timestamp: 1640995200000 },
+                { responseTime: 0, status: "up", timestamp: 1640991600000 }, // filtered out
+                { responseTime: -1, status: "up", timestamp: 1640988000000 }, // filtered out
             ];
 
             const { result } = renderHook(() => useSiteStats(history));
@@ -117,11 +119,11 @@ describe("useSiteStats Edge Cases", () => {
 
         it("should handle records with various status types for uptime calculation", () => {
             const history: StatusHistory[] = [
-                { timestamp: 1640995200000, status: "up", responseTime: 100 },
-                { timestamp: 1640991600000, status: "down", responseTime: 0 },
-                { timestamp: 1640988000000, status: "up", responseTime: 200 },
-                { timestamp: 1640984400000, status: "down", responseTime: 0 },
-                { timestamp: 1640980800000, status: "up", responseTime: 300 },
+                { responseTime: 100, status: "up", timestamp: 1640995200000 },
+                { responseTime: 0, status: "down", timestamp: 1640991600000 },
+                { responseTime: 200, status: "up", timestamp: 1640988000000 },
+                { responseTime: 0, status: "down", timestamp: 1640984400000 },
+                { responseTime: 300, status: "up", timestamp: 1640980800000 },
             ];
 
             const { result } = renderHook(() => useSiteStats(history));

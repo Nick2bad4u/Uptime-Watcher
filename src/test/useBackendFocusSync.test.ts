@@ -3,15 +3,16 @@
  * Basic tests for the hook functionality.
  */
 
-import { describe, expect, it, vi, beforeEach } from "vitest";
 import { renderHook } from "@testing-library/react";
+import { describe, expect, it, vi, beforeEach } from "vitest";
+
 import { useBackendFocusSync } from "../hooks/useBackendFocusSync";
 
 // Mock the stores
 vi.mock("../stores", () => ({
     useSitesStore: vi.fn(() => ({
-        sites: [],
         fullSyncFromBackend: vi.fn(),
+        sites: [],
     })),
 }));
 

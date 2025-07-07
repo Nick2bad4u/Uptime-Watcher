@@ -3,11 +3,13 @@
  * Comprehensive tests for form field components.
  */
 
-import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { SelectField, RadioGroup } from "../components/AddSiteForm/FormFields";
+import { describe, it, expect, vi } from "vitest";
+
 import type { SelectFieldProps, RadioGroupProps } from "../components/AddSiteForm/FormFields";
+
+import { SelectField, RadioGroup } from "../components/AddSiteForm/FormFields";
 
 // Mock the theme components
 vi.mock("../../theme/components", () => ({
@@ -21,12 +23,12 @@ describe("FormFields", () => {
         const defaultProps: SelectFieldProps = {
             id: "test-select",
             label: "Test Select",
-            value: "",
             onChange: vi.fn(),
             options: [
-                { value: "option1", label: "Option 1" },
-                { value: "option2", label: "Option 2" },
+                { label: "Option 1", value: "option1" },
+                { label: "Option 2", value: "option2" },
             ],
+            value: "",
         };
 
         it("should render select field with basic props", () => {
@@ -126,12 +128,12 @@ describe("FormFields", () => {
             id: "test-radio",
             label: "Test Radio",
             name: "test-radio-group",
-            value: "",
             onChange: vi.fn(),
             options: [
-                { value: "option1", label: "Option 1" },
-                { value: "option2", label: "Option 2" },
+                { label: "Option 1", value: "option1" },
+                { label: "Option 2", value: "option2" },
             ],
+            value: "",
         };
 
         it("should render radio group with basic props", () => {
@@ -182,27 +184,27 @@ describe("FormFields", () => {
             render(<RadioGroup {...defaultProps} disabled />);
 
             const radios = screen.getAllByRole("radio");
-            radios.forEach((radio) => {
+            for (const radio of radios) {
                 expect(radio).toBeDisabled();
-            });
+            }
         });
 
         it("should render as required", () => {
             render(<RadioGroup {...defaultProps} required />);
 
             const radios = screen.getAllByRole("radio");
-            radios.forEach((radio) => {
+            for (const radio of radios) {
                 expect(radio).toBeRequired();
-            });
+            }
         });
 
         it("should have proper name attribute", () => {
             render(<RadioGroup {...defaultProps} />);
 
             const radios = screen.getAllByRole("radio");
-            radios.forEach((radio) => {
+            for (const radio of radios) {
                 expect(radio).toHaveAttribute("name", "test-radio-group");
-            });
+            }
         });
 
         it("should handle multiple radio groups independently", () => {

@@ -2,16 +2,17 @@
  * Test suite for ErrorBoundary component
  */
 
-import React from "react";
-import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import React from "react";
+import { describe, expect, it, vi, beforeEach } from "vitest";
+
 import { ErrorBoundary, withErrorBoundary } from "../stores/error/ErrorBoundary";
 
 // Component that throws an error
 const ThrowError: React.FC<{ shouldThrow?: boolean; message?: string }> = ({
-    shouldThrow = true,
     message = "Test error",
+    shouldThrow = true,
 }) => {
     if (shouldThrow) {
         throw new Error(message);

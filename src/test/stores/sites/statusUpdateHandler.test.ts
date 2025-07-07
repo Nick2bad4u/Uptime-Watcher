@@ -4,12 +4,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Site, StatusUpdate } from "../../../types";
+
 import { StatusUpdateManager, createStatusUpdateHandler } from "../../../stores/sites/utils/statusUpdateHandler";
 
 // Mock the waitForElectronAPI utility
 vi.mock("../../../stores/utils", () => ({
-    waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
     logStoreAction: vi.fn(),
+    waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
 }));
 
 // Mock the electron window API
@@ -100,29 +101,29 @@ describe("StatusUpdateHandler", () => {
             mockSites = [
                 {
                     identifier: "site1",
-                    name: "Test Site 1",
                     monitors: [
                         {
-                            id: "monitor1",
-                            type: "http",
-                            status: "up",
-                            monitoring: true,
                             history: [],
+                            id: "monitor1",
+                            monitoring: true,
+                            status: "up",
+                            type: "http",
                         },
                     ],
+                    name: "Test Site 1",
                 },
                 {
                     identifier: "site2",
-                    name: "Test Site 2",
                     monitors: [
                         {
-                            id: "monitor2",
-                            type: "http",
-                            status: "down",
-                            monitoring: true,
                             history: [],
+                            id: "monitor2",
+                            monitoring: true,
+                            status: "down",
+                            type: "http",
                         },
                     ],
+                    name: "Test Site 2",
                 },
             ];
 
@@ -134,10 +135,10 @@ describe("StatusUpdateHandler", () => {
 
         it("should create a handler function", () => {
             const handler = createStatusUpdateHandler({
-                getSites: mockGetSites,
-                setSites: mockSetSites,
                 fullSyncFromBackend: mockFullSyncFromBackend,
+                getSites: mockGetSites,
                 onUpdate: mockOnUpdate,
+                setSites: mockSetSites,
             });
 
             expect(typeof handler).toBe("function");
@@ -145,10 +146,10 @@ describe("StatusUpdateHandler", () => {
 
         it("should handle status updates for existing sites", async () => {
             const handler = createStatusUpdateHandler({
-                getSites: mockGetSites,
-                setSites: mockSetSites,
                 fullSyncFromBackend: mockFullSyncFromBackend,
+                getSites: mockGetSites,
                 onUpdate: mockOnUpdate,
+                setSites: mockSetSites,
             });
 
             const updatedSite: Site = {
@@ -162,8 +163,8 @@ describe("StatusUpdateHandler", () => {
             };
 
             const statusUpdate: StatusUpdate = {
-                site: updatedSite,
                 previousStatus: "up",
+                site: updatedSite,
             };
 
             await handler(statusUpdate);
@@ -175,21 +176,21 @@ describe("StatusUpdateHandler", () => {
 
         it("should trigger full sync for unknown sites", async () => {
             const handler = createStatusUpdateHandler({
-                getSites: mockGetSites,
-                setSites: mockSetSites,
                 fullSyncFromBackend: mockFullSyncFromBackend,
+                getSites: mockGetSites,
                 onUpdate: mockOnUpdate,
+                setSites: mockSetSites,
             });
 
             const unknownSite: Site = {
                 identifier: "unknown-site",
-                name: "Unknown Site",
                 monitors: [],
+                name: "Unknown Site",
             };
 
             const statusUpdate: StatusUpdate = {
-                site: unknownSite,
                 previousStatus: "down",
+                site: unknownSite,
             };
 
             await handler(statusUpdate);
@@ -201,10 +202,10 @@ describe("StatusUpdateHandler", () => {
 
         it("should handle updates with missing optional properties", async () => {
             const handler = createStatusUpdateHandler({
-                getSites: mockGetSites,
-                setSites: mockSetSites,
                 fullSyncFromBackend: mockFullSyncFromBackend,
+                getSites: mockGetSites,
                 onUpdate: mockOnUpdate,
+                setSites: mockSetSites,
             });
 
             const statusUpdate: StatusUpdate = {
@@ -222,10 +223,10 @@ describe("StatusUpdateHandler", () => {
             const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
             const handler = createStatusUpdateHandler({
-                getSites: mockGetSites,
-                setSites: mockSetSites,
                 fullSyncFromBackend: mockFullSyncFromBackend,
+                getSites: mockGetSites,
                 onUpdate: mockOnUpdate,
+                setSites: mockSetSites,
             });
 
             mockSetSites.mockImplementationOnce(() => {
@@ -248,10 +249,10 @@ describe("StatusUpdateHandler", () => {
             mockGetSites.mockReturnValue([]);
 
             const handler = createStatusUpdateHandler({
-                getSites: mockGetSites,
-                setSites: mockSetSites,
                 fullSyncFromBackend: mockFullSyncFromBackend,
+                getSites: mockGetSites,
                 onUpdate: mockOnUpdate,
+                setSites: mockSetSites,
             });
 
             const statusUpdate: StatusUpdate = {
@@ -270,10 +271,10 @@ describe("StatusUpdateHandler", () => {
             const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
             const handler = createStatusUpdateHandler({
-                getSites: mockGetSites,
-                setSites: mockSetSites,
                 fullSyncFromBackend: mockFullSyncFromBackend,
+                getSites: mockGetSites,
                 onUpdate: mockOnUpdate,
+                setSites: mockSetSites,
             });
 
             const statusUpdate = {

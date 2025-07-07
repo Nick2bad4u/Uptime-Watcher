@@ -5,7 +5,9 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
+
 import type { Site, MonitorType } from "../../../types";
+
 import { createSiteSyncActions, type SiteSyncDependencies } from "../../../stores/sites/useSiteSync";
 
 // Mock dependencies
@@ -34,17 +36,17 @@ vi.mock("../../../stores/utils", () => ({
 }));
 
 vi.mock("../../../stores/sites/utils", () => ({
+    createStatusUpdateHandler: vi.fn(),
     StatusUpdateManager: vi.fn().mockImplementation(() => ({
         subscribe: vi.fn().mockResolvedValue(undefined),
         unsubscribe: vi.fn(),
     })),
-    createStatusUpdateHandler: vi.fn(),
 }));
 
 // Import mocked services
 import { SiteService } from "../../../stores/sites/services";
-import { logStoreAction } from "../../../stores/utils";
 import { createStatusUpdateHandler } from "../../../stores/sites/utils";
+import { logStoreAction } from "../../../stores/utils";
 
 describe("useSiteSync", () => {
     let mockDependencies: SiteSyncDependencies;
@@ -53,17 +55,17 @@ describe("useSiteSync", () => {
     // Mock data
     const mockSite: Site = {
         identifier: "example.com",
-        name: "Example Site",
         monitors: [
             {
-                id: "monitor-1",
-                type: "http" as MonitorType,
-                status: "up" as const,
-                monitoring: true,
                 history: [],
+                id: "monitor-1",
+                monitoring: true,
+                status: "up" as const,
+                type: "http" as MonitorType,
                 url: "https://example.com",
             },
         ],
+        name: "Example Site",
     };
 
     beforeEach(() => {

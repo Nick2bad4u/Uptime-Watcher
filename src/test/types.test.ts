@@ -19,10 +19,10 @@ describe("Type Definitions", () => {
                 "error",
             ];
 
-            validStatuses.forEach((status) => {
+            for (const status of validStatuses) {
                 const testStatus: UpdateStatus = status;
                 expect(testStatus).toBe(status);
-            });
+            }
         });
     });
 
@@ -30,27 +30,27 @@ describe("Type Definitions", () => {
         it("should allow valid monitor types", () => {
             const validTypes: MonitorType[] = ["http", "port"];
 
-            validTypes.forEach((type) => {
+            for (const type of validTypes) {
                 const testType: MonitorType = type;
                 expect(testType).toBe(type);
-            });
+            }
         });
     });
 
     describe("Monitor interface", () => {
         it("should validate a complete HTTP monitor object", () => {
             const httpMonitor: Monitor = {
-                id: "test-id",
-                type: "http",
-                status: "up",
-                url: "https://example.com",
-                responseTime: 100,
-                lastChecked: new Date(),
-                history: [],
-                monitoring: true,
                 checkInterval: 300000,
-                timeout: 10000,
+                history: [],
+                id: "test-id",
+                lastChecked: new Date(),
+                monitoring: true,
+                responseTime: 100,
                 retryAttempts: 3,
+                status: "up",
+                timeout: 10000,
+                type: "http",
+                url: "https://example.com",
             };
 
             expect(httpMonitor.id).toBe("test-id");
@@ -62,15 +62,15 @@ describe("Type Definitions", () => {
 
         it("should validate a complete port monitor object", () => {
             const portMonitor: Monitor = {
-                id: "port-test-id",
-                type: "port",
-                status: "down",
+                history: [],
                 host: "example.com",
+                id: "port-test-id",
+                lastChecked: new Date(),
+                monitoring: false,
                 port: 80,
                 responseTime: 500,
-                lastChecked: new Date(),
-                history: [],
-                monitoring: false,
+                status: "down",
+                type: "port",
             };
 
             expect(portMonitor.id).toBe("port-test-id");
@@ -81,10 +81,10 @@ describe("Type Definitions", () => {
 
         it("should validate minimal monitor object", () => {
             const minimalMonitor: Monitor = {
-                id: "minimal-id",
-                type: "http",
-                status: "pending",
                 history: [],
+                id: "minimal-id",
+                status: "pending",
+                type: "http",
             };
 
             expect(minimalMonitor.id).toBe("minimal-id");
@@ -94,15 +94,15 @@ describe("Type Definitions", () => {
         it("should validate monitor status values", () => {
             const statuses = ["up", "down", "pending"] as const;
 
-            statuses.forEach((status) => {
+            for (const status of statuses) {
                 const monitor: Monitor = {
-                    id: "test",
-                    type: "http",
-                    status: status,
                     history: [],
+                    id: "test",
+                    status: status,
+                    type: "http",
                 };
                 expect(monitor.status).toBe(status);
-            });
+            }
         });
     });
 
@@ -110,17 +110,17 @@ describe("Type Definitions", () => {
         it("should validate a complete site object", () => {
             const site: Site = {
                 identifier: "site-uuid",
-                name: "Test Site",
+                monitoring: true,
                 monitors: [
                     {
-                        id: "monitor-1",
-                        type: "http",
-                        status: "up",
-                        url: "https://test.com",
                         history: [],
+                        id: "monitor-1",
+                        status: "up",
+                        type: "http",
+                        url: "https://test.com",
                     },
                 ],
-                monitoring: true,
+                name: "Test Site",
             };
 
             expect(site.identifier).toBe("site-uuid");
@@ -143,8 +143,8 @@ describe("Type Definitions", () => {
             const site: Site = {
                 identifier: "multi-monitor-site",
                 monitors: [
-                    { id: "1", type: "http", status: "up", history: [] },
-                    { id: "2", type: "port", status: "down", history: [] },
+                    { history: [], id: "1", status: "up", type: "http" },
+                    { history: [], id: "2", status: "down", type: "port" },
                 ],
             };
 
@@ -157,9 +157,9 @@ describe("Type Definitions", () => {
     describe("StatusHistory interface", () => {
         it("should validate status history object", () => {
             const history: StatusHistory = {
-                timestamp: Date.now(),
-                status: "up",
                 responseTime: 250,
+                status: "up",
+                timestamp: Date.now(),
             };
 
             expect(typeof history.timestamp).toBe("number");
@@ -170,14 +170,14 @@ describe("Type Definitions", () => {
         it("should validate status history status values", () => {
             const statuses = ["up", "down"] as const;
 
-            statuses.forEach((status) => {
+            for (const status of statuses) {
                 const history: StatusHistory = {
-                    timestamp: Date.now(),
-                    status: status,
                     responseTime: 100,
+                    status: status,
+                    timestamp: Date.now(),
                 };
                 expect(history.status).toBe(status);
-            });
+            }
         });
     });
 
@@ -189,8 +189,8 @@ describe("Type Definitions", () => {
             };
 
             const statusUpdate: StatusUpdate = {
-                site: site,
                 previousStatus: "down",
+                site: site,
             };
 
             expect(statusUpdate.site).toBe(site);
@@ -216,21 +216,21 @@ describe("Type Definitions", () => {
         it("should ensure monitor types are consistent with their properties", () => {
             // HTTP monitor should have URL
             const httpMonitor: Monitor = {
-                id: "http-test",
-                type: "http",
-                status: "up",
-                url: "https://example.com",
                 history: [],
+                id: "http-test",
+                status: "up",
+                type: "http",
+                url: "https://example.com",
             };
 
             // Port monitor should have host and port
             const portMonitor: Monitor = {
-                id: "port-test",
-                type: "port",
-                status: "up",
-                host: "example.com",
-                port: 443,
                 history: [],
+                host: "example.com",
+                id: "port-test",
+                port: 443,
+                status: "up",
+                type: "port",
             };
 
             expect(httpMonitor.type).toBe("http");
@@ -245,10 +245,10 @@ describe("Type Definitions", () => {
                 identifier: "relationship-test",
                 monitors: [
                     {
-                        id: "child-monitor",
-                        type: "http",
-                        status: "up",
                         history: [],
+                        id: "child-monitor",
+                        status: "up",
+                        type: "http",
                     },
                 ],
             };
@@ -260,12 +260,12 @@ describe("Type Definitions", () => {
         it("should ensure status update contains valid site", () => {
             const site: Site = {
                 identifier: "status-update-site",
-                monitors: [{ id: "monitor", type: "http", status: "up", history: [] }],
+                monitors: [{ history: [], id: "monitor", status: "up", type: "http" }],
             };
 
             const update: StatusUpdate = {
-                site: site,
                 previousStatus: "down",
+                site: site,
             };
 
             expect(update.site.identifier).toBe("status-update-site");
@@ -276,9 +276,9 @@ describe("Type Definitions", () => {
     describe("Type Safety", () => {
         it("should validate timestamp as number in StatusHistory", () => {
             const history: StatusHistory = {
-                timestamp: 1640995200000,
-                status: "up",
                 responseTime: 100,
+                status: "up",
+                timestamp: 1640995200000,
             };
 
             expect(typeof history.timestamp).toBe("number");
@@ -287,10 +287,10 @@ describe("Type Definitions", () => {
 
         it("should handle optional properties correctly", () => {
             const monitor: Monitor = {
-                id: "optional-test",
-                type: "http",
-                status: "pending",
                 history: [],
+                id: "optional-test",
+                status: "pending",
+                type: "http",
                 // Optional properties not set
             };
 

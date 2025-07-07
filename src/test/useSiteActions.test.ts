@@ -18,8 +18,8 @@ Object.defineProperty(window, "electronAPI", {
             stopMonitoringForSite: vi.fn(),
         },
         sites: {
-            getSites: vi.fn().mockResolvedValue([]),
             checkSiteNow: vi.fn().mockResolvedValue(undefined),
+            getSites: vi.fn().mockResolvedValue([]),
         },
     },
     writable: true,
@@ -29,11 +29,11 @@ Object.defineProperty(window, "electronAPI", {
 vi.mock("../services/logger", () => ({
     default: {
         error: vi.fn(),
-        user: {
-            action: vi.fn(),
-        },
         site: {
             error: vi.fn(),
+        },
+        user: {
+            action: vi.fn(),
         },
     },
 }));
@@ -59,34 +59,34 @@ vi.mock("../stores", () => ({
 describe("useSiteActions", () => {
     const mockSite: Site = {
         identifier: "test-site-id",
-        name: "Test Site",
-        monitors: [],
         monitoring: true,
+        monitors: [],
+        name: "Test Site",
     };
 
     const mockHttpMonitor: Monitor = {
+        checkInterval: 60000,
+        history: [],
         id: "monitor-1",
+        lastChecked: new Date(),
+        monitoring: true,
+        responseTime: 150,
+        status: "up",
         type: "http",
         url: "https://example.com",
-        status: "up",
-        responseTime: 150,
-        lastChecked: new Date(),
-        history: [],
-        monitoring: true,
-        checkInterval: 60000,
     };
 
     const mockPortMonitor: Monitor = {
-        id: "monitor-2",
-        type: "port",
-        host: "example.com",
-        port: 8080,
-        status: "down",
-        responseTime: 200,
-        lastChecked: new Date(),
-        history: [],
-        monitoring: false,
         checkInterval: 30000,
+        history: [],
+        host: "example.com",
+        id: "monitor-2",
+        lastChecked: new Date(),
+        monitoring: false,
+        port: 8080,
+        responseTime: 200,
+        status: "down",
+        type: "port",
     };
 
     beforeEach(() => {
@@ -124,8 +124,8 @@ describe("useSiteActions", () => {
         it("should work with site without name", () => {
             const siteWithoutName: Site = {
                 identifier: "test-site-id",
-                monitors: [],
                 monitoring: true,
+                monitors: [],
             };
 
             const { result } = renderHook(() => useSiteActions(siteWithoutName, mockHttpMonitor));
@@ -191,8 +191,8 @@ describe("useSiteActions", () => {
         it("should handle site without name when monitor is undefined", () => {
             const siteWithoutName: Site = {
                 identifier: "test-site-id",
-                monitors: [],
                 monitoring: true,
+                monitors: [],
             };
 
             const { result } = renderHook(() => useSiteActions(siteWithoutName, undefined));
@@ -294,8 +294,8 @@ describe("useSiteActions", () => {
         it("should handle site without name when monitor is undefined", () => {
             const siteWithoutName: Site = {
                 identifier: "test-site-id",
-                monitors: [],
                 monitoring: true,
+                monitors: [],
             };
 
             const { result } = renderHook(() => useSiteActions(siteWithoutName, undefined));
@@ -406,8 +406,8 @@ describe("useSiteActions", () => {
         it("should handle site without name when monitor is undefined", () => {
             const siteWithoutName: Site = {
                 identifier: "test-site-id",
-                monitors: [],
                 monitoring: true,
+                monitors: [],
             };
 
             const { result } = renderHook(() => useSiteActions(siteWithoutName, undefined));
@@ -526,8 +526,8 @@ describe("useSiteActions", () => {
         it("should handle card click with site without name", () => {
             const siteWithoutName: Site = {
                 identifier: "test-site-id",
-                monitors: [],
                 monitoring: true,
+                monitors: [],
             };
 
             const { result } = renderHook(() => useSiteActions(siteWithoutName, mockHttpMonitor));
@@ -551,14 +551,14 @@ describe("useSiteActions", () => {
 
     describe("Callback Stability", () => {
         it("should have stable callback references when dependencies don't change", () => {
-            const { result, rerender } = renderHook(({ site, monitor }) => useSiteActions(site, monitor), {
-                initialProps: { site: mockSite, monitor: mockHttpMonitor },
+            const { rerender, result } = renderHook(({ monitor, site }) => useSiteActions(site, monitor), {
+                initialProps: { monitor: mockHttpMonitor, site: mockSite },
             });
 
             const firstRender = result.current;
 
             // Rerender with same props
-            rerender({ site: mockSite, monitor: mockHttpMonitor });
+            rerender({ monitor: mockHttpMonitor, site: mockSite });
 
             const secondRender = result.current;
 
@@ -569,21 +569,21 @@ describe("useSiteActions", () => {
         });
 
         it("should update callbacks when site changes", () => {
-            const { result, rerender } = renderHook(({ site, monitor }) => useSiteActions(site, monitor), {
-                initialProps: { site: mockSite, monitor: mockHttpMonitor },
+            const { rerender, result } = renderHook(({ monitor, site }) => useSiteActions(site, monitor), {
+                initialProps: { monitor: mockHttpMonitor, site: mockSite },
             });
 
             const firstRender = result.current;
 
             const newSite: Site = {
                 identifier: "new-site-id",
-                name: "New Site",
-                monitors: [],
                 monitoring: true,
+                monitors: [],
+                name: "New Site",
             };
 
             // Rerender with different site
-            rerender({ site: newSite, monitor: mockHttpMonitor });
+            rerender({ monitor: mockHttpMonitor, site: newSite });
 
             const secondRender = result.current;
 
@@ -594,14 +594,14 @@ describe("useSiteActions", () => {
         });
 
         it("should update callbacks when monitor changes", () => {
-            const { result, rerender } = renderHook(({ site, monitor }) => useSiteActions(site, monitor), {
-                initialProps: { site: mockSite, monitor: mockHttpMonitor },
+            const { rerender, result } = renderHook(({ monitor, site }) => useSiteActions(site, monitor), {
+                initialProps: { monitor: mockHttpMonitor, site: mockSite },
             });
 
             const firstRender = result.current;
 
             // Rerender with different monitor
-            rerender({ site: mockSite, monitor: mockPortMonitor });
+            rerender({ monitor: mockPortMonitor, site: mockSite });
 
             const secondRender = result.current;
 

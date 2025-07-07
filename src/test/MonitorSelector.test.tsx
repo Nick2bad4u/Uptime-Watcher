@@ -2,23 +2,24 @@
  * @vitest-environment jsdom
  */
 
-import React from "react";
-import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import React from "react";
+import { describe, expect, it, vi, beforeEach } from "vitest";
+
+import type { Monitor } from "../types";
 
 import { MonitorSelector } from "../components/Dashboard/SiteCard/components/MonitorSelector";
-import type { Monitor } from "../types";
 
 // Mock ThemedSelect component
 vi.mock("../theme/components", () => ({
     ThemedSelect: ({
         children,
+        className,
         onChange,
         onClick,
         onMouseDown,
         value,
-        className,
         ...props
     }: {
         children: React.ReactNode;
@@ -47,45 +48,45 @@ describe("MonitorSelector", () => {
     const mockOnChange = vi.fn();
 
     const mockHttpMonitor: Monitor = {
+        checkInterval: 60000,
+        history: [],
         id: "http-monitor",
+        monitoring: true,
+        retryAttempts: 3,
+        status: "up",
+        timeout: 30000,
         type: "http",
         url: "https://example.com",
-        status: "up",
-        history: [],
-        monitoring: true,
-        checkInterval: 60000,
-        timeout: 30000,
-        retryAttempts: 3,
     };
 
     const mockPortMonitor: Monitor = {
-        id: "port-monitor",
-        type: "port",
-        host: "example.com",
-        port: 8080,
-        status: "up",
-        history: [],
-        monitoring: true,
         checkInterval: 60000,
-        timeout: 30000,
+        history: [],
+        host: "example.com",
+        id: "port-monitor",
+        monitoring: true,
+        port: 8080,
         retryAttempts: 3,
+        status: "up",
+        timeout: 30000,
+        type: "port",
     };
 
     const mockMinimalMonitor: Monitor = {
-        id: "minimal-monitor",
-        type: "http",
-        status: "up",
-        history: [],
-        monitoring: true,
         checkInterval: 60000,
-        timeout: 30000,
+        history: [],
+        id: "minimal-monitor",
+        monitoring: true,
         retryAttempts: 3,
+        status: "up",
+        timeout: 30000,
+        type: "http",
     };
 
     const defaultProps = {
         monitors: [mockHttpMonitor, mockPortMonitor],
-        selectedMonitorId: "http-monitor",
         onChange: mockOnChange,
+        selectedMonitorId: "http-monitor",
     };
 
     beforeEach(() => {
@@ -179,16 +180,16 @@ describe("MonitorSelector", () => {
 
         it("should format different monitor types correctly", () => {
             const portTypeMonitor: Monitor = {
-                id: "port-only-monitor",
-                type: "port",
-                host: "localhost",
-                port: 3000,
-                status: "up",
-                history: [],
-                monitoring: true,
                 checkInterval: 60000,
-                timeout: 30000,
+                history: [],
+                host: "localhost",
+                id: "port-only-monitor",
+                monitoring: true,
+                port: 3000,
                 retryAttempts: 3,
+                status: "up",
+                timeout: 30000,
+                type: "port",
             };
 
             const propsWithPortOnly = {
@@ -353,15 +354,15 @@ describe("MonitorSelector", () => {
             const { rerender } = render(<MonitorSelector {...defaultProps} />);
 
             const newMonitor: Monitor = {
+                checkInterval: 60000,
+                history: [],
                 id: "new-monitor",
+                monitoring: true,
+                retryAttempts: 3,
+                status: "up",
+                timeout: 30000,
                 type: "http",
                 url: "https://newsite.com",
-                status: "up",
-                history: [],
-                monitoring: true,
-                checkInterval: 60000,
-                timeout: 30000,
-                retryAttempts: 3,
             };
 
             const newProps = {

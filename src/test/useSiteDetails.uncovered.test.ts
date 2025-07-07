@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Test suite for uncovered lines in useSiteDetails hook
  * Targeting specific uncovered lines: 141-155, 164-170, 176-187, 192-201, 205-214, 220-222, 250
@@ -7,8 +6,10 @@
 
 import { renderHook, act } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
-import { useSiteDetails } from "../hooks/site/useSiteDetails";
+
 import type { Site, Monitor } from "../types";
+
+import { useSiteDetails } from "../hooks/site/useSiteDetails";
 
 // Mock all dependencies
 vi.mock("../stores", () => ({
@@ -20,27 +21,27 @@ vi.mock("../stores", () => ({
 vi.mock("../hooks/site/useSiteAnalytics", () => ({
     useSiteAnalytics: vi.fn(() => ({
         data: null,
-        loading: false,
         error: null,
+        loading: false,
     })),
 }));
 
 vi.mock("../services/logger", () => ({
     default: {
-        user: {
-            action: vi.fn(),
-        },
+        error: vi.fn(),
         site: {
             error: vi.fn(),
             removed: vi.fn(),
         },
-        error: vi.fn(),
+        user: {
+            action: vi.fn(),
+        },
     },
 }));
 
+import logger from "../services/logger";
 // Import the mocked modules after setting up the mocks
 import { useErrorStore, useSitesStore, useUIStore } from "../stores";
-import logger from "../services/logger";
 
 // Create mock global confirm
 const mockConfirm = vi.fn();
@@ -52,31 +53,31 @@ Object.defineProperty(global, "confirm", {
 describe("useSiteDetails uncovered lines", () => {
     const mockSite: Site = {
         identifier: "test-site-id",
-        name: "Test Site",
         monitors: [
             {
+                checkInterval: 30000,
+                history: [],
                 id: "monitor-1",
+                monitoring: true,
+                retryAttempts: 3,
+                status: "up",
+                timeout: 5000,
                 type: "http",
                 url: "https://test.com",
-                status: "up",
-                checkInterval: 30000,
-                timeout: 5000,
-                retryAttempts: 3,
-                monitoring: true,
-                history: [],
             } as Monitor,
             {
+                checkInterval: 60000,
+                history: [],
                 id: "monitor-2",
+                monitoring: false,
+                retryAttempts: 1,
+                status: "down",
+                timeout: 10000,
                 type: "port",
                 url: "https://test2.com",
-                status: "down",
-                checkInterval: 60000,
-                timeout: 10000,
-                retryAttempts: 1,
-                monitoring: false,
-                history: [],
             } as Monitor,
         ],
+        name: "Test Site",
     };
 
     // Mock store functions
@@ -100,26 +101,26 @@ describe("useSiteDetails uncovered lines", () => {
         });
 
         (useSitesStore as any).mockReturnValue({
-            sites: [mockSite],
             checkSiteNow: mockCheckSiteNow,
             deleteSite: mockDeleteSite,
-            startSiteMonitorMonitoring: mockStartSiteMonitorMonitoring,
-            stopSiteMonitorMonitoring: mockStopSiteMonitorMonitoring,
-            setSelectedMonitorId: mockSetSelectedMonitorId,
             getSelectedMonitorId: mockGetSelectedMonitorId,
             modifySite: vi.fn(),
-            updateSiteCheckInterval: vi.fn(),
-            updateMonitorTimeout: vi.fn(),
+            setSelectedMonitorId: mockSetSelectedMonitorId,
+            sites: [mockSite],
+            startSiteMonitorMonitoring: mockStartSiteMonitorMonitoring,
+            stopSiteMonitorMonitoring: mockStopSiteMonitorMonitoring,
             updateMonitorRetryAttempts: vi.fn(),
+            updateMonitorTimeout: vi.fn(),
+            updateSiteCheckInterval: vi.fn(),
         });
 
         (useUIStore as any).mockReturnValue({
             activeSiteDetailsTab: "overview",
             setActiveSiteDetailsTab: mockSetActiveSiteDetailsTab,
-            siteDetailsChartTimeRange: "24h",
+            setShowAdvancedMetrics: vi.fn(),
             setSiteDetailsChartTimeRange: vi.fn(),
             showAdvancedMetrics: false,
-            setShowAdvancedMetrics: vi.fn(),
+            siteDetailsChartTimeRange: "24h",
         });
     });
 
@@ -191,10 +192,10 @@ describe("useSiteDetails uncovered lines", () => {
             (useUIStore as any).mockReturnValue({
                 activeSiteDetailsTab: "monitor-2-analytics",
                 setActiveSiteDetailsTab: mockSetActiveSiteDetailsTab,
-                siteDetailsChartTimeRange: "24h",
+                setShowAdvancedMetrics: vi.fn(),
                 setSiteDetailsChartTimeRange: vi.fn(),
                 showAdvancedMetrics: false,
-                setShowAdvancedMetrics: vi.fn(),
+                siteDetailsChartTimeRange: "24h",
             });
 
             const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
@@ -251,17 +252,17 @@ describe("useSiteDetails uncovered lines", () => {
 
             // Mock store to return the site without name
             (useSitesStore as any).mockReturnValue({
-                sites: [siteWithoutName],
                 checkSiteNow: mockCheckSiteNow,
                 deleteSite: mockDeleteSite,
-                startSiteMonitorMonitoring: mockStartSiteMonitorMonitoring,
-                stopSiteMonitorMonitoring: mockStopSiteMonitorMonitoring,
-                setSelectedMonitorId: mockSetSelectedMonitorId,
                 getSelectedMonitorId: mockGetSelectedMonitorId,
                 modifySite: vi.fn(),
-                updateSiteCheckInterval: vi.fn(),
-                updateMonitorTimeout: vi.fn(),
+                setSelectedMonitorId: mockSetSelectedMonitorId,
+                sites: [siteWithoutName],
+                startSiteMonitorMonitoring: mockStartSiteMonitorMonitoring,
+                stopSiteMonitorMonitoring: mockStopSiteMonitorMonitoring,
                 updateMonitorRetryAttempts: vi.fn(),
+                updateMonitorTimeout: vi.fn(),
+                updateSiteCheckInterval: vi.fn(),
             });
 
             const { result } = renderHook(() => useSiteDetails({ site: siteWithoutName }));
@@ -450,17 +451,17 @@ describe("useSiteDetails uncovered lines", () => {
 
             // Mock store to return the site with undefined timeout
             (useSitesStore as any).mockReturnValue({
-                sites: [siteWithUndefinedTimeout],
                 checkSiteNow: mockCheckSiteNow,
                 deleteSite: mockDeleteSite,
-                startSiteMonitorMonitoring: mockStartSiteMonitorMonitoring,
-                stopSiteMonitorMonitoring: mockStopSiteMonitorMonitoring,
-                setSelectedMonitorId: mockSetSelectedMonitorId,
                 getSelectedMonitorId: mockGetSelectedMonitorId,
                 modifySite: vi.fn(),
-                updateSiteCheckInterval: vi.fn(),
-                updateMonitorTimeout: vi.fn(),
+                setSelectedMonitorId: mockSetSelectedMonitorId,
+                sites: [siteWithUndefinedTimeout],
+                startSiteMonitorMonitoring: mockStartSiteMonitorMonitoring,
+                stopSiteMonitorMonitoring: mockStopSiteMonitorMonitoring,
                 updateMonitorRetryAttempts: vi.fn(),
+                updateMonitorTimeout: vi.fn(),
+                updateSiteCheckInterval: vi.fn(),
             });
 
             const { result } = renderHook(() => useSiteDetails({ site: siteWithUndefinedTimeout }));
@@ -481,17 +482,17 @@ describe("useSiteDetails uncovered lines", () => {
         it("should handle site not found in sites array", () => {
             // Mock empty sites array
             (useSitesStore as any).mockReturnValue({
-                sites: [], // No sites
                 checkSiteNow: mockCheckSiteNow,
                 deleteSite: mockDeleteSite,
-                startSiteMonitorMonitoring: mockStartSiteMonitorMonitoring,
-                stopSiteMonitorMonitoring: mockStopSiteMonitorMonitoring,
-                setSelectedMonitorId: mockSetSelectedMonitorId,
                 getSelectedMonitorId: mockGetSelectedMonitorId,
                 modifySite: vi.fn(),
-                updateSiteCheckInterval: vi.fn(),
-                updateMonitorTimeout: vi.fn(),
+                setSelectedMonitorId: mockSetSelectedMonitorId,
+                sites: [], // No sites
+                startSiteMonitorMonitoring: mockStartSiteMonitorMonitoring,
+                stopSiteMonitorMonitoring: mockStopSiteMonitorMonitoring,
                 updateMonitorRetryAttempts: vi.fn(),
+                updateMonitorTimeout: vi.fn(),
+                updateSiteCheckInterval: vi.fn(),
             });
 
             const { result } = renderHook(() => useSiteDetails({ site: mockSite }));

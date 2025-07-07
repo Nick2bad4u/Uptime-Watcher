@@ -2,11 +2,10 @@
  * @vitest-environment jsdom
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+
 import { Header } from "../components/Header/Header";
 import { useSitesStore, useUIStore } from "../stores";
 import { useTheme, useAvailabilityColors } from "../theme/useTheme";
@@ -19,33 +18,12 @@ vi.mock("../stores", () => ({
 
 // Mock the theme hooks
 vi.mock("../theme/useTheme", () => ({
-    useTheme: vi.fn(),
     useAvailabilityColors: vi.fn(),
+    useTheme: vi.fn(),
 }));
 
 // Mock the themed components
 vi.mock("../theme/components", () => ({
-    ThemedBox: ({ children, border, ...props }: any) => {
-        const filteredProps = { ...props };
-        // Remove non-DOM props
-        delete filteredProps.border;
-        if (border !== undefined) filteredProps["data-border"] = border.toString();
-        return (
-            <div data-testid="themed-box" {...filteredProps}>
-                {children}
-            </div>
-        );
-    },
-    ThemedText: ({ children, ...props }: any) => (
-        <span data-testid="themed-text" {...props}>
-            {children}
-        </span>
-    ),
-    ThemedButton: ({ children, onClick, ...props }: any) => (
-        <button data-testid="themed-button" onClick={onClick} {...props}>
-            {children}
-        </button>
-    ),
     StatusIndicator: ({ status, ...props }: any) => {
         let icon = "🟡";
         if (status === "up") {
@@ -59,6 +37,27 @@ vi.mock("../theme/components", () => ({
             </div>
         );
     },
+    ThemedBox: ({ border, children, ...props }: any) => {
+        const filteredProps = { ...props };
+        // Remove non-DOM props
+        delete filteredProps.border;
+        if (border !== undefined) filteredProps["data-border"] = border.toString();
+        return (
+            <div data-testid="themed-box" {...filteredProps}>
+                {children}
+            </div>
+        );
+    },
+    ThemedButton: ({ children, onClick, ...props }: any) => (
+        <button data-testid="themed-button" onClick={onClick} {...props}>
+            {children}
+        </button>
+    ),
+    ThemedText: ({ children, ...props }: any) => (
+        <span data-testid="themed-text" {...props}>
+            {children}
+        </span>
+    ),
 }));
 
 // Mock CSS imports
@@ -72,20 +71,20 @@ describe("Header", () => {
     const mockSites = [
         {
             identifier: "site-1",
-            name: "Test Site 1",
             monitors: [
                 { id: "monitor-1", status: "up" },
                 { id: "monitor-2", status: "up" },
                 { id: "monitor-3", status: "down" },
             ],
+            name: "Test Site 1",
         },
         {
             identifier: "site-2",
-            name: "Test Site 2",
             monitors: [
                 { id: "monitor-4", status: "pending" },
                 { id: "monitor-5", status: "up" },
             ],
+            name: "Test Site 2",
         },
     ];
 
@@ -230,7 +229,7 @@ describe("Header", () => {
 
     it("should handle sites without monitors", () => {
         (useSitesStore as any).mockReturnValue({
-            sites: [{ identifier: "site-1", name: "Test Site", monitors: undefined }],
+            sites: [{ identifier: "site-1", monitors: undefined, name: "Test Site" }],
         });
 
         (useUIStore as any).mockReturnValue({

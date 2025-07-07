@@ -49,11 +49,11 @@ describe("Settings Component - Coverage Tests", () => {
     it("should test all allowed settings keys", () => {
         const allowedKeys = ["notifications", "autoStart", "minimizeToTray", "theme", "soundAlerts", "historyLimit"];
 
-        allowedKeys.forEach((key) => {
+        for (const key of allowedKeys) {
             if (!allowedKeys.includes(key)) {
                 logger.warn("Attempted to update invalid settings key", key);
             }
-        });
+        }
 
         // Verify no warnings were logged for valid keys
         expect(logger.warn).not.toHaveBeenCalled();

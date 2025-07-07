@@ -134,7 +134,7 @@ describe("StatusBadge - Simple Tests", () => {
 
     describe("Memoization", () => {
         it("renders consistently with same props", () => {
-            const props = { label: "Website", status: "up" as const, size: "base" as const };
+            const props = { label: "Website", size: "base" as const, status: "up" as const };
             const { container: container1 } = render(<StatusBadge {...props} />);
             const { container: container2 } = render(<StatusBadge {...props} />);
 

@@ -7,44 +7,44 @@ import { renderHook } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 import { useSite } from "../hooks/site/useSite";
+import { useSiteActions } from "../hooks/site/useSiteActions";
 import { useSiteMonitor } from "../hooks/site/useSiteMonitor";
 import { useSiteStats } from "../hooks/site/useSiteStats";
-import { useSiteActions } from "../hooks/site/useSiteActions";
 import { useErrorStore } from "../stores";
 import { Site, Monitor } from "../types";
 
 // Mock all the sub-hooks
 const mockSiteMonitorResult = {
     filteredHistory: [
-        { timestamp: 1640995200000, status: "up" as const, responseTime: 200 },
-        { timestamp: 1640991600000, status: "down" as const, responseTime: 0 },
+        { responseTime: 200, status: "up" as const, timestamp: 1640995200000 },
+        { responseTime: 0, status: "down" as const, timestamp: 1640991600000 },
     ],
-    monitor: {
-        id: "monitor-1",
-        type: "http",
-        status: "up",
-        history: [],
-    } as Monitor,
+    handleMonitorIdChange: vi.fn(),
+    isMonitoring: true,
     latestSite: {} as Site,
+    monitor: {
+        history: [],
+        id: "monitor-1",
+        status: "up",
+        type: "http",
+    } as Monitor,
+    monitorIds: ["monitor-1"],
+    responseTime: 200,
     selectedMonitorId: "monitor-1",
     status: "up" as const,
-    responseTime: 200,
-    isMonitoring: true,
-    monitorIds: ["monitor-1"],
-    handleMonitorIdChange: vi.fn(),
 };
 
 const mockSiteStatsResult = {
-    uptime: 50,
-    checkCount: 2,
     averageResponseTime: 200,
+    checkCount: 2,
+    uptime: 50,
 };
 
 const mockSiteActionsResult = {
+    handleCardClick: vi.fn(),
+    handleCheckNow: vi.fn(),
     handleStartMonitoring: vi.fn(),
     handleStopMonitoring: vi.fn(),
-    handleCheckNow: vi.fn(),
-    handleCardClick: vi.fn(),
 };
 
 vi.mock("../hooks/site/useSiteMonitor", () => ({
@@ -69,15 +69,15 @@ const mockUseErrorStore = vi.mocked(useErrorStore);
 describe("useSite", () => {
     const mockSite: Site = {
         identifier: "site-1",
-        name: "Test Site",
         monitors: [
             {
-                id: "monitor-1",
-                type: "http",
-                status: "up",
                 history: [],
+                id: "monitor-1",
+                status: "up",
+                type: "http",
             } as Monitor,
         ],
+        name: "Test Site",
     };
 
     const mockErrorStore = {
@@ -145,7 +145,7 @@ describe("useSite", () => {
         it("should update when loading state changes", () => {
             mockErrorStore.isLoading = false;
 
-            const { result, rerender } = renderHook(() => useSite(mockSite));
+            const { rerender, result } = renderHook(() => useSite(mockSite));
 
             expect(result.current.isLoading).toBe(false);
 
@@ -158,7 +158,7 @@ describe("useSite", () => {
 
     describe("Data Flow", () => {
         it("should pass filtered history from monitor to stats", () => {
-            const customHistory = [{ timestamp: 1640995200000, status: "up" as const, responseTime: 300 }];
+            const customHistory = [{ responseTime: 300, status: "up" as const, timestamp: 1640995200000 }];
 
             // Mock different filtered history
             vi.mocked(useSiteMonitor).mockReturnValue({
@@ -173,10 +173,10 @@ describe("useSite", () => {
 
         it("should pass monitor from monitor hook to actions", () => {
             const customMonitor: Monitor = {
-                id: "custom-monitor",
-                type: "port",
-                status: "down",
                 history: [],
+                id: "custom-monitor",
+                status: "down",
+                type: "port",
             };
 
             // Mock different monitor

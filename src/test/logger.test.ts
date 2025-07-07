@@ -2,7 +2,6 @@
  * Tests for frontend logger service.
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable testing-library/no-debugging-utils */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -13,17 +12,17 @@ const mockLog = {
     error: vi.fn(),
     info: vi.fn(),
     silly: vi.fn(),
-    verbose: vi.fn(),
-    warn: vi.fn(),
     transports: {
         console: {
-            level: "debug",
             format: "[{h}:{i}:{s}.{ms}] [{level}] {text}",
+            level: "debug",
         },
         file: {
             level: "info",
         },
     },
+    verbose: vi.fn(),
+    warn: vi.fn(),
 };
 
 vi.mock("electron-log/renderer", () => ({

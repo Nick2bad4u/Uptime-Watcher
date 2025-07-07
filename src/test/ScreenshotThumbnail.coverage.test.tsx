@@ -11,22 +11,22 @@ import logger from "../services/logger";
 // Mock logger
 vi.mock("../services/logger", () => ({
     default: {
-        warn: vi.fn(),
         error: vi.fn(),
         user: {
             action: vi.fn(),
         },
+        warn: vi.fn(),
     },
 }));
 
 // Mock useTheme hook
 vi.mock("../theme/useTheme", () => ({
     useTheme: () => ({
-        themeName: "dark",
         currentTheme: {
-            name: "dark",
             isDark: true,
+            name: "dark",
         },
+        themeName: "dark",
     }),
 }));
 
@@ -53,8 +53,8 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
 
     it("should handle cleanup with current timeout and portal removal (lines 60-61, 67-68)", () => {
         const props = {
-            url: "https://test.com",
             siteName: "Test Site",
+            url: "https://test.com",
         };
 
         const { unmount } = render(<ScreenshotThumbnail {...props} />);
@@ -88,8 +88,8 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
 
     it("should handle hover timeout creation and cleanup", () => {
         const props = {
-            url: "https://test.com",
             siteName: "Test Site",
+            url: "https://test.com",
         };
 
         render(<ScreenshotThumbnail {...props} />);
@@ -110,8 +110,8 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
 
     it("should handle portal cleanup on unmount", () => {
         const props = {
-            url: "https://test.com",
             siteName: "Test Site",
+            url: "https://test.com",
         };
 
         const { unmount } = render(<ScreenshotThumbnail {...props} />);
@@ -136,8 +136,8 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
 
     it("should handle click event and log user action", () => {
         const props = {
-            url: "https://test.com",
             siteName: "Test Site",
+            url: "https://test.com",
         };
 
         render(<ScreenshotThumbnail {...props} />);
@@ -160,8 +160,8 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
 
     it("should handle rapid hover/unhover cycles", () => {
         const props = {
-            url: "https://test.com",
             siteName: "Test Site",
+            url: "https://test.com",
         };
 
         render(<ScreenshotThumbnail {...props} />);

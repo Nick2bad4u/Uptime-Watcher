@@ -4,8 +4,10 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { waitForElectronAPI } from "../stores/utils";
+
 import type { Site } from "../types";
+
+import { waitForElectronAPI } from "../stores/utils";
 
 // Mock all dependencies
 vi.mock("../stores", () => ({
@@ -17,16 +19,16 @@ vi.mock("../stores", () => ({
 vi.mock("../hooks/site/useSiteAnalytics", () => ({
     useSiteAnalytics: vi.fn(() => ({
         data: null,
-        loading: false,
         error: null,
+        loading: false,
     })),
 }));
 
 vi.mock("../services/logger", () => ({
     default: {
-        user: { action: vi.fn() },
-        site: { error: vi.fn() },
         error: vi.fn(),
+        site: { error: vi.fn() },
+        user: { action: vi.fn() },
         warn: vi.fn(),
     },
 }));
@@ -43,9 +45,9 @@ interface MockWindow {
 }
 
 Object.defineProperty(global, "window", {
+    configurable: true,
     value: {} as MockWindow,
     writable: true,
-    configurable: true,
 });
 
 // Mock global setTimeout using vi.stubGlobal
@@ -79,21 +81,21 @@ describe("Additional Uncovered Lines Tests", () => {
             // triggering the ternary condition on line 250
             const mockSite: Site = {
                 identifier: "test-site",
-                name: "Test Site",
                 monitors: [
                     {
-                        id: "monitor-1",
-                        type: "http",
-                        status: "up",
-                        url: "https://test.com",
-                        port: undefined,
-                        timeout: undefined, // This will trigger line 250
-                        retryAttempts: 0,
-                        lastChecked: new Date("2023-01-01T00:00:00.000Z"),
-                        responseTime: 100,
                         history: [],
+                        id: "monitor-1",
+                        lastChecked: new Date("2023-01-01T00:00:00.000Z"),
+                        port: undefined,
+                        responseTime: 100,
+                        retryAttempts: 0,
+                        status: "up",
+                        timeout: undefined, // This will trigger line 250
+                        type: "http",
+                        url: "https://test.com",
                     },
                 ],
+                name: "Test Site",
             };
 
             // This test demonstrates the edge case handling in the hook
@@ -109,9 +111,9 @@ describe("Additional Uncovered Lines Tests", () => {
                 throw new Error("Failed to create object URL");
             });
             Object.defineProperty(global.URL, "createObjectURL", {
+                configurable: true,
                 value: mockCreateObjectURL,
                 writable: true,
-                configurable: true,
             });
 
             const buffer = new ArrayBuffer(8);
@@ -130,17 +132,17 @@ describe("Additional Uncovered Lines Tests", () => {
                 throw new Error("appendChild failed");
             });
             Object.defineProperty(document.body, "appendChild", {
+                configurable: true,
                 value: mockAppendChild,
                 writable: true,
-                configurable: true,
             });
 
             // Mock click to succeed on fallback
             const mockClick = vi.fn();
             Object.defineProperty(HTMLAnchorElement.prototype, "click", {
+                configurable: true,
                 value: mockClick,
                 writable: true,
-                configurable: true,
             });
 
             const buffer = new ArrayBuffer(8);
@@ -159,9 +161,9 @@ describe("Additional Uncovered Lines Tests", () => {
                 throw new Error("Network error");
             });
             Object.defineProperty(global.URL, "createObjectURL", {
+                configurable: true,
                 value: mockCreateObjectURL,
                 writable: true,
-                configurable: true,
             });
 
             const buffer = new ArrayBuffer(8);
@@ -197,8 +199,8 @@ describe("Additional Uncovered Lines Tests", () => {
             // Mock a site with no monitors to trigger edge case
             const mockSite: Site = {
                 identifier: "test-site",
-                name: "Test Site",
                 monitors: [], // Empty monitors array
+                name: "Test Site",
             };
 
             // This test verifies edge case handling when no monitors exist
@@ -210,11 +212,11 @@ describe("Additional Uncovered Lines Tests", () => {
         it("should handle exponential backoff with maximum delay", async () => {
             // Mock window.electronAPI to be undefined initially
             Object.defineProperty(global, "window", {
+                configurable: true,
                 value: {
                     electronAPI: undefined,
                 },
                 writable: true,
-                configurable: true,
             });
 
             let attemptCount = 0;
@@ -235,9 +237,9 @@ describe("Additional Uncovered Lines Tests", () => {
             });
 
             Object.defineProperty(global, "setTimeout", {
+                configurable: true,
                 value: mockSetTimeout,
                 writable: true,
-                configurable: true,
             });
 
             // This should trigger the exponential backoff logic in line 38

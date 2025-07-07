@@ -2,8 +2,6 @@
  * @vitest-environment jsdom
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { describe, expect, it } from "vitest";
 
 import { ChartConfigService, useChartConfigs } from "../services/chartConfig";
@@ -11,8 +9,34 @@ import { Theme } from "../theme/types";
 
 // Mock theme object for testing
 const mockTheme: Theme = {
-    name: "light",
+    borderRadius: {
+        full: "9999px",
+        lg: "0.5rem",
+        md: "0.375rem",
+        none: "0",
+        sm: "0.125rem",
+        xl: "0.75rem",
+    },
     colors: {
+        background: {
+            modal: "#ffffff",
+            primary: "#ffffff",
+            secondary: "#f8fafc",
+            tertiary: "#f1f5f9",
+        },
+        border: {
+            focus: "#f8fafc",
+            primary: "#e2e8f0",
+            secondary: "#f1f5f9",
+        },
+        error: "#ef4444",
+        errorAlert: "#dc2626",
+        hover: {
+            dark: "#e2e8f0",
+            light: "#f8fafc",
+            medium: "#f1f5f9",
+        },
+        info: "#3b82f6",
         primary: {
             50: "#f0f9ff",
             100: "#e0f2fe",
@@ -26,98 +50,72 @@ const mockTheme: Theme = {
             900: "#0c4a6e",
         },
         status: {
-            up: "#10b981",
             down: "#ef4444",
+            mixed: "#8b5cf6",
+            paused: "#9ca3af",
             pending: "#f59e0b",
             unknown: "#6b7280",
-            paused: "#9ca3af",
-            mixed: "#8b5cf6",
+            up: "#10b981",
         },
         success: "#10b981",
-        warning: "#f59e0b",
-        error: "#ef4444",
-        errorAlert: "#dc2626",
-        info: "#3b82f6",
-        background: {
-            primary: "#ffffff",
-            secondary: "#f8fafc",
-            tertiary: "#f1f5f9",
-            modal: "#ffffff",
-        },
-        text: {
-            primary: "#1e293b",
-            secondary: "#64748b",
-            tertiary: "#94a3b8",
-            inverse: "#ffffff",
-        },
-        border: {
-            primary: "#e2e8f0",
-            secondary: "#f1f5f9",
-            focus: "#f8fafc",
-        },
         surface: {
             base: "#f8fafc",
             elevated: "#ffffff",
             overlay: "#f1f5f9",
         },
-        hover: {
-            light: "#f8fafc",
-            medium: "#f1f5f9",
-            dark: "#e2e8f0",
+        text: {
+            inverse: "#ffffff",
+            primary: "#1e293b",
+            secondary: "#64748b",
+            tertiary: "#94a3b8",
         },
+        warning: "#f59e0b",
+    },
+    isDark: false,
+    name: "light",
+    shadows: {
+        inner: "inset 0 2px 4px 0 rgb(0 0 0 / 0.05)",
+        lg: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+        md: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+        sm: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+        xl: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+    },
+    spacing: {
+        "2xl": "3rem",
+        "3xl": "4rem",
+        lg: "1.5rem",
+        md: "1rem",
+        sm: "0.5rem",
+        xl: "2rem",
+        xs: "0.25rem",
     },
     typography: {
         fontFamily: {
-            sans: ["Inter", "system-ui", "sans-serif"],
             mono: ["JetBrains Mono", "monospace"],
+            sans: ["Inter", "system-ui", "sans-serif"],
         },
         fontSize: {
-            xs: "0.75rem",
-            sm: "0.875rem",
-            base: "1rem",
-            lg: "1.125rem",
-            xl: "1.25rem",
             "2xl": "1.5rem",
             "3xl": "1.875rem",
             "4xl": "2.25rem",
+            base: "1rem",
+            lg: "1.125rem",
+            sm: "0.875rem",
+            xl: "1.25rem",
+            xs: "0.75rem",
         },
         fontWeight: {
-            normal: "400",
-            medium: "500",
-            semibold: "600",
             bold: "700",
+            medium: "500",
+            normal: "400",
+            semibold: "600",
         },
         lineHeight: {
-            tight: "1.25",
             normal: "1.5",
             relaxed: "1.75",
+            tight: "1.25",
         },
     },
-    spacing: {
-        xs: "0.25rem",
-        sm: "0.5rem",
-        md: "1rem",
-        lg: "1.5rem",
-        xl: "2rem",
-        "2xl": "3rem",
-        "3xl": "4rem",
-    },
-    borderRadius: {
-        none: "0",
-        sm: "0.125rem",
-        md: "0.375rem",
-        lg: "0.5rem",
-        xl: "0.75rem",
-        full: "9999px",
-    },
-    shadows: {
-        sm: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
-        md: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
-        lg: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
-        xl: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
-        inner: "inset 0 2px 4px 0 rgb(0 0 0 / 0.05)",
-    },
-    isDark: false,
 };
 
 describe("ChartConfigService", () => {
@@ -291,8 +289,8 @@ describe("ChartConfigService", () => {
 
             if (labelCallback) {
                 const mockContext = {
-                    parsed: 25,
                     label: "Up",
+                    parsed: 25,
                 };
                 const result = labelCallback.call({} as any, mockContext as any);
                 expect(result).toBe("Up: 25 (25.0%)");
@@ -305,8 +303,8 @@ describe("ChartConfigService", () => {
 
             if (labelCallback) {
                 const mockContext = {
-                    parsed: 25,
                     label: "Up",
+                    parsed: 25,
                 };
                 const result = labelCallback.call({} as any, mockContext as any);
                 expect(result).toBe("Up: 25 (0%)");
@@ -399,8 +397,8 @@ describe("useChartConfigs", () => {
 
         if (labelCallback) {
             const mockContext = {
-                parsed: 75,
                 label: "Up",
+                parsed: 75,
             };
             const result = labelCallback.call({} as any, mockContext as any);
             expect(result).toBe("Up: 75 (50.0%)");
@@ -413,8 +411,8 @@ describe("useChartConfigs", () => {
 
         if (labelCallback) {
             const mockContext = {
-                parsed: 25,
                 label: "Up",
+                parsed: 25,
             };
             const result = labelCallback.call({} as any, mockContext as any);
             expect(result).toBe("Up: 25 (0%)");
@@ -441,16 +439,16 @@ describe("useChartConfigs", () => {
     it("should handle different theme objects", () => {
         const darkTheme: Theme = {
             ...mockTheme,
-            name: "dark",
             colors: {
                 ...mockTheme.colors,
                 text: {
+                    inverse: "#000000",
                     primary: "#ffffff",
                     secondary: "#cccccc",
                     tertiary: "#999999",
-                    inverse: "#000000",
                 },
             },
+            name: "dark",
         };
 
         const configs = useChartConfigs(darkTheme, 100);

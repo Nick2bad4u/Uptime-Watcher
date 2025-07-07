@@ -4,16 +4,18 @@
  */
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import { useSettingsStore } from "../stores/settings/useSettingsStore";
+
 import type { AppSettings } from "../stores/types";
+
+import { useSettingsStore } from "../stores/settings/useSettingsStore";
 
 // Mock electron API
 const mockElectronAPI = {
     settings: {
         getHistoryLimit: vi.fn(),
+        resetSettings: vi.fn(),
         setHistoryLimit: vi.fn(),
         updateHistoryLimit: vi.fn(), // Add missing method
-        resetSettings: vi.fn(),
     },
 };
 
@@ -38,8 +40,8 @@ vi.mock("../stores/error/useErrorStore", () => ({
     useErrorStore: {
         getState: vi.fn(() => ({
             clearStoreError: vi.fn(),
-            setStoreError: vi.fn(),
             setOperationLoading: vi.fn(),
+            setStoreError: vi.fn(),
         })),
     },
 }));
@@ -210,8 +212,8 @@ describe("useSettingsStore", () => {
             const originalSettings = useSettingsStore.getState().settings;
 
             useSettingsStore.getState().updateSettings({
-                theme: "dark",
                 notifications: false,
+                theme: "dark",
             });
 
             // In a real scenario, the zustand persist middleware would save to localStorage
@@ -314,11 +316,11 @@ describe("useSettingsStore", () => {
         it("should accept valid theme values", () => {
             const validThemes = ["system", "light", "dark"] as const;
 
-            validThemes.forEach((theme) => {
+            for (const theme of validThemes) {
                 useSettingsStore.getState().updateSettings({ theme });
                 const state = useSettingsStore.getState();
                 expect(state.settings.theme).toBe(theme);
-            });
+            }
         });
 
         it("should handle boolean settings correctly", () => {

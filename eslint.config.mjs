@@ -97,6 +97,21 @@ export default [
             ".agentic-tools*",
             "_ZENTASKS*",
             "_ZENTANKS*",
+            "vitest.electron.config.ts",
+            "vitest.electron.config.mts",
+            "vitest.config.ts",
+            "vitest.config.mts",
+            "tsconfig.electron.json",
+            "tsconfig.electron.*.json",
+            "tsconfig.json",
+            "tailwind.config.js",
+            "tailwind.config.mjs",
+            "tailwind.config.cjs",
+            "test/themeTypes.test.tsx",
+            "test/themeTypes.test.mts",
+            "test/themeTypes.test.tsx",
+            "test/themeTypes.test.mts",
+            "test/types.test.tsx",
         ],
     },
 
@@ -209,7 +224,7 @@ export default [
             ...pluginEslintComments.configs.recommended.rules,
             ...pluginUnicorn.configs.recommended.rules,
             ...pluginRegexp.configs.recommended.rules,
-            
+
             // Core JavaScript best practices
             "no-console": "warn",
             "no-debugger": "error",
@@ -230,8 +245,8 @@ export default [
             "no-unneeded-ternary": "warn",
             "consistent-return": "warn",
             "default-case": "warn",
-            "eqeqeq": ["error", "always"],
-            "curly": ["error", "all"],
+            eqeqeq: ["error", "always"],
+            curly: ["error", "all"],
             "no-eval": "error",
             "no-implied-eval": "error",
             "no-new-func": "error",
@@ -241,29 +256,32 @@ export default [
             "no-throw-literal": "error",
             "no-void": "error",
             "no-with": "error",
-            "radix": "error",
+            radix: "error",
             "wrap-iife": ["error", "inside"],
-            "yoda": ["error", "never"],
-            
+            yoda: ["error", "never"],
+
             // Array and object best practices
             "array-callback-return": "error",
             "no-array-constructor": "error",
-            "prefer-destructuring": ["warn", {
-                "array": true,
-                "object": true
-            }],
+            "prefer-destructuring": [
+                "warn",
+                {
+                    array: true,
+                    object: true,
+                },
+            ],
             "object-shorthand": ["warn", "always"],
             "prefer-object-spread": "warn",
-            
+
             // Function best practices
-            "func-style": ["warn", "expression", { "allowArrowFunctions": true }],
+            "func-style": ["warn", "expression", { allowArrowFunctions: true }],
             "prefer-rest-params": "error",
             "prefer-spread": "error",
-            
+
             // Modern JavaScript features
             "prefer-numeric-literals": "error",
             "symbol-description": "error",
-            
+
             // import plugin: enable a few best-practice rules manually
             "import/order": [
                 "off",
@@ -676,13 +694,13 @@ export default [
             "**/*.test.{js,ts,jsx,tsx}",
             "**/*.spec.{js,ts,jsx,tsx}",
             "vitest*.{js,ts}",
-            "electron/test/**/*.ts",
-            "src/test/**/*.ts",
+            "electron/test/**/*.{ts,tsx}",
+            "src/test/**/*.{ts,tsx}",
         ],
         languageOptions: {
             parser: tseslint.parser,
             parserOptions: {
-                project: "./tsconfig.json",
+                project: true,
                 sourceType: "module",
                 ecmaVersion: "latest",
                 tsconfigRootDir: __dirname,
@@ -725,7 +743,7 @@ export default [
             "testing-library/prefer-screen-queries": "warn",
             "testing-library/prefer-user-event": "warn",
             "testing-library/render-result-naming-convention": "warn",
-            
+
             // Relax some rules for tests
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-non-null-assertion": "off",

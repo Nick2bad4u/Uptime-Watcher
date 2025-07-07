@@ -5,16 +5,17 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
+
 import { createSiteMonitoringActions, type SiteMonitoringDependencies } from "../../../stores/sites/useSiteMonitoring";
 
 // Mock dependencies
 vi.mock("../../../stores/sites/services", () => ({
-    SiteService: {
-        checkSiteNow: vi.fn(),
-    },
     MonitoringService: {
         startMonitoring: vi.fn(),
         stopMonitoring: vi.fn(),
+    },
+    SiteService: {
+        checkSiteNow: vi.fn(),
     },
 }));
 

@@ -1,7 +1,8 @@
-import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
+import React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+
 import { SiteDetails } from "../components/SiteDetails/SiteDetails";
 import { SiteDetailsHeader } from "../components/SiteDetails/SiteDetailsHeader";
 import { SiteDetailsNavigation } from "../components/SiteDetails/SiteDetailsNavigation";
@@ -15,44 +16,44 @@ import { Site } from "../types";
 // Define mock site data first (before mocks that use it)
 const mockSite: Site = {
     identifier: "test-site-1",
-    name: "Test Site",
     monitors: [
         {
-            id: "monitor-1",
-            type: "http",
-            status: "up",
-            url: "https://example.com",
-            port: 443,
-            responseTime: 250,
-            lastChecked: new Date("2024-01-01T00:00:00Z"),
+            checkInterval: 300,
             history: [
                 {
-                    timestamp: Date.now(),
-                    status: "up",
                     responseTime: 250,
+                    status: "up",
+                    timestamp: Date.now(),
                 },
             ],
+            id: "monitor-1",
+            lastChecked: new Date("2024-01-01T00:00:00Z"),
             monitoring: true,
-            checkInterval: 300,
-            timeout: 5000,
+            port: 443,
+            responseTime: 250,
             retryAttempts: 3,
+            status: "up",
+            timeout: 5000,
+            type: "http",
+            url: "https://example.com",
         },
     ],
+    name: "Test Site",
 };
 
 // Global browser API mocks
 Object.defineProperty(window, "matchMedia", {
-    writable: true,
     value: vi.fn().mockImplementation((query) => ({
+        addEventListener: vi.fn(),
+        addListener: vi.fn(),
+        dispatchEvent: vi.fn(),
         matches: false,
         media: query,
         onchange: null,
-        addListener: vi.fn(),
-        removeListener: vi.fn(),
-        addEventListener: vi.fn(),
         removeEventListener: vi.fn(),
-        dispatchEvent: vi.fn(),
+        removeListener: vi.fn(),
     })),
+    writable: true,
 });
 
 // Hanging process detection
@@ -112,23 +113,23 @@ afterEach(() => {
 
 // Mock Chart.js and plugins - ensure no hanging processes
 vi.mock("chart.js", () => ({
+    ArcElement: vi.fn(),
+    BarElement: vi.fn(),
+    CategoryScale: vi.fn(),
     Chart: {
+        destroy: vi.fn(),
         register: vi.fn(),
         unregister: vi.fn(),
-        destroy: vi.fn(),
     },
-    CategoryScale: vi.fn(),
+    DoughnutController: vi.fn(),
+    Filler: vi.fn(),
+    Legend: vi.fn(),
     LinearScale: vi.fn(),
-    PointElement: vi.fn(),
     LineElement: vi.fn(),
-    BarElement: vi.fn(),
+    PointElement: vi.fn(),
+    TimeScale: vi.fn(),
     Title: vi.fn(),
     Tooltip: vi.fn(),
-    Legend: vi.fn(),
-    TimeScale: vi.fn(),
-    Filler: vi.fn(),
-    DoughnutController: vi.fn(),
-    ArcElement: vi.fn(),
 }));
 
 vi.mock("chartjs-plugin-zoom", () => ({
@@ -150,20 +151,20 @@ vi.mock("../stores/ui/useUiStore", () => ({
 
 vi.mock("../stores/sites/useSitesStore", () => ({
     useSitesStore: vi.fn(() => ({
-        sites: [mockSite], // Include the mockSite in the sites array
-        getSiteById: vi.fn(() => mockSite),
-        updateSite: vi.fn().mockResolvedValue(undefined),
-        removeSite: vi.fn().mockResolvedValue(undefined),
         checkSiteNow: vi.fn().mockResolvedValue(undefined),
+        getSiteById: vi.fn(() => mockSite),
+        removeSite: vi.fn().mockResolvedValue(undefined),
+        sites: [mockSite], // Include the mockSite in the sites array
+        updateSite: vi.fn().mockResolvedValue(undefined),
     })),
 }));
 
 vi.mock("../stores/settings/useSettingsStore", () => ({
     useSettingsStore: vi.fn(() => ({
         historyLimit: 100,
-        theme: "light",
         setHistoryLimit: vi.fn(),
         settings: { historyLimit: 100 },
+        theme: "light",
     })),
 }));
 
@@ -178,42 +179,23 @@ vi.mock("../stores/error/useErrorStore", () => ({
 // Mock hooks - prevent hanging async operations
 vi.mock("../hooks/site/useSiteDetails", () => ({
     useSiteDetails: vi.fn(() => ({
-        site: mockSite,
-        siteExists: true, // This is the key property that was missing!
-        isLoading: false,
-        error: null,
-        history: [],
-        analytics: {
-            avgResponseTime: 250,
-            uptime: 99.5,
-            totalChecks: 1000,
-            failedChecks: 5,
-            upCount: 995,
-            downCount: 5,
-            filteredHistory: [
-                { responseTime: 200, timestamp: Date.now() - 60000, status: "up" },
-                { responseTime: 250, timestamp: Date.now() - 30000, status: "up" },
-                { responseTime: 300, timestamp: Date.now(), status: "up" },
-            ],
-        },
-        refreshSiteData: vi.fn().mockResolvedValue(undefined),
-        updateSiteSettings: vi.fn().mockResolvedValue(undefined),
         // Add all the required properties from useSiteDetails
         activeSiteDetailsTab: "overview",
+        analytics: {
+            avgResponseTime: 250,
+            downCount: 5,
+            failedChecks: 5,
+            filteredHistory: [
+                { responseTime: 200, status: "up", timestamp: Date.now() - 60000 },
+                { responseTime: 250, status: "up", timestamp: Date.now() - 30000 },
+                { responseTime: 300, status: "up", timestamp: Date.now() },
+            ],
+            totalChecks: 1000,
+            upCount: 995,
+            uptime: 99.5,
+        },
         currentSite: mockSite,
-        selectedMonitor: mockSite.monitors[0],
-        selectedMonitorId: "monitor-1",
-        localName: "Test Site",
-        localCheckInterval: 300,
-        localTimeout: 5000,
-        localRetryAttempts: 3,
-        hasUnsavedChanges: false,
-        intervalChanged: false,
-        timeoutChanged: false,
-        retryAttemptsChanged: false,
-        isMonitoring: false,
-        showAdvancedMetrics: false,
-        siteDetailsChartTimeRange: "24h",
+        error: null,
         // Add all the required handlers
         handleCheckNow: vi.fn(),
         handleIntervalChange: vi.fn(),
@@ -230,34 +212,34 @@ vi.mock("../hooks/site/useSiteDetails", () => ({
         handleStopMonitoring: vi.fn(),
         handleStopSiteMonitoring: vi.fn(),
         handleTimeoutChange: vi.fn(),
+        hasUnsavedChanges: false,
+        history: [],
+        intervalChanged: false,
+        isLoading: false,
+        isMonitoring: false,
+        localCheckInterval: 300,
+        localName: "Test Site",
+        localRetryAttempts: 3,
+        localTimeout: 5000,
+        refreshSiteData: vi.fn().mockResolvedValue(undefined),
+        retryAttemptsChanged: false,
+        selectedMonitor: mockSite.monitors[0],
+        selectedMonitorId: "monitor-1",
         setActiveSiteDetailsTab: vi.fn(),
         setLocalName: vi.fn(),
         setShowAdvancedMetrics: vi.fn(),
         setSiteDetailsChartTimeRange: vi.fn(),
+        showAdvancedMetrics: false,
+        site: mockSite,
+        siteDetailsChartTimeRange: "24h",
+        siteExists: true, // This is the key property that was missing!
+        timeoutChanged: false,
+        updateSiteSettings: vi.fn().mockResolvedValue(undefined),
     })),
 }));
 
 // Mock theme - prevent hanging operations
 vi.mock("../theme/useTheme", () => ({
-    useTheme: vi.fn(() => ({
-        currentTheme: {
-            colors: {
-                primary: "#0066cc",
-                secondary: "#6c757d",
-                background: "#ffffff",
-                text: "#333333",
-                status: {
-                    up: "#10b981",
-                    down: "#ef4444",
-                    pending: "#f59e0b",
-                    paused: "#6b7280",
-                    mixed: "#8b5cf6",
-                    unknown: "#6b7280",
-                },
-            },
-        },
-        setTheme: vi.fn(),
-    })),
     useAvailabilityColors: vi.fn(() => ({
         getAvailabilityColor: vi.fn(() => "#00ff00"),
         getAvailabilityVariant: vi.fn((percentage: number) => {
@@ -266,13 +248,39 @@ vi.mock("../theme/useTheme", () => ({
             return "danger";
         }),
     })),
+    useTheme: vi.fn(() => ({
+        currentTheme: {
+            colors: {
+                background: "#ffffff",
+                primary: "#0066cc",
+                secondary: "#6c757d",
+                status: {
+                    down: "#ef4444",
+                    mixed: "#8b5cf6",
+                    paused: "#6b7280",
+                    pending: "#f59e0b",
+                    unknown: "#6b7280",
+                    up: "#10b981",
+                },
+                text: "#333333",
+            },
+        },
+        setTheme: vi.fn(),
+    })),
 }));
 
 // Mock theme components - prevent hanging with simple implementations that filter props
 vi.mock("../theme/components", () => ({
+    StatusIndicator: ({ children, ...safeProps }: React.PropsWithChildren<Record<string, unknown>>) => {
+        const { hoverable, iconColor, loading, showLabel, showText, size, variant, ...props } = safeProps;
+        return <span {...props}>{children}</span>;
+    },
+    ThemedBadge: ({ children, ...safeProps }: React.PropsWithChildren<Record<string, unknown>>) => {
+        const { hoverable, iconColor, loading, showLabel, showText, size, variant, ...props } = safeProps;
+        return <span {...props}>{children}</span>;
+    },
     ThemedBox: ({ children, ...safeProps }: React.PropsWithChildren<Record<string, unknown>>) => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { showLabel, iconColor, hoverable, showText, loading, variant, size, ...props } = safeProps;
+        const { hoverable, iconColor, loading, showLabel, showText, size, variant, ...props } = safeProps;
         return <div {...props}>{children}</div>;
     },
     ThemedButton: ({
@@ -280,23 +288,27 @@ vi.mock("../theme/components", () => ({
         onClick,
         ...safeProps
     }: React.PropsWithChildren<{ onClick?: () => void } & Record<string, unknown>>) => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { showLabel, iconColor, hoverable, showText, loading, variant, size, ...props } = safeProps;
+        const { hoverable, iconColor, loading, showLabel, showText, size, variant, ...props } = safeProps;
         return (
             <button onClick={onClick} {...props}>
                 {children}
             </button>
         );
     },
-    ThemedText: ({ children, ...safeProps }: React.PropsWithChildren<Record<string, unknown>>) => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { showLabel, iconColor, hoverable, showText, loading, variant, size, ...props } = safeProps;
-        return <span {...props}>{children}</span>;
-    },
     ThemedCard: ({ children, ...safeProps }: React.PropsWithChildren<Record<string, unknown>>) => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { showLabel, iconColor, hoverable, showText, loading, variant, size, ...props } = safeProps;
+        const { hoverable, iconColor, loading, showLabel, showText, size, variant, ...props } = safeProps;
         return <div {...props}>{children}</div>;
+    },
+    ThemedInput: ({
+        onChange,
+        ...safeProps
+    }: { onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void } & Record<string, unknown>) => {
+        const { hoverable, iconColor, loading, showLabel, showText, size, variant, ...props } = safeProps;
+        return <input onChange={onChange} {...props} />;
+    },
+    ThemedProgress: ({ ...safeProps }: Record<string, unknown>) => {
+        const { hoverable, iconColor, loading, showLabel, showText, size, variant, ...props } = safeProps;
+        return <div {...props} />;
     },
     ThemedSelect: ({
         children,
@@ -305,61 +317,47 @@ vi.mock("../theme/components", () => ({
     }: React.PropsWithChildren<
         { onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void } & Record<string, unknown>
     >) => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { showLabel, iconColor, hoverable, showText, loading, variant, size, ...props } = safeProps;
+        const { hoverable, iconColor, loading, showLabel, showText, size, variant, ...props } = safeProps;
         return (
             <select onChange={onChange} {...props}>
                 {children}
             </select>
         );
     },
-    ThemedInput: ({
-        onChange,
-        ...safeProps
-    }: { onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void } & Record<string, unknown>) => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { showLabel, iconColor, hoverable, showText, loading, variant, size, ...props } = safeProps;
-        return <input onChange={onChange} {...props} />;
-    },
-    StatusIndicator: ({ children, ...safeProps }: React.PropsWithChildren<Record<string, unknown>>) => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { showLabel, iconColor, hoverable, showText, loading, variant, size, ...props } = safeProps;
+    ThemedText: ({ children, ...safeProps }: React.PropsWithChildren<Record<string, unknown>>) => {
+        const { hoverable, iconColor, loading, showLabel, showText, size, variant, ...props } = safeProps;
         return <span {...props}>{children}</span>;
-    },
-    ThemedBadge: ({ children, ...safeProps }: React.PropsWithChildren<Record<string, unknown>>) => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { showLabel, iconColor, hoverable, showText, loading, variant, size, ...props } = safeProps;
-        return <span {...props}>{children}</span>;
-    },
-    ThemedProgress: ({ ...safeProps }: Record<string, unknown>) => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { showLabel, iconColor, hoverable, showText, loading, variant, size, ...props } = safeProps;
-        return <div {...props} />;
     },
 }));
 
 // Mock services - prevent hanging chart operations
 vi.mock("../services/chartConfig", () => ({
     ChartConfigService: vi.fn().mockImplementation(() => ({
-        getLineChartConfig: vi.fn(() => ({ responsive: true, maintainAspectRatio: false })),
-        getDoughnutChartConfig: vi.fn(() => ({ responsive: true, maintainAspectRatio: false })),
-        getBarChartConfig: vi.fn(() => ({ responsive: true, maintainAspectRatio: false })),
+        getBarChartConfig: vi.fn(() => ({ maintainAspectRatio: false, responsive: true })),
+        getDoughnutChartConfig: vi.fn(() => ({ maintainAspectRatio: false, responsive: true })),
+        getLineChartConfig: vi.fn(() => ({ maintainAspectRatio: false, responsive: true })),
     })),
 }));
 
 // Mock logger to prevent hanging
 vi.mock("../services/logger", () => ({
     default: {
-        info: vi.fn(),
-        error: vi.fn(),
-        warn: vi.fn(),
-        debug: vi.fn(),
         app: {
             error: vi.fn(),
             performance: vi.fn(),
             started: vi.fn(),
             stopped: vi.fn(),
         },
+        debug: vi.fn(),
+        error: vi.fn(),
+        info: vi.fn(),
+        raw: {
+            debug: vi.fn(),
+            error: vi.fn(),
+            info: vi.fn(),
+            warn: vi.fn(),
+        },
+        silly: vi.fn(),
         site: {
             added: vi.fn(),
             check: vi.fn(),
@@ -377,23 +375,12 @@ vi.mock("../services/logger", () => ({
             settingsChange: vi.fn(),
         },
         verbose: vi.fn(),
-        silly: vi.fn(),
-        raw: {
-            debug: vi.fn(),
-            info: vi.fn(),
-            warn: vi.fn(),
-            error: vi.fn(),
-        },
+        warn: vi.fn(),
     },
 }));
 
 // Mock React Chart.js components to prevent hanging
 vi.mock("react-chartjs-2", () => ({
-    Line: ({ ...props }: Record<string, unknown>) => (
-        <div data-testid="line-chart" {...props}>
-            Line Chart
-        </div>
-    ),
     Bar: ({ ...props }: Record<string, unknown>) => (
         <div data-testid="bar-chart" {...props}>
             Bar Chart
@@ -402,6 +389,11 @@ vi.mock("react-chartjs-2", () => ({
     Doughnut: ({ ...props }: Record<string, unknown>) => (
         <div data-testid="doughnut-chart" {...props}>
             Doughnut Chart
+        </div>
+    ),
+    Line: ({ ...props }: Record<string, unknown>) => (
+        <div data-testid="line-chart" {...props}>
+            Line Chart
         </div>
     ),
 }));
@@ -467,11 +459,11 @@ const mockSettingsTabProps = {
     currentSite: mockSite,
     handleIntervalChange: vi.fn(),
     handleRemoveSite: vi.fn(),
+    handleRetryAttemptsChange: vi.fn(),
     handleSaveInterval: vi.fn(),
     handleSaveName: vi.fn(),
     handleSaveRetryAttempts: vi.fn(),
     handleSaveTimeout: vi.fn(),
-    handleRetryAttemptsChange: vi.fn(),
     handleTimeoutChange: vi.fn(),
     hasUnsavedChanges: false,
     intervalChanged: false,
@@ -480,19 +472,19 @@ const mockSettingsTabProps = {
     localName: "Test Site",
     localRetryAttempts: 3,
     localTimeout: 5000,
+    retryAttemptsChanged: false,
     selectedMonitor: mockSite.monitors[0]!,
     setLocalName: vi.fn(),
-    retryAttemptsChanged: false,
     timeoutChanged: false,
 };
 
 const mockSiteOverviewTabProps = {
-    site: mockSite,
     avgResponseTime: 250,
     handleRemoveSite: vi.fn(),
     handleStartSiteMonitoring: vi.fn(),
     handleStopSiteMonitoring: vi.fn(),
     isLoading: false,
+    site: mockSite,
     totalChecks: 1000,
     uptime: 99.5,
 };

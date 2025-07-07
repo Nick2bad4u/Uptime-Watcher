@@ -8,31 +8,31 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // Mock all individual component modules to avoid dependency issues
 vi.mock("../components/Dashboard/SiteCard/components/ActionButtonGroup", () => ({
-    ActionButtonGroup: vi.fn(() => "ActionButtonGroup"),
-    ActionButtonGroupProps: {},
     // Export all to match export * pattern
     __esModule: true,
+    ActionButtonGroup: vi.fn(() => "ActionButtonGroup"),
+    ActionButtonGroupProps: {},
     default: vi.fn(() => "ActionButtonGroup"),
 }));
 
 vi.mock("../components/Dashboard/SiteCard/components/MetricCard", () => ({
+    // Export all to match export * pattern
+    __esModule: true,
+    default: vi.fn(() => "MetricCard"),
     MetricCard: vi.fn(() => "MetricCard"),
     MetricCardProps: {},
     MetricCardVariant: {
         PRIMARY: "primary",
         SECONDARY: "secondary",
     },
-    // Export all to match export * pattern
-    __esModule: true,
-    default: vi.fn(() => "MetricCard"),
 }));
 
 vi.mock("../components/Dashboard/SiteCard/components/MonitorSelector", () => ({
-    MonitorSelector: vi.fn(() => "MonitorSelector"),
-    MonitorSelectorProps: {},
     // Export all to match export * pattern
     __esModule: true,
     default: vi.fn(() => "MonitorSelector"),
+    MonitorSelector: vi.fn(() => "MonitorSelector"),
+    MonitorSelectorProps: {},
 }));
 
 // Import the barrel export module after mocking
@@ -81,20 +81,20 @@ describe("SiteCard Components Index Module", () => {
                 SiteCardComponentsIndex.MonitorSelector,
             ].filter(Boolean); // Filter out undefined exports
 
-            components.forEach((component) => {
+            for (const component of components) {
                 expect(typeof component).toBe("function");
-            });
+            }
         });
 
         it("should export all expected site card components", () => {
             const expectedComponents = ["ActionButtonGroup", "MetricCard", "MonitorSelector"];
 
-            expectedComponents.forEach((componentName) => {
+            for (const componentName of expectedComponents) {
                 const component = SiteCardComponentsIndex[componentName as keyof typeof SiteCardComponentsIndex];
                 if (component) {
                     expect(typeof component).toBe("function");
                 }
-            });
+            }
         });
     });
 
@@ -112,7 +112,7 @@ describe("SiteCard Components Index Module", () => {
             const siteCardComponents = SiteCardComponentsIndex;
             const exportNames = Object.keys(siteCardComponents);
 
-            exportNames.forEach((exportName) => {
+            for (const exportName of exportNames) {
                 const staticAccess = siteCardComponents[exportName as keyof typeof siteCardComponents];
                 const dynamicAccess = siteCardComponents[exportName as keyof typeof siteCardComponents];
 
@@ -120,7 +120,7 @@ describe("SiteCard Components Index Module", () => {
                 if (staticAccess !== undefined) {
                     expect(staticAccess).toBeDefined();
                 }
-            });
+            }
         });
     });
 
@@ -134,11 +134,11 @@ describe("SiteCard Components Index Module", () => {
 
         it("should maintain export references", () => {
             // All defined exports should not be null
-            Object.values(SiteCardComponentsIndex).forEach((exportValue) => {
+            for (const exportValue of Object.values(SiteCardComponentsIndex)) {
                 if (exportValue !== undefined) {
                     expect(exportValue).not.toBeNull();
                 }
-            });
+            }
         });
 
         it("should not modify exported values", () => {
@@ -208,22 +208,22 @@ describe("SiteCard Components Index Module", () => {
             expect(exports.length).toBeGreaterThan(0);
 
             // Each defined export should be accessible
-            exports.forEach((exportName) => {
+            for (const exportName of exports) {
                 const exportValue = (SiteCardComponentsIndex as Record<string, unknown>)[exportName];
                 if (exportValue !== undefined) {
                     expect(exportValue).toBeDefined();
                 }
-            });
+            }
         });
 
         it("should provide centralized access to all site card components", () => {
             // Verify that core site card components are available
             const coreComponents = ["ActionButtonGroup", "MetricCard", "MonitorSelector"];
 
-            coreComponents.forEach((componentName) => {
+            for (const componentName of coreComponents) {
                 const component = SiteCardComponentsIndex[componentName as keyof typeof SiteCardComponentsIndex];
                 expect(component).toBeDefined();
-            });
+            }
         });
     });
 
@@ -284,10 +284,10 @@ describe("SiteCard Components Index Module", () => {
             expect(Array.isArray(keys)).toBe(true);
             expect(keys.length).toBeGreaterThan(0);
 
-            keys.forEach((key) => {
+            for (const key of keys) {
                 expect(typeof key).toBe("string");
                 expect(key.length).toBeGreaterThan(0);
-            });
+            }
         });
     });
 
@@ -311,11 +311,11 @@ describe("SiteCard Components Index Module", () => {
                 "MonitorSelector", // Monitor selection component
             ];
 
-            requiredComponents.forEach((component) => {
+            for (const component of requiredComponents) {
                 const exportedComponent = SiteCardComponentsIndex[component as keyof typeof SiteCardComponentsIndex];
                 expect(exportedComponent).toBeDefined();
                 expect(typeof exportedComponent).toBe("function");
-            });
+            }
         });
     });
 

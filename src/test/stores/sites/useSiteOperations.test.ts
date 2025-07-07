@@ -5,22 +5,24 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
+
 import type { Site, Monitor, MonitorType } from "../../../types";
+
 import { createSiteOperationsActions, type SiteOperationsDependencies } from "../../../stores/sites/useSiteOperations";
 
 // Mock dependencies
 vi.mock("../../../stores/sites/services", () => ({
-    SiteService: {
-        getSites: vi.fn(),
-        addSite: vi.fn(),
-        removeSite: vi.fn(),
-        updateSite: vi.fn(),
-        downloadSQLiteBackup: vi.fn(),
-        checkSiteNow: vi.fn(),
-    },
     MonitoringService: {
         startMonitoring: vi.fn(),
         stopMonitoring: vi.fn(),
+    },
+    SiteService: {
+        addSite: vi.fn(),
+        checkSiteNow: vi.fn(),
+        downloadSQLiteBackup: vi.fn(),
+        getSites: vi.fn(),
+        removeSite: vi.fn(),
+        updateSite: vi.fn(),
     },
 }));
 
@@ -50,19 +52,19 @@ vi.mock("../../../stores/sites/utils", async () => {
     const actual = await vi.importActual("../../../stores/sites/utils");
     return {
         ...actual,
+        handleSQLiteBackupDownload: vi.fn(),
         normalizeMonitor: vi.fn((monitor: Monitor) => monitor),
         updateMonitorInSite: vi.fn((site: Site, monitorId: string, updates: Partial<Monitor>) => ({
             ...site,
             monitors: site.monitors.map((m: Monitor) => (m.id === monitorId ? { ...m, ...updates } : m)),
         })),
-        handleSQLiteBackupDownload: vi.fn(),
     };
 });
 
 // Import mocked services
 import { SiteService, MonitoringService } from "../../../stores/sites/services";
-import { logStoreAction } from "../../../stores/utils";
 import { normalizeMonitor, updateMonitorInSite, handleSQLiteBackupDownload } from "../../../stores/sites/utils";
+import { logStoreAction } from "../../../stores/utils";
 
 describe("useSiteOperations", () => {
     let mockDependencies: SiteOperationsDependencies;
@@ -71,31 +73,31 @@ describe("useSiteOperations", () => {
     // Mock data
     const mockSite: Site = {
         identifier: "example.com",
-        name: "Example Site",
         monitors: [
             {
-                id: "monitor-1",
-                type: "http" as MonitorType,
-                status: "up" as const,
-                monitoring: true,
-                history: [],
                 checkInterval: 30000,
+                history: [],
+                id: "monitor-1",
+                monitoring: true,
                 retryAttempts: 3,
+                status: "up" as const,
                 timeout: 10000,
+                type: "http" as MonitorType,
                 url: "https://example.com",
             },
         ],
+        name: "Example Site",
     };
 
     const mockMonitor: Monitor = {
-        id: "monitor-2",
-        type: "http" as MonitorType,
-        status: "pending" as const,
-        monitoring: true,
-        history: [],
         checkInterval: 30000,
+        history: [],
+        id: "monitor-2",
+        monitoring: true,
         retryAttempts: 3,
+        status: "pending" as const,
         timeout: 10000,
+        type: "http" as MonitorType,
         url: "https://test.com",
     };
 
@@ -104,8 +106,8 @@ describe("useSiteOperations", () => {
 
         // Setup mock dependencies
         mockDependencies = {
-            getSites: vi.fn(() => [mockSite]),
             addSite: vi.fn(),
+            getSites: vi.fn(() => [mockSite]),
             removeSite: vi.fn(),
             setSites: vi.fn(),
             syncSitesFromBackend: vi.fn(),
@@ -148,9 +150,9 @@ describe("useSiteOperations", () => {
                 ...siteData,
                 monitors: expect.arrayContaining([
                     expect.objectContaining({
-                        type: "http",
-                        status: "pending",
                         monitoring: true,
+                        status: "pending",
+                        type: "http",
                     }),
                 ]),
             });
@@ -161,8 +163,8 @@ describe("useSiteOperations", () => {
         it("should create a site with provided monitors", async () => {
             const siteData = {
                 identifier: "new-site.com",
-                name: "New Site",
                 monitors: [mockMonitor],
+                name: "New Site",
             };
             const createdSite = { ...siteData };
 
@@ -283,8 +285,8 @@ describe("useSiteOperations", () => {
             });
             expect(mockDependencies.syncSitesFromBackend).toHaveBeenCalledTimes(1);
             expect(logStoreAction).toHaveBeenCalledWith("SitesStore", "updateMonitorRetryAttempts", {
-                retryAttempts,
                 monitorId,
+                retryAttempts,
                 siteId,
             });
         });
@@ -322,9 +324,9 @@ describe("useSiteOperations", () => {
             });
             expect(mockDependencies.syncSitesFromBackend).toHaveBeenCalledTimes(1);
             expect(logStoreAction).toHaveBeenCalledWith("SitesStore", "updateMonitorTimeout", {
-                timeout,
                 monitorId,
                 siteId,
+                timeout,
             });
         });
 

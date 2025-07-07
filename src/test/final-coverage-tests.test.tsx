@@ -2,117 +2,117 @@
  * Simplified tests targeting specific uncovered lines for 100% coverage
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { ThemeProvider } from "../theme/components";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+
+import { handleSubmit } from "../components/AddSiteForm/Submit";
 import { Settings } from "../components/Settings/Settings";
 import { ScreenshotThumbnail } from "../components/SiteDetails/ScreenshotThumbnail";
-import { handleSubmit } from "../components/AddSiteForm/Submit";
 import logger from "../services/logger";
+import { ThemeProvider } from "../theme/components";
 
 // Mock all dependencies
 vi.mock("../stores", () => ({
     useErrorStore: vi.fn(() => ({
+        clearError: vi.fn(),
         error: null,
         setError: vi.fn(),
-        clearError: vi.fn(),
     })),
     useSettingsStore: vi.fn(() => ({
-        settings: {
-            theme: "dark",
-            historyLimit: 100,
-        },
-        updateSettings: vi.fn(),
         availableThemes: ["light", "dark", "system"],
         fullSyncFromBackend: vi.fn(),
+        settings: {
+            historyLimit: 100,
+            theme: "dark",
+        },
+        updateSettings: vi.fn(),
     })),
     useSitesStore: vi.fn(() => ({
-        sites: [],
-        isLoading: false,
-        error: null,
         addSite: vi.fn(),
-        removeSite: vi.fn(),
-        updateSite: vi.fn(),
+        error: null,
         getSites: vi.fn(),
+        isLoading: false,
+        removeSite: vi.fn(),
+        sites: [],
+        updateSite: vi.fn(),
     })),
 }));
 
 vi.mock("../services/logger", () => ({
     default: {
-        warn: vi.fn(),
-        error: vi.fn(),
         debug: vi.fn(),
+        error: vi.fn(),
         user: {
             action: vi.fn(),
             settingsChange: vi.fn(),
         },
+        warn: vi.fn(),
     },
 }));
 
 vi.mock("../theme/useTheme", () => ({
     useTheme: () => ({
-        themeName: "dark",
+        availableThemes: ["light", "dark", "system"],
         currentTheme: {
-            name: "dark",
-            isDark: true,
             borderRadius: {
+                full: "9999px",
+                lg: "0.5rem",
+                md: "0.375rem",
                 none: "0px",
                 sm: "0.125rem",
-                md: "0.375rem",
-                lg: "0.5rem",
                 xl: "0.75rem",
-                full: "9999px",
             },
             colors: {
                 background: {
+                    modal: "#1a202c",
                     primary: "#1a202c",
                     secondary: "#2d3748",
                     tertiary: "#4a5568",
-                    modal: "#1a202c",
-                },
-                text: {
-                    primary: "#ffffff",
-                    secondary: "#e2e8f0",
-                    tertiary: "#a0aec0",
-                    inverse: "#000000",
                 },
                 border: {
+                    focus: "#3182ce",
                     primary: "#4a5568",
                     secondary: "#2d3748",
-                    focus: "#3182ce",
+                },
+                status: {
+                    down: "#f56565",
+                    pending: "#ed8936",
+                    unknown: "#a0aec0",
+                    up: "#48bb78",
                 },
                 surface: {
                     base: "#2d3748",
                     elevated: "#4a5568",
                     overlay: "#1a202c",
                 },
-                status: {
-                    up: "#48bb78",
-                    down: "#f56565",
-                    pending: "#ed8936",
-                    unknown: "#a0aec0",
+                text: {
+                    inverse: "#000000",
+                    primary: "#ffffff",
+                    secondary: "#e2e8f0",
+                    tertiary: "#a0aec0",
                 },
             },
+            isDark: true,
+            name: "dark",
+            shadows: {
+                inner: "inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)",
+                lg: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+                md: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+                sm: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+                xl: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+            },
             spacing: {
-                xs: "0.25rem",
-                sm: "0.5rem",
-                md: "1rem",
-                lg: "1.5rem",
-                xl: "2rem",
                 "2xl": "2.5rem",
                 "3xl": "3rem",
-            },
-            shadows: {
-                sm: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
-                md: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-                lg: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-                xl: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-                inner: "inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)",
+                lg: "1.5rem",
+                md: "1rem",
+                sm: "0.5rem",
+                xl: "2rem",
+                xs: "0.25rem",
             },
             typography: {
                 fontFamily: {
-                    sans: ["-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
                     mono: [
                         "SFMono-Regular",
                         "Menlo",
@@ -122,49 +122,50 @@ vi.mock("../theme/useTheme", () => ({
                         "Courier New",
                         "monospace",
                     ],
+                    sans: ["-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
                 },
                 fontSize: {
-                    xs: "0.75rem",
-                    sm: "0.875rem",
-                    base: "1rem",
-                    lg: "1.125rem",
-                    xl: "1.25rem",
                     "2xl": "1.5rem",
                     "3xl": "1.875rem",
                     "4xl": "2.25rem",
+                    base: "1rem",
+                    lg: "1.125rem",
+                    sm: "0.875rem",
+                    xl: "1.25rem",
+                    xs: "0.75rem",
                 },
                 fontWeight: {
-                    normal: "400",
-                    medium: "500",
-                    semibold: "600",
                     bold: "700",
+                    medium: "500",
+                    normal: "400",
+                    semibold: "600",
                 },
                 lineHeight: {
-                    tight: "1.25",
                     normal: "1.5",
                     relaxed: "1.625",
+                    tight: "1.25",
                 },
             },
         },
-        availableThemes: ["light", "dark", "system"],
-        isDark: true,
-        setTheme: vi.fn(),
         getColor: vi.fn(() => "#ffffff"),
         getStatusColor: vi.fn((status: string) => {
             const colors: Record<string, string> = {
-                up: "#48bb78",
                 down: "#f56565",
                 pending: "#ed8936",
                 unknown: "#a0aec0",
+                up: "#48bb78",
             };
             return colors[status] ?? "#000000";
         }),
+        isDark: true,
+        setTheme: vi.fn(),
+        themeName: "dark",
     }),
     useThemeClasses: () => ({
         getBackgroundClass: vi.fn(() => ({ backgroundColor: "var(--color-background-primary)" })),
-        getTextClass: vi.fn(() => ({ color: "var(--color-text-primary)" })),
         getBorderClass: vi.fn(() => ({ borderColor: "var(--color-border-primary)" })),
         getSurfaceClass: vi.fn(() => ({ backgroundColor: "var(--color-surface-base)" })),
+        getTextClass: vi.fn(() => ({ color: "var(--color-text-primary)" })),
     }),
 }));
 
@@ -197,13 +198,13 @@ describe("Final Coverage Tests", () => {
             const mockUpdateSettings = vi.fn();
 
             (useSettingsStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
-                settings: {
-                    theme: "dark",
-                    historyLimit: 100,
-                },
-                updateSettings: mockUpdateSettings,
                 availableThemes: ["light", "dark", "system"],
                 fullSyncFromBackend: vi.fn(),
+                settings: {
+                    historyLimit: 100,
+                    theme: "dark",
+                },
+                updateSettings: mockUpdateSettings,
             });
 
             render(
@@ -229,26 +230,25 @@ describe("Final Coverage Tests", () => {
             } as unknown as React.FormEvent;
 
             const props = {
-                // AddSiteFormState properties
-                url: "https://test.com",
-                host: "",
-                port: "",
-                name: "Test Site",
-                monitorType: "http" as const,
-                checkInterval: 60000,
-                siteId: "test-site-id",
                 addMode: "new" as const,
-                selectedExistingSite: "",
+                addMonitorToSite: vi.fn(),
+                checkInterval: 60000,
+                clearError: vi.fn(),
+                createSite: vi.fn().mockRejectedValue(new Error("Test error")),
                 formError: undefined,
-
+                generateUuid: vi.fn(() => "test-id"),
+                host: "",
+                logger: logger,
+                monitorType: "http" as const,
+                name: "Test Site",
+                onSuccess: mockOnSuccess,
+                port: "",
+                selectedExistingSite: "",
                 // Actions and store methods
                 setFormError: mockSetFormError,
-                clearError: vi.fn(),
-                addMonitorToSite: vi.fn(),
-                createSite: vi.fn().mockRejectedValue(new Error("Test error")),
-                generateUuid: vi.fn(() => "test-id"),
-                logger: logger,
-                onSuccess: mockOnSuccess,
+                siteId: "test-site-id",
+                // AddSiteFormState properties
+                url: "https://test.com",
             };
 
             await handleSubmit(mockEvent, props);

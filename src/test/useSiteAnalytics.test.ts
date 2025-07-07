@@ -6,18 +6,19 @@
 import { renderHook } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
-import { useSiteAnalytics, useChartData, SiteAnalyticsUtils } from "../hooks/site/useSiteAnalytics";
-import { Monitor, StatusHistory } from "../types";
 import type { Theme } from "../theme/types";
 import type { TimePeriod } from "../utils/time";
+
+import { useSiteAnalytics, useChartData, SiteAnalyticsUtils } from "../hooks/site/useSiteAnalytics";
+import { Monitor, StatusHistory } from "../types";
 
 // Mock constants to avoid dependency issues
 vi.mock("../constants", () => ({
     CHART_TIME_PERIODS: {
         "1h": 60 * 60 * 1000,
+        "7d": 7 * 24 * 60 * 60 * 1000,
         "12h": 12 * 60 * 60 * 1000,
         "24h": 24 * 60 * 60 * 1000,
-        "7d": 7 * 24 * 60 * 60 * 1000,
         "30d": 30 * 24 * 60 * 60 * 1000,
     },
 }));
@@ -25,9 +26,9 @@ vi.mock("../constants", () => ({
 vi.mock("../utils/time", () => ({
     TIME_PERIOD_LABELS: {
         "1h": "Last Hour",
+        "7d": "Last 7 Days",
         "12h": "Last 12 Hours",
         "24h": "Last 24 Hours",
-        "7d": "Last 7 Days",
         "30d": "Last 30 Days",
     },
 }));
@@ -39,26 +40,23 @@ describe("useSiteAnalytics", () => {
     const oneWeekAgo = now - 7 * 24 * 60 * 60 * 1000;
 
     const createStatusRecord = (timestamp: number, status: "up" | "down", responseTime: number): StatusHistory => ({
-        timestamp,
-        status,
         responseTime,
+        status,
+        timestamp,
     });
 
     const mockMonitorEmpty: Monitor = {
+        checkInterval: 60000,
+        history: [],
         id: "monitor-empty",
+        monitoring: true,
+        status: "up",
         type: "http",
         url: "https://example.com",
-        status: "up",
-        history: [],
-        monitoring: true,
-        checkInterval: 60000,
     };
 
     const mockMonitorWithHistory: Monitor = {
-        id: "monitor-with-history",
-        type: "http",
-        url: "https://example.com",
-        status: "up",
+        checkInterval: 60000,
         history: [
             createStatusRecord(now - 1000, "up", 200),
             createStatusRecord(now - 2000, "down", 0),
@@ -69,23 +67,26 @@ describe("useSiteAnalytics", () => {
             createStatusRecord(threeDaysAgo, "up", 250),
             createStatusRecord(oneWeekAgo, "down", 0),
         ],
+        id: "monitor-with-history",
         monitoring: true,
-        checkInterval: 60000,
+        status: "up",
+        type: "http",
+        url: "https://example.com",
     };
 
     const mockPortMonitor: Monitor = {
-        id: "port-monitor",
-        type: "port",
-        host: "example.com",
-        port: 8080,
-        status: "down",
+        checkInterval: 30000,
         history: [
             createStatusRecord(now - 1000, "down", 5000),
             createStatusRecord(now - 2000, "up", 50),
             createStatusRecord(now - 3000, "up", 75),
         ],
+        host: "example.com",
+        id: "port-monitor",
         monitoring: false,
-        checkInterval: 30000,
+        port: 8080,
+        status: "down",
+        type: "port",
     };
 
     beforeEach(() => {
@@ -99,21 +100,21 @@ describe("useSiteAnalytics", () => {
             const { result } = renderHook(() => useSiteAnalytics(undefined, "24h"));
 
             expect(result.current).toEqual({
-                totalChecks: 0,
-                upCount: 0,
-                downCount: 0,
-                uptime: "0",
                 avgResponseTime: 0,
+                downCount: 0,
+                downtimePeriods: [],
                 fastestResponse: 0,
-                slowestResponse: 0,
+                filteredHistory: [],
+                incidentCount: 0,
+                mttr: 0,
                 p50: 0,
                 p95: 0,
                 p99: 0,
-                downtimePeriods: [],
+                slowestResponse: 0,
+                totalChecks: 0,
                 totalDowntime: 0,
-                mttr: 0,
-                incidentCount: 0,
-                filteredHistory: [],
+                upCount: 0,
+                uptime: "0",
             });
         });
 
@@ -121,21 +122,21 @@ describe("useSiteAnalytics", () => {
             const { result } = renderHook(() => useSiteAnalytics(mockMonitorEmpty, "24h"));
 
             expect(result.current).toEqual({
-                totalChecks: 0,
-                upCount: 0,
-                downCount: 0,
-                uptime: "0",
                 avgResponseTime: 0,
+                downCount: 0,
+                downtimePeriods: [],
                 fastestResponse: 0,
-                slowestResponse: 0,
+                filteredHistory: [],
+                incidentCount: 0,
+                mttr: 0,
                 p50: 0,
                 p95: 0,
                 p99: 0,
-                downtimePeriods: [],
+                slowestResponse: 0,
+                totalChecks: 0,
                 totalDowntime: 0,
-                mttr: 0,
-                incidentCount: 0,
-                filteredHistory: [],
+                upCount: 0,
+                uptime: "0",
             });
         });
 
@@ -290,16 +291,16 @@ describe("useSiteAnalytics", () => {
 
             // Check first downtime period (oldest: now-5000 single point)
             expect(result.current.downtimePeriods[0]).toEqual({
-                start: now - 5000,
-                end: now - 5000,
                 duration: 0,
+                end: now - 5000,
+                start: now - 5000,
             });
 
             // Check second downtime period (newest: now-3000 to now-2000)
             expect(result.current.downtimePeriods[1]).toEqual({
-                start: now - 3000,
-                end: now - 2000,
                 duration: 1000,
+                end: now - 2000,
+                start: now - 3000,
             });
         });
 
@@ -317,9 +318,9 @@ describe("useSiteAnalytics", () => {
 
             expect(result.current.incidentCount).toBe(1);
             expect(result.current.downtimePeriods[0]).toEqual({
-                start: now - 2000,
-                end: now - 1000,
                 duration: 1000,
+                end: now - 1000,
+                start: now - 2000,
             });
         });
 
@@ -337,9 +338,9 @@ describe("useSiteAnalytics", () => {
 
             expect(result.current.incidentCount).toBe(1);
             expect(result.current.downtimePeriods[0]).toEqual({
-                start: now - 3000,
-                end: now - 2000,
                 duration: 1000,
+                end: now - 2000,
+                start: now - 3000,
             });
         });
 
@@ -388,7 +389,7 @@ describe("useSiteAnalytics", () => {
             expect(result.current.totalChecks).toBeGreaterThan(0);
             expect(result.current.filteredHistory).toEqual(
                 expect.arrayContaining([
-                    expect.objectContaining({ status: expect.any(String), responseTime: expect.any(Number) }),
+                    expect.objectContaining({ responseTime: expect.any(Number), status: expect.any(String) }),
                 ])
             );
         });
@@ -405,7 +406,7 @@ describe("useSiteAnalytics", () => {
 
     describe("Memoization", () => {
         it("should memoize results when dependencies don't change", () => {
-            const { result, rerender } = renderHook(({ monitor, timeRange }) => useSiteAnalytics(monitor, timeRange), {
+            const { rerender, result } = renderHook(({ monitor, timeRange }) => useSiteAnalytics(monitor, timeRange), {
                 initialProps: { monitor: mockMonitorWithHistory, timeRange: "24h" as TimePeriod },
             });
 
@@ -418,7 +419,7 @@ describe("useSiteAnalytics", () => {
         });
 
         it("should recalculate when monitor history changes", () => {
-            const { result, rerender } = renderHook(({ monitor, timeRange }) => useSiteAnalytics(monitor, timeRange), {
+            const { rerender, result } = renderHook(({ monitor, timeRange }) => useSiteAnalytics(monitor, timeRange), {
                 initialProps: { monitor: mockMonitorWithHistory, timeRange: "24h" as TimePeriod },
             });
 
@@ -436,7 +437,7 @@ describe("useSiteAnalytics", () => {
         });
 
         it("should recalculate when time range changes", () => {
-            const { result, rerender } = renderHook(({ monitor, timeRange }) => useSiteAnalytics(monitor, timeRange), {
+            const { rerender, result } = renderHook(({ monitor, timeRange }) => useSiteAnalytics(monitor, timeRange), {
                 initialProps: { monitor: mockMonitorWithHistory, timeRange: "24h" as TimePeriod },
             });
 
@@ -452,11 +453,11 @@ describe("useSiteAnalytics", () => {
     describe("Edge Cases", () => {
         it("should handle monitor without optional fields", () => {
             const minimalMonitor: Monitor = {
-                id: "minimal",
-                type: "http",
-                status: "up",
                 history: [createStatusRecord(now - 1000, "up", 200)],
+                id: "minimal",
                 monitoring: true,
+                status: "up",
+                type: "http",
             };
 
             const { result } = renderHook(() => useSiteAnalytics(minimalMonitor, "24h"));
@@ -508,24 +509,24 @@ describe("useSiteAnalytics", () => {
 describe("useChartData", () => {
     const mockTheme: Theme = {
         colors: {
+            error: "#ef4444",
             primary: {
                 500: "#3b82f6",
             },
             success: "#10b981",
-            error: "#ef4444",
         },
     } as Theme;
 
     const mockMonitor: Monitor = {
-        id: "chart-monitor",
-        type: "http",
-        status: "up",
         history: [
-            { timestamp: 1000, status: "up", responseTime: 200 },
-            { timestamp: 2000, status: "down", responseTime: 0 },
-            { timestamp: 3000, status: "up", responseTime: 150 },
+            { responseTime: 200, status: "up", timestamp: 1000 },
+            { responseTime: 0, status: "down", timestamp: 2000 },
+            { responseTime: 150, status: "up", timestamp: 3000 },
         ],
+        id: "chart-monitor",
         monitoring: true,
+        status: "up",
+        type: "http",
     };
 
     it("should generate chart data with correct structure", () => {
@@ -585,9 +586,9 @@ describe("useChartData", () => {
         const unsortedMonitor: Monitor = {
             ...mockMonitor,
             history: [
-                { timestamp: 3000, status: "up", responseTime: 150 },
-                { timestamp: 1000, status: "up", responseTime: 200 },
-                { timestamp: 2000, status: "down", responseTime: 0 },
+                { responseTime: 150, status: "up", timestamp: 3000 },
+                { responseTime: 200, status: "up", timestamp: 1000 },
+                { responseTime: 0, status: "down", timestamp: 2000 },
             ],
         };
 
@@ -603,7 +604,7 @@ describe("useChartData", () => {
     });
 
     it("should memoize chart data correctly", () => {
-        const { result, rerender } = renderHook(({ monitor, theme }) => useChartData(monitor, theme), {
+        const { rerender, result } = renderHook(({ monitor, theme }) => useChartData(monitor, theme), {
             initialProps: { monitor: mockMonitor, theme: mockTheme },
         });
 
@@ -616,7 +617,7 @@ describe("useChartData", () => {
     });
 
     it("should recalculate when monitor history changes", () => {
-        const { result, rerender } = renderHook(({ monitor, theme }) => useChartData(monitor, theme), {
+        const { rerender, result } = renderHook(({ monitor, theme }) => useChartData(monitor, theme), {
             initialProps: { monitor: mockMonitor, theme: mockTheme },
         });
 
@@ -624,7 +625,7 @@ describe("useChartData", () => {
 
         const newMonitor: Monitor = {
             ...mockMonitor,
-            history: [...mockMonitor.history, { timestamp: 4000, status: "up", responseTime: 300 }],
+            history: [...mockMonitor.history, { responseTime: 300, status: "up", timestamp: 4000 }],
         };
 
         rerender({ monitor: newMonitor, theme: mockTheme });

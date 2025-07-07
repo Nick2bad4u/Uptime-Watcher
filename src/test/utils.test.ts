@@ -3,8 +3,10 @@
  */
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import { createBaseStore, withErrorHandling, createPersistConfig, debounce, logStoreAction } from "../stores/utils";
+
 import type { BaseStore } from "../stores/types";
+
+import { createBaseStore, withErrorHandling, createPersistConfig, debounce, logStoreAction } from "../stores/utils";
 
 describe("Store Utils", () => {
     describe("createBaseStore", () => {
@@ -51,9 +53,9 @@ describe("Store Utils", () => {
 
         beforeEach(() => {
             mockStore = {
+                clearError: vi.fn(),
                 setError: vi.fn(),
                 setLoading: vi.fn(),
-                clearError: vi.fn(),
             };
         });
 

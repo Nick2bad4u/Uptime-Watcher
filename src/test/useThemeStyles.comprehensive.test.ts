@@ -1,20 +1,21 @@
 import { renderHook } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+
 import { useThemeStyles } from "../hooks/useThemeStyles";
 
 // Mock window.matchMedia
 Object.defineProperty(window, "matchMedia", {
-    writable: true,
     value: vi.fn().mockImplementation((query) => ({
+        addEventListener: vi.fn(),
+        addListener: vi.fn(), // deprecated
+        dispatchEvent: vi.fn(),
         matches: query === "(prefers-color-scheme: dark)",
         media: query,
         onchange: null,
-        addListener: vi.fn(), // deprecated
-        removeListener: vi.fn(), // deprecated
-        addEventListener: vi.fn(),
         removeEventListener: vi.fn(),
-        dispatchEvent: vi.fn(),
+        removeListener: vi.fn(), // deprecated
     })),
+    writable: true,
 });
 
 beforeEach(() => {
@@ -63,14 +64,14 @@ describe("useThemeStyles", () => {
 
     it("should handle light mode", () => {
         vi.mocked(window.matchMedia).mockImplementation((query) => ({
+            addEventListener: vi.fn(),
+            addListener: vi.fn(),
+            dispatchEvent: vi.fn(),
             matches: false, // Light mode
             media: query,
             onchange: null,
-            addListener: vi.fn(),
-            removeListener: vi.fn(),
-            addEventListener: vi.fn(),
             removeEventListener: vi.fn(),
-            dispatchEvent: vi.fn(),
+            removeListener: vi.fn(),
         }));
 
         const { result } = renderHook(() => useThemeStyles());
@@ -81,14 +82,14 @@ describe("useThemeStyles", () => {
 
     it("should handle dark mode", () => {
         vi.mocked(window.matchMedia).mockImplementation((query) => ({
+            addEventListener: vi.fn(),
+            addListener: vi.fn(),
+            dispatchEvent: vi.fn(),
             matches: query === "(prefers-color-scheme: dark)",
             media: query,
             onchange: null,
-            addListener: vi.fn(),
-            removeListener: vi.fn(),
-            addEventListener: vi.fn(),
             removeEventListener: vi.fn(),
-            dispatchEvent: vi.fn(),
+            removeListener: vi.fn(),
         }));
 
         const { result } = renderHook(() => useThemeStyles());
@@ -143,7 +144,7 @@ describe("useThemeStyles", () => {
     });
 
     it("should memoize styles correctly", () => {
-        const { result, rerender } = renderHook(() => useThemeStyles(false));
+        const { rerender, result } = renderHook(() => useThemeStyles(false));
 
         const firstRender = result.current;
         rerender();
@@ -166,7 +167,7 @@ describe("useThemeStyles", () => {
     it("should handle missing matchMedia gracefully", () => {
         const originalMatchMedia = window.matchMedia;
         // Remove matchMedia to test defensive programming
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
         delete (window as any).matchMedia;
 
         expect(() => {
@@ -186,28 +187,28 @@ describe("useThemeStyles", () => {
     it("should have consistent color schemes", () => {
         // Test light mode
         vi.mocked(window.matchMedia).mockImplementation(() => ({
+            addEventListener: vi.fn(),
+            addListener: vi.fn(),
+            dispatchEvent: vi.fn(),
             matches: false,
             media: "",
             onchange: null,
-            addListener: vi.fn(),
-            removeListener: vi.fn(),
-            addEventListener: vi.fn(),
             removeEventListener: vi.fn(),
-            dispatchEvent: vi.fn(),
+            removeListener: vi.fn(),
         }));
 
         const { result: lightResult } = renderHook(() => useThemeStyles());
 
         // Test dark mode
         vi.mocked(window.matchMedia).mockImplementation((query) => ({
+            addEventListener: vi.fn(),
+            addListener: vi.fn(),
+            dispatchEvent: vi.fn(),
             matches: query === "(prefers-color-scheme: dark)",
             media: query,
             onchange: null,
-            addListener: vi.fn(),
-            removeListener: vi.fn(),
-            addEventListener: vi.fn(),
             removeEventListener: vi.fn(),
-            dispatchEvent: vi.fn(),
+            removeListener: vi.fn(),
         }));
 
         const { result: darkResult } = renderHook(() => useThemeStyles());

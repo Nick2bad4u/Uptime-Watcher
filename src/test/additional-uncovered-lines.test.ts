@@ -4,8 +4,10 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { waitForElectronAPI } from "../stores/utils";
+
 import type { Site, Monitor } from "../types";
+
+import { waitForElectronAPI } from "../stores/utils";
 
 // Mock all dependencies
 vi.mock("../stores", () => ({
@@ -17,16 +19,16 @@ vi.mock("../stores", () => ({
 vi.mock("../hooks/site/useSiteAnalytics", () => ({
     useSiteAnalytics: vi.fn(() => ({
         data: null,
-        loading: false,
         error: null,
+        loading: false,
     })),
 }));
 
 vi.mock("../services/logger", () => ({
     default: {
-        user: { action: vi.fn() },
-        site: { error: vi.fn() },
         error: vi.fn(),
+        site: { error: vi.fn() },
+        user: { action: vi.fn() },
         warn: vi.fn(),
     },
 }));
@@ -68,20 +70,20 @@ describe("Additional Uncovered Lines Tests", () => {
         it("should handle monitor with undefined timeout in handleTimeoutChange", () => {
             const mockSite: Site = {
                 identifier: "test-site-id",
-                name: "Test Site",
                 monitors: [
                     {
+                        checkInterval: 30000,
+                        history: [],
                         id: "monitor-1",
+                        monitoring: true,
+                        retryAttempts: 3,
+                        status: "up",
+                        timeout: undefined, // This should trigger line 250
                         type: "http",
                         url: "https://test.com",
-                        status: "up",
-                        checkInterval: 30000,
-                        timeout: undefined, // This should trigger line 250
-                        retryAttempts: 3,
-                        monitoring: true,
-                        history: [],
                     } as Monitor,
                 ],
+                name: "Test Site",
             };
 
             // This test verifies the edge case where timeout is undefined
@@ -170,8 +172,8 @@ describe("Additional Uncovered Lines Tests", () => {
         it("should handle sites with no monitors", () => {
             const mockSite: Site = {
                 identifier: "test-site-id",
-                name: "Test Site",
                 monitors: [], // Empty monitors array
+                name: "Test Site",
             };
 
             // This test verifies edge case handling when no monitors exist

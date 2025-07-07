@@ -4,41 +4,41 @@
  */
 
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
 import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
 
 import { SiteCardHeader } from "../components/Dashboard/SiteCard/SiteCardHeader";
 import { Site } from "../types";
 
 const mockSite: Site = {
     identifier: "test-site",
-    name: "Test Site",
     monitors: [
         {
-            id: "monitor1",
-            type: "http",
-            status: "up",
             history: [],
+            id: "monitor1",
+            status: "up",
+            type: "http",
         },
         {
-            id: "monitor2",
-            type: "port",
-            status: "down",
             history: [],
+            id: "monitor2",
+            status: "down",
+            type: "port",
         },
     ],
+    name: "Test Site",
 };
 
 const defaultProps = {
-    site: mockSite,
-    selectedMonitorId: "monitor1",
-    onMonitorIdChange: vi.fn(),
-    onCheckNow: vi.fn(),
-    onStartMonitoring: vi.fn(),
-    onStopMonitoring: vi.fn(),
+    hasMonitor: true,
     isLoading: false,
     isMonitoring: false,
-    hasMonitor: true,
+    onCheckNow: vi.fn(),
+    onMonitorIdChange: vi.fn(),
+    onStartMonitoring: vi.fn(),
+    onStopMonitoring: vi.fn(),
+    selectedMonitorId: "monitor1",
+    site: mockSite,
 };
 
 describe("SiteCardHeader", () => {
@@ -92,7 +92,7 @@ describe("SiteCardHeader", () => {
     });
 
     it("passes correct props to ActionButtonGroup when monitoring", () => {
-        render(<SiteCardHeader {...defaultProps} isMonitoring={true} />);
+        render(<SiteCardHeader {...defaultProps} isMonitoring />);
 
         // Verify buttons are present (ActionButtonGroup should render them)
         const buttons = screen.getAllByRole("button");
@@ -100,7 +100,7 @@ describe("SiteCardHeader", () => {
     });
 
     it("passes correct props to ActionButtonGroup when loading", () => {
-        render(<SiteCardHeader {...defaultProps} isLoading={true} />);
+        render(<SiteCardHeader {...defaultProps} isLoading />);
 
         // When loading, buttons might be disabled
         const buttons = screen.getAllByRole("button");
@@ -112,9 +112,9 @@ describe("SiteCardHeader", () => {
 
         // ActionButtonGroup should receive disabled=true
         const buttons = screen.getAllByRole("button");
-        buttons.forEach((button) => {
+        for (const button of buttons) {
             expect(button).toBeDisabled();
-        });
+        }
     });
 
     it("handles site with empty monitors array", () => {

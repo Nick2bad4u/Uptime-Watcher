@@ -4,6 +4,7 @@
  */
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+
 import { waitForElectronAPI } from "../stores/utils";
 
 // Mock window and setTimeout

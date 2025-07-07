@@ -4,36 +4,38 @@
  */
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import { useSitesStore } from "../stores/sites/useSitesStore";
+
 import type { Site, Monitor } from "../types";
+
+import { useSitesStore } from "../stores/sites/useSitesStore";
 
 // Mock electron API
 const mockElectronAPI = {
-    sites: {
-        getSites: vi.fn(),
-        addSite: vi.fn(),
-        removeSite: vi.fn(),
-        updateSite: vi.fn(),
-        checkSiteNow: vi.fn(),
-    },
-    monitoring: {
-        startMonitoring: vi.fn(),
-        stopMonitoring: vi.fn(),
-        startMonitoringForSite: vi.fn(),
-        stopMonitoringForSite: vi.fn(),
-    },
     data: {
+        downloadSQLiteBackup: vi.fn(),
         exportData: vi.fn(),
         importData: vi.fn(),
-        downloadSQLiteBackup: vi.fn(),
     },
     events: {
         onStatusUpdate: vi.fn(),
         removeAllListeners: vi.fn(),
     },
+    monitoring: {
+        startMonitoring: vi.fn(),
+        startMonitoringForSite: vi.fn(),
+        stopMonitoring: vi.fn(),
+        stopMonitoringForSite: vi.fn(),
+    },
     settings: {
         getHistoryLimit: vi.fn(),
         updateHistoryLimit: vi.fn(),
+    },
+    sites: {
+        addSite: vi.fn(),
+        checkSiteNow: vi.fn(),
+        getSites: vi.fn(),
+        removeSite: vi.fn(),
+        updateSite: vi.fn(),
     },
     system: {
         quitAndInstall: vi.fn(),
@@ -54,13 +56,13 @@ Object.defineProperty(globalThis, "crypto", {
 // Mock utils
 vi.mock("../stores/utils", () => ({
     logStoreAction: vi.fn(),
+    waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
     withErrorHandling: vi.fn((asyncFn, handlers) => {
         return asyncFn().catch((error: Error) => {
             handlers.setError(error);
             throw error;
         });
     }),
-    waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
 }));
 
 describe("useSitesStore", () => {
@@ -68,9 +70,9 @@ describe("useSitesStore", () => {
         vi.clearAllMocks();
         // Reset store state
         useSitesStore.setState({
-            sites: [],
             selectedMonitorIds: {},
             selectedSiteId: undefined,
+            sites: [],
         });
     });
 
@@ -89,8 +91,8 @@ describe("useSitesStore", () => {
         it("should add site to store", () => {
             const site: Site = {
                 identifier: "test-site",
-                name: "Test Site",
                 monitors: [],
+                name: "Test Site",
             };
 
             useSitesStore.getState().addSite(site);
@@ -104,13 +106,13 @@ describe("useSitesStore", () => {
             const sites: Site[] = [
                 {
                     identifier: "site-1",
-                    name: "Site 1",
                     monitors: [],
+                    name: "Site 1",
                 },
                 {
                     identifier: "site-2",
-                    name: "Site 2",
                     monitors: [],
+                    name: "Site 2",
                 },
             ];
             useSitesStore.setState({ ...useSitesStore.getState(), sites });
@@ -126,8 +128,8 @@ describe("useSitesStore", () => {
             const sites: Site[] = [
                 {
                     identifier: "site-1",
-                    name: "Site 1",
                     monitors: [],
+                    name: "Site 1",
                 },
             ];
 
@@ -142,17 +144,17 @@ describe("useSitesStore", () => {
         it("should create site with provided monitors", async () => {
             const siteData = {
                 identifier: "test-site",
-                name: "Test Site",
                 monitors: [
                     {
+                        history: [],
                         id: "monitor-1",
+                        monitoring: true,
+                        status: "pending" as const,
                         type: "http" as const,
                         url: "https://example.com",
-                        status: "pending" as const,
-                        history: [],
-                        monitoring: true,
                     },
                 ],
+                name: "Test Site",
             };
 
             const newSite: Site = {
@@ -167,15 +169,15 @@ describe("useSitesStore", () => {
             expect(mockElectronAPI.sites.addSite).toHaveBeenCalledWith(
                 expect.objectContaining({
                     identifier: "test-site",
-                    name: "Test Site",
                     monitors: expect.arrayContaining([
                         expect.objectContaining({
                             id: "monitor-1",
-                            type: "http",
-                            status: "pending",
                             monitoring: true,
+                            status: "pending",
+                            type: "http",
                         }),
                     ]),
+                    name: "Test Site",
                 })
             );
 
@@ -187,19 +189,19 @@ describe("useSitesStore", () => {
         it("should create site with default HTTP monitor when no monitors provided", async () => {
             const siteData = {
                 identifier: "test-site",
-                name: "Test Site",
                 monitors: [],
+                name: "Test Site",
             };
 
             const newSite: Site = {
                 ...siteData,
                 monitors: [
                     {
-                        id: "mock-uuid",
-                        type: "http" as const,
-                        status: "pending" as const,
                         history: [],
+                        id: "mock-uuid",
                         monitoring: true,
+                        status: "pending" as const,
+                        type: "http" as const,
                     },
                 ],
             };
@@ -213,9 +215,9 @@ describe("useSitesStore", () => {
                     monitors: expect.arrayContaining([
                         expect.objectContaining({
                             id: "mock-uuid",
-                            type: "http",
-                            status: "pending",
                             monitoring: true,
+                            status: "pending",
+                            type: "http",
                         }),
                     ]),
                 })
@@ -225,26 +227,26 @@ describe("useSitesStore", () => {
         it("should normalize monitor status to valid values", async () => {
             const siteData = {
                 identifier: "test-site",
-                name: "Test Site",
                 monitors: [
                     {
-                        id: "monitor-1",
-                        type: "http" as const,
-                        status: "invalid-status" as never,
                         history: [],
+                        id: "monitor-1",
+                        status: "invalid-status" as never,
+                        type: "http" as const,
                     },
                 ],
+                name: "Test Site",
             };
 
             const newSite: Site = {
                 ...siteData,
                 monitors: [
                     {
-                        id: "monitor-1",
-                        type: "http" as const,
-                        status: "pending" as const,
                         history: [],
+                        id: "monitor-1",
                         monitoring: true,
+                        status: "pending" as const,
+                        type: "http" as const,
                     },
                 ],
             };
@@ -267,8 +269,8 @@ describe("useSitesStore", () => {
         it("should handle createSite errors", async () => {
             const siteData = {
                 identifier: "test-site",
-                name: "Test Site",
                 monitors: [],
+                name: "Test Site",
             };
 
             mockElectronAPI.sites.addSite.mockRejectedValue(new Error("Backend error"));
@@ -283,21 +285,21 @@ describe("useSitesStore", () => {
             const sites: Site[] = [
                 {
                     identifier: "site-1",
-                    name: "Site 1",
                     monitors: [
                         {
-                            id: "monitor-1",
-                            type: "http",
-                            status: "up",
                             history: [],
+                            id: "monitor-1",
                             monitoring: true,
+                            status: "up",
+                            type: "http",
                         },
                     ],
+                    name: "Site 1",
                 },
                 {
                     identifier: "site-2",
-                    name: "Site 2",
                     monitors: [],
+                    name: "Site 2",
                 },
             ];
             useSitesStore.setState({ ...useSitesStore.getState(), sites });
@@ -346,16 +348,16 @@ describe("useSitesStore", () => {
             const sites: Site[] = [
                 {
                     identifier: "site-1",
-                    name: "Site 1",
                     monitors: [
                         {
-                            id: "existing-monitor",
-                            type: "http",
-                            status: "up",
                             history: [],
+                            id: "existing-monitor",
                             monitoring: true,
+                            status: "up",
+                            type: "http",
                         },
                     ],
+                    name: "Site 1",
                 },
             ];
             useSitesStore.setState({ ...useSitesStore.getState(), sites });
@@ -363,13 +365,13 @@ describe("useSitesStore", () => {
 
         it("should add monitor to existing site", async () => {
             const newMonitor: Monitor = {
-                id: "new-monitor",
-                type: "port",
+                history: [],
                 host: "localhost",
+                id: "new-monitor",
+                monitoring: true,
                 port: 3000,
                 status: "pending",
-                history: [],
-                monitoring: true,
+                type: "port",
             };
 
             mockElectronAPI.sites.updateSite.mockResolvedValue(undefined);
@@ -398,11 +400,11 @@ describe("useSitesStore", () => {
 
         it("should handle adding monitor to non-existent site", async () => {
             const newMonitor: Monitor = {
-                id: "new-monitor",
-                type: "http",
-                status: "pending",
                 history: [],
+                id: "new-monitor",
                 monitoring: true,
+                status: "pending",
+                type: "http",
             };
 
             await expect(useSitesStore.getState().addMonitorToSite("non-existent", newMonitor)).rejects.toThrow();
@@ -446,8 +448,8 @@ describe("useSitesStore", () => {
             Object.defineProperty(document, "createElement", {
                 value: mockCreateElement.mockReturnValue({
                     click: mockClick,
-                    href: "",
                     download: "",
+                    href: "",
                 }),
                 writable: true,
             });
@@ -484,16 +486,16 @@ describe("useSitesStore", () => {
             const sites: Site[] = [
                 {
                     identifier: "site-1",
-                    name: "Site 1",
                     monitors: [
                         {
-                            id: "monitor-1",
-                            type: "http",
-                            status: "up",
                             history: [],
+                            id: "monitor-1",
                             monitoring: true,
+                            status: "up",
+                            type: "http",
                         },
                     ],
+                    name: "Site 1",
                 },
             ];
             useSitesStore.setState({ ...useSitesStore.getState(), sites });

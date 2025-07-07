@@ -4,8 +4,10 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { createSitesStateActions, initialSitesState } from "../../../stores/sites/useSitesState";
+
 import type { Site } from "../../../types";
+
+import { createSitesStateActions, initialSitesState } from "../../../stores/sites/useSitesState";
 
 // Mock logging
 vi.mock("../../../stores/utils", () => ({
@@ -24,23 +26,23 @@ describe("useSitesState", () => {
 
         mockSite = {
             identifier: "test-site",
-            name: "Test Site",
             monitors: [
                 {
-                    id: "monitor-1",
-                    type: "http" as const,
-                    status: "up" as const,
                     history: [],
+                    id: "monitor-1",
                     monitoring: true,
+                    status: "up" as const,
+                    type: "http" as const,
                 },
             ],
+            name: "Test Site",
         };
 
         // Setup initial state
         mockGet.mockReturnValue({
-            sites: [mockSite],
-            selectedSiteId: undefined,
             selectedMonitorIds: {},
+            selectedSiteId: undefined,
+            sites: [mockSite],
         });
 
         stateActions = createSitesStateActions(mockSet, mockGet);
@@ -49,9 +51,9 @@ describe("useSitesState", () => {
     describe("initialSitesState", () => {
         it("should have correct initial state", () => {
             expect(initialSitesState).toEqual({
-                sites: [],
-                selectedSiteId: undefined,
                 selectedMonitorIds: {},
+                selectedSiteId: undefined,
+                sites: [],
             });
         });
     });
@@ -69,7 +71,7 @@ describe("useSitesState", () => {
             expect(setFunction).toBeDefined();
 
             if (setFunction) {
-                const result = setFunction({ sites: [], selectedSiteId: undefined, selectedMonitorIds: {} });
+                const result = setFunction({ selectedMonitorIds: {}, selectedSiteId: undefined, sites: [] });
                 expect(result).toEqual({ sites: newSites });
             }
         });
@@ -88,7 +90,7 @@ describe("useSitesState", () => {
 
             const setFunction = mockSet.mock.calls[0]?.[0];
             if (setFunction) {
-                const result = setFunction({ sites: [], selectedSiteId: undefined, selectedMonitorIds: {} });
+                const result = setFunction({ selectedMonitorIds: {}, selectedSiteId: undefined, sites: [] });
                 expect(result).toEqual({ sites: [] });
             }
         });
@@ -98,8 +100,8 @@ describe("useSitesState", () => {
         it("should add site to existing sites", () => {
             const newSite: Site = {
                 identifier: "new-site",
-                name: "New Site",
                 monitors: [],
+                name: "New Site",
             };
 
             stateActions.addSite(newSite);
@@ -144,8 +146,8 @@ describe("useSitesState", () => {
 
             if (setFunction) {
                 const result = setFunction({
-                    sites: [mockSite],
                     selectedSiteId: undefined,
+                    sites: [mockSite],
                 });
                 expect(result.sites).toHaveLength(0);
             }
@@ -163,9 +165,9 @@ describe("useSitesState", () => {
 
         it("should clear selectedSiteId if removed site was selected", () => {
             mockGet.mockReturnValue({
-                sites: [mockSite],
-                selectedSiteId: "test-site",
                 selectedMonitorIds: {},
+                selectedSiteId: "test-site",
+                sites: [mockSite],
             });
 
             stateActions.removeSite("test-site");
@@ -175,9 +177,9 @@ describe("useSitesState", () => {
 
             if (setFunction) {
                 const result = setFunction({
-                    sites: [mockSite],
-                    selectedSiteId: "test-site",
                     selectedMonitorIds: {},
+                    selectedSiteId: "test-site",
+                    sites: [mockSite],
                 });
                 expect(result.selectedSiteId).toBeUndefined();
             }
@@ -213,8 +215,8 @@ describe("useSitesState", () => {
     describe("getSelectedSite", () => {
         it("should return selected site when found", () => {
             mockGet.mockReturnValue({
-                sites: [mockSite],
                 selectedSiteId: "test-site",
+                sites: [mockSite],
             });
 
             const result = stateActions.getSelectedSite();
@@ -224,8 +226,8 @@ describe("useSitesState", () => {
 
         it("should return undefined when no site selected", () => {
             mockGet.mockReturnValue({
-                sites: [mockSite],
                 selectedSiteId: undefined,
+                sites: [mockSite],
             });
 
             const result = stateActions.getSelectedSite();
@@ -235,8 +237,8 @@ describe("useSitesState", () => {
 
         it("should return undefined when selected site not found", () => {
             mockGet.mockReturnValue({
-                sites: [mockSite],
                 selectedSiteId: "non-existent",
+                sites: [mockSite],
             });
 
             const result = stateActions.getSelectedSite();
@@ -300,8 +302,8 @@ describe("useSitesState", () => {
             const originalSites = [mockSite];
             const newSite: Site = {
                 identifier: "new-site",
-                name: "New Site",
                 monitors: [],
+                name: "New Site",
             };
 
             stateActions.addSite(newSite);

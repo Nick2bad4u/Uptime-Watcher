@@ -8,24 +8,24 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // Mock all individual component modules to avoid dependency issues
 vi.mock("../components/common/StatusBadge", () => ({
-    StatusBadge: vi.fn(() => "StatusBadge"),
-    StatusBadgeVariant: {
-        SUCCESS: "success",
-        WARNING: "warning",
-        DANGER: "danger",
-        INFO: "info",
-    },
     // Export all to match export * pattern
     __esModule: true,
     default: vi.fn(() => "StatusBadge"),
+    StatusBadge: vi.fn(() => "StatusBadge"),
+    StatusBadgeVariant: {
+        DANGER: "danger",
+        INFO: "info",
+        SUCCESS: "success",
+        WARNING: "warning",
+    },
 }));
 
 vi.mock("../components/common/HistoryChart", () => ({
-    HistoryChart: vi.fn(() => "HistoryChart"),
-    HistoryChartProps: {},
     // Export all to match export * pattern
     __esModule: true,
     default: vi.fn(() => "HistoryChart"),
+    HistoryChart: vi.fn(() => "HistoryChart"),
+    HistoryChartProps: {},
 }));
 
 // Import the barrel export module after mocking
@@ -65,20 +65,20 @@ describe("Common Components Index Module", () => {
         it("should export React components as functions", () => {
             const components = [CommonComponentsIndex.StatusBadge, CommonComponentsIndex.HistoryChart].filter(Boolean); // Filter out undefined exports
 
-            components.forEach((component) => {
+            for (const component of components) {
                 expect(typeof component).toBe("function");
-            });
+            }
         });
 
         it("should export all expected common components", () => {
             const expectedComponents = ["StatusBadge", "HistoryChart"];
 
-            expectedComponents.forEach((componentName) => {
+            for (const componentName of expectedComponents) {
                 const component = CommonComponentsIndex[componentName as keyof typeof CommonComponentsIndex];
                 if (component) {
                     expect(typeof component).toBe("function");
                 }
-            });
+            }
         });
     });
 
@@ -94,7 +94,7 @@ describe("Common Components Index Module", () => {
             const commonComponents = CommonComponentsIndex;
             const exportNames = Object.keys(commonComponents);
 
-            exportNames.forEach((exportName) => {
+            for (const exportName of exportNames) {
                 const staticAccess = commonComponents[exportName as keyof typeof commonComponents];
                 const dynamicAccess = commonComponents[exportName as keyof typeof commonComponents];
 
@@ -102,7 +102,7 @@ describe("Common Components Index Module", () => {
                 if (staticAccess !== undefined) {
                     expect(staticAccess).toBeDefined();
                 }
-            });
+            }
         });
     });
 
@@ -115,11 +115,11 @@ describe("Common Components Index Module", () => {
 
         it("should maintain export references", () => {
             // All defined exports should not be null
-            Object.values(CommonComponentsIndex).forEach((exportValue) => {
+            for (const exportValue of Object.values(CommonComponentsIndex)) {
                 if (exportValue !== undefined) {
                     expect(exportValue).not.toBeNull();
                 }
-            });
+            }
         });
 
         it("should not modify exported values", () => {
@@ -136,7 +136,7 @@ describe("Common Components Index Module", () => {
     describe("TypeScript Compatibility", () => {
         it("should work with TypeScript type checking", () => {
             // This test verifies that TypeScript can properly infer types
-            const { StatusBadge, HistoryChart } = CommonComponentsIndex;
+            const { HistoryChart, StatusBadge } = CommonComponentsIndex;
 
             expect(StatusBadge).toBeDefined();
             expect(HistoryChart).toBeDefined();
@@ -144,7 +144,7 @@ describe("Common Components Index Module", () => {
 
         it("should support named imports pattern", () => {
             // Test destructuring assignment (common import pattern)
-            const { StatusBadge, HistoryChart } = CommonComponentsIndex;
+            const { HistoryChart, StatusBadge } = CommonComponentsIndex;
             expect(StatusBadge).toBe(CommonComponentsIndex.StatusBadge);
             expect(HistoryChart).toBe(CommonComponentsIndex.HistoryChart);
         });
@@ -183,22 +183,22 @@ describe("Common Components Index Module", () => {
             expect(exports.length).toBeGreaterThan(0);
 
             // Each defined export should be accessible
-            exports.forEach((exportName) => {
+            for (const exportName of exports) {
                 const exportValue = (CommonComponentsIndex as Record<string, unknown>)[exportName];
                 if (exportValue !== undefined) {
                     expect(exportValue).toBeDefined();
                 }
-            });
+            }
         });
 
         it("should provide centralized access to all common components", () => {
             // Verify that core common components are available
             const coreComponents = ["StatusBadge", "HistoryChart"];
 
-            coreComponents.forEach((componentName) => {
+            for (const componentName of coreComponents) {
                 const component = CommonComponentsIndex[componentName as keyof typeof CommonComponentsIndex];
                 expect(component).toBeDefined();
-            });
+            }
         });
     });
 
@@ -249,10 +249,10 @@ describe("Common Components Index Module", () => {
             expect(Array.isArray(keys)).toBe(true);
             expect(keys.length).toBeGreaterThan(0);
 
-            keys.forEach((key) => {
+            for (const key of keys) {
                 expect(typeof key).toBe("string");
                 expect(key.length).toBeGreaterThan(0);
-            });
+            }
         });
     });
 
@@ -274,11 +274,11 @@ describe("Common Components Index Module", () => {
                 "HistoryChart", // Chart component
             ];
 
-            requiredComponents.forEach((component) => {
+            for (const component of requiredComponents) {
                 const exportedComponent = CommonComponentsIndex[component as keyof typeof CommonComponentsIndex];
                 expect(exportedComponent).toBeDefined();
                 expect(typeof exportedComponent).toBe("function");
-            });
+            }
         });
     });
 

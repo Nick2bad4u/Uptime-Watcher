@@ -3,19 +3,18 @@
  * Validates form submission handling, validation, and error handling.
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { describe, expect, it, vi, beforeEach } from "vitest";
 import validator from "validator";
+import { describe, expect, it, vi, beforeEach } from "vitest";
 
 import { handleSubmit } from "../components/AddSiteForm/Submit";
 
 // Mock validator - defined inline to avoid hoisting issues
 vi.mock("validator", () => ({
     default: {
-        isURL: vi.fn(),
-        isIP: vi.fn(),
         isFQDN: vi.fn(),
+        isIP: vi.fn(),
         isPort: vi.fn(),
+        isURL: vi.fn(),
     },
 }));
 
@@ -72,28 +71,25 @@ describe("AddSiteForm Submit", () => {
     const baseProps = {
         // Form state
         addMode: "new" as const,
-        checkInterval: 300000,
-        host: "",
-        monitorType: "http" as const,
-        name: "Test Site",
-        port: "",
-        selectedExistingSite: "",
-        siteId: "test-site-id",
-        url: "https://example.com",
-        formError: undefined,
-
-        // Form actions
-        setFormError: mockSetFormError,
-
         // Store actions
         addMonitorToSite: mockAddMonitorToSite,
+        checkInterval: 300000,
         clearError: mockClearError,
         createSite: mockCreateSite,
-
+        formError: undefined,
         // Dependencies
         generateUuid: mockGenerateUuid,
+        host: "",
         logger: mockLogger,
+        monitorType: "http" as const,
+        name: "Test Site",
         onSuccess: mockOnSuccess,
+        port: "",
+        selectedExistingSite: "",
+        // Form actions
+        setFormError: mockSetFormError,
+        siteId: "test-site-id",
+        url: "https://example.com",
     };
 
     const mockEvent = {
@@ -126,14 +122,14 @@ describe("AddSiteForm Submit", () => {
                 identifier: "test-site-id",
                 monitors: [
                     expect.objectContaining({
+                        checkInterval: 300000,
+                        history: [],
                         id: "mock-monitor-id",
+                        retryAttempts: 3,
+                        status: "pending",
+                        timeout: 5000,
                         type: "http",
                         url: "https://example.com",
-                        status: "pending",
-                        checkInterval: 300000,
-                        timeout: 5000,
-                        retryAttempts: 3,
-                        history: [],
                     }),
                 ],
                 name: "Test Site",
@@ -189,8 +185,8 @@ describe("AddSiteForm Submit", () => {
     describe("Port Monitor Validation", () => {
         const portProps = {
             ...baseProps,
-            monitorType: "port" as const,
             host: "example.com",
+            monitorType: "port" as const,
             port: "80",
             url: "",
         };
@@ -202,11 +198,11 @@ describe("AddSiteForm Submit", () => {
                 identifier: "test-site-id",
                 monitors: [
                     expect.objectContaining({
-                        id: "mock-monitor-id",
-                        type: "port",
                         host: "example.com",
+                        id: "mock-monitor-id",
                         port: 80,
                         status: "pending",
+                        type: "port",
                     }),
                 ],
                 name: "Test Site",
@@ -481,8 +477,8 @@ describe("AddSiteForm Submit", () => {
         it("should convert port to number for port monitors", async () => {
             await handleSubmit(mockEvent, {
                 ...baseProps,
-                monitorType: "port",
                 host: "example.com",
+                monitorType: "port",
                 port: "8080",
                 url: "",
             });
@@ -508,13 +504,13 @@ describe("AddSiteForm Submit", () => {
                 identifier: "test-site-id",
                 monitors: [
                     expect.objectContaining({
-                        id: "mock-monitor-id",
-                        type: "http",
-                        status: "pending",
                         checkInterval: 300000,
-                        timeout: 5000,
-                        retryAttempts: 3,
                         history: [],
+                        id: "mock-monitor-id",
+                        retryAttempts: 3,
+                        status: "pending",
+                        timeout: 5000,
+                        type: "http",
                     }),
                 ],
                 name: "Test Site",
@@ -533,8 +529,8 @@ describe("AddSiteForm Submit", () => {
         it("should create port monitor with host and port", async () => {
             await handleSubmit(mockEvent, {
                 ...baseProps,
-                monitorType: "port",
                 host: "api.example.com",
+                monitorType: "port",
                 port: "3000",
                 url: "",
             });
@@ -548,7 +544,6 @@ describe("AddSiteForm Submit", () => {
 
     describe("Edge Cases", () => {
         it("should handle missing onSuccess callback", async () => {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { onSuccess, ...propsWithoutOnSuccess } = baseProps;
             await handleSubmit(mockEvent, propsWithoutOnSuccess);
 
@@ -559,8 +554,8 @@ describe("AddSiteForm Submit", () => {
         it("should show only first validation error", async () => {
             await handleSubmit(mockEvent, {
                 ...baseProps,
-                name: "", // First error
                 checkInterval: 0, // Second error
+                name: "", // First error
             });
 
             expect(mockSetFormError).toHaveBeenCalledWith("Site name is required");

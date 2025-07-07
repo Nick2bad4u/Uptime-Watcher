@@ -26,19 +26,19 @@ vi.mock("../theme/components", () => ({
 describe("HistoryChart Component", () => {
     const mockHistory: StatusHistory[] = [
         {
-            timestamp: 1000,
-            status: "up",
             responseTime: 200,
-        },
-        {
-            timestamp: 2000,
-            status: "down",
-            responseTime: 0,
-        },
-        {
-            timestamp: 3000,
             status: "up",
+            timestamp: 1000,
+        },
+        {
+            responseTime: 0,
+            status: "down",
+            timestamp: 2000,
+        },
+        {
             responseTime: 150,
+            status: "up",
+            timestamp: 3000,
         },
     ];
 
@@ -90,9 +90,9 @@ describe("HistoryChart Component", () => {
         it("handles single history item", () => {
             const singleHistory: StatusHistory[] = [
                 {
-                    timestamp: 1000,
-                    status: "up",
                     responseTime: 200,
+                    status: "up",
+                    timestamp: 1000,
                 },
             ];
 
@@ -106,9 +106,9 @@ describe("HistoryChart Component", () => {
     describe("MaxItems Prop", () => {
         it("respects maxItems prop when history exceeds limit", () => {
             const largeHistory: StatusHistory[] = Array.from({ length: 200 }, (_, i) => ({
-                timestamp: i * 1000,
-                status: i % 2 === 0 ? "up" : "down",
                 responseTime: i % 2 === 0 ? 200 : 0,
+                status: i % 2 === 0 ? "up" : "down",
+                timestamp: i * 1000,
             }));
 
             render(<HistoryChart history={largeHistory} title="Large Chart" maxItems={50} />);
@@ -118,9 +118,9 @@ describe("HistoryChart Component", () => {
 
         it("defaults to 120 items when maxItems not specified", () => {
             const largeHistory: StatusHistory[] = Array.from({ length: 200 }, (_, i) => ({
-                timestamp: i * 1000,
-                status: i % 2 === 0 ? "up" : "down",
                 responseTime: i % 2 === 0 ? 200 : 0,
+                status: i % 2 === 0 ? "up" : "down",
+                timestamp: i * 1000,
             }));
 
             render(<HistoryChart history={largeHistory} title="Default Max" />);

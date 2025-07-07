@@ -3,9 +3,9 @@
  * Basic tests to start with.
  */
 
-import React from "react";
 import { render, screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import React from "react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 import { Settings } from "../components/Settings/Settings";
@@ -21,12 +21,12 @@ const mockUseStore = {
     resetSettings: vi.fn(),
     setError: vi.fn(),
     settings: {
-        notifications: true,
         autoStart: false,
-        minimizeToTray: true,
-        theme: "dark" as ThemeName,
-        soundAlerts: false,
         historyLimit: 100,
+        minimizeToTray: true,
+        notifications: true,
+        soundAlerts: false,
+        theme: "dark" as ThemeName,
     },
     updateHistoryLimitValue: vi.fn().mockResolvedValue(undefined),
     updateSettings: vi.fn(),
@@ -36,11 +36,11 @@ const mockUseStore = {
 const mockUseTheme = {
     availableThemes: ["light", "dark", "system"] as ThemeName[],
     currentTheme: {
-        isDark: true,
         colors: {
             primary: "#000",
             secondary: "#fff",
         },
+        isDark: true,
     },
     getColor: vi.fn(),
     getStatusColor: vi.fn(),
@@ -58,35 +58,35 @@ global.confirm = vi.fn();
 
 // Mock the new store structure
 const mockErrorStore = {
-    lastError: null as string | null,
-    setError: vi.fn(),
     clearError: vi.fn(),
     isLoading: false,
+    lastError: null as string | null,
+    setError: vi.fn(),
 };
 
 const mockSettingsStore = {
-    settings: {
-        notifications: true,
-        autoStart: false,
-        minimizeToTray: true,
-        theme: "dark" as ThemeName,
-        soundAlerts: false,
-        historyLimit: 100,
-    },
-    updateSettings: vi.fn(),
-    resetSettings: vi.fn(),
     isLoading: false,
+    resetSettings: vi.fn(),
+    settings: {
+        autoStart: false,
+        historyLimit: 100,
+        minimizeToTray: true,
+        notifications: true,
+        soundAlerts: false,
+        theme: "dark" as ThemeName,
+    },
     updateHistoryLimitValue: vi.fn().mockResolvedValue(undefined),
+    updateSettings: vi.fn(),
 };
 
 const mockSitesStore = {
-    fullSyncFromBackend: vi.fn().mockResolvedValue(undefined),
     downloadSQLiteBackup: vi.fn().mockResolvedValue(undefined),
+    fullSyncFromBackend: vi.fn().mockResolvedValue(undefined),
 };
 
 vi.mock("../stores", () => ({
-    useSettingsStore: vi.fn(() => mockSettingsStore),
     useErrorStore: vi.fn(() => mockErrorStore),
+    useSettingsStore: vi.fn(() => mockSettingsStore),
     useSitesStore: vi.fn(() => mockSitesStore),
 }));
 
@@ -96,20 +96,22 @@ vi.mock("../theme/useTheme", () => ({
 
 vi.mock("../services/logger", () => ({
     default: {
+        error: vi.fn(),
         user: {
-            settingsChange: vi.fn(),
             action: vi.fn(),
+            settingsChange: vi.fn(),
         },
         warn: vi.fn(),
-        error: vi.fn(),
     },
 }));
 
 // Mock themed components
 vi.mock("../theme/components", () => ({
+    StatusIndicator: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) =>
+        React.createElement("div", props, children),
     ThemedBox: ({
-        children,
         border,
+        children,
         loading,
         ...props
     }: {
@@ -126,8 +128,6 @@ vi.mock("../theme/components", () => ({
         if (loading !== undefined) filteredProps["data-loading"] = loading.toString();
         return React.createElement("div", filteredProps, children);
     },
-    ThemedText: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) =>
-        React.createElement("span", props, children),
     ThemedButton: ({
         children,
         loading,
@@ -143,11 +143,11 @@ vi.mock("../theme/components", () => ({
         if (loading !== undefined) filteredProps["data-loading"] = loading.toString();
         return React.createElement("button", filteredProps, children);
     },
-    StatusIndicator: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) =>
-        React.createElement("div", props, children),
+    ThemedCheckbox: (props: Record<string, unknown>) => React.createElement("input", { type: "checkbox", ...props }),
     ThemedSelect: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) =>
         React.createElement("select", props, children),
-    ThemedCheckbox: (props: Record<string, unknown>) => React.createElement("input", { type: "checkbox", ...props }),
+    ThemedText: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) =>
+        React.createElement("span", props, children),
 }));
 
 describe("Settings", () => {

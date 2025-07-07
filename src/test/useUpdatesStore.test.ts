@@ -3,10 +3,12 @@
  * Comprehensive tests for updates store functionality.
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
 import { act, renderHook } from "@testing-library/react";
-import { useUpdatesStore } from "../stores/updates/useUpdatesStore";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+
 import type { UpdateStatus } from "../stores/types";
+
+import { useUpdatesStore } from "../stores/updates/useUpdatesStore";
 
 // Mock the logger
 vi.mock("../stores/utils", () => ({
@@ -34,10 +36,10 @@ describe("useUpdatesStore", () => {
     beforeEach(() => {
         // Reset the store before each test
         useUpdatesStore.setState({
-            updateStatus: "idle",
-            updateProgress: 0,
             updateError: undefined,
             updateInfo: undefined,
+            updateProgress: 0,
+            updateStatus: "idle",
         });
 
         // Reset mocks
@@ -180,10 +182,10 @@ describe("useUpdatesStore", () => {
     describe("update info management", () => {
         it("should set update info", () => {
             const updateInfo = {
-                version: "1.0.0",
-                releaseNotes: "Bug fixes and improvements",
-                releaseName: "v1.0.0",
                 releaseDate: "2023-01-01",
+                releaseName: "v1.0.0",
+                releaseNotes: "Bug fixes and improvements",
+                version: "1.0.0",
             };
 
             const { result } = renderHook(() => useUpdatesStore());
@@ -197,10 +199,10 @@ describe("useUpdatesStore", () => {
 
         it("should clear update info", () => {
             const updateInfo = {
-                version: "1.0.0",
-                releaseNotes: "Bug fixes and improvements",
-                releaseName: "v1.0.0",
                 releaseDate: "2023-01-01",
+                releaseName: "v1.0.0",
+                releaseNotes: "Bug fixes and improvements",
+                version: "1.0.0",
             };
 
             const { result } = renderHook(() => useUpdatesStore());
@@ -234,10 +236,10 @@ describe("useUpdatesStore", () => {
             act(() => {
                 result.current.setUpdateStatus("available");
                 result.current.setUpdateInfo({
-                    version: "1.0.0",
-                    releaseNotes: "New features",
-                    releaseName: "v1.0.0",
                     releaseDate: "2023-01-01",
+                    releaseName: "v1.0.0",
+                    releaseNotes: "New features",
+                    version: "1.0.0",
                 });
             });
 
@@ -301,10 +303,10 @@ describe("useUpdatesStore", () => {
             const { result } = renderHook(() => useUpdatesStore());
 
             const updateInfo = {
-                version: "2.0.0",
-                releaseNotes: "Major update",
-                releaseName: "v2.0.0",
                 releaseDate: "2023-02-01",
+                releaseName: "v2.0.0",
+                releaseNotes: "Major update",
+                version: "2.0.0",
             };
 
             act(() => {
@@ -417,10 +419,10 @@ describe("useUpdatesStore", () => {
             const { result } = renderHook(() => useUpdatesStore());
 
             const updateInfo = {
-                version: "1.0.0",
-                releaseNotes: "Test update",
-                releaseName: "v1.0.0",
                 releaseDate: "2023-01-01",
+                releaseName: "v1.0.0",
+                releaseNotes: "Test update",
+                version: "1.0.0",
             };
 
             // Test all actions that should log

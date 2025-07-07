@@ -1,53 +1,54 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+
 import { SiteDetails } from "../components/SiteDetails/SiteDetails";
 import { Site } from "../types";
 
 // Define mock site data first (before mocks that use it)
 const mockSite: Site = {
     identifier: "test-site-1",
-    name: "Test Site",
     monitors: [
         {
-            id: "monitor-1",
-            type: "http",
-            status: "up",
-            url: "https://example.com",
-            port: 443,
-            responseTime: 250,
-            lastChecked: new Date("2024-01-01T00:00:00Z"),
+            checkInterval: 300,
             history: [
                 {
-                    timestamp: Date.now(),
-                    status: "up",
                     responseTime: 250,
+                    status: "up",
+                    timestamp: Date.now(),
                 },
             ],
+            id: "monitor-1",
+            lastChecked: new Date("2024-01-01T00:00:00Z"),
             monitoring: true,
-            checkInterval: 300,
-            timeout: 5000,
+            port: 443,
+            responseTime: 250,
             retryAttempts: 3,
+            status: "up",
+            timeout: 5000,
+            type: "http",
+            url: "https://example.com",
         },
     ],
+    name: "Test Site",
 };
 
 // Mock Chart.js and plugins
 vi.mock("chart.js", () => ({
+    ArcElement: vi.fn(),
+    BarElement: vi.fn(),
+    CategoryScale: vi.fn(),
     Chart: {
         register: vi.fn(),
     },
-    CategoryScale: vi.fn(),
+    DoughnutController: vi.fn(),
+    Filler: vi.fn(),
+    Legend: vi.fn(),
     LinearScale: vi.fn(),
-    PointElement: vi.fn(),
     LineElement: vi.fn(),
-    BarElement: vi.fn(),
+    PointElement: vi.fn(),
+    TimeScale: vi.fn(),
     Title: vi.fn(),
     Tooltip: vi.fn(),
-    Legend: vi.fn(),
-    TimeScale: vi.fn(),
-    Filler: vi.fn(),
-    DoughnutController: vi.fn(),
-    ArcElement: vi.fn(),
 }));
 
 vi.mock("chartjs-plugin-zoom", () => ({
@@ -95,42 +96,23 @@ vi.mock("../hooks/site/useSiteDetails", () => ({
         // Use the actual site passed as prop, fallback to mockSite
         const currentSite = props?.site ?? mockSite;
         return {
-            site: currentSite,
-            siteExists: true,
-            isLoading: false,
-            error: null,
-            history: [],
-            analytics: {
-                avgResponseTime: 250,
-                uptime: 99.5,
-                totalChecks: 1000,
-                failedChecks: 5,
-                upCount: 995,
-                downCount: 5,
-                filteredHistory: [
-                    { responseTime: 200, timestamp: Date.now() - 60000, status: "up" },
-                    { responseTime: 250, timestamp: Date.now() - 30000, status: "up" },
-                    { responseTime: 300, timestamp: Date.now(), status: "up" },
-                ],
-            },
-            refreshSiteData: vi.fn().mockResolvedValue(undefined),
-            updateSiteSettings: vi.fn().mockResolvedValue(undefined),
             // Add all the required properties from useSiteDetails
             activeSiteDetailsTab: "overview",
+            analytics: {
+                avgResponseTime: 250,
+                downCount: 5,
+                failedChecks: 5,
+                filteredHistory: [
+                    { responseTime: 200, status: "up", timestamp: Date.now() - 60000 },
+                    { responseTime: 250, status: "up", timestamp: Date.now() - 30000 },
+                    { responseTime: 300, status: "up", timestamp: Date.now() },
+                ],
+                totalChecks: 1000,
+                upCount: 995,
+                uptime: 99.5,
+            },
             currentSite: currentSite,
-            selectedMonitor: currentSite.monitors?.[0] ?? mockSite.monitors[0],
-            selectedMonitorId: currentSite.monitors?.[0]?.id ?? "monitor-1",
-            localName: currentSite.name ?? "Test Site",
-            localCheckInterval: 300,
-            localTimeout: 5000,
-            localRetryAttempts: 3,
-            hasUnsavedChanges: false,
-            intervalChanged: false,
-            timeoutChanged: false,
-            retryAttemptsChanged: false,
-            isMonitoring: false,
-            showAdvancedMetrics: false,
-            siteDetailsChartTimeRange: "24h",
+            error: null,
             // Add all the required handlers
             handleCheckNow: vi.fn(),
             handleIntervalChange: vi.fn(),
@@ -147,10 +129,29 @@ vi.mock("../hooks/site/useSiteDetails", () => ({
             handleStopMonitoring: vi.fn(),
             handleStopSiteMonitoring: vi.fn(),
             handleTimeoutChange: vi.fn(),
+            hasUnsavedChanges: false,
+            history: [],
+            intervalChanged: false,
+            isLoading: false,
+            isMonitoring: false,
+            localCheckInterval: 300,
+            localName: currentSite.name ?? "Test Site",
+            localRetryAttempts: 3,
+            localTimeout: 5000,
+            refreshSiteData: vi.fn().mockResolvedValue(undefined),
+            retryAttemptsChanged: false,
+            selectedMonitor: currentSite.monitors?.[0] ?? mockSite.monitors[0],
+            selectedMonitorId: currentSite.monitors?.[0]?.id ?? "monitor-1",
             setActiveSiteDetailsTab: vi.fn(),
             setLocalName: vi.fn(),
             setShowAdvancedMetrics: vi.fn(),
             setSiteDetailsChartTimeRange: vi.fn(),
+            showAdvancedMetrics: false,
+            site: currentSite,
+            siteDetailsChartTimeRange: "24h",
+            siteExists: true,
+            timeoutChanged: false,
+            updateSiteSettings: vi.fn().mockResolvedValue(undefined),
         };
     }),
 }));
@@ -160,9 +161,9 @@ vi.mock("../theme/useTheme", () => ({
     useTheme: vi.fn(() => ({
         currentTheme: {
             colors: {
+                background: "#ffffff",
                 primary: "#0066cc",
                 secondary: "#6c757d",
-                background: "#ffffff",
                 text: "#333333",
             },
         },
@@ -187,20 +188,20 @@ vi.mock("../stores/ui/useUiStore", () => ({
 
 vi.mock("../stores/sites/useSitesStore", () => ({
     useSitesStore: vi.fn(() => ({
-        sites: [mockSite],
-        getSiteById: vi.fn(() => mockSite),
-        updateSite: vi.fn().mockResolvedValue(undefined),
-        removeSite: vi.fn().mockResolvedValue(undefined),
         checkSiteNow: vi.fn().mockResolvedValue(undefined),
+        getSiteById: vi.fn(() => mockSite),
+        removeSite: vi.fn().mockResolvedValue(undefined),
+        sites: [mockSite],
+        updateSite: vi.fn().mockResolvedValue(undefined),
     })),
 }));
 
 vi.mock("../stores/settings/useSettingsStore", () => ({
     useSettingsStore: vi.fn(() => ({
         historyLimit: 100,
-        theme: "light",
         setHistoryLimit: vi.fn(),
         settings: { historyLimit: 100 },
+        theme: "light",
     })),
 }));
 
@@ -213,16 +214,22 @@ vi.mock("../stores/error/useErrorStore", () => ({
 // Mock logger
 vi.mock("../services/logger", () => ({
     default: {
-        info: vi.fn(),
-        error: vi.fn(),
-        warn: vi.fn(),
-        debug: vi.fn(),
         app: {
             error: vi.fn(),
             performance: vi.fn(),
             started: vi.fn(),
             stopped: vi.fn(),
         },
+        debug: vi.fn(),
+        error: vi.fn(),
+        info: vi.fn(),
+        raw: {
+            debug: vi.fn(),
+            error: vi.fn(),
+            info: vi.fn(),
+            warn: vi.fn(),
+        },
+        silly: vi.fn(),
         site: {
             added: vi.fn(),
             check: vi.fn(),
@@ -240,23 +247,12 @@ vi.mock("../services/logger", () => ({
             settingsChange: vi.fn(),
         },
         verbose: vi.fn(),
-        silly: vi.fn(),
-        raw: {
-            debug: vi.fn(),
-            info: vi.fn(),
-            warn: vi.fn(),
-            error: vi.fn(),
-        },
+        warn: vi.fn(),
     },
 }));
 
 // Mock React Chart.js components
 vi.mock("react-chartjs-2", () => ({
-    Line: ({ ...props }: Record<string, unknown>) => (
-        <div data-testid="line-chart" {...props}>
-            Line Chart
-        </div>
-    ),
     Bar: ({ ...props }: Record<string, unknown>) => (
         <div data-testid="bar-chart" {...props}>
             Bar Chart
@@ -267,14 +263,19 @@ vi.mock("react-chartjs-2", () => ({
             Doughnut Chart
         </div>
     ),
+    Line: ({ ...props }: Record<string, unknown>) => (
+        <div data-testid="line-chart" {...props}>
+            Line Chart
+        </div>
+    ),
 }));
 
 // Mock services
 vi.mock("../services/chartConfig", () => ({
     ChartConfigService: vi.fn().mockImplementation(() => ({
-        getLineChartConfig: vi.fn(() => ({ responsive: true, maintainAspectRatio: false })),
-        getDoughnutChartConfig: vi.fn(() => ({ responsive: true, maintainAspectRatio: false })),
-        getBarChartConfig: vi.fn(() => ({ responsive: true, maintainAspectRatio: false })),
+        getBarChartConfig: vi.fn(() => ({ maintainAspectRatio: false, responsive: true })),
+        getDoughnutChartConfig: vi.fn(() => ({ maintainAspectRatio: false, responsive: true })),
+        getLineChartConfig: vi.fn(() => ({ maintainAspectRatio: false, responsive: true })),
     })),
 }));
 
@@ -284,9 +285,9 @@ vi.mock("../utils/status", () => ({
 }));
 
 vi.mock("../utils/time", () => ({
-    formatResponseTime: vi.fn((time: number) => `${time}ms`),
-    formatFullTimestamp: vi.fn((date: Date) => date.toLocaleDateString()),
     formatDuration: vi.fn((ms: number) => `${ms / 1000}s`),
+    formatFullTimestamp: vi.fn((date: Date) => date.toLocaleDateString()),
+    formatResponseTime: vi.fn((time: number) => `${time}ms`),
 }));
 
 beforeEach(() => {
@@ -319,11 +320,11 @@ describe("SiteDetails Basic Coverage", () => {
             ...mockSite,
             monitors: [
                 {
-                    id: "monitor-1",
-                    type: "http",
-                    status: "down",
-                    url: "https://example.com",
                     history: [],
+                    id: "monitor-1",
+                    status: "down",
+                    type: "http",
+                    url: "https://example.com",
                 },
             ],
         };
@@ -339,11 +340,11 @@ describe("SiteDetails Basic Coverage", () => {
             ...mockSite,
             monitors: [
                 {
-                    id: "monitor-1",
-                    type: "http",
-                    status: "pending",
-                    url: "https://example.com",
                     history: [],
+                    id: "monitor-1",
+                    status: "pending",
+                    type: "http",
+                    url: "https://example.com",
                 },
             ],
         };
@@ -377,12 +378,12 @@ describe("SiteDetails Basic Coverage", () => {
             monitors: [
                 ...mockSite.monitors,
                 {
-                    id: "monitor-2",
-                    type: "port",
-                    status: "down",
-                    host: "example.com",
-                    port: 80,
                     history: [],
+                    host: "example.com",
+                    id: "monitor-2",
+                    port: 80,
+                    status: "down",
+                    type: "port",
                 },
             ],
         };
@@ -405,11 +406,11 @@ describe("SiteDetails Basic Coverage", () => {
             ...mockSite,
             monitors: [
                 {
-                    id: "monitor-1",
-                    type: "http",
-                    status: "up",
-                    url: "https://very-long-url-that-should-be-handled-properly.example.com/path/to/resource",
                     history: [],
+                    id: "monitor-1",
+                    status: "up",
+                    type: "http",
+                    url: "https://very-long-url-that-should-be-handled-properly.example.com/path/to/resource",
                 },
             ],
         };
@@ -424,12 +425,12 @@ describe("SiteDetails Basic Coverage", () => {
             ...mockSite,
             monitors: [
                 {
-                    id: "monitor-1",
-                    type: "http",
-                    status: "up",
-                    url: "https://example.com",
-                    lastChecked: new Date("2030-01-01T00:00:00Z"),
                     history: [],
+                    id: "monitor-1",
+                    lastChecked: new Date("2030-01-01T00:00:00Z"),
+                    status: "up",
+                    type: "http",
+                    url: "https://example.com",
                 },
             ],
         };
@@ -442,8 +443,8 @@ describe("SiteDetails Basic Coverage", () => {
     it("should handle null/undefined fields gracefully", () => {
         const incompleteSite: Site = {
             identifier: "test-site-2",
-            name: "Incomplete Site",
             monitors: [],
+            name: "Incomplete Site",
         };
         const mockOnClose = vi.fn();
         render(<SiteDetails site={incompleteSite} onClose={mockOnClose} />);

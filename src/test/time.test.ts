@@ -84,18 +84,18 @@ describe("Time Utils", () => {
 
         it("has all required time periods", () => {
             const expectedPeriods: TimePeriod[] = ["1h", "12h", "24h", "7d", "30d"];
-            expectedPeriods.forEach((period) => {
+            for (const period of expectedPeriods) {
                 expect(TIME_PERIOD_LABELS[period]).toBeDefined();
                 expect(typeof TIME_PERIOD_LABELS[period]).toBe("string");
-            });
+            }
         });
 
         it("has correct object structure", () => {
             expect(Object.keys(TIME_PERIOD_LABELS)).toHaveLength(5);
-            Object.values(TIME_PERIOD_LABELS).forEach((label) => {
+            for (const label of Object.values(TIME_PERIOD_LABELS)) {
                 expect(typeof label).toBe("string");
                 expect(label.length).toBeGreaterThan(0);
-            });
+            }
         });
     });
 
@@ -104,9 +104,9 @@ describe("Time Utils", () => {
             const validPeriods: TimePeriod[] = ["1h", "12h", "24h", "7d", "30d"];
 
             // This test ensures TypeScript compilation is correct
-            validPeriods.forEach((period) => {
+            for (const period of validPeriods) {
                 expect(TIME_PERIOD_LABELS[period]).toBeDefined();
-            });
+            }
         });
     });
 });

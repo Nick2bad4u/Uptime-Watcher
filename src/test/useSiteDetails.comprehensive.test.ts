@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Comprehensive test suite for useSiteDetails hook
  * Targeting coverage for lines 227-238, 245-252, 257-270, 276-280, 285-296, 301-315
@@ -7,8 +6,10 @@
 
 import { renderHook, act } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
-import { useSiteDetails } from "../hooks/site/useSiteDetails";
+
 import type { Site, Monitor } from "../types";
+
+import { useSiteDetails } from "../hooks/site/useSiteDetails";
 
 // Mock all dependencies with factory functions to avoid hoisting issues
 vi.mock("../stores", () => ({
@@ -20,25 +21,25 @@ vi.mock("../stores", () => ({
 vi.mock("../hooks/site/useSiteAnalytics", () => ({
     useSiteAnalytics: vi.fn(() => ({
         data: null,
-        loading: false,
         error: null,
+        loading: false,
     })),
 }));
 
 vi.mock("../services/logger", () => ({
     default: {
-        user: {
-            action: vi.fn(),
-        },
         site: {
             error: vi.fn(),
+        },
+        user: {
+            action: vi.fn(),
         },
     },
 }));
 
+import logger from "../services/logger";
 // Import the mocked modules after setting up the mocks
 import { useErrorStore, useSitesStore, useUIStore } from "../stores";
-import logger from "../services/logger";
 
 // Create mock global confirm
 const mockConfirm = vi.fn();
@@ -50,20 +51,20 @@ Object.defineProperty(global, "confirm", {
 describe("useSiteDetails comprehensive coverage", () => {
     const mockSite: Site = {
         identifier: "test-site-id",
-        name: "Test Site",
         monitors: [
             {
+                checkInterval: 30000,
+                history: [],
                 id: "monitor-1",
+                monitoring: true,
+                retryAttempts: 3,
+                status: "up",
+                timeout: 5000,
                 type: "http",
                 url: "https://test.com",
-                status: "up",
-                checkInterval: 30000,
-                timeout: 5000,
-                retryAttempts: 3,
-                monitoring: true,
-                history: [],
             } as Monitor,
         ],
+        name: "Test Site",
     };
 
     // Mock store functions
@@ -88,28 +89,28 @@ describe("useSiteDetails comprehensive coverage", () => {
         });
 
         (useSitesStore as any).mockReturnValue({
-            sites: [mockSite],
-            updateSiteCheckInterval: mockUpdateSiteCheckInterval,
-            updateMonitorTimeout: mockUpdateMonitorTimeout,
-            updateMonitorRetryAttempts: mockUpdateMonitorRetryAttempts,
+            checkSiteNow: vi.fn(),
+            deleteSite: vi.fn(),
+            getSelectedMonitorId: vi.fn(() => "monitor-1"),
             modifySite: mockModifySite,
             selectedMonitorId: "monitor-1",
             setSelectedMonitorId: mockSetSelectedMonitorId,
-            getSelectedMonitorId: vi.fn(() => "monitor-1"),
-            checkSiteNow: vi.fn(),
-            deleteSite: vi.fn(),
+            sites: [mockSite],
             startSiteMonitorMonitoring: vi.fn(),
             stopSiteMonitorMonitoring: vi.fn(),
+            updateMonitorRetryAttempts: mockUpdateMonitorRetryAttempts,
+            updateMonitorTimeout: mockUpdateMonitorTimeout,
+            updateSiteCheckInterval: mockUpdateSiteCheckInterval,
         });
 
         (useUIStore as any).mockReturnValue({
             activeSiteDetailsTab: "overview",
             setActiveSiteDetailsTab: mockSetActiveSiteDetailsTab,
-            siteDetailsChartTimeRange: "24h",
+            setLocalName: mockSetLocalName,
+            setShowAdvancedMetrics: mockSetShowAdvancedMetrics,
             setSiteDetailsChartTimeRange: mockSetSiteDetailsChartTimeRange,
             showAdvancedMetrics: false,
-            setShowAdvancedMetrics: mockSetShowAdvancedMetrics,
-            setLocalName: mockSetLocalName,
+            siteDetailsChartTimeRange: "24h",
         });
     });
 

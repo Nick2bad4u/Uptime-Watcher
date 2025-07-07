@@ -3,14 +3,15 @@
  * This file specifically targets the uncovered lines identified in the coverage report
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { useErrorStore, useSettingsStore, useSitesStore } from "../stores";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+
+import { handleSubmit } from "../components/AddSiteForm/Submit";
 import { Settings } from "../components/Settings/Settings";
 import { ScreenshotThumbnail } from "../components/SiteDetails/ScreenshotThumbnail";
-import { handleSubmit } from "../components/AddSiteForm/Submit";
 import logger from "../services/logger";
+import { useErrorStore, useSettingsStore, useSitesStore } from "../stores";
 
 // Mock all dependencies
 vi.mock("../stores", () => ({
@@ -21,79 +22,78 @@ vi.mock("../stores", () => ({
 
 vi.mock("../services/logger", () => ({
     default: {
-        warn: vi.fn(),
-        error: vi.fn(),
         debug: vi.fn(),
+        error: vi.fn(),
         user: {
             action: vi.fn(),
             settingsChange: vi.fn(),
         },
+        warn: vi.fn(),
     },
 }));
 
 vi.mock("../theme/useTheme", () => ({
     useTheme: () => ({
-        themeName: "dark",
+        availableThemes: ["light", "dark", "system"],
         currentTheme: {
-            name: "dark",
-            isDark: true,
             borderRadius: {
+                full: "9999px",
+                lg: "0.5rem",
+                md: "0.375rem",
                 none: "0px",
                 sm: "0.125rem",
-                md: "0.375rem",
-                lg: "0.5rem",
                 xl: "0.75rem",
-                full: "9999px",
             },
             colors: {
                 background: {
+                    modal: "#1a202c",
                     primary: "#1a202c",
                     secondary: "#2d3748",
                     tertiary: "#4a5568",
-                    modal: "#1a202c",
-                },
-                text: {
-                    primary: "#ffffff",
-                    secondary: "#e2e8f0",
-                    tertiary: "#a0aec0",
-                    inverse: "#000000",
                 },
                 border: {
+                    focus: "#3182ce",
                     primary: "#4a5568",
                     secondary: "#2d3748",
-                    focus: "#3182ce",
+                },
+                status: {
+                    down: "#f56565",
+                    pending: "#ed8936",
+                    unknown: "#a0aec0",
+                    up: "#48bb78",
                 },
                 surface: {
                     base: "#2d3748",
                     elevated: "#4a5568",
                     overlay: "#1a202c",
                 },
-                status: {
-                    up: "#48bb78",
-                    down: "#f56565",
-                    pending: "#ed8936",
-                    unknown: "#a0aec0",
+                text: {
+                    inverse: "#000000",
+                    primary: "#ffffff",
+                    secondary: "#e2e8f0",
+                    tertiary: "#a0aec0",
                 },
             },
+            isDark: true,
+            name: "dark",
+            shadows: {
+                inner: "inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)",
+                lg: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+                md: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+                sm: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+                xl: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+            },
             spacing: {
-                xs: "0.25rem",
-                sm: "0.5rem",
-                md: "1rem",
-                lg: "1.5rem",
-                xl: "2rem",
                 "2xl": "2.5rem",
                 "3xl": "3rem",
-            },
-            shadows: {
-                sm: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
-                md: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-                lg: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-                xl: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-                inner: "inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)",
+                lg: "1.5rem",
+                md: "1rem",
+                sm: "0.5rem",
+                xl: "2rem",
+                xs: "0.25rem",
             },
             typography: {
                 fontFamily: {
-                    sans: ["-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
                     mono: [
                         "SFMono-Regular",
                         "Menlo",
@@ -103,49 +103,50 @@ vi.mock("../theme/useTheme", () => ({
                         "Courier New",
                         "monospace",
                     ],
+                    sans: ["-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
                 },
                 fontSize: {
-                    xs: "0.75rem",
-                    sm: "0.875rem",
-                    base: "1rem",
-                    lg: "1.125rem",
-                    xl: "1.25rem",
                     "2xl": "1.5rem",
                     "3xl": "1.875rem",
                     "4xl": "2.25rem",
+                    base: "1rem",
+                    lg: "1.125rem",
+                    sm: "0.875rem",
+                    xl: "1.25rem",
+                    xs: "0.75rem",
                 },
                 fontWeight: {
-                    normal: "400",
-                    medium: "500",
-                    semibold: "600",
                     bold: "700",
+                    medium: "500",
+                    normal: "400",
+                    semibold: "600",
                 },
                 lineHeight: {
-                    tight: "1.25",
                     normal: "1.5",
                     relaxed: "1.625",
+                    tight: "1.25",
                 },
             },
         },
-        availableThemes: ["light", "dark", "system"],
-        isDark: true,
-        setTheme: vi.fn(),
         getColor: vi.fn(() => "#ffffff"),
         getStatusColor: vi.fn((status: string) => {
             const colors: Record<string, string> = {
-                up: "#48bb78",
                 down: "#f56565",
                 pending: "#ed8936",
                 unknown: "#a0aec0",
+                up: "#48bb78",
             };
             return colors[status] ?? "#000000";
         }),
+        isDark: true,
+        setTheme: vi.fn(),
+        themeName: "dark",
     }),
     useThemeClasses: () => ({
         getBackgroundClass: vi.fn(() => ({ backgroundColor: "var(--color-background-primary)" })),
-        getTextClass: vi.fn(() => ({ color: "var(--color-text-primary)" })),
         getBorderClass: vi.fn(() => ({ borderColor: "var(--color-border-primary)" })),
         getSurfaceClass: vi.fn(() => ({ backgroundColor: "var(--color-surface-base)" })),
+        getTextClass: vi.fn(() => ({ color: "var(--color-text-primary)" })),
     }),
 }));
 
@@ -170,17 +171,17 @@ describe("Remaining Uncovered Lines Tests", () => {
 
             (useSettingsStore as unknown as { mockReturnValue: (value: unknown) => void }).mockReturnValue({
                 settings: {
-                    theme: "system",
                     autostart: false,
-                    notificationEnabled: true,
                     historyLimit: 50,
+                    notificationEnabled: true,
+                    theme: "system",
                 },
                 updateSettings: mockUpdateSettings,
             });
 
             (useErrorStore as unknown as { mockReturnValue: (value: unknown) => void }).mockReturnValue({
-                lastError: null,
                 clearError: vi.fn(),
+                lastError: null,
             });
 
             (useSitesStore as unknown as { mockReturnValue: (value: unknown) => void }).mockReturnValue({
@@ -223,35 +224,31 @@ describe("Remaining Uncovered Lines Tests", () => {
             } as unknown as React.FormEvent;
 
             const props = {
-                // Form data
-                siteName: "Test Site",
-                url: "https://example.com",
-                port: "",
-                checkInterval: 30000,
-                timeout: 5000,
-                retryAttempts: 3,
-                monitorType: "http" as const,
-                host: "",
-                name: "Test Site",
-
-                // Site data
-                siteId: "new-site-id",
                 addMode: "new" as const,
-                selectedExistingSite: "",
-                formError: undefined,
-
-                // Actions
-                setFormError: mockSetFormError,
-
+                addMonitorToSite: vi.fn(),
+                checkInterval: 30000,
+                clearError: vi.fn(),
                 // Store actions
                 createSite: mockCreateSite,
-                addMonitorToSite: vi.fn(),
-                clearError: vi.fn(),
-
+                formError: undefined,
                 // Dependencies
                 generateUuid: vi.fn(() => "test-uuid"),
+                host: "",
                 logger: logger,
+                monitorType: "http" as const,
+                name: "Test Site",
                 onSuccess: mockOnSuccess,
+                port: "",
+                retryAttempts: 3,
+                selectedExistingSite: "",
+                // Actions
+                setFormError: mockSetFormError,
+                // Site data
+                siteId: "new-site-id",
+                // Form data
+                siteName: "Test Site",
+                timeout: 5000,
+                url: "https://example.com",
             };
 
             // This should trigger line 321 in the catch block
@@ -271,15 +268,15 @@ describe("Remaining Uncovered Lines Tests", () => {
         beforeEach(() => {
             // Mock getBoundingClientRect
             Element.prototype.getBoundingClientRect = vi.fn(() => ({
-                top: 100,
+                bottom: 200,
+                height: 100,
                 left: 100,
                 right: 200,
-                bottom: 200,
+                toJSON: vi.fn(),
+                top: 100,
                 width: 100,
-                height: 100,
                 x: 100,
                 y: 100,
-                toJSON: vi.fn(),
             }));
 
             // Create a mock portal element

@@ -11,9 +11,9 @@ import { waitForElectronAPI } from "../stores/utils";
 
 // Mock waitForElectronAPI
 vi.mock("../stores/utils", () => ({
+    logStoreAction: vi.fn(),
     waitForElectronAPI: vi.fn(),
     withErrorHandling: vi.fn(),
-    logStoreAction: vi.fn(),
 }));
 
 describe("Status Update Handler Tests", () => {
@@ -153,11 +153,11 @@ describe("History Record Edge Cases", () => {
 
         // Test the history filtering logic that might have uncovered branches
         const history: HistoryRecord[] = [
-            { status: "up", responseTime: 100 },
+            { responseTime: 100, status: "up" },
             { status: "down" }, // responseTime is undefined
-            { status: "up", responseTime: null },
-            { status: "up", responseTime: 0 },
-            { status: "up", responseTime: 250 },
+            { responseTime: null, status: "up" },
+            { responseTime: 0, status: "up" },
+            { responseTime: 250, status: "up" },
         ];
 
         const upRecordsWithResponseTime = history.filter(
@@ -191,8 +191,8 @@ describe("Theme Component Edge Cases", () => {
             }
 
             const iconProps = {
-                name: iconName,
                 color: color || "#000000",
+                name: iconName,
                 size: size || 16,
             };
 
@@ -211,15 +211,15 @@ describe("Theme Component Edge Cases", () => {
 
         // Test different paths
         expect(testRenderColoredIcon("status-up", "#00ff00", 20)).toEqual({
-            name: "status-up",
             color: "#00ff00",
+            name: "status-up",
             size: 20,
             type: "success",
         });
 
         expect(testRenderColoredIcon("unknown-icon", "#ff0000", 16)).toEqual({
-            name: "unknown-icon",
             color: "#ff0000",
+            name: "unknown-icon",
             size: 16,
             type: "default",
         });

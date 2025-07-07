@@ -58,13 +58,13 @@ describe("Utils Index Barrel Exports", () => {
     it("should export utilities that can be imported individually", async () => {
         // Test that we can destructure the exports
         const {
-            formatDuration,
             calculateMaxDuration,
-            getStatusIcon,
-            formatStatusWithIcon,
-            formatResponseTime,
+            formatDuration,
             formatFullTimestamp,
+            formatResponseTime,
+            formatStatusWithIcon,
             generateUuid,
+            getStatusIcon,
         } = await import("../../utils/index");
 
         expect(formatDuration).toBeDefined();
@@ -77,7 +77,7 @@ describe("Utils Index Barrel Exports", () => {
     });
 
     it("should export functional utilities that work correctly", async () => {
-        const { generateUuid, formatDuration, getStatusIcon } = await import("../../utils/index");
+        const { formatDuration, generateUuid, getStatusIcon } = await import("../../utils/index");
 
         // Test generateUuid
         const uuid = generateUuid();

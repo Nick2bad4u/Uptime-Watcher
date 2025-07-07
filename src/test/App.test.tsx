@@ -33,7 +33,7 @@ vi.mock("../components/Settings/Settings", () => ({
 }));
 
 vi.mock("../components/SiteDetails/SiteDetails", () => ({
-    SiteDetails: ({ site, onClose }: { site: { name: string }; onClose: () => void }) => (
+    SiteDetails: ({ onClose, site }: { site: { name: string }; onClose: () => void }) => (
         <div data-testid="site-details-modal">
             <div>Site Details for {site.name}</div>
             <button onClick={onClose} data-testid="close-site-details">
@@ -57,7 +57,6 @@ vi.mock("../services/logger", () => ({
 
 // Mock theme components
 vi.mock("../theme/components", () => ({
-    ThemeProvider: ({ children }: { children: React.ReactNode }) => <div data-testid="theme-provider">{children}</div>,
     ThemedBox: ({
         children,
         className,
@@ -75,29 +74,12 @@ vi.mock("../theme/components", () => ({
             </div>
         );
     },
-    ThemedText: ({
-        children,
-        variant,
-        size,
-        weight,
-        className,
-    }: {
-        children?: React.ReactNode;
-        variant?: string;
-        size?: string;
-        weight?: string;
-        className?: string;
-    }) => (
-        <span data-testid="themed-text" className={`${variant ?? ""} ${size ?? ""} ${weight ?? ""} ${className ?? ""}`}>
-            {children}
-        </span>
-    ),
     ThemedButton: ({
         children,
-        onClick,
         className,
-        variant,
+        onClick,
         size,
+        variant,
     }: {
         children?: React.ReactNode;
         onClick?: () => void;
@@ -113,6 +95,24 @@ vi.mock("../theme/components", () => ({
             {children}
         </button>
     ),
+    ThemedText: ({
+        children,
+        className,
+        size,
+        variant,
+        weight,
+    }: {
+        children?: React.ReactNode;
+        variant?: string;
+        size?: string;
+        weight?: string;
+        className?: string;
+    }) => (
+        <span data-testid="themed-text" className={`${variant ?? ""} ${size ?? ""} ${weight ?? ""} ${className ?? ""}`}>
+            {children}
+        </span>
+    ),
+    ThemeProvider: ({ children }: { children: React.ReactNode }) => <div data-testid="theme-provider">{children}</div>,
 }));
 
 vi.mock("../theme/useTheme", () => ({
@@ -121,15 +121,15 @@ vi.mock("../theme/useTheme", () => ({
 
 // Mock the stores with the new focused structure
 const mockErrorStore = {
-    clearError: vi.fn(),
-    isLoading: false,
-    lastError: null as string | null,
-    setError: vi.fn(),
     clearAllErrors: vi.fn(),
+    clearError: vi.fn(),
     clearStoreError: vi.fn(),
     getOperationLoading: vi.fn(),
     getStoreError: vi.fn(),
+    isLoading: false,
+    lastError: null as string | null,
     operationLoading: {},
+    setError: vi.fn(),
     setLoading: vi.fn(),
     setOperationLoading: vi.fn(),
     setStoreError: vi.fn(),
@@ -154,16 +154,16 @@ const mockSitesStore = {
 
 const mockSettingsStore = {
     initializeSettings: vi.fn(),
+    resetSettings: vi.fn(),
     settings: {
-        notifications: true,
         autoStart: false,
-        minimizeToTray: false,
-        theme: "system" as const,
-        soundAlerts: false,
         historyLimit: 1000,
+        minimizeToTray: false,
+        notifications: true,
+        soundAlerts: false,
+        theme: "system" as const,
     },
     updateSettings: vi.fn(),
-    resetSettings: vi.fn(),
 };
 
 const mockUIStore = {
@@ -188,16 +188,15 @@ const mockUpdatesStore = {
 vi.mock("../stores", () => ({
     ErrorBoundary: ({ children }: { children: React.ReactNode }) => <div data-testid="error-boundary">{children}</div>,
     useErrorStore: (selector?: (state: unknown) => unknown) => (selector ? selector(mockErrorStore) : mockErrorStore),
-    useSitesStore: (selector?: (state: unknown) => unknown) => (selector ? selector(mockSitesStore) : mockSitesStore),
     useSettingsStore: (selector?: (state: unknown) => unknown) =>
         selector ? selector(mockSettingsStore) : mockSettingsStore,
+    useSitesStore: (selector?: (state: unknown) => unknown) => (selector ? selector(mockSitesStore) : mockSitesStore),
     useUIStore: (selector?: (state: unknown) => unknown) => (selector ? selector(mockUIStore) : mockUIStore),
     useUpdatesStore: (selector?: (state: unknown) => unknown) =>
         selector ? selector(mockUpdatesStore) : mockUpdatesStore,
 }));
 
 import App from "../App";
-
 // Import the mocked module so we can modify it in tests
 import * as themeModule from "../theme/useTheme";
 
@@ -208,15 +207,15 @@ describe("App Component", () => {
         vi.clearAllMocks();
         // Reset mock stores to defaults
         Object.assign(mockErrorStore, {
-            clearError: vi.fn(),
-            isLoading: false,
-            lastError: null,
-            setError: vi.fn(),
             clearAllErrors: vi.fn(),
+            clearError: vi.fn(),
             clearStoreError: vi.fn(),
             getOperationLoading: vi.fn(),
             getStoreError: vi.fn(),
+            isLoading: false,
+            lastError: null,
             operationLoading: {},
+            setError: vi.fn(),
             setLoading: vi.fn(),
             setOperationLoading: vi.fn(),
             setStoreError: vi.fn(),
@@ -240,16 +239,16 @@ describe("App Component", () => {
 
         Object.assign(mockSettingsStore, {
             initializeSettings: vi.fn(),
+            resetSettings: vi.fn(),
             settings: {
-                notifications: true,
                 autoStart: false,
-                minimizeToTray: false,
-                theme: "system" as const,
-                soundAlerts: false,
                 historyLimit: 1000,
+                minimizeToTray: false,
+                notifications: true,
+                soundAlerts: false,
+                theme: "system" as const,
             },
             updateSettings: vi.fn(),
-            resetSettings: vi.fn(),
         });
 
         Object.assign(mockUIStore, {
@@ -273,11 +272,11 @@ describe("App Component", () => {
 
         // Reset useTheme mock to default
         vi.mocked(themeModule.useTheme).mockReturnValue({
-            isDark: false,
             availableThemes: [],
-            currentTheme: { isDark: false, colors: {} } as never,
+            currentTheme: { colors: {}, isDark: false } as never,
             getColor: vi.fn(),
             getStatusColor: vi.fn(),
+            isDark: false,
             setTheme: vi.fn(),
             systemTheme: "light",
             themeManager: {} as never,
@@ -316,11 +315,11 @@ describe("App Component", () => {
         it("applies dark CSS class when dark theme is enabled", () => {
             // Temporarily override the useTheme mock to return isDark: true
             vi.mocked(themeModule.useTheme).mockReturnValueOnce({
-                isDark: true,
                 availableThemes: [],
-                currentTheme: { isDark: true, colors: {} } as never,
+                currentTheme: { colors: {}, isDark: true } as never,
                 getColor: vi.fn(),
                 getStatusColor: vi.fn(),
+                isDark: true,
                 setTheme: vi.fn(),
                 systemTheme: "dark",
                 themeManager: {} as never,
@@ -336,8 +335,8 @@ describe("App Component", () => {
 
         it("displays correct site count", () => {
             mockSitesStore.sites = [
-                { identifier: "1", name: "Test Site", monitors: [] },
-                { identifier: "2", name: "Another Site", monitors: [] },
+                { identifier: "1", monitors: [], name: "Test Site" },
+                { identifier: "2", monitors: [], name: "Another Site" },
             ];
             render(<App />);
             expect(screen.getByText("Monitored Sites (2)")).toBeInTheDocument();
@@ -551,12 +550,12 @@ describe("App Component", () => {
         });
 
         it("shows site details modal when showSiteDetails is true and site is selected", () => {
-            const testSite = { identifier: "1", name: "Test Site", monitors: [] };
+            const testSite = { identifier: "1", monitors: [], name: "Test Site" };
 
             // Update mock store values
             Object.assign(mockUIStore, {
-                showSiteDetails: true,
                 selectedSiteId: "1",
+                showSiteDetails: true,
             });
             mockUIStore.getSelectedSite.mockReturnValue(testSite);
             Object.assign(mockSitesStore, {
@@ -570,12 +569,12 @@ describe("App Component", () => {
         });
 
         it("can close site details modal", async () => {
-            const testSite = { identifier: "1", name: "Test Site", monitors: [] };
+            const testSite = { identifier: "1", monitors: [], name: "Test Site" };
 
             // Update mock store values
             Object.assign(mockUIStore, {
-                showSiteDetails: true,
                 selectedSiteId: "1",
+                showSiteDetails: true,
             });
             mockUIStore.getSelectedSite.mockReturnValue(testSite);
             Object.assign(mockSitesStore, {

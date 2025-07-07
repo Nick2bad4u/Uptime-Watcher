@@ -1,17 +1,18 @@
-import React from "react";
 import { render, screen } from "@testing-library/react";
+import React from "react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
+
 import logger from "../services/logger";
 
 // Mock the logger
 vi.mock("../services/logger", () => ({
     default: {
-        info: vi.fn(),
-        warn: vi.fn(),
         error: vi.fn(),
+        info: vi.fn(),
         user: {
             settingsChange: vi.fn(),
         },
+        warn: vi.fn(),
     },
 }));
 
@@ -20,19 +21,19 @@ const mockUpdateSettings = vi.fn();
 vi.mock("../stores/settings/useSettingsStore", () => ({
     useSettingsStore: vi.fn(() => ({
         settings: {
-            theme: "dark",
             autoStart: true,
             autoUpdate: true,
+            historyLimit: 100,
+            logLevel: "info",
+            minimizeToTray: false,
             notifications: true,
             port: 8080,
             retryAttempts: 3,
-            timeout: 5000,
-            minimizeToTray: false,
+            soundAlerts: true,
             startMinimized: false,
             stayAlive: true,
-            logLevel: "info",
-            soundAlerts: true,
-            historyLimit: 100,
+            theme: "dark",
+            timeout: 5000,
         },
         updateSettings: mockUpdateSettings,
     })),

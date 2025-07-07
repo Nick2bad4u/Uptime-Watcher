@@ -13,10 +13,10 @@ const mockCreateRoot = vi.fn(() => ({
 
 // Mock the entire react-dom/client module
 vi.mock("react-dom/client", () => ({
+    createRoot: mockCreateRoot,
     default: {
         createRoot: mockCreateRoot,
     },
-    createRoot: mockCreateRoot,
 }));
 
 // Mock App component

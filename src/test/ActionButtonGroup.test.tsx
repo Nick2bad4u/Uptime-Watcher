@@ -4,18 +4,18 @@
  */
 
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
 import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
 
 import { ActionButtonGroup } from "../components/Dashboard/SiteCard/components/ActionButtonGroup";
 
 const defaultProps = {
+    disabled: false,
+    isLoading: false,
+    isMonitoring: false,
     onCheckNow: vi.fn(),
     onStartMonitoring: vi.fn(),
     onStopMonitoring: vi.fn(),
-    isLoading: false,
-    isMonitoring: false,
-    disabled: false,
 };
 
 describe("ActionButtonGroup", () => {
@@ -40,7 +40,7 @@ describe("ActionButtonGroup", () => {
     });
 
     it("renders stop monitoring button when monitoring", () => {
-        render(<ActionButtonGroup {...defaultProps} isMonitoring={true} />);
+        render(<ActionButtonGroup {...defaultProps} isMonitoring />);
 
         const stopButton = screen.getByLabelText("Stop Monitoring");
         expect(stopButton).toBeInTheDocument();
@@ -69,7 +69,7 @@ describe("ActionButtonGroup", () => {
 
     it("calls onStopMonitoring when stop button is clicked", async () => {
         const user = userEvent.setup();
-        render(<ActionButtonGroup {...defaultProps} isMonitoring={true} />);
+        render(<ActionButtonGroup {...defaultProps} isMonitoring />);
 
         const stopButton = screen.getByLabelText("Stop Monitoring");
         await user.click(stopButton);
@@ -78,7 +78,7 @@ describe("ActionButtonGroup", () => {
     });
 
     it("disables all buttons when loading", () => {
-        render(<ActionButtonGroup {...defaultProps} isLoading={true} />);
+        render(<ActionButtonGroup {...defaultProps} isLoading />);
 
         const checkButton = screen.getByLabelText("Check Now");
         expect(checkButton).toBeDisabled();
@@ -88,7 +88,7 @@ describe("ActionButtonGroup", () => {
     });
 
     it("disables all buttons when disabled prop is true", () => {
-        render(<ActionButtonGroup {...defaultProps} disabled={true} />);
+        render(<ActionButtonGroup {...defaultProps} disabled />);
 
         const checkButton = screen.getByLabelText("Check Now");
         expect(checkButton).toBeDisabled();
@@ -98,7 +98,7 @@ describe("ActionButtonGroup", () => {
     });
 
     it("disables all buttons when both loading and disabled", () => {
-        render(<ActionButtonGroup {...defaultProps} isLoading={true} disabled={true} />);
+        render(<ActionButtonGroup {...defaultProps} isLoading disabled />);
 
         const checkButton = screen.getByLabelText("Check Now");
         expect(checkButton).toBeDisabled();
@@ -113,7 +113,7 @@ describe("ActionButtonGroup", () => {
         expect(screen.getByLabelText("Start Monitoring")).toBeInTheDocument();
         expect(screen.queryByLabelText("Stop Monitoring")).not.toBeInTheDocument();
 
-        rerender(<ActionButtonGroup {...defaultProps} isMonitoring={true} />);
+        rerender(<ActionButtonGroup {...defaultProps} isMonitoring />);
 
         expect(screen.getByLabelText("Stop Monitoring")).toBeInTheDocument();
         expect(screen.queryByLabelText("Start Monitoring")).not.toBeInTheDocument();
@@ -147,7 +147,7 @@ describe("ActionButtonGroup", () => {
         // Start button uses success variant
         expect(startButton).toBeInTheDocument();
 
-        rerender(<ActionButtonGroup {...defaultProps} isMonitoring={true} />);
+        rerender(<ActionButtonGroup {...defaultProps} isMonitoring />);
 
         const stopButton = screen.getByLabelText("Stop Monitoring");
         // Stop button uses error variant

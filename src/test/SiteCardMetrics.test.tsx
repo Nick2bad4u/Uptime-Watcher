@@ -122,7 +122,7 @@ describe("SiteCardMetrics", () => {
         it("should handle different status values", () => {
             const statuses = ["up", "down", "pending"];
 
-            statuses.forEach((status) => {
+            for (const status of statuses) {
                 const { rerender } = render(
                     <SiteCardMetrics status={status} uptime={98.5} responseTime={250} checkCount={144} />
                 );
@@ -130,7 +130,7 @@ describe("SiteCardMetrics", () => {
                 expect(screen.getByTestId("metric-value-status")).toHaveTextContent(status.toUpperCase());
 
                 rerender(<div />); // Clear render
-            });
+            }
         });
 
         it("should handle mixed case status", () => {

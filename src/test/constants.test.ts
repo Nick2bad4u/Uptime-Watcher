@@ -181,10 +181,10 @@ describe("Constants", () => {
         });
 
         it("has positive delay values", () => {
-            Object.values(UI_DELAYS).forEach((delay) => {
+            for (const delay of Object.values(UI_DELAYS)) {
                 expect(delay).toBeGreaterThan(0);
                 expect(typeof delay).toBe("number");
-            });
+            }
         });
     });
 
@@ -229,14 +229,14 @@ describe("Constants", () => {
     describe("Type Definitions", () => {
         it("StatusType covers expected values", () => {
             const validStatuses: StatusType[] = ["up", "down", "pending", "unknown"];
-            validStatuses.forEach((status) => {
+            for (const status of validStatuses) {
                 const testStatus: StatusType = status;
                 expect(testStatus).toBe(status);
-            });
+            }
         });
 
         it("IntervalOption has correct structure", () => {
-            const testOption: IntervalOption = { value: 5000, label: "5 seconds" };
+            const testOption: IntervalOption = { label: "5 seconds", value: 5000 };
             expect(testOption.value).toBe(5000);
             expect(testOption.label).toBe("5 seconds");
         });

@@ -75,9 +75,9 @@ describe("SiteDetails Index Module", () => {
                 SiteDetailsIndex.ScreenshotThumbnail,
             ];
 
-            components.forEach((component) => {
+            for (const component of components) {
                 expect(typeof component).toBe("function");
-            });
+            }
         });
 
         it("should export all expected site details components", () => {
@@ -88,10 +88,10 @@ describe("SiteDetails Index Module", () => {
                 "ScreenshotThumbnail",
             ];
 
-            expectedComponents.forEach((componentName) => {
+            for (const componentName of expectedComponents) {
                 expect(SiteDetailsIndex).toHaveProperty(componentName);
                 expect(typeof SiteDetailsIndex[componentName as keyof typeof SiteDetailsIndex]).toBe("function");
-            });
+            }
         });
     });
 
@@ -108,13 +108,13 @@ describe("SiteDetails Index Module", () => {
             const siteDetails = SiteDetailsIndex;
             const exportNames = Object.keys(siteDetails);
 
-            exportNames.forEach((exportName) => {
+            for (const exportName of exportNames) {
                 const staticAccess = siteDetails[exportName as keyof typeof siteDetails];
                 const dynamicAccess = siteDetails[exportName as keyof typeof siteDetails];
 
                 expect(staticAccess).toBe(dynamicAccess);
                 expect(staticAccess).toBeDefined();
-            });
+            }
         });
     });
 
@@ -133,10 +133,10 @@ describe("SiteDetails Index Module", () => {
 
         it("should maintain export references", () => {
             // All exports should be defined (not undefined)
-            Object.values(SiteDetailsIndex).forEach((exportValue) => {
+            for (const exportValue of Object.values(SiteDetailsIndex)) {
                 expect(exportValue).toBeDefined();
                 expect(exportValue).not.toBeNull();
-            });
+            }
         });
 
         it("should not modify exported values", () => {
@@ -157,7 +157,7 @@ describe("SiteDetails Index Module", () => {
     describe("TypeScript Compatibility", () => {
         it("should work with TypeScript type checking", () => {
             // This test verifies that TypeScript can properly infer types
-            const { SiteDetails, SiteDetailsHeader, SiteDetailsNavigation, ScreenshotThumbnail } = SiteDetailsIndex;
+            const { ScreenshotThumbnail, SiteDetails, SiteDetailsHeader, SiteDetailsNavigation } = SiteDetailsIndex;
 
             expect(SiteDetails).toBeDefined();
             expect(SiteDetailsHeader).toBeDefined();
@@ -205,20 +205,20 @@ describe("SiteDetails Index Module", () => {
             expect(exports.length).toBe(4);
 
             // Each export should be accessible
-            exports.forEach((exportName) => {
+            for (const exportName of exports) {
                 const exportValue = (SiteDetailsIndex as Record<string, unknown>)[exportName];
                 expect(exportValue).toBeDefined();
                 expect(typeof exportValue).toBe("function");
-            });
+            }
         });
 
         it("should provide centralized access to all site details components", () => {
             // Verify that all major site details functionality is available
             const coreComponents = ["SiteDetails", "SiteDetailsHeader", "SiteDetailsNavigation", "ScreenshotThumbnail"];
 
-            coreComponents.forEach((componentName) => {
+            for (const componentName of coreComponents) {
                 expect(SiteDetailsIndex).toHaveProperty(componentName);
-            });
+            }
         });
     });
 
@@ -273,10 +273,10 @@ describe("SiteDetails Index Module", () => {
             expect(Array.isArray(keys)).toBe(true);
             expect(keys.length).toBe(4);
 
-            keys.forEach((key) => {
+            for (const key of keys) {
                 expect(typeof key).toBe("string");
                 expect(key.length).toBeGreaterThan(0);
-            });
+            }
         });
     });
 
@@ -301,10 +301,10 @@ describe("SiteDetails Index Module", () => {
                 "ScreenshotThumbnail", // Screenshot component
             ];
 
-            requiredComponents.forEach((component) => {
+            for (const component of requiredComponents) {
                 expect(SiteDetailsIndex).toHaveProperty(component);
                 expect(typeof SiteDetailsIndex[component as keyof typeof SiteDetailsIndex]).toBe("function");
-            });
+            }
         });
     });
 });

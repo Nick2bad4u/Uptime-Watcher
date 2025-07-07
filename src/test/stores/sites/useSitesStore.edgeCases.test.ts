@@ -4,24 +4,26 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { Site, Monitor } from "../../../types";
+
 import { createSiteMonitoringActions } from "../../../stores/sites/useSiteMonitoring";
 import { createSiteOperationsActions } from "../../../stores/sites/useSiteOperations";
 import { createSiteSyncActions } from "../../../stores/sites/useSiteSync";
-import type { Site, Monitor } from "../../../types";
 
 // Mock dependencies
 vi.mock("../../../stores/sites/services", () => ({
-    SiteService: {
-        getSites: vi.fn(),
-        addSite: vi.fn(),
-        removeSite: vi.fn(),
-        updateSite: vi.fn(),
-        checkSiteNow: vi.fn(),
-        downloadSQLiteBackup: vi.fn(),
-    },
     MonitoringService: {
         startMonitoring: vi.fn(),
         stopMonitoring: vi.fn(),
+    },
+    SiteService: {
+        addSite: vi.fn(),
+        checkSiteNow: vi.fn(),
+        downloadSQLiteBackup: vi.fn(),
+        getSites: vi.fn(),
+        removeSite: vi.fn(),
+        updateSite: vi.fn(),
     },
 }));
 
@@ -73,20 +75,20 @@ describe("Sites Store Modules - Edge Cases and Error Scenarios", () => {
         vi.clearAllMocks();
 
         mockMonitor = {
+            checkInterval: 30000,
+            history: [],
             id: "monitor-1",
+            lastChecked: new Date(),
+            monitoring: true,
+            status: "up",
             type: "http" as const,
             url: "https://example.com",
-            status: "up",
-            lastChecked: new Date(),
-            checkInterval: 30000,
-            monitoring: true,
-            history: [],
         };
 
         mockSite = {
             identifier: "example.com",
-            name: "Example Site",
             monitors: [mockMonitor],
+            name: "Example Site",
         };
     });
 
@@ -146,8 +148,8 @@ describe("Sites Store Modules - Edge Cases and Error Scenarios", () => {
     describe("useSiteOperations Error Scenarios", () => {
         it("should handle operations when sites array is corrupted", async () => {
             const mockDependencies = {
-                getSites: vi.fn(() => [mockSite] as Site[]),
                 addSite: vi.fn(),
+                getSites: vi.fn(() => [mockSite] as Site[]),
                 removeSite: vi.fn(),
                 setSites: vi.fn(),
                 syncSitesFromBackend: vi.fn(),
@@ -165,8 +167,8 @@ describe("Sites Store Modules - Edge Cases and Error Scenarios", () => {
 
         it("should handle site creation with empty or invalid monitor data", async () => {
             const mockDependencies = {
-                getSites: vi.fn(() => []),
                 addSite: vi.fn(),
+                getSites: vi.fn(() => []),
                 removeSite: vi.fn(),
                 setSites: vi.fn(),
                 syncSitesFromBackend: vi.fn(),
@@ -177,12 +179,12 @@ describe("Sites Store Modules - Edge Cases and Error Scenarios", () => {
 
             const siteData = {
                 identifier: "test.com",
-                name: "Test Site",
                 monitors: [
                     null, // null monitor
                     undefined, // undefined monitor
                     { id: "valid-monitor", type: "http" as const }, // partial valid monitor
                 ],
+                name: "Test Site",
             };
 
             const normalizeMonitorModule = await import("../../../stores/sites/utils/monitorOperations");
@@ -197,8 +199,8 @@ describe("Sites Store Modules - Edge Cases and Error Scenarios", () => {
 
         it("should handle monitor updates on non-existent sites", async () => {
             const mockDependencies = {
-                getSites: vi.fn(() => []), // empty sites array
                 addSite: vi.fn(),
+                getSites: vi.fn(() => []), // empty sites array
                 removeSite: vi.fn(),
                 setSites: vi.fn(),
                 syncSitesFromBackend: vi.fn(),
@@ -223,8 +225,8 @@ describe("Sites Store Modules - Edge Cases and Error Scenarios", () => {
 
         it("should handle extreme values for monitor updates", async () => {
             const mockDependencies = {
-                getSites: vi.fn(() => [mockSite]),
                 addSite: vi.fn(),
+                getSites: vi.fn(() => [mockSite]),
                 removeSite: vi.fn(),
                 setSites: vi.fn(),
                 syncSitesFromBackend: vi.fn(),
@@ -314,14 +316,14 @@ describe("Sites Store Modules - Edge Cases and Error Scenarios", () => {
         it("should handle large numbers of sites and monitors", () => {
             // Create monitors outside the nested structure to avoid deep nesting
             const createMonitor = (siteIndex: number, monitorIndex: number): Monitor => ({
+                checkInterval: 30000,
+                history: [],
                 id: `monitor-${siteIndex}-${monitorIndex}`,
+                lastChecked: new Date(),
+                monitoring: true,
+                status: "up",
                 type: "http" as const,
                 url: `https://site-${siteIndex}.com/endpoint-${monitorIndex}`,
-                status: "up",
-                lastChecked: new Date(),
-                checkInterval: 30000,
-                monitoring: true,
-                history: [],
             });
 
             const createMonitors = (siteIndex: number): Monitor[] => {
@@ -334,8 +336,8 @@ describe("Sites Store Modules - Edge Cases and Error Scenarios", () => {
 
             const createSite = (index: number): Site => ({
                 identifier: `site-${index}.com`,
-                name: `Site ${index}`,
                 monitors: createMonitors(index),
+                name: `Site ${index}`,
             });
 
             const largeSitesArray: Site[] = [];
@@ -344,8 +346,8 @@ describe("Sites Store Modules - Edge Cases and Error Scenarios", () => {
             }
 
             const mockDependencies = {
-                getSites: vi.fn(() => largeSitesArray),
                 addSite: vi.fn(),
+                getSites: vi.fn(() => largeSitesArray),
                 removeSite: vi.fn(),
                 setSites: vi.fn(),
                 syncSitesFromBackend: vi.fn(),
@@ -359,11 +361,10 @@ describe("Sites Store Modules - Edge Cases and Error Scenarios", () => {
         });
 
         it("should handle circular references in site data", () => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const circularSite: any = {
                 identifier: "circular.com",
-                name: "Circular Site",
                 monitors: [],
+                name: "Circular Site",
             };
 
             // Create circular reference
@@ -371,15 +372,15 @@ describe("Sites Store Modules - Edge Cases and Error Scenarios", () => {
             circularSite.monitors = [
                 {
                     id: "monitor-1",
+                    parent: circularSite, // circular reference
                     type: "http",
                     url: "https://circular.com",
-                    parent: circularSite, // circular reference
                 },
             ];
 
             const mockDependencies = {
-                getSites: vi.fn(() => [circularSite]),
                 addSite: vi.fn(),
+                getSites: vi.fn(() => [circularSite]),
                 removeSite: vi.fn(),
                 setSites: vi.fn(),
                 syncSitesFromBackend: vi.fn(),
@@ -395,8 +396,8 @@ describe("Sites Store Modules - Edge Cases and Error Scenarios", () => {
     describe("Concurrent Operations", () => {
         it("should handle concurrent site operations", async () => {
             const mockDependencies = {
-                getSites: vi.fn(() => [mockSite]),
                 addSite: vi.fn(),
+                getSites: vi.fn(() => [mockSite]),
                 removeSite: vi.fn(),
                 setSites: vi.fn(),
                 syncSitesFromBackend: vi.fn().mockResolvedValue(undefined),

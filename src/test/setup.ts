@@ -13,12 +13,12 @@ expect.extend(matchers);
 // Global test configuration and mocks
 const mockElectronAPI = {
     data: {
-        exportData: vi.fn().mockResolvedValue("mock-data"),
-        importData: vi.fn().mockResolvedValue(true),
         downloadSQLiteBackup: vi.fn().mockResolvedValue({
             buffer: new ArrayBuffer(8),
             fileName: "test-backup.sqlite",
         }),
+        exportData: vi.fn().mockResolvedValue("mock-data"),
+        importData: vi.fn().mockResolvedValue(true),
     },
     events: {
         onStatusUpdate: vi.fn((callback) => {
@@ -30,8 +30,8 @@ const mockElectronAPI = {
     },
     monitoring: {
         startMonitoring: vi.fn().mockResolvedValue(undefined),
-        stopMonitoring: vi.fn().mockResolvedValue(undefined),
         startMonitoringForSite: vi.fn().mockResolvedValue(undefined),
+        stopMonitoring: vi.fn().mockResolvedValue(undefined),
         stopMonitoringForSite: vi.fn().mockResolvedValue(undefined),
     },
     settings: {
@@ -39,15 +39,15 @@ const mockElectronAPI = {
         updateHistoryLimit: vi.fn().mockResolvedValue(undefined),
     },
     sites: {
-        getSites: vi.fn().mockResolvedValue([]),
         addSite: vi.fn().mockResolvedValue({
             identifier: "test-site",
-            name: "Test Site",
             monitors: [],
+            name: "Test Site",
         }),
+        checkSiteNow: vi.fn().mockResolvedValue(undefined),
+        getSites: vi.fn().mockResolvedValue([]),
         removeSite: vi.fn().mockResolvedValue(undefined),
         updateSite: vi.fn().mockResolvedValue(undefined),
-        checkSiteNow: vi.fn().mockResolvedValue(undefined),
     },
     system: {
         quitAndInstall: vi.fn(),

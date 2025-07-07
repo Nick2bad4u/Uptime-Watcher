@@ -3,8 +3,9 @@
  */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { SiteService } from "../../../stores/sites/services/SiteService";
 import type { Site } from "../../../types";
+
+import { SiteService } from "../../../stores/sites/services/SiteService";
 
 // Mock the waitForElectronAPI utility
 vi.mock("../../../stores/utils", () => ({
@@ -13,15 +14,15 @@ vi.mock("../../../stores/utils", () => ({
 
 // Mock the electron window API
 const mockElectronAPI = {
-    sites: {
-        getSites: vi.fn(),
-        addSite: vi.fn(),
-        removeSite: vi.fn(),
-        updateSite: vi.fn(),
-        checkSiteNow: vi.fn(),
-    },
     data: {
         downloadSQLiteBackup: vi.fn(),
+    },
+    sites: {
+        addSite: vi.fn(),
+        checkSiteNow: vi.fn(),
+        getSites: vi.fn(),
+        removeSite: vi.fn(),
+        updateSite: vi.fn(),
     },
 };
 
@@ -40,30 +41,30 @@ describe("SiteService", () => {
             const mockSites: Site[] = [
                 {
                     identifier: "site1",
-                    name: "Test Site 1",
                     monitors: [
                         {
-                            id: "monitor1",
-                            type: "http",
-                            status: "up",
-                            url: "https://test1.com",
                             history: [],
+                            id: "monitor1",
+                            status: "up",
+                            type: "http",
+                            url: "https://test1.com",
                         },
                     ],
+                    name: "Test Site 1",
                 },
                 {
                     identifier: "site2",
-                    name: "Test Site 2",
                     monitors: [
                         {
-                            id: "monitor2",
-                            type: "port",
-                            status: "down",
-                            host: "test2.com",
-                            port: 80,
                             history: [],
+                            host: "test2.com",
+                            id: "monitor2",
+                            port: 80,
+                            status: "down",
+                            type: "port",
                         },
                     ],
+                    name: "Test Site 2",
                 },
             ];
 
@@ -102,30 +103,30 @@ describe("SiteService", () => {
         it("should add a new site successfully", async () => {
             const newSite: Omit<Site, "id"> = {
                 identifier: "new-site",
-                name: "New Site",
                 monitors: [
                     {
-                        id: "monitor1",
-                        type: "http",
-                        status: "pending",
-                        url: "https://newsite.com",
                         history: [],
+                        id: "monitor1",
+                        status: "pending",
+                        type: "http",
+                        url: "https://newsite.com",
                     },
                 ],
+                name: "New Site",
             };
 
             const createdSite: Site = {
                 identifier: "new-site",
-                name: "New Site",
                 monitors: [
                     {
-                        id: "monitor1",
-                        type: "http",
-                        status: "pending",
-                        url: "https://newsite.com",
                         history: [],
+                        id: "monitor1",
+                        status: "pending",
+                        type: "http",
+                        url: "https://newsite.com",
                     },
                 ],
+                name: "New Site",
             };
 
             mockElectronAPI.sites.addSite.mockResolvedValueOnce(createdSite);
@@ -139,8 +140,8 @@ describe("SiteService", () => {
         it("should handle creation errors", async () => {
             const newSite: Omit<Site, "id"> = {
                 identifier: "new-site",
-                name: "New Site",
                 monitors: [],
+                name: "New Site",
             };
 
             const error = new Error("Failed to create site");
@@ -152,8 +153,8 @@ describe("SiteService", () => {
         it("should handle validation errors", async () => {
             const invalidSite: Omit<Site, "id"> = {
                 identifier: "",
-                name: "",
                 monitors: [],
+                name: "",
             };
 
             const validationError = new Error("Invalid site data");
@@ -165,8 +166,8 @@ describe("SiteService", () => {
         it("should handle duplicate site errors", async () => {
             const duplicateSite: Omit<Site, "id"> = {
                 identifier: "existing-site",
-                name: "Existing Site",
                 monitors: [],
+                name: "Existing Site",
             };
 
             const duplicateError = new Error("Site already exists");
@@ -351,16 +352,16 @@ describe("SiteService", () => {
         it("should accept valid site objects", async () => {
             const validSite: Omit<Site, "id"> = {
                 identifier: "valid-site",
-                name: "Valid Site",
                 monitors: [
                     {
-                        id: "monitor1",
-                        type: "http",
-                        status: "pending",
-                        url: "https://valid.com",
                         history: [],
+                        id: "monitor1",
+                        status: "pending",
+                        type: "http",
+                        url: "https://valid.com",
                     },
                 ],
+                name: "Valid Site",
             };
 
             mockElectronAPI.sites.addSite.mockResolvedValueOnce(validSite as Site);
@@ -373,24 +374,24 @@ describe("SiteService", () => {
         it("should handle sites with multiple monitors", async () => {
             const siteWithMonitors: Omit<Site, "id"> = {
                 identifier: "site-with-monitors",
-                name: "Site with Multiple Monitors",
                 monitors: [
                     {
-                        id: "monitor1",
-                        type: "http",
-                        status: "up",
-                        url: "https://monitored.com",
                         history: [],
+                        id: "monitor1",
+                        status: "up",
+                        type: "http",
+                        url: "https://monitored.com",
                     },
                     {
-                        id: "monitor2",
-                        type: "port",
-                        status: "down",
-                        host: "monitored.com",
-                        port: 443,
                         history: [],
+                        host: "monitored.com",
+                        id: "monitor2",
+                        port: 443,
+                        status: "down",
+                        type: "port",
                     },
                 ],
+                name: "Site with Multiple Monitors",
             };
 
             mockElectronAPI.sites.addSite.mockResolvedValueOnce(siteWithMonitors as Site);
@@ -403,16 +404,16 @@ describe("SiteService", () => {
         it("should handle special characters in site data", async () => {
             const siteWithSpecialChars: Omit<Site, "id"> = {
                 identifier: "site-with-special-chars",
-                name: "Site with Special Characters: @#$%",
                 monitors: [
                     {
-                        id: "monitor1",
-                        type: "http",
-                        status: "pending",
-                        url: "https://special-chars.com/path?param=value&other=test",
                         history: [],
+                        id: "monitor1",
+                        status: "pending",
+                        type: "http",
+                        url: "https://special-chars.com/path?param=value&other=test",
                     },
                 ],
+                name: "Site with Special Characters: @#$%",
             };
 
             mockElectronAPI.sites.addSite.mockResolvedValueOnce(siteWithSpecialChars as Site);
@@ -425,16 +426,16 @@ describe("SiteService", () => {
         it("should handle Unicode characters in site data", async () => {
             const siteWithUnicode: Omit<Site, "id"> = {
                 identifier: "site-with-unicode",
-                name: "Site with Unicode: 🌟💻🚀",
                 monitors: [
                     {
-                        id: "monitor1",
-                        type: "http",
-                        status: "pending",
-                        url: "https://unicode-site.com",
                         history: [],
+                        id: "monitor1",
+                        status: "pending",
+                        type: "http",
+                        url: "https://unicode-site.com",
                     },
                 ],
+                name: "Site with Unicode: 🌟💻🚀",
             };
 
             mockElectronAPI.sites.addSite.mockResolvedValueOnce(siteWithUnicode as Site);

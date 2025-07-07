@@ -2,13 +2,12 @@
  * @vitest-environment jsdom
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+
 import { SiteList } from "../components/Dashboard/SiteList";
-import { useTheme } from "../theme/useTheme";
 import { useSitesStore } from "../stores/sites/useSitesStore";
+import { useTheme } from "../theme/useTheme";
 
 // Mock the sites store with proper variable hoisting
 vi.mock("../stores/sites/useSitesStore", () => ({

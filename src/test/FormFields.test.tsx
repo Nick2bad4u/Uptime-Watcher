@@ -3,7 +3,6 @@
  * Validates form field wrappers, text fields, select fields, and radio groups.
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
@@ -324,9 +323,9 @@ describe("FormFields", () => {
                 />
             );
 
-            options.forEach((option) => {
+            for (const option of options) {
                 expect(screen.getByDisplayValue(option.value)).toBeDisabled();
-            });
+            }
         });
 
         it("should have proper radiogroup role", () => {
@@ -356,9 +355,9 @@ describe("FormFields", () => {
                 />
             );
 
-            options.forEach((option) => {
+            for (const option of options) {
                 expect(screen.getByDisplayValue(option.value)).toHaveAttribute("name", "test-radio-group");
-            });
+            }
         });
     });
 });

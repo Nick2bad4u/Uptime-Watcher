@@ -3,8 +3,9 @@
  * Comprehensive tests for error store functionality.
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
 import { act, renderHook } from "@testing-library/react";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+
 import { useErrorStore } from "../stores/error/useErrorStore";
 
 // Mock the logger
@@ -16,10 +17,10 @@ describe("useErrorStore", () => {
     beforeEach(() => {
         // Reset the store before each test
         useErrorStore.setState({
-            lastError: undefined,
             isLoading: false,
-            storeErrors: {},
+            lastError: undefined,
             operationLoading: {},
+            storeErrors: {},
         });
     });
 

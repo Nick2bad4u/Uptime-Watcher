@@ -4,34 +4,36 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { useSitesStore } from "../stores/sites/useSitesStore";
-import { SiteService } from "../stores/sites/services";
-import { ERROR_MESSAGES } from "../stores/types";
-import { updateMonitorInSite } from "../stores/sites/utils";
+
 import type { Site, Monitor } from "../types";
+
+import { SiteService } from "../stores/sites/services";
+import { useSitesStore } from "../stores/sites/useSitesStore";
+import { updateMonitorInSite } from "../stores/sites/utils";
+import { ERROR_MESSAGES } from "../stores/types";
 
 // Mock dependencies
 vi.mock("../stores/sites/services", () => ({
     SiteService: {
-        updateSite: vi.fn(),
         getSites: vi.fn(),
+        updateSite: vi.fn(),
     },
 }));
 
 vi.mock("../stores/sites/utils", () => ({
-    updateMonitorInSite: vi.fn(),
-    StatusUpdateManager: vi.fn().mockImplementation(() => ({})),
+    // Include other exports that might be needed
+    createStatusUpdateHandler: vi.fn(),
+    handleSQLiteBackupDownload: vi.fn(),
     logStoreAction: vi.fn(),
+    normalizeMonitor: vi.fn(),
+    StatusUpdateManager: vi.fn().mockImplementation(() => ({})),
+    updateMonitorInSite: vi.fn(),
     withErrorHandling: vi.fn((fn, handlers) => {
         return fn().catch((error: Error) => {
             handlers.setError(error);
             throw error;
         });
     }),
-    // Include other exports that might be needed
-    createStatusUpdateHandler: vi.fn(),
-    handleSQLiteBackupDownload: vi.fn(),
-    normalizeMonitor: vi.fn(),
 }));
 
 // Mock the actual utilities we need
@@ -54,30 +56,30 @@ describe("useSitesStore - Uncovered Functions", () => {
 
         mockSite = {
             identifier: "test-site-id",
-            name: "Test Site",
             monitors: [
                 {
-                    id: "monitor-1",
-                    type: "http" as const,
-                    status: "up" as const,
-                    url: "https://test.com",
-                    history: [],
                     checkInterval: 60000,
-                    timeout: 5000,
+                    history: [],
+                    id: "monitor-1",
                     retryAttempts: 3,
+                    status: "up" as const,
+                    timeout: 5000,
+                    type: "http" as const,
+                    url: "https://test.com",
                 },
             ],
+            name: "Test Site",
         };
 
         mockMonitor = {
-            id: "monitor-1",
-            type: "http" as const,
-            status: "up" as const,
-            url: "https://test.com",
-            history: [],
             checkInterval: 60000,
-            timeout: 5000,
+            history: [],
+            id: "monitor-1",
             retryAttempts: 3,
+            status: "up" as const,
+            timeout: 5000,
+            type: "http" as const,
+            url: "https://test.com",
         };
 
         // Reset store state

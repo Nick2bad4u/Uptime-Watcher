@@ -3,14 +3,15 @@
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
+
 import { ThemeManager } from "../theme/ThemeManager";
 
 // Mock window.matchMedia
 const mockMatchMedia = vi.fn();
 
 Object.defineProperty(window, "matchMedia", {
-    writable: true,
     value: mockMatchMedia,
+    writable: true,
 });
 
 describe("ThemeManager", () => {
@@ -22,8 +23,8 @@ describe("ThemeManager", () => {
 
         // Mock matchMedia to return a MediaQueryList-like object
         mockMatchMedia.mockReturnValue({
-            matches: false,
             addEventListener: vi.fn(),
+            matches: false,
             removeEventListener: vi.fn(),
         });
     });
@@ -64,8 +65,8 @@ describe("ThemeManager", () => {
 
     it("should handle system theme with light preference", () => {
         mockMatchMedia.mockReturnValue({
-            matches: false, // Light mode
             addEventListener: vi.fn(),
+            matches: false, // Light mode
             removeEventListener: vi.fn(),
         });
 
@@ -77,8 +78,8 @@ describe("ThemeManager", () => {
 
     it("should handle system theme with dark preference", () => {
         mockMatchMedia.mockReturnValue({
-            matches: true, // Dark mode
             addEventListener: vi.fn(),
+            matches: true, // Dark mode
             removeEventListener: vi.fn(),
         });
 
@@ -98,8 +99,8 @@ describe("ThemeManager", () => {
 
     it("should get system theme preference", () => {
         mockMatchMedia.mockReturnValue({
-            matches: false,
             addEventListener: vi.fn(),
+            matches: false,
             removeEventListener: vi.fn(),
         });
 
@@ -107,8 +108,8 @@ describe("ThemeManager", () => {
         expect(preference).toBe("light");
 
         mockMatchMedia.mockReturnValue({
-            matches: true,
             addEventListener: vi.fn(),
+            matches: true,
             removeEventListener: vi.fn(),
         });
 
@@ -131,8 +132,8 @@ describe("ThemeManager", () => {
         const mockRemoveEventListener = vi.fn();
 
         mockMatchMedia.mockReturnValue({
-            matches: false,
             addEventListener: mockAddEventListener,
+            matches: false,
             removeEventListener: mockRemoveEventListener,
         });
 
@@ -148,8 +149,8 @@ describe("ThemeManager", () => {
     it("should fallback to light theme for invalid system preference", () => {
         // Mock matchMedia to return an invalid value that would cause issues
         const invalidMatchMedia = vi.fn().mockReturnValue({
-            matches: undefined, // Invalid value
             addEventListener: vi.fn(),
+            matches: undefined, // Invalid value
             removeEventListener: vi.fn(),
         });
 
@@ -171,7 +172,7 @@ describe("ThemeManager", () => {
         const originalMatchMedia = window.matchMedia;
 
         // Remove matchMedia temporarily
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
         delete (window as any).matchMedia;
 
         const preference = themeManager.getSystemThemePreference();
@@ -185,30 +186,30 @@ describe("ThemeManager", () => {
         beforeEach(() => {
             // Mock document and document.documentElement
             const mockRoot = {
-                style: {
-                    setProperty: vi.fn(),
-                },
                 classList: {
                     add: vi.fn(),
                     remove: vi.fn(),
                 },
-            };
-
-            const mockBody = {
-                className: "theme-old-theme some-other-class",
-                classList: {
-                    add: vi.fn(),
+                style: {
+                    setProperty: vi.fn(),
                 },
             };
 
+            const mockBody = {
+                classList: {
+                    add: vi.fn(),
+                },
+                className: "theme-old-theme some-other-class",
+            };
+
             Object.defineProperty(document, "documentElement", {
-                writable: true,
                 value: mockRoot,
+                writable: true,
             });
 
             Object.defineProperty(document, "body", {
-                writable: true,
                 value: mockBody,
+                writable: true,
             });
         });
 
@@ -263,7 +264,7 @@ describe("ThemeManager", () => {
             const originalDocument = global.document;
 
             // Remove document temporarily
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
             delete (global as any).document;
 
             const lightTheme = themeManager.getTheme("light");
@@ -288,7 +289,7 @@ describe("ThemeManager", () => {
             };
 
             // Cast to Theme to bypass type checking for this test case
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
             themeManager.applyTheme(themeWithStringColors as any);
 
             expect(document.documentElement.style.setProperty).toHaveBeenCalledWith("--color-customColor", "#ff0000");
@@ -299,7 +300,6 @@ describe("ThemeManager", () => {
         it("should create custom theme with overrides", () => {
             const baseTheme = themeManager.getTheme("light");
             const overrides = {
-                name: "custom" as const,
                 colors: {
                     ...baseTheme.colors,
                     primary: {
@@ -307,6 +307,7 @@ describe("ThemeManager", () => {
                         50: "#custom-color",
                     },
                 },
+                name: "custom" as const,
                 spacing: {
                     ...baseTheme.spacing,
                     xs: "2px",
@@ -334,16 +335,16 @@ describe("ThemeManager", () => {
         it("should merge nested properties correctly", () => {
             const baseTheme = themeManager.getTheme("light");
             const overrides = {
+                borderRadius: {
+                    ...baseTheme.borderRadius,
+                    lg: "12px",
+                },
                 typography: {
                     ...baseTheme.typography,
                     fontSize: {
                         ...baseTheme.typography.fontSize,
                         xl: "24px",
                     },
-                },
-                borderRadius: {
-                    ...baseTheme.borderRadius,
-                    lg: "12px",
                 },
             };
 
@@ -405,7 +406,6 @@ describe("ThemeManager", () => {
                 },
             };
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const cssVariables = themeManager.generateCSSVariables(themeWithStringColors as any);
             expect(cssVariables).toContain("--color-customColor: #ff0000;");
         });
@@ -421,15 +421,14 @@ describe("ThemeManager", () => {
 
     describe("getTheme edge cases", () => {
         it("should fallback to light theme for invalid theme name", () => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const theme = themeManager.getTheme("invalid" as any);
             expect(theme.name).toBe("light");
         });
 
         it("should handle system theme when matchMedia returns unexpected value", () => {
             const mockMediaQuery = {
-                matches: null, // Unexpected value
                 addEventListener: vi.fn(),
+                matches: null, // Unexpected value
                 removeEventListener: vi.fn(),
             };
 
@@ -443,14 +442,13 @@ describe("ThemeManager", () => {
             // Mock getSystemThemePreference to return an unexpected value
             const originalGetSystemThemePreference = themeManager.getSystemThemePreference;
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (themeManager as any).getSystemThemePreference = vi.fn().mockReturnValue("unexpected" as any);
 
             const systemTheme = themeManager.getTheme("system");
             expect(systemTheme.name).toBe("light"); // Should fallback to light theme
 
             // Restore original method
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
             (themeManager as any).getSystemThemePreference = originalGetSystemThemePreference;
         });
     });
@@ -460,7 +458,7 @@ describe("ThemeManager", () => {
             const originalWindow = global.window;
 
             // Remove window temporarily
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
             delete (global as any).window;
 
             const mockCallback = vi.fn();
@@ -478,7 +476,7 @@ describe("ThemeManager", () => {
             const originalMatchMedia = window.matchMedia;
 
             // Remove matchMedia temporarily
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
             delete (window as any).matchMedia;
 
             const mockCallback = vi.fn();
@@ -498,8 +496,8 @@ describe("ThemeManager", () => {
             const mockRemoveEventListener = vi.fn();
 
             mockMatchMedia.mockReturnValue({
-                matches: false,
                 addEventListener: mockAddEventListener,
+                matches: false,
                 removeEventListener: mockRemoveEventListener,
             });
 

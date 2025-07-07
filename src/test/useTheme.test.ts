@@ -2,13 +2,12 @@
  * @vitest-environment jsdom
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-import { useTheme, useThemeValue, useStatusColors, useThemeClasses, useAvailabilityColors } from "../theme/useTheme";
-import { themeManager } from "../theme/ThemeManager";
+import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
+
 import { useSettingsStore } from "../stores";
+import { themeManager } from "../theme/ThemeManager";
+import { useTheme, useThemeValue, useStatusColors, useThemeClasses, useAvailabilityColors } from "../theme/useTheme";
 
 // Mock the settings store
 vi.mock("../stores", () => ({
@@ -18,42 +17,42 @@ vi.mock("../stores", () => ({
 // Mock the theme manager
 vi.mock("../theme/ThemeManager", () => ({
     themeManager: {
-        getTheme: vi.fn(),
         applyTheme: vi.fn(),
-        onSystemThemeChange: vi.fn(),
-        getSystemThemePreference: vi.fn(),
         getAvailableThemes: vi.fn(),
+        getSystemThemePreference: vi.fn(),
+        getTheme: vi.fn(),
+        onSystemThemeChange: vi.fn(),
     },
 }));
 
 describe("Theme Hooks", () => {
     const mockUpdateSettings = vi.fn();
     const mockTheme = {
-        name: "light",
-        isDark: false,
         colors: {
-            primary: {
-                500: "#3b82f6",
-            },
-            status: {
-                up: "#10b981",
-                down: "#ef4444",
-                pending: "#f59e0b",
-                unknown: "#6b7280",
-            },
-            success: "#10b981",
-            warning: "#f59e0b",
-            error: "#ef4444",
             background: {
                 primary: "#ffffff",
                 secondary: "#f8fafc",
                 tertiary: "#f1f5f9",
             },
+            error: "#ef4444",
+            primary: {
+                500: "#3b82f6",
+            },
+            status: {
+                down: "#ef4444",
+                pending: "#f59e0b",
+                unknown: "#6b7280",
+                up: "#10b981",
+            },
+            success: "#10b981",
             text: {
                 primary: "#1f2937",
                 secondary: "#6b7280",
             },
+            warning: "#f59e0b",
         },
+        isDark: false,
+        name: "light",
     };
 
     beforeEach(() => {
@@ -206,10 +205,10 @@ describe("Theme Hooks", () => {
             const { result } = renderHook(() => useStatusColors());
 
             expect(result.current).toEqual({
-                up: "#10b981",
                 down: "#ef4444",
                 pending: "#f59e0b",
                 unknown: "#6b7280",
+                up: "#10b981",
             });
         });
     });

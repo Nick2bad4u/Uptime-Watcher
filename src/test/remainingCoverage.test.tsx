@@ -3,14 +3,16 @@
  * These tests target specific uncovered lines to achieve 100% coverage
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { useErrorStore, useSettingsStore, useSitesStore } from "../stores";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+
+import type { Monitor, StatusHistory } from "../types";
+
 import { Settings } from "../components/Settings/Settings";
 import { ScreenshotThumbnail } from "../components/SiteDetails/ScreenshotThumbnail";
 import { HistoryTab } from "../components/SiteDetails/tabs/HistoryTab";
+import { useErrorStore, useSettingsStore, useSitesStore } from "../stores";
 import { ThemedIconButton } from "../theme/components";
-import type { Monitor, StatusHistory } from "../types";
 
 // Mock the stores and other dependencies
 vi.mock("../stores", () => ({
@@ -21,13 +23,13 @@ vi.mock("../stores", () => ({
 
 vi.mock("../services/logger", () => ({
     default: {
-        warn: vi.fn(),
-        info: vi.fn(),
-        error: vi.fn(),
         debug: vi.fn(),
+        error: vi.fn(),
+        info: vi.fn(),
         user: {
             action: vi.fn(),
         },
+        warn: vi.fn(),
     },
 }));
 
@@ -42,17 +44,17 @@ describe("Remaining Coverage Tests", () => {
 
             (useSettingsStore as unknown as { mockReturnValue: (value: unknown) => void }).mockReturnValue({
                 settings: {
-                    theme: "system",
                     autostart: false,
-                    notificationEnabled: true,
                     historyLimit: 50,
+                    notificationEnabled: true,
+                    theme: "system",
                 },
                 updateSettings: mockUpdateSettings,
             });
 
             (useErrorStore as unknown as { mockReturnValue: (value: unknown) => void }).mockReturnValue({
-                lastError: null,
                 clearError: vi.fn(),
+                lastError: null,
             });
 
             (useSitesStore as unknown as { mockReturnValue: (value: unknown) => void }).mockReturnValue({
@@ -71,12 +73,12 @@ describe("Remaining Coverage Tests", () => {
         it("should position overlay at minimum distance from viewport edges", () => {
             // Mock getBoundingClientRect to return values that trigger edge cases
             const mockGetBoundingClientRect = vi.fn(() => ({
-                top: 5, // This will trigger `if (top < 8) top = 8;`
+                bottom: 50,
+                height: 45,
                 left: 5, // This will trigger `if (left < 8) left = 8;`
                 right: 50,
-                bottom: 50,
+                top: 5, // This will trigger `if (top < 8) top = 8;`
                 width: 45,
-                height: 45,
             }));
 
             // Mock DOM methods
@@ -105,18 +107,18 @@ describe("Remaining Coverage Tests", () => {
     describe("HistoryTab.tsx - Line 193 (renderDetails with no details)", () => {
         it("should render nothing when record has no details", () => {
             const mockMonitor: Monitor = {
-                id: "monitor-1",
-                type: "http",
-                status: "up",
                 checkInterval: 60000,
                 history: [
                     {
-                        timestamp: Date.now(),
-                        status: "up",
                         responseTime: 100,
+                        status: "up",
+                        timestamp: Date.now(),
                         // No details property - this should trigger line 193 to render nothing
                     },
                 ] as StatusHistory[],
+                id: "monitor-1",
+                status: "up",
+                type: "http",
             };
 
             (useSettingsStore as unknown as { mockReturnValue: (value: unknown) => void }).mockReturnValue({

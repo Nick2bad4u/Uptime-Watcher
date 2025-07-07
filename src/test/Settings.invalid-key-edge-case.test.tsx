@@ -2,8 +2,9 @@
  * Tests for Settings component edge cases - invalid key handling
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+
 import { Settings } from "../components/Settings/Settings";
 import { useSettingsStore } from "../stores/settings/useSettingsStore";
 
@@ -13,10 +14,10 @@ vi.mock("../stores/settings/useSettingsStore");
 // Mock logger with proper hoisting-safe pattern
 vi.mock("../services/logger", () => ({
     default: {
-        warn: vi.fn(),
         user: {
             settingsChange: vi.fn(),
         },
+        warn: vi.fn(),
     },
 }));
 
@@ -24,9 +25,9 @@ describe("Settings Component - Invalid Key Edge Cases", () => {
     const mockUpdateSettings = vi.fn();
     const mockOnClose = vi.fn();
     const mockSettings = {
-        theme: "dark",
-        soundAlerts: true,
         historyLimit: 100,
+        soundAlerts: true,
+        theme: "dark",
     };
 
     beforeEach(() => {

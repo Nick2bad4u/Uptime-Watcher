@@ -3,11 +3,12 @@
  * Validates form state management, validation, and user interactions.
  */
 
-import { describe, expect, it, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
+import { describe, expect, it, vi, beforeEach } from "vitest";
+
+import type { FormMode, MonitorType } from "../components/AddSiteForm/useAddSiteForm";
 
 import { useAddSiteForm } from "../components/AddSiteForm/useAddSiteForm";
-import type { FormMode, MonitorType } from "../components/AddSiteForm/useAddSiteForm";
 
 // Mock generateUuid
 vi.mock("../utils/data/generateUuid", () => ({

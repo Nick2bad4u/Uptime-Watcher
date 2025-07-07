@@ -5,27 +5,27 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
+import logger from "../services/logger";
 // Utils
 import { downloadFile } from "../stores/sites/utils/fileDownload";
 import { withErrorHandling } from "../stores/utils";
-import logger from "../services/logger";
 
 // Mock logger
 vi.mock("../services/logger", () => ({
     default: {
         error: vi.fn(),
-        warn: vi.fn(),
         user: {
             settingsChange: vi.fn(),
         },
+        warn: vi.fn(),
     },
 }));
 
 // Mock store
 const mockStore = {
-    setLoading: vi.fn(),
-    setError: vi.fn(),
     clearError: vi.fn(),
+    setError: vi.fn(),
+    setLoading: vi.fn(),
 };
 
 describe("Coverage Completion Tests", () => {

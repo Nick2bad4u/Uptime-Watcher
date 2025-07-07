@@ -1,16 +1,17 @@
 import { render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { ThemedButton, ThemedIconButton, ThemedBadge } from "../theme/components";
 
 // Mock the theme context
 const mockTheme = {
     colors: {
+        background: {
+            primary: "#ffffff",
+        },
         primary: {
             500: "#0ea5e9",
             600: "#0284c7",
-        },
-        background: {
-            primary: "#ffffff",
         },
         text: {
             primary: "#1f2937",

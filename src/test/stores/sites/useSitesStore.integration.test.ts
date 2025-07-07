@@ -4,25 +4,27 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { Site, Monitor } from "../../../types";
+
 import { createSiteMonitoringActions } from "../../../stores/sites/useSiteMonitoring";
 import { createSiteOperationsActions } from "../../../stores/sites/useSiteOperations";
 import { createSitesStateActions, initialSitesState } from "../../../stores/sites/useSitesState";
 import { createSiteSyncActions } from "../../../stores/sites/useSiteSync";
-import type { Site, Monitor } from "../../../types";
 
 // Mock all dependencies
 vi.mock("../../../stores/sites/services", () => ({
-    SiteService: {
-        getSites: vi.fn(),
-        addSite: vi.fn(),
-        removeSite: vi.fn(),
-        updateSite: vi.fn(),
-        checkSiteNow: vi.fn(),
-        downloadSQLiteBackup: vi.fn(),
-    },
     MonitoringService: {
         startMonitoring: vi.fn(),
         stopMonitoring: vi.fn(),
+    },
+    SiteService: {
+        addSite: vi.fn(),
+        checkSiteNow: vi.fn(),
+        downloadSQLiteBackup: vi.fn(),
+        getSites: vi.fn(),
+        removeSite: vi.fn(),
+        updateSite: vi.fn(),
     },
 }));
 
@@ -48,25 +50,25 @@ describe("Sites Store Modules Integration Tests", () => {
         vi.clearAllMocks();
 
         mockMonitor = {
+            checkInterval: 30000,
+            history: [],
             id: "monitor-1",
+            lastChecked: new Date(),
+            monitoring: true,
+            status: "up",
             type: "http" as const,
             url: "https://example.com",
-            status: "up",
-            lastChecked: new Date(),
-            checkInterval: 30000,
-            monitoring: true,
-            history: [],
         };
 
         mockSite = {
             identifier: "example.com",
-            name: "Example Site",
             monitors: [mockMonitor],
+            name: "Example Site",
         };
 
         mockState = {
-            sites: [],
             selectedMonitorIds: {},
+            sites: [],
         } as { sites: Site[]; selectedSiteId?: string; selectedMonitorIds: Record<string, string> };
 
         mockSet = vi.fn((updater) => {
@@ -149,7 +151,7 @@ describe("Sites Store Modules Integration Tests", () => {
         });
 
         it("should handle complete site lifecycle through modules", async () => {
-            const { SiteService, MonitoringService } = await import("../../../stores/sites/services");
+            const { MonitoringService, SiteService } = await import("../../../stores/sites/services");
 
             // Setup mocks
             vi.mocked(SiteService.addSite).mockResolvedValue(mockSite);
@@ -257,9 +259,9 @@ describe("Sites Store Modules Integration Tests", () => {
     describe("Module Initialization", () => {
         it("should have correct initial state", () => {
             expect(initialSitesState).toEqual({
-                sites: [],
-                selectedSiteId: undefined,
                 selectedMonitorIds: {},
+                selectedSiteId: undefined,
+                sites: [],
             });
         });
 
