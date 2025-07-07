@@ -7,14 +7,49 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[ab53340](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ab53340d8da6bddeb3309e8c8b042f3c296c74a4)...
+[ab53340](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ab53340d8da6bddeb3309e8c8b042f3c296c74a4)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/ab53340d8da6bddeb3309e8c8b042f3c296c74a4...ab53340d8da6bddeb3309e8c8b042f3c296c74a4))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 5.3.0 [`(ab53340)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ab53340d8da6bddeb3309e8c8b042f3c296c74a4)
+
+
+
+
+
+
+## [5.3.0] - 2025-07-06
+
+
 [[e3f2ca7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e3f2ca7664fb2320f2f90e374b6e85dd7cd32ac1)...
-[e3f2ca7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e3f2ca7664fb2320f2f90e374b6e85dd7cd32ac1)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/e3f2ca7664fb2320f2f90e374b6e85dd7cd32ac1...e3f2ca7664fb2320f2f90e374b6e85dd7cd32ac1))
+[bcb3652](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bcb36528b74ee86aaf5c4964f76c864ef9a4f455)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/e3f2ca7664fb2320f2f90e374b6e85dd7cd32ac1...bcb36528b74ee86aaf5c4964f76c864ef9a4f455))
+
+
+### ✨ Features
+
+- ✨ [feat] Add paused and mixed monitor status handling
+
+- Introduces 'paused' and 'mixed' states for monitors and sites, updating type definitions, business logic, and UI components to fully support these statuses
+- Ensures transactional safety in monitor deletion and data import/export by adding atomic operations
+- Improves monitoring lifecycle logic to reflect accurate per-monitor state transitions and immediate status updates
+- Enhances unit tests for new statuses and transactional flows, ensuring comprehensive coverage and future extensibility
+- Updates documentation and theme support for new status variants, maintaining visual consistency and contributor clarity [`(bcb3652)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bcb36528b74ee86aaf5c4964f76c864ef9a4f455)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 5.2.0 [`(e3f2ca7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e3f2ca7664fb2320f2f90e374b6e85dd7cd32ac1)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v5.2.0 [skip ci] [`(a3f7281)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a3f7281494381b8c2730a35eecaa86b3422474d5)
 
 
 
