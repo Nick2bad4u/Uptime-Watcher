@@ -386,13 +386,7 @@ export default [
     // TypeScript files - Source (renderer) files
     {
         files: ["src/**/*.ts", "src/**/*.tsx", "vitest*.ts", "vite.config.ts"],
-        ignores: [
-            "tests/**", 
-            "**/__tests__/**", 
-            "**/*.test.{ts,tsx}", 
-            "**/*.spec.{ts,tsx}",
-            "src/test/**/*.{ts,tsx}"
-        ],
+        ignores: ["tests/**", "**/__tests__/**", "**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}", "src/test/**/*.{ts,tsx}"],
         languageOptions: {
             parser: tseslint.parser,
             parserOptions: {
@@ -694,11 +688,7 @@ export default [
 
     // Electron Testing files - separate config to use different tsconfig
     {
-        files: [
-            "electron/test/**/*.{ts,tsx}",
-            "electron/**/*.test.{ts,tsx}",
-            "electron/**/*.spec.{ts,tsx}",
-        ],
+        files: ["electron/test/**/*.{ts,tsx}", "electron/**/*.test.{ts,tsx}", "electron/**/*.spec.{ts,tsx}"],
         languageOptions: {
             parser: tseslint.parser,
             parserOptions: {
@@ -763,11 +753,7 @@ export default [
             "vitest*.{js,ts}",
             "src/test/**/*.{ts,tsx}",
         ],
-        ignores: [
-            "electron/test/**/*.{ts,tsx}",
-            "electron/**/*.test.{ts,tsx}",
-            "electron/**/*.spec.{ts,tsx}",
-        ],
+        ignores: ["electron/test/**/*.{ts,tsx}", "electron/**/*.test.{ts,tsx}", "electron/**/*.spec.{ts,tsx}"],
         languageOptions: {
             parser: tseslint.parser,
             parserOptions: {

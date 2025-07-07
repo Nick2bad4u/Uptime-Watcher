@@ -3,9 +3,6 @@
  * Validates IPC communication handling and service orchestration.
  */
 
- 
- 
-
 import { ipcMain } from "electron";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 

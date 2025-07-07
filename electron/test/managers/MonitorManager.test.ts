@@ -74,7 +74,7 @@ describe("MonitorManager", () => {
 
         // We need to use any here to bypass the complex repository type requirements
         // This is acceptable in a test context where we're focusing on specific behavior
-         
+
         monitorManager = new MonitorManager(mockDependencies as any);
     });
 
@@ -89,7 +89,7 @@ describe("MonitorManager", () => {
 
             // Get the scheduler and call the callback directly
             // We need to access the private property for testing
-             
+
             const scheduler = (monitorManager as any).monitorScheduler;
             if (scheduler && scheduler.onCheckCallback) {
                 await scheduler.onCheckCallback("test-site", "test-monitor");
@@ -109,7 +109,7 @@ describe("MonitorManager", () => {
 
             // Get the scheduler and call the callback directly
             // We need to access the private property for testing
-             
+
             const scheduler = (monitorManager as any).monitorScheduler;
             if (scheduler && scheduler.onCheckCallback) {
                 // This should cover lines 181-185 where site is undefined

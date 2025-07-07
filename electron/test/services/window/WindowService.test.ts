@@ -3,8 +3,6 @@
  * Validates window management and lifecycle operations.
  */
 
- 
-
 import { BrowserWindow } from "electron";
 import { describe, expect, it, vi, beforeEach, afterEach, MockedFunction } from "vitest";
 

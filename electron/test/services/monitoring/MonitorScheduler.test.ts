@@ -1,5 +1,3 @@
- 
-
 import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 
 import { DEFAULT_CHECK_INTERVAL } from "../../../constants";

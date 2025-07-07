@@ -3,8 +3,6 @@
  * Validates development mode detection and other utility functions.
  */
 
- 
-
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
 import { isDev } from "../../electronUtils";

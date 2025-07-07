@@ -10,19 +10,13 @@
             "@/*": ["electron/*"],
             "@electron/*": ["electron/*"]
         },
-        "types": [
-            "node",
-            "vitest/globals",
-            "@testing-library/jest-dom",
-            "jest",
-            "electron"
-        ]
+        "types": ["node", "vitest/globals", "@testing-library/jest-dom", "jest", "electron"]
     },
     "include": [
-        "electron/**/*.ts", 
-        "electron/**/*.tsx", 
-        "electron/**/*.test.ts", 
-        "electron/**/*.spec.ts", 
+        "electron/**/*.ts",
+        "electron/**/*.tsx",
+        "electron/**/*.test.ts",
+        "electron/**/*.spec.ts",
         "electron/test/**/*",
         "vitest.electron.config.ts"
     ],

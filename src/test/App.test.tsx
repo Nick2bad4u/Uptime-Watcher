@@ -617,10 +617,10 @@ describe("App Component", () => {
         it("should log status updates in development mode", async () => {
             const originalEnv = process.env.NODE_ENV;
             process.env.NODE_ENV = "development";
-            
+
             // Spy on console.log
             const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
-            
+
             // Mock the subscription to capture the callback
             let statusUpdateCallback: ((update: any) => void) | undefined;
             mockSitesStore.subscribeToStatusUpdates.mockImplementation((callback: any) => {
@@ -650,10 +650,10 @@ describe("App Component", () => {
         it("should not log status updates in production mode", async () => {
             const originalEnv = process.env.NODE_ENV;
             process.env.NODE_ENV = "production";
-            
+
             // Spy on console.log
             const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
-            
+
             // Mock the subscription to capture the callback
             let statusUpdateCallback: ((update: any) => void) | undefined;
             mockSitesStore.subscribeToStatusUpdates.mockImplementation((callback: any) => {

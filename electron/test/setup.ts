@@ -3,8 +3,6 @@
  * Provides global mocks and utilities for consistent testing environment.
  */
 
- 
-
 import { vi } from "vitest";
 
 // Suppress PromiseRejectionHandledWarning for test environment

@@ -63,21 +63,17 @@ describe("monitorStatusChecker", () => {
                 history: {
                     addEntry: vi.fn().mockResolvedValue(undefined),
                     pruneHistory: vi.fn().mockResolvedValue(undefined),
-                     
                 } as any,
                 monitor: {
                     update: vi.fn().mockResolvedValue(undefined),
-                     
                 } as any,
                 site: {
                     getByIdentifier: vi.fn().mockImplementation(() => Promise.resolve(mockSite)),
-                     
                 } as any,
             },
             sites: new Map(),
             eventEmitter: {
                 emit: vi.fn(),
-                 
             } as any,
             logger: {
                 info: vi.fn(),
@@ -181,7 +177,7 @@ describe("monitorStatusChecker", () => {
             if (originalMonitor) {
                 mockSite.monitors[0] = {
                     ...originalMonitor,
-                     
+
                     id: undefined as any,
                 } as Monitor;
             }
@@ -202,7 +198,7 @@ describe("monitorStatusChecker", () => {
             if (originalMonitor) {
                 mockSite.monitors[0] = {
                     ...originalMonitor,
-                     
+
                     id: null as any,
                 } as Monitor;
             }

@@ -3,8 +3,6 @@
  * Validates HTTP/HTTPS monitoring core functionality.
  */
 
- 
-
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
 import { HttpMonitor } from "../../../services/monitoring/HttpMonitor";

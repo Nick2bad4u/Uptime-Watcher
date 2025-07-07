@@ -3,8 +3,6 @@
  * Validates type definitions and interfaces for monitoring functionality.
  */
 
- 
-
 import { describe, expect, it } from "vitest";
 
 import type { IMonitorService, MonitorCheckResult, MonitorConfig } from "../../../services/monitoring/types";

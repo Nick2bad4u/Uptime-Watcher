@@ -158,10 +158,13 @@ describe("Settings Component - Uncovered Lines", () => {
         render(<Settings onClose={mockOnClose} />);
 
         // Wait for component to render by checking for Settings text
-        await waitFor(() => {
-            const settingsTitle = screen.getByText("⚙️ Settings");
-            expect(settingsTitle).toBeInTheDocument();
-        }, { timeout: 5000 });
+        await waitFor(
+            () => {
+                const settingsTitle = screen.getByText("⚙️ Settings");
+                expect(settingsTitle).toBeInTheDocument();
+            },
+            { timeout: 5000 }
+        );
 
         // Simulate changing a checkbox to trigger handleSettingChange
         const checkboxes = screen.getAllByTestId("themed-checkbox");

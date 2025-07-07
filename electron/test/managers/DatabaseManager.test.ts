@@ -333,7 +333,6 @@ describe("DatabaseManager", () => {
             const testData = '{"sites":[],"monitors":[],"settings":{}}';
             let loadSitesCallback: (() => Promise<void>) | undefined;
 
-             
             mockImportData.mockImplementation(async (deps, callbacks, _data) => {
                 loadSitesCallback = callbacks.loadSites;
                 return true;
@@ -378,7 +377,6 @@ describe("DatabaseManager", () => {
         it("should return empty array for getSitesFromCache callback", async () => {
             let getSitesCacheCallback: (() => Site[]) | undefined;
 
-             
             mockImportData.mockImplementation(async (deps, callbacks, _data) => {
                 getSitesCacheCallback = callbacks.getSitesFromCache;
                 return true;
@@ -549,7 +547,7 @@ describe("DatabaseManager", () => {
             });
 
             // Mock getHistoryLimit to return the internal limit
-             
+
             mockGetHistoryLimit.mockImplementation((_getCallback) => {
                 // _getCallback should return the current internal limit
                 // We simulate this by just returning the current internalLimit

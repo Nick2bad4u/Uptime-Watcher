@@ -300,15 +300,15 @@ describe("SiteDetails Component - Uncovered Lines", () => {
         // Find the dialog element and verify it exists
         const dialog = screen.getByRole("dialog");
         expect(dialog).toBeInTheDocument();
-        
+
         // Find the background button (overlay) that has the keyboard handler
         const backgroundButton = screen.getByLabelText("Close modal");
         expect(backgroundButton).toBeInTheDocument();
-        
+
         // Focus the background button and press Escape
         backgroundButton.focus();
         await user.keyboard("{Escape}");
-        
+
         // onClose should be called
         expect(mockOnClose).toHaveBeenCalled();
     }, 10000);
@@ -319,10 +319,10 @@ describe("SiteDetails Component - Uncovered Lines", () => {
 
         // Find the background button (overlay)
         const backgroundButton = screen.getByLabelText("Close modal");
-        
+
         // Click the background
         await user.click(backgroundButton);
-        
+
         // onClose should be called
         expect(mockOnClose).toHaveBeenCalled();
     });
@@ -333,23 +333,23 @@ describe("SiteDetails Component - Uncovered Lines", () => {
 
         // Find the toggle button
         const toggleButton = screen.getByTestId("toggle-collapse");
-        
+
         // Initially should show "Collapse"
         expect(toggleButton).toHaveTextContent("Collapse");
-        
+
         // Click to collapse
         await user.click(toggleButton);
-        
+
         // Should now show "Expand"
         expect(toggleButton).toHaveTextContent("Expand");
     });
 
     it("should handle getAvailabilityDescription function", () => {
         render(<SiteDetails site={mockSite} onClose={mockOnClose} />);
-        
+
         // This tests the internal getAvailabilityDescription function indirectly
         // The function should return "Excellent" for >= 99%, "Good" for >= 95%, "Poor" otherwise
-        
+
         // We can't directly test the internal function, but we can verify the component renders
         // and that some part of the detailed view is present.
         expect(screen.getByTestId("site-details-header")).toBeInTheDocument();
@@ -362,7 +362,7 @@ describe("SiteDetails Component - Uncovered Lines", () => {
         });
 
         const { container } = render(<SiteDetails site={mockSite} onClose={mockOnClose} />);
-        
+
         // Should render nothing (empty container)
         expect(container).toBeEmptyDOMElement();
     });
@@ -406,11 +406,11 @@ describe("SiteDetails Component - Uncovered Lines", () => {
         render(<SiteDetails site={mockSite} onClose={mockOnClose} />);
 
         const backgroundButton = screen.getByLabelText("Close modal");
-        
+
         // Simulate keydown event with Escape key using userEvent
         backgroundButton.focus();
         await user.keyboard("{Escape}");
-        
+
         expect(mockOnClose).toHaveBeenCalled();
     });
 
@@ -419,11 +419,11 @@ describe("SiteDetails Component - Uncovered Lines", () => {
         render(<SiteDetails site={mockSite} onClose={mockOnClose} />);
 
         const backgroundButton = screen.getByLabelText("Close modal");
-        
+
         // Simulate keydown event with a non-closing key
         backgroundButton.focus();
         await user.keyboard("{Tab}");
-        
+
         expect(mockOnClose).not.toHaveBeenCalled();
     });
 });

@@ -3,8 +3,6 @@
  * Validates main application service orchestration and lifecycle management.
  */
 
- 
-
 import { app } from "electron";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 

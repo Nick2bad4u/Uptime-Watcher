@@ -1,5 +1,3 @@
- 
-
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { HistoryRepository } from "../../../services/database/HistoryRepository";
 import { DatabaseService } from "../../../services/database/DatabaseService";

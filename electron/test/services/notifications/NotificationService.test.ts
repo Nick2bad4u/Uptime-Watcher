@@ -3,8 +3,6 @@
  * Validates system notification management and configuration.
  */
 
- 
-
 import { Notification } from "electron";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 

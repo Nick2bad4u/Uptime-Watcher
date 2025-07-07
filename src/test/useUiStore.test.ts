@@ -166,7 +166,7 @@ describe("useUIStore - Uncovered Lines", () => {
         // The function returns undefined by design (components should derive this from subscriptions)
         const selectedSite = result.current.getSelectedSite();
         expect(selectedSite).toBeUndefined();
-        
+
         // But the selectedSiteId should be set
         expect(result.current.selectedSiteId).toBe("test-site");
     });

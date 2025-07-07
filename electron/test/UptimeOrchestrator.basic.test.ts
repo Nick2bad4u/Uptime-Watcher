@@ -2,8 +2,6 @@
  * Tests for UptimeOrchestrator - Basic functionality (Constructor and Initialization).
  */
 
- 
-
 import { describe, expect, it, beforeEach, afterEach, vi } from "vitest";
 import { EventEmitter } from "events";
 

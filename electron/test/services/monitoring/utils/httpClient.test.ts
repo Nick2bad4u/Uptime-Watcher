@@ -3,8 +3,6 @@
  * Tests the Axios configuration and timing interceptors.
  */
 
- 
-
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import axios, { AxiosInstance } from "axios";
 import { createHttpClient, setupTimingInterceptors } from "../../../../services/monitoring/utils/httpClient";
