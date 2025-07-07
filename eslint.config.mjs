@@ -39,7 +39,6 @@ import yamlEslintParser from "yaml-eslint-parser";
 import * as cssPlugin from "eslint-plugin-css";
 import vitest from "@vitest/eslint-plugin";
 import vitestGlobals from "eslint-plugin-vitest-globals";
-import css from "@eslint/css";
 
 // mimic CommonJS variables -- not needed if using CommonJS
 const __filename = fileURLToPath(import.meta.url);
@@ -173,6 +172,11 @@ export default [
         languageOptions: {
             sourceType: "script",
         },
+        settings: {
+            react: {
+                version: "detect",
+            },
+        },
         plugins: {
             js,
             import: pluginImport,
@@ -195,6 +199,71 @@ export default [
         },
         rules: {
             ...js.configs.recommended.rules,
+            ...pluginImport.configs.recommended.rules,
+            ...pluginPromise.configs.recommended.rules,
+            ...pluginReact.configs.recommended.rules,
+            ...pluginReactHooks.configs.recommended.rules,
+            ...pluginJsxA11y.configs.recommended.rules,
+            ...pluginSonarjs.configs.recommended.rules,
+            ...pluginSecurity.configs.recommended.rules,
+            ...pluginEslintComments.configs.recommended.rules,
+            ...pluginUnicorn.configs.recommended.rules,
+            ...pluginRegexp.configs.recommended.rules,
+            
+            // Core JavaScript best practices
+            "no-console": "warn",
+            "no-debugger": "error",
+            "no-alert": "warn",
+            "no-var": "error",
+            "prefer-const": "error",
+            "prefer-template": "warn",
+            "prefer-arrow-callback": "warn",
+            "no-unused-expressions": "warn",
+            "no-duplicate-imports": "error",
+            "no-useless-return": "warn",
+            "no-useless-constructor": "warn",
+            "no-useless-computed-key": "warn",
+            "no-useless-concat": "warn",
+            "no-useless-escape": "warn",
+            "no-useless-rename": "warn",
+            "no-nested-ternary": "warn",
+            "no-unneeded-ternary": "warn",
+            "consistent-return": "warn",
+            "default-case": "warn",
+            "eqeqeq": ["error", "always"],
+            "curly": ["error", "all"],
+            "no-eval": "error",
+            "no-implied-eval": "error",
+            "no-new-func": "error",
+            "no-script-url": "error",
+            "no-self-compare": "error",
+            "no-sequences": "error",
+            "no-throw-literal": "error",
+            "no-void": "error",
+            "no-with": "error",
+            "radix": "error",
+            "wrap-iife": ["error", "inside"],
+            "yoda": ["error", "never"],
+            
+            // Array and object best practices
+            "array-callback-return": "error",
+            "no-array-constructor": "error",
+            "prefer-destructuring": ["warn", {
+                "array": true,
+                "object": true
+            }],
+            "object-shorthand": ["warn", "always"],
+            "prefer-object-spread": "warn",
+            
+            // Function best practices
+            "func-style": ["warn", "expression", { "allowArrowFunctions": true }],
+            "prefer-rest-params": "error",
+            "prefer-spread": "error",
+            
+            // Modern JavaScript features
+            "prefer-numeric-literals": "error",
+            "symbol-description": "error",
+            
             // import plugin: enable a few best-practice rules manually
             "import/order": [
                 "off",
@@ -299,7 +368,7 @@ export default [
     // TypeScript files - Source (renderer) files
     {
         files: ["src/**/*.ts", "src/**/*.tsx", "vitest*.ts", "vite.config.ts"],
-        ignores: ["tests/**", "**/__tests__/**", "**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}", "src/test/**/*.ts"],
+        ignores: ["tests/**", "**/__tests__/**"],
         languageOptions: {
             parser: tseslint.parser,
             parserOptions: {
@@ -319,6 +388,11 @@ export default [
                 window: "readonly",
                 require: "readonly",
                 module: "readonly",
+            },
+        },
+        settings: {
+            react: {
+                version: "detect",
             },
         },
         plugins: {
@@ -343,6 +417,9 @@ export default [
         },
         rules: {
             ...tseslint.configs.recommended.rules,
+            ...tseslint.configs.strict.rules,
+            ...tseslint.configs.stylistic.rules,
+            ...tseslint.configs.stylisticTypeChecked.rules,
             // import plugin: enable a few best-practice rules manually
             "import/order": [
                 "off",
@@ -487,6 +564,9 @@ export default [
         },
         rules: {
             ...tseslint.configs.recommended.rules,
+            ...tseslint.configs.strict.rules,
+            ...tseslint.configs.stylistic.rules,
+            ...tseslint.configs.stylisticTypeChecked.rules,
             // import plugin: enable a few best-practice rules manually
             "import/order": [
                 "off",
@@ -599,11 +679,42 @@ export default [
             "electron/test/**/*.ts",
             "src/test/**/*.ts",
         ],
+        languageOptions: {
+            parser: tseslint.parser,
+            parserOptions: {
+                project: "./tsconfig.json",
+                sourceType: "module",
+                ecmaVersion: "latest",
+                tsconfigRootDir: __dirname,
+            },
+            globals: {
+                ...globals.node,
+                ...globals.browser,
+                vi: "readonly",
+                describe: "readonly",
+                it: "readonly",
+                test: "readonly",
+                expect: "readonly",
+                beforeEach: "readonly",
+                afterEach: "readonly",
+                beforeAll: "readonly",
+                afterAll: "readonly",
+            },
+        },
+        settings: {
+            react: {
+                version: "detect",
+            },
+        },
         plugins: {
+            "@typescript-eslint": tseslint.plugin,
             vitest,
             "testing-library": pluginTestingLibrary,
+            import: pluginImport,
+            "unused-imports": pluginUnusedImports,
         },
         rules: {
+            ...tseslint.configs.recommended.rules,
             ...vitest.configs.recommended.rules,
             // testing-library rules
             "testing-library/await-async-queries": "error",
@@ -614,6 +725,20 @@ export default [
             "testing-library/prefer-screen-queries": "warn",
             "testing-library/prefer-user-event": "warn",
             "testing-library/render-result-naming-convention": "warn",
+            
+            // Relax some rules for tests
+            "@typescript-eslint/no-explicit-any": "off",
+            "@typescript-eslint/no-non-null-assertion": "off",
+            "unused-imports/no-unused-imports": "error",
+            "unused-imports/no-unused-vars": [
+                "warn",
+                {
+                    vars: "all",
+                    varsIgnorePattern: "^_",
+                    args: "after-used",
+                    argsIgnorePattern: "^_",
+                },
+            ],
 
             ...(vitestGlobals.configs.recommended.rules || {}),
         },
@@ -645,7 +770,4 @@ export default [
             globals: globals.browser,
         },
     },
-    ...tseslint.configs.recommended,
-    ...tseslint.configs.strict,
-    ...tseslint.configs.stylistic,
 ];
