@@ -48,7 +48,7 @@ export function createSiteRepositoryService(eventEmitter: EventEmitter): SiteRep
 /**
  * Factory function to create a properly configured SiteWriterService.
  */
-export function createSiteWriterService(_mockConfig: any): SiteWriterService {
+export function createSiteWriterService(): SiteWriterService {
     const siteRepository = new SiteRepositoryAdapter(new SiteRepository());
     const monitorRepository = new MonitorRepositoryAdapter(new MonitorRepository());
     const logger = new LoggerAdapter(monitorLogger);

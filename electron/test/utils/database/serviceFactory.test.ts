@@ -124,7 +124,7 @@ describe("serviceFactory", () => {
 
     describe("createSiteWriterService", () => {
         it("should create a SiteWriterService with the provided dependencies", () => {
-            const service = createSiteWriterService(mockConfig);
+            const service = createSiteWriterService();
 
             expect(service).toBeInstanceOf(SiteWriterService);
         });

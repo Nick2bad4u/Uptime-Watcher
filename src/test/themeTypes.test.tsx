@@ -37,6 +37,8 @@ describe("Theme Types Module", () => {
                     down: "#ef4444",
                     pending: "#f59e0b",
                     unknown: "#6b7280",
+                    paused: "#6b7280",
+                    mixed: "#f59e0b",
                 },
                 success: "#10b981",
                 warning: "#f59e0b",
@@ -221,7 +223,11 @@ describe("Theme Types Module", () => {
                     800: "#075985",
                     900: "#0c4a6e",
                 },
-                status: { up: "#10b981", down: "#ef4444", pending: "#f59e0b", unknown: "#6b7280" },
+                status: {
+                    up: "#10b981", down: "#ef4444", pending: "#f59e0b", unknown: "#6b7280",
+                    paused: "",
+                    mixed: ""
+                },
                 success: "#10b981",
                 warning: "#f59e0b",
                 error: "#ef4444",
@@ -426,7 +432,11 @@ describe("Theme Types Module", () => {
                     800: "#075985",
                     900: "#0c4a6e",
                 },
-                status: { up: "#10b981", down: "#ef4444", pending: "#f59e0b", unknown: "#6b7280" },
+                status: {
+                    up: "#10b981", down: "#ef4444", pending: "#f59e0b", unknown: "#6b7280",
+                    paused: "",
+                    mixed: ""
+                },
                 success: "#10b981",
                 warning: "#f59e0b",
                 error: "#ef4444",
