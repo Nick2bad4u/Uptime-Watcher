@@ -373,6 +373,7 @@ describe("repositoryAdapters", () => {
 
         it("should delegate log methods to the underlying logger", () => {
             // Test debug method
+            // eslint-disable-next-line testing-library/no-debugging-utils
             adapter.debug("debug message", "arg1", "arg2");
             expect(mockLogger.debug).toHaveBeenCalledWith("debug message", "arg1", "arg2");
 

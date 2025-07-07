@@ -544,7 +544,7 @@ describe("AddSiteForm Submit", () => {
 
     describe("Edge Cases", () => {
         it("should handle missing onSuccess callback", async () => {
-            const { onSuccess, ...propsWithoutOnSuccess } = baseProps;
+            const { onSuccess: _onSuccess, ...propsWithoutOnSuccess } = baseProps;
             await handleSubmit(mockEvent, propsWithoutOnSuccess);
 
             expect(mockCreateSite).toHaveBeenCalled();

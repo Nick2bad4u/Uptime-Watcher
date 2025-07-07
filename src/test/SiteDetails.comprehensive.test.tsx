@@ -272,15 +272,15 @@ vi.mock("../theme/useTheme", () => ({
 // Mock theme components - prevent hanging with simple implementations that filter props
 vi.mock("../theme/components", () => ({
     StatusIndicator: ({ children, ...safeProps }: React.PropsWithChildren<Record<string, unknown>>) => {
-        const { hoverable, iconColor, loading, showLabel, showText, size, variant, ...props } = safeProps;
+        const { hoverable: _hoverable, iconColor: _iconColor, loading: _loading, showLabel: _showLabel, showText: _showText, size: _size, variant: _variant, ...props } = safeProps;
         return <span {...props}>{children}</span>;
     },
     ThemedBadge: ({ children, ...safeProps }: React.PropsWithChildren<Record<string, unknown>>) => {
-        const { hoverable, iconColor, loading, showLabel, showText, size, variant, ...props } = safeProps;
+        const { hoverable: _hoverable, iconColor: _iconColor, loading: _loading, showLabel: _showLabel, showText: _showText, size: _size, variant: _variant, ...props } = safeProps;
         return <span {...props}>{children}</span>;
     },
     ThemedBox: ({ children, ...safeProps }: React.PropsWithChildren<Record<string, unknown>>) => {
-        const { hoverable, iconColor, loading, showLabel, showText, size, variant, ...props } = safeProps;
+        const { hoverable: _hoverable, iconColor: _iconColor, loading: _loading, showLabel: _showLabel, showText: _showText, size: _size, variant: _variant, ...props } = safeProps;
         return <div {...props}>{children}</div>;
     },
     ThemedButton: ({
@@ -288,7 +288,7 @@ vi.mock("../theme/components", () => ({
         onClick,
         ...safeProps
     }: React.PropsWithChildren<{ onClick?: () => void } & Record<string, unknown>>) => {
-        const { hoverable, iconColor, loading, showLabel, showText, size, variant, ...props } = safeProps;
+        const { hoverable: _hoverable, iconColor: _iconColor, loading: _loading, showLabel: _showLabel, showText: _showText, size: _size, variant: _variant, ...props } = safeProps;
         return (
             <button onClick={onClick} {...props}>
                 {children}
@@ -296,18 +296,18 @@ vi.mock("../theme/components", () => ({
         );
     },
     ThemedCard: ({ children, ...safeProps }: React.PropsWithChildren<Record<string, unknown>>) => {
-        const { hoverable, iconColor, loading, showLabel, showText, size, variant, ...props } = safeProps;
+        const { hoverable: _hoverable, iconColor: _iconColor, loading: _loading, showLabel: _showLabel, showText: _showText, size: _size, variant: _variant, ...props } = safeProps;
         return <div {...props}>{children}</div>;
     },
     ThemedInput: ({
         onChange,
         ...safeProps
     }: { onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void } & Record<string, unknown>) => {
-        const { hoverable, iconColor, loading, showLabel, showText, size, variant, ...props } = safeProps;
+        const { hoverable: _hoverable, iconColor: _iconColor, loading: _loading, showLabel: _showLabel, showText: _showText, size: _size, variant: _variant, ...props } = safeProps;
         return <input onChange={onChange} {...props} />;
     },
     ThemedProgress: ({ ...safeProps }: Record<string, unknown>) => {
-        const { hoverable, iconColor, loading, showLabel, showText, size, variant, ...props } = safeProps;
+        const { hoverable: _hoverable, iconColor: _iconColor, loading: _loading, showLabel: _showLabel, showText: _showText, size: _size, variant: _variant, ...props } = safeProps;
         return <div {...props} />;
     },
     ThemedSelect: ({
@@ -317,7 +317,7 @@ vi.mock("../theme/components", () => ({
     }: React.PropsWithChildren<
         { onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void } & Record<string, unknown>
     >) => {
-        const { hoverable, iconColor, loading, showLabel, showText, size, variant, ...props } = safeProps;
+        const { hoverable: _hoverable, iconColor: _iconColor, loading: _loading, showLabel: _showLabel, showText: _showText, size: _size, variant: _variant, ...props } = safeProps;
         return (
             <select onChange={onChange} {...props}>
                 {children}
@@ -325,7 +325,7 @@ vi.mock("../theme/components", () => ({
         );
     },
     ThemedText: ({ children, ...safeProps }: React.PropsWithChildren<Record<string, unknown>>) => {
-        const { hoverable, iconColor, loading, showLabel, showText, size, variant, ...props } = safeProps;
+        const { hoverable: _hoverable, iconColor: _iconColor, loading: _loading, showLabel: _showLabel, showText: _showText, size: _size, variant: _variant, ...props } = safeProps;
         return <span {...props}>{children}</span>;
     },
 }));

@@ -379,7 +379,7 @@ describe("DatabaseManager", () => {
             let getSitesCacheCallback: (() => Site[]) | undefined;
 
              
-            mockImportData.mockImplementation(async (deps, callbacks, data) => {
+            mockImportData.mockImplementation(async (deps, callbacks, _data) => {
                 getSitesCacheCallback = callbacks.getSitesFromCache;
                 return true;
             });
@@ -550,8 +550,8 @@ describe("DatabaseManager", () => {
 
             // Mock getHistoryLimit to return the internal limit
              
-            mockGetHistoryLimit.mockImplementation((getCallback) => {
-                // getCallback should return the current internal limit
+            mockGetHistoryLimit.mockImplementation((_getCallback) => {
+                // _getCallback should return the current internal limit
                 // We simulate this by just returning the current internalLimit
                 return internalLimit;
             });

@@ -89,6 +89,7 @@ export function SiteDetailsNavigation({
                 <div className="flex flex-wrap items-center gap-2">
                     <ThemedButton
                         variant={
+                            /* eslint-disable-next-line sonarjs/no-duplicate-string */
                             activeSiteDetailsTab === "site-overview" ? BUTTON_VARIANT_PRIMARY : BUTTON_VARIANT_SECONDARY
                         }
                         size="sm"
@@ -101,6 +102,7 @@ export function SiteDetailsNavigation({
                     </ThemedButton>
                     <ThemedButton
                         variant={
+                            /* eslint-disable-next-line sonarjs/no-duplicate-string */
                             activeSiteDetailsTab === "monitor-overview"
                                 ? BUTTON_VARIANT_PRIMARY
                                 : BUTTON_VARIANT_SECONDARY

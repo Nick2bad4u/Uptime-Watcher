@@ -159,6 +159,7 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
 
         const processNext = async (currentIndex: number): Promise<void> => {
             if (currentIndex < this.middlewares.length) {
+                // eslint-disable-next-line security/detect-object-injection
                 const middleware = this.middlewares[currentIndex];
 
                 if (middleware) {

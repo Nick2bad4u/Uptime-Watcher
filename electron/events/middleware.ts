@@ -269,11 +269,11 @@ export function createDebugMiddleware(options: { enabled?: boolean; verbose?: bo
  */
 export function composeMiddleware(...middlewares: EventMiddleware[]): EventMiddleware {
     return async (event: string, data: unknown, next: () => void | Promise<void>) => {
-        let index = 0;
+        const state = { index: 0 };
 
         const processNext = async (): Promise<void> => {
-            if (index < middlewares.length) {
-                const middleware = middlewares[index++];
+            if (state.index < middlewares.length) {
+                const middleware = middlewares[state.index++];
                 if (middleware) {
                     await middleware(event, data, processNext);
                 }
