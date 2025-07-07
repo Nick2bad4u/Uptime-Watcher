@@ -612,4 +612,73 @@ describe("App Component", () => {
             process.env.NODE_ENV = originalEnv;
         });
     });
+
+    describe("Status update logging", () => {
+        it("should log status updates in development mode", async () => {
+            const originalEnv = process.env.NODE_ENV;
+            process.env.NODE_ENV = "development";
+            
+            // Spy on console.log
+            const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+            
+            // Mock the subscription to capture the callback
+            let statusUpdateCallback: ((update: any) => void) | undefined;
+            mockSitesStore.subscribeToStatusUpdates.mockImplementation((callback: any) => {
+                statusUpdateCallback = callback;
+            });
+
+            render(<App />);
+
+            // Simulate a status update
+            const mockUpdate = {
+                site: { identifier: "test-site-123" } as Site,
+                status: "up",
+                timestamp: Date.now(),
+            };
+
+            // Call the captured callback
+            if (statusUpdateCallback) {
+                statusUpdateCallback(mockUpdate);
+            }
+
+            expect(consoleSpy).toHaveBeenCalledWith("Status update received:", "test-site-123");
+
+            consoleSpy.mockRestore();
+            process.env.NODE_ENV = originalEnv;
+        });
+
+        it("should not log status updates in production mode", async () => {
+            const originalEnv = process.env.NODE_ENV;
+            process.env.NODE_ENV = "production";
+            
+            // Spy on console.log
+            const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+            
+            // Mock the subscription to capture the callback
+            let statusUpdateCallback: ((update: any) => void) | undefined;
+            mockSitesStore.subscribeToStatusUpdates.mockImplementation((callback: any) => {
+                statusUpdateCallback = callback;
+            });
+
+            render(<App />);
+
+            // Simulate a status update
+            const mockUpdate = {
+                site: { identifier: "test-site-456" } as Site,
+                status: "down",
+                timestamp: Date.now(),
+            };
+
+            // Call the captured callback
+            if (statusUpdateCallback) {
+                statusUpdateCallback(mockUpdate);
+            }
+
+            // Should not log in production
+            expect(consoleSpy).not.toHaveBeenCalled();
+
+            consoleSpy.mockRestore();
+            process.env.NODE_ENV = originalEnv;
+        });
+    });
 });
