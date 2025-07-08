@@ -38,7 +38,7 @@ vi.mock("../../../stores/utils", () => ({
 }));
 
 // Import mocked services
-import { SiteService, MonitoringService } from "../../../stores/sites/services";
+import { SiteService, MonitoringService } from "../../../stores";
 import { logStoreAction } from "../../../stores/utils";
 
 describe("useSiteMonitoring", () => {

@@ -6,7 +6,7 @@
 
 import { ChartOptions } from "chart.js";
 
-import { Theme } from "../theme/types";
+import { Theme } from "../theme";
 
 /**
  * Chart Configuration Service

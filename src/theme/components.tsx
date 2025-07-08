@@ -12,9 +12,8 @@
 import React from "react";
 
 import { ARIA_LABEL, TRANSITION_ALL } from "../constants";
-import { useTheme, useThemeClasses } from "../theme/useTheme";
-import { getStatusIcon } from "../utils/status";
-import { formatResponseTime } from "../utils/time";
+import { useTheme, useThemeClasses } from "./useTheme";
+import { getStatusIcon, formatResponseTime } from "../utils";
 import "./components.css";
 
 // Type aliases for commonly used union types

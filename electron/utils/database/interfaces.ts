@@ -4,8 +4,7 @@
 
 import { Database } from "node-sqlite3-wasm";
 
-import { UptimeEvents } from "../../events/eventTypes";
-import { TypedEventBus } from "../../events/TypedEventBus";
+import { UptimeEvents, TypedEventBus } from "../../events";
 import { Monitor, Site, StatusHistory } from "../../types";
 
 /**

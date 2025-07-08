@@ -62,7 +62,7 @@ vi.mock("../../../stores/sites/utils", async () => {
 });
 
 // Import mocked services
-import { SiteService, MonitoringService } from "../../../stores/sites/services";
+import { SiteService, MonitoringService } from "../../../stores";
 import { normalizeMonitor, updateMonitorInSite, handleSQLiteBackupDownload } from "../../../stores/sites/utils";
 import { logStoreAction } from "../../../stores/utils";
 

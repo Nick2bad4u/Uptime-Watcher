@@ -4,8 +4,7 @@
  */
 
 import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
-import { UptimeEvents } from "../../events/eventTypes";
-import { TypedEventBus } from "../../events/TypedEventBus";
+import { UptimeEvents, TypedEventBus } from "../../events";
 import { HistoryRepository, MonitorRepository, SiteRepository, DatabaseService } from "../../services/database";
 import { MonitorFactory } from "../../services/monitoring";
 import { Site, StatusHistory, StatusUpdate } from "../../types";

@@ -28,6 +28,12 @@ export { createSitesStateActions, initialSitesState } from "./sites/useSitesStat
 export type { SiteSyncActions, SiteSyncDependencies } from "./sites/useSiteSync";
 export { createSiteSyncActions } from "./sites/useSiteSync";
 
+// Site services
+export * from "./sites/services";
+
+// Site utilities
+export * from "./sites/utils";
+
 // Application settings
 export { useSettingsStore } from "./settings/useSettingsStore";
 export type { SettingsStore } from "./settings/types";
@@ -47,4 +53,4 @@ export type { StatsStore } from "./stats/types";
 // Shared types and utilities
 export type { AppSettings, ChartTimeRange, UpdateStatus } from "./types";
 export { ERROR_MESSAGES } from "./types";
-export { logStoreAction, withErrorHandling } from "./utils";
+export * from "./utils";

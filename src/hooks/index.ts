@@ -8,3 +8,4 @@ export * from "./site";
 
 // Application hooks
 export * from "./useBackendFocusSync";
+export * from "./useThemeStyles";

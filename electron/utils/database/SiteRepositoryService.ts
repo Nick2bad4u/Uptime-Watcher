@@ -3,8 +3,7 @@
  * Provides a testable, dependency-injected service for site data operations.
  */
 
-import { UptimeEvents } from "../../events/eventTypes";
-import { TypedEventBus } from "../../events/TypedEventBus";
+import { UptimeEvents, TypedEventBus } from "../../events";
 import { Site } from "../../types";
 import {
     ILogger,

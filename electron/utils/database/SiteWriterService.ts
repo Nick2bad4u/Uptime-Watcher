@@ -5,7 +5,7 @@
 
 import { Database } from "node-sqlite3-wasm";
 
-import { DatabaseService } from "../../services/database/DatabaseService";
+import { DatabaseService } from "../../services/database";
 import { Site } from "../../types";
 import {
     ILogger,

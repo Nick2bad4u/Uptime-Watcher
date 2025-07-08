@@ -7,10 +7,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Site, Monitor } from "../../../types";
 
-import { createSiteMonitoringActions } from "../../../stores/sites/useSiteMonitoring";
-import { createSiteOperationsActions } from "../../../stores/sites/useSiteOperations";
-import { createSitesStateActions, initialSitesState } from "../../../stores/sites/useSitesState";
-import { createSiteSyncActions } from "../../../stores/sites/useSiteSync";
+import {
+    createSiteMonitoringActions,
+    createSiteOperationsActions,
+    createSitesStateActions,
+    initialSitesState,
+    createSiteSyncActions,
+} from "../../../stores";
 
 // Mock all dependencies
 vi.mock("../../../stores/sites/services", () => ({
@@ -105,7 +108,7 @@ describe("Sites Store Modules Integration Tests", () => {
 
     describe("Module Integration", () => {
         it("should integrate state and sync modules correctly", async () => {
-            const { SiteService } = await import("../../../stores/sites/services");
+            const { SiteService } = await import("../../../stores");
             vi.mocked(SiteService.getSites).mockResolvedValue([mockSite]);
 
             // Start with empty state
@@ -119,7 +122,7 @@ describe("Sites Store Modules Integration Tests", () => {
         });
 
         it("should integrate operations and sync modules", async () => {
-            const { SiteService } = await import("../../../stores/sites/services");
+            const { SiteService } = await import("../../../stores");
             vi.mocked(SiteService.addSite).mockResolvedValue(mockSite);
 
             const siteData = {
@@ -139,7 +142,7 @@ describe("Sites Store Modules Integration Tests", () => {
         });
 
         it("should integrate monitoring and sync modules", async () => {
-            const { MonitoringService, SiteService } = await import("../../../stores/sites/services");
+            const { MonitoringService, SiteService } = await import("../../../stores");
             vi.mocked(MonitoringService.startMonitoring).mockResolvedValue(undefined);
             vi.mocked(SiteService.getSites).mockResolvedValue([mockSite]);
 

@@ -12,7 +12,7 @@
 import { useEffect, useState, useCallback } from "react";
 
 import { DEFAULT_CHECK_INTERVAL, DEFAULT_REQUEST_TIMEOUT_SECONDS } from "../../constants";
-import logger from "../../services/logger";
+import { logger } from "../../services";
 import { useErrorStore, useSitesStore, useUIStore } from "../../stores";
 import { Site } from "../../types";
 import { useSiteAnalytics } from "./useSiteAnalytics";
