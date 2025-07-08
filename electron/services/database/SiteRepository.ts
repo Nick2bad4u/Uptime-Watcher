@@ -113,7 +113,7 @@ export class SiteRepository {
             const db = this.getDb();
             db.run("INSERT OR REPLACE INTO sites (identifier, name) VALUES (?, ?)", [
                 site.identifier,
-                // eslint-disable-next-line unicorn/no-null
+
                 site.name ?? null,
             ]);
             logger.debug(`[SiteRepository] Upserted site: ${site.identifier}`);
@@ -209,11 +209,7 @@ export class SiteRepository {
 
             try {
                 for (const site of sites) {
-                    stmt.run([
-                        site.identifier,
-                        // eslint-disable-next-line unicorn/no-null
-                        site.name ?? null,
-                    ]);
+                    stmt.run([site.identifier, site.name ?? null]);
                 }
 
                 db.run("COMMIT");

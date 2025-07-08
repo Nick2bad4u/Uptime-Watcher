@@ -80,7 +80,7 @@ export class DataBackupOrchestrator {
      * Refresh sites from cache.
      * Simple operation that returns sites from the provided cache.
      */
-    refreshSitesFromCache(siteCache: ISiteCache): Promise<Array<{ identifier: string; name?: string }>> {
+    refreshSitesFromCache(siteCache: ISiteCache): Promise<{ identifier: string; name?: string }[]> {
         try {
             const sites = Array.from(siteCache.entries()).map(([, site]) => ({
                 identifier: site.identifier,

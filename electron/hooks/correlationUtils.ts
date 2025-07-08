@@ -3,7 +3,7 @@
  * Provides unique identifiers for request/operation tracking and debugging.
  */
 
-import { randomBytes } from "crypto";
+import { randomBytes } from "node:crypto";
 
 /**
  * Generate a unique correlation ID for tracking operations.

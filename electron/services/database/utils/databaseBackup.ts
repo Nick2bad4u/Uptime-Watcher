@@ -9,7 +9,7 @@ import { logger } from "../../../utils/logger";
  */
 export async function createDatabaseBackup(dbPath: string): Promise<{ buffer: Buffer; fileName: string }> {
     try {
-        const fs = await import("fs");
+        const fs = await import("node:fs");
         const buffer = fs.readFileSync(dbPath);
 
         logger.info("[DatabaseBackup] Database backup created successfully");

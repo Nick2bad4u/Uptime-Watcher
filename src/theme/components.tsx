@@ -9,8 +9,6 @@
  * Note: className is a standard React prop and should not be renamed.
  */
 
-/* eslint-disable unicorn/no-keyword-prefix */
-
 import React from "react";
 
 import { ARIA_LABEL, TRANSITION_ALL } from "../constants";

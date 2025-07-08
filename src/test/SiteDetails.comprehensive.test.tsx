@@ -6,8 +6,6 @@
  * This is a valid testing pattern to avoid prop drilling in test components.
  */
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import React from "react";

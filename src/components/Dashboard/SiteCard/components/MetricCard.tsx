@@ -16,7 +16,7 @@ interface MetricCardProperties {
     /** Value to display (string or number) */
     value: string | number;
     /** Optional CSS classes for custom styling */
-    // eslint-disable-next-line unicorn/no-keyword-prefix
+
     className?: string;
 }
 
@@ -42,10 +42,9 @@ interface MetricCardProperties {
  * />
  * ```
  */
-// eslint-disable-next-line unicorn/no-keyword-prefix
+
 export const MetricCard = React.memo(function MetricCard({ className = "", label, value }: MetricCardProperties) {
     return (
-        // eslint-disable-next-line unicorn/no-keyword-prefix
         <div className={`flex flex-col items-center text-center ${className}`}>
             <ThemedText size="xs" variant="secondary" className="block mb-1">
                 {label}

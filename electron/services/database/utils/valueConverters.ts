@@ -26,7 +26,6 @@ export function safeNumberConvert(value: unknown): number | undefined {
  */
 export function convertDateForDb(value: Date | string | null | undefined): string | null {
     if (!value) {
-        // eslint-disable-next-line unicorn/no-null -- required for SQLite
         return null;
     }
     if (value instanceof Date) {
@@ -46,7 +45,7 @@ export function addStringField(
 ): void {
     if (value !== undefined) {
         updateFields.push(`${fieldName} = ?`);
-        // eslint-disable-next-line unicorn/no-null -- required for SQLite
+
         updateValues.push(value ? String(value) : null);
     }
 }

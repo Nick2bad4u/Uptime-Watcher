@@ -23,7 +23,7 @@ export async function addHistoryEntry(
             entry.timestamp,
             entry.status,
             entry.responseTime,
-            // eslint-disable-next-line unicorn/no-null
+
             details ?? null,
         ]);
 
@@ -129,7 +129,7 @@ export async function bulkInsertHistory(
                     entry.timestamp,
                     entry.status === "up" || entry.status === "down" ? entry.status : "down",
                     entry.responseTime,
-                    // eslint-disable-next-line unicorn/no-null
+
                     entry.details ?? null,
                 ]);
             }

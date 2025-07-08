@@ -22,14 +22,13 @@ export type EventTriggerType = "manual" | "scheduled" | "shutdown";
  */
 export interface UptimeEvents extends Record<string, unknown> {
     // Site events
-    // eslint-disable-next-line sonarjs/no-duplicate-string
+
     "site:added": {
         site: Site;
         timestamp: number;
         source: "user" | "import" | "migration";
     };
 
-    // eslint-disable-next-line sonarjs/no-duplicate-string
     "site:updated": {
         site: Site;
         previousSite: Site;
@@ -37,7 +36,6 @@ export interface UptimeEvents extends Record<string, unknown> {
         updatedFields: string[];
     };
 
-    // eslint-disable-next-line sonarjs/no-duplicate-string
     "site:removed": {
         siteId: string;
         siteName: string;
@@ -46,14 +44,13 @@ export interface UptimeEvents extends Record<string, unknown> {
     };
 
     // Monitor events
-    // eslint-disable-next-line sonarjs/no-duplicate-string
+
     "monitor:added": {
         monitor: Monitor;
         siteId: string;
         timestamp: number;
     };
 
-    // eslint-disable-next-line sonarjs/no-duplicate-string
     "monitor:status-changed": {
         monitor: Monitor;
         newStatus: string;
@@ -79,7 +76,7 @@ export interface UptimeEvents extends Record<string, unknown> {
     };
 
     // Database events
-    // eslint-disable-next-line sonarjs/no-duplicate-string
+
     "database:transaction-completed": {
         operation: string;
         duration: number;
@@ -102,14 +99,12 @@ export interface UptimeEvents extends Record<string, unknown> {
         environment: "development" | "production" | "test";
     };
 
-    // eslint-disable-next-line sonarjs/no-duplicate-string
     "system:shutdown": {
         timestamp: number;
         reason: "user" | "error" | "update";
         uptime: number;
     };
 
-    // eslint-disable-next-line sonarjs/no-duplicate-string
     "system:error": {
         error: Error;
         context: string;
@@ -132,7 +127,7 @@ export interface UptimeEvents extends Record<string, unknown> {
     };
 
     // Configuration events
-    // eslint-disable-next-line sonarjs/no-duplicate-string
+
     "config:changed": {
         setting: string;
         oldValue: unknown;
@@ -142,7 +137,7 @@ export interface UptimeEvents extends Record<string, unknown> {
     };
 
     // Performance events
-    // eslint-disable-next-line sonarjs/no-duplicate-string
+
     "performance:metric": {
         metric: string;
         value: number;
@@ -151,7 +146,6 @@ export interface UptimeEvents extends Record<string, unknown> {
         category: "database" | "monitoring" | "ui" | "system";
     };
 
-    // eslint-disable-next-line sonarjs/no-duplicate-string
     "performance:warning": {
         metric: string;
         threshold: number;

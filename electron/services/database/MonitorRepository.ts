@@ -92,23 +92,23 @@ export class MonitorRepository {
                 [
                     siteIdentifier,
                     monitor.type,
-                    // eslint-disable-next-line unicorn/no-null
+
                     monitor.url ? String(monitor.url) : null,
-                    // eslint-disable-next-line unicorn/no-null
+
                     monitor.host ? String(monitor.host) : null,
-                    // eslint-disable-next-line unicorn/no-null
+
                     monitor.port !== undefined ? Number(monitor.port) : null,
-                    // eslint-disable-next-line unicorn/no-null
+
                     monitor.checkInterval !== undefined ? Number(monitor.checkInterval) : null,
-                    // eslint-disable-next-line unicorn/no-null
+
                     monitor.timeout !== undefined ? Number(monitor.timeout) : null,
-                    // eslint-disable-next-line unicorn/no-null
+
                     monitor.retryAttempts !== undefined ? Number(monitor.retryAttempts) : null,
                     monitor.monitoring ? 1 : 0,
                     monitor.status,
-                    // eslint-disable-next-line unicorn/no-null
+
                     monitor.responseTime !== undefined ? Number(monitor.responseTime) : null,
-                    // eslint-disable-next-line unicorn/no-null
+
                     monitor.lastChecked ? convertDateForDb(monitor.lastChecked) : null,
                 ]
             ) as { id: number } | undefined;

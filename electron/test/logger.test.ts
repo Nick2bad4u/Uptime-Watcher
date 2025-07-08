@@ -3,8 +3,6 @@
  * Validates logging functionality and proper error handling.
  */
 
-/* eslint-disable testing-library/no-debugging-utils */
-
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 // Mock electron-log/main - must be done before any imports that use it

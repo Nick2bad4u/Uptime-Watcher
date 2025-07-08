@@ -4,8 +4,8 @@
  */
 
 import axios, { AxiosInstance } from "axios";
-import * as http from "http";
-import * as https from "https";
+import * as http from "node:http";
+import * as https from "node:https";
 
 import { MonitorConfig } from "../types";
 

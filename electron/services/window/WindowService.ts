@@ -1,5 +1,5 @@
 import { BrowserWindow } from "electron";
-import * as path from "path";
+import * as path from "node:path";
 
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
@@ -9,7 +9,6 @@ import { logger } from "../../utils/logger";
  * Handles window creation, configuration, and event management.
  */
 export class WindowService {
-    // eslint-disable-next-line unicorn/no-null -- Electron BrowserWindow uses null
     private mainWindow: BrowserWindow | null = null;
 
     /**
@@ -65,7 +64,7 @@ export class WindowService {
 
         this.mainWindow.on("closed", () => {
             logger.info("[WindowService] Main window closed");
-            // eslint-disable-next-line unicorn/no-null -- Electron BrowserWindow uses null
+
             this.mainWindow = null;
         });
     }

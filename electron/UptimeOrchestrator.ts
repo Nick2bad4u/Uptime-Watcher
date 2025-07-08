@@ -4,8 +4,6 @@
  * Uses the new service-based architecture for all database operations.
  */
 
-/* eslint-disable unicorn/no-null -- null literal needed for backend */
-
 import type { UptimeEvents } from "./events/eventTypes";
 
 import { DEFAULT_HISTORY_LIMIT } from "./constants";

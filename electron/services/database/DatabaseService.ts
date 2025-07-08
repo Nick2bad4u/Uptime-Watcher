@@ -1,6 +1,6 @@
 import { app } from "electron";
 import { Database } from "node-sqlite3-wasm";
-import * as path from "path";
+import * as path from "node:path";
 
 import { logger } from "../../utils/logger";
 import { createDatabaseBackup, createDatabaseTables } from "./utils";
@@ -11,17 +11,16 @@ import { createDatabaseBackup, createDatabaseTables } from "./utils";
  */
 export class DatabaseService {
     private static instance: DatabaseService;
-    private _db: Database | undefined = undefined;
-
-    private constructor() {
-        // Private constructor for singleton pattern
-    }
-
     public static getInstance(): DatabaseService {
         if (!DatabaseService.instance) {
             DatabaseService.instance = new DatabaseService();
         }
         return DatabaseService.instance;
+    }
+    private _db: Database | undefined = undefined;
+
+    private constructor() {
+        // Private constructor for singleton pattern
     }
 
     /**
@@ -62,7 +61,7 @@ export class DatabaseService {
      */
     public async downloadBackup(): Promise<{ buffer: Buffer; fileName: string }> {
         const { app } = await import("electron");
-        const path = await import("path");
+        const path = await import("node:path");
         const dbPath = path.join(app.getPath("userData"), "uptime-watcher.sqlite");
         return createDatabaseBackup(dbPath);
     }

@@ -19,7 +19,6 @@ interface MonitorSelectorProperties {
     /** Callback function for selection change events */
     onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
     /** Optional CSS classes for custom styling */
-    // eslint-disable-next-line unicorn/no-keyword-prefix
     className?: string;
 }
 
@@ -47,7 +46,6 @@ interface MonitorSelectorProperties {
  * ```
  */
 export const MonitorSelector = React.memo(function MonitorSelector({
-    // eslint-disable-next-line unicorn/no-keyword-prefix
     className = "min-w-[80px]",
     monitors,
     onChange,
@@ -81,7 +79,6 @@ export const MonitorSelector = React.memo(function MonitorSelector({
         <ThemedSelect
             value={selectedMonitorId}
             onChange={onChange}
-            // eslint-disable-next-line unicorn/no-keyword-prefix
             className={className}
             onClick={handleClick}
             onMouseDown={handleMouseDown}
