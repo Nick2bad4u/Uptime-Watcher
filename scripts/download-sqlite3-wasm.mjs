@@ -63,7 +63,7 @@ function download(url, dest, redirectCount = 0) {
         file.on("finish", () => {
             file.close();
             console.log("Downloaded:", dest);
-            
+
             // Also copy to scripts directory
             fs.copyFile(dest, scriptsDest, (err) => {
                 if (err) {
