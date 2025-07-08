@@ -224,9 +224,12 @@ describe("Theme Types Module", () => {
                     900: "#0c4a6e",
                 },
                 status: {
-                    up: "#10b981", down: "#ef4444", pending: "#f59e0b", unknown: "#6b7280",
+                    up: "#10b981",
+                    down: "#ef4444",
+                    pending: "#f59e0b",
+                    unknown: "#6b7280",
                     paused: "",
-                    mixed: ""
+                    mixed: "",
                 },
                 success: "#10b981",
                 warning: "#f59e0b",
@@ -433,9 +436,12 @@ describe("Theme Types Module", () => {
                     900: "#0c4a6e",
                 },
                 status: {
-                    up: "#10b981", down: "#ef4444", pending: "#f59e0b", unknown: "#6b7280",
+                    up: "#10b981",
+                    down: "#ef4444",
+                    pending: "#f59e0b",
+                    unknown: "#6b7280",
                     paused: "",
-                    mixed: ""
+                    mixed: "",
                 },
                 success: "#10b981",
                 warning: "#f59e0b",

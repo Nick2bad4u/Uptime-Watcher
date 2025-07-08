@@ -139,7 +139,7 @@ export async function checkMonitor(
         previousStatus,
         site: freshSiteData,
     };
-    
+
     // Emit typed monitor status changed event
     await config.eventEmitter.emitTyped("monitor:status-changed", {
         monitor: freshSiteData.monitors.find((m) => m.id === monitor.id) || monitor,
@@ -167,7 +167,7 @@ export async function checkMonitor(
             timestamp: Date.now(),
         });
     }
-    
+
     return statusUpdate;
 }
 
