@@ -197,7 +197,7 @@ vi.mock("../stores", () => ({
 
 import App from "../App";
 // Import the mocked module so we can modify it in tests
-import * as themeModule from "../theme/useTheme";
+import * as themeModule from "../theme";
 
 describe("App Component", () => {
     const user = userEvent.setup();

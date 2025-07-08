@@ -7,10 +7,8 @@ import { render, screen, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-import { handleSubmit } from "../components/AddSiteForm/Submit";
-import { Settings } from "../components/Settings/Settings";
-import { ScreenshotThumbnail } from "../components/SiteDetails/ScreenshotThumbnail";
-import logger from "../services/logger";
+import { handleSubmit, Settings, ScreenshotThumbnail } from "../components";
+import { logger } from "../services";
 import { useErrorStore, useSettingsStore, useSitesStore } from "../stores";
 
 // Mock all dependencies

@@ -7,7 +7,7 @@ import { fireEvent, render, screen, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
-import { AddSiteForm } from "../components/AddSiteForm/AddSiteForm";
+import { AddSiteForm } from "../components";
 
 // Mock the stores
 const mockUseErrorStore = vi.fn();
@@ -44,7 +44,7 @@ vi.mock("../components/AddSiteForm/Submit", () => ({
 }));
 
 // Import the mocked module
-import { handleSubmit } from "../components/AddSiteForm/Submit";
+import { handleSubmit } from "../components/AddSiteForm";
 
 // Mock the form hook
 const mockUseAddSiteForm = vi.fn();

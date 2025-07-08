@@ -7,19 +7,11 @@
 import type { UptimeEvents } from "./events/eventTypes";
 
 import { DEFAULT_HISTORY_LIMIT } from "./constants";
-import { TypedEventBus, createLoggingMiddleware, createErrorHandlingMiddleware } from "./events/index";
-import { DatabaseManager } from "./managers/DatabaseManager";
-import { MonitorManager } from "./managers/MonitorManager";
-import { SiteManager } from "./managers/SiteManager";
-import {
-    DatabaseService,
-    SiteRepository,
-    MonitorRepository,
-    HistoryRepository,
-    SettingsRepository,
-} from "./services/database";
+import { TypedEventBus, createLoggingMiddleware, createErrorHandlingMiddleware } from "./events";
+import { DatabaseManager, MonitorManager, SiteManager } from "./managers";
+import { DatabaseService, SiteRepository, MonitorRepository, HistoryRepository, SettingsRepository } from "./services";
 import { Site, StatusUpdate } from "./types";
-import { logger } from "./utils/logger";
+import { logger } from "./utils";
 
 /**
  * Combined event interface for the orchestrator.

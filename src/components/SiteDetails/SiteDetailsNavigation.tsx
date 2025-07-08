@@ -7,7 +7,7 @@
 import React from "react";
 
 import logger from "../../services/logger";
-import { ThemedBox, ThemedButton, ThemedSelect, ThemedText } from "../../theme/components";
+import { ThemedBox, ThemedButton, ThemedSelect, ThemedText } from "../../theme";
 import { Site } from "../../types";
 
 /**

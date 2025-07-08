@@ -6,11 +6,9 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-import { handleSubmit } from "../components/AddSiteForm/Submit";
-import { Settings } from "../components/Settings/Settings";
-import { ScreenshotThumbnail } from "../components/SiteDetails/ScreenshotThumbnail";
-import logger from "../services/logger";
-import { ThemeProvider } from "../theme/components";
+import { handleSubmit, Settings, ScreenshotThumbnail } from "../components";
+import { logger } from "../services";
+import { ThemeProvider } from "../theme";
 
 // Mock all dependencies
 vi.mock("../stores", () => ({

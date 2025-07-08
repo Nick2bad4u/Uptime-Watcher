@@ -7,26 +7,14 @@
 export * from "./common";
 
 // Main application components
-export { Header } from "./Header/Header";
-export { Settings } from "./Settings/Settings";
+export * from "./Header";
+export * from "./Settings";
 
 // Site management components
-export { AddSiteForm } from "./AddSiteForm/AddSiteForm";
-export { FormField, TextField, SelectField, RadioGroup } from "./AddSiteForm/FormFields";
-export type {
-    FormFieldProperties,
-    TextFieldProperties,
-    SelectOption,
-    SelectFieldProperties,
-    RadioOption,
-    RadioGroupProperties,
-} from "./AddSiteForm/FormFields";
-export { handleSubmit } from "./AddSiteForm/Submit";
-export { useAddSiteForm } from "./AddSiteForm/useAddSiteForm";
+export * from "./AddSiteForm";
 
 // Site details components
 export * from "./SiteDetails";
 
-// Dashboard components (access through their respective directories)
-// Note: Dashboard components are accessed directly from their subdirectories
-// as they're context-specific and not commonly reused across the app
+// Dashboard components
+export * from "./Dashboard";

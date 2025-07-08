@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-import { SiteDetailsHeader } from "../components/SiteDetails/SiteDetailsHeader";
+import { SiteDetailsHeader } from "../components";
 import { Site } from "../types";
 
 // Global browser API mocks

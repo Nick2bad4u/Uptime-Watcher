@@ -6,7 +6,7 @@
 import React from "react";
 
 import { useSite } from "../../../hooks/site";
-import { ThemedBox } from "../../../theme/components";
+import { ThemedBox } from "../../../theme";
 import { Site } from "../../../types";
 import { SiteCardFooter } from "./SiteCardFooter";
 import { SiteCardHeader } from "./SiteCardHeader";

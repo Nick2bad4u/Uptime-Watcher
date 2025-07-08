@@ -32,8 +32,7 @@ import "chartjs-adapter-date-fns";
 
 import { useSiteDetails } from "../../hooks/site/useSiteDetails";
 import { ChartConfigService } from "../../services/chartConfig";
-import { ThemedBox } from "../../theme/components";
-import { useTheme } from "../../theme/useTheme";
+import { ThemedBox, useTheme } from "../../theme";
 import { Site } from "../../types";
 import { formatStatusWithIcon } from "../../utils/status";
 import { formatResponseTime, formatFullTimestamp, formatDuration } from "../../utils/time";

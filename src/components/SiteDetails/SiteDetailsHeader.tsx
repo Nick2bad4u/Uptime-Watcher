@@ -9,7 +9,7 @@ import { MdExpandLess, MdExpandMore } from "react-icons/md";
 
 import { useThemeStyles } from "../../hooks/useThemeStyles";
 import logger from "../../services/logger";
-import { ThemedText, StatusIndicator, ThemedBox, ThemedBadge } from "../../theme/components";
+import { ThemedText, StatusIndicator, ThemedBox, ThemedBadge } from "../../theme";
 import { Site, Monitor } from "../../types";
 import { ScreenshotThumbnail } from "./ScreenshotThumbnail";
 

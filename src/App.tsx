@@ -7,18 +7,13 @@ import { useEffect, useState } from "react";
 
 import type { StatusUpdate } from "./types";
 
-import { AddSiteForm } from "./components/AddSiteForm/AddSiteForm";
-import { SiteList } from "./components/Dashboard/SiteList";
-import { Header } from "./components/Header/Header";
-import { Settings } from "./components/Settings/Settings";
-import { SiteDetails } from "./components/SiteDetails/SiteDetails";
+import { AddSiteForm, SiteList, Header, Settings, SiteDetails } from "./components";
 import { UI_DELAYS } from "./constants";
 import { useBackendFocusSync } from "./hooks/useBackendFocusSync";
 import { useSelectedSite } from "./hooks/useSelectedSite";
-import logger from "./services/logger";
+import { logger } from "./services";
 import { ErrorBoundary, useErrorStore, useSettingsStore, useSitesStore, useUIStore, useUpdatesStore } from "./stores";
-import { ThemeProvider, ThemedBox, ThemedText, ThemedButton } from "./theme/components";
-import { useTheme } from "./theme/useTheme";
+import { ThemeProvider, ThemedBox, ThemedText, ThemedButton, useTheme } from "./theme";
 
 /**
  * Main application component that serves as the root of the Uptime Watcher app.

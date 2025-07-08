@@ -6,7 +6,7 @@
  */
 
 import { useSitesStore } from "../../../stores";
-import { useTheme } from "../../../theme/useTheme";
+import { useTheme } from "../../../theme";
 import { SiteCard } from "../SiteCard";
 import { EmptyState } from "./EmptyState";
 

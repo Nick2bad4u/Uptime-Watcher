@@ -5,7 +5,7 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-import { handleSubmit } from "../components/AddSiteForm/Submit";
+import { handleSubmit } from "../components/AddSiteForm";
 import logger from "../services/logger";
 
 // Mock the logger

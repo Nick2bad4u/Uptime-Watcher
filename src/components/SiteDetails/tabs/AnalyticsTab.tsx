@@ -9,8 +9,7 @@ import { MdAnalytics, MdTrendingUp, MdSpeed, MdPieChart } from "react-icons/md";
 
 import { DowntimePeriod } from "../../../hooks/site/useSiteAnalytics";
 import logger from "../../../services/logger";
-import { ThemedText, ThemedButton, ThemedCard, ThemedBadge, ThemedProgress } from "../../../theme/components";
-import { useTheme, useAvailabilityColors } from "../../../theme/useTheme";
+import { ThemedText, ThemedButton, ThemedCard, ThemedBadge, ThemedProgress, useTheme, useAvailabilityColors } from "../../../theme";
 import { MonitorType } from "../../../types";
 
 /**

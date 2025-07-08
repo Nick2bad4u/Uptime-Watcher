@@ -5,7 +5,7 @@
 
 import React, { useCallback } from "react";
 
-import { ThemedButton } from "../../../../theme/components";
+import { ThemedButton } from "../../../../theme";
 
 /**
  * Props for the ActionButtonGroup component.

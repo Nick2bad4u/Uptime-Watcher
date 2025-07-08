@@ -5,8 +5,7 @@
 
 import log from "electron-log/main";
 
-import { ApplicationService } from "./services/application";
-import { logger } from "./utils/logger";
+import { ApplicationService, logger } from "./";
 
 // Configure electron-log for main process
 log.initialize({ preload: true });

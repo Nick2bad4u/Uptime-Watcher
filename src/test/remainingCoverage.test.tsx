@@ -8,11 +8,9 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 import type { Monitor, StatusHistory } from "../types";
 
-import { Settings } from "../components/Settings/Settings";
-import { ScreenshotThumbnail } from "../components/SiteDetails/ScreenshotThumbnail";
-import { HistoryTab } from "../components/SiteDetails/tabs/HistoryTab";
+import { Settings, ScreenshotThumbnail, HistoryTab } from "../components";
 import { useErrorStore, useSettingsStore, useSitesStore } from "../stores";
-import { ThemedIconButton } from "../theme/components";
+import { ThemedIconButton } from "../theme";
 
 // Mock the stores and other dependencies
 vi.mock("../stores", () => ({

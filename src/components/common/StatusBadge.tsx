@@ -5,7 +5,7 @@
 
 import React from "react";
 
-import { StatusIndicator, ThemedText } from "../../theme/components";
+import { StatusIndicator, ThemedText } from "../../theme";
 
 /** Props for the StatusBadge component */
 interface StatusBadgeProperties {

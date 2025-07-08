@@ -19,7 +19,7 @@ import {
     ThemedSelect,
     ThemedInput,
 } from "../../../theme/components";
-import { useTheme, useAvailabilityColors } from "../../../theme/useTheme";
+import { useTheme, useAvailabilityColors } from "../../../theme";
 import { Monitor } from "../../../types";
 
 /**

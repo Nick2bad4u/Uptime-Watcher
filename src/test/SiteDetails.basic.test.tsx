@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-import { SiteDetails } from "../components/SiteDetails/SiteDetails";
+import { SiteDetails } from "../components";
 import { Site } from "../types";
 
 // Define mock site data first (before mocks that use it)

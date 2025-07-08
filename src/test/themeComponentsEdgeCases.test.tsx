@@ -6,7 +6,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 
-import { ThemedButton, ThemedProgress, ThemedIconButton, ThemedBadge } from "../theme/components";
+import { ThemedButton, ThemedProgress, ThemedIconButton, ThemedBadge } from "../theme";
 
 describe("Theme Components Edge Cases", () => {
     describe("ThemedButton size calculation", () => {

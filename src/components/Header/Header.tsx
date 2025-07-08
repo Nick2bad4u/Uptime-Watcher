@@ -6,8 +6,7 @@
 import { useMemo } from "react";
 
 import { useSitesStore, useUIStore } from "../../stores";
-import { ThemedBox, ThemedText, ThemedButton, StatusIndicator } from "../../theme/components";
-import { useTheme, useAvailabilityColors } from "../../theme/useTheme";
+import { ThemedBox, ThemedText, ThemedButton, StatusIndicator, useTheme, useAvailabilityColors } from "../../theme";
 import "./Header.css";
 
 /**

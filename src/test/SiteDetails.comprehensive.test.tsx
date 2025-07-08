@@ -11,14 +11,16 @@ import { userEvent } from "@testing-library/user-event";
 import React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-import { SiteDetails } from "../components/SiteDetails/SiteDetails";
-import { SiteDetailsHeader } from "../components/SiteDetails/SiteDetailsHeader";
-import { SiteDetailsNavigation } from "../components/SiteDetails/SiteDetailsNavigation";
-import { AnalyticsTab } from "../components/SiteDetails/tabs/AnalyticsTab";
-import { HistoryTab } from "../components/SiteDetails/tabs/HistoryTab";
-import { OverviewTab } from "../components/SiteDetails/tabs/OverviewTab";
-import { SettingsTab } from "../components/SiteDetails/tabs/SettingsTab";
-import { SiteOverviewTab } from "../components/SiteDetails/tabs/SiteOverviewTab";
+import {
+    SiteDetails,
+    SiteDetailsHeader,
+    SiteDetailsNavigation,
+    AnalyticsTab,
+    HistoryTab,
+    OverviewTab,
+    SettingsTab,
+    SiteOverviewTab,
+} from "../components";
 import { Site } from "../types";
 
 // Define mock site data first (before mocks that use it)

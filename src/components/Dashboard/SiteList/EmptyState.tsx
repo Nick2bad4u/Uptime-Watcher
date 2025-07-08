@@ -5,7 +5,7 @@
  * encouraging users to add their first website to monitor.
  */
 
-import { ThemedBox, ThemedText } from "../../../theme/components";
+import { ThemedBox, ThemedText } from "../../../theme";
 
 /**
  * Empty state component displayed when no sites are configured for monitoring.

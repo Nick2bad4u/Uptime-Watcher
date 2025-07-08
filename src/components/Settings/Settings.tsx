@@ -20,7 +20,7 @@ import {
     ThemedCheckbox,
 } from "../../theme/components";
 import { ThemeName } from "../../theme/types";
-import { useTheme } from "../../theme/useTheme";
+import { useTheme } from "../../theme";
 
 /** Props for the Settings component */
 interface SettingsProperties {
