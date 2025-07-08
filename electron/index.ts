@@ -12,8 +12,8 @@ export { UptimeOrchestrator } from "./UptimeOrchestrator";
 // Event system
 export * from "./events";
 
-// Hooks
-export * from "./hooks";
+
+
 
 // Managers
 export * from "./managers";

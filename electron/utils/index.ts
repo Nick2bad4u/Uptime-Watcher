@@ -13,3 +13,4 @@ export * from "./monitoring";
 export * from "./logger";
 export * from "./retry";
 export * from "./siteStatus";
+export * from "./correlation";

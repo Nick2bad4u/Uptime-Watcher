@@ -61,7 +61,7 @@ export default defineConfig({
                 // Remove copy to dist/ (frontend) - only needed in dist-electron/
                 {
                     dest: "../dist-electron", // Copies to dist-electron/
-                    src: "node_modules/node-sqlite3-wasm/dist/node-sqlite3-wasm.wasm",
+                    src: "assets/node-sqlite3-wasm.wasm",
                 },
             ],
         }),

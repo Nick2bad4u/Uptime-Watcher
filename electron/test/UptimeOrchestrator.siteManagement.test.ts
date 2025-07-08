@@ -13,11 +13,11 @@ vi.mock("../constants", () => ({
 }));
 
 // Mock utils
-vi.mock("../utils", () => ({
+vi.mock("./utils", () => ({
     isDev: vi.fn(() => false),
 }));
 
-vi.mock("../utils/logger", () => ({
+vi.mock("./utils", () => ({
     monitorLogger: {
         info: vi.fn(),
         error: vi.fn(),
@@ -32,7 +32,7 @@ vi.mock("../utils/logger", () => ({
     },
 }));
 
-vi.mock("../utils/retry", () => ({
+vi.mock("./utils", () => ({
     withDbRetry: vi.fn((fn) => fn()),
 }));
 
@@ -178,7 +178,7 @@ function resetAllMocks(): void {
 }
 
 async function createUptimeOrchestrator() {
-    const { UptimeOrchestrator } = await import("../UptimeOrchestrator");
+    const { UptimeOrchestrator } = await import("../index");
     return new UptimeOrchestrator();
 }
 

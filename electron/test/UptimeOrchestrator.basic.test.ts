@@ -6,18 +6,18 @@ import { describe, expect, it, beforeEach, afterEach, vi } from "vitest";
 import { EventEmitter } from "events";
 
 // Mock dependencies
-vi.mock("../constants", () => ({
+vi.mock("./constants", () => ({
     DEFAULT_REQUEST_TIMEOUT: 10000,
     DEFAULT_CHECK_INTERVAL: 300000,
     STATUS_UPDATE_EVENT: "status-update",
     DEFAULT_HISTORY_LIMIT: 500,
 }));
 
-vi.mock("../utils", () => ({
+vi.mock("./utils", () => ({
     isDev: vi.fn(() => false),
 }));
 
-vi.mock("../utils/logger", () => ({
+vi.mock("./utils", () => ({
     monitorLogger: {
         info: vi.fn(),
         error: vi.fn(),
