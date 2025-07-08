@@ -68,7 +68,7 @@
         "**/node_modules/**",
         "node_modules/**/*",
         "dist",
-        "dist-electron", 
+        "dist-electron",
         "electron",
         "release",
         "out",
