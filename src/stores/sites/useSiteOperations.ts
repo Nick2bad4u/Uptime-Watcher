@@ -1,7 +1,12 @@
 /**
  * Site operations module.
  * Handles CRUD operations for sites and monitor management.
+ *
+ * Note: Empty clearError and setLoading functions are intentional in withErrorHandling calls
+ * as error handling is managed centrally by the store infrastructure.
  */
+
+/* eslint-disable @typescript-eslint/no-empty-function */
 
 import type { Monitor, MonitorType, Site } from "../../types";
 
@@ -52,7 +57,9 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                     .getSites()
                     .filter((s) => s !== null && s !== undefined)
                     .find((s) => s.identifier === siteId);
-                if (!site) throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
+                if (!site) {
+                    throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
+                }
 
                 // Allow multiple monitors of the same type
                 const updatedMonitors = [...site.monitors, monitor];
@@ -118,12 +125,12 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                     for (const monitor of site.monitors) {
                         try {
                             await MonitoringService.stopMonitoring(identifier, monitor.id);
-                        } catch (err) {
+                        } catch (error) {
                             // Log but do not block deletion if stopping fails
                             if (process.env.NODE_ENV === "development") {
                                 console.warn(
                                     `Failed to stop monitoring for monitor ${monitor.id} of site ${identifier}:`,
-                                    err
+                                    error
                                 );
                             }
                         }
@@ -213,7 +220,9 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                     .getSites()
                     .filter((s) => s !== null && s !== undefined)
                     .find((s) => s.identifier === siteId);
-                if (!site) throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
+                if (!site) {
+                    throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
+                }
 
                 // Check if this is the only monitor - prevent removal if so
                 if (site.monitors.length <= 1) {
@@ -223,10 +232,10 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                 // Stop monitoring for this specific monitor first
                 try {
                     await MonitoringService.stopMonitoring(siteId, monitorId);
-                } catch (err) {
+                } catch (error) {
                     // Log but do not block removal if stopping fails
                     if (process.env.NODE_ENV === "development") {
-                        console.warn(`Failed to stop monitoring for monitor ${monitorId} of site ${siteId}:`, err);
+                        console.warn(`Failed to stop monitoring for monitor ${monitorId} of site ${siteId}:`, error);
                     }
                 }
 
@@ -252,7 +261,9 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                     .getSites()
                     .filter((s) => s !== null && s !== undefined)
                     .find((s) => s.identifier === siteId);
-                if (!site) throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
+                if (!site) {
+                    throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
+                }
 
                 const updatedSite = updateMonitorInSite(site, monitorId, { retryAttempts });
                 await SiteService.updateSite(siteId, { monitors: updatedSite.monitors });
@@ -274,7 +285,9 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                     .getSites()
                     .filter((s) => s !== null && s !== undefined)
                     .find((s) => s.identifier === siteId);
-                if (!site) throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
+                if (!site) {
+                    throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
+                }
 
                 const updatedSite = updateMonitorInSite(site, monitorId, { timeout });
                 await SiteService.updateSite(siteId, { monitors: updatedSite.monitors });
@@ -296,7 +309,9 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                     .getSites()
                     .filter((s) => s !== null && s !== undefined)
                     .find((s) => s.identifier === siteId);
-                if (!site) throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
+                if (!site) {
+                    throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
+                }
 
                 const updatedSite = updateMonitorInSite(site, monitorId, { checkInterval: interval });
                 await SiteService.updateSite(siteId, { monitors: updatedSite.monitors });

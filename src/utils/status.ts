@@ -12,20 +12,27 @@
  */
 export function getStatusIcon(status: string): string {
     switch (status.toLowerCase()) {
-        case "up":
+        case "up": {
             return "✅";
-        case "down":
+        }
+        case "down": {
             return "❌";
-        case "pending":
+        }
+        case "pending": {
             return "⏳";
-        case "paused":
+        }
+        case "paused": {
             return "⏸️";
-        case "mixed":
+        }
+        case "mixed": {
             return "🔄";
-        case "unknown":
+        }
+        case "unknown": {
             return "❓";
-        default:
+        }
+        default: {
             return "⚪";
+        }
     }
 }
 

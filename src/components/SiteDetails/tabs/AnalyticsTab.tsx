@@ -21,7 +21,7 @@ import { MonitorType } from "../../../types";
  * Props for the AnalyticsTab component.
  * Contains comprehensive metrics, chart data, and formatting functions.
  */
-interface AnalyticsTabProps {
+interface AnalyticsTabProperties {
     /** Average response time across all checks */
     readonly avgResponseTime: number;
     /** Chart.js data configuration for bar chart */
@@ -114,20 +114,24 @@ export function AnalyticsTab({
     upCount,
     uptime,
     uptimeChartData,
-}: AnalyticsTabProps) {
+}: AnalyticsTabProperties) {
     const { getAvailabilityColor: getColor, getAvailabilityVariant: getVariant } = useAvailabilityColors();
     const { currentTheme } = useTheme();
 
     // Function to get response time color based on performance
     const getResponseTimeColor = (responseTime: number): string => {
-        if (responseTime <= 100) return currentTheme.colors.success; // Green for excellent (≤100ms)
-        if (responseTime <= 500) return currentTheme.colors.warning; // Yellow for good (≤500ms)
+        if (responseTime <= 100) {
+            return currentTheme.colors.success;
+        } // Green for excellent (≤100ms)
+        if (responseTime <= 500) {
+            return currentTheme.colors.warning;
+        } // Yellow for good (≤500ms)
         return currentTheme.colors.error; // Red for poor (>500ms)
     };
 
     // Icon colors configuration
     const getIconColors = () => {
-        const availabilityColor = getColor(parseFloat(uptime));
+        const availabilityColor = getColor(Number.parseFloat(uptime));
         const responseTimeColor = getResponseTimeColor(avgResponseTime);
         return {
             analytics: currentTheme.colors.primary[500],
@@ -139,7 +143,7 @@ export function AnalyticsTab({
     };
 
     const iconColors = getIconColors();
-    const uptimeValue = parseFloat(uptime);
+    const uptimeValue = Number.parseFloat(uptime);
     const variant = getVariant(uptimeValue);
     const progressVariant = variant === "danger" ? "error" : variant;
 
@@ -160,6 +164,7 @@ export function AnalyticsTab({
                                 onClick={() => {
                                     logger.user.action("Chart time range changed", {
                                         monitorType: monitorType,
+
                                         newRange: range,
                                     });
                                     setSiteDetailsChartTimeRange(range);
@@ -266,6 +271,7 @@ export function AnalyticsTab({
                                     const newValue = !showAdvancedMetrics;
                                     logger.user.action("Advanced metrics toggle", {
                                         monitorType: monitorType,
+
                                         newValue: newValue,
                                     });
                                     setShowAdvancedMetrics(newValue);

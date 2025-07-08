@@ -125,6 +125,7 @@ declare global {
 
             system: {
                 quitAndInstall: () => void;
+                openExternal: (url: string) => void;
             };
         };
     }

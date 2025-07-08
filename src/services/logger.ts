@@ -34,11 +34,11 @@ const logger = {
         },
     },
     // Debug level - for development debugging
-    debug: (message: string, ...args: unknown[]) => {
-        log.debug(`[UPTIME-WATCHER] ${message}`, ...args);
+    debug: (message: string, ...arguments_: unknown[]) => {
+        log.debug(`[UPTIME-WATCHER] ${message}`, ...arguments_);
     },
     // Error level - errors that should be investigated
-    error: (message: string, error?: Error, ...args: unknown[]) => {
+    error: (message: string, error?: Error, ...arguments_: unknown[]) => {
         if (error instanceof Error) {
             log.error(
                 `[UPTIME-WATCHER] ${message}`,
@@ -47,23 +47,23 @@ const logger = {
                     name: error.name,
                     stack: error.stack,
                 },
-                ...args
+                ...arguments_
             );
         } else if (error) {
-            log.error(`[UPTIME-WATCHER] ${message}`, error, ...args);
+            log.error(`[UPTIME-WATCHER] ${message}`, error, ...arguments_);
         } else {
-            log.error(`[UPTIME-WATCHER] ${message}`, ...args);
+            log.error(`[UPTIME-WATCHER] ${message}`, ...arguments_);
         }
     },
     // Info level - general application flow
-    info: (message: string, ...args: unknown[]) => {
-        log.info(`[UPTIME-WATCHER] ${message}`, ...args);
+    info: (message: string, ...arguments_: unknown[]) => {
+        log.info(`[UPTIME-WATCHER] ${message}`, ...arguments_);
     },
     // Raw access to electron-log for special cases
     raw: log,
     // Silly level - extremely detailed debugging
-    silly: (message: string, ...args: unknown[]) => {
-        log.silly(`[UPTIME-WATCHER] ${message}`, ...args);
+    silly: (message: string, ...arguments_: unknown[]) => {
+        log.silly(`[UPTIME-WATCHER] ${message}`, ...arguments_);
     },
     // Specialized logging methods for common scenarios
     // Log site monitoring events
@@ -112,12 +112,12 @@ const logger = {
         },
     },
     // Verbose level - very detailed debugging
-    verbose: (message: string, ...args: unknown[]) => {
-        log.verbose(`[UPTIME-WATCHER] ${message}`, ...args);
+    verbose: (message: string, ...arguments_: unknown[]) => {
+        log.verbose(`[UPTIME-WATCHER] ${message}`, ...arguments_);
     },
     // Warn level - something unexpected but not an error
-    warn: (message: string, ...args: unknown[]) => {
-        log.warn(`[UPTIME-WATCHER] ${message}`, ...args);
+    warn: (message: string, ...arguments_: unknown[]) => {
+        log.warn(`[UPTIME-WATCHER] ${message}`, ...arguments_);
     },
 };
 

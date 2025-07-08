@@ -26,9 +26,10 @@ export const useErrorStore = create<ErrorStore>((set, get) => ({
         logStoreAction("ErrorStore", "clearStoreError", { store });
         set((state) => {
             const newStoreErrors = { ...state.storeErrors };
-            // eslint-disable-next-line security/detect-object-injection
-            delete newStoreErrors[store];
-            return { storeErrors: newStoreErrors };
+            // Use destructuring to avoid dynamic delete
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { [store]: _, ...remainingErrors } = newStoreErrors;
+            return { storeErrors: remainingErrors };
         });
     },
     getOperationLoading: (operation: string) => {

@@ -15,7 +15,7 @@ import { SiteCardMetrics } from "./SiteCardMetrics";
 import { SiteCardStatus } from "./SiteCardStatus";
 
 /** Props for the SiteCard component */
-interface SiteCardProps {
+interface SiteCardProperties {
     /** Site data to display */
     site: Site;
 }
@@ -37,7 +37,7 @@ interface SiteCardProps {
  * @param props - SiteCard component props
  * @returns JSX element containing the complete site monitoring card
  */
-export const SiteCard = React.memo(function SiteCard({ site }: SiteCardProps) {
+export const SiteCard = React.memo(function SiteCard({ site }: SiteCardProperties) {
     // Use our custom hook to get all the data and functionality we need
     const {
         checkCount,

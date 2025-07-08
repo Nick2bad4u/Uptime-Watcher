@@ -56,20 +56,26 @@
         "src/**/*.test.ts",
         "src/**/*.test.tsx",
         "vite.config.ts",
-        "vitest.config.ts"
+        "vitest.config.ts",
+        "src/**/*",
+        "src/types/global.d.ts",
+        "src/App.tsx",
+        "global.d.ts"
     ],
     "exclude": [
         "node_modules",
         "**/node_modules",
         "**/node_modules/**",
+        "node_modules/**/*",
         "dist",
         "dist-electron",
         "electron",
         "release",
         "out",
-        "node_modules/@codecov/**",
-        "node_modules/unplugin/**",
-        "node_modules/@eslint/**"
+        "coverage",
+        "**/node_modules/@types/**",
+        "**/node_modules/@typescript-eslint/**",
+        "**/node_modules/typescript/**"
     ]
     // Separate tsconfig should be used for renderer (src/) if needed
 }

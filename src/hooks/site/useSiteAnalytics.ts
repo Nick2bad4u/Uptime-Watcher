@@ -9,11 +9,10 @@
 import { useMemo } from "react";
 
 import type { Theme } from "../../theme/types";
-import type { TimePeriod } from "../../utils/time";
 
 import { CHART_TIME_PERIODS } from "../../constants";
 import { Monitor, StatusHistory } from "../../types";
-import { TIME_PERIOD_LABELS } from "../../utils/time";
+import { type TimePeriod, TIME_PERIOD_LABELS } from "../../utils/time";
 
 /** Represents a period of downtime with start, end, and duration */
 export interface DowntimePeriod {
@@ -117,12 +116,14 @@ export function useSiteAnalytics(monitor: Monitor | undefined, timeRange: TimePe
         const getPercentile = (p: number): number => {
             // Ensure p is between 0 and 1
             const safeP = Math.max(0, Math.min(1, p));
-            const arrLen = sortedResponseTimes.length;
-            if (arrLen === 0) return 0;
-            const idx = Math.floor(arrLen * safeP);
-            const safeIdx = Math.max(0, Math.min(idx, arrLen - 1));
+            const arrayLength = sortedResponseTimes.length;
+            if (arrayLength === 0) {
+                return 0;
+            }
+            const index = Math.floor(arrayLength * safeP);
+            const safeIndex = Math.max(0, Math.min(index, arrayLength - 1));
             // eslint-disable-next-line security/detect-object-injection -- safeIdx is validated and sanitized
-            return sortedResponseTimes[safeIdx] ?? 0;
+            return sortedResponseTimes[safeIndex] ?? 0;
         };
 
         const p50 = getPercentile(0.5);
@@ -131,20 +132,20 @@ export function useSiteAnalytics(monitor: Monitor | undefined, timeRange: TimePe
 
         // Calculate downtime periods
         const downtimePeriods: DowntimePeriod[] = [];
-        // eslint-disable-next-line functional/no-let -- this is necessary for mutable state
-        let currentDowntime: DowntimePeriod | undefined = undefined;
+
+        let currentDowntime: DowntimePeriod | undefined;
 
         // Process in reverse chronological order for proper downtime calculation
         for (const record of [...filteredHistory].reverse()) {
             if (record.status === "down") {
-                if (!currentDowntime) {
+                if (currentDowntime) {
+                    currentDowntime.end = record.timestamp;
+                } else {
                     currentDowntime = {
                         duration: 0,
                         end: record.timestamp,
                         start: record.timestamp,
                     };
-                } else {
-                    currentDowntime.end = record.timestamp;
                 }
             } else if (currentDowntime) {
                 currentDowntime.duration = currentDowntime.end - currentDowntime.start;
@@ -251,18 +252,30 @@ export const SiteAnalyticsUtils = {
      * Get availability status based on uptime percentage
      */
     getAvailabilityStatus(uptime: number): "excellent" | "good" | "warning" | "critical" {
-        if (uptime >= 99.9) return "excellent";
-        if (uptime >= 99) return "good";
-        if (uptime >= 95) return "warning";
+        if (uptime >= 99.9) {
+            return "excellent";
+        }
+        if (uptime >= 99) {
+            return "good";
+        }
+        if (uptime >= 95) {
+            return "warning";
+        }
         return "critical";
     },
     /**
      * Get performance status based on response time
      */
     getPerformanceStatus(responseTime: number): "excellent" | "good" | "warning" | "critical" {
-        if (responseTime <= 200) return "excellent";
-        if (responseTime <= 500) return "good";
-        if (responseTime <= 1000) return "warning";
+        if (responseTime <= 200) {
+            return "excellent";
+        }
+        if (responseTime <= 500) {
+            return "good";
+        }
+        if (responseTime <= 1000) {
+            return "warning";
+        }
         return "critical";
     },
 };

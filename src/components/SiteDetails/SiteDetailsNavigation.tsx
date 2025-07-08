@@ -14,13 +14,13 @@ import { Site } from "../../types";
  * Props for the SiteDetailsNavigation component.
  * Contains all necessary handlers and state for monitoring control.
  */
-interface SiteDetailsNavigationProps {
+interface SiteDetailsNavigationProperties {
     /** Currently active tab in the site details view */
     readonly activeSiteDetailsTab: string;
     /** The site object being displayed */
     readonly currentSite: Site;
     /** Handler for monitor selection changes */
-    readonly handleMonitorIdChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    readonly handleMonitorIdChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
     /** Handler for starting monitoring */
     readonly handleStartMonitoring: () => Promise<void>;
     /** Handler for starting site-level monitoring */
@@ -64,7 +64,7 @@ export function SiteDetailsNavigation({
     isMonitoring,
     selectedMonitorId,
     setActiveSiteDetailsTab,
-}: SiteDetailsNavigationProps) {
+}: SiteDetailsNavigationProperties) {
     const logTabChange = (tab: string, additionalData?: Record<string, unknown>) => {
         logger.user.action("Site details tab changed", {
             siteId: currentSite.identifier,
@@ -89,7 +89,6 @@ export function SiteDetailsNavigation({
                 <div className="flex flex-wrap items-center gap-2">
                     <ThemedButton
                         variant={
-                            /* eslint-disable-next-line sonarjs/no-duplicate-string */
                             activeSiteDetailsTab === "site-overview" ? BUTTON_VARIANT_PRIMARY : BUTTON_VARIANT_SECONDARY
                         }
                         size="sm"
@@ -102,7 +101,6 @@ export function SiteDetailsNavigation({
                     </ThemedButton>
                     <ThemedButton
                         variant={
-                            /* eslint-disable-next-line sonarjs/no-duplicate-string */
                             activeSiteDetailsTab === "monitor-overview"
                                 ? BUTTON_VARIANT_PRIMARY
                                 : BUTTON_VARIANT_SECONDARY

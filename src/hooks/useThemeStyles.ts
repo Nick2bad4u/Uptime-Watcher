@@ -18,8 +18,8 @@ interface ThemeStyles {
 export function useThemeStyles(isCollapsed = false): ThemeStyles {
     const styles = useMemo<ThemeStyles>(() => {
         const isDarkMode =
-            typeof window !== "undefined" && window.matchMedia
-                ? window.matchMedia("(prefers-color-scheme: dark)").matches
+            globalThis.window !== undefined && globalThis.matchMedia
+                ? globalThis.matchMedia("(prefers-color-scheme: dark)").matches
                 : false;
         const transitionEasing = "0.3s cubic-bezier(0.4, 0, 0.2, 1)";
 

@@ -18,7 +18,9 @@ export function useSelectedSite(): Site | undefined {
     const sites = useSitesStore((state) => state.sites);
 
     return useMemo(() => {
-        if (!selectedSiteId) return undefined;
+        if (!selectedSiteId) {
+            return undefined;
+        }
         return sites.find((site) => site.identifier === selectedSiteId) || undefined;
     }, [selectedSiteId, sites]);
 }

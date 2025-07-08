@@ -1,7 +1,7 @@
 /**
  * Site details view component with tabbed interface
  *
- * Provides a comprehensive view of a monitored site including:
+ * Provides a comprehensive view of a m    // Use our custom hook to get all the data and functionality we neede including:
  * - Overview with basic statistics
  * - History charts and response time data
  * - Analytics with advanced metrics
@@ -60,7 +60,7 @@ ChartJS.register(
 );
 
 /** Props for the SiteDetails component */
-interface SiteDetailsProps {
+interface SiteDetailsProperties {
     /** The site object to display details for */
     readonly site: Site;
     /** Callback function to close the site details view */
@@ -85,7 +85,7 @@ interface SiteDetailsProps {
  * />
  * ```
  */
-export function SiteDetails({ onClose, site }: SiteDetailsProps) {
+export function SiteDetails({ onClose, site }: SiteDetailsProperties) {
     const { currentTheme } = useTheme();
     const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
 
@@ -95,8 +95,12 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
      * @returns Human-readable description
      */
     const getAvailabilityDescription = (percentage: number): string => {
-        if (percentage >= 99) return "Excellent";
-        if (percentage >= 95) return "Good";
+        if (percentage >= 99) {
+            return "Excellent";
+        }
+        if (percentage >= 95) {
+            return "Good";
+        }
         return "Poor";
     };
 
@@ -164,7 +168,7 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
         () => ({
             datasets: [
                 {
-                    backgroundColor: currentTheme.colors.primary[500] + "20",
+                    backgroundColor: `${currentTheme.colors.primary[500]}20`,
                     borderColor: currentTheme.colors.primary[500],
                     data: analytics.filteredHistory.map((h) => h.responseTime),
                     fill: true,
@@ -214,7 +218,9 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
     };
 
     // Don't render if site doesn't exist
-    if (!siteExists) return undefined;
+    if (!siteExists) {
+        return;
+    }
 
     return (
         <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 md:p-8 bg-black/50 backdrop-blur-sm">
@@ -267,7 +273,7 @@ export function SiteDetails({ onClose, site }: SiteDetailsProps) {
                         {activeSiteDetailsTab === "site-overview" && (
                             <SiteOverviewTab
                                 site={currentSite}
-                                uptime={parseFloat(analytics.uptime)}
+                                uptime={Number.parseFloat(analytics.uptime)}
                                 avgResponseTime={analytics.avgResponseTime}
                                 totalChecks={analytics.totalChecks}
                                 handleRemoveSite={handleRemoveSite}

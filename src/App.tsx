@@ -60,15 +60,16 @@ function App() {
      * This prevents flash for quick operations while still providing feedback for longer ones
      */
     useEffect(() => {
-        if (isLoading) {
-            const timeoutId = setTimeout(() => {
-                setShowLoadingOverlay(true);
-            }, UI_DELAYS.LOADING_OVERLAY);
-            return () => clearTimeout(timeoutId);
-        } else {
+        if (!isLoading) {
             setShowLoadingOverlay(false);
             return undefined;
         }
+
+        const timeoutId = setTimeout(() => {
+            setShowLoadingOverlay(true);
+        }, UI_DELAYS.LOADING_OVERLAY);
+
+        return () => clearTimeout(timeoutId);
     }, [isLoading]);
 
     /**

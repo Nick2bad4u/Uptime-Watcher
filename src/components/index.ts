@@ -14,12 +14,12 @@ export { Settings } from "./Settings/Settings";
 export { AddSiteForm } from "./AddSiteForm/AddSiteForm";
 export { FormField, TextField, SelectField, RadioGroup } from "./AddSiteForm/FormFields";
 export type {
-    FormFieldProps,
-    TextFieldProps,
+    FormFieldProperties,
+    TextFieldProperties,
     SelectOption,
-    SelectFieldProps,
+    SelectFieldProperties,
     RadioOption,
-    RadioGroupProps,
+    RadioGroupProperties,
 } from "./AddSiteForm/FormFields";
 export { handleSubmit } from "./AddSiteForm/Submit";
 export { useAddSiteForm } from "./AddSiteForm/useAddSiteForm";

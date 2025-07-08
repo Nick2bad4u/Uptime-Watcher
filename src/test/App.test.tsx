@@ -167,7 +167,6 @@ const mockSettingsStore = {
 };
 
 const mockUIStore = {
-    getSelectedSite: vi.fn(() => null as Site | null),
     selectedSiteId: null,
     setSelectedSite: vi.fn(),
     setShowSettings: vi.fn(),
@@ -252,7 +251,6 @@ describe("App Component", () => {
         });
 
         Object.assign(mockUIStore, {
-            getSelectedSite: vi.fn(() => null),
             selectedSiteId: null,
             setSelectedSite: vi.fn(),
             setShowSettings: vi.fn(),
@@ -557,7 +555,6 @@ describe("App Component", () => {
                 selectedSiteId: "1",
                 showSiteDetails: true,
             });
-            mockUIStore.getSelectedSite.mockReturnValue(testSite);
             Object.assign(mockSitesStore, {
                 sites: [testSite],
             });
@@ -576,7 +573,6 @@ describe("App Component", () => {
                 selectedSiteId: "1",
                 showSiteDetails: true,
             });
-            mockUIStore.getSelectedSite.mockReturnValue(testSite);
             Object.assign(mockSitesStore, {
                 sites: [testSite],
             });
@@ -591,7 +587,7 @@ describe("App Component", () => {
 
         it("does not show site details modal when no site is selected", () => {
             mockUIStore.showSiteDetails = true;
-            mockUIStore.getSelectedSite.mockReturnValue(null);
+            mockUIStore.selectedSiteId = null;
             render(<App />);
 
             expect(screen.queryByTestId("site-details-modal")).not.toBeInTheDocument();

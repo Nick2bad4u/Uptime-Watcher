@@ -10,7 +10,7 @@ import { ThemedButton } from "../../../../theme/components";
 /**
  * Props for the ActionButtonGroup component.
  */
-interface ActionButtonGroupProps {
+interface ActionButtonGroupProperties {
     /** Callback function to trigger immediate site check */
     onCheckNow: () => void;
     /** Callback function to start monitoring */
@@ -57,27 +57,27 @@ export const ActionButtonGroup = React.memo(function ActionButtonGroup({
     onCheckNow,
     onStartMonitoring,
     onStopMonitoring,
-}: ActionButtonGroupProps) {
+}: ActionButtonGroupProperties) {
     // Create individual wrapped handlers for each button with event propagation control
     const handleCheckNowClick = useCallback(
-        (e?: React.MouseEvent<HTMLButtonElement>) => {
-            e?.stopPropagation();
+        (event?: React.MouseEvent<HTMLButtonElement>) => {
+            event?.stopPropagation();
             onCheckNow();
         },
         [onCheckNow]
     );
 
     const handleStartMonitoringClick = useCallback(
-        (e?: React.MouseEvent<HTMLButtonElement>) => {
-            e?.stopPropagation();
+        (event?: React.MouseEvent<HTMLButtonElement>) => {
+            event?.stopPropagation();
             onStartMonitoring();
         },
         [onStartMonitoring]
     );
 
     const handleStopMonitoringClick = useCallback(
-        (e?: React.MouseEvent<HTMLButtonElement>) => {
-            e?.stopPropagation();
+        (event?: React.MouseEvent<HTMLButtonElement>) => {
+            event?.stopPropagation();
             onStopMonitoring();
         },
         [onStopMonitoring]

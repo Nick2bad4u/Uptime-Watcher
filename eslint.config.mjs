@@ -1,19 +1,20 @@
 /**
- * ESLint configuration for the Uptime Watcher application.
+ * Optimized ESLint configuration for Uptime Watcher
  *
- * Comprehensive linting setup with TypeScript, React, accessibility,
- * code quality, and security rules for maintaining code standards.
+ * This configuration is specifically tailored for:
+ * - Electron + React + TypeScript architecture
+ * - Domain-driven design with Zustand stores
+ * - Service-based backend architecture
+ * - High code quality with reduced false positives
+ * - Modern ES2024+ features
+ * - Enhanced security and performance rules
  */
 
-import globals from "globals";
-import tseslint from "typescript-eslint";
 import js from "@eslint/js";
-import markdown from "@eslint/markdown";
 import json from "@eslint/json";
-import path from "path";
-import { fileURLToPath } from "url";
-import { FlatCompat } from "@eslint/eslintrc";
-import pluginJs from "@eslint/js";
+import markdown from "@eslint/markdown";
+import tseslint from "@typescript-eslint/eslint-plugin";
+import tseslintParser from "@typescript-eslint/parser";
 import pluginImport from "eslint-plugin-import";
 import pluginPromise from "eslint-plugin-promise";
 import pluginUnusedImports from "eslint-plugin-unused-imports";
@@ -25,139 +26,93 @@ import pluginSonarjs from "eslint-plugin-sonarjs";
 import pluginSecurity from "eslint-plugin-security";
 import pluginEslintComments from "eslint-plugin-eslint-comments";
 import pluginPerfectionist from "eslint-plugin-perfectionist";
-import pluginTestingLibrary from "eslint-plugin-testing-library";
 import pluginUnicorn from "eslint-plugin-unicorn";
 import pluginFunctional from "eslint-plugin-functional";
 import pluginFilenames from "eslint-plugin-filenames";
 import pluginRegexp from "eslint-plugin-regexp";
 import pluginTsdoc from "eslint-plugin-tsdoc";
-import html from "eslint-plugin-html";
-import eslintPluginYml from "eslint-plugin-yml";
+import pluginBoundaries from "eslint-plugin-boundaries";
+import pluginPreferArrow from "eslint-plugin-prefer-arrow";
+import pluginSortClassMembers from "eslint-plugin-sort-class-members";
+import pluginRedos from "eslint-plugin-redos";
+import pluginCompat from "eslint-plugin-compat";
+import vitest from "@vitest/eslint-plugin";
+import pluginTestingLibrary from "eslint-plugin-testing-library";
+import vitestGlobals from "eslint-plugin-vitest-globals";
+import globals from "globals";
 import eslintPluginToml from "eslint-plugin-toml";
 import tomlEslintParser from "toml-eslint-parser";
-import yamlEslintParser from "yaml-eslint-parser";
-import * as cssPlugin from "eslint-plugin-css";
-import vitest from "@vitest/eslint-plugin";
-import vitestGlobals from "eslint-plugin-vitest-globals";
 
-// mimic CommonJS variables -- not needed if using CommonJS
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const compat = new FlatCompat({
-    baseDirectory: __dirname,
-    recommendedConfig: pluginJs.configs.recommended,
-});
+const __dirname = import.meta.dirname;
 
 export default [
+    // Global ignores - must be first and more comprehensive
     {
         ignores: [
-            "node_modules/",
+            "**/node_modules/**",
+            "node_modules/**",
+            "**/dist/**",
             "dist/",
+            "**/dist-electron/**",
             "dist-electron/",
+            "**/release/**",
             "release/",
             "package.json",
             "package-lock.json",
+            "**/.vscode/**",
             ".vscode/",
-            ".vscode/settings.json",
-            "commitlint.config.js",
-            "stylelint.config.js",
+            "**/.github/**",
             ".github/",
-            ".github/**/*",
+            "**/commitlint.config.js",
             "commitlint.config.js",
+            "**/stylelint.config.js",
             "stylelint.config.js",
-            "vite.config.js",
-            "vite.config.mjs",
-            "vitest.config.js",
-            "vitest.config.mts",
-            "vitest.electron.config.js",
-            "vitest.electron.config.mts",
-            "tsconfig.json",
-            "tsconfig.*.json",
-            "tsconfig.eslint.json",
-            "eslint.config.mjs",
-            "eslint.config.js",
-            "eslint.config.cjs",
-            "node_modules/**",
-            "**/dist/**",
-            "**/dist-electron/**",
-            ".**.json",
-            ".gitleaks.toml",
-            "cliff.toml",
-            "cspell.json",
-            "**/Design-Plan.md",
-            "**/Logging-Migration-Summary.md",
-            "**/Docs/**",
-            "**/docs/**",
-            "Docs/",
-            "docs/",
+            "**/*.config.{js,mjs,ts}",
+            "*.config.{js,mjs,ts}",
+            "**/tsconfig*.json",
+            "tsconfig*.json",
+            "**/Coverage/**",
             "Coverage/",
+            "**/coverage/**",
             "coverage/",
-            "coverage",
-            "coverage/**",
+            "**/.agentic-tools*",
             ".agentic-tools*",
+            "**/_ZENTASKS*",
             "_ZENTASKS*",
-            "_ZENTANKS*",
-            "vitest.electron.config.ts",
-            "vitest.electron.config.mts",
-            "vitest.config.ts",
-            "vitest.config.mts",
-            "tsconfig.electron.json",
-            "tsconfig.electron.*.json",
-            "tsconfig.json",
-            "tailwind.config.js",
-            "tailwind.config.mjs",
-            "tailwind.config.cjs",
+            "**/test/themeTypes.test.tsx",
             "test/themeTypes.test.tsx",
-            "test/themeTypes.test.mts",
-            "test/themeTypes.test.tsx",
-            "test/themeTypes.test.mts",
+            "**/test/types.test.tsx",
             "test/types.test.tsx",
+            "**/.devskim.json",
+            ".devskim.json",
+            "**/.jscpd.json",
+            ".jscpd.json",
+            "**/.lintstagedrc.json",
+            ".lintstagedrc.json",
+            "**/.markdown-link-check.json",
+            ".markdown-link-check.json",
+            "**/.markdownlint.json",
+            ".markdownlint.json",
+            "**/.prettierrc.json",
+            ".prettierrc.json",
+            "**/cspell.json",
+            "cspell.json",
         ],
     },
-
-    // Using Stylelint for CSS files, so we don't need to lint CSS here
-    // // CSS files
-    // {
-    //     files: ["**/*.css"],
-    //     ...cssPlugin.configs["flat/recommended"],
-    //     plugins: {
-    //         css: cssPlugin,
-    //     },
-    // },
 
     // Markdown files
     {
         files: ["**/*.md"],
         ...markdown.configs.recommended[0],
-        plugins: {
-            markdown,
-        },
+        plugins: { markdown },
         language: "markdown/gfm",
     },
+
     // JSON files
     {
         files: ["**/*.json", "**/*.json5", "**/*.jsonc"],
         ...json.configs.recommended[0],
     },
-    {
-        files: ["**/*.html"],
-        plugins: {
-            html,
-        },
-    },
-
-    // // YAML/YML files
-    // {
-    //     files: ["**/*.yaml", "**/*.yml"],
-    //     ignores: ["kics.yaml", "flatpak-build.yml"],
-    //     ...eslintPluginYml.configs["flat/prettier"][0],
-    //     languageOptions: {
-    //         parser: yamlEslintParser,
-    //         parserOptions: {
-    //             defaultYAMLVersion: "1.0",
-    //         },
-    //     },
-    // },
 
     // TOML files
     {
@@ -166,258 +121,48 @@ export default [
         ...eslintPluginToml.configs["flat/standard"][0],
         languageOptions: {
             parser: tomlEslintParser,
-            parserOptions: {
-                tomlVersion: "1.0.0",
-            },
+            parserOptions: { tomlVersion: "1.0.0" },
         },
     },
 
-    // JS files
+    // TypeScript frontend files (React + Zustand)
     {
-        files: ["**/*.js"],
-        ignores: [
-            "tests/**",
-            "**/__tests__/**",
-            "**/*.test.js",
-            "**/*.spec.js",
-            "vitest*.js",
-            "electron/test/**/*.js",
-            "src/test/**/*.js",
-        ],
+        files: ["src/**/*.ts", "src/**/*.tsx"],
+        ignores: ["src/test/**/*.{ts,tsx}", "**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}"],
         languageOptions: {
-            sourceType: "script",
-        },
-        settings: {
-            react: {
-                version: "detect",
-            },
-        },
-        plugins: {
-            js,
-            import: pluginImport,
-            promise: pluginPromise,
-            "unused-imports": pluginUnusedImports,
-            react: pluginReact,
-            "react-hooks": pluginReactHooks,
-            "jsx-a11y": pluginJsxA11y,
-            prettier: pluginPrettier,
-            sonarjs: pluginSonarjs,
-            security: pluginSecurity,
-            "eslint-comments": pluginEslintComments,
-            perfectionist: pluginPerfectionist,
-            // new plugins
-            unicorn: pluginUnicorn,
-            functional: pluginFunctional,
-            filenames: pluginFilenames,
-            regexp: pluginRegexp,
-            tsdoc: pluginTsdoc,
-        },
-        rules: {
-            ...js.configs.recommended.rules,
-            ...pluginImport.configs.recommended.rules,
-            ...pluginImport.configs.react.rules,
-            ...pluginImport.configs.electron.rules,
-            ...pluginImport.configs.typescript.rules,
-            ...pluginPromise.configs.recommended.rules,
-            ...pluginReact.configs.all.rules,
-            ...pluginReactHooks.configs.recommended.rules,
-            ...pluginJsxA11y.configs.strict.rules,
-            ...pluginSonarjs.configs.recommended.rules,
-            ...pluginSecurity.configs.recommended.rules,
-            ...pluginEslintComments.configs.recommended.rules,
-            ...pluginUnicorn.configs.all.rules,
-            ...pluginRegexp.configs.all.rules,
-            ...pluginFunctional.configs.all.rules,
-            // Core JavaScript best practices
-            "no-console": "warn",
-            "no-debugger": "error",
-            "no-alert": "warn",
-            "no-var": "error",
-            "prefer-const": "error",
-            "prefer-template": "warn",
-            "prefer-arrow-callback": "warn",
-            "no-unused-expressions": "warn",
-            "no-duplicate-imports": "error",
-            "no-useless-return": "warn",
-            "no-useless-constructor": "warn",
-            "no-useless-computed-key": "warn",
-            "no-useless-concat": "warn",
-            "no-useless-escape": "warn",
-            "no-useless-rename": "warn",
-            "no-nested-ternary": "warn",
-            "no-unneeded-ternary": "warn",
-            "consistent-return": "warn",
-            "default-case": "warn",
-            eqeqeq: ["error", "always"],
-            curly: ["error", "all"],
-            "no-eval": "error",
-            "no-implied-eval": "error",
-            "no-new-func": "error",
-            "no-script-url": "error",
-            "no-self-compare": "error",
-            "no-sequences": "error",
-            "no-throw-literal": "error",
-            "no-void": "error",
-            "no-with": "error",
-            radix: "error",
-            "wrap-iife": ["error", "inside"],
-            yoda: ["error", "never"],
-
-            // Array and object best practices
-            "array-callback-return": "error",
-            "no-array-constructor": "error",
-            "prefer-destructuring": [
-                "warn",
-                {
-                    array: true,
-                    object: true,
-                },
-            ],
-            "object-shorthand": ["warn", "always"],
-            "prefer-object-spread": "warn",
-
-            // Function best practices
-            "func-style": ["warn", "expression", { allowArrowFunctions: true }],
-            "prefer-rest-params": "error",
-            "prefer-spread": "error",
-
-            // Modern JavaScript features
-            "prefer-numeric-literals": "error",
-            "symbol-description": "error",
-
-            // import plugin: enable a few best-practice rules manually
-            "import/order": [
-                "off",
-                {
-                    alphabetize: {
-                        order: "asc",
-                    },
-                    groups: ["builtin", "external", "internal", "parent", "sibling", "index"],
-                    "newlines-between": "always",
-                    distinctGroup: true,
-                    sortTypesGroup: false,
-                },
-            ],
-            "import/newline-after-import": "warn",
-            // promise plugin: enable a few best-practice rules manually
-            "promise/always-return": "warn",
-            "promise/no-return-wrap": "warn",
-            "promise/param-names": "warn",
-            // unused-imports plugin
-            "unused-imports/no-unused-imports": "error",
-            "unused-imports/no-unused-vars": [
-                "warn",
-                {
-                    vars: "all",
-                    varsIgnorePattern: "^_",
-                    args: "after-used",
-                    argsIgnorePattern: "^_",
-                },
-            ],
-            // react
-            "react/jsx-uses-react": "off",
-            "react/react-in-jsx-scope": "off",
-            "react/prop-types": "off",
-            "react/jsx-boolean-value": "warn",
-            "react/self-closing-comp": "warn",
-            // react-hooks
-            "react-hooks/rules-of-hooks": "error",
-            "react-hooks/exhaustive-deps": "warn",
-            // jsx-a11y
-            "jsx-a11y/alt-text": "warn",
-            "jsx-a11y/anchor-is-valid": "warn",
-            "jsx-a11y/no-autofocus": "warn",
-            // prettier
-            "prettier/prettier": [
-                "error",
-                {
-                    usePrettierrc: true,
-                },
-            ],
-            // sonarjs
-            "sonarjs/no-duplicate-string": "warn",
-            "sonarjs/no-identical-functions": "warn",
-            // security
-            "security/detect-object-injection": "warn",
-            // eslint-comments
-            "eslint-comments/no-unused-disable": "warn",
-            "eslint-comments/no-unlimited-disable": "warn",
-            // perfectionist
-            "perfectionist/sort-objects": [
-                "warn",
-                {
-                    type: "natural",
-                    order: "asc",
-                    fallbackSort: { type: "alphabetical", order: "asc" },
-                    newlinesBetween: 1,
-                },
-            ],
-            "perfectionist/sort-imports": [
-                "warn",
-                {
-                    type: "natural",
-                    order: "asc",
-                    fallbackSort: { type: "alphabetical", order: "asc" },
-                    newlinesBetween: 1,
-                },
-            ],
-            // unicorn
-            "unicorn/filename-case": [
-                "warn",
-                {
-                    cases: {
-                        kebabCase: true,
-                        camelCase: true,
-                        pascalCase: true,
-                    },
-                },
-            ],
-            "unicorn/no-abusive-eslint-disable": "warn",
-            "unicorn/no-array-callback-reference": "warn",
-            "unicorn/no-array-for-each": "warn",
-            "unicorn/no-null": "warn",
-            // functional
-            "functional/immutable-data": "off",
-            "functional/no-let": "warn",
-            // regexp
-            "regexp/no-dupe-characters-character-class": "warn",
-            "regexp/no-empty-alternative": "warn",
-            // tsdoc
-            "tsdoc/syntax": "warn",
-        },
-    },
-    // TypeScript files - Source (renderer) files
-    {
-        files: ["src/**/*.ts", "src/**/*.tsx", "vitest*.ts", "vite.config.ts"],
-        ignores: ["tests/**", "**/__tests__/**", "**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}", "src/test/**/*.{ts,tsx}"],
-        languageOptions: {
-            parser: tseslint.parser,
+            parser: tseslintParser,
             parserOptions: {
                 project: "./tsconfig.json",
                 sourceType: "module",
                 ecmaVersion: "latest",
                 tsconfigRootDir: __dirname,
+                ecmaFeatures: {
+                    jsx: true,
+                },
             },
             globals: {
-                ...globals.node,
                 ...globals.browser,
-                __dirname: "readonly",
-                __filename: "readonly",
-                process: "readonly",
-                Buffer: "readonly",
-                global: "readonly",
+                ...globals.node,
                 window: "readonly",
-                require: "readonly",
-                module: "readonly",
+                document: "readonly",
+                globalThis: "readonly",
             },
         },
         settings: {
-            react: {
-                version: "detect",
-            },
+            react: { version: "detect" },
+            "boundaries/elements": [
+                { type: "app", pattern: "src/App.tsx" },
+                { type: "components", pattern: "src/components/**/*" },
+                { type: "stores", pattern: "src/stores/**/*" },
+                { type: "hooks", pattern: "src/hooks/**/*" },
+                { type: "services", pattern: "src/services/**/*" },
+                { type: "theme", pattern: "src/theme/**/*" },
+                { type: "utils", pattern: "src/utils/**/*" },
+                { type: "types", pattern: "src/types.ts" },
+            ],
         },
         plugins: {
-            "@typescript-eslint": tseslint.plugin,
+            "@typescript-eslint": tseslint,
             import: pluginImport,
             promise: pluginPromise,
             "unused-imports": pluginUnusedImports,
@@ -429,50 +174,37 @@ export default [
             security: pluginSecurity,
             "eslint-comments": pluginEslintComments,
             perfectionist: pluginPerfectionist,
-            // new plugins
             unicorn: pluginUnicorn,
             functional: pluginFunctional,
+            boundaries: pluginBoundaries,
+            "prefer-arrow": pluginPreferArrow,
+            "sort-class-members": pluginSortClassMembers,
+            redos: pluginRedos,
+            compat: pluginCompat,
+            tsdoc: pluginTsdoc,
             filenames: pluginFilenames,
             regexp: pluginRegexp,
-            tsdoc: pluginTsdoc,
         },
         rules: {
-            ...pluginImport.configs.recommended.rules,
-            ...pluginImport.configs.react.rules,
-            ...pluginImport.configs.electron.rules,
-            ...pluginImport.configs.typescript.rules,
-            ...pluginPromise.configs.recommended.rules,
-            ...pluginReact.configs.all.rules,
-            ...pluginReactHooks.configs.recommended.rules,
-            ...pluginJsxA11y.configs.strict.rules,
-            ...pluginSonarjs.configs.recommended.rules,
-            ...pluginSecurity.configs.recommended.rules,
-            ...pluginEslintComments.configs.recommended.rules,
-            ...pluginUnicorn.configs.all.rules,
-            ...pluginRegexp.configs.all.rules,
-            ...pluginFunctional.configs.all.rules,
-            ...tseslint.configs.recommendedTypeChecked.rules,
-            ...tseslint.configs.strictTypeChecked.rules,
-            ...tseslint.configs.stylisticTypeChecked.rules,
-            // import plugin: enable a few best-practice rules manually
-            "import/order": [
-                "off",
-                {
-                    alphabetize: {
-                        order: "asc",
-                    },
-                    groups: ["builtin", "external", "internal", "parent", "sibling", "index"],
+            // TypeScript rules
+            ...tseslint.configs.recommended.rules,
+            ...tseslint.configs.strict.rules,
+            ...tseslint.configs.stylistic.rules,
 
-                    distinctGroup: true,
-                    sortTypesGroup: false,
-                },
-            ],
-            "import/newline-after-import": "warn",
-            // promise plugin: enable a few best-practice rules manually
-            "promise/always-return": "warn",
-            "promise/no-return-wrap": "warn",
-            "promise/param-names": "warn",
-            // unused-imports plugin
+            // Core quality rules
+            // "no-console": "warn", // Allow in development, but warn - DISABLED FOR NOW
+            "no-debugger": "error",
+            "prefer-const": "error",
+            "prefer-template": "warn",
+            "no-duplicate-imports": "error",
+            "consistent-return": "warn",
+            eqeqeq: ["error", "always"],
+            curly: ["error", "all"],
+
+            // Import management
+            "import/no-unused-modules": "warn",
+            "import/no-cycle": "error",
+            "import/no-self-import": "error",
             "unused-imports/no-unused-imports": "error",
             "unused-imports/no-unused-vars": [
                 "warn",
@@ -483,54 +215,53 @@ export default [
                     argsIgnorePattern: "^_",
                 },
             ],
-            // react
+
+            // React 19 optimized rules
             "react/jsx-uses-react": "off",
             "react/react-in-jsx-scope": "off",
             "react/prop-types": "off",
             "react/jsx-boolean-value": "warn",
             "react/self-closing-comp": "warn",
-            // react-hooks
+            "react/jsx-no-useless-fragment": "warn",
+            "react/jsx-fragments": ["warn", "syntax"],
+            "react/no-array-index-key": "warn",
+            "react/jsx-key": "error",
+            "react/no-unstable-nested-components": "error",
+
+            // React Hooks
             "react-hooks/rules-of-hooks": "error",
             "react-hooks/exhaustive-deps": "warn",
-            // jsx-a11y
+
+            // Accessibility
             "jsx-a11y/alt-text": "warn",
             "jsx-a11y/anchor-is-valid": "warn",
             "jsx-a11y/no-autofocus": "warn",
-            // prettier
-            "prettier/prettier": [
+
+            // Code organization and architecture
+            "boundaries/element-types": [
                 "error",
                 {
-                    usePrettierrc: true,
+                    default: "disallow",
+                    rules: [
+                        {
+                            from: "app",
+                            allow: ["components", "stores", "hooks", "services", "theme", "utils", "types"],
+                        },
+                        {
+                            from: "components",
+                            allow: ["components", "hooks", "services", "theme", "utils", "types", "stores"],
+                        },
+                        { from: "stores", allow: ["services", "types", "utils"] },
+                        { from: "hooks", allow: ["stores", "services", "types", "utils"] },
+                        { from: "services", allow: ["types", "utils"] },
+                        { from: "theme", allow: ["types"] },
+                        { from: "utils", allow: ["types"] },
+                        { from: "types", allow: [] },
+                    ],
                 },
             ],
-            // sonarjs
-            "sonarjs/no-duplicate-string": "warn",
-            "sonarjs/no-identical-functions": "warn",
-            // security
-            "security/detect-object-injection": "warn",
-            // eslint-comments
-            "eslint-comments/no-unused-disable": "warn",
-            "eslint-comments/no-unlimited-disable": "warn",
-            // perfectionist
-            "perfectionist/sort-objects": [
-                "warn",
-                {
-                    type: "natural",
-                    order: "asc",
-                    fallbackSort: { type: "alphabetical", order: "asc" },
-                    newlinesBetween: 1,
-                },
-            ],
-            "perfectionist/sort-imports": [
-                "warn",
-                {
-                    type: "natural",
-                    order: "asc",
-                    fallbackSort: { type: "alphabetical", order: "asc" },
-                    newlinesBetween: 1,
-                },
-            ],
-            // unicorn
+
+            // Optimized Unicorn rules (reduced false positives)
             "unicorn/filename-case": [
                 "warn",
                 {
@@ -541,27 +272,73 @@ export default [
                     },
                 },
             ],
-            "unicorn/no-abusive-eslint-disable": "warn",
-            "unicorn/no-array-callback-reference": "warn",
-            "unicorn/no-array-for-each": "warn",
-            "unicorn/no-null": "warn",
-            // functional
-            "functional/immutable-data": "off",
-            "functional/no-let": "warn",
-            // regexp
-            "regexp/no-dupe-characters-character-class": "warn",
-            "regexp/no-empty-alternative": "warn",
-            // tsdoc
+            "unicorn/no-keyword-prefix": [
+                "error",
+                {
+                    disallowedPrefixes: ["interface", "type", "enum"],
+                    checkProperties: false,
+                },
+            ], // Allow "class" prefix for className and other legitimate uses
+            "unicorn/prefer-module": "off", // CommonJS needed for Electron
+            "unicorn/prefer-top-level-await": "off", // Not suitable for React
+            "unicorn/no-array-for-each": "off", // forEach is fine
+            "unicorn/no-array-callback-reference": "off", // Conflicts with React
+            "unicorn/prefer-ternary": "off", // Can hurt readability
+            "unicorn/no-negated-condition": "off", // Sometimes clearer
+            "unicorn/prefer-node-protocol": "warn",
+            "unicorn/prefer-string-slice": "warn",
+            "unicorn/prefer-includes": "warn",
+            "unicorn/prefer-string-starts-ends-with": "warn",
+
+            // Function style preferences - disabled as too aggressive
+            // "prefer-arrow/prefer-arrow-functions": [
+            //     "warn",
+            //     {
+            //         disallowPrototype: true,
+            //         singleReturnOnly: false,
+            //         classPropertiesAllowed: false,
+            //     },
+            // ],
+
+            // Security
+            "security/detect-object-injection": "warn",
+            "security/detect-non-literal-regexp": "warn",
+            "redos/no-vulnerable": "error",
+
+            // Performance and compatibility
+            "compat/compat": "off", // Electron supports modern APIs, Opera Mini not a target
+
+            // Code style
+            "prettier/prettier": ["error", { usePrettierrc: true }],
+
+            // Documentation
             "tsdoc/syntax": "warn",
+
+            // RegExp rules for security and performance
+            "regexp/no-unused-capturing-group": "warn",
+            "regexp/no-super-linear-backtracking": "error",
+            "regexp/optimal-quantifier-concatenation": "warn",
+            "regexp/prefer-character-class": "warn",
+            "regexp/prefer-plus-quantifier": "warn",
+            "regexp/prefer-star-quantifier": "warn",
+            "regexp/no-potentially-useless-backreference": "warn",
+            "regexp/no-useless-escape": "warn",
+            "regexp/no-useless-quantifier": "warn",
+
+            // Disable overly strict rules for this project
+            "functional/immutable-data": "off",
+            "functional/no-let": "off", // Let is necessary in many React patterns
+            "@typescript-eslint/no-explicit-any": "warn", // Sometimes needed
+            "@typescript-eslint/no-non-null-assertion": "warn", // Zustand patterns
         },
     },
 
-    // TypeScript files - Electron (main process) files
+    // Electron backend files
     {
-        files: ["electron/**/*.ts", "electron/**/*.tsx", "vitest.electron.config.ts"],
+        files: ["electron/**/*.ts"],
         ignores: ["electron/test/**/*.ts", "electron/**/*.test.{ts,tsx}", "electron/**/*.spec.{ts,tsx}"],
         languageOptions: {
-            parser: tseslint.parser,
+            parser: tseslintParser,
             parserOptions: {
                 project: "./tsconfig.electron.json",
                 sourceType: "module",
@@ -579,47 +356,45 @@ export default [
                 module: "readonly",
             },
         },
+        settings: {
+            "boundaries/elements": [
+                { type: "main", pattern: "electron/main.ts" },
+                { type: "preload", pattern: "electron/preload.ts" },
+                { type: "managers", pattern: "electron/managers/**/*" },
+                { type: "services", pattern: "electron/services/**/*" },
+                { type: "utils", pattern: "electron/utils/**/*" },
+                { type: "events", pattern: "electron/events/**/*" },
+                { type: "types", pattern: "electron/types.ts" },
+            ],
+        },
         plugins: {
-            "@typescript-eslint": tseslint.plugin,
+            "@typescript-eslint": tseslint,
             import: pluginImport,
             promise: pluginPromise,
             "unused-imports": pluginUnusedImports,
-            prettier: pluginPrettier,
-            sonarjs: pluginSonarjs,
             security: pluginSecurity,
-            "eslint-comments": pluginEslintComments,
+            sonarjs: pluginSonarjs,
             perfectionist: pluginPerfectionist,
-            // new plugins
             unicorn: pluginUnicorn,
             functional: pluginFunctional,
-            filenames: pluginFilenames,
-            regexp: pluginRegexp,
+            boundaries: pluginBoundaries,
+            "prefer-arrow": pluginPreferArrow,
+            "sort-class-members": pluginSortClassMembers,
+            redos: pluginRedos,
             tsdoc: pluginTsdoc,
         },
         rules: {
+            // TypeScript backend rules
             ...tseslint.configs.recommended.rules,
             ...tseslint.configs.strict.rules,
             ...tseslint.configs.stylistic.rules,
-            ...tseslint.configs.stylisticTypeChecked.rules,
-            // import plugin: enable a few best-practice rules manually
-            "import/order": [
-                "off",
-                {
-                    alphabetize: {
-                        order: "asc",
-                    },
-                    groups: ["builtin", "external", "internal", "parent", "sibling", "index"],
 
-                    distinctGroup: true,
-                    sortTypesGroup: false,
-                },
-            ],
-            "import/newline-after-import": "warn",
-            // promise plugin: enable a few best-practice rules manually
-            "promise/always-return": "warn",
-            "promise/no-return-wrap": "warn",
-            "promise/param-names": "warn",
-            // unused-imports plugin
+            // Node.js specific
+            // "no-console": "off", // Logging is important for backend - DISABLED FOR NOW
+            "prefer-const": "error",
+            "no-var": "error",
+
+            // Import management
             "unused-imports/no-unused-imports": "error",
             "unused-imports/no-unused-vars": [
                 "warn",
@@ -630,83 +405,132 @@ export default [
                     argsIgnorePattern: "^_",
                 },
             ],
-            // prettier
-            "prettier/prettier": [
+
+            // Architecture boundaries for Electron
+            "boundaries/element-types": [
                 "error",
                 {
-                    usePrettierrc: true,
+                    default: "disallow",
+                    rules: [
+                        { from: "main", allow: ["managers", "services", "utils", "events", "types"] },
+                        { from: "preload", allow: ["utils", "types"] },
+                        { from: "managers", allow: ["services", "utils", "events", "types"] },
+                        { from: "services", allow: ["services", "utils", "types"] },
+                        { from: "utils", allow: ["types"] },
+                        { from: "events", allow: ["types"] },
+                        { from: "types", allow: [] },
+                    ],
                 },
             ],
-            // sonarjs
-            "sonarjs/no-duplicate-string": "warn",
-            "sonarjs/no-identical-functions": "warn",
-            // security
-            "security/detect-object-injection": "warn",
-            // eslint-comments
-            "eslint-comments/no-unused-disable": "warn",
-            "eslint-comments/no-unlimited-disable": "warn",
-            // perfectionist
-            "perfectionist/sort-objects": [
+
+            // Class organization for service classes
+            "sort-class-members/sort-class-members": [
                 "warn",
                 {
-                    type: "natural",
-                    order: "asc",
-                    fallbackSort: { type: "alphabetical", order: "asc" },
-                    newlinesBetween: 1,
+                    order: [
+                        "[static-properties]",
+                        "[static-methods]",
+                        "[properties]",
+                        "constructor",
+                        "[methods]",
+                        "[private-methods]",
+                    ],
                 },
             ],
-            "perfectionist/sort-imports": [
-                "warn",
-                {
-                    type: "natural",
-                    order: "asc",
-                    fallbackSort: { type: "alphabetical", order: "asc" },
-                    newlinesBetween: 1,
-                },
-            ],
-            // unicorn
+
+            // Backend-specific unicorn rules
             "unicorn/filename-case": [
                 "warn",
                 {
                     cases: {
-                        kebabCase: true,
+                        pascalCase: true, // Service classes
                         camelCase: true,
-                        pascalCase: true,
                     },
                 },
             ],
-            "unicorn/no-abusive-eslint-disable": "warn",
-            "unicorn/no-array-callback-reference": "warn",
-            "unicorn/no-array-for-each": "warn",
-            "unicorn/no-null": "warn",
-            // functional
-            "functional/immutable-data": "off",
-            "functional/no-let": "warn",
-            // regexp
-            "regexp/no-dupe-characters-character-class": "warn",
-            "regexp/no-empty-alternative": "warn",
-            // tsdoc
+            "unicorn/no-keyword-prefix": [
+                "error",
+                {
+                    disallowedPrefixes: ["interface", "type", "enum"],
+                    checkProperties: false,
+                },
+            ],
+            "unicorn/prefer-module": "off", // CommonJS required for Electron
+            "unicorn/prefer-node-protocol": "error", // Enforce for backend
+            "unicorn/prefer-top-level-await": "off", // Not suitable for Electron main
+
+            // Security for backend
+            "security/detect-object-injection": "error",
+            "security/detect-non-literal-require": "error",
+            "security/detect-non-literal-fs-filename": "error",
+            "redos/no-vulnerable": "error",
+
+            // Documentation
             "tsdoc/syntax": "warn",
 
-            // Disable React-specific rules for electron (Node.js) files
-            "react/jsx-uses-react": "off",
-            "react/react-in-jsx-scope": "off",
-            "react/prop-types": "off",
-            "react/jsx-boolean-value": "off",
-            "react/self-closing-comp": "off",
-            "react-hooks/rules-of-hooks": "off",
-            "react-hooks/exhaustive-deps": "off",
-            "jsx-a11y/alt-text": "off",
-            "jsx-a11y/anchor-is-valid": "off",
-            "jsx-a11y/no-autofocus": "off",
+            // Allow more flexibility for backend patterns
+            "functional/immutable-data": "off",
+            "functional/no-let": "off",
+            "@typescript-eslint/no-explicit-any": "warn",
         },
     },
 
-    // Electron Testing files - separate config to use different tsconfig
+    // Test files (Frontend)
+    {
+        files: ["src/test/**/*.{ts,tsx}", "src/**/*.test.{ts,tsx}", "src/**/*.spec.{ts,tsx}"],
+        languageOptions: {
+            parser: tseslintParser,
+            parserOptions: {
+                project: "./tsconfig.json",
+                sourceType: "module",
+                ecmaVersion: "latest",
+                tsconfigRootDir: __dirname,
+            },
+            globals: {
+                ...globals.browser,
+                ...globals.node,
+                vi: "readonly",
+                describe: "readonly",
+                it: "readonly",
+                test: "readonly",
+                expect: "readonly",
+                beforeEach: "readonly",
+                afterEach: "readonly",
+                beforeAll: "readonly",
+                afterAll: "readonly",
+            },
+        },
+        settings: {
+            react: { version: "detect" },
+        },
+        plugins: {
+            "@typescript-eslint": tseslint,
+            vitest,
+            "vitest-globals": vitestGlobals,
+            "testing-library": pluginTestingLibrary,
+            import: pluginImport,
+            "unused-imports": pluginUnusedImports,
+            react: pluginReact,
+            "react-hooks": pluginReactHooks,
+        },
+        rules: {
+            ...tseslint.configs.recommended.rules,
+            ...vitest.configs.recommended.rules,
+            "testing-library/await-async-queries": "error",
+            "testing-library/no-await-sync-queries": "error",
+            "testing-library/no-debugging-utils": "warn",
+            "testing-library/prefer-screen-queries": "warn",
+            "@typescript-eslint/no-explicit-any": "off",
+            "@typescript-eslint/no-non-null-assertion": "off",
+            "unused-imports/no-unused-imports": "error",
+        },
+    },
+
+    // Test files (Backend)
     {
         files: ["electron/test/**/*.{ts,tsx}", "electron/**/*.test.{ts,tsx}", "electron/**/*.spec.{ts,tsx}"],
         languageOptions: {
-            parser: tseslint.parser,
+            parser: tseslintParser,
             parserOptions: {
                 project: "./tsconfig.electron.test.json",
                 sourceType: "module",
@@ -727,133 +551,21 @@ export default [
             },
         },
         plugins: {
-            "@typescript-eslint": tseslint.plugin,
+            "@typescript-eslint": tseslint,
             vitest,
-            "testing-library": pluginTestingLibrary,
             import: pluginImport,
             "unused-imports": pluginUnusedImports,
         },
         rules: {
             ...tseslint.configs.recommended.rules,
             ...vitest.configs.recommended.rules,
-            "testing-library/await-async-queries": "error",
-            "testing-library/await-async-utils": "error",
-            "testing-library/no-await-sync-queries": "error",
-            "testing-library/no-debugging-utils": "warn",
-            "testing-library/no-dom-import": "warn",
-            "testing-library/prefer-screen-queries": "warn",
-            "testing-library/prefer-user-event": "warn",
-            "testing-library/render-result-naming-convention": "warn",
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-non-null-assertion": "off",
             "unused-imports/no-unused-imports": "error",
-            "unused-imports/no-unused-vars": [
-                "warn",
-                {
-                    vars: "all",
-                    varsIgnorePattern: "^_",
-                    args: "after-used",
-                    argsIgnorePattern: "^_",
-                },
-            ],
         },
     },
 
-    // Testing files (excluding electron tests which are handled separately)
-    {
-        files: [
-            "tests/**",
-            "**/__tests__/**",
-            "**/*.test.{js,ts,jsx,tsx}",
-            "**/*.spec.{js,ts,jsx,tsx}",
-            "vitest*.{js,ts}",
-            "src/test/**/*.{ts,tsx}",
-        ],
-        ignores: ["electron/test/**/*.{ts,tsx}", "electron/**/*.test.{ts,tsx}", "electron/**/*.spec.{ts,tsx}"],
-        languageOptions: {
-            parser: tseslint.parser,
-            parserOptions: {
-                sourceType: "module",
-                ecmaVersion: "latest",
-            },
-            globals: {
-                ...globals.node,
-                ...globals.browser,
-                vi: "readonly",
-                describe: "readonly",
-                it: "readonly",
-                test: "readonly",
-                expect: "readonly",
-                beforeEach: "readonly",
-                afterEach: "readonly",
-                beforeAll: "readonly",
-                afterAll: "readonly",
-            },
-        },
-        settings: {
-            react: {
-                version: "detect",
-            },
-        },
-        plugins: {
-            "@typescript-eslint": tseslint.plugin,
-            vitest,
-            "testing-library": pluginTestingLibrary,
-            import: pluginImport,
-            "unused-imports": pluginUnusedImports,
-        },
-        rules: {
-            ...tseslint.configs.recommended.rules,
-            ...vitest.configs.recommended.rules,
-            // testing-library rules
-            "testing-library/await-async-queries": "error",
-            "testing-library/await-async-utils": "error",
-            "testing-library/no-await-sync-queries": "error",
-            "testing-library/no-debugging-utils": "warn",
-            "testing-library/no-dom-import": "warn",
-            "testing-library/prefer-screen-queries": "warn",
-            "testing-library/prefer-user-event": "warn",
-            "testing-library/render-result-naming-convention": "warn",
-
-            // Relax some rules for tests
-            "@typescript-eslint/no-explicit-any": "off",
-            "@typescript-eslint/no-non-null-assertion": "off",
-            "unused-imports/no-unused-imports": "error",
-            "unused-imports/no-unused-vars": [
-                "warn",
-                {
-                    vars: "all",
-                    varsIgnorePattern: "^_",
-                    args: "after-used",
-                    argsIgnorePattern: "^_",
-                },
-            ],
-
-            ...(vitestGlobals.configs.recommended.rules || {}),
-        },
-    },
-
-    {
-        files: [
-            "**/__tests__/*.{j,t}s?(x)",
-            "**/*.spec.{j,t}s?(x)",
-            "tests/**/*",
-            "vitest*.{j,t}s",
-            "electron/test/**/*.{j,t}s",
-            "src/test/**/*.{j,t}s",
-        ],
-        plugins: {
-            "vitest-globals": vitestGlobals,
-        },
-        languageOptions: {
-            // Removed 'env' key as it's not allowed here
-            // If you need globals, set them directly:
-            // globals: { ... }
-        },
-        // Remove 'extends' and spread the recommended config directly
-    },
-
-    // Global browser variables
+    // Global browser environment
     {
         languageOptions: {
             globals: globals.browser,

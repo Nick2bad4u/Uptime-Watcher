@@ -68,21 +68,22 @@ export const AddSiteForm = React.memo(function AddSiteForm() {
     const [showButtonLoading, setShowButtonLoading] = useState(false);
 
     useEffect(() => {
-        if (isLoading) {
-            const timeoutId = setTimeout(() => {
-                setShowButtonLoading(true);
-            }, UI_DELAYS.LOADING_BUTTON);
-            return () => clearTimeout(timeoutId);
-        } else {
+        if (!isLoading) {
             setShowButtonLoading(false);
-            return undefined;
+            return;
         }
+
+        const timeoutId = setTimeout(() => {
+            setShowButtonLoading(true);
+        }, UI_DELAYS.LOADING_BUTTON);
+
+        return () => clearTimeout(timeoutId);
     }, [isLoading]);
 
     // Memoized submit handler
     const onSubmit = useCallback(
-        (e: React.FormEvent) =>
-            handleSubmit(e, {
+        (event: React.FormEvent) =>
+            handleSubmit(event, {
                 ...formState,
                 addMonitorToSite,
                 clearError,
@@ -204,7 +205,7 @@ export const AddSiteForm = React.memo(function AddSiteForm() {
                             helpText="Enter a port number (1-65535)"
                             id="port"
                             label="Port"
-                            max={65535}
+                            max={65_535}
                             min={1}
                             onChange={setPort}
                             placeholder="80"

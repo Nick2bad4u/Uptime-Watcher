@@ -1,3 +1,13 @@
+/**
+ * Comprehensive tests for the SiteDetails component.
+ * Tests various scenarios including loading states, error handling, and user interactions.
+ *
+ * Note: Mock components intentionally ignore certain props by destructuring them away.
+ * This is a valid testing pattern to avoid prop drilling in test components.
+ */
+
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import React from "react";

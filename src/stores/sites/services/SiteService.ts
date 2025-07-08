@@ -7,67 +7,60 @@ import type { Site } from "../../types";
 
 import { waitForElectronAPI } from "../../utils";
 
-export class SiteService {
-    /**
-     * Initialize the service by ensuring electron API is available
-     */
-    static async initialize(): Promise<void> {
-        await waitForElectronAPI();
-    }
-
-    /**
-     * Get all sites from the backend
-     */
-    static async getSites(): Promise<Site[]> {
-        await this.initialize();
-        return window.electronAPI.sites.getSites();
-    }
-
+export const SiteService = {
     /**
      * Add a new site
      */
-    static async addSite(site: Site): Promise<Site> {
+    async addSite(site: Site): Promise<Site> {
         await this.initialize();
         return window.electronAPI.sites.addSite(site);
-    }
-
-    /**
-     * Update an existing site
-     */
-    static async updateSite(identifier: string, updates: Partial<Site>): Promise<void> {
-        await this.initialize();
-        return window.electronAPI.sites.updateSite(identifier, updates);
-    }
-
-    /**
-     * Remove a site
-     */
-    static async removeSite(identifier: string): Promise<void> {
-        await this.initialize();
-        return window.electronAPI.sites.removeSite(identifier);
-    }
-
+    },
     /**
      * Check a site now
      */
-    static async checkSiteNow(siteId: string, monitorId: string): Promise<void> {
+    async checkSiteNow(siteId: string, monitorId: string): Promise<void> {
         await this.initialize();
         return window.electronAPI.sites.checkSiteNow(siteId, monitorId);
-    }
-
+    },
     /**
      * Download SQLite backup
      */
-    static async downloadSQLiteBackup(): Promise<{ buffer: ArrayBuffer; fileName: string }> {
+    async downloadSQLiteBackup(): Promise<{ buffer: ArrayBuffer; fileName: string }> {
         await this.initialize();
         return window.electronAPI.data.downloadSQLiteBackup();
-    }
-
+    },
+    /**
+     * Get all sites from the backend
+     */
+    async getSites(): Promise<Site[]> {
+        await this.initialize();
+        return window.electronAPI.sites.getSites();
+    },
+    /**
+     * Initialize the service by ensuring electron API is available
+     */
+    async initialize(): Promise<void> {
+        await waitForElectronAPI();
+    },
     /**
      * Remove a monitor from a site
      */
-    static async removeMonitor(siteIdentifier: string, monitorId: string): Promise<void> {
+    async removeMonitor(siteIdentifier: string, monitorId: string): Promise<void> {
         await this.initialize();
         return window.electronAPI.sites.removeMonitor(siteIdentifier, monitorId);
-    }
-}
+    },
+    /**
+     * Remove a site
+     */
+    async removeSite(identifier: string): Promise<void> {
+        await this.initialize();
+        return window.electronAPI.sites.removeSite(identifier);
+    },
+    /**
+     * Update an existing site
+     */
+    async updateSite(identifier: string, updates: Partial<Site>): Promise<void> {
+        await this.initialize();
+        return window.electronAPI.sites.updateSite(identifier, updates);
+    },
+};

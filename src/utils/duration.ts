@@ -7,7 +7,7 @@ export function calculateMaxDuration(timeout: number, retryAttempts: number): st
     const timeoutTime = timeout * totalAttempts;
     const backoffTime =
         retryAttempts > 0
-            ? Array.from({ length: retryAttempts }, (_, i) => Math.min(0.5 * Math.pow(2, i), 5)).reduce(
+            ? Array.from({ length: retryAttempts }, (_, index) => Math.min(0.5 * Math.pow(2, index), 5)).reduce(
                   (a, b) => a + b,
                   0
               )

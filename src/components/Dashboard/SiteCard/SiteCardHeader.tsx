@@ -11,13 +11,13 @@ import { ActionButtonGroup } from "./components/ActionButtonGroup";
 import { MonitorSelector } from "./components/MonitorSelector";
 
 /** Props for the SiteCardHeader component */
-interface SiteCardHeaderProps {
+interface SiteCardHeaderProperties {
     /** Site data to display */
     site: Site;
     /** Currently selected monitor ID */
     selectedMonitorId: string;
     /** Handler for monitor selection changes */
-    onMonitorIdChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    onMonitorIdChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
     /** Handler for immediate check button */
     onCheckNow: () => void;
     /** Handler for start monitoring button */
@@ -50,7 +50,7 @@ export const SiteCardHeader = React.memo(function SiteCardHeader({
     onStopMonitoring,
     selectedMonitorId,
     site,
-}: SiteCardHeaderProps) {
+}: SiteCardHeaderProperties) {
     return (
         <div className="flex items-center justify-between">
             <ThemedText variant="primary" size="lg" weight="semibold">

@@ -5,7 +5,11 @@
  * inputs, selects, badges, and specialized components for status display.
  * All components support the application's theming system with variants,
  * surfaces, and responsive design capabilities.
+ *
+ * Note: className is a standard React prop and should not be renamed.
  */
+
+/* eslint-disable unicorn/no-keyword-prefix */
 
 import React from "react";
 
@@ -51,18 +55,18 @@ const CSS_CLASSES = {
     THEMED_TEXT: "themed-text",
 } as const;
 
-interface ThemeProviderProps {
+interface ThemeProviderProperties {
     readonly children: React.ReactNode;
 }
 
-export function ThemeProvider({ children }: ThemeProviderProps) {
+export function ThemeProvider({ children }: ThemeProviderProperties) {
     // Initialize theme on mount
     useTheme();
 
-    return <>{children}</>;
+    return children;
 }
 
-interface ThemedBoxProps {
+interface ThemedBoxProperties {
     readonly variant?: BoxVariant;
     readonly surface?: BoxSurface;
     readonly padding?: BoxPadding;
@@ -78,7 +82,7 @@ interface ThemedBoxProps {
     readonly as?: BoxElement;
     readonly role?: string;
     readonly tabIndex?: number;
-    // eslint-disable-next-line sonarjs/no-duplicate-string -- Standard ARIA attribute name
+
     readonly "aria-label"?: string;
 }
 
@@ -99,7 +103,7 @@ export function ThemedBox({
     surface = "base",
     tabIndex,
     variant = "primary",
-}: ThemedBoxProps) {
+}: ThemedBoxProperties) {
     const classNames = [
         CSS_CLASSES.THEMED_BOX,
         `themed-box--background-${variant}`,
@@ -115,7 +119,7 @@ export function ThemedBox({
 
     // For interactive elements, add proper accessibility attributes
     const isInteractive = Boolean(onClick);
-    const elementProps = {
+    const elementProperties = {
         className: classNames,
         onClick: onClick ? (e: React.MouseEvent<HTMLElement>) => onClick(e) : undefined,
         onMouseEnter,
@@ -140,10 +144,10 @@ export function ThemedBox({
             }),
     };
 
-    return React.createElement(Component, elementProps, children);
+    return React.createElement(Component, elementProperties, children);
 }
 
-interface ThemedTextProps {
+interface ThemedTextProperties {
     readonly variant?: TextVariant;
     readonly size?: TextSize;
     readonly weight?: TextWeight;
@@ -161,7 +165,7 @@ export function ThemedText({
     style = {},
     variant = "primary",
     weight = "normal",
-}: ThemedTextProps) {
+}: ThemedTextProperties) {
     const classNames = [
         CSS_CLASSES.THEMED_TEXT,
         `themed-text--${variant}`,
@@ -180,7 +184,7 @@ export function ThemedText({
     );
 }
 
-interface ThemedButtonProps {
+interface ThemedButtonProperties {
     readonly variant?: ButtonVariant;
     readonly size?: ButtonSize;
     readonly type?: "button" | "submit" | "reset";
@@ -200,30 +204,41 @@ interface ThemedButtonProps {
 
 // Utility: map color name to CSS class for icon coloring
 function getIconColorClass(color?: string): string | undefined {
-    if (!color) return undefined;
+    if (!color) {
+        return undefined;
+    }
     switch (color) {
-        case "primary":
+        case "primary": {
             return "themed-icon--primary";
-        case "secondary":
+        }
+        case "secondary": {
             return "themed-icon--secondary";
-        case "success":
+        }
+        case "success": {
             return "themed-icon--success";
-        case "warning":
+        }
+        case "warning": {
             return "themed-icon--warning";
+        }
         case "error":
-        case "danger":
+        case "danger": {
             return "themed-icon--error";
-        case "info":
+        }
+        case "info": {
             return "themed-icon--info";
-        default:
+        }
+        default: {
             // If it's a hex or rgb(a) or custom string, fallback to inline style
             return undefined;
+        }
     }
 }
 
 // Utility: always wrap icon in a <span> with color class or style
 function renderColoredIcon(icon: React.ReactNode, color?: string) {
-    if (!icon) return icon;
+    if (!icon) {
+        return icon;
+    }
     const colorClass = getIconColorClass(color);
     if (colorClass) {
         return <span className={colorClass}>{icon}</span>;
@@ -250,7 +265,7 @@ export function ThemedButton({
     title,
     type = "button",
     variant = "primary",
-}: ThemedButtonProps) {
+}: ThemedButtonProperties) {
     const classNames = [
         CSS_CLASSES.THEMED_BUTTON,
         `themed-button--${variant}`,
@@ -272,7 +287,6 @@ export function ThemedButton({
             );
         }
         if (icon) {
-            // eslint-disable-next-line functional/no-let -- we assign iconElement conditionally
             let iconElement: React.ReactNode;
             if (React.isValidElement(icon) && iconColor) {
                 iconElement = renderColoredIcon(icon, iconColor);
@@ -314,42 +328,46 @@ export function ThemedButton({
     );
 }
 
-interface StatusIndicatorProps {
+interface StatusIndicatorProperties {
     readonly status: "up" | "down" | "pending" | "unknown" | "paused" | "mixed";
     readonly size?: "sm" | "md" | "lg";
     readonly showText?: boolean;
     readonly className?: string;
 }
 
-export function StatusIndicator({ className = "", showText = false, size = "md", status }: StatusIndicatorProps) {
+export function StatusIndicator({ className = "", showText = false, size = "md", status }: StatusIndicatorProperties) {
     const { getStatusColor } = useTheme();
     const { currentTheme } = useTheme();
 
     const getSizeStyles = () => {
         switch (size) {
-            case "sm":
+            case "sm": {
                 return {
                     fontSize: currentTheme.typography.fontSize.xs,
                     height: "8px",
                     iconSize: "12px",
                     width: "8px",
                 };
-            case "md":
+            }
+            case "md": {
                 return {
                     fontSize: currentTheme.typography.fontSize.sm,
                     height: "12px",
                     iconSize: "16px",
                     width: "12px",
                 };
-            case "lg":
+            }
+            case "lg": {
                 return {
                     fontSize: currentTheme.typography.fontSize.base,
                     height: "16px",
                     iconSize: "20px",
                     width: "16px",
                 };
-            default:
+            }
+            default: {
                 return { iconSize: "16px" };
+            }
         }
     };
 
@@ -399,7 +417,7 @@ export function StatusIndicator({ className = "", showText = false, size = "md",
     );
 }
 
-interface ThemedInputProps {
+interface ThemedInputProperties {
     readonly type?: "text" | "number" | "email" | "password" | "url";
     readonly value?: string | number;
     readonly placeholder?: string;
@@ -429,7 +447,7 @@ export function ThemedInput({
     step,
     type = "text",
     value,
-}: ThemedInputProps) {
+}: ThemedInputProperties) {
     const { currentTheme } = useTheme();
     const { getBackgroundClass, getBorderClass, getTextClass } = useThemeClasses();
 
@@ -463,12 +481,12 @@ export function ThemedInput({
             step={step}
             style={styles}
             type={type}
-            {...(value !== undefined ? { value: inputValue } : {})}
+            {...(value === undefined ? {} : { value: inputValue })}
         />
     );
 }
 
-interface ThemedSelectProps {
+interface ThemedSelectProperties {
     readonly value?: string | number;
     readonly disabled?: boolean;
     readonly required?: boolean;
@@ -496,7 +514,7 @@ export function ThemedSelect({
     required = false,
     title,
     value,
-}: ThemedSelectProps) {
+}: ThemedSelectProperties) {
     const { currentTheme } = useTheme();
     const { getBackgroundClass, getBorderClass, getTextClass } = useThemeClasses();
 
@@ -528,14 +546,14 @@ export function ThemedSelect({
             required={required}
             style={styles}
             title={title}
-            {...(value !== undefined ? { value: selectValue } : {})}
+            {...(value === undefined ? {} : { value: selectValue })}
         >
             {children}
         </select>
     );
 }
 
-interface ThemedCheckboxProps {
+interface ThemedCheckboxProperties {
     readonly checked?: boolean;
     readonly disabled?: boolean;
     readonly required?: boolean;
@@ -551,11 +569,11 @@ export function ThemedCheckbox({
     disabled = false,
     onChange,
     required = false,
-}: ThemedCheckboxProps) {
+}: ThemedCheckboxProperties) {
     return (
         <input
             type="checkbox"
-            {...(checked !== undefined ? { checked } : {})}
+            {...(checked === undefined ? {} : { checked })}
             disabled={disabled}
             required={required}
             className={`themed-checkbox ${className}`}
@@ -565,14 +583,14 @@ export function ThemedCheckbox({
     );
 }
 
-interface MiniChartBarProps {
+interface MiniChartBarProperties {
     readonly status: "up" | "down" | "pending" | "unknown" | "paused";
     readonly responseTime?: number;
     readonly timestamp: string | number | Date;
     readonly className?: string;
 }
 
-export function MiniChartBar({ className = "", responseTime, status, timestamp }: MiniChartBarProps) {
+export function MiniChartBar({ className = "", responseTime, status, timestamp }: MiniChartBarProperties) {
     const { getStatusColor } = useTheme();
     const { currentTheme } = useTheme();
 
@@ -593,7 +611,7 @@ export function MiniChartBar({ className = "", responseTime, status, timestamp }
 
 // Enhanced components with better visual feedback and icons
 
-interface ThemedIconButtonProps {
+interface ThemedIconButtonProperties {
     readonly icon: React.ReactNode;
     readonly iconColor?: string;
     readonly variant?: ButtonVariant;
@@ -615,20 +633,25 @@ export function ThemedIconButton({
     size = "md",
     tooltip,
     variant = "ghost",
-}: ThemedIconButtonProps) {
+}: ThemedIconButtonProperties) {
     const getSize = () => {
         switch (size) {
-            case "xs":
+            case "xs": {
                 return "24px";
-            case "sm":
+            }
+            case "sm": {
                 return "32px";
-            case "md":
+            }
+            case "md": {
                 return "40px";
-            case "lg":
+            }
+            case "lg": {
                 return "48px";
+            }
 
-            default:
+            default: {
                 return "40px";
+            }
         }
     };
 
@@ -655,7 +678,7 @@ export function ThemedIconButton({
     );
 }
 
-interface ThemedCardProps {
+interface ThemedCardProperties {
     readonly title?: string;
     readonly subtitle?: string;
     readonly icon?: React.ReactNode;
@@ -689,7 +712,7 @@ export function ThemedCard({
     subtitle,
     title,
     variant = "primary",
-}: ThemedCardProps) {
+}: ThemedCardProperties) {
     const { currentTheme } = useTheme();
 
     const cardStyles: React.CSSProperties = {
@@ -753,7 +776,7 @@ export function ThemedCard({
     );
 }
 
-interface ThemedBadgeProps {
+interface ThemedBadgeProperties {
     readonly variant?: BadgeVariant;
     readonly size?: BadgeSize;
     readonly icon?: React.ReactNode;
@@ -769,71 +792,82 @@ export function ThemedBadge({
     iconColor,
     size = "sm",
     variant = "primary",
-}: ThemedBadgeProps) {
+}: ThemedBadgeProperties) {
     const { currentTheme } = useTheme();
 
     const getVariantStyles = () => {
         switch (variant) {
-            case "primary":
+            case "primary": {
                 return {
                     backgroundColor: currentTheme.colors.primary[100],
                     borderColor: currentTheme.colors.primary[200],
                     color: currentTheme.colors.primary[700],
                 };
-            case "secondary":
+            }
+            case "secondary": {
                 return {
                     backgroundColor: currentTheme.colors.background.secondary,
                     borderColor: currentTheme.colors.border.secondary,
                     color: currentTheme.colors.text.secondary,
                 };
-            case "success":
+            }
+            case "success": {
                 return {
                     backgroundColor: `${currentTheme.colors.success}20`,
                     borderColor: `${currentTheme.colors.success}40`,
                     color: currentTheme.colors.success,
                 };
-            case "warning":
+            }
+            case "warning": {
                 return {
                     backgroundColor: `${currentTheme.colors.warning}20`,
                     borderColor: `${currentTheme.colors.warning}40`,
                     color: currentTheme.colors.warning,
                 };
-            case "error":
+            }
+            case "error": {
                 return {
                     backgroundColor: `${currentTheme.colors.error}20`,
                     borderColor: `${currentTheme.colors.error}40`,
                     color: currentTheme.colors.error,
                 };
-            case "info":
+            }
+            case "info": {
                 return {
                     backgroundColor: `${currentTheme.colors.primary[500]}20`,
                     borderColor: `${currentTheme.colors.primary[500]}40`,
                     color: currentTheme.colors.primary[600],
                 };
-            default:
+            }
+            default: {
                 return {};
+            }
         }
     };
 
     const getSizeStyles = () => {
         switch (size) {
-            case "xs":
+            case "xs": {
                 return {
                     fontSize: currentTheme.typography.fontSize.xs,
                     padding: `${currentTheme.spacing.xs} ${currentTheme.spacing.sm}`,
                 };
-            case "sm":
+            }
+            case "sm": {
                 return {
                     fontSize: currentTheme.typography.fontSize.sm,
                     padding: `${currentTheme.spacing.sm} ${currentTheme.spacing.md}`,
                 };
-            case "md":
+            }
+            case "md": {
                 return {
                     fontSize: currentTheme.typography.fontSize.base,
                     padding: `${currentTheme.spacing.md} ${currentTheme.spacing.lg}`,
                 };
-            default:
+            }
+            default: {
                 return {};
+            }
         }
     };
 
@@ -866,7 +900,7 @@ export function ThemedBadge({
     );
 }
 
-interface ThemedProgressProps {
+interface ThemedProgressProperties {
     readonly value: number;
     readonly max?: number;
     readonly variant?: "primary" | "success" | "warning" | "error";
@@ -884,38 +918,48 @@ export function ThemedProgress({
     size = "md",
     value,
     variant = "primary",
-}: ThemedProgressProps) {
+}: ThemedProgressProperties) {
     const { currentTheme } = useTheme();
 
     const percentage = Math.min(Math.max((value / max) * 100, 0), 100);
 
     const getVariantColor = () => {
         switch (variant) {
-            case "primary":
+            case "primary": {
                 return currentTheme.colors.primary[500];
-            case "success":
+            }
+            case "success": {
                 return currentTheme.colors.success;
-            case "warning":
+            }
+            case "warning": {
                 return currentTheme.colors.warning;
-            case "error":
+            }
+            case "error": {
                 return currentTheme.colors.error;
-            default:
+            }
+            default: {
                 return currentTheme.colors.primary[500];
+            }
         }
     };
 
     const getHeight = () => {
         switch (size) {
-            case "xs":
+            case "xs": {
                 return "4px";
-            case "sm":
+            }
+            case "sm": {
                 return "6px";
-            case "md":
+            }
+            case "md": {
                 return "8px";
-            case "lg":
+            }
+            case "lg": {
                 return "12px";
-            default:
+            }
+            default: {
                 return "8px";
+            }
         }
     };
 
@@ -967,13 +1011,13 @@ export function ThemedProgress({
     );
 }
 
-interface ThemedTooltipProps {
+interface ThemedTooltipProperties {
     readonly content: string;
     readonly className?: string;
     readonly children: React.ReactNode;
 }
 
-export function ThemedTooltip({ children, className = "", content }: ThemedTooltipProps) {
+export function ThemedTooltip({ children, className = "", content }: ThemedTooltipProperties) {
     return (
         <div className={`themed-tooltip ${className}`} title={content}>
             {children}

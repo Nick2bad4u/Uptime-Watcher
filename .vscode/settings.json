@@ -5,7 +5,18 @@
     "typescript.disableAutomaticTypeAcquisition": true,
     "typescript.suggest.autoImports": true,
     "typescript.tsserver.experimental.enableProjectDiagnostics": true,
-    "typescript.tsserver.exclude": ["**/node_modules"],
+    "typescript.tsserver.exclude": ["**/node_modules/**"],
+
+    // Exclude node_modules from TypeScript checks and problems
+    "typescript.check.npmIsInstalled": false,
+    "typescript.workspaceSymbols.excludeLibrarySymbols": true,
+
+    // ESLint exclusions
+    "eslint.workingDirectories": ["."],
+    "eslint.ignoreUntitled": true,
+    "eslint.options": {
+        "ignorePattern": "**/node_modules/**"
+    },
     "http.proxySupport": "off",
     "eslint.validate": [
         "javascript",
@@ -24,27 +35,39 @@
         "github-actions-workflow"
     ],
     "files.watcherExclude": {
-        "**/node_modules/*": true
+        "**/node_modules/**": true,
+        "**/dist/**": true,
+        "**/dist-electron/**": true,
+        "**/coverage/**": true,
+        "**/release/**": true
     },
     "files.associations": {
         "*.css": "tailwindcss"
     },
     "files.exclude": {
-        "**/node_modules": true,
-        "**/release": true,
+        "**/node_modules/**": true,
+        "**/release/**": true,
         "**/.husky/**": true,
-        "**/dist": true,
+        "**/dist/**": true,
         "**/coverage/**": true,
         "**/dist-electron/**": true
     },
     "search.exclude": {
-        "**/node_modules": true,
-        "**/release": true,
+        "**/node_modules/**": true,
+        "**/release/**": true,
         "**/.husky/**": true,
-        "**/dist": true,
+        "**/dist/**": true,
         "**/dist-electron/**": true,
         "**/coverage/**": true
     },
+
+    // Additional exclusions for problems and diagnostics
+    "problems.decorations.enabled": true,
+    "problems.showCurrentInStatus": true,
+
+    // Language server exclusions
+    "js/ts.implicitProjectConfig.experimentalDecorators": true,
+    "js/ts.implicitProjectConfig.checkJs": false,
     "prettier-eslint-typescript.eslintConfig": {
         "rules": {
             "curly": "error",
@@ -79,6 +102,19 @@
         "trailingComma": "none",
         "useTabs": false
     },
+
+    // Extension-specific settings to ignore node_modules
+    "errorLens.excludeBySource": ["ts(2339)", "ts(2307)", "ts(2304)", "eslint"],
+    "errorLens.exclude": ["**/node_modules/**"],
+
+    // SonarLint exclusions
+    "sonarlint.pathsToExclude": ["**/node_modules/**", "**/dist/**", "**/coverage/**"],
+
+    // Disable auto-indexing of node_modules
+    "typescript.preferences.includeCompletionsForImportStatements": false,
+    "typescript.preferences.includeCompletionsForModuleExports": false,
+    "typescript.preferences.includeCompletionsWithLowerCaseLetters": false,
+
     "debug.defaultCompound": "Dev: Vite + Electron Main",
     "mcp": {
         "servers": {

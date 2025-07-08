@@ -10,7 +10,7 @@ import { MetricCard } from "./components/MetricCard";
 /**
  * Props for the SiteCardMetrics component.
  */
-interface SiteCardMetricsProps {
+interface SiteCardMetricsProperties {
     /** Current status of the site */
     status: string;
     /** Uptime percentage (0-100) */
@@ -48,7 +48,7 @@ export const SiteCardMetrics = React.memo(function SiteCardMetrics({
     responseTime,
     status,
     uptime,
-}: SiteCardMetricsProps) {
+}: SiteCardMetricsProperties) {
     // Memoize the computed values to avoid recalculation on every render
     const metrics = useMemo(
         () => [
@@ -62,7 +62,7 @@ export const SiteCardMetrics = React.memo(function SiteCardMetrics({
             },
             {
                 label: "Response",
-                value: responseTime !== undefined ? `${responseTime} ms` : "-",
+                value: responseTime === undefined ? "-" : `${responseTime} ms`,
             },
             {
                 label: "Checks",

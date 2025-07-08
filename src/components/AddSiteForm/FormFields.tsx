@@ -27,13 +27,17 @@ const createAriaLabel = (label: string, required: boolean): string => `${label}$
  * @returns The aria-describedby value or undefined
  */
 const getAriaDescribedBy = (id: string, error?: string, helpText?: string): string | undefined => {
-    if (error) return `${id}-error`;
-    if (helpText) return `${id}-help`;
+    if (error) {
+        return `${id}-error`;
+    }
+    if (helpText) {
+        return `${id}-help`;
+    }
     return undefined;
 };
 
 /** Props for the base FormField wrapper component */
-export interface FormFieldProps {
+export interface FormFieldProperties {
     /** Form input element(s) to wrap */
     children: React.ReactNode;
     /** Error message to display */
@@ -62,7 +66,7 @@ export const FormField = React.memo(function FormField({
     id,
     label,
     required = false,
-}: FormFieldProps) {
+}: FormFieldProperties) {
     return (
         <div>
             <label className="block mb-1" htmlFor={id}>
@@ -90,7 +94,7 @@ export const FormField = React.memo(function FormField({
 });
 
 /** Props for the TextField component */
-export interface TextFieldProps {
+export interface TextFieldProperties {
     /** Whether the field is disabled */
     disabled?: boolean;
     /** Error message to display */
@@ -137,7 +141,7 @@ export const TextField = React.memo(function TextField({
     required = false,
     type = "text",
     value,
-}: TextFieldProps) {
+}: TextFieldProperties) {
     return (
         <FormField
             {...(error !== undefined && { error })}
@@ -156,7 +160,7 @@ export const TextField = React.memo(function TextField({
                 id={id}
                 {...(max !== undefined && { max })}
                 {...(min !== undefined && { min })}
-                onChange={(e) => onChange(e.target.value)}
+                onChange={(event) => onChange(event.target.value)}
                 {...(placeholder !== undefined && { placeholder })}
                 required={required}
                 type={type}
@@ -175,7 +179,7 @@ export interface SelectOption {
 }
 
 /** Props for the SelectField component */
-export interface SelectFieldProps {
+export interface SelectFieldProperties {
     /** Whether the field is disabled */
     disabled?: boolean;
     /** Error message to display */
@@ -207,7 +211,7 @@ export const SelectField = React.memo(function SelectField({
     placeholder,
     required = false,
     value,
-}: SelectFieldProps) {
+}: SelectFieldProperties) {
     return (
         <FormField
             {...(error !== undefined && { error })}
@@ -224,7 +228,7 @@ export const SelectField = React.memo(function SelectField({
                 aria-label={createAriaLabel(label, required)}
                 disabled={disabled}
                 id={id}
-                onChange={(e) => onChange(e.target.value)}
+                onChange={(event) => onChange(event.target.value)}
                 required={required}
                 title={createAriaLabel(label, required)}
                 value={value}
@@ -249,7 +253,7 @@ export interface RadioOption {
 }
 
 /** Props for the RadioGroup component */
-export interface RadioGroupProps {
+export interface RadioGroupProperties {
     /** Whether the radio group is disabled */
     disabled?: boolean;
     /** Error message to display */
@@ -303,7 +307,7 @@ export const RadioGroup = React.memo(function RadioGroup({
     options,
     required = false,
     value,
-}: RadioGroupProps) {
+}: RadioGroupProperties) {
     return (
         <FormField
             {...(error !== undefined && { error })}

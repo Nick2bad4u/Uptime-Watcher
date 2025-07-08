@@ -99,7 +99,7 @@ export function useAddSiteForm(): AddSiteFormState & AddSiteFormActions {
     const [selectedExistingSite, setSelectedExistingSite] = useState("");
 
     // UI state
-    const [formError, setFormError] = useState<string | undefined>(undefined);
+    const [formError, setFormError] = useState<string | undefined>();
 
     // Reset fields when monitor type changes
     useEffect(() => {
@@ -123,12 +123,12 @@ export function useAddSiteForm(): AddSiteFormState & AddSiteFormActions {
     // Simple validation function without logging - only used for submit button state
     const isFormValid = useCallback(() => {
         // Basic check for submit button enablement only
-        if (addMode === "new" && !name.trim()) return false;
-        if (addMode === "existing" && !selectedExistingSite) return false;
-        if (monitorType === "http" && !url.trim()) return false;
-        if (monitorType === "port" && (!host.trim() || !port.trim())) return false;
-
-        return true;
+        return !(
+            (addMode === "new" && !name.trim()) ||
+            (addMode === "existing" && !selectedExistingSite) ||
+            (monitorType === "http" && !url.trim()) ||
+            (monitorType === "port" && (!host.trim() || !port.trim()))
+        );
     }, [addMode, name, selectedExistingSite, monitorType, url, host, port]);
 
     // Reset form to initial state

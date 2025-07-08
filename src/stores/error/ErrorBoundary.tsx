@@ -11,7 +11,7 @@ interface ErrorBoundaryState {
     errorInfo?: React.ErrorInfo;
 }
 
-interface ErrorBoundaryProps {
+interface ErrorBoundaryProperties {
     children: React.ReactNode;
     fallback?: React.ComponentType<{ error?: Error; retry: () => void }>;
     onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
@@ -37,9 +37,9 @@ const DefaultErrorFallback: React.FC<{ error?: Error; retry: () => void }> = ({ 
 /**
  * Error boundary component for wrapping store-connected components
  */
-export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
-    constructor(props: ErrorBoundaryProps) {
-        super(props);
+export class ErrorBoundary extends React.Component<ErrorBoundaryProperties, ErrorBoundaryState> {
+    constructor(properties: ErrorBoundaryProperties) {
+        super(properties);
         this.state = { hasError: false };
     }
 
@@ -88,9 +88,9 @@ export const withErrorBoundary = <P extends object>(
     Component: React.ComponentType<P>,
     fallback?: React.ComponentType<{ error?: Error; retry: () => void }>
 ) => {
-    const WrappedComponent = (props: P) => (
+    const WrappedComponent = (properties: P) => (
         <ErrorBoundary {...(fallback ? { fallback } : {})}>
-            <Component {...props} />
+            <Component {...properties} />
         </ErrorBoundary>
     );
 

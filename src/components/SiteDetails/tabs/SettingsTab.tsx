@@ -27,13 +27,13 @@ import { calculateMaxDuration } from "../../../utils/duration";
  * @returns Formatted time string (e.g., "30s", "5m", "1h")
  */
 function formatDuration(milliseconds: number): string {
-    if (milliseconds < 60000) {
+    if (milliseconds < 60_000) {
         return `${milliseconds / 1000}s`;
     }
-    if (milliseconds < 3600000) {
-        return `${milliseconds / 60000}m`;
+    if (milliseconds < 3_600_000) {
+        return `${milliseconds / 60_000}m`;
     }
-    return `${milliseconds / 3600000}h`;
+    return `${milliseconds / 3_600_000}h`;
 }
 
 /**
@@ -104,7 +104,7 @@ function getDisplayIdentifier(currentSite: Site, selectedMonitor: Monitor): stri
 /**
  * Props for the SettingsTab component.
  */
-interface SettingsTabProps {
+interface SettingsTabProperties {
     /** Current site being configured */
     readonly currentSite: Site;
     /** Handler for monitor check interval changes */
@@ -182,7 +182,7 @@ export function SettingsTab({
     selectedMonitor,
     setLocalName,
     timeoutChanged,
-}: SettingsTabProps) {
+}: SettingsTabProperties) {
     const { currentTheme } = useTheme();
 
     // Icon colors configuration

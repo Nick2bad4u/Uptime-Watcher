@@ -96,7 +96,7 @@ describe("Remaining Coverage Tests", () => {
             const thumbnail = screen.getByRole("link");
 
             // Use fireEvent for this test as we need to test the specific hover behavior
-            // eslint-disable-next-line testing-library/prefer-user-event
+
             fireEvent.mouseEnter(thumbnail);
 
             // The positioning logic should have been executed

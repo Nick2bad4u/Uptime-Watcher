@@ -27,9 +27,9 @@ function createAndTriggerDownload(buffer: ArrayBuffer, fileName: string, mimeTyp
     const body = document.body;
     if (body) {
         try {
-            body.appendChild(a);
+            body.append(a);
             a.click();
-            body.removeChild(a);
+            a.remove();
         } catch (domError) {
             // Fallback: just click without DOM manipulation
             console.warn("DOM manipulation failed, using fallback click", domError);
@@ -53,17 +53,16 @@ export function downloadFile(options: FileDownloadOptions): void {
         createAndTriggerDownload(buffer, fileName, mimeType);
     } catch (error) {
         // Re-throw specific errors for better test coverage
-        if (error instanceof Error) {
-            if (
-                error.message.includes("createObjectURL") ||
+        if (
+            error instanceof Error &&
+            (error.message.includes("createObjectURL") ||
                 error.message.includes("createElement") ||
                 error.message.includes("Click failed") ||
                 error.message.includes("Failed to create object URL") ||
                 error.message.includes("Failed to create element") ||
-                error.message.includes("createElement not available")
-            ) {
-                throw error;
-            }
+                error.message.includes("createElement not available"))
+        ) {
+            throw error;
         }
 
         // Only try fallback for DOM-related errors
@@ -95,9 +94,9 @@ export function generateBackupFileName(prefix = "backup", extension = "sqlite"):
  * @param downloadFn - Function that returns the backup data as Uint8Array
  * @throws Error if download fails or browser APIs are not available
  */
-export async function handleSQLiteBackupDownload(downloadFn: () => Promise<Uint8Array>): Promise<void> {
+export async function handleSQLiteBackupDownload(downloadFunction: () => Promise<Uint8Array>): Promise<void> {
     // Get the backup data
-    const backupData = await downloadFn();
+    const backupData = await downloadFunction();
 
     // Validate the backup data
     if (!backupData || !(backupData instanceof Uint8Array)) {

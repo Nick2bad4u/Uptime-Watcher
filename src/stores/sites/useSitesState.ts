@@ -36,7 +36,7 @@ export interface SitesStateActions {
 export type SitesStateStore = SitesState & SitesStateActions;
 
 export const createSitesStateActions = (
-    set: (fn: (state: SitesState) => Partial<SitesState>) => void,
+    set: (function_: (state: SitesState) => Partial<SitesState>) => void,
     get: () => SitesState
 ): SitesStateActions => ({
     addSite: (site: Site) => {
@@ -50,7 +50,9 @@ export const createSitesStateActions = (
     },
     getSelectedSite: () => {
         const { selectedSiteId, sites } = get();
-        if (!selectedSiteId) return undefined;
+        if (!selectedSiteId) {
+            return undefined;
+        }
         return sites.find((s) => s.identifier === selectedSiteId) || undefined;
     },
     removeSite: (identifier: string) => {
@@ -59,7 +61,8 @@ export const createSitesStateActions = (
             // Remove the monitor selection for the removed site
             const currentMonitorIds = state.selectedMonitorIds || {};
 
-            const { [identifier]: _removedMonitorId, ...remainingMonitorIds } = currentMonitorIds;
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { [identifier]: _, ...remainingMonitorIds } = currentMonitorIds;
             return {
                 selectedMonitorIds: remainingMonitorIds,
                 selectedSiteId: state.selectedSiteId === identifier ? undefined : state.selectedSiteId,

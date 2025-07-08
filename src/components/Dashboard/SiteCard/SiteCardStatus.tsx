@@ -10,7 +10,7 @@ import { StatusBadge } from "../../common/StatusBadge";
 /**
  * Props for the SiteCardStatus component.
  */
-interface SiteCardStatusProps {
+interface SiteCardStatusProperties {
     /** ID of the currently selected monitor */
     selectedMonitorId: string;
     /** Current status of the monitor */
@@ -37,6 +37,9 @@ interface SiteCardStatusProps {
  * />
  * ```
  */
-export const SiteCardStatus = React.memo(function SiteCardStatus({ selectedMonitorId, status }: SiteCardStatusProps) {
+export const SiteCardStatus = React.memo(function SiteCardStatus({
+    selectedMonitorId,
+    status,
+}: SiteCardStatusProperties) {
     return <StatusBadge label={`${selectedMonitorId.toUpperCase()} Status`} status={status} size="sm" />;
 });

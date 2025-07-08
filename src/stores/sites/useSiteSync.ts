@@ -1,7 +1,12 @@
 /**
  * Site synchronization operations module.
  * Handles syncing data from backend and status update subscriptions.
+ *
+ * Note: Empty clearError and setLoading functions are intentional in withErrorHandling calls
+ * as error handling is managed centrally by the store infrastructure.
  */
+
+/* eslint-disable @typescript-eslint/no-empty-function */
 
 import type { Site, StatusUpdate } from "../../types";
 

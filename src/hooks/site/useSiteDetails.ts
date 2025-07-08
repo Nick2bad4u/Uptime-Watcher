@@ -18,7 +18,7 @@ import { Site } from "../../types";
 import { useSiteAnalytics } from "./useSiteAnalytics";
 
 /** Props for the useSiteDetails hook */
-interface UseSiteDetailsProps {
+interface UseSiteDetailsProperties {
     /** The site object to manage details for */
     site: Site;
 }
@@ -50,7 +50,7 @@ interface UseSiteDetailsProps {
  * ```
  */
 
-export function useSiteDetails({ site }: UseSiteDetailsProps) {
+export function useSiteDetails({ site }: UseSiteDetailsProperties) {
     const {
         checkSiteNow,
         deleteSite,
@@ -185,7 +185,7 @@ export function useSiteDetails({ site }: UseSiteDetailsProps) {
 
     // Handler for site removal
     const handleRemoveSite = useCallback(async () => {
-        if (!window.confirm(`Are you sure you want to remove ${currentSite.name ?? currentSite.identifier}?`)) {
+        if (!globalThis.confirm(`Are you sure you want to remove ${currentSite.name ?? currentSite.identifier}?`)) {
             return;
         }
 
@@ -208,7 +208,7 @@ export function useSiteDetails({ site }: UseSiteDetailsProps) {
 
         const monitorName = selectedMonitor.url ?? selectedMonitor.host ?? selectedMonitor.type;
         if (
-            !window.confirm(
+            !globalThis.confirm(
                 `Are you sure you want to remove the monitor "${monitorName}" from ${currentSite.name ?? currentSite.identifier}?`
             )
         ) {
@@ -367,7 +367,9 @@ export function useSiteDetails({ site }: UseSiteDetailsProps) {
 
     // Name save handler
     const handleSaveName = useCallback(async () => {
-        if (!hasUnsavedChanges) return;
+        if (!hasUnsavedChanges) {
+            return;
+        }
 
         clearError();
 

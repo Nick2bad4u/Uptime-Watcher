@@ -5,43 +5,39 @@
 
 import { waitForElectronAPI } from "../../utils";
 
-export class MonitoringService {
+export const MonitoringService = {
     /**
      * Initialize the service by ensuring electron API is available
      */
-    static async initialize(): Promise<void> {
+    async initialize(): Promise<void> {
         await waitForElectronAPI();
-    }
-
+    },
     /**
      * Start monitoring for a site
      */
-    static async startMonitoring(siteId: string, monitorId: string): Promise<void> {
+    async startMonitoring(siteId: string, monitorId: string): Promise<void> {
         await this.initialize();
         return window.electronAPI.monitoring.startMonitoringForSite(siteId, monitorId);
-    }
-
-    /**
-     * Stop monitoring for a site
-     */
-    static async stopMonitoring(siteId: string, monitorId: string): Promise<void> {
-        await this.initialize();
-        return window.electronAPI.monitoring.stopMonitoringForSite(siteId, monitorId);
-    }
-
+    },
     /**
      * Start monitoring for all monitors of a site
      */
-    static async startSiteMonitoring(siteId: string): Promise<void> {
+    async startSiteMonitoring(siteId: string): Promise<void> {
         await this.initialize();
         return window.electronAPI.monitoring.startMonitoringForSite(siteId);
-    }
-
+    },
+    /**
+     * Stop monitoring for a site
+     */
+    async stopMonitoring(siteId: string, monitorId: string): Promise<void> {
+        await this.initialize();
+        return window.electronAPI.monitoring.stopMonitoringForSite(siteId, monitorId);
+    },
     /**
      * Stop monitoring for all monitors of a site
      */
-    static async stopSiteMonitoring(siteId: string): Promise<void> {
+    async stopSiteMonitoring(siteId: string): Promise<void> {
         await this.initialize();
         return window.electronAPI.monitoring.stopMonitoringForSite(siteId);
-    }
-}
+    },
+};

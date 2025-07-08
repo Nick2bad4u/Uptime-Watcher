@@ -27,22 +27,25 @@ import { Monitor } from "../../../types";
  * @param milliseconds - Time duration in milliseconds
  * @returns Formatted time string (e.g., "30s", "5m", "1h")
  */
-function formatDuration(milliseconds: number): string {
-    if (milliseconds < 60000) {
-        return `${milliseconds / 1000}s`;
+const formatDuration = (milliseconds: number): string => {
+    if (milliseconds < 1000) {
+        return `${milliseconds}ms`;
     }
-    if (milliseconds < 3600000) {
-        return `${milliseconds / 60000}m`;
+    if (milliseconds < 60_000) {
+        return `${Math.round(milliseconds / 1000)}s`;
     }
-    return `${milliseconds / 3600000}h`;
-}
+    if (milliseconds < 3_600_000) {
+        return `${Math.round(milliseconds / 60_000)}m`;
+    }
+    return `${Math.round(milliseconds / 3_600_000)}h`;
+};
 
 /**
  * Helper function to get display label for interval value.
  * @param interval - Interval configuration (number or object with value/label)
  * @returns Human readable label for the interval
  */
-function getIntervalLabel(interval: number | { value: number; label?: string }): string {
+const getIntervalLabel = (interval: number | { value: number; label?: string }): string => {
     if (typeof interval === "number") {
         return formatDuration(interval);
     }
@@ -50,14 +53,13 @@ function getIntervalLabel(interval: number | { value: number; label?: string }):
     if (interval.label) {
         return interval.label;
     }
-
     return formatDuration(interval.value);
-}
+};
 
 /**
  * Props for the OverviewTab component.
  */
-interface OverviewTabProps {
+interface OverviewTabProperties {
     /** Average response time across all checks */
     readonly avgResponseTime: number;
     /** Fastest recorded response time */
@@ -109,7 +111,7 @@ interface OverviewTabProps {
  * @param props - Component props containing metrics and handlers
  * @returns JSX element displaying overview information
  */
-export function OverviewTab({
+export const OverviewTab = ({
     avgResponseTime,
     fastestResponse,
     formatResponseTime,
@@ -128,7 +130,7 @@ export function OverviewTab({
     timeoutChanged,
     totalChecks,
     uptime,
-}: OverviewTabProps) {
+}: OverviewTabProperties) => {
     const { getAvailabilityColor, getAvailabilityVariant } = useAvailabilityColors();
     const { currentTheme } = useTheme();
 
@@ -138,7 +140,7 @@ export function OverviewTab({
         return variant === "danger" ? "error" : variant;
     };
 
-    const uptimeValue = parseFloat(uptime);
+    const uptimeValue = Number.parseFloat(uptime);
     const progressVariant = mapAvailabilityToBadgeVariant(uptimeValue);
 
     // Icon colors configuration
@@ -160,8 +162,12 @@ export function OverviewTab({
      * Get response time color based on value
      */
     const getResponseTimeColor = (responseTime: number): string => {
-        if (responseTime <= 200) return currentTheme.colors.success;
-        if (responseTime <= 1000) return currentTheme.colors.warning;
+        if (responseTime <= 200) {
+            return currentTheme.colors.success;
+        }
+        if (responseTime <= 1000) {
+            return currentTheme.colors.warning;
+        }
         return currentTheme.colors.error;
     };
 
@@ -169,8 +175,12 @@ export function OverviewTab({
      * Get response time text color for styling
      */
     const getResponseTimeTextColor = (responseTime: number): string => {
-        if (responseTime <= 200) return "text-green-600 dark:text-green-400";
-        if (responseTime <= 1000) return "text-yellow-600 dark:text-yellow-400";
+        if (responseTime <= 200) {
+            return "text-green-600 dark:text-green-400";
+        }
+        if (responseTime <= 1000) {
+            return "text-yellow-600 dark:text-yellow-400";
+        }
         return "text-red-600 dark:text-red-400";
     };
 
@@ -353,4 +363,4 @@ export function OverviewTab({
             </ThemedCard>
         </div>
     );
-}
+};

@@ -11,14 +11,15 @@ import { Monitor } from "../../../../types";
 /**
  * Props for the MonitorSelector component.
  */
-interface MonitorSelectorProps {
+interface MonitorSelectorProperties {
     /** Array of available monitors to choose from */
     monitors: Monitor[];
     /** ID of the currently selected monitor */
     selectedMonitorId: string;
     /** Callback function for selection change events */
-    onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
     /** Optional CSS classes for custom styling */
+    // eslint-disable-next-line unicorn/no-keyword-prefix
     className?: string;
 }
 
@@ -46,23 +47,24 @@ interface MonitorSelectorProps {
  * ```
  */
 export const MonitorSelector = React.memo(function MonitorSelector({
+    // eslint-disable-next-line unicorn/no-keyword-prefix
     className = "min-w-[80px]",
     monitors,
     onChange,
     selectedMonitorId,
-}: MonitorSelectorProps) {
+}: MonitorSelectorProperties) {
     // Memoize event handlers to prevent recreation on every render
-    const handleClick = useCallback((e: React.MouseEvent) => {
-        e.stopPropagation();
+    const handleClick = useCallback((event: React.MouseEvent) => {
+        event.stopPropagation();
     }, []);
 
-    const handleMouseDown = useCallback((e: React.MouseEvent) => {
-        e.stopPropagation();
+    const handleMouseDown = useCallback((event: React.MouseEvent) => {
+        event.stopPropagation();
     }, []);
 
     // Memoize the option formatting to avoid recalculation
     const formatMonitorOption = useCallback((monitor: Monitor) => {
-        const typeLabel = monitor.type.toUpperCase();
+        const monitorLabel = monitor.type.toUpperCase();
         const getDetail = () => {
             if (monitor.port) {
                 return `:${monitor.port}`;
@@ -72,13 +74,14 @@ export const MonitorSelector = React.memo(function MonitorSelector({
             }
             return "";
         };
-        return `${typeLabel}${getDetail()}`;
+        return `${monitorLabel}${getDetail()}`;
     }, []);
 
     return (
         <ThemedSelect
             value={selectedMonitorId}
             onChange={onChange}
+            // eslint-disable-next-line unicorn/no-keyword-prefix
             className={className}
             onClick={handleClick}
             onMouseDown={handleMouseDown}

@@ -117,6 +117,6 @@ export default defineConfig({
         globals: true, // Enable global test functions (describe, it, expect)
         include: ["src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
         setupFiles: ["./src/test/setup.ts"], // Setup file for testing
-        testTimeout: 10000, // Set Vitest timeout to 10 seconds
+        testTimeout: 10_000, // Set Vitest timeout to 10 seconds
     },
 });

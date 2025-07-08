@@ -1,7 +1,11 @@
 /**
  * ThemeManager class for handling theme selection, system preference detection,
  * and theme switching throughout the application.
+ *
+ * Note: Empty constructor and no-op functions are intentional design patterns.
  */
+
+/* eslint-disable @typescript-eslint/no-empty-function */
 
 import { themes } from "./themes";
 import { Theme, ThemeName } from "./types";
@@ -59,8 +63,8 @@ export class ThemeManager {
      * @returns "dark" if user prefers dark mode, "light" otherwise
      */
     getSystemThemePreference(): "light" | "dark" {
-        if (typeof window !== "undefined" && window.matchMedia) {
-            return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        if (globalThis.window !== undefined && globalThis.matchMedia) {
+            return globalThis.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
         }
         return "light";
     }
@@ -73,11 +77,11 @@ export class ThemeManager {
      * @returns Cleanup function to remove the event listener
      */
     onSystemThemeChange(callback: (isDark: boolean) => void): () => void {
-        if (typeof window === "undefined" || !window.matchMedia) {
+        if (globalThis.window === undefined || !globalThis.matchMedia) {
             return () => {};
         }
 
-        const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+        const mediaQuery = globalThis.matchMedia("(prefers-color-scheme: dark)");
         const handler = (e: MediaQueryListEvent) => callback(e.matches);
 
         mediaQuery.addEventListener("change", handler);
@@ -90,7 +94,9 @@ export class ThemeManager {
      * Apply theme to document
      */
     applyTheme(theme: Theme): void {
-        if (typeof document === "undefined") return;
+        if (typeof document === "undefined") {
+            return;
+        }
 
         const root = document.documentElement;
         // Apply CSS custom properties
@@ -133,7 +139,7 @@ export class ThemeManager {
         }
 
         // Set theme class on body
-        document.body.className = document.body.className.replace(/theme-\w+/g, "").trim();
+        document.body.className = document.body.className.replaceAll(/theme-\w+/g, "").trim();
         document.body.classList.add(`theme-${theme.name}`);
 
         // Set dark mode class for Tailwind CSS

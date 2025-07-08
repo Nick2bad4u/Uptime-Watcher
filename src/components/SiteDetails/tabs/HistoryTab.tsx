@@ -1,6 +1,7 @@
 /**
  * History tab component for displaying monitor check history.
- * Provides filtering, pagination, and detailed history records view.
+ * Provid    // Dropdown options: 25, 50, 100, All (clamped to backendLimit and available history)
+    const maxShow = Math.min(backendLimit, historyLength); pagination, and detailed history records view.
  */
 
 import { useState, useEffect, useRef } from "react";
@@ -14,9 +15,24 @@ import { useTheme } from "../../../theme/useTheme";
 import { StatusHistory, Monitor } from "../../../types";
 
 /**
+ * Get the formatted label for filter buttons
+ * @param filter - The filter type
+ * @returns The formatted label for the filter button
+ */
+function getFilterButtonLabel(filter: "all" | "up" | "down"): string {
+    if (filter === "all") {
+        return "All";
+    }
+    if (filter === "up") {
+        return "✅ Up";
+    }
+    return "❌ Down";
+}
+
+/**
  * Props for the HistoryTab component.
  */
-interface HistoryTabProps {
+interface HistoryTabProperties {
     /** Function to format timestamps for display */
     readonly formatFullTimestamp: (timestamp: number) => string;
     /** Function to format response times for display */
@@ -40,12 +56,12 @@ interface HistoryTabProps {
  * @param props - Component props containing formatting functions and monitor data
  * @returns JSX element displaying history interface
  */
-export function HistoryTab({
+export const HistoryTab = ({
     formatFullTimestamp,
     formatResponseTime,
     formatStatusWithIcon,
     selectedMonitor,
-}: HistoryTabProps) {
+}: HistoryTabProperties) => {
     const { settings } = useSettingsStore();
     const { currentTheme } = useTheme();
     const [historyFilter, setHistoryFilter] = useState<"all" | "up" | "down">("all");
@@ -65,20 +81,9 @@ export function HistoryTab({
 
     const iconColors = getIconColors();
 
-    /**
-     * Get the display label for filter buttons
-     * @param filter - The filter type
-     * @returns The formatted label for the filter button
-     */
-    function getFilterButtonLabel(filter: "all" | "up" | "down"): string {
-        if (filter === "all") return "All";
-        if (filter === "up") return "✅ Up";
-        return "❌ Down";
-    }
-
     // Dropdown options: 25, 50, 100, All (clamped to backendLimit and available history)
     const maxShow = Math.min(backendLimit, historyLength);
-    const showOptions = [10, 25, 50, 100, 250, 500, 1000, 10000].filter((opt) => opt <= maxShow);
+    const showOptions = [10, 25, 50, 100, 250, 500, 1000, 10_000].filter((opt) => opt <= maxShow);
     // Always include 'All' if there are fewer than backendLimit
     if (historyLength > 0 && historyLength <= backendLimit && !showOptions.includes(historyLength)) {
         showOptions.push(historyLength);
@@ -112,11 +117,17 @@ export function HistoryTab({
     // Helper to render details with label
     // Use 'details' as optional property to handle records that may not have detail information
     function renderDetails(record: StatusHistory) {
-        if (!record.details) return undefined;
+        if (!record.details) {
+            return;
+        }
 
         const getDetailLabel = (): string => {
-            if (selectedMonitor.type === "port") return `Port: ${record.details}`;
-            if (selectedMonitor.type === "http") return `Response Code: ${record.details}`;
+            if (selectedMonitor.type === "port") {
+                return `Port: ${record.details}`;
+            }
+            if (selectedMonitor.type === "http") {
+                return `Response Code: ${record.details}`;
+            }
 
             return record.details ?? "";
         };
@@ -166,8 +177,12 @@ export function HistoryTab({
                         </ThemedText>
                         <ThemedSelect
                             value={historyLimit}
-                            onChange={(e) => {
-                                const newLimit = Math.min(parseInt(e.target.value, 10), backendLimit, historyLength);
+                            onChange={(event) => {
+                                const newLimit = Math.min(
+                                    Number.parseInt(event.target.value, 10),
+                                    backendLimit,
+                                    historyLength
+                                );
                                 setHistoryLimit(newLimit);
                                 logger.user.action("History limit changed", {
                                     monitorId: selectedMonitor.id,
@@ -229,4 +244,4 @@ export function HistoryTab({
             </ThemedCard>
         </div>
     );
-}
+};

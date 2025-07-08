@@ -9,7 +9,7 @@ import { MiniChartBar, ThemedText } from "../../theme/components";
 import { StatusHistory } from "../../types";
 
 /** Props for the HistoryChart component */
-interface HistoryChartProps {
+interface HistoryChartProperties {
     /** Array of historical status records to display */
     history: StatusHistory[];
     /** Title to display above the chart */
@@ -38,13 +38,13 @@ export const HistoryChart = React.memo(function HistoryChart({
     history,
     maxItems = 120,
     title,
-}: HistoryChartProps) {
+}: HistoryChartProperties) {
     // Return null for empty history (React convention for "render nothing")
     if (history.length === 0) {
         // React components, returning null from a render function
         // is actually the correct and idiomatic way to indicate "render nothing."
         // This is a special case where null is the standard React convention.
-        // eslint-disable-next-line unicorn/no-null
+
         return null;
     }
 

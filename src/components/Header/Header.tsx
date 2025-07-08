@@ -3,6 +3,8 @@
  * Displays uptime statistics, theme toggle, and settings access.
  */
 
+import { useMemo } from "react";
+
 import { useSitesStore, useUIStore } from "../../stores";
 import { ThemedBox, ThemedText, ThemedButton, StatusIndicator } from "../../theme/components";
 import { useTheme, useAvailabilityColors } from "../../theme/useTheme";
@@ -27,20 +29,33 @@ export function Header() {
     const { getAvailabilityColor } = useAvailabilityColors();
 
     // Count all monitors across all sites by status using functional approach
-    const monitorCounts = sites.reduce(
-        (counts, site) => {
+    const monitorCounts = useMemo(() => {
+        const counts = { down: 0, pending: 0, total: 0, up: 0 };
+
+        for (const site of sites) {
             if (site.monitors) {
                 for (const monitor of site.monitors) {
                     counts.total++;
-                    if (monitor.status === "up") counts.up++;
-                    else if (monitor.status === "down") counts.down++;
-                    else if (monitor.status === "pending") counts.pending++;
+                    switch (monitor.status) {
+                        case "up": {
+                            counts.up++;
+                            break;
+                        }
+                        case "down": {
+                            counts.down++;
+                            break;
+                        }
+                        case "pending": {
+                            counts.pending++;
+                            break;
+                        }
+                    }
                 }
             }
-            return counts;
-        },
-        { down: 0, pending: 0, total: 0, up: 0 }
-    );
+        }
+
+        return counts;
+    }, [sites]);
 
     const { down: downMonitors, pending: pendingMonitors, total: totalMonitors, up: upMonitors } = monitorCounts;
 

@@ -8,7 +8,7 @@ import React from "react";
 import { StatusIndicator, ThemedText } from "../../theme/components";
 
 /** Props for the StatusBadge component */
-interface StatusBadgeProps {
+interface StatusBadgeProperties {
     /** Label text to display */
     label: string;
     /** Current status to display */
@@ -35,7 +35,7 @@ export const StatusBadge = React.memo(function StatusBadge({
     showIcon = true,
     size = "sm",
     status,
-}: StatusBadgeProps) {
+}: StatusBadgeProperties) {
     /**
      * Maps text sizes to appropriate indicator sizes.
      * Ensures visual consistency between text and icon.
@@ -46,18 +46,22 @@ export const StatusBadge = React.memo(function StatusBadge({
     const getIndicatorSize = (textSize: typeof size): "sm" | "md" | "lg" => {
         switch (textSize) {
             case "xs":
-            case "sm":
+            case "sm": {
                 return "sm";
+            }
             case "base":
-            case "lg":
+            case "lg": {
                 return "md";
+            }
             case "xl":
             case "2xl":
             case "3xl":
-            case "4xl":
+            case "4xl": {
                 return "lg";
-            default:
+            }
+            default: {
                 return "sm";
+            }
         }
     };
 

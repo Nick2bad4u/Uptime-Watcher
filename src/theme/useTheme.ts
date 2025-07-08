@@ -40,7 +40,7 @@ export function useTheme() {
         const newTheme = getCurrentTheme();
         setCurrentTheme(newTheme);
         themeManager.applyTheme(newTheme);
-        setThemeVersion((prev) => prev + 1); // Force re-render of all themed components
+        setThemeVersion((previous) => previous + 1); // Force re-render of all themed components
     }, [settings.theme, systemTheme, getCurrentTheme]);
 
     // Listen for system theme changes
@@ -72,10 +72,10 @@ export function useTheme() {
     const getColor = (path: string): string => {
         const keys = path.split(".");
         const value = keys.reduce<unknown>(
-            (acc, key) =>
-                acc && typeof acc === "object" && Object.prototype.hasOwnProperty.call(acc, key)
+            (accumulator, key) =>
+                accumulator && typeof accumulator === "object" && Object.prototype.hasOwnProperty.call(accumulator, key)
                     ? // eslint-disable-next-line security/detect-object-injection -- Object.prototype.hasOwnProperty ensures safety
-                      (acc as Record<string, unknown>)[key]
+                      (accumulator as Record<string, unknown>)[key]
                     : undefined,
             currentTheme.colors
         );

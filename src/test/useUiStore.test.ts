@@ -142,14 +142,10 @@ describe("useUIStore - Uncovered Lines", () => {
         expect(result.current.siteDetailsChartTimeRange).toBe("30d");
     });
 
-    it("should handle getSelectedSite when no site is selected", () => {
-        const { result } = renderHook(() => useUIStore());
+    // Note: getSelectedSite tests removed as part of subscription pattern refactor
+    // Components should derive selected site from their own store subscriptions
 
-        const selectedSite = result.current.getSelectedSite();
-        expect(selectedSite).toBeUndefined();
-    });
-
-    it("should handle getSelectedSite when site is selected but return undefined due to subscription pattern", () => {
+    it("should store selectedSiteId correctly when site is selected", () => {
         const { result } = renderHook(() => useUIStore());
 
         const mockSite: Site = {
@@ -163,11 +159,32 @@ describe("useUIStore - Uncovered Lines", () => {
             result.current.setSelectedSite(mockSite);
         });
 
-        // The function returns undefined by design (components should derive this from subscriptions)
-        const selectedSite = result.current.getSelectedSite();
-        expect(selectedSite).toBeUndefined();
+        // The selectedSiteId should be cleared
+        expect(result.current.selectedSiteId).toBeUndefined();
+    });
 
-        // But the selectedSiteId should be set
+    it("should clear selectedSiteId when site is unselected", () => {
+        const { result } = renderHook(() => useUIStore());
+
+        const mockSite: Site = {
+            identifier: "test-site",
+            name: "Test Site",
+            monitors: [],
+            monitoring: true,
+        };
+
+        // First set a site
+        act(() => {
+            result.current.setSelectedSite(mockSite);
+        });
+        expect(result.current.selectedSiteId).toBe("test-site");
+
+        // Then clear it
+        act(() => {
+            result.current.setSelectedSite(undefined);
+        });
+
+        // The selectedSiteId should be cleared
         expect(result.current.selectedSiteId).toBe("test-site");
     });
 

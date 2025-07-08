@@ -18,7 +18,9 @@ export function useBackendFocusSync(enabled = false) {
     const { fullSyncFromBackend } = useSitesStore();
 
     useEffect(() => {
-        if (!enabled) return undefined;
+        if (!enabled) {
+            return undefined;
+        }
 
         const handleFocus = () => {
             // Use full sync on focus to ensure complete data consistency

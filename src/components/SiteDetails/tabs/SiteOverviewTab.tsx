@@ -23,7 +23,7 @@ import { formatResponseTime, formatDuration } from "../../../utils/time";
 /**
  * Props for the SiteOverviewTab component
  */
-interface SiteOverviewTabProps {
+interface SiteOverviewTabProperties {
     /** The site object to display overview for */
     readonly site: Site;
     /** Average response time across all monitors */
@@ -64,7 +64,7 @@ export function SiteOverviewTab({
     site,
     totalChecks,
     uptime,
-}: SiteOverviewTabProps) {
+}: SiteOverviewTabProperties) {
     const { getAvailabilityColor, getAvailabilityVariant } = useAvailabilityColors();
     const { currentTheme } = useTheme();
 
@@ -86,7 +86,9 @@ export function SiteOverviewTab({
      * Get status text for monitor
      */
     const getMonitorStatusText = (monitor: Monitor) => {
-        if (monitor.monitoring) return "Running";
+        if (monitor.monitoring) {
+            return "Running";
+        }
         return "Stopped";
     };
 
@@ -104,20 +106,27 @@ export function SiteOverviewTab({
         // Use getColor to safely access theme colors with proper validation
         const siteStatusColor = (() => {
             switch (siteDisplayStatus) {
-                case "up":
+                case "up": {
                     return currentTheme.colors.status.up;
-                case "down":
+                }
+                case "down": {
                     return currentTheme.colors.status.down;
-                case "pending":
+                }
+                case "pending": {
                     return currentTheme.colors.status.pending;
-                case "paused":
+                }
+                case "paused": {
                     return currentTheme.colors.status.paused;
-                case "mixed":
+                }
+                case "mixed": {
                     return currentTheme.colors.status.mixed;
-                case "unknown":
+                }
+                case "unknown": {
                     return currentTheme.colors.status.unknown;
-                default:
+                }
+                default: {
                     return currentTheme.colors.error;
+                }
             }
         })();
 
@@ -134,8 +143,12 @@ export function SiteOverviewTab({
      * Get response time color based on value
      */
     const getResponseTimeColor = (responseTime: number): string => {
-        if (responseTime <= 200) return currentTheme.colors.success;
-        if (responseTime <= 1000) return currentTheme.colors.warning;
+        if (responseTime <= 200) {
+            return currentTheme.colors.success;
+        }
+        if (responseTime <= 1000) {
+            return currentTheme.colors.warning;
+        }
         return currentTheme.colors.error;
     };
 
@@ -143,8 +156,12 @@ export function SiteOverviewTab({
      * Get response time text color for styling
      */
     const getResponseTimeTextColor = (responseTime: number): string => {
-        if (responseTime <= 200) return "text-green-600 dark:text-green-400";
-        if (responseTime <= 1000) return "text-yellow-600 dark:text-yellow-400";
+        if (responseTime <= 200) {
+            return "text-green-600 dark:text-green-400";
+        }
+        if (responseTime <= 1000) {
+            return "text-yellow-600 dark:text-yellow-400";
+        }
         return "text-red-600 dark:text-red-400";
     };
 
@@ -274,7 +291,7 @@ export function SiteOverviewTab({
                                                 (monitor.host ? `${monitor.host}:${monitor.port}` : monitor.id)}
                                         </ThemedText>
                                         <ThemedText size="xs" variant="tertiary">
-                                            Every {formatDuration(monitor.checkInterval ?? 30000)}
+                                            Every {formatDuration(monitor.checkInterval ?? 30_000)}
                                         </ThemedText>
                                     </div>
                                     <div className="flex items-center gap-2">

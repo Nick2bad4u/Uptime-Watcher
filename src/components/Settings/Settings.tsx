@@ -23,7 +23,7 @@ import { ThemeName } from "../../theme/types";
 import { useTheme } from "../../theme/useTheme";
 
 /** Props for the Settings component */
-interface SettingsProps {
+interface SettingsProperties {
     /** Callback function to close the settings modal/view */
     onClose: () => void;
 }
@@ -46,7 +46,7 @@ interface SettingsProps {
  * @returns JSX element containing the settings interface
  */
 
-export function Settings({ onClose }: Readonly<SettingsProps>) {
+export function Settings({ onClose }: Readonly<SettingsProperties>) {
     const { clearError, isLoading, lastError, setError } = useErrorStore();
     const { resetSettings, settings, updateHistoryLimitValue, updateSettings } = useSettingsStore();
     const { downloadSQLiteBackup, fullSyncFromBackend } = useSitesStore();
@@ -59,31 +59,32 @@ export function Settings({ onClose }: Readonly<SettingsProps>) {
     const [syncSuccess, setSyncSuccess] = useState(false);
 
     useEffect(() => {
-        if (isLoading) {
-            const timeoutId = setTimeout(() => {
-                setShowButtonLoading(true);
-            }, UI_DELAYS.LOADING_BUTTON);
-            return () => {
-                clearTimeout(timeoutId);
-            };
-        } else {
+        if (!isLoading) {
             setShowButtonLoading(false);
-            return undefined;
+            return;
         }
+
+        const timeoutId = setTimeout(() => {
+            setShowButtonLoading(true);
+        }, UI_DELAYS.LOADING_BUTTON);
+
+        return () => {
+            clearTimeout(timeoutId);
+        };
     }, [isLoading]);
 
     // Only allow keys that are part of AppSettings
-    const allowedKeys: (keyof typeof settings)[] = [
+    const allowedKeys = new Set<keyof typeof settings>([
         "notifications",
         "autoStart",
         "minimizeToTray",
         "theme",
         "soundAlerts",
         "historyLimit",
-    ];
+    ]);
 
     const handleSettingChange = (key: keyof typeof settings, value: unknown) => {
-        if (!allowedKeys.includes(key)) {
+        if (!allowedKeys.has(key)) {
             logger.warn("Attempted to update invalid settings key", key);
             return;
         }
@@ -107,7 +108,7 @@ export function Settings({ onClose }: Readonly<SettingsProps>) {
     };
 
     const handleReset = () => {
-        if (window.confirm("Are you sure you want to reset all settings to defaults?")) {
+        if (globalThis.confirm("Are you sure you want to reset all settings to defaults?")) {
             resetSettings();
             clearError(); // Clear any errors when resetting
             logger.user.action("Reset settings to defaults");
@@ -130,10 +131,11 @@ export function Settings({ onClose }: Readonly<SettingsProps>) {
         } catch (error: unknown) {
             logger.error("Failed to sync data from backend", error instanceof Error ? error : new Error(String(error)));
             setError(
-                "Failed to sync data: " +
-                    (error && typeof error === "object" && "message" in error
+                `Failed to sync data: ${
+                    error && typeof error === "object" && "message" in error
                         ? (error as { message?: string }).message
-                        : String(error))
+                        : String(error)
+                }`
             );
         }
     }, [fullSyncFromBackend, setError]);
@@ -147,10 +149,11 @@ export function Settings({ onClose }: Readonly<SettingsProps>) {
         } catch (error: unknown) {
             logger.error("Failed to download SQLite backup", error instanceof Error ? error : new Error(String(error)));
             setError(
-                "Failed to download SQLite backup: " +
-                    (error && typeof error === "object" && "message" in error
+                `Failed to download SQLite backup: ${
+                    error && typeof error === "object" && "message" in error
                         ? (error as { message?: string }).message
-                        : String(error))
+                        : String(error)
+                }`
             );
         } finally {
             setShowButtonLoading(false);
@@ -222,7 +225,7 @@ export function Settings({ onClose }: Readonly<SettingsProps>) {
                                 </ThemedText>
                                 <ThemedSelect
                                     value={settings.historyLimit}
-                                    onChange={(e) => handleHistoryLimitChange(Number(e.target.value))}
+                                    onChange={(event) => handleHistoryLimitChange(Number(event.target.value))}
                                     disabled={isLoading}
                                     aria-label="Maximum number of history records to keep per site"
                                 >
@@ -256,7 +259,7 @@ export function Settings({ onClose }: Readonly<SettingsProps>) {
                                 </div>
                                 <ThemedCheckbox
                                     checked={settings.notifications}
-                                    onChange={(e) => handleSettingChange("notifications", e.target.checked)}
+                                    onChange={(event) => handleSettingChange("notifications", event.target.checked)}
                                     disabled={isLoading}
                                     aria-label="Enable desktop notifications"
                                 />
@@ -273,7 +276,7 @@ export function Settings({ onClose }: Readonly<SettingsProps>) {
                                 </div>
                                 <ThemedCheckbox
                                     checked={settings.soundAlerts}
-                                    onChange={(e) => handleSettingChange("soundAlerts", e.target.checked)}
+                                    onChange={(event) => handleSettingChange("soundAlerts", event.target.checked)}
                                     disabled={isLoading}
                                     aria-label="Enable sound alerts"
                                 />
@@ -293,7 +296,7 @@ export function Settings({ onClose }: Readonly<SettingsProps>) {
                                 </ThemedText>
                                 <ThemedSelect
                                     value={settings.theme}
-                                    onChange={(e) => handleThemeChange(e.target.value)}
+                                    onChange={(event) => handleThemeChange(event.target.value)}
                                     disabled={isLoading}
                                     aria-label="Select application theme"
                                 >
@@ -324,7 +327,7 @@ export function Settings({ onClose }: Readonly<SettingsProps>) {
                                 </div>
                                 <ThemedCheckbox
                                     checked={settings.autoStart}
-                                    onChange={(e) => handleSettingChange("autoStart", e.target.checked)}
+                                    onChange={(event) => handleSettingChange("autoStart", event.target.checked)}
                                     disabled={isLoading}
                                     aria-label="Enable auto-start with system"
                                 />
@@ -341,7 +344,7 @@ export function Settings({ onClose }: Readonly<SettingsProps>) {
                                 </div>
                                 <ThemedCheckbox
                                     checked={settings.minimizeToTray}
-                                    onChange={(e) => handleSettingChange("minimizeToTray", e.target.checked)}
+                                    onChange={(event) => handleSettingChange("minimizeToTray", event.target.checked)}
                                     disabled={isLoading}
                                     aria-label="Enable minimize to system tray"
                                 />

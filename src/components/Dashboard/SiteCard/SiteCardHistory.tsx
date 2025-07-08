@@ -11,7 +11,7 @@ import { HistoryChart } from "../../common/HistoryChart";
 /**
  * Props for the SiteCardHistory component.
  */
-interface SiteCardHistoryProps {
+interface SiteCardHistoryProperties {
     /** Monitor data containing type and configuration */
     monitor: Monitor | undefined;
     /** Filtered history data for visualization */
@@ -66,7 +66,7 @@ function getPortSuffix(monitor: Monitor): string {
  * ```
  */
 export const SiteCardHistory = React.memo(
-    function SiteCardHistory({ filteredHistory, monitor }: SiteCardHistoryProps) {
+    function SiteCardHistory({ filteredHistory, monitor }: SiteCardHistoryProperties) {
         // Memoize the history title calculation
         const historyTitle = useMemo(() => {
             if (!monitor) {
@@ -74,40 +74,35 @@ export const SiteCardHistory = React.memo(
             }
 
             switch (monitor.type) {
-                case "http":
-                    return "HTTP History" + getHttpSuffix(monitor);
-                case "port":
-                    return "Port History" + getPortSuffix(monitor);
-                default:
+                case "http": {
+                    return `HTTP History${getHttpSuffix(monitor)}`;
+                }
+                case "port": {
+                    return `Port History${getPortSuffix(monitor)}`;
+                }
+                default: {
                     return `${monitor.type} History`;
+                }
             }
         }, [monitor]);
 
         return <HistoryChart history={filteredHistory} title={historyTitle} maxItems={60} />;
     },
-    (prevProps, nextProps) => {
+    (previousProperties, nextProperties) => {
         // Custom comparison function to ensure proper re-renders
         // Compare by history array length and last timestamp to detect changes
-        const prevHistory = prevProps.filteredHistory;
-        const nextHistory = nextProps.filteredHistory;
-
-        if (prevHistory.length !== nextHistory.length) {
-            return false; // Re-render if history length changed
-        }
+        const previousHistory = previousProperties.filteredHistory;
+        const nextHistory = nextProperties.filteredHistory;
 
         // Fix: History is sorted DESC (newest first), so latest is at index 0, not length-1
-        const prevLastTimestamp = prevHistory[0]?.timestamp;
+        const previousLastTimestamp = previousHistory[0]?.timestamp;
         const nextLastTimestamp = nextHistory[0]?.timestamp;
 
-        if (prevLastTimestamp !== nextLastTimestamp) {
-            return false; // Re-render if last timestamp changed
-        }
-
-        // Compare monitor ID to handle monitor switching
-        if (prevProps.monitor?.id !== nextProps.monitor?.id) {
-            return false; // Re-render if monitor changed
-        }
-
-        return true; // Skip re-render if nothing important changed
+        // Return true if nothing important changed (skip re-render)
+        return (
+            previousHistory.length === nextHistory.length &&
+            previousLastTimestamp === nextLastTimestamp &&
+            previousProperties.monitor?.id === nextProperties.monitor?.id
+        );
     }
 );

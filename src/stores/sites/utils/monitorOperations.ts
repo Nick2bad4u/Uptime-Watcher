@@ -3,16 +3,14 @@
  * Provides utilities for working with monitor data and configurations.
  */
 
-import type { Monitor, MonitorType, Site } from "../../types";
-
-import { ERROR_MESSAGES } from "../../types";
+import { type Monitor, type MonitorType, type Site, ERROR_MESSAGES } from "../../types";
 
 /**
  * Creates a default monitor for a site
  */
 export function createDefaultMonitor(overrides: Partial<Monitor> = {}): Monitor {
     return {
-        checkInterval: 300000, // 5 minutes default
+        checkInterval: 300_000, // 5 minutes default
         history: [],
         id: overrides.id ?? crypto.randomUUID(),
         monitoring: true,

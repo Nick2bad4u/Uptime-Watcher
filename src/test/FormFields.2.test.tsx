@@ -7,7 +7,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 
-import type { SelectFieldProps, RadioGroupProps } from "../components/AddSiteForm/FormFields";
+import type { SelectFieldProperties, RadioGroupProperties } from "../components/AddSiteForm/FormFields";
 
 import { SelectField, RadioGroup } from "../components/AddSiteForm/FormFields";
 
@@ -20,7 +20,7 @@ vi.mock("../../theme/components", () => ({
 
 describe("FormFields", () => {
     describe("SelectField", () => {
-        const defaultProps: SelectFieldProps = {
+        const defaultProps: SelectFieldProperties = {
             id: "test-select",
             label: "Test Select",
             onChange: vi.fn(),
@@ -124,7 +124,7 @@ describe("FormFields", () => {
     });
 
     describe("RadioGroup", () => {
-        const defaultProps: RadioGroupProps = {
+        const defaultProps: RadioGroupProperties = {
             id: "test-radio",
             label: "Test Radio",
             name: "test-radio-group",

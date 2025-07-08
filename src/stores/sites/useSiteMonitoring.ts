@@ -1,7 +1,12 @@
 /**
  * Site monitoring operations module.
  * Handles monitoring start/stop operations and manual checks.
+ *
+ * Note: Empty clearError and setLoading functions are intentional in withErrorHandling calls
+ * as error handling is managed centrally by the store infrastructure.
  */
+
+/* eslint-disable @typescript-eslint/no-empty-function */
 
 import { logStoreAction, withErrorHandling } from "../utils";
 import { MonitoringService, SiteService } from "./services";

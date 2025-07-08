@@ -4,7 +4,6 @@
  */
 
 import { ThemeName } from "../theme/types";
-import { Site, StatusUpdate, Monitor, MonitorType } from "../types";
 
 /** Application update status types */
 export type UpdateStatus = "idle" | "checking" | "available" | "downloading" | "downloaded" | "error";
@@ -57,15 +56,16 @@ export interface BaseStore {
  * Store composition utility type
  */
 export type StoreActions<T> = {
-    [K in keyof T]: T[K] extends (...args: unknown[]) => unknown ? T[K] : never;
+    [K in keyof T]: T[K] extends (...arguments_: unknown[]) => unknown ? T[K] : never;
 };
 
 /**
  * Store state utility type
  */
 export type StoreState<T> = {
-    [K in keyof T]: T[K] extends (...args: unknown[]) => unknown ? never : T[K];
+    [K in keyof T]: T[K] extends (...arguments_: unknown[]) => unknown ? never : T[K];
 };
 
 // Re-export types from the main types file for convenience
-export type { Site, StatusUpdate, Monitor, MonitorType };
+
+export { type Site, type Monitor, type StatusUpdate, type MonitorType } from "../types";

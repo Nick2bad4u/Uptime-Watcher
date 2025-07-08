@@ -27,7 +27,7 @@ interface StoreActions {
  * Props interface for form submission handling.
  * Combines form state, actions, and store methods.
  */
-type FormSubmitProps = AddSiteFormState &
+type FormSubmitProperties = AddSiteFormState &
     Pick<AddSiteFormActions, "setFormError"> &
     StoreActions & {
         /** UUID generator function */
@@ -96,9 +96,7 @@ function validateHttpMonitor(url: string): string[] {
 function validatePortMonitor(host: string, port: string): string[] {
     const errors: string[] = [];
 
-    if (!host.trim()) {
-        errors.push("Host is required for port monitor");
-    } else {
+    if (host.trim()) {
         const trimmedHost = host.trim();
         const isValidIP = validator.isIP(trimmedHost);
         const isValidDomain = validator.isFQDN(trimmedHost, {
@@ -109,6 +107,8 @@ function validatePortMonitor(host: string, port: string): string[] {
         if (!isValidIP && !isValidDomain) {
             errors.push("Host must be a valid IP address or domain name");
         }
+    } else {
+        errors.push("Host is required for port monitor");
     }
 
     if (!port.trim()) {
@@ -151,8 +151,8 @@ function validateCheckInterval(checkInterval: number): string[] {
 /**
  * Creates a monitor object based on the form data.
  */
-function createMonitor(props: FormSubmitProps): Monitor {
-    const { checkInterval, generateUuid, host, monitorType, port, url } = props;
+function createMonitor(properties: FormSubmitProperties): Monitor {
+    const { checkInterval, generateUuid, host, monitorType, port, url } = properties;
 
     const monitor: Monitor = {
         checkInterval,
@@ -177,8 +177,8 @@ function createMonitor(props: FormSubmitProps): Monitor {
 /**
  * Submits a new site with monitor.
  */
-async function submitNewSite(props: FormSubmitProps, monitor: Monitor): Promise<void> {
-    const { createSite, logger, name, siteId } = props;
+async function submitNewSite(properties: FormSubmitProperties, monitor: Monitor): Promise<void> {
+    const { createSite, logger, name, siteId } = properties;
 
     const trimmedName = name.trim();
     const siteData = {
@@ -200,8 +200,8 @@ async function submitNewSite(props: FormSubmitProps, monitor: Monitor): Promise<
 /**
  * Adds monitor to existing site.
  */
-async function addToExistingSite(props: FormSubmitProps, monitor: Monitor): Promise<void> {
-    const { addMonitorToSite, logger, selectedExistingSite } = props;
+async function addToExistingSite(properties: FormSubmitProperties, monitor: Monitor): Promise<void> {
+    const { addMonitorToSite, logger, selectedExistingSite } = properties;
 
     await addMonitorToSite(selectedExistingSite, monitor);
 
@@ -215,16 +215,13 @@ async function addToExistingSite(props: FormSubmitProps, monitor: Monitor): Prom
 /**
  * Performs the actual submission based on add mode.
  */
-async function performSubmission(props: FormSubmitProps, monitor: Monitor): Promise<void> {
-    const { addMode, logger } = props;
+async function performSubmission(properties: FormSubmitProperties, monitor: Monitor): Promise<void> {
+    const { addMode, logger } = properties;
 
-    if (addMode === "new") {
-        await submitNewSite(props, monitor);
-    } else {
-        await addToExistingSite(props, monitor);
-    }
+    await (addMode === "new" ? submitNewSite(properties, monitor) : addToExistingSite(properties, monitor));
 
-    const identifier = addMode === "new" ? props.siteId : props.selectedExistingSite;
+    const { selectedExistingSite, siteId } = properties;
+    const identifier = addMode === "new" ? siteId : selectedExistingSite;
     logger.info(`Successfully ${addMode === "new" ? "created site" : "added monitor"}: ${identifier}`);
 }
 
@@ -255,7 +252,7 @@ async function performSubmission(props: FormSubmitProps, monitor: Monitor): Prom
  * };
  * ```
  */
-export async function handleSubmit(e: React.FormEvent, props: FormSubmitProps) {
+export async function handleSubmit(event: React.FormEvent, properties: FormSubmitProperties) {
     const {
         addMode,
         checkInterval,
@@ -269,9 +266,9 @@ export async function handleSubmit(e: React.FormEvent, props: FormSubmitProps) {
         selectedExistingSite,
         setFormError,
         url,
-    } = props;
+    } = properties;
 
-    e.preventDefault();
+    event.preventDefault();
     setFormError(undefined);
 
     // Log submission start
@@ -299,11 +296,11 @@ export async function handleSubmit(e: React.FormEvent, props: FormSubmitProps) {
             formData: {
                 addMode,
                 checkInterval,
-                host: host.substring(0, 50), // Truncate for privacy
+                host: host.slice(0, 50), // Truncate for privacy
                 monitorType,
-                name: name.substring(0, 50), // Truncate for privacy
+                name: name.slice(0, 50), // Truncate for privacy
                 port,
-                url: url.substring(0, 50), // Truncate for privacy
+                url: url.slice(0, 50), // Truncate for privacy
             },
         });
 
@@ -314,8 +311,8 @@ export async function handleSubmit(e: React.FormEvent, props: FormSubmitProps) {
     clearError();
 
     try {
-        const monitor = createMonitor(props);
-        await performSubmission(props, monitor);
+        const monitor = createMonitor(properties);
+        await performSubmission(properties, monitor);
         onSuccess?.();
     } catch (error) {
         logger.error("Failed to add site/monitor from form", error instanceof Error ? error : new Error(String(error)));

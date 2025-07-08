@@ -51,16 +51,19 @@ export const createPersistConfig = <T>(name: string, partialize?: (state: T) => 
 /**
  * Debounce utility for store actions
  */
-export const debounce = <T extends unknown[]>(func: (...args: T) => void, wait: number): ((...args: T) => void) => {
+export const debounce = <T extends unknown[]>(
+    function_: (...arguments_: T) => void,
+    wait: number
+): ((...arguments_: T) => void) => {
     const timeouts = new Map<string, NodeJS.Timeout>();
-    return (...args: T) => {
-        const key = JSON.stringify(args);
+    return (...arguments_: T) => {
+        const key = JSON.stringify(arguments_);
         const existingTimeout = timeouts.get(key);
         if (existingTimeout) {
             clearTimeout(existingTimeout);
         }
         const timeout = setTimeout(() => {
-            func(...args);
+            function_(...arguments_);
             timeouts.delete(key);
         }, wait);
         timeouts.set(key, timeout);
@@ -85,9 +88,9 @@ export const logStoreAction = (storeName: string, actionName: string, data?: unk
  * @throws Error when electronAPI is not available after maximum attempts
  */
 export async function waitForElectronAPI(maxAttempts = 50, baseDelay = 100): Promise<void> {
-    for (const attempt of Array.from({ length: maxAttempts }, (_, i) => i)) {
+    for (const attempt of Array.from({ length: maxAttempts }, (_, index) => index)) {
         if (
-            typeof window !== "undefined" &&
+            globalThis.window !== undefined &&
             window.electronAPI?.sites?.getSites &&
             typeof window.electronAPI.sites.getSites === "function"
         ) {

@@ -13,8 +13,17 @@ import { ThemedText, StatusIndicator, ThemedBox, ThemedBadge } from "../../theme
 import { Site, Monitor } from "../../types";
 import { ScreenshotThumbnail } from "./ScreenshotThumbnail";
 
+/**
+ * Type guard to check if the window.electronAPI has openExternal method
+ * @param api - The API object to check
+ * @returns True if the API has openExternal method
+ */
+function hasOpenExternal(api: unknown): api is { openExternal: (url: string) => void } {
+    return typeof (api as { openExternal?: unknown })?.openExternal === "function";
+}
+
 /** Props for the SiteDetailsHeader component */
-interface SiteDetailsHeaderProps {
+interface SiteDetailsHeaderProperties {
     /** The site object to display information for */
     readonly site: Site;
     /** The currently selected monitor for the site */
@@ -35,16 +44,12 @@ interface SiteDetailsHeaderProps {
  * @returns JSX element containing the site details header
  */
 
-export function SiteDetailsHeader({ isCollapsed, onToggleCollapse, selectedMonitor, site }: SiteDetailsHeaderProps) {
-    /**
-     * Type guard to check if the window.electronAPI has openExternal method
-     * @param api - The API object to check
-     * @returns True if the API has openExternal method
-     */
-    function hasOpenExternal(api: unknown): api is { openExternal: (url: string) => void } {
-        return typeof (api as { openExternal?: unknown })?.openExternal === "function";
-    }
-
+export function SiteDetailsHeader({
+    isCollapsed,
+    onToggleCollapse,
+    selectedMonitor,
+    site,
+}: SiteDetailsHeaderProperties) {
     // Use theme-aware styles
     const styles = useThemeStyles(isCollapsed);
 
@@ -68,9 +73,9 @@ export function SiteDetailsHeader({ isCollapsed, onToggleCollapse, selectedMonit
             <div style={styles.contentStyle}>
                 {/* Left accent bar */}
                 <div className="site-details-header-accent" />
-                <div className="flex items-start justify-between gap-6 site-details-header-info w-full">
+                <div className="flex items-start justify-between w-full gap-6 site-details-header-info">
                     {/* Left side: Screenshot, Status, and Site Info */}
-                    <div className="flex items-center gap-4 flex-1 min-w-0">
+                    <div className="flex items-center flex-1 min-w-0 gap-4">
                         {/* Website Screenshot Thumbnail */}
                         {!isCollapsed && (
                             <ScreenshotThumbnail
@@ -94,16 +99,21 @@ export function SiteDetailsHeader({ isCollapsed, onToggleCollapse, selectedMonit
                                     rel="noopener noreferrer"
                                     tabIndex={0}
                                     aria-label={`Open ${selectedMonitor.url} in browser`}
-                                    onClick={(e) => {
-                                        e.preventDefault();
+                                    onClick={(event) => {
+                                        event.preventDefault();
                                         const url = selectedMonitor.url ?? "";
                                         logger.user.action("External URL opened from site details", {
                                             siteId: site.identifier,
                                             siteName: site.name,
                                             url: url,
                                         });
-                                        if (hasOpenExternal(window.electronAPI)) {
-                                            window.electronAPI.openExternal(url);
+                                        const electronAPI = (
+                                            window.electronAPI as unknown as {
+                                                electronAPI?: { openExternal: (url: string) => void };
+                                            }
+                                        ).electronAPI;
+                                        if (hasOpenExternal(electronAPI)) {
+                                            electronAPI.openExternal(url);
                                         } else {
                                             window.open(url, "_blank");
                                         }
@@ -121,7 +131,7 @@ export function SiteDetailsHeader({ isCollapsed, onToggleCollapse, selectedMonit
                         </div>
                     </div>
                     {/* Right side: Monitoring Status Display and Collapse Button */}
-                    <div className="flex items-center gap-2 flex-shrink-0 self-start">
+                    <div className="flex items-center self-start flex-shrink-0 gap-2">
                         {!isCollapsed && <MonitoringStatusDisplay monitors={site.monitors} />}
                         {onToggleCollapse && (
                             <button
@@ -184,7 +194,7 @@ function MonitoringStatusDisplay({ monitors }: { readonly monitors: Monitor[] })
                         {runningCount}/{totalCount} active
                     </ThemedBadge>
                 </div>
-                <div className="flex flex-col gap-1 max-h-32 overflow-y-auto">
+                <div className="flex flex-col gap-1 overflow-y-auto max-h-32">
                     {monitors.map((monitor) => (
                         <div
                             key={monitor.id}
@@ -204,12 +214,12 @@ function MonitoringStatusDisplay({ monitors }: { readonly monitors: Monitor[] })
                                     </ThemedText>
                                 </div>
                             </ThemedBadge>
-                            <ThemedText size="xs" variant="secondary" className="min-w-0 flex-1">
+                            <ThemedText size="xs" variant="secondary" className="flex-1 min-w-0">
                                 {monitor.type === "http" && monitor.url && (
-                                    <span className="truncate block">{new URL(monitor.url).hostname}</span>
+                                    <span className="block truncate">{new URL(monitor.url).hostname}</span>
                                 )}
                                 {monitor.type === "port" && monitor.host && monitor.port && (
-                                    <span className="truncate block">
+                                    <span className="block truncate">
                                         {monitor.host}:{monitor.port}
                                     </span>
                                 )}

@@ -13,7 +13,12 @@ import "./index.css";
  * Initialize and render the React application.
  * Creates the React root and renders the App component with StrictMode for development benefits.
  */
-ReactDOM.createRoot(document.getElementById("root")!).render(
+const rootElement = document.querySelector("#root");
+if (!rootElement) {
+    throw new Error("Root element not found");
+}
+
+ReactDOM.createRoot(rootElement).render(
     <React.StrictMode>
         <App />
     </React.StrictMode>

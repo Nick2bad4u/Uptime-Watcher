@@ -258,7 +258,7 @@ describe("ScreenshotThumbnail", () => {
             // Use testing-library's built-in hover functionality
             await act(async () => {
                 // Using fireEvent instead of userEvent to avoid navigation issues
-                // eslint-disable-next-line testing-library/prefer-user-event
+
                 fireEvent.mouseEnter(link);
             });
 
@@ -637,7 +637,7 @@ describe("ScreenshotThumbnail", () => {
             const link = screen.getByRole("link");
 
             // Use fireEvent instead of userEvent to avoid JSDOM navigation errors
-            // eslint-disable-next-line testing-library/prefer-user-event
+
             fireEvent.click(link);
 
             // If hasOpenExternal works correctly, electronAPI.openExternal should be called
@@ -660,7 +660,7 @@ describe("ScreenshotThumbnail", () => {
 
             // Use fireEvent with preventDefault to avoid JSDOM navigation errors
             const clickEvent = createEvent.click(link);
-            // eslint-disable-next-line testing-library/prefer-user-event
+
             fireEvent(link, clickEvent);
 
             // Should fall back to window.open
@@ -701,9 +701,9 @@ describe("ScreenshotThumbnail", () => {
             const link = screen.getByRole("link");
 
             // Trigger mouse enter then mouse leave to create timeout
-            // eslint-disable-next-line testing-library/prefer-user-event
+
             fireEvent.mouseEnter(link);
-            // eslint-disable-next-line testing-library/prefer-user-event
+
             fireEvent.mouseLeave(link);
 
             // Verify timeout was created
@@ -727,16 +727,16 @@ describe("ScreenshotThumbnail", () => {
             const image = screen.getByAltText("Screenshot of Test Site");
 
             // First hover then leave to create timeout
-            // eslint-disable-next-line testing-library/prefer-user-event
+
             fireEvent.mouseEnter(image);
-            // eslint-disable-next-line testing-library/prefer-user-event
+
             fireEvent.mouseLeave(image);
 
             // Verify timeout was created
             expect(vi.getTimerCount()).toBeGreaterThan(0);
 
             // Hover again to trigger timeout clearing
-            // eslint-disable-next-line testing-library/prefer-user-event
+
             fireEvent.mouseEnter(image);
 
             expect(clearTimeoutSpy).toHaveBeenCalled();
@@ -752,9 +752,9 @@ describe("ScreenshotThumbnail", () => {
             const image = screen.getByAltText("Screenshot of Test Site");
 
             // First hover then leave to create timeout
-            // eslint-disable-next-line testing-library/prefer-user-event
+
             fireEvent.mouseEnter(image);
-            // eslint-disable-next-line testing-library/prefer-user-event
+
             fireEvent.mouseLeave(image);
 
             // Verify timeout was created
@@ -776,9 +776,9 @@ describe("ScreenshotThumbnail", () => {
             const image = screen.getByAltText("Screenshot of Test Site");
 
             // First hover then leave to create timeout
-            // eslint-disable-next-line testing-library/prefer-user-event
+
             fireEvent.mouseEnter(image);
-            // eslint-disable-next-line testing-library/prefer-user-event
+
             fireEvent.mouseLeave(image);
 
             // Verify timeout was created
@@ -800,16 +800,16 @@ describe("ScreenshotThumbnail", () => {
             const image = screen.getByAltText("Screenshot of Test Site");
 
             // First mouse enter/leave to create initial timeout
-            // eslint-disable-next-line testing-library/prefer-user-event
+
             fireEvent.mouseEnter(image);
-            // eslint-disable-next-line testing-library/prefer-user-event
+
             fireEvent.mouseLeave(image);
 
             // Verify timeout was created
             expect(vi.getTimerCount()).toBeGreaterThan(0);
 
             // Second mouse leave while timeout exists - should clear existing timeout first
-            // eslint-disable-next-line testing-library/prefer-user-event
+
             fireEvent.mouseLeave(image);
 
             // This should have called clearTimeout for the existing timeout before setting new one
@@ -827,7 +827,7 @@ describe("ScreenshotThumbnail", () => {
             const image = screen.getByAltText("Screenshot of Test Site");
 
             // Create hover state to trigger portal creation
-            // eslint-disable-next-line testing-library/prefer-user-event
+
             fireEvent.mouseEnter(image); // Creates portal
 
             // Verify portal exists
@@ -849,16 +849,16 @@ describe("ScreenshotThumbnail", () => {
             const image = screen.getByAltText("Screenshot of Test Site");
 
             // Create timeout with mouse leave
-            // eslint-disable-next-line testing-library/prefer-user-event
+
             fireEvent.mouseEnter(image);
-            // eslint-disable-next-line testing-library/prefer-user-event
+
             fireEvent.mouseLeave(image);
 
             // Verify timeout exists
             expect(vi.getTimerCount()).toBeGreaterThan(0);
 
             // Mouse enter again should clear existing timeout
-            // eslint-disable-next-line testing-library/prefer-user-event
+
             fireEvent.mouseEnter(image);
 
             expect(clearTimeoutSpy).toHaveBeenCalled();
@@ -875,9 +875,9 @@ describe("ScreenshotThumbnail", () => {
             const link = screen.getByRole("link");
 
             // Create timeout with mouse leave
-            // eslint-disable-next-line testing-library/prefer-user-event
+
             fireEvent.mouseEnter(link);
-            // eslint-disable-next-line testing-library/prefer-user-event
+
             fireEvent.mouseLeave(link);
 
             // Verify timeout exists
@@ -900,9 +900,9 @@ describe("ScreenshotThumbnail", () => {
             const link = screen.getByRole("link");
 
             // Create timeout with mouse leave
-            // eslint-disable-next-line testing-library/prefer-user-event
+
             fireEvent.mouseEnter(link);
-            // eslint-disable-next-line testing-library/prefer-user-event
+
             fireEvent.mouseLeave(link);
 
             // Verify timeout exists
@@ -925,16 +925,16 @@ describe("ScreenshotThumbnail", () => {
             const image = screen.getByAltText("Screenshot of Test Site");
 
             // First trigger mouseEnter then mouseLeave to create a timeout
-            // eslint-disable-next-line testing-library/prefer-user-event
+
             fireEvent.mouseEnter(image);
-            // eslint-disable-next-line testing-library/prefer-user-event
+
             fireEvent.mouseLeave(image);
 
             // Verify timeout was created
             expect(vi.getTimerCount()).toBeGreaterThan(0);
 
             // Rapid mouse leave/enter should clear and reset timeout
-            // eslint-disable-next-line testing-library/prefer-user-event
+
             fireEvent.mouseLeave(image);
 
             // This should have cleared the previous timeout and set a new one
@@ -968,7 +968,7 @@ describe("ScreenshotThumbnail", () => {
             const image = screen.getByAltText("Screenshot of Test Site 1");
 
             // Hover to trigger overlay
-            // eslint-disable-next-line testing-library/prefer-user-event
+
             fireEvent.mouseEnter(image);
 
             const overlay = document.querySelector(".site-details-thumbnail-portal-overlay");
@@ -998,7 +998,7 @@ describe("ScreenshotThumbnail", () => {
             const image2 = screen.getByAltText("Screenshot of Test Site 2");
 
             // Hover to trigger overlay
-            // eslint-disable-next-line testing-library/prefer-user-event
+
             fireEvent.mouseEnter(image2);
 
             const overlay2 = document.querySelector(".site-details-thumbnail-portal-overlay");
@@ -1018,19 +1018,19 @@ describe("ScreenshotThumbnail", () => {
             const link = screen.getByRole("link");
 
             // Test sequence: enter -> leave -> enter (should clear timeout)
-            // eslint-disable-next-line testing-library/prefer-user-event
+
             fireEvent.mouseEnter(link);
-            // eslint-disable-next-line testing-library/prefer-user-event
+
             fireEvent.mouseLeave(link);
             expect(vi.getTimerCount()).toBeGreaterThan(0);
-            // eslint-disable-next-line testing-library/prefer-user-event
+
             fireEvent.mouseEnter(link); // Should clear timeout
             expect(clearTimeoutSpy).toHaveBeenCalled();
 
             clearTimeoutSpy.mockClear();
 
             // Test sequence: enter -> leave -> focus (should clear timeout)
-            // eslint-disable-next-line testing-library/prefer-user-event
+
             fireEvent.mouseLeave(link);
             expect(vi.getTimerCount()).toBeGreaterThan(0);
             fireEvent.focus(link); // Should clear timeout
@@ -1039,7 +1039,7 @@ describe("ScreenshotThumbnail", () => {
             clearTimeoutSpy.mockClear();
 
             // Test sequence: enter -> leave -> blur (should clear timeout)
-            // eslint-disable-next-line testing-library/prefer-user-event
+
             fireEvent.mouseLeave(link);
             expect(vi.getTimerCount()).toBeGreaterThan(0);
             fireEvent.blur(link); // Should clear timeout

@@ -13,19 +13,11 @@ import { logStoreAction } from "../utils";
 
 export const useUIStore = create<UIStore>()(
     persist(
-        (set, get) => ({
+        (set) => ({
             // State
             activeSiteDetailsTab: "site-overview",
-            // Actions
-            getSelectedSite: () => {
-                const { selectedSiteId } = get();
-                if (!selectedSiteId) return undefined;
-
-                // Use subscription pattern instead of direct store access
-                // The component should handle this logic by subscribing to both stores
-                return undefined; // Components should derive this from their own subscriptions
-            },
             selectedSiteId: undefined,
+            // Actions
             setActiveSiteDetailsTab: (tab: string) => {
                 logStoreAction("UIStore", "setActiveSiteDetailsTab", { tab });
                 set({ activeSiteDetailsTab: tab });
