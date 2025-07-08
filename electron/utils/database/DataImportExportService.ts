@@ -4,12 +4,12 @@
  */
 
 import { UptimeEvents, TypedEventBus } from "../../events";
-import { 
+import {
     DatabaseService,
     HistoryRepository,
     MonitorRepository,
     SettingsRepository,
-    SiteRepository
+    SiteRepository,
 } from "../../services/database";
 import { Site, StatusHistory } from "../../types";
 import { ILogger, ISiteCache, SiteLoadingError } from "./interfaces";

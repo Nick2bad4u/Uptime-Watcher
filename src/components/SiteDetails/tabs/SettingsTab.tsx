@@ -9,15 +9,7 @@ import { MdSettings, MdTimer, MdInfoOutline, MdDangerous } from "react-icons/md"
 
 import { CHECK_INTERVALS, RETRY_CONSTRAINTS, TIMEOUT_CONSTRAINTS } from "../../../constants";
 import { logger } from "../../../services";
-import {
-    ThemedText,
-    ThemedButton,
-    ThemedCard,
-    ThemedBadge,
-    ThemedInput,
-    ThemedSelect,
-    useTheme,
-} from "../../../theme";
+import { ThemedText, ThemedButton, ThemedCard, ThemedBadge, ThemedInput, ThemedSelect, useTheme } from "../../../theme";
 import { Site, Monitor } from "../../../types";
 import { calculateMaxDuration } from "../../../utils";
 

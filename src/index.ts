@@ -1,7 +1,7 @@
 /**
  * Root barrel export for Uptime Watcher application.
  * Provides centralized access to all major application modules.
- * 
+ *
  * Import patterns:
  * - Types: import { Site, Monitor } from "@/types"
  * - Components: import { SiteDetails, Dashboard } from "@/components"
@@ -13,14 +13,7 @@
  */
 
 // Application types (export these explicitly to avoid conflicts)
-export type { 
-    UpdateStatus, 
-    MonitorType, 
-    Monitor, 
-    Site, 
-    StatusHistory, 
-    StatusUpdate 
-} from "./types";
+export type { UpdateStatus, MonitorType, Monitor, Site, StatusHistory, StatusUpdate } from "./types";
 
 // Core constants
 export * from "./constants";

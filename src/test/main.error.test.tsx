@@ -1,7 +1,7 @@
 /**
  * Tests for main.tsx error handling scenarios
  */
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 
 vi.mock("../services/logger", () => ({
     default: {
@@ -14,7 +14,7 @@ vi.mock("../services/logger", () => ({
     },
 }));
 
-describe('main.tsx Error Handling', () => {
+describe("main.tsx Error Handling", () => {
     let originalDocument: Document;
     let mockQuerySelector: any;
     let mockCreateElement: any;
@@ -23,14 +23,14 @@ describe('main.tsx Error Handling', () => {
         originalDocument = global.document;
         mockQuerySelector = vi.fn();
         mockCreateElement = vi.fn();
-        
+
         // Create a mock element with all necessary methods
         const mockElement = {
             setAttribute: vi.fn(),
             appendChild: vi.fn(),
-            innerHTML: '',
-            id: '',
-            className: '',
+            innerHTML: "",
+            id: "",
+            className: "",
             style: {},
             addEventListener: vi.fn(),
             removeEventListener: vi.fn(),
@@ -38,7 +38,7 @@ describe('main.tsx Error Handling', () => {
             focus: vi.fn(),
             blur: vi.fn(),
         };
-        
+
         // Create a more complete mock document
         global.document = {
             querySelector: mockQuerySelector,
@@ -60,15 +60,15 @@ describe('main.tsx Error Handling', () => {
         vi.resetModules();
     });
 
-    it('should throw error when root element is not found (lines 18-19)', async () => {
+    it("should throw error when root element is not found (lines 18-19)", async () => {
         // Mock querySelector to return null (no root element found)
         mockQuerySelector.mockReturnValue(null);
 
         // Use dynamic import to catch the error during module initialization
         await expect(async () => {
-            await import('../main');
-        }).rejects.toThrow('Root element not found');
-        
-        expect(mockQuerySelector).toHaveBeenCalledWith('#root');
+            await import("../main");
+        }).rejects.toThrow("Root element not found");
+
+        expect(mockQuerySelector).toHaveBeenCalledWith("#root");
     });
 });

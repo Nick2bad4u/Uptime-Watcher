@@ -6,7 +6,14 @@ import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 
 import { useSettingsStore } from "../stores";
-import { themeManager, useTheme, useThemeValue, useStatusColors, useThemeClasses, useAvailabilityColors } from "../theme";
+import {
+    themeManager,
+    useTheme,
+    useThemeValue,
+    useStatusColors,
+    useThemeClasses,
+    useAvailabilityColors,
+} from "../theme";
 
 // Mock the settings store
 vi.mock("../stores", () => ({
