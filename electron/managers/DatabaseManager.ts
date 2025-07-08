@@ -4,8 +4,7 @@
  */
 
 import { DEFAULT_HISTORY_LIMIT } from "../constants";
-import { UptimeEvents } from "../events/eventTypes";
-import { TypedEventBus } from "../events/TypedEventBus";
+import { UptimeEvents, TypedEventBus } from "../events";
 
 /**
  * Combined events interface for DatabaseManager.
@@ -17,7 +16,7 @@ import {
     MonitorRepository,
     HistoryRepository,
     SettingsRepository,
-} from "../services/database";
+} from "../services";
 import { Site } from "../types";
 import {
     initDatabase,
@@ -27,8 +26,8 @@ import {
     createSiteCache,
     createDataImportExportOrchestrator,
     createDataBackupOrchestrator,
-} from "../utils/database";
-import { monitorLogger as logger } from "../utils/logger";
+    monitorLogger as logger,
+} from "../utils";
 
 export interface DatabaseManagerDependencies {
     eventEmitter: TypedEventBus<DatabaseManagerEvents>;

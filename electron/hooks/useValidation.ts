@@ -3,10 +3,10 @@
  * Provides reusable validation patterns with consistent error reporting.
  */
 
-import type { ValidationResult } from "../managers/ConfigurationManager";
+import type { ValidationResult } from "../managers";
 import type { Site } from "../types";
 
-import { configurationManager } from "../managers/ConfigurationManager";
+import { configurationManager } from "../managers";
 import { ValidationError } from "./correlationUtils";
 
 /**

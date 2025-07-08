@@ -4,7 +4,7 @@
  */
 
 import { UptimeEvents, TypedEventBus } from "../../events";
-import { DatabaseService } from "../../services/database";
+import { DatabaseService } from "../../services";
 import { ILogger, ISiteCache, SiteLoadingError } from "./interfaces";
 
 /**

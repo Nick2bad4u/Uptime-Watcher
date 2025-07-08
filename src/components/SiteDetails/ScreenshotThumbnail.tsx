@@ -9,7 +9,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 
-import logger from "../../services/logger";
+import { logger } from "../../services";
 import { useTheme } from "../../theme";
 
 /** Props for the ScreenshotThumbnail component */

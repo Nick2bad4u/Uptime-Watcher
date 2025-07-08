@@ -5,7 +5,7 @@
 
 import type { EventMiddleware } from "./TypedEventBus";
 
-import { logger as baseLogger } from "../utils/logger";
+import { logger as baseLogger } from "../utils";
 
 const logger = baseLogger;
 const EVENT_EMITTED_MSG = "[EventBus] Event emitted";

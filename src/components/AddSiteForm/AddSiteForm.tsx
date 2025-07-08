@@ -7,7 +7,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 
 import { UI_DELAYS, CHECK_INTERVALS } from "../../constants";
-import logger from "../../services/logger";
+import { logger } from "../../services";
 import { useErrorStore, useSitesStore } from "../../stores";
 import { ThemedBox, ThemedText, ThemedButton, useTheme } from "../../theme";
 import { generateUuid } from "../../utils/data/generateUuid";

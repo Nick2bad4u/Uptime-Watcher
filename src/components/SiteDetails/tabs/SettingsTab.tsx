@@ -8,7 +8,7 @@ import { FiTrash2, FiSave } from "react-icons/fi";
 import { MdSettings, MdTimer, MdInfoOutline, MdDangerous } from "react-icons/md";
 
 import { CHECK_INTERVALS, RETRY_CONSTRAINTS, TIMEOUT_CONSTRAINTS } from "../../../constants";
-import logger from "../../../services/logger";
+import { logger } from "../../../services";
 import {
     ThemedText,
     ThemedButton,
@@ -19,7 +19,7 @@ import {
     useTheme,
 } from "../../../theme";
 import { Site, Monitor } from "../../../types";
-import { calculateMaxDuration } from "../../../utils/duration";
+import { calculateMaxDuration } from "../../../utils";
 
 /**
  * Helper function to format time duration into human readable format.

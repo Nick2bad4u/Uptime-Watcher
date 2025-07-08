@@ -6,7 +6,7 @@
 import { EventEmitter } from "node:events";
 
 import { generateCorrelationId } from "../hooks/correlationUtils";
-import { logger as baseLogger } from "../utils/logger";
+import { logger as baseLogger } from "../utils";
 
 const logger = baseLogger;
 

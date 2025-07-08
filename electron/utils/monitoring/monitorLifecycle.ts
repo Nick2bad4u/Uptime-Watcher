@@ -4,8 +4,7 @@
  */
 
 import { UptimeEvents, TypedEventBus } from "../../events";
-import { MonitorRepository, DatabaseService } from "../../services/database";
-import { MonitorScheduler } from "../../services/monitoring";
+import { MonitorRepository, DatabaseService, MonitorScheduler } from "../../services";
 import { Site } from "../../types";
 
 interface Logger {

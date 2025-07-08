@@ -8,7 +8,7 @@ import { useState, useEffect, useRef } from "react";
 import { FiFilter } from "react-icons/fi";
 import { MdHistory } from "react-icons/md";
 
-import logger from "../../../services/logger";
+import { logger } from "../../../services";
 import { useSettingsStore } from "../../../stores";
 import { ThemedText, ThemedButton, StatusIndicator, ThemedCard, ThemedSelect, useTheme } from "../../../theme";
 import { StatusHistory, Monitor } from "../../../types";

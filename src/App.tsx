@@ -9,8 +9,7 @@ import type { StatusUpdate } from "./types";
 
 import { AddSiteForm, SiteList, Header, Settings, SiteDetails } from "./components";
 import { UI_DELAYS } from "./constants";
-import { useBackendFocusSync } from "./hooks/useBackendFocusSync";
-import { useSelectedSite } from "./hooks/useSelectedSite";
+import { useBackendFocusSync, useSelectedSite } from "./hooks";
 import { logger } from "./services";
 import { ErrorBoundary, useErrorStore, useSettingsStore, useSitesStore, useUIStore, useUpdatesStore } from "./stores";
 import { ThemeProvider, ThemedBox, ThemedText, ThemedButton, useTheme } from "./theme";

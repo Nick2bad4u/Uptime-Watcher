@@ -18,8 +18,7 @@ import {
     useAvailabilityColors,
 } from "../../../theme";
 import { Site, Monitor } from "../../../types";
-import { getSiteDisplayStatus } from "../../../utils/siteStatus";
-import { formatResponseTime, formatDuration } from "../../../utils/time";
+import { getSiteDisplayStatus, formatResponseTime, formatDuration } from "../../../utils";
 
 /**
  * Props for the SiteOverviewTab component

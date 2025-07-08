@@ -9,7 +9,7 @@ import {
     HistoryRepository,
     SettingsRepository,
     DatabaseService,
-} from "../../services/database";
+} from "../../services";
 import { monitorLogger } from "../logger";
 import { DataBackupService, DataBackupOrchestrator } from "./DataBackupService";
 import { DataImportExportService, DataImportExportOrchestrator } from "./DataImportExportService";

@@ -8,7 +8,7 @@ import { FiActivity, FiTrendingUp, FiBarChart2 } from "react-icons/fi";
 import { MdAnalytics, MdTrendingUp, MdSpeed, MdPieChart } from "react-icons/md";
 
 import { DowntimePeriod } from "../../../hooks/site/useSiteAnalytics";
-import logger from "../../../services/logger";
+import { logger } from "../../../services";
 import { ThemedText, ThemedButton, ThemedCard, ThemedBadge, ThemedProgress, useTheme, useAvailabilityColors } from "../../../theme";
 import { MonitorType } from "../../../types";
 

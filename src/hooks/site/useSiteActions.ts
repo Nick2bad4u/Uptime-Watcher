@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 
-import logger from "../../services/logger";
+import { logger } from "../../services";
 import { useSitesStore, useUIStore } from "../../stores";
 import { Monitor, Site } from "../../types";
 

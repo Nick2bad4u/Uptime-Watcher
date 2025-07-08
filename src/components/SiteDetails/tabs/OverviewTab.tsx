@@ -8,7 +8,7 @@ import { FiTrash2 } from "react-icons/fi";
 import { MdAccessTime, MdBolt, MdSpeed, MdOutlineFactCheck } from "react-icons/md";
 
 import { CHECK_INTERVALS, TIMEOUT_CONSTRAINTS } from "../../../constants";
-import logger from "../../../services/logger";
+import { logger } from "../../../services";
 import {
     ThemedText,
     ThemedButton,

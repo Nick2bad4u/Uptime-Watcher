@@ -4,7 +4,7 @@
  */
 
 import { UptimeEvents, TypedEventBus } from "../../events";
-import { DatabaseService } from "../../services/database";
+import { DatabaseService } from "../../services";
 import { monitorLogger as logger } from "../logger";
 import { withDbRetry } from "../retry";
 

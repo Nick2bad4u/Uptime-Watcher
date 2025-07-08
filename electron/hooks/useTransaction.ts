@@ -5,8 +5,8 @@
 
 import { Database } from "node-sqlite3-wasm";
 
-import { DatabaseService } from "../services/database";
-import { dbLogger as logger } from "../utils/logger";
+import { DatabaseService } from "../services";
+import { dbLogger as logger } from "../utils";
 import { generateCorrelationId } from "./correlationUtils";
 
 /**

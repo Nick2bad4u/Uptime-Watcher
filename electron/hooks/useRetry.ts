@@ -3,7 +3,7 @@
  * Provides configurable retry logic with correlation tracking and logging.
  */
 
-import { monitorLogger as logger } from "../utils/logger";
+import { monitorLogger as logger } from "../utils";
 import { generateCorrelationId } from "./correlationUtils";
 
 export interface RetryOptions {

@@ -9,7 +9,7 @@
 import { useState, useEffect, useCallback } from "react";
 
 import { HISTORY_LIMIT_OPTIONS, UI_DELAYS } from "../../constants";
-import logger from "../../services/logger";
+import { logger } from "../../services";
 import { useErrorStore, useSettingsStore, useSitesStore } from "../../stores";
 import {
     ThemedBox,
