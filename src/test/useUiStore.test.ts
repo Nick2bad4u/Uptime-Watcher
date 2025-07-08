@@ -159,8 +159,8 @@ describe("useUIStore - Uncovered Lines", () => {
             result.current.setSelectedSite(mockSite);
         });
 
-        // The selectedSiteId should be cleared
-        expect(result.current.selectedSiteId).toBeUndefined();
+        // The selectedSiteId should be set to the site identifier
+        expect(result.current.selectedSiteId).toBe("test-site");
     });
 
     it("should clear selectedSiteId when site is unselected", () => {
@@ -185,7 +185,7 @@ describe("useUIStore - Uncovered Lines", () => {
         });
 
         // The selectedSiteId should be cleared
-        expect(result.current.selectedSiteId).toBe("test-site");
+        expect(result.current.selectedSiteId).toBeUndefined();
     });
 
     it("should persist only specific state properties", () => {

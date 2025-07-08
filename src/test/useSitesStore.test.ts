@@ -48,7 +48,7 @@ Object.defineProperty(window, "electronAPI", {
 });
 
 // Mock crypto.randomUUID
-Object.defineProperty(window.electronAPI, "crypto", {
+Object.defineProperty(global, "crypto", {
     value: { randomUUID: vi.fn(() => "mock-uuid") },
     writable: true,
 });

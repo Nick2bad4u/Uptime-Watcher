@@ -31,10 +31,10 @@ describe("Main Entry Point", () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
-        // Mock DOM methods
+        // Mock DOM methods - main.tsx uses querySelector("#root")
         const mockElement = document.createElement("div");
         mockElement.id = "root";
-        vi.spyOn(document, "getElementById").mockReturnValue(mockElement);
+        vi.spyOn(document, "querySelector").mockReturnValue(mockElement);
     });
 
     it("should test React and ReactDOM imports", async () => {
