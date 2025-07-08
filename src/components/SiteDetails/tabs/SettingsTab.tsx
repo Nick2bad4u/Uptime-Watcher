@@ -16,8 +16,8 @@ import {
     ThemedBadge,
     ThemedInput,
     ThemedSelect,
-} from "../../../theme/components";
-import { useTheme } from "../../../theme";
+    useTheme,
+} from "../../../theme";
 import { Site, Monitor } from "../../../types";
 import { calculateMaxDuration } from "../../../utils/duration";
 

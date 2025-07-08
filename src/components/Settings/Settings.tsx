@@ -18,9 +18,9 @@ import {
     StatusIndicator,
     ThemedSelect,
     ThemedCheckbox,
-} from "../../theme/components";
-import { ThemeName } from "../../theme/types";
-import { useTheme } from "../../theme";
+    ThemeName,
+    useTheme,
+} from "../../theme";
 
 /** Props for the Settings component */
 interface SettingsProperties {

@@ -18,8 +18,9 @@ import {
     ThemedProgress,
     ThemedSelect,
     ThemedInput,
-} from "../../../theme/components";
-import { useTheme, useAvailabilityColors } from "../../../theme";
+    useTheme,
+    useAvailabilityColors,
+} from "../../../theme";
 import { Monitor } from "../../../types";
 
 /**

@@ -114,7 +114,7 @@ comment:
     behavior: default
     require_changes: false
     require_base: false # Allow comments on first PR
-    require_head: true # Require head report to comment
+    require_head: false # Require head report to comment
     hide_project_coverage: false
 
 flags:

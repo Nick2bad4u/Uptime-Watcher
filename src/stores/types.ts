@@ -3,7 +3,7 @@
  * Contains common interfaces and types used across multiple stores.
  */
 
-import { ThemeName } from "../theme/types";
+import { ThemeName } from "../theme";
 
 /** Application update status types */
 export type UpdateStatus = "idle" | "checking" | "available" | "downloading" | "downloaded" | "error";
