@@ -11,6 +11,7 @@
             "@electron/*": ["electron/*"]
         }
     },
+    "esModuleInterop": true,
     "include": ["electron/**/*.ts", "electron/**/*.tsx", "vitest.electron.config.ts"],
     "exclude": ["electron/**/*.test.ts", "electron/**/*.spec.ts", "electron/test/**/*", "node_modules"]
 }
