@@ -12,6 +12,8 @@ import {
     DatabaseService,
 } from "../../services/database";
 import { monitorLogger } from "../logger";
+import { DataBackupService, DataBackupOrchestrator } from "./DataBackupService";
+import { DataImportExportService, DataImportExportOrchestrator } from "./DataImportExportService";
 import { SiteCache } from "./interfaces";
 import {
     SiteRepositoryAdapter,
@@ -87,5 +89,58 @@ export function createSiteCache(): SiteCache {
     return new SiteCache();
 }
 
-// Legacy exports for backward compatibility with existing tests
-export { getSitesFromDatabase, loadSitesFromDatabase } from "./siteRepository";
+/**
+ * Factory function to create a properly configured DataImportExportService.
+ */
+export function createDataImportExportService(eventEmitter: TypedEventBus<UptimeEvents>): DataImportExportService {
+    const siteRepository = new SiteRepository();
+    const monitorRepository = new MonitorRepository();
+    const historyRepository = new HistoryRepository();
+    const settingsRepository = new SettingsRepository();
+    const logger = new LoggerAdapter(monitorLogger);
+    const databaseService = DatabaseService.getInstance();
+
+    return new DataImportExportService({
+        databaseService,
+        eventEmitter,
+        logger,
+        repositories: {
+            history: historyRepository,
+            monitor: monitorRepository,
+            settings: settingsRepository,
+            site: siteRepository,
+        },
+    });
+}
+
+/**
+ * Factory function to create a properly configured DataBackupService.
+ */
+export function createDataBackupService(eventEmitter: TypedEventBus<UptimeEvents>): DataBackupService {
+    const logger = new LoggerAdapter(monitorLogger);
+    const databaseService = DatabaseService.getInstance();
+
+    return new DataBackupService({
+        databaseService,
+        eventEmitter,
+        logger,
+    });
+}
+
+/**
+ * Factory function to create a properly configured DataImportExportOrchestrator.
+ */
+export function createDataImportExportOrchestrator(
+    eventEmitter: TypedEventBus<UptimeEvents>
+): DataImportExportOrchestrator {
+    const dataImportExportService = createDataImportExportService(eventEmitter);
+    return new DataImportExportOrchestrator(dataImportExportService);
+}
+
+/**
+ * Factory function to create a properly configured DataBackupOrchestrator.
+ */
+export function createDataBackupOrchestrator(eventEmitter: TypedEventBus<UptimeEvents>): DataBackupOrchestrator {
+    const dataBackupService = createDataBackupService(eventEmitter);
+    return new DataBackupOrchestrator(dataBackupService);
+}

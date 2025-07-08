@@ -26,6 +26,10 @@ export interface ISiteRepository {
     findByIdentifier(identifier: string): Promise<{ identifier: string; name?: string | undefined } | undefined>;
     upsert(site: Pick<Site, "identifier" | "name">): Promise<void>;
     delete(identifier: string): Promise<boolean>;
+    // Import/Export operations
+    exportAll(): Promise<Site[]>;
+    deleteAll(): Promise<void>;
+    bulkInsert(sites: { identifier: string; name?: string }[]): Promise<void>;
 }
 
 /**
@@ -39,6 +43,9 @@ export interface IMonitorRepository {
     deleteBySiteIdentifier(siteIdentifier: string): Promise<void>;
     deleteBySiteIdentifierInternal(db: Database, siteIdentifier: string): void;
     deleteMonitorInternal(db: Database, monitorId: string): boolean;
+    // Import/Export operations
+    deleteAll(): Promise<void>;
+    bulkCreate(siteIdentifier: string, monitors: Monitor[]): Promise<Monitor[]>;
 }
 
 /**
@@ -48,6 +55,10 @@ export interface IHistoryRepository {
     findByMonitorId(monitorId: string): Promise<StatusHistory[]>;
     create(monitorId: string, history: StatusHistory): Promise<void>;
     deleteByMonitorId(monitorId: string): Promise<void>;
+    // Import/Export operations
+    deleteAll(): Promise<void>;
+    addEntry(monitorId: string, history: StatusHistory, details?: string): Promise<void>;
+    pruneHistory(monitorId: string, limit: number): Promise<void>;
 }
 
 /**
@@ -57,6 +68,10 @@ export interface ISettingsRepository {
     get(key: string): Promise<string | undefined>;
     set(key: string, value: string): Promise<void>;
     delete(key: string): Promise<void>;
+    // Import/Export operations
+    getAll(): Promise<Record<string, string>>;
+    deleteAll(): Promise<void>;
+    bulkInsert(settings: Record<string, string>): Promise<void>;
 }
 
 /**

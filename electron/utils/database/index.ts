@@ -3,21 +3,11 @@
  * Exports all database utility functions for easy importing.
  */
 
-// Database backup utilities
-export * from "./dataBackup";
-
 // Database initialization
 export * from "./databaseInitializer";
 
-// Data import/export
-export * from "./dataImportExport";
-
 // History limit management
 export * from "./historyLimitManager";
-
-// Site management utilities - legacy functions for specialized operations (import/export/backup)
-// TODO: Migrate these to use the new service-based architecture
-export * from "./siteRepository";
 
 // New service-based architecture
 export * from "./interfaces";
@@ -30,4 +20,16 @@ export {
     createSiteLoadingOrchestrator,
     createSiteWritingOrchestrator,
     createSiteCache,
+} from "./serviceFactory";
+
+// Import/Export services
+export { DataImportExportService, DataImportExportOrchestrator } from "./DataImportExportService";
+export type { DataImportExportConfig } from "./DataImportExportService";
+export { DataBackupService, DataBackupOrchestrator } from "./DataBackupService";
+export type { DataBackupConfig } from "./DataBackupService";
+export {
+    createDataImportExportService,
+    createDataBackupService,
+    createDataImportExportOrchestrator,
+    createDataBackupOrchestrator,
 } from "./serviceFactory";

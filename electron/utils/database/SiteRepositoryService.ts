@@ -77,7 +77,7 @@ export class SiteRepositoryService {
         } catch (error) {
             const message = `Failed to load sites into cache: ${error instanceof Error ? error.message : String(error)}`;
             this.logger.error(message, error);
-            
+
             // Emit typed error event
             await this.eventEmitter.emitTyped("database:error", {
                 details: message,
@@ -85,7 +85,7 @@ export class SiteRepositoryService {
                 operation: "load-sites-into-cache",
                 timestamp: Date.now(),
             });
-            
+
             throw error;
         }
     }

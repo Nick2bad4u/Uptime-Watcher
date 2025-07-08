@@ -1,12 +1,7 @@
 /**
  * Core uptime monitoring orchestrator.
  * Coordinates between specialized managers to provide a unified API for uptime monitoring.
- * Manager instances
-    private readonly siteManager: SiteManager;
-    private readonly monitorManager: MonitorManager;
-    // TODO: DatabaseManager still has specialized import/export/backup functions that should
-    // eventually be converted to the new service-based architecture for consistency
-    private readonly databaseManager: DatabaseManager;
+ * Uses the new service-based architecture for all database operations.
  */
 
 /* eslint-disable unicorn/no-null -- null literal needed for backend */
@@ -64,8 +59,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     // Manager instances
     private readonly siteManager: SiteManager;
     private readonly monitorManager: MonitorManager;
-    // TODO: DatabaseManager still has specialized import/export/backup functions that should
-    // TODO: eventually be converted to the new service-based architecture for consistency
     private readonly databaseManager: DatabaseManager;
 
     constructor() {

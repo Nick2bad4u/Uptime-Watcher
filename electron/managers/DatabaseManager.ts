@@ -20,18 +20,13 @@ import {
 } from "../services/database";
 import { Site } from "../types";
 import {
-    downloadBackup,
-    refreshSites,
-    DataBackupDependencies,
-    DataBackupCallbacks,
     initDatabase,
-    exportData,
-    importData,
-    DataImportExportDependencies,
-    DataImportExportCallbacks,
     getHistoryLimit as getHistoryLimitUtil,
     setHistoryLimit as setHistoryLimitUtil,
-    loadSitesFromDatabase,
+    createSiteLoadingOrchestrator,
+    createSiteCache,
+    createDataImportExportOrchestrator,
+    createDataBackupOrchestrator,
 } from "../utils/database";
 import { monitorLogger as logger } from "../utils/logger";
 
@@ -49,11 +44,7 @@ export interface DatabaseManagerDependencies {
 /**
  * Manages database operations and data management.
  * Handles initialization, import/export, backup, and history management.
- *
- * TODO: Convert remaining legacy functions (Import/Export/Backup Functions)
- * to use the new service-based architecture for consistency. These functions are currently
- * only used for specialized import/export/backup operations but should follow the same
- * patterns as the rest of the codebase.
+ * Uses the new service-based architecture for all operations.
  */
 export class DatabaseManager {
     private historyLimit: number = DEFAULT_HISTORY_LIMIT;
@@ -90,17 +81,15 @@ export class DatabaseManager {
      * Load sites from database and update cache.
      */
     private async loadSites(): Promise<void> {
-        const sitesMap = new Map<string, Site>();
+        // Create the site cache
+        const siteCache = createSiteCache();
 
-        await loadSitesFromDatabase({
-            eventEmitter: this.eventEmitter,
-            repositories: {
-                history: this.dependencies.repositories.history,
-                monitor: this.dependencies.repositories.monitor,
-                settings: this.dependencies.repositories.settings,
-                site: this.dependencies.repositories.site,
-            },
-            setHistoryLimit: async (limit) => {
+        // Create the site loading orchestrator
+        const siteLoadingOrchestrator = createSiteLoadingOrchestrator(this.eventEmitter);
+
+        // Create monitoring configuration
+        const monitoringConfig = {
+            setHistoryLimit: async (limit: number) => {
                 this.historyLimit = limit;
                 // Emit history limit updated event
                 await this.eventEmitter.emitTyped("internal:database:history-limit-updated", {
@@ -109,12 +98,11 @@ export class DatabaseManager {
                     timestamp: Date.now(),
                 });
             },
-            sites: sitesMap,
             startMonitoring: async (identifier: string, monitorId: string) => {
                 // First update the cache so monitoring can find the sites
                 await this.eventEmitter.emitTyped("internal:database:update-sites-cache-requested", {
                     operation: "update-sites-cache-requested",
-                    sites: Array.from(sitesMap.values()),
+                    sites: Array.from(siteCache.entries()).map(([, site]) => site),
                     timestamp: Date.now(),
                 });
 
@@ -125,34 +113,45 @@ export class DatabaseManager {
                     operation: "start-monitoring-requested",
                     timestamp: Date.now(),
                 });
-                return true;
+
+                return true; // Always return true for the interface
             },
-        });
+            stopMonitoring: async (identifier: string, monitorId: string) => {
+                // Request monitoring stop via events
+                await this.eventEmitter.emitTyped("internal:site:stop-monitoring-requested", {
+                    identifier,
+                    monitorId,
+                    operation: "stop-monitoring-requested",
+                    timestamp: Date.now(),
+                });
+
+                return true; // Always return true for the interface
+            },
+        };
+
+        // Load sites using the new service-based architecture
+        const result = await siteLoadingOrchestrator.loadSitesFromDatabase(siteCache, monitoringConfig);
+
+        if (!result.success) {
+            throw new Error(result.message);
+        }
 
         // Update the cache with loaded sites (final update to ensure consistency)
         await this.eventEmitter.emitTyped("internal:database:update-sites-cache-requested", {
             operation: "update-sites-cache-requested",
-            sites: Array.from(sitesMap.values()),
+            sites: Array.from(siteCache.entries()).map(([, site]) => site),
             timestamp: Date.now(),
         });
+
+        logger.info(`[DatabaseManager] Successfully loaded ${result.sitesLoaded} sites from database`);
     }
 
     /**
      * Export all application data to JSON string.
      */
     public async exportData(): Promise<string> {
-        const dependencies: DataImportExportDependencies = {
-            databaseService: this.dependencies.repositories.database,
-            eventEmitter: this.eventEmitter,
-            repositories: {
-                history: this.dependencies.repositories.history,
-                monitor: this.dependencies.repositories.monitor,
-                settings: this.dependencies.repositories.settings,
-                site: this.dependencies.repositories.site,
-            },
-        };
-
-        const result = await exportData(dependencies);
+        const dataImportExportOrchestrator = createDataImportExportOrchestrator(this.eventEmitter);
+        const result = await dataImportExportOrchestrator.exportData();
 
         // Emit typed data exported event
         await this.eventEmitter.emitTyped("internal:database:data-exported", {
@@ -169,47 +168,27 @@ export class DatabaseManager {
      * Import data from JSON string.
      */
     public async importData(data: string): Promise<boolean> {
-        const dependencies: DataImportExportDependencies = {
-            databaseService: this.dependencies.repositories.database,
-            eventEmitter: this.eventEmitter,
-            repositories: {
-                history: this.dependencies.repositories.history,
-                monitor: this.dependencies.repositories.monitor,
-                settings: this.dependencies.repositories.settings,
-                site: this.dependencies.repositories.site,
-            },
-        };
+        const siteCache = createSiteCache();
+        const dataImportExportOrchestrator = createDataImportExportOrchestrator(this.eventEmitter);
 
-        const callbacks: DataImportExportCallbacks = {
-            getSitesFromCache: () => {
-                // This will be handled by the orchestrator via events
-                return [];
-            },
-            loadSites: () => this.loadSites(),
-        };
-
-        const result = await importData(dependencies, callbacks, data);
+        const result = await dataImportExportOrchestrator.importData(data, siteCache, () => this.loadSites());
 
         // Emit typed data imported event
         await this.eventEmitter.emitTyped("internal:database:data-imported", {
             operation: "data-imported",
-            success: result,
+            success: result.success,
             timestamp: Date.now(),
         });
 
-        return result;
+        return result.success;
     }
 
     /**
      * Download SQLite database backup.
      */
     public async downloadBackup(): Promise<{ buffer: Buffer; fileName: string }> {
-        const dependencies: DataBackupDependencies = {
-            databaseService: this.dependencies.repositories.database,
-            eventEmitter: this.eventEmitter,
-        };
-
-        const result = await downloadBackup(dependencies);
+        const dataBackupOrchestrator = createDataBackupOrchestrator(this.eventEmitter);
+        const result = await dataBackupOrchestrator.downloadBackup();
 
         // Emit typed backup downloaded event
         await this.eventEmitter.emitTyped("internal:database:backup-downloaded", {
@@ -226,15 +205,14 @@ export class DatabaseManager {
      * Refresh sites from database and update cache.
      */
     public async refreshSites(): Promise<Site[]> {
-        const callbacks: DataBackupCallbacks = {
-            getSitesFromCache: () => {
-                // This will be handled by the orchestrator via events
-                return [];
-            },
-            loadSites: () => this.loadSites(),
-        };
+        const siteCache = createSiteCache();
+        const dataBackupOrchestrator = createDataBackupOrchestrator(this.eventEmitter);
 
-        const result = await refreshSites(callbacks);
+        // Load sites first
+        await this.loadSites();
+
+        // Then get them from cache
+        const result = await dataBackupOrchestrator.refreshSitesFromCache(siteCache);
 
         // Emit typed sites refreshed event
         await this.eventEmitter.emitTyped("internal:database:sites-refreshed", {
@@ -243,7 +221,12 @@ export class DatabaseManager {
             timestamp: Date.now(),
         });
 
-        return result;
+        // Convert to Site[] format expected by the interface
+        return result.map((site) => ({
+            identifier: site.identifier,
+            monitors: [],
+            ...(site.name && { name: site.name }),
+        }));
     }
 
     /**
