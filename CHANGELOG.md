@@ -7,14 +7,174 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[cdca1a3](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cdca1a3cafefe482662bc330dffac1623fef5bb9)...
-[cdca1a3](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cdca1a3cafefe482662bc330dffac1623fef5bb9)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/cdca1a3cafefe482662bc330dffac1623fef5bb9...cdca1a3cafefe482662bc330dffac1623fef5bb9))
+[[4769ed7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4769ed7b536157be7aa09c3c4bf502f0108e83b7)...
+[4769ed7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4769ed7b536157be7aa09c3c4bf502f0108e83b7)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/4769ed7b536157be7aa09c3c4bf502f0108e83b7...4769ed7b536157be7aa09c3c4bf502f0108e83b7))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 6.1.0 [`(4769ed7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4769ed7b536157be7aa09c3c4bf502f0108e83b7)
+
+
+
+
+
+
+## [6.1.0] - 2025-07-09
+
+
+[[834da82](https://github.com/Nick2bad4u/Uptime-Watcher/commit/834da82b5c96dbd570f57f5396ca612ead5c9778)...
+[8654c4e](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8654c4ef847b5bc808604e3d42fa085a89f1512f)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/834da82b5c96dbd570f57f5396ca612ead5c9778...8654c4ef847b5bc808604e3d42fa085a89f1512f))
+
+
+### �️ Bug Fixes
+
+- 🛠️ [fix] Move stale monitor ID update to useEffect
+
+- Prevents state updates during render by moving logic that syncs monitor ID into a useEffect.
+- Ensures React best practices are followed, improving stability and avoiding potential warnings or bugs caused by state updates in render phase.pre [`(593b545)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/593b545ace3ad3c853bd854c3f5a39c803f013e6)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 6.0.0 [`(cdca1a3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cdca1a3cafefe482662bc330dffac1623fef5bb9)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Simplifies null checks and tightens type safety
+
+- Removes unnecessary null/undefined checks and fallback logic from arrays, objects, and API calls, streamlining code and improving readability.
+- Refactors singleton patterns and theme logic for better consistency and accuracy in browser environments.
+- Strengthens type safety by adding explicit type guards, runtime checks, and TypeScript typings, especially in IPC and data import/export flows.
+- Improves performance and maintainability by removing redundant code, tightening DOM handling, and always awaiting API readiness before event binding.
+- Enhances future extensibility by preparing for additional monitor types and unifying monitor property access patterns.
+
+Relates to robustness, maintainability, and groundwork for new monitor features. [`(365af3a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/365af3a21e30051f49af69272d667be053111ed3)
+
+
+- 🚜 [refactor] Remove unnecessary async/await from sync codebase
+
+- Refactors backend and frontend code to eliminate redundant async/await usage in synchronous functions, improving clarity and performance.
+- Normalizes usage of nullish coalescing (??) to avoid fallback bugs with falsy values.
+- Updates event handlers, UI callbacks, and repository adapters to match synchronous contracts, wrapping return values in Promises where needed for compatibility.
+- Adds missing type safety, error handling, and defensive coding throughout event-driven backend logic.
+- Improves React code by ensuring side-effectful async actions are wrapped in void or handled with explicit error logging, reducing unhandled promise warnings.
+- Standardizes UI logic to use void when triggering async handlers in event callbacks, ensuring consistent behavior and better error resilience.
+- Updates documentation and ESLint tracking to reflect the new error/fixable status and progress.
+- Expands UI component support for additional sizing and better flexible layout.
+- Overall, modernizes codebase to rely on synchronous database APIs, reducing complexity, increasing maintainability, and aligning with architectural intent.
+
+Relates to ongoing technical debt and stability improvements. [`(3fe67bf)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3fe67bf1d3f5c8063697dd0c5a635efe8eebd2b0)
+
+
+- 🚜 [refactor] Unify internal imports to use explicit index paths
+
+- Standardizes all internal imports to use explicit `index` paths for improved clarity and maintainability.
+- Reduces ambiguity and risk of circular dependencies by making import sources explicit, especially for modules that could resolve to either directories or files.
+- Improves consistency across services, managers, repositories, validators, and utility modules.
+- No logic or algorithmic changes; focuses on project structure and code clarity.
+
+Relates to codebase maintainability and future-proofing. [`(212e334)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/212e3349a22d074ee59086be51f137ed6b457c50)
+
+
+- 🚜 [refactor] Unify correlation and validation utils; cleanup hooks/tests
+
+- Refactors correlation and validation utilities into a common location for improved consistency and easier maintenance
+- Removes backend hook modules and their associated tests, consolidating logic under a unified utils directory
+- Updates event bus and internal imports to reflect new utility locations, simplifying import paths and reducing redundancy
+- Standardizes test mocks and imports, reducing code duplication and improving test maintainability
+- Moves WASM asset to a central assets directory, updates scripts and build steps to reference the new location, and ensures consistent binary handling across environments
+- Cleans up obsolete script artifacts and improves download/copy logic for SQLite WASM binary
+- Adds new prompts for accessibility test/code review guidance [`(de35fa3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/de35fa38167e730018bf1e0d9d8e306199d66bb2)
+
+
+- 🚜 [refactor] Streamline imports and add root barrel export
+
+- Unifies and shortens imports throughout the codebase by centralizing service and utility exports, reducing direct file-level imports.
+- Introduces a root barrel export for the application, enabling centralized and consistent module access and promoting clearer import patterns.
+- Improves maintainability and scalability by simplifying future refactoring and reducing coupling between modules. [`(7b11f1a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7b11f1a02b41b5a15ccb4accb76775898199b3ae)
+
+
+- 🚜 [refactor] Simplify imports with barrel files and improve exports
+
+- Consolidates multiple related imports into single barrel imports for events, services, hooks, stores, and utils, reducing redundancy and improving code maintainability
+- Updates index files to re-export services, utilities, and hooks, providing a cleaner and more centralized API for internal modules and tests
+- Refactors test imports to use new barrel exports, reducing import paths and improving test clarity
+- Increases utility exports count and updates related test assertions for consistency
+- Does not change application logic, focusing on code organization and developer experience [`(834da82)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/834da82b5c96dbd570f57f5396ca612ead5c9778)
+
+
+
+### � Documentation
+
+- 📝 [docs] Update changelog with detailed release history
+
+- Documents new features, refactors, bug fixes, test improvements, style changes, build system tweaks, and dependency updates from versions 5.6.0 through 6.0.0.
+- Highlights introduction of type-safe event bus, transactional safety, new monitor statuses, major refactors, expanded test coverage, and code style unification.
+- Removes outdated documentation, test files, and redundant configs to reduce maintenance overhead and improve clarity.
+- Ensures changelog accurately reflects recent project evolution, aiding future maintainers and users in tracking progress and rationale. [`(49c7811)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/49c7811d94762b5b3f33631a4cb2a9da7d6eaee6)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Remove extraneous blank lines from test files
+
+- Cleans up test source files by deleting unnecessary empty lines
+ - Improves readability and maintains consistent formatting across test suites [`(8654c4e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8654c4ef847b5bc808604e3d42fa085a89f1512f)
+
+
+- 🎨 [style] Reformat code for consistency and readability
+
+- Applies consistent code formatting, including improved indentation, spacing, and bracket alignment across backend and utility modules.
+- Streamlines function signatures and argument lists for better clarity.
+- Enhances ESLint config readability by aligning comments and object properties.
+- Improves documentation structure and Markdown formatting for ESLint error tracking.
+
+No functional or logic changes are introduced; changes focus on code clarity and maintainability. [`(c83bd8a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c83bd8a42a91fca02288f736f7bbb949cc5fe425)
+
+
+- 🎨 [style] Improve formatting and spacing across codebase
+
+- Cleans up extra blank lines and ensures consistent spacing in documentation and source files
+ - Unifies import statement formatting for readability and maintainability
+ - Enhances markdown prompt clarity with improved list spacing
+ - No functional or logic changes introduced [`(d7b45cb)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d7b45cb4da363ceb996f253a283a2482bf03e237)
+
+
+- 🎨 [style] Standardizes import formatting and test style
+
+- Unifies import statements for consistency, improving readability and code style across modules
+- Applies consistent quote styles and formatting in test files, aligning with project conventions
+- Reformats and deduplicates code blocks in tests for clarity and maintainability
+- Does not modify business logic; focuses on stylistic and formatting enhancements only [`(20a2614)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/20a2614a29776b54a439113cbb670b60c0474ac8)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Remove redundant and edge-case tests for coverage
+
+Cleans up the test suite by deleting tests focused on unreachable code paths, artificial edge cases, and redundant null/undefined handling.
+Removes tests for invalid argument scenarios, error branches unlikely to occur in production, and defensive UI/component code not triggered in typical usage.
+Simplifies maintenance and reduces noise in the test suite, making coverage more meaningful and focused on real-world behaviors. [`(4bf8d31)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4bf8d31db276a6a447adbf0d265209b17e6549d7)
+
+
+
+### 🧹 Chores
+
+- 🧹 [chore] Remove redundant ESLint ignorePattern config
+
+- Removes explicit ESLint ignore pattern for node_modules as this exclusion is handled by default.
+- Simplifies configuration and reduces potential confusion over redundant settings. [`(ddf1915)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ddf1915afc8dc7449604b14be31baffc45a6ce43)
+
+
+- Update changelogs for v6.0.0 [skip ci] [`(1c4ed00)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1c4ed00d758bf0b2803890b0f415cf6ea93550d3)
 
 
 
