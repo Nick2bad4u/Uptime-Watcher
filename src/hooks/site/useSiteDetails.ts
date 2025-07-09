@@ -93,10 +93,13 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties) {
     const foundMonitor = currentSite.monitors.find((m) => m.id === selectedMonitorId);
     const selectedMonitor = foundMonitor ?? currentSite.monitors[0];
 
-    // If the selected monitor ID is stale (doesn't exist), update it to match the actual selected monitor
-    if (!foundMonitor && selectedMonitor) {
-        setSelectedMonitorId(currentSite.identifier, selectedMonitor.id);
-    }
+    // Use useEffect to handle stale monitor ID updates (avoid state updates during render)
+    useEffect(() => {
+        // If the selected monitor ID is stale (doesn't exist), update it to match the actual selected monitor
+        if (!foundMonitor && selectedMonitor) {
+            setSelectedMonitorId(currentSite.identifier, selectedMonitor.id);
+        }
+    }, [foundMonitor, selectedMonitor, currentSite.identifier, setSelectedMonitorId]);
 
     const isMonitoring = selectedMonitor ? selectedMonitor.monitoring !== false : false;
 
