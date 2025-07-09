@@ -14,9 +14,6 @@
     // ESLint exclusions
     "eslint.workingDirectories": ["."],
     "eslint.ignoreUntitled": true,
-    "eslint.options": {
-        "ignorePattern": "**/node_modules/**"
-    },
     "http.proxySupport": "off",
     "eslint.validate": [
         "javascript",
