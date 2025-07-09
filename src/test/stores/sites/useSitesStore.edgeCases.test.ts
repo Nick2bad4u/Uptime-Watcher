@@ -107,7 +107,6 @@ describe("Sites Store Modules - Edge Cases and Error Scenarios", () => {
             expect(mockSetSites).not.toHaveBeenCalled();
         });
 
-
         it("should handle malformed site data", async () => {
             const mockSetSites = vi.fn();
             const syncActions = createSiteSyncActions({

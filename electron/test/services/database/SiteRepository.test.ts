@@ -119,7 +119,6 @@ describe("SiteRepository", () => {
     });
 
     describe("getByIdentifier", () => {
-
         it("should return undefined when site not found", async () => {
             mockDatabase.get.mockReturnValue(undefined);
 
@@ -220,7 +219,6 @@ describe("SiteRepository", () => {
     });
 
     describe("exportAll", () => {
-
         it("should handle falsy identifier in exportAll (line 167)", async () => {
             const mockSites = [
                 { identifier: "site1", name: "Site 1" },

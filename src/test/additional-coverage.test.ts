@@ -50,7 +50,6 @@ describe("Status Update Handler Tests", () => {
 
             expect(waitForElectronAPI).toHaveBeenCalled();
         });
-
     });
 });
 

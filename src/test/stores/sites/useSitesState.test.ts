@@ -81,8 +81,6 @@ describe("useSitesState", () => {
 
             expect(mockSet).toHaveBeenCalledWith(expect.any(Function));
         });
-
-
     });
 
     describe("addSite", () => {
@@ -125,8 +123,6 @@ describe("useSitesState", () => {
     });
 
     describe("removeSite", () => {
-
-
         it("should clear selectedSiteId if removed site was selected", () => {
             mockGet.mockReturnValue({
                 selectedMonitorIds: {},
