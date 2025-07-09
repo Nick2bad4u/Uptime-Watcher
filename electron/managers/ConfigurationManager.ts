@@ -6,7 +6,7 @@
 import { DEFAULT_CHECK_INTERVAL } from "../constants";
 import { isDev } from "../electronUtils";
 import { Site } from "../types";
-import { SiteValidator, MonitorValidator } from "./validators";
+import { SiteValidator, MonitorValidator } from "./validators/index";
 
 export interface ValidationResult {
     isValid: boolean;

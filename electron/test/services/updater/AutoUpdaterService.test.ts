@@ -311,7 +311,7 @@ describe("AutoUpdaterService", () => {
     });
 
     // Helper function to get event handler
-    function getEventHandler(eventName: string): Function {
+    function getEventHandler(eventName: string): (...args: unknown[]) => void {
         const call = mockAutoUpdater.on.mock.calls.find((call: any[]) => call[0] === eventName);
         expect(call).toBeDefined();
         return call![1];

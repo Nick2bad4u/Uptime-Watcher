@@ -1,6 +1,6 @@
 import { Database } from "node-sqlite3-wasm";
 
-import { logger } from "../../../utils/logger";
+import { logger } from "../../../utils/index";
 
 /**
  * Database schema management utilities.

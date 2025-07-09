@@ -218,7 +218,7 @@ export function SiteDetails({ onClose, site }: SiteDetailsProperties) {
 
     // Don't render if site doesn't exist
     if (!siteExists) {
-        return;
+        return null;
     }
 
     return (

@@ -5,9 +5,9 @@
 
 import { EventEmitter } from "node:events";
 
-import { generateCorrelationId, logger as baseLogger } from "../utils";
+import { generateCorrelationId, logger } from "../utils/index";
 
-const logger = baseLogger;
+
 
 /**
  * Middleware function for event processing.
@@ -220,6 +220,6 @@ export interface EventBusDiagnostics {
 /**
  * Utility function to create a typed event bus instance.
  */
-export function createTypedEventBus<EventMap extends Record<string, any>>(name?: string): TypedEventBus<EventMap> {
+export function createTypedEventBus<EventMap extends Record<string, unknown>>(name?: string): TypedEventBus<EventMap> {
     return new TypedEventBus<EventMap>(name);
 }

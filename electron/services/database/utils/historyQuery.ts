@@ -1,7 +1,7 @@
 import { Database } from "node-sqlite3-wasm";
 
 import { StatusHistory } from "../../../types";
-import { logger } from "../../../utils/logger";
+import { logger } from "../../../utils/index";
 import { rowToHistoryEntry } from "./historyMapper";
 
 /**

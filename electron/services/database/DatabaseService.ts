@@ -2,8 +2,8 @@ import { app } from "electron";
 import { Database } from "node-sqlite3-wasm";
 import * as path from "node:path";
 
-import { logger } from "../../utils/logger";
-import { createDatabaseBackup, createDatabaseTables } from "./utils";
+import { logger } from "../../utils/index";
+import { createDatabaseBackup, createDatabaseTables } from "./utils/index";
 
 /**
  * Service responsible for database initialization and schema management.

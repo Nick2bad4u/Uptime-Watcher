@@ -69,7 +69,7 @@ export const AddSiteForm = React.memo(function AddSiteForm() {
     useEffect(() => {
         if (!isLoading) {
             setShowButtonLoading(false);
-            return;
+            return () => {}; // Return empty cleanup function for consistency
         }
 
         const timeoutId = setTimeout(() => {

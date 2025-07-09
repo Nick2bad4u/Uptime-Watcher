@@ -3,8 +3,8 @@
  * Responsible for site data persistence and in-memory cache synchronization.
  */
 
-import { UptimeEvents, TypedEventBus } from "../events";
-import { SiteRepository, MonitorRepository, HistoryRepository, DatabaseService } from "../services";
+import { UptimeEvents, TypedEventBus } from "../events/index";
+import { SiteRepository, MonitorRepository, HistoryRepository, DatabaseService } from "../services/index";
 import { Site } from "../types";
 import {
     SiteWritingOrchestrator,
@@ -13,7 +13,7 @@ import {
     SiteRepositoryService,
     monitorLogger as logger,
 } from "../utils";
-import { configurationManager } from "../managers";
+import { configurationManager } from "../managers/index";
 
 /**
  * Combined events interface for SiteManager.

@@ -359,13 +359,13 @@ describe("IpcService", () => {
     });
 
     // Helper functions
-    function getHandlerForChannel(channel: string): Function {
+    function getHandlerForChannel(channel: string): (...args: unknown[]) => unknown {
         const call = mockIpcMain.handle.mock.calls.find((call: any[]) => call[0] === channel);
         expect(call).toBeDefined();
         return call![1];
     }
 
-    function getListenerForChannel(channel: string): Function {
+    function getListenerForChannel(channel: string): (...args: unknown[]) => void {
         const call = mockIpcMain.on.mock.calls.find((call: any[]) => call[0] === channel);
         expect(call).toBeDefined();
         return call![1];

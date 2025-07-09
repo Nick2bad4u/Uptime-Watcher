@@ -3,14 +3,14 @@
  * Provides a testable, dependency-injected service for application data management.
  */
 
-import { UptimeEvents, TypedEventBus } from "../../events";
+import { UptimeEvents, TypedEventBus } from "../../events/index";
 import {
     DatabaseService,
     HistoryRepository,
     MonitorRepository,
     SettingsRepository,
     SiteRepository,
-} from "../../services/database";
+} from "../../services/index";
 import { Site, StatusHistory } from "../../types";
 import { ILogger, ISiteCache, SiteLoadingError } from "./interfaces";
 

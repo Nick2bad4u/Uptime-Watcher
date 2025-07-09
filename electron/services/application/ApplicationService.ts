@@ -1,12 +1,12 @@
 import { app } from "electron";
 
 import { StatusUpdate, Site } from "../../types";
-import { UptimeOrchestrator } from "../../UptimeOrchestrator";
-import { logger } from "../../utils/logger";
-import { IpcService } from "../ipc";
-import { NotificationService } from "../notifications";
-import { AutoUpdaterService } from "../updater";
-import { WindowService } from "../window";
+import { UptimeOrchestrator } from "../../index";
+import { logger } from "../../utils/index";
+import { IpcService } from "../ipc/index";
+import { NotificationService } from "../notifications/index";
+import { AutoUpdaterService } from "../updater/index";
+import { WindowService } from "../window/index";
 
 /**
  * Main application service that orchestrates all other services.

@@ -4,7 +4,7 @@
  */
 
 import { DEFAULT_HISTORY_LIMIT } from "../constants";
-import { UptimeEvents, TypedEventBus } from "../events";
+import { UptimeEvents, TypedEventBus } from "../events/index";
 
 /**
  * Combined events interface for DatabaseManager.

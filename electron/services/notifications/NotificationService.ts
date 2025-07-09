@@ -1,7 +1,7 @@
 import { Notification } from "electron";
 
 import { Site } from "../../types";
-import { logger } from "../../utils/logger";
+import { logger } from "../../utils/index";
 
 export interface NotificationConfig {
     showDownAlerts: boolean;

@@ -3,7 +3,7 @@
  */
 
 import { isDev } from "../../../electronUtils";
-import { logger } from "../../../utils/logger";
+import { logger } from "../../../utils/index";
 
 /**
  * Constants for port monitor error messages.

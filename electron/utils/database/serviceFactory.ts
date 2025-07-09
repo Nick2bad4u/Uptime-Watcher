@@ -9,8 +9,8 @@ import {
     HistoryRepository,
     SettingsRepository,
     DatabaseService,
-} from "../../services";
-import { monitorLogger } from "../logger";
+} from "../../services/index";
+import { monitorLogger } from "../../utils/index";
 import { DataBackupService, DataBackupOrchestrator } from "./DataBackupService";
 import { DataImportExportService, DataImportExportOrchestrator } from "./DataImportExportService";
 import { SiteCache } from "./interfaces";

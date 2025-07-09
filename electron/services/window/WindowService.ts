@@ -2,7 +2,7 @@ import { BrowserWindow } from "electron";
 import * as path from "node:path";
 
 import { isDev } from "../../electronUtils";
-import { logger } from "../../utils/logger";
+import { logger } from "../../utils/index";
 
 /**
  * Service responsible for window management and lifecycle.

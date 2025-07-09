@@ -6,8 +6,6 @@
  * as error handling is managed centrally by the store infrastructure.
  */
 
-/* eslint-disable @typescript-eslint/no-empty-function */
-
 import type { Site, StatusUpdate } from "../../types";
 
 import { logStoreAction, withErrorHandling } from "../utils";

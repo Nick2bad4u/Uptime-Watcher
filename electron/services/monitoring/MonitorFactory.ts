@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-extraneous-class */
 import { Site } from "../../types";
 import { HttpMonitor } from "./HttpMonitor";
 import { PortMonitor } from "./PortMonitor";

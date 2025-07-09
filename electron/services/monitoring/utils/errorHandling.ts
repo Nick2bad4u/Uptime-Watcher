@@ -6,7 +6,7 @@
 import axios, { AxiosError } from "axios";
 
 import { isDev } from "../../../electronUtils";
-import { logger } from "../../../utils/logger";
+import { logger } from "../../../utils/index";
 import { MonitorCheckResult } from "../types";
 
 /**

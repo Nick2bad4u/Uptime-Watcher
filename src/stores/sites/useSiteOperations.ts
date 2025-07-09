@@ -6,8 +6,6 @@
  * as error handling is managed centrally by the store infrastructure.
  */
 
-/* eslint-disable @typescript-eslint/no-empty-function */
-
 import type { Monitor, MonitorType, Site } from "../../types";
 
 import { ERROR_MESSAGES } from "../types";

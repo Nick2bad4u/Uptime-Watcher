@@ -61,16 +61,14 @@ export function Settings({ onClose }: Readonly<SettingsProperties>) {
     useEffect(() => {
         if (!isLoading) {
             setShowButtonLoading(false);
-            return;
+            return () => {}; // Return empty cleanup function for consistency
         }
 
         const timeoutId = setTimeout(() => {
             setShowButtonLoading(true);
         }, UI_DELAYS.LOADING_BUTTON);
 
-        return () => {
-            clearTimeout(timeoutId);
-        };
+        return () => clearTimeout(timeoutId);
     }, [isLoading]);
 
     // Only allow keys that are part of AppSettings

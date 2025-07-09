@@ -117,7 +117,7 @@ export const HistoryTab = ({
     // Use 'details' as optional property to handle records that may not have detail information
     function renderDetails(record: StatusHistory) {
         if (!record.details) {
-            return;
+            return null;
         }
 
         const getDetailLabel = (): string => {

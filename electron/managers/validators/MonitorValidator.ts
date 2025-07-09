@@ -4,7 +4,7 @@
  */
 
 import { Site } from "../../types";
-import { ValidationResult } from "../ConfigurationManager";
+import { ValidationResult } from "../../managers/index";
 
 /**
  * Validates monitor configuration according to business rules.

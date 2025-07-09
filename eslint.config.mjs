@@ -330,6 +330,81 @@ export default [
             "functional/no-let": "off", // Let is necessary in many React patterns
             "@typescript-eslint/no-explicit-any": "warn", // Sometimes needed
             "@typescript-eslint/no-non-null-assertion": "warn", // Zustand patterns
+
+            // Function and type safety rules
+            "@typescript-eslint/no-restricted-types": [
+                "error",
+                {
+                    types: {
+                        Function: {
+                            message: [
+                                "The `Function` type accepts any function-like value.",
+                                "It provides no type safety when calling the function, which can be a common source of bugs.",
+                                "If you are expecting the function to accept certain arguments, you should explicitly define the function shape.",
+                                "Use '(...args: unknown[]) => unknown' for generic handlers or define specific function signatures."
+                            ].join("\n"),
+                        },
+                    },
+                },
+            ],
+            "@typescript-eslint/no-unsafe-function-type": "error",
+            "@typescript-eslint/no-wrapper-object-types": "error", 
+            "@typescript-eslint/no-empty-object-type": "error",
+            "@typescript-eslint/prefer-function-type": "error",
+            "@typescript-eslint/no-empty-function": [
+                "error", 
+                { 
+                    allow: ["arrowFunctions"] // Allow empty arrow functions for React useEffect cleanup
+                }
+            ],
+
+            // Advanced type-checked rules for async safety and runtime error prevention
+            "@typescript-eslint/no-floating-promises": [
+                "error",
+                {
+                    ignoreVoid: true, // Allow void for intentionally ignored promises
+                    ignoreIIFE: false // Catch floating IIFEs which can cause issues
+                }
+            ],
+            "@typescript-eslint/await-thenable": "error", // Prevent awaiting non-promises
+            "@typescript-eslint/no-misused-promises": [
+                "error",
+                {
+                    checksConditionals: true, // Check if Promises used in conditionals
+                    checksVoidReturn: true, // Critical for Electron IPC handlers
+                    checksSpreads: true // Check Promise spreads
+                }
+            ],
+            "@typescript-eslint/require-await": "error", // Functions marked async must use await
+            "@typescript-eslint/return-await": ["error", "in-try-catch"], // Proper await handling in try-catch
+            
+            // Enhanced type safety for backend services
+            "@typescript-eslint/no-unnecessary-type-assertion": "error", // Remove redundant type assertions
+            "@typescript-eslint/no-unsafe-assignment": "warn", // Warn on unsafe assignments to any
+            "@typescript-eslint/no-unsafe-call": "warn", // Warn on calling any-typed functions
+            "@typescript-eslint/no-unsafe-member-access": "warn", // Warn on accessing any-typed properties
+            "@typescript-eslint/no-unsafe-return": "warn", // Warn on returning any from typed functions
+            "@typescript-eslint/no-unsafe-argument": "warn", // Warn on passing any to typed parameters
+            
+            // Backend-specific type safety
+            "@typescript-eslint/prefer-readonly": "warn", // Prefer readonly for service class properties
+            "@typescript-eslint/switch-exhaustiveness-check": "error", // Ensure switch statements are exhaustive
+            
+            // Null safety for backend operations
+            "@typescript-eslint/no-unnecessary-condition": [
+                "warn", 
+                { 
+                    allowConstantLoopConditions: true // Allow while(true) patterns in services
+                }
+            ],
+            "@typescript-eslint/prefer-nullish-coalescing": [
+                "error",
+                {
+                    ignoreConditionalTests: false, // Check conditionals for nullish coalescing opportunities
+                    ignoreMixedLogicalExpressions: false // Check complex logical expressions
+                }
+            ],
+            "@typescript-eslint/prefer-optional-chain": "error", // Use optional chaining instead of logical AND
         },
     },
 
@@ -388,7 +463,6 @@ export default [
             ...tseslint.configs.recommended.rules,
             ...tseslint.configs.strict.rules,
             ...tseslint.configs.stylistic.rules,
-
             // Node.js specific
             // "no-console": "off", // Logging is important for backend - DISABLED FOR NOW
             "prefer-const": "error",
@@ -470,8 +544,94 @@ export default [
 
             // Allow more flexibility for backend patterns
             "functional/immutable-data": "off",
+            "functional/prefer-immutable-types": "off",
+            "functional/no-expression-statements": "off",
+            "functional/no-conditional-statement": "off",
+            "functional/no-loop-statements": "off",
+            "functional/no-return-void": "off",
+            "functional/no-conditional-statements": "off",
+            "functional/functional-parameters": "off",
             "functional/no-let": "off",
+            "functional/no-classes": "off", // Classes are common in Electron services
+            "functional/no-throw-statements": "off", // Throwing errors is common in Electron
+            "functional/no-class-inheritance": "off", // Classes are common in Electron services
+            "functional/no-mixed-types": "off", // Mixed types are common in Electron services
             "@typescript-eslint/no-explicit-any": "warn",
+
+            // Function and type safety rules (same as frontend)
+            "@typescript-eslint/no-restricted-types": [
+                "error",
+                {
+                    types: {
+                        Function: {
+                            message: [
+                                "The `Function` type accepts any function-like value.",
+                                "It provides no type safety when calling the function, which can be a common source of bugs.",
+                                "If you are expecting the function to accept certain arguments, you should explicitly define the function shape.",
+                                "Use '(...args: unknown[]) => unknown' for generic handlers or define specific function signatures."
+                            ].join("\n"),
+                        },
+                    },
+                },
+            ],
+            "@typescript-eslint/no-unsafe-function-type": "error",
+            "@typescript-eslint/no-wrapper-object-types": "error",
+            "@typescript-eslint/no-empty-object-type": "error", 
+            "@typescript-eslint/prefer-function-type": "error",
+            "@typescript-eslint/no-empty-function": [
+                "error", 
+                { 
+                    allow: ["arrowFunctions"] // Allow empty arrow functions for React useEffect cleanup
+                }
+            ],
+
+            // Advanced type-checked rules for backend async safety and runtime error prevention  
+            "@typescript-eslint/no-floating-promises": [
+                "error",
+                {
+                    ignoreVoid: true, // Allow void for intentionally ignored promises
+                    ignoreIIFE: false // Catch floating IIFEs which can cause issues in Node.js
+                }
+            ],
+            "@typescript-eslint/await-thenable": "error", // Prevent awaiting non-promises
+            "@typescript-eslint/no-misused-promises": [
+                "error",
+                {
+                    checksConditionals: true, // Check if Promises used in conditionals
+                    checksVoidReturn: true, // Critical for Electron IPC handlers
+                    checksSpreads: true // Check Promise spreads
+                }
+            ],
+            "@typescript-eslint/require-await": "error", // Functions marked async must use await
+            "@typescript-eslint/return-await": ["error", "in-try-catch"], // Proper await handling in try-catch
+            
+            // Enhanced type safety for backend services
+            "@typescript-eslint/no-unnecessary-type-assertion": "error", // Remove redundant type assertions
+            "@typescript-eslint/no-unsafe-assignment": "warn", // Warn on unsafe assignments to any
+            "@typescript-eslint/no-unsafe-call": "warn", // Warn on calling any-typed functions
+            "@typescript-eslint/no-unsafe-member-access": "warn", // Warn on accessing any-typed properties
+            "@typescript-eslint/no-unsafe-return": "warn", // Warn on returning any from typed functions
+            "@typescript-eslint/no-unsafe-argument": "warn", // Warn on passing any to typed parameters
+            
+            // Backend-specific type safety
+            "@typescript-eslint/prefer-readonly": "warn", // Prefer readonly for service class properties
+            "@typescript-eslint/switch-exhaustiveness-check": "error", // Ensure switch statements are exhaustive
+            
+            // Null safety for backend operations
+            "@typescript-eslint/no-unnecessary-condition": [
+                "warn", 
+                { 
+                    allowConstantLoopConditions: true // Allow while(true) patterns in services
+                }
+            ],
+            "@typescript-eslint/prefer-nullish-coalescing": [
+                "error",
+                {
+                    ignoreConditionalTests: false, // Check conditionals for nullish coalescing opportunities
+                    ignoreMixedLogicalExpressions: false // Check complex logical expressions
+                }
+            ],
+            "@typescript-eslint/prefer-optional-chain": "error", // Use optional chaining instead of logical AND
         },
     },
 
@@ -524,6 +684,11 @@ export default [
             "@typescript-eslint/no-non-null-assertion": "off",
             "@typescript-eslint/no-unused-vars": "off",
             "unused-imports/no-unused-imports": "error",
+
+            // Relaxed function rules for tests (explicit for clarity)
+            "@typescript-eslint/no-restricted-types": "off", // Tests may need generic Function types
+            "@typescript-eslint/no-unsafe-function-type": "off", // Tests may use generic handlers
+            "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
         },
     },
 
@@ -564,6 +729,11 @@ export default [
             "@typescript-eslint/no-non-null-assertion": "off",
             "@typescript-eslint/no-unused-vars": "off",
             "unused-imports/no-unused-imports": "error",
+
+            // Relaxed function rules for backend tests (explicit for clarity)
+            "@typescript-eslint/no-restricted-types": "off", // Tests may need generic Function types
+            "@typescript-eslint/no-unsafe-function-type": "off", // Tests may use generic handlers
+            "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
         },
     },
 

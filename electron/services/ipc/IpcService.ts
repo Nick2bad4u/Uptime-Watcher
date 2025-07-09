@@ -1,9 +1,9 @@
 import { ipcMain } from "electron";
 
 import { isDev } from "../../electronUtils";
-import { UptimeOrchestrator } from "../../UptimeOrchestrator";
-import { logger } from "../../utils/logger";
-import { AutoUpdaterService } from "../updater/AutoUpdaterService";
+import { UptimeOrchestrator } from "../../index";
+import { logger } from "../../utils/index";
+import { AutoUpdaterService } from "../updater/index";
 
 /**
  * Service responsible for organizing and handling IPC communication.

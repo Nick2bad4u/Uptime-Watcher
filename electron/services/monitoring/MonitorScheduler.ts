@@ -1,7 +1,7 @@
 import { DEFAULT_CHECK_INTERVAL } from "../../constants";
 import { isDev } from "../../electronUtils";
 import { Site } from "../../types";
-import { logger } from "../../utils/logger";
+import { logger } from "../../utils/index";
 
 /**
  * Service for managing monitor scheduling and intervals.

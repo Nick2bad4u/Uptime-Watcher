@@ -5,7 +5,7 @@
 
 import { autoUpdater } from "electron-updater";
 
-import { logger } from "../../utils/logger";
+import { logger } from "../../utils/index";
 
 /**
  * Status of the application update process.

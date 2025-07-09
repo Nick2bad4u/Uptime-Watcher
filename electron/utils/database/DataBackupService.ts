@@ -3,8 +3,8 @@
  * Provides a testable, dependency-injected service for backup management.
  */
 
-import { UptimeEvents, TypedEventBus } from "../../events";
-import { DatabaseService } from "../../services";
+import { UptimeEvents, TypedEventBus } from "../../events/index";
+import { DatabaseService } from "../../services/index";
 import { ILogger, ISiteCache, SiteLoadingError } from "./interfaces";
 
 /**

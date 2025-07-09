@@ -5,7 +5,7 @@
 
 import { DEFAULT_CHECK_INTERVAL } from "../constants";
 import { isDev } from "../electronUtils";
-import { UptimeEvents, TypedEventBus } from "../events";
+import { UptimeEvents, TypedEventBus } from "../events/index";
 
 /**
  * Combined events interface for MonitorManager.

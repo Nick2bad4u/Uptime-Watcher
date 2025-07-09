@@ -5,9 +5,9 @@
 
 import { Database } from "node-sqlite3-wasm";
 
-import { SiteRepository, MonitorRepository, HistoryRepository, SettingsRepository } from "../../services";
+import { SiteRepository, MonitorRepository, HistoryRepository, SettingsRepository } from "../../services/index";
 import { Monitor, Site, StatusHistory } from "../../types";
-import { monitorLogger } from "../logger";
+import { monitorLogger } from "../../utils/index";
 import { ISiteRepository, IMonitorRepository, IHistoryRepository, ISettingsRepository, ILogger } from "./interfaces";
 
 /**
