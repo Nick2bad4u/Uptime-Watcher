@@ -25,7 +25,7 @@ export function useBackendFocusSync(enabled = false) {
         const handleFocus = () => {
             // Use full sync on focus to ensure complete data consistency
             // since the user may have been away for a while
-            fullSyncFromBackend();
+            void fullSyncFromBackend();
         };
 
         window.addEventListener("focus", handleFocus);

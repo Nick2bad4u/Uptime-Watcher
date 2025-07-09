@@ -11,7 +11,7 @@ import { rowToHistoryEntry } from "./historyMapper";
 /**
  * Find all history entries for a specific monitor.
  */
-export async function findHistoryByMonitorId(db: Database, monitorId: string): Promise<StatusHistory[]> {
+export function findHistoryByMonitorId(db: Database, monitorId: string): StatusHistory[] {
     try {
         const historyRows = db.all(
             "SELECT timestamp, status, responseTime, details FROM history WHERE monitor_id = ? ORDER BY timestamp DESC",
@@ -28,7 +28,7 @@ export async function findHistoryByMonitorId(db: Database, monitorId: string): P
 /**
  * Get the count of history entries for a monitor.
  */
-export async function getHistoryCount(db: Database, monitorId: string): Promise<number> {
+export function getHistoryCount(db: Database, monitorId: string): number {
     try {
         const result = db.get("SELECT COUNT(*) as count FROM history WHERE monitor_id = ?", [monitorId]) as
             | { count: number }
@@ -44,7 +44,7 @@ export async function getHistoryCount(db: Database, monitorId: string): Promise<
 /**
  * Get the most recent history entry for a monitor.
  */
-export async function getLatestHistoryEntry(db: Database, monitorId: string): Promise<StatusHistory | undefined> {
+export function getLatestHistoryEntry(db: Database, monitorId: string): StatusHistory | undefined {
     try {
         const row = db.get(
             "SELECT timestamp, status, responseTime, details FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT 1",

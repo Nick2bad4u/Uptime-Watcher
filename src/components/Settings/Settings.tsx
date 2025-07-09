@@ -223,7 +223,9 @@ export function Settings({ onClose }: Readonly<SettingsProperties>) {
                                 </ThemedText>
                                 <ThemedSelect
                                     value={settings.historyLimit}
-                                    onChange={(event) => handleHistoryLimitChange(Number(event.target.value))}
+                                    onChange={(event) => {
+                                        void handleHistoryLimitChange(Number(event.target.value));
+                                    }}
                                     disabled={isLoading}
                                     aria-label="Maximum number of history records to keep per site"
                                 >
@@ -360,7 +362,9 @@ export function Settings({ onClose }: Readonly<SettingsProperties>) {
                             <ThemedButton
                                 variant="secondary"
                                 size="sm"
-                                onClick={handleSyncNow}
+                                onClick={() => {
+                                    void handleSyncNow();
+                                }}
                                 loading={showButtonLoading}
                                 disabled={isLoading}
                                 className="w-full"
@@ -376,7 +380,9 @@ export function Settings({ onClose }: Readonly<SettingsProperties>) {
                                 <ThemedButton
                                     variant="primary"
                                     size="sm"
-                                    onClick={handleDownloadSQLite}
+                                    onClick={() => {
+                                        void handleDownloadSQLite();
+                                    }}
                                     disabled={isLoading || showButtonLoading}
                                     loading={showButtonLoading}
                                 >

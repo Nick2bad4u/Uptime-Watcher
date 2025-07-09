@@ -298,7 +298,12 @@ export const OverviewTab = ({
                             })}
                         </ThemedSelect>
                         {intervalChanged && (
-                            <ThemedButton variant="primary" size="xs" onClick={handleSaveInterval} disabled={isLoading}>
+                            <ThemedButton
+                                variant="primary"
+                                size="xs"
+                                onClick={() => void handleSaveInterval()}
+                                disabled={isLoading}
+                            >
                                 Save
                             </ThemedButton>
                         )}
@@ -324,7 +329,12 @@ export const OverviewTab = ({
                             s
                         </ThemedText>
                         {timeoutChanged && (
-                            <ThemedButton variant="primary" size="xs" onClick={handleSaveTimeout} disabled={isLoading}>
+                            <ThemedButton
+                                variant="primary"
+                                size="xs"
+                                onClick={() => void handleSaveTimeout()}
+                                disabled={isLoading}
+                            >
                                 Save
                             </ThemedButton>
                         )}
@@ -353,7 +363,7 @@ export const OverviewTab = ({
                                 monitorType: selectedMonitor?.type,
                                 monitorUrl: selectedMonitor?.url ?? selectedMonitor?.host,
                             });
-                            handleRemoveMonitor();
+                            void handleRemoveMonitor();
                         }}
                         disabled={isLoading}
                         icon={<FiTrash2 />}

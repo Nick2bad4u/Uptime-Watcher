@@ -299,7 +299,9 @@ export function SiteDetails({ onClose, site }: SiteDetailsProperties) {
                                 intervalChanged={intervalChanged}
                                 localCheckInterval={localCheckInterval}
                                 localTimeout={localTimeout}
-                                onCheckNow={() => handleCheckNow()}
+                                onCheckNow={() => {
+                                    void handleCheckNow();
+                                }}
                                 timeoutChanged={timeoutChanged}
                                 isLoading={isLoading}
                             />
@@ -353,7 +355,9 @@ export function SiteDetails({ onClose, site }: SiteDetailsProperties) {
                                 localCheckInterval={localCheckInterval}
                                 intervalChanged={intervalChanged}
                                 handleIntervalChange={handleIntervalChange}
-                                handleSaveInterval={handleSaveInterval}
+                                handleSaveInterval={() => {
+                                    void handleSaveInterval();
+                                }}
                                 handleRetryAttemptsChange={handleRetryAttemptsChange}
                                 handleSaveRetryAttempts={handleSaveRetryAttempts}
                                 handleSaveTimeout={handleSaveTimeout}

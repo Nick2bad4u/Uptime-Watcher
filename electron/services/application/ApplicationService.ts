@@ -38,12 +38,14 @@ export class ApplicationService {
      * Setup application-level event handlers.
      */
     private setupApplication(): void {
-        app.on("ready", async () => {
-            try {
-                await this.onAppReady();
-            } catch (error) {
-                logger.error("[ApplicationService] Error during app initialization", error);
-            }
+        app.on("ready", () => {
+            void (async () => {
+                try {
+                    await this.onAppReady();
+                } catch (error) {
+                    logger.error("[ApplicationService] Error during app initialization", error);
+                }
+            })();
         });
 
         app.on("window-all-closed", () => {
@@ -92,7 +94,7 @@ export class ApplicationService {
         });
 
         this.autoUpdaterService.initialize();
-        this.autoUpdaterService.checkForUpdates();
+        void this.autoUpdaterService.checkForUpdates();
     }
 
     /**
@@ -140,7 +142,10 @@ export class ApplicationService {
 
         try {
             this.ipcService.cleanup();
-            this.uptimeOrchestrator.stopMonitoring();
+            // Fire and forget for cleanup - don't block shutdown
+            this.uptimeOrchestrator.stopMonitoring().catch((error) => {
+                logger.error("[ApplicationService] Error stopping monitoring during cleanup", error);
+            });
             this.windowService.closeMainWindow();
         } catch (error) {
             logger.error("[ApplicationService] Error during cleanup", error);

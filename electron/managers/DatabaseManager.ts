@@ -234,13 +234,15 @@ export class DatabaseManager {
                 history: this.dependencies.repositories.history,
                 settings: this.dependencies.repositories.settings,
             },
-            setHistoryLimit: async (newLimit) => {
+            setHistoryLimit: (newLimit) => {
                 this.historyLimit = newLimit;
-                // Emit typed history limit updated event
-                await this.eventEmitter.emitTyped("internal:database:history-limit-updated", {
+                // Emit typed history limit updated event - fire and forget
+                this.eventEmitter.emitTyped("internal:database:history-limit-updated", {
                     limit: newLimit,
                     operation: "history-limit-updated",
                     timestamp: Date.now(),
+                }).catch((error) => {
+                    logger.error("[DatabaseManager] Failed to emit history limit updated event", error);
                 });
             },
         });

@@ -103,7 +103,11 @@ export class StatusUpdateManager {
             throw new Error("electronAPI.events.onStatusUpdate is not available");
         }
 
-        window.electronAPI.events.onStatusUpdate(this.handler);
+        window.electronAPI.events.onStatusUpdate((update: StatusUpdate) => {
+            this.handler?.(update).catch((error) => {
+                console.error("Error in status update handler:", error);
+            });
+        });
         logStoreAction("StatusUpdateManager", "subscribed", {
             message: "Successfully subscribed to status updates",
             subscribed: true,

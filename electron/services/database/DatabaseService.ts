@@ -26,7 +26,7 @@ export class DatabaseService {
     /**
      * Initialize the database connection and create tables if they don't exist.
      */
-    public async initialize(): Promise<Database> {
+    public initialize(): Database {
         if (this._db) {
             return this._db;
         }
@@ -36,7 +36,7 @@ export class DatabaseService {
             logger.info(`[DatabaseService] Initializing SQLite DB at: ${dbPath}`);
 
             this._db = new Database(dbPath);
-            await createDatabaseTables(this._db);
+            createDatabaseTables(this._db);
 
             logger.info("[DatabaseService] Database initialized successfully");
             return this._db;
@@ -91,7 +91,7 @@ export class DatabaseService {
     /**
      * Close the database connection.
      */
-    public async close(): Promise<void> {
+    public close(): void {
         if (this._db) {
             try {
                 this._db.close();

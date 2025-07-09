@@ -9,7 +9,7 @@ import { logger } from "../../../utils/index";
 /**
  * Create all required database tables if they don't exist.
  */
-export async function createDatabaseTables(db: Database): Promise<void> {
+export function createDatabaseTables(db: Database): void {
     try {
         // Sites table
         db.run(`

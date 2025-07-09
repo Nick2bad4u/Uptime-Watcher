@@ -25,7 +25,7 @@ export class SettingsRepository {
     /**
      * Get a setting by key.
      */
-    public async get(key: string): Promise<string | undefined> {
+    public get(key: string): string | undefined {
         try {
             const db = this.getDb();
             const result = db.get("SELECT value FROM settings WHERE key = ?", [key]);
@@ -39,7 +39,7 @@ export class SettingsRepository {
     /**
      * Set a setting value.
      */
-    public async set(key: string, value: string): Promise<void> {
+    public set(key: string, value: string): void {
         try {
             const db = this.getDb();
             db.run("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)", [key, value]);
@@ -55,7 +55,7 @@ export class SettingsRepository {
     /**
      * Delete a setting by key.
      */
-    public async delete(key: string): Promise<void> {
+    public delete(key: string): void {
         try {
             const db = this.getDb();
             db.run("DELETE FROM settings WHERE key = ?", [key]);
@@ -71,7 +71,7 @@ export class SettingsRepository {
     /**
      * Get all settings.
      */
-    public async getAll(): Promise<Record<string, string>> {
+    public getAll(): Record<string, string> {
         try {
             const db = this.getDb();
             const settings = db.all("SELECT * FROM settings") as { key: string; value: string }[];
@@ -93,7 +93,7 @@ export class SettingsRepository {
     /**
      * Clear all settings from the database.
      */
-    public async deleteAll(): Promise<void> {
+    public deleteAll(): void {
         try {
             const db = this.getDb();
             db.run("DELETE FROM settings");
@@ -108,7 +108,7 @@ export class SettingsRepository {
      * Bulk insert settings (for import functionality).
      * Uses a prepared statement and transaction for better performance.
      */
-    public async bulkInsert(settings: Record<string, string>): Promise<void> {
+    public bulkInsert(settings: Record<string, string>): void {
         const entries = Object.entries(settings);
         if (entries.length === 0) {
             return;

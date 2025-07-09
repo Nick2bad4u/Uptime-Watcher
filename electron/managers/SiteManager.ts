@@ -153,7 +153,7 @@ export class SiteManager {
             await this.eventEmitter.emitTyped("site:removed", {
                 cascade: true,
                 siteId: identifier,
-                siteName: removedSite?.name || "Unknown",
+                siteName: removedSite?.name ?? "Unknown",
                 timestamp: Date.now(),
             });
         }
@@ -175,7 +175,7 @@ export class SiteManager {
             },
             startMonitoring: async (identifier: string, monitorId: string) => {
                 if (this.monitoringOperations) {
-                    return await this.monitoringOperations.startMonitoringForSite(identifier, monitorId);
+                    return this.monitoringOperations.startMonitoringForSite(identifier, monitorId);
                 } else {
                     logger.warn("MonitoringOperations not available for startMonitoring");
                     return false;
@@ -183,7 +183,7 @@ export class SiteManager {
             },
             stopMonitoring: async (identifier: string, monitorId: string) => {
                 if (this.monitoringOperations) {
-                    return await this.monitoringOperations.stopMonitoringForSite(identifier, monitorId);
+                    return this.monitoringOperations.stopMonitoringForSite(identifier, monitorId);
                 } else {
                     logger.warn("MonitoringOperations not available for stopMonitoring");
                     return false;
@@ -222,7 +222,7 @@ export class SiteManager {
         await this.updateSitesCache(freshSites);
 
         // Get the refreshed site for the event
-        const refreshedSite = this.sites.get(identifier) || updatedSite;
+        const refreshedSite = this.sites.get(identifier) ?? updatedSite;
 
         // Emit typed site updated event
         await this.eventEmitter.emitTyped("site:updated", {
@@ -303,6 +303,6 @@ export class SiteManager {
     private async executeMonitorDeletion(monitorId: string): Promise<boolean> {
         // MonitorRepository.delete() already handles its own transaction,
         // so we don't need to wrap it in another transaction
-        return await this.repositories.monitorRepository.delete(monitorId);
+        return this.repositories.monitorRepository.delete(monitorId);
     }
 }

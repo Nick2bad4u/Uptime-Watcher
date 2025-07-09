@@ -84,7 +84,7 @@ function App() {
             await Promise.all([initializeSites(), initializeSettings()]);
         };
 
-        initializeApp();
+        void initializeApp();
 
         // Subscribe to status updates with optimized incremental updates
         // The store's subscribeToStatusUpdates now handles smart incremental updates automatically
@@ -172,7 +172,7 @@ function App() {
                                                 "A new update is available. Downloading..."}
                                             {updateStatus === "downloading" && "Update is downloading..."}
                                             {updateStatus === "downloaded" && "Update downloaded! Restart to apply."}
-                                            {updateStatus === "error" && (updateError || "Update failed.")}
+                                            {updateStatus === "error" && (updateError ?? "Update failed.")}
                                         </ThemedText>
                                     </div>
                                     {(updateStatus === "downloaded" || updateStatus === "error") && (

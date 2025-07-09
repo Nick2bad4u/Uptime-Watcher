@@ -317,7 +317,9 @@ export function SiteOverviewTab({
                         <ThemedButton
                             variant="error"
                             size="sm"
-                            onClick={handleStopSiteMonitoring}
+                            onClick={() => {
+                                void handleStopSiteMonitoring();
+                            }}
                             disabled={isLoading}
                             className="flex items-center gap-1"
                         >
@@ -327,7 +329,9 @@ export function SiteOverviewTab({
                         <ThemedButton
                             variant="success"
                             size="sm"
-                            onClick={handleStartSiteMonitoring}
+                            onClick={() => {
+                                void handleStartSiteMonitoring();
+                            }}
                             disabled={isLoading}
                             className="flex items-center gap-1"
                         >
@@ -337,7 +341,9 @@ export function SiteOverviewTab({
                     <ThemedButton
                         variant="error"
                         size="sm"
-                        onClick={handleRemoveSite}
+                        onClick={() => {
+                            void handleRemoveSite();
+                        }}
                         disabled={isLoading}
                         className="flex items-center gap-1"
                     >

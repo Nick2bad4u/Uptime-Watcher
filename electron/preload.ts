@@ -44,7 +44,7 @@ const monitoringAPI = {
 const dataAPI = {
     downloadSQLiteBackup: async () => {
         // Returns { buffer: ArrayBuffer, fileName: string }
-        return await ipcRenderer.invoke("download-sqlite-backup");
+        return ipcRenderer.invoke("download-sqlite-backup");
     },
     exportData: () => ipcRenderer.invoke("export-data"),
     importData: (data: string) => ipcRenderer.invoke("import-data", data),

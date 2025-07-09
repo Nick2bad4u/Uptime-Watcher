@@ -229,10 +229,11 @@ export class MonitorManager {
                 // Use transaction for database update
                 await this.dependencies.databaseService.executeTransaction(async () => {
                     if (monitor.id) {
-                        await this.dependencies.repositories.monitor.update(monitor.id, {
+                        this.dependencies.repositories.monitor.update(monitor.id, {
                             checkInterval: monitor.checkInterval,
                         });
                     }
+                    return Promise.resolve();
                 });
 
                 logger.debug(
@@ -316,7 +317,7 @@ export class MonitorManager {
             sites: this.dependencies.getSitesCache(),
         };
 
-        return await checkMonitor(config, site, monitorId);
+        return checkMonitor(config, site, monitorId);
     }
 
     /**

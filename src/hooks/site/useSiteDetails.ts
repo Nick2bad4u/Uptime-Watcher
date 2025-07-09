@@ -80,7 +80,7 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties) {
     } = useUIStore();
 
     // Always call hooks first, use fallback for currentSite
-    const currentSite = sites.find((s) => s.identifier === site.identifier) || {
+    const currentSite = sites.find((s) => s.identifier === site.identifier) ?? {
         identifier: site.identifier,
         monitors: [],
     };
@@ -91,7 +91,7 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties) {
 
     // Find the selected monitor, and if it doesn't exist, update the selection to the first monitor
     const foundMonitor = currentSite.monitors.find((m) => m.id === selectedMonitorId);
-    const selectedMonitor = foundMonitor || currentSite.monitors[0];
+    const selectedMonitor = foundMonitor ?? currentSite.monitors[0];
 
     // If the selected monitor ID is stale (doesn't exist), update it to match the actual selected monitor
     if (!foundMonitor && selectedMonitor) {

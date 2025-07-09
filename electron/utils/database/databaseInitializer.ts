@@ -20,7 +20,7 @@ export async function initDatabase(
     eventEmitter: TypedEventBus<UptimeEvents>
 ): Promise<void> {
     try {
-        await databaseService.initialize();
+        databaseService.initialize();
         await withDbRetry(loadSitesCallback, "loadSites");
     } catch (error) {
         logger.error("Failed to initialize database", error);

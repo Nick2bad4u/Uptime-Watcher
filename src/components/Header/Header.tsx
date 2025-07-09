@@ -48,6 +48,10 @@ export function Header() {
                             counts.pending++;
                             break;
                         }
+                        case "paused": {
+                            // Paused monitors are not counted in up/down/pending
+                            break;
+                        }
                     }
                 }
             }

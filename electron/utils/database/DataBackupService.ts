@@ -72,7 +72,7 @@ export class DataBackupOrchestrator {
      * Coordinates the complete backup process.
      */
     async downloadBackup(): Promise<{ buffer: Buffer; fileName: string }> {
-        return await this.dataBackupService.downloadDatabaseBackup();
+        return this.dataBackupService.downloadDatabaseBackup();
     }
 
     /**

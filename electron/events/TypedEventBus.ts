@@ -24,12 +24,12 @@ export type EventMiddleware<T = unknown> = (
  * Provides compile-time type checking for events and runtime middleware processing.
  */
 export class TypedEventBus<EventMap extends Record<string, unknown>> extends EventEmitter {
-    private middlewares: EventMiddleware[] = [];
+    private readonly middlewares: EventMiddleware[] = [];
     private readonly busId: string;
 
     constructor(name?: string) {
         super();
-        this.busId = name || generateCorrelationId();
+        this.busId = name ?? generateCorrelationId();
 
         // Set max listeners to prevent warnings in development
         this.setMaxListeners(50);

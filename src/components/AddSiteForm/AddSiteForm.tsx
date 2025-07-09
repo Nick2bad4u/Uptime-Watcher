@@ -102,7 +102,13 @@ export const AddSiteForm = React.memo(function AddSiteForm() {
 
     return (
         <ThemedBox className="max-w-md mx-auto" padding="lg" rounded="lg" surface="base">
-            <form className="space-y-4" onSubmit={onSubmit}>
+            <form
+                className="space-y-4"
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    void onSubmit(e);
+                }}
+            >
                 {/* Add mode toggle */}
                 <RadioGroup
                     disabled={isLoading}
@@ -238,7 +244,7 @@ export const AddSiteForm = React.memo(function AddSiteForm() {
                 </ThemedButton>
 
                 {/* Error Message */}
-                {(lastError || formError) && (
+                {(lastError ?? formError) && (
                     <ThemedBox
                         className={`error-alert ${isDark ? "dark" : ""}`}
                         padding="md"

@@ -31,7 +31,7 @@ export class SiteRepository {
     /**
      * Get all sites from the database (without monitors).
      */
-    public async findAll(): Promise<{ identifier: string; name?: string | undefined }[]> {
+    public findAll(): { identifier: string; name?: string | undefined }[] {
         try {
             const db = this.getDb();
             const siteRows = db.all("SELECT * FROM sites") as { identifier: string; name?: string }[];
@@ -48,9 +48,9 @@ export class SiteRepository {
     /**
      * Find a site by its identifier.
      */
-    public async findByIdentifier(
+    public findByIdentifier(
         identifier: string
-    ): Promise<{ identifier: string; name?: string | undefined } | undefined> {
+    ): { identifier: string; name?: string | undefined } | undefined {
         try {
             const db = this.getDb();
             const siteRow = db.get("SELECT * FROM sites WHERE identifier = ?", [identifier]) as
@@ -75,20 +75,20 @@ export class SiteRepository {
      * Get a complete site by identifier with monitors and history.
      * This method returns a full Site object including all monitors and their history.
      */
-    public async getByIdentifier(identifier: string): Promise<Site | undefined> {
+    public getByIdentifier(identifier: string): Site | undefined {
         try {
-            const siteRow = await this.findByIdentifier(identifier);
+            const siteRow = this.findByIdentifier(identifier);
             if (!siteRow) {
                 return undefined;
             }
 
             // Fetch monitors for this site
-            const monitors = await this.monitorRepository.findBySiteIdentifier(siteRow.identifier);
+            const monitors = this.monitorRepository.findBySiteIdentifier(siteRow.identifier);
 
             // Load history for each monitor
             for (const monitor of monitors) {
                 if (monitor.id) {
-                    monitor.history = await this.historyRepository.findByMonitorId(monitor.id);
+                    monitor.history = this.historyRepository.findByMonitorId(monitor.id);
                 }
             }
 
@@ -108,7 +108,7 @@ export class SiteRepository {
     /**
      * Create or update a site in the database.
      */
-    public async upsert(site: Pick<Site, "identifier" | "name">): Promise<void> {
+    public upsert(site: Pick<Site, "identifier" | "name">): void {
         try {
             const db = this.getDb();
             db.run("INSERT OR REPLACE INTO sites (identifier, name) VALUES (?, ?)", [
@@ -126,7 +126,7 @@ export class SiteRepository {
     /**
      * Delete a site from the database.
      */
-    public async delete(identifier: string): Promise<boolean> {
+    public delete(identifier: string): boolean {
         try {
             const db = this.getDb();
             const result = db.run("DELETE FROM sites WHERE identifier = ?", [identifier]);
@@ -148,9 +148,9 @@ export class SiteRepository {
     /**
      * Check if a site exists by identifier.
      */
-    public async exists(identifier: string): Promise<boolean> {
+    public exists(identifier: string): boolean {
         try {
-            const site = await this.findByIdentifier(identifier);
+            const site = this.findByIdentifier(identifier);
             return site !== undefined;
         } catch (error) {
             logger.error(`[SiteRepository] Failed to check if site exists: ${identifier}`, error);
@@ -161,7 +161,7 @@ export class SiteRepository {
     /**
      * Export all sites for backup/import functionality.
      */
-    public async exportAll(): Promise<{ identifier: string; name?: string | undefined }[]> {
+    public exportAll(): { identifier: string; name?: string | undefined }[] {
         try {
             const db = this.getDb();
             const sites = db.all("SELECT * FROM sites");
@@ -178,7 +178,7 @@ export class SiteRepository {
     /**
      * Clear all sites from the database.
      */
-    public async deleteAll(): Promise<void> {
+    public deleteAll(): void {
         try {
             const db = this.getDb();
             db.run("DELETE FROM sites");
@@ -193,7 +193,7 @@ export class SiteRepository {
      * Bulk insert sites (for import functionality).
      * Uses a prepared statement and transaction for better performance.
      */
-    public async bulkInsert(sites: { identifier: string; name?: string | undefined }[]): Promise<void> {
+    public bulkInsert(sites: { identifier: string; name?: string | undefined }[]): void {
         if (sites.length === 0) {
             return;
         }

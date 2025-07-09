@@ -645,6 +645,9 @@ export function ThemedIconButton({
             case "lg": {
                 return "48px";
             }
+            case "xl": {
+                return "56px";
+            }
 
             default: {
                 return "40px";
@@ -732,7 +735,7 @@ export function ThemedCard({
             {...(onMouseEnter && { onMouseEnter })}
             {...(onMouseLeave && { onMouseLeave })}
         >
-            {(title || subtitle || icon) && (
+            {(title ?? subtitle ?? icon) && (
                 <div
                     className="themed-card__header"
                     style={{
@@ -860,6 +863,12 @@ export function ThemedBadge({
                 return {
                     fontSize: currentTheme.typography.fontSize.base,
                     padding: `${currentTheme.spacing.md} ${currentTheme.spacing.lg}`,
+                };
+            }
+            case "lg": {
+                return {
+                    fontSize: currentTheme.typography.fontSize.lg,
+                    padding: `${currentTheme.spacing.lg} ${currentTheme.spacing.xl}`,
                 };
             }
             default: {

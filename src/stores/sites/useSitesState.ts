@@ -53,7 +53,7 @@ export const createSitesStateActions = (
         if (!selectedSiteId) {
             return undefined;
         }
-        return sites.find((s) => s.identifier === selectedSiteId) || undefined;
+        return sites.find((s) => s.identifier === selectedSiteId) ?? undefined;
     },
     removeSite: (identifier: string) => {
         logStoreAction("SitesStore", "removeSite", { identifier });
@@ -85,7 +85,7 @@ export const createSitesStateActions = (
     },
     setSites: (sites: Site[]) => {
         logStoreAction("SitesStore", "setSites", { count: sites?.length || 0 });
-        set(() => ({ sites: sites || [] }));
+        set(() => ({ sites: sites ?? [] }));
     },
 });
 

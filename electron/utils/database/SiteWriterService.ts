@@ -200,7 +200,7 @@ export class SiteWriterService {
         const updatedSite: Site = {
             ...site,
             ...updates,
-            monitors: updates.monitors || site.monitors,
+            monitors: updates.monitors ?? site.monitors,
         };
         siteCache.set(site.identifier, updatedSite);
         return updatedSite;
@@ -251,7 +251,7 @@ export class SiteWriterService {
         }
 
         // Remove monitors that are no longer in the site configuration
-        const newMonitorIds = new Set(newMonitors.map((m) => m.id).filter(Boolean) as string[]);
+        const newMonitorIds = new Set(newMonitors.map((m) => m.id).filter(Boolean));
         for (const existingMonitor of existingMonitors) {
             if (!newMonitorIds.has(existingMonitor.id)) {
                 // This monitor was removed from the site - delete it using internal method (we're already in a transaction)

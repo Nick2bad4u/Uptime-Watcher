@@ -58,14 +58,16 @@ export class MonitorScheduler {
         }
 
         // Start interval immediately
-        const interval = setInterval(async () => {
-            if (this.onCheckCallback) {
-                try {
-                    await this.onCheckCallback(siteIdentifier, monitor.id);
-                } catch (error) {
-                    logger.error(`[MonitorScheduler] Error during scheduled check for ${intervalKey}`, error);
+        const interval = setInterval(() => {
+            void (async () => {
+                if (this.onCheckCallback) {
+                    try {
+                        await this.onCheckCallback(siteIdentifier, monitor.id);
+                    } catch (error) {
+                        logger.error(`[MonitorScheduler] Error during scheduled check for ${intervalKey}`, error);
+                    }
                 }
-            }
+            })();
         }, checkInterval);
 
         this.intervals.set(intervalKey, interval);

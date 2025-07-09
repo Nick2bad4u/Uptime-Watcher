@@ -256,7 +256,7 @@ export function SettingsTab({
                             <ThemedButton
                                 variant={hasUnsavedChanges ? "primary" : "secondary"}
                                 size="sm"
-                                onClick={loggedHandleSaveName}
+                                onClick={() => void loggedHandleSaveName()}
                                 disabled={!hasUnsavedChanges || isLoading}
                                 loading={isLoading}
                                 icon={<FiSave />}
@@ -343,7 +343,7 @@ export function SettingsTab({
                             <ThemedButton
                                 variant={timeoutChanged ? "primary" : "secondary"}
                                 size="sm"
-                                onClick={loggedHandleSaveTimeout}
+                                onClick={() => void loggedHandleSaveTimeout()}
                                 disabled={!timeoutChanged}
                                 icon={<FiSave />}
                             >
@@ -374,7 +374,7 @@ export function SettingsTab({
                             <ThemedButton
                                 variant={retryAttemptsChanged ? "primary" : "secondary"}
                                 size="sm"
-                                onClick={loggedHandleSaveRetryAttempts}
+                                onClick={() => void loggedHandleSaveRetryAttempts()}
                                 disabled={!retryAttemptsChanged}
                                 icon={<FiSave />}
                             >
@@ -452,7 +452,7 @@ export function SettingsTab({
                         <ThemedButton
                             variant="error"
                             size="md"
-                            onClick={loggedHandleRemoveSite}
+                            onClick={() => void loggedHandleRemoveSite()}
                             loading={isLoading}
                             icon={<FiTrash2 />}
                             className="w-full"

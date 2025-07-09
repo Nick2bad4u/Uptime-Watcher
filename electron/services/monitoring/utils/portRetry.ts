@@ -21,7 +21,7 @@ export async function performPortCheckWithRetry(
     // Convert maxRetries (additional attempts) to totalAttempts for withRetry utility
     const totalAttempts = maxRetries + 1;
 
-    return await withRetry(() => performSinglePortCheck(host, port, timeout), {
+    return withRetry(() => performSinglePortCheck(host, port, timeout), {
         delayMs: RETRY_BACKOFF.INITIAL_DELAY,
         maxRetries: totalAttempts,
         onError: (error, attempt) => {

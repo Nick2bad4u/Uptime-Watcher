@@ -65,7 +65,7 @@ export function createMetricsMiddleware(options: {
 
         // Track event counts
         if (trackCounts) {
-            const count = eventCounts.get(event) || 0;
+            const count = eventCounts.get(event) ?? 0;
             eventCounts.set(event, count + 1);
 
             if (metricsCallback) {
@@ -82,7 +82,7 @@ export function createMetricsMiddleware(options: {
         // Track event timing
         if (trackTiming) {
             const duration = Date.now() - startTime;
-            const timings = eventTimings.get(event) || [];
+            const timings = eventTimings.get(event) ?? [];
             timings.push(duration);
             eventTimings.set(event, timings);
 
@@ -142,7 +142,7 @@ export function createRateLimitMiddleware(options: {
 
     return async (event: string, data: unknown, next: () => void | Promise<void>) => {
         const now = Date.now();
-        const times = eventTimes.get(event) || [];
+        const times = eventTimes.get(event) ?? [];
 
         // Remove old entries (older than 1 second)
         const recent = times.filter((time) => now - time < 1000);
@@ -218,7 +218,7 @@ export function createFilterMiddleware(options: {
         }
 
         // Check block list
-        if (blockList && blockList.includes(event)) {
+        if (blockList?.includes(event)) {
             logger.debug(`[EventBus] Event '${event}' blocked by block list`);
             return;
         }

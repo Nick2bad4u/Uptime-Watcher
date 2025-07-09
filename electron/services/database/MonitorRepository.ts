@@ -40,7 +40,7 @@ export class MonitorRepository {
     /**
      * Find all monitors for a specific site.
      */
-    public async findBySiteIdentifier(siteIdentifier: string): Promise<Site["monitors"]> {
+    public findBySiteIdentifier(siteIdentifier: string): Site["monitors"] {
         try {
             const db = this.getDb();
             const monitorRows = db.all("SELECT * FROM monitors WHERE site_identifier = ?", [siteIdentifier]) as Record<
@@ -58,7 +58,7 @@ export class MonitorRepository {
     /**
      * Find a monitor by its ID.
      */
-    public async findById(monitorId: string): Promise<Site["monitors"][0] | undefined> {
+    public findById(monitorId: string): Site["monitors"][0] | undefined {
         try {
             const db = this.getDb();
             const row = db.get("SELECT * FROM monitors WHERE id = ?", [monitorId]) as
@@ -80,7 +80,7 @@ export class MonitorRepository {
      * Create a new monitor and return its ID.
      * Fixed to use RETURNING clause to avoid race conditions.
      */
-    public async create(siteIdentifier: string, monitor: Omit<Site["monitors"][0], "id">): Promise<string> {
+    public create(siteIdentifier: string, monitor: Omit<Site["monitors"][0], "id">): string {
         try {
             const db = this.getDb();
 
@@ -131,7 +131,7 @@ export class MonitorRepository {
     /**
      * Update an existing monitor.
      */
-    public async update(monitorId: string, monitor: Partial<Site["monitors"][0]>): Promise<void> {
+    public update(monitorId: string, monitor: Partial<Site["monitors"][0]>): void {
         try {
             const db = this.getDb();
 
@@ -194,7 +194,8 @@ export class MonitorRepository {
     public async delete(monitorId: string): Promise<boolean> {
         try {
             const result = await this.databaseService.executeTransaction(async (db) => {
-                return this.deleteInternal(db, monitorId);
+                const deleted = this.deleteInternal(db, monitorId);
+                return Promise.resolve(deleted);
             });
 
             if (result) {
@@ -241,6 +242,7 @@ export class MonitorRepository {
         try {
             await this.databaseService.executeTransaction(async (db) => {
                 this.deleteBySiteIdentifierInternal(db, siteIdentifier);
+                return Promise.resolve();
             });
 
             if (isDev()) {
@@ -274,7 +276,7 @@ export class MonitorRepository {
     /**
      * Get all monitor IDs.
      */
-    public async getAllMonitorIds(): Promise<{ id: number }[]> {
+    public getAllMonitorIds(): { id: number }[] {
         try {
             const db = this.getDb();
             const rows = db.all("SELECT id FROM monitors") as { id: number }[];
@@ -288,7 +290,7 @@ export class MonitorRepository {
     /**
      * Clear all monitors from the database.
      */
-    public async deleteAll(): Promise<void> {
+    public deleteAll(): void {
         try {
             const db = this.getDb();
             db.run("DELETE FROM monitors");
@@ -306,7 +308,7 @@ export class MonitorRepository {
      * Returns the created monitor with their new IDs.
      * Fixed to use RETURNING clause to avoid race conditions.
      */
-    public async bulkCreate(siteIdentifier: string, monitors: Site["monitors"][0][]): Promise<Site["monitors"][0][]> {
+    public bulkCreate(siteIdentifier: string, monitors: Site["monitors"][0][]): Site["monitors"][0][] {
         try {
             const db = this.getDb();
             const createdMonitors: Site["monitors"][0][] = [];

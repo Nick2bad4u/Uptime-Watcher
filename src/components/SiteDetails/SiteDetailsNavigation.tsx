@@ -161,7 +161,9 @@ export function SiteDetailsNavigation({
                             <ThemedButton
                                 variant="error"
                                 size="sm"
-                                onClick={handleStopSiteMonitoring}
+                                onClick={() => {
+                                    void handleStopSiteMonitoring();
+                                }}
                                 aria-label="Stop All Monitoring"
                                 className="flex items-center gap-1"
                                 disabled={isLoading}
@@ -173,7 +175,9 @@ export function SiteDetailsNavigation({
                             <ThemedButton
                                 variant="success"
                                 size="sm"
-                                onClick={handleStartSiteMonitoring}
+                                onClick={() => {
+                                    void handleStartSiteMonitoring();
+                                }}
                                 aria-label="Start All Monitoring"
                                 className="flex items-center gap-1"
                                 disabled={isLoading}
@@ -188,7 +192,9 @@ export function SiteDetailsNavigation({
                             <ThemedButton
                                 variant="warning"
                                 size="sm"
-                                onClick={handleStopMonitoring}
+                                onClick={() => {
+                                    void handleStopMonitoring();
+                                }}
                                 aria-label="Stop Monitoring"
                                 className="flex items-center gap-1"
                             >
@@ -199,7 +205,9 @@ export function SiteDetailsNavigation({
                             <ThemedButton
                                 variant="success"
                                 size="sm"
-                                onClick={handleStartMonitoring}
+                                onClick={() => {
+                                    void handleStartMonitoring();
+                                }}
                                 aria-label="Start Monitoring"
                                 className="flex items-center gap-1"
                             >

@@ -12,6 +12,7 @@ Always keep in mind the following when making changes:
 8. Always aim for 100% test coverage.
 9. Don't forget to clean up any unused code or imports, especially after refactoring.
 10. Use as many requests as you want, and use as much time as you want. KEEP GOING UNTIL YOU FINISH ALL ASSIGNED TASKS!!!
+11. Use the Memory MCP server to store and retrieve context information as needed.
 
 # Uptime Watcher - AI Context Instructions
 

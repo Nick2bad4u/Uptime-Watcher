@@ -80,7 +80,7 @@ export class HttpMonitor implements IMonitorService {
         const timeout = monitor.timeout ?? this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT;
         const retryAttempts = monitor.retryAttempts ?? 0;
 
-        return await this.performHealthCheckWithRetry(monitor.url, timeout, retryAttempts);
+        return this.performHealthCheckWithRetry(monitor.url, timeout, retryAttempts);
     }
 
     /**
@@ -94,7 +94,7 @@ export class HttpMonitor implements IMonitorService {
         // Convert maxRetries (additional attempts) to totalAttempts for withRetry utility
         const totalAttempts = maxRetries + 1;
 
-        return await withRetry(() => this.performSingleHealthCheck(url, timeout), {
+        return withRetry(() => this.performSingleHealthCheck(url, timeout), {
             delayMs: RETRY_BACKOFF.INITIAL_DELAY,
             maxRetries: totalAttempts,
             onError: (error, attempt) => {
@@ -140,7 +140,7 @@ export class HttpMonitor implements IMonitorService {
      */
     private async makeRequest(url: string, timeout: number) {
         // Use our configured Axios instance with specific timeout override
-        return await this.axiosInstance.get(url, {
+        return this.axiosInstance.get(url, {
             timeout,
         });
     }

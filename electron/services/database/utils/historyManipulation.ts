@@ -11,12 +11,12 @@ import { logger } from "../../../utils/index";
 /**
  * Add a new history entry for a monitor.
  */
-export async function addHistoryEntry(
+export function addHistoryEntry(
     db: Database,
     monitorId: string,
     entry: StatusHistory,
     details?: string
-): Promise<void> {
+): void {
     try {
         db.run("INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)", [
             monitorId,
@@ -41,7 +41,7 @@ export async function addHistoryEntry(
 /**
  * Delete history entries for a specific monitor.
  */
-export async function deleteHistoryByMonitorId(db: Database, monitorId: string): Promise<void> {
+export function deleteHistoryByMonitorId(db: Database, monitorId: string): void {
     try {
         db.run("DELETE FROM history WHERE monitor_id = ?", [monitorId]);
         if (isDev()) {
@@ -56,7 +56,7 @@ export async function deleteHistoryByMonitorId(db: Database, monitorId: string):
 /**
  * Clear all history from the database.
  */
-export async function deleteAllHistory(db: Database): Promise<void> {
+export function deleteAllHistory(db: Database): void {
     try {
         db.run("DELETE FROM history");
         if (isDev()) {
@@ -71,7 +71,7 @@ export async function deleteAllHistory(db: Database): Promise<void> {
 /**
  * Prune old history entries for a monitor, keeping only the most recent entries.
  */
-export async function pruneHistoryForMonitor(db: Database, monitorId: string, limit: number): Promise<void> {
+export function pruneHistoryForMonitor(db: Database, monitorId: string, limit: number): void {
     if (limit <= 0) {
         return;
     }
@@ -104,11 +104,11 @@ export async function pruneHistoryForMonitor(db: Database, monitorId: string, li
  * Bulk insert history entries (for import functionality).
  * Uses a prepared statement and transaction for better performance.
  */
-export async function bulkInsertHistory(
+export function bulkInsertHistory(
     db: Database,
     monitorId: string,
     historyEntries: (StatusHistory & { details?: string })[]
-): Promise<void> {
+): void {
     if (historyEntries.length === 0) {
         return;
     }

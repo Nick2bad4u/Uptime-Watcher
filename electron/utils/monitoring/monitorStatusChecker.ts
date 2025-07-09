@@ -94,7 +94,7 @@ export async function checkMonitor(
         // Use transaction for atomicity of all database operations
         await config.databaseService.executeTransaction(async () => {
             // Add history entry using repository
-            await config.repositories.history.addEntry(monitor.id, historyEntry, checkResult.details);
+            config.repositories.history.addEntry(monitor.id, historyEntry, checkResult.details);
 
             // Trim history if needed using repository
             // Use smart history management for optimal UI experience
@@ -103,15 +103,16 @@ export async function checkMonitor(
                 // This prevents premature pruning that would leave charts looking sparse
                 const minRequiredForUI = 60; // Enough for large screens with high DPI
                 const effectiveLimit = Math.max(config.historyLimit, minRequiredForUI);
-                await config.repositories.history.pruneHistory(monitor.id, effectiveLimit);
+                config.repositories.history.pruneHistory(monitor.id, effectiveLimit);
             }
 
             // Update monitor with new status using repository
-            await config.repositories.monitor.update(monitor.id, {
+            config.repositories.monitor.update(monitor.id, {
                 lastChecked: monitor.lastChecked,
                 responseTime: monitor.responseTime,
                 status: monitor.status,
             });
+            return Promise.resolve();
         });
 
         config.logger.info(
@@ -123,7 +124,7 @@ export async function checkMonitor(
     }
 
     // Fetch fresh site data from database to ensure we have the latest history and monitor state
-    const freshSiteData = await config.repositories.site.getByIdentifier(site.identifier);
+    const freshSiteData = config.repositories.site.getByIdentifier(site.identifier);
     if (!freshSiteData) {
         config.logger.error(`[checkMonitor] Failed to fetch updated site data for ${site.identifier}`);
         return undefined;
@@ -140,7 +141,7 @@ export async function checkMonitor(
 
     // Emit typed monitor status changed event
     await config.eventEmitter.emitTyped("monitor:status-changed", {
-        monitor: freshSiteData.monitors.find((m) => m.id === monitor.id) || monitor,
+        monitor: freshSiteData.monitors.find((m) => m.id === monitor.id) ?? monitor,
         newStatus: checkResult.status,
         previousStatus,
         responseTime: checkResult.responseTime,
@@ -205,5 +206,5 @@ export async function checkSiteManually(
     }
 
     const result = await checkMonitor(config, site, targetMonitorId);
-    return result || undefined;
+    return result ?? undefined;
 }

@@ -36,7 +36,7 @@ export class HistoryRepository {
     /**
      * Find all history entries for a specific monitor.
      */
-    public async findByMonitorId(monitorId: string): Promise<StatusHistory[]> {
+    public findByMonitorId(monitorId: string): StatusHistory[] {
         const db = this.getDb();
         return findHistoryByMonitorId(db, monitorId);
     }
@@ -44,7 +44,7 @@ export class HistoryRepository {
     /**
      * Add a new history entry for a monitor.
      */
-    public async addEntry(monitorId: string, entry: StatusHistory, details?: string): Promise<void> {
+    public addEntry(monitorId: string, entry: StatusHistory, details?: string): void {
         const db = this.getDb();
         return addHistoryEntry(db, monitorId, entry, details);
     }
@@ -52,7 +52,7 @@ export class HistoryRepository {
     /**
      * Delete history entries for a specific monitor.
      */
-    public async deleteByMonitorId(monitorId: string): Promise<void> {
+    public deleteByMonitorId(monitorId: string): void {
         const db = this.getDb();
         return deleteHistoryByMonitorId(db, monitorId);
     }
@@ -60,7 +60,7 @@ export class HistoryRepository {
     /**
      * Prune old history entries for a monitor, keeping only the most recent entries.
      */
-    public async pruneHistory(monitorId: string, limit: number): Promise<void> {
+    public pruneHistory(monitorId: string, limit: number): void {
         const db = this.getDb();
         return pruneHistoryForMonitor(db, monitorId, limit);
     }
@@ -68,7 +68,7 @@ export class HistoryRepository {
     /**
      * Prune old history entries for all monitors.
      */
-    public async pruneAllHistory(limit: number): Promise<void> {
+    public pruneAllHistory(limit: number): void {
         if (limit <= 0) {
             return;
         }
@@ -81,7 +81,7 @@ export class HistoryRepository {
 
             // Prune history for each monitor
             for (const row of monitorRows) {
-                await this.pruneHistory(String(row.id), limit);
+                this.pruneHistory(String(row.id), limit);
             }
 
             if (isDev()) {
@@ -96,7 +96,7 @@ export class HistoryRepository {
     /**
      * Get the count of history entries for a monitor.
      */
-    public async getHistoryCount(monitorId: string): Promise<number> {
+    public getHistoryCount(monitorId: string): number {
         const db = this.getDb();
         return getHistoryCount(db, monitorId);
     }
@@ -104,7 +104,7 @@ export class HistoryRepository {
     /**
      * Clear all history from the database.
      */
-    public async deleteAll(): Promise<void> {
+    public deleteAll(): void {
         const db = this.getDb();
         return deleteAllHistory(db);
     }
@@ -112,7 +112,7 @@ export class HistoryRepository {
     /**
      * Get the most recent history entry for a monitor.
      */
-    public async getLatestEntry(monitorId: string): Promise<StatusHistory | undefined> {
+    public getLatestEntry(monitorId: string): StatusHistory | undefined {
         const db = this.getDb();
         return getLatestHistoryEntry(db, monitorId);
     }
@@ -120,10 +120,10 @@ export class HistoryRepository {
     /**
      * Bulk insert history entries (for import functionality).
      */
-    public async bulkInsert(
+    public bulkInsert(
         monitorId: string,
         historyEntries: (StatusHistory & { details?: string })[]
-    ): Promise<void> {
+    ): void {
         const db = this.getDb();
         return bulkInsertHistory(db, monitorId, historyEntries);
     }

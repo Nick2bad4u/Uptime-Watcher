@@ -36,7 +36,7 @@ export function useSiteActions(site: Site, monitor: Monitor | undefined): SiteAc
         }
 
         try {
-            startSiteMonitorMonitoring(site.identifier, monitor.id);
+            void startSiteMonitorMonitoring(site.identifier, monitor.id);
             logger.user.action("Started site monitoring", {
                 monitorId: monitor.id,
                 monitorType: monitor.type,
@@ -59,7 +59,7 @@ export function useSiteActions(site: Site, monitor: Monitor | undefined): SiteAc
         }
 
         try {
-            stopSiteMonitorMonitoring(site.identifier, monitor.id);
+            void stopSiteMonitorMonitoring(site.identifier, monitor.id);
             logger.user.action("Stopped site monitoring", {
                 monitorId: monitor.id,
                 monitorType: monitor.type,

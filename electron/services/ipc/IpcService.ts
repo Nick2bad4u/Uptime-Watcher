@@ -117,7 +117,7 @@ export class IpcService {
             return this.uptimeOrchestrator.setHistoryLimit(limit);
         });
 
-        ipcMain.handle("get-history-limit", async () => {
+        ipcMain.handle("get-history-limit", () => {
             if (isDev()) logger.debug("[IpcService] Handling get-history-limit");
             return this.uptimeOrchestrator.getHistoryLimit();
         });

@@ -48,7 +48,7 @@ export function useSiteMonitor(site: Site): SiteMonitorResult {
 
     // Always select the latest site from the store by id to ensure we have the most updated data
     const latestSite = useMemo(() => {
-        return sites.find((s) => s.identifier === site.identifier) || site;
+        return sites.find((s) => s.identifier === site.identifier) ?? site;
     }, [site, sites]);
 
     // Get monitor selection info

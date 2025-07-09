@@ -43,11 +43,15 @@ export class WindowService {
 
         if (isDev()) {
             logger.debug("[WindowService] Development mode: loading from localhost");
-            this.mainWindow.loadURL("http://localhost:5173");
+            this.mainWindow.loadURL("http://localhost:5173").catch((error) => {
+                logger.error("[WindowService] Failed to load development URL", error);
+            });
             this.mainWindow.webContents.openDevTools();
         } else {
             logger.debug("[WindowService] Production mode: loading from dist");
-            this.mainWindow.loadFile(path.join(__dirname, "../dist/index.html"));
+            this.mainWindow.loadFile(path.join(__dirname, "../dist/index.html")).catch((error) => {
+                logger.error("[WindowService] Failed to load production file", error);
+            });
         }
     }
 

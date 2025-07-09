@@ -21,38 +21,38 @@ export class SiteRepositoryAdapter implements ISiteRepository {
     }
 
     async findAll(): Promise<{ identifier: string; name?: string | undefined }[]> {
-        return this.repository.findAll();
+        return Promise.resolve(this.repository.findAll());
     }
 
     async findByIdentifier(identifier: string): Promise<{ identifier: string; name?: string | undefined } | undefined> {
-        return this.repository.findByIdentifier(identifier);
+        return Promise.resolve(this.repository.findByIdentifier(identifier));
     }
 
     async upsert(site: Pick<Site, "identifier" | "name">): Promise<void> {
-        return this.repository.upsert(site);
+        return Promise.resolve(this.repository.upsert(site));
     }
 
     async delete(identifier: string): Promise<boolean> {
-        return this.repository.delete(identifier);
+        return Promise.resolve(this.repository.delete(identifier));
     }
 
     // Import/Export operations
     async exportAll(): Promise<Site[]> {
         // The repository returns basic site data, we need to build full Site objects
-        const siteData = await this.repository.exportAll();
-        return siteData.map((site) => ({
+        const siteData = this.repository.exportAll();
+        return Promise.resolve(siteData.map((site) => ({
             identifier: site.identifier,
             monitors: [], // Will be populated by caller if needed
             ...(site.name && { name: site.name }),
-        }));
+        })));
     }
 
     async deleteAll(): Promise<void> {
-        return this.repository.deleteAll();
+        return Promise.resolve(this.repository.deleteAll());
     }
 
     async bulkInsert(sites: { identifier: string; name?: string }[]): Promise<void> {
-        return this.repository.bulkInsert(sites);
+        return Promise.resolve(this.repository.bulkInsert(sites));
     }
 }
 
@@ -67,15 +67,15 @@ export class MonitorRepositoryAdapter implements IMonitorRepository {
     }
 
     async findBySiteIdentifier(siteIdentifier: string): Promise<Monitor[]> {
-        return this.repository.findBySiteIdentifier(siteIdentifier);
+        return Promise.resolve(this.repository.findBySiteIdentifier(siteIdentifier));
     }
 
     async create(siteIdentifier: string, monitor: Monitor): Promise<string> {
-        return this.repository.create(siteIdentifier, monitor);
+        return Promise.resolve(this.repository.create(siteIdentifier, monitor));
     }
 
     async update(monitorId: string, monitor: Monitor): Promise<void> {
-        return this.repository.update(monitorId, monitor);
+        return Promise.resolve(this.repository.update(monitorId, monitor));
     }
 
     async delete(monitorId: string): Promise<boolean> {
@@ -96,11 +96,11 @@ export class MonitorRepositoryAdapter implements IMonitorRepository {
 
     // Import/Export operations
     async deleteAll(): Promise<void> {
-        return this.repository.deleteAll();
+        return Promise.resolve(this.repository.deleteAll());
     }
 
     async bulkCreate(siteIdentifier: string, monitors: Monitor[]): Promise<Monitor[]> {
-        return this.repository.bulkCreate(siteIdentifier, monitors);
+        return Promise.resolve(this.repository.bulkCreate(siteIdentifier, monitors));
     }
 }
 
@@ -115,28 +115,28 @@ export class HistoryRepositoryAdapter implements IHistoryRepository {
     }
 
     async findByMonitorId(monitorId: string): Promise<StatusHistory[]> {
-        return this.repository.findByMonitorId(monitorId);
+        return Promise.resolve(this.repository.findByMonitorId(monitorId));
     }
 
     async create(monitorId: string, history: StatusHistory): Promise<void> {
-        return this.repository.addEntry(monitorId, history);
+        return Promise.resolve(this.repository.addEntry(monitorId, history));
     }
 
     async deleteByMonitorId(monitorId: string): Promise<void> {
-        return this.repository.deleteByMonitorId(monitorId);
+        return Promise.resolve(this.repository.deleteByMonitorId(monitorId));
     }
 
     // Import/Export operations
     async deleteAll(): Promise<void> {
-        return this.repository.deleteAll();
+        return Promise.resolve(this.repository.deleteAll());
     }
 
     async addEntry(monitorId: string, history: StatusHistory, details?: string): Promise<void> {
-        return this.repository.addEntry(monitorId, history, details);
+        return Promise.resolve(this.repository.addEntry(monitorId, history, details));
     }
 
     async pruneHistory(monitorId: string, limit: number): Promise<void> {
-        return this.repository.pruneHistory(monitorId, limit);
+        return Promise.resolve(this.repository.pruneHistory(monitorId, limit));
     }
 }
 
@@ -151,29 +151,29 @@ export class SettingsRepositoryAdapter implements ISettingsRepository {
     }
 
     async get(key: string): Promise<string | undefined> {
-        const result = await this.repository.get(key);
-        return result ?? undefined;
+        const result = this.repository.get(key);
+        return Promise.resolve(result ?? undefined);
     }
 
     async set(key: string, value: string): Promise<void> {
-        return this.repository.set(key, value);
+        return Promise.resolve(this.repository.set(key, value));
     }
 
     async delete(key: string): Promise<void> {
-        return this.repository.delete(key);
+        return Promise.resolve(this.repository.delete(key));
     }
 
     // Import/Export operations
     async getAll(): Promise<Record<string, string>> {
-        return this.repository.getAll();
+        return Promise.resolve(this.repository.getAll());
     }
 
     async deleteAll(): Promise<void> {
-        return this.repository.deleteAll();
+        return Promise.resolve(this.repository.deleteAll());
     }
 
     async bulkInsert(settings: Record<string, string>): Promise<void> {
-        return this.repository.bulkInsert(settings);
+        return Promise.resolve(this.repository.bulkInsert(settings));
     }
 }
 
