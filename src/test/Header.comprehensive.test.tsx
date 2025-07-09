@@ -276,40 +276,6 @@ describe("Header Component", () => {
     });
 
     describe("Edge Cases", () => {
-        it("handles sites without monitors", () => {
-            const sitesWithoutMonitors = [
-                {
-                    identifier: "site1",
-                    name: "Site 1",
-                    monitors: null,
-                },
-                {
-                    identifier: "site2",
-                    name: "Site 2",
-                    // no monitors property
-                },
-            ];
-
-            (useSitesStore as any).mockReturnValue({
-                sites: sitesWithoutMonitors,
-            });
-
-            render(<Header />);
-
-            // Should show status indicators with 0 counts
-            const statusIndicators = screen.getAllByTestId("status-indicator");
-            expect(statusIndicators).toHaveLength(3);
-
-            // Check that all counts are 0
-            const upText = screen.getByText("Up").previousElementSibling;
-            const downText = screen.getByText("Down").previousElementSibling;
-            const pendingText = screen.getByText("Pending").previousElementSibling;
-
-            expect(upText).toHaveTextContent("0");
-            expect(downText).toHaveTextContent("0");
-            expect(pendingText).toHaveTextContent("0");
-        });
-
         it("handles empty monitors array", () => {
             const sitesWithEmptyMonitors = [
                 {

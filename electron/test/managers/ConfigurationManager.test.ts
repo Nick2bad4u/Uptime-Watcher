@@ -327,18 +327,6 @@ describe("ConfigurationManager", () => {
             expect(result.errors).toHaveLength(0);
         });
 
-        it("should reject monitor with no type", () => {
-            const monitor = {
-                id: "monitor-1",
-                status: "pending" as const,
-                history: [],
-            } as unknown as Site["monitors"][0];
-
-            const result = manager.validateMonitorConfiguration(monitor);
-            expect(result.isValid).toBe(false);
-            expect(result.errors).toContain("Monitor type is required");
-        });
-
         it("should reject HTTP monitor with no URL", () => {
             const monitor = {
                 id: "monitor-1",

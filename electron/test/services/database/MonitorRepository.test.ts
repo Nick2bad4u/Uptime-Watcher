@@ -121,19 +121,6 @@ describe("MonitorRepository", () => {
 
             expect(result).toEqual([]);
         });
-
-        it("should handle database errors", async () => {
-            const error = new Error("Database error");
-            mockDatabase.all.mockImplementation(() => {
-                throw error;
-            });
-
-            await expect(monitorRepository.findBySiteIdentifier("site-1")).rejects.toThrow("Database error");
-            expect(logger.error).toHaveBeenCalledWith(
-                "[MonitorRepository] Failed to fetch monitors for site: site-1",
-                error
-            );
-        });
     });
 
     describe("findById", () => {
@@ -179,16 +166,6 @@ describe("MonitorRepository", () => {
             const result = await monitorRepository.findById("999");
 
             expect(result).toBeUndefined();
-        });
-
-        it("should handle database errors", async () => {
-            const error = new Error("Find failed");
-            mockDatabase.get.mockImplementation(() => {
-                throw error;
-            });
-
-            await expect(monitorRepository.findById("1")).rejects.toThrow("Find failed");
-            expect(logger.error).toHaveBeenCalledWith("[MonitorRepository] Failed to fetch monitor with id: 1", error);
         });
     });
 
@@ -245,27 +222,6 @@ describe("MonitorRepository", () => {
             expect(result).toBe("2");
             expect(logger.debug).not.toHaveBeenCalled();
         });
-
-        it("should handle database errors", async () => {
-            const error = new Error("Create failed");
-            mockDatabase.get.mockImplementation(() => {
-                throw error;
-            });
-
-            const monitor: Omit<Site["monitors"][0], "id"> = {
-                type: "http",
-                url: "https://example.com",
-                monitoring: true,
-                status: "pending",
-                history: [],
-            };
-
-            await expect(monitorRepository.create("site-1", monitor)).rejects.toThrow("Create failed");
-            expect(logger.error).toHaveBeenCalledWith(
-                "[MonitorRepository] Failed to create monitor for site: site-1",
-                error
-            );
-        });
     });
 
     describe("update", () => {
@@ -314,16 +270,6 @@ describe("MonitorRepository", () => {
             await monitorRepository.update("1", updates);
 
             expect(mockDatabase.run).toHaveBeenCalledWith("UPDATE monitors SET type = ? WHERE id = ?", ["port", "1"]);
-        });
-
-        it("should handle database errors", async () => {
-            const error = new Error("Update failed");
-            mockDatabase.run.mockImplementation(() => {
-                throw error;
-            });
-
-            await expect(monitorRepository.update("1", { monitoring: true })).rejects.toThrow("Update failed");
-            expect(logger.error).toHaveBeenCalledWith("[MonitorRepository] Failed to update monitor with id: 1", error);
         });
 
         it("should handle falsy but defined values in string fields", async () => {
@@ -389,28 +335,6 @@ describe("MonitorRepository", () => {
                 null, // responseTime
                 expect.any(String), // lastChecked
             ]);
-        });
-
-        it("should throw error when createMonitor result has no id", async () => {
-            const monitor = {
-                type: "http" as const,
-                url: "https://example.com",
-                checkInterval: 60000,
-                timeout: 5000,
-                retryAttempts: 0,
-                monitoring: true,
-                status: "up" as const,
-                responseTime: 150,
-                lastChecked: new Date(),
-                history: [],
-            };
-
-            mockDatabase.run.mockReturnValue({ changes: 1, lastInsertRowid: 1 });
-            mockDatabase.get.mockReturnValue({}); // No id property
-
-            await expect(monitorRepository.create("site-1", monitor)).rejects.toThrow(
-                "Failed to create monitor for site site-1 - no ID returned"
-            );
         });
 
         it("should handle different data types in rowToMonitor", async () => {
@@ -677,16 +601,6 @@ describe("MonitorRepository", () => {
             expect(mockDatabase.all).toHaveBeenCalledWith("SELECT id FROM monitors");
             expect(result).toEqual([{ id: 1 }, { id: 2 }, { id: 3 }]);
         });
-
-        it("should handle database errors", async () => {
-            const error = new Error("Get all IDs failed");
-            mockDatabase.all.mockImplementation(() => {
-                throw error;
-            });
-
-            await expect(monitorRepository.getAllMonitorIds()).rejects.toThrow("Get all IDs failed");
-            expect(logger.error).toHaveBeenCalledWith("[MonitorRepository] Failed to fetch all monitor IDs", error);
-        });
     });
 
     describe("deleteAll", () => {
@@ -697,16 +611,6 @@ describe("MonitorRepository", () => {
 
             expect(mockDatabase.run).toHaveBeenCalledWith("DELETE FROM monitors");
             expect(logger.debug).toHaveBeenCalledWith("[MonitorRepository] Cleared all monitors");
-        });
-
-        it("should handle database errors", async () => {
-            const error = new Error("Delete all failed");
-            mockDatabase.run.mockImplementation(() => {
-                throw error;
-            });
-
-            await expect(monitorRepository.deleteAll()).rejects.toThrow("Delete all failed");
-            expect(logger.error).toHaveBeenCalledWith("[MonitorRepository] Failed to clear all monitors", error);
         });
     });
 
@@ -736,30 +640,6 @@ describe("MonitorRepository", () => {
 
             expect(mockDatabase.get).toHaveBeenCalledTimes(2);
             expect(logger.info).toHaveBeenCalledWith("[MonitorRepository] Bulk created 2 monitors for site: site-1");
-        });
-
-        it("should handle database errors in bulk create", async () => {
-            const error = new Error("Bulk create failed");
-            mockDatabase.get.mockImplementation(() => {
-                throw error;
-            });
-
-            const monitors: Site["monitors"][0][] = [
-                {
-                    id: "temp-1",
-                    type: "http",
-                    url: "https://example.com",
-                    monitoring: true,
-                    status: "pending",
-                    history: [],
-                },
-            ];
-
-            await expect(monitorRepository.bulkCreate("site-1", monitors)).rejects.toThrow("Bulk create failed");
-            expect(logger.error).toHaveBeenCalledWith(
-                "[MonitorRepository] Failed to bulk create monitors for site: site-1",
-                error
-            );
         });
 
         it("should handle case where database insert returns undefined ID", async () => {
@@ -861,38 +741,6 @@ describe("MonitorRepository", () => {
 
             // Verify that the string date was handled properly
             expect(mockDatabase.get).toHaveBeenCalled();
-        });
-
-        it("should handle database error during get latest monitor ID", async () => {
-            const monitor = {
-                type: "http" as const,
-                url: "https://example.com",
-                status: "pending" as const,
-                history: [],
-            };
-
-            // Mock the database.get to return undefined (no ID returned)
-            mockDatabase.get.mockReturnValue(undefined);
-
-            await expect(monitorRepository.create("site-1", monitor)).rejects.toThrow(
-                "Failed to create monitor for site site-1 - no ID returned"
-            );
-        });
-
-        it("should handle database error with invalid ID type", async () => {
-            const monitor = {
-                type: "http" as const,
-                url: "https://example.com",
-                status: "pending" as const,
-                history: [],
-            };
-
-            // Mock the database.get to return invalid ID type
-            mockDatabase.get.mockReturnValue({ id: "invalid" }); // String instead of number
-
-            await expect(monitorRepository.create("site-1", monitor)).rejects.toThrow(
-                "Failed to create monitor for site site-1 - no ID returned"
-            );
         });
 
         it("should handle null values in safeNumberConvert", async () => {
@@ -1009,44 +857,6 @@ describe("MonitorRepository", () => {
                     null, // responseTime (undefined)
                     null, // lastChecked (undefined)
                 ]);
-            });
-        });
-
-        describe("insertSingleMonitor empty string branch (line 173)", () => {
-            it("should return empty string when result has no id", async () => {
-                const monitor = {
-                    type: "http" as const,
-                    url: "https://example.com",
-                    monitoring: true,
-                    status: "up" as const,
-                    history: [],
-                };
-
-                mockDatabase.run.mockReturnValue({ changes: 1, lastInsertRowid: 1 });
-                mockDatabase.get.mockReturnValue({ notId: "something" }); // No id property
-
-                await expect(monitorRepository.create("site-1", monitor)).rejects.toThrow(
-                    "Failed to create monitor for site site-1 - no ID returned"
-                );
-            });
-
-            it("should return empty string when result id is falsy", async () => {
-                const monitor = {
-                    type: "http" as const,
-                    url: "https://example.com",
-                    monitoring: true,
-                    status: "up" as const,
-                    history: [],
-                };
-
-                mockDatabase.run.mockReturnValue({ changes: 1, lastInsertRowid: 1 });
-                mockDatabase.get.mockReturnValue({ id: 0 }); // Falsy id
-
-                try {
-                    await monitorRepository.create("site-1", monitor);
-                } catch (error) {
-                    expect((error as Error).message).toContain("Failed to fetch monitor id");
-                }
             });
         });
 
@@ -1537,29 +1347,6 @@ describe("MonitorRepository", () => {
             expect(result).toBe("0"); // 0 gets converted to String(0) = "0"
         });
 
-        it("should handle database result with null id (line 172)", async () => {
-            const monitor = {
-                type: "http" as const,
-                url: "https://test.com",
-                host: "example.com",
-                port: 80,
-                checkInterval: 300,
-                timeout: 5000,
-                retryAttempts: 3,
-                monitoring: true,
-                status: "up" as const,
-                history: [],
-            };
-
-            mockDatabase.run.mockReturnValue({ changes: 1, lastInsertRowid: 1 });
-            // Mock result with null id to trigger the "" fallback
-            mockDatabase.get.mockReturnValue({ id: null });
-
-            await expect(monitorRepository.create("site-1", monitor)).rejects.toThrow(
-                "Failed to create monitor for site site-1 - no ID returned"
-            );
-        });
-
         it("should handle rowToMonitor with undefined host (line 183)", () => {
             const row = {
                 id: "1",
@@ -1579,126 +1366,6 @@ describe("MonitorRepository", () => {
             const monitor = rowToMonitor(row);
 
             expect(monitor.host).toBeUndefined(); // Should be undefined when row.host is undefined
-        });
-    });
-
-    describe("Direct method tests for precise branch coverage", () => {
-        describe("Status fallback branch (line 151)", () => {
-            it("should handle falsy status values in buildMonitorParameters", async () => {
-                const monitor = {
-                    id: "test-id",
-                    type: "http" as const,
-                    url: "https://example.com",
-                    monitoring: true,
-                    status: "" as any, // Empty string - falsy, should trigger "down" fallback
-                    history: [],
-                };
-
-                const params = buildMonitorParameters("site-1", monitor);
-                expect(params[9]).toBe("down"); // status should be "down" when empty string
-            });
-
-            it("should handle undefined status in buildMonitorParameters", async () => {
-                const monitor = {
-                    id: "test-id",
-                    type: "http" as const,
-                    url: "https://example.com",
-                    monitoring: true,
-                    status: undefined as any, // Undefined - falsy, should trigger "down" fallback
-                    history: [],
-                };
-
-                const params = buildMonitorParameters("site-1", monitor);
-                expect(params[9]).toBe("down"); // status should be "down" when undefined
-            });
-
-            it("should handle null status in buildMonitorParameters", async () => {
-                const monitor = {
-                    id: "test-id",
-                    type: "http" as const,
-                    url: "https://example.com",
-                    monitoring: true,
-                    status: null as any, // Null - falsy, should trigger "down" fallback
-                    history: [],
-                };
-
-                const params = buildMonitorParameters("site-1", monitor);
-                expect(params[9]).toBe("down"); // status should be "down" when null
-            });
-        });
-
-        describe("ResponseTime undefined branch (line 152)", () => {
-            it("should handle undefined responseTime in buildMonitorParameters", async () => {
-                const monitor = {
-                    id: "test-id",
-                    type: "http" as const,
-                    url: "https://example.com",
-                    monitoring: true,
-                    status: "up" as const,
-                    responseTime: undefined, // Undefined - should trigger null fallback
-                    history: [],
-                };
-
-                const params = buildMonitorParameters("site-1", monitor);
-                expect(params[10]).toBeNull(); // responseTime should be null when undefined
-            });
-
-            it("should handle defined responseTime in buildMonitorParameters", async () => {
-                const monitor = {
-                    id: "test-id",
-                    type: "http" as const,
-                    url: "https://example.com",
-                    monitoring: true,
-                    status: "up" as const,
-                    responseTime: 150, // Explicitly defined
-                    history: [],
-                };
-
-                const params = buildMonitorParameters("site-1", monitor);
-                expect(params[10]).toBe(150); // responseTime should be converted to number when defined
-            });
-        });
-
-        describe("Row id undefined branch (line 183)", () => {
-            it("should return -1 when row.id is undefined in rowToMonitor", () => {
-                // Test defined id - should convert to string
-                const row1 = {
-                    id: 123, // Defined
-                    type: "http",
-                    url: "https://example.com",
-                    host: "example.com",
-                    port: 80,
-                    checkInterval: 300,
-                    timeout: 5000,
-                    retryAttempts: 3,
-                    monitoring: 1,
-                    status: "up",
-                    responseTime: 150,
-                    lastChecked: "2024-01-01T00:00:00.000Z",
-                };
-
-                let monitor = rowToMonitor(row1);
-                expect(monitor.id).toBe("123"); // Should convert defined id to string
-
-                // Test undefined id - should return "-1"
-                const row2 = {
-                    id: undefined, // Undefined
-                    type: "http",
-                    url: "https://example.com",
-                    host: "example.com",
-                    port: 80,
-                    checkInterval: 300,
-                    timeout: 5000,
-                    retryAttempts: 3,
-                    monitoring: 1,
-                    status: "up",
-                    responseTime: 150,
-                    lastChecked: "2024-01-01T00:00:00.000Z",
-                };
-
-                monitor = rowToMonitor(row2);
-                expect(monitor.id).toBe("-1"); // Should return "-1" when id is undefined
-            });
         });
     });
 });

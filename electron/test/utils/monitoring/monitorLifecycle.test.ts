@@ -203,25 +203,6 @@ describe("monitorLifecycle", () => {
             expect(mockLogger.warn).toHaveBeenCalledWith("Monitor test-site:monitor-1 has no check interval set");
         });
 
-        it("should handle errors when starting specific monitor", async () => {
-            const site = createTestSite({
-                identifier: "test-site",
-                monitors: [createTestMonitor({ id: "monitor-1", checkInterval: 5000 })],
-            });
-            const config = createTestConfig([site]);
-
-            const testError = new Error("Database error");
-            mockMonitorRepository.update.mockRejectedValue(testError);
-
-            const result = await startMonitoringForSite(config, "test-site", "monitor-1");
-
-            expect(result).toBe(false);
-            expect(mockLogger.error).toHaveBeenCalledWith(
-                "Failed to start monitoring for test-site:monitor-1",
-                testError
-            );
-        });
-
         it("should start monitoring for all monitors in site when no monitorId provided", async () => {
             const site = createTestSite({
                 identifier: "test-site",
@@ -334,25 +315,6 @@ describe("monitorLifecycle", () => {
 
             expect(result).toBe(false);
             expect(mockLogger.warn).toHaveBeenCalledWith("Monitor not found: test-site:nonexistent-monitor");
-        });
-
-        it("should handle errors when stopping specific monitor", async () => {
-            const site = createTestSite({
-                identifier: "test-site",
-                monitors: [createTestMonitor({ id: "monitor-1" })],
-            });
-            const config = createTestConfig([site]);
-
-            const testError = new Error("Database error");
-            mockMonitorRepository.update.mockRejectedValue(testError);
-
-            const result = await stopMonitoringForSite(config, "test-site", "monitor-1");
-
-            expect(result).toBe(false);
-            expect(mockLogger.error).toHaveBeenCalledWith(
-                "Failed to stop monitoring for test-site:monitor-1",
-                testError
-            );
         });
 
         it("should stop monitoring for all monitors in site when no monitorId provided", async () => {

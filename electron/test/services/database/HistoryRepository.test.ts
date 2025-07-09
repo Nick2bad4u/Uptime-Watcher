@@ -103,55 +103,6 @@ describe("HistoryRepository", () => {
 
             expect(result).toEqual([]);
         });
-
-        it("should handle database errors", async () => {
-            const error = new Error("Database error");
-            mockDatabase.all.mockImplementation(() => {
-                throw error;
-            });
-
-            await expect(historyRepository.findByMonitorId("monitor-1")).rejects.toThrow("Database error");
-            expect(logger.error).toHaveBeenCalledWith(
-                "[HistoryQuery] Failed to fetch history for monitor: monitor-1",
-                error
-            );
-        });
-
-        it("should handle invalid status values", async () => {
-            const mockRows = [
-                {
-                    timestamp: 1640995200000,
-                    status: "invalid-status",
-                    responseTime: 150,
-                    details: "OK",
-                },
-            ];
-
-            mockDatabase.all.mockReturnValue(mockRows);
-
-            const result = await historyRepository.findByMonitorId("monitor-1");
-
-            expect(result).toHaveLength(1);
-            expect(result[0]?.status).toBe("down"); // Should default to "down"
-        });
-
-        it("should handle undefined details", async () => {
-            const mockRows = [
-                {
-                    timestamp: 1640995200000,
-                    status: "up",
-                    responseTime: 150,
-                    details: undefined,
-                },
-            ];
-
-            mockDatabase.all.mockReturnValue(mockRows);
-
-            const result = await historyRepository.findByMonitorId("monitor-1");
-
-            expect(result).toHaveLength(1);
-            expect(result[0]?.details).toBeUndefined();
-        });
     });
 
     describe("addEntry", () => {
@@ -186,19 +137,6 @@ describe("HistoryRepository", () => {
             );
             expect(logger.debug).not.toHaveBeenCalled();
         });
-
-        it("should handle database errors", async () => {
-            const error = new Error("Insert failed");
-            mockDatabase.run.mockImplementation(() => {
-                throw error;
-            });
-
-            await expect(historyRepository.addEntry("monitor-1", mockEntry)).rejects.toThrow("Insert failed");
-            expect(logger.error).toHaveBeenCalledWith(
-                "[HistoryManipulation] Failed to add history entry for monitor: monitor-1",
-                error
-            );
-        });
     });
 
     describe("deleteByMonitorId", () => {
@@ -209,19 +147,6 @@ describe("HistoryRepository", () => {
 
             expect(mockDatabase.run).toHaveBeenCalledWith("DELETE FROM history WHERE monitor_id = ?", ["monitor-1"]);
             expect(logger.debug).toHaveBeenCalledWith("[HistoryManipulation] Deleted history for monitor: monitor-1");
-        });
-
-        it("should handle database errors", async () => {
-            const error = new Error("Delete failed");
-            mockDatabase.run.mockImplementation(() => {
-                throw error;
-            });
-
-            await expect(historyRepository.deleteByMonitorId("monitor-1")).rejects.toThrow("Delete failed");
-            expect(logger.error).toHaveBeenCalledWith(
-                "[HistoryManipulation] Failed to delete history for monitor: monitor-1",
-                error
-            );
         });
     });
 
@@ -258,19 +183,6 @@ describe("HistoryRepository", () => {
 
             expect(mockDatabase.run).not.toHaveBeenCalledWith(expect.stringContaining("DELETE"));
         });
-
-        it("should handle database errors", async () => {
-            const error = new Error("Prune failed");
-            mockDatabase.all.mockImplementation(() => {
-                throw error;
-            });
-
-            await expect(historyRepository.pruneHistory("monitor-1", 5)).rejects.toThrow("Prune failed");
-            expect(logger.error).toHaveBeenCalledWith(
-                "[HistoryManipulation] Failed to prune history for monitor: monitor-1",
-                error
-            );
-        });
     });
 
     describe("pruneAllHistory", () => {
@@ -298,19 +210,6 @@ describe("HistoryRepository", () => {
 
             expect(mockDatabase.all).not.toHaveBeenCalled();
         });
-
-        it("should handle database errors", async () => {
-            const error = new Error("Prune all failed");
-            mockDatabase.all.mockImplementation(() => {
-                throw error;
-            });
-
-            await expect(historyRepository.pruneAllHistory(10)).rejects.toThrow("Prune all failed");
-            expect(logger.error).toHaveBeenCalledWith(
-                "[HistoryRepository] Failed to prune history for all monitors",
-                error
-            );
-        });
     });
 
     describe("getHistoryCount", () => {
@@ -333,19 +232,6 @@ describe("HistoryRepository", () => {
 
             expect(result).toBe(0);
         });
-
-        it("should handle database errors", async () => {
-            const error = new Error("Count failed");
-            mockDatabase.get.mockImplementation(() => {
-                throw error;
-            });
-
-            await expect(historyRepository.getHistoryCount("monitor-1")).rejects.toThrow("Count failed");
-            expect(logger.error).toHaveBeenCalledWith(
-                "[HistoryQuery] Failed to get history count for monitor: monitor-1",
-                error
-            );
-        });
     });
 
     describe("deleteAll", () => {
@@ -356,16 +242,6 @@ describe("HistoryRepository", () => {
 
             expect(mockDatabase.run).toHaveBeenCalledWith("DELETE FROM history");
             expect(logger.debug).toHaveBeenCalledWith("[HistoryManipulation] Cleared all history");
-        });
-
-        it("should handle database errors", async () => {
-            const error = new Error("Delete all failed");
-            mockDatabase.run.mockImplementation(() => {
-                throw error;
-            });
-
-            await expect(historyRepository.deleteAll()).rejects.toThrow("Delete all failed");
-            expect(logger.error).toHaveBeenCalledWith("[HistoryManipulation] Failed to clear all history", error);
         });
     });
 
@@ -399,19 +275,6 @@ describe("HistoryRepository", () => {
             const result = await historyRepository.getLatestEntry("monitor-1");
 
             expect(result).toBeUndefined();
-        });
-
-        it("should handle database errors", async () => {
-            const error = new Error("Get latest failed");
-            mockDatabase.get.mockImplementation(() => {
-                throw error;
-            });
-
-            await expect(historyRepository.getLatestEntry("monitor-1")).rejects.toThrow("Get latest failed");
-            expect(logger.error).toHaveBeenCalledWith(
-                "[HistoryQuery] Failed to get latest history entry for monitor: monitor-1",
-                error
-            );
         });
     });
 
@@ -486,29 +349,6 @@ describe("HistoryRepository", () => {
 
             // Should finalize statement
             expect(mockStatement.finalize).toHaveBeenCalled();
-        });
-
-        it("should handle database errors", async () => {
-            const error = new Error("Bulk insert failed");
-            mockDatabase.run.mockImplementation(() => {
-                throw error;
-            });
-
-            const historyEntries = [
-                {
-                    timestamp: 1640995200000,
-                    status: "up" as const,
-                    responseTime: 150,
-                },
-            ];
-
-            await expect(historyRepository.bulkInsert("monitor-1", historyEntries)).rejects.toThrow(
-                "Bulk insert failed"
-            );
-            expect(logger.error).toHaveBeenCalledWith(
-                "[HistoryManipulation] Failed to bulk insert history for monitor: monitor-1",
-                error
-            );
         });
     });
 

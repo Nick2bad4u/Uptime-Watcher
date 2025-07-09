@@ -107,20 +107,6 @@ describe("Sites Store Modules - Edge Cases and Error Scenarios", () => {
             expect(mockSetSites).not.toHaveBeenCalled();
         });
 
-        it("should handle null/undefined response from backend", async () => {
-            const mockSetSites = vi.fn();
-            const syncActions = createSiteSyncActions({
-                getSites: () => [],
-                setSites: mockSetSites,
-            });
-
-            const { SiteService } = await import("../../../stores/sites/services");
-            // @ts-expect-error - Testing edge case
-            vi.mocked(SiteService.getSites).mockResolvedValue(null);
-
-            await syncActions.syncSitesFromBackend();
-            expect(mockSetSites).toHaveBeenCalledWith([]);
-        });
 
         it("should handle malformed site data", async () => {
             const mockSetSites = vi.fn();

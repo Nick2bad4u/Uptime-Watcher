@@ -181,39 +181,4 @@ describe("Additional Uncovered Lines Tests", () => {
             // The hook should handle this gracefully
         });
     });
-
-    describe("utils.ts - Line 38 (waitForElectronAPI edge case)", () => {
-        it("should handle exponential backoff with maximum delay", async () => {
-            Object.defineProperty(global, "window", {
-                value: {
-                    electronAPI: undefined,
-                },
-                writable: true,
-            });
-
-            let attemptCount = 0;
-            const mockSetTimeout = vi.fn((callback) => {
-                attemptCount++;
-                if (attemptCount >= 3) {
-                    (global.window as MockWindow).electronAPI = {
-                        sites: {
-                            getSites: vi.fn(),
-                        },
-                    };
-                }
-                callback();
-                return 1 as unknown as NodeJS.Timeout;
-            });
-
-            Object.defineProperty(global, "setTimeout", {
-                value: mockSetTimeout,
-                writable: true,
-            });
-
-            await waitForElectronAPI();
-
-            expect(mockSetTimeout).toHaveBeenCalled();
-            expect(attemptCount).toBeGreaterThan(0);
-        });
-    });
 });

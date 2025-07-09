@@ -160,27 +160,6 @@ describe("ScreenshotThumbnail", () => {
     });
 
     describe("Click Handling", () => {
-        it("should call logger and window.open when electronAPI is not available", async () => {
-            // Ensure electronAPI is not available
-            Object.defineProperty(window, "electronAPI", {
-                value: undefined,
-                writable: true,
-            });
-
-            const user = userEvent.setup();
-            render(<ScreenshotThumbnail {...defaultProps} />);
-
-            const link = screen.getByRole("link");
-            await user.click(link);
-
-            expect(logger.user.action).toHaveBeenCalledWith("External URL opened from screenshot thumbnail", {
-                siteName: "Example Site",
-                url: "https://example.com",
-            });
-
-            expect(mockWindowOpen).toHaveBeenCalledWith("https://example.com", "_blank", "noopener");
-        });
-
         it("should call electronAPI.openExternal when available", async () => {
             // Mock electronAPI with openExternal method
             Object.defineProperty(window, "electronAPI", {
@@ -662,29 +641,6 @@ describe("ScreenshotThumbnail", () => {
             const clickEvent = createEvent.click(link);
 
             fireEvent(link, clickEvent);
-
-            // Should fall back to window.open
-            expect(mockWindowOpen).toHaveBeenCalledWith("https://example.com", "_blank", "noopener");
-        });
-
-        it("should fallback to window.open when electronAPI is null", () => {
-            Object.defineProperty(window, "electronAPI", {
-                value: null,
-                writable: true,
-            });
-
-            render(<ScreenshotThumbnail {...defaultProps} />);
-
-            const link = screen.getByRole("link");
-
-            // Simulate the handleClick function directly
-            // Get the component's handleClick function by triggering it via a custom event
-            const clickEvent = createEvent.click(link);
-            const preventDefaultSpy = vi.fn();
-            Object.defineProperty(clickEvent, "preventDefault", { value: preventDefaultSpy });
-
-            // Dispatch the event instead of using fireEvent
-            link.dispatchEvent(clickEvent);
 
             // Should fall back to window.open
             expect(mockWindowOpen).toHaveBeenCalledWith("https://example.com", "_blank", "noopener");

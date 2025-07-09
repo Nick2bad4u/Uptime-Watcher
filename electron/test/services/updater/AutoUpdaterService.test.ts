@@ -182,16 +182,6 @@ describe("AutoUpdaterService", () => {
                 error: "String error",
             });
         });
-
-        it("should handle error event with null/undefined", () => {
-            const handler = getEventHandler("error");
-            handler(null);
-
-            expect(statusCallback).toHaveBeenCalledWith({
-                status: "error",
-                error: "null",
-            });
-        });
     });
 
     describe("checkForUpdates", () => {

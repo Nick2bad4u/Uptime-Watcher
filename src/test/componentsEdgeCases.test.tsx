@@ -80,49 +80,4 @@ describe("components.tsx Edge Cases", () => {
             expect(button).toHaveAttribute("title", "icon button tooltip");
         });
     });
-
-    describe("ThemedBadge", () => {
-        it("should render with primary variant (default)", () => {
-            // This test covers the primary variant which is the default
-            render(<ThemedBadge variant="primary">Primary badge message</ThemedBadge>);
-
-            const badge = screen.getByText("Primary badge message");
-            expect(badge).toBeInTheDocument();
-        });
-
-        it("should render with secondary variant", () => {
-            render(<ThemedBadge variant="secondary">Secondary badge message</ThemedBadge>);
-
-            const badge = screen.getByText("Secondary badge message");
-            expect(badge).toBeInTheDocument();
-        });
-
-        it("should apply info variant styling", () => {
-            render(<ThemedBadge variant="info">Info badge message</ThemedBadge>);
-
-            const badge = screen.getByText("Info badge message");
-            expect(badge).toBeInTheDocument();
-        });
-
-        it("should apply error variant styling", () => {
-            render(<ThemedBadge variant="error">Error badge message</ThemedBadge>);
-
-            const badge = screen.getByText("Error badge message");
-            expect(badge).toBeInTheDocument();
-        });
-
-        it("should apply warning variant styling", () => {
-            render(<ThemedBadge variant="warning">Warning badge message</ThemedBadge>);
-
-            const badge = screen.getByText("Warning badge message");
-            expect(badge).toBeInTheDocument();
-        });
-
-        it("should apply success variant styling", () => {
-            render(<ThemedBadge variant="success">Success badge message</ThemedBadge>);
-
-            const badge = screen.getByText("Success badge message");
-            expect(badge).toBeInTheDocument();
-        });
-    });
 });

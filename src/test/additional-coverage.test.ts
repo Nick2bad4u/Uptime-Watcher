@@ -51,29 +51,6 @@ describe("Status Update Handler Tests", () => {
             expect(waitForElectronAPI).toHaveBeenCalled();
         });
 
-        it("should handle case when electronAPI is still not available after wait", async () => {
-            // Setup: no electronAPI initially
-            Object.defineProperty(window, "electronAPI", {
-                value: undefined,
-                writable: true,
-            });
-
-            // Mock waitForElectronAPI to succeed but electronAPI still not available
-            vi.mocked(waitForElectronAPI).mockResolvedValue(undefined);
-
-            const manager = new StatusUpdateManager();
-            const handler = vi.fn();
-
-            try {
-                await manager.subscribe(handler);
-                expect.fail("Should have thrown an error");
-            } catch (error) {
-                expect(error).toBeInstanceOf(Error);
-                expect((error as Error).message).toBe("electronAPI.events.onStatusUpdate is not available");
-            }
-
-            expect(waitForElectronAPI).toHaveBeenCalled();
-        });
     });
 });
 

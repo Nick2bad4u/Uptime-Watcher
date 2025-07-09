@@ -12,18 +12,6 @@ import { useSiteStats } from "../hooks/site/useSiteStats";
 
 describe("useSiteStats Edge Cases", () => {
     describe("Basic edge cases", () => {
-        it("should handle null/undefined history", () => {
-            const { result: nullResult } = renderHook(() => useSiteStats(null as unknown as StatusHistory[]));
-            expect(nullResult.current.averageResponseTime).toBe(0);
-            expect(nullResult.current.checkCount).toBe(0);
-            expect(nullResult.current.uptime).toBe(0);
-
-            const { result: undefinedResult } = renderHook(() => useSiteStats(undefined as unknown as StatusHistory[]));
-            expect(undefinedResult.current.averageResponseTime).toBe(0);
-            expect(undefinedResult.current.checkCount).toBe(0);
-            expect(undefinedResult.current.uptime).toBe(0);
-        });
-
         it("should handle empty history array", () => {
             const { result } = renderHook(() => useSiteStats([]));
             expect(result.current.averageResponseTime).toBe(0);

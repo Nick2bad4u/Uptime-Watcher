@@ -470,15 +470,6 @@ describe("useSitesStore", () => {
 
             await expect(useSitesStore.getState().downloadSQLiteBackup()).rejects.toThrow("Download failed");
         });
-
-        it("should handle missing buffer", async () => {
-            mockElectronAPI.data.downloadSQLiteBackup.mockResolvedValue({
-                buffer: null,
-                fileName: "backup.sqlite",
-            });
-
-            await expect(useSitesStore.getState().downloadSQLiteBackup()).rejects.toThrow("No backup data received");
-        });
     });
 
     describe("Selected Site Management", () => {

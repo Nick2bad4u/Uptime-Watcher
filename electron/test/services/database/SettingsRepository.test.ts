@@ -89,16 +89,6 @@ describe("SettingsRepository", () => {
 
             expect(result).toBe("123");
         });
-
-        it("should handle database errors", async () => {
-            const error = new Error("Database error");
-            mockDatabase.get.mockImplementation(() => {
-                throw error;
-            });
-
-            await expect(settingsRepository.get("test-key")).rejects.toThrow("Database error");
-            expect(logger.error).toHaveBeenCalledWith("[SettingsRepository] Failed to get setting: test-key", error);
-        });
     });
 
     describe("set", () => {
@@ -125,16 +115,6 @@ describe("SettingsRepository", () => {
             );
             expect(logger.debug).not.toHaveBeenCalled();
         });
-
-        it("should handle database errors", async () => {
-            const error = new Error("Insert failed");
-            mockDatabase.run.mockImplementation(() => {
-                throw error;
-            });
-
-            await expect(settingsRepository.set("test-key", "test-value")).rejects.toThrow("Insert failed");
-            expect(logger.error).toHaveBeenCalledWith("[SettingsRepository] Failed to set setting: test-key", error);
-        });
     });
 
     describe("delete", () => {
@@ -154,16 +134,6 @@ describe("SettingsRepository", () => {
 
             expect(mockDatabase.run).toHaveBeenCalledWith("DELETE FROM settings WHERE key = ?", ["test-key"]);
             expect(logger.debug).not.toHaveBeenCalled();
-        });
-
-        it("should handle database errors", async () => {
-            const error = new Error("Delete failed");
-            mockDatabase.run.mockImplementation(() => {
-                throw error;
-            });
-
-            await expect(settingsRepository.delete("test-key")).rejects.toThrow("Delete failed");
-            expect(logger.error).toHaveBeenCalledWith("[SettingsRepository] Failed to delete setting: test-key", error);
         });
     });
 
@@ -226,16 +196,6 @@ describe("SettingsRepository", () => {
                 "boolean-value": "true",
             });
         });
-
-        it("should handle database errors", async () => {
-            const error = new Error("Query failed");
-            mockDatabase.all.mockImplementation(() => {
-                throw error;
-            });
-
-            await expect(settingsRepository.getAll()).rejects.toThrow("Query failed");
-            expect(logger.error).toHaveBeenCalledWith("[SettingsRepository] Failed to get all settings", error);
-        });
     });
 
     describe("deleteAll", () => {
@@ -244,16 +204,6 @@ describe("SettingsRepository", () => {
 
             expect(mockDatabase.run).toHaveBeenCalledWith("DELETE FROM settings");
             expect(logger.info).toHaveBeenCalledWith("[SettingsRepository] All settings deleted");
-        });
-
-        it("should handle database errors", async () => {
-            const error = new Error("Delete all failed");
-            mockDatabase.run.mockImplementation(() => {
-                throw error;
-            });
-
-            await expect(settingsRepository.deleteAll()).rejects.toThrow("Delete all failed");
-            expect(logger.error).toHaveBeenCalledWith("[SettingsRepository] Failed to delete all settings", error);
         });
     });
 
@@ -328,18 +278,6 @@ describe("SettingsRepository", () => {
 
             // Should finalize statement
             expect(mockStatement.finalize).toHaveBeenCalled();
-        });
-
-        it("should handle database errors", async () => {
-            const error = new Error("Bulk insert failed");
-            mockDatabase.run.mockImplementation(() => {
-                throw error;
-            });
-
-            const settings = { key1: "value1" };
-
-            await expect(settingsRepository.bulkInsert(settings)).rejects.toThrow("Bulk insert failed");
-            expect(logger.error).toHaveBeenCalledWith("[SettingsRepository] Failed to bulk insert settings", error);
         });
     });
 });

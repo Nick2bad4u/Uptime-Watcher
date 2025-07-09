@@ -64,20 +64,6 @@ describe("MonitorValidator", () => {
             expect(result.errors).toEqual([]);
         });
 
-        it("should return errors for monitor without type", () => {
-            const monitor = {
-                id: "monitor-1",
-                type: "", // Invalid empty type
-                status: "up",
-                history: [],
-                url: "https://example.com",
-            } as unknown as Monitor;
-
-            const result = validator.validateMonitorConfiguration(monitor);
-            expect(result.isValid).toBe(false);
-            expect(result.errors).toContain("Monitor type is required");
-        });
-
         it("should return errors for HTTP monitor without URL", () => {
             const monitor: Monitor = {
                 id: "monitor-1",

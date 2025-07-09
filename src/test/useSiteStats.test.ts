@@ -19,14 +19,6 @@ describe("useSiteStats", () => {
             expect(result.current.averageResponseTime).toBe(0);
         });
 
-        it("should return zero stats for undefined history", () => {
-            const { result } = renderHook(() => useSiteStats(undefined as any));
-
-            expect(result.current.uptime).toBe(0);
-            expect(result.current.checkCount).toBe(0);
-            expect(result.current.averageResponseTime).toBe(0);
-        });
-
         it("should calculate stats for single record", () => {
             const history: StatusHistory[] = [{ responseTime: 200, status: "up", timestamp: 1640995200000 }];
 

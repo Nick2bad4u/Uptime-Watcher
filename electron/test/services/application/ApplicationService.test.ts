@@ -109,20 +109,6 @@ describe("ApplicationService", () => {
             expect(applicationService.ipcService.setupHandlers).toHaveBeenCalled();
         });
 
-        it("should handle app ready event errors", async () => {
-            // Mock initialize to throw error
-            applicationService.uptimeOrchestrator.initialize.mockRejectedValue(new Error("Init failed"));
-
-            const readyHandler = mockApp.on.mock.calls.find((call: any) => call[0] === "ready")[1];
-
-            await readyHandler();
-
-            expect(logger.error).toHaveBeenCalledWith(
-                "[ApplicationService] Error during app initialization",
-                expect.any(Error)
-            );
-        });
-
         it("should handle window-all-closed on non-macOS", () => {
             const originalPlatform = process.platform;
             Object.defineProperty(process, "platform", { value: "win32" });

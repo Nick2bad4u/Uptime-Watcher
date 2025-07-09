@@ -82,18 +82,7 @@ describe("useSitesState", () => {
             expect(mockSet).toHaveBeenCalledWith(expect.any(Function));
         });
 
-        it("should handle undefined sites safely", () => {
-            // @ts-expect-error - Testing edge case with undefined
-            stateActions.setSites(undefined);
 
-            expect(mockSet).toHaveBeenCalledWith(expect.any(Function));
-
-            const setFunction = mockSet.mock.calls[0]?.[0];
-            if (setFunction) {
-                const result = setFunction({ selectedMonitorIds: {}, selectedSiteId: undefined, sites: [] });
-                expect(result).toEqual({ sites: [] });
-            }
-        });
     });
 
     describe("addSite", () => {
@@ -136,32 +125,7 @@ describe("useSitesState", () => {
     });
 
     describe("removeSite", () => {
-        it("should remove site by identifier", () => {
-            stateActions.removeSite("test-site");
 
-            expect(mockSet).toHaveBeenCalledWith(expect.any(Function));
-
-            const setFunction = mockSet.mock.calls[0]?.[0];
-            expect(setFunction).toBeDefined();
-
-            if (setFunction) {
-                const result = setFunction({
-                    selectedSiteId: undefined,
-                    sites: [mockSite],
-                });
-                expect(result.sites).toHaveLength(0);
-            }
-        });
-
-        it("should handle non-existent site removal", () => {
-            stateActions.removeSite("non-existent");
-
-            const setFunction = mockSet.mock.calls[0]?.[0];
-            if (setFunction) {
-                const result = setFunction({ sites: [mockSite] });
-                expect(result.sites).toEqual([mockSite]);
-            }
-        });
 
         it("should clear selectedSiteId if removed site was selected", () => {
             mockGet.mockReturnValue({

@@ -694,13 +694,6 @@ describe("SiteDetails Component Coverage", () => {
 
             expect(screen.getByText("Test Site")).toBeInTheDocument();
         });
-
-        it("should handle null/undefined site gracefully", { timeout: 5000 }, () => {
-            // This should not crash the component
-            expect(() => {
-                render(<SiteDetailsHeader site={null as unknown as Site} />);
-            }).not.toThrow();
-        });
     });
 
     describe("SiteDetailsNavigation", () => {

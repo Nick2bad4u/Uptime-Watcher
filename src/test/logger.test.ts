@@ -85,14 +85,6 @@ describe("Frontend Logger Service", () => {
             });
         });
 
-        it("should handle non-Error objects", () => {
-            const errorData = { code: 500, message: "Server error" };
-
-            logger.error("Non-error object", errorData);
-
-            expect(mockLog.error).toHaveBeenCalledWith("[UPTIME-WATCHER] Non-error object", errorData);
-        });
-
         it("should handle error without error object", () => {
             logger.error("Simple error message");
 

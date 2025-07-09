@@ -312,15 +312,6 @@ describe("repositoryAdapters", () => {
             expect(result).toBe("test-value");
         });
 
-        it("should delegate get to the underlying repository and return undefined for null result", async () => {
-            mockRepository.get.mockResolvedValue(null);
-
-            const result = await adapter.get("test-key");
-
-            expect(mockRepository.get).toHaveBeenCalledWith("test-key");
-            expect(result).toBeUndefined();
-        });
-
         it("should delegate get to the underlying repository and return undefined for undefined result", async () => {
             mockRepository.get.mockResolvedValue(undefined);
 

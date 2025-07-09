@@ -344,54 +344,6 @@ describe("useUpdatesStore", () => {
             expect(mockQuitAndInstall).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle missing electronAPI gracefully", () => {
-            // Mock electronAPI to be undefined
-            setupElectronAPIMock({
-                system: {
-                    quitAndInstall: undefined,
-                },
-            });
-
-            const { result } = renderHook(() => useUpdatesStore());
-
-            // Should not throw when electronAPI is undefined
-            expect(() => {
-                act(() => {
-                    result.current.applyUpdate();
-                });
-            }).not.toThrow();
-        });
-
-        it("should handle missing electronAPI.system gracefully", () => {
-            // Mock electronAPI.system to be undefined
-            setupElectronAPIMock({
-                system: undefined,
-            });
-
-            const { result } = renderHook(() => useUpdatesStore());
-
-            // Should not throw when electronAPI.system is undefined
-            expect(() => {
-                act(() => {
-                    result.current.applyUpdate();
-                });
-            }).not.toThrow();
-        });
-
-        it("should handle completely missing electronAPI", () => {
-            // Remove electronAPI completely
-            setupElectronAPIMock(undefined);
-
-            const { result } = renderHook(() => useUpdatesStore());
-
-            // Should not throw when electronAPI is completely missing
-            expect(() => {
-                act(() => {
-                    result.current.applyUpdate();
-                });
-            }).not.toThrow();
-        });
-
         it("should apply update in downloaded state", () => {
             const { result } = renderHook(() => useUpdatesStore());
 

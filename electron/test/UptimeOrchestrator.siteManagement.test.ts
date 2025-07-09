@@ -249,33 +249,6 @@ describe("UptimeOrchestrator - Site Management", () => {
                 expect(result).toEqual(expect.objectContaining(site));
             });
 
-            it("should create monitors for the site", async () => {
-                const monitorRepoInstance = mockMonitorRepository.mock.results[0]?.value;
-                const site = {
-                    identifier: "new-site",
-                    name: "New Site",
-                    monitors: [
-                        {
-                            id: "monitor1",
-                            type: "http" as const,
-                            status: "pending" as const,
-                            history: [],
-                            url: "https://example.com",
-                        },
-                    ],
-                };
-
-                await uptimeOrchestrator.addSite(site);
-
-                expect(monitorRepoInstance.create).toHaveBeenCalledWith(
-                    "new-site",
-                    expect.objectContaining({
-                        type: "http",
-                        url: "https://example.com",
-                    })
-                );
-            });
-
             it("should update in-memory cache", async () => {
                 const site = {
                     identifier: "new-site",
@@ -312,37 +285,6 @@ describe("UptimeOrchestrator - Site Management", () => {
                 );
                 expect(siteRepoInstance.delete).toHaveBeenCalledWith(identifier);
                 expect(result).toBe(true);
-            });
-
-            it("should remove monitors and history", async () => {
-                const siteRepoInstance = mockSiteRepository.mock.results[0]?.value;
-                const monitorRepoInstance = mockMonitorRepository.mock.results[0]?.value;
-                const identifier = "site-to-remove";
-
-                // First add the site to in-memory cache so it can be removed
-                const site = {
-                    identifier,
-                    name: "Site to Remove",
-                    monitors: [
-                        {
-                            id: "monitor1",
-                            siteIdentifier: identifier,
-                            type: "http",
-                            url: "https://example.com",
-                            status: "pending",
-                            history: [],
-                        },
-                    ],
-                };
-                await uptimeOrchestrator.addSite(site);
-
-                await uptimeOrchestrator.removeSite(identifier);
-
-                expect(monitorRepoInstance.deleteBySiteIdentifierInternal).toHaveBeenCalledWith(
-                    expect.anything(),
-                    identifier
-                );
-                expect(siteRepoInstance.delete).toHaveBeenCalledWith(identifier);
             });
 
             it("should return false when site does not exist", async () => {

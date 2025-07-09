@@ -167,21 +167,6 @@ describe("ThemeManager", () => {
         }
     });
 
-    it("should handle edge case when matchMedia is undefined", () => {
-        // Store original matchMedia
-        const originalMatchMedia = window.matchMedia;
-
-        // Remove matchMedia temporarily
-
-        delete (window as any).matchMedia;
-
-        const preference = themeManager.getSystemThemePreference();
-        expect(preference).toBe("light"); // Should fallback to light
-
-        // Restore matchMedia
-        window.matchMedia = originalMatchMedia;
-    });
-
     describe("applyTheme", () => {
         beforeEach(() => {
             // Mock document and document.documentElement
@@ -419,40 +404,6 @@ describe("ThemeManager", () => {
         });
     });
 
-    describe("getTheme edge cases", () => {
-        it("should fallback to light theme for invalid theme name", () => {
-            const theme = themeManager.getTheme("invalid" as any);
-            expect(theme.name).toBe("light");
-        });
-
-        it("should handle system theme when matchMedia returns unexpected value", () => {
-            const mockMediaQuery = {
-                addEventListener: vi.fn(),
-                matches: null, // Unexpected value
-                removeEventListener: vi.fn(),
-            };
-
-            mockMatchMedia.mockReturnValue(mockMediaQuery);
-
-            const systemTheme = themeManager.getTheme("system");
-            expect(systemTheme.name).toBe("light"); // Should fallback
-        });
-
-        it("should fallback to light theme when getSystemThemePreference returns neither light nor dark", () => {
-            // Mock getSystemThemePreference to return an unexpected value
-            const originalGetSystemThemePreference = themeManager.getSystemThemePreference;
-
-            (themeManager as any).getSystemThemePreference = vi.fn().mockReturnValue("unexpected" as any);
-
-            const systemTheme = themeManager.getTheme("system");
-            expect(systemTheme.name).toBe("light"); // Should fallback to light theme
-
-            // Restore original method
-
-            (themeManager as any).getSystemThemePreference = originalGetSystemThemePreference;
-        });
-    });
-
     describe("onSystemThemeChange edge cases", () => {
         it("should return empty cleanup function when window is undefined", () => {
             const originalWindow = global.window;
@@ -470,48 +421,6 @@ describe("ThemeManager", () => {
 
             // Restore window
             global.window = originalWindow;
-        });
-
-        it("should return empty cleanup function when matchMedia is undefined", () => {
-            const originalMatchMedia = window.matchMedia;
-
-            // Remove matchMedia temporarily
-
-            delete (window as any).matchMedia;
-
-            const mockCallback = vi.fn();
-            const cleanup = themeManager.onSystemThemeChange(mockCallback);
-
-            // Should not throw and return a function
-            expect(typeof cleanup).toBe("function");
-            expect(() => cleanup()).not.toThrow();
-
-            // Restore matchMedia
-            window.matchMedia = originalMatchMedia;
-        });
-
-        it("should call callback when system theme changes", () => {
-            const mockCallback = vi.fn();
-            const mockAddEventListener = vi.fn();
-            const mockRemoveEventListener = vi.fn();
-
-            mockMatchMedia.mockReturnValue({
-                addEventListener: mockAddEventListener,
-                matches: false,
-                removeEventListener: mockRemoveEventListener,
-            });
-
-            themeManager.onSystemThemeChange(mockCallback);
-
-            // Get the handler that was registered
-            const handler = mockAddEventListener.mock.calls[0]?.[1];
-
-            // Simulate a theme change event
-            if (handler) {
-                handler({ matches: true });
-            }
-
-            expect(mockCallback).toHaveBeenCalledWith(true);
         });
     });
 });

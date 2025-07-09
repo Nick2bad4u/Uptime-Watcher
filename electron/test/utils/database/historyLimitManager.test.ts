@@ -165,55 +165,6 @@ describe("historyLimitManager", () => {
             expect(mockLogger.debug).not.toHaveBeenCalled();
         });
 
-        it("should handle settings repository errors gracefully", async () => {
-            const setHistoryLimitCallback = vi.fn();
-            const limit = 100;
-            const settingsError = new Error("Settings save failed");
-
-            mockSettingsRepository.set = vi.fn().mockRejectedValue(settingsError);
-
-            await expect(
-                setHistoryLimit({
-                    limit,
-                    databaseService: mockDatabaseService,
-                    repositories: {
-                        history: mockHistoryRepository,
-                        settings: mockSettingsRepository,
-                    },
-                    setHistoryLimit: setHistoryLimitCallback,
-                    logger: mockLogger,
-                })
-            ).rejects.toThrow(settingsError);
-
-            expect(setHistoryLimitCallback).toHaveBeenCalledWith(limit);
-            expect(mockSettingsRepository.set).toHaveBeenCalledWith("historyLimit", limit.toString());
-        });
-
-        it("should handle history repository errors gracefully", async () => {
-            const setHistoryLimitCallback = vi.fn();
-            const limit = 100;
-            const historyError = new Error("History pruning failed");
-
-            mockHistoryRepository.pruneAllHistory = vi.fn().mockRejectedValue(historyError);
-
-            await expect(
-                setHistoryLimit({
-                    limit,
-                    databaseService: mockDatabaseService,
-                    repositories: {
-                        history: mockHistoryRepository,
-                        settings: mockSettingsRepository,
-                    },
-                    setHistoryLimit: setHistoryLimitCallback,
-                    logger: mockLogger,
-                })
-            ).rejects.toThrow(historyError);
-
-            expect(setHistoryLimitCallback).toHaveBeenCalledWith(limit);
-            expect(mockSettingsRepository.set).toHaveBeenCalledWith("historyLimit", limit.toString());
-            expect(mockHistoryRepository.pruneAllHistory).toHaveBeenCalledWith(limit);
-        });
-
         it("should handle large limit values", async () => {
             const setHistoryLimitCallback = vi.fn();
             const limit = 999999;

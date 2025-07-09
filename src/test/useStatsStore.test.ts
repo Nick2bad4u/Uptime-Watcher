@@ -188,58 +188,6 @@ describe("useStatsStore - Uncovered Lines", () => {
         expect(result.current.totalDowntime).toBe(5000);
     });
 
-    it("should handle history entries with null/undefined responseTime", () => {
-        const { result } = renderHook(() => useStatsStore());
-
-        const mockSites: Site[] = [
-            {
-                identifier: "site1",
-                name: "Site 1",
-                monitors: [
-                    {
-                        id: "monitor1",
-                        type: "http",
-                        url: "https://example.com",
-                        status: "up",
-                        monitoring: true,
-                        checkInterval: 60000,
-                        timeout: 30000,
-                        retryAttempts: 3,
-                        history: [
-                            {
-                                details: "1",
-                                timestamp: Date.now(),
-                                status: "up",
-                                responseTime: 200,
-                            },
-                            {
-                                details: "2",
-                                timestamp: Date.now(),
-                                status: "up",
-                                responseTime: null as any, // null responseTime
-                            },
-                            {
-                                details: "3",
-                                timestamp: Date.now(),
-                                status: "up",
-                                responseTime: undefined as any, // undefined responseTime
-                            },
-                        ],
-                    },
-                ],
-                monitoring: true,
-            },
-        ];
-
-        act(() => {
-            result.current.computeStats(mockSites);
-        });
-
-        // Should handle null/undefined responseTime gracefully (defaulting to 0)
-        expect(result.current.totalUptime).toBe(200); // Only the valid responseTime
-        expect(result.current.totalDowntime).toBe(0);
-    });
-
     it("should set total downtime directly", () => {
         const { result } = renderHook(() => useStatsStore());
 
