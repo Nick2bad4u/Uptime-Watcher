@@ -54,7 +54,7 @@ export const SiteCardMetrics = React.memo(function SiteCardMetrics({
         () => [
             {
                 label: "Status",
-                value: status?.toUpperCase() || "UNKNOWN",
+                value: status.toUpperCase() || "UNKNOWN",
             },
             {
                 label: "Uptime",

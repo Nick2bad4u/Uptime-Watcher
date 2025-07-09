@@ -26,11 +26,6 @@ export function createStatusUpdateHandler(options: StatusUpdateHandlerOptions) {
 
     return async (update: StatusUpdate): Promise<void> => {
         try {
-            // Validate update payload
-            if (!update?.site) {
-                throw new Error("Invalid status update: update or update.site is null/undefined");
-            }
-
             // Call the optional callback first
             if (onUpdate) {
                 onUpdate(update);
@@ -88,21 +83,15 @@ export class StatusUpdateManager {
     async subscribe(handler: (update: StatusUpdate) => Promise<void>): Promise<void> {
         this.handler = handler;
 
-        // Check if electronAPI is available before subscribing
-        if (!window.electronAPI?.events?.onStatusUpdate) {
-            // If electronAPI is not ready, wait for it and retry
-            try {
-                await waitForElectronAPI();
-            } catch (error) {
-                console.error("Failed to initialize electronAPI:", error);
-                throw new Error("Failed to initialize electronAPI");
-            }
+        // Always wait for electronAPI to be ready before subscribing
+        try {
+            await waitForElectronAPI();
+        } catch (error) {
+            console.error("Failed to initialize electronAPI:", error);
+            throw new Error("Failed to initialize electronAPI");
         }
 
-        if (!window.electronAPI?.events?.onStatusUpdate) {
-            throw new Error("electronAPI.events.onStatusUpdate is not available");
-        }
-
+        // At this point, electronAPI.events.onStatusUpdate should be available
         window.electronAPI.events.onStatusUpdate((update: StatusUpdate) => {
             this.handler?.(update).catch((error) => {
                 console.error("Error in status update handler:", error);
@@ -118,9 +107,7 @@ export class StatusUpdateManager {
      * Unsubscribe from status updates
      */
     unsubscribe(): void {
-        if (window.electronAPI?.events?.removeAllListeners) {
-            window.electronAPI.events.removeAllListeners("status-update");
-        }
+        window.electronAPI.events.removeAllListeners("status-update");
         this.handler = undefined;
         logStoreAction("StatusUpdateManager", "unsubscribed", {
             message: "Successfully unsubscribed from status updates",

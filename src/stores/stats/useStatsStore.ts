@@ -32,9 +32,9 @@ export const useStatsStore = create<StatsStore>()(
                     for (const monitor of site.monitors) {
                         for (const entry of monitor.history) {
                             if (entry.status === "up") {
-                                stats.totalUptime += entry.responseTime ?? 0;
+                                stats.totalUptime += entry.responseTime;
                             } else if (entry.status === "down") {
-                                stats.totalDowntime += entry.responseTime ?? 0;
+                                stats.totalDowntime += entry.responseTime;
                             }
                         }
                     }

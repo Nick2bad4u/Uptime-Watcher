@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition -- will be adding multiple monitor types soon */
 /**
  * Settings tab component for configuring site monitoring parameters.
  * Provides interface for modifying site settings, intervals, and performing site management actions.
@@ -199,9 +200,9 @@ export function SettingsTab({
 
     const loggedHandleSaveInterval = () => {
         logger.user.action("Settings: Save check interval", {
-            monitorId: selectedMonitor?.id,
+            monitorId: selectedMonitor.id,
             newInterval: localCheckInterval,
-            oldInterval: selectedMonitor?.checkInterval,
+            oldInterval: selectedMonitor.checkInterval,
             siteId: currentSite.identifier,
         });
         handleSaveInterval();
@@ -217,9 +218,9 @@ export function SettingsTab({
 
     const loggedHandleSaveTimeout = async () => {
         logger.user.action("Settings: Save timeout", {
-            monitorId: selectedMonitor?.id,
+            monitorId: selectedMonitor.id,
             newTimeout: localTimeout,
-            oldTimeout: selectedMonitor?.timeout,
+            oldTimeout: selectedMonitor.timeout,
             siteId: currentSite.identifier,
         });
         await handleSaveTimeout();
@@ -227,9 +228,9 @@ export function SettingsTab({
 
     const loggedHandleSaveRetryAttempts = async () => {
         logger.user.action("Settings: Save retry attempts", {
-            monitorId: selectedMonitor?.id,
+            monitorId: selectedMonitor.id,
             newRetryAttempts: localRetryAttempts,
-            oldRetryAttempts: selectedMonitor?.retryAttempts,
+            oldRetryAttempts: selectedMonitor.retryAttempts,
             siteId: currentSite.identifier,
         });
         await handleSaveRetryAttempts();
@@ -388,7 +389,7 @@ export function SettingsTab({
 
                     {/* Total monitoring time indicator */}
                     {localRetryAttempts > 0 && (
-                        <div className="p-3 bg-info/10 border border-info/20 rounded-lg">
+                        <div className="p-3 border rounded-lg bg-info/10 border-info/20">
                             <ThemedText size="xs" variant="info">
                                 💡 <strong>Maximum check duration:</strong> ~
                                 {calculateMaxDuration(localTimeout, localRetryAttempts)} ({localTimeout}s per attempt ×{" "}
@@ -416,7 +417,7 @@ export function SettingsTab({
                                 History Records:
                             </ThemedText>
                             <ThemedBadge variant="info" size="sm">
-                                {(selectedMonitor.history || []).length}
+                                {selectedMonitor.history.length}
                             </ThemedBadge>
                         </div>
                     </div>

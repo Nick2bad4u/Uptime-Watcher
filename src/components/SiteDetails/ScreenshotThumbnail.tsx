@@ -26,7 +26,7 @@ interface ScreenshotThumbnailProperties {
  * @returns True if the API has openExternal method
  */
 function hasOpenExternal(api: unknown): api is { openExternal: (url: string) => void } {
-    return typeof (api as { openExternal?: unknown })?.openExternal === "function";
+    return typeof (api as { openExternal?: unknown }).openExternal === "function";
 }
 
 /**

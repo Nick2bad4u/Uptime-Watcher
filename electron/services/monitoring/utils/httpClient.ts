@@ -75,9 +75,10 @@ export function setupTimingInterceptors(axiosInstance: AxiosInstance): void {
         },
         (error) => {
             // Also calculate timing for error responses
-            if (error.config?.metadata?.startTime) {
-                const duration = performance.now() - error.config.metadata.startTime;
-                error.responseTime = Math.round(duration);
+            const err = error as { config?: { metadata?: { startTime?: number } }; responseTime?: number };
+            if (err.config?.metadata?.startTime) {
+                const duration = performance.now() - err.config.metadata.startTime;
+                err.responseTime = Math.round(duration);
             }
             return Promise.reject(error instanceof Error ? error : new Error(String(error)));
         }

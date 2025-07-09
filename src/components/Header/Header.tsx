@@ -32,26 +32,24 @@ export function Header() {
         const counts = { down: 0, pending: 0, total: 0, up: 0 };
 
         for (const site of sites) {
-            if (site.monitors) {
-                for (const monitor of site.monitors) {
-                    counts.total++;
-                    switch (monitor.status) {
-                        case "up": {
-                            counts.up++;
-                            break;
-                        }
-                        case "down": {
-                            counts.down++;
-                            break;
-                        }
-                        case "pending": {
-                            counts.pending++;
-                            break;
-                        }
-                        case "paused": {
-                            // Paused monitors are not counted in up/down/pending
-                            break;
-                        }
+            for (const monitor of site.monitors) {
+                counts.total++;
+                switch (monitor.status) {
+                    case "up": {
+                        counts.up++;
+                        break;
+                    }
+                    case "down": {
+                        counts.down++;
+                        break;
+                    }
+                    case "pending": {
+                        counts.pending++;
+                        break;
+                    }
+                    case "paused": {
+                        // Paused monitors are not counted in up/down/pending
+                        break;
                     }
                 }
             }

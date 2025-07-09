@@ -359,9 +359,9 @@ export const OverviewTab = ({
                         size="sm"
                         onClick={() => {
                             logger.user.action("Monitor removal button clicked from overview tab", {
-                                monitorId: selectedMonitor?.id,
-                                monitorType: selectedMonitor?.type,
-                                monitorUrl: selectedMonitor?.url ?? selectedMonitor?.host,
+                                monitorId: selectedMonitor.id,
+                                monitorType: selectedMonitor.type,
+                                monitorUrl: selectedMonitor.url ?? selectedMonitor.host,
                             });
                             void handleRemoveMonitor();
                         }}

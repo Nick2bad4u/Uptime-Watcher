@@ -13,8 +13,8 @@ const siteAPI = {
     /** Add a new site with monitors */
     addSite: (site: Site) => ipcRenderer.invoke("add-site", site),
     /** Trigger an immediate check for a specific site monitor */
-    checkSiteNow: (identifier: string, monitorType: string) =>
-        ipcRenderer.invoke("check-site-now", identifier, monitorType),
+    checkSiteNow: (identifier: string, monitorId: string) =>
+        ipcRenderer.invoke("check-site-now", identifier, monitorId),
     /** Retrieve all sites from the database */
     getSites: () => ipcRenderer.invoke("get-sites"),
     /** Remove a monitor from a site */
@@ -31,20 +31,20 @@ const monitoringAPI = {
     /** Start monitoring for all sites */
     startMonitoring: () => ipcRenderer.invoke("start-monitoring"),
     /** Start monitoring for a specific site */
-    startMonitoringForSite: (identifier: string, monitorType?: string) =>
-        ipcRenderer.invoke("start-monitoring-for-site", identifier, monitorType),
+    startMonitoringForSite: (identifier: string, monitorId?: string) =>
+        ipcRenderer.invoke("start-monitoring-for-site", identifier, monitorId),
     /** Stop monitoring for all sites */
     stopMonitoring: () => ipcRenderer.invoke("stop-monitoring"),
     /** Stop monitoring for a specific site */
-    stopMonitoringForSite: (identifier: string, monitorType?: string) =>
-        ipcRenderer.invoke("stop-monitoring-for-site", identifier, monitorType),
+    stopMonitoringForSite: (identifier: string, monitorId?: string) =>
+        ipcRenderer.invoke("stop-monitoring-for-site", identifier, monitorId),
 };
 
 /** Data management API methods for import/export operations */
 const dataAPI = {
-    downloadSQLiteBackup: async () => {
+    downloadSQLiteBackup: async (): Promise<{ buffer: ArrayBuffer; fileName: string }> => {
         // Returns { buffer: ArrayBuffer, fileName: string }
-        return ipcRenderer.invoke("download-sqlite-backup");
+        return ipcRenderer.invoke("download-sqlite-backup") as Promise<{ buffer: ArrayBuffer; fileName: string }>;
     },
     exportData: () => ipcRenderer.invoke("export-data"),
     importData: (data: string) => ipcRenderer.invoke("import-data", data),

@@ -44,7 +44,7 @@ export class SiteValidator {
     private validateSiteIdentifier(site: Site): string[] {
         const errors: string[] = [];
 
-        if (!site?.identifier && site?.identifier !== "") {
+        if (!site.identifier && site.identifier !== "") {
             errors.push("Site identifier is required");
         } else if (site.identifier.trim().length === 0) {
             errors.push("Site identifier cannot be empty");

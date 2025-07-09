@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition -- will be adding multiple monitor types soon */
+
 /**
  * History tab component for displaying monitor check history.
- * Provid    // Dropdown options: 25, 50, 100, All (clamped to backendLimit and available history)
+ * Provide    // Dropdown options: 25, 50, 100, All (clamped to backendLimit and available history)
     const maxShow = Math.min(backendLimit, historyLength); pagination, and detailed history records view.
  */
 
@@ -64,7 +66,7 @@ export const HistoryTab = ({
     const { settings } = useSettingsStore();
     const { currentTheme } = useTheme();
     const [historyFilter, setHistoryFilter] = useState<"all" | "up" | "down">("all");
-    const historyLength = (selectedMonitor.history || []).length;
+    const historyLength = selectedMonitor.history.length;
 
     const backendLimit = settings.historyLimit || 25;
 
@@ -97,7 +99,7 @@ export const HistoryTab = ({
             logger.user.action("History tab viewed", {
                 monitorId: selectedMonitor.id,
                 monitorType: selectedMonitor.type,
-                totalRecords: (selectedMonitor.history || []).length,
+                totalRecords: selectedMonitor.history.length,
             });
             lastLoggedMonitorId.current = selectedMonitor.id;
         }
@@ -105,11 +107,11 @@ export const HistoryTab = ({
     }, [selectedMonitor.id, selectedMonitor.type]);
 
     useEffect(() => {
-        const safeHistoryLength = (selectedMonitor.history || []).length;
+        const safeHistoryLength = selectedMonitor.history.length;
         setHistoryLimit(Math.min(50, backendLimit, safeHistoryLength));
     }, [settings.historyLimit, backendLimit, selectedMonitor.history]);
 
-    const filteredHistoryRecords = (selectedMonitor.history || [])
+    const filteredHistoryRecords = selectedMonitor.history
         .filter((record: StatusHistory) => historyFilter === "all" || record.status === historyFilter)
         .slice(0, historyLimit);
 
@@ -218,7 +220,7 @@ export const HistoryTab = ({
                                         {formatFullTimestamp(record.timestamp)}
                                     </ThemedText>
                                     <ThemedText size="xs" variant="secondary" className="ml-4">
-                                        Check #{(selectedMonitor.history || []).length - index}
+                                        Check #{selectedMonitor.history.length - index}
                                     </ThemedText>
                                     {renderDetails(record)}
                                 </div>

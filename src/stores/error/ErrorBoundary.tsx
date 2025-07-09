@@ -25,7 +25,7 @@ const DefaultErrorFallback: React.FC<{ error?: Error; retry: () => void }> = ({ 
         <div className="mb-4 text-red-600">
             <h2 className="mb-2 text-lg font-semibold">Something went wrong</h2>
             <p className="text-sm">
-                {error?.message?.trim() ? error.message : "An unexpected error occurred while loading this section."}
+                {error?.message.trim() ? error.message : "An unexpected error occurred while loading this section."}
             </p>
         </div>
         <button onClick={retry} className="px-4 py-2 text-white transition-colors bg-red-600 rounded hover:bg-red-700">

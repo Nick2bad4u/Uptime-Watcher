@@ -44,7 +44,7 @@ export const createSitesStateActions = (
         set((state) => ({ sites: [...state.sites, site] }));
     },
     getSelectedMonitorId: (siteId: string) => {
-        const ids = get().selectedMonitorIds || {};
+        const ids = get().selectedMonitorIds;
         // eslint-disable-next-line security/detect-object-injection
         return ids[siteId];
     },
@@ -59,7 +59,7 @@ export const createSitesStateActions = (
         logStoreAction("SitesStore", "removeSite", { identifier });
         set((state) => {
             // Remove the monitor selection for the removed site
-            const currentMonitorIds = state.selectedMonitorIds || {};
+            const currentMonitorIds = state.selectedMonitorIds;
 
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { [identifier]: _, ...remainingMonitorIds } = currentMonitorIds;
@@ -84,8 +84,8 @@ export const createSitesStateActions = (
         set(() => ({ selectedSiteId: site ? site.identifier : undefined }));
     },
     setSites: (sites: Site[]) => {
-        logStoreAction("SitesStore", "setSites", { count: sites?.length || 0 });
-        set(() => ({ sites: sites ?? [] }));
+        logStoreAction("SitesStore", "setSites", { count: sites.length || 0 });
+        set(() => ({ sites }));
     },
 });
 

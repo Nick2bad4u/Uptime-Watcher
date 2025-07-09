@@ -166,6 +166,7 @@ function createMonitor(properties: FormSubmitProperties): Monitor {
 
     if (monitorType === "http") {
         monitor.url = url.trim();
+        /* eslint-disable @typescript-eslint/no-unnecessary-condition -- will be adding multiple monitor types soon */
     } else if (monitorType === "port") {
         monitor.host = host.trim();
         monitor.port = Number(port);

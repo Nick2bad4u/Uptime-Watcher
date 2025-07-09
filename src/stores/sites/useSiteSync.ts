@@ -70,7 +70,7 @@ export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActio
                 async () => {
                     const backendSites = await SiteService.getSites();
                     // Handle null/undefined responses from backend by defaulting to empty array
-                    deps.setSites(backendSites ?? []);
+                    deps.setSites(backendSites);
 
                     logStoreAction("SitesStore", "syncSitesFromBackend", {
                         message: "Sites synchronized from backend",

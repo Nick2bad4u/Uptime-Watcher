@@ -16,7 +16,7 @@ import { Theme, ThemeName } from "./types";
  */
 export class ThemeManager {
     /** Singleton instance */
-    private static instance: ThemeManager;
+    private static instance: ThemeManager | null = null;
 
     /** Private constructor to enforce singleton pattern */
     private constructor() {}
@@ -28,9 +28,7 @@ export class ThemeManager {
      * @returns ThemeManager singleton instance
      */
     public static getInstance(): ThemeManager {
-        if (!ThemeManager.instance) {
-            ThemeManager.instance = new ThemeManager();
-        }
+        ThemeManager.instance ??= new ThemeManager();
         return ThemeManager.instance;
     }
 
@@ -44,16 +42,11 @@ export class ThemeManager {
     getTheme(name: ThemeName): Theme {
         if (name === "system") {
             const systemPreference = this.getSystemThemePreference();
-            // Only allow "light" or "dark" as keys
-            if (systemPreference === "light" || systemPreference === "dark") {
-                // eslint-disable-next-line security/detect-object-injection -- always light or dark
-                return themes[systemPreference];
-            }
-            // Fallback to light theme if unexpected value
-            return themes.light;
+            // eslint-disable-next-line security/detect-object-injection -- always light or dark
+            return themes[systemPreference];
         }
 
-        return themes[name as keyof typeof themes] || themes.light;
+        return themes[name as keyof typeof themes];
     }
 
     /**
@@ -63,8 +56,8 @@ export class ThemeManager {
      * @returns "dark" if user prefers dark mode, "light" otherwise
      */
     getSystemThemePreference(): "light" | "dark" {
-        if (globalThis.window !== undefined && globalThis.matchMedia) {
-            return globalThis.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        if (typeof window !== "undefined") {
+            return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
         }
         return "light";
     }
@@ -77,11 +70,11 @@ export class ThemeManager {
      * @returns Cleanup function to remove the event listener
      */
     onSystemThemeChange(callback: (isDark: boolean) => void): () => void {
-        if (globalThis.window === undefined || !globalThis.matchMedia) {
+        if (typeof window === "undefined") {
             return () => {};
         }
 
-        const mediaQuery = globalThis.matchMedia("(prefers-color-scheme: dark)");
+        const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
         const handler = (e: MediaQueryListEvent) => callback(e.matches);
 
         mediaQuery.addEventListener("change", handler);
@@ -101,8 +94,8 @@ export class ThemeManager {
         const root = document.documentElement;
         // Apply CSS custom properties
         for (const [category, colors] of Object.entries(theme.colors)) {
-            if (typeof colors === "object" && colors !== undefined) {
-                for (const [key, value] of Object.entries(colors)) {
+            if (typeof colors === "object" && colors !== null) {
+                for (const [key, value] of Object.entries(colors as Record<string, unknown>)) {
                     root.style.setProperty(`--color-${category}-${key}`, String(value));
                 }
             } else {
@@ -112,30 +105,30 @@ export class ThemeManager {
 
         // Apply typography
         for (const [size, value] of Object.entries(theme.typography.fontSize)) {
-            root.style.setProperty(`--font-size-${size}`, value);
+            root.style.setProperty(`--font-size-${size}`, String(value));
         }
 
         for (const [weight, value] of Object.entries(theme.typography.fontWeight)) {
-            root.style.setProperty(`--font-weight-${weight}`, value);
+            root.style.setProperty(`--font-weight-${weight}`, String(value));
         }
 
         for (const [height, value] of Object.entries(theme.typography.lineHeight)) {
-            root.style.setProperty(`--line-height-${height}`, value);
+            root.style.setProperty(`--line-height-${height}`, String(value));
         }
 
         // Apply spacing
         for (const [size, value] of Object.entries(theme.spacing)) {
-            root.style.setProperty(`--spacing-${size}`, value);
+            root.style.setProperty(`--spacing-${size}`, String(value));
         }
 
         // Apply shadows
         for (const [size, value] of Object.entries(theme.shadows)) {
-            root.style.setProperty(`--shadow-${size}`, value);
+            root.style.setProperty(`--shadow-${size}`, String(value));
         }
 
         // Apply border radius
         for (const [size, value] of Object.entries(theme.borderRadius)) {
-            root.style.setProperty(`--radius-${size}`, value);
+            root.style.setProperty(`--radius-${size}`, String(value));
         }
 
         // Set theme class on body
@@ -202,8 +195,8 @@ export class ThemeManager {
 
         // Colors
         for (const [category, colors] of Object.entries(theme.colors)) {
-            if (typeof colors === "object" && colors !== undefined) {
-                for (const [key, value] of Object.entries(colors)) {
+            if (typeof colors === "object" && colors !== null) {
+                for (const [key, value] of Object.entries(colors as Record<string, unknown>)) {
                     variables.push(`  --color-${category}-${key}: ${value};`);
                 }
             } else {

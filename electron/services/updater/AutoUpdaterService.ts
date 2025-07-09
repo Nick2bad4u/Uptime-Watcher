@@ -73,7 +73,7 @@ export class AutoUpdaterService {
         autoUpdater.on("error", (error) => {
             logger.error("[AutoUpdaterService] Auto-updater error", error);
             this.notifyStatusChange({
-                error: error?.message || String(error),
+                error: error.message || String(error),
                 status: "error",
             });
         });

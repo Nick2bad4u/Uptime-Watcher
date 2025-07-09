@@ -19,7 +19,7 @@ import { ScreenshotThumbnail } from "./ScreenshotThumbnail";
  * @returns True if the API has openExternal method
  */
 function hasOpenExternal(api: unknown): api is { openExternal: (url: string) => void } {
-    return typeof (api as { openExternal?: unknown })?.openExternal === "function";
+    return typeof (api as { openExternal?: unknown }).openExternal === "function";
 }
 
 /** Props for the SiteDetailsHeader component */
@@ -53,20 +53,6 @@ export function SiteDetailsHeader({
     // Use theme-aware styles
     const styles = useThemeStyles(isCollapsed);
 
-    // Guard clause for null/undefined site
-    if (!site) {
-        return (
-            <div style={styles.headerStyle}>
-                <div style={styles.overlayStyle} />
-                <div style={styles.contentStyle}>
-                    <ThemedText size="2xl" weight="bold">
-                        No site data
-                    </ThemedText>
-                </div>
-            </div>
-        );
-    }
-
     return (
         <div style={styles.headerStyle}>
             <div style={styles.overlayStyle} />
@@ -79,7 +65,7 @@ export function SiteDetailsHeader({
                         {/* Website Screenshot Thumbnail */}
                         {!isCollapsed && (
                             <ScreenshotThumbnail
-                                url={selectedMonitor?.type === "http" ? (selectedMonitor?.url ?? "") : ""}
+                                url={selectedMonitor?.type === "http" ? (selectedMonitor.url ?? "") : ""}
                                 siteName={site.name ?? site.identifier}
                             />
                         )}
@@ -91,7 +77,7 @@ export function SiteDetailsHeader({
                                 {site.name ?? site.identifier}
                             </ThemedText>
                             {/* Show URL for HTTP, host:port for port monitor */}
-                            {!isCollapsed && selectedMonitor?.type === "http" && selectedMonitor?.url && (
+                            {!isCollapsed && selectedMonitor?.type === "http" && selectedMonitor.url && (
                                 <a
                                     href={selectedMonitor.url}
                                     className="truncate site-details-url"

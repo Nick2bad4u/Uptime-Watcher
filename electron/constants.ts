@@ -23,3 +23,6 @@ export const DEFAULT_HISTORY_LIMIT = 500;
 
 /** Event name for status updates (kept for backwards compatibility) */
 export const STATUS_UPDATE_EVENT = "status-update";
+
+/** Allowed monitor types */
+export const MONITOR_TYPES = ["http", "port"] as const;

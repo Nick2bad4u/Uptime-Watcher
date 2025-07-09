@@ -37,7 +37,7 @@ export class SiteRepository {
             const siteRows = db.all("SELECT * FROM sites") as { identifier: string; name?: string }[];
             return siteRows.map((row) => ({
                 identifier: String(row.identifier),
-                ...(row.name !== undefined && row.name !== null && { name: String(row.name) }),
+                ...(row.name !== undefined && { name: String(row.name) }),
             }));
         } catch (error) {
             logger.error("[SiteRepository] Failed to fetch all sites", error);
@@ -63,7 +63,7 @@ export class SiteRepository {
 
             return {
                 identifier: String(siteRow.identifier),
-                ...(siteRow.name !== undefined && siteRow.name !== null && { name: String(siteRow.name) }),
+                ...(siteRow.name !== undefined && { name: String(siteRow.name) }),
             };
         } catch (error) {
             logger.error(`[SiteRepository] Failed to fetch site with identifier: ${identifier}`, error);
@@ -95,7 +95,7 @@ export class SiteRepository {
             const site: Site = {
                 identifier: siteRow.identifier,
                 monitors: monitors,
-                ...(siteRow.name !== undefined && siteRow.name !== null && { name: siteRow.name }),
+                ...(siteRow.name !== undefined && { name: siteRow.name }),
             };
 
             return site;
@@ -130,7 +130,7 @@ export class SiteRepository {
         try {
             const db = this.getDb();
             const result = db.run("DELETE FROM sites WHERE identifier = ?", [identifier]);
-            const deleted = (result.changes ?? 0) > 0;
+            const deleted = result.changes > 0;
 
             if (deleted) {
                 logger.debug(`[SiteRepository] Deleted site: ${identifier}`);
@@ -167,7 +167,7 @@ export class SiteRepository {
             const sites = db.all("SELECT * FROM sites");
             return sites.map((row) => ({
                 identifier: row.identifier ? String(row.identifier) : "",
-                ...(row.name !== undefined && row.name !== null && { name: String(row.name) }),
+                ...(row.name !== undefined && { name: String(row.name) }),
             }));
         } catch (error) {
             logger.error("[SiteRepository] Failed to export sites", error);

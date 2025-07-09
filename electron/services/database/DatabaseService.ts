@@ -10,11 +10,8 @@ import { createDatabaseBackup, createDatabaseTables } from "./utils/index";
  * Handles database connection and table creation.
  */
 export class DatabaseService {
-    private static instance: DatabaseService;
+    private static readonly instance: DatabaseService = new DatabaseService();
     public static getInstance(): DatabaseService {
-        if (!DatabaseService.instance) {
-            DatabaseService.instance = new DatabaseService();
-        }
         return DatabaseService.instance;
     }
     private _db: Database | undefined = undefined;

@@ -49,8 +49,6 @@ const logger = {
                 },
                 ...arguments_
             );
-        } else if (error) {
-            log.error(`[UPTIME-WATCHER] ${message}`, error, ...arguments_);
         } else {
             log.error(`[UPTIME-WATCHER] ${message}`, ...arguments_);
         }

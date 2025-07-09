@@ -23,7 +23,7 @@ interface SiteStats {
 export function useSiteStats(history: StatusHistory[]): SiteStats {
     // Memoize the calculations to avoid recalculating on every render
     return useMemo(() => {
-        if (!history || history.length === 0) {
+        if (history.length === 0) {
             return {
                 averageResponseTime: 0,
                 checkCount: 0,

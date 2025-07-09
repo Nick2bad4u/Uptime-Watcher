@@ -68,12 +68,14 @@ describe("monitorStatusChecker", () => {
                     update: vi.fn().mockResolvedValue(undefined),
                 } as any,
                 site: {
-                    getByIdentifier: vi.fn().mockImplementation(() => Promise.resolve(mockSite)),
+                    // Return synchronously, not as a Promise
+                    getByIdentifier: vi.fn().mockImplementation(() => mockSite),
                 } as any,
             },
             sites: new Map(),
             eventEmitter: {
                 emit: vi.fn(),
+                emitTyped: vi.fn(), // <-- Add this line to mock emitTyped
             } as any,
             logger: {
                 info: vi.fn(),
@@ -82,7 +84,10 @@ describe("monitorStatusChecker", () => {
                 warn: vi.fn(),
             },
             historyLimit: 100,
-            statusUpdateEvent: "statusUpdate",
+            databaseService: {
+                executeTransaction: vi.fn().mockImplementation(async (cb) => cb()),
+                // Add other methods if needed for future tests
+            } as any,
         };
     });
 

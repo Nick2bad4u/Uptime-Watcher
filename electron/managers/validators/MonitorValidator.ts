@@ -17,9 +17,6 @@ export class MonitorValidator {
     public validateMonitorConfiguration(monitor: Site["monitors"][0]): ValidationResult {
         const errors: string[] = [];
 
-        // Validate monitor type
-        errors.push(...this.validateMonitorType(monitor));
-
         // Type-specific validation
         errors.push(...this.validateMonitorTypeSpecific(monitor));
 
@@ -36,19 +33,6 @@ export class MonitorValidator {
     }
 
     /**
-     * Validate monitor type is present.
-     */
-    private validateMonitorType(monitor: Site["monitors"][0]): string[] {
-        const errors: string[] = [];
-
-        if (!monitor.type) {
-            errors.push("Monitor type is required");
-        }
-
-        return errors;
-    }
-
-    /**
      * Validate monitor type-specific requirements.
      */
     private validateMonitorTypeSpecific(monitor: Site["monitors"][0]): string[] {
@@ -56,6 +40,7 @@ export class MonitorValidator {
 
         if (monitor.type === "http") {
             errors.push(...this.validateHttpMonitor(monitor));
+            /* eslint-disable @typescript-eslint/no-unnecessary-condition -- will be adding multiple monitor types soon */
         } else if (monitor.type === "port") {
             errors.push(...this.validatePortMonitor(monitor));
         }

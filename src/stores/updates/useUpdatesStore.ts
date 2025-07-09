@@ -13,7 +13,7 @@ import { logStoreAction } from "../utils";
 export const useUpdatesStore = create<UpdatesStore>((set) => ({
     // Actions
     applyUpdate: () => {
-        window.electronAPI?.system?.quitAndInstall?.();
+        window.electronAPI.system.quitAndInstall();
         logStoreAction("UpdatesStore", "applyUpdate", {
             message: "Applying update and restarting application",
             success: true,

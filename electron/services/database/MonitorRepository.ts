@@ -223,7 +223,7 @@ export class MonitorRepository {
 
         // Delete the monitor
         const deleteResult = db.run("DELETE FROM monitors WHERE id = ?", [monitorId]);
-        return (deleteResult.changes ?? 0) > 0;
+        return deleteResult.changes > 0;
     }
 
     /**

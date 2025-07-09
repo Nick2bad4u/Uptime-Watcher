@@ -39,6 +39,21 @@ export interface DataImportExportConfig {
 }
 
 /**
+ * Type guard for expected import data structure.
+ */
+function isImportData(obj: unknown): obj is { sites: ImportSite[]; settings?: Record<string, string> } {
+    if (
+        typeof obj === "object" &&
+        obj !== null &&
+        Array.isArray((obj as Record<string, unknown>).sites)
+    ) {
+        // Optionally check each site for required properties
+        return true;
+    }
+    return false;
+}
+
+/**
  * Service for handling data import/export operations.
  * Separates data operations from side effects for better testability.
  */
@@ -101,15 +116,17 @@ export class DataImportExportService {
      */
     async importDataFromJson(jsonData: string): Promise<{ sites: ImportSite[]; settings: Record<string, string> }> {
         try {
-            const data = JSON.parse(jsonData);
+            // Parse and validate the JSON data
+            const data: unknown = JSON.parse(jsonData);
 
-            if (!data.sites || !Array.isArray(data.sites)) {
+            // Use the top-level isImportData function
+            if (!isImportData(data)) {
                 throw new Error("Invalid import data format: missing or invalid sites array");
             }
 
             return {
-                settings: data.settings ?? {},
-                sites: data.sites,
+                settings: (data as { settings?: Record<string, string> }).settings ?? {},
+                sites: (data as { sites: ImportSite[] }).sites,
             };
         } catch (error) {
             const message = `Failed to parse import data: ${error instanceof Error ? error.message : String(error)}`;

@@ -25,18 +25,14 @@ function createAndTriggerDownload(buffer: ArrayBuffer, fileName: string, mimeTyp
 
     // Safe DOM manipulation
     const body = document.body;
-    if (body) {
-        try {
-            body.append(a);
-            a.click();
-            a.remove();
-        } catch (domError) {
-            // Fallback: just click without DOM manipulation
-            console.warn("DOM manipulation failed, using fallback click", domError);
-            a.click();
-        }
-    } else {
-        // No body available, just click
+    // No need to check if body exists; it's always present in browser environments
+    try {
+        body.append(a);
+        a.click();
+        a.remove();
+    } catch (domError) {
+        // Fallback: just click without DOM manipulation
+        console.warn("DOM manipulation failed, using fallback click", domError);
         a.click();
     }
 
@@ -99,7 +95,7 @@ export async function handleSQLiteBackupDownload(downloadFunction: () => Promise
     const backupData = await downloadFunction();
 
     // Validate the backup data
-    if (!backupData || !(backupData instanceof Uint8Array)) {
+    if (!(backupData instanceof Uint8Array)) {
         throw new Error("Invalid backup data received");
     }
 
@@ -107,10 +103,7 @@ export async function handleSQLiteBackupDownload(downloadFunction: () => Promise
     const blob = new Blob([backupData], { type: "application/x-sqlite3" });
 
     // Create object URL
-    if (!URL.createObjectURL) {
-        throw new Error("URL.createObjectURL is not available");
-    }
-
+    // URL.createObjectURL is always available in modern browsers
     const objectURL = URL.createObjectURL(blob);
 
     try {
@@ -132,8 +125,6 @@ export async function handleSQLiteBackupDownload(downloadFunction: () => Promise
         }
     } finally {
         // Clean up object URL
-        if (URL.revokeObjectURL) {
-            URL.revokeObjectURL(objectURL);
-        }
+        URL.revokeObjectURL(objectURL);
     }
 }

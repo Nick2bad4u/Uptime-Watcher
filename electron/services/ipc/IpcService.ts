@@ -4,6 +4,7 @@ import { isDev } from "../../electronUtils";
 import { UptimeOrchestrator } from "../../index";
 import { logger } from "../../utils/index";
 import { AutoUpdaterService } from "../updater/index";
+import { Site } from "../../types";
 
 /**
  * Service responsible for organizing and handling IPC communication.
@@ -32,12 +33,12 @@ export class IpcService {
      * Setup site management IPC handlers.
      */
     private setupSiteHandlers(): void {
-        ipcMain.handle("add-site", async (_, site) => {
+        ipcMain.handle("add-site", async (_, site: Site) => {
             if (isDev()) logger.debug("[IpcService] Handling add-site");
             return this.uptimeOrchestrator.addSite(site);
         });
 
-        ipcMain.handle("remove-site", async (_, identifier) => {
+        ipcMain.handle("remove-site", async (_, identifier: string) => {
             if (isDev()) logger.debug("[IpcService] Handling remove-site", { identifier });
             return this.uptimeOrchestrator.removeSite(identifier);
         });
@@ -47,12 +48,12 @@ export class IpcService {
             return this.uptimeOrchestrator.getSites();
         });
 
-        ipcMain.handle("update-site", async (_, identifier, updates) => {
+        ipcMain.handle("update-site", async (_, identifier: string, updates: Partial<Site>) => {
             if (isDev()) logger.debug("[IpcService] Handling update-site", { identifier });
             return this.uptimeOrchestrator.updateSite(identifier, updates);
         });
 
-        ipcMain.handle("remove-monitor", async (_, siteIdentifier, monitorId) => {
+        ipcMain.handle("remove-monitor", async (_, siteIdentifier: string, monitorId: string) => {
             if (isDev()) logger.debug("[IpcService] Handling remove-monitor", { monitorId, siteIdentifier });
             return this.uptimeOrchestrator.removeMonitor(siteIdentifier, monitorId);
         });
@@ -74,27 +75,37 @@ export class IpcService {
             return true;
         });
 
-        ipcMain.handle("start-monitoring-for-site", async (_, identifier, monitorType) => {
+        ipcMain.handle("start-monitoring-for-site", async (_, identifier: string, monitorId?: string) => {
             if (isDev())
-                /* v8 ignore next 3 */ logger.debug("[IpcService] Handling start-monitoring-for-site", {
+                logger.debug("[IpcService] Handling start-monitoring-for-site", {
                     identifier,
-                    monitorType,
+                    monitorId,
                 });
-            return this.uptimeOrchestrator.startMonitoringForSite(identifier, monitorType);
+            return this.uptimeOrchestrator.startMonitoringForSite(identifier, monitorId);
         });
 
-        ipcMain.handle("stop-monitoring-for-site", async (_, identifier, monitorType) => {
+        ipcMain.handle("stop-monitoring-for-site", async (_, identifier: string, monitorId?: string) => {
             if (isDev())
-                /* v8 ignore next 3 */ logger.debug("[IpcService] Handling stop-monitoring-for-site", {
+                logger.debug("[IpcService] Handling stop-monitoring-for-site", {
                     identifier,
-                    monitorType,
+                    monitorId,
                 });
-            return this.uptimeOrchestrator.stopMonitoringForSite(identifier, monitorType);
+            return this.uptimeOrchestrator.stopMonitoringForSite(identifier, monitorId);
         });
 
-        ipcMain.handle("check-site-now", async (_, identifier, monitorType) => {
-            if (isDev()) logger.debug("[IpcService] Handling check-site-now", { identifier, monitorType });
-            return this.uptimeOrchestrator.checkSiteManually(identifier, monitorType);
+        ipcMain.handle("check-site-now", async (_, identifier: string, monitorId: string) => {
+            if (isDev()) logger.debug("[IpcService] Handling check-site-now", { identifier, monitorId });
+            
+            // Runtime check for string identifier and monitorId
+            if (typeof identifier !== "string") {
+                throw new Error("Invalid site identifier");
+            }
+            
+            if (typeof monitorId !== "string") {
+                throw new Error("Invalid monitor ID");
+            }
+            
+            return this.uptimeOrchestrator.checkSiteManually(identifier, monitorId);
         });
     }
 
@@ -107,12 +118,12 @@ export class IpcService {
             return this.uptimeOrchestrator.exportData();
         });
 
-        ipcMain.handle("import-data", async (_, data) => {
+        ipcMain.handle("import-data", async (_, data: string) => {
             if (isDev()) logger.debug("[IpcService] Handling import-data");
             return this.uptimeOrchestrator.importData(data);
         });
 
-        ipcMain.handle("update-history-limit", async (_, limit) => {
+        ipcMain.handle("update-history-limit", async (_, limit: number) => {
             if (isDev()) logger.debug("[IpcService] Handling update-history-limit", { limit });
             return this.uptimeOrchestrator.setHistoryLimit(limit);
         });

@@ -51,10 +51,7 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
         await withErrorHandling(
             async () => {
                 // Get the current site
-                const site = deps
-                    .getSites()
-                    .filter((s) => s !== null && s !== undefined)
-                    .find((s) => s.identifier === siteId);
+                const site = deps.getSites().find((s) => s.identifier === siteId);
                 if (!site) {
                     throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
                 }
@@ -115,10 +112,7 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
             async () => {
                 // Stop monitoring for all monitors of this site before deleting
                 // Filter out null/undefined values to handle corrupted data
-                const site = deps
-                    .getSites()
-                    .filter((s) => s !== null && s !== undefined)
-                    .find((s) => s.identifier === identifier);
+                const site = deps.getSites().find((s) => s.identifier === identifier);
                 if (site) {
                     for (const monitor of site.monitors) {
                         try {
@@ -149,9 +143,6 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
             async () => {
                 await handleSQLiteBackupDownload(async () => {
                     const result = await SiteService.downloadSQLiteBackup();
-                    if (!result.buffer) {
-                        throw new Error("No backup data received");
-                    }
                     return new Uint8Array(result.buffer);
                 });
             },
@@ -214,10 +205,7 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
         await withErrorHandling(
             async () => {
                 // Get the current site
-                const site = deps
-                    .getSites()
-                    .filter((s) => s !== null && s !== undefined)
-                    .find((s) => s.identifier === siteId);
+                const site = deps.getSites().find((s) => s.identifier === siteId);
                 if (!site) {
                     throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
                 }
@@ -255,10 +243,7 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
 
         await withErrorHandling(
             async () => {
-                const site = deps
-                    .getSites()
-                    .filter((s) => s !== null && s !== undefined)
-                    .find((s) => s.identifier === siteId);
+                const site = deps.getSites().find((s) => s.identifier === siteId);
                 if (!site) {
                     throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
                 }
@@ -279,10 +264,7 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
 
         await withErrorHandling(
             async () => {
-                const site = deps
-                    .getSites()
-                    .filter((s) => s !== null && s !== undefined)
-                    .find((s) => s.identifier === siteId);
+                const site = deps.getSites().find((s) => s.identifier === siteId);
                 if (!site) {
                     throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
                 }
@@ -303,10 +285,7 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
 
         await withErrorHandling(
             async () => {
-                const site = deps
-                    .getSites()
-                    .filter((s) => s !== null && s !== undefined)
-                    .find((s) => s.identifier === siteId);
+                const site = deps.getSites().find((s) => s.identifier === siteId);
                 if (!site) {
                     throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
                 }

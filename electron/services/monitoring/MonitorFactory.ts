@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-extraneous-class */
+/* eslint-disable @typescript-eslint/no-unnecessary-condition -- will be adding multiple monitor types soon */
+
 import { Site } from "../../types";
 import { HttpMonitor } from "./HttpMonitor";
 import { PortMonitor } from "./PortMonitor";

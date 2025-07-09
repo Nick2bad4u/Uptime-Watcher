@@ -101,8 +101,7 @@ export function buildMonitorParameters(siteIdentifier: string, monitor: Site["mo
 
         monitor.retryAttempts !== undefined ? Number(monitor.retryAttempts) : null,
         monitor.monitoring ? 1 : 0,
-        monitor.status || "down",
-
+        monitor.status,
         monitor.responseTime !== undefined ? Number(monitor.responseTime) : null,
         convertDateForDb(monitor.lastChecked),
     ];

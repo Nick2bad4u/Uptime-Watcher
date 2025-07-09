@@ -89,11 +89,7 @@ export const logStoreAction = (storeName: string, actionName: string, data?: unk
  */
 export async function waitForElectronAPI(maxAttempts = 50, baseDelay = 100): Promise<void> {
     for (const attempt of Array.from({ length: maxAttempts }, (_, index) => index)) {
-        if (
-            globalThis.window !== undefined &&
-            window.electronAPI?.sites?.getSites &&
-            typeof window.electronAPI.sites.getSites === "function"
-        ) {
+        if (typeof window.electronAPI.sites.getSites === "function") {
             return; // API is ready
         }
 
