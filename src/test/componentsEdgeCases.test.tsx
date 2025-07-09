@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { ThemedButton, ThemedIconButton, ThemedBadge } from "../theme";
+import { ThemedButton, ThemedIconButton } from "../theme";
 
 // Mock the theme context
 const mockTheme = {

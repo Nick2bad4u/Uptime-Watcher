@@ -7,7 +7,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 import type { Site, Monitor } from "../types";
 
-import { waitForElectronAPI } from "../stores/utils";
 
 // Mock all dependencies
 vi.mock("../stores", () => ({

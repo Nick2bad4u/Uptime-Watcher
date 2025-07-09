@@ -3,13 +3,10 @@
  * These tests target specific uncovered lines to achieve 100% coverage
  */
 
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-import type { Monitor, StatusHistory } from "../types";
 
-import { Settings, ScreenshotThumbnail, HistoryTab } from "../components";
-import { useErrorStore, useSettingsStore, useSitesStore } from "../stores";
 import { ThemedIconButton } from "../theme";
 
 // Mock the stores and other dependencies
