@@ -42,11 +42,7 @@ export interface DataImportExportConfig {
  * Type guard for expected import data structure.
  */
 function isImportData(obj: unknown): obj is { sites: ImportSite[]; settings?: Record<string, string> } {
-    if (
-        typeof obj === "object" &&
-        obj !== null &&
-        Array.isArray((obj as Record<string, unknown>).sites)
-    ) {
+    if (typeof obj === "object" && obj !== null && Array.isArray((obj as Record<string, unknown>).sites)) {
         // Optionally check each site for required properties
         return true;
     }
@@ -168,7 +164,7 @@ export class DataImportExportService {
 
                 // Import settings
                 this.repositories.settings.bulkInsert(settings);
-                
+
                 return Promise.resolve();
             });
 
@@ -210,10 +206,7 @@ export class DataImportExportService {
      * Import history for created monitors by matching with original monitors.
      * Private helper method for history data persistence.
      */
-    private importHistoryForMonitors(
-        createdMonitors: Site["monitors"],
-        originalMonitors: Site["monitors"]
-    ): void {
+    private importHistoryForMonitors(createdMonitors: Site["monitors"], originalMonitors: Site["monitors"]): void {
         for (const createdMonitor of createdMonitors) {
             // Find the original monitor with matching properties to get its history
             const originalMonitor = originalMonitors.find(

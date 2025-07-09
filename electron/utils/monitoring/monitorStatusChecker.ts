@@ -5,7 +5,13 @@
 
 import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
 import { UptimeEvents, TypedEventBus } from "../../events/index";
-import { HistoryRepository, MonitorRepository, SiteRepository, DatabaseService, MonitorFactory } from "../../services/index";
+import {
+    HistoryRepository,
+    MonitorRepository,
+    SiteRepository,
+    DatabaseService,
+    MonitorFactory,
+} from "../../services/index";
 import { Site, StatusHistory, StatusUpdate } from "../../types";
 
 interface Logger {

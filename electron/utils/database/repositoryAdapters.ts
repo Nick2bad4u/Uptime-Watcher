@@ -40,11 +40,13 @@ export class SiteRepositoryAdapter implements ISiteRepository {
     async exportAll(): Promise<Site[]> {
         // The repository returns basic site data, we need to build full Site objects
         const siteData = this.repository.exportAll();
-        return Promise.resolve(siteData.map((site) => ({
-            identifier: site.identifier,
-            monitors: [], // Will be populated by caller if needed
-            ...(site.name && { name: site.name }),
-        })));
+        return Promise.resolve(
+            siteData.map((site) => ({
+                identifier: site.identifier,
+                monitors: [], // Will be populated by caller if needed
+                ...(site.name && { name: site.name }),
+            }))
+        );
     }
 
     async deleteAll(): Promise<void> {

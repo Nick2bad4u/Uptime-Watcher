@@ -5,8 +5,7 @@
 
 import { UptimeEvents, TypedEventBus } from "../../events/index";
 import { DatabaseService } from "../../services/index";
-import { monitorLogger as logger , withDbRetry } from "../../utils/index";
-
+import { monitorLogger as logger, withDbRetry } from "../../utils/index";
 
 /**
  * Initialize the database and load sites.

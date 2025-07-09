@@ -95,16 +95,16 @@ export class IpcService {
 
         ipcMain.handle("check-site-now", async (_, identifier: string, monitorId: string) => {
             if (isDev()) logger.debug("[IpcService] Handling check-site-now", { identifier, monitorId });
-            
+
             // Runtime check for string identifier and monitorId
             if (typeof identifier !== "string") {
                 throw new Error("Invalid site identifier");
             }
-            
+
             if (typeof monitorId !== "string") {
                 throw new Error("Invalid monitor ID");
             }
-            
+
             return this.uptimeOrchestrator.checkSiteManually(identifier, monitorId);
         });
     }

@@ -11,12 +11,7 @@ import { logger } from "../../../utils/index";
 /**
  * Add a new history entry for a monitor.
  */
-export function addHistoryEntry(
-    db: Database,
-    monitorId: string,
-    entry: StatusHistory,
-    details?: string
-): void {
+export function addHistoryEntry(db: Database, monitorId: string, entry: StatusHistory, details?: string): void {
     try {
         db.run("INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)", [
             monitorId,

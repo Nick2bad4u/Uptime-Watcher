@@ -341,21 +341,21 @@ export default [
                                 "The `Function` type accepts any function-like value.",
                                 "It provides no type safety when calling the function, which can be a common source of bugs.",
                                 "If you are expecting the function to accept certain arguments, you should explicitly define the function shape.",
-                                "Use '(...args: unknown[]) => unknown' for generic handlers or define specific function signatures."
+                                "Use '(...args: unknown[]) => unknown' for generic handlers or define specific function signatures.",
                             ].join("\n"),
                         },
                     },
                 },
             ],
             "@typescript-eslint/no-unsafe-function-type": "error",
-            "@typescript-eslint/no-wrapper-object-types": "error", 
+            "@typescript-eslint/no-wrapper-object-types": "error",
             "@typescript-eslint/no-empty-object-type": "error",
             "@typescript-eslint/prefer-function-type": "error",
             "@typescript-eslint/no-empty-function": [
-                "error", 
-                { 
-                    allow: ["arrowFunctions"] // Allow empty arrow functions for React useEffect cleanup
-                }
+                "error",
+                {
+                    allow: ["arrowFunctions"], // Allow empty arrow functions for React useEffect cleanup
+                },
             ],
 
             // Advanced type-checked rules for async safety and runtime error prevention
@@ -363,8 +363,8 @@ export default [
                 "error",
                 {
                     ignoreVoid: true, // Allow void for intentionally ignored promises
-                    ignoreIIFE: false // Catch floating IIFEs which can cause issues
-                }
+                    ignoreIIFE: false, // Catch floating IIFEs which can cause issues
+                },
             ],
             "@typescript-eslint/await-thenable": "error", // Prevent awaiting non-promises
             "@typescript-eslint/no-misused-promises": [
@@ -372,12 +372,12 @@ export default [
                 {
                     checksConditionals: true, // Check if Promises used in conditionals
                     checksVoidReturn: true, // Critical for Electron IPC handlers
-                    checksSpreads: true // Check Promise spreads
-                }
+                    checksSpreads: true, // Check Promise spreads
+                },
             ],
             "@typescript-eslint/require-await": "error", // Functions marked async must use await
             "@typescript-eslint/return-await": ["error", "in-try-catch"], // Proper await handling in try-catch
-            
+
             // Enhanced type safety for backend services
             "@typescript-eslint/no-unnecessary-type-assertion": "error", // Remove redundant type assertions
             "@typescript-eslint/no-unsafe-assignment": "warn", // Warn on unsafe assignments to any
@@ -385,24 +385,24 @@ export default [
             "@typescript-eslint/no-unsafe-member-access": "warn", // Warn on accessing any-typed properties
             "@typescript-eslint/no-unsafe-return": "warn", // Warn on returning any from typed functions
             "@typescript-eslint/no-unsafe-argument": "warn", // Warn on passing any to typed parameters
-            
+
             // Backend-specific type safety
             "@typescript-eslint/prefer-readonly": "warn", // Prefer readonly for service class properties
             "@typescript-eslint/switch-exhaustiveness-check": "error", // Ensure switch statements are exhaustive
-            
+
             // Null safety for backend operations
             "@typescript-eslint/no-unnecessary-condition": [
-                "warn", 
-                { 
-                    allowConstantLoopConditions: true // Allow while(true) patterns in services
-                }
+                "warn",
+                {
+                    allowConstantLoopConditions: true, // Allow while(true) patterns in services
+                },
             ],
             "@typescript-eslint/prefer-nullish-coalescing": [
                 "error",
                 {
                     ignoreConditionalTests: false, // Check conditionals for nullish coalescing opportunities
-                    ignoreMixedLogicalExpressions: false // Check complex logical expressions
-                }
+                    ignoreMixedLogicalExpressions: false, // Check complex logical expressions
+                },
             ],
             "@typescript-eslint/prefer-optional-chain": "error", // Use optional chaining instead of logical AND
         },
@@ -568,7 +568,7 @@ export default [
                                 "The `Function` type accepts any function-like value.",
                                 "It provides no type safety when calling the function, which can be a common source of bugs.",
                                 "If you are expecting the function to accept certain arguments, you should explicitly define the function shape.",
-                                "Use '(...args: unknown[]) => unknown' for generic handlers or define specific function signatures."
+                                "Use '(...args: unknown[]) => unknown' for generic handlers or define specific function signatures.",
                             ].join("\n"),
                         },
                     },
@@ -576,22 +576,22 @@ export default [
             ],
             "@typescript-eslint/no-unsafe-function-type": "error",
             "@typescript-eslint/no-wrapper-object-types": "error",
-            "@typescript-eslint/no-empty-object-type": "error", 
+            "@typescript-eslint/no-empty-object-type": "error",
             "@typescript-eslint/prefer-function-type": "error",
             "@typescript-eslint/no-empty-function": [
-                "error", 
-                { 
-                    allow: ["arrowFunctions"] // Allow empty arrow functions for React useEffect cleanup
-                }
+                "error",
+                {
+                    allow: ["arrowFunctions"], // Allow empty arrow functions for React useEffect cleanup
+                },
             ],
 
-            // Advanced type-checked rules for backend async safety and runtime error prevention  
+            // Advanced type-checked rules for backend async safety and runtime error prevention
             "@typescript-eslint/no-floating-promises": [
                 "error",
                 {
                     ignoreVoid: true, // Allow void for intentionally ignored promises
-                    ignoreIIFE: false // Catch floating IIFEs which can cause issues in Node.js
-                }
+                    ignoreIIFE: false, // Catch floating IIFEs which can cause issues in Node.js
+                },
             ],
             "@typescript-eslint/await-thenable": "error", // Prevent awaiting non-promises
             "@typescript-eslint/no-misused-promises": [
@@ -599,12 +599,12 @@ export default [
                 {
                     checksConditionals: true, // Check if Promises used in conditionals
                     checksVoidReturn: true, // Critical for Electron IPC handlers
-                    checksSpreads: true // Check Promise spreads
-                }
+                    checksSpreads: true, // Check Promise spreads
+                },
             ],
             "@typescript-eslint/require-await": "error", // Functions marked async must use await
             "@typescript-eslint/return-await": ["error", "in-try-catch"], // Proper await handling in try-catch
-            
+
             // Enhanced type safety for backend services
             "@typescript-eslint/no-unnecessary-type-assertion": "error", // Remove redundant type assertions
             "@typescript-eslint/no-unsafe-assignment": "warn", // Warn on unsafe assignments to any
@@ -612,24 +612,24 @@ export default [
             "@typescript-eslint/no-unsafe-member-access": "warn", // Warn on accessing any-typed properties
             "@typescript-eslint/no-unsafe-return": "warn", // Warn on returning any from typed functions
             "@typescript-eslint/no-unsafe-argument": "warn", // Warn on passing any to typed parameters
-            
+
             // Backend-specific type safety
             "@typescript-eslint/prefer-readonly": "warn", // Prefer readonly for service class properties
             "@typescript-eslint/switch-exhaustiveness-check": "error", // Ensure switch statements are exhaustive
-            
+
             // Null safety for backend operations
             "@typescript-eslint/no-unnecessary-condition": [
-                "warn", 
-                { 
-                    allowConstantLoopConditions: true // Allow while(true) patterns in services
-                }
+                "warn",
+                {
+                    allowConstantLoopConditions: true, // Allow while(true) patterns in services
+                },
             ],
             "@typescript-eslint/prefer-nullish-coalescing": [
                 "error",
                 {
                     ignoreConditionalTests: false, // Check conditionals for nullish coalescing opportunities
-                    ignoreMixedLogicalExpressions: false // Check complex logical expressions
-                }
+                    ignoreMixedLogicalExpressions: false, // Check complex logical expressions
+                },
             ],
             "@typescript-eslint/prefer-optional-chain": "error", // Use optional chaining instead of logical AND
         },

@@ -120,10 +120,7 @@ export class HistoryRepository {
     /**
      * Bulk insert history entries (for import functionality).
      */
-    public bulkInsert(
-        monitorId: string,
-        historyEntries: (StatusHistory & { details?: string })[]
-    ): void {
+    public bulkInsert(monitorId: string, historyEntries: (StatusHistory & { details?: string })[]): void {
         const db = this.getDb();
         return bulkInsertHistory(db, monitorId, historyEntries);
     }

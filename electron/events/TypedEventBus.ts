@@ -7,8 +7,6 @@ import { EventEmitter } from "node:events";
 
 import { generateCorrelationId, logger } from "../utils/index";
 
-
-
 /**
  * Middleware function for event processing.
  * Can modify event data, add logging, metrics, or perform other cross-cutting concerns.

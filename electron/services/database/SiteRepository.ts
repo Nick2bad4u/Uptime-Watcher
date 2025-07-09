@@ -48,9 +48,7 @@ export class SiteRepository {
     /**
      * Find a site by its identifier.
      */
-    public findByIdentifier(
-        identifier: string
-    ): { identifier: string; name?: string | undefined } | undefined {
+    public findByIdentifier(identifier: string): { identifier: string; name?: string | undefined } | undefined {
         try {
             const db = this.getDb();
             const siteRow = db.get("SELECT * FROM sites WHERE identifier = ?", [identifier]) as
