@@ -7,7 +7,7 @@
 import { useState, useEffect, useCallback } from "react";
 
 import { DEFAULT_CHECK_INTERVAL } from "../../constants";
-import { generateUuid } from "../../utils/data/generateUuid";
+import { generateUuid } from "../../utils/index";
 
 /** Form operation mode */
 export type FormMode = "new" | "existing";
@@ -68,7 +68,7 @@ export interface AddSiteFormActions {
     /** Reset form to initial state */
     resetForm: () => void;
     /** Whether the form is currently valid */
-    isFormValid: boolean;
+    isFormValid: () => boolean;
 }
 
 /**
@@ -101,12 +101,20 @@ export function useAddSiteForm(): AddSiteFormState & AddSiteFormActions {
     // UI state
     const [formError, setFormError] = useState<string | undefined>();
 
-    // Reset fields when monitor type changes
+    // Reset fields when monitor type changes, but preserve them if they've been explicitly set
     useEffect(() => {
         setFormError(undefined);
-        setUrl("");
-        setHost("");
-        setPort("");
+
+        // Only reset URL if we're switching to port mode
+        if (monitorType === "port") {
+            setUrl("");
+        }
+
+        // Only reset host/port if we're switching to http mode
+        if (monitorType === "http") {
+            setHost("");
+            setPort("");
+        }
     }, [monitorType]);
 
     // Reset name and siteId when switching to new site
@@ -151,7 +159,7 @@ export function useAddSiteForm(): AddSiteFormState & AddSiteFormActions {
         checkInterval,
         formError,
         host,
-        isFormValid: isFormValid(),
+        isFormValid,
         monitorType,
         name,
         port,
