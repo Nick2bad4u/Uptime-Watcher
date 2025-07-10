@@ -22,40 +22,7 @@ import {
     useAvailabilityColors,
 } from "../../../theme";
 import { Monitor } from "../../../types";
-
-/**
- * Helper function to format time duration into human readable format.
- * @param milliseconds - Time duration in milliseconds
- * @returns Formatted time string (e.g., "30s", "5m", "1h")
- */
-const formatDuration = (milliseconds: number): string => {
-    if (milliseconds < 1000) {
-        return `${milliseconds}ms`;
-    }
-    if (milliseconds < 60_000) {
-        return `${Math.round(milliseconds / 1000)}s`;
-    }
-    if (milliseconds < 3_600_000) {
-        return `${Math.round(milliseconds / 60_000)}m`;
-    }
-    return `${Math.round(milliseconds / 3_600_000)}h`;
-};
-
-/**
- * Helper function to get display label for interval value.
- * @param interval - Interval configuration (number or object with value/label)
- * @returns Human readable label for the interval
- */
-const getIntervalLabel = (interval: number | { value: number; label?: string }): string => {
-    if (typeof interval === "number") {
-        return formatDuration(interval);
-    }
-
-    if (interval.label) {
-        return interval.label;
-    }
-    return formatDuration(interval.value);
-};
+import { getIntervalLabel } from "../../../utils";
 
 /**
  * Props for the OverviewTab component.

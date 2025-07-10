@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { ThemeProvider } from "../theme/components";
-import { lightTheme } from "../theme/themes";
 
 // Mock components to test uncovered Dashboard components
 const SiteCardFooter = vi.fn(() => <div data-testid="site-card-footer">Footer</div>);
@@ -22,7 +21,7 @@ describe("Dashboard Components (Mocked for Coverage)", () => {
 
   const renderWithTheme = (component: React.ReactNode) => {
     return render(
-      <ThemeProvider theme={lightTheme}>
+      <ThemeProvider>
         {component}
       </ThemeProvider>
     );
@@ -180,7 +179,7 @@ describe("Dashboard Components (Mocked for Coverage)", () => {
       expect(screen.getByTestId("props-component")).toHaveTextContent("Test - primary - active");
 
       rerender(
-        <ThemeProvider theme={lightTheme}>
+        <ThemeProvider>
           <MockPropsComponent title="Updated" variant="secondary" status="inactive" />
         </ThemeProvider>
       );

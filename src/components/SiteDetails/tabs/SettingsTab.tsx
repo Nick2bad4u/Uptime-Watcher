@@ -12,39 +12,7 @@ import { CHECK_INTERVALS, RETRY_CONSTRAINTS, TIMEOUT_CONSTRAINTS } from "../../.
 import { logger } from "../../../services";
 import { ThemedText, ThemedButton, ThemedCard, ThemedBadge, ThemedInput, ThemedSelect, useTheme } from "../../../theme";
 import { Site, Monitor } from "../../../types";
-import { calculateMaxDuration } from "../../../utils";
-
-/**
- * Helper function to format time duration into human readable format.
- * @param milliseconds - Time duration in milliseconds
- * @returns Formatted time string (e.g., "30s", "5m", "1h")
- */
-function formatDuration(milliseconds: number): string {
-    if (milliseconds < 60_000) {
-        return `${milliseconds / 1000}s`;
-    }
-    if (milliseconds < 3_600_000) {
-        return `${milliseconds / 60_000}m`;
-    }
-    return `${milliseconds / 3_600_000}h`;
-}
-
-/**
- * Helper function to get display label for interval value.
- * @param interval - Interval configuration (number or object with value/label)
- * @returns Human readable label for the interval
- */
-function getIntervalLabel(interval: number | { value: number; label?: string }): string {
-    if (typeof interval === "number") {
-        return formatDuration(interval);
-    }
-
-    if (interval.label) {
-        return interval.label;
-    }
-
-    return formatDuration(interval.value);
-}
+import { calculateMaxDuration, getIntervalLabel } from "../../../utils";
 
 /**
  * Helper function to format retry attempts text.

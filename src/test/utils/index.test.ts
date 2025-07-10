@@ -48,7 +48,7 @@ describe("Utils Index Barrel Exports", () => {
         // Verify total number of exports matches expectations
         const exportKeys = Object.keys(module);
         console.log("Actual exports:", exportKeys);
-        expect(exportKeys.length).toBe(14); // Should have exactly 14 utility exports (updated to match actual)
+        expect(exportKeys.length).toBe(17); // Should have exactly 17 utility exports (updated to match actual)
 
         // Verify no undefined exports
         const undefinedExports = exportKeys.filter((key) => module[key as keyof typeof module] === undefined);

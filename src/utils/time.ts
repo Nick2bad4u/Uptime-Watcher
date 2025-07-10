@@ -79,6 +79,59 @@ export function formatDuration(ms: number): string {
     return `${seconds}s`;
 }
 
+/**
+ * Format time duration for monitoring intervals (simple format).
+ * Used for displaying check intervals in a concise format.
+ * @param milliseconds - Time duration in milliseconds
+ * @returns Formatted time string (e.g., "30s", "5m", "1h")
+ */
+export function formatIntervalDuration(milliseconds: number): string {
+    if (milliseconds < 60_000) {
+        return `${milliseconds / 1000}s`;
+    }
+    if (milliseconds < 3_600_000) {
+        return `${milliseconds / 60_000}m`;
+    }
+    return `${milliseconds / 3_600_000}h`;
+}
+
+/**
+ * Format time duration with milliseconds for response times (detailed format).
+ * Used for displaying response times and performance metrics.
+ * @param milliseconds - Time duration in milliseconds
+ * @returns Formatted time string (e.g., "123ms", "30s", "5m", "1h")
+ */
+export function formatResponseDuration(milliseconds: number): string {
+    if (milliseconds < 1000) {
+        return `${milliseconds}ms`;
+    }
+    if (milliseconds < 60_000) {
+        return `${Math.round(milliseconds / 1000)}s`;
+    }
+    if (milliseconds < 3_600_000) {
+        return `${Math.round(milliseconds / 60_000)}m`;
+    }
+    return `${Math.round(milliseconds / 3_600_000)}h`;
+}
+
+/**
+ * Get display label for interval value.
+ * Handles both numeric intervals and interval objects with custom labels.
+ * @param interval - Interval configuration (number or object with value/label)
+ * @returns Human readable label for the interval
+ */
+export function getIntervalLabel(interval: number | { value: number; label?: string }): string {
+    if (typeof interval === "number") {
+        return formatIntervalDuration(interval);
+    }
+
+    if (interval.label) {
+        return interval.label;
+    }
+
+    return formatIntervalDuration(interval.value);
+}
+
 import { CHART_TIME_PERIODS } from "../constants";
 
 /**

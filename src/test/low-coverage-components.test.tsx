@@ -376,7 +376,7 @@ describe("Low Coverage Component Tests", () => {
       ];
       
       expect(mockHistoryHandler([], "all")).toEqual({ items: [], totalCount: 0, filtered: false });
-      expect(mockHistoryHandler(undefined, "up")).toEqual({ items: [], totalCount: 0, filtered: false });
+      expect(mockHistoryHandler([], "up")).toEqual({ items: [], totalCount: 0, filtered: false });
       expect(mockHistoryHandler(history, "down")).toEqual({
         items: [{ status: "down", timestamp: 2 }],
         totalCount: 3,
