@@ -94,9 +94,7 @@ export class ApplicationService {
         });
 
         this.autoUpdaterService.initialize();
-        this.autoUpdaterService.checkForUpdates().catch((error) => {
-            logger.error("[ApplicationService] Error checking for updates", error);
-        });
+        void this.autoUpdaterService.checkForUpdates();
     }
 
     /**
