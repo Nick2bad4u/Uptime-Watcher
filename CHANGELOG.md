@@ -7,14 +7,146 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[0b5c883](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0b5c883693ef6d218c70f87e780be56991d02fdf)...
-[0b5c883](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0b5c883693ef6d218c70f87e780be56991d02fdf)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/0b5c883693ef6d218c70f87e780be56991d02fdf...0b5c883693ef6d218c70f87e780be56991d02fdf))
+[[155201c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/155201c4300c35002001f43bad2870048c5cc3c1)...
+[155201c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/155201c4300c35002001f43bad2870048c5cc3c1)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/155201c4300c35002001f43bad2870048c5cc3c1...155201c4300c35002001f43bad2870048c5cc3c1))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 6.5.0 [`(155201c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/155201c4300c35002001f43bad2870048c5cc3c1)
+
+
+
+
+
+
+## [6.5.0] - 2025-07-10
+
+
+[[7131308](https://github.com/Nick2bad4u/Uptime-Watcher/commit/713130863945e04e1f0c8a1e87d791a93bb2dd0f)...
+[ee269f9](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ee269f9972c98fe7c7fbf4662d315fa170aa5a99)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/713130863945e04e1f0c8a1e87d791a93bb2dd0f...ee269f9972c98fe7c7fbf4662d315fa170aa5a99))
+
+
+### ✨ Features
+
+- ✨ [feat] Add script to find empty directories in project
+
+- Introduces a Node.js script to recursively identify and list empty directories under key project folders.
+- Aims to help maintain a clean repository by facilitating the detection and potential removal of unused directories.
+- Handles permission errors gracefully and provides clear output for developers running the tool. [`(ee269f9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ee269f9972c98fe7c7fbf4662d315fa170aa5a99)
+
+
+
+### �️ Bug Fixes
+
+- 🛠️ [fix] Use Object.hasOwn for safer property checks
+
+- Replaces Object.prototype.hasOwnProperty calls with Object.hasOwn to improve code safety and modernize property checking.
+- Enhances reliability by using a method less prone to issues with prototype pollution. [`(75aacf2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/75aacf22b3681304b4c67f3b3876c676e94c4f65)
+
+
+- 🛠️ [fix] Update type configs and test mocks for ES2024 features
+
+- Expands TypeScript lib settings to include ESNext and ES2022, supporting modern JS features like Object.hasOwn
+- Adjusts event category check to use Object.hasOwn for improved code clarity, with ts-expect-error for Electron compatibility
+- Updates test mocks to include all monitor properties, ensuring coverage and alignment with data model
+
+Addresses compatibility with recent ECMAScript enhancements and improves type safety in tests. [`(7131308)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/713130863945e04e1f0c8a1e87d791a93bb2dd0f)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 6.4.0 [`(0b5c883)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0b5c883693ef6d218c70f87e780be56991d02fdf)
+
+
+
+### 🛡️ Security
+
+- [StepSecurity] ci: Harden GitHub Actions (#27)
+
+Signed-off-by: StepSecurity Bot <bot@stepsecurity.io> [`(eee9c0e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/eee9c0e602acdeb5a42b86de8a67cfa7a616148c)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(7757dbc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7757dbcbb943db149a0fa76299138c3191defab9)
+
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(ac198c1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ac198c1abece14c85983f5e23d6ff49ae5864776)
+
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(27c0d56)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/27c0d56d435ca1dcdd28256ebd42b93fb8bfd521)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Improve cspell word appender script flexibility
+
+- Refactors the script to use .mjs extension for better ES module compatibility
+- Allows custom dictionary file path via CLI argument or environment variable
+- Enhances handling for missing or commented word files, supporting multiple comment styles
+- Improves file path resolution to default to project root, increasing portability
+- Cleans up output and ensures consistent trailing newline in the word list
+- Adds more robust error and stderr logging for cspell invocation
+
+These updates make the script more flexible and robust for different environments and workflows. [`(cc661ab)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cc661ab10fc628ed34880fe865f5d14bb1c8df5a)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Reformat script for consistent indentation
+
+- Improves code readability by standardizing indentation and formatting
+- Makes control flow and logic blocks clearer, aiding maintainability
+- No functional or algorithmic changes introduced [`(cac77db)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cac77dbea7ecf430e51ab29f0a776d42d11c7c18)
+
+
+
+### 🧹 Chores
+
+- 🧹 [chore] Unify Prettier config, improve meta tags & CI YAMLs
+
+- Replaces redundant Prettier config file with a single unified config and disables JSON Prettier errors for better compatibility.
+- Adds SEO-focused meta description and keywords to main HTML for improved discoverability.
+- Updates workflow YAML indentation and comments for clarity and consistency.
+- Refines linter and VS Code settings for improved maintainability. [`(f4494d2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f4494d208098e3a06c737140a4218704827ca419)
+
+
+- Update changelogs for v6.4.0 [skip ci] [`(e57a261)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e57a261dd1155da4dbab41ad73da9726691e72f6)
+
+
+- 🧹 [chore] Update spell-check config and add automation script
+
+- Expands custom spelling dictionary with new terms and removes unused entries to improve spell-check accuracy
+- Introduces a script for automatically appending unknown cspell words, streamlining dictionary maintenance
+- Updates TypeScript config to include a broader set of ECMAScript libraries for enhanced compatibility
+- Refactors test formatting for consistency
+
+Relates to automated spell-checking and build tooling improvements [`(979a6d2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/979a6d224ecc82dc8b311d14f4e33b6b169ab8b6)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update linter configs and ignore patterns for dev tools
+
+- Broadens suppression scope for a security rule to all files and disables DevSkim errors to streamline development workflows.
+- Expands markdown lint ignore list to cover more documentation and dependency files, reducing noise from irrelevant lint warnings.
+- Aims to improve DX by reducing unnecessary linter interruptions in non-production or documentation files. [`(fa1a154)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fa1a1541d139b1cda59e31914a85ca0214327c7a)
+
+
+- 🔧 [build] Add PostCSS asset and SVG plugins, update settings
+
+- Integrates postcss-assets, postcss-inline-svg, and postcss-reporter to enhance CSS asset handling and reporting
+- Updates stylesheet import for Tailwind CSS compatibility and streamlines status indicator padding
+- Ignores CSS @import lint warnings in editor settings to reduce noise
+- Improves PostCSS workflow for asset management, theming, and error visibility [`(1a38f79)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1a38f793a8d47c39edb4831c62150d588023c0d2)
 
 
 
