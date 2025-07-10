@@ -7,14 +7,193 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[4769ed7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4769ed7b536157be7aa09c3c4bf502f0108e83b7)...
-[4769ed7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4769ed7b536157be7aa09c3c4bf502f0108e83b7)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/4769ed7b536157be7aa09c3c4bf502f0108e83b7...4769ed7b536157be7aa09c3c4bf502f0108e83b7))
+[[354d522](https://github.com/Nick2bad4u/Uptime-Watcher/commit/354d5226c936e2c8718204ecd8273ac8879cf421)...
+[7e8c6e1](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7e8c6e1d608a821a77328e178949898592f43b0e)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/354d5226c936e2c8718204ecd8273ac8879cf421...7e8c6e1d608a821a77328e178949898592f43b0e))
+
+
+### �️ Bug Fixes
+
+- 🛠️ [fix] Prevents update check errors from logging to console
+
+- Removes error logging for update check failures during initialization
+- Avoids cluttering logs with non-critical update check exceptions [`(7e8c6e1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7e8c6e1d608a821a77328e178949898592f43b0e)
+
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 6.2.0 [`(354d522)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/354d5226c936e2c8718204ecd8273ac8879cf421)
+
+
+
+
+
+
+## [6.2.0] - 2025-07-10
+
+
+[[466e771](https://github.com/Nick2bad4u/Uptime-Watcher/commit/466e7717624ebae684db76e3b140091b7a58a643)...
+[b474c4f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b474c4f54d0f9ecbaa70e07c2caaa923c6d9bb0f)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/466e7717624ebae684db76e3b140091b7a58a643...b474c4f54d0f9ecbaa70e07c2caaa923c6d9bb0f))
+
+
+### ✨ Features
+
+- ✨ [feat] Add shared interval formatting utils and tests
+
+- Centralizes interval formatting and label helpers in a shared utility, enabling consistent display of monitoring intervals across components
+- Refactors components to use new shared helper, removing duplicate logic and improving maintainability
+- Expands and corrects related unit tests to reflect updated utility exports
+- Adds comprehensive unit tests for core backend managers and event bus, increasing backend test coverage and reliability [`(a24df3a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a24df3aac74860c35caf8ef19d14bad84943bdac)
+
+
+
+### �️ Bug Fixes
+
+- 🛠️ [fix] Log update check errors during initialization
+
+- Ensures errors from the update check are properly logged to improve visibility and troubleshooting
+- Prevents unhandled promise rejections during application startup [`(b474c4f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b474c4f54d0f9ecbaa70e07c2caaa923c6d9bb0f)
+
+
+- 🛠️ [fix] Guard category lookup in event type check
+
+Prevents errors when checking event categories by verifying the
+category exists before accessing its properties. Adds unit tests to
+ensure correct behavior for valid, invalid, and unknown event names
+and categories. Improves robustness and test coverage for event
+category and priority logic. [`(d5176f5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d5176f55f4860097bbe22f93073f0b4986dc6f51)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 6.1.0 [`(4769ed7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4769ed7b536157be7aa09c3c4bf502f0108e83b7)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(6509dda)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6509ddaf56d1fb181c30b95a2c1a168e0c2e268d)
+
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(3ed1480)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3ed14806e196dc745621ac2255c94d9628592cd8)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Remove form validity check from submit button
+
+- Simplifies form handling by eliminating the explicit validity check before enabling the submit button.
+- Removes related prop usage and unit test to streamline button logic and reduce redundancy.
+- Shifts responsibility for preventing invalid submissions away from button state management, likely centralizing validation elsewhere. [`(26d7bc0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/26d7bc0fe7d6c610aa2904ed0f74e36eb3bb49ff)
+
+
+- 🚜 [refactor] Improve form reset logic and validation
+
+- Refactors form field reset behavior to selectively clear fields based on monitor type transitions, preserving user input when switching modes.
+- Changes validation state to be exposed as a function instead of a boolean for improved flexibility.
+- Updates utility import path for UUID generation. [`(ced7df8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ced7df83eef29edef4531456f59881d86a0a9914)
+
+
+
+### � Documentation
+
+- 📝 [docs] Rename prompt files for consistent naming
+
+- Ensures prompt files use a standardized ".prompt.md" extension
+- Improves clarity and organization of documentation assets [`(2d8e7a2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2d8e7a2eaa52c2222888e66fc54f9e27d71a82eb)
+
+
+- 📝 [docs] Add guidelines for achieving 100% test coverage
+
+- Introduces detailed instructions for reviewing coverage reports and ensuring all files reach 100% branch coverage.
+- Emphasizes comprehensive testing, including edge case handling and non-skippable files, to improve code reliability.
+- Updates internal documentation to guide contributors on maintaining full test coverage across the project. [`(466e771)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/466e7717624ebae684db76e3b140091b7a58a643)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Format VS Code settings, add bracket colorization
+
+- Improves readability by expanding JSON arrays and objects to multiline format
+- Adds custom bracket and cursor color settings for enhanced code visibility without extensions
+- Organizes configuration for ESLint, SonarLint, and task arguments for better maintainability [`(a99cbbf)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a99cbbfa7b598ea233694bce3f96c5e5fd682de1)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Improve formatting and branch coverage in tests
+
+- Refactors test files for improved formatting and consistent style,
+  including array/object literals, function signatures, and mock usage
+
+- Expands test cases to cover previously uncovered branches and edge
+  conditions, especially for UI components, error boundaries, and
+  utility functions
+
+- Normalizes whitespace and code structure for better readability
+  and maintenance
+
+- Ensures all mocked components and functions are fully exercised
+  to maximize code coverage and reduce untested lines [`(b27ca95)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b27ca95520763a4b50f4fbd225f95bc435900578)
+
+
+- 🧪 [test] Add comprehensive unit tests for middleware and coverage
+
+- Introduces extensive unit tests to cover middleware functionalities, including logging, metrics, error handling, rate limiting, validation, filtering, and debugging behaviors.
+- Adds general tests to improve code coverage for constants, types, utilities, environment configurations, file system interactions, runtime types, edge cases, and async operations.
+- Enhances confidence in core logic and ensures robust handling of various scenarios. [`(eeded29)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/eeded292e440a91afde6153a3e11b1b3a7efea9f)
+
+
+- 🧪 [test] Add comprehensive tests for database and orchestrators
+
+- Expands test coverage for advanced orchestrator event handling, database backup, schema creation, and import/export services.
+- Validates error handling, edge cases, and large data scenarios for backup, import, and export logic.
+- Ensures robust test mocks for dependencies to isolate unit logic.
+- Aims to improve regression protection and facilitate future refactoring by covering critical integration points. [`(0b1d820)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0b1d8205cef1fe9313ecf8e7c10bc10d9cec637d)
+
+
+- 🧪 [test] Add comprehensive unit tests for SiteCard and SiteDetails components
+
+- Provides full test coverage for SiteCard-related components and SiteDetails modal logic, including rendering, props, event handling, and edge cases
+- Ensures accessibility and keyboard navigation are covered
+- Mocks child components and hooks to enable isolated, focused tests and verify integration points
+- Improves test reliability by mocking external dependencies and logging
+- Aims to prevent regressions and facilitate future refactoring by documenting expected behaviors in tests [`(3c30742)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3c307420b749d383da6473151c238f0b912d4515)
+
+
+- 🧪 [test] Increase component and hook test coverage
+
+- Adds comprehensive unit tests targeting low-coverage and edge-case areas across dashboard components, UI states, and core hooks
+- Introduces new test suites covering form logic, event handling, error boundaries, performance optimizations, and uncovered branches
+- Mocks browser APIs for consistent theme-related testing
+- Improves future maintainability and reliability by ensuring broader code coverage and validating previously untested scenarios [`(f6e5540)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f6e55409fdc2de157a2cb5ca55964d7812f567c1)
+
+
+- 🧪 [test] Remove unused imports from test files
+
+- Cleans up test files by removing unnecessary imports to improve readability and prevent confusion.
+- Helps maintain clarity in test dependencies and reduces noise for future maintenance. [`(da68a80)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/da68a80c163d7722def52da3393da75d7781549e)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v6.1.0 [skip ci] [`(de05de8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/de05de8ca28599e94a539af4ccb6845e3cd139c7)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Remove direct test file path from test config
+
+- Eliminates the explicit inclusion of a single test file in the test sources configuration to ensure only test directories are considered.
+- Prevents potential issues with test discovery and maintains consistency in test configuration. [`(be6d994)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/be6d99421e4d983a0e952832e85670d1b53190e5)
 
 
 
