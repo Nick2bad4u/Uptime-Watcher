@@ -1,6 +1,6 @@
 {
   "name": "uptime-watcher",
-  "version": "6.3.0",
+  "version": "6.4.0",
   "description": "An Electron app to monitor website uptime status",
   "author": "Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> (https://Uptime-Watcher.typpi.online)",
   "contributors": [
