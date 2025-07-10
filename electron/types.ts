@@ -14,6 +14,22 @@
 export type MonitorType = "http" | "port";
 
 /**
+ * Allowed status values for a monitor's current state.
+ *
+ * @remarks
+ * Includes "pending" for monitors that have not yet been checked.
+ */
+export type MonitorStatus = "up" | "down" | "pending" | "paused";
+
+/**
+ * Allowed status values for a historical check result.
+ *
+ * @remarks
+ * Does not include "pending"; only actual check outcomes are recorded.
+ */
+export type StatusHistoryStatus = "up" | "down" | "paused";
+
+/**
  * Monitor configuration and state.
  * Represents a single monitoring endpoint (HTTP URL or TCP port).
  *
@@ -32,7 +48,7 @@ export interface Monitor {
      * @remarks
      * Includes `"pending"` to indicate the monitor has not yet been checked.
      */
-    status: "up" | "down" | "pending" | "paused";
+    status: MonitorStatus;
     /**
      * Last recorded response time in milliseconds.
      *
@@ -43,10 +59,20 @@ export interface Monitor {
     responseTime: number;
     /**
      * Timestamp of last check (Unix timestamp in milliseconds).
-     * Use the same format as StatusHistory.timestamp for consistency.
+     *
+     * @remarks
+     * Will be `undefined` if the monitor has never been checked (i.e., before the first check).
+     * Uses the same format as the `timestamp` property in `StatusHistory` for consistency.
      */
-    lastChecked?: number | undefined;
-    /** Historical check results */
+    lastChecked?: Date | undefined;
+    /**
+     * Historical check results, ordered from oldest to newest.
+     *
+     * @remarks
+     * The first element is the oldest check; the last element is the most recent.
+     * This array may be empty if no checks have been performed yet.
+     * For performance and storage reasons, implementers should typically enforce a maximum length (e.g., keep only the most recent N results).
+     */
     history: StatusHistory[];
     /**
      * Whether this specific monitor is actively being monitored.
@@ -58,20 +84,48 @@ export interface Monitor {
     /**
      * URL to monitor.
      * Only set for HTTP monitors; will be undefined for other monitor types.
+     *
+     * @remarks
+     * This property must never be set at the same time as `host`. Implementers must ensure that only one of `url` (for HTTP monitors)
+     * or `host` (for port monitors) is set for a given monitor. If both are set, this indicates a configuration error.
      */
     url?: string | undefined;
     /**
      * Hostname or IP to monitor.
      * Only set for port monitors; will be undefined for other monitor types.
+     *
+     * @remarks
+     * This property must never be set at the same time as `url`. Implementers must ensure that only one of `host` (for port monitors)
+     * or `url` (for HTTP monitors) is set for a given monitor. If both are set, this indicates a configuration error.
+     * This exclusivity is enforced to prevent ambiguous configuration and ensure type safety.
      */
     host?: string | undefined;
     /** Port number for port monitors */
     port?: number | undefined;
-    /** Check interval in milliseconds (per-monitor override) */
+    /**
+     * Check interval in milliseconds (per-monitor override).
+     *
+     * @remarks
+     * If `undefined`, the system will use the global or site-level default check interval.
+     * This allows for per-monitor customization while maintaining a fallback to broader configuration.
+     */
     checkInterval?: number | undefined;
-    /** Request timeout in milliseconds for this monitor */
+    /**
+     * Request timeout in milliseconds for this monitor.
+     *
+     * @remarks
+     * If `undefined`, the system will use the global or site-level default timeout value.
+     * This allows for per-monitor customization while maintaining a fallback to broader configuration.
+     */
     timeout?: number | undefined;
-    /** Number of retry attempts before marking as down for this monitor */
+    /**
+     * Number of retry attempts before marking as down for this monitor.
+     *
+     * @remarks
+     * - If set to `0`, no retries will be performed (the monitor will be marked as down after the first failure).
+     * - If `undefined`, the system will use the global or site-level default retry attempts.
+     * - Any positive integer specifies the number of additional attempts after the initial failure.
+     */
     retryAttempts?: number | undefined;
 }
 
@@ -82,9 +136,20 @@ export interface Monitor {
 export interface Site {
     /** Unique identifier for the site (UUID, used as the key everywhere) */
     identifier: string;
-    /** Display name for the site */
+    /**
+     * Display name for the site.
+     *
+     * @remarks
+     * This property is optional. If provided, it will be used for display purposes in the UI.
+     * If omitted, the site may be displayed using its identifier or a fallback label.
+     */
     name?: string | undefined;
-    /** Array of monitors associated with this site */
+    /**
+     * Array of monitors associated with this site.
+     *
+     * @remarks
+     * This array may be empty if the site has no monitors configured.
+     */
     monitors: Monitor[];
     /**
      * Whether monitoring is active for this site.
@@ -112,7 +177,7 @@ export interface StatusHistory {
      * @remarks
      * Does not include `"pending"`; only actual check outcomes are recorded.
      */
-    status: "up" | "down" | "paused";
+    status: StatusHistoryStatus;
     /** Response time in milliseconds */
     responseTime: number;
     /** Optional additional details about the check */
@@ -126,5 +191,5 @@ export interface StatusHistory {
  */
 export interface StatusUpdate {
     site: Site;
-    previousStatus?: "up" | "down" | "pending" | "paused" | undefined;
+    previousStatus?: MonitorStatus | undefined;
 }

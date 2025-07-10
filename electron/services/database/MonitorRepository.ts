@@ -107,7 +107,7 @@ export class MonitorRepository {
                     monitor.monitoring ? 1 : 0,
                     monitor.status,
 
-                    monitor.responseTime !== undefined ? Number(monitor.responseTime) : null,
+                    Number(monitor.responseTime),
 
                     monitor.lastChecked ? convertDateForDb(monitor.lastChecked) : null,
                 ]
@@ -158,6 +158,7 @@ export class MonitorRepository {
                 updateValues.push(monitor.status);
             }
 
+            // monitor.responseTime is always a number, so no need for unnecessary conditional
             addNumberField("responseTime", monitor.responseTime, updateFields, updateValues);
 
             if (monitor.lastChecked !== undefined) {

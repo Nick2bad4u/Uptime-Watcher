@@ -34,6 +34,7 @@ export function rowToMonitor(row: Record<string, unknown>): Site["monitors"][0] 
         id: row.id !== undefined ? String(row.id) : "-1",
         status: typeof row.status === "string" ? (row.status as "up" | "down" | "pending") : "down",
         type: typeof row.type === "string" ? (row.type as Site["monitors"][0]["type"]) : "http",
+        responseTime: 0
     };
 
     // Add optional properties only if they have valid values
@@ -102,7 +103,7 @@ export function buildMonitorParameters(siteIdentifier: string, monitor: Site["mo
         monitor.retryAttempts !== undefined ? Number(monitor.retryAttempts) : null,
         monitor.monitoring ? 1 : 0,
         monitor.status,
-        monitor.responseTime !== undefined ? Number(monitor.responseTime) : null,
+        Number(monitor.responseTime),
         convertDateForDb(monitor.lastChecked),
     ];
 }

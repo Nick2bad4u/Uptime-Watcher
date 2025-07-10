@@ -6,7 +6,7 @@
 import log from "electron-log/main";
 
 import { app } from "electron";
-import { ApplicationService } from "./index";
+import { ApplicationService, logger } from "./index";
 
 // Configure electron-log for main process
 // Enable preload mode for reliable logging in Electron's main process, especially with context isolation enabled
@@ -31,7 +31,7 @@ class Main {
      * Sets up logging, creates application service, and configures cleanup handlers.
      */
     constructor() {
-        log.info("Starting Uptime Watcher application");
+        logger.info("Starting Uptime Watcher application");
         this.applicationService = new ApplicationService();
 
         // Ensure cleanup is only called once
