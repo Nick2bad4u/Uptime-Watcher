@@ -95,7 +95,6 @@ export function useSiteActions(site: Site, monitor: Monitor | undefined): SiteAc
                     siteId: site.identifier,
                     siteName: site.name,
                 });
-                return; // Explicitly return undefined to satisfy ESLint
             })
             .catch((error) => {
                 logger.site.error(site.identifier, error instanceof Error ? error : String(error));

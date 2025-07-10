@@ -1,7 +1,7 @@
 /**
  * Site details view component with tabbed interface
  *
- * Provides a comprehensive view of a m    // Use our custom hook to get all the data and functionality we neede including:
+ * Use our custom hook to get all the data and functionality we needed including:
  * - Overview with basic statistics
  * - History charts and response time data
  * - Analytics with advanced metrics
