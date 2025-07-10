@@ -348,6 +348,10 @@ export const EVENT_PRIORITIES = {
  * Type guard to check if an event is of a specific category.
  */
 export function isEventOfCategory(eventName: keyof UptimeEvents, category: keyof typeof EVENT_CATEGORIES): boolean {
+    // Check if the category exists in EVENT_CATEGORIES
+    if (!Object.prototype.hasOwnProperty.call(EVENT_CATEGORIES, category)) {
+        return false;
+    }
     // eslint-disable-next-line security/detect-object-injection
     return EVENT_CATEGORIES[category].includes(eventName as never);
 }
