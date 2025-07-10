@@ -500,8 +500,8 @@ describe("AddSiteForm", () => {
             mockUseSitesStore.mockReturnValue({
                 ...defaultSitesStoreState,
                 sites: [
-                    { identifier: "site1", monitors: [], name: undefined },
-                    { identifier: "site2", monitors: [], name: null },
+                    { identifier: "site1", monitors: [], name: "site1" },
+                    { identifier: "site2", monitors: [], name: "site2" },
                 ],
             });
 

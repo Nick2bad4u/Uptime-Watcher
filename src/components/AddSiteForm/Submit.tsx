@@ -158,6 +158,8 @@ function createMonitor(properties: FormSubmitProperties): Monitor {
         checkInterval,
         history: [] as Monitor["history"],
         id: generateUuid(),
+        monitoring: true, // Default to monitoring enabled
+        responseTime: -1, // Sentinel value for never checked
         retryAttempts: RETRY_CONSTRAINTS.DEFAULT, // Explicit default retry attempts
         status: "pending" as const,
         timeout: DEFAULT_REQUEST_TIMEOUT, // Explicit default timeout
@@ -185,7 +187,8 @@ async function submitNewSite(properties: FormSubmitProperties, monitor: Monitor)
     const siteData = {
         identifier: siteId,
         monitors: [monitor],
-        ...(trimmedName && { name: trimmedName }),
+        monitoring: true, // Default to monitoring enabled
+        name: trimmedName || "Unnamed Site", // Provide default name
     };
 
     await createSite(siteData);

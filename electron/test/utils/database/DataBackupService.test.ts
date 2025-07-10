@@ -232,7 +232,7 @@ describe("DataBackupOrchestrator", () => {
             const mockSiteCache: ISiteCache = {
                 entries: vi.fn().mockReturnValue([
                     ["site1", { identifier: "site1", monitors: [] }],
-                    ["site2", { identifier: "site2", name: undefined, monitors: [] }],
+                    ["site2", { identifier: "site2", name: "Site 2", monitoring: true, monitors: [] }],
                 ]),
                 get: vi.fn(),
                 set: vi.fn(),
@@ -243,7 +243,10 @@ describe("DataBackupOrchestrator", () => {
 
             const result = await dataBackupOrchestrator.refreshSitesFromCache(mockSiteCache);
 
-            expect(result).toEqual([{ identifier: "site1" }, { identifier: "site2" }]);
+            expect(result).toEqual([
+                { identifier: "site1" }, 
+                { identifier: "site2", name: "Site 2" }
+            ]);
         });
 
         it("should handle sites with empty string names", async () => {

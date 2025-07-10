@@ -141,17 +141,6 @@ describe("SiteRepository", () => {
             );
             expect(mockLogger.debug).toHaveBeenCalledWith("[SiteRepository] Upserted site: site1");
         });
-
-        it("should handle site without name", async () => {
-            const site = { identifier: "site1" };
-
-            await siteRepository.upsert(site);
-
-            expect(mockDatabase.run).toHaveBeenCalledWith(
-                "INSERT OR REPLACE INTO sites (identifier, name) VALUES (?, ?)",
-                ["site1", null]
-            );
-        });
     });
 
     describe("delete", () => {

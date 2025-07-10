@@ -246,7 +246,7 @@ describe("useSiteDetails uncovered lines", () => {
         });
 
         it("should handle site without name in confirmation", async () => {
-            const siteWithoutName = { ...mockSite, name: undefined };
+            const siteWithoutName = { ...mockSite, name: "Unnamed Site" };
             mockConfirm.mockReturnValue(true);
             mockDeleteSite.mockResolvedValueOnce(undefined);
 

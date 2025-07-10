@@ -21,25 +21,25 @@ export interface Monitor {
     /** Current status of the monitor */
     status: "up" | "down" | "pending" | "paused";
     /** Optional URL for HTTP monitors. For other types (e.g., port, IP), this is undefined. */
-    url?: string | undefined;
+    url?: string;
     /** Hostname or IP for port monitors. */
-    host?: string | undefined;
+    host?: string;
     /** Port number for port monitors. */
-    port?: number | undefined;
+    port?: number;
     /** Last recorded response time in milliseconds */
-    responseTime?: number | undefined;
+    responseTime: number;
     /** Timestamp of last check */
-    lastChecked?: Date | undefined;
+    lastChecked?: Date;
     /** Historical status data */
     history: StatusHistory[];
     /** Per-monitor-type monitoring state */
-    monitoring?: boolean | undefined;
+    monitoring: boolean;
     /** Per-monitor check interval (ms) */
-    checkInterval?: number | undefined;
+    checkInterval: number;
     /** Request timeout in milliseconds for this monitor */
-    timeout?: number | undefined;
+    timeout: number;
     /** Number of retry attempts before marking as down for this monitor */
-    retryAttempts?: number | undefined;
+    retryAttempts: number;
 }
 
 /**
@@ -50,11 +50,11 @@ export interface Site {
     /** Unique identifier for the site (UUID, used as the key everywhere) */
     identifier: string;
     /** Human-readable name for the site */
-    name?: string | undefined;
+    name: string;
     /** Array of monitors for this site */
     monitors: Monitor[];
     /** Per-site monitoring state */
-    monitoring?: boolean | undefined;
+    monitoring: boolean;
 }
 
 /**
@@ -68,7 +68,7 @@ export interface StatusHistory {
     /** Response time in milliseconds */
     responseTime: number;
     /** Optional additional details about the check */
-    details?: string | undefined;
+    details?: string;
 }
 
 /**
@@ -79,7 +79,7 @@ export interface StatusUpdate {
     /** Updated site data */
     site: Site;
     /** Previous status for change detection */
-    previousStatus?: "up" | "down" | "pending" | "paused" | undefined;
+    previousStatus?: "up" | "down" | "pending" | "paused";
 }
 
 /**

@@ -64,7 +64,7 @@ export interface Monitor {
      * Will be `undefined` if the monitor has never been checked (i.e., before the first check).
      * Uses the same format as the `timestamp` property in `StatusHistory` for consistency.
      */
-    lastChecked?: Date | undefined;
+    lastChecked?: Date;
     /**
      * Historical check results, ordered from oldest to newest.
      *
@@ -78,9 +78,9 @@ export interface Monitor {
      * Whether this specific monitor is actively being monitored.
      *
      * @remarks
-     * This field is optional and may be `undefined`. Consuming code must handle the `undefined` case appropriately.
+     * Defaults to true for new monitors.
      */
-    monitoring?: boolean | undefined;
+    monitoring: boolean;
     /**
      * URL to monitor.
      * Only set for HTTP monitors; will be undefined for other monitor types.
@@ -89,7 +89,7 @@ export interface Monitor {
      * This property must never be set at the same time as `host`. Implementers must ensure that only one of `url` (for HTTP monitors)
      * or `host` (for port monitors) is set for a given monitor. If both are set, this indicates a configuration error.
      */
-    url?: string | undefined;
+    url?: string;
     /**
      * Hostname or IP to monitor.
      * Only set for port monitors; will be undefined for other monitor types.
@@ -99,34 +99,32 @@ export interface Monitor {
      * or `url` (for HTTP monitors) is set for a given monitor. If both are set, this indicates a configuration error.
      * This exclusivity is enforced to prevent ambiguous configuration and ensure type safety.
      */
-    host?: string | undefined;
+    host?: string;
     /** Port number for port monitors */
-    port?: number | undefined;
+    port?: number;
     /**
      * Check interval in milliseconds (per-monitor override).
      *
      * @remarks
-     * If `undefined`, the system will use the global or site-level default check interval.
-     * This allows for per-monitor customization while maintaining a fallback to broader configuration.
+     * Defaults to global check interval if not specified.
      */
-    checkInterval?: number | undefined;
+    checkInterval: number;
     /**
      * Request timeout in milliseconds for this monitor.
      *
      * @remarks
-     * If `undefined`, the system will use the global or site-level default timeout value.
-     * This allows for per-monitor customization while maintaining a fallback to broader configuration.
+     * Defaults to global timeout value if not specified.
      */
-    timeout?: number | undefined;
+    timeout: number;
     /**
      * Number of retry attempts before marking as down for this monitor.
      *
      * @remarks
      * - If set to `0`, no retries will be performed (the monitor will be marked as down after the first failure).
-     * - If `undefined`, the system will use the global or site-level default retry attempts.
+     * - Defaults to global retry attempts if not specified.
      * - Any positive integer specifies the number of additional attempts after the initial failure.
      */
-    retryAttempts?: number | undefined;
+    retryAttempts: number;
 }
 
 /**
@@ -140,10 +138,9 @@ export interface Site {
      * Display name for the site.
      *
      * @remarks
-     * This property is optional. If provided, it will be used for display purposes in the UI.
-     * If omitted, the site may be displayed using its identifier or a fallback label.
+     * Defaults to "Unnamed Site" if not provided.
      */
-    name?: string | undefined;
+    name: string;
     /**
      * Array of monitors associated with this site.
      *
@@ -155,9 +152,9 @@ export interface Site {
      * Whether monitoring is active for this site.
      *
      * @remarks
-     * This field is optional and may be `undefined`. Consuming code must handle the `undefined` case appropriately.
+     * Defaults to true for new sites.
      */
-    monitoring?: boolean | undefined;
+    monitoring: boolean;
 }
 
 /**
@@ -181,7 +178,7 @@ export interface StatusHistory {
     /** Response time in milliseconds */
     responseTime: number;
     /** Optional additional details about the check */
-    details?: string | undefined;
+    details?: string;
 }
 
 /**
@@ -191,5 +188,5 @@ export interface StatusHistory {
  */
 export interface StatusUpdate {
     site: Site;
-    previousStatus?: MonitorStatus | undefined;
+    previousStatus?: MonitorStatus;
 }

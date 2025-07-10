@@ -14,7 +14,10 @@ export function createDefaultMonitor(overrides: Partial<Monitor> = {}): Monitor 
         history: [],
         id: overrides.id ?? crypto.randomUUID(),
         monitoring: true,
+        responseTime: -1, // Sentinel value for never checked
+        retryAttempts: 3, // Default retry attempts
         status: "pending",
+        timeout: 5000, // Default timeout
         type: "http" as MonitorType,
         ...overrides,
     };
@@ -30,6 +33,10 @@ export function validateMonitor(monitor: Partial<Monitor>): monitor is Monitor {
         typeof monitor.status === "string" &&
         ["pending", "up", "down"].includes(monitor.status) &&
         typeof monitor.monitoring === "boolean" &&
+        typeof monitor.responseTime === "number" &&
+        typeof monitor.checkInterval === "number" &&
+        typeof monitor.timeout === "number" &&
+        typeof monitor.retryAttempts === "number" &&
         Array.isArray(monitor.history)
     );
 }
@@ -39,22 +46,22 @@ export function validateMonitor(monitor: Partial<Monitor>): monitor is Monitor {
  */
 export function normalizeMonitor(monitor: Partial<Monitor>): Monitor {
     return {
+        checkInterval: monitor.checkInterval ?? 300_000, // 5 minutes default
         history: monitor.history ?? [],
         id: monitor.id ?? crypto.randomUUID(),
+        monitoring: monitor.monitoring ?? true,
+        responseTime: monitor.responseTime ?? -1, // Sentinel value for never checked
+        retryAttempts: monitor.retryAttempts ?? 3, // Default retry attempts
         status: ["pending", "up", "down"].includes(monitor.status as string)
             ? (monitor.status as Monitor["status"])
             : "pending",
+        timeout: monitor.timeout ?? 5000, // Default timeout
         type: monitor.type ?? "http",
         // Only add optional fields if they are explicitly provided
         ...(monitor.url !== undefined && { url: monitor.url }),
         ...(monitor.host !== undefined && { host: monitor.host }),
         ...(monitor.port !== undefined && { port: monitor.port }),
-        ...(monitor.responseTime !== undefined && { responseTime: monitor.responseTime }),
         ...(monitor.lastChecked !== undefined && { lastChecked: monitor.lastChecked }),
-        ...(monitor.monitoring !== undefined && { monitoring: monitor.monitoring }),
-        ...(monitor.checkInterval !== undefined && { checkInterval: monitor.checkInterval }),
-        ...(monitor.timeout !== undefined && { timeout: monitor.timeout }),
-        ...(monitor.retryAttempts !== undefined && { retryAttempts: monitor.retryAttempts }),
     };
 }
 
@@ -132,7 +139,7 @@ export const monitorOperations = {
     /**
      * Update monitor retry attempts
      */
-    updateRetryAttempts: (monitor: Monitor, retryAttempts: number | undefined): Monitor => ({
+    updateRetryAttempts: (monitor: Monitor, retryAttempts: number): Monitor => ({
         ...monitor,
         retryAttempts,
     }),
@@ -146,7 +153,7 @@ export const monitorOperations = {
     /**
      * Update monitor timeout
      */
-    updateTimeout: (monitor: Monitor, timeout: number | undefined): Monitor => ({
+    updateTimeout: (monitor: Monitor, timeout: number): Monitor => ({
         ...monitor,
         timeout,
     }),

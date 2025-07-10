@@ -130,7 +130,7 @@ export const AddSiteForm = React.memo(function AddSiteForm() {
                         label="Select Site"
                         onChange={setSelectedExistingSite}
                         options={sites.map((site) => ({
-                            label: site.name ?? site.identifier,
+                            label: site.name,
                             value: site.identifier,
                         }))}
                         placeholder="-- Select a site --"

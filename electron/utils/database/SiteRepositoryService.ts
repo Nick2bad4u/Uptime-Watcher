@@ -166,12 +166,10 @@ export class SiteRepositoryService {
 
         const site: Site = {
             identifier: siteRow.identifier,
+            monitoring: true, // Default to monitoring enabled
             monitors: monitors,
+            name: siteRow.name ?? "Unnamed Site", // Provide default name
         };
-
-        if (siteRow.name !== undefined) {
-            site.name = siteRow.name;
-        }
 
         return site;
     }

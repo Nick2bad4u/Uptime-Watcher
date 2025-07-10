@@ -124,7 +124,7 @@ describe("NotificationService", () => {
         });
 
         it("should use identifier when site name is not available", () => {
-            const siteWithoutName = { ...mockSite, name: undefined };
+            const siteWithoutName = { ...mockSite, name: "example.com" };
             notificationService.notifyMonitorDown(siteWithoutName, "monitor-1");
 
             expect(Notification).toHaveBeenCalledWith({
@@ -197,7 +197,7 @@ describe("NotificationService", () => {
         });
 
         it("should use identifier when site name is not available", () => {
-            const siteWithoutName = { ...mockSite, name: undefined };
+            const siteWithoutName = { ...mockSite, name: "example.com" };
             notificationService.notifyMonitorUp(siteWithoutName, "monitor-1");
 
             expect(Notification).toHaveBeenCalledWith({

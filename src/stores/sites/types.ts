@@ -27,9 +27,9 @@ export interface SitesActions {
     /** Update site check interval */
     updateSiteCheckInterval: (siteId: string, monitorId: string, interval: number) => Promise<void>;
     /** Update monitor retry attempts */
-    updateMonitorRetryAttempts: (siteId: string, monitorId: string, retryAttempts: number | undefined) => Promise<void>;
+    updateMonitorRetryAttempts: (siteId: string, monitorId: string, retryAttempts: number) => Promise<void>;
     /** Update monitor timeout */
-    updateMonitorTimeout: (siteId: string, monitorId: string, timeout: number | undefined) => Promise<void>;
+    updateMonitorTimeout: (siteId: string, monitorId: string, timeout: number) => Promise<void>;
     /** Start monitoring for a site monitor */
     startSiteMonitorMonitoring: (siteId: string, monitorId: string) => Promise<void>;
     /** Start monitoring for all monitors of a site */

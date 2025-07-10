@@ -82,7 +82,9 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties) {
     // Always call hooks first, use fallback for currentSite
     const currentSite = sites.find((s) => s.identifier === site.identifier) ?? {
         identifier: site.identifier,
+        monitoring: true, // Default to monitoring enabled
         monitors: [],
+        name: "Unnamed Site", // Provide default name
     };
 
     const monitorIds = currentSite.monitors.map((m) => m.id);
@@ -120,7 +122,7 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties) {
     const [retryAttemptsChanged, setRetryAttemptsChanged] = useState(false);
 
     // Site name state for settings
-    const [localName, setLocalName] = useState(currentSite.name ?? "");
+    const [localName, setLocalName] = useState(currentSite.name);
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
     // Update local state when monitor changes
@@ -129,7 +131,7 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties) {
         setIntervalChanged(false);
         setLocalTimeout(selectedMonitor?.timeout ? selectedMonitor.timeout / 1000 : DEFAULT_REQUEST_TIMEOUT_SECONDS);
         setTimeoutChanged(false);
-        setLocalRetryAttempts(selectedMonitor?.retryAttempts ?? 0);
+        setLocalRetryAttempts(selectedMonitor?.retryAttempts ?? 3);
         setRetryAttemptsChanged(false);
     }, [
         selectedMonitor?.checkInterval,
@@ -141,7 +143,7 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties) {
 
     // Track name changes
     useEffect(() => {
-        setHasUnsavedChanges(localName !== (currentSite.name ?? ""));
+        setHasUnsavedChanges(localName !== currentSite.name);
     }, [localName, currentSite.name]);
 
     // Handler for check now
@@ -188,7 +190,7 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties) {
 
     // Handler for site removal
     const handleRemoveSite = useCallback(async () => {
-        if (!globalThis.confirm(`Are you sure you want to remove ${currentSite.name ?? currentSite.identifier}?`)) {
+        if (!globalThis.confirm(`Are you sure you want to remove ${currentSite.name}?`)) {
             return;
         }
 
@@ -212,7 +214,7 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties) {
         const monitorName = selectedMonitor.url ?? selectedMonitor.host ?? selectedMonitor.type;
         if (
             !globalThis.confirm(
-                `Are you sure you want to remove the monitor "${monitorName}" from ${currentSite.name ?? currentSite.identifier}?`
+                `Are you sure you want to remove the monitor "${monitorName}" from ${currentSite.name}?`
             )
         ) {
             return;

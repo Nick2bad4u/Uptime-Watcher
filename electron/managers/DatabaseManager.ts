@@ -217,8 +217,9 @@ export class DatabaseManager {
         // Convert to Site[] format expected by the interface
         return result.map((site) => ({
             identifier: site.identifier,
+            name: site.name ?? "Unnamed Site",
             monitors: [],
-            ...(site.name && { name: site.name }),
+            monitoring: true,
         }));
     }
 

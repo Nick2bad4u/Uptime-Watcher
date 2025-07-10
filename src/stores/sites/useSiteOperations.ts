@@ -17,7 +17,12 @@ export interface SiteOperationsActions {
     /** Initialize sites data from backend */
     initializeSites: () => Promise<{ success: boolean; sitesLoaded: number; message: string }>;
     /** Create a new site */
-    createSite: (siteData: { identifier: string; name?: string; monitors?: Monitor[] }) => Promise<void>;
+    createSite: (siteData: {
+        identifier: string;
+        name?: string;
+        monitors?: Monitor[];
+        monitoring?: boolean;
+    }) => Promise<void>;
     /** Delete a site */
     deleteSite: (identifier: string) => Promise<void>;
     /** Modify an existing site */
@@ -29,9 +34,9 @@ export interface SiteOperationsActions {
     /** Update site check interval */
     updateSiteCheckInterval: (siteId: string, monitorId: string, interval: number) => Promise<void>;
     /** Update monitor retry attempts */
-    updateMonitorRetryAttempts: (siteId: string, monitorId: string, retryAttempts: number | undefined) => Promise<void>;
+    updateMonitorRetryAttempts: (siteId: string, monitorId: string, retryAttempts: number) => Promise<void>;
     /** Update monitor timeout */
-    updateMonitorTimeout: (siteId: string, monitorId: string, timeout: number | undefined) => Promise<void>;
+    updateMonitorTimeout: (siteId: string, monitorId: string, timeout: number) => Promise<void>;
     /** Download SQLite backup */
     downloadSQLiteBackup: () => Promise<void>;
 }
@@ -92,7 +97,8 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                 const completeSite: Site = {
                     identifier: siteData.identifier,
                     monitors,
-                    name: siteData.name,
+                    monitoring: siteData.monitoring ?? true, // Default to monitoring enabled
+                    name: siteData.name ?? "Unnamed Site", // Provide default name
                 };
 
                 const newSite = await SiteService.addSite(completeSite);
@@ -238,7 +244,7 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
             }
         );
     },
-    updateMonitorRetryAttempts: async (siteId: string, monitorId: string, retryAttempts: number | undefined) => {
+    updateMonitorRetryAttempts: async (siteId: string, monitorId: string, retryAttempts: number) => {
         logStoreAction("SitesStore", "updateMonitorRetryAttempts", { monitorId, retryAttempts, siteId });
 
         await withErrorHandling(
@@ -259,7 +265,7 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
             }
         );
     },
-    updateMonitorTimeout: async (siteId: string, monitorId: string, timeout: number | undefined) => {
+    updateMonitorTimeout: async (siteId: string, monitorId: string, timeout: number) => {
         logStoreAction("SitesStore", "updateMonitorTimeout", { monitorId, siteId, timeout });
 
         await withErrorHandling(

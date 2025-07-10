@@ -30,14 +30,18 @@ export interface MonitorRow {
  */
 export function rowToMonitor(row: Record<string, unknown>): Site["monitors"][0] {
     const monitor: Site["monitors"][0] = {
+        checkInterval: 300_000, // Default 5 minutes
         history: [], // History will be loaded separately
         id: row.id !== undefined ? String(row.id) : "-1",
+        monitoring: true, // Default to monitoring enabled
+        responseTime: -1, // Default to never checked sentinel value
+        retryAttempts: 3, // Default retry attempts
         status: typeof row.status === "string" ? (row.status as "up" | "down" | "pending") : "down",
+        timeout: 5000, // Default timeout
         type: typeof row.type === "string" ? (row.type as Site["monitors"][0]["type"]) : "http",
-        responseTime: 0
     };
 
-    // Add optional properties only if they have valid values
+    // Override defaults with database values if they exist and are valid
     const checkInterval = safeNumberConvert(row.checkInterval);
     if (checkInterval !== undefined) {
         monitor.checkInterval = checkInterval;
@@ -96,11 +100,11 @@ export function buildMonitorParameters(siteIdentifier: string, monitor: Site["mo
 
         monitor.port !== undefined ? Number(monitor.port) : null,
 
-        monitor.checkInterval !== undefined ? Number(monitor.checkInterval) : null,
+        Number(monitor.checkInterval),
 
-        monitor.timeout !== undefined ? Number(monitor.timeout) : null,
+        Number(monitor.timeout),
 
-        monitor.retryAttempts !== undefined ? Number(monitor.retryAttempts) : null,
+        Number(monitor.retryAttempts),
         monitor.monitoring ? 1 : 0,
         monitor.status,
         Number(monitor.responseTime),

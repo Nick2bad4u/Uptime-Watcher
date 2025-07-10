@@ -71,7 +71,9 @@ describe("useSiteActions", () => {
         lastChecked: new Date(),
         monitoring: true,
         responseTime: 150,
+        retryAttempts: 3,
         status: "up",
+        timeout: 5000,
         type: "http",
         url: "https://example.com",
     };
@@ -85,7 +87,9 @@ describe("useSiteActions", () => {
         monitoring: false,
         port: 8080,
         responseTime: 200,
+        retryAttempts: 3,
         status: "down",
+        timeout: 5000,
         type: "port",
     };
 
@@ -126,6 +130,7 @@ describe("useSiteActions", () => {
                 identifier: "test-site-id",
                 monitoring: true,
                 monitors: [],
+                name: "Test Site",
             };
 
             const { result } = renderHook(() => useSiteActions(siteWithoutName, mockHttpMonitor));
@@ -193,6 +198,7 @@ describe("useSiteActions", () => {
                 identifier: "test-site-id",
                 monitoring: true,
                 monitors: [],
+                name: "Test Site",
             };
 
             const { result } = renderHook(() => useSiteActions(siteWithoutName, undefined));
@@ -206,7 +212,7 @@ describe("useSiteActions", () => {
                 undefined,
                 {
                     siteId: "test-site-id",
-                    siteName: undefined,
+                    siteName: "Test Site",
                 }
             );
         });
@@ -296,6 +302,7 @@ describe("useSiteActions", () => {
                 identifier: "test-site-id",
                 monitoring: true,
                 monitors: [],
+                name: "Test Site",
             };
 
             const { result } = renderHook(() => useSiteActions(siteWithoutName, undefined));
@@ -306,7 +313,7 @@ describe("useSiteActions", () => {
 
             expect(logger.error).toHaveBeenCalledWith("Attempted to stop monitoring without valid monitor", undefined, {
                 siteId: "test-site-id",
-                siteName: undefined,
+                siteName: "Test Site",
             });
         });
 
@@ -408,6 +415,7 @@ describe("useSiteActions", () => {
                 identifier: "test-site-id",
                 monitoring: true,
                 monitors: [],
+                name: "Test Site",
             };
 
             const { result } = renderHook(() => useSiteActions(siteWithoutName, undefined));
@@ -418,7 +426,7 @@ describe("useSiteActions", () => {
 
             expect(logger.error).toHaveBeenCalledWith("Attempted to check site without valid monitor", undefined, {
                 siteId: "test-site-id",
-                siteName: undefined,
+                siteName: "Test Site",
             });
         });
 
@@ -528,6 +536,7 @@ describe("useSiteActions", () => {
                 identifier: "test-site-id",
                 monitoring: true,
                 monitors: [],
+                name: "Test Site",
             };
 
             const { result } = renderHook(() => useSiteActions(siteWithoutName, mockHttpMonitor));

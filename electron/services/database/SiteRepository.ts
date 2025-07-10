@@ -92,8 +92,9 @@ export class SiteRepository {
 
             const site: Site = {
                 identifier: siteRow.identifier,
+                name: siteRow.name ?? "Unnamed Site",
                 monitors: monitors,
-                ...(siteRow.name !== undefined && { name: siteRow.name }),
+                monitoring: true,
             };
 
             return site;
@@ -111,8 +112,7 @@ export class SiteRepository {
             const db = this.getDb();
             db.run("INSERT OR REPLACE INTO sites (identifier, name) VALUES (?, ?)", [
                 site.identifier,
-
-                site.name ?? null,
+                site.name,
             ]);
             logger.debug(`[SiteRepository] Upserted site: ${site.identifier}`);
         } catch (error) {

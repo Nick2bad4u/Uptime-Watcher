@@ -43,8 +43,9 @@ export class SiteRepositoryAdapter implements ISiteRepository {
         return Promise.resolve(
             siteData.map((site) => ({
                 identifier: site.identifier,
+                name: site.name ?? "Unnamed Site",
                 monitors: [], // Will be populated by caller if needed
-                ...(site.name && { name: site.name }),
+                monitoring: true,
             }))
         );
     }
