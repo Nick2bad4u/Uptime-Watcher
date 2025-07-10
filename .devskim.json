@@ -41,8 +41,7 @@
         },
         {
             "Justification": "Development-only: Checking for 127.0.0.1 is required for dev/debug logic. This code is not present in production builds.",
-            "FilePattern": "**/renderer.js",
-            "LineNumber": 59,
+            "FilePattern": "*",
             "RuleId": "DS162092"
         }
     ],

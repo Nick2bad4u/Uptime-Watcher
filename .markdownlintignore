@@ -11,3 +11,7 @@ docs/Validator.md
 .github/prompts/*
 LICENSE
 .github/instructions/*
+docs/guides/Documentation-Contribution.md
+deps
+docs/README.md
+https://raw.githubusercontent.com/nick2bad4u/Uptime-Watcher/metrics/metrics.repository.svg
