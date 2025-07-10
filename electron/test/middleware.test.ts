@@ -58,8 +58,12 @@ describe("middleware.ts", () => {
             const next = vi.fn();
             const mw = createMetricsMiddleware({ metricsCallback });
             await mw("eventC", {}, next);
-            expect(metricsCallback).toHaveBeenCalledWith(expect.objectContaining({ name: "events.eventC.count", type: "counter" }));
-            expect(metricsCallback).toHaveBeenCalledWith(expect.objectContaining({ name: "events.eventC.duration", type: "timing" }));
+            expect(metricsCallback).toHaveBeenCalledWith(
+                expect.objectContaining({ name: "events.eventC.count", type: "counter" })
+            );
+            expect(metricsCallback).toHaveBeenCalledWith(
+                expect.objectContaining({ name: "events.eventC.duration", type: "timing" })
+            );
             expect(next).toHaveBeenCalled();
         });
 
@@ -106,7 +110,7 @@ describe("middleware.ts", () => {
             await mw("eventH", {}, next);
             // Second call blocked
             await mw("eventH", {}, next);
-            expect(logger.warn).toHaveBeenCalledWith(expect.stringContaining("burst limit"),);
+            expect(logger.warn).toHaveBeenCalledWith(expect.stringContaining("burst limit"));
             expect(onRateLimit).toHaveBeenCalledWith("eventH", {});
         });
 
@@ -118,7 +122,7 @@ describe("middleware.ts", () => {
             await mw("eventI", {}, next);
             // Second call blocked (simulate within 1s)
             await mw("eventI", {}, next);
-            expect(logger.warn).toHaveBeenCalledWith(expect.stringContaining("rate limit"),);
+            expect(logger.warn).toHaveBeenCalledWith(expect.stringContaining("rate limit"));
             expect(onRateLimit).toHaveBeenCalledWith("eventI", {});
         });
     });
@@ -188,16 +192,14 @@ describe("middleware.ts", () => {
             const mw = createDebugMiddleware({ enabled: true, verbose: true });
             await mw("eventR", { foo: "bar" }, next);
             expect(logger.debug).toHaveBeenCalledWith(
-                expect.stringContaining("Processing event 'eventR'"), 
-                expect.objectContaining({ 
+                expect.stringContaining("Processing event 'eventR'"),
+                expect.objectContaining({
                     event: "eventR",
                     data: { foo: "bar" },
-                    timestamp: expect.any(Number)
+                    timestamp: expect.any(Number),
                 })
             );
-            expect(logger.debug).toHaveBeenCalledWith(
-                expect.stringContaining("Completed event 'eventR' in")
-            );
+            expect(logger.debug).toHaveBeenCalledWith(expect.stringContaining("Completed event 'eventR' in"));
             expect(next).toHaveBeenCalled();
         });
 
@@ -213,8 +215,14 @@ describe("middleware.ts", () => {
     describe("composeMiddleware", () => {
         it("runs all middleware in order", async () => {
             const calls: string[] = [];
-            const mw1 = async (_e: string, _d: unknown, next: () => void) => { calls.push("mw1"); await next(); };
-            const mw2 = async (_e: string, _d: unknown, next: () => void) => { calls.push("mw2"); await next(); };
+            const mw1 = async (_e: string, _d: unknown, next: () => void) => {
+                calls.push("mw1");
+                await next();
+            };
+            const mw2 = async (_e: string, _d: unknown, next: () => void) => {
+                calls.push("mw2");
+                await next();
+            };
             const composed = composeMiddleware(mw1, mw2);
             const next = vi.fn();
             await composed("eventT", {}, next);
@@ -233,7 +241,10 @@ describe("middleware.ts", () => {
     describe("MIDDLEWARE_STACKS", () => {
         it("custom stack composes given middleware", async () => {
             const calls: string[] = [];
-            const mw = async (_e: string, _d: unknown, next: () => void) => { calls.push("custom"); await next(); };
+            const mw = async (_e: string, _d: unknown, next: () => void) => {
+                calls.push("custom");
+                await next();
+            };
             const stack = MIDDLEWARE_STACKS.custom([mw]);
             const next = vi.fn();
             await stack("eventV", {}, next);

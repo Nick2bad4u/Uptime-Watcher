@@ -65,7 +65,7 @@ describe("DatabaseService", () => {
 
         // Get the singleton instance
         databaseService = DatabaseService.getInstance();
-        
+
         // Reset the internal database state by setting _db to undefined
         (databaseService as any)._db = undefined;
     });
@@ -92,15 +92,13 @@ describe("DatabaseService", () => {
             expect(mockLogger.info).toHaveBeenCalledWith(
                 "[DatabaseService] Initializing SQLite DB at: /mock/userData/uptime-watcher.sqlite"
             );
-            expect(mockLogger.info).toHaveBeenCalledWith(
-                "[DatabaseService] Database initialized successfully"
-            );
+            expect(mockLogger.info).toHaveBeenCalledWith("[DatabaseService] Database initialized successfully");
         });
 
         it("should return existing database if already initialized", () => {
             // First initialization
             const db1 = databaseService.initialize();
-            
+
             // Second call should return the same instance
             const db2 = databaseService.initialize();
 
@@ -116,10 +114,7 @@ describe("DatabaseService", () => {
             });
 
             expect(() => databaseService.initialize()).toThrow("Failed to create database");
-            expect(mockLogger.error).toHaveBeenCalledWith(
-                "[DatabaseService] Failed to initialize database",
-                error
-            );
+            expect(mockLogger.error).toHaveBeenCalledWith("[DatabaseService] Failed to initialize database", error);
         });
 
         it("should handle table creation errors", async () => {
@@ -141,16 +136,14 @@ describe("DatabaseService", () => {
         });
 
         it("should throw error when not initialized", () => {
-            expect(() => databaseService.getDatabase()).toThrow(
-                "Database not initialized. Call initialize() first."
-            );
+            expect(() => databaseService.getDatabase()).toThrow("Database not initialized. Call initialize() first.");
         });
     });
 
     describe("downloadBackup", () => {
         it("should create database backup", async () => {
             databaseService.initialize();
-            
+
             const { createDatabaseBackup } = await import("../../../services/database/utils/index");
             const mockBackup = { buffer: Buffer.from("backup"), fileName: "backup.sqlite" };
             vi.mocked(createDatabaseBackup).mockResolvedValue(mockBackup);
@@ -201,7 +194,7 @@ describe("DatabaseService", () => {
             const operationError = new Error("Operation failed");
             const rollbackError = new Error("Rollback failed");
             const operation = vi.fn().mockRejectedValue(operationError);
-            
+
             mockDatabase.run.mockImplementation((sql: string) => {
                 if (sql === "ROLLBACK") {
                     throw rollbackError;
@@ -219,7 +212,7 @@ describe("DatabaseService", () => {
         it("should throw error if database not initialized", async () => {
             const uninitializedService = DatabaseService.getInstance();
             (uninitializedService as any)._db = undefined;
-            
+
             const operation = vi.fn();
 
             await expect(uninitializedService.executeTransaction(operation)).rejects.toThrow(
@@ -231,7 +224,7 @@ describe("DatabaseService", () => {
     describe("close", () => {
         it("should close database connection", () => {
             databaseService.initialize();
-            
+
             databaseService.close();
 
             expect(mockDatabase.close).toHaveBeenCalled();
@@ -246,15 +239,12 @@ describe("DatabaseService", () => {
             });
 
             expect(() => databaseService.close()).toThrow("Close failed");
-            expect(mockLogger.error).toHaveBeenCalledWith(
-                "[DatabaseService] Failed to close database",
-                error
-            );
+            expect(mockLogger.error).toHaveBeenCalledWith("[DatabaseService] Failed to close database", error);
         });
 
         it("should handle multiple close calls gracefully", () => {
             databaseService.initialize();
-            
+
             databaseService.close();
             databaseService.close(); // Second call should be safe
 

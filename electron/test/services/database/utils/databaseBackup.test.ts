@@ -31,7 +31,7 @@ describe("Database Backup Utilities", () => {
         it("should successfully create database backup", async () => {
             const mockBuffer = Buffer.from("mock database content");
             const dbPath = "/path/to/database.sqlite";
-            
+
             mockFs.readFileSync.mockReturnValue(mockBuffer);
 
             const result = await createDatabaseBackup(dbPath);
@@ -46,7 +46,7 @@ describe("Database Backup Utilities", () => {
         it("should handle file read errors", async () => {
             const dbPath = "/path/to/nonexistent.sqlite";
             const error = new Error("File not found");
-            
+
             mockFs.readFileSync.mockImplementation(() => {
                 throw error;
             });
@@ -58,7 +58,7 @@ describe("Database Backup Utilities", () => {
         it("should handle permission errors", async () => {
             const dbPath = "/path/to/protected.sqlite";
             const error = new Error("Permission denied");
-            
+
             mockFs.readFileSync.mockImplementation(() => {
                 throw error;
             });
@@ -69,7 +69,7 @@ describe("Database Backup Utilities", () => {
         it("should handle empty database files", async () => {
             const mockBuffer = Buffer.alloc(0);
             const dbPath = "/path/to/empty.sqlite";
-            
+
             mockFs.readFileSync.mockReturnValue(mockBuffer);
 
             const result = await createDatabaseBackup(dbPath);
@@ -82,7 +82,7 @@ describe("Database Backup Utilities", () => {
         it("should handle large database files", async () => {
             const mockBuffer = Buffer.alloc(1024 * 1024); // 1MB
             const dbPath = "/path/to/large.sqlite";
-            
+
             mockFs.readFileSync.mockReturnValue(mockBuffer);
 
             const result = await createDatabaseBackup(dbPath);
@@ -95,7 +95,7 @@ describe("Database Backup Utilities", () => {
         it("should handle special characters in path", async () => {
             const mockBuffer = Buffer.from("database content");
             const dbPath = "/path/to/database with spaces & special-chars.sqlite";
-            
+
             mockFs.readFileSync.mockReturnValue(mockBuffer);
 
             const result = await createDatabaseBackup(dbPath);
@@ -106,7 +106,7 @@ describe("Database Backup Utilities", () => {
 
         it("should handle undefined/null path gracefully", async () => {
             const error = new Error("Path must be a string");
-            
+
             mockFs.readFileSync.mockImplementation(() => {
                 throw error;
             });
@@ -118,7 +118,7 @@ describe("Database Backup Utilities", () => {
         it("should handle network drive paths", async () => {
             const mockBuffer = Buffer.from("network database content");
             const dbPath = "\\\\server\\share\\database.sqlite";
-            
+
             mockFs.readFileSync.mockReturnValue(mockBuffer);
 
             const result = await createDatabaseBackup(dbPath);
@@ -130,7 +130,7 @@ describe("Database Backup Utilities", () => {
         it("should handle relative paths", async () => {
             const mockBuffer = Buffer.from("relative database content");
             const dbPath = "./database.sqlite";
-            
+
             mockFs.readFileSync.mockReturnValue(mockBuffer);
 
             const result = await createDatabaseBackup(dbPath);
@@ -143,7 +143,7 @@ describe("Database Backup Utilities", () => {
             const originalData = "database content with binary data \0\x01\x02\xFF";
             const mockBuffer = Buffer.from(originalData, "binary");
             const dbPath = "/path/to/binary.sqlite";
-            
+
             mockFs.readFileSync.mockReturnValue(mockBuffer);
 
             const result = await createDatabaseBackup(dbPath);

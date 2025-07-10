@@ -56,7 +56,7 @@ describe("DataBackupService", () => {
             mockDatabaseService.downloadBackup.mockRejectedValue(mockError);
 
             await expect(dataBackupService.downloadDatabaseBackup()).rejects.toThrow(SiteLoadingError);
-            
+
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Failed to download backup: Database connection failed",
                 mockError
@@ -74,11 +74,8 @@ describe("DataBackupService", () => {
             mockDatabaseService.downloadBackup.mockRejectedValue(mockError);
 
             await expect(dataBackupService.downloadDatabaseBackup()).rejects.toThrow(SiteLoadingError);
-            
-            expect(mockLogger.error).toHaveBeenCalledWith(
-                "Failed to download backup: String error",
-                mockError
-            );
+
+            expect(mockLogger.error).toHaveBeenCalledWith("Failed to download backup: String error", mockError);
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith("database:error", {
                 details: "Failed to download backup: String error",
                 error: new Error("String error"),
@@ -91,33 +88,24 @@ describe("DataBackupService", () => {
             mockDatabaseService.downloadBackup.mockRejectedValue(null);
 
             await expect(dataBackupService.downloadDatabaseBackup()).rejects.toThrow(SiteLoadingError);
-            
-            expect(mockLogger.error).toHaveBeenCalledWith(
-                "Failed to download backup: null",
-                null
-            );
+
+            expect(mockLogger.error).toHaveBeenCalledWith("Failed to download backup: null", null);
         });
 
         it("should handle undefined error", async () => {
             mockDatabaseService.downloadBackup.mockRejectedValue(undefined);
 
             await expect(dataBackupService.downloadDatabaseBackup()).rejects.toThrow(SiteLoadingError);
-            
-            expect(mockLogger.error).toHaveBeenCalledWith(
-                "Failed to download backup: undefined",
-                undefined
-            );
+
+            expect(mockLogger.error).toHaveBeenCalledWith("Failed to download backup: undefined", undefined);
         });
 
         it("should handle empty error", async () => {
             mockDatabaseService.downloadBackup.mockRejectedValue("");
 
             await expect(dataBackupService.downloadDatabaseBackup()).rejects.toThrow(SiteLoadingError);
-            
-            expect(mockLogger.error).toHaveBeenCalledWith(
-                "Failed to download backup: ",
-                ""
-            );
+
+            expect(mockLogger.error).toHaveBeenCalledWith("Failed to download backup: ", "");
         });
 
         it("should handle complex error objects", async () => {
@@ -125,11 +113,8 @@ describe("DataBackupService", () => {
             mockDatabaseService.downloadBackup.mockRejectedValue(complexError);
 
             await expect(dataBackupService.downloadDatabaseBackup()).rejects.toThrow(SiteLoadingError);
-            
-            expect(mockLogger.error).toHaveBeenCalledWith(
-                "Failed to download backup: [object Object]",
-                complexError
-            );
+
+            expect(mockLogger.error).toHaveBeenCalledWith("Failed to download backup: [object Object]", complexError);
         });
 
         it("should handle empty buffer in response", async () => {
@@ -258,17 +243,12 @@ describe("DataBackupOrchestrator", () => {
 
             const result = await dataBackupOrchestrator.refreshSitesFromCache(mockSiteCache);
 
-            expect(result).toEqual([
-                { identifier: "site1" },
-                { identifier: "site2" },
-            ]);
+            expect(result).toEqual([{ identifier: "site1" }, { identifier: "site2" }]);
         });
 
         it("should handle sites with empty string names", async () => {
             const mockSiteCache: ISiteCache = {
-                entries: vi.fn().mockReturnValue([
-                    ["site1", { identifier: "site1", name: "", monitors: [] }],
-                ]),
+                entries: vi.fn().mockReturnValue([["site1", { identifier: "site1", name: "", monitors: [] }]]),
                 get: vi.fn(),
                 set: vi.fn(),
                 delete: vi.fn(),
@@ -278,9 +258,7 @@ describe("DataBackupOrchestrator", () => {
 
             const result = await dataBackupOrchestrator.refreshSitesFromCache(mockSiteCache);
 
-            expect(result).toEqual([
-                { identifier: "site1", name: "" },
-            ]);
+            expect(result).toEqual([{ identifier: "site1", name: "" }]);
         });
 
         it("should handle cache iteration errors", async () => {
@@ -295,8 +273,7 @@ describe("DataBackupOrchestrator", () => {
                 size: vi.fn(),
             };
 
-            await expect(dataBackupOrchestrator.refreshSitesFromCache(mockSiteCache))
-                .rejects.toThrow(SiteLoadingError);
+            await expect(dataBackupOrchestrator.refreshSitesFromCache(mockSiteCache)).rejects.toThrow(SiteLoadingError);
         });
 
         it("should handle non-Error exceptions in cache operations", async () => {
@@ -312,8 +289,7 @@ describe("DataBackupOrchestrator", () => {
                 size: vi.fn(),
             };
 
-            const error = await dataBackupOrchestrator.refreshSitesFromCache(mockSiteCache)
-                .catch(e => e);
+            const error = await dataBackupOrchestrator.refreshSitesFromCache(mockSiteCache).catch((e) => e);
 
             expect(error).toBeInstanceOf(SiteLoadingError);
             expect(error.message).toContain("String error");
@@ -321,14 +297,17 @@ describe("DataBackupOrchestrator", () => {
 
         it("should handle large number of sites", async () => {
             const entries: Array<[string, any]> = [];
-            
+
             // Add 1000 sites
             for (let i = 0; i < 1000; i++) {
-                entries.push([`site${i}`, { 
-                    identifier: `site${i}`, 
-                    name: `Site ${i}`,
-                    monitors: []
-                }]);
+                entries.push([
+                    `site${i}`,
+                    {
+                        identifier: `site${i}`,
+                        name: `Site ${i}`,
+                        monitors: [],
+                    },
+                ]);
             }
 
             const mockSiteCache: ISiteCache = {

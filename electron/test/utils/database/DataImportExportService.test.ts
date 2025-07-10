@@ -91,10 +91,7 @@ describe("DataImportExportService", () => {
 
             await expect(dataImportExportService.exportAllData()).rejects.toThrow(SiteLoadingError);
 
-            expect(mockLogger.error).toHaveBeenCalledWith(
-                "Failed to export data: Site export failed",
-                error
-            );
+            expect(mockLogger.error).toHaveBeenCalledWith("Failed to export data: Site export failed", error);
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith("database:error", {
                 details: "Failed to export data: Site export failed",
                 error,
@@ -112,10 +109,7 @@ describe("DataImportExportService", () => {
 
             await expect(dataImportExportService.exportAllData()).rejects.toThrow(SiteLoadingError);
 
-            expect(mockLogger.error).toHaveBeenCalledWith(
-                "Failed to export data: Settings export failed",
-                error
-            );
+            expect(mockLogger.error).toHaveBeenCalledWith("Failed to export data: Settings export failed", error);
         });
 
         it("should handle non-Error objects", async () => {
@@ -128,10 +122,7 @@ describe("DataImportExportService", () => {
 
             await expect(dataImportExportService.exportAllData()).rejects.toThrow(SiteLoadingError);
 
-            expect(mockLogger.error).toHaveBeenCalledWith(
-                "Failed to export data: String error",
-                expect.any(Error)
-            );
+            expect(mockLogger.error).toHaveBeenCalledWith("Failed to export data: String error", expect.any(Error));
         });
 
         it("should handle empty sites and settings", async () => {
@@ -271,9 +262,7 @@ describe("DataImportExportService", () => {
                 { identifier: "site2", name: "Site 2" },
             ]);
             expect(mockRepositories.settings.bulkInsert).toHaveBeenCalledWith(settings);
-            expect(mockLogger.info).toHaveBeenCalledWith(
-                "Successfully imported 2 sites and 2 settings"
-            );
+            expect(mockLogger.info).toHaveBeenCalledWith("Successfully imported 2 sites and 2 settings");
         });
 
         it("should handle sites with monitors", async () => {
@@ -281,9 +270,7 @@ describe("DataImportExportService", () => {
                 {
                     identifier: "site1",
                     name: "Site 1",
-                    monitors: [
-                        { id: "monitor1", type: "http", url: "https://example.com" },
-                    ],
+                    monitors: [{ id: "monitor1", type: "http", url: "https://example.com" }],
                 },
             ];
             const settings = {};
@@ -308,12 +295,11 @@ describe("DataImportExportService", () => {
 
             mockDatabaseService.executeTransaction.mockRejectedValue(error);
 
-            await expect(dataImportExportService.persistImportedData(sites, settings)).rejects.toThrow(SiteLoadingError);
-
-            expect(mockLogger.error).toHaveBeenCalledWith(
-                "Failed to persist imported data: Transaction failed",
-                error
+            await expect(dataImportExportService.persistImportedData(sites, settings)).rejects.toThrow(
+                SiteLoadingError
             );
+
+            expect(mockLogger.error).toHaveBeenCalledWith("Failed to persist imported data: Transaction failed", error);
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith("database:error", {
                 details: "Failed to persist imported data: Transaction failed",
                 error,
@@ -335,9 +321,7 @@ describe("DataImportExportService", () => {
 
             expect(mockRepositories.site.bulkInsert).toHaveBeenCalledWith([]);
             expect(mockRepositories.settings.bulkInsert).toHaveBeenCalledWith({});
-            expect(mockLogger.info).toHaveBeenCalledWith(
-                "Successfully imported 0 sites and 0 settings"
-            );
+            expect(mockLogger.info).toHaveBeenCalledWith("Successfully imported 0 sites and 0 settings");
         });
 
         it("should handle sites without monitors", async () => {
@@ -358,9 +342,7 @@ describe("DataImportExportService", () => {
         });
 
         it("should handle sites with empty monitors array", async () => {
-            const sites = [
-                { identifier: "site1", name: "Site 1", monitors: [] },
-            ];
+            const sites = [{ identifier: "site1", name: "Site 1", monitors: [] }];
             const settings = {};
 
             mockDatabaseService.executeTransaction.mockImplementation((callback: () => void) => {
@@ -384,7 +366,9 @@ describe("DataImportExportService", () => {
                 throw error;
             });
 
-            await expect(dataImportExportService.persistImportedData(sites, settings)).rejects.toThrow(SiteLoadingError);
+            await expect(dataImportExportService.persistImportedData(sites, settings)).rejects.toThrow(
+                SiteLoadingError
+            );
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Failed to persist imported data: String error",

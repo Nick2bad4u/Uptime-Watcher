@@ -12,13 +12,11 @@ describe("Database Schema", () => {
 
     it("should create tables", () => {
         mockDatabase.run.mockReturnValue(undefined);
-        
+
         createDatabaseTables(mockDatabase as any);
-        
+
         expect(mockDatabase.run).toHaveBeenCalled();
-        expect(mockDatabase.run).toHaveBeenCalledWith(
-            expect.stringContaining("CREATE TABLE IF NOT EXISTS sites")
-        );
+        expect(mockDatabase.run).toHaveBeenCalledWith(expect.stringContaining("CREATE TABLE IF NOT EXISTS sites"));
     });
 
     it("should handle errors", () => {

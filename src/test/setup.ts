@@ -77,12 +77,12 @@ Object.defineProperty(window, "matchMedia", {
 
 // Mock electron-log for logging
 vi.mock("electron-log", () => ({
-  default: {
-    debug: vi.fn(),
-    info: vi.fn(),
-    error: vi.fn(),
-    warn: vi.fn(),
-  },
+    default: {
+        debug: vi.fn(),
+        info: vi.fn(),
+        error: vi.fn(),
+        warn: vi.fn(),
+    },
 }));
 
 // Export mock for use in individual tests

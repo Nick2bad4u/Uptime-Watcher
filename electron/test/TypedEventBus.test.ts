@@ -9,7 +9,7 @@ vi.mock("../utils/index", () => ({
         warn: vi.fn(),
         error: vi.fn(),
     },
-    generateCorrelationId: () => "test-correlation-id"
+    generateCorrelationId: () => "test-correlation-id",
 }));
 
 type TestEvents = {
@@ -37,7 +37,7 @@ describe("TypedEventBus", () => {
         expect(callArg._meta).toMatchObject({
             busId: "test-bus",
             correlationId: "test-correlation-id",
-            eventName: "foo"
+            eventName: "foo",
         });
         expect(typeof callArg._meta.timestamp).toBe("number");
     });
@@ -96,7 +96,9 @@ describe("TypedEventBus", () => {
     });
 
     it("removes and clears middleware", async () => {
-        const mw: EventMiddleware = vi.fn(async (event, data, next) => { await next(); });
+        const mw: EventMiddleware = vi.fn(async (event, data, next) => {
+            await next();
+        });
         bus.use(mw);
         expect(bus.removeMiddleware(mw)).toBe(true);
         expect(bus.removeMiddleware(mw)).toBe(false);
@@ -112,7 +114,9 @@ describe("TypedEventBus", () => {
 
     it("handles middleware errors and logs them", async () => {
         const error = new Error("middleware fail");
-        const mw: EventMiddleware = async () => { throw error; };
+        const mw: EventMiddleware = async () => {
+            throw error;
+        };
         bus.use(mw);
 
         await expect(bus.emitTyped("foo", { value: 1 })).rejects.toThrow("middleware fail");
@@ -125,7 +129,7 @@ describe("TypedEventBus", () => {
         expect(handler).toHaveBeenCalledWith(
             expect.objectContaining({
                 value: "hello",
-                _meta: expect.any(Object)
+                _meta: expect.any(Object),
             })
         );
     });
@@ -133,7 +137,9 @@ describe("TypedEventBus", () => {
     it("getDiagnostics returns correct info", () => {
         const handler = () => {};
         bus.onTyped("foo", handler);
-        bus.use(async (e, d, n) => { await n(); });
+        bus.use(async (e, d, n) => {
+            await n();
+        });
 
         const diag = bus.getDiagnostics();
         expect(diag.busId).toBe("test-bus");

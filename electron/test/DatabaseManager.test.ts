@@ -11,7 +11,7 @@ const {
     mockCreateDataImportExportOrchestrator,
     mockCreateDataBackupOrchestrator,
     mockSetHistoryLimitUtil,
-    mockGetHistoryLimitUtil
+    mockGetHistoryLimitUtil,
 } = vi.hoisted(() => {
     const mockEmitTyped = vi.fn(() => Promise.resolve());
     const mockInitDatabase = vi.fn(async (db, callback, eventEmitter) => {
@@ -21,7 +21,7 @@ const {
         }
     });
     const mockCreateSiteCache = vi.fn(() => new Map());
-    
+
     // Create the orchestrator instance once so we can track calls
     const mockSiteLoadingOrchestrator = {
         loadSitesFromDatabase: vi.fn(async (cache, config) => {
@@ -30,7 +30,7 @@ const {
             const mockSite2 = { identifier: "site2", name: "Site 2", monitors: [] };
             cache.set("site1", mockSite1);
             cache.set("site2", mockSite2);
-            
+
             return {
                 success: true,
                 message: "",
@@ -38,14 +38,17 @@ const {
             };
         }),
     };
-    
+
     const mockCreateSiteLoadingOrchestrator = vi.fn(() => mockSiteLoadingOrchestrator);
     const mockCreateDataImportExportOrchestrator = vi.fn(() => ({
         exportData: vi.fn(async () => '{"mock":"data"}'),
         importData: vi.fn(async (_data, _cache, _cb) => ({ success: true })),
     }));
     const mockCreateDataBackupOrchestrator = vi.fn(() => ({
-        downloadBackup: vi.fn(async () => ({ buffer: Buffer.from("backup"), fileName: "uptime-watcher-backup.sqlite" })),
+        downloadBackup: vi.fn(async () => ({
+            buffer: Buffer.from("backup"),
+            fileName: "uptime-watcher-backup.sqlite",
+        })),
         refreshSitesFromCache: vi.fn(async (_cache) => [
             { identifier: "site1", name: "Site 1" },
             { identifier: "site2", name: "Site 2" },
@@ -65,13 +68,13 @@ const {
         mockCreateDataImportExportOrchestrator,
         mockCreateDataBackupOrchestrator,
         mockSetHistoryLimitUtil,
-        mockGetHistoryLimitUtil
+        mockGetHistoryLimitUtil,
     };
 });
 
 // Use vi.hoisted to ensure mocks are set up before module imports
 vi.mock("../utils", async (importOriginal) => {
-    const actual = await importOriginal() as any;
+    const actual = (await importOriginal()) as any;
     return {
         ...actual,
         initDatabase: mockInitDatabase,
@@ -114,7 +117,7 @@ vi.mock("../services", () => ({
     })),
     SettingsRepository: vi.fn(() => ({
         get: vi.fn((key) => {
-            if (key === 'historyLimit') return Promise.resolve({ value: '500' });
+            if (key === "historyLimit") return Promise.resolve({ value: "500" });
             return Promise.resolve(null);
         }),
         set: vi.fn(),
@@ -151,7 +154,7 @@ const createManager = () => {
 
     const mockSettingsRepository = {
         get: vi.fn((key) => {
-            if (key === 'historyLimit') return Promise.resolve({ value: '500' });
+            if (key === "historyLimit") return Promise.resolve({ value: "500" });
             return Promise.resolve(null);
         }),
         set: vi.fn(),
@@ -179,39 +182,51 @@ describe("DatabaseManager", () => {
         const manager = createManager();
         await manager.initialize();
         expect(mockInitDatabase).toHaveBeenCalled();
-        expect(mockEmitTyped).toHaveBeenCalledWith("database:transaction-completed", expect.objectContaining({
-            operation: "database:initialize",
-            success: true,
-        }));
+        expect(mockEmitTyped).toHaveBeenCalledWith(
+            "database:transaction-completed",
+            expect.objectContaining({
+                operation: "database:initialize",
+                success: true,
+            })
+        );
     });
 
     it("loads sites and emits update-sites-cache-requested", async () => {
         const manager = createManager();
         await manager["loadSites"]();
         expect(mockSiteLoadingOrchestrator.loadSitesFromDatabase).toHaveBeenCalled();
-        expect(mockEmitTyped).toHaveBeenCalledWith("internal:database:update-sites-cache-requested", expect.objectContaining({
-            operation: "update-sites-cache-requested",
-        }));
+        expect(mockEmitTyped).toHaveBeenCalledWith(
+            "internal:database:update-sites-cache-requested",
+            expect.objectContaining({
+                operation: "update-sites-cache-requested",
+            })
+        );
     });
 
     it("exports data and emits data-exported", async () => {
         const manager = createManager();
         const result = await manager.exportData();
         expect(result).toBe('{"mock":"data"}');
-        expect(mockEmitTyped).toHaveBeenCalledWith("internal:database:data-exported", expect.objectContaining({
-            operation: "data-exported",
-            success: true,
-        }));
+        expect(mockEmitTyped).toHaveBeenCalledWith(
+            "internal:database:data-exported",
+            expect.objectContaining({
+                operation: "data-exported",
+                success: true,
+            })
+        );
     });
 
     it("imports data and emits data-imported", async () => {
         const manager = createManager();
         const result = await manager.importData('{"mock":"data"}');
         expect(result).toBe(true);
-        expect(mockEmitTyped).toHaveBeenCalledWith("internal:database:data-imported", expect.objectContaining({
-            operation: "data-imported",
-            success: true,
-        }));
+        expect(mockEmitTyped).toHaveBeenCalledWith(
+            "internal:database:data-imported",
+            expect.objectContaining({
+                operation: "data-imported",
+                success: true,
+            })
+        );
     });
 
     it("downloads backup and emits backup-downloaded", async () => {
@@ -219,10 +234,13 @@ describe("DatabaseManager", () => {
         const result = await manager.downloadBackup();
         expect(result.fileName).toBe("uptime-watcher-backup.sqlite");
         expect(result.buffer).toBeInstanceOf(Buffer);
-        expect(mockEmitTyped).toHaveBeenCalledWith("internal:database:backup-downloaded", expect.objectContaining({
-            operation: "backup-downloaded",
-            success: true,
-        }));
+        expect(mockEmitTyped).toHaveBeenCalledWith(
+            "internal:database:backup-downloaded",
+            expect.objectContaining({
+                operation: "backup-downloaded",
+                success: true,
+            })
+        );
     });
 
     it("refreshes sites and emits sites-refreshed", async () => {
@@ -231,20 +249,26 @@ describe("DatabaseManager", () => {
         expect(Array.isArray(result)).toBe(true);
         expect(result.length).toBe(2);
         expect(result[0]).toMatchObject({ identifier: "site1" });
-        expect(mockEmitTyped).toHaveBeenCalledWith("internal:database:sites-refreshed", expect.objectContaining({
-            operation: "sites-refreshed",
-            siteCount: 2,
-        }));
+        expect(mockEmitTyped).toHaveBeenCalledWith(
+            "internal:database:sites-refreshed",
+            expect.objectContaining({
+                operation: "sites-refreshed",
+                siteCount: 2,
+            })
+        );
     });
 
     it("sets history limit and emits history-limit-updated", async () => {
         const manager = createManager();
         await manager.setHistoryLimit(123);
         expect(mockSetHistoryLimitUtil).toHaveBeenCalled();
-        expect(mockEmitTyped).toHaveBeenCalledWith("internal:database:history-limit-updated", expect.objectContaining({
-            limit: 123,
-            operation: "history-limit-updated",
-        }));
+        expect(mockEmitTyped).toHaveBeenCalledWith(
+            "internal:database:history-limit-updated",
+            expect.objectContaining({
+                limit: 123,
+                operation: "history-limit-updated",
+            })
+        );
     });
 
     it("gets current history limit", () => {

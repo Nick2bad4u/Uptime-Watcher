@@ -7,7 +7,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 import type { Site, Monitor } from "../types";
 
-
 // Mock all dependencies
 vi.mock("../stores", () => ({
     useErrorStore: vi.fn(),

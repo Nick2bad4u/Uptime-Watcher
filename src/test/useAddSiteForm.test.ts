@@ -486,11 +486,28 @@ describe("useAddSiteForm", () => {
             const { result } = renderHook(() => useAddSiteForm());
 
             const expectedProperties = [
-                "url", "host", "port", "name", "monitorType", "checkInterval",
-                "siteId", "addMode", "selectedExistingSite", "formError", "isFormValid",
-                "setUrl", "setHost", "setPort", "setName", "setMonitorType",
-                "setCheckInterval", "setSiteId", "setAddMode", "setSelectedExistingSite",
-                "setFormError", "resetForm"
+                "url",
+                "host",
+                "port",
+                "name",
+                "monitorType",
+                "checkInterval",
+                "siteId",
+                "addMode",
+                "selectedExistingSite",
+                "formError",
+                "isFormValid",
+                "setUrl",
+                "setHost",
+                "setPort",
+                "setName",
+                "setMonitorType",
+                "setCheckInterval",
+                "setSiteId",
+                "setAddMode",
+                "setSelectedExistingSite",
+                "setFormError",
+                "resetForm",
             ];
 
             for (const property of expectedProperties) {

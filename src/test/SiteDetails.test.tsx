@@ -32,7 +32,7 @@ vi.mock("chart.js", () => ({
 }));
 
 vi.mock("chartjs-plugin-zoom", () => ({
-  default: {},
+    default: {},
 }));
 vi.mock("chartjs-adapter-date-fns", () => ({}));
 
@@ -68,41 +68,37 @@ vi.mock("../components/SiteDetails/SiteDetailsHeader", () => ({
 }));
 
 vi.mock("../components/SiteDetails/SiteDetailsNavigation", () => ({
-    SiteDetailsNavigation: ({ 
-        activeSiteDetailsTab, 
-        setActiveSiteDetailsTab, 
-        selectedMonitorId 
-    }: any) => (
+    SiteDetailsNavigation: ({ activeSiteDetailsTab, setActiveSiteDetailsTab, selectedMonitorId }: any) => (
         <div data-testid="site-details-navigation">
-            <button 
+            <button
                 onClick={() => setActiveSiteDetailsTab("site-overview")}
                 data-testid="nav-site-overview"
                 className={activeSiteDetailsTab === "site-overview" ? "active" : ""}
             >
                 Site Overview
             </button>
-            <button 
+            <button
                 onClick={() => setActiveSiteDetailsTab("monitor-overview")}
                 data-testid="nav-monitor-overview"
                 className={activeSiteDetailsTab === "monitor-overview" ? "active" : ""}
             >
                 Monitor Overview
             </button>
-            <button 
+            <button
                 onClick={() => setActiveSiteDetailsTab(`${selectedMonitorId}-analytics`)}
                 data-testid="nav-analytics"
                 className={activeSiteDetailsTab === `${selectedMonitorId}-analytics` ? "active" : ""}
             >
                 Analytics
             </button>
-            <button 
+            <button
                 onClick={() => setActiveSiteDetailsTab("history")}
                 data-testid="nav-history"
                 className={activeSiteDetailsTab === "history" ? "active" : ""}
             >
                 History
             </button>
-            <button 
+            <button
                 onClick={() => setActiveSiteDetailsTab("settings")}
                 data-testid="nav-settings"
                 className={activeSiteDetailsTab === "settings" ? "active" : ""}
@@ -392,7 +388,7 @@ describe("SiteDetails", () => {
             render(<SiteDetails site={mockSite} onClose={mockOnClose} />);
 
             const toggleButton = screen.getByTestId("toggle-collapse");
-            
+
             // Initially expanded
             expect(toggleButton).toHaveTextContent("Collapse");
 
@@ -494,7 +490,7 @@ describe("SiteDetails", () => {
             render(<SiteDetails site={mockSite} onClose={mockOnClose} />);
 
             const background = screen.getByLabelText("Close modal");
-            
+
             // Test escape key
             fireEvent.keyDown(background, { key: "Escape" });
             expect(mockOnClose).toHaveBeenCalledTimes(1);

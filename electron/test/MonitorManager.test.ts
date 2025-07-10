@@ -15,7 +15,7 @@ const {
     mockCheckSiteManually,
     mockCheckMonitor,
     mockMonitorScheduler,
-    mockLogger
+    mockLogger,
 } = vi.hoisted(() => {
     const mockEmitTyped = vi.fn(() => Promise.resolve());
     const mockPerformInitialMonitorChecks = vi.fn(async () => {});
@@ -29,7 +29,7 @@ const {
         responseTime: 100,
         statusCode: 200,
         timestamp: Date.now(),
-        message: "OK"
+        message: "OK",
     }));
     const mockCheckMonitor = vi.fn(async () => ({
         monitorId: "monitor1",
@@ -37,7 +37,7 @@ const {
         responseTime: 100,
         statusCode: 200,
         timestamp: Date.now(),
-        message: "OK"
+        message: "OK",
     }));
 
     const mockMonitorScheduler = {
@@ -63,13 +63,13 @@ const {
         mockCheckSiteManually,
         mockCheckMonitor,
         mockMonitorScheduler,
-        mockLogger
+        mockLogger,
     };
 });
 
 // Mock the utils module
 vi.mock("../utils", async (importOriginal) => {
-    const actual = await importOriginal() as any;
+    const actual = (await importOriginal()) as any;
     return {
         ...actual,
         monitorLogger: mockLogger,
@@ -378,11 +378,7 @@ describe("MonitorManager", () => {
         it("should perform manual check for a specific monitor", async () => {
             const result = await manager.checkSiteManually("site1", "monitor1");
 
-            expect(mockCheckSiteManually).toHaveBeenCalledWith(
-                expect.any(Object),
-                "site1",
-                "monitor1"
-            );
+            expect(mockCheckSiteManually).toHaveBeenCalledWith(expect.any(Object), "site1", "monitor1");
             expect(result).toBeDefined();
         });
 
@@ -419,17 +415,13 @@ describe("MonitorManager", () => {
 
             await manager.setupSiteForMonitoring(site);
 
-            expect(mockPerformInitialMonitorChecks).toHaveBeenCalledWith(
-                site,
-                expect.any(Function),
-                mockLogger
-            );
+            expect(mockPerformInitialMonitorChecks).toHaveBeenCalledWith(site, expect.any(Function), mockLogger);
         });
 
         it("should apply default intervals for monitors without checkInterval", async () => {
             const site = createMockSite("testSite", [
                 { id: "monitor1", checkInterval: undefined },
-                { id: "monitor2", checkInterval: 30000 }
+                { id: "monitor2", checkInterval: 30000 },
             ]);
 
             await manager.setupSiteForMonitoring(site);
@@ -470,9 +462,7 @@ describe("MonitorManager", () => {
 
     describe("business logic - default intervals", () => {
         it("should not apply default interval if monitor already has one", async () => {
-            const site = createMockSite("testSite", [
-                { id: "monitor1", checkInterval: 30000 }
-            ]);
+            const site = createMockSite("testSite", [{ id: "monitor1", checkInterval: 30000 }]);
 
             await manager.setupSiteForMonitoring(site);
 
@@ -480,9 +470,7 @@ describe("MonitorManager", () => {
         });
 
         it("should apply default interval to monitor without checkInterval", async () => {
-            const site = createMockSite("testSite", [
-                { id: "monitor1", checkInterval: undefined }
-            ]);
+            const site = createMockSite("testSite", [{ id: "monitor1", checkInterval: undefined }]);
 
             await manager.setupSiteForMonitoring(site);
 
@@ -621,9 +609,7 @@ describe("MonitorManager", () => {
         it("should handle errors in database operations", async () => {
             mockDatabaseService.executeTransaction.mockRejectedValueOnce(new Error("DB Error"));
 
-            const site = createMockSite("testSite", [
-                { id: "monitor1", checkInterval: undefined }
-            ]);
+            const site = createMockSite("testSite", [{ id: "monitor1", checkInterval: undefined }]);
 
             await expect(manager.setupSiteForMonitoring(site)).rejects.toThrow("DB Error");
         });
