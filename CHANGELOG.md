@@ -7,9 +7,52 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[0b5c883](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0b5c883693ef6d218c70f87e780be56991d02fdf)...
+[0b5c883](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0b5c883693ef6d218c70f87e780be56991d02fdf)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/0b5c883693ef6d218c70f87e780be56991d02fdf...0b5c883693ef6d218c70f87e780be56991d02fdf))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 6.4.0 [`(0b5c883)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0b5c883693ef6d218c70f87e780be56991d02fdf)
+
+
+
+
+
+
+## [6.4.0] - 2025-07-10
+
+
+[[063d3e4](https://github.com/Nick2bad4u/Uptime-Watcher/commit/063d3e4ca647320ca78ecdd5e408d79aa9d7e8e3)...
+[4bb41cf](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4bb41cf231a7b54791374d087a532d6b194444b1)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/063d3e4ca647320ca78ecdd5e408d79aa9d7e8e3...4bb41cf231a7b54791374d087a532d6b194444b1))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 6.3.0 [`(063d3e4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/063d3e4ca647320ca78ecdd5e408d79aa9d7e8e3)
+
+
+
+### � Documentation
+
+- 📝 [docs] Correct typo and remove redundant ESLint comment
+
+- Fixes documentation typo for improved clarity in component description
+- Removes unnecessary comment intended to satisfy ESLint, as explicit return is no longer required [`(4bb41cf)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4bb41cf231a7b54791374d087a532d6b194444b1)
+
+
+
+
+
+
+## [6.3.0] - 2025-07-10
+
+
 [[354d522](https://github.com/Nick2bad4u/Uptime-Watcher/commit/354d5226c936e2c8718204ecd8273ac8879cf421)...
-[7e8c6e1](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7e8c6e1d608a821a77328e178949898592f43b0e)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/354d5226c936e2c8718204ecd8273ac8879cf421...7e8c6e1d608a821a77328e178949898592f43b0e))
+[f3c207d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f3c207db31b94ecf3f74126ccb62b35386af2765)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/354d5226c936e2c8718204ecd8273ac8879cf421...f3c207db31b94ecf3f74126ccb62b35386af2765))
 
 
 ### �️ Bug Fixes
@@ -24,6 +67,27 @@ All notable changes to this project will be documented in this file.
 ### 📦 Dependencies
 
 - [dependency] Update version 6.2.0 [`(354d522)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/354d5226c936e2c8718204ecd8273ac8879cf421)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(f3c207d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f3c207db31b94ecf3f74126ccb62b35386af2765)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Extract theme property application into helper methods
+
+- Improves maintainability by modularizing logic for applying colors, typography, spacing, shadows, and border radius as CSS custom properties
+- Enhances readability and simplifies future extension by moving direct property application code into dedicated private methods [`(e81a89c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e81a89c033a35b27b98da77b847e23b16e3d3254)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v6.2.0 [skip ci] [`(976e06d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/976e06dae8bc10477bbc0d7a54de8a3e0891d18b)
 
 
 
