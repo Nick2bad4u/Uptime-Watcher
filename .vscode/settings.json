@@ -6,7 +6,7 @@
     "typescript.suggest.autoImports": true,
     "typescript.tsserver.experimental.enableProjectDiagnostics": true,
     "typescript.tsserver.exclude": ["**/node_modules/**"],
-    // Exclude node_modules from TypeScript checks and problems
+    // Exclude from TypeScript checks and problems
     "typescript.check.npmIsInstalled": false,
     "typescript.workspaceSymbols.excludeLibrarySymbols": true,
     // ESLint exclusions
@@ -148,5 +148,5 @@
     "sonarlint.connectedMode.project": {
         "connectionId": "nick2bad4u",
         "projectKey": "Nick2bad4u_Uptime-Watcher"
-    },
+    }
 }

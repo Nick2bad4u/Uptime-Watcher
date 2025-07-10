@@ -54,6 +54,12 @@
             "options": {
                 "tabWidth": 1
             }
+        },
+        {
+            "files": ["**/package.json", "**/package-lock.json"],
+            "options": {
+                "requirePragma": true
+            }
         }
     ]
 }
