@@ -67,6 +67,7 @@ settings (key PK, value, updated_at)
 22. **Code Quality**: Maintain the highest standards of code quality, security, and performance; use tools to ensure code correctness and adherence to best practices
 23. **Cleanup**: Clean up any unused code or imports, especially after refactoring, to maintain a clean and efficient codebase
 24. **Incremental Development**: Break down tasks into smaller, manageable pieces; focus on completing each task thoroughly before moving on to the next
+25. **TSDoc Comments**: Use TSDoc comments for all public APIs and complex logic to ensure clarity and maintainability (Use the Base TSDoc style)
 
 ## When Making Changes
 

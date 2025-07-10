@@ -52,8 +52,6 @@ class Main {
 }
 
 // Start the application
-// eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
-const mainApp = new Main();
 // which is intentional in this case since we just need to keep the reference
 // alive to prevent garbage collection.
 new Main();
