@@ -1,4 +1,5 @@
-@import url("tailwindcss");
+/* stylelint-disable-next-line import-notation -- This is the proper way for Tailwind CSS */
+@import "tailwindcss";
 
 :root {
     /* Define gray color palette for compatibility */
@@ -87,10 +88,7 @@ body {
     .status-indicator {
         display: inline-flex;
         align-items: center;
-        padding-left: 0.5rem;
-        padding-right: 0.5rem;
-        padding-top: 0.25rem;
-        padding-bottom: 0.25rem;
+        padding: 0.25rem 0.5rem;
         border-radius: 9999px;
         font-size: 0.75rem;
         font-weight: 500;

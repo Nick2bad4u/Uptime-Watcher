@@ -70,7 +70,7 @@
 }
 
 /* Responsive header adjustments */
-@media (max-width: 1024px) {
+@media (width <= 1024px) {
     .site-details-header-content {
         gap: var(--spacing-lg);
         padding-left: var(--spacing-lg);
@@ -78,7 +78,7 @@
     }
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .site-details-header-content {
         flex-direction: column;
         align-items: flex-start;
@@ -94,7 +94,7 @@
     }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
     .site-details-header {
         padding: var(--spacing-lg);
     }

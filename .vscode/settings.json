@@ -13,6 +13,7 @@
     "eslint.workingDirectories": ["."],
     "eslint.ignoreUntitled": true,
     "http.proxySupport": "off",
+    "css.lint.importStatement": "ignore",
     "eslint.validate": [
         "javascript",
         "javascriptreact",
@@ -147,5 +148,5 @@
     "sonarlint.connectedMode.project": {
         "connectionId": "nick2bad4u",
         "projectKey": "Nick2bad4u_Uptime-Watcher"
-    }
+    },
 }
