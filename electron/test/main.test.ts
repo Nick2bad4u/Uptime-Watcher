@@ -67,7 +67,7 @@ describe("Electron Main Process", () => {
         }));
 
         // Reset process listeners
-        process.removeAllListeners("before-exit");
+        process.removeAllListeners("beforeExit");
     });
 
     describe("Application Initialization", () => {
@@ -108,17 +108,17 @@ describe("Electron Main Process", () => {
     });
 
     describe("Process Event Handlers", () => {
-        it("should setup before-exit event handler", async () => {
+        it("should setup beforeExit event handler", async () => {
             const mockOn = vi.spyOn(process, "on");
 
             await import("../main");
 
-            expect(mockOn).toHaveBeenCalledWith("before-exit", expect.any(Function));
+            expect(mockOn).toHaveBeenCalledWith("beforeExit", expect.any(Function));
 
             mockOn.mockRestore();
         });
 
-        it("should call cleanup on before-exit", async () => {
+        it("should call cleanup on beforeExit", async () => {
             const mockCleanup = vi.fn();
 
             // Update ApplicationService mock to return cleanup function
@@ -131,7 +131,7 @@ describe("Electron Main Process", () => {
             const mockOn = vi
                 .spyOn(process, "on")
                 .mockImplementation((event: string | symbol, callback: (...args: unknown[]) => void) => {
-                    if (event === "before-exit") {
+                    if (event === "beforeExit") {
                         // Simulate the event being fired
                         setImmediate(() => callback());
                     }

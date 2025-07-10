@@ -5,9 +5,11 @@
 
 import log from "electron-log/main";
 
-import { ApplicationService, logger } from "./";
+import { app } from "electron";
+import { ApplicationService } from "./index";
 
 // Configure electron-log for main process
+// Enable preload mode for reliable logging in Electron's main process, especially with context isolation enabled
 log.initialize({ preload: true });
 log.transports.file.level = "info";
 log.transports.console.level = "debug";
@@ -29,18 +31,29 @@ class Main {
      * Sets up logging, creates application service, and configures cleanup handlers.
      */
     constructor() {
-        logger.info("Starting Uptime Watcher application");
+        log.info("Starting Uptime Watcher application");
         this.applicationService = new ApplicationService();
 
+        // Ensure cleanup is only called once
+        let cleanedUp = false;
+        const safeCleanup = () => {
+            if (!cleanedUp) {
+                this.applicationService.cleanup();
+                cleanedUp = true;
+            }
+        };
+
         // Setup cleanup on app quit to ensure graceful shutdown
-        process.on("before-exit", () => {
-            this.applicationService.cleanup();
-        });
+        process.on("beforeExit", safeCleanup);
+
+        // Also handle Electron's will-quit event for robust cleanup
+        app.on("will-quit", safeCleanup);
     }
 }
 
 // Start the application
-// TypeScript is warning that the variable is declared but never read,
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
+const mainApp = new Main();
 // which is intentional in this case since we just need to keep the reference
 // alive to prevent garbage collection.
 new Main();
