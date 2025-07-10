@@ -7,7 +7,6 @@ import { isDev } from "../../../electronUtils";
 import {
     safeNumberConvert,
     convertDateForDb,
-    buildMonitorParameters,
     rowToMonitor,
     addNumberField,
     MonitorRow,

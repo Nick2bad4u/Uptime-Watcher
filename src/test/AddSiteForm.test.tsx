@@ -283,18 +283,6 @@ describe("AddSiteForm", () => {
 
             expect(vi.mocked(handleSubmit)).toHaveBeenCalled();
         });
-
-        it("should disable submit button when form is invalid", () => {
-            mockUseAddSiteForm.mockReturnValue({
-                ...defaultFormState,
-                isFormValid: false,
-            });
-
-            render(<AddSiteForm />);
-
-            const submitButton = screen.getByText("Add Site");
-            expect(submitButton).toBeDisabled();
-        });
     });
 
     describe("Theme Integration", () => {

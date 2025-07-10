@@ -44,7 +44,6 @@ export const AddSiteForm = React.memo(function AddSiteForm() {
         checkInterval,
         formError,
         host,
-        isFormValid,
         monitorType,
         name,
         port,
@@ -234,7 +233,7 @@ export const AddSiteForm = React.memo(function AddSiteForm() {
                 />
 
                 <ThemedButton
-                    disabled={!isFormValid || isLoading}
+                    disabled={isLoading}
                     fullWidth
                     loading={showButtonLoading}
                     type="submit"
