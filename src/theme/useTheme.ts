@@ -73,8 +73,8 @@ export function useTheme() {
         const keys = path.split(".");
         const value = keys.reduce<unknown>(
             (accumulator, key) =>
-                accumulator && typeof accumulator === "object" && Object.prototype.hasOwnProperty.call(accumulator, key)
-                    ? // eslint-disable-next-line security/detect-object-injection -- Object.prototype.hasOwnProperty ensures safety
+                accumulator && typeof accumulator === "object" && Object.hasOwn(accumulator, key)
+                    ? // eslint-disable-next-line security/detect-object-injection -- Object.hasOwn ensures safety
                       (accumulator as Record<string, unknown>)[key]
                     : undefined,
             currentTheme.colors
