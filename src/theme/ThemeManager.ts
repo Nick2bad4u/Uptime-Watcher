@@ -92,44 +92,79 @@ export class ThemeManager {
         }
 
         const root = document.documentElement;
-        // Apply CSS custom properties
-        for (const [category, colors] of Object.entries(theme.colors)) {
-            if (typeof colors === "object" && colors !== null) {
-                for (const [key, value] of Object.entries(colors as Record<string, unknown>)) {
+
+        this.applyColors(root, theme.colors);
+        this.applyTypography(root, theme.typography);
+        this.applySpacing(root, theme.spacing);
+        this.applyShadows(root, theme.shadows);
+        this.applyBorderRadius(root, theme.borderRadius);
+        this.applyThemeClasses(theme);
+    }
+
+    /**
+     * Apply color CSS custom properties
+     */
+    private applyColors(root: HTMLElement, colors: Theme["colors"]): void {
+        for (const [category, colorValue] of Object.entries(colors)) {
+            if (typeof colorValue === "object" && colorValue !== null) {
+                for (const [key, value] of Object.entries(colorValue as Record<string, unknown>)) {
                     root.style.setProperty(`--color-${category}-${key}`, String(value));
                 }
             } else {
-                root.style.setProperty(`--color-${category}`, String(colors));
+                root.style.setProperty(`--color-${category}`, String(colorValue));
             }
         }
+    }
 
-        // Apply typography
-        for (const [size, value] of Object.entries(theme.typography.fontSize)) {
+    /**
+     * Apply typography CSS custom properties
+     */
+    private applyTypography(root: HTMLElement, typography: Theme["typography"]): void {
+        for (const [size, value] of Object.entries(typography.fontSize)) {
             root.style.setProperty(`--font-size-${size}`, String(value));
         }
 
-        for (const [weight, value] of Object.entries(theme.typography.fontWeight)) {
+        for (const [weight, value] of Object.entries(typography.fontWeight)) {
             root.style.setProperty(`--font-weight-${weight}`, String(value));
         }
 
-        for (const [height, value] of Object.entries(theme.typography.lineHeight)) {
+        for (const [height, value] of Object.entries(typography.lineHeight)) {
             root.style.setProperty(`--line-height-${height}`, String(value));
         }
+    }
 
-        // Apply spacing
-        for (const [size, value] of Object.entries(theme.spacing)) {
+    /**
+     * Apply spacing CSS custom properties
+     */
+    private applySpacing(root: HTMLElement, spacing: Theme["spacing"]): void {
+        for (const [size, value] of Object.entries(spacing)) {
             root.style.setProperty(`--spacing-${size}`, String(value));
         }
+    }
 
-        // Apply shadows
-        for (const [size, value] of Object.entries(theme.shadows)) {
+    /**
+     * Apply shadow CSS custom properties
+     */
+    private applyShadows(root: HTMLElement, shadows: Theme["shadows"]): void {
+        for (const [size, value] of Object.entries(shadows)) {
             root.style.setProperty(`--shadow-${size}`, String(value));
         }
+    }
 
-        // Apply border radius
-        for (const [size, value] of Object.entries(theme.borderRadius)) {
+    /**
+     * Apply border radius CSS custom properties
+     */
+    private applyBorderRadius(root: HTMLElement, borderRadius: Theme["borderRadius"]): void {
+        for (const [size, value] of Object.entries(borderRadius)) {
             root.style.setProperty(`--radius-${size}`, String(value));
         }
+    }
+
+    /**
+     * Apply theme classes to document elements
+     */
+    private applyThemeClasses(theme: Theme): void {
+        const root = document.documentElement;
 
         // Set theme class on body
         document.body.className = document.body.className.replaceAll(/theme-\w+/g, "").trim();
