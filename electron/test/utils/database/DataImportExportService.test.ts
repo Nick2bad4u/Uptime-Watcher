@@ -270,13 +270,15 @@ describe("DataImportExportService", () => {
                 {
                     identifier: "site1",
                     name: "Site 1",
-                    monitors: [{ 
-                        id: "monitor1", 
-                        type: "http", 
-                        url: "https://example.com",
-                        status: "active",
-                        history: []
-                    }],
+                    monitors: [
+                        {
+                            id: "monitor1",
+                            type: "http",
+                            url: "https://example.com",
+                            status: "active",
+                            history: [],
+                        },
+                    ],
                 },
             ];
             const settings = {};
