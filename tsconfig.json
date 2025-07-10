@@ -2,7 +2,7 @@
     "compilerOptions": {
         "target": "ES2024",
         "useDefineForClassFields": true,
-        "lib": ["ES2024", "DOM", "DOM.Iterable"],
+        "lib": ["ES2024", "DOM", "DOM.Iterable", "ESNext", "ES2022"],
         "module": "ESNext",
         "moduleResolution": "bundler",
         "resolveJsonModule": true,

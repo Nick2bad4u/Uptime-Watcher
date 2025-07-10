@@ -270,7 +270,13 @@ describe("DataImportExportService", () => {
                 {
                     identifier: "site1",
                     name: "Site 1",
-                    monitors: [{ id: "monitor1", type: "http", url: "https://example.com" }],
+                    monitors: [{ 
+                        id: "monitor1", 
+                        type: "http", 
+                        url: "https://example.com",
+                        status: "active",
+                        history: []
+                    }],
                 },
             ];
             const settings = {};
@@ -280,10 +286,10 @@ describe("DataImportExportService", () => {
                 return Promise.resolve();
             });
             mockRepositories.monitor.bulkCreate.mockReturnValue([
-                { id: "monitor1", type: "http", url: "https://example.com" },
+                { id: "monitor1", type: "http", url: "https://example.com", status: "active", history: [] },
             ]);
 
-            await dataImportExportService.persistImportedData(sites, settings);
+            await dataImportExportService.persistImportedData(sites as any, settings);
 
             expect(mockRepositories.monitor.bulkCreate).toHaveBeenCalledWith("site1", sites[0].monitors);
         });

@@ -4,6 +4,7 @@
         "outDir": "dist-electron",
         "module": "ESNext",
         "target": "ES2024",
+        "lib": ["ES2022", "ES2024", "DOM", "DOM.Iterable", "ESNext"],
         "moduleResolution": "bundler",
         "baseUrl": ".",
         "paths": {
