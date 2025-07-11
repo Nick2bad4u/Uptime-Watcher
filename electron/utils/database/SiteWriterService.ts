@@ -65,7 +65,7 @@ export class SiteWriterService {
                 return Promise.resolve();
             });
 
-            this.logger.info(`Site created successfully in database: ${site.identifier} (${site.name ?? "unnamed"})`);
+            this.logger.info(`Site created successfully in database: ${site.identifier} (${site.name || "unnamed"})`);
             return site;
         } catch (error) {
             const message = `Failed to create site ${siteData.identifier}: ${error instanceof Error ? error.message : String(error)}`;

@@ -247,7 +247,7 @@ export function SiteOverviewTab({
                                 <strong>ID:</strong> {site.identifier}
                             </ThemedText>
                             <ThemedText variant="secondary">
-                                <strong>Name:</strong> {site.name ?? "Unnamed Site"}
+                                <strong>Name:</strong> {site.name}
                             </ThemedText>
                             <ThemedText variant="secondary">
                                 <strong>Monitors:</strong> {site.monitors.length}
@@ -291,7 +291,7 @@ export function SiteOverviewTab({
                                                 (monitor.host ? `${monitor.host}:${monitor.port}` : monitor.id)}
                                         </ThemedText>
                                         <ThemedText size="xs" variant="tertiary">
-                                            Every {formatDuration(monitor.checkInterval ?? 30_000)}
+                                            Every {formatDuration(monitor.checkInterval)}
                                         </ThemedText>
                                     </div>
                                     <div className="flex items-center gap-2">

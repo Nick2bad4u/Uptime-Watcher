@@ -83,7 +83,7 @@ export class DataBackupOrchestrator {
         try {
             const sites = Array.from(siteCache.entries()).map(([, site]) => ({
                 identifier: site.identifier,
-                ...(site.name !== undefined && { name: site.name }),
+                name: site.name,
             }));
             return Promise.resolve(sites);
         } catch (error) {

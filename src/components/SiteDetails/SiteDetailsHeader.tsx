@@ -66,7 +66,7 @@ export function SiteDetailsHeader({
                         {!isCollapsed && (
                             <ScreenshotThumbnail
                                 url={selectedMonitor?.type === "http" ? (selectedMonitor.url ?? "") : ""}
-                                siteName={site.name ?? site.identifier}
+                                siteName={site.name}
                             />
                         )}
                         <div className="site-details-status-indicator">
@@ -74,7 +74,7 @@ export function SiteDetailsHeader({
                         </div>
                         <div className="flex-1 min-w-0">
                             <ThemedText size="2xl" weight="bold" className="truncate site-details-title">
-                                {site.name ?? site.identifier}
+                                {site.name}
                             </ThemedText>
                             {/* Show URL for HTTP, host:port for port monitor */}
                             {!isCollapsed && selectedMonitor?.type === "http" && selectedMonitor.url && (

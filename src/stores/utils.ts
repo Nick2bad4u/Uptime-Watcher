@@ -71,15 +71,19 @@ export const debounce = <T extends unknown[]>(
 };
 
 /**
+ * Use electron-log for consistent logging across frontend and backend
+ */
+import log from "electron-log/renderer";
+
+/**
  * Logger utility for store actions in development
  */
 export const logStoreAction = (storeName: string, actionName: string, data?: unknown) => {
     if (process.env.NODE_ENV === "development") {
-        const timestamp = new Date().toLocaleTimeString();
         if (data !== undefined) {
-            console.log(`[${timestamp}] [${storeName}] ${actionName}`, data);
+            log.info(`[${storeName}] ${actionName}`, data);
         } else {
-            console.log(`[${timestamp}] [${storeName}] ${actionName}`);
+            log.info(`[${storeName}] ${actionName}`);
         }
     }
 };

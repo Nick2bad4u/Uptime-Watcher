@@ -54,7 +54,7 @@ export const SiteCardHeader = React.memo(function SiteCardHeader({
     return (
         <div className="flex items-center justify-between">
             <ThemedText variant="primary" size="lg" weight="semibold">
-                {site.name ?? site.identifier}
+                {site.name}
             </ThemedText>
 
             <div className="flex items-center gap-2 min-w-[180px]">

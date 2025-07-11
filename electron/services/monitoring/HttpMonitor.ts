@@ -77,8 +77,8 @@ export class HttpMonitor implements IMonitorService {
             return createErrorResult("HTTP monitor missing URL", 0);
         }
 
-        const timeout = monitor.timeout ?? this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT;
-        const retryAttempts = monitor.retryAttempts ?? 0;
+        const timeout = monitor.timeout;
+        const retryAttempts = monitor.retryAttempts;
 
         return this.performHealthCheckWithRetry(monitor.url, timeout, retryAttempts);
     }

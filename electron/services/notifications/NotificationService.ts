@@ -28,17 +28,17 @@ export class NotificationService {
         const monitor = site.monitors.find((m) => m.id === monitorId);
         const monitorType = monitor?.type ?? "unknown";
 
-        logger.warn(`[NotificationService] Monitor down alert: ${site.name ?? site.identifier} [${monitorType}]`);
+        logger.warn(`[NotificationService] Monitor down alert: ${site.name} [${monitorType}]`);
 
         if (Notification.isSupported()) {
             new Notification({
-                body: `${site.name ?? site.identifier} (${monitorType}) is currently down!`,
+                body: `${site.name} (${monitorType}) is currently down!`,
                 title: "Monitor Down Alert",
                 urgency: "critical",
             }).show();
 
             logger.info(
-                `[NotificationService] Notification sent for monitor down: ${site.name ?? site.identifier} (${monitorType})`
+                `[NotificationService] Notification sent for monitor down: ${site.name} (${monitorType})`
             );
         } else {
             logger.warn("[NotificationService] Notifications not supported on this platform");
@@ -54,17 +54,17 @@ export class NotificationService {
         const monitor = site.monitors.find((m) => m.id === monitorId);
         const monitorType = monitor?.type ?? "unknown";
 
-        logger.info(`[NotificationService] Monitor restored: ${site.name ?? site.identifier} [${monitorType}]`);
+        logger.info(`[NotificationService] Monitor restored: ${site.name} [${monitorType}]`);
 
         if (Notification.isSupported()) {
             new Notification({
-                body: `${site.name ?? site.identifier} (${monitorType}) is back online!`,
+                body: `${site.name} (${monitorType}) is back online!`,
                 title: "Monitor Restored",
                 urgency: "normal",
             }).show();
 
             logger.info(
-                `[NotificationService] Notification sent for monitor restored: ${site.name ?? site.identifier} (${monitorType})`
+                `[NotificationService] Notification sent for monitor restored: ${site.name} (${monitorType})`
             );
         } else {
             logger.warn("[NotificationService] Notifications not supported on this platform");

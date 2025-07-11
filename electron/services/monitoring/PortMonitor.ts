@@ -42,8 +42,8 @@ export class PortMonitor implements IMonitorService {
             };
         }
 
-        const timeout = monitor.timeout ?? this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT;
-        const retryAttempts = monitor.retryAttempts ?? 0;
+        const timeout = monitor.timeout;
+        const retryAttempts = monitor.retryAttempts;
 
         return performPortCheckWithRetry(monitor.host, monitor.port, timeout, retryAttempts);
     }

@@ -96,13 +96,13 @@ export class MonitorRepository {
 
                         monitor.host ? String(monitor.host) : null,
 
-                        monitor.port !== undefined ? Number(monitor.port) : null,
+                        monitor.port ?? null,
 
-                        monitor.checkInterval !== undefined ? Number(monitor.checkInterval) : null,
+                        Number(monitor.checkInterval),
 
-                        monitor.timeout !== undefined ? Number(monitor.timeout) : null,
+                        Number(monitor.timeout),
 
-                        monitor.retryAttempts !== undefined ? Number(monitor.retryAttempts) : null,
+                        Number(monitor.retryAttempts),
                         monitor.monitoring ? 1 : 0,
                         monitor.status,
 
@@ -144,10 +144,10 @@ export class MonitorRepository {
                 monitor.type,
                 monitor.url ? String(monitor.url) : null,
                 monitor.host ? String(monitor.host) : null,
-                monitor.port !== undefined ? Number(monitor.port) : null,
-                monitor.checkInterval !== undefined ? Number(monitor.checkInterval) : null,
-                monitor.timeout !== undefined ? Number(monitor.timeout) : null,
-                monitor.retryAttempts !== undefined ? Number(monitor.retryAttempts) : null,
+                monitor.port ?? null,
+                Number(monitor.checkInterval),
+                Number(monitor.timeout),
+                Number(monitor.retryAttempts),
                 monitor.monitoring ? 1 : 0,
                 monitor.status,
                 Number(monitor.responseTime),

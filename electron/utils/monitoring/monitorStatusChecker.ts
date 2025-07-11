@@ -3,7 +3,6 @@
  * This is extracted from UptimeMonitor to improve modularity and maintainability.
  */
 
-import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
 import { UptimeEvents, TypedEventBus } from "../../events/index";
 import {
     HistoryRepository,
@@ -66,7 +65,7 @@ export async function checkMonitor(
     const getCheckResult = async () => {
         try {
             const monitorService = MonitorFactory.getMonitor(monitor.type, {
-                timeout: monitor.timeout ?? DEFAULT_REQUEST_TIMEOUT,
+                timeout: monitor.timeout,
             });
             return await monitorService.check(monitor);
         } catch (error) {

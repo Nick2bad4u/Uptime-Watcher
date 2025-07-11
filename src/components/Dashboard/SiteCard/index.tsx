@@ -69,7 +69,7 @@ export const SiteCard = React.memo(function SiteCard({ site }: SiteCardPropertie
             shadow="sm"
             className="flex flex-col w-full gap-2 text-left cursor-pointer site-card"
             onClick={handleCardClick}
-            aria-label={`View details for ${latestSite.name ?? latestSite.identifier}`}
+            aria-label={`View details for ${latestSite.name}`}
         >
             <SiteCardHeader
                 site={latestSite}

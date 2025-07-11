@@ -108,7 +108,7 @@ export class SiteManager {
             timestamp: Date.now(),
         });
 
-        logger.info(`Site added successfully: ${site.identifier} (${site.name ?? "unnamed"})`);
+        logger.info(`Site added successfully: ${site.identifier} (${site.name || "unnamed"})`);
         return site;
     }
 

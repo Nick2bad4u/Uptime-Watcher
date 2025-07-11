@@ -54,13 +54,8 @@ export class ConfigurationManager {
             return false;
         }
 
-        // Business rule: Site monitoring property takes precedence if explicitly set
-        if (site.monitoring !== undefined) {
-            return site.monitoring;
-        }
-
-        // Default business rule: Auto-start monitoring for all new sites
-        return true;
+        // Business rule: Site monitoring property takes precedence
+        return site.monitoring;
     }
 
     /**
