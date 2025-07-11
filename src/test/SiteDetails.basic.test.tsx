@@ -30,7 +30,7 @@ const mockSite: Site = {
         },
     ],
     name: "Test Site",
-    monitoring: false
+    monitoring: false,
 };
 
 // Mock Chart.js and plugins
@@ -330,7 +330,7 @@ describe("SiteDetails Basic Coverage", () => {
                     monitoring: false,
                     checkInterval: 0,
                     timeout: 0,
-                    retryAttempts: 0
+                    retryAttempts: 0,
                 },
             ],
         };
@@ -355,7 +355,7 @@ describe("SiteDetails Basic Coverage", () => {
                     monitoring: false,
                     checkInterval: 0,
                     timeout: 0,
-                    retryAttempts: 0
+                    retryAttempts: 0,
                 },
             ],
         };
@@ -399,7 +399,7 @@ describe("SiteDetails Basic Coverage", () => {
                     monitoring: false,
                     checkInterval: 0,
                     timeout: 0,
-                    retryAttempts: 0
+                    retryAttempts: 0,
                 },
             ],
         };
@@ -431,7 +431,7 @@ describe("SiteDetails Basic Coverage", () => {
                     monitoring: false,
                     checkInterval: 0,
                     timeout: 0,
-                    retryAttempts: 0
+                    retryAttempts: 0,
                 },
             ],
         };
@@ -456,7 +456,7 @@ describe("SiteDetails Basic Coverage", () => {
                     monitoring: false,
                     checkInterval: 0,
                     timeout: 0,
-                    retryAttempts: 0
+                    retryAttempts: 0,
                 },
             ],
         };
@@ -471,7 +471,7 @@ describe("SiteDetails Basic Coverage", () => {
             identifier: "test-site-2",
             monitors: [],
             name: "Incomplete Site",
-            monitoring: false
+            monitoring: false,
         };
         const mockOnClose = vi.fn();
         render(<SiteDetails site={incompleteSite} onClose={mockOnClose} />);

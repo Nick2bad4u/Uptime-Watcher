@@ -36,11 +36,11 @@ describe("useSitesState", () => {
                     responseTime: 0,
                     checkInterval: 0,
                     timeout: 0,
-                    retryAttempts: 0
+                    retryAttempts: 0,
                 },
             ],
             name: "Test Site",
-            monitoring: false
+            monitoring: false,
         };
 
         // Setup initial state
@@ -94,7 +94,7 @@ describe("useSitesState", () => {
                 identifier: "new-site",
                 monitors: [],
                 name: "New Site",
-                monitoring: false
+                monitoring: false,
             };
 
             stateActions.addSite(newSite);
@@ -270,7 +270,7 @@ describe("useSitesState", () => {
                 identifier: "new-site",
                 monitors: [],
                 name: "New Site",
-                monitoring: false
+                monitoring: false,
             };
 
             stateActions.addSite(newSite);

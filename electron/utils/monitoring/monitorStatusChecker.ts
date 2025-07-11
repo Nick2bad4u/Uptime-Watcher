@@ -108,13 +108,15 @@ export async function checkMonitor(
                 // This reduces frequency of pruning operations while maintaining reasonable limits
                 const bufferSize = Math.max(Math.floor(config.historyLimit * 0.2), 5); // 20% buffer, min 5 entries
                 const pruneThreshold = config.historyLimit + bufferSize;
-                
+
                 // Get current count for this monitor (lightweight operation)
                 const currentCount = config.repositories.history.getHistoryCount(monitor.id);
-                
+
                 if (currentCount > pruneThreshold) {
                     config.repositories.history.pruneHistoryInternal(db, monitor.id, config.historyLimit);
-                    config.logger.debug(`[MonitorStatusChecker] Pruned history for monitor ${monitor.id}: ${currentCount} -> ${config.historyLimit} entries`);
+                    config.logger.debug(
+                        `[MonitorStatusChecker] Pruned history for monitor ${monitor.id}: ${currentCount} -> ${config.historyLimit} entries`
+                    );
                 }
             }
 

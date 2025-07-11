@@ -103,11 +103,11 @@ describe("StatusUpdateHandler", () => {
                             responseTime: 0,
                             checkInterval: 0,
                             timeout: 0,
-                            retryAttempts: 0
+                            retryAttempts: 0,
                         },
                     ],
                     name: "Test Site 1",
-                    monitoring: false
+                    monitoring: false,
                 },
                 {
                     identifier: "site2",
@@ -121,11 +121,11 @@ describe("StatusUpdateHandler", () => {
                             responseTime: 0,
                             checkInterval: 0,
                             timeout: 0,
-                            retryAttempts: 0
+                            retryAttempts: 0,
                         },
                     ],
                     name: "Test Site 2",
-                    monitoring: false
+                    monitoring: false,
                 },
             ];
 
@@ -188,7 +188,7 @@ describe("StatusUpdateHandler", () => {
                 identifier: "unknown-site",
                 monitors: [],
                 name: "Unknown Site",
-                monitoring: false
+                monitoring: false,
             };
 
             const statusUpdate: StatusUpdate = {

@@ -193,10 +193,10 @@ describe("HistoryRepository", () => {
         it("should prune history for all monitors", async () => {
             (isDev as any).mockReturnValue(true);
             const monitorRows = [{ id: 1 }, { id: 2 }];
-            
+
             // Mock the monitors query
             mockDatabase.all.mockReturnValueOnce(monitorRows);
-            
+
             // Mock the excess entries queries for each monitor
             const excessEntries1 = [{ id: 10 }, { id: 11 }];
             const excessEntries2 = [{ id: 20 }, { id: 21 }];
@@ -206,10 +206,10 @@ describe("HistoryRepository", () => {
             await historyRepository.pruneAllHistory(10);
 
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
-            
+
             // Verify monitors query
             expect(mockDatabase.all).toHaveBeenCalledWith("SELECT id FROM monitors");
-            
+
             // Verify pruning queries for each monitor
             expect(mockDatabase.all).toHaveBeenCalledWith(
                 "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?",
@@ -219,11 +219,11 @@ describe("HistoryRepository", () => {
                 "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?",
                 ["2", 10]
             );
-            
+
             // Verify delete queries for excess entries
             expect(mockDatabase.run).toHaveBeenCalledWith("DELETE FROM history WHERE id IN (?,?)", [10, 11]);
             expect(mockDatabase.run).toHaveBeenCalledWith("DELETE FROM history WHERE id IN (?,?)", [20, 21]);
-            
+
             expect(logger.debug).toHaveBeenCalledWith(
                 "[HistoryRepository] Pruned history for all monitors (limit: 10) (internal)"
             );

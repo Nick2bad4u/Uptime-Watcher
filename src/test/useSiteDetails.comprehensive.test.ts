@@ -66,7 +66,7 @@ describe("useSiteDetails comprehensive coverage", () => {
             } as Monitor,
         ],
         name: "Test Site",
-        monitoring: false
+        monitoring: false,
     };
 
     // Mock store functions

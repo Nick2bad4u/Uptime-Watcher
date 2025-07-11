@@ -198,13 +198,18 @@ export class DataImportExportService {
                 try {
                     // Create monitors using the async bulkCreate method
                     const createdMonitors = await this.repositories.monitor.bulkCreate(site.identifier, site.monitors);
-                    
+
                     // Import history for the created monitors
                     this.importHistoryForMonitors(db, createdMonitors, site.monitors);
-                    
-                    this.logger.debug(`[DataImportExportService] Imported ${createdMonitors.length} monitors for site: ${site.identifier}`);
+
+                    this.logger.debug(
+                        `[DataImportExportService] Imported ${createdMonitors.length} monitors for site: ${site.identifier}`
+                    );
                 } catch (error) {
-                    this.logger.error(`[DataImportExportService] Failed to import monitors for site ${site.identifier}:`, error);
+                    this.logger.error(
+                        `[DataImportExportService] Failed to import monitors for site ${site.identifier}:`,
+                        error
+                    );
                     // Continue with other sites even if one fails
                 }
             }
@@ -215,7 +220,11 @@ export class DataImportExportService {
      * Import history for created monitors by matching with original monitors.
      * Private helper method for history data persistence.
      */
-    private importHistoryForMonitors(db: Database, createdMonitors: Site["monitors"], originalMonitors: Site["monitors"]): void {
+    private importHistoryForMonitors(
+        db: Database,
+        createdMonitors: Site["monitors"],
+        originalMonitors: Site["monitors"]
+    ): void {
         for (const createdMonitor of createdMonitors) {
             // Find the original monitor with matching properties to get its history
             const originalMonitor = originalMonitors.find(

@@ -77,7 +77,11 @@ describe("historyLimitManager", () => {
             });
 
             expect(setHistoryLimitCallback).toHaveBeenCalledWith(limit);
-            expect(mockSettingsRepository.setInternal).toHaveBeenCalledWith(mockDatabase, "historyLimit", limit.toString());
+            expect(mockSettingsRepository.setInternal).toHaveBeenCalledWith(
+                mockDatabase,
+                "historyLimit",
+                limit.toString()
+            );
             expect(mockHistoryRepository.pruneAllHistoryInternal).toHaveBeenCalledWith(mockDatabase, limit);
             expect(mockLogger.debug).toHaveBeenCalledWith(`History limit set to ${limit}`);
             expect(mockLogger.debug).toHaveBeenCalledWith(`Pruned history to ${limit} entries per monitor`);
@@ -100,7 +104,11 @@ describe("historyLimitManager", () => {
             });
 
             expect(setHistoryLimitCallback).toHaveBeenCalledWith(expectedLimit);
-            expect(mockSettingsRepository.setInternal).toHaveBeenCalledWith(mockDatabase, "historyLimit", expectedLimit.toString());
+            expect(mockSettingsRepository.setInternal).toHaveBeenCalledWith(
+                mockDatabase,
+                "historyLimit",
+                expectedLimit.toString()
+            );
             expect(mockHistoryRepository.pruneAllHistoryInternal).toHaveBeenCalledWith(mockDatabase, expectedLimit);
             expect(mockLogger.debug).toHaveBeenCalledWith(`History limit set to ${expectedLimit}`);
         });
@@ -122,7 +130,11 @@ describe("historyLimitManager", () => {
             });
 
             expect(setHistoryLimitCallback).toHaveBeenCalledWith(expectedLimit);
-            expect(mockSettingsRepository.setInternal).toHaveBeenCalledWith(mockDatabase, "historyLimit", expectedLimit.toString());
+            expect(mockSettingsRepository.setInternal).toHaveBeenCalledWith(
+                mockDatabase,
+                "historyLimit",
+                expectedLimit.toString()
+            );
             expect(mockHistoryRepository.pruneAllHistoryInternal).not.toHaveBeenCalled();
             expect(mockLogger.debug).toHaveBeenCalledWith(`History limit set to ${expectedLimit}`);
             expect(mockLogger.debug).not.toHaveBeenCalledWith(expect.stringContaining("Pruned history"));
@@ -145,7 +157,11 @@ describe("historyLimitManager", () => {
             });
 
             expect(setHistoryLimitCallback).toHaveBeenCalledWith(expectedLimit);
-            expect(mockSettingsRepository.setInternal).toHaveBeenCalledWith(mockDatabase, "historyLimit", expectedLimit.toString());
+            expect(mockSettingsRepository.setInternal).toHaveBeenCalledWith(
+                mockDatabase,
+                "historyLimit",
+                expectedLimit.toString()
+            );
             expect(mockHistoryRepository.pruneAllHistoryInternal).not.toHaveBeenCalled();
             expect(mockLogger.debug).toHaveBeenCalledWith(`History limit set to ${expectedLimit}`);
             expect(mockLogger.debug).not.toHaveBeenCalledWith(expect.stringContaining("Pruned history"));
@@ -166,7 +182,11 @@ describe("historyLimitManager", () => {
             });
 
             expect(setHistoryLimitCallback).toHaveBeenCalledWith(limit);
-            expect(mockSettingsRepository.setInternal).toHaveBeenCalledWith(mockDatabase, "historyLimit", limit.toString());
+            expect(mockSettingsRepository.setInternal).toHaveBeenCalledWith(
+                mockDatabase,
+                "historyLimit",
+                limit.toString()
+            );
             expect(mockHistoryRepository.pruneAllHistoryInternal).toHaveBeenCalledWith(mockDatabase, limit);
             expect(mockLogger.debug).not.toHaveBeenCalled();
         });
@@ -187,7 +207,11 @@ describe("historyLimitManager", () => {
             });
 
             expect(setHistoryLimitCallback).toHaveBeenCalledWith(limit);
-            expect(mockSettingsRepository.setInternal).toHaveBeenCalledWith(mockDatabase, "historyLimit", limit.toString());
+            expect(mockSettingsRepository.setInternal).toHaveBeenCalledWith(
+                mockDatabase,
+                "historyLimit",
+                limit.toString()
+            );
             expect(mockHistoryRepository.pruneAllHistoryInternal).toHaveBeenCalledWith(mockDatabase, limit);
         });
 
@@ -207,7 +231,11 @@ describe("historyLimitManager", () => {
             });
 
             expect(setHistoryLimitCallback).toHaveBeenCalledWith(limit);
-            expect(mockSettingsRepository.setInternal).toHaveBeenCalledWith(mockDatabase, "historyLimit", limit.toString());
+            expect(mockSettingsRepository.setInternal).toHaveBeenCalledWith(
+                mockDatabase,
+                "historyLimit",
+                limit.toString()
+            );
             expect(mockHistoryRepository.pruneAllHistoryInternal).toHaveBeenCalledWith(mockDatabase, limit);
         });
     });
@@ -289,7 +317,11 @@ describe("historyLimitManager", () => {
 
             expect(result).toBe(limit);
             expect(setHistoryLimitCallback).toHaveBeenCalledWith(limit);
-            expect(mockSettingsRepository.setInternal).toHaveBeenCalledWith(mockDatabase, "historyLimit", limit.toString());
+            expect(mockSettingsRepository.setInternal).toHaveBeenCalledWith(
+                mockDatabase,
+                "historyLimit",
+                limit.toString()
+            );
             expect(mockHistoryRepository.pruneAllHistoryInternal).toHaveBeenCalledWith(mockDatabase, limit);
         });
 
@@ -319,7 +351,11 @@ describe("historyLimitManager", () => {
 
             expect(result).toBe(expectedLimit);
             expect(setHistoryLimitCallback).toHaveBeenCalledWith(expectedLimit);
-            expect(mockSettingsRepository.setInternal).toHaveBeenCalledWith(mockDatabase, "historyLimit", expectedLimit.toString());
+            expect(mockSettingsRepository.setInternal).toHaveBeenCalledWith(
+                mockDatabase,
+                "historyLimit",
+                expectedLimit.toString()
+            );
             expect(mockHistoryRepository.pruneAllHistoryInternal).toHaveBeenCalledWith(mockDatabase, expectedLimit);
         });
     });

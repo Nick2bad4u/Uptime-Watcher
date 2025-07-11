@@ -34,11 +34,11 @@ describe("useSitesStore - getSites Functions (Internal Arrow Functions)", () => 
                         responseTime: 0,
                         checkInterval: 0,
                         timeout: 0,
-                        retryAttempts: 0
+                        retryAttempts: 0,
                     },
                 ],
                 name: "Site 1",
-                monitoring: false
+                monitoring: false,
             },
             {
                 identifier: "site-2",
@@ -53,11 +53,11 @@ describe("useSitesStore - getSites Functions (Internal Arrow Functions)", () => 
                         responseTime: 0,
                         checkInterval: 0,
                         timeout: 0,
-                        retryAttempts: 0
+                        retryAttempts: 0,
                     },
                 ],
                 name: "Site 2",
-                monitoring: false
+                monitoring: false,
             },
         ];
         useSitesStore.setState({ sites });
@@ -100,7 +100,7 @@ describe("useSitesStore - getSites Functions (Internal Arrow Functions)", () => 
             responseTime: 0,
             checkInterval: 0,
             timeout: 0,
-            retryAttempts: 0
+            retryAttempts: 0,
         };
 
         // This will internally call deps.getSites() through the operationsActions

@@ -88,7 +88,7 @@ describe("useSite", () => {
             } as Monitor,
         ],
         name: "Test Site",
-        monitoring: false
+        monitoring: false,
     };
 
     const mockErrorStore = {
@@ -192,7 +192,7 @@ describe("useSite", () => {
                 monitoring: false,
                 checkInterval: 0,
                 timeout: 0,
-                retryAttempts: 0
+                retryAttempts: 0,
             };
 
             // Mock different monitor
@@ -266,7 +266,7 @@ describe("useSite", () => {
                 identifier: "empty-site",
                 monitors: [],
                 name: "",
-                monitoring: false
+                monitoring: false,
             };
 
             renderHook(() => useSite(emptySite));

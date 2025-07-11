@@ -105,7 +105,9 @@ describe("SettingsRepository", () => {
                 "INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)",
                 ["test-key", "test-value"]
             );
-            expect(logger.debug).toHaveBeenCalledWith("[SettingsRepository] Set setting (internal): test-key = test-value");
+            expect(logger.debug).toHaveBeenCalledWith(
+                "[SettingsRepository] Set setting (internal): test-key = test-value"
+            );
         });
 
         it("should set a setting value in production mode", async () => {

@@ -88,10 +88,10 @@ describe("NotificationService", () => {
                     monitoring: false,
                     checkInterval: 0,
                     timeout: 0,
-                    retryAttempts: 0
+                    retryAttempts: 0,
                 },
             ],
-            monitoring: false
+            monitoring: false,
         };
 
         it("should show notification when alerts are enabled", () => {
@@ -166,10 +166,10 @@ describe("NotificationService", () => {
                     monitoring: false,
                     checkInterval: 0,
                     timeout: 0,
-                    retryAttempts: 0
+                    retryAttempts: 0,
                 },
             ],
-            monitoring: false
+            monitoring: false,
         };
 
         it("should show notification when alerts are enabled", () => {

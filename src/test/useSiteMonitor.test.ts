@@ -59,7 +59,7 @@ describe("useSiteMonitor", () => {
             },
         ] as Monitor[],
         name: "Test Site",
-        monitoring: false
+        monitoring: false,
     };
 
     beforeEach(() => {
@@ -141,7 +141,7 @@ describe("useSiteMonitor", () => {
                 identifier: "empty-site",
                 monitors: [],
                 name: "",
-                monitoring: false
+                monitoring: false,
             };
 
             mockStore.sites = [emptySite];
@@ -190,11 +190,11 @@ describe("useSiteMonitor", () => {
                         monitoring: true,
                         checkInterval: 0,
                         timeout: 0,
-                        retryAttempts: 0
+                        retryAttempts: 0,
                     } as Monitor,
                 ],
                 name: "",
-                monitoring: false
+                monitoring: false,
             };
 
             mockStore.sites = [siteWithUndefinedMonitoring];
@@ -240,7 +240,7 @@ describe("useSiteMonitor", () => {
                     } as Monitor,
                 ],
                 name: "",
-                monitoring: false
+                monitoring: false,
             };
 
             mockStore.sites = [siteWithoutHistory];
@@ -322,7 +322,7 @@ describe("useSiteMonitor", () => {
                         monitoring: true,
                         checkInterval: 0,
                         timeout: 0,
-                        retryAttempts: 0
+                        retryAttempts: 0,
                     } as Monitor,
                 ],
             };
@@ -379,7 +379,7 @@ describe("useSiteMonitor", () => {
                 identifier: "single-site",
                 monitors: mockSite.monitors[0] ? [mockSite.monitors[0]] : [],
                 name: "",
-                monitoring: false
+                monitoring: false,
             };
 
             mockStore.sites = [singleMonitorSite];
@@ -401,14 +401,14 @@ describe("useSiteMonitor", () => {
                 monitoring: false,
                 checkInterval: 0,
                 timeout: 0,
-                retryAttempts: 0
+                retryAttempts: 0,
             };
 
             const minimalSite: Site = {
                 identifier: "minimal-site",
                 monitors: [minimalMonitor],
                 name: "",
-                monitoring: false
+                monitoring: false,
             };
 
             mockStore.sites = [minimalSite];

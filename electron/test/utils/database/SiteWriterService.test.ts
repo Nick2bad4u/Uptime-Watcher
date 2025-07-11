@@ -92,28 +92,39 @@ describe("SiteWriterService", () => {
                 name: "Test Site",
                 monitors: [
                     {
-                        id: "", type: "http", status: "up", history: [], url: "https://example.com",
+                        id: "",
+                        type: "http",
+                        status: "up",
+                        history: [],
+                        url: "https://example.com",
                         responseTime: 0,
                         monitoring: false,
                         checkInterval: 0,
                         timeout: 0,
-                        retryAttempts: 0
+                        retryAttempts: 0,
                     },
                     {
-                        id: "", type: "port", status: "up", history: [], host: "example.com", port: 80,
+                        id: "",
+                        type: "port",
+                        status: "up",
+                        history: [],
+                        host: "example.com",
+                        port: 80,
                         responseTime: 0,
                         monitoring: false,
                         checkInterval: 0,
                         timeout: 0,
-                        retryAttempts: 0
+                        retryAttempts: 0,
                     },
                 ],
-                monitoring: false
+                monitoring: false,
             };
 
             vi.mocked(mockSiteRepository.upsert).mockResolvedValue();
             vi.mocked(mockMonitorRepository.deleteBySiteIdentifier).mockResolvedValue();
-            vi.mocked(mockMonitorRepository.createInternal).mockReturnValueOnce("monitor1").mockReturnValueOnce("monitor2");
+            vi.mocked(mockMonitorRepository.createInternal)
+                .mockReturnValueOnce("monitor1")
+                .mockReturnValueOnce("monitor2");
 
             const result = await siteWriterService.createSite(siteData);
 
@@ -135,7 +146,7 @@ describe("SiteWriterService", () => {
                 identifier: "site1",
                 monitors: [],
                 name: "",
-                monitoring: false
+                monitoring: false,
             };
 
             vi.mocked(mockSiteRepository.upsert).mockResolvedValue();
@@ -150,9 +161,10 @@ describe("SiteWriterService", () => {
 
         it("should handle errors and wrap them in SiteCreationError", async () => {
             const siteData: Site = {
-                identifier: "site1", monitors: [],
+                identifier: "site1",
+                monitors: [],
                 name: "",
-                monitoring: false
+                monitoring: false,
             };
             const error = new Error("Database error");
             vi.mocked(mockSiteRepository.upsertInternal).mockImplementation(() => {
@@ -170,15 +182,20 @@ describe("SiteWriterService", () => {
             const existingSite: Site = {
                 identifier: "site1",
                 name: "Old Name",
-                monitors: [{
-                    id: "monitor1", type: "http", status: "up", history: [],
-                    responseTime: 0,
-                    monitoring: false,
-                    checkInterval: 0,
-                    timeout: 0,
-                    retryAttempts: 0
-                }],
-                monitoring: false
+                monitors: [
+                    {
+                        id: "monitor1",
+                        type: "http",
+                        status: "up",
+                        history: [],
+                        responseTime: 0,
+                        monitoring: false,
+                        checkInterval: 0,
+                        timeout: 0,
+                        retryAttempts: 0,
+                    },
+                ],
+                monitoring: false,
             };
             siteCache.set("site1", existingSite);
 
@@ -186,20 +203,28 @@ describe("SiteWriterService", () => {
                 name: "New Name",
                 monitors: [
                     {
-                        id: "monitor1", type: "http", status: "up", history: [],
+                        id: "monitor1",
+                        type: "http",
+                        status: "up",
+                        history: [],
                         responseTime: 0,
                         monitoring: false,
                         checkInterval: 0,
                         timeout: 0,
-                        retryAttempts: 0
+                        retryAttempts: 0,
                     },
                     {
-                        id: "", type: "port", status: "up", history: [], host: "example.com", port: 80,
+                        id: "",
+                        type: "port",
+                        status: "up",
+                        history: [],
+                        host: "example.com",
+                        port: 80,
                         responseTime: 0,
                         monitoring: false,
                         checkInterval: 0,
                         timeout: 0,
-                        retryAttempts: 0
+                        retryAttempts: 0,
                     },
                 ],
             };
@@ -207,12 +232,15 @@ describe("SiteWriterService", () => {
             vi.mocked(mockSiteRepository.upsert).mockResolvedValue();
             vi.mocked(mockMonitorRepository.findBySiteIdentifier).mockResolvedValue([
                 {
-                    id: "monitor1", type: "http", status: "up", history: [],
+                    id: "monitor1",
+                    type: "http",
+                    status: "up",
+                    history: [],
                     responseTime: 0,
                     monitoring: false,
                     checkInterval: 0,
                     timeout: 0,
-                    retryAttempts: 0
+                    retryAttempts: 0,
                 },
             ]);
             vi.mocked(mockMonitorRepository.create).mockResolvedValue("monitor2");
@@ -245,9 +273,10 @@ describe("SiteWriterService", () => {
         it("should handle database errors and wrap them in SiteUpdateError", async () => {
             const siteCache = new SiteCache();
             const existingSite: Site = {
-                identifier: "site1", monitors: [],
+                identifier: "site1",
+                monitors: [],
                 name: "",
-                monitoring: false
+                monitoring: false,
             };
             siteCache.set("site1", existingSite);
 
@@ -266,9 +295,10 @@ describe("SiteWriterService", () => {
         it("should delete a site and return true if found", async () => {
             const siteCache = new SiteCache();
             const site: Site = {
-                identifier: "site1", monitors: [],
+                identifier: "site1",
+                monitors: [],
                 name: "",
-                monitoring: false
+                monitoring: false,
             };
             siteCache.set("site1", site);
 
@@ -312,10 +342,15 @@ describe("SiteWriterService", () => {
                 identifier: "site1",
                 monitors: [
                     {
-                        id: "monitor1", type: "http", status: "up", history: [], checkInterval: 10000, monitoring: true,
+                        id: "monitor1",
+                        type: "http",
+                        status: "up",
+                        history: [],
+                        checkInterval: 10000,
+                        monitoring: true,
                         responseTime: 0,
                         timeout: 0,
-                        retryAttempts: 0
+                        retryAttempts: 0,
                     },
                     {
                         id: "monitor2",
@@ -326,25 +361,35 @@ describe("SiteWriterService", () => {
                         monitoring: false,
                         responseTime: 0,
                         timeout: 0,
-                        retryAttempts: 0
+                        retryAttempts: 0,
                     },
                 ],
                 name: "",
-                monitoring: false
+                monitoring: false,
             };
 
             const newMonitors: Monitor[] = [
                 {
-                    id: "monitor1", type: "http", status: "up", history: [], checkInterval: 15000, monitoring: true,
+                    id: "monitor1",
+                    type: "http",
+                    status: "up",
+                    history: [],
+                    checkInterval: 15000,
+                    monitoring: true,
                     responseTime: 0,
                     timeout: 0,
-                    retryAttempts: 0
+                    retryAttempts: 0,
                 },
                 {
-                    id: "monitor2", type: "http", status: "up", history: [], checkInterval: 25000, monitoring: false,
+                    id: "monitor2",
+                    type: "http",
+                    status: "up",
+                    history: [],
+                    checkInterval: 25000,
+                    monitoring: false,
                     responseTime: 0,
                     timeout: 0,
-                    retryAttempts: 0
+                    retryAttempts: 0,
                 },
             ];
 
@@ -354,7 +399,7 @@ describe("SiteWriterService", () => {
                 stopMonitoring: vi.fn().mockResolvedValue(true),
                 setupNewMonitors: function (site: Site, newMonitorIds: string[]): Promise<void> {
                     throw new Error("Function not implemented.");
-                }
+                },
             };
 
             await siteWriterService.handleMonitorIntervalChanges(
@@ -377,22 +422,32 @@ describe("SiteWriterService", () => {
                 identifier: "site1",
                 monitors: [
                     {
-                        id: "monitor1", type: "http", status: "up", history: [], checkInterval: 10000, monitoring: true,
+                        id: "monitor1",
+                        type: "http",
+                        status: "up",
+                        history: [],
+                        checkInterval: 10000,
+                        monitoring: true,
                         responseTime: 0,
                         timeout: 0,
-                        retryAttempts: 0
+                        retryAttempts: 0,
                     },
                 ],
                 name: "",
-                monitoring: false
+                monitoring: false,
             };
 
             const newMonitors: Monitor[] = [
                 {
-                    id: "monitor1", type: "http", status: "up", history: [], checkInterval: 10000, monitoring: true,
+                    id: "monitor1",
+                    type: "http",
+                    status: "up",
+                    history: [],
+                    checkInterval: 10000,
+                    monitoring: true,
                     responseTime: 0,
                     timeout: 0,
-                    retryAttempts: 0
+                    retryAttempts: 0,
                 },
             ];
 
@@ -402,7 +457,7 @@ describe("SiteWriterService", () => {
                 stopMonitoring: vi.fn(),
                 setupNewMonitors: function (site: Site, newMonitorIds: string[]): Promise<void> {
                     throw new Error("Function not implemented.");
-                }
+                },
             };
 
             await siteWriterService.handleMonitorIntervalChanges(
@@ -421,22 +476,32 @@ describe("SiteWriterService", () => {
                 identifier: "site1",
                 monitors: [
                     {
-                        id: "monitor1", type: "http", status: "up", history: [], checkInterval: 10000, monitoring: true,
+                        id: "monitor1",
+                        type: "http",
+                        status: "up",
+                        history: [],
+                        checkInterval: 10000,
+                        monitoring: true,
                         responseTime: 0,
                         timeout: 0,
-                        retryAttempts: 0
+                        retryAttempts: 0,
                     },
                 ],
                 name: "",
-                monitoring: false
+                monitoring: false,
             };
 
             const newMonitors: Monitor[] = [
                 {
-                    id: "monitor1", type: "http", status: "up", history: [], checkInterval: 15000, monitoring: true,
+                    id: "monitor1",
+                    type: "http",
+                    status: "up",
+                    history: [],
+                    checkInterval: 15000,
+                    monitoring: true,
                     responseTime: 0,
                     timeout: 0,
-                    retryAttempts: 0
+                    retryAttempts: 0,
                 },
             ];
 
@@ -447,7 +512,7 @@ describe("SiteWriterService", () => {
                 stopMonitoring: vi.fn().mockRejectedValue(error),
                 setupNewMonitors: function (site: Site, newMonitorIds: string[]): Promise<void> {
                     throw new Error("Function not implemented.");
-                }
+                },
             };
 
             await expect(
@@ -466,54 +531,73 @@ describe("SiteWriterService", () => {
             const siteCache = new SiteCache();
             const existingSite: Site = {
                 identifier: "site1",
-                monitors: [{
-                    id: "monitor1", type: "http", status: "up", history: [],
-                    responseTime: 0,
-                    monitoring: false,
-                    checkInterval: 0,
-                    timeout: 0,
-                    retryAttempts: 0
-                }],
+                monitors: [
+                    {
+                        id: "monitor1",
+                        type: "http",
+                        status: "up",
+                        history: [],
+                        responseTime: 0,
+                        monitoring: false,
+                        checkInterval: 0,
+                        timeout: 0,
+                        retryAttempts: 0,
+                    },
+                ],
                 name: "",
-                monitoring: false
+                monitoring: false,
             };
             siteCache.set("site1", existingSite);
 
             const dbMonitors: Monitor[] = [
                 {
-                    id: "monitor1", type: "http", status: "up", history: [],
+                    id: "monitor1",
+                    type: "http",
+                    status: "up",
+                    history: [],
                     responseTime: 0,
                     monitoring: false,
                     checkInterval: 0,
                     timeout: 0,
-                    retryAttempts: 0
+                    retryAttempts: 0,
                 },
                 {
-                    id: "monitor2", type: "http", status: "up", history: [],
+                    id: "monitor2",
+                    type: "http",
+                    status: "up",
+                    history: [],
                     responseTime: 0,
                     monitoring: false,
                     checkInterval: 0,
                     timeout: 0,
-                    retryAttempts: 0
+                    retryAttempts: 0,
                 },
             ];
 
             const newMonitors: Monitor[] = [
                 {
-                    id: "monitor1", type: "http", status: "up", history: [],
+                    id: "monitor1",
+                    type: "http",
+                    status: "up",
+                    history: [],
                     responseTime: 0,
                     monitoring: false,
                     checkInterval: 0,
                     timeout: 0,
-                    retryAttempts: 0
+                    retryAttempts: 0,
                 },
                 {
-                    id: "", type: "port", status: "up", history: [], host: "example.com", port: 80,
+                    id: "",
+                    type: "port",
+                    status: "up",
+                    history: [],
+                    host: "example.com",
+                    port: 80,
                     responseTime: 0,
                     monitoring: false,
                     checkInterval: 0,
                     timeout: 0,
-                    retryAttempts: 0
+                    retryAttempts: 0,
                 },
             ];
 
@@ -562,39 +646,57 @@ describe("SiteWritingOrchestrator", () => {
             const siteCache = new SiteCache();
             const originalSite: Site = {
                 identifier: "site1",
-                monitors: [{
-                    id: "monitor1", type: "http", status: "up", history: [], checkInterval: 10000,
-                    responseTime: 0,
-                    monitoring: false,
-                    timeout: 0,
-                    retryAttempts: 0
-                }],
+                monitors: [
+                    {
+                        id: "monitor1",
+                        type: "http",
+                        status: "up",
+                        history: [],
+                        checkInterval: 10000,
+                        responseTime: 0,
+                        monitoring: false,
+                        timeout: 0,
+                        retryAttempts: 0,
+                    },
+                ],
                 name: "",
-                monitoring: false
+                monitoring: false,
             };
             siteCache.set("site1", originalSite);
 
             const updatedSite: Site = {
                 identifier: "site1",
-                monitors: [{
-                    id: "monitor1", type: "http", status: "up", history: [], checkInterval: 15000,
-                    responseTime: 0,
-                    monitoring: false,
-                    timeout: 0,
-                    retryAttempts: 0
-                }],
+                monitors: [
+                    {
+                        id: "monitor1",
+                        type: "http",
+                        status: "up",
+                        history: [],
+                        checkInterval: 15000,
+                        responseTime: 0,
+                        monitoring: false,
+                        timeout: 0,
+                        retryAttempts: 0,
+                    },
+                ],
                 name: "",
-                monitoring: false
+                monitoring: false,
             };
 
             const updates: Partial<Site> = {
-                monitors: [{
-                    id: "monitor1", type: "http", status: "up", history: [], checkInterval: 15000,
-                    responseTime: 0,
-                    monitoring: false,
-                    timeout: 0,
-                    retryAttempts: 0
-                }],
+                monitors: [
+                    {
+                        id: "monitor1",
+                        type: "http",
+                        status: "up",
+                        history: [],
+                        checkInterval: 15000,
+                        responseTime: 0,
+                        monitoring: false,
+                        timeout: 0,
+                        retryAttempts: 0,
+                    },
+                ],
             };
 
             const mockMonitoringConfig: MonitoringConfig = {
@@ -603,7 +705,7 @@ describe("SiteWritingOrchestrator", () => {
                 stopMonitoring: vi.fn(),
                 setupNewMonitors: function (site: Site, newMonitorIds: string[]): Promise<void> {
                     throw new Error("Function not implemented.");
-                }
+                },
             };
 
             vi.mocked(mockSiteWriterService.updateSite).mockResolvedValue(updatedSite);
@@ -632,7 +734,7 @@ describe("SiteWritingOrchestrator", () => {
                 identifier: "site1",
                 monitors: [],
                 name: "",
-                monitoring: false
+                monitoring: false,
             };
             siteCache.set("site1", originalSite);
 
@@ -640,7 +742,7 @@ describe("SiteWritingOrchestrator", () => {
                 identifier: "site1",
                 name: "Updated Name",
                 monitors: [],
-                monitoring: false
+                monitoring: false,
             };
 
             const updates: Partial<Site> = {
@@ -653,7 +755,7 @@ describe("SiteWritingOrchestrator", () => {
                 stopMonitoring: vi.fn(),
                 setupNewMonitors: function (site: Site, newMonitorIds: string[]): Promise<void> {
                     throw new Error("Function not implemented.");
-                }
+                },
             };
 
             vi.mocked(mockSiteWriterService.updateSite).mockResolvedValue(updatedSite);
@@ -678,7 +780,7 @@ describe("SiteWritingOrchestrator", () => {
                 stopMonitoring: vi.fn(),
                 setupNewMonitors: function (site: Site, newMonitorIds: string[]): Promise<void> {
                     throw new Error("Function not implemented.");
-                }
+                },
             };
 
             await expect(

@@ -93,7 +93,7 @@ describe("useSitesStore", () => {
                 identifier: "test-site",
                 monitors: [],
                 name: "Test Site",
-                monitoring: false
+                monitoring: false,
             };
 
             useSitesStore.getState().addSite(site);
@@ -109,13 +109,13 @@ describe("useSitesStore", () => {
                     identifier: "site-1",
                     monitors: [],
                     name: "Site 1",
-                    monitoring: false
+                    monitoring: false,
                 },
                 {
                     identifier: "site-2",
                     monitors: [],
                     name: "Site 2",
-                    monitoring: false
+                    monitoring: false,
                 },
             ];
             useSitesStore.setState({ ...useSitesStore.getState(), sites });
@@ -133,7 +133,7 @@ describe("useSitesStore", () => {
                     identifier: "site-1",
                     monitors: [],
                     name: "Site 1",
-                    monitoring: false
+                    monitoring: false,
                 },
             ];
 
@@ -159,7 +159,7 @@ describe("useSitesStore", () => {
                         responseTime: 0,
                         checkInterval: 0,
                         timeout: 0,
-                        retryAttempts: 0
+                        retryAttempts: 0,
                     },
                 ],
                 name: "Test Site",
@@ -168,7 +168,7 @@ describe("useSitesStore", () => {
             const newSite: Site = {
                 ...siteData,
                 monitors: siteData.monitors,
-                monitoring: false
+                monitoring: false,
             };
 
             mockElectronAPI.sites.addSite.mockResolvedValue(newSite);
@@ -214,10 +214,10 @@ describe("useSitesStore", () => {
                         responseTime: 0,
                         checkInterval: 0,
                         timeout: 0,
-                        retryAttempts: 0
+                        retryAttempts: 0,
                     },
                 ],
-                monitoring: false
+                monitoring: false,
             };
 
             mockElectronAPI.sites.addSite.mockResolvedValue(newSite);
@@ -251,7 +251,7 @@ describe("useSitesStore", () => {
                         responseTime: 0,
                         checkInterval: 0,
                         timeout: 0,
-                        retryAttempts: 0
+                        retryAttempts: 0,
                     },
                 ],
                 name: "Test Site",
@@ -269,10 +269,10 @@ describe("useSitesStore", () => {
                         responseTime: 0,
                         checkInterval: 0,
                         timeout: 0,
-                        retryAttempts: 0
+                        retryAttempts: 0,
                     },
                 ],
-                monitoring: false
+                monitoring: false,
             };
 
             mockElectronAPI.sites.addSite.mockResolvedValue(newSite);
@@ -319,17 +319,17 @@ describe("useSitesStore", () => {
                             responseTime: 0,
                             checkInterval: 0,
                             timeout: 0,
-                            retryAttempts: 0
+                            retryAttempts: 0,
                         },
                     ],
                     name: "Site 1",
-                    monitoring: false
+                    monitoring: false,
                 },
                 {
                     identifier: "site-2",
                     monitors: [],
                     name: "Site 2",
-                    monitoring: false
+                    monitoring: false,
                 },
             ];
             useSitesStore.setState({ ...useSitesStore.getState(), sites });
@@ -388,11 +388,11 @@ describe("useSitesStore", () => {
                             responseTime: 0,
                             checkInterval: 0,
                             timeout: 0,
-                            retryAttempts: 0
+                            retryAttempts: 0,
                         },
                     ],
                     name: "Site 1",
-                    monitoring: false
+                    monitoring: false,
                 },
             ];
             useSitesStore.setState({ ...useSitesStore.getState(), sites });
@@ -410,7 +410,7 @@ describe("useSitesStore", () => {
                 responseTime: 0,
                 checkInterval: 0,
                 timeout: 0,
-                retryAttempts: 0
+                retryAttempts: 0,
             };
 
             mockElectronAPI.sites.updateSite.mockResolvedValue(undefined);
@@ -447,7 +447,7 @@ describe("useSitesStore", () => {
                 responseTime: 0,
                 checkInterval: 0,
                 timeout: 0,
-                retryAttempts: 0
+                retryAttempts: 0,
             };
 
             await expect(useSitesStore.getState().addMonitorToSite("non-existent", newMonitor)).rejects.toThrow();
@@ -530,11 +530,11 @@ describe("useSitesStore", () => {
                             responseTime: 0,
                             checkInterval: 0,
                             timeout: 0,
-                            retryAttempts: 0
+                            retryAttempts: 0,
                         },
                     ],
                     name: "Site 1",
-                    monitoring: false
+                    monitoring: false,
                 },
             ];
             useSitesStore.setState({ ...useSitesStore.getState(), sites });

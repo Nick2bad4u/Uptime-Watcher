@@ -80,7 +80,7 @@ describe("useSiteDetails uncovered lines", () => {
             } as Monitor,
         ],
         name: "Test Site",
-        monitoring: false
+        monitoring: false,
     };
 
     // Mock store functions
@@ -505,7 +505,7 @@ describe("useSiteDetails uncovered lines", () => {
                 identifier: "test-site-id",
                 monitoring: true,
                 monitors: [],
-                name: "Unnamed Site"
+                name: "Unnamed Site",
             });
             expect(result.current.siteExists).toBe(false);
         });

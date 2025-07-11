@@ -160,7 +160,9 @@ export class MonitorRepository {
         }
 
         if (isDev()) {
-            logger.debug(`[MonitorRepository] Created monitor with id: ${insertResult.id} for site: ${siteIdentifier} (internal)`);
+            logger.debug(
+                `[MonitorRepository] Created monitor with id: ${insertResult.id} for site: ${siteIdentifier} (internal)`
+            );
         }
 
         return String(insertResult.id);

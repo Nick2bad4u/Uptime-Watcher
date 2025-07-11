@@ -284,7 +284,7 @@ describe("SiteDetails Component - Uncovered Lines", () => {
                 timeout: 30000,
                 retryAttempts: 3,
                 history: [],
-                responseTime: 0
+                responseTime: 0,
             },
         ],
         monitoring: true,

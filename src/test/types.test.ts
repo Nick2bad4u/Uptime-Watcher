@@ -73,7 +73,7 @@ describe("Type Definitions", () => {
                 type: "port",
                 checkInterval: 0,
                 timeout: 0,
-                retryAttempts: 0
+                retryAttempts: 0,
             };
 
             expect(portMonitor.id).toBe("port-test-id");
@@ -92,7 +92,7 @@ describe("Type Definitions", () => {
                 monitoring: false,
                 checkInterval: 0,
                 timeout: 0,
-                retryAttempts: 0
+                retryAttempts: 0,
             };
 
             expect(minimalMonitor.id).toBe("minimal-id");
@@ -112,7 +112,7 @@ describe("Type Definitions", () => {
                     monitoring: false,
                     checkInterval: 0,
                     timeout: 0,
-                    retryAttempts: 0
+                    retryAttempts: 0,
                 };
                 expect(monitor.status).toBe(status);
             }
@@ -135,7 +135,7 @@ describe("Type Definitions", () => {
                         monitoring: false,
                         checkInterval: 0,
                         timeout: 0,
-                        retryAttempts: 0
+                        retryAttempts: 0,
                     },
                 ],
                 name: "Test Site",
@@ -152,7 +152,7 @@ describe("Type Definitions", () => {
                 identifier: "minimal-site-uuid",
                 monitors: [],
                 name: "",
-                monitoring: false
+                monitoring: false,
             };
 
             expect(minimalSite.identifier).toBe("minimal-site-uuid");
@@ -164,24 +164,30 @@ describe("Type Definitions", () => {
                 identifier: "multi-monitor-site",
                 monitors: [
                     {
-                        history: [], id: "1", status: "up", type: "http",
+                        history: [],
+                        id: "1",
+                        status: "up",
+                        type: "http",
                         responseTime: 0,
                         monitoring: false,
                         checkInterval: 0,
                         timeout: 0,
-                        retryAttempts: 0
+                        retryAttempts: 0,
                     },
                     {
-                        history: [], id: "2", status: "down", type: "port",
+                        history: [],
+                        id: "2",
+                        status: "down",
+                        type: "port",
                         responseTime: 0,
                         monitoring: false,
                         checkInterval: 0,
                         timeout: 0,
-                        retryAttempts: 0
+                        retryAttempts: 0,
                     },
                 ],
                 name: "",
-                monitoring: false
+                monitoring: false,
             };
 
             expect(site.monitors).toHaveLength(2);
@@ -223,7 +229,7 @@ describe("Type Definitions", () => {
                 identifier: "update-site",
                 monitors: [],
                 name: "",
-                monitoring: false
+                monitoring: false,
             };
 
             const statusUpdate: StatusUpdate = {
@@ -240,7 +246,7 @@ describe("Type Definitions", () => {
                 identifier: "new-site",
                 monitors: [],
                 name: "",
-                monitoring: false
+                monitoring: false,
             };
 
             const statusUpdate: StatusUpdate = {
@@ -265,7 +271,7 @@ describe("Type Definitions", () => {
                 monitoring: false,
                 checkInterval: 0,
                 timeout: 0,
-                retryAttempts: 0
+                retryAttempts: 0,
             };
 
             // Port monitor should have host and port
@@ -280,7 +286,7 @@ describe("Type Definitions", () => {
                 monitoring: false,
                 checkInterval: 0,
                 timeout: 0,
-                retryAttempts: 0
+                retryAttempts: 0,
             };
 
             expect(httpMonitor.type).toBe("http");
@@ -303,11 +309,11 @@ describe("Type Definitions", () => {
                         monitoring: false,
                         checkInterval: 0,
                         timeout: 0,
-                        retryAttempts: 0
+                        retryAttempts: 0,
                     },
                 ],
                 name: "",
-                monitoring: false
+                monitoring: false,
             };
 
             expect(site.monitors).toHaveLength(1);
@@ -317,16 +323,21 @@ describe("Type Definitions", () => {
         it("should ensure status update contains valid site", () => {
             const site: Site = {
                 identifier: "status-update-site",
-                monitors: [{
-                    history: [], id: "monitor", status: "up", type: "http",
-                    responseTime: 0,
-                    monitoring: false,
-                    checkInterval: 0,
-                    timeout: 0,
-                    retryAttempts: 0
-                }],
+                monitors: [
+                    {
+                        history: [],
+                        id: "monitor",
+                        status: "up",
+                        type: "http",
+                        responseTime: 0,
+                        monitoring: false,
+                        checkInterval: 0,
+                        timeout: 0,
+                        retryAttempts: 0,
+                    },
+                ],
                 name: "",
-                monitoring: false
+                monitoring: false,
             };
 
             const update: StatusUpdate = {
@@ -361,7 +372,7 @@ describe("Type Definitions", () => {
                 monitoring: false,
                 checkInterval: 0,
                 timeout: 0,
-                retryAttempts: 0
+                retryAttempts: 0,
             };
 
             expect(monitor.url).toBeUndefined();

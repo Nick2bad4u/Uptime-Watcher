@@ -79,11 +79,11 @@ describe("Additional Uncovered Lines Tests", () => {
                         timeout: undefined, // This should trigger line 250
                         type: "http",
                         url: "https://test.com",
-                        responseTime: 0
+                        responseTime: 0,
                     } as unknown as Monitor,
                 ],
                 name: "Test Site",
-                monitoring: false
+                monitoring: false,
             };
 
             // This test verifies the edge case where timeout is undefined
@@ -174,7 +174,7 @@ describe("Additional Uncovered Lines Tests", () => {
                 identifier: "test-site-id",
                 monitors: [], // Empty monitors array
                 name: "Test Site",
-                monitoring: false
+                monitoring: false,
             };
 
             // This test verifies edge case handling when no monitors exist

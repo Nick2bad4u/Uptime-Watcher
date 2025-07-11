@@ -52,11 +52,11 @@ describe("SiteService", () => {
                             monitoring: false,
                             checkInterval: 0,
                             timeout: 0,
-                            retryAttempts: 0
+                            retryAttempts: 0,
                         },
                     ],
                     name: "Test Site 1",
-                    monitoring: false
+                    monitoring: false,
                 },
                 {
                     identifier: "site2",
@@ -72,11 +72,11 @@ describe("SiteService", () => {
                             monitoring: false,
                             checkInterval: 0,
                             timeout: 0,
-                            retryAttempts: 0
+                            retryAttempts: 0,
                         },
                     ],
                     name: "Test Site 2",
-                    monitoring: false
+                    monitoring: false,
                 },
             ];
 
@@ -126,11 +126,11 @@ describe("SiteService", () => {
                         monitoring: false,
                         checkInterval: 0,
                         timeout: 0,
-                        retryAttempts: 0
+                        retryAttempts: 0,
                     },
                 ],
                 name: "New Site",
-                monitoring: false
+                monitoring: false,
             };
 
             const createdSite: Site = {
@@ -146,11 +146,11 @@ describe("SiteService", () => {
                         monitoring: false,
                         checkInterval: 0,
                         timeout: 0,
-                        retryAttempts: 0
+                        retryAttempts: 0,
                     },
                 ],
                 name: "New Site",
-                monitoring: false
+                monitoring: false,
             };
 
             mockElectronAPI.sites.addSite.mockResolvedValueOnce(createdSite);
@@ -166,7 +166,7 @@ describe("SiteService", () => {
                 identifier: "new-site",
                 monitors: [],
                 name: "New Site",
-                monitoring: false
+                monitoring: false,
             };
 
             const error = new Error("Failed to create site");
@@ -180,7 +180,7 @@ describe("SiteService", () => {
                 identifier: "",
                 monitors: [],
                 name: "",
-                monitoring: false
+                monitoring: false,
             };
 
             const validationError = new Error("Invalid site data");
@@ -194,7 +194,7 @@ describe("SiteService", () => {
                 identifier: "existing-site",
                 monitors: [],
                 name: "Existing Site",
-                monitoring: false
+                monitoring: false,
             };
 
             const duplicateError = new Error("Site already exists");
@@ -390,11 +390,11 @@ describe("SiteService", () => {
                         monitoring: false,
                         checkInterval: 0,
                         timeout: 0,
-                        retryAttempts: 0
+                        retryAttempts: 0,
                     },
                 ],
                 name: "Valid Site",
-                monitoring: false
+                monitoring: false,
             };
 
             mockElectronAPI.sites.addSite.mockResolvedValueOnce(validSite as Site);
@@ -418,7 +418,7 @@ describe("SiteService", () => {
                         monitoring: false,
                         checkInterval: 0,
                         timeout: 0,
-                        retryAttempts: 0
+                        retryAttempts: 0,
                     },
                     {
                         history: [],
@@ -431,11 +431,11 @@ describe("SiteService", () => {
                         monitoring: false,
                         checkInterval: 0,
                         timeout: 0,
-                        retryAttempts: 0
+                        retryAttempts: 0,
                     },
                 ],
                 name: "Site with Multiple Monitors",
-                monitoring: false
+                monitoring: false,
             };
 
             mockElectronAPI.sites.addSite.mockResolvedValueOnce(siteWithMonitors as Site);
@@ -459,11 +459,11 @@ describe("SiteService", () => {
                         monitoring: false,
                         checkInterval: 0,
                         timeout: 0,
-                        retryAttempts: 0
+                        retryAttempts: 0,
                     },
                 ],
                 name: "Site with Special Characters: @#$%",
-                monitoring: false
+                monitoring: false,
             };
 
             mockElectronAPI.sites.addSite.mockResolvedValueOnce(siteWithSpecialChars as Site);
@@ -487,11 +487,11 @@ describe("SiteService", () => {
                         monitoring: false,
                         checkInterval: 0,
                         timeout: 0,
-                        retryAttempts: 0
+                        retryAttempts: 0,
                     },
                 ],
                 name: "Site with Unicode: 🌟💻🚀",
-                monitoring: false
+                monitoring: false,
             };
 
             mockElectronAPI.sites.addSite.mockResolvedValueOnce(siteWithUnicode as Site);

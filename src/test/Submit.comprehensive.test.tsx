@@ -620,7 +620,7 @@ describe("Submit.tsx - Uncovered Lines Coverage", () => {
                         status: "pending",
                         history: [],
                         monitoring: true,
-                        responseTime: -1
+                        responseTime: -1,
                     },
                 ],
             });

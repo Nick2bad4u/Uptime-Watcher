@@ -109,7 +109,10 @@ describe("SiteRepository", () => {
 
             const result = await siteRepository.findByIdentifier("site1");
 
-            expect(mockDatabase.get).toHaveBeenCalledWith("SELECT identifier, name, monitoring FROM sites WHERE identifier = ?", ["site1"]);
+            expect(mockDatabase.get).toHaveBeenCalledWith(
+                "SELECT identifier, name, monitoring FROM sites WHERE identifier = ?",
+                ["site1"]
+            );
             expect(result).toEqual({ identifier: "site1", name: "Site 1" });
         });
 
@@ -255,7 +258,9 @@ describe("SiteRepository", () => {
             await siteRepository.bulkInsert(sites);
 
             // Check that executeTransaction was called (via the mock)
-            expect(mockDatabase.prepare).toHaveBeenCalledWith("INSERT INTO sites (identifier, name, monitoring) VALUES (?, ?, ?)");
+            expect(mockDatabase.prepare).toHaveBeenCalledWith(
+                "INSERT INTO sites (identifier, name, monitoring) VALUES (?, ?, ?)"
+            );
 
             // Check prepared statement calls
             expect(mockPreparedStatement.run).toHaveBeenCalledWith(["site1", "Site 1", 0]);

@@ -66,11 +66,11 @@ describe("useSiteSync", () => {
                 responseTime: 0,
                 checkInterval: 0,
                 timeout: 0,
-                retryAttempts: 0
+                retryAttempts: 0,
             },
         ],
         name: "Example Site",
-        monitoring: false
+        monitoring: false,
     };
 
     beforeEach(() => {

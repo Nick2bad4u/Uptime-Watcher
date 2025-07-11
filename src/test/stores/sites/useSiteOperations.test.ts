@@ -84,11 +84,11 @@ describe("useSiteOperations", () => {
                 timeout: 10000,
                 type: "http" as MonitorType,
                 url: "https://example.com",
-                responseTime: 0
+                responseTime: 0,
             },
         ],
         name: "Example Site",
-        monitoring: false
+        monitoring: false,
     };
 
     const mockMonitor: Monitor = {
@@ -101,7 +101,7 @@ describe("useSiteOperations", () => {
         timeout: 10000,
         type: "http" as MonitorType,
         url: "https://test.com",
-        responseTime: 0
+        responseTime: 0,
     };
 
     beforeEach(() => {

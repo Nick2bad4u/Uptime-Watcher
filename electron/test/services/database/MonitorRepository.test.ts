@@ -183,7 +183,7 @@ describe("MonitorRepository", () => {
                 monitoring: true,
                 status: "pending",
                 history: [],
-                responseTime: 0
+                responseTime: 0,
             };
 
             const result = await monitorRepository.create("site-1", monitor);
@@ -212,7 +212,7 @@ describe("MonitorRepository", () => {
                 monitoring: false,
                 status: "pending",
                 history: [],
-                responseTime: 0
+                responseTime: 0,
             };
 
             const result = await monitorRepository.create("site-2", monitor);
@@ -629,7 +629,7 @@ describe("MonitorRepository", () => {
                     responseTime: 0,
                     checkInterval: 300000,
                     timeout: 5000,
-                    retryAttempts: 3
+                    retryAttempts: 3,
                 },
                 {
                     id: "temp-2",
@@ -642,7 +642,7 @@ describe("MonitorRepository", () => {
                     responseTime: 0,
                     checkInterval: 300000,
                     timeout: 5000,
-                    retryAttempts: 3
+                    retryAttempts: 3,
                 },
             ];
 
@@ -755,7 +755,7 @@ describe("MonitorRepository", () => {
                 checkInterval: 300000,
                 timeout: 5000,
                 retryAttempts: 3,
-                monitoring: true
+                monitoring: true,
             };
 
             mockDatabase.get.mockReturnValue({ id: 123 });
@@ -777,7 +777,7 @@ describe("MonitorRepository", () => {
                 checkInterval: undefined, // Test undefined
                 responseTime: 0,
                 retryAttempts: 3,
-                monitoring: true
+                monitoring: true,
             };
 
             mockDatabase.get.mockReturnValue({ id: 123 });
@@ -798,7 +798,7 @@ describe("MonitorRepository", () => {
                 responseTime: 0,
                 checkInterval: 300000,
                 retryAttempts: 3,
-                monitoring: true
+                monitoring: true,
             };
 
             mockDatabase.get.mockReturnValue({ id: 123 });
@@ -1322,7 +1322,7 @@ describe("MonitorRepository", () => {
                 monitoring: true,
                 status: "up" as const,
                 history: [],
-                responseTime: 0
+                responseTime: 0,
             };
 
             mockDatabase.run.mockReturnValue({ changes: 1, lastInsertRowid: 1 });
@@ -1349,7 +1349,7 @@ describe("MonitorRepository", () => {
                 monitoring: true,
                 status: "up" as const,
                 history: [],
-                responseTime: 0
+                responseTime: 0,
             };
 
             mockDatabase.run.mockReturnValue({ changes: 1, lastInsertRowid: 1 });
@@ -1376,7 +1376,7 @@ describe("MonitorRepository", () => {
                 monitoring: true,
                 status: "up" as const,
                 history: [],
-                responseTime: 0
+                responseTime: 0,
             };
 
             mockDatabase.run.mockReturnValue({ changes: 1, lastInsertRowid: 1 });

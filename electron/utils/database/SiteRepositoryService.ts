@@ -128,7 +128,7 @@ export class SiteRepositoryService {
     /**
      * Start monitoring for sites based on their configuration.
      * Side effect operation separated from data loading.
-     * 
+     *
      * @deprecated This method is deprecated. Auto-start logic is now handled by MonitorManager.setupSiteForMonitoring()
      * This method is kept as a no-op to maintain compatibility during refactoring.
      */
@@ -166,7 +166,6 @@ export class SiteRepositoryService {
 
         return site;
     }
-
 }
 
 /**

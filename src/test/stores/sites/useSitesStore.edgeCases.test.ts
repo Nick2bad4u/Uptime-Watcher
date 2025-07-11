@@ -85,14 +85,14 @@ describe("Sites Store Modules - Edge Cases and Error Scenarios", () => {
             url: "https://example.com",
             responseTime: 0,
             timeout: 0,
-            retryAttempts: 0
+            retryAttempts: 0,
         };
 
         mockSite = {
             identifier: "example.com",
             monitors: [mockMonitor],
             name: "Example Site",
-            monitoring: false
+            monitoring: false,
         };
     });
 
@@ -315,7 +315,7 @@ describe("Sites Store Modules - Edge Cases and Error Scenarios", () => {
                 url: `https://site-${siteIndex}.com/endpoint-${monitorIndex}`,
                 responseTime: 0,
                 timeout: 0,
-                retryAttempts: 0
+                retryAttempts: 0,
             });
 
             const createMonitors = (siteIndex: number): Monitor[] => {
@@ -330,7 +330,7 @@ describe("Sites Store Modules - Edge Cases and Error Scenarios", () => {
                 identifier: `site-${index}.com`,
                 monitors: createMonitors(index),
                 name: `Site ${index}`,
-                monitoring: false
+                monitoring: false,
             });
 
             const largeSitesArray: Site[] = [];

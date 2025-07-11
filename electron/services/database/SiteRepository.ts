@@ -34,9 +34,9 @@ export class SiteRepository {
     public findAll(): { identifier: string; name?: string | undefined; monitoring?: boolean | undefined }[] {
         try {
             const db = this.getDb();
-            const siteRows = db.all("SELECT identifier, name, monitoring FROM sites") as { 
-                identifier: string; 
-                name?: string; 
+            const siteRows = db.all("SELECT identifier, name, monitoring FROM sites") as {
+                identifier: string;
+                name?: string;
                 monitoring?: number;
             }[];
             return siteRows.map((row) => ({
@@ -53,12 +53,14 @@ export class SiteRepository {
     /**
      * Find a site by its identifier.
      */
-    public findByIdentifier(identifier: string): { identifier: string; name?: string | undefined; monitoring?: boolean | undefined } | undefined {
+    public findByIdentifier(
+        identifier: string
+    ): { identifier: string; name?: string | undefined; monitoring?: boolean | undefined } | undefined {
         try {
             const db = this.getDb();
-            const siteRow = db.get("SELECT identifier, name, monitoring FROM sites WHERE identifier = ?", [identifier]) as
-                | { identifier: string; name?: string; monitoring?: number }
-                | undefined;
+            const siteRow = db.get("SELECT identifier, name, monitoring FROM sites WHERE identifier = ?", [
+                identifier,
+            ]) as { identifier: string; name?: string; monitoring?: number } | undefined;
 
             if (!siteRow) {
                 return undefined;
@@ -241,7 +243,9 @@ export class SiteRepository {
      * Bulk insert sites (for import functionality).
      * Uses executeTransaction for atomic operation.
      */
-    public async bulkInsert(sites: { identifier: string; name?: string | undefined; monitoring?: boolean | undefined }[]): Promise<void> {
+    public async bulkInsert(
+        sites: { identifier: string; name?: string | undefined; monitoring?: boolean | undefined }[]
+    ): Promise<void> {
         if (sites.length === 0) {
             return;
         }
@@ -258,19 +262,15 @@ export class SiteRepository {
                         if (site.monitoring !== undefined) {
                             monitoringValue = site.monitoring ? 1 : 0;
                         }
-                        
-                        stmt.run([
-                            site.identifier, 
-                            site.name ?? null,
-                            monitoringValue
-                        ]);
+
+                        stmt.run([site.identifier, site.name ?? null, monitoringValue]);
                     }
 
                     logger.info(`[SiteRepository] Bulk inserted ${sites.length} sites`);
                 } finally {
                     stmt.finalize();
                 }
-                
+
                 return Promise.resolve();
             });
         } catch (error) {

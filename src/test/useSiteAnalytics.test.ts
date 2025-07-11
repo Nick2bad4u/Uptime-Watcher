@@ -55,7 +55,7 @@ describe("useSiteAnalytics", () => {
         url: "https://example.com",
         responseTime: 0,
         timeout: 0,
-        retryAttempts: 0
+        retryAttempts: 0,
     };
 
     const mockMonitorWithHistory: Monitor = {
@@ -77,7 +77,7 @@ describe("useSiteAnalytics", () => {
         url: "https://example.com",
         responseTime: 0,
         timeout: 0,
-        retryAttempts: 0
+        retryAttempts: 0,
     };
 
     const mockPortMonitor: Monitor = {
@@ -95,7 +95,7 @@ describe("useSiteAnalytics", () => {
         type: "port",
         responseTime: 0,
         timeout: 0,
-        retryAttempts: 0
+        retryAttempts: 0,
     };
 
     beforeEach(() => {
@@ -470,7 +470,7 @@ describe("useSiteAnalytics", () => {
                 responseTime: 0,
                 checkInterval: 0,
                 timeout: 0,
-                retryAttempts: 0
+                retryAttempts: 0,
             };
 
             const { result } = renderHook(() => useSiteAnalytics(minimalMonitor, "24h"));
@@ -543,7 +543,7 @@ describe("useChartData", () => {
         responseTime: 0,
         checkInterval: 0,
         timeout: 0,
-        retryAttempts: 0
+        retryAttempts: 0,
     };
 
     it("should generate chart data with correct structure", () => {

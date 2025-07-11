@@ -156,7 +156,10 @@ export class HistoryRepository {
     /**
      * Bulk insert history entries (for import functionality).
      */
-    public async bulkInsert(monitorId: string, historyEntries: (StatusHistory & { details?: string })[]): Promise<void> {
+    public async bulkInsert(
+        monitorId: string,
+        historyEntries: (StatusHistory & { details?: string })[]
+    ): Promise<void> {
         if (historyEntries.length === 0) {
             return;
         }
@@ -185,7 +188,7 @@ export class HistoryRepository {
                 } finally {
                     stmt.finalize();
                 }
-                
+
                 return Promise.resolve();
             });
         } catch (error) {
@@ -202,9 +205,9 @@ export class HistoryRepository {
         if (limit <= 0) {
             return;
         }
-        
+
         pruneHistoryForMonitor(db, monitorId, limit);
-        
+
         if (isDev()) {
             logger.debug(`[HistoryRepository] Pruned history for monitor ${monitorId} (limit: ${limit}) (internal)`);
         }

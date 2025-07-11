@@ -67,11 +67,11 @@ describe("useSitesStore - Uncovered Functions", () => {
                     type: "http" as const,
                     url: "https://test.com",
                     responseTime: 0,
-                    monitoring: false
+                    monitoring: false,
                 },
             ],
             name: "Test Site",
-            monitoring: false
+            monitoring: false,
         };
 
         mockMonitor = {
@@ -84,7 +84,7 @@ describe("useSitesStore - Uncovered Functions", () => {
             type: "http" as const,
             url: "https://test.com",
             responseTime: 0,
-            monitoring: false
+            monitoring: false,
         };
 
         // Reset store state

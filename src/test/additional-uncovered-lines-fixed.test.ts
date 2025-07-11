@@ -92,11 +92,11 @@ describe("Additional Uncovered Lines Tests", () => {
                         type: "http",
                         url: "https://test.com",
                         monitoring: false,
-                        checkInterval: 0
+                        checkInterval: 0,
                     },
                 ],
                 name: "Test Site",
-                monitoring: false
+                monitoring: false,
             };
 
             // This test demonstrates the edge case handling in the hook

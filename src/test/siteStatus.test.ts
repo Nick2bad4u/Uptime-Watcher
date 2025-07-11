@@ -41,7 +41,7 @@ describe("siteStatus utilities - Uncovered Lines", () => {
                         timeout: 30000,
                         retryAttempts: 3,
                         history: [],
-                        responseTime: 0
+                        responseTime: 0,
                     },
                     {
                         id: "monitor2",
@@ -53,7 +53,7 @@ describe("siteStatus utilities - Uncovered Lines", () => {
                         timeout: 30000,
                         retryAttempts: 3,
                         history: [],
-                        responseTime: 0
+                        responseTime: 0,
                     },
                 ],
                 monitoring: true,
@@ -78,7 +78,7 @@ describe("siteStatus utilities - Uncovered Lines", () => {
                         timeout: 30000,
                         retryAttempts: 3,
                         history: [],
-                        responseTime: 0
+                        responseTime: 0,
                     },
                     {
                         id: "monitor2",
@@ -90,7 +90,7 @@ describe("siteStatus utilities - Uncovered Lines", () => {
                         timeout: 30000,
                         retryAttempts: 3,
                         history: [],
-                        responseTime: 0
+                        responseTime: 0,
                     },
                 ],
                 monitoring: true,
@@ -115,7 +115,7 @@ describe("siteStatus utilities - Uncovered Lines", () => {
                         timeout: 30000,
                         retryAttempts: 3,
                         history: [],
-                        responseTime: 0
+                        responseTime: 0,
                     },
                 ],
                 monitoring: true,
@@ -140,7 +140,7 @@ describe("siteStatus utilities - Uncovered Lines", () => {
                         timeout: 30000,
                         retryAttempts: 3,
                         history: [],
-                        responseTime: 0
+                        responseTime: 0,
                     },
                     {
                         id: "monitor2",
@@ -152,7 +152,7 @@ describe("siteStatus utilities - Uncovered Lines", () => {
                         timeout: 30000,
                         retryAttempts: 3,
                         history: [],
-                        responseTime: 0
+                        responseTime: 0,
                     },
                 ],
                 monitoring: true,
@@ -191,7 +191,7 @@ describe("siteStatus utilities - Uncovered Lines", () => {
                         timeout: 30000,
                         retryAttempts: 3,
                         history: [],
-                        responseTime: 0
+                        responseTime: 0,
                     },
                     {
                         id: "monitor2",
@@ -203,7 +203,7 @@ describe("siteStatus utilities - Uncovered Lines", () => {
                         timeout: 30000,
                         retryAttempts: 3,
                         history: [],
-                        responseTime: 0
+                        responseTime: 0,
                     },
                 ],
                 monitoring: false,
@@ -228,7 +228,7 @@ describe("siteStatus utilities - Uncovered Lines", () => {
                         timeout: 30000,
                         retryAttempts: 3,
                         history: [],
-                        responseTime: 0
+                        responseTime: 0,
                     },
                     {
                         id: "monitor2",
@@ -240,7 +240,7 @@ describe("siteStatus utilities - Uncovered Lines", () => {
                         timeout: 30000,
                         retryAttempts: 3,
                         history: [],
-                        responseTime: 0
+                        responseTime: 0,
                     },
                 ],
                 monitoring: true,
@@ -265,7 +265,7 @@ describe("siteStatus utilities - Uncovered Lines", () => {
                         timeout: 30000,
                         retryAttempts: 3,
                         history: [],
-                        responseTime: 0
+                        responseTime: 0,
                     },
                     {
                         id: "monitor2",
@@ -277,7 +277,7 @@ describe("siteStatus utilities - Uncovered Lines", () => {
                         timeout: 30000,
                         retryAttempts: 3,
                         history: [],
-                        responseTime: 0
+                        responseTime: 0,
                     },
                 ],
                 monitoring: true,
@@ -316,7 +316,7 @@ describe("siteStatus utilities - Uncovered Lines", () => {
                         timeout: 30000,
                         retryAttempts: 3,
                         history: [],
-                        responseTime: 0
+                        responseTime: 0,
                     },
                 ],
                 monitoring: false,
@@ -341,7 +341,7 @@ describe("siteStatus utilities - Uncovered Lines", () => {
                         timeout: 30000,
                         retryAttempts: 3,
                         history: [],
-                        responseTime: 0
+                        responseTime: 0,
                     },
                     {
                         id: "monitor2",
@@ -353,7 +353,7 @@ describe("siteStatus utilities - Uncovered Lines", () => {
                         timeout: 30000,
                         retryAttempts: 3,
                         history: [],
-                        responseTime: 0
+                        responseTime: 0,
                     },
                 ],
                 monitoring: true,
@@ -378,7 +378,7 @@ describe("siteStatus utilities - Uncovered Lines", () => {
                         timeout: 30000,
                         retryAttempts: 3,
                         history: [],
-                        responseTime: 0
+                        responseTime: 0,
                     },
                     {
                         id: "monitor2",
@@ -390,7 +390,7 @@ describe("siteStatus utilities - Uncovered Lines", () => {
                         timeout: 30000,
                         retryAttempts: 3,
                         history: [],
-                        responseTime: 0
+                        responseTime: 0,
                     },
                 ],
                 monitoring: true,
@@ -429,7 +429,7 @@ describe("siteStatus utilities - Uncovered Lines", () => {
                         timeout: 30000,
                         retryAttempts: 3,
                         history: [],
-                        responseTime: 0
+                        responseTime: 0,
                     },
                     {
                         id: "monitor2",
@@ -441,7 +441,7 @@ describe("siteStatus utilities - Uncovered Lines", () => {
                         timeout: 30000,
                         retryAttempts: 3,
                         history: [],
-                        responseTime: 0
+                        responseTime: 0,
                     },
                 ],
                 monitoring: true,
@@ -466,7 +466,7 @@ describe("siteStatus utilities - Uncovered Lines", () => {
                         timeout: 30000,
                         retryAttempts: 3,
                         history: [],
-                        responseTime: 0
+                        responseTime: 0,
                     },
                 ],
                 monitoring: true,
@@ -491,7 +491,7 @@ describe("siteStatus utilities - Uncovered Lines", () => {
                         timeout: 30000,
                         retryAttempts: 3,
                         history: [],
-                        responseTime: 0
+                        responseTime: 0,
                     },
                     {
                         id: "monitor2",
@@ -503,7 +503,7 @@ describe("siteStatus utilities - Uncovered Lines", () => {
                         timeout: 30000,
                         retryAttempts: 3,
                         history: [],
-                        responseTime: 0
+                        responseTime: 0,
                     },
                 ],
                 monitoring: true,
@@ -528,7 +528,7 @@ describe("siteStatus utilities - Uncovered Lines", () => {
                         timeout: 30000,
                         retryAttempts: 3,
                         history: [],
-                        responseTime: 0
+                        responseTime: 0,
                     },
                     {
                         id: "monitor2",
@@ -540,7 +540,7 @@ describe("siteStatus utilities - Uncovered Lines", () => {
                         timeout: 30000,
                         retryAttempts: 3,
                         history: [],
-                        responseTime: 0
+                        responseTime: 0,
                     },
                 ],
                 monitoring: false,
@@ -565,7 +565,7 @@ describe("siteStatus utilities - Uncovered Lines", () => {
                         timeout: 30000,
                         retryAttempts: 3,
                         history: [],
-                        responseTime: 0
+                        responseTime: 0,
                     },
                     {
                         id: "monitor2",
@@ -577,7 +577,7 @@ describe("siteStatus utilities - Uncovered Lines", () => {
                         timeout: 30000,
                         retryAttempts: 3,
                         history: [],
-                        responseTime: 0
+                        responseTime: 0,
                     },
                     {
                         id: "monitor3",
@@ -589,7 +589,7 @@ describe("siteStatus utilities - Uncovered Lines", () => {
                         timeout: 30000,
                         retryAttempts: 3,
                         history: [],
-                        responseTime: 0
+                        responseTime: 0,
                     },
                 ],
                 monitoring: true,
@@ -615,7 +615,7 @@ describe("siteStatus utilities - Uncovered Lines", () => {
                         timeout: 30000,
                         retryAttempts: 3,
                         history: [],
-                        responseTime: 0
+                        responseTime: 0,
                     },
                 ],
                 monitoring: true,
