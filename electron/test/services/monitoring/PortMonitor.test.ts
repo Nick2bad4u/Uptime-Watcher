@@ -144,7 +144,8 @@ describe("PortMonitor", () => {
                 80,
                 5000, // timeout (from mockPortMonitor.timeout)
                 3 // retryAttempts
-            );        });
+            );
+        });
     });
 
     describe("updateConfig", () => {

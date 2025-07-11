@@ -73,7 +73,7 @@ describe("Types Module", () => {
                 monitoring: false,
                 checkInterval: 0,
                 timeout: 0,
-                retryAttempts: 0
+                retryAttempts: 0,
             };
 
             expect(monitor.id).toBe("http-monitor");
@@ -96,7 +96,7 @@ describe("Types Module", () => {
                 monitoring: false,
                 checkInterval: 0,
                 timeout: 0,
-                retryAttempts: 0
+                retryAttempts: 0,
             };
 
             expect(monitor.id).toBe("port-monitor");
@@ -120,7 +120,7 @@ describe("Types Module", () => {
                     monitoring: false,
                     checkInterval: 0,
                     timeout: 0,
-                    retryAttempts: 0
+                    retryAttempts: 0,
                 };
 
                 expect(monitor.status).toBe(status);
@@ -154,7 +154,7 @@ describe("Types Module", () => {
                 monitoring: false,
                 checkInterval: 0,
                 timeout: 0,
-                retryAttempts: 0
+                retryAttempts: 0,
             };
 
             const portMonitor: Monitor = {
@@ -168,14 +168,14 @@ describe("Types Module", () => {
                 monitoring: false,
                 checkInterval: 0,
                 timeout: 0,
-                retryAttempts: 0
+                retryAttempts: 0,
             };
 
             const site: Site = {
                 identifier: "multi-monitor-site",
                 name: "Multi Monitor Site",
                 monitors: [httpMonitor, portMonitor],
-                monitoring: false
+                monitoring: false,
             };
 
             expect(site.monitors).toHaveLength(2);
@@ -188,7 +188,7 @@ describe("Types Module", () => {
                 identifier: "minimal-site",
                 monitors: [],
                 name: "",
-                monitoring: false
+                monitoring: false,
             };
 
             expect(site.identifier).toBe("minimal-site");
@@ -242,7 +242,7 @@ describe("Types Module", () => {
                 identifier: "update-site",
                 monitors: [],
                 name: "",
-                monitoring: false
+                monitoring: false,
             };
 
             const statusUpdate: StatusUpdate = {
@@ -259,7 +259,7 @@ describe("Types Module", () => {
                 identifier: "new-site",
                 monitors: [],
                 name: "",
-                monitoring: false
+                monitoring: false,
             };
 
             const statusUpdate: StatusUpdate = {
@@ -273,9 +273,10 @@ describe("Types Module", () => {
         it("should support all previous status values", () => {
             const statuses: ("up" | "down" | "pending")[] = ["up", "down", "pending"];
             const site: Site = {
-                identifier: "test", monitors: [],
+                identifier: "test",
+                monitors: [],
                 name: "",
-                monitoring: false
+                monitoring: false,
             };
 
             statuses.forEach((status) => {
@@ -362,14 +363,14 @@ describe("Types Module", () => {
                 monitoring: false,
                 checkInterval: 0,
                 timeout: 0,
-                retryAttempts: 0
+                retryAttempts: 0,
             };
 
             const site: Site = {
                 identifier: "test-site",
                 monitors: [monitor],
                 name: "",
-                monitoring: false
+                monitoring: false,
             };
 
             expect(site.monitors[0]).toBe(monitor);
@@ -391,7 +392,7 @@ describe("Types Module", () => {
                 monitoring: false,
                 checkInterval: 0,
                 timeout: 0,
-                retryAttempts: 0
+                retryAttempts: 0,
             };
 
             expect(monitor.history[0]).toBe(history);
@@ -402,7 +403,7 @@ describe("Types Module", () => {
                 identifier: "test",
                 monitors: [],
                 name: "",
-                monitoring: false
+                monitoring: false,
             };
 
             const update: StatusUpdate = {
@@ -424,7 +425,7 @@ describe("Types Module", () => {
                 monitoring: false,
                 checkInterval: 0,
                 timeout: 0,
-                retryAttempts: 0
+                retryAttempts: 0,
             };
 
             // All optional fields should be undefined
@@ -444,7 +445,7 @@ describe("Types Module", () => {
                 identifier: "minimal",
                 monitors: [],
                 name: "",
-                monitoring: false
+                monitoring: false,
             };
 
             expect(minimalSite.name).toBe("");
@@ -453,9 +454,10 @@ describe("Types Module", () => {
 
         it("should handle optional StatusUpdate fields", () => {
             const site: Site = {
-                identifier: "test", monitors: [],
+                identifier: "test",
+                monitors: [],
                 name: "",
-                monitoring: false
+                monitoring: false,
             };
             const minimalUpdate: StatusUpdate = { site };
 

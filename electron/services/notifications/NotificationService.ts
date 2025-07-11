@@ -37,9 +37,7 @@ export class NotificationService {
                 urgency: "critical",
             }).show();
 
-            logger.info(
-                `[NotificationService] Notification sent for monitor down: ${site.name} (${monitorType})`
-            );
+            logger.info(`[NotificationService] Notification sent for monitor down: ${site.name} (${monitorType})`);
         } else {
             logger.warn("[NotificationService] Notifications not supported on this platform");
         }
@@ -63,9 +61,7 @@ export class NotificationService {
                 urgency: "normal",
             }).show();
 
-            logger.info(
-                `[NotificationService] Notification sent for monitor restored: ${site.name} (${monitorType})`
-            );
+            logger.info(`[NotificationService] Notification sent for monitor restored: ${site.name} (${monitorType})`);
         } else {
             logger.warn("[NotificationService] Notifications not supported on this platform");
         }
