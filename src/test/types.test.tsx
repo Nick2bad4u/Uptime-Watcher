@@ -69,6 +69,11 @@ describe("Types Module", () => {
                 type: "http",
                 status: "pending",
                 history: [],
+                responseTime: 0,
+                monitoring: false,
+                checkInterval: 0,
+                timeout: 0,
+                retryAttempts: 0
             };
 
             expect(monitor.id).toBe("http-monitor");
@@ -88,6 +93,10 @@ describe("Types Module", () => {
                 port: 80,
                 history: [],
                 responseTime: 100,
+                monitoring: false,
+                checkInterval: 0,
+                timeout: 0,
+                retryAttempts: 0
             };
 
             expect(monitor.id).toBe("port-monitor");
@@ -107,6 +116,11 @@ describe("Types Module", () => {
                     type: "http",
                     status,
                     history: [],
+                    responseTime: 0,
+                    monitoring: false,
+                    checkInterval: 0,
+                    timeout: 0,
+                    retryAttempts: 0
                 };
 
                 expect(monitor.status).toBe(status);
@@ -136,6 +150,11 @@ describe("Types Module", () => {
                 status: "up",
                 url: "https://example.com",
                 history: [],
+                responseTime: 0,
+                monitoring: false,
+                checkInterval: 0,
+                timeout: 0,
+                retryAttempts: 0
             };
 
             const portMonitor: Monitor = {
@@ -145,12 +164,18 @@ describe("Types Module", () => {
                 host: "example.com",
                 port: 443,
                 history: [],
+                responseTime: 0,
+                monitoring: false,
+                checkInterval: 0,
+                timeout: 0,
+                retryAttempts: 0
             };
 
             const site: Site = {
                 identifier: "multi-monitor-site",
                 name: "Multi Monitor Site",
                 monitors: [httpMonitor, portMonitor],
+                monitoring: false
             };
 
             expect(site.monitors).toHaveLength(2);
@@ -162,11 +187,13 @@ describe("Types Module", () => {
             const site: Site = {
                 identifier: "minimal-site",
                 monitors: [],
+                name: "",
+                monitoring: false
             };
 
             expect(site.identifier).toBe("minimal-site");
-            expect(site.name).toBeUndefined();
-            expect(site.monitoring).toBeUndefined();
+            expect(site.name).toBe("");
+            expect(site.monitoring).toBe(false);
             expect(site.monitors).toHaveLength(0);
         });
     });
@@ -214,6 +241,8 @@ describe("Types Module", () => {
             const site: Site = {
                 identifier: "update-site",
                 monitors: [],
+                name: "",
+                monitoring: false
             };
 
             const statusUpdate: StatusUpdate = {
@@ -229,6 +258,8 @@ describe("Types Module", () => {
             const site: Site = {
                 identifier: "new-site",
                 monitors: [],
+                name: "",
+                monitoring: false
             };
 
             const statusUpdate: StatusUpdate = {
@@ -241,7 +272,11 @@ describe("Types Module", () => {
 
         it("should support all previous status values", () => {
             const statuses: ("up" | "down" | "pending")[] = ["up", "down", "pending"];
-            const site: Site = { identifier: "test", monitors: [] };
+            const site: Site = {
+                identifier: "test", monitors: [],
+                name: "",
+                monitoring: false
+            };
 
             statuses.forEach((status) => {
                 const statusUpdate: StatusUpdate = {
@@ -323,11 +358,18 @@ describe("Types Module", () => {
                 type: "http",
                 status: "up",
                 history: [],
+                responseTime: 0,
+                monitoring: false,
+                checkInterval: 0,
+                timeout: 0,
+                retryAttempts: 0
             };
 
             const site: Site = {
                 identifier: "test-site",
                 monitors: [monitor],
+                name: "",
+                monitoring: false
             };
 
             expect(site.monitors[0]).toBe(monitor);
@@ -345,6 +387,11 @@ describe("Types Module", () => {
                 type: "http",
                 status: "up",
                 history: [history],
+                responseTime: 0,
+                monitoring: false,
+                checkInterval: 0,
+                timeout: 0,
+                retryAttempts: 0
             };
 
             expect(monitor.history[0]).toBe(history);
@@ -354,6 +401,8 @@ describe("Types Module", () => {
             const site: Site = {
                 identifier: "test",
                 monitors: [],
+                name: "",
+                monitoring: false
             };
 
             const update: StatusUpdate = {
@@ -371,32 +420,43 @@ describe("Types Module", () => {
                 type: "http",
                 status: "pending",
                 history: [],
+                responseTime: 0,
+                monitoring: false,
+                checkInterval: 0,
+                timeout: 0,
+                retryAttempts: 0
             };
 
             // All optional fields should be undefined
             expect(minimalMonitor.url).toBeUndefined();
             expect(minimalMonitor.host).toBeUndefined();
             expect(minimalMonitor.port).toBeUndefined();
-            expect(minimalMonitor.responseTime).toBeUndefined();
+            expect(minimalMonitor.responseTime).toBe(0);
             expect(minimalMonitor.lastChecked).toBeUndefined();
-            expect(minimalMonitor.monitoring).toBeUndefined();
-            expect(minimalMonitor.checkInterval).toBeUndefined();
-            expect(minimalMonitor.timeout).toBeUndefined();
-            expect(minimalMonitor.retryAttempts).toBeUndefined();
+            expect(minimalMonitor.monitoring).toBe(false);
+            expect(minimalMonitor.checkInterval).toBe(+0);
+            expect(minimalMonitor.timeout).toBe(+0);
+            expect(minimalMonitor.retryAttempts).toBe(0);
         });
 
         it("should handle optional Site fields", () => {
             const minimalSite: Site = {
                 identifier: "minimal",
                 monitors: [],
+                name: "",
+                monitoring: false
             };
 
-            expect(minimalSite.name).toBeUndefined();
-            expect(minimalSite.monitoring).toBeUndefined();
+            expect(minimalSite.name).toBe("");
+            expect(minimalSite.monitoring).toBe(false);
         });
 
         it("should handle optional StatusUpdate fields", () => {
-            const site: Site = { identifier: "test", monitors: [] };
+            const site: Site = {
+                identifier: "test", monitors: [],
+                name: "",
+                monitoring: false
+            };
             const minimalUpdate: StatusUpdate = { site };
 
             expect(minimalUpdate.previousStatus).toBeUndefined();
