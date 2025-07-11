@@ -7,14 +7,204 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[1482c88](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1482c884c3145ace9bc028c206014c2c1f04da8d)...
+[1482c88](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1482c884c3145ace9bc028c206014c2c1f04da8d)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/1482c884c3145ace9bc028c206014c2c1f04da8d...1482c884c3145ace9bc028c206014c2c1f04da8d))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 6.6.0 [`(1482c88)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1482c884c3145ace9bc028c206014c2c1f04da8d)
+
+
+
+
+
+
+## [6.6.0] - 2025-07-11
+
+
 [[155201c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/155201c4300c35002001f43bad2870048c5cc3c1)...
-[155201c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/155201c4300c35002001f43bad2870048c5cc3c1)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/155201c4300c35002001f43bad2870048c5cc3c1...155201c4300c35002001f43bad2870048c5cc3c1))
+[66688c4](https://github.com/Nick2bad4u/Uptime-Watcher/commit/66688c485541c87f5c1813b082554a2f1cf780ef)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/155201c4300c35002001f43bad2870048c5cc3c1...66688c485541c87f5c1813b082554a2f1cf780ef))
+
+
+### ✨ Features
+
+- ✨ [feat] Add site-level monitoring control and type safety
+
+- Introduces a `monitoring` boolean property at the site level, allowing sites to globally enable or disable monitoring of all their monitors.
+- Updates auto-start monitoring logic to respect site-level `monitoring` as a master switch and ensures only monitors with monitoring enabled are started.
+- Extends database schema, queries, and upsert logic to persist `monitoring` state for sites, including during import/export and bulk operations.
+- Refactors test data and utilities to enforce stricter type requirements, normalizing required properties such as `monitoring` and `responseTime` for monitors and sites.
+- Deprecates redundant monitoring start logic to avoid duplicate operations and centralizes control in the monitoring manager.
+- Improves test coverage for new type constraints and ensures all test cases properly specify required fields.
+- Motivated by the need for finer monitoring control, improved type safety, and reduction of subtle monitoring logic errors. [`(c1d3af8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c1d3af8d1f2687933933b6d0b0ead36100e6e654)
+
+
+
+### �️ Bug Fixes
+
+- 🛠️ [fix] Prevent duplicate monitor checks and clean up tests
+
+- Removes redundant initial monitor check logic, ensuring only a single check occurs when adding a monitor or creating a site, which avoids double status updates and improves performance.
+- Cleans up unused functions and imports related to monitor checks for maintainability.
+- Updates unit tests to match the new monitor lifecycle behavior and corrects test mocks for transaction-safe repository methods.
+- Refines logging for consistency and fixes ESLint/TypeScript warnings, especially unnecessary conditionals and formatting. [`(33e1de5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/33e1de5af48b39ee42f254e437effe82bbd20279)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 6.5.0 [`(155201c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/155201c4300c35002001f43bad2870048c5cc3c1)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Simplifies monitor and site property handling logic
+
+- Removes fallback and default value logic for monitor and site properties, relying directly on explicit values for consistency.
+- Updates notification, logging, and UI components to use the site name without fallback to identifiers.
+- Standardizes interval and timeout usage, eliminating redundant default assignments.
+- Replaces frontend store logging with electron-log for unified logging across client and backend.
+
+Improves code clarity, predictability, and reduces implicit behavior. [`(ada111c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ada111cc0709a199a7e99712fe45761a8c9095a0)
+
+
+- 🚜 [refactor] Ensure consistent transactional DB patterns, fix monitor double-check, and update lint/test infra
+
+- Refactors database repositories and service layers to use explicit internal vs. external transaction methods, eliminating nested transaction errors and enforcing ACID compliance across all site, monitor, history, and settings operations
+- Implements internal methods and interface updates for HistoryRepository and SettingsRepository, fixes transaction use throughout DataImportExportService and history limit management logic
+- Adds efficient history pruning with buffered logic during monitor checks, respecting user-set limits and preventing expensive DB operations
+- Fixes monitor setup so new monitors only perform a single initial check before interval scheduling, preventing duplicate immediate checks during site/monitor creation
+- Updates event, state, and logging patterns for consistency and maintainability; improves frontend and backend error handling and logging formatting
+- Cleans up test mocks and expectations to support internal repository methods, updates all failing or outdated tests, and fixes missing/invalid test logic to achieve 100% passing coverage
+- Expands and documents lint/test/package scripts for improved code quality, adds markdown ignore to ESLint config, and resolves unnecessary conditional nags where appropriate
+
+Relates to ongoing project-wide transaction refactor, monitor lifecycle consistency, and test/lint reliability improvements. [`(4c60717)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4c60717e08c92b80cae6732a3a6e16ca0072c194)
+
+
+- 🚜 [refactor] Move initial monitor checks to scheduler
+
+- Refactors monitoring setup logic by removing initial monitor checks from site setup methods and delegating them to the monitor scheduler when monitoring starts.
+- Cleans up related code paths and updates tests to skip initial check assertions, aligning with the new responsibility split.
+- Improves separation of concerns and simplifies site setup flow. [`(b898d4c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b898d4cdd926f64391f02cccc13b6cf45247f313)
+
+
+- 🚜 [refactor] Unifies DB transactions, adds new monitor setup logic
+
+- Refactors database repository methods to consistently use explicit transactions, introducing internal variants to prevent nested transaction issues and ensure data integrity on bulk and multi-step operations.
+- Adds logic to detect and properly set up new monitors added to existing sites, aligning their lifecycle and default configuration with newly created sites for consistent monitoring behavior.
+- Streamlines bulk import/export and history pruning operations, reducing redundant transactions and improving performance, especially for large-scale data operations and history limit enforcement.
+- Improves developer experience with enhanced logging, timestamped messages, and clearer debugging output, especially during site and monitor updates.
+- Updates interfaces and adapters to support new transactional method signatures, ensuring type safety and clear separation between async and internal operations.
+- Fixes subtle bugs with store updates by only applying monitor changes when the relevant value is defined, preventing unintended overwrites.
+
+Relates to reliability, maintainability, and operational consistency across site and monitor management workflows. [`(9eb2349)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9eb2349e0aa2c0007d269763c66a952bc48b7f69)
+
+
+- 🚜 [refactor] Remove unnecessary use of undefined in types
+
+- Updates core type definitions to eliminate optional/undefined fields for site and monitor properties that always have defaults or are required.
+- Ensures all monitors and sites have guaranteed values for name, monitoring, checkInterval, timeout, retryAttempts, and responseTime, reducing null/undefined handling across the codebase.
+- Refactors all data creation, database mapping, and UI logic to provide and expect these required defaults.
+- Updates tests, mocks, and related store actions to align with stricter type requirements, resulting in more predictable and type-safe behavior.
+- Retains undefined usage for fields that are genuinely optional or mutually exclusive (e.g., lastChecked, url/host, port, details).
+- Improves code clarity, maintainability, and reduces runtime errors by enforcing stronger typing and consistent data structures. [`(f5824a9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f5824a9b8b3c8eb35781c54b7264b50f639cf62a)
+
+
+- 🚜 [refactor] Refine monitor types and streamline responseTime handling
+
+- Unifies and documents monitor status types for clarity and future extensibility, introducing dedicated type aliases for current and historical statuses.
+- Refactors code to treat responseTime as always a number, removing unnecessary null/undefined checks, and updates mapping logic to set a default value.
+- Enhances and clarifies type documentation, specifying property exclusivity and fallback behaviors to prevent misconfiguration.
+- Improves maintainability and type safety for code working with monitor and status objects. [`(7d5b710)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7d5b710cf22157a5a4ab73508d46ec6b9eafd5dc)
+
+
+
+### � Documentation
+
+- 📝 [docs] Clarify and expand TSDoc comments for monitoring types
+
+- Improves documentation for all public APIs and complex logic in monitoring types file, ensuring clarity on status semantics and field usage.
+- Updates barrel file documentation for better overview and consistency.
+- Adds process note to contribution instructions to require TSDoc comments on all public APIs and complex logic.
+- Removes redundant variable assignment in application entry point for cleaner code.
+- Enhances maintainability and onboarding for new contributors by providing precise contract details and rationale in type definitions. [`(f77a8d1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f77a8d1a176d72d3a6404e5642cf306ffa223f83)
+
+
+- 📝 [docs] Add TSDoc tag kinds docs and update logging cleanup
+
+- Introduces detailed documentation on TSDoc's block, modifier, and inline tags to support API documentation efforts.
+- Refines Electron main process cleanup: ensures robust and idempotent shutdown by handling both Node's beforeExit and Electron's will-quit events, and switches to using the correct log instance.
+- Updates tests to reflect event name changes and cleanup logic.
+- [dependency] Updates package version to 6.5.0 and adds @microsoft/api-extractor and @microsoft/tsdoc-config as dev dependencies to enable API extraction and improved documentation tooling. [`(193faeb)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/193faeb1787bc1708c47e7d453970feb59322232)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Guard monitor type checks against undefined
+
+- Updates monitor type assertions to use optional chaining,
+  preventing potential runtime errors if the monitor list is shorter
+  than expected. Improves test robustness when accessing array elements. [`(66688c4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/66688c485541c87f5c1813b082554a2f1cf780ef)
+
+
+- 🧪 [test] Remove redundant frontend tests and skip unstable branches
+
+- Cleans up frontend test suite by deleting numerous low-value and edge-case tests for UI components, stores, and hooks
+- Skips flaky or unstable backend and integration test branches related to timeout fallback logic and error handling
+- Adds comprehensive tests for newly introduced configuration manager, improving backend validation and business rules coverage
+- Refactors test scripts to reduce maintenance burden and avoid excessive coverage chasing
+- Renames test prebuild script for better CI clarity
+
+Reduces maintenance and flakiness while retaining critical backend coverage. [`(c62062f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c62062fda67b2a1af9c9fc24257d5c066cb7f94b)
+
+
+- 🧪 [test] Update tests for monitor defaults and remove timeout fallback checks
+
+- Aligns tests with updated monitor and site defaults, ensuring explicit values for fields like responseTime, monitoring, checkInterval, timeout, and retryAttempts.
+- Removes redundant checks for timeout fallback logic, reflecting changes in monitor configuration handling.
+- Improves clarity and reliability of type-related test expectations. [`(d1f3668)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d1f366869db75d9fb00fcc17e68574cf666780d2)
+
+
+- 🧪 [test] Remove obsolete configuration and port monitor tests
+
+- Cleans up redundant and outdated unit tests for configuration management and port monitoring, streamlining the test suite.
+- Updates npm scripts to clarify prestart logic, reducing confusion before running the application.
+- Improves maintainability by eliminating legacy test coverage no longer needed. [`(618f15e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/618f15e48a6d4f3c813c7b50d6d728a47d9e4c59)
+
+
+- 🧪 [test] Update tests for internal DB transaction usage
+
+- Migrates test mocks and assertions to use internal repository methods and explicit database transactions for improved accuracy and coverage.
+- Expands test data structures with missing monitor/site fields to match current interfaces and edge cases.
+- Refines log output assertions to match new timestamped formats for consistency.
+- Removes obsolete or redundant test cases and updates expectations for function calls related to internal operations.
+- Improves coverage for scenarios with zero/undefined values and enhances test reliability for site/monitor actions. [`(ff6abfc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ff6abfcfc8a03ee5243b7af45256995ec22c4f90)
+
+
+- 🧪 [test] Set default responseTime to 0 in monitor tests
+
+- Updates test monitor objects to use responseTime: 0 instead of undefined, ensuring tests align with expected default values
+- Skips test cases related to undefined or null numeric fields, likely due to changes in default field handling
+- Improves consistency and future resilience of unit tests as code moves toward stricter type and value expectations [`(cb92f09)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cb92f09dce477d38c770fa4070a10232ba5d9f60)
+
+
+
+### 🧹 Chores
+
+- 🧹 [chore] Standardize property formatting and trailing commas
+
+- Enforces consistent use of double quotes and trailing commas across all relevant test, utility, and service files.
+- Updates object and array property formatting for clarity and future maintainability.
+- Improves readability and reduces noise in diffs, simplifying future code reviews.
+- Prepares the codebase for automated linting and formatting tools. [`(0481571)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/04815717377282e6ead249fea81a279b6b4f7f8e)
+
+
+- Update changelogs for v6.5.0 [skip ci] [`(f4a444e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f4a444e2e4d6d49c41305870bfd8d70623e219a2)
 
 
 
