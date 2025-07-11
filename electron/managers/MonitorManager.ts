@@ -16,7 +16,6 @@ import { MonitorRepository, HistoryRepository, SiteRepository, DatabaseService, 
 import { Site, StatusUpdate } from "../types";
 import {
     monitorLogger as logger,
-    performInitialMonitorChecks,
     startAllMonitoring,
     startMonitoringForSite,
     stopAllMonitoring,
@@ -198,13 +197,11 @@ export class MonitorManager {
      * Set up a new site for monitoring (initial checks, intervals, auto-start).
      */
     public async setupSiteForMonitoring(site: Site): Promise<void> {
-        // Initial check for all monitors
-        await performInitialMonitorChecks(site, this.checkMonitor.bind(this), logger);
-
         // Apply business rules for default intervals
         await this.applyDefaultIntervals(site);
 
         // Apply business rules for auto-starting monitoring
+        // Note: Initial checks are handled by MonitorScheduler when monitoring starts
         await this.autoStartMonitoringIfAppropriate(site);
 
         // Emit site setup completed event
@@ -223,7 +220,7 @@ export class MonitorManager {
         logger.debug(`[MonitorManager] Setting up ${newMonitorIds.length} new monitors for site: ${site.identifier}`);
 
         // Filter to only the new monitors
-        const newMonitors = site.monitors.filter(m => m.id && newMonitorIds.includes(m.id));
+        const newMonitors = site.monitors.filter((m) => m.id && newMonitorIds.includes(m.id));
 
         if (newMonitors.length === 0) {
             logger.debug(`[MonitorManager] No valid new monitors found for site: ${site.identifier}`);
@@ -233,7 +230,9 @@ export class MonitorManager {
         // Apply default intervals and perform setup for each new monitor
         await this.setupIndividualNewMonitors(site, newMonitors);
 
-        logger.info(`[MonitorManager] Completed setup for ${newMonitors.length} new monitors in site: ${site.identifier}`);
+        logger.info(
+            `[MonitorManager] Completed setup for ${newMonitors.length} new monitors in site: ${site.identifier}`
+        );
     }
 
     /**
@@ -244,35 +243,18 @@ export class MonitorManager {
         for (const monitor of newMonitors) {
             if (this.shouldApplyDefaultInterval(monitor)) {
                 monitor.checkInterval = DEFAULT_CHECK_INTERVAL;
-                logger.debug(`[MonitorManager] Applied default interval ${monitor.checkInterval}ms to new monitor: ${monitor.id}`);
-            }
-        }
-
-        // Perform initial checks for new monitors
-        for (const monitor of newMonitors) {
-            if (monitor.id) {
-                await this.performInitialCheckForNewMonitor(site, monitor.id);
+                logger.debug(
+                    `[MonitorManager] Applied default interval ${monitor.checkInterval}ms to new monitor: ${monitor.id}`
+                );
             }
         }
 
         // Auto-start monitoring for new monitors if appropriate
+        // Note: Initial checks are handled by MonitorScheduler when monitoring starts
         if (site.monitoring !== false) {
             await this.autoStartNewMonitors(site, newMonitors);
         } else {
             logger.debug(`[MonitorManager] Skipping auto-start for new monitors - site monitoring disabled`);
-        }
-    }
-
-    /**
-     * Perform initial check for a new monitor.
-     */
-    private async performInitialCheckForNewMonitor(site: Site, monitorId: string): Promise<void> {
-        try {
-            logger.debug(`[MonitorManager] Performing initial check for new monitor: ${monitorId}`);
-            await this.checkMonitor(site, monitorId);
-        } catch (error) {
-            logger.error(`[MonitorManager] Failed initial check for new monitor ${monitorId}:`, error);
-            // Continue with other monitors even if one fails
         }
     }
 
@@ -331,11 +313,15 @@ export class MonitorManager {
      * Business logic: Automatically start monitoring if appropriate according to business rules.
      */
     private async autoStartMonitoringIfAppropriate(site: Site): Promise<void> {
-        logger.debug(`[MonitorManager] Evaluating auto-start for site: ${site.identifier} (site.monitoring: ${site.monitoring})`);
+        logger.debug(
+            `[MonitorManager] Evaluating auto-start for site: ${site.identifier} (site.monitoring: ${site.monitoring})`
+        );
 
         // Site-level monitoring acts as a master switch
         if (site.monitoring === false) {
-            logger.debug(`[MonitorManager] Site monitoring disabled, skipping all monitors for site: ${site.identifier}`);
+            logger.debug(
+                `[MonitorManager] Site monitoring disabled, skipping all monitors for site: ${site.identifier}`
+            );
             return;
         }
 
