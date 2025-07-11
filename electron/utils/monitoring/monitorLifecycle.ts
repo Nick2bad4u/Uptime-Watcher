@@ -52,9 +52,9 @@ export async function startAllMonitoring(config: MonitoringLifecycleConfig, isMo
             if (monitor.id) {
                 try {
                     // Use transaction for database update
-                    await config.databaseService.executeTransaction(async () => {
+                    await config.databaseService.executeTransaction(async (db) => {
                         if (monitor.id) {
-                            config.monitorRepository.update(monitor.id, {
+                            config.monitorRepository.updateInternal(db, monitor.id, {
                                 monitoring: true,
                                 status: "pending",
                             });
@@ -88,9 +88,9 @@ export async function stopAllMonitoring(config: MonitoringLifecycleConfig): Prom
             if (monitor.id && monitor.monitoring !== false) {
                 try {
                     // Use transaction for database update
-                    await config.databaseService.executeTransaction(async () => {
+                    await config.databaseService.executeTransaction(async (db) => {
                         if (monitor.id) {
-                            config.monitorRepository.update(monitor.id, {
+                            config.monitorRepository.updateInternal(db, monitor.id, {
                                 monitoring: false,
                                 status: "paused",
                             });
@@ -186,8 +186,8 @@ async function startSpecificMonitor(
 
     try {
         // Use transaction for database update
-        await config.databaseService.executeTransaction(async () => {
-            config.monitorRepository.update(monitorId, {
+        await config.databaseService.executeTransaction(async (db) => {
+            config.monitorRepository.updateInternal(db, monitorId, {
                 monitoring: true,
                 status: "pending",
             });
@@ -221,8 +221,8 @@ async function stopSpecificMonitor(
 
     try {
         // Use transaction for database update
-        await config.databaseService.executeTransaction(async () => {
-            config.monitorRepository.update(monitorId, {
+        await config.databaseService.executeTransaction(async (db) => {
+            config.monitorRepository.updateInternal(db, monitorId, {
                 monitoring: false,
                 status: "paused",
             });
@@ -243,6 +243,7 @@ async function stopSpecificMonitor(
  * Helper function to start or stop monitoring for all monitors in a site.
  */
 async function processAllSiteMonitors(
+    config: MonitoringLifecycleConfig,
     site: Site,
     identifier: string,
     callback?: MonitoringCallback,
@@ -264,7 +265,7 @@ async function processAllSiteMonitors(
                 results.push(result);
             } catch (error) {
                 // Log error but continue processing other monitors
-                console.error(`Failed to process monitor ${monitor.id}:`, error);
+                config.logger.error(`Failed to process monitor ${monitor.id}:`, error);
                 results.push(false);
             }
         }
@@ -279,22 +280,22 @@ async function processAllSiteMonitors(
  * Helper function to start monitoring for all monitors in a site.
  */
 async function startAllSiteMonitors(
-    _config: MonitoringLifecycleConfig,
+    config: MonitoringLifecycleConfig,
     site: Site,
     identifier: string,
     callback?: MonitoringCallback
 ): Promise<boolean> {
-    return processAllSiteMonitors(site, identifier, callback, true); // Use optimistic logic for starting
+    return processAllSiteMonitors(config, site, identifier, callback, true); // Use optimistic logic for starting
 }
 
 /**
  * Helper function to stop monitoring for all monitors in a site.
  */
 async function stopAllSiteMonitors(
-    _config: MonitoringLifecycleConfig,
+    config: MonitoringLifecycleConfig,
     site: Site,
     identifier: string,
     callback?: MonitoringCallback
 ): Promise<boolean> {
-    return processAllSiteMonitors(site, identifier, callback, false); // Use pessimistic logic for stopping
+    return processAllSiteMonitors(config, site, identifier, callback, false); // Use pessimistic logic for stopping
 }

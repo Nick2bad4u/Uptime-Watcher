@@ -91,7 +91,8 @@ function App() {
         subscribeToStatusUpdates((update: StatusUpdate) => {
             // Optional callback for additional processing if needed
             if (process.env.NODE_ENV === "development") {
-                console.log("Status update received:", update.site.identifier);
+                const timestamp = new Date().toLocaleTimeString();
+                console.log(`[${timestamp}] [App] Status update received:`, update.site.identifier);
             }
         });
 

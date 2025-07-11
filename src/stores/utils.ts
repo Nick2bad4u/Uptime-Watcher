@@ -75,7 +75,12 @@ export const debounce = <T extends unknown[]>(
  */
 export const logStoreAction = (storeName: string, actionName: string, data?: unknown) => {
     if (process.env.NODE_ENV === "development") {
-        console.log(`[${storeName}] ${actionName}`, data);
+        const timestamp = new Date().toLocaleTimeString();
+        if (data !== undefined) {
+            console.log(`[${timestamp}] [${storeName}] ${actionName}`, data);
+        } else {
+            console.log(`[${timestamp}] [${storeName}] ${actionName}`);
+        }
     }
 };
 

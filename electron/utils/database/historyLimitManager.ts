@@ -57,23 +57,22 @@ export async function setHistoryLimit(params: SetHistoryLimitParams): Promise<vo
     // Update the internal limit
     setHistoryLimit(finalLimit);
 
-    // Save to settings using repository - Use transaction for consistency
-    await databaseService.executeTransaction(async () => {
-        repositories.settings.set("historyLimit", finalLimit.toString());
+    // Use single transaction for atomicity - either both operations succeed or both fail
+    await databaseService.executeTransaction(async (db) => {
+        // Save to settings using internal method
+        repositories.settings.setInternal(db, "historyLimit", finalLimit.toString());
+        
+        // Prune history for all monitors if limit > 0 using internal method
+        if (finalLimit > 0) {
+            repositories.history.pruneAllHistoryInternal(db, finalLimit);
+        }
+        
         return Promise.resolve();
     });
 
     if (logger) {
         logger.debug(`History limit set to ${finalLimit}`);
-    }
-
-    // Prune history for all monitors using repository if limit > 0 - Use transaction
-    if (finalLimit > 0) {
-        await databaseService.executeTransaction(async () => {
-            repositories.history.pruneAllHistory(finalLimit);
-            return Promise.resolve();
-        });
-        if (logger) {
+        if (finalLimit > 0) {
             logger.debug(`Pruned history to ${finalLimit} entries per monitor`);
         }
     }

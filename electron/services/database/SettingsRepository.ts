@@ -39,13 +39,12 @@ export class SettingsRepository {
     /**
      * Set a setting value.
      */
-    public set(key: string, value: string): void {
+    public async set(key: string, value: string): Promise<void> {
         try {
-            const db = this.getDb();
-            db.run("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)", [key, value]);
-            if (isDev()) {
-                logger.debug(`[SettingsRepository] Set setting: ${key} = ${value}`);
-            }
+            await this.databaseService.executeTransaction((db) => {
+                this.setInternal(db, key, value);
+                return Promise.resolve();
+            });
         } catch (error) {
             logger.error(`[SettingsRepository] Failed to set setting: ${key}`, error);
             throw error;
@@ -53,18 +52,39 @@ export class SettingsRepository {
     }
 
     /**
+     * Internal method to set a setting value within an existing transaction.
+     * Use this method when you're already within a transaction context.
+     */
+    public setInternal(db: Database, key: string, value: string): void {
+        db.run("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)", [key, value]);
+        if (isDev()) {
+            logger.debug(`[SettingsRepository] Set setting (internal): ${key} = ${value}`);
+        }
+    }
+
+    /**
      * Delete a setting by key.
      */
-    public delete(key: string): void {
+    public async delete(key: string): Promise<void> {
         try {
-            const db = this.getDb();
-            db.run("DELETE FROM settings WHERE key = ?", [key]);
-            if (isDev()) {
-                logger.debug(`[SettingsRepository] Deleted setting: ${key}`);
-            }
+            await this.databaseService.executeTransaction((db) => {
+                this.deleteInternal(db, key);
+                return Promise.resolve();
+            });
         } catch (error) {
             logger.error(`[SettingsRepository] Failed to delete setting: ${key}`, error);
             throw error;
+        }
+    }
+
+    /**
+     * Internal method to delete a setting by key within an existing transaction.
+     * Use this method when you're already within a transaction context.
+     */
+    public deleteInternal(db: Database, key: string): void {
+        db.run("DELETE FROM settings WHERE key = ?", [key]);
+        if (isDev()) {
+            logger.debug(`[SettingsRepository] Deleted setting (internal): ${key}`);
         }
     }
 
@@ -93,11 +113,12 @@ export class SettingsRepository {
     /**
      * Clear all settings from the database.
      */
-    public deleteAll(): void {
+    public async deleteAll(): Promise<void> {
         try {
-            const db = this.getDb();
-            db.run("DELETE FROM settings");
-            logger.info("[SettingsRepository] All settings deleted");
+            await this.databaseService.executeTransaction((db) => {
+                this.deleteAllInternal(db);
+                return Promise.resolve();
+            });
         } catch (error) {
             logger.error("[SettingsRepository] Failed to delete all settings", error);
             throw error;
@@ -105,40 +126,56 @@ export class SettingsRepository {
     }
 
     /**
+     * Internal method to clear all settings from the database within an existing transaction.
+     * Use this method when you're already within a transaction context.
+     */
+    public deleteAllInternal(db: Database): void {
+        db.run("DELETE FROM settings");
+        logger.info("[SettingsRepository] All settings deleted (internal)");
+    }
+
+    /**
      * Bulk insert settings (for import functionality).
      * Uses a prepared statement and transaction for better performance.
      */
-    public bulkInsert(settings: Record<string, string>): void {
+    public async bulkInsert(settings: Record<string, string>): Promise<void> {
         const entries = Object.entries(settings);
         if (entries.length === 0) {
             return;
         }
 
         try {
-            const db = this.getDb();
-
-            // Use a transaction for bulk operations
-            db.run("BEGIN TRANSACTION");
-
-            // Prepare the statement once for better performance
-            const stmt = db.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)");
-
-            try {
-                for (const [key, value] of entries) {
-                    stmt.run([key, String(value)]);
-                }
-
-                db.run("COMMIT");
-                logger.info(`[SettingsRepository] Bulk inserted ${entries.length} settings`);
-            } catch (error) {
-                db.run("ROLLBACK");
-                throw error;
-            } finally {
-                stmt.finalize();
-            }
+            await this.databaseService.executeTransaction((db) => {
+                this.bulkInsertInternal(db, settings);
+                return Promise.resolve();
+            });
         } catch (error) {
             logger.error("[SettingsRepository] Failed to bulk insert settings", error);
             throw error;
+        }
+    }
+
+    /**
+     * Internal method to bulk insert settings within an existing transaction.
+     * Use this method when you're already within a transaction context.
+     */
+    public bulkInsertInternal(db: Database, settings: Record<string, string>): void {
+        const entries = Object.entries(settings);
+        if (entries.length === 0) {
+            return;
+        }
+
+        // Prepare the statement once for better performance
+        const stmt = db.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)");
+
+        try {
+            for (const [key, value] of entries) {
+                stmt.run([key, String(value)]);
+            }
+
+            logger.info(`[SettingsRepository] Bulk inserted ${entries.length} settings (internal)`);
+        } finally {
+            stmt.finalize();
         }
     }
 }

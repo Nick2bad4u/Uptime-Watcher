@@ -27,6 +27,7 @@ export interface IMonitoringOperations {
     startMonitoringForSite: (identifier: string, monitorId: string) => Promise<boolean>;
     stopMonitoringForSite: (identifier: string, monitorId: string) => Promise<boolean>;
     setHistoryLimit: (limit: number) => Promise<void>;
+    setupNewMonitors: (site: Site, newMonitorIds: string[]) => Promise<void>;
 }
 
 export interface SiteManagerDependencies {
@@ -187,6 +188,13 @@ export class SiteManager {
                 } else {
                     logger.warn("MonitoringOperations not available for stopMonitoring");
                     return false;
+                }
+            },
+            setupNewMonitors: async (site: Site, newMonitorIds: string[]) => {
+                if (this.monitoringOperations) {
+                    await this.monitoringOperations.setupNewMonitors(site, newMonitorIds);
+                } else {
+                    logger.warn("MonitoringOperations not available for setupNewMonitors");
                 }
             },
         };

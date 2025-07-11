@@ -216,6 +216,81 @@ export class MonitorManager {
     }
 
     /**
+     * Set up new monitors that were added to an existing site.
+     * Ensures new monitors get the same treatment as monitors in new sites.
+     */
+    public async setupNewMonitors(site: Site, newMonitorIds: string[]): Promise<void> {
+        logger.debug(`[MonitorManager] Setting up ${newMonitorIds.length} new monitors for site: ${site.identifier}`);
+
+        // Filter to only the new monitors
+        const newMonitors = site.monitors.filter(m => m.id && newMonitorIds.includes(m.id));
+
+        if (newMonitors.length === 0) {
+            logger.debug(`[MonitorManager] No valid new monitors found for site: ${site.identifier}`);
+            return;
+        }
+
+        // Apply default intervals and perform setup for each new monitor
+        await this.setupIndividualNewMonitors(site, newMonitors);
+
+        logger.info(`[MonitorManager] Completed setup for ${newMonitors.length} new monitors in site: ${site.identifier}`);
+    }
+
+    /**
+     * Set up individual new monitors (extracted for complexity reduction).
+     */
+    private async setupIndividualNewMonitors(site: Site, newMonitors: Site["monitors"]): Promise<void> {
+        // Apply default intervals for new monitors that don't have one
+        for (const monitor of newMonitors) {
+            if (this.shouldApplyDefaultInterval(monitor)) {
+                monitor.checkInterval = DEFAULT_CHECK_INTERVAL;
+                logger.debug(`[MonitorManager] Applied default interval ${monitor.checkInterval}ms to new monitor: ${monitor.id}`);
+            }
+        }
+
+        // Perform initial checks for new monitors
+        for (const monitor of newMonitors) {
+            if (monitor.id) {
+                await this.performInitialCheckForNewMonitor(site, monitor.id);
+            }
+        }
+
+        // Auto-start monitoring for new monitors if appropriate
+        if (site.monitoring !== false) {
+            await this.autoStartNewMonitors(site, newMonitors);
+        } else {
+            logger.debug(`[MonitorManager] Skipping auto-start for new monitors - site monitoring disabled`);
+        }
+    }
+
+    /**
+     * Perform initial check for a new monitor.
+     */
+    private async performInitialCheckForNewMonitor(site: Site, monitorId: string): Promise<void> {
+        try {
+            logger.debug(`[MonitorManager] Performing initial check for new monitor: ${monitorId}`);
+            await this.checkMonitor(site, monitorId);
+        } catch (error) {
+            logger.error(`[MonitorManager] Failed initial check for new monitor ${monitorId}:`, error);
+            // Continue with other monitors even if one fails
+        }
+    }
+
+    /**
+     * Auto-start monitoring for new monitors if appropriate.
+     */
+    private async autoStartNewMonitors(site: Site, newMonitors: Site["monitors"]): Promise<void> {
+        for (const monitor of newMonitors) {
+            if (monitor.id && monitor.monitoring) {
+                await this.startMonitoringForSite(site.identifier, monitor.id);
+                logger.debug(`[MonitorManager] Auto-started monitoring for new monitor: ${monitor.id}`);
+            } else if (monitor.id && !monitor.monitoring) {
+                logger.debug(`[MonitorManager] Skipping new monitor ${monitor.id} - individual monitoring disabled`);
+            }
+        }
+    }
+
+    /**
      * Business logic: Apply default check intervals for monitors that don't have one.
      * This ensures all monitors have a check interval set according to business rules.
      */
@@ -227,9 +302,9 @@ export class MonitorManager {
                 monitor.checkInterval = DEFAULT_CHECK_INTERVAL;
 
                 // Use transaction for database update
-                await this.dependencies.databaseService.executeTransaction(async () => {
+                await this.dependencies.databaseService.executeTransaction(async (db) => {
                     if (monitor.id) {
-                        this.dependencies.repositories.monitor.update(monitor.id, {
+                        this.dependencies.repositories.monitor.updateInternal(db, monitor.id, {
                             checkInterval: monitor.checkInterval,
                         });
                     }

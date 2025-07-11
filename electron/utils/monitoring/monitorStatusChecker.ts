@@ -12,7 +12,7 @@ import {
     DatabaseService,
     MonitorFactory,
 } from "../../services/index";
-import { Site, StatusHistory, StatusUpdate } from "../../types";
+import { Monitor, Site, StatusHistory, StatusUpdate } from "../../types";
 
 interface Logger {
     debug: (message: string, ...args: unknown[]) => void;
@@ -98,26 +98,36 @@ export async function checkMonitor(
 
     try {
         // Use transaction for atomicity of all database operations
-        await config.databaseService.executeTransaction(async () => {
-            // Add history entry using repository
-            config.repositories.history.addEntry(monitor.id, historyEntry, checkResult.details);
+        await config.databaseService.executeTransaction(async (db) => {
+            // Add history entry using internal method to avoid nested transactions
+            config.repositories.history.addEntryInternal(db, monitor.id, historyEntry, checkResult.details);
 
-            // Trim history if needed using repository
-            // Use smart history management for optimal UI experience
+            // Smart history pruning: Only prune when necessary to avoid performance overhead
             if (config.historyLimit > 0) {
-                // Calculate effective limit: ensure we always keep enough for large screen displays
-                // This prevents premature pruning that would leave charts looking sparse
-                const minRequiredForUI = 60; // Enough for large screens with high DPI
-                const effectiveLimit = Math.max(config.historyLimit, minRequiredForUI);
-                config.repositories.history.pruneHistory(monitor.id, effectiveLimit);
+                // Use a buffer strategy: only prune when we exceed limit + buffer
+                // This reduces frequency of pruning operations while maintaining reasonable limits
+                const bufferSize = Math.max(Math.floor(config.historyLimit * 0.2), 5); // 20% buffer, min 5 entries
+                const pruneThreshold = config.historyLimit + bufferSize;
+                
+                // Get current count for this monitor (lightweight operation)
+                const currentCount = config.repositories.history.getHistoryCount(monitor.id);
+                
+                if (currentCount > pruneThreshold) {
+                    config.repositories.history.pruneHistoryInternal(db, monitor.id, config.historyLimit);
+                    config.logger.debug(`[MonitorStatusChecker] Pruned history for monitor ${monitor.id}: ${currentCount} -> ${config.historyLimit} entries`);
+                }
             }
 
-            // Update monitor with new status using repository
-            config.repositories.monitor.update(monitor.id, {
-                lastChecked: monitor.lastChecked,
+            // Update monitor with new status using internal method (we're already in a transaction)
+            const updateData: Partial<Monitor> = {
                 responseTime: monitor.responseTime,
                 status: monitor.status,
-            });
+            };
+            // We just set lastChecked to 'now', so it's definitely defined
+            if (monitor.lastChecked !== undefined) {
+                updateData.lastChecked = monitor.lastChecked;
+            }
+            config.repositories.monitor.updateInternal(db, monitor.id, updateData);
             return Promise.resolve();
         });
 

@@ -24,7 +24,9 @@ export interface ISiteRepository {
     findAll(): Promise<{ identifier: string; name?: string | undefined }[]>;
     findByIdentifier(identifier: string): Promise<{ identifier: string; name?: string | undefined } | undefined>;
     upsert(site: Pick<Site, "identifier" | "name">): Promise<void>;
+    upsertInternal(db: Database, site: Pick<Site, "identifier" | "name" | "monitoring">): void;
     delete(identifier: string): Promise<boolean>;
+    deleteInternal(db: Database, identifier: string): boolean;
     // Import/Export operations
     exportAll(): Promise<Site[]>;
     deleteAll(): Promise<void>;
@@ -37,7 +39,9 @@ export interface ISiteRepository {
 export interface IMonitorRepository {
     findBySiteIdentifier(siteIdentifier: string): Promise<Monitor[]>;
     create(siteIdentifier: string, monitor: Monitor): Promise<string>;
+    createInternal(db: Database, siteIdentifier: string, monitor: Omit<Monitor, "id">): string;
     update(monitorId: string, monitor: Partial<Monitor>): Promise<void>;
+    updateInternal(db: Database, monitorId: string, monitor: Partial<Monitor>): void;
     delete(monitorId: string): Promise<boolean>;
     deleteBySiteIdentifier(siteIdentifier: string): Promise<void>;
     deleteBySiteIdentifierInternal(db: Database, siteIdentifier: string): void;
@@ -54,10 +58,15 @@ export interface IHistoryRepository {
     findByMonitorId(monitorId: string): Promise<StatusHistory[]>;
     create(monitorId: string, history: StatusHistory): Promise<void>;
     deleteByMonitorId(monitorId: string): Promise<void>;
+    deleteByMonitorIdInternal(db: Database, monitorId: string): void;
     // Import/Export operations
     deleteAll(): Promise<void>;
+    deleteAllInternal(db: Database): void;
     addEntry(monitorId: string, history: StatusHistory, details?: string): Promise<void>;
+    addEntryInternal(db: Database, monitorId: string, history: StatusHistory, details?: string): void;
     pruneHistory(monitorId: string, limit: number): Promise<void>;
+    pruneHistoryInternal(db: Database, monitorId: string, limit: number): void;
+    pruneAllHistoryInternal(db: Database, limit: number): void;
 }
 
 /**
@@ -66,11 +75,15 @@ export interface IHistoryRepository {
 export interface ISettingsRepository {
     get(key: string): Promise<string | undefined>;
     set(key: string, value: string): Promise<void>;
+    setInternal(db: Database, key: string, value: string): void;
     delete(key: string): Promise<void>;
+    deleteInternal(db: Database, key: string): void;
     // Import/Export operations
     getAll(): Promise<Record<string, string>>;
     deleteAll(): Promise<void>;
+    deleteAllInternal(db: Database): void;
     bulkInsert(settings: Record<string, string>): Promise<void>;
+    bulkInsertInternal(db: Database, settings: Record<string, string>): void;
 }
 
 /**
@@ -113,6 +126,8 @@ export interface MonitoringConfig {
     stopMonitoring: (identifier: string, monitorId: string) => Promise<boolean>;
     /** Function to set history limit */
     setHistoryLimit: (limit: number) => void;
+    /** Function to setup new monitors for a site */
+    setupNewMonitors: (site: Site, newMonitorIds: string[]) => Promise<void>;
 }
 
 /**

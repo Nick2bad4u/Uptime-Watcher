@@ -3,6 +3,8 @@
  * Provides a testable, dependency-injected service for application data management.
  */
 
+import { Database } from "node-sqlite3-wasm";
+
 import { UptimeEvents, TypedEventBus } from "../../events/index";
 import {
     DatabaseService,
@@ -145,25 +147,25 @@ export class DataImportExportService {
      */
     async persistImportedData(sites: ImportSite[], settings: Record<string, string>): Promise<void> {
         try {
-            await this.databaseService.executeTransaction(() => {
-                // Clear existing data
-                this.repositories.site.deleteAll();
-                this.repositories.settings.deleteAll();
-                this.repositories.monitor.deleteAll();
-                this.repositories.history.deleteAll();
+            await this.databaseService.executeTransaction(async (db) => {
+                // Clear existing data using internal methods to avoid nested transactions
+                await this.repositories.site.deleteAll();
+                this.repositories.settings.deleteAllInternal(db);
+                await this.repositories.monitor.deleteAll();
+                this.repositories.history.deleteAllInternal(db);
 
                 // Import sites using bulk insert
                 const siteRows = sites.map((site) => ({
                     identifier: site.identifier,
                     name: site.name,
                 }));
-                this.repositories.site.bulkInsert(siteRows);
+                await this.repositories.site.bulkInsert(siteRows);
 
                 // Import monitors and history
-                this.importMonitorsWithHistory(sites);
+                await this.importMonitorsWithHistory(db, sites);
 
-                // Import settings
-                this.repositories.settings.bulkInsert(settings);
+                // Import settings using internal method to avoid nested transactions
+                this.repositories.settings.bulkInsertInternal(db, settings);
 
                 return Promise.resolve();
             });
@@ -190,14 +192,21 @@ export class DataImportExportService {
      * Import monitors with their history for all sites.
      * Private helper method for monitor data persistence.
      */
-    private importMonitorsWithHistory(sites: ImportSite[]): void {
+    private async importMonitorsWithHistory(db: Database, sites: ImportSite[]): Promise<void> {
         for (const site of sites) {
             if (Array.isArray(site.monitors) && site.monitors.length > 0) {
-                // Use bulk create for monitors
-                const createdMonitors = this.repositories.monitor.bulkCreate(site.identifier, site.monitors);
-
-                // Import history for each created monitor
-                this.importHistoryForMonitors(createdMonitors, site.monitors);
+                try {
+                    // Create monitors using the async bulkCreate method
+                    const createdMonitors = await this.repositories.monitor.bulkCreate(site.identifier, site.monitors);
+                    
+                    // Import history for the created monitors
+                    this.importHistoryForMonitors(db, createdMonitors, site.monitors);
+                    
+                    this.logger.debug(`[DataImportExportService] Imported ${createdMonitors.length} monitors for site: ${site.identifier}`);
+                } catch (error) {
+                    this.logger.error(`[DataImportExportService] Failed to import monitors for site ${site.identifier}:`, error);
+                    // Continue with other sites even if one fails
+                }
             }
         }
     }
@@ -206,7 +215,7 @@ export class DataImportExportService {
      * Import history for created monitors by matching with original monitors.
      * Private helper method for history data persistence.
      */
-    private importHistoryForMonitors(createdMonitors: Site["monitors"], originalMonitors: Site["monitors"]): void {
+    private importHistoryForMonitors(db: Database, createdMonitors: Site["monitors"], originalMonitors: Site["monitors"]): void {
         for (const createdMonitor of createdMonitors) {
             // Find the original monitor with matching properties to get its history
             const originalMonitor = originalMonitors.find(
@@ -217,7 +226,7 @@ export class DataImportExportService {
             );
 
             if (originalMonitor?.history && originalMonitor.history.length > 0 && createdMonitor.id) {
-                this.importMonitorHistory(Number(createdMonitor.id), originalMonitor.history);
+                this.importMonitorHistory(db, Number(createdMonitor.id), originalMonitor.history);
             }
         }
     }
@@ -226,9 +235,10 @@ export class DataImportExportService {
      * Import history for a specific monitor.
      * Private helper method for history data persistence.
      */
-    private importMonitorHistory(monitorId: number, history: StatusHistory[]): void {
+    private importMonitorHistory(db: Database, monitorId: number, history: StatusHistory[]): void {
         for (const entry of history) {
-            this.repositories.history.addEntry(
+            this.repositories.history.addEntryInternal(
+                db,
                 String(monitorId),
                 {
                     responseTime: entry.responseTime,

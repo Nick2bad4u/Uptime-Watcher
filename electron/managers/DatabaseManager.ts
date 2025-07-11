@@ -120,6 +120,12 @@ export class DatabaseManager {
 
                 return true; // Always return true for the interface
             },
+            setupNewMonitors: (site: Site, newMonitorIds: string[]) => {
+                // For database loading, we don't need to setup new monitors
+                // This is only used during site updates
+                logger.debug(`[DatabaseManager] setupNewMonitors called for site ${site.identifier} with ${newMonitorIds.length} monitors - no action needed during loading`);
+                return Promise.resolve();
+            },
         };
 
         // Load sites using the new service-based architecture

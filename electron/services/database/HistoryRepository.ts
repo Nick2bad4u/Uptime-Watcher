@@ -6,7 +6,6 @@ import { logger } from "../../utils/index";
 import { DatabaseService } from "./DatabaseService";
 import {
     addHistoryEntry,
-    bulkInsertHistory,
     deleteAllHistory,
     deleteHistoryByMonitorId,
     findHistoryByMonitorId,
@@ -68,25 +67,16 @@ export class HistoryRepository {
     /**
      * Prune old history entries for all monitors.
      */
-    public pruneAllHistory(limit: number): void {
+    public async pruneAllHistory(limit: number): Promise<void> {
         if (limit <= 0) {
             return;
         }
 
         try {
-            const db = this.getDb();
-
-            // Get all monitor IDs
-            const monitorRows = db.all("SELECT id FROM monitors") as { id: number }[];
-
-            // Prune history for each monitor
-            for (const row of monitorRows) {
-                this.pruneHistory(String(row.id), limit);
-            }
-
-            if (isDev()) {
-                logger.debug(`[HistoryRepository] Pruned history for all monitors (limit: ${limit})`);
-            }
+            await this.databaseService.executeTransaction((db) => {
+                this.pruneAllHistoryInternal(db, limit);
+                return Promise.resolve();
+            });
         } catch (error) {
             logger.error("[HistoryRepository] Failed to prune history for all monitors", error);
             throw error;
@@ -110,6 +100,52 @@ export class HistoryRepository {
     }
 
     /**
+     * Internal method to clear all history from the database within an existing transaction.
+     * Use this method when you're already within a transaction context.
+     */
+    public deleteAllInternal(db: Database): void {
+        return deleteAllHistory(db);
+    }
+
+    /**
+     * Internal method to delete history entries for a specific monitor within an existing transaction.
+     * Use this method when you're already within a transaction context.
+     */
+    public deleteByMonitorIdInternal(db: Database, monitorId: string): void {
+        return deleteHistoryByMonitorId(db, monitorId);
+    }
+
+    /**
+     * Internal method to add a new history entry for a monitor within an existing transaction.
+     * Use this method when you're already within a transaction context.
+     */
+    public addEntryInternal(db: Database, monitorId: string, entry: StatusHistory, details?: string): void {
+        return addHistoryEntry(db, monitorId, entry, details);
+    }
+
+    /**
+     * Internal method to prune old history entries for all monitors within an existing transaction.
+     * Use this method when you're already within a transaction context.
+     */
+    public pruneAllHistoryInternal(db: Database, limit: number): void {
+        if (limit <= 0) {
+            return;
+        }
+
+        // Get all monitor IDs
+        const monitorRows = db.all("SELECT id FROM monitors") as { id: number }[];
+
+        // Prune history for each monitor
+        for (const row of monitorRows) {
+            pruneHistoryForMonitor(db, String(row.id), limit);
+        }
+
+        if (isDev()) {
+            logger.debug(`[HistoryRepository] Pruned history for all monitors (limit: ${limit}) (internal)`);
+        }
+    }
+
+    /**
      * Get the most recent history entry for a monitor.
      */
     public getLatestEntry(monitorId: string): StatusHistory | undefined {
@@ -120,8 +156,57 @@ export class HistoryRepository {
     /**
      * Bulk insert history entries (for import functionality).
      */
-    public bulkInsert(monitorId: string, historyEntries: (StatusHistory & { details?: string })[]): void {
-        const db = this.getDb();
-        return bulkInsertHistory(db, monitorId, historyEntries);
+    public async bulkInsert(monitorId: string, historyEntries: (StatusHistory & { details?: string })[]): Promise<void> {
+        if (historyEntries.length === 0) {
+            return;
+        }
+
+        try {
+            await this.databaseService.executeTransaction((db) => {
+                // Prepare the statement once for better performance
+                const stmt = db.prepare(
+                    "INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)"
+                );
+
+                try {
+                    for (const entry of historyEntries) {
+                        stmt.run([
+                            monitorId,
+                            entry.timestamp,
+                            entry.status === "up" || entry.status === "down" ? entry.status : "down",
+                            entry.responseTime,
+                            entry.details ?? null,
+                        ]);
+                    }
+
+                    logger.info(
+                        `[HistoryRepository] Bulk inserted ${historyEntries.length} history entries for monitor: ${monitorId}`
+                    );
+                } finally {
+                    stmt.finalize();
+                }
+                
+                return Promise.resolve();
+            });
+        } catch (error) {
+            logger.error(`[HistoryRepository] Failed to bulk insert history for monitor: ${monitorId}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * Internal method to prune old history entries for a specific monitor within an existing transaction.
+     * Use this method when you're already within a transaction context.
+     */
+    public pruneHistoryInternal(db: Database, monitorId: string, limit: number): void {
+        if (limit <= 0) {
+            return;
+        }
+        
+        pruneHistoryForMonitor(db, monitorId, limit);
+        
+        if (isDev()) {
+            logger.debug(`[HistoryRepository] Pruned history for monitor ${monitorId} (limit: ${limit}) (internal)`);
+        }
     }
 }

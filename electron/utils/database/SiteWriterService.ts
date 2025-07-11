@@ -6,7 +6,7 @@
 import { Database } from "node-sqlite3-wasm";
 
 import { DatabaseService } from "../../services/index";
-import { Site } from "../../types";
+import { Site, Monitor } from "../../types";
 import {
     ILogger,
     ISiteRepository,
@@ -49,18 +49,20 @@ export class SiteWriterService {
             const site: Site = { ...siteData };
 
             // Use transaction for atomicity
-            await this.databaseService.executeTransaction(async (db) => {
-                // Persist site to database
-                await this.repositories.site.upsert(site);
+            await this.databaseService.executeTransaction((db) => {
+                // Persist site to database using internal method to avoid nested transactions
+                this.repositories.site.upsertInternal(db, site);
 
                 // Remove all existing monitors for this site, then insert new ones
                 this.repositories.monitor.deleteBySiteIdentifierInternal(db, site.identifier);
 
-                // Create monitors and assign IDs
+                // Create monitors and assign IDs using internal method to avoid nested transactions
                 for (const monitor of site.monitors) {
-                    const newId = await this.repositories.monitor.create(site.identifier, monitor);
+                    const newId = this.repositories.monitor.createInternal(db, site.identifier, monitor);
                     monitor.id = newId;
                 }
+
+                return Promise.resolve();
             });
 
             this.logger.info(`Site created successfully in database: ${site.identifier} (${site.name ?? "unnamed"})`);
@@ -85,14 +87,15 @@ export class SiteWriterService {
             const updatedSite = this.createUpdatedSite(siteCache, site, updates);
 
             // Use transaction for atomicity
-            await this.databaseService.executeTransaction(async (db) => {
-                // Persist to database
-                await this.repositories.site.upsert(updatedSite);
+            await this.databaseService.executeTransaction((db) => {
+                // Persist to database using internal method to avoid nested transactions
+                this.repositories.site.upsertInternal(db, updatedSite);
 
                 // Update monitors if provided - UPDATE existing monitors instead of recreating
                 if (updates.monitors) {
-                    await this.updateMonitorsPreservingHistory(db, identifier, updates.monitors);
+                    return this.updateMonitorsPreservingHistory(db, identifier, updates.monitors);
                 }
+                return Promise.resolve();
             });
 
             this.logger.info(`Site updated successfully: ${identifier}`);
@@ -119,10 +122,11 @@ export class SiteWriterService {
             const removed = siteCache.delete(identifier);
 
             // Use transaction for atomicity
-            await this.databaseService.executeTransaction(async (db) => {
-                // Remove from database
+            await this.databaseService.executeTransaction((db) => {
+                // Remove from database using internal methods to avoid nested transactions
                 this.repositories.monitor.deleteBySiteIdentifierInternal(db, identifier);
-                await this.repositories.site.delete(identifier);
+                this.repositories.site.deleteInternal(db, identifier);
+                return Promise.resolve();
             });
 
             if (removed) {
@@ -224,28 +228,37 @@ export class SiteWriterService {
                 // Existing monitor - look for it in the database
                 const existingMonitor = existingMonitors.find((m) => m.id === newMonitor.id);
                 if (existingMonitor) {
-                    await this.repositories.monitor.update(newMonitor.id, {
+                    const updateData: Partial<Monitor> = {
                         checkInterval: newMonitor.checkInterval,
-                        host: newMonitor.host,
                         monitoring: existingMonitor.monitoring,
-                        port: newMonitor.port,
                         retryAttempts: newMonitor.retryAttempts,
                         status: existingMonitor.status,
                         timeout: newMonitor.timeout,
                         type: newMonitor.type,
-                        url: newMonitor.url,
-                    });
+                    };
+                    if (newMonitor.host !== undefined) {
+                        updateData.host = newMonitor.host;
+                    }
+                    if (newMonitor.port !== undefined) {
+                        updateData.port = newMonitor.port;
+                    }
+                    if (newMonitor.url !== undefined) {
+                        updateData.url = newMonitor.url;
+                    }
+                    this.repositories.monitor.updateInternal(db, newMonitor.id, updateData);
                     this.logger.debug(`Updated existing monitor ${newMonitor.id} for site ${siteIdentifier}`);
                 } else {
                     // Monitor ID exists but not found in database - treat as new
-                    const newId = await this.repositories.monitor.create(siteIdentifier, newMonitor);
-                    // DON'T mutate the original object - this affects the cache
+                    const newId = this.repositories.monitor.createInternal(db, siteIdentifier, newMonitor);
+                    // Update the monitor object with the new database ID
+                    newMonitor.id = newId;
                     this.logger.debug(`Created new monitor ${newId} for site ${siteIdentifier} (ID not found)`);
                 }
             } else {
                 // New monitor - create it
-                const newId = await this.repositories.monitor.create(siteIdentifier, newMonitor);
-                // DON'T mutate the original object - this affects the cache
+                const newId = this.repositories.monitor.createInternal(db, siteIdentifier, newMonitor);
+                // Update the monitor object with the new database ID
+                newMonitor.id = newId;
                 this.logger.debug(`Created new monitor ${newId} for site ${siteIdentifier}`);
             }
         }
@@ -259,6 +272,25 @@ export class SiteWriterService {
                 this.logger.debug(`Removed monitor ${existingMonitor.id} from site ${siteIdentifier}`);
             }
         }
+    }
+
+    /**
+     * Detect new monitors that were added to an existing site.
+     * @param originalMonitors - The original monitors before update
+     * @param updatedMonitors - The updated monitors after update
+     * @returns Array of new monitor IDs
+     */
+    public detectNewMonitors(originalMonitors: Site["monitors"], updatedMonitors: Site["monitors"]): string[] {
+        const originalIds = new Set(originalMonitors.map((m) => m.id).filter(Boolean));
+        const newMonitorIds: string[] = [];
+
+        for (const monitor of updatedMonitors) {
+            if (monitor.id && !originalIds.has(monitor.id)) {
+                newMonitorIds.push(monitor.id);
+            }
+        }
+
+        return newMonitorIds;
     }
 }
 
@@ -316,6 +348,12 @@ export class SiteWritingOrchestrator {
                 updates.monitors,
                 monitoringConfig
             );
+
+            // Detect and setup new monitors to ensure consistency with new site behavior
+            const newMonitorIds = this.siteWriterService.detectNewMonitors(originalSite.monitors, updates.monitors);
+            if (newMonitorIds.length > 0) {
+                await monitoringConfig.setupNewMonitors(updatedSite, newMonitorIds);
+            }
         }
 
         return updatedSite;

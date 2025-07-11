@@ -254,7 +254,13 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                     throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
                 }
 
-                const updatedSite = updateMonitorInSite(site, monitorId, { retryAttempts });
+                // Only update if retryAttempts is defined
+                const updates: Partial<Monitor> = {};
+                if (retryAttempts !== undefined) {
+                    updates.retryAttempts = retryAttempts;
+                }
+
+                const updatedSite = updateMonitorInSite(site, monitorId, updates);
                 await SiteService.updateSite(siteId, { monitors: updatedSite.monitors });
                 await deps.syncSitesFromBackend();
             },
@@ -275,7 +281,13 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                     throw new Error(ERROR_MESSAGES.SITE_NOT_FOUND);
                 }
 
-                const updatedSite = updateMonitorInSite(site, monitorId, { timeout });
+                // Only update if timeout is defined
+                const updates: Partial<Monitor> = {};
+                if (timeout !== undefined) {
+                    updates.timeout = timeout;
+                }
+
+                const updatedSite = updateMonitorInSite(site, monitorId, updates);
                 await SiteService.updateSite(siteId, { monitors: updatedSite.monitors });
                 await deps.syncSitesFromBackend();
             },

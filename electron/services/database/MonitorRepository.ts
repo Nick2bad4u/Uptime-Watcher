@@ -78,50 +78,51 @@ export class MonitorRepository {
 
     /**
      * Create a new monitor and return its ID.
-     * Fixed to use RETURNING clause to avoid race conditions.
+     * Uses transactions to ensure atomicity.
      */
-    public create(siteIdentifier: string, monitor: Omit<Site["monitors"][0], "id">): string {
+    public async create(siteIdentifier: string, monitor: Omit<Site["monitors"][0], "id">): Promise<string> {
         try {
-            const db = this.getDb();
+            const result = await this.databaseService.executeTransaction(async (db) => {
+                // Use RETURNING clause to get the ID directly from the insert
+                const insertResult = db.get(
+                    `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, timeout, retryAttempts, monitoring, status, responseTime, lastChecked) 
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
+                     RETURNING id`,
+                    [
+                        siteIdentifier,
+                        monitor.type,
 
-            // Use RETURNING clause to get the ID directly from the insert
-            const result = db.get(
-                `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, timeout, retryAttempts, monitoring, status, responseTime, lastChecked) 
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
-                 RETURNING id`,
-                [
-                    siteIdentifier,
-                    monitor.type,
+                        monitor.url ? String(monitor.url) : null,
 
-                    monitor.url ? String(monitor.url) : null,
+                        monitor.host ? String(monitor.host) : null,
 
-                    monitor.host ? String(monitor.host) : null,
+                        monitor.port !== undefined ? Number(monitor.port) : null,
 
-                    monitor.port !== undefined ? Number(monitor.port) : null,
+                        monitor.checkInterval !== undefined ? Number(monitor.checkInterval) : null,
 
-                    monitor.checkInterval !== undefined ? Number(monitor.checkInterval) : null,
+                        monitor.timeout !== undefined ? Number(monitor.timeout) : null,
 
-                    monitor.timeout !== undefined ? Number(monitor.timeout) : null,
+                        monitor.retryAttempts !== undefined ? Number(monitor.retryAttempts) : null,
+                        monitor.monitoring ? 1 : 0,
+                        monitor.status,
 
-                    monitor.retryAttempts !== undefined ? Number(monitor.retryAttempts) : null,
-                    monitor.monitoring ? 1 : 0,
-                    monitor.status,
+                        Number(monitor.responseTime),
 
-                    Number(monitor.responseTime),
+                        monitor.lastChecked ? convertDateForDb(monitor.lastChecked) : null,
+                    ]
+                ) as { id: number } | undefined;
 
-                    monitor.lastChecked ? convertDateForDb(monitor.lastChecked) : null,
-                ]
-            ) as { id: number } | undefined;
+                if (!insertResult || typeof insertResult.id !== "number") {
+                    throw new Error(`Failed to create monitor for site ${siteIdentifier} - no ID returned`);
+                }
 
-            if (!result || typeof result.id !== "number") {
-                throw new Error(`Failed to create monitor for site ${siteIdentifier} - no ID returned`);
-            }
+                return Promise.resolve(String(insertResult.id));
+            });
 
-            const newId = String(result.id);
             if (isDev()) {
-                logger.debug(`[MonitorRepository] Created monitor with id: ${newId} for site: ${siteIdentifier}`);
+                logger.debug(`[MonitorRepository] Created monitor with id: ${result} for site: ${siteIdentifier}`);
             }
-            return newId;
+            return result;
         } catch (error) {
             logger.error(`[MonitorRepository] Failed to create monitor for site: ${siteIdentifier}`, error);
             throw error;
@@ -129,62 +130,156 @@ export class MonitorRepository {
     }
 
     /**
-     * Update an existing monitor.
+     * Internal method to create a monitor within an existing transaction.
+     * Use this method when you're already within a transaction context.
      */
-    public update(monitorId: string, monitor: Partial<Site["monitors"][0]>): void {
+    public createInternal(db: Database, siteIdentifier: string, monitor: Omit<Site["monitors"][0], "id">): string {
+        // Use RETURNING clause to get the ID directly from the insert
+        const insertResult = db.get(
+            `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, timeout, retryAttempts, monitoring, status, responseTime, lastChecked) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
+             RETURNING id`,
+            [
+                siteIdentifier,
+                monitor.type,
+                monitor.url ? String(monitor.url) : null,
+                monitor.host ? String(monitor.host) : null,
+                monitor.port !== undefined ? Number(monitor.port) : null,
+                monitor.checkInterval !== undefined ? Number(monitor.checkInterval) : null,
+                monitor.timeout !== undefined ? Number(monitor.timeout) : null,
+                monitor.retryAttempts !== undefined ? Number(monitor.retryAttempts) : null,
+                monitor.monitoring ? 1 : 0,
+                monitor.status,
+                Number(monitor.responseTime),
+                monitor.lastChecked ? convertDateForDb(monitor.lastChecked) : null,
+            ]
+        ) as { id: number } | undefined;
+
+        if (!insertResult || typeof insertResult.id !== "number") {
+            throw new Error(`Failed to create monitor for site ${siteIdentifier} - no ID returned`);
+        }
+
+        if (isDev()) {
+            logger.debug(`[MonitorRepository] Created monitor with id: ${insertResult.id} for site: ${siteIdentifier} (internal)`);
+        }
+
+        return String(insertResult.id);
+    }
+
+    /**
+     * Update an existing monitor.
+     * Uses transactions to ensure atomicity.
+     */
+    public async update(monitorId: string, monitor: Partial<Site["monitors"][0]>): Promise<void> {
         try {
-            const db = this.getDb();
+            await this.databaseService.executeTransaction(async (db) => {
+                // Build dynamic SQL based on provided fields to avoid overwriting with defaults
+                const updateFields: string[] = [];
+                const updateValues: DbValue[] = [];
 
-            // Build dynamic SQL based on provided fields to avoid overwriting with defaults
-            const updateFields: string[] = [];
-            const updateValues: DbValue[] = [];
-
-            // Add fields using helper methods
-            if (monitor.type !== undefined) {
-                updateFields.push("type = ?");
-                updateValues.push(monitor.type);
-            }
-
-            addStringField("url", monitor.url, updateFields, updateValues);
-            addStringField("host", monitor.host, updateFields, updateValues);
-            addNumberField("port", monitor.port, updateFields, updateValues);
-            addNumberField("checkInterval", monitor.checkInterval, updateFields, updateValues);
-            addNumberField("timeout", monitor.timeout, updateFields, updateValues);
-            addNumberField("retryAttempts", monitor.retryAttempts, updateFields, updateValues);
-            addBooleanField("monitoring", monitor.monitoring, updateFields, updateValues);
-
-            if (monitor.status !== undefined) {
-                updateFields.push("status = ?");
-                updateValues.push(monitor.status);
-            }
-
-            // monitor.responseTime is always a number, so no need for unnecessary conditional
-            addNumberField("responseTime", monitor.responseTime, updateFields, updateValues);
-
-            if (monitor.lastChecked !== undefined) {
-                updateFields.push("lastChecked = ?");
-                const lastCheckedValue = convertDateForDb(monitor.lastChecked);
-                updateValues.push(lastCheckedValue);
-            }
-
-            if (updateFields.length === 0) {
-                if (isDev()) {
-                    logger.debug(`[MonitorRepository] No fields to update for monitor: ${monitorId}`);
+                // Add fields using helper methods
+                if (monitor.type !== undefined) {
+                    updateFields.push("type = ?");
+                    updateValues.push(monitor.type);
                 }
-                return;
-            }
 
-            updateValues.push(monitorId);
+                addStringField("url", monitor.url, updateFields, updateValues);
+                addStringField("host", monitor.host, updateFields, updateValues);
+                addNumberField("port", monitor.port, updateFields, updateValues);
+                addNumberField("checkInterval", monitor.checkInterval, updateFields, updateValues);
+                addNumberField("timeout", monitor.timeout, updateFields, updateValues);
+                addNumberField("retryAttempts", monitor.retryAttempts, updateFields, updateValues);
+                addBooleanField("monitoring", monitor.monitoring, updateFields, updateValues);
 
-            const sql = `UPDATE monitors SET ${updateFields.join(", ")} WHERE id = ?`;
-            db.run(sql, updateValues);
+                if (monitor.status !== undefined) {
+                    updateFields.push("status = ?");
+                    updateValues.push(monitor.status);
+                }
 
-            if (isDev()) {
-                logger.debug(`[MonitorRepository] Updated monitor with id: ${monitorId}`);
-            }
+                // monitor.responseTime is always a number, so no need for unnecessary conditional
+                addNumberField("responseTime", monitor.responseTime, updateFields, updateValues);
+
+                if (monitor.lastChecked !== undefined) {
+                    updateFields.push("lastChecked = ?");
+                    const lastCheckedValue = convertDateForDb(monitor.lastChecked);
+                    updateValues.push(lastCheckedValue);
+                }
+
+                if (updateFields.length === 0) {
+                    if (isDev()) {
+                        logger.debug(`[MonitorRepository] No fields to update for monitor: ${monitorId}`);
+                    }
+                    return Promise.resolve();
+                }
+
+                updateValues.push(monitorId);
+
+                const sql = `UPDATE monitors SET ${updateFields.join(", ")} WHERE id = ?`;
+                db.run(sql, updateValues);
+
+                if (isDev()) {
+                    logger.debug(`[MonitorRepository] Updated monitor with id: ${monitorId}`);
+                }
+
+                return Promise.resolve();
+            });
         } catch (error) {
             logger.error(`[MonitorRepository] Failed to update monitor with id: ${monitorId}`, error);
             throw error;
+        }
+    }
+
+    /**
+     * Update an existing monitor (internal version for use within existing transactions).
+     * Does not create its own transaction.
+     */
+    public updateInternal(db: Database, monitorId: string, monitor: Partial<Site["monitors"][0]>): void {
+        // Build dynamic SQL based on provided fields to avoid overwriting with defaults
+        const updateFields: string[] = [];
+        const updateValues: DbValue[] = [];
+
+        // Add fields using helper methods
+        if (monitor.type !== undefined) {
+            updateFields.push("type = ?");
+            updateValues.push(monitor.type);
+        }
+
+        addStringField("url", monitor.url, updateFields, updateValues);
+        addStringField("host", monitor.host, updateFields, updateValues);
+        addNumberField("port", monitor.port, updateFields, updateValues);
+        addNumberField("checkInterval", monitor.checkInterval, updateFields, updateValues);
+        addNumberField("timeout", monitor.timeout, updateFields, updateValues);
+        addNumberField("retryAttempts", monitor.retryAttempts, updateFields, updateValues);
+        addBooleanField("monitoring", monitor.monitoring, updateFields, updateValues);
+
+        if (monitor.status !== undefined) {
+            updateFields.push("status = ?");
+            updateValues.push(monitor.status);
+        }
+
+        // monitor.responseTime is always a number, so no need for unnecessary conditional
+        addNumberField("responseTime", monitor.responseTime, updateFields, updateValues);
+
+        if (monitor.lastChecked !== undefined) {
+            updateFields.push("lastChecked = ?");
+            const lastCheckedValue = convertDateForDb(monitor.lastChecked);
+            updateValues.push(lastCheckedValue);
+        }
+
+        if (updateFields.length === 0) {
+            if (isDev()) {
+                logger.debug(`[MonitorRepository] No fields to update for monitor: ${monitorId} (internal)`);
+            }
+            return;
+        }
+
+        updateValues.push(monitorId);
+
+        const sql = `UPDATE monitors SET ${updateFields.join(", ")} WHERE id = ?`;
+        db.run(sql, updateValues);
+
+        if (isDev()) {
+            logger.debug(`[MonitorRepository] Updated monitor with id: ${monitorId} (internal)`);
         }
     }
 
@@ -290,14 +385,17 @@ export class MonitorRepository {
 
     /**
      * Clear all monitors from the database.
+     * Uses transactions to ensure atomicity.
      */
-    public deleteAll(): void {
+    public async deleteAll(): Promise<void> {
         try {
-            const db = this.getDb();
-            db.run("DELETE FROM monitors");
-            if (isDev()) {
-                logger.debug("[MonitorRepository] Cleared all monitors");
-            }
+            await this.databaseService.executeTransaction(async (db) => {
+                db.run("DELETE FROM monitors");
+                if (isDev()) {
+                    logger.debug("[MonitorRepository] Cleared all monitors");
+                }
+                return Promise.resolve();
+            });
         } catch (error) {
             logger.error("[MonitorRepository] Failed to clear all monitors", error);
             throw error;
@@ -307,33 +405,36 @@ export class MonitorRepository {
     /**
      * Bulk create monitors (for import functionality).
      * Returns the created monitor with their new IDs.
-     * Fixed to use RETURNING clause to avoid race conditions.
+     * Uses transactions to ensure atomicity.
      */
-    public bulkCreate(siteIdentifier: string, monitors: Site["monitors"][0][]): Site["monitors"][0][] {
+    public async bulkCreate(siteIdentifier: string, monitors: Site["monitors"][0][]): Promise<Site["monitors"][0][]> {
         try {
-            const db = this.getDb();
-            const createdMonitors: Site["monitors"][0][] = [];
+            const result = await this.databaseService.executeTransaction(async (db) => {
+                const createdMonitors: Site["monitors"][0][] = [];
 
-            for (const monitor of monitors) {
-                // Use RETURNING clause to get the ID directly from the insert
-                const result = db.get(
-                    `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, timeout, retryAttempts, monitoring, status, responseTime, lastChecked) 
-                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
-                     RETURNING id`,
-                    buildMonitorParameters(siteIdentifier, monitor)
-                ) as { id: number } | undefined;
+                for (const monitor of monitors) {
+                    // Use RETURNING clause to get the ID directly from the insert
+                    const insertResult = db.get(
+                        `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, timeout, retryAttempts, monitoring, status, responseTime, lastChecked) 
+                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
+                         RETURNING id`,
+                        buildMonitorParameters(siteIdentifier, monitor)
+                    ) as { id: number } | undefined;
 
-                if (result && typeof result.id === "number") {
-                    const newMonitor = {
-                        ...monitor,
-                        id: String(result.id),
-                    };
-                    createdMonitors.push(newMonitor);
+                    if (insertResult && typeof insertResult.id === "number") {
+                        const newMonitor = {
+                            ...monitor,
+                            id: String(insertResult.id),
+                        };
+                        createdMonitors.push(newMonitor);
+                    }
                 }
-            }
+
+                return Promise.resolve(createdMonitors);
+            });
 
             logger.info(`[MonitorRepository] Bulk created ${monitors.length} monitors for site: ${siteIdentifier}`);
-            return createdMonitors;
+            return result;
         } catch (error) {
             logger.error(`[MonitorRepository] Failed to bulk create monitors for site: ${siteIdentifier}`, error);
             throw error;

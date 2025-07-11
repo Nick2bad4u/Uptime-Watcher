@@ -153,6 +153,9 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                 stopMonitoringForSite: async (identifier: string, monitorId: string) => {
                     return this.monitorManager.stopMonitoringForSite(identifier, monitorId);
                 },
+                setupNewMonitors: async (site: Site, newMonitorIds: string[]) => {
+                    return this.monitorManager.setupNewMonitors(site, newMonitorIds);
+                },
             },
             monitorRepository,
             siteRepository,

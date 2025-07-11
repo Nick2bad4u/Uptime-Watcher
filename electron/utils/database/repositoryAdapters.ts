@@ -28,12 +28,20 @@ export class SiteRepositoryAdapter implements ISiteRepository {
         return Promise.resolve(this.repository.findByIdentifier(identifier));
     }
 
-    async upsert(site: Pick<Site, "identifier" | "name">): Promise<void> {
-        return Promise.resolve(this.repository.upsert(site));
+    async upsert(site: Pick<Site, "identifier" | "name" | "monitoring">): Promise<void> {
+        return this.repository.upsert(site);
+    }
+
+    upsertInternal(db: Database, site: Pick<Site, "identifier" | "name" | "monitoring">): void {
+        return this.repository.upsertInternal(db, site);
     }
 
     async delete(identifier: string): Promise<boolean> {
-        return Promise.resolve(this.repository.delete(identifier));
+        return this.repository.delete(identifier);
+    }
+
+    deleteInternal(db: Database, identifier: string): boolean {
+        return this.repository.deleteInternal(db, identifier);
     }
 
     // Import/Export operations
@@ -51,11 +59,11 @@ export class SiteRepositoryAdapter implements ISiteRepository {
     }
 
     async deleteAll(): Promise<void> {
-        return Promise.resolve(this.repository.deleteAll());
+        return this.repository.deleteAll();
     }
 
     async bulkInsert(sites: { identifier: string; name?: string }[]): Promise<void> {
-        return Promise.resolve(this.repository.bulkInsert(sites));
+        return this.repository.bulkInsert(sites);
     }
 }
 
@@ -77,8 +85,16 @@ export class MonitorRepositoryAdapter implements IMonitorRepository {
         return Promise.resolve(this.repository.create(siteIdentifier, monitor));
     }
 
+    createInternal(db: Database, siteIdentifier: string, monitor: Monitor): string {
+        return this.repository.createInternal(db, siteIdentifier, monitor);
+    }
+
     async update(monitorId: string, monitor: Monitor): Promise<void> {
         return Promise.resolve(this.repository.update(monitorId, monitor));
+    }
+
+    updateInternal(db: Database, monitorId: string, monitor: Partial<Monitor>): void {
+        return this.repository.updateInternal(db, monitorId, monitor);
     }
 
     async delete(monitorId: string): Promise<boolean> {
@@ -129,17 +145,37 @@ export class HistoryRepositoryAdapter implements IHistoryRepository {
         return Promise.resolve(this.repository.deleteByMonitorId(monitorId));
     }
 
+    deleteByMonitorIdInternal(db: Database, monitorId: string): void {
+        return this.repository.deleteByMonitorIdInternal(db, monitorId);
+    }
+
     // Import/Export operations
     async deleteAll(): Promise<void> {
         return Promise.resolve(this.repository.deleteAll());
+    }
+
+    deleteAllInternal(db: Database): void {
+        return this.repository.deleteAllInternal(db);
     }
 
     async addEntry(monitorId: string, history: StatusHistory, details?: string): Promise<void> {
         return Promise.resolve(this.repository.addEntry(monitorId, history, details));
     }
 
+    addEntryInternal(db: Database, monitorId: string, history: StatusHistory, details?: string): void {
+        return this.repository.addEntryInternal(db, monitorId, history, details);
+    }
+
     async pruneHistory(monitorId: string, limit: number): Promise<void> {
         return Promise.resolve(this.repository.pruneHistory(monitorId, limit));
+    }
+
+    pruneHistoryInternal(db: Database, monitorId: string, limit: number): void {
+        return this.repository.pruneHistoryInternal(db, monitorId, limit);
+    }
+
+    pruneAllHistoryInternal(db: Database, limit: number): void {
+        return this.repository.pruneAllHistoryInternal(db, limit);
     }
 }
 
@@ -159,11 +195,19 @@ export class SettingsRepositoryAdapter implements ISettingsRepository {
     }
 
     async set(key: string, value: string): Promise<void> {
-        return Promise.resolve(this.repository.set(key, value));
+        return this.repository.set(key, value);
+    }
+
+    setInternal(db: Database, key: string, value: string): void {
+        return this.repository.setInternal(db, key, value);
     }
 
     async delete(key: string): Promise<void> {
-        return Promise.resolve(this.repository.delete(key));
+        return this.repository.delete(key);
+    }
+
+    deleteInternal(db: Database, key: string): void {
+        return this.repository.deleteInternal(db, key);
     }
 
     // Import/Export operations
@@ -172,11 +216,19 @@ export class SettingsRepositoryAdapter implements ISettingsRepository {
     }
 
     async deleteAll(): Promise<void> {
-        return Promise.resolve(this.repository.deleteAll());
+        return this.repository.deleteAll();
+    }
+
+    deleteAllInternal(db: Database): void {
+        return this.repository.deleteAllInternal(db);
     }
 
     async bulkInsert(settings: Record<string, string>): Promise<void> {
-        return Promise.resolve(this.repository.bulkInsert(settings));
+        return this.repository.bulkInsert(settings);
+    }
+
+    bulkInsertInternal(db: Database, settings: Record<string, string>): void {
+        return this.repository.bulkInsertInternal(db, settings);
     }
 }
 
