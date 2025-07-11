@@ -97,6 +97,7 @@ export default [
             ".prettierrc.json",
             "**/cspell.json",
             "cspell.json",
+            "**/chatproject.md"
         ],
     },
 
