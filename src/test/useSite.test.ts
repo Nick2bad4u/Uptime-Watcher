@@ -27,6 +27,11 @@ const mockSiteMonitorResult = {
         id: "monitor-1",
         status: "up",
         type: "http",
+        responseTime: 0,
+        monitoring: true,
+        checkInterval: 30000,
+        timeout: 5000,
+        retryAttempts: 3,
     } as Monitor,
     monitorIds: ["monitor-1"],
     responseTime: 200,
@@ -75,9 +80,15 @@ describe("useSite", () => {
                 id: "monitor-1",
                 status: "up",
                 type: "http",
+                responseTime: 0,
+                monitoring: true,
+                checkInterval: 30000,
+                timeout: 5000,
+                retryAttempts: 3,
             } as Monitor,
         ],
         name: "Test Site",
+        monitoring: false
     };
 
     const mockErrorStore = {
@@ -177,6 +188,11 @@ describe("useSite", () => {
                 id: "custom-monitor",
                 status: "down",
                 type: "port",
+                responseTime: 0,
+                monitoring: false,
+                checkInterval: 0,
+                timeout: 0,
+                retryAttempts: 0
             };
 
             // Mock different monitor
@@ -249,6 +265,8 @@ describe("useSite", () => {
             const emptySite: Site = {
                 identifier: "empty-site",
                 monitors: [],
+                name: "",
+                monitoring: false
             };
 
             renderHook(() => useSite(emptySite));

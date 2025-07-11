@@ -48,9 +48,15 @@ describe("SiteService", () => {
                             status: "up",
                             type: "http",
                             url: "https://test1.com",
+                            responseTime: 0,
+                            monitoring: false,
+                            checkInterval: 0,
+                            timeout: 0,
+                            retryAttempts: 0
                         },
                     ],
                     name: "Test Site 1",
+                    monitoring: false
                 },
                 {
                     identifier: "site2",
@@ -62,9 +68,15 @@ describe("SiteService", () => {
                             port: 80,
                             status: "down",
                             type: "port",
+                            responseTime: 0,
+                            monitoring: false,
+                            checkInterval: 0,
+                            timeout: 0,
+                            retryAttempts: 0
                         },
                     ],
                     name: "Test Site 2",
+                    monitoring: false
                 },
             ];
 
@@ -110,9 +122,15 @@ describe("SiteService", () => {
                         status: "pending",
                         type: "http",
                         url: "https://newsite.com",
+                        responseTime: 0,
+                        monitoring: false,
+                        checkInterval: 0,
+                        timeout: 0,
+                        retryAttempts: 0
                     },
                 ],
                 name: "New Site",
+                monitoring: false
             };
 
             const createdSite: Site = {
@@ -124,9 +142,15 @@ describe("SiteService", () => {
                         status: "pending",
                         type: "http",
                         url: "https://newsite.com",
+                        responseTime: 0,
+                        monitoring: false,
+                        checkInterval: 0,
+                        timeout: 0,
+                        retryAttempts: 0
                     },
                 ],
                 name: "New Site",
+                monitoring: false
             };
 
             mockElectronAPI.sites.addSite.mockResolvedValueOnce(createdSite);
@@ -142,6 +166,7 @@ describe("SiteService", () => {
                 identifier: "new-site",
                 monitors: [],
                 name: "New Site",
+                monitoring: false
             };
 
             const error = new Error("Failed to create site");
@@ -155,6 +180,7 @@ describe("SiteService", () => {
                 identifier: "",
                 monitors: [],
                 name: "",
+                monitoring: false
             };
 
             const validationError = new Error("Invalid site data");
@@ -168,6 +194,7 @@ describe("SiteService", () => {
                 identifier: "existing-site",
                 monitors: [],
                 name: "Existing Site",
+                monitoring: false
             };
 
             const duplicateError = new Error("Site already exists");
@@ -359,9 +386,15 @@ describe("SiteService", () => {
                         status: "pending",
                         type: "http",
                         url: "https://valid.com",
+                        responseTime: 0,
+                        monitoring: false,
+                        checkInterval: 0,
+                        timeout: 0,
+                        retryAttempts: 0
                     },
                 ],
                 name: "Valid Site",
+                monitoring: false
             };
 
             mockElectronAPI.sites.addSite.mockResolvedValueOnce(validSite as Site);
@@ -381,6 +414,11 @@ describe("SiteService", () => {
                         status: "up",
                         type: "http",
                         url: "https://monitored.com",
+                        responseTime: 0,
+                        monitoring: false,
+                        checkInterval: 0,
+                        timeout: 0,
+                        retryAttempts: 0
                     },
                     {
                         history: [],
@@ -389,9 +427,15 @@ describe("SiteService", () => {
                         port: 443,
                         status: "down",
                         type: "port",
+                        responseTime: 0,
+                        monitoring: false,
+                        checkInterval: 0,
+                        timeout: 0,
+                        retryAttempts: 0
                     },
                 ],
                 name: "Site with Multiple Monitors",
+                monitoring: false
             };
 
             mockElectronAPI.sites.addSite.mockResolvedValueOnce(siteWithMonitors as Site);
@@ -411,9 +455,15 @@ describe("SiteService", () => {
                         status: "pending",
                         type: "http",
                         url: "https://special-chars.com/path?param=value&other=test",
+                        responseTime: 0,
+                        monitoring: false,
+                        checkInterval: 0,
+                        timeout: 0,
+                        retryAttempts: 0
                     },
                 ],
                 name: "Site with Special Characters: @#$%",
+                monitoring: false
             };
 
             mockElectronAPI.sites.addSite.mockResolvedValueOnce(siteWithSpecialChars as Site);
@@ -433,9 +483,15 @@ describe("SiteService", () => {
                         status: "pending",
                         type: "http",
                         url: "https://unicode-site.com",
+                        responseTime: 0,
+                        monitoring: false,
+                        checkInterval: 0,
+                        timeout: 0,
+                        retryAttempts: 0
                     },
                 ],
                 name: "Site with Unicode: 🌟💻🚀",
+                monitoring: false
             };
 
             mockElectronAPI.sites.addSite.mockResolvedValueOnce(siteWithUnicode as Site);

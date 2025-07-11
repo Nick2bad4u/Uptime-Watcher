@@ -146,7 +146,7 @@ describe("SiteDetails", () => {
                 id: "1",
                 type: "http",
                 url: "https://example.com",
-                port: undefined,
+                // port omitted entirely to satisfy exactOptionalPropertyTypes
                 checkInterval: 60000,
                 timeout: 5000,
                 retryAttempts: 3,

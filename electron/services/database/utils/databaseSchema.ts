@@ -15,7 +15,8 @@ export function createDatabaseTables(db: Database): void {
         db.run(`
             CREATE TABLE IF NOT EXISTS sites (
                 identifier TEXT PRIMARY KEY,
-                name TEXT
+                name TEXT,
+                monitoring BOOLEAN DEFAULT 1
             );
         `);
 

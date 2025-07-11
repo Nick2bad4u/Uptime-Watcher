@@ -49,6 +49,7 @@ const mockSite: Site = {
         },
     ],
     name: "Test Site",
+    monitoring: false
 };
 
 // Global browser API mocks

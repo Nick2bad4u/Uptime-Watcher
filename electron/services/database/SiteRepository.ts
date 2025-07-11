@@ -31,13 +31,18 @@ export class SiteRepository {
     /**
      * Get all sites from the database (without monitors).
      */
-    public findAll(): { identifier: string; name?: string | undefined }[] {
+    public findAll(): { identifier: string; name?: string | undefined; monitoring?: boolean | undefined }[] {
         try {
             const db = this.getDb();
-            const siteRows = db.all("SELECT * FROM sites") as { identifier: string; name?: string }[];
+            const siteRows = db.all("SELECT identifier, name, monitoring FROM sites") as { 
+                identifier: string; 
+                name?: string; 
+                monitoring?: number;
+            }[];
             return siteRows.map((row) => ({
                 identifier: String(row.identifier),
                 ...(row.name !== undefined && { name: String(row.name) }),
+                ...(row.monitoring !== undefined && { monitoring: Boolean(row.monitoring) }),
             }));
         } catch (error) {
             logger.error("[SiteRepository] Failed to fetch all sites", error);
@@ -48,11 +53,11 @@ export class SiteRepository {
     /**
      * Find a site by its identifier.
      */
-    public findByIdentifier(identifier: string): { identifier: string; name?: string | undefined } | undefined {
+    public findByIdentifier(identifier: string): { identifier: string; name?: string | undefined; monitoring?: boolean | undefined } | undefined {
         try {
             const db = this.getDb();
-            const siteRow = db.get("SELECT * FROM sites WHERE identifier = ?", [identifier]) as
-                | { identifier: string; name?: string }
+            const siteRow = db.get("SELECT identifier, name, monitoring FROM sites WHERE identifier = ?", [identifier]) as
+                | { identifier: string; name?: string; monitoring?: number }
                 | undefined;
 
             if (!siteRow) {
@@ -62,6 +67,7 @@ export class SiteRepository {
             return {
                 identifier: String(siteRow.identifier),
                 ...(siteRow.name !== undefined && { name: String(siteRow.name) }),
+                ...(siteRow.monitoring !== undefined && { monitoring: Boolean(siteRow.monitoring) }),
             };
         } catch (error) {
             logger.error(`[SiteRepository] Failed to fetch site with identifier: ${identifier}`, error);
@@ -94,7 +100,7 @@ export class SiteRepository {
                 identifier: siteRow.identifier,
                 name: siteRow.name ?? "Unnamed Site",
                 monitors: monitors,
-                monitoring: true,
+                monitoring: siteRow.monitoring ?? true, // Default to true if not set
             };
 
             return site;
@@ -107,12 +113,13 @@ export class SiteRepository {
     /**
      * Create or update a site in the database.
      */
-    public upsert(site: Pick<Site, "identifier" | "name">): void {
+    public upsert(site: Pick<Site, "identifier" | "name" | "monitoring">): void {
         try {
             const db = this.getDb();
-            db.run("INSERT OR REPLACE INTO sites (identifier, name) VALUES (?, ?)", [
+            db.run("INSERT OR REPLACE INTO sites (identifier, name, monitoring) VALUES (?, ?, ?)", [
                 site.identifier,
                 site.name,
+                site.monitoring ? 1 : 0, // Convert boolean to integer for SQLite
             ]);
             logger.debug(`[SiteRepository] Upserted site: ${site.identifier}`);
         } catch (error) {
@@ -159,13 +166,14 @@ export class SiteRepository {
     /**
      * Export all sites for backup/import functionality.
      */
-    public exportAll(): { identifier: string; name?: string | undefined }[] {
+    public exportAll(): { identifier: string; name?: string | undefined; monitoring?: boolean | undefined }[] {
         try {
             const db = this.getDb();
-            const sites = db.all("SELECT * FROM sites");
+            const sites = db.all("SELECT identifier, name, monitoring FROM sites");
             return sites.map((row) => ({
                 identifier: row.identifier ? String(row.identifier) : "",
                 ...(row.name !== undefined && { name: String(row.name) }),
+                ...(row.monitoring !== undefined && { monitoring: Boolean(row.monitoring) }),
             }));
         } catch (error) {
             logger.error("[SiteRepository] Failed to export sites", error);
@@ -191,7 +199,7 @@ export class SiteRepository {
      * Bulk insert sites (for import functionality).
      * Uses a prepared statement and transaction for better performance.
      */
-    public bulkInsert(sites: { identifier: string; name?: string | undefined }[]): void {
+    public bulkInsert(sites: { identifier: string; name?: string | undefined; monitoring?: boolean | undefined }[]): void {
         if (sites.length === 0) {
             return;
         }
@@ -203,11 +211,21 @@ export class SiteRepository {
             db.run("BEGIN TRANSACTION");
 
             // Prepare the statement once for better performance
-            const stmt = db.prepare("INSERT INTO sites (identifier, name) VALUES (?, ?)");
+            const stmt = db.prepare("INSERT INTO sites (identifier, name, monitoring) VALUES (?, ?, ?)");
 
             try {
                 for (const site of sites) {
-                    stmt.run([site.identifier, site.name ?? null]);
+                    // Convert monitoring boolean to SQLite integer
+                    let monitoringValue = 1; // Default to true (1) if not specified
+                    if (site.monitoring !== undefined) {
+                        monitoringValue = site.monitoring ? 1 : 0;
+                    }
+                    
+                    stmt.run([
+                        site.identifier, 
+                        site.name ?? null,
+                        monitoringValue
+                    ]);
                 }
 
                 db.run("COMMIT");

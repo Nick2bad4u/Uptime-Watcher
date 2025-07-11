@@ -75,6 +75,7 @@ describe("useStatsStore - Uncovered Lines", () => {
                                 responseTime: 150,
                             },
                         ],
+                        responseTime: 0
                     },
                 ],
                 monitoring: true,
@@ -121,6 +122,7 @@ describe("useStatsStore - Uncovered Lines", () => {
                                 responseTime: 3000,
                             },
                         ],
+                        responseTime: 0
                     },
                 ],
                 monitoring: true,
@@ -173,6 +175,7 @@ describe("useStatsStore - Uncovered Lines", () => {
                                 responseTime: 1000,
                             },
                         ],
+                        responseTime: 0
                     },
                 ],
                 monitoring: true,
@@ -256,6 +259,7 @@ describe("useStatsStore - Uncovered Lines", () => {
                                 responseTime: 100,
                             },
                         ],
+                        responseTime: 0
                     },
                     {
                         id: "monitor2",
@@ -274,6 +278,7 @@ describe("useStatsStore - Uncovered Lines", () => {
                                 responseTime: 2000,
                             },
                         ],
+                        responseTime: 0
                     },
                 ],
                 monitoring: true,
@@ -299,6 +304,7 @@ describe("useStatsStore - Uncovered Lines", () => {
                                 responseTime: 300,
                             },
                         ],
+                        responseTime: 0
                     },
                 ],
                 monitoring: true,

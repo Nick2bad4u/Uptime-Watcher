@@ -63,9 +63,14 @@ describe("useSiteSync", () => {
                 status: "up" as const,
                 type: "http" as MonitorType,
                 url: "https://example.com",
+                responseTime: 0,
+                checkInterval: 0,
+                timeout: 0,
+                retryAttempts: 0
             },
         ],
         name: "Example Site",
+        monitoring: false
     };
 
     beforeEach(() => {

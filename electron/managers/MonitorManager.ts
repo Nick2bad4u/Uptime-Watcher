@@ -256,15 +256,25 @@ export class MonitorManager {
      * Business logic: Automatically start monitoring if appropriate according to business rules.
      */
     private async autoStartMonitoringIfAppropriate(site: Site): Promise<void> {
-        if (!this.shouldAutoStartMonitoring(site)) {
-            logger.debug(`[MonitorManager] Skipping auto-start for site: ${site.identifier} (business rules)`);
+        logger.debug(`[MonitorManager] Evaluating auto-start for site: ${site.identifier} (site.monitoring: ${site.monitoring})`);
+
+        // Site-level monitoring acts as a master switch
+        if (site.monitoring === false) {
+            logger.debug(`[MonitorManager] Site monitoring disabled, skipping all monitors for site: ${site.identifier}`);
+            return;
+        }
+
+        // Only process sites that have monitors
+        if (site.monitors.length === 0) {
+            logger.debug(`[MonitorManager] No monitors found for site: ${site.identifier}`);
             return;
         }
 
         logger.debug(`[MonitorManager] Auto-starting monitoring for site: ${site.identifier}`);
 
+        // Start only monitors that have monitoring enabled (respecting individual monitor states)
         for (const monitor of site.monitors) {
-            if (monitor.id) {
+            if (monitor.id && monitor.monitoring) {
                 await this.startMonitoringForSite(site.identifier, monitor.id);
 
                 if (isDev()) {
@@ -272,34 +282,12 @@ export class MonitorManager {
                         `[MonitorManager] Auto-started monitoring for monitor ${monitor.id} with interval ${monitor.checkInterval}ms`
                     );
                 }
+            } else if (monitor.id && !monitor.monitoring) {
+                logger.debug(`[MonitorManager] Skipping monitor ${monitor.id} - individual monitoring disabled`);
             }
         }
 
         logger.info(`[MonitorManager] Completed auto-starting monitoring for site: ${site.identifier}`);
-    }
-
-    /**
-     * Business logic: Determine if monitoring should be auto-started for a site.
-     * Business rules: Auto-start monitoring unless in development mode or site is inactive.
-     */
-    private shouldAutoStartMonitoring(site: Site): boolean {
-        // Business rule: Don't auto-start in development mode
-        if (isDev()) {
-            return false;
-        }
-
-        // Business rule: Only auto-start for sites that have monitors
-        if (site.monitors.length === 0) {
-            return false;
-        }
-
-        // Business rule: Site monitoring property takes precedence if explicitly set
-        if (site.monitoring !== undefined) {
-            return site.monitoring;
-        }
-
-        // Default business rule: Auto-start monitoring for all new sites
-        return true;
     }
 
     /**

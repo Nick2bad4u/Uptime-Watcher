@@ -40,6 +40,9 @@ describe("useSiteMonitor", () => {
                 status: "up",
                 type: "http",
                 url: "https://example.com",
+                checkInterval: 30000,
+                timeout: 5000,
+                retryAttempts: 3,
             },
             {
                 history: [{ responseTime: 0, status: "down", timestamp: 1640995200000 }],
@@ -50,9 +53,13 @@ describe("useSiteMonitor", () => {
                 responseTime: 0,
                 status: "down",
                 type: "port",
+                checkInterval: 60000,
+                timeout: 10000,
+                retryAttempts: 1,
             },
         ] as Monitor[],
         name: "Test Site",
+        monitoring: false
     };
 
     beforeEach(() => {
@@ -133,6 +140,8 @@ describe("useSiteMonitor", () => {
             const emptySite: Site = {
                 identifier: "empty-site",
                 monitors: [],
+                name: "",
+                monitoring: false
             };
 
             mockStore.sites = [emptySite];
@@ -177,9 +186,15 @@ describe("useSiteMonitor", () => {
                         id: "monitor-1",
                         status: "up",
                         type: "http",
-                        // monitoring is undefined
+                        responseTime: 0,
+                        monitoring: true,
+                        checkInterval: 0,
+                        timeout: 0,
+                        retryAttempts: 0
                     } as Monitor,
                 ],
+                name: "",
+                monitoring: false
             };
 
             mockStore.sites = [siteWithUndefinedMonitoring];
@@ -224,6 +239,8 @@ describe("useSiteMonitor", () => {
                         // history is undefined
                     } as Monitor,
                 ],
+                name: "",
+                monitoring: false
             };
 
             mockStore.sites = [siteWithoutHistory];
@@ -301,6 +318,11 @@ describe("useSiteMonitor", () => {
                         id: "monitor-3",
                         status: "up",
                         type: "http",
+                        responseTime: 0,
+                        monitoring: true,
+                        checkInterval: 0,
+                        timeout: 0,
+                        retryAttempts: 0
                     } as Monitor,
                 ],
             };
@@ -356,6 +378,8 @@ describe("useSiteMonitor", () => {
             const singleMonitorSite: Site = {
                 identifier: "single-site",
                 monitors: mockSite.monitors[0] ? [mockSite.monitors[0]] : [],
+                name: "",
+                monitoring: false
             };
 
             mockStore.sites = [singleMonitorSite];
@@ -373,11 +397,18 @@ describe("useSiteMonitor", () => {
                 id: "minimal-monitor",
                 status: "pending",
                 type: "http",
+                responseTime: 0,
+                monitoring: false,
+                checkInterval: 0,
+                timeout: 0,
+                retryAttempts: 0
             };
 
             const minimalSite: Site = {
                 identifier: "minimal-site",
                 monitors: [minimalMonitor],
+                name: "",
+                monitoring: false
             };
 
             mockStore.sites = [minimalSite];
@@ -386,8 +417,8 @@ describe("useSiteMonitor", () => {
             const { result } = renderHook(() => useSiteMonitor(minimalSite));
 
             expect(result.current.status).toBe("pending");
-            expect(result.current.responseTime).toBeUndefined();
-            expect(result.current.isMonitoring).toBe(true); // defaults to true
+            expect(result.current.responseTime).toBe(+0);
+            expect(result.current.isMonitoring).toBe(false); // defaults to true
         });
     });
 });

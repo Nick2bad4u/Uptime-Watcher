@@ -333,8 +333,8 @@ describe("App Component", () => {
 
         it("displays correct site count", () => {
             mockSitesStore.sites = [
-                { identifier: "1", monitors: [], name: "Test Site" },
-                { identifier: "2", monitors: [], name: "Another Site" },
+                { identifier: "1", monitors: [], name: "Test Site", monitoring: true },
+                { identifier: "2", monitors: [], name: "Another Site", monitoring: true },
             ];
             render(<App />);
             expect(screen.getByText("Monitored Sites (2)")).toBeInTheDocument();
@@ -548,7 +548,7 @@ describe("App Component", () => {
         });
 
         it("shows site details modal when showSiteDetails is true and site is selected", () => {
-            const testSite = { identifier: "1", monitors: [], name: "Test Site" };
+            const testSite = { identifier: "1", monitors: [], name: "Test Site", monitoring: true };
 
             // Update mock store values
             Object.assign(mockUIStore, {
@@ -566,7 +566,7 @@ describe("App Component", () => {
         });
 
         it("can close site details modal", async () => {
-            const testSite = { identifier: "1", monitors: [], name: "Test Site" };
+            const testSite = { identifier: "1", monitors: [], name: "Test Site", monitoring: true };
 
             // Update mock store values
             Object.assign(mockUIStore, {

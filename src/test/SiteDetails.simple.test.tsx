@@ -148,6 +148,7 @@ const mockSite: Site = {
         },
     ],
     name: "Test Site",
+    monitoring: false
 };
 
 describe("SiteDetails Simple Tests", () => {

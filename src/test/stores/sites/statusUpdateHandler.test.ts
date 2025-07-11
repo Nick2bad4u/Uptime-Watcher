@@ -100,9 +100,14 @@ describe("StatusUpdateHandler", () => {
                             monitoring: true,
                             status: "up",
                             type: "http",
+                            responseTime: 0,
+                            checkInterval: 0,
+                            timeout: 0,
+                            retryAttempts: 0
                         },
                     ],
                     name: "Test Site 1",
+                    monitoring: false
                 },
                 {
                     identifier: "site2",
@@ -113,9 +118,14 @@ describe("StatusUpdateHandler", () => {
                             monitoring: true,
                             status: "down",
                             type: "http",
+                            responseTime: 0,
+                            checkInterval: 0,
+                            timeout: 0,
+                            retryAttempts: 0
                         },
                     ],
                     name: "Test Site 2",
+                    monitoring: false
                 },
             ];
 
@@ -178,6 +188,7 @@ describe("StatusUpdateHandler", () => {
                 identifier: "unknown-site",
                 monitors: [],
                 name: "Unknown Site",
+                monitoring: false
             };
 
             const statusUpdate: StatusUpdate = {

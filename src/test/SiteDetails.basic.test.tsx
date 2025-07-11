@@ -30,6 +30,7 @@ const mockSite: Site = {
         },
     ],
     name: "Test Site",
+    monitoring: false
 };
 
 // Mock Chart.js and plugins
@@ -325,6 +326,11 @@ describe("SiteDetails Basic Coverage", () => {
                     status: "down",
                     type: "http",
                     url: "https://example.com",
+                    responseTime: 0,
+                    monitoring: false,
+                    checkInterval: 0,
+                    timeout: 0,
+                    retryAttempts: 0
                 },
             ],
         };
@@ -345,6 +351,11 @@ describe("SiteDetails Basic Coverage", () => {
                     status: "pending",
                     type: "http",
                     url: "https://example.com",
+                    responseTime: 0,
+                    monitoring: false,
+                    checkInterval: 0,
+                    timeout: 0,
+                    retryAttempts: 0
                 },
             ],
         };
@@ -384,6 +395,11 @@ describe("SiteDetails Basic Coverage", () => {
                     port: 80,
                     status: "down",
                     type: "port",
+                    responseTime: 0,
+                    monitoring: false,
+                    checkInterval: 0,
+                    timeout: 0,
+                    retryAttempts: 0
                 },
             ],
         };
@@ -411,6 +427,11 @@ describe("SiteDetails Basic Coverage", () => {
                     status: "up",
                     type: "http",
                     url: "https://very-long-url-that-should-be-handled-properly.example.com/path/to/resource",
+                    responseTime: 0,
+                    monitoring: false,
+                    checkInterval: 0,
+                    timeout: 0,
+                    retryAttempts: 0
                 },
             ],
         };
@@ -431,6 +452,11 @@ describe("SiteDetails Basic Coverage", () => {
                     status: "up",
                     type: "http",
                     url: "https://example.com",
+                    responseTime: 0,
+                    monitoring: false,
+                    checkInterval: 0,
+                    timeout: 0,
+                    retryAttempts: 0
                 },
             ],
         };
@@ -445,6 +471,7 @@ describe("SiteDetails Basic Coverage", () => {
             identifier: "test-site-2",
             monitors: [],
             name: "Incomplete Site",
+            monitoring: false
         };
         const mockOnClose = vi.fn();
         render(<SiteDetails site={incompleteSite} onClose={mockOnClose} />);

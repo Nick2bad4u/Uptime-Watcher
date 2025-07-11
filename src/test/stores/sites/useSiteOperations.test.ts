@@ -84,9 +84,11 @@ describe("useSiteOperations", () => {
                 timeout: 10000,
                 type: "http" as MonitorType,
                 url: "https://example.com",
+                responseTime: 0
             },
         ],
         name: "Example Site",
+        monitoring: false
     };
 
     const mockMonitor: Monitor = {
@@ -99,6 +101,7 @@ describe("useSiteOperations", () => {
         timeout: 10000,
         type: "http" as MonitorType,
         url: "https://test.com",
+        responseTime: 0
     };
 
     beforeEach(() => {
@@ -139,7 +142,7 @@ describe("useSiteOperations", () => {
                 identifier: "new-site.com",
                 name: "New Site",
             };
-            const createdSite = { ...siteData, monitors: [mockMonitor] };
+            const createdSite = { ...siteData, monitors: [mockMonitor], monitoring: false };
 
             vi.mocked(SiteService.addSite).mockResolvedValue(createdSite);
             vi.mocked(normalizeMonitor).mockImplementation((monitor: Partial<Monitor>) => monitor as Monitor);
@@ -148,6 +151,7 @@ describe("useSiteOperations", () => {
 
             expect(SiteService.addSite).toHaveBeenCalledWith({
                 ...siteData,
+                monitoring: true, // <-- Add this line to match implementation
                 monitors: expect.arrayContaining([
                     expect.objectContaining({
                         monitoring: true,
@@ -156,7 +160,10 @@ describe("useSiteOperations", () => {
                     }),
                 ]),
             });
-            expect(mockDependencies.addSite).toHaveBeenCalledWith(createdSite);
+            expect(mockDependencies.addSite).toHaveBeenCalledWith({
+                ...createdSite,
+                monitoring: false, // Ensure monitoring property is expected
+            });
             expect(logStoreAction).toHaveBeenCalledWith("SitesStore", "createSite", { siteData });
         });
 
@@ -166,7 +173,7 @@ describe("useSiteOperations", () => {
                 monitors: [mockMonitor],
                 name: "New Site",
             };
-            const createdSite = { ...siteData };
+            const createdSite = { ...siteData, monitoring: false };
 
             vi.mocked(SiteService.addSite).mockResolvedValue(createdSite);
             vi.mocked(normalizeMonitor).mockImplementation((monitor: Partial<Monitor>) => monitor as Monitor);
@@ -175,9 +182,13 @@ describe("useSiteOperations", () => {
 
             expect(SiteService.addSite).toHaveBeenCalledWith({
                 ...siteData,
+                monitoring: true, // <-- Add this line to match implementation
                 monitors: [mockMonitor],
             });
-            expect(mockDependencies.addSite).toHaveBeenCalledWith(createdSite);
+            expect(mockDependencies.addSite).toHaveBeenCalledWith({
+                ...createdSite,
+                monitoring: false, // Ensure monitoring property is expected
+            });
         });
     });
 
@@ -298,7 +309,7 @@ describe("useSiteOperations", () => {
 
             vi.mocked(SiteService.updateSite).mockResolvedValue(undefined);
 
-            await operations.updateMonitorRetryAttempts(siteId, monitorId, retryAttempts);
+            await operations.updateMonitorRetryAttempts(siteId, monitorId, retryAttempts as any);
 
             expect(updateMonitorInSite).toHaveBeenCalledWith(mockSite, monitorId, { retryAttempts: undefined });
             expect(SiteService.updateSite).toHaveBeenCalledWith(siteId, {
@@ -337,7 +348,8 @@ describe("useSiteOperations", () => {
 
             vi.mocked(SiteService.updateSite).mockResolvedValue(undefined);
 
-            await operations.updateMonitorTimeout(siteId, monitorId, timeout);
+            // Cast timeout as any to satisfy the type checker if needed
+            await operations.updateMonitorTimeout(siteId, monitorId, timeout as any);
 
             expect(updateMonitorInSite).toHaveBeenCalledWith(mockSite, monitorId, { timeout: undefined });
             expect(SiteService.updateSite).toHaveBeenCalledWith(siteId, {

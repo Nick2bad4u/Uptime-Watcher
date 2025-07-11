@@ -62,9 +62,11 @@ describe("useSiteDetails comprehensive coverage", () => {
                 timeout: 5000,
                 type: "http",
                 url: "https://test.com",
+                responseTime: 0,
             } as Monitor,
         ],
         name: "Test Site",
+        monitoring: false
     };
 
     // Mock store functions
@@ -193,7 +195,7 @@ describe("useSiteDetails comprehensive coverage", () => {
                     {
                         ...mockSite.monitors[0],
                         timeout: undefined,
-                    } as Monitor,
+                    } as unknown as Monitor,
                 ],
             };
 
@@ -302,7 +304,7 @@ describe("useSiteDetails comprehensive coverage", () => {
                     {
                         ...mockSite.monitors[0],
                         retryAttempts: undefined,
-                    } as Monitor,
+                    } as unknown as Monitor,
                 ],
             };
 

@@ -71,6 +71,9 @@ describe("Type Definitions", () => {
                 responseTime: 500,
                 status: "down",
                 type: "port",
+                checkInterval: 0,
+                timeout: 0,
+                retryAttempts: 0
             };
 
             expect(portMonitor.id).toBe("port-test-id");
@@ -85,6 +88,11 @@ describe("Type Definitions", () => {
                 id: "minimal-id",
                 status: "pending",
                 type: "http",
+                responseTime: 0,
+                monitoring: false,
+                checkInterval: 0,
+                timeout: 0,
+                retryAttempts: 0
             };
 
             expect(minimalMonitor.id).toBe("minimal-id");
@@ -100,6 +108,11 @@ describe("Type Definitions", () => {
                     id: "test",
                     status: status,
                     type: "http",
+                    responseTime: 0,
+                    monitoring: false,
+                    checkInterval: 0,
+                    timeout: 0,
+                    retryAttempts: 0
                 };
                 expect(monitor.status).toBe(status);
             }
@@ -118,6 +131,11 @@ describe("Type Definitions", () => {
                         status: "up",
                         type: "http",
                         url: "https://test.com",
+                        responseTime: 0,
+                        monitoring: false,
+                        checkInterval: 0,
+                        timeout: 0,
+                        retryAttempts: 0
                     },
                 ],
                 name: "Test Site",
@@ -133,6 +151,8 @@ describe("Type Definitions", () => {
             const minimalSite: Site = {
                 identifier: "minimal-site-uuid",
                 monitors: [],
+                name: "",
+                monitoring: false
             };
 
             expect(minimalSite.identifier).toBe("minimal-site-uuid");
@@ -143,9 +163,25 @@ describe("Type Definitions", () => {
             const site: Site = {
                 identifier: "multi-monitor-site",
                 monitors: [
-                    { history: [], id: "1", status: "up", type: "http" },
-                    { history: [], id: "2", status: "down", type: "port" },
+                    {
+                        history: [], id: "1", status: "up", type: "http",
+                        responseTime: 0,
+                        monitoring: false,
+                        checkInterval: 0,
+                        timeout: 0,
+                        retryAttempts: 0
+                    },
+                    {
+                        history: [], id: "2", status: "down", type: "port",
+                        responseTime: 0,
+                        monitoring: false,
+                        checkInterval: 0,
+                        timeout: 0,
+                        retryAttempts: 0
+                    },
                 ],
+                name: "",
+                monitoring: false
             };
 
             expect(site.monitors).toHaveLength(2);
@@ -186,6 +222,8 @@ describe("Type Definitions", () => {
             const site: Site = {
                 identifier: "update-site",
                 monitors: [],
+                name: "",
+                monitoring: false
             };
 
             const statusUpdate: StatusUpdate = {
@@ -201,6 +239,8 @@ describe("Type Definitions", () => {
             const site: Site = {
                 identifier: "new-site",
                 monitors: [],
+                name: "",
+                monitoring: false
             };
 
             const statusUpdate: StatusUpdate = {
@@ -221,6 +261,11 @@ describe("Type Definitions", () => {
                 status: "up",
                 type: "http",
                 url: "https://example.com",
+                responseTime: 0,
+                monitoring: false,
+                checkInterval: 0,
+                timeout: 0,
+                retryAttempts: 0
             };
 
             // Port monitor should have host and port
@@ -231,6 +276,11 @@ describe("Type Definitions", () => {
                 port: 443,
                 status: "up",
                 type: "port",
+                responseTime: 0,
+                monitoring: false,
+                checkInterval: 0,
+                timeout: 0,
+                retryAttempts: 0
             };
 
             expect(httpMonitor.type).toBe("http");
@@ -249,8 +299,15 @@ describe("Type Definitions", () => {
                         id: "child-monitor",
                         status: "up",
                         type: "http",
+                        responseTime: 0,
+                        monitoring: false,
+                        checkInterval: 0,
+                        timeout: 0,
+                        retryAttempts: 0
                     },
                 ],
+                name: "",
+                monitoring: false
             };
 
             expect(site.monitors).toHaveLength(1);
@@ -260,7 +317,16 @@ describe("Type Definitions", () => {
         it("should ensure status update contains valid site", () => {
             const site: Site = {
                 identifier: "status-update-site",
-                monitors: [{ history: [], id: "monitor", status: "up", type: "http" }],
+                monitors: [{
+                    history: [], id: "monitor", status: "up", type: "http",
+                    responseTime: 0,
+                    monitoring: false,
+                    checkInterval: 0,
+                    timeout: 0,
+                    retryAttempts: 0
+                }],
+                name: "",
+                monitoring: false
             };
 
             const update: StatusUpdate = {
@@ -291,16 +357,20 @@ describe("Type Definitions", () => {
                 id: "optional-test",
                 status: "pending",
                 type: "http",
-                // Optional properties not set
+                responseTime: 0,
+                monitoring: false,
+                checkInterval: 0,
+                timeout: 0,
+                retryAttempts: 0
             };
 
             expect(monitor.url).toBeUndefined();
-            expect(monitor.responseTime).toBeUndefined();
+            expect(monitor.responseTime).toBe(0);
             expect(monitor.lastChecked).toBeUndefined();
-            expect(monitor.monitoring).toBeUndefined();
-            expect(monitor.checkInterval).toBeUndefined();
-            expect(monitor.timeout).toBeUndefined();
-            expect(monitor.retryAttempts).toBeUndefined();
+            expect(monitor.monitoring).toBe(false);
+            expect(monitor.checkInterval).toBe(0);
+            expect(monitor.timeout).toBe(0);
+            expect(monitor.retryAttempts).toBe(0);
         });
     });
 });

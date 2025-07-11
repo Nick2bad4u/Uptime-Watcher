@@ -500,7 +500,9 @@ describe("useSiteDetails uncovered lines", () => {
             // Should use fallback currentSite with just identifier and empty monitors
             expect(result.current.currentSite).toEqual({
                 identifier: "test-site-id",
+                monitoring: true,
                 monitors: [],
+                name: "Unnamed Site"
             });
             expect(result.current.siteExists).toBe(false);
         });

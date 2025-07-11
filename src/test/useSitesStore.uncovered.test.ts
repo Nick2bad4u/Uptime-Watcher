@@ -66,9 +66,12 @@ describe("useSitesStore - Uncovered Functions", () => {
                     timeout: 5000,
                     type: "http" as const,
                     url: "https://test.com",
+                    responseTime: 0,
+                    monitoring: false
                 },
             ],
             name: "Test Site",
+            monitoring: false
         };
 
         mockMonitor = {
@@ -80,6 +83,8 @@ describe("useSitesStore - Uncovered Functions", () => {
             timeout: 5000,
             type: "http" as const,
             url: "https://test.com",
+            responseTime: 0,
+            monitoring: false
         };
 
         // Reset store state
@@ -130,9 +135,10 @@ describe("useSitesStore - Uncovered Functions", () => {
                 syncSitesFromBackend,
             });
 
-            await store.updateMonitorTimeout("test-site-id", "monitor-1", undefined);
+            // Pass 0 instead of undefined to match the function signature
+            await store.updateMonitorTimeout("test-site-id", "monitor-1", 0);
 
-            expect(updateMonitorInSite).toHaveBeenCalledWith(mockSite, "monitor-1", { timeout: undefined });
+            expect(updateMonitorInSite).toHaveBeenCalledWith(mockSite, "monitor-1", { timeout: 0 });
         });
 
         it("should handle SiteService.updateSite error", async () => {

@@ -83,17 +83,17 @@ describe("SiteRepository", () => {
     describe("findAll", () => {
         it("should return all sites", async () => {
             const mockSites = [
-                { identifier: "site1", name: "Site 1" },
-                { identifier: "site2", name: "Site 2" },
+                { identifier: "site1", name: "Site 1", monitoring: 1 },
+                { identifier: "site2", name: "Site 2", monitoring: 0 },
             ];
             mockDatabase.all.mockReturnValue(mockSites);
 
             const result = await siteRepository.findAll();
 
-            expect(mockDatabase.all).toHaveBeenCalledWith("SELECT * FROM sites");
+            expect(mockDatabase.all).toHaveBeenCalledWith("SELECT identifier, name, monitoring FROM sites");
             expect(result).toEqual([
-                { identifier: "site1", name: "Site 1" },
-                { identifier: "site2", name: "Site 2" },
+                { identifier: "site1", name: "Site 1", monitoring: true },
+                { identifier: "site2", name: "Site 2", monitoring: false },
             ]);
         });
     });

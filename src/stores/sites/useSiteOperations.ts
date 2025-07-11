@@ -244,7 +244,7 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
             }
         );
     },
-    updateMonitorRetryAttempts: async (siteId: string, monitorId: string, retryAttempts: number) => {
+    updateMonitorRetryAttempts: async (siteId: string, monitorId: string, retryAttempts: number | undefined) => {
         logStoreAction("SitesStore", "updateMonitorRetryAttempts", { monitorId, retryAttempts, siteId });
 
         await withErrorHandling(
@@ -265,7 +265,7 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
             }
         );
     },
-    updateMonitorTimeout: async (siteId: string, monitorId: string, timeout: number) => {
+    updateMonitorTimeout: async (siteId: string, monitorId: string, timeout: number | undefined) => {
         logStoreAction("SitesStore", "updateMonitorTimeout", { monitorId, siteId, timeout });
 
         await withErrorHandling(

@@ -61,12 +61,16 @@ describe("Sites Store Modules Integration Tests", () => {
             status: "up",
             type: "http" as const,
             url: "https://example.com",
+            responseTime: 0,
+            timeout: 0,
+            retryAttempts: 0,
         };
 
         mockSite = {
             identifier: "example.com",
             monitors: [mockMonitor],
             name: "Example Site",
+            monitoring: false,
         };
 
         mockState = {

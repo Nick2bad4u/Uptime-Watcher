@@ -243,10 +243,7 @@ describe("DataBackupOrchestrator", () => {
 
             const result = await dataBackupOrchestrator.refreshSitesFromCache(mockSiteCache);
 
-            expect(result).toEqual([
-                { identifier: "site1" }, 
-                { identifier: "site2", name: "Site 2" }
-            ]);
+            expect(result).toEqual([{ identifier: "site1" }, { identifier: "site2" }]);
         });
 
         it("should handle sites with empty string names", async () => {

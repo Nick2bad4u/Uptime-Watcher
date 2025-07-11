@@ -128,23 +128,16 @@ export class SiteRepositoryService {
     /**
      * Start monitoring for sites based on their configuration.
      * Side effect operation separated from data loading.
+     * 
+     * @deprecated This method is deprecated. Auto-start logic is now handled by MonitorManager.setupSiteForMonitoring()
+     * This method is kept as a no-op to maintain compatibility during refactoring.
      */
-    async startMonitoringForSites(siteCache: ISiteCache, monitoringConfig: MonitoringConfig): Promise<void> {
-        try {
-            for (const [, site] of Array.from(siteCache.entries())) {
-                if (site.monitoring) {
-                    // Site-level monitoring enabled
-                    await this.startSiteMonitoring(site, monitoringConfig);
-                } else {
-                    // Check individual monitor flags
-                    await this.startIndividualMonitors(site, monitoringConfig);
-                }
-            }
-        } catch (error) {
-            const message = `Failed to start monitoring for sites: ${error instanceof Error ? error.message : String(error)}`;
-            this.logger.error(message, error);
-            throw new SiteLoadingError(message, error instanceof Error ? error : undefined);
-        }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    startMonitoringForSites(_siteCache: ISiteCache, _monitoringConfig: MonitoringConfig): Promise<void> {
+        // Auto-start logic moved to MonitorManager.setupSiteForMonitoring()
+        // This method is now a no-op to prevent duplicate auto-start behavior
+        this.logger.debug(`[SiteRepositoryService] Auto-start logic delegated to MonitorManager`);
+        return Promise.resolve();
     }
 
     /**
@@ -174,31 +167,6 @@ export class SiteRepositoryService {
         return site;
     }
 
-    /**
-     * Start monitoring for all monitors in a site.
-     * Private helper method for monitoring operations.
-     */
-    private async startSiteMonitoring(site: Site, monitoringConfig: MonitoringConfig): Promise<void> {
-        this.logger.debug(`Auto-starting monitoring for site: ${site.identifier}`);
-        for (const monitor of site.monitors) {
-            if (monitor.id) {
-                await monitoringConfig.startMonitoring(site.identifier, monitor.id);
-            }
-        }
-    }
-
-    /**
-     * Start monitoring for individual monitors that have monitoring enabled.
-     * Private helper method for monitoring operations.
-     */
-    private async startIndividualMonitors(site: Site, monitoringConfig: MonitoringConfig): Promise<void> {
-        for (const monitor of site.monitors) {
-            if (monitor.id && monitor.monitoring) {
-                this.logger.debug(`Auto-starting monitoring for monitor: ${site.identifier}:${monitor.id}`);
-                await monitoringConfig.startMonitoring(site.identifier, monitor.id);
-            }
-        }
-    }
 }
 
 /**

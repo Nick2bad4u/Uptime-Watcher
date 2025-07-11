@@ -93,6 +93,7 @@ describe("useSitesStore", () => {
                 identifier: "test-site",
                 monitors: [],
                 name: "Test Site",
+                monitoring: false
             };
 
             useSitesStore.getState().addSite(site);
@@ -108,11 +109,13 @@ describe("useSitesStore", () => {
                     identifier: "site-1",
                     monitors: [],
                     name: "Site 1",
+                    monitoring: false
                 },
                 {
                     identifier: "site-2",
                     monitors: [],
                     name: "Site 2",
+                    monitoring: false
                 },
             ];
             useSitesStore.setState({ ...useSitesStore.getState(), sites });
@@ -130,6 +133,7 @@ describe("useSitesStore", () => {
                     identifier: "site-1",
                     monitors: [],
                     name: "Site 1",
+                    monitoring: false
                 },
             ];
 
@@ -152,6 +156,10 @@ describe("useSitesStore", () => {
                         status: "pending" as const,
                         type: "http" as const,
                         url: "https://example.com",
+                        responseTime: 0,
+                        checkInterval: 0,
+                        timeout: 0,
+                        retryAttempts: 0
                     },
                 ],
                 name: "Test Site",
@@ -160,6 +168,7 @@ describe("useSitesStore", () => {
             const newSite: Site = {
                 ...siteData,
                 monitors: siteData.monitors,
+                monitoring: false
             };
 
             mockElectronAPI.sites.addSite.mockResolvedValue(newSite);
@@ -202,8 +211,13 @@ describe("useSitesStore", () => {
                         monitoring: true,
                         status: "pending" as const,
                         type: "http" as const,
+                        responseTime: 0,
+                        checkInterval: 0,
+                        timeout: 0,
+                        retryAttempts: 0
                     },
                 ],
+                monitoring: false
             };
 
             mockElectronAPI.sites.addSite.mockResolvedValue(newSite);
@@ -233,6 +247,11 @@ describe("useSitesStore", () => {
                         id: "monitor-1",
                         status: "invalid-status" as never,
                         type: "http" as const,
+                        monitoring: true,
+                        responseTime: 0,
+                        checkInterval: 0,
+                        timeout: 0,
+                        retryAttempts: 0
                     },
                 ],
                 name: "Test Site",
@@ -247,8 +266,13 @@ describe("useSitesStore", () => {
                         monitoring: true,
                         status: "pending" as const,
                         type: "http" as const,
+                        responseTime: 0,
+                        checkInterval: 0,
+                        timeout: 0,
+                        retryAttempts: 0
                     },
                 ],
+                monitoring: false
             };
 
             mockElectronAPI.sites.addSite.mockResolvedValue(newSite);
@@ -292,14 +316,20 @@ describe("useSitesStore", () => {
                             monitoring: true,
                             status: "up",
                             type: "http",
+                            responseTime: 0,
+                            checkInterval: 0,
+                            timeout: 0,
+                            retryAttempts: 0
                         },
                     ],
                     name: "Site 1",
+                    monitoring: false
                 },
                 {
                     identifier: "site-2",
                     monitors: [],
                     name: "Site 2",
+                    monitoring: false
                 },
             ];
             useSitesStore.setState({ ...useSitesStore.getState(), sites });
@@ -355,9 +385,14 @@ describe("useSitesStore", () => {
                             monitoring: true,
                             status: "up",
                             type: "http",
+                            responseTime: 0,
+                            checkInterval: 0,
+                            timeout: 0,
+                            retryAttempts: 0
                         },
                     ],
                     name: "Site 1",
+                    monitoring: false
                 },
             ];
             useSitesStore.setState({ ...useSitesStore.getState(), sites });
@@ -372,6 +407,10 @@ describe("useSitesStore", () => {
                 port: 3000,
                 status: "pending",
                 type: "port",
+                responseTime: 0,
+                checkInterval: 0,
+                timeout: 0,
+                retryAttempts: 0
             };
 
             mockElectronAPI.sites.updateSite.mockResolvedValue(undefined);
@@ -405,6 +444,10 @@ describe("useSitesStore", () => {
                 monitoring: true,
                 status: "pending",
                 type: "http",
+                responseTime: 0,
+                checkInterval: 0,
+                timeout: 0,
+                retryAttempts: 0
             };
 
             await expect(useSitesStore.getState().addMonitorToSite("non-existent", newMonitor)).rejects.toThrow();
@@ -484,9 +527,14 @@ describe("useSitesStore", () => {
                             monitoring: true,
                             status: "up",
                             type: "http",
+                            responseTime: 0,
+                            checkInterval: 0,
+                            timeout: 0,
+                            retryAttempts: 0
                         },
                     ],
                     name: "Site 1",
+                    monitoring: false
                 },
             ];
             useSitesStore.setState({ ...useSitesStore.getState(), sites });

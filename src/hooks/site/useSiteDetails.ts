@@ -238,6 +238,9 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties) {
     const handleStartSiteMonitoring = useCallback(async () => {
         clearError();
         try {
+            // First, update the site's monitoring field in the database
+            await modifySite(currentSite.identifier, { monitoring: true });
+            // Then start the actual monitoring processes
             await startSiteMonitoring(currentSite.identifier);
             logger.user.action("Started site monitoring", {
                 monitorCount: currentSite.monitors.length,
@@ -246,11 +249,14 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties) {
         } catch (error) {
             logger.site.error(currentSite.identifier, error instanceof Error ? error : String(error));
         }
-    }, [currentSite.identifier, currentSite.monitors.length, startSiteMonitoring, clearError]);
+    }, [currentSite.identifier, currentSite.monitors.length, startSiteMonitoring, modifySite, clearError]);
 
     const handleStopSiteMonitoring = useCallback(async () => {
         clearError();
         try {
+            // First, update the site's monitoring field in the database
+            await modifySite(currentSite.identifier, { monitoring: false });
+            // Then stop the actual monitoring processes
             await stopSiteMonitoring(currentSite.identifier);
             logger.user.action("Stopped site monitoring", {
                 monitorCount: currentSite.monitors.length,
@@ -259,7 +265,7 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties) {
         } catch (error) {
             logger.site.error(currentSite.identifier, error instanceof Error ? error : String(error));
         }
-    }, [currentSite.identifier, currentSite.monitors.length, stopSiteMonitoring, clearError]);
+    }, [currentSite.identifier, currentSite.monitors.length, stopSiteMonitoring, modifySite, clearError]);
 
     // Monitoring handlers
     const handleStartMonitoring = useCallback(async () => {

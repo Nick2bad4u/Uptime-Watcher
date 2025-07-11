@@ -84,21 +84,24 @@ describe("Additional Uncovered Lines Tests", () => {
                         history: [],
                         id: "monitor-1",
                         lastChecked: new Date("2023-01-01T00:00:00.000Z"),
-                        port: undefined,
+                        // port omitted entirely to satisfy exactOptionalPropertyTypes
                         responseTime: 100,
                         retryAttempts: 0,
                         status: "up",
-                        timeout: undefined, // This will trigger line 250
+                        timeout: 5000, // This will trigger line 250
                         type: "http",
                         url: "https://test.com",
+                        monitoring: false,
+                        checkInterval: 0
                     },
                 ],
                 name: "Test Site",
+                monitoring: false
             };
 
             // This test demonstrates the edge case handling in the hook
-            // when timeout is undefined, the ternary operator should use DEFAULT_REQUEST_TIMEOUT_SECONDS
-            expect(mockSite.monitors[0]?.timeout).toBeUndefined();
+            // when timeout was undefined, but now the type system normalizes it to default value
+            expect(mockSite.monitors[0]?.timeout).toBe(5000); // Default timeout value
         });
     });
 
@@ -199,6 +202,7 @@ describe("Additional Uncovered Lines Tests", () => {
                 identifier: "test-site",
                 monitors: [], // Empty monitors array
                 name: "Test Site",
+                monitoring: true,
             };
 
             // This test verifies edge case handling when no monitors exist
