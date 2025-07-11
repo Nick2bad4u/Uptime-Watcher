@@ -179,8 +179,8 @@ describe("Types Module", () => {
             };
 
             expect(site.monitors).toHaveLength(2);
-            expect(site.monitors[0].type).toBe("http");
-            expect(site.monitors[1].type).toBe("port");
+            expect(site.monitors[0]?.type).toBe("http");
+            expect(site.monitors[1]?.type).toBe("port");
         });
 
         it("should create Site with minimal fields", () => {
