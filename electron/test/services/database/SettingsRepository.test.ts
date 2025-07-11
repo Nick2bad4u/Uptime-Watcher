@@ -42,6 +42,10 @@ describe("SettingsRepository", () => {
         // Mock DatabaseService
         mockDatabaseService = {
             getDatabase: vi.fn().mockReturnValue(mockDatabase),
+            executeTransaction: vi.fn().mockImplementation(async (callback) => {
+                // Simulate the callback being called with the database
+                return callback(mockDatabase);
+            }),
         };
 
         // Mock the static getInstance method
@@ -101,7 +105,7 @@ describe("SettingsRepository", () => {
                 "INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)",
                 ["test-key", "test-value"]
             );
-            expect(logger.debug).toHaveBeenCalledWith("[SettingsRepository] Set setting: test-key = test-value");
+            expect(logger.debug).toHaveBeenCalledWith("[SettingsRepository] Set setting (internal): test-key = test-value");
         });
 
         it("should set a setting value in production mode", async () => {
@@ -124,7 +128,7 @@ describe("SettingsRepository", () => {
             await settingsRepository.delete("test-key");
 
             expect(mockDatabase.run).toHaveBeenCalledWith("DELETE FROM settings WHERE key = ?", ["test-key"]);
-            expect(logger.debug).toHaveBeenCalledWith("[SettingsRepository] Deleted setting: test-key");
+            expect(logger.debug).toHaveBeenCalledWith("[SettingsRepository] Deleted setting (internal): test-key");
         });
 
         it("should delete a setting in production mode", async () => {
@@ -203,7 +207,7 @@ describe("SettingsRepository", () => {
             await settingsRepository.deleteAll();
 
             expect(mockDatabase.run).toHaveBeenCalledWith("DELETE FROM settings");
-            expect(logger.info).toHaveBeenCalledWith("[SettingsRepository] All settings deleted");
+            expect(logger.info).toHaveBeenCalledWith("[SettingsRepository] All settings deleted (internal)");
         });
     });
 
@@ -217,8 +221,8 @@ describe("SettingsRepository", () => {
 
             await settingsRepository.bulkInsert(settings);
 
-            // Should start transaction
-            expect(mockDatabase.run).toHaveBeenCalledWith("BEGIN TRANSACTION");
+            // Since we now use executeTransaction, verify the transaction wrapper is called
+            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
 
             // Should prepare statement
             expect(mockDatabase.prepare).toHaveBeenCalledWith(
@@ -231,9 +235,6 @@ describe("SettingsRepository", () => {
             expect(mockStatement.run).toHaveBeenNthCalledWith(1, ["key1", "value1"]);
             expect(mockStatement.run).toHaveBeenNthCalledWith(2, ["key2", "value2"]);
             expect(mockStatement.run).toHaveBeenNthCalledWith(3, ["key3", "value3"]);
-
-            // Should commit transaction
-            expect(mockDatabase.run).toHaveBeenCalledWith("COMMIT");
 
             // Should finalize statement
             expect(mockStatement.finalize).toHaveBeenCalled();
@@ -257,8 +258,8 @@ describe("SettingsRepository", () => {
 
             await settingsRepository.bulkInsert(settings as any);
 
-            // Should start transaction
-            expect(mockDatabase.run).toHaveBeenCalledWith("BEGIN TRANSACTION");
+            // Since we now use executeTransaction, verify the transaction wrapper is called
+            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
 
             // Should prepare statement
             expect(mockDatabase.prepare).toHaveBeenCalledWith(
@@ -272,9 +273,6 @@ describe("SettingsRepository", () => {
             expect(mockStatement.run).toHaveBeenCalledWith(["number", "42"]);
             expect(mockStatement.run).toHaveBeenCalledWith(["boolean", "true"]);
             expect(mockStatement.run).toHaveBeenCalledWith(["object", "[object Object]"]);
-
-            // Should commit transaction
-            expect(mockDatabase.run).toHaveBeenCalledWith("COMMIT");
 
             // Should finalize statement
             expect(mockStatement.finalize).toHaveBeenCalled();

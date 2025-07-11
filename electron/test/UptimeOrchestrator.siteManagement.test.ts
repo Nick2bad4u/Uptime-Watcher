@@ -57,6 +57,8 @@ const mockSiteRepositoryInstance = {
     findByIdentifier: vi.fn(() => Promise.resolve(undefined)),
     update: vi.fn(() => Promise.resolve()),
     upsert: vi.fn(() => Promise.resolve()),
+    upsertInternal: vi.fn(() => undefined),
+    deleteInternal: vi.fn(() => true),
     deleteByIdentifier: vi.fn(() => Promise.resolve()),
     exportAll: vi.fn(() => Promise.resolve([])),
     getByIdentifier: vi.fn(() => Promise.resolve(null)),
@@ -73,6 +75,7 @@ const mockMonitorRepositoryInstance = {
     findById: vi.fn(() => Promise.resolve(null)),
     findBySiteIdentifier: vi.fn(() => Promise.resolve([])),
     update: vi.fn(() => Promise.resolve()),
+    updateInternal: vi.fn(() => undefined),
     deleteByIds: vi.fn(() => Promise.resolve()),
     deleteBySiteIdentifier: vi.fn(() => Promise.resolve()),
     deleteBySiteIdentifierInternal: vi.fn(),
@@ -95,6 +98,8 @@ const mockHistoryRepositoryInstance = {
     addEntry: vi.fn(() => Promise.resolve()),
     pruneHistory: vi.fn(() => Promise.resolve()),
     pruneAllHistory: vi.fn(() => Promise.resolve()),
+    pruneAllHistoryInternal: vi.fn(() => undefined),
+    deleteAllInternal: vi.fn(() => undefined),
     bulkInsert: vi.fn(() => Promise.resolve()),
     deleteAll: vi.fn(() => Promise.resolve()),
 };
@@ -109,6 +114,8 @@ const mockSettingsRepositoryInstance = {
     update: vi.fn(() => Promise.resolve()),
     get: vi.fn(() => Promise.resolve(null)) as any,
     set: vi.fn(() => Promise.resolve()),
+    setInternal: vi.fn(() => undefined),
+    deleteAllInternal: vi.fn(() => undefined),
     getAll: vi.fn(() => Promise.resolve({})),
     bulkInsert: vi.fn(() => Promise.resolve()),
     deleteAll: vi.fn(() => Promise.resolve()),
@@ -240,7 +247,8 @@ describe("UptimeOrchestrator - Site Management", () => {
 
                 const result = await uptimeOrchestrator.addSite(site);
 
-                expect(siteRepoInstance.upsert).toHaveBeenCalledWith(
+                expect(siteRepoInstance.upsertInternal).toHaveBeenCalledWith(
+                    { mockDb: true },
                     expect.objectContaining({
                         identifier: "new-site",
                         name: "New Site",
@@ -283,7 +291,7 @@ describe("UptimeOrchestrator - Site Management", () => {
                     expect.anything(),
                     identifier
                 );
-                expect(siteRepoInstance.delete).toHaveBeenCalledWith(identifier);
+                expect(siteRepoInstance.deleteInternal).toHaveBeenCalledWith(expect.anything(), identifier);
                 expect(result).toBe(true);
             });
 

@@ -532,12 +532,12 @@ describe("useSiteActions", () => {
         });
 
         it("should handle card click with site without name", () => {
-            const siteWithoutName: Site = {
+            const siteWithoutName = {
                 identifier: "test-site-id",
                 monitoring: true,
                 monitors: [],
-                name: "Test Site",
-            };
+                name: undefined,
+            } as unknown as Site; // Cast to test undefined name behavior
 
             const { result } = renderHook(() => useSiteActions(siteWithoutName, mockHttpMonitor));
 

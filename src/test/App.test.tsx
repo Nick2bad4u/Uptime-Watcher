@@ -637,7 +637,9 @@ describe("App Component", () => {
                 statusUpdateCallback(mockUpdate);
             }
 
-            expect(consoleSpy).toHaveBeenCalledWith("Status update received:", "test-site-123");
+            // Expect formatted log output (timestamp + [App] prefix)
+            expect(consoleSpy.mock.calls[0]?.[0]).toMatch(/^\[\d{1,2}:\d{2}:\d{2} [AP]M\] \[App\] Status update received:$/);
+            expect(consoleSpy.mock.calls[0]?.[1]).toBe("test-site-123");
 
             consoleSpy.mockRestore();
             process.env.NODE_ENV = originalEnv;

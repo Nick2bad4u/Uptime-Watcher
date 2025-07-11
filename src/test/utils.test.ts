@@ -221,7 +221,9 @@ describe("Store Utils", () => {
 
             logStoreAction("TestStore", "testAction", { data: "test" });
 
-            expect(consoleSpy).toHaveBeenCalledWith("[TestStore] testAction", { data: "test" });
+            // Match timestamped log format
+            expect(consoleSpy.mock.calls[0]?.[0]).toMatch(/^\[\d{1,2}:\d{2}:\d{2} [AP]M\] \[TestStore\] testAction$/);
+            expect(consoleSpy.mock.calls[0]?.[1]).toEqual({ data: "test" });
 
             process.env.NODE_ENV = originalEnv;
         });
@@ -243,7 +245,9 @@ describe("Store Utils", () => {
 
             logStoreAction("TestStore", "testAction");
 
-            expect(consoleSpy).toHaveBeenCalledWith("[TestStore] testAction", undefined);
+            // Match timestamped log format
+            expect(consoleSpy.mock.calls[0]?.[0]).toMatch(/^\[\d{1,2}:\d{2}:\d{2} [AP]M\] \[TestStore\] testAction$/);
+            expect(consoleSpy.mock.calls[0]?.[1]).toBeUndefined();
 
             process.env.NODE_ENV = originalEnv;
         });

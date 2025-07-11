@@ -342,6 +342,7 @@ describe("Submit.tsx - Uncovered Lines Coverage", () => {
             expect(mockStoreActions.clearError).toHaveBeenCalled();
             expect(mockStoreActions.createSite).toHaveBeenCalledWith({
                 identifier: "test-site-id",
+                monitoring: true,
                 name: "Test Site",
                 monitors: [
                     {
@@ -352,6 +353,8 @@ describe("Submit.tsx - Uncovered Lines Coverage", () => {
                         timeout: 10000,
                         retryAttempts: 0,
                         status: "pending",
+                        monitoring: true,
+                        responseTime: -1,
                         history: [],
                     },
                 ],
@@ -566,6 +569,7 @@ describe("Submit.tsx - Uncovered Lines Coverage", () => {
 
             expect(mockStoreActions.createSite).toHaveBeenCalledWith({
                 identifier: "test-site-id",
+                monitoring: true,
                 name: "Test Site",
                 monitors: [
                     {
@@ -576,6 +580,8 @@ describe("Submit.tsx - Uncovered Lines Coverage", () => {
                         timeout: 10000,
                         retryAttempts: 0,
                         status: "pending",
+                        monitoring: true,
+                        responseTime: -1,
                         history: [],
                     },
                 ],
@@ -600,6 +606,7 @@ describe("Submit.tsx - Uncovered Lines Coverage", () => {
 
             expect(mockStoreActions.createSite).toHaveBeenCalledWith({
                 identifier: "test-site-id",
+                monitoring: true,
                 name: "Test Site",
                 monitors: [
                     {

@@ -4,7 +4,6 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { EventEmitter } from "events";
 import {
     startAllMonitoring,
     stopAllMonitoring,
@@ -25,12 +24,16 @@ const mockLogger = {
 // Mock MonitorRepository
 const mockMonitorRepository = {
     update: vi.fn(),
+    updateInternal: vi.fn(),
 } as const;
+
+// Mock database object
+const mockDatabase = {} as any;
 
 // Mock DatabaseService
 const mockDatabaseService = {
     executeTransaction: vi.fn(async (callback) => {
-        return await callback();
+        return await callback(mockDatabase);
     }),
 };
 
@@ -42,17 +45,27 @@ const mockMonitorScheduler = {
     stopMonitor: vi.fn(),
 } as const;
 
-// Mock EventEmitter
-const mockEventEmitter = new EventEmitter();
+// Mock EventEmitter with proper TypedEventBus interface
+const mockEventEmitter = {
+    emit: vi.fn(),
+    on: vi.fn(),
+    off: vi.fn(),
+    removeAllListeners: vi.fn(),
+} as any;
 
 // Helper function to create test monitor
 const createTestMonitor = (partial: Partial<Monitor>): Monitor => ({
     id: "default-id",
     type: "http",
     status: "pending",
+    responseTime: 0,
+    lastChecked: new Date(),
     history: [],
     url: "https://example.com",
     checkInterval: 5000,
+    monitoring: false,
+    timeout: 10000,
+    retryAttempts: 3,
     ...partial,
 });
 
@@ -77,7 +90,6 @@ const createTestConfig = (sites: Site[] = []): MonitoringLifecycleConfig => {
         databaseService: mockDatabaseService as any,
         eventEmitter: mockEventEmitter,
         logger: mockLogger,
-        statusUpdateEvent: "status-update",
     };
 };
 
@@ -161,13 +173,13 @@ describe("monitorLifecycle", () => {
             });
             const config = createTestConfig([site]);
 
-            mockMonitorRepository.update.mockResolvedValue(true);
+            mockMonitorRepository.updateInternal.mockReturnValue(undefined);
             mockMonitorScheduler.startMonitor.mockReturnValue(true);
 
             const result = await startMonitoringForSite(config, "test-site", "monitor-1");
 
             expect(result).toBe(true);
-            expect(mockMonitorRepository.update).toHaveBeenCalledWith("monitor-1", {
+            expect(mockMonitorRepository.updateInternal).toHaveBeenCalledWith(mockDatabase, "monitor-1", {
                 monitoring: true,
                 status: "pending",
             });
@@ -288,13 +300,13 @@ describe("monitorLifecycle", () => {
             });
             const config = createTestConfig([site]);
 
-            mockMonitorRepository.update.mockResolvedValue(true);
+            mockMonitorRepository.updateInternal.mockReturnValue(undefined);
             mockMonitorScheduler.stopMonitor.mockReturnValue(true);
 
             const result = await stopMonitoringForSite(config, "test-site", "monitor-1");
 
             expect(result).toBe(true);
-            expect(mockMonitorRepository.update).toHaveBeenCalledWith("monitor-1", {
+            expect(mockMonitorRepository.updateInternal).toHaveBeenCalledWith(mockDatabase, "monitor-1", {
                 monitoring: false,
                 status: "paused",
             });
@@ -386,13 +398,13 @@ describe("monitorLifecycle", () => {
             });
             const config = createTestConfig([site]);
 
-            mockMonitorRepository.update.mockResolvedValue(true);
+            mockMonitorRepository.updateInternal.mockReturnValue(undefined);
             mockMonitorScheduler.startMonitor.mockReturnValue(false);
 
             const result = await startMonitoringForSite(config, "test-site", "monitor-1");
 
             expect(result).toBe(false);
-            expect(mockMonitorRepository.update).toHaveBeenCalledWith("monitor-1", {
+            expect(mockMonitorRepository.updateInternal).toHaveBeenCalledWith(mockDatabase, "monitor-1", {
                 monitoring: true,
                 status: "pending",
             });
@@ -409,13 +421,13 @@ describe("monitorLifecycle", () => {
             });
             const config = createTestConfig([site]);
 
-            mockMonitorRepository.update.mockResolvedValue(true);
+            mockMonitorRepository.updateInternal.mockReturnValue(undefined);
             mockMonitorScheduler.stopMonitor.mockReturnValue(false);
 
             const result = await stopMonitoringForSite(config, "test-site", "monitor-1");
 
             expect(result).toBe(false);
-            expect(mockMonitorRepository.update).toHaveBeenCalledWith("monitor-1", {
+            expect(mockMonitorRepository.updateInternal).toHaveBeenCalledWith(mockDatabase, "monitor-1", {
                 monitoring: false,
                 status: "paused",
             });

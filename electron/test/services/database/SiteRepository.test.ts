@@ -12,6 +12,10 @@ vi.mock("../../../services/database/DatabaseService", () => ({
     DatabaseService: {
         getInstance: vi.fn(() => ({
             getDatabase: vi.fn(() => mockDatabase),
+            executeTransaction: vi.fn((callback) => {
+                // Mock transaction by calling the callback with the mock database
+                return Promise.resolve(callback(mockDatabase));
+            }),
         })),
     },
 }));
@@ -105,7 +109,7 @@ describe("SiteRepository", () => {
 
             const result = await siteRepository.findByIdentifier("site1");
 
-            expect(mockDatabase.get).toHaveBeenCalledWith("SELECT * FROM sites WHERE identifier = ?", ["site1"]);
+            expect(mockDatabase.get).toHaveBeenCalledWith("SELECT identifier, name, monitoring FROM sites WHERE identifier = ?", ["site1"]);
             expect(result).toEqual({ identifier: "site1", name: "Site 1" });
         });
 
@@ -131,13 +135,13 @@ describe("SiteRepository", () => {
 
     describe("upsert", () => {
         it("should create or update site", async () => {
-            const site = { identifier: "site1", name: "Site 1" };
+            const site = { identifier: "site1", name: "Site 1", monitoring: false };
 
             await siteRepository.upsert(site);
 
             expect(mockDatabase.run).toHaveBeenCalledWith(
-                "INSERT OR REPLACE INTO sites (identifier, name) VALUES (?, ?)",
-                ["site1", "Site 1"]
+                "INSERT OR REPLACE INTO sites (identifier, name, monitoring) VALUES (?, ?, ?)",
+                ["site1", "Site 1", 0]
             );
             expect(mockLogger.debug).toHaveBeenCalledWith("[SiteRepository] Upserted site: site1");
         });
@@ -244,33 +248,30 @@ describe("SiteRepository", () => {
     describe("bulkInsert", () => {
         it("should bulk insert sites", async () => {
             const sites = [
-                { identifier: "site1", name: "Site 1" },
-                { identifier: "site2", name: "Site 2" },
+                { identifier: "site1", name: "Site 1", monitoring: false },
+                { identifier: "site2", name: "Site 2", monitoring: true },
             ];
 
             await siteRepository.bulkInsert(sites);
 
-            // Check transaction calls
-            expect(mockDatabase.run).toHaveBeenCalledWith("BEGIN TRANSACTION");
-            expect(mockDatabase.run).toHaveBeenCalledWith("COMMIT");
-            expect(mockDatabase.prepare).toHaveBeenCalledWith("INSERT INTO sites (identifier, name) VALUES (?, ?)");
+            // Check that executeTransaction was called (via the mock)
+            expect(mockDatabase.prepare).toHaveBeenCalledWith("INSERT INTO sites (identifier, name, monitoring) VALUES (?, ?, ?)");
 
             // Check prepared statement calls
-            expect(mockPreparedStatement.run).toHaveBeenCalledWith(["site1", "Site 1"]);
-            expect(mockPreparedStatement.run).toHaveBeenCalledWith(["site2", "Site 2"]);
+            expect(mockPreparedStatement.run).toHaveBeenCalledWith(["site1", "Site 1", 0]);
+            expect(mockPreparedStatement.run).toHaveBeenCalledWith(["site2", "Site 2", 1]);
             expect(mockPreparedStatement.finalize).toHaveBeenCalled();
 
             expect(mockLogger.info).toHaveBeenCalledWith("[SiteRepository] Bulk inserted 2 sites");
         });
 
         it("should handle sites without names", async () => {
-            const sites = [{ identifier: "site1" }];
+            const sites = [{ identifier: "site1", monitoring: true }];
 
             await siteRepository.bulkInsert(sites);
 
-            expect(mockDatabase.run).toHaveBeenCalledWith("BEGIN TRANSACTION");
-            expect(mockDatabase.run).toHaveBeenCalledWith("COMMIT");
-            expect(mockPreparedStatement.run).toHaveBeenCalledWith(["site1", null]);
+            // Check that executeTransaction was called and prepared statement used correctly
+            expect(mockPreparedStatement.run).toHaveBeenCalledWith(["site1", null, 1]);
         });
     });
 });

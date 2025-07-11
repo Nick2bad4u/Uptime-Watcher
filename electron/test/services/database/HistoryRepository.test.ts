@@ -43,6 +43,10 @@ describe("HistoryRepository", () => {
         // Mock DatabaseService
         mockDatabaseService = {
             getDatabase: vi.fn().mockReturnValue(mockDatabase),
+            executeTransaction: vi.fn().mockImplementation(async (callback) => {
+                // Simulate the callback being called with the database
+                return callback(mockDatabase);
+            }),
         };
 
         // Mock the static getInstance method
@@ -189,18 +193,39 @@ describe("HistoryRepository", () => {
         it("should prune history for all monitors", async () => {
             (isDev as any).mockReturnValue(true);
             const monitorRows = [{ id: 1 }, { id: 2 }];
-            mockDatabase.all.mockReturnValue(monitorRows);
-
-            // Mock the pruneHistory calls to not actually run
-            const pruneHistorySpy = vi.spyOn(historyRepository, "pruneHistory").mockResolvedValue();
+            
+            // Mock the monitors query
+            mockDatabase.all.mockReturnValueOnce(monitorRows);
+            
+            // Mock the excess entries queries for each monitor
+            const excessEntries1 = [{ id: 10 }, { id: 11 }];
+            const excessEntries2 = [{ id: 20 }, { id: 21 }];
+            mockDatabase.all.mockReturnValueOnce(excessEntries1);
+            mockDatabase.all.mockReturnValueOnce(excessEntries2);
 
             await historyRepository.pruneAllHistory(10);
 
+            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
+            
+            // Verify monitors query
             expect(mockDatabase.all).toHaveBeenCalledWith("SELECT id FROM monitors");
-            expect(pruneHistorySpy).toHaveBeenCalledWith("1", 10);
-            expect(pruneHistorySpy).toHaveBeenCalledWith("2", 10);
+            
+            // Verify pruning queries for each monitor
+            expect(mockDatabase.all).toHaveBeenCalledWith(
+                "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?",
+                ["1", 10]
+            );
+            expect(mockDatabase.all).toHaveBeenCalledWith(
+                "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?",
+                ["2", 10]
+            );
+            
+            // Verify delete queries for excess entries
+            expect(mockDatabase.run).toHaveBeenCalledWith("DELETE FROM history WHERE id IN (?,?)", [10, 11]);
+            expect(mockDatabase.run).toHaveBeenCalledWith("DELETE FROM history WHERE id IN (?,?)", [20, 21]);
+            
             expect(logger.debug).toHaveBeenCalledWith(
-                "[HistoryRepository] Pruned history for all monitors (limit: 10)"
+                "[HistoryRepository] Pruned history for all monitors (limit: 10) (internal)"
             );
         });
 
@@ -208,7 +233,7 @@ describe("HistoryRepository", () => {
             await historyRepository.pruneAllHistory(0);
             await historyRepository.pruneAllHistory(-1);
 
-            expect(mockDatabase.all).not.toHaveBeenCalled();
+            expect(mockDatabaseService.executeTransaction).not.toHaveBeenCalled();
         });
     });
 
@@ -296,8 +321,8 @@ describe("HistoryRepository", () => {
 
             await historyRepository.bulkInsert("monitor-1", historyEntries);
 
-            // Should start transaction
-            expect(mockDatabase.run).toHaveBeenCalledWith("BEGIN TRANSACTION");
+            // Since we now use executeTransaction, verify the transaction wrapper is called
+            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
 
             // Should prepare statement
             expect(mockDatabase.prepare).toHaveBeenCalledWith(
@@ -310,14 +335,11 @@ describe("HistoryRepository", () => {
             expect(mockStatement.run).toHaveBeenNthCalledWith(1, ["monitor-1", 1640995200000, "up", 150, "Success"]);
             expect(mockStatement.run).toHaveBeenNthCalledWith(2, ["monitor-1", 1640995100000, "down", 0, null]);
 
-            // Should commit transaction
-            expect(mockDatabase.run).toHaveBeenCalledWith("COMMIT");
-
             // Should finalize statement
             expect(mockStatement.finalize).toHaveBeenCalled();
 
             expect(logger.info).toHaveBeenCalledWith(
-                "[HistoryManipulation] Bulk inserted 2 history entries for monitor: monitor-1"
+                "[HistoryRepository] Bulk inserted 2 history entries for monitor: monitor-1"
             );
         });
 
@@ -332,8 +354,8 @@ describe("HistoryRepository", () => {
 
             await historyRepository.bulkInsert("monitor-1", historyEntries);
 
-            // Should start transaction
-            expect(mockDatabase.run).toHaveBeenCalledWith("BEGIN TRANSACTION");
+            // Since we now use executeTransaction, verify the transaction wrapper is called
+            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
 
             // Should prepare statement
             expect(mockDatabase.prepare).toHaveBeenCalledWith(
@@ -343,9 +365,6 @@ describe("HistoryRepository", () => {
             // Should run statement with corrected status (invalid -> down)
             const mockStatement = mockDatabase.prepare.mock.results[0].value;
             expect(mockStatement.run).toHaveBeenCalledWith(["monitor-1", 1640995200000, "down", 150, null]);
-
-            // Should commit transaction
-            expect(mockDatabase.run).toHaveBeenCalledWith("COMMIT");
 
             // Should finalize statement
             expect(mockStatement.finalize).toHaveBeenCalled();

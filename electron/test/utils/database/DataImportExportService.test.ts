@@ -19,7 +19,9 @@ describe("DataImportExportService", () => {
             settings: {
                 getAll: vi.fn(),
                 deleteAll: vi.fn(),
+                deleteAllInternal: vi.fn(),
                 bulkInsert: vi.fn(),
+                bulkInsertInternal: vi.fn(),
             },
             monitor: {
                 deleteAll: vi.fn(),
@@ -27,6 +29,7 @@ describe("DataImportExportService", () => {
             },
             history: {
                 deleteAll: vi.fn(),
+                deleteAllInternal: vi.fn(),
                 bulkInsert: vi.fn(),
             },
         };
@@ -245,8 +248,8 @@ describe("DataImportExportService", () => {
             ];
             const settings = { key1: "value1", key2: "value2" };
 
-            mockDatabaseService.executeTransaction.mockImplementation((callback: () => void) => {
-                callback();
+            mockDatabaseService.executeTransaction.mockImplementation(async (callback: (db: any) => Promise<void>) => {
+                await callback({} as any); // Pass mock database
                 return Promise.resolve();
             });
 
@@ -254,14 +257,14 @@ describe("DataImportExportService", () => {
 
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
             expect(mockRepositories.site.deleteAll).toHaveBeenCalled();
-            expect(mockRepositories.settings.deleteAll).toHaveBeenCalled();
+            expect(mockRepositories.settings.deleteAllInternal).toHaveBeenCalled();
             expect(mockRepositories.monitor.deleteAll).toHaveBeenCalled();
-            expect(mockRepositories.history.deleteAll).toHaveBeenCalled();
+            expect(mockRepositories.history.deleteAllInternal).toHaveBeenCalled();
             expect(mockRepositories.site.bulkInsert).toHaveBeenCalledWith([
                 { identifier: "site1", name: "Site 1" },
                 { identifier: "site2", name: "Site 2" },
             ]);
-            expect(mockRepositories.settings.bulkInsert).toHaveBeenCalledWith(settings);
+            expect(mockRepositories.settings.bulkInsertInternal).toHaveBeenCalledWith(expect.anything(), settings);
             expect(mockLogger.info).toHaveBeenCalledWith("Successfully imported 2 sites and 2 settings");
         });
 
@@ -283,11 +286,11 @@ describe("DataImportExportService", () => {
             ];
             const settings = {};
 
-            mockDatabaseService.executeTransaction.mockImplementation((callback: () => void) => {
-                callback();
+            mockDatabaseService.executeTransaction.mockImplementation(async (callback: (db: any) => Promise<void>) => {
+                await callback({} as any); // Pass mock database
                 return Promise.resolve();
             });
-            mockRepositories.monitor.bulkCreate.mockReturnValue([
+            mockRepositories.monitor.bulkCreate.mockResolvedValue([
                 { id: "monitor1", type: "http", url: "https://example.com", status: "active", history: [] },
             ]);
 
@@ -320,15 +323,15 @@ describe("DataImportExportService", () => {
             const sites: any[] = [];
             const settings = {};
 
-            mockDatabaseService.executeTransaction.mockImplementation((callback: () => void) => {
-                callback();
+            mockDatabaseService.executeTransaction.mockImplementation(async (callback: (db: any) => Promise<void>) => {
+                await callback({} as any); // Pass mock database
                 return Promise.resolve();
             });
 
             await dataImportExportService.persistImportedData(sites, settings);
 
             expect(mockRepositories.site.bulkInsert).toHaveBeenCalledWith([]);
-            expect(mockRepositories.settings.bulkInsert).toHaveBeenCalledWith({});
+            expect(mockRepositories.settings.bulkInsertInternal).toHaveBeenCalledWith(expect.anything(), {});
             expect(mockLogger.info).toHaveBeenCalledWith("Successfully imported 0 sites and 0 settings");
         });
 

@@ -56,7 +56,10 @@ describe("MonitorRepository", () => {
         // Mock DatabaseService
         mockDatabaseService = {
             getDatabase: vi.fn().mockReturnValue(mockDatabase),
-            executeTransaction: vi.fn(),
+            executeTransaction: vi.fn().mockImplementation(async (callback) => {
+                // Execute the callback with the mocked database to simulate transaction behavior
+                return await callback(mockDatabase);
+            }),
         };
 
         // Mock the static getInstance method
@@ -658,7 +661,10 @@ describe("MonitorRepository", () => {
                     monitoring: true,
                     status: "pending" as const,
                     history: [],
-                    responseTime: 0
+                    responseTime: 0,
+                    checkInterval: 60000,
+                    timeout: 5000,
+                    retryAttempts: 3,
                 },
                 {
                     id: "temp-2",
@@ -668,7 +674,10 @@ describe("MonitorRepository", () => {
                     monitoring: false,
                     status: "pending" as const,
                     history: [],
-                    responseTime: 0
+                    responseTime: 0,
+                    checkInterval: 60000,
+                    timeout: 5000,
+                    retryAttempts: 3,
                 },
             ];
 
@@ -985,7 +994,10 @@ describe("MonitorRepository", () => {
                     monitoring: false, // False boolean
                     status: "down" as const,
                     history: [],
-                    responseTime: 0
+                    responseTime: 0,
+                    checkInterval: 60000,
+                    timeout: 5000,
+                    retryAttempts: 3,
                 };
 
                 mockDatabase.run.mockReturnValue({ changes: 1, lastInsertRowid: 1 });
@@ -1114,7 +1126,10 @@ describe("MonitorRepository", () => {
                     monitoring: true,
                     status: "up" as const,
                     history: [],
-                    responseTime: 0
+                    responseTime: 0,
+                    checkInterval: 60000,
+                    timeout: 5000,
+                    retryAttempts: 3,
                 };
 
                 mockDatabase.run.mockReturnValue({ changes: 1, lastInsertRowid: 1 });

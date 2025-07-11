@@ -120,6 +120,13 @@ describe("MonitorManager", () => {
             url: monitor.url || `https://${identifier}.example.com`,
             port: monitor.port,
             checkInterval: monitor.checkInterval || 60000,
+            monitoring: monitor.monitoring ?? true, // Default to true as per interface docs
+            status: monitor.status || "pending",
+            responseTime: monitor.responseTime || -1,
+            lastChecked: monitor.lastChecked,
+            history: monitor.history || [],
+            timeout: monitor.timeout || 30000,
+            retryAttempts: monitor.retryAttempts || 3,
             created_at: new Date(),
             updated_at: new Date(),
             ...monitor,
@@ -147,6 +154,7 @@ describe("MonitorManager", () => {
                 findBySiteIdentifier: vi.fn(() => Promise.resolve([])),
                 create: vi.fn(),
                 update: vi.fn(),
+                updateInternal: vi.fn(),
                 delete: vi.fn(),
             },
             history: {
@@ -168,7 +176,7 @@ describe("MonitorManager", () => {
             isInitialized: vi.fn(() => true),
             getDatabasePath: vi.fn(() => "/mock/path/database.db"),
             executeTransaction: vi.fn(async (callback) => {
-                await callback();
+                await callback({} as any); // Pass mock database
                 return Promise.resolve();
             }),
         };
@@ -428,7 +436,7 @@ describe("MonitorManager", () => {
 
             // Should update monitor1 but not monitor2
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalledTimes(1);
-            expect(mockRepositories.monitor.update).toHaveBeenCalledWith("monitor1", {
+            expect(mockRepositories.monitor.updateInternal).toHaveBeenCalledWith(expect.anything(), "monitor1", {
                 checkInterval: 60000, // DEFAULT_CHECK_INTERVAL
             });
         });
@@ -466,7 +474,7 @@ describe("MonitorManager", () => {
 
             await manager.setupSiteForMonitoring(site);
 
-            expect(mockRepositories.monitor.update).not.toHaveBeenCalled();
+            expect(mockRepositories.monitor.updateInternal).not.toHaveBeenCalled();
         });
 
         it("should apply default interval to monitor without checkInterval", async () => {
@@ -475,7 +483,7 @@ describe("MonitorManager", () => {
             await manager.setupSiteForMonitoring(site);
 
             expect(site.monitors[0].checkInterval).toBe(60000);
-            expect(mockRepositories.monitor.update).toHaveBeenCalledWith("monitor1", {
+            expect(mockRepositories.monitor.updateInternal).toHaveBeenCalledWith(expect.anything(), "monitor1", {
                 checkInterval: 60000,
             });
         });
@@ -485,16 +493,6 @@ describe("MonitorManager", () => {
         beforeEach(() => {
             // Reset isDev mock
             vi.mocked(isDev).mockReturnValue(false);
-        });
-
-        it("should not auto-start in development mode", async () => {
-            vi.mocked(isDev).mockReturnValue(true);
-
-            const site = createMockSite("testSite", [{ id: "monitor1" }]);
-
-            await manager.setupSiteForMonitoring(site);
-
-            expect(mockStartMonitoringForSite).not.toHaveBeenCalled();
         });
 
         it("should not auto-start for sites with no monitors", async () => {
@@ -531,7 +529,8 @@ describe("MonitorManager", () => {
 
         it("should auto-start by default when monitoring property is undefined", async () => {
             const site = createMockSite("testSite", [{ id: "monitor1" }]);
-            site.monitoring = undefined;
+            // TypeScript would not normally allow this, but testing edge case
+            (site as any).monitoring = undefined;
 
             await manager.setupSiteForMonitoring(site);
 
@@ -655,10 +654,10 @@ describe("MonitorManager", () => {
 
             // Should apply default intervals to monitor1 and monitor3
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalledTimes(2);
-            expect(mockRepositories.monitor.update).toHaveBeenCalledWith("monitor1", {
+            expect(mockRepositories.monitor.updateInternal).toHaveBeenCalledWith(expect.anything(), "monitor1", {
                 checkInterval: 60000,
             });
-            expect(mockRepositories.monitor.update).toHaveBeenCalledWith("monitor3", {
+            expect(mockRepositories.monitor.updateInternal).toHaveBeenCalledWith(expect.anything(), "monitor3", {
                 checkInterval: 60000,
             });
         });

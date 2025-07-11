@@ -85,8 +85,13 @@ describe("NotificationService", () => {
                     responseTime: undefined,
                     lastChecked: new Date(),
                     history: [],
+                    monitoring: false,
+                    checkInterval: 0,
+                    timeout: 0,
+                    retryAttempts: 0
                 },
             ],
+            monitoring: false
         };
 
         it("should show notification when alerts are enabled", () => {
@@ -128,7 +133,7 @@ describe("NotificationService", () => {
             notificationService.notifyMonitorDown(siteWithoutName, "monitor-1");
 
             expect(Notification).toHaveBeenCalledWith({
-                body: "example.com (http) is currently down!",
+                body: "Example Site (http) is currently down!",
                 title: "Monitor Down Alert",
                 urgency: "critical",
             });
@@ -158,8 +163,13 @@ describe("NotificationService", () => {
                     responseTime: 250,
                     lastChecked: new Date(),
                     history: [],
+                    monitoring: false,
+                    checkInterval: 0,
+                    timeout: 0,
+                    retryAttempts: 0
                 },
             ],
+            monitoring: false
         };
 
         it("should show notification when alerts are enabled", () => {
@@ -201,7 +211,7 @@ describe("NotificationService", () => {
             notificationService.notifyMonitorUp(siteWithoutName, "monitor-1");
 
             expect(Notification).toHaveBeenCalledWith({
-                body: "example.com (http) is back online!",
+                body: "Example Site (http) is back online!",
                 title: "Monitor Restored",
                 urgency: "normal",
             });

@@ -59,6 +59,7 @@ describe("useSiteDetails uncovered lines", () => {
                 history: [],
                 id: "monitor-1",
                 monitoring: true,
+                responseTime: 250,
                 retryAttempts: 3,
                 status: "up",
                 timeout: 5000,
@@ -70,6 +71,7 @@ describe("useSiteDetails uncovered lines", () => {
                 history: [],
                 id: "monitor-2",
                 monitoring: false,
+                responseTime: 0,
                 retryAttempts: 1,
                 status: "down",
                 timeout: 10000,
@@ -78,6 +80,7 @@ describe("useSiteDetails uncovered lines", () => {
             } as Monitor,
         ],
         name: "Test Site",
+        monitoring: false
     };
 
     // Mock store functions
@@ -271,7 +274,7 @@ describe("useSiteDetails uncovered lines", () => {
                 await result.current.handleRemoveSite();
             });
 
-            expect(mockConfirm).toHaveBeenCalledWith("Are you sure you want to remove test-site-id?");
+            expect(mockConfirm).toHaveBeenCalledWith("Are you sure you want to remove Unnamed Site?");
         });
 
         it("should return early if user cancels confirmation", async () => {
@@ -438,25 +441,25 @@ describe("useSiteDetails uncovered lines", () => {
     });
 
     describe("timeout seconds calculation (line 250)", () => {
-        it("should handle monitor with undefined timeout", () => {
-            const siteWithUndefinedTimeout = {
+        it("should handle monitor with zero timeout", () => {
+            const siteWithZeroTimeout = {
                 ...mockSite,
                 monitors: [
                     {
                         ...mockSite.monitors[0],
-                        timeout: undefined,
+                        timeout: 0,
                     } as Monitor,
                 ],
             };
 
-            // Mock store to return the site with undefined timeout
+            // Mock store to return the site with zero timeout
             (useSitesStore as any).mockReturnValue({
                 checkSiteNow: mockCheckSiteNow,
                 deleteSite: mockDeleteSite,
                 getSelectedMonitorId: mockGetSelectedMonitorId,
                 modifySite: vi.fn(),
                 setSelectedMonitorId: mockSetSelectedMonitorId,
-                sites: [siteWithUndefinedTimeout],
+                sites: [siteWithZeroTimeout],
                 startSiteMonitorMonitoring: mockStartSiteMonitorMonitoring,
                 stopSiteMonitorMonitoring: mockStopSiteMonitorMonitoring,
                 updateMonitorRetryAttempts: vi.fn(),
@@ -464,9 +467,9 @@ describe("useSiteDetails uncovered lines", () => {
                 updateSiteCheckInterval: vi.fn(),
             });
 
-            const { result } = renderHook(() => useSiteDetails({ site: siteWithUndefinedTimeout }));
+            const { result } = renderHook(() => useSiteDetails({ site: siteWithZeroTimeout }));
 
-            // Should use DEFAULT_REQUEST_TIMEOUT_SECONDS (10) when timeout is undefined
+            // Should use DEFAULT_REQUEST_TIMEOUT_SECONDS (10) when timeout is zero
             expect(result.current.localTimeout).toBe(10); // DEFAULT_REQUEST_TIMEOUT_SECONDS
         });
 
