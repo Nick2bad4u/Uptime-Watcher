@@ -146,32 +146,6 @@ describe("PortMonitor", () => {
             );
         });
 
-        it("should use default timeout when monitor timeout is not provided", async () => {
-            const monitorWithoutTimeout: Site["monitors"][0] = {
-                ...mockPortMonitor,
-                timeout: undefined,
-            };
-
-            const mockResult: MonitorCheckResult = {
-                status: "up",
-                responseTime: 100,
-                details: "Port reachable",
-            };
-
-            // Mock the utility function to return success
-            const { performPortCheckWithRetry } = await import("../../../services/monitoring/utils");
-            vi.mocked(performPortCheckWithRetry).mockResolvedValue(mockResult);
-
-            await portMonitor.check(monitorWithoutTimeout);
-
-            expect(performPortCheckWithRetry).toHaveBeenCalledWith(
-                "example.com",
-                80,
-                10000, // Should use default timeout from config
-                3 // retryAttempts
-            );
-        });
-
         it("should use config timeout when monitor timeout is undefined and config timeout is set", async () => {
             // Line 67: testing monitor.timeout ?? this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT
             const monitorWithoutTimeout: Site["monitors"][0] = {

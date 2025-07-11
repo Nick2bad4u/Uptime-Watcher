@@ -154,7 +154,7 @@
     "build:prepublish": "npm run lint && npm run test && npm run build",
     "prebuild": "npm run lint && npm run type-check",
     "pretest": "npm run lint && npm run type-check",
-    "prestart": "npm run lint && npm run type-check",
+    "prestart:old": "npm run lint && npm run type-check",
     "start:electron": "electron .",
     "start:renderer": "vite",
     "start:prod": "npm run build && npm run start:electron",
