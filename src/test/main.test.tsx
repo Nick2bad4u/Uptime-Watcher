@@ -68,4 +68,28 @@ describe("Main Entry Point", () => {
         const mockRoot = mockCreateRoot();
         expect(mockRoot.render).toBe(mockRender);
     });
+
+    it("should throw error when root element is not found", async () => {
+        // Mock querySelector to return null (no root element found)
+        vi.spyOn(document, "querySelector").mockReturnValue(null);
+
+        // Clear the module cache to force re-evaluation
+        vi.resetModules();
+
+        // Importing main.tsx should throw an error
+        await expect(async () => {
+            await import("../main");
+        }).rejects.toThrow("Root element not found");
+    });
+
+    it("should call querySelector with correct selector", async () => {
+        const querySelectorSpy = vi.spyOn(document, "querySelector");
+        
+        // Clear modules to ensure fresh import
+        vi.resetModules();
+        
+        await import("../main");
+
+        expect(querySelectorSpy).toHaveBeenCalledWith("#root");
+    });
 });

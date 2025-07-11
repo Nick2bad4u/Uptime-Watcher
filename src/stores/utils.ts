@@ -98,8 +98,13 @@ export const logStoreAction = (storeName: string, actionName: string, data?: unk
  */
 export async function waitForElectronAPI(maxAttempts = 50, baseDelay = 100): Promise<void> {
     for (const attempt of Array.from({ length: maxAttempts }, (_, index) => index)) {
-        if (typeof window.electronAPI.sites.getSites === "function") {
-            return; // API is ready
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            if (typeof window.electronAPI?.sites?.getSites === "function") {
+                return; // API is ready
+            }
+        } catch {
+            // window.electronAPI not available yet
         }
 
         // Wait with exponential backoff
