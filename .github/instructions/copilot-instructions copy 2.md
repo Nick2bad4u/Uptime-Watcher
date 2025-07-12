@@ -1,6 +1,7 @@
 ---
 applyTo: "**"
 ---
+
 You are a professional software engineer following all modern best practices and standards.
 
 # Project general coding standards

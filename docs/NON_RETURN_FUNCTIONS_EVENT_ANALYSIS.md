@@ -7,6 +7,7 @@ After scanning 25+ files across the Uptime Watcher codebase, I analyzed function
 ## Files Analyzed
 
 ### Backend (Electron) - 20+ Files
+
 1. `electron/services/database/SiteRepository.ts` - Database operations
 2. `electron/services/database/MonitorRepository.ts` - Monitor persistence
 3. `electron/services/database/SettingsRepository.ts` - Settings management
@@ -29,6 +30,7 @@ After scanning 25+ files across the Uptime Watcher codebase, I analyzed function
 20. `electron/utils/monitoring/monitorStatusChecker.ts` - Status checking
 
 ### Frontend (React) - 5+ Files
+
 21. `src/stores/sites/services/SiteService.ts` - Frontend site operations
 22. `src/stores/sites/services/MonitoringService.ts` - Frontend monitoring
 23. `src/hooks/site/useSiteActions.ts` - User interaction hooks
@@ -42,18 +44,21 @@ After scanning 25+ files across the Uptime Watcher codebase, I analyzed function
 Most critical functions already emit appropriate events:
 
 #### **Database Operations**
+
 - ✅ `SiteRepository.upsert()` - Emits through transaction events
 - ✅ `MonitorRepository.update()` - Uses transaction-level events
 - ✅ `SettingsRepository.set()` - Handled via transaction events
 - ✅ `DatabaseManager.initialize()` - Emits `database:transaction-completed`
 
-#### **Site Management** 
+#### **Site Management**
+
 - ✅ `SiteManager.addSite()` - Emits `site:added`
 - ✅ `SiteManager.removeSite()` - Emits `site:removed`
 - ✅ `SiteManager.updateSite()` - Emits `site:updated`
 - ✅ `SiteManager.loadSiteInBackground()` - Emits `site:cache-updated`
 
 #### **Monitoring Operations**
+
 - ✅ `MonitorManager.startMonitoring()` - Emits `monitoring:started`
 - ✅ `MonitorManager.stopMonitoring()` - Emits `monitoring:stopped`
 - ✅ Monitor status changes - Emit `monitor:status-changed`
@@ -74,12 +79,13 @@ public updateConfig(config: Partial<NotificationConfig>): void {
 ```
 
 **Recommendation**: Add event emission for configuration observability
+
 ```typescript
 public updateConfig(config: Partial<NotificationConfig>): void {
     const oldConfig = { ...this.config };
     this.config = { ...this.config, ...config };
     logger.debug("[NotificationService] Configuration updated", this.config);
-    
+
     // Emit event for each changed setting
     for (const [key, newValue] of Object.entries(config)) {
         this.eventEmitter?.emitTyped("config:changed", {
@@ -146,7 +152,7 @@ public async pruneAllHistory(limit: number): Promise<void> {
 public createMainWindow(): BrowserWindow {
     this.mainWindow = new BrowserWindow({...});
     // 🔄 COULD EMIT: "window:created" event
-    
+
     this.loadContent();
     this.setupWindowEvents();
     return this.mainWindow;
@@ -165,6 +171,7 @@ public closeMainWindow(): void {
 These functions correctly do NOT emit events:
 
 #### **Internal Utilities**
+
 ```typescript
 // These are internal, non-business operations
 private validateSite(site: Site): void // Business logic validation
@@ -173,13 +180,15 @@ private setupWindowEvents(): void // Internal setup
 ```
 
 #### **Frontend Service Wrappers**
+
 ```typescript
 // These are pass-through wrappers to backend
-SiteService.addSite() // Just calls window.electronAPI
-MonitoringService.startMonitoring() // Just calls window.electronAPI
+SiteService.addSite(); // Just calls window.electronAPI
+MonitoringService.startMonitoring(); // Just calls window.electronAPI
 ```
 
 #### **Guard Clause Functions**
+
 ```typescript
 // These are safety checks, not business operations
 if (!this.mainWindow) return; // Window safety
@@ -198,6 +207,7 @@ if (!this.config.showDownAlerts) return; // Feature flag
 ### **⚡ MEDIUM PRIORITY - Consider implementing**
 
 2. **Auto-Updater Lifecycle Events**
+
    - **Impact**: Update process affects application state
    - **Events**: `system:update-check-started`, `system:update-available`, `system:update-error`
    - **Benefit**: Better user feedback, error handling
@@ -210,6 +220,7 @@ if (!this.config.showDownAlerts) return; // Feature flag
 ### **💡 LOW PRIORITY - Nice to have**
 
 4. **Window Lifecycle Events**
+
    - **Impact**: Minor UX improvements
    - **Events**: `window:created`, `window:closed`, `window:focused`
    - **Benefit**: Analytics, debugging
@@ -227,12 +238,12 @@ Update service constructors to accept optional event emitters:
 
 ```typescript
 export class NotificationService {
-    constructor(
-        config?: NotificationConfig,
-        private eventEmitter?: TypedEventBus<UptimeEvents>
-    ) {
-        this.config = config ?? { showDownAlerts: true, showUpAlerts: true };
-    }
+ constructor(
+  config?: NotificationConfig,
+  private eventEmitter?: TypedEventBus<UptimeEvents>
+ ) {
+  this.config = config ?? { showDownAlerts: true, showUpAlerts: true };
+ }
 }
 ```
 
@@ -261,13 +272,15 @@ Add new event types to `eventTypes.ts`:
 Use optional chaining for non-critical events:
 
 ```typescript
-this.eventEmitter?.emitTyped("config:changed", {
-    setting: `notifications.${key}`,
-    oldValue: oldConfig[key],
-    newValue,
-    timestamp: Date.now(),
-    source: "user"
-}).catch(error => logger.debug("Event emission failed", error));
+this.eventEmitter
+ ?.emitTyped("config:changed", {
+  setting: `notifications.${key}`,
+  oldValue: oldConfig[key],
+  newValue,
+  timestamp: Date.now(),
+  source: "user",
+ })
+ .catch((error) => logger.debug("Event emission failed", error));
 ```
 
 ## Summary
@@ -280,8 +293,9 @@ The Uptime Watcher application has **excellent event coverage** for core busines
 - ✅ **Monitoring state changes properly tracked**
 
 **Only 5 functions identified as candidates for additional events**, primarily around:
+
 1. **Configuration changes** (highest priority)
-2. **Update lifecycle** (medium priority)  
+2. **Update lifecycle** (medium priority)
 3. **Window management** (low priority)
 
 The application's event architecture is **mature and well-implemented**. The identified gaps are minor enhancements rather than critical missing functionality.

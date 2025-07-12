@@ -30,4 +30,4 @@ This document tracks ESLint rules that have been disabled with explanations for 
 
 ---
 
-*This document will be updated as more rules are reviewed during the ESLint fixing process.*
+_This document will be updated as more rules are reviewed during the ESLint fixing process._

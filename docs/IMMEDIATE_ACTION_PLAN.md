@@ -5,6 +5,7 @@
 After analyzing the codebase's return patterns (null/undefined/void returns), here are the **immediate actionable improvements** we can implement:
 
 ## 🚨 TypeScript Errors Status
+
 - ✅ **RESOLVED**: Added `downlevelIteration: true` to `tsconfig.json` to fix iterator compilation errors
 - ✅ **ESLint Clean**: All 54 errors and 4 warnings fixed in previous work
 
@@ -53,33 +54,33 @@ public getSiteFromCache(identifier: string): Site | undefined {
 
 ```typescript
 export async function withOperationalHooks<T>(
-    operation: () => Promise<T>,
-    options: {
-        operationName: string;
-        onRetry?: (attempt: number) => void;
-        onSuccess?: (result: T) => void;
-        onFailure?: (error: Error) => void;
-        maxRetries?: number;
-    }
+ operation: () => Promise<T>,
+ options: {
+  operationName: string;
+  onRetry?: (attempt: number) => void;
+  onSuccess?: (result: T) => void;
+  onFailure?: (error: Error) => void;
+  maxRetries?: number;
+ }
 ): Promise<T> {
-    const { operationName, onRetry, onSuccess, onFailure, maxRetries = 3 } = options;
-    
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        try {
-            const result = await operation();
-            onSuccess?.(result);
-            return result;
-        } catch (error) {
-            if (attempt === maxRetries) {
-                onFailure?.(error as Error);
-                throw error;
-            }
-            onRetry?.(attempt);
-            // Simple exponential backoff
-            await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 100));
-        }
-    }
-    throw new Error(`Operation ${operationName} failed after ${maxRetries} attempts`);
+ const { operationName, onRetry, onSuccess, onFailure, maxRetries = 3 } = options;
+
+ for (let attempt = 1; attempt <= maxRetries; attempt++) {
+  try {
+   const result = await operation();
+   onSuccess?.(result);
+   return result;
+  } catch (error) {
+   if (attempt === maxRetries) {
+    onFailure?.(error as Error);
+    throw error;
+   }
+   onRetry?.(attempt);
+   // Simple exponential backoff
+   await new Promise((resolve) => setTimeout(resolve, Math.pow(2, attempt) * 100));
+  }
+ }
+ throw new Error(`Operation ${operationName} failed after ${maxRetries} attempts`);
 }
 ```
 
@@ -91,22 +92,20 @@ export async function withOperationalHooks<T>(
 ```typescript
 // Add to existing store
 useEffect(() => {
-    // Listen for background cache updates
-    const unsubscribe = window.electronAPI?.events.onTyped?.(
-        "site:cache-updated", 
-        (data) => {
-            // Trigger re-fetch of sites to update UI
-            void refreshSites();
-        }
-    );
-    
-    return unsubscribe;
+ // Listen for background cache updates
+ const unsubscribe = window.electronAPI?.events.onTyped?.("site:cache-updated", (data) => {
+  // Trigger re-fetch of sites to update UI
+  void refreshSites();
+ });
+
+ return unsubscribe;
 }, [refreshSites]);
 ```
 
 ## 🔧 Quick Configuration Fixes
 
 ### Add New Event Types
+
 **File**: `electron/types.ts`
 Add these event types to the existing `SiteManagerEvents` interface:
 
@@ -135,18 +134,20 @@ Add these event types to the existing `SiteManagerEvents` interface:
 These changes will provide:
 
 1. **Better UX**: Data appears faster through background loading
-2. **Resilience**: Automatic retries for database operations  
+2. **Resilience**: Automatic retries for database operations
 3. **Observability**: Events for debugging and monitoring
 4. **Performance**: Proactive loading reduces wait times
 
 ## 🧪 Testing Strategy
 
 ### Unit Tests to Add
+
 1. **Background Loading**: Test that cache misses trigger background loads
 2. **Event Emission**: Verify events are emitted correctly
 3. **Error Recovery**: Test retry logic and failure handling
 
 ### Integration Tests
+
 1. **React Hook Updates**: Test UI updates when background data loads
 2. **Error Boundaries**: Test graceful degradation
 3. **Performance**: Measure cache hit rate improvements
@@ -154,13 +155,17 @@ These changes will provide:
 ## 📝 Documentation Updates
 
 ### Update CONTRIBUTING.md
+
 Add section on:
+
 - When to use background loading patterns
 - How to emit operational events
 - Error handling best practices
 
 ### Update README.md
+
 Add section on:
+
 - Reactive data loading
 - Error recovery mechanisms
 - Performance optimizations
@@ -168,18 +173,21 @@ Add section on:
 ## 🚀 Rollout Plan
 
 ### Phase 1 (This Week)
+
 1. ✅ Fix TypeScript compilation errors (DONE)
 2. 🔧 Implement smart cache with background loading
 3. 🔧 Add operational hooks utility
 4. 📝 Update type definitions
 
-### Phase 2 (Next Week)  
+### Phase 2 (Next Week)
+
 1. 🎯 Integrate with React hooks
 2. 🧪 Add comprehensive tests
 3. 📊 Measure performance impact
 4. 📝 Document new patterns
 
 ### Phase 3 (Following Week)
+
 1. 🔄 Expand to all repositories
 2. 🎯 Add predictive loading
 3. 📈 Monitor success metrics

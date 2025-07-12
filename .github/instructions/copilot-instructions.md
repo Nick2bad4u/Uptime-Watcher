@@ -49,7 +49,7 @@ applyTo: "**"
 - **Repository Transaction**:
   ```typescript
   await this.databaseService.executeTransaction(async (db) => {
-    // ...mutation logic
+   // ...mutation logic
   });
   ```
 - **Event Emission**:
@@ -58,7 +58,9 @@ applyTo: "**"
   ```
 - **IPC Handler**:
   ```typescript
-  ipcMain.handle("add-site", async (_, data) => { /* ... */ });
+  ipcMain.handle("add-site", async (_, data) => {
+   /* ... */
+  });
   ```
 - **Frontend Store Update**:
   ```typescript
@@ -77,4 +79,5 @@ applyTo: "**"
 - `electron/utils/database/interfaces.ts` – Backend types/interfaces
 
 ---
+
 **If any section is unclear or missing, please provide feedback so instructions can be improved.**
