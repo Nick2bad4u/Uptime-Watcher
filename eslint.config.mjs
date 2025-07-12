@@ -42,6 +42,7 @@ import vitestGlobals from "eslint-plugin-vitest-globals";
 import globals from "globals";
 import eslintPluginToml from "eslint-plugin-toml";
 import tomlEslintParser from "toml-eslint-parser";
+import jsoncEslintParser from "jsonc-eslint-parser";
 
 const __dirname = import.meta.dirname;
 
@@ -113,6 +114,10 @@ export default [
     {
         files: ["**/*.json", "**/*.json5", "**/*.jsonc"],
         ...json.configs.recommended[0],
+        languageOptions: {
+            parser: jsoncEslintParser,
+            parserOptions: { jsonSyntax: "JSON" },
+        },
     },
 
     // TOML files

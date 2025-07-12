@@ -1,5 +1,5 @@
 # Comprehensive Event System Architecture Guide
-
+<!-- markdownlint-disable -->
 ## Overview
 
 The Uptime Watcher application implements a sophisticated, type-safe event system built on a custom `TypedEventBus` that enhances Node.js's EventEmitter with compile-time type safety, middleware processing, and comprehensive observability features.
@@ -314,7 +314,7 @@ return withOperationalHooks(operation, {
 
 ### 1. Cache Miss to Background Loading Flow:
 
-```
+```folder
 User Request → getSiteFromCache() → Cache Miss Detected
     ↓
 Event: "site:cache-miss" → Middleware Processing → Logging
@@ -326,7 +326,7 @@ Event: "site:cache-updated" → UI Re-render → Data Appears
 
 ### 2. Database Operation with Retry Flow:
 
-```
+```folder
 Database Operation → withOperationalHooks() → First Attempt Fails
     ↓
 Event: "database:retry" → Wait (Exponential Backoff) → Retry
@@ -336,7 +336,7 @@ Second Attempt Succeeds → Event: "database:success" → Operation Complete
 
 ### 3. Monitor Status Change Flow:
 
-```
+```folder
 Monitor Check → Status Change Detected → Update Database
     ↓
 Event: "monitor:status-changed" → Middleware Chain → Logging + Metrics

@@ -6,6 +6,7 @@
 import { UptimeEvents, TypedEventBus } from "../../events/index";
 import { MonitorRepository, DatabaseService, MonitorScheduler } from "../../services/index";
 import { Site } from "../../types";
+import { withDatabaseOperation } from "../operationalHooks";
 
 interface Logger {
     debug: (message: string, ...args: unknown[]) => void;
@@ -51,16 +52,22 @@ export async function startAllMonitoring(config: MonitoringLifecycleConfig, isMo
         for (const monitor of site.monitors) {
             if (monitor.id) {
                 try {
-                    // Use transaction for database update
-                    await config.databaseService.executeTransaction((db) => {
-                        if (monitor.id) {
-                            config.monitorRepository.updateInternal(db, monitor.id, {
-                                monitoring: true,
-                                status: "pending",
-                            });
-                        }
-                        return Promise.resolve();
-                    });
+                    // Use operational hooks for database update
+                    await withDatabaseOperation(
+                        () => {
+                            const db = config.databaseService.getDatabase();
+                            if (monitor.id) {
+                                config.monitorRepository.updateInternal(db, monitor.id, {
+                                    monitoring: true,
+                                    status: "pending",
+                                });
+                            }
+                            return Promise.resolve();
+                        },
+                        "monitor-start-all-update",
+                        config.eventEmitter,
+                        { monitorId: monitor.id }
+                    );
                 } catch (error) {
                     config.logger.error(`Failed to update monitor ${monitor.id} to pending status`, error);
                 }
@@ -87,16 +94,22 @@ export async function stopAllMonitoring(config: MonitoringLifecycleConfig): Prom
         for (const monitor of site.monitors) {
             if (monitor.id && monitor.monitoring !== false) {
                 try {
-                    // Use transaction for database update
-                    await config.databaseService.executeTransaction((db) => {
-                        if (monitor.id) {
-                            config.monitorRepository.updateInternal(db, monitor.id, {
-                                monitoring: false,
-                                status: "paused",
-                            });
-                        }
-                        return Promise.resolve();
-                    });
+                    // Use operational hooks for database update
+                    await withDatabaseOperation(
+                        () => {
+                            const db = config.databaseService.getDatabase();
+                            if (monitor.id) {
+                                config.monitorRepository.updateInternal(db, monitor.id, {
+                                    monitoring: false,
+                                    status: "paused",
+                                });
+                            }
+                            return Promise.resolve();
+                        },
+                        "monitor-stop-all-update",
+                        config.eventEmitter,
+                        { monitorId: monitor.id }
+                    );
                 } catch (error) {
                     config.logger.error(`Failed to update monitor ${monitor.id} to paused status`, error);
                 }
@@ -181,14 +194,20 @@ async function startSpecificMonitor(
     }
 
     try {
-        // Use transaction for database update
-        await config.databaseService.executeTransaction((db) => {
-            config.monitorRepository.updateInternal(db, monitorId, {
-                monitoring: true,
-                status: "pending",
-            });
-            return Promise.resolve();
-        });
+        // Use operational hooks for database update
+        await withDatabaseOperation(
+            () => {
+                const db = config.databaseService.getDatabase();
+                config.monitorRepository.updateInternal(db, monitorId, {
+                    monitoring: true,
+                    status: "pending",
+                });
+                return Promise.resolve();
+            },
+            "monitor-start-specific",
+            config.eventEmitter,
+            { identifier, monitorId }
+        );
         const started = config.monitorScheduler.startMonitor(identifier, monitor);
         if (started) {
             config.logger.debug(`Started monitoring for ${identifier}:${monitorId} - status set to pending`);
@@ -216,14 +235,20 @@ async function stopSpecificMonitor(
     }
 
     try {
-        // Use transaction for database update
-        await config.databaseService.executeTransaction((db) => {
-            config.monitorRepository.updateInternal(db, monitorId, {
-                monitoring: false,
-                status: "paused",
-            });
-            return Promise.resolve();
-        });
+        // Use operational hooks for database update
+        await withDatabaseOperation(
+            () => {
+                const db = config.databaseService.getDatabase();
+                config.monitorRepository.updateInternal(db, monitorId, {
+                    monitoring: false,
+                    status: "paused",
+                });
+                return Promise.resolve();
+            },
+            "monitor-stop-specific",
+            config.eventEmitter,
+            { identifier, monitorId }
+        );
         const stopped = config.monitorScheduler.stopMonitor(identifier, monitorId);
         if (stopped) {
             config.logger.debug(`Stopped monitoring for ${identifier}:${monitorId} - status set to paused`);

@@ -14,6 +14,7 @@ import {
     SiteRepository,
 } from "../../services/index";
 import { Site, StatusHistory } from "../../types";
+import { withDatabaseOperation } from "../operationalHooks";
 import { ILogger, ISiteCache, SiteLoadingError } from "./interfaces";
 
 /**
@@ -146,12 +147,14 @@ export class DataImportExportService {
      * Database operation that persists the imported data.
      */
     async persistImportedData(sites: ImportSite[], settings: Record<string, string>): Promise<void> {
-        try {
-            await this.databaseService.executeTransaction(async (db) => {
+        return withDatabaseOperation(
+            async () => {
+                const db = this.databaseService.getDatabase();
+
                 // Clear existing data using internal methods to avoid nested transactions
-                await this.repositories.site.deleteAll();
+                this.repositories.site.deleteAllInternal(db);
                 this.repositories.settings.deleteAllInternal(db);
-                await this.repositories.monitor.deleteAll();
+                this.repositories.monitor.deleteAllInternal(db);
                 this.repositories.history.deleteAllInternal(db);
 
                 // Import sites using bulk insert
@@ -159,7 +162,7 @@ export class DataImportExportService {
                     identifier: site.identifier,
                     name: site.name,
                 }));
-                await this.repositories.site.bulkInsert(siteRows);
+                this.repositories.site.bulkInsertInternal(db, siteRows);
 
                 // Import monitors and history
                 await this.importMonitorsWithHistory(db, sites);
@@ -167,25 +170,14 @@ export class DataImportExportService {
                 // Import settings using internal method to avoid nested transactions
                 this.repositories.settings.bulkInsertInternal(db, settings);
 
-                return;
-            });
-
-            this.logger.info(
-                `Successfully imported ${sites.length} sites and ${Object.keys(settings).length} settings`
-            );
-        } catch (error) {
-            const message = `Failed to persist imported data: ${error instanceof Error ? error.message : String(error)}`;
-            this.logger.error(message, error);
-
-            await this.eventEmitter.emitTyped(DataImportExportService.DATABASE_ERROR_EVENT, {
-                details: message,
-                error: error instanceof Error ? error : new Error(String(error)),
-                operation: "import-data-persist",
-                timestamp: Date.now(),
-            });
-
-            throw new SiteLoadingError(message, error instanceof Error ? error : undefined);
-        }
+                this.logger.info(
+                    `Successfully imported ${sites.length} sites and ${Object.keys(settings).length} settings`
+                );
+            },
+            "data-import-persist",
+            this.eventEmitter,
+            { sitesCount: sites.length, settingsCount: Object.keys(settings).length }
+        );
     }
 
     /**

@@ -76,11 +76,17 @@ export function createStatusUpdateHandler(options: StatusUpdateHandlerOptions) {
  */
 export class StatusUpdateManager {
     private handler: ((update: StatusUpdate) => Promise<void>) | undefined = undefined;
+    private isListenerAttached = false;
 
     /**
      * Subscribe to status updates
      */
     async subscribe(handler: (update: StatusUpdate) => Promise<void>): Promise<void> {
+        // If already subscribed, unsubscribe first to avoid duplicates
+        if (this.isListenerAttached) {
+            this.unsubscribe();
+        }
+
         this.handler = handler;
 
         // Always wait for electronAPI to be ready before subscribing
@@ -97,6 +103,8 @@ export class StatusUpdateManager {
                 console.error("Error in status update handler:", error);
             });
         });
+
+        this.isListenerAttached = true;
         logStoreAction("StatusUpdateManager", "subscribed", {
             message: "Successfully subscribed to status updates",
             subscribed: true,
@@ -107,8 +115,10 @@ export class StatusUpdateManager {
      * Unsubscribe from status updates
      */
     unsubscribe(): void {
-        window.electronAPI.events.removeAllListeners("status-update");
+        // Remove all listeners for the update-status channel
+        window.electronAPI.events.removeAllListeners("update-status");
         this.handler = undefined;
+        this.isListenerAttached = false;
         logStoreAction("StatusUpdateManager", "unsubscribed", {
             message: "Successfully unsubscribed from status updates",
             unsubscribed: true,
@@ -119,6 +129,6 @@ export class StatusUpdateManager {
      * Check if currently subscribed
      */
     isSubscribed(): boolean {
-        return this.handler !== undefined;
+        return this.handler !== undefined && this.isListenerAttached;
     }
 }

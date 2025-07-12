@@ -2,6 +2,7 @@
  * Utility for managing history limits in the database.
  */
 import type { HistoryRepository, SettingsRepository, DatabaseService } from "../../services/index";
+import { withDatabaseOperation } from "../operationalHooks";
 
 interface Logger {
     debug: (message: string, ...args: unknown[]) => void;
@@ -58,17 +59,24 @@ export async function setHistoryLimit(params: SetHistoryLimitParams): Promise<vo
     setHistoryLimit(finalLimit);
 
     // Use single transaction for atomicity - either both operations succeed or both fail
-    await databaseService.executeTransaction((db) => {
-        // Save to settings using internal method
-        repositories.settings.setInternal(db, "historyLimit", finalLimit.toString());
+    await withDatabaseOperation(
+        () => {
+            const db = databaseService.getDatabase();
 
-        // Prune history for all monitors if limit > 0 using internal method
-        if (finalLimit > 0) {
-            repositories.history.pruneAllHistoryInternal(db, finalLimit);
-        }
+            // Save to settings using internal method
+            repositories.settings.setInternal(db, "historyLimit", finalLimit.toString());
 
-        return Promise.resolve();
-    });
+            // Prune history for all monitors if limit > 0 using internal method
+            if (finalLimit > 0) {
+                repositories.history.pruneAllHistoryInternal(db, finalLimit);
+            }
+
+            return Promise.resolve();
+        },
+        "history-limit-manager-set",
+        undefined,
+        { limit: finalLimit }
+    );
 
     if (logger) {
         logger.debug(`History limit set to ${finalLimit}`);

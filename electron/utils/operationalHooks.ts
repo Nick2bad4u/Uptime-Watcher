@@ -15,56 +15,56 @@ export interface OperationalHooksConfig<T = unknown> {
      * Name of the operation for logging and event emission.
      */
     operationName: string;
-    
+
     /**
      * Maximum number of retry attempts.
      * @default 3
      */
     maxRetries?: number;
-    
+
     /**
      * Initial delay between retries in milliseconds.
      * @default 100
      */
     initialDelay?: number;
-    
+
     /**
      * Backoff strategy for retry delays.
      * @default "exponential"
      */
     backoff?: "linear" | "exponential";
-    
+
     /**
      * Event emitter for operation events.
      */
     eventEmitter?: TypedEventBus<UptimeEvents>;
-    
+
     /**
      * Context data to include in events.
      */
     context?: Record<string, unknown>;
-    
+
     /**
      * Callback when retry is attempted.
      */
     onRetry?: (attempt: number, error: Error) => void | Promise<void>;
-    
+
     /**
      * Callback when operation succeeds.
      */
     onSuccess?: (result: T) => void | Promise<void>;
-    
+
     /**
      * Callback when operation fails permanently.
      */
     onFailure?: (error: Error, attempts: number) => void | Promise<void>;
-    
+
     /**
      * Whether to emit events for this operation.
      * @default true
      */
     emitEvents?: boolean;
-    
+
     /**
      * Whether to throw on final failure.
      * @default true
@@ -212,13 +212,13 @@ async function handleRetry<T>(
     }
 
     const delay = calculateDelay(attempt, initialDelay, backoff);
-    
+
     if (delay > 0) {
         logger.debug(`[OperationalHooks] Retrying ${operationName} in ${delay}ms`, {
             attempt: attempt + 1,
             operationId,
         });
-        
+
         await new Promise((resolve) => setTimeout(resolve, delay));
     }
 }
@@ -253,7 +253,7 @@ export async function withOperationalHooks<T>(
             return await handleSuccess(result, config, operationName, startTime, attempt, operationId);
         } catch (error) {
             lastError = error instanceof Error ? error : new Error(String(error));
-            
+
             logger.debug(`[OperationalHooks] ${operationName} failed on attempt ${attempt}/${maxRetries}`, {
                 error: lastError,
                 operationId,

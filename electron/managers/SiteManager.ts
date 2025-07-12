@@ -265,7 +265,7 @@ export class SiteManager {
      */
     public getSiteFromCache(identifier: string): Site | undefined {
         const site = this.sites.get(identifier);
-        
+
         if (!site) {
             // Emit cache miss event
             this.eventEmitter
@@ -278,13 +278,13 @@ export class SiteManager {
                 .catch((error) => {
                     logger.debug(`[SiteManager] Failed to emit cache miss event`, error);
                 });
-            
+
             // Trigger background loading without blocking
             this.loadSiteInBackground(identifier).catch((error) => {
                 logger.debug(`[SiteManager] Background loading error ignored`, error);
             });
         }
-        
+
         return site;
     }
 
@@ -294,19 +294,19 @@ export class SiteManager {
     private async loadSiteInBackground(identifier: string): Promise<void> {
         try {
             logger.debug(`[SiteManager] Loading site in background: ${identifier}`);
-            
+
             const sites = await this.siteRepositoryService.getSitesFromDatabase();
             const site = sites.find((s) => s.identifier === identifier);
-            
+
             if (site) {
                 this.sites.set(identifier, site);
-                
+
                 await this.eventEmitter.emitTyped("site:cache-updated", {
                     identifier,
                     operation: "background-load",
                     timestamp: Date.now(),
                 });
-                
+
                 logger.debug(`[SiteManager] Background site load completed: ${identifier}`);
             } else {
                 logger.debug(`[SiteManager] Site not found during background load: ${identifier}`);

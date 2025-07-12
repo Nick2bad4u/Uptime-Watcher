@@ -1,7 +1,7 @@
 import { Database } from "node-sqlite3-wasm";
 
 import { isDev } from "../../electronUtils";
-import { logger } from "../../utils/index";
+import { logger, withDatabaseOperation } from "../../utils/index";
 import { DatabaseService } from "./DatabaseService";
 
 /**
@@ -40,15 +40,15 @@ export class SettingsRepository {
      * Set a setting value.
      */
     public async set(key: string, value: string): Promise<void> {
-        try {
-            await this.databaseService.executeTransaction((db) => {
+        return withDatabaseOperation(
+            async () => {
+                const db = this.databaseService.getDatabase();
                 this.setInternal(db, key, value);
-                return Promise.resolve();
-            });
-        } catch (error) {
-            logger.error(`[SettingsRepository] Failed to set setting: ${key}`, error);
-            throw error;
-        }
+            },
+            "settings-set",
+            undefined,
+            { key }
+        );
     }
 
     /**
@@ -66,15 +66,15 @@ export class SettingsRepository {
      * Delete a setting by key.
      */
     public async delete(key: string): Promise<void> {
-        try {
-            await this.databaseService.executeTransaction((db) => {
+        return withDatabaseOperation(
+            async () => {
+                const db = this.databaseService.getDatabase();
                 this.deleteInternal(db, key);
-                return Promise.resolve();
-            });
-        } catch (error) {
-            logger.error(`[SettingsRepository] Failed to delete setting: ${key}`, error);
-            throw error;
-        }
+            },
+            "settings-delete",
+            undefined,
+            { key }
+        );
     }
 
     /**
@@ -112,15 +112,10 @@ export class SettingsRepository {
      * Clear all settings from the database.
      */
     public async deleteAll(): Promise<void> {
-        try {
-            await this.databaseService.executeTransaction((db) => {
-                this.deleteAllInternal(db);
-                return Promise.resolve();
-            });
-        } catch (error) {
-            logger.error("[SettingsRepository] Failed to delete all settings", error);
-            throw error;
-        }
+        return withDatabaseOperation(async () => {
+            const db = this.databaseService.getDatabase();
+            this.deleteAllInternal(db);
+        }, "settings-delete-all");
     }
 
     /**
@@ -142,15 +137,15 @@ export class SettingsRepository {
             return;
         }
 
-        try {
-            await this.databaseService.executeTransaction((db) => {
+        return withDatabaseOperation(
+            async () => {
+                const db = this.databaseService.getDatabase();
                 this.bulkInsertInternal(db, settings);
-                return Promise.resolve();
-            });
-        } catch (error) {
-            logger.error("[SettingsRepository] Failed to bulk insert settings", error);
-            throw error;
-        }
+            },
+            "settings-bulk-insert",
+            undefined,
+            { count: entries.length }
+        );
     }
 
     /**

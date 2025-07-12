@@ -59,15 +59,25 @@ export class SiteRepository {
         return withDatabaseOperation(
             async () => {
                 const db = this.getDb();
-                
-                return new Promise<{ identifier: string; name?: string | undefined; monitoring?: boolean | undefined } | undefined>((resolve, reject) => {
+
+                return new Promise<
+                    { identifier: string; name?: string | undefined; monitoring?: boolean | undefined } | undefined
+                >((resolve, reject) => {
                     try {
                         const siteRow = db.get("SELECT identifier, name, monitoring FROM sites WHERE identifier = ?", [
                             identifier,
                         ]) as { identifier: string; name?: string; monitoring?: number } | undefined;
 
                         if (!siteRow) {
-                            resolve(undefined as { identifier: string; name?: string | undefined; monitoring?: boolean | undefined } | undefined);
+                            resolve(
+                                undefined as
+                                    | {
+                                          identifier: string;
+                                          name?: string | undefined;
+                                          monitoring?: boolean | undefined;
+                                      }
+                                    | undefined
+                            );
                             return;
                         }
 
@@ -126,25 +136,15 @@ export class SiteRepository {
      * Create or update a site in the database.
      */
     public async upsert(site: Pick<Site, "identifier" | "name" | "monitoring">): Promise<void> {
-        try {
-            await this.databaseService.executeTransaction((db) => {
-                // Ensure all values are valid for SQLite
-                const identifier = site.identifier || ""; // Fallback for undefined/empty identifier
-                const name = site.name || "Unnamed Site"; // Fallback for undefined/empty name
-                const monitoring = site.monitoring ? 1 : 0; // Convert boolean to integer
-                
-                db.run("INSERT OR REPLACE INTO sites (identifier, name, monitoring) VALUES (?, ?, ?)", [
-                    identifier,
-                    name,
-                    monitoring,
-                ]);
-                logger.debug(`[SiteRepository] Upserted site: ${identifier}`);
-                return Promise.resolve();
-            });
-        } catch (error) {
-            logger.error(`[SiteRepository] Failed to upsert site: ${site.identifier}`, error);
-            throw error;
-        }
+        return withDatabaseOperation(
+            async () => {
+                const db = this.databaseService.getDatabase();
+                this.upsertInternal(db, site);
+            },
+            "site-upsert",
+            undefined,
+            { identifier: site.identifier }
+        );
     }
 
     /**
@@ -156,7 +156,7 @@ export class SiteRepository {
         const identifier = site.identifier || ""; // Fallback for undefined/empty identifier
         const name = site.name || "Unnamed Site"; // Fallback for undefined/empty name
         const monitoring = site.monitoring ? 1 : 0; // Convert boolean to integer
-        
+
         db.run("INSERT OR REPLACE INTO sites (identifier, name, monitoring) VALUES (?, ?, ?)", [
             identifier,
             name,
@@ -169,23 +169,15 @@ export class SiteRepository {
      * Delete a site from the database.
      */
     public async delete(identifier: string): Promise<boolean> {
-        try {
-            return await this.databaseService.executeTransaction((db) => {
-                const result = db.run("DELETE FROM sites WHERE identifier = ?", [identifier]);
-                const deleted = result.changes > 0;
-
-                if (deleted) {
-                    logger.debug(`[SiteRepository] Deleted site: ${identifier}`);
-                } else {
-                    logger.warn(`[SiteRepository] Site not found for deletion: ${identifier}`);
-                }
-
-                return Promise.resolve(deleted);
-            });
-        } catch (error) {
-            logger.error(`[SiteRepository] Failed to delete site: ${identifier}`, error);
-            throw error;
-        }
+        return withDatabaseOperation(
+            async () => {
+                const db = this.databaseService.getDatabase();
+                return this.deleteInternal(db, identifier);
+            },
+            "site-delete",
+            undefined,
+            { identifier }
+        );
     }
 
     /**
@@ -247,16 +239,19 @@ export class SiteRepository {
      * Clear all sites from the database.
      */
     public async deleteAll(): Promise<void> {
-        try {
-            await this.databaseService.executeTransaction((db) => {
-                db.run("DELETE FROM sites");
-                logger.info("[SiteRepository] All sites deleted");
-                return Promise.resolve();
-            });
-        } catch (error) {
-            logger.error("[SiteRepository] Failed to delete all sites", error);
-            throw error;
-        }
+        return withDatabaseOperation(async () => {
+            const db = this.databaseService.getDatabase();
+            this.deleteAllInternal(db);
+        }, "site-delete-all");
+    }
+
+    /**
+     * Internal method to clear all sites from the database within an existing transaction.
+     * Use this method when you're already within a transaction context.
+     */
+    public deleteAllInternal(db: Database): void {
+        db.run("DELETE FROM sites");
+        logger.debug("[SiteRepository] All sites deleted (internal)");
     }
 
     /**
@@ -270,32 +265,46 @@ export class SiteRepository {
             return;
         }
 
+        return withDatabaseOperation(
+            async () => {
+                const db = this.databaseService.getDatabase();
+                this.bulkInsertInternal(db, sites);
+            },
+            "site-bulk-insert",
+            undefined,
+            { count: sites.length }
+        );
+    }
+
+    /**
+     * Internal method to bulk insert sites within an existing transaction.
+     * Use this method when you're already within a transaction context.
+     */
+    public bulkInsertInternal(
+        db: Database,
+        sites: { identifier: string; name?: string | undefined; monitoring?: boolean | undefined }[]
+    ): void {
+        if (sites.length === 0) {
+            return;
+        }
+
+        // Prepare the statement once for better performance
+        const stmt = db.prepare("INSERT INTO sites (identifier, name, monitoring) VALUES (?, ?, ?)");
+
         try {
-            await this.databaseService.executeTransaction((db) => {
-                // Prepare the statement once for better performance
-                const stmt = db.prepare("INSERT INTO sites (identifier, name, monitoring) VALUES (?, ?, ?)");
-
-                try {
-                    for (const site of sites) {
-                        // Convert monitoring boolean to SQLite integer
-                        let monitoringValue = 1; // Default to true (1) if not specified
-                        if (site.monitoring !== undefined) {
-                            monitoringValue = site.monitoring ? 1 : 0;
-                        }
-
-                        stmt.run([site.identifier, site.name ?? null, monitoringValue]);
-                    }
-
-                    logger.info(`[SiteRepository] Bulk inserted ${sites.length} sites`);
-                } finally {
-                    stmt.finalize();
+            for (const site of sites) {
+                // Convert monitoring boolean to SQLite integer
+                let monitoringValue = 1; // Default to true (1) if not specified
+                if (site.monitoring !== undefined) {
+                    monitoringValue = site.monitoring ? 1 : 0;
                 }
 
-                return Promise.resolve();
-            });
-        } catch (error) {
-            logger.error("[SiteRepository] Failed to bulk insert sites", error);
-            throw error;
+                stmt.run([site.identifier, site.name ?? null, monitoringValue]);
+            }
+
+            logger.debug(`[SiteRepository] Bulk inserted ${sites.length} sites (internal)`);
+        } finally {
+            stmt.finalize();
         }
     }
 }

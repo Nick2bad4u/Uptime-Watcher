@@ -33,10 +33,10 @@ function App() {
     const { clearError, isLoading, lastError } = useErrorStore();
 
     // Sites store
-    const { initializeSites, sites, subscribeToStatusUpdates, unsubscribeFromStatusUpdates } = useSitesStore();
+    const { sites } = useSitesStore();
 
     // Settings store
-    const { initializeSettings } = useSettingsStore();
+    useSettingsStore();
 
     // UI store
     const { setShowSettings, setShowSiteDetails, showSettings, showSiteDetails } = useUIStore();
@@ -77,32 +77,36 @@ function App() {
      * - Cleanup on component unmount
      */
     useEffect(() => {
-        if (process.env.NODE_ENV === "production") {
-            logger.app.started();
-        }
-
-        // Initialize all stores
         const initializeApp = async () => {
-            await Promise.all([initializeSites(), initializeSettings()]);
+            if (process.env.NODE_ENV === "production") {
+                logger.app.started();
+            }
+
+            // Get fresh references to avoid stale closures
+            const sitesStore = useSitesStore.getState();
+            const settingsStore = useSettingsStore.getState();
+
+            // Initialize both stores
+            await Promise.all([sitesStore.initializeSites(), settingsStore.initializeSettings()]);
+
+            // Subscribe to status updates
+            sitesStore.subscribeToStatusUpdates((update: StatusUpdate) => {
+                // Optional callback for additional processing if needed
+                if (process.env.NODE_ENV === "development") {
+                    const timestamp = new Date().toLocaleTimeString();
+                    console.log(`[${timestamp}] [App] Status update received:`, update.site.identifier);
+                }
+            });
         };
 
         void initializeApp();
 
-        // Subscribe to status updates with optimized incremental updates
-        // The store's subscribeToStatusUpdates now handles smart incremental updates automatically
-        subscribeToStatusUpdates((update: StatusUpdate) => {
-            // Optional callback for additional processing if needed
-            if (process.env.NODE_ENV === "development") {
-                const timestamp = new Date().toLocaleTimeString();
-                console.log(`[${timestamp}] [App] Status update received:`, update.site.identifier);
-            }
-        });
-
         // Cleanup
         return () => {
-            unsubscribeFromStatusUpdates();
+            const currentSitesStore = useSitesStore.getState();
+            currentSitesStore.unsubscribeFromStatusUpdates();
         };
-    }, [initializeSites, initializeSettings, subscribeToStatusUpdates, unsubscribeFromStatusUpdates]);
+    }, []); // Empty dependency array - this should only run once
 
     // Focus-based state synchronization (disabled by default for performance)
     useBackendFocusSync(false); // Set to true to enable focus-based backend sync

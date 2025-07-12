@@ -7,6 +7,7 @@ import { Database } from "node-sqlite3-wasm";
 
 import { DatabaseService } from "../../services/index";
 import { Site, Monitor } from "../../types";
+import { withDatabaseOperation } from "../operationalHooks";
 import {
     ILogger,
     ISiteRepository,
@@ -15,9 +16,6 @@ import {
     SiteWritingConfig,
     MonitoringConfig,
     SiteNotFoundError,
-    SiteCreationError,
-    SiteUpdateError,
-    SiteDeletionError,
 } from "./interfaces";
 
 /**
@@ -43,13 +41,14 @@ export class SiteWriterService {
      * Pure data operation without side effects.
      */
     async createSite(siteData: Site): Promise<Site> {
-        try {
-            this.logger.info(`Creating new site in database: ${siteData.identifier}`);
+        return withDatabaseOperation(
+            () => {
+                this.logger.info(`Creating new site in database: ${siteData.identifier}`);
 
-            const site: Site = { ...siteData };
+                const site: Site = { ...siteData };
 
-            // Use transaction for atomicity
-            await this.databaseService.executeTransaction((db) => {
+                const db = this.databaseService.getDatabase();
+
                 // Persist site to database using internal method to avoid nested transactions
                 this.repositories.site.upsertInternal(db, site);
 
@@ -62,16 +61,15 @@ export class SiteWriterService {
                     monitor.id = newId;
                 }
 
-                return Promise.resolve();
-            });
-
-            this.logger.info(`Site created successfully in database: ${site.identifier} (${site.name || "unnamed"})`);
-            return site;
-        } catch (error) {
-            const message = `Failed to create site ${siteData.identifier}: ${error instanceof Error ? error.message : String(error)}`;
-            this.logger.error(message, error);
-            throw new SiteCreationError(siteData.identifier, error instanceof Error ? error : undefined);
-        }
+                this.logger.info(
+                    `Site created successfully in database: ${site.identifier} (${site.name || "unnamed"})`
+                );
+                return Promise.resolve(site);
+            },
+            "site-writer-create",
+            undefined,
+            { identifier: siteData.identifier, monitorCount: siteData.monitors.length }
+        );
     }
 
     /**
@@ -79,35 +77,31 @@ export class SiteWriterService {
      * Pure data operation without side effects.
      */
     async updateSite(siteCache: ISiteCache, identifier: string, updates: Partial<Site>): Promise<Site> {
-        try {
-            // Validate input
-            const site = this.validateSiteExists(siteCache, identifier);
+        return withDatabaseOperation(
+            async () => {
+                // Validate input
+                const site = this.validateSiteExists(siteCache, identifier);
 
-            // Create updated site
-            const updatedSite = this.createUpdatedSite(siteCache, site, updates);
+                // Create updated site
+                const updatedSite = this.createUpdatedSite(siteCache, site, updates);
 
-            // Use transaction for atomicity
-            await this.databaseService.executeTransaction((db) => {
+                const db = this.databaseService.getDatabase();
+
                 // Persist to database using internal method to avoid nested transactions
                 this.repositories.site.upsertInternal(db, updatedSite);
 
                 // Update monitors if provided - UPDATE existing monitors instead of recreating
                 if (updates.monitors) {
-                    return this.updateMonitorsPreservingHistory(db, identifier, updates.monitors);
+                    await this.updateMonitorsPreservingHistory(db, identifier, updates.monitors);
                 }
-                return Promise.resolve();
-            });
 
-            this.logger.info(`Site updated successfully: ${identifier}`);
-            return updatedSite;
-        } catch (error) {
-            if (error instanceof SiteNotFoundError) {
-                throw error;
-            }
-            const message = `Failed to update site ${identifier}: ${error instanceof Error ? error.message : String(error)}`;
-            this.logger.error(message, error);
-            throw new SiteUpdateError(identifier, error instanceof Error ? error : undefined);
-        }
+                this.logger.info(`Site updated successfully: ${identifier}`);
+                return updatedSite;
+            },
+            "site-writer-update",
+            undefined,
+            { identifier }
+        );
     }
 
     /**
@@ -115,32 +109,31 @@ export class SiteWriterService {
      * Pure data operation without side effects.
      */
     async deleteSite(siteCache: ISiteCache, identifier: string): Promise<boolean> {
-        try {
-            this.logger.info(`Removing site: ${identifier}`);
+        return withDatabaseOperation(
+            () => {
+                this.logger.info(`Removing site: ${identifier}`);
 
-            // Remove from cache
-            const removed = siteCache.delete(identifier);
+                // Remove from cache
+                const removed = siteCache.delete(identifier);
 
-            // Use transaction for atomicity
-            await this.databaseService.executeTransaction((db) => {
+                const db = this.databaseService.getDatabase();
+
                 // Remove from database using internal methods to avoid nested transactions
                 this.repositories.monitor.deleteBySiteIdentifierInternal(db, identifier);
                 this.repositories.site.deleteInternal(db, identifier);
-                return Promise.resolve();
-            });
 
-            if (removed) {
-                this.logger.info(`Site removed successfully: ${identifier}`);
-            } else {
-                this.logger.warn(`Site not found in cache for removal: ${identifier}`);
-            }
+                if (removed) {
+                    this.logger.info(`Site removed successfully: ${identifier}`);
+                } else {
+                    this.logger.warn(`Site not found in cache for removal: ${identifier}`);
+                }
 
-            return removed;
-        } catch (error) {
-            const message = `Failed to delete site ${identifier}: ${error instanceof Error ? error.message : String(error)}`;
-            this.logger.error(message, error);
-            throw new SiteDeletionError(identifier, error instanceof Error ? error : undefined);
-        }
+                return Promise.resolve(removed);
+            },
+            "site-writer-delete",
+            undefined,
+            { identifier }
+        );
     }
 
     /**

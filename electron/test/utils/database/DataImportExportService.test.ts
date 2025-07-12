@@ -7,14 +7,25 @@ describe("DataImportExportService", () => {
     let mockDatabaseService: any;
     let mockLogger: any;
     let mockEventEmitter: any;
+    let mockDb: any;
     let dataImportExportService: DataImportExportService;
 
     beforeEach(() => {
+        mockDb = {
+            run: vi.fn(),
+            prepare: vi.fn(() => ({
+                run: vi.fn(),
+                finalize: vi.fn(),
+            })),
+        };
+
         mockRepositories = {
             site: {
                 exportAll: vi.fn(),
                 deleteAll: vi.fn(),
+                deleteAllInternal: vi.fn(),
                 bulkInsert: vi.fn(),
+                bulkInsertInternal: vi.fn(),
             },
             settings: {
                 getAll: vi.fn(),
@@ -25,17 +36,21 @@ describe("DataImportExportService", () => {
             },
             monitor: {
                 deleteAll: vi.fn(),
+                deleteAllInternal: vi.fn(),
                 bulkCreate: vi.fn(),
+                createInternal: vi.fn(),
             },
             history: {
                 deleteAll: vi.fn(),
                 deleteAllInternal: vi.fn(),
                 bulkInsert: vi.fn(),
+                addEntryInternal: vi.fn(),
             },
         };
 
         mockDatabaseService = {
             executeTransaction: vi.fn(),
+            getDatabase: vi.fn(() => mockDb),
         };
 
         mockLogger = {

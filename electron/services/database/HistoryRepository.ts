@@ -2,7 +2,7 @@ import { Database } from "node-sqlite3-wasm";
 
 import { isDev } from "../../electronUtils";
 import { StatusHistory } from "../../types";
-import { logger } from "../../utils/index";
+import { logger, withDatabaseOperation } from "../../utils/index";
 import { DatabaseService } from "./DatabaseService";
 import {
     addHistoryEntry,
@@ -72,15 +72,16 @@ export class HistoryRepository {
             return;
         }
 
-        try {
-            await this.databaseService.executeTransaction((db) => {
+        return withDatabaseOperation(
+            () => {
+                const db = this.databaseService.getDatabase();
                 this.pruneAllHistoryInternal(db, limit);
                 return Promise.resolve();
-            });
-        } catch (error) {
-            logger.error("[HistoryRepository] Failed to prune history for all monitors", error);
-            throw error;
-        }
+            },
+            "history-prune-all",
+            undefined,
+            { limit }
+        );
     }
 
     /**
@@ -164,8 +165,9 @@ export class HistoryRepository {
             return;
         }
 
-        try {
-            await this.databaseService.executeTransaction((db) => {
+        return withDatabaseOperation(
+            () => {
+                const db = this.databaseService.getDatabase();
                 // Prepare the statement once for better performance
                 const stmt = db.prepare(
                     "INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)"
@@ -188,13 +190,12 @@ export class HistoryRepository {
                 } finally {
                     stmt.finalize();
                 }
-
                 return Promise.resolve();
-            });
-        } catch (error) {
-            logger.error(`[HistoryRepository] Failed to bulk insert history for monitor: ${monitorId}`, error);
-            throw error;
-        }
+            },
+            "history-bulk-insert",
+            undefined,
+            { monitorId, count: historyEntries.length }
+        );
     }
 
     /**

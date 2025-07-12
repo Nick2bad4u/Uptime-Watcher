@@ -62,7 +62,7 @@ export class MonitorRepository {
         return withDatabaseOperation(
             async () => {
                 const db = this.getDb();
-                
+
                 // Wrap synchronous operation in Promise to make it truly async
                 return new Promise<Site["monitors"][0] | undefined>((resolve, reject) => {
                     try {
@@ -92,8 +92,10 @@ export class MonitorRepository {
      * Uses transactions to ensure atomicity.
      */
     public async create(siteIdentifier: string, monitor: Omit<Site["monitors"][0], "id">): Promise<string> {
-        try {
-            const result = await this.databaseService.executeTransaction((db) => {
+        return withDatabaseOperation(
+            () => {
+                const db = this.getDb();
+
                 // Use RETURNING clause to get the ID directly from the insert
                 const insertResult = db.get(
                     `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, timeout, retryAttempts, monitoring, status, responseTime, lastChecked) 
@@ -127,17 +129,17 @@ export class MonitorRepository {
                     throw new Error(`Failed to create monitor for site ${siteIdentifier} - no ID returned`);
                 }
 
-                return Promise.resolve(String(insertResult.id));
-            });
+                const result = String(insertResult.id);
 
-            if (isDev()) {
-                logger.debug(`[MonitorRepository] Created monitor with id: ${result} for site: ${siteIdentifier}`);
-            }
-            return result;
-        } catch (error) {
-            logger.error(`[MonitorRepository] Failed to create monitor for site: ${siteIdentifier}`, error);
-            throw error;
-        }
+                if (isDev()) {
+                    logger.debug(`[MonitorRepository] Created monitor with id: ${result} for site: ${siteIdentifier}`);
+                }
+                return Promise.resolve(result);
+            },
+            "monitor-create",
+            undefined,
+            { siteIdentifier, type: monitor.type }
+        );
     }
 
     /**
@@ -184,8 +186,10 @@ export class MonitorRepository {
      * Uses transactions to ensure atomicity.
      */
     public async update(monitorId: string, monitor: Partial<Site["monitors"][0]>): Promise<void> {
-        try {
-            await this.databaseService.executeTransaction((db) => {
+        return withDatabaseOperation(
+            () => {
+                const db = this.getDb();
+
                 // Build dynamic SQL based on provided fields to avoid overwriting with defaults
                 const updateFields: string[] = [];
                 const updateValues: DbValue[] = [];
@@ -222,7 +226,7 @@ export class MonitorRepository {
                     if (isDev()) {
                         logger.debug(`[MonitorRepository] No fields to update for monitor: ${monitorId}`);
                     }
-                    return;
+                    return Promise.resolve();
                 }
 
                 updateValues.push(monitorId);
@@ -235,11 +239,11 @@ export class MonitorRepository {
                 }
 
                 return Promise.resolve();
-            });
-        } catch (error) {
-            logger.error(`[MonitorRepository] Failed to update monitor with id: ${monitorId}`, error);
-            throw error;
-        }
+            },
+            "monitor-update",
+            undefined,
+            { monitorId }
+        );
     }
 
     /**
@@ -301,25 +305,25 @@ export class MonitorRepository {
      * Uses a transaction to ensure atomicity.
      */
     public async delete(monitorId: string): Promise<boolean> {
-        try {
-            const result = await this.databaseService.executeTransaction((db) => {
-                const deleted = this.deleteInternal(db, monitorId);
-                return Promise.resolve(deleted);
-            });
+        return withDatabaseOperation(
+            async () => {
+                const db = this.databaseService.getDatabase();
+                const result = this.deleteInternal(db, monitorId);
 
-            if (result) {
-                if (isDev()) {
-                    logger.debug(`[MonitorRepository] Deleted monitor with id: ${monitorId}`);
+                if (result) {
+                    if (isDev()) {
+                        logger.debug(`[MonitorRepository] Deleted monitor with id: ${monitorId}`);
+                    }
+                } else {
+                    logger.warn(`[MonitorRepository] Monitor not found for deletion: ${monitorId}`);
                 }
-            } else {
-                logger.warn(`[MonitorRepository] Monitor not found for deletion: ${monitorId}`);
-            }
 
-            return result;
-        } catch (error) {
-            logger.error(`[MonitorRepository] Failed to delete monitor with id: ${monitorId}`, error);
-            throw error;
-        }
+                return result;
+            },
+            "monitor-delete",
+            undefined,
+            { monitorId }
+        );
     }
 
     /**
@@ -348,19 +352,19 @@ export class MonitorRepository {
      * Uses a transaction to ensure atomicity.
      */
     public async deleteBySiteIdentifier(siteIdentifier: string): Promise<void> {
-        try {
-            await this.databaseService.executeTransaction((db) => {
+        return withDatabaseOperation(
+            async () => {
+                const db = this.databaseService.getDatabase();
                 this.deleteBySiteIdentifierInternal(db, siteIdentifier);
-                return Promise.resolve();
-            });
 
-            if (isDev()) {
-                logger.debug(`[MonitorRepository] Deleted all monitors for site: ${siteIdentifier}`);
-            }
-        } catch (error) {
-            logger.error(`[MonitorRepository] Failed to delete monitors for site: ${siteIdentifier}`, error);
-            throw error;
-        }
+                if (isDev()) {
+                    logger.debug(`[MonitorRepository] Deleted all monitors for site: ${siteIdentifier}`);
+                }
+            },
+            "monitor-delete-by-site",
+            undefined,
+            { siteIdentifier }
+        );
     }
 
     /**
@@ -401,18 +405,19 @@ export class MonitorRepository {
      * Uses transactions to ensure atomicity.
      */
     public async deleteAll(): Promise<void> {
-        try {
-            await this.databaseService.executeTransaction((db) => {
-                db.run("DELETE FROM monitors");
-                if (isDev()) {
-                    logger.debug("[MonitorRepository] Cleared all monitors");
-                }
-                return Promise.resolve();
-            });
-        } catch (error) {
-            logger.error("[MonitorRepository] Failed to clear all monitors", error);
-            throw error;
-        }
+        return withDatabaseOperation(async () => {
+            const db = this.databaseService.getDatabase();
+            this.deleteAllInternal(db);
+        }, "monitor-delete-all");
+    }
+
+    /**
+     * Internal method to clear all monitors from the database within an existing transaction.
+     * Use this method when you're already within a transaction context.
+     */
+    public deleteAllInternal(db: Database): void {
+        db.run("DELETE FROM monitors");
+        logger.debug("[MonitorRepository] Cleared all monitors (internal)");
     }
 
     /**
@@ -421,8 +426,9 @@ export class MonitorRepository {
      * Uses transactions to ensure atomicity.
      */
     public async bulkCreate(siteIdentifier: string, monitors: Site["monitors"][0][]): Promise<Site["monitors"][0][]> {
-        try {
-            const result = await this.databaseService.executeTransaction((db) => {
+        return withDatabaseOperation(
+            async () => {
+                const db = this.databaseService.getDatabase();
                 const createdMonitors: Site["monitors"][0][] = [];
 
                 for (const monitor of monitors) {
@@ -443,14 +449,12 @@ export class MonitorRepository {
                     }
                 }
 
-                return Promise.resolve(createdMonitors);
-            });
-
-            logger.info(`[MonitorRepository] Bulk created ${monitors.length} monitors for site: ${siteIdentifier}`);
-            return result;
-        } catch (error) {
-            logger.error(`[MonitorRepository] Failed to bulk create monitors for site: ${siteIdentifier}`, error);
-            throw error;
-        }
+                logger.info(`[MonitorRepository] Bulk created ${monitors.length} monitors for site: ${siteIdentifier}`);
+                return createdMonitors;
+            },
+            "monitor-bulk-create",
+            undefined,
+            { siteIdentifier, count: monitors.length }
+        );
     }
 }
