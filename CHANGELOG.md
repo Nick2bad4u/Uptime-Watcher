@@ -7,14 +7,73 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[4abd419](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4abd41907c8cfaf99faf94540610499e44558f11)...
-[4abd419](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4abd41907c8cfaf99faf94540610499e44558f11)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/4abd41907c8cfaf99faf94540610499e44558f11...4abd41907c8cfaf99faf94540610499e44558f11))
+[[5057801](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5057801a96411ba5dfe38fd9902d52d283daaee9)...
+[5057801](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5057801a96411ba5dfe38fd9902d52d283daaee9)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/5057801a96411ba5dfe38fd9902d52d283daaee9...5057801a96411ba5dfe38fd9902d52d283daaee9))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 6.8.0 [`(5057801)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5057801a96411ba5dfe38fd9902d52d283daaee9)
+
+
+
+
+
+
+## [6.8.0] - 2025-07-12
+
+
+[[02e867f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/02e867f096bb7cf5e51f810cb4ce48aaabc4cf39)...
+[58cd258](https://github.com/Nick2bad4u/Uptime-Watcher/commit/58cd25810e238e0d2d2e614cbf2e54aab2859093)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/02e867f096bb7cf5e51f810cb4ce48aaabc4cf39...58cd25810e238e0d2d2e614cbf2e54aab2859093))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 6.7.0 [`(4abd419)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4abd41907c8cfaf99faf94540610499e44558f11)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(2b883f2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2b883f2df040bb46208bcfbb78fb49c3c13720bb)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Normalize DB operation handlers and improve history pruning
+
+- Refactors database operation handlers to consistently return resolved promises, streamlining async control and error handling across repository methods.
+- Updates history pruning logic to reliably remove excess entries per monitor, ensuring only the specified limit is retained.
+- Simplifies bulk history insertion by removing redundant transaction management, assuming external transaction context for better flexibility and performance. [`(02e867f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/02e867f096bb7cf5e51f810cb4ce48aaabc4cf39)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Update monitor tests for null default values
+
+- Replaces undefined with null for monitor property defaults in tests
+- Improves test consistency with expected data model
+- Cleans up formatting, removing unnecessary blank lines in multiple test files [`(58cd258)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/58cd25810e238e0d2d2e614cbf2e54aab2859093)
+
+
+- 🧪 [test] Remove redundant and error-handling tests from backend
+
+- Cleans up unit tests by removing error-handling cases, redundant logger assertions, and duplicate transactional checks.
+- Simplifies and future-proofs test suites by marking complex or outdated tests for refactoring.
+- Updates expectation for event unsubscription to match revised event name.
+- Skips frontend component tests to reduce noise during backend test refactoring.
+
+Streamlines backend test maintenance and aligns with recent changes to error management and transactional logic. [`(d813f05)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d813f05f08cf40c2771f7937a4f077a7aa279278)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v6.7.0 [skip ci] [`(15545f0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/15545f0c6c044b013f93a061985d1575fc0b9c3c)
 
 
 
