@@ -270,8 +270,6 @@ describe("monitorLifecycle", () => {
             expect(mockLogger.warn).toHaveBeenCalledWith("Site not found for stopping monitoring: nonexistent-site");
         });
 
-
-
         it("should return false if monitor is not found", async () => {
             const site = createTestSite({
                 identifier: "test-site",
@@ -344,7 +342,8 @@ describe("monitorLifecycle", () => {
 
             expect(result).toBe(true);
         });
-    });    describe("edge cases", () => {
+    });
+    describe("edge cases", () => {
         it("should handle empty monitors array", async () => {
             const site = createTestSite({
                 identifier: "test-site",

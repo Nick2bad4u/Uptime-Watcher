@@ -133,8 +133,6 @@ describe("SettingsRepository", () => {
             expect(mockDatabase.run).toHaveBeenCalledWith("DELETE FROM settings WHERE key = ?", ["test-key"]);
             expect(logger.debug).toHaveBeenCalledWith("[SettingsRepository] Deleted setting (internal): test-key");
         });
-
-
     });
 
     describe("getAll", () => {
@@ -232,9 +230,5 @@ describe("SettingsRepository", () => {
             // Should finalize statement
             expect(mockStatement.finalize).toHaveBeenCalled();
         });
-
-
-
-
     });
 });

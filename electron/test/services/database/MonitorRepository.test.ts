@@ -305,13 +305,13 @@ describe("MonitorRepository", () => {
                 type: "http" as const,
                 url: "https://example.com",
                 host: undefined,
-                port: undefined,
-                checkInterval: undefined, // Line 146
-                timeout: undefined, // Line 148
-                retryAttempts: undefined, // Line 150
+                port: null, // changed from undefined to null
+                checkInterval: null, // changed from undefined to null
+                timeout: null, // changed from undefined to null
+                retryAttempts: null, // changed from undefined to null
                 monitoring: true,
                 status: "up" as const,
-                responseTime: undefined, // Line 152
+                responseTime: null, // changed from undefined to null
                 lastChecked: new Date(),
                 history: [],
             };
@@ -537,8 +537,6 @@ describe("MonitorRepository", () => {
 
             expect(result).toBe(false);
         });
-
-
     });
 
     describe("deleteBySiteIdentifier", () => {
@@ -1267,8 +1265,6 @@ describe("MonitorRepository", () => {
 
             expect(result).toBe(false); // (undefined ?? 0) > 0 should be false
         });
-
-
     });
 
     describe("Edge case coverage for remaining uncovered lines", () => {

@@ -69,7 +69,7 @@ export class HistoryRepository {
      */
     public async pruneAllHistory(limit: number): Promise<void> {
         if (limit <= 0) return;
-        
+
         return withDatabaseOperation(
             () => {
                 const db = this.databaseService.getDatabase();

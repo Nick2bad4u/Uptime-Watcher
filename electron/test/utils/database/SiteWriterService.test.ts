@@ -153,8 +153,6 @@ describe("SiteWriterService", () => {
             expect(result.name).toBe("");
             expect(mockLogger.info).toHaveBeenCalledWith("Site created successfully in database: site1 ()");
         });
-
-
     });
 
     describe("updateSite", () => {
@@ -250,8 +248,6 @@ describe("SiteWriterService", () => {
 
             await expect(siteWriterService.updateSite(siteCache, "", updates)).rejects.toThrow(SiteNotFoundError);
         });
-
-
     });
 
     describe("deleteSite", () => {
