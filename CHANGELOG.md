@@ -7,14 +7,104 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[4abd419](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4abd41907c8cfaf99faf94540610499e44558f11)...
+[4abd419](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4abd41907c8cfaf99faf94540610499e44558f11)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/4abd41907c8cfaf99faf94540610499e44558f11...4abd41907c8cfaf99faf94540610499e44558f11))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 6.7.0 [`(4abd419)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4abd41907c8cfaf99faf94540610499e44558f11)
+
+
+
+
+
+
+## [6.7.0] - 2025-07-12
+
+
 [[1482c88](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1482c884c3145ace9bc028c206014c2c1f04da8d)...
-[1482c88](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1482c884c3145ace9bc028c206014c2c1f04da8d)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/1482c884c3145ace9bc028c206014c2c1f04da8d...1482c884c3145ace9bc028c206014c2c1f04da8d))
+[3e22673](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3e22673014215c6c667f8573fd4601f720390d73)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/1482c884c3145ace9bc028c206014c2c1f04da8d...3e22673014215c6c667f8573fd4601f720390d73))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 6.6.0 [`(1482c88)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1482c884c3145ace9bc028c206014c2c1f04da8d)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Centralizes DB operations with operational hooks
+
+- Refactors database-related logic across repositories and services to use a unified operational hook for transactional operations, error handling, and event emission.
+- Simplifies control flow by removing repetitive try/catch and transaction boilerplate.
+- Improves reliability and observability of all critical CRUD and bulk operations, including site, monitor, settings, and history management.
+- Updates frontend stores and status update handler for safer event subscription and cleanup.
+- Adds support for JSONC parsing in ESLint config and introduces TSDoc config for custom tags.
+
+Relates to improved maintainability and future extensibility of data handling. [`(13875bd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/13875bd200c491cffbfe866d6e8f36ea0010edf1)
+
+
+- 🚜 [refactor] Standardize async patterns, error handling, and code style
+
+- Refactors async database, cache, and monitor operations to use standardized wrappers for error handling, retries, and event emission.
+- Improves code readability by converting array manipulations to use spread syntax and removing unnecessary Promise.resolve wrappers.
+- Moves utility functions out of React render scope for better memoization and lint compliance.
+- Enhances consistency in type checking, error types, and singleton initialization.
+- Updates switch statements and callback signatures for clarity and future maintainability.
+- Introduces operational hooks utility and integrates it throughout for unified observability.
+- Cleans up ESLint disables, ensures explicit return types, and aligns code with modern TypeScript best practices. [`(6077686)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/60776865b7a6524df3b027543df8a34a78fe6051)
+
+
+
+### � Documentation
+
+- 📝 [docs] Modernize docs for event-driven patterns and return logic
+
+- Updates documentation to reflect reactive event-driven architecture and modernization of return patterns.
+- Details improvements to cache management, error recovery, state updates, and operational hooks.
+- Adds clarity to event coverage, new event types, configuration observability, and system best practices.
+- Enhances formatting, consistency, and structure for improved readability and maintainability. [`(3e22673)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3e22673014215c6c667f8573fd4601f720390d73)
+
+
+- 📝 [docs] Document and modernize return/event patterns
+
+- Adds comprehensive guides and action plans for modernizing return patterns, cache handling, error recovery, and event-driven architecture.
+- Documents ESLint rule decisions, fixes summary, event system architecture, actionable implementation steps, and non-return function event analysis.
+- Updates ignore rules for Markdown and documentation files, and enables downlevel iteration in TypeScript configs to resolve compilation issues.
+- Removes obsolete scripts and ESLint results for clarity and maintainability.
+- Improves project observability, error resilience, and developer onboarding by clarifying best practices and event patterns across backend and frontend. [`(6ef21cd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6ef21cdca520f528f3e9c5a504ec3de86defe1e3)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Add comprehensive tests for dashboard components
+
+- Introduces thorough unit tests for key dashboard UI components, covering rendering, event handling, accessibility, and React.memo optimization.
+- Improves reliability with edge case and integration scenarios for buttons, selectors, metrics, and empty states.
+- Fixes API readiness logic for Electron integration by using optional chaining and error handling.
+- Refines setup to correctly mock electron log renderer module.
+- Enhances main entry point testing with root element error and selector verification. [`(eab39fd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/eab39fd41125c34cc0d29a55510abf2b36388987)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v6.6.0 [skip ci] [`(23966fc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/23966fc69085853d016e19604f0882e995e6d05c)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Enhance ESLint config and update test code style
+
+- Expands ESLint configuration with improved TypeScript, React, Promise, Unicorn, and Prettier integration for better code quality and consistency.
+- Adds new ESLint plugins and resolvers, updates package dependencies, and bumps project version.
+- Refines test suite formatting for readability and alignment with linting rules. [`(f741d20)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f741d2063d6cdb8516b187aafb413de5e8085c90)
 
 
 
