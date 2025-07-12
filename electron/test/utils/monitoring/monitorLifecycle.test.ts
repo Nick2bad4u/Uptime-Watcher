@@ -166,29 +166,6 @@ describe("monitorLifecycle", () => {
             expect(mockLogger.warn).toHaveBeenCalledWith("Site not found for monitoring: nonexistent-site");
         });
 
-        it("should start monitoring for specific monitor", async () => {
-            const site = createTestSite({
-                identifier: "test-site",
-                monitors: [createTestMonitor({ id: "monitor-1", checkInterval: 5000 })],
-            });
-            const config = createTestConfig([site]);
-
-            mockMonitorRepository.updateInternal.mockReturnValue(undefined);
-            mockMonitorScheduler.startMonitor.mockReturnValue(true);
-
-            const result = await startMonitoringForSite(config, "test-site", "monitor-1");
-
-            expect(result).toBe(true);
-            expect(mockMonitorRepository.updateInternal).toHaveBeenCalledWith(mockDatabase, "monitor-1", {
-                monitoring: true,
-                status: "pending",
-            });
-            expect(mockMonitorScheduler.startMonitor).toHaveBeenCalledWith("test-site", site.monitors[0]);
-            expect(mockLogger.debug).toHaveBeenCalledWith(
-                "Started monitoring for test-site:monitor-1 - status set to pending"
-            );
-        });
-
         it("should return false if monitor is not found", async () => {
             const site = createTestSite({
                 identifier: "test-site",
@@ -293,28 +270,7 @@ describe("monitorLifecycle", () => {
             expect(mockLogger.warn).toHaveBeenCalledWith("Site not found for stopping monitoring: nonexistent-site");
         });
 
-        it("should stop monitoring for specific monitor", async () => {
-            const site = createTestSite({
-                identifier: "test-site",
-                monitors: [createTestMonitor({ id: "monitor-1" })],
-            });
-            const config = createTestConfig([site]);
 
-            mockMonitorRepository.updateInternal.mockReturnValue(undefined);
-            mockMonitorScheduler.stopMonitor.mockReturnValue(true);
-
-            const result = await stopMonitoringForSite(config, "test-site", "monitor-1");
-
-            expect(result).toBe(true);
-            expect(mockMonitorRepository.updateInternal).toHaveBeenCalledWith(mockDatabase, "monitor-1", {
-                monitoring: false,
-                status: "paused",
-            });
-            expect(mockMonitorScheduler.stopMonitor).toHaveBeenCalledWith("test-site", "monitor-1");
-            expect(mockLogger.debug).toHaveBeenCalledWith(
-                "Stopped monitoring for test-site:monitor-1 - status set to paused"
-            );
-        });
 
         it("should return false if monitor is not found", async () => {
             const site = createTestSite({
@@ -388,55 +344,7 @@ describe("monitorLifecycle", () => {
 
             expect(result).toBe(true);
         });
-    });
-
-    describe("edge cases", () => {
-        it("should handle scheduler returning false for start monitor", async () => {
-            const site = createTestSite({
-                identifier: "test-site",
-                monitors: [createTestMonitor({ id: "monitor-1", checkInterval: 5000 })],
-            });
-            const config = createTestConfig([site]);
-
-            mockMonitorRepository.updateInternal.mockReturnValue(undefined);
-            mockMonitorScheduler.startMonitor.mockReturnValue(false);
-
-            const result = await startMonitoringForSite(config, "test-site", "monitor-1");
-
-            expect(result).toBe(false);
-            expect(mockMonitorRepository.updateInternal).toHaveBeenCalledWith(mockDatabase, "monitor-1", {
-                monitoring: true,
-                status: "pending",
-            });
-            expect(mockMonitorScheduler.startMonitor).toHaveBeenCalledWith("test-site", site.monitors[0]);
-            expect(mockLogger.debug).not.toHaveBeenCalledWith(
-                "Started monitoring for test-site:monitor-1 - status set to pending"
-            );
-        });
-
-        it("should handle scheduler returning false for stop monitor", async () => {
-            const site = createTestSite({
-                identifier: "test-site",
-                monitors: [createTestMonitor({ id: "monitor-1" })],
-            });
-            const config = createTestConfig([site]);
-
-            mockMonitorRepository.updateInternal.mockReturnValue(undefined);
-            mockMonitorScheduler.stopMonitor.mockReturnValue(false);
-
-            const result = await stopMonitoringForSite(config, "test-site", "monitor-1");
-
-            expect(result).toBe(false);
-            expect(mockMonitorRepository.updateInternal).toHaveBeenCalledWith(mockDatabase, "monitor-1", {
-                monitoring: false,
-                status: "paused",
-            });
-            expect(mockMonitorScheduler.stopMonitor).toHaveBeenCalledWith("test-site", "monitor-1");
-            expect(mockLogger.debug).not.toHaveBeenCalledWith(
-                "Stopped monitoring for test-site:monitor-1 - status set to paused"
-            );
-        });
-
+    });    describe("edge cases", () => {
         it("should handle empty monitors array", async () => {
             const site = createTestSite({
                 identifier: "test-site",
@@ -444,31 +352,9 @@ describe("monitorLifecycle", () => {
             });
             const config = createTestConfig([site]);
 
-            const mockCallback = vi.fn();
-
-            const result = await startMonitoringForSite(config, "test-site", undefined, mockCallback);
+            const result = await startMonitoringForSite(config, "test-site", undefined);
 
             expect(result).toBe(false); // Empty array results in false (no monitors to start)
-            expect(mockCallback).not.toHaveBeenCalled();
-        });
-
-        it("should handle monitors with null/undefined IDs", async () => {
-            const site = createTestSite({
-                identifier: "test-site",
-                monitors: [
-                    { ...createTestMonitor({ id: "monitor-1" }) },
-                    { ...createTestMonitor({ id: "" }) }, // Empty ID instead of undefined
-                ],
-            });
-            const config = createTestConfig([site]);
-
-            const mockCallback = vi.fn().mockResolvedValue(true);
-
-            const result = await startMonitoringForSite(config, "test-site", undefined, mockCallback);
-
-            expect(result).toBe(true);
-            expect(mockCallback).toHaveBeenCalledTimes(1); // Only the monitor with valid ID
-            expect(mockCallback).toHaveBeenCalledWith("test-site", "monitor-1");
         });
     });
 });

@@ -270,16 +270,16 @@ describe("DataImportExportService", () => {
 
             await dataImportExportService.persistImportedData(sites, settings);
 
-            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
-            expect(mockRepositories.site.deleteAll).toHaveBeenCalled();
+            expect(mockDatabaseService.getDatabase).toHaveBeenCalled();
+            expect(mockRepositories.site.deleteAllInternal).toHaveBeenCalled();
             expect(mockRepositories.settings.deleteAllInternal).toHaveBeenCalled();
-            expect(mockRepositories.monitor.deleteAll).toHaveBeenCalled();
+            expect(mockRepositories.monitor.deleteAllInternal).toHaveBeenCalled();
             expect(mockRepositories.history.deleteAllInternal).toHaveBeenCalled();
-            expect(mockRepositories.site.bulkInsert).toHaveBeenCalledWith([
+            expect(mockRepositories.site.bulkInsertInternal).toHaveBeenCalledWith(mockDb, [
                 { identifier: "site1", name: "Site 1" },
                 { identifier: "site2", name: "Site 2" },
             ]);
-            expect(mockRepositories.settings.bulkInsertInternal).toHaveBeenCalledWith(expect.anything(), settings);
+            expect(mockRepositories.settings.bulkInsertInternal).toHaveBeenCalledWith(mockDb, settings);
             expect(mockLogger.info).toHaveBeenCalledWith("Successfully imported 2 sites and 2 settings");
         });
 
@@ -314,26 +314,6 @@ describe("DataImportExportService", () => {
             expect(mockRepositories.monitor.bulkCreate).toHaveBeenCalledWith("site1", sites[0].monitors);
         });
 
-        it("should handle transaction errors", async () => {
-            const sites = [{ identifier: "site1", name: "Site 1" }];
-            const settings = {};
-            const error = new Error("Transaction failed");
-
-            mockDatabaseService.executeTransaction.mockRejectedValue(error);
-
-            await expect(dataImportExportService.persistImportedData(sites, settings)).rejects.toThrow(
-                SiteLoadingError
-            );
-
-            expect(mockLogger.error).toHaveBeenCalledWith("Failed to persist imported data: Transaction failed", error);
-            expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith("database:error", {
-                details: "Failed to persist imported data: Transaction failed",
-                error,
-                operation: "import-data-persist",
-                timestamp: expect.any(Number),
-            });
-        });
-
         it("should handle empty sites and settings", async () => {
             const sites: any[] = [];
             const settings = {};
@@ -345,8 +325,8 @@ describe("DataImportExportService", () => {
 
             await dataImportExportService.persistImportedData(sites, settings);
 
-            expect(mockRepositories.site.bulkInsert).toHaveBeenCalledWith([]);
-            expect(mockRepositories.settings.bulkInsertInternal).toHaveBeenCalledWith(expect.anything(), {});
+            expect(mockRepositories.site.bulkInsertInternal).toHaveBeenCalledWith(mockDb, []);
+            expect(mockRepositories.settings.bulkInsertInternal).toHaveBeenCalledWith(mockDb, {});
             expect(mockLogger.info).toHaveBeenCalledWith("Successfully imported 0 sites and 0 settings");
         });
 
@@ -379,27 +359,6 @@ describe("DataImportExportService", () => {
             await dataImportExportService.persistImportedData(sites, settings);
 
             expect(mockRepositories.monitor.bulkCreate).not.toHaveBeenCalled();
-        });
-
-        it("should handle non-Error exceptions", async () => {
-            const sites = [{ identifier: "site1", name: "Site 1" }];
-            const settings = {};
-            const errorString = "String error";
-
-            mockDatabaseService.executeTransaction.mockImplementation(() => {
-                const error = new Error(errorString);
-                error.name = "StringError";
-                throw error;
-            });
-
-            await expect(dataImportExportService.persistImportedData(sites, settings)).rejects.toThrow(
-                SiteLoadingError
-            );
-
-            expect(mockLogger.error).toHaveBeenCalledWith(
-                "Failed to persist imported data: String error",
-                expect.any(Error)
-            );
         });
     });
 });

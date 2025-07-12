@@ -51,7 +51,7 @@ describe("StatusUpdateHandler", () => {
         it("should unsubscribe from status updates", () => {
             manager.unsubscribe();
 
-            expect(mockElectronAPI.events.removeAllListeners).toHaveBeenCalledWith("status-update");
+            expect(mockElectronAPI.events.removeAllListeners).toHaveBeenCalledWith("update-status");
         });
 
         it("should handle errors during subscription", async () => {

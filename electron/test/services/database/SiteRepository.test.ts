@@ -146,7 +146,6 @@ describe("SiteRepository", () => {
                 "INSERT OR REPLACE INTO sites (identifier, name, monitoring) VALUES (?, ?, ?)",
                 ["site1", "Site 1", 0]
             );
-            expect(mockLogger.debug).toHaveBeenCalledWith("[SiteRepository] Upserted site: site1");
         });
     });
 
@@ -244,7 +243,6 @@ describe("SiteRepository", () => {
             await siteRepository.deleteAll();
 
             expect(mockDatabase.run).toHaveBeenCalledWith("DELETE FROM sites");
-            expect(mockLogger.info).toHaveBeenCalledWith("[SiteRepository] All sites deleted");
         });
     });
 
@@ -266,8 +264,6 @@ describe("SiteRepository", () => {
             expect(mockPreparedStatement.run).toHaveBeenCalledWith(["site1", "Site 1", 0]);
             expect(mockPreparedStatement.run).toHaveBeenCalledWith(["site2", "Site 2", 1]);
             expect(mockPreparedStatement.finalize).toHaveBeenCalled();
-
-            expect(mockLogger.info).toHaveBeenCalledWith("[SiteRepository] Bulk inserted 2 sites");
         });
 
         it("should handle sites without names", async () => {

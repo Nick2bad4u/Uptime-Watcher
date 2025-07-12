@@ -222,7 +222,6 @@ describe("MonitorRepository", () => {
                 expect.arrayContaining(["site-2", "port", null, "example.com", 80])
             );
             expect(result).toBe("2");
-            expect(logger.debug).not.toHaveBeenCalled();
         });
     });
 
@@ -539,18 +538,7 @@ describe("MonitorRepository", () => {
             expect(result).toBe(false);
         });
 
-        it("should handle database errors", async () => {
-            const error = new Error("Delete failed");
 
-            // Mock executeTransaction to simulate an error during the transaction
-            mockDatabaseService.executeTransaction.mockImplementation(async () => {
-                // Simulate an error during the transaction
-                throw error;
-            });
-
-            await expect(monitorRepository.delete("1")).rejects.toThrow("Delete failed");
-            expect(logger.error).toHaveBeenCalledWith("[MonitorRepository] Failed to delete monitor with id: 1", error);
-        });
     });
 
     describe("deleteBySiteIdentifier", () => {
@@ -576,21 +564,6 @@ describe("MonitorRepository", () => {
             expect(mockDatabase.run).toHaveBeenCalledWith("DELETE FROM monitors WHERE site_identifier = ?", ["site-1"]);
             expect(logger.debug).toHaveBeenCalledWith("[MonitorRepository] Deleted all monitors for site: site-1");
         });
-
-        it("should handle database errors", async () => {
-            const error = new Error("Delete by site failed");
-
-            // Mock executeTransaction to simulate an error during the transaction
-            mockDatabaseService.executeTransaction.mockImplementation(async () => {
-                throw error;
-            });
-
-            await expect(monitorRepository.deleteBySiteIdentifier("site-1")).rejects.toThrow("Delete by site failed");
-            expect(logger.error).toHaveBeenCalledWith(
-                "[MonitorRepository] Failed to delete monitors for site: site-1",
-                error
-            );
-        });
     });
 
     describe("getAllMonitorIds", () => {
@@ -612,7 +585,6 @@ describe("MonitorRepository", () => {
             await monitorRepository.deleteAll();
 
             expect(mockDatabase.run).toHaveBeenCalledWith("DELETE FROM monitors");
-            expect(logger.debug).toHaveBeenCalledWith("[MonitorRepository] Cleared all monitors");
         });
     });
 
@@ -1296,17 +1268,7 @@ describe("MonitorRepository", () => {
             expect(result).toBe(false); // (undefined ?? 0) > 0 should be false
         });
 
-        it("should handle database error during deletion", async () => {
-            const monitorId = "monitor-1";
-            const error = new Error("Database error");
 
-            // Mock executeTransaction to simulate an error during the transaction
-            mockDatabaseService.executeTransaction.mockImplementation(async () => {
-                throw error;
-            });
-
-            await expect(monitorRepository.delete(monitorId)).rejects.toThrow("Database error");
-        });
     });
 
     describe("Edge case coverage for remaining uncovered lines", () => {

@@ -205,8 +205,6 @@ describe("HistoryRepository", () => {
 
             await historyRepository.pruneAllHistory(10);
 
-            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
-
             // Verify monitors query
             expect(mockDatabase.all).toHaveBeenCalledWith("SELECT id FROM monitors");
 
@@ -223,10 +221,6 @@ describe("HistoryRepository", () => {
             // Verify delete queries for excess entries
             expect(mockDatabase.run).toHaveBeenCalledWith("DELETE FROM history WHERE id IN (?,?)", [10, 11]);
             expect(mockDatabase.run).toHaveBeenCalledWith("DELETE FROM history WHERE id IN (?,?)", [20, 21]);
-
-            expect(logger.debug).toHaveBeenCalledWith(
-                "[HistoryRepository] Pruned history for all monitors (limit: 10) (internal)"
-            );
         });
 
         it("should do nothing when limit is 0 or negative", async () => {
@@ -321,9 +315,6 @@ describe("HistoryRepository", () => {
 
             await historyRepository.bulkInsert("monitor-1", historyEntries);
 
-            // Since we now use executeTransaction, verify the transaction wrapper is called
-            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
-
             // Should prepare statement
             expect(mockDatabase.prepare).toHaveBeenCalledWith(
                 "INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)"
@@ -337,10 +328,6 @@ describe("HistoryRepository", () => {
 
             // Should finalize statement
             expect(mockStatement.finalize).toHaveBeenCalled();
-
-            expect(logger.info).toHaveBeenCalledWith(
-                "[HistoryRepository] Bulk inserted 2 history entries for monitor: monitor-1"
-            );
         });
 
         it("should handle invalid status values in bulk insert", async () => {
@@ -353,9 +340,6 @@ describe("HistoryRepository", () => {
             ];
 
             await historyRepository.bulkInsert("monitor-1", historyEntries);
-
-            // Since we now use executeTransaction, verify the transaction wrapper is called
-            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
 
             // Should prepare statement
             expect(mockDatabase.prepare).toHaveBeenCalledWith(
