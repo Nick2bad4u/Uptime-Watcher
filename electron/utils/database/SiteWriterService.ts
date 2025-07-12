@@ -212,55 +212,132 @@ export class SiteWriterService {
         siteIdentifier: string,
         newMonitors: Site["monitors"]
     ): Promise<void> {
-        // Get existing monitors for this site
         const existingMonitors = await this.repositories.monitor.findBySiteIdentifier(siteIdentifier);
 
-        // Update or create monitors
+        // Process each monitor: update existing or create new
+        this.processMonitorUpdates(db, siteIdentifier, newMonitors, existingMonitors);
+
+        // Clean up monitors that are no longer needed
+        this.removeObsoleteMonitors(db, siteIdentifier, newMonitors, existingMonitors);
+    }
+
+    /**
+     * Process monitor updates and creations.
+     */
+    private processMonitorUpdates(
+        db: Database,
+        siteIdentifier: string,
+        newMonitors: Site["monitors"],
+        existingMonitors: Site["monitors"]
+    ): void {
         for (const newMonitor of newMonitors) {
-            if (newMonitor.id) {
-                // Existing monitor - look for it in the database
-                const existingMonitor = existingMonitors.find((m) => m.id === newMonitor.id);
-                if (existingMonitor) {
-                    const updateData: Partial<Monitor> = {
-                        checkInterval: newMonitor.checkInterval,
-                        monitoring: existingMonitor.monitoring,
-                        retryAttempts: newMonitor.retryAttempts,
-                        status: existingMonitor.status,
-                        timeout: newMonitor.timeout,
-                        type: newMonitor.type,
-                    };
-                    if (newMonitor.host !== undefined) {
-                        updateData.host = newMonitor.host;
-                    }
-                    if (newMonitor.port !== undefined) {
-                        updateData.port = newMonitor.port;
-                    }
-                    if (newMonitor.url !== undefined) {
-                        updateData.url = newMonitor.url;
-                    }
-                    this.repositories.monitor.updateInternal(db, newMonitor.id, updateData);
-                    this.logger.debug(`Updated existing monitor ${newMonitor.id} for site ${siteIdentifier}`);
-                } else {
-                    // Monitor ID exists but not found in database - treat as new
-                    const newId = this.repositories.monitor.createInternal(db, siteIdentifier, newMonitor);
-                    // Update the monitor object with the new database ID
-                    newMonitor.id = newId;
-                    this.logger.debug(`Created new monitor ${newId} for site ${siteIdentifier} (ID not found)`);
-                }
-            } else {
-                // New monitor - create it
-                const newId = this.repositories.monitor.createInternal(db, siteIdentifier, newMonitor);
-                // Update the monitor object with the new database ID
-                newMonitor.id = newId;
-                this.logger.debug(`Created new monitor ${newId} for site ${siteIdentifier}`);
-            }
+            this.processIndividualMonitor(db, siteIdentifier, newMonitor, existingMonitors);
+        }
+    }
+
+    /**
+     * Process a single monitor: update if exists, create if new.
+     */
+    private processIndividualMonitor(
+        db: Database,
+        siteIdentifier: string,
+        newMonitor: Monitor,
+        existingMonitors: Site["monitors"]
+    ): void {
+        if (newMonitor.id) {
+            this.handleExistingMonitor(db, siteIdentifier, newMonitor, existingMonitors);
+        } else {
+            this.createNewMonitor(db, siteIdentifier, newMonitor);
+        }
+    }
+
+    /**
+     * Handle a monitor that has an ID (existing or orphaned).
+     */
+    private handleExistingMonitor(
+        db: Database,
+        siteIdentifier: string,
+        newMonitor: Monitor,
+        existingMonitors: Site["monitors"]
+    ): void {
+        const existingMonitor = existingMonitors.find((m) => m.id === newMonitor.id);
+
+        if (existingMonitor) {
+            this.updateExistingMonitor(db, siteIdentifier, newMonitor, existingMonitor);
+        } else {
+            this.createNewMonitor(db, siteIdentifier, newMonitor, "ID not found");
+        }
+    }
+
+    /**
+     * Update an existing monitor in the database.
+     */
+    private updateExistingMonitor(
+        db: Database,
+        siteIdentifier: string,
+        newMonitor: Monitor,
+        existingMonitor: Monitor
+    ): void {
+        if (!newMonitor.id) {
+            return; // Safety check - should not happen in this context
         }
 
-        // Remove monitors that are no longer in the site configuration
+        const updateData = this.buildMonitorUpdateData(newMonitor, existingMonitor);
+        this.repositories.monitor.updateInternal(db, newMonitor.id, updateData);
+        this.logger.debug(`Updated existing monitor ${newMonitor.id} for site ${siteIdentifier}`);
+    }
+
+    /**
+     * Build the update data for a monitor, preserving existing state.
+     */
+    private buildMonitorUpdateData(newMonitor: Monitor, existingMonitor: Monitor): Partial<Monitor> {
+        const updateData: Partial<Monitor> = {
+            checkInterval: newMonitor.checkInterval,
+            monitoring: existingMonitor.monitoring,
+            retryAttempts: newMonitor.retryAttempts,
+            status: existingMonitor.status,
+            timeout: newMonitor.timeout,
+            type: newMonitor.type,
+        };
+
+        // Only update optional fields if they are defined
+        if (newMonitor.host !== undefined) {
+            updateData.host = newMonitor.host;
+        }
+        if (newMonitor.port !== undefined) {
+            updateData.port = newMonitor.port;
+        }
+        if (newMonitor.url !== undefined) {
+            updateData.url = newMonitor.url;
+        }
+
+        return updateData;
+    }
+
+    /**
+     * Create a new monitor in the database.
+     */
+    private createNewMonitor(db: Database, siteIdentifier: string, newMonitor: Monitor, reason?: string): void {
+        const newId = this.repositories.monitor.createInternal(db, siteIdentifier, newMonitor);
+        newMonitor.id = newId;
+
+        const reasonSuffix = reason ? ` (${reason})` : "";
+        this.logger.debug(`Created new monitor ${newId} for site ${siteIdentifier}${reasonSuffix}`);
+    }
+
+    /**
+     * Remove monitors that are no longer in the site configuration.
+     */
+    private removeObsoleteMonitors(
+        db: Database,
+        siteIdentifier: string,
+        newMonitors: Site["monitors"],
+        existingMonitors: Site["monitors"]
+    ): void {
         const newMonitorIds = new Set(newMonitors.map((m) => m.id).filter(Boolean));
+
         for (const existingMonitor of existingMonitors) {
             if (!newMonitorIds.has(existingMonitor.id)) {
-                // This monitor was removed from the site - delete it using internal method (we're already in a transaction)
                 this.repositories.monitor.deleteMonitorInternal(db, existingMonitor.id);
                 this.logger.debug(`Removed monitor ${existingMonitor.id} from site ${siteIdentifier}`);
             }

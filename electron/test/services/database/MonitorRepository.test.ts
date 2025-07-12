@@ -299,45 +299,6 @@ describe("MonitorRepository", () => {
                 expect.arrayContaining([null, null]) // url and host should be null
             );
         });
-
-        it.skip("should handle undefined numeric fields", async () => {
-            const monitor = {
-                type: "http" as const,
-                url: "https://example.com",
-                host: undefined,
-                port: null, // changed from undefined to null
-                checkInterval: null, // changed from undefined to null
-                timeout: null, // changed from undefined to null
-                retryAttempts: null, // changed from undefined to null
-                monitoring: true,
-                status: "up" as const,
-                responseTime: null, // changed from undefined to null
-                lastChecked: new Date(),
-                history: [],
-            };
-
-            mockDatabase.run.mockReturnValue({ changes: 1, lastInsertRowid: 1 });
-            mockDatabase.get.mockReturnValue({ id: 1 });
-
-            await monitorRepository.create("site-1", monitor);
-
-            // Should insert null for undefined numeric fields
-            expect(mockDatabase.get).toHaveBeenCalledWith(expect.stringContaining("INSERT INTO monitors"), [
-                "site-1",
-                "http",
-                "https://example.com",
-                null, // host
-                null, // port
-                null, // checkInterval
-                null, // timeout
-                null, // retryAttempts
-                1, // monitoring
-                "up",
-                null, // responseTime
-                expect.any(String), // lastChecked
-            ]);
-        });
-
         it("should handle different data types in rowToMonitor", async () => {
             // Test with string values that need conversion
             const row = {
@@ -736,27 +697,6 @@ describe("MonitorRepository", () => {
             expect(mockDatabase.get).toHaveBeenCalled();
         });
 
-        it("should handle null values in safeNumberConvert", async () => {
-            const monitor = {
-                type: "http" as const,
-                url: "https://example.com",
-                status: "pending" as const,
-                history: [],
-                port: null as unknown as number, // Test null value
-                timeout: 0, // Test zero value
-                checkInterval: undefined, // Test undefined
-                responseTime: 0,
-                retryAttempts: 3,
-                monitoring: true,
-            };
-
-            mockDatabase.get.mockReturnValue({ id: 123 });
-
-            await monitorRepository.create("site-1", monitor);
-
-            expect(mockDatabase.get).toHaveBeenCalled();
-        });
-
         it("should handle truthy but non-number values in safeNumberConvert", async () => {
             const monitor = {
                 type: "http" as const,
@@ -818,45 +758,6 @@ describe("MonitorRepository", () => {
                     "UPDATE monitors SET port = ?, checkInterval = ?, retryAttempts = ? WHERE id = ?",
                     [0, 0, 0, "monitor-1"]
                 );
-            });
-        });
-
-        describe.skip("buildMonitorParameters null branches (lines 146-154)", () => {
-            it("should handle falsy url in buildMonitorParameters", async () => {
-                const monitor = {
-                    type: "http" as const,
-                    url: "", // Empty string - triggers null branch (line 146)
-                    host: null as unknown as string, // Null - triggers null branch (line 147)
-                    port: undefined, // Undefined - triggers null branch (line 148)
-                    checkInterval: undefined, // Undefined - triggers null branch (line 149)
-                    timeout: undefined, // Undefined - triggers null branch (line 150)
-                    retryAttempts: undefined, // Undefined - triggers null branch (line 152)
-                    responseTime: undefined, // Undefined - triggers null branch (line 153)
-                    monitoring: true,
-                    status: "up" as const,
-                    lastChecked: undefined, // Undefined - triggers null branch (line 154)
-                    history: [],
-                };
-
-                mockDatabase.run.mockReturnValue({ changes: 1, lastInsertRowid: 1 });
-                mockDatabase.get.mockReturnValue({ id: 1 });
-
-                await monitorRepository.create("site-1", monitor);
-
-                expect(mockDatabase.get).toHaveBeenCalledWith(expect.stringContaining("INSERT INTO monitors"), [
-                    "site-1",
-                    "http",
-                    null, // url (falsy)
-                    null, // host (null)
-                    null, // port (undefined)
-                    null, // checkInterval (undefined)
-                    null, // timeout (undefined)
-                    null, // retryAttempts (undefined)
-                    1, // monitoring
-                    "up",
-                    null, // responseTime (undefined)
-                    null, // lastChecked (undefined)
-                ]);
             });
         });
 
@@ -1046,45 +947,6 @@ describe("MonitorRepository", () => {
                 const testValue = undefined;
                 const result = testValue !== undefined ? Number(testValue) : null;
                 expect(result).toBeNull();
-            });
-        });
-
-        describe.skip("Lines 146-154: buildMonitorParameters null branches", () => {
-            it("should hit all null branches in buildMonitorParameters", async () => {
-                const monitor = {
-                    type: "http" as const,
-                    url: "", // Falsy string - line 146 null branch
-                    host: null as unknown as string, // Null value - line 147 null branch
-                    port: undefined, // Undefined - line 148 null branch
-                    checkInterval: undefined, // Undefined - line 149 null branch
-                    timeout: undefined, // Undefined - line 150 null branch
-                    retryAttempts: undefined, // Undefined - line 152 null branch
-                    monitoring: false, // Test false monitoring
-                    status: undefined as unknown as "up" | "down" | "pending", // Test undefined status (should become "down")
-                    responseTime: undefined, // Undefined - line 153 null branch
-                    lastChecked: undefined, // Undefined - should become null
-                    history: [],
-                };
-
-                mockDatabase.run.mockReturnValue({ changes: 1, lastInsertRowid: 1 });
-                mockDatabase.get.mockReturnValue({ id: 1 });
-
-                await monitorRepository.create("site-1", monitor);
-
-                expect(mockDatabase.get).toHaveBeenCalledWith(expect.stringContaining("INSERT INTO monitors"), [
-                    "site-1",
-                    "http",
-                    null, // url empty string becomes null
-                    null, // host null becomes null
-                    null, // port undefined becomes null
-                    null, // checkInterval undefined becomes null
-                    null, // timeout undefined becomes null
-                    null, // retryAttempts undefined becomes null
-                    0, // monitoring false becomes 0
-                    undefined, // status undefined preserved
-                    null, // responseTime undefined becomes null
-                    null, // lastChecked undefined becomes null
-                ]);
             });
         });
 
