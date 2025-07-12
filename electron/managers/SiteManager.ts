@@ -78,7 +78,7 @@ export class SiteManager {
      * Get sites from in-memory cache (faster, for internal use).
      */
     public getSitesFromCache(): Site[] {
-        return Array.from(this.sites.values());
+        return [...this.sites.values()];
     }
 
     /**
@@ -261,10 +261,60 @@ export class SiteManager {
     }
 
     /**
-     * Get a specific site from cache.
+     * Get a specific site from cache with smart background loading.
      */
     public getSiteFromCache(identifier: string): Site | undefined {
-        return this.sites.get(identifier);
+        const site = this.sites.get(identifier);
+        
+        if (!site) {
+            // Emit cache miss event
+            this.eventEmitter
+                .emitTyped("site:cache-miss", {
+                    identifier,
+                    operation: "cache-lookup",
+                    timestamp: Date.now(),
+                    backgroundLoading: true,
+                })
+                .catch((error) => {
+                    logger.debug(`[SiteManager] Failed to emit cache miss event`, error);
+                });
+            
+            // Trigger background loading without blocking
+            this.loadSiteInBackground(identifier).catch((error) => {
+                logger.debug(`[SiteManager] Background loading error ignored`, error);
+            });
+        }
+        
+        return site;
+    }
+
+    /**
+     * Load a site in the background and update cache.
+     */
+    private async loadSiteInBackground(identifier: string): Promise<void> {
+        try {
+            logger.debug(`[SiteManager] Loading site in background: ${identifier}`);
+            
+            const sites = await this.siteRepositoryService.getSitesFromDatabase();
+            const site = sites.find((s) => s.identifier === identifier);
+            
+            if (site) {
+                this.sites.set(identifier, site);
+                
+                await this.eventEmitter.emitTyped("site:cache-updated", {
+                    identifier,
+                    operation: "background-load",
+                    timestamp: Date.now(),
+                });
+                
+                logger.debug(`[SiteManager] Background site load completed: ${identifier}`);
+            } else {
+                logger.debug(`[SiteManager] Site not found during background load: ${identifier}`);
+            }
+        } catch (error) {
+            // Silent failure for background operations - don't throw
+            logger.debug(`[SiteManager] Background site load failed for ${identifier}`, error);
+        }
     }
 
     /**

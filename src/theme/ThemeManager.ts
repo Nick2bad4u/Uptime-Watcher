@@ -16,7 +16,7 @@ import { Theme, ThemeName } from "./types";
  */
 export class ThemeManager {
     /** Singleton instance */
-    private static instance: ThemeManager | null = null;
+    private static instance: ThemeManager | undefined;
 
     /** Private constructor to enforce singleton pattern */
     private constructor() {}

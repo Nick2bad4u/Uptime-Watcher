@@ -53,7 +53,7 @@ function App() {
      * Only show loading overlay if loading takes more than 100ms
      * This prevents flash for quick operations while still providing feedback for longer ones
      */
-    useEffect(() => {
+    useEffect((): (() => void) | undefined => {
         if (!isLoading) {
             setShowLoadingOverlay(false);
             return undefined;
@@ -63,7 +63,9 @@ function App() {
             setShowLoadingOverlay(true);
         }, UI_DELAYS.LOADING_OVERLAY);
 
-        return () => clearTimeout(timeoutId);
+        return (): void => {
+            clearTimeout(timeoutId);
+        };
     }, [isLoading]);
 
     /**

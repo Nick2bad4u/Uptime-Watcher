@@ -21,6 +21,36 @@ import { Site, Monitor } from "../../../types";
 import { getSiteDisplayStatus, formatResponseTime, formatDuration } from "../../../utils";
 
 /**
+ * Get status text for monitor
+ */
+function getMonitorStatusText(monitor: Monitor): string {
+    if (monitor.monitoring) {
+        return "Running";
+    }
+    return "Stopped";
+}
+
+/**
+ * Get monitor badge variant
+ */
+function getMonitorBadgeVariant(monitor: Monitor): "success" | "warning" | "error" {
+    return monitor.monitoring ? "success" : "warning";
+}
+
+/**
+ * Get response time text color for styling
+ */
+function getResponseTimeTextColor(responseTime: number): string {
+    if (responseTime <= 200) {
+        return "text-green-600 dark:text-green-400";
+    }
+    if (responseTime <= 1000) {
+        return "text-yellow-600 dark:text-yellow-400";
+    }
+    return "text-red-600 dark:text-red-400";
+}
+
+/**
  * Props for the SiteOverviewTab component
  */
 interface SiteOverviewTabProperties {
@@ -82,23 +112,6 @@ export function SiteOverviewTab({
         return variant === "danger" ? "error" : variant;
     };
 
-    /**
-     * Get status text for monitor
-     */
-    const getMonitorStatusText = (monitor: Monitor) => {
-        if (monitor.monitoring) {
-            return "Running";
-        }
-        return "Stopped";
-    };
-
-    /**
-     * Get monitor badge variant
-     */
-    const getMonitorBadgeVariant = (monitor: Monitor): "success" | "warning" | "error" => {
-        return monitor.monitoring ? "success" : "warning";
-    };
-
     // Icon colors configuration
     const getIconColors = () => {
         const availabilityColor = getAvailabilityColor(uptime);
@@ -150,19 +163,6 @@ export function SiteOverviewTab({
             return currentTheme.colors.warning;
         }
         return currentTheme.colors.error;
-    };
-
-    /**
-     * Get response time text color for styling
-     */
-    const getResponseTimeTextColor = (responseTime: number): string => {
-        if (responseTime <= 200) {
-            return "text-green-600 dark:text-green-400";
-        }
-        if (responseTime <= 1000) {
-            return "text-yellow-600 dark:text-yellow-400";
-        }
-        return "text-red-600 dark:text-red-400";
     };
 
     const iconColors = getIconColors();

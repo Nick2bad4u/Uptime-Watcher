@@ -44,7 +44,7 @@ export const HistoryChart = React.memo(function HistoryChart({
         // React components, returning null from a render function
         // is actually the correct and idiomatic way to indicate "render nothing."
         // This is a special case where null is the standard React convention.
-
+        // eslint-disable-next-line unicorn/no-null -- React components can return null
         return null;
     }
 

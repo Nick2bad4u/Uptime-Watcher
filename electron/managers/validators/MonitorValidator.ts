@@ -15,16 +15,11 @@ export class MonitorValidator {
      * Validate monitor configuration according to business rules.
      */
     public validateMonitorConfiguration(monitor: Site["monitors"][0]): ValidationResult {
-        const errors: string[] = [];
-
-        // Type-specific validation
-        errors.push(...this.validateMonitorTypeSpecific(monitor));
-
-        // Validate timing constraints
-        errors.push(...this.validateTimingConstraints(monitor));
-
-        // Validate retry attempts
-        errors.push(...this.validateRetryAttempts(monitor));
+        const errors: string[] = [
+            ...this.validateMonitorTypeSpecific(monitor),
+            ...this.validateTimingConstraints(monitor),
+            ...this.validateRetryAttempts(monitor),
+        ];
 
         return {
             errors,
@@ -73,7 +68,7 @@ export class MonitorValidator {
             errors.push("Port monitors must have a host");
         }
 
-        if (!monitor.port || monitor.port <= 0 || monitor.port > 65535) {
+        if (!monitor.port || monitor.port <= 0 || monitor.port > 65_535) {
             errors.push("Port monitors must have a valid port number (1-65535)");
         }
 

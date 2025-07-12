@@ -97,7 +97,7 @@ export async function checkMonitor(
 
     try {
         // Use transaction for atomicity of all database operations
-        await config.databaseService.executeTransaction(async (db) => {
+        await config.databaseService.executeTransaction((db) => {
             // Add history entry using internal method to avoid nested transactions
             config.repositories.history.addEntryInternal(db, monitor.id, historyEntry, checkResult.details);
 
@@ -135,13 +135,13 @@ export async function checkMonitor(
         config.logger.info(
             `[checkMonitor] Database operations completed: monitor_id=${monitor.id}, status=${historyEntry.status}, responseTime=${historyEntry.responseTime}, timestamp=${historyEntry.timestamp}, details=${checkResult.details ?? "undefined"}`
         );
-    } catch (err) {
-        config.logger.error(`[checkMonitor] Failed to complete database operations: monitor_id=${monitor.id}`, err);
+    } catch (error) {
+        config.logger.error(`[checkMonitor] Failed to complete database operations: monitor_id=${monitor.id}`, error);
         return undefined; // Return early if database operations fail
     }
 
     // Fetch fresh site data from database to ensure we have the latest history and monitor state
-    const freshSiteData = config.repositories.site.getByIdentifier(site.identifier);
+    const freshSiteData = await config.repositories.site.getByIdentifier(site.identifier);
     if (!freshSiteData) {
         config.logger.error(`[checkMonitor] Failed to fetch updated site data for ${site.identifier}`);
         return undefined;

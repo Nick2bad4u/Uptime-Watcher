@@ -4,10 +4,10 @@
  */
 
 /** Default timeout for HTTP requests (10 seconds) */
-export const DEFAULT_REQUEST_TIMEOUT = 10000;
+export const DEFAULT_REQUEST_TIMEOUT = 10_000;
 
 /** Default check interval for new monitors (5 minutes) */
-export const DEFAULT_CHECK_INTERVAL = 300000;
+export const DEFAULT_CHECK_INTERVAL = 300_000;
 
 /** User agent string for HTTP requests */
 export const USER_AGENT = "Uptime-Watcher/1.0";

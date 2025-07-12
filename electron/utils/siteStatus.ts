@@ -32,7 +32,7 @@ export function calculateSiteStatus(site: Site): SiteStatus {
     }
 
     // Get unique statuses
-    const statuses = Array.from(new Set(monitors.map((m) => m.status)));
+    const statuses = [...new Set(monitors.map((m) => m.status))];
 
     // Single status - all monitors have the same status
     if (statuses.length === 1) {
@@ -116,20 +116,27 @@ export function getSiteStatusDescription(site: Site): string {
     const runningCount = site.monitors.filter((m) => m.monitoring === true).length;
 
     switch (status) {
-        case "up":
+        case "up": {
             return `All ${monitorCount} monitors are up and running`;
-        case "down":
+        }
+        case "down": {
             return `All ${monitorCount} monitors are down`;
-        case "pending":
+        }
+        case "pending": {
             return `All ${monitorCount} monitors are pending`;
-        case "paused":
+        }
+        case "paused": {
             return `Monitoring is paused (${runningCount}/${monitorCount} active)`;
-        case "mixed":
+        }
+        case "mixed": {
             return `Mixed status (${runningCount}/${monitorCount} monitoring active)`;
-        case "unknown":
+        }
+        case "unknown": {
             return "No monitors configured";
-        default:
+        }
+        default: {
             return "Unknown status";
+        }
     }
 }
 
@@ -141,19 +148,26 @@ export function getSiteStatusDescription(site: Site): string {
  */
 export function getSiteStatusVariant(status: SiteStatus): "success" | "warning" | "error" | "info" {
     switch (status) {
-        case "up":
+        case "up": {
             return "success";
-        case "down":
+        }
+        case "down": {
             return "error";
-        case "pending":
+        }
+        case "pending": {
             return "info";
-        case "paused":
+        }
+        case "paused": {
             return "warning";
-        case "mixed":
+        }
+        case "mixed": {
             return "warning";
-        case "unknown":
+        }
+        case "unknown": {
             return "error";
-        default:
+        }
+        default: {
             return "info";
+        }
     }
 }

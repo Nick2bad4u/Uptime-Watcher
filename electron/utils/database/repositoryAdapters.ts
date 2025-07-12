@@ -3,6 +3,8 @@
  * These adapters make the existing concrete classes compatible with the new interfaces.
  */
 
+/* eslint-disable @typescript-eslint/require-await -- Adapter methods must be async to match interface contracts */
+
 import { Database } from "node-sqlite3-wasm";
 
 import { SiteRepository, MonitorRepository, HistoryRepository, SettingsRepository } from "../../services/index";
@@ -21,11 +23,11 @@ export class SiteRepositoryAdapter implements ISiteRepository {
     }
 
     async findAll(): Promise<{ identifier: string; name?: string | undefined }[]> {
-        return Promise.resolve(this.repository.findAll());
+        return this.repository.findAll();
     }
 
     async findByIdentifier(identifier: string): Promise<{ identifier: string; name?: string | undefined } | undefined> {
-        return Promise.resolve(this.repository.findByIdentifier(identifier));
+        return this.repository.findByIdentifier(identifier);
     }
 
     async upsert(site: Pick<Site, "identifier" | "name" | "monitoring">): Promise<void> {
@@ -48,14 +50,12 @@ export class SiteRepositoryAdapter implements ISiteRepository {
     async exportAll(): Promise<Site[]> {
         // The repository returns basic site data, we need to build full Site objects
         const siteData = this.repository.exportAll();
-        return Promise.resolve(
-            siteData.map((site) => ({
-                identifier: site.identifier,
-                name: site.name ?? "Unnamed Site",
-                monitors: [], // Will be populated by caller if needed
-                monitoring: true,
-            }))
-        );
+        return siteData.map((site) => ({
+            identifier: site.identifier,
+            name: site.name ?? "Unnamed Site",
+            monitors: [], // Will be populated by caller if needed
+            monitoring: true,
+        }));
     }
 
     async deleteAll(): Promise<void> {
@@ -78,11 +78,11 @@ export class MonitorRepositoryAdapter implements IMonitorRepository {
     }
 
     async findBySiteIdentifier(siteIdentifier: string): Promise<Monitor[]> {
-        return Promise.resolve(this.repository.findBySiteIdentifier(siteIdentifier));
+        return this.repository.findBySiteIdentifier(siteIdentifier);
     }
 
     async create(siteIdentifier: string, monitor: Monitor): Promise<string> {
-        return Promise.resolve(this.repository.create(siteIdentifier, monitor));
+        return this.repository.create(siteIdentifier, monitor);
     }
 
     createInternal(db: Database, siteIdentifier: string, monitor: Monitor): string {
@@ -90,7 +90,7 @@ export class MonitorRepositoryAdapter implements IMonitorRepository {
     }
 
     async update(monitorId: string, monitor: Monitor): Promise<void> {
-        return Promise.resolve(this.repository.update(monitorId, monitor));
+        return this.repository.update(monitorId, monitor);
     }
 
     updateInternal(db: Database, monitorId: string, monitor: Partial<Monitor>): void {
@@ -115,11 +115,11 @@ export class MonitorRepositoryAdapter implements IMonitorRepository {
 
     // Import/Export operations
     async deleteAll(): Promise<void> {
-        return Promise.resolve(this.repository.deleteAll());
+        return this.repository.deleteAll();
     }
 
     async bulkCreate(siteIdentifier: string, monitors: Monitor[]): Promise<Monitor[]> {
-        return Promise.resolve(this.repository.bulkCreate(siteIdentifier, monitors));
+        return this.repository.bulkCreate(siteIdentifier, monitors);
     }
 }
 
@@ -134,15 +134,15 @@ export class HistoryRepositoryAdapter implements IHistoryRepository {
     }
 
     async findByMonitorId(monitorId: string): Promise<StatusHistory[]> {
-        return Promise.resolve(this.repository.findByMonitorId(monitorId));
+        return this.repository.findByMonitorId(monitorId);
     }
 
     async create(monitorId: string, history: StatusHistory): Promise<void> {
-        return Promise.resolve(this.repository.addEntry(monitorId, history));
+        return this.repository.addEntry(monitorId, history);
     }
 
     async deleteByMonitorId(monitorId: string): Promise<void> {
-        return Promise.resolve(this.repository.deleteByMonitorId(monitorId));
+        return this.repository.deleteByMonitorId(monitorId);
     }
 
     deleteByMonitorIdInternal(db: Database, monitorId: string): void {
@@ -151,7 +151,7 @@ export class HistoryRepositoryAdapter implements IHistoryRepository {
 
     // Import/Export operations
     async deleteAll(): Promise<void> {
-        return Promise.resolve(this.repository.deleteAll());
+        return this.repository.deleteAll();
     }
 
     deleteAllInternal(db: Database): void {
@@ -159,7 +159,7 @@ export class HistoryRepositoryAdapter implements IHistoryRepository {
     }
 
     async addEntry(monitorId: string, history: StatusHistory, details?: string): Promise<void> {
-        return Promise.resolve(this.repository.addEntry(monitorId, history, details));
+        return this.repository.addEntry(monitorId, history, details);
     }
 
     addEntryInternal(db: Database, monitorId: string, history: StatusHistory, details?: string): void {
@@ -167,7 +167,7 @@ export class HistoryRepositoryAdapter implements IHistoryRepository {
     }
 
     async pruneHistory(monitorId: string, limit: number): Promise<void> {
-        return Promise.resolve(this.repository.pruneHistory(monitorId, limit));
+        return this.repository.pruneHistory(monitorId, limit);
     }
 
     pruneHistoryInternal(db: Database, monitorId: string, limit: number): void {
@@ -191,7 +191,7 @@ export class SettingsRepositoryAdapter implements ISettingsRepository {
 
     async get(key: string): Promise<string | undefined> {
         const result = this.repository.get(key);
-        return Promise.resolve(result ?? undefined);
+        return result ?? undefined;
     }
 
     async set(key: string, value: string): Promise<void> {
@@ -212,7 +212,7 @@ export class SettingsRepositoryAdapter implements ISettingsRepository {
 
     // Import/Export operations
     async getAll(): Promise<Record<string, string>> {
-        return Promise.resolve(this.repository.getAll());
+        return this.repository.getAll();
     }
 
     async deleteAll(): Promise<void> {

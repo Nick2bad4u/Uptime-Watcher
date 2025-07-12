@@ -95,15 +95,13 @@ export class SettingsRepository {
         try {
             const db = this.getDb();
             const settings = db.all("SELECT * FROM settings") as { key: string; value: string }[];
-            return settings.reduce(
-                (acc, row) => {
-                    if (typeof row.key === "string") {
-                        acc[row.key] = String(row.value);
-                    }
-                    return acc;
-                },
-                {} as Record<string, string>
-            );
+            const result: Record<string, string> = {};
+            for (const row of settings) {
+                if (typeof row.key === "string") {
+                    result[row.key] = String(row.value);
+                }
+            }
+            return result;
         } catch (error) {
             logger.error("[SettingsRepository] Failed to get all settings", error);
             throw error;

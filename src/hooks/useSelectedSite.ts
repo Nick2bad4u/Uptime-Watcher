@@ -17,7 +17,7 @@ export function useSelectedSite(): Site | undefined {
     const selectedSiteId = useUIStore((state) => state.selectedSiteId);
     const sites = useSitesStore((state) => state.sites);
 
-    return useMemo(() => {
+    return useMemo((): Site | undefined => {
         if (!selectedSiteId) {
             return undefined;
         }

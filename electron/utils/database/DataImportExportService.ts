@@ -167,7 +167,7 @@ export class DataImportExportService {
                 // Import settings using internal method to avoid nested transactions
                 this.repositories.settings.bulkInsertInternal(db, settings);
 
-                return Promise.resolve();
+                return;
             });
 
             this.logger.info(

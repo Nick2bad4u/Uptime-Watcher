@@ -17,18 +17,20 @@ import { useSitesStore } from "../stores";
 export function useBackendFocusSync(enabled = false) {
     const { fullSyncFromBackend } = useSitesStore();
 
-    useEffect(() => {
+    useEffect((): (() => void) | undefined => {
         if (!enabled) {
             return undefined;
         }
 
-        const handleFocus = () => {
+        const handleFocus = (): void => {
             // Use full sync on focus to ensure complete data consistency
             // since the user may have been away for a while
             void fullSyncFromBackend();
         };
 
         window.addEventListener("focus", handleFocus);
-        return () => window.removeEventListener("focus", handleFocus);
+        return (): void => {
+            window.removeEventListener("focus", handleFocus);
+        };
     }, [enabled, fullSyncFromBackend]);
 }

@@ -67,6 +67,21 @@ interface SiteDetailsProperties {
 }
 
 /**
+ * Get availability description based on percentage
+ * @param percentage - Availability percentage
+ * @returns Human-readable description
+ */
+function getAvailabilityDescription(percentage: number): string {
+    if (percentage >= 99) {
+        return "Excellent";
+    }
+    if (percentage >= 95) {
+        return "Good";
+    }
+    return "Poor";
+}
+
+/**
  * Site details component with tabbed interface for comprehensive site monitoring.
  * Provides overview, history, analytics, and settings views for a monitored site.
  *
@@ -87,21 +102,6 @@ interface SiteDetailsProperties {
 export function SiteDetails({ onClose, site }: SiteDetailsProperties) {
     const { currentTheme } = useTheme();
     const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
-
-    /**
-     * Get availability description based on percentage
-     * @param percentage - Availability percentage
-     * @returns Human-readable description
-     */
-    const getAvailabilityDescription = (percentage: number): string => {
-        if (percentage >= 99) {
-            return "Excellent";
-        }
-        if (percentage >= 95) {
-            return "Good";
-        }
-        return "Poor";
-    };
 
     // Use our custom hook to get all the data and functionality we need
     const {
@@ -218,6 +218,7 @@ export function SiteDetails({ onClose, site }: SiteDetailsProperties) {
 
     // Don't render if site doesn't exist
     if (!siteExists) {
+        // eslint-disable-next-line unicorn/no-null -- React components can return null
         return null;
     }
 

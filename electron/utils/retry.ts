@@ -44,7 +44,7 @@ export async function withRetry<T>(
         }
     }
 
-    const lastError = errors[errors.length - 1];
+    const lastError = errors.at(-1);
     dbLogger.error(`Persistent failure after ${maxRetries} retries for ${operationName}`, lastError);
     throw lastError;
 }

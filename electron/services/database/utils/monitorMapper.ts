@@ -32,7 +32,7 @@ export function rowToMonitor(row: Record<string, unknown>): Site["monitors"][0] 
     const monitor: Site["monitors"][0] = {
         checkInterval: 300_000, // Default 5 minutes
         history: [], // History will be loaded separately
-        id: row.id !== undefined ? String(row.id) : "-1",
+        id: row.id === undefined ? "-1" : String(row.id),
         monitoring: true, // Default to monitoring enabled
         responseTime: -1, // Default to never checked sentinel value
         retryAttempts: 3, // Default retry attempts
@@ -98,7 +98,7 @@ export function buildMonitorParameters(siteIdentifier: string, monitor: Site["mo
 
         monitor.host ? String(monitor.host) : null,
 
-        monitor.port !== undefined ? Number(monitor.port) : null,
+        monitor.port === undefined ? null : Number(monitor.port),
 
         Number(monitor.checkInterval),
 

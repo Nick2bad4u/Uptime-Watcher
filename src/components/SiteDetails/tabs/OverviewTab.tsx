@@ -25,6 +25,19 @@ import { Monitor } from "../../../types";
 import { getIntervalLabel } from "../../../utils";
 
 /**
+ * Get response time text color for styling
+ */
+function getResponseTimeTextColor(responseTime: number): string {
+    if (responseTime <= 200) {
+        return "text-green-600 dark:text-green-400";
+    }
+    if (responseTime <= 1000) {
+        return "text-yellow-600 dark:text-yellow-400";
+    }
+    return "text-red-600 dark:text-red-400";
+}
+
+/**
  * Props for the OverviewTab component.
  */
 interface OverviewTabProperties {
@@ -137,19 +150,6 @@ export const OverviewTab = ({
             return currentTheme.colors.warning;
         }
         return currentTheme.colors.error;
-    };
-
-    /**
-     * Get response time text color for styling
-     */
-    const getResponseTimeTextColor = (responseTime: number): string => {
-        if (responseTime <= 200) {
-            return "text-green-600 dark:text-green-400";
-        }
-        if (responseTime <= 1000) {
-            return "text-yellow-600 dark:text-yellow-400";
-        }
-        return "text-red-600 dark:text-red-400";
     };
 
     const iconColors = getIconColors();

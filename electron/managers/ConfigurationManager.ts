@@ -111,7 +111,7 @@ export class ConfigurationManager {
      * Business rule: Get the maximum allowed port number.
      */
     public getMaximumPortNumber(): number {
-        return 65535;
+        return 65_535;
     }
 
     /**

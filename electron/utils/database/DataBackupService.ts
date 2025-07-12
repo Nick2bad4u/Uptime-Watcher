@@ -81,7 +81,7 @@ export class DataBackupOrchestrator {
      */
     refreshSitesFromCache(siteCache: ISiteCache): Promise<{ identifier: string; name?: string }[]> {
         try {
-            const sites = Array.from(siteCache.entries()).map(([, site]) => ({
+            const sites = [...siteCache.entries()].map(([, site]) => ({
                 identifier: site.identifier,
                 name: site.name,
             }));

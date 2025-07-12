@@ -15,8 +15,8 @@ export interface NotificationConfig {
 export class NotificationService {
     private config: NotificationConfig;
 
-    constructor(config: NotificationConfig = { showDownAlerts: true, showUpAlerts: true }) {
-        this.config = config;
+    constructor(config?: NotificationConfig) {
+        this.config = config ?? { showDownAlerts: true, showUpAlerts: true };
     }
 
     /**

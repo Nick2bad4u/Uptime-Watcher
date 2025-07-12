@@ -1,5 +1,6 @@
 import { app } from "electron";
 import { Database } from "node-sqlite3-wasm";
+// eslint-disable-next-line unicorn/import-style -- Need namespace import for both sync and async usage
 import * as path from "node:path";
 
 import { logger } from "../../utils/index";
@@ -58,7 +59,6 @@ export class DatabaseService {
      */
     public async downloadBackup(): Promise<{ buffer: Buffer; fileName: string }> {
         const { app } = await import("electron");
-        const path = await import("node:path");
         const dbPath = path.join(app.getPath("userData"), "uptime-watcher.sqlite");
         return createDatabaseBackup(dbPath);
     }

@@ -182,6 +182,42 @@ export interface UptimeEvents extends Record<string, unknown> {
         timestamp: number;
     };
 
+    // Cache operation events
+    "site:cache-updated": {
+        identifier: string;
+        operation: "background-load" | "cache-updated" | "manual-refresh";
+        timestamp: number;
+    };
+
+    "site:cache-miss": {
+        identifier: string;
+        operation: "cache-lookup";
+        timestamp: number;
+        backgroundLoading: boolean;
+    };
+
+    // Database operation events
+    "database:retry": {
+        operation: string;
+        attempt: number;
+        timestamp: number;
+        [key: string]: unknown;
+    };
+
+    "database:error": {
+        operation: string;
+        error: Error;
+        timestamp: number;
+        [key: string]: unknown;
+    };
+
+    "database:success": {
+        operation: string;
+        timestamp: number;
+        duration?: number;
+        [key: string]: unknown;
+    };
+
     "internal:site:start-monitoring-requested": {
         identifier: string;
         monitorId?: string;

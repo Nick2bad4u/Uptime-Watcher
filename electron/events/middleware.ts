@@ -30,18 +30,22 @@ export function createLoggingMiddleware(options: {
         const logData = includeData ? { data, event } : { event };
 
         switch (level) {
-            case "debug":
+            case "debug": {
                 logger.debug(EVENT_EMITTED_MSG, logData);
                 break;
-            case "info":
+            }
+            case "info": {
                 logger.info(EVENT_EMITTED_MSG, logData);
                 break;
-            case "warn":
+            }
+            case "warn": {
                 logger.warn(EVENT_EMITTED_MSG, logData);
                 break;
-            case "error":
+            }
+            case "error": {
                 logger.error(EVENT_EMITTED_MSG, logData);
                 break;
+            }
         }
 
         await next();

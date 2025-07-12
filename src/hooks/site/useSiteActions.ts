@@ -88,22 +88,25 @@ export function useSiteActions(site: Site, monitor: Monitor | undefined): SiteAc
             siteName: site.name,
         });
 
-        checkSiteNow(site.identifier, monitor.id)
-            .then(() => {
+        // Handle async operation with proper error handling
+        void (async () => {
+            try {
+                await checkSiteNow(site.identifier, monitor.id);
                 logger.user.action("Manual site check completed successfully", {
                     monitorId: monitor.id,
                     siteId: site.identifier,
                     siteName: site.name,
                 });
-            })
-            .catch((error) => {
+            } catch (error) {
                 logger.site.error(site.identifier, error instanceof Error ? error : String(error));
                 logger.error("Manual site check failed", error instanceof Error ? error : new Error(String(error)), {
                     monitorId: monitor.id,
                     siteId: site.identifier,
                     siteName: site.name,
                 });
-            });
+                // Don't re-throw here since this is a fire-and-forget operation
+            }
+        })();
     }, [checkSiteNow, monitor, site.identifier, site.name]);
 
     // Handle clicking on the site card to show details with navigation logging

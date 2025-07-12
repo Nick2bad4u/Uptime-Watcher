@@ -72,7 +72,7 @@ export class MonitorManager {
 
         // Emit typed monitoring started event
         const sitesCache = this.dependencies.getSitesCache();
-        const sites = Array.from(sitesCache.values());
+        const sites = [...sitesCache.values()];
         await this.eventEmitter.emitTyped("monitoring:started", {
             monitorCount: sites.reduce((total, site) => total + site.monitors.length, 0),
             siteCount: sites.length,
@@ -251,10 +251,10 @@ export class MonitorManager {
 
         // Auto-start monitoring for new monitors if appropriate
         // Note: Initial checks are handled by MonitorScheduler when monitoring starts
-        if (site.monitoring !== false) {
-            await this.autoStartNewMonitors(site, newMonitors);
-        } else {
+        if (site.monitoring === false) {
             logger.debug(`[MonitorManager] Skipping auto-start for new monitors - site monitoring disabled`);
+        } else {
+            await this.autoStartNewMonitors(site, newMonitors);
         }
     }
 
@@ -284,7 +284,7 @@ export class MonitorManager {
                 monitor.checkInterval = DEFAULT_CHECK_INTERVAL;
 
                 // Use transaction for database update
-                await this.dependencies.databaseService.executeTransaction(async (db) => {
+                await this.dependencies.databaseService.executeTransaction((db) => {
                     if (monitor.id) {
                         this.dependencies.repositories.monitor.updateInternal(db, monitor.id, {
                             checkInterval: monitor.checkInterval,

@@ -21,6 +21,7 @@ export type EventMiddleware<T = unknown> = (
  * Enhanced event bus with type safety and middleware support.
  * Provides compile-time type checking for events and runtime middleware processing.
  */
+// eslint-disable-next-line unicorn/prefer-event-target -- EventEmitter required for Node.js specific features
 export class TypedEventBus<EventMap extends Record<string, unknown>> extends EventEmitter {
     private readonly middlewares: EventMiddleware[] = [];
     private readonly busId: string;
@@ -180,15 +181,14 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
      * Get diagnostic information about the event bus.
      */
     getDiagnostics(): EventBusDiagnostics {
+        const listenerCounts: Record<string, number> = {};
+        for (const eventName of this.eventNames()) {
+            listenerCounts[eventName as string] = this.listenerCount(eventName);
+        }
+
         return {
             busId: this.busId,
-            listenerCounts: this.eventNames().reduce(
-                (acc, eventName) => {
-                    acc[eventName as string] = this.listenerCount(eventName);
-                    return acc;
-                },
-                {} as Record<string, number>
-            ),
+            listenerCounts,
             maxListeners: this.getMaxListeners(),
             middlewareCount: this.middlewares.length,
         };

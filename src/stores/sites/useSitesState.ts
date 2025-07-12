@@ -48,7 +48,7 @@ export const createSitesStateActions = (
         // eslint-disable-next-line security/detect-object-injection
         return ids[siteId];
     },
-    getSelectedSite: () => {
+    getSelectedSite: (): Site | undefined => {
         const { selectedSiteId, sites } = get();
         if (!selectedSiteId) {
             return undefined;

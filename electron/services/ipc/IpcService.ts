@@ -98,11 +98,11 @@ export class IpcService {
 
             // Runtime check for string identifier and monitorId
             if (typeof identifier !== "string") {
-                throw new Error("Invalid site identifier");
+                throw new TypeError("Invalid site identifier");
             }
 
             if (typeof monitorId !== "string") {
-                throw new Error("Invalid monitor ID");
+                throw new TypeError("Invalid monitor ID");
             }
 
             return this.uptimeOrchestrator.checkSiteManually(identifier, monitorId);

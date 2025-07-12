@@ -19,20 +19,23 @@ export class MonitorFactory {
      */
     public static getMonitor(type: Site["monitors"][0]["type"], config?: MonitorConfig): IMonitorService {
         switch (type) {
-            case "http":
+            case "http": {
                 if (!this.httpMonitor) {
                     this.httpMonitor = new HttpMonitor(config);
                 }
                 return this.httpMonitor;
+            }
 
-            case "port":
+            case "port": {
                 if (!this.portMonitor) {
                     this.portMonitor = new PortMonitor(config);
                 }
                 return this.portMonitor;
+            }
 
-            default:
+            default: {
                 throw new Error(`Unsupported monitor type: ${type}`);
+            }
         }
     }
 

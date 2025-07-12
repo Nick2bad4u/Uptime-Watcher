@@ -100,8 +100,8 @@ export class SiteRepositoryService {
                 return undefined;
             }
 
-            const limit = parseInt(historyLimitSetting, 10);
-            if (isNaN(limit) || limit <= 0) {
+            const limit = Number.parseInt(historyLimitSetting, 10);
+            if (Number.isNaN(limit) || limit <= 0) {
                 this.logger.warn(`Invalid history limit setting: ${historyLimitSetting}`);
                 return undefined;
             }

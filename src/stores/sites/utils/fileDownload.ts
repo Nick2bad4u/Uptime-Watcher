@@ -96,7 +96,7 @@ export async function handleSQLiteBackupDownload(downloadFunction: () => Promise
 
     // Validate the backup data
     if (!(backupData instanceof Uint8Array)) {
-        throw new Error("Invalid backup data received");
+        throw new TypeError("Invalid backup data received");
     }
 
     // Create blob from the backup data

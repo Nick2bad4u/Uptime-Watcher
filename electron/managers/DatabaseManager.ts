@@ -95,7 +95,7 @@ export class DatabaseManager {
                 // First update the cache so monitoring can find the sites
                 await this.eventEmitter.emitTyped("internal:database:update-sites-cache-requested", {
                     operation: "update-sites-cache-requested",
-                    sites: Array.from(siteCache.entries()).map(([, site]) => site),
+                    sites: [...siteCache.entries()].map(([, site]) => site),
                     timestamp: Date.now(),
                 });
 
@@ -140,7 +140,7 @@ export class DatabaseManager {
         // Update the cache with loaded sites (final update to ensure consistency)
         await this.eventEmitter.emitTyped("internal:database:update-sites-cache-requested", {
             operation: "update-sites-cache-requested",
-            sites: Array.from(siteCache.entries()).map(([, site]) => site),
+            sites: [...siteCache.entries()].map(([, site]) => site),
             timestamp: Date.now(),
         });
 

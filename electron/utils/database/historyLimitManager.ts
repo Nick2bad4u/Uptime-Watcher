@@ -58,7 +58,7 @@ export async function setHistoryLimit(params: SetHistoryLimitParams): Promise<vo
     setHistoryLimit(finalLimit);
 
     // Use single transaction for atomicity - either both operations succeed or both fail
-    await databaseService.executeTransaction(async (db) => {
+    await databaseService.executeTransaction((db) => {
         // Save to settings using internal method
         repositories.settings.setInternal(db, "historyLimit", finalLimit.toString());
 

@@ -7,7 +7,7 @@ import { Database } from "node-sqlite3-wasm";
 
 import { isDev } from "../../electronUtils";
 import { Site } from "../../types";
-import { logger } from "../../utils/index";
+import { logger, withDatabaseOperation } from "../../utils/index";
 import { DatabaseService } from "./DatabaseService";
 import {
     addBooleanField,
@@ -56,24 +56,35 @@ export class MonitorRepository {
     }
 
     /**
-     * Find a monitor by its ID.
+     * Find a monitor by its ID with resilient error handling.
      */
-    public findById(monitorId: string): Site["monitors"][0] | undefined {
-        try {
-            const db = this.getDb();
-            const row = db.get("SELECT * FROM monitors WHERE id = ?", [monitorId]) as
-                | Record<string, unknown>
-                | undefined;
+    public async findById(monitorId: string): Promise<Site["monitors"][0] | undefined> {
+        return withDatabaseOperation(
+            async () => {
+                const db = this.getDb();
+                
+                // Wrap synchronous operation in Promise to make it truly async
+                return new Promise<Site["monitors"][0] | undefined>((resolve, reject) => {
+                    try {
+                        const row = db.get("SELECT * FROM monitors WHERE id = ?", [monitorId]) as
+                            | Record<string, unknown>
+                            | undefined;
 
-            if (!row) {
-                return undefined;
-            }
+                        if (!row) {
+                            resolve(undefined as Site["monitors"][0] | undefined);
+                            return;
+                        }
 
-            return rowToMonitor(row);
-        } catch (error) {
-            logger.error(`[MonitorRepository] Failed to fetch monitor with id: ${monitorId}`, error);
-            throw error;
-        }
+                        resolve(rowToMonitor(row));
+                    } catch (error) {
+                        reject(error);
+                    }
+                });
+            },
+            "monitor-lookup",
+            undefined,
+            { monitorId }
+        );
     }
 
     /**
@@ -82,7 +93,7 @@ export class MonitorRepository {
      */
     public async create(siteIdentifier: string, monitor: Omit<Site["monitors"][0], "id">): Promise<string> {
         try {
-            const result = await this.databaseService.executeTransaction(async (db) => {
+            const result = await this.databaseService.executeTransaction((db) => {
                 // Use RETURNING clause to get the ID directly from the insert
                 const insertResult = db.get(
                     `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, timeout, retryAttempts, monitoring, status, responseTime, lastChecked) 
@@ -174,7 +185,7 @@ export class MonitorRepository {
      */
     public async update(monitorId: string, monitor: Partial<Site["monitors"][0]>): Promise<void> {
         try {
-            await this.databaseService.executeTransaction(async (db) => {
+            await this.databaseService.executeTransaction((db) => {
                 // Build dynamic SQL based on provided fields to avoid overwriting with defaults
                 const updateFields: string[] = [];
                 const updateValues: DbValue[] = [];
@@ -211,7 +222,7 @@ export class MonitorRepository {
                     if (isDev()) {
                         logger.debug(`[MonitorRepository] No fields to update for monitor: ${monitorId}`);
                     }
-                    return Promise.resolve();
+                    return;
                 }
 
                 updateValues.push(monitorId);
@@ -291,7 +302,7 @@ export class MonitorRepository {
      */
     public async delete(monitorId: string): Promise<boolean> {
         try {
-            const result = await this.databaseService.executeTransaction(async (db) => {
+            const result = await this.databaseService.executeTransaction((db) => {
                 const deleted = this.deleteInternal(db, monitorId);
                 return Promise.resolve(deleted);
             });
@@ -338,7 +349,7 @@ export class MonitorRepository {
      */
     public async deleteBySiteIdentifier(siteIdentifier: string): Promise<void> {
         try {
-            await this.databaseService.executeTransaction(async (db) => {
+            await this.databaseService.executeTransaction((db) => {
                 this.deleteBySiteIdentifierInternal(db, siteIdentifier);
                 return Promise.resolve();
             });
@@ -391,7 +402,7 @@ export class MonitorRepository {
      */
     public async deleteAll(): Promise<void> {
         try {
-            await this.databaseService.executeTransaction(async (db) => {
+            await this.databaseService.executeTransaction((db) => {
                 db.run("DELETE FROM monitors");
                 if (isDev()) {
                     logger.debug("[MonitorRepository] Cleared all monitors");
@@ -411,7 +422,7 @@ export class MonitorRepository {
      */
     public async bulkCreate(siteIdentifier: string, monitors: Site["monitors"][0][]): Promise<Site["monitors"][0][]> {
         try {
-            const result = await this.databaseService.executeTransaction(async (db) => {
+            const result = await this.databaseService.executeTransaction((db) => {
                 const createdMonitors: Site["monitors"][0][] = [];
 
                 for (const monitor of monitors) {

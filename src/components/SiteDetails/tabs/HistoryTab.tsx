@@ -119,6 +119,7 @@ export const HistoryTab = ({
     // Use 'details' as optional property to handle records that may not have detail information
     function renderDetails(record: StatusHistory) {
         if (!record.details) {
+            // eslint-disable-next-line unicorn/no-null -- React components can return null
             return null;
         }
 

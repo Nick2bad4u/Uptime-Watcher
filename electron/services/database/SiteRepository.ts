@@ -1,7 +1,7 @@
 import { Database } from "node-sqlite3-wasm";
 
 import { Site } from "../../types";
-import { logger } from "../../utils/index";
+import { logger, withDatabaseOperation } from "../../utils/index";
 import { DatabaseService } from "./DatabaseService";
 import { HistoryRepository } from "./HistoryRepository";
 import { MonitorRepository } from "./MonitorRepository";
@@ -51,39 +51,49 @@ export class SiteRepository {
     }
 
     /**
-     * Find a site by its identifier.
+     * Find a site by its identifier with resilient error handling.
      */
-    public findByIdentifier(
+    public async findByIdentifier(
         identifier: string
-    ): { identifier: string; name?: string | undefined; monitoring?: boolean | undefined } | undefined {
-        try {
-            const db = this.getDb();
-            const siteRow = db.get("SELECT identifier, name, monitoring FROM sites WHERE identifier = ?", [
-                identifier,
-            ]) as { identifier: string; name?: string; monitoring?: number } | undefined;
+    ): Promise<{ identifier: string; name?: string | undefined; monitoring?: boolean | undefined } | undefined> {
+        return withDatabaseOperation(
+            async () => {
+                const db = this.getDb();
+                
+                return new Promise<{ identifier: string; name?: string | undefined; monitoring?: boolean | undefined } | undefined>((resolve, reject) => {
+                    try {
+                        const siteRow = db.get("SELECT identifier, name, monitoring FROM sites WHERE identifier = ?", [
+                            identifier,
+                        ]) as { identifier: string; name?: string; monitoring?: number } | undefined;
 
-            if (!siteRow) {
-                return undefined;
-            }
+                        if (!siteRow) {
+                            resolve(undefined as { identifier: string; name?: string | undefined; monitoring?: boolean | undefined } | undefined);
+                            return;
+                        }
 
-            return {
-                identifier: String(siteRow.identifier),
-                ...(siteRow.name !== undefined && { name: String(siteRow.name) }),
-                ...(siteRow.monitoring !== undefined && { monitoring: Boolean(siteRow.monitoring) }),
-            };
-        } catch (error) {
-            logger.error(`[SiteRepository] Failed to fetch site with identifier: ${identifier}`, error);
-            throw error;
-        }
+                        resolve({
+                            identifier: String(siteRow.identifier),
+                            ...(siteRow.name !== undefined && { name: String(siteRow.name) }),
+                            ...(siteRow.monitoring !== undefined && { monitoring: Boolean(siteRow.monitoring) }),
+                        });
+                    } catch (error) {
+                        reject(error);
+                    }
+                });
+            },
+            "site-lookup",
+            undefined,
+            { identifier }
+        );
     }
 
     /**
      * Get a complete site by identifier with monitors and history.
      * This method returns a full Site object including all monitors and their history.
      */
-    public getByIdentifier(identifier: string): Site | undefined {
+    public async getByIdentifier(identifier: string): Promise<Site | undefined> {
         try {
-            const siteRow = this.findByIdentifier(identifier);
+            const siteRow = await this.findByIdentifier(identifier);
             if (!siteRow) {
                 return undefined;
             }
@@ -118,12 +128,17 @@ export class SiteRepository {
     public async upsert(site: Pick<Site, "identifier" | "name" | "monitoring">): Promise<void> {
         try {
             await this.databaseService.executeTransaction((db) => {
+                // Ensure all values are valid for SQLite
+                const identifier = site.identifier || ""; // Fallback for undefined/empty identifier
+                const name = site.name || "Unnamed Site"; // Fallback for undefined/empty name
+                const monitoring = site.monitoring ? 1 : 0; // Convert boolean to integer
+                
                 db.run("INSERT OR REPLACE INTO sites (identifier, name, monitoring) VALUES (?, ?, ?)", [
-                    site.identifier,
-                    site.name,
-                    site.monitoring ? 1 : 0, // Convert boolean to integer for SQLite
+                    identifier,
+                    name,
+                    monitoring,
                 ]);
-                logger.debug(`[SiteRepository] Upserted site: ${site.identifier}`);
+                logger.debug(`[SiteRepository] Upserted site: ${identifier}`);
                 return Promise.resolve();
             });
         } catch (error) {
@@ -137,12 +152,17 @@ export class SiteRepository {
      * Use this method when you're already within a transaction context.
      */
     public upsertInternal(db: Database, site: Pick<Site, "identifier" | "name" | "monitoring">): void {
+        // Ensure all values are valid for SQLite
+        const identifier = site.identifier || ""; // Fallback for undefined/empty identifier
+        const name = site.name || "Unnamed Site"; // Fallback for undefined/empty name
+        const monitoring = site.monitoring ? 1 : 0; // Convert boolean to integer
+        
         db.run("INSERT OR REPLACE INTO sites (identifier, name, monitoring) VALUES (?, ?, ?)", [
-            site.identifier,
-            site.name,
-            site.monitoring ? 1 : 0, // Convert boolean to integer for SQLite
+            identifier,
+            name,
+            monitoring,
         ]);
-        logger.debug(`[SiteRepository] Upserted site (internal): ${site.identifier}`);
+        logger.debug(`[SiteRepository] Upserted site (internal): ${identifier}`);
     }
 
     /**
@@ -195,9 +215,9 @@ export class SiteRepository {
     /**
      * Check if a site exists by identifier.
      */
-    public exists(identifier: string): boolean {
+    public async exists(identifier: string): Promise<boolean> {
         try {
-            const site = this.findByIdentifier(identifier);
+            const site = await this.findByIdentifier(identifier);
             return site !== undefined;
         } catch (error) {
             logger.error(`[SiteRepository] Failed to check if site exists: ${identifier}`, error);

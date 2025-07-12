@@ -401,7 +401,7 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties) {
     const analytics = useSiteAnalytics(selectedMonitor, siteDetailsChartTimeRange);
 
     // Check if site exists
-    const siteExists = !!sites.find((s) => s.identifier === site.identifier);
+    const siteExists = sites.some((s) => s.identifier === site.identifier);
 
     return {
         // UI state

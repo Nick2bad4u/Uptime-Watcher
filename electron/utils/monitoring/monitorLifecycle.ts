@@ -47,12 +47,12 @@ export async function startAllMonitoring(config: MonitoringLifecycleConfig, isMo
     config.logger.info(`Starting monitoring with ${config.sites.size} sites (per-site intervals)`);
 
     // Set all monitors to pending status and enable monitoring
-    for (const [, site] of Array.from(config.sites)) {
+    for (const [, site] of config.sites) {
         for (const monitor of site.monitors) {
             if (monitor.id) {
                 try {
                     // Use transaction for database update
-                    await config.databaseService.executeTransaction(async (db) => {
+                    await config.databaseService.executeTransaction((db) => {
                         if (monitor.id) {
                             config.monitorRepository.updateInternal(db, monitor.id, {
                                 monitoring: true,
@@ -83,12 +83,12 @@ export async function stopAllMonitoring(config: MonitoringLifecycleConfig): Prom
     config.monitorScheduler.stopAll();
 
     // Set all monitors to paused status
-    for (const [, site] of Array.from(config.sites)) {
+    for (const [, site] of config.sites) {
         for (const monitor of site.monitors) {
             if (monitor.id && monitor.monitoring !== false) {
                 try {
                     // Use transaction for database update
-                    await config.databaseService.executeTransaction(async (db) => {
+                    await config.databaseService.executeTransaction((db) => {
                         if (monitor.id) {
                             config.monitorRepository.updateInternal(db, monitor.id, {
                                 monitoring: false,
@@ -129,11 +129,9 @@ export async function startMonitoringForSite(
         return false;
     }
 
-    if (monitorId) {
-        return startSpecificMonitor(config, site, identifier, monitorId);
-    } else {
-        return startAllSiteMonitors(config, site, identifier, callback);
-    }
+    return monitorId
+        ? startSpecificMonitor(config, site, identifier, monitorId)
+        : startAllSiteMonitors(config, site, identifier, callback);
 }
 
 /**
@@ -157,11 +155,9 @@ export async function stopMonitoringForSite(
         return false;
     }
 
-    if (monitorId) {
-        return stopSpecificMonitor(config, site, identifier, monitorId);
-    } else {
-        return stopAllSiteMonitors(config, site, identifier, callback);
-    }
+    return monitorId
+        ? stopSpecificMonitor(config, site, identifier, monitorId)
+        : stopAllSiteMonitors(config, site, identifier, callback);
 }
 
 /**
@@ -186,7 +182,7 @@ async function startSpecificMonitor(
 
     try {
         // Use transaction for database update
-        await config.databaseService.executeTransaction(async (db) => {
+        await config.databaseService.executeTransaction((db) => {
             config.monitorRepository.updateInternal(db, monitorId, {
                 monitoring: true,
                 status: "pending",
@@ -221,7 +217,7 @@ async function stopSpecificMonitor(
 
     try {
         // Use transaction for database update
-        await config.databaseService.executeTransaction(async (db) => {
+        await config.databaseService.executeTransaction((db) => {
             config.monitorRepository.updateInternal(db, monitorId, {
                 monitoring: false,
                 status: "paused",
@@ -273,7 +269,7 @@ async function processAllSiteMonitors(
 
     // For starting monitors, use optimistic logic (succeed if ANY monitor starts)
     // For stopping monitors, use pessimistic logic (fail if ANY monitor fails to stop)
-    return useOptimisticLogic ? results.some((result) => result) : results.every((result) => result);
+    return useOptimisticLogic ? results.some(Boolean) : results.every(Boolean);
 }
 
 /**

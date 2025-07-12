@@ -127,9 +127,7 @@ export class MonitorScheduler {
             }
         } else {
             // Stop all monitors for this site
-            const siteIntervals = Array.from(this.intervals.keys()).filter((key) =>
-                key.startsWith(`${siteIdentifier}|`)
-            );
+            const siteIntervals = [...this.intervals.keys()].filter((key) => key.startsWith(`${siteIdentifier}|`));
             for (const intervalKey of siteIntervals) {
                 const [, monitorId] = intervalKey.split("|");
                 if (monitorId) {
@@ -143,7 +141,7 @@ export class MonitorScheduler {
      * Stop all monitoring intervals.
      */
     public stopAll(): void {
-        for (const interval of Array.from(this.intervals.values())) {
+        for (const interval of this.intervals.values()) {
             clearInterval(interval);
         }
         this.intervals.clear();
@@ -181,6 +179,6 @@ export class MonitorScheduler {
      * Get all active monitoring keys.
      */
     public getActiveMonitors(): string[] {
-        return Array.from(this.intervals.keys());
+        return [...this.intervals.keys()];
     }
 }

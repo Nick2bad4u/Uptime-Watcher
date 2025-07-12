@@ -3,6 +3,8 @@
  * Handles theme switching, system theme detection, and provides color/styling utilities.
  */
 
+/* eslint-disable unicorn/consistent-function-scoping -- Hook functions must remain inside hooks for context access */
+
 import { useEffect, useState, useCallback } from "react";
 
 import type { StatusType } from "../constants";
@@ -71,14 +73,16 @@ export function useTheme() {
     // Get theme-aware color
     const getColor = (path: string): string => {
         const keys = path.split(".");
-        const value = keys.reduce<unknown>(
-            (accumulator, key) =>
-                accumulator && typeof accumulator === "object" && Object.hasOwn(accumulator, key)
-                    ? // eslint-disable-next-line security/detect-object-injection -- Object.hasOwn ensures safety
-                      (accumulator as Record<string, unknown>)[key]
-                    : undefined,
-            currentTheme.colors
-        );
+        let value: unknown = currentTheme.colors;
+        for (const key of keys) {
+            if (value && typeof value === "object" && Object.hasOwn(value, key)) {
+                // eslint-disable-next-line security/detect-object-injection -- Object.hasOwn ensures safety
+                value = (value as Record<string, unknown>)[key];
+            } else {
+                value = undefined;
+                break;
+            }
+        }
         return typeof value === "string" ? value : "#000000";
     };
 

@@ -1,4 +1,5 @@
 import { BrowserWindow } from "electron";
+// eslint-disable-next-line unicorn/import-style -- Need namespace import for path operations
 import * as path from "node:path";
 
 import { isDev } from "../../electronUtils";
