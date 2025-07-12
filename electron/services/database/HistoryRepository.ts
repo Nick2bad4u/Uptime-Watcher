@@ -68,14 +68,23 @@ export class HistoryRepository {
      * Prune old history entries for all monitors.
      */
     public async pruneAllHistory(limit: number): Promise<void> {
-        if (limit <= 0) {
-            return;
-        }
-
+        if (limit <= 0) return;
+        
         return withDatabaseOperation(
             () => {
                 const db = this.databaseService.getDatabase();
-                this.pruneAllHistoryInternal(db, limit);
+                const monitors = db.all("SELECT id FROM monitors") as { id: number }[];
+                for (const monitor of monitors) {
+                    const excessEntries = db.all(
+                        "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?",
+                        [String(monitor.id), limit]
+                    ) as { id: number }[];
+                    if (excessEntries.length > 0) {
+                        const excessIds = excessEntries.map((e) => e.id);
+                        const placeholders = excessIds.map(() => "?").join(",");
+                        db.run(`DELETE FROM history WHERE id IN (${placeholders})`, excessIds);
+                    }
+                }
                 return Promise.resolve();
             },
             "history-prune-all",

@@ -306,7 +306,7 @@ export class MonitorRepository {
      */
     public async delete(monitorId: string): Promise<boolean> {
         return withDatabaseOperation(
-            async () => {
+            () => {
                 const db = this.databaseService.getDatabase();
                 const result = this.deleteInternal(db, monitorId);
 
@@ -318,7 +318,7 @@ export class MonitorRepository {
                     logger.warn(`[MonitorRepository] Monitor not found for deletion: ${monitorId}`);
                 }
 
-                return result;
+                return Promise.resolve(result);
             },
             "monitor-delete",
             undefined,
@@ -353,13 +353,14 @@ export class MonitorRepository {
      */
     public async deleteBySiteIdentifier(siteIdentifier: string): Promise<void> {
         return withDatabaseOperation(
-            async () => {
+            () => {
                 const db = this.databaseService.getDatabase();
                 this.deleteBySiteIdentifierInternal(db, siteIdentifier);
 
                 if (isDev()) {
                     logger.debug(`[MonitorRepository] Deleted all monitors for site: ${siteIdentifier}`);
                 }
+                return Promise.resolve();
             },
             "monitor-delete-by-site",
             undefined,
@@ -405,9 +406,10 @@ export class MonitorRepository {
      * Uses transactions to ensure atomicity.
      */
     public async deleteAll(): Promise<void> {
-        return withDatabaseOperation(async () => {
+        return withDatabaseOperation(() => {
             const db = this.databaseService.getDatabase();
             this.deleteAllInternal(db);
+            return Promise.resolve();
         }, "monitor-delete-all");
     }
 
@@ -427,7 +429,7 @@ export class MonitorRepository {
      */
     public async bulkCreate(siteIdentifier: string, monitors: Site["monitors"][0][]): Promise<Site["monitors"][0][]> {
         return withDatabaseOperation(
-            async () => {
+            () => {
                 const db = this.databaseService.getDatabase();
                 const createdMonitors: Site["monitors"][0][] = [];
 
@@ -450,7 +452,7 @@ export class MonitorRepository {
                 }
 
                 logger.info(`[MonitorRepository] Bulk created ${monitors.length} monitors for site: ${siteIdentifier}`);
-                return createdMonitors;
+                return Promise.resolve(createdMonitors);
             },
             "monitor-bulk-create",
             undefined,

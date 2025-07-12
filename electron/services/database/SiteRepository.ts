@@ -137,9 +137,10 @@ export class SiteRepository {
      */
     public async upsert(site: Pick<Site, "identifier" | "name" | "monitoring">): Promise<void> {
         return withDatabaseOperation(
-            async () => {
+            () => {
                 const db = this.databaseService.getDatabase();
                 this.upsertInternal(db, site);
+                return Promise.resolve();
             },
             "site-upsert",
             undefined,
@@ -170,9 +171,10 @@ export class SiteRepository {
      */
     public async delete(identifier: string): Promise<boolean> {
         return withDatabaseOperation(
-            async () => {
+            () => {
                 const db = this.databaseService.getDatabase();
-                return this.deleteInternal(db, identifier);
+                const result = this.deleteInternal(db, identifier);
+                return Promise.resolve(result);
             },
             "site-delete",
             undefined,
@@ -239,9 +241,10 @@ export class SiteRepository {
      * Clear all sites from the database.
      */
     public async deleteAll(): Promise<void> {
-        return withDatabaseOperation(async () => {
+        return withDatabaseOperation(() => {
             const db = this.databaseService.getDatabase();
             this.deleteAllInternal(db);
+            return Promise.resolve();
         }, "site-delete-all");
     }
 
@@ -266,9 +269,10 @@ export class SiteRepository {
         }
 
         return withDatabaseOperation(
-            async () => {
+            () => {
                 const db = this.databaseService.getDatabase();
                 this.bulkInsertInternal(db, sites);
+                return Promise.resolve();
             },
             "site-bulk-insert",
             undefined,

@@ -41,9 +41,10 @@ export class SettingsRepository {
      */
     public async set(key: string, value: string): Promise<void> {
         return withDatabaseOperation(
-            async () => {
+            () => {
                 const db = this.databaseService.getDatabase();
                 this.setInternal(db, key, value);
+                return Promise.resolve();
             },
             "settings-set",
             undefined,
@@ -67,9 +68,10 @@ export class SettingsRepository {
      */
     public async delete(key: string): Promise<void> {
         return withDatabaseOperation(
-            async () => {
+            () => {
                 const db = this.databaseService.getDatabase();
                 this.deleteInternal(db, key);
+                return Promise.resolve();
             },
             "settings-delete",
             undefined,
@@ -112,9 +114,10 @@ export class SettingsRepository {
      * Clear all settings from the database.
      */
     public async deleteAll(): Promise<void> {
-        return withDatabaseOperation(async () => {
+        return withDatabaseOperation(() => {
             const db = this.databaseService.getDatabase();
             this.deleteAllInternal(db);
+            return Promise.resolve();
         }, "settings-delete-all");
     }
 
@@ -138,9 +141,10 @@ export class SettingsRepository {
         }
 
         return withDatabaseOperation(
-            async () => {
+            () => {
                 const db = this.databaseService.getDatabase();
                 this.bulkInsertInternal(db, settings);
+                return Promise.resolve();
             },
             "settings-bulk-insert",
             undefined,

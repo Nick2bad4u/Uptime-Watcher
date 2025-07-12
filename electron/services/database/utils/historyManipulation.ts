@@ -97,7 +97,8 @@ export function pruneHistoryForMonitor(db: Database, monitorId: string, limit: n
 
 /**
  * Bulk insert history entries (for import functionality).
- * Uses a prepared statement and transaction for better performance.
+ * Assumes it's called within an existing transaction context.
+ * Uses a prepared statement for better performance.
  */
 export function bulkInsertHistory(
     db: Database,
@@ -109,9 +110,6 @@ export function bulkInsertHistory(
     }
 
     try {
-        // Use a transaction for bulk operations
-        db.run("BEGIN TRANSACTION");
-
         // Prepare the statement once for better performance
         const stmt = db.prepare(
             "INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)"
@@ -124,18 +122,13 @@ export function bulkInsertHistory(
                     entry.timestamp,
                     entry.status === "up" || entry.status === "down" ? entry.status : "down",
                     entry.responseTime,
-
                     entry.details ?? null,
                 ]);
             }
 
-            db.run("COMMIT");
             logger.info(
                 `[HistoryManipulation] Bulk inserted ${historyEntries.length} history entries for monitor: ${monitorId}`
             );
-        } catch (error) {
-            db.run("ROLLBACK");
-            throw error;
         } finally {
             stmt.finalize();
         }
