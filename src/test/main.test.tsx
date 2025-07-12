@@ -84,10 +84,10 @@ describe("Main Entry Point", () => {
 
     it("should call querySelector with correct selector", async () => {
         const querySelectorSpy = vi.spyOn(document, "querySelector");
-        
+
         // Clear modules to ensure fresh import
         vi.resetModules();
-        
+
         await import("../main");
 
         expect(querySelectorSpy).toHaveBeenCalledWith("#root");

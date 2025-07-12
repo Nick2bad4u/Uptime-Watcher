@@ -285,7 +285,7 @@ describe("ActionButtonGroup", () => {
             render(<ActionButtonGroup {...defaultProps} />);
 
             const checkButton = screen.getByLabelText("Check Now");
-            
+
             // Create mock event with stopPropagation
             const mockEvent = {
                 stopPropagation: vi.fn(),

@@ -11,12 +11,7 @@ import { SiteCardFooter } from "../../components/Dashboard/SiteCard/SiteCardFoot
 // Mock ThemedText component
 vi.mock("../../theme", () => ({
     ThemedText: ({ children, size, variant, className }: any) => (
-        <div 
-            data-testid="themed-text"
-            data-size={size}
-            data-variant={variant}
-            className={className}
-        >
+        <div data-testid="themed-text" data-size={size} data-variant={variant} className={className}>
             {children}
         </div>
     ),
@@ -50,12 +45,7 @@ describe("SiteCardFooter", () => {
             render(<SiteCardFooter />);
 
             const themedText = screen.getByTestId("themed-text");
-            expect(themedText).toHaveClass(
-                "text-center",
-                "transition-opacity",
-                "opacity-0",
-                "group-hover:opacity-100"
-            );
+            expect(themedText).toHaveClass("text-center", "transition-opacity", "opacity-0", "group-hover:opacity-100");
         });
     });
 
@@ -67,12 +57,12 @@ describe("SiteCardFooter", () => {
 
         it("should not re-render when props don't change", () => {
             const { rerender } = render(<SiteCardFooter />);
-            
+
             const initialElement = screen.getByText("Click to view detailed statistics and settings");
-            
+
             // Re-render with same props (no props in this case)
             rerender(<SiteCardFooter />);
-            
+
             const afterRerenderElement = screen.getByText("Click to view detailed statistics and settings");
             expect(initialElement).toBe(afterRerenderElement);
         });

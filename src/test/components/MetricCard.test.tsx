@@ -85,7 +85,14 @@ describe("MetricCard", () => {
             render(<MetricCard {...defaultProps} className="border-r custom-class" />);
 
             const container = screen.getByText("Uptime").closest("div")?.parentElement;
-            expect(container).toHaveClass("flex", "flex-col", "items-center", "text-center", "border-r", "custom-class");
+            expect(container).toHaveClass(
+                "flex",
+                "flex-col",
+                "items-center",
+                "text-center",
+                "border-r",
+                "custom-class"
+            );
         });
 
         it("should handle empty className", () => {

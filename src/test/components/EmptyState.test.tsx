@@ -11,12 +11,7 @@ import { EmptyState } from "../../components/Dashboard/SiteList/EmptyState";
 // Mock themed components
 vi.mock("../../theme", () => ({
     ThemedBox: ({ children, surface, padding, className }: any) => (
-        <div
-            data-testid="themed-box"
-            data-surface={surface}
-            data-padding={padding}
-            className={className}
-        >
+        <div data-testid="themed-box" data-surface={surface} data-padding={padding} className={className}>
             {children}
         </div>
     ),

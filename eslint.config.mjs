@@ -140,6 +140,11 @@ export default [
                 ecmaFeatures: {
                     jsx: true,
                 },
+                experimentalDecorators: true,
+                JSDocParsingMode: "all",
+                jsxPragma: "React",
+                jsxFragmentName: "React.Fragment",
+                warnOnUnsupportedTypeScriptVersion: true,
             },
             globals: {
                 ...globals.browser,
@@ -191,7 +196,12 @@ export default [
             ...tseslint.configs.recommended.rules,
             ...tseslint.configs.strict.rules,
             ...tseslint.configs.stylistic.rules,
+            ...pluginImport.flatConfigs.typescript.rules,
+            ...pluginPromise.configs["flat/recommended"].rules,
+            ...pluginUnicorn.configs.recommended.rules,
 
+            "unicorn/prefer-global-this": "off", // Not suitable for Electron
+            "unicorn/prevent-abbreviations": "off", // Too many false positives
             // Core quality rules
             // "no-console": "warn", // Allow in development, but warn - DISABLED FOR NOW
             "no-debugger": "error",
@@ -420,6 +430,14 @@ export default [
                 sourceType: "module",
                 ecmaVersion: "latest",
                 tsconfigRootDir: __dirname,
+                ecmaFeatures: {
+                    jsx: true,
+                },
+                experimentalDecorators: true,
+                JSDocParsingMode: "all",
+                jsxPragma: "React",
+                jsxFragmentName: "React.Fragment",
+                warnOnUnsupportedTypeScriptVersion: true,
             },
             globals: {
                 ...globals.node,
@@ -448,8 +466,13 @@ export default [
             import: pluginImport,
             promise: pluginPromise,
             "unused-imports": pluginUnusedImports,
-            security: pluginSecurity,
+            react: pluginReact,
+            "react-hooks": pluginReactHooks,
+            "jsx-a11y": pluginJsxA11y,
+            prettier: pluginPrettier,
             sonarjs: pluginSonarjs,
+            security: pluginSecurity,
+            "eslint-comments": pluginEslintComments,
             perfectionist: pluginPerfectionist,
             unicorn: pluginUnicorn,
             functional: pluginFunctional,
@@ -457,13 +480,23 @@ export default [
             "prefer-arrow": pluginPreferArrow,
             "sort-class-members": pluginSortClassMembers,
             redos: pluginRedos,
+            compat: pluginCompat,
             tsdoc: pluginTsdoc,
+            filenames: pluginFilenames,
+            regexp: pluginRegexp,
         },
         rules: {
             // TypeScript backend rules
             ...tseslint.configs.recommended.rules,
             ...tseslint.configs.strict.rules,
             ...tseslint.configs.stylistic.rules,
+            ...pluginImport.flatConfigs.typescript.rules,
+            ...pluginPromise.configs["flat/recommended"].rules,
+            ...pluginUnicorn.configs.recommended.rules,
+
+            "unicorn/prefer-global-this": "off", // Not suitable for Electron
+            "unicorn/prevent-abbreviations": "off", // Too many false positives
+            "unicorn/no-null": "off", // Null is common in SQLite and IPC
             // Node.js specific
             // "no-console": "off", // Logging is important for backend - DISABLED FOR NOW
             "prefer-const": "error",
@@ -586,6 +619,8 @@ export default [
                 },
             ],
 
+            "prettier/prettier": ["error", { usePrettierrc: true }],
+
             // Advanced type-checked rules for backend async safety and runtime error prevention
             "@typescript-eslint/no-floating-promises": [
                 "error",
@@ -646,6 +681,14 @@ export default [
                 sourceType: "module",
                 ecmaVersion: "latest",
                 tsconfigRootDir: __dirname,
+                ecmaFeatures: {
+                    jsx: true,
+                },
+                experimentalDecorators: true,
+                JSDocParsingMode: "all",
+                jsxPragma: "React",
+                jsxFragmentName: "React.Fragment",
+                warnOnUnsupportedTypeScriptVersion: true,
             },
             globals: {
                 ...globals.browser,
@@ -703,6 +746,14 @@ export default [
                 sourceType: "module",
                 ecmaVersion: "latest",
                 tsconfigRootDir: __dirname,
+                ecmaFeatures: {
+                    jsx: true,
+                },
+                experimentalDecorators: true,
+                JSDocParsingMode: "all",
+                jsxPragma: "React",
+                jsxFragmentName: "React.Fragment",
+                warnOnUnsupportedTypeScriptVersion: true,
             },
             globals: {
                 ...globals.node,

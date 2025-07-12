@@ -49,7 +49,7 @@ describe("SiteCardHeader", () => {
             { isLoading: false, isMonitoring: false },
         ];
 
-        states.forEach(state => {
+        states.forEach((state) => {
             const props = { ...defaultProps, ...state };
             expect(props.isLoading).toBe(state.isLoading);
             expect(props.isMonitoring).toBe(state.isMonitoring);
