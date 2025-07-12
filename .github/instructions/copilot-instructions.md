@@ -1,82 +1,80 @@
-You are a professional software engineer following all modern best practices and standards.
+---
+applyTo: "**"
+---
 
-Always keep in mind the following when making changes:
+# Uptime Watcher – AI Agent Instructions
 
-1. Review all logic and data paths
-2. Ensure proper state management
-3. Use project standards for coding
-4. Ensure proper integration with front and backend
-5. Double check all changes for consistency
-6. Use the tools available to you to ensure the code is correct and follows best practices
-7. Always test your changes thoroughly before finalizing
-8. Always aim for 100% test coverage.
-9. Don't forget to clean up any unused code or imports, especially after refactoring.
-10. Use as many requests as you want, and use as much time as you want. KEEP GOING UNTIL YOU FINISH ALL ASSIGNED TASKS!!!
-11. Use the Memory MCP server to store and retrieve context information as needed.
-
-# Uptime Watcher - AI Context Instructions
-
-### Technology Stack
+## Architecture Overview
 
 - **Frontend**: React + TypeScript + Zustand + TailwindCSS + Vite
-- **Backend**: Electron main process + Node.js + SQLite
-- **Communication**: IPC with contextBridge security
-- **Testing**: Vitest with extensive frontend and backend test suites
-- **State Management**: Zustand for domain-specific stores
-- **Styling**: TailwindCSS for utility-first design
+- **Backend**: Electron main process (Node.js) + SQLite
+- **IPC**: All backend/renderer communication via secure contextBridge (`window.electronAPI`)
+- **State Management**: Domain-specific Zustand stores; no global state
+- **Testing**: Vitest for both frontend and backend; see `electron/test/` and `src/test/`
+- **Database**: All operations use repository pattern and are wrapped in transactions via `executeTransaction()`
+- **Event System**: TypedEventBus with middleware, correlation IDs, and domain event contracts
 
-## Database Schema
+## Key Patterns & Conventions
 
-```sql
-sites (identifier PK, name, created_at, updated_at)
-monitors (id PK, site_identifier FK, type, url, port, interval, enabled)
-status_history (id PK, monitor_id FK, status, response_time, checked_at)
-settings (key PK, value, updated_at)
-```
+- **Repository Pattern**: All DB access via repositories (`electron/services/database/*Repository.ts`). Mutation methods are always async and use transactions.
+- **Service Layer**: Managers (e.g., `SiteManager`, `MonitorManager`, `DatabaseManager`) orchestrate business logic and event flows.
+- **Event-Driven Updates**: UI and backend communicate via events; status updates, site/monitor changes, and settings propagate through event bus and IPC.
+- **Error Handling**: Use `withErrorHandling` and centralized logger. Always re-throw errors after logging.
+- **Testing**: All new logic must be covered by Vitest tests. Use mocks for Electron APIs and database.
+- **Frontend State**: All UI updates flow through React state and Zustand stores. Never mutate state directly; always use store actions.
+- **IPC Handlers**: Add new IPC handlers in `electron/services/ipc/IpcService.ts` and expose them via preload (`electron/preload.ts`).
+- **Type Safety**: Strict TypeScript config; update interfaces in `electron/utils/database/interfaces.ts` and `src/types.ts` for new data structures.
+- **Barrel Exports**: Use barrel files (`index.ts`) for service and utility exports to maintain clean import paths.
+- **Testing Setup**: See `electron/test/setup.ts` for global mocks and test environment config.
 
-## Security & Performance
+## Developer Workflows
 
-- **Security**: Context isolation, input validation, no direct DOM manipulation
-- **Performance**: Incremental updates, domain-separated stores, intelligent caching
-- **Error Handling**: Centralized with graceful degradation
-- **Testing**: High coverage across frontend and backend with comprehensive test suites
+- **Build Frontend**: `npm run build` (Vite)
+- **Build Electron**: `npm run electron` or `npm run electron-dev` (see `README.md`)
+- **Run Tests**: `npm run test` (frontend), `npm run test:electron` (backend)
+- **Debugging**: Use VS Code launch configs and Electron dev tools. Debug IPC via event logs and correlation IDs.
+- **Database Migrations**: Schema is managed in `electron/services/database/utils/databaseSchema.ts`. All changes must be reflected in repository interfaces and tests.
+- **Event Contracts**: Define new event types in `electron/events/eventTypes.ts`. Use `TypedEventBus` for type-safe event handling.
+- **Testing**: Do NOT change source code to fit invalid tests. Only change source to fix bugs you can CONFIRM. Never implement behavior just to satisfy a test. Use `electron/test/` for backend tests and `src/test/` for frontend tests.
 
-## Key App Behaviors
+## Integration Points
 
-1. **No Direct DOM**: All UI updates flow through React state
-2. **Type Safety**: Full TypeScript with strict configuration
-3. **Real-Time**: Event-driven status updates with optimized re-renders
-4. **Modular**: Clean domain separation, dependency injection ready
-5. **Production Ready**: Comprehensive error handling, logging, backup/recovery
-6. **IPC Communication**: All backend interactions via `window.electronAPI` for security and maintainability
-7. **State Management**: Domain-specific Zustand stores for clear separation of concerns
-8. **Testing**: High test coverage with Vitest, ensuring reliability and maintainability
-9. **Styling**: TailwindCSS for consistent, responsive design
-10. **Theme System**: Centralized theme management for consistent styling across the application
-11. **Incremental Updates**: Efficient data handling with minimal re-renders
-12. **Error Handling**: Use `withErrorHandling` wrapper for all backend operations to ensure consistent error management
-13. **Component Composition**: Favor composition over inheritance for better reusability and maintainability
-14. **Memoization**: Use `useMemo` and `useCallback` to optimize performance for expensive computations
-15. **Side Effects**: Use `useEffect` for side effects, never in render methods
-16. **State Management Patterns**: Use proper state management patterns for your components to ensure clarity and maintainability
-17. **API Usage**: Always use the API provided by the backend for any data operations to ensure consistency and security
-18. **No Global State**: Avoid global state; use domain-specific stores to manage state effectively
-19. **Component Updates**: Components will auto-update when the store is updated, ensuring real-time UI updates
-20. **Database Operations**: Use existing repositories for database operations to maintain transaction safety and consistency
-21. **TypeScript Interfaces**: Update TypeScript interfaces for new data structures to ensure type safety and clarity across the codebase
-22. **Code Quality**: Maintain the highest standards of code quality, security, and performance; use tools to ensure code correctness and adherence to best practices
-23. **Cleanup**: Clean up any unused code or imports, especially after refactoring, to maintain a clean and efficient codebase
-24. **Incremental Development**: Break down tasks into smaller, manageable pieces; focus on completing each task thoroughly before moving on to the next
-25. **TSDoc Comments**: Use TSDoc comments for all public APIs and complex logic to ensure clarity and maintainability (Use the Base TSDoc style)
+- **Electron/React**: All backend calls go through `window.electronAPI` (see `electron/preload.ts`).
+- **Event Bus**: TypedEventBus is the backbone for cross-component communication. Middleware can be added for logging, metrics, or error handling.
+- **Operational Hooks**: Backend uses operational hooks (`useTransaction`, `useRetry`, `useValidation`) for standardized transaction, retry, and validation logic.
+- **Testing**: All service, manager, and IPC logic must be covered by integration tests in `electron/test/`.
 
-## When Making Changes
+## Examples
 
-1. **Frontend**: Update store → component will auto-update
-2. **Backend**: Add IPC handler → update preload → update frontend
-3. **Database**: Use existing repositories, maintain transaction safety
-4. **Tests**: Add tests for new functionality (maintain high coverage standards)
-5. **Types**: Update TypeScript interfaces for new data structures
-6. **Code Quality**: Use tools to ensure code correctness and adherence to best practices
+- **Repository Transaction**:
+  ```typescript
+  await this.databaseService.executeTransaction(async (db) => {
+    // ...mutation logic
+  });
+  ```
+- **Event Emission**:
+  ```typescript
+  await this.eventEmitter.emitTyped("site:added", { identifier, ... });
+  ```
+- **IPC Handler**:
+  ```typescript
+  ipcMain.handle("add-site", async (_, data) => { /* ... */ });
+  ```
+- **Frontend Store Update**:
+  ```typescript
+  useSitesState.getState().addSite(newSite);
+  ```
 
-Keep going until you finish all assigned tasks, and don't forget to clean up any unused code or imports, especially after refactoring.
-Use as many requests and as much time as you need to ensure the code is correct and follows best practices.
+## References
+
+- `README.md` – Build/test/dev commands, architecture summary
+- `electron/services/` – Service layer and business logic
+- `electron/events/TypedEventBus.ts` – Event bus implementation
+- `electron/preload.ts` – IPC exposure to renderer
+- `electron/test/` – Backend test suite and mocks
+- `src/stores/` – Zustand store implementations
+- `src/types.ts` – Frontend types
+- `electron/utils/database/interfaces.ts` – Backend types/interfaces
+
+---
+**If any section is unclear or missing, please provide feedback so instructions can be improved.**

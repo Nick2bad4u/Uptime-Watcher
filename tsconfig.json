@@ -28,6 +28,7 @@
         "esModuleInterop": true,
         "allowJs": true,
         "allowSyntheticDefaultImports": true,
+        "downlevelIteration": true,
         "strict": true,
         "alwaysStrict": true,
         "strictNullChecks": true,

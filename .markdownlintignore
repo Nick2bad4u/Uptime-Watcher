@@ -8,9 +8,10 @@ release/
 dist-electron/
 docs/Validator.md
 .markdownlintignore
-.github/prompts/*
+.github/prompts/*.md
 LICENSE
-.github/instructions/*
+docs/
+.github/instructions/*.md
 docs/guides/Documentation-Contribution.md
 deps
 docs/README.md
