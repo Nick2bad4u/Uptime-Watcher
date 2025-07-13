@@ -1,6 +1,37 @@
 /**
- * Utility function for checking individual monitors.
- * This is extracted from UptimeMonitor to improve modularity and maintainability.
+ * Monitor status checking utilities for individual monitor health verification.
+ *
+ * @remarks
+ * Provides comprehensive monitor checking capabilities with automatic status updates,
+ * history tracking, and event emission. Extracted from UptimeMonitor for improved
+ * modularity and maintainability with full transaction safety and error handling.
+ *
+ * Key features:
+ * - **Individual Monitor Checks**: Perform health checks on specific monitors
+ * - **Automatic Status Updates**: Update monitor status in database with transactions
+ * - **History Tracking**: Maintain detailed history with configurable limits
+ * - **Event Emission**: Emit typed events for status changes and notifications
+ * - **Error Resilience**: Comprehensive error handling with proper logging
+ * - **Cache Synchronization**: Keep in-memory cache synchronized with database
+ *
+ * @example
+ * ```typescript
+ * const config: MonitorCheckConfig = {
+ *   repositories: { monitor, history, site },
+ *   databaseService,
+ *   sites: siteCache,
+ *   eventEmitter,
+ *   logger,
+ *   historyLimit: 500
+ * };
+ *
+ * const result = await checkMonitor(config, site, "monitor_123");
+ * if (result) {
+ *   console.log(`Monitor ${result.monitorId} is ${result.status}`);
+ * }
+ * ```
+ *
+ * @packageDocumentation
  */
 
 import { UptimeEvents, TypedEventBus } from "../../events/index";
@@ -15,6 +46,13 @@ import { Monitor, Site, StatusHistory, StatusUpdate } from "../../types";
 import { ISiteCache } from "../database/interfaces";
 import { withDatabaseOperation } from "../operationalHooks";
 
+/**
+ * Logger interface for monitor checking operations.
+ *
+ * @remarks
+ * Standardized logging interface used throughout monitor checking utilities
+ * to ensure consistent logging patterns and error reporting.
+ */
 interface Logger {
     debug: (message: string, ...args: unknown[]) => void;
     error: (message: string, error?: unknown, ...args: unknown[]) => void;
@@ -24,17 +62,29 @@ interface Logger {
 
 /**
  * Configuration object for monitor checking functions.
+ *
+ * @remarks
+ * Provides all necessary dependencies for monitor checking operations,
+ * including repository access, database services, cache management,
+ * and event emission capabilities. Designed for dependency injection
+ * and comprehensive testing support.
  */
 export interface MonitorCheckConfig {
+    /** Repository services for database operations */
     repositories: {
         history: HistoryRepository;
         monitor: MonitorRepository;
         site: SiteRepository;
     };
+    /** Database service for transaction management */
     databaseService: DatabaseService;
+    /** In-memory site cache for performance optimization */
     sites: ISiteCache;
-    eventEmitter: TypedEventBus<UptimeEvents>; // Typed event bus for high-level events
+    /** Typed event bus for high-level event communication */
+    eventEmitter: TypedEventBus<UptimeEvents>;
+    /** Logger instance for operation tracking */
     logger: Logger;
+    /** Maximum number of history entries to retain per monitor */
     historyLimit: number;
 }
 
@@ -44,7 +94,29 @@ export interface MonitorCheckConfig {
  * @param config - Configuration object with required dependencies
  * @param site - Site containing the monitor to check
  * @param monitorId - ID of the monitor to check
- * @returns Promise\<StatusUpdate | undefined\> - Status update result or undefined if error
+ * @returns Promise resolving to status update result or undefined if error occurs
+ *
+ * @remarks
+ * Performs a comprehensive health check on the specified monitor, including:
+ * - Monitor validation and existence verification
+ * - Health check execution using appropriate monitor service
+ * - Status comparison and change detection
+ * - Database updates with transaction safety
+ * - History tracking with automatic pruning
+ * - Event emission for status changes and notifications
+ * - Cache synchronization for performance
+ *
+ * The function is designed to be resilient to errors and will return undefined
+ * if critical failures occur, while logging appropriate error messages for debugging.
+ *
+ * @example
+ * ```typescript
+ * const result = await checkMonitor(config, site, "monitor_123");
+ * if (result) {
+ *   console.log(`Monitor status: ${result.status}`);
+ *   console.log(`Response time: ${result.responseTime}ms`);
+ * }
+ * ```
  */
 export async function checkMonitor(
     config: MonitorCheckConfig,

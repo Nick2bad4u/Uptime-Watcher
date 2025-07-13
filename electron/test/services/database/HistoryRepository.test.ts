@@ -78,7 +78,7 @@ describe("HistoryRepository", () => {
 
             mockDatabase.all.mockReturnValue(mockRows);
 
-            const result = historyRepository.findByMonitorId("monitor-1");
+            const result = await historyRepository.findByMonitorId("monitor-1");
 
             expect(mockDatabase.all).toHaveBeenCalledWith(
                 "SELECT timestamp, status, responseTime, details FROM history WHERE monitor_id = ? ORDER BY timestamp DESC",

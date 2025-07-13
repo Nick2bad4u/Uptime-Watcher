@@ -1,6 +1,45 @@
 /**
- * Manages site operations including cache management and CRUD operations.
- * Responsible for site data persistence and in-memory cache synchronization.
+ * Site management coordinator for CRUD operations and cache synchronization.
+ *
+ * @remarks
+ * The SiteManager serves as the primary interface for all site-related operations,
+ * providing a unified API for site creation, updates, deletion, and monitoring
+ * coordination. It maintains an in-memory cache for performance while ensuring
+ * data consistency with the underlying database through transactional operations.
+ *
+ * Key responsibilities:
+ * - **Site CRUD Operations**: Create, read, update, and delete site configurations
+ * - **Cache Management**: Maintain synchronized in-memory cache for performance
+ * - **Monitor Integration**: Coordinate with MonitorManager for monitoring operations
+ * - **Event Communication**: Emit typed events for frontend and internal coordination
+ * - **Data Persistence**: Ensure atomic database operations with transaction safety
+ * - **Error Handling**: Provide comprehensive error handling and recovery mechanisms
+ *
+ * The manager uses dependency injection for testability and follows the repository
+ * pattern for data access. All operations are designed to be atomic and maintain
+ * data consistency across cache and database layers.
+ *
+ * @example
+ * ```typescript
+ * const siteManager = new SiteManager({
+ *   siteRepository,
+ *   monitorRepository,
+ *   historyRepository,
+ *   databaseService,
+ *   eventEmitter,
+ *   monitoringOperations
+ * });
+ *
+ * // Add a new site
+ * const site = await siteManager.addSite({
+ *   identifier: "site_123",
+ *   name: "My Website",
+ *   monitors: [...],
+ *   monitoring: true
+ * });
+ * ```
+ *
+ * @packageDocumentation
  */
 
 import { UptimeEvents, TypedEventBus } from "../events/index";
@@ -18,32 +57,68 @@ import { configurationManager } from "../managers/index";
 
 /**
  * Combined events interface for SiteManager.
+ *
+ * @remarks
+ * Supports all uptime monitoring events for comprehensive event communication
+ * between the SiteManager and other system components.
  */
 type SiteManagerEvents = UptimeEvents;
 
 /**
- * Interface for monitoring operations.
+ * Interface for monitoring operations integration.
+ *
+ * @remarks
+ * Defines the contract for monitoring operations that can be performed
+ * in coordination with site management. This allows loose coupling between
+ * the SiteManager and MonitorManager while enabling coordinated operations.
  */
 export interface IMonitoringOperations {
+    /** Start monitoring for a specific site and monitor */
     startMonitoringForSite: (identifier: string, monitorId: string) => Promise<boolean>;
+    /** Stop monitoring for a specific site and monitor */
     stopMonitoringForSite: (identifier: string, monitorId: string) => Promise<boolean>;
+    /** Update the global history limit setting */
     setHistoryLimit: (limit: number) => Promise<void>;
+    /** Set up monitoring for newly created monitors */
     setupNewMonitors: (site: Site, newMonitorIds: string[]) => Promise<void>;
 }
 
+/**
+ * Dependency injection configuration for SiteManager.
+ *
+ * @remarks
+ * Provides all required dependencies for SiteManager operation, including
+ * repository services, database access, event communication, and optional
+ * monitoring integration for coordinated operations.
+ */
 export interface SiteManagerDependencies {
+    /** Site repository for database operations */
     siteRepository: SiteRepository;
+    /** Monitor repository for monitor-related operations */
     monitorRepository: MonitorRepository;
+    /** History repository for status history management */
     historyRepository: HistoryRepository;
+    /** Database service for transaction management */
     databaseService: DatabaseService;
+    /** Event emitter for system-wide communication */
     eventEmitter: TypedEventBus<SiteManagerEvents>;
-    // Optional MonitorManager dependency for proper monitoring integration
+    /** Optional MonitorManager dependency for coordinated operations */
     monitoringOperations?: IMonitoringOperations;
 }
 
 /**
  * Manages site operations and maintains in-memory cache.
- * Handles site CRUD operations and cache synchronization.
+ *
+ * @remarks
+ * The SiteManager is the central coordinator for all site-related operations
+ * in the uptime monitoring system. It provides a high-level API that abstracts
+ * the complexity of database operations, cache management, and cross-component
+ * coordination while ensuring data consistency and performance.
+ *
+ * The manager maintains a synchronized in-memory cache of all sites for fast
+ * access patterns while ensuring all mutations go through proper database
+ * transactions. Event emission keeps other system components informed of
+ * site changes and enables reactive UI updates.
  */
 export class SiteManager {
     private readonly siteCache = new SiteCache();
@@ -53,6 +128,17 @@ export class SiteManager {
     private readonly siteRepositoryService: SiteRepositoryService;
     private readonly monitoringOperations: IMonitoringOperations | undefined;
 
+    /**
+     * Create a new SiteManager instance.
+     *
+     * @param dependencies - Required dependencies for site management operations
+     *
+     * @remarks
+     * Initializes the SiteManager with all required dependencies including repositories,
+     * database service, event emitter, and optional monitoring operations. Creates
+     * internal service orchestrators for coordinated operations and sets up the
+     * in-memory cache for performance optimization.
+     */
     constructor(dependencies: SiteManagerDependencies) {
         this.repositories = {
             databaseService: dependencies.databaseService,
@@ -69,14 +155,39 @@ export class SiteManager {
     }
 
     /**
-     * Get all sites from database.
+     * Get all sites from database with full monitor and history data.
+     *
+     * @returns Promise resolving to array of complete site objects
+     *
+     * @remarks
+     * Retrieves all sites from the database including their associated monitors
+     * and status history. This operation bypasses the cache and provides the
+     * most current data directly from the database. Use this method when you
+     * need guaranteed fresh data or during initialization.
+     *
+     * @example
+     * ```typescript
+     * const allSites = await siteManager.getSites();
+     * console.log(`Found ${allSites.length} sites`);
+     * ```
      */
     public async getSites(): Promise<Site[]> {
         return this.siteRepositoryService.getSitesFromDatabase();
     }
 
     /**
-     * Get sites from in-memory cache (faster, for internal use).
+     * Get sites from in-memory cache for fast access.
+     *
+     * @returns The current site cache instance
+     *
+     * @remarks
+     * Returns the in-memory cache containing all sites for high-performance
+     * access patterns. The cache is automatically synchronized with database
+     * changes through event handling. Use this for internal operations and
+     * when performance is critical.
+     *
+     * Internal use only - external components should use getSites() for
+     * guaranteed fresh data or subscribe to cache update events.
      */
     public getSitesFromCache(): Site[] {
         return this.siteCache.getAll();

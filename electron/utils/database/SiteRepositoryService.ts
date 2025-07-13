@@ -1,6 +1,36 @@
 /**
- * Service for site repository operations.
- * Provides a testable, dependency-injected service for site data operations.
+ * Site repository service for data operations and dependency injection.
+ *
+ * @remarks
+ * Provides a testable, dependency-injected service layer for site data operations,
+ * separating business logic from infrastructure concerns. Designed with the repository
+ * pattern and service layer architecture to enable comprehensive testing and
+ * maintainable code organization.
+ *
+ * Key features:
+ * - **Dependency Injection**: Fully configurable with injected repositories and services
+ * - **Separation of Concerns**: Pure data operations separated from side effects
+ * - **Comprehensive Testing**: Designed for easy mocking and unit testing
+ * - **Error Handling**: Standardized error handling with proper logging and types
+ * - **Event Integration**: Coordinated event emission for reactive system behavior
+ * - **Transaction Safety**: All operations use proper database transactions
+ *
+ * The service provides both data operations (SiteRepositoryService) and orchestration
+ * logic (SiteLoadingOrchestrator) to handle complex workflows while maintaining
+ * clean separation between pure functions and side effects.
+ *
+ * @example
+ * ```typescript
+ * const service = new SiteRepositoryService({
+ *   repositories: { site, monitor, history, settings },
+ *   logger,
+ *   eventEmitter
+ * });
+ *
+ * const sites = await service.getSitesFromDatabase();
+ * ```
+ *
+ * @packageDocumentation
  */
 
 import { UptimeEvents, TypedEventBus } from "../../events/index";
@@ -19,7 +49,16 @@ import {
 
 /**
  * Service for handling site repository operations.
- * Separates data operations from side effects for better testability.
+ *
+ * @remarks
+ * Provides pure data operations for site management without side effects,
+ * enabling easy testing and clean separation of concerns. All methods are
+ * designed to be deterministic and focused on data transformation and
+ * retrieval operations.
+ *
+ * The service abstracts repository complexity and provides a clean interface
+ * for higher-level components while maintaining transaction safety and
+ * comprehensive error handling throughout all operations.
  */
 export class SiteRepositoryService {
     private readonly repositories: {
@@ -31,6 +70,16 @@ export class SiteRepositoryService {
     private readonly logger: ILogger;
     private readonly eventEmitter: TypedEventBus<UptimeEvents>;
 
+    /**
+     * Create a new SiteRepositoryService instance.
+     *
+     * @param config - Configuration with required dependencies
+     *
+     * @remarks
+     * Initializes the service with injected dependencies for repositories,
+     * logging, and event communication. All dependencies are required
+     * for proper operation and comprehensive functionality.
+     */
     constructor(config: SiteLoadingConfig) {
         this.repositories = config.repositories;
         this.logger = config.logger;
@@ -39,7 +88,19 @@ export class SiteRepositoryService {
 
     /**
      * Get sites from database with their monitors and history.
-     * Pure data operation without side effects.
+     *
+     * @returns Promise resolving to array of complete site objects
+     *
+     * @throws SiteLoadingError When database operation fails
+     *
+     * @remarks
+     * Performs a complete site loading operation including all associated
+     * monitors and their status history. This is a pure data operation
+     * without side effects, making it ideal for testing and composition.
+     *
+     * The operation builds complete site objects by fetching site metadata,
+     * associated monitors, and historical data in an efficient manner while
+     * maintaining proper error handling throughout the process.
      */
     async getSitesFromDatabase(): Promise<Site[]> {
         try {
