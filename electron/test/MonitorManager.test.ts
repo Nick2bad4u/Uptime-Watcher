@@ -23,15 +23,17 @@ const {
     const mockStartMonitoringForSite = vi.fn(async () => true);
     const mockStopAllMonitoring = vi.fn(async () => false);
     const mockStopMonitoringForSite = vi.fn(async () => true);
-    const mockCheckSiteManually = vi.fn(async (): Promise<StatusUpdate | undefined> => ({
-        site: {
-            identifier: "test-site",
-            name: "Test Site",
-            monitoring: true,
-            monitors: []
-        },
-        previousStatus: "pending"
-    }));
+    const mockCheckSiteManually = vi.fn(
+        async (): Promise<StatusUpdate | undefined> => ({
+            site: {
+                identifier: "test-site",
+                name: "Test Site",
+                monitoring: true,
+                monitors: [],
+            },
+            previousStatus: "pending",
+        })
+    );
     const mockCheckMonitor = vi.fn(async () => ({
         monitorId: "monitor1",
         status: "up" as const,

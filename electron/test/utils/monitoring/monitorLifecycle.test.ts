@@ -82,9 +82,9 @@ const createTestSite = (partial: Partial<Site>): Site => ({
 const createTestConfig = (sites: Site[] = []): MonitoringLifecycleConfig => {
     const sitesCache = {
         getAll: () => sites,
-        get: (key: string) => sites.find(s => s.identifier === key),
+        get: (key: string) => sites.find((s) => s.identifier === key),
         set: vi.fn(),
-        has: (key: string) => sites.some(s => s.identifier === key),
+        has: (key: string) => sites.some((s) => s.identifier === key),
         delete: vi.fn(),
         clear: vi.fn(),
         size: () => sites.length,
