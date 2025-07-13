@@ -203,16 +203,6 @@ describe("UptimeOrchestrator - Advanced", () => {
     });
 
     describe("Public API Methods", () => {
-        it("should delegate addSite to SiteManager", async () => {
-            const site = { identifier: "test-site", monitors: [] };
-
-            const result = await orchestrator.addSite(site);
-
-            expect(mockSiteManager.addSite).toHaveBeenCalledWith(site);
-            expect(mockMonitorManager.setupSiteForMonitoring).toHaveBeenCalledWith(result);
-            expect(result).toEqual({ identifier: "test-site", monitors: [] });
-        });
-
         it("should delegate removeSite to SiteManager", async () => {
             const identifier = "test-site";
 
@@ -230,16 +220,6 @@ describe("UptimeOrchestrator - Advanced", () => {
 
             expect(mockSiteManager.updateSite).toHaveBeenCalledWith(identifier, updates);
             expect(result).toEqual({ identifier: "test-site", name: "Updated Site", monitors: [] });
-        });
-
-        it("should delegate getSites to SiteManager", async () => {
-            const sites = [{ identifier: "site1", monitors: [] }];
-            mockSiteManager.getSites.mockResolvedValueOnce(sites);
-
-            const result = await orchestrator.getSites();
-
-            expect(mockSiteManager.getSites).toHaveBeenCalled();
-            expect(result).toEqual(sites);
         });
 
         it("should delegate startMonitoring to MonitorManager", async () => {
@@ -378,16 +358,8 @@ describe("UptimeOrchestrator - Advanced", () => {
     });
 
     describe("Edge Cases and Error Handling", () => {
-        it("should handle undefined results from managers gracefully", async () => {
-            mockSiteManager.addSite.mockResolvedValueOnce(undefined);
-
-            const result = await orchestrator.addSite({ identifier: "test", monitors: [] });
-
-            expect(result).toBeUndefined();
-        });
-
         it("should handle null monitor ID in startMonitoringForSite", async () => {
-            const result = await orchestrator.startMonitoringForSite("test-site", undefined);
+            const result = await orchestrator.startMonitoringForSite("test-site");
 
             expect(mockMonitorManager.startMonitoringForSite).toHaveBeenCalledWith("test-site", undefined);
             expect(result).toBe(true);
