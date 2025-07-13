@@ -125,7 +125,7 @@ describe("MonitorRepository", () => {
         });
     });
 
-    describe("findById", () => {
+    describe("findByIdentifier", () => {
         it("should return a monitor by ID", async () => {
             const mockRow: MonitorRow = {
                 id: 1,
@@ -142,7 +142,7 @@ describe("MonitorRepository", () => {
 
             mockDatabase.get.mockReturnValue(mockRow);
 
-            const result = await monitorRepository.findById("1");
+            const result = await monitorRepository.findByIdentifier("1");
 
             expect(mockDatabase.get).toHaveBeenCalledWith("SELECT * FROM monitors WHERE id = ?", ["1"]);
             expect(result).toEqual({
@@ -163,7 +163,7 @@ describe("MonitorRepository", () => {
         it("should return undefined when monitor not found", async () => {
             mockDatabase.get.mockReturnValue(undefined);
 
-            const result = await monitorRepository.findById("999");
+            const result = await monitorRepository.findByIdentifier("999");
 
             expect(result).toBeUndefined();
         });
@@ -318,7 +318,7 @@ describe("MonitorRepository", () => {
 
             mockDatabase.get.mockReturnValue(row);
 
-            const result = await monitorRepository.findById("monitor-1");
+            const result = await monitorRepository.findByIdentifier("monitor-1");
 
             expect(result).toEqual({
                 id: "123", // Converted to string
@@ -459,7 +459,7 @@ describe("MonitorRepository", () => {
 
             mockDatabase.get.mockReturnValue(row);
 
-            const result = await monitorRepository.findById("monitor-1");
+            const result = await monitorRepository.findByIdentifier("monitor-1");
 
             expect(result?.lastChecked).toEqual(new Date(123));
         });
@@ -781,7 +781,7 @@ describe("MonitorRepository", () => {
 
                 mockDatabase.get.mockReturnValue(row);
 
-                const result = await monitorRepository.findById("monitor-1");
+                const result = await monitorRepository.findByIdentifier("monitor-1");
 
                 expect(result?.host).toBeUndefined();
             });
@@ -797,7 +797,7 @@ describe("MonitorRepository", () => {
 
                 mockDatabase.get.mockReturnValue(row);
 
-                const result = await monitorRepository.findById("monitor-1");
+                const result = await monitorRepository.findByIdentifier("monitor-1");
 
                 expect(result?.status).toBe("down");
             });
@@ -813,7 +813,7 @@ describe("MonitorRepository", () => {
 
                 mockDatabase.get.mockReturnValue(row);
 
-                const result = await monitorRepository.findById("monitor-1");
+                const result = await monitorRepository.findByIdentifier("monitor-1");
 
                 expect(result?.type).toBe("http");
             });
@@ -829,7 +829,7 @@ describe("MonitorRepository", () => {
 
                 mockDatabase.get.mockReturnValue(row);
 
-                const result = await monitorRepository.findById("monitor-1");
+                const result = await monitorRepository.findByIdentifier("monitor-1");
 
                 expect(result?.url).toBeUndefined();
             });
@@ -898,7 +898,7 @@ describe("MonitorRepository", () => {
 
                 mockDatabase.get.mockReturnValue(row);
 
-                const result = await monitorRepository.findById("monitor-1");
+                const result = await monitorRepository.findByIdentifier("monitor-1");
 
                 expect(result?.port).toBeUndefined();
                 expect(result?.checkInterval).toBeUndefined();
@@ -919,7 +919,7 @@ describe("MonitorRepository", () => {
 
                 mockDatabase.get.mockReturnValue(row);
 
-                const result = await monitorRepository.findById("monitor-1");
+                const result = await monitorRepository.findByIdentifier("monitor-1");
 
                 expect(result?.lastChecked).toBeUndefined();
             });

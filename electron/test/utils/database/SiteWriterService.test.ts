@@ -10,9 +10,7 @@ import {
     SiteWritingOrchestrator,
     SiteCache,
     SiteNotFoundError,
-    ISiteRepository,
-    IMonitorRepository,
-    ILogger,
+    Logger,
     MonitoringConfig,
 } from "../../../utils/database";
 
@@ -23,9 +21,9 @@ vi.mock("../../../electronUtils", () => ({
 
 describe("SiteWriterService", () => {
     let siteWriterService: SiteWriterService;
-    let mockSiteRepository: ISiteRepository;
-    let mockMonitorRepository: IMonitorRepository;
-    let mockLogger: ILogger;
+    let mockSiteRepository: any;
+    let mockMonitorRepository: any;
+    let mockLogger: Logger;
     let mockDatabaseService: any;
 
     beforeEach(() => {
@@ -58,7 +56,7 @@ describe("SiteWriterService", () => {
             deleteAll: vi.fn(),
             deleteBySiteIdentifier: vi.fn(),
             deleteBySiteIdentifierInternal: vi.fn(),
-            deleteMonitorInternal: vi.fn(),
+            deleteInternal: vi.fn(),
             bulkCreate: vi.fn(),
         };
 
@@ -562,7 +560,7 @@ describe("SiteWriterService", () => {
 
             // Check that the repository methods were called correctly
             expect(mockMonitorRepository.findBySiteIdentifier).toHaveBeenCalledWith("site1");
-            expect(mockMonitorRepository.deleteMonitorInternal).toHaveBeenCalled();
+            expect(mockMonitorRepository.deleteInternal).toHaveBeenCalled();
             expect(mockMonitorRepository.updateInternal).toHaveBeenCalled();
             expect(mockMonitorRepository.createInternal).toHaveBeenCalled();
             // Don't assert the specific ID since we're not actually mutating it anymore

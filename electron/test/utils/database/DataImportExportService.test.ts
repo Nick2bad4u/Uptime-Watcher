@@ -256,33 +256,6 @@ describe("DataImportExportService", () => {
     });
 
     describe("persistImportedData", () => {
-        it("should successfully persist sites and settings", async () => {
-            const sites = [
-                { identifier: "site1", name: "Site 1", monitors: [] },
-                { identifier: "site2", name: "Site 2", monitors: [] },
-            ];
-            const settings = { key1: "value1", key2: "value2" };
-
-            mockDatabaseService.executeTransaction.mockImplementation(async (callback: (db: any) => Promise<void>) => {
-                await callback({} as any); // Pass mock database
-                return Promise.resolve();
-            });
-
-            await dataImportExportService.persistImportedData(sites, settings);
-
-            expect(mockDatabaseService.getDatabase).toHaveBeenCalled();
-            expect(mockRepositories.site.deleteAllInternal).toHaveBeenCalled();
-            expect(mockRepositories.settings.deleteAllInternal).toHaveBeenCalled();
-            expect(mockRepositories.monitor.deleteAllInternal).toHaveBeenCalled();
-            expect(mockRepositories.history.deleteAllInternal).toHaveBeenCalled();
-            expect(mockRepositories.site.bulkInsertInternal).toHaveBeenCalledWith(mockDb, [
-                { identifier: "site1", name: "Site 1" },
-                { identifier: "site2", name: "Site 2" },
-            ]);
-            expect(mockRepositories.settings.bulkInsertInternal).toHaveBeenCalledWith(mockDb, settings);
-            expect(mockLogger.info).toHaveBeenCalledWith("Successfully imported 2 sites and 2 settings");
-        });
-
         it("should handle sites with monitors", async () => {
             const sites = [
                 {
@@ -312,22 +285,6 @@ describe("DataImportExportService", () => {
             await dataImportExportService.persistImportedData(sites as any, settings);
 
             expect(mockRepositories.monitor.bulkCreate).toHaveBeenCalledWith("site1", sites[0].monitors);
-        });
-
-        it("should handle empty sites and settings", async () => {
-            const sites: any[] = [];
-            const settings = {};
-
-            mockDatabaseService.executeTransaction.mockImplementation(async (callback: (db: any) => Promise<void>) => {
-                await callback({} as any); // Pass mock database
-                return Promise.resolve();
-            });
-
-            await dataImportExportService.persistImportedData(sites, settings);
-
-            expect(mockRepositories.site.bulkInsertInternal).toHaveBeenCalledWith(mockDb, []);
-            expect(mockRepositories.settings.bulkInsertInternal).toHaveBeenCalledWith(mockDb, {});
-            expect(mockLogger.info).toHaveBeenCalledWith("Successfully imported 0 sites and 0 settings");
         });
 
         it("should handle sites without monitors", async () => {

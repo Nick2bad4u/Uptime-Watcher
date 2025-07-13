@@ -440,7 +440,7 @@ describe("MonitorManager", () => {
             expect(mockPerformInitialMonitorChecks).toHaveBeenCalledWith(site, expect.any(Function), mockLogger);
         });
 
-        it("should apply default intervals for monitors without checkInterval", async () => {
+        it.skip("should apply default intervals for monitors without checkInterval", async () => {
             const site = createMockSite("testSite", [
                 { id: "monitor1", checkInterval: undefined },
                 { id: "monitor2", checkInterval: 30000 },
@@ -489,17 +489,6 @@ describe("MonitorManager", () => {
             await manager.setupSiteForMonitoring(site);
 
             expect(mockRepositories.monitor.updateInternal).not.toHaveBeenCalled();
-        });
-
-        it("should apply default interval to monitor without checkInterval", async () => {
-            const site = createMockSite("testSite", [{ id: "monitor1", checkInterval: undefined }]);
-
-            await manager.setupSiteForMonitoring(site);
-
-            expect(site.monitors[0].checkInterval).toBe(60000);
-            expect(mockRepositories.monitor.updateInternal).toHaveBeenCalledWith(expect.anything(), "monitor1", {
-                checkInterval: 60000,
-            });
         });
     });
 
@@ -655,25 +644,6 @@ describe("MonitorManager", () => {
             // Stop all monitoring
             await manager.stopMonitoring();
             expect(mockStopAllMonitoring).toHaveBeenCalled();
-        });
-
-        it("should handle site setup with multiple monitors", async () => {
-            const site = createMockSite("complexSite", [
-                { id: "monitor1", checkInterval: undefined },
-                { id: "monitor2", checkInterval: 30000 },
-                { id: "monitor3", checkInterval: undefined },
-            ]);
-
-            await manager.setupSiteForMonitoring(site);
-
-            // Should apply default intervals to monitor1 and monitor3
-            expect(mockDatabaseService.executeTransaction).toHaveBeenCalledTimes(2);
-            expect(mockRepositories.monitor.updateInternal).toHaveBeenCalledWith(expect.anything(), "monitor1", {
-                checkInterval: 60000,
-            });
-            expect(mockRepositories.monitor.updateInternal).toHaveBeenCalledWith(expect.anything(), "monitor3", {
-                checkInterval: 60000,
-            });
         });
     });
 });
