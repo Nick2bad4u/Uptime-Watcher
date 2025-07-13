@@ -1,24 +1,82 @@
 /**
  * Type definitions for all events in the Uptime Watcher application.
- * Provides compile-time type safety for event data.
+ *
+ * @remarks
+ * Provides compile-time type safety for event data across the application.
+ * Events are organized by domain (site, monitor, database, system) and include
+ * comprehensive metadata for debugging and auditing purposes.
+ *
+ * @packageDocumentation
  */
 
 import type { Monitor, Site, StatusUpdate } from "../types";
 
 /**
- * Common type aliases for event data.
+ * Reason for an event occurrence.
+ *
+ * @public
  */
 export type EventReason = "user" | "error" | "shutdown";
+
+/**
+ * Source that triggered an event.
+ *
+ * @public
+ */
 export type EventSource = "user" | "import" | "migration" | "system";
+
+/**
+ * Severity level of an event for prioritization.
+ *
+ * @public
+ */
 export type EventSeverity = "low" | "medium" | "high" | "critical";
+
+/**
+ * Runtime environment where event occurred.
+ *
+ * @public
+ */
 export type EventEnvironment = "development" | "production" | "test";
+
+/**
+ * Category for grouping related events.
+ *
+ * @public
+ */
 export type EventCategory = "database" | "monitoring" | "ui" | "system";
+
+/**
+ * Type of monitoring check that triggered an event.
+ *
+ * @public
+ */
 export type EventCheckType = "scheduled" | "manual";
+
+/**
+ * What triggered a monitoring or system event.
+ *
+ * @public
+ */
 export type EventTriggerType = "manual" | "scheduled" | "shutdown";
 
 /**
- * Main event map for the application.
- * Each key represents an event name and its value represents the expected data type.
+ * Comprehensive event map for the Uptime Watcher application.
+ *
+ * @remarks
+ * Defines all events that can be emitted throughout the application lifecycle,
+ * organized by functional domains. Each event includes strongly typed data
+ * for compile-time safety and comprehensive metadata for debugging.
+ *
+ * Event Categories:
+ * - **Site Events**: Site CRUD operations and lifecycle
+ * - **Monitor Events**: Individual monitor status and operations
+ * - **Database Events**: Data persistence and backup operations
+ * - **System Events**: Application lifecycle and errors
+ * - **Internal Events**: Manager-to-manager communication
+ * - **Performance Events**: Metrics and warnings
+ *
+ * @public
  */
 export interface UptimeEvents extends Record<string, unknown> {
     // Site events
@@ -354,6 +412,21 @@ export interface UptimeEvents extends Record<string, unknown> {
         operation: "get-sites-from-cache-requested";
         timestamp: number;
         sites?: Site[];
+    };
+
+    // State synchronization events
+    "sites:state-synchronized": {
+        action: "update" | "delete" | "bulk-sync";
+        siteIdentifier?: string;
+        timestamp: number;
+        source?: "cache" | "database" | "frontend";
+    };
+
+    "cache:invalidated": {
+        type: "site" | "monitor" | "all";
+        identifier?: string;
+        timestamp: number;
+        reason: "update" | "delete" | "expiry" | "manual";
     };
 }
 

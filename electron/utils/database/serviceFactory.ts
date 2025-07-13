@@ -26,6 +26,9 @@ import { SiteWriterService, SiteWritingOrchestrator } from "./SiteWriterService"
 
 /**
  * Factory function to create a properly configured SiteRepositoryService.
+ *
+ * @param eventEmitter - Event bus for emitting database events
+ * @returns Configured SiteRepositoryService instance
  */
 export function createSiteRepositoryService(eventEmitter: TypedEventBus<UptimeEvents>): SiteRepositoryService {
     const siteRepository = new SiteRepositoryAdapter(new SiteRepository());
@@ -48,6 +51,8 @@ export function createSiteRepositoryService(eventEmitter: TypedEventBus<UptimeEv
 
 /**
  * Factory function to create a properly configured SiteWriterService.
+ *
+ * @returns Configured SiteWriterService instance
  */
 export function createSiteWriterService(): SiteWriterService {
     const siteRepository = new SiteRepositoryAdapter(new SiteRepository());
@@ -67,6 +72,9 @@ export function createSiteWriterService(): SiteWriterService {
 
 /**
  * Factory function to create a properly configured SiteLoadingOrchestrator.
+ *
+ * @param eventEmitter - Event bus for emitting database events
+ * @returns Configured SiteLoadingOrchestrator instance
  */
 export function createSiteLoadingOrchestrator(eventEmitter: TypedEventBus<UptimeEvents>): SiteLoadingOrchestrator {
     const siteRepositoryService = createSiteRepositoryService(eventEmitter);
@@ -75,6 +83,8 @@ export function createSiteLoadingOrchestrator(eventEmitter: TypedEventBus<Uptime
 
 /**
  * Factory function to create a properly configured SiteWritingOrchestrator.
+ *
+ * @returns Configured SiteWritingOrchestrator instance
  */
 export function createSiteWritingOrchestrator(): SiteWritingOrchestrator {
     const siteWriterService = createSiteWriterService();
@@ -83,6 +93,8 @@ export function createSiteWritingOrchestrator(): SiteWritingOrchestrator {
 
 /**
  * Factory function to create a site cache.
+ *
+ * @returns New SiteCache instance
  */
 export function createSiteCache(): SiteCache {
     return new SiteCache();
@@ -90,6 +102,9 @@ export function createSiteCache(): SiteCache {
 
 /**
  * Factory function to create a properly configured DataImportExportService.
+ *
+ * @param eventEmitter - Event bus for emitting import/export events
+ * @returns Configured DataImportExportService instance
  */
 export function createDataImportExportService(eventEmitter: TypedEventBus<UptimeEvents>): DataImportExportService {
     const siteRepository = new SiteRepository();

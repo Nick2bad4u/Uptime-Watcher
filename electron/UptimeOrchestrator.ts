@@ -1,7 +1,40 @@
 /**
- * Core uptime monitoring orchestrator.
- * Coordinates between specialized managers to provide a unified API for uptime monitoring.
- * Uses the new service-based architecture for all database operations.
+ * Core uptime monitoring orchestrator and application coordinator.
+ *
+ * @remarks
+ * The UptimeOrchestrator serves as the central coordination point for all monitoring
+ * operations in the application. It uses a service-based architecture to coordinate
+ * between specialized managers (DatabaseManager, MonitorManager, SiteManager) and
+ * provides a unified API for uptime monitoring functionality.
+ *
+ * Key responsibilities:
+ * - Coordinate operations between specialized managers
+ * - Provide unified API for frontend interactions
+ * - Handle internal event communication between components
+ * - Manage application lifecycle and initialization
+ * - Ensure proper error handling and logging across all operations
+ *
+ * The orchestrator extends TypedEventBus to provide type-safe event communication
+ * between the frontend and backend, as well as internal component coordination.
+ *
+ * @example
+ * ```typescript
+ * const orchestrator = new UptimeOrchestrator();
+ * await orchestrator.initialize();
+ *
+ * // Add a new site
+ * const site = await orchestrator.addSite({
+ *   identifier: "site_123",
+ *   name: "My Website",
+ *   monitors: [...],
+ *   monitoring: true
+ * });
+ *
+ * // Start monitoring
+ * await orchestrator.startMonitoring();
+ * ```
+ *
+ * @packageDocumentation
  */
 
 import type { UptimeEvents } from "./events/eventTypes";
@@ -15,38 +48,78 @@ import { logger } from "./utils";
 
 /**
  * Combined event interface for the orchestrator.
- * Supports both internal manager events and public frontend events.
+ *
+ * @remarks
+ * Supports both internal manager events and public frontend events,
+ * providing a unified event system for the entire application.
  */
 type OrchestratorEvents = UptimeEvents;
 
 /**
- * Type definitions for internal event data
+ * Data structure for internal start monitoring request events.
+ *
+ * @remarks Internal use only for coordinating between managers.
  */
 interface StartMonitoringRequestData {
+    /** Site identifier for the monitoring request */
     identifier: string;
+    /** Specific monitor ID to start (optional) */
     monitorId: string;
 }
 
+/**
+ * Data structure for internal stop monitoring request events.
+ *
+ * @remarks Internal use only for coordinating between managers.
+ */
 interface StopMonitoringRequestData {
+    /** Site identifier for the monitoring request */
     identifier: string;
+    /** Specific monitor ID to stop (optional) */
     monitorId: string;
 }
 
+/**
+ * Data structure for internal monitoring status check events.
+ *
+ * @remarks Internal use only for coordinating between managers.
+ */
 interface IsMonitoringActiveRequestData {
+    /** Site identifier for the status check */
     identifier: string;
+    /** Specific monitor ID to check (optional) */
     monitorId: string;
 }
 
+/**
+ * Data structure for internal monitor restart events.
+ *
+ * @remarks Internal use only for coordinating between managers.
+ */
 interface RestartMonitoringRequestData {
+    /** Site identifier for the restart request */
     identifier: string;
+    /** Monitor configuration for restart */
     monitor: Monitor;
 }
 
+/**
+ * Data structure for internal sites cache update events.
+ *
+ * @remarks Internal use only for coordinating between managers.
+ */
 interface UpdateSitesCacheRequestData {
+    /** Updated sites array for cache synchronization */
     sites: Site[];
 }
 
+/**
+ * Data structure for history limit update events.
+ *
+ * @remarks Internal use only for coordinating between managers.
+ */
 interface HistoryLimitUpdatedData {
+    /** New history retention limit */
     limit: number;
 }
 
@@ -265,6 +338,20 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         this.on("internal:database:update-sites-cache-requested", (data: UpdateSitesCacheRequestData) => {
             void (async () => {
                 await this.siteManager.updateSitesCache(data.sites);
+
+                // CRITICAL: Set up monitoring for each loaded site
+                // This ensures sites loaded from database get proper monitoring setup
+                for (const site of data.sites) {
+                    try {
+                        await this.monitorManager.setupSiteForMonitoring(site);
+                        logger.info(`[UptimeOrchestrator] Set up monitoring for loaded site: ${site.identifier}`);
+                    } catch (error) {
+                        logger.error(
+                            `[UptimeOrchestrator] Failed to setup monitoring for site ${site.identifier}:`,
+                            error
+                        );
+                    }
+                }
             })();
         });
 

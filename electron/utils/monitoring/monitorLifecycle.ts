@@ -6,6 +6,7 @@
 import { UptimeEvents, TypedEventBus } from "../../events/index";
 import { MonitorRepository, DatabaseService, MonitorScheduler } from "../../services/index";
 import { Site } from "../../types";
+import { ISiteCache } from "../database/interfaces";
 import { withDatabaseOperation } from "../operationalHooks";
 
 interface Logger {
@@ -19,7 +20,7 @@ interface Logger {
  * Configuration object for monitoring lifecycle functions.
  */
 export interface MonitoringLifecycleConfig {
-    sites: Map<string, Site>;
+    sites: ISiteCache;
     monitorScheduler: MonitorScheduler;
     monitorRepository: MonitorRepository;
     databaseService: DatabaseService;
@@ -45,10 +46,10 @@ export async function startAllMonitoring(config: MonitoringLifecycleConfig, isMo
         return isMonitoring;
     }
 
-    config.logger.info(`Starting monitoring with ${config.sites.size} sites (per-site intervals)`);
+    config.logger.info(`Starting monitoring with ${config.sites.size()} sites (per-site intervals)`);
 
     // Set all monitors to pending status and enable monitoring
-    for (const [, site] of config.sites) {
+    for (const site of config.sites.getAll()) {
         for (const monitor of site.monitors) {
             if (monitor.id) {
                 try {
@@ -90,7 +91,7 @@ export async function stopAllMonitoring(config: MonitoringLifecycleConfig): Prom
     config.monitorScheduler.stopAll();
 
     // Set all monitors to paused status
-    for (const [, site] of config.sites) {
+    for (const site of config.sites.getAll()) {
         for (const monitor of site.monitors) {
             if (monitor.id && monitor.monitoring !== false) {
                 try {

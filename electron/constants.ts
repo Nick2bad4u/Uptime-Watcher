@@ -1,28 +1,57 @@
 /**
  * Backend constants for the Uptime Watcher application.
- * Contains monitoring defaults, timeouts, and configuration values.
+ *
+ * @remarks
+ * Contains monitoring defaults, timeouts, and configuration values used throughout
+ * the backend process.
+ *
+ * @packageDocumentation
  */
 
-/** Default timeout for HTTP requests (10 seconds) */
+/**
+ * Default timeout for HTTP requests in milliseconds.
+ * @defaultValue 10000
+ */
 export const DEFAULT_REQUEST_TIMEOUT = 10_000;
 
-/** Default check interval for new monitors (5 minutes) */
+/**
+ * Default check interval for new monitors in milliseconds.
+ * @defaultValue 300000
+ */
 export const DEFAULT_CHECK_INTERVAL = 300_000;
 
-/** User agent string for HTTP requests */
+/**
+ * User agent string for HTTP requests.
+ * @defaultValue "Uptime-Watcher/1.0"
+ */
 export const USER_AGENT = "Uptime-Watcher/1.0";
 
-/** Retry backoff configuration */
+/**
+ * Retry backoff configuration for failed operations.
+ * @remarks Uses exponential backoff to avoid overwhelming failing services.
+ */
 export const RETRY_BACKOFF = Object.freeze({
-    INITIAL_DELAY: 500, // Initial delay in milliseconds
-    MAX_DELAY: 5000, // Maximum delay in milliseconds
+    /** Initial delay in milliseconds before first retry */
+    INITIAL_DELAY: 500,
+    /** Maximum delay in milliseconds between retries */
+    MAX_DELAY: 5000,
 });
 
-/** Default history limit (500 records) */
+/**
+ * Default number of history records to retain per monitor.
+ * @defaultValue 500
+ */
 export const DEFAULT_HISTORY_LIMIT = 500;
 
-/** Event name for status updates (kept for backwards compatibility) */
+/**
+ * Event name for status updates.
+ * @defaultValue "status-update"
+ */
 export const STATUS_UPDATE_EVENT = "status-update";
 
-/** Allowed monitor types */
+/**
+ * Supported monitor types in the application.
+ * @deprecated Use MonitorTypeRegistry.getRegisteredMonitorTypes() instead
+ * @readonly
+ */
 export const MONITOR_TYPES = ["http", "port"] as const;

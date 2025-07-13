@@ -12,6 +12,7 @@ import {
     MonitorFactory,
 } from "../../services/index";
 import { Monitor, Site, StatusHistory, StatusUpdate } from "../../types";
+import { ISiteCache } from "../database/interfaces";
 import { withDatabaseOperation } from "../operationalHooks";
 
 interface Logger {
@@ -31,7 +32,7 @@ export interface MonitorCheckConfig {
         site: SiteRepository;
     };
     databaseService: DatabaseService;
-    sites: Map<string, Site>;
+    sites: ISiteCache;
     eventEmitter: TypedEventBus<UptimeEvents>; // Typed event bus for high-level events
     logger: Logger;
     historyLimit: number;

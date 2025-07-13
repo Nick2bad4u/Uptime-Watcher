@@ -1,106 +1,179 @@
 /**
  * Type definitions for Electron main process.
- * Defines core data structures for site monitoring functionality.
+ *
+ * @remarks
+ * Core data structures for site monitoring functionality.
+ *
+ * @packageDocumentation
  */
 
 /**
- * Supported monitor types.
- *
+ * Monitor type identifier.
  * @remarks
- * Defines the types of monitoring supported by the application.
- * - "http": HTTP/HTTPS endpoint monitoring
- * - "port": TCP port monitoring
+ * Semantic type alias for monitor type strings. While technically a string,
+ * this type provides semantic meaning and enables future type refinement.
+ * Use isValidMonitorTypeGuard() for runtime validation.
+ * @public
  */
-export type MonitorType = "http" | "port";
+// SonarQube: Intentional semantic type alias for future extensibility
+// sonar-disable-next-line typescript:S6564
+export type MonitorType = string;
 
 /**
- * Allowed status values for a monitor's current state.
- *
- * @remarks
- * Includes "pending" for monitors that have not yet been checked.
+ * Allowed status values for a monitor's current operational state.
+ * @public
  */
 export type MonitorStatus = "up" | "down" | "pending" | "paused";
 
 /**
- * Allowed status values for a historical check result.
+ * Allowed status values for historical check results.
  *
  * @remarks
- * Does not include "pending"; only actual check outcomes are recorded.
+ * Similar to {@link MonitorStatus} but excludes `"pending"` since historical
+ * records only capture actual check outcomes, not transitional states.
+ *
+ * @public
  */
 export type StatusHistoryStatus = "up" | "down" | "paused";
 
 /**
- * Monitor configuration and state.
- * Represents a single monitoring endpoint (HTTP URL or TCP port).
+ * Monitor configuration and state interface.
  *
  * @remarks
- * The `status` property includes `"pending"` to represent a monitor that has not yet been checked or is awaiting its first result.
- * This is distinct from `StatusHistory.status`, which only records actual check outcomes and does not include `"pending"`.
+ * Represents a single monitoring endpoint that can check either HTTP/HTTPS URLs
+ * or TCP port connectivity. Each monitor maintains its current status, performance
+ * metrics, and historical data.
+ *
+ * @example
+ * ```typescript
+ * // HTTP monitor example
+ * const httpMonitor: Monitor = {
+ *   id: "mon_123",
+ *   type: "http",
+ *   status: "up",
+ *   responseTime: 250,
+ *   monitoring: true,
+ *   url: "https://example.com",
+ *   history: []
+ * };
+ *
+ * // Port monitor example
+ * const portMonitor: Monitor = {
+ *   id: "mon_456",
+ *   type: "port",
+ *   status: "down",
+ *   responseTime: -1,
+ *   monitoring: true,
+ *   host: "example.com",
+ *   port: 80,
+ *   history: []
+ * };
+ * ```
+ *
+ * @public
  */
 export interface Monitor {
-    /** Unique string identifier for this monitor (UUID or DB id as string) */
-    id: string;
-    /** Type of monitor (HTTP or port check) */
-    type: MonitorType;
     /**
-     * Current status of the monitor.
+     * Unique identifier for this monitor.
      *
      * @remarks
-     * Includes `"pending"` to indicate the monitor has not yet been checked.
+     * Usually a UUID or database-generated ID converted to string.
+     * Used for referencing this monitor across the application.
+     */
+    id: string;
+
+    /**
+     * Type of monitoring performed by this monitor.
+     *
+     * @see {@link MonitorType}
+     */
+    type: MonitorType;
+
+    /**
+     * Current operational status of the monitor.
+     *
+     * @remarks
+     * Includes `"pending"` state for monitors that haven't been checked yet.
+     *
+     * @see {@link MonitorStatus}
      */
     status: MonitorStatus;
+
     /**
      * Last recorded response time in milliseconds.
      *
      * @remarks
-     * If the monitor has never been checked, this will be set to -1 as a sentinel value.
-     * Otherwise, it will be the last measured response time in milliseconds.
+     * - For successful checks: actual response time
+     * - For failed checks: may be timeout value or -1
+     * - For unchecked monitors: typically -1 as sentinel value
+     *
+     * @defaultValue -1
      */
     responseTime: number;
+
     /**
-     * Timestamp of last check (Unix timestamp in milliseconds).
+     * Timestamp of the most recent check attempt.
      *
      * @remarks
-     * Will be `undefined` if the monitor has never been checked (i.e., before the first check).
-     * Uses the same format as the `timestamp` property in `StatusHistory` for consistency.
+     * `undefined` for monitors that have never been checked.
+     * Uses JavaScript Date object for consistent time handling.
      */
     lastChecked?: Date;
+
     /**
-     * Historical check results, ordered from oldest to newest.
+     * Array of historical check results.
      *
      * @remarks
-     * The first element is the oldest check; the last element is the most recent.
-     * This array may be empty if no checks have been performed yet.
-     * For performance and storage reasons, implementers should typically enforce a maximum length (e.g., keep only the most recent N results).
+     * Ordered chronologically from oldest to newest. May be empty for
+     * new monitors. Typically limited to a maximum number of entries
+     * for performance and storage efficiency.
+     *
+     * @see {@link StatusHistory}
      */
     history: StatusHistory[];
+
     /**
-     * Whether this specific monitor is actively being monitored.
+     * Whether this monitor is actively being checked.
      *
      * @remarks
-     * Defaults to true for new monitors.
+     * When `false`, the monitor exists but checks are not performed.
+     * Useful for temporarily disabling monitors without deleting them.
+     *
+     * @defaultValue true
      */
     monitoring: boolean;
+
     /**
-     * URL to monitor.
-     * Only set for HTTP monitors; will be undefined for other monitor types.
+     * URL endpoint for HTTP monitors.
      *
      * @remarks
-     * This property must never be set at the same time as `host`. Implementers must ensure that only one of `url` (for HTTP monitors)
-     * or `host` (for port monitors) is set for a given monitor. If both are set, this indicates a configuration error.
+     * Required for `type: "http"` monitors. Must be `undefined` for other types.
+     * Should include protocol (http:// or https://).
+     *
+     * @example "https://api.example.com/health"
      */
     url?: string;
+
     /**
-     * Hostname or IP to monitor.
-     * Only set for port monitors; will be undefined for other monitor types.
+     * Hostname or IP address for port monitors.
      *
      * @remarks
-     * This property must never be set at the same time as `url`. Implementers must ensure that only one of `host` (for port monitors)
-     * or `url` (for HTTP monitors) is set for a given monitor. If both are set, this indicates a configuration error.
-     * This exclusivity is enforced to prevent ambiguous configuration and ensure type safety.
+     * Required for `type: "port"` monitors. Must be `undefined` for other types.
+     * Can be domain name, IPv4, or IPv6 address.
+     *
+     * @example "example.com" | "192.168.1.1" | "::1"
      */
     host?: string;
-    /** Port number for port monitors */
+
+    /**
+     * Port number for port monitors.
+     *
+     * @remarks
+     * Required for `type: "port"` monitors. Must be `undefined` for other types.
+     * Valid range: 1-65535.
+     *
+     * @example 80 | 443 | 3000
+     */
     port?: number;
     /**
      * Check interval in milliseconds (per-monitor override).

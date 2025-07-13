@@ -6,6 +6,7 @@
 import { UptimeEvents, TypedEventBus } from "../events/index";
 import { SiteRepository, MonitorRepository, HistoryRepository, DatabaseService } from "../services/index";
 import { Site } from "../types";
+import { ISiteCache, SiteCache } from "../utils/database/interfaces";
 import {
     SiteWritingOrchestrator,
     createSiteWritingOrchestrator,
@@ -45,7 +46,7 @@ export interface SiteManagerDependencies {
  * Handles site CRUD operations and cache synchronization.
  */
 export class SiteManager {
-    private readonly sites = new Map<string, Site>();
+    private readonly siteCache = new SiteCache();
     private readonly repositories: Omit<SiteManagerDependencies, "eventEmitter" | "monitoringOperations">;
     private readonly eventEmitter: TypedEventBus<SiteManagerEvents>;
     private readonly siteWritingOrchestrator: SiteWritingOrchestrator;
@@ -78,14 +79,14 @@ export class SiteManager {
      * Get sites from in-memory cache (faster, for internal use).
      */
     public getSitesFromCache(): Site[] {
-        return [...this.sites.values()];
+        return this.siteCache.getAll();
     }
 
     /**
      * Get the in-memory sites cache (for internal use by other managers).
      */
-    public getSitesCache(): Map<string, Site> {
-        return this.sites;
+    public getSitesCache(): ISiteCache {
+        return this.siteCache;
     }
 
     /**
@@ -99,7 +100,7 @@ export class SiteManager {
         const site = await this.siteWritingOrchestrator.createSite(siteData);
 
         // Add to in-memory cache
-        this.sites.set(site.identifier, site);
+        this.siteCache.set(site.identifier, site);
 
         // Emit typed site added event
         await this.eventEmitter.emitTyped("site:added", {
@@ -124,31 +125,14 @@ export class SiteManager {
     }
 
     /**
-     * Create adapter for ISiteCache interface from internal Map.
-     */
-    private createSiteCacheAdapter() {
-        return {
-            clear: () => this.sites.clear(),
-            delete: (id: string) => this.sites.delete(id),
-            entries: () => this.sites.entries(),
-            get: (id: string) => this.sites.get(id),
-            set: (id: string, site: Site) => {
-                this.sites.set(id, site);
-            },
-            size: () => this.sites.size,
-        };
-    }
-
-    /**
      * Remove a site from the database and cache.
      */
     public async removeSite(identifier: string): Promise<boolean> {
-        const siteCache = this.createSiteCacheAdapter();
-        const result = await this.siteWritingOrchestrator.deleteSite(siteCache, identifier);
+        const result = await this.siteWritingOrchestrator.deleteSite(this.siteCache, identifier);
 
         if (result) {
             // Get site name before removal for event (already removed from cache by service)
-            const removedSite = this.sites.get(identifier);
+            const removedSite = this.siteCache.get(identifier);
 
             // Emit typed site removed event
             await this.eventEmitter.emitTyped("site:removed", {
@@ -205,20 +189,17 @@ export class SiteManager {
      */
     public async updateSite(identifier: string, updates: Partial<Site>): Promise<Site> {
         // Get the current site before updating for event data
-        const previousSite = this.sites.get(identifier);
+        const previousSite = this.siteCache.get(identifier);
         if (!previousSite) {
             throw new Error(`Site with identifier ${identifier} not found`);
         }
-
-        // Create site cache adapter
-        const siteCache = this.createSiteCacheAdapter();
 
         // Create full monitoring configuration
         const monitoringConfig = this.createMonitoringConfig();
 
         // Use the service with proper monitoring integration
         const updatedSite = await this.siteWritingOrchestrator.updateSiteWithMonitoring(
-            siteCache,
+            this.siteCache,
             identifier,
             updates,
             monitoringConfig
@@ -230,7 +211,7 @@ export class SiteManager {
         await this.updateSitesCache(freshSites);
 
         // Get the refreshed site for the event
-        const refreshedSite = this.sites.get(identifier) ?? updatedSite;
+        const refreshedSite = this.siteCache.get(identifier) ?? updatedSite;
 
         // Emit typed site updated event
         await this.eventEmitter.emitTyped("site:updated", {
@@ -247,9 +228,9 @@ export class SiteManager {
      * Update the sites cache with new data.
      */
     public async updateSitesCache(sites: Site[]): Promise<void> {
-        this.sites.clear();
+        this.siteCache.clear();
         for (const site of sites) {
-            this.sites.set(site.identifier, site);
+            this.siteCache.set(site.identifier, site);
         }
 
         // Emit cache updated event
@@ -264,7 +245,7 @@ export class SiteManager {
      * Get a specific site from cache with smart background loading.
      */
     public getSiteFromCache(identifier: string): Site | undefined {
-        const site = this.sites.get(identifier);
+        const site = this.siteCache.get(identifier);
 
         if (!site) {
             // Emit cache miss event
@@ -299,7 +280,7 @@ export class SiteManager {
             const site = sites.find((s) => s.identifier === identifier);
 
             if (site) {
-                this.sites.set(identifier, site);
+                this.siteCache.set(identifier, site);
 
                 await this.eventEmitter.emitTyped("site:cache-updated", {
                     identifier,
@@ -333,7 +314,7 @@ export class SiteManager {
                 await this.updateSitesCache(allSites);
 
                 // Find the updated site for the event
-                const updatedSite = this.sites.get(siteIdentifier);
+                const updatedSite = this.siteCache.get(siteIdentifier);
                 if (updatedSite) {
                     // Emit internal site updated event
                     await this.eventEmitter.emitTyped("internal:site:updated", {

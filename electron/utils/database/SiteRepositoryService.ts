@@ -194,12 +194,12 @@ export class SiteLoadingOrchestrator {
             // Apply settings
             await this.siteRepositoryService.applyHistoryLimitSetting(monitoringConfig);
 
-            // Start monitoring
-            await this.siteRepositoryService.startMonitoringForSites(siteCache, monitoringConfig);
+            // Note: Auto-start monitoring is now handled by MonitorManager.setupSiteForMonitoring()
+            // No need to explicitly start monitoring here as it's handled during site setup
 
             const sitesLoaded = siteCache.size();
             return {
-                message: `Successfully loaded ${sitesLoaded} sites and started monitoring`,
+                message: `Successfully loaded ${sitesLoaded} sites`,
                 sitesLoaded,
                 success: true,
             };

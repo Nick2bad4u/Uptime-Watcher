@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition -- will be adding multiple monitor types soon */
-
 /**
  * Analytics tab component providing comprehensive monitoring statistics and visualizations.
  * Displays advanced metrics, charts, and performance analysis for site monitoring.

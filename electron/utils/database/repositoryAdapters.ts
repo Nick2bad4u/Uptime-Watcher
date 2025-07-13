@@ -190,8 +190,7 @@ export class SettingsRepositoryAdapter implements ISettingsRepository {
     }
 
     async get(key: string): Promise<string | undefined> {
-        const result = this.repository.get(key);
-        return result ?? undefined;
+        return this.repository.get(key);
     }
 
     async set(key: string, value: string): Promise<void> {

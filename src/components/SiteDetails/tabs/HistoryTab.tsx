@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition -- will be adding multiple monitor types soon */
-
 /**
  * History tab component for displaying monitor check history.
  * Provide    // Dropdown options: 25, 50, 100, All (clamped to backendLimit and available history)

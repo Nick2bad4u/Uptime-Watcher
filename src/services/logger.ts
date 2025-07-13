@@ -1,7 +1,11 @@
 /**
- * Centralized logging service using electron-log
- * Provides consistent logging across main and renderer processes.
- * Example: logger.site.statusChange("example.com", "up", "down") // oldStatus -\> newStatus
+ * Centralized logging service using electron-log for consistent logging across processes.
+ *
+ * @remarks
+ * Provides structured logging functionality organized by functional domains
+ * (app, site, monitor, store) for contextual logging that's easy to filter.
+ *
+ * @packageDocumentation
  */
 
 import log from "electron-log/renderer";

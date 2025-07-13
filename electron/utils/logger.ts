@@ -6,10 +6,8 @@
 import log from "electron-log/main";
 
 /**
- * Centralized logger utility for the backend
-/**
- * Centralized logger utility for the backend
- * Provides consistent logging across all backend services
+ * Centralized logger utility for the backend.
+ * Provides consistent logging across all backend services.
  */
 export const logger = {
     debug: (message: string, ...args: unknown[]) => log.debug(`[MONITOR] ${message}`, ...args),

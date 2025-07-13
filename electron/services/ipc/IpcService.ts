@@ -1,4 +1,4 @@
-import { ipcMain } from "electron";
+import { ipcMain, BrowserWindow } from "electron";
 
 import { isDev } from "../../electronUtils";
 import { UptimeOrchestrator } from "../../index";
@@ -7,30 +7,56 @@ import { AutoUpdaterService } from "../updater/index";
 import { Site } from "../../types";
 
 /**
- * Service responsible for organizing and handling IPC communication.
- * Groups IPC handlers by domain for better maintainability.
+ * Inter-Process Communication service for Electron main-renderer communication.
+ *
+ * @remarks
+ * Manages all IPC handlers between the main process and renderer processes,
+ * organized by functional domains (sites, monitoring, data, system).
+ * Provides a secure interface for the frontend to interact with backend services.
  */
 export class IpcService {
     private readonly uptimeOrchestrator: UptimeOrchestrator;
     private readonly autoUpdaterService: AutoUpdaterService;
 
+    /**
+     * Create a new IPC service instance.
+     *
+     * @param uptimeOrchestrator - Core orchestrator for monitoring operations
+     * @param autoUpdaterService - Service for handling application updates
+     */
     constructor(uptimeOrchestrator: UptimeOrchestrator, autoUpdaterService: AutoUpdaterService) {
         this.uptimeOrchestrator = uptimeOrchestrator;
         this.autoUpdaterService = autoUpdaterService;
     }
 
     /**
-     * Setup all IPC handlers organized by domain.
+     * Initialize all IPC handlers organized by functional domain.
+     *
+     * @remarks
+     * Sets up handlers for:
+     * - Site management (CRUD operations)
+     * - Monitoring control (start/stop operations)
+     * - Data management (import/export/backup)
+     * - System operations (updates, quit)
      */
     public setupHandlers(): void {
         this.setupSiteHandlers();
         this.setupMonitoringHandlers();
         this.setupDataHandlers();
         this.setupSystemHandlers();
+        this.setupStateSyncHandlers();
     }
 
     /**
-     * Setup site management IPC handlers.
+     * Setup IPC handlers for site management operations.
+     *
+     * @remarks
+     * Handles site CRUD operations:
+     * - `add-site`: Create new site with monitors
+     * - `remove-site`: Delete site and all associated data
+     * - `get-sites`: Retrieve all configured sites
+     * - `update-site`: Modify existing site configuration
+     * - `remove-monitor`: Delete specific monitor from site
      */
     private setupSiteHandlers(): void {
         ipcMain.handle("add-site", async (_, site: Site) => {
@@ -60,7 +86,15 @@ export class IpcService {
     }
 
     /**
-     * Setup monitoring control IPC handlers.
+     * Setup IPC handlers for monitoring control operations.
+     *
+     * @remarks
+     * Handles monitoring lifecycle operations:
+     * - `start-monitoring`: Begin monitoring all configured sites
+     * - `stop-monitoring`: Stop all monitoring activities
+     * - `start-monitoring-for-site`: Start monitoring specific site/monitor
+     * - `stop-monitoring-for-site`: Stop monitoring specific site/monitor
+     * - `check-site-now`: Perform immediate manual check
      */
     private setupMonitoringHandlers(): void {
         ipcMain.handle("start-monitoring", async () => {
@@ -96,7 +130,7 @@ export class IpcService {
         ipcMain.handle("check-site-now", async (_, identifier: string, monitorId: string) => {
             if (isDev()) logger.debug("[IpcService] Handling check-site-now", { identifier, monitorId });
 
-            // Runtime check for string identifier and monitorId
+            // Runtime validation for type safety
             if (typeof identifier !== "string") {
                 throw new TypeError("Invalid site identifier");
             }
@@ -110,7 +144,15 @@ export class IpcService {
     }
 
     /**
-     * Setup data management IPC handlers.
+     * Setup IPC handlers for data management operations.
+     *
+     * @remarks
+     * Handles data persistence and backup operations:
+     * - `export-data`: Export all configuration and history as JSON
+     * - `import-data`: Import configuration from JSON data
+     * - `update-history-limit`: Configure history retention policy
+     * - `get-history-limit`: Retrieve current history retention setting
+     * - `download-sqlite-backup`: Create and download database backup
      */
     private setupDataHandlers(): void {
         ipcMain.handle("export-data", async () => {
@@ -133,11 +175,9 @@ export class IpcService {
             return this.uptimeOrchestrator.getHistoryLimit();
         });
 
-        // Direct SQLite backup download
         ipcMain.handle("download-sqlite-backup", async () => {
             if (isDev()) logger.debug("[IpcService] Handling download-sqlite-backup");
             try {
-                // Delegate to uptimeOrchestrator which should handle this through services
                 return await this.uptimeOrchestrator.downloadBackup();
             } catch (error) {
                 logger.error("[IpcService] Failed to download SQLite backup", error);
@@ -148,7 +188,11 @@ export class IpcService {
     }
 
     /**
-     * Setup system-level IPC handlers.
+     * Setup IPC handlers for system-level operations.
+     *
+     * @remarks
+     * Handles application lifecycle and system operations:
+     * - `quit-and-install`: Quit application and install pending update
      */
     private setupSystemHandlers(): void {
         ipcMain.on("quit-and-install", () => {
@@ -158,7 +202,43 @@ export class IpcService {
     }
 
     /**
-     * Remove all IPC listeners (cleanup).
+     * Setup IPC handlers for state synchronization operations.
+     *
+     * @remarks
+     * Handles:
+     * - `request-full-sync`: Manual full state synchronization request
+     */
+    private setupStateSyncHandlers(): void {
+        ipcMain.handle("request-full-sync", async () => {
+            logger.debug("[IpcService] Handling request-full-sync");
+            try {
+                // Get all sites and send to frontend
+                const sites = await this.uptimeOrchestrator.getSites();
+
+                // Emit state sync event to all renderer processes
+                for (const window of BrowserWindow.getAllWindows()) {
+                    window.webContents.send("state-sync-event", {
+                        action: "bulk-sync",
+                        sites: sites,
+                        timestamp: Date.now(),
+                    });
+                }
+
+                logger.debug("[IpcService] Full sync completed");
+                return { success: true };
+            } catch (error) {
+                logger.error("[IpcService] Failed to perform full sync", error);
+                throw error;
+            }
+        });
+    }
+
+    /**
+     * Clean up all IPC listeners.
+     *
+     * @remarks
+     * Removes all registered IPC handlers to prevent memory leaks.
+     * Should be called during application shutdown.
      */
     public cleanup(): void {
         logger.info("[IpcService] Cleaning up IPC handlers");

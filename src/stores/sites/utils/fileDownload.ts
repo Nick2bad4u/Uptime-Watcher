@@ -13,7 +13,11 @@ export interface FileDownloadOptions {
 }
 
 /**
- * Helper function to create and trigger download
+ * Helper function to create and trigger download.
+ *
+ * @param buffer - File data as ArrayBuffer
+ * @param fileName - Name for the downloaded file
+ * @param mimeType - MIME type for the file
  */
 function createAndTriggerDownload(buffer: ArrayBuffer, fileName: string, mimeType: string): void {
     const blob = new Blob([buffer], { type: mimeType });

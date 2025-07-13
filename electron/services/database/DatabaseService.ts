@@ -4,25 +4,67 @@ import { Database } from "node-sqlite3-wasm";
 import * as path from "node:path";
 
 import { logger } from "../../utils/index";
-import { createDatabaseBackup, createDatabaseTables } from "./utils/index";
+import {
+    createDatabaseBackup,
+    createDatabaseTables,
+    createDatabaseIndexes,
+    setupMonitorTypeValidation,
+} from "./utils/index";
 
 /**
- * Service responsible for database initialization and schema management.
- * Handles database connection and table creation.
+ * Database service for SQLite connection and transaction management.
+ *
+ * @remarks
+ * Provides a singleton interface for database operations with automatic
+ * connection management, schema initialization, and transaction support.
+ * All database operations should go through this service for consistency.
+ *
+ * @example
+ * ```typescript
+ * const dbService = DatabaseService.getInstance();
+ * await dbService.initialize();
+ * const db = dbService.getDatabase();
+ * ```
  */
 export class DatabaseService {
     private static readonly instance: DatabaseService = new DatabaseService();
+
+    /**
+     * Get the singleton database service instance.
+     *
+     * @returns The shared DatabaseService instance
+     *
+     * @remarks
+     * Uses singleton pattern to ensure only one database connection
+     * exists throughout the application lifecycle.
+     */
     public static getInstance(): DatabaseService {
         return DatabaseService.instance;
     }
+
     private _db: Database | undefined = undefined;
 
+    /**
+     * Private constructor for singleton pattern.
+     *
+     * @remarks
+     * Use {@link DatabaseService.getInstance} to get the service instance.
+     */
     private constructor() {
         // Private constructor for singleton pattern
     }
 
     /**
      * Initialize the database connection and create tables if they don't exist.
+     *
+     * @returns The initialized database instance
+     *
+     * @throws {@link Error} When database initialization fails
+     *
+     * @remarks
+     * Creates the database file in the user data directory if it doesn't exist.
+     * Sets up the complete schema including all required tables and indexes.
+     * Safe to call multiple times - returns existing connection if already initialized.
      */
     public initialize(): Database {
         if (this._db) {
@@ -35,6 +77,8 @@ export class DatabaseService {
 
             this._db = new Database(dbPath);
             createDatabaseTables(this._db);
+            createDatabaseIndexes(this._db);
+            setupMonitorTypeValidation();
 
             logger.info("[DatabaseService] Database initialized successfully");
             return this._db;
@@ -45,7 +89,14 @@ export class DatabaseService {
     }
 
     /**
-     * Get the database instance. Throws if not initialized.
+     * Get the database instance.
+     *
+     * @returns The active database connection
+     *
+     * @throws {@link Error} When database is not initialized
+     *
+     * @remarks
+     * Call {@link DatabaseService.initialize} first to set up the database connection.
      */
     public getDatabase(): Database {
         if (!this._db) {
@@ -55,7 +106,15 @@ export class DatabaseService {
     }
 
     /**
-     * Download database backup as buffer.
+     * Create a backup of the database as a downloadable buffer.
+     *
+     * @returns Promise resolving to backup data and filename
+     *
+     * @throws {@link Error} When backup creation fails
+     *
+     * @remarks
+     * Creates a compressed backup of the entire database suitable for download or storage.
+     * The backup includes all tables, data, and schema information.
      */
     public async downloadBackup(): Promise<{ buffer: Buffer; fileName: string }> {
         const { app } = await import("electron");
@@ -65,7 +124,18 @@ export class DatabaseService {
 
     /**
      * Execute a function within a database transaction.
-     * If the function throws an error, the transaction will be rolled back.
+     *
+     * @param operation - Function to execute within the transaction
+     * @returns Promise resolving to the operation result
+     *
+     * @throws {@link Error} When transaction fails or operation throws
+     *
+     * @remarks
+     * Automatically handles transaction lifecycle:
+     * - Begins transaction before operation
+     * - Commits transaction on successful completion
+     * - Rolls back transaction if operation throws
+     * Ensures data consistency for complex operations involving multiple queries.
      */
     public async executeTransaction<T>(operation: (db: Database) => Promise<T>): Promise<T> {
         const db = this.getDatabase();
@@ -87,6 +157,12 @@ export class DatabaseService {
 
     /**
      * Close the database connection.
+     *
+     * @throws {@link Error} When connection close fails
+     *
+     * @remarks
+     * Safely closes the database connection and cleans up resources.
+     * Should be called during application shutdown to ensure proper cleanup.
      */
     public close(): void {
         if (this._db) {

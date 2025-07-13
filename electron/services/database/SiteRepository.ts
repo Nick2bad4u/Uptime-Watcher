@@ -31,8 +31,11 @@ export class SiteRepository {
     /**
      * Get all sites from the database (without monitors).
      */
-    public findAll(): { identifier: string; name?: string | undefined; monitoring?: boolean | undefined }[] {
-        try {
+    public async findAll(): Promise<
+        { identifier: string; name?: string | undefined; monitoring?: boolean | undefined }[]
+    > {
+        // eslint-disable-next-line @typescript-eslint/require-await
+        return withDatabaseOperation(async () => {
             const db = this.getDb();
             const siteRows = db.all("SELECT identifier, name, monitoring FROM sites") as {
                 identifier: string;
@@ -44,10 +47,7 @@ export class SiteRepository {
                 ...(row.name !== undefined && { name: String(row.name) }),
                 ...(row.monitoring !== undefined && { monitoring: Boolean(row.monitoring) }),
             }));
-        } catch (error) {
-            logger.error("[SiteRepository] Failed to fetch all sites", error);
-            throw error;
-        }
+        }, "find-all-sites");
     }
 
     /**
@@ -87,7 +87,7 @@ export class SiteRepository {
                             ...(siteRow.monitoring !== undefined && { monitoring: Boolean(siteRow.monitoring) }),
                         });
                     } catch (error) {
-                        reject(error);
+                        reject(error instanceof Error ? error : new Error(String(error)));
                     }
                 });
             },
@@ -109,7 +109,7 @@ export class SiteRepository {
             }
 
             // Fetch monitors for this site
-            const monitors = this.monitorRepository.findBySiteIdentifier(siteRow.identifier);
+            const monitors = await this.monitorRepository.findBySiteIdentifier(siteRow.identifier);
 
             // Load history for each monitor
             for (const monitor of monitors) {

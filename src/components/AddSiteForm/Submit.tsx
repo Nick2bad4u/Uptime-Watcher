@@ -1,6 +1,12 @@
 /**
  * Form submission handling utilities for the AddSiteForm component.
- * Provides validation and submission logic for creating new sites or adding monitors to existing sites.
+ *
+ * @remarks
+ * Provides validation and submission logic for creating new sites or adding
+ * monitors to existing sites. Supports HTTP and port monitor types with
+ * comprehensive validation and error handling.
+ *
+ * @packageDocumentation
  */
 
 import validator from "validator";
@@ -12,7 +18,12 @@ import type { AddSiteFormState, AddSiteFormActions } from "./useAddSiteForm";
 import { DEFAULT_REQUEST_TIMEOUT, RETRY_CONSTRAINTS } from "../../constants";
 
 /**
- * Store actions interface for form submission.
+ * Store actions interface for form submission operations.
+ *
+ * @remarks
+ * Defines the required store methods needed for form submission. This interface
+ * decouples the submission logic from specific store implementations, making
+ * the code more testable and flexible.
  */
 interface StoreActions {
     /** Add a monitor to an existing site */
@@ -24,15 +35,17 @@ interface StoreActions {
 }
 
 /**
- * Props interface for form submission handling.
- * Combines form state, actions, and store methods.
+ * Properties interface for form submission handling.
+ *
+ * @remarks
+ * Combines form state, actions, and store methods for the submission handler.
  */
 type FormSubmitProperties = AddSiteFormState &
     Pick<AddSiteFormActions, "setFormError"> &
     StoreActions & {
-        /** UUID generator function */
+        /** UUID generator function for creating unique identifiers */
         generateUuid: () => string;
-        /** Logger instance for debugging */
+        /** Logger instance for debugging and error tracking */
         logger: Logger;
         /** Optional callback executed after successful submission */
         onSuccess?: () => void;
@@ -40,6 +53,11 @@ type FormSubmitProperties = AddSiteFormState &
 
 /**
  * Validates the add mode selection and site information.
+ *
+ * @param addMode - Mode of adding ("new" or "existing")
+ * @param name - Site name for new sites
+ * @param selectedExistingSite - Selected existing site identifier
+ * @returns Array of validation error messages
  */
 function validateAddMode(addMode: string, name: string, selectedExistingSite: string): string[] {
     const errors: string[] = [];
@@ -57,6 +75,9 @@ function validateAddMode(addMode: string, name: string, selectedExistingSite: st
 
 /**
  * Validates HTTP monitor configuration.
+ *
+ * @param url - Website URL to validate
+ * @returns Array of validation error messages
  */
 function validateHttpMonitor(url: string): string[] {
     const errors: string[] = [];
@@ -92,6 +113,10 @@ function validateHttpMonitor(url: string): string[] {
 
 /**
  * Validates port monitor configuration.
+ *
+ * @param host - Host address (IP or domain)
+ * @param port - Port number
+ * @returns Array of validation error messages
  */
 function validatePortMonitor(host: string, port: string): string[] {
     const errors: string[] = [];
@@ -122,6 +147,12 @@ function validatePortMonitor(host: string, port: string): string[] {
 
 /**
  * Validates monitor type-specific configuration.
+ *
+ * @param monitorType - Type of monitor ("http" or "port")
+ * @param url - URL for HTTP monitors
+ * @param host - Host for port monitors
+ * @param port - Port for port monitors
+ * @returns Array of validation error messages
  */
 function validateMonitorType(monitorType: string, url: string, host: string, port: string): string[] {
     if (monitorType === "http") {
@@ -137,6 +168,9 @@ function validateMonitorType(monitorType: string, url: string, host: string, por
 
 /**
  * Validates check interval configuration.
+ *
+ * @param checkInterval - Check interval in milliseconds
+ * @returns Array of validation error messages
  */
 function validateCheckInterval(checkInterval: number): string[] {
     const errors: string[] = [];
@@ -168,7 +202,6 @@ function createMonitor(properties: FormSubmitProperties): Monitor {
 
     if (monitorType === "http") {
         monitor.url = url.trim();
-        /* eslint-disable @typescript-eslint/no-unnecessary-condition -- will be adding multiple monitor types soon */
     } else if (monitorType === "port") {
         monitor.host = host.trim();
         monitor.port = Number(port);

@@ -14,6 +14,7 @@ type MonitorManagerEvents = UptimeEvents;
 
 import { MonitorRepository, HistoryRepository, SiteRepository, DatabaseService, MonitorScheduler } from "../services";
 import { Site, StatusUpdate } from "../types";
+import { ISiteCache } from "../utils/database/interfaces";
 import {
     monitorLogger as logger,
     startAllMonitoring,
@@ -34,7 +35,7 @@ export interface MonitorManagerDependencies {
     };
     databaseService: DatabaseService;
     getHistoryLimit: () => number;
-    getSitesCache: () => Map<string, Site>;
+    getSitesCache: () => ISiteCache;
 }
 
 /**
@@ -72,7 +73,7 @@ export class MonitorManager {
 
         // Emit typed monitoring started event
         const sitesCache = this.dependencies.getSitesCache();
-        const sites = [...sitesCache.values()];
+        const sites = sitesCache.getAll();
         await this.eventEmitter.emitTyped("monitoring:started", {
             monitorCount: sites.reduce((total, site) => total + site.monitors.length, 0),
             siteCount: sites.length,

@@ -25,15 +25,13 @@ export class SettingsRepository {
     /**
      * Get a setting by key.
      */
-    public get(key: string): string | undefined {
-        try {
+    public async get(key: string): Promise<string | undefined> {
+        // eslint-disable-next-line @typescript-eslint/require-await
+        return withDatabaseOperation(async () => {
             const db = this.getDb();
             const result = db.get("SELECT value FROM settings WHERE key = ?", [key]);
             return result?.value ? String(result.value) : undefined;
-        } catch (error) {
-            logger.error(`[SettingsRepository] Failed to get setting: ${key}`, error);
-            throw error;
-        }
+        }, `get-setting-${key}`);
     }
 
     /**

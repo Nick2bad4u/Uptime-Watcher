@@ -1,7 +1,26 @@
 /**
- * Chart configuration service for consistent chart styling and behavior.
- * Provides theme-aware chart configurations for Chart.js components
- * used throughout the application for data visualization.
+ * Chart configuration service for consistent, theme-aware data visualization.
+ *
+ * @remarks
+ * Provides centralized Chart.js configuration management with automatic theme
+ * integration for consistent styling across all charts in the application.
+ * This service ensures that charts maintain visual consistency and respond
+ * to theme changes appropriately.
+ *
+ * The service supports multiple chart types with optimized configurations:
+ * - Line charts for time-series data (response times, uptime trends)
+ * - Area charts for filled visualizations
+ * - Doughnut charts for status distributions
+ * - Responsive design with mobile-friendly defaults
+ *
+ * @example
+ * ```typescript
+ * const chartConfig = new ChartConfigService(currentTheme);
+ * const lineConfig = chartConfig.getLineChartConfig();
+ * const doughnutConfig = chartConfig.getDoughnutChartConfig();
+ * ```
+ *
+ * @packageDocumentation
  */
 
 import { ChartOptions } from "chart.js";
@@ -9,18 +28,39 @@ import { ChartOptions } from "chart.js";
 import { Theme } from "../theme";
 
 /**
- * Chart Configuration Service
- * Centralizes all chart configurations for consistency and maintainability
+ * Chart Configuration Service for theme-aware chart styling.
+ *
+ * @remarks
+ * Centralizes all chart configurations to ensure consistency and maintainability
+ * across the application. The service automatically applies theme colors, fonts,
+ * and spacing to all chart configurations.
+ *
+ * @public
  */
 export class ChartConfigService {
+    /** Current theme instance for styling configuration */
     private readonly theme: Theme;
 
+    /**
+     * Creates a new chart configuration service.
+     *
+     * @param theme - Theme instance containing colors, typography, and spacing
+     */
     constructor(theme: Theme) {
         this.theme = theme;
     }
 
     /**
-     * Get base configuration shared across all charts
+     * Get base configuration shared across all chart types.
+     *
+     * @returns Partial chart options with common styling and behavior
+     *
+     * @remarks
+     * Provides consistent foundation for all charts including responsive behavior,
+     * theme-aware colors, typography, and tooltip styling. This configuration
+     * is extended by specific chart type methods.
+     *
+     * This is an internal method used by other configuration methods.
      */
     private getBaseConfig(): Partial<ChartOptions> {
         return {

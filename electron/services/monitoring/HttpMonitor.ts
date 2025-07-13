@@ -1,3 +1,36 @@
+/**
+ * HTTP/HTTPS monitoring service for web endpoint health checks.
+ *
+ * @remarks
+ * Provides comprehensive HTTP monitoring capabilities with advanced Axios features
+ * for optimal performance and reliability. Supports precise response time measurement,
+ * per-monitor timeout configuration, and intelligent status code interpretation.
+ *
+ * Key features:
+ * - Precise response time measurement using performance.now()
+ * - Per-monitor timeout configuration support
+ * - Intelligent status code handling (2xx/4xx = up, 5xx = down)
+ * - Connection pooling with HTTP/HTTPS agents
+ * - Request/response size limits for security
+ * - Comprehensive error handling with network detection
+ * - Retry logic for transient failures
+ *
+ * @example
+ * ```typescript
+ * const httpMonitor = new HttpMonitor({ timeout: 5000 });
+ * const result = await httpMonitor.check({
+ *   id: "mon_1",
+ *   type: "http",
+ *   url: "https://example.com",
+ *   status: "pending",
+ *   // ... other monitor properties
+ * });
+ * console.log(`Status: ${result.status}, Response time: ${result.responseTime}ms`);
+ * ```
+ *
+ * @packageDocumentation
+ */
+
 import { AxiosInstance } from "axios";
 
 import { DEFAULT_REQUEST_TIMEOUT, RETRY_BACKOFF, USER_AGENT } from "../../constants";
@@ -10,38 +43,60 @@ import { determineMonitorStatus, handleCheckError, createHttpClient, createError
 
 /**
  * Declaration merging to extend Axios types with timing metadata.
+ *
+ * @remarks
+ * Extends Axios request/response interfaces to support precise timing measurements
+ * through request interceptors and response metadata.
  */
 declare module "axios" {
+    /** Extended request config with timing metadata */
     interface InternalAxiosRequestConfig {
         metadata?: {
+            /** High-precision start time for response time calculation */
             startTime: number;
         };
     }
 
+    /** Extended response with calculated response time */
     interface AxiosResponse {
+        /** Calculated response time in milliseconds */
         responseTime?: number;
     }
 
+    /** Extended error with response time (if available) */
     interface AxiosError {
+        /** Response time at point of failure (if available) */
         responseTime?: number;
     }
 }
 
 /**
  * Service for performing HTTP/HTTPS monitoring checks.
- * Leverages advanced Axios features for optimal performance and reliability:
- * - Precise response time measurement with interceptors and performance.now()
- * - Proper per-monitor timeout configuration support
- * - Manual status code handling for monitoring logic (2xx/4xx = up, 5xx = down)
- * - Connection pooling with HTTP/HTTPS agents for better performance
- * - Request/response size limits for security
- * - Comprehensive error handling with network and timeout detection
- * Note: Retry logic intentionally disabled for immediate failure detection
+ *
+ * @remarks
+ * Implements the IMonitorService interface to provide HTTP endpoint monitoring
+ * with advanced features for reliability and performance. Uses Axios with custom
+ * interceptors for precise timing and comprehensive error handling.
+ *
+ * The service is designed for monitoring use cases where response time accuracy
+ * and failure detection are critical. It includes intelligent status code
+ * interpretation suitable for uptime monitoring scenarios.
  */
 export class HttpMonitor implements IMonitorService {
+    /** Configuration for HTTP monitoring behavior */
     private config: MonitorConfig;
+    /** Axios instance with custom interceptors and configuration */
     private axiosInstance: AxiosInstance;
 
+    /**
+     * Initialize the HTTP monitor with optional configuration.
+     *
+     * @param config - Optional configuration overrides for HTTP monitoring
+     *
+     * @remarks
+     * Creates an Axios instance with optimized settings for monitoring,
+     * including timing interceptors, appropriate timeouts, and security limits.
+     */
     constructor(config: MonitorConfig = {}) {
         this.config = {
             timeout: DEFAULT_REQUEST_TIMEOUT,

@@ -8,12 +8,10 @@ import { useState, useEffect, useCallback } from "react";
 
 import { DEFAULT_CHECK_INTERVAL } from "../../constants";
 import { generateUuid } from "../../utils/index";
+import type { MonitorType } from "../../types";
 
 /** Form operation mode */
 export type FormMode = "new" | "existing";
-
-/** Supported monitor types */
-export type MonitorType = "http" | "port";
 
 /**
  * Form state interface containing all form field values and UI state.

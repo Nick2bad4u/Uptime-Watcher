@@ -38,7 +38,7 @@ export function rowToMonitor(row: Record<string, unknown>): Site["monitors"][0] 
         retryAttempts: 3, // Default retry attempts
         status: typeof row.status === "string" ? (row.status as "up" | "down" | "pending") : "down",
         timeout: 5000, // Default timeout
-        type: typeof row.type === "string" ? (row.type as Site["monitors"][0]["type"]) : "http",
+        type: typeof row.type === "string" ? row.type : "http",
     };
 
     // Override defaults with database values if they exist and are valid

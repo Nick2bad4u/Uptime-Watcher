@@ -1,14 +1,36 @@
 /**
- * Site details view component with tabbed interface
+ * Site details view component with comprehensive tabbed interface.
  *
- * Use our custom hook to get all the data and functionality we needed including:
- * - Overview with basic statistics
- * - History charts and response time data
- * - Analytics with advanced metrics
- * - Settings for monitoring configuration
+ * @remarks
+ * This component provides a detailed view of a single site's monitoring data,
+ * statistics, and configuration options. It uses a composition pattern with
+ * specialized child components for maintainability and clear separation of concerns.
  *
- * Uses composition pattern with smaller specialized components for maintainability.
- * Integrates with Chart.js for visualization and custom hooks for state management.
+ * The component integrates multiple advanced features:
+ * - Real-time status monitoring and visualization
+ * - Historical data charts with Chart.js integration
+ * - Analytics and performance metrics
+ * - Configuration management for monitoring settings
+ * - Responsive design with theme support
+ *
+ * Uses custom hooks for state management and Chart.js for data visualization
+ * with zoom, pan, and time-based charting capabilities.
+ *
+ * @param site - Site object containing monitoring data and configuration
+ *
+ * @example
+ * ```tsx
+ * <SiteDetails
+ *   site={{
+ *     identifier: "site-123",
+ *     name: "My Website",
+ *     monitors: [],
+ *     monitoring: true
+ *   }}
+ * />
+ * ```
+ *
+ * @public
  */
 
 import {
@@ -67,9 +89,10 @@ interface SiteDetailsProperties {
 }
 
 /**
- * Get availability description based on percentage
- * @param percentage - Availability percentage
- * @returns Human-readable description
+ * Gets a descriptive label for availability percentage.
+ *
+ * @param percentage - Availability percentage (0-100)
+ * @returns Description string ("Excellent", "Good", or "Poor")
  */
 function getAvailabilityDescription(percentage: number): string {
     if (percentage >= 99) {

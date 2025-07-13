@@ -199,7 +199,12 @@ interface ThemedButtonProperties {
     readonly "aria-label"?: string;
 }
 
-// Utility: map color name to CSS class for icon coloring
+/**
+ * Maps color name to CSS class for icon coloring.
+ *
+ * @param color - Color name or custom color value
+ * @returns CSS class name or undefined for custom colors
+ */
 function getIconColorClass(color?: string): string | undefined {
     if (!color) {
         return undefined;
@@ -231,7 +236,13 @@ function getIconColorClass(color?: string): string | undefined {
     }
 }
 
-// Utility: always wrap icon in a <span> with color class or style
+/**
+ * Wraps icon in a span with color class or inline style.
+ *
+ * @param icon - React icon element
+ * @param color - Color name or custom color value
+ * @returns Colored icon wrapped in span
+ */
 function renderColoredIcon(icon: React.ReactNode, color?: string) {
     if (!icon) {
         return icon;

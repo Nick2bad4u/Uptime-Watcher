@@ -1,9 +1,9 @@
 {
     "$schema": "https://developer.microsoft.com/json-schemas/tsdoc/v0/tsdoc.schema.json",
-    "tagDefinitions": [
-        {
-            "tagName": "@default",
-            "syntaxKind": "block"
-        }
-    ]
+    "tagDefinitions": [],
+    "extends": [],
+    "noStandardTags": false,
+    "supportedHtmlElements": ["b", "i", "em", "strong", "code", "pre", "ul", "ol", "li", "p", "br"],
+    "reportUnsupportedHtmlElements": false,
+    "supportForTags": {}
 }

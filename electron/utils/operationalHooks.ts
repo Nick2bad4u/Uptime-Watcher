@@ -18,19 +18,19 @@ export interface OperationalHooksConfig<T = unknown> {
 
     /**
      * Maximum number of retry attempts.
-     * @default 3
+     * @defaultValue 3
      */
     maxRetries?: number;
 
     /**
      * Initial delay between retries in milliseconds.
-     * @default 100
+     * @defaultValue 100
      */
     initialDelay?: number;
 
     /**
      * Backoff strategy for retry delays.
-     * @default "exponential"
+     * @defaultValue "exponential"
      */
     backoff?: "linear" | "exponential";
 
@@ -61,13 +61,13 @@ export interface OperationalHooksConfig<T = unknown> {
 
     /**
      * Whether to emit events for this operation.
-     * @default true
+     * @defaultValue true
      */
     emitEvents?: boolean;
 
     /**
      * Whether to throw on final failure.
-     * @default true
+     * @defaultValue true
      */
     throwOnFailure?: boolean;
 }
@@ -125,7 +125,7 @@ async function handleSuccess<T>(
                 duration,
                 timestamp: Date.now(),
                 success: true,
-                recordsAffected: typeof result === "number" ? result : undefined,
+                ...(typeof result === "number" && { recordsAffected: result }),
                 ...context,
             });
         } catch (eventError) {
@@ -304,8 +304,8 @@ export async function withDatabaseOperation<T>(
         maxRetries: 3,
         initialDelay: 100,
         backoff: "exponential",
-        eventEmitter,
-        context,
+        ...(eventEmitter && { eventEmitter }),
+        ...(context && { context }),
         emitEvents: Boolean(eventEmitter),
     });
 }
@@ -323,8 +323,8 @@ export async function withCacheOperation<T>(
         operationName: `cache:${operationName}`,
         maxRetries: 1, // Cache operations typically don't retry
         initialDelay: 0,
-        eventEmitter,
-        context,
+        ...(eventEmitter && { eventEmitter }),
+        ...(context && { context }),
         emitEvents: Boolean(eventEmitter),
         throwOnFailure: false, // Cache operations should not throw
     });

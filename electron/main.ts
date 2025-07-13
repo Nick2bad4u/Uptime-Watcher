@@ -1,6 +1,11 @@
 /**
  * Main entry point for the Electron application.
- * Configures logging and initializes the application service.
+ *
+ * @remarks
+ * Configures logging and initializes the main application service.
+ * Sets up proper shutdown handlers for graceful cleanup.
+ *
+ * @packageDocumentation
  */
 
 import log from "electron-log/main";
@@ -20,7 +25,14 @@ log.transports.console.format = "[{h}:{i}:{s}.{ms}] [{level}] {text}";
 
 /**
  * Main application class that initializes and manages the Electron app.
- * Uses modular ApplicationService for clean separation of concerns.
+ *
+ * @remarks
+ * Uses modular ApplicationService for clean separation of concerns and follows
+ * the single responsibility principle. Handles application lifecycle management
+ * including initialization, cleanup, and graceful shutdown.
+ *
+ * The class ensures that cleanup is performed only once even if multiple
+ * shutdown events are triggered, preventing resource leaks and errors.
  */
 class Main {
     /** Application service instance for managing app lifecycle and features */
@@ -28,13 +40,20 @@ class Main {
 
     /**
      * Initialize the main application.
+     *
+     * @remarks
      * Sets up logging, creates application service, and configures cleanup handlers.
+     * Establishes event listeners for both Node.js process events and Electron
+     * app events to ensure proper cleanup in all shutdown scenarios.
+     *
+     * The cleanup is designed to be idempotent - safe to call multiple times
+     * without side effects or errors.
      */
     constructor() {
         logger.info("Starting Uptime Watcher application");
         this.applicationService = new ApplicationService();
 
-        // Ensure cleanup is only called once
+        // Ensure cleanup is only called once to prevent double-cleanup errors
         let cleanedUp = false;
         const safeCleanup = () => {
             if (!cleanedUp) {
@@ -43,7 +62,7 @@ class Main {
             }
         };
 
-        // Setup cleanup on app quit to ensure graceful shutdown
+        // Setup cleanup on Node.js process exit to ensure graceful shutdown
         process.on("beforeExit", safeCleanup);
 
         // Also handle Electron's will-quit event for robust cleanup
@@ -52,6 +71,6 @@ class Main {
 }
 
 // Start the application
-// which is intentional in this case since we just need to keep the reference
-// alive to prevent garbage collection.
+// Create Main instance and keep reference alive to prevent garbage collection.
+// This is intentional - we need the instance to persist for the lifetime of the application.
 new Main();

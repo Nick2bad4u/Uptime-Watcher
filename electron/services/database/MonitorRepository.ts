@@ -40,8 +40,9 @@ export class MonitorRepository {
     /**
      * Find all monitors for a specific site.
      */
-    public findBySiteIdentifier(siteIdentifier: string): Site["monitors"] {
-        try {
+    public async findBySiteIdentifier(siteIdentifier: string): Promise<Site["monitors"]> {
+        // eslint-disable-next-line @typescript-eslint/require-await
+        return withDatabaseOperation(async () => {
             const db = this.getDb();
             const monitorRows = db.all("SELECT * FROM monitors WHERE site_identifier = ?", [siteIdentifier]) as Record<
                 string,
@@ -49,10 +50,7 @@ export class MonitorRepository {
             >[];
 
             return monitorRows.map((row) => rowToMonitor(row));
-        } catch (error) {
-            logger.error(`[MonitorRepository] Failed to fetch monitors for site: ${siteIdentifier}`, error);
-            throw error;
-        }
+        }, `find-monitors-by-site-${siteIdentifier}`);
     }
 
     /**
@@ -77,7 +75,7 @@ export class MonitorRepository {
 
                         resolve(rowToMonitor(row));
                     } catch (error) {
-                        reject(error);
+                        reject(error instanceof Error ? error : new Error(String(error)));
                     }
                 });
             },

@@ -148,5 +148,34 @@
     "sonarlint.connectedMode.project": {
         "connectionId": "nick2bad4u",
         "projectKey": "Nick2bad4u_Uptime-Watcher"
+    },
+    "chat.mcp.serverSampling": {
+        "Uptime-Watcher/.vscode/mcp.json: vite": {
+            "allowedModels": [
+                "github.copilot-chat/gpt-4.1",
+                "github.copilot-chat/Anthropic-claude-3-5-haiku-20241022",
+                "github.copilot-chat/Anthropic-claude-3-5-sonnet-20241022",
+                "github.copilot-chat/Anthropic-claude-3-7-sonnet-20250219",
+                "github.copilot-chat/claude-opus-4",
+                "github.copilot-chat/claude-3.5-sonnet",
+                "github.copilot-chat/claude-3.7-sonnet",
+                "github.copilot-chat/claude-3.7-sonnet-thought",
+                "github.copilot-chat/claude-sonnet-4",
+                "github.copilot-chat/Groq-deepseek-r1-distill-llama-70b",
+                "github.copilot-chat/gemini-2.0-flash-001",
+                "github.copilot-chat/Gemini-models/gemini-2.5-flash-preview-04-17",
+                "github.copilot-chat/gemini-2.5-pro",
+                "github.copilot-chat/Gemini-models/gemini-2.5-pro-preview-03-25",
+                "github.copilot-chat/Gemini-models/gemma-3-27b-it",
+                "github.copilot-chat/Groq-gemma2-9b-it",
+                "github.copilot-chat/gpt-4o",
+                "github.copilot-chat/Groq-llama-3.1-8b-instant",
+                "github.copilot-chat/Groq-llama-3.3-70b-versatile",
+                "github.copilot-chat/o3",
+                "github.copilot-chat/o3-mini",
+                "github.copilot-chat/o4-mini",
+                "github.copilot-chat/Groq-qwen-qwq-32b"
+            ]
+        }
     }
 }

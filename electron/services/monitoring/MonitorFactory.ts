@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-extraneous-class */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition -- will be adding multiple monitor types soon */
 
 import { Site } from "../../types";
 import { HttpMonitor } from "./HttpMonitor";
 import { PortMonitor } from "./PortMonitor";
 import { IMonitorService, MonitorConfig } from "./types";
+import { isValidMonitorType, getRegisteredMonitorTypes } from "./MonitorTypeRegistry";
 
 /**
  * Factory for creating and managing monitor services.
@@ -16,10 +16,21 @@ export class MonitorFactory {
 
     /**
      * Get the appropriate monitor service for the given monitor type.
+     *
+     * @param type - Monitor type string
+     * @param config - Optional monitor configuration
+     * @returns Monitor service instance
+     * @throws Error if monitor type is not supported
      */
     public static getMonitor(type: Site["monitors"][0]["type"], config?: MonitorConfig): IMonitorService {
+        // Validate monitor type using registry
+        if (!isValidMonitorType(type)) {
+            throw new Error(`Unsupported monitor type: ${type}. Use MonitorTypeRegistry to register new types.`);
+        }
+
         switch (type) {
             case "http": {
+                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
                 if (!this.httpMonitor) {
                     this.httpMonitor = new HttpMonitor(config);
                 }
@@ -27,6 +38,7 @@ export class MonitorFactory {
             }
 
             case "port": {
+                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
                 if (!this.portMonitor) {
                     this.portMonitor = new PortMonitor(config);
                 }
@@ -34,7 +46,9 @@ export class MonitorFactory {
             }
 
             default: {
-                throw new Error(`Unsupported monitor type: ${type}`);
+                throw new Error(
+                    `Monitor type '${type}' is registered but no implementation found. Please implement the monitor service.`
+                );
             }
         }
     }
@@ -43,18 +57,21 @@ export class MonitorFactory {
      * Update configuration for all monitor types.
      */
     public static updateConfig(config: MonitorConfig): void {
-        if (this.httpMonitor) {
+        // Update config for all initialized monitor instances
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (this.httpMonitor !== undefined) {
             this.httpMonitor.updateConfig(config);
         }
-        if (this.portMonitor) {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (this.portMonitor !== undefined) {
             this.portMonitor.updateConfig(config);
         }
     }
 
     /**
-     * Get all available monitor types.
+     * Get all available monitor types from registry.
      */
-    public static getAvailableTypes(): Site["monitors"][0]["type"][] {
-        return ["http", "port"];
+    public static getAvailableTypes(): string[] {
+        return getRegisteredMonitorTypes();
     }
 }

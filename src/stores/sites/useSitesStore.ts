@@ -1,12 +1,35 @@
 /**
- * Sites store for managing site data and operations.
- * Refactored to use modular architecture with separate concerns.
+ * Main sites store for managing site data and operations using modular architecture.
  *
- * This main store composes smaller, focused modules for better testability:
- * - useSitesState: Core state management
- * - useSiteOperations: CRUD operations
- * - useSiteMonitoring: Monitoring operations
- * - useSiteSync: Synchronization operations
+ * @remarks
+ * This store uses a modular composition pattern to separate concerns and improve
+ * testability. Instead of a monolithic store, it composes smaller, focused modules:
+ *
+ * - `useSitesState`: Core state management and data manipulation
+ * - `useSiteOperations`: CRUD operations for sites and monitors
+ * - `useSiteMonitoring`: Monitoring lifecycle and status management
+ * - `useSiteSync`: Backend synchronization and data consistency
+ *
+ * Each module is independently testable and has clear responsibilities, making
+ * the codebase more maintainable and easier to understand.
+ *
+ * @example
+ * ```typescript
+ * import { useSitesStore } from './stores';
+ *
+ * function MyComponent() {
+ *   const { sites, addSite, startMonitoring } = useSitesStore();
+ *
+ *   const handleAddSite = async () => {
+ *     const newSite = await addSite({ name: 'Example Site', monitors: [] });
+ *     await startMonitoring();
+ *   };
+ *
+ *   return <div>{sites.length} sites</div>;
+ * }
+ * ```
+ *
+ * @packageDocumentation
  */
 
 import { create } from "zustand";
@@ -18,6 +41,16 @@ import { createSiteOperationsActions } from "./useSiteOperations";
 import { createSitesStateActions, initialSitesState } from "./useSitesState";
 import { createSiteSyncActions } from "./useSiteSync";
 
+/**
+ * Main sites store combining all site-related functionality.
+ *
+ * @remarks
+ * Creates a Zustand store that composes multiple action modules to provide
+ * a complete interface for site management. The store uses dependency injection
+ * to share common functions between modules while maintaining clear boundaries.
+ *
+ * @public
+ */
 export const useSitesStore = create<SitesStore>((set, get) => {
     // Create state actions
     const stateActions = createSitesStateActions(set, get);
