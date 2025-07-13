@@ -1,35 +1,27 @@
 import { app } from "electron";
 
 import { StatusUpdate, Site } from "../../types";
-import { UptimeOrchestrator } from "../../index";
 import { logger } from "../../utils/index";
-import { IpcService } from "../ipc/index";
-import { NotificationService } from "../notifications/index";
-import { AutoUpdaterService } from "../updater/index";
-import { WindowService } from "../window/index";
+import { ServiceContainer } from "../ServiceContainer";
 
 /**
  * Main application service that orchestrates all other services.
  * Handles application lifecycle and service coordination.
+ *
+ * @remarks
+ * Uses dependency injection through ServiceContainer to manage all services
+ * and their dependencies. Provides proper initialization order and cleanup.
  */
 export class ApplicationService {
-    private readonly windowService: WindowService;
-    private readonly ipcService: IpcService;
-    private readonly notificationService: NotificationService;
-    private readonly autoUpdaterService: AutoUpdaterService;
-    private readonly uptimeOrchestrator: UptimeOrchestrator;
+    private readonly serviceContainer: ServiceContainer;
 
     constructor() {
         logger.info("[ApplicationService] Initializing application services");
 
-        // Initialize core services
-        this.windowService = new WindowService();
-        this.notificationService = new NotificationService();
-        this.autoUpdaterService = new AutoUpdaterService();
-        this.uptimeOrchestrator = new UptimeOrchestrator();
-
-        // Initialize IPC with dependencies
-        this.ipcService = new IpcService(this.uptimeOrchestrator, this.autoUpdaterService);
+        // Get service container instance
+        this.serviceContainer = ServiceContainer.getInstance({
+            enableDebugLogging: process.env.NODE_ENV === "development",
+        });
 
         this.setupApplication();
     }
@@ -39,13 +31,9 @@ export class ApplicationService {
      */
     private setupApplication(): void {
         app.on("ready", () => {
-            void (async () => {
-                try {
-                    await this.onAppReady();
-                } catch (error) {
-                    logger.error("[ApplicationService] Error during app initialization", error);
-                }
-            })();
+            this.onAppReady().catch((error) => {
+                logger.error("[ApplicationService] Error during app initialization", error);
+            });
         });
 
         app.on("window-all-closed", () => {
@@ -58,9 +46,10 @@ export class ApplicationService {
 
         app.on("activate", () => {
             logger.info("[ApplicationService] App activated");
-            if (this.windowService.getAllWindows().length === 0) {
+            const windowService = this.serviceContainer.getWindowService();
+            if (windowService.getAllWindows().length === 0) {
                 logger.info("[ApplicationService] No windows open, creating main window");
-                this.windowService.createMainWindow();
+                windowService.createMainWindow();
             }
         });
     }
@@ -69,84 +58,102 @@ export class ApplicationService {
      * Handle app ready event.
      */
     private async onAppReady(): Promise<void> {
-        // Initialize the uptime monitor with database
-        await this.uptimeOrchestrator.initialize();
+        logger.info("[ApplicationService] App ready - initializing services");
+
+        // Initialize all services through the container
+        await this.serviceContainer.initialize();
 
         // Create main window
-        this.windowService.createMainWindow();
+        this.serviceContainer.getWindowService().createMainWindow();
 
-        // Setup IPC handlers
-        this.ipcService.setupHandlers();
+        // Setup event handlers
+        this.setupUptimeEventHandlers();
 
         // Setup auto-updater
         this.setupAutoUpdater();
 
-        // Setup monitor event listeners
-        this.setupMonitorEvents();
+        logger.info("[ApplicationService] All services initialized successfully");
     }
 
     /**
-     * Setup auto-updater service.
+     * Setup auto-updater with callbacks.
      */
     private setupAutoUpdater(): void {
-        this.autoUpdaterService.setStatusCallback((statusData) => {
-            this.windowService.sendToRenderer("update-status", statusData);
+        const autoUpdater = this.serviceContainer.getAutoUpdaterService();
+        const windowService = this.serviceContainer.getWindowService();
+
+        autoUpdater.setStatusCallback((statusData) => {
+            windowService.sendToRenderer("update-status", statusData);
         });
 
-        this.autoUpdaterService.initialize();
-        void this.autoUpdaterService.checkForUpdates();
+        autoUpdater.initialize();
+        autoUpdater.checkForUpdates().catch((error) => {
+            logger.error("[ApplicationService] Failed to check for updates", error);
+        });
     }
 
     /**
-     * Setup uptime monitor event listeners.
+     * Setup event handlers for uptime monitoring events.
      */
-    private setupMonitorEvents(): void {
-        // Status updates
-        this.uptimeOrchestrator.on("status-update", (data: StatusUpdate) => {
-            const monitorStatuses = data.site.monitors
-                .map((m) => {
-                    const responseTimeInfo = m.responseTime ? ` (${m.responseTime}ms)` : "";
-                    return `${m.type}: ${m.status}${responseTimeInfo}`;
-                })
-                .join(", ");
+    private setupUptimeEventHandlers(): void {
+        const orchestrator = this.serviceContainer.getUptimeOrchestrator();
+        const windowService = this.serviceContainer.getWindowService();
+        const notificationService = this.serviceContainer.getNotificationService();
 
-            logger.debug(`[ApplicationService] Status update for ${data.site.identifier}: ${monitorStatuses}`);
-            logger.debug(`[ApplicationService] Sending status-update to renderer`);
-            this.windowService.sendToRenderer("status-update", data);
+        orchestrator.on("status-update", (data: StatusUpdate) => {
+            try {
+                logger.debug("[ApplicationService] Forwarding status update to renderer", {
+                    siteId: data.site.identifier,
+                    previousStatus: data.previousStatus,
+                });
+
+                windowService.sendToRenderer("status-update", data);
+            } catch (error) {
+                logger.error("[ApplicationService] Failed to forward status update to renderer", error);
+            }
         });
 
-        // Monitor down alerts
-        this.uptimeOrchestrator.on("site-monitor-down", ({ monitorId, site }: { monitorId: string; site: Site }) => {
-            logger.debug(`[ApplicationService] Monitor down alert for ${site.identifier}, monitor: ${monitorId}`);
-            this.notificationService.notifyMonitorDown(site, monitorId);
+        orchestrator.on("site-monitor-down", ({ monitorId, site }: { monitorId: string; site: Site }) => {
+            logger.debug("[ApplicationService] Monitor down notification", { monitorId, siteId: site.identifier });
+            notificationService.notifyMonitorDown(site, monitorId);
         });
 
-        // Monitor up alerts
-        this.uptimeOrchestrator.on("site-monitor-up", ({ monitorId, site }: { monitorId: string; site: Site }) => {
-            logger.debug(`[ApplicationService] Monitor up alert for ${site.identifier}, monitor: ${monitorId}`);
-            this.notificationService.notifyMonitorUp(site, monitorId);
+        orchestrator.on("site-monitor-up", ({ monitorId, site }: { monitorId: string; site: Site }) => {
+            logger.debug("[ApplicationService] Monitor up notification", { monitorId, siteId: site.identifier });
+            notificationService.notifyMonitorUp(site, monitorId);
         });
 
-        // Database errors
-        this.uptimeOrchestrator.on("db-error", ({ error, operation }: { error: Error; operation: string }) => {
+        orchestrator.on("db-error", ({ error, operation }: { error: Error; operation: string }) => {
             logger.error(`[ApplicationService] Database error during ${operation}`, error);
-            // Could add error notifications here if needed
         });
     }
 
     /**
-     * Cleanup all services (called on app quit).
+     * Cleanup resources before application shutdown.
      */
-    public cleanup(): void {
-        logger.info("[ApplicationService] Cleaning up services");
+    public async cleanup(): Promise<void> {
+        logger.info("[ApplicationService] Starting cleanup");
 
         try {
-            this.ipcService.cleanup();
-            // Fire and forget for cleanup - don't block shutdown
-            this.uptimeOrchestrator.stopMonitoring().catch((error) => {
-                logger.error("[ApplicationService] Error stopping monitoring during cleanup", error);
-            });
-            this.windowService.closeMainWindow();
+            const services = this.serviceContainer.getInitializedServices();
+            for (const { name } of services) {
+                logger.debug(`[ApplicationService] Cleaning up ${name}`);
+            }
+
+            // Cleanup IPC handlers
+            const ipcService = this.serviceContainer.getIpcService();
+            if ("cleanup" in ipcService && typeof ipcService.cleanup === "function") {
+                ipcService.cleanup();
+            }
+
+            // Stop monitoring
+            const orchestrator = this.serviceContainer.getUptimeOrchestrator();
+            await orchestrator.stopMonitoring();
+
+            // Close windows
+            this.serviceContainer.getWindowService().closeMainWindow();
+
+            logger.info("[ApplicationService] Cleanup completed");
         } catch (error) {
             logger.error("[ApplicationService] Error during cleanup", error);
         }

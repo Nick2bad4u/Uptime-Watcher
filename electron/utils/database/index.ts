@@ -11,7 +11,6 @@ export * from "./historyLimitManager";
 
 // New service-based architecture
 export * from "./interfaces";
-export * from "./repositoryAdapters";
 export * from "./SiteRepositoryService";
 export * from "./SiteWriterService";
 export {

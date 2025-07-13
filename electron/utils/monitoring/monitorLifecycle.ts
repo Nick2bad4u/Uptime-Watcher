@@ -6,7 +6,7 @@
 import { UptimeEvents, TypedEventBus } from "../../events/index";
 import { MonitorRepository, DatabaseService, MonitorScheduler } from "../../services/index";
 import { Site } from "../../types";
-import { ISiteCache } from "../database/interfaces";
+import { SiteCacheInterface } from "../database/interfaces";
 import { withDatabaseOperation } from "../operationalHooks";
 
 interface Logger {
@@ -20,7 +20,7 @@ interface Logger {
  * Configuration object for monitoring lifecycle functions.
  */
 export interface MonitoringLifecycleConfig {
-    sites: ISiteCache;
+    sites: SiteCacheInterface;
     monitorScheduler: MonitorScheduler;
     monitorRepository: MonitorRepository;
     databaseService: DatabaseService;

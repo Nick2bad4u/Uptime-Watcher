@@ -57,7 +57,9 @@ class Main {
         let cleanedUp = false;
         const safeCleanup = () => {
             if (!cleanedUp) {
-                this.applicationService.cleanup();
+                this.applicationService.cleanup().catch((error) => {
+                    logger.error("[Main] Cleanup failed", error);
+                });
                 cleanedUp = true;
             }
         };

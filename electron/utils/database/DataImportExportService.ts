@@ -15,7 +15,7 @@ import {
 } from "../../services/index";
 import { Site, StatusHistory } from "../../types";
 import { withDatabaseOperation } from "../operationalHooks";
-import { ILogger, ISiteCache, SiteLoadingError } from "./interfaces";
+import { Logger, SiteCacheInterface, SiteLoadingError } from "./interfaces";
 
 /**
  * Type for imported site data structure.
@@ -38,7 +38,7 @@ export interface DataImportExportConfig {
         settings: SettingsRepository;
         site: SiteRepository;
     };
-    logger: ILogger;
+    logger: Logger;
 }
 
 /**
@@ -66,7 +66,7 @@ export class DataImportExportService {
         site: SiteRepository;
     };
     private readonly databaseService: DatabaseService;
-    private readonly logger: ILogger;
+    private readonly logger: Logger;
     private readonly eventEmitter: TypedEventBus<UptimeEvents>;
 
     constructor(config: DataImportExportConfig) {
@@ -149,26 +149,27 @@ export class DataImportExportService {
     async persistImportedData(sites: ImportSite[], settings: Record<string, string>): Promise<void> {
         return withDatabaseOperation(
             async () => {
-                const db = this.databaseService.getDatabase();
+                // Use executeTransaction for atomic multi-table operation
+                await this.databaseService.executeTransaction(async (db) => {
+                    // Clear existing data using internal methods
+                    this.repositories.site.deleteAllInternal(db);
+                    this.repositories.settings.deleteAllInternal(db);
+                    this.repositories.monitor.deleteAllInternal(db);
+                    this.repositories.history.deleteAllInternal(db);
 
-                // Clear existing data using internal methods to avoid nested transactions
-                this.repositories.site.deleteAllInternal(db);
-                this.repositories.settings.deleteAllInternal(db);
-                this.repositories.monitor.deleteAllInternal(db);
-                this.repositories.history.deleteAllInternal(db);
+                    // Import sites using bulk insert
+                    const siteRows = sites.map((site) => ({
+                        identifier: site.identifier,
+                        name: site.name,
+                    }));
+                    this.repositories.site.bulkInsertInternal(db, siteRows);
 
-                // Import sites using bulk insert
-                const siteRows = sites.map((site) => ({
-                    identifier: site.identifier,
-                    name: site.name,
-                }));
-                this.repositories.site.bulkInsertInternal(db, siteRows);
+                    // Import monitors and history
+                    await this.importMonitorsWithHistory(db, sites);
 
-                // Import monitors and history
-                await this.importMonitorsWithHistory(db, sites);
-
-                // Import settings using internal method to avoid nested transactions
-                this.repositories.settings.bulkInsertInternal(db, settings);
+                    // Import settings using internal method
+                    this.repositories.settings.bulkInsertInternal(db, settings);
+                });
 
                 this.logger.info(
                     `Successfully imported ${sites.length} sites and ${Object.keys(settings).length} settings`
@@ -277,7 +278,7 @@ export class DataImportExportOrchestrator {
      */
     async importData(
         jsonData: string,
-        siteCache: ISiteCache,
+        siteCache: SiteCacheInterface,
         onSitesReloaded: () => Promise<void>
     ): Promise<{ success: boolean; message: string }> {
         try {

@@ -2,88 +2,18 @@
  * Interfaces for database utilities to support dependency injection and testing.
  */
 
-import { Database } from "node-sqlite3-wasm";
-
-import { UptimeEvents, TypedEventBus } from "../../events";
-import { Monitor, Site, StatusHistory } from "../../types";
+import { UptimeEvents, TypedEventBus } from "../../events/index";
+import { SiteRepository, MonitorRepository, HistoryRepository, SettingsRepository } from "../../services/index";
+import { Site } from "../../types";
 
 /**
  * Logger interface abstraction.
  */
-export interface ILogger {
+export interface Logger {
     debug(message: string, ...args: unknown[]): void;
     error(message: string, error?: unknown, ...args: unknown[]): void;
     info(message: string, ...args: unknown[]): void;
     warn(message: string, ...args: unknown[]): void;
-}
-
-/**
- * Site repository interface.
- */
-export interface ISiteRepository {
-    findAll(): Promise<{ identifier: string; name?: string | undefined }[]>;
-    findByIdentifier(identifier: string): Promise<{ identifier: string; name?: string | undefined } | undefined>;
-    upsert(site: Pick<Site, "identifier" | "name">): Promise<void>;
-    upsertInternal(db: Database, site: Pick<Site, "identifier" | "name" | "monitoring">): void;
-    delete(identifier: string): Promise<boolean>;
-    deleteInternal(db: Database, identifier: string): boolean;
-    // Import/Export operations
-    exportAll(): Promise<Site[]>;
-    deleteAll(): Promise<void>;
-    bulkInsert(sites: { identifier: string; name?: string }[]): Promise<void>;
-}
-
-/**
- * Monitor repository interface.
- */
-export interface IMonitorRepository {
-    findBySiteIdentifier(siteIdentifier: string): Promise<Monitor[]>;
-    create(siteIdentifier: string, monitor: Monitor): Promise<string>;
-    createInternal(db: Database, siteIdentifier: string, monitor: Omit<Monitor, "id">): string;
-    update(monitorId: string, monitor: Partial<Monitor>): Promise<void>;
-    updateInternal(db: Database, monitorId: string, monitor: Partial<Monitor>): void;
-    delete(monitorId: string): Promise<boolean>;
-    deleteBySiteIdentifier(siteIdentifier: string): Promise<void>;
-    deleteBySiteIdentifierInternal(db: Database, siteIdentifier: string): void;
-    deleteMonitorInternal(db: Database, monitorId: string): boolean;
-    // Import/Export operations
-    deleteAll(): Promise<void>;
-    bulkCreate(siteIdentifier: string, monitors: Monitor[]): Promise<Monitor[]>;
-}
-
-/**
- * History repository interface.
- */
-export interface IHistoryRepository {
-    findByMonitorId(monitorId: string): Promise<StatusHistory[]>;
-    create(monitorId: string, history: StatusHistory): Promise<void>;
-    deleteByMonitorId(monitorId: string): Promise<void>;
-    deleteByMonitorIdInternal(db: Database, monitorId: string): void;
-    // Import/Export operations
-    deleteAll(): Promise<void>;
-    deleteAllInternal(db: Database): void;
-    addEntry(monitorId: string, history: StatusHistory, details?: string): Promise<void>;
-    addEntryInternal(db: Database, monitorId: string, history: StatusHistory, details?: string): void;
-    pruneHistory(monitorId: string, limit: number): Promise<void>;
-    pruneHistoryInternal(db: Database, monitorId: string, limit: number): void;
-    pruneAllHistoryInternal(db: Database, limit: number): void;
-}
-
-/**
- * Settings repository interface.
- */
-export interface ISettingsRepository {
-    get(key: string): Promise<string | undefined>;
-    set(key: string, value: string): Promise<void>;
-    setInternal(db: Database, key: string, value: string): void;
-    delete(key: string): Promise<void>;
-    deleteInternal(db: Database, key: string): void;
-    // Import/Export operations
-    getAll(): Promise<Record<string, string>>;
-    deleteAll(): Promise<void>;
-    deleteAllInternal(db: Database): void;
-    bulkInsert(settings: Record<string, string>): Promise<void>;
-    bulkInsertInternal(db: Database, settings: Record<string, string>): void;
 }
 
 /**
@@ -92,13 +22,13 @@ export interface ISettingsRepository {
 export interface SiteLoadingConfig {
     /** Repository dependencies */
     repositories: {
-        site: ISiteRepository;
-        monitor: IMonitorRepository;
-        history: IHistoryRepository;
-        settings: ISettingsRepository;
+        site: SiteRepository;
+        monitor: MonitorRepository;
+        history: HistoryRepository;
+        settings: SettingsRepository;
     };
     /** Logger instance */
-    logger: ILogger;
+    logger: Logger;
     /** Typed event emitter for error handling */
     eventEmitter: TypedEventBus<UptimeEvents>;
 }
@@ -109,11 +39,11 @@ export interface SiteLoadingConfig {
 export interface SiteWritingConfig {
     /** Repository dependencies */
     repositories: {
-        site: ISiteRepository;
-        monitor: IMonitorRepository;
+        site: SiteRepository;
+        monitor: MonitorRepository;
     };
     /** Logger instance */
-    logger: ILogger;
+    logger: Logger;
 }
 
 /**
@@ -133,7 +63,7 @@ export interface MonitoringConfig {
 /**
  * Site cache interface with advanced cache management capabilities.
  */
-export interface ISiteCache {
+export interface SiteCacheInterface {
     get(identifier: string): Site | undefined;
     set(identifier: string, site: Site): void;
     delete(identifier: string): boolean;
@@ -155,7 +85,7 @@ export interface ISiteCache {
 /**
  * Advanced implementation of ISiteCache with invalidation support.
  */
-export class SiteCache implements ISiteCache {
+export class SiteCache implements SiteCacheInterface {
     private readonly cache = new Map<string, Site>();
     private readonly invalidationCallbacks = new Set<(identifier?: string) => void>();
 

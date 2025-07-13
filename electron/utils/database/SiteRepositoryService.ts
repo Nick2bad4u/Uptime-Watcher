@@ -34,18 +34,9 @@
  */
 
 import { UptimeEvents, TypedEventBus } from "../../events/index";
+import { SiteRepository, MonitorRepository, HistoryRepository, SettingsRepository } from "../../services/index";
 import { Site } from "../../types";
-import {
-    ILogger,
-    ISiteRepository,
-    IMonitorRepository,
-    IHistoryRepository,
-    ISettingsRepository,
-    ISiteCache,
-    SiteLoadingConfig,
-    MonitoringConfig,
-    SiteLoadingError,
-} from "./interfaces";
+import { Logger, SiteCacheInterface, SiteLoadingConfig, MonitoringConfig, SiteLoadingError } from "./interfaces";
 
 /**
  * Service for handling site repository operations.
@@ -62,12 +53,12 @@ import {
  */
 export class SiteRepositoryService {
     private readonly repositories: {
-        site: ISiteRepository;
-        monitor: IMonitorRepository;
-        history: IHistoryRepository;
-        settings: ISettingsRepository;
+        site: SiteRepository;
+        monitor: MonitorRepository;
+        history: HistoryRepository;
+        settings: SettingsRepository;
     };
-    private readonly logger: ILogger;
+    private readonly logger: Logger;
     private readonly eventEmitter: TypedEventBus<UptimeEvents>;
 
     /**
@@ -124,7 +115,7 @@ export class SiteRepositoryService {
      * Load sites into cache.
      * Pure data operation that populates the cache.
      */
-    async loadSitesIntoCache(siteCache: ISiteCache): Promise<void> {
+    async loadSitesIntoCache(siteCache: SiteCacheInterface): Promise<void> {
         try {
             const sites = await this.getSitesFromDatabase();
             siteCache.clear();
@@ -194,7 +185,7 @@ export class SiteRepositoryService {
      * This method is kept as a no-op to maintain compatibility during refactoring.
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    startMonitoringForSites(_siteCache: ISiteCache, _monitoringConfig: MonitoringConfig): Promise<void> {
+    startMonitoringForSites(_siteCache: SiteCacheInterface, _monitoringConfig: MonitoringConfig): Promise<void> {
         // Auto-start logic moved to MonitorManager.setupSiteForMonitoring()
         // This method is now a no-op to prevent duplicate auto-start behavior
         this.logger.debug(`[SiteRepositoryService] Auto-start logic delegated to MonitorManager`);
@@ -245,7 +236,7 @@ export class SiteLoadingOrchestrator {
      * Coordinates all aspects of site loading process.
      */
     async loadSitesFromDatabase(
-        siteCache: ISiteCache,
+        siteCache: SiteCacheInterface,
         monitoringConfig: MonitoringConfig
     ): Promise<{ success: boolean; sitesLoaded: number; message: string }> {
         try {

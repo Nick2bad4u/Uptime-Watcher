@@ -476,6 +476,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      */
     public async initialize(): Promise<void> {
         await this.databaseManager.initialize();
+        await this.siteManager.initialize();
     }
 
     // Site Management Operations

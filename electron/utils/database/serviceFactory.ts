@@ -14,15 +14,35 @@ import { monitorLogger } from "../../utils/index";
 import { DataBackupService, DataBackupOrchestrator } from "./DataBackupService";
 import { DataImportExportService, DataImportExportOrchestrator } from "./DataImportExportService";
 import { SiteCache } from "./interfaces";
-import {
-    SiteRepositoryAdapter,
-    MonitorRepositoryAdapter,
-    HistoryRepositoryAdapter,
-    SettingsRepositoryAdapter,
-    LoggerAdapter,
-} from "./repositoryAdapters";
 import { SiteRepositoryService, SiteLoadingOrchestrator } from "./SiteRepositoryService";
 import { SiteWriterService, SiteWritingOrchestrator } from "./SiteWriterService";
+
+/**
+ * Adapter for the logger to implement Logger interface.
+ */
+class LoggerAdapter {
+    private readonly logger: typeof monitorLogger;
+
+    constructor(logger: typeof monitorLogger) {
+        this.logger = logger;
+    }
+
+    debug(message: string, ...args: unknown[]): void {
+        this.logger.debug(message, ...args);
+    }
+
+    error(message: string, error?: unknown, ...args: unknown[]): void {
+        this.logger.error(message, error, ...args);
+    }
+
+    info(message: string, ...args: unknown[]): void {
+        this.logger.info(message, ...args);
+    }
+
+    warn(message: string, ...args: unknown[]): void {
+        this.logger.warn(message, ...args);
+    }
+}
 
 /**
  * Factory function to create a properly configured SiteRepositoryService.
@@ -31,10 +51,10 @@ import { SiteWriterService, SiteWritingOrchestrator } from "./SiteWriterService"
  * @returns Configured SiteRepositoryService instance
  */
 export function createSiteRepositoryService(eventEmitter: TypedEventBus<UptimeEvents>): SiteRepositoryService {
-    const siteRepository = new SiteRepositoryAdapter(new SiteRepository());
-    const monitorRepository = new MonitorRepositoryAdapter(new MonitorRepository());
-    const historyRepository = new HistoryRepositoryAdapter(new HistoryRepository());
-    const settingsRepository = new SettingsRepositoryAdapter(new SettingsRepository());
+    const siteRepository = new SiteRepository();
+    const monitorRepository = new MonitorRepository();
+    const historyRepository = new HistoryRepository();
+    const settingsRepository = new SettingsRepository();
     const logger = new LoggerAdapter(monitorLogger);
 
     return new SiteRepositoryService({
@@ -55,8 +75,8 @@ export function createSiteRepositoryService(eventEmitter: TypedEventBus<UptimeEv
  * @returns Configured SiteWriterService instance
  */
 export function createSiteWriterService(): SiteWriterService {
-    const siteRepository = new SiteRepositoryAdapter(new SiteRepository());
-    const monitorRepository = new MonitorRepositoryAdapter(new MonitorRepository());
+    const siteRepository = new SiteRepository();
+    const monitorRepository = new MonitorRepository();
     const logger = new LoggerAdapter(monitorLogger);
     const databaseService = DatabaseService.getInstance();
 

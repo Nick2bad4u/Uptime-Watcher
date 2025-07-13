@@ -5,18 +5,10 @@
 
 import { Database } from "node-sqlite3-wasm";
 
-import { DatabaseService } from "../../services/index";
+import { DatabaseService, SiteRepository, MonitorRepository } from "../../services/index";
 import { Site, Monitor } from "../../types";
 import { withDatabaseOperation } from "../operationalHooks";
-import {
-    ILogger,
-    ISiteRepository,
-    IMonitorRepository,
-    ISiteCache,
-    SiteWritingConfig,
-    MonitoringConfig,
-    SiteNotFoundError,
-} from "./interfaces";
+import { Logger, SiteCacheInterface, SiteWritingConfig, MonitoringConfig, SiteNotFoundError } from "./interfaces";
 
 /**
  * Service for handling site writing operations.
@@ -24,10 +16,10 @@ import {
  */
 export class SiteWriterService {
     private readonly repositories: {
-        site: ISiteRepository;
-        monitor: IMonitorRepository;
+        site: SiteRepository;
+        monitor: MonitorRepository;
     };
-    private readonly logger: ILogger;
+    private readonly logger: Logger;
     private readonly databaseService: DatabaseService;
 
     constructor(config: SiteWritingConfig & { databaseService: DatabaseService }) {
@@ -42,29 +34,32 @@ export class SiteWriterService {
      */
     async createSite(siteData: Site): Promise<Site> {
         return withDatabaseOperation(
-            () => {
+            async () => {
                 this.logger.info(`Creating new site in database: ${siteData.identifier}`);
 
                 const site: Site = { ...siteData };
 
-                const db = this.databaseService.getDatabase();
+                // Use executeTransaction for atomic multi-step operation
+                await this.databaseService.executeTransaction((db) => {
+                    // Persist site to database using internal method
+                    this.repositories.site.upsertInternal(db, site);
 
-                // Persist site to database using internal method to avoid nested transactions
-                this.repositories.site.upsertInternal(db, site);
+                    // Remove all existing monitors for this site, then insert new ones
+                    this.repositories.monitor.deleteBySiteIdentifierInternal(db, site.identifier);
 
-                // Remove all existing monitors for this site, then insert new ones
-                this.repositories.monitor.deleteBySiteIdentifierInternal(db, site.identifier);
+                    // Create monitors and assign IDs using internal method
+                    for (const monitor of site.monitors) {
+                        const newId = this.repositories.monitor.createInternal(db, site.identifier, monitor);
+                        monitor.id = newId;
+                    }
 
-                // Create monitors and assign IDs using internal method to avoid nested transactions
-                for (const monitor of site.monitors) {
-                    const newId = this.repositories.monitor.createInternal(db, site.identifier, monitor);
-                    monitor.id = newId;
-                }
+                    return Promise.resolve();
+                });
 
                 this.logger.info(
                     `Site created successfully in database: ${site.identifier} (${site.name || "unnamed"})`
                 );
-                return Promise.resolve(site);
+                return site;
             },
             "site-writer-create",
             undefined,
@@ -76,7 +71,7 @@ export class SiteWriterService {
      * Update a site with new values.
      * Pure data operation without side effects.
      */
-    async updateSite(siteCache: ISiteCache, identifier: string, updates: Partial<Site>): Promise<Site> {
+    async updateSite(siteCache: SiteCacheInterface, identifier: string, updates: Partial<Site>): Promise<Site> {
         return withDatabaseOperation(
             async () => {
                 // Validate input
@@ -85,15 +80,16 @@ export class SiteWriterService {
                 // Create updated site
                 const updatedSite = this.createUpdatedSite(siteCache, site, updates);
 
-                const db = this.databaseService.getDatabase();
+                // Use executeTransaction for atomic multi-step operation
+                await this.databaseService.executeTransaction(async (db) => {
+                    // Persist to database using internal method
+                    this.repositories.site.upsertInternal(db, updatedSite);
 
-                // Persist to database using internal method to avoid nested transactions
-                this.repositories.site.upsertInternal(db, updatedSite);
-
-                // Update monitors if provided - UPDATE existing monitors instead of recreating
-                if (updates.monitors) {
-                    await this.updateMonitorsPreservingHistory(db, identifier, updates.monitors);
-                }
+                    // Update monitors if provided - UPDATE existing monitors instead of recreating
+                    if (updates.monitors) {
+                        await this.updateMonitorsPreservingHistory(db, identifier, updates.monitors);
+                    }
+                });
 
                 this.logger.info(`Site updated successfully: ${identifier}`);
                 return updatedSite;
@@ -108,19 +104,21 @@ export class SiteWriterService {
      * Delete a site and all its monitors from the database.
      * Pure data operation without side effects.
      */
-    async deleteSite(siteCache: ISiteCache, identifier: string): Promise<boolean> {
+    async deleteSite(siteCache: SiteCacheInterface, identifier: string): Promise<boolean> {
         return withDatabaseOperation(
-            () => {
+            async () => {
                 this.logger.info(`Removing site: ${identifier}`);
 
                 // Remove from cache
                 const removed = siteCache.delete(identifier);
 
-                const db = this.databaseService.getDatabase();
-
-                // Remove from database using internal methods to avoid nested transactions
-                this.repositories.monitor.deleteBySiteIdentifierInternal(db, identifier);
-                this.repositories.site.deleteInternal(db, identifier);
+                // Use executeTransaction for atomic multi-table deletion
+                await this.databaseService.executeTransaction((db) => {
+                    // Remove from database using internal methods
+                    this.repositories.monitor.deleteBySiteIdentifierInternal(db, identifier);
+                    this.repositories.site.deleteInternal(db, identifier);
+                    return Promise.resolve();
+                });
 
                 if (removed) {
                     this.logger.info(`Site removed successfully: ${identifier}`);
@@ -128,7 +126,7 @@ export class SiteWriterService {
                     this.logger.warn(`Site not found in cache for removal: ${identifier}`);
                 }
 
-                return Promise.resolve(removed);
+                return removed;
             },
             "site-writer-delete",
             undefined,
@@ -177,7 +175,7 @@ export class SiteWriterService {
     /**
      * Validate that a site exists in the cache.
      */
-    private validateSiteExists(siteCache: ISiteCache, identifier: string): Site {
+    private validateSiteExists(siteCache: SiteCacheInterface, identifier: string): Site {
         if (!identifier) {
             throw new SiteNotFoundError("Site identifier is required");
         }
@@ -193,7 +191,7 @@ export class SiteWriterService {
     /**
      * Create updated site object with new values.
      */
-    private createUpdatedSite(siteCache: ISiteCache, site: Site, updates: Partial<Site>): Site {
+    private createUpdatedSite(siteCache: SiteCacheInterface, site: Site, updates: Partial<Site>): Site {
         const updatedSite: Site = {
             ...site,
             ...updates,
@@ -338,7 +336,7 @@ export class SiteWriterService {
 
         for (const existingMonitor of existingMonitors) {
             if (!newMonitorIds.has(existingMonitor.id)) {
-                this.repositories.monitor.deleteMonitorInternal(db, existingMonitor.id);
+                this.repositories.monitor.deleteInternal(db, existingMonitor.id);
                 this.logger.debug(`Removed monitor ${existingMonitor.id} from site ${siteIdentifier}`);
             }
         }
@@ -387,7 +385,7 @@ export class SiteWritingOrchestrator {
      * Delete a site from the database.
      * Pure data operation delegated to the service.
      */
-    async deleteSite(siteCache: ISiteCache, identifier: string): Promise<boolean> {
+    async deleteSite(siteCache: SiteCacheInterface, identifier: string): Promise<boolean> {
         return this.siteWriterService.deleteSite(siteCache, identifier);
     }
 
@@ -396,7 +394,7 @@ export class SiteWritingOrchestrator {
      * Coordinates data updates with monitoring side effects.
      */
     async updateSiteWithMonitoring(
-        siteCache: ISiteCache,
+        siteCache: SiteCacheInterface,
         identifier: string,
         updates: Partial<Site>,
         monitoringConfig: MonitoringConfig

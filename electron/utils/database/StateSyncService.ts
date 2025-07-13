@@ -12,8 +12,9 @@
  */
 
 import { UptimeEvents, TypedEventBus } from "../../events";
+import { SiteRepository } from "../../services/index";
 import { Site } from "../../types";
-import { ISiteRepository, ISiteCache } from "./interfaces";
+import { SiteCacheInterface } from "./interfaces";
 import { logger } from "../logger";
 
 /**
@@ -23,9 +24,9 @@ import { logger } from "../logger";
  */
 export interface StateSyncConfig {
     /** Site repository for database access */
-    siteRepository: ISiteRepository;
+    siteRepository: SiteRepository;
     /** Site cache for memory access */
-    siteCache: ISiteCache;
+    siteCache: SiteCacheInterface;
     /** Event emitter for state change notifications */
     eventEmitter: TypedEventBus<UptimeEvents>;
     /** Frontend store synchronization callback */

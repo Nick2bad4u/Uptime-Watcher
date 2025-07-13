@@ -5,7 +5,7 @@
 
 import { UptimeEvents, TypedEventBus } from "../../events/index";
 import { DatabaseService } from "../../services/index";
-import { ILogger, ISiteCache, SiteLoadingError } from "./interfaces";
+import { Logger, SiteCacheInterface, SiteLoadingError } from "./interfaces";
 
 /**
  * Configuration for data backup operations.
@@ -13,7 +13,7 @@ import { ILogger, ISiteCache, SiteLoadingError } from "./interfaces";
 export interface DataBackupConfig {
     eventEmitter: TypedEventBus<UptimeEvents>;
     databaseService: DatabaseService;
-    logger: ILogger;
+    logger: Logger;
 }
 
 /**
@@ -22,7 +22,7 @@ export interface DataBackupConfig {
  */
 export class DataBackupService {
     private readonly databaseService: DatabaseService;
-    private readonly logger: ILogger;
+    private readonly logger: Logger;
     private readonly eventEmitter: TypedEventBus<UptimeEvents>;
 
     constructor(config: DataBackupConfig) {
@@ -79,7 +79,7 @@ export class DataBackupOrchestrator {
      * Refresh sites from cache.
      * Simple operation that returns sites from the provided cache.
      */
-    refreshSitesFromCache(siteCache: ISiteCache): Promise<{ identifier: string; name?: string }[]> {
+    refreshSitesFromCache(siteCache: SiteCacheInterface): Promise<{ identifier: string; name?: string }[]> {
         try {
             const sites = [...siteCache.entries()].map(([, site]) => ({
                 identifier: site.identifier,

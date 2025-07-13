@@ -43,7 +43,7 @@ import {
     MonitorFactory,
 } from "../../services/index";
 import { Monitor, Site, StatusHistory, StatusUpdate } from "../../types";
-import { ISiteCache } from "../database/interfaces";
+import { SiteCacheInterface } from "../database/interfaces";
 import { withDatabaseOperation } from "../operationalHooks";
 
 /**
@@ -79,7 +79,7 @@ export interface MonitorCheckConfig {
     /** Database service for transaction management */
     databaseService: DatabaseService;
     /** In-memory site cache for performance optimization */
-    sites: ISiteCache;
+    sites: SiteCacheInterface;
     /** Typed event bus for high-level event communication */
     eventEmitter: TypedEventBus<UptimeEvents>;
     /** Logger instance for operation tracking */

@@ -14,7 +14,7 @@ type MonitorManagerEvents = UptimeEvents;
 
 import { MonitorRepository, HistoryRepository, SiteRepository, DatabaseService, MonitorScheduler } from "../services";
 import { Site, StatusUpdate } from "../types";
-import { ISiteCache } from "../utils/database/interfaces";
+import { SiteCacheInterface } from "../utils/database/interfaces";
 import {
     monitorLogger as logger,
     startAllMonitoring,
@@ -23,6 +23,7 @@ import {
     stopMonitoringForSite,
     checkSiteManually,
     checkMonitor,
+    withDatabaseOperation,
     MonitorCheckConfig,
 } from "../utils";
 
@@ -35,7 +36,7 @@ export interface MonitorManagerDependencies {
     };
     databaseService: DatabaseService;
     getHistoryLimit: () => number;
-    getSitesCache: () => ISiteCache;
+    getSitesCache: () => SiteCacheInterface;
 }
 
 /**
@@ -284,15 +285,21 @@ export class MonitorManager {
             if (monitor.id && this.shouldApplyDefaultInterval(monitor)) {
                 monitor.checkInterval = DEFAULT_CHECK_INTERVAL;
 
-                // Use transaction for database update
-                await this.dependencies.databaseService.executeTransaction((db) => {
-                    if (monitor.id) {
-                        this.dependencies.repositories.monitor.updateInternal(db, monitor.id, {
-                            checkInterval: monitor.checkInterval,
-                        });
-                    }
-                    return Promise.resolve();
-                });
+                // Use withDatabaseOperation for consistency and proper error handling
+                await withDatabaseOperation(
+                    () => {
+                        const db = this.dependencies.databaseService.getDatabase();
+                        if (monitor.id) {
+                            this.dependencies.repositories.monitor.updateInternal(db, monitor.id, {
+                                checkInterval: monitor.checkInterval,
+                            });
+                        }
+                        return Promise.resolve();
+                    },
+                    "monitor-manager-apply-default-interval",
+                    undefined,
+                    { monitorId: monitor.id, interval: DEFAULT_CHECK_INTERVAL }
+                );
 
                 logger.debug(
                     `[MonitorManager] Applied default interval ${DEFAULT_CHECK_INTERVAL}ms for monitor: ${monitor.id}`

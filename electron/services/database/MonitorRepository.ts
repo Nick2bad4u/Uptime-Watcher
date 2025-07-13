@@ -54,9 +54,9 @@ export class MonitorRepository {
     }
 
     /**
-     * Find a monitor by its ID with resilient error handling.
+     * Find a monitor by its identifier with resilient error handling.
      */
-    public async findById(monitorId: string): Promise<Site["monitors"][0] | undefined> {
+    public async findByIdentifier(monitorId: string): Promise<Site["monitors"][0] | undefined> {
         return withDatabaseOperation(
             async () => {
                 const db = this.getDb();
@@ -328,21 +328,13 @@ export class MonitorRepository {
      * Internal method to delete a monitor and its history within an existing transaction.
      * This method should be called from within a database transaction.
      */
-    private deleteInternal(db: Database, monitorId: string): boolean {
+    public deleteInternal(db: Database, monitorId: string): boolean {
         // Delete history first (foreign key constraint)
         db.run("DELETE FROM history WHERE monitor_id = ?", [monitorId]);
 
         // Delete the monitor
         const deleteResult = db.run("DELETE FROM monitors WHERE id = ?", [monitorId]);
         return deleteResult.changes > 0;
-    }
-
-    /**
-     * Public internal method to delete a monitor within an existing transaction.
-     * This method should be called from within a database transaction.
-     */
-    public deleteMonitorInternal(db: Database, monitorId: string): boolean {
-        return this.deleteInternal(db, monitorId);
     }
 
     /**
@@ -427,30 +419,33 @@ export class MonitorRepository {
      */
     public async bulkCreate(siteIdentifier: string, monitors: Site["monitors"][0][]): Promise<Site["monitors"][0][]> {
         return withDatabaseOperation(
-            () => {
-                const db = this.databaseService.getDatabase();
+            async () => {
+                // Use executeTransaction for atomic bulk create operation
                 const createdMonitors: Site["monitors"][0][] = [];
 
-                for (const monitor of monitors) {
-                    // Use RETURNING clause to get the ID directly from the insert
-                    const insertResult = db.get(
-                        `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, timeout, retryAttempts, monitoring, status, responseTime, lastChecked) 
-                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
-                         RETURNING id`,
-                        buildMonitorParameters(siteIdentifier, monitor)
-                    ) as { id: number } | undefined;
+                await this.databaseService.executeTransaction((db) => {
+                    for (const monitor of monitors) {
+                        // Use RETURNING clause to get the ID directly from the insert
+                        const insertResult = db.get(
+                            `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, timeout, retryAttempts, monitoring, status, responseTime, lastChecked) 
+                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
+                             RETURNING id`,
+                            buildMonitorParameters(siteIdentifier, monitor)
+                        ) as { id: number } | undefined;
 
-                    if (insertResult && typeof insertResult.id === "number") {
-                        const newMonitor = {
-                            ...monitor,
-                            id: String(insertResult.id),
-                        };
-                        createdMonitors.push(newMonitor);
+                        if (insertResult && typeof insertResult.id === "number") {
+                            const newMonitor = {
+                                ...monitor,
+                                id: String(insertResult.id),
+                            };
+                            createdMonitors.push(newMonitor);
+                        }
                     }
-                }
+                    return Promise.resolve();
+                });
 
                 logger.info(`[MonitorRepository] Bulk created ${monitors.length} monitors for site: ${siteIdentifier}`);
-                return Promise.resolve(createdMonitors);
+                return createdMonitors;
             },
             "monitor-bulk-create",
             undefined,

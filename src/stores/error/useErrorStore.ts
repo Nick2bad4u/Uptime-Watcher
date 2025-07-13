@@ -9,7 +9,7 @@ import type { ErrorStore } from "./types";
 
 import { logStoreAction } from "../utils";
 
-export const useErrorStore = create<ErrorStore>((set, get) => ({
+export const useErrorStore = create<ErrorStore>()((set, get) => ({
     // Actions
     clearAllErrors: () => {
         logStoreAction("ErrorStore", "clearAllErrors");

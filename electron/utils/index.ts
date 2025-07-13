@@ -15,3 +15,4 @@ export * from "./retry";
 export * from "./siteStatus";
 export * from "./correlation";
 export * from "./operationalHooks";
+export * from "./errorHandling";

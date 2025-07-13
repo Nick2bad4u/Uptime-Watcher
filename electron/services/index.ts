@@ -3,6 +3,9 @@
  * Provides centralized access to all electron services.
  */
 
+// Service Container
+export * from "./ServiceContainer";
+
 // Application services
 export * from "./application";
 

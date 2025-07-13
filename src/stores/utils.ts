@@ -10,6 +10,7 @@
  */
 
 import { BaseStore } from "./types";
+import logger from "../services/logger";
 
 /**
  * Creates a base store slice with common error handling functionality.
@@ -159,11 +160,6 @@ export const debounce = <T extends unknown[]>(
 };
 
 /**
- * Use electron-log for consistent logging across frontend and backend
- */
-import log from "electron-log/renderer";
-
-/**
  * Logger utility for store actions in development mode.
  *
  * @param storeName - Name of the store performing the action
@@ -185,9 +181,9 @@ import log from "electron-log/renderer";
 export const logStoreAction = (storeName: string, actionName: string, data?: unknown) => {
     if (process.env.NODE_ENV === "development") {
         if (data !== undefined) {
-            log.info(`[${storeName}] ${actionName}`, data);
+            logger.info(`[${storeName}] ${actionName}`, data);
         } else {
-            log.info(`[${storeName}] ${actionName}`);
+            logger.info(`[${storeName}] ${actionName}`);
         }
     }
 };

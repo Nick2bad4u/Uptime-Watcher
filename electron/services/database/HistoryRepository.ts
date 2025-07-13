@@ -98,21 +98,23 @@ export class HistoryRepository {
         if (limit <= 0) return;
 
         return withDatabaseOperation(
-            () => {
-                const db = this.databaseService.getDatabase();
-                const monitors = db.all("SELECT id FROM monitors") as { id: number }[];
-                for (const monitor of monitors) {
-                    const excessEntries = db.all(
-                        "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?",
-                        [String(monitor.id), limit]
-                    ) as { id: number }[];
-                    if (excessEntries.length > 0) {
-                        const excessIds = excessEntries.map((e) => e.id);
-                        const placeholders = excessIds.map(() => "?").join(",");
-                        db.run(`DELETE FROM history WHERE id IN (${placeholders})`, excessIds);
+            async () => {
+                // Use executeTransaction for atomic multi-monitor operation
+                await this.databaseService.executeTransaction((db) => {
+                    const monitors = db.all("SELECT id FROM monitors") as { id: number }[];
+                    for (const monitor of monitors) {
+                        const excessEntries = db.all(
+                            "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?",
+                            [String(monitor.id), limit]
+                        ) as { id: number }[];
+                        if (excessEntries.length > 0) {
+                            const excessIds = excessEntries.map((e) => e.id);
+                            const placeholders = excessIds.map(() => "?").join(",");
+                            db.run(`DELETE FROM history WHERE id IN (${placeholders})`, excessIds);
+                        }
                     }
-                }
-                return Promise.resolve();
+                    return Promise.resolve();
+                });
             },
             "history-prune-all",
             undefined,
@@ -202,31 +204,33 @@ export class HistoryRepository {
         }
 
         return withDatabaseOperation(
-            () => {
-                const db = this.databaseService.getDatabase();
-                // Prepare the statement once for better performance
-                const stmt = db.prepare(
-                    "INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)"
-                );
-
-                try {
-                    for (const entry of historyEntries) {
-                        stmt.run([
-                            monitorId,
-                            entry.timestamp,
-                            entry.status === "up" || entry.status === "down" ? entry.status : "down",
-                            entry.responseTime,
-                            entry.details ?? null,
-                        ]);
-                    }
-
-                    logger.info(
-                        `[HistoryRepository] Bulk inserted ${historyEntries.length} history entries for monitor: ${monitorId}`
+            async () => {
+                // Use executeTransaction for atomic bulk insert operation
+                await this.databaseService.executeTransaction((db) => {
+                    // Prepare the statement once for better performance
+                    const stmt = db.prepare(
+                        "INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)"
                     );
-                } finally {
-                    stmt.finalize();
-                }
-                return Promise.resolve();
+
+                    try {
+                        for (const entry of historyEntries) {
+                            stmt.run([
+                                monitorId,
+                                entry.timestamp,
+                                entry.status === "up" || entry.status === "down" ? entry.status : "down",
+                                entry.responseTime,
+                                entry.details ?? null,
+                            ]);
+                        }
+
+                        logger.info(
+                            `[HistoryRepository] Bulk inserted ${historyEntries.length} history entries for monitor: ${monitorId}`
+                        );
+                    } finally {
+                        stmt.finalize();
+                    }
+                    return Promise.resolve();
+                });
             },
             "history-bulk-insert",
             undefined,

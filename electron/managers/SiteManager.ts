@@ -45,7 +45,7 @@
 import { UptimeEvents, TypedEventBus } from "../events/index";
 import { SiteRepository, MonitorRepository, HistoryRepository, DatabaseService } from "../services/index";
 import { Site } from "../types";
-import { ISiteCache, SiteCache } from "../utils/database/interfaces";
+import { SiteCacheInterface, SiteCache } from "../utils/database/interfaces";
 import {
     SiteWritingOrchestrator,
     createSiteWritingOrchestrator,
@@ -155,15 +155,31 @@ export class SiteManager {
     }
 
     /**
+     * Initialize the SiteManager by loading all sites into cache.
+     * This method should be called during application startup.
+     */
+    public async initialize(): Promise<void> {
+        try {
+            logger.info("[SiteManager] Initializing - loading sites into cache");
+            const sites = await this.siteRepositoryService.getSitesFromDatabase();
+            await this.updateSitesCache(sites);
+            logger.info(`[SiteManager] Initialized with ${sites.length} sites in cache`);
+        } catch (error) {
+            logger.error("[SiteManager] Failed to initialize cache", error);
+            throw error;
+        }
+    }
+
+    /**
      * Get all sites from database with full monitor and history data.
      *
      * @returns Promise resolving to array of complete site objects
      *
      * @remarks
      * Retrieves all sites from the database including their associated monitors
-     * and status history. This operation bypasses the cache and provides the
-     * most current data directly from the database. Use this method when you
-     * need guaranteed fresh data or during initialization.
+     * and status history. This operation also updates the cache to ensure it
+     * stays synchronized with the database. Use this method when you need
+     * guaranteed fresh data or during cache refresh operations.
      *
      * @example
      * ```typescript
@@ -172,7 +188,10 @@ export class SiteManager {
      * ```
      */
     public async getSites(): Promise<Site[]> {
-        return this.siteRepositoryService.getSitesFromDatabase();
+        const sites = await this.siteRepositoryService.getSitesFromDatabase();
+        // Keep cache synchronized with database
+        await this.updateSitesCache(sites);
+        return sites;
     }
 
     /**
@@ -196,7 +215,7 @@ export class SiteManager {
     /**
      * Get the in-memory sites cache (for internal use by other managers).
      */
-    public getSitesCache(): ISiteCache {
+    public getSitesCache(): SiteCacheInterface {
         return this.siteCache;
     }
 

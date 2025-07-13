@@ -51,7 +51,7 @@ import { createSiteSyncActions } from "./useSiteSync";
  *
  * @public
  */
-export const useSitesStore = create<SitesStore>((set, get) => {
+export const useSitesStore = create<SitesStore>()((set, get) => {
     // Create state actions
     const stateActions = createSitesStateActions(set, get);
 

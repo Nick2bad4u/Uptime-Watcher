@@ -22,4 +22,4 @@ export { handleSubmit } from "./Submit";
 
 // Custom hook
 export { useAddSiteForm } from "./useAddSiteForm";
-export type { AddSiteFormState, AddSiteFormActions, FormMode, MonitorType } from "./useAddSiteForm";
+export type { AddSiteFormState, AddSiteFormActions, FormMode } from "./useAddSiteForm";
