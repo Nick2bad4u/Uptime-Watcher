@@ -33,6 +33,8 @@ vi.mock("../../../utils/logger", () => ({
 
 vi.mock("../../../services/database/utils/index", () => ({
     createDatabaseTables: vi.fn(),
+    createDatabaseIndexes: vi.fn(),
+    setupMonitorTypeValidation: vi.fn(),
     createDatabaseBackup: vi.fn(),
 }));
 

@@ -114,7 +114,7 @@ export class SiteRepository {
             // Load history for each monitor
             for (const monitor of monitors) {
                 if (monitor.id) {
-                    monitor.history = this.historyRepository.findByMonitorId(monitor.id);
+                    monitor.history = await this.historyRepository.findByMonitorId(monitor.id);
                 }
             }
 

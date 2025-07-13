@@ -78,7 +78,7 @@ describe("HistoryRepository", () => {
 
             mockDatabase.all.mockReturnValue(mockRows);
 
-            const result = await historyRepository.findByMonitorId("monitor-1");
+            const result = historyRepository.findByMonitorId("monitor-1");
 
             expect(mockDatabase.all).toHaveBeenCalledWith(
                 "SELECT timestamp, status, responseTime, details FROM history WHERE monitor_id = ? ORDER BY timestamp DESC",
@@ -103,7 +103,7 @@ describe("HistoryRepository", () => {
         it("should return empty array when no history found", async () => {
             mockDatabase.all.mockReturnValue([]);
 
-            const result = await historyRepository.findByMonitorId("monitor-1");
+            const result = historyRepository.findByMonitorId("monitor-1");
 
             expect(result).toEqual([]);
         });
@@ -147,7 +147,7 @@ describe("HistoryRepository", () => {
         it("should delete history entries for a monitor", async () => {
             (isDev as any).mockReturnValue(true);
 
-            await historyRepository.deleteByMonitorId("monitor-1");
+            historyRepository.deleteByMonitorId("monitor-1");
 
             expect(mockDatabase.run).toHaveBeenCalledWith("DELETE FROM history WHERE monitor_id = ?", ["monitor-1"]);
             expect(logger.debug).toHaveBeenCalledWith("[HistoryManipulation] Deleted history for monitor: monitor-1");
@@ -160,7 +160,7 @@ describe("HistoryRepository", () => {
             const excessEntries = [{ id: 1 }, { id: 2 }, { id: 3 }];
             mockDatabase.all.mockReturnValue(excessEntries);
 
-            await historyRepository.pruneHistory("monitor-1", 5);
+            historyRepository.pruneHistory("monitor-1", 5);
 
             expect(mockDatabase.all).toHaveBeenCalledWith(
                 "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?",
@@ -173,8 +173,8 @@ describe("HistoryRepository", () => {
         });
 
         it("should do nothing when limit is 0 or negative", async () => {
-            await historyRepository.pruneHistory("monitor-1", 0);
-            await historyRepository.pruneHistory("monitor-1", -1);
+            historyRepository.pruneHistory("monitor-1", 0);
+            historyRepository.pruneHistory("monitor-1", -1);
 
             expect(mockDatabase.all).not.toHaveBeenCalled();
             expect(mockDatabase.run).not.toHaveBeenCalled();
@@ -183,7 +183,7 @@ describe("HistoryRepository", () => {
         it("should do nothing when no excess entries", async () => {
             mockDatabase.all.mockReturnValue([]);
 
-            await historyRepository.pruneHistory("monitor-1", 5);
+            historyRepository.pruneHistory("monitor-1", 5);
 
             expect(mockDatabase.run).not.toHaveBeenCalledWith(expect.stringContaining("DELETE"));
         });
@@ -235,7 +235,7 @@ describe("HistoryRepository", () => {
         it("should return history count for a monitor", async () => {
             mockDatabase.get.mockReturnValue({ count: 25 });
 
-            const result = await historyRepository.getHistoryCount("monitor-1");
+            const result = historyRepository.getHistoryCount("monitor-1");
 
             expect(mockDatabase.get).toHaveBeenCalledWith(
                 "SELECT COUNT(*) as count FROM history WHERE monitor_id = ?",
@@ -247,7 +247,7 @@ describe("HistoryRepository", () => {
         it("should return 0 when no result", async () => {
             mockDatabase.get.mockReturnValue(undefined);
 
-            const result = await historyRepository.getHistoryCount("monitor-1");
+            const result = historyRepository.getHistoryCount("monitor-1");
 
             expect(result).toBe(0);
         });
@@ -257,7 +257,7 @@ describe("HistoryRepository", () => {
         it("should delete all history entries", async () => {
             (isDev as any).mockReturnValue(true);
 
-            await historyRepository.deleteAll();
+            historyRepository.deleteAll();
 
             expect(mockDatabase.run).toHaveBeenCalledWith("DELETE FROM history");
             expect(logger.debug).toHaveBeenCalledWith("[HistoryManipulation] Cleared all history");
@@ -274,7 +274,7 @@ describe("HistoryRepository", () => {
             };
             mockDatabase.get.mockReturnValue(mockRow);
 
-            const result = await historyRepository.getLatestEntry("monitor-1");
+            const result = historyRepository.getLatestEntry("monitor-1");
 
             expect(mockDatabase.get).toHaveBeenCalledWith(
                 "SELECT timestamp, status, responseTime, details FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT 1",
@@ -291,7 +291,7 @@ describe("HistoryRepository", () => {
         it("should return undefined when no entry found", async () => {
             mockDatabase.get.mockReturnValue(undefined);
 
-            const result = await historyRepository.getLatestEntry("monitor-1");
+            const result = historyRepository.getLatestEntry("monitor-1");
 
             expect(result).toBeUndefined();
         });
@@ -375,7 +375,7 @@ describe("HistoryRepository", () => {
 
             mockDatabase.all.mockReturnValue(mockRows);
 
-            const result = await historyRepository.findByMonitorId("monitor-1");
+            const result = historyRepository.findByMonitorId("monitor-1");
 
             // Verify that string values were converted to numbers
             expect(result).toEqual([
@@ -405,7 +405,7 @@ describe("HistoryRepository", () => {
 
             mockDatabase.get.mockReturnValue(mockRow);
 
-            const result = await historyRepository.getLatestEntry("monitor-1");
+            const result = historyRepository.getLatestEntry("monitor-1");
 
             expect(result).toEqual({
                 timestamp: 1640995200000, // String converted to number

@@ -80,11 +80,19 @@ const createTestSite = (partial: Partial<Site>): Site => ({
 
 // Helper function to create test config
 const createTestConfig = (sites: Site[] = []): MonitoringLifecycleConfig => {
-    const sitesMap = new Map<string, Site>();
-    sites.forEach((site) => sitesMap.set(site.identifier, site));
+    const sitesCache = {
+        getAll: () => sites,
+        get: (key: string) => sites.find(s => s.identifier === key),
+        set: vi.fn(),
+        has: (key: string) => sites.some(s => s.identifier === key),
+        delete: vi.fn(),
+        clear: vi.fn(),
+        size: () => sites.length,
+        invalidate: vi.fn(),
+    };
 
     return {
-        sites: sitesMap,
+        sites: sitesCache as any,
         monitorScheduler: mockMonitorScheduler as unknown as MonitoringLifecycleConfig["monitorScheduler"],
         monitorRepository: mockMonitorRepository as unknown as MonitoringLifecycleConfig["monitorRepository"],
         databaseService: mockDatabaseService as any,
@@ -351,7 +359,7 @@ describe("monitorLifecycle", () => {
             });
             const config = createTestConfig([site]);
 
-            const result = await startMonitoringForSite(config, "test-site", undefined);
+            const result = await startMonitoringForSite(config, "test-site");
 
             expect(result).toBe(false); // Empty array results in false (no monitors to start)
         });

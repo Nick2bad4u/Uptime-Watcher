@@ -35,33 +35,60 @@ export class HistoryRepository {
     /**
      * Find all history entries for a specific monitor.
      */
-    public findByMonitorId(monitorId: string): StatusHistory[] {
-        const db = this.getDb();
-        return findHistoryByMonitorId(db, monitorId);
+    public async findByMonitorId(monitorId: string): Promise<StatusHistory[]> {
+        // eslint-disable-next-line @typescript-eslint/require-await
+        return withDatabaseOperation(async () => {
+            const db = this.getDb();
+            return findHistoryByMonitorId(db, monitorId);
+        }, `find-history-by-monitor-${monitorId}`);
     }
 
     /**
      * Add a new history entry for a monitor.
      */
-    public addEntry(monitorId: string, entry: StatusHistory, details?: string): void {
-        const db = this.getDb();
-        return addHistoryEntry(db, monitorId, entry, details);
+    public async addEntry(monitorId: string, entry: StatusHistory, details?: string): Promise<void> {
+        return withDatabaseOperation(
+            () => {
+                const db = this.getDb();
+                addHistoryEntry(db, monitorId, entry, details);
+                return Promise.resolve();
+            },
+            "history-add-entry",
+            undefined,
+            { monitorId }
+        );
     }
 
     /**
      * Delete history entries for a specific monitor.
      */
-    public deleteByMonitorId(monitorId: string): void {
-        const db = this.getDb();
-        return deleteHistoryByMonitorId(db, monitorId);
+    public async deleteByMonitorId(monitorId: string): Promise<void> {
+        return withDatabaseOperation(
+            () => {
+                const db = this.getDb();
+                deleteHistoryByMonitorId(db, monitorId);
+                return Promise.resolve();
+            },
+            "history-delete-by-monitor",
+            undefined,
+            { monitorId }
+        );
     }
 
     /**
      * Prune old history entries for a monitor, keeping only the most recent entries.
      */
-    public pruneHistory(monitorId: string, limit: number): void {
-        const db = this.getDb();
-        return pruneHistoryForMonitor(db, monitorId, limit);
+    public async pruneHistory(monitorId: string, limit: number): Promise<void> {
+        return withDatabaseOperation(
+            () => {
+                const db = this.getDb();
+                pruneHistoryForMonitor(db, monitorId, limit);
+                return Promise.resolve();
+            },
+            "history-prune",
+            undefined,
+            { monitorId, limit }
+        );
     }
 
     /**

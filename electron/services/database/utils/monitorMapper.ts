@@ -1,6 +1,11 @@
 /**
  * Monitor data mapping utilities.
+ *
+ * @remarks
  * Handles conversion between database rows and application monitor objects.
+ * Provides type-safe mapping with default value handling and validation.
+ *
+ * @packageDocumentation
  */
 
 import { Site } from "../../../types";
@@ -8,6 +13,8 @@ import { convertDateForDb, DbValue, safeNumberConvert } from "./valueConverters"
 
 /**
  * Database row representation of a monitor.
+ *
+ * @public
  */
 export interface MonitorRow {
     id: number;
@@ -27,6 +34,15 @@ export interface MonitorRow {
 
 /**
  * Convert database row to monitor object.
+ *
+ * @param row - Database row data
+ * @returns Converted monitor object
+ *
+ * @remarks
+ * Applies default values for missing fields and validates data types.
+ * Boolean fields are converted from SQLite integer representation.
+ *
+ * @public
  */
 export function rowToMonitor(row: Record<string, unknown>): Site["monitors"][0] {
     const monitor: Site["monitors"][0] = {

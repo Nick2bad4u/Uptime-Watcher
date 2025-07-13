@@ -530,7 +530,7 @@ describe("MonitorRepository", () => {
             const mockRows = [{ id: 1 }, { id: 2 }, { id: 3 }];
             mockDatabase.all.mockReturnValue(mockRows);
 
-            const result = await monitorRepository.getAllMonitorIds();
+            const result = monitorRepository.getAllMonitorIds();
 
             expect(mockDatabase.all).toHaveBeenCalledWith("SELECT id FROM monitors");
             expect(result).toEqual([{ id: 1 }, { id: 2 }, { id: 3 }]);

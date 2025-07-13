@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { MonitorManager } from "../managers/MonitorManager";
 import type { MonitorManagerDependencies } from "../managers/MonitorManager";
-import type { Site, Monitor } from "../types";
+import type { Site, Monitor, StatusUpdate } from "../types";
 import { isDev } from "../electronUtils";
 
 // Use vi.hoisted to ensure these are available when mocks are hoisted
@@ -23,13 +23,14 @@ const {
     const mockStartMonitoringForSite = vi.fn(async () => true);
     const mockStopAllMonitoring = vi.fn(async () => false);
     const mockStopMonitoringForSite = vi.fn(async () => true);
-    const mockCheckSiteManually = vi.fn(async () => ({
-        monitorId: "monitor1",
-        status: "up" as const,
-        responseTime: 100,
-        statusCode: 200,
-        timestamp: Date.now(),
-        message: "OK",
+    const mockCheckSiteManually = vi.fn(async (): Promise<StatusUpdate | undefined> => ({
+        site: {
+            identifier: "test-site",
+            name: "Test Site",
+            monitoring: true,
+            monitors: []
+        },
+        previousStatus: "pending"
     }));
     const mockCheckMonitor = vi.fn(async () => ({
         monitorId: "monitor1",
@@ -104,7 +105,7 @@ vi.mock("../electronUtils", () => ({
 describe("MonitorManager", () => {
     let manager: MonitorManager;
     let mockDependencies: MonitorManagerDependencies;
-    let mockSitesCache: Map<string, Site>;
+    let mockSitesCache: any;
     let mockEventEmitter: any;
     let mockRepositories: any;
     let mockDatabaseService: any;
@@ -137,11 +138,22 @@ describe("MonitorManager", () => {
         vi.clearAllMocks();
 
         // Create mock sites cache
-        mockSitesCache = new Map();
         const site1 = createMockSite("site1", [{ id: "monitor1" }, { id: "monitor2" }]);
         const site2 = createMockSite("site2", [{ id: "monitor3" }]);
-        mockSitesCache.set("site1", site1);
-        mockSitesCache.set("site2", site2);
+        mockSitesCache = {
+            getAll: vi.fn(() => [site1, site2]),
+            get: vi.fn((key) => {
+                if (key === "site1") return site1;
+                if (key === "site2") return site2;
+                return undefined;
+            }),
+            set: vi.fn(),
+            has: vi.fn(),
+            delete: vi.fn(),
+            clear: vi.fn(),
+            size: vi.fn(() => 2),
+            invalidate: vi.fn(),
+        };
 
         // Create mock event emitter
         mockEventEmitter = {
@@ -380,7 +392,7 @@ describe("MonitorManager", () => {
                 undefined
             );
             expect(result).toBeDefined();
-            expect(result?.previousStatus).toBe(undefined);
+            expect(result?.previousStatus).toBe("pending");
         });
 
         it("should perform manual check for a specific monitor", async () => {
@@ -403,7 +415,7 @@ describe("MonitorManager", () => {
         });
 
         it("should handle undefined result", async () => {
-            mockCheckSiteManually.mockResolvedValueOnce(null);
+            mockCheckSiteManually.mockResolvedValueOnce(undefined);
 
             const result = await manager.checkSiteManually("site1");
 
@@ -411,7 +423,7 @@ describe("MonitorManager", () => {
             expect(mockEmitTyped).toHaveBeenCalledWith("internal:monitor:manual-check-completed", {
                 identifier: "site1",
                 operation: "manual-check-completed",
-                result: null,
+                result: undefined,
                 timestamp: expect.any(Number),
             });
         });

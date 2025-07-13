@@ -144,7 +144,7 @@ describe("SettingsRepository", () => {
             ];
             mockDatabase.all.mockReturnValue(mockSettings);
 
-            const result = await settingsRepository.getAll();
+            const result = settingsRepository.getAll();
 
             expect(mockDatabase.all).toHaveBeenCalledWith("SELECT * FROM settings");
             expect(result).toEqual({
@@ -157,7 +157,7 @@ describe("SettingsRepository", () => {
         it("should return empty object when no settings", async () => {
             mockDatabase.all.mockReturnValue([]);
 
-            const result = await settingsRepository.getAll();
+            const result = settingsRepository.getAll();
 
             expect(result).toEqual({});
         });
@@ -170,7 +170,7 @@ describe("SettingsRepository", () => {
             ];
             mockDatabase.all.mockReturnValue(mockSettings);
 
-            const result = await settingsRepository.getAll();
+            const result = settingsRepository.getAll();
 
             // Should only include valid string keys
             expect(result).toEqual({
@@ -186,7 +186,7 @@ describe("SettingsRepository", () => {
             ];
             mockDatabase.all.mockReturnValue(mockSettings);
 
-            const result = await settingsRepository.getAll();
+            const result = settingsRepository.getAll();
 
             expect(result).toEqual({
                 "string-value": "test",
