@@ -5,12 +5,16 @@
     "typescript.disableAutomaticTypeAcquisition": true,
     "typescript.suggest.autoImports": true,
     "typescript.tsserver.experimental.enableProjectDiagnostics": true,
-    "typescript.tsserver.exclude": ["**/node_modules/**"],
+    "typescript.tsserver.exclude": [
+        "**/node_modules/**"
+    ],
     // Exclude from TypeScript checks and problems
     "typescript.check.npmIsInstalled": false,
     "typescript.workspaceSymbols.excludeLibrarySymbols": true,
     // ESLint exclusions
-    "eslint.workingDirectories": ["."],
+    "eslint.workingDirectories": [
+        "."
+    ],
     "eslint.ignoreUntitled": true,
     "http.proxySupport": "off",
     "css.lint.importStatement": "ignore",
@@ -80,10 +84,22 @@
             ],
             "prefer-const": "error",
             "prefer-template": "error",
-            "array-bracket-spacing": ["error", "always"],
-            "generator-star-spacing": ["error", "both"],
-            "space-before-function-paren": ["error", "always"],
-            "yield-star-spacing": ["error", "both"]
+            "array-bracket-spacing": [
+                "error",
+                "always"
+            ],
+            "generator-star-spacing": [
+                "error",
+                "both"
+            ],
+            "space-before-function-paren": [
+                "error",
+                "always"
+            ],
+            "yield-star-spacing": [
+                "error",
+                "both"
+            ]
         }
     },
     "prettier-eslint-typescript.prettierOptions": {
@@ -97,10 +113,21 @@
         "useTabs": false
     },
     // Extension-specific settings to ignore node_modules
-    "errorLens.excludeBySource": ["ts(2339)", "ts(2307)", "ts(2304)", "eslint"],
-    "errorLens.exclude": ["**/node_modules/**"],
+    "errorLens.excludeBySource": [
+        "ts(2339)",
+        "ts(2307)",
+        "ts(2304)",
+        "eslint"
+    ],
+    "errorLens.exclude": [
+        "**/node_modules/**"
+    ],
     // SonarLint exclusions
-    "sonarlint.pathsToExclude": ["**/node_modules/**", "**/dist/**", "**/coverage/**"],
+    "sonarlint.pathsToExclude": [
+        "**/node_modules/**",
+        "**/dist/**",
+        "**/coverage/**"
+    ],
     // Disable auto-indexing of node_modules
     "typescript.preferences.includeCompletionsForImportStatements": false,
     "typescript.preferences.includeCompletionsForModuleExports": false,
@@ -118,14 +145,20 @@
             },
             "github": {
                 "command": "npx",
-                "args": ["-y", "@modelcontextprotocol/server-github"],
+                "args": [
+                    "-y",
+                    "@modelcontextprotocol/server-github"
+                ],
                 "env": {
                     "GITHUB_PERSONAL_ACCESS_TOKEN": ""
                 }
             },
             "memory": {
                 "command": "npx",
-                "args": ["-y", "@modelcontextprotocol/server-memory"]
+                "args": [
+                    "-y",
+                    "@modelcontextprotocol/server-memory"
+                ]
             }
         }
     },
@@ -177,5 +210,250 @@
                 "github.copilot-chat/Groq-qwen-qwq-32b"
             ]
         }
-    }
+    },
+    "better-comments.tags": [
+        {
+            "tag": "//",
+            "color": "#6272a4",
+            "strikethrough": true,
+            "underline": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "EXPLANATION:",
+            "color": "#ff70b3",
+            "strikethrough": false,
+            "underline": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "TODO:",
+            "color": "#ffc66d",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "FIXME:",
+            "color": "#ff6e6e",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "BUG:",
+            "color": "#f8f8f2",
+            "strikethrough": false,
+            "backgroundColor": "#bb80ff"
+        },
+        {
+            "tag": "HACK:",
+            "color": "#ffffa5",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "NOTE:",
+            "color": "#94f0ff",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "INFO:",
+            "color": "#c798e6",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "IDEA:",
+            "color": "#80ffce",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "DEBUG:",
+            "color": "#ff2975",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "WHY:",
+            "color": "#ff9580",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "WHAT THIS DO:",
+            "color": "#FBBF24",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "CONTEXT:",
+            "color": "#d8ff80",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "CRITICAL:",
+            "color": "#FFFFFF",
+            "strikethrough": false,
+            "backgroundColor": "#9F1239"
+        },
+        {
+            "tag": "REVIEW:",
+            "color": "#A5B4FC",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "OPTIMIZE:",
+            "color": "#4ADE80",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "SECTION:",
+            "color": "#f1a18e",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "NEXT STEP:",
+            "color": "#ba6645",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "SECURITY:",
+            "color": "#cff028",
+            "strikethrough": false,
+            "backgroundColor": "#44475a"
+        },
+        {
+            "tag": "PERFORMANCE:",
+            "color": "#d7ffad",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "DEPRECATED:",
+            "color": "#8b8098",
+            "strikethrough": true,
+            "backgroundColor": "#44475a"
+        },
+        {
+            "tag": "API:",
+            "color": "#c798e6",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "@remarks",
+            "color": "#94f0ff",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "@example",
+            "color": "#80ffce",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "@param",
+            "color": "#ffc66d",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "@returns",
+            "color": "#4ADE80",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "@throws",
+            "color": "#ff6e6e",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "@deprecated",
+            "color": "#8b8098",
+            "strikethrough": true,
+            "backgroundColor": "#44475a"
+        },
+        {
+            "tag": "@see",
+            "color": "#A5B4FC",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "@defaultValue",
+            "color": "#d8ff80",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "@public",
+            "color": "#4ADE80",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "@private",
+            "color": "#ff2975",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "@protected",
+            "color": "#ffc66d",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "@readonly",
+            "color": "#94f0ff",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "@sealed",
+            "color": "#ff9580",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "@virtual",
+            "color": "#c798e6",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "{@link",
+            "color": "#45A9F9",
+            "strikethrough": false,
+            "underline": true,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "{@inheritDoc",
+            "color": "#ff70b3",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "@packageDocumentation",
+            "color": "#ffffa5",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "{@linkcode",
+            "color": "#45A9F9",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        }
+    ],
 }

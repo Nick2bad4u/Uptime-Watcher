@@ -325,7 +325,7 @@ export default [
             "compat/compat": "off", // Electron supports modern APIs, Opera Mini not a target
 
             // Code style
-            "prettier/prettier": ["error", { usePrettierrc: true }],
+            "prettier/prettier": ["warn", { usePrettierrc: true }],
 
             // Documentation
             "tsdoc/syntax": "warn",
@@ -624,7 +624,7 @@ export default [
                 },
             ],
 
-            "prettier/prettier": ["error", { usePrettierrc: true }],
+            "prettier/prettier": ["warn", { usePrettierrc: true }],
 
             // Advanced type-checked rules for backend async safety and runtime error prevention
             "@typescript-eslint/no-floating-promises": [
