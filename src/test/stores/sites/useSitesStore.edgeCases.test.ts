@@ -247,10 +247,7 @@ describe("Sites Store Modules - Edge Cases and Error Scenarios", () => {
 
     describe("useSiteMonitoring Error Scenarios", () => {
         it("should handle monitoring operations with invalid site data", async () => {
-            const mockSyncSitesFromBackend = vi.fn();
-            const monitoringActions = createSiteMonitoringActions({
-                syncSitesFromBackend: mockSyncSitesFromBackend,
-            });
+            const monitoringActions = createSiteMonitoringActions();
 
             const { MonitoringService } = await import("../../../stores/sites/services");
             vi.mocked(MonitoringService.startMonitoring).mockRejectedValue(new Error("Monitoring service unavailable"));
@@ -262,10 +259,7 @@ describe("Sites Store Modules - Edge Cases and Error Scenarios", () => {
         });
 
         it("should handle stop monitoring for non-existent monitors", async () => {
-            const mockSyncSitesFromBackend = vi.fn();
-            const monitoringActions = createSiteMonitoringActions({
-                syncSitesFromBackend: mockSyncSitesFromBackend,
-            });
+            const monitoringActions = createSiteMonitoringActions();
 
             const { MonitoringService } = await import("../../../stores/sites/services");
             vi.mocked(MonitoringService.stopMonitoring).mockResolvedValue(undefined);
@@ -276,10 +270,7 @@ describe("Sites Store Modules - Edge Cases and Error Scenarios", () => {
         });
 
         it("should handle check site now with various error conditions", async () => {
-            const mockSyncSitesFromBackend = vi.fn();
-            const monitoringActions = createSiteMonitoringActions({
-                syncSitesFromBackend: mockSyncSitesFromBackend,
-            });
+            const monitoringActions = createSiteMonitoringActions();
 
             const { SiteService } = await import("../../../stores/sites/services");
 

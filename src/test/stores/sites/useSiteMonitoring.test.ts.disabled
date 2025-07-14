@@ -6,7 +6,7 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-import { createSiteMonitoringActions, type SiteMonitoringDependencies } from "../../../stores/sites/useSiteMonitoring";
+import { createSiteMonitoringActions } from "../../../stores/sites/useSiteMonitoring";
 
 // Mock dependencies
 vi.mock("../../../stores/sites/services", () => ({
@@ -42,18 +42,13 @@ import { SiteService, MonitoringService } from "../../../stores";
 import { logStoreAction } from "../../../stores/utils";
 
 describe("useSiteMonitoring", () => {
-    let mockDependencies: SiteMonitoringDependencies;
     let monitoringActions: ReturnType<typeof createSiteMonitoringActions>;
 
     beforeEach(() => {
         vi.clearAllMocks();
 
-        // Setup mock dependencies
-        mockDependencies = {
-            syncSitesFromBackend: vi.fn(),
-        };
-
-        monitoringActions = createSiteMonitoringActions(mockDependencies);
+        // Setup monitoring actions
+        monitoringActions = createSiteMonitoringActions();
     });
 
     describe("startSiteMonitorMonitoring", () => {
@@ -66,7 +61,6 @@ describe("useSiteMonitoring", () => {
             await monitoringActions.startSiteMonitorMonitoring(siteId, monitorId);
 
             expect(MonitoringService.startMonitoring).toHaveBeenCalledWith(siteId, monitorId);
-            expect(mockDependencies.syncSitesFromBackend).toHaveBeenCalledTimes(1);
             expect(logStoreAction).toHaveBeenCalledWith("SitesStore", "startSiteMonitorMonitoring", {
                 monitorId,
                 siteId,
@@ -84,7 +78,6 @@ describe("useSiteMonitoring", () => {
             await expect(monitoringActions.startSiteMonitorMonitoring(siteId, monitorId)).resolves.toBeUndefined();
 
             expect(MonitoringService.startMonitoring).toHaveBeenCalledWith(siteId, monitorId);
-            expect(mockDependencies.syncSitesFromBackend).not.toHaveBeenCalled();
             expect(logStoreAction).toHaveBeenCalledWith("SitesStore", "startSiteMonitorMonitoring", {
                 monitorId,
                 siteId,

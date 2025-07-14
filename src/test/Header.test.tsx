@@ -49,13 +49,13 @@ describe("Header Component", () => {
     it("should display status indicators", () => {
         render(<Header />);
         const statusElements = screen.getAllByTestId("status-unknown");
-        expect(statusElements).toHaveLength(3); // up, down, pending
+        expect(statusElements).toHaveLength(4); // up, down, pending, paused
     });
 
     it("should show zero counts when no sites", () => {
         render(<Header />);
         const statusElements = screen.getAllByTestId("status-unknown");
-        expect(statusElements).toHaveLength(3); // up, down, pending
+        expect(statusElements).toHaveLength(4); // up, down, pending, paused
         statusElements.forEach((element) => {
             expect(element).toHaveTextContent("0");
         });
