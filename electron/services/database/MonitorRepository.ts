@@ -17,6 +17,8 @@ import {
     convertDateForDb,
     DbValue,
     rowToMonitor,
+    generateSqlParameters,
+    mapMonitorToRow,
 } from "./utils";
 
 /**
@@ -94,34 +96,13 @@ export class MonitorRepository {
             () => {
                 const db = this.getDb();
 
-                // Use RETURNING clause to get the ID directly from the insert
-                const insertResult = db.get(
-                    `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, timeout, retryAttempts, monitoring, status, responseTime, lastChecked) 
-                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
-                     RETURNING id`,
-                    [
-                        siteIdentifier,
-                        monitor.type,
+                // Generate dynamic SQL and parameters
+                const { columns, placeholders } = generateSqlParameters();
+                const parameters = buildMonitorParameters(siteIdentifier, monitor as Site["monitors"][0]);
 
-                        monitor.url ? String(monitor.url) : null,
+                const insertSql = `INSERT INTO monitors (${columns.join(", ")}) VALUES (${placeholders}) RETURNING id`;
 
-                        monitor.host ? String(monitor.host) : null,
-
-                        monitor.port ?? null,
-
-                        Number(monitor.checkInterval),
-
-                        Number(monitor.timeout),
-
-                        Number(monitor.retryAttempts),
-                        monitor.monitoring ? 1 : 0,
-                        monitor.status,
-
-                        Number(monitor.responseTime),
-
-                        monitor.lastChecked ? convertDateForDb(monitor.lastChecked) : null,
-                    ]
-                ) as { id: number } | undefined;
+                const insertResult = db.get(insertSql, parameters) as { id: number } | undefined;
 
                 if (!insertResult || typeof insertResult.id !== "number") {
                     throw new Error(`Failed to create monitor for site ${siteIdentifier} - no ID returned`);
@@ -145,26 +126,13 @@ export class MonitorRepository {
      * Use this method when you're already within a transaction context.
      */
     public createInternal(db: Database, siteIdentifier: string, monitor: Omit<Site["monitors"][0], "id">): string {
-        // Use RETURNING clause to get the ID directly from the insert
-        const insertResult = db.get(
-            `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, timeout, retryAttempts, monitoring, status, responseTime, lastChecked) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
-             RETURNING id`,
-            [
-                siteIdentifier,
-                monitor.type,
-                monitor.url ? String(monitor.url) : null,
-                monitor.host ? String(monitor.host) : null,
-                monitor.port ?? null,
-                Number(monitor.checkInterval),
-                Number(monitor.timeout),
-                Number(monitor.retryAttempts),
-                monitor.monitoring ? 1 : 0,
-                monitor.status,
-                Number(monitor.responseTime),
-                monitor.lastChecked ? convertDateForDb(monitor.lastChecked) : null,
-            ]
-        ) as { id: number } | undefined;
+        // Generate dynamic SQL and parameters
+        const { columns, placeholders } = generateSqlParameters();
+        const parameters = buildMonitorParameters(siteIdentifier, monitor as Site["monitors"][0]);
+
+        const insertSql = `INSERT INTO monitors (${columns.join(", ")}) VALUES (${placeholders}) RETURNING id`;
+
+        const insertResult = db.get(insertSql, parameters) as { id: number } | undefined;
 
         if (!insertResult || typeof insertResult.id !== "number") {
             throw new Error(`Failed to create monitor for site ${siteIdentifier} - no ID returned`);
@@ -249,36 +217,47 @@ export class MonitorRepository {
      * Does not create its own transaction.
      */
     public updateInternal(db: Database, monitorId: string, monitor: Partial<Site["monitors"][0]>): void {
-        // Build dynamic SQL based on provided fields to avoid overwriting with defaults
+        if (isDev()) {
+            logger.debug(`[MonitorRepository] updateInternal called with monitorId: ${monitorId}, monitor:`, monitor);
+        }
+
+        // Use dynamic row mapping to convert camelCase to snake_case
+        const row = mapMonitorToRow(monitor as Record<string, unknown>);
+
+        if (isDev()) {
+            logger.debug(`[MonitorRepository] mapMonitorToRow result:`, row);
+        }
+
         const updateFields: string[] = [];
         const updateValues: DbValue[] = [];
 
-        // Add fields using helper methods
-        if (monitor.type !== undefined) {
-            updateFields.push("type = ?");
-            updateValues.push(monitor.type);
-        }
+        // Only update fields that are actually provided and are primitive types
+        for (const [key, value] of Object.entries(row)) {
+            if (value !== undefined && value !== null) {
+                // Skip 'enabled' field if monitoring state wasn't provided in the original monitor object
+                // This prevents status updates from accidentally disabling monitoring
+                if (key === "enabled" && !("monitoring" in monitor) && !("enabled" in monitor)) {
+                    if (isDev()) {
+                        logger.debug(
+                            `[MonitorRepository] Skipping 'enabled' field - monitoring state not provided in update`
+                        );
+                    }
+                    continue;
+                }
 
-        addStringField("url", monitor.url, updateFields, updateValues);
-        addStringField("host", monitor.host, updateFields, updateValues);
-        addNumberField("port", monitor.port, updateFields, updateValues);
-        addNumberField("checkInterval", monitor.checkInterval, updateFields, updateValues);
-        addNumberField("timeout", monitor.timeout, updateFields, updateValues);
-        addNumberField("retryAttempts", monitor.retryAttempts, updateFields, updateValues);
-        addBooleanField("monitoring", monitor.monitoring, updateFields, updateValues);
-
-        if (monitor.status !== undefined) {
-            updateFields.push("status = ?");
-            updateValues.push(monitor.status);
-        }
-
-        // monitor.responseTime is always a number, so no need for unnecessary conditional
-        addNumberField("responseTime", monitor.responseTime, updateFields, updateValues);
-
-        if (monitor.lastChecked !== undefined) {
-            updateFields.push("lastChecked = ?");
-            const lastCheckedValue = convertDateForDb(monitor.lastChecked);
-            updateValues.push(lastCheckedValue);
+                // Ensure we only bind primitive types that SQLite can handle
+                if (typeof value === "string" || typeof value === "number") {
+                    updateFields.push(`${key} = ?`);
+                    updateValues.push(value);
+                } else if (typeof value === "boolean") {
+                    updateFields.push(`${key} = ?`);
+                    updateValues.push(value ? 1 : 0);
+                } else {
+                    if (isDev()) {
+                        logger.warn(`[MonitorRepository] Skipping non-primitive field ${key} with value:`, value);
+                    }
+                }
+            }
         }
 
         if (updateFields.length === 0) {
@@ -291,6 +270,11 @@ export class MonitorRepository {
         updateValues.push(monitorId);
 
         const sql = `UPDATE monitors SET ${updateFields.join(", ")} WHERE id = ?`;
+
+        if (isDev()) {
+            logger.debug(`[MonitorRepository] Executing SQL: ${sql} with values:`, updateValues);
+        }
+
         db.run(sql, updateValues);
 
         if (isDev()) {

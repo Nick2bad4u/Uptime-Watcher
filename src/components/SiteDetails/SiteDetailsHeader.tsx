@@ -62,7 +62,7 @@ export function SiteDetailsHeader({
                 <div className="flex items-start justify-between w-full gap-6 site-details-header-info">
                     {/* Left side: Screenshot, Status, and Site Info */}
                     <div className="flex items-center flex-1 min-w-0 gap-4">
-                        {/* Website Screenshot Thumbnail */}
+                        {/* Website Screenshot Thumbnail - Only show URL for HTTP monitors */}
                         {!isCollapsed && (
                             <ScreenshotThumbnail
                                 url={selectedMonitor?.type === "http" ? (selectedMonitor.url ?? "") : ""}
@@ -76,7 +76,7 @@ export function SiteDetailsHeader({
                             <ThemedText size="2xl" weight="bold" className="truncate site-details-title">
                                 {site.name}
                             </ThemedText>
-                            {/* Show URL for HTTP, host:port for port monitor */}
+                            {/* Show clickable URL for HTTP monitors that have a URL */}
                             {!isCollapsed && selectedMonitor?.type === "http" && selectedMonitor.url && (
                                 <a
                                     href={selectedMonitor.url}
@@ -201,6 +201,7 @@ function MonitoringStatusDisplay({ monitors }: { readonly monitors: Monitor[] })
                                 </div>
                             </ThemedBadge>
                             <ThemedText size="xs" variant="secondary" className="flex-1 min-w-0">
+                                {/* Display appropriate connection info based on monitor type */}
                                 {monitor.type === "http" && monitor.url && (
                                     <span className="block truncate">{new URL(monitor.url).hostname}</span>
                                 )}

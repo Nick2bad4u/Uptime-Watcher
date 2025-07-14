@@ -206,6 +206,34 @@ const eventsAPI = {
     },
 
     /**
+     * Register a callback for monitoring started events.
+     *
+     * @param callback - Function to call when monitoring starts for a site/monitor
+     *
+     * @remarks
+     * Called when a monitor begins actively monitoring a site.
+     */
+    onMonitoringStarted: (callback: (data: { siteId: string; monitorId: string }) => void) => {
+        ipcRenderer.on("monitoring-started", (_, data: { siteId: string; monitorId: string }) => {
+            callback(data);
+        });
+    },
+
+    /**
+     * Register a callback for monitoring stopped events.
+     *
+     * @param callback - Function to call when monitoring stops for a site/monitor
+     *
+     * @remarks
+     * Called when a monitor stops actively monitoring a site.
+     */
+    onMonitoringStopped: (callback: (data: { siteId: string; monitorId: string }) => void) => {
+        ipcRenderer.on("monitoring-stopped", (_, data: { siteId: string; monitorId: string }) => {
+            callback(data);
+        });
+    },
+
+    /**
      * Register a callback for test events (development/debugging).
      *
      * @param callback - Function to call when test events are received
@@ -310,6 +338,31 @@ const stateSyncAPI = {
 };
 
 /**
+ * Monitor types API methods for accessing monitor type registry.
+ *
+ * @remarks
+ * Provides access to available monitor types and their configurations
+ * for dynamic form generation and validation.
+ */
+const monitorTypesAPI = {
+    /**
+     * Get all available monitor types with their configurations.
+     *
+     * @returns Promise resolving to array of monitor type configurations
+     */
+    getMonitorTypes: () => ipcRenderer.invoke("get-monitor-types"),
+
+    /**
+     * Validate monitor data using backend registry.
+     *
+     * @param type - Monitor type to validate
+     * @param data - Monitor data to validate
+     * @returns Promise resolving to validation result
+     */
+    validateMonitorData: (type: string, data: unknown) => ipcRenderer.invoke("validate-monitor-data", type, data),
+};
+
+/**
  * Expose the organized API to the renderer process via contextBridge.
  *
  * @remarks
@@ -326,4 +379,5 @@ contextBridge.exposeInMainWorld("electronAPI", {
     sites: siteAPI,
     stateSync: stateSyncAPI,
     system: systemAPI,
+    monitorTypes: monitorTypesAPI,
 });

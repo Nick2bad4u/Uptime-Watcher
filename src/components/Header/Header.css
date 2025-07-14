@@ -94,6 +94,14 @@
     will-change: transform, box-shadow;
 }
 
+.status-paused-badge {
+    transition:
+        box-shadow 0.18s,
+        background 0.18s,
+        transform 0.16s;
+    will-change: transform, box-shadow;
+}
+
 .health-badge:hover {
     box-shadow: 0 4px 18px 0 var(--color-success-shadow, var(--color-success) 33);
     background-color: color-mix(in srgb, var(--color-success) 18%, transparent);
@@ -118,6 +126,13 @@
 .status-pending-badge:hover {
     background-color: color-mix(in srgb, var(--color-warning) 12%, transparent);
     box-shadow: 0 2px 12px 0 var(--color-warning-shadow, var(--color-warning) 22);
+    transform: scale(1.04) translateY(-1px);
+    filter: brightness(1.03) saturate(1.08);
+}
+
+.status-paused-badge:hover {
+    background-color: color-mix(in srgb, var(--color-status-paused) 12%, transparent);
+    box-shadow: 0 2px 12px 0 var(--color-status-paused-shadow, var(--color-status-paused) 22);
     transform: scale(1.04) translateY(-1px);
     filter: brightness(1.03) saturate(1.08);
 }
@@ -181,6 +196,13 @@
     box-shadow: 0 2px 12px 0 var(--color-warning-shadow, var(--color-warning) 22);
 }
 
+.status-paused-badge:hover,
+.status-paused-badge:focus-visible {
+    border-color: var(--color-status-paused);
+    background: color-mix(in srgb, var(--color-status-paused) 8%, transparent);
+    box-shadow: 0 2px 12px 0 var(--color-status-paused-shadow, var(--color-status-paused) 22);
+}
+
 .total-sites-badge:hover,
 .total-sites-badge:focus-visible {
     border-color: var(--color-border, var(--color-accent));
@@ -210,7 +232,8 @@
     .health-badge,
     .status-up-badge,
     .status-down-badge,
-    .status-pending-badge {
+    .status-pending-badge,
+    .status-paused-badge {
         transition: none !important;
     }
 }

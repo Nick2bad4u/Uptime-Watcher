@@ -4,7 +4,7 @@
  * Provides interface for modifying site settings, intervals, and performing site management actions.
  */
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FiTrash2, FiSave } from "react-icons/fi";
 import { MdSettings, MdTimer, MdInfoOutline, MdDangerous } from "react-icons/md";
 
@@ -13,6 +13,7 @@ import { logger } from "../../../services";
 import { ThemedText, ThemedButton, ThemedCard, ThemedBadge, ThemedInput, ThemedSelect, useTheme } from "../../../theme";
 import { Site, Monitor } from "../../../types";
 import { calculateMaxDuration, getIntervalLabel } from "../../../utils";
+import { getMonitorTypeConfig } from "../../../utils/monitorTypeHelper";
 
 /**
  * Helper function to format retry attempts text.
@@ -29,33 +30,84 @@ function formatRetryAttemptsText(attempts: number): string {
 }
 
 /**
+ * Component that displays the identifier label for a monitor type.
+ */
+function IdentifierLabel({ selectedMonitor }: { selectedMonitor: Monitor }) {
+    const [label, setLabel] = useState<string>("Loading...");
+
+    useEffect(() => {
+        let isCancelled = false;
+
+        const loadLabel = async () => {
+            try {
+                const identifierLabel = await getIdentifierLabel(selectedMonitor);
+                if (!isCancelled) {
+                    setLabel(identifierLabel);
+                }
+            } catch (error) {
+                console.warn("Failed to load identifier label:", error);
+                if (!isCancelled) {
+                    setLabel("Identifier");
+                }
+            }
+        };
+
+        void loadLabel();
+
+        return () => {
+            isCancelled = true;
+        };
+    }, [selectedMonitor]);
+
+    return label;
+}
+
+/**
  * Generate a display label for the identifier field based on monitor type.
  */
-function getIdentifierLabel(selectedMonitor: Monitor): string {
+async function getIdentifierLabel(selectedMonitor: Monitor): Promise<string> {
+    try {
+        const config = await getMonitorTypeConfig(selectedMonitor.type);
+        if (config?.fields) {
+            // Generate label based on primary field(s)
+            const primaryField = config.fields.find((field) => field.required);
+            if (primaryField) {
+                return primaryField.label;
+            }
+            // Fallback to first field
+            if (config.fields.length > 0 && config.fields[0]) {
+                return config.fields[0].label;
+            }
+        }
+    } catch (error) {
+        console.warn("Failed to get monitor config for identifier label:", error);
+    }
+
+    // Fallback to hardcoded labels
     if (selectedMonitor.type === "http") {
         return "Website URL";
     }
-
     if (selectedMonitor.type === "port") {
         return "Host & Port";
     }
-
     return "Internal Site ID";
 }
 
 /**
  * Generate a display identifier based on the monitor type.
- * For HTTP monitors: shows the URL
- * For port monitors: shows host:port
- * Fallback: shows the site identifier
+ * Uses the monitor registry to format the display value appropriately.
  */
 function getDisplayIdentifier(currentSite: Site, selectedMonitor: Monitor): string {
-    if (selectedMonitor.type === "http" && selectedMonitor.url) {
-        return selectedMonitor.url;
-    }
-
-    if (selectedMonitor.type === "port" && selectedMonitor.host && selectedMonitor.port) {
-        return `${selectedMonitor.host}:${selectedMonitor.port}`;
+    try {
+        // Try to get the primary value for display
+        if (selectedMonitor.type === "http" && selectedMonitor.url) {
+            return selectedMonitor.url;
+        }
+        if (selectedMonitor.type === "port" && selectedMonitor.host && selectedMonitor.port) {
+            return `${selectedMonitor.host}:${selectedMonitor.port}`;
+        }
+    } catch (error) {
+        console.warn("Failed to generate display identifier:", error);
     }
 
     // Fallback to site identifier
@@ -243,7 +295,7 @@ export function SettingsTab({
                     {/* Site Identifier */}
                     <div className="space-y-2">
                         <ThemedText size="sm" weight="medium" variant="secondary">
-                            {getIdentifierLabel(selectedMonitor)}
+                            <IdentifierLabel selectedMonitor={selectedMonitor} />
                         </ThemedText>
                         <ThemedInput
                             type="text"
@@ -374,7 +426,7 @@ export function SettingsTab({
                     <div className="space-y-3">
                         <div className="flex items-center justify-between">
                             <ThemedText size="sm" variant="secondary">
-                                {getIdentifierLabel(selectedMonitor)}:
+                                <IdentifierLabel selectedMonitor={selectedMonitor} />:
                             </ThemedText>
                             <ThemedBadge variant="secondary" size="sm">
                                 {getDisplayIdentifier(currentSite, selectedMonitor)}

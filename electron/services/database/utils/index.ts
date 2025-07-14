@@ -9,6 +9,9 @@ export * from "./valueConverters";
 // Monitor mapping utilities
 export * from "./monitorMapper";
 
+// Dynamic schema utilities
+export * from "./dynamicSchema";
+
 // History utilities
 export * from "./historyMapper";
 export * from "./historyQuery";

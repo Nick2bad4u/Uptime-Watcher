@@ -9,6 +9,7 @@ import { useState, useEffect, useCallback } from "react";
 import { DEFAULT_CHECK_INTERVAL } from "../../constants";
 import { generateUuid } from "../../utils/index";
 import type { MonitorType } from "../../types";
+import { useMonitorFields } from "../../hooks/useMonitorFields";
 
 /** Form operation mode */
 export type FormMode = "new" | "existing";
@@ -99,21 +100,28 @@ export function useAddSiteForm(): AddSiteFormState & AddSiteFormActions {
     // UI state
     const [formError, setFormError] = useState<string | undefined>();
 
+    // Use monitor fields hook for dynamic validation
+    const { getFields } = useMonitorFields();
+
     // Reset fields when monitor type changes, but preserve them if they've been explicitly set
     useEffect(() => {
         setFormError(undefined);
 
-        // Only reset URL if we're switching to port mode
-        if (monitorType === "port") {
+        // Get current monitor type fields
+        const currentFields = getFields(monitorType);
+        const currentFieldNames = new Set(currentFields.map((field) => field.name));
+
+        // Reset fields that are not used by the current monitor type
+        if (!currentFieldNames.has("url")) {
             setUrl("");
         }
-
-        // Only reset host/port if we're switching to http mode
-        if (monitorType === "http") {
+        if (!currentFieldNames.has("host")) {
             setHost("");
+        }
+        if (!currentFieldNames.has("port")) {
             setPort("");
         }
-    }, [monitorType]);
+    }, [monitorType, getFields]);
 
     // Reset name and siteId when switching to new site
     useEffect(() => {
@@ -128,14 +136,44 @@ export function useAddSiteForm(): AddSiteFormState & AddSiteFormActions {
 
     // Simple validation function without logging - only used for submit button state
     const isFormValid = useCallback(() => {
-        // Basic check for submit button enablement only
-        return !(
-            (addMode === "new" && !name.trim()) ||
-            (addMode === "existing" && !selectedExistingSite) ||
-            (monitorType === "http" && !url.trim()) ||
-            (monitorType === "port" && (!host.trim() || !port.trim()))
-        );
-    }, [addMode, name, selectedExistingSite, monitorType, url, host, port]);
+        // Basic validation for mode and name
+        if (addMode === "new" && !name.trim()) {
+            return false;
+        }
+        if (addMode === "existing" && !selectedExistingSite) {
+            return false;
+        }
+
+        // Dynamic validation based on monitor type fields
+        const currentFields = getFields(monitorType);
+        for (const field of currentFields) {
+            if (field.required) {
+                let value = "";
+                switch (field.name) {
+                    case "url": {
+                        value = url;
+                        break;
+                    }
+                    case "host": {
+                        value = host;
+                        break;
+                    }
+                    case "port": {
+                        value = port;
+                        break;
+                    }
+                    default: {
+                        value = "";
+                    }
+                }
+                if (!value.trim()) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }, [addMode, name, selectedExistingSite, monitorType, url, host, port, getFields]);
 
     // Reset form to initial state
     const resetForm = useCallback(() => {

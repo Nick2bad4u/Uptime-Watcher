@@ -9,13 +9,13 @@
  * @packageDocumentation
  */
 
-import validator from "validator";
-
 import type { Logger } from "../../services/logger";
-import type { Monitor } from "../../types";
-import type { AddSiteFormState, AddSiteFormActions } from "./useAddSiteForm";
+import type { Monitor, MonitorType } from "../../types";
+import type { AddSiteFormState, AddSiteFormActions } from "../SiteDetails/useAddSiteForm";
 
 import { DEFAULT_REQUEST_TIMEOUT, RETRY_CONSTRAINTS } from "../../constants";
+import { validateMonitorData } from "../../utils/monitorValidation";
+import { getMonitorTypeConfig } from "../../utils/monitorTypeHelper";
 
 /**
  * Store actions interface for form submission operations.
@@ -74,96 +74,80 @@ function validateAddMode(addMode: string, name: string, selectedExistingSite: st
 }
 
 /**
- * Validates HTTP monitor configuration.
+ * Builds monitor data object dynamically based on monitor type configuration.
  *
- * @param url - Website URL to validate
- * @returns Array of validation error messages
+ * @param monitorType - Type of monitor
+ * @param formData - Form data containing field values
+ * @returns Monitor data object with type-specific fields
  */
-function validateHttpMonitor(url: string): string[] {
-    const errors: string[] = [];
+async function buildMonitorData(
+    monitorType: MonitorType,
+    formData: { url: string; host: string; port: string }
+): Promise<Record<string, unknown>> {
+    const monitorData: Record<string, unknown> = { type: monitorType };
 
-    if (!url.trim()) {
-        errors.push("Website URL is required for HTTP monitor");
-        return errors;
-    }
-
-    const trimmedUrl = url.trim();
-
-    if (!/^https?:\/\//i.test(trimmedUrl)) {
-        errors.push("HTTP monitor requires a URL starting with http:// or https://");
-        return errors;
-    }
-
-    if (
-        !validator.isURL(trimmedUrl, {
-            allow_protocol_relative_urls: false,
-            allow_trailing_dot: false,
-            allow_underscores: false,
-            disallow_auth: false,
-            protocols: ["http", "https"],
-            require_protocol: true,
-            require_valid_protocol: true,
-        })
-    ) {
-        errors.push("Please enter a valid URL with a proper domain");
-    }
-
-    return errors;
-}
-
-/**
- * Validates port monitor configuration.
- *
- * @param host - Host address (IP or domain)
- * @param port - Port number
- * @returns Array of validation error messages
- */
-function validatePortMonitor(host: string, port: string): string[] {
-    const errors: string[] = [];
-
-    if (host.trim()) {
-        const trimmedHost = host.trim();
-        const isValidIP = validator.isIP(trimmedHost);
-        const isValidDomain = validator.isFQDN(trimmedHost, {
-            allow_trailing_dot: false,
-            allow_underscores: false,
-        });
-
-        if (!isValidIP && !isValidDomain) {
-            errors.push("Host must be a valid IP address or domain name");
+    try {
+        const config = await getMonitorTypeConfig(monitorType);
+        if (config?.fields) {
+            // Dynamically map form fields to monitor data based on field definitions
+            for (const field of config.fields) {
+                const fieldName = field.name;
+                if (fieldName in formData) {
+                    const value = formData[fieldName as keyof typeof formData];
+                    const trimmedValue = value.trim();
+                    if (trimmedValue) {
+                        // Convert value based on field type
+                        if (field.type === "number") {
+                            // eslint-disable-next-line security/detect-object-injection -- fieldName comes from trusted monitor config
+                            monitorData[fieldName] = Number(trimmedValue);
+                        } else {
+                            // eslint-disable-next-line security/detect-object-injection -- fieldName comes from trusted monitor config
+                            monitorData[fieldName] = trimmedValue;
+                        }
+                    }
+                }
+            }
+        } else {
+            // Fallback to hardcoded mapping if config is unavailable
+            if (monitorType === "http") {
+                monitorData.url = formData.url.trim();
+            }
+            if (monitorType === "port") {
+                monitorData.host = formData.host.trim();
+                monitorData.port = Number(formData.port);
+            }
         }
-    } else {
-        errors.push("Host is required for port monitor");
+    } catch (error) {
+        console.warn("Failed to get monitor config, using fallback mapping:", error);
+        // Fallback to hardcoded mapping
+        if (monitorType === "http") {
+            monitorData.url = formData.url.trim();
+        }
+        if (monitorType === "port") {
+            monitorData.host = formData.host.trim();
+            monitorData.port = Number(formData.port);
+        }
     }
 
-    if (!port.trim()) {
-        errors.push("Port is required for port monitor");
-    } else if (!validator.isPort(port.trim())) {
-        errors.push("Port must be a valid port number (1-65535)");
-    }
-
-    return errors;
+    return monitorData;
 }
 
 /**
- * Validates monitor type-specific configuration.
+ * Validates monitor type-specific configuration using backend registry.
  *
- * @param monitorType - Type of monitor ("http" or "port")
+ * @param monitorType - Type of monitor
  * @param url - URL for HTTP monitors
  * @param host - Host for port monitors
  * @param port - Port for port monitors
- * @returns Array of validation error messages
+ * @returns Promise resolving to array of validation error messages
  */
-function validateMonitorType(monitorType: string, url: string, host: string, port: string): string[] {
-    if (monitorType === "http") {
-        return validateHttpMonitor(url);
-    }
+async function validateMonitorType(monitorType: string, url: string, host: string, port: string): Promise<string[]> {
+    // Build monitor data object dynamically
+    const monitorData = await buildMonitorData(monitorType as MonitorType, { url, host, port });
 
-    if (monitorType === "port") {
-        return validatePortMonitor(host, port);
-    }
-
-    return [];
+    // Use backend registry validation
+    const result = await validateMonitorData(monitorType as MonitorType, monitorData);
+    return result.errors;
 }
 
 /**
@@ -185,7 +169,7 @@ function validateCheckInterval(checkInterval: number): string[] {
 /**
  * Creates a monitor object based on the form data.
  */
-function createMonitor(properties: FormSubmitProperties): Monitor {
+async function createMonitor(properties: FormSubmitProperties): Promise<Monitor> {
     const { checkInterval, generateUuid, host, monitorType, port, url } = properties;
 
     const monitor: Monitor = {
@@ -200,11 +184,16 @@ function createMonitor(properties: FormSubmitProperties): Monitor {
         type: monitorType,
     };
 
-    if (monitorType === "http") {
-        monitor.url = url.trim();
-    } else if (monitorType === "port") {
-        monitor.host = host.trim();
-        monitor.port = Number(port);
+    // Add type-specific fields dynamically using monitor config
+    const monitorData = await buildMonitorData(monitorType, { url, host, port });
+
+    // Copy the type-specific fields to the monitor object
+    for (const [key, value] of Object.entries(monitorData)) {
+        if (key !== "type") {
+            // Skip the type field as it's already set
+            // eslint-disable-next-line security/detect-object-injection -- key comes from trusted monitor config
+            (monitor as unknown as Record<string, unknown>)[key] = value;
+        }
     }
 
     return monitor;
@@ -322,7 +311,7 @@ export async function handleSubmit(event: React.FormEvent, properties: FormSubmi
     // Collect all validation errors
     const validationErrors: string[] = [
         ...validateAddMode(addMode, name, selectedExistingSite),
-        ...validateMonitorType(monitorType, url, host, port),
+        ...(await validateMonitorType(monitorType, url, host, port)),
         ...validateCheckInterval(checkInterval),
     ];
 
@@ -348,7 +337,7 @@ export async function handleSubmit(event: React.FormEvent, properties: FormSubmi
     clearError();
 
     try {
-        const monitor = createMonitor(properties);
+        const monitor = await createMonitor(properties);
         await performSubmission(properties, monitor);
         onSuccess?.();
     } catch (error) {

@@ -22,11 +22,9 @@ export interface SiteMonitoringActions {
     stopSiteMonitorMonitoring: (siteId: string, monitorId: string) => Promise<void>;
 }
 
-export interface SiteMonitoringDependencies {
-    syncSitesFromBackend: () => Promise<void>;
-}
+export type SiteMonitoringDependencies = Record<string, never>;
 
-export const createSiteMonitoringActions = (deps: SiteMonitoringDependencies): SiteMonitoringActions => ({
+export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
     checkSiteNow: async (siteId: string, monitorId: string) => {
         logStoreAction("SitesStore", "checkSiteNow", { monitorId, siteId });
 
@@ -48,7 +46,7 @@ export const createSiteMonitoringActions = (deps: SiteMonitoringDependencies): S
         await withErrorHandling(
             async () => {
                 await MonitoringService.startSiteMonitoring(siteId);
-                await deps.syncSitesFromBackend();
+                // No need for manual sync - StatusUpdateHandler will update UI via events
             },
             {
                 clearError: () => {},
@@ -63,7 +61,7 @@ export const createSiteMonitoringActions = (deps: SiteMonitoringDependencies): S
         await withErrorHandling(
             async () => {
                 await MonitoringService.startMonitoring(siteId, monitorId);
-                await deps.syncSitesFromBackend();
+                // No need for manual sync - StatusUpdateHandler will update UI via events
             },
             {
                 clearError: () => {},
@@ -78,7 +76,7 @@ export const createSiteMonitoringActions = (deps: SiteMonitoringDependencies): S
         await withErrorHandling(
             async () => {
                 await MonitoringService.stopSiteMonitoring(siteId);
-                await deps.syncSitesFromBackend();
+                // No need for manual sync - StatusUpdateHandler will update UI via events
             },
             {
                 clearError: () => {},
@@ -93,7 +91,7 @@ export const createSiteMonitoringActions = (deps: SiteMonitoringDependencies): S
         await withErrorHandling(
             async () => {
                 await MonitoringService.stopMonitoring(siteId, monitorId);
-                await deps.syncSitesFromBackend();
+                // No need for manual sync - StatusUpdateHandler will update UI via events
             },
             {
                 clearError: () => {},

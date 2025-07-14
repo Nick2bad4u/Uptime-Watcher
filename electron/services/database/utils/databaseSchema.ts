@@ -1,6 +1,7 @@
 import { Database } from "node-sqlite3-wasm";
 
 import { logger } from "../../../utils/index";
+import { generateMonitorTableSchema } from "./dynamicSchema";
 
 /**
  * Database schema management utilities.
@@ -20,7 +21,7 @@ import { logger } from "../../../utils/index";
  * @remarks
  * Creates the following tables:
  * - sites: Site configuration and monitoring status
- * - monitors: Monitor configuration and runtime data
+ * - monitors: Monitor configuration and runtime data (dynamic schema)
  * - history: Historical monitoring data
  * - settings: Application configuration
  * - stats: Runtime statistics
@@ -37,25 +38,9 @@ export function createDatabaseTables(db: Database): void {
             );
         `);
 
-        // Monitors table
-        db.run(`
-            CREATE TABLE IF NOT EXISTS monitors (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                site_identifier TEXT,
-                type TEXT,
-                url TEXT,
-                host TEXT,
-                port INTEGER,
-                checkInterval INTEGER,
-                timeout INTEGER,
-                retryAttempts INTEGER DEFAULT 0,
-                monitoring BOOLEAN,
-                status TEXT,
-                responseTime INTEGER,
-                lastChecked DATETIME,
-                FOREIGN KEY(site_identifier) REFERENCES sites(identifier)
-            );
-        `);
+        // Monitors table with dynamic schema based on monitor type registry
+        const dynamicMonitorSchema = generateMonitorTableSchema();
+        db.run(dynamicMonitorSchema);
 
         // History table
         db.run(`

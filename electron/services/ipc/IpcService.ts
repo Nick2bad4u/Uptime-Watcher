@@ -5,6 +5,7 @@ import { UptimeOrchestrator } from "../../index";
 import { logger } from "../../utils/index";
 import { AutoUpdaterService } from "../updater/index";
 import { Site } from "../../types";
+import { getAllMonitorTypeConfigs, validateMonitorData } from "../monitoring/MonitorTypeRegistry";
 
 /**
  * Inter-Process Communication service for Electron main-renderer communication.
@@ -42,6 +43,7 @@ export class IpcService {
     public setupHandlers(): void {
         this.setupSiteHandlers();
         this.setupMonitoringHandlers();
+        this.setupMonitorTypeHandlers();
         this.setupDataHandlers();
         this.setupSystemHandlers();
         this.setupStateSyncHandlers();
@@ -230,6 +232,53 @@ export class IpcService {
                 logger.error("[IpcService] Failed to perform full sync", error);
                 throw error;
             }
+        });
+    }
+
+    /**
+     * Setup IPC handlers for monitor type registry operations.
+     *
+     * @remarks
+     * Handles monitor type metadata operations:
+     * - `get-monitor-types`: Get all available monitor type configurations
+     */
+    private setupMonitorTypeHandlers(): void {
+        ipcMain.handle("get-monitor-types", () => {
+            if (isDev()) logger.debug("[IpcService] Handling get-monitor-types");
+
+            // Get all monitor type configs and strip out non-serializable data (Zod schemas and functions)
+            const configs = getAllMonitorTypeConfigs();
+            return configs.map((config) => ({
+                type: config.type,
+                displayName: config.displayName,
+                description: config.description,
+                version: config.version,
+                fields: config.fields, // This is serializable
+                // Serialize uiConfig by excluding functions and keeping only data
+                uiConfig: config.uiConfig
+                    ? {
+                          supportsResponseTime: config.uiConfig.supportsResponseTime,
+                          supportsAdvancedAnalytics: config.uiConfig.supportsAdvancedAnalytics,
+                          helpTexts: config.uiConfig.helpTexts,
+                          display: config.uiConfig.display,
+                          detailFormats: config.uiConfig.detailFormats
+                              ? {
+                                    analyticsLabel: config.uiConfig.detailFormats.analyticsLabel,
+                                    // Exclude functions, we'll recreate them on the frontend based on type
+                                }
+                              : undefined,
+                      }
+                    : undefined,
+                // Exclude validationSchema as it contains Zod objects that can't be serialized
+                // Exclude serviceFactory as it contains function references
+            }));
+        });
+
+        ipcMain.handle("validate-monitor-data", (_, type: string, data: unknown) => {
+            if (isDev()) logger.debug("[IpcService] Handling validate-monitor-data", { type, data });
+
+            // Use the registry's validation function
+            return validateMonitorData(type, data);
         });
     }
 

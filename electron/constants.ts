@@ -48,10 +48,3 @@ export const DEFAULT_HISTORY_LIMIT = 500;
  * @defaultValue "status-update"
  */
 export const STATUS_UPDATE_EVENT = "status-update";
-
-/**
- * Supported monitor types in the application.
- * @deprecated Use MonitorTypeRegistry.getRegisteredMonitorTypes() instead
- * @readonly
- */
-export const MONITOR_TYPES = ["http", "port"] as const;

@@ -7,6 +7,7 @@ import { Line, Bar, Doughnut } from "react-chartjs-2";
 import { FiActivity, FiTrendingUp, FiBarChart2 } from "react-icons/fi";
 import { MdAnalytics, MdTrendingUp, MdSpeed, MdPieChart } from "react-icons/md";
 
+import { ConditionalResponseTime } from "../../dynamic-monitor-ui";
 import { DowntimePeriod } from "../../../hooks/site/useSiteAnalytics";
 import { logger } from "../../../services";
 import {
@@ -20,10 +21,6 @@ import {
 } from "../../../theme";
 import { MonitorType } from "../../../types";
 
-/**
- * Props for the AnalyticsTab component.
- * Contains comprehensive metrics, chart data, and formatting functions.
- */
 /**
  * Props for the AnalyticsTab component.
  * Contains comprehensive metrics, chart data, and formatting functions.
@@ -209,7 +206,8 @@ export function AnalyticsTab({
                     </div>
                 </ThemedCard>
 
-                {(monitorType === "http" || monitorType === "port") && (
+                {/* Average Response Time Card - Available for all current monitor types */}
+                <ConditionalResponseTime monitorType={monitorType}>
                     <ThemedCard
                         icon={<MdTrendingUp />}
                         iconColor={iconColors.performance}
@@ -226,7 +224,7 @@ export function AnalyticsTab({
                             </ThemedText>
                         </div>
                     </ThemedCard>
-                )}
+                </ConditionalResponseTime>
 
                 <ThemedCard
                     icon={<FiActivity />}
@@ -264,7 +262,7 @@ export function AnalyticsTab({
             </div>
 
             {/* Response Time Percentiles */}
-            {(monitorType === "http" || monitorType === "port") && (
+            <ConditionalResponseTime monitorType={monitorType}>
                 <ThemedCard icon={<MdSpeed color={iconColors.performance} />} title="Response Time Analysis">
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
@@ -352,12 +350,12 @@ export function AnalyticsTab({
                         )}
                     </div>
                 </ThemedCard>
-            )}
+            </ConditionalResponseTime>
 
             {/* Charts Grid */}
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 {/* Response Time Chart */}
-                {(monitorType === "http" || monitorType === "port") && (
+                <ConditionalResponseTime monitorType={monitorType}>
                     <ThemedCard icon={<FiTrendingUp color={iconColors.performance} />} title="Response Time Trends">
                         <div className="h-64">
                             <Line
@@ -372,7 +370,7 @@ export function AnalyticsTab({
                             />
                         </div>
                     </ThemedCard>
-                )}
+                </ConditionalResponseTime>
 
                 {/* Uptime Doughnut Chart */}
                 <ThemedCard icon={<MdPieChart color={iconColors.uptime} />} title="Uptime Distribution">

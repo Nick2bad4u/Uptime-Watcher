@@ -12,6 +12,7 @@ import { logger } from "../../../services";
 import { useSettingsStore } from "../../../stores";
 import { ThemedText, ThemedButton, StatusIndicator, ThemedCard, ThemedSelect, useTheme } from "../../../theme";
 import { StatusHistory, Monitor } from "../../../types";
+import { DetailLabel } from "../../dynamic-monitor-ui";
 
 /**
  * Get the formatted label for filter buttons
@@ -113,30 +114,14 @@ export const HistoryTab = ({
         .filter((record: StatusHistory) => historyFilter === "all" || record.status === historyFilter)
         .slice(0, historyLimit);
 
-    // Helper to render details with label
-    // Use 'details' as optional property to handle records that may not have detail information
+    // Helper to render details with label using dynamic formatting
     function renderDetails(record: StatusHistory) {
         if (!record.details) {
             // eslint-disable-next-line unicorn/no-null -- React components can return null
             return null;
         }
 
-        const getDetailLabel = (): string => {
-            if (selectedMonitor.type === "port") {
-                return `Port: ${record.details}`;
-            }
-            if (selectedMonitor.type === "http") {
-                return `Response Code: ${record.details}`;
-            }
-
-            return record.details ?? "";
-        };
-
-        return (
-            <ThemedText size="xs" variant="secondary" className="ml-4">
-                {getDetailLabel()}
-            </ThemedText>
-        );
+        return <DetailLabel monitorType={selectedMonitor.type} details={record.details} />;
     }
 
     return (

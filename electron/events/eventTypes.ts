@@ -458,7 +458,7 @@ export const EVENT_PRIORITIES = {
  */
 export function isEventOfCategory(eventName: keyof UptimeEvents, category: keyof typeof EVENT_CATEGORIES): boolean {
     // Check if the category exists in EVENT_CATEGORIES
-    if (!Object.prototype.hasOwnProperty.call(EVENT_CATEGORIES, category)) {
+    if (!Object.hasOwn(EVENT_CATEGORIES, category)) {
         return false;
     }
     // eslint-disable-next-line security/detect-object-injection

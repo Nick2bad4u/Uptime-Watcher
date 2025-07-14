@@ -113,6 +113,25 @@ export class ApplicationService {
             }
         });
 
+        // Forward monitoring start/stop events to renderer
+        orchestrator.on("monitoring:started", (data) => {
+            try {
+                logger.debug("[ApplicationService] Forwarding monitoring started to renderer", data);
+                windowService.sendToRenderer("monitoring-started", data);
+            } catch (error) {
+                logger.error("[ApplicationService] Failed to forward monitoring started to renderer", error);
+            }
+        });
+
+        orchestrator.on("monitoring:stopped", (data) => {
+            try {
+                logger.debug("[ApplicationService] Forwarding monitoring stopped to renderer", data);
+                windowService.sendToRenderer("monitoring-stopped", data);
+            } catch (error) {
+                logger.error("[ApplicationService] Failed to forward monitoring stopped to renderer", error);
+            }
+        });
+
         orchestrator.on("site-monitor-down", ({ monitorId, site }: { monitorId: string; site: Site }) => {
             logger.debug("[ApplicationService] Monitor down notification", { monitorId, siteId: site.identifier });
             notificationService.notifyMonitorDown(site, monitorId);

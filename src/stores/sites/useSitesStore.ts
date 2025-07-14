@@ -65,9 +65,7 @@ export const useSitesStore = create<SitesStore>()((set, get) => {
     });
 
     // Create monitoring actions
-    const monitoringActions = createSiteMonitoringActions({
-        syncSitesFromBackend: syncActions.syncSitesFromBackend,
-    });
+    const monitoringActions = createSiteMonitoringActions();
 
     // Create operations actions
     const operationsActions = createSiteOperationsActions({

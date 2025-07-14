@@ -178,21 +178,6 @@ export class SiteRepositoryService {
     }
 
     /**
-     * Start monitoring for sites based on their configuration.
-     * Side effect operation separated from data loading.
-     *
-     * @deprecated This method is deprecated. Auto-start logic is now handled by MonitorManager.setupSiteForMonitoring()
-     * This method is kept as a no-op to maintain compatibility during refactoring.
-     */
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    startMonitoringForSites(_siteCache: SiteCacheInterface, _monitoringConfig: MonitoringConfig): Promise<void> {
-        // Auto-start logic moved to MonitorManager.setupSiteForMonitoring()
-        // This method is now a no-op to prevent duplicate auto-start behavior
-        this.logger.debug(`[SiteRepositoryService] Auto-start logic delegated to MonitorManager`);
-        return Promise.resolve();
-    }
-
-    /**
      * Build a site object with monitors and history.
      * Private helper method for data construction.
      */

@@ -207,6 +207,10 @@ declare global {
             events: {
                 /** Register callback for monitor status updates */
                 onStatusUpdate: (callback: (update: StatusUpdate) => void) => void;
+                /** Register callback for monitoring started events */
+                onMonitoringStarted: (callback: (data: { siteId: string; monitorId: string }) => void) => void;
+                /** Register callback for monitoring stopped events */
+                onMonitoringStopped: (callback: (data: { siteId: string; monitorId: string }) => void) => void;
                 /** Register callback for test events (development/debugging) */
                 onTestEvent: (callback: (data: unknown) => void) => void;
                 /** Remove all listeners for a specific event */
@@ -253,6 +257,39 @@ declare global {
                 checkSiteNow: (siteId: string, monitorId: string) => Promise<void>;
                 /** Remove a specific monitor from a site */
                 removeMonitor: (siteIdentifier: string, monitorId: string) => Promise<void>;
+            };
+
+            /**
+             * Monitor type registry and configuration operations.
+             */
+            monitorTypes: {
+                /** Get all available monitor type configurations */
+                getMonitorTypes: () => Promise<
+                    {
+                        type: string;
+                        displayName: string;
+                        description: string;
+                        version: string;
+                        fields: {
+                            name: string;
+                            label: string;
+                            type: "text" | "number" | "url";
+                            required: boolean;
+                            placeholder?: string;
+                            helpText?: string;
+                            min?: number;
+                            max?: number;
+                        }[];
+                    }[]
+                >;
+                /** Validate monitor data using backend registry */
+                validateMonitorData: (
+                    type: string,
+                    data: unknown
+                ) => Promise<{
+                    success: boolean;
+                    errors: string[];
+                }>;
             };
 
             /**

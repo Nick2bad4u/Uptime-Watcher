@@ -7,17 +7,10 @@
  * @packageDocumentation
  */
 
-/**
- * Monitor type identifier.
- * @remarks
- * Semantic type alias for monitor type strings. While technically a string,
- * this type provides semantic meaning and enables future type refinement.
- * Use isValidMonitorTypeGuard() for runtime validation.
- * @public
- */
-// SonarQube: Intentional semantic type alias for future extensibility
-// sonar-disable-next-line typescript:S6564
-export type MonitorType = string;
+import type { MonitorType as RegistryMonitorType } from "./services/monitoring/MonitorTypeRegistry";
+
+// Re-export for use throughout the application
+export type MonitorType = RegistryMonitorType;
 
 /**
  * Allowed status values for a monitor's current operational state.

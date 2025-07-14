@@ -77,17 +77,25 @@ export function createStatusUpdateHandler(options: StatusUpdateHandlerOptions) {
 export class StatusUpdateManager {
     private handler: ((update: StatusUpdate) => Promise<void>) | undefined = undefined;
     private isListenerAttached = false;
+    private monitoringEventHandler: (() => Promise<void>) | undefined = undefined;
 
     /**
-     * Subscribe to status updates
+     * Subscribe to status updates and monitoring events
      */
-    async subscribe(handler: (update: StatusUpdate) => Promise<void>): Promise<void> {
+    async subscribe(
+        handler: (update: StatusUpdate) => Promise<void>,
+        fullSyncHandler?: () => Promise<void>
+    ): Promise<void> {
         // If already subscribed, unsubscribe first to avoid duplicates
         if (this.isListenerAttached) {
             this.unsubscribe();
         }
 
         this.handler = handler;
+
+        if (fullSyncHandler) {
+            this.monitoringEventHandler = fullSyncHandler;
+        }
 
         // Always wait for electronAPI to be ready before subscribing
         try {
@@ -97,12 +105,27 @@ export class StatusUpdateManager {
             throw new Error("Failed to initialize electronAPI");
         }
 
-        // At this point, electronAPI.events.onStatusUpdate should be available
+        // Subscribe to status updates
         window.electronAPI.events.onStatusUpdate((update: StatusUpdate) => {
             this.handler?.(update).catch((error) => {
                 console.error("Error in status update handler:", error);
             });
         });
+
+        // Subscribe to monitoring state changes
+        if (this.monitoringEventHandler) {
+            window.electronAPI.events.onMonitoringStarted(() => {
+                this.monitoringEventHandler?.().catch((error) => {
+                    console.error("Error in monitoring started handler:", error);
+                });
+            });
+
+            window.electronAPI.events.onMonitoringStopped(() => {
+                this.monitoringEventHandler?.().catch((error) => {
+                    console.error("Error in monitoring stopped handler:", error);
+                });
+            });
+        }
 
         this.isListenerAttached = true;
         logStoreAction("StatusUpdateManager", "subscribed", {
@@ -112,12 +135,13 @@ export class StatusUpdateManager {
     }
 
     /**
-     * Unsubscribe from status updates
+     * Unsubscribe from status updates and monitoring events
      */
     unsubscribe(): void {
         // Remove all listeners for the update-status channel
         window.electronAPI.events.removeAllListeners("update-status");
         this.handler = undefined;
+        this.monitoringEventHandler = undefined;
         this.isListenerAttached = false;
         logStoreAction("StatusUpdateManager", "unsubscribed", {
             message: "Successfully unsubscribed from status updates",

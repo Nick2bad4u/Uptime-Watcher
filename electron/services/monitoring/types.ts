@@ -95,6 +95,17 @@ export interface IMonitorService {
      * Must match one of the values in the monitor's `type` field.
      */
     getType(): Site["monitors"][0]["type"];
+
+    /**
+     * Update the configuration for this monitor service.
+     *
+     * @param config - Partial configuration to update
+     *
+     * @remarks
+     * Allows runtime configuration updates without recreating the service instance.
+     * Only the provided configuration properties will be updated.
+     */
+    updateConfig(config: Partial<MonitorConfig>): void;
 }
 
 /**

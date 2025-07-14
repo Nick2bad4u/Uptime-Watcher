@@ -10,10 +10,14 @@ import { UI_DELAYS, CHECK_INTERVALS } from "../../constants";
 import { logger } from "../../services";
 import { useErrorStore, useSitesStore } from "../../stores";
 import { ThemedBox, ThemedText, ThemedButton, useTheme } from "../../theme";
+import type { MonitorType } from "../../types";
 import { generateUuid } from "../../utils/data/generateUuid";
 import { TextField, SelectField, RadioGroup } from "./FormFields";
+import { useDynamicHelpText } from "../dynamic-monitor-ui";
+import { DynamicMonitorFields } from "./DynamicMonitorFields";
 import { handleSubmit } from "./Submit";
-import { useAddSiteForm } from "./useAddSiteForm";
+import { useAddSiteForm } from "../SiteDetails/useAddSiteForm";
+import { useMonitorTypes } from "../../hooks/useMonitorTypes";
 
 /**
  * Main form component for adding new monitoring sites or monitors.
@@ -36,6 +40,9 @@ export const AddSiteForm = React.memo(function AddSiteForm() {
     const { addMonitorToSite, createSite, sites } = useSitesStore();
     const { isLoading } = useErrorStore();
     const { isDark } = useTheme();
+
+    // Load monitor types from backend
+    const { options: monitorTypeOptions, isLoading: isLoadingMonitorTypes } = useMonitorTypes();
 
     // Use our custom hook for form state management
     const formState = useAddSiteForm();
@@ -61,6 +68,9 @@ export const AddSiteForm = React.memo(function AddSiteForm() {
         siteId,
         url,
     } = formState;
+
+    // Get dynamic help text for the current monitor type
+    const helpTexts = useDynamicHelpText(monitorType);
 
     // Delayed loading state for button spinner (100ms delay)
     const [showButtonLoading, setShowButtonLoading] = useState(false);
@@ -164,61 +174,29 @@ export const AddSiteForm = React.memo(function AddSiteForm() {
 
                 {/* Monitor Type Selector */}
                 <SelectField
-                    disabled={isLoading}
+                    disabled={isLoading || isLoadingMonitorTypes}
                     id="monitorType"
                     label="Monitor Type"
-                    onChange={(value) => setMonitorType(value as "http" | "port")}
-                    options={[
-                        { label: "HTTP (Website/API)", value: "http" },
-                        { label: "Port (Host/Port)", value: "port" },
-                    ]}
+                    onChange={(value) => setMonitorType(value as MonitorType)}
+                    options={monitorTypeOptions}
                     value={monitorType}
                 />
 
-                {/* HTTP Monitor Fields */}
-                {monitorType === "http" && (
-                    <TextField
-                        disabled={isLoading}
-                        helpText="Enter the full URL including http:// or https://"
-                        id="websiteUrl"
-                        label="Website URL"
-                        onChange={setUrl}
-                        placeholder="https://example.com"
-                        required
-                        type="url"
-                        value={url}
-                    />
-                )}
-
-                {/* Port Monitor Fields */}
-                {monitorType === "port" && (
-                    <div className="flex flex-col gap-2">
-                        <TextField
-                            disabled={isLoading}
-                            helpText="Enter a valid host (domain or IP)"
-                            id="host"
-                            label="Host"
-                            onChange={setHost}
-                            placeholder="example.com or 192.168.1.1"
-                            required
-                            type="text"
-                            value={host}
-                        />
-                        <TextField
-                            disabled={isLoading}
-                            helpText="Enter a port number (1-65535)"
-                            id="port"
-                            label="Port"
-                            max={65_535}
-                            min={1}
-                            onChange={setPort}
-                            placeholder="80"
-                            required
-                            type="number"
-                            value={port}
-                        />
-                    </div>
-                )}
+                {/* Dynamic Monitor Fields */}
+                <DynamicMonitorFields
+                    monitorType={monitorType}
+                    values={{
+                        url: url,
+                        host: host,
+                        port: port,
+                    }}
+                    onChange={{
+                        url: (value: string | number) => setUrl(String(value)),
+                        host: (value: string | number) => setHost(String(value)),
+                        port: (value: string | number) => setPort(String(value)),
+                    }}
+                    isLoading={isLoading}
+                />
 
                 <SelectField
                     disabled={isLoading}
@@ -270,20 +248,15 @@ export const AddSiteForm = React.memo(function AddSiteForm() {
                     <ThemedText size="xs" variant="tertiary">
                         • {addMode === "new" ? "Site name is required" : "Select a site to add the monitor to"}
                     </ThemedText>
-                    {monitorType === "http" && (
+                    {helpTexts.primary && (
                         <ThemedText size="xs" variant="tertiary">
-                            • Enter the full URL including http:// or https://
+                            • {helpTexts.primary}
                         </ThemedText>
                     )}
-                    {monitorType === "port" && (
-                        <>
-                            <ThemedText size="xs" variant="tertiary">
-                                • Enter a valid host (domain or IP)
-                            </ThemedText>
-                            <ThemedText size="xs" variant="tertiary">
-                                • Enter a port number (1-65535)
-                            </ThemedText>
-                        </>
+                    {helpTexts.secondary && (
+                        <ThemedText size="xs" variant="tertiary">
+                            • {helpTexts.secondary}
+                        </ThemedText>
                     )}
                     <ThemedText size="xs" variant="tertiary">
                         • The monitor will be checked according to your monitoring interval

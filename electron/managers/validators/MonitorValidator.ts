@@ -1,14 +1,19 @@
 /**
  * Monitor validation logic extracted for better separation of concerns.
- * Handles all monitor-specific validation rules.
+ * Handles all monitor-specific validation rules using registry-driven approach.
  */
 
 import { Site } from "../../types";
 import { ValidationResult } from "../../managers/index";
+import {
+    validateMonitorData,
+    isValidMonitorType,
+    getRegisteredMonitorTypes,
+} from "../../services/monitoring/MonitorTypeRegistry";
 
 /**
  * Validates monitor configuration according to business rules.
- * Focused on monitor-level validation concerns.
+ * Uses registry-driven validation with Zod schemas.
  */
 export class MonitorValidator {
     /**
@@ -28,51 +33,23 @@ export class MonitorValidator {
     }
 
     /**
-     * Validate monitor type-specific requirements.
+     * Validate monitor type-specific requirements using registry and Zod schemas.
      */
     private validateMonitorTypeSpecific(monitor: Site["monitors"][0]): string[] {
-        const errors: string[] = [];
-
-        if (monitor.type === "http") {
-            errors.push(...this.validateHttpMonitor(monitor));
-            /* eslint-disable @typescript-eslint/no-unnecessary-condition -- will be adding multiple monitor types soon */
-        } else if (monitor.type === "port") {
-            errors.push(...this.validatePortMonitor(monitor));
+        // Validate monitor type using registry
+        if (!isValidMonitorType(monitor.type)) {
+            const availableTypes = getRegisteredMonitorTypes().join(", ");
+            return [`Invalid monitor type '${monitor.type}'. Available types: ${availableTypes}`];
         }
 
-        return errors;
-    }
+        // Use Zod schema validation from registry
+        const validationResult = validateMonitorData(monitor.type, monitor);
 
-    /**
-     * Validate HTTP monitor specific requirements.
-     */
-    private validateHttpMonitor(monitor: Site["monitors"][0]): string[] {
-        const errors: string[] = [];
-
-        if (!monitor.url) {
-            errors.push("HTTP monitors must have a URL");
-        } else if (!this.isValidUrl(monitor.url)) {
-            errors.push("HTTP monitors must have a valid URL");
+        if (!validationResult.success) {
+            return validationResult.errors;
         }
 
-        return errors;
-    }
-
-    /**
-     * Validate port monitor specific requirements.
-     */
-    private validatePortMonitor(monitor: Site["monitors"][0]): string[] {
-        const errors: string[] = [];
-
-        if (!monitor.host) {
-            errors.push("Port monitors must have a host");
-        }
-
-        if (!monitor.port || monitor.port <= 0 || monitor.port > 65_535) {
-            errors.push("Port monitors must have a valid port number (1-65535)");
-        }
-
-        return errors;
+        return [];
     }
 
     /**
@@ -81,11 +58,11 @@ export class MonitorValidator {
     private validateTimingConstraints(monitor: Site["monitors"][0]): string[] {
         const errors: string[] = [];
 
-        if (monitor.checkInterval !== undefined && monitor.checkInterval < 1000) {
+        if (monitor.checkInterval < 1000) {
             errors.push("Monitor check interval must be at least 1000ms");
         }
 
-        if (monitor.timeout !== undefined && monitor.timeout < 1000) {
+        if (monitor.timeout < 1000) {
             errors.push("Monitor timeout must be at least 1000ms");
         }
 
@@ -98,7 +75,7 @@ export class MonitorValidator {
     private validateRetryAttempts(monitor: Site["monitors"][0]): string[] {
         const errors: string[] = [];
 
-        if (monitor.retryAttempts !== undefined && monitor.retryAttempts < 0) {
+        if (monitor.retryAttempts < 0) {
             errors.push("Monitor retry attempts cannot be negative");
         }
 
@@ -109,18 +86,6 @@ export class MonitorValidator {
      * Business rule: Determine if a monitor should receive a default interval.
      */
     public shouldApplyDefaultInterval(monitor: Site["monitors"][0]): boolean {
-        return monitor.checkInterval === undefined || monitor.checkInterval === 0;
-    }
-
-    /**
-     * Validate if a URL is properly formatted.
-     */
-    private isValidUrl(url: string): boolean {
-        try {
-            const urlObj = new URL(url);
-            return urlObj.protocol === "http:" || urlObj.protocol === "https:";
-        } catch {
-            return false;
-        }
+        return monitor.checkInterval === 0;
     }
 }

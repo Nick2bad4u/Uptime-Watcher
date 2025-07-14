@@ -29,7 +29,7 @@ export function Header() {
 
     // Count all monitors across all sites by status using functional approach
     const monitorCounts = useMemo(() => {
-        const counts = { down: 0, pending: 0, total: 0, up: 0 };
+        const counts = { down: 0, paused: 0, pending: 0, total: 0, up: 0 };
 
         for (const site of sites) {
             for (const monitor of site.monitors) {
@@ -48,7 +48,7 @@ export function Header() {
                         break;
                     }
                     case "paused": {
-                        // Paused monitors are not counted in up/down/pending
+                        counts.paused++;
                         break;
                     }
                 }
@@ -58,7 +58,13 @@ export function Header() {
         return counts;
     }, [sites]);
 
-    const { down: downMonitors, pending: pendingMonitors, total: totalMonitors, up: upMonitors } = monitorCounts;
+    const {
+        down: downMonitors,
+        paused: pausedMonitors,
+        pending: pendingMonitors,
+        total: totalMonitors,
+        up: upMonitors,
+    } = monitorCounts;
 
     // Calculate overall uptime percentage across all monitors
     const uptimePercentage = totalMonitors > 0 ? Math.round((upMonitors / totalMonitors) * 100) : 0;
@@ -154,6 +160,22 @@ export function Header() {
                                     </ThemedText>
                                     <ThemedText size="xs" variant="secondary" className="leading-none">
                                         Pending
+                                    </ThemedText>
+                                </div>
+                            </div>
+
+                            {/* Divider */}
+                            <div className="w-px h-8 bg-current opacity-20" />
+
+                            {/* Paused Status */}
+                            <div className="flex items-center px-2 py-1 space-x-2 transition-all duration-200 rounded-md group status-paused-badge">
+                                <StatusIndicator status="paused" size="sm" />
+                                <div className="flex flex-col">
+                                    <ThemedText size="sm" weight="semibold" variant="primary">
+                                        {pausedMonitors}
+                                    </ThemedText>
+                                    <ThemedText size="xs" variant="secondary" className="leading-none">
+                                        Paused
                                     </ThemedText>
                                 </div>
                             </div>

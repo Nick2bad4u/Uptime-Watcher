@@ -56,7 +56,7 @@ export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActio
                 setSites: deps.setSites,
             });
 
-            statusUpdateManager.subscribe(handler).catch((error) => {
+            statusUpdateManager.subscribe(handler, actions.fullSyncFromBackend).catch((error) => {
                 console.error("Failed to subscribe to status updates:", error);
             });
 
