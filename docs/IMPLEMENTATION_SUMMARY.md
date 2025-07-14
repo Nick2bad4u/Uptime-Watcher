@@ -1,5 +1,5 @@
 # Implementation Summary: Cache Miss Returns & Async Operation Failure Handling
-
+<!-- markdownlint-disable -->
 ## ✅ **COMPLETED IMPLEMENTATION**
 
 ### 1. **Operational Hooks Framework** ⚙️
@@ -110,7 +110,7 @@ const site = getSiteFromCache("site-id");
 
 ## 🔧 **Implementation Pattern Examples**
 
-### **Before (Old Pattern)**:
+### **Before (Old Pattern)**
 
 ```typescript
 // Cache miss = user waits for manual loading
@@ -130,7 +130,7 @@ public findById(monitorId: string): Site["monitors"][0] | undefined {
 }
 ```
 
-### **After (Modern Pattern)**:
+### **After (Modern Pattern)**
 
 ```typescript
 // Cache miss = immediate response + background loading

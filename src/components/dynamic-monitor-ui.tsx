@@ -6,7 +6,7 @@
 
 import React, { useEffect, useState } from "react";
 import type { MonitorType } from "../types";
-import { formatMonitorDetail } from "../utils/dynamic-monitor-ui";
+import { formatMonitorDetail } from "../utils/dynamicMonitorUi";
 
 /**
  * Component that dynamically formats monitor detail labels.
@@ -52,7 +52,7 @@ export function ConditionalResponseTime({ monitorType, children, fallback }: Con
 
         const checkSupport = async () => {
             try {
-                const { supportsResponseTime: checkSupport } = await import("../utils/dynamic-monitor-ui");
+                const { supportsResponseTime: checkSupport } = await import("../utils/dynamicMonitorUi");
                 const supports = await checkSupport(monitorType);
                 if (!isCancelled) {
                     setSupportsResponseTime(supports);
@@ -99,7 +99,7 @@ export function ConditionalAdvancedAnalytics({ monitorType, children, fallback }
 
         const checkSupport = async () => {
             try {
-                const { supportsAdvancedAnalytics } = await import("../utils/dynamic-monitor-ui");
+                const { supportsAdvancedAnalytics } = await import("../utils/dynamicMonitorUi");
                 const supports = await supportsAdvancedAnalytics(monitorType);
                 if (!isCancelled) {
                     setSupportsAdvanced(supports);
@@ -148,7 +148,7 @@ export function ConditionalMultipleTypes({ monitorTypes, feature, children, fall
         const checkSupport = async () => {
             try {
                 const { allSupportsResponseTime, allSupportsAdvancedAnalytics } = await import(
-                    "../utils/dynamic-monitor-ui"
+                    "../utils/dynamicMonitorUi"
                 );
                 const checkFunction =
                     feature === "responseTime" ? allSupportsResponseTime : allSupportsAdvancedAnalytics;
@@ -195,7 +195,7 @@ export function useDynamicHelpText(monitorType: MonitorType) {
 
         const loadHelpTexts = async () => {
             try {
-                const { getMonitorHelpTexts } = await import("../utils/dynamic-monitor-ui");
+                const { getMonitorHelpTexts } = await import("../utils/dynamicMonitorUi");
                 const texts = await getMonitorHelpTexts(monitorType);
                 if (!isCancelled) {
                     setHelpTexts(texts);
