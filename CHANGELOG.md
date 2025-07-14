@@ -7,14 +7,141 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[5057801](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5057801a96411ba5dfe38fd9902d52d283daaee9)...
-[5057801](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5057801a96411ba5dfe38fd9902d52d283daaee9)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/5057801a96411ba5dfe38fd9902d52d283daaee9...5057801a96411ba5dfe38fd9902d52d283daaee9))
+[[05af275](https://github.com/Nick2bad4u/Uptime-Watcher/commit/05af275a43743dab4cebeca3deb183b2d314ee7d)...
+[05af275](https://github.com/Nick2bad4u/Uptime-Watcher/commit/05af275a43743dab4cebeca3deb183b2d314ee7d)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/05af275a43743dab4cebeca3deb183b2d314ee7d...05af275a43743dab4cebeca3deb183b2d314ee7d))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 6.9.0 [`(05af275)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/05af275a43743dab4cebeca3deb183b2d314ee7d)
+
+
+
+
+
+
+## [6.9.0] - 2025-07-13
+
+
+[[d33eb0a](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d33eb0a224d4fd1d3cbdb82a67ac8cdb721ec7f2)...
+[f2f5be6](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f2f5be661635cfbc76d2079e24dbb49a2170f8c1)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/d33eb0a224d4fd1d3cbdb82a67ac8cdb721ec7f2...f2f5be661635cfbc76d2079e24dbb49a2170f8c1))
+
+
+### ✨ Features
+
+- ✨ [feat] Unifies state management, monitoring types, and docs
+
+- ✨ [feat] Introduces centralized state synchronization service to unify database, cache, and frontend store, resolving consistency issues and simplifying cross-layer updates
+- ✨ [feat] Replaces hard-coded monitor types with extensible registry, enabling future plugin-based monitor expansion without widespread code changes
+- ✨ [feat] Adds frontend hook for state synchronization, improving real-time updates and store consistency
+- 🚜 [refactor] Refactors site and monitor managers to leverage new cache interface, advanced invalidation, and registry-driven monitor type validation
+- 🚜 [refactor] Updates IPC and preload APIs to support state sync events and bulk synchronization from backend to frontend
+- 📝 [docs] Expands and standardizes TSDoc across backend and frontend for all services, types, and components, improving maintainability and developer onboarding
+- ⚡ [perf] Adds database indexes for optimized query performance, especially for history and monitor lookups
+- 🧪 [test] Refactors tests to support new async repository interfaces and registry-driven monitor instantiation
+- 🛠️ [fix] Ensures cache invalidation properly propagates to frontend and backend, preventing stale data issues
+- 🧹 [chore] Cleans up legacy comments, disables unnecessary lint rules, and reorganizes exports for clarity
+
+Addresses maintainability, extensibility, and reliability of monitoring and state handling across the app. [`(d3cadd2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d3cadd205afd1867698acfbfb2085ae9dfae9f7d)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 6.8.0 [`(5057801)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5057801a96411ba5dfe38fd9902d52d283daaee9)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(00f2bab)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/00f2babe061e35aca46022052dc9c44f8a684777)
+
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(f385357)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f385357358c09192e901ac82dd15b64e4e21a0b9)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Unifies service architecture and error handling
+
+- Introduces a centralized service container for dependency management and lifecycle control, simplifying initialization and cleanup of Electron services.
+- Refactors database and site management layers to remove legacy adapter interfaces, enabling direct dependency injection of concrete repository classes.
+- Standardizes error handling with reusable utility methods for consistent logging, wrapping, and event emission, improving maintainability and debugging.
+- Updates frontend Zustand store initialization for clarity and future extensibility, and switches to a unified logger for UI and backend actions.
+- Improves data consistency by enforcing cache synchronization on database reads and transactional integrity for bulk operations.
+- Enhances robustness by adding error catching to cleanup routines and IPC operations, reducing risk of silent failures.
+
+Relates to overall architecture modernization and maintainability goals. [`(85bfaf5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/85bfaf59561174ade218eaf4f6e66ea32888d6d6)
+
+
+- 🚜 [refactor] Make repository methods async and update tests
+
+- Refactors database repository methods to return Promises for improved consistency and future-proofing of async operations.
+- Updates related service logic and tests to use await or handle Promises properly.
+- Enhances monitor mapping docs for clarity and type safety.
+- Unifies sites cache mock implementations in tests for more predictable behavior. [`(86c4090)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/86c40900b8ec3c6174db50e1596e0e865d0e03d1)
+
+
+- 🚜 [refactor] Extract monitor update logic into helper methods
+
+- Improves maintainability by splitting complex monitor update and creation logic into focused, private helper functions.
+- Clarifies responsibilities for updating existing monitors, creating new ones, and removing obsolete monitors.
+- Removes redundant and skipped test cases for undefined/null monitor parameters, keeping the test suite relevant and lean.
+- Enhances readability and future extensibility of site monitor transaction workflows. [`(d33eb0a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d33eb0a224d4fd1d3cbdb82a67ac8cdb721ec7f2)
+
+
+
+### � Documentation
+
+- 📝 [docs] Add codebase consistency audit prompt template
+
+- Introduces a detailed prompt outlining procedures for auditing codebase consistency across logic, data flow, architectural patterns, and interfaces
+- Provides structured requirements for analysis, reporting, prioritization, and improvement roadmap
+- Aims to standardize code practices and proactively identify inconsistencies to enhance maintainability and stability [`(5c5c8c3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5c5c8c34bc82520d2f3f6e30352bee80dd50ca0d)
+
+
+- 📝 [docs] Enhance code documentation for manager and service modules
+
+- Expands and improves inline documentation and JSDoc comments across site management, monitoring, repository service, and utility modules.
+- Clarifies responsibilities, usage examples, and error handling for key classes and interfaces.
+- Facilitates maintainability, onboarding, and future feature extension by detailing architectural patterns and intended behaviors.
+- Addresses code readability and developer experience, making modules easier to test and integrate. [`(c8a1d3d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c8a1d3dd9ca3e8b1155250c624510cd324f7d6d7)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Improve code formatting and markdown consistency
+
+- Updates indentation and spacing across markdown and TypeScript code samples for better readability.
+- Applies consistent arrow function formatting in tests.
+- Enhances markdown structure for clarity in documentation and action plans. [`(3c00443)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3c00443d9a504770bd03ad71885ef77457f784f1)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Remove redundant and edge case tests from orchestrator suite
+
+- Cleans up test suite by removing duplicate delegation tests and unnecessary edge case handling for undefined manager results.
+- Simplifies monitoring API tests, focusing coverage on relevant scenarios.
+- Improves maintainability by reducing test noise and focusing on meaningful validations. [`(f2f5be6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f2f5be661635cfbc76d2079e24dbb49a2170f8c1)
+
+
+- 🧪 [test] Remove obsolete tests and skip unstable test cases
+
+- Removes outdated or redundant test files to reduce maintenance overhead and improve clarity.
+- Skips several flaky or unstable unit tests to stabilize test runs and allow for future investigation.
+- Updates test suite logic to reflect API changes, ensuring consistency with recent refactors. [`(f92bd27)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f92bd27a5a00111bddb47e07b7364687f37a3702)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v6.8.0 [skip ci] [`(cf4001b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cf4001ba79a8f454b4856902f5935cef9efc5424)
 
 
 
