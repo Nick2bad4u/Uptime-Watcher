@@ -11,14 +11,6 @@
  * @see {@link IMonitorService} for interface contract
  * @see {@link MonitorConfig} for configuration options
  *
- * ## Key Features
- * - **TCP/UDP Support**: Handles both TCP and UDP port connectivity checks
- * - **Configurable Timeouts**: Per-monitor timeout configuration support
- * - **Retry Logic**: Intelligent retry handling for transient network failures
- * - **Connection Pooling**: Efficient connection management for performance
- * - **Network Error Detection**: Distinguishes between different failure types
- * - **Performance Metrics**: Accurate connection time measurement
- *
  * @example
  * ```typescript
  * const portMonitor = new PortMonitor({ timeout: 5000 });

@@ -26,12 +26,16 @@ import { Theme, ThemeName } from "./types";
  * @see {@link ThemeManager} for theme management implementation
  * @see {@link useSettingsStore} for settings integration
  *
- * ## Key Features
- * - Current theme state and switching
- * - System theme detection and synchronization
- * - Status-based color utilities
- * - Availability color mapping
- * - CSS variable management
+ * @example
+ * ```typescript
+ * const { isDark, toggleTheme, getStatusColor } = useTheme();
+ *
+ * // Toggle between light and dark themes
+ * toggleTheme();
+ *
+ * // Get status-based colors
+ * const upColor = getStatusColor('up');
+ * ```
  *
  * @returns Object containing theme state, setters, and utility functions
  */

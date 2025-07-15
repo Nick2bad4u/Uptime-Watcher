@@ -11,13 +11,6 @@
  * @see {@link EventMiddleware} for middleware patterns
  * @see {@link UptimeEvents} for event type definitions
  *
- * ## Key Features
- * - Enhanced EventEmitter functionality with compile-time type safety
- * - Middleware processing pipeline for events
- * - Comprehensive event categorization and priority system
- * - Full type safety for event names and payloads
- * - Debugging and diagnostic capabilities
- *
  * @packageDocumentation
  */
 

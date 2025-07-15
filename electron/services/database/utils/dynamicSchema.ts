@@ -85,6 +85,16 @@ ${staticFields}${dynamicFields ? ",\n" + dynamicFields : ""}
 }
 
 /**
+ * Safely converts an error value to a string for database storage.
+ */
+function safeStringifyError(value: unknown): string {
+    if (typeof value === "string") {
+        return value;
+    }
+    return JSON.stringify(value);
+}
+
+/**
  * Map database row to monitor object with dynamic field handling.
  */
 export function mapRowToMonitor(row: Record<string, unknown>): Record<string, unknown> {
@@ -101,7 +111,7 @@ export function mapRowToMonitor(row: Record<string, unknown>): Record<string, un
         lastChecked: row.last_checked ? Number(row.last_checked) : undefined,
         nextCheck: row.next_check ? Number(row.next_check) : undefined,
         responseTime: row.response_time ? Number(row.response_time) : undefined,
-        lastError: row.last_error ? String(row.last_error) : undefined,
+        lastError: row.last_error ? safeStringifyError(row.last_error) : undefined,
         createdAt: Number(row.created_at),
         updatedAt: Number(row.updated_at),
     };
@@ -214,7 +224,7 @@ function convertFromDatabase(value: unknown, sqlType: string): unknown {
             return Number(value);
         }
         case "TEXT": {
-            return String(value);
+            return typeof value === "string" ? value : JSON.stringify(value);
         }
         default: {
             return value;
@@ -235,10 +245,10 @@ function convertToDatabase(value: unknown, sqlType: string): unknown {
             return Number(value);
         }
         case "TEXT": {
-            return String(value);
+            return typeof value === "string" ? value : JSON.stringify(value);
         }
         default: {
-            return String(value);
+            return typeof value === "string" ? value : JSON.stringify(value);
         } // Convert anything else to string to avoid object binding errors
     }
 }

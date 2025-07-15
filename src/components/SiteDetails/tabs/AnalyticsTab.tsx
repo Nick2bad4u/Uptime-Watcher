@@ -314,7 +314,7 @@ export function AnalyticsTab({
                         </div>
 
                         {showAdvancedMetrics && (
-                            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-primary/20">
                                 <div className="flex flex-col items-center text-center">
                                     <ThemedText size="sm" variant="secondary" className="mb-2">
                                         Mean Time To Recovery

@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from "react";
-import { getMonitorTypeOptions } from "../utils/monitorTypeHelper";
+import { getMonitorTypeOptions } from "../utils";
 
 interface UseMonitorTypesResult {
     /** Monitor type options for form select fields */

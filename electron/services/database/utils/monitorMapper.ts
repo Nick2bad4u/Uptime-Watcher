@@ -31,7 +31,7 @@ export function rowToMonitor(row: Record<string, unknown>): Site["monitors"][0] 
     const monitor: Site["monitors"][0] = {
         checkInterval: Number(dynamicMonitor.checkInterval) || 300_000,
         history: [], // History will be loaded separately
-        id: String(dynamicMonitor.id ?? "-1"),
+        id: dynamicMonitor.id ? String(dynamicMonitor.id) : "-1",
         monitoring: Boolean(dynamicMonitor.enabled),
         responseTime: Number(dynamicMonitor.responseTime) || (row.responseTime ? Number(row.responseTime) : -1),
         retryAttempts: Number(dynamicMonitor.retryAttempts) || 3,

@@ -12,15 +12,6 @@
  * @see {@link MonitorConfig} for configuration options
  * @see {@link MonitorCheckResult} for result types
  *
- * ## Key Features
- * - Precise response time measurement using performance.now()
- * - Per-monitor timeout configuration support
- * - Intelligent status code handling (2xx/4xx = up, 5xx = down)
- * - Connection pooling with HTTP/HTTPS agents
- * - Request/response size limits for security
- * - Comprehensive error handling with network detection
- * - Retry logic for transient failures
- *
  * @example
  * ```typescript
  * const httpMonitor = new HttpMonitor({ timeout: 5000 });

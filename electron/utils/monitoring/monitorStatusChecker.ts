@@ -14,14 +14,6 @@
  * @see {@link MonitorCheckConfig} for configuration options
  * @see {@link StatusUpdate} for result types
  *
- * ## Key Features
- * - **Individual Monitor Checks**: Perform health checks on specific monitors
- * - **Automatic Status Updates**: Update monitor status in database with transactions
- * - **History Tracking**: Maintain detailed history with configurable limits
- * - **Event Emission**: Emit typed events for status changes and notifications
- * - **Error Resilience**: Comprehensive error handling with proper logging
- * - **Cache Synchronization**: Keep in-memory cache synchronized with database
- *
  * @example
  * ```typescript
  * const config: MonitorCheckConfig = {

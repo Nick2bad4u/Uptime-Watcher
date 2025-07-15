@@ -6,11 +6,8 @@
 import { useState, useEffect } from "react";
 import { TextField } from "./FormFields";
 import { logger } from "../../services";
-import {
-    getMonitorTypeConfig,
-    type MonitorFieldDefinition,
-    type MonitorTypeConfig,
-} from "../../utils/monitorTypeHelper";
+import { ThemedText } from "../../theme";
+import { getMonitorTypeConfig, type MonitorFieldDefinition, type MonitorTypeConfig } from "../../utils";
 
 interface DynamicMonitorFieldsProps {
     /** Selected monitor type */
@@ -64,15 +61,15 @@ export function DynamicMonitorFields({ monitorType, values, onChange, isLoading 
     }, [monitorType]);
 
     if (isLoadingConfig) {
-        return <div className="text-gray-500">Loading monitor fields...</div>;
+        return <ThemedText variant="secondary">Loading monitor fields...</ThemedText>;
     }
 
     if (error) {
-        return <div className="text-red-600">Error loading monitor fields: {error}</div>;
+        return <ThemedText variant="error">Error loading monitor fields: {error}</ThemedText>;
     }
 
     if (!config) {
-        return <div className="text-red-600">Unknown monitor type: {monitorType}</div>;
+        return <ThemedText variant="error">Unknown monitor type: {monitorType}</ThemedText>;
     }
 
     return (
@@ -146,7 +143,7 @@ function DynamicField({ field, value, onChange, disabled = false }: DynamicField
         }
 
         default: {
-            return <div className="text-red-600">Unsupported field type: {field.type}</div>;
+            return <ThemedText variant="error">Unsupported field type: {field.type}</ThemedText>;
         }
     }
 }

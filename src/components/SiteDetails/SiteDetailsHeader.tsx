@@ -128,9 +128,9 @@ export function SiteDetailsHeader({
                                 title={isCollapsed ? "Expand header" : "Collapse header"}
                             >
                                 {isCollapsed ? (
-                                    <MdExpandMore className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                                    <MdExpandMore className="w-5 h-5 themed-text-secondary" />
                                 ) : (
-                                    <MdExpandLess className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                                    <MdExpandLess className="w-5 h-5 themed-text-secondary" />
                                 )}
                             </button>
                         )}
@@ -191,7 +191,7 @@ function MonitoringStatusDisplay({ monitors }: { readonly monitors: Monitor[] })
                                 <div className="flex items-center gap-1">
                                     <div
                                         className={`w-2 h-2 rounded-full ${
-                                            monitor.monitoring ? "bg-green-500" : "bg-gray-400"
+                                            monitor.monitoring ? "themed-status-up" : "themed-status-paused"
                                         }`}
                                         title={`${monitor.type.toUpperCase()}: ${monitor.monitoring ? "Running" : "Stopped"}`}
                                     />

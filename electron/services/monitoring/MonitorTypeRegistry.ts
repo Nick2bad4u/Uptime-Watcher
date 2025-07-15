@@ -470,6 +470,3 @@ export function isValidMonitorTypeGuard(type: unknown): type is string {
 
 // Generate union type from registered monitor types
 export type MonitorType = ReturnType<typeof getRegisteredMonitorTypes>[number];
-
-// Helper to get the current monitor types as a union
-export type RegisteredMonitorType = MonitorType;

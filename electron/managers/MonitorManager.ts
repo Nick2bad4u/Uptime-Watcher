@@ -14,7 +14,7 @@ type MonitorManagerEvents = UptimeEvents;
 
 import { MonitorRepository, HistoryRepository, SiteRepository, DatabaseService, MonitorScheduler } from "../services";
 import { Site, StatusUpdate } from "../types";
-import { SiteCacheInterface } from "../utils/database/interfaces";
+import { SiteCacheInterface } from "../utils/database";
 import {
     monitorLogger as logger,
     startAllMonitoring,

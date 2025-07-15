@@ -10,10 +10,18 @@ import { MdSettings, MdTimer, MdInfoOutline, MdDangerous } from "react-icons/md"
 
 import { CHECK_INTERVALS, RETRY_CONSTRAINTS, TIMEOUT_CONSTRAINTS } from "../../../constants";
 import { logger } from "../../../services";
-import { ThemedText, ThemedButton, ThemedCard, ThemedBadge, ThemedInput, ThemedSelect, useTheme } from "../../../theme";
+import {
+    ThemedText,
+    ThemedButton,
+    ThemedCard,
+    ThemedBadge,
+    ThemedInput,
+    ThemedSelect,
+    ThemedBox,
+    useTheme,
+} from "../../../theme";
 import { Site, Monitor } from "../../../types";
-import { calculateMaxDuration, getIntervalLabel } from "../../../utils";
-import { getMonitorTypeConfig } from "../../../utils/monitorTypeHelper";
+import { calculateMaxDuration, getIntervalLabel, getMonitorTypeConfig } from "../../../utils";
 
 /**
  * Helper function to format retry attempts text.
@@ -410,13 +418,18 @@ export function SettingsTab({
 
                     {/* Total monitoring time indicator */}
                     {localRetryAttempts > 0 && (
-                        <div className="p-3 border rounded-lg bg-info/10 border-info/20">
-                            <ThemedText size="xs" variant="info">
+                        <ThemedBox
+                            variant="tertiary"
+                            padding="md"
+                            rounded="lg"
+                            className="bg-surface-elevated border border-primary/20"
+                        >
+                            <ThemedText size="xs" variant="secondary">
                                 💡 <strong>Maximum check duration:</strong> ~
                                 {calculateMaxDuration(localTimeout, localRetryAttempts)} ({localTimeout}s per attempt ×{" "}
                                 {localRetryAttempts + 1} attempts + backoff delays)
                             </ThemedText>
-                        </div>
+                        </ThemedBox>
                     )}
                 </div>
             </ThemedCard>

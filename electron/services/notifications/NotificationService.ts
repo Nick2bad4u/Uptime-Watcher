@@ -33,13 +33,6 @@ export interface NotificationConfig {
  * @see {@link Site} for site data structure
  * @see {@link Monitor} for monitor data structure
  *
- * ## Key Features
- * - **Configurable Alerts**: Control which types of status changes trigger notifications
- * - **Platform Detection**: Automatically detects if notifications are supported
- * - **Monitor Context**: Includes site name and monitor type in notification content
- * - **Urgency Levels**: Sets appropriate urgency for different notification types
- * - **Comprehensive Logging**: Logs all notification activities for debugging
- *
  * @example
  * ```typescript
  * const notificationService = new NotificationService({

@@ -29,12 +29,12 @@ import { getIntervalLabel } from "../../../utils";
  */
 function getResponseTimeTextColor(responseTime: number): string {
     if (responseTime <= 200) {
-        return "text-green-600 dark:text-green-400";
+        return "themed-text-success";
     }
     if (responseTime <= 1000) {
-        return "text-yellow-600 dark:text-yellow-400";
+        return "themed-text-warning";
     }
-    return "text-red-600 dark:text-red-400";
+    return "themed-text-danger";
 }
 
 /**

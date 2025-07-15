@@ -15,8 +15,7 @@ import type { AddSiteFormState, AddSiteFormActions } from "../SiteDetails/useAdd
 
 import { DEFAULT_REQUEST_TIMEOUT, RETRY_CONSTRAINTS } from "../../constants";
 import { logger } from "../../services";
-import { validateMonitorData } from "../../utils/monitorValidation";
-import { getMonitorTypeConfig } from "../../utils/monitorTypeHelper";
+import { validateMonitorData, getMonitorTypeConfig } from "../../utils";
 
 /**
  * Store actions interface for form submission operations.
@@ -90,47 +89,61 @@ async function buildMonitorData(
     try {
         const config = await getMonitorTypeConfig(monitorType);
         if (config?.fields) {
-            // Dynamically map form fields to monitor data based on field definitions
-            for (const field of config.fields) {
-                const fieldName = field.name;
-                if (fieldName in formData) {
-                    const value = formData[fieldName as keyof typeof formData];
-                    const trimmedValue = value.trim();
-                    if (trimmedValue) {
-                        // Convert value based on field type
-                        if (field.type === "number") {
-                            // eslint-disable-next-line security/detect-object-injection -- fieldName comes from trusted monitor config
-                            monitorData[fieldName] = Number(trimmedValue);
-                        } else {
-                            // eslint-disable-next-line security/detect-object-injection -- fieldName comes from trusted monitor config
-                            monitorData[fieldName] = trimmedValue;
-                        }
-                    }
-                }
-            }
+            return buildMonitorDataFromConfig(config, formData, monitorData);
         } else {
-            // Fallback to hardcoded mapping if config is unavailable
-            if (monitorType === "http") {
-                monitorData.url = formData.url.trim();
-            }
-            if (monitorType === "port") {
-                monitorData.host = formData.host.trim();
-                monitorData.port = Number(formData.port);
-            }
+            return buildMonitorDataFallback(monitorType, formData, monitorData);
         }
     } catch (error) {
         logger.warn("Failed to get monitor config, using fallback mapping", error as Error);
-        // Fallback to hardcoded mapping for backward compatibility and error recovery
-        // This ensures the form continues to work even if the registry is unavailable
-        if (monitorType === "http") {
-            monitorData.url = formData.url.trim();
-        }
-        if (monitorType === "port") {
-            monitorData.host = formData.host.trim();
-            monitorData.port = Number(formData.port);
+        return buildMonitorDataFallback(monitorType, formData, monitorData);
+    }
+}
+
+/**
+ * Builds monitor data using dynamic configuration.
+ */
+function buildMonitorDataFromConfig(
+    config: { fields: { name: string; type: string }[] },
+    formData: { url: string; host: string; port: string },
+    monitorData: Record<string, unknown>
+): Record<string, unknown> {
+    for (const field of config.fields) {
+        const fieldName = field.name;
+        if (fieldName in formData) {
+            const value = formData[fieldName as keyof typeof formData];
+            const trimmedValue = value.trim();
+            if (trimmedValue) {
+                // Convert value based on field type
+                if (field.type === "number") {
+                    // eslint-disable-next-line security/detect-object-injection -- fieldName comes from trusted monitor config
+                    monitorData[fieldName] = Number(trimmedValue);
+                } else {
+                    // eslint-disable-next-line security/detect-object-injection -- fieldName comes from trusted monitor config
+                    monitorData[fieldName] = trimmedValue;
+                }
+            }
         }
     }
+    return monitorData;
+}
 
+/**
+ * Builds monitor data using fallback hardcoded mapping.
+ */
+function buildMonitorDataFallback(
+    monitorType: MonitorType,
+    formData: { url: string; host: string; port: string },
+    monitorData: Record<string, unknown>
+): Record<string, unknown> {
+    // Fallback to hardcoded mapping for backward compatibility and error recovery
+    // This ensures the form continues to work even if the registry is unavailable
+    if (monitorType === "http") {
+        monitorData.url = formData.url.trim();
+    }
+    if (monitorType === "port") {
+        monitorData.host = formData.host.trim();
+        monitorData.port = Number(formData.port);
+    }
     return monitorData;
 }
 

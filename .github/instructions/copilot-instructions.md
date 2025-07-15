@@ -27,6 +27,23 @@ applyTo: "**"
 - **Barrel Exports**: Use barrel files (`index.ts`) for service and utility exports to maintain clean import paths.
 - **Testing Setup**: See `electron/test/setup.ts` for global mocks and test environment config.
 
+## Import/Export Standards (CRITICAL)
+
+- **Barrel Export Usage**: ALL imports must use barrel exports (`index.ts`) files when available. Never import directly from subdirectories.
+- **Frontend Barrel Structure**: `src/` has barrel exports for: `utils/`, `hooks/`, `components/`, `stores/`, `services/`, `theme/`
+- **Backend Barrel Structure**: `electron/` has barrel exports for: `services/`, `utils/`, `managers/`, `events/`
+- **Monitor Utilities**: All monitor-related utilities are exported from `src/utils/` barrel: `monitorTitleFormatters`, `monitorTypeHelper`, `monitorUiHelpers`, `monitorValidation`
+- **Import Consistency**: Use `import { X } from "../utils"` instead of `import { X } from "../utils/specificFile"`
+- **Type Re-exports**: Common types are re-exported through barrel files to avoid deep imports
+
+## Code Quality Standards
+
+- **Nested Ternary**: Extract complex nested ternary expressions into helper functions for better readability
+- **Error Handling**: Always use `safeStringifyError` for error conversion in database operations
+- **Empty Directories**: Remove empty directories to keep codebase clean (no empty `managers/`, `dist/`, or test directories)
+- **Barrel Export Completeness**: Ensure all utilities/services are exported from their respective barrel files
+- **Import Deduplication**: Merge duplicate imports from the same module into single import statements
+
 ## Developer Workflows
 
 - **Build Frontend**: `npm run build` (Vite)
@@ -65,6 +82,14 @@ applyTo: "**"
 - **Frontend Store Update**:
   ```typescript
   useSitesState.getState().addSite(newSite);
+  ```
+- **Proper Import Usage**:
+  ```typescript
+  // Good: Use barrel export
+  import { validateMonitorData, getMonitorTypeConfig } from "../utils";
+  
+  // Bad: Direct import from subdirectory
+  import { validateMonitorData } from "../utils/monitorValidation";
   ```
 
 ## References

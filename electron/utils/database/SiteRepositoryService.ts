@@ -15,13 +15,17 @@
  * @see {@link SiteLoadingOrchestrator} for orchestration logic
  * @see {@link SiteRepository} for data access patterns
  *
- * ## Key Features
- * - **Dependency Injection**: Fully configurable with injected repositories and services
- * - **Separation of Concerns**: Pure data operations separated from side effects
- * - **Comprehensive Testing**: Designed for easy mocking and unit testing
- * - **Error Handling**: Standardized error handling with proper logging and types
- * - **Event Integration**: Coordinated event emission for reactive system behavior
- * - **Transaction Safety**: All operations use proper database transactions
+ * @example
+ * ```typescript
+ * const service = new SiteRepositoryService({
+ *   repositories: { site, monitor, history, settings },
+ *   logger,
+ *   eventEmitter
+ * });
+ *
+ * const sites = await service.getSitesFromDatabase();
+ * await service.loadSitesIntoCache(siteCache);
+ * ```
  *
  * The service provides both data operations (SiteRepositoryService) and orchestration
  * logic (SiteLoadingOrchestrator) to handle complex workflows while maintaining

@@ -7,8 +7,8 @@ import React, { useMemo } from "react";
 
 import { Monitor, StatusHistory } from "../../../types";
 import { HistoryChart } from "../../common/HistoryChart";
-import { useMonitorTypes } from "../../../hooks/useMonitorTypes";
-import { formatTitleSuffix } from "../../../utils/monitorTitleFormatters";
+import { useMonitorTypes } from "../../../hooks";
+import { formatTitleSuffix } from "../../../utils";
 
 /**
  * Props for the SiteCardHistory component.

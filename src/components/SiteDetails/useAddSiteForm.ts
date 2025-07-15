@@ -9,7 +9,7 @@ import { useState, useEffect, useCallback } from "react";
 import { DEFAULT_CHECK_INTERVAL } from "../../constants";
 import { generateUuid } from "../../utils/index";
 import type { MonitorType } from "../../types";
-import { useMonitorFields } from "../../hooks/useMonitorFields";
+import { useMonitorFields } from "../../hooks";
 
 /** Form operation mode */
 export type FormMode = "new" | "existing";
@@ -73,13 +73,9 @@ export interface AddSiteFormActions {
 /**
  * Hook for managing add site form state and operations.
  *
- * Features:
- * - Complete form state management
- * - Real-time validation
- * - Support for both new sites and adding monitors to existing sites
- * - Automatic UUID generation for new sites
- * - Form reset functionality
- * - Error handling and display
+ * @remarks
+ * Provides comprehensive form state management with real-time validation,
+ * support for both new sites and adding monitors to existing sites.
  *
  * @returns Combined form state and action handlers
  */
@@ -163,7 +159,8 @@ export function useAddSiteForm(): AddSiteFormState & AddSiteFormActions {
                         break;
                     }
                     default: {
-                        value = "";
+                        // value already initialized to ""
+                        break;
                     }
                 }
                 if (!value.trim()) {

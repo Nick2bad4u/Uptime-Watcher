@@ -13,7 +13,7 @@ import {
     supportsAdvancedAnalytics as checkSupportsAdvancedAnalytics,
     allSupportsResponseTime,
     allSupportsAdvancedAnalytics,
-} from "../../utils/monitorUiHelpers";
+} from "../../utils";
 
 /**
  * Component that dynamically formats monitor detail labels.

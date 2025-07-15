@@ -216,6 +216,10 @@ export class MonitorRepository {
      * Update an existing monitor (internal version for use within existing transactions).
      * Does not create its own transaction.
      */
+    /**
+     * Update an existing monitor (internal version for use within existing transactions).
+     * Does not create its own transaction.
+     */
     public updateInternal(db: Database, monitorId: string, monitor: Partial<Site["monitors"][0]>): void {
         if (isDev()) {
             logger.debug(`[MonitorRepository] updateInternal called with monitorId: ${monitorId}, monitor:`, monitor);
@@ -228,37 +232,7 @@ export class MonitorRepository {
             logger.debug(`[MonitorRepository] mapMonitorToRow result:`, row);
         }
 
-        const updateFields: string[] = [];
-        const updateValues: DbValue[] = [];
-
-        // Only update fields that are actually provided and are primitive types
-        for (const [key, value] of Object.entries(row)) {
-            if (value !== undefined && value !== null) {
-                // Skip 'enabled' field if monitoring state wasn't provided in the original monitor object
-                // This prevents status updates from accidentally disabling monitoring
-                if (key === "enabled" && !("monitoring" in monitor) && !("enabled" in monitor)) {
-                    if (isDev()) {
-                        logger.debug(
-                            `[MonitorRepository] Skipping 'enabled' field - monitoring state not provided in update`
-                        );
-                    }
-                    continue;
-                }
-
-                // Ensure we only bind primitive types that SQLite can handle
-                if (typeof value === "string" || typeof value === "number") {
-                    updateFields.push(`${key} = ?`);
-                    updateValues.push(value);
-                } else if (typeof value === "boolean") {
-                    updateFields.push(`${key} = ?`);
-                    updateValues.push(value ? 1 : 0);
-                } else {
-                    if (isDev()) {
-                        logger.warn(`[MonitorRepository] Skipping non-primitive field ${key} with value:`, value);
-                    }
-                }
-            }
-        }
+        const { updateFields, updateValues } = this.buildUpdateFieldsAndValues(row, monitor);
 
         if (updateFields.length === 0) {
             if (isDev()) {
@@ -267,8 +241,74 @@ export class MonitorRepository {
             return;
         }
 
-        updateValues.push(monitorId);
+        this.executeUpdateQuery(db, updateFields, updateValues, monitorId);
+    }
 
+    /**
+     * Builds the update fields and values for the monitor update query.
+     */
+    private buildUpdateFieldsAndValues(
+        row: Record<string, unknown>,
+        monitor: Partial<Site["monitors"][0]>
+    ): { updateFields: string[]; updateValues: DbValue[] } {
+        const updateFields: string[] = [];
+        const updateValues: DbValue[] = [];
+
+        // Only update fields that are actually provided and are primitive types
+        for (const [key, value] of Object.entries(row)) {
+            if (value !== undefined && value !== null) {
+                // Skip 'enabled' field if monitoring state wasn't provided in the original monitor object
+                // This prevents status updates from accidentally disabling monitoring
+                if (this.shouldSkipEnabledField(key, monitor)) {
+                    continue;
+                }
+
+                // Ensure we only bind primitive types that SQLite can handle
+                const fieldValue = this.convertValueForDatabase(key, value);
+                if (fieldValue !== null) {
+                    updateFields.push(`${key} = ?`);
+                    updateValues.push(fieldValue);
+                }
+            }
+        }
+
+        return { updateFields, updateValues };
+    }
+
+    /**
+     * Checks if the 'enabled' field should be skipped during update.
+     */
+    private shouldSkipEnabledField(key: string, monitor: Partial<Site["monitors"][0]>): boolean {
+        if (key === "enabled" && !("monitoring" in monitor) && !("enabled" in monitor)) {
+            if (isDev()) {
+                logger.debug(`[MonitorRepository] Skipping 'enabled' field - monitoring state not provided in update`);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Converts a value to the appropriate database format.
+     */
+    private convertValueForDatabase(key: string, value: unknown): DbValue | null {
+        if (typeof value === "string" || typeof value === "number") {
+            return value;
+        } else if (typeof value === "boolean") {
+            return value ? 1 : 0;
+        }
+
+        if (isDev()) {
+            logger.warn(`[MonitorRepository] Skipping non-primitive field ${key} with value:`, value);
+        }
+        return null;
+    }
+
+    /**
+     * Executes the update query with the given fields and values.
+     */
+    private executeUpdateQuery(db: Database, updateFields: string[], updateValues: DbValue[], monitorId: string): void {
+        updateValues.push(monitorId);
         const sql = `UPDATE monitors SET ${updateFields.join(", ")} WHERE id = ?`;
 
         if (isDev()) {

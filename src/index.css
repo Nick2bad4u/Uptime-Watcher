@@ -84,6 +84,58 @@ body {
     }
 }
 
+/* Global scrollbar theming */
+
+/* Light mode scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--color-background-secondary, #f9fafb);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--color-border-secondary, #d1d5db);
+    border-radius: 4px;
+    transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-tertiary, #9ca3af);
+}
+
+/* Dark mode scrollbar */
+@media (prefers-color-scheme: dark) {
+    ::-webkit-scrollbar-track {
+        background: var(--color-background-tertiary, #1a1f29);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--color-border-primary, #4b5563);
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--color-text-secondary, #d1d5db);
+    }
+}
+
+/* High contrast scrollbar */
+@media (prefers-contrast: more) {
+    ::-webkit-scrollbar-thumb {
+        background: var(--color-primary-500, #3b82f6);
+    }
+}
+
+/* Reduced motion scrollbar */
+@media (prefers-reduced-motion: reduce) {
+    ::-webkit-scrollbar-thumb {
+        transition: none;
+    }
+}
+
 @layer components {
     .status-indicator {
         display: inline-flex;
@@ -112,5 +164,76 @@ body {
     .status-paused {
         background-color: var(--color-status-paused-bg, #f3f4f6);
         color: var(--color-status-paused, #6b7280);
+    }
+
+    /* Theme-aware status classes */
+    .themed-status-up {
+        background-color: var(--color-status-up, #10b981);
+        border-radius: 50%;
+    }
+
+    .themed-status-down {
+        background-color: var(--color-status-down, #ef4444);
+        border-radius: 50%;
+    }
+
+    .themed-status-pending {
+        background-color: var(--color-status-pending, #f59e0b);
+        border-radius: 50%;
+    }
+
+    .themed-status-paused {
+        background-color: var(--color-text-tertiary, #9ca3af);
+        border-radius: 50%;
+    }
+
+    /* Theme-aware text classes */
+    .themed-text-primary {
+        color: var(--color-text-primary, #1f2937);
+    }
+
+    .themed-text-secondary {
+        color: var(--color-text-secondary, #6b7280);
+    }
+
+    .themed-text-tertiary {
+        color: var(--color-text-tertiary, #9ca3af);
+    }
+
+    .themed-text-success {
+        color: var(--color-status-up, #10b981);
+    }
+
+    .themed-text-warning {
+        color: var(--color-status-pending, #f59e0b);
+    }
+
+    .themed-text-danger {
+        color: var(--color-status-down, #ef4444);
+    }
+
+    /* Theme-aware box classes */
+    .themed-box-surface-elevated {
+        background-color: var(--color-background-elevated, #f9fafb);
+        border: 1px solid var(--color-border-primary, #e5e7eb);
+    }
+
+    @media (prefers-color-scheme: dark) {
+        .themed-text-primary {
+            color: var(--color-text-primary, #f9fafb);
+        }
+
+        .themed-text-secondary {
+            color: var(--color-text-secondary, #d1d5db);
+        }
+
+        .themed-text-tertiary {
+            color: var(--color-text-tertiary, #9ca3af);
+        }
+
+        .themed-box-surface-elevated {
+            background-color: var(--color-background-elevated, #1f2937);
+            border: 1px solid var(--color-border-primary, #374151);
+        }
     }
 }

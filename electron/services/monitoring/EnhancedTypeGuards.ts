@@ -396,7 +396,7 @@ export const GenericTypeInference = {
                 break;
             }
             case "url": {
-                validator = z.string().url();
+                validator = z.string().url({ message: "Invalid URL format" });
                 break;
             }
             default: {
@@ -544,7 +544,7 @@ export class TypeSafeMonitorBuilder<T extends MonitorType> {
     /**
      * Set field value with runtime validation
      */
-    setField<K extends string>(fieldName: K, value: unknown): TypeSafeMonitorBuilder<T> {
+    setField<K extends string>(fieldName: K, value: unknown): this {
         try {
             // Validate field based on monitor type
             const validation = this.validateField(fieldName, value);

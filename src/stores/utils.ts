@@ -72,57 +72,55 @@ export const createBaseStore = <T extends BaseStore>(
  *
  * @public
  */
+/**
+ * Safely executes a store operation with error handling.
+ */
+function safeStoreOperation(operation: () => void, operationName: string): void {
+    try {
+        operation();
+    } catch (error) {
+        logger.error(`Failed to ${operationName}`, error instanceof Error ? error : new Error(String(error)));
+    }
+}
+
+/**
+ * Handles operation errors by updating store state.
+ */
+function handleOperationError(error: unknown, store: Pick<BaseStore, "setError" | "setLoading" | "clearError">): void {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+
+    try {
+        store.setError(errorMessage);
+    } catch (storeError) {
+        // If setError fails, log both errors
+        logger.error(
+            "Failed to set error state",
+            storeError instanceof Error ? storeError : new Error(String(storeError))
+        );
+        logger.error("Original operation error", error instanceof Error ? error : new Error(String(error)));
+    }
+}
+
 export const withErrorHandling = async <T>(
     operation: () => Promise<T>,
     store: Pick<BaseStore, "setError" | "setLoading" | "clearError">
 ): Promise<T> => {
     // Clear any previous error state before starting
-    try {
-        store.clearError();
-    } catch (error) {
-        // If clearError fails, log it but don't prevent the operation
-        logger.error("Failed to clear error state", error instanceof Error ? error : new Error(String(error)));
-    }
+    safeStoreOperation(() => store.clearError(), "clear error state");
 
     // Set loading state to true
-    try {
-        store.setLoading(true);
-    } catch (error) {
-        // If setLoading fails, log it but don't prevent the operation
-        logger.error("Failed to set loading state", error instanceof Error ? error : new Error(String(error)));
-    }
+    safeStoreOperation(() => store.setLoading(true), "set loading state");
 
     try {
         const result = await operation();
         return result;
     } catch (error) {
         // Handle the error from the operation
-        const errorMessage = error instanceof Error ? error.message : String(error);
-
-        try {
-            store.setError(errorMessage);
-        } catch (storeError) {
-            // If setError fails, log both errors
-            logger.error(
-                "Failed to set error state",
-                storeError instanceof Error ? storeError : new Error(String(storeError))
-            );
-            logger.error("Original operation error", error instanceof Error ? error : new Error(String(error)));
-        }
-
+        handleOperationError(error, store);
         throw error;
     } finally {
         // Always clear loading state, with error handling
-        try {
-            store.setLoading(false);
-        } catch (error) {
-            // If setLoading fails in finally, log it but don't throw
-            // to avoid masking the original error
-            logger.error(
-                "Failed to clear loading state in finally block",
-                error instanceof Error ? error : new Error(String(error))
-            );
-        }
+        safeStoreOperation(() => store.setLoading(false), "clear loading state in finally block");
     }
 };
 

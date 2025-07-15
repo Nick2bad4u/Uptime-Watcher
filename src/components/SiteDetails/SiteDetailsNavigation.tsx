@@ -42,12 +42,9 @@ interface SiteDetailsNavigationProperties {
 /**
  * Navigation and control component for site details page.
  *
- * Features:
- * - Tab navigation for different views (Overview, History, Analytics, Settings)
- * - Monitor control buttons (Start/Stop monitoring, Check now)
- * - Monitor selection dropdown
- * - Check interval configuration
- * - Time range selection for charts
+ * @remarks
+ * Provides tabbed navigation and monitoring controls for site details,
+ * including start/stop monitoring, manual checks, and configuration options.
  *
  * @param props - Component props for navigation and control
  * @returns JSX element containing navigation controls

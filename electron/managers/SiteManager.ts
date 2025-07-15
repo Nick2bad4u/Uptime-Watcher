@@ -45,7 +45,7 @@
 import { UptimeEvents, TypedEventBus } from "../events/index";
 import { SiteRepository, MonitorRepository, HistoryRepository, DatabaseService } from "../services/index";
 import { Site } from "../types";
-import { SiteCacheInterface, SiteCache, MonitoringConfig } from "../utils/database/interfaces";
+import { SiteCacheInterface, SiteCache, MonitoringConfig } from "../utils/database";
 import {
     SiteWritingOrchestrator,
     createSiteWritingOrchestrator,

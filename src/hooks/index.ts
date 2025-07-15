@@ -10,3 +10,8 @@ export * from "./site";
 export * from "./useBackendFocusSync";
 export * from "./useSelectedSite";
 export * from "./useThemeStyles";
+
+// Monitor-related hooks
+export * from "./useDynamicHelpText";
+export * from "./useMonitorFields";
+export * from "./useMonitorTypes";

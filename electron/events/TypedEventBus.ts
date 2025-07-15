@@ -62,13 +62,6 @@ export type EventMiddleware<T = unknown> = (
  * middleware processing, and comprehensive debugging capabilities. Events are
  * processed through a middleware chain before emission.
  *
- * Features:
- * - **Type Safety**: Compile-time checking of event names and data
- * - **Middleware Support**: Pluggable processing pipeline
- * - **Correlation Tracking**: Automatic correlation IDs for debugging
- * - **Rich Metadata**: Timestamps, bus IDs, and diagnostic information
- * - **Error Handling**: Graceful error handling in middleware chain
- *
  * @typeParam EventMap - Map of event names to their data types
  *
  * @public

@@ -281,7 +281,13 @@ export class DatabaseSchemaMigrator {
         if (strategy.defaultValue !== undefined) {
             const updateSQL = `UPDATE monitors SET ${strategy.newName} = ? WHERE type = ?`;
             try {
-                const defaultValue = strategy.defaultValue === null ? null : String(strategy.defaultValue);
+                let defaultValue: string | null = null;
+                if (strategy.defaultValue !== null) {
+                    defaultValue =
+                        typeof strategy.defaultValue === "string"
+                            ? strategy.defaultValue
+                            : JSON.stringify(strategy.defaultValue);
+                }
                 const result = db.run(updateSQL, [defaultValue, monitorType]);
                 logger.info(
                     `Updated ${result.changes} ${monitorType} monitors with default value for ${strategy.newName}`

@@ -291,7 +291,7 @@ export function SiteDetails({ onClose, site }: SiteDetailsProperties) {
                     <ThemedBox
                         variant="primary"
                         padding="lg"
-                        className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800"
+                        className={`flex-1 overflow-y-auto custom-scrollbar ${currentTheme.isDark ? "dark" : ""}`}
                     >
                         {activeSiteDetailsTab === "site-overview" && (
                             <SiteOverviewTab

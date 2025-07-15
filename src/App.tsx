@@ -29,14 +29,20 @@ import { ThemeProvider, ThemedBox, ThemedText, ThemedButton, useTheme } from "./
  * @see {@link useTheme} for theme management
  * @see {@link useSitesStore} for site state management
  *
- * ## Key Features
- * - Global state management via focused Zustand stores
- * - Theme management with light/dark mode support
- * - Modal management (Settings, Site Details)
- * - Error and update notifications
- * - Loading states with delayed overlay
- * - Real-time status updates subscription
- * - Focus-based backend synchronization
+ * @example
+ * ```tsx
+ * function App() {
+ *   return (
+ *     <ErrorBoundary>
+ *       <ThemeProvider>
+ *         <div className="app-container">
+ *           <Header />
+ *         </div>
+ *       </ThemeProvider>
+ *     </ErrorBoundary>
+ *   );
+ * }
+ * ```
  *
  * @returns The main App component JSX
  */
