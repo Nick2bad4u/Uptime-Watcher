@@ -119,7 +119,8 @@ async function buildMonitorData(
         }
     } catch (error) {
         console.warn("Failed to get monitor config, using fallback mapping:", error);
-        // Fallback to hardcoded mapping
+        // Fallback to hardcoded mapping for backward compatibility and error recovery
+        // This ensures the form continues to work even if the registry is unavailable
         if (monitorType === "http") {
             monitorData.url = formData.url.trim();
         }
@@ -331,6 +332,10 @@ export async function handleSubmit(event: React.FormEvent, properties: FormSubmi
         });
 
         setFormError(validationErrors[0]); // Show first error
+
+        // Add debugging to see if error is being set
+        console.log("🚨 Setting form error:", validationErrors[0]);
+
         return;
     }
 

@@ -105,6 +105,7 @@ export function useAddSiteForm(): AddSiteFormState & AddSiteFormActions {
 
     // Reset fields when monitor type changes, but preserve them if they've been explicitly set
     useEffect(() => {
+        console.log("🔄 Clearing form error due to monitorType change:", monitorType);
         setFormError(undefined);
 
         // Get current monitor type fields
@@ -125,6 +126,7 @@ export function useAddSiteForm(): AddSiteFormState & AddSiteFormActions {
 
     // Reset name and siteId when switching to new site
     useEffect(() => {
+        console.log("🔄 Clearing form error due to addMode change:", addMode);
         if (addMode === "new") {
             setName("");
             setSiteId(generateUuid());

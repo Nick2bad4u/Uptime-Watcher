@@ -93,7 +93,7 @@ export function mapRowToMonitor(row: Record<string, unknown>): Record<string, un
         siteIdentifier: String(row.site_identifier),
         type: String(row.type),
         enabled: Boolean(row.enabled),
-        monitoring: Boolean(row.enabled), // Map enabled -> monitoring for frontend compatibility
+        monitoring: Boolean(row.enabled), // Map enabled -> monitoring for frontend
         checkInterval: Number(row.check_interval),
         timeout: Number(row.timeout),
         retryAttempts: Number(row.retry_attempts),

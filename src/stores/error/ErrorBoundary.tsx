@@ -5,6 +5,8 @@
 
 import React from "react";
 
+import { DefaultErrorFallback } from "../../components/error/DefaultErrorFallback";
+
 interface ErrorBoundaryState {
     hasError: boolean;
     error?: Error;
@@ -16,23 +18,6 @@ interface ErrorBoundaryProperties {
     fallback?: React.ComponentType<{ error?: Error; retry: () => void }>;
     onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
 }
-
-/**
- * Default fallback component for error boundary
- */
-const DefaultErrorFallback: React.FC<{ error?: Error; retry: () => void }> = ({ error, retry }) => (
-    <div className="flex flex-col items-center justify-center p-8 border border-red-200 rounded-lg bg-red-50">
-        <div className="mb-4 text-red-600">
-            <h2 className="mb-2 text-lg font-semibold">Something went wrong</h2>
-            <p className="text-sm">
-                {error?.message.trim() ? error.message : "An unexpected error occurred while loading this section."}
-            </p>
-        </div>
-        <button onClick={retry} className="px-4 py-2 text-white transition-colors bg-red-600 rounded hover:bg-red-700">
-            Try Again
-        </button>
-    </div>
-);
 
 /**
  * Error boundary component for wrapping store-connected components

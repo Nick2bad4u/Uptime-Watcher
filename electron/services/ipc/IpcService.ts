@@ -5,7 +5,7 @@ import { UptimeOrchestrator } from "../../index";
 import { logger } from "../../utils/index";
 import { AutoUpdaterService } from "../updater/index";
 import { Site } from "../../types";
-import { getAllMonitorTypeConfigs, validateMonitorData } from "../monitoring/MonitorTypeRegistry";
+import { getAllMonitorTypeConfigs, validateMonitorData, getMonitorTypeConfig } from "../monitoring/MonitorTypeRegistry";
 
 /**
  * Inter-Process Communication service for Electron main-renderer communication.
@@ -241,52 +241,188 @@ export class IpcService {
      * @remarks
      * Handles monitor type metadata operations:
      * - `get-monitor-types`: Get all available monitor type configurations
+     * - `format-monitor-detail`: Format monitor detail strings using backend functions
+     * - `format-monitor-title-suffix`: Format monitor title suffixes using backend functions
+     * - `validate-monitor-data`: Validate monitor configuration data
      */
     private setupMonitorTypeHandlers(): void {
         ipcMain.handle("get-monitor-types", () => {
             if (isDev()) logger.debug("[IpcService] Handling get-monitor-types");
 
-            // Get all monitor type configs and strip out non-serializable data (Zod schemas and functions)
-            const configs = getAllMonitorTypeConfigs();
-            return configs.map((config) => ({
-                type: config.type,
-                displayName: config.displayName,
-                description: config.description,
-                version: config.version,
-                fields: config.fields, // This is serializable
-                // Serialize uiConfig by excluding functions and keeping only data
-                uiConfig: config.uiConfig
-                    ? {
-                          supportsResponseTime: config.uiConfig.supportsResponseTime,
-                          supportsAdvancedAnalytics: config.uiConfig.supportsAdvancedAnalytics,
-                          helpTexts: config.uiConfig.helpTexts,
-                          display: config.uiConfig.display,
-                          detailFormats: config.uiConfig.detailFormats
-                              ? {
-                                    analyticsLabel: config.uiConfig.detailFormats.analyticsLabel,
-                                    // Exclude functions, we'll recreate them on the frontend based on type
-                                }
-                              : undefined,
-                      }
-                    : undefined,
-                // Exclude validationSchema as it contains Zod objects that can't be serialized
-                // Exclude serviceFactory as it contains function references
-            }));
+            try {
+                // Get all monitor type configs and serialize them safely for IPC
+                const configs = getAllMonitorTypeConfigs();
+                return configs.map((config) => this.serializeMonitorTypeConfig(config));
+            } catch (error) {
+                logger.error("[IpcService] Failed to get monitor types", error);
+                throw new Error("Failed to retrieve monitor type configurations");
+            }
+        });
+
+        ipcMain.handle("format-monitor-detail", (_, type: string, details: string) => {
+            if (isDev()) logger.debug("[IpcService] Handling format-monitor-detail", { type, details });
+
+            try {
+                // Input validation
+                if (typeof type !== "string" || !type.trim()) {
+                    throw new TypeError("Invalid monitor type provided");
+                }
+                if (typeof details !== "string") {
+                    throw new TypeError("Invalid details provided");
+                }
+
+                const config = getMonitorTypeConfig(type.trim());
+                if (!config) {
+                    logger.warn("[IpcService] Unknown monitor type for detail formatting", { type });
+                    return details; // Return original details if type is unknown
+                }
+
+                if (config.uiConfig?.formatDetail) {
+                    return config.uiConfig.formatDetail(details);
+                }
+
+                return details;
+            } catch (error) {
+                logger.error("[IpcService] Failed to format monitor detail", { type, details, error });
+                return details; // Return original details on error
+            }
+        });
+
+        ipcMain.handle("format-monitor-title-suffix", (_, type: string, monitor: Record<string, unknown>) => {
+            if (isDev()) logger.debug("[IpcService] Handling format-monitor-title-suffix", { type, monitor });
+
+            try {
+                // Input validation
+                if (typeof type !== "string" || !type.trim()) {
+                    throw new TypeError("Invalid monitor type provided");
+                }
+                // monitor is already typed as Record<string, unknown>, so basic validation is sufficient
+
+                const config = getMonitorTypeConfig(type.trim());
+                if (!config) {
+                    logger.warn("[IpcService] Unknown monitor type for title suffix formatting", { type });
+                    return ""; // Return empty string if type is unknown
+                }
+
+                if (config.uiConfig?.formatTitleSuffix) {
+                    return config.uiConfig.formatTitleSuffix(monitor);
+                }
+
+                return "";
+            } catch (error) {
+                logger.error("[IpcService] Failed to format monitor title suffix", { type, monitor, error });
+                return ""; // Return empty string on error
+            }
         });
 
         ipcMain.handle("validate-monitor-data", (_, type: string, data: unknown) => {
             if (isDev()) logger.debug("[IpcService] Handling validate-monitor-data", { type, data });
 
-            // Use the basic validation function for form validation
-            // The advanced validation is for more complex scenarios
-            const result = validateMonitorData(type, data);
-            return {
-                success: result.success,
-                errors: result.errors,
-                warnings: [], // Basic validation doesn't have warnings
-                metadata: {}, // Basic validation doesn't have metadata
-            };
+            try {
+                // Input validation
+                if (typeof type !== "string" || !type.trim()) {
+                    return {
+                        success: false,
+                        errors: ["Invalid monitor type provided"],
+                        warnings: [],
+                        metadata: {},
+                    };
+                }
+
+                // Use the validation function from the registry
+                const result = validateMonitorData(type.trim(), data);
+                return {
+                    success: result.success,
+                    errors: result.errors,
+                    warnings: [], // Basic validation doesn't have warnings
+                    metadata: {}, // Basic validation doesn't have metadata
+                };
+            } catch (error) {
+                logger.error("[IpcService] Failed to validate monitor data", { type, data, error });
+                return {
+                    success: false,
+                    errors: ["Validation failed due to internal error"],
+                    warnings: [],
+                    metadata: {},
+                };
+            }
         });
+    }
+
+    /**
+     * Safely serialize a monitor type configuration for IPC transmission.
+     * Excludes non-serializable data while preserving all useful information.
+     *
+     * @param config - The monitor type configuration to serialize
+     * @returns Serializable configuration object
+     */
+    private serializeMonitorTypeConfig(config: ReturnType<typeof getAllMonitorTypeConfigs>[0]) {
+        // Extract and validate base properties
+        const {
+            type,
+            displayName,
+            description,
+            version,
+            fields,
+            uiConfig,
+            // Explicitly exclude non-serializable properties
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            validationSchema: _,
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            serviceFactory: __,
+            ...unexpectedProperties
+        } = config;
+
+        // Log if there are unexpected properties (helps with future maintenance)
+        if (Object.keys(unexpectedProperties).length > 0) {
+            logger.warn("[IpcService] Unexpected properties in monitor config", {
+                type,
+                unexpectedProperties: Object.keys(unexpectedProperties),
+            });
+        }
+
+        // Serialize UI configuration with comprehensive property handling
+        const serializedUiConfig = uiConfig
+            ? {
+                  // Feature support flags
+                  supportsResponseTime: uiConfig.supportsResponseTime ?? false,
+                  supportsAdvancedAnalytics: uiConfig.supportsAdvancedAnalytics ?? false,
+
+                  // Help texts (preserve original structure)
+                  helpTexts: uiConfig.helpTexts
+                      ? {
+                            primary: uiConfig.helpTexts.primary,
+                            secondary: uiConfig.helpTexts.secondary,
+                        }
+                      : undefined,
+
+                  // Display preferences (preserve all flags)
+                  display: uiConfig.display
+                      ? {
+                            showUrl: uiConfig.display.showUrl ?? false,
+                            showAdvancedMetrics: uiConfig.display.showAdvancedMetrics ?? false,
+                        }
+                      : undefined,
+
+                  // Detail formats (include all serializable data)
+                  detailFormats: uiConfig.detailFormats
+                      ? {
+                            analyticsLabel: uiConfig.detailFormats.analyticsLabel,
+                            // Note: historyDetail function is excluded (handled via IPC)
+                            // Note: formatDetail and formatTitleSuffix functions are excluded (handled via IPC)
+                        }
+                      : undefined,
+              }
+            : undefined;
+
+        return {
+            type,
+            displayName,
+            description,
+            version,
+            fields, // Fields are always present in BaseMonitorConfig
+            uiConfig: serializedUiConfig,
+        };
     }
 
     /**

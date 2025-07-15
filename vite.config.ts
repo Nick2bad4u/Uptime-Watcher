@@ -6,6 +6,7 @@
 import { codecovVitePlugin } from "@codecov/vite-plugin";
 import react from "@vitejs/plugin-react";
 import * as path from "node:path";
+import checker from "vite-plugin-checker";
 import electron from "vite-plugin-electron";
 import { ViteMcp } from "vite-plugin-mcp";
 import { viteStaticCopy } from "vite-plugin-static-copy";
@@ -30,7 +31,39 @@ export default defineConfig({
         target: "es2024", // Match TypeScript target for consistency
     },
     plugins: [
-        react(),
+        react({
+            // Enable Fast Refresh for better development experience
+            // Includes .js, .jsx, .ts, .tsx by default
+            include: /\.(js|jsx|ts|tsx)$/,
+
+            // Use automatic JSX runtime (default, but explicit for clarity)
+            jsxRuntime: "automatic",
+
+            // Configure babel for any custom transformations if needed
+            babel: {
+                // Use babel configuration files if they exist
+                babelrc: false,
+                configFile: false,
+                // Add any custom babel plugins here if needed
+                plugins: [],
+            },
+        }),
+        // // TypeScript checking in development (ESLint disabled due to flat config compatibility)
+        // checker({
+        //     typescript: {
+        //         tsconfigPath: "./tsconfig.json",
+        //     },
+        //     // stylelint: {
+        //     //     // for example, lint .css and .vue
+        //     //     lintCommand: "stylelint ./src/**/*.{css,vue}",
+        //     //     watchPath: './src',
+        //     // },
+        //     overlay: {
+        //         initialIsOpen: false, // Don't auto-open overlay
+        //         position: "br", // Bottom-right position
+        //     },
+        //     enableBuild: false, // Disable in build mode (use CI for production checking)
+        // }),
         ViteMcp(),
         electron([
             {

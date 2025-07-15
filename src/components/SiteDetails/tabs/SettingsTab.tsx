@@ -83,14 +83,15 @@ async function getIdentifierLabel(selectedMonitor: Monitor): Promise<string> {
         console.warn("Failed to get monitor config for identifier label:", error);
     }
 
-    // Fallback to hardcoded labels
+    // Fallback to hardcoded labels - these should be dynamically determined
+    // but we keep them for backward compatibility
     if (selectedMonitor.type === "http") {
         return "Website URL";
     }
     if (selectedMonitor.type === "port") {
         return "Host & Port";
     }
-    return "Internal Site ID";
+    return "Monitor Configuration";
 }
 
 /**
@@ -99,7 +100,7 @@ async function getIdentifierLabel(selectedMonitor: Monitor): Promise<string> {
  */
 function getDisplayIdentifier(currentSite: Site, selectedMonitor: Monitor): string {
     try {
-        // Try to get the primary value for display
+        // Fallback to hardcoded patterns for backward compatibility
         if (selectedMonitor.type === "http" && selectedMonitor.url) {
             return selectedMonitor.url;
         }

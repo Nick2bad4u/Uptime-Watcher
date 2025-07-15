@@ -3,6 +3,7 @@
  * These utilities eliminate hardcoded monitor type checks throughout the frontend.
  */
 
+import { logger } from "../services";
 import type { MonitorType } from "../types";
 import { getMonitorTypeConfig, getAvailableMonitorTypes, type MonitorTypeConfig } from "./monitorTypeHelper";
 
@@ -36,28 +37,49 @@ async function getConfig(monitorType: MonitorType): Promise<MonitorTypeConfig | 
  *
  * @example
  * ```typescript
- * const label = formatMonitorDetail("http", "200"); // "Response Code: 200"
- * const label = formatMonitorDetail("port", "80");  // "Port: 80"
+ * const label = await formatMonitorDetail("http", "200"); // "Response Code: 200"
+ * const label = await formatMonitorDetail("port", "80");  // "Port: 80"
  * ```
  */
-export function formatMonitorDetail(monitorType: MonitorType, details: string): string {
+export async function formatMonitorDetail(monitorType: MonitorType, details: string): Promise<string> {
     try {
-        // Recreate formatter functions based on monitor type since they can't be serialized over IPC
-        const formatters: Record<MonitorType, (details: string) => string> = {
-            http: (details: string) => `Response Code: ${details}`,
-            port: (details: string) => `Port: ${details}`,
-        };
-
-        // eslint-disable-next-line security/detect-object-injection -- MonitorType is a known safe union type
-        const formatter = formatters[monitorType];
-        if (!formatter) {
-            console.warn(`No formatter found for monitor type ${monitorType}`);
-            return details;
-        }
-        return formatter(details);
+        // Use the IPC method to format on the backend where functions are available
+        return await window.electronAPI.monitorTypes.formatMonitorDetail(monitorType, details);
     } catch (error) {
-        console.warn(`Failed to format detail for monitor type ${monitorType}:`, error);
+        logger.error(
+            `Failed to format detail for monitor type ${monitorType}`,
+            error instanceof Error ? error : new Error(String(error))
+        );
         return details;
+    }
+}
+
+/**
+ * Format title suffix dynamically based on monitor type configuration.
+ *
+ * @param monitorType - Type of monitor
+ * @param monitor - Monitor data
+ * @returns Formatted title suffix string
+ *
+ * @example
+ * ```typescript
+ * const suffix = await formatMonitorTitleSuffix("http", { url: "https://example.com" }); // " (https://example.com)"
+ * const suffix = await formatMonitorTitleSuffix("port", { host: "localhost", port: 80 }); // " (localhost:80)"
+ * ```
+ */
+export async function formatMonitorTitleSuffix(
+    monitorType: MonitorType,
+    monitor: Record<string, unknown>
+): Promise<string> {
+    try {
+        // Use the IPC method to format on the backend where functions are available
+        return await window.electronAPI.monitorTypes.formatMonitorTitleSuffix(monitorType, monitor);
+    } catch (error) {
+        logger.error(
+            `Failed to format title suffix for monitor type ${monitorType}`,
+            error instanceof Error ? error : new Error(String(error))
+        );
+        return "";
     }
 }
 

@@ -1,0 +1,62 @@
+{
+    "$schema": "https://biomejs.dev/schemas/2.1.1/schema.json",
+    "vcs": { "enabled": false, "clientKind": "git", "useIgnoreFile": false },
+    "files": { "ignoreUnknown": false },
+    "formatter": {
+        "enabled": true,
+        "formatWithErrors": false,
+        "indentStyle": "space",
+        "indentWidth": 4,
+        "lineEnding": "lf",
+        "lineWidth": 120,
+        "attributePosition": "auto",
+        "bracketSameLine": false,
+        "bracketSpacing": true,
+        "expand": "auto",
+        "useEditorconfig": true,
+        "includes": [
+            "**",
+            "!**/libs/",
+            "!**/node_modules/",
+            "!**/build/",
+            "!**/coverage/",
+            "!**/*.min.js",
+            "!**/*.min.css",
+            "!**/dist/",
+            "!**/dist-electron/",
+            "!**/CHANGELOG.md",
+            "!electron-app/package.json",
+            "!electron-app/package-lock.json",
+            "!**/package-lock.json",
+            "!**/package.json"
+        ]
+    },
+    "linter": { "enabled": true, "rules": { "recommended": true } },
+    "javascript": {
+        "formatter": {
+            "jsxQuoteStyle": "double",
+            "quoteProperties": "asNeeded",
+            "trailingCommas": "es5",
+            "semicolons": "always",
+            "arrowParentheses": "always",
+            "bracketSameLine": false,
+            "quoteStyle": "double",
+            "attributePosition": "auto",
+            "bracketSpacing": true
+        }
+    },
+    "html": { "formatter": { "selfCloseVoidElements": "always" } },
+    "overrides": [
+        { "includes": ["*.css"], "formatter": { "lineWidth": 120 } },
+        { "includes": ["*.user.css"], "formatter": { "lineWidth": 120 } },
+        { "includes": ["*.styl"] },
+        { "includes": ["*.html"], "formatter": { "lineWidth": 120 } },
+        { "includes": ["*.user.js"], "formatter": { "lineWidth": 120 } },
+        { "includes": ["*.md"], "formatter": { "indentWidth": 1 } },
+        { "includes": ["**/package.json", "**/package-lock.json"] }
+    ],
+    "assist": {
+        "enabled": true,
+        "actions": { "source": { "organizeImports": "on" } }
+    }
+}

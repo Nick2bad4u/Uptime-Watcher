@@ -3,6 +3,7 @@
  * Uses the backend monitor type registry for consistent validation.
  */
 
+import { logger } from "../services";
 import type { MonitorType } from "../types";
 
 /**
@@ -26,7 +27,7 @@ export async function validateMonitorData(
             errors: result.errors,
         };
     } catch (error) {
-        console.error("Failed to validate monitor data:", error);
+        logger.error("Failed to validate monitor data", error instanceof Error ? error : new Error(String(error)));
         return {
             success: false,
             errors: ["Validation failed - unable to connect to backend"],
@@ -57,7 +58,10 @@ export async function validateMonitorField(type: MonitorType, fieldName: string,
 
         return fieldErrors.length > 0 ? fieldErrors : result.errors;
     } catch (error) {
-        console.error(`Failed to validate field ${fieldName}:`, error);
+        logger.error(
+            `Failed to validate field ${fieldName}`,
+            error instanceof Error ? error : new Error(String(error))
+        );
         return [`Failed to validate ${fieldName}`];
     }
 }

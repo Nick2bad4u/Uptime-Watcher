@@ -11,10 +11,11 @@
 
 import { useEffect, useState, useCallback } from "react";
 
-import { DEFAULT_CHECK_INTERVAL, DEFAULT_REQUEST_TIMEOUT_SECONDS } from "../../constants";
+import { DEFAULT_CHECK_INTERVAL } from "../../constants";
 import { logger } from "../../services";
 import { useErrorStore, useSitesStore, useUIStore } from "../../stores";
 import { Site } from "../../types";
+import { getTimeoutSeconds, timeoutSecondsToMs, clampTimeoutSeconds } from "../../utils";
 import { useSiteAnalytics } from "./useSiteAnalytics";
 
 /** Props for the useSiteDetails hook */
@@ -112,9 +113,7 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties) {
     const [intervalChanged, setIntervalChanged] = useState(false);
 
     // Timeout state (stored in seconds for UI, converted to ms when saving)
-    const [localTimeout, setLocalTimeout] = useState<number>(
-        selectedMonitor?.timeout ? selectedMonitor.timeout / 1000 : DEFAULT_REQUEST_TIMEOUT_SECONDS
-    );
+    const [localTimeout, setLocalTimeout] = useState<number>(getTimeoutSeconds(selectedMonitor?.timeout));
     const [timeoutChanged, setTimeoutChanged] = useState(false);
 
     // Retry attempts state
@@ -129,7 +128,7 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties) {
     useEffect(() => {
         setLocalCheckInterval(selectedMonitor?.checkInterval ?? DEFAULT_CHECK_INTERVAL);
         setIntervalChanged(false);
-        setLocalTimeout(selectedMonitor?.timeout ? selectedMonitor.timeout / 1000 : DEFAULT_REQUEST_TIMEOUT_SECONDS);
+        setLocalTimeout(getTimeoutSeconds(selectedMonitor?.timeout));
         setTimeoutChanged(false);
         setLocalRetryAttempts(selectedMonitor?.retryAttempts ?? 3);
         setRetryAttemptsChanged(false);
@@ -322,12 +321,10 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties) {
     const handleTimeoutChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
             // Work directly with seconds in the UI
-            const timeoutInSeconds = Number(e.target.value);
+            const timeoutInSeconds = clampTimeoutSeconds(Number(e.target.value));
             setLocalTimeout(timeoutInSeconds);
             // Compare against the monitor's timeout converted to seconds
-            const currentTimeoutInSeconds = selectedMonitor?.timeout
-                ? selectedMonitor.timeout / 1000
-                : DEFAULT_REQUEST_TIMEOUT_SECONDS;
+            const currentTimeoutInSeconds = getTimeoutSeconds(selectedMonitor?.timeout);
             setTimeoutChanged(timeoutInSeconds !== currentTimeoutInSeconds);
         },
         [selectedMonitor?.timeout]
@@ -337,7 +334,7 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties) {
         clearError();
         try {
             // Convert seconds to milliseconds when saving to backend
-            const timeoutInMs = localTimeout * 1000;
+            const timeoutInMs = timeoutSecondsToMs(localTimeout);
             await updateMonitorTimeout(currentSite.identifier, selectedMonitorId, timeoutInMs);
             setTimeoutChanged(false);
             logger.user.action("Updated monitor timeout", {

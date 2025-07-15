@@ -120,7 +120,7 @@ export function bulkInsertHistory(
                 stmt.run([
                     monitorId,
                     entry.timestamp,
-                    entry.status === "up" || entry.status === "down" ? entry.status : "down",
+                    entry.status, // StatusHistoryType is always "up" or "down"
                     entry.responseTime,
                     entry.details ?? null,
                 ]);

@@ -8,8 +8,7 @@
         "moduleResolution": "bundler",
         "baseUrl": ".",
         "paths": {
-            "@/*": ["electron/*"],
-            "@electron/*": ["electron/*"]
+            "@/*": ["electron/*"]
         },
         "types": ["node", "vitest/globals", "@testing-library/jest-dom", "jest", "electron"]
     },

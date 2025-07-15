@@ -52,10 +52,17 @@ class MigrationRegistry {
     getMigrationPath(monitorType: string, fromVersion: string, toVersion: string): MigrationRule[] {
         const rules = this.migrations.get(monitorType) ?? [];
         const path: MigrationRule[] = [];
+        const visitedVersions = new Set<string>();
 
         let currentVersion = fromVersion;
 
         while (currentVersion !== toVersion) {
+            // Prevent infinite loops by checking if we've already visited this version
+            if (visitedVersions.has(currentVersion)) {
+                throw new Error(`Circular migration path detected for ${monitorType} at version ${currentVersion}`);
+            }
+            visitedVersions.add(currentVersion);
+
             const nextRule = rules.find((rule) => rule.fromVersion === currentVersion);
 
             if (!nextRule) {
@@ -64,6 +71,13 @@ class MigrationRegistry {
 
             path.push(nextRule);
             currentVersion = nextRule.toVersion;
+
+            // Additional safeguard: limit the number of migration steps
+            if (path.length > 100) {
+                throw new Error(
+                    `Migration path too long for ${monitorType}: ${path.length} steps exceeded maximum of 100`
+                );
+            }
         }
 
         return path;

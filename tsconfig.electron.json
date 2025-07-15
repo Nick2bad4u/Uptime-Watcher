@@ -8,8 +8,7 @@
         "moduleResolution": "bundler",
         "baseUrl": ".",
         "paths": {
-            "@/*": ["electron/*"],
-            "@electron/*": ["electron/*"]
+            "@/*": ["electron/*"]
         }
     },
     "esModuleInterop": true,

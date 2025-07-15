@@ -6,6 +6,7 @@
 // Time utilities
 export * from "./time";
 export * from "./duration";
+export * from "./timeoutUtils";
 
 // Status utilities
 export * from "./status";

@@ -20,14 +20,9 @@ export type MonitorStatus = "up" | "down" | "pending" | "paused";
 
 /**
  * Allowed status values for historical check results.
- *
- * @remarks
- * Similar to {@link MonitorStatus} but excludes `"pending"` since historical
- * records only capture actual check outcomes, not transitional states.
- *
  * @public
  */
-export type StatusHistoryStatus = "up" | "down" | "paused";
+export type StatusHistoryType = "up" | "down";
 
 /**
  * Monitor configuration and state interface.
@@ -240,7 +235,7 @@ export interface StatusHistory {
      * @remarks
      * Does not include `"pending"`; only actual check outcomes are recorded.
      */
-    status: StatusHistoryStatus;
+    status: StatusHistoryType;
     /** Response time in milliseconds */
     responseTime: number;
     /** Optional additional details about the check */

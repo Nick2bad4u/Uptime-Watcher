@@ -43,6 +43,7 @@ import globals from "globals";
 import eslintPluginToml from "eslint-plugin-toml";
 import tomlEslintParser from "toml-eslint-parser";
 import jsoncEslintParser from "jsonc-eslint-parser";
+import reactRefresh from "eslint-plugin-react-refresh";
 
 const __dirname = import.meta.dirname;
 
@@ -195,12 +196,14 @@ export default [
             tsdoc: pluginTsdoc,
             filenames: pluginFilenames,
             regexp: pluginRegexp,
+            "react-refresh": reactRefresh,
         },
         rules: {
             // TypeScript rules
             ...tseslint.configs.recommended.rules,
             ...tseslint.configs.strict.rules,
             ...tseslint.configs.stylistic.rules,
+            ...reactRefresh.configs.vite.rules,
             ...pluginImport.flatConfigs.typescript.rules,
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.recommended.rules,

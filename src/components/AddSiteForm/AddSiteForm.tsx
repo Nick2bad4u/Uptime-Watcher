@@ -12,7 +12,7 @@ import { useErrorStore, useSitesStore } from "../../stores";
 import { ThemedBox, ThemedText, ThemedButton, useTheme } from "../../theme";
 import { generateUuid } from "../../utils/data/generateUuid";
 import { TextField, SelectField, RadioGroup } from "./FormFields";
-import { useDynamicHelpText } from "../common/MonitorUiComponents";
+import { useDynamicHelpText } from "../../hooks/useDynamicHelpText";
 import { DynamicMonitorFields } from "./DynamicMonitorFields";
 import { handleSubmit } from "./Submit";
 import { useAddSiteForm } from "../SiteDetails/useAddSiteForm";

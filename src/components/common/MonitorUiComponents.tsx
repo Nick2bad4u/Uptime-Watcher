@@ -12,7 +12,6 @@ import {
     supportsAdvancedAnalytics as checkSupportsAdvancedAnalytics,
     allSupportsResponseTime,
     allSupportsAdvancedAnalytics,
-    getMonitorHelpTexts,
 } from "../../utils/monitorUiHelpers";
 
 /**
@@ -29,13 +28,27 @@ export function DetailLabel({ monitorType, details, fallback = details }: Detail
     const [formattedLabel, setFormattedLabel] = useState<string>(fallback);
 
     useEffect(() => {
-        try {
-            const formatted = formatMonitorDetail(monitorType, details);
-            setFormattedLabel(formatted);
-        } catch (error) {
-            console.warn("Failed to format detail label:", error);
-            setFormattedLabel(fallback);
-        }
+        let isCancelled = false;
+
+        const formatLabel = async () => {
+            try {
+                const formatted = await formatMonitorDetail(monitorType, details);
+                if (!isCancelled) {
+                    setFormattedLabel(formatted);
+                }
+            } catch (error) {
+                console.warn("Failed to format detail label:", error);
+                if (!isCancelled) {
+                    setFormattedLabel(fallback);
+                }
+            }
+        };
+
+        void formatLabel();
+
+        return () => {
+            isCancelled = true;
+        };
     }, [monitorType, details, fallback]);
 
     return <span>{formattedLabel}</span>;
@@ -181,40 +194,4 @@ export function ConditionalMultipleTypes({ monitorTypes, feature, children, fall
     }
 
     return supportsFeature ? children : fallback;
-}
-
-/**
- * Hook for dynamic help text loading.
- */
-export function useDynamicHelpText(monitorType: MonitorType) {
-    const [helpTexts, setHelpTexts] = useState<{
-        primary?: string;
-        secondary?: string;
-    }>({});
-
-    useEffect(() => {
-        let isCancelled = false;
-
-        const loadHelpTexts = async () => {
-            try {
-                const texts = await getMonitorHelpTexts(monitorType);
-                if (!isCancelled) {
-                    setHelpTexts(texts);
-                }
-            } catch (error) {
-                console.warn("Failed to load help texts:", error);
-                if (!isCancelled) {
-                    setHelpTexts({});
-                }
-            }
-        };
-
-        void loadHelpTexts();
-
-        return () => {
-            isCancelled = true;
-        };
-    }, [monitorType]);
-
-    return helpTexts;
 }

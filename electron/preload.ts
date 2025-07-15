@@ -346,11 +346,30 @@ const stateSyncAPI = {
  */
 const monitorTypesAPI = {
     /**
-     * Get all available monitor types with their configurations.
+     * Get all available monitor types from backend registry.
      *
      * @returns Promise resolving to array of monitor type configurations
      */
     getMonitorTypes: () => ipcRenderer.invoke("get-monitor-types"),
+
+    /**
+     * Format monitor detail using backend registry.
+     *
+     * @param type - Monitor type
+     * @param details - Detail value to format
+     * @returns Promise resolving to formatted detail string
+     */
+    formatMonitorDetail: (type: string, details: string) => ipcRenderer.invoke("format-monitor-detail", type, details),
+
+    /**
+     * Format monitor title suffix using backend registry.
+     *
+     * @param type - Monitor type
+     * @param monitor - Monitor data
+     * @returns Promise resolving to formatted title suffix
+     */
+    formatMonitorTitleSuffix: (type: string, monitor: Record<string, unknown>) =>
+        ipcRenderer.invoke("format-monitor-title-suffix", type, monitor),
 
     /**
      * Validate monitor data using backend registry.

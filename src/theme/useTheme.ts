@@ -7,7 +7,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 
-import type { StatusType } from "../constants";
+import type { SiteStatus } from "../types";
 
 import { useSettingsStore } from "../stores";
 import { themeManager } from "./ThemeManager";
@@ -87,9 +87,9 @@ export function useTheme() {
     };
 
     // Get status color
-    const getStatusColor = (status: StatusType): string => {
+    const getStatusColor = (status: SiteStatus): string => {
         // Only allow known status keys
-        const allowedStatuses: StatusType[] = ["up", "down", "pending", "unknown", "paused", "mixed"];
+        const allowedStatuses: SiteStatus[] = ["up", "down", "pending", "unknown", "paused", "mixed"];
         if (allowedStatuses.includes(status)) {
             // eslint-disable-next-line security/detect-object-injection -- currentTheme.colors.status is validated against allowedStatuses
             return currentTheme.colors.status[status];

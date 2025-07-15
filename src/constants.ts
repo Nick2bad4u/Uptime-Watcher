@@ -3,9 +3,6 @@
  * Contains configuration values, UI constants, and type definitions.
  */
 
-/** Status types for site monitoring */
-export type StatusType = "up" | "down" | "pending" | "unknown" | "paused" | "mixed";
-
 /** Font family constants for theme reuse */
 export const FONT_FAMILY_MONO = ["SF Mono", "Monaco", "Inconsolata", "Roboto Mono", "monospace"];
 export const FONT_FAMILY_SANS = ["Inter", "system-ui", "Avenir", "Helvetica", "Arial", "sans-serif"];

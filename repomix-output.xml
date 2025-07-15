@@ -82,7 +82,6 @@ electron/services/database/utils/valueConverters.ts
 electron/services/index.ts
 electron/services/ipc/index.ts
 electron/services/ipc/IpcService.ts
-electron/services/monitoring/AdvancedValidationEngine.ts
 electron/services/monitoring/DatabaseSchemaMigrator.ts
 electron/services/monitoring/EnhancedTypeGuards.ts
 electron/services/monitoring/HttpMonitor.ts
@@ -140,6 +139,7 @@ src/components/AddSiteForm/index.ts
 src/components/AddSiteForm/Submit.tsx
 src/components/common/HistoryChart.tsx
 src/components/common/index.ts
+src/components/common/MonitorUiComponents.tsx
 src/components/common/StatusBadge.tsx
 src/components/Dashboard/index.ts
 src/components/Dashboard/SiteCard/components/ActionButtonGroup.tsx
@@ -154,7 +154,6 @@ src/components/Dashboard/SiteCard/SiteCardMetrics.tsx
 src/components/Dashboard/SiteCard/SiteCardStatus.tsx
 src/components/Dashboard/SiteList/EmptyState.tsx
 src/components/Dashboard/SiteList/index.tsx
-src/components/dynamic-monitor-ui.tsx
 src/components/Header/Header.css
 src/components/Header/Header.tsx
 src/components/Header/index.ts
@@ -232,10 +231,10 @@ src/theme/useTheme.ts
 src/types.ts
 src/utils/data/generateUuid.ts
 src/utils/duration.ts
-src/utils/dynamicMonitorUi.ts
 src/utils/index.ts
 src/utils/monitorTitleFormatters.ts
 src/utils/monitorTypeHelper.ts
+src/utils/monitorUiHelpers.ts
 src/utils/monitorValidation.ts
 src/utils/siteStatus.ts
 src/utils/status.ts
@@ -374,774 +373,11 @@ export function addBooleanField(
  */
 </file>
 
-<file path="electron/services/monitoring/AdvancedValidationEngine.ts">
-/**
- * Advanced validation rule composition system with async validation
- * and cross-field validation dependencies.
- */
-/* eslint-disable security/detect-object-injection */
-// ^ Dynamic object access is required for flexible validation rule composition
-// This is a controlled environment where property names come from validated sources
-import { z } from "zod";
-import validator from "validator";
-import { logger } from "../../utils/logger";
-import type { MonitorType } from "../../types";
-/**
- * Validation context for cross-field validation
- */
-export interface ValidationContext {
-    /** Current field being validated */
-    currentField: string;
-    /** All field values */
-    allFields: Record<string, unknown>;
-    /** Monitor type */
-    monitorType: MonitorType;
-    /** Previous validation results */
-    previousResults: ValidationResult[];
-    /** Additional context data */
-    context?: Record<string, unknown>;
-}
-⋮----
-/** Current field being validated */
-⋮----
-/** All field values */
-⋮----
-/** Monitor type */
-⋮----
-/** Previous validation results */
-⋮----
-/** Additional context data */
-⋮----
-/**
- * Validation result with detailed information
- */
-export interface ValidationResult {
-    /** Field name */
-    field: string;
-    /** Validation success */
-    success: boolean;
-    /** Error messages */
-    errors: string[];
-    /** Warnings (non-blocking) */
-    warnings: string[];
-    /** Validation metadata */
-    metadata?: Record<string, unknown>;
-    /** Execution time in milliseconds */
-    executionTime?: number;
-}
-⋮----
-/** Field name */
-⋮----
-/** Validation success */
-⋮----
-/** Error messages */
-⋮----
-/** Warnings (non-blocking) */
-⋮----
-/** Validation metadata */
-⋮----
-/** Execution time in milliseconds */
-⋮----
-/**
- * Async validation function type
- */
-export type AsyncValidationFunction = (
-    value: unknown,
-    context: ValidationContext
-) => Promise<{
-    success: boolean;
-    errors: string[];
-    warnings: string[];
-    metadata?: Record<string, unknown>;
-}>;
-/**
- * Cross-field validation rule
- */
-export interface CrossFieldValidationRule {
-    /** Rule name */
-    name: string;
-    /** Fields this rule depends on */
-    dependsOn: string[];
-    /** Validation function */
-    validate: AsyncValidationFunction;
-    /** Rule priority (lower = higher priority) */
-    priority: number;
-    /** Whether this rule is async */
-    isAsync: boolean;
-}
-⋮----
-/** Rule name */
-⋮----
-/** Fields this rule depends on */
-⋮----
-/** Validation function */
-⋮----
-/** Rule priority (lower = higher priority) */
-⋮----
-/** Whether this rule is async */
-⋮----
-/**
- * Validation rule composition
- */
-export interface ValidationRuleComposition {
-    /** Field-specific rules */
-    fieldRules: Record<string, z.ZodSchema[]>;
-    /** Cross-field validation rules */
-    crossFieldRules: CrossFieldValidationRule[];
-    /** Async validation rules */
-    asyncRules: AsyncValidationFunction[];
-    /** Rule dependencies */
-    dependencies: Record<string, string[]>;
-}
-⋮----
-/** Field-specific rules */
-⋮----
-/** Cross-field validation rules */
-⋮----
-/** Async validation rules */
-⋮----
-/** Rule dependencies */
-⋮----
-/**
- * Validation rule builder for fluent API
- */
-export class ValidationRuleBuilder {
-⋮----
-/**
-     * Add field validation rule
-     */
-addFieldRule(fieldName: string, rule: z.ZodSchema): this
-/**
-     * Add cross-field validation rule
-     */
-addCrossFieldRule(rule: CrossFieldValidationRule): this
-⋮----
-// Update dependencies
-⋮----
-/**
-     * Add async validation rule
-     */
-addAsyncRule(rule: AsyncValidationFunction): this
-/**
-     * Add dependency between fields
-     */
-addDependency(field: string, dependsOn: string[]): this
-/**
-     * Build the validation composition
-     */
-build(): ValidationRuleComposition
-⋮----
-/**
- * Advanced validation engine with async and cross-field support
- */
-export class AdvancedValidationEngine {
-⋮----
-/**
-     * Register validation rules for a monitor type
-     */
-registerRules(monitorType: MonitorType, composition: ValidationRuleComposition): void
-/**
-     * Validate monitor data with comprehensive validation
-     */
-async validateMonitorData(
-        monitorType: MonitorType,
-        data: Record<string, unknown>
-): Promise<
-⋮----
-// 1. Field-level validation
-⋮----
-// 2. Cross-field validation
-⋮----
-// 3. Async validation
-⋮----
-// Collect all errors and warnings
-⋮----
-/**
-     * Validate individual fields
-     */
-private validateFields(
-        _monitorType: MonitorType,
-        data: Record<string, unknown>,
-        composition: ValidationRuleComposition
-): ValidationResult[]
-/**
-     * Validate cross-field dependencies
-     */
-private async validateCrossFields(
-        monitorType: MonitorType,
-        data: Record<string, unknown>,
-        composition: ValidationRuleComposition
-): Promise<ValidationResult[]>
-⋮----
-// Sort rules by priority
-⋮----
-/**
-     * Validate with async rules
-     */
-private async validateAsync(
-        monitorType: MonitorType,
-        data: Record<string, unknown>,
-        composition: ValidationRuleComposition
-): Promise<ValidationResult[]>
-/**
-     * Clear validation cache
-     */
-clearCache(): void
-/**
-     * Get validation rules for a monitor type
-     */
-getRules(monitorType: MonitorType): ValidationRuleComposition | undefined
-⋮----
-/**
- * Pre-built validation rules for common scenarios
- */
-⋮----
-/**
-     * URL validation with detailed error reporting
-     */
-⋮----
-// Use validator.js for robust URL validation
-⋮----
-// Additional check for HTTPS vs HTTP
-⋮----
-/**
-     * Port range validation
-     */
-⋮----
-// Check for well-known ports
-⋮----
-/**
-     * Host validation with detailed error reporting
-     */
-⋮----
-// Use validator.js for robust host validation
-⋮----
-// Check for valid FQDN
-⋮----
-// Check for localhost (special case)
-⋮----
-// Export singleton instance
-</file>
-
-<file path="electron/services/monitoring/DatabaseSchemaMigrator.ts">
-/**
- * Sophisticated database schema migration system for monitor types.
- * Handles version tracking, field type coercion, and migration strategies.
- */
-/* eslint-disable security/detect-object-injection */
-// ^ Dynamic object access is required for flexible schema migration
-// Property names come from validated migration configurations
-import { logger } from "../../utils/logger";
-import type { BaseMonitorConfig } from "./MonitorTypeRegistry";
-/**
- * Database field type definitions with proper coercion
- */
-⋮----
-JSON: "TEXT", // JSON stored as TEXT
-TIMESTAMP: "INTEGER", // Unix timestamp
-⋮----
-export type DatabaseFieldType = (typeof DatabaseFieldTypes)[keyof typeof DatabaseFieldTypes];
-/**
- * Field migration strategy options
- */
-export interface FieldMigrationStrategy {
-    /** Strategy type */
-    type: "add" | "remove" | "rename" | "transform";
-    /** Old field name (for rename/transform) */
-    oldName?: string;
-    /** New field name */
-    newName: string;
-    /** Field type */
-    fieldType: DatabaseFieldType;
-    /** Default value for new fields */
-    defaultValue?: unknown;
-    /** Transformation function for complex migrations */
-    transform?: (oldValue: unknown) => unknown;
-    /** Validation function for new values */
-    validate?: (value: unknown) => boolean;
-}
-⋮----
-/** Strategy type */
-⋮----
-/** Old field name (for rename/transform) */
-⋮----
-/** New field name */
-⋮----
-/** Field type */
-⋮----
-/** Default value for new fields */
-⋮----
-/** Transformation function for complex migrations */
-⋮----
-/** Validation function for new values */
-⋮----
-/**
- * Monitor type version configuration
- */
-export interface MonitorTypeVersion {
-    /** Version number (semantic versioning) */
-    version: string;
-    /** Migration strategies for this version */
-    migrations: FieldMigrationStrategy[];
-    /** Breaking changes flag */
-    isBreaking: boolean;
-    /** Description of changes */
-    description?: string;
-}
-⋮----
-/** Version number (semantic versioning) */
-⋮----
-/** Migration strategies for this version */
-⋮----
-/** Breaking changes flag */
-⋮----
-/** Description of changes */
-⋮----
-/**
- * Migration log entry
- */
-export interface MigrationLogEntry {
-    version: string;
-    type: string;
-    timestamp: number;
-    success: boolean;
-    error?: string;
-}
-/**
- * Enhanced monitor type configuration with versioning
- */
-export interface VersionedMonitorConfig extends BaseMonitorConfig {
-    /** Version history for migrations */
-    versionHistory: MonitorTypeVersion[];
-    /** Current version */
-    currentVersion: string;
-    /** Schema evolution strategy */
-    evolutionStrategy: "backward-compatible" | "breaking-changes-allowed";
-}
-⋮----
-/** Version history for migrations */
-⋮----
-/** Current version */
-⋮----
-/** Schema evolution strategy */
-⋮----
-/**
- * Parse semantic version string
- */
-function parseVersion(version: string): number[]
-/**
- * Database schema migration manager
- */
-export class DatabaseSchemaMigrator {
-⋮----
-/**
-     * Apply migrations for a monitor type
-     */
-async applyMigrations(
-        config: VersionedMonitorConfig,
-        currentVersion: string,
-        targetVersion: string
-): Promise<
-/**
-     * Get migrations to apply between versions
-     */
-private getMigrationsToApply(
-        versionHistory: MonitorTypeVersion[],
-        currentVersion: string,
-        targetVersion: string
-): MonitorTypeVersion[]
-⋮----
-// Sort versions chronologically
-⋮----
-// No migrations needed or downgrade (not supported)
-⋮----
-// Return migrations to apply (exclusive of current, inclusive of target)
-⋮----
-/**
-     * Apply a single migration
-     */
-private async applyMigration(monitorType: string, migration: MonitorTypeVersion): Promise<void>
-/**
-     * Map field type to SQL type
-     */
-private mapFieldTypeToSQL(fieldType: DatabaseFieldType): string
-⋮----
-return "INTEGER"; // SQLite stores booleans as integers
-⋮----
-/**
-     * Add a new field to monitors
-     */
-private async addField(monitorType: string, strategy: FieldMigrationStrategy): Promise<void>
-⋮----
-// Get the database service (we'll need to inject it)
-⋮----
-// 1. Alter the database table to add the column
-⋮----
-// 2. Update existing records with the default value if provided
-⋮----
-// 3. Note: Monitor type schema updates would happen in the registry
-⋮----
-/**
-     * Remove a field from monitors
-     */
-private async removeField(monitorType: string, strategy: FieldMigrationStrategy): Promise<void>
-⋮----
-// Get the database service
-⋮----
-// SQLite doesn't support DROP COLUMN directly, so we need to:
-// 1. Create a new table without the column
-// 2. Copy data from old table to new table
-// 3. Drop old table and rename new table
-⋮----
-// Get current table schema
-⋮----
-// Filter out the column we want to remove
-⋮----
-// Create new table schema
-⋮----
-// Copy data to new table
-⋮----
-// Drop old table and rename new table
-⋮----
-/**
-     * Rename a field in monitors
-     */
-private renameField(monitorType: string, strategy: FieldMigrationStrategy): Promise<void>
-⋮----
-// In a real implementation, this would:
-// 1. Create new column with new name
-// 2. Copy data from old column to new column
-// 3. Remove old column
-// 4. Update schema
-⋮----
-/**
-     * Transform field values in monitors
-     */
-private transformField(monitorType: string, strategy: FieldMigrationStrategy): Promise<void>
-⋮----
-// In a real implementation, this would:
-// 1. Read all existing values
-// 2. Apply transformation function
-// 3. Update with new values
-// 4. Validate results
-⋮----
-/**
-     * Compare semantic versions
-     */
-private compareVersions(a: string, b: string): number
-/**
-     * Get migration log
-     */
-getMigrationLog(): MigrationLogEntry[]
-/**
-     * Check if migration is applied
-     */
-isMigrationApplied(migrationId: string): boolean
-⋮----
-/**
- * Enhanced field type coercion with better error handling
- */
-⋮----
-/**
-     * Coerce value to target type with comprehensive error handling
-     */
-coerceValue(
-        value: unknown,
-        targetType: DatabaseFieldType,
-        fieldName: string
-):
-/**
-     * Coerce to string with null/undefined handling
-     */
-coerceToString(value: unknown, fieldName: string)
-/**
-     * Coerce to number with range validation
-     */
-coerceToNumber(value: unknown, fieldName: string)
-/**
-     * Coerce to real number
-     */
-coerceToReal(value: unknown, fieldName: string)
-/**
-     * Coerce to boolean with comprehensive interpretation
-     */
-coerceToBoolean(value: unknown, fieldName: string)
-/**
-     * Coerce to JSON with validation
-     */
-coerceToJSON(value: unknown, fieldName: string)
-⋮----
-JSON.parse(value); // Validate JSON
-⋮----
-/**
-     * Coerce to timestamp
-     */
-coerceToTimestamp(value: unknown, fieldName: string)
-⋮----
-// Export singleton instance
-</file>
-
-<file path="electron/services/monitoring/EnhancedTypeGuards.ts">
-/**
- * Enhanced runtime type guards with better error messages
- * and improved generic type inference for dynamic fields.
- */
-/* eslint-disable security/detect-object-injection */
-// ^ Dynamic object access is required for flexible type validation
-// Property names come from validated monitor configurations
-import { z } from "zod";
-import validator from "validator";
-import { logger } from "../../utils/logger";
-import type { MonitorType } from "../../types";
-import type { BaseMonitorConfig } from "./MonitorTypeRegistry";
-/**
- * Type guard result with detailed error information
- */
-export interface TypeGuardResult<T = unknown> {
-    success: boolean;
-    value?: T;
-    error?: string;
-    details?: {
-        expectedType: string;
-        actualType: string;
-        path?: string[];
-        suggestions?: string[];
-    };
-}
-/**
- * Runtime type validation context
- */
-export interface RuntimeValidationContext {
-    path: string[];
-    fieldName: string;
-    expectedType: string;
-    actualValue: unknown;
-    suggestions: string[];
-}
-/**
- * Enhanced runtime type guards with better error messages
- */
-⋮----
-/**
-     * Validate monitor type with detailed error reporting
-     */
-validateMonitorType(value: unknown): TypeGuardResult<MonitorType>
-⋮----
-// Check against known monitor types
-⋮----
-/**
-     * Validate URL with comprehensive error reporting
-     */
-validateURL(value: unknown): TypeGuardResult<string>
-⋮----
-// Use validator.js for proper URL validation
-⋮----
-/**
-     * Validate hostname with detailed error reporting
-     */
-validateHostname(value: unknown): TypeGuardResult<string>
-⋮----
-// Check for valid IP address first
-⋮----
-// Check for valid FQDN (domain name)
-⋮----
-// Additional check for localhost
-⋮----
-/**
-     * Validate port number with range checking
-     */
-validatePort(value: unknown): TypeGuardResult<number>
-⋮----
-// Use validator.js for port validation
-⋮----
-/**
-     * Validate boolean value with flexible interpretation
-     */
-validateBoolean(value: unknown): TypeGuardResult<boolean>
-⋮----
-/**
- * Generic type inference helper for dynamic fields
- */
-⋮----
-/**
-     * Infer field type from monitor configuration
-     */
-inferFieldType<T extends BaseMonitorConfig>(
-        config: T,
-        fieldName: string
-):
-/**
-     * Create typed field accessor with runtime validation
-     */
-createTypedAccessor<T extends BaseMonitorConfig>(
-        config: T,
-        fieldName: string
-):
-⋮----
-/**
- * Type-safe monitor data interface with runtime validation
- */
-export interface TypeSafeMonitorData<T extends MonitorType> {
-    type: T;
-    [K: string]: unknown;
-}
-/**
- * Enhanced monitor data builder with type safety
- */
-export class TypeSafeMonitorBuilder<T extends MonitorType> {
-⋮----
-constructor(monitorType: T)
-/**
-     * Set field value with runtime validation
-     */
-setField<K extends string>(fieldName: K, value: unknown): TypeSafeMonitorBuilder<T>
-⋮----
-// Validate field based on monitor type
-⋮----
-/**
-     * Get field value with type checking
-     */
-getField<K extends string>(fieldName: K): TypeGuardResult<unknown>
-/**
-     * Build the monitor data with validation
-     */
-build(): TypeGuardResult<TypeSafeMonitorData<T>>
-/**
-     * Validate individual field
-     */
-private validateField(fieldName: string, value: unknown): TypeGuardResult<unknown>
-⋮----
-// Basic validation based on monitor type
-⋮----
-// Default validation for common fields
-⋮----
-// Allow any other fields
-⋮----
-/**
- * Type-safe monitor factory with enhanced error reporting
- */
-⋮----
-/**
-     * Create a typed monitor builder
-     */
-create<T extends MonitorType>(monitorType: T): TypeSafeMonitorBuilder<T>
-/**
-     * Validate existing monitor data
-     */
-validate<T extends MonitorType>(data: unknown): TypeGuardResult<TypeSafeMonitorData<T>>
-</file>
-
 <file path="electron/services/monitoring/index.ts">
 /**
  * Monitoring services barrel export.
  * Provides access to all monitoring-related services, factories, and types.
  */
-</file>
-
-<file path="electron/services/monitoring/MigrationSystem.ts">
-/**
- * Basic migration system for monitor types.
- * Simple, functional implementation without over-complexity.
- */
-import { logger } from "../../utils/logger";
-export interface MigrationRule {
-    fromVersion: string;
-    toVersion: string;
-    description: string;
-    isBreaking: boolean;
-    transform: (data: Record<string, unknown>) => Promise<Record<string, unknown>>;
-}
-export interface VersionInfo {
-    version: string;
-    timestamp: number;
-    applied: boolean;
-}
-/**
- * Simple migration registry
- */
-class MigrationRegistry {
-⋮----
-/**
-     * Register a migration for a monitor type
-     */
-registerMigration(monitorType: string, rule: MigrationRule): void
-⋮----
-// Sort by version
-⋮----
-/**
-     * Get migration path from one version to another
-     */
-getMigrationPath(monitorType: string, fromVersion: string, toVersion: string): MigrationRule[]
-/**
-     * Check if migration is possible
-     */
-canMigrate(monitorType: string, fromVersion: string, toVersion: string): boolean
-/**
-     * Compare semantic versions
-     */
-private compareVersions(a: string, b: string): number
-⋮----
-// eslint-disable-next-line security/detect-object-injection
-⋮----
-// eslint-disable-next-line security/detect-object-injection
-⋮----
-/**
- * Simple version manager
- */
-class VersionManager {
-⋮----
-/**
-     * Set version for a monitor type
-     */
-setVersion(monitorType: string, version: string): void
-/**
-     * Get version for a monitor type
-     */
-getVersion(monitorType: string): string | undefined
-/**
-     * Check if version is applied
-     */
-isVersionApplied(monitorType: string, version: string): boolean
-/**
-     * Get all versions
-     */
-getAllVersions(): Map<string, VersionInfo>
-⋮----
-/**
- * Basic migration orchestrator
- */
-class MigrationOrchestrator {
-⋮----
-constructor(
-/**
-     * Migrate monitor data from one version to another
-     */
-async migrateMonitorData(
-        monitorType: string,
-        data: Record<string, unknown>,
-        fromVersion: string,
-        toVersion: string
-): Promise<
-⋮----
-// Check if migration is needed
-⋮----
-// Get migration path
-⋮----
-// Apply migrations in sequence
-⋮----
-// Update version if all migrations succeeded
-⋮----
-// Export singleton instances
-⋮----
-// Export factory function for orchestrator
-export function createMigrationOrchestrator(): MigrationOrchestrator
-// Export example migrations for reference
-⋮----
-// Example: HTTP monitor adding timeout field
-⋮----
-timeout: (data.timeout as number | undefined) ?? 30_000, // Default 30 seconds
-⋮----
-// Example: Port monitor converting port to number
 </file>
 
 <file path="electron/services/monitoring/utils/errorHandling.ts">
@@ -1408,6 +644,29 @@ export function generateCorrelationId(): string
 export class ValidationError extends Error {
 ⋮----
 constructor(public errors: string[])
+</file>
+
+<file path="electron/utils/database/databaseInitializer.ts">
+/**
+ * Database initialization utility.
+ * Handles database setup and site loading with proper error handling.
+ */
+import { UptimeEvents, TypedEventBus } from "../../events/index";
+import { DatabaseService } from "../../services/index";
+import { monitorLogger as logger, withDbRetry } from "../../utils/index";
+/**
+ * Initialize the database and load sites.
+ * @param databaseService - The database service instance
+ * @param loadSitesCallback - Callback function to load sites
+ * @param eventEmitter - Event emitter for error handling
+ */
+export async function initDatabase(
+    databaseService: DatabaseService,
+    loadSitesCallback: () => Promise<void>,
+    eventEmitter: TypedEventBus<UptimeEvents>
+): Promise<void>
+⋮----
+// Don't re-throw the error - let it be handled via the event system
 </file>
 
 <file path="electron/utils/monitoring/autoMonitorManager.ts">
@@ -1988,70 +1247,6 @@ import { ThemedText } from "../../../theme";
  */
 </file>
 
-<file path="src/components/Dashboard/SiteCard/SiteCardHistory.tsx">
-/**
- * Site card history visualization component.
- * Displays monitor history data using a chart component.
- */
-import React, { useMemo } from "react";
-import { Monitor, StatusHistory } from "../../../types";
-import { HistoryChart } from "../../common/HistoryChart";
-import { useMonitorTypes } from "../../../hooks/useMonitorTypes";
-import { formatTitleSuffix } from "../../../utils/monitorTitleFormatters";
-/**
- * Props for the SiteCardHistory component.
- */
-interface SiteCardHistoryProperties {
-    /** Monitor data containing type and configuration */
-    monitor: Monitor | undefined;
-    /** Filtered history data for visualization */
-    filteredHistory: StatusHistory[];
-}
-⋮----
-/** Monitor data containing type and configuration */
-⋮----
-/** Filtered history data for visualization */
-⋮----
-/**
- * History visualization component for site cards displaying monitor status over time.
- *
- * Features:
- * - Dynamic title generation based on monitor type and configuration
- * - Optimized with React.memo and custom comparison for performance
- * - Automatic updates when monitor history changes in store
- * - Supports up to 60 history items for visualization
- * - Handles HTTP and port monitor types with specific title formatting
- *
- * Data flow: Store → useSiteMonitor → useSite → SiteCard → SiteCardHistory
- *
- * @param props - Component props
- * @returns JSX element containing the history chart
- *
- * @example
- * ```tsx
- * <SiteCardHistory
- *   monitor={selectedMonitor}
- *   filteredHistory={recentHistory}
- * />
- * ```
- */
-⋮----
-// Get monitor type configurations
-⋮----
-// Memoize the history title calculation
-⋮----
-// Get display name from monitor type options
-⋮----
-// Get type-specific suffix using dynamic formatter
-⋮----
-// Custom comparison function to ensure proper re-renders
-// Compare by history array length and last timestamp to detect changes
-⋮----
-// Fix: History is sorted DESC (newest first), so latest is at index 0, not length-1
-⋮----
-// Return true if nothing important changed (skip re-render)
-</file>
-
 <file path="src/components/Dashboard/SiteCard/SiteCardMetrics.tsx">
 /**
  * Site card metrics display component.
@@ -2347,78 +1542,6 @@ const handleDownloadSQLite = async () =>
  */
 ⋮----
 // Export tabs
-</file>
-
-<file path="src/components/SiteDetails/ScreenshotThumbnail.tsx">
-/**
- * Screenshot thumbnail component with hover preview
- *
- * Displays a small thumbnail of a website screenshot that expands into a larger
- * preview on hover/focus. Uses Microlink API for screenshot generation and
- * React portals for the overlay positioning.
- */
-import React, { useState, useRef, useEffect, useCallback } from "react";
-import { createPortal } from "react-dom";
-import { logger } from "../../services";
-import { useTheme } from "../../theme";
-/** Props for the ScreenshotThumbnail component */
-interface ScreenshotThumbnailProperties {
-    /** The URL to capture a screenshot of */
-    readonly url: string;
-    /** The site name for accessibility and alt text */
-    readonly siteName: string;
-}
-⋮----
-/** The URL to capture a screenshot of */
-⋮----
-/** The site name for accessibility and alt text */
-⋮----
-/**
- * Type guard to check if the window.electronAPI has openExternal method
- * @param api - The API object to check
- * @returns True if the API has openExternal method
- */
-function hasOpenExternal(api: unknown): api is
-/**
- * Screenshot thumbnail component with hover preview overlay.
- *
- * Generates a thumbnail using Microlink API and displays a larger preview
- * when hovered. Handles external URL opening and proper positioning of
- * the preview overlay within viewport bounds.
- *
- * @param props - Component props
- * @returns JSX element containing the thumbnail and optional preview overlay
- */
-export function ScreenshotThumbnail(
-⋮----
-// Clean up portal overlay on unmount and state changes
-⋮----
-// Clear any pending timeouts
-⋮----
-// Clean up any portal element that might still be in the DOM
-⋮----
-function handleClick(event: React.MouseEvent)
-⋮----
-const maxImgW = Math.min(viewportW * 0.9, 900); // 90vw or 900px max
-const maxImgH = Math.min(viewportH * 0.9, 700); // 90vh or 700px max
-⋮----
-let top = rect.top - overlayH - 16; // 16px gap above
-⋮----
-// Clear any pending timeouts when hiding overlay
-⋮----
-// Debounced hover handlers to prevent rapid state changes
-⋮----
-// Clear any existing timeout
-⋮----
-// Clear any existing timeout
-⋮----
-// Add a small delay to prevent flickering on rapid mouse movements
-⋮----
-// Clear any existing timeout
-⋮----
-// Clear any existing timeout
-⋮----
-// Generate accessible aria-label, handling empty URLs
 </file>
 
 <file path="src/components/SiteDetails/SiteDetailsNavigation.tsx">
@@ -4210,42 +3333,6 @@ export function generateUuid(): string
 // Data utilities
 </file>
 
-<file path="src/utils/monitorTitleFormatters.ts">
-/**
- * Client-side monitor type suffix formatters.
- * This provides dynamic suffix generation for monitor types in the frontend.
- */
-import { Monitor } from "../types";
-/**
- * Type for monitor title suffix formatter functions
- */
-export type TitleSuffixFormatter = (monitor: Monitor) => string;
-/**
- * Registry of title suffix formatters for different monitor types
- */
-⋮----
-/**
- * Get title suffix formatter for a monitor type
- */
-export function getTitleSuffixFormatter(monitorType: string): TitleSuffixFormatter | undefined
-⋮----
-// eslint-disable-next-line security/detect-object-injection
-⋮----
-/**
- * Register a title suffix formatter for a monitor type
- */
-export function registerTitleSuffixFormatter(monitorType: string, formatter: TitleSuffixFormatter): void
-⋮----
-// eslint-disable-next-line security/detect-object-injection
-⋮----
-/**
- * Format title suffix for a monitor dynamically
- */
-export function formatTitleSuffix(monitor: Monitor): string
-⋮----
-// Fallback to empty string if no formatter is registered
-</file>
-
 <file path="src/utils/siteStatus.ts">
 /**
  * Site status calculation utilities for the frontend.
@@ -4646,6 +3733,49 @@ function convertToDatabase(value: unknown, sqlType: string): unknown
 } // Convert anything else to string to avoid object binding errors
 </file>
 
+<file path="electron/services/database/utils/historyManipulation.ts">
+import { Database } from "node-sqlite3-wasm";
+import { isDev } from "../../../electronUtils";
+import { StatusHistory } from "../../../types";
+import { logger } from "../../../utils/index";
+/**
+ * Utility functions for manipulating history data in the database.
+ */
+/**
+ * Add a new history entry for a monitor.
+ */
+export function addHistoryEntry(db: Database, monitorId: string, entry: StatusHistory, details?: string): void
+/**
+ * Delete history entries for a specific monitor.
+ */
+export function deleteHistoryByMonitorId(db: Database, monitorId: string): void
+/**
+ * Clear all history from the database.
+ */
+export function deleteAllHistory(db: Database): void
+/**
+ * Prune old history entries for a monitor, keeping only the most recent entries.
+ */
+export function pruneHistoryForMonitor(db: Database, monitorId: string, limit: number): void
+⋮----
+// Get entries to delete (keep only the most recent 'limit' entries)
+⋮----
+// Use parameterized query to avoid SQL injection
+⋮----
+/**
+ * Bulk insert history entries (for import functionality).
+ * Assumes it's called within an existing transaction context.
+ * Uses a prepared statement for better performance.
+ */
+export function bulkInsertHistory(
+    db: Database,
+    monitorId: string,
+    historyEntries: (StatusHistory & { details?: string })[]
+): void
+⋮----
+// Prepare the statement once for better performance
+</file>
+
 <file path="electron/services/database/utils/historyMapper.ts">
 import { StatusHistory } from "../../../types";
 /**
@@ -4695,6 +3825,521 @@ export function rowToHistoryEntry(row: Record<string, unknown>): StatusHistory
 // Updater services
 ⋮----
 // Window services
+</file>
+
+<file path="electron/services/monitoring/DatabaseSchemaMigrator.ts">
+/**
+ * Sophisticated database schema migration system for monitor types.
+ * Handles version tracking, field type coercion, and migration strategies.
+ */
+/* eslint-disable security/detect-object-injection */
+// ^ Dynamic object access is required for flexible schema migration
+// Property names come from validated migration configurations
+import { logger } from "../../utils/logger";
+import type { BaseMonitorConfig } from "./MonitorTypeRegistry";
+/**
+ * Database field type definitions with proper coercion
+ */
+⋮----
+JSON: "TEXT", // JSON stored as TEXT
+TIMESTAMP: "INTEGER", // Unix timestamp
+⋮----
+export type DatabaseFieldType = (typeof DatabaseFieldTypes)[keyof typeof DatabaseFieldTypes];
+/**
+ * Field migration strategy options
+ */
+export interface FieldMigrationStrategy {
+    /** Strategy type */
+    type: "add" | "remove" | "rename" | "transform";
+    /** Old field name (for rename/transform) */
+    oldName?: string;
+    /** New field name */
+    newName: string;
+    /** Field type */
+    fieldType: DatabaseFieldType;
+    /** Default value for new fields */
+    defaultValue?: unknown;
+    /** Transformation function for complex migrations */
+    transform?: (oldValue: unknown) => unknown;
+    /** Validation function for new values */
+    validate?: (value: unknown) => boolean;
+}
+⋮----
+/** Strategy type */
+⋮----
+/** Old field name (for rename/transform) */
+⋮----
+/** New field name */
+⋮----
+/** Field type */
+⋮----
+/** Default value for new fields */
+⋮----
+/** Transformation function for complex migrations */
+⋮----
+/** Validation function for new values */
+⋮----
+/**
+ * Monitor type version configuration
+ */
+export interface MonitorTypeVersion {
+    /** Version number (semantic versioning) */
+    version: string;
+    /** Migration strategies for this version */
+    migrations: FieldMigrationStrategy[];
+    /** Breaking changes flag */
+    isBreaking: boolean;
+    /** Description of changes */
+    description?: string;
+}
+⋮----
+/** Version number (semantic versioning) */
+⋮----
+/** Migration strategies for this version */
+⋮----
+/** Breaking changes flag */
+⋮----
+/** Description of changes */
+⋮----
+/**
+ * Migration log entry
+ */
+export interface MigrationLogEntry {
+    version: string;
+    type: string;
+    timestamp: number;
+    success: boolean;
+    error?: string;
+}
+/**
+ * Enhanced monitor type configuration with versioning
+ */
+export interface VersionedMonitorConfig extends BaseMonitorConfig {
+    /** Version history for migrations */
+    versionHistory: MonitorTypeVersion[];
+    /** Current version */
+    currentVersion: string;
+    /** Schema evolution strategy */
+    evolutionStrategy: "backward-compatible" | "breaking-changes-allowed";
+}
+⋮----
+/** Version history for migrations */
+⋮----
+/** Current version */
+⋮----
+/** Schema evolution strategy */
+⋮----
+/**
+ * Parse semantic version string
+ */
+function parseVersion(version: string): number[]
+/**
+ * Database schema migration manager
+ */
+export class DatabaseSchemaMigrator {
+⋮----
+/**
+     * Apply migrations for a monitor type
+     */
+async applyMigrations(
+        config: VersionedMonitorConfig,
+        currentVersion: string,
+        targetVersion: string
+): Promise<
+/**
+     * Get migrations to apply between versions
+     */
+private getMigrationsToApply(
+        versionHistory: MonitorTypeVersion[],
+        currentVersion: string,
+        targetVersion: string
+): MonitorTypeVersion[]
+⋮----
+// Sort versions chronologically
+⋮----
+// No migrations needed or downgrade (not supported)
+⋮----
+// Return migrations to apply (exclusive of current, inclusive of target)
+⋮----
+/**
+     * Apply a single migration
+     */
+private async applyMigration(monitorType: string, migration: MonitorTypeVersion): Promise<void>
+/**
+     * Map field type to SQL type
+     */
+private mapFieldTypeToSQL(fieldType: DatabaseFieldType): string
+⋮----
+return "INTEGER"; // SQLite stores booleans as integers
+⋮----
+/**
+     * Add a new field to monitors
+     */
+private async addField(monitorType: string, strategy: FieldMigrationStrategy): Promise<void>
+⋮----
+// Get the database service (we'll need to inject it)
+⋮----
+// 1. Alter the database table to add the column
+⋮----
+// 2. Update existing records with the default value if provided
+⋮----
+// 3. Note: Monitor type schema updates would happen in the registry
+⋮----
+/**
+     * Remove a field from monitors
+     */
+private async removeField(monitorType: string, strategy: FieldMigrationStrategy): Promise<void>
+⋮----
+// Get the database service
+⋮----
+// SQLite doesn't support DROP COLUMN directly, so we need to:
+// 1. Create a new table without the column
+// 2. Copy data from old table to new table
+// 3. Drop old table and rename new table
+⋮----
+// Get current table schema
+⋮----
+// Filter out the column we want to remove
+⋮----
+// Create new table schema
+⋮----
+// Copy data to new table
+⋮----
+// Drop old table and rename new table
+⋮----
+/**
+     * Rename a field in monitors
+     */
+private renameField(monitorType: string, strategy: FieldMigrationStrategy): Promise<void>
+⋮----
+// In a real implementation, this would:
+// 1. Create new column with new name
+// 2. Copy data from old column to new column
+// 3. Remove old column
+// 4. Update schema
+⋮----
+/**
+     * Transform field values in monitors
+     */
+private transformField(monitorType: string, strategy: FieldMigrationStrategy): Promise<void>
+⋮----
+// In a real implementation, this would:
+// 1. Read all existing values
+// 2. Apply transformation function
+// 3. Update with new values
+// 4. Validate results
+⋮----
+/**
+     * Compare semantic versions
+     */
+private compareVersions(a: string, b: string): number
+/**
+     * Get migration log
+     */
+getMigrationLog(): MigrationLogEntry[]
+/**
+     * Check if migration is applied
+     */
+isMigrationApplied(migrationId: string): boolean
+⋮----
+/**
+ * Enhanced field type coercion with better error handling
+ */
+⋮----
+/**
+     * Coerce value to target type with comprehensive error handling
+     */
+coerceValue(
+        value: unknown,
+        targetType: DatabaseFieldType,
+        fieldName: string
+):
+/**
+     * Coerce to string with null/undefined handling
+     */
+coerceToString(value: unknown, fieldName: string)
+/**
+     * Coerce to number with range validation
+     */
+coerceToNumber(value: unknown, fieldName: string)
+/**
+     * Coerce to real number
+     */
+coerceToReal(value: unknown, fieldName: string)
+/**
+     * Coerce to boolean with comprehensive interpretation
+     */
+coerceToBoolean(value: unknown, fieldName: string)
+/**
+     * Coerce to JSON with validation
+     */
+coerceToJSON(value: unknown, fieldName: string)
+⋮----
+JSON.parse(value); // Validate JSON
+⋮----
+/**
+     * Coerce to timestamp
+     */
+coerceToTimestamp(value: unknown, fieldName: string)
+⋮----
+// Export singleton instance
+</file>
+
+<file path="electron/services/monitoring/EnhancedTypeGuards.ts">
+/**
+ * Enhanced runtime type guards with better error messages
+ * and improved generic type inference for dynamic fields.
+ */
+/* eslint-disable security/detect-object-injection */
+// ^ Dynamic object access is required for flexible type validation
+// Property names come from validated monitor configurations
+import { z } from "zod";
+import validator from "validator";
+import { logger } from "../../utils/logger";
+import type { MonitorType } from "../../types";
+import type { BaseMonitorConfig } from "./MonitorTypeRegistry";
+import { getRegisteredMonitorTypes } from "./MonitorTypeRegistry";
+/**
+ * Type guard result with detailed error information
+ */
+export interface TypeGuardResult<T = unknown> {
+    success: boolean;
+    value?: T;
+    error?: string;
+    details?: {
+        expectedType: string;
+        actualType: string;
+        path?: string[];
+        suggestions?: string[];
+    };
+}
+/**
+ * Runtime type validation context
+ */
+export interface RuntimeValidationContext {
+    path: string[];
+    fieldName: string;
+    expectedType: string;
+    actualValue: unknown;
+    suggestions: string[];
+}
+/**
+ * Enhanced runtime type guards with better error messages
+ */
+⋮----
+/**
+     * Validate monitor type with detailed error reporting
+     */
+validateMonitorType(value: unknown): TypeGuardResult<MonitorType>
+⋮----
+// Check against registered monitor types
+⋮----
+/**
+     * Validate URL with comprehensive error reporting
+     */
+validateURL(value: unknown): TypeGuardResult<string>
+⋮----
+// Use validator.js for proper URL validation
+⋮----
+/**
+     * Validate hostname with detailed error reporting
+     */
+validateHostname(value: unknown): TypeGuardResult<string>
+⋮----
+// Check for valid IP address first
+⋮----
+// Check for valid FQDN (domain name)
+⋮----
+// Additional check for localhost
+⋮----
+/**
+     * Validate port number with range checking
+     */
+validatePort(value: unknown): TypeGuardResult<number>
+⋮----
+// Use validator.js for port validation
+⋮----
+/**
+     * Validate boolean value with flexible interpretation
+     */
+validateBoolean(value: unknown): TypeGuardResult<boolean>
+⋮----
+/**
+ * Generic type inference helper for dynamic fields
+ */
+⋮----
+/**
+     * Infer field type from monitor configuration
+     */
+inferFieldType<T extends BaseMonitorConfig>(
+        config: T,
+        fieldName: string
+):
+/**
+     * Create typed field accessor with runtime validation
+     */
+createTypedAccessor<T extends BaseMonitorConfig>(
+        config: T,
+        fieldName: string
+):
+⋮----
+/**
+ * Type-safe monitor data interface with runtime validation
+ */
+export interface TypeSafeMonitorData<T extends MonitorType> {
+    type: T;
+    [K: string]: unknown;
+}
+/**
+ * Enhanced monitor data builder with type safety
+ */
+export class TypeSafeMonitorBuilder<T extends MonitorType> {
+⋮----
+constructor(monitorType: T)
+/**
+     * Set field value with runtime validation
+     */
+setField<K extends string>(fieldName: K, value: unknown): TypeSafeMonitorBuilder<T>
+⋮----
+// Validate field based on monitor type
+⋮----
+/**
+     * Get field value with type checking
+     */
+getField<K extends string>(fieldName: K): TypeGuardResult<unknown>
+/**
+     * Build the monitor data with validation
+     */
+build(): TypeGuardResult<TypeSafeMonitorData<T>>
+/**
+     * Validate individual field
+     */
+private validateField(fieldName: string, value: unknown): TypeGuardResult<unknown>
+⋮----
+// Basic validation based on monitor type
+⋮----
+// Default validation for common fields
+⋮----
+// Allow any other fields
+⋮----
+/**
+ * Type-safe monitor factory with enhanced error reporting
+ */
+⋮----
+/**
+     * Create a typed monitor builder
+     */
+create<T extends MonitorType>(monitorType: T): TypeSafeMonitorBuilder<T>
+/**
+     * Validate existing monitor data
+     */
+validate<T extends MonitorType>(data: unknown): TypeGuardResult<TypeSafeMonitorData<T>>
+</file>
+
+<file path="electron/services/monitoring/MigrationSystem.ts">
+/**
+ * Basic migration system for monitor types.
+ * Simple, functional implementation without over-complexity.
+ */
+import { logger } from "../../utils/logger";
+export interface MigrationRule {
+    fromVersion: string;
+    toVersion: string;
+    description: string;
+    isBreaking: boolean;
+    transform: (data: Record<string, unknown>) => Promise<Record<string, unknown>>;
+}
+export interface VersionInfo {
+    version: string;
+    timestamp: number;
+    applied: boolean;
+}
+/**
+ * Simple migration registry
+ */
+class MigrationRegistry {
+⋮----
+/**
+     * Register a migration for a monitor type
+     */
+registerMigration(monitorType: string, rule: MigrationRule): void
+⋮----
+// Sort by version
+⋮----
+/**
+     * Get migration path from one version to another
+     */
+getMigrationPath(monitorType: string, fromVersion: string, toVersion: string): MigrationRule[]
+/**
+     * Check if migration is possible
+     */
+canMigrate(monitorType: string, fromVersion: string, toVersion: string): boolean
+/**
+     * Compare semantic versions
+     */
+private compareVersions(a: string, b: string): number
+⋮----
+// eslint-disable-next-line security/detect-object-injection
+⋮----
+// eslint-disable-next-line security/detect-object-injection
+⋮----
+/**
+ * Simple version manager
+ */
+class VersionManager {
+⋮----
+/**
+     * Set version for a monitor type
+     */
+setVersion(monitorType: string, version: string): void
+/**
+     * Get version for a monitor type
+     */
+getVersion(monitorType: string): string | undefined
+/**
+     * Check if version is applied
+     */
+isVersionApplied(monitorType: string, version: string): boolean
+/**
+     * Get all versions
+     */
+getAllVersions(): Map<string, VersionInfo>
+⋮----
+/**
+ * Basic migration orchestrator
+ */
+class MigrationOrchestrator {
+⋮----
+constructor(
+/**
+     * Migrate monitor data from one version to another
+     */
+async migrateMonitorData(
+        monitorType: string,
+        data: Record<string, unknown>,
+        fromVersion: string,
+        toVersion: string
+): Promise<
+⋮----
+// Check if migration is needed
+⋮----
+// Get migration path
+⋮----
+// Apply migrations in sequence
+⋮----
+// Update version if all migrations succeeded
+⋮----
+// Export singleton instances
+⋮----
+// Export factory function for orchestrator
+export function createMigrationOrchestrator(): MigrationOrchestrator
+// Export example migrations for reference
+⋮----
+// Example: HTTP monitor adding timeout field
+⋮----
+timeout: (data.timeout as number | undefined) ?? 30_000, // Default 30 seconds
+⋮----
+// Example: Port monitor converting port to number
 </file>
 
 <file path="electron/services/ServiceContainer.ts">
@@ -4783,29 +4428,6 @@ public getIpcService(): IpcService
      * Get all initialized services for shutdown.
      */
 public getInitializedServices():
-</file>
-
-<file path="electron/utils/database/databaseInitializer.ts">
-/**
- * Database initialization utility.
- * Handles database setup and site loading with proper error handling.
- */
-import { UptimeEvents, TypedEventBus } from "../../events/index";
-import { DatabaseService } from "../../services/index";
-import { monitorLogger as logger, withDbRetry } from "../../utils/index";
-/**
- * Initialize the database and load sites.
- * @param databaseService - The database service instance
- * @param loadSitesCallback - Callback function to load sites
- * @param eventEmitter - Event emitter for error handling
- */
-export async function initDatabase(
-    databaseService: DatabaseService,
-    loadSitesCallback: () => Promise<void>,
-    eventEmitter: TypedEventBus<UptimeEvents>
-): Promise<void>
-⋮----
-// Don't re-throw the error - let it be handled via the event system
 </file>
 
 <file path="electron/utils/database/index.ts">
@@ -5238,6 +4860,71 @@ interface HistoryChartProperties {
 // Show up to maxItems bars, most recent first (reverse chronological order)
 </file>
 
+<file path="src/components/common/MonitorUiComponents.tsx">
+/**
+ * React components for dynamic monitor UI behavior.
+ * These components handle async loading of monitor configurations and provide
+ * consistent UI behavior across different monitor types.
+ */
+import React, { useEffect, useState } from "react";
+import type { MonitorType } from "../../types";
+import {
+    formatMonitorDetail,
+    supportsResponseTime as checkSupportsResponseTime,
+    supportsAdvancedAnalytics as checkSupportsAdvancedAnalytics,
+    allSupportsResponseTime,
+    allSupportsAdvancedAnalytics,
+    getMonitorHelpTexts,
+} from "../../utils/monitorUiHelpers";
+/**
+ * Component that dynamically formats monitor detail labels.
+ * Handles async loading of monitor configuration.
+ */
+interface DetailLabelProps {
+    readonly monitorType: MonitorType;
+    readonly details: string;
+    readonly fallback?: string;
+}
+export function DetailLabel(
+/**
+ * Component that conditionally renders based on response time support.
+ */
+interface ConditionalResponseTimeProps {
+    readonly monitorType: MonitorType;
+    readonly children: React.ReactNode;
+    readonly fallback?: React.ReactNode;
+}
+export function ConditionalResponseTime(
+⋮----
+const checkSupport = async () =>
+⋮----
+/**
+ * Component that conditionally renders based on advanced analytics support.
+ */
+interface ConditionalAdvancedAnalyticsProps {
+    readonly monitorType: MonitorType;
+    readonly children: React.ReactNode;
+    readonly fallback?: React.ReactNode;
+}
+export function ConditionalAdvancedAnalytics(
+/**
+ * Component that conditionally renders based on multiple monitor types support.
+ */
+interface ConditionalMultipleTypesProps {
+    readonly monitorTypes: MonitorType[];
+    readonly feature: "responseTime" | "advancedAnalytics";
+    readonly children: React.ReactNode;
+    readonly fallback?: React.ReactNode;
+}
+export function ConditionalMultipleTypes(
+/**
+ * Hook for dynamic help text loading.
+ */
+export function useDynamicHelpText(monitorType: MonitorType)
+⋮----
+const loadHelpTexts = async () =>
+</file>
+
 <file path="src/components/Dashboard/SiteCard/index.tsx">
 /**
  * SiteCard component displaying comprehensive monitoring information for a single site.
@@ -5349,6 +5036,70 @@ interface SiteCardHeaderProperties {
  */
 </file>
 
+<file path="src/components/Dashboard/SiteCard/SiteCardHistory.tsx">
+/**
+ * Site card history visualization component.
+ * Displays monitor history data using a chart component.
+ */
+import React, { useMemo } from "react";
+import { Monitor, StatusHistory } from "../../../types";
+import { HistoryChart } from "../../common/HistoryChart";
+import { useMonitorTypes } from "../../../hooks/useMonitorTypes";
+import { formatTitleSuffix } from "../../../utils/monitorTitleFormatters";
+/**
+ * Props for the SiteCardHistory component.
+ */
+interface SiteCardHistoryProperties {
+    /** Monitor data containing type and configuration */
+    monitor: Monitor | undefined;
+    /** Filtered history data for visualization */
+    filteredHistory: StatusHistory[];
+}
+⋮----
+/** Monitor data containing type and configuration */
+⋮----
+/** Filtered history data for visualization */
+⋮----
+/**
+ * History visualization component for site cards displaying monitor status over time.
+ *
+ * Features:
+ * - Dynamic title generation based on monitor type and configuration
+ * - Optimized with React.memo and custom comparison for performance
+ * - Automatic updates when monitor history changes in store
+ * - Supports up to 60 history items for visualization
+ * - Handles HTTP and port monitor types with specific title formatting
+ *
+ * Data flow: Store → useSiteMonitor → useSite → SiteCard → SiteCardHistory
+ *
+ * @param props - Component props
+ * @returns JSX element containing the history chart
+ *
+ * @example
+ * ```tsx
+ * <SiteCardHistory
+ *   monitor={selectedMonitor}
+ *   filteredHistory={recentHistory}
+ * />
+ * ```
+ */
+⋮----
+// Get monitor type configurations
+⋮----
+// Memoize the history title calculation
+⋮----
+// Get display name from monitor type options
+⋮----
+// Get type-specific suffix using dynamic formatter
+⋮----
+// Custom comparison function to ensure proper re-renders
+// Compare by history array length and last timestamp to detect changes
+⋮----
+// Fix: History is sorted DESC (newest first), so latest is at index 0, not length-1
+⋮----
+// Return true if nothing important changed (skip re-render)
+</file>
+
 <file path="src/components/Header/Header.css">
 /* Use theme variables for status colors and accent */
 :root {
@@ -5443,6 +5194,80 @@ data-health-color=
 {/* Theme Toggle */}
 ⋮----
 {/* Settings Button */}
+</file>
+
+<file path="src/components/SiteDetails/ScreenshotThumbnail.tsx">
+/**
+ * Screenshot thumbnail component with hover preview
+ *
+ * Displays a small thumbnail of a website screenshot that expands into a larger
+ * preview on hover/focus. Uses Microlink API for screenshot generation and
+ * React portals for the overlay positioning.
+ */
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
+import { logger } from "../../services";
+import { useTheme } from "../../theme";
+/** Props for the ScreenshotThumbnail component */
+interface ScreenshotThumbnailProperties {
+    /** The URL to capture a screenshot of */
+    readonly url: string;
+    /** The site name for accessibility and alt text */
+    readonly siteName: string;
+}
+⋮----
+/** The URL to capture a screenshot of */
+⋮----
+/** The site name for accessibility and alt text */
+⋮----
+/**
+ * Type guard to check if the window.electronAPI has openExternal method
+ * @param api - The API object to check
+ * @returns True if the API has openExternal method
+ */
+function hasOpenExternal(api: unknown): api is
+/**
+ * Screenshot thumbnail component with hover preview overlay.
+ *
+ * Generates a thumbnail using Microlink API and displays a larger preview
+ * when hovered. Handles external URL opening and proper positioning of
+ * the preview overlay within viewport bounds.
+ *
+ * @param props - Component props
+ * @returns JSX element containing the thumbnail and optional preview overlay
+ */
+export function ScreenshotThumbnail(
+⋮----
+// Clean up portal overlay on unmount and state changes
+⋮----
+// Clear any pending timeouts
+⋮----
+// Reset state
+⋮----
+// Additional cleanup on hovered state changes
+⋮----
+// Clear any pending timeouts when hiding overlay
+⋮----
+function handleClick(event: React.MouseEvent)
+⋮----
+const maxImgW = Math.min(viewportW * 0.9, 900); // 90vw or 900px max
+const maxImgH = Math.min(viewportH * 0.9, 700); // 90vh or 700px max
+⋮----
+let top = rect.top - overlayH - 16; // 16px gap above
+⋮----
+// Debounced hover handlers to prevent rapid state changes
+⋮----
+// Clear any existing timeout
+⋮----
+// Clear any existing timeout
+⋮----
+// Add a small delay to prevent flickering on rapid mouse movements
+⋮----
+// Clear any existing timeout
+⋮----
+// Clear any existing timeout
+⋮----
+// Generate accessible aria-label, handling empty URLs
 </file>
 
 <file path="src/components/SiteDetails/SiteDetails.css">
@@ -6797,102 +6622,40 @@ export function ThemedTooltip(
 export function calculateMaxDuration(timeout: number, retryAttempts: number): string
 </file>
 
-<file path="src/utils/dynamicMonitorUi.ts">
+<file path="src/utils/monitorTitleFormatters.ts">
 /**
- * Dynamic UI utilities that use monitor registry for extensible UI behavior.
- * These utilities eliminate hardcoded monitor type checks throughout the frontend.
+ * Client-side monitor type suffix formatters.
+ * This provides dynamic suffix generation for monitor types in the frontend.
  */
-import type { MonitorType } from "../types";
-import { getMonitorTypeConfig, type MonitorTypeConfig } from "./monitorTypeHelper";
+import { Monitor } from "../types";
 /**
- * Cache for monitor type configurations
+ * Type for monitor title suffix formatter functions
+ */
+export type TitleSuffixFormatter = (monitor: Monitor) => string;
+/**
+ * Registry of title suffix formatters for different monitor types
  */
 ⋮----
 /**
- * Get monitor type configuration with caching
+ * Get title suffix formatter for a monitor type
  */
-async function getConfig(monitorType: MonitorType): Promise<MonitorTypeConfig | undefined>
-/**
- * Format detail label dynamically based on monitor type configuration.
- *
- * @param monitorType - Type of monitor
- * @param details - Detail value to format
- * @returns Formatted detail string
- *
- * @example
- * ```typescript
- * const label = formatMonitorDetail("http", "200"); // "Response Code: 200"
- * const label = formatMonitorDetail("port", "80");  // "Port: 80"
- * ```
- */
-export function formatMonitorDetail(monitorType: MonitorType, details: string): string
+export function getTitleSuffixFormatter(monitorType: string): TitleSuffixFormatter | undefined
 ⋮----
-// Recreate formatter functions based on monitor type since they can't be serialized over IPC
-⋮----
-// eslint-disable-next-line security/detect-object-injection -- MonitorType is a known safe union type
+// eslint-disable-next-line security/detect-object-injection
 ⋮----
 /**
- * Check if monitor type supports response time analytics.
- *
- * @param monitorType - Type of monitor
- * @returns Whether monitor supports response time analytics
+ * Register a title suffix formatter for a monitor type
  */
-export async function supportsResponseTime(monitorType: MonitorType): Promise<boolean>
+export function registerTitleSuffixFormatter(monitorType: string, formatter: TitleSuffixFormatter): void
+⋮----
+// eslint-disable-next-line security/detect-object-injection
+⋮----
 /**
- * Check if monitor type supports advanced analytics.
- *
- * @param monitorType - Type of monitor
- * @returns Whether monitor supports advanced analytics
+ * Format title suffix for a monitor dynamically
  */
-export async function supportsAdvancedAnalytics(monitorType: MonitorType): Promise<boolean>
-/**
- * Get help text for monitor type form fields.
- *
- * @param monitorType - Type of monitor
- * @returns Object containing primary and secondary help texts
- */
-export async function getMonitorHelpTexts(monitorType: MonitorType): Promise<
-/**
- * Get analytics label for monitor type.
- *
- * @param monitorType - Type of monitor
- * @returns Analytics label or fallback
- */
-export async function getAnalyticsLabel(monitorType: MonitorType): Promise<string>
-/**
- * Check if monitor type should show URL in display.
- *
- * @param monitorType - Type of monitor
- * @returns Whether to show URL
- */
-export async function shouldShowUrl(monitorType: MonitorType): Promise<boolean>
-/**
- * Check if all monitor types in array support response time.
- * Useful for conditional rendering of response time charts.
- *
- * @param monitorTypes - Array of monitor types to check
- * @returns Whether all types support response time
- */
-export async function allSupportsResponseTime(monitorTypes: MonitorType[]): Promise<boolean>
-/**
- * Check if all monitor types in array support advanced analytics.
- * Useful for conditional rendering of advanced analytics components.
- *
- * @param monitorTypes - Array of monitor types to check
- * @returns Whether all types support advanced analytics
- */
-export async function allSupportsAdvancedAnalytics(monitorTypes: MonitorType[]): Promise<boolean>
-/**
- * Get available monitor types that support a specific feature.
- *
- * @param feature - Feature to check for ('responseTime' | 'advancedAnalytics')
- * @returns Array of monitor types that support the feature
- */
-export async function getTypesWithFeature(feature: "responseTime" | "advancedAnalytics"): Promise<MonitorType[]>
-/**
- * Clear the configuration cache. Useful for testing or when monitor types change.
- */
-export function clearConfigCache(): void
+export function formatTitleSuffix(monitor: Monitor): string
+⋮----
+// Fallback to empty string if no formatter is registered
 </file>
 
 <file path="src/utils/monitorTypeHelper.ts">
@@ -7028,50 +6791,102 @@ export async function getMonitorTypeOptions(): Promise<
 export function clearMonitorTypeCache(): void
 </file>
 
-<file path="src/utils/monitorValidation.ts">
+<file path="src/utils/monitorUiHelpers.ts">
 /**
- * Registry-based monitor validation utilities.
- * Uses the backend monitor type registry for consistent validation.
+ * Dynamic UI utilities that use monitor registry for extensible UI behavior.
+ * These utilities eliminate hardcoded monitor type checks throughout the frontend.
  */
 import type { MonitorType } from "../types";
+import { getMonitorTypeConfig, getAvailableMonitorTypes, type MonitorTypeConfig } from "./monitorTypeHelper";
 /**
- * Validate monitor data using backend registry.
- *
- * @param type - Monitor type
- * @param data - Monitor data to validate
- * @returns Promise resolving to validation result
+ * Cache for monitor type configurations
  */
-export async function validateMonitorData(
-    type: MonitorType,
-    data: Record<string, unknown>
-): Promise<
-⋮----
-// Use IPC to validate via backend registry
-⋮----
-// Handle the advanced validation result format
 ⋮----
 /**
- * Validate individual monitor field.
- *
- * @param type - Monitor type
- * @param fieldName - Field name to validate
- * @param value - Field value
- * @returns Promise resolving to validation errors (empty if valid)
+ * Get monitor type configuration with caching
  */
-export async function validateMonitorField(type: MonitorType, fieldName: string, value: unknown): Promise<string[]>
+async function getConfig(monitorType: MonitorType): Promise<MonitorTypeConfig | undefined>
+/**
+ * Format detail label dynamically based on monitor type configuration.
+ *
+ * @param monitorType - Type of monitor
+ * @param details - Detail value to format
+ * @returns Formatted detail string
+ *
+ * @example
+ * ```typescript
+ * const label = formatMonitorDetail("http", "200"); // "Response Code: 200"
+ * const label = formatMonitorDetail("port", "80");  // "Port: 80"
+ * ```
+ */
+export function formatMonitorDetail(monitorType: MonitorType, details: string): string
 ⋮----
-// Use the full validation and extract errors for this field
+// Recreate formatter functions based on monitor type since they can't be serialized over IPC
 ⋮----
-// Filter errors to only include those for the specific field
+// eslint-disable-next-line security/detect-object-injection -- MonitorType is a known safe union type
 ⋮----
 /**
- * Create monitor object with proper field mapping.
+ * Check if monitor type supports response time analytics.
  *
- * @param type - Monitor type
- * @param fields - Field values
- * @returns Monitor object with type-specific fields
+ * @param monitorType - Type of monitor
+ * @returns Whether monitor supports response time analytics
  */
-export function createMonitorObject(type: MonitorType, fields: Record<string, unknown>): Record<string, unknown>
+export async function supportsResponseTime(monitorType: MonitorType): Promise<boolean>
+/**
+ * Check if monitor type supports advanced analytics.
+ *
+ * @param monitorType - Type of monitor
+ * @returns Whether monitor supports advanced analytics
+ */
+export async function supportsAdvancedAnalytics(monitorType: MonitorType): Promise<boolean>
+/**
+ * Get help text for monitor type form fields.
+ *
+ * @param monitorType - Type of monitor
+ * @returns Object containing primary and secondary help texts
+ */
+export async function getMonitorHelpTexts(monitorType: MonitorType): Promise<
+/**
+ * Get analytics label for monitor type.
+ *
+ * @param monitorType - Type of monitor
+ * @returns Analytics label or fallback
+ */
+export async function getAnalyticsLabel(monitorType: MonitorType): Promise<string>
+/**
+ * Check if monitor type should show URL in display.
+ *
+ * @param monitorType - Type of monitor
+ * @returns Whether to show URL
+ */
+export async function shouldShowUrl(monitorType: MonitorType): Promise<boolean>
+/**
+ * Check if all monitor types in array support response time.
+ * Useful for conditional rendering of response time charts.
+ *
+ * @param monitorTypes - Array of monitor types to check
+ * @returns Whether all types support response time
+ */
+export async function allSupportsResponseTime(monitorTypes: MonitorType[]): Promise<boolean>
+/**
+ * Check if all monitor types in array support advanced analytics.
+ * Useful for conditional rendering of advanced analytics components.
+ *
+ * @param monitorTypes - Array of monitor types to check
+ * @returns Whether all types support advanced analytics
+ */
+export async function allSupportsAdvancedAnalytics(monitorTypes: MonitorType[]): Promise<boolean>
+/**
+ * Get available monitor types that support a specific feature.
+ *
+ * @param feature - Feature to check for ('responseTime' | 'advancedAnalytics')
+ * @returns Array of monitor types that support the feature
+ */
+export async function getTypesWithFeature(feature: "responseTime" | "advancedAnalytics"): Promise<MonitorType[]>
+/**
+ * Clear the configuration cache. Useful for testing or when monitor types change.
+ */
+export function clearConfigCache(): void
 </file>
 
 <file path="src/utils/time.ts">
@@ -7692,47 +7507,157 @@ public async executeTransaction<T>(operation: (db: Database) => Promise<T>): Pro
 public close(): void
 </file>
 
-<file path="electron/services/database/utils/historyManipulation.ts">
-import { Database } from "node-sqlite3-wasm";
-import { isDev } from "../../../electronUtils";
-import { StatusHistory } from "../../../types";
-import { logger } from "../../../utils/index";
+<file path="electron/services/monitoring/HttpMonitor.ts">
 /**
- * Utility functions for manipulating history data in the database.
+ * HTTP/HTTPS monitoring service for web endpoint health checks.
+ *
+ * @remarks
+ * Provides comprehensive HTTP monitoring capabilities with advanced Axios features
+ * for optimal performance and reliability. Supports precise response time measurement,
+ * per-monitor timeout configuration, and intelligent status code interpretation.
+ *
+ * Key features:
+ * - Precise response time measurement using performance.now()
+ * - Per-monitor timeout configuration support
+ * - Intelligent status code handling (2xx/4xx = up, 5xx = down)
+ * - Connection pooling with HTTP/HTTPS agents
+ * - Request/response size limits for security
+ * - Comprehensive error handling with network detection
+ * - Retry logic for transient failures
+ *
+ * @example
+ * ```typescript
+ * const httpMonitor = new HttpMonitor({ timeout: 5000 });
+ * const result = await httpMonitor.check({
+ *   id: "mon_1",
+ *   type: "http",
+ *   url: "https://example.com",
+ *   status: "pending",
+ *   // ... other monitor properties
+ * });
+ * console.log(`Status: ${result.status}, Response time: ${result.responseTime}ms`);
+ * ```
+ *
+ * @packageDocumentation
  */
+import { AxiosInstance } from "axios";
+import { DEFAULT_REQUEST_TIMEOUT, RETRY_BACKOFF, USER_AGENT } from "../../constants";
+import { isDev } from "../../electronUtils";
+import { Site } from "../../types";
+import { logger, withRetry } from "../../utils/index";
+import { IMonitorService, MonitorCheckResult, MonitorConfig } from "./types";
+import { determineMonitorStatus, handleCheckError, createHttpClient, createErrorResult } from "./utils";
 /**
- * Add a new history entry for a monitor.
+ * Declaration merging to extend Axios types with timing metadata.
+ *
+ * @remarks
+ * Extends Axios request/response interfaces to support precise timing measurements
+ * through request interceptors and response metadata.
  */
-export function addHistoryEntry(db: Database, monitorId: string, entry: StatusHistory, details?: string): void
-/**
- * Delete history entries for a specific monitor.
- */
-export function deleteHistoryByMonitorId(db: Database, monitorId: string): void
-/**
- * Clear all history from the database.
- */
-export function deleteAllHistory(db: Database): void
-/**
- * Prune old history entries for a monitor, keeping only the most recent entries.
- */
-export function pruneHistoryForMonitor(db: Database, monitorId: string, limit: number): void
 ⋮----
-// Get entries to delete (keep only the most recent 'limit' entries)
+/** Extended request config with timing metadata */
+interface InternalAxiosRequestConfig {
+        metadata?: {
+            /** High-precision start time for response time calculation */
+            startTime: number;
+        };
+    }
 ⋮----
-// Use parameterized query to avoid SQL injection
+/** High-precision start time for response time calculation */
+⋮----
+/** Extended response with calculated response time */
+interface AxiosResponse {
+        /** Calculated response time in milliseconds */
+        responseTime?: number;
+    }
+⋮----
+/** Calculated response time in milliseconds */
+⋮----
+/** Extended error with response time (if available) */
+interface AxiosError {
+        /** Response time at point of failure (if available) */
+        responseTime?: number;
+    }
+⋮----
+/** Response time at point of failure (if available) */
 ⋮----
 /**
- * Bulk insert history entries (for import functionality).
- * Assumes it's called within an existing transaction context.
- * Uses a prepared statement for better performance.
+ * Service for performing HTTP/HTTPS monitoring checks.
+ *
+ * @remarks
+ * Implements the IMonitorService interface to provide HTTP endpoint monitoring
+ * with advanced features for reliability and performance. Uses Axios with custom
+ * interceptors for precise timing and comprehensive error handling.
+ *
+ * The service is designed for monitoring use cases where response time accuracy
+ * and failure detection are critical. It includes intelligent status code
+ * interpretation suitable for uptime monitoring scenarios.
  */
-export function bulkInsertHistory(
-    db: Database,
-    monitorId: string,
-    historyEntries: (StatusHistory & { details?: string })[]
-): void
+export class HttpMonitor implements IMonitorService {
 ⋮----
-// Prepare the statement once for better performance
+/** Configuration for HTTP monitoring behavior */
+⋮----
+/** Axios instance with custom interceptors and configuration */
+⋮----
+/**
+     * Initialize the HTTP monitor with optional configuration.
+     *
+     * @param config - Optional configuration overrides for HTTP monitoring
+     *
+     * @remarks
+     * Creates an Axios instance with optimized settings for monitoring,
+     * including timing interceptors, appropriate timeouts, and security limits.
+     */
+constructor(config: MonitorConfig =
+⋮----
+// Create Axios instance with advanced configuration (best practices)
+⋮----
+/**
+     * Get the monitor type this service handles.
+     */
+public getType(): Site["monitors"][0]["type"]
+/**
+     * Perform an HTTP health check on the given monitor.
+     * Uses per-monitor retry attempts and timeout configuration.
+     */
+public async check(monitor: Site["monitors"][0]): Promise<MonitorCheckResult>
+/**
+     * Perform health check with retry logic.
+     */
+private async performHealthCheckWithRetry(
+        url: string,
+        timeout: number,
+        maxRetries: number
+): Promise<MonitorCheckResult>
+⋮----
+// Convert maxRetries (additional attempts) to totalAttempts for withRetry utility
+⋮----
+/**
+     * Perform a single health check attempt without retry logic.
+     */
+private async performSingleHealthCheck(url: string, timeout: number): Promise<MonitorCheckResult>
+⋮----
+// Determine status based on HTTP status code
+⋮----
+/**
+     * Make the actual HTTP request using Axios.
+     */
+private async makeRequest(url: string, timeout: number)
+⋮----
+// Use our configured Axios instance with specific timeout override
+⋮----
+/**
+     * Update the configuration for this monitor.
+     * Recreates the Axios instance with updated configuration.
+     */
+public updateConfig(config: Partial<MonitorConfig>): void
+⋮----
+// Recreate Axios instance with updated configuration
+⋮----
+/**
+     * Get the current configuration.
+     */
+public getConfig(): MonitorConfig
 </file>
 
 <file path="electron/services/monitoring/MonitorScheduler.ts">
@@ -7803,242 +7728,6 @@ public getActiveCount(): number
      * Get all active monitoring keys.
      */
 public getActiveMonitors(): string[]
-</file>
-
-<file path="electron/services/monitoring/MonitorTypeRegistry.ts">
-/**
- * Extensible monitor type system for new monitoring capabilities.
- *
- * @remarks
- * This new architecture replaces hard-coded monitor types with a plugin-based
- * system that allows easy addition of new monitor types without code changes
- * in multiple files.
- */
-/* eslint-disable security/detect-object-injection */
-// ^ Dynamic object access is required for flexible monitor type registration
-// Property names come from validated monitor configurations
-import { z } from "zod";
-import validator from "validator";
-import { HttpMonitor } from "./HttpMonitor";
-import { PortMonitor } from "./PortMonitor";
-import { advancedValidationEngine, ValidationRuleBuilder, CommonValidationRules } from "./AdvancedValidationEngine";
-import { EnhancedTypeGuard } from "./EnhancedTypeGuards";
-import { migrationRegistry, versionManager, createMigrationOrchestrator, exampleMigrations } from "./MigrationSystem";
-import { logger } from "../../utils/logger";
-// Field definition for dynamic form generation
-export interface MonitorFieldDefinition {
-    /** Field name (matches monitor property) */
-    name: string;
-    /** Display label for the field */
-    label: string;
-    /** Input type for form rendering */
-    type: "text" | "number" | "url";
-    /** Whether field is required */
-    required: boolean;
-    /** Placeholder text */
-    placeholder?: string;
-    /** Help text for the field */
-    helpText?: string;
-    /** Min value for number fields */
-    min?: number;
-    /** Max value for number fields */
-    max?: number;
-}
-⋮----
-/** Field name (matches monitor property) */
-⋮----
-/** Display label for the field */
-⋮----
-/** Input type for form rendering */
-⋮----
-/** Whether field is required */
-⋮----
-/** Placeholder text */
-⋮----
-/** Help text for the field */
-⋮----
-/** Min value for number fields */
-⋮----
-/** Max value for number fields */
-⋮----
-// UI configuration for monitor type display
-export interface MonitorUIConfig {
-    /** Detail label formatter function name */
-    detailLabelFormatter?: string;
-    /** Chart data formatters */
-    chartFormatters?: {
-        responseTime?: boolean;
-        uptime?: boolean;
-        advanced?: boolean;
-    };
-    /** Help text for form fields */
-    helpTexts?: {
-        primary?: string;
-        secondary?: string;
-    };
-    /** Display preferences */
-    display?: {
-        showUrl?: boolean;
-        showPort?: boolean;
-        showAdvancedMetrics?: boolean;
-    };
-}
-⋮----
-/** Detail label formatter function name */
-⋮----
-/** Chart data formatters */
-⋮----
-/** Help text for form fields */
-⋮----
-/** Display preferences */
-⋮----
-// Base monitor type definition
-export interface BaseMonitorConfig {
-    /** Unique identifier for the monitor type */
-    readonly type: string;
-    /** Human-readable display name */
-    readonly displayName: string;
-    /** Description of what this monitor checks */
-    readonly description: string;
-    /** Version of the monitor implementation */
-    readonly version: string;
-    /** Field definitions for dynamic form generation */
-    readonly fields: MonitorFieldDefinition[];
-    /** Zod validation schema for this monitor type */
-    readonly validationSchema: z.ZodSchema;
-    /** Factory function to create monitor service instances */
-    readonly serviceFactory: () => import("./types").IMonitorService;
-⋮----
-/** Unique identifier for the monitor type */
-⋮----
-/** Human-readable display name */
-⋮----
-/** Description of what this monitor checks */
-⋮----
-/** Version of the monitor implementation */
-⋮----
-/** Field definitions for dynamic form generation */
-⋮----
-/** Zod validation schema for this monitor type */
-⋮----
-/** Factory function to create monitor service instances */
-⋮----
-/** UI display configuration */
-⋮----
-/** Function to format detail display in history (e.g., "Port: 80", "Response Code: 200") */
-⋮----
-/** Function to format title suffix for history charts (e.g., " (https://example.com)") */
-⋮----
-/** Whether this monitor type supports response time analytics */
-⋮----
-/** Whether this monitor type supports advanced analytics */
-⋮----
-/** Help text for form fields */
-⋮----
-/** Display preferences */
-⋮----
-/** Detail label formatter for different contexts */
-⋮----
-/** Format for history detail column */
-⋮----
-/** Format for analytics display */
-⋮----
-// Shared validation schemas using Zod with enhanced validation
-⋮----
-// Use validator.js for robust URL validation
-⋮----
-// Use validator.js for robust host validation
-⋮----
-// Registry for monitor types
-⋮----
-/**
- * Register a new monitor type.
- *
- * @param config - Monitor type configuration
- */
-export function registerMonitorType(config: BaseMonitorConfig): void
-/**
- * Get all registered monitor types.
- *
- * @returns Array of registered monitor types
- */
-export function getRegisteredMonitorTypes(): string[]
-/**
- * Get all registered monitor types with their configurations.
- *
- * @returns Array of monitor type configurations
- */
-export function getAllMonitorTypeConfigs(): BaseMonitorConfig[]
-/**
- * Check if a monitor type is registered.
- *
- * @param type - Monitor type to check
- * @returns True if type is registered
- */
-export function isValidMonitorType(type: string): boolean
-/**
- * Get configuration for a monitor type.
- *
- * @param type - Monitor type
- * @returns Monitor configuration or undefined
- */
-export function getMonitorTypeConfig(type: string): BaseMonitorConfig | undefined
-/**
- * Get service factory for a monitor type.
- *
- * @param type - Monitor type
- * @returns Service factory function or undefined
- */
-⋮----
-/**
- * Validate monitor data using Zod schemas.
- *
- * @param type - Monitor type
- * @param data - Monitor data to validate
- * @returns Validation result
- */
-⋮----
-// Register existing monitor types with their field definitions and schemas
-⋮----
-// Initialize advanced validation rules for existing monitor types
-⋮----
-// URL validation will catch this
-⋮----
-// Check for common port/protocol combinations
-⋮----
-// Register validation rules with the advanced validation engine
-⋮----
-// Register example migrations for the migration system
-⋮----
-// Set current versions for existing monitor types
-⋮----
-// Enhanced validation function with improved error reporting
-⋮----
-// First, validate the monitor type
-⋮----
-// Validate using the advanced validation engine
-⋮----
-// Enhanced type guard for better runtime validation
-⋮----
-// Use enhanced type guard validation
-⋮----
-// Create monitor object with proper validation
-⋮----
-// Database migration helper - properly implemented with basic migration system
-⋮----
-// Validate the monitor type
-⋮----
-// Check if migration is needed
-⋮----
-// If no data provided, just return success for version bump
-⋮----
-// Use the migration orchestrator for data migration
-⋮----
-// Type guard for runtime validation
-⋮----
-// Generate union type from registered monitor types
-⋮----
-// Helper to get the current monitor types as a union
 </file>
 
 <file path="electron/services/monitoring/PortMonitor.ts">
@@ -8791,64 +8480,6 @@ private setupCacheInvalidationHandling(): void
 // Custom hook
 </file>
 
-<file path="src/components/dynamic-monitor-ui.tsx">
-/**
- * React components for dynamic monitor UI behavior.
- * These components handle async loading of monitor configurations and provide
- * consistent UI behavior across different monitor types.
- */
-import React, { useEffect, useState } from "react";
-import type { MonitorType } from "../types";
-import { formatMonitorDetail } from "../utils/dynamicMonitorUi";
-/**
- * Component that dynamically formats monitor detail labels.
- * Handles async loading of monitor configuration.
- */
-interface DetailLabelProps {
-    readonly monitorType: MonitorType;
-    readonly details: string;
-    readonly fallback?: string;
-}
-export function DetailLabel(
-/**
- * Component that conditionally renders based on response time support.
- */
-interface ConditionalResponseTimeProps {
-    readonly monitorType: MonitorType;
-    readonly children: React.ReactNode;
-    readonly fallback?: React.ReactNode;
-}
-export function ConditionalResponseTime(
-⋮----
-const checkSupport = async () =>
-⋮----
-/**
- * Component that conditionally renders based on advanced analytics support.
- */
-interface ConditionalAdvancedAnalyticsProps {
-    readonly monitorType: MonitorType;
-    readonly children: React.ReactNode;
-    readonly fallback?: React.ReactNode;
-}
-export function ConditionalAdvancedAnalytics(
-/**
- * Component that conditionally renders based on multiple monitor types support.
- */
-interface ConditionalMultipleTypesProps {
-    readonly monitorTypes: MonitorType[];
-    readonly feature: "responseTime" | "advancedAnalytics";
-    readonly children: React.ReactNode;
-    readonly fallback?: React.ReactNode;
-}
-export function ConditionalMultipleTypes(
-/**
- * Hook for dynamic help text loading.
- */
-export function useDynamicHelpText(monitorType: MonitorType)
-⋮----
-const loadHelpTexts = async () =>
-</file>
-
 <file path="src/components/SiteDetails/SiteDetailsHeader.tsx">
 /**
  * Site details header component
@@ -8909,183 +8540,6 @@ interface SiteDetailsHeaderProperties {
 {/* Show clickable URL for HTTP monitors that have a URL */}
 ⋮----
 {/* Display appropriate connection info based on monitor type */}
-</file>
-
-<file path="src/components/SiteDetails/tabs/AnalyticsTab.tsx">
-/**
- * Analytics tab component providing comprehensive monitoring statistics and visualizations.
- * Displays advanced metrics, charts, and performance analysis for site monitoring.
- */
-import { Line, Bar, Doughnut } from "react-chartjs-2";
-import { FiActivity, FiTrendingUp, FiBarChart2 } from "react-icons/fi";
-import { MdAnalytics, MdTrendingUp, MdSpeed, MdPieChart } from "react-icons/md";
-import { ConditionalResponseTime } from "../../dynamic-monitor-ui";
-import { DowntimePeriod } from "../../../hooks/site/useSiteAnalytics";
-import { logger } from "../../../services";
-import {
-    ThemedText,
-    ThemedButton,
-    ThemedCard,
-    ThemedBadge,
-    ThemedProgress,
-    useTheme,
-    useAvailabilityColors,
-} from "../../../theme";
-import { MonitorType } from "../../../types";
-/**
- * Props for the AnalyticsTab component.
- * Contains comprehensive metrics, chart data, and formatting functions.
- */
-interface AnalyticsTabProperties {
-    /** Average response time across all checks */
-    readonly avgResponseTime: number;
-    /** Chart.js data configuration for bar chart */
-    readonly barChartData: Record<string, unknown>;
-    /** Chart.js options configuration for bar chart */
-    readonly barChartOptions: Record<string, unknown>;
-    /** Chart.js options configuration for doughnut chart */
-    readonly doughnutOptions: Record<string, unknown>;
-    /** Number of failed checks */
-    readonly downCount: number;
-    /** Array of downtime periods with durations */
-    readonly downtimePeriods: DowntimePeriod[];
-    /** Function to format duration values */
-    readonly formatDuration: (ms: number) => string;
-    /** Function to format response time values */
-    readonly formatResponseTime: (time: number) => string;
-    /** Function to get description based on availability percentage */
-    readonly getAvailabilityDescription: (percentage: number) => string;
-    /** Chart.js data configuration for line chart */
-    readonly lineChartData: Record<string, unknown>;
-    /** Chart.js options configuration for line chart */
-    readonly lineChartOptions: Record<string, unknown>;
-    /** Type of monitor being analyzed */
-    readonly monitorType: MonitorType;
-    /** Mean time to recovery in milliseconds */
-    readonly mttr: number;
-    /** 50th percentile response time */
-    readonly p50: number;
-    /** 95th percentile response time */
-    readonly p95: number;
-    /** 99th percentile response time */
-    readonly p99: number;
-    /** Function to toggle advanced metrics visibility */
-    readonly setShowAdvancedMetrics: (show: boolean) => void;
-    /** Function to set the chart time range */
-    readonly setSiteDetailsChartTimeRange: (range: "1h" | "24h" | "7d" | "30d") => void;
-    /** Whether advanced metrics are currently shown */
-    readonly showAdvancedMetrics: boolean;
-    /** Current chart time range selection */
-    readonly siteDetailsChartTimeRange: "1h" | "24h" | "7d" | "30d";
-    /** Total number of checks performed */
-    readonly totalChecks: number;
-    /** Total downtime in milliseconds */
-    readonly totalDowntime: number;
-    /** Number of successful checks */
-    readonly upCount: number;
-    /** Uptime percentage as string */
-    readonly uptime: string;
-    /** Chart.js data configuration for uptime chart */
-    readonly uptimeChartData: Record<string, unknown>;
-}
-⋮----
-/** Average response time across all checks */
-⋮----
-/** Chart.js data configuration for bar chart */
-⋮----
-/** Chart.js options configuration for bar chart */
-⋮----
-/** Chart.js options configuration for doughnut chart */
-⋮----
-/** Number of failed checks */
-⋮----
-/** Array of downtime periods with durations */
-⋮----
-/** Function to format duration values */
-⋮----
-/** Function to format response time values */
-⋮----
-/** Function to get description based on availability percentage */
-⋮----
-/** Chart.js data configuration for line chart */
-⋮----
-/** Chart.js options configuration for line chart */
-⋮----
-/** Type of monitor being analyzed */
-⋮----
-/** Mean time to recovery in milliseconds */
-⋮----
-/** 50th percentile response time */
-⋮----
-/** 95th percentile response time */
-⋮----
-/** 99th percentile response time */
-⋮----
-/** Function to toggle advanced metrics visibility */
-⋮----
-/** Function to set the chart time range */
-⋮----
-/** Whether advanced metrics are currently shown */
-⋮----
-/** Current chart time range selection */
-⋮----
-/** Total number of checks performed */
-⋮----
-/** Total downtime in milliseconds */
-⋮----
-/** Number of successful checks */
-⋮----
-/** Uptime percentage as string */
-⋮----
-/** Chart.js data configuration for uptime chart */
-⋮----
-/**
- * Analytics tab component displaying comprehensive monitoring analytics and visualizations.
- *
- * Features:
- * - Multiple chart types (line, bar, doughnut) for different metrics
- * - Key performance indicators (uptime, response time, availability)
- * - Advanced metrics (percentiles, MTTR, downtime analysis)
- * - Interactive charts with time range filtering
- * - Downtime period analysis
- * - Export capabilities for chart data
- *
- * @param props - Component props containing metrics and chart configurations
- * @returns JSX element displaying analytics interface
- */
-⋮----
-// Function to get response time color based on performance
-const getResponseTimeColor = (responseTime: number): string =>
-⋮----
-} // Green for excellent (≤100ms)
-⋮----
-} // Yellow for good (≤500ms)
-return currentTheme.colors.error; // Red for poor (>500ms)
-⋮----
-// Icon colors configuration
-const getIconColors = () =>
-⋮----
-{/* Time Range Selector */}
-⋮----
-setSiteDetailsChartTimeRange(range);
-⋮----
-{/* Key Metrics Grid */}
-⋮----
-
-⋮----
-{/* Average Response Time Card - Available for all current monitor types */}
-⋮----
-icon=
-⋮----
-{/* Response Time Percentiles */}
-⋮----
-{/* Charts Grid */}
-⋮----
-{/* Response Time Chart */}
-⋮----
-{/* Uptime Doughnut Chart */}
-⋮----
-{/* Status Distribution Bar Chart */}
 </file>
 
 <file path="src/components/SiteDetails/tabs/OverviewTab.tsx">
@@ -9693,87 +9147,6 @@ export async function handleSQLiteBackupDownload(downloadFunction: () => Promise
 // Clean up object URL
 </file>
 
-<file path="src/stores/sites/utils/statusUpdateHandler.ts">
-/**
- * Status update handler utility for managing site status updates.
- * Provides optimized incremental updates and fallback mechanisms.
- */
-import type { Site, StatusUpdate } from "../../types";
-import { logStoreAction, waitForElectronAPI } from "../../utils";
-export interface StatusUpdateHandlerOptions {
-    /** Function to get current sites */
-    getSites: () => Site[];
-    /** Function to set sites */
-    setSites: (sites: Site[]) => void;
-    /** Function to trigger full sync */
-    fullSyncFromBackend: () => Promise<void>;
-    /** Optional callback for additional processing */
-    onUpdate?: (update: StatusUpdate) => void;
-}
-⋮----
-/** Function to get current sites */
-⋮----
-/** Function to set sites */
-⋮----
-/** Function to trigger full sync */
-⋮----
-/** Optional callback for additional processing */
-⋮----
-/**
- * Creates a status update handler with optimized incremental updates
- */
-export function createStatusUpdateHandler(options: StatusUpdateHandlerOptions)
-⋮----
-// Call the optional callback first
-⋮----
-// Smart incremental update - use the payload data directly
-⋮----
-// Use the complete updated site data from the backend
-⋮----
-return site; // Keep other sites unchanged
-⋮----
-// Check if the site was actually found and updated
-⋮----
-// Update store state efficiently
-⋮----
-// Site not found in current state - trigger full sync as fallback
-⋮----
-// Fallback to full sync on any processing error
-⋮----
-/**
- * Manages status update subscriptions
- */
-export class StatusUpdateManager {
-⋮----
-/**
-     * Subscribe to status updates and monitoring events
-     */
-async subscribe(
-        handler: (update: StatusUpdate) => Promise<void>,
-        fullSyncHandler?: () => Promise<void>
-): Promise<void>
-⋮----
-// If already subscribed, unsubscribe first to avoid duplicates
-⋮----
-// Always wait for electronAPI to be ready before subscribing
-⋮----
-// Subscribe to status updates
-⋮----
-// Subscribe to monitoring state changes
-⋮----
-/**
-     * Unsubscribe from status updates and monitoring events
-     */
-unsubscribe(): void
-⋮----
-// Remove all listeners for the update-status channel
-⋮----
-/**
-     * Check if currently subscribed
-     */
-isSubscribed(): boolean
-</file>
-
 <file path="src/theme/ThemeManager.ts">
 /**
  * ThemeManager class for handling theme selection, system preference detection,
@@ -10002,6 +9375,52 @@ const getAvailabilityVariant = (percentage: number): "success" | "warning" | "da
 const getAvailabilityDescription = (percentage: number): string =>
 </file>
 
+<file path="src/utils/monitorValidation.ts">
+/**
+ * Registry-based monitor validation utilities.
+ * Uses the backend monitor type registry for consistent validation.
+ */
+import type { MonitorType } from "../types";
+/**
+ * Validate monitor data using backend registry.
+ *
+ * @param type - Monitor type
+ * @param data - Monitor data to validate
+ * @returns Promise resolving to validation result
+ */
+export async function validateMonitorData(
+    type: MonitorType,
+    data: Record<string, unknown>
+): Promise<
+⋮----
+// Use IPC to validate via backend registry
+⋮----
+// Handle the advanced validation result format
+⋮----
+/**
+ * Validate individual monitor field.
+ *
+ * @param type - Monitor type
+ * @param fieldName - Field name to validate
+ * @param value - Field value
+ * @returns Promise resolving to validation errors (empty if valid)
+ */
+export async function validateMonitorField(type: MonitorType, fieldName: string, value: unknown): Promise<string[]>
+⋮----
+// Use the full validation and extract errors for this field
+⋮----
+// Filter errors to only include those for the specific field
+⋮----
+/**
+ * Create monitor object with proper field mapping.
+ *
+ * @param type - Monitor type
+ * @param fields - Field values
+ * @returns Monitor object with type-specific fields
+ */
+export function createMonitorObject(type: MonitorType, fields: Record<string, unknown>): Record<string, unknown>
+</file>
+
 <file path="electron/constants.ts">
 /**
  * Backend constants for the Uptime Watcher application.
@@ -10126,12 +9545,14 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
      * Create a new typed event bus.
      *
      * @param name - Optional name for the bus (used in logging and diagnostics)
+     * @param options - Optional configuration options
      *
      * @remarks
      * If no name is provided, a unique correlation ID will be generated.
      * The bus is configured with a reasonable max listener limit for development use.
+     * A maximum middleware limit prevents memory leaks from excessive middleware registration.
      */
-constructor(name?: string)
+constructor(name?: string, options?:
 ⋮----
 // Set max listeners to prevent warnings in development
 ⋮----
@@ -10139,10 +9560,15 @@ constructor(name?: string)
      * Register middleware to process events before emission.
      *
      * @param middleware - Middleware function to register
+     * @throws {@link Error} When the maximum middleware limit is exceeded
      *
      * @remarks
      * Middleware is executed in registration order. Each middleware must call
      * `next()` to continue the chain or throw an error to abort processing.
+     *
+     * A maximum middleware limit prevents memory leaks from excessive registrations.
+     * If you need more middleware, consider increasing the limit in the constructor
+     * or combining multiple middleware functions into one.
      */
 use(middleware: EventMiddleware): void
 /**
@@ -10294,6 +9720,10 @@ export interface EventBusDiagnostics {
     busId: string;
     /** Number of registered middleware functions */
     middlewareCount: number;
+    /** Maximum number of middleware functions allowed */
+    maxMiddleware: number;
+    /** Percentage of middleware slots used (0-100) */
+    middlewareUtilization: number;
     /** Number of listeners registered for each event */
     listenerCounts: Record<string, number>;
     /** Maximum number of listeners allowed per event */
@@ -10304,6 +9734,10 @@ export interface EventBusDiagnostics {
 ⋮----
 /** Number of registered middleware functions */
 ⋮----
+/** Maximum number of middleware functions allowed */
+⋮----
+/** Percentage of middleware slots used (0-100) */
+⋮----
 /** Number of listeners registered for each event */
 ⋮----
 /** Maximum number of listeners allowed per event */
@@ -10312,11 +9746,12 @@ export interface EventBusDiagnostics {
  * Utility function to create a typed event bus instance.
  *
  * @param name - Optional name for the bus
+ * @param options - Optional configuration options
  * @returns A new TypedEventBus instance
  *
  * @remarks
  * Convenience factory function for creating typed event bus instances.
- * Equivalent to `new TypedEventBus<EventMap>(name)`.
+ * Equivalent to `new TypedEventBus<EventMap>(name, options)`.
  *
  * @example
  * ```typescript
@@ -10324,10 +9759,13 @@ export interface EventBusDiagnostics {
  *   'user:login': { userId: string };
  * }
  *
- * const bus = createTypedEventBus<AppEvents>('main-bus');
+ * const bus = createTypedEventBus<AppEvents>('main-bus', { maxMiddleware: 50 });
  * ```
  */
-export function createTypedEventBus<EventMap extends Record<string, unknown>>(name?: string): TypedEventBus<EventMap>
+export function createTypedEventBus<EventMap extends Record<string, unknown>>(
+    name?: string,
+    options?: { maxMiddleware?: number }
+): TypedEventBus<EventMap>
 </file>
 
 <file path="electron/services/database/utils/databaseSchema.ts">
@@ -10411,159 +9849,6 @@ export function setupMonitorTypeValidation(): void
 // Future versions could add a CHECK constraint or trigger
 </file>
 
-<file path="electron/services/monitoring/HttpMonitor.ts">
-/**
- * HTTP/HTTPS monitoring service for web endpoint health checks.
- *
- * @remarks
- * Provides comprehensive HTTP monitoring capabilities with advanced Axios features
- * for optimal performance and reliability. Supports precise response time measurement,
- * per-monitor timeout configuration, and intelligent status code interpretation.
- *
- * Key features:
- * - Precise response time measurement using performance.now()
- * - Per-monitor timeout configuration support
- * - Intelligent status code handling (2xx/4xx = up, 5xx = down)
- * - Connection pooling with HTTP/HTTPS agents
- * - Request/response size limits for security
- * - Comprehensive error handling with network detection
- * - Retry logic for transient failures
- *
- * @example
- * ```typescript
- * const httpMonitor = new HttpMonitor({ timeout: 5000 });
- * const result = await httpMonitor.check({
- *   id: "mon_1",
- *   type: "http",
- *   url: "https://example.com",
- *   status: "pending",
- *   // ... other monitor properties
- * });
- * console.log(`Status: ${result.status}, Response time: ${result.responseTime}ms`);
- * ```
- *
- * @packageDocumentation
- */
-import { AxiosInstance } from "axios";
-import { DEFAULT_REQUEST_TIMEOUT, RETRY_BACKOFF, USER_AGENT } from "../../constants";
-import { isDev } from "../../electronUtils";
-import { Site } from "../../types";
-import { logger, withRetry } from "../../utils/index";
-import { IMonitorService, MonitorCheckResult, MonitorConfig } from "./types";
-import { determineMonitorStatus, handleCheckError, createHttpClient, createErrorResult } from "./utils";
-/**
- * Declaration merging to extend Axios types with timing metadata.
- *
- * @remarks
- * Extends Axios request/response interfaces to support precise timing measurements
- * through request interceptors and response metadata.
- */
-⋮----
-/** Extended request config with timing metadata */
-interface InternalAxiosRequestConfig {
-        metadata?: {
-            /** High-precision start time for response time calculation */
-            startTime: number;
-        };
-    }
-⋮----
-/** High-precision start time for response time calculation */
-⋮----
-/** Extended response with calculated response time */
-interface AxiosResponse {
-        /** Calculated response time in milliseconds */
-        responseTime?: number;
-    }
-⋮----
-/** Calculated response time in milliseconds */
-⋮----
-/** Extended error with response time (if available) */
-interface AxiosError {
-        /** Response time at point of failure (if available) */
-        responseTime?: number;
-    }
-⋮----
-/** Response time at point of failure (if available) */
-⋮----
-/**
- * Service for performing HTTP/HTTPS monitoring checks.
- *
- * @remarks
- * Implements the IMonitorService interface to provide HTTP endpoint monitoring
- * with advanced features for reliability and performance. Uses Axios with custom
- * interceptors for precise timing and comprehensive error handling.
- *
- * The service is designed for monitoring use cases where response time accuracy
- * and failure detection are critical. It includes intelligent status code
- * interpretation suitable for uptime monitoring scenarios.
- */
-export class HttpMonitor implements IMonitorService {
-⋮----
-/** Configuration for HTTP monitoring behavior */
-⋮----
-/** Axios instance with custom interceptors and configuration */
-⋮----
-/**
-     * Initialize the HTTP monitor with optional configuration.
-     *
-     * @param config - Optional configuration overrides for HTTP monitoring
-     *
-     * @remarks
-     * Creates an Axios instance with optimized settings for monitoring,
-     * including timing interceptors, appropriate timeouts, and security limits.
-     */
-constructor(config: MonitorConfig =
-⋮----
-// Create Axios instance with advanced configuration (best practices)
-⋮----
-/**
-     * Get the monitor type this service handles.
-     */
-public getType(): Site["monitors"][0]["type"]
-/**
-     * Perform an HTTP health check on the given monitor.
-     * Uses per-monitor retry attempts and timeout configuration.
-     */
-public async check(monitor: Site["monitors"][0]): Promise<MonitorCheckResult>
-/**
-     * Perform health check with retry logic.
-     */
-private async performHealthCheckWithRetry(
-        url: string,
-        timeout: number,
-        maxRetries: number
-): Promise<MonitorCheckResult>
-⋮----
-// Convert maxRetries (additional attempts) to totalAttempts for withRetry utility
-⋮----
-/**
-     * Perform a single health check attempt without retry logic.
-     */
-private async performSingleHealthCheck(url: string, timeout: number): Promise<MonitorCheckResult>
-⋮----
-// Determine status based on HTTP status code
-⋮----
-/**
-     * Make the actual HTTP request using Axios.
-     */
-private async makeRequest(url: string, timeout: number)
-⋮----
-// Use our configured Axios instance with specific timeout override
-⋮----
-/**
-     * Update the configuration for this monitor.
-     * Recreates the Axios instance with updated configuration.
-     */
-public updateConfig(config: Partial<MonitorConfig>): void
-⋮----
-// Recreate Axios instance with updated configuration
-⋮----
-/**
-     * Get the current configuration.
-     */
-public getConfig(): MonitorConfig
-</file>
-
 <file path="electron/services/monitoring/MonitorFactory.ts">
 /* eslint-disable @typescript-eslint/no-extraneous-class */
 import { Site } from "../../types";
@@ -10607,6 +9892,224 @@ public static getAvailableTypes(): string[]
      * Useful for testing or configuration reloading.
      */
 public static clearCache(): void
+</file>
+
+<file path="electron/services/monitoring/MonitorTypeRegistry.ts">
+/**
+ * Extensible monitor type system for new monitoring capabilities.
+ *
+ * @remarks
+ * This new architecture replaces hard-coded monitor types with a plugin-based
+ * system that allows easy addition of new monitor types without code changes
+ * in multiple files.
+ */
+import { z } from "zod";
+import validator from "validator";
+import { HttpMonitor } from "./HttpMonitor";
+import { PortMonitor } from "./PortMonitor";
+import { EnhancedTypeGuard } from "./EnhancedTypeGuards";
+import { migrationRegistry, versionManager, createMigrationOrchestrator, exampleMigrations } from "./MigrationSystem";
+import { logger } from "../../utils/logger";
+// Field definition for dynamic form generation
+export interface MonitorFieldDefinition {
+    /** Field name (matches monitor property) */
+    name: string;
+    /** Display label for the field */
+    label: string;
+    /** Input type for form rendering */
+    type: "text" | "number" | "url";
+    /** Whether field is required */
+    required: boolean;
+    /** Placeholder text */
+    placeholder?: string;
+    /** Help text for the field */
+    helpText?: string;
+    /** Min value for number fields */
+    min?: number;
+    /** Max value for number fields */
+    max?: number;
+}
+⋮----
+/** Field name (matches monitor property) */
+⋮----
+/** Display label for the field */
+⋮----
+/** Input type for form rendering */
+⋮----
+/** Whether field is required */
+⋮----
+/** Placeholder text */
+⋮----
+/** Help text for the field */
+⋮----
+/** Min value for number fields */
+⋮----
+/** Max value for number fields */
+⋮----
+// UI configuration for monitor type display
+export interface MonitorUIConfig {
+    /** Detail label formatter function name */
+    detailLabelFormatter?: string;
+    /** Chart data formatters */
+    chartFormatters?: {
+        responseTime?: boolean;
+        uptime?: boolean;
+        advanced?: boolean;
+    };
+    /** Help text for form fields */
+    helpTexts?: {
+        primary?: string;
+        secondary?: string;
+    };
+    /** Display preferences */
+    display?: {
+        showUrl?: boolean;
+        showPort?: boolean;
+        showAdvancedMetrics?: boolean;
+    };
+}
+⋮----
+/** Detail label formatter function name */
+⋮----
+/** Chart data formatters */
+⋮----
+/** Help text for form fields */
+⋮----
+/** Display preferences */
+⋮----
+// Base monitor type definition
+export interface BaseMonitorConfig {
+    /** Unique identifier for the monitor type */
+    readonly type: string;
+    /** Human-readable display name */
+    readonly displayName: string;
+    /** Description of what this monitor checks */
+    readonly description: string;
+    /** Version of the monitor implementation */
+    readonly version: string;
+    /** Field definitions for dynamic form generation */
+    readonly fields: MonitorFieldDefinition[];
+    /** Zod validation schema for this monitor type */
+    readonly validationSchema: z.ZodSchema;
+    /** Factory function to create monitor service instances */
+    readonly serviceFactory: () => import("./types").IMonitorService;
+⋮----
+/** Unique identifier for the monitor type */
+⋮----
+/** Human-readable display name */
+⋮----
+/** Description of what this monitor checks */
+⋮----
+/** Version of the monitor implementation */
+⋮----
+/** Field definitions for dynamic form generation */
+⋮----
+/** Zod validation schema for this monitor type */
+⋮----
+/** Factory function to create monitor service instances */
+⋮----
+/** UI display configuration */
+⋮----
+/** Function to format detail display in history (e.g., "Port: 80", "Response Code: 200") */
+⋮----
+/** Function to format title suffix for history charts (e.g., " (https://example.com)") */
+⋮----
+/** Whether this monitor type supports response time analytics */
+⋮----
+/** Whether this monitor type supports advanced analytics */
+⋮----
+/** Help text for form fields */
+⋮----
+/** Display preferences */
+⋮----
+/** Detail label formatter for different contexts */
+⋮----
+/** Format for history detail column */
+⋮----
+/** Format for analytics display */
+⋮----
+// Shared validation schemas using Zod with enhanced validation
+⋮----
+// Use validator.js for robust URL validation
+⋮----
+// Use validator.js for robust host validation
+⋮----
+// Registry for monitor types
+⋮----
+/**
+ * Register a new monitor type.
+ *
+ * @param config - Monitor type configuration
+ */
+export function registerMonitorType(config: BaseMonitorConfig): void
+/**
+ * Get all registered monitor types.
+ *
+ * @returns Array of registered monitor types
+ */
+export function getRegisteredMonitorTypes(): string[]
+/**
+ * Get all registered monitor types with their configurations.
+ *
+ * @returns Array of monitor type configurations
+ */
+export function getAllMonitorTypeConfigs(): BaseMonitorConfig[]
+/**
+ * Check if a monitor type is registered.
+ *
+ * @param type - Monitor type to check
+ * @returns True if type is registered
+ */
+export function isValidMonitorType(type: string): boolean
+/**
+ * Get configuration for a monitor type.
+ *
+ * @param type - Monitor type
+ * @returns Monitor configuration or undefined
+ */
+export function getMonitorTypeConfig(type: string): BaseMonitorConfig | undefined
+/**
+ * Get service factory for a monitor type.
+ *
+ * @param type - Monitor type
+ * @returns Service factory function or undefined
+ */
+⋮----
+/**
+ * Validate monitor data using Zod schemas.
+ *
+ * @param type - Monitor type
+ * @param data - Monitor data to validate
+ * @returns Validation result
+ */
+⋮----
+// Register existing monitor types with their field definitions and schemas
+⋮----
+// Register example migrations for the migration system
+⋮----
+// Set current versions for existing monitor types
+⋮----
+// Enhanced type guard for better runtime validation
+⋮----
+// Use enhanced type guard validation
+⋮----
+// Create monitor object with proper validation
+⋮----
+// Database migration helper - properly implemented with basic migration system
+⋮----
+// Validate the monitor type
+⋮----
+// Check if migration is needed
+⋮----
+// If no data provided, just return success for version bump
+⋮----
+// Use the migration orchestrator for data migration
+⋮----
+// Type guard for runtime validation
+⋮----
+// Generate union type from registered monitor types
+⋮----
+// Helper to get the current monitor types as a union
 </file>
 
 <file path="electron/UptimeOrchestrator.ts">
@@ -11400,269 +10903,6 @@ applyUpdate();
 {/* Site Details Modal */}
 </file>
 
-<file path="src/components/AddSiteForm/AddSiteForm.tsx">
-/**
- * AddSiteForm component for creating new sites and adding monitors to existing sites.
- * Provides a comprehensive form with validation and flexible configuration options.
- * Supports both HTTP and port monitoring types, with customizable check intervals.
- */
-import React, { useState, useEffect, useCallback } from "react";
-import { UI_DELAYS, CHECK_INTERVALS } from "../../constants";
-import { logger } from "../../services";
-import { useErrorStore, useSitesStore } from "../../stores";
-import { ThemedBox, ThemedText, ThemedButton, useTheme } from "../../theme";
-import type { MonitorType } from "../../types";
-import { generateUuid } from "../../utils/data/generateUuid";
-import { TextField, SelectField, RadioGroup } from "./FormFields";
-import { useDynamicHelpText } from "../dynamic-monitor-ui";
-import { DynamicMonitorFields } from "./DynamicMonitorFields";
-import { handleSubmit } from "./Submit";
-import { useAddSiteForm } from "../SiteDetails/useAddSiteForm";
-import { useMonitorTypes } from "../../hooks/useMonitorTypes";
-/**
- * Main form component for adding new monitoring sites or monitors.
- *
- * Features:
- * - Create new sites with monitors
- * - Add monitors to existing sites
- * - Support for HTTP and port monitoring
- * - Form validation and error handling
- * - Configurable check intervals
- * - Responsive design with loading states
- *
- * The component uses a custom hook (useAddSiteForm) for state management
- * and modular sub-components for form fields and submission handling.
- *
- * @returns JSX element containing the complete add site form
- */
-⋮----
-// Load monitor types from backend
-⋮----
-// Use our custom hook for form state management
-⋮----
-// Get dynamic help text for the current monitor type
-⋮----
-// Delayed loading state for button spinner (100ms delay)
-⋮----
-return () => {}; // Return empty cleanup function for consistency
-⋮----
-// Memoized submit handler
-⋮----
-onSuccess: resetForm, // Reset form on successful submission
-⋮----
-// Memoized error clear handler
-⋮----
-{/* Add mode toggle */}
-⋮----
-{/* Existing site selector */}
-⋮----
-{/* Site Name (only for new site) */}
-⋮----
-{/* Show generated UUID (for new site) */}
-⋮----
-{/* Monitor Type Selector */}
-⋮----
-{/* Dynamic Monitor Fields */}
-⋮----
-{/* Error Message */}
-</file>
-
-<file path="src/components/AddSiteForm/Submit.tsx">
-/**
- * Form submission handling utilities for the AddSiteForm component.
- *
- * @remarks
- * Provides validation and submission logic for creating new sites or adding
- * monitors to existing sites. Supports HTTP and port monitor types with
- * comprehensive validation and error handling.
- *
- * @packageDocumentation
- */
-import type { Logger } from "../../services/logger";
-import type { Monitor, MonitorType } from "../../types";
-import type { AddSiteFormState, AddSiteFormActions } from "../SiteDetails/useAddSiteForm";
-import { DEFAULT_REQUEST_TIMEOUT, RETRY_CONSTRAINTS } from "../../constants";
-import { validateMonitorData } from "../../utils/monitorValidation";
-import { getMonitorTypeConfig } from "../../utils/monitorTypeHelper";
-/**
- * Store actions interface for form submission operations.
- *
- * @remarks
- * Defines the required store methods needed for form submission. This interface
- * decouples the submission logic from specific store implementations, making
- * the code more testable and flexible.
- */
-interface StoreActions {
-    /** Add a monitor to an existing site */
-    addMonitorToSite: (siteId: string, monitor: Monitor) => Promise<void>;
-    /** Clear any existing error state */
-    clearError: () => void;
-    /** Create a new site with monitors */
-    createSite: (siteData: { identifier: string; monitors: Monitor[]; name?: string }) => Promise<void>;
-}
-⋮----
-/** Add a monitor to an existing site */
-⋮----
-/** Clear any existing error state */
-⋮----
-/** Create a new site with monitors */
-⋮----
-/**
- * Properties interface for form submission handling.
- *
- * @remarks
- * Combines form state, actions, and store methods for the submission handler.
- */
-type FormSubmitProperties = AddSiteFormState &
-    Pick<AddSiteFormActions, "setFormError"> &
-    StoreActions & {
-        /** UUID generator function for creating unique identifiers */
-        generateUuid: () => string;
-        /** Logger instance for debugging and error tracking */
-        logger: Logger;
-        /** Optional callback executed after successful submission */
-        onSuccess?: () => void;
-    };
-⋮----
-/** UUID generator function for creating unique identifiers */
-⋮----
-/** Logger instance for debugging and error tracking */
-⋮----
-/** Optional callback executed after successful submission */
-⋮----
-/**
- * Validates the add mode selection and site information.
- *
- * @param addMode - Mode of adding ("new" or "existing")
- * @param name - Site name for new sites
- * @param selectedExistingSite - Selected existing site identifier
- * @returns Array of validation error messages
- */
-function validateAddMode(addMode: string, name: string, selectedExistingSite: string): string[]
-/**
- * Builds monitor data object dynamically based on monitor type configuration.
- *
- * @param monitorType - Type of monitor
- * @param formData - Form data containing field values
- * @returns Monitor data object with type-specific fields
- */
-async function buildMonitorData(
-    monitorType: MonitorType,
-    formData: { url: string; host: string; port: string }
-): Promise<Record<string, unknown>>
-⋮----
-// Dynamically map form fields to monitor data based on field definitions
-⋮----
-// Convert value based on field type
-⋮----
-// eslint-disable-next-line security/detect-object-injection -- fieldName comes from trusted monitor config
-⋮----
-// eslint-disable-next-line security/detect-object-injection -- fieldName comes from trusted monitor config
-⋮----
-// Fallback to hardcoded mapping if config is unavailable
-⋮----
-// Fallback to hardcoded mapping
-⋮----
-/**
- * Validates monitor type-specific configuration using backend registry.
- *
- * @param monitorType - Type of monitor
- * @param url - URL for HTTP monitors
- * @param host - Host for port monitors
- * @param port - Port for port monitors
- * @returns Promise resolving to array of validation error messages
- */
-async function validateMonitorType(monitorType: string, url: string, host: string, port: string): Promise<string[]>
-⋮----
-// Build monitor data object dynamically
-⋮----
-// Use backend registry validation
-⋮----
-/**
- * Validates check interval configuration.
- *
- * @param checkInterval - Check interval in milliseconds
- * @returns Array of validation error messages
- */
-function validateCheckInterval(checkInterval: number): string[]
-/**
- * Creates a monitor object based on the form data.
- */
-async function createMonitor(properties: FormSubmitProperties): Promise<Monitor>
-⋮----
-monitoring: true, // Default to monitoring enabled
-responseTime: -1, // Sentinel value for never checked
-retryAttempts: RETRY_CONSTRAINTS.DEFAULT, // Explicit default retry attempts
-⋮----
-timeout: DEFAULT_REQUEST_TIMEOUT, // Explicit default timeout
-⋮----
-// Add type-specific fields dynamically using monitor config
-⋮----
-// Copy the type-specific fields to the monitor object
-⋮----
-// Skip the type field as it's already set
-// eslint-disable-next-line security/detect-object-injection -- key comes from trusted monitor config
-⋮----
-/**
- * Submits a new site with monitor.
- */
-async function submitNewSite(properties: FormSubmitProperties, monitor: Monitor): Promise<void>
-⋮----
-monitoring: true, // Default to monitoring enabled
-name: trimmedName || "Unnamed Site", // Provide default name
-⋮----
-/**
- * Adds monitor to existing site.
- */
-async function addToExistingSite(properties: FormSubmitProperties, monitor: Monitor): Promise<void>
-/**
- * Performs the actual submission based on add mode.
- */
-async function performSubmission(properties: FormSubmitProperties, monitor: Monitor): Promise<void>
-/**
- * Handles form submission for adding sites or monitors.
- *
- * Performs comprehensive validation based on add mode and monitor type:
- * - For new sites: validates site name and monitor configuration
- * - For existing sites: validates site selection and monitor configuration
- * - For HTTP monitors: validates URL format and protocol
- * - For port monitors: validates host and port number
- *
- * @param e - Form submission event
- * @param props - Form state, actions, and dependencies
- * @returns Promise that resolves when submission is complete
- *
- * @example
- * ```tsx
- * const handleFormSubmit = (e: React.FormEvent) => {
- *   handleSubmit(e, {
- *     ...formState,
- *     ...formActions,
- *     ...storeActions,
- *     generateUuid,
- *     logger,
- *     onSuccess: () => setIsVisible(false)
- *   });
- * };
- * ```
- */
-export async function handleSubmit(event: React.FormEvent, properties: FormSubmitProperties)
-⋮----
-// Log submission start
-⋮----
-// Collect all validation errors
-⋮----
-// Handle validation failures
-⋮----
-host: host.slice(0, 50), // Truncate for privacy
-⋮----
-name: name.slice(0, 50), // Truncate for privacy
-⋮----
-url: url.slice(0, 50), // Truncate for privacy
-⋮----
-setFormError(validationErrors[0]); // Show first error
-</file>
-
 <file path="src/components/SiteDetails/SiteDetails.tsx">
 /**
  * Site details view component with comprehensive tabbed interface.
@@ -11800,86 +11040,315 @@ const handleKeyDown = (event: React.KeyboardEvent) =>
 {/* Tab Content */}
 </file>
 
-<file path="src/components/SiteDetails/tabs/HistoryTab.tsx">
+<file path="src/components/SiteDetails/tabs/AnalyticsTab.tsx">
 /**
- * History tab component for displaying monitor check history.
- * Provide    // Dropdown options: 25, 50, 100, All (clamped to backendLimit and available history)
-    const maxShow = Math.min(backendLimit, historyLength); pagination, and detailed history records view.
+ * Analytics tab component providing comprehensive monitoring statistics and visualizations.
+ * Displays advanced metrics, charts, and performance analysis for site monitoring.
  */
-import { useState, useEffect, useRef } from "react";
-import { FiFilter } from "react-icons/fi";
-import { MdHistory } from "react-icons/md";
+import { Line, Bar, Doughnut } from "react-chartjs-2";
+import { FiActivity, FiTrendingUp, FiBarChart2 } from "react-icons/fi";
+import { MdAnalytics, MdTrendingUp, MdSpeed, MdPieChart } from "react-icons/md";
+import { ConditionalResponseTime } from "../../common/MonitorUiComponents";
+import { DowntimePeriod } from "../../../hooks/site/useSiteAnalytics";
 import { logger } from "../../../services";
-import { useSettingsStore } from "../../../stores";
-import { ThemedText, ThemedButton, StatusIndicator, ThemedCard, ThemedSelect, useTheme } from "../../../theme";
-import { StatusHistory, Monitor } from "../../../types";
-import { DetailLabel } from "../../dynamic-monitor-ui";
+import {
+    ThemedText,
+    ThemedButton,
+    ThemedCard,
+    ThemedBadge,
+    ThemedProgress,
+    useTheme,
+    useAvailabilityColors,
+} from "../../../theme";
+import { MonitorType } from "../../../types";
 /**
- * Get the formatted label for filter buttons
- * @param filter - The filter type
- * @returns The formatted label for the filter button
+ * Props for the AnalyticsTab component.
+ * Contains comprehensive metrics, chart data, and formatting functions.
  */
-function getFilterButtonLabel(filter: "all" | "up" | "down"): string
-/**
- * Props for the HistoryTab component.
- */
-interface HistoryTabProperties {
-    /** Function to format timestamps for display */
-    readonly formatFullTimestamp: (timestamp: number) => string;
-    /** Function to format response times for display */
+interface AnalyticsTabProperties {
+    /** Average response time across all checks */
+    readonly avgResponseTime: number;
+    /** Chart.js data configuration for bar chart */
+    readonly barChartData: Record<string, unknown>;
+    /** Chart.js options configuration for bar chart */
+    readonly barChartOptions: Record<string, unknown>;
+    /** Chart.js options configuration for doughnut chart */
+    readonly doughnutOptions: Record<string, unknown>;
+    /** Number of failed checks */
+    readonly downCount: number;
+    /** Array of downtime periods with durations */
+    readonly downtimePeriods: DowntimePeriod[];
+    /** Function to format duration values */
+    readonly formatDuration: (ms: number) => string;
+    /** Function to format response time values */
     readonly formatResponseTime: (time: number) => string;
-    /** Function to format status with appropriate icons */
-    readonly formatStatusWithIcon: (status: string) => string;
-    /** Currently selected monitor to display history for */
-    readonly selectedMonitor: Monitor;
+    /** Function to get description based on availability percentage */
+    readonly getAvailabilityDescription: (percentage: number) => string;
+    /** Chart.js data configuration for line chart */
+    readonly lineChartData: Record<string, unknown>;
+    /** Chart.js options configuration for line chart */
+    readonly lineChartOptions: Record<string, unknown>;
+    /** Type of monitor being analyzed */
+    readonly monitorType: MonitorType;
+    /** Mean time to recovery in milliseconds */
+    readonly mttr: number;
+    /** 50th percentile response time */
+    readonly p50: number;
+    /** 95th percentile response time */
+    readonly p95: number;
+    /** 99th percentile response time */
+    readonly p99: number;
+    /** Function to toggle advanced metrics visibility */
+    readonly setShowAdvancedMetrics: (show: boolean) => void;
+    /** Function to set the chart time range */
+    readonly setSiteDetailsChartTimeRange: (range: "1h" | "24h" | "7d" | "30d") => void;
+    /** Whether advanced metrics are currently shown */
+    readonly showAdvancedMetrics: boolean;
+    /** Current chart time range selection */
+    readonly siteDetailsChartTimeRange: "1h" | "24h" | "7d" | "30d";
+    /** Total number of checks performed */
+    readonly totalChecks: number;
+    /** Total downtime in milliseconds */
+    readonly totalDowntime: number;
+    /** Number of successful checks */
+    readonly upCount: number;
+    /** Uptime percentage as string */
+    readonly uptime: string;
+    /** Chart.js data configuration for uptime chart */
+    readonly uptimeChartData: Record<string, unknown>;
 }
 ⋮----
-/** Function to format timestamps for display */
+/** Average response time across all checks */
 ⋮----
-/** Function to format response times for display */
+/** Chart.js data configuration for bar chart */
 ⋮----
-/** Function to format status with appropriate icons */
+/** Chart.js options configuration for bar chart */
 ⋮----
-/** Currently selected monitor to display history for */
+/** Chart.js options configuration for doughnut chart */
+⋮----
+/** Number of failed checks */
+⋮----
+/** Array of downtime periods with durations */
+⋮----
+/** Function to format duration values */
+⋮----
+/** Function to format response time values */
+⋮----
+/** Function to get description based on availability percentage */
+⋮----
+/** Chart.js data configuration for line chart */
+⋮----
+/** Chart.js options configuration for line chart */
+⋮----
+/** Type of monitor being analyzed */
+⋮----
+/** Mean time to recovery in milliseconds */
+⋮----
+/** 50th percentile response time */
+⋮----
+/** 95th percentile response time */
+⋮----
+/** 99th percentile response time */
+⋮----
+/** Function to toggle advanced metrics visibility */
+⋮----
+/** Function to set the chart time range */
+⋮----
+/** Whether advanced metrics are currently shown */
+⋮----
+/** Current chart time range selection */
+⋮----
+/** Total number of checks performed */
+⋮----
+/** Total downtime in milliseconds */
+⋮----
+/** Number of successful checks */
+⋮----
+/** Uptime percentage as string */
+⋮----
+/** Chart.js data configuration for uptime chart */
 ⋮----
 /**
- * History tab component displaying paginated monitor check history.
+ * Analytics tab component displaying comprehensive monitoring analytics and visualizations.
  *
  * Features:
- * - Filterable history by status (all, up, down)
- * - Configurable display limits with pagination
- * - Detailed history records with timestamps and response times
- * - Export functionality for history data
- * - User action logging for analytics
+ * - Multiple chart types (line, bar, doughnut) for different metrics
+ * - Key performance indicators (uptime, response time, availability)
+ * - Advanced metrics (percentiles, MTTR, downtime analysis)
+ * - Interactive charts with time range filtering
+ * - Downtime period analysis
+ * - Export capabilities for chart data
  *
- * @param props - Component props containing formatting functions and monitor data
- * @returns JSX element displaying history interface
+ * @param props - Component props containing metrics and chart configurations
+ * @returns JSX element displaying analytics interface
  */
 ⋮----
-// Track the last monitor ID we logged for to prevent duplicate logging
+// Function to get response time color based on performance
+const getResponseTimeColor = (responseTime: number): string =>
+⋮----
+} // Green for excellent (≤100ms)
+⋮----
+} // Yellow for good (≤500ms)
+return currentTheme.colors.error; // Red for poor (>500ms)
 ⋮----
 // Icon colors configuration
-const getIconColors = () => (
+const getIconColors = () =>
 ⋮----
-// Dropdown options: 25, 50, 100, All (clamped to backendLimit and available history)
+{/* Time Range Selector */}
 ⋮----
-// Always include 'All' if there are fewer than backendLimit
+setSiteDetailsChartTimeRange(range);
 ⋮----
-// Default to 50, but never more than backendLimit or available history
+{/* Key Metrics Grid */}
 ⋮----
-// Log when history tab is viewed - only when monitor actually changes
+
 ⋮----
-// eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally exclude selectedMonitor.history to prevent re-logging on history updates
+{/* Average Response Time Card - Available for all current monitor types */}
 ⋮----
-// Helper to render details with label using dynamic formatting
-function renderDetails(record: StatusHistory)
+icon=
 ⋮----
-// eslint-disable-next-line unicorn/no-null -- React components can return null
+{/* Response Time Percentiles */}
 ⋮----
-{/* History Controls */}
+{/* Charts Grid */}
 ⋮----
-{/* History List */}
+{/* Response Time Chart */}
 ⋮----
+{/* Uptime Doughnut Chart */}
+⋮----
+{/* Status Distribution Bar Chart */}
+</file>
+
+<file path="src/hooks/site/useSiteDetails.ts">
+/**
+ * Custom hook for managing site details state and operations
+ *
+ * Provides comprehensive state management for the site details view including:
+ * - Site data and monitor information
+ * - UI state (active tab, loading states)
+ * - Site operations (start/stop monitoring, check now, update settings)
+ * - Local state management for editable fields
+ * - Integration with analytics data
+ */
+import { useEffect, useState, useCallback } from "react";
+import { DEFAULT_CHECK_INTERVAL, DEFAULT_REQUEST_TIMEOUT_SECONDS } from "../../constants";
+import { logger } from "../../services";
+import { useErrorStore, useSitesStore, useUIStore } from "../../stores";
+import { Site } from "../../types";
+import { useSiteAnalytics } from "./useSiteAnalytics";
+/** Props for the useSiteDetails hook */
+interface UseSiteDetailsProperties {
+    /** The site object to manage details for */
+    site: Site;
+}
+⋮----
+/** The site object to manage details for */
+⋮----
+/**
+ * Hook for managing site details state and operations.
+ *
+ * Provides all necessary state and handlers for the site details view,
+ * including monitor selection, monitoring controls, settings management,
+ * and integration with analytics.
+ *
+ * @param props - Hook props containing the site to manage
+ * @returns Object containing all site details state and handlers
+ *
+ * @example
+ * ```tsx
+ * function SiteDetails({ site }) {
+ *   const {
+ *     currentSite,
+ *     selectedMonitor,
+ *     isLoading,
+ *     handleStartMonitoring,
+ *     handleStopMonitoring,
+ *     // ... other state and handlers
+ *   } = useSiteDetails({ site });
+ *
+ *   // Use the state and handlers in your component
+ * }
+ * ```
+ */
+export function useSiteDetails(
+⋮----
+// Always call hooks first, use fallback for currentSite
+⋮----
+monitoring: true, // Default to monitoring enabled
+⋮----
+name: "Unnamed Site", // Provide default name
+⋮----
+// Find the selected monitor, and if it doesn't exist, update the selection to the first monitor
+⋮----
+// Use useEffect to handle stale monitor ID updates (avoid state updates during render)
+⋮----
+// If the selected monitor ID is stale (doesn't exist), update it to match the actual selected monitor
+⋮----
+// Check interval state
+⋮----
+// Timeout state (stored in seconds for UI, converted to ms when saving)
+⋮----
+// Retry attempts state
+⋮----
+// Site name state for settings
+⋮----
+// Update local state when monitor changes
+⋮----
+// Track name changes
+⋮----
+// Handler for check now
+⋮----
+// No auto-refresh - respect the monitor's configured interval
+// Users can manually click "Check Now" if they want immediate updates
+// Handler for monitor selection change
+⋮----
+// If current tab is an analytics tab, switch to the new monitor's analytics tab
+⋮----
+// Handler for site removal
+⋮----
+// Handler for monitor removal
+⋮----
+// Site-level monitoring handlers
+⋮----
+// First, update the site's monitoring field in the database
+⋮----
+// Then start the actual monitoring processes
+⋮----
+// First, update the site's monitoring field in the database
+⋮----
+// Then stop the actual monitoring processes
+⋮----
+// Monitoring handlers
+⋮----
+// Interval change handlers
+⋮----
+// Timeout change handlers
+⋮----
+// Work directly with seconds in the UI
+⋮----
+// Compare against the monitor's timeout converted to seconds
+⋮----
+// Convert seconds to milliseconds when saving to backend
+⋮----
+// Retry attempts change handlers
+⋮----
+// Name save handler
+⋮----
+// Use analytics hook
+⋮----
+// Check if site exists
+⋮----
+// UI state
+⋮----
+// Analytics
+⋮----
+// Site data
+⋮----
+// Handlers
+⋮----
+// Name state
+⋮----
+// Interval state
+⋮----
+// Store actions
 </file>
 
 <file path="src/stores/sites/useSiteOperations.ts">
@@ -12055,6 +11524,96 @@ const getSites = ()
 // Monitoring actions
 ⋮----
 // Sync actions
+</file>
+
+<file path="src/stores/sites/utils/statusUpdateHandler.ts">
+/**
+ * Status update handler utility for managing site status updates.
+ * Provides optimized incremental updates and fallback mechanisms.
+ */
+import type { Site, StatusUpdate } from "../../types";
+import { logStoreAction, waitForElectronAPI } from "../../utils";
+export interface StatusUpdateHandlerOptions {
+    /** Function to get current sites */
+    getSites: () => Site[];
+    /** Function to set sites */
+    setSites: (sites: Site[]) => void;
+    /** Function to trigger full sync */
+    fullSyncFromBackend: () => Promise<void>;
+    /** Optional callback for additional processing */
+    onUpdate?: (update: StatusUpdate) => void;
+}
+⋮----
+/** Function to get current sites */
+⋮----
+/** Function to set sites */
+⋮----
+/** Function to trigger full sync */
+⋮----
+/** Optional callback for additional processing */
+⋮----
+/**
+ * Creates a status update handler with optimized incremental updates and race condition protection
+ */
+export function createStatusUpdateHandler(options: StatusUpdateHandlerOptions)
+⋮----
+// Track pending updates to prevent race conditions
+⋮----
+// Call the optional callback first
+⋮----
+// Validate timestamp bounds
+⋮----
+// Check if there's a more recent update already pending
+⋮----
+// This update is stale, ignore it
+⋮----
+// Mark this update as pending
+⋮----
+// Get current sites and find the target site
+⋮----
+// Site found - perform atomic update
+// Only proceed if this is still the latest update
+⋮----
+// Site not found in current state - trigger full sync as fallback
+⋮----
+// Clean up pending update tracking
+⋮----
+// Clean up pending update tracking on error
+⋮----
+// Fallback to full sync on any processing error
+⋮----
+/**
+ * Manages status update subscriptions
+ */
+export class StatusUpdateManager {
+⋮----
+/**
+     * Subscribe to status updates and monitoring events
+     */
+async subscribe(
+        handler: (update: StatusUpdate) => Promise<void>,
+        fullSyncHandler?: () => Promise<void>
+): Promise<void>
+⋮----
+// If already subscribed, unsubscribe first to avoid duplicates
+⋮----
+// Always wait for electronAPI to be ready before subscribing
+⋮----
+// Subscribe to status updates
+⋮----
+// Subscribe to monitoring state changes
+⋮----
+/**
+     * Unsubscribe from status updates and monitoring events
+     */
+unsubscribe(): void
+⋮----
+// Remove all listeners for the update-status channel
+⋮----
+/**
+     * Check if currently subscribed
+     */
+isSubscribed(): boolean
 </file>
 
 <file path="src/types.ts">
@@ -12478,6 +12037,135 @@ interface Window {
 /** Open URL in external browser */
 </file>
 
+<file path="electron/managers/DatabaseManager.ts">
+/**
+ * Manages database operations including initialization, data management, and backups.
+ * Handles database initialization, import/export, and backup operations.
+ */
+import { DEFAULT_HISTORY_LIMIT } from "../constants";
+import { UptimeEvents, TypedEventBus } from "../events/index";
+/**
+ * Combined events interface for DatabaseManager.
+ */
+type DatabaseManagerEvents = UptimeEvents;
+import { DatabaseService, SiteRepository, MonitorRepository, HistoryRepository, SettingsRepository } from "../services";
+import { Site } from "../types";
+import {
+    initDatabase,
+    getHistoryLimit as getHistoryLimitUtil,
+    setHistoryLimit as setHistoryLimitUtil,
+    createSiteLoadingOrchestrator,
+    createSiteCache,
+    createDataImportExportOrchestrator,
+    createDataBackupOrchestrator,
+    monitorLogger as logger,
+} from "../utils";
+export interface DatabaseManagerDependencies {
+    eventEmitter: TypedEventBus<DatabaseManagerEvents>;
+    repositories: {
+        database: DatabaseService;
+        site: SiteRepository;
+        monitor: MonitorRepository;
+        history: HistoryRepository;
+        settings: SettingsRepository;
+    };
+}
+/**
+ * Manages database operations and data management.
+ * Handles initialization, import/export, backup, and history management.
+ * Uses the new service-based architecture for all operations.
+ */
+export class DatabaseManager {
+⋮----
+constructor(dependencies: DatabaseManagerDependencies)
+/**
+     * Initialize the database and load sites.
+     */
+public async initialize(): Promise<void>
+⋮----
+// Emit typed database initialized event
+⋮----
+duration: 0, // Database initialization duration not tracked yet
+⋮----
+// Don't throw here as the database initialization itself succeeded
+⋮----
+/**
+     * Load sites from database and update cache.
+     */
+private async loadSites(): Promise<void>
+⋮----
+// Create the site cache
+⋮----
+// Create the site loading orchestrator
+⋮----
+// Create monitoring configuration
+⋮----
+// Emit history limit updated event
+⋮----
+// First update the cache so monitoring can find the sites
+⋮----
+// Then request monitoring start via events
+⋮----
+return true; // Always return true for the interface
+⋮----
+// Request monitoring stop via events
+⋮----
+return true; // Always return true for the interface
+⋮----
+// For database loading, we don't need to setup new monitors
+// This is only used during site updates
+⋮----
+// Load sites using the new service-based architecture
+⋮----
+// Update the cache with loaded sites (final update to ensure consistency)
+⋮----
+/**
+     * Export all application data to JSON string.
+     */
+public async exportData(): Promise<string>
+⋮----
+// Emit typed data exported event
+⋮----
+/**
+     * Import data from JSON string.
+     */
+public async importData(data: string): Promise<boolean>
+⋮----
+// Emit typed data imported event
+⋮----
+/**
+     * Download SQLite database backup.
+     */
+public async downloadBackup(): Promise<
+⋮----
+// Emit typed backup downloaded event
+⋮----
+/**
+     * Refresh sites from database and update cache.
+     */
+public async refreshSites(): Promise<Site[]>
+⋮----
+// Load sites first
+⋮----
+// Then get them from cache
+⋮----
+// Emit typed sites refreshed event
+⋮----
+// Convert to Site[] format expected by the interface
+⋮----
+/**
+     * Set history limit for monitor data retention.
+     */
+public async setHistoryLimit(limit: number): Promise<void>
+⋮----
+// Emit typed history limit updated event - fire and forget
+⋮----
+/**
+     * Get current history limit.
+     */
+public getHistoryLimit(): number
+</file>
+
 <file path="electron/services/application/ApplicationService.ts">
 import { app } from "electron";
 import { StatusUpdate, Site } from "../../types";
@@ -12544,7 +12232,7 @@ import { UptimeOrchestrator } from "../../index";
 import { logger } from "../../utils/index";
 import { AutoUpdaterService } from "../updater/index";
 import { Site } from "../../types";
-import { getAllMonitorTypeConfigs, validateMonitorDataAdvanced } from "../monitoring/MonitorTypeRegistry";
+import { getAllMonitorTypeConfigs, validateMonitorData } from "../monitoring/MonitorTypeRegistry";
 /**
  * Inter-Process Communication service for Electron main-renderer communication.
  *
@@ -12652,7 +12340,11 @@ fields: config.fields, // This is serializable
 // Exclude validationSchema as it contains Zod objects that can't be serialized
 // Exclude serviceFactory as it contains function references
 ⋮----
-// Use the advanced validation function with better validation
+// Use the basic validation function for form validation
+// The advanced validation is for more complex scenarios
+⋮----
+warnings: [], // Basic validation doesn't have warnings
+metadata: {}, // Basic validation doesn't have metadata
 ⋮----
 /**
      * Clean up all IPC listeners.
@@ -12883,138 +12575,348 @@ export async function setHistoryLimit(params: SetHistoryLimitParams): Promise<vo
 export function getHistoryLimit(getHistoryLimit: () => number): number
 </file>
 
-<file path="src/hooks/site/useSiteDetails.ts">
+<file path="src/components/AddSiteForm/AddSiteForm.tsx">
 /**
- * Custom hook for managing site details state and operations
- *
- * Provides comprehensive state management for the site details view including:
- * - Site data and monitor information
- * - UI state (active tab, loading states)
- * - Site operations (start/stop monitoring, check now, update settings)
- * - Local state management for editable fields
- * - Integration with analytics data
+ * AddSiteForm component for creating new sites and adding monitors to existing sites.
+ * Provides a comprehensive form with validation and flexible configuration options.
+ * Supports both HTTP and port monitoring types, with customizable check intervals.
  */
-import { useEffect, useState, useCallback } from "react";
-import { DEFAULT_CHECK_INTERVAL, DEFAULT_REQUEST_TIMEOUT_SECONDS } from "../../constants";
+import React, { useState, useEffect, useCallback } from "react";
+import { UI_DELAYS, CHECK_INTERVALS } from "../../constants";
 import { logger } from "../../services";
-import { useErrorStore, useSitesStore, useUIStore } from "../../stores";
-import { Site } from "../../types";
-import { useSiteAnalytics } from "./useSiteAnalytics";
-/** Props for the useSiteDetails hook */
-interface UseSiteDetailsProperties {
-    /** The site object to manage details for */
-    site: Site;
+import { useErrorStore, useSitesStore } from "../../stores";
+import { ThemedBox, ThemedText, ThemedButton, useTheme } from "../../theme";
+import { generateUuid } from "../../utils/data/generateUuid";
+import { TextField, SelectField, RadioGroup } from "./FormFields";
+import { useDynamicHelpText } from "../common/MonitorUiComponents";
+import { DynamicMonitorFields } from "./DynamicMonitorFields";
+import { handleSubmit } from "./Submit";
+import { useAddSiteForm } from "../SiteDetails/useAddSiteForm";
+import { useMonitorTypes } from "../../hooks/useMonitorTypes";
+/**
+ * Main form component for adding new monitoring sites or monitors.
+ *
+ * Features:
+ * - Create new sites with monitors
+ * - Add monitors to existing sites
+ * - Support for HTTP and port monitoring
+ * - Form validation and error handling
+ * - Configurable check intervals
+ * - Responsive design with loading states
+ *
+ * The component uses a custom hook (useAddSiteForm) for state management
+ * and modular sub-components for form fields and submission handling.
+ *
+ * @returns JSX element containing the complete add site form
+ */
+⋮----
+// Load monitor types from backend
+⋮----
+// Use our custom hook for form state management
+⋮----
+// Get dynamic help text for the current monitor type
+⋮----
+// Delayed loading state for button spinner (100ms delay)
+⋮----
+return () => {}; // Return empty cleanup function for consistency
+⋮----
+// Memoized submit handler
+⋮----
+onSuccess: resetForm, // Reset form on successful submission
+⋮----
+// Memoized error clear handler
+⋮----
+{/* Add mode toggle */}
+⋮----
+{/* Existing site selector */}
+⋮----
+{/* Site Name (only for new site) */}
+⋮----
+{/* Show generated UUID (for new site) */}
+⋮----
+{/* Monitor Type Selector */}
+⋮----
+{/* Dynamic Monitor Fields */}
+⋮----
+{/* Error Message */}
+</file>
+
+<file path="src/components/AddSiteForm/Submit.tsx">
+/**
+ * Form submission handling utilities for the AddSiteForm component.
+ *
+ * @remarks
+ * Provides validation and submission logic for creating new sites or adding
+ * monitors to existing sites. Supports HTTP and port monitor types with
+ * comprehensive validation and error handling.
+ *
+ * @packageDocumentation
+ */
+import type { Logger } from "../../services/logger";
+import type { Monitor, MonitorType } from "../../types";
+import type { AddSiteFormState, AddSiteFormActions } from "../SiteDetails/useAddSiteForm";
+import { DEFAULT_REQUEST_TIMEOUT, RETRY_CONSTRAINTS } from "../../constants";
+import { validateMonitorData } from "../../utils/monitorValidation";
+import { getMonitorTypeConfig } from "../../utils/monitorTypeHelper";
+/**
+ * Store actions interface for form submission operations.
+ *
+ * @remarks
+ * Defines the required store methods needed for form submission. This interface
+ * decouples the submission logic from specific store implementations, making
+ * the code more testable and flexible.
+ */
+interface StoreActions {
+    /** Add a monitor to an existing site */
+    addMonitorToSite: (siteId: string, monitor: Monitor) => Promise<void>;
+    /** Clear any existing error state */
+    clearError: () => void;
+    /** Create a new site with monitors */
+    createSite: (siteData: { identifier: string; monitors: Monitor[]; name?: string }) => Promise<void>;
 }
 ⋮----
-/** The site object to manage details for */
+/** Add a monitor to an existing site */
+⋮----
+/** Clear any existing error state */
+⋮----
+/** Create a new site with monitors */
 ⋮----
 /**
- * Hook for managing site details state and operations.
+ * Properties interface for form submission handling.
  *
- * Provides all necessary state and handlers for the site details view,
- * including monitor selection, monitoring controls, settings management,
- * and integration with analytics.
+ * @remarks
+ * Combines form state, actions, and store methods for the submission handler.
+ */
+type FormSubmitProperties = AddSiteFormState &
+    Pick<AddSiteFormActions, "setFormError"> &
+    StoreActions & {
+        /** UUID generator function for creating unique identifiers */
+        generateUuid: () => string;
+        /** Logger instance for debugging and error tracking */
+        logger: Logger;
+        /** Optional callback executed after successful submission */
+        onSuccess?: () => void;
+    };
+⋮----
+/** UUID generator function for creating unique identifiers */
+⋮----
+/** Logger instance for debugging and error tracking */
+⋮----
+/** Optional callback executed after successful submission */
+⋮----
+/**
+ * Validates the add mode selection and site information.
  *
- * @param props - Hook props containing the site to manage
- * @returns Object containing all site details state and handlers
+ * @param addMode - Mode of adding ("new" or "existing")
+ * @param name - Site name for new sites
+ * @param selectedExistingSite - Selected existing site identifier
+ * @returns Array of validation error messages
+ */
+function validateAddMode(addMode: string, name: string, selectedExistingSite: string): string[]
+/**
+ * Builds monitor data object dynamically based on monitor type configuration.
+ *
+ * @param monitorType - Type of monitor
+ * @param formData - Form data containing field values
+ * @returns Monitor data object with type-specific fields
+ */
+async function buildMonitorData(
+    monitorType: MonitorType,
+    formData: { url: string; host: string; port: string }
+): Promise<Record<string, unknown>>
+⋮----
+// Dynamically map form fields to monitor data based on field definitions
+⋮----
+// Convert value based on field type
+⋮----
+// eslint-disable-next-line security/detect-object-injection -- fieldName comes from trusted monitor config
+⋮----
+// eslint-disable-next-line security/detect-object-injection -- fieldName comes from trusted monitor config
+⋮----
+// Fallback to hardcoded mapping if config is unavailable
+⋮----
+// Fallback to hardcoded mapping
+⋮----
+/**
+ * Validates monitor type-specific configuration using backend registry.
+ *
+ * @param monitorType - Type of monitor
+ * @param url - URL for HTTP monitors
+ * @param host - Host for port monitors
+ * @param port - Port for port monitors
+ * @returns Promise resolving to array of validation error messages
+ */
+async function validateMonitorType(monitorType: string, url: string, host: string, port: string): Promise<string[]>
+⋮----
+// Build monitor data object dynamically
+⋮----
+// Use backend registry validation
+⋮----
+/**
+ * Validates check interval configuration.
+ *
+ * @param checkInterval - Check interval in milliseconds
+ * @returns Array of validation error messages
+ */
+function validateCheckInterval(checkInterval: number): string[]
+/**
+ * Creates a monitor object based on the form data.
+ */
+async function createMonitor(properties: FormSubmitProperties): Promise<Monitor>
+⋮----
+monitoring: true, // Default to monitoring enabled
+responseTime: -1, // Sentinel value for never checked
+retryAttempts: RETRY_CONSTRAINTS.DEFAULT, // Explicit default retry attempts
+⋮----
+timeout: DEFAULT_REQUEST_TIMEOUT, // Explicit default timeout
+⋮----
+// Add type-specific fields dynamically using monitor config
+⋮----
+// Copy the type-specific fields to the monitor object
+⋮----
+// Skip the type field as it's already set
+// eslint-disable-next-line security/detect-object-injection -- key comes from trusted monitor config
+⋮----
+/**
+ * Submits a new site with monitor.
+ */
+async function submitNewSite(properties: FormSubmitProperties, monitor: Monitor): Promise<void>
+⋮----
+monitoring: true, // Default to monitoring enabled
+name: trimmedName || "Unnamed Site", // Provide default name
+⋮----
+/**
+ * Adds monitor to existing site.
+ */
+async function addToExistingSite(properties: FormSubmitProperties, monitor: Monitor): Promise<void>
+/**
+ * Performs the actual submission based on add mode.
+ */
+async function performSubmission(properties: FormSubmitProperties, monitor: Monitor): Promise<void>
+/**
+ * Handles form submission for adding sites or monitors.
+ *
+ * Performs comprehensive validation based on add mode and monitor type:
+ * - For new sites: validates site name and monitor configuration
+ * - For existing sites: validates site selection and monitor configuration
+ * - For HTTP monitors: validates URL format and protocol
+ * - For port monitors: validates host and port number
+ *
+ * @param e - Form submission event
+ * @param props - Form state, actions, and dependencies
+ * @returns Promise that resolves when submission is complete
  *
  * @example
  * ```tsx
- * function SiteDetails({ site }) {
- *   const {
- *     currentSite,
- *     selectedMonitor,
- *     isLoading,
- *     handleStartMonitoring,
- *     handleStopMonitoring,
- *     // ... other state and handlers
- *   } = useSiteDetails({ site });
- *
- *   // Use the state and handlers in your component
- * }
+ * const handleFormSubmit = (e: React.FormEvent) => {
+ *   handleSubmit(e, {
+ *     ...formState,
+ *     ...formActions,
+ *     ...storeActions,
+ *     generateUuid,
+ *     logger,
+ *     onSuccess: () => setIsVisible(false)
+ *   });
+ * };
  * ```
  */
-export function useSiteDetails(
+export async function handleSubmit(event: React.FormEvent, properties: FormSubmitProperties)
 ⋮----
-// Always call hooks first, use fallback for currentSite
+// Log submission start
 ⋮----
-monitoring: true, // Default to monitoring enabled
+// Collect all validation errors
 ⋮----
-name: "Unnamed Site", // Provide default name
+// Handle validation failures
 ⋮----
-// Find the selected monitor, and if it doesn't exist, update the selection to the first monitor
+host: host.slice(0, 50), // Truncate for privacy
 ⋮----
-// Use useEffect to handle stale monitor ID updates (avoid state updates during render)
+name: name.slice(0, 50), // Truncate for privacy
 ⋮----
-// If the selected monitor ID is stale (doesn't exist), update it to match the actual selected monitor
+url: url.slice(0, 50), // Truncate for privacy
 ⋮----
-// Check interval state
+setFormError(validationErrors[0]); // Show first error
+</file>
+
+<file path="src/components/SiteDetails/tabs/HistoryTab.tsx">
+/**
+ * History tab component for displaying monitor check history.
+ * Provide    // Dropdown options: 25, 50, 100, All (clamped to backendLimit and available history)
+    const maxShow = Math.min(backendLimit, historyLength); pagination, and detailed history records view.
+ */
+import { useState, useEffect, useRef } from "react";
+import { FiFilter } from "react-icons/fi";
+import { MdHistory } from "react-icons/md";
+import { logger } from "../../../services";
+import { useSettingsStore } from "../../../stores";
+import { ThemedText, ThemedButton, StatusIndicator, ThemedCard, ThemedSelect, useTheme } from "../../../theme";
+import { StatusHistory, Monitor } from "../../../types";
+import { DetailLabel } from "../../common/MonitorUiComponents";
+/**
+ * Get the formatted label for filter buttons
+ * @param filter - The filter type
+ * @returns The formatted label for the filter button
+ */
+function getFilterButtonLabel(filter: "all" | "up" | "down"): string
+/**
+ * Props for the HistoryTab component.
+ */
+interface HistoryTabProperties {
+    /** Function to format timestamps for display */
+    readonly formatFullTimestamp: (timestamp: number) => string;
+    /** Function to format response times for display */
+    readonly formatResponseTime: (time: number) => string;
+    /** Function to format status with appropriate icons */
+    readonly formatStatusWithIcon: (status: string) => string;
+    /** Currently selected monitor to display history for */
+    readonly selectedMonitor: Monitor;
+}
 ⋮----
-// Timeout state (stored in seconds for UI, converted to ms when saving)
+/** Function to format timestamps for display */
 ⋮----
-// Retry attempts state
+/** Function to format response times for display */
 ⋮----
-// Site name state for settings
+/** Function to format status with appropriate icons */
 ⋮----
-// Update local state when monitor changes
+/** Currently selected monitor to display history for */
 ⋮----
-// Track name changes
+/**
+ * History tab component displaying paginated monitor check history.
+ *
+ * Features:
+ * - Filterable history by status (all, up, down)
+ * - Configurable display limits with pagination
+ * - Detailed history records with timestamps and response times
+ * - Export functionality for history data
+ * - User action logging for analytics
+ *
+ * @param props - Component props containing formatting functions and monitor data
+ * @returns JSX element displaying history interface
+ */
 ⋮----
-// Handler for check now
+// Track the last monitor ID we logged for to prevent duplicate logging
 ⋮----
-// No auto-refresh - respect the monitor's configured interval
-// Users can manually click "Check Now" if they want immediate updates
-// Handler for monitor selection change
+// Icon colors configuration
+const getIconColors = () => (
 ⋮----
-// If current tab is an analytics tab, switch to the new monitor's analytics tab
+// Dropdown options: 25, 50, 100, All (clamped to backendLimit and available history)
 ⋮----
-// Handler for site removal
+// Always include 'All' if there are fewer than backendLimit
 ⋮----
-// Handler for monitor removal
+// Default to 50, but never more than backendLimit or available history
 ⋮----
-// Site-level monitoring handlers
+// Log when history tab is viewed - only when monitor actually changes
 ⋮----
-// First, update the site's monitoring field in the database
+// eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally exclude selectedMonitor.history to prevent re-logging on history updates
 ⋮----
-// Then start the actual monitoring processes
+// Helper to render details with label using dynamic formatting
+function renderDetails(record: StatusHistory)
 ⋮----
-// First, update the site's monitoring field in the database
+// eslint-disable-next-line unicorn/no-null -- React components can return null
 ⋮----
-// Then stop the actual monitoring processes
+{/* History Controls */}
 ⋮----
-// Monitoring handlers
+{/* History List */}
 ⋮----
-// Interval change handlers
-⋮----
-// Timeout change handlers
-⋮----
-// Work directly with seconds in the UI
-⋮----
-// Compare against the monitor's timeout converted to seconds
-⋮----
-// Convert seconds to milliseconds when saving to backend
-⋮----
-// Retry attempts change handlers
-⋮----
-// Name save handler
-⋮----
-// Use analytics hook
-⋮----
-// Check if site exists
-⋮----
-// UI state
-⋮----
-// Analytics
-⋮----
-// Site data
-⋮----
-// Handlers
-⋮----
-// Name state
-⋮----
-// Interval state
-⋮----
-// Store actions
 </file>
 
 <file path="electron/main.ts">
@@ -13073,135 +12975,6 @@ const safeCleanup = () =>
 // Start the application
 // Create Main instance and keep reference alive to prevent garbage collection.
 // This is intentional - we need the instance to persist for the lifetime of the application.
-</file>
-
-<file path="electron/managers/DatabaseManager.ts">
-/**
- * Manages database operations including initialization, data management, and backups.
- * Handles database initialization, import/export, and backup operations.
- */
-import { DEFAULT_HISTORY_LIMIT } from "../constants";
-import { UptimeEvents, TypedEventBus } from "../events/index";
-/**
- * Combined events interface for DatabaseManager.
- */
-type DatabaseManagerEvents = UptimeEvents;
-import { DatabaseService, SiteRepository, MonitorRepository, HistoryRepository, SettingsRepository } from "../services";
-import { Site } from "../types";
-import {
-    initDatabase,
-    getHistoryLimit as getHistoryLimitUtil,
-    setHistoryLimit as setHistoryLimitUtil,
-    createSiteLoadingOrchestrator,
-    createSiteCache,
-    createDataImportExportOrchestrator,
-    createDataBackupOrchestrator,
-    monitorLogger as logger,
-} from "../utils";
-export interface DatabaseManagerDependencies {
-    eventEmitter: TypedEventBus<DatabaseManagerEvents>;
-    repositories: {
-        database: DatabaseService;
-        site: SiteRepository;
-        monitor: MonitorRepository;
-        history: HistoryRepository;
-        settings: SettingsRepository;
-    };
-}
-/**
- * Manages database operations and data management.
- * Handles initialization, import/export, backup, and history management.
- * Uses the new service-based architecture for all operations.
- */
-export class DatabaseManager {
-⋮----
-constructor(dependencies: DatabaseManagerDependencies)
-/**
-     * Initialize the database and load sites.
-     */
-public async initialize(): Promise<void>
-⋮----
-// Emit typed database initialized event
-⋮----
-duration: 0, // Database initialization duration not tracked yet
-⋮----
-// Don't throw here as the database initialization itself succeeded
-⋮----
-/**
-     * Load sites from database and update cache.
-     */
-private async loadSites(): Promise<void>
-⋮----
-// Create the site cache
-⋮----
-// Create the site loading orchestrator
-⋮----
-// Create monitoring configuration
-⋮----
-// Emit history limit updated event
-⋮----
-// First update the cache so monitoring can find the sites
-⋮----
-// Then request monitoring start via events
-⋮----
-return true; // Always return true for the interface
-⋮----
-// Request monitoring stop via events
-⋮----
-return true; // Always return true for the interface
-⋮----
-// For database loading, we don't need to setup new monitors
-// This is only used during site updates
-⋮----
-// Load sites using the new service-based architecture
-⋮----
-// Update the cache with loaded sites (final update to ensure consistency)
-⋮----
-/**
-     * Export all application data to JSON string.
-     */
-public async exportData(): Promise<string>
-⋮----
-// Emit typed data exported event
-⋮----
-/**
-     * Import data from JSON string.
-     */
-public async importData(data: string): Promise<boolean>
-⋮----
-// Emit typed data imported event
-⋮----
-/**
-     * Download SQLite database backup.
-     */
-public async downloadBackup(): Promise<
-⋮----
-// Emit typed backup downloaded event
-⋮----
-/**
-     * Refresh sites from database and update cache.
-     */
-public async refreshSites(): Promise<Site[]>
-⋮----
-// Load sites first
-⋮----
-// Then get them from cache
-⋮----
-// Emit typed sites refreshed event
-⋮----
-// Convert to Site[] format expected by the interface
-⋮----
-/**
-     * Set history limit for monitor data retention.
-     */
-public async setHistoryLimit(limit: number): Promise<void>
-⋮----
-// Emit typed history limit updated event - fire and forget
-⋮----
-/**
-     * Get current history limit.
-     */
-public getHistoryLimit(): number
 </file>
 
 <file path="electron/services/database/SettingsRepository.ts">
@@ -13671,6 +13444,154 @@ export interface StatusUpdate {
 }
 </file>
 
+<file path="electron/utils/database/DataImportExportService.ts">
+/**
+ * Service for data import/export operations.
+ * Provides a testable, dependency-injected service for application data management.
+ */
+import { Database } from "node-sqlite3-wasm";
+import { UptimeEvents, TypedEventBus } from "../../events/index";
+import {
+    DatabaseService,
+    HistoryRepository,
+    MonitorRepository,
+    SettingsRepository,
+    SiteRepository,
+} from "../../services/index";
+import { Site, StatusHistory } from "../../types";
+import { withDatabaseOperation } from "../operationalHooks";
+import { Logger, SiteCacheInterface, SiteLoadingError } from "./interfaces";
+/**
+ * Type for imported site data structure.
+ */
+export interface ImportSite {
+    identifier: string;
+    name?: string;
+    monitors?: Site["monitors"];
+}
+/**
+ * Configuration for data import/export operations.
+ */
+export interface DataImportExportConfig {
+    eventEmitter: TypedEventBus<UptimeEvents>;
+    databaseService: DatabaseService;
+    repositories: {
+        history: HistoryRepository;
+        monitor: MonitorRepository;
+        settings: SettingsRepository;
+        site: SiteRepository;
+    };
+    logger: Logger;
+}
+/**
+ * Type guard for expected import data structure.
+ */
+function isImportData(obj: unknown): obj is
+⋮----
+// Optionally check each site for required properties
+⋮----
+/**
+ * Service for handling data import/export operations.
+ * Separates data operations from side effects for better testability.
+ */
+export class DataImportExportService {
+⋮----
+constructor(config: DataImportExportConfig)
+/**
+     * Export all application data as JSON string.
+     * Pure data operation without side effects.
+     */
+async exportAllData(): Promise<string>
+⋮----
+// Export all sites and settings using repositories
+⋮----
+/**
+     * Import data from JSON string.
+     * Pure data operation that returns the imported data.
+     */
+async importDataFromJson(jsonData: string): Promise<
+⋮----
+// Parse and validate the JSON data
+⋮----
+// Use the top-level isImportData function
+⋮----
+/**
+     * Import sites and settings into database.
+     * Database operation that persists the imported data.
+     */
+async persistImportedData(sites: ImportSite[], settings: Record<string, string>): Promise<void>
+⋮----
+// Use executeTransaction for atomic multi-table operation
+⋮----
+// Clear existing data using internal methods
+⋮----
+// Import sites using bulk insert
+⋮----
+// Import monitors and history
+⋮----
+// Import settings using internal method
+⋮----
+/**
+     * Import monitors with their history for all sites.
+     * Private helper method for monitor data persistence.
+     */
+private async importMonitorsWithHistory(db: Database, sites: ImportSite[]): Promise<void>
+⋮----
+// Create monitors using the async bulkCreate method
+⋮----
+// Import history for the created monitors
+⋮----
+// Continue with other sites even if one fails
+⋮----
+/**
+     * Import history for created monitors by matching with original monitors.
+     * Private helper method for history data persistence.
+     */
+private importHistoryForMonitors(
+        db: Database,
+        createdMonitors: Site["monitors"],
+        originalMonitors: Site["monitors"]
+): void
+⋮----
+// Find the original monitor with matching properties to get its history
+⋮----
+/**
+     * Import history for a specific monitor.
+     * Private helper method for history data persistence.
+     */
+private importMonitorHistory(db: Database, monitorId: number, history: StatusHistory[]): void
+⋮----
+"" // No details available in import data
+⋮----
+/**
+ * Orchestrates the complete data import/export process.
+ * Coordinates data operations with side effects.
+ */
+export class DataImportExportOrchestrator {
+⋮----
+constructor(dataImportExportService: DataImportExportService)
+/**
+     * Export all application data.
+     * Coordinates the complete export process.
+     */
+async exportData(): Promise<string>
+/**
+     * Import data and reload application state.
+     * Coordinates the complete import process including cache refresh.
+     */
+async importData(
+        jsonData: string,
+        siteCache: SiteCacheInterface,
+        onSitesReloaded: () => Promise<void>
+): Promise<
+⋮----
+// Parse the import data
+⋮----
+// Persist to database
+⋮----
+// Clear cache and reload sites
+</file>
+
 <file path="electron/utils/database/SiteWriterService.ts">
 /**
  * Service for site writing operations.
@@ -14028,185 +13949,6 @@ async function stopAllSiteMonitors(
 ): Promise<boolean>
 ⋮----
 return processAllSiteMonitors(config, site, identifier, callback, false); // Use pessimistic logic for stopping
-</file>
-
-<file path="src/stores/utils.ts">
-/**
- * Utility functions for store management and composition.
- *
- * @remarks
- * Provides common functionality for error handling, persistence, and store composition
- * across all Zustand stores in the application. These utilities ensure consistent
- * patterns for async operations, error states, and data persistence.
- *
- * @packageDocumentation
- */
-import { BaseStore } from "./types";
-import logger from "../services/logger";
-/**
- * Creates a base store slice with common error handling functionality.
- *
- * @param set - Zustand set function for updating store state
- * @returns Object containing common store methods and initial state values
- *
- * @remarks
- * This function provides a standardized way to add error handling, loading states,
- * and error management to any Zustand store. It ensures consistent error handling
- * patterns across all stores in the application.
- *
- * @example
- * ```typescript
- * const useMyStore = create<MyStore>((set, get) => ({
- *   ...createBaseStore(set),
- *   // ... other store properties
- * }));
- * ```
- *
- * @public
- */
-export const createBaseStore = <T extends BaseStore>(
-    set: (partial: Partial<T>) => void
-): Pick<T, "lastError" | "isLoading" | "setError" | "setLoading" | "clearError"> => (
-/**
- * Wrapper for async operations with standardized error handling.
- *
- * @param operation - Async function to execute with error handling
- * @param store - Store instance with error handling methods
- * @returns Promise resolving to the operation result
- *
- * @throws Re-throws the original error after setting it in the store
- *
- * @remarks
- * This utility automatically manages loading states and error handling for async
- * operations. It sets loading to true at the start, clears any previous errors,
- * and properly handles both success and failure scenarios.
- *
- * The loading state is always cleared in the finally block, ensuring consistent
- * state management even if the operation throws an error.
- *
- * @example
- * ```typescript
- * const fetchData = async () => {
- *   return withErrorHandling(
- *     () => api.getData(),
- *     store
- *   );
- * };
- * ```
- *
- * @public
- */
-export const withErrorHandling = async <T>(
-    operation: () => Promise<T>,
-    store: Pick<BaseStore, "setError" | "setLoading" | "clearError">
-): Promise<T> =>
-/**
- * Creates a persistence configuration for Zustand store persistence.
- *
- * @param name - Unique name for the persisted store data
- * @param partialize - Optional function to select which parts of state to persist
- * @returns Configuration object for zustand/middleware/persist
- *
- * @remarks
- * This utility creates a standardized persistence configuration that prefixes
- * all store names with 'uptime-watcher-' to avoid conflicts with other applications.
- * The partialize function allows selective persistence of store properties.
- *
- * @example
- * ```typescript
- * const useMyStore = create(
- *   persist(
- *     (set, get) => ({ }),
- *     createPersistConfig('my-store')
- *   )
- * );
- * ```
- *
- * @public
- */
-export const createPersistConfig = <T>(name: string, partialize?: (state: T) => Partial<T>) => (
-/**
- * Debounce utility for store actions with automatic cleanup.
- *
- * @param function_ - Function to debounce
- * @param wait - Wait time in milliseconds before executing
- * @returns Debounced version of the input function
- *
- * @remarks
- * This utility prevents rapid successive calls to expensive operations like
- * API requests or state updates. It uses a Map to track timeouts per unique
- * argument combination, allowing different argument sets to be debounced independently.
- *
- * @example
- * ```typescript
- * const debouncedSave = debounce(saveSettings, 500);
- * debouncedSave(newSettings); // Will only execute after 500ms of no new calls
- * ```
- *
- * @public
- */
-export const debounce = <T extends unknown[]>(
-    function_: (...arguments_: T) => void,
-    wait: number
-): ((...arguments_: T) => void) =>
-/**
- * Logger utility for store actions in development mode.
- *
- * @param storeName - Name of the store performing the action
- * @param actionName - Name of the action being performed
- * @param data - Optional data associated with the action
- *
- * @remarks
- * This utility provides consistent logging for store actions during development.
- * It only logs when NODE_ENV is set to 'development' to avoid performance
- * impact in production builds.
- *
- * @example
- * ```typescript
- * logStoreAction('SitesStore', 'addSite', { id: 'site-123' });
- * ```
- *
- * @public
- */
-export const logStoreAction = (storeName: string, actionName: string, data?: unknown) =>
-/**
- * Utility function to wait for electronAPI to be available.
- *
- * @param maxAttempts - Maximum number of polling attempts
- * @param baseDelay - Base delay in milliseconds for exponential backoff
- * @returns Promise that resolves when electronAPI is available
- *
- * @throws Error when electronAPI is not available after maximum attempts
- *
- * @remarks
- * Polls for the API with exponential backoff to handle timing issues during
- * application startup. This is necessary because the preload script may not
- * have finished executing when React components first mount.
- *
- * @defaultValue maxAttempts - 50
- * @defaultValue baseDelay - 100
- *
- * @example
- * ```typescript
- * try {
- *   await waitForElectronAPI();
- *   // Safe to use window.electronAPI
- * } catch (error) {
- *   console.error('ElectronAPI not available:', error);
- * }
- * ```
- *
- * @public
- */
-export async function waitForElectronAPI(maxAttempts = 50, baseDelay = 100): Promise<void>
-⋮----
-// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-⋮----
-return; // API is ready
-⋮----
-// window.electronAPI not available yet
-⋮----
-// Wait with exponential backoff
 </file>
 
 <file path="electron/events/eventTypes.ts">
@@ -14842,152 +14584,201 @@ export function buildMonitorParameters(siteIdentifier: string, monitor: Site["mo
 // eslint-disable-next-line security/detect-object-injection
 </file>
 
-<file path="electron/utils/database/DataImportExportService.ts">
+<file path="src/stores/utils.ts">
 /**
- * Service for data import/export operations.
- * Provides a testable, dependency-injected service for application data management.
+ * Utility functions for store management and composition.
+ *
+ * @remarks
+ * Provides common functionality for error handling, persistence, and store composition
+ * across all Zustand stores in the application. These utilities ensure consistent
+ * patterns for async operations, error states, and data persistence.
+ *
+ * @packageDocumentation
  */
-import { Database } from "node-sqlite3-wasm";
-import { UptimeEvents, TypedEventBus } from "../../events/index";
-import {
-    DatabaseService,
-    HistoryRepository,
-    MonitorRepository,
-    SettingsRepository,
-    SiteRepository,
-} from "../../services/index";
-import { Site, StatusHistory } from "../../types";
-import { withDatabaseOperation } from "../operationalHooks";
-import { Logger, SiteCacheInterface, SiteLoadingError } from "./interfaces";
+import { BaseStore } from "./types";
+import logger from "../services/logger";
 /**
- * Type for imported site data structure.
+ * Creates a base store slice with common error handling functionality.
+ *
+ * @param set - Zustand set function for updating store state
+ * @returns Object containing common store methods and initial state values
+ *
+ * @remarks
+ * This function provides a standardized way to add error handling, loading states,
+ * and error management to any Zustand store. It ensures consistent error handling
+ * patterns across all stores in the application.
+ *
+ * @example
+ * ```typescript
+ * const useMyStore = create<MyStore>((set, get) => ({
+ *   ...createBaseStore(set),
+ *   // ... other store properties
+ * }));
+ * ```
+ *
+ * @public
  */
-export interface ImportSite {
-    identifier: string;
-    name?: string;
-    monitors?: Site["monitors"];
-}
+export const createBaseStore = <T extends BaseStore>(
+    set: (partial: Partial<T>) => void
+): Pick<T, "lastError" | "isLoading" | "setError" | "setLoading" | "clearError"> => (
 /**
- * Configuration for data import/export operations.
+ * Wrapper for async operations with standardized error handling.
+ *
+ * @param operation - Async function to execute with error handling
+ * @param store - Store instance with error handling methods
+ * @returns Promise resolving to the operation result
+ *
+ * @throws Re-throws the original error after setting it in the store
+ *
+ * @remarks
+ * This utility automatically manages loading states and error handling for async
+ * operations. It sets loading to true at the start, clears any previous errors,
+ * and properly handles both success and failure scenarios.
+ *
+ * The loading state is always cleared in the finally block with proper error
+ * handling to prevent state corruption if the finally block itself throws.
+ *
+ * @example
+ * ```typescript
+ * const fetchData = async () => {
+ *   return withErrorHandling(
+ *     () => api.getData(),
+ *     store
+ *   );
+ * };
+ * ```
+ *
+ * @public
  */
-export interface DataImportExportConfig {
-    eventEmitter: TypedEventBus<UptimeEvents>;
-    databaseService: DatabaseService;
-    repositories: {
-        history: HistoryRepository;
-        monitor: MonitorRepository;
-        settings: SettingsRepository;
-        site: SiteRepository;
-    };
-    logger: Logger;
-}
+export const withErrorHandling = async <T>(
+    operation: () => Promise<T>,
+    store: Pick<BaseStore, "setError" | "setLoading" | "clearError">
+): Promise<T> =>
+⋮----
+// Clear any previous error state before starting
+⋮----
+// If clearError fails, log it but don't prevent the operation
+⋮----
+// Set loading state to true
+⋮----
+// If setLoading fails, log it but don't prevent the operation
+⋮----
+// Handle the error from the operation
+⋮----
+// If setError fails, log both errors
+⋮----
+// Always clear loading state, with error handling
+⋮----
+// If setLoading fails in finally, log it but don't throw
+// to avoid masking the original error
+⋮----
 /**
- * Type guard for expected import data structure.
+ * Creates a persistence configuration for Zustand store persistence.
+ *
+ * @param name - Unique name for the persisted store data
+ * @param partialize - Optional function to select which parts of state to persist
+ * @returns Configuration object for zustand/middleware/persist
+ *
+ * @remarks
+ * This utility creates a standardized persistence configuration that prefixes
+ * all store names with 'uptime-watcher-' to avoid conflicts with other applications.
+ * The partialize function allows selective persistence of store properties.
+ *
+ * @example
+ * ```typescript
+ * const useMyStore = create(
+ *   persist(
+ *     (set, get) => ({ }),
+ *     createPersistConfig('my-store')
+ *   )
+ * );
+ * ```
+ *
+ * @public
  */
-function isImportData(obj: unknown): obj is
-⋮----
-// Optionally check each site for required properties
-⋮----
+export const createPersistConfig = <T>(name: string, partialize?: (state: T) => Partial<T>) => (
 /**
- * Service for handling data import/export operations.
- * Separates data operations from side effects for better testability.
+ * Debounce utility for store actions with automatic cleanup.
+ *
+ * @param function_ - Function to debounce
+ * @param wait - Wait time in milliseconds before executing
+ * @returns Debounced version of the input function
+ *
+ * @remarks
+ * This utility prevents rapid successive calls to expensive operations like
+ * API requests or state updates. It uses a Map to track timeouts per unique
+ * argument combination, allowing different argument sets to be debounced independently.
+ *
+ * @example
+ * ```typescript
+ * const debouncedSave = debounce(saveSettings, 500);
+ * debouncedSave(newSettings); // Will only execute after 500ms of no new calls
+ * ```
+ *
+ * @public
  */
-export class DataImportExportService {
-⋮----
-constructor(config: DataImportExportConfig)
+export const debounce = <T extends unknown[]>(
+    function_: (...arguments_: T) => void,
+    wait: number
+): ((...arguments_: T) => void) =>
 /**
-     * Export all application data as JSON string.
-     * Pure data operation without side effects.
-     */
-async exportAllData(): Promise<string>
-⋮----
-// Export all sites and settings using repositories
-⋮----
-/**
-     * Import data from JSON string.
-     * Pure data operation that returns the imported data.
-     */
-async importDataFromJson(jsonData: string): Promise<
-⋮----
-// Parse and validate the JSON data
-⋮----
-// Use the top-level isImportData function
-⋮----
-/**
-     * Import sites and settings into database.
-     * Database operation that persists the imported data.
-     */
-async persistImportedData(sites: ImportSite[], settings: Record<string, string>): Promise<void>
-⋮----
-// Use executeTransaction for atomic multi-table operation
-⋮----
-// Clear existing data using internal methods
-⋮----
-// Import sites using bulk insert
-⋮----
-// Import monitors and history
-⋮----
-// Import settings using internal method
-⋮----
-/**
-     * Import monitors with their history for all sites.
-     * Private helper method for monitor data persistence.
-     */
-private async importMonitorsWithHistory(db: Database, sites: ImportSite[]): Promise<void>
-⋮----
-// Create monitors using the async bulkCreate method
-⋮----
-// Import history for the created monitors
-⋮----
-// Continue with other sites even if one fails
-⋮----
-/**
-     * Import history for created monitors by matching with original monitors.
-     * Private helper method for history data persistence.
-     */
-private importHistoryForMonitors(
-        db: Database,
-        createdMonitors: Site["monitors"],
-        originalMonitors: Site["monitors"]
-): void
-⋮----
-// Find the original monitor with matching properties to get its history
-⋮----
-/**
-     * Import history for a specific monitor.
-     * Private helper method for history data persistence.
-     */
-private importMonitorHistory(db: Database, monitorId: number, history: StatusHistory[]): void
-⋮----
-"" // No details available in import data
-⋮----
-/**
- * Orchestrates the complete data import/export process.
- * Coordinates data operations with side effects.
+ * Logger utility for store actions in development mode.
+ *
+ * @param storeName - Name of the store performing the action
+ * @param actionName - Name of the action being performed
+ * @param data - Optional data associated with the action
+ *
+ * @remarks
+ * This utility provides consistent logging for store actions during development.
+ * It only logs when NODE_ENV is set to 'development' to avoid performance
+ * impact in production builds.
+ *
+ * @example
+ * ```typescript
+ * logStoreAction('SitesStore', 'addSite', { id: 'site-123' });
+ * ```
+ *
+ * @public
  */
-export class DataImportExportOrchestrator {
-⋮----
-constructor(dataImportExportService: DataImportExportService)
+export const logStoreAction = (storeName: string, actionName: string, data?: unknown) =>
 /**
-     * Export all application data.
-     * Coordinates the complete export process.
-     */
-async exportData(): Promise<string>
-/**
-     * Import data and reload application state.
-     * Coordinates the complete import process including cache refresh.
-     */
-async importData(
-        jsonData: string,
-        siteCache: SiteCacheInterface,
-        onSitesReloaded: () => Promise<void>
-): Promise<
+ * Utility function to wait for electronAPI to be available.
+ *
+ * @param maxAttempts - Maximum number of polling attempts
+ * @param baseDelay - Base delay in milliseconds for exponential backoff
+ * @returns Promise that resolves when electronAPI is available
+ *
+ * @throws Error when electronAPI is not available after maximum attempts
+ *
+ * @remarks
+ * Polls for the API with exponential backoff to handle timing issues during
+ * application startup. This is necessary because the preload script may not
+ * have finished executing when React components first mount.
+ *
+ * @defaultValue maxAttempts - 50
+ * @defaultValue baseDelay - 100
+ *
+ * @example
+ * ```typescript
+ * try {
+ *   await waitForElectronAPI();
+ *   // Safe to use window.electronAPI
+ * } catch (error) {
+ *   console.error('ElectronAPI not available:', error);
+ * }
+ * ```
+ *
+ * @public
+ */
+export async function waitForElectronAPI(maxAttempts = 50, baseDelay = 100): Promise<void>
 ⋮----
-// Parse the import data
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 ⋮----
-// Persist to database
+return; // API is ready
 ⋮----
-// Clear cache and reload sites
+// window.electronAPI not available yet
+⋮----
+// Wait with exponential backoff
 </file>
 
 <file path="electron/managers/SiteManager.ts">
@@ -15534,153 +15325,6 @@ async loadSitesFromDatabase(
 // No need to explicitly start monitoring here as it's handled during site setup
 </file>
 
-<file path="electron/services/database/MonitorRepository.ts">
-/**
- * Database repository for monitor persistence and management.
- * Handles CRUD operations for site monitoring configurations.
- */
-import { Database } from "node-sqlite3-wasm";
-import { isDev } from "../../electronUtils";
-import { Site } from "../../types";
-import { logger, withDatabaseOperation } from "../../utils/index";
-import { DatabaseService } from "./DatabaseService";
-import {
-    addBooleanField,
-    addNumberField,
-    addStringField,
-    buildMonitorParameters,
-    convertDateForDb,
-    DbValue,
-    rowToMonitor,
-    generateSqlParameters,
-    mapMonitorToRow,
-} from "./utils";
-/**
- * Repository for managing monitor data persistence.
- * Handles CRUD operations for monitors in the database.
- */
-export class MonitorRepository {
-⋮----
-constructor()
-/**
-     * Get the database instance.
-     */
-private getDb(): Database
-/**
-     * Find all monitors for a specific site.
-     */
-public async findBySiteIdentifier(siteIdentifier: string): Promise<Site["monitors"]>
-⋮----
-// eslint-disable-next-line @typescript-eslint/require-await
-⋮----
-/**
-     * Find a monitor by its identifier with resilient error handling.
-     */
-public async findByIdentifier(monitorId: string): Promise<Site["monitors"][0] | undefined>
-⋮----
-// Wrap synchronous operation in Promise to make it truly async
-⋮----
-/**
-     * Create a new monitor and return its ID.
-     * Uses transactions to ensure atomicity.
-     */
-public async create(siteIdentifier: string, monitor: Omit<Site["monitors"][0], "id">): Promise<string>
-⋮----
-// Generate dynamic SQL and parameters
-⋮----
-/**
-     * Internal method to create a monitor within an existing transaction.
-     * Use this method when you're already within a transaction context.
-     */
-public createInternal(db: Database, siteIdentifier: string, monitor: Omit<Site["monitors"][0], "id">): string
-⋮----
-// Generate dynamic SQL and parameters
-⋮----
-/**
-     * Update an existing monitor.
-     * Uses transactions to ensure atomicity.
-     */
-public async update(monitorId: string, monitor: Partial<Site["monitors"][0]>): Promise<void>
-⋮----
-// Build dynamic SQL based on provided fields to avoid overwriting with defaults
-⋮----
-// Add fields using helper methods
-⋮----
-// monitor.responseTime is always a number, so no need for unnecessary conditional
-⋮----
-/**
-     * Update an existing monitor (internal version for use within existing transactions).
-     * Does not create its own transaction.
-     */
-public updateInternal(db: Database, monitorId: string, monitor: Partial<Site["monitors"][0]>): void
-⋮----
-// Use dynamic row mapping to convert camelCase to snake_case
-⋮----
-// Only update fields that are actually provided and are primitive types
-⋮----
-// Skip 'enabled' field if monitoring state wasn't provided in the original monitor object
-// This prevents status updates from accidentally disabling monitoring
-⋮----
-// Ensure we only bind primitive types that SQLite can handle
-⋮----
-/**
-     * Delete a monitor and its history.
-     * Uses a transaction to ensure atomicity.
-     */
-public async delete(monitorId: string): Promise<boolean>
-/**
-     * Internal method to delete a monitor and its history within an existing transaction.
-     * This method should be called from within a database transaction.
-     */
-public deleteInternal(db: Database, monitorId: string): boolean
-⋮----
-// Delete history first (foreign key constraint)
-⋮----
-// Delete the monitor
-⋮----
-/**
-     * Delete all monitors for a specific site.
-     * Uses a transaction to ensure atomicity.
-     */
-public async deleteBySiteIdentifier(siteIdentifier: string): Promise<void>
-/**
-     * Internal method to delete all monitors for a specific site within an existing transaction.
-     * This method should be called from within a database transaction.
-     */
-public deleteBySiteIdentifierInternal(db: Database, siteIdentifier: string): void
-⋮----
-// Get all monitor IDs for this site
-⋮----
-// Delete history for all monitors
-⋮----
-// Delete all monitors for this site
-⋮----
-/**
-     * Get all monitor IDs.
-     */
-public getAllMonitorIds():
-/**
-     * Clear all monitors from the database.
-     * Uses transactions to ensure atomicity.
-     */
-public async deleteAll(): Promise<void>
-/**
-     * Internal method to clear all monitors from the database within an existing transaction.
-     * Use this method when you're already within a transaction context.
-     */
-public deleteAllInternal(db: Database): void
-/**
-     * Bulk create monitors (for import functionality).
-     * Returns the created monitor with their new IDs.
-     * Uses transactions to ensure atomicity.
-     */
-public async bulkCreate(siteIdentifier: string, monitors: Site["monitors"][0][]): Promise<Site["monitors"][0][]>
-⋮----
-// Use executeTransaction for atomic bulk create operation
-⋮----
-// Use RETURNING clause to get the ID directly from the insert
-</file>
-
 <file path="electron/services/database/SiteRepository.ts">
 import { Database } from "node-sqlite3-wasm";
 import { Site } from "../../types";
@@ -15998,6 +15642,153 @@ export async function checkSiteManually(
 // Validate the monitor exists
 ⋮----
 const result = await checkMonitor(config, site, targetMonitorId, true); // Mark as manual check
+</file>
+
+<file path="electron/services/database/MonitorRepository.ts">
+/**
+ * Database repository for monitor persistence and management.
+ * Handles CRUD operations for site monitoring configurations.
+ */
+import { Database } from "node-sqlite3-wasm";
+import { isDev } from "../../electronUtils";
+import { Site } from "../../types";
+import { logger, withDatabaseOperation } from "../../utils/index";
+import { DatabaseService } from "./DatabaseService";
+import {
+    addBooleanField,
+    addNumberField,
+    addStringField,
+    buildMonitorParameters,
+    convertDateForDb,
+    DbValue,
+    rowToMonitor,
+    generateSqlParameters,
+    mapMonitorToRow,
+} from "./utils";
+/**
+ * Repository for managing monitor data persistence.
+ * Handles CRUD operations for monitors in the database.
+ */
+export class MonitorRepository {
+⋮----
+constructor()
+/**
+     * Get the database instance.
+     */
+private getDb(): Database
+/**
+     * Find all monitors for a specific site.
+     */
+public async findBySiteIdentifier(siteIdentifier: string): Promise<Site["monitors"]>
+⋮----
+// eslint-disable-next-line @typescript-eslint/require-await
+⋮----
+/**
+     * Find a monitor by its identifier with resilient error handling.
+     */
+public async findByIdentifier(monitorId: string): Promise<Site["monitors"][0] | undefined>
+⋮----
+// Wrap synchronous operation in Promise to make it truly async
+⋮----
+/**
+     * Create a new monitor and return its ID.
+     * Uses transactions to ensure atomicity.
+     */
+public async create(siteIdentifier: string, monitor: Omit<Site["monitors"][0], "id">): Promise<string>
+⋮----
+// Generate dynamic SQL and parameters
+⋮----
+/**
+     * Internal method to create a monitor within an existing transaction.
+     * Use this method when you're already within a transaction context.
+     */
+public createInternal(db: Database, siteIdentifier: string, monitor: Omit<Site["monitors"][0], "id">): string
+⋮----
+// Generate dynamic SQL and parameters
+⋮----
+/**
+     * Update an existing monitor.
+     * Uses transactions to ensure atomicity.
+     */
+public async update(monitorId: string, monitor: Partial<Site["monitors"][0]>): Promise<void>
+⋮----
+// Build dynamic SQL based on provided fields to avoid overwriting with defaults
+⋮----
+// Add fields using helper methods
+⋮----
+// monitor.responseTime is always a number, so no need for unnecessary conditional
+⋮----
+/**
+     * Update an existing monitor (internal version for use within existing transactions).
+     * Does not create its own transaction.
+     */
+public updateInternal(db: Database, monitorId: string, monitor: Partial<Site["monitors"][0]>): void
+⋮----
+// Use dynamic row mapping to convert camelCase to snake_case
+⋮----
+// Only update fields that are actually provided and are primitive types
+⋮----
+// Skip 'enabled' field if monitoring state wasn't provided in the original monitor object
+// This prevents status updates from accidentally disabling monitoring
+⋮----
+// Ensure we only bind primitive types that SQLite can handle
+⋮----
+/**
+     * Delete a monitor and its history.
+     * Uses a transaction to ensure atomicity.
+     */
+public async delete(monitorId: string): Promise<boolean>
+/**
+     * Internal method to delete a monitor and its history within an existing transaction.
+     * This method should be called from within a database transaction.
+     */
+public deleteInternal(db: Database, monitorId: string): boolean
+⋮----
+// Delete history first (foreign key constraint)
+⋮----
+// Delete the monitor
+⋮----
+/**
+     * Delete all monitors for a specific site.
+     * Uses a transaction to ensure atomicity.
+     */
+public async deleteBySiteIdentifier(siteIdentifier: string): Promise<void>
+/**
+     * Internal method to delete all monitors for a specific site within an existing transaction.
+     * This method should be called from within a database transaction.
+     */
+public deleteBySiteIdentifierInternal(db: Database, siteIdentifier: string): void
+⋮----
+// Get all monitor IDs for this site
+⋮----
+// Delete history for all monitors
+⋮----
+// Delete all monitors for this site
+⋮----
+/**
+     * Get all monitor IDs.
+     */
+public getAllMonitorIds():
+/**
+     * Clear all monitors from the database.
+     * Uses transactions to ensure atomicity.
+     */
+public async deleteAll(): Promise<void>
+/**
+     * Internal method to clear all monitors from the database within an existing transaction.
+     * Use this method when you're already within a transaction context.
+     */
+public deleteAllInternal(db: Database): void
+/**
+     * Bulk create monitors (for import functionality).
+     * Returns the created monitor with their new IDs.
+     * Uses transactions to ensure atomicity.
+     */
+public async bulkCreate(siteIdentifier: string, monitors: Site["monitors"][0][]): Promise<Site["monitors"][0][]>
+⋮----
+// Use executeTransaction for atomic bulk create operation
+⋮----
+// Use RETURNING clause to get the ID directly from the insert
 </file>
 
 </files>

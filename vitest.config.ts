@@ -4,6 +4,7 @@
  * Settings match the test configuration from vite.config.ts.
  */
 
+import react from "@vitejs/plugin-react";
 import * as path from "node:path";
 import { defineConfig } from "vitest/config";
 
@@ -15,6 +16,18 @@ export default defineConfig({
     esbuild: {
         target: "es2024", // Match TypeScript target for consistency
     },
+    plugins: [
+        react({
+            // Configure React plugin for testing
+            include: /\.(js|jsx|ts|tsx)$/,
+            jsxRuntime: 'automatic',
+            babel: {
+                babelrc: false,
+                configFile: false,
+                plugins: [],
+            },
+        }),
+    ],
     resolve: {
         alias: {
             "@": path.resolve(__dirname, "src"),

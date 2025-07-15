@@ -3,7 +3,7 @@
  * Provides field configurations for dynamic form handling.
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import type { MonitorFieldDefinition } from "../utils/monitorTypeHelper";
 
 interface UseMonitorFieldsResult {
@@ -45,21 +45,30 @@ export function useMonitorFields(): UseMonitorFieldsResult {
         void loadFieldConfigs();
     }, []);
 
-    const getFields = (monitorType: string): MonitorFieldDefinition[] => {
-        // eslint-disable-next-line security/detect-object-injection
-        return fieldConfigs[monitorType] ?? [];
-    };
+    const getFields = useCallback(
+        (monitorType: string): MonitorFieldDefinition[] => {
+            // eslint-disable-next-line security/detect-object-injection
+            return fieldConfigs[monitorType] ?? [];
+        },
+        [fieldConfigs]
+    );
 
-    const getRequiredFields = (monitorType: string): string[] => {
-        const fields = getFields(monitorType);
-        return fields.filter((field) => field.required).map((field) => field.name);
-    };
+    const getRequiredFields = useCallback(
+        (monitorType: string): string[] => {
+            const fields = getFields(monitorType);
+            return fields.filter((field) => field.required).map((field) => field.name);
+        },
+        [getFields]
+    );
 
-    const isFieldRequired = (monitorType: string, fieldName: string): boolean => {
-        const fields = getFields(monitorType);
-        const field = fields.find((f) => f.name === fieldName);
-        return field?.required ?? false;
-    };
+    const isFieldRequired = useCallback(
+        (monitorType: string, fieldName: string): boolean => {
+            const fields = getFields(monitorType);
+            const field = fields.find((f) => f.name === fieldName);
+            return field?.required ?? false;
+        },
+        [getFields]
+    );
 
     return {
         getFields,

@@ -7,6 +7,10 @@
  * @packageDocumentation
  */
 
+// Re-export status types for better type safety
+export type { MonitorStatus, SiteStatus } from "./types/status";
+export { isMonitorStatus, isComputedSiteStatus, isSiteStatus } from "./types/status";
+
 /**
  * Application update status types for the auto-updater.
  */
@@ -282,6 +286,10 @@ declare global {
                         }[];
                     }[]
                 >;
+                /** Format monitor detail using backend registry */
+                formatMonitorDetail: (type: string, details: string) => Promise<string>;
+                /** Format monitor title suffix using backend registry */
+                formatMonitorTitleSuffix: (type: string, monitor: Record<string, unknown>) => Promise<string>;
                 /** Validate monitor data using backend registry */
                 validateMonitorData: (
                     type: string,

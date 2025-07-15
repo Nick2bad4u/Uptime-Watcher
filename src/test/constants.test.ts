@@ -22,8 +22,9 @@ import {
     ARIA_LABEL,
     TRANSITION_ALL,
     type IntervalOption,
-    type StatusType,
 } from "../constants";
+
+import type { SiteStatus } from "../types";
 
 describe("Constants", () => {
     describe("Font Families", () => {
@@ -227,10 +228,10 @@ describe("Constants", () => {
     });
 
     describe("Type Definitions", () => {
-        it("StatusType covers expected values", () => {
-            const validStatuses: StatusType[] = ["up", "down", "pending", "unknown"];
+        it("SiteStatus covers expected values", () => {
+            const validStatuses: SiteStatus[] = ["up", "down", "pending", "unknown"];
             for (const status of validStatuses) {
-                const testStatus: StatusType = status;
+                const testStatus: SiteStatus = status;
                 expect(testStatus).toBe(status);
             }
         });
