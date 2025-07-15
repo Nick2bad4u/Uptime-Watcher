@@ -5,6 +5,7 @@
 
 import { useState, useEffect } from "react";
 import { TextField } from "./FormFields";
+import { logger } from "../../services";
 import {
     getMonitorTypeConfig,
     type MonitorFieldDefinition,
@@ -46,7 +47,7 @@ export function DynamicMonitorFields({ monitorType, values, onChange, isLoading 
                 if (!isCancelled) {
                     const errorMessage = error_ instanceof Error ? error_.message : "Failed to load monitor config";
                     setError(errorMessage);
-                    console.error("Failed to load monitor type config:", error_);
+                    logger.error("Failed to load monitor type config", error_ as Error);
                 }
             } finally {
                 if (!isCancelled) {

@@ -5,6 +5,7 @@
 import { UptimeEvents, TypedEventBus } from "../../events/index";
 import { SiteRepository, MonitorRepository, HistoryRepository, SettingsRepository } from "../../services/index";
 import { Site } from "../../types";
+import { dbLogger } from "../logger";
 
 /**
  * Logger interface abstraction.
@@ -161,7 +162,7 @@ export class SiteCache implements SiteCacheInterface {
                 callback(identifier);
             } catch (error) {
                 // Silently handle callback errors to prevent cache corruption
-                console.error("Cache invalidation callback error:", error);
+                dbLogger.error("Cache invalidation callback error:", error);
             }
         }
     }

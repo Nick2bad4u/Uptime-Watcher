@@ -6,7 +6,12 @@
  * with configurable timeouts, retry logic, and intelligent connection handling.
  * Designed for reliable network connectivity verification across various protocols.
  *
- * Key features:
+ * @public
+ *
+ * @see {@link IMonitorService} for interface contract
+ * @see {@link MonitorConfig} for configuration options
+ *
+ * ## Key Features
  * - **TCP/UDP Support**: Handles both TCP and UDP port connectivity checks
  * - **Configurable Timeouts**: Per-monitor timeout configuration support
  * - **Retry Logic**: Intelligent retry handling for transient network failures

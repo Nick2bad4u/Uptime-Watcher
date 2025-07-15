@@ -17,7 +17,19 @@ import { ThemeProvider, ThemedBox, ThemedText, ThemedButton, useTheme } from "./
 /**
  * Main application component that serves as the root of the Uptime Watcher app.
  *
- * Features:
+ * @remarks
+ * This is the primary entry point component that orchestrates the entire application
+ * including state management, theming, error handling, and real-time updates.
+ *
+ * @public
+ *
+ * @beta
+ * The component API may change as we refine the architecture.
+ *
+ * @see {@link useTheme} for theme management
+ * @see {@link useSitesStore} for site state management
+ *
+ * ## Key Features
  * - Global state management via focused Zustand stores
  * - Theme management with light/dark mode support
  * - Modal management (Settings, Site Details)
@@ -94,7 +106,7 @@ function App() {
                 // Optional callback for additional processing if needed
                 if (process.env.NODE_ENV === "development") {
                     const timestamp = new Date().toLocaleTimeString();
-                    console.log(`[${timestamp}] [App] Status update received:`, update.site.identifier);
+                    logger.debug(`[${timestamp}] Status update received for site: ${update.site.identifier}`);
                 }
             });
         };

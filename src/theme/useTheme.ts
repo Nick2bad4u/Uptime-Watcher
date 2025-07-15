@@ -16,7 +16,17 @@ import { Theme, ThemeName } from "./types";
 /**
  * Main theme hook providing comprehensive theme management functionality.
  *
- * Features:
+ * @remarks
+ * This hook provides a complete theming solution with system integration,
+ * color utilities, and automatic updates. It serves as the primary interface
+ * for all theme-related operations throughout the application.
+ *
+ * @public
+ *
+ * @see {@link ThemeManager} for theme management implementation
+ * @see {@link useSettingsStore} for settings integration
+ *
+ * ## Key Features
  * - Current theme state and switching
  * - System theme detection and synchronization
  * - Status-based color utilities

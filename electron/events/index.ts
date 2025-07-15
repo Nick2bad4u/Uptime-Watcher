@@ -1,6 +1,24 @@
 /**
  * Type-Safe Event Bus with Middleware support.
- * Provides enhanced EventEmitter functionality with compile-time type safety.
+ *
+ * @remarks
+ * Provides enhanced EventEmitter functionality with compile-time type safety,
+ * middleware processing, and comprehensive event handling capabilities.
+ *
+ * @public
+ *
+ * @see {@link TypedEventBus} for the main event bus implementation
+ * @see {@link EventMiddleware} for middleware patterns
+ * @see {@link UptimeEvents} for event type definitions
+ *
+ * ## Key Features
+ * - Enhanced EventEmitter functionality with compile-time type safety
+ * - Middleware processing pipeline for events
+ * - Comprehensive event categorization and priority system
+ * - Full type safety for event names and payloads
+ * - Debugging and diagnostic capabilities
+ *
+ * @packageDocumentation
  */
 
 export { TypedEventBus, createTypedEventBus } from "./TypedEventBus";

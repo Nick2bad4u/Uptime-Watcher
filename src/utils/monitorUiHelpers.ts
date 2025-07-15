@@ -94,7 +94,7 @@ export async function supportsResponseTime(monitorType: MonitorType): Promise<bo
         const config = await getConfig(monitorType);
         return config?.uiConfig?.supportsResponseTime ?? false;
     } catch (error) {
-        console.warn(`Failed to check response time support for ${monitorType}:`, error);
+        logger.warn(`Failed to check response time support for ${monitorType}`, error as Error);
         return false;
     }
 }
@@ -110,7 +110,7 @@ export async function supportsAdvancedAnalytics(monitorType: MonitorType): Promi
         const config = await getConfig(monitorType);
         return config?.uiConfig?.supportsAdvancedAnalytics ?? false;
     } catch (error) {
-        console.warn(`Failed to check advanced analytics support for ${monitorType}:`, error);
+        logger.warn(`Failed to check advanced analytics support for ${monitorType}`, error as Error);
         return false;
     }
 }
@@ -129,7 +129,7 @@ export async function getMonitorHelpTexts(monitorType: MonitorType): Promise<{
         const config = await getConfig(monitorType);
         return config?.uiConfig?.helpTexts ?? {};
     } catch (error) {
-        console.warn(`Failed to get help texts for ${monitorType}:`, error);
+        logger.warn(`Failed to get help texts for ${monitorType}`, error as Error);
         return {};
     }
 }
@@ -145,7 +145,7 @@ export async function getAnalyticsLabel(monitorType: MonitorType): Promise<strin
         const config = await getConfig(monitorType);
         return config?.uiConfig?.detailFormats?.analyticsLabel ?? `${monitorType.toUpperCase()} Response Time`;
     } catch (error) {
-        console.warn(`Failed to get analytics label for ${monitorType}:`, error);
+        logger.warn(`Failed to get analytics label for ${monitorType}`, error as Error);
         return `${monitorType.toUpperCase()} Response Time`;
     }
 }
@@ -161,7 +161,7 @@ export async function shouldShowUrl(monitorType: MonitorType): Promise<boolean> 
         const config = await getConfig(monitorType);
         return config?.uiConfig?.display?.showUrl ?? false;
     } catch (error) {
-        console.warn(`Failed to check URL display for ${monitorType}:`, error);
+        logger.warn(`Failed to check URL display for ${monitorType}`, error as Error);
         return false;
     }
 }
@@ -178,7 +178,7 @@ export async function allSupportsResponseTime(monitorTypes: MonitorType[]): Prom
         const supportChecks = await Promise.all(monitorTypes.map((type) => supportsResponseTime(type)));
         return supportChecks.every(Boolean);
     } catch (error) {
-        console.warn("Failed to check response time support for multiple types:", error);
+        logger.warn("Failed to check response time support for multiple types", error as Error);
         return false;
     }
 }
@@ -195,7 +195,7 @@ export async function allSupportsAdvancedAnalytics(monitorTypes: MonitorType[]):
         const supportChecks = await Promise.all(monitorTypes.map((type) => supportsAdvancedAnalytics(type)));
         return supportChecks.every(Boolean);
     } catch (error) {
-        console.warn("Failed to check advanced analytics support for multiple types:", error);
+        logger.warn("Failed to check advanced analytics support for multiple types", error as Error);
         return false;
     }
 }
@@ -224,7 +224,7 @@ export async function getTypesWithFeature(feature: "responseTime" | "advancedAna
 
         return supportedTypes;
     } catch (error) {
-        console.warn(`Failed to get types with feature ${feature}:`, error);
+        logger.warn(`Failed to get types with feature ${feature}`, error as Error);
         return [];
     }
 }

@@ -6,7 +6,13 @@
  * for optimal performance and reliability. Supports precise response time measurement,
  * per-monitor timeout configuration, and intelligent status code interpretation.
  *
- * Key features:
+ * @public
+ *
+ * @see {@link IMonitorService} for interface contract
+ * @see {@link MonitorConfig} for configuration options
+ * @see {@link MonitorCheckResult} for result types
+ *
+ * ## Key Features
  * - Precise response time measurement using performance.now()
  * - Per-monitor timeout configuration support
  * - Intelligent status code handling (2xx/4xx = up, 5xx = down)

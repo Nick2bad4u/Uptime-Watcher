@@ -45,7 +45,7 @@ function IdentifierLabel({ selectedMonitor }: { selectedMonitor: Monitor }) {
                     setLabel(identifierLabel);
                 }
             } catch (error) {
-                console.warn("Failed to load identifier label:", error);
+                logger.warn("Failed to load identifier label", error as Error);
                 if (!isCancelled) {
                     setLabel("Identifier");
                 }
@@ -80,7 +80,7 @@ async function getIdentifierLabel(selectedMonitor: Monitor): Promise<string> {
             }
         }
     } catch (error) {
-        console.warn("Failed to get monitor config for identifier label:", error);
+        logger.warn("Failed to get monitor config for identifier label", error as Error);
     }
 
     // Fallback to hardcoded labels - these should be dynamically determined
@@ -108,7 +108,7 @@ function getDisplayIdentifier(currentSite: Site, selectedMonitor: Monitor): stri
             return `${selectedMonitor.host}:${selectedMonitor.port}`;
         }
     } catch (error) {
-        console.warn("Failed to generate display identifier:", error);
+        logger.warn("Failed to generate display identifier", error as Error);
     }
 
     // Fallback to site identifier

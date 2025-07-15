@@ -14,6 +14,7 @@ import type { Monitor, MonitorType } from "../../types";
 import type { AddSiteFormState, AddSiteFormActions } from "../SiteDetails/useAddSiteForm";
 
 import { DEFAULT_REQUEST_TIMEOUT, RETRY_CONSTRAINTS } from "../../constants";
+import { logger } from "../../services";
 import { validateMonitorData } from "../../utils/monitorValidation";
 import { getMonitorTypeConfig } from "../../utils/monitorTypeHelper";
 
@@ -118,7 +119,7 @@ async function buildMonitorData(
             }
         }
     } catch (error) {
-        console.warn("Failed to get monitor config, using fallback mapping:", error);
+        logger.warn("Failed to get monitor config, using fallback mapping", error as Error);
         // Fallback to hardcoded mapping for backward compatibility and error recovery
         // This ensures the form continues to work even if the registry is unavailable
         if (monitorType === "http") {

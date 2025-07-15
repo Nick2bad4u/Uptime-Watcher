@@ -27,7 +27,13 @@ export interface NotificationConfig {
  * Notification API. Provides configurable settings for different notification
  * types and handles platform compatibility checks.
  *
- * Features:
+ * @public
+ *
+ * @see {@link NotificationConfig} for configuration options
+ * @see {@link Site} for site data structure
+ * @see {@link Monitor} for monitor data structure
+ *
+ * ## Key Features
  * - **Configurable Alerts**: Control which types of status changes trigger notifications
  * - **Platform Detection**: Automatically detects if notifications are supported
  * - **Monitor Context**: Includes site name and monitor type in notification content

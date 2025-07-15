@@ -6,7 +6,15 @@
  * history tracking, and event emission. Extracted from UptimeMonitor for improved
  * modularity and maintainability with full transaction safety and error handling.
  *
- * Key features:
+ * @public
+ *
+ * @alpha
+ * This API is in active development and may change frequently.
+ *
+ * @see {@link MonitorCheckConfig} for configuration options
+ * @see {@link StatusUpdate} for result types
+ *
+ * ## Key Features
  * - **Individual Monitor Checks**: Perform health checks on specific monitors
  * - **Automatic Status Updates**: Update monitor status in database with transactions
  * - **History Tracking**: Maintain detailed history with configurable limits
@@ -27,7 +35,7 @@
  *
  * const result = await checkMonitor(config, site, "monitor_123");
  * if (result) {
- *   console.log(`Monitor ${result.monitorId} is ${result.status}`);
+ *   logger.info(`Monitor ${result.monitorId} is ${result.status}`);
  * }
  * ```
  *
@@ -117,8 +125,8 @@ export interface MonitorCheckConfig {
  * ```typescript
  * const result = await checkMonitor(config, site, "monitor_123");
  * if (result) {
- *   console.log(`Monitor status: ${result.status}`);
- *   console.log(`Response time: ${result.responseTime}ms`);
+ *   logger.info(`Monitor status: ${result.status}`);
+ *   logger.info(`Response time: ${result.responseTime}ms`);
  * }
  * ```
  */

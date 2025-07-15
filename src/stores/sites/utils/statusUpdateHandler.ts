@@ -5,6 +5,7 @@
 
 import type { Site, StatusUpdate } from "../../types";
 
+import { logger } from "../../../services";
 import { logStoreAction, waitForElectronAPI } from "../../utils";
 
 export interface StatusUpdateHandlerOptions {
@@ -39,7 +40,10 @@ export function createStatusUpdateHandler(options: StatusUpdateHandlerOptions) {
 
             // Validate timestamp bounds
             if (!Number.isFinite(updateTimestamp) || updateTimestamp <= 0) {
-                console.error("Invalid timestamp generated for update:", updateTimestamp);
+                logger.error(
+                    "Invalid timestamp generated for update",
+                    new Error(`Invalid timestamp: ${updateTimestamp}`)
+                );
                 return;
             }
 
@@ -77,11 +81,11 @@ export function createStatusUpdateHandler(options: StatusUpdateHandlerOptions) {
             } else {
                 // Site not found in current state - trigger full sync as fallback
                 if (process.env.NODE_ENV === "development") {
-                    console.warn(`Site ${update.site.identifier} not found in store, triggering full sync`);
+                    logger.warn(`Site ${update.site.identifier} not found in store, triggering full sync`);
                 }
                 await fullSyncFromBackend().catch((error) => {
                     if (process.env.NODE_ENV === "development") {
-                        console.error("Fallback full sync failed:", error);
+                        logger.error("Fallback full sync failed", error as Error);
                     }
                 });
             }
@@ -91,12 +95,12 @@ export function createStatusUpdateHandler(options: StatusUpdateHandlerOptions) {
                 pendingUpdates.delete(siteId);
             }
         } catch (error) {
-            console.error("Error processing status update:", error);
+            logger.error("Error processing status update", error as Error);
             // Clean up pending update tracking on error
             pendingUpdates.delete(update.site.identifier);
             // Fallback to full sync on any processing error
             await fullSyncFromBackend().catch((syncError) => {
-                console.error("Fallback sync after error failed:", syncError);
+                logger.error("Fallback sync after error failed", syncError as Error);
             });
         }
     };

@@ -6,6 +6,7 @@
 
 import React, { useEffect, useState } from "react";
 import type { MonitorType } from "../../types";
+import { logger } from "../../services";
 import {
     formatMonitorDetail,
     supportsResponseTime as checkSupportsResponseTime,
@@ -37,7 +38,7 @@ export function DetailLabel({ monitorType, details, fallback = details }: Detail
                     setFormattedLabel(formatted);
                 }
             } catch (error) {
-                console.warn("Failed to format detail label:", error);
+                logger.warn("Failed to format detail label", error as Error);
                 if (!isCancelled) {
                     setFormattedLabel(fallback);
                 }
@@ -78,7 +79,7 @@ export function ConditionalResponseTime({ monitorType, children, fallback }: Con
                     setIsLoading(false);
                 }
             } catch (error) {
-                console.warn("Failed to check response time support:", error);
+                logger.warn("Failed to check response time support", error as Error);
                 if (!isCancelled) {
                     setSupportsResponseTime(false);
                     setIsLoading(false);
@@ -124,7 +125,7 @@ export function ConditionalAdvancedAnalytics({ monitorType, children, fallback }
                     setIsLoading(false);
                 }
             } catch (error) {
-                console.warn("Failed to check advanced analytics support:", error);
+                logger.warn("Failed to check advanced analytics support", error as Error);
                 if (!isCancelled) {
                     setSupportsAdvanced(false);
                     setIsLoading(false);
@@ -174,7 +175,7 @@ export function ConditionalMultipleTypes({ monitorTypes, feature, children, fall
                     setIsLoading(false);
                 }
             } catch (error) {
-                console.warn(`Failed to check ${feature} support for multiple types:`, error);
+                logger.warn(`Failed to check ${feature} support for multiple types`, error as Error);
                 if (!isCancelled) {
                     setSupportsFeature(false);
                     setIsLoading(false);

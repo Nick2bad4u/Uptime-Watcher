@@ -7,7 +7,15 @@
  * pattern and service layer architecture to enable comprehensive testing and
  * maintainable code organization.
  *
- * Key features:
+ * @public
+ *
+ * @beta
+ * This service is currently in beta and may undergo breaking changes.
+ *
+ * @see {@link SiteLoadingOrchestrator} for orchestration logic
+ * @see {@link SiteRepository} for data access patterns
+ *
+ * ## Key Features
  * - **Dependency Injection**: Fully configurable with injected repositories and services
  * - **Separation of Concerns**: Pure data operations separated from side effects
  * - **Comprehensive Testing**: Designed for easy mocking and unit testing

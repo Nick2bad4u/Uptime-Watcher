@@ -160,7 +160,7 @@ function resetAllMocks(): void {
     mockSettingsRepositoryInstance.get.mockResolvedValue(null);
 }
 
-async function createUptimeOrchestrator() {
+async function createUptimeOrchestrator(): Promise<import("../UptimeOrchestrator").UptimeOrchestrator> {
     const { UptimeOrchestrator } = await import("../UptimeOrchestrator");
     return new UptimeOrchestrator();
 }

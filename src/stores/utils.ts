@@ -246,7 +246,7 @@ export const logStoreAction = (storeName: string, actionName: string, data?: unk
  *   await waitForElectronAPI();
  *   // Safe to use window.electronAPI
  * } catch (error) {
- *   console.error('ElectronAPI not available:', error);
+ *   logger.error('ElectronAPI not available', error as Error);
  * }
  * ```
  *
