@@ -165,7 +165,9 @@
     "postreset": "npm run reset && npm run postbuild",
     "test:watch:electron": "vitest --config vitest.electron.config.ts --watch",
     "test:watch:frontend": "vitest --watch",
-    "test:coverage:open": "npm run test:coverage && npm run open:coverage"
+    "test:coverage:open": "npm run test:coverage && npm run open:coverage",
+    "context": "repomix --compress --include \"src/**,electron/**\" --ignore \"**/test/**\"",
+    "ai:context": "repomix --compress --include \"src/**,electron/**\" --ignore \"**/test/**\""
   },
   "dependencies": {
     "axios": "^1.10.0",

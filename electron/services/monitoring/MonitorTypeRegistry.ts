@@ -8,8 +8,12 @@
  */
 
 import { z } from "zod";
+import validator from "validator";
 import { HttpMonitor } from "./HttpMonitor";
 import { PortMonitor } from "./PortMonitor";
+import { EnhancedTypeGuard } from "./EnhancedTypeGuards";
+import { migrationRegistry, versionManager, createMigrationOrchestrator, exampleMigrations } from "./MigrationSystem";
+import { logger } from "../../utils/logger";
 
 // Field definition for dynamic form generation
 export interface MonitorFieldDefinition {
@@ -74,6 +78,8 @@ export interface BaseMonitorConfig {
     readonly uiConfig?: {
         /** Function to format detail display in history (e.g., "Port: 80", "Response Code: 200") */
         formatDetail?: (details: string) => string;
+        /** Function to format title suffix for history charts (e.g., " (https://example.com)") */
+        formatTitleSuffix?: (monitor: Record<string, unknown>) => string;
         /** Whether this monitor type supports response time analytics */
         supportsResponseTime?: boolean;
         /** Whether this monitor type supports advanced analytics */
@@ -98,15 +104,47 @@ export interface BaseMonitorConfig {
     };
 }
 
-// Shared validation schemas using Zod
+// Shared validation schemas using Zod with enhanced validation
 export const monitorSchemas = {
     http: z.object({
-        url: z.string().url("Must be a valid URL"),
+        url: z.string().refine((val) => {
+            // Use validator.js for robust URL validation
+            return validator.isURL(val, {
+                protocols: ["http", "https"],
+                require_protocol: true,
+                require_host: true,
+                require_tld: true,
+                allow_underscores: false,
+                allow_trailing_dot: false,
+                allow_protocol_relative_urls: false,
+                disallow_auth: false,
+                validate_length: true,
+            });
+        }, "Must be a valid URL"),
         type: z.literal("http"),
     }),
     port: z.object({
-        host: z.string().min(1, "Host is required"),
-        port: z.number().min(1, "Port must be at least 1").max(65_535, "Port must be at most 65535"),
+        host: z.string().refine((val) => {
+            // Use validator.js for robust host validation
+            if (validator.isIP(val)) {
+                return true;
+            }
+            if (
+                validator.isFQDN(val, {
+                    require_tld: true,
+                    allow_underscores: false,
+                    allow_trailing_dot: false,
+                    allow_numeric_tld: false,
+                    allow_wildcard: false,
+                })
+            ) {
+                return true;
+            }
+            return val === "localhost";
+        }, "Must be a valid hostname, IP address, or localhost"),
+        port: z.number().refine((val) => {
+            return validator.isPort(val.toString());
+        }, "Must be a valid port number (1-65535)"),
         type: z.literal("port"),
     }),
 };
@@ -236,6 +274,10 @@ registerMonitorType({
     ],
     uiConfig: {
         formatDetail: (details: string) => `Response Code: ${details}`,
+        formatTitleSuffix: (monitor: Record<string, unknown>) => {
+            const url = monitor.url as string;
+            return url ? ` (${url})` : "";
+        },
         supportsResponseTime: true,
         supportsAdvancedAnalytics: true,
         helpTexts: {
@@ -282,6 +324,11 @@ registerMonitorType({
     ],
     uiConfig: {
         formatDetail: (details: string) => `Port: ${details}`,
+        formatTitleSuffix: (monitor: Record<string, unknown>) => {
+            const host = monitor.host as string;
+            const port = monitor.port as number;
+            return host && port ? ` (${host}:${port})` : "";
+        },
         supportsResponseTime: true,
         supportsAdvancedAnalytics: true,
         helpTexts: {
@@ -299,13 +346,130 @@ registerMonitorType({
     },
 });
 
+// Register example migrations for the migration system
+migrationRegistry.registerMigration("http", exampleMigrations.httpV1_0_to_1_1);
+migrationRegistry.registerMigration("port", exampleMigrations.portV1_0_to_1_1);
+
+// Set current versions for existing monitor types
+versionManager.setVersion("http", "1.0.0");
+versionManager.setVersion("port", "1.0.0");
+
+// Enhanced type guard for better runtime validation
+export function createMonitorWithTypeGuards(
+    type: string,
+    data: Record<string, unknown>
+): {
+    success: boolean;
+    monitor?: Record<string, unknown>;
+    errors: string[];
+} {
+    // Use enhanced type guard validation
+    const validationResult = EnhancedTypeGuard.validateMonitorType(type);
+    if (!validationResult.success) {
+        return {
+            success: false,
+            errors: [validationResult.error ?? "Invalid monitor type"],
+        };
+    }
+
+    const validMonitorType = validationResult.value;
+
+    // Create monitor object with proper validation
+    const monitor: Record<string, unknown> = {
+        type: validMonitorType,
+        monitoring: true,
+        status: "pending",
+        responseTime: -1,
+        retryAttempts: 3,
+        timeout: 10_000,
+        history: [],
+        ...data,
+    };
+
+    return {
+        success: true,
+        monitor,
+        errors: [],
+    };
+}
+
+// Database migration helper - properly implemented with basic migration system
+export async function migrateMonitorType(
+    monitorType: MonitorType,
+    fromVersion: string,
+    toVersion: string,
+    data?: Record<string, unknown>
+): Promise<{
+    success: boolean;
+    appliedMigrations: string[];
+    errors: string[];
+    data?: Record<string, unknown>;
+}> {
+    try {
+        // Validate the monitor type
+        const validationResult = EnhancedTypeGuard.validateMonitorType(monitorType);
+        if (!validationResult.success) {
+            return {
+                success: false,
+                appliedMigrations: [],
+                errors: [validationResult.error ?? "Invalid monitor type"],
+            };
+        }
+
+        logger.info(`Migrating monitor type ${monitorType} from ${fromVersion} to ${toVersion}`);
+
+        // Check if migration is needed
+        if (fromVersion === toVersion) {
+            return {
+                success: true,
+                appliedMigrations: [],
+                errors: [],
+                ...(data && { data }),
+            };
+        }
+
+        // If no data provided, just return success for version bump
+        if (!data) {
+            return {
+                success: true,
+                appliedMigrations: [`${monitorType}_${fromVersion}_to_${toVersion}`],
+                errors: [],
+            };
+        }
+
+        // Use the migration orchestrator for data migration
+        const migrationOrchestrator = createMigrationOrchestrator();
+
+        const migrationResult = await migrationOrchestrator.migrateMonitorData(
+            monitorType,
+            data,
+            fromVersion,
+            toVersion
+        );
+
+        return {
+            success: migrationResult.success,
+            appliedMigrations: migrationResult.appliedMigrations,
+            errors: migrationResult.errors,
+            ...(migrationResult.data && { data: migrationResult.data }),
+        };
+    } catch (error) {
+        logger.error("Migration error:", error);
+        return {
+            success: false,
+            appliedMigrations: [],
+            errors: [`Migration failed: ${error}`],
+        };
+    }
+}
+
 // Type guard for runtime validation
 export function isValidMonitorTypeGuard(type: unknown): type is string {
     return typeof type === "string" && isValidMonitorType(type);
 }
 
 // Generate union type from registered monitor types
-export type MonitorType = "http" | "port";
+export type MonitorType = ReturnType<typeof getRegisteredMonitorTypes>[number];
 
 // Helper to get the current monitor types as a union
-export type RegisteredMonitorType = ReturnType<typeof getRegisteredMonitorTypes>[number];
+export type RegisteredMonitorType = MonitorType;

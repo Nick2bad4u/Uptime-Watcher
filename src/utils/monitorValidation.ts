@@ -19,7 +19,12 @@ export async function validateMonitorData(
     try {
         // Use IPC to validate via backend registry
         const result = await window.electronAPI.monitorTypes.validateMonitorData(type, data);
-        return result;
+
+        // Handle the advanced validation result format
+        return {
+            success: result.success,
+            errors: result.errors,
+        };
     } catch (error) {
         console.error("Failed to validate monitor data:", error);
         return {

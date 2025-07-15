@@ -159,6 +159,15 @@
                     "-y",
                     "@modelcontextprotocol/server-memory"
                 ]
+            },
+            "repomix": {
+                "name": "repomix",
+                "command": "npx",
+                "args": [
+                    "-y",
+                    "repomix",
+                    "--mcp"
+                ]
             }
         }
     },

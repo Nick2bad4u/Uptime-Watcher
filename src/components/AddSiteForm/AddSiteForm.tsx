@@ -10,10 +10,9 @@ import { UI_DELAYS, CHECK_INTERVALS } from "../../constants";
 import { logger } from "../../services";
 import { useErrorStore, useSitesStore } from "../../stores";
 import { ThemedBox, ThemedText, ThemedButton, useTheme } from "../../theme";
-import type { MonitorType } from "../../types";
 import { generateUuid } from "../../utils/data/generateUuid";
 import { TextField, SelectField, RadioGroup } from "./FormFields";
-import { useDynamicHelpText } from "../dynamic-monitor-ui";
+import { useDynamicHelpText } from "../common/MonitorUiComponents";
 import { DynamicMonitorFields } from "./DynamicMonitorFields";
 import { handleSubmit } from "./Submit";
 import { useAddSiteForm } from "../SiteDetails/useAddSiteForm";
@@ -177,7 +176,7 @@ export const AddSiteForm = React.memo(function AddSiteForm() {
                     disabled={isLoading || isLoadingMonitorTypes}
                     id="monitorType"
                     label="Monitor Type"
-                    onChange={(value) => setMonitorType(value as MonitorType)}
+                    onChange={(value) => setMonitorType(value)}
                     options={monitorTypeOptions}
                     value={monitorType}
                 />

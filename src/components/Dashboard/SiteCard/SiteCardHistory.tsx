@@ -7,6 +7,8 @@ import React, { useMemo } from "react";
 
 import { Monitor, StatusHistory } from "../../../types";
 import { HistoryChart } from "../../common/HistoryChart";
+import { useMonitorTypes } from "../../../hooks/useMonitorTypes";
+import { formatTitleSuffix } from "../../../utils/monitorTitleFormatters";
 
 /**
  * Props for the SiteCardHistory component.
@@ -16,30 +18,6 @@ interface SiteCardHistoryProperties {
     monitor: Monitor | undefined;
     /** Filtered history data for visualization */
     filteredHistory: StatusHistory[];
-}
-
-/**
- * Formats the suffix for HTTP monitor titles.
- * @param monitor - The monitor object
- * @returns Formatted suffix string or empty string
- */
-function getHttpSuffix(monitor: Monitor): string {
-    return monitor.url ? ` (${monitor.url})` : "";
-}
-
-/**
- * Formats the suffix for port monitor titles.
- * @param monitor - The monitor object
- * @returns Formatted suffix string or empty string
- */
-function getPortSuffix(monitor: Monitor): string {
-    if (monitor.port) {
-        return ` (${monitor.host}:${monitor.port})`;
-    }
-    if (monitor.host) {
-        return ` (${monitor.host})`;
-    }
-    return "";
 }
 
 /**
@@ -67,24 +45,24 @@ function getPortSuffix(monitor: Monitor): string {
  */
 export const SiteCardHistory = React.memo(
     function SiteCardHistory({ filteredHistory, monitor }: SiteCardHistoryProperties) {
+        // Get monitor type configurations
+        const { options } = useMonitorTypes();
+
         // Memoize the history title calculation
         const historyTitle = useMemo(() => {
             if (!monitor) {
                 return "No Monitor Selected";
             }
 
-            switch (monitor.type) {
-                case "http": {
-                    return `HTTP History${getHttpSuffix(monitor)}`;
-                }
-                case "port": {
-                    return `Port History${getPortSuffix(monitor)}`;
-                }
-                default: {
-                    return `${monitor.type} History`;
-                }
-            }
-        }, [monitor]);
+            // Get display name from monitor type options
+            const monitorTypeOption = options.find((option) => option.value === monitor.type);
+            const displayName = monitorTypeOption?.label ?? monitor.type;
+
+            // Get type-specific suffix using dynamic formatter
+            const suffix = formatTitleSuffix(monitor);
+
+            return `${displayName} History${suffix}`;
+        }, [monitor, options]);
 
         return <HistoryChart history={filteredHistory} title={historyTitle} maxItems={60} />;
     },

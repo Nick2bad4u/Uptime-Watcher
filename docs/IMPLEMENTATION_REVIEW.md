@@ -1,5 +1,5 @@
 # Implementation Review: Dynamic Monitor System
-
+<!-- markdownlint-disable -->
 ## Review of Original Plan Implementation
 
 This document reviews how well we addressed each key problem identified in the original plan.

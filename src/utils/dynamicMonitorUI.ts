@@ -4,7 +4,7 @@
  */
 
 import type { MonitorType } from "../types";
-import { getMonitorTypeConfig, type MonitorTypeConfig } from "./monitorTypeHelper";
+import { getMonitorTypeConfig, getAvailableMonitorTypes, type MonitorTypeConfig } from "./monitorTypeHelper";
 
 /**
  * Cache for monitor type configurations
@@ -50,6 +50,10 @@ export function formatMonitorDetail(monitorType: MonitorType, details: string): 
 
         // eslint-disable-next-line security/detect-object-injection -- MonitorType is a known safe union type
         const formatter = formatters[monitorType];
+        if (!formatter) {
+            console.warn(`No formatter found for monitor type ${monitorType}`);
+            return details;
+        }
         return formatter(details);
     } catch (error) {
         console.warn(`Failed to format detail for monitor type ${monitorType}:`, error);
@@ -182,7 +186,6 @@ export async function allSupportsAdvancedAnalytics(monitorTypes: MonitorType[]):
  */
 export async function getTypesWithFeature(feature: "responseTime" | "advancedAnalytics"): Promise<MonitorType[]> {
     try {
-        const { getAvailableMonitorTypes } = await import("./monitorTypeHelper");
         const allTypes = await getAvailableMonitorTypes();
         const supportedTypes: MonitorType[] = [];
 
@@ -193,7 +196,7 @@ export async function getTypesWithFeature(feature: "responseTime" | "advancedAna
                     : config.uiConfig?.supportsAdvancedAnalytics;
 
             if (supports) {
-                supportedTypes.push(config.type as MonitorType);
+                supportedTypes.push(config.type);
             }
         }
 

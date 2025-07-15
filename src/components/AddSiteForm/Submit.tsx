@@ -143,10 +143,10 @@ async function buildMonitorData(
  */
 async function validateMonitorType(monitorType: string, url: string, host: string, port: string): Promise<string[]> {
     // Build monitor data object dynamically
-    const monitorData = await buildMonitorData(monitorType as MonitorType, { url, host, port });
+    const monitorData = await buildMonitorData(monitorType, { url, host, port });
 
     // Use backend registry validation
-    const result = await validateMonitorData(monitorType as MonitorType, monitorData);
+    const result = await validateMonitorData(monitorType, monitorData);
     return result.errors;
 }
 

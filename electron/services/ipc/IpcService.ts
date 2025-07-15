@@ -277,8 +277,15 @@ export class IpcService {
         ipcMain.handle("validate-monitor-data", (_, type: string, data: unknown) => {
             if (isDev()) logger.debug("[IpcService] Handling validate-monitor-data", { type, data });
 
-            // Use the registry's validation function
-            return validateMonitorData(type, data);
+            // Use the basic validation function for form validation
+            // The advanced validation is for more complex scenarios
+            const result = validateMonitorData(type, data);
+            return {
+                success: result.success,
+                errors: result.errors,
+                warnings: [], // Basic validation doesn't have warnings
+                metadata: {}, // Basic validation doesn't have metadata
+            };
         });
     }
 

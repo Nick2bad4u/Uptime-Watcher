@@ -5,14 +5,15 @@
  */
 
 import React, { useEffect, useState } from "react";
-import type { MonitorType } from "../types";
+import type { MonitorType } from "../../types";
 import {
     formatMonitorDetail,
-    supportsAdvancedAnalytics,
+    supportsResponseTime as checkSupportsResponseTime,
+    supportsAdvancedAnalytics as checkSupportsAdvancedAnalytics,
     allSupportsResponseTime,
     allSupportsAdvancedAnalytics,
     getMonitorHelpTexts,
-} from "../utils/dynamicMonitorUi";
+} from "../../utils/monitorUiHelpers";
 
 /**
  * Component that dynamically formats monitor detail labels.
@@ -58,7 +59,7 @@ export function ConditionalResponseTime({ monitorType, children, fallback }: Con
 
         const checkSupport = async () => {
             try {
-                const supports = await supportsResponseTime(monitorType);
+                const supports = await checkSupportsResponseTime(monitorType);
                 if (!isCancelled) {
                     setSupportsResponseTime(supports);
                     setIsLoading(false);
@@ -104,7 +105,7 @@ export function ConditionalAdvancedAnalytics({ monitorType, children, fallback }
 
         const checkSupport = async () => {
             try {
-                const supports = await supportsAdvancedAnalytics(monitorType);
+                const supports = await checkSupportsAdvancedAnalytics(monitorType);
                 if (!isCancelled) {
                     setSupportsAdvanced(supports);
                     setIsLoading(false);

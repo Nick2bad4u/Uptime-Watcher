@@ -7,7 +7,7 @@ import { Line, Bar, Doughnut } from "react-chartjs-2";
 import { FiActivity, FiTrendingUp, FiBarChart2 } from "react-icons/fi";
 import { MdAnalytics, MdTrendingUp, MdSpeed, MdPieChart } from "react-icons/md";
 
-import { ConditionalResponseTime } from "../../dynamic-monitor-ui";
+import { ConditionalResponseTime } from "../../common/MonitorUiComponents";
 import { DowntimePeriod } from "../../../hooks/site/useSiteAnalytics";
 import { logger } from "../../../services";
 import {

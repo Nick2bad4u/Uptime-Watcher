@@ -12,7 +12,7 @@ import { logger } from "../../../services";
 import { useSettingsStore } from "../../../stores";
 import { ThemedText, ThemedButton, StatusIndicator, ThemedCard, ThemedSelect, useTheme } from "../../../theme";
 import { StatusHistory, Monitor } from "../../../types";
-import { DetailLabel } from "../../dynamic-monitor-ui";
+import { DetailLabel } from "../../common/MonitorUiComponents";
 
 /**
  * Get the formatted label for filter buttons
