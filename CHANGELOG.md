@@ -7,14 +7,95 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[7ac619f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7ac619fb871cf48af4495972241eb19c206164bb)...
+[7ac619f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7ac619fb871cf48af4495972241eb19c206164bb)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/7ac619fb871cf48af4495972241eb19c206164bb...7ac619fb871cf48af4495972241eb19c206164bb))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 7.0.0 [`(7ac619f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7ac619fb871cf48af4495972241eb19c206164bb)
+
+
+
+
+
+
+## [7.0.0] - 2025-07-14
+
+
 [[05af275](https://github.com/Nick2bad4u/Uptime-Watcher/commit/05af275a43743dab4cebeca3deb183b2d314ee7d)...
-[05af275](https://github.com/Nick2bad4u/Uptime-Watcher/commit/05af275a43743dab4cebeca3deb183b2d314ee7d)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/05af275a43743dab4cebeca3deb183b2d314ee7d...05af275a43743dab4cebeca3deb183b2d314ee7d))
+[483d424](https://github.com/Nick2bad4u/Uptime-Watcher/commit/483d42400c4ce907962513305b51037e8b6f752e)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/05af275a43743dab4cebeca3deb183b2d314ee7d...483d42400c4ce907962513305b51037e8b6f752e))
+
+
+### ✨ Features
+
+- ✨ [feat] Enable dynamic monitor type registry and UI integration
+
+- Implements a dynamic registry system for monitor types, allowing addition, validation, and configuration of new monitor types without hardcoding.
+- Refactors validation, database schema, form rendering, and monitor service factory to use registry-driven configurations and Zod schemas.
+- Updates frontend to render monitor fields and help texts dynamically, improving extensibility and UX.
+- Adds IPC handlers and unified event flow for monitoring state changes, ensuring real-time UI sync.
+- Removes deprecated constants and legacy validation logic; unifies data mapping to support extensible monitor types.
+- Improves testability and future-proofing for adding new monitor types and features.
+
+Relates to extensibility and future support for custom monitor types. [`(c7940c1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c7940c14a98b1cf77554ff3f07725a085c6e5e89)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 6.9.0 [`(05af275)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/05af275a43743dab4cebeca3deb183b2d314ee7d)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(43116ee)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/43116ee8f00391a247bd7f7e256a5a5ceb797559)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Remove legacy tests and scripts after monitor type overhaul
+
+Removes obsolete unit tests and PowerShell/BAT scripts related to configuration, monitoring, and markdown link fixing, reflecting migration to a dynamic, registry-driven monitor type system.
+
+Updates remaining tests for compatibility with new monitor status types.
+Documentation is fully rewritten to guide new monitor type implementation and refactoring process.
+
+ - Reduces maintenance overhead and test complexity
+ - Ensures future extensibility and easier onboarding for contributors [`(483d424)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/483d42400c4ce907962513305b51037e8b6f752e)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Format VS Code settings for readability
+
+- Expands arrays in settings for improved clarity and consistency
+- Adds extensive comment tag color configuration to enhance code annotations
+- Updates Prettier ESLint rules to use warnings instead of errors for smoother development experience
+- [dependency] Updates dependency version to address minor package update [`(8bcd9bd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8bcd9bd66db3243e6e5cf8a4b489dfc38bd5bd87)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v6.9.0 [skip ci] [`(8ccb2e2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8ccb2e2332abaf14f708f45ddf1505e1f1b878de)
+
+
+
+### 👷 CI/CD
+
+- 👷 [ci] Improve SonarCloud config for coverage and exclusions
+
+- Refines test file exclusions to prevent test code from being analyzed as sources
+- Adds electron-specific coverage reports and tsconfig paths for broader analysis
+- Excludes test folders from duplication checks to reduce false positives
+- Sets default issue assignee and enables sensor cache for faster analysis
+- Increases max file size for JavaScript analysis to support larger files [`(8e1c9cf)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8e1c9cf45245dd9a3dd1b0e4b55b379bec7181f6)
 
 
 
