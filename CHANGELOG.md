@@ -7,14 +7,180 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[114e444](https://github.com/Nick2bad4u/Uptime-Watcher/commit/114e444598cdcfcdf3f62e9611f58c3d9c9033c8)...
-[114e444](https://github.com/Nick2bad4u/Uptime-Watcher/commit/114e444598cdcfcdf3f62e9611f58c3d9c9033c8)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/114e444598cdcfcdf3f62e9611f58c3d9c9033c8...114e444598cdcfcdf3f62e9611f58c3d9c9033c8))
+[[2e8b973](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2e8b97363ca519804d3e8dbb784fc8fae1e5a2e3)...
+[2e8b973](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2e8b97363ca519804d3e8dbb784fc8fae1e5a2e3)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/2e8b97363ca519804d3e8dbb784fc8fae1e5a2e3...2e8b97363ca519804d3e8dbb784fc8fae1e5a2e3))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 7.3.0 [`(2e8b973)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2e8b97363ca519804d3e8dbb784fc8fae1e5a2e3)
+
+
+
+
+
+
+## [7.3.0] - 2025-07-15
+
+
+[[f4e43ae](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f4e43aee3e597c6eba8edb174a4d70575711bf85)...
+[7981606](https://github.com/Nick2bad4u/Uptime-Watcher/commit/79816068aaecff5423b54bb779d9def939aba323)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/f4e43aee3e597c6eba8edb174a4d70575711bf85...79816068aaecff5423b54bb779d9def939aba323))
+
+
+### ✨ Features
+
+- ✨ [feat] Enforces barrel imports, theme consistency, and error handling
+
+- Updates import/export standards to require barrel files for all utility and service imports, improving maintainability and consistency.
+- Refactors codebase to strictly use barrel exports for monitor utilities and hooks, removing deep imports.
+- Introduces robust theme-aware CSS classes and global scrollbar styling for a more consistent UI across light/dark modes.
+- Enhances error handling logic in stores and database utilities, ensuring safer state updates and error conversion.
+- Improves code readability by extracting nested ternary expressions and splitting logic into helper functions.
+- Removes redundant feature doc comments and unused unit tests to streamline documentation and coverage.
+- Adds electron-devtools-installer for improved development workflow.
+- Adjusts formatting and linting scripts for stricter code quality. [`(7981606)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/79816068aaecff5423b54bb779d9def939aba323)
+
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 7.2.0 [`(f4e43ae)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f4e43aee3e597c6eba8edb174a4d70575711bf85)
+
+
+
+### � Documentation
+
+- 📝 [docs] Reformat monitor type guide examples for clarity
+
+- Improves readability in monitor type implementation guides by applying consistent code formatting and indentation
+- Adds spacing and formatting to clarify code block sections, field type explanations, UI configuration, and integration steps
+- Enhances step-by-step instructions for adding and registering new monitor types
+- Aims to make the documentation easier to follow for developers extending monitoring functionality [`(ff92f0c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ff92f0c1bc451a0cad7e5de883a8eaccb5569481)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Replace console logging with structured logger
+
+- Unifies error and warning reporting across frontend and backend by replacing all console.* calls with a structured logger interface.
+- Enhances log consistency, improves error traceability, and supports future log aggregation or filtering.
+- Adds logger imports where missing and adapts all error/warning handling code to use logger methods instead of direct console statements.
+- Updates documentation comments for clarity and standardization, and improves error context in log messages. [`(ee45c3c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ee45c3cbe5ef8f4d67d8ea295164a692ff6ba76d)
+
+
+
+
+
+
+## [7.2.0] - 2025-07-15
+
+
+[[15de9b5](https://github.com/Nick2bad4u/Uptime-Watcher/commit/15de9b5f08ac149aaad420caf6a841197442381b)...
+[f6c3db1](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f6c3db18b64f0ac3bcf798ef391d3399ae018442)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/15de9b5f08ac149aaad420caf6a841197442381b...f6c3db18b64f0ac3bcf798ef391d3399ae018442))
+
+
+### ✨ Features
+
+- ✨ [feat] Emit sync events after site updates for consistency
+
+- Ensures state synchronization by emitting a dedicated event after site and monitor updates.
+- Facilitates downstream listeners to react to state changes and maintain data integrity. [`(0e1c0cc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0e1c0cc5166e4557c56ddb5e5a7f2e916ab87852)
+
+
+- ✨ [feat] Add unified state sync event support and sync status API
+
+- Implements real-time state synchronization events for better consistency between backend, cache, and frontend, replacing previous ad-hoc sync logic.
+- Adds a structured API to query synchronization status and metadata, improving diagnostics and UI feedback.
+- Updates relevant interfaces and event emitters to include synchronization source and timestamp for traceability.
+- Cleans up redundant legacy state sync code to streamline state management. [`(863989e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/863989ebb8ebb3f653439027df4709c27e37f360)
+
+
+- ✨ [feat] Add Biome integration, IPC monitor formatting, and docs
+
+- Introduces Biome for code formatting and linting, adds configuration, and updates scripts for linting workflows.
+- Expands IPC interface and backend handlers to support dynamic monitor detail and title formatting, enabling frontend to use backend registry for monitor type display logic.
+- Documents the process for adding new monitor types, clarifying which steps are automated and which require manual intervention.
+- Refactors status history logic for type safety, cleans up event constants, and improves migration system robustness.
+- Updates ESLint configuration to include React Refresh and adds related dev dependencies.
+- Adds new dev tooling for dependency analysis and static code checks (depcheck, madge, vite-plugin-checker, vite-plugin-eslint2).
+- Ensures database schema and history manipulation match improved type definitions for historical status.
+- Relates to ongoing extensibility and maintenance improvements for monitor type system. [`(b670584)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b6705840a0389fbc3124b4c2449246b189057d51)
+
+
+
+### �️ Bug Fixes
+
+- 🛠️ [fix] Prevent memory leaks & improve error handling
+
+- Adds a configurable middleware limit to event bus to prevent excessive registrations and potential memory leaks, with diagnostics reporting usage.
+- Refines store utility error handling to log and gracefully recover from failures in state management methods, ensuring robust operation and preventing state corruption.
+- Cleans up overlay and timeout logic in screenshot thumbnail for more reliable UI behavior.
+- Removes unused dynamic monitor UI logic to reduce code complexity.
+- Introduces targeted tests to validate critical error handling and middleware leak prevention features. [`(15de9b5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/15de9b5f08ac149aaad420caf6a841197442381b)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 7.1.0 [`(114e444)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/114e444598cdcfcdf3f62e9611f58c3d9c9033c8)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(5c3d12e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5c3d12e9dbc4396c1f62fc3cba599c989d321803)
+
+
+
+### � Documentation
+
+- 📝 [docs] Add updated guide for monitor type implementation
+
+- Introduces a simplified documentation outlining the new registry-driven approach for adding monitor types, reducing required changes to just two files and streamlining development.
+- Improves error handling in monitoring configuration logic by ensuring failed history limit updates are logged without blocking execution.
+- Skips a test for handling invalid status values in bulk inserts, reflecting a change in expectations around status correction behavior. [`(f6c3db1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f6c3db18b64f0ac3bcf798ef391d3399ae018442)
+
+
+- 📝 [docs] Update monitor type docs for dynamic registry refactor
+
+- Modernizes documentation for dynamic monitor system and registry-driven architecture
+- Documents removal of hard-coded type lists, switch cases, and manual registration patterns
+- Details new Zod validation schemas, migration framework, and monitor type extensibility
+- Clarifies implementation steps, file organization, and integration points for adding new monitor types
+- Improves formatting, adds examples, and updates guides to reflect plugin/plugin-like approach
+- Ensures future extensibility, maintainability, and developer experience are highlighted
+
+Relates to overall system refactor and onboarding improvements. [`(88d04e2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/88d04e21affafdee8c624ba285fca1a67e57b869)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Reformat configuration file with consistent indentation
+
+Standardizes indentation to improve readability and maintain consistent code style across the configuration file.
+
+No logic or functional changes introduced. [`(e61db61)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e61db611567440696d6d6f3c2d505887380765fa)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v7.1.0 [skip ci] [`(3febd52)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3febd52ebd35faa525dfdc96cee56b40a80e75c3)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update dependencies for improved compatibility
+
+- Upgrades multiple project dependencies to latest versions, including zod, eslint, electron, playwright, vite, and various CSpell, TypeScript, and ESLint plugins.
+ - Addresses security, bug fixes, and compatibility improvements with new library releases.
+ - Ensures continued support for development and testing tools in the evolving ecosystem. [`(0ecdeed)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0ecdeed52ce55db06da8166f7bf156e4e7168d4a)
 
 
 
