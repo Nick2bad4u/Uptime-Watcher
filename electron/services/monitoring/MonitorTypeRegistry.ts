@@ -234,7 +234,7 @@ export function validateMonitorData(
     }
 
     try {
-        const validData = config.validationSchema.parse(data) as unknown;
+        const validData = config.validationSchema.parse(data);
         return {
             success: true,
             errors: [],
@@ -244,7 +244,7 @@ export function validateMonitorData(
         if (error instanceof z.ZodError) {
             return {
                 success: false,
-                errors: error.errors.map((err) => `${err.path.join(".")}: ${err.message}`),
+                errors: error.issues.map((err) => `${err.path.join(".")}: ${err.message}`),
             };
         }
         return {

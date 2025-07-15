@@ -485,7 +485,7 @@ export const GenericTypeInference = {
                         details: {
                             expectedType: fieldInfo.type,
                             actualType: typeof value,
-                            suggestions: validationResult.error.errors.map((e) => e.message),
+                            suggestions: validationResult.error.issues.map((e) => e.message),
                         },
                     };
                 }
@@ -506,7 +506,7 @@ export const GenericTypeInference = {
                         details: {
                             expectedType: fieldInfo.type,
                             actualType: typeof value,
-                            suggestions: validationResult.error.errors.map((e) => e.message),
+                            suggestions: validationResult.error.issues.map((e) => e.message),
                         },
                     };
                 }

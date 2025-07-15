@@ -239,6 +239,14 @@ export class SiteManager {
             timestamp: Date.now(),
         });
 
+        // Emit sync event for state consistency
+        await this.eventEmitter.emitTyped("sites:state-synchronized", {
+            action: "update" as const,
+            siteIdentifier: site.identifier,
+            timestamp: Date.now(),
+            source: "database" as const,
+        });
+
         logger.info(`Site added successfully: ${site.identifier} (${site.name || "unnamed"})`);
         return site;
     }
@@ -270,6 +278,14 @@ export class SiteManager {
                 siteId: identifier,
                 siteName: removedSite?.name ?? "Unknown",
                 timestamp: Date.now(),
+            });
+
+            // Emit sync event for state consistency
+            await this.eventEmitter.emitTyped("sites:state-synchronized", {
+                action: "delete" as const,
+                siteIdentifier: identifier,
+                timestamp: Date.now(),
+                source: "database" as const,
             });
         }
 

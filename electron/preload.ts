@@ -320,6 +320,8 @@ const stateSyncAPI = {
             action: "update" | "delete" | "bulk-sync";
             siteIdentifier?: string;
             sites?: Site[];
+            timestamp?: number;
+            source?: "cache" | "database" | "frontend";
         }) => void
     ) => {
         const handler = (_event: Electron.IpcRendererEvent, eventData: Parameters<typeof callback>[0]) => {
@@ -334,7 +336,19 @@ const stateSyncAPI = {
      *
      * @returns Promise resolving when sync is complete
      */
-    requestFullSync: () => ipcRenderer.invoke("request-full-sync"),
+    requestFullSync: (): Promise<{ success: boolean; siteCount: number }> => ipcRenderer.invoke("request-full-sync"),
+
+    /**
+     * Get current synchronization status.
+     *
+     * @returns Promise with sync status information
+     */
+    getSyncStatus: (): Promise<{
+        success: boolean;
+        synchronized: boolean;
+        lastSync: number | null;
+        siteCount: number;
+    }> => ipcRenderer.invoke("get-sync-status"),
 };
 
 /**

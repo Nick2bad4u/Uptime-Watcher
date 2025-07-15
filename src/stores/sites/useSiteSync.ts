@@ -17,6 +17,13 @@ export interface SiteSyncActions {
     syncSitesFromBackend: () => Promise<void>;
     /** Full sync from backend */
     fullSyncFromBackend: () => Promise<void>;
+    /** Get sync status */
+    getSyncStatus: () => Promise<{
+        success: boolean;
+        synchronized: boolean;
+        lastSync: number | null | undefined;
+        siteCount: number;
+    }>;
     /** Subscribe to status updates */
     subscribeToStatusUpdates: (callback: (update: StatusUpdate) => void) => {
         success: boolean;
@@ -29,6 +36,8 @@ export interface SiteSyncActions {
         unsubscribed: boolean;
         message: string;
     };
+    /** Subscribe to sync events */
+    subscribeToSyncEvents: () => () => void;
 }
 
 export interface SiteSyncDependencies {
@@ -47,6 +56,26 @@ export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActio
                 message: "Full backend synchronization completed",
                 success: true,
             });
+        },
+        getSyncStatus: async () => {
+            try {
+                const status = await window.electronAPI.stateSync.getSyncStatus();
+                logStoreAction("SitesStore", "getSyncStatus", {
+                    message: "Sync status retrieved",
+                    synchronized: status.synchronized,
+                    siteCount: status.siteCount,
+                    success: true,
+                });
+                return status;
+            } catch (error) {
+                logStoreAction("SitesStore", "error", { error });
+                return {
+                    success: false,
+                    synchronized: false,
+                    lastSync: undefined,
+                    siteCount: 0,
+                };
+            }
         },
         subscribeToStatusUpdates: (callback: (update: StatusUpdate) => void) => {
             const handler = createStatusUpdateHandler({
@@ -95,6 +124,39 @@ export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActio
             logStoreAction("SitesStore", "unsubscribeFromStatusUpdates", result);
 
             return result;
+        },
+        subscribeToSyncEvents: () => {
+            const cleanup = window.electronAPI.stateSync.onStateSyncEvent((event) => {
+                logStoreAction("SitesStore", "syncEventReceived", {
+                    action: event.action,
+                    siteIdentifier: event.siteIdentifier,
+                    timestamp: event.timestamp,
+                    source: event.source,
+                }); // Handle different sync actions
+                switch (event.action) {
+                    case "bulk-sync": {
+                        if (event.sites) {
+                            deps.setSites(event.sites);
+                        }
+                        break;
+                    }
+                    case "update":
+                    case "delete": {
+                        // For single site updates, trigger a full sync
+                        actions.syncSitesFromBackend().catch((error: unknown) => {
+                            logStoreAction("SitesStore", "error", { error });
+                        });
+                        break;
+                    }
+                }
+            });
+
+            logStoreAction("SitesStore", "subscribeToSyncEvents", {
+                message: "Successfully subscribed to sync events",
+                success: true,
+            });
+
+            return cleanup;
         },
     };
 

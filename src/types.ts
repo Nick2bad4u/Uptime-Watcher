@@ -301,6 +301,31 @@ declare global {
             };
 
             /**
+             * State synchronization operations for real-time updates.
+             */
+            stateSync: {
+                /** Register listener for state synchronization events */
+                onStateSyncEvent: (
+                    callback: (event: {
+                        action: "update" | "delete" | "bulk-sync";
+                        siteIdentifier?: string;
+                        sites?: Site[];
+                        timestamp?: number;
+                        source?: "cache" | "database" | "frontend";
+                    }) => void
+                ) => () => void;
+                /** Manually request full state synchronization */
+                requestFullSync: () => Promise<{ success: boolean; siteCount: number }>;
+                /** Get current synchronization status */
+                getSyncStatus: () => Promise<{
+                    success: boolean;
+                    synchronized: boolean;
+                    lastSync: number | null;
+                    siteCount: number;
+                }>;
+            };
+
+            /**
              * System-level operations and utilities.
              */
             system: {

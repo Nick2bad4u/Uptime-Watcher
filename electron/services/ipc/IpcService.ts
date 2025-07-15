@@ -209,6 +209,7 @@ export class IpcService {
      * @remarks
      * Handles:
      * - `request-full-sync`: Manual full state synchronization request
+     * - `get-sync-status`: Get current synchronization status
      */
     private setupStateSyncHandlers(): void {
         ipcMain.handle("request-full-sync", async () => {
@@ -217,20 +218,49 @@ export class IpcService {
                 // Get all sites and send to frontend
                 const sites = await this.uptimeOrchestrator.getSites();
 
-                // Emit state sync event to all renderer processes
+                // Emit proper typed sync event
+                await this.uptimeOrchestrator.emitTyped("sites:state-synchronized", {
+                    action: "bulk-sync",
+                    timestamp: Date.now(),
+                    source: "database",
+                });
+
+                // Send state sync event to all renderer processes
                 for (const window of BrowserWindow.getAllWindows()) {
                     window.webContents.send("state-sync-event", {
                         action: "bulk-sync",
                         sites: sites,
                         timestamp: Date.now(),
+                        source: "database",
                     });
                 }
 
-                logger.debug("[IpcService] Full sync completed");
-                return { success: true };
+                logger.debug("[IpcService] Full sync completed", { siteCount: sites.length });
+                return { success: true, siteCount: sites.length };
             } catch (error) {
                 logger.error("[IpcService] Failed to perform full sync", error);
                 throw error;
+            }
+        });
+
+        ipcMain.handle("get-sync-status", async () => {
+            logger.debug("[IpcService] Handling get-sync-status");
+            try {
+                const sites = await this.uptimeOrchestrator.getSites();
+                return {
+                    success: true,
+                    synchronized: true,
+                    lastSync: Date.now(),
+                    siteCount: sites.length,
+                };
+            } catch (error) {
+                logger.error("[IpcService] Failed to get sync status", error);
+                return {
+                    success: false,
+                    synchronized: false,
+                    lastSync: null,
+                    siteCount: 0,
+                };
             }
         });
     }

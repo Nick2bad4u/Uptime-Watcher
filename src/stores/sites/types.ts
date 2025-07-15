@@ -46,6 +46,13 @@ export interface SitesActions {
     syncSitesFromBackend: () => Promise<void>;
     /** Full sync from backend */
     fullSyncFromBackend: () => Promise<void>;
+    /** Get sync status */
+    getSyncStatus: () => Promise<{
+        success: boolean;
+        synchronized: boolean;
+        lastSync: number | null | undefined;
+        siteCount: number;
+    }>;
     /** Set sites data */
     setSites: (sites: Site[]) => void;
     /** Add a site to the store */
@@ -66,6 +73,8 @@ export interface SitesActions {
     unsubscribeFromStatusUpdates: () => void;
     /** Download SQLite backup */
     downloadSQLiteBackup: () => Promise<void>;
+    /** Subscribe to sync events */
+    subscribeToSyncEvents: () => () => void;
 }
 
 export type SitesStore = SitesState & SitesActions;
