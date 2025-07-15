@@ -7,14 +7,71 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[7ac619f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7ac619fb871cf48af4495972241eb19c206164bb)...
-[7ac619f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7ac619fb871cf48af4495972241eb19c206164bb)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/7ac619fb871cf48af4495972241eb19c206164bb...7ac619fb871cf48af4495972241eb19c206164bb))
+[[114e444](https://github.com/Nick2bad4u/Uptime-Watcher/commit/114e444598cdcfcdf3f62e9611f58c3d9c9033c8)...
+[114e444](https://github.com/Nick2bad4u/Uptime-Watcher/commit/114e444598cdcfcdf3f62e9611f58c3d9c9033c8)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/114e444598cdcfcdf3f62e9611f58c3d9c9033c8...114e444598cdcfcdf3f62e9611f58c3d9c9033c8))
 
 
 ### 📦 Dependencies
 
+- [dependency] Update version 7.1.0 [`(114e444)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/114e444598cdcfcdf3f62e9611f58c3d9c9033c8)
+
+
+
+
+
+
+## [7.1.0] - 2025-07-15
+
+
+[[7ac619f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7ac619fb871cf48af4495972241eb19c206164bb)...
+[6d0384d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6d0384d05d474bfbeb37f11e56b5348b0a0a0a8b)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/7ac619fb871cf48af4495972241eb19c206164bb...6d0384d05d474bfbeb37f11e56b5348b0a0a0a8b))
+
+
+### ✨ Features
+
+- ✨ [feat] Implement dynamic monitor migration and validation system
+
+- Introduces a robust migration system for monitor types with version tracking, registry-driven data transformation, and schema evolution support.
+- Adds advanced runtime validation and type guard utilities for monitor data, improving error handling and extensibility.
+- Refactors monitor type registry and frontend utilities to eliminate hard-coded logic and support dynamic field configuration.
+- Updates documentation to reflect completed dynamic monitor architecture, migration strategies, and validation improvements.
+- Enhances performance with caching and memoization for monitor type lookups.
+- Improves error handling, state management, and test coverage for validation and migration features.
+- Increases maintainability and scalability by enabling easy addition of new monitor types with minimal code changes. [`(88a65a0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/88a65a0a00765dcb5e5f857859af8e72c7742be2)
+
+
+
+### 📦 Dependencies
+
+- *(deps)* [dependency] Update google/osv-scanner-action (#28) [`(2804a12)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2804a1200b476d2a65cf19f55f8f331fbacd602e)
+
+
 - [dependency] Update version 7.0.0 [`(7ac619f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7ac619fb871cf48af4495972241eb19c206164bb)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(6d0384d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6d0384d05d474bfbeb37f11e56b5348b0a0a0a8b)
+
+
+
+### � Documentation
+
+- 📝 [docs] Add implementation, legacy code, and file org reviews
+
+- Adds comprehensive documentation for the dynamic monitor system, including implementation review, legacy code analysis, final summary, and detailed file organization recommendations.
+- Removes the outdated monitor type guide to reflect current registry-based architecture and dynamic patterns.
+- Updates imports and file naming to use consistent camelCase across components and utilities.
+- Motivates future splitting of large utility files for better maintainability and developer experience. [`(3af3ce9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3af3ce9abd6021ac372b10d6e05290c3d3bd5ce4)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v7.0.0 [skip ci] [`(7fe5603)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7fe5603fa143e800266a2e21387fa9bc876c3f1f)
 
 
 
