@@ -44,30 +44,37 @@ export function ScreenshotThumbnail({ siteName, url }: ScreenshotThumbnailProper
     const [hovered, setHovered] = useState(false);
     const [overlayVariables, setOverlayVariables] = useState<React.CSSProperties>({});
     const linkReference = useRef<HTMLAnchorElement>(null);
-    const portalReference = useRef<HTMLDivElement | null>(null);
+    const portalReference = useRef<HTMLDivElement>(null);
     const hoverTimeoutReference = useRef<NodeJS.Timeout | undefined>(undefined);
     const { themeName } = useTheme();
     const screenshotUrl = `https://api.microlink.io/?url=${encodeURIComponent(url)}&screenshot=true&meta=false&embed=screenshot.url&colorScheme=auto`;
 
     // Clean up portal overlay on unmount and state changes
     useEffect(() => {
-        const currentPortal = portalReference.current;
-        const currentTimeout = hoverTimeoutReference.current;
         return () => {
             // Clear any pending timeouts
-
-            if (currentTimeout) {
-                clearTimeout(currentTimeout);
+            if (hoverTimeoutReference.current) {
+                clearTimeout(hoverTimeoutReference.current);
+                hoverTimeoutReference.current = undefined;
             }
+
+            // Reset state
             setHovered(false);
             setOverlayVariables({});
-            // Clean up any portal element that might still be in the DOM
-
-            if (currentPortal?.parentNode) {
-                currentPortal.remove();
-            }
         };
     }, []);
+
+    // Additional cleanup on hovered state changes
+    useEffect(() => {
+        if (!hovered) {
+            // Clear any pending timeouts when hiding overlay
+            if (hoverTimeoutReference.current) {
+                clearTimeout(hoverTimeoutReference.current);
+                hoverTimeoutReference.current = undefined;
+            }
+            setOverlayVariables({});
+        }
+    }, [hovered]);
 
     function handleClick(event: React.MouseEvent) {
         event.preventDefault();
@@ -117,13 +124,6 @@ export function ScreenshotThumbnail({ siteName, url }: ScreenshotThumbnailProper
                 "--overlay-top": `${top}px`,
                 "--overlay-width": `${overlayW}px`,
             } as React.CSSProperties);
-        } else if (!hovered) {
-            // Clear any pending timeouts when hiding overlay
-            if (hoverTimeoutReference.current) {
-                clearTimeout(hoverTimeoutReference.current);
-                hoverTimeoutReference.current = undefined;
-            }
-            setOverlayVariables({});
         }
     }, [hovered, url, siteName]);
 

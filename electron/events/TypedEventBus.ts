@@ -77,38 +77,56 @@ export type EventMiddleware<T = unknown> = (
 export class TypedEventBus<EventMap extends Record<string, unknown>> extends EventEmitter {
     private readonly middlewares: EventMiddleware[] = [];
     private readonly busId: string;
+    private readonly maxMiddleware: number;
 
     /**
      * Create a new typed event bus.
      *
      * @param name - Optional name for the bus (used in logging and diagnostics)
+     * @param options - Optional configuration options
      *
      * @remarks
      * If no name is provided, a unique correlation ID will be generated.
      * The bus is configured with a reasonable max listener limit for development use.
+     * A maximum middleware limit prevents memory leaks from excessive middleware registration.
      */
-    constructor(name?: string) {
+    constructor(name?: string, options?: { maxMiddleware?: number }) {
         super();
         this.busId = name ?? generateCorrelationId();
+        this.maxMiddleware = options?.maxMiddleware ?? 20;
 
         // Set max listeners to prevent warnings in development
         this.setMaxListeners(50);
 
-        logger.debug(`[TypedEventBus:${this.busId}] Created new event bus`);
+        logger.debug(`[TypedEventBus:${this.busId}] Created new event bus (max middleware: ${this.maxMiddleware})`);
     }
 
     /**
      * Register middleware to process events before emission.
      *
      * @param middleware - Middleware function to register
+     * @throws {@link Error} When the maximum middleware limit is exceeded
      *
      * @remarks
      * Middleware is executed in registration order. Each middleware must call
      * `next()` to continue the chain or throw an error to abort processing.
+     *
+     * A maximum middleware limit prevents memory leaks from excessive registrations.
+     * If you need more middleware, consider increasing the limit in the constructor
+     * or combining multiple middleware functions into one.
      */
     use(middleware: EventMiddleware): void {
+        if (this.middlewares.length >= this.maxMiddleware) {
+            throw new Error(
+                `Maximum middleware limit (${this.maxMiddleware}) exceeded. ` +
+                    `Consider increasing maxMiddleware or combining middleware functions.`
+            );
+        }
+
         this.middlewares.push(middleware);
-        logger.debug(`[TypedEventBus:${this.busId}] Registered middleware (total: ${this.middlewares.length})`);
+        logger.debug(
+            `[TypedEventBus:${this.busId}] Registered middleware (total: ${this.middlewares.length}/${this.maxMiddleware})`
+        );
     }
 
     /**
@@ -311,6 +329,8 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
             listenerCounts,
             maxListeners: this.getMaxListeners(),
             middlewareCount: this.middlewares.length,
+            maxMiddleware: this.maxMiddleware,
+            middlewareUtilization: (this.middlewares.length / this.maxMiddleware) * 100,
         };
     }
 }
@@ -349,6 +369,10 @@ export interface EventBusDiagnostics {
     busId: string;
     /** Number of registered middleware functions */
     middlewareCount: number;
+    /** Maximum number of middleware functions allowed */
+    maxMiddleware: number;
+    /** Percentage of middleware slots used (0-100) */
+    middlewareUtilization: number;
     /** Number of listeners registered for each event */
     listenerCounts: Record<string, number>;
     /** Maximum number of listeners allowed per event */
@@ -359,11 +383,12 @@ export interface EventBusDiagnostics {
  * Utility function to create a typed event bus instance.
  *
  * @param name - Optional name for the bus
+ * @param options - Optional configuration options
  * @returns A new TypedEventBus instance
  *
  * @remarks
  * Convenience factory function for creating typed event bus instances.
- * Equivalent to `new TypedEventBus<EventMap>(name)`.
+ * Equivalent to `new TypedEventBus<EventMap>(name, options)`.
  *
  * @example
  * ```typescript
@@ -371,9 +396,12 @@ export interface EventBusDiagnostics {
  *   'user:login': { userId: string };
  * }
  *
- * const bus = createTypedEventBus<AppEvents>('main-bus');
+ * const bus = createTypedEventBus<AppEvents>('main-bus', { maxMiddleware: 50 });
  * ```
  */
-export function createTypedEventBus<EventMap extends Record<string, unknown>>(name?: string): TypedEventBus<EventMap> {
-    return new TypedEventBus<EventMap>(name);
+export function createTypedEventBus<EventMap extends Record<string, unknown>>(
+    name?: string,
+    options?: { maxMiddleware?: number }
+): TypedEventBus<EventMap> {
+    return new TypedEventBus<EventMap>(name, options);
 }
