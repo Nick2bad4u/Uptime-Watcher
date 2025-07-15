@@ -367,6 +367,14 @@ export class SiteManager {
             updatedFields: Object.keys(updates),
         });
 
+        // Emit sync event for state consistency
+        await this.eventEmitter.emitTyped("sites:state-synchronized", {
+            action: "update" as const,
+            siteIdentifier: identifier,
+            timestamp: Date.now(),
+            source: "database" as const,
+        });
+
         return refreshedSite;
     }
 
@@ -469,6 +477,14 @@ export class SiteManager {
                         site: updatedSite,
                         timestamp: Date.now(),
                         updatedFields: ["monitors"],
+                    });
+
+                    // Emit sync event for state consistency
+                    await this.eventEmitter.emitTyped("sites:state-synchronized", {
+                        action: "update" as const,
+                        siteIdentifier: siteIdentifier,
+                        timestamp: Date.now(),
+                        source: "database" as const,
                     });
 
                     logger.info(`[SiteManager] Monitor ${monitorId} removed from site ${siteIdentifier}`);
