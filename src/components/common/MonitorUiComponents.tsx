@@ -7,13 +7,7 @@
 import React, { useEffect, useState } from "react";
 import type { MonitorType } from "../../types";
 import { logger } from "../../services";
-import {
-    formatMonitorDetail,
-    supportsResponseTime as checkSupportsResponseTime,
-    supportsAdvancedAnalytics as checkSupportsAdvancedAnalytics,
-    allSupportsResponseTime,
-    allSupportsAdvancedAnalytics,
-} from "../../utils";
+import { formatMonitorDetail, supportsResponseTime as checkSupportsResponseTime } from "../../utils";
 
 /**
  * Component that dynamically formats monitor detail labels.
@@ -99,100 +93,4 @@ export function ConditionalResponseTime({ monitorType, children, fallback }: Con
     }
 
     return supportsResponseTime ? children : fallback;
-}
-
-/**
- * Component that conditionally renders based on advanced analytics support.
- */
-interface ConditionalAdvancedAnalyticsProps {
-    readonly monitorType: MonitorType;
-    readonly children: React.ReactNode;
-    readonly fallback?: React.ReactNode;
-}
-
-export function ConditionalAdvancedAnalytics({ monitorType, children, fallback }: ConditionalAdvancedAnalyticsProps) {
-    const [supportsAdvanced, setSupportsAdvanced] = useState<boolean>(false);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
-
-    useEffect(() => {
-        let isCancelled = false;
-
-        const checkSupport = async () => {
-            try {
-                const supports = await checkSupportsAdvancedAnalytics(monitorType);
-                if (!isCancelled) {
-                    setSupportsAdvanced(supports);
-                    setIsLoading(false);
-                }
-            } catch (error) {
-                logger.warn("Failed to check advanced analytics support", error as Error);
-                if (!isCancelled) {
-                    setSupportsAdvanced(false);
-                    setIsLoading(false);
-                }
-            }
-        };
-
-        void checkSupport();
-
-        return () => {
-            isCancelled = true;
-        };
-    }, [monitorType]);
-
-    if (isLoading) {
-        return fallback;
-    }
-
-    return supportsAdvanced ? children : fallback;
-}
-
-/**
- * Component that conditionally renders based on multiple monitor types support.
- */
-interface ConditionalMultipleTypesProps {
-    readonly monitorTypes: MonitorType[];
-    readonly feature: "responseTime" | "advancedAnalytics";
-    readonly children: React.ReactNode;
-    readonly fallback?: React.ReactNode;
-}
-
-export function ConditionalMultipleTypes({ monitorTypes, feature, children, fallback }: ConditionalMultipleTypesProps) {
-    const [supportsFeature, setSupportsFeature] = useState<boolean>(false);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
-
-    useEffect(() => {
-        let isCancelled = false;
-
-        const checkSupport = async () => {
-            try {
-                const checkFunction =
-                    feature === "responseTime" ? allSupportsResponseTime : allSupportsAdvancedAnalytics;
-                const supports = await checkFunction(monitorTypes);
-
-                if (!isCancelled) {
-                    setSupportsFeature(supports);
-                    setIsLoading(false);
-                }
-            } catch (error) {
-                logger.warn(`Failed to check ${feature} support for multiple types`, error as Error);
-                if (!isCancelled) {
-                    setSupportsFeature(false);
-                    setIsLoading(false);
-                }
-            }
-        };
-
-        void checkSupport();
-
-        return () => {
-            isCancelled = true;
-        };
-    }, [monitorTypes, feature]);
-
-    if (isLoading) {
-        return fallback;
-    }
-
-    return supportsFeature ? children : fallback;
 }

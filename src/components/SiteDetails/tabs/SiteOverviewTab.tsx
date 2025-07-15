@@ -12,6 +12,7 @@ import {
     ThemedButton,
     ThemedBadge,
     ThemedCard,
+    ThemedBox,
     StatusIndicator,
     ThemedProgress,
     useTheme,
@@ -35,19 +36,6 @@ function getMonitorStatusText(monitor: Monitor): string {
  */
 function getMonitorBadgeVariant(monitor: Monitor): "success" | "warning" | "error" {
     return monitor.monitoring ? "success" : "warning";
-}
-
-/**
- * Get response time text color for styling
- */
-function getResponseTimeTextColor(responseTime: number): string {
-    if (responseTime <= 200) {
-        return "themed-text-success";
-    }
-    if (responseTime <= 1000) {
-        return "themed-text-warning";
-    }
-    return "themed-text-danger";
 }
 
 /**
@@ -225,7 +213,7 @@ export function SiteOverviewTab({
                     className="flex flex-col items-center justify-center space-y-1 text-center"
                 >
                     <div className="flex flex-col items-center">
-                        <ThemedText size="xl" weight="bold" className={getResponseTimeTextColor(avgResponseTime)}>
+                        <ThemedText size="xl" weight="bold" style={{ color: getResponseTimeColor(avgResponseTime) }}>
                             {formatResponseTime(avgResponseTime)}
                         </ThemedText>
                         <ThemedText size="xs" variant="secondary">
@@ -280,9 +268,14 @@ export function SiteOverviewTab({
                     {site.monitors.length > 0 ? (
                         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                             {site.monitors.map((monitor) => (
-                                <div
+                                <ThemedBox
                                     key={monitor.id}
-                                    className="flex items-center justify-between p-3 border border-primary/20 rounded-lg themed-box-surface-elevated"
+                                    surface="elevated"
+                                    variant="secondary"
+                                    padding="md"
+                                    rounded="lg"
+                                    border
+                                    className="flex items-center justify-between"
                                 >
                                     <div className="flex flex-col">
                                         <ThemedText weight="medium">{monitor.type.toUpperCase()} Monitor</ThemedText>
@@ -299,7 +292,7 @@ export function SiteOverviewTab({
                                             {getMonitorStatusText(monitor)}
                                         </ThemedBadge>
                                     </div>
-                                </div>
+                                </ThemedBox>
                             ))}
                         </div>
                     ) : (

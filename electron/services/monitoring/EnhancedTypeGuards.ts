@@ -396,7 +396,7 @@ export const GenericTypeInference = {
                 break;
             }
             case "url": {
-                validator = z.string().url({ message: "Invalid URL format" });
+                validator = z.string().url();
                 break;
             }
             default: {

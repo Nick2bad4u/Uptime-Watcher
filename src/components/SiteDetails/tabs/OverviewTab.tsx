@@ -25,19 +25,6 @@ import { Monitor } from "../../../types";
 import { getIntervalLabel } from "../../../utils";
 
 /**
- * Get response time text color for styling
- */
-function getResponseTimeTextColor(responseTime: number): string {
-    if (responseTime <= 200) {
-        return "themed-text-success";
-    }
-    if (responseTime <= 1000) {
-        return "themed-text-warning";
-    }
-    return "themed-text-danger";
-}
-
-/**
  * Props for the OverviewTab component.
  */
 interface OverviewTabProperties {
@@ -193,7 +180,7 @@ export const OverviewTab = ({
                     hoverable
                     className="flex flex-col items-center text-center"
                 >
-                    <ThemedText size="xl" weight="bold" className={getResponseTimeTextColor(avgResponseTime)}>
+                    <ThemedText size="xl" weight="bold" style={{ color: getResponseTimeColor(avgResponseTime) }}>
                         {formatResponseTime(avgResponseTime)}
                     </ThemedText>
                 </ThemedCard>

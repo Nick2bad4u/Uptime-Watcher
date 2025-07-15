@@ -3,8 +3,8 @@
  * Provides a single entry point for importing manager classes.
  */
 
-export { ConfigurationManager, configurationManager } from "./ConfigurationManager";
-export type { ValidationResult, HistoryRetentionConfig } from "./ConfigurationManager";
+export { configurationManager } from "./ConfigurationManager";
+export type { ValidationResult } from "./ConfigurationManager";
 export { DatabaseManager } from "./DatabaseManager";
 export { MonitorManager } from "./MonitorManager";
 export { SiteManager } from "./SiteManager";

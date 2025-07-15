@@ -44,13 +44,9 @@ describe("Barrel exports", () => {
         it("should export all monitoring services from index", async () => {
             const exports = await import("../services/monitoring/index");
 
-            expect(exports.HttpMonitor).toBeDefined();
-            expect(exports.PortMonitor).toBeDefined();
             expect(exports.MonitorFactory).toBeDefined();
             expect(exports.MonitorScheduler).toBeDefined();
 
-            expect(typeof exports.HttpMonitor).toBe("function");
-            expect(typeof exports.PortMonitor).toBe("function");
             expect(typeof exports.MonitorFactory).toBe("function");
             expect(typeof exports.MonitorScheduler).toBe("function");
         });

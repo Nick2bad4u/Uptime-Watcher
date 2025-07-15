@@ -5,7 +5,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import type { IMonitorService, MonitorCheckResult, MonitorConfig } from "../../../services/monitoring/types";
+import type { IMonitorService, MonitorCheckResult, MonitorConfig } from "../../../services/monitoring";
 
 describe("Monitoring Types", () => {
     describe("MonitorCheckResult", () => {
@@ -78,6 +78,9 @@ describe("Monitoring Types", () => {
                 getType() {
                     return "http";
                 },
+                updateConfig: function (config: Partial<MonitorConfig>): void {
+                    throw new Error("Function not implemented.");
+                }
             };
 
             expect(typeof mockService.check).toBe("function");
@@ -96,6 +99,9 @@ describe("Monitoring Types", () => {
                 getType() {
                     return "port";
                 },
+                updateConfig: function (config: Partial<MonitorConfig>): void {
+                    throw new Error("Function not implemented.");
+                }
             };
 
             const mockMonitor = {

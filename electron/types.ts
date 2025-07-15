@@ -7,7 +7,7 @@
  * @packageDocumentation
  */
 
-import type { MonitorType as RegistryMonitorType } from "./services/monitoring";
+import type { MonitorType as RegistryMonitorType } from "./services/monitoring/MonitorTypeRegistry";
 
 // Re-export for use throughout the application
 export type MonitorType = RegistryMonitorType;

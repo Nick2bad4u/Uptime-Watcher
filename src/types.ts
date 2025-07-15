@@ -9,12 +9,6 @@
 
 // Re-export status types for better type safety
 export type { MonitorStatus, SiteStatus } from "./types/status";
-export { isMonitorStatus, isComputedSiteStatus, isSiteStatus } from "./types/status";
-
-/**
- * Application update status types for the auto-updater.
- */
-export type UpdateStatus = "idle" | "checking" | "available" | "downloading" | "downloaded" | "error";
 
 // Re-export MonitorType from electron types to avoid duplication
 export type { MonitorType } from "../electron/types";

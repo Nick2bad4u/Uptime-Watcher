@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { PortMonitor } from "../../../services/monitoring/PortMonitor";
-import { MonitorCheckResult, MonitorConfig } from "../../../services/monitoring/types";
+import { MonitorCheckResult, MonitorConfig } from "../../../services/monitoring";
 import { Site } from "../../../types";
 
 // Mock dependencies

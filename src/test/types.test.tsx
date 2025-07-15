@@ -5,7 +5,8 @@
 
 import { describe, expect, it } from "vitest";
 
-import type { UpdateStatus, MonitorType, Monitor, Site, StatusHistory, StatusUpdate } from "../types";
+import type { MonitorType, Monitor, Site, StatusHistory, StatusUpdate } from "../types";
+import type { UpdateStatus } from "../stores/types";
 
 describe("Types Module", () => {
     describe("Type Definitions", () => {

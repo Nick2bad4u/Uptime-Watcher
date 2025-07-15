@@ -4,7 +4,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import type { MonitorCheckResult, IMonitorService, MonitorConfig } from "../services/monitoring/types";
+import type { MonitorCheckResult, IMonitorService, MonitorConfig } from "../services/monitoring";
 import type { Site } from "../types";
 
 describe("Monitoring Types", () => {
@@ -61,6 +61,9 @@ describe("Monitoring Types", () => {
                 getType(): Site["monitors"][0]["type"] {
                     return "http";
                 },
+                updateConfig: function (config: Partial<MonitorConfig>): void {
+                    throw new Error("Function not implemented.");
+                }
             };
 
             expect(mockService.getType()).toBe("http");
@@ -75,6 +78,10 @@ describe("Monitoring Types", () => {
                 history: [],
                 monitoring: true,
                 url: "https://example.com",
+                responseTime: 0,
+                checkInterval: 0,
+                timeout: 0,
+                retryAttempts: 0
             };
 
             const httpService: IMonitorService = {
@@ -88,6 +95,9 @@ describe("Monitoring Types", () => {
                 getType(): Site["monitors"][0]["type"] {
                     return "http";
                 },
+                updateConfig: function (config: Partial<MonitorConfig>): void {
+                    throw new Error("Function not implemented.");
+                }
             };
 
             const result = await httpService.check(mockMonitor);
@@ -106,6 +116,10 @@ describe("Monitoring Types", () => {
                 monitoring: true,
                 host: "example.com",
                 port: 80,
+                responseTime: 0,
+                checkInterval: 0,
+                timeout: 0,
+                retryAttempts: 0
             };
 
             const portService: IMonitorService = {
@@ -119,6 +133,9 @@ describe("Monitoring Types", () => {
                 getType(): Site["monitors"][0]["type"] {
                     return "port";
                 },
+                updateConfig: function (config: Partial<MonitorConfig>): void {
+                    throw new Error("Function not implemented.");
+                }
             };
 
             const result = await portService.check(mockMonitor);

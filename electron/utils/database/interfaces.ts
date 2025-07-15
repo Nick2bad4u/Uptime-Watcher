@@ -178,36 +178,6 @@ export class SiteNotFoundError extends Error {
     }
 }
 
-export class SiteCreationError extends Error {
-    constructor(identifier: string, cause?: Error) {
-        super(`Failed to create site: ${identifier}`);
-        this.name = "SiteCreationError";
-        if (cause?.stack) {
-            this.stack = cause.stack;
-        }
-    }
-}
-
-export class SiteUpdateError extends Error {
-    constructor(identifier: string, cause?: Error) {
-        super(`Failed to update site: ${identifier}`);
-        this.name = "SiteUpdateError";
-        if (cause?.stack) {
-            this.stack = cause.stack;
-        }
-    }
-}
-
-export class SiteDeletionError extends Error {
-    constructor(identifier: string, cause?: Error) {
-        super(`Failed to delete site: ${identifier}`);
-        this.name = "SiteDeletionError";
-        if (cause?.stack) {
-            this.stack = cause.stack;
-        }
-    }
-}
-
 export class SiteLoadingError extends Error {
     constructor(message: string, cause?: Error) {
         super(`Failed to load sites: ${message}`);

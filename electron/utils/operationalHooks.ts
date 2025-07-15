@@ -309,23 +309,3 @@ export async function withDatabaseOperation<T>(
         emitEvents: Boolean(eventEmitter),
     });
 }
-
-/**
- * Specialized wrapper for cache operations with background loading.
- */
-export async function withCacheOperation<T>(
-    operation: () => Promise<T>,
-    operationName: string,
-    eventEmitter?: TypedEventBus<UptimeEvents>,
-    context?: Record<string, unknown>
-): Promise<T> {
-    return withOperationalHooks(operation, {
-        operationName: `cache:${operationName}`,
-        maxRetries: 1, // Cache operations typically don't retry
-        initialDelay: 0,
-        ...(eventEmitter && { eventEmitter }),
-        ...(context && { context }),
-        emitEvents: Boolean(eventEmitter),
-        throwOnFailure: false, // Cache operations should not throw
-    });
-}

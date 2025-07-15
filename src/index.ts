@@ -4,7 +4,8 @@
  */
 
 // Application types (export these explicitly to avoid conflicts)
-export type { UpdateStatus, MonitorType, Monitor, Site, StatusHistory, StatusUpdate } from "./types";
+export type { MonitorType, Monitor, Site, StatusHistory, StatusUpdate } from "./types";
+export type { UpdateStatus } from "./stores/types";
 
 // Core constants
 export * from "./constants";

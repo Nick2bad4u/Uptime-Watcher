@@ -7,7 +7,8 @@ import { render, screen, act } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
-import type { Site, UpdateStatus } from "../types";
+import type { Site } from "../types";
+import type { UpdateStatus } from "../stores/types";
 
 // Mock all the child components
 vi.mock("../components/AddSiteForm/AddSiteForm", () => ({
