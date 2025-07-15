@@ -6,7 +6,7 @@
 import { codecovVitePlugin } from "@codecov/vite-plugin";
 import react from "@vitejs/plugin-react";
 import * as path from "node:path";
-import checker from "vite-plugin-checker";
+// import checker from "vite-plugin-checker";
 import electron from "vite-plugin-electron";
 import { ViteMcp } from "vite-plugin-mcp";
 import { viteStaticCopy } from "vite-plugin-static-copy";

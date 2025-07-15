@@ -333,9 +333,6 @@ export async function handleSubmit(event: React.FormEvent, properties: FormSubmi
 
         setFormError(validationErrors[0]); // Show first error
 
-        // Add debugging to see if error is being set
-        console.log("🚨 Setting form error:", validationErrors[0]);
-
         return;
     }
 
