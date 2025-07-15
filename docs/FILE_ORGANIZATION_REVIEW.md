@@ -1,5 +1,7 @@
 # File Organization Review - Dynamic Monitor System
+
 <!-- markdownlint-disable -->
+
 ## 🔍 **Deep Review of New Files and Functions**
 
 After analyzing all new files and functions in the dynamic monitor system, here are my recommendations for improved organization:
@@ -38,6 +40,7 @@ electron/services/monitoring/
 ### **1. dynamicMonitorUi.ts is Too Large (213 lines)**
 
 **Current Functions:**
+
 - `getConfig()` - Config caching
 - `formatMonitorDetail()` - Detail formatting
 - `supportsResponseTime()` - Feature checks
@@ -51,6 +54,7 @@ electron/services/monitoring/
 - `clearConfigCache()` - Cache management
 
 **Issues:**
+
 - Multiple unrelated concerns in one file
 - Mixing cache management with UI utilities
 - Bulk operations mixed with single operations
@@ -59,6 +63,7 @@ electron/services/monitoring/
 ### **2. Lack of Logical Grouping**
 
 **Current organization has:**
+
 - Cache utilities mixed with UI formatters
 - Feature detection mixed with label generation
 - Single operations mixed with bulk operations
@@ -85,44 +90,50 @@ src/utils/dynamic-monitor-ui/
 #### **File Contents:**
 
 **`cache.ts`** - Cache management only
+
 ```typescript
-export async function getConfig(monitorType: MonitorType): Promise<MonitorTypeConfig | undefined>
-export function clearConfigCache(): void
+export async function getConfig(monitorType: MonitorType): Promise<MonitorTypeConfig | undefined>;
+export function clearConfigCache(): void;
 ```
 
 **`features.ts`** - Feature detection
+
 ```typescript
-export async function supportsResponseTime(monitorType: MonitorType): Promise<boolean>
-export async function supportsAdvancedAnalytics(monitorType: MonitorType): Promise<boolean>
-export async function allSupportsResponseTime(monitorTypes: MonitorType[]): Promise<boolean>
-export async function allSupportsAdvancedAnalytics(monitorTypes: MonitorType[]): Promise<boolean>
-export async function getTypesWithFeature(feature: "responseTime" | "advancedAnalytics"): Promise<MonitorType[]>
+export async function supportsResponseTime(monitorType: MonitorType): Promise<boolean>;
+export async function supportsAdvancedAnalytics(monitorType: MonitorType): Promise<boolean>;
+export async function allSupportsResponseTime(monitorTypes: MonitorType[]): Promise<boolean>;
+export async function allSupportsAdvancedAnalytics(monitorTypes: MonitorType[]): Promise<boolean>;
+export async function getTypesWithFeature(feature: "responseTime" | "advancedAnalytics"): Promise<MonitorType[]>;
 ```
 
 **`formatters.ts`** - UI formatting utilities
+
 ```typescript
-export function formatMonitorDetail(monitorType: MonitorType, details: string): string
+export function formatMonitorDetail(monitorType: MonitorType, details: string): string;
 ```
 
 **`labels.ts`** - Label generation
+
 ```typescript
 export async function getAnalyticsLabel(monitorType: MonitorType): Promise<string>
 export async function getMonitorHelpTexts(monitorType: MonitorType): Promise<{...}>
 ```
 
 **`display.ts`** - Display preferences
+
 ```typescript
-export async function shouldShowUrl(monitorType: MonitorType): Promise<boolean>
+export async function shouldShowUrl(monitorType: MonitorType): Promise<boolean>;
 ```
 
 **`index.ts`** - Barrel export
+
 ```typescript
-export * from './cache';
-export * from './features';
-export * from './formatters';
-export * from './labels';
-export * from './display';
-export * from './types';
+export * from "./cache";
+export * from "./features";
+export * from "./formatters";
+export * from "./labels";
+export * from "./display";
+export * from "./types";
 ```
 
 ### **2. Create Validation Directory**
@@ -178,23 +189,27 @@ src/utils/types/
 ### **After Reorganization:**
 
 ✅ **Clear separation of concerns**
+
 - Cache management isolated
 - Feature detection grouped
 - Formatters separated from logic
 - Display preferences isolated
 
 ✅ **Better maintainability**
+
 - Smaller, focused files
 - Logical grouping
 - Easier to find specific functions
 - Reduced cognitive load
 
 ✅ **Improved testability**
+
 - Each module can be tested independently
 - Easier to mock dependencies
 - Clear test boundaries
 
 ✅ **Enhanced developer experience**
+
 - Clearer imports
 - Better IDE support
 - Logical file structure
@@ -204,28 +219,31 @@ src/utils/types/
 
 ## 📊 **File Size Targets**
 
-| File Type | Current Size | Target Size | Status |
-|-----------|--------------|-------------|--------|
-| dynamicMonitorUi.ts | 213 lines | Split into 5 files | ❌ Too large |
-| monitorTypeHelper.ts | 113 lines | 100-120 lines | ✅ Good |
-| monitorValidation.ts | 81 lines | 80-100 lines | ✅ Good |
-| Individual modules | N/A | 50-80 lines each | 🎯 Target |
+| File Type            | Current Size | Target Size        | Status       |
+| -------------------- | ------------ | ------------------ | ------------ |
+| dynamicMonitorUi.ts  | 213 lines    | Split into 5 files | ❌ Too large |
+| monitorTypeHelper.ts | 113 lines    | 100-120 lines      | ✅ Good      |
+| monitorValidation.ts | 81 lines     | 80-100 lines       | ✅ Good      |
+| Individual modules   | N/A          | 50-80 lines each   | 🎯 Target    |
 
 ---
 
 ## 🚀 **Implementation Priority**
 
 ### **Phase 1: Critical (High Impact)**
+
 1. Split `dynamicMonitorUi.ts` into logical modules
 2. Create barrel export for clean imports
 3. Update all import statements
 
 ### **Phase 2: Important (Medium Impact)**
+
 1. Create validation directory
 2. Extract type definitions
 3. Create shared types module
 
 ### **Phase 3: Optional (Low Impact)**
+
 1. Further granular organization
 2. Create specialized utility directories
 3. Performance optimizations
@@ -234,7 +252,7 @@ src/utils/types/
 
 ## 📝 **Conclusion**
 
-The current file organization is **functional but not optimal**. The main issue is `dynamicMonitorUi.ts` being too large and containing multiple unrelated concerns. 
+The current file organization is **functional but not optimal**. The main issue is `dynamicMonitorUi.ts` being too large and containing multiple unrelated concerns.
 
 **Recommended action:** Split this file into logical modules within a `dynamic-monitor-ui/` directory to improve maintainability and developer experience.
 

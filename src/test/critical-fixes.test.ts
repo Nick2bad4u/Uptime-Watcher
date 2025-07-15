@@ -1,6 +1,6 @@
 /**
  * Tests for critical fixes to ensure they work correctly.
- * 
+ *
  * This test suite validates:
  * 1. The improved error handling in store utils
  * 2. The middleware memory leak prevention in TypedEventBus
@@ -30,7 +30,11 @@ describe("Critical Fixes", () => {
          */
         const withErrorHandling = async <T>(
             operation: () => Promise<T>,
-            store: { setError: (error: string | undefined) => void; setLoading: (loading: boolean) => void; clearError: () => void }
+            store: {
+                setError: (error: string | undefined) => void;
+                setLoading: (loading: boolean) => void;
+                clearError: () => void;
+            }
         ): Promise<T> => {
             // Clear any previous error state before starting
             try {
@@ -52,13 +56,13 @@ describe("Critical Fixes", () => {
             } catch (error) {
                 // Handle the error from the operation
                 const errorMessage = error instanceof Error ? error.message : String(error);
-                
+
                 try {
                     store.setError(errorMessage);
                 } catch (storeError) {
                     // If setError fails, continue (both errors are logged in actual implementation)
                 }
-                
+
                 throw error;
             } finally {
                 // Always clear loading state, with error handling
@@ -91,7 +95,7 @@ describe("Critical Fixes", () => {
         it("should handle setError failure during error handling", async () => {
             const operationError = new Error("operation failed");
             const operation = vi.fn().mockRejectedValue(operationError);
-            
+
             // Mock setError to fail
             mockStore.setError.mockImplementation(() => {
                 throw new Error("setError failed");
@@ -104,7 +108,7 @@ describe("Critical Fixes", () => {
 
         it("should handle setLoading failure in finally block", async () => {
             const operation = vi.fn().mockResolvedValue("success");
-            
+
             // Mock setLoading to fail only on the second call (finally block)
             mockStore.setLoading
                 .mockImplementationOnce(() => {}) // First call succeeds
@@ -119,9 +123,9 @@ describe("Critical Fixes", () => {
 
         it("should clear error state before starting operation", async () => {
             const operation = vi.fn().mockResolvedValue("success");
-            
+
             await withErrorHandling(operation, mockStore);
-            
+
             expect(mockStore.clearError).toHaveBeenCalledBefore(mockStore.setLoading);
             expect(mockStore.setLoading).toHaveBeenCalledWith(true);
             expect(mockStore.setLoading).toHaveBeenCalledWith(false);
@@ -199,7 +203,7 @@ describe("Critical Fixes", () => {
 
             // Clear all middleware
             bus.clearMiddleware();
-            
+
             // Should be able to add middleware again
             expect(() => bus.use(middleware)).not.toThrow();
             expect(() => bus.use(middleware)).not.toThrow();

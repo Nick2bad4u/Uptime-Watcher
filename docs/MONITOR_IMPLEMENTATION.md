@@ -22,36 +22,34 @@ import { logger } from "../../utils";
 import type { IMonitorService, MonitorCheckResult, MonitorConfig } from "./types";
 
 export class DnsMonitor implements IMonitorService {
-    async check(config: MonitorConfig): Promise<MonitorCheckResult> {
-        const { target, timeout = DNS_TIMEOUT } = config;
-        const startTime = Date.now();
-        
-        try {
-            if (!target) {
-                throw new Error("DNS target is required");
-            }
+ async check(config: MonitorConfig): Promise<MonitorCheckResult> {
+  const { target, timeout = DNS_TIMEOUT } = config;
+  const startTime = Date.now();
 
-            const dns = await import("dns/promises");
-            await Promise.race([
-                dns.resolve(target),
-                new Promise((_, reject) => 
-                    setTimeout(() => reject(new Error("DNS timeout")), timeout)
-                )
-            ]);
-            
-            return {
-                success: true,
-                responseTime: Date.now() - startTime,
-                details: `DNS resolution successful for ${target}`
-            };
-        } catch (error) {
-            return {
-                success: false,
-                responseTime: Date.now() - startTime,
-                error: error instanceof Error ? error.message : "DNS resolution failed"
-            };
-        }
-    }
+  try {
+   if (!target) {
+    throw new Error("DNS target is required");
+   }
+
+   const dns = await import("dns/promises");
+   await Promise.race([
+    dns.resolve(target),
+    new Promise((_, reject) => setTimeout(() => reject(new Error("DNS timeout")), timeout)),
+   ]);
+
+   return {
+    success: true,
+    responseTime: Date.now() - startTime,
+    details: `DNS resolution successful for ${target}`,
+   };
+  } catch (error) {
+   return {
+    success: false,
+    responseTime: Date.now() - startTime,
+    error: error instanceof Error ? error.message : "DNS resolution failed",
+   };
+  }
+ }
 }
 ```
 
@@ -63,9 +61,9 @@ Add to `electron/services/monitoring/MonitorTypeRegistry.ts`:
 import { DnsMonitor } from "./DnsMonitor";
 
 export const MONITOR_REGISTRY = {
-    http: new HttpMonitor(),
-    port: new PortMonitor(),
-    dns: new DnsMonitor(), // Add this line
+ http: new HttpMonitor(),
+ port: new PortMonitor(),
+ dns: new DnsMonitor(), // Add this line
 } as const;
 ```
 
@@ -78,14 +76,14 @@ import { z } from "zod";
 import type { MonitorFieldConfig } from "../types";
 
 export const dnsFieldsConfig: MonitorFieldConfig[] = [
-    {
-        name: "target",
-        type: "text",
-        label: "DNS Target",
-        placeholder: "example.com",
-        required: true,
-        validation: z.string().min(1, "DNS target is required"),
-    },
+ {
+  name: "target",
+  type: "text",
+  label: "DNS Target",
+  placeholder: "example.com",
+  required: true,
+  validation: z.string().min(1, "DNS target is required"),
+ },
 ];
 ```
 
@@ -95,9 +93,9 @@ Register in `src/utils/dynamic-monitor-ui/config/index.ts`:
 import { dnsFieldsConfig } from "./dnsFields";
 
 export const MONITOR_FIELD_CONFIGS = {
-    http: httpFieldsConfig,
-    port: portFieldsConfig,
-    dns: dnsFieldsConfig, // Add this line
+ http: httpFieldsConfig,
+ port: portFieldsConfig,
+ dns: dnsFieldsConfig, // Add this line
 } as const;
 ```
 

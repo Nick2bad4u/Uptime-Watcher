@@ -1,5 +1,7 @@
 # Legacy Code Review and Cleanup Report
+
 <!-- markdownlint-disable -->
+
 ## 🔍 **Deep Review of Recent Changes - Legacy Code Findings**
 
 After a thorough review of the entire codebase, here are the legacy patterns that still need to be addressed:
@@ -11,38 +13,46 @@ After a thorough review of the entire codebase, here are the legacy patterns tha
 ### **1. Hard-coded Switch Cases Still Present**
 
 #### **File: `src/components/Dashboard/SiteCard/SiteCardHistory.tsx`**
+
 **Lines 77-85:**
+
 ```typescript
 switch (monitor.type) {
-    case "http": {
-        return `HTTP History${getHttpSuffix(monitor)}`;
-    }
-    case "port": {
-        return `Port History${getPortSuffix(monitor)}`;
-    }
-    default: {
-        return `${monitor.type} History`;
-    }
+ case "http": {
+  return `HTTP History${getHttpSuffix(monitor)}`;
+ }
+ case "port": {
+  return `Port History${getPortSuffix(monitor)}`;
+ }
+ default: {
+  return `${monitor.type} History`;
+ }
 }
 ```
+
 **Status: ❌ LEGACY - NEEDS REPLACEMENT**
 **Action Required:** Replace with dynamic title generation from monitor type config
 
 #### **File: `src/components/SiteDetails/useAddSiteForm.ts`**
+
 **Lines 161-175:**
+
 ```typescript
 case "port": {
     value = port;
     break;
 }
 ```
+
 **Status: ❌ LEGACY - NEEDS REPLACEMENT**
 **Action Required:** Replace with dynamic field access from monitor type config
 
 ### **2. Hard-coded Field Access Patterns**
 
 #### **File: `src/components/SiteDetails/useAddSiteForm.ts`**
+
 **Lines 155-175:**
+
 ```typescript
 case "host": {
     value = host;
@@ -53,6 +63,7 @@ case "port": {
     break;
 }
 ```
+
 **Status: ❌ LEGACY - NEEDS REPLACEMENT**
 **Action Required:** Use dynamic field configuration to access monitor fields
 
@@ -61,16 +72,19 @@ case "port": {
 ## ✅ **Successfully Modernized Components**
 
 ### **1. MonitorFactory.ts**
+
 - **Status:** ✅ FULLY MODERNIZED
 - **Pattern:** Uses `MonitorTypeRegistry` for all operations
 - **No legacy switch cases found**
 
 ### **2. MonitorValidator.ts**
+
 - **Status:** ✅ FULLY MODERNIZED
 - **Pattern:** Uses Zod schema validation from registry
 - **No legacy switch cases found**
 
 ### **3. Removed Files**
+
 - **getAllSites() method:** ✅ REMOVED
 - **No TODO or deprecated comments found**
 
@@ -81,6 +95,7 @@ case "port": {
 ### **Priority 1: Fix Remaining Switch Cases**
 
 1. **Replace SiteCardHistory.tsx switch case:**
+
    - Create dynamic title generation function
    - Use monitor type config for titles
    - Remove hard-coded cases
@@ -93,6 +108,7 @@ case "port": {
 ### **Priority 2: Search for More Legacy Patterns**
 
 Need to search for these additional patterns:
+
 - Hard-coded monitor type strings ("http", "port")
 - Manual field validation logic
 - Hard-coded form field rendering
@@ -102,16 +118,19 @@ Need to search for these additional patterns:
 ## 📊 **Legacy Code Score**
 
 ### **Before Full Dynamic System:**
+
 - **Switch cases:** 5+ locations
 - **Hard-coded types:** 20+ locations
 - **Manual validation:** 3+ locations
 
 ### **Current State:**
+
 - **Switch cases:** 2 locations remaining ❌
 - **Hard-coded types:** ~15 locations remaining ❌
 - **Manual validation:** 0 locations ✅
 
 ### **Target State:**
+
 - **Switch cases:** 0 locations ✅
 - **Hard-coded types:** 0 locations ✅
 - **Manual validation:** 0 locations ✅
@@ -121,15 +140,18 @@ Need to search for these additional patterns:
 ## 🔧 **Required Actions**
 
 ### **Immediate (High Priority):**
+
 1. Fix `SiteCardHistory.tsx` switch case
 2. Fix `useAddSiteForm.ts` switch case
 3. Search for more hard-coded "http"/"port" strings
 
 ### **Medium Priority:**
+
 1. Add comprehensive tests for dynamic behavior
 2. Update documentation to reflect new patterns
 
 ### **Low Priority:**
+
 1. Performance optimization for dynamic lookups
 2. Enhanced error handling for invalid monitor types
 

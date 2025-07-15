@@ -20,7 +20,7 @@ export default defineConfig({
         react({
             // Configure React plugin for testing
             include: /\.(js|jsx|ts|tsx)$/,
-            jsxRuntime: 'automatic',
+            jsxRuntime: "automatic",
             babel: {
                 babelrc: false,
                 configFile: false,

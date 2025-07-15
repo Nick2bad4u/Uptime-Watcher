@@ -5,16 +5,12 @@
     "typescript.disableAutomaticTypeAcquisition": true,
     "typescript.suggest.autoImports": true,
     "typescript.tsserver.experimental.enableProjectDiagnostics": true,
-    "typescript.tsserver.exclude": [
-        "**/node_modules/**"
-    ],
+    "typescript.tsserver.exclude": ["**/node_modules/**"],
     // Exclude from TypeScript checks and problems
     "typescript.check.npmIsInstalled": false,
     "typescript.workspaceSymbols.excludeLibrarySymbols": true,
     // ESLint exclusions
-    "eslint.workingDirectories": [
-        "."
-    ],
+    "eslint.workingDirectories": ["."],
     "eslint.ignoreUntitled": true,
     "http.proxySupport": "off",
     "css.lint.importStatement": "ignore",
@@ -84,22 +80,10 @@
             ],
             "prefer-const": "error",
             "prefer-template": "error",
-            "array-bracket-spacing": [
-                "error",
-                "always"
-            ],
-            "generator-star-spacing": [
-                "error",
-                "both"
-            ],
-            "space-before-function-paren": [
-                "error",
-                "always"
-            ],
-            "yield-star-spacing": [
-                "error",
-                "both"
-            ]
+            "array-bracket-spacing": ["error", "always"],
+            "generator-star-spacing": ["error", "both"],
+            "space-before-function-paren": ["error", "always"],
+            "yield-star-spacing": ["error", "both"]
         }
     },
     "prettier-eslint-typescript.prettierOptions": {
@@ -113,21 +97,10 @@
         "useTabs": false
     },
     // Extension-specific settings to ignore node_modules
-    "errorLens.excludeBySource": [
-        "ts(2339)",
-        "ts(2307)",
-        "ts(2304)",
-        "eslint"
-    ],
-    "errorLens.exclude": [
-        "**/node_modules/**"
-    ],
+    "errorLens.excludeBySource": ["ts(2339)", "ts(2307)", "ts(2304)", "eslint"],
+    "errorLens.exclude": ["**/node_modules/**"],
     // SonarLint exclusions
-    "sonarlint.pathsToExclude": [
-        "**/node_modules/**",
-        "**/dist/**",
-        "**/coverage/**"
-    ],
+    "sonarlint.pathsToExclude": ["**/node_modules/**", "**/dist/**", "**/coverage/**"],
     // Disable auto-indexing of node_modules
     "typescript.preferences.includeCompletionsForImportStatements": false,
     "typescript.preferences.includeCompletionsForModuleExports": false,
@@ -145,29 +118,19 @@
             },
             "github": {
                 "command": "npx",
-                "args": [
-                    "-y",
-                    "@modelcontextprotocol/server-github"
-                ],
+                "args": ["-y", "@modelcontextprotocol/server-github"],
                 "env": {
                     "GITHUB_PERSONAL_ACCESS_TOKEN": ""
                 }
             },
             "memory": {
                 "command": "npx",
-                "args": [
-                    "-y",
-                    "@modelcontextprotocol/server-memory"
-                ]
+                "args": ["-y", "@modelcontextprotocol/server-memory"]
             },
             "repomix": {
                 "name": "repomix",
                 "command": "npx",
-                "args": [
-                    "-y",
-                    "repomix",
-                    "--mcp"
-                ]
+                "args": ["-y", "repomix", "--mcp"]
             }
         }
     },
@@ -464,5 +427,5 @@
             "strikethrough": false,
             "backgroundColor": "transparent"
         }
-    ],
+    ]
 }
