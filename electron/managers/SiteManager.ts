@@ -45,7 +45,7 @@
 import { UptimeEvents, TypedEventBus } from "../events/index";
 import { SiteRepository, MonitorRepository, HistoryRepository, DatabaseService } from "../services/index";
 import { Site } from "../types";
-import { SiteCacheInterface, SiteCache } from "../utils/database/interfaces";
+import { SiteCacheInterface, SiteCache, MonitoringConfig } from "../utils/database/interfaces";
 import {
     SiteWritingOrchestrator,
     createSiteWritingOrchestrator,
@@ -294,12 +294,17 @@ export class SiteManager {
 
     /**
      * Create monitoring configuration for site operations.
+     *
+     * @returns Configuration for managing monitoring operations
      */
-    private createMonitoringConfig() {
+    private createMonitoringConfig(): MonitoringConfig {
         return {
-            setHistoryLimit: async (limit: number) => {
+            setHistoryLimit: (limit: number) => {
                 if (this.monitoringOperations) {
-                    await this.monitoringOperations.setHistoryLimit(limit);
+                    // Execute but don't await the promise
+                    this.monitoringOperations.setHistoryLimit(limit).catch((error) => {
+                        logger.error("[SiteManager] Failed to set history limit", error);
+                    });
                 } else {
                     logger.warn("MonitoringOperations not available for setHistoryLimit");
                 }
