@@ -52,93 +52,93 @@ import { promises as dns } from "dns";
 
 /**
  * DNS resolution monitoring service.
- * 
+ *
  * Checks DNS resolution for specified hostname and record type.
  */
 export class DnsMonitor implements IMonitorService {
-    private config: MonitorConfig;
+ private config: MonitorConfig;
 
-    constructor(config: MonitorConfig = {}) {
-        this.config = {
-            timeout: DEFAULT_REQUEST_TIMEOUT,
-            ...config,
-        };
-    }
+ constructor(config: MonitorConfig = {}) {
+  this.config = {
+   timeout: DEFAULT_REQUEST_TIMEOUT,
+   ...config,
+  };
+ }
 
-    public getType(): Site["monitors"][0]["type"] {
-        return "dns";
-    }
+ public getType(): Site["monitors"][0]["type"] {
+  return "dns";
+ }
 
-    public updateConfig(config: Partial<MonitorConfig>): void {
-        this.config = {
-            ...this.config,
-            ...config,
-        };
-    }
+ public updateConfig(config: Partial<MonitorConfig>): void {
+  this.config = {
+   ...this.config,
+   ...config,
+  };
+ }
 
-    public async check(monitor: Site["monitors"][0]): Promise<MonitorCheckResult> {
-        const startTime = Date.now();
-        
-        // Type assertion for DNS-specific fields
-        const hostname = monitor.hostname as string;
-        const recordType = monitor.recordType as string;
-        
-        if (!hostname || !recordType) {
-            return {
-                status: "error",
-                responseTime: 0,
-                details: "Missing hostname or record type",
-                timestamp: Date.now(),
-            };
-        }
+ public async check(monitor: Site["monitors"][0]): Promise<MonitorCheckResult> {
+  const startTime = Date.now();
 
-        try {
-            // Use appropriate DNS lookup method based on record type
-            switch (recordType) {
-                case "A":
-                    await dns.resolve4(hostname, { ttl: true });
-                    break;
-                case "AAAA": 
-                    await dns.resolve6(hostname, { ttl: true });
-                    break;
-                case "MX":
-                    await dns.resolveMx(hostname);
-                    break;
-                case "TXT":
-                    await dns.resolveTxt(hostname);
-                    break;
-                case "CNAME":
-                    await dns.resolveCname(hostname);
-                    break;
-                default:
-                    return {
-                        status: "error",
-                        responseTime: 0,
-                        details: `Unsupported record type: ${recordType}`,
-                        timestamp: Date.now(),
-                    };
-            }
+  // Type assertion for DNS-specific fields
+  const hostname = monitor.hostname as string;
+  const recordType = monitor.recordType as string;
 
-            const responseTime = Date.now() - startTime;
+  if (!hostname || !recordType) {
+   return {
+    status: "error",
+    responseTime: 0,
+    details: "Missing hostname or record type",
+    timestamp: Date.now(),
+   };
+  }
 
-            return {
-                status: "up",
-                responseTime,
-                details: recordType,
-                timestamp: Date.now(),
-            };
-        } catch (error) {
-            const responseTime = Date.now() - startTime;
-            const details = error instanceof Error ? error.message : "DNS resolution failed";
-            
-            return {
-                status: "down",
-                responseTime,
-                details,
-                timestamp: Date.now(),
-            };
-        }
-    }
+  try {
+   // Use appropriate DNS lookup method based on record type
+   switch (recordType) {
+    case "A":
+     await dns.resolve4(hostname, { ttl: true });
+     break;
+    case "AAAA":
+     await dns.resolve6(hostname, { ttl: true });
+     break;
+    case "MX":
+     await dns.resolveMx(hostname);
+     break;
+    case "TXT":
+     await dns.resolveTxt(hostname);
+     break;
+    case "CNAME":
+     await dns.resolveCname(hostname);
+     break;
+    default:
+     return {
+      status: "error",
+      responseTime: 0,
+      details: `Unsupported record type: ${recordType}`,
+      timestamp: Date.now(),
+     };
+   }
+
+   const responseTime = Date.now() - startTime;
+
+   return {
+    status: "up",
+    responseTime,
+    details: recordType,
+    timestamp: Date.now(),
+   };
+  } catch (error) {
+   const responseTime = Date.now() - startTime;
+   const details = error instanceof Error ? error.message : "DNS resolution failed";
+
+   return {
+    status: "down",
+    responseTime,
+    details,
+    timestamp: Date.now(),
+   };
+  }
+ }
 }
 ```
 
@@ -153,58 +153,58 @@ import { DnsMonitor } from "./DnsMonitor";
 
 // Register DNS monitor type
 registerMonitorType({
-    type: "dns",
-    displayName: "DNS Lookup",
-    description: "Monitors DNS resolution for specific record types",
-    version: "1.0.0",
-    validationSchema: z.object({
-        hostname: z.string().min(1, "Hostname is required"),
-        recordType: z.enum(["A", "AAAA", "MX", "CNAME", "TXT"], {
-            errorMap: () => ({ message: "Invalid record type" }),
-        }),
-        type: z.literal("dns"),
-    }),
-    serviceFactory: () => new DnsMonitor(),
-    fields: [
-        {
-            name: "hostname",
-            label: "Hostname",
-            type: "text",
-            required: true,
-            placeholder: "example.com",
-            helpText: "Enter the hostname to check",
-        },
-        {
-            name: "recordType",
-            label: "Record Type",
-            type: "text", // Should be "select" when frontend adds support
-            required: true,
-            placeholder: "A",
-            helpText: "Enter a valid DNS record type (A, AAAA, MX, CNAME, TXT)",
-        },
-    ],
-    uiConfig: {
-        formatDetail: (details: string) => `Record: ${details}`,
-        formatTitleSuffix: (monitor: Record<string, unknown>) => {
-            const hostname = monitor.hostname as string;
-            const recordType = monitor.recordType as string;
-            return hostname && recordType ? ` (${hostname}/${recordType})` : "";
-        },
-        supportsResponseTime: true,
-        supportsAdvancedAnalytics: false,
-        helpTexts: {
-            primary: "Enter the hostname to resolve",
-            secondary: "Select the DNS record type to check",
-        },
-        display: {
-            showUrl: false,
-            showAdvancedMetrics: false,
-        },
-        detailFormats: {
-            historyDetail: (details: string) => `Record: ${details}`,
-            analyticsLabel: "DNS Resolution Time",
-        },
-    },
+ type: "dns",
+ displayName: "DNS Lookup",
+ description: "Monitors DNS resolution for specific record types",
+ version: "1.0.0",
+ validationSchema: z.object({
+  hostname: z.string().min(1, "Hostname is required"),
+  recordType: z.enum(["A", "AAAA", "MX", "CNAME", "TXT"], {
+   errorMap: () => ({ message: "Invalid record type" }),
+  }),
+  type: z.literal("dns"),
+ }),
+ serviceFactory: () => new DnsMonitor(),
+ fields: [
+  {
+   name: "hostname",
+   label: "Hostname",
+   type: "text",
+   required: true,
+   placeholder: "example.com",
+   helpText: "Enter the hostname to check",
+  },
+  {
+   name: "recordType",
+   label: "Record Type",
+   type: "text", // Should be "select" when frontend adds support
+   required: true,
+   placeholder: "A",
+   helpText: "Enter a valid DNS record type (A, AAAA, MX, CNAME, TXT)",
+  },
+ ],
+ uiConfig: {
+  formatDetail: (details: string) => `Record: ${details}`,
+  formatTitleSuffix: (monitor: Record<string, unknown>) => {
+   const hostname = monitor.hostname as string;
+   const recordType = monitor.recordType as string;
+   return hostname && recordType ? ` (${hostname}/${recordType})` : "";
+  },
+  supportsResponseTime: true,
+  supportsAdvancedAnalytics: false,
+  helpTexts: {
+   primary: "Enter the hostname to resolve",
+   secondary: "Select the DNS record type to check",
+  },
+  display: {
+   showUrl: false,
+   showAdvancedMetrics: false,
+  },
+  detailFormats: {
+   historyDetail: (details: string) => `Record: ${details}`,
+   analyticsLabel: "DNS Resolution Time",
+  },
+ },
 });
 ```
 
@@ -213,6 +213,7 @@ registerMonitorType({
 ## ✅ **That's it!**
 
 The frontend will automatically:
+
 - Show the new monitor type in dropdown menus
 - Generate appropriate form fields
 - Validate input using the defined Zod schema
@@ -228,15 +229,18 @@ There's no need to modify any other files - the registry-driven architecture tak
 To verify your new monitor type works correctly:
 
 1. **Build the application**:
+
    ```bash
    npm run build
    npm run electron-dev
    ```
 
 2. **Check the monitor type list**:
+
    - Your new monitor type should appear in the dropdown when adding a monitor
 
 3. **Add a monitor with the new type**:
+
    - Fill in the required fields and submit
    - Verify that validation works correctly
 
@@ -255,15 +259,15 @@ If you need to provide migration support for version updates of your monitor typ
 ```typescript
 // In MonitorTypeRegistry.ts after registration
 migrationRegistry.registerMigration("dns", {
-    sourceVersion: "1.0.0",
-    targetVersion: "1.1.0",
-    migrate: (monitor) => {
-        // Transform monitor data for version upgrade
-        return {
-            ...monitor,
-            additionalField: "default value",
-        };
-    },
+ sourceVersion: "1.0.0",
+ targetVersion: "1.1.0",
+ migrate: (monitor) => {
+  // Transform monitor data for version upgrade
+  return {
+   ...monitor,
+   additionalField: "default value",
+  };
+ },
 });
 ```
 
