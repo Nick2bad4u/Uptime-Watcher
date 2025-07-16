@@ -59,6 +59,7 @@ Requirements:
 # Low Confidence AI Claims Review Prompt
 
 New claims to review, these are low confidence claims that need to be reviewed to ensure that they are:
+
 1. Real and not false positives
 2. Make sense with our project
 3. If they are valid issues, proceed to implement the proper fixes according to project standards.
