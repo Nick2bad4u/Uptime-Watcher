@@ -67,7 +67,6 @@ export default defineConfig({
             ],
             include: ["electron/**/*.ts"],
             ignoreEmptyLines: true, // Ignore empty lines in coverage reports
-            experimentalAstAwareRemapping: true, // Enable AST-aware remapping for better accuracy
             provider: "v8",
             reporter: ["text", "json", "lcov", "html"],
             reportsDirectory: "./coverage/electron",

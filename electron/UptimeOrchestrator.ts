@@ -191,19 +191,15 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         const settingsRepository = new SettingsRepository();
 
         // Initialize managers with event-driven dependencies
-        this.siteManager = new SiteManager({
-            databaseService,
-            eventEmitter: this,
-            historyRepository,
-            monitorRepository,
-            siteRepository,
-        });
+
+        // Create monitorManager first, but pass a placeholder for getSitesCache (will be set after siteManager is constructed)
+        let siteManagerInstance: SiteManager;
 
         this.monitorManager = new MonitorManager({
             databaseService,
             eventEmitter: this,
             getHistoryLimit: () => this.historyLimit,
-            getSitesCache: () => this.siteManager.getSitesCache(),
+            getSitesCache: () => siteManagerInstance.getSitesCache(),
             repositories: {
                 history: historyRepository,
                 monitor: monitorRepository,
@@ -211,8 +207,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             },
         });
 
-        // Now update SiteManager with MonitorManager integration
-        this.siteManager = new SiteManager({
+        // Now construct SiteManager with monitoringOperations using monitorManager
+        this.siteManager = siteManagerInstance = new SiteManager({
             databaseService,
             eventEmitter: this,
             historyRepository,
@@ -282,7 +278,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         this.on("internal:site:stop-monitoring-requested", (data: StopMonitoringRequestData) => {
             void (async () => {
                 try {
-                    const success = this.monitorManager.stopMonitoringForSite(data.identifier, data.monitorId);
+                    const success = await this.monitorManager.stopMonitoringForSite(data.identifier, data.monitorId);
                     // Emit response event with the result
                     await this.emitTyped("internal:site:stop-monitoring-response", {
                         identifier: data.identifier,
@@ -387,16 +383,16 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                 await this.emitTyped("site:removed", {
                     cascade: true,
                     siteId: data.identifier ?? data.site.identifier,
-                    siteName: data.identifier ?? data.site.identifier,
+                    siteName: data.site.name,
                     timestamp: data.timestamp,
                 });
             })();
         });
 
-        this.on("internal:site:updated", (data: SiteEventData) => {
+        this.on("internal:site:updated", (data: SiteEventData & { previousSite?: Site }) => {
             void (async () => {
                 await this.emitTyped("site:updated", {
-                    previousSite: data.site,
+                    previousSite: data.previousSite ?? data.site, // Use previousSite if provided, fallback to current site
                     site: data.site,
                     timestamp: data.timestamp,
                     updatedFields: data.updatedFields ?? [],

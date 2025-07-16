@@ -302,7 +302,26 @@ describe("Types Module", () => {
                     downloadSQLiteBackup: () => Promise.resolve({ buffer: new ArrayBuffer(0), fileName: "backup.db" }),
                 },
                 events: {
-                    onStatusUpdate: () => {},
+                    onStatusUpdate: () => {
+                        const cleanup = () => {};
+                        return cleanup;
+                    },
+                    onMonitoringStarted: () => {
+                        const cleanup = () => {};
+                        return cleanup;
+                    },
+                    onMonitoringStopped: () => {
+                        const cleanup = () => {};
+                        return cleanup;
+                    },
+                    onTestEvent: () => {
+                        const cleanup = () => {};
+                        return cleanup;
+                    },
+                    onUpdateStatus: () => {
+                        const cleanup = () => {};
+                        return cleanup;
+                    },
                     removeAllListeners: () => {},
                 },
                 monitoring: {

@@ -113,6 +113,7 @@ export class StatusUpdateManager {
     private handler: ((update: StatusUpdate) => Promise<void>) | undefined = undefined;
     private isListenerAttached = false;
     private monitoringEventHandler: (() => Promise<void>) | undefined = undefined;
+    private cleanupFunctions: (() => void)[] = [];
 
     /**
      * Subscribe to status updates and monitoring events
@@ -141,25 +142,28 @@ export class StatusUpdateManager {
         }
 
         // Subscribe to status updates
-        window.electronAPI.events.onStatusUpdate((update: StatusUpdate) => {
+        const statusUpdateCleanup = window.electronAPI.events.onStatusUpdate((update: StatusUpdate) => {
             this.handler?.(update).catch((error) => {
                 console.error("Error in status update handler:", error);
             });
         });
+        this.cleanupFunctions.push(statusUpdateCleanup);
 
         // Subscribe to monitoring state changes
         if (this.monitoringEventHandler) {
-            window.electronAPI.events.onMonitoringStarted(() => {
+            const monitoringStartedCleanup = window.electronAPI.events.onMonitoringStarted(() => {
                 this.monitoringEventHandler?.().catch((error) => {
                     console.error("Error in monitoring started handler:", error);
                 });
             });
+            this.cleanupFunctions.push(monitoringStartedCleanup);
 
-            window.electronAPI.events.onMonitoringStopped(() => {
+            const monitoringStoppedCleanup = window.electronAPI.events.onMonitoringStopped(() => {
                 this.monitoringEventHandler?.().catch((error) => {
                     console.error("Error in monitoring stopped handler:", error);
                 });
             });
+            this.cleanupFunctions.push(monitoringStoppedCleanup);
         }
 
         this.isListenerAttached = true;
@@ -173,8 +177,10 @@ export class StatusUpdateManager {
      * Unsubscribe from status updates and monitoring events
      */
     unsubscribe(): void {
-        // Remove all listeners for the update-status channel
-        window.electronAPI.events.removeAllListeners("update-status");
+        // Call all cleanup functions to properly remove listeners
+        this.cleanupFunctions.forEach((cleanup) => cleanup());
+        this.cleanupFunctions = [];
+        
         this.handler = undefined;
         this.monitoringEventHandler = undefined;
         this.isListenerAttached = false;

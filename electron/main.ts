@@ -1,8 +1,10 @@
 /**
- * Main entry point for the Electron application
+ * Main entry point for the Electron application.
  * Sets up proper shutdown handlers for graceful cleanup.
  *
  * @packageDocumentation
+ * @remarks
+ * contextIsolation is enabled and uses preload scripts for secure logging.
  */
 
 import log from "electron-log/main";
@@ -47,7 +49,7 @@ class Main {
      * without side effects or errors.
      */
     constructor() {
-        logger.info("Starting Uptime Watcher application");
+        logger.info("Starting Uptime Watcher application"); /* v8 ignore next */
         this.applicationService = new ApplicationService();
 
         // Ensure cleanup is only called once to prevent double-cleanup errors
@@ -55,10 +57,10 @@ class Main {
         const safeCleanup = () => {
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             if (!cleanedUp && this.applicationService?.cleanup) {
-                this.applicationService.cleanup().catch((error) => {
-                    logger.error("[Main] Cleanup failed", error);
-                });
                 cleanedUp = true;
+                this.applicationService.cleanup().catch((error) => {
+                    logger.error("[Main] Cleanup failed", error); /* v8 ignore next */
+                });
             }
         };
 
@@ -71,6 +73,9 @@ class Main {
 }
 
 // Start the application
-// Create Main instance and keep reference alive to prevent garbage collection.
-// This is intentional - we need the instance to persist for the lifetime of the application.
+/**
+ * Intentionally not assigning the Main instance to a variable.
+ * This ensures the instance persists for the application's lifetime,
+ * preventing premature garbage collection and maintaining lifecycle handlers.
+ */
 new Main();

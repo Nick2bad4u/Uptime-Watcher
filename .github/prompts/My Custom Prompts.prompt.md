@@ -13,6 +13,7 @@ Perform a comprehensive, full project scan for dead code. Conduct a thorough lin
 During the review, identify and address:
 
 - Dead/unused code
+- Logical Inconsistencies'
 - Bugs or potential issues
 - Small improvements (not large refactors)
 - Style inconsistencies

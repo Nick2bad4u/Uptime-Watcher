@@ -218,3 +218,4 @@ dist-electron/
 **/dist-electron/
 .agentic-tools*
 _ZENTASKS
+repomix-output.xml

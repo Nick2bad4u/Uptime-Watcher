@@ -21,10 +21,25 @@ const mockElectronAPI = {
         importData: vi.fn().mockResolvedValue(true),
     },
     events: {
-        onStatusUpdate: vi.fn((callback) => {
-            // Mock implementation - just store the callback but don't call it
-            // In real usage, this would be called by the backend
-            return callback;
+        onStatusUpdate: vi.fn((_callback) => {
+            // Mock implementation - return cleanup function
+            return vi.fn(); // Mock cleanup function
+        }),
+        onMonitoringStarted: vi.fn((_callback) => {
+            // Mock implementation - return cleanup function
+            return vi.fn(); // Mock cleanup function
+        }),
+        onMonitoringStopped: vi.fn((_callback) => {
+            // Mock implementation - return cleanup function
+            return vi.fn(); // Mock cleanup function
+        }),
+        onTestEvent: vi.fn((_callback) => {
+            // Mock implementation - return cleanup function
+            return vi.fn(); // Mock cleanup function
+        }),
+        onUpdateStatus: vi.fn((_callback) => {
+            // Mock implementation - return cleanup function
+            return vi.fn(); // Mock cleanup function
         }),
         removeAllListeners: vi.fn(),
     },

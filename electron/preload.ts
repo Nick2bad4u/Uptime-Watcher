@@ -194,69 +194,86 @@ const eventsAPI = {
      * Register a callback for monitor status update events.
      *
      * @param callback - Function to call when a monitor status changes
+     * @returns Cleanup function to remove the listener
      *
      * @remarks
      * This is the primary way to receive real-time updates about monitor
      * status changes for UI updates and notifications.
      */
     onStatusUpdate: (callback: (data: unknown) => void) => {
-        ipcRenderer.on("status-update", (_, data) => {
+        const handler = (_: Electron.IpcRendererEvent, data: unknown) => {
             callback(data);
-        });
+        };
+        ipcRenderer.on("status-update", handler);
+        return () => ipcRenderer.removeListener("status-update", handler);
     },
 
     /**
      * Register a callback for monitoring started events.
      *
      * @param callback - Function to call when monitoring starts for a site/monitor
+     * @returns Cleanup function to remove the listener
      *
      * @remarks
      * Called when a monitor begins actively monitoring a site.
      */
     onMonitoringStarted: (callback: (data: { siteId: string; monitorId: string }) => void) => {
-        ipcRenderer.on("monitoring-started", (_, data: { siteId: string; monitorId: string }) => {
+        const handler = (_: Electron.IpcRendererEvent, data: { siteId: string; monitorId: string }) => {
             callback(data);
-        });
+        };
+        ipcRenderer.on("monitoring-started", handler);
+        return () => ipcRenderer.removeListener("monitoring-started", handler);
     },
 
     /**
      * Register a callback for monitoring stopped events.
      *
      * @param callback - Function to call when monitoring stops for a site/monitor
+     * @returns Cleanup function to remove the listener
      *
      * @remarks
      * Called when a monitor stops actively monitoring a site.
      */
     onMonitoringStopped: (callback: (data: { siteId: string; monitorId: string }) => void) => {
-        ipcRenderer.on("monitoring-stopped", (_, data: { siteId: string; monitorId: string }) => {
+        const handler = (_: Electron.IpcRendererEvent, data: { siteId: string; monitorId: string }) => {
             callback(data);
-        });
+        };
+        ipcRenderer.on("monitoring-stopped", handler);
+        return () => ipcRenderer.removeListener("monitoring-stopped", handler);
     },
 
     /**
      * Register a callback for test events (development/debugging).
      *
      * @param callback - Function to call when test events are received
+     * @returns Cleanup function to remove the listener
      *
      * @remarks
      * Used primarily for development and debugging purposes.
      */
     onTestEvent: (callback: (data: unknown) => void) => {
-        ipcRenderer.on("test-event", (_, data) => {
+        const handler = (_: Electron.IpcRendererEvent, data: unknown) => {
             callback(data);
-        });
+        };
+        ipcRenderer.on("test-event", handler);
+        return () => ipcRenderer.removeListener("test-event", handler);
     },
 
     /**
      * Register a callback for application update status events.
      *
      * @param callback - Function to call when update status changes
+     * @returns Cleanup function to remove the listener
      *
      * @remarks
      * Receives events about application updates (checking, downloading, ready to install).
      */
     onUpdateStatus: (callback: (data: unknown) => void) => {
-        ipcRenderer.on("update-status", (_, data) => callback(data));
+        const handler = (_: Electron.IpcRendererEvent, data: unknown) => {
+            callback(data);
+        };
+        ipcRenderer.on("update-status", handler);
+        return () => ipcRenderer.removeListener("update-status", handler);
     },
 
     /**
@@ -400,6 +417,7 @@ const monitorTypesAPI = {
  *
  * @remarks
  * This creates the `window.electronAPI` object available in the renderer process.
+ * All APIs are exposed as read-only and cannot be mutated from the renderer, reinforcing the security model.
  * The API is organized by functional domains for better maintainability and
  * type safety. Each domain corresponds to a specific area of functionality.
  */

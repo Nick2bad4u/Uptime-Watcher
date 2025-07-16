@@ -204,13 +204,15 @@ declare global {
              */
             events: {
                 /** Register callback for monitor status updates */
-                onStatusUpdate: (callback: (update: StatusUpdate) => void) => void;
+                onStatusUpdate: (callback: (update: StatusUpdate) => void) => () => void;
                 /** Register callback for monitoring started events */
-                onMonitoringStarted: (callback: (data: { siteId: string; monitorId: string }) => void) => void;
+                onMonitoringStarted: (callback: (data: { siteId: string; monitorId: string }) => void) => () => void;
                 /** Register callback for monitoring stopped events */
-                onMonitoringStopped: (callback: (data: { siteId: string; monitorId: string }) => void) => void;
+                onMonitoringStopped: (callback: (data: { siteId: string; monitorId: string }) => void) => () => void;
                 /** Register callback for test events (development/debugging) */
-                onTestEvent: (callback: (data: unknown) => void) => void;
+                onTestEvent: (callback: (data: unknown) => void) => () => void;
+                /** Register callback for application update status events */
+                onUpdateStatus: (callback: (data: unknown) => void) => () => void;
                 /** Remove all listeners for a specific event */
                 removeAllListeners: (event: string) => void;
             };
