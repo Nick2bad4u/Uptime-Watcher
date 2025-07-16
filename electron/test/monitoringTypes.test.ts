@@ -63,7 +63,7 @@ describe("Monitoring Types", () => {
                 },
                 updateConfig: function (config: Partial<MonitorConfig>): void {
                     throw new Error("Function not implemented.");
-                }
+                },
             };
 
             expect(mockService.getType()).toBe("http");
@@ -81,7 +81,7 @@ describe("Monitoring Types", () => {
                 responseTime: 0,
                 checkInterval: 0,
                 timeout: 0,
-                retryAttempts: 0
+                retryAttempts: 0,
             };
 
             const httpService: IMonitorService = {
@@ -97,7 +97,7 @@ describe("Monitoring Types", () => {
                 },
                 updateConfig: function (config: Partial<MonitorConfig>): void {
                     throw new Error("Function not implemented.");
-                }
+                },
             };
 
             const result = await httpService.check(mockMonitor);
@@ -119,7 +119,7 @@ describe("Monitoring Types", () => {
                 responseTime: 0,
                 checkInterval: 0,
                 timeout: 0,
-                retryAttempts: 0
+                retryAttempts: 0,
             };
 
             const portService: IMonitorService = {
@@ -135,7 +135,7 @@ describe("Monitoring Types", () => {
                 },
                 updateConfig: function (config: Partial<MonitorConfig>): void {
                     throw new Error("Function not implemented.");
-                }
+                },
             };
 
             const result = await portService.check(mockMonitor);

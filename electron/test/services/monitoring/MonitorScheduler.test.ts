@@ -46,7 +46,7 @@ describe("MonitorScheduler", () => {
         monitoring: true,
         status: "up",
         history: [],
-        responseTime: 0
+        responseTime: 0,
     };
 
     beforeEach(() => {

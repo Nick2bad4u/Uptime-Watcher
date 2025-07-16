@@ -84,10 +84,11 @@ applyTo: "**"
   useSitesState.getState().addSite(newSite);
   ```
 - **Proper Import Usage**:
+
   ```typescript
   // Good: Use barrel export
   import { validateMonitorData, getMonitorTypeConfig } from "../utils";
-  
+
   // Bad: Direct import from subdirectory
   import { validateMonitorData } from "../utils/monitorValidation";
   ```

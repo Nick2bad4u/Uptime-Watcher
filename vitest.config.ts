@@ -15,15 +15,25 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
     esbuild: {
         target: "es2024", // Match TypeScript target for consistency
+        // Transpile all files with ESBuild to remove comments from code coverage.
+        // Required for `test.coverage.ignoreEmptyLines` to work:
+        include: ["**/*.js", "**/*.jsx", "**/*.mjs", "**/*.ts", "**/*.tsx"],
     },
     plugins: [
         react({
-            // Configure React plugin for testing
+            // Enable Fast Refresh for better development experience
+            // Includes .js, .jsx, .ts, .tsx by default
             include: /\.(js|jsx|ts|tsx)$/,
+
+            // Use automatic JSX runtime (default, but explicit for clarity)
             jsxRuntime: "automatic",
+
+            // Configure babel for any custom transformations if needed
             babel: {
+                // Use babel configuration files if they exist
                 babelrc: false,
                 configFile: false,
+                // Add any custom babel plugins here if needed
                 plugins: [],
             },
         }),
@@ -31,6 +41,7 @@ export default defineConfig({
     resolve: {
         alias: {
             "@": path.resolve(__dirname, "src"),
+            "@electron": path.resolve(__dirname, "electron"), // Keep for backward compatibility
         },
     },
     test: {
@@ -68,6 +79,7 @@ export default defineConfig({
                 "**/index.tsx", // Exclude JSX barrel export files
             ],
             ignoreEmptyLines: true, // Ignore empty lines in coverage reports
+            experimentalAstAwareRemapping: true, // Enable AST-aware remapping for better accuracy
             provider: "v8",
             reporter: ["text", "json", "lcov", "html"],
             reportsDirectory: "./coverage",

@@ -15,7 +15,8 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
     describe("Utility Function Tests", () => {
         it("should handle string manipulation", () => {
             const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
-            const truncate = (str: string, length: number) => str.length > length ? str.slice(0, length) + "..." : str;
+            const truncate = (str: string, length: number) =>
+                str.length > length ? str.slice(0, length) + "..." : str;
 
             expect(capitalize("hello")).toBe("Hello");
             expect(truncate("Hello world", 5)).toBe("Hello...");
@@ -39,7 +40,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
         it("should handle object operations", () => {
             const pick = (obj: any, keys: string[]): any => {
                 const result: any = {};
-                keys.forEach(key => {
+                keys.forEach((key) => {
                     result[key] = obj[key];
                 });
                 return result;
@@ -47,7 +48,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
 
             const omit = (obj: any, keys: string[]): any => {
                 const result = { ...obj };
-                keys.forEach(key => {
+                keys.forEach((key) => {
                     delete result[key];
                 });
                 return result;
@@ -134,13 +135,13 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
 
                 emit(event: string, ...args: any[]) {
                     if (this.events[event]) {
-                        this.events[event].forEach(callback => callback(...args));
+                        this.events[event].forEach((callback) => callback(...args));
                     }
                 }
 
                 off(event: string, callback: Function) {
                     if (this.events[event]) {
-                        this.events[event] = this.events[event].filter(cb => cb !== callback);
+                        this.events[event] = this.events[event].filter((cb) => cb !== callback);
                     }
                 }
             }
@@ -194,19 +195,19 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
 
             await Promise.all([
                 queue.add(async () => {
-                    await new Promise(resolve => setTimeout(resolve, 10));
+                    await new Promise((resolve) => setTimeout(resolve, 10));
                     results.push(1);
                     return 1;
                 }),
                 queue.add(async () => {
-                    await new Promise(resolve => setTimeout(resolve, 5));
+                    await new Promise((resolve) => setTimeout(resolve, 5));
                     results.push(2);
                     return 2;
                 }),
                 queue.add(async () => {
                     results.push(3);
                     return 3;
-                })
+                }),
             ]);
 
             expect(results).toEqual([1, 2, 3]);
@@ -219,7 +220,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                 set(key: string, value: any, ttl: number) {
                     this.cache.set(key, {
                         value,
-                        expiry: Date.now() + ttl
+                        expiry: Date.now() + ttl,
                     });
                 }
 
@@ -267,7 +268,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                         port: parsed.port,
                         pathname: parsed.pathname,
                         search: parsed.search,
-                        hash: parsed.hash
+                        hash: parsed.hash,
                     };
                 } catch {
                     return null;
@@ -281,7 +282,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                 port: "8080",
                 pathname: "/path",
                 search: "?query=value",
-                hash: "#hash"
+                hash: "#hash",
             });
 
             expect(parseUrl("invalid-url")).toBeNull();
@@ -298,7 +299,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                 }
 
                 if (obj instanceof Array) {
-                    return obj.map(item => deepClone(item));
+                    return obj.map((item) => deepClone(item));
                 }
 
                 if (typeof obj === "object") {
@@ -318,9 +319,9 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                 name: "Test",
                 nested: {
                     value: 42,
-                    array: [1, 2, 3]
+                    array: [1, 2, 3],
                 },
-                date: new Date()
+                date: new Date(),
             };
 
             const cloned = deepClone(original);
@@ -334,7 +335,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
     describe("Component Edge Cases", () => {
         it("should handle component with no props", () => {
             const SimpleComponent = () => <div>Simple</div>;
-            
+
             render(<SimpleComponent />);
             expect(screen.getByText("Simple")).toBeInTheDocument();
         });
@@ -400,7 +401,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
         it("should handle event handling", () => {
             const EventComponent = () => {
                 const [count, setCount] = React.useState(0);
-                
+
                 return (
                     <div>
                         <span data-testid="count">{count}</span>
@@ -419,7 +420,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
         it("should handle form inputs", () => {
             const FormComponent = () => {
                 const [value, setValue] = React.useState("");
-                
+
                 return (
                     <form>
                         <input
@@ -435,7 +436,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
 
             render(<FormComponent />);
             const input = screen.getByTestId("input");
-            
+
             fireEvent.change(input, { target: { value: "test" } });
             expect(screen.getByTestId("value")).toHaveTextContent("test");
         });
@@ -486,7 +487,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
         it("should handle memoization", () => {
             const memoize = (fn: any) => {
                 const cache = new Map();
-                return ((...args: any[]) => {
+                return (...args: any[]) => {
                     const key = JSON.stringify(args);
                     if (cache.has(key)) {
                         return cache.get(key);
@@ -494,7 +495,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                     const result = fn(...args);
                     cache.set(key, result);
                     return result;
-                });
+                };
             };
 
             const expensive = vi.fn((n: number) => {
@@ -518,7 +519,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             const lazy = (fn: () => any) => {
                 let value: any;
                 let computed = false;
-                
+
                 return () => {
                     if (!computed) {
                         value = fn();
@@ -553,7 +554,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                     destroy: () => {
                         isDestroyed = true;
                     },
-                    isDestroyed: () => isDestroyed
+                    isDestroyed: () => isDestroyed,
                 };
             };
 
@@ -571,23 +572,19 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             const operation2 = async () => "result2";
             const operation3 = async () => "result3";
 
-            const results = await Promise.all([
-                operation1(),
-                operation2(),
-                operation3()
-            ]);
+            const results = await Promise.all([operation1(), operation2(), operation3()]);
 
             expect(results).toEqual(["result1", "result2", "result3"]);
         });
 
         it("should handle race conditions", async () => {
             const fastOperation = async () => {
-                await new Promise(resolve => setTimeout(resolve, 1));
+                await new Promise((resolve) => setTimeout(resolve, 1));
                 return "fast";
             };
 
             const slowOperation = async () => {
-                await new Promise(resolve => setTimeout(resolve, 10));
+                await new Promise((resolve) => setTimeout(resolve, 10));
                 return "slow";
             };
 

@@ -80,7 +80,7 @@ describe("Monitoring Types", () => {
                 },
                 updateConfig: function (config: Partial<MonitorConfig>): void {
                     throw new Error("Function not implemented.");
-                }
+                },
             };
 
             expect(typeof mockService.check).toBe("function");
@@ -101,7 +101,7 @@ describe("Monitoring Types", () => {
                 },
                 updateConfig: function (config: Partial<MonitorConfig>): void {
                     throw new Error("Function not implemented.");
-                }
+                },
             };
 
             const mockMonitor = {

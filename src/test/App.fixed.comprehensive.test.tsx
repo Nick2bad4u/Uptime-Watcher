@@ -42,7 +42,7 @@ vi.mock("../components", () => ({
 describe("App Component - Fixed Comprehensive Coverage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        
+
         // Default mock implementations
         mockUseAppInitialization.mockReturnValue({
             initializeApp: vi.fn(),
@@ -51,9 +51,9 @@ describe("App Component - Fixed Comprehensive Coverage", () => {
             error: null,
             dismissError: vi.fn(),
         });
-        
+
         mockUseSelectedSite.mockReturnValue(null);
-        
+
         mockUseUpdatesState.mockReturnValue({
             updateStatus: "idle",
             updateProgress: 0,
@@ -62,24 +62,24 @@ describe("App Component - Fixed Comprehensive Coverage", () => {
             clearUpdateError: vi.fn(),
             applyUpdate: vi.fn(),
         });
-        
+
         mockUseAppLifecycle.mockReturnValue({
             subscribeToStatusUpdates: vi.fn(),
             unsubscribeFromStatusUpdates: vi.fn(),
         });
-        
+
         mockUseSettingsStore.mockReturnValue({
             theme: "light",
             settings: { theme: "light" },
         });
-        
+
         mockUseUiStore.mockReturnValue({
             showSettings: false,
             showSiteDetails: false,
             setShowSettings: vi.fn(),
             setShowSiteDetails: vi.fn(),
         });
-        
+
         mockUseSitesStore.mockReturnValue({
             sites: [],
             sitesCount: 0,
@@ -88,14 +88,14 @@ describe("App Component - Fixed Comprehensive Coverage", () => {
 
     it("should render App component with basic structure", () => {
         render(<App />);
-        
+
         expect(screen.getByTestId("header")).toBeInTheDocument();
         expect(screen.getByTestId("site-list")).toBeInTheDocument();
     });
 
     it("should apply light theme class by default", () => {
         render(<App />);
-        
+
         const appElement = screen.getByTestId("header").closest(".uptime-watcher-app");
         expect(appElement).toHaveClass("light");
     });
@@ -107,7 +107,7 @@ describe("App Component - Fixed Comprehensive Coverage", () => {
         });
 
         render(<App />);
-        
+
         const appElement = screen.getByTestId("header").closest(".uptime-watcher-app");
         expect(appElement).toHaveClass("dark");
     });
@@ -122,7 +122,7 @@ describe("App Component - Fixed Comprehensive Coverage", () => {
         });
 
         render(<App />);
-        
+
         expect(screen.getByTestId("loading-overlay")).toBeInTheDocument();
     });
 
@@ -136,7 +136,7 @@ describe("App Component - Fixed Comprehensive Coverage", () => {
         });
 
         render(<App />);
-        
+
         expect(screen.getByTestId("error-notification")).toBeInTheDocument();
     });
 
@@ -151,7 +151,7 @@ describe("App Component - Fixed Comprehensive Coverage", () => {
         });
 
         render(<App />);
-        
+
         expect(screen.getByTestId("update-notification")).toBeInTheDocument();
     });
 
@@ -164,7 +164,7 @@ describe("App Component - Fixed Comprehensive Coverage", () => {
         });
 
         render(<App />);
-        
+
         expect(screen.getByTestId("settings")).toBeInTheDocument();
     });
 
@@ -175,7 +175,7 @@ describe("App Component - Fixed Comprehensive Coverage", () => {
             setShowSettings: vi.fn(),
             setShowSiteDetails: vi.fn(),
         });
-        
+
         mockUseSelectedSite.mockReturnValue({
             identifier: "test-site",
             name: "Test Site",
@@ -185,13 +185,13 @@ describe("App Component - Fixed Comprehensive Coverage", () => {
         });
 
         render(<App />);
-        
+
         expect(screen.getByTestId("site-details")).toBeInTheDocument();
     });
 
     it("should handle initialization on mount", () => {
         const mockInitialize = vi.fn();
-        
+
         mockUseAppInitialization.mockReturnValue({
             initializeApp: mockInitialize,
             isLoading: false,
@@ -201,30 +201,30 @@ describe("App Component - Fixed Comprehensive Coverage", () => {
         });
 
         render(<App />);
-        
+
         expect(mockInitialize).toHaveBeenCalled();
     });
 
     it("should handle status update subscription", () => {
         const mockSubscribe = vi.fn();
         const mockUnsubscribe = vi.fn();
-        
+
         mockUseAppLifecycle.mockReturnValue({
             subscribeToStatusUpdates: mockSubscribe,
             unsubscribeFromStatusUpdates: mockUnsubscribe,
         });
 
         const { unmount } = render(<App />);
-        
+
         expect(mockSubscribe).toHaveBeenCalled();
-        
+
         unmount();
         expect(mockUnsubscribe).toHaveBeenCalled();
     });
 
     it("should handle various update statuses", () => {
         const mockApplyUpdate = vi.fn();
-        
+
         mockUseUpdatesState.mockReturnValue({
             updateStatus: "downloaded",
             updateProgress: 100,
@@ -235,13 +235,13 @@ describe("App Component - Fixed Comprehensive Coverage", () => {
         });
 
         render(<App />);
-        
+
         expect(screen.getByTestId("update-notification")).toBeInTheDocument();
     });
 
     it("should handle update error scenarios", () => {
         const mockClearError = vi.fn();
-        
+
         mockUseUpdatesState.mockReturnValue({
             updateStatus: "error",
             updateProgress: 0,
@@ -252,7 +252,7 @@ describe("App Component - Fixed Comprehensive Coverage", () => {
         });
 
         render(<App />);
-        
+
         expect(screen.getByTestId("update-notification")).toBeInTheDocument();
     });
 
@@ -266,7 +266,7 @@ describe("App Component - Fixed Comprehensive Coverage", () => {
         });
 
         render(<App />);
-        
+
         expect(screen.getByTestId("site-list")).toBeInTheDocument();
     });
 
@@ -278,18 +278,18 @@ describe("App Component - Fixed Comprehensive Coverage", () => {
         });
 
         const { rerender } = render(<App />);
-        
+
         let appElement = screen.getByTestId("header").closest(".uptime-watcher-app");
         expect(appElement).toHaveClass("light");
-        
+
         // Switch to dark theme
         mockUseSettingsStore.mockReturnValue({
             theme: "dark",
             settings: { theme: "dark" },
         });
-        
+
         rerender(<App />);
-        
+
         appElement = screen.getByTestId("header").closest(".uptime-watcher-app");
         expect(appElement).toHaveClass("dark");
     });
@@ -304,14 +304,14 @@ describe("App Component - Fixed Comprehensive Coverage", () => {
         });
 
         render(<App />);
-        
+
         expect(screen.getByTestId("loading-overlay")).toBeInTheDocument();
     });
 
     it("should handle modal state changes", () => {
         const mockSetShowSettings = vi.fn();
         const mockSetShowSiteDetails = vi.fn();
-        
+
         mockUseUiStore.mockReturnValue({
             showSettings: false,
             showSiteDetails: false,
@@ -320,7 +320,7 @@ describe("App Component - Fixed Comprehensive Coverage", () => {
         });
 
         render(<App />);
-        
+
         // Should not show modals initially
         expect(screen.queryByTestId("settings")).not.toBeInTheDocument();
         expect(screen.queryByTestId("site-details")).not.toBeInTheDocument();
@@ -328,7 +328,7 @@ describe("App Component - Fixed Comprehensive Coverage", () => {
 
     it("should handle error dismissal", () => {
         const mockDismissError = vi.fn();
-        
+
         mockUseAppInitialization.mockReturnValue({
             initializeApp: vi.fn(),
             isLoading: false,
@@ -338,7 +338,7 @@ describe("App Component - Fixed Comprehensive Coverage", () => {
         });
 
         render(<App />);
-        
+
         expect(screen.getByTestId("error-notification")).toBeInTheDocument();
     });
 
@@ -349,7 +349,7 @@ describe("App Component - Fixed Comprehensive Coverage", () => {
         });
 
         render(<App />);
-        
+
         const appElement = screen.getByTestId("header").closest(".uptime-watcher-app");
         expect(appElement).toHaveClass("system");
     });
@@ -361,7 +361,7 @@ describe("App Component - Fixed Comprehensive Coverage", () => {
         });
 
         render(<App />);
-        
+
         expect(screen.getByTestId("site-list")).toBeInTheDocument();
     });
 
@@ -375,7 +375,7 @@ describe("App Component - Fixed Comprehensive Coverage", () => {
         });
 
         render(<App />);
-        
+
         expect(screen.getByTestId("loading-overlay")).toBeInTheDocument();
         expect(screen.getByTestId("error-notification")).toBeInTheDocument();
     });
@@ -391,7 +391,7 @@ describe("App Component - Fixed Comprehensive Coverage", () => {
         });
 
         render(<App />);
-        
+
         expect(screen.getByTestId("update-notification")).toBeInTheDocument();
     });
 
@@ -408,7 +408,7 @@ describe("App Component - Fixed Comprehensive Coverage", () => {
         });
 
         render(<App />);
-        
+
         expect(screen.getByTestId("site-list")).toBeInTheDocument();
     });
 
@@ -419,11 +419,11 @@ describe("App Component - Fixed Comprehensive Coverage", () => {
             setShowSettings: vi.fn(),
             setShowSiteDetails: vi.fn(),
         });
-        
+
         mockUseSelectedSite.mockReturnValue(null);
 
         render(<App />);
-        
+
         expect(screen.queryByTestId("site-details")).not.toBeInTheDocument();
     });
 
@@ -438,7 +438,7 @@ describe("App Component - Fixed Comprehensive Coverage", () => {
         });
 
         render(<App />);
-        
+
         expect(screen.getByTestId("update-notification")).toBeInTheDocument();
     });
 
@@ -452,7 +452,7 @@ describe("App Component - Fixed Comprehensive Coverage", () => {
         });
 
         render(<App />);
-        
+
         expect(screen.getByTestId("loading-overlay")).toBeInTheDocument();
     });
 
@@ -466,7 +466,7 @@ describe("App Component - Fixed Comprehensive Coverage", () => {
         });
 
         render(<App />);
-        
+
         expect(screen.getByTestId("loading-overlay")).toBeInTheDocument();
     });
 });

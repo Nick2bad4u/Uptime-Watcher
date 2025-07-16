@@ -4,13 +4,13 @@
 
 import { describe, expect, it, vi } from "vitest";
 import { z } from "zod";
-import { 
-    EnhancedTypeGuard, 
-    GenericTypeInference, 
+import {
+    EnhancedTypeGuard,
+    GenericTypeInference,
     TypeSafeMonitorBuilder,
     TypeSafeMonitorFactory,
     type TypeGuardResult,
-    type RuntimeValidationContext
+    type RuntimeValidationContext,
 } from "../../../services/monitoring/EnhancedTypeGuards";
 import type { BaseMonitorConfig } from "../../../services/monitoring/MonitorTypeRegistry";
 
@@ -237,7 +237,7 @@ describe("EnhancedTypeGuards", () => {
                     type: "url",
                     label: "URL",
                     required: true,
-                    placeholder: "https://example.com"
+                    placeholder: "https://example.com",
                 },
                 {
                     name: "timeout",
@@ -246,31 +246,31 @@ describe("EnhancedTypeGuards", () => {
                     required: false,
                     min: 1000,
                     max: 60000,
-                    placeholder: "5000"
+                    placeholder: "5000",
                 },
                 {
                     name: "description",
                     type: "text",
                     label: "Description",
                     required: false,
-                    placeholder: "Monitor description"
-                }
+                    placeholder: "Monitor description",
+                },
             ],
             validationSchema: z.object({
                 url: z.url(),
-                timeout: z.number().optional()
+                timeout: z.number().optional(),
             }),
             serviceFactory: () => ({
-                check: async () => ({ 
-                    success: true, 
+                check: async () => ({
+                    success: true,
                     responseTime: 200,
                     status: "up" as const,
-                    timestamp: Date.now()
+                    timestamp: Date.now(),
                 }),
                 getType: () => "http" as const,
                 updateConfig: () => {},
-                getConfig: () => ({})
-            })
+                getConfig: () => ({}),
+            }),
         };
 
         describe("inferFieldType", () => {
@@ -455,12 +455,12 @@ describe("EnhancedTypeGuards", () => {
             // Mock logger to avoid actual logging
             const mockLogger = {
                 warn: vi.fn(),
-                error: vi.fn()
+                error: vi.fn(),
             };
             vi.doMock("../../utils/logger", () => ({
-                logger: mockLogger
+                logger: mockLogger,
             }));
-            
+
             // This should handle the exception gracefully
             builder.setField("url", "https://example.com");
             const result = builder.build();
@@ -477,7 +477,7 @@ describe("EnhancedTypeGuards", () => {
         it("should validate monitor data successfully", () => {
             const data = {
                 type: "http",
-                url: "https://example.com"
+                url: "https://example.com",
             };
             const result = TypeSafeMonitorFactory.validate(data);
             expect(result.success).toBe(true);
@@ -499,7 +499,7 @@ describe("EnhancedTypeGuards", () => {
         it("should reject data with invalid monitor type", () => {
             const data = {
                 type: "invalid",
-                url: "https://example.com"
+                url: "https://example.com",
             };
             const result = TypeSafeMonitorFactory.validate(data);
             expect(result.success).toBe(false);
@@ -508,7 +508,7 @@ describe("EnhancedTypeGuards", () => {
 
         it("should handle missing type field", () => {
             const data = {
-                url: "https://example.com"
+                url: "https://example.com",
             };
             const result = TypeSafeMonitorFactory.validate(data);
             expect(result.success).toBe(false);
@@ -519,7 +519,7 @@ describe("EnhancedTypeGuards", () => {
         it("should define TypeGuardResult interface", () => {
             const result: TypeGuardResult<string> = {
                 success: true,
-                value: "test"
+                value: "test",
             };
             expect(result.success).toBe(true);
             expect(result.value).toBe("test");
@@ -532,8 +532,8 @@ describe("EnhancedTypeGuards", () => {
                 details: {
                     expectedType: "string",
                     actualType: "number",
-                    suggestions: ["Use a string value"]
-                }
+                    suggestions: ["Use a string value"],
+                },
             };
             expect(result.success).toBe(false);
             expect(result.error).toBe("Validation failed");
@@ -545,7 +545,7 @@ describe("EnhancedTypeGuards", () => {
                 fieldName: "test",
                 expectedType: "string",
                 actualValue: 123,
-                suggestions: ["Use a string"]
+                suggestions: ["Use a string"],
             };
             expect(context.fieldName).toBe("test");
             expect(context.expectedType).toBe("string");
