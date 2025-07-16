@@ -11,8 +11,8 @@
 export type { MonitorStatus, SiteStatus } from "./types/status";
 
 // Re-export MonitorType from electron types to avoid duplication
-export type { MonitorType } from "../electron/types";
 import type { MonitorType } from "../electron/types";
+export type { MonitorType } from "../electron/types";
 
 /**
  * Monitor interface representing a single monitoring endpoint.

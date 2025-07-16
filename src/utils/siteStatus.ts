@@ -3,12 +3,7 @@
  * Provides comprehensive logic for determining overall site status based on monitor states.
  */
 
-import { Site } from "../types";
-
-/**
- * Possible site status values based on monitor states
- */
-export type SiteStatus = "up" | "down" | "pending" | "paused" | "mixed" | "unknown";
+import { Site, SiteStatus } from "../types";
 
 /**
  * Calculate the overall site status based on monitor states.
