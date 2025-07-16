@@ -4,7 +4,7 @@
  */
 
 import { codecovVitePlugin } from "@codecov/vite-plugin";
-// import react from "@vitejs/plugin-react";
+import react from "@vitejs/plugin-react";
 import * as path from "node:path";
 import electron from "vite-plugin-electron";
 import { ViteMcp } from "vite-plugin-mcp";
@@ -30,24 +30,24 @@ export default defineConfig({
         target: "es2024", // Match TypeScript target for consistency
     },
     plugins: [
-        // react({
-        //     // Enable Fast Refresh for better development experience
-        //     // Includes .js, .jsx, .ts, .tsx by default
-        //     include: /\.(js|jsx|ts|tsx)$/,
+        react({
+            // Enable Fast Refresh for better development experience
+            // Includes .js, .jsx, .ts, .tsx by default
+            include: /\.(js|jsx|ts|tsx)$/,
 
-        //     // Use automatic JSX runtime (default, but explicit for clarity)
-        //     jsxRuntime: "automatic",
+            // Use automatic JSX runtime (default, but explicit for clarity)
+            jsxRuntime: "automatic",
 
-        //     // Configure babel for any custom transformations if needed
-        //     babel: {
-        //         // Use babel configuration files if they exist
-        //         babelrc: false,
-        //         configFile: false,
-        //         // Add any custom babel plugins here if needed
-        //         plugins: [],
-        //     },
-        // }),
-        // // // TypeScript checking in development (ESLint disabled due to flat config compatibility)
+            // Configure babel for any custom transformations if needed
+            babel: {
+                // Use babel configuration files if they exist
+                babelrc: false,
+                configFile: false,
+                // Add any custom babel plugins here if needed
+                plugins: [],
+            },
+        }),
+        // // TypeScript checking in development (ESLint disabled due to flat config compatibility)
         // checker({
         //     typescript: {
         //         tsconfigPath: "./tsconfig.json",

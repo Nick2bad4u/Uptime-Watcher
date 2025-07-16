@@ -116,7 +116,7 @@ describe("MonitorScheduler", () => {
             scheduler.startMonitor("site-1", mockMonitor);
 
             // Fast-forward time by the monitor's check interval
-            await vi.advanceTimersByTimeAsync(mockMonitor.checkInterval!);
+            await vi.advanceTimersByTimeAsync(mockMonitor.checkInterval);
 
             expect(mockCheckCallback).toHaveBeenCalledWith("site-1", "monitor-1");
         });

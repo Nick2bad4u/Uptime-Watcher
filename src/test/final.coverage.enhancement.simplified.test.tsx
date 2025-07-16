@@ -97,7 +97,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                 let timeoutId: NodeJS.Timeout;
                 return (...args: any[]) => {
                     clearTimeout(timeoutId);
-                    timeoutId = setTimeout(() => fn.apply(null, args), delay);
+                    timeoutId = setTimeout(() => fn(...args), delay);
                 };
             };
 
@@ -107,7 +107,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                     const now = Date.now();
                     if (now - lastCall >= delay) {
                         lastCall = now;
-                        return fn.apply(null, args);
+                        return fn(...args);
                     }
                 };
             };
@@ -128,9 +128,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                 private events: Record<string, Function[]> = {};
 
                 on(event: string, callback: Function) {
-                    if (!this.events[event]) {
-                        this.events[event] = [];
-                    }
+                    this.events[event] ??= [];
                     this.events[event].push(callback);
                 }
 
@@ -161,7 +159,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
 
         it("should handle async queue", async () => {
             class AsyncQueue {
-                private queue: (() => Promise<any>)[] = [];
+                private readonly queue: (() => Promise<any>)[] = [];
                 private running = false;
 
                 async add(fn: () => Promise<any>): Promise<any> {
@@ -216,7 +214,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
 
         it("should handle cache with expiration", () => {
             class Cache {
-                private cache = new Map<string, { value: any; expiry: number }>();
+                private readonly cache = new Map<string, { value: any; expiry: number }>();
 
                 set(key: string, value: any, ttl: number) {
                     this.cache.set(key, {
