@@ -7,14 +7,116 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[35abfa8](https://github.com/Nick2bad4u/Uptime-Watcher/commit/35abfa85418510b09dbff01daa8853676a1a5902)...
-[35abfa8](https://github.com/Nick2bad4u/Uptime-Watcher/commit/35abfa85418510b09dbff01daa8853676a1a5902)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/35abfa85418510b09dbff01daa8853676a1a5902...35abfa85418510b09dbff01daa8853676a1a5902))
+[[e4b7976](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e4b79766c44cf48c9c26b0c51f14e8e04f94ad0e)...
+[e4b7976](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e4b79766c44cf48c9c26b0c51f14e8e04f94ad0e)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/e4b79766c44cf48c9c26b0c51f14e8e04f94ad0e...e4b79766c44cf48c9c26b0c51f14e8e04f94ad0e))
 
 
 ### 📦 Dependencies
 
+- [dependency] Update version 7.6.0 [`(e4b7976)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e4b79766c44cf48c9c26b0c51f14e8e04f94ad0e)
+
+
+
+
+
+
+## [7.6.0] - 2025-07-16
+
+
+[[c2ad587](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c2ad587da68272b729fe2096f583ebce2eede37f)...
+[6869f0b](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6869f0b5b2ce12be8c9c80cee7d6619cd5b6240f)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/c2ad587da68272b729fe2096f583ebce2eede37f...6869f0b5b2ce12be8c9c80cee7d6619cd5b6240f))
+
+
+### ✨ Features
+
+- ✨ [feat] Unifies and extends monitor event system for status changes
+
+- Standardizes monitor status events by replacing legacy "status-update" with typed "monitor:status-changed", "monitor:up", and "monitor:down" events, enabling a more granular and type-safe notification system.
+- Refactors event emission, handling, and IPC wiring across backend and frontend to consistently use the new event names and payload structures.
+- Updates preload and global typings to expose new event listeners, and revises all related tests, mocks, and documentation accordingly.
+- Improves initialization, error handling, and event processing logic for better reliability and maintainability.
+- Removes outdated event constants and handler code, ensuring cleaner API boundaries and reducing redundancy.
+- Motivated by the need for clearer event semantics, stronger typing, and improved frontend reactivity to monitor state changes. [`(6869f0b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6869f0b5b2ce12be8c9c80cee7d6619cd5b6240f)
+
+
+- ✨ [feat] Add event listener cleanup support and improve API typing
+
+- Introduces cleanup functions for all event subscription APIs, enabling proper removal of listeners in the renderer, improving memory management and preventing listener leaks
+- Updates type definitions and test mocks to reflect the new pattern, ensuring type safety and test accuracy
+- Refactors subscription management in the status update handler to utilize cleanup functions instead of global listener removal, enabling more granular and reliable event unsubscription
+- Adds and clarifies documentation on Electron application entry, context isolation, and event security model
+- Fixes minor logic and parameter handling in orchestrator and event emission for accuracy and consistency
+- Removes experimental code coverage setting for improved compatibility [`(7b44526)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7b44526edec1831e7abf0fab47310316a4ac2581)
+
+
+
+### �️ Bug Fixes
+
+- 🛠️ [fix] Improve monitor ID handling and React plugin config
+
+- Updates monitor mapping logic to ensure IDs are only stringified if valid, improving data consistency.
+- Reactivates and configures the React Vite plugin with Fast Refresh and explicit Babel options for better DX and JSX handling.
+- Refines test coverage matching/exclusions in SonarQube properties to avoid double-counting test files.
+- Cleans up test and utility code for clarity, using more concise methods and stricter type usage.
+- Removes redundant cleanup logic in the Electron main entry point. [`(c2ad587)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c2ad587da68272b729fe2096f583ebce2eede37f)
+
+
+
+### 📦 Dependencies
+
+- *(deps)* [dependency] Update dependency group (#31) [`(e925d80)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e925d80ab81bff71a319b3cfedac444d94ce13f5)
+
+
 - [dependency] Update version 7.5.0 [`(35abfa8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/35abfa85418510b09dbff01daa8853676a1a5902)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(57f011e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/57f011eecd32acc3a89d4a0bce40f92861b93901)
+
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(8f909c6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8f909c6f3d7ed2d45f804e2a56a343e6dbbf5e57)
+
+
+
+### � Documentation
+
+- 📝 [docs] Enhance monitor integration guide and clarify architecture
+
+- Expands the guide for adding new monitor types with richer examples, advanced usage patterns, and clearer step-by-step instructions
+ - Details registry-driven features, migration support, operational hooks, and type safety improvements
+ - Updates code samples to reflect modern best practices, including use of JSON columns for schema flexibility and validator.js for robust validation
+ - Adds advanced notes, debugging tips, architectural status, and clarifies error handling and caching strategies
+ - Refines comments and JSDoc in orchestrator and main process for maintainability and onboarding
+ - Removes outdated instructions and improves overall documentation structure for better developer experience [`(4e39e39)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4e39e39e7bc7dc30b0d758584862163b6332f424)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Improve test formatting and coverage config consistency
+
+- Standardizes code style and formatting across test files, enhancing readability and reducing diff noise.
+- Updates coverage and build configurations for more accurate and maintainable code coverage reporting, including enabling AST-aware remapping and ensuring comment removal.
+- Refines plugin and alias usage for better consistency between main and electron test setups.
+- Clarifies and expands comments for better documentation of config intent.
+- No functional or logic changes to application or test behavior. [`(e366f3d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e366f3deb8c89d6ed1c9ed2824dabff2821bf3ec)
+
+
+
+### 🧹 Chores
+
+- 🧹 [chore] Annotate logger calls for v8 coverage ignore
+
+- Adds `/* v8 ignore next */` or `/* v8 ignore next 2 */` comments to logger calls throughout the codebase to prevent logging statements from affecting coverage metrics.
+- Aims to improve the accuracy of code coverage reports by excluding side-effect-only logging from coverage analysis.
+- No changes to application logic or behavior; purely for tooling and code quality purposes. [`(33f1fd6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/33f1fd6fcc7415053890059c425fadd4cdf80881)
+
+
+- Update changelogs for v7.5.0 [skip ci] [`(cf03e6e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cf03e6e7ec0a8310d027887d06a6b9859ddd0a08)
 
 
 
