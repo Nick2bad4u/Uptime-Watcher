@@ -46,6 +46,7 @@ describe("MonitorScheduler", () => {
         monitoring: true,
         status: "up",
         history: [],
+        responseTime: 0
     };
 
     beforeEach(() => {
@@ -167,7 +168,7 @@ describe("MonitorScheduler", () => {
             scheduler.startMonitor("site-1", mockMonitor);
 
             // Fast-forward time to trigger the callback
-            await vi.advanceTimersByTimeAsync(mockMonitor.checkInterval!);
+            await vi.advanceTimersByTimeAsync(mockMonitor.checkInterval);
 
             // Verify the callback was called (the error handling is internal)
             expect(errorCallback).toHaveBeenCalledWith("site-1", "monitor-1");
