@@ -1,4 +1,3 @@
-/* stylelint-disable-next-line import-notation -- This is the proper way for Tailwind CSS */
 @import "tailwindcss";
 
 :root {

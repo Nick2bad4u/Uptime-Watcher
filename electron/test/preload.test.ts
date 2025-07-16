@@ -333,12 +333,12 @@ describe("Electron Preload Script", () => {
             const listener = listenerCall![1];
 
             // Simulate IPC event
-            const testData = { 
+            const testData = {
                 siteId: "test-site",
                 monitor: { id: "test-monitor", type: "http" },
                 newStatus: "up",
                 previousStatus: "down",
-                timestamp: Date.now()
+                timestamp: Date.now(),
             };
             listener(null, testData);
 

@@ -7,6 +7,11 @@
  */
 /** @type {import('stylelint').Config} */
 module.exports = {
-    extends: "stylelint-config-standard",
-    rules: {},
+    extends: [
+        "stylelint-config-standard",
+        "stylelint-config-tailwindcss"
+    ],
+    rules: {
+        // You can add Tailwind-specific or custom rules here if needed
+    },
 };

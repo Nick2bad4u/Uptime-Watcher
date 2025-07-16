@@ -180,7 +180,7 @@ export class StatusUpdateManager {
         // Call all cleanup functions to properly remove listeners
         this.cleanupFunctions.forEach((cleanup) => cleanup());
         this.cleanupFunctions = [];
-        
+
         this.handler = undefined;
         this.monitoringEventHandler = undefined;
         this.isListenerAttached = false;

@@ -110,7 +110,9 @@ const logger = {
             logger.info(`User action: ${action}`, details ?? ""); /* v8 ignore next */
         },
         settingsChange: (setting: string, oldValue: unknown, newValue: unknown) => {
-            logger.info(`Settings change: ${setting} - ${String(oldValue)} -> ${String(newValue)}`); /* v8 ignore next */
+            /* v8 ignore next */ logger.info(
+                `Settings change: ${setting} - ${String(oldValue)} -> ${String(newValue)}`
+            );
         },
     },
     // Verbose level - very detailed debugging
