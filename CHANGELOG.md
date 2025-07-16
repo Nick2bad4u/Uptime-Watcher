@@ -7,14 +7,61 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[2e8b973](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2e8b97363ca519804d3e8dbb784fc8fae1e5a2e3)...
-[2e8b973](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2e8b97363ca519804d3e8dbb784fc8fae1e5a2e3)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/2e8b97363ca519804d3e8dbb784fc8fae1e5a2e3...2e8b97363ca519804d3e8dbb784fc8fae1e5a2e3))
+[[5dfd73a](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5dfd73ada0c18888be3c5528cb05d43f5dfbc4cc)...
+[5dfd73a](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5dfd73ada0c18888be3c5528cb05d43f5dfbc4cc)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/5dfd73ada0c18888be3c5528cb05d43f5dfbc4cc...5dfd73ada0c18888be3c5528cb05d43f5dfbc4cc))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 7.4.0 [`(5dfd73a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5dfd73ada0c18888be3c5528cb05d43f5dfbc4cc)
+
+
+
+
+
+
+## [7.4.0] - 2025-07-16
+
+
+[[1109dae](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1109dae06ddc098df15eb54f0cfc602bfe644236)...
+[45ba5f2](https://github.com/Nick2bad4u/Uptime-Watcher/commit/45ba5f27917b1291d1f81905e46f0e5bef16de74)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/1109dae06ddc098df15eb54f0cfc602bfe644236...45ba5f27917b1291d1f81905e46f0e5bef16de74))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 7.3.0 [`(2e8b973)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2e8b97363ca519804d3e8dbb784fc8fae1e5a2e3)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(c272f34)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c272f34f73b3c48818280cece0d0b6c728492efb)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Add responseTime mock and fix timer advance call
+
+- Ensures mock monitor objects include a response time property to align with expected structure.
+- Updates timer advancement to use a non-null assertion, preventing potential errors during async test execution. [`(45ba5f2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/45ba5f27917b1291d1f81905e46f0e5bef16de74)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v7.3.0 [skip ci] [`(7607175)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/76071753456ea426a851eb50152104b60f7add5a)
+
+
+- 🧹 [chore] Remove unused exports and consolidate types
+
+- Cleans up unused and duplicate exports across barrel files and type definitions to reduce confusion and maintenance overhead.
+- Removes never-used error classes, utility functions, and conditional UI components for advanced analytics.
+- Consolidates type exports to single sources of truth, improving type safety and reducing redundancy.
+- Adjusts imports and tests to match new export structure, ensuring consistency and easier future refactoring.
+- Improves code clarity in UI components by switching from class-based to style-based response time coloring. [`(1109dae)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1109dae06ddc098df15eb54f0cfc602bfe644236)
 
 
 
