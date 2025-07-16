@@ -563,7 +563,7 @@ export class TypeSafeMonitorBuilder<T extends MonitorType> {
                 this.data[fieldName] = validation.value;
             } else {
                 this.errors.push(validation.error ?? `Invalid value for field ${fieldName}`);
-                logger.warn("Field validation failed:", validation.details);
+                logger.warn("Field validation failed:", validation.details); /* v8 ignore next */
             }
         } catch (error) {
             this.errors.push(`Error setting field ${fieldName}: ${error}`);

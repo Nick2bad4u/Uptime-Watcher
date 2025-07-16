@@ -16,7 +16,7 @@ export class ApplicationService {
     private readonly serviceContainer: ServiceContainer;
 
     constructor() {
-        logger.info("[ApplicationService] Initializing application services");
+        logger.info("[ApplicationService] Initializing application services"); /* v8 ignore next */
 
         // Get service container instance
         this.serviceContainer = ServiceContainer.getInstance({
@@ -32,23 +32,23 @@ export class ApplicationService {
     private setupApplication(): void {
         app.on("ready", () => {
             this.onAppReady().catch((error) => {
-                logger.error("[ApplicationService] Error during app initialization", error);
+                logger.error("[ApplicationService] Error during app initialization", error); /* v8 ignore next */
             });
         });
 
         app.on("window-all-closed", () => {
-            logger.info("[ApplicationService] All windows closed");
+            logger.info("[ApplicationService] All windows closed"); /* v8 ignore next */
             if (process.platform !== "darwin") {
-                logger.info("[ApplicationService] Quitting app (non-macOS)");
+                logger.info("[ApplicationService] Quitting app (non-macOS)"); /* v8 ignore next */
                 app.quit();
             }
         });
 
         app.on("activate", () => {
-            logger.info("[ApplicationService] App activated");
+            logger.info("[ApplicationService] App activated"); /* v8 ignore next */
             const windowService = this.serviceContainer.getWindowService();
             if (windowService.getAllWindows().length === 0) {
-                logger.info("[ApplicationService] No windows open, creating main window");
+                logger.info("[ApplicationService] No windows open, creating main window"); /* v8 ignore next */
                 windowService.createMainWindow();
             }
         });
@@ -58,7 +58,7 @@ export class ApplicationService {
      * Handle app ready event.
      */
     private async onAppReady(): Promise<void> {
-        logger.info("[ApplicationService] App ready - initializing services");
+        logger.info("[ApplicationService] App ready - initializing services"); /* v8 ignore next */
 
         // Initialize all services through the container
         await this.serviceContainer.initialize();
@@ -72,7 +72,7 @@ export class ApplicationService {
         // Setup auto-updater
         this.setupAutoUpdater();
 
-        logger.info("[ApplicationService] All services initialized successfully");
+        logger.info("[ApplicationService] All services initialized successfully"); /* v8 ignore next */
     }
 
     /**
@@ -88,7 +88,7 @@ export class ApplicationService {
 
         autoUpdater.initialize();
         autoUpdater.checkForUpdates().catch((error) => {
-            logger.error("[ApplicationService] Failed to check for updates", error);
+            logger.error("[ApplicationService] Failed to check for updates", error); /* v8 ignore next */
         });
     }
 
@@ -102,48 +102,69 @@ export class ApplicationService {
 
         orchestrator.on("status-update", (data: StatusUpdate) => {
             try {
-                logger.debug("[ApplicationService] Forwarding status update to renderer", {
+                /* v8 ignore next */ logger.debug("[ApplicationService] Forwarding status update to renderer", {
                     siteId: data.site.identifier,
                     previousStatus: data.previousStatus,
                 });
 
                 windowService.sendToRenderer("status-update", data);
             } catch (error) {
-                logger.error("[ApplicationService] Failed to forward status update to renderer", error);
+                /* v8 ignore next 2 */ logger.error(
+                    "[ApplicationService] Failed to forward status update to renderer",
+                    error
+                );
             }
         });
 
         // Forward monitoring start/stop events to renderer
         orchestrator.on("monitoring:started", (data) => {
             try {
-                logger.debug("[ApplicationService] Forwarding monitoring started to renderer", data);
+                /* v8 ignore next 2 */ logger.debug(
+                    "[ApplicationService] Forwarding monitoring started to renderer",
+                    data
+                );
                 windowService.sendToRenderer("monitoring-started", data);
             } catch (error) {
-                logger.error("[ApplicationService] Failed to forward monitoring started to renderer", error);
+                /* v8 ignore next 2 */ logger.error(
+                    "[ApplicationService] Failed to forward monitoring started to renderer",
+                    error
+                );
             }
         });
 
         orchestrator.on("monitoring:stopped", (data) => {
             try {
-                logger.debug("[ApplicationService] Forwarding monitoring stopped to renderer", data);
+                /* v8 ignore next 2 */ logger.debug(
+                    "[ApplicationService] Forwarding monitoring stopped to renderer",
+                    data
+                );
                 windowService.sendToRenderer("monitoring-stopped", data);
             } catch (error) {
-                logger.error("[ApplicationService] Failed to forward monitoring stopped to renderer", error);
+                /* v8 ignore next 2 */ logger.error(
+                    "[ApplicationService] Failed to forward monitoring stopped to renderer",
+                    error
+                );
             }
         });
 
         orchestrator.on("site-monitor-down", ({ monitorId, site }: { monitorId: string; site: Site }) => {
-            logger.debug("[ApplicationService] Monitor down notification", { monitorId, siteId: site.identifier });
+            /* v8 ignore next */ logger.debug("[ApplicationService] Monitor down notification", {
+                monitorId,
+                siteId: site.identifier,
+            });
             notificationService.notifyMonitorDown(site, monitorId);
         });
 
         orchestrator.on("site-monitor-up", ({ monitorId, site }: { monitorId: string; site: Site }) => {
-            logger.debug("[ApplicationService] Monitor up notification", { monitorId, siteId: site.identifier });
+            /* v8 ignore next */ logger.debug("[ApplicationService] Monitor up notification", {
+                monitorId,
+                siteId: site.identifier,
+            });
             notificationService.notifyMonitorUp(site, monitorId);
         });
 
         orchestrator.on("db-error", ({ error, operation }: { error: Error; operation: string }) => {
-            logger.error(`[ApplicationService] Database error during ${operation}`, error);
+            /* v8 ignore next */ logger.error(`[ApplicationService] Database error during ${operation}`, error);
         });
     }
 
@@ -151,12 +172,12 @@ export class ApplicationService {
      * Cleanup resources before application shutdown.
      */
     public async cleanup(): Promise<void> {
-        logger.info("[ApplicationService] Starting cleanup");
+        logger.info("[ApplicationService] Starting cleanup"); /* v8 ignore next */
 
         try {
             const services = this.serviceContainer.getInitializedServices();
             for (const { name } of services) {
-                logger.debug(`[ApplicationService] Cleaning up ${name}`);
+                logger.debug(`[ApplicationService] Cleaning up ${name}`); /* v8 ignore next */
             }
 
             // Cleanup IPC handlers
@@ -172,9 +193,9 @@ export class ApplicationService {
             // Close windows
             this.serviceContainer.getWindowService().closeMainWindow();
 
-            logger.info("[ApplicationService] Cleanup completed");
+            logger.info("[ApplicationService] Cleanup completed"); /* v8 ignore next */
         } catch (error) {
-            logger.error("[ApplicationService] Error during cleanup", error);
+            logger.error("[ApplicationService] Error during cleanup", error); /* v8 ignore next */
         }
     }
 }

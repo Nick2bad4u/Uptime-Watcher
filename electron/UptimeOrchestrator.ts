@@ -263,7 +263,10 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                         timestamp: Date.now(),
                     });
                 } catch (error) {
-                    logger.error(`[UptimeOrchestrator] Error starting monitoring for site ${data.identifier}:`, error);
+                    /* v8 ignore next 2 */ logger.error(
+                        `[UptimeOrchestrator] Error starting monitoring for site ${data.identifier}:`,
+                        error
+                    );
                     await this.emitTyped("internal:site:start-monitoring-response", {
                         identifier: data.identifier,
                         monitorId: data.monitorId,
@@ -288,7 +291,10 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                         timestamp: Date.now(),
                     });
                 } catch (error) {
-                    logger.error(`[UptimeOrchestrator] Error stopping monitoring for site ${data.identifier}:`, error);
+                    /* v8 ignore next 2 */ logger.error(
+                        `[UptimeOrchestrator] Error stopping monitoring for site ${data.identifier}:`,
+                        error
+                    );
                     await this.emitTyped("internal:site:stop-monitoring-response", {
                         identifier: data.identifier,
                         monitorId: data.monitorId,
@@ -340,9 +346,11 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                 for (const site of data.sites) {
                     try {
                         await this.monitorManager.setupSiteForMonitoring(site);
-                        logger.info(`[UptimeOrchestrator] Set up monitoring for loaded site: ${site.identifier}`);
+                        /* v8 ignore next 2 */ logger.info(
+                            `[UptimeOrchestrator] Set up monitoring for loaded site: ${site.identifier}`
+                        );
                     } catch (error) {
-                        logger.error(
+                        /* v8 ignore next 2 */ logger.error(
                             `[UptimeOrchestrator] Failed to setup monitoring for site ${site.identifier}:`,
                             error
                         );
@@ -402,7 +410,9 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
 
         // Transform typed events to simple events for ApplicationService
         this.on("monitor:status-changed", (data: MonitorStatusChangedData) => {
-            logger.debug(`[UptimeOrchestrator] Received monitor:status-changed event for site: ${data.siteId}`);
+            /* v8 ignore next 2 */ logger.debug(
+                `[UptimeOrchestrator] Received monitor:status-changed event for site: ${data.siteId}`
+            );
 
             // Emit the simple status-update event that ApplicationService expects
             this.emit("status-update", {

@@ -37,9 +37,14 @@
 import { BrowserWindow } from "electron";
 // eslint-disable-next-line unicorn/import-style -- Need namespace import for path operations
 import * as path from "node:path";
+import { fileURLToPath } from "node:url";
 
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/index";
+
+// ESM equivalent of __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
  * Service responsible for window management and lifecycle.
