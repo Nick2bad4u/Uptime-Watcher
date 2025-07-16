@@ -125,6 +125,20 @@ export interface UptimeEvents extends Record<string, unknown> {
         timestamp: number;
     };
 
+    "monitor:up": {
+        monitor: Monitor;
+        site: Site;
+        siteId: string;
+        timestamp: number;
+    };
+
+    "monitor:down": {
+        monitor: Monitor;
+        site: Site;
+        siteId: string;
+        timestamp: number;
+    };
+
     "monitor:check-completed": {
         monitorId: string;
         siteId: string;
@@ -411,7 +425,12 @@ export interface UptimeEvents extends Record<string, unknown> {
     "internal:database:get-sites-from-cache-requested": {
         operation: "get-sites-from-cache-requested";
         timestamp: number;
-        sites?: Site[];
+    };
+
+    "internal:database:get-sites-from-cache-response": {
+        operation: "get-sites-from-cache-response";
+        timestamp: number;
+        sites: Site[];
     };
 
     // State synchronization events
@@ -436,7 +455,14 @@ export interface UptimeEvents extends Record<string, unknown> {
 export const EVENT_CATEGORIES = {
     CONFIG: ["config:changed"],
     DATABASE: ["database:backup-created", "database:transaction-completed"],
-    MONITOR: ["monitor:added", "monitor:check-completed", "monitor:removed", "monitor:status-changed"],
+    MONITOR: [
+        "monitor:added",
+        "monitor:check-completed",
+        "monitor:removed",
+        "monitor:status-changed",
+        "monitor:up",
+        "monitor:down",
+    ],
     MONITORING: ["monitoring:started", "monitoring:stopped"],
     PERFORMANCE: ["performance:metric", "performance:warning"],
     SITE: ["site:added", "site:removed", "site:updated"],
@@ -448,7 +474,7 @@ export const EVENT_CATEGORIES = {
  */
 export const EVENT_PRIORITIES = {
     CRITICAL: ["performance:warning", "system:error", "system:shutdown"],
-    HIGH: ["database:transaction-completed", "monitor:status-changed", "site:removed"],
+    HIGH: ["database:transaction-completed", "monitor:status-changed", "monitor:up", "monitor:down", "site:removed"],
     LOW: ["performance:metric"],
     MEDIUM: ["config:changed", "monitor:added", "site:added", "site:updated"],
 } as const;

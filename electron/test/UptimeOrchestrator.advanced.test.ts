@@ -8,7 +8,7 @@ import { describe, expect, it, beforeEach, afterEach, vi } from "vitest";
 vi.mock("../constants", () => ({
     DEFAULT_REQUEST_TIMEOUT: 10000,
     DEFAULT_CHECK_INTERVAL: 300000,
-    STATUS_UPDATE_EVENT: "status-update",
+    STATUS_UPDATE_EVENT: "monitor:status-changed",
     DEFAULT_HISTORY_LIMIT: 500,
 }));
 

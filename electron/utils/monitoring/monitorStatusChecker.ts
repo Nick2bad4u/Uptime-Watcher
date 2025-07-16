@@ -260,14 +260,22 @@ export async function checkMonitor(
     });
 
     // Emit monitor state change events with proper typing
-    if (previousStatus === "up" && checkResult.status === "down") {
+    const shouldEmitDownEvent =
+        (previousStatus === "up" && checkResult.status === "down") ||
+        (previousStatus === "pending" && checkResult.status === "down");
+
+    const shouldEmitUpEvent =
+        (previousStatus === "down" && checkResult.status === "up") ||
+        (previousStatus === "pending" && checkResult.status === "up");
+
+    if (shouldEmitDownEvent) {
         await config.eventEmitter.emitTyped("monitor:down", {
             monitor: { ...monitor },
             site: freshSiteData,
             siteId: site.identifier,
             timestamp: Date.now(),
         });
-    } else if (previousStatus === "down" && checkResult.status === "up") {
+    } else if (shouldEmitUpEvent) {
         await config.eventEmitter.emitTyped("monitor:up", {
             monitor: { ...monitor },
             site: freshSiteData,

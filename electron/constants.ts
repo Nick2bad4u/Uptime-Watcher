@@ -42,9 +42,3 @@ export const RETRY_BACKOFF = Object.freeze({
  * @defaultValue 500
  */
 export const DEFAULT_HISTORY_LIMIT = 500;
-
-/**
- * Event name for status updates.
- * @defaultValue "status-update"
- */
-export const STATUS_UPDATE_EVENT = "status-update";

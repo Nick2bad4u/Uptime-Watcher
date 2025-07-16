@@ -200,12 +200,46 @@ const eventsAPI = {
      * This is the primary way to receive real-time updates about monitor
      * status changes for UI updates and notifications.
      */
-    onStatusUpdate: (callback: (data: unknown) => void) => {
+    onMonitorStatusChanged: (callback: (data: unknown) => void) => {
         const handler = (_: Electron.IpcRendererEvent, data: unknown) => {
             callback(data);
         };
-        ipcRenderer.on("status-update", handler);
-        return () => ipcRenderer.removeListener("status-update", handler);
+        ipcRenderer.on("monitor:status-changed", handler);
+        return () => ipcRenderer.removeListener("monitor:status-changed", handler);
+    },
+
+    /**
+     * Register a callback for monitor up events.
+     *
+     * @param callback - Function to call when a monitor comes back up
+     * @returns Cleanup function to remove the listener
+     *
+     * @remarks
+     * Called when a monitor recovers from a down state.
+     */
+    onMonitorUp: (callback: (data: unknown) => void) => {
+        const handler = (_: Electron.IpcRendererEvent, data: unknown) => {
+            callback(data);
+        };
+        ipcRenderer.on("monitor:up", handler);
+        return () => ipcRenderer.removeListener("monitor:up", handler);
+    },
+
+    /**
+     * Register a callback for monitor down events.
+     *
+     * @param callback - Function to call when a monitor goes down
+     * @returns Cleanup function to remove the listener
+     *
+     * @remarks
+     * Called when a monitor detects a failure.
+     */
+    onMonitorDown: (callback: (data: unknown) => void) => {
+        const handler = (_: Electron.IpcRendererEvent, data: unknown) => {
+            callback(data);
+        };
+        ipcRenderer.on("monitor:down", handler);
+        return () => ipcRenderer.removeListener("monitor:down", handler);
     },
 
     /**
@@ -221,8 +255,8 @@ const eventsAPI = {
         const handler = (_: Electron.IpcRendererEvent, data: { siteId: string; monitorId: string }) => {
             callback(data);
         };
-        ipcRenderer.on("monitoring-started", handler);
-        return () => ipcRenderer.removeListener("monitoring-started", handler);
+        ipcRenderer.on("monitoring:started", handler);
+        return () => ipcRenderer.removeListener("monitoring:started", handler);
     },
 
     /**
@@ -238,8 +272,8 @@ const eventsAPI = {
         const handler = (_: Electron.IpcRendererEvent, data: { siteId: string; monitorId: string }) => {
             callback(data);
         };
-        ipcRenderer.on("monitoring-stopped", handler);
-        return () => ipcRenderer.removeListener("monitoring-stopped", handler);
+        ipcRenderer.on("monitoring:stopped", handler);
+        return () => ipcRenderer.removeListener("monitoring:stopped", handler);
     },
 
     /**
@@ -417,7 +451,7 @@ const monitorTypesAPI = {
  *
  * @remarks
  * This creates the `window.electronAPI` object available in the renderer process.
- * All APIs are exposed as read-only and cannot be mutated from the renderer, reinforcing the security model.
+ * All APIs are exposed as read-only properties, ensuring they cannot be mutated from the renderer process, which reinforces the security model.
  * The API is organized by functional domains for better maintainability and
  * type safety. Each domain corresponds to a specific area of functionality.
  */

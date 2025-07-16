@@ -10,7 +10,6 @@ import {
     DEFAULT_HISTORY_LIMIT,
     DEFAULT_REQUEST_TIMEOUT,
     RETRY_BACKOFF,
-    STATUS_UPDATE_EVENT,
     USER_AGENT,
 } from "../constants";
 
@@ -80,17 +79,6 @@ describe("Electron Constants", () => {
         });
     });
 
-    describe("Event Names", () => {
-        it("should export STATUS_UPDATE_EVENT with correct value", () => {
-            expect(STATUS_UPDATE_EVENT).toBe("status-update");
-            expect(typeof STATUS_UPDATE_EVENT).toBe("string");
-        });
-
-        it("should use kebab-case for event names", () => {
-            expect(STATUS_UPDATE_EVENT).toMatch(/^[a-z]+(-[a-z]+)*$/);
-        });
-    });
-
     describe("History Configuration", () => {
         it("should export DEFAULT_HISTORY_LIMIT with correct value", () => {
             expect(DEFAULT_HISTORY_LIMIT).toBe(500);
@@ -111,7 +99,6 @@ describe("Electron Constants", () => {
                 DEFAULT_CHECK_INTERVAL,
                 USER_AGENT,
                 RETRY_BACKOFF,
-                STATUS_UPDATE_EVENT,
                 DEFAULT_HISTORY_LIMIT,
             };
 

@@ -1,6 +1,5 @@
 import { app } from "electron";
 
-import { StatusUpdate, Site } from "../../types";
 import { logger } from "../../utils/index";
 import { ServiceContainer } from "../ServiceContainer";
 
@@ -100,30 +99,77 @@ export class ApplicationService {
         const windowService = this.serviceContainer.getWindowService();
         const notificationService = this.serviceContainer.getNotificationService();
 
-        orchestrator.on("status-update", (data: StatusUpdate) => {
+        // Handle monitor status changes with typed events
+        orchestrator.onTyped("monitor:status-changed", (data) => {
             try {
-                /* v8 ignore next */ logger.debug("[ApplicationService] Forwarding status update to renderer", {
-                    siteId: data.site.identifier,
+                /* v8 ignore next */ logger.debug("[ApplicationService] Forwarding monitor status change to renderer", {
+                    siteId: data.siteId,
+                    monitorId: data.monitor.id,
                     previousStatus: data.previousStatus,
+                    newStatus: data.newStatus,
                 });
 
-                windowService.sendToRenderer("status-update", data);
+                // Send status update to renderer
+                windowService.sendToRenderer("monitor:status-changed", data);
             } catch (error) {
                 /* v8 ignore next 2 */ logger.error(
-                    "[ApplicationService] Failed to forward status update to renderer",
+                    "[ApplicationService] Failed to forward monitor status change to renderer",
                     error
                 );
             }
         });
 
+        // Handle monitor up events
+        orchestrator.onTyped("monitor:up", (data) => {
+            try {
+                logger.info("[ApplicationService] Monitor recovered - forwarding to renderer", {
+                    siteId: data.siteId,
+                    monitorId: data.monitor.id,
+                    siteName: data.site.name,
+                });
+
+                windowService.sendToRenderer("monitor:up", data);
+                notificationService.notifyMonitorUp(data.site, data.monitor.id);
+            } catch (error) {
+                /* v8 ignore next 2 */ logger.error(
+                    "[ApplicationService] Failed to forward monitor up to renderer",
+                    error
+                );
+            }
+        });
+
+        // Handle monitor down events
+        orchestrator.onTyped("monitor:down", (data) => {
+            try {
+                logger.warn("[ApplicationService] Monitor failure detected - forwarding to renderer", {
+                    siteId: data.siteId,
+                    monitorId: data.monitor.id,
+                    siteName: data.site.name,
+                });
+
+                windowService.sendToRenderer("monitor:down", data);
+                notificationService.notifyMonitorDown(data.site, data.monitor.id);
+            } catch (error) {
+                /* v8 ignore next 2 */ logger.error(
+                    "[ApplicationService] Failed to forward monitor down to renderer",
+                    error
+                );
+            }
+        });
+
+        // Handle system errors
+        orchestrator.onTyped("system:error", (data) => {
+            /* v8 ignore next */ logger.error(`[ApplicationService] System error: ${data.context}`, data.error);
+        });
+
         // Forward monitoring start/stop events to renderer
-        orchestrator.on("monitoring:started", (data) => {
+        orchestrator.onTyped("monitoring:started", (data) => {
             try {
                 /* v8 ignore next 2 */ logger.debug(
                     "[ApplicationService] Forwarding monitoring started to renderer",
                     data
                 );
-                windowService.sendToRenderer("monitoring-started", data);
+                windowService.sendToRenderer("monitoring:started", data);
             } catch (error) {
                 /* v8 ignore next 2 */ logger.error(
                     "[ApplicationService] Failed to forward monitoring started to renderer",
@@ -132,39 +178,19 @@ export class ApplicationService {
             }
         });
 
-        orchestrator.on("monitoring:stopped", (data) => {
+        orchestrator.onTyped("monitoring:stopped", (data) => {
             try {
                 /* v8 ignore next 2 */ logger.debug(
                     "[ApplicationService] Forwarding monitoring stopped to renderer",
                     data
                 );
-                windowService.sendToRenderer("monitoring-stopped", data);
+                windowService.sendToRenderer("monitoring:stopped", data);
             } catch (error) {
                 /* v8 ignore next 2 */ logger.error(
                     "[ApplicationService] Failed to forward monitoring stopped to renderer",
                     error
                 );
             }
-        });
-
-        orchestrator.on("site-monitor-down", ({ monitorId, site }: { monitorId: string; site: Site }) => {
-            /* v8 ignore next */ logger.debug("[ApplicationService] Monitor down notification", {
-                monitorId,
-                siteId: site.identifier,
-            });
-            notificationService.notifyMonitorDown(site, monitorId);
-        });
-
-        orchestrator.on("site-monitor-up", ({ monitorId, site }: { monitorId: string; site: Site }) => {
-            /* v8 ignore next */ logger.debug("[ApplicationService] Monitor up notification", {
-                monitorId,
-                siteId: site.identifier,
-            });
-            notificationService.notifyMonitorUp(site, monitorId);
-        });
-
-        orchestrator.on("db-error", ({ error, operation }: { error: Error; operation: string }) => {
-            /* v8 ignore next */ logger.error(`[ApplicationService] Database error during ${operation}`, error);
         });
     }
 

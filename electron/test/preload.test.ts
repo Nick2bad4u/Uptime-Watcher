@@ -278,20 +278,22 @@ describe("Electron Preload Script", () => {
             const exposedAPI = getExposedAPI();
             const eventsAPI = exposedAPI.events;
 
-            expect(eventsAPI).toHaveProperty("onStatusUpdate");
+            expect(eventsAPI).toHaveProperty("onMonitorStatusChanged");
+            expect(eventsAPI).toHaveProperty("onMonitorUp");
+            expect(eventsAPI).toHaveProperty("onMonitorDown");
             expect(eventsAPI).toHaveProperty("onUpdateStatus");
             expect(eventsAPI).toHaveProperty("removeAllListeners");
         });
 
-        it("should properly setup IPC listener for onStatusUpdate", async () => {
+        it("should properly setup IPC listener for onMonitorStatusChanged", async () => {
             await import("../preload");
 
             const exposedAPI = getExposedAPI();
             const callback = vi.fn();
 
-            exposedAPI.events.onStatusUpdate(callback);
+            exposedAPI.events.onMonitorStatusChanged(callback);
 
-            expect(mockIpcRenderer.on).toHaveBeenCalledWith("status-update", expect.any(Function));
+            expect(mockIpcRenderer.on).toHaveBeenCalledWith("monitor:status-changed", expect.any(Function));
         });
 
         it("should properly setup IPC listener for onUpdateStatus", async () => {
@@ -309,7 +311,7 @@ describe("Electron Preload Script", () => {
             await import("../preload");
 
             const exposedAPI = getExposedAPI();
-            const channel = "status-update";
+            const channel = "monitor:status-changed";
 
             exposedAPI.events.removeAllListeners(channel);
 
@@ -322,16 +324,22 @@ describe("Electron Preload Script", () => {
             const exposedAPI = getExposedAPI();
             const callback = vi.fn();
 
-            exposedAPI.events.onStatusUpdate(callback);
+            exposedAPI.events.onMonitorStatusChanged(callback);
 
             // Get the listener function that was registered
-            const listenerCall = mockIpcRenderer.on.mock.calls.find((call) => call[0] === "status-update");
+            const listenerCall = mockIpcRenderer.on.mock.calls.find((call) => call[0] === "monitor:status-changed");
             expect(listenerCall).toBeDefined();
 
             const listener = listenerCall![1];
 
             // Simulate IPC event
-            const testData = { site: { identifier: "test" } };
+            const testData = { 
+                siteId: "test-site",
+                monitor: { id: "test-monitor", type: "http" },
+                newStatus: "up",
+                previousStatus: "down",
+                timestamp: Date.now()
+            };
             listener(null, testData);
 
             expect(callback).toHaveBeenCalledWith(testData);

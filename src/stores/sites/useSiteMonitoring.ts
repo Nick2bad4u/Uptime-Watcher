@@ -31,7 +31,7 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
         await withErrorHandling(
             async () => {
                 await SiteService.checkSiteNow(siteId, monitorId);
-                // Backend will emit 'status-update', which will trigger incremental update
+                // Backend will emit 'monitor:status-changed', which will trigger incremental update
             },
             {
                 clearError: () => {},

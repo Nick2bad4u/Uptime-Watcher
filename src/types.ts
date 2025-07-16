@@ -203,8 +203,12 @@ declare global {
              * Event management for real-time updates and communication.
              */
             events: {
-                /** Register callback for monitor status updates */
-                onStatusUpdate: (callback: (update: StatusUpdate) => void) => () => void;
+                /** Register callback for monitor status changes */
+                onMonitorStatusChanged: (callback: (update: StatusUpdate) => void) => () => void;
+                /** Register callback for monitor up events */
+                onMonitorUp: (callback: (data: unknown) => void) => () => void;
+                /** Register callback for monitor down events */
+                onMonitorDown: (callback: (data: unknown) => void) => () => void;
                 /** Register callback for monitoring started events */
                 onMonitoringStarted: (callback: (data: { siteId: string; monitorId: string }) => void) => () => void;
                 /** Register callback for monitoring stopped events */

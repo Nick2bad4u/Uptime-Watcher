@@ -302,7 +302,15 @@ describe("Types Module", () => {
                     downloadSQLiteBackup: () => Promise.resolve({ buffer: new ArrayBuffer(0), fileName: "backup.db" }),
                 },
                 events: {
-                    onStatusUpdate: () => {
+                    onMonitorStatusChanged: () => {
+                        const cleanup = () => {};
+                        return cleanup;
+                    },
+                    onMonitorUp: () => {
+                        const cleanup = () => {};
+                        return cleanup;
+                    },
+                    onMonitorDown: () => {
                         const cleanup = () => {};
                         return cleanup;
                     },
@@ -351,7 +359,9 @@ describe("Types Module", () => {
             expect(typeof mockAPI.data.importData).toBe("function");
             expect(typeof mockAPI.data.downloadSQLiteBackup).toBe("function");
 
-            expect(typeof mockAPI.events.onStatusUpdate).toBe("function");
+            expect(typeof mockAPI.events.onMonitorStatusChanged).toBe("function");
+            expect(typeof mockAPI.events.onMonitorUp).toBe("function");
+            expect(typeof mockAPI.events.onMonitorDown).toBe("function");
             expect(typeof mockAPI.events.removeAllListeners).toBe("function");
 
             expect(typeof mockAPI.monitoring.startMonitoring).toBe("function");

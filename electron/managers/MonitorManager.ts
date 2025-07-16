@@ -408,4 +408,13 @@ export class MonitorManager {
     public restartMonitorWithNewConfig(siteIdentifier: string, monitor: Site["monitors"][0]): boolean {
         return this.monitorScheduler.restartMonitor(siteIdentifier, monitor);
     }
+
+    /**
+     * Get the count of active monitors currently being monitored.
+     *
+     * @returns The number of active monitors in the scheduler.
+     */
+    public getActiveMonitorCount(): number {
+        return this.monitorScheduler.getActiveCount();
+    }
 }

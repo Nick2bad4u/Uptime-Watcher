@@ -63,7 +63,7 @@ type OrchestratorEvents = UptimeEvents;
 interface StartMonitoringRequestData {
     /** Site identifier for the monitoring request */
     identifier: string;
-    /** Specific monitor ID to start (optional) */
+    /** Specific monitor ID to start */
     monitorId: string;
 }
 
@@ -75,7 +75,7 @@ interface StartMonitoringRequestData {
 interface StopMonitoringRequestData {
     /** Site identifier for the monitoring request */
     identifier: string;
-    /** Specific monitor ID to stop (optional) */
+    /** Specific monitor ID to stop */
     monitorId: string;
 }
 
@@ -87,7 +87,7 @@ interface StopMonitoringRequestData {
 interface IsMonitoringActiveRequestData {
     /** Site identifier for the status check */
     identifier: string;
-    /** Specific monitor ID to check (optional) */
+    /** Specific monitor ID to check */
     monitorId: string;
 }
 
@@ -130,20 +130,6 @@ interface SiteEventData {
     updatedFields?: string[];
 }
 
-interface MonitorStatusChangedData {
-    siteId: string;
-    monitor: Monitor;
-    site: Site;
-    newStatus: string;
-    previousStatus: string;
-    timestamp: number;
-}
-
-interface SystemErrorData {
-    error: Error;
-    context: string;
-}
-
 /**
  * Core uptime monitoring orchestrator that coordinates specialized managers.
  *
@@ -155,15 +141,17 @@ interface SystemErrorData {
  * Uses TypedEventBus to provide real-time updates to the renderer process with type safety.
  *
  * Events emitted:
- * - status-update: When monitor status changes
- * - site-monitor-down: When a monitor goes down
- * - site-monitor-up: When a monitor comes back up
- * - db-error: When database operations fail
+ * - monitor:status-changed: When monitor status changes
+ * - monitor:down: When a monitor goes down
+ * - monitor:up: When a monitor comes back up
+ * - system:error: When system operations fail
+ * - monitoring:started: When monitoring begins
+ * - monitoring:stopped: When monitoring stops
  *
  * @example
  * ```typescript
  * const orchestrator = new UptimeOrchestrator();
- * orchestrator.on('status-update', (data) => console.log(data));
+ * orchestrator.onTyped('monitor:status-changed', (data) => console.log(data));
  * await orchestrator.addSite({ identifier: 'example', monitors: [...] });
  * orchestrator.startMonitoring();
  * ```
@@ -176,12 +164,16 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     private readonly monitorManager: MonitorManager;
     private readonly databaseManager: DatabaseManager;
 
+    /**
+     * Constructs a new UptimeOrchestrator and initializes all managers and middleware.
+     *
+     * @remarks
+     * Sets up event bus middleware, repositories, and manager dependencies.
+     */
     constructor() {
         super("UptimeOrchestrator");
 
-        // Set up middleware for the event bus
-        this.use(createErrorHandlingMiddleware({ continueOnError: true }));
-        this.use(createLoggingMiddleware({ includeData: false, level: "info" }));
+        this.setupMiddleware();
 
         // Initialize repositories
         const databaseService = DatabaseService.getInstance();
@@ -243,6 +235,17 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
 
         // Set up event-driven communication between managers
         this.setupEventHandlers();
+    }
+
+    /**
+     * Set up middleware for the event bus.
+     *
+     * @remarks
+     * Extracted from constructor for clarity and maintainability.
+     */
+    private setupMiddleware(): void {
+        this.use(createErrorHandlingMiddleware({ continueOnError: true }));
+        this.use(createLoggingMiddleware({ includeData: false, level: "info" }));
     }
 
     /**
@@ -342,19 +345,36 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                 await this.siteManager.updateSitesCache(data.sites);
 
                 // CRITICAL: Set up monitoring for each loaded site
-                // This ensures sites loaded from database get proper monitoring setup
-                for (const site of data.sites) {
-                    try {
-                        await this.monitorManager.setupSiteForMonitoring(site);
-                        /* v8 ignore next 2 */ logger.info(
-                            `[UptimeOrchestrator] Set up monitoring for loaded site: ${site.identifier}`
-                        );
-                    } catch (error) {
-                        /* v8 ignore next 2 */ logger.error(
-                            `[UptimeOrchestrator] Failed to setup monitoring for site ${site.identifier}:`,
-                            error
-                        );
-                    }
+                // Process sites concurrently with proper error handling
+                const setupResults = await Promise.allSettled(
+                    data.sites.map(async (site) => {
+                        try {
+                            await this.monitorManager.setupSiteForMonitoring(site);
+                            return { site: site.identifier, success: true };
+                        } catch (error) {
+                            /* v8 ignore next 2 */ logger.error(
+                                `[UptimeOrchestrator] Failed to setup monitoring for site ${site.identifier}:`,
+                                error
+                            );
+                            return { site: site.identifier, success: false, error };
+                        }
+                    })
+                );
+
+                // Log summary of setup results
+                const successful = setupResults.filter(
+                    (result) => result.status === "fulfilled" && result.value.success
+                ).length;
+                const failed = setupResults.length - successful;
+
+                if (failed > 0) {
+                    /* v8 ignore next 2 */ logger.warn(
+                        `[UptimeOrchestrator] Site monitoring setup completed: ${successful} successful, ${failed} failed`
+                    );
+                } else {
+                    /* v8 ignore next 2 */ logger.info(
+                        `[UptimeOrchestrator] Successfully set up monitoring for all ${successful} loaded sites`
+                    );
                 }
             })();
         });
@@ -363,8 +383,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             void (async () => {
                 // Respond with sites from cache
                 const sites = this.siteManager.getSitesFromCache();
-                await this.emitTyped("internal:database:get-sites-from-cache-requested", {
-                    operation: "get-sites-from-cache-requested",
+                await this.emitTyped("internal:database:get-sites-from-cache-response", {
+                    operation: "get-sites-from-cache-response",
                     sites,
                     timestamp: Date.now(),
                 });
@@ -408,166 +428,374 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             })();
         });
 
-        // Transform typed events to simple events for ApplicationService
-        this.on("monitor:status-changed", (data: MonitorStatusChangedData) => {
-            /* v8 ignore next 2 */ logger.debug(
-                `[UptimeOrchestrator] Received monitor:status-changed event for site: ${data.siteId}`
-            );
-
-            // Emit the simple status-update event that ApplicationService expects
-            this.emit("status-update", {
-                monitor: data.monitor,
-                newStatus: data.newStatus,
-                previousStatus: data.previousStatus,
-                site: data.site, // Use complete site data from the event
-                timestamp: data.timestamp,
-            });
-
-            // Also emit monitor up/down events
-            if (data.previousStatus !== "down" && data.newStatus === "down") {
-                this.emit("site-monitor-down", {
-                    monitorId: data.monitor.id,
-                    site: data.site, // Use complete site data from the event
-                });
-            } else if (data.previousStatus === "down" && data.newStatus === "up") {
-                this.emit("site-monitor-up", {
-                    monitorId: data.monitor.id,
-                    site: data.site, // Use complete site data from the event
-                });
-            }
-        });
-
-        // Transform system error events
-        this.on("system:error", (data: SystemErrorData) => {
-            this.emit("db-error", {
-                error: data.error,
-                operation: data.context,
-            });
-        });
-
+        // Handle internal monitoring events and emit typed events
         this.on("internal:monitor:started", () => {
             void (async () => {
-                await this.emitTyped("monitoring:started", {
-                    monitorCount: 0,
-                    siteCount: 0,
-                    timestamp: Date.now(),
-                });
+                try {
+                    // Get actual counts from the system
+                    const sites = this.siteManager.getSitesFromCache();
+                    const totalMonitors = sites.reduce((total: number, site: Site) => total + site.monitors.length, 0);
+
+                    await this.emitTyped("monitoring:started", {
+                        monitorCount: totalMonitors,
+                        siteCount: sites.length,
+                        timestamp: Date.now(),
+                    });
+                } catch (error) {
+                    /* v8 ignore next 2 */ logger.error(
+                        "[UptimeOrchestrator] Error handling internal:monitor:started:",
+                        error
+                    );
+                }
             })();
         });
 
         this.on("internal:monitor:stopped", () => {
             void (async () => {
-                await this.emitTyped("monitoring:stopped", {
-                    activeMonitors: 0,
-                    reason: "user" as const,
-                    timestamp: Date.now(),
-                });
+                try {
+                    // Get actual active monitor count from scheduler
+                    const activeMonitors = this.monitorManager.isMonitoringActive()
+                        ? this.monitorManager.getActiveMonitorCount()
+                        : 0;
+
+                    await this.emitTyped("monitoring:stopped", {
+                        activeMonitors,
+                        reason: "user" as const,
+                        timestamp: Date.now(),
+                    });
+                } catch (error) {
+                    /* v8 ignore next 2 */ logger.error(
+                        "[UptimeOrchestrator] Error handling internal:monitor:stopped:",
+                        error
+                    );
+                }
             })();
         });
 
         this.on("internal:database:initialized", () => {
             void (async () => {
-                await this.emitTyped("database:transaction-completed", {
-                    duration: 0,
-                    operation: "initialize",
-                    success: true,
-                    timestamp: Date.now(),
-                });
+                try {
+                    await this.emitTyped("database:transaction-completed", {
+                        duration: 0,
+                        operation: "initialize",
+                        success: true,
+                        timestamp: Date.now(),
+                    });
+                } catch (error) {
+                    /* v8 ignore next 2 */ logger.error(
+                        "[UptimeOrchestrator] Error handling internal:database:initialized:",
+                        error
+                    );
+                }
             })();
         });
     }
 
     /**
-     * Initialize the orchestrator and all its managers.
+     * Initializes the orchestrator and all its managers.
+     * Ensures proper initialization order and error handling.
+     *
+     * @returns Promise that resolves when initialization is complete.
      */
     public async initialize(): Promise<void> {
-        await this.databaseManager.initialize();
-        await this.siteManager.initialize();
+        try {
+            /* v8 ignore next 2 */ logger.info("[UptimeOrchestrator] Starting initialization...");
+
+            // Step 1: Initialize database first (required by other managers)
+            await this.databaseManager.initialize();
+            /* v8 ignore next 2 */ logger.info("[UptimeOrchestrator] Database manager initialized");
+
+            // Step 2: Initialize site manager (loads sites from database)
+            await this.siteManager.initialize();
+            /* v8 ignore next 2 */ logger.info("[UptimeOrchestrator] Site manager initialized");
+
+            // Step 3: Validate that managers are properly initialized
+            this.validateInitialization();
+
+            /* v8 ignore next 2 */ logger.info("[UptimeOrchestrator] Initialization completed successfully");
+        } catch (error) {
+            /* v8 ignore next 2 */ logger.error("[UptimeOrchestrator] Initialization failed:", error);
+            throw error;
+        }
+    }
+
+    /**
+     * Validates that all managers are properly initialized.
+     *
+     * @throws Error if validation fails
+     */
+    private validateInitialization(): void {
+        // Basic validation that we can access manager methods
+        if (typeof this.databaseManager.initialize !== "function") {
+            throw new TypeError("DatabaseManager not properly initialized");
+        }
+        if (typeof this.siteManager.initialize !== "function") {
+            throw new TypeError("SiteManager not properly initialized");
+        }
+        if (typeof this.monitorManager.startMonitoring !== "function") {
+            throw new TypeError("MonitorManager not properly initialized");
+        }
     }
 
     // Site Management Operations
+
+    /**
+     * Retrieves all sites from the site manager.
+     *
+     * @returns Promise resolving to an array of Site objects.
+     */
     public async getSites(): Promise<Site[]> {
         return this.siteManager.getSites();
     }
 
+    /**
+     * Gets the current sites from the in-memory cache.
+     *
+     * @returns Array of Site objects from cache.
+     */
     public getSitesFromCache(): Site[] {
         return this.siteManager.getSitesFromCache();
     }
 
+    /**
+     * Adds a new site and sets up monitoring for it.
+     * Uses transaction-like behavior to ensure consistency.
+     *
+     * @param siteData - The site data to add.
+     * @returns Promise resolving to the added Site object.
+     */
     public async addSite(siteData: Site): Promise<Site> {
-        const site = await this.siteManager.addSite(siteData);
+        let site: Site | undefined;
 
-        // Set up monitoring for the new site
-        await this.monitorManager.setupSiteForMonitoring(site);
+        try {
+            // Step 1: Add the site
+            site = await this.siteManager.addSite(siteData);
 
-        return site;
+            // Step 2: Set up monitoring for the new site
+            await this.monitorManager.setupSiteForMonitoring(site);
+
+            return site;
+        } catch (error) {
+            // If monitoring setup fails, attempt to clean up the site
+            if (site) {
+                try {
+                    await this.siteManager.removeSite(site.identifier);
+                    /* v8 ignore next 2 */ logger.info(
+                        `[UptimeOrchestrator] Cleaned up site ${site.identifier} after monitoring setup failure`
+                    );
+                } catch (cleanupError) {
+                    /* v8 ignore next 2 */ logger.error(
+                        `[UptimeOrchestrator] Failed to cleanup site ${site.identifier} after monitoring setup failure:`,
+                        cleanupError
+                    );
+                }
+            }
+
+            /* v8 ignore next 2 */ logger.error(
+                `[UptimeOrchestrator] Failed to add site ${siteData.identifier}:`,
+                error
+            );
+            throw error;
+        }
     }
 
+    /**
+     * Removes a site by its identifier.
+     *
+     * @param identifier - The site identifier.
+     * @returns Promise resolving to true if removed, false otherwise.
+     */
     public async removeSite(identifier: string): Promise<boolean> {
         return this.siteManager.removeSite(identifier);
     }
 
+    /**
+     * Removes a monitor from a site and stops its monitoring.
+     * Uses a single database transaction to ensure atomicity.
+     *
+     * @param siteIdentifier - The site identifier.
+     * @param monitorId - The monitor identifier.
+     * @returns Promise resolving to true if removed, false otherwise.
+     */
     public async removeMonitor(siteIdentifier: string, monitorId: string): Promise<boolean> {
-        // Stop monitoring for this specific monitor first
-        await this.monitorManager.stopMonitoringForSite(siteIdentifier, monitorId);
+        try {
+            // Step 1: Stop monitoring immediately (before transaction)
+            const monitoringStopped = await this.monitorManager.stopMonitoringForSite(siteIdentifier, monitorId);
 
-        // Remove the monitor through the site manager
-        return this.siteManager.removeMonitor(siteIdentifier, monitorId);
+            // Step 2: Remove monitor from database using transaction
+            const removed = await this.siteManager.removeMonitor(siteIdentifier, monitorId);
+
+            // If database removal succeeded, we're done
+            if (removed) {
+                return true;
+            }
+
+            // If database removal failed but monitoring was stopped, restart monitoring
+            if (monitoringStopped) {
+                try {
+                    await this.monitorManager.startMonitoringForSite(siteIdentifier, monitorId);
+                    /* v8 ignore next 2 */ logger.info(
+                        `[UptimeOrchestrator] Restarted monitoring for ${siteIdentifier}/${monitorId} after failed removal`
+                    );
+                } catch (restartError) {
+                    /* v8 ignore next 2 */ logger.error(
+                        `[UptimeOrchestrator] Failed to restart monitoring for ${siteIdentifier}/${monitorId} after failed removal:`,
+                        restartError
+                    );
+                }
+            }
+
+            return false;
+        } catch (error) {
+            /* v8 ignore next 2 */ logger.error(
+                `[UptimeOrchestrator] Failed to remove monitor ${siteIdentifier}/${monitorId}:`,
+                error
+            );
+            throw error;
+        }
     }
 
+    /**
+     * Updates a site with the given changes.
+     *
+     * @param identifier - The site identifier.
+     * @param updates - Partial site data to update.
+     * @returns Promise resolving to the updated Site object.
+     */
     public async updateSite(identifier: string, updates: Partial<Site>): Promise<Site> {
         return this.siteManager.updateSite(identifier, updates);
     }
 
     // Monitoring Operations
+
+    /**
+     * Starts monitoring for all sites.
+     *
+     * @returns Promise that resolves when monitoring has started.
+     */
     public async startMonitoring(): Promise<void> {
         await this.monitorManager.startMonitoring();
     }
 
+    /**
+     * Stops monitoring for all sites.
+     *
+     * @returns Promise that resolves when monitoring has stopped.
+     */
     public async stopMonitoring(): Promise<void> {
         await this.monitorManager.stopMonitoring();
     }
 
+    /**
+     * Starts monitoring for a specific site and monitor.
+     *
+     * @param identifier - The site identifier.
+     * @param monitorId - Optional monitor identifier.
+     * @returns Promise resolving to true if started, false otherwise.
+     */
     public async startMonitoringForSite(identifier: string, monitorId?: string): Promise<boolean> {
         return this.monitorManager.startMonitoringForSite(identifier, monitorId);
     }
 
+    /**
+     * Stops monitoring for a specific site and monitor.
+     *
+     * @param identifier - The site identifier.
+     * @param monitorId - Optional monitor identifier.
+     * @returns Promise resolving to true if stopped, false otherwise.
+     */
     public async stopMonitoringForSite(identifier: string, monitorId?: string): Promise<boolean> {
         return this.monitorManager.stopMonitoringForSite(identifier, monitorId);
     }
 
+    /**
+     * Manually triggers a check for a site or monitor.
+     *
+     * @param identifier - The site identifier.
+     * @param monitorId - Optional monitor identifier.
+     * @returns Promise resolving to a StatusUpdate or null.
+     */
     public async checkSiteManually(identifier: string, monitorId?: string): Promise<StatusUpdate | null> {
         const result = await this.monitorManager.checkSiteManually(identifier, monitorId);
         return result ?? null;
     }
 
     // Database Operations
+
+    /**
+     * Exports all application data as a JSON string.
+     *
+     * @returns Promise resolving to the exported data string.
+     */
     public async exportData(): Promise<string> {
         return this.databaseManager.exportData();
     }
 
+    /**
+     * Imports application data from a JSON string.
+     *
+     * @param data - The JSON data string to import.
+     * @returns Promise resolving to true if import succeeded, false otherwise.
+     */
     public async importData(data: string): Promise<boolean> {
         return this.databaseManager.importData(data);
     }
 
+    /**
+     * Downloads a backup of the SQLite database.
+     *
+     * @returns Promise resolving to an object containing the backup buffer and file name.
+     */
     public async downloadBackup(): Promise<{ buffer: Buffer; fileName: string }> {
         return this.databaseManager.downloadBackup();
     }
 
+    /**
+     * Refreshes sites from the database and updates the cache.
+     *
+     * @returns Promise resolving to an array of refreshed Site objects.
+     */
     public async refreshSites(): Promise<Site[]> {
         return this.databaseManager.refreshSites();
     }
 
     // History Management
+
+    /**
+     * Sets the history retention limit for monitor data.
+     *
+     * @remarks
+     * This method delegates to the DatabaseManager to update the history limit
+     * in the database and prune existing history entries if necessary. It also
+     * emits an internal event to notify other components of the change.
+     *
+     * The operation is performed within a database transaction to ensure
+     * consistency between the setting update and history pruning.
+     *
+     * @param limit - The new history limit (number of entries to retain per monitor).
+     *                Values less than or equal to 0 will disable history pruning.
+     * @returns Promise that resolves when the limit is set and events are emitted.
+     */
     public async setHistoryLimit(limit: number): Promise<void> {
         await this.databaseManager.setHistoryLimit(limit);
     }
 
+    /**
+     * Gets the current history retention limit.
+     *
+     * @returns The current history limit.
+     */
     public getHistoryLimit(): number {
         return this.historyLimit;
     }
 
     // Status Information
+
+    /**
+     * Checks if monitoring is currently active.
+     *
+     * @returns True if monitoring is active, false otherwise.
+     */
     public isMonitoringActive(): boolean {
         return this.monitorManager.isMonitoringActive();
     }

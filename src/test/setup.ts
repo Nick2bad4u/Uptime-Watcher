@@ -21,7 +21,15 @@ const mockElectronAPI = {
         importData: vi.fn().mockResolvedValue(true),
     },
     events: {
-        onStatusUpdate: vi.fn((_callback) => {
+        onMonitorStatusChanged: vi.fn((_callback) => {
+            // Mock implementation - return cleanup function
+            return vi.fn(); // Mock cleanup function
+        }),
+        onMonitorUp: vi.fn((_callback) => {
+            // Mock implementation - return cleanup function
+            return vi.fn(); // Mock cleanup function
+        }),
+        onMonitorDown: vi.fn((_callback) => {
             // Mock implementation - return cleanup function
             return vi.fn(); // Mock cleanup function
         }),

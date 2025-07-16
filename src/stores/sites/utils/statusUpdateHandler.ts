@@ -141,8 +141,8 @@ export class StatusUpdateManager {
             throw new Error("Failed to initialize electronAPI");
         }
 
-        // Subscribe to status updates
-        const statusUpdateCleanup = window.electronAPI.events.onStatusUpdate((update: StatusUpdate) => {
+        // Subscribe to monitor status changes
+        const statusUpdateCleanup = window.electronAPI.events.onMonitorStatusChanged((update: StatusUpdate) => {
             this.handler?.(update).catch((error) => {
                 console.error("Error in status update handler:", error);
             });

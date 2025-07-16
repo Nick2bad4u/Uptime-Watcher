@@ -33,7 +33,6 @@ export default defineConfig({
         react({
             // Enable Fast Refresh for better development experience
             // Includes .js, .jsx, .ts, .tsx by default
-            include: /\.(js|jsx|ts|tsx)$/,
 
             // Use automatic JSX runtime (default, but explicit for clarity)
             jsxRuntime: "automatic",

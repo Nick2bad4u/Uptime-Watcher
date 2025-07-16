@@ -26,7 +26,6 @@ describe("Additional Coverage Tests", () => {
 
             expect(constants.DEFAULT_REQUEST_TIMEOUT).toBeDefined();
             expect(constants.DEFAULT_CHECK_INTERVAL).toBeDefined();
-            expect(constants.STATUS_UPDATE_EVENT).toBeDefined();
             expect(constants.DEFAULT_HISTORY_LIMIT).toBeDefined();
         });
     });
