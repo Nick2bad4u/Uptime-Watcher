@@ -370,14 +370,14 @@ export const GenericTypeInference = {
     ): {
         type: string;
         optional: boolean;
-        validator: z.ZodSchema;
+        validator: z.ZodType;
     } | null {
         const field = config.fields.find((f) => f.name === fieldName);
         if (!field) {
             return null;
         }
 
-        let validator: z.ZodSchema;
+        let validator: z.ZodType;
 
         switch (field.type) {
             case "text": {
@@ -396,7 +396,17 @@ export const GenericTypeInference = {
                 break;
             }
             case "url": {
-                validator = z.string().url();
+                validator = z.string().refine(
+                    (val) => {
+                        try {
+                            new URL(val);
+                            return true;
+                        } catch {
+                            return false;
+                        }
+                    },
+                    { message: "Invalid URL format" }
+                );
                 break;
             }
             default: {

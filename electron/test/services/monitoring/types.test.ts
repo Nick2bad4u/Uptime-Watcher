@@ -109,6 +109,11 @@ describe("Monitoring Types", () => {
                 type: "port" as const,
                 status: "pending" as const,
                 history: [],
+                responseTime: 0,
+                monitoring: false,
+                checkInterval: 30000,
+                timeout: 5000,
+                retryAttempts: 3,
             };
 
             const result = await mockService.check(mockMonitor);

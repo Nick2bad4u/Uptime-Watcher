@@ -134,6 +134,34 @@ global.console = {
     info: vi.fn(),
 };
 
+// Mock logger module
+vi.mock("../utils/logger", () => ({
+    logger: {
+        info: vi.fn(),
+        error: vi.fn(),
+        warn: vi.fn(),
+        debug: vi.fn(),
+        silly: vi.fn(),
+        verbose: vi.fn(),
+    },
+    dbLogger: {
+        info: vi.fn(),
+        error: vi.fn(),
+        warn: vi.fn(),
+        debug: vi.fn(),
+        silly: vi.fn(),
+        verbose: vi.fn(),
+    },
+    monitorLogger: {
+        info: vi.fn(),
+        error: vi.fn(),
+        warn: vi.fn(),
+        debug: vi.fn(),
+        silly: vi.fn(),
+        verbose: vi.fn(),
+    },
+}));
+
 // Note: Repository classes are NOT mocked globally to allow individual test files
 // to provide their own mocks for better test isolation and control
 
@@ -184,7 +212,7 @@ vi.mock("../services/monitoring/MonitorScheduler", () => ({
                     });
                 } else {
                     // Stop all monitors for the site
-                    const keysToDelete = [];
+                    const keysToDelete: string[] = [];
                     for (const key of Array.from(this.intervals.keys())) {
                         if (typeof key === "string" && key.startsWith(`${siteId}|`)) {
                             keysToDelete.push(key);

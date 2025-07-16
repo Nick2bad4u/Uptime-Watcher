@@ -119,7 +119,7 @@ describe("Electron Main Process", () => {
         });
 
         it("should call cleanup on beforeExit", async () => {
-            const mockCleanup = vi.fn();
+            const mockCleanup = vi.fn().mockResolvedValue(undefined);
 
             // Update ApplicationService mock to return cleanup function
             ApplicationService.mockReturnValue({

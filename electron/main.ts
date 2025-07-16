@@ -1,8 +1,15 @@
 /**
- * Main entry point for the Electron application.
- *
- * @remarks
- * Configures logging and initializes the main application service.
+ * Main entry point for the Electron application        // Ensure cleanup is only called once to prevent double-cleanup errors
+        let cleanedUp = false;
+        const safeCleanup = () => {
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            if (!cleanedUp && this.applicationService?.cleanup) {
+                this.applicationService.cleanup().catch((error) => {
+                    logger.error("[Main] Cleanup failed", error);
+                });
+                cleanedUp = true;
+            }
+        };es logging and initializes the main application service.
  * Sets up proper shutdown handlers for graceful cleanup.
  *
  * @packageDocumentation
@@ -56,7 +63,8 @@ class Main {
         // Ensure cleanup is only called once to prevent double-cleanup errors
         let cleanedUp = false;
         const safeCleanup = () => {
-            if (!cleanedUp) {
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            if (!cleanedUp && this.applicationService?.cleanup) {
                 this.applicationService.cleanup().catch((error) => {
                     logger.error("[Main] Cleanup failed", error);
                 });

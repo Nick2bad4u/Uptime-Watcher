@@ -71,7 +71,7 @@ export interface BaseMonitorConfig {
     /** Field definitions for dynamic form generation */
     readonly fields: MonitorFieldDefinition[];
     /** Zod validation schema for this monitor type */
-    readonly validationSchema: z.ZodSchema;
+    readonly validationSchema: z.ZodType;
     /** Factory function to create monitor service instances */
     readonly serviceFactory: () => import("./types").IMonitorService;
     /** UI display configuration */
