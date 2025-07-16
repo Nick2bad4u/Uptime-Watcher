@@ -21,8 +21,6 @@ During the review, identify and address:
 
 Document all findings and changes made during this process.
 
-After completing the review, update the copilot-instructions document with all insights gained. Keep the document concise while providing maximum future context to aid in coding decisions. The instructions can use AI-friendly language and don't need to be human-readable.
-
 ## 2. Import/Export Consistency Review
 
 Review all files in the project to analyze imports and exports. Determine if we need:
@@ -36,8 +34,6 @@ Requirements:
 - Ensure all imports across the entire frontend and backend use appropriate barrel imports
 - Conduct a deep review of ALL items in the project that contain the word "import"
 - Maintain logical consistency across the entire project
-
-After completing the frontend and backend review, recursively examine the entire electron folder for the same import/export patterns.
 
 Fix any inconsistencies found and ensure proper barrel export usage throughout the codebase.
 

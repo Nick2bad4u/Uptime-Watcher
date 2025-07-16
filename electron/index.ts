@@ -1,6 +1,6 @@
 /**
- * @packageDocumentation
  * Electron main barrel export.
+ * @packageDocumentation
  *
  * Provides centralized access to all Electron modules.
  *

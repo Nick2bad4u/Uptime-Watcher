@@ -10,6 +10,10 @@
 import type { MonitorType as RegistryMonitorType } from "./services/monitoring/MonitorTypeRegistry";
 
 // Re-export for use throughout the application
+/**
+ * Allowed monitor types as defined in the MonitorTypeRegistry.
+ * @public
+ */
 export type MonitorType = RegistryMonitorType;
 
 /**

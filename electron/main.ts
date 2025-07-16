@@ -64,7 +64,9 @@ class Main {
             }
         };
 
-        // Setup cleanup on Node.js process exit to ensure graceful shutdown
+        // Setup cleanup on Node.js process exit to ensure graceful shutdown.
+        // Note: 'beforeExit' may not fire in all shutdown scenarios (e.g., forced kills or SIGKILL).
+        // It is best-effort and should be combined with Electron's 'will-quit' for robustness.
         process.on("beforeExit", safeCleanup);
 
         // Also handle Electron's will-quit event for robust cleanup
