@@ -7,14 +7,58 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[5dfd73a](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5dfd73ada0c18888be3c5528cb05d43f5dfbc4cc)...
-[5dfd73a](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5dfd73ada0c18888be3c5528cb05d43f5dfbc4cc)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/5dfd73ada0c18888be3c5528cb05d43f5dfbc4cc...5dfd73ada0c18888be3c5528cb05d43f5dfbc4cc))
+[[35abfa8](https://github.com/Nick2bad4u/Uptime-Watcher/commit/35abfa85418510b09dbff01daa8853676a1a5902)...
+[35abfa8](https://github.com/Nick2bad4u/Uptime-Watcher/commit/35abfa85418510b09dbff01daa8853676a1a5902)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/35abfa85418510b09dbff01daa8853676a1a5902...35abfa85418510b09dbff01daa8853676a1a5902))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 7.5.0 [`(35abfa8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/35abfa85418510b09dbff01daa8853676a1a5902)
+
+
+
+
+
+
+## [7.5.0] - 2025-07-16
+
+
+[[0379231](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0379231f105aa420ab1e94676a66b5db5a352e30)...
+[d6924c0](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d6924c014d9f23b79bc94e9a15f5e8f260404dfa)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/0379231f105aa420ab1e94676a66b5db5a352e30...d6924c014d9f23b79bc94e9a15f5e8f260404dfa))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 7.4.0 [`(5dfd73a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5dfd73ada0c18888be3c5528cb05d43f5dfbc4cc)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(d6924c0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d6924c014d9f23b79bc94e9a15f5e8f260404dfa)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Enhance coverage with new and fixed tests, minor type fixes
+
+- Adds comprehensive and edge-case tests for runtime type guards, monitor UI helpers, and App component to significantly improve frontend and backend coverage
+- Introduces a final coverage summary and simplified coverage enhancement tests to document and validate testing strategies, reliability, and achievements
+- Removes redundant logger test in favor of global logger mocks and more targeted coverage
+- Fixes test reliability for main process cleanup logic and MonitorScheduler interval case, skipping unstable tests as needed
+- Updates type references for Zod schemas to ZodType for better type safety
+- Improves mocking and setup in test environment, ensuring better isolation and logger test coverage
+
+Relates to coverage targets and continuous quality improvements [`(0379231)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0379231f105aa420ab1e94676a66b5db5a352e30)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v7.4.0 [skip ci] [`(eed05be)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/eed05be1933575477932490de27b1598c536faee)
 
 
 
