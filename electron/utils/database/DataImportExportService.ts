@@ -83,8 +83,8 @@ export class DataImportExportService {
     async exportAllData(): Promise<string> {
         try {
             // Export all sites and settings using repositories
-            const sites = this.repositories.site.exportAll();
-            const settings = this.repositories.settings.getAll();
+            const sites = await this.repositories.site.exportAll();
+            const settings = await this.repositories.settings.getAll();
 
             const exportData = {
                 exportedAt: new Date().toISOString(),
@@ -160,7 +160,8 @@ export class DataImportExportService {
                     // Import sites using bulk insert
                     const siteRows = sites.map((site) => ({
                         identifier: site.identifier,
-                        name: site.name,
+                        ...(site.name && { name: site.name }),
+                        monitoring: true, // Default monitoring to true for imported sites
                     }));
                     this.repositories.site.bulkInsertInternal(db, siteRows);
 

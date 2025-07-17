@@ -16,9 +16,10 @@ import {
     buildMonitorParameters,
     convertDateForDb,
     DbValue,
-    rowToMonitor,
     generateSqlParameters,
     mapMonitorToRow,
+    rowsToMonitors,
+    rowToMonitorOrUndefined,
 } from "./utils";
 
 /**
@@ -51,7 +52,7 @@ export class MonitorRepository {
                 unknown
             >[];
 
-            return monitorRows.map((row) => rowToMonitor(row));
+            return rowsToMonitors(monitorRows);
         }, `find-monitors-by-site-${siteIdentifier}`);
     }
 
@@ -60,26 +61,13 @@ export class MonitorRepository {
      */
     public async findByIdentifier(monitorId: string): Promise<Site["monitors"][0] | undefined> {
         return withDatabaseOperation(
-            async () => {
+            () => {
                 const db = this.getDb();
+                const row = db.get("SELECT * FROM monitors WHERE id = ?", [monitorId]) as
+                    | Record<string, unknown>
+                    | undefined;
 
-                // Wrap synchronous operation in Promise to make it truly async
-                return new Promise<Site["monitors"][0] | undefined>((resolve, reject) => {
-                    try {
-                        const row = db.get("SELECT * FROM monitors WHERE id = ?", [monitorId]) as
-                            | Record<string, unknown>
-                            | undefined;
-
-                        if (!row) {
-                            resolve(undefined as Site["monitors"][0] | undefined);
-                            return;
-                        }
-
-                        resolve(rowToMonitor(row));
-                    } catch (error) {
-                        reject(error instanceof Error ? error : new Error(String(error)));
-                    }
-                });
+                return Promise.resolve(rowToMonitorOrUndefined(row));
             },
             "monitor-lookup",
             undefined,
@@ -404,15 +392,12 @@ export class MonitorRepository {
     /**
      * Get all monitor IDs.
      */
-    public getAllMonitorIds(): { id: number }[] {
-        try {
+    public async getAllMonitorIds(): Promise<{ id: number }[]> {
+        return withDatabaseOperation(() => {
             const db = this.getDb();
             const rows = db.all("SELECT id FROM monitors") as { id: number }[];
-            return rows;
-        } catch (error) {
-            logger.error("[MonitorRepository] Failed to fetch all monitor IDs", error);
-            throw error;
-        }
+            return Promise.resolve(rows);
+        }, "monitor-get-all-ids");
     }
 
     /**

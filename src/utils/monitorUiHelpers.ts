@@ -3,9 +3,9 @@
  * These utilities eliminate hardcoded monitor type checks throughout the frontend.
  */
 
-import { logger } from "../services";
 import type { MonitorType } from "../types";
 import { getMonitorTypeConfig, getAvailableMonitorTypes, type MonitorTypeConfig } from "./monitorTypeHelper";
+import { withUtilityErrorHandling } from "./errorHandling";
 
 /**
  * Cache for monitor type configurations
@@ -42,16 +42,14 @@ async function getConfig(monitorType: MonitorType): Promise<MonitorTypeConfig | 
  * ```
  */
 export async function formatMonitorDetail(monitorType: MonitorType, details: string): Promise<string> {
-    try {
-        // Use the IPC method to format on the backend where functions are available
-        return await window.electronAPI.monitorTypes.formatMonitorDetail(monitorType, details);
-    } catch (error) {
-        logger.error(
-            `Failed to format detail for monitor type ${monitorType}`,
-            error instanceof Error ? error : new Error(String(error))
-        );
-        return details;
-    }
+    return withUtilityErrorHandling(
+        async () => {
+            // Use the IPC method to format on the backend where functions are available
+            return window.electronAPI.monitorTypes.formatMonitorDetail(monitorType, details);
+        },
+        `Format monitor detail for ${monitorType}`,
+        details
+    );
 }
 
 /**
@@ -71,16 +69,14 @@ export async function formatMonitorTitleSuffix(
     monitorType: MonitorType,
     monitor: Record<string, unknown>
 ): Promise<string> {
-    try {
-        // Use the IPC method to format on the backend where functions are available
-        return await window.electronAPI.monitorTypes.formatMonitorTitleSuffix(monitorType, monitor);
-    } catch (error) {
-        logger.error(
-            `Failed to format title suffix for monitor type ${monitorType}`,
-            error instanceof Error ? error : new Error(String(error))
-        );
-        return "";
-    }
+    return withUtilityErrorHandling(
+        async () => {
+            // Use the IPC method to format on the backend where functions are available
+            return window.electronAPI.monitorTypes.formatMonitorTitleSuffix(monitorType, monitor);
+        },
+        `Format monitor title suffix for ${monitorType}`,
+        ""
+    );
 }
 
 /**
@@ -90,13 +86,14 @@ export async function formatMonitorTitleSuffix(
  * @returns Whether monitor supports response time analytics
  */
 export async function supportsResponseTime(monitorType: MonitorType): Promise<boolean> {
-    try {
-        const config = await getConfig(monitorType);
-        return config?.uiConfig?.supportsResponseTime ?? false;
-    } catch (error) {
-        logger.warn(`Failed to check response time support for ${monitorType}`, error as Error);
-        return false;
-    }
+    return withUtilityErrorHandling(
+        async () => {
+            const config = await getConfig(monitorType);
+            return config?.uiConfig?.supportsResponseTime ?? false;
+        },
+        `Check response time support for ${monitorType}`,
+        false
+    );
 }
 
 /**
@@ -106,13 +103,14 @@ export async function supportsResponseTime(monitorType: MonitorType): Promise<bo
  * @returns Whether monitor supports advanced analytics
  */
 export async function supportsAdvancedAnalytics(monitorType: MonitorType): Promise<boolean> {
-    try {
-        const config = await getConfig(monitorType);
-        return config?.uiConfig?.supportsAdvancedAnalytics ?? false;
-    } catch (error) {
-        logger.warn(`Failed to check advanced analytics support for ${monitorType}`, error as Error);
-        return false;
-    }
+    return withUtilityErrorHandling(
+        async () => {
+            const config = await getConfig(monitorType);
+            return config?.uiConfig?.supportsAdvancedAnalytics ?? false;
+        },
+        `Check advanced analytics support for ${monitorType}`,
+        false
+    );
 }
 
 /**
@@ -125,13 +123,14 @@ export async function getMonitorHelpTexts(monitorType: MonitorType): Promise<{
     primary?: string;
     secondary?: string;
 }> {
-    try {
-        const config = await getConfig(monitorType);
-        return config?.uiConfig?.helpTexts ?? {};
-    } catch (error) {
-        logger.warn(`Failed to get help texts for ${monitorType}`, error as Error);
-        return {};
-    }
+    return withUtilityErrorHandling(
+        async () => {
+            const config = await getConfig(monitorType);
+            return config?.uiConfig?.helpTexts ?? {};
+        },
+        `Get help texts for ${monitorType}`,
+        {}
+    );
 }
 
 /**
@@ -141,13 +140,14 @@ export async function getMonitorHelpTexts(monitorType: MonitorType): Promise<{
  * @returns Analytics label or fallback
  */
 export async function getAnalyticsLabel(monitorType: MonitorType): Promise<string> {
-    try {
-        const config = await getConfig(monitorType);
-        return config?.uiConfig?.detailFormats?.analyticsLabel ?? `${monitorType.toUpperCase()} Response Time`;
-    } catch (error) {
-        logger.warn(`Failed to get analytics label for ${monitorType}`, error as Error);
-        return `${monitorType.toUpperCase()} Response Time`;
-    }
+    return withUtilityErrorHandling(
+        async () => {
+            const config = await getConfig(monitorType);
+            return config?.uiConfig?.detailFormats?.analyticsLabel ?? `${monitorType.toUpperCase()} Response Time`;
+        },
+        `Get analytics label for ${monitorType}`,
+        `${monitorType.toUpperCase()} Response Time`
+    );
 }
 
 /**
@@ -157,13 +157,14 @@ export async function getAnalyticsLabel(monitorType: MonitorType): Promise<strin
  * @returns Whether to show URL
  */
 export async function shouldShowUrl(monitorType: MonitorType): Promise<boolean> {
-    try {
-        const config = await getConfig(monitorType);
-        return config?.uiConfig?.display?.showUrl ?? false;
-    } catch (error) {
-        logger.warn(`Failed to check URL display for ${monitorType}`, error as Error);
-        return false;
-    }
+    return withUtilityErrorHandling(
+        async () => {
+            const config = await getConfig(monitorType);
+            return config?.uiConfig?.display?.showUrl ?? false;
+        },
+        `Check URL display for ${monitorType}`,
+        false
+    );
 }
 
 /**
@@ -174,13 +175,14 @@ export async function shouldShowUrl(monitorType: MonitorType): Promise<boolean> 
  * @returns Whether all types support response time
  */
 export async function allSupportsResponseTime(monitorTypes: MonitorType[]): Promise<boolean> {
-    try {
-        const supportChecks = await Promise.all(monitorTypes.map((type) => supportsResponseTime(type)));
-        return supportChecks.every(Boolean);
-    } catch (error) {
-        logger.warn("Failed to check response time support for multiple types", error as Error);
-        return false;
-    }
+    return withUtilityErrorHandling(
+        async () => {
+            const supportChecks = await Promise.all(monitorTypes.map((type) => supportsResponseTime(type)));
+            return supportChecks.every(Boolean);
+        },
+        "Check response time support for multiple types",
+        false
+    );
 }
 
 /**
@@ -191,13 +193,14 @@ export async function allSupportsResponseTime(monitorTypes: MonitorType[]): Prom
  * @returns Whether all types support advanced analytics
  */
 export async function allSupportsAdvancedAnalytics(monitorTypes: MonitorType[]): Promise<boolean> {
-    try {
-        const supportChecks = await Promise.all(monitorTypes.map((type) => supportsAdvancedAnalytics(type)));
-        return supportChecks.every(Boolean);
-    } catch (error) {
-        logger.warn("Failed to check advanced analytics support for multiple types", error as Error);
-        return false;
-    }
+    return withUtilityErrorHandling(
+        async () => {
+            const supportChecks = await Promise.all(monitorTypes.map((type) => supportsAdvancedAnalytics(type)));
+            return supportChecks.every(Boolean);
+        },
+        "Check advanced analytics support for multiple types",
+        false
+    );
 }
 
 /**
@@ -207,26 +210,27 @@ export async function allSupportsAdvancedAnalytics(monitorTypes: MonitorType[]):
  * @returns Array of monitor types that support the feature
  */
 export async function getTypesWithFeature(feature: "responseTime" | "advancedAnalytics"): Promise<MonitorType[]> {
-    try {
-        const allTypes = await getAvailableMonitorTypes();
-        const supportedTypes: MonitorType[] = [];
+    return withUtilityErrorHandling(
+        async () => {
+            const allTypes = await getAvailableMonitorTypes();
+            const supportedTypes: MonitorType[] = [];
 
-        for (const config of allTypes) {
-            const supports =
-                feature === "responseTime"
-                    ? config.uiConfig?.supportsResponseTime
-                    : config.uiConfig?.supportsAdvancedAnalytics;
+            for (const config of allTypes) {
+                const supports =
+                    feature === "responseTime"
+                        ? config.uiConfig?.supportsResponseTime
+                        : config.uiConfig?.supportsAdvancedAnalytics;
 
-            if (supports) {
-                supportedTypes.push(config.type);
+                if (supports) {
+                    supportedTypes.push(config.type);
+                }
             }
-        }
 
-        return supportedTypes;
-    } catch (error) {
-        logger.warn(`Failed to get types with feature ${feature}`, error as Error);
-        return [];
-    }
+            return supportedTypes;
+        },
+        `Get types with feature ${feature}`,
+        []
+    );
 }
 
 /**

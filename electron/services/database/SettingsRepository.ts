@@ -3,6 +3,7 @@ import { Database } from "node-sqlite3-wasm";
 import { isDev } from "../../electronUtils";
 import { logger, withDatabaseOperation } from "../../utils/index";
 import { DatabaseService } from "./DatabaseService";
+import { rowToSettingValue, rowsToSettings, settingsToRecord } from "./utils";
 
 /**
  * Repository for managing application settings persistence.
@@ -29,8 +30,10 @@ export class SettingsRepository {
         // eslint-disable-next-line @typescript-eslint/require-await
         return withDatabaseOperation(async () => {
             const db = this.getDb();
-            const result = db.get("SELECT value FROM settings WHERE key = ?", [key]);
-            return result?.value ? String(result.value) : undefined;
+            const result = db.get("SELECT value FROM settings WHERE key = ?", [key]) as
+                | Record<string, unknown>
+                | undefined;
+            return rowToSettingValue(result);
         }, `get-setting-${key}`);
     }
 
@@ -91,21 +94,13 @@ export class SettingsRepository {
     /**
      * Get all settings.
      */
-    public getAll(): Record<string, string> {
-        try {
+    public async getAll(): Promise<Record<string, string>> {
+        return withDatabaseOperation(() => {
             const db = this.getDb();
-            const settings = db.all("SELECT * FROM settings") as { key: string; value: string }[];
-            const result: Record<string, string> = {};
-            for (const row of settings) {
-                if (typeof row.key === "string") {
-                    result[row.key] = String(row.value);
-                }
-            }
-            return result;
-        } catch (error) {
-            logger.error("[SettingsRepository] Failed to get all settings", error);
-            throw error;
-        }
+            const settings = db.all("SELECT * FROM settings") as Record<string, unknown>[];
+            const settingRows = rowsToSettings(settings);
+            return Promise.resolve(settingsToRecord(settingRows));
+        }, "settings-get-all");
     }
 
     /**

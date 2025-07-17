@@ -185,7 +185,7 @@ describe("UptimeOrchestrator - Basic", () => {
         });
 
         it("should initialize with default values", () => {
-            expect(uptimeOrchestrator.getHistoryLimit()).toBe(500);
+            expect(uptimeOrchestrator.historyLimit).toBe(500);
             expect(uptimeOrchestrator.getSitesFromCache()).toEqual([]);
         });
 
@@ -230,7 +230,7 @@ describe("UptimeOrchestrator - Basic", () => {
             await uptimeOrchestrator.initialize();
 
             expect(mockSettingsRepositoryInstance.get).toHaveBeenCalledWith("historyLimit");
-            expect(uptimeOrchestrator.getHistoryLimit()).toBe(1000);
+            expect(uptimeOrchestrator.historyLimit).toBe(1000);
         });
 
         it("should use default history limit when setting not found", async () => {
@@ -240,7 +240,7 @@ describe("UptimeOrchestrator - Basic", () => {
 
             await uptimeOrchestrator.initialize();
 
-            expect(uptimeOrchestrator.getHistoryLimit()).toBe(500);
+            expect(uptimeOrchestrator.historyLimit).toBe(500);
         });
 
         it("should handle database initialization errors", async () => {

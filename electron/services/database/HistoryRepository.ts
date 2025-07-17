@@ -36,10 +36,9 @@ export class HistoryRepository {
      * Find all history entries for a specific monitor.
      */
     public async findByMonitorId(monitorId: string): Promise<StatusHistory[]> {
-        // eslint-disable-next-line @typescript-eslint/require-await
-        return withDatabaseOperation(async () => {
+        return withDatabaseOperation(() => {
             const db = this.getDb();
-            return findHistoryByMonitorId(db, monitorId);
+            return Promise.resolve(findHistoryByMonitorId(db, monitorId));
         }, `find-history-by-monitor-${monitorId}`);
     }
 

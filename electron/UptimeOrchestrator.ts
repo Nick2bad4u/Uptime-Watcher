@@ -157,7 +157,7 @@ interface SiteEventData {
  * ```
  */
 export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
-    private historyLimit: number = DEFAULT_HISTORY_LIMIT;
+    private _historyLimit: number = DEFAULT_HISTORY_LIMIT;
 
     // Manager instances
     private readonly siteManager: SiteManager;
@@ -190,7 +190,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         this.monitorManager = new MonitorManager({
             databaseService,
             eventEmitter: this,
-            getHistoryLimit: () => this.historyLimit,
+            getHistoryLimit: () => this._historyLimit,
             getSitesCache: () => siteManagerInstance.getSitesCache(),
             repositories: {
                 history: historyRepository,
@@ -204,20 +204,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             databaseService,
             eventEmitter: this,
             historyRepository,
-            monitoringOperations: {
-                setHistoryLimit: async (limit: number) => {
-                    await this.setHistoryLimit(limit);
-                },
-                startMonitoringForSite: async (identifier: string, monitorId: string) => {
-                    return this.monitorManager.startMonitoringForSite(identifier, monitorId);
-                },
-                stopMonitoringForSite: async (identifier: string, monitorId: string) => {
-                    return this.monitorManager.stopMonitoringForSite(identifier, monitorId);
-                },
-                setupNewMonitors: async (site: Site, newMonitorIds: string[]) => {
-                    return this.monitorManager.setupNewMonitors(site, newMonitorIds);
-                },
-            },
+            monitoringOperations: this.createMonitoringOperations(),
             monitorRepository,
             siteRepository,
         });
@@ -246,6 +233,28 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     private setupMiddleware(): void {
         this.use(createErrorHandlingMiddleware({ continueOnError: true }));
         this.use(createLoggingMiddleware({ includeData: false, level: "info" }));
+    }
+
+    /**
+     * Creates the monitoringOperations object for SiteManager.
+     *
+     * @returns The monitoringOperations object.
+     */
+    private createMonitoringOperations() {
+        return {
+            setHistoryLimit: async (limit: number) => {
+                await this.setHistoryLimit(limit);
+            },
+            startMonitoringForSite: async (identifier: string, monitorId: string) => {
+                return this.monitorManager.startMonitoringForSite(identifier, monitorId);
+            },
+            stopMonitoringForSite: async (identifier: string, monitorId: string) => {
+                return this.monitorManager.stopMonitoringForSite(identifier, monitorId);
+            },
+            setupNewMonitors: async (site: Site, newMonitorIds: string[]) => {
+                return this.monitorManager.setupNewMonitors(site, newMonitorIds);
+            },
+        };
     }
 
     /**
@@ -392,7 +401,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         });
 
         this.on("internal:database:history-limit-updated", (data: HistoryLimitUpdatedData) => {
-            this.historyLimit = data.limit;
+            this._historyLimit = data.limit;
         });
 
         // Forward internal manager events to public typed events for renderer process
@@ -766,15 +775,14 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      *
      * @remarks
      * This method delegates to the DatabaseManager to update the history limit
-     * in the database and prune existing history entries if necessary. It also
-     * emits an internal event to notify other components of the change.
+     * in the database and prune existing history entries if necessary.
      *
      * The operation is performed within a database transaction to ensure
      * consistency between the setting update and history pruning.
      *
      * @param limit - The new history limit (number of entries to retain per monitor).
      *                Values less than or equal to 0 will disable history pruning.
-     * @returns Promise that resolves when the limit is set and events are emitted.
+     * @returns Promise that resolves when the limit is set.
      */
     public async setHistoryLimit(limit: number): Promise<void> {
         await this.databaseManager.setHistoryLimit(limit);
@@ -785,8 +793,17 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      *
      * @returns The current history limit.
      */
+    public get historyLimit(): number {
+        return this._historyLimit;
+    }
+
+    /**
+     * Gets the current history retention limit (method version for IPC compatibility).
+     *
+     * @returns The current history limit.
+     */
     public getHistoryLimit(): number {
-        return this.historyLimit;
+        return this.databaseManager.getHistoryLimit();
     }
 
     // Status Information

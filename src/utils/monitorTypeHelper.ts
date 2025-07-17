@@ -3,7 +3,7 @@
  * Provides access to monitor type definitions through the IPC bridge.
  */
 
-import { logger } from "../services";
+import { withUtilityErrorHandling } from "./errorHandling";
 
 /**
  * Frontend representation of monitor field definition.
@@ -74,15 +74,13 @@ let monitorTypeCache: MonitorTypeConfig[] | undefined;
  * Results are cached for performance.
  */
 export async function getAvailableMonitorTypes(): Promise<MonitorTypeConfig[]> {
-    if (monitorTypeCache === undefined) {
-        try {
-            monitorTypeCache = await window.electronAPI.monitorTypes.getMonitorTypes();
-        } catch (error) {
-            logger.error("Failed to fetch monitor types from backend", error as Error);
-            // Fallback to empty array if backend is unavailable
-            monitorTypeCache = [];
-        }
-    }
+    monitorTypeCache ??= await withUtilityErrorHandling(
+        async () => {
+            return window.electronAPI.monitorTypes.getMonitorTypes();
+        },
+        "Fetch monitor types from backend",
+        []
+    );
     return monitorTypeCache;
 }
 

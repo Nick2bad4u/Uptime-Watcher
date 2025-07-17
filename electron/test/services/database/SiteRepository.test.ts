@@ -225,7 +225,7 @@ describe("SiteRepository", () => {
             ];
             mockDatabase.all.mockReturnValue(mockSites);
 
-            const result = siteRepository.exportAll();
+            const result = await siteRepository.exportAll();
 
             expect(result).toEqual([
                 { identifier: "site1", name: "Site 1" },

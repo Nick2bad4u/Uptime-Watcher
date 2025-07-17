@@ -3,8 +3,8 @@
  * Uses the backend monitor type registry for consistent validation.
  */
 
-import { logger } from "../services";
 import type { MonitorType } from "../types";
+import { withUtilityErrorHandling } from "./errorHandling";
 
 /**
  * Validate monitor data using backend registry.
@@ -17,22 +17,23 @@ export async function validateMonitorData(
     type: MonitorType,
     data: Record<string, unknown>
 ): Promise<{ success: boolean; errors: string[] }> {
-    try {
-        // Use IPC to validate via backend registry
-        const result = await window.electronAPI.monitorTypes.validateMonitorData(type, data);
+    return withUtilityErrorHandling(
+        async () => {
+            // Use IPC to validate via backend registry
+            const result = await window.electronAPI.monitorTypes.validateMonitorData(type, data);
 
-        // Handle the advanced validation result format
-        return {
-            success: result.success,
-            errors: result.errors,
-        };
-    } catch (error) {
-        logger.error("Failed to validate monitor data", error instanceof Error ? error : new Error(String(error)));
-        return {
+            // Handle the advanced validation result format
+            return {
+                success: result.success,
+                errors: result.errors,
+            };
+        },
+        "Monitor data validation",
+        {
             success: false,
             errors: ["Validation failed - unable to connect to backend"],
-        };
-    }
+        }
+    );
 }
 
 /**
@@ -44,26 +45,24 @@ export async function validateMonitorData(
  * @returns Promise resolving to validation errors (empty if valid)
  */
 export async function validateMonitorField(type: MonitorType, fieldName: string, value: unknown): Promise<string[]> {
-    try {
-        // Use the full validation and extract errors for this field
-        const data: Record<string, unknown> = { [fieldName]: value, type };
-        const result = await validateMonitorData(type, data);
+    return withUtilityErrorHandling(
+        async () => {
+            // Use the full validation and extract errors for this field
+            const data: Record<string, unknown> = { [fieldName]: value, type };
+            const result = await validateMonitorData(type, data);
 
-        if (result.success) {
-            return [];
-        }
+            if (result.success) {
+                return [];
+            }
 
-        // Filter errors to only include those for the specific field
-        const fieldErrors = result.errors.filter((error) => error.toLowerCase().includes(fieldName.toLowerCase()));
+            // Filter errors to only include those for the specific field
+            const fieldErrors = result.errors.filter((error) => error.toLowerCase().includes(fieldName.toLowerCase()));
 
-        return fieldErrors.length > 0 ? fieldErrors : result.errors;
-    } catch (error) {
-        logger.error(
-            `Failed to validate field ${fieldName}`,
-            error instanceof Error ? error : new Error(String(error))
-        );
-        return [`Failed to validate ${fieldName}`];
-    }
+            return fieldErrors.length > 0 ? fieldErrors : result.errors;
+        },
+        `Monitor field validation for ${fieldName}`,
+        [`Failed to validate ${fieldName}`]
+    );
 }
 
 /**

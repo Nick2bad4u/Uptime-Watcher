@@ -3,6 +3,9 @@
  * Provides centralized access to all utility functions.
  */
 
+// Error handling utilities
+export * from "./errorHandling";
+
 // Time utilities
 export * from "./time";
 export * from "./duration";

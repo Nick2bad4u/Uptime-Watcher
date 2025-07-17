@@ -5,6 +5,7 @@ import { logger, withDatabaseOperation } from "../../utils/index";
 import { DatabaseService } from "./DatabaseService";
 import { HistoryRepository } from "./HistoryRepository";
 import { MonitorRepository } from "./MonitorRepository";
+import { rowToSite, rowsToSites, type SiteRow } from "./utils";
 
 /**
  * Repository for managing site data persistence.
@@ -31,61 +32,35 @@ export class SiteRepository {
     /**
      * Get all sites from the database (without monitors).
      */
-    public async findAll(): Promise<
-        { identifier: string; name?: string | undefined; monitoring?: boolean | undefined }[]
-    > {
+    public async findAll(): Promise<SiteRow[]> {
         // eslint-disable-next-line @typescript-eslint/require-await
         return withDatabaseOperation(async () => {
             const db = this.getDb();
-            const siteRows = db.all("SELECT identifier, name, monitoring FROM sites") as {
-                identifier: string;
-                name?: string;
-                monitoring?: number;
-            }[];
-            return siteRows.map((row) => ({
-                identifier: String(row.identifier),
-                ...(row.name !== undefined && { name: String(row.name) }),
-                ...(row.monitoring !== undefined && { monitoring: Boolean(row.monitoring) }),
-            }));
+            const siteRows = db.all("SELECT identifier, name, monitoring FROM sites") as Record<string, unknown>[];
+            return rowsToSites(siteRows);
         }, "find-all-sites");
     }
 
     /**
      * Find a site by its identifier with resilient error handling.
      */
-    public async findByIdentifier(
-        identifier: string
-    ): Promise<{ identifier: string; name?: string | undefined; monitoring?: boolean | undefined } | undefined> {
+    public async findByIdentifier(identifier: string): Promise<SiteRow | undefined> {
         return withDatabaseOperation(
             async () => {
                 const db = this.getDb();
 
-                return new Promise<
-                    { identifier: string; name?: string | undefined; monitoring?: boolean | undefined } | undefined
-                >((resolve, reject) => {
+                return new Promise<SiteRow | undefined>((resolve, reject) => {
                     try {
                         const siteRow = db.get("SELECT identifier, name, monitoring FROM sites WHERE identifier = ?", [
                             identifier,
-                        ]) as { identifier: string; name?: string; monitoring?: number } | undefined;
+                        ]) as Record<string, unknown> | undefined;
 
                         if (!siteRow) {
-                            resolve(
-                                undefined as
-                                    | {
-                                          identifier: string;
-                                          name?: string | undefined;
-                                          monitoring?: boolean | undefined;
-                                      }
-                                    | undefined
-                            );
+                            resolve(undefined as SiteRow | undefined);
                             return;
                         }
 
-                        resolve({
-                            identifier: String(siteRow.identifier),
-                            ...(siteRow.name !== undefined && { name: String(siteRow.name) }),
-                            ...(siteRow.monitoring !== undefined && { monitoring: Boolean(siteRow.monitoring) }),
-                        });
+                        resolve(rowToSite(siteRow));
                     } catch (error) {
                         reject(error instanceof Error ? error : new Error(String(error)));
                     }
@@ -102,34 +77,36 @@ export class SiteRepository {
      * This method returns a full Site object including all monitors and their history.
      */
     public async getByIdentifier(identifier: string): Promise<Site | undefined> {
-        try {
-            const siteRow = await this.findByIdentifier(identifier);
-            if (!siteRow) {
-                return undefined;
-            }
-
-            // Fetch monitors for this site
-            const monitors = await this.monitorRepository.findBySiteIdentifier(siteRow.identifier);
-
-            // Load history for each monitor
-            for (const monitor of monitors) {
-                if (monitor.id) {
-                    monitor.history = await this.historyRepository.findByMonitorId(monitor.id);
+        return withDatabaseOperation(
+            async () => {
+                const siteRow = await this.findByIdentifier(identifier);
+                if (!siteRow) {
+                    return;
                 }
-            }
 
-            const site: Site = {
-                identifier: siteRow.identifier,
-                name: siteRow.name ?? "Unnamed Site",
-                monitors: monitors,
-                monitoring: siteRow.monitoring ?? true, // Default to true if not set
-            };
+                // Fetch monitors for this site
+                const monitors = await this.monitorRepository.findBySiteIdentifier(siteRow.identifier);
 
-            return site;
-        } catch (error) {
-            logger.error(`[SiteRepository] Failed to fetch complete site with identifier: ${identifier}`, error);
-            throw error;
-        }
+                // Load history for each monitor
+                for (const monitor of monitors) {
+                    if (monitor.id) {
+                        monitor.history = await this.historyRepository.findByMonitorId(monitor.id);
+                    }
+                }
+
+                const site: Site = {
+                    identifier: siteRow.identifier,
+                    name: siteRow.name ?? "Unnamed Site",
+                    monitors: monitors,
+                    monitoring: siteRow.monitoring ?? true, // Default to true if not set
+                };
+
+                return site;
+            },
+            "site-get-by-identifier",
+            undefined,
+            { identifier }
+        );
     }
 
     /**
@@ -210,31 +187,26 @@ export class SiteRepository {
      * Check if a site exists by identifier.
      */
     public async exists(identifier: string): Promise<boolean> {
-        try {
-            const site = await this.findByIdentifier(identifier);
-            return site !== undefined;
-        } catch (error) {
-            logger.error(`[SiteRepository] Failed to check if site exists: ${identifier}`, error);
-            throw error;
-        }
+        return withDatabaseOperation(
+            async () => {
+                const site = await this.findByIdentifier(identifier);
+                return site !== undefined;
+            },
+            "site-exists",
+            undefined,
+            { identifier }
+        );
     }
 
     /**
      * Export all sites for backup/import functionality.
      */
-    public exportAll(): { identifier: string; name?: string | undefined; monitoring?: boolean | undefined }[] {
-        try {
+    public async exportAll(): Promise<SiteRow[]> {
+        return withDatabaseOperation(() => {
             const db = this.getDb();
-            const sites = db.all("SELECT identifier, name, monitoring FROM sites");
-            return sites.map((row) => ({
-                identifier: row.identifier ? String(row.identifier) : "",
-                ...(row.name !== undefined && { name: String(row.name) }),
-                ...(row.monitoring !== undefined && { monitoring: Boolean(row.monitoring) }),
-            }));
-        } catch (error) {
-            logger.error("[SiteRepository] Failed to export sites", error);
-            throw error;
-        }
+            const sites = db.all("SELECT identifier, name, monitoring FROM sites") as Record<string, unknown>[];
+            return Promise.resolve(rowsToSites(sites));
+        }, "site-export-all");
     }
 
     /**
@@ -261,9 +233,7 @@ export class SiteRepository {
      * Bulk insert sites (for import functionality).
      * Uses executeTransaction for atomic operation.
      */
-    public async bulkInsert(
-        sites: { identifier: string; name?: string | undefined; monitoring?: boolean | undefined }[]
-    ): Promise<void> {
+    public async bulkInsert(sites: SiteRow[]): Promise<void> {
         if (sites.length === 0) {
             return;
         }
@@ -284,10 +254,7 @@ export class SiteRepository {
      * Internal method to bulk insert sites within an existing transaction.
      * Use this method when you're already within a transaction context.
      */
-    public bulkInsertInternal(
-        db: Database,
-        sites: { identifier: string; name?: string | undefined; monitoring?: boolean | undefined }[]
-    ): void {
+    public bulkInsertInternal(db: Database, sites: SiteRow[]): void {
         if (sites.length === 0) {
             return;
         }

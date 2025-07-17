@@ -47,6 +47,7 @@
 
 import { UptimeEvents, TypedEventBus } from "../../events/index";
 import { SiteRepository, MonitorRepository, HistoryRepository, SettingsRepository } from "../../services/index";
+import { SiteRow } from "../../services/database/utils";
 import { Site } from "../../types";
 import { Logger, SiteCacheInterface, SiteLoadingConfig, MonitoringConfig, SiteLoadingError } from "./interfaces";
 
@@ -193,10 +194,7 @@ export class SiteRepositoryService {
      * Build a site object with monitors and history.
      * Private helper method for data construction.
      */
-    private async buildSiteWithMonitorsAndHistory(siteRow: {
-        identifier: string;
-        name?: string | undefined;
-    }): Promise<Site> {
+    private async buildSiteWithMonitorsAndHistory(siteRow: SiteRow): Promise<Site> {
         const monitors = await this.repositories.monitor.findBySiteIdentifier(siteRow.identifier);
 
         // Load history for each monitor
@@ -208,7 +206,7 @@ export class SiteRepositoryService {
 
         const site: Site = {
             identifier: siteRow.identifier,
-            monitoring: true, // Default to monitoring enabled
+            monitoring: siteRow.monitoring ?? true, // Use the actual monitoring status with default
             monitors: monitors,
             name: siteRow.name ?? "Unnamed Site", // Provide default name
         };

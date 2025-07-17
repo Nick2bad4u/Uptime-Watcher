@@ -198,7 +198,7 @@ describe("UptimeOrchestrator - Advanced", () => {
             await orchestrator.emitTyped("internal:database:history-limit-updated", eventData);
 
             // The history limit should be updated internally
-            expect(orchestrator.getHistoryLimit()).toBe(1000);
+            expect(orchestrator.historyLimit).toBe(1000);
         });
     });
 
@@ -287,7 +287,7 @@ describe("UptimeOrchestrator - Advanced", () => {
                 eventReceived = true;
                 // Manually trigger the orchestrator's internal history limit update
                 // since we're mocking the DatabaseManager
-                orchestrator["historyLimit"] = data.limit;
+                orchestrator["_historyLimit"] = data.limit;
             });
 
             // Mock the DatabaseManager to emit the event after setHistoryLimit is called
@@ -309,7 +309,7 @@ describe("UptimeOrchestrator - Advanced", () => {
 
             expect(mockDatabaseManager.setHistoryLimit).toHaveBeenCalledWith(1000);
             expect(eventReceived).toBe(true);
-            expect(orchestrator.getHistoryLimit()).toBe(1000);
+            expect(orchestrator.historyLimit).toBe(1000);
         });
 
         it("should handle getHistoryLimit", async () => {
@@ -317,7 +317,7 @@ describe("UptimeOrchestrator - Advanced", () => {
             let eventReceived = false;
             orchestrator.once("internal:database:history-limit-updated", (data) => {
                 eventReceived = true;
-                orchestrator["historyLimit"] = data.limit;
+                orchestrator["_historyLimit"] = data.limit;
             });
 
             // Mock the DatabaseManager to emit the event
@@ -335,7 +335,7 @@ describe("UptimeOrchestrator - Advanced", () => {
             // Wait for async event handling
             await new Promise((resolve) => setTimeout(resolve, 10));
 
-            const result = orchestrator.getHistoryLimit();
+            const result = orchestrator.historyLimit;
 
             expect(eventReceived).toBe(true);
             expect(result).toBe(750);
@@ -376,7 +376,7 @@ describe("UptimeOrchestrator - Advanced", () => {
             let eventReceived = false;
             orchestrator.once("internal:database:history-limit-updated", (data) => {
                 eventReceived = true;
-                orchestrator["historyLimit"] = data.limit;
+                orchestrator["_historyLimit"] = data.limit;
             });
 
             mockDatabaseManager.setHistoryLimit.mockImplementationOnce(async (limit: number) => {
@@ -395,14 +395,14 @@ describe("UptimeOrchestrator - Advanced", () => {
 
             expect(mockDatabaseManager.setHistoryLimit).toHaveBeenCalledWith(-100);
             expect(eventReceived).toBe(true);
-            expect(orchestrator.getHistoryLimit()).toBe(-100);
+            expect(orchestrator.historyLimit).toBe(-100);
         });
 
         it("should handle zero history limit", async () => {
             let eventReceived = false;
             orchestrator.once("internal:database:history-limit-updated", (data) => {
                 eventReceived = true;
-                orchestrator["historyLimit"] = data.limit;
+                orchestrator["_historyLimit"] = data.limit;
             });
 
             mockDatabaseManager.setHistoryLimit.mockImplementationOnce(async (limit: number) => {
@@ -421,7 +421,7 @@ describe("UptimeOrchestrator - Advanced", () => {
 
             expect(mockDatabaseManager.setHistoryLimit).toHaveBeenCalledWith(0);
             expect(eventReceived).toBe(true);
-            expect(orchestrator.getHistoryLimit()).toBe(0);
+            expect(orchestrator.historyLimit).toBe(0);
         });
     });
 });
