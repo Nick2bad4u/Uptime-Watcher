@@ -5,8 +5,8 @@
  * when no sites have been added. Applies theme-aware styling with dividers.
  */
 
-import { useSitesStore } from "../../../stores";
-import { useTheme } from "../../../theme";
+import { useSitesStore } from "../../../stores/sites/useSitesStore";
+import { useTheme } from "../../../theme/useTheme";
 import { SiteCard } from "../SiteCard";
 import { EmptyState } from "./EmptyState";
 

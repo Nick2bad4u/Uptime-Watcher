@@ -10,7 +10,7 @@ import {
     composeMiddleware,
     MIDDLEWARE_STACKS,
 } from "../events/middleware";
-import { logger } from "../utils/index";
+import { logger } from "../utils/logger";
 
 // Mock logger
 vi.mock("../utils/index", () => ({

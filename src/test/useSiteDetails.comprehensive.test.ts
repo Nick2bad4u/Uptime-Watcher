@@ -39,7 +39,9 @@ vi.mock("../services/logger", () => ({
 
 import logger from "../services/logger";
 // Import the mocked modules after setting up the mocks
-import { useErrorStore, useSitesStore, useUIStore } from "../stores";
+import { useErrorStore } from "../stores/error/useErrorStore";
+import { useSitesStore } from "../stores/sites/useSitesStore";
+import { useUIStore } from "../stores/ui/useUiStore";
 
 // Create mock global confirm
 const mockConfirm = vi.fn();

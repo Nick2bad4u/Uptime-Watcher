@@ -6,7 +6,7 @@
 
 import React from "react";
 
-import { ThemedInput, ThemedSelect, ThemedText } from "../../theme";
+import { ThemedInput, ThemedSelect, ThemedText } from "../../theme/components";
 
 /** Suffix for required field accessibility labels */
 const REQUIRED_SUFFIX = " (required)";

@@ -2,7 +2,8 @@
  * Interfaces for database utilities to support dependency injection and testing.
  */
 
-import { UptimeEvents, TypedEventBus } from "../../events/index";
+import { UptimeEvents } from "../../events/eventTypes";
+import { TypedEventBus } from "../../events/TypedEventBus";
 import { SiteRepository } from "../../services/database/SiteRepository";
 import { MonitorRepository } from "../../services/database/MonitorRepository";
 import { HistoryRepository } from "../../services/database/HistoryRepository";

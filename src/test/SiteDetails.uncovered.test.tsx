@@ -5,7 +5,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { SiteDetails } from "../components";
+import { SiteDetails } from "../components/SiteDetails/SiteDetails";
 import type { Site } from "../types";
 
 // Mock electron-log to prevent initialization issues

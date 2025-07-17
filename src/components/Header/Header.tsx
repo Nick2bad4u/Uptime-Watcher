@@ -5,8 +5,10 @@
 
 import { useMemo } from "react";
 
-import { useSitesStore, useUIStore } from "../../stores";
-import { ThemedBox, ThemedText, ThemedButton, StatusIndicator, useTheme, useAvailabilityColors } from "../../theme";
+import { useSitesStore } from "../../stores/sites/useSitesStore";
+import { useUIStore } from "../../stores/ui/useUiStore";
+import { ThemedBox, ThemedText, ThemedButton, StatusIndicator } from "../../theme/components";
+import { useTheme, useAvailabilityColors } from "../../theme/useTheme";
 import "./Header.css";
 
 /**

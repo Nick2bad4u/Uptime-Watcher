@@ -9,8 +9,8 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 
-import { logger } from "../../services";
-import { useTheme } from "../../theme";
+import logger from "../../services/logger";
+import { useTheme } from "../../theme/useTheme";
 
 /** Props for the ScreenshotThumbnail component */
 interface ScreenshotThumbnailProperties {

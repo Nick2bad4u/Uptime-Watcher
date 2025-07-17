@@ -10,8 +10,10 @@ import type { Monitor, MonitorType, Site } from "../../types";
 
 import { ERROR_MESSAGES } from "../types";
 import { logStoreAction, withErrorHandling } from "../utils";
-import { MonitoringService, SiteService } from "./services";
-import { normalizeMonitor, updateMonitorInSite, handleSQLiteBackupDownload } from "./utils";
+import { MonitoringService } from "./services/MonitoringService";
+import { SiteService } from "./services/SiteService";
+import { normalizeMonitor, updateMonitorInSite } from "./utils/monitorOperations";
+import { handleSQLiteBackupDownload } from "./utils/fileDownload";
 
 export interface SiteOperationsActions {
     /** Initialize sites data from backend */

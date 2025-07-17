@@ -39,14 +39,19 @@ import { useSiteDetails } from "../../hooks/site/useSiteDetails";
 import { ChartConfigService } from "../../services/chartConfig";
 // Import from centralized chart setup
 import "../../services/chartSetup";
-import { ThemedBox, useTheme } from "../../theme";
+import { ThemedBox } from "../../theme/components";
+import { useTheme } from "../../theme/useTheme";
 import { Site } from "../../types";
 import { formatStatusWithIcon } from "../../utils/status";
 import { formatResponseTime, formatFullTimestamp, formatDuration } from "../../utils/time";
 import "./SiteDetails.css";
 import { SiteDetailsHeader } from "./SiteDetailsHeader";
 import { SiteDetailsNavigation } from "./SiteDetailsNavigation";
-import { AnalyticsTab, HistoryTab, OverviewTab, SettingsTab, SiteOverviewTab } from "./tabs";
+import { AnalyticsTab } from "./tabs/AnalyticsTab";
+import { HistoryTab } from "./tabs/HistoryTab";
+import { OverviewTab } from "./tabs/OverviewTab";
+import { SettingsTab } from "./tabs/SettingsTab";
+import { SiteOverviewTab } from "./tabs/SiteOverviewTab";
 
 /** Props for the SiteDetails component */
 interface SiteDetailsProperties {

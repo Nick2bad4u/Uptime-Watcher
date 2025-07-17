@@ -10,7 +10,7 @@ import { useSite } from "../hooks/site/useSite";
 import { useSiteActions } from "../hooks/site/useSiteActions";
 import { useSiteMonitor } from "../hooks/site/useSiteMonitor";
 import { useSiteStats } from "../hooks/site/useSiteStats";
-import { useErrorStore } from "../stores";
+import { useErrorStore } from "../stores/error/useErrorStore";
 import { Site, Monitor } from "../types";
 
 // Mock all the sub-hooks

@@ -25,7 +25,7 @@
 
 import { ChartData, ChartOptions } from "./chartSetup";
 
-import { Theme } from "../theme";
+import { Theme } from "../theme/types";
 
 /**
  * Chart Configuration Service for theme-aware chart styling.

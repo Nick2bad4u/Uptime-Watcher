@@ -37,7 +37,9 @@ import { logger } from "../../utils/logger";
 import { withRetry } from "../../utils/retry";
 
 import { IMonitorService, MonitorCheckResult, MonitorConfig } from "./types";
-import { determineMonitorStatus, handleCheckError, createHttpClient, createErrorResult } from "./utils";
+import { handleCheckError, createErrorResult } from "./utils/errorHandling";
+import { createHttpClient } from "./utils/httpClient";
+import { determineMonitorStatus } from "./utils/httpStatusUtils";
 
 /**
  * Declaration merging to extend Axios types with timing metadata.

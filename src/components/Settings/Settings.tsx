@@ -9,8 +9,10 @@
 import { useState, useEffect, useCallback } from "react";
 
 import { HISTORY_LIMIT_OPTIONS, UI_DELAYS } from "../../constants";
-import { logger } from "../../services";
-import { useErrorStore, useSettingsStore, useSitesStore } from "../../stores";
+import logger from "../../services/logger";
+import { useErrorStore } from "../../stores/error/useErrorStore";
+import { useSettingsStore } from "../../stores/settings/useSettingsStore";
+import { useSitesStore } from "../../stores/sites/useSitesStore";
 import {
     ThemedBox,
     ThemedText,
@@ -18,9 +20,9 @@ import {
     StatusIndicator,
     ThemedSelect,
     ThemedCheckbox,
-    ThemeName,
-    useTheme,
-} from "../../theme";
+} from "../../theme/components";
+import { ThemeName } from "../../theme/types";
+import { useTheme } from "../../theme/useTheme";
 
 /** Props for the Settings component */
 interface SettingsProperties {

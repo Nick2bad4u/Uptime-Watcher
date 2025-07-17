@@ -3,7 +3,7 @@ import { ipcMain, BrowserWindow } from "electron";
 import { isDev } from "../../electronUtils";
 import { UptimeOrchestrator } from "../../UptimeOrchestrator";
 import { logger } from "../../utils/logger";
-import { AutoUpdaterService } from "../updater/index";
+import { AutoUpdaterService } from "../updater/AutoUpdaterService";
 import { Site } from "../../types";
 import { getAllMonitorTypeConfigs, validateMonitorData, getMonitorTypeConfig } from "../monitoring/MonitorTypeRegistry";
 

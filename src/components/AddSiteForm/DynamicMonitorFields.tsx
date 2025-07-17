@@ -5,9 +5,9 @@
 
 import { useState, useEffect } from "react";
 import { TextField } from "./FormFields";
-import { logger } from "../../services";
-import { ThemedText } from "../../theme";
-import { getMonitorTypeConfig, type MonitorFieldDefinition, type MonitorTypeConfig } from "../../utils";
+import logger from "../../services/logger";
+import { ThemedText } from "../../theme/components";
+import { getMonitorTypeConfig, type MonitorFieldDefinition, type MonitorTypeConfig } from "../../utils/monitorTypeHelper";
 
 interface DynamicMonitorFieldsProps {
     /** Selected monitor type */

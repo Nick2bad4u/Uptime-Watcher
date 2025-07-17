@@ -8,7 +8,7 @@ import { FiTrash2 } from "react-icons/fi";
 import { MdAccessTime, MdBolt, MdSpeed, MdOutlineFactCheck } from "react-icons/md";
 
 import { CHECK_INTERVALS, TIMEOUT_CONSTRAINTS } from "../../../constants";
-import { logger } from "../../../services";
+import logger from "../../../services/logger";
 import {
     ThemedText,
     ThemedButton,
@@ -18,11 +18,10 @@ import {
     ThemedProgress,
     ThemedSelect,
     ThemedInput,
-    useTheme,
-    useAvailabilityColors,
-} from "../../../theme";
+} from "../../../theme/components";
+import { useTheme, useAvailabilityColors } from "../../../theme/useTheme";
 import { Monitor } from "../../../types";
-import { getIntervalLabel } from "../../../utils";
+import { getIntervalLabel } from "../../../utils/time";
 
 /**
  * Props for the OverviewTab component.

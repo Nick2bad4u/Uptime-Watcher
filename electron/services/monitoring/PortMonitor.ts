@@ -31,7 +31,7 @@
 import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
 import { Site } from "../../types";
 import { IMonitorService, MonitorCheckResult, MonitorConfig } from "./types";
-import { performPortCheckWithRetry } from "./utils/index";
+import { performPortCheckWithRetry } from "./utils/portRetry";
 
 /**
  * Service for performing port monitoring checks.

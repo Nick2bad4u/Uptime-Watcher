@@ -1,5 +1,5 @@
 # Circular Dependency Resolution Report
-
+<!-- markdownlint-disable -->
 ## Summary
 
 I have successfully untangled the major circular dependencies in the Uptime Watcher codebase. The primary causes were:

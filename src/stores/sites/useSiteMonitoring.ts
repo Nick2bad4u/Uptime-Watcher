@@ -7,7 +7,8 @@
  */
 
 import { logStoreAction, withErrorHandling } from "../utils";
-import { MonitoringService, SiteService } from "./services";
+import { MonitoringService } from "./services/MonitoringService";
+import { SiteService } from "./services/SiteService";
 
 export interface SiteMonitoringActions {
     /** Check a site now */

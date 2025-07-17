@@ -15,11 +15,11 @@ import {
     ThemedBox,
     StatusIndicator,
     ThemedProgress,
-    useTheme,
-    useAvailabilityColors,
-} from "../../../theme";
+} from "../../../theme/components";
+import { useTheme, useAvailabilityColors } from "../../../theme/useTheme";
 import { Site, Monitor } from "../../../types";
-import { getSiteDisplayStatus, formatResponseTime, formatDuration } from "../../../utils";
+import { getSiteDisplayStatus } from "../../../utils/siteStatus";
+import { formatResponseTime, formatDuration } from "../../../utils/time";
 
 /**
  * Get status text for monitor

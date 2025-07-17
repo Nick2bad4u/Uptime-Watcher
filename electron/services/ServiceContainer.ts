@@ -13,11 +13,11 @@
  */
 
 import { UptimeOrchestrator } from "../UptimeOrchestrator";
-import { AutoUpdaterService } from "./updater/index";
-import { DatabaseService } from "./database/index";
-import { IpcService } from "./ipc/index";
-import { NotificationService } from "./notifications/index";
-import { WindowService } from "./window/index";
+import { AutoUpdaterService } from "./updater/AutoUpdaterService";
+import { DatabaseService } from "./database/DatabaseService";
+import { IpcService } from "./ipc/IpcService";
+import { NotificationService } from "./notifications/NotificationService";
+import { WindowService } from "./window/WindowService";
 import { logger } from "../utils/logger";
 
 /**

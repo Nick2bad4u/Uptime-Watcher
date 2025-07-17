@@ -5,7 +5,7 @@
 
 import React, { useCallback } from "react";
 
-import { ThemedSelect } from "../../../../theme";
+import { ThemedSelect } from "../../../../theme/components";
 import { Monitor } from "../../../../types";
 
 /**

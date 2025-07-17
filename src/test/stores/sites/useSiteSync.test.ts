@@ -44,8 +44,8 @@ vi.mock("../../../stores/sites/utils", () => ({
 }));
 
 // Import mocked services
-import { SiteService } from "../../../stores/sites/services";
-import { createStatusUpdateHandler } from "../../../stores/sites/utils";
+import { SiteService } from "../../../stores/sites/services/SiteService";
+import { createStatusUpdateHandler } from "../../../stores/sites/utils/statusUpdateHandler";
 import { logStoreAction } from "../../../stores/utils";
 
 describe("useSiteSync", () => {

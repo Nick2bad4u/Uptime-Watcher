@@ -2,7 +2,8 @@
  * Factory functions to create services with proper dependency injection.
  */
 
-import { UptimeEvents, TypedEventBus } from "../../events";
+import { UptimeEvents } from "../../events/eventTypes";
+import { TypedEventBus } from "../../events/TypedEventBus";
 import { SiteRepository } from "../../services/database/SiteRepository";
 import { MonitorRepository } from "../../services/database/MonitorRepository";
 import { HistoryRepository } from "../../services/database/HistoryRepository";

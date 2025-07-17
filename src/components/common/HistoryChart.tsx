@@ -5,7 +5,7 @@
 
 import React from "react";
 
-import { MiniChartBar, ThemedText } from "../../theme";
+import { MiniChartBar, ThemedText } from "../../theme/components";
 import { StatusHistory } from "../../types";
 
 /** Props for the HistoryChart component */

@@ -9,13 +9,13 @@
  * @packageDocumentation
  */
 
-import type { Logger } from "../../services/logger";
+import logger, { type Logger } from "../../services/logger";
 import type { Monitor, MonitorType } from "../../types";
 import type { AddSiteFormState, AddSiteFormActions } from "../SiteDetails/useAddSiteForm";
 
 import { DEFAULT_REQUEST_TIMEOUT, RETRY_CONSTRAINTS } from "../../constants";
-import { logger } from "../../services";
-import { validateMonitorData, getMonitorTypeConfig } from "../../utils";
+import { validateMonitorData } from "../../utils/monitorValidation";
+import { getMonitorTypeConfig } from "../../utils/monitorTypeHelper";
 
 /**
  * Store actions interface for form submission operations.

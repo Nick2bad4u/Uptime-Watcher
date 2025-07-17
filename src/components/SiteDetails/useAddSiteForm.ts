@@ -7,9 +7,9 @@
 import { useState, useEffect, useCallback } from "react";
 
 import { DEFAULT_CHECK_INTERVAL } from "../../constants";
-import { generateUuid } from "../../utils/index";
+import { generateUuid } from "../../utils/data/generateUuid";
 import type { MonitorType } from "../../types";
-import { useMonitorFields } from "../../hooks";
+import { useMonitorFields } from "../../hooks/useMonitorFields";
 
 /** Form operation mode */
 export type FormMode = "new" | "existing";

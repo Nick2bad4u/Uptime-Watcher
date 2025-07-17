@@ -7,9 +7,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Site, Monitor } from "../types";
 
-import { SiteService } from "../stores/sites/services";
+import { SiteService } from "../stores/sites/services/SiteService";
 import { useSitesStore } from "../stores/sites/useSitesStore";
-import { updateMonitorInSite } from "../stores/sites/utils";
+import { updateMonitorInSite } from "../stores/sites/utils/monitorOperations";
 import { ERROR_MESSAGES } from "../stores/types";
 
 // Mock dependencies

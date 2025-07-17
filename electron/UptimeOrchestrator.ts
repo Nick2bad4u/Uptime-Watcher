@@ -39,7 +39,8 @@
 import type { UptimeEvents } from "./events/eventTypes";
 
 import { DEFAULT_HISTORY_LIMIT } from "./constants";
-import { TypedEventBus, createLoggingMiddleware, createErrorHandlingMiddleware } from "./events";
+import { TypedEventBus } from "./events/TypedEventBus";
+import { createLoggingMiddleware, createErrorHandlingMiddleware } from "./events/middleware";
 import { DatabaseManager } from "./managers/DatabaseManager";
 import { MonitorManager } from "./managers/MonitorManager";
 import { SiteManager } from "./managers/SiteManager";

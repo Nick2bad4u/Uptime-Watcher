@@ -8,7 +8,10 @@ import { isDev } from "../electronUtils";
 import { Site } from "../types";
 import { SiteValidator } from "./validators/SiteValidator";
 import { MonitorValidator } from "./validators/MonitorValidator";
-import { ValidationResult } from "./validators/interfaces";
+import type { ValidationResult } from "./validators/interfaces";
+
+// Re-export ValidationResult for use in manager index
+export type { ValidationResult } from "./validators/interfaces";
 
 export interface HistoryRetentionConfig {
     defaultLimit: number;

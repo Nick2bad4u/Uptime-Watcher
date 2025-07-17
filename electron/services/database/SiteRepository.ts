@@ -6,7 +6,7 @@ import { withDatabaseOperation } from "../../utils/operationalHooks";
 import { DatabaseService } from "./DatabaseService";
 import { HistoryRepository } from "./HistoryRepository";
 import { MonitorRepository } from "./MonitorRepository";
-import { rowToSite, rowsToSites, type SiteRow } from "./utils";
+import { rowToSite, rowsToSites, type SiteRow } from "./utils/siteMapper";
 
 /**
  * Repository for managing site data persistence.

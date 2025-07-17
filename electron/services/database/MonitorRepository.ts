@@ -11,17 +11,21 @@ import { logger } from "../../utils/logger";
 import { withDatabaseOperation } from "../../utils/operationalHooks";
 import { DatabaseService } from "./DatabaseService";
 import {
+    generateSqlParameters,
+    mapMonitorToRow,
+} from "./utils/dynamicSchema";
+import {
+    buildMonitorParameters,
+    rowsToMonitors,
+    rowToMonitorOrUndefined,
+} from "./utils/monitorMapper";
+import {
     addBooleanField,
     addNumberField,
     addStringField,
-    buildMonitorParameters,
     convertDateForDb,
     DbValue,
-    generateSqlParameters,
-    mapMonitorToRow,
-    rowsToMonitors,
-    rowToMonitorOrUndefined,
-} from "./utils";
+} from "./utils/valueConverters";
 
 /**
  * Repository for managing monitor data persistence.

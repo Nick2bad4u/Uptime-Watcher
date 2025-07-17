@@ -8,9 +8,10 @@ import { useState, useEffect, useRef } from "react";
 import { FiFilter } from "react-icons/fi";
 import { MdHistory } from "react-icons/md";
 
-import { logger } from "../../../services";
-import { useSettingsStore } from "../../../stores";
-import { ThemedText, ThemedButton, StatusIndicator, ThemedCard, ThemedSelect, useTheme } from "../../../theme";
+import logger from "../../../services/logger";
+import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
+import { ThemedText, ThemedButton, StatusIndicator, ThemedCard, ThemedSelect } from "../../../theme/components";
+import { useTheme } from "../../../theme/useTheme";
 import { StatusHistory, Monitor } from "../../../types";
 import { DetailLabel } from "../../common/MonitorUiComponents";
 

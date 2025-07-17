@@ -42,20 +42,21 @@
  * @packageDocumentation
  */
 
-import { UptimeEvents, TypedEventBus } from "../events/index";
+import { UptimeEvents } from "../events/eventTypes";
+import { TypedEventBus } from "../events/TypedEventBus";
 import { SiteRepository } from "../services/database/SiteRepository";
 import { MonitorRepository } from "../services/database/MonitorRepository";
 import { HistoryRepository } from "../services/database/HistoryRepository";
 import { DatabaseService } from "../services/database/DatabaseService";
 import { Site } from "../types";
-import { SiteCacheInterface, SiteCache, MonitoringConfig } from "../utils/database";
+import { SiteCacheInterface, SiteCache, MonitoringConfig } from "../utils/database/interfaces";
+import { SiteWritingOrchestrator } from "../utils/database/SiteWriterService";
+import { SiteRepositoryService } from "../utils/database/SiteRepositoryService";
 import {
-    SiteWritingOrchestrator,
     createSiteWritingOrchestrator,
     createSiteRepositoryService,
-    SiteRepositoryService,
-    monitorLogger as logger,
-} from "../utils";
+} from "../utils/database/serviceFactory";
+import { monitorLogger as logger } from "../utils/logger";
 import { configurationManager } from "./ConfigurationManager";
 
 /**

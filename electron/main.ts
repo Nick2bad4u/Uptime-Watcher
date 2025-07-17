@@ -10,7 +10,8 @@
 import log from "electron-log/main";
 
 import { app } from "electron";
-import { ApplicationService, logger } from "./index";
+import { ApplicationService } from "./services/application/ApplicationService";
+import { logger } from "./utils/logger";
 
 import { installExtension, REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtools-installer";
 

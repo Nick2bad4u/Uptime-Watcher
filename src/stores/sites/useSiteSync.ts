@@ -9,8 +9,8 @@
 import type { Site, StatusUpdate } from "../../types";
 
 import { logStoreAction, withErrorHandling } from "../utils";
-import { SiteService } from "./services";
-import { StatusUpdateManager, createStatusUpdateHandler } from "./utils";
+import { SiteService } from "./services/SiteService";
+import { StatusUpdateManager, createStatusUpdateHandler } from "./utils/statusUpdateHandler";
 
 export interface SiteSyncActions {
     /** Sync sites from backend */

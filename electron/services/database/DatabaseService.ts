@@ -4,12 +4,12 @@ import { Database } from "node-sqlite3-wasm";
 import * as path from "node:path";
 
 import { logger } from "../../utils/logger";
+import { createDatabaseBackup } from "./utils/databaseBackup";
 import {
-    createDatabaseBackup,
     createDatabaseTables,
     createDatabaseIndexes,
     setupMonitorTypeValidation,
-} from "./utils/index";
+} from "./utils/databaseSchema";
 
 /**
  * Database service for SQLite connection and transaction management.

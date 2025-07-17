@@ -5,7 +5,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import { ApplicationService } from "../../../services/application/index";
+import { ApplicationService } from "../../../services/application/ApplicationService";
 
 describe("Application Services Index", () => {
     it("should export ApplicationService", () => {

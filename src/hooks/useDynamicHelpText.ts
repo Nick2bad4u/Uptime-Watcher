@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from "react";
 import type { MonitorType } from "../types";
-import { getMonitorHelpTexts } from "../utils";
+import { getMonitorHelpTexts } from "../utils/monitorUiHelpers";
 
 /**
  * Hook for dynamic help text loading.

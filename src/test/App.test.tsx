@@ -198,7 +198,7 @@ vi.mock("../stores", () => ({
 
 import App from "../App";
 // Import the mocked module so we can modify it in tests
-import * as themeModule from "../theme";
+import * as useThemeModule from "../theme/useTheme";
 
 describe.skip("App Component", () => {
     const user = userEvent.setup();
@@ -270,7 +270,7 @@ describe.skip("App Component", () => {
         });
 
         // Reset useTheme mock to default
-        vi.mocked(themeModule.useTheme).mockReturnValue({
+        vi.mocked(useThemeModule.useTheme).mockReturnValue({
             availableThemes: [],
             currentTheme: { colors: {}, isDark: false } as never,
             getColor: vi.fn(),
@@ -313,7 +313,7 @@ describe.skip("App Component", () => {
 
         it("applies dark CSS class when dark theme is enabled", () => {
             // Temporarily override the useTheme mock to return isDark: true
-            vi.mocked(themeModule.useTheme).mockReturnValueOnce({
+            vi.mocked(useThemeModule.useTheme).mockReturnValueOnce({
                 availableThemes: [],
                 currentTheme: { colors: {}, isDark: true } as never,
                 getColor: vi.fn(),

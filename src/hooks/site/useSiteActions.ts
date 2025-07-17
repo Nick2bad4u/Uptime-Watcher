@@ -1,7 +1,8 @@
 import { useCallback } from "react";
 
-import { logger } from "../../services";
-import { useSitesStore, useUIStore } from "../../stores";
+import logger from "../../services/logger";
+import { useSitesStore } from "../../stores/sites/useSitesStore";
+import { useUIStore } from "../../stores/ui/useUiStore";
 import { Monitor, Site } from "../../types";
 
 interface SiteActionsResult {

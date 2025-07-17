@@ -4,7 +4,7 @@ import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
 import { withDatabaseOperation } from "../../utils/operationalHooks";
 import { DatabaseService } from "./DatabaseService";
-import { rowToSettingValue, rowsToSettings, settingsToRecord } from "./utils";
+import { rowToSettingValue, rowsToSettings, settingsToRecord } from "./utils/settingsMapper";
 
 /**
  * Repository for managing application settings persistence.

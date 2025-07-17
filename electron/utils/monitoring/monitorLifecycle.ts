@@ -3,7 +3,8 @@
  * Consolidates monitor starting and stopping operations for better organization.
  */
 
-import { UptimeEvents, TypedEventBus } from "../../events/index";
+import { UptimeEvents } from "../../events/eventTypes";
+import { TypedEventBus } from "../../events/TypedEventBus";
 import { MonitorRepository } from "../../services/database/MonitorRepository";
 import { DatabaseService } from "../../services/database/DatabaseService";
 import { MonitorScheduler } from "../../services/monitoring/MonitorScheduler";

@@ -11,7 +11,7 @@ import { ResponseTimeChart, StatusChart, UptimeChart } from "../charts/ChartComp
 
 import { ConditionalResponseTime } from "../../common/MonitorUiComponents";
 import { DowntimePeriod } from "../../../hooks/site/useSiteAnalytics";
-import { logger } from "../../../services";
+import logger from "../../../services/logger";
 import { ResponseTimeChartData, StatusBarChartData, UptimeChartData } from "../../../services/chartConfig";
 import {
     ThemedText,
@@ -19,9 +19,8 @@ import {
     ThemedCard,
     ThemedBadge,
     ThemedProgress,
-    useTheme,
-    useAvailabilityColors,
-} from "../../../theme";
+} from "../../../theme/components";
+import { useTheme, useAvailabilityColors } from "../../../theme/useTheme";
 import { MonitorType } from "../../../types";
 
 /**

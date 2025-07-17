@@ -12,10 +12,12 @@
 import { useEffect, useState, useCallback } from "react";
 
 import { DEFAULT_CHECK_INTERVAL } from "../../constants";
-import { logger } from "../../services";
-import { useErrorStore, useSitesStore, useUIStore } from "../../stores";
+import logger from "../../services/logger";
+import { useErrorStore } from "../../stores/error/useErrorStore";
+import { useSitesStore } from "../../stores/sites/useSitesStore";
+import { useUIStore } from "../../stores/ui/useUiStore";
 import { Site } from "../../types";
-import { getTimeoutSeconds, timeoutSecondsToMs, clampTimeoutSeconds } from "../../utils";
+import { getTimeoutSeconds, timeoutSecondsToMs, clampTimeoutSeconds } from "../../utils/timeoutUtils";
 import { useSiteAnalytics } from "./useSiteAnalytics";
 
 /** Props for the useSiteDetails hook */

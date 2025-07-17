@@ -6,7 +6,7 @@
 
 import { useEffect } from "react";
 
-import { useSitesStore } from "../stores";
+import { useSitesStore } from "../stores/sites/useSitesStore";
 
 /**
  * useBackendFocusSync

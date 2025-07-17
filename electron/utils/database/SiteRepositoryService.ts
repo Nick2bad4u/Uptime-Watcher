@@ -45,12 +45,13 @@
  * @packageDocumentation
  */
 
-import { UptimeEvents, TypedEventBus } from "../../events/index";
+import { UptimeEvents } from "../../events/eventTypes";
+import { TypedEventBus } from "../../events/TypedEventBus";
 import { SiteRepository } from "../../services/database/SiteRepository";
 import { MonitorRepository } from "../../services/database/MonitorRepository";
 import { HistoryRepository } from "../../services/database/HistoryRepository";
 import { SettingsRepository } from "../../services/database/SettingsRepository";
-import { SiteRow } from "../../services/database/utils";
+import { SiteRow } from "../../services/database/utils/siteMapper";
 import { Site } from "../../types";
 import { Logger, SiteCacheInterface, SiteLoadingConfig, MonitoringConfig, SiteLoadingError } from "./interfaces";
 

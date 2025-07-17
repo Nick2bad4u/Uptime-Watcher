@@ -1,4 +1,4 @@
-import { useErrorStore } from "../../stores";
+import { useErrorStore } from "../../stores/error/useErrorStore";
 import { Site } from "../../types";
 import { useSiteActions } from "./useSiteActions";
 import { useSiteMonitor } from "./useSiteMonitor";

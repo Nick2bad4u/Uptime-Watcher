@@ -8,7 +8,7 @@
 
 import { useMemo } from "react";
 
-import type { Theme } from "../../theme";
+import type { Theme } from "../../theme/types";
 
 import { CHART_TIME_PERIODS } from "../../constants";
 import { Monitor, StatusHistory } from "../../types";

@@ -5,7 +5,7 @@
 
 import { useMemo, useCallback } from "react";
 
-import { useSitesStore } from "../../stores";
+import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { Monitor, Site, StatusHistory } from "../../types";
 
 /**

@@ -34,7 +34,8 @@
  * @packageDocumentation
  */
 
-import { UptimeEvents, TypedEventBus } from "../../events/index";
+import { UptimeEvents } from "../../events/eventTypes";
+import { TypedEventBus } from "../../events/TypedEventBus";
 import { HistoryRepository } from "../../services/database/HistoryRepository";
 import { MonitorRepository } from "../../services/database/MonitorRepository";
 import { SiteRepository } from "../../services/database/SiteRepository";

@@ -9,7 +9,7 @@ import { FiTrash2, FiSave } from "react-icons/fi";
 import { MdSettings, MdTimer, MdInfoOutline, MdDangerous } from "react-icons/md";
 
 import { CHECK_INTERVALS, RETRY_CONSTRAINTS, TIMEOUT_CONSTRAINTS } from "../../../constants";
-import { logger } from "../../../services";
+import logger from "../../../services/logger";
 import {
     ThemedText,
     ThemedButton,
@@ -18,10 +18,12 @@ import {
     ThemedInput,
     ThemedSelect,
     ThemedBox,
-    useTheme,
-} from "../../../theme";
+} from "../../../theme/components";
+import { useTheme } from "../../../theme/useTheme";
 import { Site, Monitor } from "../../../types";
-import { calculateMaxDuration, getIntervalLabel, getMonitorTypeConfig } from "../../../utils";
+import { calculateMaxDuration } from "../../../utils/duration";
+import { getIntervalLabel } from "../../../utils/time";
+import { getMonitorTypeConfig } from "../../../utils/monitorTypeHelper";
 
 /**
  * Helper function to format retry attempts text.

@@ -5,7 +5,7 @@
 
 import React from "react";
 
-import { ThemedText } from "../../../theme";
+import { ThemedText } from "../../../theme/components";
 
 /**
  * Footer section component for site cards with interactive hint text.

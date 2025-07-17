@@ -6,8 +6,8 @@
 
 import React, { useEffect, useState } from "react";
 import type { MonitorType } from "../../types";
-import { logger } from "../../services";
-import { formatMonitorDetail, supportsResponseTime as checkSupportsResponseTime } from "../../utils";
+import logger from "../../services/logger";
+import { formatMonitorDetail, supportsResponseTime as checkSupportsResponseTime } from "../../utils/monitorUiHelpers";
 
 /**
  * Component that dynamically formats monitor detail labels.

@@ -7,12 +7,23 @@ import { useEffect, useState } from "react";
 
 import type { StatusUpdate } from "./types";
 
-import { AddSiteForm, SiteList, Header, Settings, SiteDetails } from "./components";
+import { AddSiteForm } from "./components/AddSiteForm/AddSiteForm";
+import { SiteList } from "./components/Dashboard/SiteList";
+import { Header } from "./components/Header/Header";
+import { Settings } from "./components/Settings/Settings";
+import { SiteDetails } from "./components/SiteDetails/SiteDetails";
 import { UI_DELAYS } from "./constants";
-import { useBackendFocusSync, useSelectedSite } from "./hooks";
-import { logger } from "./services";
-import { ErrorBoundary, useErrorStore, useSettingsStore, useSitesStore, useUIStore, useUpdatesStore } from "./stores";
-import { ThemeProvider, ThemedBox, ThemedText, ThemedButton, useTheme } from "./theme";
+import { useBackendFocusSync } from "./hooks/useBackendFocusSync";
+import { useSelectedSite } from "./hooks/useSelectedSite";
+import logger from "./services/logger";
+import { ErrorBoundary } from "./stores/error/ErrorBoundary";
+import { useErrorStore } from "./stores/error/useErrorStore";
+import { useSettingsStore } from "./stores/settings/useSettingsStore";
+import { useSitesStore } from "./stores/sites/useSitesStore";
+import { useUIStore } from "./stores/ui/useUiStore";
+import { useUpdatesStore } from "./stores/updates/useUpdatesStore";
+import { ThemeProvider, ThemedBox, ThemedText, ThemedButton } from "./theme/components";
+import { useTheme } from "./theme/useTheme";
 
 /**
  * Main application component that serves as the root of the Uptime Watcher app.

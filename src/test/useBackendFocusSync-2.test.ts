@@ -7,7 +7,7 @@ import { renderHook } from "@testing-library/react";
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 
 import { useBackendFocusSync } from "../hooks/useBackendFocusSync";
-import { useSitesStore } from "../stores";
+import { useSitesStore } from "../stores/sites/useSitesStore";
 
 // Mock the sites store
 vi.mock("../stores", () => ({

@@ -32,7 +32,8 @@ import { useMemo } from "react";
 
 import type { Site } from "../types";
 
-import { useSitesStore, useUIStore } from "../stores";
+import { useSitesStore } from "../stores/sites/useSitesStore";
+import { useUIStore } from "../stores/ui/useUiStore";
 
 /**
  * Hook to get the currently selected site from coordinated store data.

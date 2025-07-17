@@ -7,13 +7,15 @@
 import React, { useState, useEffect, useCallback } from "react";
 
 import { UI_DELAYS, CHECK_INTERVALS } from "../../constants";
-import { logger } from "../../services";
-import { useErrorStore, useSitesStore } from "../../stores";
-import { ThemedBox, ThemedText, ThemedButton, useTheme } from "../../theme";
+import logger from "../../services/logger";
+import { useErrorStore } from "../../stores/error/useErrorStore";
+import { useSitesStore } from "../../stores/sites/useSitesStore";
+import { ThemedBox, ThemedText, ThemedButton } from "../../theme/components";
+import { useTheme } from "../../theme/useTheme";
 import type { MonitorType } from "../../types";
 import { generateUuid } from "../../utils/data/generateUuid";
 import { TextField, SelectField, RadioGroup } from "./FormFields";
-import { useDynamicHelpText } from "../../hooks";
+import { useDynamicHelpText } from "../../hooks/useDynamicHelpText";
 import { DynamicMonitorFields } from "./DynamicMonitorFields";
 import { handleSubmit } from "./Submit";
 import { useAddSiteForm } from "../SiteDetails/useAddSiteForm";

@@ -9,11 +9,13 @@ import {
     addHistoryEntry,
     deleteAllHistory,
     deleteHistoryByMonitorId,
+    pruneHistoryForMonitor,
+} from "./utils/historyManipulation";
+import {
     findHistoryByMonitorId,
     getHistoryCount,
     getLatestHistoryEntry,
-    pruneHistoryForMonitor,
-} from "./utils";
+} from "./utils/historyQuery";
 
 /**
  * Repository for managing history data persistence.

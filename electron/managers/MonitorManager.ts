@@ -5,7 +5,8 @@
 
 import { DEFAULT_CHECK_INTERVAL } from "../constants";
 import { isDev } from "../electronUtils";
-import { UptimeEvents, TypedEventBus } from "../events/index";
+import { UptimeEvents } from "../events/eventTypes";
+import { TypedEventBus } from "../events/TypedEventBus";
 
 /**
  * Combined events interface for MonitorManager.
@@ -18,18 +19,20 @@ import { SiteRepository } from "../services/database/SiteRepository";
 import { DatabaseService } from "../services/database/DatabaseService";
 import { MonitorScheduler } from "../services/monitoring/MonitorScheduler";
 import { Site, StatusUpdate } from "../types";
-import { SiteCacheInterface } from "../utils/database";
+import { SiteCacheInterface } from "../utils/database/interfaces";
+import { monitorLogger as logger } from "../utils/logger";
+import { withDatabaseOperation } from "../utils/operationalHooks";
 import {
-    monitorLogger as logger,
     startAllMonitoring,
     startMonitoringForSite,
     stopAllMonitoring,
     stopMonitoringForSite,
+} from "../utils/monitoring/monitorLifecycle";
+import {
     checkSiteManually,
     checkMonitor,
-    withDatabaseOperation,
     MonitorCheckConfig,
-} from "../utils";
+} from "../utils/monitoring/monitorStatusChecker";
 
 export interface MonitorManagerDependencies {
     eventEmitter: TypedEventBus<MonitorManagerEvents>;
