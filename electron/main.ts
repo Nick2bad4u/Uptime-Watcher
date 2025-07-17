@@ -12,6 +12,8 @@ import log from "electron-log/main";
 import { app } from "electron";
 import { ApplicationService, logger } from "./index";
 
+import { installExtension, REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtools-installer";
+
 // Configure electron-log for main process
 // Enable preload mode for reliable logging in Electron's main process, especially with context isolation enabled
 log.initialize({ preload: true });
@@ -81,3 +83,19 @@ class Main {
  * preventing premature garbage collection and maintaining lifecycle handlers.
  */
 new Main();
+
+void app.whenReady().then(async () => {
+    // Wait a bit for the main window to be created and ready
+    await new Promise((resolve) => setTimeout(resolve, 1));
+
+    try {
+        const extensions = await installExtension([REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS], {
+            loadExtensionOptions: { allowFileAccess: true },
+        });
+        logger.info(`[Main] Added Extensions: ${extensions.map((ext) => ext.name).join(", ")}`);
+        return extensions;
+    } catch (error) {
+        logger.warn("[Main] Failed to install dev extensions (this is normal in production)", error);
+        return [];
+    }
+});

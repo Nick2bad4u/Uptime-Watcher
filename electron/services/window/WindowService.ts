@@ -110,17 +110,55 @@ export class WindowService {
         if (!this.mainWindow) return;
 
         if (isDev()) {
-            logger.debug("[WindowService] Development mode: loading from localhost");
-            this.mainWindow.loadURL("http://localhost:5173").catch((error) => {
-                logger.error("[WindowService] Failed to load development URL", error);
-            });
-            this.mainWindow.webContents.openDevTools();
+            logger.debug("[WindowService] Development mode: waiting for Vite dev server");
+            // Wait for Vite server before loading content
+            void this.loadDevelopmentContent();
         } else {
             logger.debug("[WindowService] Production mode: loading from dist");
             this.mainWindow.loadFile(path.join(__dirname, "../dist/index.html")).catch((error) => {
                 logger.error("[WindowService] Failed to load production file", error);
             });
         }
+    }
+
+    /**
+     * Load development content after waiting for Vite server.
+     */
+    private async loadDevelopmentContent(): Promise<void> {
+        try {
+            await this.waitForViteServer();
+            if (this.mainWindow) {
+                await this.mainWindow.loadURL("http://localhost:5173");
+                // Delay opening DevTools to ensure renderer is ready
+                setTimeout(() => {
+                    this.mainWindow?.webContents.openDevTools();
+                }, 1000);
+            }
+        } catch (error) {
+            logger.error("[WindowService] Failed to load development content", error);
+        }
+    }
+
+    /**
+     * Wait for Vite dev server to be ready.
+     */
+    private async waitForViteServer(maxRetries = 30, retryDelay = 1000): Promise<void> {
+        for (let i = 0; i < maxRetries; i++) {
+            try {
+                const response = await fetch("http://localhost:5173");
+                if (response.ok) {
+                    logger.debug("[WindowService] Vite dev server is ready");
+                    return;
+                }
+            } catch {
+                // Server not ready yet
+            }
+
+            logger.debug(`[WindowService] Waiting for Vite dev server... (attempt ${i + 1}/${maxRetries})`);
+            await new Promise((resolve) => setTimeout(resolve, retryDelay));
+        }
+
+        throw new Error("Vite dev server did not become available within timeout");
     }
 
     /**
@@ -134,9 +172,20 @@ export class WindowService {
             this.mainWindow?.show();
         });
 
+        this.mainWindow.webContents.once("dom-ready", () => {
+            logger.debug("[WindowService] DOM ready in renderer");
+        });
+
+        this.mainWindow.webContents.once("did-finish-load", () => {
+            logger.debug("[WindowService] Renderer finished loading");
+        });
+
+        this.mainWindow.webContents.on("did-fail-load", (_event, errorCode, errorDescription) => {
+            logger.error(`[WindowService] Failed to load renderer: ${errorCode} - ${errorDescription}`);
+        });
+
         this.mainWindow.on("closed", () => {
             logger.info("[WindowService] Main window closed");
-
             this.mainWindow = null;
         });
     }
