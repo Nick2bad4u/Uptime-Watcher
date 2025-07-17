@@ -8,6 +8,16 @@ import { Site } from "../../types";
 import { getAllMonitorTypeConfigs, validateMonitorData, getMonitorTypeConfig } from "../monitoring/MonitorTypeRegistry";
 
 /**
+ * The result structure returned by the validate-monitor-data IPC handler.
+ */
+interface MonitorValidationResult {
+    success: boolean;
+    errors: string[];
+    warnings: string[];
+    metadata: Record<string, unknown>;
+}
+
+/**
  * Inter-Process Communication service for Electron main-renderer communication.
  *
  * @remarks
@@ -18,6 +28,7 @@ import { getAllMonitorTypeConfigs, validateMonitorData, getMonitorTypeConfig } f
 export class IpcService {
     private readonly uptimeOrchestrator: UptimeOrchestrator;
     private readonly autoUpdaterService: AutoUpdaterService;
+    private readonly registeredIpcHandlers = new Set<string>();
 
     /**
      * Create a new IPC service instance.
@@ -61,26 +72,31 @@ export class IpcService {
      * - `remove-monitor`: Delete specific monitor from site
      */
     private setupSiteHandlers(): void {
+        this.registeredIpcHandlers.add("add-site");
         ipcMain.handle("add-site", async (_, site: Site) => {
             if (isDev()) logger.debug("[IpcService] Handling add-site");
             return this.uptimeOrchestrator.addSite(site);
         });
 
+        this.registeredIpcHandlers.add("remove-site");
         ipcMain.handle("remove-site", async (_, identifier: string) => {
             if (isDev()) logger.debug("[IpcService] Handling remove-site", { identifier });
             return this.uptimeOrchestrator.removeSite(identifier);
         });
 
+        this.registeredIpcHandlers.add("get-sites");
         ipcMain.handle("get-sites", async () => {
             if (isDev()) logger.debug("[IpcService] Handling get-sites");
             return this.uptimeOrchestrator.getSites();
         });
 
+        this.registeredIpcHandlers.add("update-site");
         ipcMain.handle("update-site", async (_, identifier: string, updates: Partial<Site>) => {
             if (isDev()) logger.debug("[IpcService] Handling update-site", { identifier });
             return this.uptimeOrchestrator.updateSite(identifier, updates);
         });
 
+        this.registeredIpcHandlers.add("remove-monitor");
         ipcMain.handle("remove-monitor", async (_, siteIdentifier: string, monitorId: string) => {
             if (isDev()) logger.debug("[IpcService] Handling remove-monitor", { monitorId, siteIdentifier });
             return this.uptimeOrchestrator.removeMonitor(siteIdentifier, monitorId);
@@ -99,18 +115,21 @@ export class IpcService {
      * - `check-site-now`: Perform immediate manual check
      */
     private setupMonitoringHandlers(): void {
+        this.registeredIpcHandlers.add("start-monitoring");
         ipcMain.handle("start-monitoring", async () => {
             if (isDev()) logger.debug("[IpcService] Handling start-monitoring");
             await this.uptimeOrchestrator.startMonitoring();
             return true;
         });
 
+        this.registeredIpcHandlers.add("stop-monitoring");
         ipcMain.handle("stop-monitoring", async () => {
             if (isDev()) logger.debug("[IpcService] Handling stop-monitoring");
             await this.uptimeOrchestrator.stopMonitoring();
             return true;
         });
 
+        this.registeredIpcHandlers.add("start-monitoring-for-site");
         ipcMain.handle("start-monitoring-for-site", async (_, identifier: string, monitorId?: string) => {
             if (isDev())
                 logger.debug("[IpcService] Handling start-monitoring-for-site", {
@@ -120,6 +139,7 @@ export class IpcService {
             return this.uptimeOrchestrator.startMonitoringForSite(identifier, monitorId);
         });
 
+        this.registeredIpcHandlers.add("stop-monitoring-for-site");
         ipcMain.handle("stop-monitoring-for-site", async (_, identifier: string, monitorId?: string) => {
             if (isDev())
                 logger.debug("[IpcService] Handling stop-monitoring-for-site", {
@@ -129,6 +149,7 @@ export class IpcService {
             return this.uptimeOrchestrator.stopMonitoringForSite(identifier, monitorId);
         });
 
+        this.registeredIpcHandlers.add("check-site-now");
         ipcMain.handle("check-site-now", async (_, identifier: string, monitorId: string) => {
             if (isDev()) logger.debug("[IpcService] Handling check-site-now", { identifier, monitorId });
 
@@ -157,26 +178,31 @@ export class IpcService {
      * - `download-sqlite-backup`: Create and download database backup
      */
     private setupDataHandlers(): void {
+        this.registeredIpcHandlers.add("export-data");
         ipcMain.handle("export-data", async () => {
             if (isDev()) logger.debug("[IpcService] Handling export-data");
             return this.uptimeOrchestrator.exportData();
         });
 
+        this.registeredIpcHandlers.add("import-data");
         ipcMain.handle("import-data", async (_, data: string) => {
             if (isDev()) logger.debug("[IpcService] Handling import-data");
             return this.uptimeOrchestrator.importData(data);
         });
 
+        this.registeredIpcHandlers.add("update-history-limit");
         ipcMain.handle("update-history-limit", async (_, limit: number) => {
             if (isDev()) logger.debug("[IpcService] Handling update-history-limit", { limit });
             return this.uptimeOrchestrator.setHistoryLimit(limit);
         });
 
+        this.registeredIpcHandlers.add("get-history-limit");
         ipcMain.handle("get-history-limit", () => {
             if (isDev()) logger.debug("[IpcService] Handling get-history-limit");
             return this.uptimeOrchestrator.getHistoryLimit();
         });
 
+        this.registeredIpcHandlers.add("download-sqlite-backup");
         ipcMain.handle("download-sqlite-backup", async () => {
             if (isDev()) logger.debug("[IpcService] Handling download-sqlite-backup");
             try {
@@ -197,6 +223,7 @@ export class IpcService {
      * - `quit-and-install`: Quit application and install pending update
      */
     private setupSystemHandlers(): void {
+        this.registeredIpcHandlers.add("quit-and-install");
         ipcMain.on("quit-and-install", () => {
             logger.info("[IpcService] Handling quit-and-install");
             this.autoUpdaterService.quitAndInstall();
@@ -212,6 +239,7 @@ export class IpcService {
      * - `get-sync-status`: Get current synchronization status
      */
     private setupStateSyncHandlers(): void {
+        this.registeredIpcHandlers.add("request-full-sync");
         ipcMain.handle("request-full-sync", async () => {
             logger.debug("[IpcService] Handling request-full-sync");
             try {
@@ -243,6 +271,7 @@ export class IpcService {
             }
         });
 
+        this.registeredIpcHandlers.add("get-sync-status");
         ipcMain.handle("get-sync-status", async () => {
             logger.debug("[IpcService] Handling get-sync-status");
             try {
@@ -274,8 +303,19 @@ export class IpcService {
      * - `format-monitor-detail`: Format monitor detail strings using backend functions
      * - `format-monitor-title-suffix`: Format monitor title suffixes using backend functions
      * - `validate-monitor-data`: Validate monitor configuration data
+     *
+     * @returns For `validate-monitor-data`, returns a {@link MonitorValidationResult} object:
+     * ```typescript
+     * interface MonitorValidationResult {
+     *   success: boolean;
+     *   errors: string[];
+     *   warnings: string[];
+     *   metadata: Record<string, unknown>;
+     * }
+     * ```
      */
     private setupMonitorTypeHandlers(): void {
+        this.registeredIpcHandlers.add("get-monitor-types");
         ipcMain.handle("get-monitor-types", () => {
             if (isDev()) logger.debug("[IpcService] Handling get-monitor-types");
 
@@ -289,6 +329,7 @@ export class IpcService {
             }
         });
 
+        this.registeredIpcHandlers.add("format-monitor-detail");
         ipcMain.handle("format-monitor-detail", (_, type: string, details: string) => {
             if (isDev()) logger.debug("[IpcService] Handling format-monitor-detail", { type, details });
 
@@ -318,6 +359,7 @@ export class IpcService {
             }
         });
 
+        this.registeredIpcHandlers.add("format-monitor-title-suffix");
         ipcMain.handle("format-monitor-title-suffix", (_, type: string, monitor: Record<string, unknown>) => {
             if (isDev()) logger.debug("[IpcService] Handling format-monitor-title-suffix", { type, monitor });
 
@@ -345,7 +387,8 @@ export class IpcService {
             }
         });
 
-        ipcMain.handle("validate-monitor-data", (_, type: string, data: unknown) => {
+        this.registeredIpcHandlers.add("validate-monitor-data");
+        ipcMain.handle("validate-monitor-data", (_, type: string, data: unknown): MonitorValidationResult => {
             if (isDev()) logger.debug("[IpcService] Handling validate-monitor-data", { type, data });
 
             try {
@@ -364,8 +407,8 @@ export class IpcService {
                 return {
                     success: result.success,
                     errors: result.errors,
-                    warnings: [], // Basic validation doesn't have warnings
-                    metadata: {}, // Basic validation doesn't have metadata
+                    warnings: result.warnings,
+                    metadata: result.metadata,
                 };
             } catch (error) {
                 logger.error("[IpcService] Failed to validate monitor data", { type, data, error });
@@ -464,6 +507,12 @@ export class IpcService {
      */
     public cleanup(): void {
         logger.info("[IpcService] Cleaning up IPC handlers");
-        ipcMain.removeAllListeners();
+        for (const channel of this.registeredIpcHandlers) {
+            ipcMain.removeHandler(channel);
+        }
+        // Remove listeners for channels registered with ipcMain.on
+        // Currently, only "quit-and-install" is handled here.
+        // Note: If you add more ipcMain.on listeners, document and remove them below.
+        ipcMain.removeAllListeners("quit-and-install");
     }
 }

@@ -7,6 +7,8 @@
  * @packageDocumentation
  */
 
+// Import MonitorType from the registry and alias it to avoid naming conflicts and clarify its origin.
+// This helps maintain clarity when re-exporting or extending types in this file.
 import type { MonitorType as RegistryMonitorType } from "./services/monitoring/MonitorTypeRegistry";
 
 // Re-export for use throughout the application
@@ -35,6 +37,11 @@ export type StatusHistoryType = "up" | "down";
  * Represents a single monitoring endpoint that can check either HTTP/HTTPS URLs
  * or TCP port connectivity. Each monitor maintains its current status, performance
  * metrics, and historical data.
+ *
+ * **Field requirements by monitor type:**
+ * - For monitors with `type: "http"`: `url` is required; `host` and `port` must be `undefined`.
+ * - For monitors with `type: "port"`: `host` and `port` are required; `url` must be `undefined`.
+ * - For other monitor types, refer to their specific documentation.
  *
  * @example
  * ```typescript
@@ -195,9 +202,18 @@ export interface Monitor {
 /**
  * Site configuration containing multiple monitors.
  * Represents a logical grouping of monitors for a single service/website.
+ *
+ * @remarks
+ * The `identifier` field must be globally unique across all workspaces and sites.
+ * Typically, this is a UUID and is used as the primary key throughout the application.
  */
 export interface Site {
-    /** Unique identifier for the site (UUID, used as the key everywhere) */
+    /**
+     * Globally unique identifier for the site (UUID, used as the key everywhere).
+     *
+     * @remarks
+     * This identifier must be unique across all workspaces and sites.
+     */
     identifier: string;
     /**
      * Display name for the site.
@@ -250,8 +266,16 @@ export interface StatusHistory {
  * Status update event payload.
  *
  * Represents a status update for a site, including the site data and the previous status.
+ *
+ * @remarks
+ * The `previousStatus` property is present only for status change events (e.g., when a monitor's status transitions from one state to another).
+ * For other event types (such as initial load or manual refresh), `previousStatus` may be `undefined`.
  */
 export interface StatusUpdate {
     site: Site;
+    /**
+     * The previous status of the monitor before this update.
+     * Present only for status change events; otherwise, may be `undefined`.
+     */
     previousStatus?: MonitorStatus;
 }

@@ -451,7 +451,7 @@ const monitorTypesAPI = {
  *
  * @remarks
  * This creates the `window.electronAPI` object available in the renderer process.
- * All APIs are exposed as read-only properties, ensuring they cannot be mutated from the renderer process, which reinforces the security model.
+ * All APIs are exposed as immutable, read-only properties—attempts to modify or reassign them from the renderer process will have no effect—reinforcing the security model.
  * The API is organized by functional domains for better maintainability and
  * type safety. Each domain corresponds to a specific area of functionality.
  */

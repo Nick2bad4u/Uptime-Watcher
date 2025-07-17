@@ -23,7 +23,7 @@
  * @packageDocumentation
  */
 
-import { ChartOptions } from "chart.js";
+import { ChartData, ChartOptions } from "./chartSetup";
 
 import { Theme } from "../theme";
 
@@ -265,4 +265,49 @@ export function useChartConfigs(theme: Theme, totalChecks = 0) {
         doughnutOptions: chartService.getDoughnutChartConfig(totalChecks),
         lineChartOptions: chartService.getLineChartConfig(),
     };
+}
+
+/**
+ * Type definitions for chart data to avoid manual type casting
+ */
+
+/**
+ * Response time line chart data structure
+ */
+export interface ResponseTimeChartData extends ChartData<"line"> {
+    datasets: {
+        label: string;
+        data: (number | null)[];
+        borderColor: string;
+        backgroundColor: string;
+        fill: boolean;
+        tension: number;
+    }[];
+}
+
+/**
+ * Uptime status doughnut chart data structure
+ */
+export interface UptimeChartData extends ChartData<"doughnut"> {
+    labels: string[];
+    datasets: {
+        data: number[];
+        backgroundColor: string[];
+        borderColor: string[];
+        borderWidth: number;
+    }[];
+}
+
+/**
+ * Status distribution bar chart data structure
+ */
+export interface StatusBarChartData extends ChartData<"bar"> {
+    labels: string[];
+    datasets: {
+        label: string;
+        data: number[];
+        backgroundColor: string[];
+        borderColor: string[];
+        borderWidth: number;
+    }[];
 }

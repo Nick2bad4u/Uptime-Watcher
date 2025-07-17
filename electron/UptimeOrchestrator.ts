@@ -1,21 +1,20 @@
 /**
- * Core uptime monitoring orchestrator and application coordinator.
+ * Core uptime monitoring orchestrator that coordinates specialized managers.
  *
- * @remarks
- * The UptimeOrchestrator serves as the central coordination point for all monitoring
- * operations in the application. It uses a service-based architecture to coordinate
- * between specialized managers (DatabaseManager, MonitorManager, SiteManager) and
- * provides a unified API for uptime monitoring functionality.
+ * This class serves as a lightweight coordinator that delegates operations to:
+ * - SiteManager: Site CRUD operations and cache management
+ * - MonitorManager: Monitoring operations and scheduling
+ * - DatabaseManager: Database operations and data management
  *
- * Key responsibilities:
- * - Coordinate operations between specialized managers
- * - Provide unified API for frontend interactions
- * - Handle internal event communication between components
- * - Manage application lifecycle and initialization
- * - Ensure proper error handling and logging across all operations
+ * Uses TypedEventBus to provide real-time updates to the renderer process with type safety.
  *
- * The orchestrator extends TypedEventBus to provide type-safe event communication
- * between the frontend and backend, as well as internal component coordination.
+ * Events emitted:
+ * - monitor:status-changed: When monitor status changes
+ * - monitor:down: When a monitor goes down
+ * - monitor:up: When a monitor comes back up
+ * - system:error: When system operations fail
+ * - monitoring:started: When monitoring begins
+ * - monitoring:stopped: When monitoring stops
  *
  * @example
  * ```typescript
@@ -45,6 +44,20 @@ import { DatabaseManager, MonitorManager, SiteManager } from "./managers";
 import { DatabaseService, SiteRepository, MonitorRepository, HistoryRepository, SettingsRepository } from "./services";
 import { Site, StatusUpdate, Monitor } from "./types";
 import { logger } from "./utils";
+
+/**
+ * Interface defining the monitoring operations provided to the SiteManager.
+ */
+interface MonitoringOperations {
+    /** Set the history retention limit for monitor data */
+    setHistoryLimit: (limit: number) => Promise<void>;
+    /** Start monitoring for a specific site and monitor */
+    startMonitoringForSite: (identifier: string, monitorId: string) => Promise<boolean>;
+    /** Stop monitoring for a specific site and monitor */
+    stopMonitoringForSite: (identifier: string, monitorId: string) => Promise<boolean>;
+    /** Set up monitoring for newly added monitors */
+    setupNewMonitors: (site: Site, newMonitorIds: string[]) => Promise<void>;
+}
 
 /**
  * Combined event interface for the orchestrator.
@@ -175,53 +188,96 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
 
         this.setupMiddleware();
 
-        // Initialize repositories
+        // Initialize repositories and managers using helper methods
+        const repositories = this.initRepositories();
+        const managers = this.initManagers(repositories);
+
+        this.monitorManager = managers.monitorManager;
+        this.siteManager = managers.siteManager;
+        this.databaseManager = managers.databaseManager;
+
+        // Set up event-driven communication between managers
+        this.setupEventHandlers();
+    }
+
+    /**
+     * Initializes all repository instances.
+     *
+     * @returns Object containing all repository instances.
+     */
+    private initRepositories(): {
+        databaseService: DatabaseService;
+        siteRepository: SiteRepository;
+        monitorRepository: MonitorRepository;
+        historyRepository: HistoryRepository;
+        settingsRepository: SettingsRepository;
+    } {
         const databaseService = DatabaseService.getInstance();
         const siteRepository = new SiteRepository();
         const monitorRepository = new MonitorRepository();
         const historyRepository = new HistoryRepository();
         const settingsRepository = new SettingsRepository();
 
-        // Initialize managers with event-driven dependencies
-
-        // Create monitorManager first, but pass a placeholder for getSitesCache (will be set after siteManager is constructed)
-        let siteManagerInstance: SiteManager;
-
-        this.monitorManager = new MonitorManager({
+        return {
             databaseService,
+            siteRepository,
+            monitorRepository,
+            historyRepository,
+            settingsRepository,
+        };
+    }
+
+    /**
+     * Initializes all manager instances using the provided repositories.
+     *
+     * @param repositories - Object containing all repository instances.
+     * @returns Object containing all manager instances.
+     */
+    private initManagers(repositories: ReturnType<UptimeOrchestrator["initRepositories"]>): {
+        monitorManager: MonitorManager;
+        siteManager: SiteManager;
+        databaseManager: DatabaseManager;
+    } {
+        // Create site manager first so we can reference it in the monitor manager
+        const siteManagerInstance = new SiteManager({
+            databaseService: repositories.databaseService,
+            eventEmitter: this,
+            historyRepository: repositories.historyRepository,
+            monitoringOperations: this.createMonitoringOperations(),
+            monitorRepository: repositories.monitorRepository,
+            siteRepository: repositories.siteRepository,
+        });
+
+        const monitorManager = new MonitorManager({
+            databaseService: repositories.databaseService,
             eventEmitter: this,
             getHistoryLimit: () => this._historyLimit,
             getSitesCache: () => siteManagerInstance.getSitesCache(),
             repositories: {
-                history: historyRepository,
-                monitor: monitorRepository,
-                site: siteRepository,
+                history: repositories.historyRepository,
+                monitor: repositories.monitorRepository,
+                site: repositories.siteRepository,
             },
         });
 
-        // Now construct SiteManager with monitoringOperations using monitorManager
-        this.siteManager = siteManagerInstance = new SiteManager({
-            databaseService,
-            eventEmitter: this,
-            historyRepository,
-            monitoringOperations: this.createMonitoringOperations(),
-            monitorRepository,
-            siteRepository,
-        });
+        // We've already constructed SiteManager before MonitorManager
 
-        this.databaseManager = new DatabaseManager({
+        const databaseManager = new DatabaseManager({
             eventEmitter: this,
             repositories: {
-                database: databaseService,
-                history: historyRepository,
-                monitor: monitorRepository,
-                settings: settingsRepository,
-                site: siteRepository,
+                database: repositories.databaseService,
+                history: repositories.historyRepository,
+                monitor: repositories.monitorRepository,
+                settings: repositories.settingsRepository,
+                site: repositories.siteRepository,
             },
         });
 
-        // Set up event-driven communication between managers
-        this.setupEventHandlers();
+        return {
+            monitorManager,
+            siteManager: siteManagerInstance,
+            databaseManager,
+        };
     }
 
     /**
@@ -238,9 +294,9 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     /**
      * Creates the monitoringOperations object for SiteManager.
      *
-     * @returns The monitoringOperations object.
+     * @returns The monitoringOperations object implementing the MonitoringOperations interface.
      */
-    private createMonitoringOperations() {
+    private createMonitoringOperations(): MonitoringOperations {
         return {
             setHistoryLimit: async (limit: number) => {
                 await this.setHistoryLimit(limit);
@@ -794,7 +850,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * @returns The current history limit.
      */
     public get historyLimit(): number {
-        return this._historyLimit;
+        return this.databaseManager.getHistoryLimit();
     }
 
     /**

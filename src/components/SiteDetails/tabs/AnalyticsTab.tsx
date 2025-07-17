@@ -3,13 +3,16 @@
  * Displays advanced metrics, charts, and performance analysis for site monitoring.
  */
 
-import { Line, Bar, Doughnut } from "react-chartjs-2";
 import { FiActivity, FiTrendingUp, FiBarChart2 } from "react-icons/fi";
 import { MdAnalytics, MdTrendingUp, MdSpeed, MdPieChart } from "react-icons/md";
+
+import { ChartOptions } from "../../../services/chartSetup";
+import { ResponseTimeChart, StatusChart, UptimeChart } from "../charts/ChartComponents";
 
 import { ConditionalResponseTime } from "../../common/MonitorUiComponents";
 import { DowntimePeriod } from "../../../hooks/site/useSiteAnalytics";
 import { logger } from "../../../services";
+import { ResponseTimeChartData, StatusBarChartData, UptimeChartData } from "../../../services/chartConfig";
 import {
     ThemedText,
     ThemedButton,
@@ -29,11 +32,11 @@ interface AnalyticsTabProperties {
     /** Average response time across all checks */
     readonly avgResponseTime: number;
     /** Chart.js data configuration for bar chart */
-    readonly barChartData: Record<string, unknown>;
+    readonly barChartData: StatusBarChartData;
     /** Chart.js options configuration for bar chart */
-    readonly barChartOptions: Record<string, unknown>;
+    readonly barChartOptions: ChartOptions<"bar">;
     /** Chart.js options configuration for doughnut chart */
-    readonly doughnutOptions: Record<string, unknown>;
+    readonly doughnutOptions: ChartOptions<"doughnut">;
     /** Number of failed checks */
     readonly downCount: number;
     /** Array of downtime periods with durations */
@@ -45,9 +48,9 @@ interface AnalyticsTabProperties {
     /** Function to get description based on availability percentage */
     readonly getAvailabilityDescription: (percentage: number) => string;
     /** Chart.js data configuration for line chart */
-    readonly lineChartData: Record<string, unknown>;
+    readonly lineChartData: ResponseTimeChartData;
     /** Chart.js options configuration for line chart */
-    readonly lineChartOptions: Record<string, unknown>;
+    readonly lineChartOptions: ChartOptions<"line">;
     /** Type of monitor being analyzed */
     readonly monitorType: MonitorType;
     /** Mean time to recovery in milliseconds */
@@ -75,7 +78,7 @@ interface AnalyticsTabProperties {
     /** Uptime percentage as string */
     readonly uptime: string;
     /** Chart.js data configuration for uptime chart */
-    readonly uptimeChartData: Record<string, unknown>;
+    readonly uptimeChartData: UptimeChartData;
 }
 
 /**
@@ -358,16 +361,7 @@ export function AnalyticsTab({
                 <ConditionalResponseTime monitorType={monitorType}>
                     <ThemedCard icon={<FiTrendingUp color={iconColors.performance} />} title="Response Time Trends">
                         <div className="h-64">
-                            <Line
-                                data={
-                                    lineChartData as unknown as import("chart.js").ChartData<
-                                        "line",
-                                        (number | import("chart.js").Point | null)[],
-                                        unknown
-                                    >
-                                }
-                                options={lineChartOptions as unknown as import("chart.js").ChartOptions<"line">}
-                            />
+                            <ResponseTimeChart data={lineChartData} options={lineChartOptions} />
                         </div>
                     </ThemedCard>
                 </ConditionalResponseTime>
@@ -375,16 +369,7 @@ export function AnalyticsTab({
                 {/* Uptime Doughnut Chart */}
                 <ThemedCard icon={<MdPieChart color={iconColors.uptime} />} title="Uptime Distribution">
                     <div className="h-64">
-                        <Doughnut
-                            data={
-                                uptimeChartData as unknown as import("chart.js").ChartData<
-                                    "doughnut",
-                                    number[],
-                                    unknown
-                                >
-                            }
-                            options={doughnutOptions as unknown as import("chart.js").ChartOptions<"doughnut">}
-                        />
+                        <UptimeChart data={uptimeChartData} options={doughnutOptions} />
                     </div>
                 </ThemedCard>
 
@@ -395,16 +380,7 @@ export function AnalyticsTab({
                     className="lg:col-span-2"
                 >
                     <div className="h-64">
-                        <Bar
-                            data={
-                                barChartData as unknown as import("chart.js").ChartData<
-                                    "bar",
-                                    (number | [number, number] | null)[],
-                                    unknown
-                                >
-                            }
-                            options={barChartOptions as unknown as import("chart.js").ChartOptions<"bar">}
-                        />
+                        <StatusChart data={barChartData} options={barChartOptions} />
                     </div>
                 </ThemedCard>
             </div>

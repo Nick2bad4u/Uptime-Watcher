@@ -219,3 +219,4 @@ dist-electron/
 .agentic-tools*
 _ZENTASKS
 repomix-output.xml
+coverage-results.json

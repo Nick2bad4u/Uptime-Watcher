@@ -223,6 +223,8 @@ export function validateMonitorData(
 ): {
     success: boolean;
     errors: string[];
+    warnings: string[];
+    metadata: Record<string, unknown>;
     data?: unknown;
 } {
     const config = getMonitorTypeConfig(type);
@@ -230,6 +232,8 @@ export function validateMonitorData(
         return {
             success: false,
             errors: [`Unknown monitor type: ${type}`],
+            warnings: [],
+            metadata: { monitorType: type },
         };
     }
 
@@ -238,18 +242,43 @@ export function validateMonitorData(
         return {
             success: true,
             errors: [],
+            warnings: [],
+            metadata: {
+                monitorType: type,
+                validatedDataSize: JSON.stringify(validData).length,
+            },
             data: validData,
         };
     } catch (error) {
         if (error instanceof z.ZodError) {
+            // Extract warnings from non-critical Zod issues
+            const errors: string[] = [];
+            const warnings: string[] = [];
+
+            for (const issue of error.issues) {
+                // Consider optional fields with format issues as warnings rather than errors
+                if (issue.code === "invalid_type" && issue.message.includes("optional")) {
+                    warnings.push(`${issue.path.join(".")}: ${issue.message}`);
+                } else {
+                    errors.push(`${issue.path.join(".")}: ${issue.message}`);
+                }
+            }
+
             return {
-                success: false,
-                errors: error.issues.map((err) => `${err.path.join(".")}: ${err.message}`),
+                success: errors.length === 0,
+                errors,
+                warnings,
+                metadata: {
+                    monitorType: type,
+                    issueCount: error.issues.length,
+                },
             };
         }
         return {
             success: false,
             errors: ["Validation failed with unknown error"],
+            warnings: [],
+            metadata: { errorType: "unknown" },
         };
     }
 }

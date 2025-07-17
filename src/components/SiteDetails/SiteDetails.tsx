@@ -33,27 +33,12 @@
  * @public
  */
 
-import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    BarElement,
-    Title,
-    Tooltip,
-    Legend,
-    TimeScale,
-    Filler,
-    DoughnutController,
-    ArcElement,
-} from "chart.js";
-import zoomPlugin from "chartjs-plugin-zoom";
 import { useMemo, useState } from "react";
-import "chartjs-adapter-date-fns";
 
 import { useSiteDetails } from "../../hooks/site/useSiteDetails";
 import { ChartConfigService } from "../../services/chartConfig";
+// Import from centralized chart setup
+import "../../services/chartSetup";
 import { ThemedBox, useTheme } from "../../theme";
 import { Site } from "../../types";
 import { formatStatusWithIcon } from "../../utils/status";
@@ -62,23 +47,6 @@ import "./SiteDetails.css";
 import { SiteDetailsHeader } from "./SiteDetailsHeader";
 import { SiteDetailsNavigation } from "./SiteDetailsNavigation";
 import { AnalyticsTab, HistoryTab, OverviewTab, SettingsTab, SiteOverviewTab } from "./tabs";
-
-// Register Chart.js components
-ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    BarElement,
-    Title,
-    Tooltip,
-    Legend,
-    TimeScale,
-    Filler,
-    DoughnutController,
-    ArcElement,
-    zoomPlugin
-);
 
 /** Props for the SiteDetails component */
 interface SiteDetailsProperties {
@@ -207,7 +175,10 @@ export function SiteDetails({ onClose, site }: SiteDetailsProperties) {
         () => ({
             datasets: [
                 {
+                    label: "Status Distribution",
                     backgroundColor: [currentTheme.colors.success, currentTheme.colors.error],
+                    borderColor: [currentTheme.colors.success, currentTheme.colors.error],
+                    borderWidth: 1,
                     data: [analytics.upCount, analytics.downCount],
                 },
             ],
@@ -221,6 +192,8 @@ export function SiteDetails({ onClose, site }: SiteDetailsProperties) {
             datasets: [
                 {
                     backgroundColor: [currentTheme.colors.success, currentTheme.colors.error],
+                    borderColor: [currentTheme.colors.success, currentTheme.colors.error],
+                    borderWidth: 1,
                     data: [analytics.upCount, analytics.downCount],
                 },
             ],
