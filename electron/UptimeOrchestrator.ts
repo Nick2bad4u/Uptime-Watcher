@@ -143,32 +143,6 @@ interface SiteEventData {
     updatedFields?: string[];
 }
 
-/**
- * Core uptime monitoring orchestrator that coordinates specialized managers.
- *
- * This class serves as a lightweight coordinator that delegates operations to:
- * - SiteManager: Site CRUD operations and cache management
- * - MonitorManager: Monitoring operations and scheduling
- * - DatabaseManager: Database operations and data management
- *
- * Uses TypedEventBus to provide real-time updates to the renderer process with type safety.
- *
- * Events emitted:
- * - monitor:status-changed: When monitor status changes
- * - monitor:down: When a monitor goes down
- * - monitor:up: When a monitor comes back up
- * - system:error: When system operations fail
- * - monitoring:started: When monitoring begins
- * - monitoring:stopped: When monitoring stops
- *
- * @example
- * ```typescript
- * const orchestrator = new UptimeOrchestrator();
- * orchestrator.onTyped('monitor:status-changed', (data) => console.log(data));
- * await orchestrator.addSite({ identifier: 'example', monitors: [...] });
- * orchestrator.startMonitoring();
- * ```
- */
 export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     private _historyLimit: number = DEFAULT_HISTORY_LIMIT;
 
