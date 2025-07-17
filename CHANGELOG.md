@@ -7,14 +7,112 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[e4b7976](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e4b79766c44cf48c9c26b0c51f14e8e04f94ad0e)...
-[e4b7976](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e4b79766c44cf48c9c26b0c51f14e8e04f94ad0e)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/e4b79766c44cf48c9c26b0c51f14e8e04f94ad0e...e4b79766c44cf48c9c26b0c51f14e8e04f94ad0e))
+[[6cc2475](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6cc247568337686edc8a29a036e15716c33fb89e)...
+[6cc2475](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6cc247568337686edc8a29a036e15716c33fb89e)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6cc247568337686edc8a29a036e15716c33fb89e...6cc247568337686edc8a29a036e15716c33fb89e))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 7.7.0 [`(6cc2475)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6cc247568337686edc8a29a036e15716c33fb89e)
+
+
+
+
+
+
+## [7.7.0] - 2025-07-17
+
+
+[[b0f0af8](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b0f0af8d175b052759db39a47060929160e3d408)...
+[0324cf2](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0324cf2b6de5b2e4ebd59388cc288a2de2cde880)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/b0f0af8d175b052759db39a47060929160e3d408...0324cf2b6de5b2e4ebd59388cc288a2de2cde880))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 7.6.0 [`(e4b7976)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e4b79766c44cf48c9c26b0c51f14e8e04f94ad0e)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(7f729cf)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7f729cf403f12fbd5d4dc5e19583f56d9e79ccb7)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Centralize Chart.js setup and improve chart typings
+
+- Moves Chart.js component registration and configuration into a single setup module to prevent duplication and inconsistencies across the app
+- Refactors chart-related components to use strongly typed, memoized wrappers for improved type safety and rendering performance
+- Updates chart data structures and options for strict typing, eliminating type assertions and clarifying intent
+- Cleans up imports and code organization in chart-related UI, adopting the new centralized system
+- Enhances maintainability by consolidating chart logic and reducing repeated setup code [`(227178b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/227178bae223f88f67bba6e48635bc6057634b35)
+
+
+- 🚜 [refactor] Standardize repository data mapping and error handling
+
+- Replaces ad-hoc and conditional data transformations in all repository layers with dedicated, reusable mapper utilities for sites, monitors, history, and settings.
+- Unifies type handling by introducing strict row types and validation functions, increasing type safety and maintainability across database operations.
+- Refactors repository methods to consistently return promises and leverage shared transformation logic, reducing code duplication and improving testability.
+- Implements centralized, layered error handling utilities for backend, frontend, and utility operations, supporting standardized logging, event emission, and retries.
+- Updates related services and frontend utilities to use new error handling wrappers, simplifying error management and ensuring consistent user-facing behavior.
+- Documents the repository pattern standardization, outlining before/after patterns, benefits, and next steps for further improvements.
+- Updates all affected tests to match new async interfaces and improved result consistency.
+
+Addresses code consistency, reduces duplication, and lays groundwork for further pattern standardization across the codebase. [`(bd999aa)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bd999aaffec74850d8818c4583788cfd96eb2e11)
+
+
+
+### � Documentation
+
+- 📝 [docs] Remove orchestrator class JSDoc block
+
+- Cleans up the file by deleting the class-level documentation comment
+- May reduce duplication or prepare for alternative documentation approaches [`(ddf78bf)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ddf78bf5643afb3e7c5bd6a84b8773f71e7ed2e0)
+
+
+- 📝 [docs] Add consistency audit plan and improve repo docs
+
+- Documents a comprehensive codebase consistency audit, outlining current inconsistencies, areas of strength, and a phased improvement roadmap for error handling, repository patterns, and IPC handlers.
+- Updates repository pattern documentation for clarity and highlights benefits of recent standardizations.
+- Adds new terms to custom dictionary for better tooling support.
+- Cleans up formatting in config and markdown files for improved readability and consistency.
+- Ignores coverage result files in code style and tooling configs to reduce noise.
+
+These changes aim to guide ongoing architectural alignment and improve maintainability across the codebase. [`(dae5886)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/dae588644f14d3939a59c57805804a92d85d7764)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Reformat codeblocks, update ignore and linter configs
+
+- Reformats code examples in documentation for improved readability and consistency, primarily converting indentation to spaces in large markdown code blocks.
+- Expands ignore rules to exclude more file types and folders for stylelint, reducing noise and improving linting accuracy.
+- Enhances Stylelint configuration by adding Tailwind CSS support and separating rule definitions, enabling better compatibility with Tailwind CSS conventions.
+- Applies small whitespace and formatting fixes across scripts and test files for cleaner diffs.
+- Improves clarity and markdown compliance in docs through minor adjustments. [`(b0f0af8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b0f0af8d175b052759db39a47060929160e3d408)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v7.6.0 [skip ci] [`(85fbdac)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/85fbdacffdbd33ca0535be9b5a3581d442a0727a)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Enhance linting, metrics, and testing toolchain
+
+- Adds new development dependencies for cognitive complexity analysis, duplication detection, and code metrics.
+- Expands and refines npm scripts for code quality, including new tasks for cognitive complexity, code duplication, metrics, secret scanning, and orphan/circular dependency detection.
+- Updates duplication detection configuration for more output formats and stricter thresholds, while broadening ignore patterns for tests.
+- Extends .gitignore to exclude generated reports.
+- Improves maintainability and code quality enforcement by integrating more automation and reporting into the development workflow. [`(0324cf2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0324cf2b6de5b2e4ebd59388cc288a2de2cde880)
 
 
 
