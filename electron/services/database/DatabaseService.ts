@@ -5,11 +5,7 @@ import * as path from "node:path";
 
 import { logger } from "../../utils/logger";
 import { createDatabaseBackup } from "./utils/databaseBackup";
-import {
-    createDatabaseTables,
-    createDatabaseIndexes,
-    setupMonitorTypeValidation,
-} from "./utils/databaseSchema";
+import { createDatabaseTables, createDatabaseIndexes, setupMonitorTypeValidation } from "./utils/databaseSchema";
 
 /**
  * Database service for SQLite connection and transaction management.

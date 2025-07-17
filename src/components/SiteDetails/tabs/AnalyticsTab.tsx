@@ -13,13 +13,7 @@ import { ConditionalResponseTime } from "../../common/MonitorUiComponents";
 import { DowntimePeriod } from "../../../hooks/site/useSiteAnalytics";
 import logger from "../../../services/logger";
 import { ResponseTimeChartData, StatusBarChartData, UptimeChartData } from "../../../services/chartConfig";
-import {
-    ThemedText,
-    ThemedButton,
-    ThemedCard,
-    ThemedBadge,
-    ThemedProgress,
-} from "../../../theme/components";
+import { ThemedText, ThemedButton, ThemedCard, ThemedBadge, ThemedProgress } from "../../../theme/components";
 import { useTheme, useAvailabilityColors } from "../../../theme/useTheme";
 import { MonitorType } from "../../../types";
 

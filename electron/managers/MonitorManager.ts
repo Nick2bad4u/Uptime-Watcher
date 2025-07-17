@@ -28,11 +28,7 @@ import {
     stopAllMonitoring,
     stopMonitoringForSite,
 } from "../utils/monitoring/monitorLifecycle";
-import {
-    checkSiteManually,
-    checkMonitor,
-    MonitorCheckConfig,
-} from "../utils/monitoring/monitorStatusChecker";
+import { checkSiteManually, checkMonitor, MonitorCheckConfig } from "../utils/monitoring/monitorStatusChecker";
 
 export interface MonitorManagerDependencies {
     eventEmitter: TypedEventBus<MonitorManagerEvents>;

@@ -52,10 +52,7 @@ import { Site } from "../types";
 import { SiteCacheInterface, SiteCache, MonitoringConfig } from "../utils/database/interfaces";
 import { SiteWritingOrchestrator } from "../utils/database/SiteWriterService";
 import { SiteRepositoryService } from "../utils/database/SiteRepositoryService";
-import {
-    createSiteWritingOrchestrator,
-    createSiteRepositoryService,
-} from "../utils/database/serviceFactory";
+import { createSiteWritingOrchestrator, createSiteRepositoryService } from "../utils/database/serviceFactory";
 import { monitorLogger as logger } from "../utils/logger";
 import { configurationManager } from "./ConfigurationManager";
 
