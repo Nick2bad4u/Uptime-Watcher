@@ -220,3 +220,4 @@ dist-electron/
 _ZENTASKS
 repomix-output.xml
 coverage-results.json
+report/

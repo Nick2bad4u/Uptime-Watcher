@@ -1,6 +1,6 @@
 {
-    "threshold": 10,
-    "reporters": ["html", "markdown"],
+    "threshold": 3,
+    "reporters": ["html", "markdown", "json", "console", "sarif", "xml"],
     "ignore": [
         "**/node_modules/**",
         "**/.git/**",
@@ -9,6 +9,10 @@
         "**/dist/**",
         "**/build/**",
         "**/coverage/**",
-        "**/docs/**"
+        "**/docs/**",
+        "**/test/**",
+        "**/tests/**",
+        "src/test/**",
+        "**/electron/test/**"
     ]
 }
