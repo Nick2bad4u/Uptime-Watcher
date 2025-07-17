@@ -7,14 +7,94 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[75ba5b3](https://github.com/Nick2bad4u/Uptime-Watcher/commit/75ba5b30133c1f073d70105d5fad21cd4857471a)...
+[75ba5b3](https://github.com/Nick2bad4u/Uptime-Watcher/commit/75ba5b30133c1f073d70105d5fad21cd4857471a)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/75ba5b30133c1f073d70105d5fad21cd4857471a...75ba5b30133c1f073d70105d5fad21cd4857471a))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 7.8.0 [`(75ba5b3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/75ba5b30133c1f073d70105d5fad21cd4857471a)
+
+
+
+
+
+
+## [7.8.0] - 2025-07-17
+
+
 [[6cc2475](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6cc247568337686edc8a29a036e15716c33fb89e)...
-[6cc2475](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6cc247568337686edc8a29a036e15716c33fb89e)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6cc247568337686edc8a29a036e15716c33fb89e...6cc247568337686edc8a29a036e15716c33fb89e))
+[775e23f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/775e23f8671a2d2e163ee75e36a67531f2b0fbaa)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6cc247568337686edc8a29a036e15716c33fb89e...775e23f8671a2d2e163ee75e36a67531f2b0fbaa))
+
+
+### ✨ Features
+
+- ✨ [feat] Add devtools installer and robust Vite dev server wait
+
+- Installs React and Redux DevTools extensions automatically in development mode, enhancing debugging capabilities for developers.
+- Implements a retry mechanism to wait for the Vite dev server to be ready before loading the app, improving reliability and reducing errors during startup.
+- Adds detailed logging for window lifecycle and content loading events, aiding diagnosis and development workflow. [`(7d2b034)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7d2b0348cfabe325825ab8e117db02a9f5400cbe)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 7.7.0 [`(6cc2475)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6cc247568337686edc8a29a036e15716c33fb89e)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(0fa9b90)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0fa9b90577405ae1a4771e48de1fada9c9732ea6)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Split event imports for error handling modules
+
+- Updates imports in error handling utilities to reference event bus and event types from their specific modules rather than a combined source.
+- Improves module clarity and reduces coupling, supporting better maintainability and future scalability. [`(775e23f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/775e23f8671a2d2e163ee75e36a67531f2b0fbaa)
+
+
+- 🚜 [refactor] Remove barrel files and switch to direct imports
+
+- Resolves all circular dependencies by eliminating barrel (index) files and updating to explicit file-based imports across the codebase
+- Improves maintainability, IDE performance, and build efficiency by clarifying dependency chains and aligning with modern TypeScript best practices
+- Updates component, store, hook, and utility imports throughout frontend and backend, removing >70 index files and cleaning up related tests
+- Documents completion of the circular dependency resolution plan and updates architecture notes for future maintainability
+- Ensures zero circular dependencies remain and prepares the project for easier future refactoring [`(6a284dd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6a284ddad91fe255a4b0e1e9fb1970f44fe24603)
+
+
+- 🚜 [refactor] Untangles circular dependencies and cleans imports
+
+- Refactors import structure across backend and frontend to eliminate 19 circular dependencies, improving maintainability and compilation reliability
+- Moves core monitor type definitions to break cross-module cycles and introduces a shared validation interface for configuration logic
+- Replaces barrel imports with direct file imports, especially for logger and services, to prevent cyclic chains
+- Extracts and centralizes shared types and utility functions into dedicated shared modules, breaking store/theme cycles in the frontend
+- Updates type assertions and type guard usage for improved type safety and clarity
+- Provides detailed documentation and tracking for circular dependency resolution and code duplication, setting clear future refactoring actions
+- No functional or API changes; all updates are internal and preserve existing behavior
+
+Relates to circular dependency cleanup and maintainability goals. [`(72c3d9b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/72c3d9bd002a5575c384a59257c34f14f65febde)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Reformat imports and docs for clarity
+
+- Collapses multi-line import statements into single lines for improved readability and maintainability.
+- Updates Markdown documentation to add spacing and correct minor formatting inconsistencies.
+- Enhances overall code and documentation clarity without altering logic or functionality. [`(d8a910a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d8a910a27b2d4ce8aa3c6bad6a43fdff8a29f29b)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v7.7.0 [skip ci] [`(cda8e50)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cda8e502b277ccc551affa470bbeaf5430885c7b)
 
 
 
