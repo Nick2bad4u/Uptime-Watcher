@@ -10,7 +10,11 @@ import { UptimeEvents, TypedEventBus } from "../events/index";
  * Combined events interface for DatabaseManager.
  */
 type DatabaseManagerEvents = UptimeEvents;
-import { DatabaseService, SiteRepository, MonitorRepository, HistoryRepository, SettingsRepository } from "../services";
+import { DatabaseService } from "../services/database/DatabaseService";
+import { SiteRepository } from "../services/database/SiteRepository";
+import { MonitorRepository } from "../services/database/MonitorRepository";
+import { HistoryRepository } from "../services/database/HistoryRepository";
+import { SettingsRepository } from "../services/database/SettingsRepository";
 import { Site } from "../types";
 import {
     initDatabase,

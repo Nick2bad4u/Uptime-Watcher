@@ -4,7 +4,9 @@
  */
 
 import { UptimeEvents, TypedEventBus } from "../../events/index";
-import { MonitorRepository, DatabaseService, MonitorScheduler } from "../../services/index";
+import { MonitorRepository } from "../../services/database/MonitorRepository";
+import { DatabaseService } from "../../services/database/DatabaseService";
+import { MonitorScheduler } from "../../services/monitoring/MonitorScheduler";
 import { Site } from "../../types";
 import { SiteCacheInterface } from "../database/interfaces";
 import { withDatabaseOperation } from "../operationalHooks";

@@ -222,7 +222,7 @@ export async function getTypesWithFeature(feature: "responseTime" | "advancedAna
                         : config.uiConfig?.supportsAdvancedAnalytics;
 
                 if (supports) {
-                    supportedTypes.push(config.type);
+                    supportedTypes.push(config.type as MonitorType);
                 }
             }
 

@@ -6,13 +6,11 @@
 import { Database } from "node-sqlite3-wasm";
 
 import { UptimeEvents, TypedEventBus } from "../../events/index";
-import {
-    DatabaseService,
-    HistoryRepository,
-    MonitorRepository,
-    SettingsRepository,
-    SiteRepository,
-} from "../../services/index";
+import { DatabaseService } from "../../services/database/DatabaseService";
+import { HistoryRepository } from "../../services/database/HistoryRepository";
+import { MonitorRepository } from "../../services/database/MonitorRepository";
+import { SettingsRepository } from "../../services/database/SettingsRepository";
+import { SiteRepository } from "../../services/database/SiteRepository";
 import { Site, StatusHistory } from "../../types";
 import { withDatabaseOperation } from "../operationalHooks";
 import { Logger, SiteCacheInterface, SiteLoadingError } from "./interfaces";

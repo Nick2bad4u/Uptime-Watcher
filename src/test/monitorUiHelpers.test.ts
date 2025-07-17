@@ -3,6 +3,7 @@
  */
 
 import { describe, expect, it, vi } from "vitest";
+import type { MonitorType } from "../types";
 import {
     formatMonitorDetail,
     supportsAdvancedAnalytics,
@@ -58,7 +59,7 @@ describe("Monitor UI Helpers - Enhanced Coverage", () => {
             // Setup mock to return undefined
             getMonitorTypeConfig.mockResolvedValueOnce(undefined);
 
-            const result = await formatMonitorDetail("unknown", "test");
+            const result = await formatMonitorDetail("unknown" as MonitorType, "test");
             expect(result).toBe("test");
         });
     });

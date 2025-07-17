@@ -3,7 +3,7 @@
  * Provides consistent data transformation between database rows and Settings objects.
  */
 
-import { logger } from "../../../utils";
+import { logger } from "../../../utils/logger";
 
 /**
  * Setting row type for database operations.

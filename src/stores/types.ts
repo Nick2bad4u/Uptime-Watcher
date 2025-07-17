@@ -8,8 +8,6 @@
  * @packageDocumentation
  */
 
-import { ThemeName } from "../theme";
-
 /**
  * Application update status enumeration.
  *
@@ -40,23 +38,8 @@ export const ERROR_MESSAGES = {
     SITE_NOT_FOUND: "Site not found",
 } as const;
 
-/**
- * Application settings interface for user preferences and configuration.
- */
-export interface AppSettings {
-    /** Enable desktop notifications for status changes */
-    notifications: boolean;
-    /** Auto-start monitoring when the application launches */
-    autoStart: boolean;
-    /** Minimize to system tray instead of closing the application */
-    minimizeToTray: boolean;
-    /** Current theme name (light, dark, etc.) */
-    theme: ThemeName;
-    /** Enable sound alerts for status changes */
-    soundAlerts: boolean;
-    /** Maximum number of history records to keep per monitor */
-    historyLimit: number;
-}
+// Re-export from shared types to maintain compatibility
+export type { AppSettings } from "./shared/types";
 
 /**
  * Base store interface providing common error handling and loading state functionality.

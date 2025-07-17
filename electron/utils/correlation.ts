@@ -1,6 +1,9 @@
 /**
  * Correlation ID utilities for tracking operations across the application.
  * Provides unique identifiers for request/operation tracking and debugging.
+ *
+ * @remarks
+ * This module uses Node.js built-in modules and is intended for Electron main process (backend) use only.
  */
 
 import { randomBytes } from "node:crypto";

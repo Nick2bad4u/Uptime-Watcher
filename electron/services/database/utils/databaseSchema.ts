@@ -1,6 +1,6 @@
 import { Database } from "node-sqlite3-wasm";
 
-import { logger } from "../../../utils/index";
+import { logger } from "../../../utils/logger";
 import { generateMonitorTableSchema } from "./dynamicSchema";
 
 /**

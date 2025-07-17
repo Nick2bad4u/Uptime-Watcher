@@ -25,7 +25,8 @@
 
 import { EventEmitter } from "node:events";
 
-import { generateCorrelationId, logger } from "../utils/index";
+import { generateCorrelationId } from "../utils/correlation";
+import { logger } from "../utils/logger";
 
 /**
  * Middleware function for event processing.

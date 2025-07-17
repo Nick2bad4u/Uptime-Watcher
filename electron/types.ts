@@ -7,16 +7,15 @@
  * @packageDocumentation
  */
 
-// Import MonitorType from the registry and alias it to avoid naming conflicts and clarify its origin.
-// This helps maintain clarity when re-exporting or extending types in this file.
-import type { MonitorType as RegistryMonitorType } from "./services/monitoring/MonitorTypeRegistry";
-
-// Re-export for use throughout the application
 /**
- * Allowed monitor types as defined in the MonitorTypeRegistry.
- * @public
+ * Core monitor types supported by the system.
+ *
+ * @remarks
+ * This union type represents the monitor types that the system supports.
+ * Additional types can be registered at runtime through the MonitorTypeRegistry,
+ * but they must extend this base set for TypeScript compatibility.
  */
-export type MonitorType = RegistryMonitorType;
+export type MonitorType = "http" | "port";
 
 /**
  * Allowed status values for a monitor's current operational state.

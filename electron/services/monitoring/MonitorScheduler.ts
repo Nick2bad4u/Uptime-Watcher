@@ -1,6 +1,6 @@
 import { isDev } from "../../electronUtils";
 import { Site } from "../../types";
-import { logger } from "../../utils/index";
+import { logger } from "../../utils/logger";
 
 /**
  * Service for managing monitor scheduling and intervals.

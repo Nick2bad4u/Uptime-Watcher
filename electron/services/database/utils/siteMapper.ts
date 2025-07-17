@@ -3,7 +3,7 @@
  * Provides consistent data transformation between database rows and Site objects.
  */
 
-import { logger } from "../../../utils";
+import { logger } from "../../../utils/logger";
 
 /**
  * Site type for basic operations (without monitors).

@@ -1,0 +1,220 @@
+Clone found (typescript): [FIXED]
+ - electron\utils\monitoring\monitorStatusChecker.ts [56:1 - 71:4] (15 lines, 123 tokens)
+   electron\utils\monitoring\monitorValidator.ts [8:1 - 22:4]
+ - SOLUTION: Extracted common Logger interface to sharedTypes.ts and imported in both files
+
+Clone found (typescript): [FIXED]
+ - electron\utils\monitoring\monitorLifecycle.ts [10:22 - 21:4] (11 lines, 128 tokens)
+   electron\utils\monitoring\monitorValidator.ts [6:14 - 22:4]
+ - SOLUTION: Extracted common Logger interface to sharedTypes.ts and imported in all files
+
+Clone found (typescript): [NEEDS ANALYSIS]
+ - electron\utils\monitoring\monitorLifecycle.ts [226:20 - 238:4] (12 lines, 120 tokens)
+   electron\utils\monitoring\monitorLifecycle.ts [180:21 - 192:3]
+ - NOTES: Similar function structures between startSpecificMonitor and stopSpecificMonitor - need to analyze further
+
+Clone found (typescript): [FIXED]
+ - electron\utils\monitoring\intervalManager.ts [6:1 - 23:4] (17 lines, 141 tokens)
+   electron\utils\monitoring\monitorValidator.ts [6:1 - 22:4]
+ - SOLUTION: Extracted common Logger interface to sharedTypes.ts and imported in all files
+
+Clone found (typescript): [FIXED]
+ - electron\utils\monitoring\autoMonitorManager.ts [6:1 - 23:4] (17 lines, 141 tokens)
+   electron\utils\monitoring\monitorValidator.ts [6:1 - 22:4]
+ - SOLUTION: Extracted common Logger interface to sharedTypes.ts and imported in all files
+
+Clone found (typescript): [FIXED]
+ - electron\utils\database\historyLimitManager.ts [4:23 - 16:4] (12 lines, 142 tokens)
+   electron\utils\monitoring\monitorLifecycle.ts [9:25 - 22:4]
+ - SOLUTION: Extracted common Logger interface to sharedTypes.ts and imported in both files
+
+Clone found (typescript): [NEEDS IMPLEMENTATION]
+ - electron\utils\database\DataImportExportService.ts [131:31 - 137:20] (6 lines, 95 tokens)
+   electron\utils\database\DataImportExportService.ts [98:25 - 104:14]
+ - NOTES: Created errorHandling.ts utility but implementation in DataImportExportService still pending
+
+Clone found (typescript): [NEEDS ANALYSIS]
+ - electron\services\monitoring\HttpMonitor.ts [149:4 - 156:20] (7 lines, 91 tokens)
+   electron\services\monitoring\utils\portRetry.ts [24:5 - 31:21]
+ - NOTES: Need to analyze error handling patterns
+
+Clone found (typescript): [FIXED]
+ - electron\services\database\MonitorRepository.ts [117:9 - 129:3] (12 lines, 160 tokens)
+   electron\services\database\MonitorRepository.ts [87:17 - 99:6]
+ - SOLUTION: Extracted duplicate monitor insertion code to private insertMonitorAndGetId helper method
+
+Clone found (typescript): [NEEDS REFACTORING]
+ - electron\services\database\HistoryRepository.ts [208:2 - 226:36] (18 lines, 121 tokens)
+   electron\services\database\utils\historyManipulation.ts [112:2 - 130:38]
+ - NOTES: Common bulk insertion pattern for history entries. Should extract to shared utility function that both modules can use.
+
+Clone found (typescript): [FIXED]
+ - electron\utils\logger.ts [44:2 - 55:2] (11 lines, 245 tokens)
+   electron\utils\logger.ts [12:2 - 23:2]
+ - SOLUTION: Extracted common logging logic to createPrefixedLogger factory function
+
+Clone found (typescript): [NEEDS CONSOLIDATION]
+ - electron\utils\errorHandling.ts [45:2 - 70:12] (25 lines, 185 tokens)
+   electron\utils\unifiedErrorHandling.ts [47:2 - 72:6]
+ - NOTES: Two nearly identical error handling modules with duplicate functions. Need to consolidate into a single error handling module and remove the duplicate.
+
+Clone found (typescript): [NEEDS REFACTORING]
+ - electron\managers\MonitorManager.ts [141:22 - 152:22] (11 lines, 99 tokens)
+   electron\managers\MonitorManager.ts [110:23 - 121:23]
+ - NOTES: Create a common createMonitorConfig method in MonitorManager to avoid duplication of config object creation.
+
+Clone found (tsx): [NEEDS REFACTORING]
+ - src\components\SiteDetails\tabs\SettingsTab.tsx [398:21 - 415:2] (17 lines, 127 tokens)
+   src\components\SiteDetails\tabs\SettingsTab.tsx [367:25 - 384:8]
+ - NOTES: Extract common input + button pattern to a reusable NumberSettingField component.
+
+Clone found (tsx): [NEEDS REFACTORING]
+ - src\components\SiteDetails\tabs\OverviewTab.tsx [124:18 - 144:7] (20 lines, 141 tokens)
+   src\components\SiteDetails\tabs\SiteOverviewTab.tsx [138:16 - 157:6]
+ - NOTES: Extract common getResponseTimeColor function to a shared utility in src/utils/colors.ts
+
+Clone found (tsx): [NEEDS REFACTORING]
+ - src\components\SiteDetails\tabs\OverviewTab.tsx [243:2 - 254:2] (11 lines, 113 tokens)
+   src\components\SiteDetails\tabs\SettingsTab.tsx [331:2 - 342:2]
+ - NOTES: Extract interval select dropdown into a reusable CheckIntervalSelect component.
+
+Clone found (typescript): [NEEDS REFACTORING]
+ - src\stores\sites\useSiteOperations.ts [198:8 - 208:22] (10 lines, 94 tokens)
+   src\stores\sites\useSiteOperations.ts [66:2 - 76:11]
+ - SOLUTION: Created getStandardErrorHandlers utility in src/stores/errorHandling.ts to replace duplicate error handling blocks
+
+Clone found (typescript): [NEEDS REFACTORING]
+ - src\stores\sites\useSiteOperations.ts [209:10 - 219:61] (10 lines, 97 tokens)
+   src\stores\sites\useSiteOperations.ts [54:8 - 64:44]
+ - SOLUTION: Created getStandardErrorHandlers utility in src/stores/errorHandling.ts to replace duplicate error handling blocks
+
+Clone found (typescript): [NEEDS REFACTORING]
+ - src\stores\sites\useSiteOperations.ts [264:2 - 274:21] (10 lines, 95 tokens)
+   src\stores\sites\useSiteOperations.ts [66:2 - 76:11]
+ - SOLUTION: Created getStandardErrorHandlers utility in src/stores/errorHandling.ts to replace duplicate error handling blocks
+
+Clone found (typescript): [NEEDS REFACTORING]
+ - src\stores\sites\useSiteOperations.ts [287:8 - 301:24] (14 lines, 143 tokens)
+   src\stores\sites\useSiteOperations.ts [260:14 - 76:11]
+ - SOLUTION: Created getStandardErrorHandlers utility in src/stores/errorHandling.ts to replace duplicate error handling blocks 
+
+Clone found (typescript): [NEEDS REFACTORING]
+ - src\stores\sites\useSiteOperations.ts [302:10 - 311:6] (9 lines, 93 tokens)
+   src\stores\sites\useSiteOperations.ts [248:14 - 257:43]
+ - SOLUTION: Created getStandardErrorHandlers utility in src/stores/errorHandling.ts to replace duplicate error handling blocks
+
+Clone found (typescript): [NEEDS REFACTORING]
+ - src\stores\sites\useSiteOperations.ts [311:2 - 322:2] (11 lines, 117 tokens)
+   src\stores\sites\useSiteOperations.ts [263:8 - 76:11]
+ - SOLUTION: Created getStandardErrorHandlers utility in src/stores/errorHandling.ts to replace duplicate error handling blocks
+
+Clone found (typescript): [JUSTIFIABLE]
+ - src\stores\sites\types.ts [26:2 - 33:43] (7 lines, 120 tokens)
+   src\stores\sites\useSiteOperations.ts [33:7 - 40:30]
+ - JUSTIFICATION: This duplication is necessary because these are TypeScript interface definitions in types.ts that must match the implementation signatures in useSiteOperations.ts. The duplication ensures type-safety and proper implementation.
+
+Clone found (typescript): [JUSTIFIABLE]
+ - src\stores\sites\types.ts [45:5 - 56:22] (11 lines, 104 tokens)
+   src\stores\sites\useSiteSync.ts [16:5 - 27:35]
+ - JUSTIFICATION: These are TypeScript interface definitions that must match implementations. The duplication ensures type-safety.
+
+Clone found (typescript): [JUSTIFIABLE]
+ - src\stores\sites\types.ts [56:5 - 70:35] (14 lines, 163 tokens)
+   src\stores\sites\useSitesState.ts [20:5 - 34:2]
+ - JUSTIFICATION: These are TypeScript interface definitions that must match implementations. The duplication ensures type-safety.
+
+Clone found (typescript): [NEEDS REFACTORING]
+ - src\hooks\site\useSiteDetails.ts [260:26 - 267:19] (7 lines, 98 tokens)
+   src\hooks\site\useSiteDetails.ts [244:26 - 251:20]
+ - NOTES: Extract common error handling pattern to a custom hook like useHandleAsyncError().
+
+Clone found (typescript): [NEEDS REFACTORING]
+ - src\hooks\site\useSiteDetails.ts [287:21 - 294:26] (7 lines, 90 tokens)
+   src\hooks\site\useSiteDetails.ts [274:21 - 281:27]
+ - NOTES: Extract common error handling pattern to a custom hook like useHandleAsyncError().
+
+Clone found (typescript): [NEEDS REFACTORING]
+ - src\hooks\site\useSiteActions.ts [63:26 - 72:26] (9 lines, 117 tokens)
+   src\hooks\site\useSiteActions.ts [40:26 - 49:27]
+ - NOTES: Create a common utility function for handling async operations with similar try/catch patterns.
+
+Clone found (tsx): [NEEDS REFACTORING]
+ - src\components\SiteDetails\SiteDetails.tsx [194:21 - 208:8] (14 lines, 119 tokens)
+   src\components\SiteDetails\SiteDetails.tsx [179:21 - 190:6]
+ - NOTES: Extract the similar JSX structures into reusable components or create a higher-order component.
+
+Clone found (tsx): [NEEDS REFACTORING]
+ - src\components\Header\Header.tsx [223:22 - 235:9] (12 lines, 73 tokens)
+   src\components\Header\Header.tsx [205:19 - 217:13]
+ - NOTES: Create a reusable component for similar UI structures in the Header component.
+
+Clone found (tsx): [NEEDS REFACTORING]
+ - src\components\AddSiteForm\FormFields.tsx [224:17 - 231:9] (7 lines, 95 tokens)
+   src\components\AddSiteForm\FormFields.tsx [154:17 - 161:2]
+ - NOTES: Extract common form field patterns to a reusable FormField component.
+
+Clone found (tsx): [NEEDS REFACTORING]
+ - src\components\AddSiteForm\AddSiteForm.tsx [75:21 - 90:27] (15 lines, 131 tokens)
+   src\components\Settings\Settings.tsx [59:15 - 74:48]
+ - NOTES: Create a reusable form section component that can be used across different forms.
+
+Clone found (typescript): [JUSTIFIABLE]
+ - src\utils\siteStatus.ts [6:1 - 173:2] (167 lines, 1003 tokens)
+   electron\utils\siteStatus.ts [6:1 - 173:2]
+ - JUSTIFICATION: This is intentional code duplication to allow the same status calculation logic in both frontend and backend. This ensures consistency in status calculations across processes and could be refactored to a shared module if the architecture allows.
+
+Clone found (typescript): [NEEDS REFACTORING]
+ - src\utils\monitorTypeHelper.ts [11:1 - 32:4] (21 lines, 122 tokens)
+   electron\services\monitoring\MonitorTypeRegistry.ts [19:1 - 38:45]
+ - NOTES: Implement a shared configuration package for monitor types that can be imported by both frontend and backend.
+
+Clone found (typescript): [NEEDS REFACTORING]
+ - src\utils\monitorTypeHelper.ts [46:9 - 62:36] (16 lines, 108 tokens)
+   electron\services\monitoring\MonitorTypeRegistry.ts [83:9 - 99:40]
+ - NOTES: Extract common monitor type configuration to a shared module accessible by both frontend and backend.
+
+Clone found (typescript): [NEEDS REFACTORING]
+ - src\theme\themes.ts [197:75 - 237:41] (40 lines, 278 tokens)
+   src\theme\themes.ts [83:76 - 126:4]
+ - NOTES: Extract common theme configuration objects to a reusable base theme that can be extended.
+
+Clone found (typescript): [NEEDS REFACTORING]
+ - src\theme\themes.ts [308:42 - 325:10] (17 lines, 122 tokens)
+   src\theme\themes.ts [83:76 - 100:9]
+ - NOTES: Create a theme generator function that can create theme variants from a base configuration.
+
+Clone found (typescript): [NEEDS REFACTORING]
+ - src\services\chartConfig.ts [179:2 - 188:22] (9 lines, 87 tokens)
+   src\services\chartConfig.ts [119:8 - 128:26]
+ - NOTES: Extract common chart configuration patterns to a chart options factory function.
+
+Clone found (typescript): [NEEDS REFACTORING]
+ - src\services\chartConfig.ts [192:2 - 202:8] (10 lines, 94 tokens)
+   src\services\chartConfig.ts [153:2 - 163:21]
+ - NOTES: Create reusable chart configuration generation functions to avoid duplicate configurations.
+
+Clone found (typescript): [NEEDS REFACTORING]
+ - src\services\chartConfig.ts [227:17 - 236:22] (9 lines, 88 tokens)
+   src\services\chartConfig.ts [179:2 - 128:26]
+ - NOTES: Extract common chart rendering options to a shared configuration generator.
+
+HTML report saved to report\html\
+Markdown report saved to report\jscpd-report.md
+JSON report saved to report\jscpd-report.json
+┌────────────┬────────────────┬─────────────┬──────────────┬──────────────┬──────────────────┬───────────────────┐
+│ Format     │ Files analyzed │ Total lines │ Total tokens │ Clones found │ Duplicated lines │ Duplicated tokens │
+├────────────┼────────────────┼─────────────┼──────────────┼──────────────┼──────────────────┼───────────────────┤
+│ typescript │ 163            │ 22979       │ 164700       │ 33           │ 582 (2.53%)      │ 5024 (3.05%)      │
+├────────────┼────────────────┼─────────────┼──────────────┼──────────────┼──────────────────┼───────────────────┤
+│ javascript │ 28             │ 2291        │ 19343        │ 0            │ 0 (0%)           │ 0 (0%)            │
+├────────────┼────────────────┼─────────────┼──────────────┼──────────────┼──────────────────┼───────────────────┤
+│ tsx        │ 34             │ 6089        │ 45833        │ 7            │ 96 (1.58%)       │ 799 (1.74%)       │
+├────────────┼────────────────┼─────────────┼──────────────┼──────────────┼──────────────────┼───────────────────┤
+│ css        │ 3              │ 840         │ 6580         │ 0            │ 0 (0%)           │ 0 (0%)            │
+├────────────┼────────────────┼─────────────┼──────────────┼──────────────┼──────────────────┼───────────────────┤
+│ Total:     │ 228            │ 32199       │ 236456       │ 40           │ 678 (2.11%)      │ 5823 (2.46%)      │
+└────────────┴────────────────┴─────────────┴──────────────┴──────────────┴──────────────────┴───────────────────┘
+Found 40 clones.
+SARIF report saved to report\jscpd-sarif.json
+XML report saved to report\jscpd-report.xml
+Detection time:: 1.738s

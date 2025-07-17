@@ -1,8 +1,8 @@
 import { ipcMain, BrowserWindow } from "electron";
 
 import { isDev } from "../../electronUtils";
-import { UptimeOrchestrator } from "../../index";
-import { logger } from "../../utils/index";
+import { UptimeOrchestrator } from "../../UptimeOrchestrator";
+import { logger } from "../../utils/logger";
 import { AutoUpdaterService } from "../updater/index";
 import { Site } from "../../types";
 import { getAllMonitorTypeConfigs, validateMonitorData, getMonitorTypeConfig } from "../monitoring/MonitorTypeRegistry";

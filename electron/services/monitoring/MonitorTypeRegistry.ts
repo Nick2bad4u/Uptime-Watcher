@@ -9,9 +9,9 @@
 
 import { z } from "zod";
 import validator from "validator";
+import type { MonitorType } from "./monitorTypes";
 import { HttpMonitor } from "./HttpMonitor";
 import { PortMonitor } from "./PortMonitor";
-import { EnhancedTypeGuard } from "./EnhancedTypeGuards";
 import { migrationRegistry, versionManager, createMigrationOrchestrator, exampleMigrations } from "./MigrationSystem";
 import { logger } from "../../utils/logger";
 
@@ -187,6 +187,38 @@ export function getAllMonitorTypeConfigs(): BaseMonitorConfig[] {
  */
 export function isValidMonitorType(type: string): boolean {
     return monitorTypes.has(type);
+}
+
+/**
+ * Simple monitor type validation for internal use (breaks circular dependency with EnhancedTypeGuards).
+ *
+ * @param type - Monitor type to validate
+ * @returns Validation result compatible with EnhancedTypeGuard interface
+ */
+function validateMonitorTypeInternal(type: unknown): {
+    success: boolean;
+    value?: MonitorType;
+    error?: string;
+} {
+    if (typeof type !== "string") {
+        return {
+            success: false,
+            error: "Monitor type must be a string",
+        };
+    }
+
+    if (!isValidMonitorType(type)) {
+        const validTypes = getRegisteredMonitorTypes();
+        return {
+            success: false,
+            error: `Invalid monitor type: ${type}. Valid types: ${validTypes.join(", ")}`,
+        };
+    }
+
+    return {
+        success: true,
+        value: type as MonitorType,
+    };
 }
 
 /**
@@ -392,8 +424,8 @@ export function createMonitorWithTypeGuards(
     monitor?: Record<string, unknown>;
     errors: string[];
 } {
-    // Use enhanced type guard validation
-    const validationResult = EnhancedTypeGuard.validateMonitorType(type);
+    // Use internal type validation to avoid circular dependency
+    const validationResult = validateMonitorTypeInternal(type);
     if (!validationResult.success) {
         return {
             success: false,
@@ -435,8 +467,8 @@ export async function migrateMonitorType(
     data?: Record<string, unknown>;
 }> {
     try {
-        // Validate the monitor type
-        const validationResult = EnhancedTypeGuard.validateMonitorType(monitorType);
+        // Validate the monitor type using internal validation
+        const validationResult = validateMonitorTypeInternal(monitorType);
         if (!validationResult.success) {
             return {
                 success: false,
@@ -496,6 +528,3 @@ export async function migrateMonitorType(
 export function isValidMonitorTypeGuard(type: unknown): type is string {
     return typeof type === "string" && isValidMonitorType(type);
 }
-
-// Generate union type from registered monitor types
-export type MonitorType = ReturnType<typeof getRegisteredMonitorTypes>[number];

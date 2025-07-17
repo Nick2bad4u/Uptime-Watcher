@@ -9,7 +9,7 @@
  */
 
 import { Site } from "../../../types";
-import { logger } from "../../../utils";
+import { logger } from "../../../utils/logger";
 import { DbValue } from "./valueConverters";
 import { mapRowToMonitor, mapMonitorToRow, generateSqlParameters } from "./dynamicSchema";
 

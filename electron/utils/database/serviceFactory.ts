@@ -3,14 +3,12 @@
  */
 
 import { UptimeEvents, TypedEventBus } from "../../events";
-import {
-    SiteRepository,
-    MonitorRepository,
-    HistoryRepository,
-    SettingsRepository,
-    DatabaseService,
-} from "../../services/index";
-import { monitorLogger } from "../../utils/index";
+import { SiteRepository } from "../../services/database/SiteRepository";
+import { MonitorRepository } from "../../services/database/MonitorRepository";
+import { HistoryRepository } from "../../services/database/HistoryRepository";
+import { SettingsRepository } from "../../services/database/SettingsRepository";
+import { DatabaseService } from "../../services/database/DatabaseService";
+import { monitorLogger } from "../logger";
 import { DataBackupService, DataBackupOrchestrator } from "./DataBackupService";
 import { DataImportExportService, DataImportExportOrchestrator } from "./DataImportExportService";
 import { SiteCache } from "./interfaces";

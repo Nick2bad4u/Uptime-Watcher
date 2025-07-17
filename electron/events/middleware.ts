@@ -3,9 +3,9 @@
  * Provides common functionality like logging, metrics, and filtering.
  */
 
-import type { EventMiddleware } from "../events/index";
+import type { EventMiddleware } from "./TypedEventBus";
 
-import { logger as baseLogger } from "../utils/index";
+import { logger as baseLogger } from "../utils/logger";
 
 const logger = baseLogger;
 const EVENT_EMITTED_MSG = "[EventBus] Event emitted";

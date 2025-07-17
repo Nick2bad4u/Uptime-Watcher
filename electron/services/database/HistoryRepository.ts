@@ -2,7 +2,8 @@ import { Database } from "node-sqlite3-wasm";
 
 import { isDev } from "../../electronUtils";
 import { StatusHistory } from "../../types";
-import { logger, withDatabaseOperation } from "../../utils/index";
+import { logger } from "../../utils/logger";
+import { withDatabaseOperation } from "../../utils/operationalHooks";
 import { DatabaseService } from "./DatabaseService";
 import {
     addHistoryEntry,

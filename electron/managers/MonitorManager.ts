@@ -12,7 +12,11 @@ import { UptimeEvents, TypedEventBus } from "../events/index";
  */
 type MonitorManagerEvents = UptimeEvents;
 
-import { MonitorRepository, HistoryRepository, SiteRepository, DatabaseService, MonitorScheduler } from "../services";
+import { MonitorRepository } from "../services/database/MonitorRepository";
+import { HistoryRepository } from "../services/database/HistoryRepository";
+import { SiteRepository } from "../services/database/SiteRepository";
+import { DatabaseService } from "../services/database/DatabaseService";
+import { MonitorScheduler } from "../services/monitoring/MonitorScheduler";
 import { Site, StatusUpdate } from "../types";
 import { SiteCacheInterface } from "../utils/database";
 import {

@@ -1,7 +1,9 @@
 /**
  * Utility for managing history limits in the database.
  */
-import type { HistoryRepository, SettingsRepository, DatabaseService } from "../../services/index";
+import type { HistoryRepository } from "../../services/database/HistoryRepository";
+import type { SettingsRepository } from "../../services/database/SettingsRepository";
+import type { DatabaseService } from "../../services/database/DatabaseService";
 import { withDatabaseOperation } from "../operationalHooks";
 
 interface Logger {

@@ -40,7 +40,7 @@ import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { isDev } from "../../electronUtils";
-import { logger } from "../../utils/index";
+import { logger } from "../../utils/logger";
 
 // ESM equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -111,6 +111,8 @@ export class WindowService {
 
         if (isDev()) {
             logger.debug("[WindowService] Development mode: waiting for Vite dev server");
+            logger.debug("[WindowService] NODE_ENV:", process.env.NODE_ENV);
+            // Load from Vite dev server
             // Wait for Vite server before loading content
             void this.loadDevelopmentContent();
         } else {

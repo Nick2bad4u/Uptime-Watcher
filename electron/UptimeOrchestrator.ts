@@ -40,10 +40,16 @@ import type { UptimeEvents } from "./events/eventTypes";
 
 import { DEFAULT_HISTORY_LIMIT } from "./constants";
 import { TypedEventBus, createLoggingMiddleware, createErrorHandlingMiddleware } from "./events";
-import { DatabaseManager, MonitorManager, SiteManager } from "./managers";
-import { DatabaseService, SiteRepository, MonitorRepository, HistoryRepository, SettingsRepository } from "./services";
+import { DatabaseManager } from "./managers/DatabaseManager";
+import { MonitorManager } from "./managers/MonitorManager";
+import { SiteManager } from "./managers/SiteManager";
+import { DatabaseService } from "./services/database/DatabaseService";
+import { SiteRepository } from "./services/database/SiteRepository";
+import { MonitorRepository } from "./services/database/MonitorRepository";
+import { HistoryRepository } from "./services/database/HistoryRepository";
+import { SettingsRepository } from "./services/database/SettingsRepository";
 import { Site, StatusUpdate, Monitor } from "./types";
-import { logger } from "./utils";
+import { logger } from "./utils/logger";
 
 /**
  * Interface defining the monitoring operations provided to the SiteManager.

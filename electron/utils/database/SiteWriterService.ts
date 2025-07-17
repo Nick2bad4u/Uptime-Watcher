@@ -5,7 +5,9 @@
 
 import { Database } from "node-sqlite3-wasm";
 
-import { DatabaseService, SiteRepository, MonitorRepository } from "../../services/index";
+import { DatabaseService } from "../../services/database/DatabaseService";
+import { SiteRepository } from "../../services/database/SiteRepository";
+import { MonitorRepository } from "../../services/database/MonitorRepository";
 import { Site, Monitor } from "../../types";
 import { withDatabaseOperation } from "../operationalHooks";
 import { Logger, SiteCacheInterface, SiteWritingConfig, MonitoringConfig, SiteNotFoundError } from "./interfaces";

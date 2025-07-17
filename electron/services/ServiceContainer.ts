@@ -12,13 +12,13 @@
  * - **Utility Services**: Support functions (Window, Updater)
  */
 
-import { UptimeOrchestrator } from "../index";
+import { UptimeOrchestrator } from "../UptimeOrchestrator";
 import { AutoUpdaterService } from "./updater/index";
 import { DatabaseService } from "./database/index";
 import { IpcService } from "./ipc/index";
 import { NotificationService } from "./notifications/index";
 import { WindowService } from "./window/index";
-import { logger } from "../utils/index";
+import { logger } from "../utils/logger";
 
 /**
  * Service container configuration interface.

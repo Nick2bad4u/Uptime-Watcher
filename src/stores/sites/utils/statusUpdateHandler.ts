@@ -5,7 +5,7 @@
 
 import type { Site, StatusUpdate } from "../../types";
 
-import { logger } from "../../../services";
+import logger from "../../../services/logger";
 import { logStoreAction, waitForElectronAPI } from "../../utils";
 
 export interface StatusUpdateHandlerOptions {

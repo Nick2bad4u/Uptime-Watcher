@@ -6,12 +6,9 @@
 import { DEFAULT_CHECK_INTERVAL } from "../constants";
 import { isDev } from "../electronUtils";
 import { Site } from "../types";
-import { SiteValidator, MonitorValidator } from "./validators/index";
-
-export interface ValidationResult {
-    isValid: boolean;
-    errors: string[];
-}
+import { SiteValidator } from "./validators/SiteValidator";
+import { MonitorValidator } from "./validators/MonitorValidator";
+import { ValidationResult } from "./validators/interfaces";
 
 export interface HistoryRetentionConfig {
     defaultLimit: number;

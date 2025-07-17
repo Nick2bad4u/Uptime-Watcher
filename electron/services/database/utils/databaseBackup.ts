@@ -1,4 +1,4 @@
-import { logger } from "../../../utils/index";
+import { logger } from "../../../utils/logger";
 
 /**
  * Database backup utilities.

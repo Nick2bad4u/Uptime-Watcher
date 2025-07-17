@@ -7,7 +7,7 @@ import { create } from "zustand";
 
 import type { ErrorStore } from "./types";
 
-import { logStoreAction } from "../utils";
+import { logStoreAction } from "../shared/utils";
 
 export const useErrorStore = create<ErrorStore>()((set, get) => ({
     // Actions

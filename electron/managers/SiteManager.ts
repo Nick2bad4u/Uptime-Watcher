@@ -43,7 +43,10 @@
  */
 
 import { UptimeEvents, TypedEventBus } from "../events/index";
-import { SiteRepository, MonitorRepository, HistoryRepository, DatabaseService } from "../services/index";
+import { SiteRepository } from "../services/database/SiteRepository";
+import { MonitorRepository } from "../services/database/MonitorRepository";
+import { HistoryRepository } from "../services/database/HistoryRepository";
+import { DatabaseService } from "../services/database/DatabaseService";
 import { Site } from "../types";
 import { SiteCacheInterface, SiteCache, MonitoringConfig } from "../utils/database";
 import {
@@ -53,7 +56,7 @@ import {
     SiteRepositoryService,
     monitorLogger as logger,
 } from "../utils";
-import { configurationManager } from "../managers/index";
+import { configurationManager } from "./ConfigurationManager";
 
 /**
  * Combined events interface for SiteManager.

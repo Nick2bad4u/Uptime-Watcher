@@ -10,7 +10,7 @@
 import { z } from "zod";
 import validator from "validator";
 import { logger } from "../../utils/logger";
-import type { MonitorType } from "../../types";
+import type { MonitorType } from "./monitorTypes";
 import type { BaseMonitorConfig } from "./MonitorTypeRegistry";
 import { getRegisteredMonitorTypes } from "./MonitorTypeRegistry";
 
@@ -80,7 +80,7 @@ export const EnhancedTypeGuard = {
 
         return {
             success: true,
-            value: value,
+            value: value as MonitorType,
         };
     },
 

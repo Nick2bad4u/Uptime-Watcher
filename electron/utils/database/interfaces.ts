@@ -3,7 +3,10 @@
  */
 
 import { UptimeEvents, TypedEventBus } from "../../events/index";
-import { SiteRepository, MonitorRepository, HistoryRepository, SettingsRepository } from "../../services/index";
+import { SiteRepository } from "../../services/database/SiteRepository";
+import { MonitorRepository } from "../../services/database/MonitorRepository";
+import { HistoryRepository } from "../../services/database/HistoryRepository";
+import { SettingsRepository } from "../../services/database/SettingsRepository";
 import { Site } from "../../types";
 import { dbLogger } from "../logger";
 

@@ -33,7 +33,8 @@ import { AxiosInstance } from "axios";
 import { DEFAULT_REQUEST_TIMEOUT, RETRY_BACKOFF, USER_AGENT } from "../../constants";
 import { isDev } from "../../electronUtils";
 import { Site } from "../../types";
-import { logger, withRetry } from "../../utils/index";
+import { logger } from "../../utils/logger";
+import { withRetry } from "../../utils/retry";
 
 import { IMonitorService, MonitorCheckResult, MonitorConfig } from "./types";
 import { determineMonitorStatus, handleCheckError, createHttpClient, createErrorResult } from "./utils";

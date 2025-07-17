@@ -1,6 +1,6 @@
 import { app } from "electron";
 
-import { logger } from "../../utils/index";
+import { logger } from "../../utils/logger";
 import { ServiceContainer } from "../ServiceContainer";
 
 /**

@@ -1,6 +1,7 @@
 import { RETRY_BACKOFF } from "../../../constants";
 import { isDev } from "../../../electronUtils";
-import { logger, withRetry } from "../../../utils/index";
+import { logger } from "../../../utils/logger";
+import { withRetry } from "../../../utils/retry";
 import { MonitorCheckResult } from "../types";
 import { performSinglePortCheck } from "./portChecker";
 import { handlePortCheckError } from "./portErrorHandling";

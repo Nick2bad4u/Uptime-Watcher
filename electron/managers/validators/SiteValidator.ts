@@ -4,7 +4,7 @@
  */
 
 import { Site } from "../../types";
-import { ValidationResult } from "../../managers/index";
+import { ValidationResult } from "./interfaces";
 import { MonitorValidator } from "./MonitorValidator";
 
 /**

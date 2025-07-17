@@ -3,7 +3,7 @@ import { Database } from "node-sqlite3-wasm";
 // eslint-disable-next-line unicorn/import-style -- Need namespace import for both sync and async usage
 import * as path from "node:path";
 
-import { logger } from "../../utils/index";
+import { logger } from "../../utils/logger";
 import {
     createDatabaseBackup,
     createDatabaseTables,

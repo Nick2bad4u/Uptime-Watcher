@@ -9,7 +9,7 @@ import { useEffect, useState, useCallback } from "react";
 
 import type { SiteStatus } from "../types";
 
-import { useSettingsStore } from "../stores";
+import { useSettingsStore } from "../stores/settings/useSettingsStore";
 import { themeManager } from "./ThemeManager";
 import { Theme, ThemeName } from "./types";
 

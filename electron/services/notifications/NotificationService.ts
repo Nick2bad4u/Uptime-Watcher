@@ -1,7 +1,7 @@
 import { Notification } from "electron";
 
 import { Site } from "../../types";
-import { logger } from "../../utils/index";
+import { logger } from "../../utils/logger";
 
 /**
  * Configuration options for the notification service.

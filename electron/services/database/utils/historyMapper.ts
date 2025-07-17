@@ -4,7 +4,7 @@
  */
 
 import { StatusHistory } from "../../../types";
-import { logger } from "../../../utils";
+import { logger } from "../../../utils/logger";
 
 /**
  * History row interface for database operations.

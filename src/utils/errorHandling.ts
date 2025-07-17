@@ -3,7 +3,7 @@
  * Provides consistent error handling for utility functions that don't need store management.
  */
 
-import { logger } from "../services";
+import logger from "../services/logger";
 
 /**
  * Simple error handling wrapper for utility functions.

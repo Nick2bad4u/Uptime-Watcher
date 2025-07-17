@@ -35,13 +35,11 @@
  */
 
 import { UptimeEvents, TypedEventBus } from "../../events/index";
-import {
-    HistoryRepository,
-    MonitorRepository,
-    SiteRepository,
-    DatabaseService,
-    MonitorFactory,
-} from "../../services/index";
+import { HistoryRepository } from "../../services/database/HistoryRepository";
+import { MonitorRepository } from "../../services/database/MonitorRepository";
+import { SiteRepository } from "../../services/database/SiteRepository";
+import { DatabaseService } from "../../services/database/DatabaseService";
+import { MonitorFactory } from "../../services/monitoring/MonitorFactory";
 import { Site, StatusHistory, StatusUpdate } from "../../types";
 import { SiteCacheInterface } from "../database/interfaces";
 import { withDatabaseOperation } from "../operationalHooks";
