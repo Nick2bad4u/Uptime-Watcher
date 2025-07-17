@@ -13,7 +13,8 @@
  */
 
 import { logger } from "./logger";
-import { TypedEventBus, UptimeEvents } from "../events";
+import { TypedEventBus } from "../events/TypedEventBus";
+import { UptimeEvents } from "../events/eventTypes";
 
 /**
  * Error context information for better error tracking.
@@ -101,13 +102,8 @@ export async function handleError(
     context: ErrorContext,
     options: ErrorHandlingOptions = {}
 ): Promise<void> {
-    const {
-        rethrow = true,
-        emitEvents = false,
-        logError = true,
-        messagePrefix = "Operation failed",
-        eventEmitter,
-    } = options;
+    const { rethrow = true, emitEvents = false, logError = true, messagePrefix = "Operation failed" } = options;
+    const eventEmitter = options.eventEmitter;
 
     // Wrap unknown errors
     const wrappedError = wrapError(error, `Unknown error during ${context.operation}`);

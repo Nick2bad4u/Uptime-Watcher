@@ -1,0 +1,180 @@
+Clone found (typescript):
+ - electron\utils\monitoring\monitorStatusChecker.ts [55:1 - 70:4] (15 lines, 123 tokens)
+   electron\utils\monitoring\monitorValidator.ts [8:1 - 22:4]
+
+Clone found (typescript):
+ - electron\utils\monitoring\monitorLifecycle.ts [13:22 - 24:4] (11 lines, 128 tokens)
+   electron\utils\monitoring\monitorValidator.ts [6:14 - 22:4]
+
+Clone found (typescript):
+ - electron\utils\monitoring\monitorLifecycle.ts [229:20 - 241:4] (12 lines, 120 tokens)
+   electron\utils\monitoring\monitorLifecycle.ts [183:21 - 195:3]
+
+Clone found (typescript):
+ - electron\utils\monitoring\intervalManager.ts [6:1 - 23:4] (17 lines, 141 tokens)
+   electron\utils\monitoring\monitorValidator.ts [6:1 - 22:4]
+
+Clone found (typescript):
+ - electron\utils\monitoring\autoMonitorManager.ts [6:1 - 23:4] (17 lines, 141 tokens)
+   electron\utils\monitoring\monitorValidator.ts [6:1 - 22:4]
+
+Clone found (typescript):
+ - electron\utils\database\historyLimitManager.ts [6:42 - 18:4] (12 lines, 142 tokens)
+   electron\utils\monitoring\monitorLifecycle.ts [12:25 - 22:4]
+
+Clone found (typescript):
+ - electron\utils\database\DataImportExportService.ts [130:31 - 136:20] (6 lines, 95 tokens)
+   electron\utils\database\DataImportExportService.ts [97:25 - 103:14]
+
+Clone found (typescript):
+ - electron\services\monitoring\HttpMonitor.ts [152:4 - 159:20] (7 lines, 91 tokens)
+   electron\services\monitoring\utils\portRetry.ts [25:5 - 32:21]
+
+Clone found (typescript):
+ - electron\services\database\MonitorRepository.ts [109:9 - 121:3] (12 lines, 160 tokens)
+   electron\services\database\MonitorRepository.ts [79:17 - 91:6]
+
+Clone found (typescript):
+ - electron\services\database\HistoryRepository.ts [207:2 - 225:36] (18 lines, 121 tokens)
+   electron\services\database\utils\historyManipulation.ts [112:2 - 130:38]
+
+Clone found (typescript):
+ - electron\utils\logger.ts [44:2 - 55:2] (11 lines, 245 tokens)
+   electron\utils\logger.ts [12:2 - 23:2]
+
+Clone found (typescript):
+ - electron\utils\errorHandling.ts [45:2 - 70:12] (25 lines, 185 tokens)
+   electron\utils\unifiedErrorHandling.ts [47:2 - 72:6]
+
+Clone found (typescript):
+ - electron\managers\MonitorManager.ts [144:22 - 155:22] (11 lines, 99 tokens)
+   electron\managers\MonitorManager.ts [113:23 - 124:23]
+
+Clone found (tsx):
+ - src\components\SiteDetails\tabs\SettingsTab.tsx [400:21 - 417:2] (17 lines, 127 tokens)
+   src\components\SiteDetails\tabs\SettingsTab.tsx [369:25 - 386:8]
+
+Clone found (tsx):
+ - src\components\SiteDetails\tabs\OverviewTab.tsx [123:18 - 143:7] (20 lines, 141 tokens)
+   src\components\SiteDetails\tabs\SiteOverviewTab.tsx [138:16 - 157:6]
+
+Clone found (tsx):
+ - src\components\SiteDetails\tabs\OverviewTab.tsx [242:2 - 253:2] (11 lines, 113 tokens)
+   src\components\SiteDetails\tabs\SettingsTab.tsx [333:2 - 344:2]
+
+Clone found (typescript):
+ - src\stores\sites\useSiteOperations.ts [200:8 - 210:22] (10 lines, 94 tokens)
+   src\stores\sites\useSiteOperations.ts [68:2 - 78:11]
+
+Clone found (typescript):
+ - src\stores\sites\useSiteOperations.ts [211:10 - 221:61] (10 lines, 97 tokens)
+   src\stores\sites\useSiteOperations.ts [56:8 - 66:44]
+
+Clone found (typescript):
+ - src\stores\sites\useSiteOperations.ts [266:2 - 276:21] (10 lines, 95 tokens)
+   src\stores\sites\useSiteOperations.ts [68:2 - 78:11]
+
+Clone found (typescript):
+ - src\stores\sites\useSiteOperations.ts [289:8 - 303:24] (14 lines, 143 tokens)
+   src\stores\sites\useSiteOperations.ts [262:14 - 78:11]
+
+Clone found (typescript):
+ - src\stores\sites\useSiteOperations.ts [304:10 - 313:6] (9 lines, 93 tokens)
+   src\stores\sites\useSiteOperations.ts [250:14 - 259:43]
+
+Clone found (typescript):
+ - src\stores\sites\useSiteOperations.ts [313:2 - 324:2] (11 lines, 117 tokens)
+   src\stores\sites\useSiteOperations.ts [265:8 - 78:11]
+
+Clone found (typescript):
+ - src\stores\sites\types.ts [26:2 - 33:43] (7 lines, 120 tokens)
+   src\stores\sites\useSiteOperations.ts [35:7 - 42:30]
+
+Clone found (typescript):
+ - src\stores\sites\types.ts [45:5 - 56:22] (11 lines, 104 tokens)
+   src\stores\sites\useSiteSync.ts [16:5 - 27:35]
+
+Clone found (typescript):
+ - src\stores\sites\types.ts [56:5 - 70:35] (14 lines, 163 tokens)
+   src\stores\sites\useSitesState.ts [20:5 - 34:2]
+
+Clone found (typescript):
+ - src\hooks\site\useSiteDetails.ts [262:26 - 269:19] (7 lines, 98 tokens)
+   src\hooks\site\useSiteDetails.ts [246:26 - 253:20]
+
+Clone found (typescript):
+ - src\hooks\site\useSiteDetails.ts [289:21 - 296:26] (7 lines, 90 tokens)
+   src\hooks\site\useSiteDetails.ts [276:21 - 283:27]
+
+Clone found (typescript):
+ - src\hooks\site\useSiteActions.ts [64:26 - 73:26] (9 lines, 117 tokens)
+   src\hooks\site\useSiteActions.ts [41:26 - 50:27]
+
+Clone found (tsx):
+ - src\components\SiteDetails\SiteDetails.tsx [199:21 - 213:8] (14 lines, 119 tokens)
+   src\components\SiteDetails\SiteDetails.tsx [184:21 - 195:6]
+
+Clone found (tsx):
+ - src\components\Header\Header.tsx [225:22 - 237:9] (12 lines, 73 tokens)
+   src\components\Header\Header.tsx [207:19 - 219:13]
+
+Clone found (tsx):
+ - src\components\AddSiteForm\FormFields.tsx [224:17 - 231:9] (7 lines, 95 tokens)
+   src\components\AddSiteForm\FormFields.tsx [154:17 - 161:2]
+
+Clone found (tsx):
+ - src\components\AddSiteForm\AddSiteForm.tsx [78:21 - 93:27] (15 lines, 131 tokens)
+   src\components\Settings\Settings.tsx [61:15 - 76:48]
+
+Clone found (typescript):
+ - src\utils\siteStatus.ts [6:1 - 173:2] (167 lines, 1003 tokens)
+   electron\utils\siteStatus.ts [6:1 - 173:2]
+
+Clone found (typescript):
+ - src\utils\monitorTypeHelper.ts [11:1 - 32:4] (21 lines, 122 tokens)
+   electron\services\monitoring\MonitorTypeRegistry.ts [19:1 - 38:45]
+
+Clone found (typescript):
+ - src\utils\monitorTypeHelper.ts [46:9 - 62:36] (16 lines, 108 tokens)
+   electron\services\monitoring\MonitorTypeRegistry.ts [83:9 - 99:40]
+
+Clone found (typescript):
+ - src\theme\themes.ts [197:75 - 237:41] (40 lines, 278 tokens)
+   src\theme\themes.ts [83:76 - 126:4]
+
+Clone found (typescript):
+ - src\theme\themes.ts [308:42 - 325:10] (17 lines, 122 tokens)
+   src\theme\themes.ts [83:76 - 100:9]
+
+Clone found (typescript):
+ - src\services\chartConfig.ts [179:2 - 188:22] (9 lines, 87 tokens)
+   src\services\chartConfig.ts [119:8 - 128:26]
+
+Clone found (typescript):
+ - src\services\chartConfig.ts [192:2 - 202:8] (10 lines, 94 tokens)
+   src\services\chartConfig.ts [153:2 - 163:21]
+
+Clone found (typescript):
+ - src\services\chartConfig.ts [227:17 - 236:22] (9 lines, 88 tokens)
+   src\services\chartConfig.ts [179:2 - 128:26]
+
+HTML report saved to report\html\
+Markdown report saved to report\jscpd-report.md
+JSON report saved to report\jscpd-report.json
+┌────────────┬────────────────┬─────────────┬──────────────┬──────────────┬──────────────────┬───────────────────┐
+│ Format     │ Files analyzed │ Total lines │ Total tokens │ Clones found │ Duplicated lines │ Duplicated tokens │
+├────────────┼────────────────┼─────────────┼──────────────┼──────────────┼──────────────────┼───────────────────┤
+│ typescript │ 132            │ 22616       │ 163672       │ 33           │ 582 (2.57%)      │ 5024 (3.07%)      │
+├────────────┼────────────────┼─────────────┼──────────────┼──────────────┼──────────────────┼───────────────────┤
+│ javascript │ 28             │ 2291        │ 19345        │ 0            │ 0 (0%)           │ 0 (0%)            │
+├────────────┼────────────────┼─────────────┼──────────────┼──────────────┼──────────────────┼───────────────────┤
+│ tsx        │ 34             │ 6111        │ 46141        │ 7            │ 96 (1.57%)       │ 799 (1.73%)       │
+├────────────┼────────────────┼─────────────┼──────────────┼──────────────┼──────────────────┼───────────────────┤
+│ css        │ 3              │ 840         │ 6580         │ 0            │ 0 (0%)           │ 0 (0%)            │
+├────────────┼────────────────┼─────────────┼──────────────┼──────────────┼──────────────────┼───────────────────┤
+│ Total:     │ 197            │ 31858       │ 235738       │ 40           │ 678 (2.13%)      │ 5823 (2.47%)      │
+└────────────┴────────────────┴─────────────┴──────────────┴──────────────┴──────────────────┴───────────────────┘
+Found 40 clones.
+SARIF report saved to report\jscpd-sarif.json
+XML report saved to report\jscpd-report.xml
+Detection time:: 1.887s

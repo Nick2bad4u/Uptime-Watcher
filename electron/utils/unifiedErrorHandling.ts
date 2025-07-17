@@ -7,7 +7,8 @@
  * error logging, event emission, and recovery behavior throughout the application.
  */
 
-import { TypedEventBus, UptimeEvents } from "../events";
+import { TypedEventBus } from "../events/TypedEventBus";
+import { UptimeEvents } from "../events/eventTypes";
 import { logger } from "./logger";
 import { generateCorrelationId } from "./correlation";
 
