@@ -126,7 +126,7 @@ export function rowToMonitorOrUndefined(row: Record<string, unknown> | undefined
     if (!row) {
         return undefined;
     }
-    
+
     return rowToMonitor(row);
 }
 

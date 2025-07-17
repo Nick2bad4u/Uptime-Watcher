@@ -26,8 +26,8 @@ chriso
 cmkdl
 Compability
 constexpr
-Copilotmd
 copilotmd
+Copilotmd
 Cpath
 creatordate
 cstat
@@ -94,6 +94,7 @@ lintstagedrc
 lowlighter
 ltrim
 Luhn
+madge
 malept
 mangement
 mcpna
@@ -134,6 +135,7 @@ postprocessors
 profnandaa
 pulseaudio
 qualitygate
+repomix
 Rik
 ripemd
 robinraju
@@ -142,9 +144,9 @@ rtrim
 rubiin
 saf
 Sarhan
+sarif
 Sarif
 SARIF
-sarif
 scm
 Selecter
 sitecard
@@ -166,8 +168,8 @@ typestat
 Typpi
 uage
 unhover
-Upserted
 upserted
+Upserted
 uptimewatcher
 UTTON
 wantarray

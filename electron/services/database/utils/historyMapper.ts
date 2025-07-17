@@ -67,7 +67,7 @@ export function rowToHistoryEntryOrUndefined(row: Record<string, unknown> | unde
     if (!row) {
         return undefined;
     }
-    
+
     return rowToHistoryEntry(row);
 }
 

@@ -157,7 +157,7 @@ async function handleRetry(
     maxRetries: number
 ): Promise<void> {
     const delay = calculateRetryDelay(retry, attempt);
-    
+
     logger.debug(`Retrying ${context.operation} in ${delay}ms (attempt ${attempt + 1}/${maxRetries})`, {
         correlationId,
         delay,

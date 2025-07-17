@@ -100,6 +100,7 @@ export default [
             "**/cspell.json",
             "cspell.json",
             "**/chatproject.md",
+            "**/coverage-results.json",
         ],
     },
 

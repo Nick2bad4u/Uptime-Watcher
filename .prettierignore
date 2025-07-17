@@ -20,3 +20,6 @@ electron-app/package.json
 electron-app/package-lock.json
 package-lock.json
 package.json
+
+# Ignore specific files
+**/coverage-results.json"
