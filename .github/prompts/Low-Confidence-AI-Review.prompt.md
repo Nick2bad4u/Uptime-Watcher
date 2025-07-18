@@ -16,11 +16,12 @@ New claims to review, these are LOW confidence claims that need to be reviewed t
 ## Instructions
 
 - Review each claim listed below.
-- For each claim, Read the source code to understand the context of the claim.
+- For each claim, read the source code to understand the context of the claim.
 - For each claim, determine if it is a real issue or a false positive.
 - Assess whether the claim is relevant and makes sense in the context of our project.
-- If they are valid issues, proceed to plan a document outlining the proper fixes according to project standards.
-- Trace all data paths before making changes to ensure we don't break anything.
+- If they are valid issues, proceed to plan a document outlining the proper fixes and actions to take according to project standards.
+- Trace all data paths before making recommending changes to ensure we don't break anything, and that the changes are properly implemented.
 - Backwards compatibility is not necessary as we are in a development phase - feel free to make breaking changes, as long as you update the entire data path properly. Never write backwards compatibility code.
+- If you stumble upon any issues that are not related to the claims, add them to the document.
 
 Proceed to review all low confidence claims below using the outline above:

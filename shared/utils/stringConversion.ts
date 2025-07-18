@@ -15,10 +15,12 @@
  * - Preserves strings as-is
  * - Converts numbers and booleans using String()
  * - Uses JSON.stringify for objects when possible
- * - Falls back to String() conversion for edge cases
+ * - For objects that can't be JSON serialized, uses custom toString() if available
+ * - Provides meaningful fallbacks for functions, symbols, and other types
+ * - Never returns '[object Object]' - uses descriptive placeholders instead
  *
- * This approach avoids the '[object Object]' issue that SonarCloud flags
- * by using JSON.stringify for proper object serialization.
+ * This approach completely avoids the '[object Object]' issue by providing
+ * meaningful string representations for all value types.
  *
  * @example
  * ```typescript
@@ -26,6 +28,10 @@
  * safeStringify("hello") // "hello"
  * safeStringify(42) // "42"
  * safeStringify({a: 1}) // '{"a":1}'
+ * safeStringify(() => {}) // "[Function]"
+ * safeStringify(Symbol("test")) // "Symbol(test)"
+ * const circular = {}; circular.self = circular;
+ * safeStringify(circular) // "[Object]" (for circular references)
  * ```
  */
 export function safeStringify(value: unknown): string {
@@ -44,9 +50,27 @@ export function safeStringify(value: unknown): string {
         try {
             return JSON.stringify(value);
         } catch {
-            // Fallback to toString if JSON.stringify fails (e.g., circular references)
-            return String(value);
+            // Fallback for objects that can't be JSON serialized (e.g., circular references)
+            // Use a safer approach than String(value) which produces '[object Object]'
+            if (value && typeof value.toString === "function" && value.toString !== Object.prototype.toString) {
+                try {
+                    return value.toString();
+                } catch {
+                    return "[Complex Object]";
+                }
+            }
+            return "[Object]";
         }
     }
-    return String(value);
+    
+    // Handle remaining types (functions, symbols, etc.) without '[object Object]'
+    if (typeof value === "function") {
+        return "[Function]";
+    }
+    if (typeof value === "symbol") {
+        return value.toString();
+    }
+    
+    // Final fallback for any other types
+    return "[Unknown Type]";
 }

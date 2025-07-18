@@ -5,14 +5,12 @@
     "typescript.disableAutomaticTypeAcquisition": true,
     "typescript.suggest.autoImports": true,
     "typescript.tsserver.experimental.enableProjectDiagnostics": true,
-    "typescript.tsserver.exclude": ["**/node_modules/**"],
-    // Exclude from TypeScript checks and problems
     "typescript.check.npmIsInstalled": false,
     "typescript.workspaceSymbols.excludeLibrarySymbols": true,
-    // ESLint exclusions
-    "eslint.workingDirectories": ["."],
+    "eslint.workingDirectories": [
+        "."
+    ],
     "eslint.ignoreUntitled": true,
-    "http.proxySupport": "off",
     "css.lint.importStatement": "ignore",
     "eslint.validate": [
         "javascript",
@@ -56,10 +54,8 @@
         "**/dist-electron/**": true,
         "**/coverage/**": true
     },
-    // Additional exclusions for problems and diagnostics
     "problems.decorations.enabled": true,
     "problems.showCurrentInStatus": true,
-    // Language server exclusions
     "js/ts.implicitProjectConfig.experimentalDecorators": true,
     "js/ts.implicitProjectConfig.checkJs": false,
     "prettier-eslint-typescript.eslintConfig": {
@@ -80,10 +76,22 @@
             ],
             "prefer-const": "error",
             "prefer-template": "error",
-            "array-bracket-spacing": ["error", "always"],
-            "generator-star-spacing": ["error", "both"],
-            "space-before-function-paren": ["error", "always"],
-            "yield-star-spacing": ["error", "both"]
+            "array-bracket-spacing": [
+                "error",
+                "always"
+            ],
+            "generator-star-spacing": [
+                "error",
+                "both"
+            ],
+            "space-before-function-paren": [
+                "error",
+                "always"
+            ],
+            "yield-star-spacing": [
+                "error",
+                "both"
+            ]
         }
     },
     "prettier-eslint-typescript.prettierOptions": {
@@ -96,12 +104,20 @@
         "trailingComma": "none",
         "useTabs": false
     },
-    // Extension-specific settings to ignore node_modules
-    "errorLens.excludeBySource": ["ts(2339)", "ts(2307)", "ts(2304)", "eslint"],
-    "errorLens.exclude": ["**/node_modules/**"],
-    // SonarLint exclusions
-    "sonarlint.pathsToExclude": ["**/node_modules/**", "**/dist/**", "**/coverage/**"],
-    // Disable auto-indexing of node_modules
+    "errorLens.excludeBySource": [
+        "ts(2339)",
+        "ts(2307)",
+        "ts(2304)",
+        "eslint"
+    ],
+    "errorLens.exclude": [
+        "**/node_modules/**"
+    ],
+    "sonarlint.pathsToExclude": [
+        "**/node_modules/**",
+        "**/dist/**",
+        "**/coverage/**"
+    ],
     "typescript.preferences.includeCompletionsForImportStatements": false,
     "typescript.preferences.includeCompletionsForModuleExports": false,
     "typescript.preferences.includeCompletionsWithLowerCaseLetters": false,
@@ -118,37 +134,54 @@
             },
             "github": {
                 "command": "npx",
-                "args": ["-y", "@modelcontextprotocol/server-github"],
+                "args": [
+                    "-y",
+                    "@modelcontextprotocol/server-github"
+                ],
                 "env": {
                     "GITHUB_PERSONAL_ACCESS_TOKEN": ""
                 }
             },
             "memory": {
                 "command": "npx",
-                "args": ["-y", "@modelcontextprotocol/server-memory"]
+                "args": [
+                    "-y",
+                    "@modelcontextprotocol/server-memory"
+                ]
             },
             "repomix": {
                 "name": "repomix",
                 "command": "npx",
-                "args": ["-y", "repomix", "--mcp"]
+                "args": [
+                    "-y",
+                    "repomix",
+                    "--mcp"
+                ]
             }
         }
     },
-    // Bracket Colorize Without Any Extesion
     "workbench.colorCustomizations": {
-        "inlineparameters.annotationBackground": "#17181a",
-        "inlineparameters.annotationForeground": "#45A9F9",
-        "editorBracketHighlight.foreground1": "#FF75B5",
-        "editorBracketHighlight.foreground2": "#45A9F9",
-        "editorBracketHighlight.foreground3": "#924cee",
-        "editorBracketHighlight.foreground4": "#46fc55",
-        "editorBracketHighlight.foreground5": "#FFB86C",
-        "editorBracketHighlight.foreground6": "#F39C12",
-        "editorBracketHighlight.unexpectedBracket.oreground": "#FF2C6D",
+        "editorBracketPairGuide.activeBackground1": "#FF75B5",
+        "editorBracketPairGuide.activeBackground2": "#45A9F9",
+        "editorBracketPairGuide.activeBackground3": "#924cee",
+        "editorBracketPairGuide.activeBackground4": "#46fc55",
+        "editorBracketPairGuide.activeBackground5": "#FFB86C",
+        "editorBracketPairGuide.activeBackground6": "#F39C12",
+        "editorBracketHighlight.unexpectedBracket.foreground": "#FF2C6D",
         "editorCursor.foreground": "#ce2952",
-        "editor.cursorStyle": "line",
-        "editor.cursorWidth": 8,
-        "terminalCursor.foreground": "#ce2952"
+        "terminalCursor.foreground": "#ce2952",
+        "debugConsole.warningForeground": "#f06a6a",
+        "debugConsole.errorForeground": "#eb5a5a",
+        "debugConsole.sourceForeground": "#0c0",
+        "debugConsole.infoForeground": "#ececf3",
+        "debugView.valueChangedHighlight": "#ececf3",
+        "terminal.foreground": "#00FD61",
+        "terminal.background": "#000000",
+        "editorSuggestWidget.background": "#24262b",
+        "editorSuggestWidget.selectedBackground": "#768fc4",
+        "editorSuggestWidget.highlightForeground": "#ffffff",
+        "editor.selectionBackground": "#805d5d",
+        "editor.selectionForeground": "#ff0000"
     },
     "sonarlint.connectedMode.project": {
         "connectionId": "nick2bad4u",

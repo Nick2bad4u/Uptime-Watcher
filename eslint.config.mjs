@@ -45,7 +45,6 @@ import jsoncEslintParser from "jsonc-eslint-parser";
 import reactRefresh from "eslint-plugin-react-refresh";
 import putout from "eslint-plugin-putout";
 import { defineConfig } from "eslint/config";
-import importPlugin from "eslint-plugin-import";
 
 const __dirname = import.meta.dirname;
 
@@ -185,7 +184,7 @@ export default [
         },
         plugins: {
             "@typescript-eslint": tseslint,
-            importPlugin: pluginImport,
+            pluginImport: pluginImport,
             promise: pluginPromise,
             "unused-imports": pluginUnusedImports,
             react: pluginReact,
@@ -505,7 +504,7 @@ export default [
         },
         plugins: {
             "@typescript-eslint": tseslint,
-            importPlugin: pluginImport,
+            pluginImport: pluginImport,
             promise: pluginPromise,
             "unused-imports": pluginUnusedImports,
             react: pluginReact,
@@ -775,7 +774,7 @@ export default [
             vitest,
             "vitest-globals": vitestGlobals,
             "testing-library": pluginTestingLibrary,
-            importPlugin: pluginImport,
+            pluginImport: pluginImport,
             "unused-imports": pluginUnusedImports,
             react: pluginReact,
             "react-hooks": pluginReactHooks,
@@ -835,7 +834,7 @@ export default [
         plugins: {
             "@typescript-eslint": tseslint,
             vitest,
-            importPlugin: pluginImport,
+            pluginImport: pluginImport,
             "unused-imports": pluginUnusedImports,
         },
         rules: {
