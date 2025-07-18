@@ -5,10 +5,10 @@
 
 /**
  * Safely convert a value to string, handling complex objects appropriately.
- * 
+ *
  * @param value - Value to convert to string
  * @returns String representation of the value
- * 
+ *
  * @remarks
  * This function provides safe string conversion that:
  * - Returns empty string for null/undefined values
@@ -16,10 +16,10 @@
  * - Converts numbers and booleans using String()
  * - Uses JSON.stringify for objects when possible
  * - Falls back to String() conversion for edge cases
- * 
+ *
  * This approach avoids the '[object Object]' issue that SonarCloud flags
  * by using JSON.stringify for proper object serialization.
- * 
+ *
  * @example
  * ```typescript
  * safeStringify(null) // ""
