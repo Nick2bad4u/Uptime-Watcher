@@ -177,7 +177,8 @@ export class HistoryRepository {
                             [String(monitor.id), limit]
                         ) as { id: number }[];
                         if (excessEntries.length > 0) {
-                            const excessIds = excessEntries.map((e) => e.id);
+                            // Convert numeric IDs to ensure type safety
+                            const excessIds = excessEntries.map((e) => Number(e.id));
                             const placeholders = excessIds.map(() => "?").join(",");
                             db.run(`DELETE FROM history WHERE id IN (${placeholders})`, excessIds);
                         }

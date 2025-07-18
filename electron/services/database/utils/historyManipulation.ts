@@ -122,7 +122,8 @@ export function pruneHistoryForMonitor(db: Database, monitorId: string, limit: n
         ]) as { id: number }[];
 
         if (excess.length > 0) {
-            const excessIds = excess.map((row) => row.id);
+            // Convert numeric IDs to ensure type safety
+            const excessIds = excess.map((row) => Number(row.id));
             // Use parameterized query to avoid SQL injection
             const placeholders = excessIds.map(() => "?").join(",");
             db.run(`DELETE FROM history WHERE id IN (${placeholders})`, excessIds);

@@ -43,7 +43,9 @@ import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
 
 // ESM equivalent of __dirname
+// eslint-disable-next-line unicorn/prefer-import-meta-properties
 const __filename = fileURLToPath(import.meta.url);
+// eslint-disable-next-line unicorn/prefer-import-meta-properties
 const __dirname = path.dirname(__filename);
 
 /**
