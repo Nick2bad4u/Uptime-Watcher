@@ -11,13 +11,7 @@ import { MonitorScheduler } from "../../services/monitoring/MonitorScheduler";
 import { Site } from "../../types";
 import { SiteCacheInterface } from "../database/interfaces";
 import { withDatabaseOperation } from "../operationalHooks";
-
-interface Logger {
-    debug: (message: string, ...args: unknown[]) => void;
-    error: (message: string, error?: unknown, ...args: unknown[]) => void;
-    info: (message: string, ...args: unknown[]) => void;
-    warn: (message: string, ...args: unknown[]) => void;
-}
+import type { Logger } from "../interfaces";
 
 /**
  * Configuration object for monitoring lifecycle functions.

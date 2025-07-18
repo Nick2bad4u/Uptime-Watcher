@@ -4,13 +4,7 @@
  */
 
 import type { Site } from "../../types";
-
-interface Logger {
-    debug: (message: string, ...args: unknown[]) => void;
-    error: (message: string, error?: unknown, ...args: unknown[]) => void;
-    info: (message: string, ...args: unknown[]) => void;
-    warn: (message: string, ...args: unknown[]) => void;
-}
+import type { Logger } from "../interfaces";
 
 /**
  * Sets default check intervals for monitors that don't have one specified.

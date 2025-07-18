@@ -25,7 +25,9 @@ interface ErrorBoundaryProperties {
 export class ErrorBoundary extends React.Component<ErrorBoundaryProperties, ErrorBoundaryState> {
     constructor(properties: ErrorBoundaryProperties) {
         super(properties);
-        this.state = { hasError: false };
+        this.state = {
+            hasError: false,
+        };
     }
 
     static getDerivedStateFromError(error: Error): ErrorBoundaryState {

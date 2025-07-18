@@ -20,7 +20,7 @@ import pluginPromise from "eslint-plugin-promise";
 import pluginUnusedImports from "eslint-plugin-unused-imports";
 import pluginReact from "eslint-plugin-react";
 import pluginReactHooks from "eslint-plugin-react-hooks";
-import pluginJsxA11y from "eslint-plugin-jsx-a11y";
+import jsxA11y from "eslint-plugin-jsx-a11y";
 import pluginPrettier from "eslint-plugin-prettier";
 import pluginSonarjs from "eslint-plugin-sonarjs";
 import pluginSecurity from "eslint-plugin-security";
@@ -44,6 +44,9 @@ import eslintPluginToml from "eslint-plugin-toml";
 import tomlEslintParser from "toml-eslint-parser";
 import jsoncEslintParser from "jsonc-eslint-parser";
 import reactRefresh from "eslint-plugin-react-refresh";
+import putout from "eslint-plugin-putout";
+import { defineConfig } from "eslint/config";
+import plugin from "eslint-plugin-import";
 
 const __dirname = import.meta.dirname;
 
@@ -162,7 +165,7 @@ export default [
             },
         },
         settings: {
-            react: { version: "detect" },
+            react: { version: "19" },
             "boundaries/elements": [
                 { type: "app", pattern: "src/App.tsx" },
                 { type: "components", pattern: "src/components/**/*" },
@@ -181,7 +184,7 @@ export default [
             "unused-imports": pluginUnusedImports,
             react: pluginReact,
             "react-hooks": pluginReactHooks,
-            "jsx-a11y": pluginJsxA11y,
+            "jsx-a11y": jsxA11y,
             prettier: pluginPrettier,
             sonarjs: pluginSonarjs,
             security: pluginSecurity,
@@ -198,16 +201,36 @@ export default [
             filenames: pluginFilenames,
             regexp: pluginRegexp,
             "react-refresh": reactRefresh,
+            putout: putout,
+            regexp: pluginRegexp,
         },
         rules: {
             // TypeScript rules
             ...tseslint.configs.recommended.rules,
             ...tseslint.configs.strict.rules,
             ...tseslint.configs.stylistic.rules,
+            ...pluginRegexp.configs["flat/recommended"].rules,
             ...reactRefresh.configs.vite.rules,
             ...pluginImport.flatConfigs.typescript.rules,
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.recommended.rules,
+            ...pluginReact.configs.recommended.rules,
+            ...pluginReactHooks.configs["recommended-latest"].rules,
+            ...jsxA11y.flatConfigs.recommended.rules,
+            ...pluginSonarjs.configs.recommended.rules,
+            ...pluginEslintComments.configs.recommended.rules,
+            ...pluginPerfectionist.configs["recommended-natural"].rules,
+
+            "putout/array-element-newline": "off",
+            "putout/single-property-destructuring": "off",
+            "putout/multiple-properties-destructuring": "off",
+            "putout/long-properties-destructuring": "off",
+            "putout/destructuring-as-function-argument": "off",
+            "putout/align-spaces": "error",
+            "putout/newline-function-call-arguments": "off",
+            "putout/function-declaration-paren-newline": "error",
+            "putout/objects-braces-inside-array": "error",
+            "putout/object-property-newline": "error",
 
             "unicorn/prefer-global-this": "off", // Not suitable for Electron
             "unicorn/prevent-abbreviations": "off", // Too many false positives
@@ -323,7 +346,6 @@ export default [
             // Security
             "security/detect-object-injection": "warn",
             "security/detect-non-literal-regexp": "warn",
-            "redos/no-vulnerable": "error",
 
             // Performance and compatibility
             "compat/compat": "off", // Electron supports modern APIs, Opera Mini not a target
@@ -460,6 +482,7 @@ export default [
             },
         },
         settings: {
+            react: { version: "19" },
             "boundaries/elements": [
                 { type: "main", pattern: "electron/main.ts" },
                 { type: "preload", pattern: "electron/preload.ts" },
@@ -477,7 +500,7 @@ export default [
             "unused-imports": pluginUnusedImports,
             react: pluginReact,
             "react-hooks": pluginReactHooks,
-            "jsx-a11y": pluginJsxA11y,
+            "jsx-a11y": jsxA11y,
             prettier: pluginPrettier,
             sonarjs: pluginSonarjs,
             security: pluginSecurity,
@@ -493,15 +516,23 @@ export default [
             tsdoc: pluginTsdoc,
             filenames: pluginFilenames,
             regexp: pluginRegexp,
+            putout: putout,
         },
         rules: {
             // TypeScript backend rules
             ...tseslint.configs.recommended.rules,
             ...tseslint.configs.strict.rules,
             ...tseslint.configs.stylistic.rules,
+            ...pluginRegexp.configs["flat/recommended"].rules,
             ...pluginImport.flatConfigs.typescript.rules,
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.recommended.rules,
+            ...pluginReact.configs.recommended.rules,
+            ...pluginReactHooks.configs["recommended-latest"].rules,
+            ...jsxA11y.flatConfigs.recommended.rules,
+            ...pluginSonarjs.configs.recommended.rules,
+            ...pluginEslintComments.configs.recommended.rules,
+            ...pluginPerfectionist.configs["recommended-natural"].rules,
 
             "unicorn/prefer-global-this": "off", // Not suitable for Electron
             "unicorn/prevent-abbreviations": "off", // Too many false positives
@@ -510,6 +541,17 @@ export default [
             // "no-console": "off", // Logging is important for backend - DISABLED FOR NOW
             "prefer-const": "error",
             "no-var": "error",
+
+            "putout/array-element-newline": "off",
+            "putout/single-property-destructuring": "off",
+            "putout/multiple-properties-destructuring": "off",
+            "putout/long-properties-destructuring": "off",
+            "putout/destructuring-as-function-argument": "off",
+            "putout/align-spaces": "error",
+            "putout/newline-function-call-arguments": "off",
+            "putout/function-declaration-paren-newline": "error",
+            "putout/objects-braces-inside-array": "error",
+            "putout/object-property-newline": "error",
 
             // Import management
             "unused-imports/no-unused-imports": "error",
@@ -714,7 +756,7 @@ export default [
             },
         },
         settings: {
-            react: { version: "detect" },
+            react: { version: "19" },
         },
         plugins: {
             "@typescript-eslint": tseslint,

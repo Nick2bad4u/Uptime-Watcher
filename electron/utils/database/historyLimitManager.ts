@@ -5,13 +5,7 @@ import type { HistoryRepository } from "../../services/database/HistoryRepositor
 import type { SettingsRepository } from "../../services/database/SettingsRepository";
 import type { DatabaseService } from "../../services/database/DatabaseService";
 import { withDatabaseOperation } from "../operationalHooks";
-
-interface Logger {
-    debug: (message: string, ...args: unknown[]) => void;
-    error: (message: string, error?: unknown, ...args: unknown[]) => void;
-    info: (message: string, ...args: unknown[]) => void;
-    warn: (message: string, ...args: unknown[]) => void;
-}
+import type { Logger } from "../interfaces";
 
 /**
  * Parameters for setting history limit

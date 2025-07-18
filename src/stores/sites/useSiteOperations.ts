@@ -7,7 +7,6 @@
  */
 
 import type { Monitor, MonitorType, Site } from "../../types";
-
 import { ERROR_MESSAGES } from "../types";
 import { logStoreAction, withErrorHandling } from "../utils";
 import { MonitoringService } from "./services/MonitoringService";

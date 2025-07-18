@@ -14,26 +14,7 @@ import { HttpMonitor } from "./HttpMonitor";
 import { PortMonitor } from "./PortMonitor";
 import { migrationRegistry, versionManager, createMigrationOrchestrator, exampleMigrations } from "./MigrationSystem";
 import { logger } from "../../utils/logger";
-
-// Field definition for dynamic form generation
-export interface MonitorFieldDefinition {
-    /** Field name (matches monitor property) */
-    name: string;
-    /** Display label for the field */
-    label: string;
-    /** Input type for form rendering */
-    type: "text" | "number" | "url";
-    /** Whether field is required */
-    required: boolean;
-    /** Placeholder text */
-    placeholder?: string;
-    /** Help text for the field */
-    helpText?: string;
-    /** Min value for number fields */
-    min?: number;
-    /** Max value for number fields */
-    max?: number;
-}
+import type { MonitorFieldDefinition } from "../../../shared/types";
 
 // UI configuration for monitor type display
 export interface MonitorUIConfig {

@@ -44,20 +44,7 @@ import { MonitorFactory } from "../../services/monitoring/MonitorFactory";
 import { Site, StatusHistory, StatusUpdate } from "../../types";
 import { SiteCacheInterface } from "../database/interfaces";
 import { withDatabaseOperation } from "../operationalHooks";
-
-/**
- * Logger interface for monitor checking operations.
- *
- * @remarks
- * Standardized logging interface used throughout monitor checking utilities
- * to ensure consistent logging patterns and error reporting.
- */
-interface Logger {
-    debug: (message: string, ...args: unknown[]) => void;
-    error: (message: string, error?: unknown, ...args: unknown[]) => void;
-    info: (message: string, ...args: unknown[]) => void;
-    warn: (message: string, ...args: unknown[]) => void;
-}
+import type { Logger } from "../interfaces";
 
 /**
  * Configuration object for monitor checking functions.

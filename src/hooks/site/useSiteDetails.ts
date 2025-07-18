@@ -386,7 +386,9 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties) {
         try {
             const trimmedName = localName.trim();
             if (trimmedName) {
-                const updates = { name: trimmedName };
+                const updates = {
+                    name: trimmedName,
+                };
                 await modifySite(currentSite.identifier, updates);
             }
             setHasUnsavedChanges(false);

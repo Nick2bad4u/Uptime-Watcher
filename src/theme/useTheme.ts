@@ -97,6 +97,7 @@ export function useTheme() {
                 break;
             }
         }
+
         return typeof value === "string" ? value : "#000000";
     };
 

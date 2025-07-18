@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect, useCallback } from "react";
-import type { MonitorFieldDefinition } from "../utils/monitorTypeHelper";
+import type { MonitorFieldDefinition } from "../../shared/types";
 
 interface UseMonitorFieldsResult {
     /** Get field definitions for a specific monitor type */
