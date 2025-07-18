@@ -6,7 +6,7 @@ import { withDatabaseOperation } from "../../utils/operationalHooks";
 import { DatabaseService } from "./DatabaseService";
 import { HistoryRepository } from "./HistoryRepository";
 import { MonitorRepository } from "./MonitorRepository";
-import { rowToSite, rowsToSites, type SiteRow } from "./utils/siteMapper";
+import { rowsToSites, rowToSite, type SiteRow } from "./utils/siteMapper";
 
 /**
  * Repository for managing site data persistence.
@@ -14,8 +14,8 @@ import { rowToSite, rowsToSites, type SiteRow } from "./utils/siteMapper";
  */
 export class SiteRepository {
     private readonly databaseService: DatabaseService;
-    private readonly monitorRepository: MonitorRepository;
     private readonly historyRepository: HistoryRepository;
+    private readonly monitorRepository: MonitorRepository;
 
     constructor() {
         this.databaseService = DatabaseService.getInstance();
@@ -24,10 +24,139 @@ export class SiteRepository {
     }
 
     /**
-     * Get the database instance.
+     * Bulk insert sites (for import functionality).
+     * Uses executeTransaction for atomic operation.
      */
-    private getDb(): Database {
-        return this.databaseService.getDatabase();
+    public async bulkInsert(sites: SiteRow[]): Promise<void> {
+        if (sites.length === 0) {
+            return;
+        }
+
+        return withDatabaseOperation(
+            () => {
+                const db = this.databaseService.getDatabase();
+                this.bulkInsertInternal(db, sites);
+                return Promise.resolve();
+            },
+            "site-bulk-insert",
+            undefined,
+            { count: sites.length }
+        );
+    }
+
+    /**
+     * Internal method to bulk insert sites within an existing transaction.
+     * Use this method when you're already within a transaction context.
+     */
+    public bulkInsertInternal(db: Database, sites: SiteRow[]): void {
+        if (sites.length === 0) {
+            return;
+        }
+
+        // Prepare the statement once for better performance
+        const stmt = db.prepare("INSERT INTO sites (identifier, name, monitoring) VALUES (?, ?, ?)");
+
+        try {
+            for (const site of sites) {
+                // Convert monitoring boolean to SQLite integer
+                let monitoringValue = 1; // Default to true (1) if not specified
+                if (site.monitoring !== undefined) {
+                    monitoringValue = site.monitoring ? 1 : 0;
+                }
+
+                stmt.run([site.identifier, site.name ?? null, monitoringValue]);
+            }
+
+            logger.debug(`[SiteRepository] Bulk inserted ${sites.length} sites (internal)`);
+        } finally {
+            stmt.finalize();
+        }
+    }
+
+    /**
+     * Delete a site from the database.
+     */
+    public async delete(identifier: string): Promise<boolean> {
+        return withDatabaseOperation(
+            () => {
+                const db = this.databaseService.getDatabase();
+                const result = this.deleteInternal(db, identifier);
+                return Promise.resolve(result);
+            },
+            "site-delete",
+            undefined,
+            { identifier }
+        );
+    }
+
+    /**
+     * Clear all sites from the database.
+     */
+    public async deleteAll(): Promise<void> {
+        return withDatabaseOperation(() => {
+            const db = this.databaseService.getDatabase();
+            this.deleteAllInternal(db);
+            return Promise.resolve();
+        }, "site-delete-all");
+    }
+
+    /**
+     * Internal method to clear all sites from the database within an existing transaction.
+     * Use this method when you're already within a transaction context.
+     */
+    public deleteAllInternal(db: Database): void {
+        db.run("DELETE FROM sites");
+        logger.debug("[SiteRepository] All sites deleted (internal)");
+    }
+
+    /**
+     * Delete a site from the database (internal version for use within existing transactions).
+     * @param db - Database connection
+     * @param identifier - Site identifier
+     * @returns boolean indicating if the site was deleted
+     */
+    public deleteInternal(db: Database, identifier: string): boolean {
+        try {
+            const result = db.run("DELETE FROM sites WHERE identifier = ?", [identifier]);
+            const deleted = result.changes > 0;
+
+            if (deleted) {
+                logger.debug(`[SiteRepository] Deleted site: ${identifier}`);
+            } else {
+                logger.warn(`[SiteRepository] Site not found for deletion: ${identifier}`);
+            }
+
+            return deleted;
+        } catch (error) {
+            logger.error(`[SiteRepository] Failed to delete site: ${identifier}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * Check if a site exists by identifier.
+     */
+    public async exists(identifier: string): Promise<boolean> {
+        return withDatabaseOperation(
+            async () => {
+                const site = await this.findByIdentifier(identifier);
+                return site !== undefined;
+            },
+            "site-exists",
+            undefined,
+            { identifier }
+        );
+    }
+
+    /**
+     * Export all sites for backup/import functionality.
+     */
+    public async exportAll(): Promise<SiteRow[]> {
+        return withDatabaseOperation(() => {
+            const db = this.getDb();
+            const sites = db.all("SELECT identifier, name, monitoring FROM sites") as Record<string, unknown>[];
+            return Promise.resolve(rowsToSites(sites));
+        }, "site-export-all");
     }
 
     /**
@@ -97,9 +226,9 @@ export class SiteRepository {
 
                 const site: Site = {
                     identifier: siteRow.identifier,
-                    name: siteRow.name ?? "Unnamed Site",
-                    monitors: monitors,
                     monitoring: siteRow.monitoring ?? true, // Default to true if not set
+                    monitors: monitors,
+                    name: siteRow.name ?? "Unnamed Site",
                 };
 
                 return site;
@@ -113,7 +242,7 @@ export class SiteRepository {
     /**
      * Create or update a site in the database.
      */
-    public async upsert(site: Pick<Site, "identifier" | "name" | "monitoring">): Promise<void> {
+    public async upsert(site: Pick<Site, "identifier" | "monitoring" | "name">): Promise<void> {
         return withDatabaseOperation(
             () => {
                 const db = this.databaseService.getDatabase();
@@ -130,7 +259,7 @@ export class SiteRepository {
      * Internal method to create or update a site within an existing transaction.
      * Use this method when you're already within a transaction context.
      */
-    public upsertInternal(db: Database, site: Pick<Site, "identifier" | "name" | "monitoring">): void {
+    public upsertInternal(db: Database, site: Pick<Site, "identifier" | "monitoring" | "name">): void {
         // Ensure all values are valid for SQLite
         const identifier = site.identifier || ""; // Fallback for undefined/empty identifier
         const name = site.name || "Unnamed Site"; // Fallback for undefined/empty name
@@ -145,138 +274,9 @@ export class SiteRepository {
     }
 
     /**
-     * Delete a site from the database.
+     * Get the database instance.
      */
-    public async delete(identifier: string): Promise<boolean> {
-        return withDatabaseOperation(
-            () => {
-                const db = this.databaseService.getDatabase();
-                const result = this.deleteInternal(db, identifier);
-                return Promise.resolve(result);
-            },
-            "site-delete",
-            undefined,
-            { identifier }
-        );
-    }
-
-    /**
-     * Delete a site from the database (internal version for use within existing transactions).
-     * @param db - Database connection
-     * @param identifier - Site identifier
-     * @returns boolean indicating if the site was deleted
-     */
-    public deleteInternal(db: Database, identifier: string): boolean {
-        try {
-            const result = db.run("DELETE FROM sites WHERE identifier = ?", [identifier]);
-            const deleted = result.changes > 0;
-
-            if (deleted) {
-                logger.debug(`[SiteRepository] Deleted site: ${identifier}`);
-            } else {
-                logger.warn(`[SiteRepository] Site not found for deletion: ${identifier}`);
-            }
-
-            return deleted;
-        } catch (error) {
-            logger.error(`[SiteRepository] Failed to delete site: ${identifier}`, error);
-            throw error;
-        }
-    }
-
-    /**
-     * Check if a site exists by identifier.
-     */
-    public async exists(identifier: string): Promise<boolean> {
-        return withDatabaseOperation(
-            async () => {
-                const site = await this.findByIdentifier(identifier);
-                return site !== undefined;
-            },
-            "site-exists",
-            undefined,
-            { identifier }
-        );
-    }
-
-    /**
-     * Export all sites for backup/import functionality.
-     */
-    public async exportAll(): Promise<SiteRow[]> {
-        return withDatabaseOperation(() => {
-            const db = this.getDb();
-            const sites = db.all("SELECT identifier, name, monitoring FROM sites") as Record<string, unknown>[];
-            return Promise.resolve(rowsToSites(sites));
-        }, "site-export-all");
-    }
-
-    /**
-     * Clear all sites from the database.
-     */
-    public async deleteAll(): Promise<void> {
-        return withDatabaseOperation(() => {
-            const db = this.databaseService.getDatabase();
-            this.deleteAllInternal(db);
-            return Promise.resolve();
-        }, "site-delete-all");
-    }
-
-    /**
-     * Internal method to clear all sites from the database within an existing transaction.
-     * Use this method when you're already within a transaction context.
-     */
-    public deleteAllInternal(db: Database): void {
-        db.run("DELETE FROM sites");
-        logger.debug("[SiteRepository] All sites deleted (internal)");
-    }
-
-    /**
-     * Bulk insert sites (for import functionality).
-     * Uses executeTransaction for atomic operation.
-     */
-    public async bulkInsert(sites: SiteRow[]): Promise<void> {
-        if (sites.length === 0) {
-            return;
-        }
-
-        return withDatabaseOperation(
-            () => {
-                const db = this.databaseService.getDatabase();
-                this.bulkInsertInternal(db, sites);
-                return Promise.resolve();
-            },
-            "site-bulk-insert",
-            undefined,
-            { count: sites.length }
-        );
-    }
-
-    /**
-     * Internal method to bulk insert sites within an existing transaction.
-     * Use this method when you're already within a transaction context.
-     */
-    public bulkInsertInternal(db: Database, sites: SiteRow[]): void {
-        if (sites.length === 0) {
-            return;
-        }
-
-        // Prepare the statement once for better performance
-        const stmt = db.prepare("INSERT INTO sites (identifier, name, monitoring) VALUES (?, ?, ?)");
-
-        try {
-            for (const site of sites) {
-                // Convert monitoring boolean to SQLite integer
-                let monitoringValue = 1; // Default to true (1) if not specified
-                if (site.monitoring !== undefined) {
-                    monitoringValue = site.monitoring ? 1 : 0;
-                }
-
-                stmt.run([site.identifier, site.name ?? null, monitoringValue]);
-            }
-
-            logger.debug(`[SiteRepository] Bulk inserted ${sites.length} sites (internal)`);
-        } finally {
-            stmt.finalize();
-        }
+    private getDb(): Database {
+        return this.databaseService.getDatabase();
     }
 }

@@ -79,72 +79,72 @@ export function SiteDetailsNavigation({
     const BUTTON_VARIANT_SECONDARY = "secondary";
 
     return (
-        <ThemedBox variant="secondary" padding="lg" className="space-y-4 border-b">
+        <ThemedBox className="space-y-4 border-b" padding="lg" variant="secondary">
             {/* Tab Navigation and Monitor Selection */}
             <div className="flex flex-wrap items-center justify-between gap-4">
                 {/* Tab navigation buttons (left) */}
                 <div className="flex flex-wrap items-center gap-2">
                     <ThemedButton
-                        variant={
-                            activeSiteDetailsTab === "site-overview" ? BUTTON_VARIANT_PRIMARY : BUTTON_VARIANT_SECONDARY
-                        }
-                        size="sm"
                         onClick={() => {
                             setActiveSiteDetailsTab("site-overview");
                             logTabChange("site-overview");
                         }}
+                        size="sm"
+                        variant={
+                            activeSiteDetailsTab === "site-overview" ? BUTTON_VARIANT_PRIMARY : BUTTON_VARIANT_SECONDARY
+                        }
                     >
                         🏠 Site Overview
                     </ThemedButton>
                     <ThemedButton
+                        onClick={() => {
+                            setActiveSiteDetailsTab("monitor-overview");
+                            logTabChange("monitor-overview");
+                        }}
+                        size="sm"
                         variant={
                             activeSiteDetailsTab === "monitor-overview"
                                 ? BUTTON_VARIANT_PRIMARY
                                 : BUTTON_VARIANT_SECONDARY
                         }
-                        size="sm"
-                        onClick={() => {
-                            setActiveSiteDetailsTab("monitor-overview");
-                            logTabChange("monitor-overview");
-                        }}
                     >
                         📊 Monitor Overview
                     </ThemedButton>
                     {/* Render analytics tab for selected monitor type only */}
                     <ThemedButton
                         key={selectedMonitorId}
+                        onClick={() => {
+                            setActiveSiteDetailsTab(`${selectedMonitorId}-analytics`);
+                            logTabChange("analytics", { monitorId: selectedMonitorId });
+                        }}
+                        size="sm"
                         variant={
                             activeSiteDetailsTab === `${selectedMonitorId}-analytics`
                                 ? BUTTON_VARIANT_PRIMARY
                                 : BUTTON_VARIANT_SECONDARY
                         }
-                        size="sm"
-                        onClick={() => {
-                            setActiveSiteDetailsTab(`${selectedMonitorId}-analytics`);
-                            logTabChange("analytics", { monitorId: selectedMonitorId });
-                        }}
                     >
                         {`📈 ${selectedMonitorId.toUpperCase()}`}
                     </ThemedButton>
                     <ThemedButton
-                        variant={activeSiteDetailsTab === "history" ? BUTTON_VARIANT_PRIMARY : BUTTON_VARIANT_SECONDARY}
-                        size="sm"
                         onClick={() => {
                             setActiveSiteDetailsTab("history");
                             logTabChange("history");
                         }}
+                        size="sm"
+                        variant={activeSiteDetailsTab === "history" ? BUTTON_VARIANT_PRIMARY : BUTTON_VARIANT_SECONDARY}
                     >
                         📜 History
                     </ThemedButton>
                     <ThemedButton
-                        variant={
-                            activeSiteDetailsTab === "settings" ? BUTTON_VARIANT_PRIMARY : BUTTON_VARIANT_SECONDARY
-                        }
-                        size="sm"
                         onClick={() => {
                             setActiveSiteDetailsTab("settings");
                             logTabChange("settings");
                         }}
+                        size="sm"
+                        variant={
+                            activeSiteDetailsTab === "settings" ? BUTTON_VARIANT_PRIMARY : BUTTON_VARIANT_SECONDARY
+                        }
                     >
                         ⚙️ Settings
                     </ThemedButton>
@@ -156,28 +156,28 @@ export function SiteDetailsNavigation({
                     <div className="flex items-center gap-2">
                         {allMonitorsRunning ? (
                             <ThemedButton
-                                variant="error"
-                                size="sm"
-                                onClick={() => {
-                                    void handleStopSiteMonitoring();
-                                }}
                                 aria-label="Stop All Monitoring"
                                 className="flex items-center gap-1"
                                 disabled={isLoading}
+                                onClick={() => {
+                                    void handleStopSiteMonitoring();
+                                }}
+                                size="sm"
+                                variant="error"
                             >
                                 <span>⏹️</span>
                                 <span className="hidden text-xs sm:inline">Stop All</span>
                             </ThemedButton>
                         ) : (
                             <ThemedButton
-                                variant="success"
-                                size="sm"
-                                onClick={() => {
-                                    void handleStartSiteMonitoring();
-                                }}
                                 aria-label="Start All Monitoring"
                                 className="flex items-center gap-1"
                                 disabled={isLoading}
+                                onClick={() => {
+                                    void handleStartSiteMonitoring();
+                                }}
+                                size="sm"
+                                variant="success"
                             >
                                 <span>▶️</span>
                                 <span className="hidden text-xs sm:inline">Start All</span>
@@ -187,26 +187,26 @@ export function SiteDetailsNavigation({
                         {/* Individual monitor controls */}
                         {isMonitoring ? (
                             <ThemedButton
-                                variant="warning"
-                                size="sm"
+                                aria-label="Stop Monitoring"
+                                className="flex items-center gap-1"
                                 onClick={() => {
                                     void handleStopMonitoring();
                                 }}
-                                aria-label="Stop Monitoring"
-                                className="flex items-center gap-1"
+                                size="sm"
+                                variant="warning"
                             >
                                 <span>⏸️</span>
                                 <span className="hidden text-xs sm:inline">Stop</span>
                             </ThemedButton>
                         ) : (
                             <ThemedButton
-                                variant="success"
-                                size="sm"
+                                aria-label="Start Monitoring"
+                                className="flex items-center gap-1"
                                 onClick={() => {
                                     void handleStartMonitoring();
                                 }}
-                                aria-label="Start Monitoring"
-                                className="flex items-center gap-1"
+                                size="sm"
+                                variant="success"
                             >
                                 <span>▶️</span>
                                 <span className="hidden text-xs sm:inline">Start</span>
@@ -216,10 +216,10 @@ export function SiteDetailsNavigation({
 
                     {/* Monitor Selection */}
                     <div className="flex items-center gap-2">
-                        <ThemedText variant="secondary" size="sm">
+                        <ThemedText size="sm" variant="secondary">
                             Monitor:
                         </ThemedText>
-                        <ThemedSelect value={selectedMonitorId} onChange={handleMonitorIdChange}>
+                        <ThemedSelect onChange={handleMonitorIdChange} value={selectedMonitorId}>
                             {currentSite.monitors.map((monitor) => (
                                 <option key={monitor.id} value={monitor.id}>
                                     {monitor.type.toUpperCase()}

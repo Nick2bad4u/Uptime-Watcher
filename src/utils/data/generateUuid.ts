@@ -17,7 +17,10 @@
  * ```
  */
 export function generateUuid(): string {
-    return typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
-        ? crypto.randomUUID()
-        : `site-${Math.random().toString(36).slice(2, 10)}-${Date.now()}`;
+    if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+        return crypto.randomUUID();
+    }
+    // Fallback for environments without crypto.randomUUID
+    // eslint-disable-next-line sonarjs/pseudo-random -- Fallback for compatibility
+    return `site-${Math.random().toString(36).slice(2, 10)}-${Date.now()}`;
 }

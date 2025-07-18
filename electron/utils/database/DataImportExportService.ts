@@ -17,38 +17,79 @@ import { withDatabaseOperation } from "../operationalHooks";
 import { Logger, SiteCacheInterface, SiteLoadingError } from "./interfaces";
 
 /**
- * Type for imported site data structure.
- */
-export interface ImportSite {
-    identifier: string;
-    name?: string;
-    monitors?: Site["monitors"];
-}
-
-/**
  * Configuration for data import/export operations.
  */
 export interface DataImportExportConfig {
-    eventEmitter: TypedEventBus<UptimeEvents>;
     databaseService: DatabaseService;
+    eventEmitter: TypedEventBus<UptimeEvents>;
+    logger: Logger;
     repositories: {
         history: HistoryRepository;
         monitor: MonitorRepository;
         settings: SettingsRepository;
         site: SiteRepository;
     };
-    logger: Logger;
 }
 
 /**
- * Type guard for expected import data structure.
+ * Type for imported site data structure.
  */
-function isImportData(obj: unknown): obj is { sites: ImportSite[]; settings?: Record<string, string> } {
-    if (typeof obj === "object" && obj !== null && Array.isArray((obj as Record<string, unknown>).sites)) {
-        // Optionally check each site for required properties
-        return true;
+export interface ImportSite {
+    identifier: string;
+    monitors?: Site["monitors"];
+    name?: string;
+}
+
+/**
+ * Orchestrates the complete data import/export process.
+ * Coordinates data operations with side effects.
+ */
+export class DataImportExportOrchestrator {
+    private readonly dataImportExportService: DataImportExportService;
+
+    constructor(dataImportExportService: DataImportExportService) {
+        this.dataImportExportService = dataImportExportService;
     }
-    return false;
+
+    /**
+     * Export all application data.
+     * Coordinates the complete export process.
+     */
+    async exportData(): Promise<string> {
+        return this.dataImportExportService.exportAllData();
+    }
+
+    /**
+     * Import data and reload application state.
+     * Coordinates the complete import process including cache refresh.
+     */
+    async importData(
+        jsonData: string,
+        siteCache: SiteCacheInterface,
+        onSitesReloaded: () => Promise<void>
+    ): Promise<{ message: string; success: boolean }> {
+        try {
+            // Parse the import data
+            const { settings, sites } = await this.dataImportExportService.importDataFromJson(jsonData);
+
+            // Persist to database
+            await this.dataImportExportService.persistImportedData(sites, settings);
+
+            // Clear cache and reload sites
+            siteCache.clear();
+            await onSitesReloaded();
+
+            return {
+                message: `Successfully imported ${sites.length} sites and ${Object.keys(settings).length} settings`,
+                success: true,
+            };
+        } catch (error) {
+            return {
+                message: `Failed to import data: ${error instanceof Error ? error.message : "Unknown error"}`,
+                success: false,
+            };
+        }
+    }
 }
 
 /**
@@ -58,15 +99,15 @@ function isImportData(obj: unknown): obj is { sites: ImportSite[]; settings?: Re
 export class DataImportExportService {
     private static readonly DATABASE_ERROR_EVENT = "database:error" as const;
 
+    private readonly databaseService: DatabaseService;
+    private readonly eventEmitter: TypedEventBus<UptimeEvents>;
+    private readonly logger: Logger;
     private readonly repositories: {
         history: HistoryRepository;
         monitor: MonitorRepository;
         settings: SettingsRepository;
         site: SiteRepository;
     };
-    private readonly databaseService: DatabaseService;
-    private readonly logger: Logger;
-    private readonly eventEmitter: TypedEventBus<UptimeEvents>;
 
     constructor(config: DataImportExportConfig) {
         this.repositories = config.repositories;
@@ -112,7 +153,7 @@ export class DataImportExportService {
      * Import data from JSON string.
      * Pure data operation that returns the imported data.
      */
-    async importDataFromJson(jsonData: string): Promise<{ sites: ImportSite[]; settings: Record<string, string> }> {
+    async importDataFromJson(jsonData: string): Promise<{ settings: Record<string, string>; sites: ImportSite[] }> {
         try {
             // Parse and validate the JSON data
             const data: unknown = JSON.parse(jsonData);
@@ -177,36 +218,8 @@ export class DataImportExportService {
             },
             "data-import-persist",
             this.eventEmitter,
-            { sitesCount: sites.length, settingsCount: Object.keys(settings).length }
+            { settingsCount: Object.keys(settings).length, sitesCount: sites.length }
         );
-    }
-
-    /**
-     * Import monitors with their history for all sites.
-     * Private helper method for monitor data persistence.
-     */
-    private async importMonitorsWithHistory(db: Database, sites: ImportSite[]): Promise<void> {
-        for (const site of sites) {
-            if (Array.isArray(site.monitors) && site.monitors.length > 0) {
-                try {
-                    // Create monitors using the async bulkCreate method
-                    const createdMonitors = await this.repositories.monitor.bulkCreate(site.identifier, site.monitors);
-
-                    // Import history for the created monitors
-                    this.importHistoryForMonitors(db, createdMonitors, site.monitors);
-
-                    this.logger.debug(
-                        `[DataImportExportService] Imported ${createdMonitors.length} monitors for site: ${site.identifier}`
-                    );
-                } catch (error) {
-                    this.logger.error(
-                        `[DataImportExportService] Failed to import monitors for site ${site.identifier}:`,
-                        error
-                    );
-                    // Continue with other sites even if one fails
-                }
-            }
-        }
     }
 
     /**
@@ -251,56 +264,39 @@ export class DataImportExportService {
             );
         }
     }
+
+    /**
+     * Import monitors with their history for all sites.
+     * Private helper method for monitor data persistence.
+     */
+    private async importMonitorsWithHistory(db: Database, sites: ImportSite[]): Promise<void> {
+        for (const site of sites) {
+            if (Array.isArray(site.monitors) && site.monitors.length > 0) {
+                try {
+                    // Create monitors using the async bulkCreate method
+                    const createdMonitors = await this.repositories.monitor.bulkCreate(site.identifier, site.monitors);
+
+                    // Import history for the created monitors
+                    this.importHistoryForMonitors(db, createdMonitors, site.monitors);
+
+                    this.logger.debug(
+                        `[DataImportExportService] Imported ${createdMonitors.length} monitors for site: ${site.identifier}`
+                    );
+                } catch (error) {
+                    this.logger.error(
+                        `[DataImportExportService] Failed to import monitors for site ${site.identifier}:`,
+                        error
+                    );
+                    // Continue with other sites even if one fails
+                }
+            }
+        }
+    }
 }
 
 /**
- * Orchestrates the complete data import/export process.
- * Coordinates data operations with side effects.
+ * Type guard for expected import data structure.
  */
-export class DataImportExportOrchestrator {
-    private readonly dataImportExportService: DataImportExportService;
-
-    constructor(dataImportExportService: DataImportExportService) {
-        this.dataImportExportService = dataImportExportService;
-    }
-
-    /**
-     * Export all application data.
-     * Coordinates the complete export process.
-     */
-    async exportData(): Promise<string> {
-        return this.dataImportExportService.exportAllData();
-    }
-
-    /**
-     * Import data and reload application state.
-     * Coordinates the complete import process including cache refresh.
-     */
-    async importData(
-        jsonData: string,
-        siteCache: SiteCacheInterface,
-        onSitesReloaded: () => Promise<void>
-    ): Promise<{ success: boolean; message: string }> {
-        try {
-            // Parse the import data
-            const { settings, sites } = await this.dataImportExportService.importDataFromJson(jsonData);
-
-            // Persist to database
-            await this.dataImportExportService.persistImportedData(sites, settings);
-
-            // Clear cache and reload sites
-            siteCache.clear();
-            await onSitesReloaded();
-
-            return {
-                message: `Successfully imported ${sites.length} sites and ${Object.keys(settings).length} settings`,
-                success: true,
-            };
-        } catch (error) {
-            return {
-                message: `Failed to import data: ${error instanceof Error ? error.message : "Unknown error"}`,
-                success: false,
-            };
-        }
-    }
+function isImportData(obj: unknown): obj is { settings?: Record<string, string>; sites: ImportSite[] } {
+    return typeof obj === "object" && obj !== null && Array.isArray((obj as Record<string, unknown>).sites);
 }

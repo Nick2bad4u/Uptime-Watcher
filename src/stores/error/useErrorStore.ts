@@ -25,10 +25,12 @@ export const useErrorStore = create<ErrorStore>()((set, get) => ({
     clearStoreError: (store: string) => {
         logStoreAction("ErrorStore", "clearStoreError", { store });
         set((state) => {
-            const newStoreErrors = { ...state.storeErrors };
+            const newStoreErrors = {
+                ...state.storeErrors,
+            };
             // Use destructuring to avoid dynamic delete
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { [store]: _, ...remainingErrors } = newStoreErrors;
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars, sonarjs/no-unused-vars
+            const { [store]: _unused, ...remainingErrors } = newStoreErrors;
             return { storeErrors: remainingErrors };
         });
     },

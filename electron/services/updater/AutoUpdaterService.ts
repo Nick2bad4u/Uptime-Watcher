@@ -10,14 +10,14 @@ import { logger } from "../../utils/logger";
 /**
  * Status of the application update process.
  */
-export type UpdateStatus = "idle" | "checking" | "available" | "downloading" | "downloaded" | "error";
+export type UpdateStatus = "available" | "checking" | "downloaded" | "downloading" | "error" | "idle";
 
 /**
  * Data structure for update status information.
  */
 export interface UpdateStatusData {
-    status: UpdateStatus;
     error?: string;
+    status: UpdateStatus;
 }
 
 /**
@@ -28,10 +28,18 @@ export class AutoUpdaterService {
     private onStatusChange?: (statusData: UpdateStatusData) => void;
 
     /**
-     * Set the callback for update status changes.
+     * Check for updates and notify if available.
      */
-    public setStatusCallback(callback: (statusData: UpdateStatusData) => void): void {
-        this.onStatusChange = callback;
+    public async checkForUpdates(): Promise<void> {
+        try {
+            await autoUpdater.checkForUpdatesAndNotify();
+        } catch (error) {
+            logger.error("[AutoUpdaterService] Failed to check for updates", error);
+            this.notifyStatusChange({
+                error: error instanceof Error ? error.message : String(error),
+                status: "error",
+            });
+        }
     }
 
     /**
@@ -80,26 +88,18 @@ export class AutoUpdaterService {
     }
 
     /**
-     * Check for updates and notify if available.
-     */
-    public async checkForUpdates(): Promise<void> {
-        try {
-            await autoUpdater.checkForUpdatesAndNotify();
-        } catch (error) {
-            logger.error("[AutoUpdaterService] Failed to check for updates", error);
-            this.notifyStatusChange({
-                error: error instanceof Error ? error.message : String(error),
-                status: "error",
-            });
-        }
-    }
-
-    /**
      * Quit the application and install the update.
      */
     public quitAndInstall(): void {
         logger.info("[AutoUpdaterService] Quitting and installing update");
         autoUpdater.quitAndInstall();
+    }
+
+    /**
+     * Set the callback for update status changes.
+     */
+    public setStatusCallback(callback: (statusData: UpdateStatusData) => void): void {
+        this.onStatusChange = callback;
     }
 
     /**

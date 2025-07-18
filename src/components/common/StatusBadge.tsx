@@ -9,16 +9,16 @@ import { StatusIndicator, ThemedText } from "../../theme/components";
 
 /** Props for the StatusBadge component */
 interface StatusBadgeProperties {
-    /** Label text to display */
-    label: string;
-    /** Current status to display */
-    status: "up" | "down" | "pending" | "paused";
-    /** Text size (affects both text and icon sizing) */
-    size?: "xs" | "sm" | "base" | "lg" | "xl" | "2xl" | "3xl" | "4xl";
-    /** Whether to show the status icon */
-    showIcon?: boolean;
     /** Additional CSS classes */
     className?: string;
+    /** Label text to display */
+    label: string;
+    /** Whether to show the status icon */
+    showIcon?: boolean;
+    /** Text size (affects both text and icon sizing) */
+    size?: "2xl" | "3xl" | "4xl" | "base" | "lg" | "sm" | "xl" | "xs";
+    /** Current status to display */
+    status: "down" | "paused" | "pending" | "up";
 }
 
 /**
@@ -43,21 +43,21 @@ export const StatusBadge = React.memo(function StatusBadge({
      * @param textSize - The text size to map
      * @returns Corresponding indicator size
      */
-    const getIndicatorSize = (textSize: typeof size): "sm" | "md" | "lg" => {
+    const getIndicatorSize = (textSize: typeof size): "lg" | "md" | "sm" => {
         switch (textSize) {
-            case "xs":
-            case "sm": {
-                return "sm";
+            case "2xl":
+            case "3xl":
+            case "4xl":
+            case "xl": {
+                return "lg";
             }
             case "base":
             case "lg": {
                 return "md";
             }
-            case "xl":
-            case "2xl":
-            case "3xl":
-            case "4xl": {
-                return "lg";
+            case "sm":
+            case "xs": {
+                return "sm";
             }
             default: {
                 return "sm";
@@ -67,8 +67,8 @@ export const StatusBadge = React.memo(function StatusBadge({
 
     return (
         <div className={`flex items-center gap-3 ${className}`}>
-            {showIcon && <StatusIndicator status={status} size={getIndicatorSize(size)} />}
-            <ThemedText variant="secondary" size={size}>
+            {showIcon && <StatusIndicator size={getIndicatorSize(size)} status={status} />}
+            <ThemedText size={size} variant="secondary">
                 {label}: {status}
             </ThemedText>
         </div>

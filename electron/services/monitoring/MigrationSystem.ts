@@ -6,17 +6,109 @@
 import { logger } from "../../utils/logger";
 
 export interface MigrationRule {
-    fromVersion: string;
-    toVersion: string;
     description: string;
+    fromVersion: string;
     isBreaking: boolean;
+    toVersion: string;
     transform: (data: Record<string, unknown>) => Promise<Record<string, unknown>>;
 }
 
 export interface VersionInfo {
-    version: string;
-    timestamp: number;
     applied: boolean;
+    timestamp: number;
+    version: string;
+}
+
+/**
+ * Basic migration orchestrator
+ */
+class MigrationOrchestrator {
+    constructor(
+        private readonly registry: MigrationRegistry,
+        private readonly versionManager: VersionManager
+    ) {}
+
+    /**
+     * Migrate monitor data from one version to another
+     */
+    async migrateMonitorData(
+        monitorType: string,
+        data: Record<string, unknown>,
+        fromVersion: string,
+        toVersion: string
+    ): Promise<{
+        appliedMigrations: string[];
+        data?: Record<string, unknown>;
+        errors: string[];
+        success: boolean;
+        warnings: string[];
+    }> {
+        const errors: string[] = [];
+        const warnings: string[] = [];
+        const appliedMigrations: string[] = [];
+
+        try {
+            // Check if migration is needed
+            if (fromVersion === toVersion) {
+                return {
+                    appliedMigrations: [],
+                    data,
+                    errors: [],
+                    success: true,
+                    warnings: [],
+                };
+            }
+
+            // Get migration path
+            const migrationPath = this.registry.getMigrationPath(monitorType, fromVersion, toVersion);
+
+            // Apply migrations in sequence
+            let currentData = data;
+
+            for (const migration of migrationPath) {
+                try {
+                    logger.info(`Applying migration: ${monitorType} ${migration.fromVersion} → ${migration.toVersion}`);
+
+                    currentData = await migration.transform(currentData);
+                    appliedMigrations.push(`${migration.fromVersion}_to_${migration.toVersion}`);
+
+                    if (migration.isBreaking) {
+                        warnings.push(`Applied breaking migration: ${migration.description}`);
+                    }
+                } catch (error) {
+                    const errorMessage = `Migration failed: ${migration.description} - ${error}`;
+                    errors.push(errorMessage);
+                    logger.error(errorMessage, error);
+                    break;
+                }
+            }
+
+            // Update version if all migrations succeeded
+            if (errors.length === 0) {
+                this.versionManager.setVersion(monitorType, toVersion);
+            }
+
+            return {
+                appliedMigrations,
+                data: currentData,
+                errors,
+                success: errors.length === 0,
+                warnings,
+            };
+        } catch (error) {
+            const errorMessage = `Migration orchestration failed: ${error}`;
+            errors.push(errorMessage);
+            logger.error(errorMessage, error);
+
+            return {
+                appliedMigrations,
+                data,
+                errors,
+                success: false,
+                warnings,
+            };
+        }
+    }
 }
 
 /**
@@ -26,24 +118,15 @@ class MigrationRegistry {
     private readonly migrations = new Map<string, MigrationRule[]>();
 
     /**
-     * Register a migration for a monitor type
+     * Check if migration is possible
      */
-    registerMigration(monitorType: string, rule: MigrationRule): void {
-        if (!this.migrations.has(monitorType)) {
-            this.migrations.set(monitorType, []);
+    canMigrate(monitorType: string, fromVersion: string, toVersion: string): boolean {
+        try {
+            this.getMigrationPath(monitorType, fromVersion, toVersion);
+            return true;
+        } catch {
+            return false;
         }
-
-        const rules = this.migrations.get(monitorType);
-        if (!rules) {
-            throw new Error(`Failed to create migration rules for ${monitorType}`);
-        }
-
-        rules.push(rule);
-
-        // Sort by version
-        rules.sort((a, b) => this.compareVersions(a.fromVersion, b.fromVersion));
-
-        logger.info(`Registered migration for ${monitorType}: ${rule.fromVersion} → ${rule.toVersion}`);
     }
 
     /**
@@ -84,15 +167,24 @@ class MigrationRegistry {
     }
 
     /**
-     * Check if migration is possible
+     * Register a migration for a monitor type
      */
-    canMigrate(monitorType: string, fromVersion: string, toVersion: string): boolean {
-        try {
-            this.getMigrationPath(monitorType, fromVersion, toVersion);
-            return true;
-        } catch {
-            return false;
+    registerMigration(monitorType: string, rule: MigrationRule): void {
+        if (!this.migrations.has(monitorType)) {
+            this.migrations.set(monitorType, []);
         }
+
+        const rules = this.migrations.get(monitorType);
+        if (!rules) {
+            throw new Error(`Failed to create migration rules for ${monitorType}`);
+        }
+
+        rules.push(rule);
+
+        // Sort by version
+        rules.sort((a, b) => this.compareVersions(a.fromVersion, b.fromVersion));
+
+        logger.info(`Registered migration for ${monitorType}: ${rule.fromVersion} → ${rule.toVersion}`);
     }
 
     /**
@@ -123,14 +215,10 @@ class VersionManager {
     private readonly versions = new Map<string, VersionInfo>();
 
     /**
-     * Set version for a monitor type
+     * Get all versions
      */
-    setVersion(monitorType: string, version: string): void {
-        this.versions.set(monitorType, {
-            version,
-            timestamp: Date.now(),
-            applied: true,
-        });
+    getAllVersions(): Map<string, VersionInfo> {
+        return new Map(this.versions);
     }
 
     /**
@@ -149,102 +237,14 @@ class VersionManager {
     }
 
     /**
-     * Get all versions
+     * Set version for a monitor type
      */
-    getAllVersions(): Map<string, VersionInfo> {
-        return new Map(this.versions);
-    }
-}
-
-/**
- * Basic migration orchestrator
- */
-class MigrationOrchestrator {
-    constructor(
-        private readonly registry: MigrationRegistry,
-        private readonly versionManager: VersionManager
-    ) {}
-
-    /**
-     * Migrate monitor data from one version to another
-     */
-    async migrateMonitorData(
-        monitorType: string,
-        data: Record<string, unknown>,
-        fromVersion: string,
-        toVersion: string
-    ): Promise<{
-        success: boolean;
-        data?: Record<string, unknown>;
-        appliedMigrations: string[];
-        errors: string[];
-        warnings: string[];
-    }> {
-        const errors: string[] = [];
-        const warnings: string[] = [];
-        const appliedMigrations: string[] = [];
-
-        try {
-            // Check if migration is needed
-            if (fromVersion === toVersion) {
-                return {
-                    success: true,
-                    data,
-                    appliedMigrations: [],
-                    errors: [],
-                    warnings: [],
-                };
-            }
-
-            // Get migration path
-            const migrationPath = this.registry.getMigrationPath(monitorType, fromVersion, toVersion);
-
-            // Apply migrations in sequence
-            let currentData = data;
-
-            for (const migration of migrationPath) {
-                try {
-                    logger.info(`Applying migration: ${monitorType} ${migration.fromVersion} → ${migration.toVersion}`);
-
-                    currentData = await migration.transform(currentData);
-                    appliedMigrations.push(`${migration.fromVersion}_to_${migration.toVersion}`);
-
-                    if (migration.isBreaking) {
-                        warnings.push(`Applied breaking migration: ${migration.description}`);
-                    }
-                } catch (error) {
-                    const errorMessage = `Migration failed: ${migration.description} - ${error}`;
-                    errors.push(errorMessage);
-                    logger.error(errorMessage, error);
-                    break;
-                }
-            }
-
-            // Update version if all migrations succeeded
-            if (errors.length === 0) {
-                this.versionManager.setVersion(monitorType, toVersion);
-            }
-
-            return {
-                success: errors.length === 0,
-                data: currentData,
-                appliedMigrations,
-                errors,
-                warnings,
-            };
-        } catch (error) {
-            const errorMessage = `Migration orchestration failed: ${error}`;
-            errors.push(errorMessage);
-            logger.error(errorMessage, error);
-
-            return {
-                success: false,
-                data,
-                appliedMigrations,
-                errors,
-                warnings,
-            };
-        }
+    setVersion(monitorType: string, version: string): void {
+        this.versions.set(monitorType, {
+            applied: true,
+            timestamp: Date.now(),
+            version,
+        });
     }
 }
 
@@ -261,10 +261,10 @@ export function createMigrationOrchestrator(): MigrationOrchestrator {
 export const exampleMigrations = {
     // Example: HTTP monitor adding timeout field
     httpV1_0_to_1_1: {
-        fromVersion: "1.0.0",
-        toVersion: "1.1.0",
         description: "Add timeout field with default 30s",
+        fromVersion: "1.0.0",
         isBreaking: false,
+        toVersion: "1.1.0",
         transform: (data: Record<string, unknown>) =>
             Promise.resolve({
                 ...data,
@@ -274,10 +274,10 @@ export const exampleMigrations = {
 
     // Example: Port monitor converting port to number
     portV1_0_to_1_1: {
-        fromVersion: "1.0.0",
-        toVersion: "1.1.0",
         description: "Ensure port is a number",
+        fromVersion: "1.0.0",
         isBreaking: false,
+        toVersion: "1.1.0",
         transform: (data: Record<string, unknown>) =>
             Promise.resolve({
                 ...data,

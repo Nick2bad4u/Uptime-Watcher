@@ -8,16 +8,16 @@ import { getAllMonitorTypeConfigs } from "../../monitoring/MonitorTypeRegistry";
 export interface DatabaseFieldDefinition {
     /** Column name in database */
     columnName: string;
-    /** SQL data type */
-    sqlType: string;
-    /** Whether column allows NULL values */
-    nullable: boolean;
     /** Default value for the column */
     defaultValue?: string;
-    /** Field name from monitor type definition */
-    sourceField: string;
     /** Monitor type this field belongs to */
     monitorType: string;
+    /** Whether column allows NULL values */
+    nullable: boolean;
+    /** Field name from monitor type definition */
+    sourceField: string;
+    /** SQL data type */
+    sqlType: string;
 }
 
 /**
@@ -41,12 +41,12 @@ export function generateDatabaseFieldDefinitions(): DatabaseFieldDefinition[] {
 
             fields.push({
                 columnName,
-                sqlType: getSqlTypeFromFieldType(field.type),
+                defaultValue: "NULL",
+                monitorType: config.type,
                 // All dynamic fields are nullable since they're only used by specific monitor types
                 nullable: true,
-                defaultValue: "NULL",
                 sourceField: field.name,
-                monitorType: config.type,
+                sqlType: getSqlTypeFromFieldType(field.type),
             });
         }
     }
@@ -85,80 +85,6 @@ ${staticFields}${dynamicFields ? ",\n" + dynamicFields : ""}
 }
 
 /**
- * Safely converts an error value to a string for database storage.
- */
-function safeStringifyError(value: unknown): string {
-    if (typeof value === "string") {
-        return value;
-    }
-    return JSON.stringify(value);
-}
-
-/**
- * Map database row to monitor object with dynamic field handling.
- */
-export function mapRowToMonitor(row: Record<string, unknown>): Record<string, unknown> {
-    const monitor: Record<string, unknown> = {
-        id: Number(row.id),
-        siteIdentifier: String(row.site_identifier),
-        type: String(row.type),
-        enabled: Boolean(row.enabled),
-        monitoring: Boolean(row.enabled), // Map enabled -> monitoring for frontend
-        checkInterval: Number(row.check_interval),
-        timeout: Number(row.timeout),
-        retryAttempts: Number(row.retry_attempts),
-        status: row.status as "up" | "down" | "pending" | "paused",
-        lastChecked: row.last_checked ? Number(row.last_checked) : undefined,
-        nextCheck: row.next_check ? Number(row.next_check) : undefined,
-        responseTime: row.response_time ? Number(row.response_time) : undefined,
-        lastError: row.last_error ? safeStringifyError(row.last_error) : undefined,
-        createdAt: Number(row.created_at),
-        updatedAt: Number(row.updated_at),
-    };
-
-    // Dynamically map monitor type specific fields
-    const fieldDefs = generateDatabaseFieldDefinitions();
-    for (const fieldDef of fieldDefs) {
-        if (row[fieldDef.columnName] !== undefined && row[fieldDef.columnName] !== null) {
-            monitor[fieldDef.sourceField] = convertFromDatabase(row[fieldDef.columnName], fieldDef.sqlType);
-        }
-    }
-
-    return monitor;
-}
-
-/**
- * Map monitor object to database row with dynamic field handling.
- */
-export function mapMonitorToRow(monitor: Record<string, unknown>): Record<string, unknown> {
-    const row: Record<string, unknown> = {
-        site_identifier: monitor.siteIdentifier,
-        type: monitor.type,
-        enabled: (monitor.monitoring ?? monitor.enabled) ? 1 : 0,
-        check_interval: monitor.checkInterval,
-        timeout: monitor.timeout,
-        retry_attempts: monitor.retryAttempts,
-        status: monitor.status,
-        last_checked: monitor.lastChecked,
-        next_check: monitor.nextCheck,
-        response_time: monitor.responseTime,
-        last_error: monitor.lastError,
-        created_at: monitor.createdAt,
-        updated_at: monitor.updatedAt,
-    };
-
-    // Dynamically map monitor type specific fields
-    const fieldDefs = generateDatabaseFieldDefinitions();
-    for (const fieldDef of fieldDefs) {
-        if (monitor[fieldDef.sourceField] !== undefined) {
-            row[fieldDef.columnName] = convertToDatabase(monitor[fieldDef.sourceField], fieldDef.sqlType);
-        }
-    }
-
-    return row;
-}
-
-/**
  * Generate SQL parameter placeholders for INSERT/UPDATE operations.
  */
 export function generateSqlParameters(): { columns: string[]; placeholders: string } {
@@ -187,28 +113,67 @@ export function generateSqlParameters(): { columns: string[]; placeholders: stri
 }
 
 /**
- * Convert field type to SQL data type.
+ * Map monitor object to database row with dynamic field handling.
  */
-function getSqlTypeFromFieldType(fieldType: string): string {
-    switch (fieldType) {
-        case "text":
-        case "url": {
-            return "TEXT";
-        }
-        case "number": {
-            return "INTEGER";
-        }
-        default: {
-            return "TEXT";
+export function mapMonitorToRow(monitor: Record<string, unknown>): Record<string, unknown> {
+    const row: Record<string, unknown> = {
+        check_interval: monitor.checkInterval,
+        created_at: monitor.createdAt,
+        enabled: (monitor.monitoring ?? monitor.enabled) ? 1 : 0,
+        last_checked: monitor.lastChecked,
+        last_error: monitor.lastError,
+        next_check: monitor.nextCheck,
+        response_time: monitor.responseTime,
+        retry_attempts: monitor.retryAttempts,
+        site_identifier: monitor.siteIdentifier,
+        status: monitor.status,
+        timeout: monitor.timeout,
+        type: monitor.type,
+        updated_at: monitor.updatedAt,
+    };
+
+    // Dynamically map monitor type specific fields
+    const fieldDefs = generateDatabaseFieldDefinitions();
+    for (const fieldDef of fieldDefs) {
+        if (monitor[fieldDef.sourceField] !== undefined) {
+            row[fieldDef.columnName] = convertToDatabase(monitor[fieldDef.sourceField], fieldDef.sqlType);
         }
     }
+
+    return row;
 }
 
 /**
- * Convert camelCase to snake_case for database columns.
+ * Map database row to monitor object with dynamic field handling.
  */
-function toSnakeCase(str: string): string {
-    return str.replaceAll(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+export function mapRowToMonitor(row: Record<string, unknown>): Record<string, unknown> {
+    const monitor: Record<string, unknown> = {
+        checkInterval: Number(row.check_interval),
+        createdAt: Number(row.created_at),
+        enabled: Boolean(row.enabled),
+        id: Number(row.id),
+        lastChecked: row.last_checked ? Number(row.last_checked) : undefined,
+        lastError: row.last_error ? safeStringifyError(row.last_error) : undefined,
+        monitoring: Boolean(row.enabled), // Map enabled -> monitoring for frontend
+        nextCheck: row.next_check ? Number(row.next_check) : undefined,
+        responseTime: row.response_time ? Number(row.response_time) : undefined,
+        retryAttempts: Number(row.retry_attempts),
+        siteIdentifier: String(row.site_identifier),
+        status: row.status as "down" | "paused" | "pending" | "up",
+        timeout: Number(row.timeout),
+        type: String(row.type),
+        updatedAt: Number(row.updated_at),
+    };
+
+    // Dynamically map monitor type specific fields
+    const fieldDefs = generateDatabaseFieldDefinitions();
+    for (const fieldDef of fieldDefs) {
+        if (row[fieldDef.columnName] !== undefined && row[fieldDef.columnName] !== null) {
+            monitor[fieldDef.sourceField] = convertFromDatabase(row[fieldDef.columnName], fieldDef.sqlType);
+        }
+    }
+
+    return monitor;
 }
 
 /**
@@ -251,4 +216,39 @@ function convertToDatabase(value: unknown, sqlType: string): unknown {
             return typeof value === "string" ? value : JSON.stringify(value);
         } // Convert anything else to string to avoid object binding errors
     }
+}
+
+/**
+ * Convert field type to SQL data type.
+ */
+function getSqlTypeFromFieldType(fieldType: string): string {
+    switch (fieldType) {
+        case "number": {
+            return "INTEGER";
+        }
+        case "text":
+        case "url": {
+            return "TEXT";
+        }
+        default: {
+            return "TEXT";
+        }
+    }
+}
+
+/**
+ * Safely converts an error value to a string for database storage.
+ */
+function safeStringifyError(value: unknown): string {
+    if (typeof value === "string") {
+        return value;
+    }
+    return JSON.stringify(value);
+}
+
+/**
+ * Convert camelCase to snake_case for database columns.
+ */
+function toSnakeCase(str: string): string {
+    return str.replaceAll(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
 }

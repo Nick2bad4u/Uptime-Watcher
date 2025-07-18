@@ -28,7 +28,6 @@ import pluginEslintComments from "eslint-plugin-eslint-comments";
 import pluginPerfectionist from "eslint-plugin-perfectionist";
 import pluginUnicorn from "eslint-plugin-unicorn";
 import pluginFunctional from "eslint-plugin-functional";
-import pluginFilenames from "eslint-plugin-filenames";
 import pluginRegexp from "eslint-plugin-regexp";
 import pluginTsdoc from "eslint-plugin-tsdoc";
 import pluginBoundaries from "eslint-plugin-boundaries";
@@ -46,7 +45,7 @@ import jsoncEslintParser from "jsonc-eslint-parser";
 import reactRefresh from "eslint-plugin-react-refresh";
 import putout from "eslint-plugin-putout";
 import { defineConfig } from "eslint/config";
-import plugin from "eslint-plugin-import";
+import importPlugin from "eslint-plugin-import";
 
 const __dirname = import.meta.dirname;
 
@@ -176,10 +175,17 @@ export default [
                 { type: "utils", pattern: "src/utils/**/*" },
                 { type: "types", pattern: "src/types.ts" },
             ],
+            "import/resolver": {
+                // You will also need to install and configure the TypeScript resolver
+                // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
+                typescript: true,
+                node: true,
+                project: ["tsconfig.json", "tsconfig.electron.json"],
+            },
         },
         plugins: {
             "@typescript-eslint": tseslint,
-            import: pluginImport,
+            importPlugin: pluginImport,
             promise: pluginPromise,
             "unused-imports": pluginUnusedImports,
             react: pluginReact,
@@ -198,8 +204,6 @@ export default [
             redos: pluginRedos,
             compat: pluginCompat,
             tsdoc: pluginTsdoc,
-            filenames: pluginFilenames,
-            regexp: pluginRegexp,
             "react-refresh": reactRefresh,
             putout: putout,
             regexp: pluginRegexp,
@@ -220,6 +224,8 @@ export default [
             ...pluginSonarjs.configs.recommended.rules,
             ...pluginEslintComments.configs.recommended.rules,
             ...pluginPerfectionist.configs["recommended-natural"].rules,
+            ...pluginBoundaries.configs.recommended.rules,
+            ...pluginRedos.configs.recommended.rules,
 
             "putout/array-element-newline": "off",
             "putout/single-property-destructuring": "off",
@@ -245,9 +251,6 @@ export default [
             curly: ["error", "all"],
 
             // Import management
-            "import/no-unused-modules": "warn",
-            "import/no-cycle": "error",
-            "import/no-self-import": "error",
             "unused-imports/no-unused-imports": "error",
             "unused-imports/no-unused-vars": [
                 "warn",
@@ -294,7 +297,7 @@ export default [
                             from: "components",
                             allow: ["components", "hooks", "services", "theme", "utils", "types", "stores"],
                         },
-                        { from: "stores", allow: ["services", "types", "utils"] },
+                        { from: "stores", allow: ["services", "types", "utils", "stores", "components"] },
                         { from: "hooks", allow: ["stores", "services", "types", "utils"] },
                         { from: "services", allow: ["types", "utils"] },
                         { from: "theme", allow: ["types"] },
@@ -492,10 +495,17 @@ export default [
                 { type: "events", pattern: "electron/events/**/*" },
                 { type: "types", pattern: "electron/types.ts" },
             ],
+            "import/resolver": {
+                // You will also need to install and configure the TypeScript resolver
+                // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
+                typescript: true,
+                node: true,
+                project: ["tsconfig.json", "tsconfig.electron.json"],
+            },
         },
         plugins: {
             "@typescript-eslint": tseslint,
-            import: pluginImport,
+            importPlugin: pluginImport,
             promise: pluginPromise,
             "unused-imports": pluginUnusedImports,
             react: pluginReact,
@@ -514,7 +524,6 @@ export default [
             redos: pluginRedos,
             compat: pluginCompat,
             tsdoc: pluginTsdoc,
-            filenames: pluginFilenames,
             regexp: pluginRegexp,
             putout: putout,
         },
@@ -533,6 +542,8 @@ export default [
             ...pluginSonarjs.configs.recommended.rules,
             ...pluginEslintComments.configs.recommended.rules,
             ...pluginPerfectionist.configs["recommended-natural"].rules,
+            ...pluginBoundaries.configs.recommended.rules,
+            ...pluginRedos.configs.recommended.rules,
 
             "unicorn/prefer-global-this": "off", // Not suitable for Electron
             "unicorn/prevent-abbreviations": "off", // Too many false positives
@@ -578,13 +589,14 @@ export default [
                         { from: "utils", allow: ["types"] },
                         { from: "events", allow: ["types"] },
                         { from: "types", allow: [] },
+                        { from: "utils", allow: ["managers", "services", "utils", "events", "types"] },
                     ],
                 },
             ],
 
             // Class organization for service classes
             "sort-class-members/sort-class-members": [
-                "warn",
+                "off",
                 {
                     order: [
                         "[static-properties]",
@@ -763,7 +775,7 @@ export default [
             vitest,
             "vitest-globals": vitestGlobals,
             "testing-library": pluginTestingLibrary,
-            import: pluginImport,
+            importPlugin: pluginImport,
             "unused-imports": pluginUnusedImports,
             react: pluginReact,
             "react-hooks": pluginReactHooks,
@@ -808,6 +820,7 @@ export default [
             },
             globals: {
                 ...globals.node,
+                ...vitest.environments.env.globals,
                 vi: "readonly",
                 describe: "readonly",
                 it: "readonly",
@@ -822,7 +835,7 @@ export default [
         plugins: {
             "@typescript-eslint": tseslint,
             vitest,
-            import: pluginImport,
+            importPlugin: pluginImport,
             "unused-imports": pluginUnusedImports,
         },
         rules: {

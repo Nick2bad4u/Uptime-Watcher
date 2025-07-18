@@ -23,9 +23,53 @@
  * @packageDocumentation
  */
 
+import { Theme } from "../theme/types";
 import { ChartData, ChartOptions } from "./chartSetup";
 
-import { Theme } from "../theme/types";
+/**
+ * Response time line chart data structure
+ */
+export interface ResponseTimeChartData extends ChartData<"line"> {
+    datasets: {
+        backgroundColor: string;
+        borderColor: string;
+        data: (null | number)[];
+        fill: boolean;
+        label: string;
+        tension: number;
+    }[];
+}
+
+/**
+ * Status distribution bar chart data structure
+ */
+export interface StatusBarChartData extends ChartData<"bar"> {
+    datasets: {
+        backgroundColor: string[];
+        borderColor: string[];
+        borderWidth: number;
+        data: number[];
+        label: string;
+    }[];
+    labels: string[];
+}
+
+/**
+ * Type definitions for chart data to avoid manual type casting
+ */
+
+/**
+ * Uptime status doughnut chart data structure
+ */
+export interface UptimeChartData extends ChartData<"doughnut"> {
+    datasets: {
+        backgroundColor: string[];
+        borderColor: string[];
+        borderWidth: number;
+        data: number[];
+    }[];
+    labels: string[];
+}
 
 /**
  * Chart Configuration Service for theme-aware chart styling.
@@ -48,124 +92,6 @@ export class ChartConfigService {
      */
     constructor(theme: Theme) {
         this.theme = theme;
-    }
-
-    /**
-     * Get base configuration shared across all chart types.
-     *
-     * @returns Partial chart options with common styling and behavior
-     *
-     * @remarks
-     * Provides consistent foundation for all charts including responsive behavior,
-     * theme-aware colors, typography, and tooltip styling. This configuration
-     * is extended by specific chart type methods.
-     *
-     * This is an internal method used by other configuration methods.
-     */
-    private getBaseConfig(): Partial<ChartOptions> {
-        return {
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    labels: {
-                        color: this.theme.colors.text.primary,
-                        font: {
-                            family: this.theme.typography.fontFamily.sans.join(", "),
-                            size: 12,
-                        },
-                    },
-                },
-                tooltip: {
-                    backgroundColor: this.theme.colors.surface.elevated,
-                    bodyColor: this.theme.colors.text.secondary,
-                    borderColor: this.theme.colors.border.primary,
-                    borderWidth: 1,
-                    titleColor: this.theme.colors.text.primary,
-                },
-            },
-            responsive: true,
-        };
-    }
-
-    /**
-     * Get base scale configuration
-     */
-    private getBaseScale() {
-        return {
-            grid: {
-                color: this.theme.colors.border.secondary,
-            },
-            ticks: {
-                color: this.theme.colors.text.secondary,
-                font: {
-                    family: this.theme.typography.fontFamily.sans.join(", "),
-                    size: 11,
-                },
-            },
-        };
-    }
-
-    /**
-     * Response time line chart configuration
-     */
-    getLineChartConfig(): ChartOptions<"line"> {
-        return {
-            ...this.getBaseConfig(),
-            interaction: {
-                intersect: false,
-                mode: "index",
-            },
-            plugins: {
-                ...this.getBaseConfig().plugins,
-                title: {
-                    color: this.theme.colors.text.primary,
-                    display: true,
-                    font: {
-                        family: this.theme.typography.fontFamily.sans.join(", "),
-                        size: 16,
-                        weight: "bold",
-                    },
-                    text: "Response Time Over Time",
-                },
-                zoom: {
-                    pan: {
-                        enabled: true,
-                        mode: "x",
-                    },
-                    zoom: {
-                        mode: "x",
-                        pinch: { enabled: true },
-                        wheel: { enabled: true },
-                    },
-                },
-            },
-            scales: {
-                x: {
-                    time: {
-                        displayFormats: {
-                            day: "MMM dd",
-                            hour: "HH:mm",
-                            minute: "HH:mm",
-                        },
-                    },
-                    type: "time",
-                    ...this.getBaseScale(),
-                },
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        color: this.theme.colors.text.secondary,
-                        display: true,
-                        font: {
-                            family: this.theme.typography.fontFamily.sans.join(", "),
-                            size: 12,
-                        },
-                        text: "Response Time (ms)",
-                    },
-                    ...this.getBaseScale(),
-                },
-            },
-        } as ChartOptions<"line">;
     }
 
     /**
@@ -248,6 +174,124 @@ export class ChartConfigService {
             },
         } as ChartOptions<"doughnut">;
     }
+
+    /**
+     * Response time line chart configuration
+     */
+    getLineChartConfig(): ChartOptions<"line"> {
+        return {
+            ...this.getBaseConfig(),
+            interaction: {
+                intersect: false,
+                mode: "index",
+            },
+            plugins: {
+                ...this.getBaseConfig().plugins,
+                title: {
+                    color: this.theme.colors.text.primary,
+                    display: true,
+                    font: {
+                        family: this.theme.typography.fontFamily.sans.join(", "),
+                        size: 16,
+                        weight: "bold",
+                    },
+                    text: "Response Time Over Time",
+                },
+                zoom: {
+                    pan: {
+                        enabled: true,
+                        mode: "x",
+                    },
+                    zoom: {
+                        mode: "x",
+                        pinch: { enabled: true },
+                        wheel: { enabled: true },
+                    },
+                },
+            },
+            scales: {
+                x: {
+                    time: {
+                        displayFormats: {
+                            day: "MMM dd",
+                            hour: "HH:mm",
+                            minute: "HH:mm",
+                        },
+                    },
+                    type: "time",
+                    ...this.getBaseScale(),
+                },
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        color: this.theme.colors.text.secondary,
+                        display: true,
+                        font: {
+                            family: this.theme.typography.fontFamily.sans.join(", "),
+                            size: 12,
+                        },
+                        text: "Response Time (ms)",
+                    },
+                    ...this.getBaseScale(),
+                },
+            },
+        } as ChartOptions<"line">;
+    }
+
+    /**
+     * Get base configuration shared across all chart types.
+     *
+     * @returns Partial chart options with common styling and behavior
+     *
+     * @remarks
+     * Provides consistent foundation for all charts including responsive behavior,
+     * theme-aware colors, typography, and tooltip styling. This configuration
+     * is extended by specific chart type methods.
+     *
+     * This is an internal method used by other configuration methods.
+     */
+    private getBaseConfig(): Partial<ChartOptions> {
+        return {
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: this.theme.colors.text.primary,
+                        font: {
+                            family: this.theme.typography.fontFamily.sans.join(", "),
+                            size: 12,
+                        },
+                    },
+                },
+                tooltip: {
+                    backgroundColor: this.theme.colors.surface.elevated,
+                    bodyColor: this.theme.colors.text.secondary,
+                    borderColor: this.theme.colors.border.primary,
+                    borderWidth: 1,
+                    titleColor: this.theme.colors.text.primary,
+                },
+            },
+            responsive: true,
+        };
+    }
+
+    /**
+     * Get base scale configuration
+     */
+    private getBaseScale() {
+        return {
+            grid: {
+                color: this.theme.colors.border.secondary,
+            },
+            ticks: {
+                color: this.theme.colors.text.secondary,
+                font: {
+                    family: this.theme.typography.fontFamily.sans.join(", "),
+                    size: 11,
+                },
+            },
+        };
+    }
 }
 
 /**
@@ -265,49 +309,4 @@ export function useChartConfigs(theme: Theme, totalChecks = 0) {
         doughnutOptions: chartService.getDoughnutChartConfig(totalChecks),
         lineChartOptions: chartService.getLineChartConfig(),
     };
-}
-
-/**
- * Type definitions for chart data to avoid manual type casting
- */
-
-/**
- * Response time line chart data structure
- */
-export interface ResponseTimeChartData extends ChartData<"line"> {
-    datasets: {
-        label: string;
-        data: (number | null)[];
-        borderColor: string;
-        backgroundColor: string;
-        fill: boolean;
-        tension: number;
-    }[];
-}
-
-/**
- * Uptime status doughnut chart data structure
- */
-export interface UptimeChartData extends ChartData<"doughnut"> {
-    labels: string[];
-    datasets: {
-        data: number[];
-        backgroundColor: string[];
-        borderColor: string[];
-        borderWidth: number;
-    }[];
-}
-
-/**
- * Status distribution bar chart data structure
- */
-export interface StatusBarChartData extends ChartData<"bar"> {
-    labels: string[];
-    datasets: {
-        label: string;
-        data: number[];
-        backgroundColor: string[];
-        borderColor: string[];
-        borderWidth: number;
-    }[];
 }

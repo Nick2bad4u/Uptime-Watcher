@@ -11,13 +11,13 @@ import { ThemedText } from "../../../../theme/components";
  * Props for the MetricCard component.
  */
 interface MetricCardProperties {
+    className?: string;
     /** Label text describing the metric */
     label: string;
-    /** Value to display (string or number) */
-    value: string | number;
     /** Optional CSS classes for custom styling */
 
-    className?: string;
+    /** Value to display (string or number) */
+    value: number | string;
 }
 
 /**
@@ -46,7 +46,7 @@ interface MetricCardProperties {
 export const MetricCard = React.memo(function MetricCard({ className = "", label, value }: MetricCardProperties) {
     return (
         <div className={`flex flex-col items-center text-center ${className}`}>
-            <ThemedText size="xs" variant="secondary" className="block mb-1">
+            <ThemedText className="block mb-1" size="xs" variant="secondary">
                 {label}
             </ThemedText>
             <ThemedText size="sm" weight="medium">

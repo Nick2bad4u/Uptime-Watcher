@@ -44,26 +44,17 @@
 
 import { UptimeEvents } from "../events/eventTypes";
 import { TypedEventBus } from "../events/TypedEventBus";
-import { SiteRepository } from "../services/database/SiteRepository";
-import { MonitorRepository } from "../services/database/MonitorRepository";
-import { HistoryRepository } from "../services/database/HistoryRepository";
 import { DatabaseService } from "../services/database/DatabaseService";
+import { HistoryRepository } from "../services/database/HistoryRepository";
+import { MonitorRepository } from "../services/database/MonitorRepository";
+import { SiteRepository } from "../services/database/SiteRepository";
 import { Site } from "../types";
-import { SiteCacheInterface, SiteCache, MonitoringConfig } from "../utils/database/interfaces";
-import { SiteWritingOrchestrator } from "../utils/database/SiteWriterService";
+import { MonitoringConfig, SiteCache, SiteCacheInterface } from "../utils/database/interfaces";
+import { createSiteRepositoryService, createSiteWritingOrchestrator } from "../utils/database/serviceFactory";
 import { SiteRepositoryService } from "../utils/database/SiteRepositoryService";
-import { createSiteWritingOrchestrator, createSiteRepositoryService } from "../utils/database/serviceFactory";
+import { SiteWritingOrchestrator } from "../utils/database/SiteWriterService";
 import { monitorLogger as logger } from "../utils/logger";
 import { configurationManager } from "./ConfigurationManager";
-
-/**
- * Combined events interface for SiteManager.
- *
- * @remarks
- * Supports all uptime monitoring events for comprehensive event communication
- * between the SiteManager and other system components.
- */
-type SiteManagerEvents = UptimeEvents;
 
 /**
  * Interface for monitoring operations integration.
@@ -74,14 +65,14 @@ type SiteManagerEvents = UptimeEvents;
  * the SiteManager and MonitorManager while enabling coordinated operations.
  */
 export interface IMonitoringOperations {
-    /** Start monitoring for a specific site and monitor */
-    startMonitoringForSite: (identifier: string, monitorId: string) => Promise<boolean>;
-    /** Stop monitoring for a specific site and monitor */
-    stopMonitoringForSite: (identifier: string, monitorId: string) => Promise<boolean>;
     /** Update the global history limit setting */
     setHistoryLimit: (limit: number) => Promise<void>;
     /** Set up monitoring for newly created monitors */
     setupNewMonitors: (site: Site, newMonitorIds: string[]) => Promise<void>;
+    /** Start monitoring for a specific site and monitor */
+    startMonitoringForSite: (identifier: string, monitorId: string) => Promise<boolean>;
+    /** Stop monitoring for a specific site and monitor */
+    stopMonitoringForSite: (identifier: string, monitorId: string) => Promise<boolean>;
 }
 
 /**
@@ -93,19 +84,28 @@ export interface IMonitoringOperations {
  * monitoring integration for coordinated operations.
  */
 export interface SiteManagerDependencies {
-    /** Site repository for database operations */
-    siteRepository: SiteRepository;
-    /** Monitor repository for monitor-related operations */
-    monitorRepository: MonitorRepository;
-    /** History repository for status history management */
-    historyRepository: HistoryRepository;
     /** Database service for transaction management */
     databaseService: DatabaseService;
     /** Event emitter for system-wide communication */
     eventEmitter: TypedEventBus<SiteManagerEvents>;
+    /** History repository for status history management */
+    historyRepository: HistoryRepository;
     /** Optional MonitorManager dependency for coordinated operations */
     monitoringOperations?: IMonitoringOperations;
+    /** Monitor repository for monitor-related operations */
+    monitorRepository: MonitorRepository;
+    /** Site repository for database operations */
+    siteRepository: SiteRepository;
 }
+
+/**
+ * Combined events interface for SiteManager.
+ *
+ * @remarks
+ * Supports all uptime monitoring events for comprehensive event communication
+ * between the SiteManager and other system components.
+ */
+type SiteManagerEvents = UptimeEvents;
 
 /**
  * Manages site operations and maintains in-memory cache.
@@ -122,12 +122,12 @@ export interface SiteManagerDependencies {
  * site changes and enables reactive UI updates.
  */
 export class SiteManager {
-    private readonly siteCache = new SiteCache();
-    private readonly repositories: Omit<SiteManagerDependencies, "eventEmitter" | "monitoringOperations">;
     private readonly eventEmitter: TypedEventBus<SiteManagerEvents>;
-    private readonly siteWritingOrchestrator: SiteWritingOrchestrator;
-    private readonly siteRepositoryService: SiteRepositoryService;
     private readonly monitoringOperations: IMonitoringOperations | undefined;
+    private readonly repositories: Omit<SiteManagerDependencies, "eventEmitter" | "monitoringOperations">;
+    private readonly siteCache = new SiteCache();
+    private readonly siteRepositoryService: SiteRepositoryService;
+    private readonly siteWritingOrchestrator: SiteWritingOrchestrator;
 
     /**
      * Create a new SiteManager instance.
@@ -156,19 +156,63 @@ export class SiteManager {
     }
 
     /**
-     * Initialize the SiteManager by loading all sites into cache.
-     * This method should be called during application startup.
+     * Add a new site to the database and cache.
      */
-    public async initialize(): Promise<void> {
-        try {
-            logger.info("[SiteManager] Initializing - loading sites into cache");
-            const sites = await this.siteRepositoryService.getSitesFromDatabase();
-            await this.updateSitesCache(sites);
-            logger.info(`[SiteManager] Initialized with ${sites.length} sites in cache`);
-        } catch (error) {
-            logger.error("[SiteManager] Failed to initialize cache", error);
-            throw error;
+    public async addSite(siteData: Site): Promise<Site> {
+        // Business validation
+        this.validateSite(siteData);
+
+        // Use the new service-based approach to add site to database
+        const site = await this.siteWritingOrchestrator.createSite(siteData);
+
+        // Add to in-memory cache
+        this.siteCache.set(site.identifier, site);
+
+        // Emit typed site added event
+        await this.eventEmitter.emitTyped("site:added", {
+            site,
+            source: "user" as const,
+            timestamp: Date.now(),
+        });
+
+        // Emit sync event for state consistency
+        await this.eventEmitter.emitTyped("sites:state-synchronized", {
+            action: "update" as const,
+            siteIdentifier: site.identifier,
+            source: "database" as const,
+            timestamp: Date.now(),
+        });
+
+        logger.info(`Site added successfully: ${site.identifier} (${site.name || "unnamed"})`);
+        return site;
+    }
+
+    /**
+     * Get a specific site from cache with smart background loading.
+     */
+    public getSiteFromCache(identifier: string): Site | undefined {
+        const site = this.siteCache.get(identifier);
+
+        if (!site) {
+            // Emit cache miss event
+            this.eventEmitter
+                .emitTyped("site:cache-miss", {
+                    backgroundLoading: true,
+                    identifier,
+                    operation: "cache-lookup",
+                    timestamp: Date.now(),
+                })
+                .catch((error) => {
+                    logger.debug(`[SiteManager] Failed to emit cache miss event`, error);
+                });
+
+            // Trigger background loading without blocking
+            this.loadSiteInBackground(identifier).catch((error) => {
+                logger.debug(`[SiteManager] Background loading error ignored`, error);
+            });
         }
+
+        return site;
     }
 
     /**
@@ -196,6 +240,13 @@ export class SiteManager {
     }
 
     /**
+     * Get the in-memory sites cache (for internal use by other managers).
+     */
+    public getSitesCache(): SiteCacheInterface {
+        return this.siteCache;
+    }
+
+    /**
      * Get sites from in-memory cache for fast access.
      *
      * @returns The current site cache instance
@@ -214,52 +265,64 @@ export class SiteManager {
     }
 
     /**
-     * Get the in-memory sites cache (for internal use by other managers).
+     * Initialize the SiteManager by loading all sites into cache.
+     * This method should be called during application startup.
      */
-    public getSitesCache(): SiteCacheInterface {
-        return this.siteCache;
+    public async initialize(): Promise<void> {
+        try {
+            logger.info("[SiteManager] Initializing - loading sites into cache");
+            const sites = await this.siteRepositoryService.getSitesFromDatabase();
+            await this.updateSitesCache(sites);
+            logger.info(`[SiteManager] Initialized with ${sites.length} sites in cache`);
+        } catch (error) {
+            logger.error("[SiteManager] Failed to initialize cache", error);
+            throw error;
+        }
     }
 
     /**
-     * Add a new site to the database and cache.
+     * Remove a monitor from a site.
      */
-    public async addSite(siteData: Site): Promise<Site> {
-        // Business validation
-        this.validateSite(siteData);
+    public async removeMonitor(siteIdentifier: string, monitorId: string): Promise<boolean> {
+        try {
+            // Remove the monitor from the database using transaction
+            const success = await this.executeMonitorDeletion(monitorId);
 
-        // Use the new service-based approach to add site to database
-        const site = await this.siteWritingOrchestrator.createSite(siteData);
+            if (success) {
+                // Refresh the cache by getting all sites (to ensure proper site structure)
+                const allSites = await this.siteRepositoryService.getSitesFromDatabase();
 
-        // Add to in-memory cache
-        this.siteCache.set(site.identifier, site);
+                // Update cache
+                await this.updateSitesCache(allSites);
 
-        // Emit typed site added event
-        await this.eventEmitter.emitTyped("site:added", {
-            site,
-            source: "user" as const,
-            timestamp: Date.now(),
-        });
+                // Find the updated site for the event
+                const updatedSite = this.siteCache.get(siteIdentifier);
+                if (updatedSite) {
+                    // Emit internal site updated event
+                    await this.eventEmitter.emitTyped("internal:site:updated", {
+                        identifier: siteIdentifier,
+                        operation: "updated",
+                        site: updatedSite,
+                        timestamp: Date.now(),
+                        updatedFields: ["monitors"],
+                    });
 
-        // Emit sync event for state consistency
-        await this.eventEmitter.emitTyped("sites:state-synchronized", {
-            action: "update" as const,
-            siteIdentifier: site.identifier,
-            timestamp: Date.now(),
-            source: "database" as const,
-        });
+                    // Emit sync event for state consistency
+                    await this.eventEmitter.emitTyped("sites:state-synchronized", {
+                        action: "update" as const,
+                        siteIdentifier: siteIdentifier,
+                        source: "database" as const,
+                        timestamp: Date.now(),
+                    });
 
-        logger.info(`Site added successfully: ${site.identifier} (${site.name || "unnamed"})`);
-        return site;
-    }
+                    logger.info(`[SiteManager] Monitor ${monitorId} removed from site ${siteIdentifier}`);
+                }
+            }
 
-    /**
-     * Business logic: Validate site data according to business rules.
-     */
-    private validateSite(site: Site): void {
-        const validationResult = configurationManager.validateSiteConfiguration(site);
-
-        if (!validationResult.isValid) {
-            throw new Error(`Site validation failed: ${validationResult.errors.join(", ")}`);
+            return success;
+        } catch (error) {
+            logger.error(`[SiteManager] Failed to remove monitor ${monitorId} from site ${siteIdentifier}`, error);
+            throw error;
         }
     }
 
@@ -285,55 +348,12 @@ export class SiteManager {
             await this.eventEmitter.emitTyped("sites:state-synchronized", {
                 action: "delete" as const,
                 siteIdentifier: identifier,
-                timestamp: Date.now(),
                 source: "database" as const,
+                timestamp: Date.now(),
             });
         }
 
         return result;
-    }
-
-    /**
-     * Create monitoring configuration for site operations.
-     *
-     * @returns Configuration for managing monitoring operations
-     */
-    private createMonitoringConfig(): MonitoringConfig {
-        return {
-            setHistoryLimit: (limit: number) => {
-                if (this.monitoringOperations) {
-                    // Execute but don't await the promise
-                    this.monitoringOperations.setHistoryLimit(limit).catch((error) => {
-                        logger.error("[SiteManager] Failed to set history limit", error);
-                    });
-                } else {
-                    logger.warn("MonitoringOperations not available for setHistoryLimit");
-                }
-            },
-            startMonitoring: async (identifier: string, monitorId: string) => {
-                if (this.monitoringOperations) {
-                    return this.monitoringOperations.startMonitoringForSite(identifier, monitorId);
-                } else {
-                    logger.warn("MonitoringOperations not available for startMonitoring");
-                    return false;
-                }
-            },
-            stopMonitoring: async (identifier: string, monitorId: string) => {
-                if (this.monitoringOperations) {
-                    return this.monitoringOperations.stopMonitoringForSite(identifier, monitorId);
-                } else {
-                    logger.warn("MonitoringOperations not available for stopMonitoring");
-                    return false;
-                }
-            },
-            setupNewMonitors: async (site: Site, newMonitorIds: string[]) => {
-                if (this.monitoringOperations) {
-                    await this.monitoringOperations.setupNewMonitors(site, newMonitorIds);
-                } else {
-                    logger.warn("MonitoringOperations not available for setupNewMonitors");
-                }
-            },
-        };
     }
 
     /**
@@ -377,8 +397,8 @@ export class SiteManager {
         await this.eventEmitter.emitTyped("sites:state-synchronized", {
             action: "update" as const,
             siteIdentifier: identifier,
-            timestamp: Date.now(),
             source: "database" as const,
+            timestamp: Date.now(),
         });
 
         return refreshedSite;
@@ -402,31 +422,55 @@ export class SiteManager {
     }
 
     /**
-     * Get a specific site from cache with smart background loading.
+     * Create monitoring configuration for site operations.
+     *
+     * @returns Configuration for managing monitoring operations
      */
-    public getSiteFromCache(identifier: string): Site | undefined {
-        const site = this.siteCache.get(identifier);
+    private createMonitoringConfig(): MonitoringConfig {
+        return {
+            setHistoryLimit: (limit: number) => {
+                if (this.monitoringOperations) {
+                    // Execute but don't await the promise
+                    this.monitoringOperations.setHistoryLimit(limit).catch((error) => {
+                        logger.error("[SiteManager] Failed to set history limit", error);
+                    });
+                } else {
+                    logger.warn("MonitoringOperations not available for setHistoryLimit");
+                }
+            },
+            setupNewMonitors: async (site: Site, newMonitorIds: string[]) => {
+                if (this.monitoringOperations) {
+                    await this.monitoringOperations.setupNewMonitors(site, newMonitorIds);
+                } else {
+                    logger.warn("MonitoringOperations not available for setupNewMonitors");
+                }
+            },
+            startMonitoring: async (identifier: string, monitorId: string) => {
+                if (this.monitoringOperations) {
+                    return this.monitoringOperations.startMonitoringForSite(identifier, monitorId);
+                } else {
+                    logger.warn("MonitoringOperations not available for startMonitoring");
+                    return false;
+                }
+            },
+            stopMonitoring: async (identifier: string, monitorId: string) => {
+                if (this.monitoringOperations) {
+                    return this.monitoringOperations.stopMonitoringForSite(identifier, monitorId);
+                } else {
+                    logger.warn("MonitoringOperations not available for stopMonitoring");
+                    return false;
+                }
+            },
+        };
+    }
 
-        if (!site) {
-            // Emit cache miss event
-            this.eventEmitter
-                .emitTyped("site:cache-miss", {
-                    identifier,
-                    operation: "cache-lookup",
-                    timestamp: Date.now(),
-                    backgroundLoading: true,
-                })
-                .catch((error) => {
-                    logger.debug(`[SiteManager] Failed to emit cache miss event`, error);
-                });
-
-            // Trigger background loading without blocking
-            this.loadSiteInBackground(identifier).catch((error) => {
-                logger.debug(`[SiteManager] Background loading error ignored`, error);
-            });
-        }
-
-        return site;
+    /**
+     * Execute monitor deletion.
+     */
+    private async executeMonitorDeletion(monitorId: string): Promise<boolean> {
+        // MonitorRepository.delete() already handles its own transaction,
+        // so we don't need to wrap it in another transaction
+        return this.repositories.monitorRepository.delete(monitorId);
     }
 
     /**
@@ -459,57 +503,13 @@ export class SiteManager {
     }
 
     /**
-     * Remove a monitor from a site.
+     * Business logic: Validate site data according to business rules.
      */
-    public async removeMonitor(siteIdentifier: string, monitorId: string): Promise<boolean> {
-        try {
-            // Remove the monitor from the database using transaction
-            const success = await this.executeMonitorDeletion(monitorId);
+    private validateSite(site: Site): void {
+        const validationResult = configurationManager.validateSiteConfiguration(site);
 
-            if (success) {
-                // Refresh the cache by getting all sites (to ensure proper site structure)
-                const allSites = await this.siteRepositoryService.getSitesFromDatabase();
-
-                // Update cache
-                await this.updateSitesCache(allSites);
-
-                // Find the updated site for the event
-                const updatedSite = this.siteCache.get(siteIdentifier);
-                if (updatedSite) {
-                    // Emit internal site updated event
-                    await this.eventEmitter.emitTyped("internal:site:updated", {
-                        identifier: siteIdentifier,
-                        operation: "updated",
-                        site: updatedSite,
-                        timestamp: Date.now(),
-                        updatedFields: ["monitors"],
-                    });
-
-                    // Emit sync event for state consistency
-                    await this.eventEmitter.emitTyped("sites:state-synchronized", {
-                        action: "update" as const,
-                        siteIdentifier: siteIdentifier,
-                        timestamp: Date.now(),
-                        source: "database" as const,
-                    });
-
-                    logger.info(`[SiteManager] Monitor ${monitorId} removed from site ${siteIdentifier}`);
-                }
-            }
-
-            return success;
-        } catch (error) {
-            logger.error(`[SiteManager] Failed to remove monitor ${monitorId} from site ${siteIdentifier}`, error);
-            throw error;
+        if (!validationResult.isValid) {
+            throw new Error(`Site validation failed: ${validationResult.errors.join(", ")}`);
         }
-    }
-
-    /**
-     * Execute monitor deletion.
-     */
-    private async executeMonitorDeletion(monitorId: string): Promise<boolean> {
-        // MonitorRepository.delete() already handles its own transaction,
-        // so we don't need to wrap it in another transaction
-        return this.repositories.monitorRepository.delete(monitorId);
     }
 }

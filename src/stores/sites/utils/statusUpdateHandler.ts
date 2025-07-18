@@ -9,14 +9,106 @@ import logger from "../../../services/logger";
 import { logStoreAction, waitForElectronAPI } from "../../utils";
 
 export interface StatusUpdateHandlerOptions {
-    /** Function to get current sites */
-    getSites: () => Site[];
-    /** Function to set sites */
-    setSites: (sites: Site[]) => void;
     /** Function to trigger full sync */
     fullSyncFromBackend: () => Promise<void>;
+    /** Function to get current sites */
+    getSites: () => Site[];
     /** Optional callback for additional processing */
     onUpdate?: (update: StatusUpdate) => void;
+    /** Function to set sites */
+    setSites: (sites: Site[]) => void;
+}
+
+/**
+ * Manages status update subscriptions
+ */
+export class StatusUpdateManager {
+    private cleanupFunctions: (() => void)[] = [];
+    private handler: ((update: StatusUpdate) => Promise<void>) | undefined = undefined;
+    private isListenerAttached = false;
+    private monitoringEventHandler: (() => Promise<void>) | undefined = undefined;
+
+    /**
+     * Check if currently subscribed
+     */
+    isSubscribed(): boolean {
+        return this.handler !== undefined && this.isListenerAttached;
+    }
+
+    /**
+     * Subscribe to status updates and monitoring events
+     */
+    async subscribe(
+        handler: (update: StatusUpdate) => Promise<void>,
+        fullSyncHandler?: () => Promise<void>
+    ): Promise<void> {
+        // If already subscribed, unsubscribe first to avoid duplicates
+        if (this.isListenerAttached) {
+            this.unsubscribe();
+        }
+
+        this.handler = handler;
+
+        if (fullSyncHandler) {
+            this.monitoringEventHandler = fullSyncHandler;
+        }
+
+        // Always wait for electronAPI to be ready before subscribing
+        try {
+            await waitForElectronAPI();
+        } catch (error) {
+            console.error("Failed to initialize electronAPI:", error);
+            throw new Error("Failed to initialize electronAPI");
+        }
+
+        // Subscribe to monitor status changes
+        const statusUpdateCleanup = window.electronAPI.events.onMonitorStatusChanged((update: StatusUpdate) => {
+            this.handler?.(update).catch((error) => {
+                console.error("Error in status update handler:", error);
+            });
+        });
+        this.cleanupFunctions.push(statusUpdateCleanup);
+
+        // Subscribe to monitoring state changes
+        if (this.monitoringEventHandler) {
+            const monitoringStartedCleanup = window.electronAPI.events.onMonitoringStarted(() => {
+                this.monitoringEventHandler?.().catch((error) => {
+                    console.error("Error in monitoring started handler:", error);
+                });
+            });
+            this.cleanupFunctions.push(monitoringStartedCleanup);
+
+            const monitoringStoppedCleanup = window.electronAPI.events.onMonitoringStopped(() => {
+                this.monitoringEventHandler?.().catch((error) => {
+                    console.error("Error in monitoring stopped handler:", error);
+                });
+            });
+            this.cleanupFunctions.push(monitoringStoppedCleanup);
+        }
+
+        this.isListenerAttached = true;
+        logStoreAction("StatusUpdateManager", "subscribed", {
+            message: "Successfully subscribed to status updates",
+            subscribed: true,
+        });
+    }
+
+    /**
+     * Unsubscribe from status updates and monitoring events
+     */
+    unsubscribe(): void {
+        // Call all cleanup functions to properly remove listeners
+        this.cleanupFunctions.forEach((cleanup) => cleanup());
+        this.cleanupFunctions = [];
+
+        this.handler = undefined;
+        this.monitoringEventHandler = undefined;
+        this.isListenerAttached = false;
+        logStoreAction("StatusUpdateManager", "unsubscribed", {
+            message: "Successfully unsubscribed from status updates",
+            unsubscribed: true,
+        });
+    }
 }
 
 /**
@@ -104,96 +196,4 @@ export function createStatusUpdateHandler(options: StatusUpdateHandlerOptions) {
             });
         }
     };
-}
-
-/**
- * Manages status update subscriptions
- */
-export class StatusUpdateManager {
-    private handler: ((update: StatusUpdate) => Promise<void>) | undefined = undefined;
-    private isListenerAttached = false;
-    private monitoringEventHandler: (() => Promise<void>) | undefined = undefined;
-    private cleanupFunctions: (() => void)[] = [];
-
-    /**
-     * Subscribe to status updates and monitoring events
-     */
-    async subscribe(
-        handler: (update: StatusUpdate) => Promise<void>,
-        fullSyncHandler?: () => Promise<void>
-    ): Promise<void> {
-        // If already subscribed, unsubscribe first to avoid duplicates
-        if (this.isListenerAttached) {
-            this.unsubscribe();
-        }
-
-        this.handler = handler;
-
-        if (fullSyncHandler) {
-            this.monitoringEventHandler = fullSyncHandler;
-        }
-
-        // Always wait for electronAPI to be ready before subscribing
-        try {
-            await waitForElectronAPI();
-        } catch (error) {
-            console.error("Failed to initialize electronAPI:", error);
-            throw new Error("Failed to initialize electronAPI");
-        }
-
-        // Subscribe to monitor status changes
-        const statusUpdateCleanup = window.electronAPI.events.onMonitorStatusChanged((update: StatusUpdate) => {
-            this.handler?.(update).catch((error) => {
-                console.error("Error in status update handler:", error);
-            });
-        });
-        this.cleanupFunctions.push(statusUpdateCleanup);
-
-        // Subscribe to monitoring state changes
-        if (this.monitoringEventHandler) {
-            const monitoringStartedCleanup = window.electronAPI.events.onMonitoringStarted(() => {
-                this.monitoringEventHandler?.().catch((error) => {
-                    console.error("Error in monitoring started handler:", error);
-                });
-            });
-            this.cleanupFunctions.push(monitoringStartedCleanup);
-
-            const monitoringStoppedCleanup = window.electronAPI.events.onMonitoringStopped(() => {
-                this.monitoringEventHandler?.().catch((error) => {
-                    console.error("Error in monitoring stopped handler:", error);
-                });
-            });
-            this.cleanupFunctions.push(monitoringStoppedCleanup);
-        }
-
-        this.isListenerAttached = true;
-        logStoreAction("StatusUpdateManager", "subscribed", {
-            message: "Successfully subscribed to status updates",
-            subscribed: true,
-        });
-    }
-
-    /**
-     * Unsubscribe from status updates and monitoring events
-     */
-    unsubscribe(): void {
-        // Call all cleanup functions to properly remove listeners
-        this.cleanupFunctions.forEach((cleanup) => cleanup());
-        this.cleanupFunctions = [];
-
-        this.handler = undefined;
-        this.monitoringEventHandler = undefined;
-        this.isListenerAttached = false;
-        logStoreAction("StatusUpdateManager", "unsubscribed", {
-            message: "Successfully unsubscribed from status updates",
-            unsubscribed: true,
-        });
-    }
-
-    /**
-     * Check if currently subscribed
-     */
-    isSubscribed(): boolean {
-        return this.handler !== undefined && this.isListenerAttached;
-    }
 }

@@ -13,6 +13,40 @@ import { generateMonitorTableSchema } from "./dynamicSchema";
  */
 
 /**
+ * Create database indexes for better query performance.
+ *
+ * @param db - SQLite database instance
+ * @throws When index creation fails
+ *
+ * @remarks
+ * Creates the following indexes:
+ * - idx_monitors_site_identifier: Fast site-based monitor queries
+ * - idx_monitors_type: Monitor type filtering
+ * - idx_history_monitor_id: Fast history lookups by monitor
+ * - idx_history_timestamp: Time-based history queries
+ */
+export function createDatabaseIndexes(db: Database): void {
+    try {
+        // Index on monitor site_identifier for faster site queries
+        db.run("CREATE INDEX IF NOT EXISTS idx_monitors_site_identifier ON monitors(site_identifier)");
+
+        // Index on monitor type for monitor type queries
+        db.run("CREATE INDEX IF NOT EXISTS idx_monitors_type ON monitors(type)");
+
+        // Index on history monitor_id for faster history queries
+        db.run("CREATE INDEX IF NOT EXISTS idx_history_monitor_id ON history(monitor_id)");
+
+        // Index on history timestamp for time-based queries
+        db.run("CREATE INDEX IF NOT EXISTS idx_history_timestamp ON history(timestamp)");
+
+        logger.info("[DatabaseSchema] All indexes created successfully");
+    } catch (error) {
+        logger.error("[DatabaseSchema] Failed to create indexes", error);
+        throw error;
+    }
+}
+
+/**
  * Create all required database tables if they don't exist.
  *
  * @param db - SQLite database instance
@@ -85,40 +119,6 @@ export function createDatabaseTables(db: Database): void {
         logger.info("[DatabaseSchema] All tables created successfully");
     } catch (error) {
         logger.error("[DatabaseSchema] Failed to create tables", error);
-        throw error;
-    }
-}
-
-/**
- * Create database indexes for better query performance.
- *
- * @param db - SQLite database instance
- * @throws When index creation fails
- *
- * @remarks
- * Creates the following indexes:
- * - idx_monitors_site_identifier: Fast site-based monitor queries
- * - idx_monitors_type: Monitor type filtering
- * - idx_history_monitor_id: Fast history lookups by monitor
- * - idx_history_timestamp: Time-based history queries
- */
-export function createDatabaseIndexes(db: Database): void {
-    try {
-        // Index on monitor site_identifier for faster site queries
-        db.run("CREATE INDEX IF NOT EXISTS idx_monitors_site_identifier ON monitors(site_identifier)");
-
-        // Index on monitor type for monitor type queries
-        db.run("CREATE INDEX IF NOT EXISTS idx_monitors_type ON monitors(type)");
-
-        // Index on history monitor_id for faster history queries
-        db.run("CREATE INDEX IF NOT EXISTS idx_history_monitor_id ON history(monitor_id)");
-
-        // Index on history timestamp for time-based queries
-        db.run("CREATE INDEX IF NOT EXISTS idx_history_timestamp ON history(timestamp)");
-
-        logger.info("[DatabaseSchema] All indexes created successfully");
-    } catch (error) {
-        logger.error("[DatabaseSchema] Failed to create indexes", error);
         throw error;
     }
 }

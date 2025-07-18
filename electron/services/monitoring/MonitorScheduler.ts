@@ -11,10 +11,25 @@ export class MonitorScheduler {
     private onCheckCallback?: (siteIdentifier: string, monitorId: string) => Promise<void>;
 
     /**
-     * Set the callback function to execute when a monitor check is scheduled.
+     * Get the number of active monitoring intervals.
      */
-    public setCheckCallback(callback: (siteIdentifier: string, monitorId: string) => Promise<void>): void {
-        this.onCheckCallback = callback;
+    public getActiveCount(): number {
+        return this.intervals.size;
+    }
+
+    /**
+     * Get all active monitoring keys.
+     */
+    public getActiveMonitors(): string[] {
+        return [...this.intervals.keys()];
+    }
+
+    /**
+     * Check if a monitor is currently being monitored.
+     */
+    public isMonitoring(siteIdentifier: string, monitorId: string): boolean {
+        const intervalKey = `${siteIdentifier}|${monitorId}`;
+        return this.intervals.has(intervalKey);
     }
 
     /**
@@ -31,6 +46,25 @@ export class MonitorScheduler {
                 );
             }
         }
+    }
+
+    /**
+     * Restart monitoring for a specific monitor (useful when interval changes).
+     */
+    public restartMonitor(siteIdentifier: string, monitor: Site["monitors"][0]): boolean {
+        if (!monitor.id) {
+            return false;
+        }
+
+        this.stopMonitor(siteIdentifier, monitor.id);
+        return this.startMonitor(siteIdentifier, monitor);
+    }
+
+    /**
+     * Set the callback function to execute when a monitor check is scheduled.
+     */
+    public setCheckCallback(callback: (siteIdentifier: string, monitorId: string) => Promise<void>): void {
+        this.onCheckCallback = callback;
     }
 
     /**
@@ -87,6 +121,28 @@ export class MonitorScheduler {
     }
 
     /**
+     * Start monitoring for all monitors in a site.
+     */
+    public startSite(site: Site): void {
+        for (const monitor of site.monitors) {
+            if (monitor.monitoring && monitor.id) {
+                this.startMonitor(site.identifier, monitor);
+            }
+        }
+    }
+
+    /**
+     * Stop all monitoring intervals.
+     */
+    public stopAll(): void {
+        for (const interval of this.intervals.values()) {
+            clearInterval(interval);
+        }
+        this.intervals.clear();
+        logger.info("[MonitorScheduler] Stopped all monitoring intervals");
+    }
+
+    /**
      * Stop monitoring for a specific monitor.
      */
     public stopMonitor(siteIdentifier: string, monitorId: string): boolean {
@@ -101,17 +157,6 @@ export class MonitorScheduler {
         }
 
         return false;
-    }
-
-    /**
-     * Start monitoring for all monitors in a site.
-     */
-    public startSite(site: Site): void {
-        for (const monitor of site.monitors) {
-            if (monitor.monitoring && monitor.id) {
-                this.startMonitor(site.identifier, monitor);
-            }
-        }
     }
 
     /**
@@ -135,50 +180,5 @@ export class MonitorScheduler {
                 }
             }
         }
-    }
-
-    /**
-     * Stop all monitoring intervals.
-     */
-    public stopAll(): void {
-        for (const interval of this.intervals.values()) {
-            clearInterval(interval);
-        }
-        this.intervals.clear();
-        logger.info("[MonitorScheduler] Stopped all monitoring intervals");
-    }
-
-    /**
-     * Restart monitoring for a specific monitor (useful when interval changes).
-     */
-    public restartMonitor(siteIdentifier: string, monitor: Site["monitors"][0]): boolean {
-        if (!monitor.id) {
-            return false;
-        }
-
-        this.stopMonitor(siteIdentifier, monitor.id);
-        return this.startMonitor(siteIdentifier, monitor);
-    }
-
-    /**
-     * Check if a monitor is currently being monitored.
-     */
-    public isMonitoring(siteIdentifier: string, monitorId: string): boolean {
-        const intervalKey = `${siteIdentifier}|${monitorId}`;
-        return this.intervals.has(intervalKey);
-    }
-
-    /**
-     * Get the number of active monitoring intervals.
-     */
-    public getActiveCount(): number {
-        return this.intervals.size;
-    }
-
-    /**
-     * Get all active monitoring keys.
-     */
-    public getActiveMonitors(): string[] {
-        return [...this.intervals.keys()];
     }
 }

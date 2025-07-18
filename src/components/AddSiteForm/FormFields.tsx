@@ -116,7 +116,7 @@ export interface TextFieldProperties {
     /** Whether the field is required */
     required?: boolean;
     /** Input type (text, url, or number) */
-    type?: "text" | "url" | "number";
+    type?: "number" | "text" | "url";
     /** Current field value */
     value: string;
 }
@@ -170,14 +170,6 @@ export const TextField = React.memo(function TextField({
     );
 });
 
-/** Option interface for SelectField dropdown items */
-export interface SelectOption {
-    /** Display text for the option */
-    label: string;
-    /** Value to be selected */
-    value: string | number;
-}
-
 /** Props for the SelectField component */
 export interface SelectFieldProperties {
     /** Whether the field is disabled */
@@ -197,7 +189,15 @@ export interface SelectFieldProperties {
     /** Placeholder text for empty selection */
     placeholder?: string;
     required?: boolean;
-    value: string | number;
+    value: number | string;
+}
+
+/** Option interface for SelectField dropdown items */
+export interface SelectOption {
+    /** Display text for the option */
+    label: string;
+    /** Value to be selected */
+    value: number | string;
 }
 
 export const SelectField = React.memo(function SelectField({
@@ -244,14 +244,6 @@ export const SelectField = React.memo(function SelectField({
     );
 });
 
-/** Option interface for RadioGroup items */
-export interface RadioOption {
-    /** Display text for the radio option */
-    label: string;
-    /** Value to be selected */
-    value: string;
-}
-
 /** Props for the RadioGroup component */
 export interface RadioGroupProperties {
     /** Whether the radio group is disabled */
@@ -273,6 +265,14 @@ export interface RadioGroupProperties {
     /** Whether a selection is required */
     required?: boolean;
     /** Currently selected value */
+    value: string;
+}
+
+/** Option interface for RadioGroup items */
+export interface RadioOption {
+    /** Display text for the radio option */
+    label: string;
+    /** Value to be selected */
     value: string;
 }
 

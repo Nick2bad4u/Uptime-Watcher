@@ -10,34 +10,34 @@ import type { Site, StatusUpdate } from "../../types";
 
 import { logStoreAction, withErrorHandling } from "../utils";
 import { SiteService } from "./services/SiteService";
-import { StatusUpdateManager, createStatusUpdateHandler } from "./utils/statusUpdateHandler";
+import { createStatusUpdateHandler, StatusUpdateManager } from "./utils/statusUpdateHandler";
 
 export interface SiteSyncActions {
-    /** Sync sites from backend */
-    syncSitesFromBackend: () => Promise<void>;
     /** Full sync from backend */
     fullSyncFromBackend: () => Promise<void>;
     /** Get sync status */
     getSyncStatus: () => Promise<{
+        lastSync: null | number | undefined;
+        siteCount: number;
         success: boolean;
         synchronized: boolean;
-        lastSync: number | null | undefined;
-        siteCount: number;
     }>;
     /** Subscribe to status updates */
     subscribeToStatusUpdates: (callback: (update: StatusUpdate) => void) => {
-        success: boolean;
+        message: string;
         subscribed: boolean;
-        message: string;
-    };
-    /** Unsubscribe from status updates */
-    unsubscribeFromStatusUpdates: () => {
         success: boolean;
-        unsubscribed: boolean;
-        message: string;
     };
     /** Subscribe to sync events */
     subscribeToSyncEvents: () => () => void;
+    /** Sync sites from backend */
+    syncSitesFromBackend: () => Promise<void>;
+    /** Unsubscribe from status updates */
+    unsubscribeFromStatusUpdates: () => {
+        message: string;
+        success: boolean;
+        unsubscribed: boolean;
+    };
 }
 
 export interface SiteSyncDependencies {
@@ -62,18 +62,18 @@ export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActio
                 const status = await window.electronAPI.stateSync.getSyncStatus();
                 logStoreAction("SitesStore", "getSyncStatus", {
                     message: "Sync status retrieved",
-                    synchronized: status.synchronized,
                     siteCount: status.siteCount,
                     success: true,
+                    synchronized: status.synchronized,
                 });
                 return status;
             } catch (error) {
                 logStoreAction("SitesStore", "error", { error });
                 return {
-                    success: false,
-                    synchronized: false,
                     lastSync: undefined,
                     siteCount: 0,
+                    success: false,
+                    synchronized: false,
                 };
             }
         },
@@ -89,10 +89,47 @@ export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActio
                 console.error("Failed to subscribe to status updates:", error);
             });
 
-            const result = { message: "Successfully subscribed to status updates", subscribed: true, success: true };
+            const result = {
+                message: "Successfully subscribed to status updates",
+                subscribed: true,
+                success: true,
+            };
             logStoreAction("SitesStore", "subscribeToStatusUpdates", result);
 
             return result;
+        },
+        subscribeToSyncEvents: () => {
+            const cleanup = window.electronAPI.stateSync.onStateSyncEvent((event) => {
+                logStoreAction("SitesStore", "syncEventReceived", {
+                    action: event.action,
+                    siteIdentifier: event.siteIdentifier,
+                    source: event.source,
+                    timestamp: event.timestamp,
+                }); // Handle different sync actions
+                switch (event.action) {
+                    case "bulk-sync": {
+                        if (event.sites) {
+                            deps.setSites(event.sites);
+                        }
+                        break;
+                    }
+                    case "delete":
+                    case "update": {
+                        // For single site updates, trigger a full sync
+                        actions.syncSitesFromBackend().catch((error: unknown) => {
+                            logStoreAction("SitesStore", "error", { error });
+                        });
+                        break;
+                    }
+                }
+            });
+
+            logStoreAction("SitesStore", "subscribeToSyncEvents", {
+                message: "Successfully subscribed to sync events",
+                success: true,
+            });
+
+            return cleanup;
         },
         syncSitesFromBackend: async () => {
             await withErrorHandling(
@@ -124,39 +161,6 @@ export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActio
             logStoreAction("SitesStore", "unsubscribeFromStatusUpdates", result);
 
             return result;
-        },
-        subscribeToSyncEvents: () => {
-            const cleanup = window.electronAPI.stateSync.onStateSyncEvent((event) => {
-                logStoreAction("SitesStore", "syncEventReceived", {
-                    action: event.action,
-                    siteIdentifier: event.siteIdentifier,
-                    timestamp: event.timestamp,
-                    source: event.source,
-                }); // Handle different sync actions
-                switch (event.action) {
-                    case "bulk-sync": {
-                        if (event.sites) {
-                            deps.setSites(event.sites);
-                        }
-                        break;
-                    }
-                    case "update":
-                    case "delete": {
-                        // For single site updates, trigger a full sync
-                        actions.syncSitesFromBackend().catch((error: unknown) => {
-                            logStoreAction("SitesStore", "error", { error });
-                        });
-                        break;
-                    }
-                }
-            });
-
-            logStoreAction("SitesStore", "subscribeToSyncEvents", {
-                message: "Successfully subscribed to sync events",
-                success: true,
-            });
-
-            return cleanup;
         },
     };
 

@@ -5,60 +5,37 @@
  */
 
 import React, { useEffect, useState } from "react";
+
 import type { MonitorType } from "../../types";
+
 import logger from "../../services/logger";
-import { formatMonitorDetail, supportsResponseTime as checkSupportsResponseTime } from "../../utils/monitorUiHelpers";
+import { supportsResponseTime as checkSupportsResponseTime, formatMonitorDetail } from "../../utils/monitorUiHelpers";
+
+/**
+ * Component that conditionally renders based on response time support.
+ */
+interface ConditionalResponseTimeProps {
+    readonly children: React.ReactNode;
+    readonly fallback?: React.ReactNode;
+    readonly monitorType: MonitorType;
+}
 
 /**
  * Component that dynamically formats monitor detail labels.
  * Handles async loading of monitor configuration.
  */
 interface DetailLabelProps {
-    readonly monitorType: MonitorType;
     readonly details: string;
     readonly fallback?: string;
-}
-
-export function DetailLabel({ monitorType, details, fallback = details }: DetailLabelProps) {
-    const [formattedLabel, setFormattedLabel] = useState<string>(fallback);
-
-    useEffect(() => {
-        let isCancelled = false;
-
-        const formatLabel = async () => {
-            try {
-                const formatted = await formatMonitorDetail(monitorType, details);
-                if (!isCancelled) {
-                    setFormattedLabel(formatted);
-                }
-            } catch (error) {
-                logger.warn("Failed to format detail label", error as Error);
-                if (!isCancelled) {
-                    setFormattedLabel(fallback);
-                }
-            }
-        };
-
-        void formatLabel();
-
-        return () => {
-            isCancelled = true;
-        };
-    }, [monitorType, details, fallback]);
-
-    return <span>{formattedLabel}</span>;
-}
-
-/**
- * Component that conditionally renders based on response time support.
- */
-interface ConditionalResponseTimeProps {
     readonly monitorType: MonitorType;
-    readonly children: React.ReactNode;
-    readonly fallback?: React.ReactNode;
 }
 
-export function ConditionalResponseTime({ monitorType, children, fallback }: ConditionalResponseTimeProps) {
+// eslint-disable-next-line sonarjs/function-return-type -- React component can return different node types
+export function ConditionalResponseTime({
+    children,
+    fallback,
+    monitorType,
+}: ConditionalResponseTimeProps): React.ReactNode {
     const [supportsResponseTime, setSupportsResponseTime] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -93,4 +70,34 @@ export function ConditionalResponseTime({ monitorType, children, fallback }: Con
     }
 
     return supportsResponseTime ? children : fallback;
+}
+
+export function DetailLabel({ details, fallback = details, monitorType }: DetailLabelProps) {
+    const [formattedLabel, setFormattedLabel] = useState<string>(fallback);
+
+    useEffect(() => {
+        let isCancelled = false;
+
+        const formatLabel = async () => {
+            try {
+                const formatted = await formatMonitorDetail(monitorType, details);
+                if (!isCancelled) {
+                    setFormattedLabel(formatted);
+                }
+            } catch (error) {
+                logger.warn("Failed to format detail label", error as Error);
+                if (!isCancelled) {
+                    setFormattedLabel(fallback);
+                }
+            }
+        };
+
+        void formatLabel();
+
+        return () => {
+            isCancelled = true;
+        };
+    }, [monitorType, details, fallback]);
+
+    return <span>{formattedLabel}</span>;
 }

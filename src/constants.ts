@@ -9,8 +9,8 @@ export const FONT_FAMILY_SANS = ["Inter", "system-ui", "Avenir", "Helvetica", "A
 
 /** Interface for interval options used in dropdowns */
 export interface IntervalOption {
-    value: number;
     label: string;
+    value: number;
 }
 
 /**
@@ -117,10 +117,10 @@ export const UI_DELAYS = {
 /** Chart time periods for analytics components (in milliseconds) */
 export const CHART_TIME_PERIODS = {
     "1h": 60 * 60 * 1000,
-    "12h": 12 * 60 * 60 * 1000,
-    "24h": 24 * 60 * 60 * 1000,
-
     "7d": 7 * 24 * 60 * 60 * 1000,
+    "12h": 12 * 60 * 60 * 1000,
+
+    "24h": 24 * 60 * 60 * 1000,
     "30d": 30 * 24 * 60 * 60 * 1000,
 } as const;
 

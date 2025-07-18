@@ -191,6 +191,57 @@ const settingsAPI = {
  */
 const eventsAPI = {
     /**
+     * Register a callback for monitor down events.
+     *
+     * @param callback - Function to call when a monitor goes down
+     * @returns Cleanup function to remove the listener
+     *
+     * @remarks
+     * Called when a monitor detects a failure.
+     */
+    onMonitorDown: (callback: (data: unknown) => void) => {
+        const handler = (_: Electron.IpcRendererEvent, data: unknown) => {
+            callback(data);
+        };
+        ipcRenderer.on("monitor:down", handler);
+        return () => ipcRenderer.removeListener("monitor:down", handler);
+    },
+
+    /**
+     * Register a callback for monitoring started events.
+     *
+     * @param callback - Function to call when monitoring starts for a site/monitor
+     * @returns Cleanup function to remove the listener
+     *
+     * @remarks
+     * Called when a monitor begins actively monitoring a site.
+     */
+    onMonitoringStarted: (callback: (data: { monitorId: string; siteId: string }) => void) => {
+        const handler = (_: Electron.IpcRendererEvent, data: { monitorId: string; siteId: string }) => {
+            callback(data);
+        };
+        ipcRenderer.on("monitoring:started", handler);
+        return () => ipcRenderer.removeListener("monitoring:started", handler);
+    },
+
+    /**
+     * Register a callback for monitoring stopped events.
+     *
+     * @param callback - Function to call when monitoring stops for a site/monitor
+     * @returns Cleanup function to remove the listener
+     *
+     * @remarks
+     * Called when a monitor stops actively monitoring a site.
+     */
+    onMonitoringStopped: (callback: (data: { monitorId: string; siteId: string }) => void) => {
+        const handler = (_: Electron.IpcRendererEvent, data: { monitorId: string; siteId: string }) => {
+            callback(data);
+        };
+        ipcRenderer.on("monitoring:stopped", handler);
+        return () => ipcRenderer.removeListener("monitoring:stopped", handler);
+    },
+
+    /**
      * Register a callback for monitor status update events.
      *
      * @param callback - Function to call when a monitor status changes
@@ -223,57 +274,6 @@ const eventsAPI = {
         };
         ipcRenderer.on("monitor:up", handler);
         return () => ipcRenderer.removeListener("monitor:up", handler);
-    },
-
-    /**
-     * Register a callback for monitor down events.
-     *
-     * @param callback - Function to call when a monitor goes down
-     * @returns Cleanup function to remove the listener
-     *
-     * @remarks
-     * Called when a monitor detects a failure.
-     */
-    onMonitorDown: (callback: (data: unknown) => void) => {
-        const handler = (_: Electron.IpcRendererEvent, data: unknown) => {
-            callback(data);
-        };
-        ipcRenderer.on("monitor:down", handler);
-        return () => ipcRenderer.removeListener("monitor:down", handler);
-    },
-
-    /**
-     * Register a callback for monitoring started events.
-     *
-     * @param callback - Function to call when monitoring starts for a site/monitor
-     * @returns Cleanup function to remove the listener
-     *
-     * @remarks
-     * Called when a monitor begins actively monitoring a site.
-     */
-    onMonitoringStarted: (callback: (data: { siteId: string; monitorId: string }) => void) => {
-        const handler = (_: Electron.IpcRendererEvent, data: { siteId: string; monitorId: string }) => {
-            callback(data);
-        };
-        ipcRenderer.on("monitoring:started", handler);
-        return () => ipcRenderer.removeListener("monitoring:started", handler);
-    },
-
-    /**
-     * Register a callback for monitoring stopped events.
-     *
-     * @param callback - Function to call when monitoring stops for a site/monitor
-     * @returns Cleanup function to remove the listener
-     *
-     * @remarks
-     * Called when a monitor stops actively monitoring a site.
-     */
-    onMonitoringStopped: (callback: (data: { siteId: string; monitorId: string }) => void) => {
-        const handler = (_: Electron.IpcRendererEvent, data: { siteId: string; monitorId: string }) => {
-            callback(data);
-        };
-        ipcRenderer.on("monitoring:stopped", handler);
-        return () => ipcRenderer.removeListener("monitoring:stopped", handler);
     },
 
     /**
@@ -332,15 +332,6 @@ const eventsAPI = {
  */
 const systemAPI = {
     /**
-     * Quit the application and install a pending update.
-     *
-     * @remarks
-     * Only effective when an update has been downloaded and is ready to install.
-     * This will close the application and start the update installer.
-     */
-    quitAndInstall: () => ipcRenderer.send("quit-and-install"),
-
-    /**
      * Open a URL in the user's default external browser.
      *
      * @param url - The URL to open in the external browser
@@ -350,6 +341,15 @@ const systemAPI = {
      * away from the application.
      */
     openExternal: (url: string) => ipcRenderer.invoke("open-external", url),
+
+    /**
+     * Quit the application and install a pending update.
+     *
+     * @remarks
+     * Only effective when an update has been downloaded and is ready to install.
+     * This will close the application and start the update installer.
+     */
+    quitAndInstall: () => ipcRenderer.send("quit-and-install"),
 };
 
 /**
@@ -361,6 +361,18 @@ const systemAPI = {
  */
 const stateSyncAPI = {
     /**
+     * Get current synchronization status.
+     *
+     * @returns Promise with sync status information
+     */
+    getSyncStatus: (): Promise<{
+        lastSync: null | number;
+        siteCount: number;
+        success: boolean;
+        synchronized: boolean;
+    }> => ipcRenderer.invoke("get-sync-status"),
+
+    /**
      * Register listener for state synchronization events.
      *
      * @param callback - Function to call when state changes occur
@@ -368,11 +380,11 @@ const stateSyncAPI = {
      */
     onStateSyncEvent: (
         callback: (event: {
-            action: "update" | "delete" | "bulk-sync";
+            action: "bulk-sync" | "delete" | "update";
             siteIdentifier?: string;
             sites?: Site[];
-            timestamp?: number;
             source?: "cache" | "database" | "frontend";
+            timestamp?: number;
         }) => void
     ) => {
         const handler = (_event: Electron.IpcRendererEvent, eventData: Parameters<typeof callback>[0]) => {
@@ -387,19 +399,7 @@ const stateSyncAPI = {
      *
      * @returns Promise resolving when sync is complete
      */
-    requestFullSync: (): Promise<{ success: boolean; siteCount: number }> => ipcRenderer.invoke("request-full-sync"),
-
-    /**
-     * Get current synchronization status.
-     *
-     * @returns Promise with sync status information
-     */
-    getSyncStatus: (): Promise<{
-        success: boolean;
-        synchronized: boolean;
-        lastSync: number | null;
-        siteCount: number;
-    }> => ipcRenderer.invoke("get-sync-status"),
+    requestFullSync: (): Promise<{ siteCount: number; success: boolean }> => ipcRenderer.invoke("request-full-sync"),
 };
 
 /**
@@ -410,13 +410,6 @@ const stateSyncAPI = {
  * for dynamic form generation and validation.
  */
 const monitorTypesAPI = {
-    /**
-     * Get all available monitor types from backend registry.
-     *
-     * @returns Promise resolving to array of monitor type configurations
-     */
-    getMonitorTypes: () => ipcRenderer.invoke("get-monitor-types"),
-
     /**
      * Format monitor detail using backend registry.
      *
@@ -435,6 +428,13 @@ const monitorTypesAPI = {
      */
     formatMonitorTitleSuffix: (type: string, monitor: Record<string, unknown>) =>
         ipcRenderer.invoke("format-monitor-title-suffix", type, monitor),
+
+    /**
+     * Get all available monitor types from backend registry.
+     *
+     * @returns Promise resolving to array of monitor type configurations
+     */
+    getMonitorTypes: () => ipcRenderer.invoke("get-monitor-types"),
 
     /**
      * Validate monitor data using backend registry.
@@ -460,9 +460,9 @@ contextBridge.exposeInMainWorld("electronAPI", {
     data: dataAPI,
     events: eventsAPI,
     monitoring: monitoringAPI,
+    monitorTypes: monitorTypesAPI,
     settings: settingsAPI,
     sites: siteAPI,
     stateSync: stateSyncAPI,
     system: systemAPI,
-    monitorTypes: monitorTypesAPI,
 });

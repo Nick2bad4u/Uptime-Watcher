@@ -3,19 +3,18 @@
  * Displays advanced metrics, charts, and performance analysis for site monitoring.
  */
 
-import { FiActivity, FiTrendingUp, FiBarChart2 } from "react-icons/fi";
-import { MdAnalytics, MdTrendingUp, MdSpeed, MdPieChart } from "react-icons/md";
+import { FiActivity, FiBarChart2, FiTrendingUp } from "react-icons/fi";
+import { MdAnalytics, MdPieChart, MdSpeed, MdTrendingUp } from "react-icons/md";
 
-import { ChartOptions } from "../../../services/chartSetup";
-import { ResponseTimeChart, StatusChart, UptimeChart } from "../charts/ChartComponents";
-
-import { ConditionalResponseTime } from "../../common/MonitorUiComponents";
 import { DowntimePeriod } from "../../../hooks/site/useSiteAnalytics";
-import logger from "../../../services/logger";
 import { ResponseTimeChartData, StatusBarChartData, UptimeChartData } from "../../../services/chartConfig";
-import { ThemedText, ThemedButton, ThemedCard, ThemedBadge, ThemedProgress } from "../../../theme/components";
-import { useTheme, useAvailabilityColors } from "../../../theme/useTheme";
+import { ChartOptions } from "../../../services/chartSetup";
+import logger from "../../../services/logger";
+import { ThemedBadge, ThemedButton, ThemedCard, ThemedProgress, ThemedText } from "../../../theme/components";
+import { useAvailabilityColors, useTheme } from "../../../theme/useTheme";
 import { MonitorType } from "../../../types";
+import { ConditionalResponseTime } from "../../common/MonitorUiComponents";
+import { ResponseTimeChart, StatusChart, UptimeChart } from "../charts/ChartComponents";
 
 /**
  * Props for the AnalyticsTab component.
@@ -57,11 +56,11 @@ interface AnalyticsTabProperties {
     /** Function to toggle advanced metrics visibility */
     readonly setShowAdvancedMetrics: (show: boolean) => void;
     /** Function to set the chart time range */
-    readonly setSiteDetailsChartTimeRange: (range: "1h" | "24h" | "7d" | "30d") => void;
+    readonly setSiteDetailsChartTimeRange: (range: "1h" | "7d" | "24h" | "30d") => void;
     /** Whether advanced metrics are currently shown */
     readonly showAdvancedMetrics: boolean;
     /** Current chart time range selection */
-    readonly siteDetailsChartTimeRange: "1h" | "24h" | "7d" | "30d";
+    readonly siteDetailsChartTimeRange: "1h" | "7d" | "24h" | "30d";
     /** Total number of checks performed */
     readonly totalChecks: number;
     /** Total downtime in milliseconds */
@@ -148,7 +147,7 @@ export function AnalyticsTab({
     const progressVariant = variant === "danger" ? "error" : variant;
 
     return (
-        <div data-testid="analytics-tab" className="space-y-6">
+        <div className="space-y-6" data-testid="analytics-tab">
             {/* Time Range Selector */}
             <ThemedCard icon={<MdAnalytics />} title="Analytics Time Range">
                 <div className="flex items-center justify-between">
@@ -159,8 +158,6 @@ export function AnalyticsTab({
                         {(["1h", "24h", "7d", "30d"] as const).map((range) => (
                             <ThemedButton
                                 key={range}
-                                variant={siteDetailsChartTimeRange === range ? "primary" : "ghost"}
-                                size="sm"
                                 onClick={() => {
                                     logger.user.action("Chart time range changed", {
                                         monitorType: monitorType,
@@ -169,6 +166,8 @@ export function AnalyticsTab({
                                     });
                                     setSiteDetailsChartTimeRange(range);
                                 }}
+                                size="sm"
+                                variant={siteDetailsChartTimeRange === range ? "primary" : "ghost"}
                             >
                                 {range}
                             </ThemedButton>
@@ -180,20 +179,20 @@ export function AnalyticsTab({
             {/* Key Metrics Grid */}
             <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                 <ThemedCard
+                    className="flex flex-col items-center text-center"
+                    hoverable
                     icon={<MdAnalytics />}
                     iconColor={iconColors.uptime}
                     title="Availability"
-                    hoverable
-                    className="flex flex-col items-center text-center"
                 >
                     <div className="flex flex-col items-center space-y-2">
                         <ThemedProgress
+                            className="flex flex-col items-center"
+                            showLabel
                             value={uptimeValue}
                             variant={progressVariant}
-                            showLabel
-                            className="flex flex-col items-center"
                         />
-                        <ThemedBadge variant={progressVariant} size="sm">
+                        <ThemedBadge size="sm" variant={progressVariant}>
                             {uptime}%
                         </ThemedBadge>
                         <ThemedText size="xs" variant="secondary">
@@ -205,11 +204,11 @@ export function AnalyticsTab({
                 {/* Average Response Time Card - Available for all current monitor types */}
                 <ConditionalResponseTime monitorType={monitorType}>
                     <ThemedCard
+                        className="flex flex-col items-center text-center"
+                        hoverable
                         icon={<MdTrendingUp />}
                         iconColor={iconColors.performance}
                         title="Avg Response"
-                        hoverable
-                        className="flex flex-col items-center text-center"
                     >
                         <div className="flex flex-col items-center space-y-1">
                             <ThemedText size="xl" weight="bold">
@@ -223,14 +222,14 @@ export function AnalyticsTab({
                 </ConditionalResponseTime>
 
                 <ThemedCard
+                    className="flex flex-col items-center text-center"
+                    hoverable
                     icon={<FiActivity />}
                     iconColor={iconColors.downtime}
                     title="Downtime"
-                    hoverable
-                    className="flex flex-col items-center text-center"
                 >
                     <div className="flex flex-col items-center space-y-1">
-                        <ThemedText size="xl" weight="bold" variant="error">
+                        <ThemedText size="xl" variant="error" weight="bold">
                             {formatDuration(totalDowntime)}
                         </ThemedText>
                         <ThemedText size="xs" variant="secondary">
@@ -240,11 +239,11 @@ export function AnalyticsTab({
                 </ThemedCard>
 
                 <ThemedCard
+                    className="flex flex-col items-center text-center"
+                    hoverable
                     icon={<FiTrendingUp />}
                     iconColor={iconColors.analytics}
                     title="Total Checks"
-                    hoverable
-                    className="flex flex-col items-center text-center"
                 >
                     <div className="flex flex-col items-center space-y-1">
                         <ThemedText size="xl" weight="bold">
@@ -266,8 +265,6 @@ export function AnalyticsTab({
                                 Percentile Analysis
                             </ThemedText>
                             <ThemedButton
-                                variant="ghost"
-                                size="sm"
                                 onClick={() => {
                                     const newValue = !showAdvancedMetrics;
                                     logger.user.action("Advanced metrics toggle", {
@@ -277,6 +274,8 @@ export function AnalyticsTab({
                                     });
                                     setShowAdvancedMetrics(newValue);
                                 }}
+                                size="sm"
+                                variant="ghost"
                             >
                                 {showAdvancedMetrics ? "Hide" : "Show"} Advanced
                             </ThemedButton>
@@ -284,26 +283,26 @@ export function AnalyticsTab({
 
                         <div className="grid grid-cols-3 gap-4">
                             <div className="flex flex-col items-center text-center">
-                                <ThemedText size="sm" variant="secondary" className="mb-2">
+                                <ThemedText className="mb-2" size="sm" variant="secondary">
                                     P50
                                 </ThemedText>
-                                <ThemedText size="lg" weight="medium" style={{ color: getResponseTimeColor(p50) }}>
+                                <ThemedText size="lg" style={{ color: getResponseTimeColor(p50) }} weight="medium">
                                     {formatResponseTime(p50)}
                                 </ThemedText>
                             </div>
                             <div className="flex flex-col items-center text-center">
-                                <ThemedText size="sm" variant="secondary" className="mb-2">
+                                <ThemedText className="mb-2" size="sm" variant="secondary">
                                     P95
                                 </ThemedText>
-                                <ThemedText size="lg" weight="medium" style={{ color: getResponseTimeColor(p95) }}>
+                                <ThemedText size="lg" style={{ color: getResponseTimeColor(p95) }} weight="medium">
                                     {formatResponseTime(p95)}
                                 </ThemedText>
                             </div>
                             <div className="flex flex-col items-center text-center">
-                                <ThemedText size="sm" variant="secondary" className="mb-2">
+                                <ThemedText className="mb-2" size="sm" variant="secondary">
                                     P99
                                 </ThemedText>
-                                <ThemedText size="lg" weight="medium" style={{ color: getResponseTimeColor(p99) }}>
+                                <ThemedText size="lg" style={{ color: getResponseTimeColor(p99) }} weight="medium">
                                     {formatResponseTime(p99)}
                                 </ThemedText>
                             </div>
@@ -312,32 +311,32 @@ export function AnalyticsTab({
                         {showAdvancedMetrics && (
                             <div className="grid grid-cols-2 gap-4 pt-4 border-t border-primary/20">
                                 <div className="flex flex-col items-center text-center">
-                                    <ThemedText size="sm" variant="secondary" className="mb-2">
+                                    <ThemedText className="mb-2" size="sm" variant="secondary">
                                         Mean Time To Recovery
                                     </ThemedText>
                                     <ThemedText
                                         size="lg"
-                                        weight="medium"
                                         style={{
                                             color: mttr === 0 ? currentTheme.colors.success : iconColors.downtime,
                                         }}
+                                        weight="medium"
                                     >
                                         {formatDuration(mttr)}
                                     </ThemedText>
                                 </div>
                                 <div className="flex flex-col items-center text-center">
-                                    <ThemedText size="sm" variant="secondary" className="mb-2">
+                                    <ThemedText className="mb-2" size="sm" variant="secondary">
                                         Incidents
                                     </ThemedText>
                                     <ThemedText
                                         size="lg"
-                                        weight="medium"
                                         style={{
                                             color:
                                                 downtimePeriods.length === 0
                                                     ? currentTheme.colors.success
                                                     : iconColors.downtime,
                                         }}
+                                        weight="medium"
                                     >
                                         {downtimePeriods.length}
                                     </ThemedText>
@@ -368,9 +367,9 @@ export function AnalyticsTab({
 
                 {/* Status Distribution Bar Chart */}
                 <ThemedCard
+                    className="lg:col-span-2"
                     icon={<FiBarChart2 color={iconColors.charts} />}
                     title="Status Distribution"
-                    className="lg:col-span-2"
                 >
                     <div className="h-64">
                         <StatusChart data={barChartData} options={barChartOptions} />

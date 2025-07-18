@@ -13,37 +13,6 @@ export interface FileDownloadOptions {
 }
 
 /**
- * Helper function to create and trigger download.
- *
- * @param buffer - File data as ArrayBuffer
- * @param fileName - Name for the downloaded file
- * @param mimeType - MIME type for the file
- */
-function createAndTriggerDownload(buffer: ArrayBuffer, fileName: string, mimeType: string): void {
-    const blob = new Blob([buffer], { type: mimeType });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = fileName;
-    a.style.display = "none";
-
-    // Safe DOM manipulation
-    const body = document.body;
-    // No need to check if body exists; it's always present in browser environments
-    try {
-        body.append(a);
-        a.click();
-        a.remove();
-    } catch (domError) {
-        // Fallback: just click without DOM manipulation
-        console.warn("DOM manipulation failed, using fallback click", domError);
-        a.click();
-    }
-
-    URL.revokeObjectURL(url);
-}
-
-/**
  * Triggers a file download in the browser
  */
 export function downloadFile(options: FileDownloadOptions): void {
@@ -131,4 +100,35 @@ export async function handleSQLiteBackupDownload(downloadFunction: () => Promise
         // Clean up object URL
         URL.revokeObjectURL(objectURL);
     }
+}
+
+/**
+ * Helper function to create and trigger download.
+ *
+ * @param buffer - File data as ArrayBuffer
+ * @param fileName - Name for the downloaded file
+ * @param mimeType - MIME type for the file
+ */
+function createAndTriggerDownload(buffer: ArrayBuffer, fileName: string, mimeType: string): void {
+    const blob = new Blob([buffer], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = fileName;
+    a.style.display = "none";
+
+    // Safe DOM manipulation
+    const body = document.body;
+    // No need to check if body exists; it's always present in browser environments
+    try {
+        body.append(a);
+        a.click();
+        a.remove();
+    } catch (domError) {
+        // Fallback: just click without DOM manipulation
+        console.warn("DOM manipulation failed, using fallback click", domError);
+        a.click();
+    }
+
+    URL.revokeObjectURL(url);
 }

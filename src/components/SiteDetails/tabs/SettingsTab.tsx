@@ -1,129 +1,28 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition -- will be adding multiple monitor types soon */
 /**
  * Settings tab component for configuring site monitoring parameters.
  * Provides interface for modifying site settings, intervals, and performing site management actions.
  */
 
 import React, { useEffect, useState } from "react";
-import { FiTrash2, FiSave } from "react-icons/fi";
-import { MdSettings, MdTimer, MdInfoOutline, MdDangerous } from "react-icons/md";
+import { FiSave, FiTrash2 } from "react-icons/fi";
+import { MdDangerous, MdInfoOutline, MdSettings, MdTimer } from "react-icons/md";
 
 import { CHECK_INTERVALS, RETRY_CONSTRAINTS, TIMEOUT_CONSTRAINTS } from "../../../constants";
 import logger from "../../../services/logger";
 import {
-    ThemedText,
+    ThemedBadge,
+    ThemedBox,
     ThemedButton,
     ThemedCard,
-    ThemedBadge,
     ThemedInput,
     ThemedSelect,
-    ThemedBox,
+    ThemedText,
 } from "../../../theme/components";
 import { useTheme } from "../../../theme/useTheme";
-import { Site, Monitor } from "../../../types";
+import { Monitor, Site } from "../../../types";
 import { calculateMaxDuration } from "../../../utils/duration";
-import { getIntervalLabel } from "../../../utils/time";
 import { getMonitorTypeConfig } from "../../../utils/monitorTypeHelper";
-
-/**
- * Helper function to format retry attempts text.
- * @param attempts - Number of retry attempts
- * @returns Formatted retry attempts description
- */
-function formatRetryAttemptsText(attempts: number): string {
-    if (attempts === 0) {
-        return "(Retry disabled - immediate failure detection)";
-    }
-
-    const timesText = attempts === 1 ? "time" : "times";
-    return `(Retry ${attempts} ${timesText} before marking down)`;
-}
-
-/**
- * Component that displays the identifier label for a monitor type.
- */
-function IdentifierLabel({ selectedMonitor }: { selectedMonitor: Monitor }) {
-    const [label, setLabel] = useState<string>("Loading...");
-
-    useEffect(() => {
-        let isCancelled = false;
-
-        const loadLabel = async () => {
-            try {
-                const identifierLabel = await getIdentifierLabel(selectedMonitor);
-                if (!isCancelled) {
-                    setLabel(identifierLabel);
-                }
-            } catch (error) {
-                logger.warn("Failed to load identifier label", error as Error);
-                if (!isCancelled) {
-                    setLabel("Identifier");
-                }
-            }
-        };
-
-        void loadLabel();
-
-        return () => {
-            isCancelled = true;
-        };
-    }, [selectedMonitor]);
-
-    return label;
-}
-
-/**
- * Generate a display label for the identifier field based on monitor type.
- */
-async function getIdentifierLabel(selectedMonitor: Monitor): Promise<string> {
-    try {
-        const config = await getMonitorTypeConfig(selectedMonitor.type);
-        if (config?.fields) {
-            // Generate label based on primary field(s)
-            const primaryField = config.fields.find((field) => field.required);
-            if (primaryField) {
-                return primaryField.label;
-            }
-            // Fallback to first field
-            if (config.fields.length > 0 && config.fields[0]) {
-                return config.fields[0].label;
-            }
-        }
-    } catch (error) {
-        logger.warn("Failed to get monitor config for identifier label", error as Error);
-    }
-
-    // Fallback to hardcoded labels - these should be dynamically determined
-    // but we keep them for backward compatibility
-    if (selectedMonitor.type === "http") {
-        return "Website URL";
-    }
-    if (selectedMonitor.type === "port") {
-        return "Host & Port";
-    }
-    return "Monitor Configuration";
-}
-
-/**
- * Generate a display identifier based on the monitor type.
- * Uses the monitor registry to format the display value appropriately.
- */
-function getDisplayIdentifier(currentSite: Site, selectedMonitor: Monitor): string {
-    try {
-        // Fallback to hardcoded patterns for backward compatibility
-        if (selectedMonitor.type === "http" && selectedMonitor.url) {
-            return selectedMonitor.url;
-        }
-        if (selectedMonitor.type === "port" && selectedMonitor.host && selectedMonitor.port) {
-            return `${selectedMonitor.host}:${selectedMonitor.port}`;
-        }
-    } catch (error) {
-        logger.warn("Failed to generate display identifier", error as Error);
-    }
-
-    // Fallback to site identifier
-    return currentSite.identifier;
-}
+import { getIntervalLabel } from "../../../utils/time";
 
 /**
  * Props for the SettingsTab component.
@@ -135,6 +34,8 @@ interface SettingsTabProperties {
     readonly handleIntervalChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
     /** Handler for removing/deleting the site */
     readonly handleRemoveSite: () => Promise<void>;
+    /** Handler for monitor retry attempts changes */
+    readonly handleRetryAttemptsChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     /** Handler for saving interval changes */
     readonly handleSaveInterval: () => void;
     /** Handler for saving site name changes */
@@ -143,8 +44,6 @@ interface SettingsTabProperties {
     readonly handleSaveRetryAttempts: () => Promise<void>;
     /** Handler for saving timeout changes */
     readonly handleSaveTimeout: () => Promise<void>;
-    /** Handler for monitor retry attempts changes */
-    readonly handleRetryAttemptsChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     /** Handler for monitor timeout changes */
     readonly handleTimeoutChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     /** Whether there are unsaved changes pending */
@@ -161,12 +60,12 @@ interface SettingsTabProperties {
     readonly localRetryAttempts: number;
     /** Local state value for timeout in seconds (converted to ms when saving) */
     readonly localTimeout: number;
+    /** Whether the retry attempts have been changed */
+    readonly retryAttemptsChanged: boolean;
     /** Currently selected monitor being configured */
     readonly selectedMonitor: Monitor;
     /** Function to update local site name state */
     readonly setLocalName: (name: string) => void;
-    /** Whether the retry attempts have been changed */
-    readonly retryAttemptsChanged: boolean;
     /** Whether the timeout has been changed */
     readonly timeoutChanged: boolean;
 }
@@ -223,7 +122,7 @@ export function SettingsTab({
     const loggedHandleSaveName = async () => {
         logger.user.action("Settings: Save site name initiated", {
             newName: localName.trim(),
-            oldName: currentSite.name ?? "",
+            oldName: currentSite.name,
             siteId: currentSite.identifier,
         });
         await handleSaveName();
@@ -242,7 +141,7 @@ export function SettingsTab({
     const loggedHandleRemoveSite = async () => {
         logger.user.action("Settings: Remove site initiated", {
             siteId: currentSite.identifier,
-            siteName: currentSite.name ?? "",
+            siteName: currentSite.name,
         });
         await handleRemoveSite();
     };
@@ -268,36 +167,36 @@ export function SettingsTab({
     };
 
     return (
-        <div data-testid="settings-tab" className="space-y-6">
+        <div className="space-y-6" data-testid="settings-tab">
             {/* Site Configuration */}
             <ThemedCard icon={<MdSettings color={iconColors.settings} />} title="Site Configuration">
                 <div className="space-y-6">
                     {/* Site Name */}
                     <div className="space-y-2">
-                        <ThemedText size="sm" weight="medium" variant="secondary">
+                        <ThemedText size="sm" variant="secondary" weight="medium">
                             Site Name
                         </ThemedText>
                         <div className="flex items-center gap-3">
                             <ThemedInput
-                                type="text"
-                                value={localName}
+                                className="flex-1"
                                 onChange={(e) => setLocalName(e.target.value)}
                                 placeholder="Enter a custom name for this site"
-                                className="flex-1"
+                                type="text"
+                                value={localName}
                             />
                             <ThemedButton
-                                variant={hasUnsavedChanges ? "primary" : "secondary"}
-                                size="sm"
-                                onClick={() => void loggedHandleSaveName()}
                                 disabled={!hasUnsavedChanges || isLoading}
-                                loading={isLoading}
                                 icon={<FiSave />}
+                                loading={isLoading}
+                                onClick={() => void loggedHandleSaveName()}
+                                size="sm"
+                                variant={hasUnsavedChanges ? "primary" : "secondary"}
                             >
                                 Save
                             </ThemedButton>
                         </div>
                         {hasUnsavedChanges && (
-                            <ThemedBadge variant="warning" size="sm">
+                            <ThemedBadge size="sm" variant="warning">
                                 ⚠️ Unsaved changes
                             </ThemedBadge>
                         )}
@@ -305,14 +204,14 @@ export function SettingsTab({
 
                     {/* Site Identifier */}
                     <div className="space-y-2">
-                        <ThemedText size="sm" weight="medium" variant="secondary">
+                        <ThemedText size="sm" variant="secondary" weight="medium">
                             <IdentifierLabel selectedMonitor={selectedMonitor} />
                         </ThemedText>
                         <ThemedInput
+                            className="opacity-70"
+                            disabled
                             type="text"
                             value={getDisplayIdentifier(currentSite, selectedMonitor)}
-                            disabled
-                            className="opacity-70"
                         />
                         <ThemedText size="xs" variant="tertiary">
                             Identifier cannot be changed
@@ -326,11 +225,11 @@ export function SettingsTab({
                 <div className="space-y-6">
                     {/* Check Interval */}
                     <div className="space-y-2">
-                        <ThemedText size="sm" weight="medium" variant="secondary">
+                        <ThemedText size="sm" variant="secondary" weight="medium">
                             Check Interval
                         </ThemedText>
                         <div className="flex items-center gap-3">
-                            <ThemedSelect value={localCheckInterval} onChange={handleIntervalChange} className="flex-1">
+                            <ThemedSelect className="flex-1" onChange={handleIntervalChange} value={localCheckInterval}>
                                 {CHECK_INTERVALS.map((interval) => {
                                     const value = typeof interval === "number" ? interval : interval.value;
                                     const label = getIntervalLabel(interval);
@@ -342,11 +241,11 @@ export function SettingsTab({
                                 })}
                             </ThemedSelect>
                             <ThemedButton
-                                variant={intervalChanged ? "primary" : "secondary"}
-                                size="sm"
-                                onClick={loggedHandleSaveInterval}
                                 disabled={!intervalChanged}
                                 icon={<FiSave />}
+                                onClick={loggedHandleSaveInterval}
+                                size="sm"
+                                variant={intervalChanged ? "primary" : "secondary"}
                             >
                                 Save
                             </ThemedButton>
@@ -358,26 +257,26 @@ export function SettingsTab({
 
                     {/* Timeout Configuration */}
                     <div className="space-y-2">
-                        <ThemedText size="sm" weight="medium" variant="secondary">
+                        <ThemedText size="sm" variant="secondary" weight="medium">
                             Timeout (seconds)
                         </ThemedText>
                         <div className="flex items-center gap-3">
                             <ThemedInput
-                                type="number"
-                                value={localTimeout}
+                                className="flex-1"
+                                max={TIMEOUT_CONSTRAINTS.MAX}
+                                min={TIMEOUT_CONSTRAINTS.MIN}
                                 onChange={handleTimeoutChange}
                                 placeholder="Enter timeout in seconds"
-                                className="flex-1"
-                                min={TIMEOUT_CONSTRAINTS.MIN}
-                                max={TIMEOUT_CONSTRAINTS.MAX}
                                 step={TIMEOUT_CONSTRAINTS.STEP}
+                                type="number"
+                                value={localTimeout}
                             />
                             <ThemedButton
-                                variant={timeoutChanged ? "primary" : "secondary"}
-                                size="sm"
-                                onClick={() => void loggedHandleSaveTimeout()}
                                 disabled={!timeoutChanged}
                                 icon={<FiSave />}
+                                onClick={() => void loggedHandleSaveTimeout()}
+                                size="sm"
+                                variant={timeoutChanged ? "primary" : "secondary"}
                             >
                                 Save
                             </ThemedButton>
@@ -389,26 +288,26 @@ export function SettingsTab({
 
                     {/* Retry Attempts Configuration */}
                     <div className="space-y-2">
-                        <ThemedText size="sm" weight="medium" variant="secondary">
+                        <ThemedText size="sm" variant="secondary" weight="medium">
                             Retry Attempts
                         </ThemedText>
                         <div className="flex items-center gap-3">
                             <ThemedInput
-                                type="number"
-                                value={localRetryAttempts}
+                                className="flex-1"
+                                max={RETRY_CONSTRAINTS.MAX}
+                                min={RETRY_CONSTRAINTS.MIN}
                                 onChange={handleRetryAttemptsChange}
                                 placeholder="Enter retry attempts"
-                                className="flex-1"
-                                min={RETRY_CONSTRAINTS.MIN}
-                                max={RETRY_CONSTRAINTS.MAX}
                                 step={RETRY_CONSTRAINTS.STEP}
+                                type="number"
+                                value={localRetryAttempts}
                             />
                             <ThemedButton
-                                variant={retryAttemptsChanged ? "primary" : "secondary"}
-                                size="sm"
-                                onClick={() => void loggedHandleSaveRetryAttempts()}
                                 disabled={!retryAttemptsChanged}
                                 icon={<FiSave />}
+                                onClick={() => void loggedHandleSaveRetryAttempts()}
+                                size="sm"
+                                variant={retryAttemptsChanged ? "primary" : "secondary"}
                             >
                                 Save
                             </ThemedButton>
@@ -421,10 +320,10 @@ export function SettingsTab({
                     {/* Total monitoring time indicator */}
                     {localRetryAttempts > 0 && (
                         <ThemedBox
-                            variant="tertiary"
+                            className="bg-surface-elevated border border-primary/20"
                             padding="md"
                             rounded="lg"
-                            className="bg-surface-elevated border border-primary/20"
+                            variant="tertiary"
                         >
                             <ThemedText size="xs" variant="secondary">
                                 💡 <strong>Maximum check duration:</strong> ~
@@ -444,7 +343,7 @@ export function SettingsTab({
                             <ThemedText size="sm" variant="secondary">
                                 <IdentifierLabel selectedMonitor={selectedMonitor} />:
                             </ThemedText>
-                            <ThemedBadge variant="secondary" size="sm">
+                            <ThemedBadge size="sm" variant="secondary">
                                 {getDisplayIdentifier(currentSite, selectedMonitor)}
                             </ThemedBadge>
                         </div>
@@ -452,7 +351,7 @@ export function SettingsTab({
                             <ThemedText size="sm" variant="secondary">
                                 History Records:
                             </ThemedText>
-                            <ThemedBadge variant="info" size="sm">
+                            <ThemedBadge size="sm" variant="info">
                                 {selectedMonitor.history.length}
                             </ThemedBadge>
                         </div>
@@ -474,25 +373,25 @@ export function SettingsTab({
 
             {/* Danger Zone */}
             <ThemedCard
+                className="border-2 border-error/30 bg-error/5"
                 icon={<MdDangerous color={iconColors.danger} />}
                 title="Danger Zone"
-                className="border-2 border-error/30 bg-error/5"
             >
                 <div className="space-y-4">
                     <div>
-                        <ThemedText size="sm" weight="medium" variant="error" className="mb-2">
+                        <ThemedText className="mb-2" size="sm" variant="error" weight="medium">
                             Remove Site
                         </ThemedText>
-                        <ThemedText size="xs" variant="tertiary" className="mb-4">
+                        <ThemedText className="mb-4" size="xs" variant="tertiary">
                             This action cannot be undone. All history data for this site will be lost.
                         </ThemedText>
                         <ThemedButton
-                            variant="error"
-                            size="md"
-                            onClick={() => void loggedHandleRemoveSite()}
-                            loading={isLoading}
-                            icon={<FiTrash2 />}
                             className="w-full"
+                            icon={<FiTrash2 />}
+                            loading={isLoading}
+                            onClick={() => void loggedHandleRemoveSite()}
+                            size="md"
+                            variant="error"
                         >
                             Remove Site
                         </ThemedButton>
@@ -501,4 +400,105 @@ export function SettingsTab({
             </ThemedCard>
         </div>
     );
+}
+
+/**
+ * Helper function to format retry attempts text.
+ * @param attempts - Number of retry attempts
+ * @returns Formatted retry attempts description
+ */
+function formatRetryAttemptsText(attempts: number): string {
+    if (attempts === 0) {
+        return "(Retry disabled - immediate failure detection)";
+    }
+
+    const timesText = attempts === 1 ? "time" : "times";
+    return `(Retry ${attempts} ${timesText} before marking down)`;
+}
+
+/**
+ * Generate a display identifier based on the monitor type.
+ * Uses the monitor registry to format the display value appropriately.
+ */
+function getDisplayIdentifier(currentSite: Site, selectedMonitor: Monitor): string {
+    try {
+        // Fallback to hardcoded patterns for backward compatibility
+        if (selectedMonitor.type === "http" && selectedMonitor.url) {
+            return selectedMonitor.url;
+        }
+        if (selectedMonitor.type === "port" && selectedMonitor.host && selectedMonitor.port) {
+            return `${selectedMonitor.host}:${selectedMonitor.port}`;
+        }
+    } catch (error) {
+        logger.warn("Failed to generate display identifier", error as Error);
+    }
+
+    // Fallback to site identifier
+    return currentSite.identifier;
+}
+
+/**
+ * Generate a display label for the identifier field based on monitor type.
+ */
+async function getIdentifierLabel(selectedMonitor: Monitor): Promise<string> {
+    try {
+        const config = await getMonitorTypeConfig(selectedMonitor.type);
+        if (config?.fields) {
+            // Generate label based on primary field(s)
+            const primaryField = config.fields.find((field) => field.required);
+            if (primaryField) {
+                return primaryField.label;
+            }
+            // Fallback to first field
+            if (config.fields.length > 0 && config.fields[0]) {
+                return config.fields[0].label;
+            }
+        }
+    } catch (error) {
+        logger.warn("Failed to get monitor config for identifier label", error as Error);
+    }
+
+    // Fallback to hardcoded labels - these should be dynamically determined
+    // but we keep them for backward compatibility
+    if (selectedMonitor.type === "http") {
+        return "Website URL";
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- hardcoded fallback and more types soon
+    if (selectedMonitor.type === "port") {
+        return "Host & Port";
+    }
+    return "Monitor Configuration";
+}
+
+/**
+ * Component that displays the identifier label for a monitor type.
+ */
+function IdentifierLabel({ selectedMonitor }: { selectedMonitor: Monitor }) {
+    const [label, setLabel] = useState<string>("Loading...");
+
+    useEffect(() => {
+        let isCancelled = false;
+
+        const loadLabel = async () => {
+            try {
+                const identifierLabel = await getIdentifierLabel(selectedMonitor);
+                if (!isCancelled) {
+                    setLabel(identifierLabel);
+                }
+            } catch (error) {
+                logger.warn("Failed to load identifier label", error as Error);
+                if (!isCancelled) {
+                    setLabel("Identifier");
+                }
+            }
+        };
+
+        void loadLabel();
+
+        return () => {
+            isCancelled = true;
+        };
+    }, [selectedMonitor]);
+
+    return label;
 }

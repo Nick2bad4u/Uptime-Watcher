@@ -6,13 +6,13 @@
 import { useMemo } from "react";
 
 interface ThemeStyles {
-    headerStyle: React.CSSProperties;
-    contentStyle: React.CSSProperties;
-    overlayStyle: React.CSSProperties;
     collapseButtonStyle: React.CSSProperties;
+    contentStyle: React.CSSProperties;
+    headerStyle: React.CSSProperties;
+    metaStyle: React.CSSProperties;
+    overlayStyle: React.CSSProperties;
     titleStyle: React.CSSProperties;
     urlStyle: React.CSSProperties;
-    metaStyle: React.CSSProperties;
 }
 
 export function useThemeStyles(isCollapsed = false): ThemeStyles {

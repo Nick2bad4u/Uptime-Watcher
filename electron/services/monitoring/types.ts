@@ -11,56 +11,6 @@
 import type { Site } from "../../types";
 
 /**
- * Result of a monitor check operation.
- *
- * @remarks
- * Contains the outcome of a single health check attempt, including status,
- * performance metrics, and optional diagnostic information.
- *
- * @public
- */
-export interface MonitorCheckResult {
-    /**
-     * Status outcome of the check.
-     *
-     * @remarks
-     * - `"up"`: Monitor endpoint is healthy and responding normally
-     * - `"down"`: Monitor endpoint is failing, unreachable, or returned an error
-     */
-    status: "up" | "down";
-
-    /**
-     * Response time in milliseconds.
-     *
-     * @remarks
-     * For successful checks, this represents the actual response time.
-     * For failed checks, this may represent timeout value or time until failure.
-     */
-    responseTime: number;
-
-    /**
-     * Optional human-readable details about the check result.
-     *
-     * @remarks
-     * May include status codes, response headers, or other diagnostic information
-     * useful for troubleshooting or display purposes.
-     *
-     * @remarks Examples: "HTTP 200 OK", "Connection timeout", "DNS resolution failed"
-     */
-    details?: string;
-
-    /**
-     * Optional error message if the check failed.
-     *
-     * @remarks
-     * Provides technical error information for debugging failed checks.
-     * Should not be displayed directly to end users.
-     * Examples: "ECONNREFUSED", "Socket timeout", "Certificate expired"
-     */
-    error?: string;
-}
-
-/**
  * Interface for monitor services that perform health checks.
  *
  * @remarks
@@ -106,6 +56,56 @@ export interface IMonitorService {
      * Only the provided configuration properties will be updated.
      */
     updateConfig(config: Partial<MonitorConfig>): void;
+}
+
+/**
+ * Result of a monitor check operation.
+ *
+ * @remarks
+ * Contains the outcome of a single health check attempt, including status,
+ * performance metrics, and optional diagnostic information.
+ *
+ * @public
+ */
+export interface MonitorCheckResult {
+    /**
+     * Optional human-readable details about the check result.
+     *
+     * @remarks
+     * May include status codes, response headers, or other diagnostic information
+     * useful for troubleshooting or display purposes.
+     *
+     * @remarks Examples: "HTTP 200 OK", "Connection timeout", "DNS resolution failed"
+     */
+    details?: string;
+
+    /**
+     * Optional error message if the check failed.
+     *
+     * @remarks
+     * Provides technical error information for debugging failed checks.
+     * Should not be displayed directly to end users.
+     * Examples: "ECONNREFUSED", "Socket timeout", "Certificate expired"
+     */
+    error?: string;
+
+    /**
+     * Response time in milliseconds.
+     *
+     * @remarks
+     * For successful checks, this represents the actual response time.
+     * For failed checks, this may represent timeout value or time until failure.
+     */
+    responseTime: number;
+
+    /**
+     * Status outcome of the check.
+     *
+     * @remarks
+     * - `"up"`: Monitor endpoint is healthy and responding normally
+     * - `"down"`: Monitor endpoint is failing, unreachable, or returned an error
+     */
+    status: "down" | "up";
 }
 
 /**

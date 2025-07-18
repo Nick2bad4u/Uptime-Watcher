@@ -29,6 +29,50 @@ import { generateCorrelationId } from "../utils/correlation";
 import { logger } from "../utils/logger";
 
 /**
+ * Diagnostic information about an event bus instance.
+ *
+ * @remarks
+ * Provides runtime insights into event bus configuration and usage.
+ * Useful for debugging, monitoring, and performance analysis.
+ *
+ * @public
+ */
+export interface EventBusDiagnostics {
+    /** Unique identifier for this event bus instance */
+    busId: string;
+    /** Number of listeners registered for each event */
+    listenerCounts: Record<string, number>;
+    /** Maximum number of listeners allowed per event */
+    maxListeners: number;
+    /** Maximum number of middleware functions allowed */
+    maxMiddleware: number;
+    /** Number of registered middleware functions */
+    middlewareCount: number;
+    /** Percentage of middleware slots used (0-100) */
+    middlewareUtilization: number;
+}
+
+/**
+ * Metadata automatically added to all emitted events.
+ *
+ * @remarks
+ * Provides debugging and tracking information automatically added to every event.
+ * Available in all event listeners under the `_meta` property.
+ *
+ * @public
+ */
+export interface EventMetadata {
+    /** Identifier of the event bus that emitted this event */
+    busId: string;
+    /** Unique identifier for tracking this specific event emission */
+    correlationId: string;
+    /** Name of the event that was emitted */
+    eventName: string;
+    /** Unix timestamp when the event was emitted */
+    timestamp: number;
+}
+
+/**
  * Middleware function for event processing.
  *
  * @param event - Name of the event being processed
@@ -52,8 +96,8 @@ import { logger } from "../utils/logger";
 export type EventMiddleware<T = unknown> = (
     event: string,
     data: T,
-    next: () => void | Promise<void>
-) => void | Promise<void>;
+    next: () => Promise<void> | void
+) => Promise<void> | void;
 
 /**
  * Enhanced event bus with type safety and middleware support.
@@ -69,9 +113,9 @@ export type EventMiddleware<T = unknown> = (
  */
 // eslint-disable-next-line unicorn/prefer-event-target -- EventEmitter required for Node.js specific features
 export class TypedEventBus<EventMap extends Record<string, unknown>> extends EventEmitter {
-    private readonly middlewares: EventMiddleware[] = [];
     private readonly busId: string;
     private readonly maxMiddleware: number;
+    private readonly middlewares: EventMiddleware[] = [];
 
     /**
      * Create a new typed event bus.
@@ -93,50 +137,6 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
         this.setMaxListeners(50);
 
         logger.debug(`[TypedEventBus:${this.busId}] Created new event bus (max middleware: ${this.maxMiddleware})`);
-    }
-
-    /**
-     * Register middleware to process events before emission.
-     *
-     * @param middleware - Middleware function to register
-     * @throws {@link Error} When the maximum middleware limit is exceeded
-     *
-     * @remarks
-     * Middleware is executed in registration order. Each middleware must call
-     * `next()` to continue the chain or throw an error to abort processing.
-     *
-     * A maximum middleware limit prevents memory leaks from excessive registrations.
-     * If you need more middleware, consider increasing the limit in the constructor
-     * or combining multiple middleware functions into one.
-     */
-    use(middleware: EventMiddleware): void {
-        if (this.middlewares.length >= this.maxMiddleware) {
-            throw new Error(
-                `Maximum middleware limit (${this.maxMiddleware}) exceeded. ` +
-                    `Consider increasing maxMiddleware or combining middleware functions.`
-            );
-        }
-
-        this.middlewares.push(middleware);
-        logger.debug(
-            `[TypedEventBus:${this.busId}] Registered middleware (total: ${this.middlewares.length}/${this.maxMiddleware})`
-        );
-    }
-
-    /**
-     * Remove a specific middleware from the processing chain.
-     *
-     * @param middleware - The middleware function to remove
-     * @returns `true` if middleware was found and removed, `false` otherwise
-     */
-    removeMiddleware(middleware: EventMiddleware): boolean {
-        const index = this.middlewares.indexOf(middleware);
-        if (index !== -1) {
-            this.middlewares.splice(index, 1);
-            logger.debug(`[TypedEventBus:${this.busId}] Removed middleware (remaining: ${this.middlewares.length})`);
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -177,7 +177,7 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
 
             // Emit the actual event with enhanced data
             const enhancedData = {
-                ...(typeof data === "object" && data !== null ? data : { value: data }),
+                ...(typeof data === "object" && data != null ? data : { value: data }),
                 _meta: {
                     busId: this.busId,
                     correlationId,
@@ -196,46 +196,28 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
     }
 
     /**
-     * Register a typed event listener with guaranteed type safety.
+     * Get diagnostic information about the event bus.
      *
-     * @param event - The event name to listen for
-     * @param listener - Function to call when the event is emitted
-     * @returns This event bus instance for chaining
+     * @returns Diagnostic data including listener counts and middleware information
      *
      * @remarks
-     * The listener receives the original event data plus automatically added metadata.
-     * TypeScript will enforce that the listener signature matches the event data type.
+     * Provides runtime information useful for debugging and monitoring.
+     * Includes listener counts per event, middleware count, and configuration.
      */
-    onTyped<K extends keyof EventMap>(
-        event: K,
-        listener: (data: EventMap[K] & { _meta: EventMetadata }) => void
-    ): this {
-        const eventName = event as string;
-        this.on(eventName, listener);
+    getDiagnostics(): EventBusDiagnostics {
+        const listenerCounts: Record<string, number> = {};
+        for (const eventName of this.eventNames()) {
+            listenerCounts[eventName as string] = this.listenerCount(eventName);
+        }
 
-        logger.debug(`[TypedEventBus:${this.busId}] Registered listener for '${eventName}'`);
-        return this;
-    }
-
-    /**
-     * Register a one-time typed event listener.
-     *
-     * @param event - The event name to listen for
-     * @param listener - Function to call when the event is emitted (called only once)
-     * @returns This event bus instance for chaining
-     *
-     * @remarks
-     * The listener is automatically removed after the first time the event is emitted.
-     */
-    onceTyped<K extends keyof EventMap>(
-        event: K,
-        listener: (data: EventMap[K] & { _meta: EventMetadata }) => void
-    ): this {
-        const eventName = event as string;
-        this.once(eventName, listener);
-
-        logger.debug(`[TypedEventBus:${this.busId}] Registered one-time listener for '${eventName}'`);
-        return this;
+        return {
+            busId: this.busId,
+            listenerCounts,
+            maxListeners: this.getMaxListeners(),
+            maxMiddleware: this.maxMiddleware,
+            middlewareCount: this.middlewares.length,
+            middlewareUtilization: (this.middlewares.length / this.maxMiddleware) * 100,
+        };
     }
 
     /**
@@ -261,6 +243,93 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
 
         logger.debug(`[TypedEventBus:${this.busId}] Removed listener(s) for '${eventName}'`);
         return this;
+    }
+
+    /**
+     * Register a one-time typed event listener.
+     *
+     * @param event - The event name to listen for
+     * @param listener - Function to call when the event is emitted (called only once)
+     * @returns This event bus instance for chaining
+     *
+     * @remarks
+     * The listener is automatically removed after the first time the event is emitted.
+     */
+    onceTyped<K extends keyof EventMap>(
+        event: K,
+        listener: (data: EventMap[K] & { _meta: EventMetadata }) => void
+    ): this {
+        const eventName = event as string;
+        this.once(eventName, listener);
+
+        logger.debug(`[TypedEventBus:${this.busId}] Registered one-time listener for '${eventName}'`);
+        return this;
+    }
+
+    /**
+     * Register a typed event listener with guaranteed type safety.
+     *
+     * @param event - The event name to listen for
+     * @param listener - Function to call when the event is emitted
+     * @returns This event bus instance for chaining
+     *
+     * @remarks
+     * The listener receives the original event data plus automatically added metadata.
+     * TypeScript will enforce that the listener signature matches the event data type.
+     */
+    onTyped<K extends keyof EventMap>(
+        event: K,
+        listener: (data: EventMap[K] & { _meta: EventMetadata }) => void
+    ): this {
+        const eventName = event as string;
+        this.on(eventName, listener);
+
+        logger.debug(`[TypedEventBus:${this.busId}] Registered listener for '${eventName}'`);
+        return this;
+    }
+
+    /**
+     * Remove a specific middleware from the processing chain.
+     *
+     * @param middleware - The middleware function to remove
+     * @returns `true` if middleware was found and removed, `false` otherwise
+     */
+    removeMiddleware(middleware: EventMiddleware): boolean {
+        const index = this.middlewares.indexOf(middleware);
+        if (index !== -1) {
+            this.middlewares.splice(index, 1);
+            logger.debug(`[TypedEventBus:${this.busId}] Removed middleware (remaining: ${this.middlewares.length})`);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Register middleware to process events before emission.
+     *
+     * @param middleware - Middleware function to register
+     * @throws {@link Error} When the maximum middleware limit is exceeded
+     *
+     * @remarks
+     * Middleware is executed in registration order. Each middleware must call
+     * `next()` to continue the chain or throw an error to abort processing.
+     *
+     * A maximum middleware limit prevents memory leaks from excessive registrations.
+     * If you need more middleware, consider increasing the limit in the constructor
+     * or combining multiple middleware functions into one.
+     */
+    use(middleware: EventMiddleware): void {
+        if (this.middlewares.length >= this.maxMiddleware) {
+            throw new Error(
+                `Maximum middleware limit (${this.maxMiddleware}) exceeded. ` +
+                    `Consider increasing maxMiddleware or combining middleware functions.`
+            );
+        }
+
+        this.middlewares.push(middleware);
+        logger.debug(
+            `[TypedEventBus:${this.busId}] Registered middleware (total: ${this.middlewares.length}/${this.maxMiddleware})`
+        );
     }
 
     /**
@@ -302,75 +371,6 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
 
         await processNext(0);
     }
-
-    /**
-     * Get diagnostic information about the event bus.
-     *
-     * @returns Diagnostic data including listener counts and middleware information
-     *
-     * @remarks
-     * Provides runtime information useful for debugging and monitoring.
-     * Includes listener counts per event, middleware count, and configuration.
-     */
-    getDiagnostics(): EventBusDiagnostics {
-        const listenerCounts: Record<string, number> = {};
-        for (const eventName of this.eventNames()) {
-            listenerCounts[eventName as string] = this.listenerCount(eventName);
-        }
-
-        return {
-            busId: this.busId,
-            listenerCounts,
-            maxListeners: this.getMaxListeners(),
-            middlewareCount: this.middlewares.length,
-            maxMiddleware: this.maxMiddleware,
-            middlewareUtilization: (this.middlewares.length / this.maxMiddleware) * 100,
-        };
-    }
-}
-
-/**
- * Metadata automatically added to all emitted events.
- *
- * @remarks
- * Provides debugging and tracking information automatically added to every event.
- * Available in all event listeners under the `_meta` property.
- *
- * @public
- */
-export interface EventMetadata {
-    /** Unique identifier for tracking this specific event emission */
-    correlationId: string;
-    /** Identifier of the event bus that emitted this event */
-    busId: string;
-    /** Unix timestamp when the event was emitted */
-    timestamp: number;
-    /** Name of the event that was emitted */
-    eventName: string;
-}
-
-/**
- * Diagnostic information about an event bus instance.
- *
- * @remarks
- * Provides runtime insights into event bus configuration and usage.
- * Useful for debugging, monitoring, and performance analysis.
- *
- * @public
- */
-export interface EventBusDiagnostics {
-    /** Unique identifier for this event bus instance */
-    busId: string;
-    /** Number of registered middleware functions */
-    middlewareCount: number;
-    /** Maximum number of middleware functions allowed */
-    maxMiddleware: number;
-    /** Percentage of middleware slots used (0-100) */
-    middlewareUtilization: number;
-    /** Number of listeners registered for each event */
-    listenerCounts: Record<string, number>;
-    /** Maximum number of listeners allowed per event */
-    maxListeners: number;
 }
 
 /**

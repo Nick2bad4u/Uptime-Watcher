@@ -60,6 +60,15 @@ export class WindowService {
     private mainWindow: BrowserWindow | null = null;
 
     /**
+     * Close the main window.
+     */
+    public closeMainWindow(): void {
+        if (this.hasMainWindow()) {
+            this.mainWindow?.close();
+        }
+    }
+
+    /**
      * Create and configure the main application window.
      *
      * @returns The created BrowserWindow instance
@@ -94,6 +103,39 @@ export class WindowService {
         this.setupWindowEvents();
 
         return this.mainWindow;
+    }
+
+    /**
+     * Get all browser windows.
+     */
+    public getAllWindows(): BrowserWindow[] {
+        return BrowserWindow.getAllWindows();
+    }
+
+    /**
+     * Get the main window instance.
+     */
+    public getMainWindow(): BrowserWindow | null {
+        return this.mainWindow;
+    }
+
+    /**
+     * Check if the main window exists and is not destroyed.
+     */
+    public hasMainWindow(): boolean {
+        return this.mainWindow !== null && !this.mainWindow.isDestroyed();
+    }
+
+    /**
+     * Send a message to the main window's renderer process.
+     */
+    public sendToRenderer(channel: string, data?: unknown): void {
+        if (this.hasMainWindow()) {
+            logger.debug(`[WindowService] Sending to renderer: ${channel}`);
+            this.mainWindow?.webContents.send(channel, data);
+        } else {
+            logger.warn(`[WindowService] Cannot send to renderer (no main window): ${channel}`);
+        }
     }
 
     /**
@@ -142,28 +184,6 @@ export class WindowService {
     }
 
     /**
-     * Wait for Vite dev server to be ready.
-     */
-    private async waitForViteServer(maxRetries = 30, retryDelay = 1000): Promise<void> {
-        for (let i = 0; i < maxRetries; i++) {
-            try {
-                const response = await fetch("http://localhost:5173");
-                if (response.ok) {
-                    logger.debug("[WindowService] Vite dev server is ready");
-                    return;
-                }
-            } catch {
-                // Server not ready yet
-            }
-
-            logger.debug(`[WindowService] Waiting for Vite dev server... (attempt ${i + 1}/${maxRetries})`);
-            await new Promise((resolve) => setTimeout(resolve, retryDelay));
-        }
-
-        throw new Error("Vite dev server did not become available within timeout");
-    }
-
-    /**
      * Setup window event handlers.
      */
     private setupWindowEvents(): void {
@@ -193,44 +213,24 @@ export class WindowService {
     }
 
     /**
-     * Get the main window instance.
+     * Wait for Vite dev server to be ready.
      */
-    public getMainWindow(): BrowserWindow | null {
-        return this.mainWindow;
-    }
+    private async waitForViteServer(maxRetries = 30, retryDelay = 1000): Promise<void> {
+        for (let i = 0; i < maxRetries; i++) {
+            try {
+                const response = await fetch("http://localhost:5173");
+                if (response.ok) {
+                    logger.debug("[WindowService] Vite dev server is ready");
+                    return;
+                }
+            } catch {
+                // Server not ready yet
+            }
 
-    /**
-     * Check if the main window exists and is not destroyed.
-     */
-    public hasMainWindow(): boolean {
-        return this.mainWindow !== null && !this.mainWindow.isDestroyed();
-    }
-
-    /**
-     * Send a message to the main window's renderer process.
-     */
-    public sendToRenderer(channel: string, data?: unknown): void {
-        if (this.hasMainWindow()) {
-            logger.debug(`[WindowService] Sending to renderer: ${channel}`);
-            this.mainWindow?.webContents.send(channel, data);
-        } else {
-            logger.warn(`[WindowService] Cannot send to renderer (no main window): ${channel}`);
+            logger.debug(`[WindowService] Waiting for Vite dev server... (attempt ${i + 1}/${maxRetries})`);
+            await new Promise((resolve) => setTimeout(resolve, retryDelay));
         }
-    }
 
-    /**
-     * Close the main window.
-     */
-    public closeMainWindow(): void {
-        if (this.hasMainWindow()) {
-            this.mainWindow?.close();
-        }
-    }
-
-    /**
-     * Get all browser windows.
-     */
-    public getAllWindows(): BrowserWindow[] {
-        return BrowserWindow.getAllWindows();
+        throw new Error("Vite dev server did not become available within timeout");
     }
 }

@@ -12,50 +12,87 @@ import type { Theme } from "../../theme/types";
 
 import { CHART_TIME_PERIODS } from "../../constants";
 import { Monitor, StatusHistory } from "../../types";
-import { type TimePeriod, TIME_PERIOD_LABELS } from "../../utils/time";
+import { TIME_PERIOD_LABELS, type TimePeriod } from "../../utils/time";
 
 /** Represents a period of downtime with start, end, and duration */
 export interface DowntimePeriod {
-    /** Timestamp when downtime started */
-    start: number;
-    /** Timestamp when downtime ended */
-    end: number;
     /** Duration of downtime in milliseconds */
     duration: number;
+    /** Timestamp when downtime ended */
+    end: number;
+    /** Timestamp when downtime started */
+    start: number;
 }
 
 /** Comprehensive analytics data for a site monitor */
 export interface SiteAnalytics {
-    /** Total number of checks performed */
-    totalChecks: number;
-    /** Number of successful checks */
-    upCount: number;
-    /** Number of failed checks */
-    downCount: number;
-    /** Uptime percentage as formatted string */
-    uptime: string;
     /** Average response time in milliseconds */
     avgResponseTime: number;
+    /** Number of failed checks */
+    downCount: number;
+    /** Array of downtime periods */
+    downtimePeriods: DowntimePeriod[];
     /** Fastest response time recorded */
     fastestResponse: number;
-    /** Slowest response time recorded */
-    slowestResponse: number;
+    /** Status history filtered by time range */
+    filteredHistory: StatusHistory[];
+    /** Number of separate downtime incidents */
+    incidentCount: number;
+    /** Mean Time To Recovery in milliseconds */
+    mttr: number;
     /** 50th percentile response time */
     p50: number;
     /** 95th percentile response time */
     p95: number;
     /** 99th percentile response time */
     p99: number;
-    /** Array of downtime periods */
-    downtimePeriods: DowntimePeriod[];
+    /** Slowest response time recorded */
+    slowestResponse: number;
+    /** Total number of checks performed */
+    totalChecks: number;
     /** Total downtime in milliseconds */
     totalDowntime: number;
-    /** Mean Time To Recovery in milliseconds */
-    mttr: number;
-    /** Number of separate downtime incidents */
-    incidentCount: number;
-    /** Status history filtered by time range */
-    filteredHistory: StatusHistory[];
+    /** Number of successful checks */
+    upCount: number;
+    /** Uptime percentage as formatted string */
+    uptime: string;
+}
+
+/**
+ * Hook for generating chart data
+ * Separates data preparation from component logic
+ */
+export function useChartData(monitor: Monitor, theme: Theme) {
+    return useMemo(() => {
+        const sortedHistory = [...monitor.history].sort((a, b) => a.timestamp - b.timestamp);
+
+        const lineChartData = {
+            datasets: [
+                {
+                    backgroundColor: `${theme.colors.primary[500]}20`,
+                    borderColor: theme.colors.primary[500],
+                    borderWidth: 2,
+                    data: sortedHistory.map((record) => ({
+                        x: record.timestamp,
+                        y: record.responseTime,
+                    })),
+                    fill: true,
+                    label: "Response Time",
+                    pointBackgroundColor: sortedHistory.map((record) =>
+                        record.status === "up" ? theme.colors.success : theme.colors.error
+                    ),
+                    pointBorderColor: sortedHistory.map((record) =>
+                        record.status === "up" ? theme.colors.success : theme.colors.error
+                    ),
+                    pointHoverRadius: 6,
+                    pointRadius: 4,
+                    tension: 0.1,
+                },
+            ],
+        };
+
+        return { lineChartData };
+    }, [monitor.history, theme]);
 }
 
 /**
@@ -184,43 +221,6 @@ export function useSiteAnalytics(monitor: Monitor | undefined, timeRange: TimePe
 }
 
 /**
- * Hook for generating chart data
- * Separates data preparation from component logic
- */
-export function useChartData(monitor: Monitor, theme: Theme) {
-    return useMemo(() => {
-        const sortedHistory = [...monitor.history].sort((a, b) => a.timestamp - b.timestamp);
-
-        const lineChartData = {
-            datasets: [
-                {
-                    backgroundColor: `${theme.colors.primary[500]}20`,
-                    borderColor: theme.colors.primary[500],
-                    borderWidth: 2,
-                    data: sortedHistory.map((record) => ({
-                        x: record.timestamp,
-                        y: record.responseTime,
-                    })),
-                    fill: true,
-                    label: "Response Time",
-                    pointBackgroundColor: sortedHistory.map((record) =>
-                        record.status === "up" ? theme.colors.success : theme.colors.error
-                    ),
-                    pointBorderColor: sortedHistory.map((record) =>
-                        record.status === "up" ? theme.colors.success : theme.colors.error
-                    ),
-                    pointHoverRadius: 6,
-                    pointRadius: 4,
-                    tension: 0.1,
-                },
-            ],
-        };
-
-        return { lineChartData };
-    }, [monitor.history, theme]);
-}
-
-/**
  * Utility functions for common calculations
  */
 export const SiteAnalyticsUtils = {
@@ -231,10 +231,10 @@ export const SiteAnalyticsUtils = {
         uptime: number,
         targetSLA = 99.9
     ): {
+        actualDowntime: number;
+        allowedDowntime: number;
         compliant: boolean;
         deficit: number;
-        allowedDowntime: number;
-        actualDowntime: number;
     } {
         const compliant = uptime >= targetSLA;
         const deficit = Math.max(0, targetSLA - uptime);
@@ -251,7 +251,7 @@ export const SiteAnalyticsUtils = {
     /**
      * Get availability status based on uptime percentage
      */
-    getAvailabilityStatus(uptime: number): "excellent" | "good" | "warning" | "critical" {
+    getAvailabilityStatus(uptime: number): "critical" | "excellent" | "good" | "warning" {
         if (uptime >= 99.9) {
             return "excellent";
         }
@@ -266,7 +266,7 @@ export const SiteAnalyticsUtils = {
     /**
      * Get performance status based on response time
      */
-    getPerformanceStatus(responseTime: number): "excellent" | "good" | "warning" | "critical" {
+    getPerformanceStatus(responseTime: number): "critical" | "excellent" | "good" | "warning" {
         if (responseTime <= 200) {
             return "excellent";
         }

@@ -9,6 +9,11 @@
  */
 
 /**
+ * Chart time range options for data visualization.
+ */
+export type ChartTimeRange = "1h" | "7d" | "24h" | "30d";
+
+/**
  * Application update status enumeration.
  *
  * @remarks
@@ -17,12 +22,7 @@
  * Used by the updates store to track update progress and display
  * appropriate UI states to the user.
  */
-export type UpdateStatus = "idle" | "checking" | "available" | "downloading" | "downloaded" | "error";
-
-/**
- * Chart time range options for data visualization.
- */
-export type ChartTimeRange = "1h" | "24h" | "7d" | "30d";
+export type UpdateStatus = "available" | "checking" | "downloaded" | "downloading" | "error" | "idle";
 
 /**
  * Standardized error messages used across the application.
@@ -38,8 +38,15 @@ export const ERROR_MESSAGES = {
     SITE_NOT_FOUND: "Site not found",
 } as const;
 
-// Re-export from shared types to maintain compatibility
-export type { AppSettings } from "./shared/types";
+/**
+ * Re-exported types from the main types file for convenience.
+ *
+ * @remarks
+ * These re-exports provide convenient access to core application types without
+ * needing to import from multiple files. This helps maintain a clean import
+ * structure and reduces the number of import statements needed in store files.
+ */
+export { type Monitor, type MonitorType, type Site, type StatusUpdate } from "../types";
 
 /**
  * Base store interface providing common error handling and loading state functionality.
@@ -49,16 +56,16 @@ export type { AppSettings } from "./shared/types";
  * All store interfaces should extend this for consistent error handling.
  */
 export interface BaseStore {
-    /** The last error message, if any */
-    lastError: string | undefined;
+    /** Clear the current error message */
+    clearError: () => void;
     /** Whether an async operation is currently in progress */
     isLoading: boolean;
+    /** The last error message, if any */
+    lastError: string | undefined;
     /** Set an error message in the store */
     setError: (error: string | undefined) => void;
     /** Set the loading state */
     setLoading: (loading: boolean) => void;
-    /** Clear the current error message */
-    clearError: () => void;
 }
 
 /**
@@ -111,12 +118,5 @@ export type StoreState<T> = {
     [K in keyof T]: T[K] extends (...arguments_: unknown[]) => unknown ? never : T[K];
 };
 
-/**
- * Re-exported types from the main types file for convenience.
- *
- * @remarks
- * These re-exports provide convenient access to core application types without
- * needing to import from multiple files. This helps maintain a clean import
- * structure and reduces the number of import statements needed in store files.
- */
-export { type Site, type Monitor, type StatusUpdate, type MonitorType } from "../types";
+// Re-export from shared types to maintain compatibility
+export type { AppSettings } from "./shared/types";

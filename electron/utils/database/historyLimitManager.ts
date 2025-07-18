@@ -1,43 +1,54 @@
+import type { DatabaseService } from "../../services/database/DatabaseService";
 /**
  * Utility for managing history limits in the database.
  */
 import type { HistoryRepository } from "../../services/database/HistoryRepository";
 import type { SettingsRepository } from "../../services/database/SettingsRepository";
-import type { DatabaseService } from "../../services/database/DatabaseService";
-import { withDatabaseOperation } from "../operationalHooks";
 import type { Logger } from "../interfaces";
+
+import { withDatabaseOperation } from "../operationalHooks";
 
 /**
  * Parameters for setting history limit
  */
 interface SetHistoryLimitParams {
     /**
-     * The limit to set
-     */
-    limit: number;
-
-    /**
-     * Repository instances
-     */
-    repositories: {
-        settings: SettingsRepository;
-        history: HistoryRepository;
-    };
-
-    /**
      * Database service for transactions
      */
     databaseService: DatabaseService;
 
     /**
-     * Callback to update the internal history limit
+     * The limit to set
      */
-    setHistoryLimit: (limit: number) => void;
+    limit: number;
 
     /**
      * Logger instance
      */
     logger?: Logger;
+
+    /**
+     * Repository instances
+     */
+    repositories: {
+        history: HistoryRepository;
+        settings: SettingsRepository;
+    };
+
+    /**
+     * Callback to update the internal history limit
+     */
+    setHistoryLimit: (limit: number) => void;
+}
+
+/**
+ * Get the current history limit.
+ *
+ * @param getHistoryLimit - Function to retrieve the current history limit
+ * @returns The current history limit
+ */
+export function getHistoryLimit(getHistoryLimit: () => number): number {
+    return getHistoryLimit();
 }
 
 /**
@@ -80,14 +91,4 @@ export async function setHistoryLimit(params: SetHistoryLimitParams): Promise<vo
             logger.debug(`Pruned history to ${finalLimit} entries per monitor`);
         }
     }
-}
-
-/**
- * Get the current history limit.
- *
- * @param getHistoryLimit - Function to retrieve the current history limit
- * @returns The current history limit
- */
-export function getHistoryLimit(getHistoryLimit: () => number): number {
-    return getHistoryLimit();
 }

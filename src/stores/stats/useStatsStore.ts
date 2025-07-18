@@ -27,7 +27,10 @@ export const useStatsStore = create<StatsStore>()(
                 }
 
                 // Calculate stats from site data
-                const stats = { totalDowntime: 0, totalUptime: 0 };
+                const stats = {
+                    totalDowntime: 0,
+                    totalUptime: 0,
+                };
                 for (const site of sites) {
                     for (const monitor of site.monitors) {
                         for (const entry of monitor.history) {

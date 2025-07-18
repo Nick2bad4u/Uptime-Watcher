@@ -19,6 +19,14 @@ export class SiteValidator {
     }
 
     /**
+     * Business rule: Determine if a site should be included in exports.
+     */
+    public shouldIncludeInExport(site: Site): boolean {
+        // Business rule: Include all sites with valid identifiers
+        return Boolean(site.identifier && site.identifier.trim().length > 0);
+    }
+
+    /**
      * Validate complete site configuration.
      */
     public validateSiteConfiguration(site: Site): ValidationResult {
@@ -73,13 +81,5 @@ export class SiteValidator {
         }
 
         return errors;
-    }
-
-    /**
-     * Business rule: Determine if a site should be included in exports.
-     */
-    public shouldIncludeInExport(site: Site): boolean {
-        // Business rule: Include all sites with valid identifiers
-        return Boolean(site.identifier && site.identifier.trim().length > 0);
     }
 }

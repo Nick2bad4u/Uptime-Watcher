@@ -7,102 +7,104 @@
  * in multiple files.
  */
 
-import { z } from "zod";
 import validator from "validator";
-import type { MonitorType } from "./monitorTypes";
-import { HttpMonitor } from "./HttpMonitor";
-import { PortMonitor } from "./PortMonitor";
-import { migrationRegistry, versionManager, createMigrationOrchestrator, exampleMigrations } from "./MigrationSystem";
-import { logger } from "../../utils/logger";
+import { z } from "zod";
+
 import type { MonitorFieldDefinition } from "../../../shared/types";
+import type { MonitorType } from "./monitorTypes";
+
+import { logger } from "../../utils/logger";
+import { HttpMonitor } from "./HttpMonitor";
+import { createMigrationOrchestrator, exampleMigrations, migrationRegistry, versionManager } from "./MigrationSystem";
+import { PortMonitor } from "./PortMonitor";
+
+// Base monitor type definition
+export interface BaseMonitorConfig {
+    /** Description of what this monitor checks */
+    readonly description: string;
+    /** Human-readable display name */
+    readonly displayName: string;
+    /** Field definitions for dynamic form generation */
+    readonly fields: MonitorFieldDefinition[];
+    /** Factory function to create monitor service instances */
+    readonly serviceFactory: () => import("./types").IMonitorService;
+    /** Unique identifier for the monitor type */
+    readonly type: string;
+    /** UI display configuration */
+    readonly uiConfig?: {
+        /** Detail label formatter for different contexts */
+        detailFormats?: {
+            /** Format for analytics display */
+            analyticsLabel?: string;
+            /** Format for history detail column */
+            historyDetail?: (details: string) => string;
+        };
+        /** Display preferences */
+        display?: {
+            showAdvancedMetrics?: boolean;
+            showUrl?: boolean;
+        };
+        /** Function to format detail display in history (e.g., "Port: 80", "Response Code: 200") */
+        formatDetail?: (details: string) => string;
+        /** Function to format title suffix for history charts (e.g., " (https://example.com)") */
+        formatTitleSuffix?: (monitor: Record<string, unknown>) => string;
+        /** Help text for form fields */
+        helpTexts?: {
+            primary?: string;
+            secondary?: string;
+        };
+        /** Whether this monitor type supports advanced analytics */
+        supportsAdvancedAnalytics?: boolean;
+        /** Whether this monitor type supports response time analytics */
+        supportsResponseTime?: boolean;
+    };
+    /** Zod validation schema for this monitor type */
+    readonly validationSchema: z.ZodType;
+    /** Version of the monitor implementation */
+    readonly version: string;
+}
 
 // UI configuration for monitor type display
 export interface MonitorUIConfig {
-    /** Detail label formatter function name */
-    detailLabelFormatter?: string;
     /** Chart data formatters */
     chartFormatters?: {
+        advanced?: boolean;
         responseTime?: boolean;
         uptime?: boolean;
-        advanced?: boolean;
+    };
+    /** Detail label formatter function name */
+    detailLabelFormatter?: string;
+    /** Display preferences */
+    display?: {
+        showAdvancedMetrics?: boolean;
+        showPort?: boolean;
+        showUrl?: boolean;
     };
     /** Help text for form fields */
     helpTexts?: {
         primary?: string;
         secondary?: string;
     };
-    /** Display preferences */
-    display?: {
-        showUrl?: boolean;
-        showPort?: boolean;
-        showAdvancedMetrics?: boolean;
-    };
-}
-
-// Base monitor type definition
-export interface BaseMonitorConfig {
-    /** Unique identifier for the monitor type */
-    readonly type: string;
-    /** Human-readable display name */
-    readonly displayName: string;
-    /** Description of what this monitor checks */
-    readonly description: string;
-    /** Version of the monitor implementation */
-    readonly version: string;
-    /** Field definitions for dynamic form generation */
-    readonly fields: MonitorFieldDefinition[];
-    /** Zod validation schema for this monitor type */
-    readonly validationSchema: z.ZodType;
-    /** Factory function to create monitor service instances */
-    readonly serviceFactory: () => import("./types").IMonitorService;
-    /** UI display configuration */
-    readonly uiConfig?: {
-        /** Function to format detail display in history (e.g., "Port: 80", "Response Code: 200") */
-        formatDetail?: (details: string) => string;
-        /** Function to format title suffix for history charts (e.g., " (https://example.com)") */
-        formatTitleSuffix?: (monitor: Record<string, unknown>) => string;
-        /** Whether this monitor type supports response time analytics */
-        supportsResponseTime?: boolean;
-        /** Whether this monitor type supports advanced analytics */
-        supportsAdvancedAnalytics?: boolean;
-        /** Help text for form fields */
-        helpTexts?: {
-            primary?: string;
-            secondary?: string;
-        };
-        /** Display preferences */
-        display?: {
-            showUrl?: boolean;
-            showAdvancedMetrics?: boolean;
-        };
-        /** Detail label formatter for different contexts */
-        detailFormats?: {
-            /** Format for history detail column */
-            historyDetail?: (details: string) => string;
-            /** Format for analytics display */
-            analyticsLabel?: string;
-        };
-    };
 }
 
 // Shared validation schemas using Zod with enhanced validation
 export const monitorSchemas = {
     http: z.object({
+        type: z.literal("http"),
         url: z.string().refine((val) => {
             // Use validator.js for robust URL validation
             return validator.isURL(val, {
-                protocols: ["http", "https"],
-                require_protocol: true,
-                require_host: true,
-                require_tld: true,
-                allow_underscores: false,
-                allow_trailing_dot: false,
                 allow_protocol_relative_urls: false,
+                allow_trailing_dot: false,
+                allow_underscores: false,
                 disallow_auth: false,
+                protocols: ["http", "https"],
+                require_host: true,
+                require_protocol: true,
+                require_tld: true,
                 validate_length: true,
             });
         }, "Must be a valid URL"),
-        type: z.literal("http"),
     }),
     port: z.object({
         host: z.string().refine((val) => {
@@ -112,11 +114,11 @@ export const monitorSchemas = {
             }
             if (
                 validator.isFQDN(val, {
-                    require_tld: true,
-                    allow_underscores: false,
-                    allow_trailing_dot: false,
                     allow_numeric_tld: false,
+                    allow_trailing_dot: false,
+                    allow_underscores: false,
                     allow_wildcard: false,
+                    require_tld: true,
                 })
             ) {
                 return true;
@@ -134,82 +136,12 @@ export const monitorSchemas = {
 const monitorTypes = new Map<string, BaseMonitorConfig>();
 
 /**
- * Register a new monitor type.
- *
- * @param config - Monitor type configuration
- */
-export function registerMonitorType(config: BaseMonitorConfig): void {
-    monitorTypes.set(config.type, config);
-}
-
-/**
- * Get all registered monitor types.
- *
- * @returns Array of registered monitor types
- */
-export function getRegisteredMonitorTypes(): string[] {
-    return [...monitorTypes.keys()];
-}
-
-/**
  * Get all registered monitor types with their configurations.
  *
  * @returns Array of monitor type configurations
  */
 export function getAllMonitorTypeConfigs(): BaseMonitorConfig[] {
     return [...monitorTypes.values()];
-}
-
-/**
- * Check if a monitor type is registered.
- *
- * @param type - Monitor type to check
- * @returns True if type is registered
- */
-export function isValidMonitorType(type: string): boolean {
-    return monitorTypes.has(type);
-}
-
-/**
- * Simple monitor type validation for internal use (breaks circular dependency with EnhancedTypeGuards).
- *
- * @param type - Monitor type to validate
- * @returns Validation result compatible with EnhancedTypeGuard interface
- */
-function validateMonitorTypeInternal(type: unknown): {
-    success: boolean;
-    value?: MonitorType;
-    error?: string;
-} {
-    if (typeof type !== "string") {
-        return {
-            success: false,
-            error: "Monitor type must be a string",
-        };
-    }
-
-    if (!isValidMonitorType(type)) {
-        const validTypes = getRegisteredMonitorTypes();
-        return {
-            success: false,
-            error: `Invalid monitor type: ${type}. Valid types: ${validTypes.join(", ")}`,
-        };
-    }
-
-    return {
-        success: true,
-        value: type as MonitorType,
-    };
-}
-
-/**
- * Get configuration for a monitor type.
- *
- * @param type - Monitor type
- * @returns Monitor configuration or undefined
- */
-export function getMonitorTypeConfig(type: string): BaseMonitorConfig | undefined {
-    return monitorTypes.get(type);
 }
 
 /**
@@ -224,6 +156,44 @@ export function getMonitorServiceFactory(type: string): (() => import("./types")
 }
 
 /**
+ * Get configuration for a monitor type.
+ *
+ * @param type - Monitor type
+ * @returns Monitor configuration or undefined
+ */
+export function getMonitorTypeConfig(type: string): BaseMonitorConfig | undefined {
+    return monitorTypes.get(type);
+}
+
+/**
+ * Get all registered monitor types.
+ *
+ * @returns Array of registered monitor types
+ */
+export function getRegisteredMonitorTypes(): string[] {
+    return [...monitorTypes.keys()];
+}
+
+/**
+ * Check if a monitor type is registered.
+ *
+ * @param type - Monitor type to check
+ * @returns True if type is registered
+ */
+export function isValidMonitorType(type: string): boolean {
+    return monitorTypes.has(type);
+}
+
+/**
+ * Register a new monitor type.
+ *
+ * @param config - Monitor type configuration
+ */
+export function registerMonitorType(config: BaseMonitorConfig): void {
+    monitorTypes.set(config.type, config);
+}
+
+/**
  * Validate monitor data using Zod schemas.
  *
  * @param type - Monitor type
@@ -234,33 +204,33 @@ export function validateMonitorData(
     type: string,
     data: unknown
 ): {
-    success: boolean;
-    errors: string[];
-    warnings: string[];
-    metadata: Record<string, unknown>;
     data?: unknown;
+    errors: string[];
+    metadata: Record<string, unknown>;
+    success: boolean;
+    warnings: string[];
 } {
     const config = getMonitorTypeConfig(type);
     if (!config) {
         return {
-            success: false,
             errors: [`Unknown monitor type: ${type}`],
-            warnings: [],
             metadata: { monitorType: type },
+            success: false,
+            warnings: [],
         };
     }
 
     try {
         const validData = config.validationSchema.parse(data);
         return {
-            success: true,
+            data: validData,
             errors: [],
-            warnings: [],
             metadata: {
                 monitorType: type,
                 validatedDataSize: JSON.stringify(validData).length,
             },
-            data: validData,
+            success: true,
+            warnings: [],
         };
     } catch (error) {
         if (error instanceof z.ZodError) {
@@ -278,114 +248,146 @@ export function validateMonitorData(
             }
 
             return {
-                success: errors.length === 0,
                 errors,
-                warnings,
                 metadata: {
-                    monitorType: type,
                     issueCount: error.issues.length,
+                    monitorType: type,
                 },
+                success: errors.length === 0,
+                warnings,
             };
         }
         return {
-            success: false,
             errors: ["Validation failed with unknown error"],
-            warnings: [],
             metadata: { errorType: "unknown" },
+            success: false,
+            warnings: [],
         };
     }
 }
 
+/**
+ * Simple monitor type validation for internal use (breaks circular dependency with EnhancedTypeGuards).
+ *
+ * @param type - Monitor type to validate
+ * @returns Validation result compatible with EnhancedTypeGuard interface
+ */
+function validateMonitorTypeInternal(type: unknown): {
+    error?: string;
+    success: boolean;
+    value?: MonitorType;
+} {
+    if (typeof type !== "string") {
+        return {
+            error: "Monitor type must be a string",
+            success: false,
+        };
+    }
+
+    if (!isValidMonitorType(type)) {
+        const validTypes = getRegisteredMonitorTypes();
+        return {
+            error: `Invalid monitor type: ${type}. Valid types: ${validTypes.join(", ")}`,
+            success: false,
+        };
+    }
+
+    return {
+        success: true,
+        value: type as MonitorType,
+    };
+}
+
 // Register existing monitor types with their field definitions and schemas
 registerMonitorType({
-    type: "http",
-    displayName: "HTTP (Website/API)",
     description: "Monitors HTTP/HTTPS endpoints for availability and response time",
-    version: "1.0.0",
-    validationSchema: monitorSchemas.http,
-    serviceFactory: () => new HttpMonitor(),
+    displayName: "HTTP (Website/API)",
     fields: [
         {
-            name: "url",
-            label: "Website URL",
-            type: "url",
-            required: true,
-            placeholder: "https://example.com",
             helpText: "Enter the full URL including http:// or https://",
+            label: "Website URL",
+            name: "url",
+            placeholder: "https://example.com",
+            required: true,
+            type: "url",
         },
     ],
+    serviceFactory: () => new HttpMonitor(),
+    type: "http",
     uiConfig: {
+        detailFormats: {
+            analyticsLabel: "HTTP Response Time",
+            historyDetail: (details: string) => `Response Code: ${details}`,
+        },
+        display: {
+            showAdvancedMetrics: true,
+            showUrl: true,
+        },
         formatDetail: (details: string) => `Response Code: ${details}`,
         formatTitleSuffix: (monitor: Record<string, unknown>) => {
             const url = monitor.url as string;
             return url ? ` (${url})` : "";
         },
-        supportsResponseTime: true,
-        supportsAdvancedAnalytics: true,
         helpTexts: {
             primary: "Enter the full URL including http:// or https://",
             secondary: "The monitor will check this URL according to your monitoring interval",
         },
-        display: {
-            showUrl: true,
-            showAdvancedMetrics: true,
-        },
-        detailFormats: {
-            historyDetail: (details: string) => `Response Code: ${details}`,
-            analyticsLabel: "HTTP Response Time",
-        },
+        supportsAdvancedAnalytics: true,
+        supportsResponseTime: true,
     },
+    validationSchema: monitorSchemas.http,
+    version: "1.0.0",
 });
 
 registerMonitorType({
-    type: "port",
-    displayName: "Port (Host/Port)",
     description: "Monitors TCP port connectivity",
-    version: "1.0.0",
-    validationSchema: monitorSchemas.port,
-    serviceFactory: () => new PortMonitor(),
+    displayName: "Port (Host/Port)",
     fields: [
         {
-            name: "host",
-            label: "Host",
-            type: "text",
-            required: true,
-            placeholder: "example.com or 192.168.1.1",
             helpText: "Enter a valid host (domain or IP)",
+            label: "Host",
+            name: "host",
+            placeholder: "example.com or 192.168.1.1",
+            required: true,
+            type: "text",
         },
         {
-            name: "port",
-            label: "Port",
-            type: "number",
-            required: true,
-            placeholder: "80",
             helpText: "Enter a port number (1-65535)",
-            min: 1,
+            label: "Port",
             max: 65_535,
+            min: 1,
+            name: "port",
+            placeholder: "80",
+            required: true,
+            type: "number",
         },
     ],
+    serviceFactory: () => new PortMonitor(),
+    type: "port",
     uiConfig: {
+        detailFormats: {
+            analyticsLabel: "Port Response Time",
+            historyDetail: (details: string) => `Port: ${details}`,
+        },
+        display: {
+            showAdvancedMetrics: true,
+            showUrl: false,
+        },
         formatDetail: (details: string) => `Port: ${details}`,
         formatTitleSuffix: (monitor: Record<string, unknown>) => {
             const host = monitor.host as string;
             const port = monitor.port as number;
             return host && port ? ` (${host}:${port})` : "";
         },
-        supportsResponseTime: true,
-        supportsAdvancedAnalytics: true,
         helpTexts: {
             primary: "Enter a valid host (domain or IP)",
             secondary: "Enter a port number (1-65535)",
         },
-        display: {
-            showUrl: false,
-            showAdvancedMetrics: true,
-        },
-        detailFormats: {
-            historyDetail: (details: string) => `Port: ${details}`,
-            analyticsLabel: "Port Response Time",
-        },
+        supportsAdvancedAnalytics: true,
+        supportsResponseTime: true,
     },
+    validationSchema: monitorSchemas.port,
+    version: "1.0.0",
 });
 
 // Register example migrations for the migration system
@@ -401,16 +403,16 @@ export function createMonitorWithTypeGuards(
     type: string,
     data: Record<string, unknown>
 ): {
-    success: boolean;
-    monitor?: Record<string, unknown>;
     errors: string[];
+    monitor?: Record<string, unknown>;
+    success: boolean;
 } {
     // Use internal type validation to avoid circular dependency
     const validationResult = validateMonitorTypeInternal(type);
     if (!validationResult.success) {
         return {
-            success: false,
             errors: [validationResult.error ?? "Invalid monitor type"],
+            success: false,
         };
     }
 
@@ -418,21 +420,26 @@ export function createMonitorWithTypeGuards(
 
     // Create monitor object with proper validation
     const monitor: Record<string, unknown> = {
-        type: validMonitorType,
+        history: [],
         monitoring: true,
-        status: "pending",
         responseTime: -1,
         retryAttempts: 3,
+        status: "pending",
         timeout: 10_000,
-        history: [],
+        type: validMonitorType,
         ...data,
     };
 
     return {
-        success: true,
-        monitor,
         errors: [],
+        monitor,
+        success: true,
     };
+}
+
+// Type guard for runtime validation
+export function isValidMonitorTypeGuard(type: unknown): type is string {
+    return typeof type === "string" && isValidMonitorType(type);
 }
 
 // Database migration helper - properly implemented with basic migration system
@@ -442,19 +449,19 @@ export async function migrateMonitorType(
     toVersion: string,
     data?: Record<string, unknown>
 ): Promise<{
-    success: boolean;
     appliedMigrations: string[];
-    errors: string[];
     data?: Record<string, unknown>;
+    errors: string[];
+    success: boolean;
 }> {
     try {
         // Validate the monitor type using internal validation
         const validationResult = validateMonitorTypeInternal(monitorType);
         if (!validationResult.success) {
             return {
-                success: false,
                 appliedMigrations: [],
                 errors: [validationResult.error ?? "Invalid monitor type"],
+                success: false,
             };
         }
 
@@ -463,9 +470,9 @@ export async function migrateMonitorType(
         // Check if migration is needed
         if (fromVersion === toVersion) {
             return {
-                success: true,
                 appliedMigrations: [],
                 errors: [],
+                success: true,
                 ...(data && { data }),
             };
         }
@@ -473,9 +480,9 @@ export async function migrateMonitorType(
         // If no data provided, just return success for version bump
         if (!data) {
             return {
-                success: true,
                 appliedMigrations: [`${monitorType}_${fromVersion}_to_${toVersion}`],
                 errors: [],
+                success: true,
             };
         }
 
@@ -490,22 +497,17 @@ export async function migrateMonitorType(
         );
 
         return {
-            success: migrationResult.success,
             appliedMigrations: migrationResult.appliedMigrations,
             errors: migrationResult.errors,
+            success: migrationResult.success,
             ...(migrationResult.data && { data: migrationResult.data }),
         };
     } catch (error) {
         logger.error("Migration error:", error);
         return {
-            success: false,
             appliedMigrations: [],
             errors: [`Migration failed: ${error}`],
+            success: false,
         };
     }
-}
-
-// Type guard for runtime validation
-export function isValidMonitorTypeGuard(type: unknown): type is string {
-    return typeof type === "string" && isValidMonitorType(type);
 }

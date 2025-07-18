@@ -31,8 +31,8 @@ export function findHistoryByMonitorId(db: Database, monitorId: string): StatusH
 export function getHistoryCount(db: Database, monitorId: string): number {
     try {
         const result = db.get("SELECT COUNT(*) as count FROM history WHERE monitor_id = ?", [monitorId]) as
-            | { count: number }
-            | undefined;
+            | undefined
+            | { count: number };
 
         return result?.count ?? 0;
     } catch (error) {

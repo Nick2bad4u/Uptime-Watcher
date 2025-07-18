@@ -23,7 +23,8 @@
         "outDir": "dist",
         "baseUrl": ".",
         "paths": {
-            "@/*": ["src/*"]
+            "@/*": ["src/*"],
+            "@shared/*": ["shared/*"]
         },
         "esModuleInterop": true,
         "allowJs": true,
@@ -56,6 +57,8 @@
         "src/**/*.tsx",
         "src/**/*.test.ts",
         "src/**/*.test.tsx",
+        "shared/**/*.ts",
+        "shared/**/*.tsx",
         "vite.config.ts",
         "vitest.config.ts",
         "src/**/*",

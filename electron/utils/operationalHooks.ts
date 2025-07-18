@@ -3,8 +3,8 @@
  * Provides consistent patterns for async operations with observability.
  */
 
-import { TypedEventBus } from "../events/TypedEventBus";
 import { UptimeEvents } from "../events/eventTypes";
+import { TypedEventBus } from "../events/TypedEventBus";
 import { logger } from "./logger";
 
 /**
@@ -12,15 +12,26 @@ import { logger } from "./logger";
  */
 export interface OperationalHooksConfig<T = unknown> {
     /**
-     * Name of the operation for logging and event emission.
+     * Backoff strategy for retry delays.
+     * @defaultValue "exponential"
      */
-    operationName: string;
+    backoff?: "exponential" | "linear";
 
     /**
-     * Maximum number of retry attempts.
-     * @defaultValue 3
+     * Context data to include in events.
      */
-    maxRetries?: number;
+    context?: Record<string, unknown>;
+
+    /**
+     * Whether to emit events for this operation.
+     * @defaultValue true
+     */
+    emitEvents?: boolean;
+
+    /**
+     * Event emitter for operation events.
+     */
+    eventEmitter?: TypedEventBus<UptimeEvents>;
 
     /**
      * Initial delay between retries in milliseconds.
@@ -29,41 +40,30 @@ export interface OperationalHooksConfig<T = unknown> {
     initialDelay?: number;
 
     /**
-     * Backoff strategy for retry delays.
-     * @defaultValue "exponential"
+     * Maximum number of retry attempts.
+     * @defaultValue 3
      */
-    backoff?: "linear" | "exponential";
-
-    /**
-     * Event emitter for operation events.
-     */
-    eventEmitter?: TypedEventBus<UptimeEvents>;
-
-    /**
-     * Context data to include in events.
-     */
-    context?: Record<string, unknown>;
-
-    /**
-     * Callback when retry is attempted.
-     */
-    onRetry?: (attempt: number, error: Error) => void | Promise<void>;
-
-    /**
-     * Callback when operation succeeds.
-     */
-    onSuccess?: (result: T) => void | Promise<void>;
+    maxRetries?: number;
 
     /**
      * Callback when operation fails permanently.
      */
-    onFailure?: (error: Error, attempts: number) => void | Promise<void>;
+    onFailure?: (error: Error, attempts: number) => Promise<void> | void;
 
     /**
-     * Whether to emit events for this operation.
-     * @defaultValue true
+     * Callback when retry is attempted.
      */
-    emitEvents?: boolean;
+    onRetry?: (attempt: number, error: Error) => Promise<void> | void;
+
+    /**
+     * Callback when operation succeeds.
+     */
+    onSuccess?: (result: T) => Promise<void> | void;
+
+    /**
+     * Name of the operation for logging and event emission.
+     */
+    operationName: string;
 
     /**
      * Whether to throw on final failure.
@@ -73,175 +73,23 @@ export interface OperationalHooksConfig<T = unknown> {
 }
 
 /**
- * Emit operation start event safely.
+ * Specialized wrapper for database operations with common patterns.
  */
-async function emitStartEvent(
-    eventEmitter: TypedEventBus<UptimeEvents>,
+export async function withDatabaseOperation<T>(
+    operation: () => Promise<T>,
     operationName: string,
-    startTime: number,
-    context: Record<string, unknown>
-): Promise<void> {
-    try {
-        await eventEmitter.emitTyped("database:transaction-completed", {
-            operation: `${operationName}:start`,
-            duration: 0,
-            timestamp: startTime,
-            success: true,
-            ...context,
-        });
-    } catch (eventError) {
-        /* v8 ignore next 2 */ logger.debug(
-            `[OperationalHooks] Failed to emit start event for ${operationName}`,
-            eventError
-        );
-    }
-}
-
-/**
- * Handle successful operation completion.
- */
-async function handleSuccess<T>(
-    result: T,
-    config: OperationalHooksConfig<T>,
-    operationName: string,
-    startTime: number,
-    attempt: number,
-    operationId: string
+    eventEmitter?: TypedEventBus<UptimeEvents>,
+    context?: Record<string, unknown>
 ): Promise<T> {
-    const { onSuccess, emitEvents, eventEmitter, context = {} } = config;
-    const duration = Date.now() - startTime;
-
-    // Call success callback
-    if (onSuccess) {
-        try {
-            await onSuccess(result);
-        } catch (callbackError) {
-            /* v8 ignore next 2 */ logger.debug(
-                `[OperationalHooks] Success callback failed for ${operationName}`,
-                callbackError
-            );
-        }
-    }
-
-    // Emit success event
-    if (emitEvents && eventEmitter) {
-        try {
-            await eventEmitter.emitTyped("database:transaction-completed", {
-                operation: operationName,
-                duration,
-                timestamp: Date.now(),
-                success: true,
-                ...(typeof result === "number" && { recordsAffected: result }),
-                ...context,
-            });
-        } catch (eventError) {
-            /* v8 ignore next 2 */ logger.debug(
-                `[OperationalHooks] Failed to emit success event for ${operationName}`,
-                eventError
-            );
-        }
-    }
-
-    /* v8 ignore next 2 */ logger.debug(`[OperationalHooks] ${operationName} succeeded after ${attempt} attempt(s)`, {
-        duration,
-        operationId,
+    return withOperationalHooks(operation, {
+        backoff: "exponential",
+        initialDelay: 100,
+        maxRetries: 3,
+        operationName: `database:${operationName}`,
+        ...(eventEmitter && { eventEmitter }),
+        ...(context && { context }),
+        emitEvents: Boolean(eventEmitter),
     });
-
-    return result;
-}
-
-/**
- * Handle operation failure.
- */
-async function handleFailure<T>(
-    error: Error,
-    config: OperationalHooksConfig<T>,
-    operationName: string,
-    startTime: number,
-    attempt: number,
-    operationId: string
-): Promise<T> {
-    const { onFailure, emitEvents, eventEmitter, context = {}, throwOnFailure = true } = config;
-    const duration = Date.now() - startTime;
-
-    if (onFailure) {
-        try {
-            await onFailure(error, attempt);
-        } catch (callbackError) {
-            /* v8 ignore next 2 */ logger.debug(
-                `[OperationalHooks] Failure callback failed for ${operationName}`,
-                callbackError
-            );
-        }
-    }
-
-    // Emit failure event
-    if (emitEvents && eventEmitter) {
-        try {
-            await eventEmitter.emitTyped("database:transaction-completed", {
-                operation: operationName,
-                duration,
-                timestamp: Date.now(),
-                success: false,
-                ...context,
-            });
-        } catch (eventError) {
-            /* v8 ignore next 2 */ logger.debug(
-                `[OperationalHooks] Failed to emit failure event for ${operationName}`,
-                eventError
-            );
-        }
-    }
-
-    /* v8 ignore next 2 */ logger.error(
-        `[OperationalHooks] ${operationName} failed permanently after ${attempt} attempts`,
-        {
-            error,
-            duration,
-            operationId,
-        }
-    );
-
-    if (throwOnFailure) {
-        throw error;
-    }
-
-    return null as T;
-}
-
-/**
- * Handle retry attempt.
- */
-async function handleRetry<T>(
-    error: Error,
-    config: OperationalHooksConfig<T>,
-    operationName: string,
-    attempt: number,
-    operationId: string
-): Promise<void> {
-    const { onRetry, initialDelay = 100, backoff = "exponential" } = config;
-
-    if (onRetry) {
-        try {
-            await onRetry(attempt, error);
-        } catch (callbackError) {
-            /* v8 ignore next 2 */ logger.debug(
-                `[OperationalHooks] Retry callback failed for ${operationName}`,
-                callbackError
-            );
-        }
-    }
-
-    const delay = calculateDelay(attempt, initialDelay, backoff);
-
-    if (delay > 0) {
-        /* v8 ignore next 2 */ logger.debug(`[OperationalHooks] Retrying ${operationName} in ${delay}ms`, {
-            attempt: attempt + 1,
-            operationId,
-        });
-
-        await new Promise((resolve) => setTimeout(resolve, delay));
-    }
 }
 
 /**
@@ -251,7 +99,7 @@ export async function withOperationalHooks<T>(
     operation: () => Promise<T>,
     config: OperationalHooksConfig<T>
 ): Promise<T> {
-    const { operationName, maxRetries = 3, emitEvents = true, eventEmitter, context = {} } = config;
+    const { context = {}, emitEvents = true, eventEmitter, maxRetries = 3, operationName } = config;
 
     const operationId = generateOperationId();
     const startTime = Date.now();
@@ -268,8 +116,8 @@ export async function withOperationalHooks<T>(
             /* v8 ignore next 2 */ logger.debug(
                 `[OperationalHooks] ${operationName} attempt ${attempt}/${maxRetries}`,
                 {
-                    operationId,
                     context,
+                    operationId,
                 }
             );
 
@@ -303,7 +151,7 @@ export async function withOperationalHooks<T>(
 /**
  * Calculate retry delay based on attempt number and backoff strategy.
  */
-function calculateDelay(attempt: number, initialDelay: number, backoff: "linear" | "exponential"): number {
+function calculateDelay(attempt: number, initialDelay: number, backoff: "exponential" | "linear"): number {
     if (backoff === "exponential") {
         return initialDelay * Math.pow(2, attempt - 1);
     }
@@ -311,28 +159,187 @@ function calculateDelay(attempt: number, initialDelay: number, backoff: "linear"
 }
 
 /**
- * Generate a unique operation ID for tracking.
+ * Emit operation start event safely.
  */
-function generateOperationId(): string {
-    return `op_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+async function emitStartEvent(
+    eventEmitter: TypedEventBus<UptimeEvents>,
+    operationName: string,
+    startTime: number,
+    context: Record<string, unknown>
+): Promise<void> {
+    try {
+        await eventEmitter.emitTyped("database:transaction-completed", {
+            duration: 0,
+            operation: `${operationName}:start`,
+            success: true,
+            timestamp: startTime,
+            ...context,
+        });
+    } catch (eventError) {
+        /* v8 ignore next 2 */ logger.debug(
+            `[OperationalHooks] Failed to emit start event for ${operationName}`,
+            eventError
+        );
+    }
 }
 
 /**
- * Specialized wrapper for database operations with common patterns.
+ * Generate a unique operation ID for tracking.
  */
-export async function withDatabaseOperation<T>(
-    operation: () => Promise<T>,
+function generateOperationId(): string {
+    // Using crypto.randomUUID for secure random generation
+    try {
+        return `op_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
+    } catch {
+        // Fallback for environments without crypto.randomUUID
+        // eslint-disable-next-line sonarjs/pseudo-random -- Fallback for compatibility
+        return `op_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+    }
+}
+
+/**
+ * Handle operation failure.
+ */
+async function handleFailure<T>(
+    error: Error,
+    config: OperationalHooksConfig<T>,
     operationName: string,
-    eventEmitter?: TypedEventBus<UptimeEvents>,
-    context?: Record<string, unknown>
+    startTime: number,
+    attempt: number,
+    operationId: string
 ): Promise<T> {
-    return withOperationalHooks(operation, {
-        operationName: `database:${operationName}`,
-        maxRetries: 3,
-        initialDelay: 100,
-        backoff: "exponential",
-        ...(eventEmitter && { eventEmitter }),
-        ...(context && { context }),
-        emitEvents: Boolean(eventEmitter),
+    const { context = {}, emitEvents, eventEmitter, onFailure, throwOnFailure = true } = config;
+    const duration = Date.now() - startTime;
+
+    if (onFailure) {
+        try {
+            await onFailure(error, attempt);
+        } catch (callbackError) {
+            /* v8 ignore next 2 */ logger.debug(
+                `[OperationalHooks] Failure callback failed for ${operationName}`,
+                callbackError
+            );
+        }
+    }
+
+    // Emit failure event
+    if (emitEvents && eventEmitter) {
+        try {
+            await eventEmitter.emitTyped("database:transaction-completed", {
+                duration,
+                operation: operationName,
+                success: false,
+                timestamp: Date.now(),
+                ...context,
+            });
+        } catch (eventError) {
+            /* v8 ignore next 2 */ logger.debug(
+                `[OperationalHooks] Failed to emit failure event for ${operationName}`,
+                eventError
+            );
+        }
+    }
+
+    /* v8 ignore next 2 */ logger.error(
+        `[OperationalHooks] ${operationName} failed permanently after ${attempt} attempts`,
+        {
+            duration,
+            error,
+            operationId,
+        }
+    );
+
+    if (throwOnFailure) {
+        throw error;
+    }
+
+    return null as T;
+}
+
+/**
+ * Handle retry attempt.
+ */
+async function handleRetry<T>(
+    error: Error,
+    config: OperationalHooksConfig<T>,
+    operationName: string,
+    attempt: number,
+    operationId: string
+): Promise<void> {
+    const { backoff = "exponential", initialDelay = 100, onRetry } = config;
+
+    if (onRetry) {
+        try {
+            await onRetry(attempt, error);
+        } catch (callbackError) {
+            /* v8 ignore next 2 */ logger.debug(
+                `[OperationalHooks] Retry callback failed for ${operationName}`,
+                callbackError
+            );
+        }
+    }
+
+    const delay = calculateDelay(attempt, initialDelay, backoff);
+
+    if (delay > 0) {
+        /* v8 ignore next 2 */ logger.debug(`[OperationalHooks] Retrying ${operationName} in ${delay}ms`, {
+            attempt: attempt + 1,
+            operationId,
+        });
+
+        await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+}
+
+/**
+ * Handle successful operation completion.
+ */
+async function handleSuccess<T>(
+    result: T,
+    config: OperationalHooksConfig<T>,
+    operationName: string,
+    startTime: number,
+    attempt: number,
+    operationId: string
+): Promise<T> {
+    const { context = {}, emitEvents, eventEmitter, onSuccess } = config;
+    const duration = Date.now() - startTime;
+
+    // Call success callback
+    if (onSuccess) {
+        try {
+            await onSuccess(result);
+        } catch (callbackError) {
+            /* v8 ignore next 2 */ logger.debug(
+                `[OperationalHooks] Success callback failed for ${operationName}`,
+                callbackError
+            );
+        }
+    }
+
+    // Emit success event
+    if (emitEvents && eventEmitter) {
+        try {
+            await eventEmitter.emitTyped("database:transaction-completed", {
+                duration,
+                operation: operationName,
+                success: true,
+                timestamp: Date.now(),
+                ...(typeof result === "number" && { recordsAffected: result }),
+                ...context,
+            });
+        } catch (eventError) {
+            /* v8 ignore next 2 */ logger.debug(
+                `[OperationalHooks] Failed to emit success event for ${operationName}`,
+                eventError
+            );
+        }
+    }
+
+    /* v8 ignore next 2 */ logger.debug(`[OperationalHooks] ${operationName} succeeded after ${attempt} attempt(s)`, {
+        duration,
+        operationId,
     });
+
+    return result;
 }

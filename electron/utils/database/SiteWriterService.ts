@@ -6,23 +6,23 @@
 import { Database } from "node-sqlite3-wasm";
 
 import { DatabaseService } from "../../services/database/DatabaseService";
-import { SiteRepository } from "../../services/database/SiteRepository";
 import { MonitorRepository } from "../../services/database/MonitorRepository";
-import { Site, Monitor } from "../../types";
+import { SiteRepository } from "../../services/database/SiteRepository";
+import { Monitor, Site } from "../../types";
 import { withDatabaseOperation } from "../operationalHooks";
-import { Logger, SiteCacheInterface, SiteWritingConfig, MonitoringConfig, SiteNotFoundError } from "./interfaces";
+import { Logger, MonitoringConfig, SiteCacheInterface, SiteNotFoundError, SiteWritingConfig } from "./interfaces";
 
 /**
  * Service for handling site writing operations.
  * Separates data operations from side effects for better testability.
  */
 export class SiteWriterService {
-    private readonly repositories: {
-        site: SiteRepository;
-        monitor: MonitorRepository;
-    };
-    private readonly logger: Logger;
     private readonly databaseService: DatabaseService;
+    private readonly logger: Logger;
+    private readonly repositories: {
+        monitor: MonitorRepository;
+        site: SiteRepository;
+    };
 
     constructor(config: SiteWritingConfig & { databaseService: DatabaseService }) {
         this.repositories = config.repositories;
@@ -39,7 +39,9 @@ export class SiteWriterService {
             async () => {
                 this.logger.info(`Creating new site in database: ${siteData.identifier}`);
 
-                const site: Site = { ...siteData };
+                const site: Site = {
+                    ...siteData,
+                };
 
                 // Use executeTransaction for atomic multi-step operation
                 await this.databaseService.executeTransaction((db) => {
@@ -66,39 +68,6 @@ export class SiteWriterService {
             "site-writer-create",
             undefined,
             { identifier: siteData.identifier, monitorCount: siteData.monitors.length }
-        );
-    }
-
-    /**
-     * Update a site with new values.
-     * Pure data operation without side effects.
-     */
-    async updateSite(siteCache: SiteCacheInterface, identifier: string, updates: Partial<Site>): Promise<Site> {
-        return withDatabaseOperation(
-            async () => {
-                // Validate input
-                const site = this.validateSiteExists(siteCache, identifier);
-
-                // Create updated site
-                const updatedSite = this.createUpdatedSite(siteCache, site, updates);
-
-                // Use executeTransaction for atomic multi-step operation
-                await this.databaseService.executeTransaction(async (db) => {
-                    // Persist to database using internal method
-                    this.repositories.site.upsertInternal(db, updatedSite);
-
-                    // Update monitors if provided - UPDATE existing monitors instead of recreating
-                    if (updates.monitors) {
-                        await this.updateMonitorsPreservingHistory(db, identifier, updates.monitors);
-                    }
-                });
-
-                this.logger.info(`Site updated successfully: ${identifier}`);
-                return updatedSite;
-            },
-            "site-writer-update",
-            undefined,
-            { identifier }
         );
     }
 
@@ -134,6 +103,25 @@ export class SiteWriterService {
             undefined,
             { identifier }
         );
+    }
+
+    /**
+     * Detect new monitors that were added to an existing site.
+     * @param originalMonitors - The original monitors before update
+     * @param updatedMonitors - The updated monitors after update
+     * @returns Array of new monitor IDs
+     */
+    public detectNewMonitors(originalMonitors: Site["monitors"], updatedMonitors: Site["monitors"]): string[] {
+        const originalIds = new Set(originalMonitors.map((m) => m.id).filter(Boolean));
+        const newMonitorIds: string[] = [];
+
+        for (const monitor of updatedMonitors) {
+            if (monitor.id && !originalIds.has(monitor.id)) {
+                newMonitorIds.push(monitor.id);
+            }
+        }
+
+        return newMonitorIds;
     }
 
     /**
@@ -175,116 +163,36 @@ export class SiteWriterService {
     }
 
     /**
-     * Validate that a site exists in the cache.
+     * Update a site with new values.
+     * Pure data operation without side effects.
      */
-    private validateSiteExists(siteCache: SiteCacheInterface, identifier: string): Site {
-        if (!identifier) {
-            throw new SiteNotFoundError("Site identifier is required");
-        }
+    async updateSite(siteCache: SiteCacheInterface, identifier: string, updates: Partial<Site>): Promise<Site> {
+        return withDatabaseOperation(
+            async () => {
+                // Validate input
+                const site = this.validateSiteExists(siteCache, identifier);
 
-        const site = siteCache.get(identifier);
-        if (!site) {
-            throw new SiteNotFoundError(identifier);
-        }
+                // Create updated site
+                const updatedSite = this.createUpdatedSite(siteCache, site, updates);
 
-        return site;
-    }
+                // Use executeTransaction for atomic multi-step operation
+                await this.databaseService.executeTransaction(async (db) => {
+                    // Persist to database using internal method
+                    this.repositories.site.upsertInternal(db, updatedSite);
 
-    /**
-     * Create updated site object with new values.
-     */
-    private createUpdatedSite(siteCache: SiteCacheInterface, site: Site, updates: Partial<Site>): Site {
-        const updatedSite: Site = {
-            ...site,
-            ...updates,
-            monitors: updates.monitors ?? site.monitors,
-        };
-        siteCache.set(site.identifier, updatedSite);
-        return updatedSite;
-    }
+                    // Update monitors if provided - UPDATE existing monitors instead of recreating
+                    if (updates.monitors) {
+                        await this.updateMonitorsPreservingHistory(db, identifier, updates.monitors);
+                    }
+                });
 
-    /**
-     * Update monitors preserving their history and IDs.
-     * This method updates existing monitors and creates new ones as needed.
-     */
-    private async updateMonitorsPreservingHistory(
-        db: Database,
-        siteIdentifier: string,
-        newMonitors: Site["monitors"]
-    ): Promise<void> {
-        const existingMonitors = await this.repositories.monitor.findBySiteIdentifier(siteIdentifier);
-
-        // Process each monitor: update existing or create new
-        this.processMonitorUpdates(db, siteIdentifier, newMonitors, existingMonitors);
-
-        // Clean up monitors that are no longer needed
-        this.removeObsoleteMonitors(db, siteIdentifier, newMonitors, existingMonitors);
-    }
-
-    /**
-     * Process monitor updates and creations.
-     */
-    private processMonitorUpdates(
-        db: Database,
-        siteIdentifier: string,
-        newMonitors: Site["monitors"],
-        existingMonitors: Site["monitors"]
-    ): void {
-        for (const newMonitor of newMonitors) {
-            this.processIndividualMonitor(db, siteIdentifier, newMonitor, existingMonitors);
-        }
-    }
-
-    /**
-     * Process a single monitor: update if exists, create if new.
-     */
-    private processIndividualMonitor(
-        db: Database,
-        siteIdentifier: string,
-        newMonitor: Monitor,
-        existingMonitors: Site["monitors"]
-    ): void {
-        if (newMonitor.id) {
-            this.handleExistingMonitor(db, siteIdentifier, newMonitor, existingMonitors);
-        } else {
-            this.createNewMonitor(db, siteIdentifier, newMonitor);
-        }
-    }
-
-    /**
-     * Handle a monitor that has an ID (existing or orphaned).
-     */
-    private handleExistingMonitor(
-        db: Database,
-        siteIdentifier: string,
-        newMonitor: Monitor,
-        existingMonitors: Site["monitors"]
-    ): void {
-        const existingMonitor = existingMonitors.find((m) => m.id === newMonitor.id);
-
-        if (existingMonitor) {
-            this.updateExistingMonitor(db, siteIdentifier, newMonitor, existingMonitor);
-        } else {
-            this.createNewMonitor(db, siteIdentifier, newMonitor, "ID not found");
-        }
-    }
-
-    /**
-     * Update an existing monitor in the database.
-     */
-    private updateExistingMonitor(
-        db: Database,
-        siteIdentifier: string,
-        newMonitor: Monitor,
-        existingMonitor: Monitor
-    ): void {
-        if (!newMonitor.id) {
-            return; // Safety check - should not happen in this context
-        }
-
-        const updateData = this.buildMonitorUpdateData(newMonitor, existingMonitor);
-        this.repositories.monitor.updateInternal(db, newMonitor.id, updateData);
-        this.logger.debug(`Updated existing monitor ${newMonitor.id} for site ${siteIdentifier}`);
+                this.logger.info(`Site updated successfully: ${identifier}`);
+                return updatedSite;
+            },
+            "site-writer-update",
+            undefined,
+            { identifier }
+        );
     }
 
     /**
@@ -326,6 +234,67 @@ export class SiteWriterService {
     }
 
     /**
+     * Create updated site object with new values.
+     */
+    private createUpdatedSite(siteCache: SiteCacheInterface, site: Site, updates: Partial<Site>): Site {
+        const updatedSite: Site = {
+            ...site,
+            ...updates,
+            monitors: updates.monitors ?? site.monitors,
+        };
+        siteCache.set(site.identifier, updatedSite);
+        return updatedSite;
+    }
+
+    /**
+     * Handle a monitor that has an ID (existing or orphaned).
+     */
+    private handleExistingMonitor(
+        db: Database,
+        siteIdentifier: string,
+        newMonitor: Monitor,
+        existingMonitors: Site["monitors"]
+    ): void {
+        const existingMonitor = existingMonitors.find((m) => m.id === newMonitor.id);
+
+        if (existingMonitor) {
+            this.updateExistingMonitor(db, siteIdentifier, newMonitor, existingMonitor);
+        } else {
+            this.createNewMonitor(db, siteIdentifier, newMonitor, "ID not found");
+        }
+    }
+
+    /**
+     * Process a single monitor: update if exists, create if new.
+     */
+    private processIndividualMonitor(
+        db: Database,
+        siteIdentifier: string,
+        newMonitor: Monitor,
+        existingMonitors: Site["monitors"]
+    ): void {
+        if (newMonitor.id) {
+            this.handleExistingMonitor(db, siteIdentifier, newMonitor, existingMonitors);
+        } else {
+            this.createNewMonitor(db, siteIdentifier, newMonitor);
+        }
+    }
+
+    /**
+     * Process monitor updates and creations.
+     */
+    private processMonitorUpdates(
+        db: Database,
+        siteIdentifier: string,
+        newMonitors: Site["monitors"],
+        existingMonitors: Site["monitors"]
+    ): void {
+        for (const newMonitor of newMonitors) {
+            this.processIndividualMonitor(db, siteIdentifier, newMonitor, existingMonitors);
+        }
+    }
+
+    /**
      * Remove monitors that are no longer in the site configuration.
      */
     private removeObsoleteMonitors(
@@ -345,22 +314,55 @@ export class SiteWriterService {
     }
 
     /**
-     * Detect new monitors that were added to an existing site.
-     * @param originalMonitors - The original monitors before update
-     * @param updatedMonitors - The updated monitors after update
-     * @returns Array of new monitor IDs
+     * Update an existing monitor in the database.
      */
-    public detectNewMonitors(originalMonitors: Site["monitors"], updatedMonitors: Site["monitors"]): string[] {
-        const originalIds = new Set(originalMonitors.map((m) => m.id).filter(Boolean));
-        const newMonitorIds: string[] = [];
-
-        for (const monitor of updatedMonitors) {
-            if (monitor.id && !originalIds.has(monitor.id)) {
-                newMonitorIds.push(monitor.id);
-            }
+    private updateExistingMonitor(
+        db: Database,
+        siteIdentifier: string,
+        newMonitor: Monitor,
+        existingMonitor: Monitor
+    ): void {
+        if (!newMonitor.id) {
+            return; // Safety check - should not happen in this context
         }
 
-        return newMonitorIds;
+        const updateData = this.buildMonitorUpdateData(newMonitor, existingMonitor);
+        this.repositories.monitor.updateInternal(db, newMonitor.id, updateData);
+        this.logger.debug(`Updated existing monitor ${newMonitor.id} for site ${siteIdentifier}`);
+    }
+
+    /**
+     * Update monitors preserving their history and IDs.
+     * This method updates existing monitors and creates new ones as needed.
+     */
+    private async updateMonitorsPreservingHistory(
+        db: Database,
+        siteIdentifier: string,
+        newMonitors: Site["monitors"]
+    ): Promise<void> {
+        const existingMonitors = await this.repositories.monitor.findBySiteIdentifier(siteIdentifier);
+
+        // Process each monitor: update existing or create new
+        this.processMonitorUpdates(db, siteIdentifier, newMonitors, existingMonitors);
+
+        // Clean up monitors that are no longer needed
+        this.removeObsoleteMonitors(db, siteIdentifier, newMonitors, existingMonitors);
+    }
+
+    /**
+     * Validate that a site exists in the cache.
+     */
+    private validateSiteExists(siteCache: SiteCacheInterface, identifier: string): Site {
+        if (!identifier) {
+            throw new SiteNotFoundError("Site identifier is required");
+        }
+
+        const site = siteCache.get(identifier);
+        if (!site) {
+            throw new SiteNotFoundError(identifier);
+        }
+
+        return site;
     }
 }
 

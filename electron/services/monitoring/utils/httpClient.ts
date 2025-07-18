@@ -56,7 +56,9 @@ export function setupTimingInterceptors(axiosInstance: AxiosInstance): void {
     axiosInstance.interceptors.request.use(
         (config) => {
             // Use a more precise timing method
-            config.metadata = { startTime: performance.now() };
+            config.metadata = {
+                startTime: performance.now(),
+            };
             return config;
         },
         (error) => {

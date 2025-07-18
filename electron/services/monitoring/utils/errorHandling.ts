@@ -22,6 +22,21 @@ export function createErrorResult(error: string, responseTime: number): MonitorC
 }
 
 /**
+ * Handle Axios-specific errors.
+ */
+export function handleAxiosError(error: AxiosError, url: string, responseTime: number): MonitorCheckResult {
+    // With validateStatus: () => true, we should only get network errors here
+    // HTTP response errors are handled in the success path
+
+    // Network errors, timeouts, DNS failures, etc.
+    const errorMessage = error.message || "Network error";
+    if (isDev()) {
+        logger.debug(`[HttpMonitor] Network error for ${url}: ${errorMessage}`);
+    }
+    return createErrorResult(errorMessage, responseTime);
+}
+
+/**
  * Handle errors that occur during health checks.
  */
 export function handleCheckError(error: unknown, url: string): MonitorCheckResult {
@@ -35,20 +50,5 @@ export function handleCheckError(error: unknown, url: string): MonitorCheckResul
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
     logger.error(`[HttpMonitor] Unexpected error checking ${url}`, error);
-    return createErrorResult(errorMessage, responseTime);
-}
-
-/**
- * Handle Axios-specific errors.
- */
-export function handleAxiosError(error: AxiosError, url: string, responseTime: number): MonitorCheckResult {
-    // With validateStatus: () => true, we should only get network errors here
-    // HTTP response errors are handled in the success path
-
-    // Network errors, timeouts, DNS failures, etc.
-    const errorMessage = error.message || "Network error";
-    if (isDev()) {
-        logger.debug(`[HttpMonitor] Network error for ${url}: ${errorMessage}`);
-    }
     return createErrorResult(errorMessage, responseTime);
 }

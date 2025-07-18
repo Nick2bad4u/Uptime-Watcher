@@ -11,14 +11,14 @@ import { MetricCard } from "./components/MetricCard";
  * Props for the SiteCardMetrics component.
  */
 interface SiteCardMetricsProperties {
+    /** Total number of checks performed */
+    checkCount: number;
+    /** Average response time in milliseconds */
+    responseTime?: number;
     /** Current status of the site */
     status: string;
     /** Uptime percentage (0-100) */
     uptime: number;
-    /** Average response time in milliseconds */
-    responseTime?: number;
-    /** Total number of checks performed */
-    checkCount: number;
 }
 
 /**

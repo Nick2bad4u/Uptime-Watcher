@@ -26,44 +26,43 @@ export class MonitorRepository {
     }
 
     /**
-     * Get the database instance.
+     * Bulk create monitors (for import functionality).
+     * Returns the created monitor with their new IDs.
+     * Uses transactions to ensure atomicity.
      */
-    private getDb(): Database {
-        return this.databaseService.getDatabase();
-    }
-
-    /**
-     * Find all monitors for a specific site.
-     */
-    public async findBySiteIdentifier(siteIdentifier: string): Promise<Site["monitors"]> {
-        // eslint-disable-next-line @typescript-eslint/require-await
-        return withDatabaseOperation(async () => {
-            const db = this.getDb();
-            const monitorRows = db.all("SELECT * FROM monitors WHERE site_identifier = ?", [siteIdentifier]) as Record<
-                string,
-                unknown
-            >[];
-
-            return rowsToMonitors(monitorRows);
-        }, `find-monitors-by-site-${siteIdentifier}`);
-    }
-
-    /**
-     * Find a monitor by its identifier with resilient error handling.
-     */
-    public async findByIdentifier(monitorId: string): Promise<Site["monitors"][0] | undefined> {
+    public async bulkCreate(siteIdentifier: string, monitors: Site["monitors"][0][]): Promise<Site["monitors"][0][]> {
         return withDatabaseOperation(
-            () => {
-                const db = this.getDb();
-                const row = db.get("SELECT * FROM monitors WHERE id = ?", [monitorId]) as
-                    | Record<string, unknown>
-                    | undefined;
+            async () => {
+                // Use executeTransaction for atomic bulk create operation
+                const createdMonitors: Site["monitors"][0][] = [];
 
-                return Promise.resolve(rowToMonitorOrUndefined(row));
+                await this.databaseService.executeTransaction((db) => {
+                    for (const monitor of monitors) {
+                        // Use RETURNING clause to get the ID directly from the insert
+                        const insertResult = db.get(
+                            `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, timeout, retryAttempts, monitoring, status, responseTime, lastChecked) 
+                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
+                             RETURNING id`,
+                            buildMonitorParameters(siteIdentifier, monitor)
+                        ) as undefined | { id: number };
+
+                        if (insertResult && typeof insertResult.id === "number") {
+                            const newMonitor = {
+                                ...monitor,
+                                id: String(insertResult.id),
+                            };
+                            createdMonitors.push(newMonitor);
+                        }
+                    }
+                    return Promise.resolve();
+                });
+
+                logger.info(`[MonitorRepository] Bulk created ${monitors.length} monitors for site: ${siteIdentifier}`);
+                return createdMonitors;
             },
-            "monitor-lookup",
+            "monitor-bulk-create",
             undefined,
-            { monitorId }
+            { count: monitors.length, siteIdentifier }
         );
     }
 
@@ -82,7 +81,7 @@ export class MonitorRepository {
 
                 const insertSql = `INSERT INTO monitors (${columns.join(", ")}) VALUES (${placeholders}) RETURNING id`;
 
-                const insertResult = db.get(insertSql, parameters) as { id: number } | undefined;
+                const insertResult = db.get(insertSql, parameters) as undefined | { id: number };
 
                 if (!insertResult || typeof insertResult.id !== "number") {
                     throw new Error(`Failed to create monitor for site ${siteIdentifier} - no ID returned`);
@@ -112,7 +111,7 @@ export class MonitorRepository {
 
         const insertSql = `INSERT INTO monitors (${columns.join(", ")}) VALUES (${placeholders}) RETURNING id`;
 
-        const insertResult = db.get(insertSql, parameters) as { id: number } | undefined;
+        const insertResult = db.get(insertSql, parameters) as undefined | { id: number };
 
         if (!insertResult || typeof insertResult.id !== "number") {
             throw new Error(`Failed to create monitor for site ${siteIdentifier} - no ID returned`);
@@ -125,6 +124,152 @@ export class MonitorRepository {
         }
 
         return String(insertResult.id);
+    }
+
+    /**
+     * Delete a monitor and its history.
+     * Uses a transaction to ensure atomicity.
+     */
+    public async delete(monitorId: string): Promise<boolean> {
+        return withDatabaseOperation(
+            () => {
+                const db = this.databaseService.getDatabase();
+                const result = this.deleteInternal(db, monitorId);
+
+                if (result) {
+                    if (isDev()) {
+                        logger.debug(`[MonitorRepository] Deleted monitor with id: ${monitorId}`);
+                    }
+                } else {
+                    logger.warn(`[MonitorRepository] Monitor not found for deletion: ${monitorId}`);
+                }
+
+                return Promise.resolve(result);
+            },
+            "monitor-delete",
+            undefined,
+            { monitorId }
+        );
+    }
+
+    /**
+     * Clear all monitors from the database.
+     * Uses transactions to ensure atomicity.
+     */
+    public async deleteAll(): Promise<void> {
+        return withDatabaseOperation(() => {
+            const db = this.databaseService.getDatabase();
+            this.deleteAllInternal(db);
+            return Promise.resolve();
+        }, "monitor-delete-all");
+    }
+
+    /**
+     * Internal method to clear all monitors from the database within an existing transaction.
+     * Use this method when you're already within a transaction context.
+     */
+    public deleteAllInternal(db: Database): void {
+        db.run("DELETE FROM monitors");
+        logger.debug("[MonitorRepository] Cleared all monitors (internal)");
+    }
+
+    /**
+     * Delete all monitors for a specific site.
+     * Uses a transaction to ensure atomicity.
+     */
+    public async deleteBySiteIdentifier(siteIdentifier: string): Promise<void> {
+        return withDatabaseOperation(
+            () => {
+                const db = this.databaseService.getDatabase();
+                this.deleteBySiteIdentifierInternal(db, siteIdentifier);
+
+                if (isDev()) {
+                    logger.debug(`[MonitorRepository] Deleted all monitors for site: ${siteIdentifier}`);
+                }
+                return Promise.resolve();
+            },
+            "monitor-delete-by-site",
+            undefined,
+            { siteIdentifier }
+        );
+    }
+
+    /**
+     * Internal method to delete all monitors for a specific site within an existing transaction.
+     * This method should be called from within a database transaction.
+     */
+    public deleteBySiteIdentifierInternal(db: Database, siteIdentifier: string): void {
+        // Get all monitor IDs for this site
+        const monitorRows = db.all("SELECT id FROM monitors WHERE site_identifier = ?", [siteIdentifier]) as {
+            id: number;
+        }[];
+
+        // Delete history for all monitors
+        for (const row of monitorRows) {
+            db.run("DELETE FROM history WHERE monitor_id = ?", [row.id]);
+        }
+
+        // Delete all monitors for this site
+        db.run("DELETE FROM monitors WHERE site_identifier = ?", [siteIdentifier]);
+    }
+
+    /**
+     * Internal method to delete a monitor and its history within an existing transaction.
+     * This method should be called from within a database transaction.
+     */
+    public deleteInternal(db: Database, monitorId: string): boolean {
+        // Delete history first (foreign key constraint)
+        db.run("DELETE FROM history WHERE monitor_id = ?", [monitorId]);
+
+        // Delete the monitor
+        const deleteResult = db.run("DELETE FROM monitors WHERE id = ?", [monitorId]);
+        return deleteResult.changes > 0;
+    }
+
+    /**
+     * Find a monitor by its identifier with resilient error handling.
+     */
+    public async findByIdentifier(monitorId: string): Promise<Site["monitors"][0] | undefined> {
+        return withDatabaseOperation(
+            () => {
+                const db = this.getDb();
+                const row = db.get("SELECT * FROM monitors WHERE id = ?", [monitorId]) as
+                    | Record<string, unknown>
+                    | undefined;
+
+                return Promise.resolve(rowToMonitorOrUndefined(row));
+            },
+            "monitor-lookup",
+            undefined,
+            { monitorId }
+        );
+    }
+
+    /**
+     * Find all monitors for a specific site.
+     */
+    public async findBySiteIdentifier(siteIdentifier: string): Promise<Site["monitors"]> {
+        // eslint-disable-next-line @typescript-eslint/require-await
+        return withDatabaseOperation(async () => {
+            const db = this.getDb();
+            const monitorRows = db.all("SELECT * FROM monitors WHERE site_identifier = ?", [siteIdentifier]) as Record<
+                string,
+                unknown
+            >[];
+
+            return rowsToMonitors(monitorRows);
+        }, `find-monitors-by-site-${siteIdentifier}`);
+    }
+
+    /**
+     * Get all monitor IDs.
+     */
+    public async getAllMonitorIds(): Promise<{ id: number }[]> {
+        return withDatabaseOperation(() => {
+            const db = this.getDb();
+            const rows = db.all("SELECT id FROM monitors") as { id: number }[];
+            return Promise.resolve(rows);
+        }, "monitor-get-all-ids");
     }
 
     /**
@@ -256,25 +401,14 @@ export class MonitorRepository {
     }
 
     /**
-     * Checks if the 'enabled' field should be skipped during update.
-     */
-    private shouldSkipEnabledField(key: string, monitor: Partial<Site["monitors"][0]>): boolean {
-        if (key === "enabled" && !("monitoring" in monitor) && !("enabled" in monitor)) {
-            if (isDev()) {
-                logger.debug(`[MonitorRepository] Skipping 'enabled' field - monitoring state not provided in update`);
-            }
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * Converts a value to the appropriate database format.
      */
+    // eslint-disable-next-line sonarjs/function-return-type -- Function returns different types based on input type
     private convertValueForDatabase(key: string, value: unknown): DbValue | null {
         if (typeof value === "string" || typeof value === "number") {
             return value;
-        } else if (typeof value === "boolean") {
+        }
+        if (typeof value === "boolean") {
             return value ? 1 : 0;
         }
 
@@ -303,154 +437,22 @@ export class MonitorRepository {
     }
 
     /**
-     * Delete a monitor and its history.
-     * Uses a transaction to ensure atomicity.
+     * Get the database instance.
      */
-    public async delete(monitorId: string): Promise<boolean> {
-        return withDatabaseOperation(
-            () => {
-                const db = this.databaseService.getDatabase();
-                const result = this.deleteInternal(db, monitorId);
-
-                if (result) {
-                    if (isDev()) {
-                        logger.debug(`[MonitorRepository] Deleted monitor with id: ${monitorId}`);
-                    }
-                } else {
-                    logger.warn(`[MonitorRepository] Monitor not found for deletion: ${monitorId}`);
-                }
-
-                return Promise.resolve(result);
-            },
-            "monitor-delete",
-            undefined,
-            { monitorId }
-        );
+    private getDb(): Database {
+        return this.databaseService.getDatabase();
     }
 
     /**
-     * Internal method to delete a monitor and its history within an existing transaction.
-     * This method should be called from within a database transaction.
+     * Checks if the 'enabled' field should be skipped during update.
      */
-    public deleteInternal(db: Database, monitorId: string): boolean {
-        // Delete history first (foreign key constraint)
-        db.run("DELETE FROM history WHERE monitor_id = ?", [monitorId]);
-
-        // Delete the monitor
-        const deleteResult = db.run("DELETE FROM monitors WHERE id = ?", [monitorId]);
-        return deleteResult.changes > 0;
-    }
-
-    /**
-     * Delete all monitors for a specific site.
-     * Uses a transaction to ensure atomicity.
-     */
-    public async deleteBySiteIdentifier(siteIdentifier: string): Promise<void> {
-        return withDatabaseOperation(
-            () => {
-                const db = this.databaseService.getDatabase();
-                this.deleteBySiteIdentifierInternal(db, siteIdentifier);
-
-                if (isDev()) {
-                    logger.debug(`[MonitorRepository] Deleted all monitors for site: ${siteIdentifier}`);
-                }
-                return Promise.resolve();
-            },
-            "monitor-delete-by-site",
-            undefined,
-            { siteIdentifier }
-        );
-    }
-
-    /**
-     * Internal method to delete all monitors for a specific site within an existing transaction.
-     * This method should be called from within a database transaction.
-     */
-    public deleteBySiteIdentifierInternal(db: Database, siteIdentifier: string): void {
-        // Get all monitor IDs for this site
-        const monitorRows = db.all("SELECT id FROM monitors WHERE site_identifier = ?", [siteIdentifier]) as {
-            id: number;
-        }[];
-
-        // Delete history for all monitors
-        for (const row of monitorRows) {
-            db.run("DELETE FROM history WHERE monitor_id = ?", [row.id]);
+    private shouldSkipEnabledField(key: string, monitor: Partial<Site["monitors"][0]>): boolean {
+        if (key === "enabled" && !("monitoring" in monitor) && !("enabled" in monitor)) {
+            if (isDev()) {
+                logger.debug(`[MonitorRepository] Skipping 'enabled' field - monitoring state not provided in update`);
+            }
+            return true;
         }
-
-        // Delete all monitors for this site
-        db.run("DELETE FROM monitors WHERE site_identifier = ?", [siteIdentifier]);
-    }
-
-    /**
-     * Get all monitor IDs.
-     */
-    public async getAllMonitorIds(): Promise<{ id: number }[]> {
-        return withDatabaseOperation(() => {
-            const db = this.getDb();
-            const rows = db.all("SELECT id FROM monitors") as { id: number }[];
-            return Promise.resolve(rows);
-        }, "monitor-get-all-ids");
-    }
-
-    /**
-     * Clear all monitors from the database.
-     * Uses transactions to ensure atomicity.
-     */
-    public async deleteAll(): Promise<void> {
-        return withDatabaseOperation(() => {
-            const db = this.databaseService.getDatabase();
-            this.deleteAllInternal(db);
-            return Promise.resolve();
-        }, "monitor-delete-all");
-    }
-
-    /**
-     * Internal method to clear all monitors from the database within an existing transaction.
-     * Use this method when you're already within a transaction context.
-     */
-    public deleteAllInternal(db: Database): void {
-        db.run("DELETE FROM monitors");
-        logger.debug("[MonitorRepository] Cleared all monitors (internal)");
-    }
-
-    /**
-     * Bulk create monitors (for import functionality).
-     * Returns the created monitor with their new IDs.
-     * Uses transactions to ensure atomicity.
-     */
-    public async bulkCreate(siteIdentifier: string, monitors: Site["monitors"][0][]): Promise<Site["monitors"][0][]> {
-        return withDatabaseOperation(
-            async () => {
-                // Use executeTransaction for atomic bulk create operation
-                const createdMonitors: Site["monitors"][0][] = [];
-
-                await this.databaseService.executeTransaction((db) => {
-                    for (const monitor of monitors) {
-                        // Use RETURNING clause to get the ID directly from the insert
-                        const insertResult = db.get(
-                            `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, timeout, retryAttempts, monitoring, status, responseTime, lastChecked) 
-                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
-                             RETURNING id`,
-                            buildMonitorParameters(siteIdentifier, monitor)
-                        ) as { id: number } | undefined;
-
-                        if (insertResult && typeof insertResult.id === "number") {
-                            const newMonitor = {
-                                ...monitor,
-                                id: String(insertResult.id),
-                            };
-                            createdMonitors.push(newMonitor);
-                        }
-                    }
-                    return Promise.resolve();
-                });
-
-                logger.info(`[MonitorRepository] Bulk created ${monitors.length} monitors for site: ${siteIdentifier}`);
-                return createdMonitors;
-            },
-            "monitor-bulk-create",
-            undefined,
-            { siteIdentifier, count: monitors.length }
-        );
+        return false;
     }
 }

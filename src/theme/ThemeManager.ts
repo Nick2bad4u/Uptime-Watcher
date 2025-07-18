@@ -5,8 +5,6 @@
  * Note: Empty constructor and no-op functions are intentional design patterns.
  */
 
-/* eslint-disable @typescript-eslint/no-empty-function */
-
 import { themes } from "./themes";
 import { Theme, ThemeName } from "./types";
 
@@ -18,9 +16,6 @@ export class ThemeManager {
     /** Singleton instance */
     private static instance: ThemeManager | undefined;
 
-    /** Private constructor to enforce singleton pattern */
-    private constructor() {}
-
     /**
      * Get the singleton instance of ThemeManager.
      * Creates the instance if it doesn't exist.
@@ -30,57 +25,6 @@ export class ThemeManager {
     public static getInstance(): ThemeManager {
         ThemeManager.instance ??= new ThemeManager();
         return ThemeManager.instance;
-    }
-
-    /**
-     * Get theme by name, with automatic system theme detection.
-     * Handles "system" theme by detecting user's OS preference.
-     *
-     * @param name - Theme name to retrieve
-     * @returns Theme object containing colors, typography, and spacing
-     */
-    getTheme(name: ThemeName): Theme {
-        if (name === "system") {
-            const systemPreference = this.getSystemThemePreference();
-            // eslint-disable-next-line security/detect-object-injection -- always light or dark
-            return themes[systemPreference];
-        }
-
-        return themes[name as keyof typeof themes];
-    }
-
-    /**
-     * Get system theme preference from OS/browser settings.
-     * Uses CSS media query to detect dark mode preference.
-     *
-     * @returns "dark" if user prefers dark mode, "light" otherwise
-     */
-    getSystemThemePreference(): "light" | "dark" {
-        if (typeof window !== "undefined") {
-            return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-        }
-        return "light";
-    }
-
-    /**
-     * Listen for system theme changes and call callback when detected.
-     * Useful for automatic theme switching when user changes OS settings.
-     *
-     * @param callback - Function to call when system theme changes
-     * @returns Cleanup function to remove the event listener
-     */
-    onSystemThemeChange(callback: (isDark: boolean) => void): () => void {
-        if (typeof window === "undefined") {
-            return () => {};
-        }
-
-        const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-        const handler = (e: MediaQueryListEvent) => callback(e.matches);
-
-        mediaQuery.addEventListener("change", handler);
-
-        // Return cleanup function
-        return () => mediaQuery.removeEventListener("change", handler);
     }
 
     /**
@@ -99,83 +43,6 @@ export class ThemeManager {
         this.applyShadows(root, theme.shadows);
         this.applyBorderRadius(root, theme.borderRadius);
         this.applyThemeClasses(theme);
-    }
-
-    /**
-     * Apply color CSS custom properties
-     */
-    private applyColors(root: HTMLElement, colors: Theme["colors"]): void {
-        for (const [category, colorValue] of Object.entries(colors)) {
-            if (typeof colorValue === "object" && colorValue !== null) {
-                for (const [key, value] of Object.entries(colorValue as Record<string, unknown>)) {
-                    root.style.setProperty(`--color-${category}-${key}`, String(value));
-                }
-            } else {
-                root.style.setProperty(`--color-${category}`, String(colorValue));
-            }
-        }
-    }
-
-    /**
-     * Apply typography CSS custom properties
-     */
-    private applyTypography(root: HTMLElement, typography: Theme["typography"]): void {
-        for (const [size, value] of Object.entries(typography.fontSize)) {
-            root.style.setProperty(`--font-size-${size}`, String(value));
-        }
-
-        for (const [weight, value] of Object.entries(typography.fontWeight)) {
-            root.style.setProperty(`--font-weight-${weight}`, String(value));
-        }
-
-        for (const [height, value] of Object.entries(typography.lineHeight)) {
-            root.style.setProperty(`--line-height-${height}`, String(value));
-        }
-    }
-
-    /**
-     * Apply spacing CSS custom properties
-     */
-    private applySpacing(root: HTMLElement, spacing: Theme["spacing"]): void {
-        for (const [size, value] of Object.entries(spacing)) {
-            root.style.setProperty(`--spacing-${size}`, String(value));
-        }
-    }
-
-    /**
-     * Apply shadow CSS custom properties
-     */
-    private applyShadows(root: HTMLElement, shadows: Theme["shadows"]): void {
-        for (const [size, value] of Object.entries(shadows)) {
-            root.style.setProperty(`--shadow-${size}`, String(value));
-        }
-    }
-
-    /**
-     * Apply border radius CSS custom properties
-     */
-    private applyBorderRadius(root: HTMLElement, borderRadius: Theme["borderRadius"]): void {
-        for (const [size, value] of Object.entries(borderRadius)) {
-            root.style.setProperty(`--radius-${size}`, String(value));
-        }
-    }
-
-    /**
-     * Apply theme classes to document elements
-     */
-    private applyThemeClasses(theme: Theme): void {
-        const root = document.documentElement;
-
-        // Set theme class on body
-        document.body.className = document.body.className.replaceAll(/theme-\w+/g, "").trim();
-        document.body.classList.add(`theme-${theme.name}`);
-
-        // Set dark mode class for Tailwind CSS
-        if (theme.isDark) {
-            root.classList.add("dark");
-        } else {
-            root.classList.remove("dark");
-        }
     }
 
     /**
@@ -206,20 +73,6 @@ export class ThemeManager {
                 ...overrides.typography,
             },
         };
-    }
-
-    /**
-     * Get all available theme names
-     */
-    getAvailableThemes(): ThemeName[] {
-        return ["light", "dark", "high-contrast", "system"];
-    }
-
-    /**
-     * Validate if theme name is valid
-     */
-    isValidThemeName(name: string): name is ThemeName {
-        return this.getAvailableThemes().includes(name as ThemeName);
     }
 
     /**
@@ -268,6 +121,148 @@ export class ThemeManager {
         }
 
         return `:root {\n${variables.join("\n")}\n}`;
+    }
+
+    /**
+     * Get all available theme names
+     */
+    getAvailableThemes(): ThemeName[] {
+        return ["light", "dark", "high-contrast", "system"];
+    }
+
+    /**
+     * Get system theme preference from OS/browser settings.
+     * Uses CSS media query to detect dark mode preference.
+     *
+     * @returns "dark" if user prefers dark mode, "light" otherwise
+     */
+    getSystemThemePreference(): "dark" | "light" {
+        if (typeof window !== "undefined") {
+            return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        }
+        return "light";
+    }
+
+    /**
+     * Get theme by name, with automatic system theme detection.
+     * Handles "system" theme by detecting user's OS preference.
+     *
+     * @param name - Theme name to retrieve
+     * @returns Theme object containing colors, typography, and spacing
+     */
+    getTheme(name: ThemeName): Theme {
+        if (name === "system") {
+            const systemPreference = this.getSystemThemePreference();
+            // eslint-disable-next-line security/detect-object-injection -- always light or dark
+            return themes[systemPreference];
+        }
+
+        return themes[name as keyof typeof themes];
+    }
+
+    /**
+     * Validate if theme name is valid
+     */
+    isValidThemeName(name: string): name is ThemeName {
+        return this.getAvailableThemes().includes(name as ThemeName);
+    }
+
+    /**
+     * Listen for system theme changes and call callback when detected.
+     * Useful for automatic theme switching when user changes OS settings.
+     *
+     * @param callback - Function to call when system theme changes
+     * @returns Cleanup function to remove the event listener
+     */
+    onSystemThemeChange(callback: (isDark: boolean) => void): () => void {
+        if (typeof window === "undefined") {
+            return () => {};
+        }
+
+        const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+        const handler = (e: MediaQueryListEvent) => callback(e.matches);
+
+        mediaQuery.addEventListener("change", handler);
+
+        // Return cleanup function
+        return () => mediaQuery.removeEventListener("change", handler);
+    }
+
+    /**
+     * Apply border radius CSS custom properties
+     */
+    private applyBorderRadius(root: HTMLElement, borderRadius: Theme["borderRadius"]): void {
+        for (const [size, value] of Object.entries(borderRadius)) {
+            root.style.setProperty(`--radius-${size}`, String(value));
+        }
+    }
+
+    /**
+     * Apply color CSS custom properties
+     */
+    private applyColors(root: HTMLElement, colors: Theme["colors"]): void {
+        for (const [category, colorValue] of Object.entries(colors)) {
+            if (typeof colorValue === "object" && colorValue !== null) {
+                for (const [key, value] of Object.entries(colorValue as Record<string, unknown>)) {
+                    root.style.setProperty(`--color-${category}-${key}`, String(value));
+                }
+            } else {
+                root.style.setProperty(`--color-${category}`, String(colorValue));
+            }
+        }
+    }
+
+    /**
+     * Apply shadow CSS custom properties
+     */
+    private applyShadows(root: HTMLElement, shadows: Theme["shadows"]): void {
+        for (const [size, value] of Object.entries(shadows)) {
+            root.style.setProperty(`--shadow-${size}`, String(value));
+        }
+    }
+
+    /**
+     * Apply spacing CSS custom properties
+     */
+    private applySpacing(root: HTMLElement, spacing: Theme["spacing"]): void {
+        for (const [size, value] of Object.entries(spacing)) {
+            root.style.setProperty(`--spacing-${size}`, String(value));
+        }
+    }
+
+    /**
+     * Apply theme classes to document elements
+     */
+    private applyThemeClasses(theme: Theme): void {
+        const root = document.documentElement;
+
+        // Set theme class on body
+        document.body.className = document.body.className.replaceAll(/theme-\w+/g, "").trim();
+        document.body.classList.add(`theme-${theme.name}`);
+
+        // Set dark mode class for Tailwind CSS
+        if (theme.isDark) {
+            root.classList.add("dark");
+        } else {
+            root.classList.remove("dark");
+        }
+    }
+
+    /**
+     * Apply typography CSS custom properties
+     */
+    private applyTypography(root: HTMLElement, typography: Theme["typography"]): void {
+        for (const [size, value] of Object.entries(typography.fontSize)) {
+            root.style.setProperty(`--font-size-${size}`, String(value));
+        }
+
+        for (const [weight, value] of Object.entries(typography.fontWeight)) {
+            root.style.setProperty(`--font-weight-${weight}`, String(value));
+        }
+
+        for (const [height, value] of Object.entries(typography.lineHeight)) {
+            root.style.setProperty(`--line-height-${height}`, String(value));
+        }
     }
 }
 

@@ -26,6 +26,19 @@ const titleSuffixFormatters: Record<string, TitleSuffixFormatter> = {
 };
 
 /**
+ * Format title suffix for a monitor dynamically
+ */
+export function formatTitleSuffix(monitor: Monitor): string {
+    const formatter = getTitleSuffixFormatter(monitor.type);
+    if (formatter) {
+        return formatter(monitor);
+    }
+
+    // Fallback to empty string if no formatter is registered
+    return "";
+}
+
+/**
  * Get title suffix formatter for a monitor type
  */
 export function getTitleSuffixFormatter(monitorType: string): TitleSuffixFormatter | undefined {
@@ -39,17 +52,4 @@ export function getTitleSuffixFormatter(monitorType: string): TitleSuffixFormatt
 export function registerTitleSuffixFormatter(monitorType: string, formatter: TitleSuffixFormatter): void {
     // eslint-disable-next-line security/detect-object-injection
     titleSuffixFormatters[monitorType] = formatter;
-}
-
-/**
- * Format title suffix for a monitor dynamically
- */
-export function formatTitleSuffix(monitor: Monitor): string {
-    const formatter = getTitleSuffixFormatter(monitor.type);
-    if (formatter) {
-        return formatter(monitor);
-    }
-
-    // Fallback to empty string if no formatter is registered
-    return "";
 }

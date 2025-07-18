@@ -15,6 +15,15 @@ import type { MonitorType } from "../../types";
 export type { MonitorType } from "../../types";
 
 /**
+ * Get all base monitor types as an array.
+ *
+ * @returns Array of base monitor types
+ */
+export function getBaseMonitorTypes(): MonitorType[] {
+    return ["http", "port"];
+}
+
+/**
  * Type guard to check if a string is a valid monitor type.
  *
  * @param type - The type to check
@@ -22,13 +31,4 @@ export type { MonitorType } from "../../types";
  */
 export function isBaseMonitorType(type: string): type is MonitorType {
     return type === "http" || type === "port";
-}
-
-/**
- * Get all base monitor types as an array.
- *
- * @returns Array of base monitor types
- */
-export function getBaseMonitorTypes(): MonitorType[] {
-    return ["http", "port"];
 }

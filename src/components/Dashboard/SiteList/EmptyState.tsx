@@ -28,9 +28,9 @@ import { ThemedBox, ThemedText } from "../../../theme/components";
  */
 export function EmptyState() {
     return (
-        <ThemedBox surface="base" padding="xl" className="text-center">
+        <ThemedBox className="text-center" padding="xl" surface="base">
             <div className="empty-state-icon">🌐</div>
-            <ThemedText size="lg" weight="medium" className="mb-2">
+            <ThemedText className="mb-2" size="lg" weight="medium">
                 No sites to monitor
             </ThemedText>
             <ThemedText variant="secondary">Add your first website to start monitoring its uptime.</ThemedText>

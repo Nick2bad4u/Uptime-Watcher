@@ -63,24 +63,24 @@ export const SiteCard = React.memo(function SiteCard({ site }: SiteCardPropertie
 
     return (
         <ThemedBox
-            variant="secondary"
+            aria-label={`View details for ${latestSite.name}`}
+            className="flex flex-col w-full gap-2 text-left cursor-pointer site-card"
+            onClick={handleCardClick}
             padding="md"
             rounded="md"
             shadow="sm"
-            className="flex flex-col w-full gap-2 text-left cursor-pointer site-card"
-            onClick={handleCardClick}
-            aria-label={`View details for ${latestSite.name}`}
+            variant="secondary"
         >
             <SiteCardHeader
-                site={latestSite}
-                selectedMonitorId={selectedMonitorId}
-                onMonitorIdChange={handleMonitorIdChange}
-                onCheckNow={handleCheckNow}
-                onStartMonitoring={handleStartMonitoring}
-                onStopMonitoring={handleStopMonitoring}
+                hasMonitor={!!monitor}
                 isLoading={isLoading}
                 isMonitoring={isMonitoring}
-                hasMonitor={!!monitor}
+                onCheckNow={handleCheckNow}
+                onMonitorIdChange={handleMonitorIdChange}
+                onStartMonitoring={handleStartMonitoring}
+                onStopMonitoring={handleStopMonitoring}
+                selectedMonitorId={selectedMonitorId}
+                site={latestSite}
             />
 
             <SiteCardStatus selectedMonitorId={selectedMonitorId} status={status} />
@@ -92,7 +92,7 @@ export const SiteCard = React.memo(function SiteCard({ site }: SiteCardPropertie
                 checkCount={checkCount}
             />
 
-            <SiteCardHistory monitor={monitor} filteredHistory={filteredHistory} />
+            <SiteCardHistory filteredHistory={filteredHistory} monitor={monitor} />
 
             <SiteCardFooter />
         </ThemedBox>

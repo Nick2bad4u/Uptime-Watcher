@@ -12,25 +12,18 @@
 import type { Monitor, Site, StatusUpdate } from "../types";
 
 /**
- * Reason for an event occurrence.
+ * Category for grouping related events.
  *
  * @public
  */
-export type EventReason = "user" | "error" | "shutdown";
+export type EventCategory = "database" | "monitoring" | "system" | "ui";
 
 /**
- * Source that triggered an event.
+ * Type of monitoring check that triggered an event.
  *
  * @public
  */
-export type EventSource = "user" | "import" | "migration" | "system";
-
-/**
- * Severity level of an event for prioritization.
- *
- * @public
- */
-export type EventSeverity = "low" | "medium" | "high" | "critical";
+export type EventCheckType = "manual" | "scheduled";
 
 /**
  * Runtime environment where event occurred.
@@ -40,18 +33,25 @@ export type EventSeverity = "low" | "medium" | "high" | "critical";
 export type EventEnvironment = "development" | "production" | "test";
 
 /**
- * Category for grouping related events.
+ * Reason for an event occurrence.
  *
  * @public
  */
-export type EventCategory = "database" | "monitoring" | "ui" | "system";
+export type EventReason = "error" | "shutdown" | "user";
 
 /**
- * Type of monitoring check that triggered an event.
+ * Severity level of an event for prioritization.
  *
  * @public
  */
-export type EventCheckType = "scheduled" | "manual";
+export type EventSeverity = "critical" | "high" | "low" | "medium";
+
+/**
+ * Source that triggered an event.
+ *
+ * @public
+ */
+export type EventSource = "import" | "migration" | "system" | "user";
 
 /**
  * What triggered a monitoring or system event.
@@ -81,80 +81,19 @@ export type EventTriggerType = "manual" | "scheduled" | "shutdown";
 export interface UptimeEvents extends Record<string, unknown> {
     // Site events
 
-    "site:added": {
-        site: Site;
+    "cache:invalidated": {
+        identifier?: string;
+        reason: "delete" | "expiry" | "manual" | "update";
         timestamp: number;
-        source: "user" | "import" | "migration";
+        type: "all" | "monitor" | "site";
     };
 
-    "site:updated": {
-        site: Site;
-        previousSite: Site;
+    "config:changed": {
+        newValue: unknown;
+        oldValue: unknown;
+        setting: string;
+        source: "migration" | "system" | "user";
         timestamp: number;
-        updatedFields: string[];
-    };
-
-    "site:removed": {
-        siteId: string;
-        siteName: string;
-        timestamp: number;
-        cascade: boolean;
-    };
-
-    // Monitor events
-
-    "monitor:added": {
-        monitor: Monitor;
-        siteId: string;
-        timestamp: number;
-    };
-
-    "monitor:status-changed": {
-        monitor: Monitor;
-        newStatus: string;
-        previousStatus: string;
-        responseTime?: number;
-        site: Site;
-        siteId: string;
-        timestamp: number;
-    };
-
-    "monitor:removed": {
-        monitorId: string;
-        siteId: string;
-        timestamp: number;
-    };
-
-    "monitor:up": {
-        monitor: Monitor;
-        site: Site;
-        siteId: string;
-        timestamp: number;
-    };
-
-    "monitor:down": {
-        monitor: Monitor;
-        site: Site;
-        siteId: string;
-        timestamp: number;
-    };
-
-    "monitor:check-completed": {
-        monitorId: string;
-        siteId: string;
-        result: StatusUpdate;
-        timestamp: number;
-        checkType: "scheduled" | "manual";
-    };
-
-    // Database events
-
-    "database:transaction-completed": {
-        operation: string;
-        duration: number;
-        timestamp: number;
-        success: boolean;
-        recordsAffected?: number;
     };
 
     "database:backup-created": {
@@ -164,73 +103,169 @@ export interface UptimeEvents extends Record<string, unknown> {
         triggerType: "manual" | "scheduled" | "shutdown";
     };
 
-    // System events
-    "system:startup": {
-        version: string;
-        timestamp: number;
-        environment: "development" | "production" | "test";
-    };
+    // Monitor events
 
-    "system:shutdown": {
-        timestamp: number;
-        reason: "user" | "error" | "update";
-        uptime: number;
-    };
-
-    "system:error": {
+    "database:error": {
+        [key: string]: unknown;
         error: Error;
-        context: string;
+        operation: string;
         timestamp: number;
-        severity: "low" | "medium" | "high" | "critical";
-        recovery?: string;
     };
 
-    // Monitoring service events
-    "monitoring:started": {
+    // Database operation events
+    "database:retry": {
+        [key: string]: unknown;
+        attempt: number;
+        operation: string;
+        timestamp: number;
+    };
+
+    "database:success": {
+        [key: string]: unknown;
+        duration?: number;
+        operation: string;
+        timestamp: number;
+    };
+
+    "database:transaction-completed": {
+        duration: number;
+        operation: string;
+        recordsAffected?: number;
+        success: boolean;
+        timestamp: number;
+    };
+
+    "internal:database:backup-downloaded": {
+        fileName?: string;
+        operation: "backup-downloaded";
+        success: boolean;
+        timestamp: number;
+    };
+
+    "internal:database:data-exported": {
+        fileName?: string;
+        operation: "data-exported";
+        success: boolean;
+        timestamp: number;
+    };
+
+    // Database events
+
+    "internal:database:data-imported": {
+        operation: "data-imported";
+        recordCount?: number;
+        success: boolean;
+        timestamp: number;
+    };
+
+    "internal:database:get-sites-from-cache-requested": {
+        operation: "get-sites-from-cache-requested";
+        timestamp: number;
+    };
+
+    "internal:database:get-sites-from-cache-response": {
+        operation: "get-sites-from-cache-response";
+        sites: Site[];
+        timestamp: number;
+    };
+
+    "internal:database:history-limit-updated": {
+        limit: number;
+        operation: "history-limit-updated";
+        timestamp: number;
+    };
+
+    "internal:database:initialized": {
+        operation: "initialized";
+        success: boolean;
+        timestamp: number;
+    };
+
+    "internal:database:sites-refreshed": {
+        operation: "sites-refreshed";
         siteCount: number;
-        monitorCount: number;
         timestamp: number;
     };
 
-    "monitoring:stopped": {
-        reason: "user" | "error" | "shutdown";
+    "internal:database:update-sites-cache-requested": {
+        operation: "update-sites-cache-requested";
+        sites?: Site[];
         timestamp: number;
-        activeMonitors: number;
     };
 
     // Configuration events
 
-    "config:changed": {
-        setting: string;
-        oldValue: unknown;
-        newValue: unknown;
+    "internal:monitor:all-started": {
+        monitorCount: number;
+        operation: "all-started";
+        siteCount: number;
         timestamp: number;
-        source: "user" | "system" | "migration";
     };
 
     // Performance events
 
-    "performance:metric": {
-        metric: string;
-        value: number;
-        unit: string;
+    "internal:monitor:all-stopped": {
+        activeMonitors: number;
+        operation: "all-stopped";
+        reason: EventReason;
         timestamp: number;
-        category: "database" | "monitoring" | "ui" | "system";
     };
 
-    "performance:warning": {
-        metric: string;
-        threshold: number;
-        actual: number;
+    "internal:monitor:manual-check-completed": {
+        identifier: string;
+        monitorId?: string;
+        operation: "manual-check-completed";
+        result: StatusUpdate;
         timestamp: number;
-        suggestion?: string;
+    };
+
+    "internal:monitor:site-setup-completed": {
+        identifier: string;
+        operation: "site-setup-completed";
+        timestamp: number;
+    };
+
+    "internal:monitor:started": {
+        identifier: string;
+        monitorId?: string;
+        operation: "started";
+        timestamp: number;
+    };
+
+    "internal:monitor:stopped": {
+        identifier: string;
+        monitorId?: string;
+        operation: "stopped";
+        reason: EventReason;
+        timestamp: number;
     };
 
     // Internal events for manager-to-manager communication
     "internal:site:added": {
         identifier: string;
-        site: Site;
         operation: "added";
+        site: Site;
+        timestamp: number;
+    };
+
+    "internal:site:cache-updated": {
+        identifier: string;
+        operation: "cache-updated";
+        timestamp: number;
+    };
+
+    "internal:site:is-monitoring-active-requested": {
+        identifier: string;
+        monitorId: string;
+        operation: "is-monitoring-active-requested";
+        timestamp: number;
+    };
+
+    "internal:site:is-monitoring-active-response": {
+        identifier: string;
+        isActive: boolean;
+        monitorId: string;
+        operation: "is-monitoring-active-response";
         timestamp: number;
     };
 
@@ -240,54 +275,19 @@ export interface UptimeEvents extends Record<string, unknown> {
         timestamp: number;
     };
 
-    "internal:site:updated": {
+    "internal:site:restart-monitoring-requested": {
         identifier: string;
-        site: Site;
-        operation: "updated";
+        monitor: Monitor;
+        operation: "restart-monitoring-requested";
         timestamp: number;
-        updatedFields?: string[];
     };
 
-    "internal:site:cache-updated": {
+    "internal:site:restart-monitoring-response": {
         identifier: string;
-        operation: "cache-updated";
+        monitorId: string;
+        operation: "restart-monitoring-response";
+        success: boolean;
         timestamp: number;
-    };
-
-    // Cache operation events
-    "site:cache-updated": {
-        identifier: string;
-        operation: "background-load" | "cache-updated" | "manual-refresh";
-        timestamp: number;
-    };
-
-    "site:cache-miss": {
-        identifier: string;
-        operation: "cache-lookup";
-        timestamp: number;
-        backgroundLoading: boolean;
-    };
-
-    // Database operation events
-    "database:retry": {
-        operation: string;
-        attempt: number;
-        timestamp: number;
-        [key: string]: unknown;
-    };
-
-    "database:error": {
-        operation: string;
-        error: Error;
-        timestamp: number;
-        [key: string]: unknown;
-    };
-
-    "database:success": {
-        operation: string;
-        timestamp: number;
-        duration?: number;
-        [key: string]: unknown;
     };
 
     "internal:site:start-monitoring-requested": {
@@ -304,148 +304,148 @@ export interface UptimeEvents extends Record<string, unknown> {
         timestamp: number;
     };
 
-    "internal:site:is-monitoring-active-requested": {
+    "internal:site:updated": {
         identifier: string;
-        monitorId: string;
-        operation: "is-monitoring-active-requested";
+        operation: "updated";
+        site: Site;
         timestamp: number;
+        updatedFields?: string[];
     };
 
-    "internal:site:restart-monitoring-requested": {
-        identifier: string;
+    "monitor:added": {
         monitor: Monitor;
-        operation: "restart-monitoring-requested";
+        siteId: string;
         timestamp: number;
     };
 
-    "internal:site:is-monitoring-active-response": {
-        identifier: string;
-        isActive: boolean;
+    "monitor:check-completed": {
+        checkType: "manual" | "scheduled";
         monitorId: string;
-        operation: "is-monitoring-active-response";
-        timestamp: number;
-    };
-
-    "internal:site:restart-monitoring-response": {
-        identifier: string;
-        monitorId: string;
-        operation: "restart-monitoring-response";
-        success: boolean;
-        timestamp: number;
-    };
-
-    "internal:monitor:all-started": {
-        operation: "all-started";
-        timestamp: number;
-        siteCount: number;
-        monitorCount: number;
-    };
-
-    "internal:monitor:all-stopped": {
-        operation: "all-stopped";
-        timestamp: number;
-        activeMonitors: number;
-        reason: EventReason;
-    };
-
-    "internal:monitor:started": {
-        identifier: string;
-        monitorId?: string;
-        operation: "started";
-        timestamp: number;
-    };
-
-    "internal:monitor:stopped": {
-        identifier: string;
-        monitorId?: string;
-        operation: "stopped";
-        timestamp: number;
-        reason: EventReason;
-    };
-
-    "internal:monitor:manual-check-completed": {
-        identifier: string;
-        monitorId?: string;
         result: StatusUpdate;
-        operation: "manual-check-completed";
+        siteId: string;
         timestamp: number;
     };
 
-    "internal:monitor:site-setup-completed": {
-        identifier: string;
-        operation: "site-setup-completed";
+    "monitor:down": {
+        monitor: Monitor;
+        site: Site;
+        siteId: string;
         timestamp: number;
     };
 
-    "internal:database:initialized": {
-        operation: "initialized";
-        timestamp: number;
-        success: boolean;
-    };
-
-    "internal:database:history-limit-updated": {
-        operation: "history-limit-updated";
-        limit: number;
+    "monitor:removed": {
+        monitorId: string;
+        siteId: string;
         timestamp: number;
     };
 
-    "internal:database:data-exported": {
-        operation: "data-exported";
+    "monitor:status-changed": {
+        monitor: Monitor;
+        newStatus: string;
+        previousStatus: string;
+        responseTime?: number;
+        site: Site;
+        siteId: string;
         timestamp: number;
-        success: boolean;
-        fileName?: string;
     };
 
-    "internal:database:data-imported": {
-        operation: "data-imported";
+    "monitor:up": {
+        monitor: Monitor;
+        site: Site;
+        siteId: string;
         timestamp: number;
-        success: boolean;
-        recordCount?: number;
     };
 
-    "internal:database:backup-downloaded": {
-        operation: "backup-downloaded";
-        timestamp: number;
-        success: boolean;
-        fileName?: string;
-    };
-
-    "internal:database:sites-refreshed": {
-        operation: "sites-refreshed";
-        timestamp: number;
+    // Monitoring service events
+    "monitoring:started": {
+        monitorCount: number;
         siteCount: number;
-    };
-
-    "internal:database:update-sites-cache-requested": {
-        operation: "update-sites-cache-requested";
-        sites?: Site[];
         timestamp: number;
     };
 
-    "internal:database:get-sites-from-cache-requested": {
-        operation: "get-sites-from-cache-requested";
+    "monitoring:stopped": {
+        activeMonitors: number;
+        reason: "error" | "shutdown" | "user";
         timestamp: number;
     };
 
-    "internal:database:get-sites-from-cache-response": {
-        operation: "get-sites-from-cache-response";
+    "performance:metric": {
+        category: "database" | "monitoring" | "system" | "ui";
+        metric: string;
         timestamp: number;
-        sites: Site[];
+        unit: string;
+        value: number;
+    };
+
+    "performance:warning": {
+        actual: number;
+        metric: string;
+        suggestion?: string;
+        threshold: number;
+        timestamp: number;
+    };
+
+    "site:added": {
+        site: Site;
+        source: "import" | "migration" | "user";
+        timestamp: number;
+    };
+
+    "site:cache-miss": {
+        backgroundLoading: boolean;
+        identifier: string;
+        operation: "cache-lookup";
+        timestamp: number;
+    };
+
+    // Cache operation events
+    "site:cache-updated": {
+        identifier: string;
+        operation: "background-load" | "cache-updated" | "manual-refresh";
+        timestamp: number;
+    };
+
+    "site:removed": {
+        cascade: boolean;
+        siteId: string;
+        siteName: string;
+        timestamp: number;
+    };
+
+    "site:updated": {
+        previousSite: Site;
+        site: Site;
+        timestamp: number;
+        updatedFields: string[];
     };
 
     // State synchronization events
     "sites:state-synchronized": {
-        action: "update" | "delete" | "bulk-sync";
+        action: "bulk-sync" | "delete" | "update";
         siteIdentifier?: string;
-        timestamp: number;
         source?: "cache" | "database" | "frontend";
+        timestamp: number;
     };
 
-    "cache:invalidated": {
-        type: "site" | "monitor" | "all";
-        identifier?: string;
+    "system:error": {
+        context: string;
+        error: Error;
+        recovery?: string;
+        severity: "critical" | "high" | "low" | "medium";
         timestamp: number;
-        reason: "update" | "delete" | "expiry" | "manual";
+    };
+
+    "system:shutdown": {
+        reason: "error" | "update" | "user";
+        timestamp: number;
+        uptime: number;
+    };
+
+    // System events
+    "system:startup": {
+        environment: "development" | "production" | "test";
+        timestamp: number;
+        version: string;
     };
 }
 
@@ -480,18 +480,6 @@ export const EVENT_PRIORITIES = {
 } as const;
 
 /**
- * Type guard to check if an event is of a specific category.
- */
-export function isEventOfCategory(eventName: keyof UptimeEvents, category: keyof typeof EVENT_CATEGORIES): boolean {
-    // Check if the category exists in EVENT_CATEGORIES
-    if (!Object.hasOwn(EVENT_CATEGORIES, category)) {
-        return false;
-    }
-    // eslint-disable-next-line security/detect-object-injection
-    return EVENT_CATEGORIES[category].includes(eventName as never);
-}
-
-/**
  * Get the priority level of an event.
  */
 export function getEventPriority(eventName: keyof UptimeEvents): keyof typeof EVENT_PRIORITIES {
@@ -501,4 +489,16 @@ export function getEventPriority(eventName: keyof UptimeEvents): keyof typeof EV
         }
     }
     return "MEDIUM"; // Default priority
+}
+
+/**
+ * Type guard to check if an event is of a specific category.
+ */
+export function isEventOfCategory(eventName: keyof UptimeEvents, category: keyof typeof EVENT_CATEGORIES): boolean {
+    // Check if the category exists in EVENT_CATEGORIES
+    if (!Object.hasOwn(EVENT_CATEGORIES, category)) {
+        return false;
+    }
+    // eslint-disable-next-line security/detect-object-injection
+    return EVENT_CATEGORIES[category].includes(eventName as never);
 }

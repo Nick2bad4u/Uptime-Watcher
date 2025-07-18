@@ -17,16 +17,16 @@ export const DefaultErrorFallback: React.FC<{ error?: Error; retry: () => void }
         </div>
         <div className="flex gap-4">
             <button
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded hover:bg-red-700"
                 onClick={retry}
                 type="button"
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded hover:bg-red-700"
             >
                 Try Again
             </button>
             <button
+                className="px-4 py-2 text-sm font-medium text-red-600 border border-red-600 rounded hover:bg-red-50"
                 onClick={() => window.location.reload()}
                 type="button"
-                className="px-4 py-2 text-sm font-medium text-red-600 border border-red-600 rounded hover:bg-red-50"
             >
                 Reload Page
             </button>

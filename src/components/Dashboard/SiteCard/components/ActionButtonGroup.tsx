@@ -11,18 +11,18 @@ import { ThemedButton } from "../../../../theme/components";
  * Props for the ActionButtonGroup component.
  */
 interface ActionButtonGroupProperties {
+    /** Whether all buttons should be disabled */
+    disabled: boolean;
+    /** Whether any operation is currently loading */
+    isLoading: boolean;
+    /** Whether monitoring is currently active */
+    isMonitoring: boolean;
     /** Callback function to trigger immediate site check */
     onCheckNow: () => void;
     /** Callback function to start monitoring */
     onStartMonitoring: () => void;
     /** Callback function to stop monitoring */
     onStopMonitoring: () => void;
-    /** Whether any operation is currently loading */
-    isLoading: boolean;
-    /** Whether monitoring is currently active */
-    isMonitoring: boolean;
-    /** Whether all buttons should be disabled */
-    disabled: boolean;
 }
 
 /**
@@ -86,35 +86,35 @@ export const ActionButtonGroup = React.memo(function ActionButtonGroup({
     return (
         <div className="flex items-center gap-2">
             <ThemedButton
-                variant="ghost"
-                size="sm"
-                onClick={handleCheckNowClick}
-                className="min-w-[32px]"
                 aria-label="Check Now"
+                className="min-w-[32px]"
                 disabled={isLoading || disabled}
+                onClick={handleCheckNowClick}
+                size="sm"
+                variant="ghost"
             >
                 <span>🔄</span>
             </ThemedButton>
 
             {isMonitoring ? (
                 <ThemedButton
-                    variant="error"
-                    size="sm"
-                    onClick={handleStopMonitoringClick}
-                    className="min-w-[32px]"
                     aria-label="Stop Monitoring"
+                    className="min-w-[32px]"
                     disabled={isLoading || disabled}
+                    onClick={handleStopMonitoringClick}
+                    size="sm"
+                    variant="error"
                 >
                     ⏸️
                 </ThemedButton>
             ) : (
                 <ThemedButton
-                    variant="success"
-                    size="sm"
-                    onClick={handleStartMonitoringClick}
-                    className="min-w-[32px]"
                     aria-label="Start Monitoring"
+                    className="min-w-[32px]"
                     disabled={isLoading || disabled}
+                    onClick={handleStartMonitoringClick}
+                    size="sm"
+                    variant="success"
                 >
                     ▶️
                 </ThemedButton>

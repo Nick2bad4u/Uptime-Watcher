@@ -5,7 +5,7 @@ import * as path from "node:path";
 
 import { logger } from "../../utils/logger";
 import { createDatabaseBackup } from "./utils/databaseBackup";
-import { createDatabaseTables, createDatabaseIndexes, setupMonitorTypeValidation } from "./utils/databaseSchema";
+import { createDatabaseIndexes, createDatabaseTables, setupMonitorTypeValidation } from "./utils/databaseSchema";
 
 /**
  * Database service for SQLite connection and transaction management.
@@ -25,19 +25,6 @@ import { createDatabaseTables, createDatabaseIndexes, setupMonitorTypeValidation
 export class DatabaseService {
     private static readonly instance: DatabaseService = new DatabaseService();
 
-    /**
-     * Get the singleton database service instance.
-     *
-     * @returns The shared DatabaseService instance
-     *
-     * @remarks
-     * Uses singleton pattern to ensure only one database connection
-     * exists throughout the application lifecycle.
-     */
-    public static getInstance(): DatabaseService {
-        return DatabaseService.instance;
-    }
-
     private _db: Database | undefined = undefined;
 
     /**
@@ -51,54 +38,38 @@ export class DatabaseService {
     }
 
     /**
-     * Initialize the database connection and create tables if they don't exist.
+     * Get the singleton database service instance.
      *
-     * @returns The initialized database instance
-     *
-     * @throws {@link Error} When database initialization fails
+     * @returns The shared DatabaseService instance
      *
      * @remarks
-     * Creates the database file in the user data directory if it doesn't exist.
-     * Sets up the complete schema including all required tables and indexes.
-     * Safe to call multiple times - returns existing connection if already initialized.
+     * Uses singleton pattern to ensure only one database connection
+     * exists throughout the application lifecycle.
      */
-    public initialize(): Database {
-        if (this._db) {
-            return this._db;
-        }
-
-        try {
-            const dbPath = path.join(app.getPath("userData"), "uptime-watcher.sqlite");
-            logger.info(`[DatabaseService] Initializing SQLite DB at: ${dbPath}`);
-
-            this._db = new Database(dbPath);
-            createDatabaseTables(this._db);
-            createDatabaseIndexes(this._db);
-            setupMonitorTypeValidation();
-
-            logger.info("[DatabaseService] Database initialized successfully");
-            return this._db;
-        } catch (error) {
-            logger.error("[DatabaseService] Failed to initialize database", error);
-            throw error;
-        }
+    public static getInstance(): DatabaseService {
+        return DatabaseService.instance;
     }
 
     /**
-     * Get the database instance.
+     * Close the database connection.
      *
-     * @returns The active database connection
-     *
-     * @throws {@link Error} When database is not initialized
+     * @throws {@link Error} When connection close fails
      *
      * @remarks
-     * Call {@link DatabaseService.initialize} first to set up the database connection.
+     * Safely closes the database connection and cleans up resources.
+     * Should be called during application shutdown to ensure proper cleanup.
      */
-    public getDatabase(): Database {
-        if (!this._db) {
-            throw new Error("Database not initialized. Call initialize() first.");
+    public close(): void {
+        if (this._db) {
+            try {
+                this._db.close();
+                this._db = undefined;
+                logger.info("[DatabaseService] Database connection closed");
+            } catch (error) {
+                logger.error("[DatabaseService] Failed to close database", error);
+                throw error;
+            }
         }
-        return this._db;
     }
 
     /**
@@ -152,24 +123,53 @@ export class DatabaseService {
     }
 
     /**
-     * Close the database connection.
+     * Get the database instance.
      *
-     * @throws {@link Error} When connection close fails
+     * @returns The active database connection
+     *
+     * @throws {@link Error} When database is not initialized
      *
      * @remarks
-     * Safely closes the database connection and cleans up resources.
-     * Should be called during application shutdown to ensure proper cleanup.
+     * Call {@link DatabaseService.initialize} first to set up the database connection.
      */
-    public close(): void {
+    public getDatabase(): Database {
+        if (!this._db) {
+            throw new Error("Database not initialized. Call initialize() first.");
+        }
+        return this._db;
+    }
+
+    /**
+     * Initialize the database connection and create tables if they don't exist.
+     *
+     * @returns The initialized database instance
+     *
+     * @throws {@link Error} When database initialization fails
+     *
+     * @remarks
+     * Creates the database file in the user data directory if it doesn't exist.
+     * Sets up the complete schema including all required tables and indexes.
+     * Safe to call multiple times - returns existing connection if already initialized.
+     */
+    public initialize(): Database {
         if (this._db) {
-            try {
-                this._db.close();
-                this._db = undefined;
-                logger.info("[DatabaseService] Database connection closed");
-            } catch (error) {
-                logger.error("[DatabaseService] Failed to close database", error);
-                throw error;
-            }
+            return this._db;
+        }
+
+        try {
+            const dbPath = path.join(app.getPath("userData"), "uptime-watcher.sqlite");
+            logger.info(`[DatabaseService] Initializing SQLite DB at: ${dbPath}`);
+
+            this._db = new Database(dbPath);
+            createDatabaseTables(this._db);
+            createDatabaseIndexes(this._db);
+            setupMonitorTypeValidation();
+
+            logger.info("[DatabaseService] Database initialized successfully");
+            return this._db;
+        } catch (error) {
+            logger.error("[DatabaseService] Failed to initialize database", error);
+            throw error;
         }
     }
 }

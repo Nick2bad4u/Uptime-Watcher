@@ -39,18 +39,40 @@
 import type { UptimeEvents } from "./events/eventTypes";
 
 import { DEFAULT_HISTORY_LIMIT } from "./constants";
+import { createErrorHandlingMiddleware, createLoggingMiddleware } from "./events/middleware";
 import { TypedEventBus } from "./events/TypedEventBus";
-import { createLoggingMiddleware, createErrorHandlingMiddleware } from "./events/middleware";
 import { DatabaseManager } from "./managers/DatabaseManager";
 import { MonitorManager } from "./managers/MonitorManager";
 import { SiteManager } from "./managers/SiteManager";
 import { DatabaseService } from "./services/database/DatabaseService";
-import { SiteRepository } from "./services/database/SiteRepository";
-import { MonitorRepository } from "./services/database/MonitorRepository";
 import { HistoryRepository } from "./services/database/HistoryRepository";
+import { MonitorRepository } from "./services/database/MonitorRepository";
 import { SettingsRepository } from "./services/database/SettingsRepository";
-import { Site, StatusUpdate, Monitor } from "./types";
+import { SiteRepository } from "./services/database/SiteRepository";
+import { Monitor, Site, StatusUpdate } from "./types";
 import { logger } from "./utils/logger";
+
+/**
+ * Data structure for history limit update events.
+ *
+ * @remarks Internal use only for coordinating between managers.
+ */
+interface HistoryLimitUpdatedData {
+    /** New history retention limit */
+    limit: number;
+}
+
+/**
+ * Data structure for internal monitoring status check events.
+ *
+ * @remarks Internal use only for coordinating between managers.
+ */
+interface IsMonitoringActiveRequestData {
+    /** Site identifier for the status check */
+    identifier: string;
+    /** Specific monitor ID to check */
+    monitorId: string;
+}
 
 /**
  * Interface defining the monitoring operations provided to the SiteManager.
@@ -58,12 +80,12 @@ import { logger } from "./utils/logger";
 interface MonitoringOperations {
     /** Set the history retention limit for monitor data */
     setHistoryLimit: (limit: number) => Promise<void>;
+    /** Set up monitoring for newly added monitors */
+    setupNewMonitors: (site: Site, newMonitorIds: string[]) => Promise<void>;
     /** Start monitoring for a specific site and monitor */
     startMonitoringForSite: (identifier: string, monitorId: string) => Promise<boolean>;
     /** Stop monitoring for a specific site and monitor */
     stopMonitoringForSite: (identifier: string, monitorId: string) => Promise<boolean>;
-    /** Set up monitoring for newly added monitors */
-    setupNewMonitors: (site: Site, newMonitorIds: string[]) => Promise<void>;
 }
 
 /**
@@ -74,6 +96,25 @@ interface MonitoringOperations {
  * providing a unified event system for the entire application.
  */
 type OrchestratorEvents = UptimeEvents;
+
+/**
+ * Data structure for internal monitor restart events.
+ *
+ * @remarks Internal use only for coordinating between managers.
+ */
+interface RestartMonitoringRequestData {
+    /** Site identifier for the restart request */
+    identifier: string;
+    /** Monitor configuration for restart */
+    monitor: Monitor;
+}
+
+interface SiteEventData {
+    identifier?: string;
+    site: Site;
+    timestamp: number;
+    updatedFields?: string[];
+}
 
 /**
  * Data structure for internal start monitoring request events.
@@ -100,30 +141,6 @@ interface StopMonitoringRequestData {
 }
 
 /**
- * Data structure for internal monitoring status check events.
- *
- * @remarks Internal use only for coordinating between managers.
- */
-interface IsMonitoringActiveRequestData {
-    /** Site identifier for the status check */
-    identifier: string;
-    /** Specific monitor ID to check */
-    monitorId: string;
-}
-
-/**
- * Data structure for internal monitor restart events.
- *
- * @remarks Internal use only for coordinating between managers.
- */
-interface RestartMonitoringRequestData {
-    /** Site identifier for the restart request */
-    identifier: string;
-    /** Monitor configuration for restart */
-    monitor: Monitor;
-}
-
-/**
  * Data structure for internal sites cache update events.
  *
  * @remarks Internal use only for coordinating between managers.
@@ -133,30 +150,22 @@ interface UpdateSitesCacheRequestData {
     sites: Site[];
 }
 
-/**
- * Data structure for history limit update events.
- *
- * @remarks Internal use only for coordinating between managers.
- */
-interface HistoryLimitUpdatedData {
-    /** New history retention limit */
-    limit: number;
-}
-
-interface SiteEventData {
-    site: Site;
-    timestamp: number;
-    identifier?: string;
-    updatedFields?: string[];
-}
-
 export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
+    /**
+     * Gets the current history retention limit.
+     *
+     * @returns The current history limit.
+     */
+    public get historyLimit(): number {
+        return this.databaseManager.getHistoryLimit();
+    }
+
     private _historyLimit: number = DEFAULT_HISTORY_LIMIT;
+    private readonly databaseManager: DatabaseManager;
+    private readonly monitorManager: MonitorManager;
 
     // Manager instances
     private readonly siteManager: SiteManager;
-    private readonly monitorManager: MonitorManager;
-    private readonly databaseManager: DatabaseManager;
 
     /**
      * Constructs a new UptimeOrchestrator and initializes all managers and middleware.
@@ -182,29 +191,310 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     }
 
     /**
-     * Initializes all repository instances.
+     * Adds a new site and sets up monitoring for it.
+     * Uses transaction-like behavior to ensure consistency.
      *
-     * @returns Object containing all repository instances.
+     * @param siteData - The site data to add.
+     * @returns Promise resolving to the added Site object.
      */
-    private initRepositories(): {
-        databaseService: DatabaseService;
-        siteRepository: SiteRepository;
-        monitorRepository: MonitorRepository;
-        historyRepository: HistoryRepository;
-        settingsRepository: SettingsRepository;
-    } {
-        const databaseService = DatabaseService.getInstance();
-        const siteRepository = new SiteRepository();
-        const monitorRepository = new MonitorRepository();
-        const historyRepository = new HistoryRepository();
-        const settingsRepository = new SettingsRepository();
+    public async addSite(siteData: Site): Promise<Site> {
+        let site: Site | undefined;
 
+        try {
+            // Step 1: Add the site
+            site = await this.siteManager.addSite(siteData);
+
+            // Step 2: Set up monitoring for the new site
+            await this.monitorManager.setupSiteForMonitoring(site);
+
+            return site;
+        } catch (error) {
+            // If monitoring setup fails, attempt to clean up the site
+            if (site) {
+                try {
+                    await this.siteManager.removeSite(site.identifier);
+                    /* v8 ignore next 2 */ logger.info(
+                        `[UptimeOrchestrator] Cleaned up site ${site.identifier} after monitoring setup failure`
+                    );
+                } catch (cleanupError) {
+                    /* v8 ignore next 2 */ logger.error(
+                        `[UptimeOrchestrator] Failed to cleanup site ${site.identifier} after monitoring setup failure:`,
+                        cleanupError
+                    );
+                }
+            }
+
+            /* v8 ignore next 2 */ logger.error(
+                `[UptimeOrchestrator] Failed to add site ${siteData.identifier}:`,
+                error
+            );
+            throw error;
+        }
+    }
+
+    /**
+     * Manually triggers a check for a site or monitor.
+     *
+     * @param identifier - The site identifier.
+     * @param monitorId - Optional monitor identifier.
+     * @returns Promise resolving to a StatusUpdate or null.
+     */
+    public async checkSiteManually(identifier: string, monitorId?: string): Promise<null | StatusUpdate> {
+        const result = await this.monitorManager.checkSiteManually(identifier, monitorId);
+        return result ?? null;
+    }
+
+    /**
+     * Downloads a backup of the SQLite database.
+     *
+     * @returns Promise resolving to an object containing the backup buffer and file name.
+     */
+    public async downloadBackup(): Promise<{ buffer: Buffer; fileName: string }> {
+        return this.databaseManager.downloadBackup();
+    }
+
+    /**
+     * Exports all application data as a JSON string.
+     *
+     * @returns Promise resolving to the exported data string.
+     */
+    public async exportData(): Promise<string> {
+        return this.databaseManager.exportData();
+    }
+
+    /**
+     * Gets the current history retention limit (method version for IPC compatibility).
+     *
+     * @returns The current history limit.
+     */
+    public getHistoryLimit(): number {
+        return this.databaseManager.getHistoryLimit();
+    }
+
+    /**
+     * Retrieves all sites from the site manager.
+     *
+     * @returns Promise resolving to an array of Site objects.
+     */
+    public async getSites(): Promise<Site[]> {
+        return this.siteManager.getSites();
+    }
+
+    // Site Management Operations
+
+    /**
+     * Gets the current sites from the in-memory cache.
+     *
+     * @returns Array of Site objects from cache.
+     */
+    public getSitesFromCache(): Site[] {
+        return this.siteManager.getSitesFromCache();
+    }
+
+    /**
+     * Imports application data from a JSON string.
+     *
+     * @param data - The JSON data string to import.
+     * @returns Promise resolving to true if import succeeded, false otherwise.
+     */
+    public async importData(data: string): Promise<boolean> {
+        return this.databaseManager.importData(data);
+    }
+
+    /**
+     * Initializes the orchestrator and all its managers.
+     * Ensures proper initialization order and error handling.
+     *
+     * @returns Promise that resolves when initialization is complete.
+     */
+    public async initialize(): Promise<void> {
+        try {
+            /* v8 ignore next 2 */ logger.info("[UptimeOrchestrator] Starting initialization...");
+
+            // Step 1: Initialize database first (required by other managers)
+            await this.databaseManager.initialize();
+            /* v8 ignore next 2 */ logger.info("[UptimeOrchestrator] Database manager initialized");
+
+            // Step 2: Initialize site manager (loads sites from database)
+            await this.siteManager.initialize();
+            /* v8 ignore next 2 */ logger.info("[UptimeOrchestrator] Site manager initialized");
+
+            // Step 3: Validate that managers are properly initialized
+            this.validateInitialization();
+
+            /* v8 ignore next 2 */ logger.info("[UptimeOrchestrator] Initialization completed successfully");
+        } catch (error) {
+            /* v8 ignore next 2 */ logger.error("[UptimeOrchestrator] Initialization failed:", error);
+            throw error;
+        }
+    }
+
+    /**
+     * Checks if monitoring is currently active.
+     *
+     * @returns True if monitoring is active, false otherwise.
+     */
+    public isMonitoringActive(): boolean {
+        return this.monitorManager.isMonitoringActive();
+    }
+
+    /**
+     * Refreshes sites from the database and updates the cache.
+     *
+     * @returns Promise resolving to an array of refreshed Site objects.
+     */
+    public async refreshSites(): Promise<Site[]> {
+        return this.databaseManager.refreshSites();
+    }
+
+    /**
+     * Removes a monitor from a site and stops its monitoring.
+     * Uses a single database transaction to ensure atomicity.
+     *
+     * @param siteIdentifier - The site identifier.
+     * @param monitorId - The monitor identifier.
+     * @returns Promise resolving to true if removed, false otherwise.
+     */
+    public async removeMonitor(siteIdentifier: string, monitorId: string): Promise<boolean> {
+        try {
+            // Step 1: Stop monitoring immediately (before transaction)
+            const monitoringStopped = await this.monitorManager.stopMonitoringForSite(siteIdentifier, monitorId);
+
+            // Step 2: Remove monitor from database using transaction
+            const removed = await this.siteManager.removeMonitor(siteIdentifier, monitorId);
+
+            // If database removal succeeded, we're done
+            if (removed) {
+                return true;
+            }
+
+            // If database removal failed but monitoring was stopped, restart monitoring
+            if (monitoringStopped) {
+                try {
+                    await this.monitorManager.startMonitoringForSite(siteIdentifier, monitorId);
+                    /* v8 ignore next 2 */ logger.info(
+                        `[UptimeOrchestrator] Restarted monitoring for ${siteIdentifier}/${monitorId} after failed removal`
+                    );
+                } catch (restartError) {
+                    /* v8 ignore next 2 */ logger.error(
+                        `[UptimeOrchestrator] Failed to restart monitoring for ${siteIdentifier}/${monitorId} after failed removal:`,
+                        restartError
+                    );
+                }
+            }
+
+            return false;
+        } catch (error) {
+            /* v8 ignore next 2 */ logger.error(
+                `[UptimeOrchestrator] Failed to remove monitor ${siteIdentifier}/${monitorId}:`,
+                error
+            );
+            throw error;
+        }
+    }
+
+    // Monitoring Operations
+
+    /**
+     * Removes a site by its identifier.
+     *
+     * @param identifier - The site identifier.
+     * @returns Promise resolving to true if removed, false otherwise.
+     */
+    public async removeSite(identifier: string): Promise<boolean> {
+        return this.siteManager.removeSite(identifier);
+    }
+
+    /**
+     * Sets the history retention limit for monitor data.
+     *
+     * @remarks
+     * This method delegates to the DatabaseManager to update the history limit
+     * in the database and prune existing history entries if necessary.
+     *
+     * The operation is performed within a database transaction to ensure
+     * consistency between the setting update and history pruning.
+     *
+     * @param limit - The new history limit (number of entries to retain per monitor).
+     *                Values less than or equal to 0 will disable history pruning.
+     * @returns Promise that resolves when the limit is set.
+     */
+    public async setHistoryLimit(limit: number): Promise<void> {
+        await this.databaseManager.setHistoryLimit(limit);
+    }
+
+    /**
+     * Starts monitoring for all sites.
+     *
+     * @returns Promise that resolves when monitoring has started.
+     */
+    public async startMonitoring(): Promise<void> {
+        await this.monitorManager.startMonitoring();
+    }
+
+    /**
+     * Starts monitoring for a specific site and monitor.
+     *
+     * @param identifier - The site identifier.
+     * @param monitorId - Optional monitor identifier.
+     * @returns Promise resolving to true if started, false otherwise.
+     */
+    public async startMonitoringForSite(identifier: string, monitorId?: string): Promise<boolean> {
+        return this.monitorManager.startMonitoringForSite(identifier, monitorId);
+    }
+
+    /**
+     * Stops monitoring for all sites.
+     *
+     * @returns Promise that resolves when monitoring has stopped.
+     */
+    public async stopMonitoring(): Promise<void> {
+        await this.monitorManager.stopMonitoring();
+    }
+
+    // Database Operations
+
+    /**
+     * Stops monitoring for a specific site and monitor.
+     *
+     * @param identifier - The site identifier.
+     * @param monitorId - Optional monitor identifier.
+     * @returns Promise resolving to true if stopped, false otherwise.
+     */
+    public async stopMonitoringForSite(identifier: string, monitorId?: string): Promise<boolean> {
+        return this.monitorManager.stopMonitoringForSite(identifier, monitorId);
+    }
+
+    /**
+     * Updates a site with the given changes.
+     *
+     * @param identifier - The site identifier.
+     * @param updates - Partial site data to update.
+     * @returns Promise resolving to the updated Site object.
+     */
+    public async updateSite(identifier: string, updates: Partial<Site>): Promise<Site> {
+        return this.siteManager.updateSite(identifier, updates);
+    }
+
+    /**
+     * Creates the monitoringOperations object for SiteManager.
+     *
+     * @returns The monitoringOperations object implementing the MonitoringOperations interface.
+     */
+    private createMonitoringOperations(): MonitoringOperations {
         return {
-            databaseService,
-            siteRepository,
-            monitorRepository,
-            historyRepository,
-            settingsRepository,
+            setHistoryLimit: async (limit: number) => {
+                await this.setHistoryLimit(limit);
+            },
+            setupNewMonitors: async (site: Site, newMonitorIds: string[]) => {
+                return this.monitorManager.setupNewMonitors(site, newMonitorIds);
+            },
+            startMonitoringForSite: async (identifier: string, monitorId: string) => {
+                return this.monitorManager.startMonitoringForSite(identifier, monitorId);
+            },
+            stopMonitoringForSite: async (identifier: string, monitorId: string) => {
+                return this.monitorManager.stopMonitoringForSite(identifier, monitorId);
+            },
         };
     }
 
@@ -215,9 +505,9 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * @returns Object containing all manager instances.
      */
     private initManagers(repositories: ReturnType<UptimeOrchestrator["initRepositories"]>): {
+        databaseManager: DatabaseManager;
         monitorManager: MonitorManager;
         siteManager: SiteManager;
-        databaseManager: DatabaseManager;
     } {
         // Create site manager first so we can reference it in the monitor manager
         const siteManagerInstance = new SiteManager({
@@ -255,42 +545,38 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         });
 
         return {
+            databaseManager,
             monitorManager,
             siteManager: siteManagerInstance,
-            databaseManager,
         };
     }
 
-    /**
-     * Set up middleware for the event bus.
-     *
-     * @remarks
-     * Extracted from constructor for clarity and maintainability.
-     */
-    private setupMiddleware(): void {
-        this.use(createErrorHandlingMiddleware({ continueOnError: true }));
-        this.use(createLoggingMiddleware({ includeData: false, level: "info" }));
-    }
+    // History Management
 
     /**
-     * Creates the monitoringOperations object for SiteManager.
+     * Initializes all repository instances.
      *
-     * @returns The monitoringOperations object implementing the MonitoringOperations interface.
+     * @returns Object containing all repository instances.
      */
-    private createMonitoringOperations(): MonitoringOperations {
+    private initRepositories(): {
+        databaseService: DatabaseService;
+        historyRepository: HistoryRepository;
+        monitorRepository: MonitorRepository;
+        settingsRepository: SettingsRepository;
+        siteRepository: SiteRepository;
+    } {
+        const databaseService = DatabaseService.getInstance();
+        const siteRepository = new SiteRepository();
+        const monitorRepository = new MonitorRepository();
+        const historyRepository = new HistoryRepository();
+        const settingsRepository = new SettingsRepository();
+
         return {
-            setHistoryLimit: async (limit: number) => {
-                await this.setHistoryLimit(limit);
-            },
-            startMonitoringForSite: async (identifier: string, monitorId: string) => {
-                return this.monitorManager.startMonitoringForSite(identifier, monitorId);
-            },
-            stopMonitoringForSite: async (identifier: string, monitorId: string) => {
-                return this.monitorManager.stopMonitoringForSite(identifier, monitorId);
-            },
-            setupNewMonitors: async (site: Site, newMonitorIds: string[]) => {
-                return this.monitorManager.setupNewMonitors(site, newMonitorIds);
-            },
+            databaseService,
+            historyRepository,
+            monitorRepository,
+            settingsRepository,
+            siteRepository,
         };
     }
 
@@ -402,7 +688,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                                 `[UptimeOrchestrator] Failed to setup monitoring for site ${site.identifier}:`,
                                 error
                             );
-                            return { site: site.identifier, success: false, error };
+                            return { error, site: site.identifier, success: false };
                         }
                     })
                 );
@@ -538,32 +824,17 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     }
 
     /**
-     * Initializes the orchestrator and all its managers.
-     * Ensures proper initialization order and error handling.
+     * Set up middleware for the event bus.
      *
-     * @returns Promise that resolves when initialization is complete.
+     * @remarks
+     * Extracted from constructor for clarity and maintainability.
      */
-    public async initialize(): Promise<void> {
-        try {
-            /* v8 ignore next 2 */ logger.info("[UptimeOrchestrator] Starting initialization...");
-
-            // Step 1: Initialize database first (required by other managers)
-            await this.databaseManager.initialize();
-            /* v8 ignore next 2 */ logger.info("[UptimeOrchestrator] Database manager initialized");
-
-            // Step 2: Initialize site manager (loads sites from database)
-            await this.siteManager.initialize();
-            /* v8 ignore next 2 */ logger.info("[UptimeOrchestrator] Site manager initialized");
-
-            // Step 3: Validate that managers are properly initialized
-            this.validateInitialization();
-
-            /* v8 ignore next 2 */ logger.info("[UptimeOrchestrator] Initialization completed successfully");
-        } catch (error) {
-            /* v8 ignore next 2 */ logger.error("[UptimeOrchestrator] Initialization failed:", error);
-            throw error;
-        }
+    private setupMiddleware(): void {
+        this.use(createErrorHandlingMiddleware({ continueOnError: true }));
+        this.use(createLoggingMiddleware({ includeData: false, level: "info" }));
     }
+
+    // Status Information
 
     /**
      * Validates that all managers are properly initialized.
@@ -581,276 +852,5 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         if (typeof this.monitorManager.startMonitoring !== "function") {
             throw new TypeError("MonitorManager not properly initialized");
         }
-    }
-
-    // Site Management Operations
-
-    /**
-     * Retrieves all sites from the site manager.
-     *
-     * @returns Promise resolving to an array of Site objects.
-     */
-    public async getSites(): Promise<Site[]> {
-        return this.siteManager.getSites();
-    }
-
-    /**
-     * Gets the current sites from the in-memory cache.
-     *
-     * @returns Array of Site objects from cache.
-     */
-    public getSitesFromCache(): Site[] {
-        return this.siteManager.getSitesFromCache();
-    }
-
-    /**
-     * Adds a new site and sets up monitoring for it.
-     * Uses transaction-like behavior to ensure consistency.
-     *
-     * @param siteData - The site data to add.
-     * @returns Promise resolving to the added Site object.
-     */
-    public async addSite(siteData: Site): Promise<Site> {
-        let site: Site | undefined;
-
-        try {
-            // Step 1: Add the site
-            site = await this.siteManager.addSite(siteData);
-
-            // Step 2: Set up monitoring for the new site
-            await this.monitorManager.setupSiteForMonitoring(site);
-
-            return site;
-        } catch (error) {
-            // If monitoring setup fails, attempt to clean up the site
-            if (site) {
-                try {
-                    await this.siteManager.removeSite(site.identifier);
-                    /* v8 ignore next 2 */ logger.info(
-                        `[UptimeOrchestrator] Cleaned up site ${site.identifier} after monitoring setup failure`
-                    );
-                } catch (cleanupError) {
-                    /* v8 ignore next 2 */ logger.error(
-                        `[UptimeOrchestrator] Failed to cleanup site ${site.identifier} after monitoring setup failure:`,
-                        cleanupError
-                    );
-                }
-            }
-
-            /* v8 ignore next 2 */ logger.error(
-                `[UptimeOrchestrator] Failed to add site ${siteData.identifier}:`,
-                error
-            );
-            throw error;
-        }
-    }
-
-    /**
-     * Removes a site by its identifier.
-     *
-     * @param identifier - The site identifier.
-     * @returns Promise resolving to true if removed, false otherwise.
-     */
-    public async removeSite(identifier: string): Promise<boolean> {
-        return this.siteManager.removeSite(identifier);
-    }
-
-    /**
-     * Removes a monitor from a site and stops its monitoring.
-     * Uses a single database transaction to ensure atomicity.
-     *
-     * @param siteIdentifier - The site identifier.
-     * @param monitorId - The monitor identifier.
-     * @returns Promise resolving to true if removed, false otherwise.
-     */
-    public async removeMonitor(siteIdentifier: string, monitorId: string): Promise<boolean> {
-        try {
-            // Step 1: Stop monitoring immediately (before transaction)
-            const monitoringStopped = await this.monitorManager.stopMonitoringForSite(siteIdentifier, monitorId);
-
-            // Step 2: Remove monitor from database using transaction
-            const removed = await this.siteManager.removeMonitor(siteIdentifier, monitorId);
-
-            // If database removal succeeded, we're done
-            if (removed) {
-                return true;
-            }
-
-            // If database removal failed but monitoring was stopped, restart monitoring
-            if (monitoringStopped) {
-                try {
-                    await this.monitorManager.startMonitoringForSite(siteIdentifier, monitorId);
-                    /* v8 ignore next 2 */ logger.info(
-                        `[UptimeOrchestrator] Restarted monitoring for ${siteIdentifier}/${monitorId} after failed removal`
-                    );
-                } catch (restartError) {
-                    /* v8 ignore next 2 */ logger.error(
-                        `[UptimeOrchestrator] Failed to restart monitoring for ${siteIdentifier}/${monitorId} after failed removal:`,
-                        restartError
-                    );
-                }
-            }
-
-            return false;
-        } catch (error) {
-            /* v8 ignore next 2 */ logger.error(
-                `[UptimeOrchestrator] Failed to remove monitor ${siteIdentifier}/${monitorId}:`,
-                error
-            );
-            throw error;
-        }
-    }
-
-    /**
-     * Updates a site with the given changes.
-     *
-     * @param identifier - The site identifier.
-     * @param updates - Partial site data to update.
-     * @returns Promise resolving to the updated Site object.
-     */
-    public async updateSite(identifier: string, updates: Partial<Site>): Promise<Site> {
-        return this.siteManager.updateSite(identifier, updates);
-    }
-
-    // Monitoring Operations
-
-    /**
-     * Starts monitoring for all sites.
-     *
-     * @returns Promise that resolves when monitoring has started.
-     */
-    public async startMonitoring(): Promise<void> {
-        await this.monitorManager.startMonitoring();
-    }
-
-    /**
-     * Stops monitoring for all sites.
-     *
-     * @returns Promise that resolves when monitoring has stopped.
-     */
-    public async stopMonitoring(): Promise<void> {
-        await this.monitorManager.stopMonitoring();
-    }
-
-    /**
-     * Starts monitoring for a specific site and monitor.
-     *
-     * @param identifier - The site identifier.
-     * @param monitorId - Optional monitor identifier.
-     * @returns Promise resolving to true if started, false otherwise.
-     */
-    public async startMonitoringForSite(identifier: string, monitorId?: string): Promise<boolean> {
-        return this.monitorManager.startMonitoringForSite(identifier, monitorId);
-    }
-
-    /**
-     * Stops monitoring for a specific site and monitor.
-     *
-     * @param identifier - The site identifier.
-     * @param monitorId - Optional monitor identifier.
-     * @returns Promise resolving to true if stopped, false otherwise.
-     */
-    public async stopMonitoringForSite(identifier: string, monitorId?: string): Promise<boolean> {
-        return this.monitorManager.stopMonitoringForSite(identifier, monitorId);
-    }
-
-    /**
-     * Manually triggers a check for a site or monitor.
-     *
-     * @param identifier - The site identifier.
-     * @param monitorId - Optional monitor identifier.
-     * @returns Promise resolving to a StatusUpdate or null.
-     */
-    public async checkSiteManually(identifier: string, monitorId?: string): Promise<StatusUpdate | null> {
-        const result = await this.monitorManager.checkSiteManually(identifier, monitorId);
-        return result ?? null;
-    }
-
-    // Database Operations
-
-    /**
-     * Exports all application data as a JSON string.
-     *
-     * @returns Promise resolving to the exported data string.
-     */
-    public async exportData(): Promise<string> {
-        return this.databaseManager.exportData();
-    }
-
-    /**
-     * Imports application data from a JSON string.
-     *
-     * @param data - The JSON data string to import.
-     * @returns Promise resolving to true if import succeeded, false otherwise.
-     */
-    public async importData(data: string): Promise<boolean> {
-        return this.databaseManager.importData(data);
-    }
-
-    /**
-     * Downloads a backup of the SQLite database.
-     *
-     * @returns Promise resolving to an object containing the backup buffer and file name.
-     */
-    public async downloadBackup(): Promise<{ buffer: Buffer; fileName: string }> {
-        return this.databaseManager.downloadBackup();
-    }
-
-    /**
-     * Refreshes sites from the database and updates the cache.
-     *
-     * @returns Promise resolving to an array of refreshed Site objects.
-     */
-    public async refreshSites(): Promise<Site[]> {
-        return this.databaseManager.refreshSites();
-    }
-
-    // History Management
-
-    /**
-     * Sets the history retention limit for monitor data.
-     *
-     * @remarks
-     * This method delegates to the DatabaseManager to update the history limit
-     * in the database and prune existing history entries if necessary.
-     *
-     * The operation is performed within a database transaction to ensure
-     * consistency between the setting update and history pruning.
-     *
-     * @param limit - The new history limit (number of entries to retain per monitor).
-     *                Values less than or equal to 0 will disable history pruning.
-     * @returns Promise that resolves when the limit is set.
-     */
-    public async setHistoryLimit(limit: number): Promise<void> {
-        await this.databaseManager.setHistoryLimit(limit);
-    }
-
-    /**
-     * Gets the current history retention limit.
-     *
-     * @returns The current history limit.
-     */
-    public get historyLimit(): number {
-        return this.databaseManager.getHistoryLimit();
-    }
-
-    /**
-     * Gets the current history retention limit (method version for IPC compatibility).
-     *
-     * @returns The current history limit.
-     */
-    public getHistoryLimit(): number {
-        return this.databaseManager.getHistoryLimit();
-    }
-
-    // Status Information
-
-    /**
-     * Checks if monitoring is currently active.
-     *
-     * @returns True if monitoring is active, false otherwise.
-     */
-    public isMonitoringActive(): boolean {
-        return this.monitorManager.isMonitoringActive();
     }
 }

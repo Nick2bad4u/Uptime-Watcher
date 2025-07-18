@@ -3,12 +3,13 @@
  * Centralizes business logic for configuration decisions.
  */
 
+import type { ValidationResult } from "./validators/interfaces";
+
 import { DEFAULT_CHECK_INTERVAL } from "../constants";
 import { isDev } from "../electronUtils";
 import { Site } from "../types";
-import { SiteValidator } from "./validators/SiteValidator";
 import { MonitorValidator } from "./validators/MonitorValidator";
-import type { ValidationResult } from "./validators/interfaces";
+import { SiteValidator } from "./validators/SiteValidator";
 
 // Re-export ValidationResult for use in manager index
 export type { ValidationResult } from "./validators/interfaces";
@@ -25,8 +26,8 @@ export interface HistoryRetentionConfig {
  * Uses composition pattern with specialized validators to reduce complexity.
  */
 export class ConfigurationManager {
-    private readonly siteValidator: SiteValidator;
     private readonly monitorValidator: MonitorValidator;
+    private readonly siteValidator: SiteValidator;
 
     constructor() {
         this.siteValidator = new SiteValidator();
@@ -38,6 +39,46 @@ export class ConfigurationManager {
      */
     public getDefaultMonitorInterval(): number {
         return DEFAULT_CHECK_INTERVAL;
+    }
+
+    /**
+     * Get history retention configuration according to business rules.
+     * These limits align with the HISTORY_LIMIT_OPTIONS available in the UI.
+     */
+    public getHistoryRetentionRules(): HistoryRetentionConfig {
+        return {
+            defaultLimit: 500, // Matches DEFAULT_HISTORY_LIMIT constant
+            maxLimit: Number.MAX_SAFE_INTEGER, // Matches "Unlimited" option in HISTORY_LIMIT_OPTIONS
+            minLimit: 25, // Matches lowest option in HISTORY_LIMIT_OPTIONS
+        };
+    }
+
+    /**
+     * Business rule: Get the maximum allowed port number.
+     */
+    public getMaximumPortNumber(): number {
+        return 65_535;
+    }
+
+    /**
+     * Business rule: Get the minimum allowed check interval.
+     */
+    public getMinimumCheckInterval(): number {
+        return 1000; // 1 second minimum
+    }
+
+    /**
+     * Business rule: Get the minimum allowed timeout.
+     */
+    public getMinimumTimeout(): number {
+        return 1000; // 1 second minimum
+    }
+
+    /**
+     * Business rule: Determine if a monitor should receive a default interval.
+     */
+    public shouldApplyDefaultInterval(monitor: Site["monitors"][0]): boolean {
+        return this.monitorValidator.shouldApplyDefaultInterval(monitor);
     }
 
     /**
@@ -59,30 +100,11 @@ export class ConfigurationManager {
     }
 
     /**
-     * Business rule: Determine if a monitor should receive a default interval.
+     * Business rule: Determine if a site should be included in exports.
+     * Delegates to site validator for consistency.
      */
-    public shouldApplyDefaultInterval(monitor: Site["monitors"][0]): boolean {
-        return this.monitorValidator.shouldApplyDefaultInterval(monitor);
-    }
-
-    /**
-     * Get history retention configuration according to business rules.
-     * These limits align with the HISTORY_LIMIT_OPTIONS available in the UI.
-     */
-    public getHistoryRetentionRules(): HistoryRetentionConfig {
-        return {
-            defaultLimit: 500, // Matches DEFAULT_HISTORY_LIMIT constant
-            maxLimit: Number.MAX_SAFE_INTEGER, // Matches "Unlimited" option in HISTORY_LIMIT_OPTIONS
-            minLimit: 25, // Matches lowest option in HISTORY_LIMIT_OPTIONS
-        };
-    }
-
-    /**
-     * Validate site configuration according to business rules.
-     * Delegates to specialized site validator.
-     */
-    public validateSiteConfiguration(site: Site): ValidationResult {
-        return this.siteValidator.validateSiteConfiguration(site);
+    public shouldIncludeInExport(site: Site): boolean {
+        return this.siteValidator.shouldIncludeInExport(site);
     }
 
     /**
@@ -94,32 +116,11 @@ export class ConfigurationManager {
     }
 
     /**
-     * Business rule: Get the minimum allowed check interval.
+     * Validate site configuration according to business rules.
+     * Delegates to specialized site validator.
      */
-    public getMinimumCheckInterval(): number {
-        return 1000; // 1 second minimum
-    }
-
-    /**
-     * Business rule: Get the minimum allowed timeout.
-     */
-    public getMinimumTimeout(): number {
-        return 1000; // 1 second minimum
-    }
-
-    /**
-     * Business rule: Get the maximum allowed port number.
-     */
-    public getMaximumPortNumber(): number {
-        return 65_535;
-    }
-
-    /**
-     * Business rule: Determine if a site should be included in exports.
-     * Delegates to site validator for consistency.
-     */
-    public shouldIncludeInExport(site: Site): boolean {
-        return this.siteValidator.shouldIncludeInExport(site);
+    public validateSiteConfiguration(site: Site): ValidationResult {
+        return this.siteValidator.validateSiteConfiguration(site);
     }
 }
 

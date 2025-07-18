@@ -10,14 +10,14 @@ import { StatusHistory } from "../../types";
 
 /** Props for the HistoryChart component */
 interface HistoryChartProperties {
-    /** Array of historical status records to display */
-    history: StatusHistory[];
-    /** Title to display above the chart */
-    title: string;
-    /** Maximum number of items to display (default: 120) */
-    maxItems?: number;
     /** Additional CSS classes */
     className?: string;
+    /** Array of historical status records to display */
+    history: StatusHistory[];
+    /** Maximum number of items to display (default: 120) */
+    maxItems?: number;
+    /** Title to display above the chart */
+    title: string;
 }
 
 /**
@@ -62,8 +62,8 @@ export const HistoryChart = React.memo(function HistoryChart({
                 {displayedHistory.map((record) => (
                     <MiniChartBar
                         key={record.timestamp}
-                        status={record.status}
                         responseTime={record.responseTime}
+                        status={record.status}
                         timestamp={record.timestamp}
                     />
                 ))}

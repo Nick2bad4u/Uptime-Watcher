@@ -84,7 +84,10 @@ export const useSettingsStore = create<SettingsStore>()(
             updateSettings: (newSettings: Partial<AppSettings>) => {
                 logStoreAction("SettingsStore", "updateSettings", { newSettings });
                 set((state) => {
-                    const updatedSettings = { ...state.settings, ...newSettings };
+                    const updatedSettings = {
+                        ...state.settings,
+                        ...newSettings,
+                    };
                     return { settings: updatedSettings };
                 });
             },

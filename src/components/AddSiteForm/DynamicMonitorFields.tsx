@@ -3,29 +3,41 @@
  * Eliminates hard-coded form field rendering by loading field definitions from backend.
  */
 
-import { useState, useEffect } from "react";
-import { TextField } from "./FormFields";
-import { ThemedText } from "../../theme/components";
-import logger from "../../services/logger";
+import { useEffect, useState } from "react";
 
-import { getMonitorTypeConfig, type MonitorTypeConfig } from "../../utils/monitorTypeHelper";
 import type { MonitorFieldDefinition } from "../../../shared/types";
 
+import logger from "../../services/logger";
+import { ThemedText } from "../../theme/components";
+import { getMonitorTypeConfig, type MonitorTypeConfig } from "../../utils/monitorTypeHelper";
+import { TextField } from "./FormFields";
+
+interface DynamicFieldProps {
+    /** Whether the field is disabled */
+    readonly disabled?: boolean;
+    /** Field definition */
+    readonly field: MonitorFieldDefinition;
+    /** Change handler */
+    readonly onChange: (value: number | string) => void;
+    /** Current field value */
+    readonly value: number | string;
+}
+
 interface DynamicMonitorFieldsProps {
-    /** Selected monitor type */
-    readonly monitorType: string;
-    /** Current form values */
-    readonly values: Record<string, string | number>;
-    /** Change handlers for each field */
-    readonly onChange: Record<string, (value: string | number) => void>;
     /** Whether the form is in a loading state */
     readonly isLoading?: boolean;
+    /** Selected monitor type */
+    readonly monitorType: string;
+    /** Change handlers for each field */
+    readonly onChange: Record<string, (value: number | string) => void>;
+    /** Current form values */
+    readonly values: Record<string, number | string>;
 }
 
 /**
  * Renders form fields dynamically based on monitor type configuration loaded from backend.
  */
-export function DynamicMonitorFields({ monitorType, values, onChange, isLoading = false }: DynamicMonitorFieldsProps) {
+export function DynamicMonitorFields({ isLoading = false, monitorType, onChange, values }: DynamicMonitorFieldsProps) {
     const [config, setConfig] = useState<MonitorTypeConfig | undefined>();
     const [isLoadingConfig, setIsLoadingConfig] = useState(true);
     const [error, setError] = useState<string | undefined>();
@@ -78,54 +90,26 @@ export function DynamicMonitorFields({ monitorType, values, onChange, isLoading 
         <div className="flex flex-col gap-2">
             {config.fields.map((field) => (
                 <DynamicField
-                    key={field.name}
-                    field={field}
-                    value={values[field.name] ?? ""}
-                    onChange={onChange[field.name] ?? (() => {})}
                     disabled={isLoading}
+                    field={field}
+                    key={field.name}
+                    onChange={onChange[field.name] ?? (() => {})}
+                    value={values[field.name] ?? ""}
                 />
             ))}
         </div>
     );
 }
 
-interface DynamicFieldProps {
-    /** Field definition */
-    readonly field: MonitorFieldDefinition;
-    /** Current field value */
-    readonly value: string | number;
-    /** Change handler */
-    readonly onChange: (value: string | number) => void;
-    /** Whether the field is disabled */
-    readonly disabled?: boolean;
-}
-
 /**
  * Renders a single form field based on its definition.
  */
-function DynamicField({ field, value, onChange, disabled = false }: DynamicFieldProps) {
-    const handleChange = (newValue: string | number) => {
+function DynamicField({ disabled = false, field, onChange, value }: DynamicFieldProps) {
+    const handleChange = (newValue: number | string) => {
         onChange(newValue);
     };
 
     switch (field.type) {
-        case "text":
-        case "url": {
-            return (
-                <TextField
-                    disabled={disabled}
-                    {...(field.helpText && { helpText: field.helpText })}
-                    id={field.name}
-                    label={field.label}
-                    onChange={(val: string) => handleChange(val)}
-                    {...(field.placeholder && { placeholder: field.placeholder })}
-                    required={field.required}
-                    type={field.type}
-                    value={String(value)}
-                />
-            );
-        }
-
         case "number": {
             return (
                 <TextField
@@ -139,6 +123,23 @@ function DynamicField({ field, value, onChange, disabled = false }: DynamicField
                     {...(field.placeholder && { placeholder: field.placeholder })}
                     required={field.required}
                     type="number"
+                    value={String(value)}
+                />
+            );
+        }
+        case "text":
+
+        case "url": {
+            return (
+                <TextField
+                    disabled={disabled}
+                    {...(field.helpText && { helpText: field.helpText })}
+                    id={field.name}
+                    label={field.label}
+                    onChange={(val: string) => handleChange(val)}
+                    {...(field.placeholder && { placeholder: field.placeholder })}
+                    required={field.required}
+                    type={field.type}
                     value={String(value)}
                 />
             );

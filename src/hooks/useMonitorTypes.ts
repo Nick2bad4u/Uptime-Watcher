@@ -3,16 +3,17 @@
  * Provides async loading with caching and error handling.
  */
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+
 import { getMonitorTypeOptions } from "../utils/monitorTypeHelper";
 
 interface UseMonitorTypesResult {
-    /** Monitor type options for form select fields */
-    options: { label: string; value: string }[];
-    /** Whether monitor types are currently loading */
-    isLoading: boolean;
     /** Error message if loading failed */
     error: string | undefined;
+    /** Whether monitor types are currently loading */
+    isLoading: boolean;
+    /** Monitor type options for form select fields */
+    options: { label: string; value: string }[];
     /** Refresh monitor types from backend */
     refresh: () => Promise<void>;
 }
@@ -56,9 +57,9 @@ export function useMonitorTypes(): UseMonitorTypesResult {
     }, []);
 
     return {
-        options,
-        isLoading,
         error,
+        isLoading,
+        options,
         refresh,
     };
 }

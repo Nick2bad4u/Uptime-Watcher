@@ -6,7 +6,7 @@
  * Includes data synchronization and SQLite backup functionality.
  */
 
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { HISTORY_LIMIT_OPTIONS, UI_DELAYS } from "../../constants";
 import logger from "../../services/logger";
@@ -14,12 +14,12 @@ import { useErrorStore } from "../../stores/error/useErrorStore";
 import { useSettingsStore } from "../../stores/settings/useSettingsStore";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import {
-    ThemedBox,
-    ThemedText,
-    ThemedButton,
     StatusIndicator,
-    ThemedSelect,
+    ThemedBox,
+    ThemedButton,
     ThemedCheckbox,
+    ThemedSelect,
+    ThemedText,
 } from "../../theme/components";
 import { ThemeName } from "../../theme/types";
 import { useTheme } from "../../theme/useTheme";
@@ -75,12 +75,12 @@ export function Settings({ onClose }: Readonly<SettingsProperties>) {
 
     // Only allow keys that are part of AppSettings
     const allowedKeys = new Set<keyof typeof settings>([
-        "notifications",
         "autoStart",
-        "minimizeToTray",
-        "theme",
-        "soundAlerts",
         "historyLimit",
+        "minimizeToTray",
+        "notifications",
+        "soundAlerts",
+        "theme",
     ]);
 
     const handleSettingChange = (key: keyof typeof settings, value: unknown) => {
@@ -162,14 +162,14 @@ export function Settings({ onClose }: Readonly<SettingsProperties>) {
 
     return (
         <div className="modal-overlay">
-            <ThemedBox surface="overlay" padding="md" rounded="lg" shadow="xl" className="modal-container">
+            <ThemedBox className="modal-container" padding="md" rounded="lg" shadow="xl" surface="overlay">
                 {/* Header */}
-                <ThemedBox surface="elevated" padding="lg" rounded="none" border className="border-b">
+                <ThemedBox border className="border-b" padding="lg" rounded="none" surface="elevated">
                     <div className="flex items-center justify-between">
                         <ThemedText size="xl" weight="semibold">
                             ⚙️ Settings
                         </ThemedText>
-                        <ThemedButton variant="secondary" size="sm" onClick={onClose} className="hover-opacity">
+                        <ThemedButton className="hover-opacity" onClick={onClose} size="sm" variant="secondary">
                             ✕
                         </ThemedButton>
                     </div>
@@ -178,24 +178,24 @@ export function Settings({ onClose }: Readonly<SettingsProperties>) {
                 {/* Error Display */}
                 {lastError && (
                     <ThemedBox
-                        surface="base"
-                        padding="md"
                         className={`error-alert ${isDark ? "dark" : ""}`}
+                        padding="md"
                         rounded="md"
+                        surface="base"
                     >
                         <div className="flex items-center justify-between">
                             <ThemedText
-                                variant="primary"
-                                size="sm"
                                 className={`error-alert__text ${isDark ? "dark" : ""}`}
+                                size="sm"
+                                variant="primary"
                             >
                                 ⚠️ {lastError}
                             </ThemedText>
                             <ThemedButton
-                                variant="secondary"
-                                size="xs"
-                                onClick={clearError}
                                 className={`error-alert__close ${isDark ? "dark" : ""}`}
+                                onClick={clearError}
+                                size="xs"
+                                variant="secondary"
                             >
                                 ✕
                             </ThemedButton>
@@ -204,32 +204,32 @@ export function Settings({ onClose }: Readonly<SettingsProperties>) {
                 )}
                 {/* Sync Success Display */}
                 {syncSuccess && !lastError && (
-                    <ThemedBox surface="base" padding="md" className="success-alert" rounded="md">
-                        <ThemedText variant="success" size="sm">
+                    <ThemedBox className="success-alert" padding="md" rounded="md" surface="base">
+                        <ThemedText size="sm" variant="success">
                             ✅ Data synced from database.
                         </ThemedText>
                     </ThemedBox>
                 )}
 
                 {/* Content */}
-                <ThemedBox surface="base" padding="lg" className="space-y-6">
+                <ThemedBox className="space-y-6" padding="lg" surface="base">
                     {/* Monitoring Settings */}
                     <section>
-                        <ThemedText size="lg" weight="medium" className="mb-4">
+                        <ThemedText className="mb-4" size="lg" weight="medium">
                             🔍 Monitoring
                         </ThemedText>
                         <div className="space-y-4">
                             <div>
-                                <ThemedText size="sm" weight="medium" variant="secondary" className="block mb-2">
+                                <ThemedText className="block mb-2" size="sm" variant="secondary" weight="medium">
                                     History Limit
                                 </ThemedText>
                                 <ThemedSelect
-                                    value={settings.historyLimit}
+                                    aria-label="Maximum number of history records to keep per site"
+                                    disabled={isLoading}
                                     onChange={(event) => {
                                         void handleHistoryLimitChange(Number(event.target.value));
                                     }}
-                                    disabled={isLoading}
-                                    aria-label="Maximum number of history records to keep per site"
+                                    value={settings.historyLimit}
                                 >
                                     {HISTORY_LIMIT_OPTIONS.map((option) => (
                                         <option key={option.value} value={option.value}>
@@ -237,7 +237,7 @@ export function Settings({ onClose }: Readonly<SettingsProperties>) {
                                         </option>
                                     ))}
                                 </ThemedSelect>
-                                <ThemedText size="xs" variant="secondary" className="mt-1">
+                                <ThemedText className="mt-1" size="xs" variant="secondary">
                                     Maximum number of check results to store per site
                                 </ThemedText>
                             </div>
@@ -246,41 +246,41 @@ export function Settings({ onClose }: Readonly<SettingsProperties>) {
 
                     {/* Notification Settings */}
                     <section>
-                        <ThemedText size="lg" weight="medium" className="mb-4">
+                        <ThemedText className="mb-4" size="lg" weight="medium">
                             🔔 Notifications
                         </ThemedText>
                         <div className="space-y-4">
                             <div className="setting-item">
                                 <div className="setting-info">
-                                    <ThemedText size="sm" weight="medium" className="setting-title">
+                                    <ThemedText className="setting-title" size="sm" weight="medium">
                                         Desktop Notifications
                                     </ThemedText>
-                                    <ThemedText size="xs" variant="tertiary" className="setting-description">
+                                    <ThemedText className="setting-description" size="xs" variant="tertiary">
                                         Show notifications when sites go up or down
                                     </ThemedText>
                                 </div>
                                 <ThemedCheckbox
-                                    checked={settings.notifications}
-                                    onChange={(event) => handleSettingChange("notifications", event.target.checked)}
-                                    disabled={isLoading}
                                     aria-label="Enable desktop notifications"
+                                    checked={settings.notifications}
+                                    disabled={isLoading}
+                                    onChange={(event) => handleSettingChange("notifications", event.target.checked)}
                                 />
                             </div>
 
                             <div className="setting-item">
                                 <div className="setting-info">
-                                    <ThemedText size="sm" weight="medium" className="setting-title">
+                                    <ThemedText className="setting-title" size="sm" weight="medium">
                                         Sound Alerts
                                     </ThemedText>
-                                    <ThemedText size="xs" variant="tertiary" className="setting-description">
+                                    <ThemedText className="setting-description" size="xs" variant="tertiary">
                                         Play sound when status changes occur
                                     </ThemedText>
                                 </div>
                                 <ThemedCheckbox
-                                    checked={settings.soundAlerts}
-                                    onChange={(event) => handleSettingChange("soundAlerts", event.target.checked)}
-                                    disabled={isLoading}
                                     aria-label="Enable sound alerts"
+                                    checked={settings.soundAlerts}
+                                    disabled={isLoading}
+                                    onChange={(event) => handleSettingChange("soundAlerts", event.target.checked)}
                                 />
                             </div>
                         </div>
@@ -288,19 +288,19 @@ export function Settings({ onClose }: Readonly<SettingsProperties>) {
 
                     {/* Application Settings */}
                     <section>
-                        <ThemedText size="lg" weight="medium" className="mb-4">
+                        <ThemedText className="mb-4" size="lg" weight="medium">
                             🖥️ Application
                         </ThemedText>
                         <div className="space-y-4">
                             <div>
-                                <ThemedText size="sm" weight="medium" variant="secondary" className="block mb-2">
+                                <ThemedText className="block mb-2" size="sm" variant="secondary" weight="medium">
                                     Theme
                                 </ThemedText>
                                 <ThemedSelect
-                                    value={settings.theme}
-                                    onChange={(event) => handleThemeChange(event.target.value)}
-                                    disabled={isLoading}
                                     aria-label="Select application theme"
+                                    disabled={isLoading}
+                                    onChange={(event) => handleThemeChange(event.target.value)}
+                                    value={settings.theme}
                                 >
                                     {availableThemes.map((theme) => (
                                         <option key={theme} value={theme}>
@@ -312,43 +312,43 @@ export function Settings({ onClose }: Readonly<SettingsProperties>) {
                                     <ThemedText size="xs" variant="tertiary">
                                         Current theme preview:
                                     </ThemedText>
-                                    <StatusIndicator status="up" size="sm" />
-                                    <StatusIndicator status="down" size="sm" />
-                                    <StatusIndicator status="pending" size="sm" />
+                                    <StatusIndicator size="sm" status="up" />
+                                    <StatusIndicator size="sm" status="down" />
+                                    <StatusIndicator size="sm" status="pending" />
                                 </div>
                             </div>
 
                             <div className="setting-item">
                                 <div className="setting-info">
-                                    <ThemedText size="sm" weight="medium" className="setting-title">
+                                    <ThemedText className="setting-title" size="sm" weight="medium">
                                         Auto-start with System
                                     </ThemedText>
-                                    <ThemedText size="xs" variant="tertiary" className="setting-description">
+                                    <ThemedText className="setting-description" size="xs" variant="tertiary">
                                         Launch Uptime Watcher when your computer starts
                                     </ThemedText>
                                 </div>
                                 <ThemedCheckbox
-                                    checked={settings.autoStart}
-                                    onChange={(event) => handleSettingChange("autoStart", event.target.checked)}
-                                    disabled={isLoading}
                                     aria-label="Enable auto-start with system"
+                                    checked={settings.autoStart}
+                                    disabled={isLoading}
+                                    onChange={(event) => handleSettingChange("autoStart", event.target.checked)}
                                 />
                             </div>
 
                             <div className="setting-item">
                                 <div className="setting-info">
-                                    <ThemedText size="sm" weight="medium" className="setting-title">
+                                    <ThemedText className="setting-title" size="sm" weight="medium">
                                         Minimize to System Tray
                                     </ThemedText>
-                                    <ThemedText size="xs" variant="tertiary" className="setting-description">
+                                    <ThemedText className="setting-description" size="xs" variant="tertiary">
                                         Keep app running in system tray when window is closed
                                     </ThemedText>
                                 </div>
                                 <ThemedCheckbox
-                                    checked={settings.minimizeToTray}
-                                    onChange={(event) => handleSettingChange("minimizeToTray", event.target.checked)}
-                                    disabled={isLoading}
                                     aria-label="Enable minimize to system tray"
+                                    checked={settings.minimizeToTray}
+                                    disabled={isLoading}
+                                    onChange={(event) => handleSettingChange("minimizeToTray", event.target.checked)}
                                 />
                             </div>
                         </div>
@@ -356,41 +356,41 @@ export function Settings({ onClose }: Readonly<SettingsProperties>) {
 
                     {/* Data Management */}
                     <section>
-                        <ThemedText size="lg" weight="medium" className="mb-4">
+                        <ThemedText className="mb-4" size="lg" weight="medium">
                             📂 Data Management
                         </ThemedText>
                         <div className="space-y-4">
                             {/* Sync Data Button */}
                             <ThemedButton
-                                variant="secondary"
-                                size="sm"
+                                className="w-full"
+                                disabled={isLoading}
+                                loading={showButtonLoading}
                                 onClick={() => {
                                     void handleSyncNow();
                                 }}
-                                loading={showButtonLoading}
-                                disabled={isLoading}
-                                className="w-full"
+                                size="sm"
+                                variant="secondary"
                             >
                                 🔄 Sync Data
                             </ThemedButton>
 
                             {/* SQLite direct download */}
                             <div>
-                                <ThemedText size="sm" weight="medium" variant="secondary" className="block mb-2">
+                                <ThemedText className="block mb-2" size="sm" variant="secondary" weight="medium">
                                     Export SQLite Database
                                 </ThemedText>
                                 <ThemedButton
-                                    variant="primary"
-                                    size="sm"
+                                    disabled={isLoading || showButtonLoading}
+                                    loading={showButtonLoading}
                                     onClick={() => {
                                         void handleDownloadSQLite();
                                     }}
-                                    disabled={isLoading || showButtonLoading}
-                                    loading={showButtonLoading}
+                                    size="sm"
+                                    variant="primary"
                                 >
                                     Download SQLite Backup
                                 </ThemedButton>
-                                <ThemedText size="xs" variant="tertiary" className="block mt-1">
+                                <ThemedText className="block mt-1" size="xs" variant="tertiary">
                                     Download a direct backup of the raw SQLite database file for advanced backup or
                                     migration.
                                 </ThemedText>
@@ -400,22 +400,22 @@ export function Settings({ onClose }: Readonly<SettingsProperties>) {
                 </ThemedBox>
 
                 {/* Footer */}
-                <ThemedBox surface="elevated" padding="lg" rounded="none" border className="border-t">
+                <ThemedBox border className="border-t" padding="lg" rounded="none" surface="elevated">
                     <div className="flex items-center justify-between">
                         <ThemedButton
-                            variant="error"
-                            size="sm"
-                            onClick={handleReset}
                             disabled={isLoading}
                             loading={showButtonLoading}
+                            onClick={handleReset}
+                            size="sm"
+                            variant="error"
                         >
                             Reset to Defaults
                         </ThemedButton>
                         <div className="flex items-center space-x-3">
-                            <ThemedButton variant="secondary" size="sm" onClick={onClose} disabled={isLoading}>
+                            <ThemedButton disabled={isLoading} onClick={onClose} size="sm" variant="secondary">
                                 Cancel
                             </ThemedButton>
-                            <ThemedButton variant="primary" size="sm" onClick={onClose} loading={showButtonLoading}>
+                            <ThemedButton loading={showButtonLoading} onClick={onClose} size="sm" variant="primary">
                                 Save Changes
                             </ThemedButton>
                         </div>

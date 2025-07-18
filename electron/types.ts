@@ -8,28 +8,6 @@
  */
 
 /**
- * Core monitor types supported by the system.
- *
- * @remarks
- * This union type represents the monitor types that the system supports.
- * Additional types can be registered at runtime through the MonitorTypeRegistry,
- * but they must extend this base set for TypeScript compatibility.
- */
-export type MonitorType = "http" | "port";
-
-/**
- * Allowed status values for a monitor's current operational state.
- * @public
- */
-export type MonitorStatus = "up" | "down" | "pending" | "paused";
-
-/**
- * Allowed status values for historical check results.
- * @public
- */
-export type StatusHistoryType = "up" | "down";
-
-/**
  * Monitor configuration and state interface.
  *
  * @remarks
@@ -72,51 +50,12 @@ export type StatusHistoryType = "up" | "down";
  */
 export interface Monitor {
     /**
-     * Unique identifier for this monitor.
+     * Check interval in milliseconds (per-monitor override).
      *
      * @remarks
-     * Usually a UUID or database-generated ID converted to string.
-     * Used for referencing this monitor across the application.
+     * Defaults to global check interval if not specified.
      */
-    id: string;
-
-    /**
-     * Type of monitoring performed by this monitor.
-     *
-     * @see {@link MonitorType}
-     */
-    type: MonitorType;
-
-    /**
-     * Current operational status of the monitor.
-     *
-     * @remarks
-     * Includes `"pending"` state for monitors that haven't been checked yet.
-     *
-     * @see {@link MonitorStatus}
-     */
-    status: MonitorStatus;
-
-    /**
-     * Last recorded response time in milliseconds.
-     *
-     * @remarks
-     * - For successful checks: actual response time
-     * - For failed checks: may be timeout value or -1
-     * - For unchecked monitors: typically -1 as sentinel value
-     *
-     * @defaultValue -1
-     */
-    responseTime: number;
-
-    /**
-     * Timestamp of the most recent check attempt.
-     *
-     * @remarks
-     * `undefined` for monitors that have never been checked.
-     * Uses JavaScript Date object for consistent time handling.
-     */
-    lastChecked?: Date;
+    checkInterval: number;
 
     /**
      * Array of historical check results.
@@ -131,28 +70,6 @@ export interface Monitor {
     history: StatusHistory[];
 
     /**
-     * Whether this monitor is actively being checked.
-     *
-     * @remarks
-     * When `false`, the monitor exists but checks are not performed.
-     * Useful for temporarily disabling monitors without deleting them.
-     *
-     * @defaultValue true
-     */
-    monitoring: boolean;
-
-    /**
-     * URL endpoint for HTTP monitors.
-     *
-     * @remarks
-     * Required for `type: "http"` monitors. Must be `undefined` for other types.
-     * Should include protocol (http:// or https://).
-     *
-     * @example "https://api.example.com/health"
-     */
-    url?: string;
-
-    /**
      * Hostname or IP address for port monitors.
      *
      * @remarks
@@ -164,6 +81,35 @@ export interface Monitor {
     host?: string;
 
     /**
+     * Unique identifier for this monitor.
+     *
+     * @remarks
+     * Usually a UUID or database-generated ID converted to string.
+     * Used for referencing this monitor across the application.
+     */
+    id: string;
+
+    /**
+     * Timestamp of the most recent check attempt.
+     *
+     * @remarks
+     * `undefined` for monitors that have never been checked.
+     * Uses JavaScript Date object for consistent time handling.
+     */
+    lastChecked?: Date;
+
+    /**
+     * Whether this monitor is actively being checked.
+     *
+     * @remarks
+     * When `false`, the monitor exists but checks are not performed.
+     * Useful for temporarily disabling monitors without deleting them.
+     *
+     * @defaultValue true
+     */
+    monitoring: boolean;
+
+    /**
      * Port number for port monitors.
      *
      * @remarks
@@ -173,20 +119,19 @@ export interface Monitor {
      * @example 80 | 443 | 3000
      */
     port?: number;
+
     /**
-     * Check interval in milliseconds (per-monitor override).
+     * Last recorded response time in milliseconds.
      *
      * @remarks
-     * Defaults to global check interval if not specified.
-     */
-    checkInterval: number;
-    /**
-     * Request timeout in milliseconds for this monitor.
+     * - For successful checks: actual response time
+     * - For failed checks: may be timeout value or -1
+     * - For unchecked monitors: typically -1 as sentinel value
      *
-     * @remarks
-     * Defaults to global timeout value if not specified.
+     * @defaultValue -1
      */
-    timeout: number;
+    responseTime: number;
+
     /**
      * Number of retry attempts before marking as down for this monitor.
      *
@@ -196,7 +141,56 @@ export interface Monitor {
      * - Any positive integer specifies the number of additional attempts after the initial failure.
      */
     retryAttempts: number;
+
+    /**
+     * Current operational status of the monitor.
+     *
+     * @remarks
+     * Includes `"pending"` state for monitors that haven't been checked yet.
+     *
+     * @see {@link MonitorStatus}
+     */
+    status: MonitorStatus;
+    /**
+     * Request timeout in milliseconds for this monitor.
+     *
+     * @remarks
+     * Defaults to global timeout value if not specified.
+     */
+    timeout: number;
+    /**
+     * Type of monitoring performed by this monitor.
+     *
+     * @see {@link MonitorType}
+     */
+    type: MonitorType;
+    /**
+     * URL endpoint for HTTP monitors.
+     *
+     * @remarks
+     * Required for `type: "http"` monitors. Must be `undefined` for other types.
+     * Should include protocol (http:// or https://).
+     *
+     * @example "https://api.example.com/health"
+     */
+    url?: string;
 }
+
+/**
+ * Allowed status values for a monitor's current operational state.
+ * @public
+ */
+export type MonitorStatus = "down" | "paused" | "pending" | "up";
+
+/**
+ * Core monitor types supported by the system.
+ *
+ * @remarks
+ * This union type represents the monitor types that the system supports.
+ * Additional types can be registered at runtime through the MonitorTypeRegistry,
+ * but they must extend this base set for TypeScript compatibility.
+ */
+export type MonitorType = "http" | "port";
 
 /**
  * Site configuration containing multiple monitors.
@@ -215,12 +209,12 @@ export interface Site {
      */
     identifier: string;
     /**
-     * Display name for the site.
+     * Whether monitoring is active for this site.
      *
      * @remarks
-     * Defaults to "Unnamed Site" if not provided.
+     * Defaults to true for new sites.
      */
-    name: string;
+    monitoring: boolean;
     /**
      * Array of monitors associated with this site.
      *
@@ -229,12 +223,12 @@ export interface Site {
      */
     monitors: Monitor[];
     /**
-     * Whether monitoring is active for this site.
+     * Display name for the site.
      *
      * @remarks
-     * Defaults to true for new sites.
+     * Defaults to "Unnamed Site" if not provided.
      */
-    monitoring: boolean;
+    name: string;
 }
 
 /**
@@ -246,8 +240,10 @@ export interface Site {
  * `"pending"` is used in `Monitor.status` to indicate a monitor has not yet been checked, but is never stored in history.
  */
 export interface StatusHistory {
-    /** Timestamp when the check was performed */
-    timestamp: number;
+    /** Optional additional details about the check */
+    details?: string;
+    /** Response time in milliseconds */
+    responseTime: number;
     /**
      * Result status of the check.
      *
@@ -255,11 +251,15 @@ export interface StatusHistory {
      * Does not include `"pending"`; only actual check outcomes are recorded.
      */
     status: StatusHistoryType;
-    /** Response time in milliseconds */
-    responseTime: number;
-    /** Optional additional details about the check */
-    details?: string;
+    /** Timestamp when the check was performed */
+    timestamp: number;
 }
+
+/**
+ * Allowed status values for historical check results.
+ * @public
+ */
+export type StatusHistoryType = "down" | "up";
 
 /**
  * Status update event payload.
@@ -271,10 +271,10 @@ export interface StatusHistory {
  * For other event types (such as initial load or manual refresh), `previousStatus` may be `undefined`.
  */
 export interface StatusUpdate {
-    site: Site;
     /**
      * The previous status of the monitor before this update.
      * Present only for status change events; otherwise, may be `undefined`.
      */
     previousStatus?: MonitorStatus;
+    site: Site;
 }

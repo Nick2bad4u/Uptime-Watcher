@@ -3,19 +3,26 @@
  * Handles all monitor-specific validation rules using registry-driven approach.
  */
 
+import {
+    getRegisteredMonitorTypes,
+    isValidMonitorType,
+    validateMonitorData,
+} from "../../services/monitoring/MonitorTypeRegistry";
 import { Site } from "../../types";
 import { ValidationResult } from "./interfaces";
-import {
-    validateMonitorData,
-    isValidMonitorType,
-    getRegisteredMonitorTypes,
-} from "../../services/monitoring/MonitorTypeRegistry";
 
 /**
  * Validates monitor configuration according to business rules.
  * Uses registry-driven validation with Zod schemas.
  */
 export class MonitorValidator {
+    /**
+     * Business rule: Determine if a monitor should receive a default interval.
+     */
+    public shouldApplyDefaultInterval(monitor: Site["monitors"][0]): boolean {
+        return monitor.checkInterval === 0;
+    }
+
     /**
      * Validate monitor configuration according to business rules.
      */
@@ -53,6 +60,19 @@ export class MonitorValidator {
     }
 
     /**
+     * Validate retry attempts configuration.
+     */
+    private validateRetryAttempts(monitor: Site["monitors"][0]): string[] {
+        const errors: string[] = [];
+
+        if (monitor.retryAttempts < 0) {
+            errors.push("Monitor retry attempts cannot be negative");
+        }
+
+        return errors;
+    }
+
+    /**
      * Validate timing constraints (intervals, timeouts).
      */
     private validateTimingConstraints(monitor: Site["monitors"][0]): string[] {
@@ -67,25 +87,5 @@ export class MonitorValidator {
         }
 
         return errors;
-    }
-
-    /**
-     * Validate retry attempts configuration.
-     */
-    private validateRetryAttempts(monitor: Site["monitors"][0]): string[] {
-        const errors: string[] = [];
-
-        if (monitor.retryAttempts < 0) {
-            errors.push("Monitor retry attempts cannot be negative");
-        }
-
-        return errors;
-    }
-
-    /**
-     * Business rule: Determine if a monitor should receive a default interval.
-     */
-    public shouldApplyDefaultInterval(monitor: Site["monitors"][0]): boolean {
-        return monitor.checkInterval === 0;
     }
 }

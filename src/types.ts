@@ -7,11 +7,11 @@
  * @packageDocumentation
  */
 
-// Re-export status types for better type safety
-export type { MonitorStatus, SiteStatus } from "./types/status";
-
 // Re-export MonitorType from electron types to avoid duplication
 export type { MonitorType } from "../electron/types";
+
+// Re-export status types for better type safety
+export type { MonitorStatus, SiteStatus } from "./types/status";
 import type { MonitorType } from "../electron/types";
 
 /**
@@ -58,32 +58,32 @@ import type { MonitorType } from "../electron/types";
  * ```
  */
 export interface Monitor {
-    /** Unique identifier for this monitor (UUID or database-generated ID) */
-    id: string;
-    /** Type of monitoring to perform */
-    type: MonitorType;
-    /** Current operational status of the monitor */
-    status: "up" | "down" | "pending" | "paused";
-    /** URL endpoint for HTTP monitors (required for type "http", undefined for others) */
-    url?: string;
+    /** Check interval in milliseconds for this specific monitor */
+    checkInterval: number;
+    /** Array of historical check results ordered chronologically */
+    history: StatusHistory[];
     /** Hostname or IP address for port monitors (required for type "port", undefined for others) */
     host?: string;
+    /** Unique identifier for this monitor (UUID or database-generated ID) */
+    id: string;
+    /** Timestamp of the most recent check attempt (undefined if never checked) */
+    lastChecked?: Date;
+    /** Whether this monitor is actively being checked */
+    monitoring: boolean;
     /** Port number for port monitors (required for type "port", undefined for others) */
     port?: number;
     /** Last recorded response time in milliseconds (-1 if check failed or not yet checked) */
     responseTime: number;
-    /** Timestamp of the most recent check attempt (undefined if never checked) */
-    lastChecked?: Date;
-    /** Array of historical check results ordered chronologically */
-    history: StatusHistory[];
-    /** Whether this monitor is actively being checked */
-    monitoring: boolean;
-    /** Check interval in milliseconds for this specific monitor */
-    checkInterval: number;
-    /** Request timeout in milliseconds for this monitor */
-    timeout: number;
     /** Number of retry attempts before marking as down for this monitor */
     retryAttempts: number;
+    /** Current operational status of the monitor */
+    status: "down" | "paused" | "pending" | "up";
+    /** Request timeout in milliseconds for this monitor */
+    timeout: number;
+    /** Type of monitoring to perform */
+    type: MonitorType;
+    /** URL endpoint for HTTP monitors (required for type "http", undefined for others) */
+    url?: string;
 }
 
 /**
@@ -123,12 +123,12 @@ export interface Monitor {
 export interface Site {
     /** Unique identifier for the site (UUID, used as the primary key) */
     identifier: string;
-    /** Human-readable display name for the site */
-    name: string;
-    /** Array of monitors associated with this site */
-    monitors: Monitor[];
     /** Whether monitoring is active for this site (affects all monitors) */
     monitoring: boolean;
+    /** Array of monitors associated with this site */
+    monitors: Monitor[];
+    /** Human-readable display name for the site */
+    name: string;
 }
 
 /**
@@ -143,14 +143,14 @@ export interface Site {
  * capture actual check outcomes, not transitional states.
  */
 export interface StatusHistory {
-    /** Unix timestamp (in milliseconds) when this status was recorded */
-    timestamp: number;
-    /** Status result at this point in time */
-    status: "up" | "down" | "paused";
-    /** Response time in milliseconds (-1 if check failed) */
-    responseTime: number;
     /** Optional diagnostic details about the check (error messages, HTTP status codes, etc.) */
     details?: string;
+    /** Response time in milliseconds (-1 if check failed) */
+    responseTime: number;
+    /** Status result at this point in time */
+    status: "down" | "paused" | "up";
+    /** Unix timestamp (in milliseconds) when this status was recorded */
+    timestamp: number;
 }
 
 /**
@@ -162,10 +162,10 @@ export interface StatusHistory {
  * real-time UI updates and status change notifications.
  */
 export interface StatusUpdate {
+    /** Previous status for change detection and transition logic */
+    previousStatus?: "down" | "paused" | "pending" | "up";
     /** Updated site data with current monitor statuses */
     site: Site;
-    /** Previous status for change detection and transition logic */
-    previousStatus?: "up" | "down" | "pending" | "paused";
 }
 
 /**
@@ -191,28 +191,28 @@ declare global {
              * Data management operations for import, export, and backup.
              */
             data: {
+                /** Download SQLite database backup as binary data */
+                downloadSQLiteBackup: () => Promise<{ buffer: ArrayBuffer; fileName: string }>;
                 /** Export all application data as JSON string */
                 exportData: () => Promise<string>;
                 /** Import application data from JSON string */
                 importData: (data: string) => Promise<boolean>;
-                /** Download SQLite database backup as binary data */
-                downloadSQLiteBackup: () => Promise<{ buffer: ArrayBuffer; fileName: string }>;
             };
 
             /**
              * Event management for real-time updates and communication.
              */
             events: {
+                /** Register callback for monitor down events */
+                onMonitorDown: (callback: (data: unknown) => void) => () => void;
+                /** Register callback for monitoring started events */
+                onMonitoringStarted: (callback: (data: { monitorId: string; siteId: string }) => void) => () => void;
+                /** Register callback for monitoring stopped events */
+                onMonitoringStopped: (callback: (data: { monitorId: string; siteId: string }) => void) => () => void;
                 /** Register callback for monitor status changes */
                 onMonitorStatusChanged: (callback: (update: StatusUpdate) => void) => () => void;
                 /** Register callback for monitor up events */
                 onMonitorUp: (callback: (data: unknown) => void) => () => void;
-                /** Register callback for monitor down events */
-                onMonitorDown: (callback: (data: unknown) => void) => () => void;
-                /** Register callback for monitoring started events */
-                onMonitoringStarted: (callback: (data: { siteId: string; monitorId: string }) => void) => () => void;
-                /** Register callback for monitoring stopped events */
-                onMonitoringStopped: (callback: (data: { siteId: string; monitorId: string }) => void) => () => void;
                 /** Register callback for test events (development/debugging) */
                 onTestEvent: (callback: (data: unknown) => void) => () => void;
                 /** Register callback for application update status events */
@@ -227,12 +227,49 @@ declare global {
             monitoring: {
                 /** Start monitoring for all configured sites */
                 startMonitoring: () => Promise<void>;
-                /** Stop monitoring for all sites */
-                stopMonitoring: () => Promise<void>;
                 /** Start monitoring for a specific site or monitor */
                 startMonitoringForSite: (siteId: string, monitorId?: string) => Promise<void>;
+                /** Stop monitoring for all sites */
+                stopMonitoring: () => Promise<void>;
                 /** Stop monitoring for a specific site or monitor */
                 stopMonitoringForSite: (siteId: string, monitorId?: string) => Promise<void>;
+            };
+
+            /**
+             * Monitor type registry and configuration operations.
+             */
+            monitorTypes: {
+                /** Format monitor detail using backend registry */
+                formatMonitorDetail: (type: string, details: string) => Promise<string>;
+                /** Format monitor title suffix using backend registry */
+                formatMonitorTitleSuffix: (type: string, monitor: Record<string, unknown>) => Promise<string>;
+                /** Get all available monitor type configurations */
+                getMonitorTypes: () => Promise<
+                    {
+                        description: string;
+                        displayName: string;
+                        fields: {
+                            helpText?: string;
+                            label: string;
+                            max?: number;
+                            min?: number;
+                            name: string;
+                            placeholder?: string;
+                            required: boolean;
+                            type: "number" | "text" | "url";
+                        }[];
+                        type: string;
+                        version: string;
+                    }[]
+                >;
+                /** Validate monitor data using backend registry */
+                validateMonitorData: (
+                    type: string,
+                    data: unknown
+                ) => Promise<{
+                    errors: string[];
+                    success: boolean;
+                }>;
             };
 
             /**
@@ -249,90 +286,53 @@ declare global {
              * Site and monitor CRUD operations.
              */
             sites: {
-                /** Retrieve all configured sites with their monitors */
-                getSites: () => Promise<Site[]>;
                 /** Add a new site with its monitors */
                 addSite: (site: Site) => Promise<Site>;
+                /** Perform immediate manual check for a specific monitor */
+                checkSiteNow: (siteId: string, monitorId: string) => Promise<void>;
+                /** Retrieve all configured sites with their monitors */
+                getSites: () => Promise<Site[]>;
+                /** Remove a specific monitor from a site */
+                removeMonitor: (siteIdentifier: string, monitorId: string) => Promise<void>;
                 /** Remove a site and all its monitors */
                 removeSite: (id: string) => Promise<void>;
                 /** Update site configuration */
                 updateSite: (id: string, updates: Partial<Site>) => Promise<void>;
-                /** Perform immediate manual check for a specific monitor */
-                checkSiteNow: (siteId: string, monitorId: string) => Promise<void>;
-                /** Remove a specific monitor from a site */
-                removeMonitor: (siteIdentifier: string, monitorId: string) => Promise<void>;
-            };
-
-            /**
-             * Monitor type registry and configuration operations.
-             */
-            monitorTypes: {
-                /** Get all available monitor type configurations */
-                getMonitorTypes: () => Promise<
-                    {
-                        type: string;
-                        displayName: string;
-                        description: string;
-                        version: string;
-                        fields: {
-                            name: string;
-                            label: string;
-                            type: "text" | "number" | "url";
-                            required: boolean;
-                            placeholder?: string;
-                            helpText?: string;
-                            min?: number;
-                            max?: number;
-                        }[];
-                    }[]
-                >;
-                /** Format monitor detail using backend registry */
-                formatMonitorDetail: (type: string, details: string) => Promise<string>;
-                /** Format monitor title suffix using backend registry */
-                formatMonitorTitleSuffix: (type: string, monitor: Record<string, unknown>) => Promise<string>;
-                /** Validate monitor data using backend registry */
-                validateMonitorData: (
-                    type: string,
-                    data: unknown
-                ) => Promise<{
-                    success: boolean;
-                    errors: string[];
-                }>;
             };
 
             /**
              * State synchronization operations for real-time updates.
              */
             stateSync: {
+                /** Get current synchronization status */
+                getSyncStatus: () => Promise<{
+                    lastSync: null | number;
+                    siteCount: number;
+                    success: boolean;
+                    synchronized: boolean;
+                }>;
                 /** Register listener for state synchronization events */
                 onStateSyncEvent: (
                     callback: (event: {
-                        action: "update" | "delete" | "bulk-sync";
+                        action: "bulk-sync" | "delete" | "update";
                         siteIdentifier?: string;
                         sites?: Site[];
-                        timestamp?: number;
                         source?: "cache" | "database" | "frontend";
+                        timestamp?: number;
                     }) => void
                 ) => () => void;
                 /** Manually request full state synchronization */
-                requestFullSync: () => Promise<{ success: boolean; siteCount: number }>;
-                /** Get current synchronization status */
-                getSyncStatus: () => Promise<{
-                    success: boolean;
-                    synchronized: boolean;
-                    lastSync: number | null;
-                    siteCount: number;
-                }>;
+                requestFullSync: () => Promise<{ siteCount: number; success: boolean }>;
             };
 
             /**
              * System-level operations and utilities.
              */
             system: {
-                /** Quit application and install pending update */
-                quitAndInstall: () => void;
                 /** Open URL in external browser */
                 openExternal: (url: string) => void;
+                /** Quit application and install pending update */
+                quitAndInstall: () => void;
             };
         };
     }

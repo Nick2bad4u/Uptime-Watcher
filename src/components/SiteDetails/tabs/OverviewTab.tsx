@@ -5,21 +5,21 @@
 
 import { FaListOl } from "react-icons/fa";
 import { FiTrash2 } from "react-icons/fi";
-import { MdAccessTime, MdBolt, MdSpeed, MdOutlineFactCheck } from "react-icons/md";
+import { MdAccessTime, MdBolt, MdOutlineFactCheck, MdSpeed } from "react-icons/md";
 
 import { CHECK_INTERVALS, TIMEOUT_CONSTRAINTS } from "../../../constants";
 import logger from "../../../services/logger";
 import {
-    ThemedText,
-    ThemedButton,
     StatusIndicator,
-    ThemedCard,
     ThemedBadge,
+    ThemedButton,
+    ThemedCard,
+    ThemedInput,
     ThemedProgress,
     ThemedSelect,
-    ThemedInput,
+    ThemedText,
 } from "../../../theme/components";
-import { useTheme, useAvailabilityColors } from "../../../theme/useTheme";
+import { useAvailabilityColors, useTheme } from "../../../theme/useTheme";
 import { Monitor } from "../../../types";
 import { getIntervalLabel } from "../../../utils/time";
 
@@ -102,7 +102,7 @@ export const OverviewTab = ({
     const { currentTheme } = useTheme();
 
     // Map availability variant to progress/badge variant
-    const mapAvailabilityToBadgeVariant = (availability: number): "success" | "warning" | "error" => {
+    const mapAvailabilityToBadgeVariant = (availability: number): "error" | "success" | "warning" => {
         const variant = getAvailabilityVariant(availability);
         return variant === "danger" ? "error" : variant;
     };
@@ -141,55 +141,55 @@ export const OverviewTab = ({
     const iconColors = getIconColors();
 
     return (
-        <div data-testid="overview-tab" className="space-y-6">
+        <div className="space-y-6" data-testid="overview-tab">
             {/* Key Metrics Grid */}
             <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                 <ThemedCard
+                    className="flex flex-col items-center text-center"
+                    hoverable
                     icon={<MdOutlineFactCheck />}
                     iconColor={iconColors.status}
                     title="Status"
-                    hoverable
-                    className="flex flex-col items-center text-center"
                 >
-                    <StatusIndicator status={selectedMonitor.status} size="lg" showText />
+                    <StatusIndicator showText size="lg" status={selectedMonitor.status} />
                 </ThemedCard>
 
                 <ThemedCard
+                    className="flex flex-col items-center text-center"
+                    hoverable
                     icon={<MdAccessTime />}
                     iconColor={iconColors.uptime}
                     title="Uptime"
-                    hoverable
-                    className="flex flex-col items-center text-center"
                 >
                     <ThemedProgress
+                        className="flex flex-col items-center"
+                        showLabel
                         value={uptimeValue}
                         variant={progressVariant}
-                        showLabel
-                        className="flex flex-col items-center"
                     />
-                    <ThemedBadge variant={progressVariant} size="sm" className="mt-2">
+                    <ThemedBadge className="mt-2" size="sm" variant={progressVariant}>
                         {uptime}%
                     </ThemedBadge>
                 </ThemedCard>
 
                 <ThemedCard
+                    className="flex flex-col items-center text-center"
+                    hoverable
                     icon={<MdSpeed />}
                     iconColor={iconColors.response}
                     title="Response Time"
-                    hoverable
-                    className="flex flex-col items-center text-center"
                 >
-                    <ThemedText size="xl" weight="bold" style={{ color: getResponseTimeColor(avgResponseTime) }}>
+                    <ThemedText size="xl" style={{ color: getResponseTimeColor(avgResponseTime) }} weight="bold">
                         {formatResponseTime(avgResponseTime)}
                     </ThemedText>
                 </ThemedCard>
 
                 <ThemedCard
+                    className="flex flex-col items-center text-center"
+                    hoverable
                     icon={<FaListOl />}
                     iconColor={iconColors.checks}
                     title="Total Checks"
-                    hoverable
-                    className="flex flex-col items-center text-center"
                 >
                     <ThemedText size="xl" weight="bold">
                         {totalChecks}
@@ -206,10 +206,10 @@ export const OverviewTab = ({
                                 Fastest Response
                             </ThemedText>
                             <ThemedBadge
-                                variant="success"
+                                className="ml-4"
                                 icon={<MdBolt />}
                                 iconColor={iconColors.fastest}
-                                className="ml-4"
+                                variant="success"
                             >
                                 {formatResponseTime(fastestResponse)}
                             </ThemedBadge>
@@ -219,10 +219,10 @@ export const OverviewTab = ({
                                 Slowest Response
                             </ThemedText>
                             <ThemedBadge
-                                variant="warning"
+                                className="ml-4"
                                 icon={<MdAccessTime />}
                                 iconColor={iconColors.slowest}
-                                className="ml-4"
+                                variant="warning"
                             >
                                 {formatResponseTime(slowestResponse)}
                             </ThemedBadge>
@@ -239,7 +239,7 @@ export const OverviewTab = ({
                         <ThemedText size="sm" variant="secondary">
                             Interval:
                         </ThemedText>
-                        <ThemedSelect value={localCheckInterval} onChange={handleIntervalChange} disabled={isLoading}>
+                        <ThemedSelect disabled={isLoading} onChange={handleIntervalChange} value={localCheckInterval}>
                             {CHECK_INTERVALS.map((interval) => {
                                 const value = typeof interval === "number" ? interval : interval.value;
                                 const label = getIntervalLabel(interval);
@@ -252,10 +252,10 @@ export const OverviewTab = ({
                         </ThemedSelect>
                         {intervalChanged && (
                             <ThemedButton
-                                variant="primary"
-                                size="xs"
-                                onClick={() => void handleSaveInterval()}
                                 disabled={isLoading}
+                                onClick={() => void handleSaveInterval()}
+                                size="xs"
+                                variant="primary"
                             >
                                 Save
                             </ThemedButton>
@@ -268,25 +268,25 @@ export const OverviewTab = ({
                             Timeout:
                         </ThemedText>
                         <ThemedInput
-                            type="number"
-                            min={TIMEOUT_CONSTRAINTS.MIN}
-                            max={TIMEOUT_CONSTRAINTS.MAX}
-                            step={TIMEOUT_CONSTRAINTS.STEP}
-                            value={localTimeout}
-                            onChange={handleTimeoutChange}
-                            disabled={isLoading}
                             aria-label="Monitor timeout in seconds"
                             className="w-16 text-xs"
+                            disabled={isLoading}
+                            max={TIMEOUT_CONSTRAINTS.MAX}
+                            min={TIMEOUT_CONSTRAINTS.MIN}
+                            onChange={handleTimeoutChange}
+                            step={TIMEOUT_CONSTRAINTS.STEP}
+                            type="number"
+                            value={localTimeout}
                         />
                         <ThemedText size="xs" variant="secondary">
                             s
                         </ThemedText>
                         {timeoutChanged && (
                             <ThemedButton
-                                variant="primary"
-                                size="xs"
-                                onClick={() => void handleSaveTimeout()}
                                 disabled={isLoading}
+                                onClick={() => void handleSaveTimeout()}
+                                size="xs"
+                                variant="primary"
                             >
                                 Save
                             </ThemedButton>
@@ -295,12 +295,12 @@ export const OverviewTab = ({
 
                     {/* Check Now Button */}
                     <ThemedButton
-                        variant="secondary"
-                        size="sm"
-                        onClick={onCheckNow}
                         aria-label="Check Now"
-                        disabled={isLoading}
                         className="flex items-center gap-1"
+                        disabled={isLoading}
+                        onClick={onCheckNow}
+                        size="sm"
+                        variant="secondary"
                     >
                         <span>🔄</span>
                         <span className="text-xs">Check Now</span>
@@ -308,8 +308,8 @@ export const OverviewTab = ({
 
                     {/* Remove Monitor Button */}
                     <ThemedButton
-                        variant="error"
-                        size="sm"
+                        disabled={isLoading}
+                        icon={<FiTrash2 />}
                         onClick={() => {
                             logger.user.action("Monitor removal button clicked from overview tab", {
                                 monitorId: selectedMonitor.id,
@@ -318,8 +318,8 @@ export const OverviewTab = ({
                             });
                             void handleRemoveMonitor();
                         }}
-                        disabled={isLoading}
-                        icon={<FiTrash2 />}
+                        size="sm"
+                        variant="error"
                     >
                         Remove Monitor
                     </ThemedButton>

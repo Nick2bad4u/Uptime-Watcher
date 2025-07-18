@@ -3,7 +3,7 @@
  * Provides monitor state, statistics, and selection handling for sites.
  */
 
-import { useMemo, useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { Monitor, Site, StatusHistory } from "../../types";
@@ -12,29 +12,29 @@ import { Monitor, Site, StatusHistory } from "../../types";
  * Result interface for the useSiteMonitor hook.
  */
 interface SiteMonitorResult {
-    // Current state
-    /** Most up-to-date site data from store */
-    latestSite: Site;
-    /** ID of the currently selected monitor */
-    selectedMonitorId: string;
-    /** Currently selected monitor object */
-    monitor: Monitor | undefined;
-    /** Current status of the selected monitor */
-    status: "up" | "down" | "pending" | "paused";
-    /** Response time of the selected monitor */
-    responseTime: number | undefined;
-    /** Whether the selected monitor is actively being monitored */
-    isMonitoring: boolean;
-
-    // Helpers
-    /** Array of all monitor IDs for this site */
-    monitorIds: string[];
     /** Filtered history for the selected monitor */
     filteredHistory: StatusHistory[];
-
     // Actions
     /** Handler for monitor selection changes */
     handleMonitorIdChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    /** Whether the selected monitor is actively being monitored */
+    isMonitoring: boolean;
+    // Current state
+    /** Most up-to-date site data from store */
+    latestSite: Site;
+    /** Currently selected monitor object */
+    monitor: Monitor | undefined;
+    // Helpers
+    /** Array of all monitor IDs for this site */
+    monitorIds: string[];
+
+    /** Response time of the selected monitor */
+    responseTime: number | undefined;
+    /** ID of the currently selected monitor */
+    selectedMonitorId: string;
+
+    /** Current status of the selected monitor */
+    status: "down" | "paused" | "pending" | "up";
 }
 
 /**

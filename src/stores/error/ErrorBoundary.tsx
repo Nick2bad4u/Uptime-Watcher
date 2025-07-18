@@ -7,16 +7,16 @@ import React from "react";
 
 import { DefaultErrorFallback } from "../../components/error/DefaultErrorFallback";
 
-interface ErrorBoundaryState {
-    hasError: boolean;
-    error?: Error;
-    errorInfo?: React.ErrorInfo;
-}
-
 interface ErrorBoundaryProperties {
     children: React.ReactNode;
     fallback?: React.ComponentType<{ error?: Error; retry: () => void }>;
     onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
+}
+
+interface ErrorBoundaryState {
+    error?: Error;
+    errorInfo?: React.ErrorInfo;
+    hasError: boolean;
 }
 
 /**
@@ -53,6 +53,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProperties, Erro
         this.setState({ hasError: false });
     };
 
+    // eslint-disable-next-line sonarjs/function-return-type -- React component can return different node types
     override render() {
         if (this.state.hasError) {
             const FallbackComponent = this.props.fallback ?? DefaultErrorFallback;

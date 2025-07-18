@@ -35,9 +35,8 @@ import { isDev } from "../../electronUtils";
 import { Site } from "../../types";
 import { logger } from "../../utils/logger";
 import { withRetry } from "../../utils/retry";
-
 import { IMonitorService, MonitorCheckResult, MonitorConfig } from "./types";
-import { handleCheckError, createErrorResult } from "./utils/errorHandling";
+import { createErrorResult, handleCheckError } from "./utils/errorHandling";
 import { createHttpClient } from "./utils/httpClient";
 import { determineMonitorStatus } from "./utils/httpStatusUtils";
 
@@ -49,12 +48,10 @@ import { determineMonitorStatus } from "./utils/httpStatusUtils";
  * through request interceptors and response metadata.
  */
 declare module "axios" {
-    /** Extended request config with timing metadata */
-    interface InternalAxiosRequestConfig {
-        metadata?: {
-            /** High-precision start time for response time calculation */
-            startTime: number;
-        };
+    /** Extended error with response time (if available) */
+    interface AxiosError {
+        /** Response time at point of failure (if available) */
+        responseTime?: number;
     }
 
     /** Extended response with calculated response time */
@@ -63,10 +60,12 @@ declare module "axios" {
         responseTime?: number;
     }
 
-    /** Extended error with response time (if available) */
-    interface AxiosError {
-        /** Response time at point of failure (if available) */
-        responseTime?: number;
+    /** Extended request config with timing metadata */
+    interface InternalAxiosRequestConfig {
+        metadata?: {
+            /** High-precision start time for response time calculation */
+            startTime: number;
+        };
     }
 }
 
@@ -83,10 +82,10 @@ declare module "axios" {
  * interpretation suitable for uptime monitoring scenarios.
  */
 export class HttpMonitor implements IMonitorService {
-    /** Configuration for HTTP monitoring behavior */
-    private config: MonitorConfig;
     /** Axios instance with custom interceptors and configuration */
     private axiosInstance: AxiosInstance;
+    /** Configuration for HTTP monitoring behavior */
+    private config: MonitorConfig;
 
     /**
      * Initialize the HTTP monitor with optional configuration.
@@ -113,13 +112,6 @@ export class HttpMonitor implements IMonitorService {
     }
 
     /**
-     * Get the monitor type this service handles.
-     */
-    public getType(): Site["monitors"][0]["type"] {
-        return "http";
-    }
-
-    /**
      * Perform an HTTP health check on the given monitor.
      * Uses per-monitor retry attempts and timeout configuration.
      */
@@ -136,6 +128,44 @@ export class HttpMonitor implements IMonitorService {
         const retryAttempts = monitor.retryAttempts;
 
         return this.performHealthCheckWithRetry(monitor.url, timeout, retryAttempts);
+    }
+
+    /**
+     * Get the current configuration.
+     */
+    public getConfig(): MonitorConfig {
+        return { ...this.config };
+    }
+
+    /**
+     * Get the monitor type this service handles.
+     */
+    public getType(): Site["monitors"][0]["type"] {
+        return "http";
+    }
+
+    /**
+     * Update the configuration for this monitor.
+     * Recreates the Axios instance with updated configuration.
+     */
+    public updateConfig(config: Partial<MonitorConfig>): void {
+        this.config = {
+            ...this.config,
+            ...config,
+        };
+
+        // Recreate Axios instance with updated configuration
+        this.axiosInstance = createHttpClient(this.config);
+    }
+
+    /**
+     * Make the actual HTTP request using Axios.
+     */
+    private async makeRequest(url: string, timeout: number) {
+        // Use our configured Axios instance with specific timeout override
+        return this.axiosInstance.get(url, {
+            timeout,
+        });
     }
 
     /**
@@ -188,33 +218,5 @@ export class HttpMonitor implements IMonitorService {
             status,
             ...(status === "down" && { error: `HTTP ${response.status}` }),
         };
-    }
-
-    /**
-     * Make the actual HTTP request using Axios.
-     */
-    private async makeRequest(url: string, timeout: number) {
-        // Use our configured Axios instance with specific timeout override
-        return this.axiosInstance.get(url, {
-            timeout,
-        });
-    }
-
-    /**
-     * Update the configuration for this monitor.
-     * Recreates the Axios instance with updated configuration.
-     */
-    public updateConfig(config: Partial<MonitorConfig>): void {
-        this.config = { ...this.config, ...config };
-
-        // Recreate Axios instance with updated configuration
-        this.axiosInstance = createHttpClient(this.config);
-    }
-
-    /**
-     * Get the current configuration.
-     */
-    public getConfig(): MonitorConfig {
-        return { ...this.config };
     }
 }

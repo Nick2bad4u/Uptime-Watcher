@@ -102,7 +102,7 @@ This change positions the project for:
 
 **Recommendation**: Continue with direct import pattern and avoid re-introducing barrel exports.
 
-***
+---
 
 ## Legacy Information (For Reference)
 

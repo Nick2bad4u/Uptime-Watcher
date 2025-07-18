@@ -9,8 +9,8 @@
  * @packageDocumentation
  */
 
-import { BaseStore } from "./types";
 import logger from "../services/logger";
+import { BaseStore } from "./types";
 
 /**
  * Creates a base store slice with common error handling functionality.
@@ -35,13 +35,31 @@ import logger from "../services/logger";
  */
 export const createBaseStore = <T extends BaseStore>(
     set: (partial: Partial<T>) => void
-): Pick<T, "lastError" | "isLoading" | "setError" | "setLoading" | "clearError"> => ({
+): Pick<T, "clearError" | "isLoading" | "lastError" | "setError" | "setLoading"> => ({
     clearError: () => set({ lastError: undefined } as Partial<T>),
     isLoading: false,
     lastError: undefined,
     setError: (error: string | undefined) => set({ lastError: error } as Partial<T>),
     setLoading: (loading: boolean) => set({ isLoading: loading } as Partial<T>),
 });
+
+/**
+ * Handles operation errors by updating store state.
+ */
+function handleOperationError(error: unknown, store: Pick<BaseStore, "clearError" | "setError" | "setLoading">): void {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+
+    try {
+        store.setError(errorMessage);
+    } catch (storeError) {
+        // If setError fails, log both errors
+        logger.error(
+            "Failed to set error state",
+            storeError instanceof Error ? storeError : new Error(String(storeError))
+        );
+        logger.error("Original operation error", error instanceof Error ? error : new Error(String(error)));
+    }
+}
 
 /**
  * Wrapper for async operations with standardized error handling.
@@ -83,27 +101,9 @@ function safeStoreOperation(operation: () => void, operationName: string): void 
     }
 }
 
-/**
- * Handles operation errors by updating store state.
- */
-function handleOperationError(error: unknown, store: Pick<BaseStore, "setError" | "setLoading" | "clearError">): void {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-
-    try {
-        store.setError(errorMessage);
-    } catch (storeError) {
-        // If setError fails, log both errors
-        logger.error(
-            "Failed to set error state",
-            storeError instanceof Error ? storeError : new Error(String(storeError))
-        );
-        logger.error("Original operation error", error instanceof Error ? error : new Error(String(error)));
-    }
-}
-
 export const withErrorHandling = async <T>(
     operation: () => Promise<T>,
-    store: Pick<BaseStore, "setError" | "setLoading" | "clearError">
+    store: Pick<BaseStore, "clearError" | "setError" | "setLoading">
 ): Promise<T> => {
     // Clear any previous error state before starting
     safeStoreOperation(() => store.clearError(), "clear error state");

@@ -5,19 +5,19 @@
 
 import React, { useMemo } from "react";
 
-import { Monitor, StatusHistory } from "../../../types";
-import { HistoryChart } from "../../common/HistoryChart";
 import { useMonitorTypes } from "../../../hooks/useMonitorTypes";
+import { Monitor, StatusHistory } from "../../../types";
 import { formatTitleSuffix } from "../../../utils/monitorTitleFormatters";
+import { HistoryChart } from "../../common/HistoryChart";
 
 /**
  * Props for the SiteCardHistory component.
  */
 interface SiteCardHistoryProperties {
-    /** Monitor data containing type and configuration */
-    monitor: Monitor | undefined;
     /** Filtered history data for visualization */
     filteredHistory: StatusHistory[];
+    /** Monitor data containing type and configuration */
+    monitor: Monitor | undefined;
 }
 
 /**
@@ -64,7 +64,7 @@ export const SiteCardHistory = React.memo(
             return `${displayName} History${suffix}`;
         }, [monitor, options]);
 
-        return <HistoryChart history={filteredHistory} title={historyTitle} maxItems={60} />;
+        return <HistoryChart history={filteredHistory} maxItems={60} title={historyTitle} />;
     },
     (previousProperties, nextProperties) => {
         // Custom comparison function to ensure proper re-renders

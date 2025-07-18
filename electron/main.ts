@@ -7,13 +7,12 @@
  * contextIsolation is enabled and uses preload scripts for secure logging.
  */
 
+import { app } from "electron";
+import { installExtension, REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtools-installer";
 import log from "electron-log/main";
 
-import { app } from "electron";
 import { ApplicationService } from "./services/application/ApplicationService";
 import { logger } from "./utils/logger";
-
-import { installExtension, REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtools-installer";
 
 // Configure electron-log for main process
 // Enable preload mode for reliable logging in Electron's main process, especially with context isolation enabled
@@ -83,6 +82,7 @@ class Main {
  * This ensures the instance persists for the application's lifetime,
  * preventing premature garbage collection and maintaining lifecycle handlers.
  */
+// eslint-disable-next-line sonarjs/constructor-for-side-effects -- Main instance needed for lifecycle management
 new Main();
 
 void app.whenReady().then(async () => {

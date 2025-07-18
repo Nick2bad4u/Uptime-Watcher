@@ -26,6 +26,58 @@ export class ApplicationService {
     }
 
     /**
+     * Cleanup resources before application shutdown.
+     */
+    public async cleanup(): Promise<void> {
+        logger.info("[ApplicationService] Starting cleanup"); /* v8 ignore next */
+
+        try {
+            const services = this.serviceContainer.getInitializedServices();
+            for (const { name } of services) {
+                logger.debug(`[ApplicationService] Cleaning up ${name}`); /* v8 ignore next */
+            }
+
+            // Cleanup IPC handlers
+            const ipcService = this.serviceContainer.getIpcService();
+            if ("cleanup" in ipcService && typeof ipcService.cleanup === "function") {
+                ipcService.cleanup();
+            }
+
+            // Stop monitoring
+            const orchestrator = this.serviceContainer.getUptimeOrchestrator();
+            await orchestrator.stopMonitoring();
+
+            // Close windows
+            this.serviceContainer.getWindowService().closeMainWindow();
+
+            logger.info("[ApplicationService] Cleanup completed"); /* v8 ignore next */
+        } catch (error) {
+            logger.error("[ApplicationService] Error during cleanup", error); /* v8 ignore next */
+        }
+    }
+
+    /**
+     * Handle app ready event.
+     */
+    private async onAppReady(): Promise<void> {
+        logger.info("[ApplicationService] App ready - initializing services"); /* v8 ignore next */
+
+        // Initialize all services through the container
+        await this.serviceContainer.initialize();
+
+        // Create main window
+        this.serviceContainer.getWindowService().createMainWindow();
+
+        // Setup event handlers
+        this.setupUptimeEventHandlers();
+
+        // Setup auto-updater
+        this.setupAutoUpdater();
+
+        logger.info("[ApplicationService] All services initialized successfully"); /* v8 ignore next */
+    }
+
+    /**
      * Setup application-level event handlers.
      */
     private setupApplication(): void {
@@ -51,27 +103,6 @@ export class ApplicationService {
                 windowService.createMainWindow();
             }
         });
-    }
-
-    /**
-     * Handle app ready event.
-     */
-    private async onAppReady(): Promise<void> {
-        logger.info("[ApplicationService] App ready - initializing services"); /* v8 ignore next */
-
-        // Initialize all services through the container
-        await this.serviceContainer.initialize();
-
-        // Create main window
-        this.serviceContainer.getWindowService().createMainWindow();
-
-        // Setup event handlers
-        this.setupUptimeEventHandlers();
-
-        // Setup auto-updater
-        this.setupAutoUpdater();
-
-        logger.info("[ApplicationService] All services initialized successfully"); /* v8 ignore next */
     }
 
     /**
@@ -103,10 +134,10 @@ export class ApplicationService {
         orchestrator.onTyped("monitor:status-changed", (data) => {
             try {
                 /* v8 ignore next */ logger.debug("[ApplicationService] Forwarding monitor status change to renderer", {
-                    siteId: data.siteId,
                     monitorId: data.monitor.id,
-                    previousStatus: data.previousStatus,
                     newStatus: data.newStatus,
+                    previousStatus: data.previousStatus,
+                    siteId: data.siteId,
                 });
 
                 // Send status update to renderer
@@ -123,8 +154,8 @@ export class ApplicationService {
         orchestrator.onTyped("monitor:up", (data) => {
             try {
                 logger.info("[ApplicationService] Monitor recovered - forwarding to renderer", {
-                    siteId: data.siteId,
                     monitorId: data.monitor.id,
+                    siteId: data.siteId,
                     siteName: data.site.name,
                 });
 
@@ -142,8 +173,8 @@ export class ApplicationService {
         orchestrator.onTyped("monitor:down", (data) => {
             try {
                 logger.warn("[ApplicationService] Monitor failure detected - forwarding to renderer", {
-                    siteId: data.siteId,
                     monitorId: data.monitor.id,
+                    siteId: data.siteId,
                     siteName: data.site.name,
                 });
 
@@ -192,36 +223,5 @@ export class ApplicationService {
                 );
             }
         });
-    }
-
-    /**
-     * Cleanup resources before application shutdown.
-     */
-    public async cleanup(): Promise<void> {
-        logger.info("[ApplicationService] Starting cleanup"); /* v8 ignore next */
-
-        try {
-            const services = this.serviceContainer.getInitializedServices();
-            for (const { name } of services) {
-                logger.debug(`[ApplicationService] Cleaning up ${name}`); /* v8 ignore next */
-            }
-
-            // Cleanup IPC handlers
-            const ipcService = this.serviceContainer.getIpcService();
-            if ("cleanup" in ipcService && typeof ipcService.cleanup === "function") {
-                ipcService.cleanup();
-            }
-
-            // Stop monitoring
-            const orchestrator = this.serviceContainer.getUptimeOrchestrator();
-            await orchestrator.stopMonitoring();
-
-            // Close windows
-            this.serviceContainer.getWindowService().closeMainWindow();
-
-            logger.info("[ApplicationService] Cleanup completed"); /* v8 ignore next */
-        } catch (error) {
-            logger.error("[ApplicationService] Error during cleanup", error); /* v8 ignore next */
-        }
     }
 }

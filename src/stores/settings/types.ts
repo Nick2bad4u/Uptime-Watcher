@@ -10,20 +10,20 @@ import type { AppSettings } from "../shared/types";
  * Manages user preferences and application configuration.
  */
 export interface SettingsStore {
-    // State
-    /** Application settings */
-    settings: AppSettings;
-
-    // Actions
-    /** Update multiple settings at once */
-    updateSettings: (settings: Partial<AppSettings>) => void;
+    /** Initialize settings from backend */
+    initializeSettings: () => Promise<{ message: string; settingsLoaded: boolean; success: boolean }>;
 
     /** Reset all settings to default values */
     resetSettings: () => void;
 
+    // State
+    /** Application settings */
+    settings: AppSettings;
+
     /** Update history limit with backend sync */
     updateHistoryLimitValue: (limit: number) => Promise<void>;
 
-    /** Initialize settings from backend */
-    initializeSettings: () => Promise<{ success: boolean; settingsLoaded: boolean; message: string }>;
+    // Actions
+    /** Update multiple settings at once */
+    updateSettings: (settings: Partial<AppSettings>) => void;
 }

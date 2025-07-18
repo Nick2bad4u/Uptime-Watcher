@@ -4,71 +4,72 @@
  * Supports real-time validation, automatic UUID generation, and error handling.
  */
 
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
+
+import type { MonitorType } from "../../types";
 
 import { DEFAULT_CHECK_INTERVAL } from "../../constants";
-import { generateUuid } from "../../utils/data/generateUuid";
-import type { MonitorType } from "../../types";
 import { useMonitorFields } from "../../hooks/useMonitorFields";
-
-/** Form operation mode */
-export type FormMode = "new" | "existing";
-
-/**
- * Form state interface containing all form field values and UI state.
- */
-export interface AddSiteFormState {
-    /** URL field for HTTP monitors */
-    url: string;
-    /** Host/IP field for port monitors */
-    host: string;
-    /** Port number field for port monitors */
-    port: string;
-    /** Display name for the site */
-    name: string;
-    /** Selected monitor type */
-    monitorType: MonitorType;
-    /** Check interval in milliseconds */
-    checkInterval: number;
-    /** Generated site identifier */
-    siteId: string;
-    /** Form operation mode (new site vs existing site) */
-    addMode: FormMode;
-    /** Selected existing site ID when adding to existing */
-    selectedExistingSite: string;
-    /** Current form validation error */
-    formError: string | undefined;
-}
+import { generateUuid } from "../../utils/data/generateUuid";
 
 /**
  * Form actions interface containing all form manipulation functions.
  */
 export interface AddSiteFormActions {
-    /** Set URL field value */
-    setUrl: (value: string) => void;
-    /** Set host field value */
-    setHost: (value: string) => void;
-    /** Set port field value */
-    setPort: (value: string) => void;
-    /** Set site name field value */
-    setName: (value: string) => void;
-    /** Set monitor type */
-    setMonitorType: (value: MonitorType) => void;
-    /** Set check interval */
-    setCheckInterval: (value: number) => void;
-    /** Set site ID */
-    setSiteId: (value: string) => void;
-    /** Set form operation mode */
-    setAddMode: (value: FormMode) => void;
-    /** Set selected existing site */
-    setSelectedExistingSite: (value: string) => void;
-    /** Set form error message */
-    setFormError: (error: string | undefined) => void;
-    /** Reset form to initial state */
-    resetForm: () => void;
     /** Whether the form is currently valid */
     isFormValid: () => boolean;
+    /** Reset form to initial state */
+    resetForm: () => void;
+    /** Set form operation mode */
+    setAddMode: (value: FormMode) => void;
+    /** Set check interval */
+    setCheckInterval: (value: number) => void;
+    /** Set form error message */
+    setFormError: (error: string | undefined) => void;
+    /** Set host field value */
+    setHost: (value: string) => void;
+    /** Set monitor type */
+    setMonitorType: (value: MonitorType) => void;
+    /** Set site name field value */
+    setName: (value: string) => void;
+    /** Set port field value */
+    setPort: (value: string) => void;
+    /** Set selected existing site */
+    setSelectedExistingSite: (value: string) => void;
+    /** Set site ID */
+    setSiteId: (value: string) => void;
+    /** Set URL field value */
+    setUrl: (value: string) => void;
 }
+
+/**
+ * Form state interface containing all form field values and UI state.
+ */
+export interface AddSiteFormState {
+    /** Form operation mode (new site vs existing site) */
+    addMode: FormMode;
+    /** Check interval in milliseconds */
+    checkInterval: number;
+    /** Current form validation error */
+    formError: string | undefined;
+    /** Host/IP field for port monitors */
+    host: string;
+    /** Selected monitor type */
+    monitorType: MonitorType;
+    /** Display name for the site */
+    name: string;
+    /** Port number field for port monitors */
+    port: string;
+    /** Selected existing site ID when adding to existing */
+    selectedExistingSite: string;
+    /** Generated site identifier */
+    siteId: string;
+    /** URL field for HTTP monitors */
+    url: string;
+}
+
+/** Form operation mode */
+export type FormMode = "existing" | "new";
 
 /**
  * Hook for managing add site form state and operations.
@@ -79,7 +80,7 @@ export interface AddSiteFormActions {
  *
  * @returns Combined form state and action handlers
  */
-export function useAddSiteForm(): AddSiteFormState & AddSiteFormActions {
+export function useAddSiteForm(): AddSiteFormActions & AddSiteFormState {
     // Form field state
     const [url, setUrl] = useState("");
     const [host, setHost] = useState("");
@@ -146,16 +147,16 @@ export function useAddSiteForm(): AddSiteFormState & AddSiteFormActions {
             if (field.required) {
                 let value = "";
                 switch (field.name) {
-                    case "url": {
-                        value = url;
-                        break;
-                    }
                     case "host": {
                         value = host;
                         break;
                     }
                     case "port": {
                         value = port;
+                        break;
+                    }
+                    case "url": {
+                        value = url;
                         break;
                     }
                     default: {

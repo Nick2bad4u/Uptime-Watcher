@@ -34,17 +34,18 @@
  * @packageDocumentation
  */
 
+import type { Logger } from "../interfaces";
+
 import { UptimeEvents } from "../../events/eventTypes";
 import { TypedEventBus } from "../../events/TypedEventBus";
+import { DatabaseService } from "../../services/database/DatabaseService";
 import { HistoryRepository } from "../../services/database/HistoryRepository";
 import { MonitorRepository } from "../../services/database/MonitorRepository";
 import { SiteRepository } from "../../services/database/SiteRepository";
-import { DatabaseService } from "../../services/database/DatabaseService";
 import { MonitorFactory } from "../../services/monitoring/MonitorFactory";
 import { Site, StatusHistory, StatusUpdate } from "../../types";
 import { SiteCacheInterface } from "../database/interfaces";
 import { withDatabaseOperation } from "../operationalHooks";
-import type { Logger } from "../interfaces";
 
 /**
  * Configuration object for monitor checking functions.
@@ -56,22 +57,22 @@ import type { Logger } from "../interfaces";
  * and comprehensive testing support.
  */
 export interface MonitorCheckConfig {
+    /** Database service for transaction management */
+    databaseService: DatabaseService;
+    /** Typed event bus for high-level event communication */
+    eventEmitter: TypedEventBus<UptimeEvents>;
+    /** Maximum number of history entries to retain per monitor */
+    historyLimit: number;
+    /** Logger instance for operation tracking */
+    logger: Logger;
     /** Repository services for database operations */
     repositories: {
         history: HistoryRepository;
         monitor: MonitorRepository;
         site: SiteRepository;
     };
-    /** Database service for transaction management */
-    databaseService: DatabaseService;
     /** In-memory site cache for performance optimization */
     sites: SiteCacheInterface;
-    /** Typed event bus for high-level event communication */
-    eventEmitter: TypedEventBus<UptimeEvents>;
-    /** Logger instance for operation tracking */
-    logger: Logger;
-    /** Maximum number of history entries to retain per monitor */
-    historyLimit: number;
 }
 
 /**

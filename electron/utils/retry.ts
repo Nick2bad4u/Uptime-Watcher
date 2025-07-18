@@ -6,6 +6,22 @@
 import { dbLogger } from "./logger";
 
 /**
+ * Database-specific retry wrapper with optimized settings for database operations.
+ *
+ * @param operation - Database operation to retry
+ * @param operationName - Name of the operation for logging
+ * @param maxRetries - Maximum number of retry attempts (default: 5)
+ * @returns Promise that resolves with the operation result
+ */
+export async function withDbRetry<T>(operation: () => Promise<T>, operationName: string, maxRetries = 5): Promise<T> {
+    return withRetry(operation, {
+        delayMs: 300,
+        maxRetries,
+        operationName,
+    });
+}
+
+/**
  * Generic retry utility with configurable parameters
  *
  * @param operation - The async operation to retry
@@ -47,20 +63,4 @@ export async function withRetry<T>(
     const lastError = errors.at(-1);
     dbLogger.error(`Persistent failure after ${maxRetries} retries for ${operationName}`, lastError);
     throw lastError;
-}
-
-/**
- * Database-specific retry wrapper with optimized settings for database operations.
- *
- * @param operation - Database operation to retry
- * @param operationName - Name of the operation for logging
- * @param maxRetries - Maximum number of retry attempts (default: 5)
- * @returns Promise that resolves with the operation result
- */
-export async function withDbRetry<T>(operation: () => Promise<T>, operationName: string, maxRetries = 5): Promise<T> {
-    return withRetry(operation, {
-        delayMs: 300,
-        maxRetries,
-        operationName,
-    });
 }

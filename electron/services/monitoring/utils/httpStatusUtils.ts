@@ -12,7 +12,7 @@
  * - 5xx = server error (down)
  * - 3xx redirects or other unexpected codes (up - site is responding)
  */
-export function determineMonitorStatus(httpStatus: number): "up" | "down" {
+export function determineMonitorStatus(httpStatus: number): "down" | "up" {
     // 2xx = success (up)
     if (httpStatus >= 200 && httpStatus < 300) {
         return "up";

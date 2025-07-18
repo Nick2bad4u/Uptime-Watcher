@@ -1,15 +1,29 @@
-/* eslint-disable @typescript-eslint/no-extraneous-class */
-
 import { Site } from "../../types";
+import { getMonitorServiceFactory, getRegisteredMonitorTypes, isValidMonitorType } from "./MonitorTypeRegistry";
 import { IMonitorService, MonitorConfig } from "./types";
-import { isValidMonitorType, getRegisteredMonitorTypes, getMonitorServiceFactory } from "./MonitorTypeRegistry";
 
 /**
  * Factory for creating and managing monitor services.
  * Uses the registry's service factories for complete automation.
  */
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class -- Factory pattern with static methods is intentional
 export class MonitorFactory {
     private static readonly serviceInstances = new Map<string, IMonitorService>();
+
+    /**
+     * Clear all cached service instances.
+     * Useful for testing or configuration reloading.
+     */
+    public static clearCache(): void {
+        this.serviceInstances.clear();
+    }
+
+    /**
+     * Get all available monitor types from registry.
+     */
+    public static getAvailableTypes(): string[] {
+        return getRegisteredMonitorTypes();
+    }
 
     /**
      * Get the appropriate monitor service for the given monitor type.
@@ -56,20 +70,5 @@ export class MonitorFactory {
         for (const instance of this.serviceInstances.values()) {
             instance.updateConfig(config);
         }
-    }
-
-    /**
-     * Get all available monitor types from registry.
-     */
-    public static getAvailableTypes(): string[] {
-        return getRegisteredMonitorTypes();
-    }
-
-    /**
-     * Clear all cached service instances.
-     * Useful for testing or configuration reloading.
-     */
-    public static clearCache(): void {
-        this.serviceInstances.clear();
     }
 }

@@ -14,7 +14,7 @@ interface SiteCardStatusProperties {
     /** ID of the currently selected monitor */
     selectedMonitorId: string;
     /** Current status of the monitor */
-    status: "up" | "down" | "pending" | "paused";
+    status: "down" | "paused" | "pending" | "up";
 }
 
 /**
@@ -41,5 +41,5 @@ export const SiteCardStatus = React.memo(function SiteCardStatus({
     selectedMonitorId,
     status,
 }: SiteCardStatusProperties) {
-    return <StatusBadge label={`${selectedMonitorId.toUpperCase()} Status`} status={status} size="sm" />;
+    return <StatusBadge label={`${selectedMonitorId.toUpperCase()} Status`} size="sm" status={status} />;
 });

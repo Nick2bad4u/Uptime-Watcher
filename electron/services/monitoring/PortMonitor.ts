@@ -65,19 +65,6 @@ export class PortMonitor implements IMonitorService {
     }
 
     /**
-     * Get the monitor type this service handles.
-     *
-     * @returns The monitor type identifier
-     *
-     * @remarks
-     * Returns the string identifier used to route monitoring requests
-     * to this service implementation.
-     */
-    public getType(): Site["monitors"][0]["type"] {
-        return "port";
-    }
-
-    /**
      * Perform a port connectivity check on the given monitor.
      *
      * @param monitor - Monitor configuration containing host and port details
@@ -115,20 +102,6 @@ export class PortMonitor implements IMonitorService {
     }
 
     /**
-     * Update the configuration for this monitor.
-     *
-     * @param config - Partial configuration to merge with existing settings
-     *
-     * @remarks
-     * Updates the monitor's configuration by merging the provided partial
-     * configuration with existing settings. This allows dynamic reconfiguration
-     * of timeout values and other parameters without recreating the monitor instance.
-     */
-    public updateConfig(config: Partial<MonitorConfig>): void {
-        this.config = { ...this.config, ...config };
-    }
-
-    /**
      * Get the current configuration.
      *
      * @returns A copy of the current monitor configuration
@@ -140,5 +113,35 @@ export class PortMonitor implements IMonitorService {
      */
     public getConfig(): MonitorConfig {
         return { ...this.config };
+    }
+
+    /**
+     * Get the monitor type this service handles.
+     *
+     * @returns The monitor type identifier
+     *
+     * @remarks
+     * Returns the string identifier used to route monitoring requests
+     * to this service implementation.
+     */
+    public getType(): Site["monitors"][0]["type"] {
+        return "port";
+    }
+
+    /**
+     * Update the configuration for this monitor.
+     *
+     * @param config - Partial configuration to merge with existing settings
+     *
+     * @remarks
+     * Updates the monitor's configuration by merging the provided partial
+     * configuration with existing settings. This allows dynamic reconfiguration
+     * of timeout values and other parameters without recreating the monitor instance.
+     */
+    public updateConfig(config: Partial<MonitorConfig>): void {
+        this.config = {
+            ...this.config,
+            ...config,
+        };
     }
 }

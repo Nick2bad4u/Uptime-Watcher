@@ -14,12 +14,6 @@ import { logStoreAction } from "../utils";
 export const useUpdatesStore = create<UpdatesStore>()(
     persist(
         (set) => ({
-            // State
-            updateStatus: "idle" as UpdateStatus,
-            updateError: undefined,
-            updateProgress: 0,
-            updateInfo: undefined,
-
             // Actions
             applyUpdate: () => {
                 window.electronAPI.system.quitAndInstall();
@@ -43,6 +37,7 @@ export const useUpdatesStore = create<UpdatesStore>()(
                 logStoreAction("UpdatesStore", "setUpdateInfo", { info });
                 set({ updateInfo: info });
             },
+
             setUpdateProgress: (progress: number) => {
                 logStoreAction("UpdatesStore", "setUpdateProgress", { progress });
                 set({ updateProgress: progress });
@@ -51,12 +46,17 @@ export const useUpdatesStore = create<UpdatesStore>()(
                 logStoreAction("UpdatesStore", "setUpdateStatus", { status });
                 set({ updateStatus: status });
             },
+            updateError: undefined,
+            updateInfo: undefined,
+            updateProgress: 0,
+            // State
+            updateStatus: "idle" as UpdateStatus,
         }),
         {
             name: "uptime-watcher-updates",
             partialize: (state) => ({
-                updateStatus: state.updateStatus,
                 updateInfo: state.updateInfo,
+                updateStatus: state.updateStatus,
             }),
         }
     )

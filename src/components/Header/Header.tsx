@@ -7,8 +7,8 @@ import { useMemo } from "react";
 
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { useUIStore } from "../../stores/ui/useUiStore";
-import { ThemedBox, ThemedText, ThemedButton, StatusIndicator } from "../../theme/components";
-import { useTheme, useAvailabilityColors } from "../../theme/useTheme";
+import { StatusIndicator, ThemedBox, ThemedButton, ThemedText } from "../../theme/components";
+import { useAvailabilityColors, useTheme } from "../../theme/useTheme";
 import "./Header.css";
 
 /**
@@ -31,26 +31,32 @@ export function Header() {
 
     // Count all monitors across all sites by status using functional approach
     const monitorCounts = useMemo(() => {
-        const counts = { down: 0, paused: 0, pending: 0, total: 0, up: 0 };
+        const counts = {
+            down: 0,
+            paused: 0,
+            pending: 0,
+            total: 0,
+            up: 0,
+        };
 
         for (const site of sites) {
             for (const monitor of site.monitors) {
                 counts.total++;
                 switch (monitor.status) {
-                    case "up": {
-                        counts.up++;
-                        break;
-                    }
                     case "down": {
                         counts.down++;
+                        break;
+                    }
+                    case "paused": {
+                        counts.paused++;
                         break;
                     }
                     case "pending": {
                         counts.pending++;
                         break;
                     }
-                    case "paused": {
-                        counts.paused++;
+                    case "up": {
+                        counts.up++;
                         break;
                     }
                 }
@@ -72,7 +78,7 @@ export function Header() {
     const uptimePercentage = totalMonitors > 0 ? Math.round((upMonitors / totalMonitors) * 100) : 0;
 
     return (
-        <ThemedBox surface="elevated" padding="md" className="border-b shadow-sm" border>
+        <ThemedBox border className="border-b shadow-sm" padding="md" surface="elevated">
             <div className="header-container">
                 <div className="flex flex-wrap items-center justify-between gap-4 py-4">
                     {/* Left: App Title & Status Summary */}
@@ -80,18 +86,18 @@ export function Header() {
                         {/* App Title with subtle background and border */}
                         <span className="flex items-center gap-2 min-w-[180px] px-4 py-1 header-title-box">
                             <span className="text-2xl select-none">📊</span>
-                            <ThemedText size="2xl" weight="bold" className="truncate header-title-accent">
+                            <ThemedText className="truncate header-title-accent" size="2xl" weight="bold">
                                 Uptime Watcher
                             </ThemedText>
                         </span>
 
                         {/* Status Summary - Enhanced */}
                         <ThemedBox
-                            variant="secondary"
+                            className="flex items-center space-x-3 transition-all duration-300 min-w-[340px] header-status-summary-box"
                             padding="sm"
                             rounded="lg"
                             shadow="sm"
-                            className="flex items-center space-x-3 transition-all duration-300 min-w-[340px] header-status-summary-box"
+                            variant="secondary"
                         >
                             {/* Overall Health Badge */}
                             {totalMonitors > 0 && (
@@ -105,14 +111,14 @@ export function Header() {
                                     />
                                     <div className="flex flex-col">
                                         <ThemedText
-                                            size="sm"
-                                            weight="bold"
                                             className="health-text"
                                             data-health-color={getAvailabilityColor(uptimePercentage)}
+                                            size="sm"
+                                            weight="bold"
                                         >
                                             {uptimePercentage}%
                                         </ThemedText>
-                                        <ThemedText size="xs" variant="secondary" className="leading-none">
+                                        <ThemedText className="leading-none" size="xs" variant="secondary">
                                             Health
                                         </ThemedText>
                                     </div>
@@ -123,12 +129,12 @@ export function Header() {
 
                             {/* Up Status */}
                             <div className="flex items-center px-2 py-1 space-x-2 transition-all duration-200 rounded-md group status-up-badge">
-                                <StatusIndicator status="up" size="sm" />
+                                <StatusIndicator size="sm" status="up" />
                                 <div className="flex flex-col">
-                                    <ThemedText size="sm" weight="semibold" variant="primary">
+                                    <ThemedText size="sm" variant="primary" weight="semibold">
                                         {upMonitors}
                                     </ThemedText>
-                                    <ThemedText size="xs" variant="secondary" className="leading-none">
+                                    <ThemedText className="leading-none" size="xs" variant="secondary">
                                         Up
                                     </ThemedText>
                                 </div>
@@ -139,12 +145,12 @@ export function Header() {
 
                             {/* Down Status */}
                             <div className="flex items-center px-2 py-1 space-x-2 transition-all duration-200 rounded-md group status-down-badge">
-                                <StatusIndicator status="down" size="sm" />
+                                <StatusIndicator size="sm" status="down" />
                                 <div className="flex flex-col">
-                                    <ThemedText size="sm" weight="semibold" variant="primary">
+                                    <ThemedText size="sm" variant="primary" weight="semibold">
                                         {downMonitors}
                                     </ThemedText>
-                                    <ThemedText size="xs" variant="secondary" className="leading-none">
+                                    <ThemedText className="leading-none" size="xs" variant="secondary">
                                         Down
                                     </ThemedText>
                                 </div>
@@ -155,12 +161,12 @@ export function Header() {
 
                             {/* Pending Status */}
                             <div className="flex items-center px-2 py-1 space-x-2 transition-all duration-200 rounded-md group status-pending-badge">
-                                <StatusIndicator status="pending" size="sm" />
+                                <StatusIndicator size="sm" status="pending" />
                                 <div className="flex flex-col">
-                                    <ThemedText size="sm" weight="semibold" variant="primary">
+                                    <ThemedText size="sm" variant="primary" weight="semibold">
                                         {pendingMonitors}
                                     </ThemedText>
-                                    <ThemedText size="xs" variant="secondary" className="leading-none">
+                                    <ThemedText className="leading-none" size="xs" variant="secondary">
                                         Pending
                                     </ThemedText>
                                 </div>
@@ -171,12 +177,12 @@ export function Header() {
 
                             {/* Paused Status */}
                             <div className="flex items-center px-2 py-1 space-x-2 transition-all duration-200 rounded-md group status-paused-badge">
-                                <StatusIndicator status="paused" size="sm" />
+                                <StatusIndicator size="sm" status="paused" />
                                 <div className="flex flex-col">
-                                    <ThemedText size="sm" weight="semibold" variant="primary">
+                                    <ThemedText size="sm" variant="primary" weight="semibold">
                                         {pausedMonitors}
                                     </ThemedText>
-                                    <ThemedText size="xs" variant="secondary" className="leading-none">
+                                    <ThemedText className="leading-none" size="xs" variant="secondary">
                                         Paused
                                     </ThemedText>
                                 </div>
@@ -189,10 +195,10 @@ export function Header() {
                                     <div className="flex items-center px-2 py-1 space-x-2 rounded-md bg-opacity-10 total-sites-badge">
                                         <div className="w-2 h-2 bg-current rounded-full opacity-50" />
                                         <div className="flex flex-col">
-                                            <ThemedText size="sm" weight="semibold" variant="primary">
+                                            <ThemedText size="sm" variant="primary" weight="semibold">
                                                 {totalMonitors}
                                             </ThemedText>
-                                            <ThemedText size="xs" variant="secondary" className="leading-none">
+                                            <ThemedText className="leading-none" size="xs" variant="secondary">
                                                 Total
                                             </ThemedText>
                                         </div>
@@ -206,17 +212,17 @@ export function Header() {
                     <div className="flex flex-wrap items-center gap-3">
                         {/* Theme Toggle */}
                         <ThemedBox
-                            variant="tertiary"
+                            className="flex items-center header-controls-box"
                             padding="xs"
                             rounded="md"
-                            className="flex items-center header-controls-box"
+                            variant="tertiary"
                         >
                             <ThemedButton
-                                variant="secondary"
-                                size="sm"
-                                onClick={toggleTheme}
-                                className="p-2 themed-button--icon"
                                 aria-label="Toggle theme"
+                                className="p-2 themed-button--icon"
+                                onClick={toggleTheme}
+                                size="sm"
+                                variant="secondary"
                             >
                                 {isDark ? "☀️" : "🌙"}
                             </ThemedButton>
@@ -224,17 +230,17 @@ export function Header() {
 
                         {/* Settings Button */}
                         <ThemedBox
-                            variant="tertiary"
+                            className="flex items-center header-controls-box"
                             padding="xs"
                             rounded="md"
-                            className="flex items-center header-controls-box"
+                            variant="tertiary"
                         >
                             <ThemedButton
-                                variant="secondary"
-                                size="sm"
-                                onClick={() => setShowSettings(true)}
-                                className="p-2 themed-button--icon"
                                 aria-label="Settings"
+                                className="p-2 themed-button--icon"
+                                onClick={() => setShowSettings(true)}
+                                size="sm"
+                                variant="secondary"
                             >
                                 ⚙️
                             </ThemedButton>

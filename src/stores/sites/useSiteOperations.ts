@@ -7,44 +7,45 @@
  */
 
 import type { Monitor, MonitorType, Site } from "../../types";
+
 import { ERROR_MESSAGES } from "../types";
 import { logStoreAction, withErrorHandling } from "../utils";
 import { MonitoringService } from "./services/MonitoringService";
 import { SiteService } from "./services/SiteService";
-import { normalizeMonitor, updateMonitorInSite } from "./utils/monitorOperations";
 import { handleSQLiteBackupDownload } from "./utils/fileDownload";
+import { normalizeMonitor, updateMonitorInSite } from "./utils/monitorOperations";
 
 export interface SiteOperationsActions {
-    /** Initialize sites data from backend */
-    initializeSites: () => Promise<{ success: boolean; sitesLoaded: number; message: string }>;
+    /** Add a monitor to an existing site */
+    addMonitorToSite: (siteId: string, monitor: Monitor) => Promise<void>;
     /** Create a new site */
     createSite: (siteData: {
         identifier: string;
-        name?: string;
-        monitors?: Monitor[];
         monitoring?: boolean;
+        monitors?: Monitor[];
+        name?: string;
     }) => Promise<void>;
     /** Delete a site */
     deleteSite: (identifier: string) => Promise<void>;
+    /** Download SQLite backup */
+    downloadSQLiteBackup: () => Promise<void>;
+    /** Initialize sites data from backend */
+    initializeSites: () => Promise<{ message: string; sitesLoaded: number; success: boolean }>;
     /** Modify an existing site */
     modifySite: (identifier: string, updates: Partial<Site>) => Promise<void>;
-    /** Add a monitor to an existing site */
-    addMonitorToSite: (siteId: string, monitor: Monitor) => Promise<void>;
     /** Remove a monitor from a site */
     removeMonitorFromSite: (siteId: string, monitorId: string) => Promise<void>;
-    /** Update site check interval */
-    updateSiteCheckInterval: (siteId: string, monitorId: string, interval: number) => Promise<void>;
     /** Update monitor retry attempts */
     updateMonitorRetryAttempts: (siteId: string, monitorId: string, retryAttempts: number) => Promise<void>;
     /** Update monitor timeout */
     updateMonitorTimeout: (siteId: string, monitorId: string, timeout: number) => Promise<void>;
-    /** Download SQLite backup */
-    downloadSQLiteBackup: () => Promise<void>;
+    /** Update site check interval */
+    updateSiteCheckInterval: (siteId: string, monitorId: string, interval: number) => Promise<void>;
 }
 
 export interface SiteOperationsDependencies {
-    getSites: () => Site[];
     addSite: (site: Site) => void;
+    getSites: () => Site[];
     removeSite: (identifier: string) => void;
     setSites: (sites: Site[]) => void;
     syncSitesFromBackend: () => Promise<void>;
@@ -97,8 +98,8 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                 // Construct a complete Site object
                 const completeSite: Site = {
                     identifier: siteData.identifier,
-                    monitors,
                     monitoring: siteData.monitoring ?? true, // Default to monitoring enabled
+                    monitors,
                     name: siteData.name ?? "Unnamed Site", // Provide default name
                 };
 

@@ -43,7 +43,7 @@ import { ThemedBox } from "../../theme/components";
 import { useTheme } from "../../theme/useTheme";
 import { Site } from "../../types";
 import { formatStatusWithIcon } from "../../utils/status";
-import { formatResponseTime, formatFullTimestamp, formatDuration } from "../../utils/time";
+import { formatDuration, formatFullTimestamp, formatResponseTime } from "../../utils/time";
 import "./SiteDetails.css";
 import { SiteDetailsHeader } from "./SiteDetailsHeader";
 import { SiteDetailsNavigation } from "./SiteDetailsNavigation";
@@ -55,26 +55,10 @@ import { SiteOverviewTab } from "./tabs/SiteOverviewTab";
 
 /** Props for the SiteDetails component */
 interface SiteDetailsProperties {
-    /** The site object to display details for */
-    readonly site: Site;
     /** Callback function to close the site details view */
     readonly onClose: () => void;
-}
-
-/**
- * Gets a descriptive label for availability percentage.
- *
- * @param percentage - Availability percentage (0-100)
- * @returns Description string ("Excellent", "Good", or "Poor")
- */
-function getAvailabilityDescription(percentage: number): string {
-    if (percentage >= 99) {
-        return "Excellent";
-    }
-    if (percentage >= 95) {
-        return "Good";
-    }
-    return "Poor";
+    /** The site object to display details for */
+    readonly site: Site;
 }
 
 /**
@@ -180,11 +164,11 @@ export function SiteDetails({ onClose, site }: SiteDetailsProperties) {
         () => ({
             datasets: [
                 {
-                    label: "Status Distribution",
                     backgroundColor: [currentTheme.colors.success, currentTheme.colors.error],
                     borderColor: [currentTheme.colors.success, currentTheme.colors.error],
                     borderWidth: 1,
                     data: [analytics.upCount, analytics.downCount],
+                    label: "Status Distribution",
                 },
             ],
             labels: ["Up", "Down"],
@@ -226,23 +210,23 @@ export function SiteDetails({ onClose, site }: SiteDetailsProperties) {
     return (
         <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 md:p-8 bg-black/50 backdrop-blur-sm">
             <button
-                type="button"
+                aria-label="Close modal"
                 className="absolute inset-0 bg-transparent border-none cursor-pointer"
                 onClick={onClose}
                 onKeyDown={handleKeyDown}
-                aria-label="Close modal"
+                type="button"
             />
             <dialog
-                open
-                className="relative w-full max-w-[1400px] max-h-[90vh] mx-auto flex flex-col sm:max-w-[calc(100vw-2rem)] md:max-w-[calc(100vw-4rem)] lg:max-w-[1400px]"
                 aria-label="Site details"
+                className="relative w-full max-w-[1400px] max-h-[90vh] mx-auto flex flex-col sm:max-w-[calc(100vw-2rem)] md:max-w-[calc(100vw-4rem)] lg:max-w-[1400px]"
+                open
             >
                 <ThemedBox
-                    surface="overlay"
+                    className="flex flex-col h-[90vh] overflow-hidden"
                     padding="lg"
                     rounded="lg"
                     shadow="xl"
-                    className="flex flex-col h-[90vh] overflow-hidden"
+                    surface="overlay"
                 >
                     <SiteDetailsHeader
                         site={currentSite}
@@ -267,110 +251,110 @@ export function SiteDetails({ onClose, site }: SiteDetailsProperties) {
 
                     {/* Tab Content */}
                     <ThemedBox
-                        variant="primary"
-                        padding="lg"
                         className={`flex-1 overflow-y-auto custom-scrollbar ${currentTheme.isDark ? "dark" : ""}`}
+                        padding="lg"
+                        variant="primary"
                     >
                         {activeSiteDetailsTab === "site-overview" && (
                             <SiteOverviewTab
-                                site={currentSite}
-                                uptime={Number.parseFloat(analytics.uptime)}
                                 avgResponseTime={analytics.avgResponseTime}
-                                totalChecks={analytics.totalChecks}
                                 handleRemoveSite={handleRemoveSite}
-                                isLoading={isLoading}
                                 handleStartSiteMonitoring={handleStartSiteMonitoring}
                                 handleStopSiteMonitoring={handleStopSiteMonitoring}
+                                isLoading={isLoading}
+                                site={currentSite}
+                                totalChecks={analytics.totalChecks}
+                                uptime={Number.parseFloat(analytics.uptime)}
                             />
                         )}
 
                         {activeSiteDetailsTab === "monitor-overview" && selectedMonitor && (
                             <OverviewTab
-                                selectedMonitor={selectedMonitor}
-                                uptime={analytics.uptime}
                                 avgResponseTime={analytics.avgResponseTime}
-                                totalChecks={analytics.totalChecks}
                                 fastestResponse={analytics.fastestResponse}
-                                slowestResponse={analytics.slowestResponse}
                                 formatResponseTime={formatResponseTime}
-                                handleRemoveMonitor={handleRemoveMonitor}
                                 handleIntervalChange={handleIntervalChange}
+                                handleRemoveMonitor={handleRemoveMonitor}
                                 handleSaveInterval={handleSaveInterval}
                                 handleSaveTimeout={handleSaveTimeout}
                                 handleTimeoutChange={handleTimeoutChange}
                                 intervalChanged={intervalChanged}
+                                isLoading={isLoading}
                                 localCheckInterval={localCheckInterval}
                                 localTimeout={localTimeout}
                                 onCheckNow={() => {
                                     void handleCheckNow();
                                 }}
+                                selectedMonitor={selectedMonitor}
+                                slowestResponse={analytics.slowestResponse}
                                 timeoutChanged={timeoutChanged}
-                                isLoading={isLoading}
+                                totalChecks={analytics.totalChecks}
+                                uptime={analytics.uptime}
                             />
                         )}
 
                         {activeSiteDetailsTab === `${selectedMonitorId}-analytics` && selectedMonitor && (
                             <AnalyticsTab
-                                upCount={analytics.upCount}
-                                downCount={analytics.downCount}
-                                totalChecks={analytics.totalChecks}
-                                uptime={analytics.uptime}
                                 avgResponseTime={analytics.avgResponseTime}
+                                barChartData={barChartData}
+                                barChartOptions={barChartOptions}
+                                doughnutOptions={doughnutOptions}
+                                downCount={analytics.downCount}
+                                downtimePeriods={analytics.downtimePeriods}
+                                formatDuration={formatDuration}
+                                formatResponseTime={formatResponseTime}
+                                getAvailabilityDescription={getAvailabilityDescription}
+                                lineChartData={lineChartData}
+                                lineChartOptions={lineChartOptions}
+                                monitorType={selectedMonitor.type}
+                                mttr={analytics.mttr}
                                 p50={analytics.p50}
                                 p95={analytics.p95}
                                 p99={analytics.p99}
-                                mttr={analytics.mttr}
-                                totalDowntime={analytics.totalDowntime}
-                                downtimePeriods={analytics.downtimePeriods}
-                                lineChartData={lineChartData}
-                                lineChartOptions={lineChartOptions}
-                                barChartData={barChartData}
-                                barChartOptions={barChartOptions}
-                                uptimeChartData={doughnutChartData}
-                                doughnutOptions={doughnutOptions}
-                                formatResponseTime={formatResponseTime}
-                                formatDuration={formatDuration}
-                                showAdvancedMetrics={showAdvancedMetrics}
                                 setShowAdvancedMetrics={setShowAdvancedMetrics}
                                 setSiteDetailsChartTimeRange={setSiteDetailsChartTimeRange}
+                                showAdvancedMetrics={showAdvancedMetrics}
                                 siteDetailsChartTimeRange={siteDetailsChartTimeRange}
-                                getAvailabilityDescription={getAvailabilityDescription}
-                                monitorType={selectedMonitor.type}
+                                totalChecks={analytics.totalChecks}
+                                totalDowntime={analytics.totalDowntime}
+                                upCount={analytics.upCount}
+                                uptime={analytics.uptime}
+                                uptimeChartData={doughnutChartData}
                             />
                         )}
 
                         {activeSiteDetailsTab === "history" && selectedMonitor && (
                             <HistoryTab
-                                selectedMonitor={selectedMonitor}
-                                formatResponseTime={formatResponseTime}
                                 formatFullTimestamp={formatFullTimestamp}
+                                formatResponseTime={formatResponseTime}
                                 formatStatusWithIcon={formatStatusWithIcon}
+                                selectedMonitor={selectedMonitor}
                             />
                         )}
 
                         {activeSiteDetailsTab === "settings" && selectedMonitor && (
                             <SettingsTab
                                 currentSite={currentSite}
-                                selectedMonitor={selectedMonitor}
-                                handleRemoveSite={handleRemoveSite}
-                                isLoading={isLoading}
-                                localCheckInterval={localCheckInterval}
-                                intervalChanged={intervalChanged}
                                 handleIntervalChange={handleIntervalChange}
+                                handleRemoveSite={handleRemoveSite}
+                                handleRetryAttemptsChange={handleRetryAttemptsChange}
                                 handleSaveInterval={() => {
                                     void handleSaveInterval();
                                 }}
-                                handleRetryAttemptsChange={handleRetryAttemptsChange}
+                                handleSaveName={handleSaveName}
                                 handleSaveRetryAttempts={handleSaveRetryAttempts}
                                 handleSaveTimeout={handleSaveTimeout}
                                 handleTimeoutChange={handleTimeoutChange}
+                                hasUnsavedChanges={hasUnsavedChanges}
+                                intervalChanged={intervalChanged}
+                                isLoading={isLoading}
+                                localCheckInterval={localCheckInterval}
                                 localName={localName}
                                 localRetryAttempts={localRetryAttempts}
                                 localTimeout={localTimeout}
-                                setLocalName={setLocalName}
-                                hasUnsavedChanges={hasUnsavedChanges}
-                                handleSaveName={handleSaveName}
                                 retryAttemptsChanged={retryAttemptsChanged}
+                                selectedMonitor={selectedMonitor}
+                                setLocalName={setLocalName}
                                 timeoutChanged={timeoutChanged}
                             />
                         )}
@@ -379,4 +363,20 @@ export function SiteDetails({ onClose, site }: SiteDetailsProperties) {
             </dialog>
         </div>
     );
+}
+
+/**
+ * Gets a descriptive label for availability percentage.
+ *
+ * @param percentage - Availability percentage (0-100)
+ * @returns Description string ("Excellent", "Good", or "Poor")
+ */
+function getAvailabilityDescription(percentage: number): string {
+    if (percentage >= 99) {
+        return "Excellent";
+    }
+    if (percentage >= 95) {
+        return "Good";
+    }
+    return "Poor";
 }

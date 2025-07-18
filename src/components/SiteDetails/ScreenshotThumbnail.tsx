@@ -6,7 +6,7 @@
  * React portals for the overlay positioning.
  */
 
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import logger from "../../services/logger";
@@ -14,31 +14,11 @@ import { useTheme } from "../../theme/useTheme";
 
 /** Props for the ScreenshotThumbnail component */
 interface ScreenshotThumbnailProperties {
-    /** The URL to capture a screenshot of */
-    readonly url: string;
     /** The site name for accessibility and alt text */
     readonly siteName: string;
+    /** The URL to capture a screenshot of */
+    readonly url: string;
 }
-
-/**
- * Type guard to check if the window.electronAPI has openExternal method
- * @param api - The API object to check
- * @returns True if the API has openExternal method
- */
-function hasOpenExternal(api: unknown): api is { openExternal: (url: string) => void } {
-    return typeof (api as { openExternal?: unknown }).openExternal === "function";
-}
-
-/**
- * Screenshot thumbnail component with hover preview overlay.
- *
- * Generates a thumbnail using Microlink API and displays a larger preview
- * when hovered. Handles external URL opening and proper positioning of
- * the preview overlay within viewport bounds.
- *
- * @param props - Component props
- * @returns JSX element containing the thumbnail and optional preview overlay
- */
 
 export function ScreenshotThumbnail({ siteName, url }: ScreenshotThumbnailProperties) {
     const [hovered, setHovered] = useState(false);
@@ -172,38 +152,38 @@ export function ScreenshotThumbnail({ siteName, url }: ScreenshotThumbnailProper
     return (
         <>
             <a
-                ref={linkReference}
-                href={url}
-                tabIndex={0}
                 aria-label={ariaLabel}
-                onClick={handleClick}
                 className="site-details-thumbnail-link"
+                href={url}
+                onBlur={handleBlur}
+                onClick={handleClick}
+                onFocus={handleFocus}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
+                ref={linkReference}
+                tabIndex={0}
             >
                 <img
-                    src={screenshotUrl}
                     alt={`Screenshot of ${siteName}`}
                     className="site-details-thumbnail-img"
                     loading="lazy"
+                    src={screenshotUrl}
                 />
                 <span className="site-details-thumbnail-caption">Preview: {siteName}</span>
             </a>
             {hovered &&
                 createPortal(
                     <div
-                        ref={portalReference}
                         className={`site-details-thumbnail-portal-overlay theme-${themeName}`}
+                        ref={portalReference}
                         style={overlayVariables}
                     >
                         <div className="site-details-thumbnail-portal-img-wrapper">
                             <img
-                                src={screenshotUrl}
                                 alt={`Large screenshot of ${siteName}`}
                                 className="site-details-thumbnail-img-portal"
                                 loading="lazy"
+                                src={screenshotUrl}
                             />
                         </div>
                     </div>,
@@ -211,4 +191,24 @@ export function ScreenshotThumbnail({ siteName, url }: ScreenshotThumbnailProper
                 )}
         </>
     );
+}
+
+/**
+ * Screenshot thumbnail component with hover preview overlay.
+ *
+ * Generates a thumbnail using Microlink API and displays a larger preview
+ * when hovered. Handles external URL opening and proper positioning of
+ * the preview overlay within viewport bounds.
+ *
+ * @param props - Component props
+ * @returns JSX element containing the thumbnail and optional preview overlay
+ */
+
+/**
+ * Type guard to check if the window.electronAPI has openExternal method
+ * @param api - The API object to check
+ * @returns True if the API has openExternal method
+ */
+function hasOpenExternal(api: unknown): api is { openExternal: (url: string) => void } {
+    return typeof (api as { openExternal?: unknown }).openExternal === "function";
 }

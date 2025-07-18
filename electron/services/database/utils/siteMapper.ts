@@ -10,8 +10,32 @@ import { logger } from "../../../utils/logger";
  */
 export interface SiteRow {
     identifier: string;
-    name?: string;
     monitoring?: boolean;
+    name?: string;
+}
+
+/**
+ * Validate that a row contains the minimum required fields for a site.
+ *
+ * @param row - Database row to validate
+ * @returns True if row is valid
+ *
+ * @public
+ */
+export function isValidSiteRow(row: Record<string, unknown>): boolean {
+    return row.identifier !== undefined && row.identifier !== null;
+}
+
+/**
+ * Convert multiple database rows to Site objects.
+ *
+ * @param rows - Array of raw database rows
+ * @returns Array of mapped Site objects
+ *
+ * @public
+ */
+export function rowsToSites(rows: Record<string, unknown>[]): SiteRow[] {
+    return rows.map((row) => rowToSite(row));
 }
 
 /**
@@ -47,31 +71,7 @@ export function rowToSite(row: Record<string, unknown>): SiteRow {
 
         return site;
     } catch (error) {
-        logger.error("[SiteMapper] Failed to map database row to site", { row, error });
+        logger.error("[SiteMapper] Failed to map database row to site", { error, row });
         throw error;
     }
-}
-
-/**
- * Convert multiple database rows to Site objects.
- *
- * @param rows - Array of raw database rows
- * @returns Array of mapped Site objects
- *
- * @public
- */
-export function rowsToSites(rows: Record<string, unknown>[]): SiteRow[] {
-    return rows.map((row) => rowToSite(row));
-}
-
-/**
- * Validate that a row contains the minimum required fields for a site.
- *
- * @param row - Database row to validate
- * @returns True if row is valid
- *
- * @public
- */
-export function isValidSiteRow(row: Record<string, unknown>): boolean {
-    return row.identifier !== undefined && row.identifier !== null;
 }

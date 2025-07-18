@@ -12,14 +12,14 @@ import { Monitor } from "../../../../types";
  * Props for the MonitorSelector component.
  */
 interface MonitorSelectorProperties {
-    /** Array of available monitors to choose from */
-    monitors: Monitor[];
-    /** ID of the currently selected monitor */
-    selectedMonitorId: string;
-    /** Callback function for selection change events */
-    onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
     /** Optional CSS classes for custom styling */
     className?: string;
+    /** Array of available monitors to choose from */
+    monitors: Monitor[];
+    /** Callback function for selection change events */
+    onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+    /** ID of the currently selected monitor */
+    selectedMonitorId: string;
 }
 
 /**
@@ -77,11 +77,11 @@ export const MonitorSelector = React.memo(function MonitorSelector({
 
     return (
         <ThemedSelect
-            value={selectedMonitorId}
-            onChange={onChange}
             className={className}
+            onChange={onChange}
             onClick={handleClick}
             onMouseDown={handleMouseDown}
+            value={selectedMonitorId}
         >
             {monitors.map((monitor) => (
                 <option key={monitor.id} value={monitor.id}>

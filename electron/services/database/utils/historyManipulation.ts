@@ -34,68 +34,6 @@ export function addHistoryEntry(db: Database, monitorId: string, entry: StatusHi
 }
 
 /**
- * Delete history entries for a specific monitor.
- */
-export function deleteHistoryByMonitorId(db: Database, monitorId: string): void {
-    try {
-        db.run("DELETE FROM history WHERE monitor_id = ?", [monitorId]);
-        if (isDev()) {
-            logger.debug(`[HistoryManipulation] Deleted history for monitor: ${monitorId}`);
-        }
-    } catch (error) {
-        logger.error(`[HistoryManipulation] Failed to delete history for monitor: ${monitorId}`, error);
-        throw error;
-    }
-}
-
-/**
- * Clear all history from the database.
- */
-export function deleteAllHistory(db: Database): void {
-    try {
-        db.run("DELETE FROM history");
-        if (isDev()) {
-            logger.debug("[HistoryManipulation] Cleared all history");
-        }
-    } catch (error) {
-        logger.error("[HistoryManipulation] Failed to clear all history", error);
-        throw error;
-    }
-}
-
-/**
- * Prune old history entries for a monitor, keeping only the most recent entries.
- */
-export function pruneHistoryForMonitor(db: Database, monitorId: string, limit: number): void {
-    if (limit <= 0) {
-        return;
-    }
-
-    try {
-        // Get entries to delete (keep only the most recent 'limit' entries)
-        const excess = db.all("SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?", [
-            monitorId,
-            limit,
-        ]) as { id: number }[];
-
-        if (excess.length > 0) {
-            const excessIds = excess.map((row) => row.id);
-            // Use parameterized query to avoid SQL injection
-            const placeholders = excessIds.map(() => "?").join(",");
-            db.run(`DELETE FROM history WHERE id IN (${placeholders})`, excessIds);
-            if (isDev()) {
-                logger.debug(
-                    `[HistoryManipulation] Pruned ${excess.length} old history entries for monitor: ${monitorId}`
-                );
-            }
-        }
-    } catch (error) {
-        logger.error(`[HistoryManipulation] Failed to prune history for monitor: ${monitorId}`, error);
-        throw error;
-    }
-}
-
-/**
  * Bulk insert history entries (for import functionality).
  * Assumes it's called within an existing transaction context.
  * Uses a prepared statement for better performance.
@@ -134,6 +72,68 @@ export function bulkInsertHistory(
         }
     } catch (error) {
         logger.error(`[HistoryManipulation] Failed to bulk insert history for monitor: ${monitorId}`, error);
+        throw error;
+    }
+}
+
+/**
+ * Clear all history from the database.
+ */
+export function deleteAllHistory(db: Database): void {
+    try {
+        db.run("DELETE FROM history");
+        if (isDev()) {
+            logger.debug("[HistoryManipulation] Cleared all history");
+        }
+    } catch (error) {
+        logger.error("[HistoryManipulation] Failed to clear all history", error);
+        throw error;
+    }
+}
+
+/**
+ * Delete history entries for a specific monitor.
+ */
+export function deleteHistoryByMonitorId(db: Database, monitorId: string): void {
+    try {
+        db.run("DELETE FROM history WHERE monitor_id = ?", [monitorId]);
+        if (isDev()) {
+            logger.debug(`[HistoryManipulation] Deleted history for monitor: ${monitorId}`);
+        }
+    } catch (error) {
+        logger.error(`[HistoryManipulation] Failed to delete history for monitor: ${monitorId}`, error);
+        throw error;
+    }
+}
+
+/**
+ * Prune old history entries for a monitor, keeping only the most recent entries.
+ */
+export function pruneHistoryForMonitor(db: Database, monitorId: string, limit: number): void {
+    if (limit <= 0) {
+        return;
+    }
+
+    try {
+        // Get entries to delete (keep only the most recent 'limit' entries)
+        const excess = db.all("SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?", [
+            monitorId,
+            limit,
+        ]) as { id: number }[];
+
+        if (excess.length > 0) {
+            const excessIds = excess.map((row) => row.id);
+            // Use parameterized query to avoid SQL injection
+            const placeholders = excessIds.map(() => "?").join(",");
+            db.run(`DELETE FROM history WHERE id IN (${placeholders})`, excessIds);
+            if (isDev()) {
+                logger.debug(
+                    `[HistoryManipulation] Pruned ${excess.length} old history entries for monitor: ${monitorId}`
+                );
+            }
+        }
+    } catch (error) {
+        logger.error(`[HistoryManipulation] Failed to prune history for monitor: ${monitorId}`, error);
         throw error;
     }
 }

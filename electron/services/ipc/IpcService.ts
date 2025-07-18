@@ -1,20 +1,20 @@
-import { ipcMain, BrowserWindow } from "electron";
+import { BrowserWindow, ipcMain } from "electron";
 
 import { isDev } from "../../electronUtils";
+import { Site } from "../../types";
 import { UptimeOrchestrator } from "../../UptimeOrchestrator";
 import { logger } from "../../utils/logger";
+import { getAllMonitorTypeConfigs, getMonitorTypeConfig, validateMonitorData } from "../monitoring/MonitorTypeRegistry";
 import { AutoUpdaterService } from "../updater/AutoUpdaterService";
-import { Site } from "../../types";
-import { getAllMonitorTypeConfigs, validateMonitorData, getMonitorTypeConfig } from "../monitoring/MonitorTypeRegistry";
 
 /**
  * The result structure returned by the validate-monitor-data IPC handler.
  */
 interface MonitorValidationResult {
-    success: boolean;
     errors: string[];
-    warnings: string[];
     metadata: Record<string, unknown>;
+    success: boolean;
+    warnings: string[];
 }
 
 /**
@@ -26,9 +26,9 @@ interface MonitorValidationResult {
  * Provides a secure interface for the frontend to interact with backend services.
  */
 export class IpcService {
-    private readonly uptimeOrchestrator: UptimeOrchestrator;
     private readonly autoUpdaterService: AutoUpdaterService;
     private readonly registeredIpcHandlers = new Set<string>();
+    private readonly uptimeOrchestrator: UptimeOrchestrator;
 
     /**
      * Create a new IPC service instance.
@@ -39,6 +39,24 @@ export class IpcService {
     constructor(uptimeOrchestrator: UptimeOrchestrator, autoUpdaterService: AutoUpdaterService) {
         this.uptimeOrchestrator = uptimeOrchestrator;
         this.autoUpdaterService = autoUpdaterService;
+    }
+
+    /**
+     * Clean up all IPC listeners.
+     *
+     * @remarks
+     * Removes all registered IPC handlers to prevent memory leaks.
+     * Should be called during application shutdown.
+     */
+    public cleanup(): void {
+        logger.info("[IpcService] Cleaning up IPC handlers");
+        for (const channel of this.registeredIpcHandlers) {
+            ipcMain.removeHandler(channel);
+        }
+        // Remove listeners for channels registered with ipcMain.on
+        // Currently, only "quit-and-install" is handled here.
+        // Note: If you add more ipcMain.on listeners, document and remove them below.
+        ipcMain.removeAllListeners("quit-and-install");
     }
 
     /**
@@ -61,45 +79,127 @@ export class IpcService {
     }
 
     /**
-     * Setup IPC handlers for site management operations.
+     * Safely serialize a monitor type configuration for IPC transmission.
+     * Excludes non-serializable data while preserving all useful information.
+     *
+     * @param config - The monitor type configuration to serialize
+     * @returns Serializable configuration object
+     */
+    private serializeMonitorTypeConfig(config: ReturnType<typeof getAllMonitorTypeConfigs>[0]) {
+        // Extract and validate base properties
+        const {
+            description,
+            displayName,
+            fields,
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars, sonarjs/no-unused-vars
+            serviceFactory: _unused1,
+            type,
+            uiConfig,
+            // Explicitly exclude non-serializable properties
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars, sonarjs/no-unused-vars
+            validationSchema: _unused2,
+            version,
+            ...unexpectedProperties
+        } = config;
+
+        // Log if there are unexpected properties (helps with future maintenance)
+        if (Object.keys(unexpectedProperties).length > 0) {
+            logger.warn("[IpcService] Unexpected properties in monitor config", {
+                type,
+                unexpectedProperties: Object.keys(unexpectedProperties),
+            });
+        }
+
+        // Serialize UI configuration with comprehensive property handling
+        const serializedUiConfig = uiConfig
+            ? {
+                  // Detail formats (include all serializable data)
+                  detailFormats: uiConfig.detailFormats
+                      ? {
+                            analyticsLabel: uiConfig.detailFormats.analyticsLabel,
+                            // Note: historyDetail function is excluded (handled via IPC)
+                            // Note: formatDetail and formatTitleSuffix functions are excluded (handled via IPC)
+                        }
+                      : undefined,
+                  // Display preferences (preserve all flags)
+                  display: uiConfig.display
+                      ? {
+                            showAdvancedMetrics: uiConfig.display.showAdvancedMetrics ?? false,
+                            showUrl: uiConfig.display.showUrl ?? false,
+                        }
+                      : undefined,
+
+                  // Help texts (preserve original structure)
+                  helpTexts: uiConfig.helpTexts
+                      ? {
+                            primary: uiConfig.helpTexts.primary,
+                            secondary: uiConfig.helpTexts.secondary,
+                        }
+                      : undefined,
+
+                  supportsAdvancedAnalytics: uiConfig.supportsAdvancedAnalytics ?? false,
+
+                  // Feature support flags
+                  supportsResponseTime: uiConfig.supportsResponseTime ?? false,
+              }
+            : undefined;
+
+        return {
+            description,
+            displayName,
+            fields, // Fields are always present in BaseMonitorConfig
+            type,
+            uiConfig: serializedUiConfig,
+            version,
+        };
+    }
+
+    /**
+     * Setup IPC handlers for data management operations.
      *
      * @remarks
-     * Handles site CRUD operations:
-     * - `add-site`: Create new site with monitors
-     * - `remove-site`: Delete site and all associated data
-     * - `get-sites`: Retrieve all configured sites
-     * - `update-site`: Modify existing site configuration
-     * - `remove-monitor`: Delete specific monitor from site
+     * Handles data persistence and backup operations:
+     * - `export-data`: Export all configuration and history as JSON
+     * - `import-data`: Import configuration from JSON data
+     * - `update-history-limit`: Configure history retention policy
+     * - `get-history-limit`: Retrieve current history retention setting
+     * - `download-sqlite-backup`: Create and download database backup
      */
-    private setupSiteHandlers(): void {
-        this.registeredIpcHandlers.add("add-site");
-        ipcMain.handle("add-site", async (_, site: Site) => {
-            if (isDev()) logger.debug("[IpcService] Handling add-site");
-            return this.uptimeOrchestrator.addSite(site);
+    private setupDataHandlers(): void {
+        this.registeredIpcHandlers.add("export-data");
+        ipcMain.handle("export-data", async () => {
+            if (isDev()) logger.debug("[IpcService] Handling export-data");
+            return this.uptimeOrchestrator.exportData();
         });
 
-        this.registeredIpcHandlers.add("remove-site");
-        ipcMain.handle("remove-site", async (_, identifier: string) => {
-            if (isDev()) logger.debug("[IpcService] Handling remove-site", { identifier });
-            return this.uptimeOrchestrator.removeSite(identifier);
+        this.registeredIpcHandlers.add("import-data");
+        ipcMain.handle("import-data", async (_, data: string) => {
+            if (isDev()) logger.debug("[IpcService] Handling import-data");
+            return this.uptimeOrchestrator.importData(data);
         });
 
-        this.registeredIpcHandlers.add("get-sites");
-        ipcMain.handle("get-sites", async () => {
-            if (isDev()) logger.debug("[IpcService] Handling get-sites");
-            return this.uptimeOrchestrator.getSites();
+        this.registeredIpcHandlers.add("update-history-limit");
+        ipcMain.handle("update-history-limit", async (_, limit: number) => {
+            if (isDev()) logger.debug("[IpcService] Handling update-history-limit", { limit });
+            return this.uptimeOrchestrator.setHistoryLimit(limit);
         });
 
-        this.registeredIpcHandlers.add("update-site");
-        ipcMain.handle("update-site", async (_, identifier: string, updates: Partial<Site>) => {
-            if (isDev()) logger.debug("[IpcService] Handling update-site", { identifier });
-            return this.uptimeOrchestrator.updateSite(identifier, updates);
+        this.registeredIpcHandlers.add("get-history-limit");
+        ipcMain.handle("get-history-limit", () => {
+            if (isDev()) logger.debug("[IpcService] Handling get-history-limit");
+            return this.uptimeOrchestrator.getHistoryLimit();
         });
 
-        this.registeredIpcHandlers.add("remove-monitor");
-        ipcMain.handle("remove-monitor", async (_, siteIdentifier: string, monitorId: string) => {
-            if (isDev()) logger.debug("[IpcService] Handling remove-monitor", { monitorId, siteIdentifier });
-            return this.uptimeOrchestrator.removeMonitor(siteIdentifier, monitorId);
+        this.registeredIpcHandlers.add("download-sqlite-backup");
+        ipcMain.handle("download-sqlite-backup", async () => {
+            if (isDev()) logger.debug("[IpcService] Handling download-sqlite-backup");
+            try {
+                return await this.uptimeOrchestrator.downloadBackup();
+            } catch (error) {
+                logger.error("[IpcService] Failed to download SQLite backup", error);
+                const message = error instanceof Error ? error.message : String(error);
+                throw new Error("Failed to download SQLite backup: " + message);
+            }
         });
     }
 
@@ -167,134 +267,6 @@ export class IpcService {
     }
 
     /**
-     * Setup IPC handlers for data management operations.
-     *
-     * @remarks
-     * Handles data persistence and backup operations:
-     * - `export-data`: Export all configuration and history as JSON
-     * - `import-data`: Import configuration from JSON data
-     * - `update-history-limit`: Configure history retention policy
-     * - `get-history-limit`: Retrieve current history retention setting
-     * - `download-sqlite-backup`: Create and download database backup
-     */
-    private setupDataHandlers(): void {
-        this.registeredIpcHandlers.add("export-data");
-        ipcMain.handle("export-data", async () => {
-            if (isDev()) logger.debug("[IpcService] Handling export-data");
-            return this.uptimeOrchestrator.exportData();
-        });
-
-        this.registeredIpcHandlers.add("import-data");
-        ipcMain.handle("import-data", async (_, data: string) => {
-            if (isDev()) logger.debug("[IpcService] Handling import-data");
-            return this.uptimeOrchestrator.importData(data);
-        });
-
-        this.registeredIpcHandlers.add("update-history-limit");
-        ipcMain.handle("update-history-limit", async (_, limit: number) => {
-            if (isDev()) logger.debug("[IpcService] Handling update-history-limit", { limit });
-            return this.uptimeOrchestrator.setHistoryLimit(limit);
-        });
-
-        this.registeredIpcHandlers.add("get-history-limit");
-        ipcMain.handle("get-history-limit", () => {
-            if (isDev()) logger.debug("[IpcService] Handling get-history-limit");
-            return this.uptimeOrchestrator.getHistoryLimit();
-        });
-
-        this.registeredIpcHandlers.add("download-sqlite-backup");
-        ipcMain.handle("download-sqlite-backup", async () => {
-            if (isDev()) logger.debug("[IpcService] Handling download-sqlite-backup");
-            try {
-                return await this.uptimeOrchestrator.downloadBackup();
-            } catch (error) {
-                logger.error("[IpcService] Failed to download SQLite backup", error);
-                const message = error instanceof Error ? error.message : String(error);
-                throw new Error("Failed to download SQLite backup: " + message);
-            }
-        });
-    }
-
-    /**
-     * Setup IPC handlers for system-level operations.
-     *
-     * @remarks
-     * Handles application lifecycle and system operations:
-     * - `quit-and-install`: Quit application and install pending update
-     */
-    private setupSystemHandlers(): void {
-        this.registeredIpcHandlers.add("quit-and-install");
-        ipcMain.on("quit-and-install", () => {
-            logger.info("[IpcService] Handling quit-and-install");
-            this.autoUpdaterService.quitAndInstall();
-        });
-    }
-
-    /**
-     * Setup IPC handlers for state synchronization operations.
-     *
-     * @remarks
-     * Handles:
-     * - `request-full-sync`: Manual full state synchronization request
-     * - `get-sync-status`: Get current synchronization status
-     */
-    private setupStateSyncHandlers(): void {
-        this.registeredIpcHandlers.add("request-full-sync");
-        ipcMain.handle("request-full-sync", async () => {
-            logger.debug("[IpcService] Handling request-full-sync");
-            try {
-                // Get all sites and send to frontend
-                const sites = await this.uptimeOrchestrator.getSites();
-
-                // Emit proper typed sync event
-                await this.uptimeOrchestrator.emitTyped("sites:state-synchronized", {
-                    action: "bulk-sync",
-                    timestamp: Date.now(),
-                    source: "database",
-                });
-
-                // Send state sync event to all renderer processes
-                for (const window of BrowserWindow.getAllWindows()) {
-                    window.webContents.send("state-sync-event", {
-                        action: "bulk-sync",
-                        sites: sites,
-                        timestamp: Date.now(),
-                        source: "database",
-                    });
-                }
-
-                logger.debug("[IpcService] Full sync completed", { siteCount: sites.length });
-                return { success: true, siteCount: sites.length };
-            } catch (error) {
-                logger.error("[IpcService] Failed to perform full sync", error);
-                throw error;
-            }
-        });
-
-        this.registeredIpcHandlers.add("get-sync-status");
-        ipcMain.handle("get-sync-status", async () => {
-            logger.debug("[IpcService] Handling get-sync-status");
-            try {
-                const sites = await this.uptimeOrchestrator.getSites();
-                return {
-                    success: true,
-                    synchronized: true,
-                    lastSync: Date.now(),
-                    siteCount: sites.length,
-                };
-            } catch (error) {
-                logger.error("[IpcService] Failed to get sync status", error);
-                return {
-                    success: false,
-                    synchronized: false,
-                    lastSync: null,
-                    siteCount: 0,
-                };
-            }
-        });
-    }
-
-    /**
      * Setup IPC handlers for monitor type registry operations.
      *
      * @remarks
@@ -331,7 +303,7 @@ export class IpcService {
 
         this.registeredIpcHandlers.add("format-monitor-detail");
         ipcMain.handle("format-monitor-detail", (_, type: string, details: string) => {
-            if (isDev()) logger.debug("[IpcService] Handling format-monitor-detail", { type, details });
+            if (isDev()) logger.debug("[IpcService] Handling format-monitor-detail", { details, type });
 
             try {
                 // Input validation
@@ -354,14 +326,14 @@ export class IpcService {
 
                 return details;
             } catch (error) {
-                logger.error("[IpcService] Failed to format monitor detail", { type, details, error });
+                logger.error("[IpcService] Failed to format monitor detail", { details, error, type });
                 return details; // Return original details on error
             }
         });
 
         this.registeredIpcHandlers.add("format-monitor-title-suffix");
         ipcMain.handle("format-monitor-title-suffix", (_, type: string, monitor: Record<string, unknown>) => {
-            if (isDev()) logger.debug("[IpcService] Handling format-monitor-title-suffix", { type, monitor });
+            if (isDev()) logger.debug("[IpcService] Handling format-monitor-title-suffix", { monitor, type });
 
             try {
                 // Input validation
@@ -382,137 +354,165 @@ export class IpcService {
 
                 return "";
             } catch (error) {
-                logger.error("[IpcService] Failed to format monitor title suffix", { type, monitor, error });
+                logger.error("[IpcService] Failed to format monitor title suffix", { error, monitor, type });
                 return ""; // Return empty string on error
             }
         });
 
         this.registeredIpcHandlers.add("validate-monitor-data");
         ipcMain.handle("validate-monitor-data", (_, type: string, data: unknown): MonitorValidationResult => {
-            if (isDev()) logger.debug("[IpcService] Handling validate-monitor-data", { type, data });
+            if (isDev()) logger.debug("[IpcService] Handling validate-monitor-data", { data, type });
 
             try {
                 // Input validation
                 if (typeof type !== "string" || !type.trim()) {
                     return {
-                        success: false,
                         errors: ["Invalid monitor type provided"],
-                        warnings: [],
                         metadata: {},
+                        success: false,
+                        warnings: [],
                     };
                 }
 
                 // Use the validation function from the registry
                 const result = validateMonitorData(type.trim(), data);
                 return {
-                    success: result.success,
                     errors: result.errors,
-                    warnings: result.warnings,
                     metadata: result.metadata,
+                    success: result.success,
+                    warnings: result.warnings,
                 };
             } catch (error) {
-                logger.error("[IpcService] Failed to validate monitor data", { type, data, error });
+                logger.error("[IpcService] Failed to validate monitor data", { data, error, type });
                 return {
-                    success: false,
                     errors: ["Validation failed due to internal error"],
-                    warnings: [],
                     metadata: {},
+                    success: false,
+                    warnings: [],
                 };
             }
         });
     }
 
     /**
-     * Safely serialize a monitor type configuration for IPC transmission.
-     * Excludes non-serializable data while preserving all useful information.
+     * Setup IPC handlers for site management operations.
      *
-     * @param config - The monitor type configuration to serialize
-     * @returns Serializable configuration object
+     * @remarks
+     * Handles site CRUD operations:
+     * - `add-site`: Create new site with monitors
+     * - `remove-site`: Delete site and all associated data
+     * - `get-sites`: Retrieve all configured sites
+     * - `update-site`: Modify existing site configuration
+     * - `remove-monitor`: Delete specific monitor from site
      */
-    private serializeMonitorTypeConfig(config: ReturnType<typeof getAllMonitorTypeConfigs>[0]) {
-        // Extract and validate base properties
-        const {
-            type,
-            displayName,
-            description,
-            version,
-            fields,
-            uiConfig,
-            // Explicitly exclude non-serializable properties
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            validationSchema: _,
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            serviceFactory: __,
-            ...unexpectedProperties
-        } = config;
+    private setupSiteHandlers(): void {
+        this.registeredIpcHandlers.add("add-site");
+        ipcMain.handle("add-site", async (_, site: Site) => {
+            if (isDev()) logger.debug("[IpcService] Handling add-site");
+            return this.uptimeOrchestrator.addSite(site);
+        });
 
-        // Log if there are unexpected properties (helps with future maintenance)
-        if (Object.keys(unexpectedProperties).length > 0) {
-            logger.warn("[IpcService] Unexpected properties in monitor config", {
-                type,
-                unexpectedProperties: Object.keys(unexpectedProperties),
-            });
-        }
+        this.registeredIpcHandlers.add("remove-site");
+        ipcMain.handle("remove-site", async (_, identifier: string) => {
+            if (isDev()) logger.debug("[IpcService] Handling remove-site", { identifier });
+            return this.uptimeOrchestrator.removeSite(identifier);
+        });
 
-        // Serialize UI configuration with comprehensive property handling
-        const serializedUiConfig = uiConfig
-            ? {
-                  // Feature support flags
-                  supportsResponseTime: uiConfig.supportsResponseTime ?? false,
-                  supportsAdvancedAnalytics: uiConfig.supportsAdvancedAnalytics ?? false,
+        this.registeredIpcHandlers.add("get-sites");
+        ipcMain.handle("get-sites", async () => {
+            if (isDev()) logger.debug("[IpcService] Handling get-sites");
+            return this.uptimeOrchestrator.getSites();
+        });
 
-                  // Help texts (preserve original structure)
-                  helpTexts: uiConfig.helpTexts
-                      ? {
-                            primary: uiConfig.helpTexts.primary,
-                            secondary: uiConfig.helpTexts.secondary,
-                        }
-                      : undefined,
+        this.registeredIpcHandlers.add("update-site");
+        ipcMain.handle("update-site", async (_, identifier: string, updates: Partial<Site>) => {
+            if (isDev()) logger.debug("[IpcService] Handling update-site", { identifier });
+            return this.uptimeOrchestrator.updateSite(identifier, updates);
+        });
 
-                  // Display preferences (preserve all flags)
-                  display: uiConfig.display
-                      ? {
-                            showUrl: uiConfig.display.showUrl ?? false,
-                            showAdvancedMetrics: uiConfig.display.showAdvancedMetrics ?? false,
-                        }
-                      : undefined,
-
-                  // Detail formats (include all serializable data)
-                  detailFormats: uiConfig.detailFormats
-                      ? {
-                            analyticsLabel: uiConfig.detailFormats.analyticsLabel,
-                            // Note: historyDetail function is excluded (handled via IPC)
-                            // Note: formatDetail and formatTitleSuffix functions are excluded (handled via IPC)
-                        }
-                      : undefined,
-              }
-            : undefined;
-
-        return {
-            type,
-            displayName,
-            description,
-            version,
-            fields, // Fields are always present in BaseMonitorConfig
-            uiConfig: serializedUiConfig,
-        };
+        this.registeredIpcHandlers.add("remove-monitor");
+        ipcMain.handle("remove-monitor", async (_, siteIdentifier: string, monitorId: string) => {
+            if (isDev()) logger.debug("[IpcService] Handling remove-monitor", { monitorId, siteIdentifier });
+            return this.uptimeOrchestrator.removeMonitor(siteIdentifier, monitorId);
+        });
     }
 
     /**
-     * Clean up all IPC listeners.
+     * Setup IPC handlers for state synchronization operations.
      *
      * @remarks
-     * Removes all registered IPC handlers to prevent memory leaks.
-     * Should be called during application shutdown.
+     * Handles:
+     * - `request-full-sync`: Manual full state synchronization request
+     * - `get-sync-status`: Get current synchronization status
      */
-    public cleanup(): void {
-        logger.info("[IpcService] Cleaning up IPC handlers");
-        for (const channel of this.registeredIpcHandlers) {
-            ipcMain.removeHandler(channel);
-        }
-        // Remove listeners for channels registered with ipcMain.on
-        // Currently, only "quit-and-install" is handled here.
-        // Note: If you add more ipcMain.on listeners, document and remove them below.
-        ipcMain.removeAllListeners("quit-and-install");
+    private setupStateSyncHandlers(): void {
+        this.registeredIpcHandlers.add("request-full-sync");
+        ipcMain.handle("request-full-sync", async () => {
+            logger.debug("[IpcService] Handling request-full-sync");
+            try {
+                // Get all sites and send to frontend
+                const sites = await this.uptimeOrchestrator.getSites();
+
+                // Emit proper typed sync event
+                await this.uptimeOrchestrator.emitTyped("sites:state-synchronized", {
+                    action: "bulk-sync",
+                    source: "database",
+                    timestamp: Date.now(),
+                });
+
+                // Send state sync event to all renderer processes
+                for (const window of BrowserWindow.getAllWindows()) {
+                    window.webContents.send("state-sync-event", {
+                        action: "bulk-sync",
+                        sites: sites,
+                        source: "database",
+                        timestamp: Date.now(),
+                    });
+                }
+
+                logger.debug("[IpcService] Full sync completed", { siteCount: sites.length });
+                return { siteCount: sites.length, success: true };
+            } catch (error) {
+                logger.error("[IpcService] Failed to perform full sync", error);
+                throw error;
+            }
+        });
+
+        this.registeredIpcHandlers.add("get-sync-status");
+        ipcMain.handle("get-sync-status", async () => {
+            logger.debug("[IpcService] Handling get-sync-status");
+            try {
+                const sites = await this.uptimeOrchestrator.getSites();
+                return {
+                    lastSync: Date.now(),
+                    siteCount: sites.length,
+                    success: true,
+                    synchronized: true,
+                };
+            } catch (error) {
+                logger.error("[IpcService] Failed to get sync status", error);
+                return {
+                    lastSync: null,
+                    siteCount: 0,
+                    success: false,
+                    synchronized: false,
+                };
+            }
+        });
+    }
+
+    /**
+     * Setup IPC handlers for system-level operations.
+     *
+     * @remarks
+     * Handles application lifecycle and system operations:
+     * - `quit-and-install`: Quit application and install pending update
+     */
+    private setupSystemHandlers(): void {
+        this.registeredIpcHandlers.add("quit-and-install");
+        ipcMain.on("quit-and-install", () => {
+            logger.info("[IpcService] Handling quit-and-install");
+            this.autoUpdaterService.quitAndInstall();
+        });
     }
 }

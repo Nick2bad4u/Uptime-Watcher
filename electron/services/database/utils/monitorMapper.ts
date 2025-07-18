@@ -10,26 +10,89 @@
 
 import { Site } from "../../../types";
 import { logger } from "../../../utils/logger";
+import { generateSqlParameters, mapMonitorToRow, mapRowToMonitor } from "./dynamicSchema";
 import { DbValue } from "./valueConverters";
-import { mapRowToMonitor, mapMonitorToRow, generateSqlParameters } from "./dynamicSchema";
 
 /**
  * Monitor row interface for database operations.
  */
 export interface MonitorRow {
-    id: string;
-    siteIdentifier: string;
-    type: Site["monitors"][0]["type"];
-    enabled: boolean;
     checkInterval: number;
-    timeout: number;
-    retryAttempts: number;
-    status: Site["monitors"][0]["status"];
-    lastChecked?: Date;
-    responseTime?: number;
-    lastError?: string;
     createdAt: number;
+    enabled: boolean;
+    id: string;
+    lastChecked?: Date;
+    lastError?: string;
+    responseTime?: number;
+    retryAttempts: number;
+    siteIdentifier: string;
+    status: Site["monitors"][0]["status"];
+    timeout: number;
+    type: Site["monitors"][0]["type"];
     updatedAt: number;
+}
+
+/**
+ * Build parameter array for monitor insertion using dynamic schema.
+ */
+export function buildMonitorParameters(siteIdentifier: string, monitor: Site["monitors"][0]): DbValue[] {
+    try {
+        // Convert monitor to row format
+        const monitorWithMetadata = {
+            ...monitor,
+            createdAt: Date.now(),
+            enabled: monitor.monitoring,
+            siteIdentifier,
+            updatedAt: Date.now(),
+        };
+
+        const row = mapMonitorToRow(monitorWithMetadata);
+        const { columns } = generateSqlParameters();
+
+        // Return values in the same order as columns
+        // eslint-disable-next-line sonarjs/function-return-type -- Returns DbValue which can be different types
+        return columns.map((column): DbValue => {
+            // eslint-disable-next-line security/detect-object-injection
+            const value = row[column];
+            if (value === undefined || value === null) {
+                return null;
+            }
+            return value as DbValue;
+        });
+    } catch (error) {
+        logger.error("[MonitorMapper] Failed to build monitor parameters", { error, monitor, siteIdentifier });
+        throw error;
+    }
+}
+
+/**
+ * Validate that a row contains the minimum required fields for a monitor.
+ *
+ * @param row - Database row to validate
+ * @returns True if row is valid
+ *
+ * @public
+ */
+export function isValidMonitorRow(row: Record<string, unknown>): boolean {
+    return (
+        row.id !== undefined &&
+        row.site_identifier !== undefined &&
+        row.type !== undefined &&
+        typeof row.site_identifier === "string" &&
+        typeof row.type === "string"
+    );
+}
+
+/**
+ * Convert multiple database rows to monitor objects.
+ *
+ * @param rows - Array of database rows
+ * @returns Array of converted monitor objects
+ *
+ * @public
+ */
+export function rowsToMonitors(rows: Record<string, unknown>[]): Site["monitors"] {
+    return rows.map((row) => rowToMonitor(row));
 }
 
 /**
@@ -73,20 +136,20 @@ export function rowToMonitor(row: Record<string, unknown>): Site["monitors"][0] 
         for (const [key, value] of Object.entries(dynamicMonitor)) {
             if (
                 ![
-                    "id",
-                    "siteIdentifier",
-                    "name",
-                    "type",
-                    "enabled",
                     "checkInterval",
-                    "timeout",
-                    "retryAttempts",
-                    "status",
+                    "createdAt",
+                    "enabled",
+                    "id",
                     "lastChecked",
+                    "lastError",
+                    "name",
                     "nextCheck",
                     "responseTime",
-                    "lastError",
-                    "createdAt",
+                    "retryAttempts",
+                    "siteIdentifier",
+                    "status",
+                    "timeout",
+                    "type",
                     "updatedAt",
                 ].includes(key)
             ) {
@@ -97,21 +160,9 @@ export function rowToMonitor(row: Record<string, unknown>): Site["monitors"][0] 
 
         return monitor;
     } catch (error) {
-        logger.error("[MonitorMapper] Failed to map database row to monitor", { row, error });
+        logger.error("[MonitorMapper] Failed to map database row to monitor", { error, row });
         throw error;
     }
-}
-
-/**
- * Convert multiple database rows to monitor objects.
- *
- * @param rows - Array of database rows
- * @returns Array of converted monitor objects
- *
- * @public
- */
-export function rowsToMonitors(rows: Record<string, unknown>[]): Site["monitors"] {
-    return rows.map((row) => rowToMonitor(row));
 }
 
 /**
@@ -128,54 +179,4 @@ export function rowToMonitorOrUndefined(row: Record<string, unknown> | undefined
     }
 
     return rowToMonitor(row);
-}
-
-/**
- * Build parameter array for monitor insertion using dynamic schema.
- */
-export function buildMonitorParameters(siteIdentifier: string, monitor: Site["monitors"][0]): DbValue[] {
-    try {
-        // Convert monitor to row format
-        const monitorWithMetadata = {
-            ...monitor,
-            siteIdentifier,
-            enabled: monitor.monitoring,
-            createdAt: Date.now(),
-            updatedAt: Date.now(),
-        };
-
-        const row = mapMonitorToRow(monitorWithMetadata);
-        const { columns } = generateSqlParameters();
-
-        // Return values in the same order as columns
-        return columns.map((column) => {
-            // eslint-disable-next-line security/detect-object-injection
-            const value = row[column];
-            if (value === undefined || value === null) {
-                return null;
-            }
-            return value as DbValue;
-        });
-    } catch (error) {
-        logger.error("[MonitorMapper] Failed to build monitor parameters", { siteIdentifier, monitor, error });
-        throw error;
-    }
-}
-
-/**
- * Validate that a row contains the minimum required fields for a monitor.
- *
- * @param row - Database row to validate
- * @returns True if row is valid
- *
- * @public
- */
-export function isValidMonitorRow(row: Record<string, unknown>): boolean {
-    return (
-        row.id !== undefined &&
-        row.site_identifier !== undefined &&
-        row.type !== undefined &&
-        typeof row.site_identifier === "string" &&
-        typeof row.type === "string"
-    );
 }

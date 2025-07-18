@@ -47,13 +47,58 @@
 
 import { UptimeEvents } from "../../events/eventTypes";
 import { TypedEventBus } from "../../events/TypedEventBus";
-import { SiteRepository } from "../../services/database/SiteRepository";
-import { MonitorRepository } from "../../services/database/MonitorRepository";
 import { HistoryRepository } from "../../services/database/HistoryRepository";
+import { MonitorRepository } from "../../services/database/MonitorRepository";
 import { SettingsRepository } from "../../services/database/SettingsRepository";
+import { SiteRepository } from "../../services/database/SiteRepository";
 import { SiteRow } from "../../services/database/utils/siteMapper";
 import { Site } from "../../types";
-import { Logger, SiteCacheInterface, SiteLoadingConfig, MonitoringConfig, SiteLoadingError } from "./interfaces";
+import { Logger, MonitoringConfig, SiteCacheInterface, SiteLoadingConfig, SiteLoadingError } from "./interfaces";
+
+/**
+ * Orchestrates the complete site loading process.
+ * Coordinates data loading with side effects.
+ */
+export class SiteLoadingOrchestrator {
+    private readonly siteRepositoryService: SiteRepositoryService;
+
+    constructor(siteRepositoryService: SiteRepositoryService) {
+        this.siteRepositoryService = siteRepositoryService;
+    }
+
+    /**
+     * Load sites from database and start monitoring.
+     * Coordinates all aspects of site loading process.
+     */
+    async loadSitesFromDatabase(
+        siteCache: SiteCacheInterface,
+        monitoringConfig: MonitoringConfig
+    ): Promise<{ message: string; sitesLoaded: number; success: boolean }> {
+        try {
+            // Load sites data
+            await this.siteRepositoryService.loadSitesIntoCache(siteCache);
+
+            // Apply settings
+            await this.siteRepositoryService.applyHistoryLimitSetting(monitoringConfig);
+
+            // Note: Auto-start monitoring is now handled by MonitorManager.setupSiteForMonitoring()
+            // No need to explicitly start monitoring here as it's handled during site setup
+
+            const sitesLoaded = siteCache.size();
+            return {
+                message: `Successfully loaded ${sitesLoaded} sites`,
+                sitesLoaded,
+                success: true,
+            };
+        } catch (error) {
+            return {
+                message: `Failed to load sites: ${error instanceof Error ? error.message : "Unknown error"}`,
+                sitesLoaded: 0,
+                success: false,
+            };
+        }
+    }
+}
 
 /**
  * Service for handling site repository operations.
@@ -69,14 +114,14 @@ import { Logger, SiteCacheInterface, SiteLoadingConfig, MonitoringConfig, SiteLo
  * comprehensive error handling throughout all operations.
  */
 export class SiteRepositoryService {
-    private readonly repositories: {
-        site: SiteRepository;
-        monitor: MonitorRepository;
-        history: HistoryRepository;
-        settings: SettingsRepository;
-    };
-    private readonly logger: Logger;
     private readonly eventEmitter: TypedEventBus<UptimeEvents>;
+    private readonly logger: Logger;
+    private readonly repositories: {
+        history: HistoryRepository;
+        monitor: MonitorRepository;
+        settings: SettingsRepository;
+        site: SiteRepository;
+    };
 
     /**
      * Create a new SiteRepositoryService instance.
@@ -92,6 +137,42 @@ export class SiteRepositoryService {
         this.repositories = config.repositories;
         this.logger = config.logger;
         this.eventEmitter = config.eventEmitter;
+    }
+
+    /**
+     * Apply history limit setting.
+     * Side effect operation separated from data loading.
+     */
+    async applyHistoryLimitSetting(monitoringConfig: MonitoringConfig): Promise<void> {
+        const limit = await this.getHistoryLimitSetting();
+        if (limit !== undefined) {
+            monitoringConfig.setHistoryLimit(limit);
+            this.logger.info(`History limit applied: ${limit}`);
+        }
+    }
+
+    /**
+     * Load history limit setting from database.
+     * Pure data operation without side effects.
+     */
+    async getHistoryLimitSetting(): Promise<number | undefined> {
+        try {
+            const historyLimitSetting = await this.repositories.settings.get("historyLimit");
+            if (!historyLimitSetting) {
+                return undefined;
+            }
+
+            const limit = Number.parseInt(historyLimitSetting, 10);
+            if (Number.isNaN(limit) || limit <= 0) {
+                this.logger.warn(`Invalid history limit setting: ${historyLimitSetting}`);
+                return undefined;
+            }
+
+            return limit;
+        } catch (error) {
+            this.logger.warn("Could not load history limit from settings:", error);
+            return undefined;
+        }
     }
 
     /**
@@ -159,42 +240,6 @@ export class SiteRepositoryService {
     }
 
     /**
-     * Load history limit setting from database.
-     * Pure data operation without side effects.
-     */
-    async getHistoryLimitSetting(): Promise<number | undefined> {
-        try {
-            const historyLimitSetting = await this.repositories.settings.get("historyLimit");
-            if (!historyLimitSetting) {
-                return undefined;
-            }
-
-            const limit = Number.parseInt(historyLimitSetting, 10);
-            if (Number.isNaN(limit) || limit <= 0) {
-                this.logger.warn(`Invalid history limit setting: ${historyLimitSetting}`);
-                return undefined;
-            }
-
-            return limit;
-        } catch (error) {
-            this.logger.warn("Could not load history limit from settings:", error);
-            return undefined;
-        }
-    }
-
-    /**
-     * Apply history limit setting.
-     * Side effect operation separated from data loading.
-     */
-    async applyHistoryLimitSetting(monitoringConfig: MonitoringConfig): Promise<void> {
-        const limit = await this.getHistoryLimitSetting();
-        if (limit !== undefined) {
-            monitoringConfig.setHistoryLimit(limit);
-            this.logger.info(`History limit applied: ${limit}`);
-        }
-    }
-
-    /**
      * Build a site object with monitors and history.
      * Private helper method for data construction.
      */
@@ -216,50 +261,5 @@ export class SiteRepositoryService {
         };
 
         return site;
-    }
-}
-
-/**
- * Orchestrates the complete site loading process.
- * Coordinates data loading with side effects.
- */
-export class SiteLoadingOrchestrator {
-    private readonly siteRepositoryService: SiteRepositoryService;
-
-    constructor(siteRepositoryService: SiteRepositoryService) {
-        this.siteRepositoryService = siteRepositoryService;
-    }
-
-    /**
-     * Load sites from database and start monitoring.
-     * Coordinates all aspects of site loading process.
-     */
-    async loadSitesFromDatabase(
-        siteCache: SiteCacheInterface,
-        monitoringConfig: MonitoringConfig
-    ): Promise<{ success: boolean; sitesLoaded: number; message: string }> {
-        try {
-            // Load sites data
-            await this.siteRepositoryService.loadSitesIntoCache(siteCache);
-
-            // Apply settings
-            await this.siteRepositoryService.applyHistoryLimitSetting(monitoringConfig);
-
-            // Note: Auto-start monitoring is now handled by MonitorManager.setupSiteForMonitoring()
-            // No need to explicitly start monitoring here as it's handled during site setup
-
-            const sitesLoaded = siteCache.size();
-            return {
-                message: `Successfully loaded ${sitesLoaded} sites`,
-                sitesLoaded,
-                success: true,
-            };
-        } catch (error) {
-            return {
-                message: `Failed to load sites: ${error instanceof Error ? error.message : "Unknown error"}`,
-                sitesLoaded: 0,
-                success: false,
-            };
-        }
     }
 }

@@ -4,22 +4,23 @@
  * Supports both HTTP and port monitoring types, with customizable check intervals.
  */
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
-import { UI_DELAYS, CHECK_INTERVALS } from "../../constants";
+import type { MonitorType } from "../../types";
+
+import { CHECK_INTERVALS, UI_DELAYS } from "../../constants";
+import { useDynamicHelpText } from "../../hooks/useDynamicHelpText";
+import { useMonitorTypes } from "../../hooks/useMonitorTypes";
 import logger from "../../services/logger";
 import { useErrorStore } from "../../stores/error/useErrorStore";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
-import { ThemedBox, ThemedText, ThemedButton } from "../../theme/components";
+import { ThemedBox, ThemedButton, ThemedText } from "../../theme/components";
 import { useTheme } from "../../theme/useTheme";
-import type { MonitorType } from "../../types";
 import { generateUuid } from "../../utils/data/generateUuid";
-import { TextField, SelectField, RadioGroup } from "./FormFields";
-import { useDynamicHelpText } from "../../hooks/useDynamicHelpText";
-import { DynamicMonitorFields } from "./DynamicMonitorFields";
-import { handleSubmit } from "./Submit";
 import { useAddSiteForm } from "../SiteDetails/useAddSiteForm";
-import { useMonitorTypes } from "../../hooks/useMonitorTypes";
+import { DynamicMonitorFields } from "./DynamicMonitorFields";
+import { RadioGroup, SelectField, TextField } from "./FormFields";
+import { handleSubmit } from "./Submit";
 
 /**
  * Main form component for adding new monitoring sites or monitors.
@@ -44,7 +45,7 @@ export const AddSiteForm = React.memo(function AddSiteForm() {
     const { isDark } = useTheme();
 
     // Load monitor types from backend
-    const { options: monitorTypeOptions, isLoading: isLoadingMonitorTypes } = useMonitorTypes();
+    const { isLoading: isLoadingMonitorTypes, options: monitorTypeOptions } = useMonitorTypes();
 
     // Use our custom hook for form state management
     const formState = useAddSiteForm();
@@ -126,7 +127,7 @@ export const AddSiteForm = React.memo(function AddSiteForm() {
                     id="addMode"
                     label="Add Mode"
                     name="addMode"
-                    onChange={(value) => setAddMode(value as "new" | "existing")}
+                    onChange={(value) => setAddMode(value as "existing" | "new")}
                     options={[
                         { label: "Create New Site", value: "new" },
                         { label: "Add to Existing Site", value: "existing" },
@@ -186,18 +187,18 @@ export const AddSiteForm = React.memo(function AddSiteForm() {
 
                 {/* Dynamic Monitor Fields */}
                 <DynamicMonitorFields
+                    isLoading={isLoading}
                     monitorType={monitorType}
+                    onChange={{
+                        host: (value: number | string) => setHost(String(value)),
+                        port: (value: number | string) => setPort(String(value)),
+                        url: (value: number | string) => setUrl(String(value)),
+                    }}
                     values={{
-                        url: url,
                         host: host,
                         port: port,
+                        url: url,
                     }}
-                    onChange={{
-                        url: (value: string | number) => setUrl(String(value)),
-                        host: (value: string | number) => setHost(String(value)),
-                        port: (value: string | number) => setPort(String(value)),
-                    }}
-                    isLoading={isLoading}
                 />
 
                 <SelectField

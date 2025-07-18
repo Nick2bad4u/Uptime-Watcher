@@ -6,8 +6,8 @@
 // Re-export everything from shared utilities
 export type { SiteStatus } from "../../shared/types";
 export {
-    calculateSiteStatus,
     calculateSiteMonitoringStatus,
+    calculateSiteStatus,
     getSiteDisplayStatus,
     getSiteStatusDescription,
     getSiteStatusVariant,

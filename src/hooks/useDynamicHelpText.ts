@@ -2,8 +2,10 @@
  * Dynamic hook for loading monitor type help text.
  */
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+
 import type { MonitorType } from "../types";
+
 import { getMonitorHelpTexts } from "../utils/monitorUiHelpers";
 
 /**

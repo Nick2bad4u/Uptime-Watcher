@@ -5,45 +5,26 @@
  */
 
 import { FiSettings } from "react-icons/fi";
-import { MdDomain, MdMonitorHeart, MdSpeed, MdOutlineFactCheck } from "react-icons/md";
+import { MdDomain, MdMonitorHeart, MdOutlineFactCheck, MdSpeed } from "react-icons/md";
 
 import {
-    ThemedText,
-    ThemedButton,
-    ThemedBadge,
-    ThemedCard,
-    ThemedBox,
     StatusIndicator,
+    ThemedBadge,
+    ThemedBox,
+    ThemedButton,
+    ThemedCard,
     ThemedProgress,
+    ThemedText,
 } from "../../../theme/components";
-import { useTheme, useAvailabilityColors } from "../../../theme/useTheme";
-import { Site, Monitor } from "../../../types";
+import { useAvailabilityColors, useTheme } from "../../../theme/useTheme";
+import { Monitor, Site } from "../../../types";
 import { getSiteDisplayStatus } from "../../../utils/siteStatus";
-import { formatResponseTime, formatDuration } from "../../../utils/time";
-
-/**
- * Get status text for monitor
- */
-function getMonitorStatusText(monitor: Monitor): string {
-    if (monitor.monitoring) {
-        return "Running";
-    }
-    return "Stopped";
-}
-
-/**
- * Get monitor badge variant
- */
-function getMonitorBadgeVariant(monitor: Monitor): "success" | "warning" | "error" {
-    return monitor.monitoring ? "success" : "warning";
-}
+import { formatDuration, formatResponseTime } from "../../../utils/time";
 
 /**
  * Props for the SiteOverviewTab component
  */
 interface SiteOverviewTabProperties {
-    /** The site object to display overview for */
-    readonly site: Site;
     /** Average response time across all monitors */
     readonly avgResponseTime: number;
     /** Handler for removing the site */
@@ -54,6 +35,8 @@ interface SiteOverviewTabProperties {
     readonly handleStopSiteMonitoring: () => Promise<void>;
     /** Whether any async operation is in progress */
     readonly isLoading: boolean;
+    /** The site object to display overview for */
+    readonly site: Site;
     /** Total number of checks across all monitors */
     readonly totalChecks: number;
     /** Total uptime percentage across all monitors */
@@ -95,7 +78,7 @@ export function SiteOverviewTab({
     /**
      * Get status variant for theming based on uptime percentage
      */
-    const getUptimeVariant = (percentage: number): "success" | "warning" | "error" => {
+    const getUptimeVariant = (percentage: number): "error" | "success" | "warning" => {
         const variant = getAvailabilityVariant(percentage);
         return variant === "danger" ? "error" : variant;
     };
@@ -107,23 +90,23 @@ export function SiteOverviewTab({
         // Use getColor to safely access theme colors with proper validation
         const siteStatusColor = (() => {
             switch (siteDisplayStatus) {
-                case "up": {
-                    return currentTheme.colors.status.up;
-                }
                 case "down": {
                     return currentTheme.colors.status.down;
-                }
-                case "pending": {
-                    return currentTheme.colors.status.pending;
-                }
-                case "paused": {
-                    return currentTheme.colors.status.paused;
                 }
                 case "mixed": {
                     return currentTheme.colors.status.mixed;
                 }
+                case "paused": {
+                    return currentTheme.colors.status.paused;
+                }
+                case "pending": {
+                    return currentTheme.colors.status.pending;
+                }
                 case "unknown": {
                     return currentTheme.colors.status.unknown;
+                }
+                case "up": {
+                    return currentTheme.colors.status.up;
                 }
                 default: {
                     return currentTheme.colors.error;
@@ -157,25 +140,25 @@ export function SiteOverviewTab({
     const uptimeVariant = getUptimeVariant(uptime);
 
     return (
-        <div data-testid="site-overview-tab" className="space-y-6">
+        <div className="space-y-6" data-testid="site-overview-tab">
             {/* Site Overview Metrics */}
             <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                 <ThemedCard
+                    className="flex flex-col items-center justify-center text-center"
+                    hoverable
                     icon={<MdDomain />}
                     iconColor={iconColors.site}
                     title="Site Status"
-                    hoverable
-                    className="flex flex-col items-center justify-center text-center"
                 >
-                    <StatusIndicator status={siteDisplayStatus} size="lg" showText />
+                    <StatusIndicator showText size="lg" status={siteDisplayStatus} />
                 </ThemedCard>
 
                 <ThemedCard
+                    className="flex flex-col items-center justify-center space-y-1 text-center"
+                    hoverable
                     icon={<MdMonitorHeart />}
                     iconColor={iconColors.monitors}
                     title="Monitors"
-                    hoverable
-                    className="flex flex-col items-center justify-center space-y-1 text-center"
                 >
                     <div className="flex flex-col items-center">
                         <ThemedText size="xl" weight="bold">
@@ -188,32 +171,32 @@ export function SiteOverviewTab({
                 </ThemedCard>
 
                 <ThemedCard
+                    className="flex flex-col items-center justify-center text-center"
+                    hoverable
                     icon={<MdOutlineFactCheck />}
                     iconColor={iconColors.uptime}
                     title="Overall Uptime"
-                    hoverable
-                    className="flex flex-col items-center justify-center text-center"
                 >
                     <ThemedProgress
+                        className="flex flex-col items-center"
+                        showLabel
                         value={uptime}
                         variant={uptimeVariant}
-                        showLabel
-                        className="flex flex-col items-center"
                     />
-                    <ThemedBadge variant={uptimeVariant} size="sm" className="mt-2">
+                    <ThemedBadge className="mt-2" size="sm" variant={uptimeVariant}>
                         {uptime.toFixed(2)}%
                     </ThemedBadge>
                 </ThemedCard>
 
                 <ThemedCard
+                    className="flex flex-col items-center justify-center space-y-1 text-center"
+                    hoverable
                     icon={<MdSpeed />}
                     iconColor={iconColors.response}
                     title="Avg Response"
-                    hoverable
-                    className="flex flex-col items-center justify-center space-y-1 text-center"
                 >
                     <div className="flex flex-col items-center">
-                        <ThemedText size="xl" weight="bold" style={{ color: getResponseTimeColor(avgResponseTime) }}>
+                        <ThemedText size="xl" style={{ color: getResponseTimeColor(avgResponseTime) }} weight="bold">
                             {formatResponseTime(avgResponseTime)}
                         </ThemedText>
                         <ThemedText size="xs" variant="secondary">
@@ -227,7 +210,7 @@ export function SiteOverviewTab({
             <ThemedCard icon={<MdDomain color={iconColors.site} />} title="Site Information">
                 <div className="space-y-4">
                     <div className="space-y-2">
-                        <ThemedText size="xl" weight="bold" variant="primary" className="text-center">
+                        <ThemedText className="text-center" size="xl" variant="primary" weight="bold">
                             {site.name}
                         </ThemedText>
                         <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
@@ -249,7 +232,7 @@ export function SiteOverviewTab({
             <ThemedCard icon={<MdMonitorHeart color={iconColors.monitors} />} title="Monitor Details">
                 <div className="space-y-4">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                        <ThemedText size="lg" weight="semibold" variant="primary">
+                        <ThemedText size="lg" variant="primary" weight="semibold">
                             Individual Monitors
                         </ThemedText>
                         <div className="flex flex-wrap items-center gap-4 text-sm">
@@ -269,13 +252,13 @@ export function SiteOverviewTab({
                         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                             {site.monitors.map((monitor) => (
                                 <ThemedBox
-                                    key={monitor.id}
-                                    surface="elevated"
-                                    variant="secondary"
-                                    padding="md"
-                                    rounded="lg"
                                     border
                                     className="flex items-center justify-between"
+                                    key={monitor.id}
+                                    padding="md"
+                                    rounded="lg"
+                                    surface="elevated"
+                                    variant="secondary"
                                 >
                                     <div className="flex flex-col">
                                         <ThemedText weight="medium">{monitor.type.toUpperCase()} Monitor</ThemedText>
@@ -288,7 +271,7 @@ export function SiteOverviewTab({
                                         </ThemedText>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <ThemedBadge variant={getMonitorBadgeVariant(monitor)} size="sm">
+                                        <ThemedBadge size="sm" variant={getMonitorBadgeVariant(monitor)}>
                                             {getMonitorStatusText(monitor)}
                                         </ThemedBadge>
                                     </div>
@@ -296,7 +279,7 @@ export function SiteOverviewTab({
                             ))}
                         </div>
                     ) : (
-                        <ThemedText variant="secondary" className="py-8 text-center">
+                        <ThemedText className="py-8 text-center" variant="secondary">
                             No monitors configured for this site.
                         </ThemedText>
                     )}
@@ -308,37 +291,37 @@ export function SiteOverviewTab({
                 <div className="flex flex-wrap items-center gap-4">
                     {allMonitorsRunning ? (
                         <ThemedButton
-                            variant="error"
-                            size="sm"
+                            className="flex items-center gap-1"
+                            disabled={isLoading}
                             onClick={() => {
                                 void handleStopSiteMonitoring();
                             }}
-                            disabled={isLoading}
-                            className="flex items-center gap-1"
+                            size="sm"
+                            variant="error"
                         >
                             ⏹️ Stop All Monitoring
                         </ThemedButton>
                     ) : (
                         <ThemedButton
-                            variant="success"
-                            size="sm"
+                            className="flex items-center gap-1"
+                            disabled={isLoading}
                             onClick={() => {
                                 void handleStartSiteMonitoring();
                             }}
-                            disabled={isLoading}
-                            className="flex items-center gap-1"
+                            size="sm"
+                            variant="success"
                         >
                             ▶️ Start All Monitoring
                         </ThemedButton>
                     )}
                     <ThemedButton
-                        variant="error"
-                        size="sm"
+                        className="flex items-center gap-1"
+                        disabled={isLoading}
                         onClick={() => {
                             void handleRemoveSite();
                         }}
-                        disabled={isLoading}
-                        className="flex items-center gap-1"
+                        size="sm"
+                        variant="error"
                     >
                         �️ Remove Site
                     </ThemedButton>
@@ -346,4 +329,21 @@ export function SiteOverviewTab({
             </ThemedCard>
         </div>
     );
+}
+
+/**
+ * Get monitor badge variant
+ */
+function getMonitorBadgeVariant(monitor: Monitor): "error" | "success" | "warning" {
+    return monitor.monitoring ? "success" : "warning";
+}
+
+/**
+ * Get status text for monitor
+ */
+function getMonitorStatusText(monitor: Monitor): string {
+    if (monitor.monitoring) {
+        return "Running";
+    }
+    return "Stopped";
 }

@@ -61,6 +61,33 @@ export class NotificationService {
     }
 
     /**
+     * Get the current notification configuration.
+     *
+     * @returns A copy of the current configuration
+     *
+     * @remarks
+     * Returns a copy to prevent external modification of the internal configuration.
+     * Use {@link NotificationService.updateConfig} to modify settings.
+     */
+    public getConfig(): NotificationConfig {
+        return { ...this.config };
+    }
+
+    /**
+     * Check if system notifications are supported on the current platform.
+     *
+     * @returns `true` if notifications are supported, `false` otherwise
+     *
+     * @remarks
+     * Uses Electron's built-in platform detection to determine notification support.
+     * On unsupported platforms, notification methods will log warnings instead
+     * of attempting to display notifications.
+     */
+    public isSupported(): boolean {
+        return Notification.isSupported();
+    }
+
+    /**
      * Show a notification when a monitor goes down.
      *
      * @param site - The site containing the monitor that went down
@@ -147,34 +174,10 @@ export class NotificationService {
      * Changes take effect immediately for subsequent notifications.
      */
     public updateConfig(config: Partial<NotificationConfig>): void {
-        this.config = { ...this.config, ...config };
+        this.config = {
+            ...this.config,
+            ...config,
+        };
         logger.debug("[NotificationService] Configuration updated", this.config);
-    }
-
-    /**
-     * Get the current notification configuration.
-     *
-     * @returns A copy of the current configuration
-     *
-     * @remarks
-     * Returns a copy to prevent external modification of the internal configuration.
-     * Use {@link NotificationService.updateConfig} to modify settings.
-     */
-    public getConfig(): NotificationConfig {
-        return { ...this.config };
-    }
-
-    /**
-     * Check if system notifications are supported on the current platform.
-     *
-     * @returns `true` if notifications are supported, `false` otherwise
-     *
-     * @remarks
-     * Uses Electron's built-in platform detection to determine notification support.
-     * On unsupported platforms, notification methods will log warnings instead
-     * of attempting to display notifications.
-     */
-    public isSupported(): boolean {
-        return Notification.isSupported();
     }
 }

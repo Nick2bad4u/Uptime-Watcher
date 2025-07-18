@@ -22,7 +22,7 @@ import { useSettingsStore } from "./stores/settings/useSettingsStore";
 import { useSitesStore } from "./stores/sites/useSitesStore";
 import { useUIStore } from "./stores/ui/useUiStore";
 import { useUpdatesStore } from "./stores/updates/useUpdatesStore";
-import { ThemeProvider, ThemedBox, ThemedText, ThemedButton } from "./theme/components";
+import { ThemedBox, ThemedButton, ThemedText, ThemeProvider } from "./theme/components";
 import { useTheme } from "./theme/useTheme";
 
 /**
@@ -149,7 +149,7 @@ function App() {
                     {/* Global Loading Overlay */}
                     {showLoadingOverlay && (
                         <div className="loading-overlay">
-                            <ThemedBox surface="elevated" padding="lg" rounded="lg" shadow="xl">
+                            <ThemedBox padding="lg" rounded="lg" shadow="xl" surface="elevated">
                                 <div className="loading-content">
                                     <div className="loading-spinner" />
                                     <ThemedText size="base" weight="medium">
@@ -163,7 +163,7 @@ function App() {
                     {/* Global Error Notification */}
                     {lastError && (
                         <div className="fixed top-0 left-0 right-0 z-50">
-                            <ThemedBox surface="elevated" padding="md" className="error-alert">
+                            <ThemedBox className="error-alert" padding="md" surface="elevated">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center space-x-2">
                                         <div className="error-alert__icon">⚠️</div>
@@ -172,10 +172,10 @@ function App() {
                                         </ThemedText>
                                     </div>
                                     <ThemedButton
-                                        variant="secondary"
-                                        size="sm"
-                                        onClick={clearError}
                                         className="ml-4 error-alert__close"
+                                        onClick={clearError}
+                                        size="sm"
+                                        variant="secondary"
                                     >
                                         ✕
                                     </ThemedButton>
@@ -191,9 +191,9 @@ function App() {
                         updateStatus === "error") && (
                         <div className="fixed left-0 right-0 z-50 top-12">
                             <ThemedBox
-                                surface="elevated"
-                                padding="md"
                                 className={`update-alert update-alert--${updateStatus}`}
+                                padding="md"
+                                surface="elevated"
                             >
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center space-x-2">
@@ -213,8 +213,7 @@ function App() {
                                     </div>
                                     {(updateStatus === "downloaded" || updateStatus === "error") && (
                                         <ThemedButton
-                                            variant="secondary"
-                                            size="sm"
+                                            className="ml-4 update-alert__action"
                                             onClick={() => {
                                                 if (updateStatus === "downloaded") {
                                                     applyUpdate();
@@ -223,7 +222,8 @@ function App() {
                                                     setUpdateError(undefined);
                                                 }
                                             }}
-                                            className="ml-4 update-alert__action"
+                                            size="sm"
+                                            variant="secondary"
                                         >
                                             {updateStatus === "downloaded" ? "Restart Now" : "Dismiss"}
                                         </ThemedButton>
@@ -239,8 +239,8 @@ function App() {
                         <div className="grid-layout">
                             {/* Main content */}
                             <div>
-                                <ThemedBox surface="elevated" padding="md" shadow="sm" rounded="lg">
-                                    <ThemedBox surface="base" padding="md" border className="border-b">
+                                <ThemedBox padding="md" rounded="lg" shadow="sm" surface="elevated">
+                                    <ThemedBox border className="border-b" padding="md" surface="base">
                                         <ThemedText size="lg" weight="medium">
                                             Monitored Sites ({sites.length})
                                         </ThemedText>
@@ -253,8 +253,8 @@ function App() {
 
                             {/* Sidebar */}
                             <div>
-                                <ThemedBox surface="elevated" padding="lg" shadow="sm" rounded="lg">
-                                    <ThemedText size="lg" weight="medium" className="mb-4">
+                                <ThemedBox padding="lg" rounded="lg" shadow="sm" surface="elevated">
+                                    <ThemedText className="mb-4" size="lg" weight="medium">
                                         Add New Site
                                     </ThemedText>
                                     <AddSiteForm />
@@ -268,7 +268,7 @@ function App() {
 
                     {/* Site Details Modal */}
                     {showSiteDetails && selectedSite && (
-                        <SiteDetails site={selectedSite} onClose={() => setShowSiteDetails(false)} />
+                        <SiteDetails onClose={() => setShowSiteDetails(false)} site={selectedSite} />
                     )}
                 </div>
             </ThemeProvider>

@@ -6,11 +6,11 @@ import { useUIStore } from "../../stores/ui/useUiStore";
 import { Monitor, Site } from "../../types";
 
 interface SiteActionsResult {
+    handleCardClick: () => void;
+    handleCheckNow: () => void;
     // Action handlers
     handleStartMonitoring: () => void;
     handleStopMonitoring: () => void;
-    handleCheckNow: () => void;
-    handleCardClick: () => void;
 }
 
 /**

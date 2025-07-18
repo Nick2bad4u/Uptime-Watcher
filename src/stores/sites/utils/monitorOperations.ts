@@ -3,7 +3,15 @@
  * Provides utilities for working with monitor data and configurations.
  */
 
-import { type Monitor, type MonitorType, type Site, ERROR_MESSAGES } from "../../types";
+import { ERROR_MESSAGES, type Monitor, type MonitorType, type Site } from "../../types";
+
+/**
+ * Adds a monitor to a site
+ */
+export function addMonitorToSite(site: Site, monitor: Monitor): Site {
+    const updatedMonitors = [...site.monitors, monitor];
+    return { ...site, monitors: updatedMonitors };
+}
 
 /**
  * Creates a default monitor for a site
@@ -24,21 +32,10 @@ export function createDefaultMonitor(overrides: Partial<Monitor> = {}): Monitor 
 }
 
 /**
- * Validates monitor data
+ * Finds a monitor in a site by ID
  */
-export function validateMonitor(monitor: Partial<Monitor>): monitor is Monitor {
-    return (
-        typeof monitor.id === "string" &&
-        typeof monitor.type === "string" &&
-        typeof monitor.status === "string" &&
-        ["pending", "up", "down"].includes(monitor.status) &&
-        typeof monitor.monitoring === "boolean" &&
-        typeof monitor.responseTime === "number" &&
-        typeof monitor.checkInterval === "number" &&
-        typeof monitor.timeout === "number" &&
-        typeof monitor.retryAttempts === "number" &&
-        Array.isArray(monitor.history)
-    );
+export function findMonitorInSite(site: Site, monitorId: string): Monitor | undefined {
+    return site.monitors.find((monitor) => monitor.id === monitorId);
 }
 
 /**
@@ -52,7 +49,7 @@ export function normalizeMonitor(monitor: Partial<Monitor>): Monitor {
         monitoring: monitor.monitoring ?? true,
         responseTime: monitor.responseTime ?? -1, // Sentinel value for never checked
         retryAttempts: monitor.retryAttempts ?? 3, // Default retry attempts
-        status: ["pending", "up", "down"].includes(monitor.status as string)
+        status: ["down", "pending", "up"].includes(monitor.status as string)
             ? (monitor.status as Monitor["status"])
             : "pending",
         timeout: monitor.timeout ?? 5000, // Default timeout
@@ -66,10 +63,11 @@ export function normalizeMonitor(monitor: Partial<Monitor>): Monitor {
 }
 
 /**
- * Finds a monitor in a site by ID
+ * Removes a monitor from a site
  */
-export function findMonitorInSite(site: Site, monitorId: string): Monitor | undefined {
-    return site.monitors.find((monitor) => monitor.id === monitorId);
+export function removeMonitorFromSite(site: Site, monitorId: string): Site {
+    const updatedMonitors = site.monitors.filter((monitor) => monitor.id !== monitorId);
+    return { ...site, monitors: updatedMonitors };
 }
 
 /**
@@ -89,19 +87,21 @@ export function updateMonitorInSite(site: Site, monitorId: string, updates: Part
 }
 
 /**
- * Adds a monitor to a site
+ * Validates monitor data
  */
-export function addMonitorToSite(site: Site, monitor: Monitor): Site {
-    const updatedMonitors = [...site.monitors, monitor];
-    return { ...site, monitors: updatedMonitors };
-}
-
-/**
- * Removes a monitor from a site
- */
-export function removeMonitorFromSite(site: Site, monitorId: string): Site {
-    const updatedMonitors = site.monitors.filter((monitor) => monitor.id !== monitorId);
-    return { ...site, monitors: updatedMonitors };
+export function validateMonitor(monitor: Partial<Monitor>): monitor is Monitor {
+    return (
+        typeof monitor.id === "string" &&
+        typeof monitor.type === "string" &&
+        typeof monitor.status === "string" &&
+        ["down", "pending", "up"].includes(monitor.status) &&
+        typeof monitor.monitoring === "boolean" &&
+        typeof monitor.responseTime === "number" &&
+        typeof monitor.checkInterval === "number" &&
+        typeof monitor.timeout === "number" &&
+        typeof monitor.retryAttempts === "number" &&
+        Array.isArray(monitor.history)
+    );
 }
 
 /**

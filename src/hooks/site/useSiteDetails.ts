@@ -9,7 +9,7 @@
  * - Integration with analytics data
  */
 
-import { useEffect, useState, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { DEFAULT_CHECK_INTERVAL } from "../../constants";
 import logger from "../../services/logger";
@@ -17,7 +17,7 @@ import { useErrorStore } from "../../stores/error/useErrorStore";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { useUIStore } from "../../stores/ui/useUiStore";
 import { Site } from "../../types";
-import { getTimeoutSeconds, timeoutSecondsToMs, clampTimeoutSeconds } from "../../utils/timeoutUtils";
+import { clampTimeoutSeconds, getTimeoutSeconds, timeoutSecondsToMs } from "../../utils/timeoutUtils";
 import { useSiteAnalytics } from "./useSiteAnalytics";
 
 /** Props for the useSiteDetails hook */

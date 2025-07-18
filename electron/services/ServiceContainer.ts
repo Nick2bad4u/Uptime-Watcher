@@ -13,12 +13,12 @@
  */
 
 import { UptimeOrchestrator } from "../UptimeOrchestrator";
-import { AutoUpdaterService } from "./updater/AutoUpdaterService";
+import { logger } from "../utils/logger";
 import { DatabaseService } from "./database/DatabaseService";
 import { IpcService } from "./ipc/IpcService";
 import { NotificationService } from "./notifications/NotificationService";
+import { AutoUpdaterService } from "./updater/AutoUpdaterService";
 import { WindowService } from "./window/WindowService";
-import { logger } from "../utils/logger";
 
 /**
  * Service container configuration interface.
@@ -39,6 +39,27 @@ export interface ServiceContainerConfig {
 export class ServiceContainer {
     private static instance: ServiceContainer | undefined = undefined;
 
+    private _autoUpdaterService?: AutoUpdaterService;
+
+    // Core Services (Infrastructure)
+    private _databaseService?: DatabaseService;
+
+    private _ipcService?: IpcService;
+
+    private _notificationService?: NotificationService;
+
+    // Application Services (Business Logic)
+    private _uptimeOrchestrator?: UptimeOrchestrator;
+    // Utility Services
+    private _windowService?: WindowService;
+    private readonly config: ServiceContainerConfig;
+
+    private constructor(config: ServiceContainerConfig = {}) {
+        this.config = config;
+        if (config.enableDebugLogging) {
+            logger.debug("[ServiceContainer] Creating new service container");
+        }
+    }
     /**
      * Get the singleton service container instance.
      */
@@ -54,62 +75,6 @@ export class ServiceContainer {
         ServiceContainer.instance = undefined;
     }
 
-    private readonly config: ServiceContainerConfig;
-
-    // Core Services (Infrastructure)
-    private _databaseService?: DatabaseService;
-
-    // Utility Services
-    private _windowService?: WindowService;
-    private _autoUpdaterService?: AutoUpdaterService;
-    private _notificationService?: NotificationService;
-
-    // Application Services (Business Logic)
-    private _uptimeOrchestrator?: UptimeOrchestrator;
-    private _ipcService?: IpcService;
-
-    private constructor(config: ServiceContainerConfig = {}) {
-        this.config = config;
-        if (config.enableDebugLogging) {
-            logger.debug("[ServiceContainer] Creating new service container");
-        }
-    }
-
-    /**
-     * Initialize all services in the correct order.
-     */
-    public async initialize(): Promise<void> {
-        logger.info("[ServiceContainer] Initializing services");
-
-        // Initialize core services first
-        this.getDatabaseService().initialize();
-
-        // Initialize application services
-        await this.getUptimeOrchestrator().initialize();
-
-        // Initialize IPC (depends on orchestrator)
-        this.getIpcService().setupHandlers();
-
-        logger.info("[ServiceContainer] All services initialized successfully");
-    }
-
-    // Core Services
-    public getDatabaseService(): DatabaseService {
-        this._databaseService ??= DatabaseService.getInstance();
-        return this._databaseService;
-    }
-
-    // Utility Services
-    public getWindowService(): WindowService {
-        if (!this._windowService) {
-            this._windowService = new WindowService();
-            if (this.config.enableDebugLogging) {
-                logger.debug("[ServiceContainer] Created WindowService"); /* v8 ignore next */
-            }
-        }
-        return this._windowService;
-    }
-
     public getAutoUpdaterService(): AutoUpdaterService {
         if (!this._autoUpdaterService) {
             this._autoUpdaterService = new AutoUpdaterService();
@@ -118,6 +83,46 @@ export class ServiceContainer {
             }
         }
         return this._autoUpdaterService;
+    }
+
+    // Core Services
+    public getDatabaseService(): DatabaseService {
+        this._databaseService ??= DatabaseService.getInstance();
+        return this._databaseService;
+    }
+
+    /**
+     * Get all initialized services for shutdown.
+     */
+    public getInitializedServices(): { name: string; service: unknown }[] {
+        const services: { name: string; service: unknown }[] = [];
+
+        if (this._databaseService) services.push({ name: "DatabaseService", service: this._databaseService });
+        if (this._windowService) services.push({ name: "WindowService", service: this._windowService });
+        if (this._autoUpdaterService) {
+            services.push({ name: "AutoUpdaterService", service: this._autoUpdaterService });
+        }
+        if (this._notificationService) {
+            services.push({ name: "NotificationService", service: this._notificationService });
+        }
+        if (this._uptimeOrchestrator) services.push({ name: "UptimeOrchestrator", service: this._uptimeOrchestrator });
+        if (this._ipcService) services.push({ name: "IpcService", service: this._ipcService });
+
+        return services;
+    }
+
+    public getIpcService(): IpcService {
+        if (!this._ipcService) {
+            // IPC service depends on orchestrator and updater
+            const orchestrator = this.getUptimeOrchestrator();
+            const updater = this.getAutoUpdaterService();
+
+            this._ipcService = new IpcService(orchestrator, updater);
+            if (this.config.enableDebugLogging) {
+                logger.debug("[ServiceContainer] Created IpcService with dependencies"); /* v8 ignore next */
+            }
+        }
+        return this._ipcService;
     }
 
     public getNotificationService(): NotificationService {
@@ -141,37 +146,32 @@ export class ServiceContainer {
         return this._uptimeOrchestrator;
     }
 
-    public getIpcService(): IpcService {
-        if (!this._ipcService) {
-            // IPC service depends on orchestrator and updater
-            const orchestrator = this.getUptimeOrchestrator();
-            const updater = this.getAutoUpdaterService();
-
-            this._ipcService = new IpcService(orchestrator, updater);
+    // Utility Services
+    public getWindowService(): WindowService {
+        if (!this._windowService) {
+            this._windowService = new WindowService();
             if (this.config.enableDebugLogging) {
-                logger.debug("[ServiceContainer] Created IpcService with dependencies"); /* v8 ignore next */
+                logger.debug("[ServiceContainer] Created WindowService"); /* v8 ignore next */
             }
         }
-        return this._ipcService;
+        return this._windowService;
     }
 
     /**
-     * Get all initialized services for shutdown.
+     * Initialize all services in the correct order.
      */
-    public getInitializedServices(): { name: string; service: unknown }[] {
-        const services: { name: string; service: unknown }[] = [];
+    public async initialize(): Promise<void> {
+        logger.info("[ServiceContainer] Initializing services");
 
-        if (this._databaseService) services.push({ name: "DatabaseService", service: this._databaseService });
-        if (this._windowService) services.push({ name: "WindowService", service: this._windowService });
-        if (this._autoUpdaterService) {
-            services.push({ name: "AutoUpdaterService", service: this._autoUpdaterService });
-        }
-        if (this._notificationService) {
-            services.push({ name: "NotificationService", service: this._notificationService });
-        }
-        if (this._uptimeOrchestrator) services.push({ name: "UptimeOrchestrator", service: this._uptimeOrchestrator });
-        if (this._ipcService) services.push({ name: "IpcService", service: this._ipcService });
+        // Initialize core services first
+        this.getDatabaseService().initialize();
 
-        return services;
+        // Initialize application services
+        await this.getUptimeOrchestrator().initialize();
+
+        // Initialize IPC (depends on orchestrator)
+        this.getIpcService().setupHandlers();
+
+        logger.info("[ServiceContainer] All services initialized successfully");
     }
 }

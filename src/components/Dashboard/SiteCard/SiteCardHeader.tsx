@@ -12,24 +12,24 @@ import { MonitorSelector } from "./components/MonitorSelector";
 
 /** Props for the SiteCardHeader component */
 interface SiteCardHeaderProperties {
-    /** Site data to display */
-    site: Site;
-    /** Currently selected monitor ID */
-    selectedMonitorId: string;
-    /** Handler for monitor selection changes */
-    onMonitorIdChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
-    /** Handler for immediate check button */
-    onCheckNow: () => void;
-    /** Handler for start monitoring button */
-    onStartMonitoring: () => void;
-    /** Handler for stop monitoring button */
-    onStopMonitoring: () => void;
+    /** Whether site has any monitors configured */
+    hasMonitor: boolean;
     /** Whether any operation is currently loading */
     isLoading: boolean;
     /** Whether monitoring is currently active */
     isMonitoring: boolean;
-    /** Whether site has any monitors configured */
-    hasMonitor: boolean;
+    /** Handler for immediate check button */
+    onCheckNow: () => void;
+    /** Handler for monitor selection changes */
+    onMonitorIdChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+    /** Handler for start monitoring button */
+    onStartMonitoring: () => void;
+    /** Handler for stop monitoring button */
+    onStopMonitoring: () => void;
+    /** Currently selected monitor ID */
+    selectedMonitorId: string;
+    /** Site data to display */
+    site: Site;
 }
 
 /**
@@ -53,24 +53,24 @@ export const SiteCardHeader = React.memo(function SiteCardHeader({
 }: SiteCardHeaderProperties) {
     return (
         <div className="flex items-center justify-between">
-            <ThemedText variant="primary" size="lg" weight="semibold">
+            <ThemedText size="lg" variant="primary" weight="semibold">
                 {site.name}
             </ThemedText>
 
             <div className="flex items-center gap-2 min-w-[180px]">
                 <MonitorSelector
                     monitors={site.monitors}
-                    selectedMonitorId={selectedMonitorId}
                     onChange={onMonitorIdChange}
+                    selectedMonitorId={selectedMonitorId}
                 />
 
                 <ActionButtonGroup
+                    disabled={!hasMonitor}
+                    isLoading={isLoading}
+                    isMonitoring={isMonitoring}
                     onCheckNow={onCheckNow}
                     onStartMonitoring={onStartMonitoring}
                     onStopMonitoring={onStopMonitoring}
-                    isLoading={isLoading}
-                    isMonitoring={isMonitoring}
-                    disabled={!hasMonitor}
                 />
             </div>
         </div>

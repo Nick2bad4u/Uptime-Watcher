@@ -12,49 +12,9 @@ import { Logger, SiteCacheInterface, SiteLoadingError } from "./interfaces";
  * Configuration for data backup operations.
  */
 export interface DataBackupConfig {
-    eventEmitter: TypedEventBus<UptimeEvents>;
     databaseService: DatabaseService;
+    eventEmitter: TypedEventBus<UptimeEvents>;
     logger: Logger;
-}
-
-/**
- * Service for handling data backup operations.
- * Separates data operations from side effects for better testability.
- */
-export class DataBackupService {
-    private readonly databaseService: DatabaseService;
-    private readonly logger: Logger;
-    private readonly eventEmitter: TypedEventBus<UptimeEvents>;
-
-    constructor(config: DataBackupConfig) {
-        this.databaseService = config.databaseService;
-        this.logger = config.logger;
-        this.eventEmitter = config.eventEmitter;
-    }
-
-    /**
-     * Download SQLite database backup.
-     * Pure data operation that returns backup buffer and filename.
-     */
-    async downloadDatabaseBackup(): Promise<{ buffer: Buffer; fileName: string }> {
-        try {
-            const result = await this.databaseService.downloadBackup();
-            this.logger.info(`Database backup created: ${result.fileName}`);
-            return result;
-        } catch (error) {
-            const message = `Failed to download backup: ${error instanceof Error ? error.message : String(error)}`;
-            this.logger.error(message, error);
-
-            await this.eventEmitter.emitTyped("database:error", {
-                details: message,
-                error: error instanceof Error ? error : new Error(String(error)),
-                operation: "download-backup",
-                timestamp: Date.now(),
-            });
-
-            throw new SiteLoadingError(message, error instanceof Error ? error : undefined);
-        }
-    }
 }
 
 /**
@@ -94,6 +54,46 @@ export class DataBackupOrchestrator {
                     error instanceof Error ? error : undefined
                 )
             );
+        }
+    }
+}
+
+/**
+ * Service for handling data backup operations.
+ * Separates data operations from side effects for better testability.
+ */
+export class DataBackupService {
+    private readonly databaseService: DatabaseService;
+    private readonly eventEmitter: TypedEventBus<UptimeEvents>;
+    private readonly logger: Logger;
+
+    constructor(config: DataBackupConfig) {
+        this.databaseService = config.databaseService;
+        this.logger = config.logger;
+        this.eventEmitter = config.eventEmitter;
+    }
+
+    /**
+     * Download SQLite database backup.
+     * Pure data operation that returns backup buffer and filename.
+     */
+    async downloadDatabaseBackup(): Promise<{ buffer: Buffer; fileName: string }> {
+        try {
+            const result = await this.databaseService.downloadBackup();
+            this.logger.info(`Database backup created: ${result.fileName}`);
+            return result;
+        } catch (error) {
+            const message = `Failed to download backup: ${error instanceof Error ? error.message : String(error)}`;
+            this.logger.error(message, error);
+
+            await this.eventEmitter.emitTyped("database:error", {
+                details: message,
+                error: error instanceof Error ? error : new Error(String(error)),
+                operation: "download-backup",
+                timestamp: Date.now(),
+            });
+
+            throw new SiteLoadingError(message, error instanceof Error ? error : undefined);
         }
     }
 }

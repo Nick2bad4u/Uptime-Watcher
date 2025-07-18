@@ -6,47 +6,20 @@
 /**
  * Type for database parameter values.
  */
-export type DbValue = string | number | null;
+export type DbValue = null | number | string;
 
 /**
- * Safely convert a value to number or return undefined.
+ * Add a boolean field to update arrays if the value is defined.
  */
-export function safeNumberConvert(value: unknown): number | undefined {
-    if (typeof value === "number") {
-        return value;
-    }
-    if (value) {
-        return Number(value);
-    }
-    return undefined;
-}
-
-/**
- * Convert a date-like value to ISO string or null for database storage.
- */
-export function convertDateForDb(value: Date | string | null | undefined): string | null {
-    if (!value) {
-        return null;
-    }
-    if (value instanceof Date) {
-        return value.toISOString();
-    }
-    return String(value);
-}
-
-/**
- * Add a string field to update arrays if the value is defined.
- */
-export function addStringField(
+export function addBooleanField(
     fieldName: string,
-    value: string | undefined,
+    value: boolean | undefined,
     updateFields: string[],
     updateValues: DbValue[]
 ): void {
     if (value !== undefined) {
         updateFields.push(`${fieldName} = ?`);
-
-        updateValues.push(value ? String(value) : null);
+        updateValues.push(value ? 1 : 0);
     }
 }
 
@@ -66,16 +39,43 @@ export function addNumberField(
 }
 
 /**
- * Add a boolean field to update arrays if the value is defined.
+ * Add a string field to update arrays if the value is defined.
  */
-export function addBooleanField(
+export function addStringField(
     fieldName: string,
-    value: boolean | undefined,
+    value: string | undefined,
     updateFields: string[],
     updateValues: DbValue[]
 ): void {
     if (value !== undefined) {
         updateFields.push(`${fieldName} = ?`);
-        updateValues.push(value ? 1 : 0);
+
+        updateValues.push(value ? String(value) : null);
     }
+}
+
+/**
+ * Convert a date-like value to ISO string or null for database storage.
+ */
+export function convertDateForDb(value: Date | null | string | undefined): null | string {
+    if (!value) {
+        return null;
+    }
+    if (value instanceof Date) {
+        return value.toISOString();
+    }
+    return String(value);
+}
+
+/**
+ * Safely convert a value to number or return undefined.
+ */
+export function safeNumberConvert(value: unknown): number | undefined {
+    if (typeof value === "number") {
+        return value;
+    }
+    if (value) {
+        return Number(value);
+    }
+    return undefined;
 }

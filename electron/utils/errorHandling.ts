@@ -12,57 +12,38 @@
  * - **Event emission**: Automatic error event emission where appropriate
  */
 
-import { logger } from "./logger";
-import { TypedEventBus } from "../events/TypedEventBus";
 import { UptimeEvents } from "../events/eventTypes";
+import { TypedEventBus } from "../events/TypedEventBus";
+import { logger } from "./logger";
 
 /**
  * Error context information for better error tracking.
  */
 export interface ErrorContext {
-    /** Operation that failed */
-    operation: string;
+    /** Service/component where error occurred */
+    component?: string;
     /** Additional context data */
     context?: Record<string, unknown>;
     /** Whether this error occurred in a transaction */
     inTransaction?: boolean;
-    /** Service/component where error occurred */
-    component?: string;
+    /** Operation that failed */
+    operation: string;
 }
 
 /**
  * Options for error handling behavior.
  */
 export interface ErrorHandlingOptions {
-    /** Whether to re-throw the error after handling */
-    rethrow?: boolean;
     /** Whether to emit error events */
     emitEvents?: boolean;
+    /** Event emitter for error events */
+    eventEmitter?: TypedEventBus<UptimeEvents>;
     /** Whether to log the error */
     logError?: boolean;
     /** Custom error message prefix */
     messagePrefix?: string;
-    /** Event emitter for error events */
-    eventEmitter?: TypedEventBus<UptimeEvents>;
-}
-
-/**
- * Standardized error wrapper that ensures errors are Error instances.
- */
-export function wrapError(error: unknown, defaultMessage: string): Error {
-    if (error instanceof Error) {
-        return error;
-    }
-
-    const message = typeof error === "string" ? error : defaultMessage;
-    const wrappedError = new Error(message);
-
-    // Preserve original error as cause if possible
-    if (error && typeof error === "object") {
-        (wrappedError as Error & { cause?: unknown }).cause = error;
-    }
-
-    return wrappedError;
+    /** Whether to re-throw the error after handling */
+    rethrow?: boolean;
 }
 
 /**
@@ -102,7 +83,7 @@ export async function handleError(
     context: ErrorContext,
     options: ErrorHandlingOptions = {}
 ): Promise<void> {
-    const { rethrow = true, emitEvents = false, logError = true, messagePrefix = "Operation failed" } = options;
+    const { emitEvents = false, logError = true, messagePrefix = "Operation failed", rethrow = true } = options;
     const eventEmitter = options.eventEmitter;
 
     // Wrap unknown errors
@@ -114,11 +95,11 @@ export async function handleError(
     // Log error with context
     if (logError) {
         logger.error(formattedMessage, {
-            error: wrappedError,
-            operation: context.operation,
             component: context.component,
-            inTransaction: context.inTransaction,
             context: context.context,
+            error: wrappedError,
+            inTransaction: context.inTransaction,
+            operation: context.operation,
         });
     }
 
@@ -141,6 +122,58 @@ export async function handleError(
     if (rethrow) {
         throw wrappedError;
     }
+}
+
+/**
+ * Error handling specifically for operational hooks.
+ */
+export async function handleOperationalError(
+    error: unknown,
+    context: ErrorContext,
+    options: ErrorHandlingOptions = {}
+): Promise<never> {
+    // Operational errors typically need event emission
+    const operationalOptions: ErrorHandlingOptions = {
+        emitEvents: true,
+        logError: true,
+        rethrow: true,
+        ...options,
+    };
+
+    await handleError(error, context, operationalOptions);
+    // Will never reach here due to rethrow=true
+    throw error;
+}
+
+/**
+ * Special error handling for database transactions.
+ *
+ * @remarks
+ * Transactions have special requirements:
+ * - Errors should always be re-thrown to trigger rollback
+ * - Logging should include transaction context
+ * - No event emission during transaction (wait for commit/rollback)
+ */
+export function handleTransactionError(error: unknown, context: Omit<ErrorContext, "inTransaction">): never {
+    const transactionContext: ErrorContext = {
+        ...context,
+        inTransaction: true,
+    };
+
+    const wrappedError = wrapError(error, `Transaction failed during ${context.operation}`);
+    const formattedMessage = formatErrorMessage("Transaction error", transactionContext, wrappedError);
+
+    // Always log transaction errors
+    logger.error(formattedMessage, {
+        component: context.component,
+        context: context.context,
+        error: wrappedError,
+        inTransaction: true,
+        operation: context.operation,
+    });
+
+    // Always re-throw transaction errors to trigger rollback
+    throw wrappedError;
 }
 
 /**
@@ -193,53 +226,20 @@ export function withSyncErrorHandling<T>(
 }
 
 /**
- * Special error handling for database transactions.
- *
- * @remarks
- * Transactions have special requirements:
- * - Errors should always be re-thrown to trigger rollback
- * - Logging should include transaction context
- * - No event emission during transaction (wait for commit/rollback)
+ * Standardized error wrapper that ensures errors are Error instances.
  */
-export function handleTransactionError(error: unknown, context: Omit<ErrorContext, "inTransaction">): never {
-    const transactionContext: ErrorContext = {
-        ...context,
-        inTransaction: true,
-    };
+export function wrapError(error: unknown, defaultMessage: string): Error {
+    if (error instanceof Error) {
+        return error;
+    }
 
-    const wrappedError = wrapError(error, `Transaction failed during ${context.operation}`);
-    const formattedMessage = formatErrorMessage("Transaction error", transactionContext, wrappedError);
+    const message = typeof error === "string" ? error : defaultMessage;
+    const wrappedError = new Error(message);
 
-    // Always log transaction errors
-    logger.error(formattedMessage, {
-        error: wrappedError,
-        operation: context.operation,
-        component: context.component,
-        inTransaction: true,
-        context: context.context,
-    });
+    // Preserve original error as cause if possible
+    if (error && typeof error === "object") {
+        (wrappedError as Error & { cause?: unknown }).cause = error;
+    }
 
-    // Always re-throw transaction errors to trigger rollback
-    throw wrappedError;
-}
-
-/**
- * Error handling specifically for operational hooks.
- */
-export async function handleOperationalError(
-    error: unknown,
-    context: ErrorContext,
-    options: ErrorHandlingOptions = {}
-): Promise<never> {
-    // Operational errors typically need event emission
-    const operationalOptions: ErrorHandlingOptions = {
-        emitEvents: true,
-        logError: true,
-        rethrow: true,
-        ...options,
-    };
-
-    await handleError(error, context, operationalOptions);
-    // Will never reach here due to rethrow=true
-    throw error;
+    return wrappedError;
 }

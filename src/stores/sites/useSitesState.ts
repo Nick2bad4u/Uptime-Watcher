@@ -8,29 +8,29 @@ import type { Site } from "../../types";
 import { logStoreAction } from "../utils";
 
 export interface SitesState {
-    /** Array of monitored sites */
-    sites: Site[];
     /** Selected monitor IDs per site (UI state, not persisted) */
     selectedMonitorIds: Record<string, string>;
     /** Currently selected site identifier */
     selectedSiteId: string | undefined;
+    /** Array of monitored sites */
+    sites: Site[];
 }
 
 export interface SitesStateActions {
-    /** Set sites data */
-    setSites: (sites: Site[]) => void;
     /** Add a site to the store */
     addSite: (site: Site) => void;
-    /** Remove a site from the store */
-    removeSite: (identifier: string) => void;
-    /** Set selected site */
-    setSelectedSite: (site: Site | undefined) => void;
-    /** Set selected monitor ID for a site */
-    setSelectedMonitorId: (siteId: string, monitorId: string) => void;
     /** Get selected monitor ID for a site */
     getSelectedMonitorId: (siteId: string) => string | undefined;
     /** Get the currently selected site */
     getSelectedSite: () => Site | undefined;
+    /** Remove a site from the store */
+    removeSite: (identifier: string) => void;
+    /** Set selected monitor ID for a site */
+    setSelectedMonitorId: (siteId: string, monitorId: string) => void;
+    /** Set selected site */
+    setSelectedSite: (site: Site | undefined) => void;
+    /** Set sites data */
+    setSites: (sites: Site[]) => void;
 }
 
 export type SitesStateStore = SitesState & SitesStateActions;
@@ -61,8 +61,8 @@ export const createSitesStateActions = (
             // Remove the monitor selection for the removed site
             const currentMonitorIds = state.selectedMonitorIds;
 
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { [identifier]: _, ...remainingMonitorIds } = currentMonitorIds;
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars, sonarjs/no-unused-vars
+            const { [identifier]: _unused, ...remainingMonitorIds } = currentMonitorIds;
             return {
                 selectedMonitorIds: remainingMonitorIds,
                 selectedSiteId: state.selectedSiteId === identifier ? undefined : state.selectedSiteId,

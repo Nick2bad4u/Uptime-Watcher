@@ -8,55 +8,157 @@ import { isDev } from "../electronUtils";
 import { UptimeEvents } from "../events/eventTypes";
 import { TypedEventBus } from "../events/TypedEventBus";
 
-/**
- * Combined events interface for MonitorManager.
- */
-type MonitorManagerEvents = UptimeEvents;
+export interface MonitorManagerDependencies {
+    databaseService: DatabaseService;
+    eventEmitter: TypedEventBus<MonitorManagerEvents>;
+    getHistoryLimit: () => number;
+    getSitesCache: () => SiteCacheInterface;
+    repositories: {
+        history: HistoryRepository;
+        monitor: MonitorRepository;
+        site: SiteRepository;
+    };
+}
 
-import { MonitorRepository } from "../services/database/MonitorRepository";
-import { HistoryRepository } from "../services/database/HistoryRepository";
-import { SiteRepository } from "../services/database/SiteRepository";
 import { DatabaseService } from "../services/database/DatabaseService";
+import { HistoryRepository } from "../services/database/HistoryRepository";
+import { MonitorRepository } from "../services/database/MonitorRepository";
+import { SiteRepository } from "../services/database/SiteRepository";
 import { MonitorScheduler } from "../services/monitoring/MonitorScheduler";
 import { Site, StatusUpdate } from "../types";
 import { SiteCacheInterface } from "../utils/database/interfaces";
 import { monitorLogger as logger } from "../utils/logger";
-import { withDatabaseOperation } from "../utils/operationalHooks";
 import {
     startAllMonitoring,
     startMonitoringForSite,
     stopAllMonitoring,
     stopMonitoringForSite,
 } from "../utils/monitoring/monitorLifecycle";
-import { checkSiteManually, checkMonitor, MonitorCheckConfig } from "../utils/monitoring/monitorStatusChecker";
+import { checkMonitor, checkSiteManually, MonitorCheckConfig } from "../utils/monitoring/monitorStatusChecker";
+import { withDatabaseOperation } from "../utils/operationalHooks";
 
-export interface MonitorManagerDependencies {
-    eventEmitter: TypedEventBus<MonitorManagerEvents>;
-    repositories: {
-        monitor: MonitorRepository;
-        history: HistoryRepository;
-        site: SiteRepository;
-    };
-    databaseService: DatabaseService;
-    getHistoryLimit: () => number;
-    getSitesCache: () => SiteCacheInterface;
-}
+/**
+ * Combined events interface for MonitorManager.
+ */
+type MonitorManagerEvents = UptimeEvents;
 
 /**
  * Manages monitoring operations and scheduling.
  * Handles monitoring lifecycle and status checks.
  */
 export class MonitorManager {
-    private isMonitoring = false;
-    private readonly monitorScheduler: MonitorScheduler;
     private readonly dependencies: MonitorManagerDependencies;
     private readonly eventEmitter: TypedEventBus<MonitorManagerEvents>;
+    private isMonitoring = false;
+    private readonly monitorScheduler: MonitorScheduler;
 
     constructor(dependencies: MonitorManagerDependencies) {
         this.dependencies = dependencies;
         this.eventEmitter = dependencies.eventEmitter;
         this.monitorScheduler = new MonitorScheduler();
         this.monitorScheduler.setCheckCallback(this.handleScheduledCheck.bind(this));
+    }
+
+    /**
+     * Check a site manually and return status update.
+     */
+    public async checkSiteManually(identifier: string, monitorId?: string): Promise<StatusUpdate | undefined> {
+        const result = await checkSiteManually(
+            {
+                databaseService: this.dependencies.databaseService,
+                eventEmitter: this.eventEmitter,
+                historyLimit: this.dependencies.getHistoryLimit(),
+                logger,
+                repositories: this.dependencies.repositories,
+                sites: this.dependencies.getSitesCache(),
+            },
+            identifier,
+            monitorId
+        );
+
+        // Emit manual check completed event
+        await this.eventEmitter.emitTyped("internal:monitor:manual-check-completed", {
+            identifier,
+            ...(monitorId && { monitorId }),
+            operation: "manual-check-completed",
+            result: result as StatusUpdate,
+            timestamp: Date.now(),
+        });
+
+        return result ?? undefined;
+    }
+
+    /**
+     * Get the count of active monitors currently being monitored.
+     *
+     * @returns The number of active monitors in the scheduler.
+     */
+    public getActiveMonitorCount(): number {
+        return this.monitorScheduler.getActiveCount();
+    }
+
+    /**
+     * Check if a specific monitor is actively being monitored by the scheduler.
+     */
+    public isMonitorActiveInScheduler(siteIdentifier: string, monitorId: string): boolean {
+        return this.monitorScheduler.isMonitoring(siteIdentifier, monitorId);
+    }
+
+    /**
+     * Check if monitoring is currently active.
+     */
+    public isMonitoringActive(): boolean {
+        return this.isMonitoring;
+    }
+
+    /**
+     * Restart monitoring for a specific monitor with updated configuration.
+     * This is useful when monitor intervals change and need to be applied immediately.
+     */
+    public restartMonitorWithNewConfig(siteIdentifier: string, monitor: Site["monitors"][0]): boolean {
+        return this.monitorScheduler.restartMonitor(siteIdentifier, monitor);
+    }
+
+    /**
+     * Set up new monitors that were added to an existing site.
+     * Ensures new monitors get the same treatment as monitors in new sites.
+     */
+    public async setupNewMonitors(site: Site, newMonitorIds: string[]): Promise<void> {
+        logger.debug(`[MonitorManager] Setting up ${newMonitorIds.length} new monitors for site: ${site.identifier}`);
+
+        // Filter to only the new monitors
+        const newMonitors = site.monitors.filter((m) => m.id && newMonitorIds.includes(m.id));
+
+        if (newMonitors.length === 0) {
+            logger.debug(`[MonitorManager] No valid new monitors found for site: ${site.identifier}`);
+            return;
+        }
+
+        // Apply default intervals and perform setup for each new monitor
+        await this.setupIndividualNewMonitors(site, newMonitors);
+
+        logger.info(
+            `[MonitorManager] Completed setup for ${newMonitors.length} new monitors in site: ${site.identifier}`
+        );
+    }
+
+    /**
+     * Set up a new site for monitoring (initial checks, intervals, auto-start).
+     */
+    public async setupSiteForMonitoring(site: Site): Promise<void> {
+        // Apply business rules for default intervals
+        await this.applyDefaultIntervals(site);
+
+        // Apply business rules for auto-starting monitoring
+        // Note: Initial checks are handled by MonitorScheduler when monitoring starts
+        await this.autoStartMonitoringIfAppropriate(site);
+
+        // Emit site setup completed event
+        await this.eventEmitter.emitTyped("internal:monitor:site-setup-completed", {
+            identifier: site.identifier,
+            operation: "site-setup-completed",
+            timestamp: Date.now(),
+        });
     }
 
     /**
@@ -81,27 +183,6 @@ export class MonitorManager {
         await this.eventEmitter.emitTyped("monitoring:started", {
             monitorCount: sites.reduce((total, site) => total + site.monitors.length, 0),
             siteCount: sites.length,
-            timestamp: Date.now(),
-        });
-    }
-
-    /**
-     * Stop monitoring for all sites.
-     */
-    public async stopMonitoring(): Promise<void> {
-        this.isMonitoring = await stopAllMonitoring({
-            databaseService: this.dependencies.databaseService,
-            eventEmitter: this.eventEmitter,
-            logger,
-            monitorRepository: this.dependencies.repositories.monitor,
-            monitorScheduler: this.monitorScheduler,
-            sites: this.dependencies.getSitesCache(),
-        });
-
-        // Emit typed monitoring stopped event
-        await this.eventEmitter.emitTyped("monitoring:stopped", {
-            activeMonitors: 0,
-            reason: "user" as const,
             timestamp: Date.now(),
         });
     }
@@ -138,6 +219,27 @@ export class MonitorManager {
     }
 
     /**
+     * Stop monitoring for all sites.
+     */
+    public async stopMonitoring(): Promise<void> {
+        this.isMonitoring = await stopAllMonitoring({
+            databaseService: this.dependencies.databaseService,
+            eventEmitter: this.eventEmitter,
+            logger,
+            monitorRepository: this.dependencies.repositories.monitor,
+            monitorScheduler: this.monitorScheduler,
+            sites: this.dependencies.getSitesCache(),
+        });
+
+        // Emit typed monitoring stopped event
+        await this.eventEmitter.emitTyped("monitoring:stopped", {
+            activeMonitors: 0,
+            reason: "user" as const,
+            timestamp: Date.now(),
+        });
+    }
+
+    /**
      * Stop monitoring for a specific site or monitor.
      */
     public async stopMonitoringForSite(identifier: string, monitorId?: string): Promise<boolean> {
@@ -170,114 +272,6 @@ export class MonitorManager {
     }
 
     /**
-     * Check a site manually and return status update.
-     */
-    public async checkSiteManually(identifier: string, monitorId?: string): Promise<StatusUpdate | undefined> {
-        const result = await checkSiteManually(
-            {
-                databaseService: this.dependencies.databaseService,
-                eventEmitter: this.eventEmitter,
-                historyLimit: this.dependencies.getHistoryLimit(),
-                logger,
-                repositories: this.dependencies.repositories,
-                sites: this.dependencies.getSitesCache(),
-            },
-            identifier,
-            monitorId
-        );
-
-        // Emit manual check completed event
-        await this.eventEmitter.emitTyped("internal:monitor:manual-check-completed", {
-            identifier,
-            ...(monitorId && { monitorId }),
-            operation: "manual-check-completed",
-            result: result as StatusUpdate,
-            timestamp: Date.now(),
-        });
-
-        return result ?? undefined;
-    }
-
-    /**
-     * Set up a new site for monitoring (initial checks, intervals, auto-start).
-     */
-    public async setupSiteForMonitoring(site: Site): Promise<void> {
-        // Apply business rules for default intervals
-        await this.applyDefaultIntervals(site);
-
-        // Apply business rules for auto-starting monitoring
-        // Note: Initial checks are handled by MonitorScheduler when monitoring starts
-        await this.autoStartMonitoringIfAppropriate(site);
-
-        // Emit site setup completed event
-        await this.eventEmitter.emitTyped("internal:monitor:site-setup-completed", {
-            identifier: site.identifier,
-            operation: "site-setup-completed",
-            timestamp: Date.now(),
-        });
-    }
-
-    /**
-     * Set up new monitors that were added to an existing site.
-     * Ensures new monitors get the same treatment as monitors in new sites.
-     */
-    public async setupNewMonitors(site: Site, newMonitorIds: string[]): Promise<void> {
-        logger.debug(`[MonitorManager] Setting up ${newMonitorIds.length} new monitors for site: ${site.identifier}`);
-
-        // Filter to only the new monitors
-        const newMonitors = site.monitors.filter((m) => m.id && newMonitorIds.includes(m.id));
-
-        if (newMonitors.length === 0) {
-            logger.debug(`[MonitorManager] No valid new monitors found for site: ${site.identifier}`);
-            return;
-        }
-
-        // Apply default intervals and perform setup for each new monitor
-        await this.setupIndividualNewMonitors(site, newMonitors);
-
-        logger.info(
-            `[MonitorManager] Completed setup for ${newMonitors.length} new monitors in site: ${site.identifier}`
-        );
-    }
-
-    /**
-     * Set up individual new monitors (extracted for complexity reduction).
-     */
-    private async setupIndividualNewMonitors(site: Site, newMonitors: Site["monitors"]): Promise<void> {
-        // Apply default intervals for new monitors that don't have one
-        for (const monitor of newMonitors) {
-            if (this.shouldApplyDefaultInterval(monitor)) {
-                monitor.checkInterval = DEFAULT_CHECK_INTERVAL;
-                logger.debug(
-                    `[MonitorManager] Applied default interval ${monitor.checkInterval}ms to new monitor: ${monitor.id}`
-                );
-            }
-        }
-
-        // Auto-start monitoring for new monitors if appropriate
-        // Note: Initial checks are handled by MonitorScheduler when monitoring starts
-        if (site.monitoring === false) {
-            logger.debug(`[MonitorManager] Skipping auto-start for new monitors - site monitoring disabled`);
-        } else {
-            await this.autoStartNewMonitors(site, newMonitors);
-        }
-    }
-
-    /**
-     * Auto-start monitoring for new monitors if appropriate.
-     */
-    private async autoStartNewMonitors(site: Site, newMonitors: Site["monitors"]): Promise<void> {
-        for (const monitor of newMonitors) {
-            if (monitor.id && monitor.monitoring) {
-                await this.startMonitoringForSite(site.identifier, monitor.id);
-                logger.debug(`[MonitorManager] Auto-started monitoring for new monitor: ${monitor.id}`);
-            } else if (monitor.id && !monitor.monitoring) {
-                logger.debug(`[MonitorManager] Skipping new monitor ${monitor.id} - individual monitoring disabled`);
-            }
-        }
-    }
-
-    /**
      * Business logic: Apply default check intervals for monitors that don't have one.
      * This ensures all monitors have a check interval set according to business rules.
      */
@@ -301,7 +295,7 @@ export class MonitorManager {
                     },
                     "monitor-manager-apply-default-interval",
                     undefined,
-                    { monitorId: monitor.id, interval: DEFAULT_CHECK_INTERVAL }
+                    { interval: DEFAULT_CHECK_INTERVAL, monitorId: monitor.id }
                 );
 
                 logger.debug(
@@ -311,13 +305,6 @@ export class MonitorManager {
         }
 
         logger.info(`[MonitorManager] Completed applying default intervals for site: ${site.identifier}`);
-    }
-
-    /**
-     * Business logic: Determine if a monitor should receive a default interval.
-     */
-    private shouldApplyDefaultInterval(monitor: Site["monitors"][0]): boolean {
-        return !monitor.checkInterval;
     }
 
     /**
@@ -363,6 +350,20 @@ export class MonitorManager {
     }
 
     /**
+     * Auto-start monitoring for new monitors if appropriate.
+     */
+    private async autoStartNewMonitors(site: Site, newMonitors: Site["monitors"]): Promise<void> {
+        for (const monitor of newMonitors) {
+            if (monitor.id && monitor.monitoring) {
+                await this.startMonitoringForSite(site.identifier, monitor.id);
+                logger.debug(`[MonitorManager] Auto-started monitoring for new monitor: ${monitor.id}`);
+            } else if (monitor.id && !monitor.monitoring) {
+                logger.debug(`[MonitorManager] Skipping new monitor ${monitor.id} - individual monitoring disabled`);
+            }
+        }
+    }
+
+    /**
      * Check a specific monitor (private method for scheduled checks).
      * Implements the core monitoring logic with typed event emission.
      */
@@ -391,33 +392,32 @@ export class MonitorManager {
     }
 
     /**
-     * Check if monitoring is currently active.
+     * Set up individual new monitors (extracted for complexity reduction).
      */
-    public isMonitoringActive(): boolean {
-        return this.isMonitoring;
+    private async setupIndividualNewMonitors(site: Site, newMonitors: Site["monitors"]): Promise<void> {
+        // Apply default intervals for new monitors that don't have one
+        for (const monitor of newMonitors) {
+            if (this.shouldApplyDefaultInterval(monitor)) {
+                monitor.checkInterval = DEFAULT_CHECK_INTERVAL;
+                logger.debug(
+                    `[MonitorManager] Applied default interval ${monitor.checkInterval}ms to new monitor: ${monitor.id}`
+                );
+            }
+        }
+
+        // Auto-start monitoring for new monitors if appropriate
+        // Note: Initial checks are handled by MonitorScheduler when monitoring starts
+        if (site.monitoring === false) {
+            logger.debug(`[MonitorManager] Skipping auto-start for new monitors - site monitoring disabled`);
+        } else {
+            await this.autoStartNewMonitors(site, newMonitors);
+        }
     }
 
     /**
-     * Check if a specific monitor is actively being monitored by the scheduler.
+     * Business logic: Determine if a monitor should receive a default interval.
      */
-    public isMonitorActiveInScheduler(siteIdentifier: string, monitorId: string): boolean {
-        return this.monitorScheduler.isMonitoring(siteIdentifier, monitorId);
-    }
-
-    /**
-     * Restart monitoring for a specific monitor with updated configuration.
-     * This is useful when monitor intervals change and need to be applied immediately.
-     */
-    public restartMonitorWithNewConfig(siteIdentifier: string, monitor: Site["monitors"][0]): boolean {
-        return this.monitorScheduler.restartMonitor(siteIdentifier, monitor);
-    }
-
-    /**
-     * Get the count of active monitors currently being monitored.
-     *
-     * @returns The number of active monitors in the scheduler.
-     */
-    public getActiveMonitorCount(): number {
-        return this.monitorScheduler.getActiveCount();
+    private shouldApplyDefaultInterval(monitor: Site["monitors"][0]): boolean {
+        return !monitor.checkInterval;
     }
 }

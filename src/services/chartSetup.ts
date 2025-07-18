@@ -8,19 +8,19 @@
  */
 
 import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    TimeScale,
-    PointElement,
-    LineElement,
+    ArcElement,
     BarElement,
+    CategoryScale,
+    Chart as ChartJS,
+    DoughnutController,
+    Filler,
+    Legend,
+    LinearScale,
+    LineElement,
+    PointElement,
+    TimeScale,
     Title,
     Tooltip,
-    Legend,
-    Filler,
-    DoughnutController,
-    ArcElement,
 } from "chart.js";
 import zoomPlugin from "chartjs-plugin-zoom";
 import "chartjs-adapter-date-fns";
@@ -49,11 +49,7 @@ ChartJS.register(
     zoomPlugin
 );
 
-/**
- * React-chartjs-2 components with proper typings.
- * Re-export these to make it clear which components should be used.
- */
-export { Line, Bar, Doughnut } from "react-chartjs-2";
+export { type ChartData, Chart as ChartJS, type ChartOptions } from "chart.js";
 
 /**
  * Default Chart.js configuration export for type compatibility.
@@ -62,4 +58,8 @@ export { Line, Bar, Doughnut } from "react-chartjs-2";
  * Re-exporting these creates a single source of truth for chart-related types.
  */
 
-export { type ChartOptions, Chart as ChartJS, type ChartData } from "chart.js";
+/**
+ * React-chartjs-2 components with proper typings.
+ * Re-export these to make it clear which components should be used.
+ */
+export { Bar, Doughnut, Line } from "react-chartjs-2";

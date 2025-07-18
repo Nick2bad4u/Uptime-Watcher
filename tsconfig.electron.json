@@ -8,11 +8,12 @@
         "moduleResolution": "bundler",
         "baseUrl": ".",
         "paths": {
-            "@/*": ["electron/*"]
+            "@/*": ["electron/*"],
+            "@shared/*": ["shared/*"]
         }
     },
     "esModuleInterop": true,
     "downlevelIteration": true,
-    "include": ["electron/**/*.ts", "electron/**/*.tsx", "vitest.electron.config.ts"],
+    "include": ["electron/**/*.ts", "electron/**/*.tsx", "shared/**/*.ts", "shared/**/*.tsx", "vitest.electron.config.ts"],
     "exclude": ["electron/**/*.test.ts", "electron/**/*.spec.ts", "electron/test/**/*", "node_modules"]
 }

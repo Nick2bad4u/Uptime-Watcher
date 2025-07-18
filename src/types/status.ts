@@ -7,22 +7,13 @@
  * Core monitor status values returned by monitoring checks.
  * These are the only statuses that can be directly assigned to individual monitors.
  */
-export type MonitorStatus = "up" | "down" | "pending" | "paused";
+export type MonitorStatus = "down" | "paused" | "pending" | "up";
 
 /**
  * Site status values including computed aggregate states.
  * Extends MonitorStatus with UI-specific computed values.
  */
-export type SiteStatus = MonitorStatus | "mixed" | "unknown";
-
-/**
- * Type guard to check if a status is a valid monitor status.
- * @param status - Status to check
- * @returns True if status is a valid monitor status
- */
-export function isMonitorStatus(status: string): status is MonitorStatus {
-    return ["up", "down", "pending", "paused"].includes(status);
-}
+export type SiteStatus = "mixed" | "unknown" | MonitorStatus;
 
 /**
  * Type guard to check if a status is a computed site status.
@@ -31,6 +22,15 @@ export function isMonitorStatus(status: string): status is MonitorStatus {
  */
 export function isComputedSiteStatus(status: string): status is "mixed" | "unknown" {
     return ["mixed", "unknown"].includes(status);
+}
+
+/**
+ * Type guard to check if a status is a valid monitor status.
+ * @param status - Status to check
+ * @returns True if status is a valid monitor status
+ */
+export function isMonitorStatus(status: string): status is MonitorStatus {
+    return ["down", "paused", "pending", "up"].includes(status);
 }
 
 /**

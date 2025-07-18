@@ -3,32 +3,33 @@
  * Consolidates monitor starting and stopping operations for better organization.
  */
 
+import type { Logger } from "../interfaces";
+
 import { UptimeEvents } from "../../events/eventTypes";
 import { TypedEventBus } from "../../events/TypedEventBus";
-import { MonitorRepository } from "../../services/database/MonitorRepository";
 import { DatabaseService } from "../../services/database/DatabaseService";
+import { MonitorRepository } from "../../services/database/MonitorRepository";
 import { MonitorScheduler } from "../../services/monitoring/MonitorScheduler";
 import { Site } from "../../types";
 import { SiteCacheInterface } from "../database/interfaces";
 import { withDatabaseOperation } from "../operationalHooks";
-import type { Logger } from "../interfaces";
-
-/**
- * Configuration object for monitoring lifecycle functions.
- */
-export interface MonitoringLifecycleConfig {
-    sites: SiteCacheInterface;
-    monitorScheduler: MonitorScheduler;
-    monitorRepository: MonitorRepository;
-    databaseService: DatabaseService;
-    eventEmitter: TypedEventBus<UptimeEvents>;
-    logger: Logger;
-}
 
 /**
  * Type for the monitoring lifecycle callback functions.
  */
 export type MonitoringCallback = (identifier: string, monitorId?: string) => Promise<boolean>;
+
+/**
+ * Configuration object for monitoring lifecycle functions.
+ */
+export interface MonitoringLifecycleConfig {
+    databaseService: DatabaseService;
+    eventEmitter: TypedEventBus<UptimeEvents>;
+    logger: Logger;
+    monitorRepository: MonitorRepository;
+    monitorScheduler: MonitorScheduler;
+    sites: SiteCacheInterface;
+}
 
 /**
  * Start monitoring for all sites.
@@ -79,6 +80,32 @@ export async function startAllMonitoring(config: MonitoringLifecycleConfig, isMo
 }
 
 /**
+ * Start monitoring for a specific site or monitor.
+ *
+ * @param config - Configuration object with required dependencies
+ * @param identifier - Site identifier
+ * @param monitorId - Optional monitor ID (if not provided, starts all monitors for the site)
+ * @param callback - Callback function for recursive calls
+ * @returns Promise<boolean> - True if monitoring was started successfully
+ */
+export async function startMonitoringForSite(
+    config: MonitoringLifecycleConfig,
+    identifier: string,
+    monitorId?: string,
+    callback?: MonitoringCallback
+): Promise<boolean> {
+    const site = config.sites.get(identifier);
+    if (!site) {
+        config.logger.warn(`Site not found for monitoring: ${identifier}`);
+        return false;
+    }
+
+    return monitorId
+        ? startSpecificMonitor(config, site, identifier, monitorId)
+        : startAllSiteMonitors(config, site, identifier, callback);
+}
+
+/**
  * Stop all monitoring and return updated monitoring state.
  *
  * @param config - Configuration object with required dependencies
@@ -120,32 +147,6 @@ export async function stopAllMonitoring(config: MonitoringLifecycleConfig): Prom
 }
 
 /**
- * Start monitoring for a specific site or monitor.
- *
- * @param config - Configuration object with required dependencies
- * @param identifier - Site identifier
- * @param monitorId - Optional monitor ID (if not provided, starts all monitors for the site)
- * @param callback - Callback function for recursive calls
- * @returns Promise<boolean> - True if monitoring was started successfully
- */
-export async function startMonitoringForSite(
-    config: MonitoringLifecycleConfig,
-    identifier: string,
-    monitorId?: string,
-    callback?: MonitoringCallback
-): Promise<boolean> {
-    const site = config.sites.get(identifier);
-    if (!site) {
-        config.logger.warn(`Site not found for monitoring: ${identifier}`);
-        return false;
-    }
-
-    return monitorId
-        ? startSpecificMonitor(config, site, identifier, monitorId)
-        : startAllSiteMonitors(config, site, identifier, callback);
-}
-
-/**
  * Stop monitoring for a specific site or monitor.
  *
  * @param config - Configuration object with required dependencies
@@ -169,93 +170,6 @@ export async function stopMonitoringForSite(
     return monitorId
         ? stopSpecificMonitor(config, site, identifier, monitorId)
         : stopAllSiteMonitors(config, site, identifier, callback);
-}
-
-/**
- * Helper function to start monitoring for a specific monitor.
- */
-async function startSpecificMonitor(
-    config: MonitoringLifecycleConfig,
-    site: Site,
-    identifier: string,
-    monitorId: string
-): Promise<boolean> {
-    const monitor = site.monitors.find((m) => m.id === monitorId);
-    if (!monitor) {
-        config.logger.warn(`Monitor not found: ${identifier}:${monitorId}`);
-        return false;
-    }
-
-    if (!monitor.checkInterval) {
-        config.logger.warn(`Monitor ${identifier}:${monitorId} has no check interval set`);
-        return false;
-    }
-
-    try {
-        // Use operational hooks for database update
-        await withDatabaseOperation(
-            () => {
-                const db = config.databaseService.getDatabase();
-                config.monitorRepository.updateInternal(db, monitorId, {
-                    monitoring: true,
-                    status: "pending",
-                });
-                return Promise.resolve();
-            },
-            "monitor-start-specific",
-            config.eventEmitter,
-            { identifier, monitorId }
-        );
-        const started = config.monitorScheduler.startMonitor(identifier, monitor);
-        if (started) {
-            config.logger.debug(`Started monitoring for ${identifier}:${monitorId} - status set to pending`);
-        }
-        return started;
-    } catch (error) {
-        config.logger.error(`Failed to start monitoring for ${identifier}:${monitorId}`, error);
-        return false;
-    }
-}
-
-/**
- * Helper function to stop monitoring for a specific monitor.
- */
-async function stopSpecificMonitor(
-    config: MonitoringLifecycleConfig,
-    site: Site,
-    identifier: string,
-    monitorId: string
-): Promise<boolean> {
-    const monitor = site.monitors.find((m) => m.id === monitorId);
-    if (!monitor) {
-        config.logger.warn(`Monitor not found: ${identifier}:${monitorId}`);
-        return false;
-    }
-
-    try {
-        // Use operational hooks for database update
-        await withDatabaseOperation(
-            () => {
-                const db = config.databaseService.getDatabase();
-                config.monitorRepository.updateInternal(db, monitorId, {
-                    monitoring: false,
-                    status: "paused",
-                });
-                return Promise.resolve();
-            },
-            "monitor-stop-specific",
-            config.eventEmitter,
-            { identifier, monitorId }
-        );
-        const stopped = config.monitorScheduler.stopMonitor(identifier, monitorId);
-        if (stopped) {
-            config.logger.debug(`Stopped monitoring for ${identifier}:${monitorId} - status set to paused`);
-        }
-        return stopped;
-    } catch (error) {
-        config.logger.error(`Failed to stop monitoring for ${identifier}:${monitorId}`, error);
-        return false;
-    }
 }
 
 /**
@@ -308,6 +222,52 @@ async function startAllSiteMonitors(
 }
 
 /**
+ * Helper function to start monitoring for a specific monitor.
+ */
+async function startSpecificMonitor(
+    config: MonitoringLifecycleConfig,
+    site: Site,
+    identifier: string,
+    monitorId: string
+): Promise<boolean> {
+    const monitor = site.monitors.find((m) => m.id === monitorId);
+    if (!monitor) {
+        config.logger.warn(`Monitor not found: ${identifier}:${monitorId}`);
+        return false;
+    }
+
+    if (!monitor.checkInterval) {
+        config.logger.warn(`Monitor ${identifier}:${monitorId} has no check interval set`);
+        return false;
+    }
+
+    try {
+        // Use operational hooks for database update
+        await withDatabaseOperation(
+            () => {
+                const db = config.databaseService.getDatabase();
+                config.monitorRepository.updateInternal(db, monitorId, {
+                    monitoring: true,
+                    status: "pending",
+                });
+                return Promise.resolve();
+            },
+            "monitor-start-specific",
+            config.eventEmitter,
+            { identifier, monitorId }
+        );
+        const started = config.monitorScheduler.startMonitor(identifier, monitor);
+        if (started) {
+            config.logger.debug(`Started monitoring for ${identifier}:${monitorId} - status set to pending`);
+        }
+        return started;
+    } catch (error) {
+        config.logger.error(`Failed to start monitoring for ${identifier}:${monitorId}`, error);
+        return false;
+    }
+}
+
+/**
  * Helper function to stop monitoring for all monitors in a site.
  */
 async function stopAllSiteMonitors(
@@ -317,4 +277,45 @@ async function stopAllSiteMonitors(
     callback?: MonitoringCallback
 ): Promise<boolean> {
     return processAllSiteMonitors(config, site, identifier, callback, false); // Use pessimistic logic for stopping
+}
+
+/**
+ * Helper function to stop monitoring for a specific monitor.
+ */
+async function stopSpecificMonitor(
+    config: MonitoringLifecycleConfig,
+    site: Site,
+    identifier: string,
+    monitorId: string
+): Promise<boolean> {
+    const monitor = site.monitors.find((m) => m.id === monitorId);
+    if (!monitor) {
+        config.logger.warn(`Monitor not found: ${identifier}:${monitorId}`);
+        return false;
+    }
+
+    try {
+        // Use operational hooks for database update
+        await withDatabaseOperation(
+            () => {
+                const db = config.databaseService.getDatabase();
+                config.monitorRepository.updateInternal(db, monitorId, {
+                    monitoring: false,
+                    status: "paused",
+                });
+                return Promise.resolve();
+            },
+            "monitor-stop-specific",
+            config.eventEmitter,
+            { identifier, monitorId }
+        );
+        const stopped = config.monitorScheduler.stopMonitor(identifier, monitorId);
+        if (stopped) {
+            config.logger.debug(`Stopped monitoring for ${identifier}:${monitorId} - status set to paused`);
+        }
+        return stopped;
+    } catch (error) {
+        config.logger.error(`Failed to stop monitoring for ${identifier}:${monitorId}`, error);
+        return false;
+    }
 }

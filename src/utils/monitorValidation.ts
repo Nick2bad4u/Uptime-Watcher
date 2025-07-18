@@ -4,7 +4,30 @@
  */
 
 import type { MonitorType } from "../types";
+
 import { withUtilityErrorHandling } from "./errorHandling";
+
+/**
+ * Create monitor object with proper field mapping.
+ *
+ * @param type - Monitor type
+ * @param fields - Field values
+ * @returns Monitor object with type-specific fields
+ */
+export function createMonitorObject(type: MonitorType, fields: Record<string, unknown>): Record<string, unknown> {
+    const monitor: Record<string, unknown> = {
+        history: [],
+        monitoring: true,
+        responseTime: -1,
+        retryAttempts: 3,
+        status: "pending",
+        timeout: 10_000,
+        type,
+        ...fields,
+    };
+
+    return monitor;
+}
 
 /**
  * Validate monitor data using backend registry.
@@ -16,7 +39,7 @@ import { withUtilityErrorHandling } from "./errorHandling";
 export async function validateMonitorData(
     type: MonitorType,
     data: Record<string, unknown>
-): Promise<{ success: boolean; errors: string[] }> {
+): Promise<{ errors: string[]; success: boolean }> {
     return withUtilityErrorHandling(
         async () => {
             // Use IPC to validate via backend registry
@@ -24,14 +47,14 @@ export async function validateMonitorData(
 
             // Handle the advanced validation result format
             return {
-                success: result.success,
                 errors: result.errors,
+                success: result.success,
             };
         },
         "Monitor data validation",
         {
-            success: false,
             errors: ["Validation failed - unable to connect to backend"],
+            success: false,
         }
     );
 }
@@ -48,7 +71,10 @@ export async function validateMonitorField(type: MonitorType, fieldName: string,
     return withUtilityErrorHandling(
         async () => {
             // Use the full validation and extract errors for this field
-            const data: Record<string, unknown> = { [fieldName]: value, type };
+            const data: Record<string, unknown> = {
+                [fieldName]: value,
+                type,
+            };
             const result = await validateMonitorData(type, data);
 
             if (result.success) {
@@ -63,26 +89,4 @@ export async function validateMonitorField(type: MonitorType, fieldName: string,
         `Monitor field validation for ${fieldName}`,
         [`Failed to validate ${fieldName}`]
     );
-}
-
-/**
- * Create monitor object with proper field mapping.
- *
- * @param type - Monitor type
- * @param fields - Field values
- * @returns Monitor object with type-specific fields
- */
-export function createMonitorObject(type: MonitorType, fields: Record<string, unknown>): Record<string, unknown> {
-    const monitor: Record<string, unknown> = {
-        type,
-        monitoring: true,
-        status: "pending",
-        responseTime: -1,
-        retryAttempts: 3,
-        timeout: 10_000,
-        history: [],
-        ...fields,
-    };
-
-    return monitor;
 }

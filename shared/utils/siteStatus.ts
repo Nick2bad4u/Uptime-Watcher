@@ -1,7 +1,7 @@
 /**
  * Site status calculation utilities.
  * Provides comprehensive logic for determining overall site status based on monitor states.
- * 
+ *
  * This is the single source of truth for status calculations, used by both frontend and backend.
  */
 

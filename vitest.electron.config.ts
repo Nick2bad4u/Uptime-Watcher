@@ -38,6 +38,7 @@ export default defineConfig({
         alias: {
             "@": path.resolve(__dirname, "electron"), // Standardize alias pattern
             "@electron": path.resolve(__dirname, "electron"), // Keep for backward compatibility
+            "@shared": path.resolve(__dirname, "shared"),
         },
     },
     test: {
