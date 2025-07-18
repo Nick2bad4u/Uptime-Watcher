@@ -7,14 +7,108 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[75ba5b3](https://github.com/Nick2bad4u/Uptime-Watcher/commit/75ba5b30133c1f073d70105d5fad21cd4857471a)...
-[75ba5b3](https://github.com/Nick2bad4u/Uptime-Watcher/commit/75ba5b30133c1f073d70105d5fad21cd4857471a)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/75ba5b30133c1f073d70105d5fad21cd4857471a...75ba5b30133c1f073d70105d5fad21cd4857471a))
+[[69a92cd](https://github.com/Nick2bad4u/Uptime-Watcher/commit/69a92cd0a3be06ae94ab3f3cf89fd341c6c9bd64)...
+[69a92cd](https://github.com/Nick2bad4u/Uptime-Watcher/commit/69a92cd0a3be06ae94ab3f3cf89fd341c6c9bd64)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/69a92cd0a3be06ae94ab3f3cf89fd341c6c9bd64...69a92cd0a3be06ae94ab3f3cf89fd341c6c9bd64))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 7.9.0 [`(69a92cd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/69a92cd0a3be06ae94ab3f3cf89fd341c6c9bd64)
+
+
+
+
+
+
+## [7.9.0] - 2025-07-18
+
+
+[[3e03a70](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3e03a70f698ddf642108c2d59bb904f821900f5c)...
+[7b062f7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7b062f7f6eb70a81267e20aa2863944317e81f43)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/3e03a70f698ddf642108c2d59bb904f821900f5c...7b062f7f6eb70a81267e20aa2863944317e81f43))
+
+
+### ✨ Features
+
+- Add shared types and site status utilities [`(3e03a70)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3e03a70f698ddf642108c2d59bb904f821900f5c)
+
+
+
+### �️ Bug Fixes
+
+- 🛠️ [fix] Ensure type safety for DB IDs and improve ESLint config
+
+- Converts database record IDs to numbers before deletion to prevent type inconsistencies and potential query issues.
+- Updates ESLint configuration to use stricter rule sets for enhanced code quality.
+- Replaces unused promise result with void for clarity in app startup.
+- Adds ESLint directives to handle ESM meta property usage for window services.
+
+These changes collectively improve type safety, maintainability, and code standards. [`(945d9b3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/945d9b33d8593dbd9f0c904f07ebde926202fbc6)
+
+
+- 🛠️ [fix] Improve string conversion for database mapping
+
+- Introduces a safe string conversion utility to handle complex objects, preventing '[object Object]' serialization issues flagged by SonarCloud.
+- Updates database mapping logic to use the new utility, ensuring consistent and reliable string representations for settings and site data.
+- Removes redundant barrel export documentation and refines code quality standards for clarity.
+- Splits cognitive complexity linting scripts by project area for more granular analysis. [`(6b61050)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6b610503cfb57cc65aad33bbf31dd9e638dc6ba2)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 7.8.0 [`(75ba5b3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/75ba5b30133c1f073d70105d5fad21cd4857471a)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(22e1977)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/22e19779c811c5e42277a5889ec426a166e4334d)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Remove obsolete monitoring and stats utilities
+
+- Cleans up legacy backend and utility modules related to monitoring, error handling, and stats management
+- Eliminates redundant type guards, migration logic, monitor interval helpers, and site status wrappers
+- Streamlines codebase by removing unused store logic and type definitions
+- Prepares code for a new or refactored monitoring/stats architecture by reducing technical debt [`(e39762e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e39762edd60b25fbb9459ee96517c5a6d3de5b05)
+
+
+- 🚜 [refactor] Streamline service architecture and event APIs
+
+- Refactors service container and orchestration logic to improve dependency management, initialization order, and resource cleanup for better maintainability and testability.
+- Enhances event bus diagnostics, middleware, and type safety for more robust cross-service communication.
+- Reorganizes site, monitor, and database repositories for clearer separation of concerns and atomic operations, including bulk actions and transaction boundaries.
+- Refines type guard, validation, and migration logic to support extensible monitor types and forward-compatible schema evolution.
+- Updates and clarifies event IPC APIs for improved frontend/backend integration and future-proofing.
+- Fixes minor issues with field ordering, code style, and documentation for consistency and readability. [`(874aa5b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/874aa5bf220f8e7bad842428a4791a4921b44692)
+
+
+
+### � Documentation
+
+- 📝 [docs] Update project instructions for clarity and standards
+
+- Revises documentation for code and workflow standards, removing redundant and outdated testing guidelines
+- Adds stronger guidance on type safety, documentation, and developer best practices to avoid assumptions and promote thorough code review
+- Clarifies low confidence AI claim review prompts to enforce proper documentation and planning before fixes
+- Aims to reduce confusion, improve onboarding, and ensure consistent code quality across the project [`(7b062f7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7b062f7f6eb70a81267e20aa2863944317e81f43)
+
+
+
+### 🧹 Chores
+
+- 🧹 [chore] Standardize prompt file naming and add review template
+
+- Renames prompt files to use consistent kebab-case formatting for improved organization and easier discovery.
+- Adds a new template for reviewing low confidence AI claims, outlining a process for validation and fixes during development. [`(a59f910)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a59f91053979ce8fee322c8709dbf91bc5ec15a5)
+
+
+- Update changelogs for v7.8.0 [skip ci] [`(dabe3a1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/dabe3a152146edd03f9dfe8f1519a2abe809b0ca)
 
 
 
