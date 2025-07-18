@@ -84,6 +84,7 @@
     "lint:biome:write": "npx @biomejs/biome check --write",
     "lint:ci": "npm run lint:full && npm run lint:strict",
     "lint:circular": "npx madge --circular --ts-config tsconfig.json --extensions ts,tsx,js,jsx src/ electron/ --exclude \"(^|[\\\\/])(test|dist|dist-electron|node_modules)($|[\\\\/])\"",
+    "lint:circular:electron": "npx madge --circular --ts-config tsconfig.electron.json --extensions ts,tsx,js,jsx src/ electron/ --exclude \"(^|[\\\\/])(test|dist|dist-electron|node_modules)($|[\\\\/])\"",
     "lint:cognitive-complexity": "npx cognitive-complexity-ts --threshold 10",
     "lint:commit": "npx commitlint --from HEAD~1 --to HEAD --verbose",
     "lint:complexity": "npx eslint . --ext .js,.jsx,.ts,.tsx --rule '{\"complexity\": [\"warn\", 10], \"max-lines-per-function\": [\"warn\", 50], \"max-depth\": [\"warn\", 3]}' --format @eslint/eslint-formatter-compact",
