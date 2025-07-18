@@ -50,9 +50,9 @@ import { MonitorRepository } from "../services/database/MonitorRepository";
 import { SiteRepository } from "../services/database/SiteRepository";
 import { Site } from "../types";
 import { MonitoringConfig, SiteCache, SiteCacheInterface } from "../utils/database/interfaces";
-import { createSiteRepositoryService, createSiteWritingOrchestrator } from "../utils/database/serviceFactory";
+import { createSiteRepositoryService } from "../utils/database/serviceFactory";
 import { SiteRepositoryService } from "../utils/database/SiteRepositoryService";
-import { SiteWritingOrchestrator } from "../utils/database/SiteWriterService";
+import { SiteWriterService } from "../utils/database/SiteWriterService";
 import { monitorLogger as logger } from "../utils/logger";
 import { configurationManager } from "./ConfigurationManager";
 
@@ -127,7 +127,7 @@ export class SiteManager {
     private readonly repositories: Omit<SiteManagerDependencies, "eventEmitter" | "monitoringOperations">;
     private readonly siteCache = new SiteCache();
     private readonly siteRepositoryService: SiteRepositoryService;
-    private readonly siteWritingOrchestrator: SiteWritingOrchestrator;
+    private readonly siteWriterService: SiteWriterService;
 
     /**
      * Create a new SiteManager instance.
@@ -151,7 +151,14 @@ export class SiteManager {
         this.monitoringOperations = dependencies.monitoringOperations;
 
         // Create the new service-based orchestrators
-        this.siteWritingOrchestrator = createSiteWritingOrchestrator();
+        this.siteWriterService = new SiteWriterService({
+            databaseService: this.repositories.databaseService,
+            logger,
+            repositories: {
+                monitor: this.repositories.monitorRepository,
+                site: this.repositories.siteRepository,
+            },
+        });
         this.siteRepositoryService = createSiteRepositoryService(this.eventEmitter);
     }
 
@@ -163,7 +170,7 @@ export class SiteManager {
         this.validateSite(siteData);
 
         // Use the new service-based approach to add site to database
-        const site = await this.siteWritingOrchestrator.createSite(siteData);
+        const site = await this.siteWriterService.createSite(siteData);
 
         // Add to in-memory cache
         this.siteCache.set(site.identifier, site);
@@ -330,7 +337,7 @@ export class SiteManager {
      * Remove a site from the database and cache.
      */
     public async removeSite(identifier: string): Promise<boolean> {
-        const result = await this.siteWritingOrchestrator.deleteSite(this.siteCache, identifier);
+        const result = await this.siteWriterService.deleteSite(this.siteCache, identifier);
 
         if (result) {
             // Get site name before removal for event (already removed from cache by service)
@@ -360,22 +367,33 @@ export class SiteManager {
      * Update a site in the database and cache.
      */
     public async updateSite(identifier: string, updates: Partial<Site>): Promise<Site> {
-        // Get the current site before updating for event data
-        const previousSite = this.siteCache.get(identifier);
-        if (!previousSite) {
+        // Get original site before update for monitoring comparison
+        const originalSite = this.siteCache.get(identifier);
+        if (!originalSite) {
             throw new Error(`Site with identifier ${identifier} not found`);
         }
 
         // Create full monitoring configuration
         const monitoringConfig = this.createMonitoringConfig();
 
-        // Use the service with proper monitoring integration
-        const updatedSite = await this.siteWritingOrchestrator.updateSiteWithMonitoring(
-            this.siteCache,
-            identifier,
-            updates,
-            monitoringConfig
-        );
+        // Perform the update using SiteWriterService directly
+        const updatedSite = await this.siteWriterService.updateSite(this.siteCache, identifier, updates);
+
+        // Handle monitoring changes if monitors were updated (replaces orchestrator logic)
+        if (updates.monitors) {
+            await this.siteWriterService.handleMonitorIntervalChanges(
+                identifier,
+                originalSite,
+                updates.monitors,
+                monitoringConfig
+            );
+
+            // Detect and setup new monitors to ensure consistency with new site behavior
+            const newMonitorIds = this.siteWriterService.detectNewMonitors(originalSite.monitors, updates.monitors);
+            if (newMonitorIds.length > 0) {
+                await monitoringConfig.setupNewMonitors(updatedSite, newMonitorIds);
+            }
+        }
 
         // Refresh the entire cache from database to ensure we have the latest monitor IDs
         // This is especially important when monitors are added/updated
@@ -387,7 +405,7 @@ export class SiteManager {
 
         // Emit typed site updated event
         await this.eventEmitter.emitTyped("site:updated", {
-            previousSite,
+            previousSite: originalSite,
             site: refreshedSite,
             timestamp: Date.now(),
             updatedFields: Object.keys(updates),

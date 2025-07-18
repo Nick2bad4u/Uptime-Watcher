@@ -14,7 +14,7 @@ import { DataBackupOrchestrator, DataBackupService } from "./DataBackupService";
 import { DataImportExportOrchestrator, DataImportExportService } from "./DataImportExportService";
 import { SiteCache } from "./interfaces";
 import { SiteLoadingOrchestrator, SiteRepositoryService } from "./SiteRepositoryService";
-import { SiteWriterService, SiteWritingOrchestrator } from "./SiteWriterService";
+import { SiteWriterService } from "./SiteWriterService";
 
 /**
  * Adapter for the logger to implement Logger interface.
@@ -168,12 +168,4 @@ export function createSiteWriterService(): SiteWriterService {
     });
 }
 
-/**
- * Factory function to create a properly configured SiteWritingOrchestrator.
- *
- * @returns Configured SiteWritingOrchestrator instance
- */
-export function createSiteWritingOrchestrator(): SiteWritingOrchestrator {
-    const siteWriterService = createSiteWriterService();
-    return new SiteWritingOrchestrator(siteWriterService);
-}
+
