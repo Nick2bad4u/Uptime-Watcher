@@ -62,7 +62,7 @@ export function safeStringify(value: unknown): string {
             return "[Object]";
         }
     }
-    
+
     // Handle remaining types (functions, symbols, etc.) without '[object Object]'
     if (typeof value === "function") {
         return "[Function]";
@@ -70,7 +70,7 @@ export function safeStringify(value: unknown): string {
     if (typeof value === "symbol") {
         return value.toString();
     }
-    
+
     // Final fallback for any other types
     return "[Unknown Type]";
 }

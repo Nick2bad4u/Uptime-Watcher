@@ -1,11 +1,13 @@
 <!-- markdownlint-disable -->
-/**
- * Store Architecture Guidelines for Uptime Watcher
- * 
- * This document outlines the standardized patterns for creating and organizing Zustand stores
- * in the Uptime Watcher application. Follow these guidelines to ensure consistency and
- * maintainability across the codebase.
- */
+
+/\*\*
+
+- Store Architecture Guidelines for Uptime Watcher
+-
+- This document outlines the standardized patterns for creating and organizing Zustand stores
+- in the Uptime Watcher application. Follow these guidelines to ensure consistency and
+- maintainability across the codebase.
+  \*/
 
 # Store Architecture Guidelines
 
@@ -14,6 +16,7 @@
 After analyzing the current codebase, we use **different patterns based on complexity**:
 
 ### 1. Modular Composition Pattern (Complex Stores)
+
 **Use for stores with 15+ actions or complex domain logic**
 
 - **Example**: Sites Store (20+ actions)
@@ -37,7 +40,7 @@ export const useSitesStore = create<SitesStore>()((set, get) => {
     };
 });
 
-// Separate modules: 
+// Separate modules:
 // - useSitesState.ts (core state management)
 // - useSiteOperations.ts (CRUD operations)
 // - useSiteMonitoring.ts (monitoring lifecycle)
@@ -45,6 +48,7 @@ export const useSitesStore = create<SitesStore>()((set, get) => {
 ```
 
 ### 2. Monolithic Pattern (Simple/Medium Stores)
+
 **Use for stores with <15 actions or simple domain logic**
 
 - **Examples**: Settings Store (5 actions), UI Store (8 actions), Error Store (8 actions)
@@ -54,18 +58,24 @@ export const useSitesStore = create<SitesStore>()((set, get) => {
 ```typescript
 // Single file: useSettingsStore.ts
 export const useSettingsStore = create<SettingsStore>()(
-    persist(
-        (set, get) => ({
-            // State
-            settings: defaultSettings,
-            
-            // Actions
-            initializeSettings: async () => { /* ... */ },
-            updateSettings: (newSettings) => { /* ... */ },
-            resetSettings: () => { /* ... */ },
-        }),
-        persistConfig
-    )
+ persist(
+  (set, get) => ({
+   // State
+   settings: defaultSettings,
+
+   // Actions
+   initializeSettings: async () => {
+    /* ... */
+   },
+   updateSettings: (newSettings) => {
+    /* ... */
+   },
+   resetSettings: () => {
+    /* ... */
+   },
+  }),
+  persistConfig
+ )
 );
 ```
 
@@ -98,18 +108,21 @@ await withErrorHandling(
 ## Store Naming Conventions
 
 ### Store Names
+
 - Use descriptive, domain-specific names
 - Follow pattern: `use[Domain]Store` (e.g., `useSitesStore`, `useSettingsStore`)
 - Avoid generic names like `useDataStore`, `useAppStore`
 
 ### Error Store Integration
+
 - Use consistent store identifiers for error tracking:
   - `"sites-operations"` for Sites Store operations
-  - `"sites-sync"` for Sites Store synchronization  
+  - `"sites-sync"` for Sites Store synchronization
   - `"settings"` for Settings Store
   - `"ui"` for UI Store (if needed)
 
 ### Operation Names
+
 - Use descriptive operation names in `setOperationLoading`:
   - `"addMonitorToSite"`, `"createSite"`, `"syncSitesFromBackend"`
   - Avoid generic names like `"operation"`, `"update"`
@@ -117,6 +130,7 @@ await withErrorHandling(
 ## File Organization
 
 ### Modular Stores
+
 ```folder
 src/stores/sites/
 ├── useSitesStore.ts          # Main store composition
@@ -134,6 +148,7 @@ src/stores/sites/
 ```
 
 ### Monolithic Stores
+
 ```folder
 src/stores/settings/
 ├── useSettingsStore.ts      # Complete store implementation
@@ -147,25 +162,29 @@ src/stores/ui/
 ## Implementation Guidelines
 
 ### When to Use Modular Pattern
+
 - Store has 15+ actions
 - Complex domain logic spanning multiple concerns
 - Different action groups have different dependencies
 - Need independent testing of action groups
 - Store file would exceed 200-300 lines
 
-### When to Use Monolithic Pattern  
+### When to Use Monolithic Pattern
+
 - Store has <15 actions
 - Simple, focused domain
 - All actions are closely related
 - Store logic fits comfortably in single file (<200 lines)
 
 ### Error Handling Requirements
+
 1. **Import error store**: Always import `useErrorStore` in files using `withErrorHandling`
 2. **Use consistent store names**: Follow naming conventions for error tracking
 3. **Specific operation names**: Use descriptive operation names for loading states
 4. **No empty handlers**: Never use empty functions for error handling
 
 ### Type Safety
+
 - Always define comprehensive interfaces in `types.ts`
 - Use proper TypeScript for all store actions and state
 - Export store types for component consumption
@@ -174,26 +193,31 @@ src/stores/ui/
 ## Migration Guide
 
 ### Converting from Empty Error Handlers
+
 ```typescript
 // Before (incorrect)
 await withErrorHandling(
-    async () => { /* operation */ },
-    {
-        clearError: () => {},
-        setError: (error) => logStoreAction("Store", "error", { error }),
-        setLoading: () => {},
-    }
+ async () => {
+  /* operation */
+ },
+ {
+  clearError: () => {},
+  setError: (error) => logStoreAction("Store", "error", { error }),
+  setLoading: () => {},
+ }
 );
 
 // After (correct)
 const errorStore = useErrorStore.getState();
 await withErrorHandling(
-    async () => { /* operation */ },
-    {
-        clearError: () => errorStore.clearStoreError("store-domain"),
-        setError: (error) => errorStore.setStoreError("store-domain", error),
-        setLoading: (loading) => errorStore.setOperationLoading("operationName", loading),
-    }
+ async () => {
+  /* operation */
+ },
+ {
+  clearError: () => errorStore.clearStoreError("store-domain"),
+  setError: (error) => errorStore.setStoreError("store-domain", error),
+  setLoading: (loading) => errorStore.setOperationLoading("operationName", loading),
+ }
 );
 ```
 
@@ -209,6 +233,7 @@ await withErrorHandling(
 ## Examples
 
 See existing implementations:
+
 - **Modular**: `src/stores/sites/` (Sites Store)
 - **Monolithic**: `src/stores/settings/` (Settings Store), `src/stores/ui/` (UI Store)
 - **Error Handling**: `src/stores/error/` (Error Store)

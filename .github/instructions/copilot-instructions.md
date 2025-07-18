@@ -31,6 +31,7 @@ applyTo: "**"
 - **Documentation**: Use TSDoc for comments and use proper base tags found here: `docs\.github\TSDoc-base-tags.md`
 
 Critcal Instructions:
+
 - ** Always ** READ the code before making changes. Understand the context and flow.
 - ** Never ** make changes without understanding the full impact on the system.
 - ** Never ** take shortcuts or skip steps in the development process.

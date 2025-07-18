@@ -1,4 +1,5 @@
 # TSDoc Documentation Standards
+
 <!-- markdownlint-disable -->
 
 This document outlines the standardized TSDoc documentation patterns for the Uptime Watcher application.
@@ -8,7 +9,9 @@ This document outlines the standardized TSDoc documentation patterns for the Upt
 ### Required Documentation Levels
 
 #### Public APIs (Functions, Classes, Hooks, Components)
+
 **MUST include:**
+
 - Clear description of purpose and behavior
 - `@param` for all parameters with types and descriptions
 - `@returns` for return values with type and description
@@ -16,37 +19,46 @@ This document outlines the standardized TSDoc documentation patterns for the Upt
 - `@public` visibility marker
 
 **SHOULD include:**
+
 - `@remarks` for additional context or implementation details
 - `@see` for related functions or documentation
 - `@throws` for potential errors (async functions)
 
 #### Complex Functions (10+ lines, business logic)
+
 **MUST include:**
+
 - Description and purpose
 - `@param` and `@returns` documentation
 - `@remarks` for algorithm explanation or important notes
 
 **SHOULD include:**
+
 - `@example` for complex usage patterns
 
 #### Simple Utility Functions (1-5 lines)
+
 **MUST include:**
+
 - Brief description
 - `@param` and `@returns` if parameters exist
 
 #### Interfaces and Types
+
 **MUST include:**
+
 - Description of the interface purpose
 - Property documentation for complex objects
 
 **SHOULD include:**
+
 - `@example` for interface usage patterns
 
 ## TSDoc Patterns by Category
 
 ### Store Functions
 
-```typescript
+````typescript
 /**
  * Creates standardized base store properties for error handling and loading states.
  * Provides consistent error management patterns across all Zustand stores.
@@ -72,15 +84,15 @@ This document outlines the standardized TSDoc documentation patterns for the Upt
  * @public
  */
 export const createBaseStore = <T extends BaseStore>(
-    set: (partial: Partial<T>) => void
+ set: (partial: Partial<T>) => void
 ): Pick<T, "clearError" | "isLoading" | "lastError" | "setError" | "setLoading"> => {
-    // Implementation
+ // Implementation
 };
-```
+````
 
 ### Component Hooks
 
-```typescript
+````typescript
 /**
  * Custom hook for managing selected site state across store boundaries.
  *
@@ -108,13 +120,13 @@ export const createBaseStore = <T extends BaseStore>(
  * @public
  */
 export function useSelectedSite(): Site | undefined {
-    // Implementation
+ // Implementation
 }
-```
+````
 
 ### Utility Functions
 
-```typescript
+````typescript
 /**
  * Validates timeout value in milliseconds against defined constraints.
  *
@@ -130,13 +142,13 @@ export function useSelectedSite(): Site | undefined {
  * @public
  */
 export function validateTimeoutMs(timeoutMs: number): boolean {
-    // Implementation
+ // Implementation
 }
-```
+````
 
 ### Async Functions with Error Handling
 
-```typescript
+````typescript
 /**
  * Validates monitor data using the backend registry system.
  *
@@ -157,7 +169,7 @@ export function validateTimeoutMs(timeoutMs: number): boolean {
  *   url: 'https://example.com',
  *   timeout: 5000
  * });
- * 
+ *
  * if (!result.success) {
  *   console.error('Validation failed:', result.errors);
  * }
@@ -166,16 +178,16 @@ export function validateTimeoutMs(timeoutMs: number): boolean {
  * @public
  */
 export async function validateMonitorData(
-    type: MonitorType,
-    data: Record<string, unknown>
+ type: MonitorType,
+ data: Record<string, unknown>
 ): Promise<{ errors: string[]; success: boolean }> {
-    // Implementation
+ // Implementation
 }
-```
+````
 
 ### Interface Documentation
 
-```typescript
+````typescript
 /**
  * Configuration interface for site monitoring operations.
  *
@@ -199,28 +211,29 @@ export async function validateMonitorData(
  * @public
  */
 export interface Monitor {
-    /** Unique identifier for the monitor */
-    id: string;
-    /** Type of monitoring (http, port, etc.) */
-    type: MonitorType;
-    /** Current operational status */
-    status: 'up' | 'down' | 'pending';
-    /** Whether monitoring is currently active */
-    monitoring: boolean;
-    /** Check interval in milliseconds */
-    checkInterval: number;
-    /** Optional URL for HTTP monitors */
-    url?: string;
-    /** Optional host for port monitors */
-    host?: string;
-    /** Optional port number for port monitors */
-    port?: number;
+ /** Unique identifier for the monitor */
+ id: string;
+ /** Type of monitoring (http, port, etc.) */
+ type: MonitorType;
+ /** Current operational status */
+ status: "up" | "down" | "pending";
+ /** Whether monitoring is currently active */
+ monitoring: boolean;
+ /** Check interval in milliseconds */
+ checkInterval: number;
+ /** Optional URL for HTTP monitors */
+ url?: string;
+ /** Optional host for port monitors */
+ host?: string;
+ /** Optional port number for port monitors */
+ port?: number;
 }
-```
+````
 
 ## Documentation Requirements by Function Type
 
 ### Store Actions (withErrorHandling operations)
+
 - **Description**: Purpose and side effects
 - **@param**: All parameters including options objects
 - **@returns**: Return type (usually Promise<void> or specific result)
@@ -228,18 +241,21 @@ export interface Monitor {
 - **@example**: Typical usage in component
 
 ### React Components
+
 - **Description**: Component purpose and key features
 - **@param props**: Props interface with descriptions
 - **@returns**: JSX element description
 - **@example**: Basic usage with props
 
 ### Custom Hooks
+
 - **Description**: Hook purpose and state management
-- **@returns**: Return type and behavior description  
+- **@returns**: Return type and behavior description
 - **@remarks**: Cross-store coordination or complex logic
 - **@example**: Component usage pattern
 
 ### Validation Functions
+
 - **Description**: What is being validated
 - **@param**: Input parameters and expected formats
 - **@returns**: Validation result format
@@ -248,21 +264,25 @@ export interface Monitor {
 ## Common Patterns to Follow
 
 ### 1. Progressive Detail
+
 - **Short description**: One-line summary (required)
 - **@remarks**: Detailed explanation (for complex functions)
 - **@example**: Realistic usage (required for public APIs)
 
 ### 2. Consistent Language
+
 - Use active voice: "Validates data" not "Data is validated"
-- Be specific: "timeout in milliseconds" not "timeout value"  
+- Be specific: "timeout in milliseconds" not "timeout value"
 - Use consistent terminology across related functions
 
 ### 3. Practical Examples
+
 - Show realistic usage scenarios
 - Include error handling when relevant
 - Use actual interfaces and types from the codebase
 
 ### 4. Complete Type Information
+
 - Document all parameters with types
 - Specify return types clearly
 - Use union types and optional parameters correctly
@@ -291,13 +311,17 @@ export interface Monitor {
 ## Tools and Validation
 
 ### TSDoc Linting
+
 The project uses TSDoc linting to enforce documentation standards:
+
 - Missing documentation warnings
-- Malformed @param/@returns warnings  
+- Malformed @param/@returns warnings
 - Incorrect tag usage warnings
 
 ### Documentation Generation
+
 TSDoc comments can be used to generate API documentation:
+
 - Public API reference
 - Component documentation
 - Hook usage guides
@@ -305,12 +329,15 @@ TSDoc comments can be used to generate API documentation:
 ## Examples Repository
 
 ### Excellent Documentation Examples
+
 - `src/hooks/useSelectedSite.ts` - Complete hook documentation
-- `src/stores/utils.ts` - Store utility documentation  
+- `src/stores/utils.ts` - Store utility documentation
 - `src/utils/monitorValidation.ts` - Async function documentation
 
 ### Pattern Templates
+
 Use these as templates for new code:
+
 - Store action functions: Follow `useSiteOperations.ts` patterns
 - Custom hooks: Follow `useSelectedSite.ts` patterns
 - Utility functions: Follow `timeoutUtils.ts` patterns
