@@ -231,10 +231,10 @@ export default [
             "putout/multiple-properties-destructuring": "off",
             "putout/long-properties-destructuring": "off",
             "putout/destructuring-as-function-argument": "off",
-            "putout/align-spaces": "error",
+            "putout/align-spaces": "off",
             "putout/newline-function-call-arguments": "off",
-            "putout/function-declaration-paren-newline": "error",
-            "putout/objects-braces-inside-array": "error",
+            "putout/function-declaration-paren-newline": "off",
+            "putout/objects-braces-inside-array": "off",
             "putout/object-property-newline": "error",
 
             "unicorn/prefer-global-this": "off", // Not suitable for Electron

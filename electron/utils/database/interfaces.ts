@@ -2,6 +2,8 @@
  * Interfaces for database utilities to support dependency injection and testing.
  */
 
+import type { Logger } from "../interfaces";
+
 import { UptimeEvents } from "../../events/eventTypes";
 import { TypedEventBus } from "../../events/TypedEventBus";
 import { HistoryRepository } from "../../services/database/HistoryRepository";
@@ -11,15 +13,8 @@ import { SiteRepository } from "../../services/database/SiteRepository";
 import { Site } from "../../types";
 import { dbLogger } from "../logger";
 
-/**
- * Logger interface abstraction.
- */
-export interface Logger {
-    debug(message: string, ...args: unknown[]): void;
-    error(message: string, error?: unknown, ...args: unknown[]): void;
-    info(message: string, ...args: unknown[]): void;
-    warn(message: string, ...args: unknown[]): void;
-}
+// Re-export Logger to maintain backward compatibility
+export type { Logger } from "../interfaces";
 
 /**
  * Configuration for monitoring operations.

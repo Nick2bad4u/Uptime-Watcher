@@ -7,6 +7,8 @@
  * @packageDocumentation
  */
 
+import type { MonitorStatus } from "../shared/types";
+
 /**
  * Monitor configuration and state interface.
  *
@@ -176,11 +178,8 @@ export interface Monitor {
     url?: string;
 }
 
-/**
- * Allowed status values for a monitor's current operational state.
- * @public
- */
-export type MonitorStatus = "down" | "paused" | "pending" | "up";
+// Re-export MonitorStatus from shared types to avoid duplication
+export type { MonitorStatus } from "../shared/types";
 
 /**
  * Core monitor types supported by the system.

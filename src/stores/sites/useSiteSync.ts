@@ -2,12 +2,12 @@
  * Site synchronization operations module.
  * Handles syncing data from backend and status update subscriptions.
  *
- * Note: Empty clearError and setLoading functions are intentional in withErrorHandling calls
- * as error handling is managed centrally by the store infrastructure.
+ * Uses centralized error store for consistent error handling across the application.
  */
 
 import type { Site, StatusUpdate } from "../../types";
 
+import { useErrorStore } from "../error/useErrorStore";
 import { logStoreAction, withErrorHandling } from "../utils";
 import { SiteService } from "./services/SiteService";
 import { createStatusUpdateHandler, StatusUpdateManager } from "./utils/statusUpdateHandler";
@@ -58,17 +58,27 @@ export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActio
             });
         },
         getSyncStatus: async () => {
+            const errorStore = useErrorStore.getState();
             try {
-                const status = await window.electronAPI.stateSync.getSyncStatus();
-                logStoreAction("SitesStore", "getSyncStatus", {
-                    message: "Sync status retrieved",
-                    siteCount: status.siteCount,
-                    success: true,
-                    synchronized: status.synchronized,
-                });
-                return status;
-            } catch (error) {
-                logStoreAction("SitesStore", "error", { error });
+                return await withErrorHandling(
+                    async () => {
+                        const status = await window.electronAPI.stateSync.getSyncStatus();
+                        logStoreAction("SitesStore", "getSyncStatus", {
+                            message: "Sync status retrieved",
+                            siteCount: status.siteCount,
+                            success: true,
+                            synchronized: status.synchronized,
+                        });
+                        return status;
+                    },
+                    {
+                        clearError: () => errorStore.clearStoreError("sites-sync"),
+                        setError: (error) => errorStore.setStoreError("sites-sync", error),
+                        setLoading: (loading) => errorStore.setOperationLoading("getSyncStatus", loading),
+                    }
+                );
+            } catch {
+                // Fallback for error case
                 return {
                     lastSync: undefined,
                     siteCount: 0,
@@ -132,6 +142,7 @@ export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActio
             return cleanup;
         },
         syncSitesFromBackend: async () => {
+            const errorStore = useErrorStore.getState();
             await withErrorHandling(
                 async () => {
                     const backendSites = await SiteService.getSites();
@@ -145,9 +156,9 @@ export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActio
                     });
                 },
                 {
-                    clearError: () => {},
-                    setError: (error) => logStoreAction("SitesStore", "error", { error }),
-                    setLoading: () => {},
+                    clearError: () => errorStore.clearStoreError("sites-sync"),
+                    setError: (error) => errorStore.setStoreError("sites-sync", error),
+                    setLoading: (loading) => errorStore.setOperationLoading("syncSitesFromBackend", loading),
                 }
             );
         },

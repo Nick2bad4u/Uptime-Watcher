@@ -2,12 +2,12 @@
  * Site operations module.
  * Handles CRUD operations for sites and monitor management.
  *
- * Note: Empty clearError and setLoading functions are intentional in withErrorHandling calls
- * as error handling is managed centrally by the store infrastructure.
+ * Uses centralized error store for consistent error handling across the application.
  */
 
 import type { Monitor, MonitorType, Site } from "../../types";
 
+import { useErrorStore } from "../error/useErrorStore";
 import { ERROR_MESSAGES } from "../types";
 import { logStoreAction, withErrorHandling } from "../utils";
 import { MonitoringService } from "./services/MonitoringService";
@@ -55,6 +55,7 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
     addMonitorToSite: async (siteId, monitor) => {
         logStoreAction("SitesStore", "addMonitorToSite", { monitor, siteId });
 
+        const errorStore = useErrorStore.getState();
         await withErrorHandling(
             async () => {
                 // Get the current site
@@ -69,15 +70,16 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                 await deps.syncSitesFromBackend();
             },
             {
-                clearError: () => {},
-                setError: (error) => logStoreAction("SitesStore", "error", { error }),
-                setLoading: () => {},
+                clearError: () => errorStore.clearStoreError("sites-operations"),
+                setError: (error) => errorStore.setStoreError("sites-operations", error),
+                setLoading: (loading) => errorStore.setOperationLoading("addMonitorToSite", loading),
             }
         );
     },
     createSite: async (siteData) => {
         logStoreAction("SitesStore", "createSite", { siteData });
 
+        const errorStore = useErrorStore.getState();
         await withErrorHandling(
             async () => {
                 // Default to HTTP monitor if none provided
@@ -107,15 +109,16 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                 deps.addSite(newSite);
             },
             {
-                clearError: () => {},
-                setError: (error) => logStoreAction("SitesStore", "error", { error }),
-                setLoading: () => {},
+                clearError: () => errorStore.clearStoreError("sites-operations"),
+                setError: (error) => errorStore.setStoreError("sites-operations", error),
+                setLoading: (loading) => errorStore.setOperationLoading("createSite", loading),
             }
         );
     },
     deleteSite: async (identifier: string) => {
         logStoreAction("SitesStore", "deleteSite", { identifier });
 
+        const errorStore = useErrorStore.getState();
         await withErrorHandling(
             async () => {
                 // Stop monitoring for all monitors of this site before deleting
@@ -140,13 +143,14 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                 deps.removeSite(identifier);
             },
             {
-                clearError: () => {},
-                setError: (error) => logStoreAction("SitesStore", "error", { error }),
-                setLoading: () => {},
+                clearError: () => errorStore.clearStoreError("sites-operations"),
+                setError: (error) => errorStore.setStoreError("sites-operations", error),
+                setLoading: (loading) => errorStore.setOperationLoading("deleteSite", loading),
             }
         );
     },
     downloadSQLiteBackup: async () => {
+        const errorStore = useErrorStore.getState();
         await withErrorHandling(
             async () => {
                 await handleSQLiteBackupDownload(async () => {
@@ -155,9 +159,9 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                 });
             },
             {
-                clearError: () => {},
-                setError: (error) => logStoreAction("SitesStore", "error", { error }),
-                setLoading: () => {},
+                clearError: () => errorStore.clearStoreError("sites-operations"),
+                setError: (error) => errorStore.setStoreError("sites-operations", error),
+                setLoading: (loading) => errorStore.setOperationLoading("downloadSQLiteBackup", loading),
             }
         );
 
@@ -167,6 +171,7 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
         });
     },
     initializeSites: async () => {
+        const errorStore = useErrorStore.getState();
         const result = await withErrorHandling(
             async () => {
                 const sites = await SiteService.getSites();
@@ -178,9 +183,9 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                 };
             },
             {
-                clearError: () => {},
-                setError: (error) => logStoreAction("SitesStore", "error", { error }),
-                setLoading: () => {},
+                clearError: () => errorStore.clearStoreError("sites-operations"),
+                setError: (error) => errorStore.setStoreError("sites-operations", error),
+                setLoading: (loading) => errorStore.setOperationLoading("initializeSites", loading),
             }
         );
 
@@ -195,21 +200,23 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
     modifySite: async (identifier: string, updates: Partial<Site>) => {
         logStoreAction("SitesStore", "modifySite", { identifier, updates });
 
+        const errorStore = useErrorStore.getState();
         await withErrorHandling(
             async () => {
                 await SiteService.updateSite(identifier, updates);
                 await deps.syncSitesFromBackend();
             },
             {
-                clearError: () => {},
-                setError: (error) => logStoreAction("SitesStore", "error", { error }),
-                setLoading: () => {},
+                clearError: () => errorStore.clearStoreError("sites-operations"),
+                setError: (error) => errorStore.setStoreError("sites-operations", error),
+                setLoading: (loading) => errorStore.setOperationLoading("modifySite", loading),
             }
         );
     },
     removeMonitorFromSite: async (siteId, monitorId) => {
         logStoreAction("SitesStore", "removeMonitorFromSite", { monitorId, siteId });
 
+        const errorStore = useErrorStore.getState();
         await withErrorHandling(
             async () => {
                 // Get the current site
@@ -240,15 +247,16 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                 await deps.syncSitesFromBackend();
             },
             {
-                clearError: () => {},
-                setError: (error) => logStoreAction("SitesStore", "error", { error }),
-                setLoading: () => {},
+                clearError: () => errorStore.clearStoreError("sites-operations"),
+                setError: (error) => errorStore.setStoreError("sites-operations", error),
+                setLoading: (loading) => errorStore.setOperationLoading("removeMonitorFromSite", loading),
             }
         );
     },
     updateMonitorRetryAttempts: async (siteId: string, monitorId: string, retryAttempts: number | undefined) => {
         logStoreAction("SitesStore", "updateMonitorRetryAttempts", { monitorId, retryAttempts, siteId });
 
+        const errorStore = useErrorStore.getState();
         await withErrorHandling(
             async () => {
                 const site = deps.getSites().find((s) => s.identifier === siteId);
@@ -267,15 +275,16 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                 await deps.syncSitesFromBackend();
             },
             {
-                clearError: () => {},
-                setError: (error) => logStoreAction("SitesStore", "error", { error }),
-                setLoading: () => {},
+                clearError: () => errorStore.clearStoreError("sites-operations"),
+                setError: (error) => errorStore.setStoreError("sites-operations", error),
+                setLoading: (loading) => errorStore.setOperationLoading("updateMonitorRetryAttempts", loading),
             }
         );
     },
     updateMonitorTimeout: async (siteId: string, monitorId: string, timeout: number | undefined) => {
         logStoreAction("SitesStore", "updateMonitorTimeout", { monitorId, siteId, timeout });
 
+        const errorStore = useErrorStore.getState();
         await withErrorHandling(
             async () => {
                 const site = deps.getSites().find((s) => s.identifier === siteId);
@@ -294,15 +303,16 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                 await deps.syncSitesFromBackend();
             },
             {
-                clearError: () => {},
-                setError: (error) => logStoreAction("SitesStore", "error", { error }),
-                setLoading: () => {},
+                clearError: () => errorStore.clearStoreError("sites-operations"),
+                setError: (error) => errorStore.setStoreError("sites-operations", error),
+                setLoading: (loading) => errorStore.setOperationLoading("updateMonitorTimeout", loading),
             }
         );
     },
     updateSiteCheckInterval: async (siteId: string, monitorId: string, interval: number) => {
         logStoreAction("SitesStore", "updateSiteCheckInterval", { interval, monitorId, siteId });
 
+        const errorStore = useErrorStore.getState();
         await withErrorHandling(
             async () => {
                 const site = deps.getSites().find((s) => s.identifier === siteId);
@@ -315,9 +325,9 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                 await deps.syncSitesFromBackend();
             },
             {
-                clearError: () => {},
-                setError: (error) => logStoreAction("SitesStore", "error", { error }),
-                setLoading: () => {},
+                clearError: () => errorStore.clearStoreError("sites-operations"),
+                setError: (error) => errorStore.setStoreError("sites-operations", error),
+                setLoading: (loading) => errorStore.setOperationLoading("updateSiteCheckInterval", loading),
             }
         );
     },

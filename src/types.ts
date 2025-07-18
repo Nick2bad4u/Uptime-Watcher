@@ -10,8 +10,9 @@
 // Re-export MonitorType from electron types to avoid duplication
 export type { MonitorType } from "../electron/types";
 
-// Re-export status types for better type safety
-export type { MonitorStatus, SiteStatus } from "./types/status";
+// Re-export status types from shared types for consistency
+export type { MonitorStatus, SiteStatus } from "../shared/types";
+export { isComputedSiteStatus, isMonitorStatus, isSiteStatus } from "../shared/types";
 import type { MonitorType } from "../electron/types";
 
 /**
