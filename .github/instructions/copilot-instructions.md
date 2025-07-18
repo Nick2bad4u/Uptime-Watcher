@@ -24,25 +24,14 @@ applyTo: "**"
 - **Frontend State**: All UI updates flow through React state and Zustand stores. Never mutate state directly; always use store actions.
 - **IPC Handlers**: Add new IPC handlers in `electron/services/ipc/IpcService.ts` and expose them via preload (`electron/preload.ts`).
 - **Type Safety**: Strict TypeScript config; update interfaces in `electron/utils/database/interfaces.ts` and `src/types.ts` for new data structures.
-- **Barrel Exports**: Use barrel files (`index.ts`) for service and utility exports to maintain clean import paths.
-- **Testing Setup**: See `electron/test/setup.ts` for global mocks and test environment config.
-
-## Import/Export Standards (CRITICAL)
-
-- **Barrel Export Usage**: ALL imports must use barrel exports (`index.ts`) files when available. Never import directly from subdirectories.
-- **Frontend Barrel Structure**: `src/` has barrel exports for: `utils/`, `hooks/`, `components/`, `stores/`, `services/`, `theme/`
-- **Backend Barrel Structure**: `electron/` has barrel exports for: `services/`, `utils/`, `managers/`, `events/`
-- **Monitor Utilities**: All monitor-related utilities are exported from `src/utils/` barrel: `monitorTitleFormatters`, `monitorTypeHelper`, `monitorUiHelpers`, `monitorValidation`
-- **Import Consistency**: Use `import { X } from "../utils"` instead of `import { X } from "../utils/specificFile"`
-- **Type Re-exports**: Common types are re-exported through barrel files to avoid deep imports
 
 ## Code Quality Standards
 
 - **Nested Ternary**: Extract complex nested ternary expressions into helper functions for better readability
 - **Error Handling**: Always use `safeStringifyError` for error conversion in database operations
 - **Empty Directories**: Remove empty directories to keep codebase clean (no empty `managers/`, `dist/`, or test directories)
-- **Barrel Export Completeness**: Ensure all utilities/services are exported from their respective barrel files
 - **Import Deduplication**: Merge duplicate imports from the same module into single import statements
+- **Format**: Don't pay attention to small formatting issues like Prettier or Eslint demanding sorting or spacing; focus on code structure and logic
 
 ## Developer Workflows
 

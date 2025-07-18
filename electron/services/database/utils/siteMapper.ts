@@ -3,6 +3,7 @@
  * Provides consistent data transformation between database rows and Site objects.
  */
 
+import { safeStringify } from "../../../../shared/utils/stringConversion";
 import { logger } from "../../../utils/logger";
 
 /**
@@ -56,12 +57,12 @@ export function rowToSite(row: Record<string, unknown>): SiteRow {
         const identifier = row.identifier;
 
         const site: SiteRow = {
-            identifier: identifier ? String(identifier) : "",
+            identifier: identifier ? safeStringify(identifier) : "",
         };
 
         // Handle optional name field
         if (row.name !== undefined && row.name !== null) {
-            site.name = String(row.name);
+            site.name = safeStringify(row.name);
         }
 
         // Handle optional monitoring field

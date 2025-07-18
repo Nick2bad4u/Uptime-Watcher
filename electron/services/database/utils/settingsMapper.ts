@@ -3,6 +3,7 @@
  * Provides consistent data transformation between database rows and Settings objects.
  */
 
+import { safeStringify } from "../../../../shared/utils/stringConversion";
 import { logger } from "../../../utils/logger";
 
 /**
@@ -66,7 +67,7 @@ export function rowToSetting(row: Record<string, unknown>): SettingRow {
 
         const setting: SettingRow = {
             key,
-            value: value !== undefined && value !== null ? String(value) : "",
+            value: value !== undefined && value !== null ? safeStringify(value) : "",
         };
 
         return setting;
@@ -89,7 +90,7 @@ export function rowToSettingValue(row: Record<string, unknown> | undefined): str
         return undefined;
     }
 
-    const value = String(row.value);
+    const value = safeStringify(row.value);
     return value.length > 0 ? value : undefined;
 }
 

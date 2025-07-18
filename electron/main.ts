@@ -85,7 +85,7 @@ class Main {
 // eslint-disable-next-line sonarjs/constructor-for-side-effects -- Main instance needed for lifecycle management
 new Main();
 
-void app.whenReady().then(async () => {
+await app.whenReady().then(async () => {
     // Wait a bit for the main window to be created and ready
     await new Promise((resolve) => setTimeout(resolve, 1));
 
