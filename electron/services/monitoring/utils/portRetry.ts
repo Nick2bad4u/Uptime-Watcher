@@ -20,30 +20,23 @@ export async function performPortCheckWithRetry(
     maxRetries: number
 ): Promise<MonitorCheckResult> {
     try {
-        // DEBUG: Log the maxRetries value to understand the issue
-        logger.debug(`[PortRetry] performPortCheckWithRetry called with maxRetries=${maxRetries} for ${host}:${port}`);
-
         // maxRetries parameter is "additional retries after first attempt"
         // withOperationalHooks expects "total attempts"
         // So if maxRetries=3, we want 4 total attempts (1 initial + 3 retries)
         const totalAttempts = maxRetries + 1;
 
-        logger.debug(
-            `[PortRetry] Converted maxRetries=${maxRetries} to totalAttempts=${totalAttempts} for ${host}:${port}`
-        );
-
         return await withOperationalHooks(() => performSinglePortCheck(host, port, timeout), {
             initialDelay: RETRY_BACKOFF.INITIAL_DELAY,
             maxRetries: totalAttempts,
-            onRetry: isDev()
-                ? (attempt, error) => {
-                      const errorMessage = error instanceof Error ? error.message : String(error);
-                      logger.debug(
-                          `[PortMonitor] Port ${host}:${port} failed attempt ${attempt}/${totalAttempts}: ${errorMessage}`
-                      );
-                  }
-                : undefined,
             operationName: `Port check for ${host}:${port}`,
+            ...(isDev() && {
+                onRetry: (attempt: number, error: Error) => {
+                    const errorMessage = error instanceof Error ? error.message : String(error);
+                    logger.debug(
+                        `[PortMonitor] Port ${host}:${port} failed attempt ${attempt}/${totalAttempts}: ${errorMessage}`
+                    );
+                },
+            }),
         });
     } catch (error) {
         return handlePortCheckError(error, host, port);

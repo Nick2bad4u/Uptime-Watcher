@@ -179,7 +179,7 @@ export default [
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
                 typescript: true,
                 node: true,
-                project: ["tsconfig.json", "tsconfig.electron.json"],
+                project: ["./tsconfig.json"],
             },
         },
         plugins: {
@@ -499,7 +499,7 @@ export default [
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
                 typescript: true,
                 node: true,
-                project: ["tsconfig.json", "tsconfig.electron.json"],
+                project: ["./tsconfig.electron.json"],
             },
         },
         plugins: {

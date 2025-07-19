@@ -401,7 +401,10 @@ export class SiteManager {
         await this.updateSitesCache(freshSites);
 
         // Get the refreshed site for the event
-        const refreshedSite = this.siteCache.get(identifier) ?? updatedSite;
+        const refreshedSite = this.siteCache.get(identifier);
+        if (!refreshedSite) {
+            throw new Error(`Site with identifier ${identifier} not found in cache after refresh`);
+        }
 
         // Emit typed site updated event
         await this.eventEmitter.emitTyped("site:updated", {

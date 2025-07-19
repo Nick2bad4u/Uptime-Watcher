@@ -185,15 +185,15 @@ export class HttpMonitor implements IMonitorService {
             return await withOperationalHooks(() => this.performSingleHealthCheck(url, timeout), {
                 initialDelay: RETRY_BACKOFF.INITIAL_DELAY,
                 maxRetries: totalAttempts,
-                onRetry: isDev()
-                    ? (attempt, error) => {
-                          const errorMessage = error instanceof Error ? error.message : String(error);
-                          logger.debug(
-                              `[HttpMonitor] URL ${url} failed attempt ${attempt}/${totalAttempts}: ${errorMessage}`
-                          );
-                      }
-                    : undefined,
                 operationName: `HTTP check for ${url}`,
+                ...(isDev() && {
+                    onRetry: (attempt: number, error: Error) => {
+                        const errorMessage = error instanceof Error ? error.message : String(error);
+                        logger.debug(
+                            `[HttpMonitor] URL ${url} failed attempt ${attempt}/${totalAttempts}: ${errorMessage}`
+                        );
+                    },
+                }),
             });
         } catch (error) {
             return handleCheckError(error, url);
