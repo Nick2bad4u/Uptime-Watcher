@@ -7,7 +7,7 @@ import { UptimeEvents } from "../../events/eventTypes";
 import { TypedEventBus } from "../../events/TypedEventBus";
 import { DatabaseService } from "../../services/database/DatabaseService";
 import { monitorLogger as logger } from "../logger";
-import { withDbRetry } from "../retry";
+import { withDatabaseOperation } from "../operationalHooks";
 
 /**
  * Initialize the database and load sites.
@@ -22,7 +22,7 @@ export async function initDatabase(
 ): Promise<void> {
     try {
         databaseService.initialize();
-        await withDbRetry(loadSitesCallback, "loadSites");
+        await withDatabaseOperation(loadSitesCallback, "loadSites", eventEmitter);
     } catch (error) {
         logger.error("Failed to initialize database", error);
         await eventEmitter.emitTyped("database:error", {

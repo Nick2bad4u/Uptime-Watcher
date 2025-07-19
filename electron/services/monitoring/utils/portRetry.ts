@@ -1,7 +1,7 @@
 import { RETRY_BACKOFF } from "../../../constants";
 import { isDev } from "../../../electronUtils";
 import { logger } from "../../../utils/logger";
-import { withRetry } from "../../../utils/retry";
+import { withOperationalHooks } from "../../../utils/operationalHooks";
 import { MonitorCheckResult } from "../types";
 import { performSinglePortCheck } from "./portChecker";
 import { handlePortCheckError } from "./portErrorHandling";
@@ -19,20 +19,33 @@ export async function performPortCheckWithRetry(
     timeout: number,
     maxRetries: number
 ): Promise<MonitorCheckResult> {
-    // Convert maxRetries (additional attempts) to totalAttempts for withRetry utility
-    const totalAttempts = maxRetries + 1;
+    try {
+        // DEBUG: Log the maxRetries value to understand the issue
+        logger.debug(`[PortRetry] performPortCheckWithRetry called with maxRetries=${maxRetries} for ${host}:${port}`);
 
-    return withRetry(() => performSinglePortCheck(host, port, timeout), {
-        delayMs: RETRY_BACKOFF.INITIAL_DELAY,
-        maxRetries: totalAttempts,
-        onError: (error, attempt) => {
-            if (isDev()) {
-                const errorMessage = error instanceof Error ? error.message : String(error);
-                logger.debug(
-                    `[PortMonitor] Port ${host}:${port} failed attempt ${attempt}/${totalAttempts}: ${errorMessage}`
-                );
-            }
-        },
-        operationName: `Port check for ${host}:${port}`,
-    }).catch((error) => handlePortCheckError(error, host, port));
+        // maxRetries parameter is "additional retries after first attempt"
+        // withOperationalHooks expects "total attempts"
+        // So if maxRetries=3, we want 4 total attempts (1 initial + 3 retries)
+        const totalAttempts = maxRetries + 1;
+
+        logger.debug(
+            `[PortRetry] Converted maxRetries=${maxRetries} to totalAttempts=${totalAttempts} for ${host}:${port}`
+        );
+
+        return await withOperationalHooks(() => performSinglePortCheck(host, port, timeout), {
+            initialDelay: RETRY_BACKOFF.INITIAL_DELAY,
+            maxRetries: totalAttempts,
+            onRetry: isDev()
+                ? (attempt, error) => {
+                      const errorMessage = error instanceof Error ? error.message : String(error);
+                      logger.debug(
+                          `[PortMonitor] Port ${host}:${port} failed attempt ${attempt}/${totalAttempts}: ${errorMessage}`
+                      );
+                  }
+                : undefined,
+            operationName: `Port check for ${host}:${port}`,
+        });
+    } catch (error) {
+        return handlePortCheckError(error, host, port);
+    }
 }

@@ -102,7 +102,7 @@ export const TIMEOUT_CONSTRAINTS_MS = {
 
 /** Retry attempt constraints for per-monitor retry configuration */
 export const RETRY_CONSTRAINTS = {
-    DEFAULT: 0, // Default retry attempts (disabled)
+    DEFAULT: 3, // Default retry attempts
     MAX: 10, // 10 retry attempts maximum
     MIN: 0, // 0 retries minimum (immediate failure)
     STEP: 1, // 1 retry increment

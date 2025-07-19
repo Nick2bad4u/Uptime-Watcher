@@ -53,6 +53,15 @@ export class SiteWriterService {
 
                     // Create monitors and assign IDs using internal method
                     for (const monitor of site.monitors) {
+                        // DEBUG: Log monitor data during site creation
+                        this.logger.debug(`[SiteWriter] Creating monitor with data:`, {
+                            hasRetryAttempts: "retryAttempts" in monitor,
+                            monitorKeys: Object.keys(monitor),
+                            retryAttempts: monitor.retryAttempts,
+                            timeout: monitor.timeout,
+                            type: monitor.type,
+                        });
+
                         const newId = this.repositories.monitor.createInternal(db, site.identifier, monitor);
                         monitor.id = newId;
                     }

@@ -34,7 +34,7 @@ import { DEFAULT_REQUEST_TIMEOUT, RETRY_BACKOFF, USER_AGENT } from "../../consta
 import { isDev } from "../../electronUtils";
 import { Site } from "../../types";
 import { logger } from "../../utils/logger";
-import { withRetry } from "../../utils/retry";
+import { withOperationalHooks } from "../../utils/operationalHooks";
 import { IMonitorService, MonitorCheckResult, MonitorConfig } from "./types";
 import { createErrorResult, handleCheckError } from "./utils/errorHandling";
 import { createHttpClient } from "./utils/httpClient";
@@ -176,22 +176,28 @@ export class HttpMonitor implements IMonitorService {
         timeout: number,
         maxRetries: number
     ): Promise<MonitorCheckResult> {
-        // Convert maxRetries (additional attempts) to totalAttempts for withRetry utility
-        const totalAttempts = maxRetries + 1;
+        try {
+            // maxRetries parameter is "additional retries after first attempt"
+            // withOperationalHooks expects "total attempts"
+            // So if maxRetries=3, we want 4 total attempts (1 initial + 3 retries)
+            const totalAttempts = maxRetries + 1;
 
-        return withRetry(() => this.performSingleHealthCheck(url, timeout), {
-            delayMs: RETRY_BACKOFF.INITIAL_DELAY,
-            maxRetries: totalAttempts,
-            onError: (error, attempt) => {
-                if (isDev()) {
-                    const errorMessage = error instanceof Error ? error.message : String(error);
-                    logger.debug(
-                        `[HttpMonitor] URL ${url} failed attempt ${attempt}/${totalAttempts}: ${errorMessage}`
-                    );
-                }
-            },
-            operationName: `HTTP check for ${url}`,
-        }).catch((error) => handleCheckError(error, url));
+            return await withOperationalHooks(() => this.performSingleHealthCheck(url, timeout), {
+                initialDelay: RETRY_BACKOFF.INITIAL_DELAY,
+                maxRetries: totalAttempts,
+                onRetry: isDev()
+                    ? (attempt, error) => {
+                          const errorMessage = error instanceof Error ? error.message : String(error);
+                          logger.debug(
+                              `[HttpMonitor] URL ${url} failed attempt ${attempt}/${totalAttempts}: ${errorMessage}`
+                          );
+                      }
+                    : undefined,
+                operationName: `HTTP check for ${url}`,
+            });
+        } catch (error) {
+            return handleCheckError(error, url);
+        }
     }
 
     /**
