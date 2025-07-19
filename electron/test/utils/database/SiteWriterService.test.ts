@@ -5,15 +5,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 import { Site, Monitor } from "../../../types";
-import {
-    SiteWriterService,
-} from "../../../utils/database/SiteWriterService";
-import {
-    SiteCache,
-    SiteNotFoundError,
-    Logger,
-    MonitoringConfig,
-} from "../../../utils/database/interfaces";
+import { SiteWriterService } from "../../../utils/database/SiteWriterService";
+import { SiteCache, SiteNotFoundError, Logger, MonitoringConfig } from "../../../utils/database/interfaces";
 
 // Mock isDev function
 vi.mock("../../../electronUtils", () => ({
