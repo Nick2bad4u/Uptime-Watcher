@@ -314,15 +314,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     // Site Management Operations
 
     /**
-     * Gets the current sites from the in-memory cache.
-     *
-     * @returns Array of Site objects from cache.
-     */
-    public getSitesFromCache(): Site[] {
-        return this.siteManager.getSitesFromCache();
-    }
-
-    /**
      * Imports application data from a JSON string.
      *
      * @param data - The JSON data string to import.
@@ -340,42 +331,24 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      */
     public async initialize(): Promise<void> {
         try {
-            /* v8 ignore next 2 */ logger.info("[UptimeOrchestrator] Starting initialization...");
+            logger.info("[UptimeOrchestrator] Starting initialization...");
 
             // Step 1: Initialize database first (required by other managers)
             await this.databaseManager.initialize();
-            /* v8 ignore next 2 */ logger.info("[UptimeOrchestrator] Database manager initialized");
+            logger.info("[UptimeOrchestrator] Database manager initialized");
 
             // Step 2: Initialize site manager (loads sites from database)
             await this.siteManager.initialize();
-            /* v8 ignore next 2 */ logger.info("[UptimeOrchestrator] Site manager initialized");
+            logger.info("[UptimeOrchestrator] Site manager initialized");
 
             // Step 3: Validate that managers are properly initialized
             this.validateInitialization();
 
-            /* v8 ignore next 2 */ logger.info("[UptimeOrchestrator] Initialization completed successfully");
+            logger.info("[UptimeOrchestrator] Initialization completed successfully");
         } catch (error) {
-            /* v8 ignore next 2 */ logger.error("[UptimeOrchestrator] Initialization failed:", error);
+            logger.error("[UptimeOrchestrator] Initialization failed:", error);
             throw error;
         }
-    }
-
-    /**
-     * Checks if monitoring is currently active.
-     *
-     * @returns True if monitoring is active, false otherwise.
-     */
-    public isMonitoringActive(): boolean {
-        return this.monitorManager.isMonitoringActive();
-    }
-
-    /**
-     * Refreshes sites from the database and updates the cache.
-     *
-     * @returns Promise resolving to an array of refreshed Site objects.
-     */
-    public async refreshSites(): Promise<Site[]> {
-        return this.databaseManager.refreshSites();
     }
 
     /**

@@ -14,7 +14,7 @@ import { SettingsRepository } from "../../services/database/SettingsRepository";
 import { SiteRepository } from "../../services/database/SiteRepository";
 import { Site, StatusHistory } from "../../types";
 import { withDatabaseOperation } from "../operationalHooks";
-import { Logger, SiteCacheInterface, SiteLoadingError } from "./interfaces";
+import { Logger, SiteLoadingError } from "./interfaces";
 
 /**
  * Configuration for data import/export operations.
@@ -38,58 +38,6 @@ export interface ImportSite {
     identifier: string;
     monitors?: Site["monitors"];
     name?: string;
-}
-
-/**
- * Orchestrates the complete data import/export process.
- * Coordinates data operations with side effects.
- */
-export class DataImportExportOrchestrator {
-    private readonly dataImportExportService: DataImportExportService;
-
-    constructor(dataImportExportService: DataImportExportService) {
-        this.dataImportExportService = dataImportExportService;
-    }
-
-    /**
-     * Export all application data.
-     * Coordinates the complete export process.
-     */
-    async exportData(): Promise<string> {
-        return this.dataImportExportService.exportAllData();
-    }
-
-    /**
-     * Import data and reload application state.
-     * Coordinates the complete import process including cache refresh.
-     */
-    async importData(
-        jsonData: string,
-        siteCache: SiteCacheInterface,
-        onSitesReloaded: () => Promise<void>
-    ): Promise<{ message: string; success: boolean }> {
-        try {
-            // Parse the import data
-            const { settings, sites } = await this.dataImportExportService.importDataFromJson(jsonData);
-
-            // Persist to database
-            await this.dataImportExportService.persistImportedData(sites, settings);
-
-            // Clear cache and reload sites
-            siteCache.clear();
-            await onSitesReloaded();
-
-            return {
-                message: `Successfully imported ${sites.length} sites and ${Object.keys(settings).length} settings`,
-                success: true,
-            };
-        } catch (error) {
-            return {
-                message: `Failed to import data: ${error instanceof Error ? error.message : "Unknown error"}`,
-                success: false,
-            };
-        }
-    }
 }
 
 /**

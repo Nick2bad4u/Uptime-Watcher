@@ -10,8 +10,8 @@ import { MonitorRepository } from "../../services/database/MonitorRepository";
 import { SettingsRepository } from "../../services/database/SettingsRepository";
 import { SiteRepository } from "../../services/database/SiteRepository";
 import { monitorLogger } from "../logger";
-import { DataBackupOrchestrator, DataBackupService } from "./DataBackupService";
-import { DataImportExportOrchestrator, DataImportExportService } from "./DataImportExportService";
+import { DataBackupService } from "./DataBackupService";
+import { DataImportExportService } from "./DataImportExportService";
 import { SiteCache } from "./interfaces";
 import { SiteLoadingOrchestrator, SiteRepositoryService } from "./SiteRepositoryService";
 import { SiteWriterService } from "./SiteWriterService";
@@ -44,14 +44,6 @@ class LoggerAdapter {
 }
 
 /**
- * Factory function to create a properly configured DataBackupOrchestrator.
- */
-export function createDataBackupOrchestrator(eventEmitter: TypedEventBus<UptimeEvents>): DataBackupOrchestrator {
-    const dataBackupService = createDataBackupService(eventEmitter);
-    return new DataBackupOrchestrator(dataBackupService);
-}
-
-/**
  * Factory function to create a properly configured DataBackupService.
  */
 export function createDataBackupService(eventEmitter: TypedEventBus<UptimeEvents>): DataBackupService {
@@ -63,16 +55,6 @@ export function createDataBackupService(eventEmitter: TypedEventBus<UptimeEvents
         eventEmitter,
         logger,
     });
-}
-
-/**
- * Factory function to create a properly configured DataImportExportOrchestrator.
- */
-export function createDataImportExportOrchestrator(
-    eventEmitter: TypedEventBus<UptimeEvents>
-): DataImportExportOrchestrator {
-    const dataImportExportService = createDataImportExportService(eventEmitter);
-    return new DataImportExportOrchestrator(dataImportExportService);
 }
 
 /**

@@ -29,8 +29,8 @@ import {
     setHistoryLimit as setHistoryLimitUtil,
 } from "../utils/database/historyLimitManager";
 import {
-    createDataBackupOrchestrator,
-    createDataImportExportOrchestrator,
+    createDataBackupService,
+    createDataImportExportService,
     createSiteCache,
     createSiteLoadingOrchestrator,
 } from "../utils/database/serviceFactory";
@@ -60,8 +60,8 @@ export class DatabaseManager {
      * Download SQLite database backup.
      */
     public async downloadBackup(): Promise<{ buffer: Buffer; fileName: string }> {
-        const dataBackupOrchestrator = createDataBackupOrchestrator(this.eventEmitter);
-        const result = await dataBackupOrchestrator.downloadBackup();
+        const dataBackupService = createDataBackupService(this.eventEmitter);
+        const result = await dataBackupService.downloadDatabaseBackup();
 
         // Emit typed backup downloaded event
         await this.eventEmitter.emitTyped("internal:database:backup-downloaded", {
@@ -78,8 +78,8 @@ export class DatabaseManager {
      * Export all application data to JSON string.
      */
     public async exportData(): Promise<string> {
-        const dataImportExportOrchestrator = createDataImportExportOrchestrator(this.eventEmitter);
-        const result = await dataImportExportOrchestrator.exportData();
+        const dataImportExportService = createDataImportExportService(this.eventEmitter);
+        const result = await dataImportExportService.exportAllData();
 
         // Emit typed data exported event
         await this.eventEmitter.emitTyped("internal:database:data-exported", {
@@ -104,18 +104,38 @@ export class DatabaseManager {
      */
     public async importData(data: string): Promise<boolean> {
         const siteCache = createSiteCache();
-        const dataImportExportOrchestrator = createDataImportExportOrchestrator(this.eventEmitter);
+        const dataImportExportService = createDataImportExportService(this.eventEmitter);
 
-        const result = await dataImportExportOrchestrator.importData(data, siteCache, () => this.loadSites());
+        try {
+            // Parse the import data
+            const { settings, sites } = await dataImportExportService.importDataFromJson(data);
 
-        // Emit typed data imported event
-        await this.eventEmitter.emitTyped("internal:database:data-imported", {
-            operation: "data-imported",
-            success: result.success,
-            timestamp: Date.now(),
-        });
+            // Persist to database
+            await dataImportExportService.persistImportedData(sites, settings);
 
-        return result.success;
+            // Clear cache and reload sites
+            siteCache.clear();
+            await this.loadSites();
+
+            // Emit typed data imported event
+            await this.eventEmitter.emitTyped("internal:database:data-imported", {
+                operation: "data-imported",
+                success: true,
+                timestamp: Date.now(),
+            });
+
+            return true;
+        } catch (error) {
+            // Emit typed data imported event with failure
+            await this.eventEmitter.emitTyped("internal:database:data-imported", {
+                operation: "data-imported",
+                success: false,
+                timestamp: Date.now(),
+            });
+
+            logger.error("[DatabaseManager] Failed to import data:", error);
+            return false;
+        }
     }
 
     /**
@@ -144,28 +164,41 @@ export class DatabaseManager {
      */
     public async refreshSites(): Promise<Site[]> {
         const siteCache = createSiteCache();
-        const dataBackupOrchestrator = createDataBackupOrchestrator(this.eventEmitter);
 
         // Load sites first
         await this.loadSites();
 
-        // Then get them from cache
-        const result = await dataBackupOrchestrator.refreshSitesFromCache(siteCache);
+        // Then get them from cache - implement the refresh logic directly
+        try {
+            const sites = [...siteCache.entries()].map(([, site]) => ({
+                identifier: site.identifier,
+                name: site.name,
+            }));
 
-        // Emit typed sites refreshed event
-        await this.eventEmitter.emitTyped("internal:database:sites-refreshed", {
-            operation: "sites-refreshed",
-            siteCount: result.length,
-            timestamp: Date.now(),
-        });
+            // Emit typed sites refreshed event
+            await this.eventEmitter.emitTyped("internal:database:sites-refreshed", {
+                operation: "sites-refreshed",
+                siteCount: sites.length,
+                timestamp: Date.now(),
+            });
 
-        // Convert to Site[] format expected by the interface
-        return result.map((site: { identifier: string; name?: string }) => ({
-            identifier: site.identifier,
-            monitoring: true,
-            monitors: [],
-            name: site.name ?? "Unnamed Site",
-        }));
+            // Convert to Site[] format expected by the interface
+            return sites.map((site: { identifier: string; name?: string }) => ({
+                identifier: site.identifier,
+                monitoring: true,
+                monitors: [],
+                name: site.name ?? "Unnamed Site",
+            }));
+        } catch (error) {
+            // Handle error case - log and re-emit event with zero count
+            logger.error("[DatabaseManager] Failed to refresh sites from cache:", error);
+            await this.eventEmitter.emitTyped("internal:database:sites-refreshed", {
+                operation: "sites-refreshed",
+                siteCount: 0,
+                timestamp: Date.now(),
+            });
+            return [];
+        }
     }
 
     /**

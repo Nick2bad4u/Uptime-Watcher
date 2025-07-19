@@ -184,9 +184,11 @@ describe("UptimeOrchestrator - Basic", () => {
             expect(uptimeOrchestrator).toBeInstanceOf(EventEmitter);
         });
 
-        it("should initialize with default values", () => {
+        it("should initialize with default values", async () => {
             expect(uptimeOrchestrator.historyLimit).toBe(500);
-            expect(uptimeOrchestrator.getSitesFromCache()).toEqual([]);
+            // Use the async public API instead of the removed cache method
+            const sites = await uptimeOrchestrator.getSites();
+            expect(sites).toEqual([]);
         });
 
         it("should initialize database service singleton", () => {

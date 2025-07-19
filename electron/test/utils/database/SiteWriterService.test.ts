@@ -7,12 +7,13 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { Site, Monitor } from "../../../types";
 import {
     SiteWriterService,
-    SiteWritingOrchestrator,
+} from "../../../utils/database/SiteWriterService";
+import {
     SiteCache,
     SiteNotFoundError,
     Logger,
     MonitoringConfig,
-} from "../../../utils/database";
+} from "../../../utils/database/interfaces";
 
 // Mock isDev function
 vi.mock("../../../electronUtils", () => ({
@@ -564,180 +565,6 @@ describe("SiteWriterService", () => {
             expect(mockMonitorRepository.updateInternal).toHaveBeenCalled();
             expect(mockMonitorRepository.createInternal).toHaveBeenCalled();
             // Don't assert the specific ID since we're not actually mutating it anymore
-        });
-    });
-});
-
-describe("SiteWritingOrchestrator", () => {
-    let siteWritingOrchestrator: SiteWritingOrchestrator;
-    let mockSiteWriterService: SiteWriterService;
-
-    beforeEach(() => {
-        mockSiteWriterService = {
-            createSite: vi.fn(),
-            updateSite: vi.fn(),
-            deleteSite: vi.fn(),
-            handleMonitorIntervalChanges: vi.fn(),
-            detectNewMonitors: vi.fn(() => []),
-        } as unknown as SiteWriterService;
-
-        siteWritingOrchestrator = new SiteWritingOrchestrator(mockSiteWriterService);
-    });
-
-    afterEach(() => {
-        vi.clearAllMocks();
-    });
-
-    describe("updateSiteWithMonitoring", () => {
-        it("should update site and handle monitoring changes", async () => {
-            const siteCache = new SiteCache();
-            const originalSite: Site = {
-                identifier: "site1",
-                monitors: [
-                    {
-                        id: "monitor1",
-                        type: "http",
-                        status: "up",
-                        history: [],
-                        checkInterval: 10000,
-                        responseTime: 0,
-                        monitoring: false,
-                        timeout: 0,
-                        retryAttempts: 0,
-                    },
-                ],
-                name: "",
-                monitoring: false,
-            };
-            siteCache.set("site1", originalSite);
-
-            const updatedSite: Site = {
-                identifier: "site1",
-                monitors: [
-                    {
-                        id: "monitor1",
-                        type: "http",
-                        status: "up",
-                        history: [],
-                        checkInterval: 15000,
-                        responseTime: 0,
-                        monitoring: false,
-                        timeout: 0,
-                        retryAttempts: 0,
-                    },
-                ],
-                name: "",
-                monitoring: false,
-            };
-
-            const updates: Partial<Site> = {
-                monitors: [
-                    {
-                        id: "monitor1",
-                        type: "http",
-                        status: "up",
-                        history: [],
-                        checkInterval: 15000,
-                        responseTime: 0,
-                        monitoring: false,
-                        timeout: 0,
-                        retryAttempts: 0,
-                    },
-                ],
-            };
-
-            const mockMonitoringConfig: MonitoringConfig = {
-                setHistoryLimit: vi.fn(),
-                startMonitoring: vi.fn(),
-                stopMonitoring: vi.fn(),
-                setupNewMonitors: function (site: Site, newMonitorIds: string[]): Promise<void> {
-                    throw new Error("Function not implemented.");
-                },
-            };
-
-            vi.mocked(mockSiteWriterService.updateSite).mockResolvedValue(updatedSite);
-            vi.mocked(mockSiteWriterService.handleMonitorIntervalChanges).mockResolvedValue();
-
-            const result = await siteWritingOrchestrator.updateSiteWithMonitoring(
-                siteCache,
-                "site1",
-                updates,
-                mockMonitoringConfig
-            );
-
-            expect(result).toEqual(updatedSite);
-            expect(mockSiteWriterService.updateSite).toHaveBeenCalledWith(siteCache, "site1", updates);
-            expect(mockSiteWriterService.handleMonitorIntervalChanges).toHaveBeenCalledWith(
-                "site1",
-                originalSite,
-                updates.monitors,
-                mockMonitoringConfig
-            );
-        });
-
-        it("should not handle monitoring changes if monitors are not updated", async () => {
-            const siteCache = new SiteCache();
-            const originalSite: Site = {
-                identifier: "site1",
-                monitors: [],
-                name: "",
-                monitoring: false,
-            };
-            siteCache.set("site1", originalSite);
-
-            const updatedSite: Site = {
-                identifier: "site1",
-                name: "Updated Name",
-                monitors: [],
-                monitoring: false,
-            };
-
-            const updates: Partial<Site> = {
-                name: "Updated Name",
-            };
-
-            const mockMonitoringConfig: MonitoringConfig = {
-                setHistoryLimit: vi.fn(),
-                startMonitoring: vi.fn(),
-                stopMonitoring: vi.fn(),
-                setupNewMonitors: function (site: Site, newMonitorIds: string[]): Promise<void> {
-                    throw new Error("Function not implemented.");
-                },
-            };
-
-            vi.mocked(mockSiteWriterService.updateSite).mockResolvedValue(updatedSite);
-
-            const result = await siteWritingOrchestrator.updateSiteWithMonitoring(
-                siteCache,
-                "site1",
-                updates,
-                mockMonitoringConfig
-            );
-
-            expect(result).toEqual(updatedSite);
-            expect(mockSiteWriterService.handleMonitorIntervalChanges).not.toHaveBeenCalled();
-        });
-
-        it("should throw SiteNotFoundError if site does not exist", async () => {
-            const siteCache = new SiteCache();
-            const updates: Partial<Site> = { name: "Updated Name" };
-            const mockMonitoringConfig: MonitoringConfig = {
-                setHistoryLimit: vi.fn(),
-                startMonitoring: vi.fn(),
-                stopMonitoring: vi.fn(),
-                setupNewMonitors: function (site: Site, newMonitorIds: string[]): Promise<void> {
-                    throw new Error("Function not implemented.");
-                },
-            };
-
-            await expect(
-                siteWritingOrchestrator.updateSiteWithMonitoring(
-                    siteCache,
-                    "non-existent",
-                    updates,
-                    mockMonitoringConfig
-                )
-            ).rejects.toThrow(SiteNotFoundError);
         });
     });
 });
