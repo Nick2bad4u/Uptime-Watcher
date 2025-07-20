@@ -1,7 +1,7 @@
 ---
 mode: "agent"
 tools: ["All Tools"]
-description: "Generate custom React hook with comprehensive testing"
+description: "Conduct a thorough review of the codebase for consistency"
 ---
 
 # Codebase Consistency Audit Prompt
@@ -81,5 +81,7 @@ Create a consistency improvement roadmap with:
 
 - Pay special attention to boundary areas between components/modules
 - Consider both horizontal (same-layer) and vertical (cross-layer) consistency
-- Evaluate test coverage in inconsistent areas as potential risk indicators
+- Don't worry about test files for this task.
+- Focus on implementation files only
+- Don't worry about minor formatting issues when making changes. (Can always fix with (eslint . --fix))
 - Highlight any inconsistencies that might affect upcoming feature work
