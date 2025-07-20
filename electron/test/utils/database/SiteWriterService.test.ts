@@ -6,12 +6,23 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 import { Site, Monitor } from "../../../types";
 import { SiteWriterService } from "../../../utils/database/SiteWriterService";
-import { SiteCache, SiteNotFoundError, Logger, MonitoringConfig } from "../../../utils/database/interfaces";
+import { SiteNotFoundError, Logger, MonitoringConfig } from "../../../utils/database/interfaces";
+import { StandardizedCache } from "../../../utils/cache/StandardizedCache";
 
 // Mock isDev function
 vi.mock("../../../electronUtils", () => ({
     isDev: vi.fn(() => true),
 }));
+
+// Helper function to create test cache
+function createTestSiteCache(): StandardizedCache<Site> {
+    return new StandardizedCache<Site>({
+        name: "test-sites",
+        defaultTTL: 300_000,
+        maxSize: 100,
+        enableStats: false,
+    });
+}
 
 describe("SiteWriterService", () => {
     let siteWriterService: SiteWriterService;
@@ -149,7 +160,7 @@ describe("SiteWriterService", () => {
 
     describe("updateSite", () => {
         it("should update a site with new values", async () => {
-            const siteCache = new SiteCache();
+            const siteCache = createTestSiteCache();
             const existingSite: Site = {
                 identifier: "site1",
                 name: "Old Name",
@@ -226,7 +237,7 @@ describe("SiteWriterService", () => {
         });
 
         it("should throw SiteNotFoundError for non-existent site", async () => {
-            const siteCache = new SiteCache();
+            const siteCache = createTestSiteCache();
             const updates: Partial<Site> = { name: "New Name" };
 
             await expect(siteWriterService.updateSite(siteCache, "non-existent", updates)).rejects.toThrow(
@@ -235,7 +246,7 @@ describe("SiteWriterService", () => {
         });
 
         it("should throw SiteNotFoundError for empty identifier", async () => {
-            const siteCache = new SiteCache();
+            const siteCache = createTestSiteCache();
             const updates: Partial<Site> = { name: "New Name" };
 
             await expect(siteWriterService.updateSite(siteCache, "", updates)).rejects.toThrow(SiteNotFoundError);
@@ -244,7 +255,7 @@ describe("SiteWriterService", () => {
 
     describe("deleteSite", () => {
         it("should delete a site and return true if found", async () => {
-            const siteCache = new SiteCache();
+            const siteCache = createTestSiteCache();
             const site: Site = {
                 identifier: "site1",
                 monitors: [],
@@ -266,7 +277,7 @@ describe("SiteWriterService", () => {
         });
 
         it("should return false and log warning if site not found in cache", async () => {
-            const siteCache = new SiteCache();
+            const siteCache = createTestSiteCache();
 
             vi.mocked(mockSiteRepository.deleteInternal).mockReturnValue(false);
 
@@ -469,7 +480,7 @@ describe("SiteWriterService", () => {
 
     describe("updateSiteMonitors", () => {
         it("should delete obsolete monitors and upsert new ones", async () => {
-            const siteCache = new SiteCache();
+            const siteCache = createTestSiteCache();
             const existingSite: Site = {
                 identifier: "site1",
                 monitors: [

@@ -53,7 +53,8 @@ import { SettingsRepository } from "../../services/database/SettingsRepository";
 import { SiteRepository } from "../../services/database/SiteRepository";
 import { SiteRow } from "../../services/database/utils/siteMapper";
 import { Site } from "../../types";
-import { Logger, MonitoringConfig, SiteCacheInterface, SiteLoadingConfig, SiteLoadingError } from "./interfaces";
+import { StandardizedCache } from "../cache/StandardizedCache";
+import { Logger, MonitoringConfig, SiteLoadingConfig, SiteLoadingError } from "./interfaces";
 
 /**
  * Orchestrates the complete site loading process.
@@ -71,7 +72,7 @@ export class SiteLoadingOrchestrator {
      * Coordinates all aspects of site loading process.
      */
     async loadSitesFromDatabase(
-        siteCache: SiteCacheInterface,
+        siteCache: StandardizedCache<Site>,
         monitoringConfig: MonitoringConfig
     ): Promise<{ message: string; sitesLoaded: number; success: boolean }> {
         try {
@@ -84,7 +85,7 @@ export class SiteLoadingOrchestrator {
             // Note: Auto-start monitoring is now handled by MonitorManager.setupSiteForMonitoring()
             // No need to explicitly start monitoring here as it's handled during site setup
 
-            const sitesLoaded = siteCache.size();
+            const sitesLoaded = siteCache.size;
             return {
                 message: `Successfully loaded ${sitesLoaded} sites`,
                 sitesLoaded,
@@ -213,7 +214,7 @@ export class SiteRepositoryService {
      * Load sites into cache.
      * Pure data operation that populates the cache.
      */
-    async loadSitesIntoCache(siteCache: SiteCacheInterface): Promise<void> {
+    async loadSitesIntoCache(siteCache: StandardizedCache<Site>): Promise<void> {
         try {
             const sites = await this.getSitesFromDatabase();
             siteCache.clear();

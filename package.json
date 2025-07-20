@@ -356,6 +356,7 @@
     "publint": "^0.3.12",
     "putout": "^40.4.0",
     "react-refresh": "^0.17.0",
+    "rollup-plugin-visualizer": "^6.0.3",
     "sort-package-json": "^3.4.0",
     "stylelint": "^16.21.1",
     "stylelint-config-recommended": "^16.0.0",
@@ -380,6 +381,7 @@
     "vite-plugin-eslint2": "^5.0.4",
     "vite-plugin-mcp": "^0.2.3",
     "vite-plugin-static-copy": "^3.1.1",
+    "vite-plugin-tsconfig-paths": "^1.4.1",
     "vitest": "^3.2.4",
     "wait-on": "^8.0.3",
     "yaml-eslint-parser": "^1.3.0"

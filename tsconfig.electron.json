@@ -19,7 +19,8 @@
         "electron/**/*.tsx",
         "shared/**/*.ts",
         "shared/**/*.tsx",
-        "vitest.electron.config.ts"
+        "vitest.electron.config.ts",
+        "vite/client"
     ],
     "exclude": ["electron/**/*.test.ts", "electron/**/*.spec.ts", "electron/test/**/*", "node_modules"]
 }

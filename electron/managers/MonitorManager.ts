@@ -12,7 +12,7 @@ export interface MonitorManagerDependencies {
     databaseService: DatabaseService;
     eventEmitter: TypedEventBus<MonitorManagerEvents>;
     getHistoryLimit: () => number;
-    getSitesCache: () => SiteCacheInterface;
+    getSitesCache: () => StandardizedCache<Site>;
     repositories: {
         history: HistoryRepository;
         monitor: MonitorRepository;
@@ -26,7 +26,7 @@ import { MonitorRepository } from "../services/database/MonitorRepository";
 import { SiteRepository } from "../services/database/SiteRepository";
 import { MonitorScheduler } from "../services/monitoring/MonitorScheduler";
 import { Site, StatusUpdate } from "../types";
-import { SiteCacheInterface } from "../utils/database/interfaces";
+import { StandardizedCache } from "../utils/cache/StandardizedCache";
 import { monitorLogger as logger } from "../utils/logger";
 import {
     startAllMonitoring,

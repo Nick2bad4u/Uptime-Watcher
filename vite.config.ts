@@ -9,7 +9,8 @@ import * as path from "node:path";
 import electron from "vite-plugin-electron";
 import { ViteMcp } from "vite-plugin-mcp";
 import { viteStaticCopy } from "vite-plugin-static-copy";
-import { defineConfig } from "vitest/config";
+import { visualizer } from "rollup-plugin-visualizer";
+import { defineConfig, type PluginOption } from "vite";
 
 /**
  * Vite configuration object.
@@ -30,6 +31,30 @@ export default defineConfig({
         target: "es2024", // Match TypeScript target for consistency
     },
     plugins: [
+        electron([
+            {
+                entry: "electron/main.ts",
+                onstart(options) {
+                    options.startup();
+                },
+                vite: {
+                    build: {
+                        outDir: "dist-electron",
+                    },
+                },
+            },
+            {
+                entry: "electron/preload.ts",
+                onstart(options) {
+                    options.reload();
+                },
+                vite: {
+                    build: {
+                        outDir: "dist-electron",
+                    },
+                },
+            },
+        ]),
         react({
             // Enable Fast Refresh for better development experience
             // Includes .js, .jsx, .ts, .tsx by default
@@ -63,30 +88,19 @@ export default defineConfig({
         //     enableBuild: false, // Disable in build mode (use CI for production checking)
         // }),
         ViteMcp(),
-        electron([
-            {
-                entry: "electron/main.ts",
-                onstart(options) {
-                    options.startup();
-                },
-                vite: {
-                    build: {
-                        outDir: "dist-electron",
-                    },
-                },
-            },
-            {
-                entry: "electron/preload.ts",
-                onstart(options) {
-                    options.reload();
-                },
-                vite: {
-                    build: {
-                        outDir: "dist-electron",
-                    },
-                },
-            },
-        ]),
+        visualizer({
+            filename: "build-stats.html",
+            title: "Electron React Bundle Stats",
+            open: false,
+            gzipSize: true,
+            brotliSize: true,
+            template: "treemap",
+            emitFile: true,
+            sourcemap: true,
+            projectRoot: path.resolve(__dirname),
+            include: [{ file: "**/*.ts" }, { file: "**/*.tsx" }, { file: "**/*.js" }, { file: "**/*.jsx" }],
+            exclude: [{ file: "node_modules/**" }, { file: "**/*.test.*" }, { file: "**/*.spec.*" }],
+        }) as PluginOption,
         viteStaticCopy({
             targets: [
                 // Remove copy to dist/ (frontend) - only needed in dist-electron/

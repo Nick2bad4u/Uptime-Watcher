@@ -64,7 +64,8 @@
         "src/**/*",
         "src/types/global.d.ts",
         "src/App.tsx",
-        "global.d.ts"
+        "global.d.ts",
+        "vite/client"
     ],
     "exclude": [
         "node_modules",

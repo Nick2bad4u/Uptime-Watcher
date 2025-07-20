@@ -44,7 +44,7 @@ import { MonitorRepository } from "../../services/database/MonitorRepository";
 import { SiteRepository } from "../../services/database/SiteRepository";
 import { MonitorFactory } from "../../services/monitoring/MonitorFactory";
 import { Site, StatusHistory, StatusUpdate } from "../../types";
-import { SiteCacheInterface } from "../database/interfaces";
+import { StandardizedCache } from "../cache/StandardizedCache";
 import { withDatabaseOperation } from "../operationalHooks";
 
 /**
@@ -72,7 +72,7 @@ export interface MonitorCheckConfig {
         site: SiteRepository;
     };
     /** In-memory site cache for performance optimization */
-    sites: SiteCacheInterface;
+    sites: StandardizedCache<Site>;
 }
 
 /**

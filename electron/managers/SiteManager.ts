@@ -49,7 +49,8 @@ import { HistoryRepository } from "../services/database/HistoryRepository";
 import { MonitorRepository } from "../services/database/MonitorRepository";
 import { SiteRepository } from "../services/database/SiteRepository";
 import { Site } from "../types";
-import { MonitoringConfig, SiteCache, SiteCacheInterface } from "../utils/database/interfaces";
+import { StandardizedCache } from "../utils/cache/StandardizedCache";
+import { MonitoringConfig } from "../utils/database/interfaces";
 import { createSiteRepositoryService } from "../utils/database/serviceFactory";
 import { SiteRepositoryService } from "../utils/database/SiteRepositoryService";
 import { SiteWriterService } from "../utils/database/SiteWriterService";
@@ -125,8 +126,8 @@ export class SiteManager {
     private readonly eventEmitter: TypedEventBus<SiteManagerEvents>;
     private readonly monitoringOperations: IMonitoringOperations | undefined;
     private readonly repositories: Omit<SiteManagerDependencies, "eventEmitter" | "monitoringOperations">;
-    private readonly siteCache = new SiteCache();
     private readonly siteRepositoryService: SiteRepositoryService;
+    private readonly sitesCache: StandardizedCache<Site>;
     private readonly siteWriterService: SiteWriterService;
 
     /**
@@ -150,6 +151,15 @@ export class SiteManager {
         this.eventEmitter = dependencies.eventEmitter;
         this.monitoringOperations = dependencies.monitoringOperations;
 
+        // Initialize StandardizedCache for sites
+        this.sitesCache = new StandardizedCache<Site>({
+            defaultTTL: 600_000, // 10 minutes
+            enableStats: true,
+            eventEmitter: this.eventEmitter,
+            maxSize: 500,
+            name: "sites",
+        });
+
         // Create the new service-based orchestrators
         this.siteWriterService = new SiteWriterService({
             databaseService: this.repositories.databaseService,
@@ -160,6 +170,8 @@ export class SiteManager {
             },
         });
         this.siteRepositoryService = createSiteRepositoryService(this.eventEmitter);
+
+        logger.info("[SiteManager] Initialized with StandardizedCache");
     }
 
     /**
@@ -173,7 +185,7 @@ export class SiteManager {
         const site = await this.siteWriterService.createSite(siteData);
 
         // Add to in-memory cache
-        this.siteCache.set(site.identifier, site);
+        this.sitesCache.set(site.identifier, site);
 
         // Emit typed site added event
         await this.eventEmitter.emitTyped("site:added", {
@@ -198,7 +210,7 @@ export class SiteManager {
      * Get a specific site from cache with smart background loading.
      */
     public getSiteFromCache(identifier: string): Site | undefined {
-        const site = this.siteCache.get(identifier);
+        const site = this.sitesCache.get(identifier);
 
         if (!site) {
             // Emit cache miss event
@@ -247,10 +259,10 @@ export class SiteManager {
     }
 
     /**
-     * Get the in-memory sites cache (for internal use by other managers).
+     * Get the standardized sites cache (for internal use by other managers).
      */
-    public getSitesCache(): SiteCacheInterface {
-        return this.siteCache;
+    public getSitesCache(): StandardizedCache<Site> {
+        return this.sitesCache;
     }
 
     /**
@@ -268,7 +280,7 @@ export class SiteManager {
      * guaranteed fresh data or subscribe to cache update events.
      */
     public getSitesFromCache(): Site[] {
-        return this.siteCache.getAll();
+        return this.sitesCache.getAll();
     }
 
     /**
@@ -303,7 +315,7 @@ export class SiteManager {
                 await this.updateSitesCache(allSites);
 
                 // Find the updated site for the event
-                const updatedSite = this.siteCache.get(siteIdentifier);
+                const updatedSite = this.sitesCache.get(siteIdentifier);
                 if (updatedSite) {
                     // Emit internal site updated event
                     await this.eventEmitter.emitTyped("internal:site:updated", {
@@ -337,11 +349,11 @@ export class SiteManager {
      * Remove a site from the database and cache.
      */
     public async removeSite(identifier: string): Promise<boolean> {
-        const result = await this.siteWriterService.deleteSite(this.siteCache, identifier);
+        const result = await this.siteWriterService.deleteSite(this.sitesCache, identifier);
 
         if (result) {
             // Get site name before removal for event (already removed from cache by service)
-            const removedSite = this.siteCache.get(identifier);
+            const removedSite = this.sitesCache.get(identifier);
 
             // Emit typed site removed event
             await this.eventEmitter.emitTyped("site:removed", {
@@ -368,7 +380,7 @@ export class SiteManager {
      */
     public async updateSite(identifier: string, updates: Partial<Site>): Promise<Site> {
         // Get original site before update for monitoring comparison
-        const originalSite = this.siteCache.get(identifier);
+        const originalSite = this.sitesCache.get(identifier);
         if (!originalSite) {
             throw new Error(`Site with identifier ${identifier} not found`);
         }
@@ -377,7 +389,7 @@ export class SiteManager {
         const monitoringConfig = this.createMonitoringConfig();
 
         // Perform the update using SiteWriterService directly
-        const updatedSite = await this.siteWriterService.updateSite(this.siteCache, identifier, updates);
+        const updatedSite = await this.siteWriterService.updateSite(this.sitesCache, identifier, updates);
 
         // Handle monitoring changes if monitors were updated (replaces orchestrator logic)
         if (updates.monitors) {
@@ -401,7 +413,7 @@ export class SiteManager {
         await this.updateSitesCache(freshSites);
 
         // Get the refreshed site for the event
-        const refreshedSite = this.siteCache.get(identifier);
+        const refreshedSite = this.sitesCache.get(identifier);
         if (!refreshedSite) {
             throw new Error(`Site with identifier ${identifier} not found in cache after refresh`);
         }
@@ -429,9 +441,9 @@ export class SiteManager {
      * Update the sites cache with new data.
      */
     public async updateSitesCache(sites: Site[]): Promise<void> {
-        this.siteCache.clear();
+        this.sitesCache.clear();
         for (const site of sites) {
-            this.siteCache.set(site.identifier, site);
+            this.sitesCache.set(site.identifier, site);
         }
 
         // Emit cache updated event
@@ -505,7 +517,7 @@ export class SiteManager {
             const site = sites.find((s) => s.identifier === identifier);
 
             if (site) {
-                this.siteCache.set(identifier, site);
+                this.sitesCache.set(identifier, site);
 
                 await this.eventEmitter.emitTyped("site:cache-updated", {
                     identifier,

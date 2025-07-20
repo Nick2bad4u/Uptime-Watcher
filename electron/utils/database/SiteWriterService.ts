@@ -9,8 +9,9 @@ import { DatabaseService } from "../../services/database/DatabaseService";
 import { MonitorRepository } from "../../services/database/MonitorRepository";
 import { SiteRepository } from "../../services/database/SiteRepository";
 import { Monitor, Site } from "../../types";
+import { StandardizedCache } from "../cache/StandardizedCache";
 import { withDatabaseOperation } from "../operationalHooks";
-import { Logger, MonitoringConfig, SiteCacheInterface, SiteNotFoundError, SiteWritingConfig } from "./interfaces";
+import { Logger, MonitoringConfig, SiteNotFoundError, SiteWritingConfig } from "./interfaces";
 
 /**
  * Service for handling site writing operations.
@@ -75,13 +76,13 @@ export class SiteWriterService {
      * Delete a site and all its monitors from the database.
      * Pure data operation without side effects.
      */
-    async deleteSite(siteCache: SiteCacheInterface, identifier: string): Promise<boolean> {
+    async deleteSite(sitesCache: StandardizedCache<Site>, identifier: string): Promise<boolean> {
         return withDatabaseOperation(
             async () => {
                 this.logger.info(`Removing site: ${identifier}`);
 
                 // Remove from cache
-                const removed = siteCache.delete(identifier);
+                const removed = sitesCache.delete(identifier);
 
                 // Use executeTransaction for atomic multi-table deletion
                 await this.databaseService.executeTransaction((db) => {
@@ -166,14 +167,14 @@ export class SiteWriterService {
      * Update a site with new values.
      * Pure data operation without side effects.
      */
-    async updateSite(siteCache: SiteCacheInterface, identifier: string, updates: Partial<Site>): Promise<Site> {
+    async updateSite(sitesCache: StandardizedCache<Site>, identifier: string, updates: Partial<Site>): Promise<Site> {
         return withDatabaseOperation(
             async () => {
                 // Validate input
-                const site = this.validateSiteExists(siteCache, identifier);
+                const site = this.validateSiteExists(sitesCache, identifier);
 
                 // Create updated site
-                const updatedSite = this.createUpdatedSite(siteCache, site, updates);
+                const updatedSite = this.createUpdatedSite(sitesCache, site, updates);
 
                 // Use executeTransaction for atomic multi-step operation
                 await this.databaseService.executeTransaction(async (db) => {
@@ -236,13 +237,13 @@ export class SiteWriterService {
     /**
      * Create updated site object with new values.
      */
-    private createUpdatedSite(siteCache: SiteCacheInterface, site: Site, updates: Partial<Site>): Site {
+    private createUpdatedSite(sitesCache: StandardizedCache<Site>, site: Site, updates: Partial<Site>): Site {
         const updatedSite: Site = {
             ...site,
             ...updates,
             monitors: updates.monitors ?? site.monitors,
         };
-        siteCache.set(site.identifier, updatedSite);
+        sitesCache.set(site.identifier, updatedSite);
         return updatedSite;
     }
 
@@ -352,12 +353,12 @@ export class SiteWriterService {
     /**
      * Validate that a site exists in the cache.
      */
-    private validateSiteExists(siteCache: SiteCacheInterface, identifier: string): Site {
+    private validateSiteExists(sitesCache: StandardizedCache<Site>, identifier: string): Site {
         if (!identifier) {
             throw new SiteNotFoundError("Site identifier is required");
         }
 
-        const site = siteCache.get(identifier);
+        const site = sitesCache.get(identifier);
         if (!site) {
             throw new SiteNotFoundError(identifier);
         }

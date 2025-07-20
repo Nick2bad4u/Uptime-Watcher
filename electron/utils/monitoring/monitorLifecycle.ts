@@ -11,7 +11,7 @@ import { DatabaseService } from "../../services/database/DatabaseService";
 import { MonitorRepository } from "../../services/database/MonitorRepository";
 import { MonitorScheduler } from "../../services/monitoring/MonitorScheduler";
 import { Site } from "../../types";
-import { SiteCacheInterface } from "../database/interfaces";
+import { StandardizedCache } from "../cache/StandardizedCache";
 import { withDatabaseOperation } from "../operationalHooks";
 
 /**
@@ -28,7 +28,7 @@ export interface MonitoringLifecycleConfig {
     logger: Logger;
     monitorRepository: MonitorRepository;
     monitorScheduler: MonitorScheduler;
-    sites: SiteCacheInterface;
+    sites: StandardizedCache<Site>;
 }
 
 /**
@@ -44,7 +44,7 @@ export async function startAllMonitoring(config: MonitoringLifecycleConfig, isMo
         return isMonitoring;
     }
 
-    config.logger.info(`Starting monitoring with ${config.sites.size()} sites (per-site intervals)`);
+    config.logger.info(`Starting monitoring with ${config.sites.size} sites (per-site intervals)`);
 
     // Set all monitors to pending status and enable monitoring
     for (const site of config.sites.getAll()) {

@@ -9,10 +9,11 @@ import { HistoryRepository } from "../../services/database/HistoryRepository";
 import { MonitorRepository } from "../../services/database/MonitorRepository";
 import { SettingsRepository } from "../../services/database/SettingsRepository";
 import { SiteRepository } from "../../services/database/SiteRepository";
+import { Site } from "../../types";
+import { StandardizedCache } from "../cache/StandardizedCache";
 import { monitorLogger } from "../logger";
 import { DataBackupService } from "./DataBackupService";
 import { DataImportExportService } from "./DataImportExportService";
-import { SiteCache } from "./interfaces";
 import { SiteLoadingOrchestrator, SiteRepositoryService } from "./SiteRepositoryService";
 import { SiteWriterService } from "./SiteWriterService";
 
@@ -85,12 +86,17 @@ export function createDataImportExportService(eventEmitter: TypedEventBus<Uptime
 }
 
 /**
- * Factory function to create a site cache.
+ * Factory function to create a standardized site cache.
  *
- * @returns New SiteCache instance
+ * @returns New StandardizedCache instance configured for temporary use
  */
-export function createSiteCache(): SiteCache {
-    return new SiteCache();
+export function createSiteCache(): StandardizedCache<Site> {
+    return new StandardizedCache<Site>({
+        defaultTTL: 300_000, // 5 minutes for temporary operations
+        enableStats: false, // No need for stats in temporary caches
+        maxSize: 1000,
+        name: "temporary-sites",
+    });
 }
 
 /**
