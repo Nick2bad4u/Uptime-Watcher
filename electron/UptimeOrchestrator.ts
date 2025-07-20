@@ -76,13 +76,18 @@ import { TypedEventBus } from "./events/TypedEventBus";
 import { DatabaseManager } from "./managers/DatabaseManager";
 import { MonitorManager } from "./managers/MonitorManager";
 import { SiteManager } from "./managers/SiteManager";
-import { DatabaseService } from "./services/database/DatabaseService";
-import { HistoryRepository } from "./services/database/HistoryRepository";
-import { MonitorRepository } from "./services/database/MonitorRepository";
-import { SettingsRepository } from "./services/database/SettingsRepository";
-import { SiteRepository } from "./services/database/SiteRepository";
+import { ServiceContainer } from "./services/ServiceContainer";
 import { Monitor, Site, StatusUpdate } from "./types";
 import { logger } from "./utils/logger";
+
+/**
+ * Dependencies for UptimeOrchestrator.
+ */
+export interface UptimeOrchestratorDependencies {
+    databaseManager: DatabaseManager;
+    monitorManager: MonitorManager;
+    siteManager: SiteManager;
+}
 
 /**
  * Data structure for internal monitoring status check events.
@@ -94,20 +99,6 @@ interface IsMonitoringActiveRequestData {
     identifier: string;
     /** Specific monitor ID to check */
     monitorId: string;
-}
-
-/**
- * Interface defining the monitoring operations provided to the SiteManager.
- */
-interface MonitoringOperations {
-    /** Set the history retention limit for monitor data */
-    setHistoryLimit: (limit: number) => Promise<void>;
-    /** Set up monitoring for newly added monitors */
-    setupNewMonitors: (site: Site, newMonitorIds: string[]) => Promise<void>;
-    /** Start monitoring for a specific site and monitor */
-    startMonitoringForSite: (identifier: string, monitorId: string) => Promise<boolean>;
-    /** Stop monitoring for a specific site and monitor */
-    stopMonitoringForSite: (identifier: string, monitorId: string) => Promise<boolean>;
 }
 
 /**
@@ -189,33 +180,31 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     private readonly siteManager: SiteManager;
 
     /**
-     * Gets the monitoring operations interface for SiteManager.
-     * Uses lazy initialization to ensure dependencies are available.
+     * Constructs a new UptimeOrchestrator with injected dependencies.
      *
-     * @returns The monitoring operations interface
-     */
-    private get monitoringOperations(): MonitoringOperations {
-        return this.createMonitoringOperations();
-    }
-
-    /**
-     * Constructs a new UptimeOrchestrator and initializes all managers and middleware.
+     * @param dependencies - The manager dependencies
      *
      * @remarks
-     * Sets up event bus middleware, repositories, and manager dependencies.
+     * Sets up event bus middleware and initializes with provided managers.
      */
-    constructor() {
+    constructor(dependencies?: UptimeOrchestratorDependencies) {
         super("UptimeOrchestrator");
 
         this.setupMiddleware();
 
-        // Initialize repositories and managers using helper methods
-        const repositories = this.initRepositories();
-        const managers = this.initManagers(repositories);
+        if (dependencies) {
+            // Use injected dependencies
+            this.databaseManager = dependencies.databaseManager;
+            this.monitorManager = dependencies.monitorManager;
+            this.siteManager = dependencies.siteManager;
+        } else {
+            // Fallback to ServiceContainer for backward compatibility
+            const serviceContainer = ServiceContainer.getInstance();
 
-        this.monitorManager = managers.monitorManager;
-        this.siteManager = managers.siteManager;
-        this.databaseManager = managers.databaseManager;
+            this.databaseManager = serviceContainer.getDatabaseManager();
+            this.monitorManager = serviceContainer.getMonitorManager();
+            this.siteManager = serviceContainer.getSiteManager();
+        }
 
         // Set up event-driven communication between managers
         this.setupEventHandlers();
@@ -478,110 +467,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      */
     public async updateSite(identifier: string, updates: Partial<Site>): Promise<Site> {
         return this.siteManager.updateSite(identifier, updates);
-    }
-
-    /**
-     * Creates the monitoringOperations object for SiteManager.
-     *
-     * @returns The monitoringOperations object implementing the MonitoringOperations interface.
-     */
-    private createMonitoringOperations(): MonitoringOperations {
-        return {
-            setHistoryLimit: async (limit: number) => {
-                await this.setHistoryLimit(limit);
-            },
-            setupNewMonitors: async (site: Site, newMonitorIds: string[]) => {
-                return this.monitorManager.setupNewMonitors(site, newMonitorIds);
-            },
-            startMonitoringForSite: async (identifier: string, monitorId: string) => {
-                return this.monitorManager.startMonitoringForSite(identifier, monitorId);
-            },
-            stopMonitoringForSite: async (identifier: string, monitorId: string) => {
-                return this.monitorManager.stopMonitoringForSite(identifier, monitorId);
-            },
-        };
-    }
-
-    /**
-     * Initializes all manager instances using the provided repositories.
-     *
-     * @param repositories - Object containing all repository instances.
-     * @returns Object containing all manager instances.
-     */
-    private initManagers(repositories: ReturnType<UptimeOrchestrator["initRepositories"]>): {
-        databaseManager: DatabaseManager;
-        monitorManager: MonitorManager;
-        siteManager: SiteManager;
-    } {
-        // Create site manager first so we can reference it in the monitor manager
-        const siteManagerInstance = new SiteManager({
-            databaseService: repositories.databaseService,
-            eventEmitter: this,
-            historyRepository: repositories.historyRepository,
-            monitoringOperations: this.monitoringOperations,
-            monitorRepository: repositories.monitorRepository,
-            siteRepository: repositories.siteRepository,
-        });
-
-        const monitorManager = new MonitorManager({
-            databaseService: repositories.databaseService,
-            eventEmitter: this,
-            getHistoryLimit: () => this.databaseManager.getHistoryLimit(),
-            getSitesCache: () => siteManagerInstance.getSitesCache(),
-            repositories: {
-                history: repositories.historyRepository,
-                monitor: repositories.monitorRepository,
-                site: repositories.siteRepository,
-            },
-        });
-
-        // We've already constructed SiteManager before MonitorManager
-
-        const databaseManager = new DatabaseManager({
-            eventEmitter: this,
-            repositories: {
-                database: repositories.databaseService,
-                history: repositories.historyRepository,
-                monitor: repositories.monitorRepository,
-                settings: repositories.settingsRepository,
-                site: repositories.siteRepository,
-            },
-        });
-
-        return {
-            databaseManager,
-            monitorManager,
-            siteManager: siteManagerInstance,
-        };
-    }
-
-    // History Management
-
-    /**
-     * Initializes all repository instances.
-     *
-     * @returns Object containing all repository instances.
-     */
-    private initRepositories(): {
-        databaseService: DatabaseService;
-        historyRepository: HistoryRepository;
-        monitorRepository: MonitorRepository;
-        settingsRepository: SettingsRepository;
-        siteRepository: SiteRepository;
-    } {
-        const databaseService = DatabaseService.getInstance();
-        const siteRepository = new SiteRepository();
-        const monitorRepository = new MonitorRepository();
-        const historyRepository = new HistoryRepository();
-        const settingsRepository = new SettingsRepository();
-
-        return {
-            databaseService,
-            historyRepository,
-            monitorRepository,
-            settingsRepository,
-            siteRepository,
-        };
     }
 
     /**

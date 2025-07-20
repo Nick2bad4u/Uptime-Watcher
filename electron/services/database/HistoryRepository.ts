@@ -17,11 +17,15 @@ import { findHistoryByMonitorId, getHistoryCount, getLatestHistoryEntry } from "
  * Repository for managing history data persistence.
  * Handles CRUD operations for monitor history in the database.
  */
+export interface HistoryRepositoryDependencies {
+    databaseService: DatabaseService;
+}
+
 export class HistoryRepository {
     private readonly databaseService: DatabaseService;
 
-    constructor() {
-        this.databaseService = DatabaseService.getInstance();
+    constructor(dependencies?: HistoryRepositoryDependencies) {
+        this.databaseService = dependencies?.databaseService ?? DatabaseService.getInstance();
     }
 
     /**

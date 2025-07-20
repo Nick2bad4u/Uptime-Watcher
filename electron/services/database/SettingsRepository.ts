@@ -6,6 +6,10 @@ import { withDatabaseOperation } from "../../utils/operationalHooks";
 import { DatabaseService } from "./DatabaseService";
 import { rowsToSettings, rowToSettingValue, settingsToRecord } from "./utils/settingsMapper";
 
+export interface SettingsRepositoryDependencies {
+    databaseService: DatabaseService;
+}
+
 /**
  * Repository for managing application settings persistence.
  * Handles CRUD operations for settings in the database.
@@ -13,8 +17,8 @@ import { rowsToSettings, rowToSettingValue, settingsToRecord } from "./utils/set
 export class SettingsRepository {
     private readonly databaseService: DatabaseService;
 
-    constructor() {
-        this.databaseService = DatabaseService.getInstance();
+    constructor(dependencies?: SettingsRepositoryDependencies) {
+        this.databaseService = dependencies?.databaseService ?? DatabaseService.getInstance();
     }
 
     /**

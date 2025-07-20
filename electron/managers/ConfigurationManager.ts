@@ -200,5 +200,5 @@ export class ConfigurationManager {
     }
 }
 
-// Singleton instance for easy access
-export const configurationManager = new ConfigurationManager();
+// NOTE: ConfigurationManager instances should be obtained via ServiceContainer.getInstance().getConfigurationManager()
+// This ensures proper dependency injection and lifecycle management

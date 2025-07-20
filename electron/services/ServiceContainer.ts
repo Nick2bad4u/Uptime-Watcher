@@ -12,9 +12,20 @@
  * - **Utility Services**: Support functions (Window, Updater)
  */
 
+import { UptimeEvents } from "../events/eventTypes";
+import { TypedEventBus } from "../events/TypedEventBus";
+import { ConfigurationManager } from "../managers/ConfigurationManager";
+import { DatabaseManager } from "../managers/DatabaseManager";
+import { MonitorManager } from "../managers/MonitorManager";
+import { IMonitoringOperations, SiteManager } from "../managers/SiteManager";
+import { Site } from "../types";
 import { UptimeOrchestrator } from "../UptimeOrchestrator";
 import { logger } from "../utils/logger";
 import { DatabaseService } from "./database/DatabaseService";
+import { HistoryRepository } from "./database/HistoryRepository";
+import { MonitorRepository } from "./database/MonitorRepository";
+import { SettingsRepository } from "./database/SettingsRepository";
+import { SiteRepository } from "./database/SiteRepository";
 import { IpcService } from "./ipc/IpcService";
 import { NotificationService } from "./notifications/NotificationService";
 import { AutoUpdaterService } from "./updater/AutoUpdaterService";
@@ -41,17 +52,31 @@ export class ServiceContainer {
 
     private _autoUpdaterService?: AutoUpdaterService;
 
+    // Manager Services (Business Layer)
+    private _configurationManager?: ConfigurationManager;
+
+    private _databaseManager?: DatabaseManager;
+
     // Core Services (Infrastructure)
     private _databaseService?: DatabaseService;
 
+    // Repository Services (Data Layer)
+    private _historyRepository?: HistoryRepository;
+
     private _ipcService?: IpcService;
 
+    private _monitorManager?: MonitorManager;
+    private _monitorRepository?: MonitorRepository;
     private _notificationService?: NotificationService;
+    private _settingsRepository?: SettingsRepository;
 
+    private _siteManager?: SiteManager;
+    private _siteRepository?: SiteRepository;
     // Application Services (Business Logic)
     private _uptimeOrchestrator?: UptimeOrchestrator;
     // Utility Services
     private _windowService?: WindowService;
+
     private readonly config: ServiceContainerConfig;
 
     private constructor(config: ServiceContainerConfig = {}) {
@@ -85,10 +110,57 @@ export class ServiceContainer {
         return this._autoUpdaterService;
     }
 
+    // Manager Services (Business Layer)
+    public getConfigurationManager(): ConfigurationManager {
+        if (!this._configurationManager) {
+            this._configurationManager = new ConfigurationManager();
+            if (this.config.enableDebugLogging) {
+                logger.debug("[ServiceContainer] Created ConfigurationManager");
+            }
+        }
+        return this._configurationManager;
+    }
+
+    public getDatabaseManager(): DatabaseManager {
+        if (!this._databaseManager) {
+            // Create a separate event bus for DatabaseManager to avoid circular dependency
+            const databaseEventBus = new TypedEventBus<UptimeEvents>("DatabaseManagerEventBus");
+
+            // DatabaseManager requires repositories and event bus
+            this._databaseManager = new DatabaseManager({
+                eventEmitter: databaseEventBus,
+                repositories: {
+                    database: this.getDatabaseService(),
+                    history: this.getHistoryRepository(),
+                    monitor: this.getMonitorRepository(),
+                    settings: this.getSettingsRepository(),
+                    site: this.getSiteRepository(),
+                },
+            });
+            if (this.config.enableDebugLogging) {
+                logger.debug("[ServiceContainer] Created DatabaseManager with dependencies");
+            }
+        }
+        return this._databaseManager;
+    }
+
     // Core Services
     public getDatabaseService(): DatabaseService {
         this._databaseService ??= DatabaseService.getInstance();
         return this._databaseService;
+    }
+
+    // Repository Services (Data Layer)
+    public getHistoryRepository(): HistoryRepository {
+        if (!this._historyRepository) {
+            this._historyRepository = new HistoryRepository({
+                databaseService: this.getDatabaseService(),
+            });
+            if (this.config.enableDebugLogging) {
+                logger.debug("[ServiceContainer] Created HistoryRepository");
+            }
+        }
+        return this._historyRepository;
     }
 
     /**
@@ -107,6 +179,11 @@ export class ServiceContainer {
         }
         if (this._uptimeOrchestrator) services.push({ name: "UptimeOrchestrator", service: this._uptimeOrchestrator });
         if (this._ipcService) services.push({ name: "IpcService", service: this._ipcService });
+        if (this._siteManager) services.push({ name: "SiteManager", service: this._siteManager });
+        if (this._monitorManager) services.push({ name: "MonitorManager", service: this._monitorManager });
+        if (this._databaseManager) services.push({ name: "DatabaseManager", service: this._databaseManager });
+        if (this._configurationManager)
+            services.push({ name: "ConfigurationManager", service: this._configurationManager });
 
         return services;
     }
@@ -125,6 +202,49 @@ export class ServiceContainer {
         return this._ipcService;
     }
 
+    public getMonitorManager(): MonitorManager {
+        if (!this._monitorManager) {
+            // Create a separate event bus for MonitorManager to avoid circular dependency
+            const monitorEventBus = new TypedEventBus<UptimeEvents>("MonitorManagerEventBus");
+
+            // MonitorManager requires repositories and event bus
+            this._monitorManager = new MonitorManager({
+                databaseService: this.getDatabaseService(),
+                eventEmitter: monitorEventBus,
+                getHistoryLimit: () => 1000, // Default history limit - should come from settings
+                getSitesCache: () => {
+                    // Use lazy evaluation to avoid circular dependency
+                    return this._siteManager?.getSitesCache() ?? this.getSiteManager().getSitesCache();
+                },
+                repositories: {
+                    history: this.getHistoryRepository(),
+                    monitor: this.getMonitorRepository(),
+                    site: this.getSiteRepository(),
+                },
+            });
+
+            // Forward important events from MonitorManager to main orchestrator for frontend
+            this.setupEventForwarding(monitorEventBus, "MonitorManager");
+
+            if (this.config.enableDebugLogging) {
+                logger.debug("[ServiceContainer] Created MonitorManager with dependencies");
+            }
+        }
+        return this._monitorManager;
+    }
+
+    public getMonitorRepository(): MonitorRepository {
+        if (!this._monitorRepository) {
+            this._monitorRepository = new MonitorRepository({
+                databaseService: this.getDatabaseService(),
+            });
+            if (this.config.enableDebugLogging) {
+                logger.debug("[ServiceContainer] Created MonitorRepository");
+            }
+        }
+        return this._monitorRepository;
+    }
+
     public getNotificationService(): NotificationService {
         if (!this._notificationService) {
             this._notificationService = new NotificationService(this.config.notificationConfig);
@@ -135,12 +255,89 @@ export class ServiceContainer {
         return this._notificationService;
     }
 
+    public getSettingsRepository(): SettingsRepository {
+        if (!this._settingsRepository) {
+            this._settingsRepository = new SettingsRepository({
+                databaseService: this.getDatabaseService(),
+            });
+            if (this.config.enableDebugLogging) {
+                logger.debug("[ServiceContainer] Created SettingsRepository");
+            }
+        }
+        return this._settingsRepository;
+    }
+
+    public getSiteManager(): SiteManager {
+        if (!this._siteManager) {
+            // Create monitoring operations interface that will be passed to SiteManager
+            const monitoringOperations: IMonitoringOperations = {
+                setHistoryLimit: (limit: number): Promise<void> => {
+                    // This could be implemented if needed
+                    logger.debug(`[ServiceContainer] setHistoryLimit called with ${limit}`);
+                    return Promise.resolve();
+                },
+                setupNewMonitors: async (site: Site, newMonitorIds: string[]): Promise<void> => {
+                    const monitorManager = this.getMonitorManager();
+                    return monitorManager.setupNewMonitors(site, newMonitorIds);
+                },
+                startMonitoringForSite: async (identifier: string, monitorId: string): Promise<boolean> => {
+                    const monitorManager = this.getMonitorManager();
+                    return monitorManager.startMonitoringForSite(identifier, monitorId);
+                },
+                stopMonitoringForSite: async (identifier: string, monitorId: string): Promise<boolean> => {
+                    const monitorManager = this.getMonitorManager();
+                    return monitorManager.stopMonitoringForSite(identifier, monitorId);
+                },
+            };
+
+            // SiteManager requires repositories and event bus
+            // Create a separate event bus for SiteManager to avoid circular dependency
+            const siteEventBus = new TypedEventBus<UptimeEvents>("SiteManagerEventBus");
+
+            this._siteManager = new SiteManager({
+                configurationManager: this.getConfigurationManager(),
+                databaseService: this.getDatabaseService(),
+                eventEmitter: siteEventBus,
+                historyRepository: this.getHistoryRepository(),
+                monitoringOperations,
+                monitorRepository: this.getMonitorRepository(),
+                siteRepository: this.getSiteRepository(),
+            });
+            // Forward important events from SiteManager to main orchestrator for frontend
+            this.setupEventForwarding(siteEventBus, "SiteManager");
+
+            if (this.config.enableDebugLogging) {
+                logger.debug("[ServiceContainer] Created SiteManager with dependencies");
+            }
+        }
+        return this._siteManager;
+    }
+
+    public getSiteRepository(): SiteRepository {
+        if (!this._siteRepository) {
+            this._siteRepository = new SiteRepository({
+                databaseService: this.getDatabaseService(),
+                historyRepository: this.getHistoryRepository(),
+                monitorRepository: this.getMonitorRepository(),
+            });
+            if (this.config.enableDebugLogging) {
+                logger.debug("[ServiceContainer] Created SiteRepository");
+            }
+        }
+        return this._siteRepository;
+    }
+
     // Application Services
     public getUptimeOrchestrator(): UptimeOrchestrator {
         if (!this._uptimeOrchestrator) {
-            this._uptimeOrchestrator = new UptimeOrchestrator();
+            // Create UptimeOrchestrator with injected manager dependencies
+            this._uptimeOrchestrator = new UptimeOrchestrator({
+                databaseManager: this.getDatabaseManager(),
+                monitorManager: this.getMonitorManager(),
+                siteManager: this.getSiteManager(),
+            });
             if (this.config.enableDebugLogging) {
-                logger.debug("[ServiceContainer] Created UptimeOrchestrator"); /* v8 ignore next */
+                logger.debug("[ServiceContainer] Created UptimeOrchestrator with injected dependencies");
             }
         }
         return this._uptimeOrchestrator;
@@ -158,6 +355,72 @@ export class ServiceContainer {
     }
 
     /**
+     * Setup event forwarding from manager event buses to the main orchestrator.
+     * This ensures frontend status updates work properly while maintaining dependency isolation.
+     */
+    private setupEventForwarding(managerEventBus: TypedEventBus<UptimeEvents>, managerName: string): void {
+        // Get the main orchestrator (but only when it's actually being used, not during creation)
+        const getMainOrchestrator = (): null | UptimeOrchestrator => {
+            return this._uptimeOrchestrator ?? null;
+        };
+
+        // List of events that should be forwarded to the frontend
+        const eventsToForward = [
+            // Monitor status events
+            "monitor:status-changed",
+            "monitor:up",
+            "monitor:down",
+
+            // Monitor lifecycle events
+            "monitoring:started",
+            "monitoring:stopped",
+            "internal:monitor:started",
+            "internal:monitor:stopped",
+            "internal:monitor:manual-check-completed",
+            "internal:monitor:site-setup-completed",
+
+            // Site lifecycle events
+            "site:added",
+            "site:updated",
+            "site:removed",
+            "internal:site:updated",
+            "site:cache-updated",
+            "internal:site:cache-updated",
+
+            // System events
+            "sites:state-synchronized",
+            "site:cache-miss",
+            "system:error",
+        ] as const;
+
+        // Set up forwarding for each important event
+        for (const eventType of eventsToForward) {
+            managerEventBus.on(eventType, (data: unknown) => {
+                const mainOrchestrator = getMainOrchestrator();
+                if (mainOrchestrator) {
+                    // Forward the event to the main orchestrator so frontend can receive it
+                    // Cast to any to avoid complex type checking - the event system will handle validation
+                    mainOrchestrator.emitTyped(eventType, data as any).catch((error) => {
+                        logger.error(`[ServiceContainer] Error forwarding ${eventType} from ${managerName}:`, error);
+                    });
+
+                    if (this.config.enableDebugLogging) {
+                        logger.debug(
+                            `[ServiceContainer] Forwarded ${eventType} from ${managerName} to main orchestrator`
+                        );
+                    }
+                }
+            });
+        }
+
+        if (this.config.enableDebugLogging) {
+            logger.debug(
+                `[ServiceContainer] Set up event forwarding for ${managerName} (${eventsToForward.length} events)`
+            );
+        }
+    }
+
+    /**
      * Initialize all services in the correct order.
      */
     public async initialize(): Promise<void> {
@@ -165,6 +428,18 @@ export class ServiceContainer {
 
         // Initialize core services first
         this.getDatabaseService().initialize();
+
+        // Initialize repositories
+        this.getHistoryRepository();
+        this.getMonitorRepository();
+        this.getSettingsRepository();
+        this.getSiteRepository();
+
+        // Initialize managers - order matters for circular dependencies
+        this.getSiteManager();
+        this.getMonitorManager();
+        this.getDatabaseManager();
+        this.getConfigurationManager();
 
         // Initialize application services
         await this.getUptimeOrchestrator().initialize();

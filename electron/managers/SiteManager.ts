@@ -55,7 +55,7 @@ import { createSiteRepositoryService } from "../utils/database/serviceFactory";
 import { SiteRepositoryService } from "../utils/database/SiteRepositoryService";
 import { SiteWriterService } from "../utils/database/SiteWriterService";
 import { monitorLogger as logger } from "../utils/logger";
-import { configurationManager } from "./ConfigurationManager";
+import { ConfigurationManager } from "./ConfigurationManager";
 
 /**
  * Interface for monitoring operations integration.
@@ -85,6 +85,8 @@ export interface IMonitoringOperations {
  * monitoring integration for coordinated operations.
  */
 export interface SiteManagerDependencies {
+    /** Configuration manager for business rules and validation */
+    configurationManager: ConfigurationManager;
     /** Database service for transaction management */
     databaseService: DatabaseService;
     /** Event emitter for system-wide communication */
@@ -123,9 +125,13 @@ type SiteManagerEvents = UptimeEvents;
  * site changes and enables reactive UI updates.
  */
 export class SiteManager {
+    private readonly configurationManager: ConfigurationManager;
     private readonly eventEmitter: TypedEventBus<SiteManagerEvents>;
     private readonly monitoringOperations: IMonitoringOperations | undefined;
-    private readonly repositories: Omit<SiteManagerDependencies, "eventEmitter" | "monitoringOperations">;
+    private readonly repositories: Omit<
+        SiteManagerDependencies,
+        "configurationManager" | "eventEmitter" | "monitoringOperations"
+    >;
     private readonly siteRepositoryService: SiteRepositoryService;
     private readonly sitesCache: StandardizedCache<Site>;
     private readonly siteWriterService: SiteWriterService;
@@ -142,6 +148,7 @@ export class SiteManager {
      * in-memory cache for performance optimization.
      */
     constructor(dependencies: SiteManagerDependencies) {
+        this.configurationManager = dependencies.configurationManager;
         this.repositories = {
             databaseService: dependencies.databaseService,
             historyRepository: dependencies.historyRepository,
@@ -539,7 +546,7 @@ export class SiteManager {
      * Business logic: Validate site data according to business rules.
      */
     private validateSite(site: Site): void {
-        const validationResult = configurationManager.validateSiteConfiguration(site);
+        const validationResult = this.configurationManager.validateSiteConfiguration(site);
 
         if (!validationResult.isValid) {
             throw new Error(`Site validation failed: ${validationResult.errors.join(", ")}`);

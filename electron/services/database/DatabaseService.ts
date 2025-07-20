@@ -19,8 +19,6 @@ import {
     createSiteLoadingOrchestrator,
 } from "../../utils/database/serviceFactory";
 import { logger } from "../../utils/logger";
-import { HistoryRepository } from "./HistoryRepository";
-import { SettingsRepository } from "./SettingsRepository";
 import { createDatabaseBackup } from "./utils/databaseBackup";
 import { createDatabaseIndexes, createDatabaseTables, setupMonitorTypeValidation } from "./utils/databaseSchema";
 
@@ -333,13 +331,17 @@ export class DatabaseService {
      * Consolidated from DatabaseManager for simplified architecture.
      */
     public async setHistoryLimit(limit: number, eventEmitter?: TypedEventBus<UptimeEvents>): Promise<void> {
+        // Import ServiceContainer to get repositories
+        const { ServiceContainer } = await import("../ServiceContainer");
+        const serviceContainer = ServiceContainer.getInstance();
+
         await setHistoryLimitUtil({
             databaseService: this,
             limit,
             logger,
             repositories: {
-                history: new HistoryRepository(),
-                settings: new SettingsRepository(),
+                history: serviceContainer.getHistoryRepository(),
+                settings: serviceContainer.getSettingsRepository(),
             },
             setHistoryLimit: (newLimit) => {
                 this.historyLimit = newLimit;

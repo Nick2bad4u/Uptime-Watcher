@@ -18,11 +18,15 @@ import { addBooleanField, addNumberField, addStringField, convertDateForDb, DbVa
  * Repository for managing monitor data persistence.
  * Handles CRUD operations for monitors in the database.
  */
+export interface MonitorRepositoryDependencies {
+    databaseService: DatabaseService;
+}
+
 export class MonitorRepository {
     private readonly databaseService: DatabaseService;
 
-    constructor() {
-        this.databaseService = DatabaseService.getInstance();
+    constructor(dependencies?: MonitorRepositoryDependencies) {
+        this.databaseService = dependencies?.databaseService ?? DatabaseService.getInstance();
     }
 
     /**

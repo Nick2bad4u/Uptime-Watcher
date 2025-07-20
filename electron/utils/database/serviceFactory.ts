@@ -4,11 +4,7 @@
 
 import { UptimeEvents } from "../../events/eventTypes";
 import { TypedEventBus } from "../../events/TypedEventBus";
-import { DatabaseService } from "../../services/database/DatabaseService";
-import { HistoryRepository } from "../../services/database/HistoryRepository";
-import { MonitorRepository } from "../../services/database/MonitorRepository";
-import { SettingsRepository } from "../../services/database/SettingsRepository";
-import { SiteRepository } from "../../services/database/SiteRepository";
+import { ServiceContainer } from "../../services/ServiceContainer";
 import { Site } from "../../types";
 import { StandardizedCache } from "../cache/StandardizedCache";
 import { monitorLogger } from "../logger";
@@ -48,11 +44,11 @@ class LoggerAdapter {
  * Factory function to create a properly configured DataBackupService.
  */
 export function createDataBackupService(eventEmitter: TypedEventBus<UptimeEvents>): DataBackupService {
+    const serviceContainer = ServiceContainer.getInstance();
     const logger = new LoggerAdapter(monitorLogger);
-    const databaseService = DatabaseService.getInstance();
 
     return new DataBackupService({
-        databaseService,
+        databaseService: serviceContainer.getDatabaseService(),
         eventEmitter,
         logger,
     });
@@ -65,22 +61,20 @@ export function createDataBackupService(eventEmitter: TypedEventBus<UptimeEvents
  * @returns Configured DataImportExportService instance
  */
 export function createDataImportExportService(eventEmitter: TypedEventBus<UptimeEvents>): DataImportExportService {
-    const siteRepository = new SiteRepository();
-    const monitorRepository = new MonitorRepository();
-    const historyRepository = new HistoryRepository();
-    const settingsRepository = new SettingsRepository();
+    // Use ServiceContainer to get properly configured repositories
+    const serviceContainer = ServiceContainer.getInstance();
+
     const logger = new LoggerAdapter(monitorLogger);
-    const databaseService = DatabaseService.getInstance();
 
     return new DataImportExportService({
-        databaseService,
+        databaseService: serviceContainer.getDatabaseService(),
         eventEmitter,
         logger,
         repositories: {
-            history: historyRepository,
-            monitor: monitorRepository,
-            settings: settingsRepository,
-            site: siteRepository,
+            history: serviceContainer.getHistoryRepository(),
+            monitor: serviceContainer.getMonitorRepository(),
+            settings: serviceContainer.getSettingsRepository(),
+            site: serviceContainer.getSiteRepository(),
         },
     });
 }
@@ -117,20 +111,17 @@ export function createSiteLoadingOrchestrator(eventEmitter: TypedEventBus<Uptime
  * @returns Configured SiteRepositoryService instance
  */
 export function createSiteRepositoryService(eventEmitter: TypedEventBus<UptimeEvents>): SiteRepositoryService {
-    const siteRepository = new SiteRepository();
-    const monitorRepository = new MonitorRepository();
-    const historyRepository = new HistoryRepository();
-    const settingsRepository = new SettingsRepository();
+    const serviceContainer = ServiceContainer.getInstance();
     const logger = new LoggerAdapter(monitorLogger);
 
     return new SiteRepositoryService({
         eventEmitter,
         logger,
         repositories: {
-            history: historyRepository,
-            monitor: monitorRepository,
-            settings: settingsRepository,
-            site: siteRepository,
+            history: serviceContainer.getHistoryRepository(),
+            monitor: serviceContainer.getMonitorRepository(),
+            settings: serviceContainer.getSettingsRepository(),
+            site: serviceContainer.getSiteRepository(),
         },
     });
 }
@@ -141,17 +132,15 @@ export function createSiteRepositoryService(eventEmitter: TypedEventBus<UptimeEv
  * @returns Configured SiteWriterService instance
  */
 export function createSiteWriterService(): SiteWriterService {
-    const siteRepository = new SiteRepository();
-    const monitorRepository = new MonitorRepository();
+    const serviceContainer = ServiceContainer.getInstance();
     const logger = new LoggerAdapter(monitorLogger);
-    const databaseService = DatabaseService.getInstance();
 
     return new SiteWriterService({
-        databaseService,
+        databaseService: serviceContainer.getDatabaseService(),
         logger,
         repositories: {
-            monitor: monitorRepository,
-            site: siteRepository,
+            monitor: serviceContainer.getMonitorRepository(),
+            site: serviceContainer.getSiteRepository(),
         },
     });
 }
