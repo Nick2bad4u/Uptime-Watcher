@@ -180,7 +180,7 @@ export class SiteManager {
                 site: this.repositories.siteRepository,
             },
         });
-        
+
         // Create SiteRepositoryService with injected dependencies
         const loggerAdapter = new LoggerAdapter(logger);
         this.siteRepositoryService = new SiteRepositoryService({

@@ -371,24 +371,16 @@ export class ServiceContainer {
     public async initialize(): Promise<void> {
         logger.info("[ServiceContainer] Initializing services");
 
-        // Initialize core services first and wait for completion
-        logger.info("[ServiceContainer] Initializing DatabaseService...");
+        // Initialize core services first
         this.getDatabaseService().initialize();
-        logger.info("[ServiceContainer] DatabaseService initialized successfully");
-
-        // Small delay to ensure database initialization is complete
-        await new Promise((resolve) => setTimeout(resolve, 100));
 
         // Initialize repositories
-        logger.info("[ServiceContainer] Initializing repositories...");
         this.getHistoryRepository();
         this.getMonitorRepository();
         this.getSettingsRepository();
         this.getSiteRepository();
-        logger.info("[ServiceContainer] Repositories initialized successfully");
 
         // Initialize managers - order matters for circular dependencies
-        logger.info("[ServiceContainer] Initializing managers...");
         this.getSiteManager();
         this.getMonitorManager();
 
@@ -397,7 +389,6 @@ export class ServiceContainer {
         await databaseManager.initialize();
 
         this.getConfigurationManager();
-        logger.info("[ServiceContainer] Managers initialized successfully");
 
         // Initialize application services
         await this.getUptimeOrchestrator().initialize();
