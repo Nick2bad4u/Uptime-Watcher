@@ -2,51 +2,32 @@
  * Shared types and interfaces for all stores in the application.
  *
  * @remarks
- * Common types, interfaces, and constants used across multiple stores.
- * Provides centralized location for shared functionality and consistency.
+ * Core domain types are imported from shared/types.ts for consistency.
+ * Store-specific types and UI-specific types are defined here.
  *
  * @packageDocumentation
  */
 
-/**
- * Chart time range options for data visualization.
- */
-export type ChartTimeRange = "1h" | "7d" | "24h" | "30d";
+import type { ThemeName } from "../theme/types";
 
 /**
- * Application update status enumeration.
- *
- * @remarks
- * Represents the various states of the application update process,
- * from initial idle state through checking, downloading, and completion.
- * Used by the updates store to track update progress and display
- * appropriate UI states to the user.
+ * Application settings interface.
+ * Manages user preferences and application configuration.
  */
-export type UpdateStatus = "available" | "checking" | "downloaded" | "downloading" | "error" | "idle";
-
-/**
- * Standardized error messages used across the application.
- * @readonly
- */
-export const ERROR_MESSAGES = {
-    FAILED_TO_ADD_MONITOR: "Failed to add monitor",
-    FAILED_TO_ADD_SITE: "Failed to add site",
-    FAILED_TO_CHECK_SITE: "Failed to check site",
-    FAILED_TO_DELETE_SITE: "Failed to delete site",
-    FAILED_TO_UPDATE_INTERVAL: "Failed to update check interval",
-    FAILED_TO_UPDATE_SITE: "Failed to update site",
-    SITE_NOT_FOUND: "Site not found",
-} as const;
-
-/**
- * Re-exported types from the main types file for convenience.
- *
- * @remarks
- * These re-exports provide convenient access to core application types without
- * needing to import from multiple files. This helps maintain a clean import
- * structure and reduces the number of import statements needed in store files.
- */
-export { type Monitor, type MonitorType, type Site, type StatusUpdate } from "../types";
+export interface AppSettings {
+    /** Auto-start monitoring when the application launches */
+    autoStart: boolean;
+    /** Maximum number of history records to keep per monitor */
+    historyLimit: number;
+    /** Minimize to system tray instead of closing the application */
+    minimizeToTray: boolean;
+    /** Enable desktop notifications for status changes */
+    notifications: boolean;
+    /** Enable sound alerts for status changes */
+    soundAlerts: boolean;
+    /** Current theme name (light, dark, etc.) */
+    theme: ThemeName;
+}
 
 /**
  * Base store interface providing common error handling and loading state functionality.
@@ -67,6 +48,11 @@ export interface BaseStore {
     /** Set the loading state */
     setLoading: (loading: boolean) => void;
 }
+
+/**
+ * Chart time range options for data visualization.
+ */
+export type ChartTimeRange = "1h" | "7d" | "24h" | "30d";
 
 /**
  * Store composition utility type for extracting action methods from store interfaces.
@@ -118,5 +104,16 @@ export type StoreState<T> = {
     [K in keyof T]: T[K] extends (...arguments_: unknown[]) => unknown ? never : T[K];
 };
 
-// Re-export from shared types to maintain compatibility
-export type { AppSettings } from "./shared/types";
+/**
+ * Application update status enumeration.
+ *
+ * @remarks
+ * Represents the various states of the application update process,
+ * from initial idle state through checking, downloading, and completion.
+ * Used by the updates store to track update progress and display
+ * appropriate UI states to the user.
+ */
+export type UpdateStatus = "available" | "checking" | "downloaded" | "downloading" | "error" | "idle";
+
+// Re-export core types from shared/types for convenience
+export type { ERROR_MESSAGES, Monitor, MonitorType, Site, StatusUpdate } from "@shared/types";

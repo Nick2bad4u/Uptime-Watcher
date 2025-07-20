@@ -3,7 +3,7 @@
  * These utilities eliminate hardcoded monitor type checks throughout the frontend.
  */
 
-import type { MonitorType } from "../types";
+import type { MonitorType } from "@shared/types";
 
 import { withUtilityErrorHandling } from "./errorHandling";
 import { getAvailableMonitorTypes, getMonitorTypeConfig, type MonitorTypeConfig } from "./monitorTypeHelper";

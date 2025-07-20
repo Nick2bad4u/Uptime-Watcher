@@ -5,12 +5,12 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { Site, Monitor } from "../types";
+import type { Site, Monitor } from "@shared/types";
 
 import { SiteService } from "../stores/sites/services/SiteService";
 import { useSitesStore } from "../stores/sites/useSitesStore";
 import { updateMonitorInSite } from "../stores/sites/utils/monitorOperations";
-import { ERROR_MESSAGES } from "../stores/types";
+import { ERROR_MESSAGES } from "@shared/types";
 
 // Mock dependencies
 vi.mock("../stores/sites/services", () => ({

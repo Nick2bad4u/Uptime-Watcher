@@ -3,7 +3,7 @@
  * Provides a clean abstraction over electron API calls.
  */
 
-import type { Site } from "../../types";
+import type { Site } from "@shared/types";
 
 import { waitForElectronAPI } from "../../utils";
 

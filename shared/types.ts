@@ -1,29 +1,80 @@
 /**
  * Shared type definitions used across frontend and backend.
  */
-
 /**
- * Core monitor status values returned by monitoring checks.
- * These are the only statuses that can be directly assigned to individual monitors.
+ * Shared type definitions for Uptime Watcher (frontend & backend).
+ *
+ * @remarks
+ * All core domain types (Monitor, Site, StatusUpdate, etc.) live here.
+ * Both frontend and backend must import from this file for consistency.
+ *
+ * @packageDocumentation
  */
+
+export type MonitorType = "http" | "port";
+
 export type MonitorStatus = "up" | "down" | "pending" | "paused";
-
-/**
- * Site status values including computed aggregate states.
- * Extends MonitorStatus with UI-specific computed values.
- */
 export type SiteStatus = MonitorStatus | "mixed" | "unknown";
 
-/**
- * Minimal Site interface for status calculations.
- * This allows the utilities to work with both frontend and backend Site types.
- */
-export interface SiteForStatus {
-    monitors: Array<{
-        status: MonitorStatus;
-        monitoring: boolean;
-    }>;
+export function isMonitorStatus(status: string): status is MonitorStatus {
+    return ["up", "down", "pending", "paused"].includes(status);
 }
+export function isSiteStatus(status: string): status is SiteStatus {
+    return ["up", "down", "pending", "paused", "mixed", "unknown"].includes(status);
+}
+export function isComputedSiteStatus(status: string): status is "mixed" | "unknown" {
+    return ["mixed", "unknown"].includes(status);
+}
+
+export interface Monitor {
+    checkInterval: number;
+    history: StatusHistory[];
+    host?: string;
+    id: string;
+    lastChecked?: Date;
+    monitoring: boolean;
+    port?: number;
+    responseTime: number;
+    retryAttempts: number;
+    status: MonitorStatus;
+    timeout: number;
+    type: MonitorType;
+    url?: string;
+}
+
+export interface Site {
+    identifier: string;
+    monitoring: boolean;
+    monitors: Monitor[];
+    name: string;
+}
+
+export interface StatusHistory {
+    details?: string;
+    responseTime: number;
+    status: "down" | "up";
+    timestamp: number;
+}
+
+export interface StatusUpdate {
+    details?: string;
+    monitorId: string;
+    status: MonitorStatus;
+    siteIdentifier: string;
+    timestamp: string;
+    site?: Site;
+    previousStatus?: MonitorStatus;
+}
+
+export const ERROR_MESSAGES = {
+    FAILED_TO_ADD_MONITOR: "Failed to add monitor",
+    FAILED_TO_ADD_SITE: "Failed to add site",
+    FAILED_TO_CHECK_SITE: "Failed to check site",
+    FAILED_TO_DELETE_SITE: "Failed to delete site",
+    FAILED_TO_UPDATE_INTERVAL: "Failed to update check interval",
+    FAILED_TO_UPDATE_SITE: "Failed to update site",
+    SITE_NOT_FOUND: "Site not found",
+} as const;
 
 /**
  * Field definition for dynamic form generation.
@@ -49,28 +100,13 @@ export interface MonitorFieldDefinition {
 }
 
 /**
- * Type guard to check if a status is a computed site status.
- * @param status - Status to check
- * @returns True if status is a computed site status
+ * Minimal Site interface for status calculations.
+ * This allows the utilities to work with both frontend and backend Site types.
  */
-export function isComputedSiteStatus(status: string): status is "mixed" | "unknown" {
-    return ["mixed", "unknown"].includes(status);
+export interface SiteForStatus {
+    monitors: Array<{
+        status: MonitorStatus;
+        monitoring: boolean;
+    }>;
 }
 
-/**
- * Type guard to check if a status is a valid monitor status.
- * @param status - Status to check
- * @returns True if status is a valid monitor status
- */
-export function isMonitorStatus(status: string): status is MonitorStatus {
-    return ["up", "down", "pending", "paused"].includes(status);
-}
-
-/**
- * Type guard to check if a status is a valid site status.
- * @param status - Status to check
- * @returns True if status is a valid site status
- */
-export function isSiteStatus(status: string): status is SiteStatus {
-    return isMonitorStatus(status) || isComputedSiteStatus(status);
-}

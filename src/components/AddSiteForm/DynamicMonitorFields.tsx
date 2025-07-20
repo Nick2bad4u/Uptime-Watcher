@@ -3,9 +3,9 @@
  * Eliminates hard-coded form field rendering by loading field definitions from backend.
  */
 
-import { useEffect, useState } from "react";
+import type { MonitorFieldDefinition } from "@shared/types";
 
-import type { MonitorFieldDefinition } from "../../../shared/types";
+import { useEffect, useState } from "react";
 
 import logger from "../../services/logger";
 import { ThemedText } from "../../theme/components";

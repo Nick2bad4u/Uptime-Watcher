@@ -10,7 +10,7 @@ import {
     getSiteStatusDescription,
     getSiteStatusVariant,
 } from "../utils/siteStatus";
-import type { Site } from "../types";
+import type { Site } from "@shared/types";
 
 describe("siteStatus utilities - Uncovered Lines", () => {
     describe("calculateSiteStatus", () => {

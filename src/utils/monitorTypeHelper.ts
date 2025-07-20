@@ -3,7 +3,7 @@
  * Provides access to monitor type definitions through the IPC bridge.
  */
 
-import type { MonitorFieldDefinition } from "../../shared/types";
+import type { MonitorFieldDefinition } from "@shared/types";
 
 import { withUtilityErrorHandling } from "./errorHandling";
 

@@ -3,7 +3,9 @@
  * Manages UI state, modal visibility, and user interface interactions.
  */
 
-import type { ChartTimeRange, Site } from "../types";
+import type { Site } from "@shared/types";
+
+import type { ChartTimeRange } from "../types";
 
 /**
  * UI store interface.

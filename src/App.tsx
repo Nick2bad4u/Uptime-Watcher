@@ -129,7 +129,9 @@ function App() {
                 // Optional callback for additional processing if needed
                 if (process.env.NODE_ENV === "development") {
                     const timestamp = new Date().toLocaleTimeString();
-                    logger.debug(`[${timestamp}] Status update received for site: ${update.site.identifier}`);
+                    logger.debug(
+                        `[${timestamp}] Status update received for site: ${update.site?.identifier ?? update.siteIdentifier}`
+                    );
                 }
             });
         };

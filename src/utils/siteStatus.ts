@@ -3,8 +3,6 @@
  * This file re-exports the shared status utilities for frontend use.
  */
 
-// Re-export everything from shared utilities
-export type { SiteStatus } from "../../shared/types";
 export {
     calculateSiteMonitoringStatus,
     calculateSiteStatus,
@@ -12,3 +10,5 @@ export {
     getSiteStatusDescription,
     getSiteStatusVariant,
 } from "../../shared/utils/siteStatus";
+// Re-export everything from shared utilities
+export type { SiteStatus } from "@shared/types";

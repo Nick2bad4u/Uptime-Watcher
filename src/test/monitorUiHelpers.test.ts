@@ -3,7 +3,7 @@
  */
 
 import { describe, expect, it, vi } from "vitest";
-import type { MonitorType } from "../types";
+import type { MonitorType } from "@shared/types";
 import {
     formatMonitorDetail,
     supportsAdvancedAnalytics,

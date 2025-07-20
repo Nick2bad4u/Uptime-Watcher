@@ -3,7 +3,7 @@
  * Manages application preferences and configuration.
  */
 
-import type { AppSettings } from "../shared/types";
+import type { AppSettings } from "../types";
 
 /**
  * Settings store interface.

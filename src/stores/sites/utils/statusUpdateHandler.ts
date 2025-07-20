@@ -3,7 +3,7 @@
  * Provides optimized incremental updates and fallback mechanisms.
  */
 
-import type { Site, StatusUpdate } from "../../types";
+import type { Site, StatusUpdate } from "@shared/types";
 
 import logger from "../../../services/logger";
 import { logStoreAction, waitForElectronAPI } from "../../utils";
@@ -128,7 +128,7 @@ export function createStatusUpdateHandler(options: StatusUpdateHandlerOptions) {
             }
 
             const updateTimestamp = Date.now();
-            const siteId = update.site.identifier;
+            const siteId = update.site?.identifier ?? update.siteIdentifier;
 
             // Validate timestamp bounds
             if (!Number.isFinite(updateTimestamp) || updateTimestamp <= 0) {
@@ -159,21 +159,23 @@ export function createStatusUpdateHandler(options: StatusUpdateHandlerOptions) {
                 if (pendingUpdates.get(siteId) === updateTimestamp) {
                     const updatedSites = currentSites.map((site, index) => {
                         if (index === siteIndex) {
-                            return { ...update.site };
+                            return update.site ? { ...update.site } : site;
                         }
                         return site;
                     });
 
                     setSites(updatedSites);
                     logStoreAction("StatusUpdateHandler", "incrementalUpdate", {
-                        siteId: update.site.identifier,
+                        siteId: update.site?.identifier ?? update.siteIdentifier,
                         timestamp: updateTimestamp,
                     });
                 }
             } else {
                 // Site not found in current state - trigger full sync as fallback
                 if (process.env.NODE_ENV === "development") {
-                    logger.warn(`Site ${update.site.identifier} not found in store, triggering full sync`);
+                    logger.warn(
+                        `Site ${update.site?.identifier ?? update.siteIdentifier} not found in store, triggering full sync`
+                    );
                 }
                 await fullSyncFromBackend().catch((error) => {
                     if (process.env.NODE_ENV === "development") {
@@ -189,7 +191,8 @@ export function createStatusUpdateHandler(options: StatusUpdateHandlerOptions) {
         } catch (error) {
             logger.error("Error processing status update", error as Error);
             // Clean up pending update tracking on error
-            pendingUpdates.delete(update.site.identifier);
+            const siteId = update.site?.identifier ?? update.siteIdentifier;
+            pendingUpdates.delete(siteId);
             // Fallback to full sync on any processing error
             await fullSyncFromBackend().catch((syncError) => {
                 logger.error("Fallback sync after error failed", syncError as Error);

@@ -5,7 +5,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import type { MonitorType, Monitor, Site, StatusHistory, StatusUpdate } from "../types";
+import type { MonitorType, Monitor, Site, StatusHistory, StatusUpdate } from "@shared/types";
 import type { UpdateStatus } from "../stores/types";
 
 describe("Types Module", () => {
@@ -247,6 +247,10 @@ describe("Types Module", () => {
             };
 
             const statusUpdate: StatusUpdate = {
+                monitorId: "test-monitor-id",
+                status: "up",
+                siteIdentifier: site.identifier,
+                timestamp: new Date().toISOString(),
                 site,
                 previousStatus: "down",
             };
@@ -264,6 +268,10 @@ describe("Types Module", () => {
             };
 
             const statusUpdate: StatusUpdate = {
+                monitorId: "test-monitor-id",
+                status: "up",
+                siteIdentifier: site.identifier,
+                timestamp: new Date().toISOString(),
                 site,
             };
 
@@ -282,6 +290,10 @@ describe("Types Module", () => {
 
             statuses.forEach((status) => {
                 const statusUpdate: StatusUpdate = {
+                    monitorId: "test-monitor-id",
+                    status: "up",
+                    siteIdentifier: site.identifier,
+                    timestamp: new Date().toISOString(),
                     site,
                     previousStatus: status,
                 };
@@ -437,6 +449,10 @@ describe("Types Module", () => {
             };
 
             const update: StatusUpdate = {
+                monitorId: "test-monitor-id",
+                status: "up",
+                siteIdentifier: site.identifier,
+                timestamp: new Date().toISOString(),
                 site,
             };
 
@@ -489,7 +505,13 @@ describe("Types Module", () => {
                 name: "",
                 monitoring: false,
             };
-            const minimalUpdate: StatusUpdate = { site };
+            const minimalUpdate: StatusUpdate = { 
+                monitorId: "test-monitor-id",
+                status: "up",
+                siteIdentifier: site.identifier,
+                timestamp: new Date().toISOString(),
+                site 
+            };
 
             expect(minimalUpdate.previousStatus).toBeUndefined();
         });

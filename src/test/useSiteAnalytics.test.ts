@@ -10,7 +10,7 @@ import type { Theme } from "../theme/types";
 import type { TimePeriod } from "../utils/time";
 
 import { useSiteAnalytics, useChartData, SiteAnalyticsUtils } from "../hooks/site/useSiteAnalytics";
-import { Monitor, StatusHistory } from "../types";
+import { Monitor, StatusHistory } from "@shared/types";
 
 // Mock constants to avoid dependency issues
 vi.mock("../constants", () => ({

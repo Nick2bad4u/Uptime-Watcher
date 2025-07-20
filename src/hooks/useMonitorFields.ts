@@ -3,9 +3,9 @@
  * Provides field configurations for dynamic form handling.
  */
 
-import { useCallback, useEffect, useState } from "react";
+import type { MonitorFieldDefinition } from "@shared/types";
 
-import type { MonitorFieldDefinition } from "../../shared/types";
+import { useCallback, useEffect, useState } from "react";
 
 interface UseMonitorFieldsResult {
     /** Get field definitions for a specific monitor type */

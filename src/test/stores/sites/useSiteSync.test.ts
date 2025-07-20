@@ -6,7 +6,7 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-import type { Site, MonitorType } from "../../../types";
+import type { Site, MonitorType } from "@shared/types";
 
 import { createSiteSyncActions, type SiteSyncDependencies } from "../../../stores/sites/useSiteSync";
 

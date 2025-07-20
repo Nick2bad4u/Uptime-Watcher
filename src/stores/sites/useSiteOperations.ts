@@ -5,10 +5,9 @@
  * Uses centralized error store for consistent error handling across the application.
  */
 
-import type { Monitor, MonitorType, Site } from "../../types";
+import { ERROR_MESSAGES, type Monitor, type MonitorType, type Site } from "@shared/types";
 
 import { useErrorStore } from "../error/useErrorStore";
-import { ERROR_MESSAGES } from "../types";
 import { logStoreAction, withErrorHandling } from "../utils";
 import { MonitoringService } from "./services/MonitoringService";
 import { SiteService } from "./services/SiteService";

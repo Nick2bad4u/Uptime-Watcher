@@ -3,7 +3,7 @@
  * Uses the backend monitor type registry for consistent validation.
  */
 
-import type { MonitorType } from "../types";
+import type { MonitorType } from "@shared/types";
 
 import { withUtilityErrorHandling } from "./errorHandling";
 

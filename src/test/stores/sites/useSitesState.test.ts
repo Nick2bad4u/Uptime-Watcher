@@ -5,7 +5,7 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { Site } from "../../../types";
+import type { Site } from "@shared/types";
 
 import { createSitesStateActions, initialSitesState } from "../../../stores/sites/useSitesState";
 

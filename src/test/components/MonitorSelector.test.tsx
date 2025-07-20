@@ -7,7 +7,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { MonitorSelector } from "../../components/Dashboard/SiteCard/components/MonitorSelector";
-import { Monitor } from "../../types";
+import { Monitor } from "@shared/types";
 
 // Mock ThemedSelect component
 vi.mock("../../theme", () => ({

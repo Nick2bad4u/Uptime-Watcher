@@ -6,7 +6,7 @@ vi.mock("../hooks/site/useSiteDetails", () => ({
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
 import { SiteDetails } from "../components/SiteDetails/SiteDetails";
-import { Site, Monitor } from "../types";
+import { Site, Monitor } from "@shared/types";
 import { useSiteDetails } from "../hooks/site/useSiteDetails";
 import type { ChartTimeRange } from "src/stores/types.ts";
 

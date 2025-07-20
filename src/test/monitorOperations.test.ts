@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-import type { Monitor, MonitorType, Site } from "../stores/types";
+import type { Monitor, MonitorType, Site } from "@shared/types";
 
 import {
     createDefaultMonitor,
@@ -13,7 +13,7 @@ import {
     validateMonitorExists,
     monitorOperations,
 } from "../stores/sites/utils/monitorOperations";
-import { ERROR_MESSAGES } from "../stores/types";
+import { ERROR_MESSAGES } from "@shared/types";
 
 // Mock crypto.randomUUID
 const mockUUID = "mock-uuid-123";

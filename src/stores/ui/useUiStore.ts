@@ -3,10 +3,12 @@
  * Handles modal visibility, selected states, and UI preferences.
  */
 
+import type { Site } from "@shared/types";
+
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-import type { ChartTimeRange, Site } from "../types";
+import type { ChartTimeRange } from "../types";
 import type { UIStore } from "./types";
 
 import { logStoreAction } from "../utils";

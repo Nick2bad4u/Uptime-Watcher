@@ -2,23 +2,109 @@
  * Type definitions for the Uptime Watcher application frontend.
  *
  * @remarks
- * Data structures for sites, monitors, status updates, and Electron API communication.
+ * All core domain types are imported from shared/types.ts for consistency.
  *
  * @packageDocumentation
  */
 
-// Re-export core types from electron to avoid duplication
-export type { Monitor, MonitorType, Site, StatusHistory, StatusUpdate } from "../electron/types";
+export * from "@shared/types";
 
-// Re-export status types from shared types for consistency
-export type { MonitorStatus, SiteStatus } from "../shared/types";
-export { isComputedSiteStatus, isMonitorStatus, isSiteStatus } from "../shared/types";
+// Import types for global declarations
+import type { Site, StatusUpdate } from "@shared/types";
 
-// Re-export ERROR_MESSAGES from stores for convenience
-export { ERROR_MESSAGES } from "./stores/types";
-
-// Import types for use in global declarations below
-import type { Site, StatusUpdate } from "../electron/types";
+/**
+ * Electron API interface exposed to the renderer process.
+ */
+declare global {
+    interface Window {
+        electronAPI: {
+            data: {
+                downloadSQLiteBackup: () => Promise<{ buffer: ArrayBuffer; fileName: string }>;
+                exportData: () => Promise<string>;
+                importData: (data: string) => Promise<boolean>;
+            };
+            events: {
+                onMonitorDown: (callback: (data: unknown) => void) => () => void;
+                onMonitoringStarted: (callback: (data: { monitorId: string; siteId: string }) => void) => () => void;
+                onMonitoringStopped: (callback: (data: { monitorId: string; siteId: string }) => void) => () => void;
+                onMonitorStatusChanged: (callback: (update: StatusUpdate) => void) => () => void;
+                onMonitorUp: (callback: (data: unknown) => void) => () => void;
+                onTestEvent: (callback: (data: unknown) => void) => () => void;
+                onUpdateStatus: (callback: (data: unknown) => void) => () => void;
+                removeAllListeners: (event: string) => void;
+            };
+            monitoring: {
+                startMonitoring: () => Promise<void>;
+                startMonitoringForSite: (siteId: string, monitorId?: string) => Promise<void>;
+                stopMonitoring: () => Promise<void>;
+                stopMonitoringForSite: (siteId: string, monitorId?: string) => Promise<void>;
+            };
+            monitorTypes: {
+                formatMonitorDetail: (type: string, details: string) => Promise<string>;
+                formatMonitorTitleSuffix: (type: string, monitor: Record<string, unknown>) => Promise<string>;
+                getMonitorTypes: () => Promise<
+                    {
+                        description: string;
+                        displayName: string;
+                        fields: {
+                            helpText?: string;
+                            label: string;
+                            max?: number;
+                            min?: number;
+                            name: string;
+                            placeholder?: string;
+                            required: boolean;
+                            type: "number" | "text" | "url";
+                        }[];
+                        type: string;
+                        version: string;
+                    }[]
+                >;
+                validateMonitorData: (
+                    type: string,
+                    data: unknown
+                ) => Promise<{
+                    errors: string[];
+                    success: boolean;
+                }>;
+            };
+            settings: {
+                getHistoryLimit: () => Promise<number>;
+                updateHistoryLimit: (limit: number) => Promise<void>;
+            };
+            sites: {
+                addSite: (site: Site) => Promise<Site>;
+                checkSiteNow: (siteId: string, monitorId: string) => Promise<void>;
+                getSites: () => Promise<Site[]>;
+                removeMonitor: (siteIdentifier: string, monitorId: string) => Promise<void>;
+                removeSite: (id: string) => Promise<void>;
+                updateSite: (id: string, updates: Partial<Site>) => Promise<void>;
+            };
+            stateSync: {
+                getSyncStatus: () => Promise<{
+                    lastSync: null | number;
+                    siteCount: number;
+                    success: boolean;
+                    synchronized: boolean;
+                }>;
+                onStateSyncEvent: (
+                    callback: (event: {
+                        action: "bulk-sync" | "delete" | "update";
+                        siteIdentifier?: string;
+                        sites?: Site[];
+                        source?: "cache" | "database" | "frontend";
+                        timestamp?: number;
+                    }) => void
+                ) => () => void;
+                requestFullSync: () => Promise<{ siteCount: number; success: boolean }>;
+            };
+            system: {
+                openExternal: (url: string) => void;
+                quitAndInstall: () => void;
+            };
+        };
+    }
+}
 
 /**
  * Electron API interface exposed to the renderer process.

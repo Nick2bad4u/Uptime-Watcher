@@ -3,7 +3,7 @@
  * This provides dynamic suffix generation for monitor types in the frontend.
  */
 
-import { Monitor } from "../types";
+import { Monitor } from "@shared/types";
 
 /**
  * Type for monitor title suffix formatter functions

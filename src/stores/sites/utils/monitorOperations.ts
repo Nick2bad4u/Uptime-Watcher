@@ -3,7 +3,7 @@
  * Provides utilities for working with monitor data and configurations.
  */
 
-import { ERROR_MESSAGES, type Monitor, type MonitorType, type Site } from "../../types";
+import { ERROR_MESSAGES, type Monitor, type MonitorType, type Site } from "@shared/types";
 
 /**
  * Adds a monitor to a site
