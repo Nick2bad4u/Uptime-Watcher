@@ -5,8 +5,9 @@
 
 import { useCallback, useMemo } from "react";
 
+import type { Monitor, MonitorStatus, Site, StatusHistory } from "../../types";
+
 import { useSitesStore } from "../../stores/sites/useSitesStore";
-import { Monitor, Site, StatusHistory } from "../../types";
 
 /**
  * Result interface for the useSiteMonitor hook.
@@ -34,7 +35,7 @@ interface SiteMonitorResult {
     selectedMonitorId: string;
 
     /** Current status of the selected monitor */
-    status: "down" | "paused" | "pending" | "up";
+    status: MonitorStatus;
 }
 
 /**

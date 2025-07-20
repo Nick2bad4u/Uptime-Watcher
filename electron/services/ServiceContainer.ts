@@ -28,6 +28,7 @@ import { SettingsRepository } from "./database/SettingsRepository";
 import { SiteRepository } from "./database/SiteRepository";
 import { IpcService } from "./ipc/IpcService";
 import { NotificationService } from "./notifications/NotificationService";
+import { SiteService } from "./site/SiteService";
 import { AutoUpdaterService } from "./updater/AutoUpdaterService";
 import { WindowService } from "./window/WindowService";
 
@@ -72,6 +73,7 @@ export class ServiceContainer {
 
     private _siteManager?: SiteManager;
     private _siteRepository?: SiteRepository;
+    private _siteService?: SiteService;
     // Application Services (Business Logic)
     private _uptimeOrchestrator?: UptimeOrchestrator;
     // Utility Services
@@ -231,6 +233,7 @@ export class ServiceContainer {
                     monitor: this.getMonitorRepository(),
                     site: this.getSiteRepository(),
                 },
+                siteService: this.getSiteService(),
             });
 
             // Forward important events from MonitorManager to main orchestrator for frontend
@@ -328,14 +331,27 @@ export class ServiceContainer {
         if (!this._siteRepository) {
             this._siteRepository = new SiteRepository({
                 databaseService: this.getDatabaseService(),
-                historyRepository: this.getHistoryRepository(),
-                monitorRepository: this.getMonitorRepository(),
             });
             if (this.config.enableDebugLogging) {
                 logger.debug("[ServiceContainer] Created SiteRepository");
             }
         }
         return this._siteRepository;
+    }
+
+    public getSiteService(): SiteService {
+        if (!this._siteService) {
+            this._siteService = new SiteService({
+                databaseService: this.getDatabaseService(),
+                historyRepository: this.getHistoryRepository(),
+                monitorRepository: this.getMonitorRepository(),
+                siteRepository: this.getSiteRepository(),
+            });
+            if (this.config.enableDebugLogging) {
+                logger.debug("[ServiceContainer] Created SiteService");
+            }
+        }
+        return this._siteService;
     }
 
     // Application Services
@@ -379,6 +395,9 @@ export class ServiceContainer {
         this.getMonitorRepository();
         this.getSettingsRepository();
         this.getSiteRepository();
+
+        // Initialize services
+        this.getSiteService();
 
         // Initialize managers - order matters for circular dependencies
         this.getSiteManager();

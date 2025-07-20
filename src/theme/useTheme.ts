@@ -6,7 +6,7 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable unicorn/consistent-function-scoping -- Hook functions must remain inside hooks for context access */
 
-import type { SiteStatus } from "@shared/types";
+import type { SiteStatus, MonitorStatus } from "@shared/types";
 
 import { useCallback, useEffect, useState } from "react";
 
@@ -244,7 +244,7 @@ export function useThemeClasses() {
         };
     };
 
-    const getStatusClass = (status: "down" | "paused" | "pending" | "unknown" | "up") => {
+    const getStatusClass = (status: MonitorStatus | SiteStatus) => {
         return {
             color: `var(--color-status-${status})`,
         };

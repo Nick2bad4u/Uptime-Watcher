@@ -1,11 +1,8 @@
 import { Database } from "node-sqlite3-wasm";
 
-import { Site } from "../../types";
 import { logger } from "../../utils/logger";
 import { withDatabaseOperation } from "../../utils/operationalHooks";
 import { DatabaseService } from "./DatabaseService";
-import { HistoryRepository } from "./HistoryRepository";
-import { MonitorRepository } from "./MonitorRepository";
 import { rowsToSites, rowToSite, type SiteRow } from "./utils/siteMapper";
 
 /**
@@ -14,19 +11,13 @@ import { rowsToSites, rowToSite, type SiteRow } from "./utils/siteMapper";
  */
 export interface SiteRepositoryDependencies {
     databaseService: DatabaseService;
-    historyRepository: HistoryRepository;
-    monitorRepository: MonitorRepository;
 }
 
 export class SiteRepository {
     private readonly databaseService: DatabaseService;
-    private readonly historyRepository: HistoryRepository;
-    private readonly monitorRepository: MonitorRepository;
 
     constructor(dependencies: SiteRepositoryDependencies) {
         this.databaseService = dependencies.databaseService;
-        this.monitorRepository = dependencies.monitorRepository;
-        this.historyRepository = dependencies.historyRepository;
     }
 
     /**
@@ -210,46 +201,9 @@ export class SiteRepository {
     }
 
     /**
-     * Get a complete site by identifier with monitors and history.
-     * This method returns a full Site object including all monitors and their history.
-     */
-    public async getByIdentifier(identifier: string): Promise<Site | undefined> {
-        return withDatabaseOperation(
-            async () => {
-                const siteRow = await this.findByIdentifier(identifier);
-                if (!siteRow) {
-                    return;
-                }
-
-                // Fetch monitors for this site
-                const monitors = await this.monitorRepository.findBySiteIdentifier(siteRow.identifier);
-
-                // Load history for each monitor
-                for (const monitor of monitors) {
-                    if (monitor.id) {
-                        monitor.history = await this.historyRepository.findByMonitorId(monitor.id);
-                    }
-                }
-
-                const site: Site = {
-                    identifier: siteRow.identifier,
-                    monitoring: siteRow.monitoring ?? true, // Default to true if not set
-                    monitors: monitors,
-                    name: siteRow.name ?? "Unnamed Site",
-                };
-
-                return site;
-            },
-            "site-get-by-identifier",
-            undefined,
-            { identifier }
-        );
-    }
-
-    /**
      * Create or update a site in the database.
      */
-    public async upsert(site: Pick<Site, "identifier" | "monitoring" | "name">): Promise<void> {
+    public async upsert(site: Pick<SiteRow, "identifier" | "monitoring" | "name">): Promise<void> {
         return withDatabaseOperation(
             () => {
                 const db = this.databaseService.getDatabase();
@@ -266,10 +220,10 @@ export class SiteRepository {
      * Internal method to create or update a site within an existing transaction.
      * Use this method when you're already within a transaction context.
      */
-    public upsertInternal(db: Database, site: Pick<Site, "identifier" | "monitoring" | "name">): void {
+    public upsertInternal(db: Database, site: Pick<SiteRow, "identifier" | "monitoring" | "name">): void {
         // Ensure all values are valid for SQLite
-        const identifier = site.identifier || ""; // Fallback for undefined/empty identifier
-        const name = site.name || "Unnamed Site"; // Fallback for undefined/empty name
+        const identifier = site.identifier; // identifier is required in SiteRow
+        const name = site.name ?? "Unnamed Site"; // Fallback for undefined/empty name
         const monitoring = site.monitoring ? 1 : 0; // Convert boolean to integer
 
         db.run("INSERT OR REPLACE INTO sites (identifier, name, monitoring) VALUES (?, ?, ?)", [

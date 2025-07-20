@@ -43,6 +43,7 @@ import { HistoryRepository } from "../../services/database/HistoryRepository";
 import { MonitorRepository } from "../../services/database/MonitorRepository";
 import { SiteRepository } from "../../services/database/SiteRepository";
 import { MonitorFactory } from "../../services/monitoring/MonitorFactory";
+import { SiteService } from "../../services/site/SiteService";
 import { Site, StatusHistory, StatusUpdate } from "../../types";
 import { StandardizedCache } from "../cache/StandardizedCache";
 import { withDatabaseOperation } from "../operationalHooks";
@@ -73,6 +74,8 @@ export interface MonitorCheckConfig {
     };
     /** In-memory site cache for performance optimization */
     sites: StandardizedCache<Site>;
+    /** Service for coordinated site operations */
+    siteService: SiteService;
 }
 
 /**
@@ -221,7 +224,7 @@ export async function checkMonitor(
     }
 
     // Fetch fresh site data from database to ensure we have the latest history and monitor state
-    const freshSiteData = await config.repositories.site.getByIdentifier(site.identifier);
+    const freshSiteData = await config.siteService.findByIdentifierWithDetails(site.identifier);
     if (!freshSiteData) {
         config.logger.error(`[checkMonitor] Failed to fetch updated site data for ${site.identifier}`);
         return undefined;
@@ -232,8 +235,13 @@ export async function checkMonitor(
 
     // Emit StatusUpdate as a typed event instead of old emit pattern
     const statusUpdate: StatusUpdate = {
+        details: checkResult.details,
+        monitorId: monitor.id,
         previousStatus,
         site: freshSiteData,
+        siteIdentifier: site.identifier,
+        status: checkResult.status,
+        timestamp: new Date().toISOString(),
     };
 
     // Emit typed monitor status changed event

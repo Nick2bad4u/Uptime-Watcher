@@ -3,6 +3,8 @@
  * Provides visual status indicator for site monitoring state.
  */
 
+import type { MonitorStatus } from "@shared/types";
+
 import React from "react";
 
 import { StatusBadge } from "../../common/StatusBadge";
@@ -14,7 +16,7 @@ interface SiteCardStatusProperties {
     /** ID of the currently selected monitor */
     selectedMonitorId: string;
     /** Current status of the monitor */
-    status: "down" | "paused" | "pending" | "up";
+    status: MonitorStatus;
 }
 
 /**

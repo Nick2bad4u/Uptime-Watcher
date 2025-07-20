@@ -42,18 +42,37 @@ export interface Monitor {
     url?: string;
 }
 
-export interface Site {
-    identifier: string;
-    monitoring: boolean;
-    monitors: Monitor[];
-    name: string;
-}
-
 export interface StatusHistory {
     details?: string;
     responseTime: number;
     status: "down" | "up";
     timestamp: number;
+}
+
+/**
+ * Enhanced monitor validation using shared type guards.
+ * Provides consistent validation across frontend and backend.
+ */
+export function validateMonitor(monitor: Partial<Monitor>): monitor is Monitor {
+    return (
+        typeof monitor.id === "string" &&
+        typeof monitor.type === "string" &&
+        typeof monitor.status === "string" &&
+        isMonitorStatus(monitor.status) &&
+        typeof monitor.monitoring === "boolean" &&
+        typeof monitor.responseTime === "number" &&
+        typeof monitor.checkInterval === "number" &&
+        typeof monitor.timeout === "number" &&
+        typeof monitor.retryAttempts === "number" &&
+        Array.isArray(monitor.history)
+    );
+}
+
+export interface Site {
+    identifier: string;
+    monitoring: boolean;
+    monitors: Monitor[];
+    name: string;
 }
 
 export interface StatusUpdate {

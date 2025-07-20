@@ -102,6 +102,7 @@ export default [
             "cspell.json",
             "**/chatproject.md",
             "**/coverage-results.json",
+            "**/*.md",
         ],
     },
 

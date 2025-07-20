@@ -3,7 +3,10 @@
  * Provides utilities for working with monitor data and configurations.
  */
 
-import { ERROR_MESSAGES, type Monitor, type MonitorType, type Site } from "@shared/types";
+import { ERROR_MESSAGES, isMonitorStatus, type Monitor, type MonitorType, type Site } from "@shared/types";
+
+// Re-export validateMonitor from shared types for convenience
+export { validateMonitor } from "@shared/types";
 
 /**
  * Adds a monitor to a site
@@ -49,9 +52,7 @@ export function normalizeMonitor(monitor: Partial<Monitor>): Monitor {
         monitoring: monitor.monitoring ?? true,
         responseTime: monitor.responseTime ?? -1, // Sentinel value for never checked
         retryAttempts: monitor.retryAttempts ?? 3, // Default retry attempts
-        status: ["down", "pending", "up"].includes(monitor.status as string)
-            ? (monitor.status as Monitor["status"])
-            : "pending",
+        status: monitor.status && isMonitorStatus(monitor.status) ? monitor.status : "pending",
         timeout: monitor.timeout ?? 5000, // Default timeout
         type: monitor.type ?? "http",
         // Only add optional fields if they are explicitly provided
@@ -84,24 +85,6 @@ export function updateMonitorInSite(site: Site, monitorId: string, updates: Part
     );
 
     return { ...site, monitors: updatedMonitors };
-}
-
-/**
- * Validates monitor data
- */
-export function validateMonitor(monitor: Partial<Monitor>): monitor is Monitor {
-    return (
-        typeof monitor.id === "string" &&
-        typeof monitor.type === "string" &&
-        typeof monitor.status === "string" &&
-        ["down", "pending", "up"].includes(monitor.status) &&
-        typeof monitor.monitoring === "boolean" &&
-        typeof monitor.responseTime === "number" &&
-        typeof monitor.checkInterval === "number" &&
-        typeof monitor.timeout === "number" &&
-        typeof monitor.retryAttempts === "number" &&
-        Array.isArray(monitor.history)
-    );
 }
 
 /**

@@ -3,6 +3,8 @@
  * Provides consistent status display throughout the application.
  */
 
+import type { MonitorStatus } from "@shared/types";
+
 import React from "react";
 
 import { StatusIndicator, ThemedText } from "../../theme/components";
@@ -18,7 +20,7 @@ interface StatusBadgeProperties {
     /** Text size (affects both text and icon sizing) */
     size?: "2xl" | "3xl" | "4xl" | "base" | "lg" | "sm" | "xl" | "xs";
     /** Current status to display */
-    status: "down" | "paused" | "pending" | "up";
+    status: MonitorStatus;
 }
 
 /**

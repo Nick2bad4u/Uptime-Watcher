@@ -18,6 +18,7 @@ export interface MonitorManagerDependencies {
         monitor: MonitorRepository;
         site: SiteRepository;
     };
+    siteService: SiteService;
 }
 
 import { DatabaseService } from "../services/database/DatabaseService";
@@ -25,6 +26,7 @@ import { HistoryRepository } from "../services/database/HistoryRepository";
 import { MonitorRepository } from "../services/database/MonitorRepository";
 import { SiteRepository } from "../services/database/SiteRepository";
 import { MonitorScheduler } from "../services/monitoring/MonitorScheduler";
+import { SiteService } from "../services/site/SiteService";
 import { Site, StatusUpdate } from "../types";
 import { StandardizedCache } from "../utils/cache/StandardizedCache";
 import { monitorLogger as logger } from "../utils/logger";
@@ -71,6 +73,7 @@ export class MonitorManager {
                 logger,
                 repositories: this.dependencies.repositories,
                 sites: this.dependencies.getSitesCache(),
+                siteService: this.dependencies.siteService,
             },
             identifier,
             monitorId
@@ -376,6 +379,7 @@ export class MonitorManager {
             logger,
             repositories: this.dependencies.repositories,
             sites: this.dependencies.getSitesCache(),
+            siteService: this.dependencies.siteService,
         };
 
         return checkMonitor(config, site, monitorId);

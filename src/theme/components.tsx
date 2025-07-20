@@ -9,6 +9,8 @@
  * Note: className is a standard React prop and should not be renamed.
  */
 
+import type { MonitorStatus, SiteStatus } from "@shared/types";
+
 import React from "react";
 
 import { ARIA_LABEL, TRANSITION_ALL } from "../constants";
@@ -56,7 +58,7 @@ const CSS_CLASSES = {
 interface MiniChartBarProperties {
     readonly className?: string;
     readonly responseTime?: number;
-    readonly status: "down" | "paused" | "pending" | "unknown" | "up";
+    readonly status: MonitorStatus | SiteStatus;
     readonly timestamp: Date | number | string;
 }
 
@@ -64,7 +66,7 @@ interface StatusIndicatorProperties {
     readonly className?: string;
     readonly showText?: boolean;
     readonly size?: "lg" | "md" | "sm";
-    readonly status: "down" | "mixed" | "paused" | "pending" | "unknown" | "up";
+    readonly status: SiteStatus;
 }
 
 interface ThemedBadgeProperties {
