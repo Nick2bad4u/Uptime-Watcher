@@ -23,18 +23,15 @@ import { MonitorRepository } from "../services/database/MonitorRepository";
 import { SettingsRepository } from "../services/database/SettingsRepository";
 import { SiteRepository } from "../services/database/SiteRepository";
 import { Site } from "../types";
+import { DataBackupService } from "../utils/database/DataBackupService";
 import { initDatabase } from "../utils/database/databaseInitializer";
+import { DataImportExportService } from "../utils/database/DataImportExportService";
 import {
     getHistoryLimit as getHistoryLimitUtil,
     setHistoryLimit as setHistoryLimitUtil,
 } from "../utils/database/historyLimitManager";
-import {
-    createDataBackupService,
-    createDataImportExportService,
-    createSiteCache,
-    createSiteLoadingOrchestrator,
-} from "../utils/database/serviceFactory";
-import { monitorLogger as logger } from "../utils/logger";
+import { createSiteCache, createSiteLoadingOrchestrator, LoggerAdapter } from "../utils/database/serviceFactory";
+import { monitorLogger } from "../utils/logger";
 
 /**
  * Combined events interface for DatabaseManager.
@@ -60,7 +57,12 @@ export class DatabaseManager {
      * Download SQLite database backup.
      */
     public async downloadBackup(): Promise<{ buffer: Buffer; fileName: string }> {
-        const dataBackupService = createDataBackupService(this.eventEmitter);
+        const loggerAdapter = new LoggerAdapter(monitorLogger);
+        const dataBackupService = new DataBackupService({
+            databaseService: this.dependencies.repositories.database,
+            eventEmitter: this.eventEmitter,
+            logger: loggerAdapter,
+        });
         const result = await dataBackupService.downloadDatabaseBackup();
 
         // Emit typed backup downloaded event
@@ -78,7 +80,18 @@ export class DatabaseManager {
      * Export all application data to JSON string.
      */
     public async exportData(): Promise<string> {
-        const dataImportExportService = createDataImportExportService(this.eventEmitter);
+        const loggerAdapter = new LoggerAdapter(monitorLogger);
+        const dataImportExportService = new DataImportExportService({
+            databaseService: this.dependencies.repositories.database,
+            eventEmitter: this.eventEmitter,
+            logger: loggerAdapter,
+            repositories: {
+                history: this.dependencies.repositories.history,
+                monitor: this.dependencies.repositories.monitor,
+                settings: this.dependencies.repositories.settings,
+                site: this.dependencies.repositories.site,
+            },
+        });
         const result = await dataImportExportService.exportAllData();
 
         // Emit typed data exported event
@@ -104,7 +117,18 @@ export class DatabaseManager {
      */
     public async importData(data: string): Promise<boolean> {
         const siteCache = createSiteCache();
-        const dataImportExportService = createDataImportExportService(this.eventEmitter);
+        const loggerAdapter = new LoggerAdapter(monitorLogger);
+        const dataImportExportService = new DataImportExportService({
+            databaseService: this.dependencies.repositories.database,
+            eventEmitter: this.eventEmitter,
+            logger: loggerAdapter,
+            repositories: {
+                history: this.dependencies.repositories.history,
+                monitor: this.dependencies.repositories.monitor,
+                settings: this.dependencies.repositories.settings,
+                site: this.dependencies.repositories.site,
+            },
+        });
 
         try {
             // Parse the import data
@@ -133,7 +157,7 @@ export class DatabaseManager {
                 timestamp: Date.now(),
             });
 
-            logger.error("[DatabaseManager] Failed to import data:", error);
+            monitorLogger.error("[DatabaseManager] Failed to import data:", error);
             return false;
         }
     }
@@ -154,7 +178,7 @@ export class DatabaseManager {
                 timestamp: Date.now(),
             });
         } catch (error) {
-            logger.error("[DatabaseManager] Error emitting database initialized event:", error);
+            monitorLogger.error("[DatabaseManager] Error emitting database initialized event:", error);
             // Don't throw here as the database initialization itself succeeded
         }
     }
@@ -191,7 +215,7 @@ export class DatabaseManager {
             }));
         } catch (error) {
             // Handle error case - log and re-emit event with zero count
-            logger.error("[DatabaseManager] Failed to refresh sites from cache:", error);
+            monitorLogger.error("[DatabaseManager] Failed to refresh sites from cache:", error);
             await this.eventEmitter.emitTyped("internal:database:sites-refreshed", {
                 operation: "sites-refreshed",
                 siteCount: 0,
@@ -208,7 +232,7 @@ export class DatabaseManager {
         await setHistoryLimitUtil({
             databaseService: this.dependencies.repositories.database,
             limit,
-            logger,
+            logger: monitorLogger,
             repositories: {
                 history: this.dependencies.repositories.history,
                 settings: this.dependencies.repositories.settings,
@@ -223,7 +247,7 @@ export class DatabaseManager {
                         timestamp: Date.now(),
                     })
                     .catch((error) => {
-                        logger.error("[DatabaseManager] Failed to emit history limit updated event", error);
+                        monitorLogger.error("[DatabaseManager] Failed to emit history limit updated event", error);
                     });
             },
         });
@@ -253,7 +277,7 @@ export class DatabaseManager {
             setupNewMonitors: (site: Site, newMonitorIds: string[]) => {
                 // For database loading, we don't need to setup new monitors
                 // This is only used during site updates
-                logger.debug(
+                monitorLogger.debug(
                     `[DatabaseManager] setupNewMonitors called for site ${site.identifier} with ${newMonitorIds.length} monitors - no action needed during loading`
                 );
                 return Promise.resolve();
@@ -303,6 +327,6 @@ export class DatabaseManager {
             timestamp: Date.now(),
         });
 
-        logger.info(`[DatabaseManager] Successfully loaded ${result.sitesLoaded} sites from database`);
+        monitorLogger.info(`[DatabaseManager] Successfully loaded ${result.sitesLoaded} sites from database`);
     }
 }

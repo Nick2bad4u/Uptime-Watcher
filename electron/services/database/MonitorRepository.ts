@@ -25,8 +25,8 @@ export interface MonitorRepositoryDependencies {
 export class MonitorRepository {
     private readonly databaseService: DatabaseService;
 
-    constructor(dependencies?: MonitorRepositoryDependencies) {
-        this.databaseService = dependencies?.databaseService ?? DatabaseService.getInstance();
+    constructor(dependencies: MonitorRepositoryDependencies) {
+        this.databaseService = dependencies.databaseService;
     }
 
     /**

@@ -24,8 +24,8 @@ export interface HistoryRepositoryDependencies {
 export class HistoryRepository {
     private readonly databaseService: DatabaseService;
 
-    constructor(dependencies?: HistoryRepositoryDependencies) {
-        this.databaseService = dependencies?.databaseService ?? DatabaseService.getInstance();
+    constructor(dependencies: HistoryRepositoryDependencies) {
+        this.databaseService = dependencies.databaseService;
     }
 
     /**

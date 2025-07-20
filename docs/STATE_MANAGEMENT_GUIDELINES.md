@@ -16,6 +16,7 @@ This document establishes **clear, consistent guidelines** for state management 
 6. **Reusable state logic** across multiple components
 
 **Examples:**
+
 - ✅ `useAddSiteForm` - 15+ fields with complex validation
 - ✅ `useSiteDetails` - Multiple state variables with server synchronization
 - ✅ Form components with dynamic field dependencies
@@ -29,6 +30,7 @@ This document establishes **clear, consistent guidelines** for state management 
 5. **Simple UI state** (toggles, selections, filters)
 
 **Examples:**
+
 - ✅ `HistoryTab` - Filter selection and display limits
 - ✅ Simple modals with basic inputs
 - ✅ Toggle switches and dropdowns
@@ -136,12 +138,14 @@ export const HistoryTab = ({ selectedMonitor }: HistoryTabProperties) => {
 ### **From Direct State to Custom Hook**
 
 **When to migrate:**
+
 - Component grows beyond 5 fields
 - Cross-field validation is needed
 - Multiple components need the same state logic
 - Server synchronization is required
 
 **Migration steps:**
+
 1. Extract state variables to interface
 2. Create action interface
 3. Move useState calls to custom hook
@@ -152,12 +156,14 @@ export const HistoryTab = ({ selectedMonitor }: HistoryTabProperties) => {
 ### **From Custom Hook to Direct State**
 
 **When to migrate:**
+
 - Hook is only used in one place
 - State has been simplified to 3 or fewer variables
 - No complex validation or side effects
 - No reusability requirements
 
 **Migration steps:**
+
 1. Move useState calls to component
 2. Inline simple validation
 3. Remove hook file
@@ -391,12 +397,14 @@ const SimpleComponent = () => {
 ## 📈 **Success Metrics**
 
 ### **Technical Metrics**
+
 - **Pattern Consistency**: 100% compliance with decision tree
 - **Code Reusability**: Custom hooks used in multiple components
 - **Maintainability**: Reduced time to add new fields or validation
 - **Type Safety**: All state management uses proper TypeScript interfaces
 
 ### **Developer Experience Metrics**
+
 - **Onboarding Speed**: New developers can quickly understand patterns
 - **Bug Reduction**: Fewer state-related bugs
 - **Feature Velocity**: Faster implementation of new forms and components

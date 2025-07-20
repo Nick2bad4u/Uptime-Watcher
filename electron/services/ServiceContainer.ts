@@ -85,6 +85,8 @@ export class ServiceContainer {
             logger.debug("[ServiceContainer] Creating new service container");
         }
     }
+
+    /**
     /**
      * Get the singleton service container instance.
      */
@@ -93,6 +95,8 @@ export class ServiceContainer {
         return ServiceContainer.instance;
     }
 
+    /**
+     * Reset container for testing purposes.
     /**
      * Reset container for testing purposes.
      */
@@ -211,7 +215,10 @@ export class ServiceContainer {
             this._monitorManager = new MonitorManager({
                 databaseService: this.getDatabaseService(),
                 eventEmitter: monitorEventBus,
-                getHistoryLimit: () => 1000, // Default history limit - should come from settings
+                getHistoryLimit: () => {
+                    // Get actual history limit from DatabaseManager instead of hardcoded value
+                    return this.getDatabaseManager().getHistoryLimit();
+                },
                 getSitesCache: () => {
                     // Use lazy evaluation to avoid circular dependency
                     return this._siteManager?.getSitesCache() ?? this.getSiteManager().getSitesCache();
@@ -355,15 +362,47 @@ export class ServiceContainer {
     }
 
     /**
+     * Initialize all services in the correct order.
+     */
+    public async initialize(): Promise<void> {
+        logger.info("[ServiceContainer] Initializing services");
+
+        // Initialize core services first
+        this.getDatabaseService().initialize();
+
+        // Initialize repositories
+        this.getHistoryRepository();
+        this.getMonitorRepository();
+        this.getSettingsRepository();
+        this.getSiteRepository();
+
+        // Initialize managers - order matters for circular dependencies
+        this.getSiteManager();
+        this.getMonitorManager();
+        this.getDatabaseManager();
+        this.getConfigurationManager();
+
+        // Initialize application services
+        await this.getUptimeOrchestrator().initialize();
+
+        // Initialize IPC (depends on orchestrator)
+        this.getIpcService().setupHandlers();
+
+        logger.info("[ServiceContainer] All services initialized successfully");
+    }
+
+    /**
+     * Get the main orchestrator (but only when it's actually being used, not during creation)
+     */
+    private getMainOrchestrator(): null | UptimeOrchestrator {
+        return this._uptimeOrchestrator ?? null;
+    }
+
+    /**
      * Setup event forwarding from manager event buses to the main orchestrator.
      * This ensures frontend status updates work properly while maintaining dependency isolation.
      */
     private setupEventForwarding(managerEventBus: TypedEventBus<UptimeEvents>, managerName: string): void {
-        // Get the main orchestrator (but only when it's actually being used, not during creation)
-        const getMainOrchestrator = (): null | UptimeOrchestrator => {
-            return this._uptimeOrchestrator ?? null;
-        };
-
         // List of events that should be forwarded to the frontend
         const eventsToForward = [
             // Monitor status events
@@ -396,11 +435,11 @@ export class ServiceContainer {
         // Set up forwarding for each important event
         for (const eventType of eventsToForward) {
             managerEventBus.on(eventType, (data: unknown) => {
-                const mainOrchestrator = getMainOrchestrator();
+                const mainOrchestrator = this.getMainOrchestrator();
                 if (mainOrchestrator) {
                     // Forward the event to the main orchestrator so frontend can receive it
-                    // Cast to any to avoid complex type checking - the event system will handle validation
-                    mainOrchestrator.emitTyped(eventType, data as any).catch((error) => {
+                    // Use unknown type to let the event system handle validation
+                    mainOrchestrator.emitTyped(eventType, data as UptimeEvents[typeof eventType]).catch((error) => {
                         logger.error(`[ServiceContainer] Error forwarding ${eventType} from ${managerName}:`, error);
                     });
 
@@ -418,35 +457,5 @@ export class ServiceContainer {
                 `[ServiceContainer] Set up event forwarding for ${managerName} (${eventsToForward.length} events)`
             );
         }
-    }
-
-    /**
-     * Initialize all services in the correct order.
-     */
-    public async initialize(): Promise<void> {
-        logger.info("[ServiceContainer] Initializing services");
-
-        // Initialize core services first
-        this.getDatabaseService().initialize();
-
-        // Initialize repositories
-        this.getHistoryRepository();
-        this.getMonitorRepository();
-        this.getSettingsRepository();
-        this.getSiteRepository();
-
-        // Initialize managers - order matters for circular dependencies
-        this.getSiteManager();
-        this.getMonitorManager();
-        this.getDatabaseManager();
-        this.getConfigurationManager();
-
-        // Initialize application services
-        await this.getUptimeOrchestrator().initialize();
-
-        // Initialize IPC (depends on orchestrator)
-        this.getIpcService().setupHandlers();
-
-        logger.info("[ServiceContainer] All services initialized successfully");
     }
 }

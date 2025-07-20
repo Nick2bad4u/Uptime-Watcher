@@ -38,7 +38,7 @@ export class DataBackupService {
      */
     async downloadDatabaseBackup(): Promise<{ buffer: Buffer; fileName: string }> {
         try {
-            const result = await this.databaseService.downloadBackup();
+            const result = await this.databaseService.createBackup();
             this.logger.info(`Database backup created: ${result.fileName}`);
             return result;
         } catch (error) {

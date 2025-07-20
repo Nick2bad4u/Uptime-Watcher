@@ -23,17 +23,10 @@ export class SiteRepository {
     private readonly historyRepository: HistoryRepository;
     private readonly monitorRepository: MonitorRepository;
 
-    constructor(dependencies?: SiteRepositoryDependencies) {
-        if (dependencies) {
-            this.databaseService = dependencies.databaseService;
-            this.monitorRepository = dependencies.monitorRepository;
-            this.historyRepository = dependencies.historyRepository;
-        } else {
-            // Fallback for backward compatibility and tests
-            this.databaseService = DatabaseService.getInstance();
-            this.monitorRepository = new MonitorRepository();
-            this.historyRepository = new HistoryRepository();
-        }
+    constructor(dependencies: SiteRepositoryDependencies) {
+        this.databaseService = dependencies.databaseService;
+        this.monitorRepository = dependencies.monitorRepository;
+        this.historyRepository = dependencies.historyRepository;
     }
 
     /**

@@ -17,8 +17,8 @@ export interface SettingsRepositoryDependencies {
 export class SettingsRepository {
     private readonly databaseService: DatabaseService;
 
-    constructor(dependencies?: SettingsRepositoryDependencies) {
-        this.databaseService = dependencies?.databaseService ?? DatabaseService.getInstance();
+    constructor(dependencies: SettingsRepositoryDependencies) {
+        this.databaseService = dependencies.databaseService;
     }
 
     /**

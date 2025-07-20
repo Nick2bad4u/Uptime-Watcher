@@ -16,7 +16,7 @@ import { SiteWriterService } from "./SiteWriterService";
 /**
  * Adapter for the logger to implement Logger interface.
  */
-class LoggerAdapter {
+export class LoggerAdapter {
     private readonly logger: typeof monitorLogger;
 
     constructor(logger: typeof monitorLogger) {

@@ -76,7 +76,6 @@ import { TypedEventBus } from "./events/TypedEventBus";
 import { DatabaseManager } from "./managers/DatabaseManager";
 import { MonitorManager } from "./managers/MonitorManager";
 import { SiteManager } from "./managers/SiteManager";
-import { ServiceContainer } from "./services/ServiceContainer";
 import { Monitor, Site, StatusUpdate } from "./types";
 import { logger } from "./utils/logger";
 
@@ -192,19 +191,16 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
 
         this.setupMiddleware();
 
-        if (dependencies) {
-            // Use injected dependencies
-            this.databaseManager = dependencies.databaseManager;
-            this.monitorManager = dependencies.monitorManager;
-            this.siteManager = dependencies.siteManager;
-        } else {
-            // Fallback to ServiceContainer for backward compatibility
-            const serviceContainer = ServiceContainer.getInstance();
-
-            this.databaseManager = serviceContainer.getDatabaseManager();
-            this.monitorManager = serviceContainer.getMonitorManager();
-            this.siteManager = serviceContainer.getSiteManager();
+        // Dependencies must be injected - no fallback to ServiceContainer
+        if (!dependencies) {
+            throw new Error(
+                "UptimeOrchestrator requires dependencies to be injected. Use ServiceContainer to create instances."
+            );
         }
+
+        this.databaseManager = dependencies.databaseManager;
+        this.monitorManager = dependencies.monitorManager;
+        this.siteManager = dependencies.siteManager;
 
         // Set up event-driven communication between managers
         this.setupEventHandlers();
