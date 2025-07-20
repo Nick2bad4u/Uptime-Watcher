@@ -220,8 +220,11 @@ export class ServiceContainer {
                     return this.getDatabaseManager().getHistoryLimit();
                 },
                 getSitesCache: () => {
-                    // Use lazy evaluation to avoid circular dependency
-                    return this._siteManager?.getSitesCache() ?? this.getSiteManager().getSitesCache();
+                    // Direct access to avoid circular dependency - SiteManager should be created before MonitorManager
+                    if (!this._siteManager) {
+                        throw new Error("SiteManager must be initialized before MonitorManager");
+                    }
+                    return this._siteManager.getSitesCache();
                 },
                 repositories: {
                     history: this.getHistoryRepository(),
@@ -308,6 +311,7 @@ export class ServiceContainer {
                 historyRepository: this.getHistoryRepository(),
                 monitoringOperations,
                 monitorRepository: this.getMonitorRepository(),
+                settingsRepository: this.getSettingsRepository(),
                 siteRepository: this.getSiteRepository(),
             });
             // Forward important events from SiteManager to main orchestrator for frontend
@@ -367,20 +371,33 @@ export class ServiceContainer {
     public async initialize(): Promise<void> {
         logger.info("[ServiceContainer] Initializing services");
 
-        // Initialize core services first
+        // Initialize core services first and wait for completion
+        logger.info("[ServiceContainer] Initializing DatabaseService...");
         this.getDatabaseService().initialize();
+        logger.info("[ServiceContainer] DatabaseService initialized successfully");
+
+        // Small delay to ensure database initialization is complete
+        await new Promise((resolve) => setTimeout(resolve, 100));
 
         // Initialize repositories
+        logger.info("[ServiceContainer] Initializing repositories...");
         this.getHistoryRepository();
         this.getMonitorRepository();
         this.getSettingsRepository();
         this.getSiteRepository();
+        logger.info("[ServiceContainer] Repositories initialized successfully");
 
         // Initialize managers - order matters for circular dependencies
+        logger.info("[ServiceContainer] Initializing managers...");
         this.getSiteManager();
         this.getMonitorManager();
-        this.getDatabaseManager();
+
+        // Initialize DatabaseManager with proper settings loading
+        const databaseManager = this.getDatabaseManager();
+        await databaseManager.initialize();
+
         this.getConfigurationManager();
+        logger.info("[ServiceContainer] Managers initialized successfully");
 
         // Initialize application services
         await this.getUptimeOrchestrator().initialize();

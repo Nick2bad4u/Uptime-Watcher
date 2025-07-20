@@ -30,7 +30,8 @@ import {
     getHistoryLimit as getHistoryLimitUtil,
     setHistoryLimit as setHistoryLimitUtil,
 } from "../utils/database/historyLimitManager";
-import { createSiteCache, createSiteLoadingOrchestrator, LoggerAdapter } from "../utils/database/serviceFactory";
+import { createSiteCache, LoggerAdapter } from "../utils/database/serviceFactory";
+import { SiteLoadingOrchestrator, SiteRepositoryService } from "../utils/database/SiteRepositoryService";
 import { monitorLogger } from "../utils/logger";
 
 /**
@@ -166,6 +167,21 @@ export class DatabaseManager {
      * Initialize the database and load sites.
      */
     public async initialize(): Promise<void> {
+        // First, load current settings from database including history limit
+        try {
+            const currentLimit = await this.dependencies.repositories.settings.get("historyLimit");
+            if (currentLimit) {
+                this.historyLimit = Number(currentLimit);
+                monitorLogger.info(`[DatabaseManager] Loaded history limit from database: ${this.historyLimit}`);
+            } else {
+                monitorLogger.info(
+                    `[DatabaseManager] No history limit in database, using default: ${this.historyLimit}`
+                );
+            }
+        } catch (error) {
+            monitorLogger.error("[DatabaseManager] Failed to load history limit from database, using default:", error);
+        }
+
         await initDatabase(this.dependencies.repositories.database, () => this.loadSites(), this.eventEmitter);
 
         try {
@@ -260,8 +276,19 @@ export class DatabaseManager {
         // Create the site cache
         const siteCache = createSiteCache();
 
-        // Create the site loading orchestrator
-        const siteLoadingOrchestrator = createSiteLoadingOrchestrator(this.eventEmitter);
+        // Create the site loading orchestrator with injected dependencies
+        const loggerAdapter = new LoggerAdapter(monitorLogger);
+        const siteRepositoryService = new SiteRepositoryService({
+            eventEmitter: this.eventEmitter,
+            logger: loggerAdapter,
+            repositories: {
+                history: this.dependencies.repositories.history,
+                monitor: this.dependencies.repositories.monitor,
+                settings: this.dependencies.repositories.settings,
+                site: this.dependencies.repositories.site,
+            },
+        });
+        const siteLoadingOrchestrator = new SiteLoadingOrchestrator(siteRepositoryService);
 
         // Create monitoring configuration
         const monitoringConfig = {

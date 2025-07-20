@@ -47,11 +47,12 @@ import { TypedEventBus } from "../events/TypedEventBus";
 import { DatabaseService } from "../services/database/DatabaseService";
 import { HistoryRepository } from "../services/database/HistoryRepository";
 import { MonitorRepository } from "../services/database/MonitorRepository";
+import { SettingsRepository } from "../services/database/SettingsRepository";
 import { SiteRepository } from "../services/database/SiteRepository";
 import { Site } from "../types";
 import { StandardizedCache } from "../utils/cache/StandardizedCache";
 import { MonitoringConfig } from "../utils/database/interfaces";
-import { createSiteRepositoryService } from "../utils/database/serviceFactory";
+import { LoggerAdapter } from "../utils/database/serviceFactory";
 import { SiteRepositoryService } from "../utils/database/SiteRepositoryService";
 import { SiteWriterService } from "../utils/database/SiteWriterService";
 import { monitorLogger as logger } from "../utils/logger";
@@ -97,6 +98,8 @@ export interface SiteManagerDependencies {
     monitoringOperations?: IMonitoringOperations;
     /** Monitor repository for monitor-related operations */
     monitorRepository: MonitorRepository;
+    /** Settings repository for configuration management */
+    settingsRepository: SettingsRepository;
     /** Site repository for database operations */
     siteRepository: SiteRepository;
 }
@@ -153,6 +156,7 @@ export class SiteManager {
             databaseService: dependencies.databaseService,
             historyRepository: dependencies.historyRepository,
             monitorRepository: dependencies.monitorRepository,
+            settingsRepository: dependencies.settingsRepository,
             siteRepository: dependencies.siteRepository,
         };
         this.eventEmitter = dependencies.eventEmitter;
@@ -176,7 +180,19 @@ export class SiteManager {
                 site: this.repositories.siteRepository,
             },
         });
-        this.siteRepositoryService = createSiteRepositoryService(this.eventEmitter);
+        
+        // Create SiteRepositoryService with injected dependencies
+        const loggerAdapter = new LoggerAdapter(logger);
+        this.siteRepositoryService = new SiteRepositoryService({
+            eventEmitter: this.eventEmitter,
+            logger: loggerAdapter,
+            repositories: {
+                history: this.repositories.historyRepository,
+                monitor: this.repositories.monitorRepository,
+                settings: this.repositories.settingsRepository,
+                site: this.repositories.siteRepository,
+            },
+        });
 
         logger.info("[SiteManager] Initialized with StandardizedCache");
     }

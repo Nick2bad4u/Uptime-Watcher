@@ -1,5 +1,6 @@
 import { app } from "electron";
 import { Database } from "node-sqlite3-wasm";
+import * as fs from "node:fs";
 // eslint-disable-next-line unicorn/import-style -- Need namespace import for both sync and async usage
 import * as path from "node:path";
 
@@ -163,7 +164,18 @@ export class DatabaseService {
             const dbPath = path.join(app.getPath("userData"), "uptime-watcher.sqlite");
             logger.info(`[DatabaseService] Initializing SQLite DB at: ${dbPath}`);
 
+            // Check if database file is locked by another process
+            this.checkDatabaseAccess(dbPath);
+
             this._db = new Database(dbPath);
+
+            // Note: Some PRAGMA statements may not be supported by SQLite WASM
+            // Commenting out temporarily to fix database lock issue
+            // this._db.run("PRAGMA journal_mode = WAL");
+            // this._db.run("PRAGMA synchronous = NORMAL");
+            // this._db.run("PRAGMA temp_store = MEMORY");
+            // this._db.run("PRAGMA mmap_size = 268435456"); // 256MB
+
             createDatabaseTables(this._db);
             createDatabaseIndexes(this._db);
             setupMonitorTypeValidation();
@@ -172,7 +184,37 @@ export class DatabaseService {
             return this._db;
         } catch (error) {
             logger.error("[DatabaseService] Failed to initialize database", error);
+
+            // Provide specific guidance for database lock errors
+            if (error instanceof Error && error.message.includes("database is locked")) {
+                logger.error("[DatabaseService] Database is locked. This usually means:");
+                logger.error("  1. Another instance of Uptime Watcher is already running");
+                logger.error("  2. The database file is being accessed by another process");
+                logger.error("  3. Previous instance didn't close properly");
+                logger.error("  Solution: Close all instances and restart the application");
+            }
+
             throw error;
+        }
+    }
+
+    /**
+     * Check if database file can be accessed before attempting to open it.
+     */
+    private checkDatabaseAccess(dbPath: string): void {
+        try {
+            // Check if file exists and we can access it
+            if (fs.existsSync(dbPath)) {
+                // Try to open the file for writing to check if it's locked
+                const fd = fs.openSync(dbPath, "r+");
+                fs.closeSync(fd);
+                logger.debug("[DatabaseService] Database file access check passed");
+            } else {
+                logger.debug("[DatabaseService] Database file doesn't exist yet, will be created");
+            }
+        } catch (error) {
+            logger.warn("[DatabaseService] Database file access check failed:", error);
+            // Don't throw here, let SQLite handle the actual error
         }
     }
 }
