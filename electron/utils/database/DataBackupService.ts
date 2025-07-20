@@ -3,16 +3,18 @@
  * Provides a testable, dependency-injected service for backup management.
  */
 
+import { app } from "electron";
+import path from "node:path";
+
 import { UptimeEvents } from "../../events/eventTypes";
 import { TypedEventBus } from "../../events/TypedEventBus";
-import { DatabaseService } from "../../services/database/DatabaseService";
+import { createDatabaseBackup } from "../../services/database/utils/databaseBackup";
 import { Logger, SiteLoadingError } from "./interfaces";
 
 /**
  * Configuration for data backup operations.
  */
 export interface DataBackupConfig {
-    databaseService: DatabaseService;
     eventEmitter: TypedEventBus<UptimeEvents>;
     logger: Logger;
 }
@@ -22,12 +24,10 @@ export interface DataBackupConfig {
  * Separates data operations from side effects for better testability.
  */
 export class DataBackupService {
-    private readonly databaseService: DatabaseService;
     private readonly eventEmitter: TypedEventBus<UptimeEvents>;
     private readonly logger: Logger;
 
     constructor(config: DataBackupConfig) {
-        this.databaseService = config.databaseService;
         this.logger = config.logger;
         this.eventEmitter = config.eventEmitter;
     }
@@ -38,7 +38,8 @@ export class DataBackupService {
      */
     async downloadDatabaseBackup(): Promise<{ buffer: Buffer; fileName: string }> {
         try {
-            const result = await this.databaseService.createBackup();
+            const dbPath = path.join(app.getPath("userData"), "uptime-watcher.sqlite");
+            const result = await createDatabaseBackup(dbPath);
             this.logger.info(`Database backup created: ${result.fileName}`);
             return result;
         } catch (error) {

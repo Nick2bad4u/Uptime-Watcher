@@ -4,7 +4,6 @@ import { Database } from "node-sqlite3-wasm";
 import * as path from "node:path";
 
 import { logger } from "../../utils/logger";
-import { createDatabaseBackup } from "./utils/databaseBackup";
 import { createDatabaseIndexes, createDatabaseTables, setupMonitorTypeValidation } from "./utils/databaseSchema";
 
 /**
@@ -74,22 +73,6 @@ export class DatabaseService {
                 throw error;
             }
         }
-    }
-
-    /**
-     * Create a basic backup of the database as a downloadable buffer.
-     *
-     * @returns Promise resolving to backup data and filename
-     *
-     * @throws {@link Error} When backup creation fails
-     *
-     * @remarks
-     * Creates a compressed backup of the entire database suitable for download or storage.
-     * For advanced backup features with event emission, use DatabaseManager.
-     */
-    public async createBackup(): Promise<{ buffer: Buffer; fileName: string }> {
-        const dbPath = path.join(app.getPath("userData"), "uptime-watcher.sqlite");
-        return createDatabaseBackup(dbPath);
     }
 
     /**

@@ -223,5 +223,22 @@ export class ApplicationService {
                 );
             }
         });
+
+        // Handle cache invalidation events
+        orchestrator.onTyped("cache:invalidated", (data) => {
+            try {
+                logger.debug("[ApplicationService] Forwarding cache invalidation to renderer", {
+                    identifier: data.identifier,
+                    reason: data.reason,
+                    type: data.type,
+                });
+                windowService.sendToRenderer("cache:invalidated", data);
+            } catch (error) {
+                /* v8 ignore next 2 */ logger.error(
+                    "[ApplicationService] Failed to forward cache invalidation to renderer",
+                    error
+                );
+            }
+        });
     }
 }

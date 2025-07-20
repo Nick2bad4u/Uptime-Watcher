@@ -191,6 +191,29 @@ const settingsAPI = {
  */
 const eventsAPI = {
     /**
+     * Register a callback for cache invalidation events.
+     *
+     * @param callback - Function to call when cache is invalidated
+     * @returns Cleanup function to remove the listener
+     *
+     * @remarks
+     * Called when backend caches are invalidated, allowing frontend to clear its caches.
+     * Useful for keeping frontend and backend caches synchronized.
+     */
+    onCacheInvalidated: (
+        callback: (data: { identifier?: string; reason: string; type: "all" | "monitor" | "site" }) => void
+    ) => {
+        const handler = (
+            _: Electron.IpcRendererEvent,
+            data: { identifier?: string; reason: string; type: "all" | "monitor" | "site" }
+        ) => {
+            callback(data);
+        };
+        ipcRenderer.on("cache:invalidated", handler);
+        return () => ipcRenderer.removeListener("cache:invalidated", handler);
+    },
+
+    /**
      * Register a callback for monitor down events.
      *
      * @param callback - Function to call when a monitor goes down

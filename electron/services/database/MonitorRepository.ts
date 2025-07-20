@@ -12,7 +12,7 @@ import { withDatabaseOperation } from "../../utils/operationalHooks";
 import { DatabaseService } from "./DatabaseService";
 import { generateSqlParameters, mapMonitorToRow } from "./utils/dynamicSchema";
 import { buildMonitorParameters, rowsToMonitors, rowToMonitorOrUndefined } from "./utils/monitorMapper";
-import { addBooleanField, addNumberField, addStringField, convertDateForDb, DbValue } from "./utils/valueConverters";
+import { DbValue } from "./utils/valueConverters";
 
 /**
  * Repository for managing monitor data persistence.
@@ -76,27 +76,10 @@ export class MonitorRepository {
      */
     public async create(siteIdentifier: string, monitor: Omit<Site["monitors"][0], "id">): Promise<string> {
         return withDatabaseOperation(
-            () => {
-                const db = this.getDb();
-
-                // Generate dynamic SQL and parameters
-                const { columns, placeholders } = generateSqlParameters();
-                const parameters = buildMonitorParameters(siteIdentifier, monitor as Site["monitors"][0]);
-
-                const insertSql = `INSERT INTO monitors (${columns.join(", ")}) VALUES (${placeholders}) RETURNING id`;
-
-                const insertResult = db.get(insertSql, parameters) as undefined | { id: number };
-
-                if (!insertResult || typeof insertResult.id !== "number") {
-                    throw new Error(`Failed to create monitor for site ${siteIdentifier} - no ID returned`);
-                }
-
-                const result = String(insertResult.id);
-
-                if (isDev()) {
-                    logger.debug(`[MonitorRepository] Created monitor with id: ${result} for site: ${siteIdentifier}`);
-                }
-                return Promise.resolve(result);
+            async () => {
+                return this.databaseService.executeTransaction((db) => {
+                    return Promise.resolve(this.createInternal(db, siteIdentifier, monitor));
+                });
             },
             "monitor-create",
             undefined,
@@ -136,19 +119,20 @@ export class MonitorRepository {
      */
     public async delete(monitorId: string): Promise<boolean> {
         return withDatabaseOperation(
-            () => {
-                const db = this.databaseService.getDatabase();
-                const result = this.deleteInternal(db, monitorId);
+            async () => {
+                return this.databaseService.executeTransaction((db) => {
+                    const result = this.deleteInternal(db, monitorId);
 
-                if (result) {
-                    if (isDev()) {
-                        logger.debug(`[MonitorRepository] Deleted monitor with id: ${monitorId}`);
+                    if (result) {
+                        if (isDev()) {
+                            logger.debug(`[MonitorRepository] Deleted monitor with id: ${monitorId}`);
+                        }
+                    } else {
+                        logger.warn(`[MonitorRepository] Monitor not found for deletion: ${monitorId}`);
                     }
-                } else {
-                    logger.warn(`[MonitorRepository] Monitor not found for deletion: ${monitorId}`);
-                }
 
-                return Promise.resolve(result);
+                    return Promise.resolve(result);
+                });
             },
             "monitor-delete",
             undefined,
@@ -161,10 +145,11 @@ export class MonitorRepository {
      * Uses transactions to ensure atomicity.
      */
     public async deleteAll(): Promise<void> {
-        return withDatabaseOperation(() => {
-            const db = this.databaseService.getDatabase();
-            this.deleteAllInternal(db);
-            return Promise.resolve();
+        return withDatabaseOperation(async () => {
+            return this.databaseService.executeTransaction((db) => {
+                this.deleteAllInternal(db);
+                return Promise.resolve();
+            });
         }, "monitor-delete-all");
     }
 
@@ -183,14 +168,15 @@ export class MonitorRepository {
      */
     public async deleteBySiteIdentifier(siteIdentifier: string): Promise<void> {
         return withDatabaseOperation(
-            () => {
-                const db = this.databaseService.getDatabase();
-                this.deleteBySiteIdentifierInternal(db, siteIdentifier);
+            async () => {
+                return this.databaseService.executeTransaction((db) => {
+                    this.deleteBySiteIdentifierInternal(db, siteIdentifier);
 
-                if (isDev()) {
-                    logger.debug(`[MonitorRepository] Deleted all monitors for site: ${siteIdentifier}`);
-                }
-                return Promise.resolve();
+                    if (isDev()) {
+                        logger.debug(`[MonitorRepository] Deleted all monitors for site: ${siteIdentifier}`);
+                    }
+                    return Promise.resolve();
+                });
             },
             "monitor-delete-by-site",
             undefined,
@@ -282,58 +268,11 @@ export class MonitorRepository {
      */
     public async update(monitorId: string, monitor: Partial<Site["monitors"][0]>): Promise<void> {
         return withDatabaseOperation(
-            () => {
-                const db = this.getDb();
-
-                // Build dynamic SQL based on provided fields to avoid overwriting with defaults
-                const updateFields: string[] = [];
-                const updateValues: DbValue[] = [];
-
-                // Add fields using helper methods
-                if (monitor.type !== undefined) {
-                    updateFields.push("type = ?");
-                    updateValues.push(monitor.type);
-                }
-
-                addStringField("url", monitor.url, updateFields, updateValues);
-                addStringField("host", monitor.host, updateFields, updateValues);
-                addNumberField("port", monitor.port, updateFields, updateValues);
-                addNumberField("checkInterval", monitor.checkInterval, updateFields, updateValues);
-                addNumberField("timeout", monitor.timeout, updateFields, updateValues);
-                addNumberField("retryAttempts", monitor.retryAttempts, updateFields, updateValues);
-                addBooleanField("monitoring", monitor.monitoring, updateFields, updateValues);
-
-                if (monitor.status !== undefined) {
-                    updateFields.push("status = ?");
-                    updateValues.push(monitor.status);
-                }
-
-                // monitor.responseTime is always a number, so no need for unnecessary conditional
-                addNumberField("responseTime", monitor.responseTime, updateFields, updateValues);
-
-                if (monitor.lastChecked !== undefined) {
-                    updateFields.push("lastChecked = ?");
-                    const lastCheckedValue = convertDateForDb(monitor.lastChecked);
-                    updateValues.push(lastCheckedValue);
-                }
-
-                if (updateFields.length === 0) {
-                    if (isDev()) {
-                        logger.debug(`[MonitorRepository] No fields to update for monitor: ${monitorId}`);
-                    }
+            async () => {
+                return this.databaseService.executeTransaction((db) => {
+                    this.updateInternal(db, monitorId, monitor);
                     return Promise.resolve();
-                }
-
-                updateValues.push(monitorId);
-
-                const sql = `UPDATE monitors SET ${updateFields.join(", ")} WHERE id = ?`;
-                db.run(sql, updateValues);
-
-                if (isDev()) {
-                    logger.debug(`[MonitorRepository] Updated monitor with id: ${monitorId}`);
-                }
-
-                return Promise.resolve();
+                });
             },
             "monitor-update",
             undefined,

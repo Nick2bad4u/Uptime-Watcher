@@ -32,10 +32,11 @@ export class SettingsRepository {
         }
 
         return withDatabaseOperation(
-            () => {
-                const db = this.databaseService.getDatabase();
-                this.bulkInsertInternal(db, settings);
-                return Promise.resolve();
+            async () => {
+                return this.databaseService.executeTransaction((db) => {
+                    this.bulkInsertInternal(db, settings);
+                    return Promise.resolve();
+                });
             },
             "settings-bulk-insert",
             undefined,
@@ -72,10 +73,11 @@ export class SettingsRepository {
      */
     public async delete(key: string): Promise<void> {
         return withDatabaseOperation(
-            () => {
-                const db = this.databaseService.getDatabase();
-                this.deleteInternal(db, key);
-                return Promise.resolve();
+            async () => {
+                return this.databaseService.executeTransaction((db) => {
+                    this.deleteInternal(db, key);
+                    return Promise.resolve();
+                });
             },
             "settings-delete",
             undefined,
@@ -87,10 +89,11 @@ export class SettingsRepository {
      * Clear all settings from the database.
      */
     public async deleteAll(): Promise<void> {
-        return withDatabaseOperation(() => {
-            const db = this.databaseService.getDatabase();
-            this.deleteAllInternal(db);
-            return Promise.resolve();
+        return withDatabaseOperation(async () => {
+            return this.databaseService.executeTransaction((db) => {
+                this.deleteAllInternal(db);
+                return Promise.resolve();
+            });
         }, "settings-delete-all");
     }
 
@@ -145,10 +148,11 @@ export class SettingsRepository {
      */
     public async set(key: string, value: string): Promise<void> {
         return withDatabaseOperation(
-            () => {
-                const db = this.databaseService.getDatabase();
-                this.setInternal(db, key, value);
-                return Promise.resolve();
+            async () => {
+                return this.databaseService.executeTransaction((db) => {
+                    this.setInternal(db, key, value);
+                    return Promise.resolve();
+                });
             },
             "settings-set",
             undefined,

@@ -7,10 +7,10 @@ import { FONT_FAMILY_MONO, FONT_FAMILY_SANS } from "../constants";
 import { Theme } from "./types";
 
 /**
- * Light theme configuration.
- * Provides a clean, bright appearance suitable for well-lit environments.
+ * Base theme configuration with common properties.
+ * All themes extend from this base to reduce duplication.
  */
-export const lightTheme: Theme = {
+const baseTheme: Theme = {
     borderRadius: {
         full: "9999px",
         lg: "0.5rem",
@@ -32,7 +32,7 @@ export const lightTheme: Theme = {
             secondary: "#d1d5db",
         },
         error: "#ef4444",
-        errorAlert: "#991b1b", // Dark red for error alerts
+        errorAlert: "#991b1b",
         hover: {
             dark: "rgba(0, 0, 0, 0.08)",
             light: "rgba(0, 0, 0, 0.03)",
@@ -74,7 +74,7 @@ export const lightTheme: Theme = {
         warning: "#f59e0b",
     },
     isDark: false,
-    name: "light",
+    name: "light" as const,
     shadows: {
         inner: "inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)",
         lg: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
@@ -121,18 +121,89 @@ export const lightTheme: Theme = {
 };
 
 /**
- * Dark theme configuration.
- * Provides a modern dark appearance suitable for low-light environments and reduced eye strain.
+ * Creates a theme by merging base theme with specific overrides.
+ * This approach eliminates duplication while maintaining type safety.
  */
-export const darkTheme: Theme = {
-    borderRadius: {
-        full: "9999px",
-        lg: "0.5rem",
-        md: "0.375rem",
-        none: "0",
-        sm: "0.125rem",
-        xl: "0.75rem",
-    },
+function createTheme(overrides: Partial<Theme>): Theme {
+    return {
+        ...baseTheme,
+        ...overrides,
+        colors: {
+            ...baseTheme.colors,
+            ...overrides.colors,
+            background: {
+                ...baseTheme.colors.background,
+                ...overrides.colors?.background,
+            },
+            border: {
+                ...baseTheme.colors.border,
+                ...overrides.colors?.border,
+            },
+            hover: {
+                ...baseTheme.colors.hover,
+                ...overrides.colors?.hover,
+            },
+            primary: {
+                ...baseTheme.colors.primary,
+                ...overrides.colors?.primary,
+            },
+            status: {
+                ...baseTheme.colors.status,
+                ...overrides.colors?.status,
+            },
+            surface: {
+                ...baseTheme.colors.surface,
+                ...overrides.colors?.surface,
+            },
+            text: {
+                ...baseTheme.colors.text,
+                ...overrides.colors?.text,
+            },
+        },
+        shadows: {
+            ...baseTheme.shadows,
+            ...overrides.shadows,
+        },
+        spacing: {
+            ...baseTheme.spacing,
+            ...overrides.spacing,
+        },
+        typography: {
+            ...baseTheme.typography,
+            ...overrides.typography,
+            fontFamily: {
+                ...baseTheme.typography.fontFamily,
+                ...overrides.typography?.fontFamily,
+            },
+            fontSize: {
+                ...baseTheme.typography.fontSize,
+                ...overrides.typography?.fontSize,
+            },
+            fontWeight: {
+                ...baseTheme.typography.fontWeight,
+                ...overrides.typography?.fontWeight,
+            },
+            lineHeight: {
+                ...baseTheme.typography.lineHeight,
+                ...overrides.typography?.lineHeight,
+            },
+        },
+    };
+}
+
+/**
+ * Light theme configuration.
+ * Provides a clean, bright appearance suitable for well-lit environments.
+ */
+export const lightTheme: Theme = createTheme({
+    // Light theme uses base theme values (no overrides needed)
+});
+
+/**
+ * Dark theme configuration.
+ * Provides a modern dark appearance suitable for low-light environments.
+ */
+export const darkTheme: Theme = createTheme({
     colors: {
         background: {
             modal: "rgba(0, 0, 0, 0.8)",
@@ -146,7 +217,7 @@ export const darkTheme: Theme = {
             secondary: "#4b5563",
         },
         error: "#f87171",
-        errorAlert: "#dc2626", // Red for error alerts in dark mode
+        errorAlert: "#dc2626",
         hover: {
             dark: "rgba(255, 255, 255, 0.12)",
             light: "rgba(255, 255, 255, 0.05)",
@@ -196,46 +267,13 @@ export const darkTheme: Theme = {
         sm: "0 1px 2px 0 rgba(0, 0, 0, 0.2)",
         xl: "0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2)",
     },
-    spacing: {
-        "2xl": "3rem",
-        "3xl": "4rem",
-        lg: "1.5rem",
-        md: "1rem",
-        sm: "0.5rem",
-        xl: "2rem",
-        xs: "0.25rem",
-    },
-    typography: {
-        fontFamily: {
-            mono: FONT_FAMILY_MONO,
-            sans: FONT_FAMILY_SANS,
-        },
-        fontSize: {
-            "2xl": "1.5rem",
-            "3xl": "1.875rem",
-            "4xl": "2.25rem",
-            base: "1rem",
-            lg: "1.125rem",
-            sm: "0.875rem",
-            xl: "1.25rem",
-            xs: "0.75rem",
-        },
-        fontWeight: {
-            bold: "700",
-            medium: "500",
-            normal: "400",
-            semibold: "600",
-        },
-        lineHeight: {
-            normal: "1.5",
-            relaxed: "1.75",
-            tight: "1.25",
-        },
-    },
-};
+});
 
-// High contrast theme for accessibility
-export const highContrastTheme: Theme = {
+/**
+ * High contrast theme for accessibility.
+ * Provides maximum contrast for users with visual impairments.
+ */
+export const highContrastTheme: Theme = createTheme({
     borderRadius: {
         full: "9999px",
         lg: "0.75rem",
@@ -257,7 +295,7 @@ export const highContrastTheme: Theme = {
             secondary: "#cccccc",
         },
         error: "#ff0000",
-        errorAlert: "#cc0000", // Dark red for error alerts in high contrast
+        errorAlert: "#cc0000",
         hover: {
             dark: "rgba(255, 255, 255, 0.2)",
             light: "rgba(255, 255, 255, 0.1)",
@@ -307,15 +345,6 @@ export const highContrastTheme: Theme = {
         sm: "0 2px 4px 0 rgba(255, 255, 255, 0.1)",
         xl: "0 16px 32px 0 rgba(255, 255, 255, 0.25)",
     },
-    spacing: {
-        "2xl": "3rem",
-        "3xl": "4rem",
-        lg: "1.5rem",
-        md: "1rem",
-        sm: "0.5rem",
-        xl: "2rem",
-        xs: "0.25rem",
-    },
     typography: {
         fontFamily: {
             mono: FONT_FAMILY_MONO,
@@ -329,12 +358,12 @@ export const highContrastTheme: Theme = {
             lg: "1.25rem",
             sm: "1rem",
             xl: "1.5rem",
-            xs: "0.875rem", // Slightly larger for accessibility
+            xs: "0.875rem",
         },
         fontWeight: {
             bold: "800",
             medium: "600",
-            normal: "500", // Slightly bolder for better contrast
+            normal: "500",
             semibold: "700",
         },
         lineHeight: {
@@ -343,7 +372,7 @@ export const highContrastTheme: Theme = {
             tight: "1.4",
         },
     },
-};
+});
 
 export const themes = {
     dark: darkTheme,

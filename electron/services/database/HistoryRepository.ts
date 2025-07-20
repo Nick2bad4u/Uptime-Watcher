@@ -33,10 +33,11 @@ export class HistoryRepository {
      */
     public async addEntry(monitorId: string, entry: StatusHistory, details?: string): Promise<void> {
         return withDatabaseOperation(
-            () => {
-                const db = this.getDb();
-                addHistoryEntry(db, monitorId, entry, details);
-                return Promise.resolve();
+            async () => {
+                return this.databaseService.executeTransaction((db) => {
+                    this.addEntryInternal(db, monitorId, entry, details);
+                    return Promise.resolve();
+                });
             },
             "history-add-entry",
             undefined,
@@ -119,10 +120,11 @@ export class HistoryRepository {
      */
     public async deleteByMonitorId(monitorId: string): Promise<void> {
         return withDatabaseOperation(
-            () => {
-                const db = this.getDb();
-                deleteHistoryByMonitorId(db, monitorId);
-                return Promise.resolve();
+            async () => {
+                return this.databaseService.executeTransaction((db) => {
+                    this.deleteByMonitorIdInternal(db, monitorId);
+                    return Promise.resolve();
+                });
             },
             "history-delete-by-monitor",
             undefined,

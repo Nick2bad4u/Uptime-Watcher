@@ -103,30 +103,13 @@ export class ChartConfigService {
             plugins: {
                 ...this.getBaseConfig().plugins,
                 legend: { display: false },
-                title: {
-                    color: this.theme.colors.text.primary,
-                    display: true,
-                    font: {
-                        family: this.theme.typography.fontFamily.sans.join(", "),
-                        size: 16,
-                        weight: "bold",
-                    },
-                    text: "Status Distribution",
-                },
+                title: this.getChartTitle("Status Distribution"),
             },
             scales: {
                 x: this.getBaseScale(),
                 y: {
                     beginAtZero: true,
-                    title: {
-                        color: this.theme.colors.text.secondary,
-                        display: true,
-                        font: {
-                            family: this.theme.typography.fontFamily.sans.join(", "),
-                            size: 12,
-                        },
-                        text: "Count",
-                    },
+                    title: this.getAxisTitle("Count"),
                     ...this.getBaseScale(),
                 },
             },
@@ -144,23 +127,11 @@ export class ChartConfigService {
                 legend: {
                     labels: {
                         color: this.theme.colors.text.primary,
-                        font: {
-                            family: this.theme.typography.fontFamily.sans.join(", "),
-                            size: 12,
-                        },
+                        font: this.getChartFont(12),
                     },
                     position: "bottom",
                 },
-                title: {
-                    color: this.theme.colors.text.primary,
-                    display: true,
-                    font: {
-                        family: this.theme.typography.fontFamily.sans.join(", "),
-                        size: 16,
-                        weight: "bold",
-                    },
-                    text: "Uptime Distribution",
-                },
+                title: this.getChartTitle("Uptime Distribution"),
                 tooltip: {
                     ...this.getBaseConfig().plugins?.tooltip,
                     callbacks: {
@@ -187,16 +158,7 @@ export class ChartConfigService {
             },
             plugins: {
                 ...this.getBaseConfig().plugins,
-                title: {
-                    color: this.theme.colors.text.primary,
-                    display: true,
-                    font: {
-                        family: this.theme.typography.fontFamily.sans.join(", "),
-                        size: 16,
-                        weight: "bold",
-                    },
-                    text: "Response Time Over Time",
-                },
+                title: this.getChartTitle("Response Time Over Time"),
                 zoom: {
                     pan: {
                         enabled: true,
@@ -223,19 +185,23 @@ export class ChartConfigService {
                 },
                 y: {
                     beginAtZero: true,
-                    title: {
-                        color: this.theme.colors.text.secondary,
-                        display: true,
-                        font: {
-                            family: this.theme.typography.fontFamily.sans.join(", "),
-                            size: 12,
-                        },
-                        text: "Response Time (ms)",
-                    },
+                    title: this.getAxisTitle("Response Time (ms)"),
                     ...this.getBaseScale(),
                 },
             },
         } as ChartOptions<"line">;
+    }
+
+    /**
+     * Get common axis title configuration
+     */
+    private getAxisTitle(text: string) {
+        return {
+            color: this.theme.colors.text.secondary,
+            display: true,
+            font: this.getChartFont(12),
+            text,
+        };
     }
 
     /**
@@ -290,6 +256,29 @@ export class ChartConfigService {
                     size: 11,
                 },
             },
+        };
+    }
+
+    /**
+     * Get common font configuration used across charts
+     */
+    private getChartFont(size = 12, weight = "normal") {
+        return {
+            family: this.theme.typography.fontFamily.sans.join(", "),
+            size,
+            weight,
+        };
+    }
+
+    /**
+     * Get common title configuration for charts
+     */
+    private getChartTitle(text: string) {
+        return {
+            color: this.theme.colors.text.primary,
+            display: true,
+            font: this.getChartFont(16, "bold"),
+            text,
         };
     }
 }

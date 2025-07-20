@@ -60,7 +60,6 @@ export class DatabaseManager {
     public async downloadBackup(): Promise<{ buffer: Buffer; fileName: string }> {
         const loggerAdapter = new LoggerAdapter(monitorLogger);
         const dataBackupService = new DataBackupService({
-            databaseService: this.dependencies.repositories.database,
             eventEmitter: this.eventEmitter,
             logger: loggerAdapter,
         });

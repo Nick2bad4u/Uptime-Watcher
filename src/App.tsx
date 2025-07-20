@@ -24,6 +24,7 @@ import { useUIStore } from "./stores/ui/useUiStore";
 import { useUpdatesStore } from "./stores/updates/useUpdatesStore";
 import { ThemedBox, ThemedButton, ThemedText, ThemeProvider } from "./theme/components";
 import { useTheme } from "./theme/useTheme";
+import { setupCacheSync } from "./utils/cacheSync";
 
 /**
  * Main application component that serves as the root of the Uptime Watcher app.
@@ -106,6 +107,8 @@ function App() {
      * - Cleanup on component unmount
      */
     useEffect(() => {
+        let cacheSyncCleanup: (() => void) | undefined;
+
         const initializeApp = async () => {
             if (process.env.NODE_ENV === "production") {
                 logger.app.started();
@@ -117,6 +120,9 @@ function App() {
 
             // Initialize both stores
             await Promise.all([sitesStore.initializeSites(), settingsStore.initializeSettings()]);
+
+            // Set up cache synchronization with backend
+            cacheSyncCleanup = setupCacheSync();
 
             // Subscribe to status updates
             sitesStore.subscribeToStatusUpdates((update: StatusUpdate) => {
@@ -134,6 +140,7 @@ function App() {
         return () => {
             const currentSitesStore = useSitesStore.getState();
             currentSitesStore.unsubscribeFromStatusUpdates();
+            cacheSyncCleanup?.();
         };
     }, []); // Empty dependency array - this should only run once
 

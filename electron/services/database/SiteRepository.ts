@@ -84,10 +84,10 @@ export class SiteRepository {
      */
     public async delete(identifier: string): Promise<boolean> {
         return withDatabaseOperation(
-            () => {
-                const db = this.databaseService.getDatabase();
-                const result = this.deleteInternal(db, identifier);
-                return Promise.resolve(result);
+            async () => {
+                return this.databaseService.executeTransaction((db) => {
+                    return Promise.resolve(this.deleteInternal(db, identifier));
+                });
             },
             "site-delete",
             undefined,
@@ -99,10 +99,11 @@ export class SiteRepository {
      * Clear all sites from the database.
      */
     public async deleteAll(): Promise<void> {
-        return withDatabaseOperation(() => {
-            const db = this.databaseService.getDatabase();
-            this.deleteAllInternal(db);
-            return Promise.resolve();
+        return withDatabaseOperation(async () => {
+            return this.databaseService.executeTransaction((db) => {
+                this.deleteAllInternal(db);
+                return Promise.resolve();
+            });
         }, "site-delete-all");
     }
 

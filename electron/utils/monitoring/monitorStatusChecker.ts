@@ -167,42 +167,43 @@ export async function checkMonitor(
     try {
         // Use operational hooks for database operations
         await withDatabaseOperation(
-            () => {
-                const db = config.databaseService.getDatabase();
-                // Add history entry using internal method to avoid nested transactions
-                config.repositories.history.addEntryInternal(db, monitor.id, historyEntry, checkResult.details);
+            async () => {
+                return config.databaseService.executeTransaction((db) => {
+                    // Add history entry using internal method to avoid nested transactions
+                    config.repositories.history.addEntryInternal(db, monitor.id, historyEntry, checkResult.details);
 
-                // Smart history pruning: Only prune when necessary to avoid performance overhead
-                if (config.historyLimit > 0) {
-                    // Use a buffer strategy: only prune when we exceed limit + buffer
-                    // This reduces frequency of pruning operations while maintaining reasonable limits
-                    const bufferSize = Math.max(Math.floor(config.historyLimit * 0.2), 5); // 20% buffer, min 5 entries
-                    const pruneThreshold = config.historyLimit + bufferSize;
+                    // Smart history pruning: Only prune when necessary to avoid performance overhead
+                    if (config.historyLimit > 0) {
+                        // Use a buffer strategy: only prune when we exceed limit + buffer
+                        // This reduces frequency of pruning operations while maintaining reasonable limits
+                        const bufferSize = Math.max(Math.floor(config.historyLimit * 0.2), 5); // 20% buffer, min 5 entries
+                        const pruneThreshold = config.historyLimit + bufferSize;
 
-                    // Get current count for this monitor (lightweight operation)
-                    const currentCount = config.repositories.history.getHistoryCount(monitor.id);
+                        // Get current count for this monitor (lightweight operation)
+                        const currentCount = config.repositories.history.getHistoryCount(monitor.id);
 
-                    if (currentCount > pruneThreshold) {
-                        config.repositories.history.pruneHistoryInternal(db, monitor.id, config.historyLimit);
-                        config.logger.debug(
-                            `[MonitorStatusChecker] Pruned history for monitor ${monitor.id}: ${currentCount} -> ${config.historyLimit} entries`
-                        );
+                        if (currentCount > pruneThreshold) {
+                            config.repositories.history.pruneHistoryInternal(db, monitor.id, config.historyLimit);
+                            config.logger.debug(
+                                `[MonitorStatusChecker] Pruned history for monitor ${monitor.id}: ${currentCount} -> ${config.historyLimit} entries`
+                            );
+                        }
                     }
-                }
 
-                // Update monitor with new status using internal method (we're already in a transaction)
-                const updateData: Record<string, unknown> = {
-                    responseTime: monitor.responseTime,
-                    status: monitor.status, // This preserves paused status for manual checks
-                };
-                // We just set lastChecked to 'now', so it's definitely defined
-                if (monitor.lastChecked !== undefined) {
-                    // Convert Date object to timestamp for database storage
-                    updateData.lastChecked =
-                        monitor.lastChecked instanceof Date ? monitor.lastChecked.getTime() : monitor.lastChecked;
-                }
-                config.repositories.monitor.updateInternal(db, monitor.id, updateData);
-                return Promise.resolve();
+                    // Update monitor with new status using internal method (we're already in a transaction)
+                    const updateData: Record<string, unknown> = {
+                        responseTime: monitor.responseTime,
+                        status: monitor.status, // This preserves paused status for manual checks
+                    };
+                    // We just set lastChecked to 'now', so it's definitely defined
+                    if (monitor.lastChecked !== undefined) {
+                        // Convert Date object to timestamp for database storage
+                        updateData.lastChecked =
+                            monitor.lastChecked instanceof Date ? monitor.lastChecked.getTime() : monitor.lastChecked;
+                    }
+                    config.repositories.monitor.updateInternal(db, monitor.id, updateData);
+                    return Promise.resolve();
+                });
             },
             "monitor-status-update",
             config.eventEmitter,

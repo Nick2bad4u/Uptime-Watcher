@@ -7,167 +7,18 @@
  * @packageDocumentation
  */
 
-// Re-export MonitorType from electron types to avoid duplication
-export type { MonitorType } from "../electron/types";
+// Re-export core types from electron to avoid duplication
+export type { Monitor, MonitorType, Site, StatusHistory, StatusUpdate } from "../electron/types";
 
 // Re-export status types from shared types for consistency
 export type { MonitorStatus, SiteStatus } from "../shared/types";
 export { isComputedSiteStatus, isMonitorStatus, isSiteStatus } from "../shared/types";
-import type { MonitorType } from "../electron/types";
 
-/**
- * Monitor interface representing a single monitoring endpoint.
- *
- * @remarks
- * Represents a single monitoring endpoint that can check either HTTP/HTTPS URLs
- * or TCP port connectivity. Each monitor maintains its current status, performance
- * metrics, and historical data.
- *
- * For HTTP monitors, the `url` property is required and `host`/`port` are undefined.
- * For port monitors, the `host` and `port` properties are required and `url` is undefined.
- *
- * @example
- * ```typescript
- * // HTTP monitor example
- * const httpMonitor: Monitor = {
- *   id: "mon_123",
- *   type: "http",
- *   status: "up",
- *   url: "https://example.com",
- *   responseTime: 250,
- *   monitoring: true,
- *   checkInterval: 300000,
- *   timeout: 10000,
- *   retryAttempts: 3,
- *   history: []
- * };
- *
- * // Port monitor example
- * const portMonitor: Monitor = {
- *   id: "mon_456",
- *   type: "port",
- *   status: "down",
- *   host: "example.com",
- *   port: 80,
- *   responseTime: -1,
- *   monitoring: true,
- *   checkInterval: 300000,
- *   timeout: 10000,
- *   retryAttempts: 3,
- *   history: []
- * };
- * ```
- */
-export interface Monitor {
-    /** Check interval in milliseconds for this specific monitor */
-    checkInterval: number;
-    /** Array of historical check results ordered chronologically */
-    history: StatusHistory[];
-    /** Hostname or IP address for port monitors (required for type "port", undefined for others) */
-    host?: string;
-    /** Unique identifier for this monitor (UUID or database-generated ID) */
-    id: string;
-    /** Timestamp of the most recent check attempt (undefined if never checked) */
-    lastChecked?: Date;
-    /** Whether this monitor is actively being checked */
-    monitoring: boolean;
-    /** Port number for port monitors (required for type "port", undefined for others) */
-    port?: number;
-    /** Last recorded response time in milliseconds (-1 if check failed or not yet checked) */
-    responseTime: number;
-    /** Number of retry attempts before marking as down for this monitor */
-    retryAttempts: number;
-    /** Current operational status of the monitor */
-    status: "down" | "paused" | "pending" | "up";
-    /** Request timeout in milliseconds for this monitor */
-    timeout: number;
-    /** Type of monitoring to perform */
-    type: MonitorType;
-    /** URL endpoint for HTTP monitors (required for type "http", undefined for others) */
-    url?: string;
-}
+// Re-export ERROR_MESSAGES from stores for convenience
+export { ERROR_MESSAGES } from "./stores/types";
 
-/**
- * Site interface representing a monitored service with one or more monitors.
- *
- * @remarks
- * A site represents a logical grouping of monitors for a single service or website.
- * Each site can have multiple monitors checking different aspects (HTTP endpoints,
- * port connectivity, etc.) and maintains its own monitoring state.
- *
- * @example
- * ```typescript
- * const exampleSite: Site = {
- *   identifier: "site_abc123",
- *   name: "My Website",
- *   monitoring: true,
- *   monitors: [
- *     {
- *       id: "mon_1",
- *       type: "http",
- *       url: "https://example.com",
- *       status: "up",
- *       // ... other monitor properties
- *     },
- *     {
- *       id: "mon_2",
- *       type: "port",
- *       host: "example.com",
- *       port: 443,
- *       status: "up",
- *       // ... other monitor properties
- *     }
- *   ]
- * };
- * ```
- */
-export interface Site {
-    /** Unique identifier for the site (UUID, used as the primary key) */
-    identifier: string;
-    /** Whether monitoring is active for this site (affects all monitors) */
-    monitoring: boolean;
-    /** Array of monitors associated with this site */
-    monitors: Monitor[];
-    /** Human-readable display name for the site */
-    name: string;
-}
-
-/**
- * Historical status record for tracking uptime/downtime over time.
- *
- * @remarks
- * Records the result of a single monitor check for historical analysis.
- * Used to build uptime charts, calculate availability percentages, and
- * track performance trends over time.
- *
- * Note: Does not include "pending" status as historical records only
- * capture actual check outcomes, not transitional states.
- */
-export interface StatusHistory {
-    /** Optional diagnostic details about the check (error messages, HTTP status codes, etc.) */
-    details?: string;
-    /** Response time in milliseconds (-1 if check failed) */
-    responseTime: number;
-    /** Status result at this point in time */
-    status: "down" | "paused" | "up";
-    /** Unix timestamp (in milliseconds) when this status was recorded */
-    timestamp: number;
-}
-
-/**
- * Status update payload sent from backend to frontend via IPC.
- *
- * @remarks
- * Contains the updated site data and optional previous status for comparison.
- * Used to notify the frontend when monitor status changes occur, enabling
- * real-time UI updates and status change notifications.
- */
-export interface StatusUpdate {
-    /** Previous status for change detection and transition logic */
-    previousStatus?: "down" | "paused" | "pending" | "up";
-    /** Updated site data with current monitor statuses */
-    site: Site;
-}
+// Import types for use in global declarations below
+import type { Site, StatusUpdate } from "../electron/types";
 
 /**
  * Electron API interface exposed to the renderer process.
