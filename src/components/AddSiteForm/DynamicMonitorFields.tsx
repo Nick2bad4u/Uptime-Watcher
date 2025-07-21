@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 
 import logger from "../../services/logger";
 import { ThemedText } from "../../theme/components";
+import { ensureError } from "../../utils/errorHandling";
 import { getMonitorTypeConfig, type MonitorTypeConfig } from "../../utils/monitorTypeHelper";
 import { TextField } from "./FormFields";
 
@@ -58,7 +59,7 @@ export function DynamicMonitorFields({ isLoading = false, monitorType, onChange,
                 if (!isCancelled) {
                     const errorMessage = error_ instanceof Error ? error_.message : "Failed to load monitor config";
                     setError(errorMessage);
-                    logger.error("Failed to load monitor type config", error_ as Error);
+                    logger.error("Failed to load monitor type config", ensureError(error_));
                 }
             } finally {
                 if (!isCancelled) {

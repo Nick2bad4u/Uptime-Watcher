@@ -5,6 +5,7 @@
 
 import type { MonitorFieldDefinition } from "@shared/types";
 
+import { AppCaches } from "./cache";
 import { withUtilityErrorHandling } from "./errorHandling";
 
 /**
@@ -46,15 +47,12 @@ export interface MonitorTypeConfig {
     version: string;
 }
 
-// Cache for monitor type configurations from backend
-let monitorTypeCache: MonitorTypeConfig[] | undefined;
-
 /**
  * Clear the monitor type cache.
  * Useful for forcing a refresh of monitor type data.
  */
 export function clearMonitorTypeCache(): void {
-    monitorTypeCache = undefined;
+    AppCaches.monitorTypes.clear();
 }
 
 /**
@@ -62,14 +60,25 @@ export function clearMonitorTypeCache(): void {
  * Results are cached for performance.
  */
 export async function getAvailableMonitorTypes(): Promise<MonitorTypeConfig[]> {
-    monitorTypeCache ??= await withUtilityErrorHandling(
+    const cacheKey = "all-monitor-types";
+
+    // Try cache first
+    const cached = AppCaches.monitorTypes.get(cacheKey) as MonitorTypeConfig[] | undefined;
+    if (cached) {
+        return cached;
+    }
+
+    // Fetch from backend and cache
+    const types = await withUtilityErrorHandling(
         async () => {
             return window.electronAPI.monitorTypes.getMonitorTypes();
         },
         "Fetch monitor types from backend",
         []
     );
-    return monitorTypeCache;
+
+    AppCaches.monitorTypes.set(cacheKey, types);
+    return types;
 }
 
 /**

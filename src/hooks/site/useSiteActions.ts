@@ -4,6 +4,7 @@ import logger from "../../services/logger";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { useUIStore } from "../../stores/ui/useUiStore";
 import { Monitor, Site } from "../../types";
+import { ensureError } from "../../utils/errorHandling";
 
 interface SiteActionsResult {
     handleCardClick: () => void;
@@ -45,7 +46,7 @@ export function useSiteActions(site: Site, monitor: Monitor | undefined): SiteAc
                 siteName: site.name,
             });
         } catch (error) {
-            logger.site.error(site.identifier, error instanceof Error ? error : String(error));
+            logger.site.error(site.identifier, ensureError(error));
         }
     }, [monitor, site.identifier, site.name, startSiteMonitorMonitoring]);
 
@@ -68,7 +69,7 @@ export function useSiteActions(site: Site, monitor: Monitor | undefined): SiteAc
                 siteName: site.name,
             });
         } catch (error) {
-            logger.site.error(site.identifier, error instanceof Error ? error : String(error));
+            logger.site.error(site.identifier, ensureError(error));
         }
     }, [monitor, site.identifier, site.name, stopSiteMonitorMonitoring]);
 
@@ -99,8 +100,9 @@ export function useSiteActions(site: Site, monitor: Monitor | undefined): SiteAc
                     siteName: site.name,
                 });
             } catch (error) {
-                logger.site.error(site.identifier, error instanceof Error ? error : String(error));
-                logger.error("Manual site check failed", error instanceof Error ? error : new Error(String(error)), {
+                const errorObj = ensureError(error);
+                logger.site.error(site.identifier, errorObj);
+                logger.error("Manual site check failed", errorObj, {
                     monitorId: monitor.id,
                     siteId: site.identifier,
                     siteName: site.name,

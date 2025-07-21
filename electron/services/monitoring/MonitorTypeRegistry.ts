@@ -7,12 +7,14 @@
  * in multiple files.
  */
 
-import validator from "validator";
 import { z } from "zod";
 
 import type { MonitorFieldDefinition } from "../../../shared/types";
 import type { MonitorType } from "./monitorTypes";
 
+// Import shared validation schemas
+import { withErrorHandling } from "../../../shared/utils/errorHandling";
+import { monitorSchemas, validateMonitorData as sharedValidateMonitorData } from "../../../shared/validation/schemas";
 import { logger } from "../../utils/logger";
 import { HttpMonitor } from "./HttpMonitor";
 import { createMigrationOrchestrator, exampleMigrations, migrationRegistry, versionManager } from "./MigrationSystem";
@@ -87,51 +89,6 @@ export interface MonitorUIConfig {
     };
 }
 
-// Shared validation schemas using Zod with enhanced validation
-export const monitorSchemas = {
-    http: z.object({
-        type: z.literal("http"),
-        url: z.string().refine((val) => {
-            // Use validator.js for robust URL validation
-            return validator.isURL(val, {
-                allow_protocol_relative_urls: false,
-                allow_trailing_dot: false,
-                allow_underscores: false,
-                disallow_auth: false,
-                protocols: ["http", "https"],
-                require_host: true,
-                require_protocol: true,
-                require_tld: true,
-                validate_length: true,
-            });
-        }, "Must be a valid URL"),
-    }),
-    port: z.object({
-        host: z.string().refine((val) => {
-            // Use validator.js for robust host validation
-            if (validator.isIP(val)) {
-                return true;
-            }
-            if (
-                validator.isFQDN(val, {
-                    allow_numeric_tld: false,
-                    allow_trailing_dot: false,
-                    allow_underscores: false,
-                    allow_wildcard: false,
-                    require_tld: true,
-                })
-            ) {
-                return true;
-            }
-            return val === "localhost";
-        }, "Must be a valid hostname, IP address, or localhost"),
-        port: z.number().refine((val) => {
-            return validator.isPort(val.toString());
-        }, "Must be a valid port number (1-65535)"),
-        type: z.literal("port"),
-    }),
-};
-
 // Registry for monitor types
 const monitorTypes = new Map<string, BaseMonitorConfig>();
 
@@ -194,7 +151,7 @@ export function registerMonitorType(config: BaseMonitorConfig): void {
 }
 
 /**
- * Validate monitor data using Zod schemas.
+ * Validate monitor data using shared Zod schemas.
  *
  * @param type - Monitor type
  * @param data - Monitor data to validate
@@ -210,60 +167,16 @@ export function validateMonitorData(
     success: boolean;
     warnings: string[];
 } {
-    const config = getMonitorTypeConfig(type);
-    if (!config) {
-        return {
-            errors: [`Unknown monitor type: ${type}`],
-            metadata: { monitorType: type },
-            success: false,
-            warnings: [],
-        };
-    }
+    // Use shared validation logic
+    const result = sharedValidateMonitorData(type, data);
 
-    try {
-        const validData = config.validationSchema.parse(data);
-        return {
-            data: validData,
-            errors: [],
-            metadata: {
-                monitorType: type,
-                validatedDataSize: JSON.stringify(validData).length,
-            },
-            success: true,
-            warnings: [],
-        };
-    } catch (error) {
-        if (error instanceof z.ZodError) {
-            // Extract warnings from non-critical Zod issues
-            const errors: string[] = [];
-            const warnings: string[] = [];
-
-            for (const issue of error.issues) {
-                // Consider optional fields with format issues as warnings rather than errors
-                if (issue.code === "invalid_type" && issue.message.includes("optional")) {
-                    warnings.push(`${issue.path.join(".")}: ${issue.message}`);
-                } else {
-                    errors.push(`${issue.path.join(".")}: ${issue.message}`);
-                }
-            }
-
-            return {
-                errors,
-                metadata: {
-                    issueCount: error.issues.length,
-                    monitorType: type,
-                },
-                success: errors.length === 0,
-                warnings,
-            };
-        }
-        return {
-            errors: ["Validation failed with unknown error"],
-            metadata: { errorType: "unknown" },
-            success: false,
-            warnings: [],
-        };
-    }
+    return {
+        data: result.data,
+        errors: result.errors,
+        metadata: result.metadata,
+        success: result.success,
+        warnings: result.warnings,
+    };
 }
 
 /**
@@ -454,60 +367,60 @@ export async function migrateMonitorType(
     errors: string[];
     success: boolean;
 }> {
-    try {
-        // Validate the monitor type using internal validation
-        const validationResult = validateMonitorTypeInternal(monitorType);
-        if (!validationResult.success) {
+    return withErrorHandling(
+        async () => {
+            // Validate the monitor type using internal validation
+            const validationResult = validateMonitorTypeInternal(monitorType);
+            if (!validationResult.success) {
+                return {
+                    appliedMigrations: [],
+                    errors: [validationResult.error ?? "Invalid monitor type"],
+                    success: false,
+                };
+            }
+
+            logger.info(`Migrating monitor type ${monitorType} from ${fromVersion} to ${toVersion}`);
+
+            // Check if migration is needed
+            if (fromVersion === toVersion) {
+                return {
+                    appliedMigrations: [],
+                    errors: [],
+                    success: true,
+                    ...(data && { data }),
+                };
+            }
+
+            // If no data provided, just return success for version bump
+            if (!data) {
+                return {
+                    appliedMigrations: [`${monitorType}_${fromVersion}_to_${toVersion}`],
+                    errors: [],
+                    success: true,
+                };
+            }
+
+            // Use the migration orchestrator for data migration
+            const migrationOrchestrator = createMigrationOrchestrator();
+
+            const migrationResult = await migrationOrchestrator.migrateMonitorData(
+                monitorType,
+                data,
+                fromVersion,
+                toVersion
+            );
+
             return {
-                appliedMigrations: [],
-                errors: [validationResult.error ?? "Invalid monitor type"],
-                success: false,
+                appliedMigrations: migrationResult.appliedMigrations,
+                errors: migrationResult.errors,
+                success: migrationResult.success,
+                ...(migrationResult.data && { data: migrationResult.data }),
             };
-        }
-
-        logger.info(`Migrating monitor type ${monitorType} from ${fromVersion} to ${toVersion}`);
-
-        // Check if migration is needed
-        if (fromVersion === toVersion) {
-            return {
-                appliedMigrations: [],
-                errors: [],
-                success: true,
-                ...(data && { data }),
-            };
-        }
-
-        // If no data provided, just return success for version bump
-        if (!data) {
-            return {
-                appliedMigrations: [`${monitorType}_${fromVersion}_to_${toVersion}`],
-                errors: [],
-                success: true,
-            };
-        }
-
-        // Use the migration orchestrator for data migration
-        const migrationOrchestrator = createMigrationOrchestrator();
-
-        const migrationResult = await migrationOrchestrator.migrateMonitorData(
-            monitorType,
-            data,
-            fromVersion,
-            toVersion
-        );
-
-        return {
-            appliedMigrations: migrationResult.appliedMigrations,
-            errors: migrationResult.errors,
-            success: migrationResult.success,
-            ...(migrationResult.data && { data: migrationResult.data }),
-        };
-    } catch (error) {
-        logger.error("Migration error:", error);
-        return {
-            appliedMigrations: [],
-            errors: [`Migration failed: ${error}`],
-            success: false,
-        };
-    }
+        },
+        { logger, operationName: "Monitor migration" }
+    ).catch((error) => ({
+        appliedMigrations: [],
+        errors: [`Migration failed: ${error instanceof Error ? error.message : String(error)}`],
+        success: false,
+    }));
 }

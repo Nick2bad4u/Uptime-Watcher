@@ -57,7 +57,7 @@ import { ERROR_MESSAGES } from "@shared/types";
 ### Maintenance Guidelines
 
 1. **Add new core types** → `shared/types.ts`
-2. **Add frontend-specific types** → `src/stores/types.ts` 
+2. **Add frontend-specific types** → `src/stores/types.ts`
 3. **Always import from** → `@shared/types` alias
 4. **Never duplicate types** between frontend/backend
 

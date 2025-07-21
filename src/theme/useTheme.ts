@@ -6,8 +6,7 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable unicorn/consistent-function-scoping -- Hook functions must remain inside hooks for context access */
 
-import type { SiteStatus, MonitorStatus } from "@shared/types";
-
+import { isSiteStatus, type MonitorStatus, type SiteStatus } from "@shared/types";
 import { useCallback, useEffect, useState } from "react";
 
 import { useSettingsStore } from "../stores/settings/useSettingsStore";
@@ -184,10 +183,9 @@ export function useTheme() {
 
     // Get status color
     const getStatusColor = (status: SiteStatus): string => {
-        // Only allow known status keys
-        const allowedStatuses: SiteStatus[] = ["up", "down", "pending", "unknown", "paused", "mixed"];
-        if (allowedStatuses.includes(status)) {
-            // eslint-disable-next-line security/detect-object-injection -- currentTheme.colors.status is validated against allowedStatuses
+        // Validate status using shared type guard
+        if (isSiteStatus(status)) {
+            // eslint-disable-next-line security/detect-object-injection -- currentTheme.colors.status is validated against SiteStatus type
             return currentTheme.colors.status[status];
         }
         // Fallback to a safe color if status is invalid

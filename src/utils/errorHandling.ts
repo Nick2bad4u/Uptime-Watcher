@@ -6,6 +6,17 @@
 import logger from "../services/logger";
 
 /**
+ * Ensures an error object is properly typed and formatted.
+ * Converts unknown error types to proper Error instances.
+ *
+ * @param error - Unknown error value from catch blocks
+ * @returns Properly typed Error instance
+ */
+export function ensureError(error: unknown): Error {
+    return error instanceof Error ? error : new Error(String(error));
+}
+
+/**
  * Simple error handling wrapper for utility functions.
  * Provides consistent error logging and error response formatting.
  *
@@ -24,7 +35,7 @@ export async function withUtilityErrorHandling<T>(
     try {
         return await operation();
     } catch (error) {
-        const wrappedError = error instanceof Error ? error : new Error(String(error));
+        const wrappedError = ensureError(error);
         logger.error(`${operationName} failed`, wrappedError);
 
         if (shouldThrow) {
@@ -37,18 +48,4 @@ export async function withUtilityErrorHandling<T>(
 
         return fallbackValue;
     }
-}
-
-/**
- * @deprecated Use withUtilityErrorHandling with shouldThrow=true instead
- * Error handling wrapper for utility functions that should throw on error.
- * Provides consistent error logging while preserving the error for caller handling.
- *
- * @param operation - The async operation to execute
- * @param operationName - Name of the operation for logging
- * @returns Promise resolving to operation result
- * @throws The original error after logging
- */
-export async function withUtilityErrorHandlingThrow<T>(operation: () => Promise<T>, operationName: string): Promise<T> {
-    return withUtilityErrorHandling(operation, operationName, undefined, true);
 }

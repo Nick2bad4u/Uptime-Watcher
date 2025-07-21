@@ -4,7 +4,8 @@
 
 All repository methods should follow this consistent pattern:
 
-### For methods that return data:
+### For methods that return data
+
 ```typescript
 public async methodName(params): Promise<ReturnType> {
     return withDatabaseOperation(
@@ -21,7 +22,8 @@ public async methodName(params): Promise<ReturnType> {
 }
 ```
 
-### For void methods:
+### For void methods
+
 ```typescript
 public async methodName(params): Promise<void> {
     return withDatabaseOperation(
@@ -38,7 +40,8 @@ public async methodName(params): Promise<void> {
 }
 ```
 
-### Key Standards:
+### Key Standards
+
 1. Always use `withDatabaseOperation` wrapper
 2. Always use `this.databaseService.executeTransaction` for database operations
 3. For data-returning methods: `return Promise.resolve(result)`
@@ -46,7 +49,8 @@ public async methodName(params): Promise<void> {
 5. Always provide meaningful operation names
 6. Include context data for debugging when relevant
 
-### Benefits:
+### Benefits
+
 - Consistent error handling and logging
 - Uniform transaction management
 - Predictable Promise handling

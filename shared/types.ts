@@ -16,6 +16,10 @@ export type MonitorType = "http" | "port";
 export type MonitorStatus = "up" | "down" | "pending" | "paused";
 export type SiteStatus = MonitorStatus | "mixed" | "unknown";
 
+// Default status constants
+export const DEFAULT_MONITOR_STATUS: MonitorStatus = "pending";
+export const DEFAULT_SITE_STATUS: SiteStatus = "unknown";
+
 export function isMonitorStatus(status: string): status is MonitorStatus {
     return ["up", "down", "pending", "paused"].includes(status);
 }

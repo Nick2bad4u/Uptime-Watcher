@@ -25,13 +25,11 @@ export class MonitorValidator {
 
     /**
      * Validate monitor configuration according to business rules.
+     * Uses shared Zod schemas for comprehensive validation.
      */
     public validateMonitorConfiguration(monitor: Site["monitors"][0]): ValidationResult {
-        const errors: string[] = [
-            ...this.validateMonitorTypeSpecific(monitor),
-            ...this.validateTimingConstraints(monitor),
-            ...this.validateRetryAttempts(monitor),
-        ];
+        // Use shared validation from registry (includes timing, retry attempts, and type-specific validation)
+        const errors: string[] = [...this.validateMonitorTypeSpecific(monitor)];
 
         return {
             errors,
@@ -57,35 +55,5 @@ export class MonitorValidator {
         }
 
         return [];
-    }
-
-    /**
-     * Validate retry attempts configuration.
-     */
-    private validateRetryAttempts(monitor: Site["monitors"][0]): string[] {
-        const errors: string[] = [];
-
-        if (monitor.retryAttempts < 0) {
-            errors.push("Monitor retry attempts cannot be negative");
-        }
-
-        return errors;
-    }
-
-    /**
-     * Validate timing constraints (intervals, timeouts).
-     */
-    private validateTimingConstraints(monitor: Site["monitors"][0]): string[] {
-        const errors: string[] = [];
-
-        if (monitor.checkInterval < 1000) {
-            errors.push("Monitor check interval must be at least 1000ms");
-        }
-
-        if (monitor.timeout < 1000) {
-            errors.push("Monitor timeout must be at least 1000ms");
-        }
-
-        return errors;
     }
 }

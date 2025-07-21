@@ -3,6 +3,9 @@
  * Provides consistent time formatting throughout the application.
  */
 
+import { CHART_TIME_PERIODS } from "../constants";
+import { UiDefaults } from "./fallbacks";
+
 /**
  * Type for time period keys
  */
@@ -111,15 +114,13 @@ export function formatResponseDuration(milliseconds: number): string {
  */
 export function formatResponseTime(time?: number): string {
     if (!time && time !== 0) {
-        return "N/A";
+        return UiDefaults.notAvailableLabel;
     }
     if (time < 1000) {
         return `${time}ms`;
     }
     return `${(time / 1000).toFixed(2)}s`;
 }
-
-import { CHART_TIME_PERIODS } from "../constants";
 
 /**
  * Get display label for interval value.
@@ -150,3 +151,18 @@ export const TIME_PERIOD_LABELS: Record<TimePeriod, string> = {
     "24h": "Last 24 Hours",
     "30d": "Last 30 Days",
 } as const;
+
+/**
+ * Format retry attempts with descriptive text.
+ *
+ * @param attempts - Number of retry attempts
+ * @returns Descriptive text explaining retry behavior
+ */
+export function formatRetryAttemptsText(attempts: number): string {
+    if (attempts === 0) {
+        return "(Retry disabled - immediate failure detection)";
+    }
+
+    const timesText = attempts === 1 ? "time" : "times";
+    return `(Retry ${attempts} ${timesText} before marking down)`;
+}

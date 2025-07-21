@@ -7,6 +7,8 @@
 
 import type { Site, StatusUpdate } from "../../types";
 
+import logger from "../../services/logger";
+import { ensureError } from "../../utils/errorHandling";
 import { useErrorStore } from "../error/useErrorStore";
 import { logStoreAction, withErrorHandling } from "../utils";
 import { SiteService } from "./services/SiteService";
@@ -96,7 +98,7 @@ export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActio
             });
 
             statusUpdateManager.subscribe(handler, actions.fullSyncFromBackend).catch((error) => {
-                console.error("Failed to subscribe to status updates:", error);
+                logger.error("Failed to subscribe to status updates:", ensureError(error));
             });
 
             const result = {

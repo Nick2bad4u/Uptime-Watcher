@@ -43,86 +43,8 @@ export const createBaseStore = <T extends BaseStore>(
     setLoading: (loading: boolean) => set({ isLoading: loading } as Partial<T>),
 });
 
-/**
- * Handles operation errors by updating store state.
- */
-function handleOperationError(error: unknown, store: Pick<BaseStore, "clearError" | "setError" | "setLoading">): void {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-
-    try {
-        store.setError(errorMessage);
-    } catch (storeError) {
-        // If setError fails, log both errors
-        logger.error(
-            "Failed to set error state",
-            storeError instanceof Error ? storeError : new Error(String(storeError))
-        );
-        logger.error("Original operation error", error instanceof Error ? error : new Error(String(error)));
-    }
-}
-
-/**
- * Wrapper for async operations with standardized error handling.
- *
- * @param operation - Async function to execute with error handling
- * @param store - Store instance with error handling methods
- * @returns Promise resolving to the operation result
- *
- * @throws Re-throws the original error after setting it in the store
- *
- * @remarks
- * This utility automatically manages loading states and error handling for async
- * operations. It sets loading to true at the start, clears any previous errors,
- * and properly handles both success and failure scenarios.
- *
- * The loading state is always cleared in the finally block with proper error
- * handling to prevent state corruption if the finally block itself throws.
- *
- * @example
- * ```typescript
- * const fetchData = async () => {
- *   return withErrorHandling(
- *     () => api.getData(),
- *     store
- *   );
- * };
- * ```
- *
- * @public
- */
-/**
- * Safely executes a store operation with error handling.
- */
-function safeStoreOperation(operation: () => void, operationName: string): void {
-    try {
-        operation();
-    } catch (error) {
-        logger.error(`Failed to ${operationName}`, error instanceof Error ? error : new Error(String(error)));
-    }
-}
-
-export const withErrorHandling = async <T>(
-    operation: () => Promise<T>,
-    store: Pick<BaseStore, "clearError" | "setError" | "setLoading">
-): Promise<T> => {
-    // Clear any previous error state before starting
-    safeStoreOperation(() => store.clearError(), "clear error state");
-
-    // Set loading state to true
-    safeStoreOperation(() => store.setLoading(true), "set loading state");
-
-    try {
-        const result = await operation();
-        return result;
-    } catch (error) {
-        // Handle the error from the operation
-        handleOperationError(error, store);
-        throw error;
-    } finally {
-        // Always clear loading state, with error handling
-        safeStoreOperation(() => store.setLoading(false), "clear loading state in finally block");
-    }
-};
+// Re-export shared error handling utility for frontend stores
+export { withErrorHandling } from "@shared/utils/errorHandling";
 
 /**
  * Creates a persistence configuration for Zustand store persistence.

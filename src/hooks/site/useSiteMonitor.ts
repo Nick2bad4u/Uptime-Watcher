@@ -3,11 +3,13 @@
  * Provides monitor state, statistics, and selection handling for sites.
  */
 
+import { DEFAULT_MONITOR_STATUS } from "@shared/types";
 import { useCallback, useMemo } from "react";
 
 import type { Monitor, MonitorStatus, Site, StatusHistory } from "../../types";
 
 import { useSitesStore } from "../../stores/sites/useSitesStore";
+import { getDefaultMonitorId } from "../../utils/monitorUiHelpers";
 
 /**
  * Result interface for the useSiteMonitor hook.
@@ -57,7 +59,7 @@ export function useSiteMonitor(site: Site): SiteMonitorResult {
         return latestSite.monitors.map((m) => m.id);
     }, [latestSite]);
 
-    const defaultMonitorId = monitorIds[0] ?? "";
+    const defaultMonitorId = getDefaultMonitorId(monitorIds);
     const selectedMonitorId = getSelectedMonitorId(latestSite.identifier) ?? defaultMonitorId;
 
     // Get the currently selected monitor
@@ -66,7 +68,7 @@ export function useSiteMonitor(site: Site): SiteMonitorResult {
     }, [latestSite, selectedMonitorId]);
 
     // Extract monitor state information
-    const status = monitor?.status ?? "pending";
+    const status = monitor?.status ?? DEFAULT_MONITOR_STATUS;
     const responseTime = monitor?.responseTime;
     // Fix: Use history length and last timestamp as dependencies for proper memoization
     const filteredHistory = useMemo(() => {

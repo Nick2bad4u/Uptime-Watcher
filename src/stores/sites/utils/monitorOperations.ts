@@ -3,7 +3,14 @@
  * Provides utilities for working with monitor data and configurations.
  */
 
-import { ERROR_MESSAGES, isMonitorStatus, type Monitor, type MonitorType, type Site } from "@shared/types";
+import {
+    DEFAULT_MONITOR_STATUS,
+    ERROR_MESSAGES,
+    isMonitorStatus,
+    type Monitor,
+    type MonitorType,
+    type Site,
+} from "@shared/types";
 
 // Re-export validateMonitor from shared types for convenience
 export { validateMonitor } from "@shared/types";
@@ -27,7 +34,7 @@ export function createDefaultMonitor(overrides: Partial<Monitor> = {}): Monitor 
         monitoring: true,
         responseTime: -1, // Sentinel value for never checked
         retryAttempts: 3, // Default retry attempts
-        status: "pending",
+        status: DEFAULT_MONITOR_STATUS,
         timeout: 5000, // Default timeout
         type: "http" as MonitorType,
         ...overrides,
@@ -52,7 +59,7 @@ export function normalizeMonitor(monitor: Partial<Monitor>): Monitor {
         monitoring: monitor.monitoring ?? true,
         responseTime: monitor.responseTime ?? -1, // Sentinel value for never checked
         retryAttempts: monitor.retryAttempts ?? 3, // Default retry attempts
-        status: monitor.status && isMonitorStatus(monitor.status) ? monitor.status : "pending",
+        status: monitor.status && isMonitorStatus(monitor.status) ? monitor.status : DEFAULT_MONITOR_STATUS,
         timeout: monitor.timeout ?? 5000, // Default timeout
         type: monitor.type ?? "http",
         // Only add optional fields if they are explicitly provided

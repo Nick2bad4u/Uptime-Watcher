@@ -5,13 +5,9 @@
 
 import type { MonitorType } from "@shared/types";
 
+import { AppCaches } from "./cache";
 import { withUtilityErrorHandling } from "./errorHandling";
 import { getAvailableMonitorTypes, getMonitorTypeConfig, type MonitorTypeConfig } from "./monitorTypeHelper";
-
-/**
- * Cache for monitor type configurations
- */
-let configCache: Map<string, MonitorTypeConfig> | undefined;
 
 /**
  * Check if all monitor types in array support advanced analytics.
@@ -53,7 +49,7 @@ export async function allSupportsResponseTime(monitorTypes: MonitorType[]): Prom
  * Clear the configuration cache. Useful for testing or when monitor types change.
  */
 export function clearConfigCache(): void {
-    configCache = undefined;
+    AppCaches.uiHelpers.clear();
 }
 
 /**
@@ -122,6 +118,17 @@ export async function getAnalyticsLabel(monitorType: MonitorType): Promise<strin
         `Get analytics label for ${monitorType}`,
         `${monitorType.toUpperCase()} Response Time`
     );
+}
+
+/**
+ * Get the default monitor ID from a list of monitor IDs.
+ * Returns the first monitor ID or an empty string if none exist.
+ *
+ * @param monitorIds - Array of monitor IDs
+ * @returns Default monitor ID (first in array or empty string)
+ */
+export function getDefaultMonitorId(monitorIds: string[]): string {
+    return monitorIds[0] ?? "";
 }
 
 /**
@@ -229,14 +236,19 @@ export async function supportsResponseTime(monitorType: MonitorType): Promise<bo
  * Get monitor type configuration with caching
  */
 async function getConfig(monitorType: MonitorType): Promise<MonitorTypeConfig | undefined> {
-    configCache ??= new Map();
+    const cacheKey = `config-${monitorType}`;
 
-    if (!configCache.has(monitorType)) {
-        const config = await getMonitorTypeConfig(monitorType);
-        if (config) {
-            configCache.set(monitorType, config);
-        }
+    // Try to get from cache first
+    const cached = AppCaches.uiHelpers.get(cacheKey) as MonitorTypeConfig | undefined;
+    if (cached) {
+        return cached;
     }
 
-    return configCache.get(monitorType);
+    // Get from backend and cache
+    const config = await getMonitorTypeConfig(monitorType);
+    if (config) {
+        AppCaches.uiHelpers.set(cacheKey, config);
+    }
+
+    return config;
 }

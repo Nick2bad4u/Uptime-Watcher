@@ -3,6 +3,8 @@
  * Automatically synchronizes frontend caches with backend cache invalidation events.
  */
 
+import logger from "../services/logger";
+import { ensureError } from "./errorHandling";
 import { clearMonitorTypeCache } from "./monitorTypeHelper";
 
 /**
@@ -26,7 +28,7 @@ export function setupCacheSync(): () => void {
     const eventsAPI = window.electronAPI?.events as any;
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     if (!eventsAPI?.onCacheInvalidated) {
-        console.warn("[CacheSync] Cache invalidation events not available - frontend cache sync disabled");
+        logger.warn("Cache invalidation events not available - frontend cache sync disabled");
         return () => {
             // No-op cleanup
         };
@@ -35,7 +37,7 @@ export function setupCacheSync(): () => void {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     const cleanup = eventsAPI.onCacheInvalidated((data: CacheInvalidationData) => {
         try {
-            console.debug("[CacheSync] Received cache invalidation event", data);
+            logger.debug("Received cache invalidation event", data);
 
             // Clear appropriate frontend caches based on invalidation type
             switch (data.type) {
@@ -52,15 +54,15 @@ export function setupCacheSync(): () => void {
                     break;
                 }
                 default: {
-                    console.warn("[CacheSync] Unknown cache invalidation type:", data.type);
+                    logger.warn("Unknown cache invalidation type:", data.type);
                 }
             }
         } catch (error) {
-            console.error("[CacheSync] Error handling cache invalidation:", error);
+            logger.error("Error handling cache invalidation:", ensureError(error));
         }
     });
 
-    console.debug("[CacheSync] Cache synchronization enabled");
+    logger.debug("[CacheSync] Cache synchronization enabled");
     return cleanup as () => void;
 }
 
@@ -68,7 +70,7 @@ export function setupCacheSync(): () => void {
  * Clear all frontend caches.
  */
 function clearAllFrontendCaches(): void {
-    console.debug("[CacheSync] Clearing all frontend caches");
+    logger.debug("[CacheSync] Clearing all frontend caches");
     clearMonitorTypeCache();
     // Note: configCache in monitorUiHelpers is automatically cleared when monitorTypeCache is cleared
     // since getAvailableMonitorTypes will fetch fresh data
@@ -80,7 +82,7 @@ function clearAllFrontendCaches(): void {
  * @param identifier - Optional monitor identifier for targeted clearing
  */
 function clearMonitorRelatedCaches(identifier?: string): void {
-    console.debug("[CacheSync] Clearing monitor-related caches", { identifier });
+    logger.debug("[CacheSync] Clearing monitor-related caches", { identifier });
     clearMonitorTypeCache();
     // Monitor-specific cache clearing could be added here if needed
 }
@@ -91,7 +93,7 @@ function clearMonitorRelatedCaches(identifier?: string): void {
  * @param identifier - Optional site identifier for targeted clearing
  */
 function clearSiteRelatedCaches(identifier?: string): void {
-    console.debug("[CacheSync] Clearing site-related caches", { identifier });
+    logger.debug("[CacheSync] Clearing site-related caches", { identifier });
     // Site-specific cache clearing could be added here if needed
     // For now, sites are managed through Zustand stores which handle their own cache invalidation
 }

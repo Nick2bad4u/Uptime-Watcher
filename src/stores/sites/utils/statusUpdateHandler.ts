@@ -6,6 +6,7 @@
 import type { Site, StatusUpdate } from "@shared/types";
 
 import logger from "../../../services/logger";
+import { ensureError, withUtilityErrorHandling } from "../../../utils/errorHandling";
 import { logStoreAction, waitForElectronAPI } from "../../utils";
 
 export interface StatusUpdateHandlerOptions {
@@ -57,31 +58,46 @@ export class StatusUpdateManager {
         try {
             await waitForElectronAPI();
         } catch (error) {
-            console.error("Failed to initialize electronAPI:", error);
+            logger.error("Failed to initialize electronAPI:", ensureError(error));
             throw new Error("Failed to initialize electronAPI");
         }
 
         // Subscribe to monitor status changes
         const statusUpdateCleanup = window.electronAPI.events.onMonitorStatusChanged((update: StatusUpdate) => {
-            this.handler?.(update).catch((error) => {
-                console.error("Error in status update handler:", error);
-            });
+            void withUtilityErrorHandling(
+                async () => {
+                    await this.handler?.(update);
+                },
+                "Handle status update",
+                undefined,
+                false
+            );
         });
         this.cleanupFunctions.push(statusUpdateCleanup);
 
         // Subscribe to monitoring state changes
         if (this.monitoringEventHandler) {
             const monitoringStartedCleanup = window.electronAPI.events.onMonitoringStarted(() => {
-                this.monitoringEventHandler?.().catch((error) => {
-                    console.error("Error in monitoring started handler:", error);
-                });
+                void withUtilityErrorHandling(
+                    async () => {
+                        await this.monitoringEventHandler?.();
+                    },
+                    "Handle monitoring started event",
+                    undefined,
+                    false
+                );
             });
             this.cleanupFunctions.push(monitoringStartedCleanup);
 
             const monitoringStoppedCleanup = window.electronAPI.events.onMonitoringStopped(() => {
-                this.monitoringEventHandler?.().catch((error) => {
-                    console.error("Error in monitoring stopped handler:", error);
-                });
+                void withUtilityErrorHandling(
+                    async () => {
+                        await this.monitoringEventHandler?.();
+                    },
+                    "Handle monitoring stopped event",
+                    undefined,
+                    false
+                );
             });
             this.cleanupFunctions.push(monitoringStoppedCleanup);
         }
@@ -177,11 +193,14 @@ export function createStatusUpdateHandler(options: StatusUpdateHandlerOptions) {
                         `Site ${update.site?.identifier ?? update.siteIdentifier} not found in store, triggering full sync`
                     );
                 }
-                await fullSyncFromBackend().catch((error) => {
-                    if (process.env.NODE_ENV === "development") {
-                        logger.error("Fallback full sync failed", error as Error);
-                    }
-                });
+                await withUtilityErrorHandling(
+                    async () => {
+                        await fullSyncFromBackend();
+                    },
+                    "Fallback full sync after site not found",
+                    undefined,
+                    false
+                );
             }
 
             // Clean up pending update tracking
@@ -189,14 +208,19 @@ export function createStatusUpdateHandler(options: StatusUpdateHandlerOptions) {
                 pendingUpdates.delete(siteId);
             }
         } catch (error) {
-            logger.error("Error processing status update", error as Error);
+            logger.error("Error processing status update", ensureError(error));
             // Clean up pending update tracking on error
             const siteId = update.site?.identifier ?? update.siteIdentifier;
             pendingUpdates.delete(siteId);
             // Fallback to full sync on any processing error
-            await fullSyncFromBackend().catch((syncError) => {
-                logger.error("Fallback sync after error failed", syncError as Error);
-            });
+            await withUtilityErrorHandling(
+                async () => {
+                    await fullSyncFromBackend();
+                },
+                "Fallback sync after error",
+                undefined,
+                false
+            );
         }
     };
 }

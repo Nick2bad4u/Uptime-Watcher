@@ -21,8 +21,10 @@ import {
 import { useTheme } from "../../../theme/useTheme";
 import { Monitor, Site } from "../../../types";
 import { calculateMaxDuration } from "../../../utils/duration";
+import { withUtilityErrorHandling } from "../../../utils/errorHandling";
+import { getMonitorDisplayIdentifier, getMonitorTypeDisplayLabel, UiDefaults } from "../../../utils/fallbacks";
 import { getMonitorTypeConfig } from "../../../utils/monitorTypeHelper";
-import { getIntervalLabel } from "../../../utils/time";
+import { formatRetryAttemptsText, getIntervalLabel } from "../../../utils/time";
 
 /**
  * Props for the SettingsTab component.
@@ -407,89 +409,53 @@ export function SettingsTab({
  * @param attempts - Number of retry attempts
  * @returns Formatted retry attempts description
  */
-function formatRetryAttemptsText(attempts: number): string {
-    if (attempts === 0) {
-        return "(Retry disabled - immediate failure detection)";
-    }
-
-    const timesText = attempts === 1 ? "time" : "times";
-    return `(Retry ${attempts} ${timesText} before marking down)`;
-}
-
 /**
  * Generate a display identifier based on the monitor type.
- * Uses the monitor registry to format the display value appropriately.
+ * Uses dynamic utility instead of hardcoded backward compatibility patterns.
  */
 function getDisplayIdentifier(currentSite: Site, selectedMonitor: Monitor): string {
-    try {
-        // Fallback to hardcoded patterns for backward compatibility
-        if (selectedMonitor.type === "http" && selectedMonitor.url) {
-            return selectedMonitor.url;
-        }
-        if (selectedMonitor.type === "port" && selectedMonitor.host && selectedMonitor.port) {
-            return `${selectedMonitor.host}:${selectedMonitor.port}`;
-        }
-    } catch (error) {
-        logger.warn("Failed to generate display identifier", error as Error);
-    }
-
-    // Fallback to site identifier
-    return currentSite.identifier;
+    return getMonitorDisplayIdentifier(selectedMonitor, currentSite.identifier);
 }
 
 /**
  * Generate a display label for the identifier field based on monitor type.
  */
 async function getIdentifierLabel(selectedMonitor: Monitor): Promise<string> {
-    try {
-        const config = await getMonitorTypeConfig(selectedMonitor.type);
-        if (config?.fields) {
-            // Generate label based on primary field(s)
-            const primaryField = config.fields.find((field) => field.required);
-            if (primaryField) {
-                return primaryField.label;
+    return withUtilityErrorHandling(
+        async () => {
+            const config = await getMonitorTypeConfig(selectedMonitor.type);
+            if (config?.fields) {
+                // Generate label based on primary field(s)
+                const primaryField = config.fields.find((field) => field.required);
+                if (primaryField) {
+                    return primaryField.label;
+                }
+                // Fallback to first field
+                if (config.fields.length > 0 && config.fields[0]) {
+                    return config.fields[0].label;
+                }
             }
-            // Fallback to first field
-            if (config.fields.length > 0 && config.fields[0]) {
-                return config.fields[0].label;
-            }
-        }
-    } catch (error) {
-        logger.warn("Failed to get monitor config for identifier label", error as Error);
-    }
-
-    // Fallback to hardcoded labels - these should be dynamically determined
-    // but we keep them for backward compatibility
-    if (selectedMonitor.type === "http") {
-        return "Website URL";
-    }
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- hardcoded fallback and more types soon
-    if (selectedMonitor.type === "port") {
-        return "Host & Port";
-    }
-    return "Monitor Configuration";
+            // Use dynamic utility instead of hardcoded backward compatibility patterns
+            return getMonitorTypeDisplayLabel(selectedMonitor.type);
+        },
+        "Get identifier label for monitor type",
+        UiDefaults.unknownLabel
+    );
 }
 
 /**
  * Component that displays the identifier label for a monitor type.
  */
 function IdentifierLabel({ selectedMonitor }: { selectedMonitor: Monitor }) {
-    const [label, setLabel] = useState<string>("Loading...");
+    const [label, setLabel] = useState<string>(UiDefaults.loadingLabel);
 
     useEffect(() => {
         let isCancelled = false;
 
         const loadLabel = async () => {
-            try {
-                const identifierLabel = await getIdentifierLabel(selectedMonitor);
-                if (!isCancelled) {
-                    setLabel(identifierLabel);
-                }
-            } catch (error) {
-                logger.warn("Failed to load identifier label", error as Error);
-                if (!isCancelled) {
-                    setLabel("Identifier");
-                }
+            const identifierLabel = await getIdentifierLabel(selectedMonitor);
+            if (!isCancelled) {
+                setLabel(identifierLabel);
             }
         };
 

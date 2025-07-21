@@ -23,6 +23,7 @@ import {
 } from "../../theme/components";
 import { ThemeName } from "../../theme/types";
 import { useTheme } from "../../theme/useTheme";
+import { ensureError } from "../../utils/errorHandling";
 
 /** Props for the Settings component */
 interface SettingsProperties {
@@ -99,10 +100,7 @@ export function Settings({ onClose }: Readonly<SettingsProperties>) {
             await updateHistoryLimitValue(limit);
             logger.user.settingsChange("historyLimit", settings.historyLimit, limit);
         } catch (error) {
-            logger.error(
-                "Failed to update history limit from settings",
-                error instanceof Error ? error : new Error(String(error))
-            );
+            logger.error("Failed to update history limit from settings", ensureError(error));
             // Error is already handled by the store action
         }
     };
@@ -129,7 +127,7 @@ export function Settings({ onClose }: Readonly<SettingsProperties>) {
             setSyncSuccess(true);
             logger.user.action("Synced data from SQLite backend");
         } catch (error: unknown) {
-            logger.error("Failed to sync data from backend", error instanceof Error ? error : new Error(String(error)));
+            logger.error("Failed to sync data from backend", ensureError(error));
             setError(
                 `Failed to sync data: ${
                     error && typeof error === "object" && "message" in error
@@ -147,7 +145,7 @@ export function Settings({ onClose }: Readonly<SettingsProperties>) {
             await downloadSQLiteBackup();
             logger.user.action("Downloaded SQLite backup");
         } catch (error: unknown) {
-            logger.error("Failed to download SQLite backup", error instanceof Error ? error : new Error(String(error)));
+            logger.error("Failed to download SQLite backup", ensureError(error));
             setError(
                 `Failed to download SQLite backup: ${
                     error && typeof error === "object" && "message" in error

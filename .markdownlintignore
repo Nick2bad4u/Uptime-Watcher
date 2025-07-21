@@ -10,7 +10,6 @@ docs/Validator.md
 .markdownlintignore
 .github/prompts/*.md
 LICENSE
-docs/
 .github/instructions/*.md
 docs/guides/Documentation-Contribution.md
 deps

@@ -13,9 +13,10 @@ import type { Monitor, MonitorType } from "../../types";
 import type { AddSiteFormActions, AddSiteFormState } from "../SiteDetails/useAddSiteForm";
 
 import { DEFAULT_REQUEST_TIMEOUT, RETRY_CONSTRAINTS } from "../../constants";
-import logger, { type Logger } from "../../services/logger";
-import { getMonitorTypeConfig } from "../../utils/monitorTypeHelper";
-import { validateMonitorData } from "../../utils/monitorValidation";
+import { type Logger } from "../../services/logger";
+import { withUtilityErrorHandling } from "../../utils/errorHandling";
+import { truncateForLogging } from "../../utils/fallbacks";
+import { validateMonitorFieldClientSide, validateMonitorFormData } from "../../utils/monitorValidation";
 
 /**
  * Properties interface for form submission handling.
@@ -112,7 +113,7 @@ export async function handleSubmit(event: React.FormEvent, properties: FormSubmi
     const validationErrors: string[] = [
         ...validateAddMode(addMode, name, selectedExistingSite),
         ...(await validateMonitorType(monitorType, url, host, port)),
-        ...validateCheckInterval(checkInterval),
+        ...(await validateCheckInterval(checkInterval)),
     ];
 
     // Handle validation failures
@@ -122,11 +123,11 @@ export async function handleSubmit(event: React.FormEvent, properties: FormSubmi
             formData: {
                 addMode,
                 checkInterval,
-                host: host.slice(0, 50), // Truncate for privacy
+                host: truncateForLogging(host),
                 monitorType,
-                name: name.slice(0, 50), // Truncate for privacy
+                name: truncateForLogging(name),
                 port,
-                url: url.slice(0, 50), // Truncate for privacy
+                url: truncateForLogging(url),
             },
         });
 
@@ -137,12 +138,18 @@ export async function handleSubmit(event: React.FormEvent, properties: FormSubmi
 
     clearError();
 
-    try {
-        const monitor = await createMonitor(properties);
-        await performSubmission(properties, monitor);
-        onSuccess?.();
-    } catch (error) {
-        logger.error("Failed to add site/monitor from form", error instanceof Error ? error : new Error(String(error)));
+    const result = await withUtilityErrorHandling(
+        async () => {
+            const monitor = createMonitor(properties);
+            await performSubmission(properties, monitor);
+            onSuccess?.();
+            return true; // Success indicator
+        },
+        "Add site/monitor from form",
+        false // Return false on failure
+    );
+
+    if (!result) {
         setFormError("Failed to add site/monitor. Please try again.");
     }
 }
@@ -169,79 +176,38 @@ async function addToExistingSite(properties: FormSubmitProperties, monitor: Moni
  * @param formData - Form data containing field values
  * @returns Monitor data object with type-specific fields
  */
-async function buildMonitorData(
+/**
+ * Builds monitor data object with type-specific fields.
+ *
+ * @param monitorType - Type of monitor
+ * @param formData - Form data containing field values
+ * @returns Monitor data object with type-specific fields
+ */
+function buildMonitorData(
     monitorType: MonitorType,
     formData: { host: string; port: string; url: string }
-): Promise<Record<string, unknown>> {
+): Record<string, unknown> {
     const monitorData: Record<string, unknown> = {
         type: monitorType,
     };
 
-    try {
-        const config = await getMonitorTypeConfig(monitorType);
-        if (config?.fields) {
-            return buildMonitorDataFromConfig(config, formData, monitorData);
-        } else {
-            return buildMonitorDataFallback(monitorType, formData, monitorData);
-        }
-    } catch (error) {
-        logger.warn("Failed to get monitor config, using fallback mapping", error as Error);
-        return buildMonitorDataFallback(monitorType, formData, monitorData);
-    }
-}
-
-/**
- * Builds monitor data using fallback hardcoded mapping.
- */
-function buildMonitorDataFallback(
-    monitorType: MonitorType,
-    formData: { host: string; port: string; url: string },
-    monitorData: Record<string, unknown>
-): Record<string, unknown> {
-    // Fallback to hardcoded mapping for backward compatibility and error recovery
-    // This ensures the form continues to work even if the registry is unavailable
+    // Build type-specific fields based on monitor type
     if (monitorType === "http") {
         monitorData.url = formData.url.trim();
     }
+
     if (monitorType === "port") {
         monitorData.host = formData.host.trim();
         monitorData.port = Number(formData.port);
     }
-    return monitorData;
-}
 
-/**
- * Builds monitor data using dynamic configuration.
- */
-function buildMonitorDataFromConfig(
-    config: { fields: { name: string; type: string }[] },
-    formData: { host: string; port: string; url: string },
-    monitorData: Record<string, unknown>
-): Record<string, unknown> {
-    for (const field of config.fields) {
-        const fieldName = field.name;
-        if (fieldName in formData) {
-            const value = formData[fieldName as keyof typeof formData];
-            const trimmedValue = value.trim();
-            if (trimmedValue) {
-                // Convert value based on field type
-                if (field.type === "number") {
-                    // eslint-disable-next-line security/detect-object-injection -- fieldName comes from trusted monitor config
-                    monitorData[fieldName] = Number(trimmedValue);
-                } else {
-                    // eslint-disable-next-line security/detect-object-injection -- fieldName comes from trusted monitor config
-                    monitorData[fieldName] = trimmedValue;
-                }
-            }
-        }
-    }
     return monitorData;
 }
 
 /**
  * Creates a monitor object based on the form data.
  */
-async function createMonitor(properties: FormSubmitProperties): Promise<Monitor> {
+function createMonitor(properties: FormSubmitProperties): Monitor {
     const { checkInterval, generateUuid, host, monitorType, port, url } = properties;
 
     const monitor: Monitor = {
@@ -257,7 +223,7 @@ async function createMonitor(properties: FormSubmitProperties): Promise<Monitor>
     };
 
     // Add type-specific fields dynamically using monitor config
-    const monitorData = await buildMonitorData(monitorType, { host, port, url });
+    const monitorData = buildMonitorData(monitorType, { host, port, url });
 
     // Copy the type-specific fields to the monitor object
     for (const [key, value] of Object.entries(monitorData)) {
@@ -331,23 +297,24 @@ function validateAddMode(addMode: string, name: string, selectedExistingSite: st
 }
 
 /**
- * Validates check interval configuration.
+ * Validates check interval configuration using shared schema.
  *
  * @param checkInterval - Check interval in milliseconds
  * @returns Array of validation error messages
  */
-function validateCheckInterval(checkInterval: number): string[] {
-    const errors: string[] = [];
-
-    if (!checkInterval || checkInterval <= 0) {
-        errors.push("Check interval must be a positive number");
-    }
-
-    return errors;
+async function validateCheckInterval(checkInterval: number): Promise<string[]> {
+    return withUtilityErrorHandling(
+        async () => {
+            const validationResult = await validateMonitorFieldClientSide("http", "checkInterval", checkInterval);
+            return validationResult.success ? [] : validationResult.errors;
+        },
+        "Validate check interval",
+        [`Check interval validation failed`]
+    );
 }
 
 /**
- * Validates monitor type-specific configuration using backend registry.
+ * Validates monitor type-specific configuration using form validation.
  *
  * @param monitorType - Type of monitor
  * @param url - URL for HTTP monitors
@@ -356,10 +323,20 @@ function validateCheckInterval(checkInterval: number): string[] {
  * @returns Promise resolving to array of validation error messages
  */
 async function validateMonitorType(monitorType: string, url: string, host: string, port: string): Promise<string[]> {
-    // Build monitor data object dynamically
-    const monitorData = await buildMonitorData(monitorType as MonitorType, { host, port, url });
+    // Build form data object with only the relevant fields
+    const formData: Record<string, unknown> = {
+        type: monitorType,
+    };
 
-    // Use backend registry validation
-    const result = await validateMonitorData(monitorType as MonitorType, monitorData);
+    // Add type-specific fields
+    if (monitorType === "http") {
+        formData.url = url.trim();
+    } else if (monitorType === "port") {
+        formData.host = host.trim();
+        formData.port = Number(port);
+    }
+
+    // Use form validation that only validates provided fields
+    const result = await validateMonitorFormData(monitorType as MonitorType, formData);
     return result.errors;
 }
