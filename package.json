@@ -1,6 +1,6 @@
 {
   "name": "uptime-watcher",
-  "version": "7.9.0",
+  "version": "8.0.0",
   "description": "An Electron app to monitor website uptime status",
   "keywords": [
     "electron",
