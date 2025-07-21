@@ -24,6 +24,9 @@ declare global {
                 importData: (data: string) => Promise<boolean>;
             };
             events: {
+                onCacheInvalidated: (
+                    callback: (data: { identifier?: string; reason: string; type: "all" | "monitor" | "site" }) => void
+                ) => () => void;
                 onMonitorDown: (callback: (data: unknown) => void) => () => void;
                 onMonitoringStarted: (callback: (data: { monitorId: string; siteId: string }) => void) => () => void;
                 onMonitoringStopped: (callback: (data: { monitorId: string; siteId: string }) => void) => () => void;
@@ -141,6 +144,10 @@ declare global {
              * Event management for real-time updates and communication.
              */
             events: {
+                /** Register callback for cache invalidation events */
+                onCacheInvalidated: (
+                    callback: (data: { identifier?: string; reason: string; type: "all" | "monitor" | "site" }) => void
+                ) => () => void;
                 /** Register callback for monitor down events */
                 onMonitorDown: (callback: (data: unknown) => void) => () => void;
                 /** Register callback for monitoring started events */

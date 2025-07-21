@@ -411,6 +411,7 @@ export class StandardizedCache<T> {
     private notifyInvalidation(key?: string): void {
         for (const callback of this.invalidationCallbacks) {
             try {
+                // eslint-disable-next-line n/callback-return -- This is a synchronous callback notification, not an async callback
                 callback(key);
             } catch (error) {
                 logger.error(`[Cache:${this.config.name}] Error in invalidation callback:`, error);

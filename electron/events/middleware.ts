@@ -2,9 +2,12 @@
  * Pre-built middleware functions for the TypedEventBus.
  * Provides common functionality like logging, metrics, and filtering.
  */
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable n/callback-return -- Core service for data backup operations */
 
 import type { EventMiddleware } from "./TypedEventBus";
 
+import { isDevelopment } from "../../shared/utils/environment";
 import { logger as baseLogger } from "../utils/logger";
 
 const logger = baseLogger;
@@ -24,6 +27,7 @@ export function composeMiddleware(...middlewares: EventMiddleware[]): EventMiddl
                 const middleware = middlewares[state.index++];
                 if (middleware) {
                     await middleware(event, data, processNext);
+                    return;
                 }
             } else {
                 await next();
@@ -38,7 +42,7 @@ export function composeMiddleware(...middlewares: EventMiddleware[]): EventMiddl
  * Debug middleware that provides detailed debugging information.
  */
 export function createDebugMiddleware(options: { enabled?: boolean; verbose?: boolean }): EventMiddleware {
-    const { enabled = process.env.NODE_ENV === "development", verbose = false } = options;
+    const { enabled = isDevelopment(), verbose = false } = options;
 
     return async (event: string, data: unknown, next: () => Promise<void> | void) => {
         if (!enabled) {
@@ -77,6 +81,7 @@ export function createErrorHandlingMiddleware(options: {
     return async (event: string, data: unknown, next: () => Promise<void> | void) => {
         try {
             await next();
+            return;
         } catch (error) {
             const err = error instanceof Error ? error : new Error(String(error));
 
@@ -93,6 +98,7 @@ export function createErrorHandlingMiddleware(options: {
             if (!continueOnError) {
                 throw err;
             }
+            return;
         }
     };
 }

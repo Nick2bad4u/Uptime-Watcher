@@ -3,6 +3,8 @@
  * Provides consistent string conversion handling for database operations and data mapping.
  */
 
+import { safeJsonStringifyWithFallback } from "./jsonSafety";
+
 /**
  * Safely convert a value to string, handling complex objects appropriately.
  *
@@ -45,22 +47,8 @@ export function safeStringify(value: unknown): string {
         return String(value);
     }
     if (typeof value === "object") {
-        // For objects, try JSON.stringify for better representation
-        // This avoids the '[object Object]' issue that SonarCloud flags
-        try {
-            return JSON.stringify(value);
-        } catch {
-            // Fallback for objects that can't be JSON serialized (e.g., circular references)
-            // Use a safer approach than String(value) which produces '[object Object]'
-            if (value && typeof value.toString === "function" && value.toString !== Object.prototype.toString) {
-                try {
-                    return value.toString();
-                } catch {
-                    return "[Complex Object]";
-                }
-            }
-            return "[Object]";
-        }
+        // For objects, use safe JSON stringify with comprehensive fallback handling
+        return safeJsonStringifyWithFallback(value, "[Complex Object]");
     }
 
     // Handle remaining types (functions, symbols, etc.) without '[object Object]'

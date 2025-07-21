@@ -9,6 +9,8 @@
 
 import { app } from "electron";
 
+import { isDevelopment } from "../shared/utils/environment";
+
 /**
  * Determines if the application is running in development mode.
  *
@@ -31,5 +33,5 @@ import { app } from "electron";
  * @public
  */
 export function isDev(): boolean {
-    return process.env.NODE_ENV === "development" || !app.isPackaged;
+    return isDevelopment() || !app.isPackaged;
 }

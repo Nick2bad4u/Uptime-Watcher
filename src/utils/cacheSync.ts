@@ -23,19 +23,16 @@ interface CacheInvalidationData {
  * @returns Cleanup function to remove event listeners
  */
 export function setupCacheSync(): () => void {
-    // Check if cache invalidation events are available
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-    const eventsAPI = window.electronAPI?.events as any;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    if (!eventsAPI?.onCacheInvalidated) {
+    // Check if we're in an Electron environment with cache invalidation events available
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (typeof window === "undefined" || !window.electronAPI) {
         logger.warn("Cache invalidation events not available - frontend cache sync disabled");
         return () => {
             // No-op cleanup
         };
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-    const cleanup = eventsAPI.onCacheInvalidated((data: CacheInvalidationData) => {
+    const cleanup = window.electronAPI.events.onCacheInvalidated((data: CacheInvalidationData) => {
         try {
             logger.debug("Received cache invalidation event", data);
 

@@ -7,6 +7,7 @@
 
 import { ERROR_MESSAGES, type Monitor, type MonitorType, type Site } from "@shared/types";
 
+import { isDevelopment } from "../../../shared/utils/environment";
 import { useErrorStore } from "../error/useErrorStore";
 import { logStoreAction, withErrorHandling } from "../utils";
 import { MonitoringService } from "./services/MonitoringService";
@@ -129,7 +130,7 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                             await MonitoringService.stopMonitoring(identifier, monitor.id);
                         } catch (error) {
                             // Log but do not block deletion if stopping fails
-                            if (process.env.NODE_ENV === "development") {
+                            if (isDevelopment()) {
                                 console.warn(
                                     `Failed to stop monitoring for monitor ${monitor.id} of site ${identifier}:`,
                                     error
@@ -234,7 +235,7 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
                     await MonitoringService.stopMonitoring(siteId, monitorId);
                 } catch (error) {
                     // Log but do not block removal if stopping fails
-                    if (process.env.NODE_ENV === "development") {
+                    if (isDevelopment()) {
                         console.warn(`Failed to stop monitoring for monitor ${monitorId} of site ${siteId}:`, error);
                     }
                 }

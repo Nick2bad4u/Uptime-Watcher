@@ -39,6 +39,7 @@ import { BrowserWindow } from "electron";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { getNodeEnv } from "../../../shared/utils/environment";
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
 
@@ -155,7 +156,7 @@ export class WindowService {
 
         if (isDev()) {
             logger.debug("[WindowService] Development mode: waiting for Vite dev server");
-            logger.debug("[WindowService] NODE_ENV:", process.env.NODE_ENV);
+            logger.debug("[WindowService] NODE_ENV:", getNodeEnv());
             // Load from Vite dev server
             // Wait for Vite server before loading content
             void this.loadDevelopmentContent();

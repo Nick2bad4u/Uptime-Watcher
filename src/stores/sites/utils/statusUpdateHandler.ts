@@ -5,6 +5,7 @@
 
 import type { Site, StatusUpdate } from "@shared/types";
 
+import { isDevelopment } from "../../../../shared/utils/environment";
 import logger from "../../../services/logger";
 import { ensureError, withUtilityErrorHandling } from "../../../utils/errorHandling";
 import { logStoreAction, waitForElectronAPI } from "../../utils";
@@ -188,7 +189,7 @@ export function createStatusUpdateHandler(options: StatusUpdateHandlerOptions) {
                 }
             } else {
                 // Site not found in current state - trigger full sync as fallback
-                if (process.env.NODE_ENV === "development") {
+                if (isDevelopment()) {
                     logger.warn(
                         `Site ${update.site?.identifier ?? update.siteIdentifier} not found in store, triggering full sync`
                     );

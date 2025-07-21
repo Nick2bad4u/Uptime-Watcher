@@ -194,6 +194,7 @@ async function processAllSiteMonitors(
     for (const monitor of validMonitors) {
         if (monitor.id) {
             try {
+                // eslint-disable-next-line n/callback-return -- This is a processing callback, not an async Node.js callback
                 const result = await callback(identifier, monitor.id);
                 results.push(result);
             } catch (error) {

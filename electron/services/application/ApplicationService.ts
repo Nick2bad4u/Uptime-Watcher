@@ -1,5 +1,6 @@
 import { app } from "electron";
 
+import { isDevelopment } from "../../../shared/utils/environment";
 import { logger } from "../../utils/logger";
 import { ServiceContainer } from "../ServiceContainer";
 
@@ -19,7 +20,7 @@ export class ApplicationService {
 
         // Get service container instance
         this.serviceContainer = ServiceContainer.getInstance({
-            enableDebugLogging: process.env.NODE_ENV === "development",
+            enableDebugLogging: isDevelopment(),
         });
 
         this.setupApplication();

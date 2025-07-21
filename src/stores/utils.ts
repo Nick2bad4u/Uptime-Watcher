@@ -9,6 +9,7 @@
  * @packageDocumentation
  */
 
+import { isDevelopment } from "../../shared/utils/environment";
 import logger from "../services/logger";
 import { BaseStore } from "./types";
 
@@ -134,7 +135,7 @@ export const debounce = <T extends unknown[]>(
  * @public
  */
 export const logStoreAction = (storeName: string, actionName: string, data?: unknown) => {
-    if (process.env.NODE_ENV === "development") {
+    if (isDevelopment()) {
         if (data !== undefined) {
             logger.info(`[${storeName}] ${actionName}`, data);
         } else {

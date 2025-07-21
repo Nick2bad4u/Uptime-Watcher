@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 
 import type { StatusUpdate } from "./types";
 
+import { isDevelopment, isProduction } from "../shared/utils/environment";
 import { AddSiteForm } from "./components/AddSiteForm/AddSiteForm";
 import { SiteList } from "./components/Dashboard/SiteList";
 import { Header } from "./components/Header/Header";
@@ -110,7 +111,7 @@ function App() {
         let cacheSyncCleanup: (() => void) | undefined;
 
         const initializeApp = async () => {
-            if (process.env.NODE_ENV === "production") {
+            if (isProduction()) {
                 logger.app.started();
             }
 
@@ -122,12 +123,13 @@ function App() {
             await Promise.all([sitesStore.initializeSites(), settingsStore.initializeSettings()]);
 
             // Set up cache synchronization with backend
+            // eslint-disable-next-line n/no-sync -- Function name contains 'sync' but is not a synchronous file operation
             cacheSyncCleanup = setupCacheSync();
 
             // Subscribe to status updates
             sitesStore.subscribeToStatusUpdates((update: StatusUpdate) => {
                 // Optional callback for additional processing if needed
-                if (process.env.NODE_ENV === "development") {
+                if (isDevelopment()) {
                     const timestamp = new Date().toLocaleTimeString();
                     logger.debug(
                         `[${timestamp}] Status update received for site: ${update.site?.identifier ?? update.siteIdentifier}`
@@ -147,6 +149,7 @@ function App() {
     }, []); // Empty dependency array - this should only run once
 
     // Focus-based state synchronization (disabled by default for performance)
+    // eslint-disable-next-line n/no-sync -- Function name contains 'sync' but is not a synchronous file operation
     useBackendFocusSync(false); // Set to true to enable focus-based backend sync
 
     const selectedSite = useSelectedSite();

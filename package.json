@@ -8,6 +8,9 @@
     "uptime",
     "monitoring"
   ],
+  "engines": {
+    "node": ">=23.0.0"
+  },
   "homepage": "https://github.com/Nick2bad4u/Uptime-Watcher",
   "bugs": {
     "url": "https://github.com/Nick2bad4u/Uptime-Watcher/issues",
@@ -207,7 +210,7 @@
     "test:watch": "vitest --watch",
     "test:watch:electron": "vitest --config vitest.electron.config.ts --watch",
     "test:watch:frontend": "vitest --watch",
-    "type-check": "tsc --noEmit",
+    "type-check": "npm run check:all",
     "validate:components": "node ./scripts/validate-components.js"
   },
   "overrides": {
@@ -254,6 +257,7 @@
     "@playwright/test": "^1.54.1",
     "@putout/eslint": "^4.1.0",
     "@putout/eslint-flat": "^3.0.1",
+    "@stylistic/eslint-plugin": "^5.2.0",
     "@tailwindcss/postcss": "^4.1.11",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
@@ -313,6 +317,8 @@
     "eslint-plugin-json": "^4.0.1",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-markdown": "^5.1.0",
+    "eslint-plugin-n": "^17.21.0",
+    "eslint-plugin-no-only-tests": "^3.3.0",
     "eslint-plugin-perfectionist": "^4.15.0",
     "eslint-plugin-prefer-arrow": "^1.2.3",
     "eslint-plugin-prettier": "^5.5.3",

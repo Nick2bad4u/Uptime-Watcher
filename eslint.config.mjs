@@ -45,6 +45,10 @@ import jsoncEslintParser from "jsonc-eslint-parser";
 import reactRefresh from "eslint-plugin-react-refresh";
 import putout from "eslint-plugin-putout";
 import { defineConfig } from "eslint/config";
+import pluginNoOnly from "eslint-plugin-no-only-tests";
+import nodePlugin from "eslint-plugin-n";
+import stylistic from '@stylistic/eslint-plugin'
+
 
 const __dirname = import.meta.dirname;
 
@@ -175,6 +179,7 @@ export default [
                 { type: "utils", pattern: "src/utils/**/*" },
                 { type: "types", pattern: "src/types.ts" },
             ],
+            n: { allowModules: ["electron", "node", "electron-devtools-installer"] },
             "import/resolver": {
                 // You will also need to install and configure the TypeScript resolver
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
@@ -207,6 +212,7 @@ export default [
             "react-refresh": reactRefresh,
             putout: putout,
             regexp: pluginRegexp,
+            n: nodePlugin,
         },
         rules: {
             // TypeScript rules
@@ -226,6 +232,12 @@ export default [
             ...pluginPerfectionist.configs["recommended-natural"].rules,
             ...pluginBoundaries.configs.recommended.rules,
             ...pluginRedos.configs.recommended.rules,
+            ...nodePlugin.configs["flat/all"].rules,
+
+            "n/no-missing-file-extension": "off", // Allow missing file extensions for imports
+            "n/file-extension-in-import": "off", // Allow missing file extensions for imports
+            "n/no-missing-import": "off", // Allow missing imports for dynamic imports
+            "n/no-unsupported-features/es-syntax": "off", // Allow modern ES2024+ syntax
 
             "putout/array-element-newline": "off",
             "putout/single-property-destructuring": "off",
@@ -486,6 +498,7 @@ export default [
         },
         settings: {
             react: { version: "19" },
+            n: { allowModules: ["electron", "node", "electron-devtools-installer"] },
             "boundaries/elements": [
                 { type: "main", pattern: "electron/main.ts" },
                 { type: "preload", pattern: "electron/preload.ts" },
@@ -526,6 +539,7 @@ export default [
             tsdoc: pluginTsdoc,
             regexp: pluginRegexp,
             putout: putout,
+            n: nodePlugin,
         },
         rules: {
             // TypeScript backend rules
@@ -544,6 +558,12 @@ export default [
             ...pluginPerfectionist.configs["recommended-natural"].rules,
             ...pluginBoundaries.configs.recommended.rules,
             ...pluginRedos.configs.recommended.rules,
+            ...nodePlugin.configs["flat/all"].rules,
+
+            "n/no-missing-file-extension": "off", // Allow missing file extensions for imports
+            "n/file-extension-in-import": "off", // Allow missing file extensions for imports
+            "n/no-missing-import": "off", // Allow missing imports for dynamic imports
+            "n/no-unsupported-features/es-syntax": "off", // Allow modern ES2024+ syntax
 
             "unicorn/prefer-global-this": "off", // Not suitable for Electron
             "unicorn/prevent-abbreviations": "off", // Too many false positives
@@ -837,6 +857,7 @@ export default [
             vitest,
             pluginImport: pluginImport,
             "unused-imports": pluginUnusedImports,
+            "no-only-tests": pluginNoOnly,
         },
         rules: {
             ...tseslint.configs.recommended.rules,
@@ -850,6 +871,9 @@ export default [
             "@typescript-eslint/no-restricted-types": "off", // Tests may need generic Function types
             "@typescript-eslint/no-unsafe-function-type": "off", // Tests may use generic handlers
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
+
+            // No Only Tests
+            "no-only-tests/no-only-tests": "error",
         },
     },
 

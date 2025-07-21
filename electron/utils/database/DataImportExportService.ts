@@ -5,6 +5,7 @@
 
 import { Database } from "node-sqlite3-wasm";
 
+import { safeJsonParse, safeJsonStringifyWithFallback } from "../../../shared/utils/jsonSafety";
 import { UptimeEvents } from "../../events/eventTypes";
 import { TypedEventBus } from "../../events/TypedEventBus";
 import { DatabaseService } from "../../services/database/DatabaseService";
@@ -81,7 +82,7 @@ export class DataImportExportService {
                 version: "1.0",
             };
 
-            return JSON.stringify(exportData, undefined, 2);
+            return safeJsonStringifyWithFallback(exportData, "{}", 2);
         } catch (error) {
             const message = `Failed to export data: ${error instanceof Error ? error.message : String(error)}`;
             this.logger.error(message, error);
@@ -103,17 +104,17 @@ export class DataImportExportService {
      */
     async importDataFromJson(jsonData: string): Promise<{ settings: Record<string, string>; sites: ImportSite[] }> {
         try {
-            // Parse and validate the JSON data
-            const data: unknown = JSON.parse(jsonData);
+            // Parse and validate the JSON data using safe parsing
+            const parseResult = safeJsonParse(jsonData, isImportData);
 
-            // Use the top-level isImportData function
-            if (!isImportData(data)) {
-                throw new Error("Invalid import data format: missing or invalid sites array");
+            if (!parseResult.success || !parseResult.data) {
+                throw new Error(`Invalid import data format: ${parseResult.error ?? "Unknown parsing error"}`);
             }
 
+            const validatedData = parseResult.data;
             return {
-                settings: (data as { settings?: Record<string, string> }).settings ?? {},
-                sites: (data as { sites: ImportSite[] }).sites,
+                settings: validatedData.settings ?? {},
+                sites: validatedData.sites,
             };
         } catch (error) {
             const message = `Failed to parse import data: ${error instanceof Error ? error.message : String(error)}`;

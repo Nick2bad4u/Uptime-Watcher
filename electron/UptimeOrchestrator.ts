@@ -229,21 +229,18 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             if (site) {
                 try {
                     await this.siteManager.removeSite(site.identifier);
-                    /* v8 ignore next 2 */ logger.info(
+                    logger.info(
                         `[UptimeOrchestrator] Cleaned up site ${site.identifier} after monitoring setup failure`
                     );
                 } catch (cleanupError) {
-                    /* v8 ignore next 2 */ logger.error(
+                    logger.error(
                         `[UptimeOrchestrator] Failed to cleanup site ${site.identifier} after monitoring setup failure:`,
                         cleanupError
                     );
                 }
             }
 
-            /* v8 ignore next 2 */ logger.error(
-                `[UptimeOrchestrator] Failed to add site ${siteData.identifier}:`,
-                error
-            );
+            logger.error(`[UptimeOrchestrator] Failed to add site ${siteData.identifier}:`, error);
             throw error;
         }
     }
@@ -361,11 +358,11 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             if (monitoringStopped) {
                 try {
                     await this.monitorManager.startMonitoringForSite(siteIdentifier, monitorId);
-                    /* v8 ignore next 2 */ logger.info(
+                    logger.info(
                         `[UptimeOrchestrator] Restarted monitoring for ${siteIdentifier}/${monitorId} after failed removal`
                     );
                 } catch (restartError) {
-                    /* v8 ignore next 2 */ logger.error(
+                    logger.error(
                         `[UptimeOrchestrator] Failed to restart monitoring for ${siteIdentifier}/${monitorId} after failed removal:`,
                         restartError
                     );
@@ -374,10 +371,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
 
             return false;
         } catch (error) {
-            /* v8 ignore next 2 */ logger.error(
-                `[UptimeOrchestrator] Failed to remove monitor ${siteIdentifier}/${monitorId}:`,
-                error
-            );
+            logger.error(`[UptimeOrchestrator] Failed to remove monitor ${siteIdentifier}/${monitorId}:`, error);
             throw error;
         }
     }
@@ -480,7 +474,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                             await this.monitorManager.setupSiteForMonitoring(site);
                             return { site: site.identifier, success: true };
                         } catch (error) {
-                            /* v8 ignore next 2 */ logger.error(
+                            logger.error(
                                 `[UptimeOrchestrator] Failed to setup monitoring for site ${site.identifier}:`,
                                 error
                             );
@@ -496,11 +490,11 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                 const failed = setupResults.length - successful;
 
                 if (failed > 0) {
-                    /* v8 ignore next 2 */ logger.warn(
+                    logger.warn(
                         `[UptimeOrchestrator] Site monitoring setup completed: ${successful} successful, ${failed} failed`
                     );
                 } else {
-                    /* v8 ignore next 2 */ logger.info(
+                    logger.info(
                         `[UptimeOrchestrator] Successfully set up monitoring for all ${successful} loaded sites`
                     );
                 }
@@ -528,10 +522,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                         timestamp: Date.now(),
                     });
                 } catch (error) {
-                    /* v8 ignore next 2 */ logger.error(
-                        "[UptimeOrchestrator] Error handling internal:database:initialized:",
-                        error
-                    );
+                    logger.error("[UptimeOrchestrator] Error handling internal:database:initialized:", error);
                 }
             })();
         });
@@ -611,10 +602,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                         timestamp: Date.now(),
                     });
                 } catch (error) {
-                    /* v8 ignore next 2 */ logger.error(
-                        "[UptimeOrchestrator] Error handling internal:monitor:started:",
-                        error
-                    );
+                    logger.error("[UptimeOrchestrator] Error handling internal:monitor:started:", error);
                 }
             })();
         });
@@ -632,10 +620,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                         timestamp: Date.now(),
                     });
                 } catch (error) {
-                    /* v8 ignore next 2 */ logger.error(
-                        "[UptimeOrchestrator] Error handling internal:monitor:stopped:",
-                        error
-                    );
+                    logger.error("[UptimeOrchestrator] Error handling internal:monitor:stopped:", error);
                 }
             })();
         });
@@ -657,10 +642,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                         timestamp: Date.now(),
                     });
                 } catch (error) {
-                    /* v8 ignore next 2 */ logger.error(
-                        `[UptimeOrchestrator] Error starting monitoring for site ${data.identifier}:`,
-                        error
-                    );
+                    logger.error(`[UptimeOrchestrator] Error starting monitoring for site ${data.identifier}:`, error);
                     await this.emitTyped("internal:site:start-monitoring-response", {
                         identifier: data.identifier,
                         monitorId: data.monitorId,
@@ -684,10 +666,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                         timestamp: Date.now(),
                     });
                 } catch (error) {
-                    /* v8 ignore next 2 */ logger.error(
-                        `[UptimeOrchestrator] Error stopping monitoring for site ${data.identifier}:`,
-                        error
-                    );
+                    logger.error(`[UptimeOrchestrator] Error stopping monitoring for site ${data.identifier}:`, error);
                     await this.emitTyped("internal:site:stop-monitoring-response", {
                         identifier: data.identifier,
                         monitorId: data.monitorId,

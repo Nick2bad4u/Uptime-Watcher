@@ -64,6 +64,7 @@ export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActio
             try {
                 return await withErrorHandling(
                     async () => {
+                        // eslint-disable-next-line n/no-sync -- Method name contains 'sync' but is not a synchronous file operation
                         const status = await window.electronAPI.stateSync.getSyncStatus();
                         logStoreAction("SitesStore", "getSyncStatus", {
                             message: "Sync status retrieved",
@@ -111,6 +112,7 @@ export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActio
             return result;
         },
         subscribeToSyncEvents: () => {
+            // eslint-disable-next-line n/no-sync -- Switch case handles 'sync' event types, not synchronous file operations
             const cleanup = window.electronAPI.stateSync.onStateSyncEvent((event) => {
                 logStoreAction("SitesStore", "syncEventReceived", {
                     action: event.action,
