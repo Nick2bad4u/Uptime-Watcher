@@ -12,7 +12,7 @@ The Uptime Watcher application now uses a **single source of truth** for all cor
 shared/
 ├── types.ts                    # 🎯 SINGLE SOURCE OF TRUTH
 │   ├── MonitorType            # "http" | "port"
-│   ├── MonitorStatus          # "up" | "down" | "pending" | "paused"  
+│   ├── MonitorStatus          # "up" | "down" | "pending" | "paused"
 │   ├── SiteStatus             # MonitorStatus | "mixed" | "unknown"
 │   ├── Monitor                # Core monitor interface
 │   ├── Site                   # Core site interface

@@ -23,11 +23,11 @@ This report identifies critical consistency issues across the Uptime Watcher cod
 
 ```typescript
 // ❌ Current (hardcoded)
-status: "down" | "paused" | "pending" | "unknown" | "up"
+status: "down" | "paused" | "pending" | "unknown" | "up";
 
 // ✅ Should be (from shared types)
 import type { MonitorStatus, SiteStatus } from "@shared/types";
-status: MonitorStatus
+status: MonitorStatus;
 ```
 
 **Impact**: Type safety violations, potential runtime errors, maintenance overhead
@@ -56,9 +56,9 @@ export function validateMonitor(monitor: Partial<Monitor>): monitor is Monitor {
 
 ```typescript
 export function validateMonitorData(type: string, data: unknown) {
-    // Uses Zod schemas with comprehensive validation
-    const schema = VALIDATION_SCHEMAS[type];
-    return schema.safeParse(data);
+ // Uses Zod schemas with comprehensive validation
+ const schema = VALIDATION_SCHEMAS[type];
+ return schema.safeParse(data);
 }
 ```
 
@@ -158,6 +158,6 @@ config.logger.error(`[operation] Failed`, error);
 ## Priority Order for Implementation
 
 1. **CRITICAL**: Fix hardcoded status types (immediate type safety risk)
-2. **HIGH**: Unify validation logic (data integrity risk)  
+2. **HIGH**: Unify validation logic (data integrity risk)
 3. **MEDIUM**: Standardize error handling (debugging/maintenance)
 4. **LOW**: Clean up import patterns (code organization)

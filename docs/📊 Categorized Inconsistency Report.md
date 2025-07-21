@@ -196,6 +196,7 @@ console.error("message");
 ### Phase 1: Critical Issues (Week 1)
 
 1. **Unify Monitor Interface** - HIGH PRIORITY
+
    - Remove duplicate Monitor interface from `src/types.ts`
    - Import Monitor from `electron/types.ts`
    - Update all frontend imports
@@ -209,6 +210,7 @@ console.error("message");
 ### Phase 2: Major Issues (Week 2)
 
 3. **Standardize Error Handling** - MEDIUM PRIORITY
+
    - Extend `withErrorHandling` pattern to all layers
    - Create backend equivalent that wraps `withDatabaseOperation`
    - Gradually migrate all error handling to use consistent pattern

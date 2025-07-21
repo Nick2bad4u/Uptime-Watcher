@@ -94,7 +94,7 @@ removeListener: vi.fn(), // deprecated
 // In SettingsTab.tsx - lines 419, 452
 // Fallback to hardcoded patterns for backward compatibility
 if (selectedMonitor.type === "http" && selectedMonitor.url) {
-    return selectedMonitor.url;
+ return selectedMonitor.url;
 }
 ```
 
@@ -136,7 +136,7 @@ if (selectedMonitor.type === "http" && selectedMonitor.url) {
  * Truncate sensitive data for logging (privacy protection).
  */
 export function truncateForLogging(value: string, maxLength = 50): string {
-    return value.slice(0, maxLength);
+ return value.slice(0, maxLength);
 }
 ```
 

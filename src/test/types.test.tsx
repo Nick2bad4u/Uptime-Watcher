@@ -505,12 +505,12 @@ describe("Types Module", () => {
                 name: "",
                 monitoring: false,
             };
-            const minimalUpdate: StatusUpdate = { 
+            const minimalUpdate: StatusUpdate = {
                 monitorId: "test-monitor-id",
                 status: "up",
                 siteIdentifier: site.identifier,
                 timestamp: new Date().toISOString(),
-                site 
+                site,
             };
 
             expect(minimalUpdate.previousStatus).toBeUndefined();

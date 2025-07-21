@@ -14,16 +14,19 @@
 #### **A. Scattered Error Handling Patterns:**
 
 - **Location**: `src/hooks/site/useSiteDetails.ts`
+
   - **Issue**: Multiple `.catch()` chains that are redundant with `withUtilityErrorHandling`
   - **Impact**: Inconsistent error handling, potential double logging
   - **Lines**: 210, 245, 267, 288, 307, 325, 484
 
 - **Location**: `src/hooks/site/useSiteActions.ts`
+
   - **Issue**: Direct `error instanceof Error` checks instead of `ensureError()`
   - **Impact**: Scattered type conversion logic
   - **Lines**: 48, 71, 102, 103
 
 - **Location**: `src/components/Settings/Settings.tsx`
+
   - **Issue**: Manual error type conversion
   - **Lines**: 104, 132, 150
 
@@ -49,13 +52,10 @@
 
 ```typescript
 // Utility for React event handlers that need async error handling
-export function withAsyncErrorHandling(
-    operation: () => Promise<void>,
-    operationName: string
-): () => void {
-    return () => {
-        void withUtilityErrorHandling(operation, operationName, undefined, false);
-    };
+export function withAsyncErrorHandling(operation: () => Promise<void>, operationName: string): () => void {
+ return () => {
+  void withUtilityErrorHandling(operation, operationName, undefined, false);
+ };
 }
 ```
 

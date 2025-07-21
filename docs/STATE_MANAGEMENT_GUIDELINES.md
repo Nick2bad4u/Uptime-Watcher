@@ -42,64 +42,64 @@ This document establishes **clear, consistent guidelines** for state management 
 ```typescript
 // ✅ CORRECT - Complex form with custom hook
 export interface AddSiteFormState {
-    // State properties (8+ fields)
-    url: string;
-    host: string;
-    port: string;
-    name: string;
-    monitorType: MonitorType;
-    checkInterval: number;
-    siteId: string;
-    timeout: number;
-    addMode: FormMode;
-    selectedExistingSite: string;
-    retryAttempts: number;
-    formError: string | undefined;
+ // State properties (8+ fields)
+ url: string;
+ host: string;
+ port: string;
+ name: string;
+ monitorType: MonitorType;
+ checkInterval: number;
+ siteId: string;
+ timeout: number;
+ addMode: FormMode;
+ selectedExistingSite: string;
+ retryAttempts: number;
+ formError: string | undefined;
 }
 
 export interface AddSiteFormActions {
-    // Action methods
-    setUrl: (url: string) => void;
-    setHost: (host: string) => void;
-    setPort: (port: string) => void;
-    // ... other setters
-    resetForm: () => void;
-    setFormError: (error: string | undefined) => void;
+ // Action methods
+ setUrl: (url: string) => void;
+ setHost: (host: string) => void;
+ setPort: (port: string) => void;
+ // ... other setters
+ resetForm: () => void;
+ setFormError: (error: string | undefined) => void;
 }
 
 export function useAddSiteForm(): AddSiteFormState & AddSiteFormActions {
-    const [url, setUrl] = useState("");
-    const [host, setHost] = useState("");
-    // ... other state variables
+ const [url, setUrl] = useState("");
+ const [host, setHost] = useState("");
+ // ... other state variables
 
-    // Complex validation logic
-    const validateForm = useCallback(() => {
-        // Cross-field validation
-        // Async validation calls
-        // Complex business logic
-    }, [url, host, port, monitorType]);
+ // Complex validation logic
+ const validateForm = useCallback(() => {
+  // Cross-field validation
+  // Async validation calls
+  // Complex business logic
+ }, [url, host, port, monitorType]);
 
-    // Side effects
-    useEffect(() => {
-        // Sync with external services
-        // Update dependent fields
-    }, [monitorType, addMode]);
+ // Side effects
+ useEffect(() => {
+  // Sync with external services
+  // Update dependent fields
+ }, [monitorType, addMode]);
 
-    return {
-        // State
-        url,
-        host,
-        port,
-        // ... other state
-        
-        // Actions
-        setUrl,
-        setHost,
-        setPort,
-        // ... other actions
-        resetForm,
-        setFormError,
-    };
+ return {
+  // State
+  url,
+  host,
+  port,
+  // ... other state
+
+  // Actions
+  setUrl,
+  setHost,
+  setPort,
+  // ... other actions
+  resetForm,
+  setFormError,
+ };
 }
 ```
 
@@ -177,31 +177,31 @@ export const HistoryTab = ({ selectedMonitor }: HistoryTabProperties) => {
 ```typescript
 // ✅ GOOD - Clear interfaces and type safety
 export interface FormState {
-    field1: string;
-    field2: number;
-    errors: Record<string, string>;
+ field1: string;
+ field2: number;
+ errors: Record<string, string>;
 }
 
 export interface FormActions {
-    setField1: (value: string) => void;
-    setField2: (value: number) => void;
-    validateForm: () => boolean;
-    resetForm: () => void;
+ setField1: (value: string) => void;
+ setField2: (value: number) => void;
+ validateForm: () => boolean;
+ resetForm: () => void;
 }
 
 export function useMyForm(): FormState & FormActions {
-    // Implementation with proper error handling
-    // Clear separation of concerns
-    // Memoized callbacks where appropriate
+ // Implementation with proper error handling
+ // Clear separation of concerns
+ // Memoized callbacks where appropriate
 }
 ```
 
 ```typescript
 // ❌ BAD - Unclear interfaces and mixed concerns
 export function useMyForm() {
-    // Mixed state management and business logic
-    // No clear interfaces
-    // Poor error handling
+ // Mixed state management and business logic
+ // No clear interfaces
+ // Poor error handling
 }
 ```
 
@@ -213,18 +213,18 @@ const [filter, setFilter] = useState<"all" | "specific">("all");
 const [isOpen, setIsOpen] = useState(false);
 
 const handleFilterChange = (newFilter: "all" | "specific") => {
-    setFilter(newFilter);
+ setFilter(newFilter);
 };
 ```
 
 ```typescript
 // ❌ BAD - Overly complex for simple state
 const [state, setState] = useState({
-    filter: "all",
-    isOpen: false,
-    data: [],
-    loading: false,
-    errors: {},
+ filter: "all",
+ isOpen: false,
+ data: [],
+ loading: false,
+ errors: {},
 }); // This should use a custom hook!
 ```
 
@@ -237,34 +237,34 @@ import { renderHook, act } from "@testing-library/react";
 import { useAddSiteForm } from "./useAddSiteForm";
 
 describe("useAddSiteForm", () => {
-    it("should initialize with default values", () => {
-        const { result } = renderHook(() => useAddSiteForm());
+ it("should initialize with default values", () => {
+  const { result } = renderHook(() => useAddSiteForm());
 
-        expect(result.current.url).toBe("");
-        expect(result.current.host).toBe("");
-        expect(result.current.formError).toBeUndefined();
-    });
+  expect(result.current.url).toBe("");
+  expect(result.current.host).toBe("");
+  expect(result.current.formError).toBeUndefined();
+ });
 
-    it("should update state when setters are called", () => {
-        const { result } = renderHook(() => useAddSiteForm());
+ it("should update state when setters are called", () => {
+  const { result } = renderHook(() => useAddSiteForm());
 
-        act(() => {
-            result.current.setUrl("https://example.com");
-        });
+  act(() => {
+   result.current.setUrl("https://example.com");
+  });
 
-        expect(result.current.url).toBe("https://example.com");
-    });
+  expect(result.current.url).toBe("https://example.com");
+ });
 
-    it("should validate form correctly", () => {
-        const { result } = renderHook(() => useAddSiteForm());
+ it("should validate form correctly", () => {
+  const { result } = renderHook(() => useAddSiteForm());
 
-        act(() => {
-            result.current.setUrl("invalid-url");
-        });
+  act(() => {
+   result.current.setUrl("invalid-url");
+  });
 
-        // Test validation logic
-        expect(result.current.formError).toContain("valid URL");
-    });
+  // Test validation logic
+  expect(result.current.formError).toContain("valid URL");
+ });
 });
 ```
 
@@ -294,16 +294,16 @@ describe("HistoryTab", () => {
 ```typescript
 // BAD - Inconsistent patterns for similar complexity
 const ComponentA = () => {
-    // 5 fields using custom hook
-    const formState = useComplexForm();
-    // ...
+ // 5 fields using custom hook
+ const formState = useComplexForm();
+ // ...
 };
 
 const ComponentB = () => {
-    // 5 fields using direct state
-    const [field1, setField1] = useState("");
-    const [field2, setField2] = useState("");
-    // ... 3 more fields
+ // 5 fields using direct state
+ const [field1, setField1] = useState("");
+ const [field2, setField2] = useState("");
+ // ... 3 more fields
 };
 ```
 
@@ -312,15 +312,21 @@ const ComponentB = () => {
 ```typescript
 // BAD - Complex state that should use custom hook
 const [formData, setFormData] = useState({
-    personalInfo: { name: "", email: "", phone: "" },
-    preferences: { theme: "light", notifications: true },
-    settings: { autoSave: false, language: "en" },
+ personalInfo: { name: "", email: "", phone: "" },
+ preferences: { theme: "light", notifications: true },
+ settings: { autoSave: false, language: "en" },
 });
 
 // Multiple useEffect hooks for validation
-useEffect(() => { /* complex validation */ }, [formData.personalInfo]);
-useEffect(() => { /* more validation */ }, [formData.preferences]);
-useEffect(() => { /* sync logic */ }, [formData.settings]);
+useEffect(() => {
+ /* complex validation */
+}, [formData.personalInfo]);
+useEffect(() => {
+ /* more validation */
+}, [formData.preferences]);
+useEffect(() => {
+ /* sync logic */
+}, [formData.settings]);
 ```
 
 ### **❌ Unnecessary Custom Hooks**
@@ -328,9 +334,9 @@ useEffect(() => { /* sync logic */ }, [formData.settings]);
 ```typescript
 // BAD - Overkill for simple state
 function useSimpleToggle() {
-    const [isOpen, setIsOpen] = useState(false);
-    const toggle = () => setIsOpen(!isOpen);
-    return { isOpen, toggle };
+ const [isOpen, setIsOpen] = useState(false);
+ const toggle = () => setIsOpen(!isOpen);
+ return { isOpen, toggle };
 }
 
 // BETTER - Direct state for simple cases
@@ -344,26 +350,34 @@ const toggle = () => setIsOpen(!isOpen);
 
 ```typescript
 export function useFormWithValidation() {
-    const [errors, setErrors] = useState<Record<string, string>>({});
+ const [errors, setErrors] = useState<Record<string, string>>({});
 
-    const validateField = useCallback((field: string, value: any) => {
-        // Backend registry validation for monitor data
-        if (field === "monitorData") {
-            return validateMonitorData(monitorType, value);
-        }
-        
-        // Local validation for basic fields
-        return validateBasicField(field, value);
-    }, [monitorType]);
+ const validateField = useCallback(
+  (field: string, value: any) => {
+   // Backend registry validation for monitor data
+   if (field === "monitorData") {
+    return validateMonitorData(monitorType, value);
+   }
 
-    const validateAll = useCallback(() => {
-        const newErrors: Record<string, string> = {};
-        // Comprehensive validation
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    }, [/* dependencies */]);
+   // Local validation for basic fields
+   return validateBasicField(field, value);
+  },
+  [monitorType]
+ );
 
-    return { errors, validateField, validateAll };
+ const validateAll = useCallback(
+  () => {
+   const newErrors: Record<string, string> = {};
+   // Comprehensive validation
+   setErrors(newErrors);
+   return Object.keys(newErrors).length === 0;
+  },
+  [
+   /* dependencies */
+  ]
+ );
+
+ return { errors, validateField, validateAll };
 }
 ```
 

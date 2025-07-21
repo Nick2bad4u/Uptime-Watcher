@@ -7,25 +7,30 @@
 **Files Updated:**
 
 1. **`src/theme/useTheme.ts`**
+
    - ✅ Added import for `MonitorStatus` from `@shared/types`
    - ✅ Updated `getStatusClass` function to use `MonitorStatus | SiteStatus`
    - ✅ Replaced hardcoded status union with shared types
 
 2. **`src/theme/components.tsx`**
+
    - ✅ Added imports for `MonitorStatus` and `SiteStatus` from `@shared/types`
    - ✅ Updated `MiniChartBarProperties.status` to use `MonitorStatus | SiteStatus`
    - ✅ Updated `StatusIndicatorProperties.status` to use `SiteStatus`
 
 3. **`src/components/common/StatusBadge.tsx`**
+
    - ✅ Added import for `MonitorStatus` from `@shared/types`
    - ✅ Updated `StatusBadgeProperties.status` to use `MonitorStatus`
    - ✅ Fixed import order per ESLint rules
 
 4. **`src/components/Dashboard/SiteCard/SiteCardStatus.tsx`**
+
    - ✅ Added import for `MonitorStatus` from `@shared/types`
    - ✅ Updated `SiteCardStatusProperties.status` to use `MonitorStatus`
 
 5. **`src/hooks/site/useSiteMonitor.ts`**
+
    - ✅ Added import for `MonitorStatus` from `@shared/types`
    - ✅ Updated `SiteMonitorResult.status` to use `MonitorStatus`
    - ✅ Fixed import order per ESLint rules
@@ -79,10 +84,13 @@
 
 ```typescript
 // ❌ Multiple files with hardcoded types
-status: "down" | "paused" | "pending" | "up"
-
-// ❌ Different validation logic in frontend vs backend
-["down", "pending", "up"].includes(monitor.status)
+status: "down" |
+ "paused" |
+ "pending" |
+ "up"[
+  // ❌ Different validation logic in frontend vs backend
+  ("down", "pending", "up")
+ ].includes(monitor.status);
 ```
 
 **After:**
@@ -90,11 +98,11 @@ status: "down" | "paused" | "pending" | "up"
 ```typescript
 // ✅ Consistent shared types
 import type { MonitorStatus } from "@shared/types";
-status: MonitorStatus
+status: MonitorStatus;
 
 // ✅ Shared validation logic
 import { isMonitorStatus, validateMonitor } from "@shared/types";
-isMonitorStatus(monitor.status)
+isMonitorStatus(monitor.status);
 ```
 
 ## 🚀 Next Phase Recommendations

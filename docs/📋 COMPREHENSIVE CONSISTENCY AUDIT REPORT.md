@@ -18,9 +18,9 @@ This report documents the results of a thorough codebase consistency audit condu
 ```typescript
 // PROBLEMATIC: SiteRepository.ts
 export interface SiteRepositoryDependencies {
-    databaseService: DatabaseService;
-    historyRepository: HistoryRepository;  // ❌ VIOLATION
-    monitorRepository: MonitorRepository;  // ❌ VIOLATION
+ databaseService: DatabaseService;
+ historyRepository: HistoryRepository; // ❌ VIOLATION
+ monitorRepository: MonitorRepository; // ❌ VIOLATION
 }
 ```
 
@@ -87,7 +87,7 @@ return Promise.resolve();
 
 ```typescript
 new HistoryRepository({
-    databaseService: this.getDatabaseService(),
+ databaseService: this.getDatabaseService(),
 });
 ```
 
@@ -95,9 +95,9 @@ new HistoryRepository({
 
 ```typescript
 new SiteRepository({
-    databaseService: this.getDatabaseService(),
-    historyRepository: this.getHistoryRepository(),  // Extra dependency
-    monitorRepository: this.getMonitorRepository(),  // Extra dependency
+ databaseService: this.getDatabaseService(),
+ historyRepository: this.getHistoryRepository(), // Extra dependency
+ monitorRepository: this.getMonitorRepository(), // Extra dependency
 });
 ```
 
@@ -111,7 +111,7 @@ new SiteRepository({
 - Consistent dependency injection
 - Clean initialization order
 
-### ✅ Event-Driven Architecture  
+### ✅ Event-Driven Architecture
 
 - TypedEventBus used consistently
 - Proper event forwarding between layers
@@ -136,7 +136,7 @@ new SiteRepository({
 1. **Repository Layer Violation** - Fix SiteRepository dependencies
 2. **Transaction Pattern Standardization** - Unify Promise.resolve() patterns
 
-### 🟡 SHORT-TERM (Week 2-3)  
+### 🟡 SHORT-TERM (Week 2-3)
 
 1. **Service Container Cleanup** - Simplify dependency patterns
 2. **Documentation Updates** - Update architectural documentation
@@ -163,7 +163,7 @@ new SiteRepository({
 **Files to Modify**:
 
 - `electron/services/database/SiteRepository.ts`
-- `electron/services/ServiceContainer.ts`  
+- `electron/services/ServiceContainer.ts`
 - `electron/managers/SiteManager.ts`
 - Create new: `electron/services/site/SiteService.ts`
 
@@ -176,27 +176,24 @@ new SiteRepository({
 ```typescript
 // For methods that return data
 return withDatabaseOperation(
-    async () => {
-        return this.databaseService.executeTransaction((db) => {
-            const result = this.methodInternal(db, params);
-            return Promise.resolve(result);
-        });
-    },
-    "operation-name",
-    undefined,
-    { contextData }
+ async () => {
+  return this.databaseService.executeTransaction((db) => {
+   const result = this.methodInternal(db, params);
+   return Promise.resolve(result);
+  });
+ },
+ "operation-name",
+ undefined,
+ { contextData }
 );
 
-// For void methods  
-return withDatabaseOperation(
-    async () => {
-        return this.databaseService.executeTransaction((db) => {
-            this.methodInternal(db, params);
-            return Promise.resolve();
-        });
-    },
-    "operation-name"
-);
+// For void methods
+return withDatabaseOperation(async () => {
+ return this.databaseService.executeTransaction((db) => {
+  this.methodInternal(db, params);
+  return Promise.resolve();
+ });
+}, "operation-name");
 ```
 
 ## 🎯 Success Metrics
@@ -207,7 +204,7 @@ return withDatabaseOperation(
 - **Pattern Consistency**: Uniform transaction wrapping across all repositories
 - **Dependency Clarity**: Clear, minimal dependencies in ServiceContainer
 
-### Architecture Metrics  
+### Architecture Metrics
 
 - **Layer Separation**: No cross-repository dependencies
 - **Code Maintainability**: Reduced complexity in dependency graphs
@@ -228,7 +225,7 @@ return withDatabaseOperation(
 - [ ] Identify all callers of problematic methods
 - [ ] Create comprehensive test coverage
 
-### Post-Fix Validation  
+### Post-Fix Validation
 
 - [ ] Verify no circular dependencies
 - [ ] Confirm all tests pass

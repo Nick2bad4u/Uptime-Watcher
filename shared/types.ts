@@ -132,4 +132,3 @@ export interface SiteForStatus {
         monitoring: boolean;
     }>;
 }
-
