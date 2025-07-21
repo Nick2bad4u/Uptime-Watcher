@@ -21,18 +21,18 @@ export interface SafeJsonResult<T> {
 
 /**
  * Safely parse JSON string with type validation.
- * 
+ *
  * @param json - JSON string to parse
  * @param validator - Type guard function to validate the parsed data
  * @returns Safe result object with parsed data or error
- * 
+ *
  * @example
  * ```typescript
  * const result = safeJsonParse(jsonString, (data): data is User => {
- *     return typeof data === "object" && data !== null && 
+ *     return typeof data === "object" && data !== null &&
  *            typeof data.id === "string" && typeof data.name === "string";
  * });
- * 
+ *
  * if (result.success) {
  *     console.log(result.data.name); // Type-safe access
  * } else {
@@ -40,20 +40,17 @@ export interface SafeJsonResult<T> {
  * }
  * ```
  */
-export function safeJsonParse<T>(
-    json: string,
-    validator: (data: unknown) => data is T
-): SafeJsonResult<T> {
+export function safeJsonParse<T>(json: string, validator: (data: unknown) => data is T): SafeJsonResult<T> {
     try {
         const parsed: unknown = JSON.parse(json);
-        
+
         if (validator(parsed)) {
             return {
                 success: true,
                 data: parsed,
             };
         }
-        
+
         return {
             success: false,
             error: "Parsed data does not match expected type",
@@ -68,12 +65,12 @@ export function safeJsonParse<T>(
 
 /**
  * Safely parse JSON string with fallback value.
- * 
+ *
  * @param json - JSON string to parse
  * @param validator - Type guard function to validate the parsed data
  * @param fallback - Fallback value if parsing fails
  * @returns Parsed data if successful, fallback if failed
- * 
+ *
  * @example
  * ```typescript
  * const config = safeJsonParseWithFallback(
@@ -83,22 +80,18 @@ export function safeJsonParse<T>(
  * );
  * ```
  */
-export function safeJsonParseWithFallback<T>(
-    json: string,
-    validator: (data: unknown) => data is T,
-    fallback: T
-): T {
+export function safeJsonParseWithFallback<T>(json: string, validator: (data: unknown) => data is T, fallback: T): T {
     const result = safeJsonParse(json, validator);
     return result.success && result.data !== undefined ? result.data : fallback;
 }
 
 /**
  * Safely stringify any value to JSON.
- * 
+ *
  * @param value - Value to stringify
  * @param space - Space parameter for JSON.stringify (for formatting)
  * @returns Safe result object with JSON string or error
- * 
+ *
  * @example
  * ```typescript
  * const result = safeJsonStringify({ name: "John", age: 30 });
@@ -110,14 +103,14 @@ export function safeJsonParseWithFallback<T>(
 export function safeJsonStringify(value: unknown, space?: string | number): SafeJsonResult<string> {
     try {
         const jsonString = JSON.stringify(value, undefined, space);
-        
+
         if (jsonString === undefined) {
             return {
                 success: false,
                 error: "Value cannot be serialized to JSON",
             };
         }
-        
+
         return {
             success: true,
             data: jsonString,
@@ -132,33 +125,29 @@ export function safeJsonStringify(value: unknown, space?: string | number): Safe
 
 /**
  * Safely stringify value with fallback.
- * 
+ *
  * @param value - Value to stringify
  * @param fallback - Fallback string if stringification fails
  * @param space - Space parameter for JSON.stringify (for formatting)
  * @returns JSON string if successful, fallback if failed
- * 
+ *
  * @example
  * ```typescript
  * const jsonString = safeJsonStringifyWithFallback(data, "{}");
  * ```
  */
-export function safeJsonStringifyWithFallback(
-    value: unknown,
-    fallback: string,
-    space?: string | number
-): string {
+export function safeJsonStringifyWithFallback(value: unknown, fallback: string, space?: string | number): string {
     const result = safeJsonStringify(value, space);
     return result.success && result.data !== undefined ? result.data : fallback;
 }
 
 /**
  * Parse JSON array with element validation.
- * 
+ *
  * @param json - JSON string to parse
  * @param elementValidator - Type guard for array elements
  * @returns Safe result object with validated array or error
- * 
+ *
  * @example
  * ```typescript
  * const result = safeJsonParseArray(
@@ -173,14 +162,14 @@ export function safeJsonParseArray<T>(
 ): SafeJsonResult<T[]> {
     try {
         const parsed: unknown = JSON.parse(json);
-        
+
         if (!Array.isArray(parsed)) {
             return {
                 success: false,
                 error: "Parsed data is not an array",
             };
         }
-        
+
         // Validate all elements
         for (let i = 0; i < parsed.length; i++) {
             if (!elementValidator(parsed[i])) {
@@ -190,7 +179,7 @@ export function safeJsonParseArray<T>(
                 };
             }
         }
-        
+
         return {
             success: true,
             data: parsed as T[],

@@ -47,8 +47,7 @@ import putout from "eslint-plugin-putout";
 import { defineConfig } from "eslint/config";
 import pluginNoOnly from "eslint-plugin-no-only-tests";
 import nodePlugin from "eslint-plugin-n";
-import stylistic from '@stylistic/eslint-plugin'
-
+import stylistic from "@stylistic/eslint-plugin";
 
 const __dirname = import.meta.dirname;
 
