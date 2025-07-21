@@ -235,7 +235,7 @@ export async function checkMonitor(
 
     // Emit StatusUpdate as a typed event instead of old emit pattern
     const statusUpdate: StatusUpdate = {
-        details: checkResult.details,
+        ...(checkResult.details !== undefined && { details: checkResult.details }),
         monitorId: monitor.id,
         previousStatus,
         site: freshSiteData,

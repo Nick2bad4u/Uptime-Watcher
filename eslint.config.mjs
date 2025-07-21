@@ -212,12 +212,13 @@ export default [
             putout: putout,
             regexp: pluginRegexp,
             n: nodePlugin,
+            js: js,
         },
         rules: {
             // TypeScript rules
-            ...tseslint.configs.recommended.rules,
-            ...tseslint.configs.strict.rules,
-            ...tseslint.configs.stylistic.rules,
+            ...tseslint.configs.recommendedTypeChecked,
+            ...tseslint.configs.strictTypeChecked,
+            ...tseslint.configs.stylisticTypeChecked,
             ...pluginRegexp.configs["flat/recommended"].rules,
             ...reactRefresh.configs.vite.rules,
             ...pluginImport.flatConfigs.typescript.rules,
@@ -232,6 +233,7 @@ export default [
             ...pluginBoundaries.configs.recommended.rules,
             ...pluginRedos.configs.recommended.rules,
             ...nodePlugin.configs["flat/all"].rules,
+            ...pluginSonarjs.configs.recommended.rules,
 
             "n/no-missing-file-extension": "off", // Allow missing file extensions for imports
             "n/file-extension-in-import": "off", // Allow missing file extensions for imports
@@ -539,12 +541,13 @@ export default [
             regexp: pluginRegexp,
             putout: putout,
             n: nodePlugin,
+            js: js,
         },
         rules: {
             // TypeScript backend rules
-            ...tseslint.configs.recommended.rules,
-            ...tseslint.configs.strict.rules,
-            ...tseslint.configs.stylistic.rules,
+            ...tseslint.configs.recommendedTypeChecked,
+            ...tseslint.configs.strictTypeChecked,
+            ...tseslint.configs.stylisticTypeChecked,
             ...pluginRegexp.configs["flat/recommended"].rules,
             ...pluginImport.flatConfigs.typescript.rules,
             ...pluginPromise.configs["flat/recommended"].rules,
@@ -558,6 +561,7 @@ export default [
             ...pluginBoundaries.configs.recommended.rules,
             ...pluginRedos.configs.recommended.rules,
             ...nodePlugin.configs["flat/all"].rules,
+            ...pluginSonarjs.configs.recommended.rules,
 
             "n/no-missing-file-extension": "off", // Allow missing file extensions for imports
             "n/file-extension-in-import": "off", // Allow missing file extensions for imports

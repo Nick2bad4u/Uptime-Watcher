@@ -10,7 +10,15 @@
 
 import { contextBridge, ipcRenderer } from "electron";
 
-import { Site } from "./types";
+import type {
+    CacheInvalidatedEventData,
+    MonitorDownEventData,
+    MonitoringControlEventData,
+    MonitorUpEventData,
+    Site,
+    TestEventData,
+    UpdateStatusEventData,
+} from "./types";
 
 /**
  * Site management API methods for CRUD operations.
@@ -200,13 +208,8 @@ const eventsAPI = {
      * Called when backend caches are invalidated, allowing frontend to clear its caches.
      * Useful for keeping frontend and backend caches synchronized.
      */
-    onCacheInvalidated: (
-        callback: (data: { identifier?: string; reason: string; type: "all" | "monitor" | "site" }) => void
-    ) => {
-        const handler = (
-            _: Electron.IpcRendererEvent,
-            data: { identifier?: string; reason: string; type: "all" | "monitor" | "site" }
-        ) => {
+    onCacheInvalidated: (callback: (data: CacheInvalidatedEventData) => void) => {
+        const handler = (_: Electron.IpcRendererEvent, data: CacheInvalidatedEventData) => {
             callback(data);
         };
         ipcRenderer.on("cache:invalidated", handler);
@@ -222,8 +225,8 @@ const eventsAPI = {
      * @remarks
      * Called when a monitor detects a failure.
      */
-    onMonitorDown: (callback: (data: unknown) => void) => {
-        const handler = (_: Electron.IpcRendererEvent, data: unknown) => {
+    onMonitorDown: (callback: (data: MonitorDownEventData) => void) => {
+        const handler = (_: Electron.IpcRendererEvent, data: MonitorDownEventData) => {
             callback(data);
         };
         ipcRenderer.on("monitor:down", handler);
@@ -239,8 +242,8 @@ const eventsAPI = {
      * @remarks
      * Called when a monitor begins actively monitoring a site.
      */
-    onMonitoringStarted: (callback: (data: { monitorId: string; siteId: string }) => void) => {
-        const handler = (_: Electron.IpcRendererEvent, data: { monitorId: string; siteId: string }) => {
+    onMonitoringStarted: (callback: (data: MonitoringControlEventData) => void) => {
+        const handler = (_: Electron.IpcRendererEvent, data: MonitoringControlEventData) => {
             callback(data);
         };
         ipcRenderer.on("monitoring:started", handler);
@@ -256,8 +259,8 @@ const eventsAPI = {
      * @remarks
      * Called when a monitor stops actively monitoring a site.
      */
-    onMonitoringStopped: (callback: (data: { monitorId: string; siteId: string }) => void) => {
-        const handler = (_: Electron.IpcRendererEvent, data: { monitorId: string; siteId: string }) => {
+    onMonitoringStopped: (callback: (data: MonitoringControlEventData) => void) => {
+        const handler = (_: Electron.IpcRendererEvent, data: MonitoringControlEventData) => {
             callback(data);
         };
         ipcRenderer.on("monitoring:stopped", handler);
@@ -291,8 +294,8 @@ const eventsAPI = {
      * @remarks
      * Called when a monitor recovers from a down state.
      */
-    onMonitorUp: (callback: (data: unknown) => void) => {
-        const handler = (_: Electron.IpcRendererEvent, data: unknown) => {
+    onMonitorUp: (callback: (data: MonitorUpEventData) => void) => {
+        const handler = (_: Electron.IpcRendererEvent, data: MonitorUpEventData) => {
             callback(data);
         };
         ipcRenderer.on("monitor:up", handler);
@@ -308,8 +311,8 @@ const eventsAPI = {
      * @remarks
      * Used primarily for development and debugging purposes.
      */
-    onTestEvent: (callback: (data: unknown) => void) => {
-        const handler = (_: Electron.IpcRendererEvent, data: unknown) => {
+    onTestEvent: (callback: (data: TestEventData) => void) => {
+        const handler = (_: Electron.IpcRendererEvent, data: TestEventData) => {
             callback(data);
         };
         ipcRenderer.on("test-event", handler);
@@ -325,8 +328,8 @@ const eventsAPI = {
      * @remarks
      * Receives events about application updates (checking, downloading, ready to install).
      */
-    onUpdateStatus: (callback: (data: unknown) => void) => {
-        const handler = (_: Electron.IpcRendererEvent, data: unknown) => {
+    onUpdateStatus: (callback: (data: UpdateStatusEventData) => void) => {
+        const handler = (_: Electron.IpcRendererEvent, data: UpdateStatusEventData) => {
             callback(data);
         };
         ipcRenderer.on("update-status", handler);

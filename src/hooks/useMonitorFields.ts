@@ -7,6 +7,8 @@ import type { MonitorFieldDefinition } from "@shared/types";
 
 import { useCallback, useEffect, useState } from "react";
 
+import logger from "../services/logger";
+
 interface UseMonitorFieldsResult {
     /** Get field definitions for a specific monitor type */
     getFields: (monitorType: string) => MonitorFieldDefinition[];
@@ -38,7 +40,10 @@ export function useMonitorFields(): UseMonitorFieldsResult {
                 setFieldConfigs(fieldMap);
                 setIsLoaded(true);
             } catch (error) {
-                console.error("Failed to load monitor field configurations:", error);
+                logger.error(
+                    "Failed to load monitor field configurations",
+                    error instanceof Error ? error : new Error(String(error))
+                );
                 setIsLoaded(true); // Set loaded even on error to prevent infinite loading
             }
         };

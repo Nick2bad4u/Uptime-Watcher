@@ -6,6 +6,7 @@
 import React from "react";
 
 import { DefaultErrorFallback } from "../../components/error/DefaultErrorFallback";
+import logger from "../../services/logger";
 
 interface ErrorBoundaryProperties {
     children: React.ReactNode;
@@ -38,7 +39,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProperties, Erro
     }
 
     override componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-        console.error("Store Error Boundary caught an error:", error, errorInfo);
+        logger.error("Store Error Boundary caught an error", error);
 
         this.setState({
             error,

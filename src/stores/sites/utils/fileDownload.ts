@@ -5,6 +5,8 @@
  * Provides utilities for browser-based file downloads.
  */
 
+import logger from "../../../services/logger";
+
 export interface FileDownloadOptions {
     /** The file buffer to download */
     buffer: ArrayBuffer;
@@ -42,12 +44,15 @@ export function downloadFile(options: FileDownloadOptions): void {
                 createAndTriggerDownload(buffer, fileName, mimeType);
                 return;
             } catch (fallbackError) {
-                console.error("Both primary and fallback download failed:", fallbackError);
+                logger.error(
+                    "File download failed: both primary and fallback methods failed",
+                    fallbackError instanceof Error ? fallbackError : new Error(String(fallbackError))
+                );
                 throw new Error("File download failed");
             }
         }
 
-        console.error("Failed to download file:", error);
+        logger.error("File download failed", error instanceof Error ? error : new Error(String(error)));
         throw new Error("File download failed");
     }
 }
@@ -92,7 +97,10 @@ export async function handleSQLiteBackupDownload(downloadFunction: () => Promise
             anchor.click();
         } catch (clickError) {
             // Log the click error for debugging and add context
-            console.error("Failed to trigger download click:", clickError);
+            logger.error(
+                "Failed to trigger download click",
+                clickError instanceof Error ? clickError : new Error(String(clickError))
+            );
             // Re-throw with more context
             throw new Error(
                 `Download trigger failed: ${clickError instanceof Error ? clickError.message : "Unknown error"}`
@@ -128,7 +136,10 @@ function createAndTriggerDownload(buffer: ArrayBuffer, fileName: string, mimeTyp
         a.remove();
     } catch (domError) {
         // Fallback: just click without DOM manipulation
-        console.warn("DOM manipulation failed, using fallback click", domError);
+        logger.warn(
+            "DOM manipulation failed, using fallback click",
+            domError instanceof Error ? domError : new Error(String(domError))
+        );
         a.click();
     }
 

@@ -7,10 +7,22 @@
  * @packageDocumentation
  */
 
+// Re-export specific type definitions
+export * from "./types/monitor-forms";
+
 export * from "@shared/types";
 
 // Import types for global declarations
-import type { Site, StatusUpdate } from "@shared/types";
+import type {
+    CacheInvalidatedEventData,
+    MonitorDownEventData,
+    MonitoringControlEventData,
+    MonitorUpEventData,
+    Site,
+    StatusUpdate,
+    TestEventData,
+    UpdateStatusEventData,
+} from "@shared/types";
 
 /**
  * Electron API interface exposed to the renderer process.
@@ -24,16 +36,14 @@ declare global {
                 importData: (data: string) => Promise<boolean>;
             };
             events: {
-                onCacheInvalidated: (
-                    callback: (data: { identifier?: string; reason: string; type: "all" | "monitor" | "site" }) => void
-                ) => () => void;
-                onMonitorDown: (callback: (data: unknown) => void) => () => void;
-                onMonitoringStarted: (callback: (data: { monitorId: string; siteId: string }) => void) => () => void;
-                onMonitoringStopped: (callback: (data: { monitorId: string; siteId: string }) => void) => () => void;
+                onCacheInvalidated: (callback: (data: CacheInvalidatedEventData) => void) => () => void;
+                onMonitorDown: (callback: (data: MonitorDownEventData) => void) => () => void;
+                onMonitoringStarted: (callback: (data: MonitoringControlEventData) => void) => () => void;
+                onMonitoringStopped: (callback: (data: MonitoringControlEventData) => void) => () => void;
                 onMonitorStatusChanged: (callback: (update: StatusUpdate) => void) => () => void;
-                onMonitorUp: (callback: (data: unknown) => void) => () => void;
-                onTestEvent: (callback: (data: unknown) => void) => () => void;
-                onUpdateStatus: (callback: (data: unknown) => void) => () => void;
+                onMonitorUp: (callback: (data: MonitorUpEventData) => void) => () => void;
+                onTestEvent: (callback: (data: TestEventData) => void) => () => void;
+                onUpdateStatus: (callback: (data: UpdateStatusEventData) => void) => () => void;
                 removeAllListeners: (event: string) => void;
             };
             monitoring: {
@@ -145,23 +155,21 @@ declare global {
              */
             events: {
                 /** Register callback for cache invalidation events */
-                onCacheInvalidated: (
-                    callback: (data: { identifier?: string; reason: string; type: "all" | "monitor" | "site" }) => void
-                ) => () => void;
+                onCacheInvalidated: (callback: (data: CacheInvalidatedEventData) => void) => () => void;
                 /** Register callback for monitor down events */
-                onMonitorDown: (callback: (data: unknown) => void) => () => void;
+                onMonitorDown: (callback: (data: MonitorDownEventData) => void) => () => void;
                 /** Register callback for monitoring started events */
-                onMonitoringStarted: (callback: (data: { monitorId: string; siteId: string }) => void) => () => void;
+                onMonitoringStarted: (callback: (data: MonitoringControlEventData) => void) => () => void;
                 /** Register callback for monitoring stopped events */
-                onMonitoringStopped: (callback: (data: { monitorId: string; siteId: string }) => void) => () => void;
+                onMonitoringStopped: (callback: (data: MonitoringControlEventData) => void) => () => void;
                 /** Register callback for monitor status changes */
                 onMonitorStatusChanged: (callback: (update: StatusUpdate) => void) => () => void;
                 /** Register callback for monitor up events */
-                onMonitorUp: (callback: (data: unknown) => void) => () => void;
+                onMonitorUp: (callback: (data: MonitorUpEventData) => void) => () => void;
                 /** Register callback for test events (development/debugging) */
-                onTestEvent: (callback: (data: unknown) => void) => () => void;
+                onTestEvent: (callback: (data: TestEventData) => void) => () => void;
                 /** Register callback for application update status events */
-                onUpdateStatus: (callback: (data: unknown) => void) => () => void;
+                onUpdateStatus: (callback: (data: UpdateStatusEventData) => void) => () => void;
                 /** Remove all listeners for a specific event */
                 removeAllListeners: (event: string) => void;
             };

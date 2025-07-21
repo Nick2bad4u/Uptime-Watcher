@@ -5,6 +5,7 @@
 
 import { useEffect, useState } from "react";
 
+import logger from "../services/logger";
 import { getMonitorTypeOptions } from "../utils/monitorTypeHelper";
 
 interface UseMonitorTypesResult {
@@ -37,7 +38,7 @@ export function useMonitorTypes(): UseMonitorTypesResult {
         } catch (error_) {
             const errorMessage = error_ instanceof Error ? error_.message : "Failed to load monitor types";
             setError(errorMessage);
-            console.error("Failed to load monitor types:", error_);
+            logger.error("Failed to load monitor types", error_ instanceof Error ? error_ : new Error(String(error_)));
             // Fallback to basic options if backend fails
             setOptions([
                 { label: "HTTP (Website/API)", value: "http" },

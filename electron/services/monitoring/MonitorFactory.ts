@@ -6,7 +6,7 @@ import { IMonitorService, MonitorConfig } from "./types";
  * Factory for creating and managing monitor services.
  * Uses the registry's service factories for complete automation.
  */
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class -- Factory pattern with static methods is intentional
+
 export class MonitorFactory {
     private static readonly serviceInstances = new Map<string, IMonitorService>();
 

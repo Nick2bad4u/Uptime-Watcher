@@ -36,57 +36,69 @@ export async function withErrorHandling<T>(
 ): Promise<T> {
     // Check if it's a frontend store (has setError, clearError, setLoading methods)
     if ("setError" in storeOrContext && "clearError" in storeOrContext && "setLoading" in storeOrContext) {
-        const store = storeOrContext as ErrorHandlingFrontendStore;
-
-        // Clear any previous error state before starting
-        try {
-            store.clearError();
-        } catch (error) {
-            // If clearError fails, log but continue
-            console.warn("Failed to clear error state:", error);
-        }
-
-        // Set loading state to true
-        try {
-            store.setLoading(true);
-        } catch (error) {
-            // If setLoading fails, log but continue
-            console.warn("Failed to set loading state:", error);
-        }
-
-        try {
-            const result = await operation();
-            return result;
-        } catch (error) {
-            // Handle the error from the operation
-            try {
-                const errorMessage = error instanceof Error ? error.message : String(error);
-                store.setError(errorMessage);
-            } catch (storeError) {
-                // If setError fails, log both errors
-                console.error("Failed to set error state:", storeError);
-                console.error("Original operation error:", error);
-            }
-            throw error;
-        } finally {
-            // Always clear loading state, with error handling
-            try {
-                store.setLoading(false);
-            } catch (error) {
-                console.warn("Failed to clear loading state in finally block:", error);
-            }
-        }
+        return handleFrontendOperation(operation, storeOrContext);
     } else {
-        // Backend context
-        const context = storeOrContext as ErrorHandlingBackendContext;
-        const { logger, operationName } = context;
+        return handleBackendOperation(operation, storeOrContext);
+    }
+}
 
-        try {
-            const result = await operation();
-            return result;
-        } catch (error) {
-            logger.error(operationName ? `Failed to ${operationName}` : "Async operation failed", error);
-            throw error;
+/**
+ * Handle frontend operations with store state management.
+ */
+async function handleFrontendOperation<T>(
+    operation: () => Promise<T>,
+    store: ErrorHandlingFrontendStore
+): Promise<T> {
+    // Prepare store state
+    safeStoreOperation(() => store.clearError(), "clear error state");
+    safeStoreOperation(() => store.setLoading(true), "set loading state");
+
+    try {
+        const result = await operation();
+        return result;
+    } catch (error) {
+        // Handle operation error
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        safeStoreOperation(() => store.setError(errorMessage), "set error state", error);
+        throw error;
+    } finally {
+        // Always clear loading state
+        safeStoreOperation(() => store.setLoading(false), "clear loading state in finally block");
+    }
+}
+
+/**
+ * Handle backend operations with logger.
+ */
+async function handleBackendOperation<T>(
+    operation: () => Promise<T>,
+    context: ErrorHandlingBackendContext
+): Promise<T> {
+    const { logger, operationName } = context;
+
+    try {
+        const result = await operation();
+        return result;
+    } catch (error) {
+        logger.error(operationName ? `Failed to ${operationName}` : "Async operation failed", error);
+        throw error;
+    }
+}
+
+/**
+ * Safely execute store operations with error logging.
+ */
+function safeStoreOperation(
+    storeOperation: () => void,
+    operationName: string,
+    originalError?: unknown
+): void {
+    try {
+        storeOperation();
+    } catch (error) {
+        console.warn(`Failed to ${operationName}:`, error);
+        if (originalError) {
+            console.error("Original operation error:", originalError);
         }
     }
 }

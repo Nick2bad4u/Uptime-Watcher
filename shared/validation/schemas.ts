@@ -124,12 +124,49 @@ export interface ValidationResult {
 }
 
 /**
+ * Get the appropriate schema for a monitor type.
+ */
+function getMonitorSchema(type: string) {
+    if (type === "http") {
+        return httpMonitorSchema;
+    } else if (type === "port") {
+        return portMonitorSchema;
+    }
+    return null;
+}
+
+/**
+ * Validate a specific field using the appropriate schema.
+ */
+function validateFieldWithSchema(type: string, fieldName: string, value: unknown) {
+    const testData = { [fieldName]: value };
+
+    if (fieldName === "url" && type === "http") {
+        return z.object({ url: httpMonitorSchema.shape.url }).parse(testData);
+    } else if (fieldName === "host" && type === "port") {
+        return z.object({ host: portMonitorSchema.shape.host }).parse(testData);
+    } else if (fieldName === "port" && type === "port") {
+        return z.object({ port: portMonitorSchema.shape.port }).parse(testData);
+    } else {
+        // For common fields, use base schema
+        const commonFields = baseMonitorSchema.shape;
+        if (fieldName in commonFields) {
+            return z
+                .object({ [fieldName]: commonFields[fieldName as keyof typeof commonFields] })
+                .parse(testData);
+        } else {
+            throw new Error(`Unknown field: ${fieldName}`);
+        }
+    }
+}
+
+/**
  * Validate monitor data using shared Zod schemas.
  */
 export function validateMonitorData(type: string, data: unknown): ValidationResult {
     try {
         // Get the appropriate schema
-        const schema = type === "http" ? httpMonitorSchema : type === "port" ? portMonitorSchema : null;
+        const schema = getMonitorSchema(type);
 
         if (!schema) {
             return {
@@ -224,7 +261,7 @@ export function validateSiteData(data: unknown): ValidationResult {
  */
 export function validateMonitorField(type: string, fieldName: string, value: unknown): ValidationResult {
     try {
-        const schema = type === "http" ? httpMonitorSchema : type === "port" ? portMonitorSchema : null;
+        const schema = getMonitorSchema(type);
 
         if (!schema) {
             return {
@@ -236,29 +273,7 @@ export function validateMonitorField(type: string, fieldName: string, value: unk
         }
 
         // Create a test object and validate the specific field
-        const testData = { [fieldName]: value };
-
-        // Try to parse just the field by attempting to parse a minimal valid object
-        // with the field we want to test
-        let fieldValidationResult;
-
-        if (fieldName === "url" && type === "http") {
-            fieldValidationResult = z.object({ url: httpMonitorSchema.shape.url }).parse(testData);
-        } else if (fieldName === "host" && type === "port") {
-            fieldValidationResult = z.object({ host: portMonitorSchema.shape.host }).parse(testData);
-        } else if (fieldName === "port" && type === "port") {
-            fieldValidationResult = z.object({ port: portMonitorSchema.shape.port }).parse(testData);
-        } else {
-            // For common fields, use base schema
-            const commonFields = baseMonitorSchema.shape;
-            if (fieldName in commonFields) {
-                fieldValidationResult = z
-                    .object({ [fieldName]: commonFields[fieldName as keyof typeof commonFields] })
-                    .parse(testData);
-            } else {
-                throw new Error(`Unknown field: ${fieldName}`);
-            }
-        }
+        const fieldValidationResult = validateFieldWithSchema(type, fieldName, value);
 
         return {
             success: true,

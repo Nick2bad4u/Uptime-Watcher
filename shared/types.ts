@@ -11,6 +11,9 @@
  * @packageDocumentation
  */
 
+// Re-export event types
+export * from "./types/events";
+
 export type MonitorType = "http" | "port";
 
 export type MonitorStatus = "up" | "down" | "pending" | "paused";

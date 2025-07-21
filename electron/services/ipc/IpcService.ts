@@ -91,12 +91,12 @@ export class IpcService {
             description,
             displayName,
             fields,
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars, sonarjs/no-unused-vars
+            // eslint-disable-next-line sonarjs/no-unused-vars
             serviceFactory: _unused1,
             type,
             uiConfig,
             // Explicitly exclude non-serializable properties
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars, sonarjs/no-unused-vars
+            // eslint-disable-next-line sonarjs/no-unused-vars
             validationSchema: _unused2,
             version,
             ...unexpectedProperties
