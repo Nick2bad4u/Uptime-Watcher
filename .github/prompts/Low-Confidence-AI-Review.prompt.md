@@ -25,3 +25,5 @@ New claims to review, these are LOW confidence claims that need to be reviewed t
 - If you stumble upon any issues that are not related to the claims, add them to the document.
 
 Proceed to review all low confidence claims below using the outline above:
+
+Once finished, do your own source code review of the file, including checking for claims similar to the ones you just reviewed, and new claims that may have emerged during your review. Make sure you trace data paths and ensure all changes make sense for the project. Never assume anything about the code without verifying it.
