@@ -7,67 +7,67 @@
 }
 
 .themed-header {
-    background: var(--color-surface-elevated);
-    border-bottom: 1px solid var(--color-border);
+    position: relative;
+    z-index: 10;
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-md) var(--spacing-xl);
+    background: var(--color-surface-elevated);
+    border-bottom: 1px solid var(--color-border);
     box-shadow: 0 2px 12px 0 var(--color-shadow);
-    position: relative;
-    z-index: 10;
 }
 
 .header-title {
+    position: relative;
+    padding-bottom: 0.25em;
+    margin-right: var(--spacing-lg);
     font-size: var(--font-size-2xl);
     font-weight: var(--font-weight-bold);
     color: var(--color-accent);
     letter-spacing: 0.01em;
-    position: relative;
-    padding-bottom: 0.25em;
-    margin-right: var(--spacing-lg);
-}
 
-.header-title::after {
-    content: "";
-    display: block;
-    width: 2.5em;
-    height: 3px;
-    background: linear-gradient(90deg, var(--color-accent), transparent 80%);
-    border-radius: 2px;
-    margin-top: 0.2em;
+    &::after {
+        display: block;
+        width: 2.5em;
+        height: 3px;
+        margin-top: 0.2em;
+        content: "";
+        background: linear-gradient(90deg, var(--color-accent), transparent 80%);
+        border-radius: 2px;
+    }
 }
 
 .header-controls {
     display: flex;
-    align-items: center;
     gap: var(--spacing-md);
+    align-items: center;
 }
 
 .header-status-summary {
     display: flex;
-    align-items: center;
     gap: var(--spacing-md);
+    align-items: center;
+    padding: 0.5em 1.25em;
     background: var(--color-surface);
     border-radius: var(--radius-lg);
-    padding: 0.5em 1.25em;
     box-shadow: 0 1px 6px 0 var(--color-shadow);
 }
 
 .health-badge {
-    border-width: 1px;
-    border-color: var(--color-success-border, var(--color-success) 33);
     background-color: color-mix(in srgb, var(--color-success) 10%, transparent);
+    border-color: var(--color-success-border, var(--color-success) 33);
+    border-width: 1px;
     box-shadow: 0 0 0 0 var(--color-success-shadow, var(--color-success) 22);
     transition:
         box-shadow 0.22s cubic-bezier(0.4, 1.2, 0.4, 1),
         background 0.22s,
         transform 0.18s;
     will-change: transform, box-shadow;
-}
 
-.health-badge[data-health-color] {
-    --color-success: attr(data-health-color color);
+    &[data-health-color] {
+        --color-success: attr(data-health-color color);
+    }
 }
 
 .status-up-badge {
@@ -103,38 +103,38 @@
 }
 
 .health-badge:hover {
-    box-shadow: 0 4px 18px 0 var(--color-success-shadow, var(--color-success) 33);
     background-color: color-mix(in srgb, var(--color-success) 18%, transparent);
-    transform: scale(1.045) translateY(-2px);
+    box-shadow: 0 4px 18px 0 var(--color-success-shadow, var(--color-success) 33);
     filter: brightness(1.04) saturate(1.1);
+    transform: scale(1.045) translateY(-2px);
 }
 
 .status-up-badge:hover {
     background-color: color-mix(in srgb, var(--color-success) 12%, transparent);
     box-shadow: 0 2px 12px 0 var(--color-success-shadow, var(--color-success) 22);
-    transform: scale(1.04) translateY(-1px);
     filter: brightness(1.03) saturate(1.08);
+    transform: scale(1.04) translateY(-1px);
 }
 
 .status-down-badge:hover {
     background-color: color-mix(in srgb, var(--color-error) 12%, transparent);
     box-shadow: 0 2px 12px 0 var(--color-error-shadow, var(--color-error) 22);
-    transform: scale(1.04) translateY(-1px);
     filter: brightness(1.03) saturate(1.08);
+    transform: scale(1.04) translateY(-1px);
 }
 
 .status-pending-badge:hover {
     background-color: color-mix(in srgb, var(--color-warning) 12%, transparent);
     box-shadow: 0 2px 12px 0 var(--color-warning-shadow, var(--color-warning) 22);
-    transform: scale(1.04) translateY(-1px);
     filter: brightness(1.03) saturate(1.08);
+    transform: scale(1.04) translateY(-1px);
 }
 
 .status-paused-badge:hover {
     background-color: color-mix(in srgb, var(--color-status-paused) 12%, transparent);
     box-shadow: 0 2px 12px 0 var(--color-status-paused-shadow, var(--color-status-paused) 22);
-    transform: scale(1.04) translateY(-1px);
     filter: brightness(1.03) saturate(1.08);
+    transform: scale(1.04) translateY(-1px);
 }
 
 /* Remove all default borders and box-shadows from header items */
@@ -143,9 +143,9 @@
 .total-sites-badge,
 .header-interval-box,
 .header-controls-box {
+    outline: none;
     border: 1.5px solid transparent;
     box-shadow: none;
-    outline: none;
     transition:
         box-shadow 0.18s,
         border-color 0.18s,
@@ -156,71 +156,71 @@
 /* Show visible outlines and subtle background on hover/focus */
 .header-title-box:hover,
 .header-title-box:focus-visible {
-    border-color: var(--color-accent, var(--color-primary));
     background: color-mix(in srgb, var(--color-accent, var(--color-primary)) 6%, transparent);
+    border-color: var(--color-accent, var(--color-primary));
     box-shadow: 0 2px 12px 0 var(--color-accent, var(--color-primary) 22);
 }
 
 .header-status-summary-box:hover,
 .header-status-summary-box:focus-visible {
-    border-color: var(--color-accent, var(--color-primary));
     background: color-mix(in srgb, var(--color-accent, var(--color-primary)) 6%, transparent);
+    border-color: var(--color-accent, var(--color-primary));
     box-shadow: 0 2px 12px 0 var(--color-accent, var(--color-primary) 22);
 }
 
 .health-badge:hover,
 .health-badge:focus-visible {
-    border-color: var(--color-success, var(--color-accent));
     background: color-mix(in srgb, var(--color-success, var(--color-accent)) 8%, transparent);
+    border-color: var(--color-success, var(--color-accent));
     box-shadow: 0 4px 18px 0 var(--color-success-shadow, var(--color-success) 33);
 }
 
 .status-up-badge:hover,
 .status-up-badge:focus-visible {
-    border-color: var(--color-success);
     background: color-mix(in srgb, var(--color-success) 8%, transparent);
+    border-color: var(--color-success);
     box-shadow: 0 2px 12px 0 var(--color-success-shadow, var(--color-success) 22);
 }
 
 .status-down-badge:hover,
 .status-down-badge:focus-visible {
-    border-color: var(--color-error);
     background: color-mix(in srgb, var(--color-error) 8%, transparent);
+    border-color: var(--color-error);
     box-shadow: 0 2px 12px 0 var(--color-error-shadow, var(--color-error) 22);
 }
 
 .status-pending-badge:hover,
 .status-pending-badge:focus-visible {
-    border-color: var(--color-warning);
     background: color-mix(in srgb, var(--color-warning) 8%, transparent);
+    border-color: var(--color-warning);
     box-shadow: 0 2px 12px 0 var(--color-warning-shadow, var(--color-warning) 22);
 }
 
 .status-paused-badge:hover,
 .status-paused-badge:focus-visible {
-    border-color: var(--color-status-paused);
     background: color-mix(in srgb, var(--color-status-paused) 8%, transparent);
+    border-color: var(--color-status-paused);
     box-shadow: 0 2px 12px 0 var(--color-status-paused-shadow, var(--color-status-paused) 22);
 }
 
 .total-sites-badge:hover,
 .total-sites-badge:focus-visible {
-    border-color: var(--color-border, var(--color-accent));
     background: color-mix(in srgb, var(--color-border, var(--color-accent)) 6%, transparent);
+    border-color: var(--color-border, var(--color-accent));
     box-shadow: 0 2px 12px 0 var(--color-shadow, #0002);
 }
 
 .header-interval-box:hover,
 .header-interval-box:focus-visible {
-    border-color: var(--color-accent, var(--color-primary));
     background: color-mix(in srgb, var(--color-accent, var(--color-primary)) 6%, transparent);
+    border-color: var(--color-accent, var(--color-primary));
     box-shadow: 0 2px 12px 0 var(--color-accent, var(--color-primary) 22);
 }
 
 .header-controls-box:hover,
 .header-controls-box:focus-visible {
-    border-color: var(--color-accent, var(--color-primary));
     background: color-mix(in srgb, var(--color-accent, var(--color-primary)) 6%, transparent);
+    border-color: var(--color-accent, var(--color-primary));
     box-shadow: 0 2px 12px 0 var(--color-accent, var(--color-primary) 22);
 }
 

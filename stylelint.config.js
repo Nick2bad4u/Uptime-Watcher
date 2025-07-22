@@ -8,7 +8,6 @@
 /** @type {import('stylelint').Config} */
 module.exports = {
     plugins: [
-        "stylelint-react-native",
         "stylelint-plugin-defensive-css",
         "stylelint-use-nesting",
         "stylelint-prettier",
@@ -23,11 +22,8 @@ module.exports = {
     rules: {
         "@stylistic/indentation": null,
         "@stylistic/declaration-colon-newline-after": null,
-        "react-native/css-property-no-unknown": null,
-        "react-native/font-weight-no-ignored-values": null,
-        "react-native/style-property-no-unknown:": null,
         "plugin/use-defensive-css": [true, { severity: "warning" }],
-        "csstools/use-nesting": "always" || "ignore",
+        "csstools/use-nesting": "always",
         "prettier/prettier": true,
     },
 };
