@@ -29,6 +29,7 @@ export function isArray<T = unknown>(value: unknown, itemValidator?: (item: unkn
     }
 
     if (itemValidator) {
+        // eslint-disable-next-line unicorn/no-array-callback-reference -- itemValidator is a proper type guard function
         return value.every(itemValidator);
     }
 

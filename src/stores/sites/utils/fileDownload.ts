@@ -25,35 +25,7 @@ export function downloadFile(options: FileDownloadOptions): void {
     try {
         createAndTriggerDownload(buffer, fileName, mimeType);
     } catch (error) {
-        // Re-throw specific errors for better test coverage
-        if (
-            error instanceof Error &&
-            (error.message.includes("createObjectURL") ||
-                error.message.includes("createElement") ||
-                error.message.includes("Click failed") ||
-                error.message.includes("Failed to create object URL") ||
-                error.message.includes("Failed to create element") ||
-                error.message.includes("createElement not available"))
-        ) {
-            throw error;
-        }
-
-        // Only try fallback for DOM-related errors
-        if (error instanceof Error && error.message.includes("appendChild")) {
-            try {
-                createAndTriggerDownload(buffer, fileName, mimeType);
-                return;
-            } catch (fallbackError) {
-                logger.error(
-                    "File download failed: both primary and fallback methods failed",
-                    fallbackError instanceof Error ? fallbackError : new Error(String(fallbackError))
-                );
-                throw new Error("File download failed");
-            }
-        }
-
-        logger.error("File download failed", error instanceof Error ? error : new Error(String(error)));
-        throw new Error("File download failed");
+        handleDownloadError(error, buffer, fileName, mimeType);
     }
 }
 
@@ -144,4 +116,59 @@ function createAndTriggerDownload(buffer: ArrayBuffer, fileName: string, mimeTyp
     }
 
     URL.revokeObjectURL(url);
+}
+
+/**
+ * Handle download errors with appropriate fallback strategies
+ */
+function handleDownloadError(error: unknown, buffer: ArrayBuffer, fileName: string, mimeType: string): void {
+    if (!(error instanceof Error)) {
+        logger.error("File download failed", new Error(String(error)));
+        throw new Error("File download failed");
+    }
+
+    // Re-throw specific errors that should not be retried
+    if (shouldRethrowError(error)) {
+        throw error;
+    }
+
+    // Try fallback for DOM-related errors
+    if (error.message.includes("appendChild")) {
+        tryFallbackDownload(buffer, fileName, mimeType);
+        return;
+    }
+
+    logger.error("File download failed", error);
+    throw new Error("File download failed");
+}
+
+/**
+ * Check if error should be re-thrown without retry
+ */
+function shouldRethrowError(error: Error): boolean {
+    const rethrownErrorMessages = [
+        "createObjectURL",
+        "createElement",
+        "Click failed",
+        "Failed to create object URL",
+        "Failed to create element",
+        "createElement not available",
+    ];
+
+    return rethrownErrorMessages.some((message) => error.message.includes(message));
+}
+
+/**
+ * Attempt fallback download method
+ */
+function tryFallbackDownload(buffer: ArrayBuffer, fileName: string, mimeType: string): void {
+    try {
+        createAndTriggerDownload(buffer, fileName, mimeType);
+    } catch (fallbackError) {
+        logger.error(
+            "File download failed: both primary and fallback methods failed",
+            fallbackError instanceof Error ? fallbackError : new Error(String(fallbackError))
+        );
+        throw new Error("File download failed");
+    }
 }

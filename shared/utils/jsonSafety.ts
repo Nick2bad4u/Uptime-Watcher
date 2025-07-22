@@ -148,7 +148,7 @@ export function safeJsonStringify(value: unknown, space?: number | string): Safe
     try {
         const jsonString = JSON.stringify(value, undefined, space);
 
-        if (jsonString === undefined) {
+        if (typeof jsonString !== "string") {
             return {
                 error: "Value cannot be serialized to JSON",
                 success: false,

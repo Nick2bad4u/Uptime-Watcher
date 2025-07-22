@@ -12,7 +12,8 @@
  * @returns Environment name or 'unknown' if not set
  */
 export function getEnvironment(): string {
-    return typeof process === "undefined" ? "unknown" : (process.env?.NODE_ENV ?? "unknown");
+    // eslint-disable-next-line n/no-process-env -- Environment utility needs process.env access
+    return typeof process === "undefined" ? "unknown" : (process.env.NODE_ENV ?? "unknown");
 }
 
 /**
@@ -28,7 +29,8 @@ export function getEnvironment(): string {
  * ```
  */
 export function getNodeEnv(): string {
-    return (typeof process !== "undefined" && process.env?.NODE_ENV) || "development";
+    // eslint-disable-next-line n/no-process-env -- Environment utility needs process.env access
+    return typeof process === "undefined" ? "development" : (process.env.NODE_ENV ?? "development");
 }
 
 /**
@@ -54,7 +56,8 @@ export function isBrowserEnvironment(): boolean {
  * ```
  */
 export function isDevelopment(): boolean {
-    return typeof process !== "undefined" && process.env?.NODE_ENV === "development";
+    // eslint-disable-next-line n/no-process-env -- Environment utility needs process.env access
+    return typeof process !== "undefined" && process.env.NODE_ENV === "development";
 }
 
 /**
@@ -64,7 +67,7 @@ export function isDevelopment(): boolean {
  * @returns True if in Node.js environment
  */
 export function isNodeEnvironment(): boolean {
-    return typeof process !== "undefined" && process.versions?.node !== undefined;
+    return typeof process !== "undefined" && typeof process.versions === "object" && Boolean(process.versions.node);
 }
 
 /**
@@ -74,7 +77,8 @@ export function isNodeEnvironment(): boolean {
  * @returns True if in production mode
  */
 export function isProduction(): boolean {
-    return typeof process !== "undefined" && process.env?.NODE_ENV === "production";
+    // eslint-disable-next-line n/no-process-env -- Environment utility needs process.env access
+    return typeof process !== "undefined" && process.env.NODE_ENV === "production";
 }
 
 /**
@@ -84,5 +88,6 @@ export function isProduction(): boolean {
  * @returns True if in test mode
  */
 export function isTest(): boolean {
-    return typeof process !== "undefined" && process.env?.NODE_ENV === "test";
+    // eslint-disable-next-line n/no-process-env -- Environment utility needs process.env access
+    return typeof process !== "undefined" && process.env.NODE_ENV === "test";
 }

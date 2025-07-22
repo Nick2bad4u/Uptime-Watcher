@@ -15,10 +15,10 @@ import type {
     MonitorDownEventData,
     MonitoringControlEventData,
     MonitorUpEventData,
-    Site,
     TestEventData,
     UpdateStatusEventData,
-} from "./types";
+} from "../shared/types/events";
+import type { Site } from "./types";
 
 /**
  * Site management API methods for CRUD operations.

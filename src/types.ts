@@ -13,16 +13,15 @@ export * from "./types/monitor-forms";
 export * from "@shared/types";
 
 // Import types for global declarations
+import type { Site, StatusUpdate } from "@shared/types";
 import type {
     CacheInvalidatedEventData,
     MonitorDownEventData,
     MonitoringControlEventData,
     MonitorUpEventData,
-    Site,
-    StatusUpdate,
     TestEventData,
     UpdateStatusEventData,
-} from "@shared/types";
+} from "@shared/types/events";
 
 /**
  * Electron API interface exposed to the renderer process.

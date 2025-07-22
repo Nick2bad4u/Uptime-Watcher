@@ -24,7 +24,7 @@ export function safeObjectAccess<T>(
     obj: unknown,
     key: number | string,
     fallback: T,
-    typeValidator?: (value: unknown) => value is T
+    validator?: (value: unknown) => value is T
 ): T {
     if (!isObject(obj)) {
         return fallback;
@@ -34,10 +34,11 @@ export function safeObjectAccess<T>(
         return fallback;
     }
 
+    // eslint-disable-next-line security/detect-object-injection -- Safe object property access with validation
     const value = obj[key];
 
-    if (typeValidator) {
-        return typeValidator(value) ? value : fallback;
+    if (validator) {
+        return validator(value) ? value : fallback;
     }
 
     // If no validator provided, check if value matches fallback type
@@ -61,15 +62,19 @@ export function safeObjectIteration(
     context = "Safe object iteration"
 ): void {
     if (!isObject(obj)) {
+        // Use basic console for shared utilities to avoid dependencies
+        // This is acceptable in shared utilities that can't import loggers
         console.warn(`${context}: Expected object, got ${typeof obj}`);
         return;
     }
 
     try {
         for (const [key, value] of Object.entries(obj)) {
+            // eslint-disable-next-line n/callback-return -- Callback doesn't need to return a value
             callback(key, value);
         }
     } catch (error) {
+        // Use basic console for shared utilities to avoid dependencies
         console.error(`${context} failed:`, error);
     }
 }
@@ -97,6 +102,7 @@ export function safeObjectOmit<T extends Record<PropertyKey, unknown>, K extends
     };
 
     for (const key of keys) {
+        // eslint-disable-next-line security/detect-object-injection -- Safe deletion of known keys
         delete result[key];
     }
 
@@ -125,6 +131,7 @@ export function safeObjectPick<T extends Record<PropertyKey, unknown>, K extends
 
     for (const key of keys) {
         if (Object.hasOwn(obj, key)) {
+            // eslint-disable-next-line security/detect-object-injection -- Safe assignment of known keys
             result[key] = obj[key];
         }
     }

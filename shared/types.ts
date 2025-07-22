@@ -7,12 +7,10 @@
  * @remarks
  * All core domain types (Monitor, Site, StatusUpdate, etc.) live here.
  * Both frontend and backend must import from this file for consistency.
+ * Event types are separate to avoid circular dependencies.
  *
  * @packageDocumentation
  */
-
-// Re-export event types
-export * from "./types/events";
 
 export type MonitorStatus = "down" | "paused" | "pending" | "up";
 
