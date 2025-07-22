@@ -16,7 +16,7 @@ export class ApplicationService {
     private readonly serviceContainer: ServiceContainer;
 
     constructor() {
-        logger.info("[ApplicationService] Initializing application services"); /* v8 ignore next */
+        logger.info("[ApplicationService] Initializing application services");
 
         // Get service container instance
         this.serviceContainer = ServiceContainer.getInstance({
@@ -30,12 +30,12 @@ export class ApplicationService {
      * Cleanup resources before application shutdown.
      */
     public async cleanup(): Promise<void> {
-        logger.info("[ApplicationService] Starting cleanup"); /* v8 ignore next */
+        logger.info("[ApplicationService] Starting cleanup");
 
         try {
             const services = this.serviceContainer.getInitializedServices();
             for (const { name } of services) {
-                logger.debug(`[ApplicationService] Cleaning up ${name}`); /* v8 ignore next */
+                logger.debug(`[ApplicationService] Cleaning up ${name}`);
             }
 
             // Cleanup IPC handlers
@@ -51,9 +51,9 @@ export class ApplicationService {
             // Close windows
             this.serviceContainer.getWindowService().closeMainWindow();
 
-            logger.info("[ApplicationService] Cleanup completed"); /* v8 ignore next */
+            logger.info("[ApplicationService] Cleanup completed");
         } catch (error) {
-            logger.error("[ApplicationService] Error during cleanup", error); /* v8 ignore next */
+            logger.error("[ApplicationService] Error during cleanup", error);
         }
     }
 
@@ -61,7 +61,7 @@ export class ApplicationService {
      * Handle app ready event.
      */
     private async onAppReady(): Promise<void> {
-        logger.info("[ApplicationService] App ready - initializing services"); /* v8 ignore next */
+        logger.info("[ApplicationService] App ready - initializing services");
 
         // Initialize all services through the container
         await this.serviceContainer.initialize();
@@ -75,7 +75,7 @@ export class ApplicationService {
         // Setup auto-updater
         this.setupAutoUpdater();
 
-        logger.info("[ApplicationService] All services initialized successfully"); /* v8 ignore next */
+        logger.info("[ApplicationService] All services initialized successfully");
     }
 
     /**
@@ -84,23 +84,23 @@ export class ApplicationService {
     private setupApplication(): void {
         app.on("ready", () => {
             this.onAppReady().catch((error) => {
-                logger.error("[ApplicationService] Error during app initialization", error); /* v8 ignore next */
+                logger.error("[ApplicationService] Error during app initialization", error);
             });
         });
 
         app.on("window-all-closed", () => {
-            logger.info("[ApplicationService] All windows closed"); /* v8 ignore next */
+            logger.info("[ApplicationService] All windows closed");
             if (process.platform !== "darwin") {
-                logger.info("[ApplicationService] Quitting app (non-macOS)"); /* v8 ignore next */
+                logger.info("[ApplicationService] Quitting app (non-macOS)");
                 app.quit();
             }
         });
 
         app.on("activate", () => {
-            logger.info("[ApplicationService] App activated"); /* v8 ignore next */
+            logger.info("[ApplicationService] App activated");
             const windowService = this.serviceContainer.getWindowService();
             if (windowService.getAllWindows().length === 0) {
-                logger.info("[ApplicationService] No windows open, creating main window"); /* v8 ignore next */
+                logger.info("[ApplicationService] No windows open, creating main window");
                 windowService.createMainWindow();
             }
         });
@@ -119,7 +119,7 @@ export class ApplicationService {
 
         autoUpdater.initialize();
         autoUpdater.checkForUpdates().catch((error) => {
-            logger.error("[ApplicationService] Failed to check for updates", error); /* v8 ignore next */
+            logger.error("[ApplicationService] Failed to check for updates", error);
         });
     }
 
@@ -134,7 +134,7 @@ export class ApplicationService {
         // Handle monitor status changes with typed events
         orchestrator.onTyped("monitor:status-changed", (data) => {
             try {
-                /* v8 ignore next */ logger.debug("[ApplicationService] Forwarding monitor status change to renderer", {
+                logger.debug("[ApplicationService] Forwarding monitor status change to renderer", {
                     monitorId: data.monitor.id,
                     newStatus: data.newStatus,
                     previousStatus: data.previousStatus,
@@ -191,7 +191,7 @@ export class ApplicationService {
 
         // Handle system errors
         orchestrator.onTyped("system:error", (data) => {
-            /* v8 ignore next */ logger.error(`[ApplicationService] System error: ${data.context}`, data.error);
+            logger.error(`[ApplicationService] System error: ${data.context}`, data.error);
         });
 
         // Forward monitoring start/stop events to renderer

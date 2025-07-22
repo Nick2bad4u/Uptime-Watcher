@@ -11,6 +11,7 @@ import { app } from "electron";
 import { installExtension, REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtools-installer";
 import log from "electron-log/main";
 
+import { isDev } from "./electronUtils";
 import { ApplicationService } from "./services/application/ApplicationService";
 import { logger } from "./utils/logger";
 
@@ -62,6 +63,7 @@ class Main {
                 cleanedUp = true;
                 this.applicationService.cleanup().catch((error) => {
                     logger.error("[Main] Cleanup failed", error); /* v8 ignore next */
+                    throw error;
                 });
             }
         };
@@ -85,18 +87,28 @@ class Main {
 // eslint-disable-next-line sonarjs/constructor-for-side-effects -- Main instance needed for lifecycle management
 new Main();
 
+/**
+ * Installs React and Redux DevTools extensions after the Electron app is ready.
+ *
+ * @remarks
+ * Extensions are installed only after `app.whenReady()` to ensure the Electron environment is fully initialized,
+ * as extension installation requires the app to be ready. In development, these extensions enhance debugging capabilities.
+ */
 void app.whenReady().then(async () => {
     // Wait a bit for the main window to be created and ready
     await new Promise((resolve) => setTimeout(resolve, 1));
 
-    try {
-        const extensions = await installExtension([REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS], {
-            loadExtensionOptions: { allowFileAccess: true },
-        });
-        logger.info(`[Main] Added Extensions: ${extensions.map((ext) => ext.name).join(", ")}`);
-        return extensions;
-    } catch (error) {
-        logger.warn("[Main] Failed to install dev extensions (this is normal in production)", error);
-        return [];
+    if (isDev()) {
+        try {
+            const extensions = await installExtension([REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS], {
+                loadExtensionOptions: { allowFileAccess: true },
+            });
+            logger.info(`[Main] Added Extensions: ${extensions.map((ext) => ext.name).join(", ")}`);
+            return extensions;
+        } catch (error) {
+            logger.warn("[Main] Failed to install dev extensions (this is normal in production)", error);
+            return [];
+        }
     }
+    return []; // No extensions in production
 });

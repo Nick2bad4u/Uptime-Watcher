@@ -374,6 +374,8 @@ const systemAPI = {
      * @remarks
      * Only effective when an update has been downloaded and is ready to install.
      * This will close the application and start the update installer.
+     *
+     * Note: Uses ipcRenderer.send instead of invoke because no response is needed from the main process.
      */
     quitAndInstall: () => ipcRenderer.send("quit-and-install"),
 };
@@ -473,13 +475,19 @@ const monitorTypesAPI = {
 };
 
 /**
- * Expose the organized API to the renderer process via contextBridge.
+ * Exposes a structured API object (`window.electronAPI`) to the renderer process, organized by functional domains:
+ * - `data`: Import/export and backup operations
+ * - `events`: Real-time event listeners for backend changes
+ * - `monitoring`: Control of monitoring lifecycle
+ * - `monitorTypes`: Access to monitor type registry and validation
+ * - `settings`: Application-wide configuration management
+ * - `sites`: CRUD operations for sites and monitors
+ * - `stateSync`: State synchronization and event listeners
+ * - `system`: System-level actions (updates, external links)
  *
  * @remarks
- * This creates the `window.electronAPI` object available in the renderer process.
- * All APIs are exposed as immutable, read-only properties—attempts to modify or reassign them from the renderer process will have no effect—reinforcing the security model.
- * The API is organized by functional domains for better maintainability and
- * type safety. Each domain corresponds to a specific area of functionality.
+ * Each domain provides a set of methods for a specific area of functionality, improving maintainability and type safety.
+ * All APIs are exposed as immutable, read-only properties to reinforce the security model.
  */
 contextBridge.exposeInMainWorld("electronAPI", {
     // Domain-specific APIs organized for maintainability

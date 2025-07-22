@@ -7,8 +7,27 @@
  */
 /** @type {import('stylelint').Config} */
 module.exports = {
-    extends: ["stylelint-config-standard", "stylelint-config-tailwindcss"],
+    plugins: [
+        "stylelint-react-native",
+        "stylelint-plugin-defensive-css",
+        "stylelint-use-nesting",
+        "stylelint-prettier",
+    ],
+    extends: [
+        "stylelint-config-standard",
+        "@stylistic/stylelint-config",
+        "stylelint-config-tailwindcss",
+        "stylelint-config-recess-order",
+        "stylelint-prettier/recommended",
+    ],
     rules: {
-        // You can add Tailwind-specific or custom rules here if needed
+        "@stylistic/indentation": null,
+        "@stylistic/declaration-colon-newline-after": null,
+        "react-native/css-property-no-unknown": null,
+        "react-native/font-weight-no-ignored-values": null,
+        "react-native/style-property-no-unknown:": null,
+        "plugin/use-defensive-css": [true, { severity: "warning" }],
+        "csstools/use-nesting": "always" || "ignore",
+        "prettier/prettier": true,
     },
 };

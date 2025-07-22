@@ -136,8 +136,8 @@ interface SiteEventData {
 interface StartMonitoringRequestData {
     /** Site identifier for the monitoring request */
     identifier: string;
-    /** Specific monitor ID to start */
-    monitorId: string;
+    /** Specific monitor ID to start (optional for starting all monitors) */
+    monitorId?: string;
 }
 
 /**
@@ -148,8 +148,8 @@ interface StartMonitoringRequestData {
 interface StopMonitoringRequestData {
     /** Site identifier for the monitoring request */
     identifier: string;
-    /** Specific monitor ID to stop */
-    monitorId: string;
+    /** Specific monitor ID to stop (optional for stopping all monitors) */
+    monitorId?: string;
 }
 
 /**
@@ -182,9 +182,11 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * Constructs a new UptimeOrchestrator with injected dependencies.
      *
      * @param dependencies - The manager dependencies
+     * @throws Error if dependencies are not provided
      *
      * @remarks
-     * Sets up event bus middleware and initializes with provided managers.
+     * Sets up event bus middleware and assigns provided managers.
+     * Initialization is performed separately via the initialize() method.
      */
     constructor(dependencies?: UptimeOrchestratorDependencies) {
         super("UptimeOrchestrator");
@@ -212,6 +214,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      *
      * @param siteData - The site data to add.
      * @returns Promise resolving to the added Site object.
+     * @throws Error if site creation or monitoring setup fails
      */
     public async addSite(siteData: Site): Promise<Site> {
         let site: Site | undefined;
@@ -250,17 +253,18 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      *
      * @param identifier - The site identifier.
      * @param monitorId - Optional monitor identifier.
-     * @returns Promise resolving to a StatusUpdate or null.
+     * @returns Promise resolving to a StatusUpdate or undefined if no update available.
      */
-    public async checkSiteManually(identifier: string, monitorId?: string): Promise<null | StatusUpdate> {
-        const result = await this.monitorManager.checkSiteManually(identifier, monitorId);
-        return result ?? null;
+    public async checkSiteManually(identifier: string, monitorId?: string): Promise<StatusUpdate | undefined> {
+        return this.monitorManager.checkSiteManually(identifier, monitorId);
     }
 
     /**
      * Downloads a backup of the SQLite database.
      *
-     * @returns Promise resolving to an object containing the backup buffer and file name.
+     * @returns Promise resolving to an object with:
+     *   - buffer: Buffer containing the database backup
+     *   - fileName: String with the generated backup filename
      */
     public async downloadBackup(): Promise<{ buffer: Buffer; fileName: string }> {
         return this.databaseManager.downloadBackup();
@@ -310,6 +314,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * Ensures proper initialization order and error handling.
      *
      * @returns Promise that resolves when initialization is complete.
+     * @throws Error if any manager initialization fails
      */
     public async initialize(): Promise<void> {
         try {
@@ -340,11 +345,20 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * @param siteIdentifier - The site identifier.
      * @param monitorId - The monitor identifier.
      * @returns Promise resolving to true if removed, false otherwise.
+     * @throws Error if the removal operation fails critically
      */
     public async removeMonitor(siteIdentifier: string, monitorId: string): Promise<boolean> {
         try {
             // Step 1: Stop monitoring immediately (before transaction)
             const monitoringStopped = await this.monitorManager.stopMonitoringForSite(siteIdentifier, monitorId);
+
+            // If stopping monitoring failed, log warning but continue with database removal
+            // The monitor may not be running, but database record should still be removed
+            if (!monitoringStopped) {
+                logger.warn(
+                    `[UptimeOrchestrator] Failed to stop monitoring for ${siteIdentifier}/${monitorId}, but continuing with database removal`
+                );
+            }
 
             // Step 2: Remove monitor from database using transaction
             const removed = await this.siteManager.removeMonitor(siteIdentifier, monitorId);

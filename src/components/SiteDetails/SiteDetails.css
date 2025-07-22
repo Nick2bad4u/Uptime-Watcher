@@ -59,8 +59,8 @@
     padding-left: var(--spacing-xl);
     padding-right: var(--spacing-xl);
     border-radius: var(--border-radius-xl);
-    z-index: 1;
     background: transparent;
+    z-index: 1;
     position: relative;
     display: flex;
     align-items: center;

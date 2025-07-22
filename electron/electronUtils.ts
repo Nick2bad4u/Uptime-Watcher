@@ -12,12 +12,11 @@ import { app } from "electron";
 import { isDevelopment } from "../shared/utils/environment";
 
 /**
- * Determines if the application is running in development mode.
- *
- * @returns `true` if running in development mode, `false` for production
+ * Determines if the Electron app is running in development mode (unpackaged and NODE_ENV=development).
  *
  * @remarks
- * Uses NODE_ENV and Electron's packaging state to detect runtime environment.
+ * This function extends `isDevelopment()` by also checking that the Electron app is not packaged.
+ * Use this to distinguish between development and production builds in Electron-specific code.
  *
  * @example
  * ```typescript
@@ -30,8 +29,10 @@ import { isDevelopment } from "../shared/utils/environment";
  * }
  * ```
  *
+ * @returns `true` if running in Electron development mode (unpackaged and NODE_ENV=development), `false` otherwise
  * @public
  */
 export function isDev(): boolean {
-    return isDevelopment() || !app.isPackaged;
+    // Returns true only if both isDevelopment() and Electron is not packaged
+    return isDevelopment() && !app.isPackaged;
 }
