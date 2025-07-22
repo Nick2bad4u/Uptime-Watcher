@@ -7,11 +7,7 @@
  */
 /** @type {import('stylelint').Config} */
 module.exports = {
-    plugins: [
-        "stylelint-plugin-defensive-css",
-        "stylelint-use-nesting",
-        "stylelint-prettier",
-    ],
+    plugins: ["stylelint-plugin-defensive-css", "stylelint-use-nesting", "stylelint-prettier"],
     extends: [
         "stylelint-config-standard",
         "@stylistic/stylelint-config",
