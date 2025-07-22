@@ -49,6 +49,11 @@
  * - monitoring:started: When monitoring begins
  * - monitoring:stopped: When monitoring stops
  *
+ * @see {@link DatabaseManager} for database operations and repository pattern
+ * @see {@link SiteManager} for site management and caching
+ * @see {@link MonitorManager} for monitoring operations and scheduling
+ * @see {@link TypedEventBus} for event system implementation
+ *
  * @example
  * ```typescript
  * const orchestrator = new UptimeOrchestrator();
@@ -65,8 +70,6 @@
  * // Start monitoring
  * await orchestrator.startMonitoring();
  * ```
- *
- * @packageDocumentation
  */
 
 import type { UptimeEvents } from "./events/eventTypes";
@@ -81,6 +84,15 @@ import { logger } from "./utils/logger";
 
 /**
  * Dependencies for UptimeOrchestrator.
+ *
+ * @remarks
+ * Following the repository pattern and service layer architecture,
+ * these managers encapsulate domain-specific operations and provide
+ * a clean separation between data access and business logic.
+ *
+ * Each manager implements the service layer pattern with underlying
+ * repository pattern for data persistence, ensuring consistent
+ * transaction handling and domain boundaries.
  */
 export interface UptimeOrchestratorDependencies {
     databaseManager: DatabaseManager;
@@ -167,6 +179,11 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * Gets the current history retention limit.
      *
      * @returns The current history limit from DatabaseManager
+     *
+     * @remarks
+     * This getter provides convenient property-style access for internal use.
+     * The corresponding getHistoryLimit() method exists for IPC compatibility
+     * since Electron IPC can only serialize method calls, not property access.
      */
     public get historyLimit(): number {
         return this.databaseManager.getHistoryLimit();
@@ -187,6 +204,10 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * @remarks
      * Sets up event bus middleware and assigns provided managers.
      * Initialization is performed separately via the initialize() method.
+     *
+     * Dependencies must be injected through the ServiceContainer pattern
+     * rather than creating managers directly. This ensures proper
+     * initialization order and dependency management.
      */
     constructor(dependencies?: UptimeOrchestratorDependencies) {
         super("UptimeOrchestrator");
@@ -283,6 +304,11 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * Gets the current history retention limit (method version for IPC compatibility).
      *
      * @returns The current history limit.
+     *
+     * @remarks
+     * This method provides the same value as the historyLimit getter but
+     * as a callable method. This is required for Electron IPC compatibility
+     * since IPC can serialize method calls but not property access.
      */
     public getHistoryLimit(): number {
         return this.databaseManager.getHistoryLimit();
@@ -397,6 +423,11 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      *
      * @param identifier - The site identifier.
      * @returns Promise resolving to true if removed, false otherwise.
+     *
+     * @remarks
+     * This method delegates to SiteManager for the actual removal operation.
+     * Site removal events (site:removed) are emitted by the SiteManager through
+     * the event forwarding system, not directly by this orchestrator method.
      */
     public async removeSite(identifier: string): Promise<boolean> {
         return this.siteManager.removeSite(identifier);
@@ -707,14 +738,30 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
 
         this.on("internal:site:restart-monitoring-requested", (data: RestartMonitoringRequestData) => {
             void (async () => {
-                const success = this.monitorManager.restartMonitorWithNewConfig(data.identifier, data.monitor);
-                await this.emitTyped("internal:site:restart-monitoring-response", {
-                    identifier: data.identifier,
-                    monitorId: data.monitor.id,
-                    operation: "restart-monitoring-response",
-                    success,
-                    timestamp: Date.now(),
-                });
+                try {
+                    // Note: restartMonitorWithNewConfig is intentionally synchronous
+                    // as it only updates scheduler configuration without async I/O
+                    const success = this.monitorManager.restartMonitorWithNewConfig(data.identifier, data.monitor);
+                    await this.emitTyped("internal:site:restart-monitoring-response", {
+                        identifier: data.identifier,
+                        monitorId: data.monitor.id,
+                        operation: "restart-monitoring-response",
+                        success,
+                        timestamp: Date.now(),
+                    });
+                } catch (error) {
+                    logger.error(
+                        `[UptimeOrchestrator] Error restarting monitoring for site ${data.identifier}:`,
+                        error
+                    );
+                    await this.emitTyped("internal:site:restart-monitoring-response", {
+                        identifier: data.identifier,
+                        monitorId: data.monitor.id,
+                        operation: "restart-monitoring-response",
+                        success: false,
+                        timestamp: Date.now(),
+                    });
+                }
             })();
         });
     }
@@ -725,6 +772,15 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * Validates that all managers are properly initialized.
      *
      * @throws Error if validation fails, with specific context about which manager failed
+     *
+     * @remarks
+     * Performs basic validation that each manager has the expected interface methods.
+     * This ensures managers were properly constructed and their critical methods
+     * are accessible before the orchestrator begins coordinating operations.
+     *
+     * A "properly initialized" manager must have its core interface methods
+     * available as functions, indicating successful construction and readiness
+     * for orchestrated operations.
      */
     private validateInitialization(): void {
         // Basic validation that we can access manager methods

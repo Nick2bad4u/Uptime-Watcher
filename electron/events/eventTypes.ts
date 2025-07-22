@@ -451,10 +451,52 @@ export interface UptimeEvents extends Record<string, unknown> {
 
 /**
  * Event categories for filtering and middleware processing.
+ *
+ * @remarks
+ * Organizes all events by functional domain for filtering, routing, and middleware processing.
+ * Internal events are intentionally separated for manager-to-manager communication.
  */
 export const EVENT_CATEGORIES = {
-    CONFIG: ["config:changed"],
-    DATABASE: ["database:backup-created", "database:transaction-completed"],
+    CACHE: ["cache:invalidated", "site:cache-miss", "site:cache-updated"] as const,
+    CONFIG: ["config:changed"] as const,
+    DATABASE: [
+        "database:backup-created",
+        "database:error",
+        "database:retry",
+        "database:success",
+        "database:transaction-completed",
+    ] as const,
+    INTERNAL_DATABASE: [
+        "internal:database:backup-downloaded",
+        "internal:database:data-exported",
+        "internal:database:data-imported",
+        "internal:database:get-sites-from-cache-requested",
+        "internal:database:get-sites-from-cache-response",
+        "internal:database:history-limit-updated",
+        "internal:database:initialized",
+        "internal:database:sites-refreshed",
+        "internal:database:update-sites-cache-requested",
+    ] as const,
+    INTERNAL_MONITOR: [
+        "internal:monitor:all-started",
+        "internal:monitor:all-stopped",
+        "internal:monitor:manual-check-completed",
+        "internal:monitor:site-setup-completed",
+        "internal:monitor:started",
+        "internal:monitor:stopped",
+    ] as const,
+    INTERNAL_SITE: [
+        "internal:site:added",
+        "internal:site:cache-updated",
+        "internal:site:is-monitoring-active-requested",
+        "internal:site:is-monitoring-active-response",
+        "internal:site:removed",
+        "internal:site:restart-monitoring-requested",
+        "internal:site:restart-monitoring-response",
+        "internal:site:start-monitoring-requested",
+        "internal:site:stop-monitoring-requested",
+        "internal:site:updated",
+    ] as const,
     MONITOR: [
         "monitor:added",
         "monitor:check-completed",
@@ -462,43 +504,125 @@ export const EVENT_CATEGORIES = {
         "monitor:status-changed",
         "monitor:up",
         "monitor:down",
-    ],
-    MONITORING: ["monitoring:started", "monitoring:stopped"],
-    PERFORMANCE: ["performance:metric", "performance:warning"],
-    SITE: ["site:added", "site:removed", "site:updated"],
-    SYSTEM: ["system:error", "system:shutdown", "system:startup"],
+    ] as const,
+    MONITORING: ["monitoring:started", "monitoring:stopped"] as const,
+    PERFORMANCE: ["performance:metric", "performance:warning"] as const,
+    SITE: ["site:added", "site:removed", "site:updated", "sites:state-synchronized"] as const,
+    SYSTEM: ["system:error", "system:shutdown", "system:startup"] as const,
 } as const;
 
 /**
  * Priority levels for events.
+ *
+ * @remarks
+ * Categorizes events by operational importance for filtering and middleware processing.
+ * Higher priority events should receive immediate attention and processing.
  */
 export const EVENT_PRIORITIES = {
-    CRITICAL: ["performance:warning", "system:error", "system:shutdown"],
-    HIGH: ["database:transaction-completed", "monitor:status-changed", "monitor:up", "monitor:down", "site:removed"],
-    LOW: ["performance:metric"],
-    MEDIUM: ["config:changed", "monitor:added", "site:added", "site:updated"],
+    CRITICAL: ["performance:warning", "system:error", "system:shutdown"] as const,
+    HIGH: [
+        "database:transaction-completed",
+        "monitor:status-changed",
+        "monitor:up",
+        "monitor:down",
+        "site:removed",
+    ] as const,
+    LOW: ["performance:metric"] as const,
+    MEDIUM: ["config:changed", "monitor:added", "site:added", "site:updated"] as const,
 } as const;
 
+// Type-safe helpers for event categorization
+type EventPriorityMap = typeof EVENT_PRIORITIES;
+
 /**
- * Get the priority level of an event.
+ * Get the priority level of an event with type safety.
+ *
+ * @param eventName - The event name to check priority for
+ * @returns The priority level of the event, defaults to "MEDIUM" for uncategorized events
+ *
+ * @remarks
+ * Uses type-safe lookup to determine event priority. Events not explicitly categorized
+ * default to MEDIUM priority. This ensures all events have a priority assigned for
+ * consistent middleware and filtering behavior.
+ *
+ * @example
+ * ```typescript
+ * const priority = getEventPriority("system:error"); // Returns "CRITICAL"
+ * const defaultPriority = getEventPriority("unknown:event"); // Returns "MEDIUM"
+ * ```
  */
 export function getEventPriority(eventName: keyof UptimeEvents): keyof typeof EVENT_PRIORITIES {
-    for (const [priority, events] of Object.entries(EVENT_PRIORITIES)) {
-        if (events.includes(eventName as never)) {
-            return priority as keyof typeof EVENT_PRIORITIES;
+    for (const [priority, events] of Object.entries(EVENT_PRIORITIES) as Array<
+        [keyof EventPriorityMap, readonly string[]]
+    >) {
+        if (events.includes(eventName as string)) {
+            return priority;
         }
     }
-    return "MEDIUM"; // Default priority
+    return "MEDIUM"; // Default priority for uncategorized events
 }
 
 /**
- * Type guard to check if an event is of a specific category.
+ * Type guard to check if an event belongs to a specific category.
+ *
+ * @param eventName - The event name to categorize
+ * @param category - The category to check against
+ * @returns True if the event belongs to the specified category
+ *
+ * @remarks
+ * Provides type-safe event categorization for filtering and routing.
+ * Internal events are separated into their own categories (INTERNAL_DATABASE,
+ * INTERNAL_MONITOR, INTERNAL_SITE) for manager-to-manager communication.
+ *
+ * @example
+ * ```typescript
+ * const isMonitorEvent = isEventOfCategory("monitor:up", "MONITOR"); // Returns true
+ * const isInternalEvent = isEventOfCategory("internal:site:added", "INTERNAL_SITE"); // Returns true
+ * ```
  */
 export function isEventOfCategory(eventName: keyof UptimeEvents, category: keyof typeof EVENT_CATEGORIES): boolean {
     // Check if the category exists in EVENT_CATEGORIES
     if (!Object.hasOwn(EVENT_CATEGORIES, category)) {
         return false;
     }
-    // eslint-disable-next-line security/detect-object-injection
-    return EVENT_CATEGORIES[category].includes(eventName as never);
+
+    // Type-safe category lookup - we know category exists from the check above
+    switch (category) {
+        case "CACHE": {
+            return EVENT_CATEGORIES.CACHE.includes(eventName as never);
+        }
+        case "CONFIG": {
+            return EVENT_CATEGORIES.CONFIG.includes(eventName as never);
+        }
+        case "DATABASE": {
+            return EVENT_CATEGORIES.DATABASE.includes(eventName as never);
+        }
+        case "INTERNAL_DATABASE": {
+            return EVENT_CATEGORIES.INTERNAL_DATABASE.includes(eventName as never);
+        }
+        case "INTERNAL_MONITOR": {
+            return EVENT_CATEGORIES.INTERNAL_MONITOR.includes(eventName as never);
+        }
+        case "INTERNAL_SITE": {
+            return EVENT_CATEGORIES.INTERNAL_SITE.includes(eventName as never);
+        }
+        case "MONITOR": {
+            return EVENT_CATEGORIES.MONITOR.includes(eventName as never);
+        }
+        case "MONITORING": {
+            return EVENT_CATEGORIES.MONITORING.includes(eventName as never);
+        }
+        case "PERFORMANCE": {
+            return EVENT_CATEGORIES.PERFORMANCE.includes(eventName as never);
+        }
+        case "SITE": {
+            return EVENT_CATEGORIES.SITE.includes(eventName as never);
+        }
+        case "SYSTEM": {
+            return EVENT_CATEGORIES.SYSTEM.includes(eventName as never);
+        }
+        default: {
+            return false;
+        }
+    }
 }

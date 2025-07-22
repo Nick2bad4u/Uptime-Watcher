@@ -2,13 +2,37 @@
  * Pre-built middleware functions for the TypedEventBus.
  * Provides common functionality like logging, metrics, and filtering.
  */
-// eslint-disable-next-line eslint-comments/disable-enable-pair
-/* eslint-disable n/callback-return -- Core service for data backup operations */
+
+/* eslint-disable n/callback-return -- Middleware pattern doesn't follow Node.js callback convention */
 
 import type { EventMiddleware } from "./TypedEventBus";
 
 import { isDevelopment } from "../../shared/utils/environment";
 import { logger as baseLogger } from "../utils/logger";
+
+/**
+ * Type alias for validation result that can be either a boolean or detailed result object.
+ *
+ * @remarks
+ * Validators can return:
+ * - `true` for successful validation
+ * - `false` for failed validation (generic error)
+ * - `{ isValid: true }` for successful validation with context
+ * - `{ isValid: false, error?: string }` for failed validation with specific error message
+ */
+type ValidationResult = boolean | { error?: string; isValid: boolean };
+
+/**
+ * Type alias for validator function that validates event data.
+ */
+type ValidatorFunction<TData = unknown> = (data: TData) => ValidationResult;
+
+/**
+ * Type alias for validator map that maps event names to their validator functions.
+ */
+type ValidatorMap<T extends Record<string, unknown>> = Partial<{
+    [K in keyof T]: ValidatorFunction<T[K]>;
+}>;
 
 const logger = baseLogger;
 const EVENT_EMITTED_MSG = "[EventBus] Event emitted";
@@ -86,7 +110,7 @@ export function createErrorHandlingMiddleware(options: {
             const err = error instanceof Error ? error : new Error(String(error));
 
             logger.error(`[EventBus] Middleware error for event '${event}'`, {
-                data: typeof data === "object" ? JSON.stringify(data) : data,
+                data: safeSerialize(data),
                 error: err,
                 event,
             });
@@ -272,26 +296,77 @@ export function createRateLimitMiddleware(options: {
 }
 
 /**
- * Validation middleware that validates event data against schemas.
+ * Validation middleware that validates event data against schemas with type safety.
+ *
+ * @param validators - Map of event names to validator functions
+ * @returns EventMiddleware function
+ *
+ * @remarks
+ * This middleware validates event data before processing. It supports both simple boolean
+ * validators and detailed validators that can provide specific error messages.
+ *
+ * @example
+ * ```typescript
+ * const validators = {
+ *   'user:login': (data: { userId: string }) => !!data.userId,
+ *   'data:update': (data: { table: string }) =>
+ *     data.table ? { isValid: true } : { isValid: false, error: 'Table name required' }
+ * };
+ *
+ * const validationMiddleware = createValidationMiddleware(validators);
+ * ```
  */
 export function createValidationMiddleware<T extends Record<string, unknown>>(
-    validators: Partial<{ [K in keyof T]: (data: T[K]) => boolean | { error?: string; isValid: boolean } }>
+    validators: ValidatorMap<T>
 ): EventMiddleware {
     return async (event: string, data: unknown, next: () => Promise<void> | void) => {
+        // Type-safe validator lookup with runtime validation
+        if (!Object.prototype.hasOwnProperty.call(validators, event)) {
+            // No validator for this event - continue processing
+            await next();
+            return;
+        }
+
         const validator = validators[event as keyof T];
 
-        if (validator) {
+        if (!validator) {
+            // Validator is undefined - continue processing
+            await next();
+            return;
+        }
+
+        try {
             const result = validator(data as T[keyof T]);
 
             if (typeof result === "boolean") {
                 if (!result) {
-                    logger.error(`[EventBus] Validation failed for event '${event}'`, { data, event });
+                    logger.error(`[EventBus] Validation failed for event '${event}'`, {
+                        data: safeSerialize(data),
+                        event,
+                    });
                     throw new Error(`Validation failed for event '${event}'`);
                 }
             } else if (!result.isValid) {
-                logger.error(`[EventBus] Validation failed for event '${event}': ${result.error}`, { data, event });
-                throw new Error(`Validation failed for event '${event}': ${result.error}`);
+                const errorMsg = result.error ?? "Validation failed";
+                logger.error(`[EventBus] Validation failed for event '${event}': ${errorMsg}`, {
+                    data: safeSerialize(data),
+                    event,
+                });
+                throw new Error(`Validation failed for event '${event}': ${errorMsg}`);
             }
+        } catch (error) {
+            // Re-throw validation errors, wrap unexpected errors
+            if (error instanceof Error && error.message.includes("Validation failed")) {
+                throw error;
+            }
+
+            const wrappedError = error instanceof Error ? error : new Error(String(error));
+            logger.error(`[EventBus] Validator threw unexpected error for event '${event}'`, {
+                data: safeSerialize(data),
+                error: wrappedError,
+                event,
+            });
+            throw new Error(`Validator error for event '${event}': ${wrappedError.message}`);
         }
 
         await next();
@@ -300,14 +375,53 @@ export function createValidationMiddleware<T extends Record<string, unknown>>(
 
 /**
  * Pre-configured middleware stacks for common use cases.
+ *
+ * @remarks
+ * These middleware stacks provide sensible defaults for different environments
+ * and can be used directly with TypedEventBus or as starting points for custom configurations.
+ *
+ * @example
+ * ```typescript
+ * // Use a pre-configured stack
+ * const eventBus = new TypedEventBus('my-bus');
+ * eventBus.use(MIDDLEWARE_STACKS.development());
+ *
+ * // Create a custom stack
+ * const customStack = MIDDLEWARE_STACKS.custom([
+ *   createLoggingMiddleware({ level: 'info' }),
+ *   createValidationMiddleware(validators)
+ * ]);
+ * eventBus.use(customStack);
+ * ```
  */
 export const MIDDLEWARE_STACKS = {
     /**
-     * Custom stack builder.
+     * Custom stack builder that composes multiple middleware functions.
+     *
+     * @param middlewares - Array of middleware functions to compose
+     * @returns Composed middleware function
+     *
+     * @example
+     * ```typescript
+     * const customStack = MIDDLEWARE_STACKS.custom([
+     *   createLoggingMiddleware({ level: 'info' }),
+     *   createMetricsMiddleware({ trackTiming: true }),
+     *   createValidationMiddleware(myValidators)
+     * ]);
+     * ```
      */
     custom: (middlewares: EventMiddleware[]) => composeMiddleware(...middlewares),
+
     /**
-     * Development stack with debugging, logging, and error handling.
+     * Development stack with comprehensive debugging, verbose logging, and error handling.
+     *
+     * @returns Middleware stack optimized for development
+     *
+     * @remarks
+     * Includes:
+     * - Error handling (continues on errors)
+     * - Debug middleware (verbose logging)
+     * - Detailed logging with event data
      */
     development: () =>
         composeMiddleware(
@@ -315,8 +429,18 @@ export const MIDDLEWARE_STACKS = {
             createDebugMiddleware({ enabled: true, verbose: true }),
             createLoggingMiddleware({ includeData: true, level: "debug" })
         ),
+
     /**
      * Production stack with metrics, rate limiting, and error handling.
+     *
+     * @returns Middleware stack optimized for production
+     *
+     * @remarks
+     * Includes:
+     * - Error handling (continues on errors)
+     * - Rate limiting (5 burst, 50/sec)
+     * - Metrics tracking (counts and timing)
+     * - Info-level logging (no data included)
      */
     production: () =>
         composeMiddleware(
@@ -325,8 +449,17 @@ export const MIDDLEWARE_STACKS = {
             createMetricsMiddleware({ trackCounts: true, trackTiming: true }),
             createLoggingMiddleware({ includeData: false, level: "info" })
         ),
+
     /**
-     * Testing stack with minimal overhead.
+     * Testing stack with minimal overhead and strict error handling.
+     *
+     * @returns Middleware stack optimized for testing
+     *
+     * @remarks
+     * Includes:
+     * - Error handling (fails fast on errors)
+     * - Warning-level logging (no data included)
+     * - Minimal performance impact for fast test execution
      */
     testing: () =>
         composeMiddleware(
@@ -334,3 +467,37 @@ export const MIDDLEWARE_STACKS = {
             createLoggingMiddleware({ includeData: false, level: "warn" })
         ),
 };
+
+/**
+ * Safely serialize data for logging, handling circular references and type preservation.
+ *
+ * @param data - Data to serialize
+ * @returns Serialized data safe for logging
+ */
+function safeSerialize(data: unknown): unknown {
+    if (data === null || data === undefined) {
+        return data;
+    }
+
+    if (typeof data === "string") {
+        return data;
+    }
+
+    if (typeof data === "number" || typeof data === "boolean") {
+        return data;
+    }
+
+    if (typeof data === "object") {
+        try {
+            // Try to serialize, but catch circular reference errors
+            JSON.stringify(data);
+            return data; // Return original object for better inspection
+        } catch {
+            return "[Circular Reference or Non-Serializable Object]";
+        }
+    }
+
+    return String(data);
+}
+
+/* eslint-enable n/callback-return */

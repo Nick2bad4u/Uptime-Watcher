@@ -257,6 +257,7 @@ export default [
             ...eslintPluginReactNative.configs.all.rules,
 
             "react-native/no-raw-text": "off",
+            "react-native/no-inline-styles": "off", // Not applicable to React/Electron apps
 
             "no-unsanitized/method": "error",
             "no-unsanitized/property": "error",
@@ -603,6 +604,7 @@ export default [
             ...eslintPluginReactNative.configs.all.rules,
 
             "react-native/no-raw-text": "off",
+            "react-native/no-inline-styles": "off", // Not applicable to React/Electron apps
 
             "no-unsanitized/method": "error",
             "no-unsanitized/property": "error",

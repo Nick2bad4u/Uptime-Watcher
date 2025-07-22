@@ -123,15 +123,36 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
      * @param name - Optional name for the bus (used in logging and diagnostics)
      * @param options - Optional configuration options
      *
+     * @throws {@link Error} When maxMiddleware is not positive
+     *
      * @remarks
      * If no name is provided, a unique correlation ID will be generated.
      * The bus is configured with a reasonable max listener limit for development use.
      * A maximum middleware limit prevents memory leaks from excessive middleware registration.
+     *
+     * **Configuration Guidelines:**
+     * - options.maxMiddleware: Maximum number of middleware functions allowed (default: 20, must be positive)
+     * - Values ≤ 0 will throw an error
+     * - Consider performance impact with high middleware counts
+     *
+     * @example
+     * ```typescript
+     * // Default configuration
+     * const bus = new TypedEventBus<MyEvents>('my-bus');
+     *
+     * // Custom middleware limit
+     * const bus = new TypedEventBus<MyEvents>('my-bus', { maxMiddleware: 30 });
+     * ```
      */
     constructor(name?: string, options?: { maxMiddleware?: number }) {
         super();
         this.busId = name ?? generateCorrelationId();
-        this.maxMiddleware = options?.maxMiddleware ?? 20;
+        
+        const maxMiddleware = options?.maxMiddleware ?? 20;
+        if (maxMiddleware <= 0) {
+            throw new Error(`maxMiddleware must be positive, got ${maxMiddleware}`);
+        }
+        this.maxMiddleware = maxMiddleware;
 
         // Set max listeners to prevent warnings in development
         this.setMaxListeners(50);
@@ -164,6 +185,27 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
      * Guarantees type safety between event name and data. The event is processed
      * through all registered middleware before being emitted to listeners.
      * Automatic metadata is added including correlation ID, timestamp, and bus ID.
+     *
+     * **Data Transformation Behavior:**
+     * - **Objects**: Spread with added _meta property
+     * - **Arrays**: Preserved with non-enumerable _meta property
+     * - **Primitives**: Wrapped as \{ value: primitiveData, _meta: metadata \}
+     * - **Objects with _meta**: Original _meta preserved as _originalMeta
+     *
+     * @example
+     * ```typescript
+     * // Object event (typical case)
+     * await bus.emitTyped('user:login', { userId: '123', timestamp: Date.now() });
+     * // Listener receives: { userId: '123', timestamp: Date.now(), _meta: {...} }
+     *
+     * // Array event
+     * await bus.emitTyped('data:batch', [1, 2, 3]);
+     * // Listener receives: [1, 2, 3] with _meta property attached
+     *
+     * // Primitive event
+     * await bus.emitTyped('count:updated', 42);
+     * // Listener receives: { value: 42, _meta: {...} }
+     * ```
      */
     async emitTyped<K extends keyof EventMap>(event: K, data: EventMap[K]): Promise<void> {
         const correlationId = generateCorrelationId();
@@ -176,15 +218,12 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
             await this.processMiddleware(eventName, data, correlationId);
 
             // Emit the actual event with enhanced data
-            const enhancedData = {
-                ...(typeof data === "object" && data != null ? data : { value: data }),
-                _meta: {
-                    busId: this.busId,
-                    correlationId,
-                    eventName,
-                    timestamp: Date.now(),
-                },
-            };
+            const enhancedData = this.createEnhancedData(data, {
+                busId: this.busId,
+                correlationId,
+                eventName,
+                timestamp: Date.now(),
+            });
 
             this.emit(eventName, enhancedData);
 
@@ -216,7 +255,8 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
             maxListeners: this.getMaxListeners(),
             maxMiddleware: this.maxMiddleware,
             middlewareCount: this.middlewares.length,
-            middlewareUtilization: (this.middlewares.length / this.maxMiddleware) * 100,
+            middlewareUtilization:
+                this.maxMiddleware > 0 ? Math.min((this.middlewares.length / this.maxMiddleware) * 100, 100) : 0,
         };
     }
 
@@ -330,6 +370,71 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
         logger.debug(
             `[TypedEventBus:${this.busId}] Registered middleware (total: ${this.middlewares.length}/${this.maxMiddleware})`
         );
+    }
+
+    /**
+     * Create enhanced event data with metadata, handling edge cases safely.
+     *
+     * @param data - Original event data
+     * @param metadata - Metadata to add
+     * @returns Enhanced data with _meta property
+     *
+     * @remarks
+     * Handles arrays, objects with existing _meta properties, and primitives safely.
+     * Preserves original data structure and type safety.
+     *
+     * **Special Behaviors:**
+     * - **Arrays**: Preserves array structure with non-enumerable _meta property
+     * - **Objects with _meta**: Existing _meta preserved as _originalMeta property
+     * - **Primitives**: Wrapped in \{ value: data, _meta: metadata \} structure
+     * - **Type Safety**: All transformations maintain compile-time type guarantees
+     *
+     * @example
+     * ```typescript
+     * // Array handling
+     * createEnhancedData([1, 2, 3], meta) // → [1, 2, 3] with _meta attached
+     *
+     * // Object with existing _meta
+     * createEnhancedData({ data: 'test', _meta: 'existing' }, meta)
+     * // → { data: 'test', _meta: newMeta, _originalMeta: 'existing' }
+     *
+     * // Primitive handling
+     * createEnhancedData(42, meta) // → { value: 42, _meta: meta }
+     * ```
+     */
+    private createEnhancedData<T>(data: T, metadata: EventMetadata): T & { _meta: EventMetadata } {
+        // Handle arrays specially to preserve array nature
+        if (Array.isArray(data)) {
+            const result = [...data];
+            // Use defineProperty to add non-enumerable _meta, preserving array immutability expectations
+            Object.defineProperty(result, "_meta", {
+                configurable: false,
+                enumerable: false,
+                value: metadata,
+                writable: false,
+            });
+            return result as T & { _meta: EventMetadata };
+        }
+
+        // Handle objects with potential _meta conflicts
+        if (typeof data === "object" && data != null) {
+            const hasExistingMeta = "_meta" in data;
+            if (hasExistingMeta) {
+                logger.warn(
+                    `[TypedEventBus:${this.busId}] Event data contains _meta property, preserving as _originalMeta`
+                );
+                return {
+                    ...data,
+                    _meta: metadata,
+                    _originalMeta: (data as Record<string, unknown>)._meta,
+                } as T & { _meta: EventMetadata };
+            }
+
+            return { ...data, _meta: metadata } as T & { _meta: EventMetadata };
+        }
+
+        // Handle primitives
+        return { _meta: metadata, value: data } as unknown as T & { _meta: EventMetadata };
     }
 
     /**
