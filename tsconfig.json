@@ -59,6 +59,8 @@
         "src/**/*.test.tsx",
         "shared/**/*.ts",
         "shared/**/*.tsx",
+        "shared/**/*.css",
+        "src/**/*.css",
         "vite.config.ts",
         "vitest.config.ts",
         "src/**/*",

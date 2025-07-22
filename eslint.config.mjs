@@ -48,6 +48,14 @@ import { defineConfig } from "eslint/config";
 import pluginNoOnly from "eslint-plugin-no-only-tests";
 import nodePlugin from "eslint-plugin-n";
 import stylistic from "@stylistic/eslint-plugin";
+import depend from "eslint-plugin-depend";
+import pluginWriteGood from "eslint-plugin-write-good-comments";
+import { plugin as ex } from "eslint-plugin-exception-handling";
+import eslintPluginMath from "eslint-plugin-math";
+import eslintPluginNoInferred from "eslint-plugin-no-inferred-method-name";
+import nounsanitized from "eslint-plugin-no-unsanitized";
+import tailwind from "eslint-plugin-tailwindcss";
+import * as cssPlugin from "eslint-plugin-css";
 
 const __dirname = import.meta.dirname;
 
@@ -140,7 +148,7 @@ export default [
 
     // TypeScript frontend files (React + Zustand)
     {
-        files: ["src/**/*.ts", "src/**/*.tsx"],
+        files: ["src/**/*.ts", "src/**/*.tsx", "shared/**/*.ts", "shared/**/*.tsx"],
         ignores: ["src/test/**/*.{ts,tsx}", "**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}"],
         languageOptions: {
             parser: tseslintParser,
@@ -213,6 +221,12 @@ export default [
             regexp: pluginRegexp,
             n: nodePlugin,
             js: js,
+            depend: depend,
+            "write-good-comments": pluginWriteGood,
+            math: eslintPluginMath,
+            "no-unsanitized": nounsanitized,
+            tailwind: tailwind,
+            css: cssPlugin,
         },
         rules: {
             // TypeScript rules
@@ -234,11 +248,19 @@ export default [
             ...pluginRedos.configs.recommended.rules,
             ...nodePlugin.configs["flat/all"].rules,
             ...pluginSonarjs.configs.recommended.rules,
+            ...depend.configs["flat/recommended"].rules,
+            ...eslintPluginMath.configs.recommended.rules,
+            ...tailwind.configs["flat/recommended"].rules,
+            ...cssPlugin.configs["flat/standard"].rules,
 
+            "no-unsanitized/method": "error",
+            "no-unsanitized/property": "error",
             "n/no-missing-file-extension": "off", // Allow missing file extensions for imports
             "n/file-extension-in-import": "off", // Allow missing file extensions for imports
             "n/no-missing-import": "off", // Allow missing imports for dynamic imports
             "n/no-unsupported-features/es-syntax": "off", // Allow modern ES2024+ syntax
+
+            // "write-good-comments/write-good-comments": "warn",
 
             "putout/array-element-newline": "off",
             "putout/single-property-destructuring": "off",
@@ -468,7 +490,7 @@ export default [
 
     // Electron backend files
     {
-        files: ["electron/**/*.ts"],
+        files: ["electron/**/*.ts", "shared/**/*.ts"],
         ignores: ["electron/test/**/*.ts", "electron/**/*.test.{ts,tsx}", "electron/**/*.spec.{ts,tsx}"],
         languageOptions: {
             parser: tseslintParser,
@@ -542,6 +564,12 @@ export default [
             putout: putout,
             n: nodePlugin,
             js: js,
+            depend: depend,
+            "write-good-comments": pluginWriteGood,
+            math: eslintPluginMath,
+            "no-unsanitized": nounsanitized,
+            tailwind: tailwind,
+            css: cssPlugin,
         },
         rules: {
             // TypeScript backend rules
@@ -562,11 +590,20 @@ export default [
             ...pluginRedos.configs.recommended.rules,
             ...nodePlugin.configs["flat/all"].rules,
             ...pluginSonarjs.configs.recommended.rules,
+            ...depend.configs["flat/recommended"].rules,
+            ...eslintPluginMath.configs.recommended.rules,
+            ...tailwind.configs["flat/recommended"].rules,
+            ...cssPlugin.configs["flat/standard"].rules,
+
+            "no-unsanitized/method": "error",
+            "no-unsanitized/property": "error",
 
             "n/no-missing-file-extension": "off", // Allow missing file extensions for imports
             "n/file-extension-in-import": "off", // Allow missing file extensions for imports
             "n/no-missing-import": "off", // Allow missing imports for dynamic imports
             "n/no-unsupported-features/es-syntax": "off", // Allow modern ES2024+ syntax
+
+            // "write-good-comments/write-good-comments": "warn",
 
             "unicorn/prefer-global-this": "off", // Not suitable for Electron
             "unicorn/prevent-abbreviations": "off", // Too many false positives

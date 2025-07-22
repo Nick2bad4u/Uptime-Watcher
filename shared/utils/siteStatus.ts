@@ -5,7 +5,38 @@
  * This is the single source of truth for status calculations, used by both frontend and backend.
  */
 
-import type { SiteStatus, SiteForStatus } from "../types";
+import type { SiteForStatus, SiteStatus } from "../types";
+
+/**
+ * Calculate the overall site monitoring status.
+ *
+ * Logic:
+ * - "running": All monitors are actively monitoring
+ * - "stopped": No monitors are actively monitoring
+ * - "partial": Some monitors are monitoring, some are not
+ *
+ * @param site - The site to calculate monitoring status for
+ * @returns Overall monitoring status
+ */
+export function calculateSiteMonitoringStatus(site: SiteForStatus): "partial" | "running" | "stopped" {
+    const monitors = site.monitors;
+
+    if (monitors.length === 0) {
+        return "stopped";
+    }
+
+    const monitoringCount = monitors.filter((m) => m.monitoring === true).length;
+
+    if (monitoringCount === 0) {
+        return "stopped";
+    }
+
+    if (monitoringCount === monitors.length) {
+        return "running";
+    }
+
+    return "partial";
+}
 
 /**
  * Calculate the overall site status based on monitor states.
@@ -38,37 +69,6 @@ export function calculateSiteStatus(site: SiteForStatus): SiteStatus {
 
     // Multiple statuses - mixed state
     return "mixed";
-}
-
-/**
- * Calculate the overall site monitoring status.
- *
- * Logic:
- * - "running": All monitors are actively monitoring
- * - "stopped": No monitors are actively monitoring
- * - "partial": Some monitors are monitoring, some are not
- *
- * @param site - The site to calculate monitoring status for
- * @returns Overall monitoring status
- */
-export function calculateSiteMonitoringStatus(site: SiteForStatus): "running" | "stopped" | "partial" {
-    const monitors = site.monitors;
-
-    if (monitors.length === 0) {
-        return "stopped";
-    }
-
-    const monitoringCount = monitors.filter((m) => m.monitoring === true).length;
-
-    if (monitoringCount === 0) {
-        return "stopped";
-    }
-
-    if (monitoringCount === monitors.length) {
-        return "running";
-    }
-
-    return "partial";
 }
 
 /**
@@ -113,23 +113,23 @@ export function getSiteStatusDescription(site: SiteForStatus): string {
     const runningCount = site.monitors.filter((m) => m.monitoring === true).length;
 
     switch (status) {
-        case "up": {
-            return `All ${monitorCount} monitors are up and running`;
-        }
         case "down": {
             return `All ${monitorCount} monitors are down`;
-        }
-        case "pending": {
-            return `All ${monitorCount} monitors are pending`;
-        }
-        case "paused": {
-            return `Monitoring is paused (${runningCount}/${monitorCount} active)`;
         }
         case "mixed": {
             return `Mixed status (${runningCount}/${monitorCount} monitoring active)`;
         }
+        case "paused": {
+            return `Monitoring is paused (${runningCount}/${monitorCount} active)`;
+        }
+        case "pending": {
+            return `All ${monitorCount} monitors are pending`;
+        }
         case "unknown": {
             return "No monitors configured";
+        }
+        case "up": {
+            return `All ${monitorCount} monitors are up and running`;
         }
         default: {
             return "Unknown status";
@@ -143,25 +143,25 @@ export function getSiteStatusDescription(site: SiteForStatus): string {
  * @param status - The site status
  * @returns Color variant for status indicators
  */
-export function getSiteStatusVariant(status: SiteStatus): "success" | "warning" | "error" | "info" {
+export function getSiteStatusVariant(status: SiteStatus): "error" | "info" | "success" | "warning" {
     switch (status) {
-        case "up": {
-            return "success";
-        }
         case "down": {
             return "error";
-        }
-        case "pending": {
-            return "info";
-        }
-        case "paused": {
-            return "warning";
         }
         case "mixed": {
             return "warning";
         }
+        case "paused": {
+            return "warning";
+        }
+        case "pending": {
+            return "info";
+        }
         case "unknown": {
             return "error";
+        }
+        case "up": {
+            return "success";
         }
         default: {
             return "info";

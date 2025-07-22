@@ -25,28 +25,6 @@ export function validateMonitor(monitor: Partial<Monitor>): monitor is Monitor {
 }
 
 /**
- * Validates monitor type.
- */
-export function validateMonitorType(type: unknown): type is MonitorType {
-    return typeof type === "string" && (type === "http" || type === "port");
-}
-
-/**
- * Validates site data structure.
- */
-export function validateSite(site: Partial<Site>): site is Site {
-    return (
-        typeof site.identifier === "string" &&
-        site.identifier.length > 0 &&
-        typeof site.name === "string" &&
-        site.name.length > 0 &&
-        typeof site.monitoring === "boolean" &&
-        Array.isArray(site.monitors) &&
-        site.monitors.every((monitor: unknown) => validateMonitor(monitor as Partial<Monitor>))
-    );
-}
-
-/**
  * Validates required monitor fields for a given monitor type.
  */
 export function validateMonitorFields(monitor: Partial<Monitor>): string[] {
@@ -77,10 +55,32 @@ export function validateMonitorFields(monitor: Partial<Monitor>): string[] {
         if (!monitor.host || typeof monitor.host !== "string") {
             errors.push("Host is required for port monitors");
         }
-        if (!monitor.port || typeof monitor.port !== "number" || monitor.port < 1 || monitor.port > 65535) {
+        if (!monitor.port || typeof monitor.port !== "number" || monitor.port < 1 || monitor.port > 65_535) {
             errors.push("Valid port number (1-65535) is required for port monitors");
         }
     }
 
     return errors;
+}
+
+/**
+ * Validates monitor type.
+ */
+export function validateMonitorType(type: unknown): type is MonitorType {
+    return typeof type === "string" && (type === "http" || type === "port");
+}
+
+/**
+ * Validates site data structure.
+ */
+export function validateSite(site: Partial<Site>): site is Site {
+    return (
+        typeof site.identifier === "string" &&
+        site.identifier.length > 0 &&
+        typeof site.name === "string" &&
+        site.name.length > 0 &&
+        typeof site.monitoring === "boolean" &&
+        Array.isArray(site.monitors) &&
+        site.monitors.every((monitor: unknown) => validateMonitor(monitor as Partial<Monitor>))
+    );
 }

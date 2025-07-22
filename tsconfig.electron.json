@@ -19,6 +19,8 @@
         "electron/**/*.tsx",
         "shared/**/*.ts",
         "shared/**/*.tsx",
+        "shared/**/*.css",
+        "electron/**/*.css",
         "vitest.electron.config.ts",
         "vite/client"
     ],

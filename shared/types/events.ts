@@ -6,6 +6,20 @@
 import type { Monitor, Site } from "../types";
 
 /**
+ * Event data for cache invalidation
+ */
+export interface CacheInvalidatedEventData {
+    /** Specific identifier affected (optional for global invalidation) */
+    identifier?: string;
+    /** Reason for invalidation */
+    reason: "delete" | "expiry" | "manual" | "update";
+    /** Timestamp when invalidation occurred */
+    timestamp: number;
+    /** Type of cache invalidation */
+    type: "all" | "monitor" | "site";
+}
+
+/**
  * Event data when a monitor goes down
  */
 export interface MonitorDownEventData {
@@ -15,6 +29,22 @@ export interface MonitorDownEventData {
     site: Site;
     /** Site identifier */
     siteId: string;
+    /** Timestamp when the event occurred */
+    timestamp: number;
+}
+
+/**
+ * Event data for monitoring control operations (global monitoring start/stop)
+ */
+export interface MonitoringControlEventData {
+    /** Number of active monitors (for stopped events) */
+    activeMonitors?: number;
+    /** Number of monitors involved */
+    monitorCount?: number;
+    /** Reason for stopping (for stopped events) */
+    reason?: "error" | "shutdown" | "user";
+    /** Number of sites involved */
+    siteCount?: number;
     /** Timestamp when the event occurred */
     timestamp: number;
 }
@@ -34,49 +64,19 @@ export interface MonitorUpEventData {
 }
 
 /**
- * Event data for cache invalidation
+ * Event data for test events (used in development/testing)
  */
-export interface CacheInvalidatedEventData {
-    /** Specific identifier affected (optional for global invalidation) */
-    identifier?: string;
-    /** Reason for invalidation */
-    reason: "delete" | "expiry" | "manual" | "update";
-    /** Timestamp when invalidation occurred */
-    timestamp: number;
-    /** Type of cache invalidation */
-    type: "all" | "monitor" | "site";
-}
-
-/**
- * Event data for monitoring control operations (global monitoring start/stop)
- */
-export interface MonitoringControlEventData {
-    /** Number of monitors involved */
-    monitorCount?: number;
-    /** Number of sites involved */
-    siteCount?: number;
-    /** Number of active monitors (for stopped events) */
-    activeMonitors?: number;
-    /** Reason for stopping (for stopped events) */
-    reason?: "error" | "shutdown" | "user";
-    /** Timestamp when the event occurred */
-    timestamp: number;
+export interface TestEventData {
+    /** Test data payload */
+    [key: string]: unknown;
 }
 
 /**
  * Event data for update status changes
  */
 export interface UpdateStatusEventData {
-    /** Current update status */
-    status: "available" | "checking" | "downloaded" | "downloading" | "error" | "idle";
     /** Error message if status is error */
     error?: string;
-}
-
-/**
- * Event data for test events (used in development/testing)
- */
-export interface TestEventData {
-    /** Test data payload */
-    [key: string]: unknown;
+    /** Current update status */
+    status: "available" | "checking" | "downloaded" | "downloading" | "error" | "idle";
 }

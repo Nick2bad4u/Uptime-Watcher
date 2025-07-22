@@ -4,19 +4,12 @@
  */
 
 /**
- * Ensures an error object is properly typed and formatted.
- */
-function ensureError(error: unknown): Error {
-    return error instanceof Error ? error : new Error(String(error));
-}
-
-/**
  * Safe JSON parsing result.
  */
 export interface SafeJsonResult<T> {
-    success: boolean;
     data?: T;
     error?: string;
+    success: boolean;
 }
 
 /**
@@ -46,19 +39,70 @@ export function safeJsonParse<T>(json: string, validator: (data: unknown) => dat
 
         if (validator(parsed)) {
             return {
-                success: true,
                 data: parsed,
+                success: true,
             };
         }
 
         return {
-            success: false,
             error: "Parsed data does not match expected type",
+            success: false,
         };
     } catch (error) {
         return {
-            success: false,
             error: `JSON parsing failed: ${ensureError(error).message}`,
+            success: false,
+        };
+    }
+}
+
+/**
+ * Parse JSON array with element validation.
+ *
+ * @param json - JSON string to parse
+ * @param elementValidator - Type guard for array elements
+ * @returns Safe result object with validated array or error
+ *
+ * @example
+ * ```typescript
+ * const result = safeJsonParseArray(
+ *     jsonString,
+ *     (item): item is User => typeof item === "object" && item !== null
+ * );
+ * ```
+ */
+export function safeJsonParseArray<T>(
+    json: string,
+    elementValidator: (item: unknown) => item is T
+): SafeJsonResult<T[]> {
+    try {
+        const parsed: unknown = JSON.parse(json);
+
+        if (!Array.isArray(parsed)) {
+            return {
+                error: "Parsed data is not an array",
+                success: false,
+            };
+        }
+
+        // Validate all elements
+        for (const [i, element] of parsed.entries()) {
+            if (!elementValidator(element)) {
+                return {
+                    error: `Array element at index ${i} does not match expected type`,
+                    success: false,
+                };
+            }
+        }
+
+        return {
+            data: parsed as T[],
+            success: true,
+        };
+    } catch (error) {
+        return {
+            error: `JSON parsing failed: ${ensureError(error).message}`,
+            success: false,
         };
     }
 }
@@ -100,25 +144,25 @@ export function safeJsonParseWithFallback<T>(json: string, validator: (data: unk
  * }
  * ```
  */
-export function safeJsonStringify(value: unknown, space?: string | number): SafeJsonResult<string> {
+export function safeJsonStringify(value: unknown, space?: number | string): SafeJsonResult<string> {
     try {
         const jsonString = JSON.stringify(value, undefined, space);
 
         if (jsonString === undefined) {
             return {
-                success: false,
                 error: "Value cannot be serialized to JSON",
+                success: false,
             };
         }
 
         return {
-            success: true,
             data: jsonString,
+            success: true,
         };
     } catch (error) {
         return {
-            success: false,
             error: `JSON stringification failed: ${ensureError(error).message}`,
+            success: false,
         };
     }
 }
@@ -136,58 +180,14 @@ export function safeJsonStringify(value: unknown, space?: string | number): Safe
  * const jsonString = safeJsonStringifyWithFallback(data, "{}");
  * ```
  */
-export function safeJsonStringifyWithFallback(value: unknown, fallback: string, space?: string | number): string {
+export function safeJsonStringifyWithFallback(value: unknown, fallback: string, space?: number | string): string {
     const result = safeJsonStringify(value, space);
     return result.success && result.data !== undefined ? result.data : fallback;
 }
 
 /**
- * Parse JSON array with element validation.
- *
- * @param json - JSON string to parse
- * @param elementValidator - Type guard for array elements
- * @returns Safe result object with validated array or error
- *
- * @example
- * ```typescript
- * const result = safeJsonParseArray(
- *     jsonString,
- *     (item): item is User => typeof item === "object" && item !== null
- * );
- * ```
+ * Ensures an error object is properly typed and formatted.
  */
-export function safeJsonParseArray<T>(
-    json: string,
-    elementValidator: (item: unknown) => item is T
-): SafeJsonResult<T[]> {
-    try {
-        const parsed: unknown = JSON.parse(json);
-
-        if (!Array.isArray(parsed)) {
-            return {
-                success: false,
-                error: "Parsed data is not an array",
-            };
-        }
-
-        // Validate all elements
-        for (let i = 0; i < parsed.length; i++) {
-            if (!elementValidator(parsed[i])) {
-                return {
-                    success: false,
-                    error: `Array element at index ${i} does not match expected type`,
-                };
-            }
-        }
-
-        return {
-            success: true,
-            data: parsed as T[],
-        };
-    } catch (error) {
-        return {
-            success: false,
-            error: `JSON parsing failed: ${ensureError(error).message}`,
-        };
-    }
+function ensureError(error: unknown): Error {
+    return error instanceof Error ? error : new Error(String(error));
 }

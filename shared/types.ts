@@ -14,24 +14,14 @@
 // Re-export event types
 export * from "./types/events";
 
-export type MonitorType = "http" | "port";
+export type MonitorStatus = "down" | "paused" | "pending" | "up";
 
-export type MonitorStatus = "up" | "down" | "pending" | "paused";
-export type SiteStatus = MonitorStatus | "mixed" | "unknown";
+export type MonitorType = "http" | "port";
+export type SiteStatus = "mixed" | "unknown" | MonitorStatus;
 
 // Default status constants
 export const DEFAULT_MONITOR_STATUS: MonitorStatus = "pending";
 export const DEFAULT_SITE_STATUS: SiteStatus = "unknown";
-
-export function isMonitorStatus(status: string): status is MonitorStatus {
-    return ["up", "down", "pending", "paused"].includes(status);
-}
-export function isSiteStatus(status: string): status is SiteStatus {
-    return ["up", "down", "pending", "paused", "mixed", "unknown"].includes(status);
-}
-export function isComputedSiteStatus(status: string): status is "mixed" | "unknown" {
-    return ["mixed", "unknown"].includes(status);
-}
 
 export interface Monitor {
     checkInterval: number;
@@ -48,12 +38,39 @@ export interface Monitor {
     type: MonitorType;
     url?: string;
 }
-
+export interface Site {
+    identifier: string;
+    monitoring: boolean;
+    monitors: Monitor[];
+    name: string;
+}
 export interface StatusHistory {
     details?: string;
     responseTime: number;
     status: "down" | "up";
     timestamp: number;
+}
+
+export interface StatusUpdate {
+    details?: string;
+    monitorId: string;
+    previousStatus?: MonitorStatus;
+    site?: Site;
+    siteIdentifier: string;
+    status: MonitorStatus;
+    timestamp: string;
+}
+
+export function isComputedSiteStatus(status: string): status is "mixed" | "unknown" {
+    return ["mixed", "unknown"].includes(status);
+}
+
+export function isMonitorStatus(status: string): status is MonitorStatus {
+    return ["down", "paused", "pending", "up"].includes(status);
+}
+
+export function isSiteStatus(status: string): status is SiteStatus {
+    return ["down", "mixed", "paused", "pending", "unknown", "up"].includes(status);
 }
 
 /**
@@ -75,23 +92,6 @@ export function validateMonitor(monitor: Partial<Monitor>): monitor is Monitor {
     );
 }
 
-export interface Site {
-    identifier: string;
-    monitoring: boolean;
-    monitors: Monitor[];
-    name: string;
-}
-
-export interface StatusUpdate {
-    details?: string;
-    monitorId: string;
-    status: MonitorStatus;
-    siteIdentifier: string;
-    timestamp: string;
-    site?: Site;
-    previousStatus?: MonitorStatus;
-}
-
 export const ERROR_MESSAGES = {
     FAILED_TO_ADD_MONITOR: "Failed to add monitor",
     FAILED_TO_ADD_SITE: "Failed to add site",
@@ -107,22 +107,22 @@ export const ERROR_MESSAGES = {
  * Used for monitor type configuration in both frontend and backend.
  */
 export interface MonitorFieldDefinition {
-    /** Field name (matches monitor property) */
-    name: string;
-    /** Display label for the field */
-    label: string;
-    /** Input type for form rendering */
-    type: "text" | "number" | "url";
-    /** Whether field is required */
-    required: boolean;
-    /** Placeholder text */
-    placeholder?: string;
     /** Help text for the field */
     helpText?: string;
-    /** Min value for number fields */
-    min?: number;
+    /** Display label for the field */
+    label: string;
     /** Max value for number fields */
     max?: number;
+    /** Min value for number fields */
+    min?: number;
+    /** Field name (matches monitor property) */
+    name: string;
+    /** Placeholder text */
+    placeholder?: string;
+    /** Whether field is required */
+    required: boolean;
+    /** Input type for form rendering */
+    type: "number" | "text" | "url";
 }
 
 /**
@@ -131,7 +131,7 @@ export interface MonitorFieldDefinition {
  */
 export interface SiteForStatus {
     monitors: Array<{
-        status: MonitorStatus;
         monitoring: boolean;
+        status: MonitorStatus;
     }>;
 }
