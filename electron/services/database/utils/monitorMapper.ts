@@ -71,6 +71,14 @@ export function buildMonitorParameters(siteIdentifier: string, monitor: Site["mo
  * @param row - Database row to validate
  * @returns True if row is valid
  *
+ * @remarks
+ * **Database Schema**: Validates raw database rows using snake_case column names.
+ * This is the correct pattern as database rows use snake_case while TypeScript
+ * interfaces use camelCase after conversion.
+ *
+ * **Type Safety**: Checks both existence and type for critical fields to prevent
+ * runtime conversion errors during mapping operations.
+ *
  * @public
  */
 export function isValidMonitorRow(row: Record<string, unknown>): boolean {
@@ -78,6 +86,7 @@ export function isValidMonitorRow(row: Record<string, unknown>): boolean {
         row.id !== undefined &&
         row.site_identifier !== undefined &&
         row.type !== undefined &&
+        (typeof row.id === "string" || typeof row.id === "number") &&
         typeof row.site_identifier === "string" &&
         typeof row.type === "string"
     );
@@ -101,9 +110,24 @@ export function rowsToMonitors(rows: Record<string, unknown>[]): Site["monitors"
  * @param row - Database row data
  * @returns Converted monitor object
  *
+ * @throws {@link Error} When row mapping fails or required fields are invalid
+ *
  * @remarks
- * Uses dynamic mapping based on monitor type registry.
- * Automatically handles all monitor type specific fields.
+ * **Dynamic Schema Integration**: Uses `mapRowToMonitor()` from dynamic schema system
+ * to handle monitor type-specific fields automatically.
+ *
+ * **Property Mapping**: Maps database conventions to TypeScript conventions:
+ * - `enabled` (DB) → `monitoring` (Frontend): Technical field vs user-facing state
+ * - snake_case (DB) → camelCase (TypeScript): Architectural consistency
+ *
+ * **Default Value Behavior**:
+ * - Missing numeric fields default to sensible values (checkInterval: 300000ms, timeout: 5000ms)
+ * - Invalid IDs default to "-1" for error tracking
+ * - Missing status defaults to "down" for safety
+ * - Missing responseTime uses complex fallback: dynamicMonitor.responseTime → row.responseTime → -1
+ *
+ * **Error Handling**: Catches and logs mapping failures with full context for debugging.
+ * All errors are re-thrown to ensure proper error propagation.
  *
  * @public
  */
@@ -170,6 +194,18 @@ export function rowToMonitor(row: Record<string, unknown>): Site["monitors"][0] 
  *
  * @param row - Database row data or undefined
  * @returns Converted monitor object or undefined
+ *
+ * @throws {@link Error} When row mapping fails for valid rows (propagated from rowToMonitor)
+ *
+ * @remarks
+ * **Null Safety**: Safely handles undefined/null rows without throwing errors.
+ * Used by repository methods that may not find matching records.
+ *
+ * **Error Behavior**: If row exists but is invalid, errors from `rowToMonitor()` are
+ * propagated to allow proper error handling by calling code.
+ *
+ * **Usage Pattern**: Commonly used in `MonitorRepository.findByIdentifier()` where
+ * missing monitors are expected and should return undefined.
  *
  * @public
  */

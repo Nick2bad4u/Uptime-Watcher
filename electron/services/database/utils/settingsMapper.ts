@@ -75,7 +75,11 @@ export function rowToSetting(row: Record<string, unknown>): SettingRow {
 
         return setting;
     } catch (error) {
-        logger.error("[SettingsMapper] Failed to map database row to setting", { error, row });
+        logger.error("[SettingsMapper:rowToSetting] Failed to map database row to setting", {
+            error,
+            functionName: "rowToSetting",
+            row,
+        });
         throw error;
     }
 }
@@ -86,10 +90,20 @@ export function rowToSetting(row: Record<string, unknown>): SettingRow {
  * @param row - Raw database row
  * @returns Setting value as string or undefined if not found
  *
+ * @throws {@link Error} When safeStringify conversion fails for complex objects
+ *
  * @remarks
  * **Falsy Value Handling**: Preserves all falsy values except null/undefined.
  * Empty strings, 0, and false are converted to their string representations.
  * Only null and undefined values return undefined.
+ *
+ * **Error Propagation**: Errors from `safeStringify()` are propagated to caller
+ * for proper error handling. This typically occurs with circular reference objects.
+ *
+ * **Edge Cases**:
+ * - Missing `row.value` field returns undefined
+ * - Complex objects are JSON.stringify'd by safeStringify
+ * - Malformed data structures may throw during conversion
  *
  * @public
  */
@@ -109,8 +123,15 @@ export function rowToSettingValue(row: Record<string, unknown> | undefined): str
  * @returns Record mapping keys to values
  *
  * @remarks
- * Uses isValidSettingRow for consistent validation logic.
- * Only includes settings that pass validation to ensure data integrity.
+ * **Validation**: Uses type-specific validation to ensure data integrity
+ * without awkward type casting.
+ *
+ * **Duplicate Key Handling**: If multiple settings have the same key,
+ * the last occurrence will be used. This follows JavaScript object
+ * property assignment semantics.
+ *
+ * **Type Safety**: Uses proper SettingRow validation instead of casting
+ * to generic Record type for better type safety.
  *
  * @public
  */
@@ -118,11 +139,28 @@ export function settingsToRecord(settings: SettingRow[]): Record<string, string>
     const result: Record<string, string> = {};
 
     for (const setting of settings) {
-        // Reuse existing validation logic for consistency
-        if (isValidSettingRow(setting as unknown as Record<string, unknown>)) {
+        // Use type-specific validation instead of awkward casting
+        if (isValidSettingObject(setting)) {
             result[setting.key] = setting.value;
         }
     }
 
     return result;
+}
+
+/**
+ * Validate that a SettingRow object is properly formed.
+ *
+ * @param setting - SettingRow object to validate
+ * @returns True if setting is valid
+ *
+ * @remarks
+ * Validates SettingRow objects that have already been mapped from database rows.
+ * Only checks key validity since value field is always processed appropriately.
+ * Uses simplified validation since SettingRow interface already enforces string types.
+ *
+ * @internal
+ */
+function isValidSettingObject(setting: SettingRow): boolean {
+    return typeof setting.key === "string" && setting.key.length > 0;
 }

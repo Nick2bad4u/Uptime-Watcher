@@ -89,7 +89,6 @@ export class ServiceContainer {
     }
 
     /**
-    /**
      * Get the singleton service container instance.
      */
     public static getInstance(config?: ServiceContainerConfig): ServiceContainer {
@@ -97,8 +96,6 @@ export class ServiceContainer {
         return ServiceContainer.instance;
     }
 
-    /**
-     * Reset container for testing purposes.
     /**
      * Reset container for testing purposes.
      */
@@ -110,7 +107,7 @@ export class ServiceContainer {
         if (!this._autoUpdaterService) {
             this._autoUpdaterService = new AutoUpdaterService();
             if (this.config.enableDebugLogging) {
-                logger.debug("[ServiceContainer] Created AutoUpdaterService"); /* v8 ignore next */
+                logger.debug("[ServiceContainer] Created AutoUpdaterService");
             }
         }
         return this._autoUpdaterService;
@@ -202,7 +199,7 @@ export class ServiceContainer {
 
             this._ipcService = new IpcService(orchestrator, updater);
             if (this.config.enableDebugLogging) {
-                logger.debug("[ServiceContainer] Created IpcService with dependencies"); /* v8 ignore next */
+                logger.debug("[ServiceContainer] Created IpcService with dependencies");
             }
         }
         return this._ipcService;
@@ -262,7 +259,7 @@ export class ServiceContainer {
         if (!this._notificationService) {
             this._notificationService = new NotificationService(this.config.notificationConfig);
             if (this.config.enableDebugLogging) {
-                logger.debug("[ServiceContainer] Created NotificationService"); /* v8 ignore next */
+                logger.debug("[ServiceContainer] Created NotificationService");
             }
         }
         return this._notificationService;
@@ -375,7 +372,7 @@ export class ServiceContainer {
         if (!this._windowService) {
             this._windowService = new WindowService();
             if (this.config.enableDebugLogging) {
-                logger.debug("[ServiceContainer] Created WindowService"); /* v8 ignore next */
+                logger.debug("[ServiceContainer] Created WindowService");
             }
         }
         return this._windowService;
