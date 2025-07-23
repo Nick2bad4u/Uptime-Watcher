@@ -7,14 +7,55 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[597c706](https://github.com/Nick2bad4u/Uptime-Watcher/commit/597c7060d8a390cfc59edbeeee4a23f73322c767)...
-[597c706](https://github.com/Nick2bad4u/Uptime-Watcher/commit/597c7060d8a390cfc59edbeeee4a23f73322c767)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/597c7060d8a390cfc59edbeeee4a23f73322c767...597c7060d8a390cfc59edbeeee4a23f73322c767))
+[[63d7aff](https://github.com/Nick2bad4u/Uptime-Watcher/commit/63d7affbda0e2b5db3109529e437dfd8d31b0adb)...
+[63d7aff](https://github.com/Nick2bad4u/Uptime-Watcher/commit/63d7affbda0e2b5db3109529e437dfd8d31b0adb)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/63d7affbda0e2b5db3109529e437dfd8d31b0adb...63d7affbda0e2b5db3109529e437dfd8d31b0adb))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 8.2.0 [`(63d7aff)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/63d7affbda0e2b5db3109529e437dfd8d31b0adb)
+
+
+
+
+
+
+## [8.2.0] - 2025-07-23
+
+
+[[f036cae](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f036cae36d78ddc12bc30faf35e0ee7c6bd9715a)...
+[b2fbeb1](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b2fbeb12f685ebe41f95f4af841e7427096830d0)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/f036cae36d78ddc12bc30faf35e0ee7c6bd9715a...b2fbeb12f685ebe41f95f4af841e7427096830d0))
+
+
+### �️ Bug Fixes
+
+- 🛠️ [fix] Improve validation, documentation, and event accuracy
+
+- Enhances input validation with more granular errors and upper bounds for history limits to prevent invalid usage and performance issues.
+ - Refines documentation for internal logic and business rules, adding detailed TSDoc comments and remarks for better maintainability.
+ - Ensures event data accuracy by retrieving site information before deletion, resulting in correct site name emission.
+ - Improves error formatting and readability for validation failures.
+ - Updates configuration for TSDoc to allow unsupported HTML and new tags, and removes unused dependencies and adjusts build scripts for clarity. [`(f036cae)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f036cae36d78ddc12bc30faf35e0ee7c6bd9715a)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 8.1.0 [`(597c706)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/597c7060d8a390cfc59edbeeee4a23f73322c767)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(b2fbeb1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b2fbeb12f685ebe41f95f4af841e7427096830d0)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v8.1.0 [skip ci] [`(2fe33ac)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2fe33ac2f122264213b0f9d14ce9d6826c3347c9)
 
 
 
