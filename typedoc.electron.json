@@ -1,0 +1,8 @@
+{
+  "entryPoints": [
+    "electron/main.ts"
+  ],
+  "out": "docs/docusaurus/typedoc/electron",
+  "plugin": ["typedoc-plugin-markdown"],
+  "tsconfig": "tsconfig.electron.json"
+}
