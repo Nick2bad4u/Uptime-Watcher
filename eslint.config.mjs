@@ -56,7 +56,6 @@ import eslintPluginNoInferred from "eslint-plugin-no-inferred-method-name";
 import nounsanitized from "eslint-plugin-no-unsanitized";
 import tailwind from "eslint-plugin-tailwindcss";
 import * as cssPlugin from "eslint-plugin-css";
-import eslintPluginReactNative from "eslint-plugin-react-native";
 
 const __dirname = import.meta.dirname;
 
@@ -228,7 +227,6 @@ export default [
             "no-unsanitized": nounsanitized,
             tailwind: tailwind,
             css: cssPlugin,
-            "react-native": eslintPluginReactNative,
         },
         rules: {
             // TypeScript rules
@@ -253,10 +251,7 @@ export default [
             ...eslintPluginMath.configs.recommended.rules,
             ...tailwind.configs["flat/recommended"].rules,
             ...cssPlugin.configs["flat/standard"].rules,
-            ...eslintPluginReactNative.configs.all.rules,
 
-            "react-native/no-raw-text": "off",
-            "react-native/no-inline-styles": "off", // Not applicable to React/Electron apps
 
             "no-unsanitized/method": "error",
             "no-unsanitized/property": "error",
@@ -575,7 +570,6 @@ export default [
             "no-unsanitized": nounsanitized,
             tailwind: tailwind,
             css: cssPlugin,
-            "react-native": eslintPluginReactNative,
         },
         rules: {
             // TypeScript backend rules
@@ -599,10 +593,7 @@ export default [
             ...eslintPluginMath.configs.recommended.rules,
             ...tailwind.configs["flat/recommended"].rules,
             ...cssPlugin.configs["flat/standard"].rules,
-            ...eslintPluginReactNative.configs.all.rules,
 
-            "react-native/no-raw-text": "off",
-            "react-native/no-inline-styles": "off", // Not applicable to React/Electron apps
 
             "no-unsanitized/method": "error",
             "no-unsanitized/property": "error",

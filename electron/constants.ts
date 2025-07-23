@@ -64,3 +64,9 @@ export const CACHE_SIZE_LIMITS = Object.freeze({
     /** Maximum entries for validation results cache */
     VALIDATION_RESULTS: 100,
 });
+
+/**
+ * Default database file name for backups.
+ * @defaultValue "uptime-watcher-backup.sqlite"
+ */
+export const DATABASE_FILE_NAME = "uptime-watcher-backup.sqlite";

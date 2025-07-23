@@ -7,7 +7,9 @@
     "typescript.tsserver.experimental.enableProjectDiagnostics": true,
     "typescript.check.npmIsInstalled": false,
     "typescript.workspaceSymbols.excludeLibrarySymbols": true,
-    "eslint.workingDirectories": ["."],
+    "eslint.workingDirectories": [
+        "."
+    ],
     "eslint.ignoreUntitled": true,
     "css.lint.importStatement": "ignore",
     "eslint.validate": [
@@ -74,10 +76,22 @@
             ],
             "prefer-const": "error",
             "prefer-template": "error",
-            "array-bracket-spacing": ["error", "always"],
-            "generator-star-spacing": ["error", "both"],
-            "space-before-function-paren": ["error", "always"],
-            "yield-star-spacing": ["error", "both"]
+            "array-bracket-spacing": [
+                "error",
+                "always"
+            ],
+            "generator-star-spacing": [
+                "error",
+                "both"
+            ],
+            "space-before-function-paren": [
+                "error",
+                "always"
+            ],
+            "yield-star-spacing": [
+                "error",
+                "both"
+            ]
         }
     },
     "prettier-eslint-typescript.prettierOptions": {
@@ -90,9 +104,20 @@
         "trailingComma": "none",
         "useTabs": false
     },
-    "errorLens.excludeBySource": ["ts(2339)", "ts(2307)", "ts(2304)", "eslint"],
-    "errorLens.exclude": ["**/node_modules/**"],
-    "sonarlint.pathsToExclude": ["**/node_modules/**", "**/dist/**", "**/coverage/**"],
+    "errorLens.excludeBySource": [
+        "ts(2339)",
+        "ts(2307)",
+        "ts(2304)",
+        "eslint"
+    ],
+    "errorLens.exclude": [
+        "**/node_modules/**"
+    ],
+    "sonarlint.pathsToExclude": [
+        "**/node_modules/**",
+        "**/dist/**",
+        "**/coverage/**"
+    ],
     "typescript.preferences.includeCompletionsForImportStatements": false,
     "typescript.preferences.includeCompletionsForModuleExports": false,
     "typescript.preferences.includeCompletionsWithLowerCaseLetters": false,
@@ -109,19 +134,29 @@
             },
             "github": {
                 "command": "npx",
-                "args": ["-y", "@modelcontextprotocol/server-github"],
+                "args": [
+                    "-y",
+                    "@modelcontextprotocol/server-github"
+                ],
                 "env": {
                     "GITHUB_PERSONAL_ACCESS_TOKEN": ""
                 }
             },
             "memory": {
                 "command": "npx",
-                "args": ["-y", "@modelcontextprotocol/server-memory"]
+                "args": [
+                    "-y",
+                    "@modelcontextprotocol/server-memory"
+                ]
             },
             "repomix": {
                 "name": "repomix",
                 "command": "npx",
-                "args": ["-y", "repomix", "--mcp"]
+                "args": [
+                    "-y",
+                    "repomix",
+                    "--mcp"
+                ]
             }
         }
     },
@@ -185,245 +220,449 @@
         {
             "tag": "//",
             "color": "#6272a4",
-            "strikethrough": true,
+            "strikethrough": false,
             "underline": false,
-            "backgroundColor": "transparent"
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
         },
         {
             "tag": "EXPLANATION:",
-            "color": "#ff70b3",
+            "color": "#8BE9FD",
             "strikethrough": false,
             "underline": false,
-            "backgroundColor": "transparent"
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": true
         },
         {
             "tag": "TODO:",
-            "color": "#ffc66d",
+            "color": "#FFB86C",
             "strikethrough": false,
-            "backgroundColor": "transparent"
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": true,
+            "italic": false
         },
         {
             "tag": "FIXME:",
-            "color": "#ff6e6e",
+            "color": "#FF5555",
             "strikethrough": false,
-            "backgroundColor": "transparent"
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": true,
+            "italic": false
         },
         {
             "tag": "BUG:",
-            "color": "#f8f8f2",
+            "color": "#FFFFFF",
             "strikethrough": false,
-            "backgroundColor": "#bb80ff"
+            "backgroundColor": "#FF5555",
+            "bold": true
         },
         {
             "tag": "HACK:",
-            "color": "#ffffa5",
+            "color": "#FF79C6",
             "strikethrough": false,
-            "backgroundColor": "transparent"
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": true
         },
         {
             "tag": "NOTE:",
-            "color": "#94f0ff",
+            "color": "#50FA7B",
             "strikethrough": false,
-            "backgroundColor": "transparent"
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
         },
         {
             "tag": "INFO:",
-            "color": "#c798e6",
+            "color": "#BD93F9",
             "strikethrough": false,
-            "backgroundColor": "transparent"
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
         },
         {
             "tag": "IDEA:",
-            "color": "#80ffce",
+            "color": "#8BE9FD",
             "strikethrough": false,
-            "backgroundColor": "transparent"
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": true
         },
         {
             "tag": "DEBUG:",
-            "color": "#ff2975",
+            "color": "#FF5555",
             "strikethrough": false,
-            "backgroundColor": "transparent"
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": true,
+            "italic": false
         },
         {
             "tag": "WHY:",
-            "color": "#ff9580",
+            "color": "#8BE9FD",
             "strikethrough": false,
-            "backgroundColor": "transparent"
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": true
         },
         {
             "tag": "WHAT THIS DO:",
-            "color": "#FBBF24",
+            "color": "#F1FA8C",
             "strikethrough": false,
-            "backgroundColor": "transparent"
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
         },
         {
             "tag": "CONTEXT:",
-            "color": "#d8ff80",
+            "color": "#BD93F9",
             "strikethrough": false,
-            "backgroundColor": "transparent"
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": true
         },
         {
             "tag": "CRITICAL:",
             "color": "#FFFFFF",
             "strikethrough": false,
-            "backgroundColor": "#9F1239"
+            "backgroundColor": "#FF5555",
+            "bold": true
         },
         {
             "tag": "REVIEW:",
-            "color": "#A5B4FC",
+            "color": "#8BE9FD",
             "strikethrough": false,
-            "backgroundColor": "transparent"
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
         },
         {
             "tag": "OPTIMIZE:",
-            "color": "#4ADE80",
+            "color": "#50FA7B",
             "strikethrough": false,
-            "backgroundColor": "transparent"
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": true,
+            "italic": false
         },
         {
             "tag": "SECTION:",
-            "color": "#f1a18e",
+            "color": "#FFB86C",
             "strikethrough": false,
-            "backgroundColor": "transparent"
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
         },
         {
             "tag": "NEXT STEP:",
-            "color": "#ba6645",
+            "color": "#50FA7B",
             "strikethrough": false,
-            "backgroundColor": "transparent"
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
         },
         {
             "tag": "SECURITY:",
-            "color": "#cff028",
+            "color": "#FF5555",
             "strikethrough": false,
-            "backgroundColor": "#44475a"
+            "backgroundColor": "transparent",
+            "bold": true
         },
         {
             "tag": "PERFORMANCE:",
-            "color": "#d7ffad",
+            "color": "#50FA7B",
             "strikethrough": false,
-            "backgroundColor": "transparent"
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": true,
+            "italic": false
         },
         {
             "tag": "DEPRECATED:",
-            "color": "#8b8098",
+            "color": "#6272A4",
             "strikethrough": true,
-            "backgroundColor": "#44475a"
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": true
         },
         {
             "tag": "API:",
-            "color": "#c798e6",
+            "color": "#BD93F9",
             "strikethrough": false,
-            "backgroundColor": "transparent"
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": true,
+            "italic": false
         },
         {
             "tag": "@remarks",
-            "color": "#94f0ff",
+            "color": "#8BE9FD",
             "strikethrough": false,
-            "backgroundColor": "transparent"
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
         },
         {
             "tag": "@example",
-            "color": "#80ffce",
+            "color": "#F1FA8C",
             "strikethrough": false,
-            "backgroundColor": "transparent"
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
+        },
+        {
+            "tag": "@experimental",
+            "color": "#FFB86C",
+            "strikethrough": false,
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": true
         },
         {
             "tag": "@param",
-            "color": "#ffc66d",
+            "color": "#8BE9FD",
             "strikethrough": false,
-            "backgroundColor": "transparent"
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
         },
         {
             "tag": "@returns",
-            "color": "#4ADE80",
+            "color": "#50FA7B",
             "strikethrough": false,
-            "backgroundColor": "transparent"
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
         },
         {
             "tag": "@throws",
-            "color": "#ff6e6e",
+            "color": "#FF5555",
             "strikethrough": false,
-            "backgroundColor": "transparent"
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
         },
         {
             "tag": "@deprecated",
-            "color": "#8b8098",
+            "color": "#6272A4",
             "strikethrough": true,
-            "backgroundColor": "#44475a"
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": true
         },
         {
             "tag": "@see",
-            "color": "#A5B4FC",
+            "color": "#BD93F9",
             "strikethrough": false,
-            "backgroundColor": "transparent"
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
         },
         {
             "tag": "@defaultValue",
-            "color": "#d8ff80",
+            "color": "#F1FA8C",
             "strikethrough": false,
-            "backgroundColor": "transparent"
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
         },
         {
             "tag": "@public",
-            "color": "#4ADE80",
+            "color": "#50FA7B",
             "strikethrough": false,
-            "backgroundColor": "transparent"
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
         },
         {
             "tag": "@private",
-            "color": "#ff2975",
+            "color": "#FF5555",
             "strikethrough": false,
-            "backgroundColor": "transparent"
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
         },
         {
             "tag": "@protected",
-            "color": "#ffc66d",
+            "color": "#FFB86C",
             "strikethrough": false,
-            "backgroundColor": "transparent"
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
         },
         {
             "tag": "@readonly",
-            "color": "#94f0ff",
+            "color": "#8BE9FD",
             "strikethrough": false,
-            "backgroundColor": "transparent"
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
         },
         {
             "tag": "@sealed",
-            "color": "#ff9580",
+            "color": "#BD93F9",
             "strikethrough": false,
-            "backgroundColor": "transparent"
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": true
         },
         {
             "tag": "@virtual",
-            "color": "#c798e6",
+            "color": "#BD93F9",
             "strikethrough": false,
-            "backgroundColor": "transparent"
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": true
         },
         {
             "tag": "{@link",
-            "color": "#45A9F9",
+            "color": "#8BE9FD",
             "strikethrough": false,
             "underline": true,
-            "backgroundColor": "transparent"
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
         },
         {
             "tag": "{@inheritDoc",
-            "color": "#ff70b3",
+            "color": "#FF79C6",
             "strikethrough": false,
-            "backgroundColor": "transparent"
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
         },
         {
             "tag": "@packageDocumentation",
-            "color": "#ffffa5",
+            "color": "#BD93F9",
             "strikethrough": false,
-            "backgroundColor": "transparent"
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": true,
+            "italic": false
         },
         {
             "tag": "{@linkcode",
-            "color": "#45A9F9",
+            "color": "#8BE9FD",
             "strikethrough": false,
-            "backgroundColor": "transparent"
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
+        },
+        {
+            "tag": "@beta",
+            "color": "#FFB86C",
+            "strikethrough": false,
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": true
+        },
+        {
+            "tag": "@alpha",
+            "color": "#FF5555",
+            "strikethrough": false,
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": true
+        },
+        {
+            "tag": "@decorator",
+            "color": "#FFB86C",
+            "strikethrough": false,
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
+        },
+        {
+            "tag": "@eventProperty",
+            "color": "#8BE9FD",
+            "strikethrough": false,
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
+        },
+        {
+            "tag": "@privateRemarks",
+            "color": "#FF79C6",
+            "strikethrough": false,
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": true
+        },
+        {
+            "tag": "@label",
+            "color": "#FFB86C",
+            "strikethrough": false,
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
+        },
+        {
+            "tag": "@override",
+            "color": "#FF5555",
+            "strikethrough": false,
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": true
+        },
+        {
+            "tag": "@typeParam",
+            "color": "#8BE9FD",
+            "strikethrough": false,
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
+        },
+        {
+            "tag": [
+                "Features",
+                "Key Features",
+                "@features",
+                "@keyFeatures"
+            ],
+            "color": "#50FA7B",
+            "strikethrough": false,
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": true,
+            "italic": false
         }
     ]
 }

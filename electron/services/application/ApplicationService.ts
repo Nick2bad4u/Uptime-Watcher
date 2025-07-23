@@ -15,6 +15,14 @@ import { ServiceContainer } from "../ServiceContainer";
 export class ApplicationService {
     private readonly serviceContainer: ServiceContainer;
 
+    /**
+     * Initialize the ApplicationService and set up the service container.
+     *
+     * @remarks
+     * Creates a ServiceContainer instance with appropriate debug settings
+     * and sets up application-level event handlers. This constructor should
+     * be called once during application startup.
+     */
     constructor() {
         logger.info("[ApplicationService] Initializing application services");
 
@@ -28,6 +36,13 @@ export class ApplicationService {
 
     /**
      * Cleanup resources before application shutdown.
+     *
+     * @remarks
+     * Performs ordered shutdown of all services including IPC cleanup,
+     * monitoring stoppage, and window closure. Follows project error handling
+     * standards by re-throwing errors after logging for upstream handling.
+     *
+     * @throws Re-throws any errors encountered during cleanup for upstream handling
      */
     public async cleanup(): Promise<void> {
         logger.info("[ApplicationService] Starting cleanup");
@@ -39,6 +54,7 @@ export class ApplicationService {
             }
 
             // Cleanup IPC handlers
+            // NOTE: Currently synchronous, but designed to be future-compatible with async cleanup
             const ipcService = this.serviceContainer.getIpcService();
             if ("cleanup" in ipcService && typeof ipcService.cleanup === "function") {
                 ipcService.cleanup();
@@ -49,16 +65,26 @@ export class ApplicationService {
             await orchestrator.stopMonitoring();
 
             // Close windows
+            // NOTE: Currently synchronous, but designed to be future-compatible with async closure
             this.serviceContainer.getWindowService().closeMainWindow();
 
             logger.info("[ApplicationService] Cleanup completed");
         } catch (error) {
             logger.error("[ApplicationService] Error during cleanup", error);
+            // Re-throw errors after logging (project standard)
+            throw error;
         }
     }
 
     /**
-     * Handle app ready event.
+     * Handle application ready event and initialize all services.
+     *
+     * @remarks
+     * Performs ordered initialization of all services through the ServiceContainer,
+     * creates the main application window, and sets up event handlers and auto-updater.
+     * This method is called automatically when Electron's 'ready' event fires.
+     *
+     * @throws Errors are caught and logged by the calling setupApplication method
      */
     private async onAppReady(): Promise<void> {
         logger.info("[ApplicationService] App ready - initializing services");
@@ -79,7 +105,16 @@ export class ApplicationService {
     }
 
     /**
-     * Setup application-level event handlers.
+     * Setup application-level Electron event handlers.
+     *
+     * @remarks
+     * Configures handlers for core Electron application lifecycle events:
+     * - 'ready': Triggers service initialization and window creation
+     * - 'window-all-closed': Handles application shutdown (platform-specific)
+     * - 'activate': Handles application reactivation (macOS dock click)
+     *
+     * This method is called during constructor to ensure event handlers are
+     * registered before Electron's ready event fires.
      */
     private setupApplication(): void {
         app.on("ready", () => {
@@ -107,7 +142,16 @@ export class ApplicationService {
     }
 
     /**
-     * Setup auto-updater with callbacks.
+     * Setup auto-updater service with status callbacks and initialization.
+     *
+     * @remarks
+     * Configures the auto-updater service to:
+     * - Send update status notifications to the renderer process
+     * - Initialize the auto-updater mechanism
+     * - Perform initial update check with error handling
+     *
+     * Update check errors are logged but not re-thrown to prevent
+     * application startup failures due to network issues.
      */
     private setupAutoUpdater(): void {
         const autoUpdater = this.serviceContainer.getAutoUpdaterService();
@@ -124,7 +168,19 @@ export class ApplicationService {
     }
 
     /**
-     * Setup event handlers for uptime monitoring events.
+     * Setup typed event handlers for uptime monitoring system events.
+     *
+     * @remarks
+     * Establishes communication bridge between the uptime monitoring system
+     * and the renderer process by forwarding typed events including:
+     * - Monitor status changes (up/down/status-changed)
+     * - Monitoring lifecycle events (started/stopped)
+     * - Cache invalidation events
+     * - System errors
+     *
+     * Also triggers desktop notifications for monitor state changes.
+     * All event forwarding includes error handling to prevent event
+     * processing failures from affecting monitoring operations.
      */
     private setupUptimeEventHandlers(): void {
         const orchestrator = this.serviceContainer.getUptimeOrchestrator();
@@ -144,10 +200,7 @@ export class ApplicationService {
                 // Send status update to renderer
                 windowService.sendToRenderer("monitor:status-changed", data);
             } catch (error) {
-                /* v8 ignore next 2 */ logger.error(
-                    "[ApplicationService] Failed to forward monitor status change to renderer",
-                    error
-                );
+                logger.error("[ApplicationService] Failed to forward monitor status change to renderer", error);
             }
         });
 
@@ -163,10 +216,7 @@ export class ApplicationService {
                 windowService.sendToRenderer("monitor:up", data);
                 notificationService.notifyMonitorUp(data.site, data.monitor.id);
             } catch (error) {
-                /* v8 ignore next 2 */ logger.error(
-                    "[ApplicationService] Failed to forward monitor up to renderer",
-                    error
-                );
+                logger.error("[ApplicationService] Failed to forward monitor up to renderer", error);
             }
         });
 
@@ -182,10 +232,7 @@ export class ApplicationService {
                 windowService.sendToRenderer("monitor:down", data);
                 notificationService.notifyMonitorDown(data.site, data.monitor.id);
             } catch (error) {
-                /* v8 ignore next 2 */ logger.error(
-                    "[ApplicationService] Failed to forward monitor down to renderer",
-                    error
-                );
+                logger.error("[ApplicationService] Failed to forward monitor down to renderer", error);
             }
         });
 
@@ -197,31 +244,19 @@ export class ApplicationService {
         // Forward monitoring start/stop events to renderer
         orchestrator.onTyped("monitoring:started", (data) => {
             try {
-                /* v8 ignore next 2 */ logger.debug(
-                    "[ApplicationService] Forwarding monitoring started to renderer",
-                    data
-                );
+                logger.debug("[ApplicationService] Forwarding monitoring started to renderer", data);
                 windowService.sendToRenderer("monitoring:started", data);
             } catch (error) {
-                /* v8 ignore next 2 */ logger.error(
-                    "[ApplicationService] Failed to forward monitoring started to renderer",
-                    error
-                );
+                logger.error("[ApplicationService] Failed to forward monitoring started to renderer", error);
             }
         });
 
         orchestrator.onTyped("monitoring:stopped", (data) => {
             try {
-                /* v8 ignore next 2 */ logger.debug(
-                    "[ApplicationService] Forwarding monitoring stopped to renderer",
-                    data
-                );
+                logger.debug("[ApplicationService] Forwarding monitoring stopped to renderer", data);
                 windowService.sendToRenderer("monitoring:stopped", data);
             } catch (error) {
-                /* v8 ignore next 2 */ logger.error(
-                    "[ApplicationService] Failed to forward monitoring stopped to renderer",
-                    error
-                );
+                logger.error("[ApplicationService] Failed to forward monitoring stopped to renderer", error);
             }
         });
 
@@ -235,10 +270,7 @@ export class ApplicationService {
                 });
                 windowService.sendToRenderer("cache:invalidated", data);
             } catch (error) {
-                /* v8 ignore next 2 */ logger.error(
-                    "[ApplicationService] Failed to forward cache invalidation to renderer",
-                    error
-                );
+                logger.error("[ApplicationService] Failed to forward cache invalidation to renderer", error);
             }
         });
     }
