@@ -29,7 +29,7 @@
  */
 
 import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
-import { Site } from "../../types";
+import { MonitorType, Site } from "../../types";
 import { IMonitorService, MonitorCheckResult, MonitorConfig } from "./types";
 import { performPortCheckWithRetry } from "./utils/portRetry";
 
@@ -67,14 +67,15 @@ export class PortMonitor implements IMonitorService {
     /**
      * Perform a port connectivity check on the given monitor.
      *
-     * @param monitor - Monitor configuration containing host and port details
+     * @param monitor - Monitor configuration of type {@link Site}["monitors"][0] containing host, port, and connection settings
      * @returns Promise resolving to check result with status and timing data
      *
      * @throws Error when monitor type is not "port"
      *
      * @remarks
      * Uses per-monitor retry attempts and timeout configuration for robust
-     * connectivity checking. Validates monitor configuration before attempting
+     * connectivity checking. Falls back to service defaults when monitor-specific
+     * values are not provided. Validates monitor configuration before attempting
      * connection and provides detailed error information for failures.
      *
      * The check will use the monitor's configured timeout if available,
@@ -88,15 +89,16 @@ export class PortMonitor implements IMonitorService {
 
         if (!monitor.host || !monitor.port) {
             return {
-                details: "0",
+                details: "Missing host or port configuration",
                 error: "Port monitor missing host or port",
                 responseTime: 0,
                 status: "down",
             };
         }
 
-        const timeout = monitor.timeout;
-        const retryAttempts = monitor.retryAttempts;
+        // Note: Despite type definitions, these values can be undefined in practice (see tests)
+        const timeout = (monitor.timeout as number | undefined) ?? this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT;
+        const retryAttempts = (monitor.retryAttempts as number | undefined) ?? 3; // Default retry attempts
 
         return performPortCheckWithRetry(monitor.host, monitor.port, timeout, retryAttempts);
     }
@@ -104,12 +106,14 @@ export class PortMonitor implements IMonitorService {
     /**
      * Get the current configuration.
      *
-     * @returns A copy of the current monitor configuration
+     * @returns A shallow copy of the current monitor configuration
      *
      * @remarks
-     * Returns a defensive copy of the current configuration to prevent
-     * external modification. This ensures configuration immutability
-     * and prevents accidental state corruption.
+     * Returns a defensive shallow copy of the current configuration to prevent
+     * external modification. This ensures configuration immutability and prevents
+     * accidental state corruption. Note that this is a shallow copy - only the
+     * top-level properties are copied. If nested objects are added to MonitorConfig
+     * in the future, they would be referenced, not cloned.
      */
     public getConfig(): MonitorConfig {
         return { ...this.config };
@@ -122,9 +126,10 @@ export class PortMonitor implements IMonitorService {
      *
      * @remarks
      * Returns the string identifier used to route monitoring requests
-     * to this service implementation.
+     * to this service implementation. Uses the {@link MonitorType} union type
+     * for type safety and consistency across the application.
      */
-    public getType(): Site["monitors"][0]["type"] {
+    public getType(): MonitorType {
         return "port";
     }
 
@@ -134,11 +139,25 @@ export class PortMonitor implements IMonitorService {
      * @param config - Partial configuration to merge with existing settings
      *
      * @remarks
-     * Updates the monitor's configuration by merging the provided partial
-     * configuration with existing settings. This allows dynamic reconfiguration
+     * Updates the monitor's configuration by performing a shallow merge of the provided
+     * partial configuration with existing settings. This allows dynamic reconfiguration
      * of timeout values and other parameters without recreating the monitor instance.
+     *
+     * The merge is shallow - nested objects are not deeply merged. Only validates
+     * that provided values are of correct types but does not validate ranges or
+     * other business logic constraints.
+     *
+     * @throws Error if config contains invalid property types
      */
     public updateConfig(config: Partial<MonitorConfig>): void {
+        // Basic validation of config properties
+        if (config.timeout !== undefined && (typeof config.timeout !== "number" || config.timeout <= 0)) {
+            throw new Error("Invalid timeout: must be a positive number");
+        }
+        if (config.userAgent !== undefined && typeof config.userAgent !== "string") {
+            throw new Error("Invalid userAgent: must be a string");
+        }
+
         this.config = {
             ...this.config,
             ...config,

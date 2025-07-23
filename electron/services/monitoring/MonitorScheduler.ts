@@ -5,9 +5,36 @@ import { logger } from "../../utils/logger";
 /**
  * Service for managing monitor scheduling and intervals.
  * Handles per-monitor interval timers and scheduling logic.
+ *
+ * @remarks
+ * Manages individual timer intervals for each monitor, allowing different
+ * check frequencies per monitor. Provides lifecycle management for starting,
+ * stopping, and restarting monitoring operations.
  */
 export class MonitorScheduler {
     private readonly intervals = new Map<string, NodeJS.Timeout>();
+
+    /**
+     * Callback function executed when a monitor check is scheduled.
+     *
+     * @remarks
+     * This callback is responsible for performing the actual monitor check.
+     * It should handle all monitor types and return appropriate results.
+     *
+     * Error handling:
+     * - Errors are logged but don't stop the scheduling
+     * - Critical startup errors may be re-thrown
+     * - Failed checks don't affect other monitors
+     *
+     * Contract:
+     * - Must be async and handle timeouts internally
+     * - Should not throw for normal monitoring failures
+     * - Should complete within reasonable time to avoid overlap
+     *
+     * @param siteIdentifier - Unique identifier for the site
+     * @param monitorId - Unique identifier for the monitor
+     * @returns Promise that resolves when check completes
+     */
     private onCheckCallback?: (siteIdentifier: string, monitorId: string) => Promise<void>;
 
     /**
@@ -28,7 +55,7 @@ export class MonitorScheduler {
      * Check if a monitor is currently being monitored.
      */
     public isMonitoring(siteIdentifier: string, monitorId: string): boolean {
-        const intervalKey = `${siteIdentifier}|${monitorId}`;
+        const intervalKey = this.createIntervalKey(siteIdentifier, monitorId);
         return this.intervals.has(intervalKey);
     }
 
@@ -40,16 +67,26 @@ export class MonitorScheduler {
             try {
                 await this.onCheckCallback(siteIdentifier, monitorId);
             } catch (error) {
-                logger.error(
-                    `[MonitorScheduler] Error during immediate check for ${siteIdentifier}|${monitorId}`,
-                    error
-                );
+                const intervalKey = this.createIntervalKey(siteIdentifier, monitorId);
+                logger.error(`[MonitorScheduler] Error during immediate check for ${intervalKey}`, error);
             }
         }
     }
 
     /**
-     * Restart monitoring for a specific monitor (useful when interval changes).
+     * Restart monitoring for a specific monitor.
+     *
+     * @param siteIdentifier - Site identifier
+     * @param monitor - Monitor configuration
+     * @returns True if monitoring was successfully restarted, false if monitor has no ID
+     *
+     * @remarks
+     * Stops existing monitoring for the monitor and starts fresh with current configuration.
+     * Useful when monitor settings (like check interval) have changed.
+     *
+     * Return value semantics:
+     * - true: Monitor was successfully stopped and restarted
+     * - false: Monitor has no ID and cannot be monitored
      */
     public restartMonitor(siteIdentifier: string, monitor: Site["monitors"][0]): boolean {
         if (!monitor.id) {
@@ -76,13 +113,13 @@ export class MonitorScheduler {
             return false;
         }
 
-        const intervalKey = `${siteIdentifier}|${monitor.id}`;
+        const intervalKey = this.createIntervalKey(siteIdentifier, monitor.id);
 
         // Stop existing interval if any
         this.stopMonitor(siteIdentifier, monitor.id);
 
-        // Use monitor-specific checkInterval
-        const checkInterval = monitor.checkInterval;
+        // Validate and use monitor-specific checkInterval
+        const checkInterval = this.validateCheckInterval(monitor.checkInterval);
 
         if (isDev()) {
             logger.debug(
@@ -144,9 +181,22 @@ export class MonitorScheduler {
 
     /**
      * Stop monitoring for a specific monitor.
+     *
+     * @param siteIdentifier - Site identifier
+     * @param monitorId - Monitor ID to stop
+     * @returns True if monitoring was stopped, false if not currently monitoring
+     *
+     * @remarks
+     * Clears the interval timer and removes the monitor from active tracking.
+     * Safe to call even if monitor is not currently being monitored.
+     *
+     * Side effects:
+     * - Clears associated interval timer
+     * - Removes monitor from internal tracking
+     * - Logs debug information about the stop operation
      */
     public stopMonitor(siteIdentifier: string, monitorId: string): boolean {
-        const intervalKey = `${siteIdentifier}|${monitorId}`;
+        const intervalKey = this.createIntervalKey(siteIdentifier, monitorId);
         const interval = this.intervals.get(intervalKey);
 
         if (interval) {
@@ -174,11 +224,62 @@ export class MonitorScheduler {
             // Stop all monitors for this site
             const siteIntervals = [...this.intervals.keys()].filter((key) => key.startsWith(`${siteIdentifier}|`));
             for (const intervalKey of siteIntervals) {
-                const [, monitorId] = intervalKey.split("|");
-                if (monitorId) {
-                    this.stopMonitor(siteIdentifier, monitorId);
+                const parsed = this.parseIntervalKey(intervalKey);
+                if (parsed) {
+                    this.stopMonitor(parsed.siteIdentifier, parsed.monitorId);
                 }
             }
         }
+    }
+
+    /**
+     * Create standardized interval key.
+     *
+     * @param siteIdentifier - Site identifier
+     * @param monitorId - Monitor ID
+     * @returns Formatted interval key
+     */
+    private createIntervalKey(siteIdentifier: string, monitorId: string): string {
+        return `${siteIdentifier}|${monitorId}`;
+    }
+
+    /**
+     * Parse interval key into components.
+     *
+     * @param intervalKey - Formatted interval key
+     * @returns Parsed components or null if invalid
+     */
+    private parseIntervalKey(intervalKey: string): null | { monitorId: string; siteIdentifier: string } {
+        const parts = intervalKey.split("|");
+        if (parts.length !== 2) return null;
+
+        const [siteIdentifier, monitorId] = parts;
+        if (!siteIdentifier || !monitorId) return null;
+
+        return { monitorId, siteIdentifier };
+    }
+
+    /**
+     * Validate monitor check interval.
+     *
+     * @param checkInterval - Interval value to validate
+     * @returns Validated interval or throws error
+     *
+     * @remarks
+     * Ensures check interval is a positive number to prevent setInterval issues.
+     * Very short intervals (\< 1000ms) generate warnings for performance.
+     */
+    private validateCheckInterval(checkInterval: number): number {
+        if (!Number.isInteger(checkInterval) || checkInterval <= 0) {
+            throw new Error(`Invalid check interval: ${checkInterval}. Must be a positive integer.`);
+        }
+
+        // Minimum interval to prevent excessive CPU usage
+        const MIN_INTERVAL = 1000; // 1 second
+        if (checkInterval < MIN_INTERVAL) {
+            logger.warn(`Check interval ${checkInterval}ms is very short, minimum recommended: ${MIN_INTERVAL}ms`);
+        }
+
+        return checkInterval;
     }
 }

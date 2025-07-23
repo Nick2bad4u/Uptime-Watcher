@@ -180,10 +180,22 @@ export function validateMonitorData(
 }
 
 /**
- * Simple monitor type validation for internal use (breaks circular dependency with EnhancedTypeGuards).
+ * Simple monitor type validation for internal use.
  *
  * @param type - Monitor type to validate
  * @returns Validation result compatible with EnhancedTypeGuard interface
+ *
+ * @remarks
+ * Breaks circular dependency with EnhancedTypeGuards by providing basic validation.
+ * Used internally by registry functions that need type validation without
+ * importing external validation utilities.
+ *
+ * Validation logic:
+ * - Checks if type is a string
+ * - Verifies type is registered in the monitor registry
+ * - Returns structured result compatible with type guard patterns
+ *
+ * @internal
  */
 function validateMonitorTypeInternal(type: unknown): {
     error?: string;
@@ -311,7 +323,33 @@ migrationRegistry.registerMigration("port", exampleMigrations.portV1_0_to_1_1);
 versionManager.setVersion("http", "1.0.0");
 versionManager.setVersion("port", "1.0.0");
 
-// Enhanced type guard for better runtime validation
+/**
+ * Create monitor object with runtime type validation.
+ *
+ * @param type - Monitor type string to validate
+ * @param data - Monitor data to merge with defaults
+ * @returns Validation result with created monitor or errors
+ *
+ * @remarks
+ * Provides runtime type safety by validating monitor type and creating
+ * properly structured monitor objects with sensible defaults.
+ *
+ * Process:
+ * 1. Validates monitor type using internal validation
+ * 2. Creates monitor object with default values
+ * 3. Merges provided data with defaults
+ * 4. Returns structured result for error handling
+ *
+ * @example
+ * ```typescript
+ * const result = createMonitorWithTypeGuards("http", { url: "https://example.com" });
+ * if (result.success) {
+ *   console.log("Created monitor:", result.monitor);
+ * } else {
+ *   console.error("Validation errors:", result.errors);
+ * }
+ * ```
+ */
 export function createMonitorWithTypeGuards(
     type: string,
     data: Record<string, unknown>
@@ -355,6 +393,42 @@ export function isValidMonitorTypeGuard(type: unknown): type is string {
     return typeof type === "string" && isValidMonitorType(type);
 }
 
+/**
+ * Migrate monitor data between versions with comprehensive error handling.
+ *
+ * @param monitorType - Type of monitor to migrate
+ * @param fromVersion - Source version of the data
+ * @param toVersion - Target version for migration
+ * @param data - Optional monitor data to migrate
+ * @returns Migration result with transformed data or errors
+ *
+ * @remarks
+ * Provides version migration support for monitor configurations using
+ * the migration system. Handles both data transformations and version updates.
+ *
+ * Migration process:
+ * 1. Validates monitor type using internal validation
+ * 2. Checks if migration is needed (version comparison)
+ * 3. Uses migration orchestrator for data transformation
+ * 4. Returns structured result with applied migrations
+ *
+ * Error handling:
+ * - Invalid monitor types return validation errors
+ * - Missing migration paths return migration errors
+ * - Transform failures include original error details
+ * - All errors are logged for debugging
+ *
+ * @example
+ * ```typescript
+ * const result = await migrateMonitorType("http", "1.0.0", "1.1.0", monitorData);
+ * if (result.success) {
+ *   console.log("Applied migrations:", result.appliedMigrations);
+ *   return result.data;
+ * } else {
+ *   console.error("Migration failed:", result.errors);
+ * }
+ * ```
+ */
 // Database migration helper - properly implemented with basic migration system
 export async function migrateMonitorType(
     monitorType: MonitorType,

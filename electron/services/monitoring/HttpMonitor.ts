@@ -28,7 +28,7 @@
  * @packageDocumentation
  */
 
-import { AxiosInstance } from "axios";
+import { AxiosInstance, AxiosResponse } from "axios";
 
 import { DEFAULT_REQUEST_TIMEOUT, RETRY_BACKOFF, USER_AGENT } from "../../constants";
 import { isDev } from "../../electronUtils";
@@ -113,7 +113,17 @@ export class HttpMonitor implements IMonitorService {
 
     /**
      * Perform an HTTP health check on the given monitor.
-     * Uses per-monitor retry attempts and timeout configuration.
+     *
+     * @param monitor - Monitor configuration of type {@link Site}["monitors"][0] containing URL and settings
+     * @returns Promise resolving to check result with status and timing data
+     *
+     * @throws Error when monitor type is not "http"
+     *
+     * @remarks
+     * Uses per-monitor retry attempts and timeout configuration for robust
+     * connectivity checking. Falls back to service defaults when monitor-specific
+     * values are not provided. Utilizes operational hooks for retry logic and
+     * comprehensive error handling.
      */
     public async check(monitor: Site["monitors"][0]): Promise<MonitorCheckResult> {
         if (monitor.type !== "http") {
@@ -124,8 +134,9 @@ export class HttpMonitor implements IMonitorService {
             return createErrorResult("HTTP monitor missing URL", 0);
         }
 
-        const timeout = monitor.timeout;
-        const retryAttempts = monitor.retryAttempts;
+        // Note: Despite type definitions, these values can be undefined in practice (see tests)
+        const timeout = (monitor.timeout as number | undefined) ?? this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT;
+        const retryAttempts = (monitor.retryAttempts as number | undefined) ?? 3; // Default retry attempts
 
         return this.performHealthCheckWithRetry(monitor.url, timeout, retryAttempts);
     }
@@ -146,9 +157,29 @@ export class HttpMonitor implements IMonitorService {
 
     /**
      * Update the configuration for this monitor.
-     * Recreates the Axios instance with updated configuration.
+     *
+     * @param config - Partial configuration to merge with existing settings
+     *
+     * @remarks
+     * Updates the monitor's configuration by performing a shallow merge of the provided
+     * partial configuration with existing settings. This recreates the underlying Axios
+     * instance with the updated configuration to ensure all changes take effect.
+     *
+     * The merge is shallow - nested objects are not deeply merged. Only validates
+     * that provided values are of correct types but does not validate ranges or
+     * other business logic constraints.
+     *
+     * @throws Error if config contains invalid property types
      */
     public updateConfig(config: Partial<MonitorConfig>): void {
+        // Basic validation of config properties
+        if (config.timeout !== undefined && (typeof config.timeout !== "number" || config.timeout <= 0)) {
+            throw new Error("Invalid timeout: must be a positive number");
+        }
+        if (config.userAgent !== undefined && typeof config.userAgent !== "string") {
+            throw new Error("Invalid userAgent: must be a string");
+        }
+
         this.config = {
             ...this.config,
             ...config,
@@ -160,8 +191,16 @@ export class HttpMonitor implements IMonitorService {
 
     /**
      * Make the actual HTTP request using Axios.
+     *
+     * @param url - The URL to request
+     * @param timeout - Request timeout in milliseconds
+     * @returns Promise resolving to Axios response with timing metadata
+     *
+     * @remarks
+     * Uses the configured Axios instance with per-request timeout override.
+     * The response includes timing metadata injected by request interceptors.
      */
-    private async makeRequest(url: string, timeout: number) {
+    private async makeRequest(url: string, timeout: number): Promise<AxiosResponse> {
         // Use our configured Axios instance with specific timeout override
         return this.axiosInstance.get(url, {
             timeout,
@@ -169,7 +208,20 @@ export class HttpMonitor implements IMonitorService {
     }
 
     /**
-     * Perform health check with retry logic.
+     * Perform health check with retry logic using operational hooks.
+     *
+     * @param url - The URL to health check
+     * @param timeout - Request timeout in milliseconds
+     * @param maxRetries - Maximum number of retry attempts (additional to initial attempt)
+     * @returns Promise resolving to monitor check result
+     *
+     * @remarks
+     * Uses {@link withOperationalHooks} for sophisticated retry logic with exponential backoff.
+     * The maxRetries parameter represents additional attempts after the initial attempt,
+     * so maxRetries=3 results in 4 total attempts (1 initial + 3 retries).
+     *
+     * Handles all HTTP errors and network failures, converting them to appropriate
+     * monitor status results. Uses development logging when in dev mode for debugging.
      */
     private async performHealthCheckWithRetry(
         url: string,
@@ -202,6 +254,15 @@ export class HttpMonitor implements IMonitorService {
 
     /**
      * Perform a single health check attempt without retry logic.
+     *
+     * @param url - The URL to health check
+     * @param timeout - Request timeout in milliseconds
+     * @returns Promise resolving to monitor check result
+     *
+     * @remarks
+     * Performs a single HTTP request attempt with comprehensive error handling.
+     * Uses precise timing from Axios interceptors for accurate performance measurements.
+     * Errors are propagated to the retry logic for handling.
      */
     private async performSingleHealthCheck(url: string, timeout: number): Promise<MonitorCheckResult> {
         if (isDev()) {

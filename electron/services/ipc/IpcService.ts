@@ -45,7 +45,11 @@ export class IpcService {
      * Clean up all IPC listeners.
      *
      * @remarks
-     * Removes all registered IPC handlers to prevent memory leaks.
+     * Removes all registered IPC handlers and event listeners to prevent memory leaks.
+     * This includes:
+     * - IPC handlers registered via ipcMain.handle (removed via removeHandler)
+     * - Event listeners registered via ipcMain.on (removed via removeAllListeners)
+     *
      * Should be called during application shutdown.
      */
     public cleanup(): void {
@@ -82,8 +86,21 @@ export class IpcService {
      * Safely serialize a monitor type configuration for IPC transmission.
      * Excludes non-serializable data while preserving all useful information.
      *
-     * @param config - The monitor type configuration to serialize
-     * @returns Serializable configuration object
+     * @param config - The monitor type configuration to serialize. Expected structure includes:
+     *   - description: Human-readable description of the monitor type
+     *   - displayName: UI display name for the monitor type
+     *   - fields: Configuration fields for the monitor
+     *   - type: Unique identifier for the monitor type
+     *   - uiConfig: UI configuration options and formatting
+     *   - version: Version information for the monitor type
+     *   - serviceFactory: Service factory function (excluded from serialization)
+     *   - validationSchema: Validation schema object (excluded from serialization)
+     * @returns Serializable configuration object safe for IPC transmission
+     *
+     * @remarks
+     * This method filters out non-serializable properties like functions and schemas
+     * while preserving all data needed by the renderer process. Logs warnings if
+     * unexpected properties are encountered to aid in maintenance.
      */
     private serializeMonitorTypeConfig(config: ReturnType<typeof getAllMonitorTypeConfigs>[0]) {
         // Extract and validate base properties
@@ -443,7 +460,14 @@ export class IpcService {
      * @remarks
      * Handles:
      * - `request-full-sync`: Manual full state synchronization request
-     * - `get-sync-status`: Get current synchronization status
+     * - `get-sync-status`: Get current synchronization status with response containing:
+     *   - lastSync: Current timestamp in milliseconds (Unix epoch) when status was retrieved
+     *   - siteCount: Number of sites currently configured
+     *   - success: Whether the status request was successful
+     *   - synchronized: Whether the system is in a synchronized state
+     *
+     * Note: lastSync represents the current time when the status was checked,
+     * not the actual last synchronization time.
      */
     private setupStateSyncHandlers(): void {
         this.registeredIpcHandlers.add("request-full-sync");
@@ -505,8 +529,13 @@ export class IpcService {
      * Setup IPC handlers for system-level operations.
      *
      * @remarks
-     * Handles application lifecycle and system operations:
+     * Handles application lifecycle and system operations using ipcMain.on for event listeners:
      * - `quit-and-install`: Quit application and install pending update
+     *
+     * Note: This method uses ipcMain.on (event listeners) rather than ipcMain.handle (request handlers),
+     * which affects cleanup requirements. Event listeners must be removed via removeAllListeners.
+     * If additional system handlers are added in the future, update this documentation and
+     * ensure proper cleanup in the cleanup() method.
      */
     private setupSystemHandlers(): void {
         this.registeredIpcHandlers.add("quit-and-install");

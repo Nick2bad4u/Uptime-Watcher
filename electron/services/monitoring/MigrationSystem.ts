@@ -83,8 +83,8 @@ class MigrationOrchestrator {
                 }
             }
 
-            // Update version if all migrations succeeded
-            if (errors.length === 0) {
+            // Update version only if migrations were actually applied
+            if (errors.length === 0 && appliedMigrations.length > 0) {
                 this.versionManager.setVersion(monitorType, toVersion);
             }
 
@@ -248,18 +248,71 @@ class VersionManager {
     }
 }
 
-// Export singleton instances
+/**
+ * Registry for monitor type migrations.
+ *
+ * @remarks
+ * Singleton instance for registering and retrieving migration rules.
+ * Provides migration path calculation and validation for monitor data upgrades.
+ *
+ * @example
+ * ```typescript
+ * // Register a migration
+ * migrationRegistry.registerMigration("http", {
+ *   fromVersion: "1.0.0",
+ *   toVersion: "1.1.0",
+ *   description: "Add timeout field",
+ *   isBreaking: false,
+ *   transform: async (data) => ({ ...data, timeout: 30000 })
+ * });
+ * ```
+ */
 export const migrationRegistry = new MigrationRegistry();
+
+/**
+ * Manager for monitor type version tracking.
+ *
+ * @remarks
+ * Singleton instance for tracking applied versions and migration state.
+ * Provides version queries and updates for monitor types.
+ */
 export const versionManager = new VersionManager();
 
-// Export factory function for orchestrator
+/**
+ * Factory function for creating migration orchestrator instances.
+ *
+ * @returns New migration orchestrator instance
+ *
+ * @remarks
+ * Use this when you need an isolated orchestrator instance instead of
+ * the shared singleton pattern. Useful for testing or specialized workflows.
+ */
 export function createMigrationOrchestrator(): MigrationOrchestrator {
     return new MigrationOrchestrator(migrationRegistry, versionManager);
 }
 
-// Export example migrations for reference
+/**
+ * Example migration definitions for reference and testing.
+ *
+ * @remarks
+ * Provides working examples of migration rules for different monitor types.
+ * Use these as templates when creating new migrations for your monitor types.
+ *
+ * @example
+ * ```typescript
+ * // Register example migrations
+ * migrationRegistry.registerMigration("http", exampleMigrations.httpV1_0_to_1_1);
+ * migrationRegistry.registerMigration("port", exampleMigrations.portV1_0_to_1_1);
+ * ```
+ */
 export const exampleMigrations = {
-    // Example: HTTP monitor adding timeout field
+    /**
+     * Example HTTP monitor migration: Add timeout field with default value.
+     *
+     * @remarks
+     * Demonstrates non-breaking migration that adds a new field with sensible default.
+     * Safe to apply to existing HTTP monitor configurations.
+     */
     httpV1_0_to_1_1: {
         description: "Add timeout field with default 30s",
         fromVersion: "1.0.0",
@@ -272,16 +325,49 @@ export const exampleMigrations = {
             }),
     } as MigrationRule,
 
-    // Example: Port monitor converting port to number
+    /**
+     * Example port monitor migration: Ensure port is numeric.
+     *
+     * @remarks
+     * Demonstrates data type normalization migration with validation.
+     * Converts string port numbers to integers with proper error handling.
+     */
     portV1_0_to_1_1: {
         description: "Ensure port is a number",
         fromVersion: "1.0.0",
         isBreaking: false,
         toVersion: "1.1.0",
-        transform: (data: Record<string, unknown>) =>
-            Promise.resolve({
-                ...data,
-                port: typeof data.port === "string" ? Number.parseInt(data.port, 10) : data.port,
-            }),
+        transform: (data: Record<string, unknown>) => {
+            const portValue = data.port;
+
+            // Handle different port value types
+            if (typeof portValue === "string") {
+                const parsed = Number.parseInt(portValue, 10);
+                // Validate parsed number is valid port
+                if (!Number.isNaN(parsed) && parsed >= 1 && parsed <= 65_535) {
+                    return Promise.resolve({
+                        ...data,
+                        port: parsed,
+                    });
+                } else {
+                    throw new Error(`Invalid port value: ${portValue}. Must be 1-65535.`);
+                }
+            }
+
+            // If already a number, validate it
+            if (typeof portValue === "number") {
+                if (portValue >= 1 && portValue <= 65_535) {
+                    return Promise.resolve({
+                        ...data,
+                        port: portValue,
+                    });
+                } else {
+                    throw new Error(`Invalid port number: ${portValue}. Must be 1-65535.`);
+                }
+            }
+
+            // Invalid port type
+            throw new Error(`Port must be a number or numeric string, got: ${typeof portValue}`);
+        },
     } as MigrationRule,
 };
