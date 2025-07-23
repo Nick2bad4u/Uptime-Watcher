@@ -28,7 +28,7 @@ applyTo: "**"
 - **Empty Directories**: Remove empty directories to keep codebase clean (no empty `managers/`, `dist/`, or test directories)
 - **Format**: Don't pay attention to small formatting issues like Prettier or Eslint demanding sorting or spacing; focus on code structure and logic
 - **Type Safety**: Ensure all new code is type-safe; update types/interfaces as needed, never use `any` or `unknown` or 'null' unless absolutely necessary
-- **Documentation**: Use TSDoc for comments and use proper base tags found here: `docs\.github\TSDoc-base-tags.md`
+- **Documentation**: Use TSDoc for comments and use proper base tags found here: `docs/TSDoc/`
 
 Critcal Instructions:
 

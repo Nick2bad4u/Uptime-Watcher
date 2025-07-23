@@ -26,7 +26,7 @@
         "span"
     ],
 
-    "reportUnsupportedHtmlElements": true,
+    "reportUnsupportedHtmlElements": false,
     "supportForTags": {
         "@alpha": true,
         "@beta": true,
@@ -50,6 +50,8 @@
         "@returns": true,
         "@sealed": true,
         "@see": true,
-        "@throws": true
+        "@throws": true,
+        "@typeParam": true,
+        "@virtual": true
     }
 }

@@ -372,17 +372,18 @@ export class SiteManager {
      * Remove a site from the database and cache.
      */
     public async removeSite(identifier: string): Promise<boolean> {
+        // Get site information BEFORE deletion for accurate event data
+        const siteToRemove = this.sitesCache.get(identifier);
+        const siteName = siteToRemove?.name ?? "Unknown";
+
         const result = await this.siteWriterService.deleteSite(this.sitesCache, identifier);
 
         if (result) {
-            // Get site name before removal for event (already removed from cache by service)
-            const removedSite = this.sitesCache.get(identifier);
-
-            // Emit typed site removed event
+            // Emit typed site removed event with accurate site name
             await this.eventEmitter.emitTyped("site:removed", {
                 cascade: true,
                 siteId: identifier,
-                siteName: removedSite?.name ?? "Unknown",
+                siteName: siteName,
                 timestamp: Date.now(),
             });
 
@@ -537,7 +538,23 @@ export class SiteManager {
     }
 
     /**
+     * Format validation errors for better readability.
+     */
+    private formatValidationErrors(errors: string[]): string {
+        if (errors.length === 1) {
+            // Ensure fallback to empty string if errors[0] is undefined
+            return errors[0] ?? "";
+        }
+        return `\n  - ${errors.join("\n  - ")}`;
+    }
+
+    /**
      * Load a site in the background and update cache.
+     *
+     * @remarks
+     * Performs silent background loading with error logging but no exception throwing.
+     * This ensures background operations don't disrupt the main application flow while
+     * still providing observability through logging.
      */
     private async loadSiteInBackground(identifier: string): Promise<void> {
         try {
@@ -572,7 +589,9 @@ export class SiteManager {
         const validationResult = await this.configurationManager.validateSiteConfiguration(site);
 
         if (!validationResult.isValid) {
-            throw new Error(`Site validation failed: ${validationResult.errors.join(", ")}`);
+            throw new Error(
+                `Site validation failed for '${site.identifier}': ${this.formatValidationErrors(validationResult.errors)}`
+            );
         }
     }
 }

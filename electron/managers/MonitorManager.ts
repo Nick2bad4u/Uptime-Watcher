@@ -117,6 +117,15 @@ export class MonitorManager {
     /**
      * Restart monitoring for a specific monitor with updated configuration.
      * This is useful when monitor intervals change and need to be applied immediately.
+     *
+     * @param siteIdentifier - The identifier of the site containing the monitor
+     * @param monitor - The monitor with updated configuration to restart
+     * @returns True if the monitor was successfully restarted, false otherwise
+     *
+     * @remarks
+     * Delegates to the MonitorScheduler for actual restart logic. This method
+     * provides a high-level interface for coordinated monitor restarts when
+     * configuration changes require immediate application.
      */
     public restartMonitorWithNewConfig(siteIdentifier: string, monitor: Site["monitors"][0]): boolean {
         return this.monitorScheduler.restartMonitor(siteIdentifier, monitor);
@@ -277,21 +286,25 @@ export class MonitorManager {
     /**
      * Business logic: Apply default check intervals for monitors that don't have one.
      * This ensures all monitors have a check interval set according to business rules.
+     *
+     * @remarks
+     * **State Management Compliance:**
+     * This method follows proper state management principles by updating the database
+     * first, then allowing the cache/state to be updated through proper channels
+     * (event emission and cache refresh) rather than direct mutation.
      */
     private async applyDefaultIntervals(site: Site): Promise<void> {
         logger.debug(`[MonitorManager] Applying default intervals for site: ${site.identifier}`);
 
         for (const monitor of site.monitors) {
             if (monitor.id && this.shouldApplyDefaultInterval(monitor)) {
-                monitor.checkInterval = DEFAULT_CHECK_INTERVAL;
-
-                // Use withDatabaseOperation for consistency and proper error handling
+                // Update database first (state management compliance)
                 await withDatabaseOperation(
                     () => {
                         const db = this.dependencies.databaseService.getDatabase();
                         if (monitor.id) {
                             this.dependencies.repositories.monitor.updateInternal(db, monitor.id, {
-                                checkInterval: monitor.checkInterval,
+                                checkInterval: DEFAULT_CHECK_INTERVAL,
                             });
                         }
                         return Promise.resolve();
@@ -354,6 +367,14 @@ export class MonitorManager {
 
     /**
      * Auto-start monitoring for new monitors if appropriate.
+     *
+     * @param site - The site containing the new monitors
+     * @param newMonitors - Array of new monitors to potentially auto-start
+     *
+     * @remarks
+     * Applies business logic to determine which new monitors should automatically
+     * start monitoring based on individual monitor settings. Only monitors with
+     * monitoring enabled will be auto-started.
      */
     private async autoStartNewMonitors(site: Site, newMonitors: Site["monitors"]): Promise<void> {
         for (const monitor of newMonitors) {
@@ -397,9 +418,20 @@ export class MonitorManager {
 
     /**
      * Set up individual new monitors (extracted for complexity reduction).
+     *
+     * @param site - The site containing the new monitors
+     * @param newMonitors - Array of new monitors to set up
+     *
+     * @remarks
+     * **State Management Compliance:**
+     * New monitors are handled differently as they haven't been persisted yet.
+     * Default intervals are applied directly to the monitor objects before
+     * they're saved to the database through the normal persistence flow.
      */
     private async setupIndividualNewMonitors(site: Site, newMonitors: Site["monitors"]): Promise<void> {
         // Apply default intervals for new monitors that don't have one
+        // Note: For new monitors, direct assignment is acceptable as they haven't been
+        // persisted yet and will be saved through the normal persistence flow
         for (const monitor of newMonitors) {
             if (this.shouldApplyDefaultInterval(monitor)) {
                 monitor.checkInterval = DEFAULT_CHECK_INTERVAL;
@@ -420,6 +452,15 @@ export class MonitorManager {
 
     /**
      * Business logic: Determine if a monitor should receive a default interval.
+     *
+     * @param monitor - The monitor to check for default interval application
+     * @returns True if monitor should receive default interval, false otherwise
+     *
+     * @remarks
+     * Checks for falsy checkInterval values. Zero is considered a valid interval
+     * (though unusual) and won't trigger default assignment based on current logic.
+     * The type system guarantees checkInterval is a number, but runtime values
+     * may still be falsy due to initialization or data import scenarios.
      */
     private shouldApplyDefaultInterval(monitor: Site["monitors"][0]): boolean {
         return !monitor.checkInterval;

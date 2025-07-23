@@ -343,13 +343,37 @@ export class DatabaseManager {
      * Set history limit for monitor data retention.
      *
      * @param limit - Number of history records to retain (must be non-negative integer, 0 disables history tracking)
-     * @throws Error if limit is not a non-negative integer
+     * @throws Error if limit is not a valid non-negative integer
      */
     public async setHistoryLimit(limit: number): Promise<void> {
-        // Validate input parameters
-        if (!Number.isInteger(limit) || limit < 0) {
-            throw new Error(
-                `[DatabaseManager.setHistoryLimit] History limit must be a non-negative integer, received: ${limit}`
+        // Comprehensive input validation
+        if (typeof limit !== "number" || Number.isNaN(limit)) {
+            throw new TypeError(
+                `[DatabaseManager.setHistoryLimit] History limit must be a valid number, received: ${limit} (${typeof limit})`
+            );
+        }
+
+        if (!Number.isInteger(limit)) {
+            throw new TypeError(
+                `[DatabaseManager.setHistoryLimit] History limit must be an integer, received: ${limit}`
+            );
+        }
+
+        if (limit < 0) {
+            throw new RangeError(
+                `[DatabaseManager.setHistoryLimit] History limit must be non-negative, received: ${limit}`
+            );
+        }
+
+        if (!Number.isFinite(limit)) {
+            throw new RangeError(`[DatabaseManager.setHistoryLimit] History limit must be finite, received: ${limit}`);
+        }
+
+        // Reasonable upper bound to prevent performance issues
+        const MAX_HISTORY_LIMIT = 1_000_000; // 1 million records
+        if (limit > MAX_HISTORY_LIMIT) {
+            throw new RangeError(
+                `[DatabaseManager.setHistoryLimit] History limit too large (max: ${MAX_HISTORY_LIMIT}), received: ${limit}`
             );
         }
 
@@ -421,6 +445,10 @@ export class DatabaseManager {
      * Uses atomic cache replacement instead of clear-then-populate to ensure
      * other operations reading from cache never see empty/inconsistent data.
      * The old cache remains accessible until the new one is fully loaded.
+     *
+     * @internal
+     * This method is private and intended for internal database operations only.
+     * External consumers should use public methods like initialize() or refreshSites().
      */
     private async loadSites(): Promise<void> {
         const operationId = `loadSites-${Date.now()}`;
