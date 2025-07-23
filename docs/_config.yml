@@ -10,12 +10,8 @@ baseurl: "/Uptime-Watcher"
 navigation:
     - title: "Home"
       url: /
-    - title: "API Reference"
-      url: /api/
-    - title: "Guides"
-      url: /guides/
-    - title: "Components"
-      url: /component-docs/
+    - title: "TSDoc"
+      url: /TSDoc/
     - title: "GitHub"
       url: https://github.com/Nick2bad4u/Uptime-Watcher
 
@@ -46,17 +42,7 @@ defaults:
           layout: "default"
     - scope:
           path: ""
-          type: "guides"
-      values:
-          layout: "default"
-    - scope:
-          path: ""
-          type: "api"
-      values:
-          layout: "default"
-    - scope:
-          path: ""
-          type: "components"
+          type: "TSDoc"
       values:
           layout: "default"
 

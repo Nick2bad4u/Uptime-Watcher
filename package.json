@@ -8,9 +8,6 @@
     "uptime",
     "monitoring"
   ],
-  "engines": {
-    "node": ">=23.0.0"
-  },
   "homepage": "https://github.com/Nick2bad4u/Uptime-Watcher",
   "bugs": {
     "url": "https://github.com/Nick2bad4u/Uptime-Watcher/issues",
@@ -74,6 +71,8 @@
     "electron-dev": "concurrently \"npm run dev\" \"npm run electron\"",
     "electron-main:debug": "npm run build:electron-main && NODE_ENV=development ./node_modules/.bin/electron ./dist-electron/main.js",
     "electron-pack": "electron-builder",
+    "eslint-find-option-rules": "eslint-find-rules --option --flatConfig",
+    "fetch-tsdoc": "node scripts/download-tsdoc-tags.js",
     "fix-db": "npm run postbuild",
     "format": "npm run lint:prettier-fix && npm run lint:css-fix && npm run lint:fix",
     "format:check": "npm run lint:prettier && npm run lint:css && npm run lint",
@@ -210,9 +209,10 @@
     "test:watch": "vitest --watch",
     "test:watch:electron": "vitest --config vitest.electron.config.ts --watch",
     "test:watch:frontend": "vitest --watch",
+    "tsdoc-update": "node scripts/download-tsdoc-tags.js",
     "type-check": "npm run check:all",
-    "validate:components": "node ./scripts/validate-components.js",
-    "eslint-find-option-rules": "eslint-find-rules --option --flatConfig"
+    "update-tsdoc": "node scripts/download-tsdoc-tags.js",
+    "validate:components": "node ./scripts/validate-components.js"
   },
   "overrides": {
     "@codecov/vite-plugin": {
@@ -416,6 +416,9 @@
     "yaml-eslint-parser": "^1.3.0"
   },
   "packageManager": "npm@11.4.2",
+  "engines": {
+    "node": ">=23.0.0"
+  },
   "os": [
     "windows",
     "linux",
