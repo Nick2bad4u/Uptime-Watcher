@@ -7,7 +7,7 @@ applyTo: "**"
 ## Architecture Overview
 
 - **Frontend**: React + TypeScript + Zustand + TailwindCSS + Vite
-- **Backend**: Electron main process (Node.js) + SQLite3-WASM
+- **Backend**: Electron main process (Node.js) + node-sqlite3-wasm
 - **IPC**: All backend/renderer communication via secure contextBridge (`window.electronAPI`)
 - **State Management**: Domain-specific Zustand stores; no global state
 - **Database**: All operations use repository pattern and are wrapped in transactions via `executeTransaction()`

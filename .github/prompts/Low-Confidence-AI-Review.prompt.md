@@ -8,9 +8,9 @@ description: "Review low confidence AI claims to ensure they are valid issues an
 
 New claims to review, these are LOW confidence claims that need to be reviewed to ensure that they are:
 
-1. Ensure real claims and not false positives
-2. Check that the claim makes sense with our project standards and context
-3. Document each claim in a NEW in the name format of `LCAIR-Filename.md` document and detail the findings about the claim
+1. Ensure these are real claims and not false positives
+2. Check that the claim makes sense with our project standards, context, and codebase architecture
+3. Document each claim in a NEW document in the `/docs/Reviews/` folder with name: `LC.AI.R-Filename.md` and detail the findings about the claim
 4. If they are valid claims, plan to implement the proper fixes according to project standards in the document.
 
 ## Instructions
@@ -21,9 +21,9 @@ New claims to review, these are LOW confidence claims that need to be reviewed t
 - Assess whether the claim is relevant and makes sense in the context of our project.
 - If they are valid issues, proceed to plan a document outlining the proper fixes and actions to take according to project standards.
 - Trace all data paths before making recommending changes to ensure we don't break anything, and that the changes are properly implemented.
-- Backwards compatibility is not necessary as we are in a development phase - feel free to make breaking changes, as long as you update the entire data path properly. Never write backwards compatibility code.
+- Backwards compatibility is not necessary as we are in a development phase - feel free to make breaking changes, as long as you update the entire data path properly. Never write backwards compatibility code without approval.
 - If you stumble upon any issues that are not related to the claims, add them to the document.
 
-Proceed to review all low confidence claims below using the outline above:
+## Proceed to review all low confidence claims below using the outline above:
 
-Once finished, do your own source code review of the file, including checking for claims similar to the ones you just reviewed, and new claims that may have emerged during your review. Make sure you trace data paths and ensure all changes make sense for the project. Never assume anything about the code without verifying it.
+- Once finished, do your own source code review of the file, including checking for claims similar to the ones you just reviewed, and new claims that may have emerged during your review. Make sure you trace data paths and ensure all changes make sense for the project. Never assume anything about the code without verifying it.
