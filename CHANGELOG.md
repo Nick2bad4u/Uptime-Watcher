@@ -7,14 +7,206 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[5270ffa](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5270ffaef64836e2a5ac6497960f257cb1d91944)...
-[5270ffa](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5270ffaef64836e2a5ac6497960f257cb1d91944)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/5270ffaef64836e2a5ac6497960f257cb1d91944...5270ffaef64836e2a5ac6497960f257cb1d91944))
+[[597c706](https://github.com/Nick2bad4u/Uptime-Watcher/commit/597c7060d8a390cfc59edbeeee4a23f73322c767)...
+[597c706](https://github.com/Nick2bad4u/Uptime-Watcher/commit/597c7060d8a390cfc59edbeeee4a23f73322c767)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/597c7060d8a390cfc59edbeeee4a23f73322c767...597c7060d8a390cfc59edbeeee4a23f73322c767))
 
 
 ### 📦 Dependencies
 
+- [dependency] Update version 8.1.0 [`(597c706)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/597c7060d8a390cfc59edbeeee4a23f73322c767)
+
+
+
+
+
+
+## [8.1.0] - 2025-07-23
+
+
+[[dfcce56](https://github.com/Nick2bad4u/Uptime-Watcher/commit/dfcce568b9b8c7990588bb6b92ccc8746814500d)...
+[947f859](https://github.com/Nick2bad4u/Uptime-Watcher/commit/947f859b7c02dbeb4d3ebd699c129beee9f63fe4)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/dfcce568b9b8c7990588bb6b92ccc8746814500d...947f859b7c02dbeb4d3ebd699c129beee9f63fe4))
+
+
+### ✨ Features
+
+- ✨ [feat] Expand linting, validation, and type safety across codebase
+
+- Adds multiple new ESLint plugins and rules for stricter code quality, including Tailwind, security, math, dependency, and comment style plugins
+- Expands linting to shared TypeScript files and enhances rule coverage for both frontend and backend
+- Refactors and improves type definitions for site and monitor status, ensuring consistent status handling and more robust type guards
+- Improves and reorders utility functions for error handling, environment detection, JSON safety, and object operations for clarity and reliability
+- Updates validation logic and schemas to enhance error reporting, field validation, and Zod-based type checking for monitors and sites
+- Adjusts configuration files to support new linter plugins and CSS file inclusion in TypeScript and testing configs
+
+These changes aim to enforce higher code quality, better type safety, and easier maintainability across shared and platform-specific code. [`(59b0b08)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/59b0b08fbc9a4d97ebf837d3ba2ee7155d7cb3ac)
+
+
+- ✨ [feat] Enforce strict type safety for IPC event payloads
+
+- Replaces all generic and unknown IPC event callback types with specific, strongly-typed interfaces across frontend, backend, and shared types
+- Introduces dedicated event payload definitions for all IPC communication, improving IDE support, auto-completion, and compile-time error detection
+- Refactors related validation, monitor field, and form data structures to eliminate generic Record patterns in favor of explicit interfaces
+- Updates ESLint configs to enforce strict type-checked rules, further reducing untyped or loosely-typed code
+- Ensures all logger and error handling usages are structured and type-safe, replacing console statements in production code
+- Adds extensive documentation and audit reports to summarize type safety improvements and consistency audits
+
+Relates to type safety and maintainability enhancement objectives [`(2a91885)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2a91885a23a8fd6dca42b275299ab60e70227b02)
+
+
+- ✨ [feat] Add type-safe utilities, env abstraction, and ESLint tuning
+
+- Introduces comprehensive type guard, object, JSON, and conversion utilities for enhanced type safety throughout the codebase
+- Refactors environment detection to use shared, testable abstractions, replacing raw environment variable access and improving consistency
+- Updates ESLint configuration to enable nuanced Node.js rules, disables false positives, and adds no-only-tests enforcement
+- Refactors middleware and service logic for explicit callback returns, removes unnecessary ignores, and tidies up logging and error handling
+- Adds cache invalidation event support to frontend API typings for increased reliability
+- Upgrades dependencies and enforces Node.js >=23 in the engine field
+- Documents analysis and type safety opportunities to guide future improvements
+
+Relates to Node.js best practices and maintainability improvements [`(67e9034)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/67e9034b5526d3eb8c819971d036818f036e5e39)
+
+
+
+### 📦 Dependencies
+
+- *(deps)* [dependency] Update the github-actions group across 1 directory with 5 updates [`(fce62d1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fce62d15e94e364e2e2fb0cd13c3c9bbadaf976f)
+
+
 - [dependency] Update version 8.0.0 [`(5270ffa)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5270ffaef64836e2a5ac6497960f257cb1d91944)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(ed7535e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ed7535edf7643180c9a0f270a7c41a5619e5e5ea)
+
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(5e97f5a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5e97f5a69eaef515e493630280e11fd17d5a7adb)
+
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(7262769)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/72627697f274128322b6230bfc8d78401a236522)
+
+
+
+### 💼 Other
+
+- Merge PR #35
+
+[ci][skip-ci](deps): [dependency] Update the github-actions group across 1 directory with 5 updates [`(0d46d8c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0d46d8c816d452f223dd1d339383f5c39a047ad8)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Standardizes validation, caching, and event handling
+
+- Refactors validation logic for sites and monitors to improve error reporting, ensure async compatibility, and enforce stricter business rules.
+- Introduces centralized cache TTLs and limits for consistent cache management across services.
+- Unifies event emission and error handling patterns, reducing race conditions and enhancing observability.
+- Updates middleware interfaces and documentation for clarity and best practices.
+- Improves atomic cache replacement and site refresh logic to prevent data inconsistency.
+- Cleans up ESLint config by removing redundant rules. [`(a1ae79a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a1ae79a7ce6f33552162f4723ac909855dc86f15)
+
+
+- 🚜 [refactor] Restructure shared types and improve error handling
+
+- Refactors shared type imports to separate event types from domain types, reducing circular dependencies and clarifying module boundaries.
+- Centralizes file download error handling into dedicated helper functions for clearer logic and easier maintenance.
+- Updates environment and object utility functions to improve type safety, add explanatory comments, and handle process checks more robustly.
+- Replaces console logging in store utilities with a unified logger for consistent debug output.
+- Adds inline comments to explain deviations from linting rules and clarify shared utility constraints. [`(71b6827)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/71b6827de0a1b95a35c76a7ba422833e7b819398)
+
+
+
+### � Documentation
+
+- 📝 [docs] Migrate and expand TSDoc documentation pages
+
+- Updates documentation by removing outdated TSDoc tag guides and importing the latest tag reference pages and spec docs from tsdoc.org.
+- Adds scripts to automate fetching and updating documentation, including hash tracking and change logs for downloaded files.
+- Improves coverage and accuracy of TSDoc tag, spec, package, and usage documentation for maintainers and users.
+- Enables future automated syncs and change detection for TSDoc documentation. [`(947f859)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/947f859b7c02dbeb4d3ebd699c129beee9f63fe4)
+
+
+- 📝 [docs] Remove legacy consistency audit and type safety reports
+
+- Cleans up numerous documentation files used for previous consistency audits, type safety assessments, implementation summaries, and architectural review reports
+- Reduces repository clutter by deleting outdated audit reports, implementation plans, and summary markdown files from the docs folder
+- Ensures only current, relevant documentation remains, streamlining maintenance and preventing confusion
+- Reflects completion and verification of all major consistency and type safety tasks; future audits or summaries will be tracked elsewhere [`(2160e71)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2160e7189c063b5fd8a2d9817934eb54c440336b)
+
+
+- 📝 [docs] Enhance event system and orchestrator documentation
+
+- Improves JSDoc comments for event bus, orchestrator, and middleware, clarifying architecture, usage, and edge cases
+- Expands event categorization and priority definitions for type safety and maintainability
+- Refines event data enhancement logic to handle arrays, primitives, and _meta conflicts safely
+- Strengthens validation middleware with robust type checking, safer logging, and error resilience
+- Updates ESLint config to disable irrelevant React Native rule for Electron context
+
+Improves developer experience, code clarity, and reliability of event validation and handling. [`(47d4f6d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/47d4f6d51038fd1ad88a89b2aa1c143454cb43a7)
+
+
+- 📝 [docs] Improve type safety and remediation audit docs
+
+- Updates documentation files to reflect progress on type safety, logger remediation, and IPC event type definition enhancements.
+ - Clarifies areas of improvement, completed actions, methodology, and future implementation steps for ongoing type safety initiatives.
+ - Refines formatting, tables, and code sample clarity for better readability and maintainability.
+ - Removes unnecessary whitespace and ensures consistent markdown for audit and summary reports.
+ - No logic or application code is modified; changes are documentation-only. [`(1339d4d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1339d4da40bddad610a51f639446aa0037edb3e4)
+
+
+- 📝 [docs] Add layer audit report and update lint/style configs
+
+- Documents a comprehensive layer consistency audit, including findings and recommended fixes for architectural separation
+- Refines and reorganizes Stylelint configuration: adds plugins and presets for React Native, Tailwind, defensive CSS, Prettier, and improved ordering; updates rules for better style consistency and maintainability
+- Updates ESLint config to include React Native plugin and rules, ensuring cross-platform linting coverage
+- Expands package dependencies for enhanced style and lint tooling, including React Native, defensive CSS, and improved ordering support
+- Improves Electron utility function for accurate dev/prod detection and adds inline documentation
+- Refines Electron app extension loading logic to restrict devtools to development mode only
+- Cleans up logging and documentation for application service lifecycle and main process logic
+- Clarifies and enhances documentation across Electron preload API and orchestrator code for maintainability and onboarding
+- Adjusts CSS z-index/property order for improved specificity and Stylelint compliance [`(44e4db0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/44e4db0d06d07af7fbbe4eab0ab09f69f6deaf25)
+
+
+- 📝 [docs] Update ESLint analysis and improve shared utils docs
+
+- Expands and clarifies ESLint Plugin N analysis, detailing violation types, recommendations, and migration plan for environment detection and async patterns
+- Improves documentation and consistency in shared utility files, enhancing readability and type safety explanations
+- Standardizes code formatting in config and utility modules for better maintainability
+
+Focuses on code quality, maintainability, and clear guidance for future rule configuration and refactoring. [`(70c3eca)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/70c3eca3ed5c59de24a30c2d7fb4d2110890f588)
+
+
+- 📝 [docs] Remove obsolete architectural and code audit documentation
+
+Deletes outdated docs covering legacy monitor type systems, architectural standards, code consistency audits, and implementation guides that are no longer relevant after recent registry-driven refactoring.
+
+Improves maintainability and clarity by removing redundant instructions and references to manual patterns, switch cases, and legacy validation logic.
+
+Streamlines onboarding by ensuring only current, dynamic monitor type integration processes are documented. [`(dfcce56)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/dfcce568b9b8c7990588bb6b92ccc8746814500d)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Migrate global styles to CSS nesting syntax
+
+- Adopts CSS nesting syntax throughout all main, component, and theme stylesheets for improved maintainability and consistency
+- Reorders property declarations for logical grouping and readability
+- Refactors selectors to leverage nesting, reducing repetition and enhancing clarity
+- Removes unused or irrelevant stylelint rules related to React Native
+- Enforces modern stylelint nesting configuration, preparing codebase for future CSS standard compatibility
+
+No functional or visual regressions expected; focuses purely on code style and structure. [`(d15d27a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d15d27ab7573f4c73a3871efb1ba4faf04973ecd)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v8.0.0 [skip ci] [`(0ae7bdd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0ae7bddff71f29c7e96071bdbbb528fcd323a919)
 
 
 
