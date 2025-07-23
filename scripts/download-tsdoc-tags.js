@@ -32,15 +32,15 @@ const tags = [
 ];
 
 const extraPages = [
-    { url: "https://tsdoc.org/pages/spec/overview/", fileName: "TSDoc-Spec-Overview.md" },
-    { url: "https://tsdoc.org/pages/spec/tag_kinds/", fileName: "TSDoc-Spec-TagKinds.md" },
-    { url: "https://tsdoc.org/pages/spec/standardization_groups/", fileName: "TSDoc-Spec-StandardizationGroups.md" },
-    { url: "https://tsdoc.org/", fileName: "TSDoc-Home.md" },
-    { url: "https://tsdoc.org/pages/intro/approach/", fileName: "TSDoc-Intro-Approach.md" },
-    { url: "https://tsdoc.org/pages/intro/using_tsdoc/", fileName: "TSDoc-Intro-UsingTsdoc.md" },
-    { url: "https://tsdoc.org/pages/packages/tsdoc/", fileName: "TSDoc-Package-Tsdoc.md" },
-    { url: "https://tsdoc.org/pages/packages/tsdoc-config/", fileName: "TSDoc-Package-TsdocConfig.md" },
-    { url: "https://tsdoc.org/pages/packages/eslint-plugin-tsdoc/", fileName: "TSDoc-Package-EslintPluginTsdoc.md" },
+    { url: "https://github.com/microsoft/rushstack-websites/raw/refs/heads/main/websites/tsdoc.org/docs/pages/spec/overview.md", fileName: "TSDoc-Spec-Overview.md" },
+    { url: "https://github.com/microsoft/rushstack-websites/raw/refs/heads/main/websites/tsdoc.org/docs/pages/spec/tag_kinds.md", fileName: "TSDoc-Spec-TagKinds.md" },
+    { url: "https://github.com/microsoft/rushstack-websites/raw/refs/heads/main/websites/tsdoc.org/docs/pages/spec/standardization_groups.md", fileName: "TSDoc-Spec-StandardizationGroups.md" },
+    { url: "https://github.com/microsoft/rushstack-websites/raw/refs/heads/main/websites/tsdoc.org/docs/index.md", fileName: "TSDoc-Home.md" },
+    { url: "https://github.com/microsoft/rushstack-websites/raw/refs/heads/main/websites/tsdoc.org/docs/pages/intro/approach.md", fileName: "TSDoc-Intro-Approach.md" },
+    { url: "https://github.com/microsoft/rushstack-websites/raw/refs/heads/main/websites/tsdoc.org/docs/pages/intro/using_tsdoc.md", fileName: "TSDoc-Intro-UsingTsdoc.md" },
+    { url: "https://github.com/microsoft/rushstack-websites/raw/refs/heads/main/websites/tsdoc.org/docs/pages/packages/tsdoc.md", fileName: "TSDoc-Package-Tsdoc.md" },
+    { url: "https://github.com/microsoft/rushstack-websites/raw/refs/heads/main/websites/tsdoc.org/docs/pages/packages/tsdoc-config.md", fileName: "TSDoc-Package-TsdocConfig.md" },
+    { url: "https://github.com/microsoft/rushstack-websites/raw/refs/heads/main/websites/tsdoc.org/docs/pages/packages/eslint-plugin-tsdoc.md", fileName: "TSDoc-Package-EslintPluginTsdoc.md" },
 ];
 
 const baseGitHubUrl =

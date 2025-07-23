@@ -1,306 +1,72 @@
-## 📥 TSDoc sync @ 2025-07-23T00:14:18.074Z
-**Downloaded**: 34 files
-- ✅ TSDoc-Tag-Eventproperty.md
-  ↳ Hash: `e7f3f4296316f6566a5d52a4853fc2824bd40e27080833bfb577b090ecee184d`
-- ✅ TSDoc-Tag-Deprecated.md
-  ↳ Hash: `ec400597e4a02022fe8d2ebe5a9197a60f96eace86f236a4f946ba80e145807f`
-- ✅ TSDoc-Tag-Decorator.md
-  ↳ Hash: `7ca6287a01251168482e3b1fa7436050455da93e1d71b70152d3bd487c367503`
-- ✅ TSDoc-Tag-Beta.md
-  ↳ Hash: `482f6148580718f8e4d9fd4182da6ef8d4433d46508807cf5e776b2f49acdbbb`
-- ✅ TSDoc-Tag-Alpha.md
-  ↳ Hash: `108995ab81bc59d7df468632ad0ae285ca2fef7ccee0acf669908890e0f624ef`
-- ✅ TSDoc-Tag-Defaultvalue.md
-  ↳ Hash: `4460d6b150e3137043e81001589a1bb56de87ffe6a270497aea74850c27a1e85`
-- ✅ TSDoc-Tag-Example.md
-  ↳ Hash: `d2bfd80ffe1f74bf2a30e75eb79684d011585e989589564ef06e6bea43a50f37`
-- ✅ TSDoc-Tag-Experimental.md
-  ↳ Hash: `dbfe2a222b5d06e8bb669d1467abf613ce151d9eed46c2a20c676da0e1eda8c1`
-- ✅ TSDoc-Tag-Inheritdoc.md
-  ↳ Hash: `5c49ea77b44073717e7f99fc737250121ea5b62c5490125aa628fcd43a015b88`
-- ✅ TSDoc-Tag-Internal.md
-  ↳ Hash: `53160c861175886f5c53f326e705b990cf2895c8c042ce027179c39eaabb5a4f`
-- ✅ TSDoc-Tag-Label.md
-  ↳ Hash: `ba7ad3fb938604011d8fa20ac7c465ad5c9793be7fc4dd0aa7d28e53ea5e3628`
-- ✅ TSDoc-Tag-Link.md
-  ↳ Hash: `b4ed92d7e1a75449677d78b1acc6489ed9b6c51bf16b04dcc2dff90b960bb612`
-- ✅ TSDoc-Tag-Override.md
-  ↳ Hash: `d6f7515913a70fa1466704463b73692d5c39956ca02613a5e7c85cefe1fb7116`
-- ✅ TSDoc-Tag-Packagedocumentation.md
-  ↳ Hash: `dbcab5a730336a7e9a97c51cd80347ee4de1ff831bf32f390abefab5b2f2d73e`
-- ✅ TSDoc-Tag-Param.md
-  ↳ Hash: `b9a290ebe21e9d3a942b073264a25c0de766e734c28ec9cbcf9c6d1fde5c031d`
-- ✅ TSDoc-Tag-Privateremarks.md
-  ↳ Hash: `303cc5f8780a403fe900549ba83a956a0cffa888751dfd56026d9175208393ff`
+## 🕓 TSDoc sync @ 2025-07-23T04:12:43.387Z
 - ✅ TSDoc-Tag-Readonly.md
-  ↳ Hash: `39f9db80945827a45390efd0027cfec1bf902f66d013c0d0f6e4188b16523810`
+  ↳ Hash: `78eb1efa5fab50cf37aa0f9480a80a2e8a8823f69c54072eb3fcb918bcfb912d`
 - ✅ TSDoc-Tag-Public.md
-  ↳ Hash: `ab9b828a60477512561441487297f28a65e7a728b4550518094f8f834e0d6ab4`
-- 📘 TSDoc-Home.md
-  ↳ Hash: `f0b3bc3df31c3ecf22bee699ffe870e49197cfe31c438daafa096cc49e6b53ec`
-- 📘 TSDoc-Intro-Approach.md
-  ↳ Hash: `45acc62577c13acdd96a283393bffdb5fed7549fb58ea4b29e1308dd5eb99e48`
-- 📘 TSDoc-Intro-UsingTsdoc.md
-  ↳ Hash: `53c627277a0de6788352ee480bfe61b5ed28afa4b53946b9b2653b00e6bb1624`
-- 📘 TSDoc-Spec-StandardizationGroups.md
-  ↳ Hash: `3b7f8f5e0aaac88fdb7d6294f9cb445446a3d321c19cb659006ea07392b02811`
-- 📘 TSDoc-Spec-Overview.md
-  ↳ Hash: `59857a4fd0fe5799cb488d544504629b5c284a8a4ff3d13fc053f2ca1ab0f496`
-- 📘 TSDoc-Spec-TagKinds.md
-  ↳ Hash: `9fda28e68203e83a11e8d8f2873dc022abc422f8670c805d639f6c0810d1bed2`
-- ✅ TSDoc-Tag-Remarks.md
-  ↳ Hash: `89238dee2ec0785248abd97d8e2e492198e75a1e8a933e6199d6808c34f9b166`
-- ✅ TSDoc-Tag-Sealed.md
-  ↳ Hash: `8709d0be48ccdad1242b79ed52d30337ae1380d15527160dd72c94bbadb37474`
-- ✅ TSDoc-Tag-Returns.md
-  ↳ Hash: `a2fea22cf8bbc7bd8c606e9235df5bbaa0e267826875b08507d43f10486f5b44`
-- 📘 TSDoc-Package-EslintPluginTsdoc.md
-  ↳ Hash: `f7ea2b76bb60fbcd00048f0f2b4974d80fbe52dcda373fecc440cde8d2b22739`
-- 📘 TSDoc-Package-TsdocConfig.md
-  ↳ Hash: `5c652839c2842eb70c2986d7238820481a0a2cf566b4395ded45297f575f2c2f`
-- ✅ TSDoc-Tag-See.md
-  ↳ Hash: `fb6b3417b443b4a682c0409ec8076b961b0d5f582902a3ab4961d69bce96b1bc`
-- ✅ TSDoc-Tag-Typeparam.md
-  ↳ Hash: `ce7bee8be13f8f537f27630aa7da398c7250d500a575d73e8a7396aeb2bfb988`
-- ✅ TSDoc-Tag-Throws.md
-  ↳ Hash: `f3f2971b547ac1754a85398cfe0ea377feae05434eec528ffcf8afcf3031c211`
-- ✅ TSDoc-Tag-Virtual.md
-  ↳ Hash: `53d2e2eee72727b62871bc518b47c6c027ef215d8b96996c2376e73d9405e861`
-- 📘 TSDoc-Package-Tsdoc.md
-  ↳ Hash: `f12e1c8669fa9100b553ffba12597f57ef5c1e1c854b014fa72d3985a6b3a3b6`
-
----
-## 🕓 TSDoc sync @ 2025-07-23T00:15:45.729Z
-- ✅ TSDoc-Tag-Alpha.md
-  ↳ Hash: `108995ab81bc59d7df468632ad0ae285ca2fef7ccee0acf669908890e0f624ef`
-- ✅ TSDoc-Tag-Defaultvalue.md
-  ↳ Hash: `4460d6b150e3137043e81001589a1bb56de87ffe6a270497aea74850c27a1e85`
-- ✅ TSDoc-Tag-Experimental.md
-  ↳ Hash: `dbfe2a222b5d06e8bb669d1467abf613ce151d9eed46c2a20c676da0e1eda8c1`
-- ✅ TSDoc-Tag-Beta.md
-  ↳ Hash: `482f6148580718f8e4d9fd4182da6ef8d4433d46508807cf5e776b2f49acdbbb`
-- ✅ TSDoc-Tag-Decorator.md
-  ↳ Hash: `7ca6287a01251168482e3b1fa7436050455da93e1d71b70152d3bd487c367503`
-- ✅ TSDoc-Tag-Example.md
-  ↳ Hash: `d2bfd80ffe1f74bf2a30e75eb79684d011585e989589564ef06e6bea43a50f37`
-- ✅ TSDoc-Tag-Internal.md
-  ↳ Hash: `53160c861175886f5c53f326e705b990cf2895c8c042ce027179c39eaabb5a4f`
-- ✅ TSDoc-Tag-Label.md
-  ↳ Hash: `ba7ad3fb938604011d8fa20ac7c465ad5c9793be7fc4dd0aa7d28e53ea5e3628`
-- ✅ TSDoc-Tag-Inheritdoc.md
-  ↳ Hash: `5c49ea77b44073717e7f99fc737250121ea5b62c5490125aa628fcd43a015b88`
-- ✅ TSDoc-Tag-Eventproperty.md
-  ↳ Hash: `e7f3f4296316f6566a5d52a4853fc2824bd40e27080833bfb577b090ecee184d`
-- ✅ TSDoc-Tag-Link.md
-  ↳ Hash: `b4ed92d7e1a75449677d78b1acc6489ed9b6c51bf16b04dcc2dff90b960bb612`
-- ✅ TSDoc-Tag-Deprecated.md
-  ↳ Hash: `ec400597e4a02022fe8d2ebe5a9197a60f96eace86f236a4f946ba80e145807f`
-- ✅ TSDoc-Tag-Packagedocumentation.md
-  ↳ Hash: `dbcab5a730336a7e9a97c51cd80347ee4de1ff831bf32f390abefab5b2f2d73e`
-- ✅ TSDoc-Tag-Override.md
-  ↳ Hash: `d6f7515913a70fa1466704463b73692d5c39956ca02613a5e7c85cefe1fb7116`
-- ✅ TSDoc-Tag-Param.md
-  ↳ Hash: `b9a290ebe21e9d3a942b073264a25c0de766e734c28ec9cbcf9c6d1fde5c031d`
-- 📘 TSDoc-Spec-Overview.md
-  ↳ Hash: `59857a4fd0fe5799cb488d544504629b5c284a8a4ff3d13fc053f2ca1ab0f496`
-- 📘 TSDoc-Spec-StandardizationGroups.md
-  ↳ Hash: `3b7f8f5e0aaac88fdb7d6294f9cb445446a3d321c19cb659006ea07392b02811`
-- 📘 TSDoc-Home.md
-  ↳ Hash: `f0b3bc3df31c3ecf22bee699ffe870e49197cfe31c438daafa096cc49e6b53ec`
+  ↳ Hash: `dfd3997711c4e1ae92a1e092942281fa5f32f2bfa31c6ffc0c78ac86ffa61a6a`
 - ✅ TSDoc-Tag-Privateremarks.md
-  ↳ Hash: `303cc5f8780a403fe900549ba83a956a0cffa888751dfd56026d9175208393ff`
-- ✅ TSDoc-Tag-Public.md
-  ↳ Hash: `ab9b828a60477512561441487297f28a65e7a728b4550518094f8f834e0d6ab4`
-- 📘 TSDoc-Intro-UsingTsdoc.md
-  ↳ Hash: `53c627277a0de6788352ee480bfe61b5ed28afa4b53946b9b2653b00e6bb1624`
-- ✅ TSDoc-Tag-Readonly.md
-  ↳ Hash: `39f9db80945827a45390efd0027cfec1bf902f66d013c0d0f6e4188b16523810`
-- 📘 TSDoc-Intro-Approach.md
-  ↳ Hash: `45acc62577c13acdd96a283393bffdb5fed7549fb58ea4b29e1308dd5eb99e48`
-- 📘 TSDoc-Package-TsdocConfig.md
-  ↳ Hash: `5c652839c2842eb70c2986d7238820481a0a2cf566b4395ded45297f575f2c2f`
+  ↳ Hash: `aab793ea1430480b602bcf74bc2136c12205d7e05dacc189c6aba4950818c209`
+- ✅ TSDoc-Tag-Param.md
+  ↳ Hash: `33a1cc85e0a41982fdfc8cdd12bed125b3f814d8b1aca65e4969c6744c2a50e9`
+- ✅ TSDoc-Tag-Packagedocumentation.md
+  ↳ Hash: `8b8d1559b30ba5c3a481264b5bf2e5162df1ba99dfd484cc33ea87f4b78b3a59`
+- ✅ TSDoc-Tag-Override.md
+  ↳ Hash: `98889328bb090bec5fd933364dd832b47b074e6ec95ce9ddb3bac969ba132b45`
+- ✅ TSDoc-Tag-Label.md
+  ↳ Hash: `dd0f77ae5b8c49ec039574aa30625eb64b2197e3ae4c20be4a9f9757a2d84540`
+- ✅ TSDoc-Tag-Link.md
+  ↳ Hash: `70bd58aab85c31ccfb995f0ec1884ae5817d158c279660c49e0438428373964f`
+- ✅ TSDoc-Tag-Internal.md
+  ↳ Hash: `9b6812624993b42924ab1c9a4aaf1566c403cd2bbb153665777e85c858afb796`
+- ✅ TSDoc-Tag-Inheritdoc.md
+  ↳ Hash: `37d2962d5c92641c17d984b55a410fa7e306ed6abe40d9d976a2ac419fb1fbe1`
+- ✅ TSDoc-Tag-Experimental.md
+  ↳ Hash: `5c269d50f527e7ca607f8725e93ae402b3fa75e5687d960648ceb78ab5624f6c`
+- ✅ TSDoc-Tag-Eventproperty.md
+  ↳ Hash: `8e99ff4e716e4c7acf4ed284fddb9a983768adfc653a6302b9c750bfbbcad37d`
+- ✅ TSDoc-Tag-Example.md
+  ↳ Hash: `2093b69f6b486f456d33c1e95060786b6dbaa184de0b42671a388bb1927cdfa1`
+- ✅ TSDoc-Tag-Defaultvalue.md
+  ↳ Hash: `2681977d566647c27882bbf0dc34d7029555effd0777108236722fe84a99d559`
+- ✅ TSDoc-Tag-Deprecated.md
+  ↳ Hash: `1996bd5cb6b01db8d2ce5c6c8a527e1e26c98f37fba39c6633c22ee1bbe288a9`
+- ✅ TSDoc-Tag-Alpha.md
+  ↳ Hash: `4a45bd4325244fd994eaf47ce0899f11d684638d20bc3f97aeb3148854dce54b`
+- ✅ TSDoc-Tag-Decorator.md
+  ↳ Hash: `e6d57975bbcc5457cd1a51ff6a5a66990b5ed7c98406934400b918e761e907c1`
+- ✅ TSDoc-Tag-Beta.md
+  ↳ Hash: `8388952958d59ddf7e77dd097d009e669aa2664fef0b6a036334971bf4767c4a`
 - ✅ TSDoc-Tag-Remarks.md
-  ↳ Hash: `89238dee2ec0785248abd97d8e2e492198e75a1e8a933e6199d6808c34f9b166`
-- ✅ TSDoc-Tag-Returns.md
-  ↳ Hash: `a2fea22cf8bbc7bd8c606e9235df5bbaa0e267826875b08507d43f10486f5b44`
-- 📘 TSDoc-Spec-TagKinds.md
-  ↳ Hash: `9fda28e68203e83a11e8d8f2873dc022abc422f8670c805d639f6c0810d1bed2`
-- 📘 TSDoc-Package-EslintPluginTsdoc.md
-  ↳ Hash: `f7ea2b76bb60fbcd00048f0f2b4974d80fbe52dcda373fecc440cde8d2b22739`
+  ↳ Hash: `f98c749ca0d5a7e4496795de5f1a18f572a1b193d418d20d02d43a28ea21ec50`
 - ✅ TSDoc-Tag-Sealed.md
-  ↳ Hash: `8709d0be48ccdad1242b79ed52d30337ae1380d15527160dd72c94bbadb37474`
+  ↳ Hash: `ed1c8308241f07da95d1caa146d7788cf4cc922417c53e2c12ab7055ec08f9ab`
+- ✅ TSDoc-Tag-Returns.md
+  ↳ Hash: `5dead756167c9788ef23b159f58be3d517f0e4ab609a099c472b86b9b5e416f0`
 - ✅ TSDoc-Tag-See.md
-  ↳ Hash: `fb6b3417b443b4a682c0409ec8076b961b0d5f582902a3ab4961d69bce96b1bc`
-- ✅ TSDoc-Tag-Typeparam.md
-  ↳ Hash: `ce7bee8be13f8f537f27630aa7da398c7250d500a575d73e8a7396aeb2bfb988`
-- 📘 TSDoc-Package-Tsdoc.md
-  ↳ Hash: `f12e1c8669fa9100b553ffba12597f57ef5c1e1c854b014fa72d3985a6b3a3b6`
+  ↳ Hash: `c69c30ff4067fd71a4d1bdbd080b1da2f3d38ca25f8d1ec7b078b95984605b99`
 - ✅ TSDoc-Tag-Throws.md
-  ↳ Hash: `f3f2971b547ac1754a85398cfe0ea377feae05434eec528ffcf8afcf3031c211`
+  ↳ Hash: `da35eebf8aef20f22c5d1dc6b09435e9e6695fba4dd4a5878ff78311a24de0ef`
+- ✅ TSDoc-Tag-Typeparam.md
+  ↳ Hash: `2e7e95298fab61325c285d87ac9b7a13f462062e247f04933195d88ec777e330`
 - ✅ TSDoc-Tag-Virtual.md
-  ↳ Hash: `53d2e2eee72727b62871bc518b47c6c027ef215d8b96996c2376e73d9405e861`
+  ↳ Hash: `4bcd6e65775422f85d8df57d985a52e9dcb8c502831fafab87a3b1281aa7e0dc`
+- 📘 TSDoc-Spec-Overview.md
+  ↳ Hash: `dc4c262cb6acef40b70f5adcff0d29939a89a9a53525dc253885c70babc5c4ab`
+- 📘 TSDoc-Spec-StandardizationGroups.md
+  ↳ Hash: `e39b8abf073d6a8a93be76d5ebcf7066fe0ac54ef5c193627bba8889d05e0c16`
+- 📘 TSDoc-Spec-TagKinds.md
+  ↳ Hash: `158d58e1f5309da28af95ad2ee8727e118cd670cc092a6e49cec37c691f58efa`
+- 📘 TSDoc-Intro-UsingTsdoc.md
+  ↳ Hash: `5cf565d75fca723ee015e010fb40412280c28f9ae54efbeb75791e552eeb1ba9`
+- 📘 TSDoc-Package-TsdocConfig.md
+  ↳ Hash: `d0806871a6f6feb89d383b55da0b614738620be2c35bed29a83eb2c49a9254c3`
+- 📘 TSDoc-Package-Tsdoc.md
+  ↳ Hash: `577e01445a9fb2a973e63c32e62c2d5f94bfd9aa39918d28bf1a834a4ef3fa78`
+- 📘 TSDoc-Package-EslintPluginTsdoc.md
+  ↳ Hash: `0f7c8ba55f198fc29f1eaeb12de0b7c7efc880ae26044a0dea88c9afd6a480f0`
+- 📘 TSDoc-Intro-Approach.md
+  ↳ Hash: `89ce8981ad0a6a562273b74c00ddfffe6d92a206d800d89c993d8afda630d573`
+- 📘 TSDoc-Home.md
+  ↳ Hash: `1d530a3f672e8d50656ab8524f8b47d37be4ffea6fb67fabe3687538f59c659a`
 
 🔧 34 changed files
----
-## 🕓 TSDoc sync @ 2025-07-23T00:23:54.616Z
-- ✅ TSDoc-Tag-Eventproperty.md
-  ↳ Hash: `8e99ff4e716e4c7acf4ed284fddb9a983768adfc653a6302b9c750bfbbcad37d`
-- ✅ TSDoc-Tag-Decorator.md
-  ↳ Hash: `e6d57975bbcc5457cd1a51ff6a5a66990b5ed7c98406934400b918e761e907c1`
-- ✅ TSDoc-Tag-Beta.md
-  ↳ Hash: `8388952958d59ddf7e77dd097d009e669aa2664fef0b6a036334971bf4767c4a`
-- ✅ TSDoc-Tag-Defaultvalue.md
-  ↳ Hash: `2681977d566647c27882bbf0dc34d7029555effd0777108236722fe84a99d559`
-- ✅ TSDoc-Tag-Alpha.md
-  ↳ Hash: `4a45bd4325244fd994eaf47ce0899f11d684638d20bc3f97aeb3148854dce54b`
-- ✅ TSDoc-Tag-Example.md
-  ↳ Hash: `2093b69f6b486f456d33c1e95060786b6dbaa184de0b42671a388bb1927cdfa1`
-- ✅ TSDoc-Tag-Deprecated.md
-  ↳ Hash: `1996bd5cb6b01db8d2ce5c6c8a527e1e26c98f37fba39c6633c22ee1bbe288a9`
-- ✅ TSDoc-Tag-Experimental.md
-  ↳ Hash: `5c269d50f527e7ca607f8725e93ae402b3fa75e5687d960648ceb78ab5624f6c`
-- ✅ TSDoc-Tag-Label.md
-  ↳ Hash: `dd0f77ae5b8c49ec039574aa30625eb64b2197e3ae4c20be4a9f9757a2d84540`
-- ✅ TSDoc-Tag-Inheritdoc.md
-  ↳ Hash: `37d2962d5c92641c17d984b55a410fa7e306ed6abe40d9d976a2ac419fb1fbe1`
-- ✅ TSDoc-Tag-Link.md
-  ↳ Hash: `70bd58aab85c31ccfb995f0ec1884ae5817d158c279660c49e0438428373964f`
-- ✅ TSDoc-Tag-Override.md
-  ↳ Hash: `98889328bb090bec5fd933364dd832b47b074e6ec95ce9ddb3bac969ba132b45`
-- ✅ TSDoc-Tag-Packagedocumentation.md
-  ↳ Hash: `8b8d1559b30ba5c3a481264b5bf2e5162df1ba99dfd484cc33ea87f4b78b3a59`
-- ✅ TSDoc-Tag-Param.md
-  ↳ Hash: `33a1cc85e0a41982fdfc8cdd12bed125b3f814d8b1aca65e4969c6744c2a50e9`
-- ✅ TSDoc-Tag-Privateremarks.md
-  ↳ Hash: `aab793ea1430480b602bcf74bc2136c12205d7e05dacc189c6aba4950818c209`
-- ✅ TSDoc-Tag-Readonly.md
-  ↳ Hash: `78eb1efa5fab50cf37aa0f9480a80a2e8a8823f69c54072eb3fcb918bcfb912d`
-- ✅ TSDoc-Tag-Remarks.md
-  ↳ Hash: `f98c749ca0d5a7e4496795de5f1a18f572a1b193d418d20d02d43a28ea21ec50`
-- ✅ TSDoc-Tag-Public.md
-  ↳ Hash: `dfd3997711c4e1ae92a1e092942281fa5f32f2bfa31c6ffc0c78ac86ffa61a6a`
-- ✅ TSDoc-Tag-Returns.md
-  ↳ Hash: `5dead756167c9788ef23b159f58be3d517f0e4ab609a099c472b86b9b5e416f0`
-- ✅ TSDoc-Tag-Sealed.md
-  ↳ Hash: `ed1c8308241f07da95d1caa146d7788cf4cc922417c53e2c12ab7055ec08f9ab`
-- ✅ TSDoc-Tag-See.md
-  ↳ Hash: `c69c30ff4067fd71a4d1bdbd080b1da2f3d38ca25f8d1ec7b078b95984605b99`
-- ✅ TSDoc-Tag-Throws.md
-  ↳ Hash: `da35eebf8aef20f22c5d1dc6b09435e9e6695fba4dd4a5878ff78311a24de0ef`
-- ✅ TSDoc-Tag-Virtual.md
-  ↳ Hash: `4bcd6e65775422f85d8df57d985a52e9dcb8c502831fafab87a3b1281aa7e0dc`
-- ✅ TSDoc-Tag-Typeparam.md
-  ↳ Hash: `2e7e95298fab61325c285d87ac9b7a13f462062e247f04933195d88ec777e330`
-- ✅ TSDoc-Tag-Internal.md
-  ↳ Hash: `9b6812624993b42924ab1c9a4aaf1566c403cd2bbb153665777e85c858afb796`
-
-🔧 25 changed files
----
-## 🕓 TSDoc sync @ 2025-07-23T00:24:18.905Z
-- ✅ TSDoc-Tag-Eventproperty.md
-  ↳ Hash: `e7f3f4296316f6566a5d52a4853fc2824bd40e27080833bfb577b090ecee184d`
-- ✅ TSDoc-Tag-Decorator.md
-  ↳ Hash: `7ca6287a01251168482e3b1fa7436050455da93e1d71b70152d3bd487c367503`
-- ✅ TSDoc-Tag-Beta.md
-  ↳ Hash: `482f6148580718f8e4d9fd4182da6ef8d4433d46508807cf5e776b2f49acdbbb`
-- ✅ TSDoc-Tag-Defaultvalue.md
-  ↳ Hash: `4460d6b150e3137043e81001589a1bb56de87ffe6a270497aea74850c27a1e85`
-- ✅ TSDoc-Tag-Alpha.md
-  ↳ Hash: `108995ab81bc59d7df468632ad0ae285ca2fef7ccee0acf669908890e0f624ef`
-- ✅ TSDoc-Tag-Deprecated.md
-  ↳ Hash: `ec400597e4a02022fe8d2ebe5a9197a60f96eace86f236a4f946ba80e145807f`
-- ✅ TSDoc-Tag-Example.md
-  ↳ Hash: `d2bfd80ffe1f74bf2a30e75eb79684d011585e989589564ef06e6bea43a50f37`
-- ✅ TSDoc-Tag-Experimental.md
-  ↳ Hash: `dbfe2a222b5d06e8bb669d1467abf613ce151d9eed46c2a20c676da0e1eda8c1`
-- ✅ TSDoc-Tag-Inheritdoc.md
-  ↳ Hash: `5c49ea77b44073717e7f99fc737250121ea5b62c5490125aa628fcd43a015b88`
-- ✅ TSDoc-Tag-Internal.md
-  ↳ Hash: `53160c861175886f5c53f326e705b990cf2895c8c042ce027179c39eaabb5a4f`
-- ✅ TSDoc-Tag-Link.md
-  ↳ Hash: `b4ed92d7e1a75449677d78b1acc6489ed9b6c51bf16b04dcc2dff90b960bb612`
-- ✅ TSDoc-Tag-Label.md
-  ↳ Hash: `ba7ad3fb938604011d8fa20ac7c465ad5c9793be7fc4dd0aa7d28e53ea5e3628`
-- ✅ TSDoc-Tag-Override.md
-  ↳ Hash: `d6f7515913a70fa1466704463b73692d5c39956ca02613a5e7c85cefe1fb7116`
-- ✅ TSDoc-Tag-Packagedocumentation.md
-  ↳ Hash: `dbcab5a730336a7e9a97c51cd80347ee4de1ff831bf32f390abefab5b2f2d73e`
-- ✅ TSDoc-Tag-Privateremarks.md
-  ↳ Hash: `303cc5f8780a403fe900549ba83a956a0cffa888751dfd56026d9175208393ff`
-- ✅ TSDoc-Tag-Param.md
-  ↳ Hash: `b9a290ebe21e9d3a942b073264a25c0de766e734c28ec9cbcf9c6d1fde5c031d`
-- ✅ TSDoc-Tag-Readonly.md
-  ↳ Hash: `39f9db80945827a45390efd0027cfec1bf902f66d013c0d0f6e4188b16523810`
-- ✅ TSDoc-Tag-Public.md
-  ↳ Hash: `ab9b828a60477512561441487297f28a65e7a728b4550518094f8f834e0d6ab4`
-- ✅ TSDoc-Tag-Remarks.md
-  ↳ Hash: `89238dee2ec0785248abd97d8e2e492198e75a1e8a933e6199d6808c34f9b166`
-- ✅ TSDoc-Tag-Returns.md
-  ↳ Hash: `a2fea22cf8bbc7bd8c606e9235df5bbaa0e267826875b08507d43f10486f5b44`
-- ✅ TSDoc-Tag-Throws.md
-  ↳ Hash: `f3f2971b547ac1754a85398cfe0ea377feae05434eec528ffcf8afcf3031c211`
-- ✅ TSDoc-Tag-Sealed.md
-  ↳ Hash: `8709d0be48ccdad1242b79ed52d30337ae1380d15527160dd72c94bbadb37474`
-- ✅ TSDoc-Tag-See.md
-  ↳ Hash: `fb6b3417b443b4a682c0409ec8076b961b0d5f582902a3ab4961d69bce96b1bc`
-- ✅ TSDoc-Tag-Virtual.md
-  ↳ Hash: `53d2e2eee72727b62871bc518b47c6c027ef215d8b96996c2376e73d9405e861`
-- ✅ TSDoc-Tag-Typeparam.md
-  ↳ Hash: `ce7bee8be13f8f537f27630aa7da398c7250d500a575d73e8a7396aeb2bfb988`
-
-🔧 25 changed files
----
-## 🕓 TSDoc sync @ 2025-07-23T00:24:50.050Z
-- ✅ TSDoc-Tag-Public.md
-  ↳ Hash: `dfd3997711c4e1ae92a1e092942281fa5f32f2bfa31c6ffc0c78ac86ffa61a6a`
-- ✅ TSDoc-Tag-Param.md
-  ↳ Hash: `33a1cc85e0a41982fdfc8cdd12bed125b3f814d8b1aca65e4969c6744c2a50e9`
-- ✅ TSDoc-Tag-Packagedocumentation.md
-  ↳ Hash: `8b8d1559b30ba5c3a481264b5bf2e5162df1ba99dfd484cc33ea87f4b78b3a59`
-- ✅ TSDoc-Tag-Override.md
-  ↳ Hash: `98889328bb090bec5fd933364dd832b47b074e6ec95ce9ddb3bac969ba132b45`
-- ✅ TSDoc-Tag-Link.md
-  ↳ Hash: `70bd58aab85c31ccfb995f0ec1884ae5817d158c279660c49e0438428373964f`
-- ✅ TSDoc-Tag-Label.md
-  ↳ Hash: `dd0f77ae5b8c49ec039574aa30625eb64b2197e3ae4c20be4a9f9757a2d84540`
-- ✅ TSDoc-Tag-Inheritdoc.md
-  ↳ Hash: `37d2962d5c92641c17d984b55a410fa7e306ed6abe40d9d976a2ac419fb1fbe1`
-- ✅ TSDoc-Tag-Internal.md
-  ↳ Hash: `9b6812624993b42924ab1c9a4aaf1566c403cd2bbb153665777e85c858afb796`
-- ✅ TSDoc-Tag-Example.md
-  ↳ Hash: `2093b69f6b486f456d33c1e95060786b6dbaa184de0b42671a388bb1927cdfa1`
-- ✅ TSDoc-Tag-Experimental.md
-  ↳ Hash: `5c269d50f527e7ca607f8725e93ae402b3fa75e5687d960648ceb78ab5624f6c`
-- ✅ TSDoc-Tag-Beta.md
-  ↳ Hash: `8388952958d59ddf7e77dd097d009e669aa2664fef0b6a036334971bf4767c4a`
-- ✅ TSDoc-Tag-Eventproperty.md
-  ↳ Hash: `8e99ff4e716e4c7acf4ed284fddb9a983768adfc653a6302b9c750bfbbcad37d`
-- ✅ TSDoc-Tag-Alpha.md
-  ↳ Hash: `4a45bd4325244fd994eaf47ce0899f11d684638d20bc3f97aeb3148854dce54b`
-- ✅ TSDoc-Tag-Defaultvalue.md
-  ↳ Hash: `2681977d566647c27882bbf0dc34d7029555effd0777108236722fe84a99d559`
-- ✅ TSDoc-Tag-Deprecated.md
-  ↳ Hash: `1996bd5cb6b01db8d2ce5c6c8a527e1e26c98f37fba39c6633c22ee1bbe288a9`
-- ✅ TSDoc-Tag-Decorator.md
-  ↳ Hash: `e6d57975bbcc5457cd1a51ff6a5a66990b5ed7c98406934400b918e761e907c1`
-- ✅ TSDoc-Tag-Privateremarks.md
-  ↳ Hash: `aab793ea1430480b602bcf74bc2136c12205d7e05dacc189c6aba4950818c209`
-- ✅ TSDoc-Tag-Returns.md
-  ↳ Hash: `5dead756167c9788ef23b159f58be3d517f0e4ab609a099c472b86b9b5e416f0`
-- ✅ TSDoc-Tag-Remarks.md
-  ↳ Hash: `f98c749ca0d5a7e4496795de5f1a18f572a1b193d418d20d02d43a28ea21ec50`
-- ✅ TSDoc-Tag-Sealed.md
-  ↳ Hash: `ed1c8308241f07da95d1caa146d7788cf4cc922417c53e2c12ab7055ec08f9ab`
-- ✅ TSDoc-Tag-Readonly.md
-  ↳ Hash: `78eb1efa5fab50cf37aa0f9480a80a2e8a8823f69c54072eb3fcb918bcfb912d`
-- ✅ TSDoc-Tag-See.md
-  ↳ Hash: `c69c30ff4067fd71a4d1bdbd080b1da2f3d38ca25f8d1ec7b078b95984605b99`
-- ✅ TSDoc-Tag-Throws.md
-  ↳ Hash: `da35eebf8aef20f22c5d1dc6b09435e9e6695fba4dd4a5878ff78311a24de0ef`
-- ✅ TSDoc-Tag-Typeparam.md
-  ↳ Hash: `2e7e95298fab61325c285d87ac9b7a13f462062e247f04933195d88ec777e330`
-- ✅ TSDoc-Tag-Virtual.md
-  ↳ Hash: `4bcd6e65775422f85d8df57d985a52e9dcb8c502831fafab87a3b1281aa7e0dc`
-
-🔧 25 changed files
 ---
