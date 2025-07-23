@@ -1,26 +1,24 @@
 /**
  * Utility function for generating unique identifiers.
- * Uses crypto.randomUUID when available, falls back to custom implementation.
+ * Uses crypto.randomUUID in modern Electron/Node.js environments.
  */
 
 /**
- * Generate a unique identifier string.
- * Uses the browser's crypto.randomUUID() when available for better entropy,
- * otherwise falls back to a custom implementation using Math.random() and timestamp.
+ * Generate a unique identifier string using the modern crypto.randomUUID API.
  *
- * @returns A unique identifier string (UUID format when crypto is available)
+ * @returns A UUID string in standard format
+ *
+ * @remarks
+ * Uses the native crypto.randomUUID() method which is available in modern
+ * Node.js (14.17.0+) and Electron environments. Since we target modern
+ * environments, no fallback is needed.
+ *
  * @example
  * ```typescript
  * const id = generateUuid();
- * // Returns: "123e4567-e89b-12d3-a456-426614174000" (crypto.randomUUID)
- * // Or: "site-ab3d5ef2-1640995200000" (fallback)
+ * // Returns: "123e4567-e89b-12d3-a456-426614174000"
  * ```
  */
 export function generateUuid(): string {
-    if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
-        return crypto.randomUUID();
-    }
-    // Fallback for environments without crypto.randomUUID
-    // eslint-disable-next-line sonarjs/pseudo-random -- Fallback for compatibility
-    return `site-${Math.random().toString(36).slice(2, 10)}-${Date.now()}`;
+    return crypto.randomUUID();
 }

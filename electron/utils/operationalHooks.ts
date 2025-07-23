@@ -187,14 +187,7 @@ async function emitStartEvent(
  * Generate a unique operation ID for tracking.
  */
 function generateOperationId(): string {
-    // Using crypto.randomUUID for secure random generation
-    try {
-        return `op_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
-    } catch {
-        // Fallback for environments without crypto.randomUUID
-        // eslint-disable-next-line sonarjs/pseudo-random -- Fallback for compatibility
-        return `op_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
-    }
+    return `op_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
 }
 
 /**

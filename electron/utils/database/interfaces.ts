@@ -12,7 +12,7 @@ import { SettingsRepository } from "../../services/database/SettingsRepository";
 import { SiteRepository } from "../../services/database/SiteRepository";
 import { Site } from "../../types";
 
-// Re-export Logger to maintain backward compatibility
+// Re-export Logger for database services
 export type { Logger } from "../interfaces";
 
 /**

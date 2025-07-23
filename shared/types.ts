@@ -14,7 +14,10 @@
 
 export type MonitorStatus = "down" | "paused" | "pending" | "up";
 
-export type MonitorType = "http" | "port";
+// Base monitor types - source of truth for type safety
+export const BASE_MONITOR_TYPES = ["http", "port"] as const;
+export type MonitorType = (typeof BASE_MONITOR_TYPES)[number];
+
 export type SiteStatus = "mixed" | "unknown" | MonitorStatus;
 
 // Default status constants
