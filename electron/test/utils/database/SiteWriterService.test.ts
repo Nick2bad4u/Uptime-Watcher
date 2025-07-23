@@ -6,7 +6,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 import { Site, Monitor } from "../../../types";
 import { SiteWriterService } from "../../../utils/database/SiteWriterService";
-import { SiteNotFoundError, Logger, MonitoringConfig } from "../../../utils/database/interfaces";
+import { SiteNotFoundError, MonitoringConfig } from "../../../utils/database/interfaces";
+import type { Logger } from "../../../utils/interfaces";
 import { StandardizedCache } from "../../../utils/cache/StandardizedCache";
 
 // Mock isDev function

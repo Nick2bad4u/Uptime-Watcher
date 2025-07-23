@@ -7,13 +7,11 @@ import { useThemeStyles } from "../hooks/useThemeStyles";
 Object.defineProperty(window, "matchMedia", {
     value: vi.fn().mockImplementation((query) => ({
         addEventListener: vi.fn(),
-        addListener: vi.fn(), // deprecated
         dispatchEvent: vi.fn(),
         matches: query === "(prefers-color-scheme: dark)",
         media: query,
         onchange: null,
         removeEventListener: vi.fn(),
-        removeListener: vi.fn(), // deprecated
     })),
     writable: true,
 });
