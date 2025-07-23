@@ -32,10 +32,14 @@ export function isValidSettingRow(row: Record<string, unknown>): boolean {
  * @param rows - Array of raw database rows
  * @returns Array of mapped SettingRow objects
  *
+ * @remarks
+ * Filters out invalid rows using isValidSettingRow before mapping to prevent
+ * creation of settings with empty keys or invalid data.
+ *
  * @public
  */
 export function rowsToSettings(rows: Record<string, unknown>[]): SettingRow[] {
-    return rows.map((row) => rowToSetting(row));
+    return rows.filter((row) => isValidSettingRow(row)).map((row) => rowToSetting(row));
 }
 
 /**
@@ -44,22 +48,21 @@ export function rowsToSettings(rows: Record<string, unknown>[]): SettingRow[] {
  * @param row - Raw database row
  * @returns Mapped SettingRow object
  *
+ * @throws {@link Error} When row has invalid key
+ *
  * @remarks
  * Handles type conversion and ensures consistent data transformation
- * across all settings-related database operations.
+ * across all settings-related database operations. Uses precise type checking
+ * instead of loose falsy checks for better type safety.
  *
  * @public
  */
 export function rowToSetting(row: Record<string, unknown>): SettingRow {
     try {
-        // Handle key (required field)
+        // Handle key (required field) with precise type checking
         const key = row.key;
-        if (!key || typeof key !== "string") {
-            logger.warn("[SettingsMapper] Invalid or missing key in database row", { row });
-            return {
-                key: "",
-                value: "",
-            };
+        if (key == null || typeof key !== "string" || key.length === 0) {
+            throw new Error(`[SettingsMapper] Invalid setting key: ${key}`);
         }
 
         // Handle value (required field)
@@ -83,22 +86,31 @@ export function rowToSetting(row: Record<string, unknown>): SettingRow {
  * @param row - Raw database row
  * @returns Setting value as string or undefined if not found
  *
+ * @remarks
+ * **Falsy Value Handling**: Preserves all falsy values except null/undefined.
+ * Empty strings, 0, and false are converted to their string representations.
+ * Only null and undefined values return undefined.
+ *
  * @public
  */
 export function rowToSettingValue(row: Record<string, unknown> | undefined): string | undefined {
-    if (!row?.value) {
+    if (row?.value == null) {
         return undefined;
     }
 
     const value = safeStringify(row.value);
-    return value.length > 0 ? value : undefined;
+    return value;
 }
 
 /**
- * Convert SettingRow array to a Record\<string, string\> object.
+ * Convert SettingRow array to a Record object mapping keys to values.
  *
  * @param settings - Array of SettingRow objects
  * @returns Record mapping keys to values
+ *
+ * @remarks
+ * Uses isValidSettingRow for consistent validation logic.
+ * Only includes settings that pass validation to ensure data integrity.
  *
  * @public
  */
@@ -106,8 +118,8 @@ export function settingsToRecord(settings: SettingRow[]): Record<string, string>
     const result: Record<string, string> = {};
 
     for (const setting of settings) {
-        // Only include valid string keys
-        if (typeof setting.key === "string" && setting.key.length > 0) {
+        // Reuse existing validation logic for consistency
+        if (isValidSettingRow(setting as unknown as Record<string, unknown>)) {
             result[setting.key] = setting.value;
         }
     }

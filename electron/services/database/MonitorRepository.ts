@@ -48,15 +48,21 @@ export class MonitorRepository {
                              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
                              RETURNING id`,
                             buildMonitorParameters(siteIdentifier, monitor)
-                        ) as undefined | { id: number };
+                        ) as Record<string, unknown> | undefined;
 
-                        if (insertResult && typeof insertResult.id === "number") {
-                            const newMonitor = {
-                                ...monitor,
-                                id: String(insertResult.id),
-                            };
-                            createdMonitors.push(newMonitor);
+                        // Enhanced type safety validation
+                        if (!insertResult || typeof insertResult !== "object") {
+                            throw new Error("Failed to create monitor: invalid database response");
                         }
+                        if (!("id" in insertResult) || typeof insertResult.id !== "number" || insertResult.id <= 0) {
+                            throw new Error("Failed to create monitor: invalid or missing ID in database response");
+                        }
+
+                        const newMonitor = {
+                            ...monitor,
+                            id: String(insertResult.id),
+                        };
+                        createdMonitors.push(newMonitor);
                     }
                     return Promise.resolve();
                 });
@@ -89,7 +95,17 @@ export class MonitorRepository {
 
     /**
      * Internal method to create a monitor within an existing transaction.
-     * Use this method when you're already within a transaction context.
+     *
+     * @param db - Database connection (must be within active transaction)
+     * @param siteIdentifier - Site identifier to associate monitor with
+     * @param monitor - Monitor configuration data
+     * @returns Generated monitor ID as string
+     *
+     * @throws {@link Error} When monitor creation fails or returns invalid ID
+     *
+     * @remarks
+     * **IMPORTANT**: This method must be called within an existing transaction context.
+     * Uses enhanced type safety validation to prevent silent failures from schema changes.
      */
     public createInternal(db: Database, siteIdentifier: string, monitor: Omit<Site["monitors"][0], "id">): string {
         // Generate dynamic SQL and parameters
@@ -98,10 +114,16 @@ export class MonitorRepository {
 
         const insertSql = `INSERT INTO monitors (${columns.join(", ")}) VALUES (${placeholders}) RETURNING id`;
 
-        const insertResult = db.get(insertSql, parameters) as undefined | { id: number };
+        const insertResult = db.get(insertSql, parameters) as Record<string, unknown> | undefined;
 
-        if (!insertResult || typeof insertResult.id !== "number") {
-            throw new Error(`Failed to create monitor for site ${siteIdentifier} - no ID returned`);
+        // Enhanced type safety validation
+        if (!insertResult || typeof insertResult !== "object") {
+            throw new Error(`Failed to create monitor for site ${siteIdentifier}: invalid database response`);
+        }
+        if (!("id" in insertResult) || typeof insertResult.id !== "number" || insertResult.id <= 0) {
+            throw new Error(
+                `Failed to create monitor for site ${siteIdentifier}: invalid or missing ID in database response`
+            );
         }
 
         if (isDev()) {
@@ -237,17 +259,19 @@ export class MonitorRepository {
 
     /**
      * Find all monitors for a specific site.
+     *
+     * @param siteIdentifier - Site identifier to find monitors for
+     * @returns Promise resolving to array of monitors for the site
      */
     public async findBySiteIdentifier(siteIdentifier: string): Promise<Site["monitors"]> {
-        // eslint-disable-next-line @typescript-eslint/require-await
-        return withDatabaseOperation(async () => {
+        return withDatabaseOperation(() => {
             const db = this.getDb();
             const monitorRows = db.all("SELECT * FROM monitors WHERE site_identifier = ?", [siteIdentifier]) as Record<
                 string,
                 unknown
             >[];
 
-            return rowsToMonitors(monitorRows);
+            return Promise.resolve(rowsToMonitors(monitorRows));
         }, `find-monitors-by-site-${siteIdentifier}`);
     }
 
@@ -282,11 +306,22 @@ export class MonitorRepository {
 
     /**
      * Update an existing monitor (internal version for use within existing transactions).
-     * Does not create its own transaction.
-     */
-    /**
-     * Update an existing monitor (internal version for use within existing transactions).
-     * Does not create its own transaction.
+     *
+     * @param db - Database connection (must be within active transaction)
+     * @param monitorId - ID of monitor to update
+     * @param monitor - Partial monitor data to update
+     *
+     * @remarks
+     * **IMPORTANT**: This method must be called within an existing transaction context.
+     *
+     * **Field Mapping Logic:**
+     * Converts camelCase field names to snake_case database columns using dynamic mapping.
+     * Only updates fields that are provided and are primitive types (string, number, boolean).
+     *
+     * **Domain-Specific Behavior**:
+     * The 'enabled' field is automatically derived from 'monitoring' state per domain contract.
+     * If neither 'monitoring' nor 'enabled' are provided, the 'enabled' field is skipped
+     * to preserve the current monitoring state (see shouldSkipMonitoringFields).
      */
     public updateInternal(db: Database, monitorId: string, monitor: Partial<Site["monitors"][0]>): void {
         if (isDev()) {
@@ -325,9 +360,9 @@ export class MonitorRepository {
         // Only update fields that are actually provided and are primitive types
         for (const [key, value] of Object.entries(row)) {
             if (value !== undefined && value !== null) {
-                // Skip 'enabled' field if monitoring state wasn't provided in the original monitor object
-                // This prevents status updates from accidentally disabling monitoring
-                if (this.shouldSkipEnabledField(key, monitor)) {
+                // Skip monitoring-related fields based on domain logic
+                // This prevents status updates from accidentally changing monitoring state
+                if (this.shouldSkipMonitoringFields(key, monitor)) {
                     continue;
                 }
 
@@ -345,8 +380,17 @@ export class MonitorRepository {
 
     /**
      * Converts a value to the appropriate database format.
+     *
+     * @param key - Field name for logging purposes
+     * @param value - Value to convert for database storage
+     * @returns Database-compatible value or null if conversion not possible
+     *
+     * @remarks
+     * **Type Conversion Logic**:
+     * - Strings and numbers: passed through unchanged
+     * - Booleans: converted to 1 (true) or 0 (false) for SQLite compatibility
+     * - Other types: logged as warning and returned as null (skipped)
      */
-    // eslint-disable-next-line sonarjs/function-return-type -- Function returns different types based on input type
     private convertValueForDatabase(key: string, value: unknown): DbValue | null {
         if (typeof value === "string" || typeof value === "number") {
             return value;
@@ -380,16 +424,36 @@ export class MonitorRepository {
     }
 
     /**
-     * Get the database instance.
+     * Get the database instance for internal repository operations.
+     *
+     * @returns Database connection from the DatabaseService
+     * @throws {@link Error} When database is not initialized
+     *
+     * @remarks
+     * **Usage Pattern**: Only used for read operations and internal methods.
+     * All mutations must use executeTransaction() for proper transaction management.
+     * Caller must ensure DatabaseService.initialize() was called first.
      */
     private getDb(): Database {
         return this.databaseService.getDatabase();
     }
 
     /**
-     * Checks if the 'enabled' field should be skipped during update.
+     * Checks if monitoring-related fields should be skipped during update.
+     *
+     * @param key - Database field name to check
+     * @param monitor - Monitor update data being processed
+     * @returns True if the field should be skipped, false otherwise
+     *
+     * @remarks
+     * **Domain Logic**: The 'enabled' field is automatically derived from 'monitoring' state.
+     * If neither 'monitoring' nor 'enabled' are provided in the update, the 'enabled' field
+     * should be skipped to preserve the current monitoring state.
+     *
+     * **Referenced in Domain Event Contract**: Monitor state transitions must preserve
+     * monitoring status unless explicitly changed.
      */
-    private shouldSkipEnabledField(key: string, monitor: Partial<Site["monitors"][0]>): boolean {
+    private shouldSkipMonitoringFields(key: string, monitor: Partial<Site["monitors"][0]>): boolean {
         if (key === "enabled" && !("monitoring" in monitor) && !("enabled" in monitor)) {
             if (isDev()) {
                 logger.debug(`[MonitorRepository] Skipping 'enabled' field - monitoring state not provided in update`);

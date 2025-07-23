@@ -36,10 +36,7 @@ export function getHistoryCount(db: Database, monitorId: string): number {
 
         return result?.count ?? 0;
     } catch (error) {
-        /* v8 ignore next 2 */ logger.error(
-            `[HistoryQuery] Failed to get history count for monitor: ${monitorId}`,
-            error
-        );
+        logger.error(`[HistoryQuery] Failed to get history count for monitor: ${monitorId}`, error);
         throw error;
     }
 }
@@ -60,10 +57,7 @@ export function getLatestHistoryEntry(db: Database, monitorId: string): StatusHi
 
         return rowToHistoryEntry(row);
     } catch (error) {
-        /* v8 ignore next 2 */ logger.error(
-            `[HistoryQuery] Failed to get latest history entry for monitor: ${monitorId}`,
-            error
-        );
+        logger.error(`[HistoryQuery] Failed to get latest history entry for monitor: ${monitorId}`, error);
         throw error;
     }
 }

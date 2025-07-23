@@ -63,25 +63,26 @@ export function createDatabaseIndexes(db: Database): void {
  */
 export function createDatabaseTables(db: Database): void {
     try {
-        // Sites table
+        // Sites table with INTEGER boolean for SQLite consistency
         db.run(`
             CREATE TABLE IF NOT EXISTS sites (
                 identifier TEXT PRIMARY KEY,
                 name TEXT,
-                monitoring BOOLEAN DEFAULT 1
+                monitoring INTEGER DEFAULT 1
             );
         `);
 
         // Monitors table with dynamic schema based on monitor type registry
         const dynamicMonitorSchema = generateMonitorTableSchema();
+        validateGeneratedSchema(dynamicMonitorSchema);
         db.run(dynamicMonitorSchema);
 
-        // History table
+        // History table with proper constraints and clear field naming
         db.run(`
             CREATE TABLE IF NOT EXISTS history (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                monitor_id INTEGER,
-                timestamp INTEGER,
+                monitor_id INTEGER NOT NULL,
+                checked_at INTEGER,
                 status TEXT,
                 responseTime INTEGER,
                 details TEXT,
@@ -126,6 +127,7 @@ export function createDatabaseTables(db: Database): void {
 /**
  * Setup monitor type validation framework.
  *
+ * @returns void
  * @throws When validation setup fails
  *
  * @remarks
@@ -143,5 +145,30 @@ export function setupMonitorTypeValidation(): void {
     } catch (error) {
         logger.error("[DatabaseSchema] Failed to setup monitor type validation", error);
         throw error;
+    }
+}
+
+/**
+ * Validate generated SQL schema before execution.
+ *
+ * @param schema - Generated SQL schema string
+ * @throws {@link Error} When schema validation fails
+ *
+ * @remarks
+ * **Validation Checks:**
+ * - Ensures schema is non-empty string
+ * - Verifies required table definition exists
+ * - Checks for placeholder values that indicate generation errors
+ * - Prevents runtime failures from malformed SQL
+ */
+function validateGeneratedSchema(schema: string): void {
+    if (!schema || typeof schema !== "string") {
+        throw new Error("Generated schema is empty or invalid");
+    }
+    if (!schema.includes("CREATE TABLE IF NOT EXISTS monitors")) {
+        throw new Error("Generated schema missing required monitors table definition");
+    }
+    if (schema.includes("undefined") || schema.includes("null")) {
+        throw new Error("Generated schema contains undefined or null values");
     }
 }

@@ -5,11 +5,14 @@
 
 import { getAllMonitorTypeConfigs } from "../../monitoring/MonitorTypeRegistry";
 
+/**
+ * Database field definition for dynamic monitor schema.
+ */
 export interface DatabaseFieldDefinition {
     /** Column name in database */
     columnName: string;
-    /** Default value for the column */
-    defaultValue?: string;
+    /** Default value for the column (null for dynamic fields) */
+    defaultValue?: null | string;
     /** Monitor type this field belongs to */
     monitorType: string;
     /** Whether column allows NULL values */
@@ -41,7 +44,7 @@ export function generateDatabaseFieldDefinitions(): DatabaseFieldDefinition[] {
 
             fields.push({
                 columnName,
-                defaultValue: "NULL",
+                defaultValue: null, // Actual null value, not string "NULL"
                 monitorType: config.type,
                 // All dynamic fields are nullable since they're only used by specific monitor types
                 nullable: true,
@@ -145,16 +148,24 @@ export function mapMonitorToRow(monitor: Record<string, unknown>): Record<string
 
 /**
  * Map database row to monitor object with dynamic field handling.
+ *
+ * @param row - Database row to convert
+ * @returns Monitor object with proper type conversions
+ *
+ * @remarks
+ * **Boolean Mapping**: Uses explicit comparison (=== 1) for SQLite boolean consistency.
+ * **Field Mapping**: enabled and monitoring both map to the same database field for
+ * backward compatibility - monitoring is the frontend-preferred field name.
  */
 export function mapRowToMonitor(row: Record<string, unknown>): Record<string, unknown> {
     const monitor: Record<string, unknown> = {
         checkInterval: Number(row.check_interval),
         createdAt: Number(row.created_at),
-        enabled: Boolean(row.enabled),
+        enabled: row.enabled === 1, // Explicit SQLite boolean mapping
         id: Number(row.id),
         lastChecked: row.last_checked ? Number(row.last_checked) : undefined,
         lastError: row.last_error ? safeStringifyError(row.last_error) : undefined,
-        monitoring: Boolean(row.enabled), // Map enabled -> monitoring for frontend
+        monitoring: row.enabled === 1, // Map enabled -> monitoring for frontend consistency
         nextCheck: row.next_check ? Number(row.next_check) : undefined,
         responseTime: row.response_time ? Number(row.response_time) : undefined,
         retryAttempts: Number(row.retry_attempts),
@@ -220,6 +231,13 @@ function convertToDatabase(value: unknown, sqlType: string): unknown {
 
 /**
  * Convert field type to SQL data type.
+ *
+ * @param fieldType - Field type from monitor configuration
+ * @returns SQL data type for SQLite
+ *
+ * @remarks
+ * **Default Behavior**: Unknown field types default to TEXT for safety.
+ * **Supported Types**: number -\> INTEGER, text/url -\> TEXT, default -\> TEXT
  */
 function getSqlTypeFromFieldType(fieldType: string): string {
     switch (fieldType) {
@@ -231,24 +249,62 @@ function getSqlTypeFromFieldType(fieldType: string): string {
             return "TEXT";
         }
         default: {
-            return "TEXT";
+            return "TEXT"; // Safe default for unknown types
         }
     }
 }
 
 /**
  * Safely converts an error value to a string for database storage.
+ *
+ * @param value - Error value to serialize
+ * @returns String representation of the error
+ *
+ * @remarks
+ * **Enhanced Error Handling**: Extracts meaningful information from Error objects,
+ * handles empty objects gracefully, and provides fallback serialization.
  */
 function safeStringifyError(value: unknown): string {
     if (typeof value === "string") {
         return value;
     }
-    return JSON.stringify(value);
+
+    if (value instanceof Error) {
+        return JSON.stringify({
+            message: value.message,
+            name: value.name,
+            stack: value.stack,
+        });
+    }
+
+    if (typeof value === "object" && value !== null) {
+        try {
+            const result = JSON.stringify(value);
+            // Handle empty object case
+            return result === "{}" ? String(value) : result;
+        } catch {
+            return String(value);
+        }
+    }
+
+    return String(value);
 }
 
 /**
  * Convert camelCase to snake_case for database columns.
+ *
+ * @param str - String to convert
+ * @returns snake_case version of the string
+ *
+ * @remarks
+ * **Edge Case Handling**: Properly handles leading uppercase characters
+ * (e.g., "SiteIdentifier" -\> "site_identifier" not "_site_identifier")
  */
 function toSnakeCase(str: string): string {
-    return str.replaceAll(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+    if (!str || typeof str !== "string") return str;
+
+    // Handle leading uppercase to avoid leading underscore
+    return str
+        .replace(/^[A-Z]/, (match) => match.toLowerCase())
+        .replaceAll(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
 }

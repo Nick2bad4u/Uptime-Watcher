@@ -183,7 +183,7 @@ export async function checkMonitor(
                         const pruneThreshold = config.historyLimit + bufferSize;
 
                         // Get current count for this monitor (lightweight operation)
-                        const currentCount = config.repositories.history.getHistoryCount(monitor.id);
+                        const currentCount = config.repositories.history.getHistoryCountInternal(db, monitor.id);
 
                         if (currentCount > pruneThreshold) {
                             config.repositories.history.pruneHistoryInternal(db, monitor.id, config.historyLimit);

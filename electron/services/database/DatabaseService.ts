@@ -18,6 +18,18 @@ import { createDatabaseIndexes, createDatabaseTables, setupMonitorTypeValidation
  *
  * Business logic (site loading, import/export, etc.) is handled by DatabaseManager.
  *
+ * **Platform Compatibility:**
+ * - Built for Electron main process environment
+ * - Uses node-sqlite3-wasm (compiled for Node.js compatibility)
+ * - No platform-specific caveats for Windows/macOS/Linux
+ * - WASM binary ensures consistent behavior across platforms
+ *
+ * **Thread Safety:**
+ * - Singleton pattern ensures single database connection
+ * - node-sqlite3-wasm operations are synchronous and thread-safe
+ * - Multiple initialize() calls return same connection (idempotent)
+ * - Concurrent access handled at application service layer
+ *
  * @example
  * ```typescript
  * const dbService = DatabaseService.getInstance();
@@ -54,25 +66,35 @@ export class DatabaseService {
     }
 
     /**
-     * Close the database connection.
+     * Close the database connection safely.
      *
      * @throws {@link Error} When connection close fails
      *
      * @remarks
-     * Safely closes the database connection and cleans up resources.
-     * Should be called during application shutdown to ensure proper cleanup.
+     * **Safety Considerations:**
+     * - Safe to call multiple times (idempotent operation)
+     * - In node-sqlite3-wasm, pending operations complete before close
+     * - All transactions are completed synchronously before closure
+     * - Should be called during application shutdown for proper cleanup
+     *
+     * **Platform Compatibility:**
+     * - Optimized for Electron main process environment
+     * - Uses node-sqlite3-wasm which is compiled for Node.js compatibility
+     * - No platform-specific caveats for Windows/macOS/Linux
      */
     public close(): void {
         if (this._db) {
             try {
+                // node-sqlite3-wasm completes all pending operations before closing
                 this._db.close();
                 this._db = undefined;
-                logger.info("[DatabaseService] Database connection closed");
+                logger.info("[DatabaseService] Database connection closed safely");
             } catch (error) {
                 logger.error("[DatabaseService] Failed to close database", error);
                 throw error;
             }
         }
+        // Safe to call when already closed - no-op behavior
     }
 
     /**
@@ -84,6 +106,12 @@ export class DatabaseService {
      * @throws {@link Error} When transaction fails or operation throws
      *
      * @remarks
+     * **Transaction Behavior in node-sqlite3-wasm:**
+     * - All operations (BEGIN, COMMIT, ROLLBACK) are synchronous
+     * - No race conditions possible due to synchronous execution
+     * - Automatic rollback on operation failure ensures consistency
+     * - Nested transactions not supported (will throw error)
+     *
      * Automatically handles transaction lifecycle:
      * - Begins transaction before operation
      * - Commits transaction on successful completion
@@ -133,9 +161,20 @@ export class DatabaseService {
      * @throws {@link Error} When database initialization fails
      *
      * @remarks
-     * Creates the database file in the user data directory if it doesn't exist.
-     * Sets up the complete schema including all required tables and indexes.
-     * Safe to call multiple times - returns existing connection if already initialized.
+     * **Initialization Behavior:**
+     * - Creates the database file in the user data directory if it doesn't exist
+     * - Sets up the complete schema including all required tables and indexes
+     * - Safe to call multiple times - returns existing connection if already initialized
+     * - Uses singleton pattern to prevent multiple connections
+     *
+     * **Thread Safety:**
+     * - Multiple concurrent calls are safe (idempotent operation)
+     * - Returns same Database instance for all callers
+     * - No locking required due to synchronous initialization
+     *
+     * **Schema Setup:**
+     * - setupMonitorTypeValidation() intentionally receives no database parameter
+     * - Future validation logic may require database access for consistency
      */
     public initialize(): Database {
         if (this._db) {

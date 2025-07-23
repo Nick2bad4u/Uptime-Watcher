@@ -10,6 +10,22 @@ import { logger } from "../../../utils/logger";
 
 /**
  * Add a new history entry for a monitor.
+ *
+ * @param db - Database connection instance
+ * @param monitorId - Unique identifier of the monitor
+ * @param entry - StatusHistory object containing check results
+ * @param details - Optional additional details about the check
+ *
+ * @throws {@link Error} When database insertion fails
+ *
+ * @remarks
+ * **Transaction Context**: This utility function is designed to be called from
+ * repository methods that manage transaction context and error handling.
+ *
+ * **Usage Pattern**: Always called from HistoryRepository.addEntryInternal()
+ * within an existing transaction context for proper atomicity.
+ *
+ * @internal
  */
 export function addHistoryEntry(db: Database, monitorId: string, entry: StatusHistory, details?: string): void {
     try {
@@ -35,8 +51,23 @@ export function addHistoryEntry(db: Database, monitorId: string, entry: StatusHi
 
 /**
  * Bulk insert history entries (for import functionality).
- * Assumes it's called within an existing transaction context.
- * Uses a prepared statement for better performance.
+ *
+ * @param db - Database connection instance
+ * @param monitorId - Unique identifier of the monitor
+ * @param historyEntries - Array of StatusHistory objects with optional details
+ *
+ * @throws {@link Error} When database bulk insertion fails
+ *
+ * @remarks
+ * **Transaction Context**: Assumes it's called within an existing transaction context.
+ * Uses a prepared statement for better performance during bulk operations.
+ *
+ * **Performance**: Optimized for large datasets with prepared statement reuse.
+ * The statement is properly finalized in the finally block to prevent resource leaks.
+ *
+ * **Status Validation**: StatusHistory.status is always "up" or "down" per domain contract.
+ *
+ * @internal
  */
 export function bulkInsertHistory(
     db: Database,
@@ -58,7 +89,7 @@ export function bulkInsertHistory(
                 stmt.run([
                     monitorId,
                     entry.timestamp,
-                    entry.status, // StatusHistoryType is always "up" or "down"
+                    entry.status, // StatusHistory.status is always "up" or "down" per domain contract
                     entry.responseTime,
                     entry.details ?? null,
                 ]);
@@ -78,6 +109,18 @@ export function bulkInsertHistory(
 
 /**
  * Clear all history from the database.
+ *
+ * @param db - Database connection instance
+ *
+ * @throws {@link Error} When database deletion fails
+ *
+ * @remarks
+ * **WARNING**: This operation is destructive and irreversible.
+ *
+ * **Transaction Context**: Designed to be called from repository methods
+ * that manage transaction context. Always used within HistoryRepository.deleteAllInternal().
+ *
+ * @internal
  */
 export function deleteAllHistory(db: Database): void {
     try {
@@ -93,6 +136,17 @@ export function deleteAllHistory(db: Database): void {
 
 /**
  * Delete history entries for a specific monitor.
+ *
+ * @param db - Database connection instance
+ * @param monitorId - Unique identifier of the monitor
+ *
+ * @throws {@link Error} When database deletion fails
+ *
+ * @remarks
+ * **Transaction Context**: Designed to be called from repository methods
+ * that manage transaction context. Used within HistoryRepository.deleteByMonitorIdInternal().
+ *
+ * @internal
  */
 export function deleteHistoryByMonitorId(db: Database, monitorId: string): void {
     try {
@@ -108,6 +162,24 @@ export function deleteHistoryByMonitorId(db: Database, monitorId: string): void 
 
 /**
  * Prune old history entries for a monitor, keeping only the most recent entries.
+ *
+ * @param db - Database connection instance
+ * @param monitorId - Unique identifier of the monitor
+ * @param limit - Maximum number of history entries to retain
+ *
+ * @throws {@link Error} When database operations fail
+ *
+ * @remarks
+ * **Algorithm**: Uses `LIMIT -1 OFFSET ?` to select all entries beyond the most recent `limit` entries.
+ * In SQLite, `LIMIT -1` means "no limit", and combined with `OFFSET`, this efficiently
+ * identifies excess entries for deletion.
+ *
+ * **Transaction Context**: Designed to be called from repository methods within transaction context.
+ * Used by HistoryRepository.pruneHistoryInternal() and HistoryRepository.pruneAllHistoryInternal().
+ *
+ * **Performance**: Only executes DELETE when excess entries exist to avoid unnecessary operations.
+ *
+ * @internal
  */
 export function pruneHistoryForMonitor(db: Database, monitorId: string, limit: number): void {
     if (limit <= 0) {

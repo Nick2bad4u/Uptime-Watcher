@@ -101,15 +101,29 @@ export class HistoryRepository {
 
     /**
      * Clear all history from the database.
+     *
+     * @remarks
+     * **WARNING**: This operation is irreversible and will delete all history data.
+     * Now properly wrapped in transaction for data safety and error handling.
      */
-    public deleteAll(): void {
-        const db = this.getDb();
-        return deleteAllHistory(db);
+    public async deleteAll(): Promise<void> {
+        return withDatabaseOperation(async () => {
+            return this.databaseService.executeTransaction((db) => {
+                this.deleteAllInternal(db);
+                return Promise.resolve();
+            });
+        }, "history-delete-all");
     }
 
     /**
      * Internal method to clear all history from the database within an existing transaction.
-     * Use this method when you're already within a transaction context.
+     *
+     * @param db - Database connection (must be within active transaction)
+     *
+     * @remarks
+     * **IMPORTANT**: This method must be called within an existing transaction context.
+     * The operation is destructive and irreversible. Proper error handling is
+     * delegated to the calling transaction context.
      */
     public deleteAllInternal(db: Database): void {
         return deleteAllHistory(db);
@@ -152,18 +166,61 @@ export class HistoryRepository {
 
     /**
      * Get the count of history entries for a monitor.
+     *
+     * @param monitorId - Unique identifier for the monitor
+     * @returns Promise resolving to the number of history entries
+     *
+     * @remarks
+     * Uses consistent async pattern with error handling for reliability.
+     * Wrapped in withDatabaseOperation for proper error recovery.
      */
-    public getHistoryCount(monitorId: string): number {
-        const db = this.getDb();
+    public async getHistoryCount(monitorId: string): Promise<number> {
+        return withDatabaseOperation(
+            () => {
+                const db = this.getDb();
+                return Promise.resolve(getHistoryCount(db, monitorId));
+            },
+            "history-count",
+            undefined,
+            { monitorId }
+        );
+    }
+
+    /**
+     * Get the count of history entries for a monitor (internal version for use within transactions).
+     *
+     * @param db - Database connection (must be within active transaction)
+     * @param monitorId - Unique identifier for the monitor
+     * @returns The number of history entries
+     *
+     * @remarks
+     * **IMPORTANT**: This method must be called within an existing transaction context.
+     * Provides synchronous access for use in transaction-wrapped operations.
+     */
+    public getHistoryCountInternal(db: Database, monitorId: string): number {
         return getHistoryCount(db, monitorId);
     }
 
     /**
      * Get the most recent history entry for a monitor.
+     *
+     * @param monitorId - Unique identifier for the monitor
+     * @returns Promise resolving to the latest history entry, or undefined if none exists
+     *
+     * @remarks
+     * Uses consistent async pattern with error handling for reliability.
+     * Wrapped in withDatabaseOperation for proper error recovery.
      */
-    public getLatestEntry(monitorId: string): StatusHistory | undefined {
-        const db = this.getDb();
-        return getLatestHistoryEntry(db, monitorId);
+    public async getLatestEntry(monitorId: string): Promise<StatusHistory | undefined> {
+        return withDatabaseOperation(
+            () => {
+                const db = this.getDb();
+                return Promise.resolve(getLatestHistoryEntry(db, monitorId));
+            },
+            "history-latest-entry",
+            undefined,
+            { monitorId }
+        );
     }
 
     /**
@@ -253,7 +310,21 @@ export class HistoryRepository {
     }
 
     /**
-     * Get the database instance.
+     * Get the database instance for internal repository operations.
+     *
+     * @returns Database connection from the DatabaseService
+     *
+     * @remarks
+     * **Repository Pattern Justification:**
+     * This method provides controlled access to the database connection for
+     * internal repository operations. While it exposes the raw database instance,
+     * it's designed for use within repository methods that already implement
+     * proper transaction and error handling patterns.
+     *
+     * **Usage Guidelines:**
+     * - Only used within repository methods
+     * - Always wrapped in withDatabaseOperation or executeTransaction
+     * - Provides centralized database access for consistency
      */
     private getDb(): Database {
         return this.databaseService.getDatabase();

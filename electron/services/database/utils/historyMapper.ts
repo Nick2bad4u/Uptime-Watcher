@@ -8,6 +8,15 @@ import { logger } from "../../../utils/logger";
 
 /**
  * History row interface for database operations.
+ *
+ * @remarks
+ * Represents a database row containing history data with the following fields:
+ * - details: Optional additional information about the history entry
+ * - id: Unique identifier for the history record
+ * - monitorId: Identifier of the monitor this history belongs to
+ * - responseTime: Response time in milliseconds
+ * - status: Monitor status ("up" or "down")
+ * - timestamp: Unix timestamp of when the check occurred
  */
 export interface HistoryRow {
     details?: string;
@@ -75,6 +84,12 @@ export function rowsToHistoryEntries(rows: Record<string, unknown>[]): StatusHis
  * @param row - Raw database row
  * @returns Mapped StatusHistory object
  *
+ * @throws {@link Error} When row mapping fails
+ *
+ * @remarks
+ * Uses safe number conversion and status validation to ensure data integrity.
+ * Invalid numbers default to 0, invalid status values default to "down" with logging.
+ *
  * @public
  */
 export function rowToHistoryEntry(row: Record<string, unknown>): StatusHistory {
@@ -84,12 +99,18 @@ export function rowToHistoryEntry(row: Record<string, unknown>): StatusHistory {
                 row.details !== null && {
                     details: typeof row.details === "string" ? row.details : JSON.stringify(row.details),
                 }),
-            responseTime: typeof row.responseTime === "number" ? row.responseTime : Number(row.responseTime),
-            status: row.status === "up" || row.status === "down" ? row.status : "down",
-            timestamp: typeof row.timestamp === "number" ? row.timestamp : Number(row.timestamp),
+            responseTime: safeNumber(row.responseTime, 0),
+            status: validateStatus(row.status),
+            timestamp: safeNumber(row.timestamp, Date.now()),
         };
     } catch (error) {
-        logger.error("[HistoryMapper] Failed to map database row to history entry", { error, row });
+        logger.error("[HistoryMapper] Failed to map database row to history entry", {
+            error,
+            responseTime: row.responseTime,
+            row,
+            status: row.status,
+            timestamp: row.timestamp,
+        });
         throw error;
     }
 }
@@ -108,4 +129,36 @@ export function rowToHistoryEntryOrUndefined(row: Record<string, unknown> | unde
     }
 
     return rowToHistoryEntry(row);
+}
+
+/**
+ * Safely convert a value to a number with validation.
+ *
+ * @param value - Value to convert to number
+ * @param fallback - Fallback value if conversion fails
+ * @returns Converted number or fallback value
+ *
+ * @internal
+ */
+function safeNumber(value: unknown, fallback: number = 0): number {
+    if (typeof value === "number" && !Number.isNaN(value)) return value;
+    if (typeof value === "string") {
+        const parsed = Number(value);
+        if (!Number.isNaN(parsed)) return parsed;
+    }
+    return fallback;
+}
+
+/**
+ * Validate and convert status value with logging.
+ *
+ * @param status - Status value to validate
+ * @returns Valid status value ("up" or "down")
+ *
+ * @internal
+ */
+function validateStatus(status: unknown): StatusHistory["status"] {
+    if (status === "up" || status === "down") return status;
+    logger.warn("[HistoryMapper] Invalid status value, defaulting to 'down'", { status });
+    return "down";
 }

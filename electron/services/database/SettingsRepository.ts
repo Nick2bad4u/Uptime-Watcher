@@ -46,7 +46,20 @@ export class SettingsRepository {
 
     /**
      * Internal method to bulk insert settings within an existing transaction.
-     * Use this method when you're already within a transaction context.
+     *
+     * @param db - Database connection (must be within active transaction)
+     * @param settings - Key-value pairs to insert
+     *
+     * @throws {@link Error} When database operations fail
+     *
+     * @remarks
+     * **IMPORTANT**: This method must be called within an existing transaction context.
+     *
+     * **Error Handling**: Uses prepared statements which may throw on constraint violations
+     * or database errors. All exceptions are propagated to the calling transaction context
+     * for proper rollback handling.
+     *
+     * **Performance**: Uses prepared statements for optimal bulk insert performance.
      */
     public bulkInsertInternal(db: Database, settings: Record<string, string>): void {
         const entries = Object.entries(settings);
@@ -119,20 +132,29 @@ export class SettingsRepository {
 
     /**
      * Get a setting by key.
+     *
+     * @param key - Setting key to retrieve
+     * @returns Promise resolving to setting value or undefined if not found
      */
     public async get(key: string): Promise<string | undefined> {
-        // eslint-disable-next-line @typescript-eslint/require-await
-        return withDatabaseOperation(async () => {
+        return withDatabaseOperation(() => {
             const db = this.getDb();
             const result = db.get("SELECT value FROM settings WHERE key = ?", [key]) as
                 | Record<string, unknown>
                 | undefined;
-            return rowToSettingValue(result);
+            return Promise.resolve(rowToSettingValue(result));
         }, `get-setting-${key}`);
     }
 
     /**
      * Get all settings.
+     *
+     * @returns Promise resolving to all settings as key-value pairs
+     *
+     * @remarks
+     * **Performance Note**: Settings tables are typically small (under 100 entries) by design.
+     * No pagination is needed as settings are configuration data, not user-generated content.
+     * If settings grow beyond expected size, consider splitting into separate configuration domains.
      */
     public async getAll(): Promise<Record<string, string>> {
         return withDatabaseOperation(() => {
@@ -145,6 +167,12 @@ export class SettingsRepository {
 
     /**
      * Set a setting value.
+     *
+     * @param key - Setting key to set
+     * @param value - Setting value to store
+     * @returns Promise that resolves when setting is saved
+     *
+     * @throws {@link Error} When database operation fails
      */
     public async set(key: string, value: string): Promise<void> {
         return withDatabaseOperation(
@@ -172,7 +200,15 @@ export class SettingsRepository {
     }
 
     /**
-     * Get the database instance.
+     * Get the database instance for internal repository operations.
+     *
+     * @returns Database connection from the DatabaseService
+     * @throws {@link Error} When database is not initialized
+     *
+     * @remarks
+     * **Usage Pattern**: Only used for read operations and internal methods.
+     * All mutations must use executeTransaction() for proper transaction management.
+     * Caller must ensure DatabaseService.initialize() was called first.
      */
     private getDb(): Database {
         return this.databaseService.getDatabase();
