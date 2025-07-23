@@ -10,7 +10,7 @@ New claims to review, these are LOW confidence claims that need to be reviewed t
 
 1. Ensure real claims and not false positives
 2. Check that the claim makes sense with our project standards and context
-3. Document each claim in a document and detail the findings about the claim
+3. Document each claim in a NEW in the name format of `LCAIR-Filename.md` document and detail the findings about the claim
 4. If they are valid claims, plan to implement the proper fixes according to project standards in the document.
 
 ## Instructions
