@@ -538,7 +538,7 @@ type EventPriorityMap = typeof EVENT_PRIORITIES;
  * Get the priority level of an event with type safety.
  *
  * @param eventName - The event name to check priority for
- * @returns The priority level of the event, defaults to "MEDIUM" for uncategorized events
+ * @returns The priority level of the event. Returns "MEDIUM" for uncategorized events as a safe default.
  *
  * @remarks
  * Uses type-safe lookup to determine event priority. Events not explicitly categorized
@@ -567,17 +567,19 @@ export function getEventPriority(eventName: keyof UptimeEvents): keyof typeof EV
  *
  * @param eventName - The event name to categorize
  * @param category - The category to check against
- * @returns True if the event belongs to the specified category
- *
- * @remarks
  * Provides type-safe event categorization for filtering and routing.
  * Internal events are separated into their own categories (INTERNAL_DATABASE,
  * INTERNAL_MONITOR, INTERNAL_SITE) for manager-to-manager communication.
+ *
+ * @param eventName - The event name to categorize
+ * @param category - The category to check against
+ * @returns True if the event belongs to the specified category, false if the category doesn't exist or event doesn't match
  *
  * @example
  * ```typescript
  * const isMonitorEvent = isEventOfCategory("monitor:up", "MONITOR"); // Returns true
  * const isInternalEvent = isEventOfCategory("internal:site:added", "INTERNAL_SITE"); // Returns true
+ * const invalidCategory = isEventOfCategory("monitor:up", "NONEXISTENT"); // Returns false
  * ```
  */
 export function isEventOfCategory(eventName: keyof UptimeEvents, category: keyof typeof EVENT_CATEGORIES): boolean {

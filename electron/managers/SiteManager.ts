@@ -202,7 +202,7 @@ export class SiteManager {
      */
     public async addSite(siteData: Site): Promise<Site> {
         // Business validation
-        this.validateSite(siteData);
+        await this.validateSite(siteData);
 
         // Use the new service-based approach to add site to database
         const site = await this.siteWriterService.createSite(siteData);
@@ -408,6 +408,13 @@ export class SiteManager {
             throw new Error(`Site with identifier ${identifier} not found`);
         }
 
+        // Validate the merged site data before persisting changes
+        const mergedSite = {
+            ...originalSite,
+            ...updates,
+        };
+        await this.validateSite(mergedSite);
+
         // Create full monitoring configuration
         const monitoringConfig = this.createMonitoringConfig();
 
@@ -561,8 +568,8 @@ export class SiteManager {
     /**
      * Business logic: Validate site data according to business rules.
      */
-    private validateSite(site: Site): void {
-        const validationResult = this.configurationManager.validateSiteConfiguration(site);
+    private async validateSite(site: Site): Promise<void> {
+        const validationResult = await this.configurationManager.validateSiteConfiguration(site);
 
         if (!validationResult.isValid) {
             throw new Error(`Site validation failed: ${validationResult.errors.join(", ")}`);

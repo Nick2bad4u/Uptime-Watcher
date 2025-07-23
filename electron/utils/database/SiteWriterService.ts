@@ -108,17 +108,38 @@ export class SiteWriterService {
 
     /**
      * Detect new monitors that were added to an existing site.
+     *
      * @param originalMonitors - The original monitors before update
      * @param updatedMonitors - The updated monitors after update
-     * @returns Array of new monitor IDs
+     * @returns Array of new monitor IDs (may include empty strings for monitors without IDs)
+     *
+     * @remarks
+     * This method handles two scenarios:
+     * 1. **Monitors with IDs**: Compares IDs to detect new ones
+     * 2. **Monitors without IDs**: Detects new monitors by comparing monitor objects
+     *    since IDs are assigned during database creation
+     *
+     * Monitors without IDs are returned with empty string placeholders to indicate
+     * they need special handling during monitor setup operations.
      */
     public detectNewMonitors(originalMonitors: Site["monitors"], updatedMonitors: Site["monitors"]): string[] {
         const originalIds = new Set(originalMonitors.map((m) => m.id).filter(Boolean));
         const newMonitorIds: string[] = [];
 
+        // Create a comparison set of original monitors for detecting new monitors without IDs
+        const originalMonitorSignatures = new Set(originalMonitors.map((m) => this.createMonitorSignature(m)));
+
         for (const monitor of updatedMonitors) {
             if (monitor.id && !originalIds.has(monitor.id)) {
+                // Monitor has ID and is not in original set
                 newMonitorIds.push(monitor.id);
+            } else if (!monitor.id) {
+                // Monitor without ID - check if it's genuinely new by comparing signature
+                const monitorSignature = this.createMonitorSignature(monitor);
+                if (!originalMonitorSignatures.has(monitorSignature)) {
+                    // New monitor without ID - use empty string as placeholder
+                    newMonitorIds.push("");
+                }
             }
         }
 
@@ -221,6 +242,29 @@ export class SiteWriterService {
         }
 
         return updateData;
+    }
+
+    /**
+     * Create a unique signature for a monitor based on its configuration.
+     *
+     * @param monitor - The monitor to create a signature for
+     * @returns A string signature representing the monitor's configuration
+     *
+     * @remarks
+     * Used to detect new monitors that don't have IDs yet. The signature includes
+     * all configuration properties that make a monitor unique, excluding runtime
+     * properties like status, lastChecked, and responseTime.
+     */
+    private createMonitorSignature(monitor: Site["monitors"][0]): string {
+        return [
+            `type:${monitor.type}`,
+            `host:${monitor.host ?? ""}`,
+            `port:${monitor.port ?? ""}`,
+            `url:${monitor.url ?? ""}`,
+            `checkInterval:${monitor.checkInterval}`,
+            `timeout:${monitor.timeout}`,
+            `retryAttempts:${monitor.retryAttempts}`,
+        ].join("|");
     }
 
     /**

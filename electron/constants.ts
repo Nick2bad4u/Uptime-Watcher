@@ -42,3 +42,25 @@ export const RETRY_BACKOFF = Object.freeze({
  * @defaultValue 500
  */
 export const DEFAULT_HISTORY_LIMIT = 500;
+
+/**
+ * Cache TTL values for standardized caching in milliseconds.
+ * @remarks Used by ConfigurationManager and other services for consistent cache behavior.
+ */
+export const CACHE_TTL = Object.freeze({
+    /** TTL for configuration values cache (30 minutes) */
+    CONFIGURATION_VALUES: 1_800_000,
+    /** TTL for validation results cache (5 minutes) */
+    VALIDATION_RESULTS: 300_000,
+});
+
+/**
+ * Cache size limits for standardized caching.
+ * @remarks Used by ConfigurationManager and other services for consistent cache behavior.
+ */
+export const CACHE_SIZE_LIMITS = Object.freeze({
+    /** Maximum entries for configuration values cache */
+    CONFIGURATION_VALUES: 50,
+    /** Maximum entries for validation results cache */
+    VALIDATION_RESULTS: 100,
+});

@@ -1,12 +1,33 @@
 /**
  * Manages database operations including initialization, data management, and backups.
+ *
+ * @remarks
  * Handles database initialization, import/export, and backup operations.
+ * Uses the new service-based architecture for all operations.
  */
 
+import { withErrorHandling } from "../../shared/utils/errorHandling";
 import { DEFAULT_HISTORY_LIMIT } from "../constants";
 import { UptimeEvents } from "../events/eventTypes";
 import { TypedEventBus } from "../events/TypedEventBus";
+import { DatabaseService } from "../services/database/DatabaseService";
+import { HistoryRepository } from "../services/database/HistoryRepository";
+import { MonitorRepository } from "../services/database/MonitorRepository";
+import { SettingsRepository } from "../services/database/SettingsRepository";
+import { SiteRepository } from "../services/database/SiteRepository";
+import { Site } from "../types";
+import { StandardizedCache } from "../utils/cache/StandardizedCache";
+import { DataBackupService } from "../utils/database/DataBackupService";
+import { initDatabase } from "../utils/database/databaseInitializer";
+import { DataImportExportService } from "../utils/database/DataImportExportService";
+import { setHistoryLimit as setHistoryLimitUtil } from "../utils/database/historyLimitManager";
+import { createSiteCache, LoggerAdapter } from "../utils/database/serviceFactory";
+import { SiteLoadingOrchestrator, SiteRepositoryService } from "../utils/database/SiteRepositoryService";
+import { monitorLogger } from "../utils/logger";
 
+/**
+ * Dependencies interface for DatabaseManager constructor.
+ */
 export interface DatabaseManagerDependencies {
     eventEmitter: TypedEventBus<DatabaseManagerEvents>;
     repositories: {
@@ -17,22 +38,6 @@ export interface DatabaseManagerDependencies {
         site: SiteRepository;
     };
 }
-import { DatabaseService } from "../services/database/DatabaseService";
-import { HistoryRepository } from "../services/database/HistoryRepository";
-import { MonitorRepository } from "../services/database/MonitorRepository";
-import { SettingsRepository } from "../services/database/SettingsRepository";
-import { SiteRepository } from "../services/database/SiteRepository";
-import { Site } from "../types";
-import { DataBackupService } from "../utils/database/DataBackupService";
-import { initDatabase } from "../utils/database/databaseInitializer";
-import { DataImportExportService } from "../utils/database/DataImportExportService";
-import {
-    getHistoryLimit as getHistoryLimitUtil,
-    setHistoryLimit as setHistoryLimitUtil,
-} from "../utils/database/historyLimitManager";
-import { createSiteCache, LoggerAdapter } from "../utils/database/serviceFactory";
-import { SiteLoadingOrchestrator, SiteRepositoryService } from "../utils/database/SiteRepositoryService";
-import { monitorLogger } from "../utils/logger";
 
 /**
  * Combined events interface for DatabaseManager.
@@ -40,18 +45,57 @@ import { monitorLogger } from "../utils/logger";
 type DatabaseManagerEvents = UptimeEvents;
 
 /**
- * Manages database operations and data management.
- * Handles initialization, import/export, backup, and history management.
- * Uses the new service-based architecture for all operations.
+ * Database operations manager for the Uptime Watcher application.
+ *
+ * @remarks
+ * The DatabaseManager serves as the central coordination point for all database-related
+ * operations including initialization, data import/export, backup management, and site
+ * loading. It provides a unified interface for database operations while maintaining
+ * consistency with the service-based architecture.
+ *
+ * Key responsibilities:
+ * - **Database Initialization**: Setup and schema management
+ * - **Data Import/Export**: JSON-based data persistence and restoration
+ * - **Backup Management**: SQLite database backup creation and download
+ * - **Site Loading**: Coordinated loading of sites from database into cache
+ * - **History Management**: Configuration and limits for status history retention
+ * - **Event Coordination**: Typed event emission for system-wide coordination
+ *
+ * The manager uses dependency injection for testability and follows the repository
+ * pattern for data access. All operations are designed to be atomic and maintain
+ * data consistency using the withErrorHandling utility for standardized error
+ * management and logging.
+ *
+ * @example
+ * ```typescript
+ * const databaseManager = new DatabaseManager({
+ *   eventEmitter: typedEventBus,
+ *   repositories: {
+ *     database: databaseService,
+ *     history: historyRepository,
+ *     monitor: monitorRepository,
+ *     settings: settingsRepository,
+ *     site: siteRepository
+ *   }
+ * });
+ *
+ * // Initialize the database and load sites
+ * await databaseManager.initialize();
+ *
+ * // Export application data
+ * const exportData = await databaseManager.exportData();
+ * ```
  */
 export class DatabaseManager {
     private readonly dependencies: DatabaseManagerDependencies;
     private readonly eventEmitter: TypedEventBus<DatabaseManagerEvents>;
     private historyLimit: number = DEFAULT_HISTORY_LIMIT;
+    private readonly siteCache: StandardizedCache<Site>;
 
     constructor(dependencies: DatabaseManagerDependencies) {
         this.dependencies = dependencies;
         this.eventEmitter = dependencies.eventEmitter;
+        this.siteCache = createSiteCache();
     }
 
     /**
@@ -107,112 +151,169 @@ export class DatabaseManager {
 
     /**
      * Get current history limit.
+     *
+     * @returns Current history limit value
      */
     public getHistoryLimit(): number {
-        return getHistoryLimitUtil(() => this.historyLimit);
+        return this.historyLimit;
     }
 
     /**
-     * Import data from JSON string.
+     * Import data from JSON string with comprehensive error handling.
+     *
+     * @param data - JSON string containing import data
+     * @returns Promise resolving to success status
+     *
+     * @remarks
+     * **Error Handling Pattern:**
+     * This method demonstrates the standard error handling pattern used throughout
+     * the application: `withErrorHandling()` + `.catch()` chaining.
+     *
+     * - **withErrorHandling()**: Provides standardized error logging and debugging
+     * - **.catch()**: Provides method-specific recovery behavior (events, fallbacks)
+     *
+     * **Why This Pattern:**
+     * 1. **Separation of Concerns**: withErrorHandling handles logging/debugging
+     * 2. **Custom Recovery**: .catch() handles method-specific failure behavior
+     * 3. **Event Consistency**: Ensures failure events are always emitted
+     * 4. **Type Safety**: Maintains return type contracts (boolean/specific types)
+     *
+     * **Usage Guidelines:**
+     * - Use withErrorHandling for all async operations that need error logging
+     * - Chain .catch() when you need custom recovery behavior
+     * - Always emit failure events in .catch() for observability
+     * - Return appropriate fallback values (false, empty arrays, etc.)
+     *
+     * @example
+     * ```typescript
+     * // Standard pattern used throughout the application
+     * return withErrorHandling(
+     *   async () => {
+     *     // Main operation logic
+     *     return successResult;
+     *   },
+     *   { logger, operationName: "operation description" }
+     * ).catch(async (error) => {
+     *   // Method-specific recovery logic
+     *   await this.emitFailureEvent();
+     *   return fallbackValue;
+     * });
+     * ```
      */
     public async importData(data: string): Promise<boolean> {
-        const siteCache = createSiteCache();
-        const loggerAdapter = new LoggerAdapter(monitorLogger);
-        const dataImportExportService = new DataImportExportService({
-            databaseService: this.dependencies.repositories.database,
-            eventEmitter: this.eventEmitter,
-            logger: loggerAdapter,
-            repositories: {
-                history: this.dependencies.repositories.history,
-                monitor: this.dependencies.repositories.monitor,
-                settings: this.dependencies.repositories.settings,
-                site: this.dependencies.repositories.site,
+        return withErrorHandling(
+            async () => {
+                const loggerAdapter = new LoggerAdapter(monitorLogger);
+                const dataImportExportService = new DataImportExportService({
+                    databaseService: this.dependencies.repositories.database,
+                    eventEmitter: this.eventEmitter,
+                    logger: loggerAdapter,
+                    repositories: {
+                        history: this.dependencies.repositories.history,
+                        monitor: this.dependencies.repositories.monitor,
+                        settings: this.dependencies.repositories.settings,
+                        site: this.dependencies.repositories.site,
+                    },
+                });
+
+                // Parse the import data
+                const { settings, sites } = await dataImportExportService.importDataFromJson(data);
+
+                // Persist to database
+                await dataImportExportService.persistImportedData(sites, settings);
+
+                // Reload sites from database
+                await this.loadSites();
+
+                // Emit typed data imported event
+                await this.eventEmitter.emitTyped("internal:database:data-imported", {
+                    operation: "data-imported",
+                    success: true,
+                    timestamp: Date.now(),
+                });
+
+                return true;
             },
-        });
-
-        try {
-            // Parse the import data
-            const { settings, sites } = await dataImportExportService.importDataFromJson(data);
-
-            // Persist to database
-            await dataImportExportService.persistImportedData(sites, settings);
-
-            // Clear cache and reload sites
-            siteCache.clear();
-            await this.loadSites();
-
-            // Emit typed data imported event
-            await this.eventEmitter.emitTyped("internal:database:data-imported", {
-                operation: "data-imported",
-                success: true,
-                timestamp: Date.now(),
-            });
-
-            return true;
-        } catch (error) {
+            { logger: monitorLogger, operationName: "import data" }
+        ).catch(async (_error) => {
             // Emit typed data imported event with failure
-            await this.eventEmitter.emitTyped("internal:database:data-imported", {
-                operation: "data-imported",
-                success: false,
-                timestamp: Date.now(),
-            });
+            try {
+                await this.eventEmitter.emitTyped("internal:database:data-imported", {
+                    operation: "data-imported",
+                    success: false,
+                    timestamp: Date.now(),
+                });
+            } catch (emitError) {
+                monitorLogger.error("[DatabaseManager] Failed to emit data imported failure event:", emitError);
+            }
 
-            monitorLogger.error("[DatabaseManager] Failed to import data:", error);
+            // withErrorHandling already logged the error, so we just return false
             return false;
-        }
+        });
     }
 
     /**
      * Initialize the database and load sites.
      */
     public async initialize(): Promise<void> {
-        // First, load current settings from database including history limit
-        try {
-            const currentLimit = await this.dependencies.repositories.settings.get("historyLimit");
-            if (currentLimit) {
-                this.historyLimit = Number(currentLimit);
-                monitorLogger.info(`[DatabaseManager] Loaded history limit from database: ${this.historyLimit}`);
-            } else {
-                monitorLogger.info(
-                    `[DatabaseManager] No history limit in database, using default: ${this.historyLimit}`
+        return withErrorHandling(
+            async () => {
+                // First, load current settings from database including history limit
+                try {
+                    const currentLimit = await this.dependencies.repositories.settings.get("historyLimit");
+                    if (currentLimit) {
+                        this.historyLimit = Number(currentLimit);
+                        monitorLogger.info(
+                            `[DatabaseManager] Loaded history limit from database: ${this.historyLimit}`
+                        );
+                    } else {
+                        monitorLogger.info(
+                            `[DatabaseManager] No history limit in database, using default: ${this.historyLimit}`
+                        );
+                    }
+                } catch (error) {
+                    monitorLogger.error(
+                        "[DatabaseManager] Failed to load history limit from database, using default:",
+                        error
+                    );
+                }
+
+                await initDatabase(
+                    this.dependencies.repositories.database,
+                    this.loadSites.bind(this),
+                    this.eventEmitter
                 );
-            }
-        } catch (error) {
-            monitorLogger.error("[DatabaseManager] Failed to load history limit from database, using default:", error);
-        }
 
-        await initDatabase(this.dependencies.repositories.database, () => this.loadSites(), this.eventEmitter);
-
-        try {
-            // Emit typed database initialized event
-            await this.eventEmitter.emitTyped("database:transaction-completed", {
-                duration: 0, // Database initialization duration not tracked yet
-                operation: "database:initialize",
-                recordsAffected: 0,
-                success: true,
-                timestamp: Date.now(),
-            });
-        } catch (error) {
-            monitorLogger.error("[DatabaseManager] Error emitting database initialized event:", error);
-            // Don't throw here as the database initialization itself succeeded
-        }
+                // Emit typed database initialized event (with error handling for event emission)
+                try {
+                    await this.eventEmitter.emitTyped("database:transaction-completed", {
+                        duration: 0, // Database initialization duration not tracked yet
+                        operation: "database:initialize",
+                        recordsAffected: 0,
+                        success: true,
+                        timestamp: Date.now(),
+                    });
+                } catch (error) {
+                    monitorLogger.error("[DatabaseManager] Error emitting database initialized event:", error);
+                    // Don't throw here as the database initialization itself succeeded
+                }
+            },
+            { logger: monitorLogger, operationName: "initialize database" }
+        );
     }
 
     /**
      * Refresh sites from database and update cache.
+     *
+     * @returns Promise resolving to array of sites
      */
     public async refreshSites(): Promise<Site[]> {
-        const siteCache = createSiteCache();
-
         // Load sites first
         await this.loadSites();
 
-        // Then get them from cache - implement the refresh logic directly
+        // Then get them from cache - return actual site data from cache
         try {
-            const sites = [...siteCache.entries()].map(([, site]) => ({
-                identifier: site.identifier,
-                name: site.name,
-            }));
+            const sites = [...this.siteCache.entries()].map(([, site]) => site);
 
             // Emit typed sites refreshed event
             await this.eventEmitter.emitTyped("internal:database:sites-refreshed", {
@@ -221,13 +322,8 @@ export class DatabaseManager {
                 timestamp: Date.now(),
             });
 
-            // Convert to Site[] format expected by the interface
-            return sites.map((site: { identifier: string; name?: string }) => ({
-                identifier: site.identifier,
-                monitoring: true,
-                monitors: [],
-                name: site.name ?? "Unnamed Site",
-            }));
+            // Return actual site data instead of hardcoded values
+            return sites;
         } catch (error) {
             // Handle error case - log and re-emit event with zero count
             monitorLogger.error("[DatabaseManager] Failed to refresh sites from cache:", error);
@@ -236,14 +332,27 @@ export class DatabaseManager {
                 siteCount: 0,
                 timestamp: Date.now(),
             });
+
+            // Return empty array as fallback, but the error is logged for debugging
+            // This allows the UI to continue functioning even if cache refresh fails
             return [];
         }
     }
 
     /**
      * Set history limit for monitor data retention.
+     *
+     * @param limit - Number of history records to retain (must be non-negative integer, 0 disables history tracking)
+     * @throws Error if limit is not a non-negative integer
      */
     public async setHistoryLimit(limit: number): Promise<void> {
+        // Validate input parameters
+        if (!Number.isInteger(limit) || limit < 0) {
+            throw new Error(
+                `[DatabaseManager.setHistoryLimit] History limit must be a non-negative integer, received: ${limit}`
+            );
+        }
+
         await setHistoryLimitUtil({
             databaseService: this.dependencies.repositories.database,
             limit,
@@ -254,26 +363,71 @@ export class DatabaseManager {
             },
             setHistoryLimit: (newLimit) => {
                 this.historyLimit = newLimit;
-                // Emit typed history limit updated event - fire and forget
-                this.eventEmitter
-                    .emitTyped("internal:database:history-limit-updated", {
-                        limit: newLimit,
-                        operation: "history-limit-updated",
-                        timestamp: Date.now(),
-                    })
-                    .catch((error) => {
-                        monitorLogger.error("[DatabaseManager] Failed to emit history limit updated event", error);
-                    });
+                // Use centralized event emission (fire and forget)
+                this.emitHistoryLimitUpdated(newLimit).catch((error) => {
+                    monitorLogger.error("[DatabaseManager] Failed to emit history limit updated event:", error);
+                });
             },
         });
     }
 
     /**
-     * Load sites from database and update cache.
+     * Centralized method to emit history limit updated event.
+     *
+     * @param limit - The new history limit
+     * @remarks
+     * This method consolidates all history limit event emissions to avoid redundancy
+     * and ensure consistent event structure across the application.
+     */
+    private async emitHistoryLimitUpdated(limit: number): Promise<void> {
+        try {
+            await this.eventEmitter.emitTyped("internal:database:history-limit-updated", {
+                limit,
+                operation: "history-limit-updated",
+                timestamp: Date.now(),
+            });
+        } catch (error) {
+            monitorLogger.error("[DatabaseManager] Failed to emit history limit updated event:", error);
+        }
+    }
+
+    /**
+     * Centralized method to emit sites cache update requested event.
+     *
+     * @remarks
+     * This method consolidates all sites cache update event emissions to avoid redundancy
+     * and ensure consistent event structure across the application.
+     */
+    private async emitSitesCacheUpdateRequested(): Promise<void> {
+        try {
+            await this.eventEmitter.emitTyped("internal:database:update-sites-cache-requested", {
+                operation: "update-sites-cache-requested",
+                sites: [...this.siteCache.entries()].map(([, site]) => site),
+                timestamp: Date.now(),
+            });
+        } catch (error) {
+            monitorLogger.error("[DatabaseManager] Failed to emit sites cache update requested event:", error);
+        }
+    }
+
+    /**
+     * Load sites from database and update cache using atomic replacement.
+     *
+     * @remarks
+     * This method loads all sites from the database into a temporary cache,
+     * then atomically replaces the existing cache to prevent race conditions.
+     * It also sets up monitoring configuration for each loaded site.
+     * **Race Condition Prevention:**
+     * Uses atomic cache replacement instead of clear-then-populate to ensure
+     * other operations reading from cache never see empty/inconsistent data.
+     * The old cache remains accessible until the new one is fully loaded.
      */
     private async loadSites(): Promise<void> {
-        // Create the site cache
-        const siteCache = createSiteCache();
+        const operationId = `loadSites-${Date.now()}`;
+        monitorLogger.debug(`[DatabaseManager:${operationId}] Starting site loading operation`);
+
+        // Create a temporary cache for atomic replacement (prevents race conditions)
+        const tempCache = createSiteCache();
 
         // Create the site loading orchestrator with injected dependencies
         const loggerAdapter = new LoggerAdapter(monitorLogger);
@@ -293,28 +447,20 @@ export class DatabaseManager {
         const monitoringConfig = {
             setHistoryLimit: async (limit: number) => {
                 this.historyLimit = limit;
-                // Emit history limit updated event
-                await this.eventEmitter.emitTyped("internal:database:history-limit-updated", {
-                    limit,
-                    operation: "history-limit-updated",
-                    timestamp: Date.now(),
-                });
+                // Centralized history limit event emission
+                await this.emitHistoryLimitUpdated(limit);
             },
             setupNewMonitors: (site: Site, newMonitorIds: string[]) => {
                 // For database loading, we don't need to setup new monitors
                 // This is only used during site updates
                 monitorLogger.debug(
-                    `[DatabaseManager] setupNewMonitors called for site ${site.identifier} with ${newMonitorIds.length} monitors - no action needed during loading`
+                    `[DatabaseManager:${operationId}] setupNewMonitors called for site ${site.identifier} with ${newMonitorIds.length} monitors - no action needed during loading`
                 );
                 return Promise.resolve();
             },
             startMonitoring: async (identifier: string, monitorId: string) => {
                 // First update the cache so monitoring can find the sites
-                await this.eventEmitter.emitTyped("internal:database:update-sites-cache-requested", {
-                    operation: "update-sites-cache-requested",
-                    sites: [...siteCache.entries()].map(([, site]) => site),
-                    timestamp: Date.now(),
-                });
+                await this.emitSitesCacheUpdateRequested();
 
                 // Then request monitoring start via events
                 await this.eventEmitter.emitTyped("internal:site:start-monitoring-requested", {
@@ -339,20 +485,24 @@ export class DatabaseManager {
             },
         };
 
-        // Load sites using the new service-based architecture
-        const result = await siteLoadingOrchestrator.loadSitesFromDatabase(siteCache, monitoringConfig);
+        // Load sites using the new service-based architecture into temporary cache
+        const result = await siteLoadingOrchestrator.loadSitesFromDatabase(tempCache, monitoringConfig);
 
         if (!result.success) {
             throw new Error(result.message);
         }
 
-        // Update the cache with loaded sites (final update to ensure consistency)
-        await this.eventEmitter.emitTyped("internal:database:update-sites-cache-requested", {
-            operation: "update-sites-cache-requested",
-            sites: [...siteCache.entries()].map(([, site]) => site),
-            timestamp: Date.now(),
-        });
+        // Atomically replace the main cache (prevents race conditions)
+        this.siteCache.clear();
+        for (const [key, site] of tempCache.entries()) {
+            this.siteCache.set(key, site);
+        }
 
-        monitorLogger.info(`[DatabaseManager] Successfully loaded ${result.sitesLoaded} sites from database`);
+        // Update the cache with loaded sites (final update to ensure consistency)
+        await this.emitSitesCacheUpdateRequested();
+
+        monitorLogger.info(
+            `[DatabaseManager:${operationId}] Successfully loaded ${result.sitesLoaded} sites from database`
+        );
     }
 }

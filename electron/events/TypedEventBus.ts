@@ -76,20 +76,31 @@ export interface EventMetadata {
  * Middleware function for event processing.
  *
  * @param event - Name of the event being processed
- * @param data - Event data payload
+ * @param data - Event data payload (read-only for inspection)
  * @param next - Function to call to continue to the next middleware
  *
  * @remarks
- * Middleware can modify event data, add logging, collect metrics, or perform
- * other cross-cutting concerns. Call `next()` to continue processing or throw
- * an error to stop the middleware chain.
+ * Middleware can inspect event data, add logging, collect metrics, perform validation,
+ * or handle other cross-cutting concerns. Middleware should NOT modify the data object
+ * as modifications will not be reflected in the final event delivered to listeners.
+ *
+ * Call `next()` to continue processing or throw an error to stop the middleware chain.
+ * Data transformations should be performed before calling `emitTyped()` rather than
+ * within middleware functions.
  *
  * @example
  * ```typescript
  * const loggingMiddleware: EventMiddleware = async (event, data, next) => {
  *   console.log(`Processing event: ${event}`);
- *   await next();
+ *   await next(); // Continue to next middleware
  *   console.log(`Completed event: ${event}`);
+ * };
+ *
+ * const validationMiddleware: EventMiddleware = async (event, data, next) => {
+ *   if (!isValidData(data)) {
+ *     throw new Error('Invalid event data'); // Stop processing
+ *   }
+ *   await next(); // Continue if valid
  * };
  * ```
  */
@@ -147,7 +158,7 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
     constructor(name?: string, options?: { maxMiddleware?: number }) {
         super();
         this.busId = name ?? generateCorrelationId();
-        
+
         const maxMiddleware = options?.maxMiddleware ?? 20;
         if (maxMiddleware <= 0) {
             throw new Error(`maxMiddleware must be positive, got ${maxMiddleware}`);
@@ -185,6 +196,13 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
      * Guarantees type safety between event name and data. The event is processed
      * through all registered middleware before being emitted to listeners.
      * Automatic metadata is added including correlation ID, timestamp, and bus ID.
+     *
+     * **Middleware Processing:**
+     * - Middleware is intended for cross-cutting concerns (logging, validation, rate limiting)
+     * - Middleware receives the original event data for inspection but cannot modify
+     *   the data that gets delivered to listeners
+     * - Data transformations should be performed before calling emitTyped()
+     * - If middleware throws an error, event emission is aborted
      *
      * **Data Transformation Behavior:**
      * - **Objects**: Spread with added _meta property
@@ -418,7 +436,7 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
 
         // Handle objects with potential _meta conflicts
         if (typeof data === "object" && data != null) {
-            const hasExistingMeta = "_meta" in data;
+            const hasExistingMeta = Object.hasOwn(data, "_meta");
             if (hasExistingMeta) {
                 logger.warn(
                     `[TypedEventBus:${this.busId}] Event data contains _meta property, preserving as _originalMeta`

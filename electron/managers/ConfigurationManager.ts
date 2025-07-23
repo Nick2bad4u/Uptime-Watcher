@@ -5,7 +5,7 @@
 
 import type { ValidationResult } from "./validators/interfaces";
 
-import { DEFAULT_CHECK_INTERVAL } from "../constants";
+import { CACHE_SIZE_LIMITS, CACHE_TTL, DEFAULT_CHECK_INTERVAL, DEFAULT_HISTORY_LIMIT } from "../constants";
 import { isDev } from "../electronUtils";
 import { Site } from "../types";
 import { StandardizedCache } from "../utils/cache/StandardizedCache";
@@ -26,6 +26,10 @@ export interface HistoryRetentionConfig {
  * Centralizes business rules that were previously scattered across utilities.
  * Uses composition pattern with specialized validators to reduce complexity.
  * Implements caching for validation results and configuration values for performance.
+ *
+ * @remarks
+ * ConfigurationManager instances should be obtained via ServiceContainer.getInstance().getConfigurationManager()
+ * This ensures proper dependency injection and lifecycle management
  */
 export class ConfigurationManager {
     private readonly configCache: StandardizedCache<unknown>;
@@ -39,16 +43,16 @@ export class ConfigurationManager {
 
         // Initialize standardized caches
         this.validationCache = new StandardizedCache<ValidationResult>({
-            defaultTTL: 300_000, // 5 minutes for validation results
+            defaultTTL: CACHE_TTL.VALIDATION_RESULTS,
             enableStats: true,
-            maxSize: 100,
+            maxSize: CACHE_SIZE_LIMITS.VALIDATION_RESULTS,
             name: "validation-results",
         });
 
         this.configCache = new StandardizedCache<unknown>({
-            defaultTTL: 1_800_000, // 30 minutes for config values
+            defaultTTL: CACHE_TTL.CONFIGURATION_VALUES,
             enableStats: true,
-            maxSize: 50,
+            maxSize: CACHE_SIZE_LIMITS.CONFIGURATION_VALUES,
             name: "configuration-values",
         });
     }
@@ -82,13 +86,13 @@ export class ConfigurationManager {
 
     /**
      * Get history retention configuration according to business rules.
-     * These limits align with the HISTORY_LIMIT_OPTIONS available in the UI.
+     * These limits align with the history limit options available in the UI.
      */
     public getHistoryRetentionRules(): HistoryRetentionConfig {
         return {
-            defaultLimit: 500, // Matches DEFAULT_HISTORY_LIMIT constant
-            maxLimit: Number.MAX_SAFE_INTEGER, // Matches "Unlimited" option in HISTORY_LIMIT_OPTIONS
-            minLimit: 25, // Matches lowest option in HISTORY_LIMIT_OPTIONS
+            defaultLimit: DEFAULT_HISTORY_LIMIT,
+            maxLimit: Number.MAX_SAFE_INTEGER, // Matches "Unlimited" option
+            minLimit: 25, // Matches lowest option in UI
         };
     }
 
@@ -148,14 +152,31 @@ export class ConfigurationManager {
 
     /**
      * Validate monitor configuration according to business rules with caching.
-     * Delegates to specialized monitor validator and caches results.
+     *
+     * @remarks
+     * Delegates to specialized monitor validator and caches results for performance.
+     * Marked as async for forward compatibility with future validator implementations
+     * that may require asynchronous operations or cache backends.
+     *
+     * @param monitor - The monitor configuration to validate
+     * @returns Promise resolving to validation result with errors and validity status
      */
-    public validateMonitorConfiguration(monitor: Site["monitors"][0]): ValidationResult {
-        // Create cache key from monitor properties
-        const cacheKey = `monitor:${monitor.id}:${JSON.stringify({
-            timeout: monitor.timeout,
-            type: monitor.type,
-        })}`;
+    public async validateMonitorConfiguration(monitor: Site["monitors"][0]): Promise<ValidationResult> {
+        // Create stable cache key from monitor properties that affect validation
+        // Use deterministic ordering to prevent cache misses from property order changes
+        const cacheKey = `monitor:${monitor.id}:${[
+            `checkInterval:${monitor.checkInterval}`,
+            `host:${monitor.host ?? ""}`,
+            `lastChecked:${monitor.lastChecked?.getTime() ?? ""}`,
+            `monitoring:${monitor.monitoring}`,
+            `port:${monitor.port ?? ""}`,
+            `responseTime:${monitor.responseTime}`,
+            `retryAttempts:${monitor.retryAttempts}`,
+            `status:${monitor.status}`,
+            `timeout:${monitor.timeout}`,
+            `type:${monitor.type}`,
+            `url:${monitor.url ?? ""}`,
+        ].join("|")}`;
 
         // Check cache first
         const cached = this.validationCache.get(cacheKey);
@@ -163,8 +184,8 @@ export class ConfigurationManager {
             return cached;
         }
 
-        // Perform validation
-        const result = this.monitorValidator.validateMonitorConfiguration(monitor);
+        // Perform validation (await for forward compatibility)
+        const result = await Promise.resolve(this.monitorValidator.validateMonitorConfiguration(monitor));
 
         // Cache the result
         this.validationCache.set(cacheKey, result);
@@ -174,15 +195,23 @@ export class ConfigurationManager {
 
     /**
      * Validate site configuration according to business rules with caching.
-     * Delegates to specialized site validator and caches results.
+     *
+     * @remarks
+     * Delegates to specialized site validator and caches results for performance.
+     * Marked as async for forward compatibility with future validator implementations
+     * that may require asynchronous operations or cache backends.
+     *
+     * @param site - The site configuration to validate
+     * @returns Promise resolving to validation result with errors and validity status
      */
-    public validateSiteConfiguration(site: Site): ValidationResult {
-        // Create cache key from site properties
-        const cacheKey = `site:${site.identifier}:${JSON.stringify({
-            monitorCount: site.monitors.length,
-            monitoring: site.monitoring,
-            name: site.name,
-        })}`;
+    public async validateSiteConfiguration(site: Site): Promise<ValidationResult> {
+        // Create stable cache key from site properties that affect validation
+        const cacheKey = `site:${site.identifier}:${[
+            `identifier:${site.identifier}`,
+            `monitorCount:${site.monitors.length}`,
+            `monitoring:${site.monitoring}`,
+            `name:${site.name}`,
+        ].join("|")}`;
 
         // Check cache first
         const cached = this.validationCache.get(cacheKey);
@@ -190,8 +219,8 @@ export class ConfigurationManager {
             return cached;
         }
 
-        // Perform validation
-        const result = this.siteValidator.validateSiteConfiguration(site);
+        // Perform validation (await for forward compatibility)
+        const result = await Promise.resolve(this.siteValidator.validateSiteConfiguration(site));
 
         // Cache the result
         this.validationCache.set(cacheKey, result);
@@ -199,6 +228,3 @@ export class ConfigurationManager {
         return result;
     }
 }
-
-// NOTE: ConfigurationManager instances should be obtained via ServiceContainer.getInstance().getConfigurationManager()
-// This ensures proper dependency injection and lifecycle management

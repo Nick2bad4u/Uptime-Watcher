@@ -52,7 +52,7 @@ class Main {
      * without side effects or errors.
      */
     constructor() {
-        logger.info("Starting Uptime Watcher application"); /* v8 ignore next */
+        logger.info("Starting Uptime Watcher application");
         this.applicationService = new ApplicationService();
 
         // Ensure cleanup is only called once to prevent double-cleanup errors
@@ -62,7 +62,7 @@ class Main {
             if (!cleanedUp && this.applicationService?.cleanup) {
                 cleanedUp = true;
                 this.applicationService.cleanup().catch((error) => {
-                    logger.error("[Main] Cleanup failed", error); /* v8 ignore next */
+                    logger.error("[Main] Cleanup failed", error);
                     throw error;
                 });
             }
@@ -84,31 +84,33 @@ class Main {
  * This ensures the instance persists for the application's lifetime,
  * preventing premature garbage collection and maintaining lifecycle handlers.
  */
-// eslint-disable-next-line sonarjs/constructor-for-side-effects -- Main instance needed for lifecycle management
-new Main();
+if (process.versions.electron) {
+    // eslint-disable-next-line sonarjs/constructor-for-side-effects -- Main instance needed for lifecycle management
+    new Main();
 
-/**
- * Installs React and Redux DevTools extensions after the Electron app is ready.
- *
- * @remarks
- * Extensions are installed only after `app.whenReady()` to ensure the Electron environment is fully initialized,
- * as extension installation requires the app to be ready. In development, these extensions enhance debugging capabilities.
- */
-void app.whenReady().then(async () => {
-    // Wait a bit for the main window to be created and ready
-    await new Promise((resolve) => setTimeout(resolve, 1));
+    /**
+     * Installs React and Redux DevTools extensions after the Electron app is ready.
+     *
+     * @remarks
+     * Extensions are installed only after `app.whenReady()` to ensure the Electron environment is fully initialized,
+     * as extension installation requires the app to be ready. In development, these extensions enhance debugging capabilities.
+     */
+    void app.whenReady().then(async () => {
+        // Wait a bit for the main window to be created and ready
+        await new Promise((resolve) => setTimeout(resolve, 1));
 
-    if (isDev()) {
-        try {
-            const extensions = await installExtension([REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS], {
-                loadExtensionOptions: { allowFileAccess: true },
-            });
-            logger.info(`[Main] Added Extensions: ${extensions.map((ext) => ext.name).join(", ")}`);
-            return extensions;
-        } catch (error) {
-            logger.warn("[Main] Failed to install dev extensions (this is normal in production)", error);
-            return [];
+        if (isDev()) {
+            try {
+                const extensions = await installExtension([REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS], {
+                    loadExtensionOptions: { allowFileAccess: true },
+                });
+                logger.info(`[Main] Added Extensions: ${extensions.map((ext) => ext.name).join(", ")}`);
+                return extensions;
+            } catch (error) {
+                logger.warn("[Main] Failed to install dev extensions (this is normal in production)", error);
+                return [];
+            }
         }
-    }
-    return []; // No extensions in production
-});
+        return []; // No extensions in production
+    });
+}
