@@ -2,7 +2,7 @@
 
 > **typedObjectEntries**\<`T`\>(`obj`): \[keyof `T`, `T`\[keyof `T`\]\][]
 
-Defined in: [shared/utils/objectSafety.ts:155](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/utils/objectSafety.ts#L155)
+Defined in: [shared/utils/objectSafety.ts:155](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/utils/objectSafety.ts#L155)
 
 Type-safe Object.entries that preserves key types for known object shapes.
 
@@ -10,7 +10,7 @@ Type-safe Object.entries that preserves key types for known object shapes.
 
 ### T
 
-`T` *extends* `Record`\<`PropertyKey`, `unknown`\>
+`T` *extends* [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`PropertyKey`, `unknown`\>
 
 ## Parameters
 

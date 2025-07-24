@@ -424,6 +424,8 @@
     "tslib": "^2.8.1",
     "type-fest": "^4.41.0",
     "typedoc": "^0.28.7",
+    "typedoc-plugin-dt-links": "^2.0.11",
+    "typedoc-plugin-external-package-links": "^0.1.0",
     "typedoc-plugin-extras": "^4.0.1",
     "typedoc-plugin-markdown": "^4.7.1",
     "typedoc-plugin-mdn-links": "^5.0.5",

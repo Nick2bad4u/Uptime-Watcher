@@ -1,6 +1,6 @@
 # Class: LoggerAdapter
 
-Defined in: [electron/utils/database/serviceFactory.ts:12](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/database/serviceFactory.ts#L12)
+Defined in: [electron/utils/database/serviceFactory.ts:12](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/serviceFactory.ts#L12)
 
 Adapter for the logger to implement Logger interface.
 
@@ -10,7 +10,7 @@ Adapter for the logger to implement Logger interface.
 
 > **new LoggerAdapter**(`logger`): `LoggerAdapter`
 
-Defined in: [electron/utils/database/serviceFactory.ts:15](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/database/serviceFactory.ts#L15)
+Defined in: [electron/utils/database/serviceFactory.ts:15](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/serviceFactory.ts#L15)
 
 #### Parameters
 
@@ -42,7 +42,7 @@ Defined in: [electron/utils/database/serviceFactory.ts:15](https://github.com/Ni
 
 > **debug**(`message`, ...`args`): `void`
 
-Defined in: [electron/utils/database/serviceFactory.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/database/serviceFactory.ts#L19)
+Defined in: [electron/utils/database/serviceFactory.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/serviceFactory.ts#L19)
 
 #### Parameters
 
@@ -64,7 +64,7 @@ Defined in: [electron/utils/database/serviceFactory.ts:19](https://github.com/Ni
 
 > **error**(`message`, `error?`, ...`args?`): `void`
 
-Defined in: [electron/utils/database/serviceFactory.ts:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/database/serviceFactory.ts#L23)
+Defined in: [electron/utils/database/serviceFactory.ts:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/serviceFactory.ts#L23)
 
 #### Parameters
 
@@ -90,7 +90,7 @@ Defined in: [electron/utils/database/serviceFactory.ts:23](https://github.com/Ni
 
 > **info**(`message`, ...`args`): `void`
 
-Defined in: [electron/utils/database/serviceFactory.ts:27](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/database/serviceFactory.ts#L27)
+Defined in: [electron/utils/database/serviceFactory.ts:27](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/serviceFactory.ts#L27)
 
 #### Parameters
 
@@ -112,7 +112,7 @@ Defined in: [electron/utils/database/serviceFactory.ts:27](https://github.com/Ni
 
 > **warn**(`message`, ...`args`): `void`
 
-Defined in: [electron/utils/database/serviceFactory.ts:31](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/database/serviceFactory.ts#L31)
+Defined in: [electron/utils/database/serviceFactory.ts:31](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/serviceFactory.ts#L31)
 
 #### Parameters
 

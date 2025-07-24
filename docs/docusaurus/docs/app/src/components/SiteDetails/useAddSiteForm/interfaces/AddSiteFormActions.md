@@ -1,6 +1,6 @@
 # Interface: AddSiteFormActions
 
-Defined in: [src/components/SiteDetails/useAddSiteForm.ts:18](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/SiteDetails/useAddSiteForm.ts#L18)
+Defined in: [src/components/SiteDetails/useAddSiteForm.ts:18](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/useAddSiteForm.ts#L18)
 
 Form actions interface containing all form manipulation functions.
 
@@ -10,7 +10,7 @@ Form actions interface containing all form manipulation functions.
 
 > **isFormValid**: () => `boolean`
 
-Defined in: [src/components/SiteDetails/useAddSiteForm.ts:20](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/SiteDetails/useAddSiteForm.ts#L20)
+Defined in: [src/components/SiteDetails/useAddSiteForm.ts:20](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/useAddSiteForm.ts#L20)
 
 Whether the form is currently valid
 
@@ -24,7 +24,7 @@ Whether the form is currently valid
 
 > **resetForm**: () => `void`
 
-Defined in: [src/components/SiteDetails/useAddSiteForm.ts:22](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/SiteDetails/useAddSiteForm.ts#L22)
+Defined in: [src/components/SiteDetails/useAddSiteForm.ts:22](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/useAddSiteForm.ts#L22)
 
 Reset form to initial state
 
@@ -38,7 +38,7 @@ Reset form to initial state
 
 > **setAddMode**: (`value`) => `void`
 
-Defined in: [src/components/SiteDetails/useAddSiteForm.ts:24](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/SiteDetails/useAddSiteForm.ts#L24)
+Defined in: [src/components/SiteDetails/useAddSiteForm.ts:24](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/useAddSiteForm.ts#L24)
 
 Set form operation mode
 
@@ -58,7 +58,7 @@ Set form operation mode
 
 > **setCheckInterval**: (`value`) => `void`
 
-Defined in: [src/components/SiteDetails/useAddSiteForm.ts:26](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/SiteDetails/useAddSiteForm.ts#L26)
+Defined in: [src/components/SiteDetails/useAddSiteForm.ts:26](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/useAddSiteForm.ts#L26)
 
 Set check interval
 
@@ -78,7 +78,7 @@ Set check interval
 
 > **setFormError**: (`error`) => `void`
 
-Defined in: [src/components/SiteDetails/useAddSiteForm.ts:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/SiteDetails/useAddSiteForm.ts#L28)
+Defined in: [src/components/SiteDetails/useAddSiteForm.ts:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/useAddSiteForm.ts#L28)
 
 Set form error message
 
@@ -98,7 +98,7 @@ Set form error message
 
 > **setHost**: (`value`) => `void`
 
-Defined in: [src/components/SiteDetails/useAddSiteForm.ts:30](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/SiteDetails/useAddSiteForm.ts#L30)
+Defined in: [src/components/SiteDetails/useAddSiteForm.ts:30](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/useAddSiteForm.ts#L30)
 
 Set host field value
 
@@ -118,7 +118,7 @@ Set host field value
 
 > **setMonitorType**: (`value`) => `void`
 
-Defined in: [src/components/SiteDetails/useAddSiteForm.ts:32](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/SiteDetails/useAddSiteForm.ts#L32)
+Defined in: [src/components/SiteDetails/useAddSiteForm.ts:32](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/useAddSiteForm.ts#L32)
 
 Set monitor type
 
@@ -138,7 +138,7 @@ Set monitor type
 
 > **setName**: (`value`) => `void`
 
-Defined in: [src/components/SiteDetails/useAddSiteForm.ts:34](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/SiteDetails/useAddSiteForm.ts#L34)
+Defined in: [src/components/SiteDetails/useAddSiteForm.ts:34](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/useAddSiteForm.ts#L34)
 
 Set site name field value
 
@@ -158,7 +158,7 @@ Set site name field value
 
 > **setPort**: (`value`) => `void`
 
-Defined in: [src/components/SiteDetails/useAddSiteForm.ts:36](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/SiteDetails/useAddSiteForm.ts#L36)
+Defined in: [src/components/SiteDetails/useAddSiteForm.ts:36](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/useAddSiteForm.ts#L36)
 
 Set port field value
 
@@ -178,7 +178,7 @@ Set port field value
 
 > **setSelectedExistingSite**: (`value`) => `void`
 
-Defined in: [src/components/SiteDetails/useAddSiteForm.ts:38](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/SiteDetails/useAddSiteForm.ts#L38)
+Defined in: [src/components/SiteDetails/useAddSiteForm.ts:38](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/useAddSiteForm.ts#L38)
 
 Set selected existing site
 
@@ -198,7 +198,7 @@ Set selected existing site
 
 > **setSiteId**: (`value`) => `void`
 
-Defined in: [src/components/SiteDetails/useAddSiteForm.ts:40](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/SiteDetails/useAddSiteForm.ts#L40)
+Defined in: [src/components/SiteDetails/useAddSiteForm.ts:40](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/useAddSiteForm.ts#L40)
 
 Set site ID
 
@@ -218,7 +218,7 @@ Set site ID
 
 > **setUrl**: (`value`) => `void`
 
-Defined in: [src/components/SiteDetails/useAddSiteForm.ts:42](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/SiteDetails/useAddSiteForm.ts#L42)
+Defined in: [src/components/SiteDetails/useAddSiteForm.ts:42](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/useAddSiteForm.ts#L42)
 
 Set URL field value
 

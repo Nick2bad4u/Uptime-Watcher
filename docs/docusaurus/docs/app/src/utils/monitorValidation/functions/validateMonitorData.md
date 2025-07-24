@@ -1,8 +1,8 @@
 # Function: validateMonitorData()
 
-> **validateMonitorData**(`type`, `data`): `Promise`\<\` `errors`: `string`[]; `success`: `boolean`; \`\>
+> **validateMonitorData**(`type`, `data`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<\` `errors`: `string`[]; `success`: `boolean`; \`\>
 
-Defined in: [src/utils/monitorValidation.ts:45](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/utils/monitorValidation.ts#L45)
+Defined in: [src/utils/monitorValidation.ts:45](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/utils/monitorValidation.ts#L45)
 
 Validate monitor data using backend registry.
 
@@ -16,12 +16,12 @@ Monitor type
 
 ### data
 
-`Record`\<`string`, `unknown`\>
+[`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `unknown`\>
 
 Monitor data to validate
 
 ## Returns
 
-`Promise`\<\` `errors`: `string`[]; `success`: `boolean`; \`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<\` `errors`: `string`[]; `success`: `boolean`; \`\>
 
 Promise resolving to validation result

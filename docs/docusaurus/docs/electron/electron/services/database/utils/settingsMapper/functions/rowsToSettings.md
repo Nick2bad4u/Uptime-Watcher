@@ -2,7 +2,7 @@
 
 > **rowsToSettings**(`rows`): [`SettingRow`](../interfaces/SettingRow.md)[]
 
-Defined in: [electron/services/database/utils/settingsMapper.ts:41](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/utils/settingsMapper.ts#L41)
+Defined in: [electron/services/database/utils/settingsMapper.ts:41](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/settingsMapper.ts#L41)
 
 Convert multiple database rows to SettingRow objects.
 
@@ -10,7 +10,7 @@ Convert multiple database rows to SettingRow objects.
 
 ### rows
 
-`Record`\<`string`, `unknown`\>[]
+[`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `unknown`\>[]
 
 Array of raw database rows
 

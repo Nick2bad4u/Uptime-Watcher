@@ -2,7 +2,7 @@
 
 > **createErrorResult**(`error`, `responseTime`, `correlationId?`): [`MonitorCheckResult`](../../../types/interfaces/MonitorCheckResult.md)
 
-Defined in: [electron/services/monitoring/utils/errorHandling.ts:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/utils/errorHandling.ts#L25)
+Defined in: [electron/services/monitoring/utils/errorHandling.ts:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/utils/errorHandling.ts#L25)
 
 Create a standardized error result for monitor checks.
 

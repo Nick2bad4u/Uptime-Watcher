@@ -2,7 +2,7 @@
 
 > **useSiteDetails**(`props`): `object`
 
-Defined in: [src/hooks/site/useSiteDetails.ts:59](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/hooks/site/useSiteDetails.ts#L59)
+Defined in: [src/hooks/site/useSiteDetails.ts:63](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSiteDetails.ts#L63)
 
 Hook for managing site details state and operations.
 
@@ -14,7 +14,7 @@ and integration with analytics.
 
 ### props
 
-`UseSiteDetailsProperties`
+[`UseSiteDetailsProperties`](../interfaces/UseSiteDetailsProperties.md)
 
 Hook props containing the site to manage
 
@@ -38,11 +38,11 @@ Object containing all site details state and handlers
 
 ### handleCheckNow()
 
-> **handleCheckNow**: () => `Promise`\<`void`\>
+> **handleCheckNow**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 ### handleIntervalChange()
 
@@ -52,7 +52,7 @@ Object containing all site details state and handlers
 
 ##### e
 
-`ChangeEvent`\<`HTMLSelectElement`\>
+[`ChangeEvent`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/index.d.ts#L2018)\<[`HTMLSelectElement`](https://developer.mozilla.org/docs/Web/API/HTMLSelectElement)\>
 
 #### Returns
 
@@ -66,7 +66,7 @@ Object containing all site details state and handlers
 
 ##### e
 
-`ChangeEvent`\<`HTMLSelectElement`\>
+[`ChangeEvent`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/index.d.ts#L2018)\<[`HTMLSelectElement`](https://developer.mozilla.org/docs/Web/API/HTMLSelectElement)\>
 
 #### Returns
 
@@ -74,19 +74,19 @@ Object containing all site details state and handlers
 
 ### handleRemoveMonitor()
 
-> **handleRemoveMonitor**: () => `Promise`\<`void`\>
+> **handleRemoveMonitor**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 ### handleRemoveSite()
 
-> **handleRemoveSite**: () => `Promise`\<`void`\>
+> **handleRemoveSite**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 ### handleRetryAttemptsChange()
 
@@ -96,7 +96,7 @@ Object containing all site details state and handlers
 
 ##### e
 
-`ChangeEvent`\<`HTMLInputElement`\>
+[`ChangeEvent`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/index.d.ts#L2018)\<[`HTMLInputElement`](https://developer.mozilla.org/docs/Web/API/HTMLInputElement)\>
 
 #### Returns
 
@@ -104,67 +104,67 @@ Object containing all site details state and handlers
 
 ### handleSaveInterval()
 
-> **handleSaveInterval**: () => `Promise`\<`void`\>
+> **handleSaveInterval**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 ### handleSaveName()
 
-> **handleSaveName**: () => `Promise`\<`void`\>
+> **handleSaveName**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 ### handleSaveRetryAttempts()
 
-> **handleSaveRetryAttempts**: () => `Promise`\<`void`\>
+> **handleSaveRetryAttempts**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 ### handleSaveTimeout()
 
-> **handleSaveTimeout**: () => `Promise`\<`void`\>
+> **handleSaveTimeout**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 ### handleStartMonitoring()
 
-> **handleStartMonitoring**: () => `Promise`\<`void`\>
+> **handleStartMonitoring**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 ### handleStartSiteMonitoring()
 
-> **handleStartSiteMonitoring**: () => `Promise`\<`void`\>
+> **handleStartSiteMonitoring**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 ### handleStopMonitoring()
 
-> **handleStopMonitoring**: () => `Promise`\<`void`\>
+> **handleStopMonitoring**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 ### handleStopSiteMonitoring()
 
-> **handleStopSiteMonitoring**: () => `Promise`\<`void`\>
+> **handleStopSiteMonitoring**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 ### handleTimeoutChange()
 
@@ -174,7 +174,7 @@ Object containing all site details state and handlers
 
 ##### e
 
-`ChangeEvent`\<`HTMLInputElement`\>
+[`ChangeEvent`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/index.d.ts#L2018)\<[`HTMLInputElement`](https://developer.mozilla.org/docs/Web/API/HTMLInputElement)\>
 
 #### Returns
 
@@ -240,7 +240,7 @@ Object containing all site details state and handlers
 
 ### setLocalName
 
-> **setLocalName**: `Dispatch`\<`SetStateAction`\<`string`\>\>
+> **setLocalName**: [`Dispatch`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/index.d.ts#L1636)\<[`SetStateAction`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/index.d.ts#L1630)\<`string`\>\>
 
 ### setShowAdvancedMetrics()
 

@@ -2,7 +2,7 @@
 
 > **normalizeMonitor**(`monitor`): [`Monitor`](../../../../../../shared/types/interfaces/Monitor.md)
 
-Defined in: [src/stores/sites/utils/monitorOperations.ts:54](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/sites/utils/monitorOperations.ts#L54)
+Defined in: [src/stores/sites/utils/monitorOperations.ts:54](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/utils/monitorOperations.ts#L54)
 
 Normalizes monitor data ensuring all required fields are present
 
@@ -10,7 +10,7 @@ Normalizes monitor data ensuring all required fields are present
 
 ### monitor
 
-`Partial`\<[`Monitor`](../../../../../../shared/types/interfaces/Monitor.md)\>
+[`Partial`](https://www.typescriptlang.org/docs/handbook/utility-types.html#partialtype)\<[`Monitor`](../../../../../../shared/types/interfaces/Monitor.md)\>
 
 ## Returns
 

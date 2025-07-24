@@ -1,8 +1,8 @@
 # Function: safeObjectOmit()
 
-> **safeObjectOmit**\<`T`, `K`\>(`obj`, `keys`): `Omit`\<`T`, `K`\>
+> **safeObjectOmit**\<`T`, `K`\>(`obj`, `keys`): [`Omit`](https://www.typescriptlang.org/docs/handbook/utility-types.html#omittype-keys)\<`T`, `K`\>
 
-Defined in: [shared/utils/objectSafety.ts:96](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/utils/objectSafety.ts#L96)
+Defined in: [shared/utils/objectSafety.ts:96](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/utils/objectSafety.ts#L96)
 
 Create a type-safe object with specified keys omitted.
 
@@ -10,7 +10,7 @@ Create a type-safe object with specified keys omitted.
 
 ### T
 
-`T` *extends* `Record`\<`PropertyKey`, `unknown`\>
+`T` *extends* [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`PropertyKey`, `unknown`\>
 
 ### K
 
@@ -32,7 +32,7 @@ Keys to omit from the object
 
 ## Returns
 
-`Omit`\<`T`, `K`\>
+[`Omit`](https://www.typescriptlang.org/docs/handbook/utility-types.html#omittype-keys)\<`T`, `K`\>
 
 New object without the specified keys
 

@@ -1,6 +1,6 @@
 # Class: PortMonitor
 
-Defined in: [electron/services/monitoring/PortMonitor.ts:47](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/PortMonitor.ts#L47)
+Defined in: [electron/services/monitoring/PortMonitor.ts:47](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/PortMonitor.ts#L47)
 
 Service for performing port monitoring checks.
 
@@ -23,7 +23,7 @@ provides detailed error reporting for troubleshooting connectivity issues.
 
 > **new PortMonitor**(`config`): `PortMonitor`
 
-Defined in: [electron/services/monitoring/PortMonitor.ts:60](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/PortMonitor.ts#L60)
+Defined in: [electron/services/monitoring/PortMonitor.ts:60](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/PortMonitor.ts#L60)
 
 Create a new PortMonitor instance.
 
@@ -49,9 +49,9 @@ with different configurations for various monitoring needs.
 
 ### check()
 
-> **check**(`monitor`): `Promise`\<[`MonitorCheckResult`](../../types/interfaces/MonitorCheckResult.md)\>
+> **check**(`monitor`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`MonitorCheckResult`](../../types/interfaces/MonitorCheckResult.md)\>
 
-Defined in: [electron/services/monitoring/PortMonitor.ts:85](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/PortMonitor.ts#L85)
+Defined in: [electron/services/monitoring/PortMonitor.ts:85](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/PortMonitor.ts#L85)
 
 Perform a port connectivity check on the given monitor.
 
@@ -65,7 +65,7 @@ Monitor configuration of type [Site](../../../../../shared/types/interfaces/Site
 
 #### Returns
 
-`Promise`\<[`MonitorCheckResult`](../../types/interfaces/MonitorCheckResult.md)\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`MonitorCheckResult`](../../types/interfaces/MonitorCheckResult.md)\>
 
 Promise resolving to check result with status and timing data
 
@@ -94,7 +94,7 @@ connection establishment time for accurate performance metrics.
 
 > **getConfig**(): [`MonitorConfig`](../../types/interfaces/MonitorConfig.md)
 
-Defined in: [electron/services/monitoring/PortMonitor.ts:118](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/PortMonitor.ts#L118)
+Defined in: [electron/services/monitoring/PortMonitor.ts:118](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/PortMonitor.ts#L118)
 
 Get the current configuration.
 
@@ -118,7 +118,7 @@ in the future, they would be referenced, not cloned.
 
 > **getType**(): `"http"` \| `"port"`
 
-Defined in: [electron/services/monitoring/PortMonitor.ts:132](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/PortMonitor.ts#L132)
+Defined in: [electron/services/monitoring/PortMonitor.ts:132](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/PortMonitor.ts#L132)
 
 Get the monitor type this service handles.
 
@@ -144,7 +144,7 @@ for type safety and consistency across the application.
 
 > **updateConfig**(`config`): `void`
 
-Defined in: [electron/services/monitoring/PortMonitor.ts:152](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/PortMonitor.ts#L152)
+Defined in: [electron/services/monitoring/PortMonitor.ts:152](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/PortMonitor.ts#L152)
 
 Update the configuration for this monitor.
 
@@ -152,7 +152,7 @@ Update the configuration for this monitor.
 
 ##### config
 
-`Partial`\<[`MonitorConfig`](../../types/interfaces/MonitorConfig.md)\>
+[`Partial`](https://www.typescriptlang.org/docs/handbook/utility-types.html#partialtype)\<[`MonitorConfig`](../../types/interfaces/MonitorConfig.md)\>
 
 Partial configuration to merge with existing settings
 

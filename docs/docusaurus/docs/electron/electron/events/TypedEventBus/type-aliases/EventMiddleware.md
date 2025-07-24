@@ -1,8 +1,8 @@
 # Type Alias: EventMiddleware()\<T\>
 
-> **EventMiddleware**\<`T`\> = (`event`, `data`, `next`) => `Promise`\<`void`\> \| `void`
+> **EventMiddleware**\<`T`\> = (`event`, `data`, `next`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\> \| `void`
 
-Defined in: [electron/events/TypedEventBus.ts:107](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/TypedEventBus.ts#L107)
+Defined in: [electron/events/TypedEventBus.ts:107](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/events/TypedEventBus.ts#L107)
 
 Middleware function for event processing.
 
@@ -28,13 +28,13 @@ Event data payload (read-only for inspection)
 
 ### next
 
-() => `Promise`\<`void`\> \| `void`
+() => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\> \| `void`
 
 Function to call to continue to the next middleware
 
 ## Returns
 
-`Promise`\<`void`\> \| `void`
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\> \| `void`
 
 ## Remarks
 

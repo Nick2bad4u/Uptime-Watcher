@@ -2,7 +2,7 @@
 
 > **validateMonitorExists**(`site`, `monitorId`): `void`
 
-Defined in: [src/stores/sites/utils/monitorOperations.ts:100](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/sites/utils/monitorOperations.ts#L100)
+Defined in: [src/stores/sites/utils/monitorOperations.ts:100](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/utils/monitorOperations.ts#L100)
 
 Validates that a monitor exists in a site
 

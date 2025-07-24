@@ -1,6 +1,6 @@
 # Interface: SiteOperationsDependencies
 
-Defined in: [src/stores/sites/useSiteOperations.ts:47](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/sites/useSiteOperations.ts#L47)
+Defined in: [src/stores/sites/useSiteOperations.ts:47](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/useSiteOperations.ts#L47)
 
 ## Properties
 
@@ -8,7 +8,7 @@ Defined in: [src/stores/sites/useSiteOperations.ts:47](https://github.com/Nick2b
 
 > **addSite**: (`site`) => `void`
 
-Defined in: [src/stores/sites/useSiteOperations.ts:48](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/sites/useSiteOperations.ts#L48)
+Defined in: [src/stores/sites/useSiteOperations.ts:48](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/useSiteOperations.ts#L48)
 
 #### Parameters
 
@@ -26,7 +26,7 @@ Defined in: [src/stores/sites/useSiteOperations.ts:48](https://github.com/Nick2b
 
 > **getSites**: () => [`Site`](../../../../../shared/types/interfaces/Site.md)[]
 
-Defined in: [src/stores/sites/useSiteOperations.ts:49](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/sites/useSiteOperations.ts#L49)
+Defined in: [src/stores/sites/useSiteOperations.ts:49](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/useSiteOperations.ts#L49)
 
 #### Returns
 
@@ -38,7 +38,7 @@ Defined in: [src/stores/sites/useSiteOperations.ts:49](https://github.com/Nick2b
 
 > **removeSite**: (`identifier`) => `void`
 
-Defined in: [src/stores/sites/useSiteOperations.ts:50](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/sites/useSiteOperations.ts#L50)
+Defined in: [src/stores/sites/useSiteOperations.ts:50](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/useSiteOperations.ts#L50)
 
 #### Parameters
 
@@ -56,7 +56,7 @@ Defined in: [src/stores/sites/useSiteOperations.ts:50](https://github.com/Nick2b
 
 > **setSites**: (`sites`) => `void`
 
-Defined in: [src/stores/sites/useSiteOperations.ts:51](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/sites/useSiteOperations.ts#L51)
+Defined in: [src/stores/sites/useSiteOperations.ts:51](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/useSiteOperations.ts#L51)
 
 #### Parameters
 
@@ -72,10 +72,10 @@ Defined in: [src/stores/sites/useSiteOperations.ts:51](https://github.com/Nick2b
 
 ### syncSitesFromBackend()
 
-> **syncSitesFromBackend**: () => `Promise`\<`void`\>
+> **syncSitesFromBackend**: () => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/stores/sites/useSiteOperations.ts:52](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/sites/useSiteOperations.ts#L52)
+Defined in: [src/stores/sites/useSiteOperations.ts:52](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/useSiteOperations.ts#L52)
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>

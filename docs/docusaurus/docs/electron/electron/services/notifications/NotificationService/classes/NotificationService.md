@@ -1,6 +1,6 @@
 # Class: NotificationService
 
-Defined in: [electron/services/notifications/NotificationService.ts:71](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/notifications/NotificationService.ts#L71)
+Defined in: [electron/services/notifications/NotificationService.ts:71](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/notifications/NotificationService.ts#L71)
 
 Service responsible for handling system notifications for monitor status changes.
 
@@ -58,7 +58,7 @@ Promise.all([
 
 > **new NotificationService**(`config?`): `NotificationService`
 
-Defined in: [electron/services/notifications/NotificationService.ts:83](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/notifications/NotificationService.ts#L83)
+Defined in: [electron/services/notifications/NotificationService.ts:83](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/notifications/NotificationService.ts#L83)
 
 Create a new notification service instance.
 
@@ -85,7 +85,7 @@ The configuration can be updated later using [NotificationService.updateConfig](
 
 > **getConfig**(): [`NotificationConfig`](../interfaces/NotificationConfig.md)
 
-Defined in: [electron/services/notifications/NotificationService.ts:96](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/notifications/NotificationService.ts#L96)
+Defined in: [electron/services/notifications/NotificationService.ts:96](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/notifications/NotificationService.ts#L96)
 
 Get the current notification configuration.
 
@@ -106,7 +106,7 @@ Use [NotificationService.updateConfig](#updateconfig) to modify settings.
 
 > **isSupported**(): `boolean`
 
-Defined in: [electron/services/notifications/NotificationService.ts:110](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/notifications/NotificationService.ts#L110)
+Defined in: [electron/services/notifications/NotificationService.ts:110](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/notifications/NotificationService.ts#L110)
 
 Check if system notifications are supported on the current platform.
 
@@ -128,7 +128,7 @@ of attempting to display notifications.
 
 > **notifyMonitorDown**(`site`, `monitorId`): `void`
 
-Defined in: [electron/services/notifications/NotificationService.ts:135](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/notifications/NotificationService.ts#L135)
+Defined in: [electron/services/notifications/NotificationService.ts:135](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/notifications/NotificationService.ts#L135)
 
 Show a notification when a monitor goes down.
 
@@ -172,7 +172,7 @@ Error handling:
 
 > **notifyMonitorUp**(`site`, `monitorId`): `void`
 
-Defined in: [electron/services/notifications/NotificationService.ts:192](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/notifications/NotificationService.ts#L192)
+Defined in: [electron/services/notifications/NotificationService.ts:192](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/notifications/NotificationService.ts#L192)
 
 Show a notification when a monitor comes back up.
 
@@ -216,7 +216,7 @@ Error handling:
 
 > **updateConfig**(`config`): `void`
 
-Defined in: [electron/services/notifications/NotificationService.ts:255](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/notifications/NotificationService.ts#L255)
+Defined in: [electron/services/notifications/NotificationService.ts:255](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/notifications/NotificationService.ts#L255)
 
 Update the notification configuration.
 
@@ -224,7 +224,7 @@ Update the notification configuration.
 
 ##### config
 
-`Partial`\<[`NotificationConfig`](../interfaces/NotificationConfig.md)\>
+[`Partial`](https://www.typescriptlang.org/docs/handbook/utility-types.html#partialtype)\<[`NotificationConfig`](../interfaces/NotificationConfig.md)\>
 
 Partial configuration object with settings to update
 

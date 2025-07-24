@@ -2,7 +2,7 @@
 
 > **handlePortCheckError**(`error`, `host`, `port`): [`PortCheckErrorResult`](../interfaces/PortCheckErrorResult.md)
 
-Defined in: [electron/services/monitoring/utils/portErrorHandling.ts:76](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/utils/portErrorHandling.ts#L76)
+Defined in: [electron/services/monitoring/utils/portErrorHandling.ts:76](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/utils/portErrorHandling.ts#L76)
 
 Handle errors that occur during port checks with standardized formatting.
 

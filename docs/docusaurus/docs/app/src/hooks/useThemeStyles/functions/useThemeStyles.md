@@ -1,8 +1,8 @@
 # Function: useThemeStyles()
 
-> **useThemeStyles**(`isCollapsed`): `ThemeStyles`
+> **useThemeStyles**(`isCollapsed`): [`ThemeStyles`](../interfaces/ThemeStyles.md)
 
-Defined in: [src/hooks/useThemeStyles.ts:18](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/hooks/useThemeStyles.ts#L18)
+Defined in: [src/hooks/useThemeStyles.ts:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/useThemeStyles.ts#L23)
 
 ## Parameters
 
@@ -12,4 +12,4 @@ Defined in: [src/hooks/useThemeStyles.ts:18](https://github.com/Nick2bad4u/Uptim
 
 ## Returns
 
-`ThemeStyles`
+[`ThemeStyles`](../interfaces/ThemeStyles.md)

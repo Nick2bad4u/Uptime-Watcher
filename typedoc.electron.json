@@ -9,7 +9,9 @@
     "typedoc-plugin-markdown",
     "typedoc-docusaurus-theme",
     "typedoc-plugin-mdn-links",
-    "typedoc-plugin-zod"
+    "typedoc-plugin-zod",
+    "typedoc-plugin-dt-links",
+    "typedoc-plugin-external-package-links"
   ],
   "tsconfig": "tsconfig.electron.json",
   "externalSymbolLinkMappings": {

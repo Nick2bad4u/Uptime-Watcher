@@ -1,6 +1,6 @@
 # Interface: ThemeState
 
-Defined in: [src/theme/types.ts:165](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L165)
+Defined in: [src/theme/types.ts:165](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/types.ts#L165)
 
 Theme state interface for managing active themes.
 Tracks current theme selection and custom theme definitions.
@@ -11,7 +11,7 @@ Tracks current theme selection and custom theme definitions.
 
 > **activeTheme**: [`Theme`](Theme.md)
 
-Defined in: [src/theme/types.ts:167](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L167)
+Defined in: [src/theme/types.ts:167](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/types.ts#L167)
 
 Currently active theme object
 
@@ -21,7 +21,7 @@ Currently active theme object
 
 > **currentTheme**: [`ThemeName`](../type-aliases/ThemeName.md)
 
-Defined in: [src/theme/types.ts:169](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L169)
+Defined in: [src/theme/types.ts:169](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/types.ts#L169)
 
 Currently selected theme name
 
@@ -29,9 +29,9 @@ Currently selected theme name
 
 ### customThemes
 
-> **customThemes**: `Record`\<`string`, [`Theme`](Theme.md)\>
+> **customThemes**: [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, [`Theme`](Theme.md)\>
 
-Defined in: [src/theme/types.ts:171](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L171)
+Defined in: [src/theme/types.ts:171](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/types.ts#L171)
 
 Custom user-defined themes
 
@@ -41,6 +41,6 @@ Custom user-defined themes
 
 > **systemThemePreference**: `"dark"` \| `"light"`
 
-Defined in: [src/theme/types.ts:173](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L173)
+Defined in: [src/theme/types.ts:173](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/types.ts#L173)
 
 System theme preference (light/dark)

@@ -1,8 +1,8 @@
 # Function: createDatabaseBackup()
 
-> **createDatabaseBackup**(`dbPath`, `fileName`): `Promise`\<[`DatabaseBackupResult`](../interfaces/DatabaseBackupResult.md)\>
+> **createDatabaseBackup**(`dbPath`, `fileName`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`DatabaseBackupResult`](../interfaces/DatabaseBackupResult.md)\>
 
-Defined in: [electron/services/database/utils/databaseBackup.ts:69](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/utils/databaseBackup.ts#L69)
+Defined in: [electron/services/database/utils/databaseBackup.ts:69](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/databaseBackup.ts#L69)
 
 Create a database backup by reading the SQLite file into a buffer.
 
@@ -22,7 +22,7 @@ Optional custom filename for the backup (defaults to "uptime-watcher-backup.sqli
 
 ## Returns
 
-`Promise`\<[`DatabaseBackupResult`](../interfaces/DatabaseBackupResult.md)\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`DatabaseBackupResult`](../interfaces/DatabaseBackupResult.md)\>
 
 Promise resolving to backup data with buffer, filename, and metadata
 

@@ -2,7 +2,7 @@
 
 > **StoreActions**\<`T`\> = `` [K in keyof T]: T[K] extends (arguments_: unknown[]) => unknown ? T[K] : never ``
 
-Defined in: [src/stores/types.ts:78](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/types.ts#L78)
+Defined in: [src/stores/types.ts:78](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/types.ts#L78)
 
 Store composition utility type for extracting action methods from store interfaces.
 

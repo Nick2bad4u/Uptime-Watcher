@@ -1,6 +1,6 @@
 # Interface: MonitoringControlEventData
 
-Defined in: [shared/types/events.ts:39](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/types/events.ts#L39)
+Defined in: [shared/types/events.ts:39](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types/events.ts#L39)
 
 Event data for monitoring control operations (global monitoring start/stop)
 
@@ -10,7 +10,7 @@ Event data for monitoring control operations (global monitoring start/stop)
 
 > `optional` **activeMonitors**: `number`
 
-Defined in: [shared/types/events.ts:41](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/types/events.ts#L41)
+Defined in: [shared/types/events.ts:41](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types/events.ts#L41)
 
 Number of active monitors (for stopped events)
 
@@ -20,7 +20,7 @@ Number of active monitors (for stopped events)
 
 > `optional` **monitorCount**: `number`
 
-Defined in: [shared/types/events.ts:43](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/types/events.ts#L43)
+Defined in: [shared/types/events.ts:43](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types/events.ts#L43)
 
 Number of monitors involved
 
@@ -30,7 +30,7 @@ Number of monitors involved
 
 > `optional` **reason**: `"error"` \| `"shutdown"` \| `"user"`
 
-Defined in: [shared/types/events.ts:45](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/types/events.ts#L45)
+Defined in: [shared/types/events.ts:45](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types/events.ts#L45)
 
 Reason for stopping (for stopped events)
 
@@ -40,7 +40,7 @@ Reason for stopping (for stopped events)
 
 > `optional` **siteCount**: `number`
 
-Defined in: [shared/types/events.ts:47](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/types/events.ts#L47)
+Defined in: [shared/types/events.ts:47](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types/events.ts#L47)
 
 Number of sites involved
 
@@ -50,6 +50,6 @@ Number of sites involved
 
 > **timestamp**: `number`
 
-Defined in: [shared/types/events.ts:49](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/types/events.ts#L49)
+Defined in: [shared/types/events.ts:49](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types/events.ts#L49)
 
 Timestamp when the event occurred

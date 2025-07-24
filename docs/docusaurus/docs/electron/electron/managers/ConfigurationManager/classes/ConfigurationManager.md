@@ -1,6 +1,6 @@
 # Class: ConfigurationManager
 
-Defined in: [electron/managers/ConfigurationManager.ts:34](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/ConfigurationManager.ts#L34)
+Defined in: [electron/managers/ConfigurationManager.ts:34](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/ConfigurationManager.ts#L34)
 
 Manages business configuration and policies with standardized caching.
 Centralizes business rules that were previously scattered across utilities.
@@ -18,7 +18,7 @@ This ensures proper dependency injection and lifecycle management
 
 > **new ConfigurationManager**(): `ConfigurationManager`
 
-Defined in: [electron/managers/ConfigurationManager.ts:40](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/ConfigurationManager.ts#L40)
+Defined in: [electron/managers/ConfigurationManager.ts:40](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/ConfigurationManager.ts#L40)
 
 #### Returns
 
@@ -30,7 +30,7 @@ Defined in: [electron/managers/ConfigurationManager.ts:40](https://github.com/Ni
 
 > **clearValidationCache**(): `void`
 
-Defined in: [electron/managers/ConfigurationManager.ts:63](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/ConfigurationManager.ts#L63)
+Defined in: [electron/managers/ConfigurationManager.ts:63](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/ConfigurationManager.ts#L63)
 
 Clear validation cache when configuration changes.
 
@@ -44,7 +44,7 @@ Clear validation cache when configuration changes.
 
 > **getCacheStats**(): `object`
 
-Defined in: [electron/managers/ConfigurationManager.ts:70](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/ConfigurationManager.ts#L70)
+Defined in: [electron/managers/ConfigurationManager.ts:70](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/ConfigurationManager.ts#L70)
 
 Get cache statistics for monitoring.
 
@@ -66,7 +66,7 @@ Get cache statistics for monitoring.
 
 > **getDefaultMonitorInterval**(): `number`
 
-Defined in: [electron/managers/ConfigurationManager.ts:83](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/ConfigurationManager.ts#L83)
+Defined in: [electron/managers/ConfigurationManager.ts:83](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/ConfigurationManager.ts#L83)
 
 Get the default monitor check interval according to business rules.
 
@@ -80,7 +80,7 @@ Get the default monitor check interval according to business rules.
 
 > **getHistoryRetentionRules**(): [`HistoryRetentionConfig`](../interfaces/HistoryRetentionConfig.md)
 
-Defined in: [electron/managers/ConfigurationManager.ts:91](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/ConfigurationManager.ts#L91)
+Defined in: [electron/managers/ConfigurationManager.ts:91](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/ConfigurationManager.ts#L91)
 
 Get history retention configuration according to business rules.
 These limits align with the history limit options available in the UI.
@@ -95,7 +95,7 @@ These limits align with the history limit options available in the UI.
 
 > **getMaximumPortNumber**(): `number`
 
-Defined in: [electron/managers/ConfigurationManager.ts:102](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/ConfigurationManager.ts#L102)
+Defined in: [electron/managers/ConfigurationManager.ts:102](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/ConfigurationManager.ts#L102)
 
 Business rule: Get the maximum allowed port number.
 
@@ -109,7 +109,7 @@ Business rule: Get the maximum allowed port number.
 
 > **getMinimumCheckInterval**(): `number`
 
-Defined in: [electron/managers/ConfigurationManager.ts:109](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/ConfigurationManager.ts#L109)
+Defined in: [electron/managers/ConfigurationManager.ts:109](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/ConfigurationManager.ts#L109)
 
 Business rule: Get the minimum allowed check interval.
 
@@ -123,7 +123,7 @@ Business rule: Get the minimum allowed check interval.
 
 > **getMinimumTimeout**(): `number`
 
-Defined in: [electron/managers/ConfigurationManager.ts:116](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/ConfigurationManager.ts#L116)
+Defined in: [electron/managers/ConfigurationManager.ts:116](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/ConfigurationManager.ts#L116)
 
 Business rule: Get the minimum allowed timeout.
 
@@ -137,7 +137,7 @@ Business rule: Get the minimum allowed timeout.
 
 > **shouldApplyDefaultInterval**(`monitor`): `boolean`
 
-Defined in: [electron/managers/ConfigurationManager.ts:123](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/ConfigurationManager.ts#L123)
+Defined in: [electron/managers/ConfigurationManager.ts:123](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/ConfigurationManager.ts#L123)
 
 Business rule: Determine if a monitor should receive a default interval.
 
@@ -157,7 +157,7 @@ Business rule: Determine if a monitor should receive a default interval.
 
 > **shouldAutoStartMonitoring**(`site`): `boolean`
 
-Defined in: [electron/managers/ConfigurationManager.ts:130](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/ConfigurationManager.ts#L130)
+Defined in: [electron/managers/ConfigurationManager.ts:130](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/ConfigurationManager.ts#L130)
 
 Business rule: Determine if monitoring should be auto-started for a site.
 
@@ -177,7 +177,7 @@ Business rule: Determine if monitoring should be auto-started for a site.
 
 > **shouldIncludeInExport**(`site`): `boolean`
 
-Defined in: [electron/managers/ConfigurationManager.ts:149](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/ConfigurationManager.ts#L149)
+Defined in: [electron/managers/ConfigurationManager.ts:149](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/ConfigurationManager.ts#L149)
 
 Business rule: Determine if a site should be included in exports.
 Delegates to site validator for consistency.
@@ -196,9 +196,9 @@ Delegates to site validator for consistency.
 
 ### validateMonitorConfiguration()
 
-> **validateMonitorConfiguration**(`monitor`): `Promise`\<[`ValidationResult`](../../validators/interfaces/interfaces/ValidationResult.md)\>
+> **validateMonitorConfiguration**(`monitor`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`ValidationResult`](../../validators/interfaces/interfaces/ValidationResult.md)\>
 
-Defined in: [electron/managers/ConfigurationManager.ts:164](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/ConfigurationManager.ts#L164)
+Defined in: [electron/managers/ConfigurationManager.ts:164](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/ConfigurationManager.ts#L164)
 
 Validate monitor configuration according to business rules with caching.
 
@@ -212,7 +212,7 @@ The monitor configuration to validate
 
 #### Returns
 
-`Promise`\<[`ValidationResult`](../../validators/interfaces/interfaces/ValidationResult.md)\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`ValidationResult`](../../validators/interfaces/interfaces/ValidationResult.md)\>
 
 Promise resolving to validation result with errors and validity status
 
@@ -226,9 +226,9 @@ that may require asynchronous operations or cache backends.
 
 ### validateSiteConfiguration()
 
-> **validateSiteConfiguration**(`site`): `Promise`\<[`ValidationResult`](../../validators/interfaces/interfaces/ValidationResult.md)\>
+> **validateSiteConfiguration**(`site`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`ValidationResult`](../../validators/interfaces/interfaces/ValidationResult.md)\>
 
-Defined in: [electron/managers/ConfigurationManager.ts:207](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/ConfigurationManager.ts#L207)
+Defined in: [electron/managers/ConfigurationManager.ts:207](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/ConfigurationManager.ts#L207)
 
 Validate site configuration according to business rules with caching.
 
@@ -242,7 +242,7 @@ The site configuration to validate
 
 #### Returns
 
-`Promise`\<[`ValidationResult`](../../validators/interfaces/interfaces/ValidationResult.md)\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`ValidationResult`](../../validators/interfaces/interfaces/ValidationResult.md)\>
 
 Promise resolving to validation result with errors and validity status
 

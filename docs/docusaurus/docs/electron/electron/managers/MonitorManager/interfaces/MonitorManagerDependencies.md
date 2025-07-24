@@ -1,6 +1,6 @@
 # Interface: MonitorManagerDependencies
 
-Defined in: [electron/managers/MonitorManager.ts:11](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/MonitorManager.ts#L11)
+Defined in: [electron/managers/MonitorManager.ts:11](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/MonitorManager.ts#L11)
 
 ## Properties
 
@@ -8,7 +8,7 @@ Defined in: [electron/managers/MonitorManager.ts:11](https://github.com/Nick2bad
 
 > **databaseService**: [`DatabaseService`](../../../services/database/DatabaseService/classes/DatabaseService.md)
 
-Defined in: [electron/managers/MonitorManager.ts:12](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/MonitorManager.ts#L12)
+Defined in: [electron/managers/MonitorManager.ts:12](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/MonitorManager.ts#L12)
 
 ***
 
@@ -16,7 +16,7 @@ Defined in: [electron/managers/MonitorManager.ts:12](https://github.com/Nick2bad
 
 > **eventEmitter**: [`TypedEventBus`](../../../events/TypedEventBus/classes/TypedEventBus.md)\<[`UptimeEvents`](../../../events/eventTypes/interfaces/UptimeEvents.md)\>
 
-Defined in: [electron/managers/MonitorManager.ts:13](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/MonitorManager.ts#L13)
+Defined in: [electron/managers/MonitorManager.ts:13](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/MonitorManager.ts#L13)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [electron/managers/MonitorManager.ts:13](https://github.com/Nick2bad
 
 > **getHistoryLimit**: () => `number`
 
-Defined in: [electron/managers/MonitorManager.ts:14](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/MonitorManager.ts#L14)
+Defined in: [electron/managers/MonitorManager.ts:14](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/MonitorManager.ts#L14)
 
 #### Returns
 
@@ -36,7 +36,7 @@ Defined in: [electron/managers/MonitorManager.ts:14](https://github.com/Nick2bad
 
 > **getSitesCache**: () => [`StandardizedCache`](../../../utils/cache/StandardizedCache/classes/StandardizedCache.md)\<[`Site`](../../../../shared/types/interfaces/Site.md)\>
 
-Defined in: [electron/managers/MonitorManager.ts:15](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/MonitorManager.ts#L15)
+Defined in: [electron/managers/MonitorManager.ts:15](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/MonitorManager.ts#L15)
 
 #### Returns
 
@@ -48,7 +48,7 @@ Defined in: [electron/managers/MonitorManager.ts:15](https://github.com/Nick2bad
 
 > **repositories**: `object`
 
-Defined in: [electron/managers/MonitorManager.ts:16](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/MonitorManager.ts#L16)
+Defined in: [electron/managers/MonitorManager.ts:16](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/MonitorManager.ts#L16)
 
 #### history
 
@@ -68,4 +68,4 @@ Defined in: [electron/managers/MonitorManager.ts:16](https://github.com/Nick2bad
 
 > **siteService**: [`SiteService`](../../../services/site/SiteService/classes/SiteService.md)
 
-Defined in: [electron/managers/MonitorManager.ts:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/MonitorManager.ts#L21)
+Defined in: [electron/managers/MonitorManager.ts:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/MonitorManager.ts#L21)

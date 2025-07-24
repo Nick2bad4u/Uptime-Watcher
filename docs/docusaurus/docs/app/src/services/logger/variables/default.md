@@ -2,7 +2,7 @@
 
 > `const` **default**: `object`
 
-Defined in: [src/services/logger.ts:24](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/services/logger.ts#L24)
+Defined in: [src/services/logger.ts:24](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/services/logger.ts#L24)
 
 ## Type declaration
 
@@ -22,7 +22,7 @@ Defined in: [src/services/logger.ts:24](https://github.com/Nick2bad4u/Uptime-Wat
 
 ###### error
 
-`Error`
+[`Error`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)
 
 ##### Returns
 
@@ -92,7 +92,7 @@ Defined in: [src/services/logger.ts:24](https://github.com/Nick2bad4u/Uptime-Wat
 
 ##### error?
 
-`Error`
+[`Error`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)
 
 ##### arguments\_?
 
@@ -194,7 +194,7 @@ Defined in: [src/services/logger.ts:24](https://github.com/Nick2bad4u/Uptime-Wat
 
 ###### error
 
-`string` | `Error`
+`string` | [`Error`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)
 
 ##### Returns
 

@@ -1,8 +1,8 @@
 # Function: performSinglePortCheck()
 
-> **performSinglePortCheck**(`host`, `port`, `timeout`): `Promise`\<[`MonitorCheckResult`](../../../types/interfaces/MonitorCheckResult.md)\>
+> **performSinglePortCheck**(`host`, `port`, `timeout`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`MonitorCheckResult`](../../../types/interfaces/MonitorCheckResult.md)\>
 
-Defined in: [electron/services/monitoring/utils/portChecker.ts:53](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/utils/portChecker.ts#L53)
+Defined in: [electron/services/monitoring/utils/portChecker.ts:53](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/utils/portChecker.ts#L53)
 
 Perform a single port check attempt without retry logic.
 
@@ -28,7 +28,7 @@ Maximum time to wait for connection in milliseconds
 
 ## Returns
 
-`Promise`\<[`MonitorCheckResult`](../../../types/interfaces/MonitorCheckResult.md)\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`MonitorCheckResult`](../../../types/interfaces/MonitorCheckResult.md)\>
 
 Promise resolving to monitor check result with timing information
 

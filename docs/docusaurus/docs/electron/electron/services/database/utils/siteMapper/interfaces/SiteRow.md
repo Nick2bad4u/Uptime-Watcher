@@ -1,6 +1,6 @@
 # Interface: SiteRow
 
-Defined in: [electron/services/database/utils/siteMapper.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/utils/siteMapper.ts#L19)
+Defined in: [electron/services/database/utils/siteMapper.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/siteMapper.ts#L19)
 
 Site type for basic operations (without monitors).
 
@@ -16,7 +16,7 @@ and focuses on core site properties.
 
 > **identifier**: `string`
 
-Defined in: [electron/services/database/utils/siteMapper.ts:24](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/utils/siteMapper.ts#L24)
+Defined in: [electron/services/database/utils/siteMapper.ts:24](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/siteMapper.ts#L24)
 
 Unique identifier for the site (required).
 Must be a non-empty string that serves as the primary key.
@@ -27,7 +27,7 @@ Must be a non-empty string that serves as the primary key.
 
 > `optional` **monitoring**: `boolean`
 
-Defined in: [electron/services/database/utils/siteMapper.ts:30](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/utils/siteMapper.ts#L30)
+Defined in: [electron/services/database/utils/siteMapper.ts:30](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/siteMapper.ts#L30)
 
 Optional monitoring state for the site.
 When true, indicates the site is actively being monitored.
@@ -38,7 +38,7 @@ When true, indicates the site is actively being monitored.
 
 > `optional` **name**: `string`
 
-Defined in: [electron/services/database/utils/siteMapper.ts:36](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/utils/siteMapper.ts#L36)
+Defined in: [electron/services/database/utils/siteMapper.ts:36](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/siteMapper.ts#L36)
 
 Optional human-readable name for the site.
 Used for display purposes in the UI.

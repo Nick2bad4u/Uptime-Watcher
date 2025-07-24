@@ -1,14 +1,14 @@
 # Interface: FileDownloadOptions
 
-Defined in: [src/stores/sites/utils/fileDownload.ts:10](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/sites/utils/fileDownload.ts#L10)
+Defined in: [src/stores/sites/utils/fileDownload.ts:10](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/utils/fileDownload.ts#L10)
 
 ## Properties
 
 ### buffer
 
-> **buffer**: `ArrayBuffer`
+> **buffer**: [`ArrayBuffer`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer)
 
-Defined in: [src/stores/sites/utils/fileDownload.ts:12](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/sites/utils/fileDownload.ts#L12)
+Defined in: [src/stores/sites/utils/fileDownload.ts:12](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/utils/fileDownload.ts#L12)
 
 The file buffer to download
 
@@ -18,7 +18,7 @@ The file buffer to download
 
 > **fileName**: `string`
 
-Defined in: [src/stores/sites/utils/fileDownload.ts:14](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/sites/utils/fileDownload.ts#L14)
+Defined in: [src/stores/sites/utils/fileDownload.ts:14](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/utils/fileDownload.ts#L14)
 
 The filename for the download
 
@@ -28,6 +28,6 @@ The filename for the download
 
 > `optional` **mimeType**: `string`
 
-Defined in: [src/stores/sites/utils/fileDownload.ts:16](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/sites/utils/fileDownload.ts#L16)
+Defined in: [src/stores/sites/utils/fileDownload.ts:16](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/utils/fileDownload.ts#L16)
 
 The MIME type of the file

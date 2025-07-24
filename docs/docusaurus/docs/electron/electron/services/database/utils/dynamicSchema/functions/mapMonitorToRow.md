@@ -1,8 +1,8 @@
 # Function: mapMonitorToRow()
 
-> **mapMonitorToRow**(`monitor`): `Record`\<`string`, `unknown`\>
+> **mapMonitorToRow**(`monitor`): [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `unknown`\>
 
-Defined in: [electron/services/database/utils/dynamicSchema.ts:121](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/utils/dynamicSchema.ts#L121)
+Defined in: [electron/services/database/utils/dynamicSchema.ts:121](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/dynamicSchema.ts#L121)
 
 Map monitor object to database row with dynamic field handling.
 
@@ -10,8 +10,8 @@ Map monitor object to database row with dynamic field handling.
 
 ### monitor
 
-`Record`\<`string`, `unknown`\>
+[`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `unknown`\>
 
 ## Returns
 
-`Record`\<`string`, `unknown`\>
+[`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `unknown`\>

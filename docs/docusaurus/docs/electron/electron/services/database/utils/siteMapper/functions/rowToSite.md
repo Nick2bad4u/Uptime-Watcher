@@ -2,7 +2,7 @@
 
 > **rowToSite**(`row`): [`SiteRow`](../interfaces/SiteRow.md)
 
-Defined in: [electron/services/database/utils/siteMapper.ts:94](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/utils/siteMapper.ts#L94)
+Defined in: [electron/services/database/utils/siteMapper.ts:94](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/siteMapper.ts#L94)
 
 Convert a database row to a Site object (without monitors).
 
@@ -10,7 +10,7 @@ Convert a database row to a Site object (without monitors).
 
 ### row
 
-`Record`\<`string`, `unknown`\>
+[`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `unknown`\>
 
 Raw database row
 

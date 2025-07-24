@@ -1,6 +1,6 @@
 # Class: SiteRepositoryService
 
-Defined in: [electron/utils/database/SiteRepositoryService.ts:117](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/database/SiteRepositoryService.ts#L117)
+Defined in: [electron/utils/database/SiteRepositoryService.ts:117](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/SiteRepositoryService.ts#L117)
 
 **`Beta`**
 
@@ -23,7 +23,7 @@ comprehensive error handling throughout all operations.
 
 > **new SiteRepositoryService**(`config`): `SiteRepositoryService`
 
-Defined in: [electron/utils/database/SiteRepositoryService.ts:137](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/database/SiteRepositoryService.ts#L137)
+Defined in: [electron/utils/database/SiteRepositoryService.ts:137](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/SiteRepositoryService.ts#L137)
 
 **`Beta`**
 
@@ -51,9 +51,9 @@ for proper operation and comprehensive functionality.
 
 ### applyHistoryLimitSetting()
 
-> **applyHistoryLimitSetting**(`monitoringConfig`): `Promise`\<`void`\>
+> **applyHistoryLimitSetting**(`monitoringConfig`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/utils/database/SiteRepositoryService.ts:147](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/database/SiteRepositoryService.ts#L147)
+Defined in: [electron/utils/database/SiteRepositoryService.ts:147](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/SiteRepositoryService.ts#L147)
 
 **`Beta`**
 
@@ -68,15 +68,15 @@ Side effect operation separated from data loading.
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 ***
 
 ### getHistoryLimitSetting()
 
-> **getHistoryLimitSetting**(): `Promise`\<`undefined` \| `number`\>
+> **getHistoryLimitSetting**(): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`undefined` \| `number`\>
 
-Defined in: [electron/utils/database/SiteRepositoryService.ts:159](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/database/SiteRepositoryService.ts#L159)
+Defined in: [electron/utils/database/SiteRepositoryService.ts:159](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/SiteRepositoryService.ts#L159)
 
 **`Beta`**
 
@@ -85,15 +85,15 @@ Pure data operation without side effects.
 
 #### Returns
 
-`Promise`\<`undefined` \| `number`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`undefined` \| `number`\>
 
 ***
 
 ### getSitesFromDatabase()
 
-> **getSitesFromDatabase**(): `Promise`\<[`Site`](../../../../../shared/types/interfaces/Site.md)[]\>
+> **getSitesFromDatabase**(): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Site`](../../../../../shared/types/interfaces/Site.md)[]\>
 
-Defined in: [electron/utils/database/SiteRepositoryService.ts:195](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/database/SiteRepositoryService.ts#L195)
+Defined in: [electron/utils/database/SiteRepositoryService.ts:195](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/SiteRepositoryService.ts#L195)
 
 **`Beta`**
 
@@ -101,7 +101,7 @@ Get sites from database with their monitors and history.
 
 #### Returns
 
-`Promise`\<[`Site`](../../../../../shared/types/interfaces/Site.md)[]\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Site`](../../../../../shared/types/interfaces/Site.md)[]\>
 
 Promise resolving to array of complete site objects
 
@@ -123,9 +123,9 @@ maintaining proper error handling throughout the process.
 
 ### loadSitesIntoCache()
 
-> **loadSitesIntoCache**(`siteCache`): `Promise`\<`void`\>
+> **loadSitesIntoCache**(`siteCache`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/utils/database/SiteRepositoryService.ts:217](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/database/SiteRepositoryService.ts#L217)
+Defined in: [electron/utils/database/SiteRepositoryService.ts:217](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/SiteRepositoryService.ts#L217)
 
 **`Beta`**
 
@@ -140,4 +140,4 @@ Pure data operation that populates the cache.
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>

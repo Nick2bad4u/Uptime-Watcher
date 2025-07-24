@@ -1,6 +1,6 @@
 # Class: TypedEventBus\<EventMap\>
 
-Defined in: [electron/events/TypedEventBus.ts:126](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/TypedEventBus.ts#L126)
+Defined in: [electron/events/TypedEventBus.ts:126](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/events/TypedEventBus.ts#L126)
 
 Enhanced event bus with type safety and middleware support.
 
@@ -12,7 +12,7 @@ processed through a middleware chain before emission.
 
 ## Extends
 
-- `EventEmitter`
+- [`EventEmitter`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/node/events.d.ts#L102)
 
 ## Extended by
 
@@ -22,7 +22,7 @@ processed through a middleware chain before emission.
 
 ### EventMap
 
-`EventMap` *extends* `Record`\<`string`, `unknown`\>
+`EventMap` *extends* [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `unknown`\>
 
 Map of event names to their data types
 
@@ -32,7 +32,7 @@ Map of event names to their data types
 
 > **new TypedEventBus**\<`EventMap`\>(`name?`, `options?`): `TypedEventBus`\<`EventMap`\>
 
-Defined in: [electron/events/TypedEventBus.ts:158](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/TypedEventBus.ts#L158)
+Defined in: [electron/events/TypedEventBus.ts:158](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/events/TypedEventBus.ts#L158)
 
 Create a new typed event bus.
 
@@ -91,7 +91,7 @@ const bus = new TypedEventBus<MyEvents>('my-bus', { maxMiddleware: 30 });
 
 > **clearMiddleware**(): `void`
 
-Defined in: [electron/events/TypedEventBus.ts:181](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/TypedEventBus.ts#L181)
+Defined in: [electron/events/TypedEventBus.ts:181](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/events/TypedEventBus.ts#L181)
 
 Clear all registered middleware.
 
@@ -108,9 +108,9 @@ Events will be emitted directly without middleware processing.
 
 ### emitTyped()
 
-> **emitTyped**\<`K`\>(`event`, `data`): `Promise`\<`void`\>
+> **emitTyped**\<`K`\>(`event`, `data`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/events/TypedEventBus.ts:228](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/TypedEventBus.ts#L228)
+Defined in: [electron/events/TypedEventBus.ts:228](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/events/TypedEventBus.ts#L228)
 
 Emit a typed event through the middleware chain.
 
@@ -136,7 +136,7 @@ The event data (must match the type for this event)
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 #### Throws
 
@@ -183,7 +183,7 @@ await bus.emitTyped('count:updated', 42);
 
 > **getDiagnostics**(): [`EventBusDiagnostics`](../interfaces/EventBusDiagnostics.md)
 
-Defined in: [electron/events/TypedEventBus.ts:264](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/TypedEventBus.ts#L264)
+Defined in: [electron/events/TypedEventBus.ts:264](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/events/TypedEventBus.ts#L264)
 
 Get diagnostic information about the event bus.
 
@@ -204,7 +204,7 @@ Includes listener counts per event, middleware count, and configuration.
 
 > **offTyped**\<`K`\>(`event`, `listener?`): `this`
 
-Defined in: [electron/events/TypedEventBus.ts:291](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/TypedEventBus.ts#L291)
+Defined in: [electron/events/TypedEventBus.ts:291](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/events/TypedEventBus.ts#L291)
 
 Remove typed event listener(s).
 
@@ -244,7 +244,7 @@ If no listener is specified, all listeners for the event are removed.
 
 > **onceTyped**\<`K`\>(`event`, `listener`): `this`
 
-Defined in: [electron/events/TypedEventBus.ts:316](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/TypedEventBus.ts#L316)
+Defined in: [electron/events/TypedEventBus.ts:316](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/events/TypedEventBus.ts#L316)
 
 Register a one-time typed event listener.
 
@@ -284,7 +284,7 @@ The listener is automatically removed after the first time the event is emitted.
 
 > **onTyped**\<`K`\>(`event`, `listener`): `this`
 
-Defined in: [electron/events/TypedEventBus.ts:338](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/TypedEventBus.ts#L338)
+Defined in: [electron/events/TypedEventBus.ts:338](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/events/TypedEventBus.ts#L338)
 
 Register a typed event listener with guaranteed type safety.
 
@@ -325,7 +325,7 @@ TypeScript will enforce that the listener signature matches the event data type.
 
 > **removeMiddleware**(`middleware`): `boolean`
 
-Defined in: [electron/events/TypedEventBus.ts:355](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/TypedEventBus.ts#L355)
+Defined in: [electron/events/TypedEventBus.ts:355](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/events/TypedEventBus.ts#L355)
 
 Remove a specific middleware from the processing chain.
 
@@ -349,7 +349,7 @@ The middleware function to remove
 
 > **use**(`middleware`): `void`
 
-Defined in: [electron/events/TypedEventBus.ts:379](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/TypedEventBus.ts#L379)
+Defined in: [electron/events/TypedEventBus.ts:379](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/events/TypedEventBus.ts#L379)
 
 Register middleware to process events before emission.
 

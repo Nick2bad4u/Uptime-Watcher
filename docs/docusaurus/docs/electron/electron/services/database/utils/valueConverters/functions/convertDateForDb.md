@@ -2,7 +2,7 @@
 
 > **convertDateForDb**(`value`): `null` \| `string`
 
-Defined in: [electron/services/database/utils/valueConverters.ts:120](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/utils/valueConverters.ts#L120)
+Defined in: [electron/services/database/utils/valueConverters.ts:120](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/valueConverters.ts#L120)
 
 Convert a date-like value to ISO string or null for database storage.
 
@@ -12,7 +12,7 @@ Convert a date-like value to ISO string or null for database storage.
 
 The date value to convert (Date object, string, null, or undefined)
 
-`undefined` | `null` | `string` | `Date`
+`undefined` | `null` | `string` | [`Date`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Date)
 
 ## Returns
 

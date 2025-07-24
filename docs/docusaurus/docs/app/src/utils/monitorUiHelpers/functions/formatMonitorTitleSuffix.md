@@ -1,8 +1,8 @@
 # Function: formatMonitorTitleSuffix()
 
-> **formatMonitorTitleSuffix**(`monitorType`, `monitor`): `Promise`\<`string`\>
+> **formatMonitorTitleSuffix**(`monitorType`, `monitor`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`string`\>
 
-Defined in: [src/utils/monitorUiHelpers.ts:92](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/utils/monitorUiHelpers.ts#L92)
+Defined in: [src/utils/monitorUiHelpers.ts:92](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/utils/monitorUiHelpers.ts#L92)
 
 Format title suffix dynamically based on monitor type configuration.
 
@@ -16,13 +16,13 @@ Type of monitor
 
 ### monitor
 
-`Record`\<`string`, `unknown`\>
+[`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `unknown`\>
 
 Monitor data
 
 ## Returns
 
-`Promise`\<`string`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`string`\>
 
 Formatted title suffix string
 

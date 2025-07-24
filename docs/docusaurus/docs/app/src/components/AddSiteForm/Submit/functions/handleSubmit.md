@@ -1,8 +1,8 @@
 # Function: handleSubmit()
 
-> **handleSubmit**(`event`, `properties`): `Promise`\<`void`\>
+> **handleSubmit**(`event`, `properties`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/components/AddSiteForm/Submit.tsx:82](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/AddSiteForm/Submit.tsx#L82)
+Defined in: [src/components/AddSiteForm/Submit.tsx:86](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/Submit.tsx#L86)
 
 Handles form submission for adding sites or monitors.
 
@@ -16,15 +16,19 @@ Performs comprehensive validation based on add mode and monitor type:
 
 ### event
 
-`FormEvent`
+[`FormEvent`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/index.d.ts#L2011)
+
+Form submission event
 
 ### properties
 
-`FormSubmitProperties`
+[`FormSubmitProperties`](../type-aliases/FormSubmitProperties.md)
+
+Form state, actions, and dependencies
 
 ## Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 Promise that resolves when submission is complete
 

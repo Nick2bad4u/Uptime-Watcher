@@ -1,13 +1,13 @@
 # Class: ValidationError
 
-Defined in: [electron/utils/correlation.ts:15](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/correlation.ts#L15)
+Defined in: [electron/utils/correlation.ts:15](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/correlation.ts#L15)
 
 Validation error class for business rule violations.
 Extends Error with additional validation context.
 
 ## Extends
 
-- `Error`
+- [`Error`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)
 
 ## Constructors
 
@@ -15,7 +15,7 @@ Extends Error with additional validation context.
 
 > **new ValidationError**(`errors`): `ValidationError`
 
-Defined in: [electron/utils/correlation.ts:16](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/correlation.ts#L16)
+Defined in: [electron/utils/correlation.ts:16](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/correlation.ts#L16)
 
 #### Parameters
 
@@ -37,4 +37,4 @@ Defined in: [electron/utils/correlation.ts:16](https://github.com/Nick2bad4u/Upt
 
 > **errors**: `string`[]
 
-Defined in: [electron/utils/correlation.ts:16](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/correlation.ts#L16)
+Defined in: [electron/utils/correlation.ts:16](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/correlation.ts#L16)

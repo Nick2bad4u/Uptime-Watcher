@@ -1,8 +1,8 @@
 # Function: useSiteStats()
 
-> **useSiteStats**(`history`): `SiteStats`
+> **useSiteStats**(`history`): [`SiteStats`](../interfaces/SiteStats.md)
 
-Defined in: [src/hooks/site/useSiteStats.ts:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/hooks/site/useSiteStats.ts#L23)
+Defined in: [src/hooks/site/useSiteStats.ts:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSiteStats.ts#L28)
 
 Custom hook to calculate statistics based on a monitor's history
 
@@ -16,6 +16,6 @@ Array of status history records
 
 ## Returns
 
-`SiteStats`
+[`SiteStats`](../interfaces/SiteStats.md)
 
 Object containing calculated statistics (uptime, checkCount, averageResponseTime)

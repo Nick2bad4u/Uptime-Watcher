@@ -1,8 +1,8 @@
 # Function: HistoryTab()
 
-> **HistoryTab**(`props`): `Element`
+> **HistoryTab**(`props`): [`Element`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/jsx-runtime.d.ts#L6)
 
-Defined in: [src/components/SiteDetails/tabs/HistoryTab.tsx:60](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/SiteDetails/tabs/HistoryTab.tsx#L60)
+Defined in: [src/components/SiteDetails/tabs/HistoryTab.tsx:62](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/SiteDetails/tabs/HistoryTab.tsx#L62)
 
 History tab component displaying paginated monitor check history.
 
@@ -17,12 +17,12 @@ Features:
 
 ### props
 
-`HistoryTabProperties`
+[`HistoryTabProperties`](../interfaces/HistoryTabProperties.md)
 
 Component props containing formatting functions and monitor data
 
 ## Returns
 
-`Element`
+[`Element`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/jsx-runtime.d.ts#L6)
 
 JSX element displaying history interface

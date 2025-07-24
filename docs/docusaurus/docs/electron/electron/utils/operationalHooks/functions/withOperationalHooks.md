@@ -1,8 +1,8 @@
 # Function: withOperationalHooks()
 
-> **withOperationalHooks**\<`T`\>(`operation`, `config`): `Promise`\<`T`\>
+> **withOperationalHooks**\<`T`\>(`operation`, `config`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`T`\>
 
-Defined in: [electron/utils/operationalHooks.ts:98](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/operationalHooks.ts#L98)
+Defined in: [electron/utils/operationalHooks.ts:98](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/operationalHooks.ts#L98)
 
 Wraps an async operation with retry logic, error handling, and event emission.
 
@@ -16,7 +16,7 @@ Wraps an async operation with retry logic, error handling, and event emission.
 
 ### operation
 
-() => `Promise`\<`T`\>
+() => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`T`\>
 
 ### config
 
@@ -24,4 +24,4 @@ Wraps an async operation with retry logic, error handling, and event emission.
 
 ## Returns
 
-`Promise`\<`T`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`T`\>

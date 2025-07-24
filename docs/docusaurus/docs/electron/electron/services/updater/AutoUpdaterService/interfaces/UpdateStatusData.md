@@ -1,6 +1,6 @@
 # Interface: UpdateStatusData
 
-Defined in: [electron/services/updater/AutoUpdaterService.ts:18](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/updater/AutoUpdaterService.ts#L18)
+Defined in: [electron/services/updater/AutoUpdaterService.ts:18](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/updater/AutoUpdaterService.ts#L18)
 
 Data structure for update status information.
 
@@ -10,7 +10,7 @@ Data structure for update status information.
 
 > `optional` **error**: `string`
 
-Defined in: [electron/services/updater/AutoUpdaterService.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/updater/AutoUpdaterService.ts#L19)
+Defined in: [electron/services/updater/AutoUpdaterService.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/updater/AutoUpdaterService.ts#L19)
 
 ***
 
@@ -18,4 +18,4 @@ Defined in: [electron/services/updater/AutoUpdaterService.ts:19](https://github.
 
 > **status**: [`UpdateStatus`](../type-aliases/UpdateStatus.md)
 
-Defined in: [electron/services/updater/AutoUpdaterService.ts:20](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/updater/AutoUpdaterService.ts#L20)
+Defined in: [electron/services/updater/AutoUpdaterService.ts:20](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/updater/AutoUpdaterService.ts#L20)

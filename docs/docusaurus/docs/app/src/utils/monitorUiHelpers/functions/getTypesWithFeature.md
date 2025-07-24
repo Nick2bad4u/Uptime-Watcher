@@ -1,8 +1,8 @@
 # Function: getTypesWithFeature()
 
-> **getTypesWithFeature**(`feature`): `Promise`\<(`"http"` \| `"port"`)[]\>
+> **getTypesWithFeature**(`feature`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<(`"http"` \| `"port"`)[]\>
 
-Defined in: [src/utils/monitorUiHelpers.ts:160](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/utils/monitorUiHelpers.ts#L160)
+Defined in: [src/utils/monitorUiHelpers.ts:160](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/utils/monitorUiHelpers.ts#L160)
 
 Get available monitor types that support a specific feature.
 
@@ -16,6 +16,6 @@ Feature to check for ('responseTime' | 'advancedAnalytics')
 
 ## Returns
 
-`Promise`\<(`"http"` \| `"port"`)[]\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<(`"http"` \| `"port"`)[]\>
 
 Array of monitor types that support the feature

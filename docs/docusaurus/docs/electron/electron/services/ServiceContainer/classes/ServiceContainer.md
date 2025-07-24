@@ -1,6 +1,6 @@
 # Class: ServiceContainer
 
-Defined in: [electron/services/ServiceContainer.ts:83](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/ServiceContainer.ts#L83)
+Defined in: [electron/services/ServiceContainer.ts:83](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/ServiceContainer.ts#L83)
 
 Centralized service container for dependency management.
 
@@ -10,7 +10,7 @@ Centralized service container for dependency management.
 
 > **getAutoUpdaterService**(): [`AutoUpdaterService`](../../updater/AutoUpdaterService/classes/AutoUpdaterService.md)
 
-Defined in: [electron/services/ServiceContainer.ts:158](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/ServiceContainer.ts#L158)
+Defined in: [electron/services/ServiceContainer.ts:158](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/ServiceContainer.ts#L158)
 
 #### Returns
 
@@ -22,7 +22,7 @@ Defined in: [electron/services/ServiceContainer.ts:158](https://github.com/Nick2
 
 > **getConfigurationManager**(): [`ConfigurationManager`](../../../managers/ConfigurationManager/classes/ConfigurationManager.md)
 
-Defined in: [electron/services/ServiceContainer.ts:169](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/ServiceContainer.ts#L169)
+Defined in: [electron/services/ServiceContainer.ts:169](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/ServiceContainer.ts#L169)
 
 #### Returns
 
@@ -34,7 +34,7 @@ Defined in: [electron/services/ServiceContainer.ts:169](https://github.com/Nick2
 
 > **getDatabaseManager**(): [`DatabaseManager`](../../../managers/DatabaseManager/classes/DatabaseManager.md)
 
-Defined in: [electron/services/ServiceContainer.ts:179](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/ServiceContainer.ts#L179)
+Defined in: [electron/services/ServiceContainer.ts:179](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/ServiceContainer.ts#L179)
 
 #### Returns
 
@@ -46,7 +46,7 @@ Defined in: [electron/services/ServiceContainer.ts:179](https://github.com/Nick2
 
 > **getDatabaseService**(): [`DatabaseService`](../../database/DatabaseService/classes/DatabaseService.md)
 
-Defined in: [electron/services/ServiceContainer.ts:203](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/ServiceContainer.ts#L203)
+Defined in: [electron/services/ServiceContainer.ts:203](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/ServiceContainer.ts#L203)
 
 #### Returns
 
@@ -58,7 +58,7 @@ Defined in: [electron/services/ServiceContainer.ts:203](https://github.com/Nick2
 
 > **getHistoryRepository**(): [`HistoryRepository`](../../database/HistoryRepository/classes/HistoryRepository.md)
 
-Defined in: [electron/services/ServiceContainer.ts:209](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/ServiceContainer.ts#L209)
+Defined in: [electron/services/ServiceContainer.ts:209](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/ServiceContainer.ts#L209)
 
 #### Returns
 
@@ -68,15 +68,15 @@ Defined in: [electron/services/ServiceContainer.ts:209](https://github.com/Nick2
 
 ### getInitializationStatus()
 
-> **getInitializationStatus**(): `Record`\<`string`, `boolean`\>
+> **getInitializationStatus**(): [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `boolean`\>
 
-Defined in: [electron/services/ServiceContainer.ts:226](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/ServiceContainer.ts#L226)
+Defined in: [electron/services/ServiceContainer.ts:226](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/ServiceContainer.ts#L226)
 
 Get initialization status summary for debugging.
 
 #### Returns
 
-`Record`\<`string`, `boolean`\>
+[`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `boolean`\>
 
 Object with service names and their initialization status
 
@@ -86,7 +86,7 @@ Object with service names and their initialization status
 
 > **getInitializedServices**(): `object`[]
 
-Defined in: [electron/services/ServiceContainer.ts:258](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/ServiceContainer.ts#L258)
+Defined in: [electron/services/ServiceContainer.ts:258](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/ServiceContainer.ts#L258)
 
 Get all initialized services for shutdown and debugging.
 
@@ -110,7 +110,7 @@ Useful for shutdown procedures, health checks, and debugging.
 
 > **getIpcService**(): [`IpcService`](../../ipc/IpcService/classes/IpcService.md)
 
-Defined in: [electron/services/ServiceContainer.ts:290](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/ServiceContainer.ts#L290)
+Defined in: [electron/services/ServiceContainer.ts:290](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/ServiceContainer.ts#L290)
 
 #### Returns
 
@@ -122,7 +122,7 @@ Defined in: [electron/services/ServiceContainer.ts:290](https://github.com/Nick2
 
 > **getMonitorManager**(): [`MonitorManager`](../../../managers/MonitorManager/classes/MonitorManager.md)
 
-Defined in: [electron/services/ServiceContainer.ts:304](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/ServiceContainer.ts#L304)
+Defined in: [electron/services/ServiceContainer.ts:304](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/ServiceContainer.ts#L304)
 
 #### Returns
 
@@ -134,7 +134,7 @@ Defined in: [electron/services/ServiceContainer.ts:304](https://github.com/Nick2
 
 > **getMonitorRepository**(): [`MonitorRepository`](../../database/MonitorRepository/classes/MonitorRepository.md)
 
-Defined in: [electron/services/ServiceContainer.ts:346](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/ServiceContainer.ts#L346)
+Defined in: [electron/services/ServiceContainer.ts:346](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/ServiceContainer.ts#L346)
 
 #### Returns
 
@@ -146,7 +146,7 @@ Defined in: [electron/services/ServiceContainer.ts:346](https://github.com/Nick2
 
 > **getNotificationService**(): [`NotificationService`](../../notifications/NotificationService/classes/NotificationService.md)
 
-Defined in: [electron/services/ServiceContainer.ts:358](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/ServiceContainer.ts#L358)
+Defined in: [electron/services/ServiceContainer.ts:358](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/ServiceContainer.ts#L358)
 
 #### Returns
 
@@ -158,7 +158,7 @@ Defined in: [electron/services/ServiceContainer.ts:358](https://github.com/Nick2
 
 > **getSettingsRepository**(): [`SettingsRepository`](../../database/SettingsRepository/classes/SettingsRepository.md)
 
-Defined in: [electron/services/ServiceContainer.ts:368](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/ServiceContainer.ts#L368)
+Defined in: [electron/services/ServiceContainer.ts:368](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/ServiceContainer.ts#L368)
 
 #### Returns
 
@@ -170,7 +170,7 @@ Defined in: [electron/services/ServiceContainer.ts:368](https://github.com/Nick2
 
 > **getSiteManager**(): [`SiteManager`](../../../managers/SiteManager/classes/SiteManager.md)
 
-Defined in: [electron/services/ServiceContainer.ts:380](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/ServiceContainer.ts#L380)
+Defined in: [electron/services/ServiceContainer.ts:380](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/ServiceContainer.ts#L380)
 
 #### Returns
 
@@ -182,7 +182,7 @@ Defined in: [electron/services/ServiceContainer.ts:380](https://github.com/Nick2
 
 > **getSiteRepository**(): [`SiteRepository`](../../database/SiteRepository/classes/SiteRepository.md)
 
-Defined in: [electron/services/ServiceContainer.ts:449](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/ServiceContainer.ts#L449)
+Defined in: [electron/services/ServiceContainer.ts:449](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/ServiceContainer.ts#L449)
 
 #### Returns
 
@@ -194,7 +194,7 @@ Defined in: [electron/services/ServiceContainer.ts:449](https://github.com/Nick2
 
 > **getSiteService**(): [`SiteService`](../../site/SiteService/classes/SiteService.md)
 
-Defined in: [electron/services/ServiceContainer.ts:461](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/ServiceContainer.ts#L461)
+Defined in: [electron/services/ServiceContainer.ts:461](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/ServiceContainer.ts#L461)
 
 #### Returns
 
@@ -206,7 +206,7 @@ Defined in: [electron/services/ServiceContainer.ts:461](https://github.com/Nick2
 
 > **getUptimeOrchestrator**(): [`UptimeOrchestrator`](../../../UptimeOrchestrator/classes/UptimeOrchestrator.md)
 
-Defined in: [electron/services/ServiceContainer.ts:477](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/ServiceContainer.ts#L477)
+Defined in: [electron/services/ServiceContainer.ts:477](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/ServiceContainer.ts#L477)
 
 #### Returns
 
@@ -218,7 +218,7 @@ Defined in: [electron/services/ServiceContainer.ts:477](https://github.com/Nick2
 
 > **getWindowService**(): [`WindowService`](../../window/WindowService/classes/WindowService.md)
 
-Defined in: [electron/services/ServiceContainer.ts:493](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/ServiceContainer.ts#L493)
+Defined in: [electron/services/ServiceContainer.ts:493](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/ServiceContainer.ts#L493)
 
 #### Returns
 
@@ -228,15 +228,15 @@ Defined in: [electron/services/ServiceContainer.ts:493](https://github.com/Nick2
 
 ### initialize()
 
-> **initialize**(): `Promise`\<`void`\>
+> **initialize**(): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/services/ServiceContainer.ts:506](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/ServiceContainer.ts#L506)
+Defined in: [electron/services/ServiceContainer.ts:506](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/ServiceContainer.ts#L506)
 
 Initialize all services in the correct order.
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 ***
 
@@ -244,7 +244,7 @@ Initialize all services in the correct order.
 
 > `static` **getInstance**(`config?`): `ServiceContainer`
 
-Defined in: [electron/services/ServiceContainer.ts:126](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/ServiceContainer.ts#L126)
+Defined in: [electron/services/ServiceContainer.ts:126](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/ServiceContainer.ts#L126)
 
 Get the singleton service container instance.
 
@@ -264,7 +264,9 @@ Get the singleton service container instance.
 
 > `static` **resetForTesting**(): `void`
 
-Defined in: [electron/services/ServiceContainer.ts:154](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/ServiceContainer.ts#L154)
+Defined in: [electron/services/ServiceContainer.ts:154](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/ServiceContainer.ts#L154)
+
+**`Internal`**
 
 Reset the singleton container for testing purposes.
 
@@ -290,5 +292,3 @@ const container = ServiceContainer.getInstance({ enableDebugLogging: true });
 - Does not clean up existing service instances
 - Does not close database connections or cleanup resources
 - Call cleanup methods on services before reset if needed
-
-#### Testonly

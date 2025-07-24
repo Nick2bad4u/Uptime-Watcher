@@ -1,15 +1,15 @@
 # Function: MiniChartBar()
 
-> **MiniChartBar**(`__namedParameters`): `Element`
+> **MiniChartBar**(`__namedParameters`): [`Element`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/jsx-runtime.d.ts#L6)
 
-Defined in: [src/theme/components.tsx:219](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/components.tsx#L219)
+Defined in: [src/theme/components.tsx:297](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/components.tsx#L297)
 
 ## Parameters
 
 ### \_\_namedParameters
 
-`MiniChartBarProperties`
+[`MiniChartBarProperties`](../interfaces/MiniChartBarProperties.md)
 
 ## Returns
 
-`Element`
+[`Element`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/jsx-runtime.d.ts#L6)

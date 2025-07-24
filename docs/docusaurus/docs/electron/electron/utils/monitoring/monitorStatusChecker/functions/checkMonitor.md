@@ -1,8 +1,8 @@
 # Function: checkMonitor()
 
-> **checkMonitor**(`config`, `site`, `monitorId`, `isManualCheck`): `Promise`\<`undefined` \| [`StatusUpdate`](../../../../../shared/types/interfaces/StatusUpdate.md)\>
+> **checkMonitor**(`config`, `site`, `monitorId`, `isManualCheck`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`undefined` \| [`StatusUpdate`](../../../../../shared/types/interfaces/StatusUpdate.md)\>
 
-Defined in: [electron/utils/monitoring/monitorStatusChecker.ts:115](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/monitoring/monitorStatusChecker.ts#L115)
+Defined in: [electron/utils/monitoring/monitorStatusChecker.ts:115](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/monitoring/monitorStatusChecker.ts#L115)
 
 **`Alpha`**
 
@@ -36,7 +36,7 @@ Whether this is a manual check (preserves paused state)
 
 ## Returns
 
-`Promise`\<`undefined` \| [`StatusUpdate`](../../../../../shared/types/interfaces/StatusUpdate.md)\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`undefined` \| [`StatusUpdate`](../../../../../shared/types/interfaces/StatusUpdate.md)\>
 
 Promise resolving to status update result or undefined if error occurs
 

@@ -1,6 +1,6 @@
 # Class: HistoryRepository
 
-Defined in: [electron/services/database/HistoryRepository.ts:24](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/HistoryRepository.ts#L24)
+Defined in: [electron/services/database/HistoryRepository.ts:24](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/HistoryRepository.ts#L24)
 
 ## Constructors
 
@@ -8,7 +8,7 @@ Defined in: [electron/services/database/HistoryRepository.ts:24](https://github.
 
 > **new HistoryRepository**(`dependencies`): `HistoryRepository`
 
-Defined in: [electron/services/database/HistoryRepository.ts:27](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/HistoryRepository.ts#L27)
+Defined in: [electron/services/database/HistoryRepository.ts:27](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/HistoryRepository.ts#L27)
 
 #### Parameters
 
@@ -24,9 +24,9 @@ Defined in: [electron/services/database/HistoryRepository.ts:27](https://github.
 
 ### addEntry()
 
-> **addEntry**(`monitorId`, `entry`, `details?`): `Promise`\<`void`\>
+> **addEntry**(`monitorId`, `entry`, `details?`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/services/database/HistoryRepository.ts:34](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/HistoryRepository.ts#L34)
+Defined in: [electron/services/database/HistoryRepository.ts:34](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/HistoryRepository.ts#L34)
 
 Add a new history entry for a monitor.
 
@@ -46,7 +46,7 @@ Add a new history entry for a monitor.
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 ***
 
@@ -54,7 +54,7 @@ Add a new history entry for a monitor.
 
 > **addEntryInternal**(`db`, `monitorId`, `entry`, `details?`): `void`
 
-Defined in: [electron/services/database/HistoryRepository.ts:52](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/HistoryRepository.ts#L52)
+Defined in: [electron/services/database/HistoryRepository.ts:52](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/HistoryRepository.ts#L52)
 
 Internal method to add a new history entry for a monitor within an existing transaction.
 Use this method when you're already within a transaction context.
@@ -85,9 +85,9 @@ Use this method when you're already within a transaction context.
 
 ### bulkInsert()
 
-> **bulkInsert**(`monitorId`, `historyEntries`): `Promise`\<`void`\>
+> **bulkInsert**(`monitorId`, `historyEntries`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/services/database/HistoryRepository.ts:59](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/HistoryRepository.ts#L59)
+Defined in: [electron/services/database/HistoryRepository.ts:59](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/HistoryRepository.ts#L59)
 
 Bulk insert history entries (for import functionality).
 
@@ -103,21 +103,21 @@ Bulk insert history entries (for import functionality).
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 ***
 
 ### deleteAll()
 
-> **deleteAll**(): `Promise`\<`void`\>
+> **deleteAll**(): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/services/database/HistoryRepository.ts:109](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/HistoryRepository.ts#L109)
+Defined in: [electron/services/database/HistoryRepository.ts:109](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/HistoryRepository.ts#L109)
 
 Clear all history from the database.
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 #### Remarks
 
@@ -130,7 +130,7 @@ Now properly wrapped in transaction for data safety and error handling.
 
 > **deleteAllInternal**(`db`): `void`
 
-Defined in: [electron/services/database/HistoryRepository.ts:128](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/HistoryRepository.ts#L128)
+Defined in: [electron/services/database/HistoryRepository.ts:128](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/HistoryRepository.ts#L128)
 
 Internal method to clear all history from the database within an existing transaction.
 
@@ -156,9 +156,9 @@ delegated to the calling transaction context.
 
 ### deleteByMonitorId()
 
-> **deleteByMonitorId**(`monitorId`): `Promise`\<`void`\>
+> **deleteByMonitorId**(`monitorId`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/services/database/HistoryRepository.ts:135](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/HistoryRepository.ts#L135)
+Defined in: [electron/services/database/HistoryRepository.ts:135](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/HistoryRepository.ts#L135)
 
 Delete history entries for a specific monitor.
 
@@ -170,7 +170,7 @@ Delete history entries for a specific monitor.
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 ***
 
@@ -178,7 +178,7 @@ Delete history entries for a specific monitor.
 
 > **deleteByMonitorIdInternal**(`db`, `monitorId`): `void`
 
-Defined in: [electron/services/database/HistoryRepository.ts:153](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/HistoryRepository.ts#L153)
+Defined in: [electron/services/database/HistoryRepository.ts:153](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/HistoryRepository.ts#L153)
 
 Internal method to delete history entries for a specific monitor within an existing transaction.
 Use this method when you're already within a transaction context.
@@ -201,9 +201,9 @@ Use this method when you're already within a transaction context.
 
 ### findByMonitorId()
 
-> **findByMonitorId**(`monitorId`): `Promise`\<[`StatusHistory`](../../../../../shared/types/interfaces/StatusHistory.md)[]\>
+> **findByMonitorId**(`monitorId`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`StatusHistory`](../../../../../shared/types/interfaces/StatusHistory.md)[]\>
 
-Defined in: [electron/services/database/HistoryRepository.ts:160](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/HistoryRepository.ts#L160)
+Defined in: [electron/services/database/HistoryRepository.ts:160](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/HistoryRepository.ts#L160)
 
 Find all history entries for a specific monitor.
 
@@ -215,15 +215,15 @@ Find all history entries for a specific monitor.
 
 #### Returns
 
-`Promise`\<[`StatusHistory`](../../../../../shared/types/interfaces/StatusHistory.md)[]\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`StatusHistory`](../../../../../shared/types/interfaces/StatusHistory.md)[]\>
 
 ***
 
 ### getHistoryCount()
 
-> **getHistoryCount**(`monitorId`): `Promise`\<`number`\>
+> **getHistoryCount**(`monitorId`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`number`\>
 
-Defined in: [electron/services/database/HistoryRepository.ts:177](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/HistoryRepository.ts#L177)
+Defined in: [electron/services/database/HistoryRepository.ts:177](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/HistoryRepository.ts#L177)
 
 Get the count of history entries for a monitor.
 
@@ -237,7 +237,7 @@ Unique identifier for the monitor
 
 #### Returns
 
-`Promise`\<`number`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`number`\>
 
 Promise resolving to the number of history entries
 
@@ -252,7 +252,7 @@ Wrapped in withDatabaseOperation for proper error recovery.
 
 > **getHistoryCountInternal**(`db`, `monitorId`): `number`
 
-Defined in: [electron/services/database/HistoryRepository.ts:200](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/HistoryRepository.ts#L200)
+Defined in: [electron/services/database/HistoryRepository.ts:200](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/HistoryRepository.ts#L200)
 
 Get the count of history entries for a monitor (internal version for use within transactions).
 
@@ -285,9 +285,9 @@ Provides synchronous access for use in transaction-wrapped operations.
 
 ### getLatestEntry()
 
-> **getLatestEntry**(`monitorId`): `Promise`\<`undefined` \| [`StatusHistory`](../../../../../shared/types/interfaces/StatusHistory.md)\>
+> **getLatestEntry**(`monitorId`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`undefined` \| [`StatusHistory`](../../../../../shared/types/interfaces/StatusHistory.md)\>
 
-Defined in: [electron/services/database/HistoryRepository.ts:214](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/HistoryRepository.ts#L214)
+Defined in: [electron/services/database/HistoryRepository.ts:214](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/HistoryRepository.ts#L214)
 
 Get the most recent history entry for a monitor.
 
@@ -301,7 +301,7 @@ Unique identifier for the monitor
 
 #### Returns
 
-`Promise`\<`undefined` \| [`StatusHistory`](../../../../../shared/types/interfaces/StatusHistory.md)\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`undefined` \| [`StatusHistory`](../../../../../shared/types/interfaces/StatusHistory.md)\>
 
 Promise resolving to the latest history entry, or undefined if none exists
 
@@ -314,9 +314,9 @@ Wrapped in withDatabaseOperation for proper error recovery.
 
 ### pruneAllHistory()
 
-> **pruneAllHistory**(`limit`): `Promise`\<`void`\>
+> **pruneAllHistory**(`limit`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/services/database/HistoryRepository.ts:229](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/HistoryRepository.ts#L229)
+Defined in: [electron/services/database/HistoryRepository.ts:229](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/HistoryRepository.ts#L229)
 
 Prune old history entries for all monitors.
 
@@ -328,7 +328,7 @@ Prune old history entries for all monitors.
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 ***
 
@@ -336,7 +336,7 @@ Prune old history entries for all monitors.
 
 > **pruneAllHistoryInternal**(`db`, `limit`): `void`
 
-Defined in: [electron/services/database/HistoryRepository.ts:262](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/HistoryRepository.ts#L262)
+Defined in: [electron/services/database/HistoryRepository.ts:262](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/HistoryRepository.ts#L262)
 
 Internal method to prune old history entries for all monitors within an existing transaction.
 Use this method when you're already within a transaction context.
@@ -359,9 +359,9 @@ Use this method when you're already within a transaction context.
 
 ### pruneHistory()
 
-> **pruneHistory**(`monitorId`, `limit`): `Promise`\<`void`\>
+> **pruneHistory**(`monitorId`, `limit`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/services/database/HistoryRepository.ts:283](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/HistoryRepository.ts#L283)
+Defined in: [electron/services/database/HistoryRepository.ts:283](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/HistoryRepository.ts#L283)
 
 Prune old history entries for a monitor, keeping only the most recent entries.
 
@@ -377,7 +377,7 @@ Prune old history entries for a monitor, keeping only the most recent entries.
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 ***
 
@@ -385,7 +385,7 @@ Prune old history entries for a monitor, keeping only the most recent entries.
 
 > **pruneHistoryInternal**(`db`, `monitorId`, `limit`): `void`
 
-Defined in: [electron/services/database/HistoryRepository.ts:300](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/HistoryRepository.ts#L300)
+Defined in: [electron/services/database/HistoryRepository.ts:300](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/HistoryRepository.ts#L300)
 
 Internal method to prune old history entries for a specific monitor within an existing transaction.
 Use this method when you're already within a transaction context.

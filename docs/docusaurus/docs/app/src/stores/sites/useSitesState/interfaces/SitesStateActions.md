@@ -1,6 +1,6 @@
 # Interface: SitesStateActions
 
-Defined in: [src/stores/sites/useSitesState.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/sites/useSitesState.ts#L19)
+Defined in: [src/stores/sites/useSitesState.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/useSitesState.ts#L19)
 
 ## Properties
 
@@ -8,7 +8,7 @@ Defined in: [src/stores/sites/useSitesState.ts:19](https://github.com/Nick2bad4u
 
 > **addSite**: (`site`) => `void`
 
-Defined in: [src/stores/sites/useSitesState.ts:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/sites/useSitesState.ts#L21)
+Defined in: [src/stores/sites/useSitesState.ts:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/useSitesState.ts#L21)
 
 Add a site to the store
 
@@ -28,7 +28,7 @@ Add a site to the store
 
 > **getSelectedMonitorId**: (`siteId`) => `undefined` \| `string`
 
-Defined in: [src/stores/sites/useSitesState.ts:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/sites/useSitesState.ts#L23)
+Defined in: [src/stores/sites/useSitesState.ts:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/useSitesState.ts#L23)
 
 Get selected monitor ID for a site
 
@@ -48,7 +48,7 @@ Get selected monitor ID for a site
 
 > **getSelectedSite**: () => `undefined` \| [`Site`](../../../../../shared/types/interfaces/Site.md)
 
-Defined in: [src/stores/sites/useSitesState.ts:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/sites/useSitesState.ts#L25)
+Defined in: [src/stores/sites/useSitesState.ts:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/useSitesState.ts#L25)
 
 Get the currently selected site
 
@@ -62,7 +62,7 @@ Get the currently selected site
 
 > **removeSite**: (`identifier`) => `void`
 
-Defined in: [src/stores/sites/useSitesState.ts:27](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/sites/useSitesState.ts#L27)
+Defined in: [src/stores/sites/useSitesState.ts:27](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/useSitesState.ts#L27)
 
 Remove a site from the store
 
@@ -82,7 +82,7 @@ Remove a site from the store
 
 > **setSelectedMonitorId**: (`siteId`, `monitorId`) => `void`
 
-Defined in: [src/stores/sites/useSitesState.ts:29](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/sites/useSitesState.ts#L29)
+Defined in: [src/stores/sites/useSitesState.ts:29](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/useSitesState.ts#L29)
 
 Set selected monitor ID for a site
 
@@ -106,7 +106,7 @@ Set selected monitor ID for a site
 
 > **setSelectedSite**: (`site`) => `void`
 
-Defined in: [src/stores/sites/useSitesState.ts:31](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/sites/useSitesState.ts#L31)
+Defined in: [src/stores/sites/useSitesState.ts:31](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/useSitesState.ts#L31)
 
 Set selected site
 
@@ -126,7 +126,7 @@ Set selected site
 
 > **setSites**: (`sites`) => `void`
 
-Defined in: [src/stores/sites/useSitesState.ts:33](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/sites/useSitesState.ts#L33)
+Defined in: [src/stores/sites/useSitesState.ts:33](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/useSitesState.ts#L33)
 
 Set sites data
 

@@ -2,7 +2,7 @@
 
 > **rowToHistoryEntryOrUndefined**(`row`): `undefined` \| [`StatusHistory`](../../../../../../shared/types/interfaces/StatusHistory.md)
 
-Defined in: [electron/services/database/utils/historyMapper.ts:126](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/utils/historyMapper.ts#L126)
+Defined in: [electron/services/database/utils/historyMapper.ts:126](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/historyMapper.ts#L126)
 
 Convert database row to history entry or return undefined if not found.
 
@@ -12,7 +12,7 @@ Convert database row to history entry or return undefined if not found.
 
 Database row data or undefined
 
-`undefined` | `Record`\<`string`, `unknown`\>
+`undefined` | [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `unknown`\>
 
 ## Returns
 

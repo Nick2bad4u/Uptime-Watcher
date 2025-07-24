@@ -1,6 +1,6 @@
 # Interface: IMonitorService
 
-Defined in: [electron/services/monitoring/types.ts:53](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/types.ts#L53)
+Defined in: [electron/services/monitoring/types.ts:53](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/types.ts#L53)
 
 Interface for monitor services that perform health checks.
 
@@ -13,9 +13,9 @@ consistent behavior across different monitoring types (HTTP, port, etc.).
 
 ### check()
 
-> **check**(`monitor`): `Promise`\<[`MonitorCheckResult`](MonitorCheckResult.md)\>
+> **check**(`monitor`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`MonitorCheckResult`](MonitorCheckResult.md)\>
 
-Defined in: [electron/services/monitoring/types.ts:67](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/types.ts#L67)
+Defined in: [electron/services/monitoring/types.ts:67](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/types.ts#L67)
 
 Perform a health check on a monitor.
 
@@ -29,7 +29,7 @@ The monitor configuration to check
 
 #### Returns
 
-`Promise`\<[`MonitorCheckResult`](MonitorCheckResult.md)\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`MonitorCheckResult`](MonitorCheckResult.md)\>
 
 Promise resolving to the check result
 
@@ -49,7 +49,7 @@ unless the monitor configuration itself is invalid.
 
 > **getType**(): `"http"` \| `"port"`
 
-Defined in: [electron/services/monitoring/types.ts:78](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/types.ts#L78)
+Defined in: [electron/services/monitoring/types.ts:78](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/types.ts#L78)
 
 Get the type of monitor this service handles.
 
@@ -70,7 +70,7 @@ Must match one of the values in the monitor's `type` field.
 
 > **updateConfig**(`config`): `void`
 
-Defined in: [electron/services/monitoring/types.ts:89](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/types.ts#L89)
+Defined in: [electron/services/monitoring/types.ts:89](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/types.ts#L89)
 
 Update the configuration for this monitor service.
 
@@ -78,7 +78,7 @@ Update the configuration for this monitor service.
 
 ##### config
 
-`Partial`\<[`MonitorConfig`](MonitorConfig.md)\>
+[`Partial`](https://www.typescriptlang.org/docs/handbook/utility-types.html#partialtype)\<[`MonitorConfig`](MonitorConfig.md)\>
 
 Partial configuration to update
 

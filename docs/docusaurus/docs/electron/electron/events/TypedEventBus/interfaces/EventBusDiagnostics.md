@@ -1,6 +1,6 @@
 # Interface: EventBusDiagnostics
 
-Defined in: [electron/events/TypedEventBus.ts:40](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/TypedEventBus.ts#L40)
+Defined in: [electron/events/TypedEventBus.ts:40](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/events/TypedEventBus.ts#L40)
 
 Diagnostic information about an event bus instance.
 
@@ -15,7 +15,7 @@ Useful for debugging, monitoring, and performance analysis.
 
 > **busId**: `string`
 
-Defined in: [electron/events/TypedEventBus.ts:42](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/TypedEventBus.ts#L42)
+Defined in: [electron/events/TypedEventBus.ts:42](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/events/TypedEventBus.ts#L42)
 
 Unique identifier for this event bus instance
 
@@ -23,9 +23,9 @@ Unique identifier for this event bus instance
 
 ### listenerCounts
 
-> **listenerCounts**: `Record`\<`string`, `number`\>
+> **listenerCounts**: [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `number`\>
 
-Defined in: [electron/events/TypedEventBus.ts:44](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/TypedEventBus.ts#L44)
+Defined in: [electron/events/TypedEventBus.ts:44](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/events/TypedEventBus.ts#L44)
 
 Number of listeners registered for each event
 
@@ -35,7 +35,7 @@ Number of listeners registered for each event
 
 > **maxListeners**: `number`
 
-Defined in: [electron/events/TypedEventBus.ts:46](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/TypedEventBus.ts#L46)
+Defined in: [electron/events/TypedEventBus.ts:46](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/events/TypedEventBus.ts#L46)
 
 Maximum number of listeners allowed per event
 
@@ -45,7 +45,7 @@ Maximum number of listeners allowed per event
 
 > **maxMiddleware**: `number`
 
-Defined in: [electron/events/TypedEventBus.ts:48](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/TypedEventBus.ts#L48)
+Defined in: [electron/events/TypedEventBus.ts:48](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/events/TypedEventBus.ts#L48)
 
 Maximum number of middleware functions allowed
 
@@ -55,7 +55,7 @@ Maximum number of middleware functions allowed
 
 > **middlewareCount**: `number`
 
-Defined in: [electron/events/TypedEventBus.ts:50](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/TypedEventBus.ts#L50)
+Defined in: [electron/events/TypedEventBus.ts:50](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/events/TypedEventBus.ts#L50)
 
 Number of registered middleware functions
 
@@ -65,6 +65,6 @@ Number of registered middleware functions
 
 > **middlewareUtilization**: `number`
 
-Defined in: [electron/events/TypedEventBus.ts:52](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/TypedEventBus.ts#L52)
+Defined in: [electron/events/TypedEventBus.ts:52](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/events/TypedEventBus.ts#L52)
 
 Percentage of middleware slots used (0-100)

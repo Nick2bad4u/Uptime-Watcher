@@ -1,6 +1,6 @@
 # Class: TypedCache\<K, V\>
 
-Defined in: [src/utils/cache.ts:22](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/utils/cache.ts#L22)
+Defined in: [src/utils/cache.ts:22](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/utils/cache.ts#L22)
 
 Generic cache implementation with TTL support.
 
@@ -20,7 +20,7 @@ Generic cache implementation with TTL support.
 
 > **new TypedCache**\<`K`, `V`\>(`options`): `TypedCache`\<`K`, `V`\>
 
-Defined in: [src/utils/cache.ts:34](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/utils/cache.ts#L34)
+Defined in: [src/utils/cache.ts:34](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/utils/cache.ts#L34)
 
 #### Parameters
 
@@ -40,7 +40,7 @@ Defined in: [src/utils/cache.ts:34](https://github.com/Nick2bad4u/Uptime-Watcher
 
 > **get** **size**(): `number`
 
-Defined in: [src/utils/cache.ts:26](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/utils/cache.ts#L26)
+Defined in: [src/utils/cache.ts:26](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/utils/cache.ts#L26)
 
 Get cache size.
 
@@ -54,7 +54,7 @@ Get cache size.
 
 > **cleanup**(): `void`
 
-Defined in: [src/utils/cache.ts:42](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/utils/cache.ts#L42)
+Defined in: [src/utils/cache.ts:42](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/utils/cache.ts#L42)
 
 Clean up expired entries.
 
@@ -68,7 +68,7 @@ Clean up expired entries.
 
 > **clear**(): `void`
 
-Defined in: [src/utils/cache.ts:55](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/utils/cache.ts#L55)
+Defined in: [src/utils/cache.ts:55](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/utils/cache.ts#L55)
 
 Clear all cached entries.
 
@@ -82,7 +82,7 @@ Clear all cached entries.
 
 > **delete**(`key`): `boolean`
 
-Defined in: [src/utils/cache.ts:62](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/utils/cache.ts#L62)
+Defined in: [src/utils/cache.ts:62](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/utils/cache.ts#L62)
 
 Delete specific key.
 
@@ -102,7 +102,7 @@ Delete specific key.
 
 > **get**(`key`): `undefined` \| `V`
 
-Defined in: [src/utils/cache.ts:69](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/utils/cache.ts#L69)
+Defined in: [src/utils/cache.ts:69](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/utils/cache.ts#L69)
 
 Get value from cache if not expired.
 
@@ -122,7 +122,7 @@ Get value from cache if not expired.
 
 > **has**(`key`): `boolean`
 
-Defined in: [src/utils/cache.ts:88](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/utils/cache.ts#L88)
+Defined in: [src/utils/cache.ts:88](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/utils/cache.ts#L88)
 
 Check if key exists and is not expired.
 
@@ -142,7 +142,7 @@ Check if key exists and is not expired.
 
 > **set**(`key`, `value`, `ttl?`): `void`
 
-Defined in: [src/utils/cache.ts:95](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/utils/cache.ts#L95)
+Defined in: [src/utils/cache.ts:95](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/utils/cache.ts#L95)
 
 Set value in cache with optional TTL.
 

@@ -1,6 +1,6 @@
 # Interface: HistoryRow
 
-Defined in: [electron/services/database/utils/historyMapper.ts:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/utils/historyMapper.ts#L21)
+Defined in: [electron/services/database/utils/historyMapper.ts:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/historyMapper.ts#L21)
 
 History row interface for database operations.
 
@@ -20,7 +20,7 @@ Represents a database row containing history data with the following fields:
 
 > `optional` **details**: `string`
 
-Defined in: [electron/services/database/utils/historyMapper.ts:22](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/utils/historyMapper.ts#L22)
+Defined in: [electron/services/database/utils/historyMapper.ts:22](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/historyMapper.ts#L22)
 
 ***
 
@@ -28,7 +28,7 @@ Defined in: [electron/services/database/utils/historyMapper.ts:22](https://githu
 
 > **id**: `string`
 
-Defined in: [electron/services/database/utils/historyMapper.ts:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/utils/historyMapper.ts#L23)
+Defined in: [electron/services/database/utils/historyMapper.ts:23](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/historyMapper.ts#L23)
 
 ***
 
@@ -36,7 +36,7 @@ Defined in: [electron/services/database/utils/historyMapper.ts:23](https://githu
 
 > **monitorId**: `string`
 
-Defined in: [electron/services/database/utils/historyMapper.ts:24](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/utils/historyMapper.ts#L24)
+Defined in: [electron/services/database/utils/historyMapper.ts:24](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/historyMapper.ts#L24)
 
 ***
 
@@ -44,7 +44,7 @@ Defined in: [electron/services/database/utils/historyMapper.ts:24](https://githu
 
 > **responseTime**: `number`
 
-Defined in: [electron/services/database/utils/historyMapper.ts:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/utils/historyMapper.ts#L25)
+Defined in: [electron/services/database/utils/historyMapper.ts:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/historyMapper.ts#L25)
 
 ***
 
@@ -52,7 +52,7 @@ Defined in: [electron/services/database/utils/historyMapper.ts:25](https://githu
 
 > **status**: `"down"` \| `"up"`
 
-Defined in: [electron/services/database/utils/historyMapper.ts:26](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/utils/historyMapper.ts#L26)
+Defined in: [electron/services/database/utils/historyMapper.ts:26](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/historyMapper.ts#L26)
 
 ***
 
@@ -60,4 +60,4 @@ Defined in: [electron/services/database/utils/historyMapper.ts:26](https://githu
 
 > **timestamp**: `number`
 
-Defined in: [electron/services/database/utils/historyMapper.ts:27](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/utils/historyMapper.ts#L27)
+Defined in: [electron/services/database/utils/historyMapper.ts:27](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/historyMapper.ts#L27)

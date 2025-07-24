@@ -2,7 +2,7 @@
 
 > **validateMonitor**(`monitor`): `monitor is Monitor`
 
-Defined in: [shared/types.ts:81](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/types.ts#L81)
+Defined in: [shared/types.ts:81](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/types.ts#L81)
 
 Enhanced monitor validation using shared type guards.
 Provides consistent validation across frontend and backend.
@@ -11,7 +11,7 @@ Provides consistent validation across frontend and backend.
 
 ### monitor
 
-`Partial`\<[`Monitor`](../interfaces/Monitor.md)\>
+[`Partial`](https://www.typescriptlang.org/docs/handbook/utility-types.html#partialtype)\<[`Monitor`](../interfaces/Monitor.md)\>
 
 ## Returns
 

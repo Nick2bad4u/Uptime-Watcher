@@ -1,6 +1,6 @@
 # Interface: VersionInfo
 
-Defined in: [electron/services/monitoring/MigrationSystem.ts:16](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/MigrationSystem.ts#L16)
+Defined in: [electron/services/monitoring/MigrationSystem.ts:16](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MigrationSystem.ts#L16)
 
 ## Properties
 
@@ -8,7 +8,7 @@ Defined in: [electron/services/monitoring/MigrationSystem.ts:16](https://github.
 
 > **applied**: `boolean`
 
-Defined in: [electron/services/monitoring/MigrationSystem.ts:17](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/MigrationSystem.ts#L17)
+Defined in: [electron/services/monitoring/MigrationSystem.ts:17](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MigrationSystem.ts#L17)
 
 ***
 
@@ -16,7 +16,7 @@ Defined in: [electron/services/monitoring/MigrationSystem.ts:17](https://github.
 
 > **timestamp**: `number`
 
-Defined in: [electron/services/monitoring/MigrationSystem.ts:18](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/MigrationSystem.ts#L18)
+Defined in: [electron/services/monitoring/MigrationSystem.ts:18](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MigrationSystem.ts#L18)
 
 ***
 
@@ -24,4 +24,4 @@ Defined in: [electron/services/monitoring/MigrationSystem.ts:18](https://github.
 
 > **version**: `string`
 
-Defined in: [electron/services/monitoring/MigrationSystem.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/MigrationSystem.ts#L19)
+Defined in: [electron/services/monitoring/MigrationSystem.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MigrationSystem.ts#L19)

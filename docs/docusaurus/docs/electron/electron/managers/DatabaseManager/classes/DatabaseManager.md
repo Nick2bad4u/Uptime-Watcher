@@ -1,6 +1,6 @@
 # Class: DatabaseManager
 
-Defined in: [electron/managers/DatabaseManager.ts:89](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/DatabaseManager.ts#L89)
+Defined in: [electron/managers/DatabaseManager.ts:89](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/DatabaseManager.ts#L89)
 
 Database operations manager for the Uptime Watcher application.
 
@@ -51,7 +51,7 @@ const exportData = await databaseManager.exportData();
 
 > **new DatabaseManager**(`dependencies`): `DatabaseManager`
 
-Defined in: [electron/managers/DatabaseManager.ts:95](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/DatabaseManager.ts#L95)
+Defined in: [electron/managers/DatabaseManager.ts:95](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/DatabaseManager.ts#L95)
 
 #### Parameters
 
@@ -67,29 +67,29 @@ Defined in: [electron/managers/DatabaseManager.ts:95](https://github.com/Nick2ba
 
 ### downloadBackup()
 
-> **downloadBackup**(): `Promise`\<\` `buffer`: `Buffer`; `fileName`: `string`; \`\>
+> **downloadBackup**(): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<\` `buffer`: [`Buffer`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/node/buffer.buffer.d.ts#L356); `fileName`: `string`; \`\>
 
-Defined in: [electron/managers/DatabaseManager.ts:104](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/DatabaseManager.ts#L104)
+Defined in: [electron/managers/DatabaseManager.ts:104](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/DatabaseManager.ts#L104)
 
 Download SQLite database backup.
 
 #### Returns
 
-`Promise`\<\` `buffer`: `Buffer`; `fileName`: `string`; \`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<\` `buffer`: [`Buffer`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/node/buffer.buffer.d.ts#L356); `fileName`: `string`; \`\>
 
 ***
 
 ### exportData()
 
-> **exportData**(): `Promise`\<`string`\>
+> **exportData**(): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`string`\>
 
-Defined in: [electron/managers/DatabaseManager.ts:126](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/DatabaseManager.ts#L126)
+Defined in: [electron/managers/DatabaseManager.ts:126](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/DatabaseManager.ts#L126)
 
 Export all application data to JSON string.
 
 #### Returns
 
-`Promise`\<`string`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`string`\>
 
 ***
 
@@ -97,7 +97,7 @@ Export all application data to JSON string.
 
 > **getHistoryLimit**(): `number`
 
-Defined in: [electron/managers/DatabaseManager.ts:157](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/DatabaseManager.ts#L157)
+Defined in: [electron/managers/DatabaseManager.ts:157](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/DatabaseManager.ts#L157)
 
 Get current history limit.
 
@@ -111,9 +111,9 @@ Current history limit value
 
 ### importData()
 
-> **importData**(`data`): `Promise`\<`boolean`\>
+> **importData**(`data`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`boolean`\>
 
-Defined in: [electron/managers/DatabaseManager.ts:203](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/DatabaseManager.ts#L203)
+Defined in: [electron/managers/DatabaseManager.ts:203](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/DatabaseManager.ts#L203)
 
 Import data from JSON string with comprehensive error handling.
 
@@ -127,7 +127,7 @@ JSON string containing import data
 
 #### Returns
 
-`Promise`\<`boolean`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`boolean`\>
 
 Promise resolving to success status
 
@@ -173,29 +173,29 @@ return withErrorHandling(
 
 ### initialize()
 
-> **initialize**(): `Promise`\<`void`\>
+> **initialize**(): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/managers/DatabaseManager.ts:258](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/DatabaseManager.ts#L258)
+Defined in: [electron/managers/DatabaseManager.ts:258](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/DatabaseManager.ts#L258)
 
 Initialize the database and load sites.
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 ***
 
 ### refreshSites()
 
-> **refreshSites**(): `Promise`\<[`Site`](../../../../shared/types/interfaces/Site.md)[]\>
+> **refreshSites**(): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Site`](../../../../shared/types/interfaces/Site.md)[]\>
 
-Defined in: [electron/managers/DatabaseManager.ts:310](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/DatabaseManager.ts#L310)
+Defined in: [electron/managers/DatabaseManager.ts:310](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/DatabaseManager.ts#L310)
 
 Refresh sites from database and update cache.
 
 #### Returns
 
-`Promise`\<[`Site`](../../../../shared/types/interfaces/Site.md)[]\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Site`](../../../../shared/types/interfaces/Site.md)[]\>
 
 Promise resolving to array of sites
 
@@ -203,9 +203,9 @@ Promise resolving to array of sites
 
 ### setHistoryLimit()
 
-> **setHistoryLimit**(`limit`): `Promise`\<`void`\>
+> **setHistoryLimit**(`limit`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/managers/DatabaseManager.ts:348](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/DatabaseManager.ts#L348)
+Defined in: [electron/managers/DatabaseManager.ts:348](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/DatabaseManager.ts#L348)
 
 Set history limit for monitor data retention.
 
@@ -219,7 +219,7 @@ Number of history records to retain (must be non-negative integer, 0 disables hi
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 #### Throws
 

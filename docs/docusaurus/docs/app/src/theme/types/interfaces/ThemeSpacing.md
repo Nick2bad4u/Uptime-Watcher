@@ -1,6 +1,6 @@
 # Interface: ThemeSpacing
 
-Defined in: [src/theme/types.ts:144](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L144)
+Defined in: [src/theme/types.ts:144](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/types.ts#L144)
 
 Spacing scale interface for consistent layout spacing.
 Defines standard spacing values used throughout the application.
@@ -11,7 +11,7 @@ Defines standard spacing values used throughout the application.
 
 > **2xl**: `string`
 
-Defined in: [src/theme/types.ts:146](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L146)
+Defined in: [src/theme/types.ts:146](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/types.ts#L146)
 
 Double extra large spacing
 
@@ -21,7 +21,7 @@ Double extra large spacing
 
 > **3xl**: `string`
 
-Defined in: [src/theme/types.ts:148](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L148)
+Defined in: [src/theme/types.ts:148](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/types.ts#L148)
 
 Triple extra large spacing
 
@@ -31,7 +31,7 @@ Triple extra large spacing
 
 > **lg**: `string`
 
-Defined in: [src/theme/types.ts:150](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L150)
+Defined in: [src/theme/types.ts:150](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/types.ts#L150)
 
 Large spacing
 
@@ -41,7 +41,7 @@ Large spacing
 
 > **md**: `string`
 
-Defined in: [src/theme/types.ts:152](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L152)
+Defined in: [src/theme/types.ts:152](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/types.ts#L152)
 
 Medium spacing
 
@@ -51,7 +51,7 @@ Medium spacing
 
 > **sm**: `string`
 
-Defined in: [src/theme/types.ts:154](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L154)
+Defined in: [src/theme/types.ts:154](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/types.ts#L154)
 
 Small spacing
 
@@ -61,7 +61,7 @@ Small spacing
 
 > **xl**: `string`
 
-Defined in: [src/theme/types.ts:156](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L156)
+Defined in: [src/theme/types.ts:156](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/types.ts#L156)
 
 Extra large spacing
 
@@ -71,6 +71,6 @@ Extra large spacing
 
 > **xs**: `string`
 
-Defined in: [src/theme/types.ts:158](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L158)
+Defined in: [src/theme/types.ts:158](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/types.ts#L158)
 
 Extra small spacing

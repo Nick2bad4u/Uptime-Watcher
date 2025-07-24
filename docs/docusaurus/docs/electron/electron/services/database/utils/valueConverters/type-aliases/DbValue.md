@@ -2,7 +2,7 @@
 
 > **DbValue** = `null` \| `number` \| `string`
 
-Defined in: [electron/services/database/utils/valueConverters.ts:17](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/utils/valueConverters.ts#L17)
+Defined in: [electron/services/database/utils/valueConverters.ts:17](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/valueConverters.ts#L17)
 
 Type for database parameter values.
 

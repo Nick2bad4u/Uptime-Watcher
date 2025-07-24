@@ -1,6 +1,6 @@
 # Class: AutoUpdaterService
 
-Defined in: [electron/services/updater/AutoUpdaterService.ts:37](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/updater/AutoUpdaterService.ts#L37)
+Defined in: [electron/services/updater/AutoUpdaterService.ts:37](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/updater/AutoUpdaterService.ts#L37)
 
 Service responsible for handling application auto-updates.
 Manages update checking, downloading, and installation.
@@ -30,15 +30,15 @@ Usage pattern:
 
 ### checkForUpdates()
 
-> **checkForUpdates**(): `Promise`\<`void`\>
+> **checkForUpdates**(): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/services/updater/AutoUpdaterService.ts:77](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/updater/AutoUpdaterService.ts#L77)
+Defined in: [electron/services/updater/AutoUpdaterService.ts:77](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/updater/AutoUpdaterService.ts#L77)
 
 Check for updates and notify if available.
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 Promise that resolves when check completes
 
@@ -62,7 +62,7 @@ frequently as it may impact performance and server load.
 
 > **initialize**(): `void`
 
-Defined in: [electron/services/updater/AutoUpdaterService.ts:114](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/updater/AutoUpdaterService.ts#L114)
+Defined in: [electron/services/updater/AutoUpdaterService.ts:114](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/updater/AutoUpdaterService.ts#L114)
 
 Initialize the auto-updater with event listeners.
 
@@ -99,7 +99,7 @@ duplicate event listeners.
 
 > **quitAndInstall**(): `void`
 
-Defined in: [electron/services/updater/AutoUpdaterService.ts:189](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/updater/AutoUpdaterService.ts#L189)
+Defined in: [electron/services/updater/AutoUpdaterService.ts:189](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/updater/AutoUpdaterService.ts#L189)
 
 Quit the application and install the update.
 
@@ -145,7 +145,7 @@ if (updateStatus === "downloaded") {
 
 > **setStatusCallback**(`callback`): `void`
 
-Defined in: [electron/services/updater/AutoUpdaterService.ts:232](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/updater/AutoUpdaterService.ts#L232)
+Defined in: [electron/services/updater/AutoUpdaterService.ts:232](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/updater/AutoUpdaterService.ts#L232)
 
 Set the callback for update status changes.
 

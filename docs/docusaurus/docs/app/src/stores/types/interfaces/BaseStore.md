@@ -1,6 +1,6 @@
 # Interface: BaseStore
 
-Defined in: [src/stores/types.ts:39](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/types.ts#L39)
+Defined in: [src/stores/types.ts:39](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/types.ts#L39)
 
 Base store interface providing common error handling and loading state functionality.
 
@@ -15,7 +15,7 @@ All store interfaces should extend this for consistent error handling.
 
 > **clearError**: () => `void`
 
-Defined in: [src/stores/types.ts:41](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/types.ts#L41)
+Defined in: [src/stores/types.ts:41](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/types.ts#L41)
 
 Clear the current error message
 
@@ -29,7 +29,7 @@ Clear the current error message
 
 > **isLoading**: `boolean`
 
-Defined in: [src/stores/types.ts:43](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/types.ts#L43)
+Defined in: [src/stores/types.ts:43](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/types.ts#L43)
 
 Whether an async operation is currently in progress
 
@@ -39,7 +39,7 @@ Whether an async operation is currently in progress
 
 > **lastError**: `undefined` \| `string`
 
-Defined in: [src/stores/types.ts:45](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/types.ts#L45)
+Defined in: [src/stores/types.ts:45](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/types.ts#L45)
 
 The last error message, if any
 
@@ -49,7 +49,7 @@ The last error message, if any
 
 > **setError**: (`error`) => `void`
 
-Defined in: [src/stores/types.ts:47](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/types.ts#L47)
+Defined in: [src/stores/types.ts:47](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/types.ts#L47)
 
 Set an error message in the store
 
@@ -69,7 +69,7 @@ Set an error message in the store
 
 > **setLoading**: (`loading`) => `void`
 
-Defined in: [src/stores/types.ts:49](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/types.ts#L49)
+Defined in: [src/stores/types.ts:49](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/types.ts#L49)
 
 Set the loading state
 

@@ -1,12 +1,12 @@
 # Class: ErrorBoundary
 
-Defined in: [src/stores/error/ErrorBoundary.tsx:26](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/error/ErrorBoundary.tsx#L26)
+Defined in: [src/stores/error/ErrorBoundary.tsx:36](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/error/ErrorBoundary.tsx#L36)
 
 Error boundary component for wrapping store-connected components
 
 ## Extends
 
-- `Component`\<`ErrorBoundaryProperties`, `ErrorBoundaryState`\>
+- [`Component`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/index.d.ts#L900)\<[`ErrorBoundaryProperties`](../interfaces/ErrorBoundaryProperties.md), [`ErrorBoundaryState`](../interfaces/ErrorBoundaryState.md)\>
 
 ## Constructors
 
@@ -14,13 +14,13 @@ Error boundary component for wrapping store-connected components
 
 > **new ErrorBoundary**(`properties`): `ErrorBoundary`
 
-Defined in: [src/stores/error/ErrorBoundary.tsx:27](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/error/ErrorBoundary.tsx#L27)
+Defined in: [src/stores/error/ErrorBoundary.tsx:37](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/error/ErrorBoundary.tsx#L37)
 
 #### Parameters
 
 ##### properties
 
-`ErrorBoundaryProperties`
+[`ErrorBoundaryProperties`](../interfaces/ErrorBoundaryProperties.md)
 
 #### Returns
 
@@ -36,7 +36,7 @@ Defined in: [src/stores/error/ErrorBoundary.tsx:27](https://github.com/Nick2bad4
 
 > **componentDidCatch**(`error`, `errorInfo`): `void`
 
-Defined in: [src/stores/error/ErrorBoundary.tsx:41](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/error/ErrorBoundary.tsx#L41)
+Defined in: [src/stores/error/ErrorBoundary.tsx:51](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/error/ErrorBoundary.tsx#L51)
 
 Catches exceptions generated in descendant components. Unhandled exceptions will cause
 the entire component tree to unmount.
@@ -45,11 +45,11 @@ the entire component tree to unmount.
 
 ##### error
 
-`Error`
+[`Error`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)
 
 ##### errorInfo
 
-`ErrorInfo`
+[`ErrorInfo`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/index.d.ts#L4006)
 
 #### Returns
 
@@ -65,7 +65,7 @@ the entire component tree to unmount.
 
 > **handleRetry**(): `void`
 
-Defined in: [src/stores/error/ErrorBoundary.tsx:53](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/error/ErrorBoundary.tsx#L53)
+Defined in: [src/stores/error/ErrorBoundary.tsx:63](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/error/ErrorBoundary.tsx#L63)
 
 #### Returns
 
@@ -75,13 +75,13 @@ Defined in: [src/stores/error/ErrorBoundary.tsx:53](https://github.com/Nick2bad4
 
 ### render()
 
-> **render**(): `undefined` \| `null` \| `string` \| `number` \| `bigint` \| `boolean` \| `Iterable`\<`ReactNode`, `any`, `any`\> \| `Promise`\<`AwaitedReactNode`\> \| `Element`
+> **render**(): `undefined` \| `null` \| `string` \| `number` \| `bigint` \| `boolean` \| [`Iterable`](https://www.typescriptlang.org/docs/handbook/iterators-and-generators.html#iterable-interface)\<[`ReactNode`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/index.d.ts#L427), `any`, `any`\> \| [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`AwaitedReactNode`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/index.d.ts#L42)\> \| [`Element`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/jsx-runtime.d.ts#L6)
 
-Defined in: [src/stores/error/ErrorBoundary.tsx:58](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/error/ErrorBoundary.tsx#L58)
+Defined in: [src/stores/error/ErrorBoundary.tsx:68](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/error/ErrorBoundary.tsx#L68)
 
 #### Returns
 
-`undefined` \| `null` \| `string` \| `number` \| `bigint` \| `boolean` \| `Iterable`\<`ReactNode`, `any`, `any`\> \| `Promise`\<`AwaitedReactNode`\> \| `Element`
+`undefined` \| `null` \| `string` \| `number` \| `bigint` \| `boolean` \| [`Iterable`](https://www.typescriptlang.org/docs/handbook/iterators-and-generators.html#iterable-interface)\<[`ReactNode`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/index.d.ts#L427), `any`, `any`\> \| [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`AwaitedReactNode`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/index.d.ts#L42)\> \| [`Element`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/jsx-runtime.d.ts#L6)
 
 #### Overrides
 
@@ -91,16 +91,16 @@ Defined in: [src/stores/error/ErrorBoundary.tsx:58](https://github.com/Nick2bad4
 
 ### getDerivedStateFromError()
 
-> `static` **getDerivedStateFromError**(`error`): `ErrorBoundaryState`
+> `static` **getDerivedStateFromError**(`error`): [`ErrorBoundaryState`](../interfaces/ErrorBoundaryState.md)
 
-Defined in: [src/stores/error/ErrorBoundary.tsx:34](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/error/ErrorBoundary.tsx#L34)
+Defined in: [src/stores/error/ErrorBoundary.tsx:44](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/error/ErrorBoundary.tsx#L44)
 
 #### Parameters
 
 ##### error
 
-`Error`
+[`Error`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)
 
 #### Returns
 
-`ErrorBoundaryState`
+[`ErrorBoundaryState`](../interfaces/ErrorBoundaryState.md)

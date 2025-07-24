@@ -1,8 +1,8 @@
 # Function: getCachedOrFetch()
 
-> **getCachedOrFetch**\<`T`\>(`cache`, `key`, `fetcher`, `ttl?`): `Promise`\<`T`\>
+> **getCachedOrFetch**\<`T`\>(`cache`, `key`, `fetcher`, `ttl?`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`T`\>
 
-Defined in: [src/utils/cache.ts:148](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/utils/cache.ts#L148)
+Defined in: [src/utils/cache.ts:148](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/utils/cache.ts#L148)
 
 Helper for async cache operations with fallback.
 
@@ -24,7 +24,7 @@ Helper for async cache operations with fallback.
 
 ### fetcher
 
-() => `Promise`\<`T`\>
+() => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`T`\>
 
 ### ttl?
 
@@ -32,4 +32,4 @@ Helper for async cache operations with fallback.
 
 ## Returns
 
-`Promise`\<`T`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`T`\>

@@ -1,6 +1,6 @@
 # Class: MonitorManager
 
-Defined in: [electron/managers/MonitorManager.ts:51](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/MonitorManager.ts#L51)
+Defined in: [electron/managers/MonitorManager.ts:51](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/MonitorManager.ts#L51)
 
 Manages monitoring operations and scheduling.
 Handles monitoring lifecycle and status checks.
@@ -11,7 +11,7 @@ Handles monitoring lifecycle and status checks.
 
 > **new MonitorManager**(`dependencies`): `MonitorManager`
 
-Defined in: [electron/managers/MonitorManager.ts:57](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/MonitorManager.ts#L57)
+Defined in: [electron/managers/MonitorManager.ts:57](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/MonitorManager.ts#L57)
 
 #### Parameters
 
@@ -27,9 +27,9 @@ Defined in: [electron/managers/MonitorManager.ts:57](https://github.com/Nick2bad
 
 ### checkSiteManually()
 
-> **checkSiteManually**(`identifier`, `monitorId?`): `Promise`\<`undefined` \| [`StatusUpdate`](../../../../shared/types/interfaces/StatusUpdate.md)\>
+> **checkSiteManually**(`identifier`, `monitorId?`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`undefined` \| [`StatusUpdate`](../../../../shared/types/interfaces/StatusUpdate.md)\>
 
-Defined in: [electron/managers/MonitorManager.ts:67](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/MonitorManager.ts#L67)
+Defined in: [electron/managers/MonitorManager.ts:67](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/MonitorManager.ts#L67)
 
 Check a site manually and return status update.
 
@@ -45,7 +45,7 @@ Check a site manually and return status update.
 
 #### Returns
 
-`Promise`\<`undefined` \| [`StatusUpdate`](../../../../shared/types/interfaces/StatusUpdate.md)\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`undefined` \| [`StatusUpdate`](../../../../shared/types/interfaces/StatusUpdate.md)\>
 
 ***
 
@@ -53,7 +53,7 @@ Check a site manually and return status update.
 
 > **getActiveMonitorCount**(): `number`
 
-Defined in: [electron/managers/MonitorManager.ts:99](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/MonitorManager.ts#L99)
+Defined in: [electron/managers/MonitorManager.ts:99](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/MonitorManager.ts#L99)
 
 Get the count of active monitors currently being monitored.
 
@@ -69,7 +69,7 @@ The number of active monitors in the scheduler.
 
 > **isMonitorActiveInScheduler**(`siteIdentifier`, `monitorId`): `boolean`
 
-Defined in: [electron/managers/MonitorManager.ts:106](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/MonitorManager.ts#L106)
+Defined in: [electron/managers/MonitorManager.ts:106](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/MonitorManager.ts#L106)
 
 Check if a specific monitor is actively being monitored by the scheduler.
 
@@ -93,7 +93,7 @@ Check if a specific monitor is actively being monitored by the scheduler.
 
 > **isMonitoringActive**(): `boolean`
 
-Defined in: [electron/managers/MonitorManager.ts:113](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/MonitorManager.ts#L113)
+Defined in: [electron/managers/MonitorManager.ts:113](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/MonitorManager.ts#L113)
 
 Check if monitoring is currently active.
 
@@ -107,7 +107,7 @@ Check if monitoring is currently active.
 
 > **restartMonitorWithNewConfig**(`siteIdentifier`, `monitor`): `boolean`
 
-Defined in: [electron/managers/MonitorManager.ts:130](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/MonitorManager.ts#L130)
+Defined in: [electron/managers/MonitorManager.ts:130](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/MonitorManager.ts#L130)
 
 Restart monitoring for a specific monitor with updated configuration.
 This is useful when monitor intervals change and need to be applied immediately.
@@ -142,9 +142,9 @@ configuration changes require immediate application.
 
 ### setupNewMonitors()
 
-> **setupNewMonitors**(`site`, `newMonitorIds`): `Promise`\<`void`\>
+> **setupNewMonitors**(`site`, `newMonitorIds`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/managers/MonitorManager.ts:138](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/MonitorManager.ts#L138)
+Defined in: [electron/managers/MonitorManager.ts:138](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/MonitorManager.ts#L138)
 
 Set up new monitors that were added to an existing site.
 Ensures new monitors get the same treatment as monitors in new sites.
@@ -161,15 +161,15 @@ Ensures new monitors get the same treatment as monitors in new sites.
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 ***
 
 ### setupSiteForMonitoring()
 
-> **setupSiteForMonitoring**(`site`): `Promise`\<`void`\>
+> **setupSiteForMonitoring**(`site`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/managers/MonitorManager.ts:160](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/MonitorManager.ts#L160)
+Defined in: [electron/managers/MonitorManager.ts:160](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/MonitorManager.ts#L160)
 
 Set up a new site for monitoring (initial checks, intervals, auto-start).
 
@@ -181,29 +181,29 @@ Set up a new site for monitoring (initial checks, intervals, auto-start).
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 ***
 
 ### startMonitoring()
 
-> **startMonitoring**(): `Promise`\<`void`\>
+> **startMonitoring**(): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/managers/MonitorManager.ts:179](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/MonitorManager.ts#L179)
+Defined in: [electron/managers/MonitorManager.ts:179](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/MonitorManager.ts#L179)
 
 Start monitoring for all sites.
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 ***
 
 ### startMonitoringForSite()
 
-> **startMonitoringForSite**(`identifier`, `monitorId?`): `Promise`\<`boolean`\>
+> **startMonitoringForSite**(`identifier`, `monitorId?`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`boolean`\>
 
-Defined in: [electron/managers/MonitorManager.ts:205](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/MonitorManager.ts#L205)
+Defined in: [electron/managers/MonitorManager.ts:205](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/MonitorManager.ts#L205)
 
 Start monitoring for a specific site or monitor.
 
@@ -219,29 +219,29 @@ Start monitoring for a specific site or monitor.
 
 #### Returns
 
-`Promise`\<`boolean`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`boolean`\>
 
 ***
 
 ### stopMonitoring()
 
-> **stopMonitoring**(): `Promise`\<`void`\>
+> **stopMonitoring**(): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/managers/MonitorManager.ts:236](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/MonitorManager.ts#L236)
+Defined in: [electron/managers/MonitorManager.ts:236](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/MonitorManager.ts#L236)
 
 Stop monitoring for all sites.
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 ***
 
 ### stopMonitoringForSite()
 
-> **stopMonitoringForSite**(`identifier`, `monitorId?`): `Promise`\<`boolean`\>
+> **stopMonitoringForSite**(`identifier`, `monitorId?`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`boolean`\>
 
-Defined in: [electron/managers/MonitorManager.ts:257](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/MonitorManager.ts#L257)
+Defined in: [electron/managers/MonitorManager.ts:257](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/MonitorManager.ts#L257)
 
 Stop monitoring for a specific site or monitor.
 
@@ -257,4 +257,4 @@ Stop monitoring for a specific site or monitor.
 
 #### Returns
 
-`Promise`\<`boolean`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`boolean`\>

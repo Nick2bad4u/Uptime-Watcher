@@ -2,7 +2,7 @@
 
 > **createValidationMiddleware**\<`T`\>(`validators`): [`EventMiddleware`](../../TypedEventBus/type-aliases/EventMiddleware.md)
 
-Defined in: [electron/events/middleware.ts:478](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/middleware.ts#L478)
+Defined in: [electron/events/middleware.ts:478](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/events/middleware.ts#L478)
 
 Validation middleware that validates event data against schemas with type safety.
 
@@ -10,7 +10,7 @@ Validation middleware that validates event data against schemas with type safety
 
 ### T
 
-`T` *extends* `Record`\<`string`, `unknown`\>
+`T` *extends* [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `unknown`\>
 
 Record type defining event names and their expected data structures
 

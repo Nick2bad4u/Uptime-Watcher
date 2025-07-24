@@ -1,5 +1,51 @@
 # Type Alias: PortMonitor
 
-> **PortMonitor** = `z.infer`\<*typeof* [`portMonitorSchema`](../variables/portMonitorSchema.md)\>
+> **PortMonitor** = `object`
 
-Defined in: [shared/validation/schemas.ts:114](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/validation/schemas.ts#L114)
+Defined in: [shared/validation/schemas.ts:114](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/validation/schemas.ts#L114)
+
+## Type declaration
+
+### checkInterval
+
+> **checkInterval**: `number`
+
+### host
+
+> **host**: `string`
+
+### id
+
+> **id**: `string`
+
+### lastChecked?
+
+> `optional` **lastChecked**: [`Date`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Date)
+
+### monitoring
+
+> **monitoring**: `boolean`
+
+### port
+
+> **port**: `number`
+
+### responseTime
+
+> **responseTime**: `number`
+
+### retryAttempts
+
+> **retryAttempts**: `number`
+
+### status
+
+> **status**: `"down"` \| `"paused"` \| `"pending"` \| `"up"`
+
+### timeout
+
+> **timeout**: `number`
+
+### type
+
+> **type**: `"port"`

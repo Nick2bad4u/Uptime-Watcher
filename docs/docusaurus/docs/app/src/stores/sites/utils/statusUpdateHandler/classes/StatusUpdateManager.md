@@ -1,6 +1,6 @@
 # Class: StatusUpdateManager
 
-Defined in: [src/stores/sites/utils/statusUpdateHandler.ts:27](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/sites/utils/statusUpdateHandler.ts#L27)
+Defined in: [src/stores/sites/utils/statusUpdateHandler.ts:27](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/utils/statusUpdateHandler.ts#L27)
 
 Manages status update subscriptions
 
@@ -20,7 +20,7 @@ Manages status update subscriptions
 
 > **isSubscribed**(): `boolean`
 
-Defined in: [src/stores/sites/utils/statusUpdateHandler.ts:36](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/sites/utils/statusUpdateHandler.ts#L36)
+Defined in: [src/stores/sites/utils/statusUpdateHandler.ts:36](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/utils/statusUpdateHandler.ts#L36)
 
 Check if currently subscribed
 
@@ -32,9 +32,9 @@ Check if currently subscribed
 
 ### subscribe()
 
-> **subscribe**(`handler`, `fullSyncHandler?`): `Promise`\<`void`\>
+> **subscribe**(`handler`, `fullSyncHandler?`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [src/stores/sites/utils/statusUpdateHandler.ts:43](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/sites/utils/statusUpdateHandler.ts#L43)
+Defined in: [src/stores/sites/utils/statusUpdateHandler.ts:43](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/utils/statusUpdateHandler.ts#L43)
 
 Subscribe to status updates and monitoring events
 
@@ -42,15 +42,15 @@ Subscribe to status updates and monitoring events
 
 ##### handler
 
-(`update`) => `Promise`\<`void`\>
+(`update`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 ##### fullSyncHandler?
 
-() => `Promise`\<`void`\>
+() => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 ***
 
@@ -58,7 +58,7 @@ Subscribe to status updates and monitoring events
 
 > **unsubscribe**(): `void`
 
-Defined in: [src/stores/sites/utils/statusUpdateHandler.ts:116](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/sites/utils/statusUpdateHandler.ts#L116)
+Defined in: [src/stores/sites/utils/statusUpdateHandler.ts:116](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/sites/utils/statusUpdateHandler.ts#L116)
 
 Unsubscribe from status updates and monitoring events
 

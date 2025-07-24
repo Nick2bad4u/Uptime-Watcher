@@ -1,6 +1,6 @@
 # Interface: RadioGroupProperties
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:248](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/AddSiteForm/FormFields.tsx#L248)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:248](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/FormFields.tsx#L248)
 
 Props for the RadioGroup component
 
@@ -10,7 +10,7 @@ Props for the RadioGroup component
 
 > `optional` **disabled**: `boolean`
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:250](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/AddSiteForm/FormFields.tsx#L250)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:250](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/FormFields.tsx#L250)
 
 Whether the radio group is disabled
 
@@ -20,7 +20,7 @@ Whether the radio group is disabled
 
 > `optional` **error**: `string`
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:252](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/AddSiteForm/FormFields.tsx#L252)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:252](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/FormFields.tsx#L252)
 
 Error message to display
 
@@ -30,7 +30,7 @@ Error message to display
 
 > `optional` **helpText**: `string`
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:254](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/AddSiteForm/FormFields.tsx#L254)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:254](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/FormFields.tsx#L254)
 
 Help text to show below the field
 
@@ -40,7 +40,7 @@ Help text to show below the field
 
 > **id**: `string`
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:256](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/AddSiteForm/FormFields.tsx#L256)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:256](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/FormFields.tsx#L256)
 
 Unique ID for the radio group
 
@@ -50,7 +50,7 @@ Unique ID for the radio group
 
 > **label**: `string`
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:258](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/AddSiteForm/FormFields.tsx#L258)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:258](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/FormFields.tsx#L258)
 
 Label text to display
 
@@ -60,7 +60,7 @@ Label text to display
 
 > **name**: `string`
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:260](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/AddSiteForm/FormFields.tsx#L260)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:260](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/FormFields.tsx#L260)
 
 Name attribute for radio inputs (should be unique)
 
@@ -70,7 +70,7 @@ Name attribute for radio inputs (should be unique)
 
 > **onChange**: (`value`) => `void`
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:262](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/AddSiteForm/FormFields.tsx#L262)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:262](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/FormFields.tsx#L262)
 
 Callback when selection changes
 
@@ -90,7 +90,7 @@ Callback when selection changes
 
 > **options**: [`RadioOption`](RadioOption.md)[]
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:264](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/AddSiteForm/FormFields.tsx#L264)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:264](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/FormFields.tsx#L264)
 
 Array of radio options to display
 
@@ -100,7 +100,7 @@ Array of radio options to display
 
 > `optional` **required**: `boolean`
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:266](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/AddSiteForm/FormFields.tsx#L266)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:266](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/FormFields.tsx#L266)
 
 Whether a selection is required
 
@@ -110,6 +110,6 @@ Whether a selection is required
 
 > **value**: `string`
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:268](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/AddSiteForm/FormFields.tsx#L268)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:268](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/FormFields.tsx#L268)
 
 Currently selected value

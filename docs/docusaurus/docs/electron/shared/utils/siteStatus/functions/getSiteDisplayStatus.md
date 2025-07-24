@@ -2,7 +2,7 @@
 
 > **getSiteDisplayStatus**(`site`): [`SiteStatus`](../../../types/type-aliases/SiteStatus.md)
 
-Defined in: [shared/utils/siteStatus.ts:81](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/utils/siteStatus.ts#L81)
+Defined in: [shared/utils/siteStatus.ts:81](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/utils/siteStatus.ts#L81)
 
 Get a display-friendly site status that considers both operational status and monitoring state.
 This is the primary function to use for displaying site status in the UI.

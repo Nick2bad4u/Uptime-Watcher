@@ -1,6 +1,6 @@
 # Class: SiteWriterService
 
-Defined in: [electron/utils/database/SiteWriterService.ts:20](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/database/SiteWriterService.ts#L20)
+Defined in: [electron/utils/database/SiteWriterService.ts:20](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/SiteWriterService.ts#L20)
 
 Service for handling site writing operations.
 Separates data operations from side effects for better testability.
@@ -11,7 +11,7 @@ Separates data operations from side effects for better testability.
 
 > **new SiteWriterService**(`config`): `SiteWriterService`
 
-Defined in: [electron/utils/database/SiteWriterService.ts:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/database/SiteWriterService.ts#L28)
+Defined in: [electron/utils/database/SiteWriterService.ts:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/SiteWriterService.ts#L28)
 
 #### Parameters
 
@@ -27,9 +27,9 @@ Defined in: [electron/utils/database/SiteWriterService.ts:28](https://github.com
 
 ### createSite()
 
-> **createSite**(`siteData`): `Promise`\<[`Site`](../../../../../shared/types/interfaces/Site.md)\>
+> **createSite**(`siteData`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Site`](../../../../../shared/types/interfaces/Site.md)\>
 
-Defined in: [electron/utils/database/SiteWriterService.ts:38](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/database/SiteWriterService.ts#L38)
+Defined in: [electron/utils/database/SiteWriterService.ts:38](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/SiteWriterService.ts#L38)
 
 Create a new site in the database with its monitors.
 Pure data operation without side effects.
@@ -42,15 +42,15 @@ Pure data operation without side effects.
 
 #### Returns
 
-`Promise`\<[`Site`](../../../../../shared/types/interfaces/Site.md)\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Site`](../../../../../shared/types/interfaces/Site.md)\>
 
 ***
 
 ### deleteSite()
 
-> **deleteSite**(`sitesCache`, `identifier`): `Promise`\<`boolean`\>
+> **deleteSite**(`sitesCache`, `identifier`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`boolean`\>
 
-Defined in: [electron/utils/database/SiteWriterService.ts:79](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/database/SiteWriterService.ts#L79)
+Defined in: [electron/utils/database/SiteWriterService.ts:79](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/SiteWriterService.ts#L79)
 
 Delete a site and all its monitors from the database.
 Pure data operation without side effects.
@@ -67,7 +67,7 @@ Pure data operation without side effects.
 
 #### Returns
 
-`Promise`\<`boolean`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`boolean`\>
 
 ***
 
@@ -75,7 +75,7 @@ Pure data operation without side effects.
 
 > **detectNewMonitors**(`originalMonitors`, `updatedMonitors`): `string`[]
 
-Defined in: [electron/utils/database/SiteWriterService.ts:125](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/database/SiteWriterService.ts#L125)
+Defined in: [electron/utils/database/SiteWriterService.ts:125](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/SiteWriterService.ts#L125)
 
 Detect new monitors that were added to an existing site.
 
@@ -113,9 +113,9 @@ they need special handling during monitor setup operations.
 
 ### handleMonitorIntervalChanges()
 
-> **handleMonitorIntervalChanges**(`identifier`, `originalSite`, `newMonitors`, `monitoringConfig`): `Promise`\<`void`\>
+> **handleMonitorIntervalChanges**(`identifier`, `originalSite`, `newMonitors`, `monitoringConfig`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/utils/database/SiteWriterService.ts:153](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/database/SiteWriterService.ts#L153)
+Defined in: [electron/utils/database/SiteWriterService.ts:153](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/SiteWriterService.ts#L153)
 
 Handle monitoring state changes when monitor intervals are modified.
 Side effect operation separated from data updates.
@@ -140,15 +140,15 @@ Side effect operation separated from data updates.
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 ***
 
 ### updateSite()
 
-> **updateSite**(`sitesCache`, `identifier`, `updates`): `Promise`\<[`Site`](../../../../../shared/types/interfaces/Site.md)\>
+> **updateSite**(`sitesCache`, `identifier`, `updates`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Site`](../../../../../shared/types/interfaces/Site.md)\>
 
-Defined in: [electron/utils/database/SiteWriterService.ts:191](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/database/SiteWriterService.ts#L191)
+Defined in: [electron/utils/database/SiteWriterService.ts:191](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/SiteWriterService.ts#L191)
 
 Update a site with new values.
 Pure data operation without side effects.
@@ -165,8 +165,8 @@ Pure data operation without side effects.
 
 ##### updates
 
-`Partial`\<[`Site`](../../../../../shared/types/interfaces/Site.md)\>
+[`Partial`](https://www.typescriptlang.org/docs/handbook/utility-types.html#partialtype)\<[`Site`](../../../../../shared/types/interfaces/Site.md)\>
 
 #### Returns
 
-`Promise`\<[`Site`](../../../../../shared/types/interfaces/Site.md)\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Site`](../../../../../shared/types/interfaces/Site.md)\>

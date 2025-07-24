@@ -2,7 +2,7 @@
 
 > **calculateMaxDuration**(`timeout`, `retryAttempts`): `string`
 
-Defined in: [src/utils/duration.ts:9](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/utils/duration.ts#L9)
+Defined in: [src/utils/duration.ts:9](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/utils/duration.ts#L9)
 
 Utility function to calculate the maximum duration for monitoring checks
 with retry attempts and exponential backoff.

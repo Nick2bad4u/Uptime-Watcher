@@ -1,6 +1,6 @@
 # Interface: ThemeBorderRadius
 
-Defined in: [src/theme/types.ts:31](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L31)
+Defined in: [src/theme/types.ts:31](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/types.ts#L31)
 
 Border radius system interface for consistent corner rounding.
 Defines standard border radius values for components.
@@ -11,7 +11,7 @@ Defines standard border radius values for components.
 
 > **full**: `string`
 
-Defined in: [src/theme/types.ts:33](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L33)
+Defined in: [src/theme/types.ts:33](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/types.ts#L33)
 
 Fully rounded borders
 
@@ -21,7 +21,7 @@ Fully rounded borders
 
 > **lg**: `string`
 
-Defined in: [src/theme/types.ts:35](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L35)
+Defined in: [src/theme/types.ts:35](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/types.ts#L35)
 
 Large border radius
 
@@ -31,7 +31,7 @@ Large border radius
 
 > **md**: `string`
 
-Defined in: [src/theme/types.ts:37](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L37)
+Defined in: [src/theme/types.ts:37](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/types.ts#L37)
 
 Medium border radius
 
@@ -41,7 +41,7 @@ Medium border radius
 
 > **none**: `string`
 
-Defined in: [src/theme/types.ts:39](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L39)
+Defined in: [src/theme/types.ts:39](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/types.ts#L39)
 
 No border radius
 
@@ -51,7 +51,7 @@ No border radius
 
 > **sm**: `string`
 
-Defined in: [src/theme/types.ts:41](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L41)
+Defined in: [src/theme/types.ts:41](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/types.ts#L41)
 
 Small border radius
 
@@ -61,6 +61,6 @@ Small border radius
 
 > **xl**: `string`
 
-Defined in: [src/theme/types.ts:43](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L43)
+Defined in: [src/theme/types.ts:43](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/types.ts#L43)
 
 Extra large border radius

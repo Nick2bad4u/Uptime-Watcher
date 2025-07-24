@@ -2,7 +2,7 @@
 
 > **calculateSiteStatus**(`site`): [`SiteStatus`](../../../types/type-aliases/SiteStatus.md)
 
-Defined in: [shared/utils/siteStatus.ts:55](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/utils/siteStatus.ts#L55)
+Defined in: [shared/utils/siteStatus.ts:55](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/utils/siteStatus.ts#L55)
 
 Calculate the overall site status based on monitor states.
 

@@ -1,6 +1,6 @@
 # Class: SettingsRepository
 
-Defined in: [electron/services/database/SettingsRepository.ts:17](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/SettingsRepository.ts#L17)
+Defined in: [electron/services/database/SettingsRepository.ts:17](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SettingsRepository.ts#L17)
 
 Repository for managing application settings persistence.
 Handles CRUD operations for settings in the database.
@@ -11,7 +11,7 @@ Handles CRUD operations for settings in the database.
 
 > **new SettingsRepository**(`dependencies`): `SettingsRepository`
 
-Defined in: [electron/services/database/SettingsRepository.ts:20](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/SettingsRepository.ts#L20)
+Defined in: [electron/services/database/SettingsRepository.ts:20](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SettingsRepository.ts#L20)
 
 #### Parameters
 
@@ -27,9 +27,9 @@ Defined in: [electron/services/database/SettingsRepository.ts:20](https://github
 
 ### bulkInsert()
 
-> **bulkInsert**(`settings`): `Promise`\<`void`\>
+> **bulkInsert**(`settings`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/services/database/SettingsRepository.ts:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/SettingsRepository.ts#L28)
+Defined in: [electron/services/database/SettingsRepository.ts:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SettingsRepository.ts#L28)
 
 Bulk insert settings (for import functionality).
 Uses a prepared statement and transaction for better performance.
@@ -38,11 +38,11 @@ Uses a prepared statement and transaction for better performance.
 
 ##### settings
 
-`Record`\<`string`, `string`\>
+[`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `string`\>
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 ***
 
@@ -50,7 +50,7 @@ Uses a prepared statement and transaction for better performance.
 
 > **bulkInsertInternal**(`db`, `settings`): `void`
 
-Defined in: [electron/services/database/SettingsRepository.ts:64](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/SettingsRepository.ts#L64)
+Defined in: [electron/services/database/SettingsRepository.ts:64](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SettingsRepository.ts#L64)
 
 Internal method to bulk insert settings within an existing transaction.
 
@@ -64,7 +64,7 @@ Database connection (must be within active transaction)
 
 ##### settings
 
-`Record`\<`string`, `string`\>
+[`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `string`\>
 
 Key-value pairs to insert
 
@@ -90,9 +90,9 @@ for proper rollback handling.
 
 ### delete()
 
-> **delete**(`key`): `Promise`\<`void`\>
+> **delete**(`key`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/services/database/SettingsRepository.ts:87](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/SettingsRepository.ts#L87)
+Defined in: [electron/services/database/SettingsRepository.ts:87](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SettingsRepository.ts#L87)
 
 Delete a setting by key.
 
@@ -104,21 +104,21 @@ Delete a setting by key.
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 ***
 
 ### deleteAll()
 
-> **deleteAll**(): `Promise`\<`void`\>
+> **deleteAll**(): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/services/database/SettingsRepository.ts:104](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/SettingsRepository.ts#L104)
+Defined in: [electron/services/database/SettingsRepository.ts:104](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SettingsRepository.ts#L104)
 
 Clear all settings from the database.
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 ***
 
@@ -126,7 +126,7 @@ Clear all settings from the database.
 
 > **deleteAllInternal**(`db`): `void`
 
-Defined in: [electron/services/database/SettingsRepository.ts:117](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/SettingsRepository.ts#L117)
+Defined in: [electron/services/database/SettingsRepository.ts:117](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SettingsRepository.ts#L117)
 
 Internal method to clear all settings from the database within an existing transaction.
 Use this method when you're already within a transaction context.
@@ -147,7 +147,7 @@ Use this method when you're already within a transaction context.
 
 > **deleteInternal**(`db`, `key`): `void`
 
-Defined in: [electron/services/database/SettingsRepository.ts:126](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/SettingsRepository.ts#L126)
+Defined in: [electron/services/database/SettingsRepository.ts:126](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SettingsRepository.ts#L126)
 
 Internal method to delete a setting by key within an existing transaction.
 Use this method when you're already within a transaction context.
@@ -170,9 +170,9 @@ Use this method when you're already within a transaction context.
 
 ### get()
 
-> **get**(`key`): `Promise`\<`undefined` \| `string`\>
+> **get**(`key`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`undefined` \| `string`\>
 
-Defined in: [electron/services/database/SettingsRepository.ts:139](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/SettingsRepository.ts#L139)
+Defined in: [electron/services/database/SettingsRepository.ts:139](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SettingsRepository.ts#L139)
 
 Get a setting by key.
 
@@ -186,7 +186,7 @@ Setting key to retrieve
 
 #### Returns
 
-`Promise`\<`undefined` \| `string`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`undefined` \| `string`\>
 
 Promise resolving to setting value or undefined if not found
 
@@ -194,15 +194,15 @@ Promise resolving to setting value or undefined if not found
 
 ### getAll()
 
-> **getAll**(): `Promise`\<`Record`\<`string`, `string`\>\>
+> **getAll**(): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `string`\>\>
 
-Defined in: [electron/services/database/SettingsRepository.ts:159](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/SettingsRepository.ts#L159)
+Defined in: [electron/services/database/SettingsRepository.ts:159](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SettingsRepository.ts#L159)
 
 Get all settings.
 
 #### Returns
 
-`Promise`\<`Record`\<`string`, `string`\>\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `string`\>\>
 
 Promise resolving to all settings as key-value pairs
 
@@ -216,9 +216,9 @@ If settings grow beyond expected size, consider splitting into separate configur
 
 ### set()
 
-> **set**(`key`, `value`): `Promise`\<`void`\>
+> **set**(`key`, `value`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/services/database/SettingsRepository.ts:177](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/SettingsRepository.ts#L177)
+Defined in: [electron/services/database/SettingsRepository.ts:177](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SettingsRepository.ts#L177)
 
 Set a setting value.
 
@@ -238,7 +238,7 @@ Setting value to store
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 Promise that resolves when setting is saved
 
@@ -252,7 +252,7 @@ Error When database operation fails
 
 > **setInternal**(`db`, `key`, `value`): `void`
 
-Defined in: [electron/services/database/SettingsRepository.ts:195](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/SettingsRepository.ts#L195)
+Defined in: [electron/services/database/SettingsRepository.ts:195](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/SettingsRepository.ts#L195)
 
 Internal method to set a setting value within an existing transaction.
 Use this method when you're already within a transaction context.

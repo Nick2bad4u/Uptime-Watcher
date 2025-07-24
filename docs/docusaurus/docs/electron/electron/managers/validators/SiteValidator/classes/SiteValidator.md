@@ -1,6 +1,6 @@
 # Class: SiteValidator
 
-Defined in: [electron/managers/validators/SiteValidator.ts:35](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/validators/SiteValidator.ts#L35)
+Defined in: [electron/managers/validators/SiteValidator.ts:35](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/validators/SiteValidator.ts#L35)
 
 Validates site configuration according to business rules.
 
@@ -15,7 +15,7 @@ and monitor array validation.
 
 > **new SiteValidator**(): `SiteValidator`
 
-Defined in: [electron/managers/validators/SiteValidator.ts:39](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/validators/SiteValidator.ts#L39)
+Defined in: [electron/managers/validators/SiteValidator.ts:39](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/validators/SiteValidator.ts#L39)
 
 #### Returns
 
@@ -27,7 +27,7 @@ Defined in: [electron/managers/validators/SiteValidator.ts:39](https://github.co
 
 > **shouldIncludeInExport**(`site`): `boolean`
 
-Defined in: [electron/managers/validators/SiteValidator.ts:54](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/validators/SiteValidator.ts#L54)
+Defined in: [electron/managers/validators/SiteValidator.ts:54](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/validators/SiteValidator.ts#L54)
 
 Business rule: Determine if a site should be included in exports.
 
@@ -57,7 +57,7 @@ and prevents corruption from sites with invalid identifiers.
 
 > **validateSiteConfiguration**(`site`): [`ValidationResult`](../../interfaces/interfaces/ValidationResult.md)
 
-Defined in: [electron/managers/validators/SiteValidator.ts:65](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/validators/SiteValidator.ts#L65)
+Defined in: [electron/managers/validators/SiteValidator.ts:65](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/managers/validators/SiteValidator.ts#L65)
 
 Validate complete site configuration.
 

@@ -1,11 +1,11 @@
 # Function: getMonitorTypeOptions()
 
-> **getMonitorTypeOptions**(): `Promise`\<`object`[]\>
+> **getMonitorTypeOptions**(): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`object`[]\>
 
-Defined in: [src/utils/monitorTypeHelper.ts:95](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/utils/monitorTypeHelper.ts#L95)
+Defined in: [src/utils/monitorTypeHelper.ts:95](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/utils/monitorTypeHelper.ts#L95)
 
 Get form options for monitor type selector.
 
 ## Returns
 
-`Promise`\<`object`[]\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`object`[]\>

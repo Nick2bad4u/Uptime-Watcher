@@ -2,7 +2,7 @@
 
 > **useSite**(`site`): `object`
 
-Defined in: [src/hooks/site/useSite.ts:13](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/hooks/site/useSite.ts#L13)
+Defined in: [src/hooks/site/useSite.ts:13](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/hooks/site/useSite.ts#L13)
 
 A comprehensive hook that combines site monitoring, actions, statistics, and UI state
 
@@ -58,7 +58,7 @@ Handler for monitor selection changes
 
 ##### e
 
-`ChangeEvent`\<`HTMLSelectElement`\>
+[`ChangeEvent`](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/1a60e1b9a9062ff9c48c681ca3d8b6f717b616b9/types/react/index.d.ts#L2018)\<[`HTMLSelectElement`](https://developer.mozilla.org/docs/Web/API/HTMLSelectElement)\>
 
 #### Returns
 

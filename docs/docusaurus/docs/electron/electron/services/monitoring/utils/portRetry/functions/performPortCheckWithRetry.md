@@ -1,8 +1,8 @@
 # Function: performPortCheckWithRetry()
 
-> **performPortCheckWithRetry**(`host`, `port`, `timeout`, `maxRetries`): `Promise`\<[`MonitorCheckResult`](../../../types/interfaces/MonitorCheckResult.md)\>
+> **performPortCheckWithRetry**(`host`, `port`, `timeout`, `maxRetries`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`MonitorCheckResult`](../../../types/interfaces/MonitorCheckResult.md)\>
 
-Defined in: [electron/services/monitoring/utils/portRetry.ts:62](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/utils/portRetry.ts#L62)
+Defined in: [electron/services/monitoring/utils/portRetry.ts:62](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/utils/portRetry.ts#L62)
 
 Perform port check with sophisticated retry logic and exponential backoff.
 
@@ -34,7 +34,7 @@ Number of additional retry attempts after initial failure (0 = try once only)
 
 ## Returns
 
-`Promise`\<[`MonitorCheckResult`](../../../types/interfaces/MonitorCheckResult.md)\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`MonitorCheckResult`](../../../types/interfaces/MonitorCheckResult.md)\>
 
 Promise resolving to monitor check result with timing and status information
 

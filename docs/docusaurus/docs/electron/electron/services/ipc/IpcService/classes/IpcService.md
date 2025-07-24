@@ -1,6 +1,6 @@
 # Class: IpcService
 
-Defined in: [electron/services/ipc/IpcService.ts:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/ipc/IpcService.ts#L28)
+Defined in: [electron/services/ipc/IpcService.ts:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/ipc/IpcService.ts#L28)
 
 Inter-Process Communication service for Electron main-renderer communication.
 
@@ -16,7 +16,7 @@ Provides a secure interface for the frontend to interact with backend services.
 
 > **new IpcService**(`uptimeOrchestrator`, `autoUpdaterService`): `IpcService`
 
-Defined in: [electron/services/ipc/IpcService.ts:39](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/ipc/IpcService.ts#L39)
+Defined in: [electron/services/ipc/IpcService.ts:39](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/ipc/IpcService.ts#L39)
 
 Create a new IPC service instance.
 
@@ -44,7 +44,7 @@ Service for handling application updates
 
 > **cleanup**(): `void`
 
-Defined in: [electron/services/ipc/IpcService.ts:55](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/ipc/IpcService.ts#L55)
+Defined in: [electron/services/ipc/IpcService.ts:55](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/ipc/IpcService.ts#L55)
 
 Clean up all IPC listeners.
 
@@ -67,7 +67,7 @@ Should be called during application shutdown.
 
 > **setupHandlers**(): `void`
 
-Defined in: [electron/services/ipc/IpcService.ts:76](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/ipc/IpcService.ts#L76)
+Defined in: [electron/services/ipc/IpcService.ts:76](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/ipc/IpcService.ts#L76)
 
 Initialize all IPC handlers organized by functional domain.
 

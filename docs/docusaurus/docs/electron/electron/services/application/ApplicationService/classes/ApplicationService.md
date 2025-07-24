@@ -1,6 +1,6 @@
 # Class: ApplicationService
 
-Defined in: [electron/services/application/ApplicationService.ts:15](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/application/ApplicationService.ts#L15)
+Defined in: [electron/services/application/ApplicationService.ts:15](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/application/ApplicationService.ts#L15)
 
 Main application service that orchestrates all other services.
 Handles application lifecycle and service coordination.
@@ -16,7 +16,7 @@ and their dependencies. Provides proper initialization order and cleanup.
 
 > **new ApplicationService**(): `ApplicationService`
 
-Defined in: [electron/services/application/ApplicationService.ts:26](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/application/ApplicationService.ts#L26)
+Defined in: [electron/services/application/ApplicationService.ts:26](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/application/ApplicationService.ts#L26)
 
 Initialize the ApplicationService and set up the service container.
 
@@ -34,15 +34,15 @@ be called once during application startup.
 
 ### cleanup()
 
-> **cleanup**(): `Promise`\<`void`\>
+> **cleanup**(): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Defined in: [electron/services/application/ApplicationService.ts:47](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/application/ApplicationService.ts#L47)
+Defined in: [electron/services/application/ApplicationService.ts:47](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/application/ApplicationService.ts#L47)
 
 Cleanup resources before application shutdown.
 
 #### Returns
 
-`Promise`\<`void`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 #### Remarks
 

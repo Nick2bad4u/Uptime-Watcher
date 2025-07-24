@@ -2,7 +2,7 @@
 
 > **createDatabaseIndexes**(`db`): `void`
 
-Defined in: [electron/services/database/utils/databaseSchema.ts:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/utils/databaseSchema.ts#L28)
+Defined in: [electron/services/database/utils/databaseSchema.ts:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/databaseSchema.ts#L28)
 
 Create database indexes for better query performance.
 

@@ -1,6 +1,6 @@
 # Interface: SelectOption
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:196](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/AddSiteForm/FormFields.tsx#L196)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:196](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/FormFields.tsx#L196)
 
 Option interface for SelectField dropdown items
 
@@ -10,7 +10,7 @@ Option interface for SelectField dropdown items
 
 > **label**: `string`
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:198](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/AddSiteForm/FormFields.tsx#L198)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:198](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/FormFields.tsx#L198)
 
 Display text for the option
 
@@ -20,6 +20,6 @@ Display text for the option
 
 > **value**: `string` \| `number`
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:200](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/AddSiteForm/FormFields.tsx#L200)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:200](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/components/AddSiteForm/FormFields.tsx#L200)
 
 Value to be selected

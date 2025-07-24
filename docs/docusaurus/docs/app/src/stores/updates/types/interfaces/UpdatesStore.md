@@ -1,6 +1,6 @@
 # Interface: UpdatesStore
 
-Defined in: [src/stores/updates/types.ts:26](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/updates/types.ts#L26)
+Defined in: [src/stores/updates/types.ts:26](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/updates/types.ts#L26)
 
 Updates store interface.
 Manages application update status and operations.
@@ -11,7 +11,7 @@ Manages application update status and operations.
 
 > **applyUpdate**: () => `void`
 
-Defined in: [src/stores/updates/types.ts:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/updates/types.ts#L28)
+Defined in: [src/stores/updates/types.ts:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/updates/types.ts#L28)
 
 Apply downloaded update and restart
 
@@ -25,7 +25,7 @@ Apply downloaded update and restart
 
 > **clearUpdateError**: () => `void`
 
-Defined in: [src/stores/updates/types.ts:30](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/updates/types.ts#L30)
+Defined in: [src/stores/updates/types.ts:30](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/updates/types.ts#L30)
 
 Clear update error
 
@@ -39,7 +39,7 @@ Clear update error
 
 > **setUpdateError**: (`error`) => `void`
 
-Defined in: [src/stores/updates/types.ts:32](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/updates/types.ts#L32)
+Defined in: [src/stores/updates/types.ts:32](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/updates/types.ts#L32)
 
 Set update error
 
@@ -59,7 +59,7 @@ Set update error
 
 > **setUpdateInfo**: (`info`) => `void`
 
-Defined in: [src/stores/updates/types.ts:34](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/updates/types.ts#L34)
+Defined in: [src/stores/updates/types.ts:34](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/updates/types.ts#L34)
 
 Set update info
 
@@ -79,7 +79,7 @@ Set update info
 
 > **setUpdateProgress**: (`progress`) => `void`
 
-Defined in: [src/stores/updates/types.ts:37](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/updates/types.ts#L37)
+Defined in: [src/stores/updates/types.ts:37](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/updates/types.ts#L37)
 
 Set update progress
 
@@ -99,7 +99,7 @@ Set update progress
 
 > **setUpdateStatus**: (`status`) => `void`
 
-Defined in: [src/stores/updates/types.ts:40](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/updates/types.ts#L40)
+Defined in: [src/stores/updates/types.ts:40](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/updates/types.ts#L40)
 
 Set update status
 
@@ -119,7 +119,7 @@ Set update status
 
 > **updateError**: `undefined` \| `string`
 
-Defined in: [src/stores/updates/types.ts:42](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/updates/types.ts#L42)
+Defined in: [src/stores/updates/types.ts:42](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/updates/types.ts#L42)
 
 Update error message if any
 
@@ -129,7 +129,7 @@ Update error message if any
 
 > **updateInfo**: `undefined` \| [`UpdateInfo`](UpdateInfo.md)
 
-Defined in: [src/stores/updates/types.ts:44](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/updates/types.ts#L44)
+Defined in: [src/stores/updates/types.ts:44](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/updates/types.ts#L44)
 
 Update information
 
@@ -139,7 +139,7 @@ Update information
 
 > **updateProgress**: `number`
 
-Defined in: [src/stores/updates/types.ts:46](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/updates/types.ts#L46)
+Defined in: [src/stores/updates/types.ts:46](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/updates/types.ts#L46)
 
 Update progress (0-100)
 
@@ -149,6 +149,6 @@ Update progress (0-100)
 
 > **updateStatus**: [`UpdateStatus`](../../../types/type-aliases/UpdateStatus.md)
 
-Defined in: [src/stores/updates/types.ts:49](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/updates/types.ts#L49)
+Defined in: [src/stores/updates/types.ts:49](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/stores/updates/types.ts#L49)
 
 Current update status

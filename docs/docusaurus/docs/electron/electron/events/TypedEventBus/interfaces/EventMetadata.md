@@ -1,6 +1,6 @@
 # Interface: EventMetadata
 
-Defined in: [electron/events/TypedEventBus.ts:64](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/TypedEventBus.ts#L64)
+Defined in: [electron/events/TypedEventBus.ts:64](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/events/TypedEventBus.ts#L64)
 
 Metadata automatically added to all emitted events.
 
@@ -15,7 +15,7 @@ Available in all event listeners under the `_meta` property.
 
 > **busId**: `string`
 
-Defined in: [electron/events/TypedEventBus.ts:66](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/TypedEventBus.ts#L66)
+Defined in: [electron/events/TypedEventBus.ts:66](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/events/TypedEventBus.ts#L66)
 
 Identifier of the event bus that emitted this event
 
@@ -25,7 +25,7 @@ Identifier of the event bus that emitted this event
 
 > **correlationId**: `string`
 
-Defined in: [electron/events/TypedEventBus.ts:68](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/TypedEventBus.ts#L68)
+Defined in: [electron/events/TypedEventBus.ts:68](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/events/TypedEventBus.ts#L68)
 
 Unique identifier for tracking this specific event emission
 
@@ -35,7 +35,7 @@ Unique identifier for tracking this specific event emission
 
 > **eventName**: `string`
 
-Defined in: [electron/events/TypedEventBus.ts:70](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/TypedEventBus.ts#L70)
+Defined in: [electron/events/TypedEventBus.ts:70](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/events/TypedEventBus.ts#L70)
 
 Name of the event that was emitted
 
@@ -45,6 +45,6 @@ Name of the event that was emitted
 
 > **timestamp**: `number`
 
-Defined in: [electron/events/TypedEventBus.ts:72](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/TypedEventBus.ts#L72)
+Defined in: [electron/events/TypedEventBus.ts:72](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/events/TypedEventBus.ts#L72)
 
 Unix timestamp when the event was emitted

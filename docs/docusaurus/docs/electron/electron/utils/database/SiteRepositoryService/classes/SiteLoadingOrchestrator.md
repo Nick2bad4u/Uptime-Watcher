@@ -1,6 +1,6 @@
 # Class: SiteLoadingOrchestrator
 
-Defined in: [electron/utils/database/SiteRepositoryService.ts:63](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/database/SiteRepositoryService.ts#L63)
+Defined in: [electron/utils/database/SiteRepositoryService.ts:63](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/SiteRepositoryService.ts#L63)
 
 **`Beta`**
 
@@ -13,7 +13,7 @@ Coordinates data loading with side effects.
 
 > **new SiteLoadingOrchestrator**(`siteRepositoryService`): `SiteLoadingOrchestrator`
 
-Defined in: [electron/utils/database/SiteRepositoryService.ts:66](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/database/SiteRepositoryService.ts#L66)
+Defined in: [electron/utils/database/SiteRepositoryService.ts:66](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/SiteRepositoryService.ts#L66)
 
 **`Beta`**
 
@@ -31,9 +31,9 @@ Defined in: [electron/utils/database/SiteRepositoryService.ts:66](https://github
 
 ### loadSitesFromDatabase()
 
-> **loadSitesFromDatabase**(`siteCache`, `monitoringConfig`): `Promise`\<\` `message`: `string`; `sitesLoaded`: `number`; `success`: `boolean`; \`\>
+> **loadSitesFromDatabase**(`siteCache`, `monitoringConfig`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<\` `message`: `string`; `sitesLoaded`: `number`; `success`: `boolean`; \`\>
 
-Defined in: [electron/utils/database/SiteRepositoryService.ts:74](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/database/SiteRepositoryService.ts#L74)
+Defined in: [electron/utils/database/SiteRepositoryService.ts:74](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/database/SiteRepositoryService.ts#L74)
 
 **`Beta`**
 
@@ -52,4 +52,4 @@ Coordinates all aspects of site loading process.
 
 #### Returns
 
-`Promise`\<\` `message`: `string`; `sitesLoaded`: `number`; `success`: `boolean`; \`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<\` `message`: `string`; `sitesLoaded`: `number`; `success`: `boolean`; \`\>

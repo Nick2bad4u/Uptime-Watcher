@@ -2,7 +2,7 @@
 
 > **createMonitorWithTypeGuards**(`type`, `data`): `object`
 
-Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:353](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/MonitorTypeRegistry.ts#L353)
+Defined in: [electron/services/monitoring/MonitorTypeRegistry.ts:353](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/monitoring/MonitorTypeRegistry.ts#L353)
 
 Create monitor object with runtime type validation.
 
@@ -16,7 +16,7 @@ Monitor type string to validate
 
 ### data
 
-`Record`\<`string`, `unknown`\>
+[`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `unknown`\>
 
 Monitor data to merge with defaults
 
@@ -32,7 +32,7 @@ Validation result with created monitor or errors
 
 ### monitor?
 
-> `optional` **monitor**: `Record`\<`string`, `unknown`\>
+> `optional` **monitor**: [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `unknown`\>
 
 ### success
 

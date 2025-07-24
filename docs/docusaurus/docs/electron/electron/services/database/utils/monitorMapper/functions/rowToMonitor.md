@@ -2,7 +2,7 @@
 
 > **rowToMonitor**(`row`): [`Monitor`](../../../../../../shared/types/interfaces/Monitor.md)
 
-Defined in: [electron/services/database/utils/monitorMapper.ts:134](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/utils/monitorMapper.ts#L134)
+Defined in: [electron/services/database/utils/monitorMapper.ts:134](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/services/database/utils/monitorMapper.ts#L134)
 
 Convert database row to monitor object using dynamic schema.
 
@@ -10,7 +10,7 @@ Convert database row to monitor object using dynamic schema.
 
 ### row
 
-`Record`\<`string`, `unknown`\>
+[`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `unknown`\>
 
 Database row data
 

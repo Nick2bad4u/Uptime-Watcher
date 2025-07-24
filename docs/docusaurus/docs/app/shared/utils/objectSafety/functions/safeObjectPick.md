@@ -1,8 +1,8 @@
 # Function: safeObjectPick()
 
-> **safeObjectPick**\<`T`, `K`\>(`obj`, `keys`): `Pick`\<`T`, `K`\>
+> **safeObjectPick**\<`T`, `K`\>(`obj`, `keys`): [`Pick`](https://www.typescriptlang.org/docs/handbook/utility-types.html#picktype-keys)\<`T`, `K`\>
 
-Defined in: [shared/utils/objectSafety.ts:126](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/utils/objectSafety.ts#L126)
+Defined in: [shared/utils/objectSafety.ts:126](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/shared/utils/objectSafety.ts#L126)
 
 Create a type-safe subset of an object with only specified keys.
 
@@ -10,7 +10,7 @@ Create a type-safe subset of an object with only specified keys.
 
 ### T
 
-`T` *extends* `Record`\<`PropertyKey`, `unknown`\>
+`T` *extends* [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`PropertyKey`, `unknown`\>
 
 ### K
 
@@ -32,7 +32,7 @@ Keys to pick from the object
 
 ## Returns
 
-`Pick`\<`T`, `K`\>
+[`Pick`](https://www.typescriptlang.org/docs/handbook/utility-types.html#picktype-keys)\<`T`, `K`\>
 
 New object with only the specified keys
 

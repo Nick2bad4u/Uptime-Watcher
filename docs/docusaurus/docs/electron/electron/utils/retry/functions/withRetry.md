@@ -1,8 +1,8 @@
 # Function: withRetry()
 
-> **withRetry**\<`T`\>(`operation`, `options`): `Promise`\<`T`\>
+> **withRetry**\<`T`\>(`operation`, `options`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`T`\>
 
-Defined in: [electron/utils/retry.ts:32](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/retry.ts#L32)
+Defined in: [electron/utils/retry.ts:32](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/retry.ts#L32)
 
 Generic retry utility with configurable parameters
 
@@ -16,7 +16,7 @@ Generic retry utility with configurable parameters
 
 ### operation
 
-() => `Promise`\<`T`\>
+() => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`T`\>
 
 The async operation to retry
 
@@ -42,7 +42,7 @@ Retry configuration options
 
 ## Returns
 
-`Promise`\<`T`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`T`\>
 
 Promise that resolves with the operation result
 

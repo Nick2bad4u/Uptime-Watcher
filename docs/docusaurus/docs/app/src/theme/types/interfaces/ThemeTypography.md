@@ -1,6 +1,6 @@
 # Interface: ThemeTypography
 
-Defined in: [src/theme/types.ts:180](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L180)
+Defined in: [src/theme/types.ts:180](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/types.ts#L180)
 
 Typography system interface for text styling.
 Defines font families, sizes, weights, and line heights.
@@ -11,7 +11,7 @@ Defines font families, sizes, weights, and line heights.
 
 > **fontFamily**: `object`
 
-Defined in: [src/theme/types.ts:182](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L182)
+Defined in: [src/theme/types.ts:182](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/types.ts#L182)
 
 Font family definitions
 
@@ -33,7 +33,7 @@ Sans-serif font stack
 
 > **fontSize**: `object`
 
-Defined in: [src/theme/types.ts:189](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L189)
+Defined in: [src/theme/types.ts:189](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/types.ts#L189)
 
 Font size scale
 
@@ -75,7 +75,7 @@ Font size scale
 
 > **fontWeight**: `object`
 
-Defined in: [src/theme/types.ts:200](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L200)
+Defined in: [src/theme/types.ts:200](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/types.ts#L200)
 
 Font weight scale
 
@@ -101,7 +101,7 @@ Font weight scale
 
 > **lineHeight**: `object`
 
-Defined in: [src/theme/types.ts:207](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L207)
+Defined in: [src/theme/types.ts:207](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/src/theme/types.ts#L207)
 
 Line height scale
 

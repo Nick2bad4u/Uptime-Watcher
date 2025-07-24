@@ -1,8 +1,8 @@
 # Function: withDatabaseOperation()
 
-> **withDatabaseOperation**\<`T`\>(`operation`, `operationName`, `eventEmitter?`, `context?`): `Promise`\<`T`\>
+> **withDatabaseOperation**\<`T`\>(`operation`, `operationName`, `eventEmitter?`, `context?`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`T`\>
 
-Defined in: [electron/utils/operationalHooks.ts:78](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/operationalHooks.ts#L78)
+Defined in: [electron/utils/operationalHooks.ts:78](https://github.com/Nick2bad4u/Uptime-Watcher/blob/dca5483e793478722cd3e6e125cafcec5fc771f0/electron/utils/operationalHooks.ts#L78)
 
 Specialized wrapper for database operations with common patterns.
 
@@ -16,7 +16,7 @@ Specialized wrapper for database operations with common patterns.
 
 ### operation
 
-() => `Promise`\<`T`\>
+() => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`T`\>
 
 ### operationName
 
@@ -28,8 +28,8 @@ Specialized wrapper for database operations with common patterns.
 
 ### context?
 
-`Record`\<`string`, `unknown`\>
+[`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `unknown`\>
 
 ## Returns
 
-`Promise`\<`T`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`T`\>
