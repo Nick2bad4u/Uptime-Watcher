@@ -2,7 +2,7 @@
 
 > **useSiteDetails**(`props`): `object`
 
-Defined in: [src/hooks/site/useSiteDetails.ts:59](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/hooks/site/useSiteDetails.ts#L59)
+Defined in: [src/hooks/site/useSiteDetails.ts:59](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/hooks/site/useSiteDetails.ts#L59)
 
 Hook for managing site details state and operations.
 

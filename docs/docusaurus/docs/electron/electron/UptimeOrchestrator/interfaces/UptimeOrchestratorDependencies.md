@@ -1,6 +1,6 @@
 # Interface: UptimeOrchestratorDependencies
 
-Defined in: [electron/UptimeOrchestrator.ts:97](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/UptimeOrchestrator.ts#L97)
+Defined in: [electron/UptimeOrchestrator.ts:97](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/UptimeOrchestrator.ts#L97)
 
 Dependencies for UptimeOrchestrator.
 
@@ -20,7 +20,7 @@ transaction handling and domain boundaries.
 
 > **databaseManager**: [`DatabaseManager`](../../managers/DatabaseManager/classes/DatabaseManager.md)
 
-Defined in: [electron/UptimeOrchestrator.ts:98](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/UptimeOrchestrator.ts#L98)
+Defined in: [electron/UptimeOrchestrator.ts:98](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/UptimeOrchestrator.ts#L98)
 
 ***
 
@@ -28,7 +28,7 @@ Defined in: [electron/UptimeOrchestrator.ts:98](https://github.com/Nick2bad4u/Up
 
 > **monitorManager**: [`MonitorManager`](../../managers/MonitorManager/classes/MonitorManager.md)
 
-Defined in: [electron/UptimeOrchestrator.ts:99](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/UptimeOrchestrator.ts#L99)
+Defined in: [electron/UptimeOrchestrator.ts:99](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/UptimeOrchestrator.ts#L99)
 
 ***
 
@@ -36,4 +36,4 @@ Defined in: [electron/UptimeOrchestrator.ts:99](https://github.com/Nick2bad4u/Up
 
 > **siteManager**: [`SiteManager`](../../managers/SiteManager/classes/SiteManager.md)
 
-Defined in: [electron/UptimeOrchestrator.ts:100](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/UptimeOrchestrator.ts#L100)
+Defined in: [electron/UptimeOrchestrator.ts:100](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/UptimeOrchestrator.ts#L100)

@@ -1,6 +1,6 @@
 # Interface: Logger
 
-Defined in: [electron/utils/interfaces.ts:10](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/utils/interfaces.ts#L10)
+Defined in: [electron/utils/interfaces.ts:10](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/interfaces.ts#L10)
 
 Standardized logging interface used throughout utilities.
 Provides consistent logging patterns and error reporting.
@@ -11,7 +11,7 @@ Provides consistent logging patterns and error reporting.
 
 > **debug**: (`message`, ...`args`) => `void`
 
-Defined in: [electron/utils/interfaces.ts:11](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/utils/interfaces.ts#L11)
+Defined in: [electron/utils/interfaces.ts:11](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/interfaces.ts#L11)
 
 #### Parameters
 
@@ -33,7 +33,7 @@ Defined in: [electron/utils/interfaces.ts:11](https://github.com/Nick2bad4u/Upti
 
 > **error**: (`message`, `error?`, ...`args`) => `void`
 
-Defined in: [electron/utils/interfaces.ts:12](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/utils/interfaces.ts#L12)
+Defined in: [electron/utils/interfaces.ts:12](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/interfaces.ts#L12)
 
 #### Parameters
 
@@ -59,7 +59,7 @@ Defined in: [electron/utils/interfaces.ts:12](https://github.com/Nick2bad4u/Upti
 
 > **info**: (`message`, ...`args`) => `void`
 
-Defined in: [electron/utils/interfaces.ts:13](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/utils/interfaces.ts#L13)
+Defined in: [electron/utils/interfaces.ts:13](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/interfaces.ts#L13)
 
 #### Parameters
 
@@ -81,7 +81,7 @@ Defined in: [electron/utils/interfaces.ts:13](https://github.com/Nick2bad4u/Upti
 
 > **warn**: (`message`, ...`args`) => `void`
 
-Defined in: [electron/utils/interfaces.ts:14](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/utils/interfaces.ts#L14)
+Defined in: [electron/utils/interfaces.ts:14](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/interfaces.ts#L14)
 
 #### Parameters
 

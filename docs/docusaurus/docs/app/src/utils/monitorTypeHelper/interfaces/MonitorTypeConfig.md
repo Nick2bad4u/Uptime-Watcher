@@ -1,6 +1,6 @@
 # Interface: MonitorTypeConfig
 
-Defined in: [src/utils/monitorTypeHelper.ts:14](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/utils/monitorTypeHelper.ts#L14)
+Defined in: [src/utils/monitorTypeHelper.ts:14](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/utils/monitorTypeHelper.ts#L14)
 
 Frontend representation of monitor type configuration.
 
@@ -10,7 +10,7 @@ Frontend representation of monitor type configuration.
 
 > **description**: `string`
 
-Defined in: [src/utils/monitorTypeHelper.ts:16](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/utils/monitorTypeHelper.ts#L16)
+Defined in: [src/utils/monitorTypeHelper.ts:16](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/utils/monitorTypeHelper.ts#L16)
 
 Description of what this monitor checks
 
@@ -20,7 +20,7 @@ Description of what this monitor checks
 
 > **displayName**: `string`
 
-Defined in: [src/utils/monitorTypeHelper.ts:18](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/utils/monitorTypeHelper.ts#L18)
+Defined in: [src/utils/monitorTypeHelper.ts:18](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/utils/monitorTypeHelper.ts#L18)
 
 Human-readable display name
 
@@ -30,7 +30,7 @@ Human-readable display name
 
 > **fields**: [`MonitorFieldDefinition`](../../../../shared/types/interfaces/MonitorFieldDefinition.md)[]
 
-Defined in: [src/utils/monitorTypeHelper.ts:20](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/utils/monitorTypeHelper.ts#L20)
+Defined in: [src/utils/monitorTypeHelper.ts:20](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/utils/monitorTypeHelper.ts#L20)
 
 Field definitions for dynamic form generation
 
@@ -40,7 +40,7 @@ Field definitions for dynamic form generation
 
 > **type**: `string`
 
-Defined in: [src/utils/monitorTypeHelper.ts:22](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/utils/monitorTypeHelper.ts#L22)
+Defined in: [src/utils/monitorTypeHelper.ts:22](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/utils/monitorTypeHelper.ts#L22)
 
 Unique identifier for the monitor type
 
@@ -50,7 +50,7 @@ Unique identifier for the monitor type
 
 > `optional` **uiConfig**: `object`
 
-Defined in: [src/utils/monitorTypeHelper.ts:24](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/utils/monitorTypeHelper.ts#L24)
+Defined in: [src/utils/monitorTypeHelper.ts:24](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/utils/monitorTypeHelper.ts#L24)
 
 UI display configuration
 
@@ -112,6 +112,6 @@ Whether this monitor type supports response time analytics
 
 > **version**: `string`
 
-Defined in: [src/utils/monitorTypeHelper.ts:47](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/utils/monitorTypeHelper.ts#L47)
+Defined in: [src/utils/monitorTypeHelper.ts:47](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/utils/monitorTypeHelper.ts#L47)
 
 Version of the monitor implementation

@@ -1,6 +1,6 @@
 # Interface: IMonitoringOperations
 
-Defined in: [electron/managers/SiteManager.ts:69](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/managers/SiteManager.ts#L69)
+Defined in: [electron/managers/SiteManager.ts:69](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/SiteManager.ts#L69)
 
 Interface for monitoring operations integration.
 
@@ -16,7 +16,7 @@ the SiteManager and MonitorManager while enabling coordinated operations.
 
 > **setHistoryLimit**: (`limit`) => `Promise`\<`void`\>
 
-Defined in: [electron/managers/SiteManager.ts:71](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/managers/SiteManager.ts#L71)
+Defined in: [electron/managers/SiteManager.ts:71](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/SiteManager.ts#L71)
 
 Update the global history limit setting
 
@@ -36,7 +36,7 @@ Update the global history limit setting
 
 > **setupNewMonitors**: (`site`, `newMonitorIds`) => `Promise`\<`void`\>
 
-Defined in: [electron/managers/SiteManager.ts:73](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/managers/SiteManager.ts#L73)
+Defined in: [electron/managers/SiteManager.ts:73](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/SiteManager.ts#L73)
 
 Set up monitoring for newly created monitors
 
@@ -60,7 +60,7 @@ Set up monitoring for newly created monitors
 
 > **startMonitoringForSite**: (`identifier`, `monitorId`) => `Promise`\<`boolean`\>
 
-Defined in: [electron/managers/SiteManager.ts:75](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/managers/SiteManager.ts#L75)
+Defined in: [electron/managers/SiteManager.ts:75](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/SiteManager.ts#L75)
 
 Start monitoring for a specific site and monitor
 
@@ -84,7 +84,7 @@ Start monitoring for a specific site and monitor
 
 > **stopMonitoringForSite**: (`identifier`, `monitorId`) => `Promise`\<`boolean`\>
 
-Defined in: [electron/managers/SiteManager.ts:77](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/managers/SiteManager.ts#L77)
+Defined in: [electron/managers/SiteManager.ts:77](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/SiteManager.ts#L77)
 
 Stop monitoring for a specific site and monitor
 

@@ -1,6 +1,6 @@
 # Class: DatabaseService
 
-Defined in: [electron/services/database/DatabaseService.ts:40](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/DatabaseService.ts#L40)
+Defined in: [electron/services/database/DatabaseService.ts:40](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/DatabaseService.ts#L40)
 
 Core database service for SQLite connection and schema management.
 
@@ -40,7 +40,7 @@ const db = dbService.getDatabase();
 
 > **close**(): `void`
 
-Defined in: [electron/services/database/DatabaseService.ts:85](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/DatabaseService.ts#L85)
+Defined in: [electron/services/database/DatabaseService.ts:85](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/DatabaseService.ts#L85)
 
 Close the database connection safely.
 
@@ -71,7 +71,7 @@ Error When connection close fails
 
 > **executeTransaction**\<`T`\>(`operation`): `Promise`\<`T`\>
 
-Defined in: [electron/services/database/DatabaseService.ts:121](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/DatabaseService.ts#L121)
+Defined in: [electron/services/database/DatabaseService.ts:121](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/DatabaseService.ts#L121)
 
 Execute a function within a database transaction.
 
@@ -119,7 +119,7 @@ Ensures data consistency for complex operations involving multiple queries.
 
 > **getDatabase**(): `Database`
 
-Defined in: [electron/services/database/DatabaseService.ts:149](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/DatabaseService.ts#L149)
+Defined in: [electron/services/database/DatabaseService.ts:149](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/DatabaseService.ts#L149)
 
 Get the database instance.
 
@@ -143,7 +143,7 @@ Call [DatabaseService.initialize](#initialize) first to set up the database conn
 
 > **initialize**(): `Database`
 
-Defined in: [electron/services/database/DatabaseService.ts:179](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/DatabaseService.ts#L179)
+Defined in: [electron/services/database/DatabaseService.ts:179](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/DatabaseService.ts#L179)
 
 Initialize the database connection and create schema if it doesn't exist.
 
@@ -180,7 +180,7 @@ Error When database initialization fails
 
 > `static` **getInstance**(): `DatabaseService`
 
-Defined in: [electron/services/database/DatabaseService.ts:64](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/DatabaseService.ts#L64)
+Defined in: [electron/services/database/DatabaseService.ts:64](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/DatabaseService.ts#L64)
 
 Get the singleton database service instance.
 

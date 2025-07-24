@@ -1,6 +1,6 @@
 # Interface: MigrationRule
 
-Defined in: [electron/services/monitoring/MigrationSystem.ts:8](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/MigrationSystem.ts#L8)
+Defined in: [electron/services/monitoring/MigrationSystem.ts:8](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/MigrationSystem.ts#L8)
 
 ## Properties
 
@@ -8,7 +8,7 @@ Defined in: [electron/services/monitoring/MigrationSystem.ts:8](https://github.c
 
 > **description**: `string`
 
-Defined in: [electron/services/monitoring/MigrationSystem.ts:9](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/MigrationSystem.ts#L9)
+Defined in: [electron/services/monitoring/MigrationSystem.ts:9](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/MigrationSystem.ts#L9)
 
 ***
 
@@ -16,7 +16,7 @@ Defined in: [electron/services/monitoring/MigrationSystem.ts:9](https://github.c
 
 > **fromVersion**: `string`
 
-Defined in: [electron/services/monitoring/MigrationSystem.ts:10](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/MigrationSystem.ts#L10)
+Defined in: [electron/services/monitoring/MigrationSystem.ts:10](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/MigrationSystem.ts#L10)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [electron/services/monitoring/MigrationSystem.ts:10](https://github.
 
 > **isBreaking**: `boolean`
 
-Defined in: [electron/services/monitoring/MigrationSystem.ts:11](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/MigrationSystem.ts#L11)
+Defined in: [electron/services/monitoring/MigrationSystem.ts:11](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/MigrationSystem.ts#L11)
 
 ***
 
@@ -32,7 +32,7 @@ Defined in: [electron/services/monitoring/MigrationSystem.ts:11](https://github.
 
 > **toVersion**: `string`
 
-Defined in: [electron/services/monitoring/MigrationSystem.ts:12](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/MigrationSystem.ts#L12)
+Defined in: [electron/services/monitoring/MigrationSystem.ts:12](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/MigrationSystem.ts#L12)
 
 ***
 
@@ -40,7 +40,7 @@ Defined in: [electron/services/monitoring/MigrationSystem.ts:12](https://github.
 
 > **transform**: (`data`) => `Promise`\<`Record`\<`string`, `unknown`\>\>
 
-Defined in: [electron/services/monitoring/MigrationSystem.ts:13](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/MigrationSystem.ts#L13)
+Defined in: [electron/services/monitoring/MigrationSystem.ts:13](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/MigrationSystem.ts#L13)
 
 #### Parameters
 

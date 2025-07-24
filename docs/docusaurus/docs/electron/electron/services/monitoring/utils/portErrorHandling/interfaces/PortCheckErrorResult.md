@@ -1,6 +1,6 @@
 # Interface: PortCheckErrorResult
 
-Defined in: [electron/services/monitoring/utils/portErrorHandling.ts:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/utils/portErrorHandling.ts#L25)
+Defined in: [electron/services/monitoring/utils/portErrorHandling.ts:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/utils/portErrorHandling.ts#L25)
 
 Result structure for failed port check operations.
 
@@ -10,7 +10,7 @@ Result structure for failed port check operations.
 
 > **details**: `string`
 
-Defined in: [electron/services/monitoring/utils/portErrorHandling.ts:27](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/utils/portErrorHandling.ts#L27)
+Defined in: [electron/services/monitoring/utils/portErrorHandling.ts:27](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/utils/portErrorHandling.ts#L27)
 
 Port number that was being checked
 
@@ -20,7 +20,7 @@ Port number that was being checked
 
 > **error**: `string`
 
-Defined in: [electron/services/monitoring/utils/portErrorHandling.ts:29](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/utils/portErrorHandling.ts#L29)
+Defined in: [electron/services/monitoring/utils/portErrorHandling.ts:29](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/utils/portErrorHandling.ts#L29)
 
 Standardized error message for frontend consumption
 
@@ -30,7 +30,7 @@ Standardized error message for frontend consumption
 
 > **responseTime**: `number`
 
-Defined in: [electron/services/monitoring/utils/portErrorHandling.ts:31](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/utils/portErrorHandling.ts#L31)
+Defined in: [electron/services/monitoring/utils/portErrorHandling.ts:31](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/utils/portErrorHandling.ts#L31)
 
 Response time in milliseconds, -1 if measurement failed
 
@@ -40,6 +40,6 @@ Response time in milliseconds, -1 if measurement failed
 
 > **status**: `"down"`
 
-Defined in: [electron/services/monitoring/utils/portErrorHandling.ts:33](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/utils/portErrorHandling.ts#L33)
+Defined in: [electron/services/monitoring/utils/portErrorHandling.ts:33](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/utils/portErrorHandling.ts#L33)
 
 Always "down" for error results

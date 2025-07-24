@@ -1,6 +1,6 @@
 # Interface: PortMonitorFields
 
-Defined in: [src/types/monitor-forms.ts:95](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/types/monitor-forms.ts#L95)
+Defined in: [src/types/monitor-forms.ts:95](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/types/monitor-forms.ts#L95)
 
 Port monitor specific fields
 
@@ -14,7 +14,7 @@ Port monitor specific fields
 
 > `optional` **checkInterval**: `number`
 
-Defined in: [src/types/monitor-forms.ts:13](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/types/monitor-forms.ts#L13)
+Defined in: [src/types/monitor-forms.ts:13](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/types/monitor-forms.ts#L13)
 
 Check interval in milliseconds
 
@@ -28,7 +28,7 @@ Check interval in milliseconds
 
 > `optional` **connectionType**: `"tcp"` \| `"udp"`
 
-Defined in: [src/types/monitor-forms.ts:97](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/types/monitor-forms.ts#L97)
+Defined in: [src/types/monitor-forms.ts:97](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/types/monitor-forms.ts#L97)
 
 Connection type
 
@@ -38,7 +38,7 @@ Connection type
 
 > **host**: `string`
 
-Defined in: [src/types/monitor-forms.ts:99](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/types/monitor-forms.ts#L99)
+Defined in: [src/types/monitor-forms.ts:99](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/types/monitor-forms.ts#L99)
 
 Host to monitor
 
@@ -48,7 +48,7 @@ Host to monitor
 
 > `optional` **name**: `string`
 
-Defined in: [src/types/monitor-forms.ts:15](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/types/monitor-forms.ts#L15)
+Defined in: [src/types/monitor-forms.ts:15](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/types/monitor-forms.ts#L15)
 
 Monitor name
 
@@ -62,7 +62,7 @@ Monitor name
 
 > **port**: `number`
 
-Defined in: [src/types/monitor-forms.ts:101](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/types/monitor-forms.ts#L101)
+Defined in: [src/types/monitor-forms.ts:101](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/types/monitor-forms.ts#L101)
 
 Port number
 
@@ -72,7 +72,7 @@ Port number
 
 > `optional` **retryAttempts**: `number`
 
-Defined in: [src/types/monitor-forms.ts:17](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/types/monitor-forms.ts#L17)
+Defined in: [src/types/monitor-forms.ts:17](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/types/monitor-forms.ts#L17)
 
 Number of retry attempts
 
@@ -86,7 +86,7 @@ Number of retry attempts
 
 > `optional` **timeout**: `number`
 
-Defined in: [src/types/monitor-forms.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/types/monitor-forms.ts#L19)
+Defined in: [src/types/monitor-forms.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/types/monitor-forms.ts#L19)
 
 Timeout in milliseconds
 

@@ -2,7 +2,7 @@
 
 > **isEventOfCategory**(`eventName`, `category`): `boolean`
 
-Defined in: [electron/events/eventTypes.ts:585](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L585)
+Defined in: [electron/events/eventTypes.ts:585](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L585)
 
 Type guard to check if an event belongs to a specific category.
 

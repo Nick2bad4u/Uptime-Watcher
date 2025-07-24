@@ -1,6 +1,6 @@
 # Interface: ThemeColors
 
-Defined in: [src/theme/types.ts:50](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/theme/types.ts#L50)
+Defined in: [src/theme/types.ts:50](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L50)
 
 Color palette interface defining all theme colors.
 Provides a comprehensive color system for consistent theming.
@@ -11,7 +11,7 @@ Provides a comprehensive color system for consistent theming.
 
 > **background**: `object`
 
-Defined in: [src/theme/types.ts:52](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/theme/types.ts#L52)
+Defined in: [src/theme/types.ts:52](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L52)
 
 #### modal
 
@@ -35,7 +35,7 @@ Defined in: [src/theme/types.ts:52](https://github.com/Nick2bad4u/Uptime-Watcher
 
 > **border**: `object`
 
-Defined in: [src/theme/types.ts:60](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/theme/types.ts#L60)
+Defined in: [src/theme/types.ts:60](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L60)
 
 #### focus
 
@@ -55,7 +55,7 @@ Defined in: [src/theme/types.ts:60](https://github.com/Nick2bad4u/Uptime-Watcher
 
 > **error**: `string`
 
-Defined in: [src/theme/types.ts:66](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/theme/types.ts#L66)
+Defined in: [src/theme/types.ts:66](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L66)
 
 ***
 
@@ -63,7 +63,7 @@ Defined in: [src/theme/types.ts:66](https://github.com/Nick2bad4u/Uptime-Watcher
 
 > **errorAlert**: `string`
 
-Defined in: [src/theme/types.ts:67](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/theme/types.ts#L67)
+Defined in: [src/theme/types.ts:67](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L67)
 
 ***
 
@@ -71,7 +71,7 @@ Defined in: [src/theme/types.ts:67](https://github.com/Nick2bad4u/Uptime-Watcher
 
 > **hover**: `object`
 
-Defined in: [src/theme/types.ts:69](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/theme/types.ts#L69)
+Defined in: [src/theme/types.ts:69](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L69)
 
 #### dark
 
@@ -91,7 +91,7 @@ Defined in: [src/theme/types.ts:69](https://github.com/Nick2bad4u/Uptime-Watcher
 
 > **info**: `string`
 
-Defined in: [src/theme/types.ts:74](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/theme/types.ts#L74)
+Defined in: [src/theme/types.ts:74](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L74)
 
 ***
 
@@ -99,7 +99,7 @@ Defined in: [src/theme/types.ts:74](https://github.com/Nick2bad4u/Uptime-Watcher
 
 > **primary**: `object`
 
-Defined in: [src/theme/types.ts:76](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/theme/types.ts#L76)
+Defined in: [src/theme/types.ts:76](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L76)
 
 #### 100
 
@@ -147,7 +147,7 @@ Defined in: [src/theme/types.ts:76](https://github.com/Nick2bad4u/Uptime-Watcher
 
 > **status**: `object`
 
-Defined in: [src/theme/types.ts:90](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/theme/types.ts#L90)
+Defined in: [src/theme/types.ts:90](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L90)
 
 #### down
 
@@ -179,7 +179,7 @@ Defined in: [src/theme/types.ts:90](https://github.com/Nick2bad4u/Uptime-Watcher
 
 > **success**: `string`
 
-Defined in: [src/theme/types.ts:100](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/theme/types.ts#L100)
+Defined in: [src/theme/types.ts:100](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L100)
 
 ***
 
@@ -187,7 +187,7 @@ Defined in: [src/theme/types.ts:100](https://github.com/Nick2bad4u/Uptime-Watche
 
 > **surface**: `object`
 
-Defined in: [src/theme/types.ts:103](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/theme/types.ts#L103)
+Defined in: [src/theme/types.ts:103](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L103)
 
 #### base
 
@@ -207,7 +207,7 @@ Defined in: [src/theme/types.ts:103](https://github.com/Nick2bad4u/Uptime-Watche
 
 > **text**: `object`
 
-Defined in: [src/theme/types.ts:110](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/theme/types.ts#L110)
+Defined in: [src/theme/types.ts:110](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L110)
 
 #### inverse
 
@@ -231,4 +231,4 @@ Defined in: [src/theme/types.ts:110](https://github.com/Nick2bad4u/Uptime-Watche
 
 > **warning**: `string`
 
-Defined in: [src/theme/types.ts:117](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/theme/types.ts#L117)
+Defined in: [src/theme/types.ts:117](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/types.ts#L117)

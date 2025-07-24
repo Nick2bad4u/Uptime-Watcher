@@ -214,14 +214,14 @@
     "update-tsdoc": "node scripts/download-tsdoc-tags.js",
     "validate:components": "node ./scripts/validate-components.js",
     "docs:typedoc": "typedoc --options typedoc.json && typedoc --options typedoc.electron.json && node scripts/fix-mdx-typedoc.js",
-    "docs:build": "node scripts/fix-mdx-typedoc.js && cd docs/docusaurus && yarn build",
-    "docs:deploy": "npm run docs:typedoc && node scripts/fix-mdx-typedoc.js && cd docs/docusaurus && yarn deploy",
-    "docusaurus:start": "node scripts/fix-mdx-typedoc.js && cd docs/docusaurus && docusaurus start",
-    "docusaurus:build": "node scripts/fix-mdx-typedoc.js && cd docs/docusaurus && docusaurus build",
-    "docusaurus:serve": "node scripts/fix-mdx-typedoc.js && cd docs/docusaurus && docusaurus serve",
-    "docusaurus:clean": "node scripts/fix-mdx-typedoc.js && cd docs/docusaurus && docusaurus clear",
-    "docusaurus:broken-links": "node scripts/fix-mdx-typedoc.js && cd docs/docusaurus && docusaurus check",
-    "docusaurus:sitemap": "node scripts/fix-mdx-typedoc.js && cd docs/docusaurus && docusaurus sitemap"
+    "docs:build": "npm run docs:typedoc && cd docs/docusaurus && yarn build",
+    "docs:deploy": "npm run docs:typedoc && cd docs/docusaurus && yarn deploy",
+    "docusaurus:start": "npm run docs:typedoc && cd docs/docusaurus && docusaurus start",
+    "docusaurus:build": "npm run docs:typedoc && cd docs/docusaurus && docusaurus build",
+    "docusaurus:serve": "npm run docs:typedoc && cd docs/docusaurus && docusaurus serve",
+    "docusaurus:clean": "npm run docs:typedoc && cd docs/docusaurus && docusaurus clear",
+    "docusaurus:broken-links": "npm run docs:typedoc && cd docs/docusaurus && docusaurus check",
+    "docusaurus:sitemap": "npm run docs:typedoc && cd docs/docusaurus && docusaurus sitemap"
   },
   "overrides": {
     "@codecov/vite-plugin": {

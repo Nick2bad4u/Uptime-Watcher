@@ -1,6 +1,6 @@
 # Interface: MonitorUpEventData
 
-Defined in: [shared/types/events.ts:55](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/shared/types/events.ts#L55)
+Defined in: [shared/types/events.ts:55](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/types/events.ts#L55)
 
 Event data when a monitor comes back up
 
@@ -10,7 +10,7 @@ Event data when a monitor comes back up
 
 > **monitor**: [`Monitor`](../../interfaces/Monitor.md)
 
-Defined in: [shared/types/events.ts:57](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/shared/types/events.ts#L57)
+Defined in: [shared/types/events.ts:57](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/types/events.ts#L57)
 
 Monitor that came back up
 
@@ -20,7 +20,7 @@ Monitor that came back up
 
 > **site**: [`Site`](../../interfaces/Site.md)
 
-Defined in: [shared/types/events.ts:59](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/shared/types/events.ts#L59)
+Defined in: [shared/types/events.ts:59](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/types/events.ts#L59)
 
 Site containing the monitor
 
@@ -30,7 +30,7 @@ Site containing the monitor
 
 > **siteId**: `string`
 
-Defined in: [shared/types/events.ts:61](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/shared/types/events.ts#L61)
+Defined in: [shared/types/events.ts:61](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/types/events.ts#L61)
 
 Site identifier
 
@@ -40,6 +40,6 @@ Site identifier
 
 > **timestamp**: `number`
 
-Defined in: [shared/types/events.ts:63](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/shared/types/events.ts#L63)
+Defined in: [shared/types/events.ts:63](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/types/events.ts#L63)
 
 Timestamp when the event occurred

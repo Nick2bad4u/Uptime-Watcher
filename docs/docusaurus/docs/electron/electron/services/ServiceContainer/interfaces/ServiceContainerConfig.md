@@ -1,6 +1,6 @@
 # Interface: ServiceContainerConfig
 
-Defined in: [electron/services/ServiceContainer.ts:44](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/ServiceContainer.ts#L44)
+Defined in: [electron/services/ServiceContainer.ts:44](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/ServiceContainer.ts#L44)
 
 Configuration interface for service container behavior.
 
@@ -15,7 +15,7 @@ All properties are optional with sensible defaults.
 
 > `optional` **enableDebugLogging**: `boolean`
 
-Defined in: [electron/services/ServiceContainer.ts:59](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/ServiceContainer.ts#L59)
+Defined in: [electron/services/ServiceContainer.ts:59](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/ServiceContainer.ts#L59)
 
 Enable debug logging for service initialization and lifecycle events.
 
@@ -41,7 +41,7 @@ Useful for debugging service dependency issues and startup problems.
 
 > `optional` **notificationConfig**: `object`
 
-Defined in: [electron/services/ServiceContainer.ts:72](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/ServiceContainer.ts#L72)
+Defined in: [electron/services/ServiceContainer.ts:72](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/ServiceContainer.ts#L72)
 
 Custom notification service configuration.
 

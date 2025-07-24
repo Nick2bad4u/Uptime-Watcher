@@ -2,7 +2,7 @@
 
 > **useTheme**(): `object`
 
-Defined in: [src/theme/useTheme.ts:122](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/theme/useTheme.ts#L122)
+Defined in: [src/theme/useTheme.ts:122](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/useTheme.ts#L122)
 
 Main theme hook providing comprehensive theme management functionality.
 

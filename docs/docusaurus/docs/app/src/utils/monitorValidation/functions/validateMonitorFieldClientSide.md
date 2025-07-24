@@ -2,7 +2,7 @@
 
 > **validateMonitorFieldClientSide**(`type`, `fieldName`, `value`): `Promise`\<\` `errors`: `string`[]; `success`: `boolean`; \`\>
 
-Defined in: [src/utils/monitorValidation.ts:141](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/utils/monitorValidation.ts#L141)
+Defined in: [src/utils/monitorValidation.ts:141](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/utils/monitorValidation.ts#L141)
 
 Validate a specific monitor field for real-time feedback using shared schemas.
 Provides immediate validation without IPC round-trip.

@@ -1,6 +1,6 @@
 # Class: DatabaseManager
 
-Defined in: [electron/managers/DatabaseManager.ts:89](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/managers/DatabaseManager.ts#L89)
+Defined in: [electron/managers/DatabaseManager.ts:89](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/DatabaseManager.ts#L89)
 
 Database operations manager for the Uptime Watcher application.
 
@@ -51,7 +51,7 @@ const exportData = await databaseManager.exportData();
 
 > **new DatabaseManager**(`dependencies`): `DatabaseManager`
 
-Defined in: [electron/managers/DatabaseManager.ts:95](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/managers/DatabaseManager.ts#L95)
+Defined in: [electron/managers/DatabaseManager.ts:95](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/DatabaseManager.ts#L95)
 
 #### Parameters
 
@@ -69,7 +69,7 @@ Defined in: [electron/managers/DatabaseManager.ts:95](https://github.com/Nick2ba
 
 > **downloadBackup**(): `Promise`\<\` `buffer`: `Buffer`; `fileName`: `string`; \`\>
 
-Defined in: [electron/managers/DatabaseManager.ts:104](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/managers/DatabaseManager.ts#L104)
+Defined in: [electron/managers/DatabaseManager.ts:104](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/DatabaseManager.ts#L104)
 
 Download SQLite database backup.
 
@@ -83,7 +83,7 @@ Download SQLite database backup.
 
 > **exportData**(): `Promise`\<`string`\>
 
-Defined in: [electron/managers/DatabaseManager.ts:126](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/managers/DatabaseManager.ts#L126)
+Defined in: [electron/managers/DatabaseManager.ts:126](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/DatabaseManager.ts#L126)
 
 Export all application data to JSON string.
 
@@ -97,7 +97,7 @@ Export all application data to JSON string.
 
 > **getHistoryLimit**(): `number`
 
-Defined in: [electron/managers/DatabaseManager.ts:157](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/managers/DatabaseManager.ts#L157)
+Defined in: [electron/managers/DatabaseManager.ts:157](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/DatabaseManager.ts#L157)
 
 Get current history limit.
 
@@ -113,7 +113,7 @@ Current history limit value
 
 > **importData**(`data`): `Promise`\<`boolean`\>
 
-Defined in: [electron/managers/DatabaseManager.ts:203](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/managers/DatabaseManager.ts#L203)
+Defined in: [electron/managers/DatabaseManager.ts:203](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/DatabaseManager.ts#L203)
 
 Import data from JSON string with comprehensive error handling.
 
@@ -175,7 +175,7 @@ return withErrorHandling(
 
 > **initialize**(): `Promise`\<`void`\>
 
-Defined in: [electron/managers/DatabaseManager.ts:258](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/managers/DatabaseManager.ts#L258)
+Defined in: [electron/managers/DatabaseManager.ts:258](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/DatabaseManager.ts#L258)
 
 Initialize the database and load sites.
 
@@ -189,7 +189,7 @@ Initialize the database and load sites.
 
 > **refreshSites**(): `Promise`\<[`Site`](../../../../shared/types/interfaces/Site.md)[]\>
 
-Defined in: [electron/managers/DatabaseManager.ts:310](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/managers/DatabaseManager.ts#L310)
+Defined in: [electron/managers/DatabaseManager.ts:310](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/DatabaseManager.ts#L310)
 
 Refresh sites from database and update cache.
 
@@ -205,7 +205,7 @@ Promise resolving to array of sites
 
 > **setHistoryLimit**(`limit`): `Promise`\<`void`\>
 
-Defined in: [electron/managers/DatabaseManager.ts:348](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/managers/DatabaseManager.ts#L348)
+Defined in: [electron/managers/DatabaseManager.ts:348](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/DatabaseManager.ts#L348)
 
 Set history limit for monitor data retention.
 

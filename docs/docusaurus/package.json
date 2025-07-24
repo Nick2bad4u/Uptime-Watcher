@@ -5,7 +5,11 @@
   "scripts": {
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
-    "build": "docusaurus build",
+    "build": "npm run generate-docs && docusaurus build",
+    "build:fast": "docusaurus build",
+    "generate-docs": "npm run generate-docs:app && npm run generate-docs:electron",
+    "generate-docs:app": "typedoc --options ../../typedoc.json",
+    "generate-docs:electron": "typedoc --options ../../typedoc.electron.json",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",
@@ -28,6 +32,7 @@
     "@docusaurus/tsconfig": "3.8.1",
     "@docusaurus/types": "3.8.1",
     "typedoc": "^0.28.7",
+    "typedoc-docusaurus-theme": "^0.0.7",
     "typedoc-plugin-markdown": "^4.7.1",
     "typescript": "~5.6.2"
   },

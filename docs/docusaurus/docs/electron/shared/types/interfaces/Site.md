@@ -1,6 +1,6 @@
 # Interface: Site
 
-Defined in: [shared/types.ts:42](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/shared/types.ts#L42)
+Defined in: [shared/types.ts:42](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/types.ts#L42)
 
 ## Properties
 
@@ -8,7 +8,7 @@ Defined in: [shared/types.ts:42](https://github.com/Nick2bad4u/Uptime-Watcher/bl
 
 > **identifier**: `string`
 
-Defined in: [shared/types.ts:43](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/shared/types.ts#L43)
+Defined in: [shared/types.ts:43](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/types.ts#L43)
 
 ***
 
@@ -16,7 +16,7 @@ Defined in: [shared/types.ts:43](https://github.com/Nick2bad4u/Uptime-Watcher/bl
 
 > **monitoring**: `boolean`
 
-Defined in: [shared/types.ts:44](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/shared/types.ts#L44)
+Defined in: [shared/types.ts:44](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/types.ts#L44)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [shared/types.ts:44](https://github.com/Nick2bad4u/Uptime-Watcher/bl
 
 > **monitors**: [`Monitor`](Monitor.md)[]
 
-Defined in: [shared/types.ts:45](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/shared/types.ts#L45)
+Defined in: [shared/types.ts:45](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/types.ts#L45)
 
 ***
 
@@ -32,4 +32,4 @@ Defined in: [shared/types.ts:45](https://github.com/Nick2bad4u/Uptime-Watcher/bl
 
 > **name**: `string`
 
-Defined in: [shared/types.ts:46](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/shared/types.ts#L46)
+Defined in: [shared/types.ts:46](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/types.ts#L46)

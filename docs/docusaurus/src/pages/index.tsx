@@ -91,8 +91,8 @@ export default function Home(): ReactNode {
                 </ol>
                 <Link
                   className="button button--outline button--primary"
-                  to="/docs/installation">
-                  View Installation Guide →
+                  to="/docs/intro">
+                  View Docs →
                 </Link>
               </div>
               <div className="col col--6">

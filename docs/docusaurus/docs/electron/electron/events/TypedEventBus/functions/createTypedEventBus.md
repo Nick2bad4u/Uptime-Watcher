@@ -2,7 +2,7 @@
 
 > **createTypedEventBus**\<`EventMap`\>(`name?`, `options?`): [`TypedEventBus`](../classes/TypedEventBus.md)\<`EventMap`\>
 
-Defined in: [electron/events/TypedEventBus.ts:519](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/TypedEventBus.ts#L519)
+Defined in: [electron/events/TypedEventBus.ts:519](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/TypedEventBus.ts#L519)
 
 Utility function to create a typed event bus instance.
 

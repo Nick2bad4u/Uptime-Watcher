@@ -1,6 +1,6 @@
 # Class: DataImportExportService
 
-Defined in: [electron/utils/database/DataImportExportService.ts:48](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/utils/database/DataImportExportService.ts#L48)
+Defined in: [electron/utils/database/DataImportExportService.ts:48](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/database/DataImportExportService.ts#L48)
 
 Service for handling data import/export operations.
 Separates data operations from side effects for better testability.
@@ -11,7 +11,7 @@ Separates data operations from side effects for better testability.
 
 > **new DataImportExportService**(`config`): `DataImportExportService`
 
-Defined in: [electron/utils/database/DataImportExportService.ts:61](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/utils/database/DataImportExportService.ts#L61)
+Defined in: [electron/utils/database/DataImportExportService.ts:61](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/database/DataImportExportService.ts#L61)
 
 #### Parameters
 
@@ -29,7 +29,7 @@ Defined in: [electron/utils/database/DataImportExportService.ts:61](https://gith
 
 > **exportAllData**(): `Promise`\<`string`\>
 
-Defined in: [electron/utils/database/DataImportExportService.ts:72](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/utils/database/DataImportExportService.ts#L72)
+Defined in: [electron/utils/database/DataImportExportService.ts:72](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/database/DataImportExportService.ts#L72)
 
 Export all application data as JSON string.
 Pure data operation without side effects.
@@ -44,7 +44,7 @@ Pure data operation without side effects.
 
 > **importDataFromJson**(`jsonData`): `Promise`\<\` `settings`: `Record`\<`string`, `string`\>; `sites`: [`ImportSite`](../interfaces/ImportSite.md)[]; \`\>
 
-Defined in: [electron/utils/database/DataImportExportService.ts:105](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/utils/database/DataImportExportService.ts#L105)
+Defined in: [electron/utils/database/DataImportExportService.ts:105](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/database/DataImportExportService.ts#L105)
 
 Import data from JSON string.
 Pure data operation that returns the imported data.
@@ -65,7 +65,7 @@ Pure data operation that returns the imported data.
 
 > **persistImportedData**(`sites`, `settings`): `Promise`\<`void`\>
 
-Defined in: [electron/utils/database/DataImportExportService.ts:138](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/utils/database/DataImportExportService.ts#L138)
+Defined in: [electron/utils/database/DataImportExportService.ts:138](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/database/DataImportExportService.ts#L138)
 
 Import sites and settings into database.
 Database operation that persists the imported data.

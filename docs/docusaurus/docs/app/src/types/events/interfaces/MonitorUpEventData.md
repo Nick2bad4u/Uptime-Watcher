@@ -1,6 +1,6 @@
 # Interface: MonitorUpEventData
 
-Defined in: [src/types/events.ts:49](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/types/events.ts#L49)
+Defined in: [src/types/events.ts:49](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/types/events.ts#L49)
 
 Event data when a monitor comes back up
 
@@ -10,7 +10,7 @@ Event data when a monitor comes back up
 
 > **monitor**: [`Monitor`](../../../../shared/types/interfaces/Monitor.md)
 
-Defined in: [src/types/events.ts:51](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/types/events.ts#L51)
+Defined in: [src/types/events.ts:51](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/types/events.ts#L51)
 
 Monitor that came back up
 
@@ -20,7 +20,7 @@ Monitor that came back up
 
 > `optional` **responseTime**: `number`
 
-Defined in: [src/types/events.ts:53](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/types/events.ts#L53)
+Defined in: [src/types/events.ts:53](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/types/events.ts#L53)
 
 Response time in milliseconds
 
@@ -30,7 +30,7 @@ Response time in milliseconds
 
 > **site**: [`Site`](../../../../shared/types/interfaces/Site.md)
 
-Defined in: [src/types/events.ts:55](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/types/events.ts#L55)
+Defined in: [src/types/events.ts:55](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/types/events.ts#L55)
 
 Site containing the monitor
 
@@ -40,7 +40,7 @@ Site containing the monitor
 
 > **siteId**: `string`
 
-Defined in: [src/types/events.ts:57](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/types/events.ts#L57)
+Defined in: [src/types/events.ts:57](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/types/events.ts#L57)
 
 Site identifier
 
@@ -50,6 +50,6 @@ Site identifier
 
 > **timestamp**: `number`
 
-Defined in: [src/types/events.ts:59](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/types/events.ts#L59)
+Defined in: [src/types/events.ts:59](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/types/events.ts#L59)
 
 Timestamp when the event occurred

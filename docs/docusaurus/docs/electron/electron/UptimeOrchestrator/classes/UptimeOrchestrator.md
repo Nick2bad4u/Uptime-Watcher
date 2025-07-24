@@ -1,6 +1,6 @@
 # Class: UptimeOrchestrator
 
-Defined in: [electron/UptimeOrchestrator.ts:177](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/UptimeOrchestrator.ts#L177)
+Defined in: [electron/UptimeOrchestrator.ts:177](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/UptimeOrchestrator.ts#L177)
 
 Enhanced event bus with type safety and middleware support.
 
@@ -20,7 +20,7 @@ processed through a middleware chain before emission.
 
 > **new UptimeOrchestrator**(`dependencies?`): `UptimeOrchestrator`
 
-Defined in: [electron/UptimeOrchestrator.ts:212](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/UptimeOrchestrator.ts#L212)
+Defined in: [electron/UptimeOrchestrator.ts:212](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/UptimeOrchestrator.ts#L212)
 
 Constructs a new UptimeOrchestrator with injected dependencies.
 
@@ -61,7 +61,7 @@ initialization order and dependency management.
 
 > **get** **historyLimit**(): `number`
 
-Defined in: [electron/UptimeOrchestrator.ts:188](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/UptimeOrchestrator.ts#L188)
+Defined in: [electron/UptimeOrchestrator.ts:188](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/UptimeOrchestrator.ts#L188)
 
 Gets the current history retention limit.
 
@@ -83,7 +83,7 @@ The current history limit from DatabaseManager
 
 > **addSite**(`siteData`): `Promise`\<[`Site`](../../../shared/types/interfaces/Site.md)\>
 
-Defined in: [electron/UptimeOrchestrator.ts:240](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/UptimeOrchestrator.ts#L240)
+Defined in: [electron/UptimeOrchestrator.ts:240](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/UptimeOrchestrator.ts#L240)
 
 Adds a new site and sets up monitoring for it.
 Uses transaction-like behavior to ensure consistency.
@@ -112,7 +112,7 @@ Error if site creation or monitoring setup fails
 
 > **checkSiteManually**(`identifier`, `monitorId?`): `Promise`\<`undefined` \| [`StatusUpdate`](../../../shared/types/interfaces/StatusUpdate.md)\>
 
-Defined in: [electron/UptimeOrchestrator.ts:279](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/UptimeOrchestrator.ts#L279)
+Defined in: [electron/UptimeOrchestrator.ts:279](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/UptimeOrchestrator.ts#L279)
 
 Manually triggers a check for a site or monitor.
 
@@ -142,7 +142,7 @@ Promise resolving to a StatusUpdate or undefined if no update available.
 
 > **clearMiddleware**(): `void`
 
-Defined in: [electron/events/TypedEventBus.ts:181](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/TypedEventBus.ts#L181)
+Defined in: [electron/events/TypedEventBus.ts:181](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/TypedEventBus.ts#L181)
 
 Clear all registered middleware.
 
@@ -165,7 +165,7 @@ Events will be emitted directly without middleware processing.
 
 > **downloadBackup**(): `Promise`\<\` `buffer`: `Buffer`; `fileName`: `string`; \`\>
 
-Defined in: [electron/UptimeOrchestrator.ts:290](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/UptimeOrchestrator.ts#L290)
+Defined in: [electron/UptimeOrchestrator.ts:290](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/UptimeOrchestrator.ts#L290)
 
 Downloads a backup of the SQLite database.
 
@@ -183,7 +183,7 @@ Promise resolving to an object with:
 
 > **emitTyped**\<`K`\>(`event`, `data`): `Promise`\<`void`\>
 
-Defined in: [electron/events/TypedEventBus.ts:228](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/TypedEventBus.ts#L228)
+Defined in: [electron/events/TypedEventBus.ts:228](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/TypedEventBus.ts#L228)
 
 Emit a typed event through the middleware chain.
 
@@ -260,7 +260,7 @@ await bus.emitTyped('count:updated', 42);
 
 > **exportData**(): `Promise`\<`string`\>
 
-Defined in: [electron/UptimeOrchestrator.ts:299](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/UptimeOrchestrator.ts#L299)
+Defined in: [electron/UptimeOrchestrator.ts:299](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/UptimeOrchestrator.ts#L299)
 
 Exports all application data as a JSON string.
 
@@ -276,7 +276,7 @@ Promise resolving to the exported data string.
 
 > **getDiagnostics**(): [`EventBusDiagnostics`](../../events/TypedEventBus/interfaces/EventBusDiagnostics.md)
 
-Defined in: [electron/events/TypedEventBus.ts:264](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/TypedEventBus.ts#L264)
+Defined in: [electron/events/TypedEventBus.ts:264](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/TypedEventBus.ts#L264)
 
 Get diagnostic information about the event bus.
 
@@ -301,7 +301,7 @@ Includes listener counts per event, middleware count, and configuration.
 
 > **getHistoryLimit**(): `number`
 
-Defined in: [electron/UptimeOrchestrator.ts:313](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/UptimeOrchestrator.ts#L313)
+Defined in: [electron/UptimeOrchestrator.ts:313](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/UptimeOrchestrator.ts#L313)
 
 Gets the current history retention limit (method version for IPC compatibility).
 
@@ -323,7 +323,7 @@ since IPC can serialize method calls but not property access.
 
 > **getSites**(): `Promise`\<[`Site`](../../../shared/types/interfaces/Site.md)[]\>
 
-Defined in: [electron/UptimeOrchestrator.ts:322](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/UptimeOrchestrator.ts#L322)
+Defined in: [electron/UptimeOrchestrator.ts:322](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/UptimeOrchestrator.ts#L322)
 
 Retrieves all sites from the site manager.
 
@@ -339,7 +339,7 @@ Promise resolving to an array of Site objects.
 
 > **importData**(`data`): `Promise`\<`boolean`\>
 
-Defined in: [electron/UptimeOrchestrator.ts:334](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/UptimeOrchestrator.ts#L334)
+Defined in: [electron/UptimeOrchestrator.ts:334](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/UptimeOrchestrator.ts#L334)
 
 Imports application data from a JSON string.
 
@@ -363,7 +363,7 @@ Promise resolving to true if import succeeded, false otherwise.
 
 > **initialize**(): `Promise`\<`void`\>
 
-Defined in: [electron/UptimeOrchestrator.ts:345](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/UptimeOrchestrator.ts#L345)
+Defined in: [electron/UptimeOrchestrator.ts:345](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/UptimeOrchestrator.ts#L345)
 
 Initializes the orchestrator and all its managers.
 Ensures proper initialization order and error handling.
@@ -384,7 +384,7 @@ Error if any manager initialization fails
 
 > **offTyped**\<`K`\>(`event`, `listener?`): `this`
 
-Defined in: [electron/events/TypedEventBus.ts:291](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/TypedEventBus.ts#L291)
+Defined in: [electron/events/TypedEventBus.ts:291](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/TypedEventBus.ts#L291)
 
 Remove typed event listener(s).
 
@@ -428,7 +428,7 @@ If no listener is specified, all listeners for the event are removed.
 
 > **onceTyped**\<`K`\>(`event`, `listener`): `this`
 
-Defined in: [electron/events/TypedEventBus.ts:316](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/TypedEventBus.ts#L316)
+Defined in: [electron/events/TypedEventBus.ts:316](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/TypedEventBus.ts#L316)
 
 Register a one-time typed event listener.
 
@@ -472,7 +472,7 @@ The listener is automatically removed after the first time the event is emitted.
 
 > **onTyped**\<`K`\>(`event`, `listener`): `this`
 
-Defined in: [electron/events/TypedEventBus.ts:338](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/TypedEventBus.ts#L338)
+Defined in: [electron/events/TypedEventBus.ts:338](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/TypedEventBus.ts#L338)
 
 Register a typed event listener with guaranteed type safety.
 
@@ -517,7 +517,7 @@ TypeScript will enforce that the listener signature matches the event data type.
 
 > **removeMiddleware**(`middleware`): `boolean`
 
-Defined in: [electron/events/TypedEventBus.ts:355](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/TypedEventBus.ts#L355)
+Defined in: [electron/events/TypedEventBus.ts:355](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/TypedEventBus.ts#L355)
 
 Remove a specific middleware from the processing chain.
 
@@ -545,7 +545,7 @@ The middleware function to remove
 
 > **removeMonitor**(`siteIdentifier`, `monitorId`): `Promise`\<`boolean`\>
 
-Defined in: [electron/UptimeOrchestrator.ts:376](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/UptimeOrchestrator.ts#L376)
+Defined in: [electron/UptimeOrchestrator.ts:376](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/UptimeOrchestrator.ts#L376)
 
 Removes a monitor from a site and stops its monitoring.
 Uses a single database transaction to ensure atomicity.
@@ -580,7 +580,7 @@ Error if the removal operation fails critically
 
 > **removeSite**(`identifier`): `Promise`\<`boolean`\>
 
-Defined in: [electron/UptimeOrchestrator.ts:432](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/UptimeOrchestrator.ts#L432)
+Defined in: [electron/UptimeOrchestrator.ts:432](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/UptimeOrchestrator.ts#L432)
 
 Removes a site by its identifier.
 
@@ -610,7 +610,7 @@ the event forwarding system, not directly by this orchestrator method.
 
 > **setHistoryLimit**(`limit`): `Promise`\<`void`\>
 
-Defined in: [electron/UptimeOrchestrator.ts:450](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/UptimeOrchestrator.ts#L450)
+Defined in: [electron/UptimeOrchestrator.ts:450](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/UptimeOrchestrator.ts#L450)
 
 Sets the history retention limit for monitor data.
 
@@ -643,7 +643,7 @@ consistency between the setting update and history pruning.
 
 > **startMonitoring**(): `Promise`\<`void`\>
 
-Defined in: [electron/UptimeOrchestrator.ts:459](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/UptimeOrchestrator.ts#L459)
+Defined in: [electron/UptimeOrchestrator.ts:459](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/UptimeOrchestrator.ts#L459)
 
 Starts monitoring for all sites.
 
@@ -659,7 +659,7 @@ Promise that resolves when monitoring has started.
 
 > **startMonitoringForSite**(`identifier`, `monitorId?`): `Promise`\<`boolean`\>
 
-Defined in: [electron/UptimeOrchestrator.ts:470](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/UptimeOrchestrator.ts#L470)
+Defined in: [electron/UptimeOrchestrator.ts:470](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/UptimeOrchestrator.ts#L470)
 
 Starts monitoring for a specific site and monitor.
 
@@ -689,7 +689,7 @@ Promise resolving to true if started, false otherwise.
 
 > **stopMonitoring**(): `Promise`\<`void`\>
 
-Defined in: [electron/UptimeOrchestrator.ts:479](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/UptimeOrchestrator.ts#L479)
+Defined in: [electron/UptimeOrchestrator.ts:479](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/UptimeOrchestrator.ts#L479)
 
 Stops monitoring for all sites.
 
@@ -705,7 +705,7 @@ Promise that resolves when monitoring has stopped.
 
 > **stopMonitoringForSite**(`identifier`, `monitorId?`): `Promise`\<`boolean`\>
 
-Defined in: [electron/UptimeOrchestrator.ts:492](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/UptimeOrchestrator.ts#L492)
+Defined in: [electron/UptimeOrchestrator.ts:492](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/UptimeOrchestrator.ts#L492)
 
 Stops monitoring for a specific site and monitor.
 
@@ -735,7 +735,7 @@ Promise resolving to true if stopped, false otherwise.
 
 > **updateSite**(`identifier`, `updates`): `Promise`\<[`Site`](../../../shared/types/interfaces/Site.md)\>
 
-Defined in: [electron/UptimeOrchestrator.ts:503](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/UptimeOrchestrator.ts#L503)
+Defined in: [electron/UptimeOrchestrator.ts:503](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/UptimeOrchestrator.ts#L503)
 
 Updates a site with the given changes.
 
@@ -765,7 +765,7 @@ Promise resolving to the updated Site object.
 
 > **use**(`middleware`): `void`
 
-Defined in: [electron/events/TypedEventBus.ts:379](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/TypedEventBus.ts#L379)
+Defined in: [electron/events/TypedEventBus.ts:379](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/TypedEventBus.ts#L379)
 
 Register middleware to process events before emission.
 

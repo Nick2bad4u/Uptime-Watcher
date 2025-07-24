@@ -1,6 +1,6 @@
 # Class: MonitorScheduler
 
-Defined in: [electron/services/monitoring/MonitorScheduler.ts:14](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/MonitorScheduler.ts#L14)
+Defined in: [electron/services/monitoring/MonitorScheduler.ts:14](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/MonitorScheduler.ts#L14)
 
 Service for managing monitor scheduling and intervals.
 Handles per-monitor interval timers and scheduling logic.
@@ -27,7 +27,7 @@ stopping, and restarting monitoring operations.
 
 > **getActiveCount**(): `number`
 
-Defined in: [electron/services/monitoring/MonitorScheduler.ts:43](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/MonitorScheduler.ts#L43)
+Defined in: [electron/services/monitoring/MonitorScheduler.ts:43](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/MonitorScheduler.ts#L43)
 
 Get the number of active monitoring intervals.
 
@@ -41,7 +41,7 @@ Get the number of active monitoring intervals.
 
 > **getActiveMonitors**(): `string`[]
 
-Defined in: [electron/services/monitoring/MonitorScheduler.ts:50](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/MonitorScheduler.ts#L50)
+Defined in: [electron/services/monitoring/MonitorScheduler.ts:50](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/MonitorScheduler.ts#L50)
 
 Get all active monitoring keys.
 
@@ -55,7 +55,7 @@ Get all active monitoring keys.
 
 > **isMonitoring**(`siteIdentifier`, `monitorId`): `boolean`
 
-Defined in: [electron/services/monitoring/MonitorScheduler.ts:57](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/MonitorScheduler.ts#L57)
+Defined in: [electron/services/monitoring/MonitorScheduler.ts:57](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/MonitorScheduler.ts#L57)
 
 Check if a monitor is currently being monitored.
 
@@ -79,7 +79,7 @@ Check if a monitor is currently being monitored.
 
 > **performImmediateCheck**(`siteIdentifier`, `monitorId`): `Promise`\<`void`\>
 
-Defined in: [electron/services/monitoring/MonitorScheduler.ts:65](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/MonitorScheduler.ts#L65)
+Defined in: [electron/services/monitoring/MonitorScheduler.ts:65](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/MonitorScheduler.ts#L65)
 
 Perform an immediate check for a monitor (used when starting monitoring).
 
@@ -103,7 +103,7 @@ Perform an immediate check for a monitor (used when starting monitoring).
 
 > **restartMonitor**(`siteIdentifier`, `monitor`): `boolean`
 
-Defined in: [electron/services/monitoring/MonitorScheduler.ts:91](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/MonitorScheduler.ts#L91)
+Defined in: [electron/services/monitoring/MonitorScheduler.ts:91](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/MonitorScheduler.ts#L91)
 
 Restart monitoring for a specific monitor.
 
@@ -142,7 +142,7 @@ Return value semantics:
 
 > **setCheckCallback**(`callback`): `void`
 
-Defined in: [electron/services/monitoring/MonitorScheduler.ts:103](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/MonitorScheduler.ts#L103)
+Defined in: [electron/services/monitoring/MonitorScheduler.ts:103](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/MonitorScheduler.ts#L103)
 
 Set the callback function to execute when a monitor check is scheduled.
 
@@ -162,7 +162,7 @@ Set the callback function to execute when a monitor check is scheduled.
 
 > **startMonitor**(`siteIdentifier`, `monitor`): `boolean`
 
-Defined in: [electron/services/monitoring/MonitorScheduler.ts:110](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/MonitorScheduler.ts#L110)
+Defined in: [electron/services/monitoring/MonitorScheduler.ts:110](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/MonitorScheduler.ts#L110)
 
 Start monitoring for a specific monitor with its own interval.
 
@@ -186,7 +186,7 @@ Start monitoring for a specific monitor with its own interval.
 
 > **startSite**(`site`): `void`
 
-Defined in: [electron/services/monitoring/MonitorScheduler.ts:163](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/MonitorScheduler.ts#L163)
+Defined in: [electron/services/monitoring/MonitorScheduler.ts:163](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/MonitorScheduler.ts#L163)
 
 Start monitoring for all monitors in a site.
 
@@ -206,7 +206,7 @@ Start monitoring for all monitors in a site.
 
 > **stopAll**(): `void`
 
-Defined in: [electron/services/monitoring/MonitorScheduler.ts:174](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/MonitorScheduler.ts#L174)
+Defined in: [electron/services/monitoring/MonitorScheduler.ts:174](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/MonitorScheduler.ts#L174)
 
 Stop all monitoring intervals.
 
@@ -220,7 +220,7 @@ Stop all monitoring intervals.
 
 > **stopMonitor**(`siteIdentifier`, `monitorId`): `boolean`
 
-Defined in: [electron/services/monitoring/MonitorScheduler.ts:198](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/MonitorScheduler.ts#L198)
+Defined in: [electron/services/monitoring/MonitorScheduler.ts:198](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/MonitorScheduler.ts#L198)
 
 Stop monitoring for a specific monitor.
 
@@ -260,7 +260,7 @@ Side effects:
 
 > **stopSite**(`siteIdentifier`, `monitors?`): `void`
 
-Defined in: [electron/services/monitoring/MonitorScheduler.ts:215](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/MonitorScheduler.ts#L215)
+Defined in: [electron/services/monitoring/MonitorScheduler.ts:215](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/MonitorScheduler.ts#L215)
 
 Stop monitoring for all monitors in a site.
 

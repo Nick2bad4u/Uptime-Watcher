@@ -1,6 +1,6 @@
 # Class: MonitorFactory
 
-Defined in: [electron/services/monitoring/MonitorFactory.ts:11](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/MonitorFactory.ts#L11)
+Defined in: [electron/services/monitoring/MonitorFactory.ts:11](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/MonitorFactory.ts#L11)
 
 Factory for creating and managing monitor services.
 Uses the registry's service factories for complete automation.
@@ -21,7 +21,7 @@ Uses the registry's service factories for complete automation.
 
 > `static` **clearCache**(): `void`
 
-Defined in: [electron/services/monitoring/MonitorFactory.ts:18](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/MonitorFactory.ts#L18)
+Defined in: [electron/services/monitoring/MonitorFactory.ts:18](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/MonitorFactory.ts#L18)
 
 Clear all cached service instances.
 Useful for testing or configuration reloading.
@@ -36,7 +36,7 @@ Useful for testing or configuration reloading.
 
 > `static` **getAvailableTypes**(): `string`[]
 
-Defined in: [electron/services/monitoring/MonitorFactory.ts:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/MonitorFactory.ts#L25)
+Defined in: [electron/services/monitoring/MonitorFactory.ts:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/MonitorFactory.ts#L25)
 
 Get all available monitor types from registry.
 
@@ -50,7 +50,7 @@ Get all available monitor types from registry.
 
 > `static` **getMonitor**(`type`, `config?`, `forceConfigUpdate?`): [`IMonitorService`](../../types/interfaces/IMonitorService.md)
 
-Defined in: [electron/services/monitoring/MonitorFactory.ts:46](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/MonitorFactory.ts#L46)
+Defined in: [electron/services/monitoring/MonitorFactory.ts:46](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/MonitorFactory.ts#L46)
 
 Get the appropriate monitor service for the given monitor type.
 
@@ -99,7 +99,7 @@ For consistent configuration across all instances, use [updateConfig](#updatecon
 
 > `static` **updateConfig**(`config`): `void`
 
-Defined in: [electron/services/monitoring/MonitorFactory.ts:103](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/MonitorFactory.ts#L103)
+Defined in: [electron/services/monitoring/MonitorFactory.ts:103](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/MonitorFactory.ts#L103)
 
 Update configuration for all monitor types.
 

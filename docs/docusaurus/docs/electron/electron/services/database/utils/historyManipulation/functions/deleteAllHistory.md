@@ -2,7 +2,7 @@
 
 > **deleteAllHistory**(`db`): `void`
 
-Defined in: [electron/services/database/utils/historyManipulation.ts:125](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/utils/historyManipulation.ts#L125)
+Defined in: [electron/services/database/utils/historyManipulation.ts:125](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/utils/historyManipulation.ts#L125)
 
 **`Internal`**
 

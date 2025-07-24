@@ -1,6 +1,6 @@
 # Interface: ResponseTimeChartData
 
-Defined in: [src/services/chartConfig.ts:32](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/services/chartConfig.ts#L32)
+Defined in: [src/services/chartConfig.ts:32](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/services/chartConfig.ts#L32)
 
 Response time line chart data structure
 
@@ -14,7 +14,7 @@ Response time line chart data structure
 
 > **datasets**: `object`[]
 
-Defined in: [src/services/chartConfig.ts:33](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/services/chartConfig.ts#L33)
+Defined in: [src/services/chartConfig.ts:33](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/services/chartConfig.ts#L33)
 
 #### backgroundColor
 

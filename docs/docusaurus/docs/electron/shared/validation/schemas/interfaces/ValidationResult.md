@@ -1,6 +1,6 @@
 # Interface: ValidationResult
 
-Defined in: [shared/validation/schemas.ts:118](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/shared/validation/schemas.ts#L118)
+Defined in: [shared/validation/schemas.ts:118](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/validation/schemas.ts#L118)
 
 ## Properties
 
@@ -8,7 +8,7 @@ Defined in: [shared/validation/schemas.ts:118](https://github.com/Nick2bad4u/Upt
 
 > `optional` **data**: `unknown`
 
-Defined in: [shared/validation/schemas.ts:119](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/shared/validation/schemas.ts#L119)
+Defined in: [shared/validation/schemas.ts:119](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/validation/schemas.ts#L119)
 
 ***
 
@@ -16,7 +16,7 @@ Defined in: [shared/validation/schemas.ts:119](https://github.com/Nick2bad4u/Upt
 
 > **errors**: `string`[]
 
-Defined in: [shared/validation/schemas.ts:120](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/shared/validation/schemas.ts#L120)
+Defined in: [shared/validation/schemas.ts:120](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/validation/schemas.ts#L120)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [shared/validation/schemas.ts:120](https://github.com/Nick2bad4u/Upt
 
 > **metadata**: `Record`\<`string`, `unknown`\>
 
-Defined in: [shared/validation/schemas.ts:121](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/shared/validation/schemas.ts#L121)
+Defined in: [shared/validation/schemas.ts:121](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/validation/schemas.ts#L121)
 
 ***
 
@@ -32,7 +32,7 @@ Defined in: [shared/validation/schemas.ts:121](https://github.com/Nick2bad4u/Upt
 
 > **success**: `boolean`
 
-Defined in: [shared/validation/schemas.ts:122](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/shared/validation/schemas.ts#L122)
+Defined in: [shared/validation/schemas.ts:122](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/validation/schemas.ts#L122)
 
 ***
 
@@ -40,4 +40,4 @@ Defined in: [shared/validation/schemas.ts:122](https://github.com/Nick2bad4u/Upt
 
 > **warnings**: `string`[]
 
-Defined in: [shared/validation/schemas.ts:123](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/shared/validation/schemas.ts#L123)
+Defined in: [shared/validation/schemas.ts:123](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/validation/schemas.ts#L123)

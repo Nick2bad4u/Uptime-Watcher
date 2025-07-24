@@ -1,6 +1,6 @@
 # Interface: MonitorCheckResult
 
-Defined in: [electron/services/monitoring/types.ts:101](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/types.ts#L101)
+Defined in: [electron/services/monitoring/types.ts:101](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/types.ts#L101)
 
 Result of a monitor check operation.
 
@@ -15,7 +15,7 @@ performance metrics, and optional diagnostic information.
 
 > `optional` **details**: `string`
 
-Defined in: [electron/services/monitoring/types.ts:111](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/types.ts#L111)
+Defined in: [electron/services/monitoring/types.ts:111](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/types.ts#L111)
 
 Optional human-readable details about the check result.
 
@@ -30,7 +30,7 @@ useful for troubleshooting or display purposes.
 
 > `optional` **error**: `string`
 
-Defined in: [electron/services/monitoring/types.ts:121](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/types.ts#L121)
+Defined in: [electron/services/monitoring/types.ts:121](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/types.ts#L121)
 
 Optional error message if the check failed.
 
@@ -46,7 +46,7 @@ Examples: "ECONNREFUSED", "Socket timeout", "Certificate expired"
 
 > **responseTime**: `number`
 
-Defined in: [electron/services/monitoring/types.ts:130](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/types.ts#L130)
+Defined in: [electron/services/monitoring/types.ts:130](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/types.ts#L130)
 
 Response time in milliseconds.
 
@@ -61,7 +61,7 @@ For failed checks, this may represent timeout value or time until failure.
 
 > **status**: `"down"` \| `"up"`
 
-Defined in: [electron/services/monitoring/types.ts:139](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/types.ts#L139)
+Defined in: [electron/services/monitoring/types.ts:139](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/types.ts#L139)
 
 Status outcome of the check.
 

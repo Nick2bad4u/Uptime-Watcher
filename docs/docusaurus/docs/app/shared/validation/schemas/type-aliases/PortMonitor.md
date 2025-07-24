@@ -2,4 +2,4 @@
 
 > **PortMonitor** = `z.infer`\<*typeof* [`portMonitorSchema`](../variables/portMonitorSchema.md)\>
 
-Defined in: [shared/validation/schemas.ts:114](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/shared/validation/schemas.ts#L114)
+Defined in: [shared/validation/schemas.ts:114](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/validation/schemas.ts#L114)

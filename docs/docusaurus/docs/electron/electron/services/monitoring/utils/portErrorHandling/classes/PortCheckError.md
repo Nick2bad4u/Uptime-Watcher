@@ -1,6 +1,6 @@
 # Class: PortCheckError
 
-Defined in: [electron/services/monitoring/utils/portErrorHandling.ts:43](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/utils/portErrorHandling.ts#L43)
+Defined in: [electron/services/monitoring/utils/portErrorHandling.ts:43](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/utils/portErrorHandling.ts#L43)
 
 Custom error class that preserves response time information from failed port checks.
 
@@ -19,7 +19,7 @@ by retry mechanisms to make informed decisions about backoff strategies.
 
 > **new PortCheckError**(`message`, `responseTime`): `PortCheckError`
 
-Defined in: [electron/services/monitoring/utils/portErrorHandling.ts:53](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/utils/portErrorHandling.ts#L53)
+Defined in: [electron/services/monitoring/utils/portErrorHandling.ts:53](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/utils/portErrorHandling.ts#L53)
 
 Create a new PortCheckError with timing information.
 
@@ -51,6 +51,6 @@ Time taken until failure in milliseconds
 
 > `readonly` **responseTime**: `number`
 
-Defined in: [electron/services/monitoring/utils/portErrorHandling.ts:45](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/utils/portErrorHandling.ts#L45)
+Defined in: [electron/services/monitoring/utils/portErrorHandling.ts:45](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/utils/portErrorHandling.ts#L45)
 
 Response time at point of failure in milliseconds

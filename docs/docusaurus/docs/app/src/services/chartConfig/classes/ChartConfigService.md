@@ -1,6 +1,6 @@
 # Class: ChartConfigService
 
-Defined in: [src/services/chartConfig.ts:84](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/services/chartConfig.ts#L84)
+Defined in: [src/services/chartConfig.ts:84](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/services/chartConfig.ts#L84)
 
 Chart Configuration Service for theme-aware chart styling.
 
@@ -16,7 +16,7 @@ and spacing to all chart configurations.
 
 > **new ChartConfigService**(`theme`): `ChartConfigService`
 
-Defined in: [src/services/chartConfig.ts:93](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/services/chartConfig.ts#L93)
+Defined in: [src/services/chartConfig.ts:93](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/services/chartConfig.ts#L93)
 
 Creates a new chart configuration service.
 
@@ -38,7 +38,7 @@ Theme instance containing colors, typography, and spacing
 
 > **getBarChartConfig**(): `ChartOptions`\<`"bar"`\>
 
-Defined in: [src/services/chartConfig.ts:100](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/services/chartConfig.ts#L100)
+Defined in: [src/services/chartConfig.ts:100](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/services/chartConfig.ts#L100)
 
 Status distribution bar chart configuration
 
@@ -52,7 +52,7 @@ Status distribution bar chart configuration
 
 > **getDoughnutChartConfig**(`totalChecks`): `ChartOptions`\<`"doughnut"`\>
 
-Defined in: [src/services/chartConfig.ts:122](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/services/chartConfig.ts#L122)
+Defined in: [src/services/chartConfig.ts:122](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/services/chartConfig.ts#L122)
 
 Uptime doughnut chart configuration
 
@@ -72,7 +72,7 @@ Uptime doughnut chart configuration
 
 > **getLineChartConfig**(): `ChartOptions`\<`"line"`\>
 
-Defined in: [src/services/chartConfig.ts:152](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/services/chartConfig.ts#L152)
+Defined in: [src/services/chartConfig.ts:152](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/services/chartConfig.ts#L152)
 
 Response time line chart configuration
 

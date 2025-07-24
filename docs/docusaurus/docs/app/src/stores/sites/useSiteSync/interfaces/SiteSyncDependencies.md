@@ -1,6 +1,6 @@
 # Interface: SiteSyncDependencies
 
-Defined in: [src/stores/sites/useSiteSync.ts:45](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/stores/sites/useSiteSync.ts#L45)
+Defined in: [src/stores/sites/useSiteSync.ts:45](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/sites/useSiteSync.ts#L45)
 
 ## Properties
 
@@ -8,7 +8,7 @@ Defined in: [src/stores/sites/useSiteSync.ts:45](https://github.com/Nick2bad4u/U
 
 > **getSites**: () => [`Site`](../../../../../shared/types/interfaces/Site.md)[]
 
-Defined in: [src/stores/sites/useSiteSync.ts:46](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/stores/sites/useSiteSync.ts#L46)
+Defined in: [src/stores/sites/useSiteSync.ts:46](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/sites/useSiteSync.ts#L46)
 
 #### Returns
 
@@ -20,7 +20,7 @@ Defined in: [src/stores/sites/useSiteSync.ts:46](https://github.com/Nick2bad4u/U
 
 > **setSites**: (`sites`) => `void`
 
-Defined in: [src/stores/sites/useSiteSync.ts:47](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/stores/sites/useSiteSync.ts#L47)
+Defined in: [src/stores/sites/useSiteSync.ts:47](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/sites/useSiteSync.ts#L47)
 
 #### Parameters
 

@@ -1,6 +1,6 @@
 # Interface: MonitorFieldValues
 
-Defined in: [src/types/monitor-forms.ts:55](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/types/monitor-forms.ts#L55)
+Defined in: [src/types/monitor-forms.ts:55](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/types/monitor-forms.ts#L55)
 
 Monitor field values organized by type
 
@@ -10,7 +10,7 @@ Monitor field values organized by type
 
 > **booleans**: `Record`\<`string`, `boolean`\>
 
-Defined in: [src/types/monitor-forms.ts:57](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/types/monitor-forms.ts#L57)
+Defined in: [src/types/monitor-forms.ts:57](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/types/monitor-forms.ts#L57)
 
 Boolean field values
 
@@ -20,7 +20,7 @@ Boolean field values
 
 > **numbers**: `Record`\<`string`, `number`\>
 
-Defined in: [src/types/monitor-forms.ts:59](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/types/monitor-forms.ts#L59)
+Defined in: [src/types/monitor-forms.ts:59](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/types/monitor-forms.ts#L59)
 
 Number field values
 
@@ -30,7 +30,7 @@ Number field values
 
 > **objects**: `Record`\<`string`, `Record`\<`string`, `unknown`\>\>
 
-Defined in: [src/types/monitor-forms.ts:61](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/types/monitor-forms.ts#L61)
+Defined in: [src/types/monitor-forms.ts:61](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/types/monitor-forms.ts#L61)
 
 Object field values
 
@@ -40,6 +40,6 @@ Object field values
 
 > **strings**: `Record`\<`string`, `string`\>
 
-Defined in: [src/types/monitor-forms.ts:63](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/types/monitor-forms.ts#L63)
+Defined in: [src/types/monitor-forms.ts:63](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/types/monitor-forms.ts#L63)
 
 String field values

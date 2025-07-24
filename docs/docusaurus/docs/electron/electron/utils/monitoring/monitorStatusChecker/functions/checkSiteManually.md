@@ -2,7 +2,7 @@
 
 > **checkSiteManually**(`config`, `identifier`, `monitorId?`): `Promise`\<`undefined` \| [`StatusUpdate`](../../../../../shared/types/interfaces/StatusUpdate.md)\>
 
-Defined in: [electron/utils/monitoring/monitorStatusChecker.ts:294](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/utils/monitoring/monitorStatusChecker.ts#L294)
+Defined in: [electron/utils/monitoring/monitorStatusChecker.ts:294](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/monitoring/monitorStatusChecker.ts#L294)
 
 **`Alpha`**
 

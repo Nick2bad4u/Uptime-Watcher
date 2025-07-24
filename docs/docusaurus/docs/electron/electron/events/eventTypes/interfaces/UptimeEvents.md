@@ -1,6 +1,6 @@
 # Interface: UptimeEvents
 
-Defined in: [electron/events/eventTypes.ts:81](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L81)
+Defined in: [electron/events/eventTypes.ts:81](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L81)
 
 Comprehensive event map for the Uptime Watcher application.
 
@@ -32,7 +32,7 @@ Event Categories:
 
 > **cache:invalidated**: `object`
 
-Defined in: [electron/events/eventTypes.ts:84](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L84)
+Defined in: [electron/events/eventTypes.ts:84](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L84)
 
 #### identifier?
 
@@ -56,7 +56,7 @@ Defined in: [electron/events/eventTypes.ts:84](https://github.com/Nick2bad4u/Upt
 
 > **config:changed**: `object`
 
-Defined in: [electron/events/eventTypes.ts:91](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L91)
+Defined in: [electron/events/eventTypes.ts:91](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L91)
 
 #### newValue
 
@@ -84,7 +84,7 @@ Defined in: [electron/events/eventTypes.ts:91](https://github.com/Nick2bad4u/Upt
 
 > **database:backup-created**: `object`
 
-Defined in: [electron/events/eventTypes.ts:99](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L99)
+Defined in: [electron/events/eventTypes.ts:99](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L99)
 
 #### fileName
 
@@ -108,7 +108,7 @@ Defined in: [electron/events/eventTypes.ts:99](https://github.com/Nick2bad4u/Upt
 
 > **database:error**: `object`
 
-Defined in: [electron/events/eventTypes.ts:108](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L108)
+Defined in: [electron/events/eventTypes.ts:108](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L108)
 
 #### Index Signature
 
@@ -132,7 +132,7 @@ Defined in: [electron/events/eventTypes.ts:108](https://github.com/Nick2bad4u/Up
 
 > **database:retry**: `object`
 
-Defined in: [electron/events/eventTypes.ts:116](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L116)
+Defined in: [electron/events/eventTypes.ts:116](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L116)
 
 #### Index Signature
 
@@ -156,7 +156,7 @@ Defined in: [electron/events/eventTypes.ts:116](https://github.com/Nick2bad4u/Up
 
 > **database:success**: `object`
 
-Defined in: [electron/events/eventTypes.ts:123](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L123)
+Defined in: [electron/events/eventTypes.ts:123](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L123)
 
 #### Index Signature
 
@@ -180,7 +180,7 @@ Defined in: [electron/events/eventTypes.ts:123](https://github.com/Nick2bad4u/Up
 
 > **database:transaction-completed**: `object`
 
-Defined in: [electron/events/eventTypes.ts:130](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L130)
+Defined in: [electron/events/eventTypes.ts:130](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L130)
 
 #### duration
 
@@ -208,7 +208,7 @@ Defined in: [electron/events/eventTypes.ts:130](https://github.com/Nick2bad4u/Up
 
 > **internal:database:backup-downloaded**: `object`
 
-Defined in: [electron/events/eventTypes.ts:138](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L138)
+Defined in: [electron/events/eventTypes.ts:138](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L138)
 
 #### fileName?
 
@@ -232,7 +232,7 @@ Defined in: [electron/events/eventTypes.ts:138](https://github.com/Nick2bad4u/Up
 
 > **internal:database:data-exported**: `object`
 
-Defined in: [electron/events/eventTypes.ts:145](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L145)
+Defined in: [electron/events/eventTypes.ts:145](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L145)
 
 #### fileName?
 
@@ -256,7 +256,7 @@ Defined in: [electron/events/eventTypes.ts:145](https://github.com/Nick2bad4u/Up
 
 > **internal:database:data-imported**: `object`
 
-Defined in: [electron/events/eventTypes.ts:154](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L154)
+Defined in: [electron/events/eventTypes.ts:154](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L154)
 
 #### operation
 
@@ -280,7 +280,7 @@ Defined in: [electron/events/eventTypes.ts:154](https://github.com/Nick2bad4u/Up
 
 > **internal:database:get-sites-from-cache-requested**: `object`
 
-Defined in: [electron/events/eventTypes.ts:161](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L161)
+Defined in: [electron/events/eventTypes.ts:161](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L161)
 
 #### operation
 
@@ -296,7 +296,7 @@ Defined in: [electron/events/eventTypes.ts:161](https://github.com/Nick2bad4u/Up
 
 > **internal:database:get-sites-from-cache-response**: `object`
 
-Defined in: [electron/events/eventTypes.ts:166](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L166)
+Defined in: [electron/events/eventTypes.ts:166](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L166)
 
 #### operation
 
@@ -316,7 +316,7 @@ Defined in: [electron/events/eventTypes.ts:166](https://github.com/Nick2bad4u/Up
 
 > **internal:database:history-limit-updated**: `object`
 
-Defined in: [electron/events/eventTypes.ts:172](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L172)
+Defined in: [electron/events/eventTypes.ts:172](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L172)
 
 #### limit
 
@@ -336,7 +336,7 @@ Defined in: [electron/events/eventTypes.ts:172](https://github.com/Nick2bad4u/Up
 
 > **internal:database:initialized**: `object`
 
-Defined in: [electron/events/eventTypes.ts:178](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L178)
+Defined in: [electron/events/eventTypes.ts:178](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L178)
 
 #### operation
 
@@ -356,7 +356,7 @@ Defined in: [electron/events/eventTypes.ts:178](https://github.com/Nick2bad4u/Up
 
 > **internal:database:sites-refreshed**: `object`
 
-Defined in: [electron/events/eventTypes.ts:184](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L184)
+Defined in: [electron/events/eventTypes.ts:184](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L184)
 
 #### operation
 
@@ -376,7 +376,7 @@ Defined in: [electron/events/eventTypes.ts:184](https://github.com/Nick2bad4u/Up
 
 > **internal:database:update-sites-cache-requested**: `object`
 
-Defined in: [electron/events/eventTypes.ts:190](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L190)
+Defined in: [electron/events/eventTypes.ts:190](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L190)
 
 #### operation
 
@@ -396,7 +396,7 @@ Defined in: [electron/events/eventTypes.ts:190](https://github.com/Nick2bad4u/Up
 
 > **internal:monitor:all-started**: `object`
 
-Defined in: [electron/events/eventTypes.ts:198](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L198)
+Defined in: [electron/events/eventTypes.ts:198](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L198)
 
 #### monitorCount
 
@@ -420,7 +420,7 @@ Defined in: [electron/events/eventTypes.ts:198](https://github.com/Nick2bad4u/Up
 
 > **internal:monitor:all-stopped**: `object`
 
-Defined in: [electron/events/eventTypes.ts:207](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L207)
+Defined in: [electron/events/eventTypes.ts:207](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L207)
 
 #### activeMonitors
 
@@ -444,7 +444,7 @@ Defined in: [electron/events/eventTypes.ts:207](https://github.com/Nick2bad4u/Up
 
 > **internal:monitor:manual-check-completed**: `object`
 
-Defined in: [electron/events/eventTypes.ts:214](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L214)
+Defined in: [electron/events/eventTypes.ts:214](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L214)
 
 #### identifier
 
@@ -472,7 +472,7 @@ Defined in: [electron/events/eventTypes.ts:214](https://github.com/Nick2bad4u/Up
 
 > **internal:monitor:site-setup-completed**: `object`
 
-Defined in: [electron/events/eventTypes.ts:222](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L222)
+Defined in: [electron/events/eventTypes.ts:222](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L222)
 
 #### identifier
 
@@ -492,7 +492,7 @@ Defined in: [electron/events/eventTypes.ts:222](https://github.com/Nick2bad4u/Up
 
 > **internal:monitor:started**: `object`
 
-Defined in: [electron/events/eventTypes.ts:228](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L228)
+Defined in: [electron/events/eventTypes.ts:228](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L228)
 
 #### identifier
 
@@ -516,7 +516,7 @@ Defined in: [electron/events/eventTypes.ts:228](https://github.com/Nick2bad4u/Up
 
 > **internal:monitor:stopped**: `object`
 
-Defined in: [electron/events/eventTypes.ts:235](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L235)
+Defined in: [electron/events/eventTypes.ts:235](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L235)
 
 #### identifier
 
@@ -544,7 +544,7 @@ Defined in: [electron/events/eventTypes.ts:235](https://github.com/Nick2bad4u/Up
 
 > **internal:site:added**: `object`
 
-Defined in: [electron/events/eventTypes.ts:244](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L244)
+Defined in: [electron/events/eventTypes.ts:244](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L244)
 
 #### identifier
 
@@ -568,7 +568,7 @@ Defined in: [electron/events/eventTypes.ts:244](https://github.com/Nick2bad4u/Up
 
 > **internal:site:cache-updated**: `object`
 
-Defined in: [electron/events/eventTypes.ts:251](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L251)
+Defined in: [electron/events/eventTypes.ts:251](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L251)
 
 #### identifier
 
@@ -588,7 +588,7 @@ Defined in: [electron/events/eventTypes.ts:251](https://github.com/Nick2bad4u/Up
 
 > **internal:site:is-monitoring-active-requested**: `object`
 
-Defined in: [electron/events/eventTypes.ts:257](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L257)
+Defined in: [electron/events/eventTypes.ts:257](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L257)
 
 #### identifier
 
@@ -612,7 +612,7 @@ Defined in: [electron/events/eventTypes.ts:257](https://github.com/Nick2bad4u/Up
 
 > **internal:site:is-monitoring-active-response**: `object`
 
-Defined in: [electron/events/eventTypes.ts:264](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L264)
+Defined in: [electron/events/eventTypes.ts:264](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L264)
 
 #### identifier
 
@@ -640,7 +640,7 @@ Defined in: [electron/events/eventTypes.ts:264](https://github.com/Nick2bad4u/Up
 
 > **internal:site:removed**: `object`
 
-Defined in: [electron/events/eventTypes.ts:272](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L272)
+Defined in: [electron/events/eventTypes.ts:272](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L272)
 
 #### identifier
 
@@ -660,7 +660,7 @@ Defined in: [electron/events/eventTypes.ts:272](https://github.com/Nick2bad4u/Up
 
 > **internal:site:restart-monitoring-requested**: `object`
 
-Defined in: [electron/events/eventTypes.ts:278](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L278)
+Defined in: [electron/events/eventTypes.ts:278](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L278)
 
 #### identifier
 
@@ -684,7 +684,7 @@ Defined in: [electron/events/eventTypes.ts:278](https://github.com/Nick2bad4u/Up
 
 > **internal:site:restart-monitoring-response**: `object`
 
-Defined in: [electron/events/eventTypes.ts:285](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L285)
+Defined in: [electron/events/eventTypes.ts:285](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L285)
 
 #### identifier
 
@@ -712,7 +712,7 @@ Defined in: [electron/events/eventTypes.ts:285](https://github.com/Nick2bad4u/Up
 
 > **internal:site:start-monitoring-requested**: `object`
 
-Defined in: [electron/events/eventTypes.ts:293](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L293)
+Defined in: [electron/events/eventTypes.ts:293](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L293)
 
 #### identifier
 
@@ -736,7 +736,7 @@ Defined in: [electron/events/eventTypes.ts:293](https://github.com/Nick2bad4u/Up
 
 > **internal:site:stop-monitoring-requested**: `object`
 
-Defined in: [electron/events/eventTypes.ts:300](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L300)
+Defined in: [electron/events/eventTypes.ts:300](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L300)
 
 #### identifier
 
@@ -760,7 +760,7 @@ Defined in: [electron/events/eventTypes.ts:300](https://github.com/Nick2bad4u/Up
 
 > **internal:site:updated**: `object`
 
-Defined in: [electron/events/eventTypes.ts:307](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L307)
+Defined in: [electron/events/eventTypes.ts:307](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L307)
 
 #### identifier
 
@@ -788,7 +788,7 @@ Defined in: [electron/events/eventTypes.ts:307](https://github.com/Nick2bad4u/Up
 
 > **monitor:added**: `object`
 
-Defined in: [electron/events/eventTypes.ts:315](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L315)
+Defined in: [electron/events/eventTypes.ts:315](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L315)
 
 #### monitor
 
@@ -808,7 +808,7 @@ Defined in: [electron/events/eventTypes.ts:315](https://github.com/Nick2bad4u/Up
 
 > **monitor:check-completed**: `object`
 
-Defined in: [electron/events/eventTypes.ts:321](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L321)
+Defined in: [electron/events/eventTypes.ts:321](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L321)
 
 #### checkType
 
@@ -836,7 +836,7 @@ Defined in: [electron/events/eventTypes.ts:321](https://github.com/Nick2bad4u/Up
 
 > **monitor:down**: `object`
 
-Defined in: [electron/events/eventTypes.ts:329](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L329)
+Defined in: [electron/events/eventTypes.ts:329](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L329)
 
 #### monitor
 
@@ -860,7 +860,7 @@ Defined in: [electron/events/eventTypes.ts:329](https://github.com/Nick2bad4u/Up
 
 > **monitor:removed**: `object`
 
-Defined in: [electron/events/eventTypes.ts:336](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L336)
+Defined in: [electron/events/eventTypes.ts:336](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L336)
 
 #### monitorId
 
@@ -880,7 +880,7 @@ Defined in: [electron/events/eventTypes.ts:336](https://github.com/Nick2bad4u/Up
 
 > **monitor:status-changed**: `object`
 
-Defined in: [electron/events/eventTypes.ts:342](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L342)
+Defined in: [electron/events/eventTypes.ts:342](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L342)
 
 #### monitor
 
@@ -916,7 +916,7 @@ Defined in: [electron/events/eventTypes.ts:342](https://github.com/Nick2bad4u/Up
 
 > **monitor:up**: `object`
 
-Defined in: [electron/events/eventTypes.ts:352](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L352)
+Defined in: [electron/events/eventTypes.ts:352](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L352)
 
 #### monitor
 
@@ -940,7 +940,7 @@ Defined in: [electron/events/eventTypes.ts:352](https://github.com/Nick2bad4u/Up
 
 > **monitoring:started**: `object`
 
-Defined in: [electron/events/eventTypes.ts:360](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L360)
+Defined in: [electron/events/eventTypes.ts:360](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L360)
 
 #### monitorCount
 
@@ -960,7 +960,7 @@ Defined in: [electron/events/eventTypes.ts:360](https://github.com/Nick2bad4u/Up
 
 > **monitoring:stopped**: `object`
 
-Defined in: [electron/events/eventTypes.ts:366](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L366)
+Defined in: [electron/events/eventTypes.ts:366](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L366)
 
 #### activeMonitors
 
@@ -980,7 +980,7 @@ Defined in: [electron/events/eventTypes.ts:366](https://github.com/Nick2bad4u/Up
 
 > **performance:metric**: `object`
 
-Defined in: [electron/events/eventTypes.ts:372](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L372)
+Defined in: [electron/events/eventTypes.ts:372](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L372)
 
 #### category
 
@@ -1008,7 +1008,7 @@ Defined in: [electron/events/eventTypes.ts:372](https://github.com/Nick2bad4u/Up
 
 > **performance:warning**: `object`
 
-Defined in: [electron/events/eventTypes.ts:380](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L380)
+Defined in: [electron/events/eventTypes.ts:380](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L380)
 
 #### actual
 
@@ -1036,7 +1036,7 @@ Defined in: [electron/events/eventTypes.ts:380](https://github.com/Nick2bad4u/Up
 
 > **site:added**: `object`
 
-Defined in: [electron/events/eventTypes.ts:388](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L388)
+Defined in: [electron/events/eventTypes.ts:388](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L388)
 
 #### site
 
@@ -1056,7 +1056,7 @@ Defined in: [electron/events/eventTypes.ts:388](https://github.com/Nick2bad4u/Up
 
 > **site:cache-miss**: `object`
 
-Defined in: [electron/events/eventTypes.ts:394](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L394)
+Defined in: [electron/events/eventTypes.ts:394](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L394)
 
 #### backgroundLoading
 
@@ -1080,7 +1080,7 @@ Defined in: [electron/events/eventTypes.ts:394](https://github.com/Nick2bad4u/Up
 
 > **site:cache-updated**: `object`
 
-Defined in: [electron/events/eventTypes.ts:402](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L402)
+Defined in: [electron/events/eventTypes.ts:402](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L402)
 
 #### identifier
 
@@ -1100,7 +1100,7 @@ Defined in: [electron/events/eventTypes.ts:402](https://github.com/Nick2bad4u/Up
 
 > **site:removed**: `object`
 
-Defined in: [electron/events/eventTypes.ts:408](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L408)
+Defined in: [electron/events/eventTypes.ts:408](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L408)
 
 #### cascade
 
@@ -1124,7 +1124,7 @@ Defined in: [electron/events/eventTypes.ts:408](https://github.com/Nick2bad4u/Up
 
 > **site:updated**: `object`
 
-Defined in: [electron/events/eventTypes.ts:415](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L415)
+Defined in: [electron/events/eventTypes.ts:415](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L415)
 
 #### previousSite
 
@@ -1148,7 +1148,7 @@ Defined in: [electron/events/eventTypes.ts:415](https://github.com/Nick2bad4u/Up
 
 > **sites:state-synchronized**: `object`
 
-Defined in: [electron/events/eventTypes.ts:423](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L423)
+Defined in: [electron/events/eventTypes.ts:423](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L423)
 
 #### action
 
@@ -1172,7 +1172,7 @@ Defined in: [electron/events/eventTypes.ts:423](https://github.com/Nick2bad4u/Up
 
 > **system:error**: `object`
 
-Defined in: [electron/events/eventTypes.ts:430](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L430)
+Defined in: [electron/events/eventTypes.ts:430](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L430)
 
 #### context
 
@@ -1200,7 +1200,7 @@ Defined in: [electron/events/eventTypes.ts:430](https://github.com/Nick2bad4u/Up
 
 > **system:shutdown**: `object`
 
-Defined in: [electron/events/eventTypes.ts:438](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L438)
+Defined in: [electron/events/eventTypes.ts:438](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L438)
 
 #### reason
 
@@ -1220,7 +1220,7 @@ Defined in: [electron/events/eventTypes.ts:438](https://github.com/Nick2bad4u/Up
 
 > **system:startup**: `object`
 
-Defined in: [electron/events/eventTypes.ts:445](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/events/eventTypes.ts#L445)
+Defined in: [electron/events/eventTypes.ts:445](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/events/eventTypes.ts#L445)
 
 #### environment
 

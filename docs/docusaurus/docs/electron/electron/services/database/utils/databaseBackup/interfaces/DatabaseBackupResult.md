@@ -1,6 +1,6 @@
 # Interface: DatabaseBackupResult
 
-Defined in: [electron/services/database/utils/databaseBackup.ts:20](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/utils/databaseBackup.ts#L20)
+Defined in: [electron/services/database/utils/databaseBackup.ts:20](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/utils/databaseBackup.ts#L20)
 
 Result interface for database backup operations.
 
@@ -15,7 +15,7 @@ metadata for tracking and validation.
 
 > **buffer**: `Buffer`
 
-Defined in: [electron/services/database/utils/databaseBackup.ts:22](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/utils/databaseBackup.ts#L22)
+Defined in: [electron/services/database/utils/databaseBackup.ts:22](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/utils/databaseBackup.ts#L22)
 
 Binary buffer containing the complete SQLite database
 
@@ -25,7 +25,7 @@ Binary buffer containing the complete SQLite database
 
 > **fileName**: `string`
 
-Defined in: [electron/services/database/utils/databaseBackup.ts:24](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/utils/databaseBackup.ts#L24)
+Defined in: [electron/services/database/utils/databaseBackup.ts:24](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/utils/databaseBackup.ts#L24)
 
 Standardized filename for the backup file
 
@@ -35,7 +35,7 @@ Standardized filename for the backup file
 
 > **metadata**: `object`
 
-Defined in: [electron/services/database/utils/databaseBackup.ts:26](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/utils/databaseBackup.ts#L26)
+Defined in: [electron/services/database/utils/databaseBackup.ts:26](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/utils/databaseBackup.ts#L26)
 
 Metadata about the backup operation
 

@@ -1,6 +1,6 @@
 # Interface: MonitorValidationResult
 
-Defined in: [src/types/monitor-forms.ts:74](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/types/monitor-forms.ts#L74)
+Defined in: [src/types/monitor-forms.ts:74](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/types/monitor-forms.ts#L74)
 
 Monitor validation result with specific error types
 
@@ -10,7 +10,7 @@ Monitor validation result with specific error types
 
 > **errors**: `string`[]
 
-Defined in: [src/types/monitor-forms.ts:76](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/types/monitor-forms.ts#L76)
+Defined in: [src/types/monitor-forms.ts:76](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/types/monitor-forms.ts#L76)
 
 Array of error messages
 
@@ -20,7 +20,7 @@ Array of error messages
 
 > **metadata**: `object`
 
-Defined in: [src/types/monitor-forms.ts:78](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/types/monitor-forms.ts#L78)
+Defined in: [src/types/monitor-forms.ts:78](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/types/monitor-forms.ts#L78)
 
 Additional validation metadata
 
@@ -48,7 +48,7 @@ Fields that were validated
 
 > **success**: `boolean`
 
-Defined in: [src/types/monitor-forms.ts:87](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/types/monitor-forms.ts#L87)
+Defined in: [src/types/monitor-forms.ts:87](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/types/monitor-forms.ts#L87)
 
 Whether validation passed
 
@@ -58,6 +58,6 @@ Whether validation passed
 
 > **warnings**: `string`[]
 
-Defined in: [src/types/monitor-forms.ts:89](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/types/monitor-forms.ts#L89)
+Defined in: [src/types/monitor-forms.ts:89](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/types/monitor-forms.ts#L89)
 
 Array of warning messages

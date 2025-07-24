@@ -1,6 +1,6 @@
 # Interface: AddSiteFormState
 
-Defined in: [src/components/SiteDetails/useAddSiteForm.ts:48](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/components/SiteDetails/useAddSiteForm.ts#L48)
+Defined in: [src/components/SiteDetails/useAddSiteForm.ts:48](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/SiteDetails/useAddSiteForm.ts#L48)
 
 Form state interface containing all form field values and UI state.
 
@@ -10,7 +10,7 @@ Form state interface containing all form field values and UI state.
 
 > **addMode**: [`FormMode`](../type-aliases/FormMode.md)
 
-Defined in: [src/components/SiteDetails/useAddSiteForm.ts:50](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/components/SiteDetails/useAddSiteForm.ts#L50)
+Defined in: [src/components/SiteDetails/useAddSiteForm.ts:50](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/SiteDetails/useAddSiteForm.ts#L50)
 
 Form operation mode (new site vs existing site)
 
@@ -20,7 +20,7 @@ Form operation mode (new site vs existing site)
 
 > **checkInterval**: `number`
 
-Defined in: [src/components/SiteDetails/useAddSiteForm.ts:52](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/components/SiteDetails/useAddSiteForm.ts#L52)
+Defined in: [src/components/SiteDetails/useAddSiteForm.ts:52](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/SiteDetails/useAddSiteForm.ts#L52)
 
 Check interval in milliseconds
 
@@ -30,7 +30,7 @@ Check interval in milliseconds
 
 > **formError**: `undefined` \| `string`
 
-Defined in: [src/components/SiteDetails/useAddSiteForm.ts:54](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/components/SiteDetails/useAddSiteForm.ts#L54)
+Defined in: [src/components/SiteDetails/useAddSiteForm.ts:54](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/SiteDetails/useAddSiteForm.ts#L54)
 
 Current form validation error
 
@@ -40,7 +40,7 @@ Current form validation error
 
 > **host**: `string`
 
-Defined in: [src/components/SiteDetails/useAddSiteForm.ts:56](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/components/SiteDetails/useAddSiteForm.ts#L56)
+Defined in: [src/components/SiteDetails/useAddSiteForm.ts:56](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/SiteDetails/useAddSiteForm.ts#L56)
 
 Host/IP field for port monitors
 
@@ -50,7 +50,7 @@ Host/IP field for port monitors
 
 > **monitorType**: `"http"` \| `"port"`
 
-Defined in: [src/components/SiteDetails/useAddSiteForm.ts:58](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/components/SiteDetails/useAddSiteForm.ts#L58)
+Defined in: [src/components/SiteDetails/useAddSiteForm.ts:58](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/SiteDetails/useAddSiteForm.ts#L58)
 
 Selected monitor type
 
@@ -60,7 +60,7 @@ Selected monitor type
 
 > **name**: `string`
 
-Defined in: [src/components/SiteDetails/useAddSiteForm.ts:60](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/components/SiteDetails/useAddSiteForm.ts#L60)
+Defined in: [src/components/SiteDetails/useAddSiteForm.ts:60](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/SiteDetails/useAddSiteForm.ts#L60)
 
 Display name for the site
 
@@ -70,7 +70,7 @@ Display name for the site
 
 > **port**: `string`
 
-Defined in: [src/components/SiteDetails/useAddSiteForm.ts:62](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/components/SiteDetails/useAddSiteForm.ts#L62)
+Defined in: [src/components/SiteDetails/useAddSiteForm.ts:62](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/SiteDetails/useAddSiteForm.ts#L62)
 
 Port number field for port monitors
 
@@ -80,7 +80,7 @@ Port number field for port monitors
 
 > **selectedExistingSite**: `string`
 
-Defined in: [src/components/SiteDetails/useAddSiteForm.ts:64](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/components/SiteDetails/useAddSiteForm.ts#L64)
+Defined in: [src/components/SiteDetails/useAddSiteForm.ts:64](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/SiteDetails/useAddSiteForm.ts#L64)
 
 Selected existing site ID when adding to existing
 
@@ -90,7 +90,7 @@ Selected existing site ID when adding to existing
 
 > **siteId**: `string`
 
-Defined in: [src/components/SiteDetails/useAddSiteForm.ts:66](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/components/SiteDetails/useAddSiteForm.ts#L66)
+Defined in: [src/components/SiteDetails/useAddSiteForm.ts:66](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/SiteDetails/useAddSiteForm.ts#L66)
 
 Generated site identifier
 
@@ -100,6 +100,6 @@ Generated site identifier
 
 > **url**: `string`
 
-Defined in: [src/components/SiteDetails/useAddSiteForm.ts:68](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/components/SiteDetails/useAddSiteForm.ts#L68)
+Defined in: [src/components/SiteDetails/useAddSiteForm.ts:68](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/SiteDetails/useAddSiteForm.ts#L68)
 
 URL field for HTTP monitors

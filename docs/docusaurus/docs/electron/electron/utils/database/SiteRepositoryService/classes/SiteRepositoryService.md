@@ -1,6 +1,6 @@
 # Class: SiteRepositoryService
 
-Defined in: [electron/utils/database/SiteRepositoryService.ts:117](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/utils/database/SiteRepositoryService.ts#L117)
+Defined in: [electron/utils/database/SiteRepositoryService.ts:117](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/database/SiteRepositoryService.ts#L117)
 
 **`Beta`**
 
@@ -23,7 +23,7 @@ comprehensive error handling throughout all operations.
 
 > **new SiteRepositoryService**(`config`): `SiteRepositoryService`
 
-Defined in: [electron/utils/database/SiteRepositoryService.ts:137](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/utils/database/SiteRepositoryService.ts#L137)
+Defined in: [electron/utils/database/SiteRepositoryService.ts:137](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/database/SiteRepositoryService.ts#L137)
 
 **`Beta`**
 
@@ -53,7 +53,7 @@ for proper operation and comprehensive functionality.
 
 > **applyHistoryLimitSetting**(`monitoringConfig`): `Promise`\<`void`\>
 
-Defined in: [electron/utils/database/SiteRepositoryService.ts:147](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/utils/database/SiteRepositoryService.ts#L147)
+Defined in: [electron/utils/database/SiteRepositoryService.ts:147](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/database/SiteRepositoryService.ts#L147)
 
 **`Beta`**
 
@@ -76,7 +76,7 @@ Side effect operation separated from data loading.
 
 > **getHistoryLimitSetting**(): `Promise`\<`undefined` \| `number`\>
 
-Defined in: [electron/utils/database/SiteRepositoryService.ts:159](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/utils/database/SiteRepositoryService.ts#L159)
+Defined in: [electron/utils/database/SiteRepositoryService.ts:159](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/database/SiteRepositoryService.ts#L159)
 
 **`Beta`**
 
@@ -93,7 +93,7 @@ Pure data operation without side effects.
 
 > **getSitesFromDatabase**(): `Promise`\<[`Site`](../../../../../shared/types/interfaces/Site.md)[]\>
 
-Defined in: [electron/utils/database/SiteRepositoryService.ts:195](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/utils/database/SiteRepositoryService.ts#L195)
+Defined in: [electron/utils/database/SiteRepositoryService.ts:195](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/database/SiteRepositoryService.ts#L195)
 
 **`Beta`**
 
@@ -125,7 +125,7 @@ maintaining proper error handling throughout the process.
 
 > **loadSitesIntoCache**(`siteCache`): `Promise`\<`void`\>
 
-Defined in: [electron/utils/database/SiteRepositoryService.ts:217](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/utils/database/SiteRepositoryService.ts#L217)
+Defined in: [electron/utils/database/SiteRepositoryService.ts:217](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/database/SiteRepositoryService.ts#L217)
 
 **`Beta`**
 

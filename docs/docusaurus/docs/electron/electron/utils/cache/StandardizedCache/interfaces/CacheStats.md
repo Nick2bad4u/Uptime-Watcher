@@ -1,6 +1,6 @@
 # Interface: CacheStats
 
-Defined in: [electron/utils/cache/StandardizedCache.ts:45](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/utils/cache/StandardizedCache.ts#L45)
+Defined in: [electron/utils/cache/StandardizedCache.ts:45](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/cache/StandardizedCache.ts#L45)
 
 Cache statistics.
 
@@ -10,7 +10,7 @@ Cache statistics.
 
 > **hitRatio**: `number`
 
-Defined in: [electron/utils/cache/StandardizedCache.ts:50](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/utils/cache/StandardizedCache.ts#L50)
+Defined in: [electron/utils/cache/StandardizedCache.ts:50](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/cache/StandardizedCache.ts#L50)
 
 Hit ratio (0-1).
 Calculated as hits / (hits + misses).
@@ -21,7 +21,7 @@ Calculated as hits / (hits + misses).
 
 > **hits**: `number`
 
-Defined in: [electron/utils/cache/StandardizedCache.ts:52](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/utils/cache/StandardizedCache.ts#L52)
+Defined in: [electron/utils/cache/StandardizedCache.ts:52](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/cache/StandardizedCache.ts#L52)
 
 Total cache hits
 
@@ -31,7 +31,7 @@ Total cache hits
 
 > `optional` **lastAccess**: `number`
 
-Defined in: [electron/utils/cache/StandardizedCache.ts:54](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/utils/cache/StandardizedCache.ts#L54)
+Defined in: [electron/utils/cache/StandardizedCache.ts:54](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/cache/StandardizedCache.ts#L54)
 
 Last access timestamp
 
@@ -41,7 +41,7 @@ Last access timestamp
 
 > **misses**: `number`
 
-Defined in: [electron/utils/cache/StandardizedCache.ts:56](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/utils/cache/StandardizedCache.ts#L56)
+Defined in: [electron/utils/cache/StandardizedCache.ts:56](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/cache/StandardizedCache.ts#L56)
 
 Total cache misses
 
@@ -51,6 +51,6 @@ Total cache misses
 
 > **size**: `number`
 
-Defined in: [electron/utils/cache/StandardizedCache.ts:58](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/utils/cache/StandardizedCache.ts#L58)
+Defined in: [electron/utils/cache/StandardizedCache.ts:58](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/utils/cache/StandardizedCache.ts#L58)
 
 Current cache size

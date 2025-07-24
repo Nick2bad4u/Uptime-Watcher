@@ -1,6 +1,6 @@
 # Interface: HttpMonitorFields
 
-Defined in: [src/types/monitor-forms.ts:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/types/monitor-forms.ts#L25)
+Defined in: [src/types/monitor-forms.ts:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/types/monitor-forms.ts#L25)
 
 HTTP monitor specific fields
 
@@ -14,7 +14,7 @@ HTTP monitor specific fields
 
 > `optional` **checkInterval**: `number`
 
-Defined in: [src/types/monitor-forms.ts:13](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/types/monitor-forms.ts#L13)
+Defined in: [src/types/monitor-forms.ts:13](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/types/monitor-forms.ts#L13)
 
 Check interval in milliseconds
 
@@ -28,7 +28,7 @@ Check interval in milliseconds
 
 > `optional` **expectedStatusCode**: `number`
 
-Defined in: [src/types/monitor-forms.ts:27](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/types/monitor-forms.ts#L27)
+Defined in: [src/types/monitor-forms.ts:27](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/types/monitor-forms.ts#L27)
 
 Expected status code
 
@@ -38,7 +38,7 @@ Expected status code
 
 > `optional` **followRedirects**: `boolean`
 
-Defined in: [src/types/monitor-forms.ts:29](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/types/monitor-forms.ts#L29)
+Defined in: [src/types/monitor-forms.ts:29](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/types/monitor-forms.ts#L29)
 
 Follow redirects
 
@@ -48,7 +48,7 @@ Follow redirects
 
 > `optional` **headers**: `Record`\<`string`, `string`\>
 
-Defined in: [src/types/monitor-forms.ts:31](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/types/monitor-forms.ts#L31)
+Defined in: [src/types/monitor-forms.ts:31](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/types/monitor-forms.ts#L31)
 
 Request headers
 
@@ -58,7 +58,7 @@ Request headers
 
 > `optional` **method**: `"DELETE"` \| `"GET"` \| `"HEAD"` \| `"POST"` \| `"PUT"`
 
-Defined in: [src/types/monitor-forms.ts:33](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/types/monitor-forms.ts#L33)
+Defined in: [src/types/monitor-forms.ts:33](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/types/monitor-forms.ts#L33)
 
 HTTP method
 
@@ -68,7 +68,7 @@ HTTP method
 
 > `optional` **name**: `string`
 
-Defined in: [src/types/monitor-forms.ts:15](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/types/monitor-forms.ts#L15)
+Defined in: [src/types/monitor-forms.ts:15](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/types/monitor-forms.ts#L15)
 
 Monitor name
 
@@ -82,7 +82,7 @@ Monitor name
 
 > `optional` **retryAttempts**: `number`
 
-Defined in: [src/types/monitor-forms.ts:17](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/types/monitor-forms.ts#L17)
+Defined in: [src/types/monitor-forms.ts:17](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/types/monitor-forms.ts#L17)
 
 Number of retry attempts
 
@@ -96,7 +96,7 @@ Number of retry attempts
 
 > `optional` **timeout**: `number`
 
-Defined in: [src/types/monitor-forms.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/types/monitor-forms.ts#L19)
+Defined in: [src/types/monitor-forms.ts:19](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/types/monitor-forms.ts#L19)
 
 Timeout in milliseconds
 
@@ -110,6 +110,6 @@ Timeout in milliseconds
 
 > **url**: `string`
 
-Defined in: [src/types/monitor-forms.ts:35](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/types/monitor-forms.ts#L35)
+Defined in: [src/types/monitor-forms.ts:35](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/types/monitor-forms.ts#L35)
 
 URL to monitor

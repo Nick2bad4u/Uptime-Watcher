@@ -1,6 +1,6 @@
 # Class: HttpMonitor
 
-Defined in: [electron/services/monitoring/HttpMonitor.ts:84](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/HttpMonitor.ts#L84)
+Defined in: [electron/services/monitoring/HttpMonitor.ts:84](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/HttpMonitor.ts#L84)
 
 Service for performing HTTP/HTTPS monitoring checks.
 
@@ -24,7 +24,7 @@ interpretation suitable for uptime monitoring scenarios.
 
 > **new HttpMonitor**(`config`): `HttpMonitor`
 
-Defined in: [electron/services/monitoring/HttpMonitor.ts:99](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/HttpMonitor.ts#L99)
+Defined in: [electron/services/monitoring/HttpMonitor.ts:99](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/HttpMonitor.ts#L99)
 
 Initialize the HTTP monitor with optional configuration.
 
@@ -51,7 +51,7 @@ including timing interceptors, appropriate timeouts, and security limits.
 
 > **check**(`monitor`): `Promise`\<[`MonitorCheckResult`](../../types/interfaces/MonitorCheckResult.md)\>
 
-Defined in: [electron/services/monitoring/HttpMonitor.ts:128](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/HttpMonitor.ts#L128)
+Defined in: [electron/services/monitoring/HttpMonitor.ts:128](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/HttpMonitor.ts#L128)
 
 Perform an HTTP health check on the given monitor.
 
@@ -90,7 +90,7 @@ comprehensive error handling.
 
 > **getConfig**(): [`MonitorConfig`](../../types/interfaces/MonitorConfig.md)
 
-Defined in: [electron/services/monitoring/HttpMonitor.ts:147](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/HttpMonitor.ts#L147)
+Defined in: [electron/services/monitoring/HttpMonitor.ts:147](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/HttpMonitor.ts#L147)
 
 Get the current configuration.
 
@@ -104,7 +104,7 @@ Get the current configuration.
 
 > **getType**(): `"http"` \| `"port"`
 
-Defined in: [electron/services/monitoring/HttpMonitor.ts:154](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/HttpMonitor.ts#L154)
+Defined in: [electron/services/monitoring/HttpMonitor.ts:154](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/HttpMonitor.ts#L154)
 
 Get the monitor type this service handles.
 
@@ -122,7 +122,7 @@ Get the monitor type this service handles.
 
 > **updateConfig**(`config`): `void`
 
-Defined in: [electron/services/monitoring/HttpMonitor.ts:174](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/monitoring/HttpMonitor.ts#L174)
+Defined in: [electron/services/monitoring/HttpMonitor.ts:174](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/monitoring/HttpMonitor.ts#L174)
 
 Update the configuration for this monitor.
 

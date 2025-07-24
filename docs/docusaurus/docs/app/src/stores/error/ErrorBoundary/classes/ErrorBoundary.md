@@ -1,6 +1,6 @@
 # Class: ErrorBoundary
 
-Defined in: [src/stores/error/ErrorBoundary.tsx:26](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/stores/error/ErrorBoundary.tsx#L26)
+Defined in: [src/stores/error/ErrorBoundary.tsx:26](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/error/ErrorBoundary.tsx#L26)
 
 Error boundary component for wrapping store-connected components
 
@@ -14,7 +14,7 @@ Error boundary component for wrapping store-connected components
 
 > **new ErrorBoundary**(`properties`): `ErrorBoundary`
 
-Defined in: [src/stores/error/ErrorBoundary.tsx:27](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/stores/error/ErrorBoundary.tsx#L27)
+Defined in: [src/stores/error/ErrorBoundary.tsx:27](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/error/ErrorBoundary.tsx#L27)
 
 #### Parameters
 
@@ -36,7 +36,7 @@ Defined in: [src/stores/error/ErrorBoundary.tsx:27](https://github.com/Nick2bad4
 
 > **componentDidCatch**(`error`, `errorInfo`): `void`
 
-Defined in: [src/stores/error/ErrorBoundary.tsx:41](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/stores/error/ErrorBoundary.tsx#L41)
+Defined in: [src/stores/error/ErrorBoundary.tsx:41](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/error/ErrorBoundary.tsx#L41)
 
 Catches exceptions generated in descendant components. Unhandled exceptions will cause
 the entire component tree to unmount.
@@ -65,7 +65,7 @@ the entire component tree to unmount.
 
 > **handleRetry**(): `void`
 
-Defined in: [src/stores/error/ErrorBoundary.tsx:53](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/stores/error/ErrorBoundary.tsx#L53)
+Defined in: [src/stores/error/ErrorBoundary.tsx:53](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/error/ErrorBoundary.tsx#L53)
 
 #### Returns
 
@@ -77,7 +77,7 @@ Defined in: [src/stores/error/ErrorBoundary.tsx:53](https://github.com/Nick2bad4
 
 > **render**(): `undefined` \| `null` \| `string` \| `number` \| `bigint` \| `boolean` \| `Iterable`\<`ReactNode`, `any`, `any`\> \| `Promise`\<`AwaitedReactNode`\> \| `Element`
 
-Defined in: [src/stores/error/ErrorBoundary.tsx:58](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/stores/error/ErrorBoundary.tsx#L58)
+Defined in: [src/stores/error/ErrorBoundary.tsx:58](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/error/ErrorBoundary.tsx#L58)
 
 #### Returns
 
@@ -93,7 +93,7 @@ Defined in: [src/stores/error/ErrorBoundary.tsx:58](https://github.com/Nick2bad4
 
 > `static` **getDerivedStateFromError**(`error`): `ErrorBoundaryState`
 
-Defined in: [src/stores/error/ErrorBoundary.tsx:34](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/stores/error/ErrorBoundary.tsx#L34)
+Defined in: [src/stores/error/ErrorBoundary.tsx:34](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/error/ErrorBoundary.tsx#L34)
 
 #### Parameters
 

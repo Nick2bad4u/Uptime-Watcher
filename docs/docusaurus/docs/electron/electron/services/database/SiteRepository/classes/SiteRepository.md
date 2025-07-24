@@ -1,6 +1,6 @@
 # Class: SiteRepository
 
-Defined in: [electron/services/database/SiteRepository.ts:42](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/SiteRepository.ts#L42)
+Defined in: [electron/services/database/SiteRepository.ts:42](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/SiteRepository.ts#L42)
 
 ## Constructors
 
@@ -8,7 +8,7 @@ Defined in: [electron/services/database/SiteRepository.ts:42](https://github.com
 
 > **new SiteRepository**(`dependencies`): `SiteRepository`
 
-Defined in: [electron/services/database/SiteRepository.ts:45](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/SiteRepository.ts#L45)
+Defined in: [electron/services/database/SiteRepository.ts:45](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/SiteRepository.ts#L45)
 
 #### Parameters
 
@@ -26,7 +26,7 @@ Defined in: [electron/services/database/SiteRepository.ts:45](https://github.com
 
 > **bulkInsert**(`sites`): `Promise`\<`void`\>
 
-Defined in: [electron/services/database/SiteRepository.ts:62](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/SiteRepository.ts#L62)
+Defined in: [electron/services/database/SiteRepository.ts:62](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/SiteRepository.ts#L62)
 
 Bulk insert sites (for import functionality).
 Uses executeTransaction for atomic operation.
@@ -60,7 +60,7 @@ Performs bulk insertion with consistent data normalization:
 
 > **bulkInsertInternal**(`db`, `sites`): `void`
 
-Defined in: [electron/services/database/SiteRepository.ts:96](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/SiteRepository.ts#L96)
+Defined in: [electron/services/database/SiteRepository.ts:96](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/SiteRepository.ts#L96)
 
 Internal method to bulk insert sites within an existing transaction.
 
@@ -99,7 +99,7 @@ statements for performance and applies consistent data normalization.
 
 > **delete**(`identifier`): `Promise`\<`boolean`\>
 
-Defined in: [electron/services/database/SiteRepository.ts:126](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/SiteRepository.ts#L126)
+Defined in: [electron/services/database/SiteRepository.ts:126](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/SiteRepository.ts#L126)
 
 Delete a site from the database.
 
@@ -123,7 +123,7 @@ Promise resolving to true if site was deleted, false if not found
 
 > **deleteAll**(): `Promise`\<`void`\>
 
-Defined in: [electron/services/database/SiteRepository.ts:146](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/SiteRepository.ts#L146)
+Defined in: [electron/services/database/SiteRepository.ts:146](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/SiteRepository.ts#L146)
 
 Clear all sites from the database.
 
@@ -142,7 +142,7 @@ Use with caution in production environments.
 
 > **deleteAllInternal**(`db`): `void`
 
-Defined in: [electron/services/database/SiteRepository.ts:164](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/SiteRepository.ts#L164)
+Defined in: [electron/services/database/SiteRepository.ts:164](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/SiteRepository.ts#L164)
 
 Internal method to clear all sites from the database within an existing transaction.
 
@@ -169,7 +169,7 @@ It performs a hard delete of all site records.
 
 > **deleteInternal**(`db`, `identifier`): `boolean`
 
-Defined in: [electron/services/database/SiteRepository.ts:178](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/SiteRepository.ts#L178)
+Defined in: [electron/services/database/SiteRepository.ts:178](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/SiteRepository.ts#L178)
 
 Delete a site from the database (internal version for use within existing transactions).
 
@@ -203,7 +203,7 @@ Re-throws database errors after logging for upstream handling
 
 > **exists**(`identifier`): `Promise`\<`boolean`\>
 
-Defined in: [electron/services/database/SiteRepository.ts:202](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/SiteRepository.ts#L202)
+Defined in: [electron/services/database/SiteRepository.ts:202](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/SiteRepository.ts#L202)
 
 Check if a site exists by identifier.
 
@@ -227,7 +227,7 @@ Promise resolving to true if site exists, false otherwise
 
 > **exportAll**(): `Promise`\<[`SiteRow`](../../utils/siteMapper/interfaces/SiteRow.md)[]\>
 
-Defined in: [electron/services/database/SiteRepository.ts:223](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/SiteRepository.ts#L223)
+Defined in: [electron/services/database/SiteRepository.ts:223](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/SiteRepository.ts#L223)
 
 Export all sites for backup/import functionality.
 
@@ -248,7 +248,7 @@ Uses consistent query and validation patterns.
 
 > **findAll**(): `Promise`\<[`SiteRow`](../../utils/siteMapper/interfaces/SiteRow.md)[]\>
 
-Defined in: [electron/services/database/SiteRepository.ts:240](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/SiteRepository.ts#L240)
+Defined in: [electron/services/database/SiteRepository.ts:240](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/SiteRepository.ts#L240)
 
 Get all sites from the database (without monitors).
 
@@ -269,7 +269,7 @@ in functionality but semantically different purpose.
 
 > **findByIdentifier**(`identifier`): `Promise`\<`undefined` \| [`SiteRow`](../../utils/siteMapper/interfaces/SiteRow.md)\>
 
-Defined in: [electron/services/database/SiteRepository.ts:256](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/SiteRepository.ts#L256)
+Defined in: [electron/services/database/SiteRepository.ts:256](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/SiteRepository.ts#L256)
 
 Find a site by its identifier with resilient error handling.
 
@@ -297,7 +297,7 @@ Re-throws database errors after logging for upstream handling
 
 > **upsert**(`site`): `Promise`\<`void`\>
 
-Defined in: [electron/services/database/SiteRepository.ts:289](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/SiteRepository.ts#L289)
+Defined in: [electron/services/database/SiteRepository.ts:289](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/SiteRepository.ts#L289)
 
 Create or update a site in the database.
 
@@ -328,7 +328,7 @@ Applies consistent data normalization with standard defaults.
 
 > **upsertInternal**(`db`, `site`): `void`
 
-Defined in: [electron/services/database/SiteRepository.ts:316](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/SiteRepository.ts#L316)
+Defined in: [electron/services/database/SiteRepository.ts:316](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/SiteRepository.ts#L316)
 
 Internal method to create or update a site within an existing transaction.
 

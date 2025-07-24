@@ -1,6 +1,6 @@
 # Interface: StatusBarChartData
 
-Defined in: [src/services/chartConfig.ts:46](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/services/chartConfig.ts#L46)
+Defined in: [src/services/chartConfig.ts:46](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/services/chartConfig.ts#L46)
 
 Status distribution bar chart data structure
 
@@ -14,7 +14,7 @@ Status distribution bar chart data structure
 
 > **datasets**: `object`[]
 
-Defined in: [src/services/chartConfig.ts:47](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/services/chartConfig.ts#L47)
+Defined in: [src/services/chartConfig.ts:47](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/services/chartConfig.ts#L47)
 
 #### backgroundColor
 
@@ -46,7 +46,7 @@ Defined in: [src/services/chartConfig.ts:47](https://github.com/Nick2bad4u/Uptim
 
 > **labels**: `string`[]
 
-Defined in: [src/services/chartConfig.ts:54](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/services/chartConfig.ts#L54)
+Defined in: [src/services/chartConfig.ts:54](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/services/chartConfig.ts#L54)
 
 #### Overrides
 

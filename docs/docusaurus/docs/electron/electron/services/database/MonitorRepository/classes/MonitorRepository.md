@@ -1,6 +1,6 @@
 # Class: MonitorRepository
 
-Defined in: [electron/services/database/MonitorRepository.ts:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/MonitorRepository.ts#L25)
+Defined in: [electron/services/database/MonitorRepository.ts:25](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/MonitorRepository.ts#L25)
 
 ## Constructors
 
@@ -8,7 +8,7 @@ Defined in: [electron/services/database/MonitorRepository.ts:25](https://github.
 
 > **new MonitorRepository**(`dependencies`): `MonitorRepository`
 
-Defined in: [electron/services/database/MonitorRepository.ts:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/MonitorRepository.ts#L28)
+Defined in: [electron/services/database/MonitorRepository.ts:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/MonitorRepository.ts#L28)
 
 #### Parameters
 
@@ -26,7 +26,7 @@ Defined in: [electron/services/database/MonitorRepository.ts:28](https://github.
 
 > **bulkCreate**(`siteIdentifier`, `monitors`): `Promise`\<[`Monitor`](../../../../../shared/types/interfaces/Monitor.md)[]\>
 
-Defined in: [electron/services/database/MonitorRepository.ts:37](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/MonitorRepository.ts#L37)
+Defined in: [electron/services/database/MonitorRepository.ts:37](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/MonitorRepository.ts#L37)
 
 Bulk create monitors (for import functionality).
 Returns the created monitor with their new IDs.
@@ -52,7 +52,7 @@ Uses transactions to ensure atomicity.
 
 > **create**(`siteIdentifier`, `monitor`): `Promise`\<`string`\>
 
-Defined in: [electron/services/database/MonitorRepository.ts:83](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/MonitorRepository.ts#L83)
+Defined in: [electron/services/database/MonitorRepository.ts:83](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/MonitorRepository.ts#L83)
 
 Create a new monitor and return its ID.
 Uses transactions to ensure atomicity.
@@ -77,7 +77,7 @@ Uses transactions to ensure atomicity.
 
 > **createInternal**(`db`, `siteIdentifier`, `monitor`): `string`
 
-Defined in: [electron/services/database/MonitorRepository.ts:110](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/MonitorRepository.ts#L110)
+Defined in: [electron/services/database/MonitorRepository.ts:110](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/MonitorRepository.ts#L110)
 
 Internal method to create a monitor within an existing transaction.
 
@@ -122,7 +122,7 @@ Uses enhanced type safety validation to prevent silent failures from schema chan
 
 > **delete**(`monitorId`): `Promise`\<`boolean`\>
 
-Defined in: [electron/services/database/MonitorRepository.ts:142](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/MonitorRepository.ts#L142)
+Defined in: [electron/services/database/MonitorRepository.ts:142](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/MonitorRepository.ts#L142)
 
 Delete a monitor and its history.
 Uses a transaction to ensure atomicity.
@@ -143,7 +143,7 @@ Uses a transaction to ensure atomicity.
 
 > **deleteAll**(): `Promise`\<`void`\>
 
-Defined in: [electron/services/database/MonitorRepository.ts:169](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/MonitorRepository.ts#L169)
+Defined in: [electron/services/database/MonitorRepository.ts:169](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/MonitorRepository.ts#L169)
 
 Clear all monitors from the database.
 Uses transactions to ensure atomicity.
@@ -158,7 +158,7 @@ Uses transactions to ensure atomicity.
 
 > **deleteAllInternal**(`db`): `void`
 
-Defined in: [electron/services/database/MonitorRepository.ts:182](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/MonitorRepository.ts#L182)
+Defined in: [electron/services/database/MonitorRepository.ts:182](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/MonitorRepository.ts#L182)
 
 Internal method to clear all monitors from the database within an existing transaction.
 Use this method when you're already within a transaction context.
@@ -179,7 +179,7 @@ Use this method when you're already within a transaction context.
 
 > **deleteBySiteIdentifier**(`siteIdentifier`): `Promise`\<`void`\>
 
-Defined in: [electron/services/database/MonitorRepository.ts:191](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/MonitorRepository.ts#L191)
+Defined in: [electron/services/database/MonitorRepository.ts:191](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/MonitorRepository.ts#L191)
 
 Delete all monitors for a specific site.
 Uses a transaction to ensure atomicity.
@@ -200,7 +200,7 @@ Uses a transaction to ensure atomicity.
 
 > **deleteBySiteIdentifierInternal**(`db`, `siteIdentifier`): `void`
 
-Defined in: [electron/services/database/MonitorRepository.ts:213](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/MonitorRepository.ts#L213)
+Defined in: [electron/services/database/MonitorRepository.ts:213](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/MonitorRepository.ts#L213)
 
 Internal method to delete all monitors for a specific site within an existing transaction.
 This method should be called from within a database transaction.
@@ -225,7 +225,7 @@ This method should be called from within a database transaction.
 
 > **deleteInternal**(`db`, `monitorId`): `boolean`
 
-Defined in: [electron/services/database/MonitorRepository.ts:232](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/MonitorRepository.ts#L232)
+Defined in: [electron/services/database/MonitorRepository.ts:232](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/MonitorRepository.ts#L232)
 
 Internal method to delete a monitor and its history within an existing transaction.
 This method should be called from within a database transaction.
@@ -250,7 +250,7 @@ This method should be called from within a database transaction.
 
 > **findByIdentifier**(`monitorId`): `Promise`\<`undefined` \| [`Monitor`](../../../../../shared/types/interfaces/Monitor.md)\>
 
-Defined in: [electron/services/database/MonitorRepository.ts:244](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/MonitorRepository.ts#L244)
+Defined in: [electron/services/database/MonitorRepository.ts:244](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/MonitorRepository.ts#L244)
 
 Find a monitor by its identifier with resilient error handling.
 
@@ -270,7 +270,7 @@ Find a monitor by its identifier with resilient error handling.
 
 > **findBySiteIdentifier**(`siteIdentifier`): `Promise`\<[`Monitor`](../../../../../shared/types/interfaces/Monitor.md)[]\>
 
-Defined in: [electron/services/database/MonitorRepository.ts:266](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/MonitorRepository.ts#L266)
+Defined in: [electron/services/database/MonitorRepository.ts:266](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/MonitorRepository.ts#L266)
 
 Find all monitors for a specific site.
 
@@ -294,7 +294,7 @@ Promise resolving to array of monitors for the site
 
 > **getAllMonitorIds**(): `Promise`\<`object`[]\>
 
-Defined in: [electron/services/database/MonitorRepository.ts:281](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/MonitorRepository.ts#L281)
+Defined in: [electron/services/database/MonitorRepository.ts:281](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/MonitorRepository.ts#L281)
 
 Get all monitor IDs.
 
@@ -308,7 +308,7 @@ Get all monitor IDs.
 
 > **update**(`monitorId`, `monitor`): `Promise`\<`void`\>
 
-Defined in: [electron/services/database/MonitorRepository.ts:293](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/MonitorRepository.ts#L293)
+Defined in: [electron/services/database/MonitorRepository.ts:293](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/MonitorRepository.ts#L293)
 
 Update an existing monitor.
 Uses transactions to ensure atomicity.
@@ -333,7 +333,7 @@ Uses transactions to ensure atomicity.
 
 > **updateInternal**(`db`, `monitorId`, `monitor`): `void`
 
-Defined in: [electron/services/database/MonitorRepository.ts:326](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/database/MonitorRepository.ts#L326)
+Defined in: [electron/services/database/MonitorRepository.ts:326](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/database/MonitorRepository.ts#L326)
 
 Update an existing monitor (internal version for use within existing transactions).
 

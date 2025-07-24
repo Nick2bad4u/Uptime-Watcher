@@ -33,14 +33,46 @@ import { AutoUpdaterService } from "./updater/AutoUpdaterService";
 import { WindowService } from "./window/WindowService";
 
 /**
- * Service container configuration interface.
+ * Configuration interface for service container behavior.
+ *
+ * @remarks
+ * Controls various aspects of service initialization and behavior.
+ * All properties are optional with sensible defaults.
+ *
+ * @public
  */
 export interface ServiceContainerConfig {
-    /** Enable debug logging for service initialization */
+    /**
+     * Enable debug logging for service initialization and lifecycle events.
+     *
+     * @defaultValue false
+     *
+     * @remarks
+     * When enabled, logs detailed information about:
+     * - Service creation and dependency injection
+     * - Initialization order and timing
+     * - Manager setup and event forwarding
+     * - Error contexts and recovery attempts
+     *
+     * Useful for debugging service dependency issues and startup problems.
+     */
     enableDebugLogging?: boolean;
-    /** Custom notification service configuration */
+
+    /**
+     * Custom notification service configuration.
+     *
+     * @defaultValue `{ showDownAlerts: true, showUpAlerts: true }`
+     *
+     * @remarks
+     * Controls system notification behavior for monitor status changes.
+     * Can be modified at runtime via NotificationService.updateConfig().
+     *
+     * @see {@link NotificationService} for runtime configuration updates
+     */
     notificationConfig?: {
+        /** Enable notifications when monitors go down */
         showDownAlerts: boolean;
+        /** Enable notifications when monitors come back up */
         showUpAlerts: boolean;
     };
 }
@@ -97,7 +129,27 @@ export class ServiceContainer {
     }
 
     /**
-     * Reset container for testing purposes.
+     * Reset the singleton container for testing purposes.
+     *
+     * @remarks
+     * **Testing Utility**: Clears the singleton instance to allow clean test isolation.
+     *
+     * **Usage Pattern:**
+     * ```typescript
+     * // In test setup
+     * ServiceContainer.resetForTesting();
+     *
+     * // Create fresh container for test
+     * const container = ServiceContainer.getInstance({ enableDebugLogging: true });
+     * ```
+     *
+     * **Important Notes:**
+     * - Only use in test environments
+     * - Does not clean up existing service instances
+     * - Does not close database connections or cleanup resources
+     * - Call cleanup methods on services before reset if needed
+     *
+     * @testonly
      */
     public static resetForTesting(): void {
         ServiceContainer.instance = undefined;
@@ -167,26 +219,70 @@ export class ServiceContainer {
     }
 
     /**
-     * Get all initialized services for shutdown.
+     * Get initialization status summary for debugging.
+     *
+     * @returns Object with service names and their initialization status
+     */
+    public getInitializationStatus(): Record<string, boolean> {
+        return {
+            AutoUpdaterService: this._autoUpdaterService !== undefined,
+            ConfigurationManager: this._configurationManager !== undefined,
+            DatabaseManager: this._databaseManager !== undefined,
+            DatabaseService: this._databaseService !== undefined,
+            HistoryRepository: this._historyRepository !== undefined,
+            IpcService: this._ipcService !== undefined,
+            MonitorManager: this._monitorManager !== undefined,
+            MonitorRepository: this._monitorRepository !== undefined,
+            NotificationService: this._notificationService !== undefined,
+            SettingsRepository: this._settingsRepository !== undefined,
+            SiteManager: this._siteManager !== undefined,
+            SiteRepository: this._siteRepository !== undefined,
+            SiteService: this._siteService !== undefined,
+            UptimeOrchestrator: this._uptimeOrchestrator !== undefined,
+            WindowService: this._windowService !== undefined,
+        };
+    }
+
+    /**
+     * Get all initialized services for shutdown and debugging.
+     *
+     * @returns Array of service name/instance pairs for all initialized services
+     *
+     * @remarks
+     * Dynamically discovers all initialized services by inspecting private fields.
+     * This approach automatically includes new services without manual updates.
+     *
+     * Only includes services that are actually initialized (not undefined).
+     * Useful for shutdown procedures, health checks, and debugging.
      */
     public getInitializedServices(): { name: string; service: unknown }[] {
         const services: { name: string; service: unknown }[] = [];
 
-        if (this._databaseService) services.push({ name: "DatabaseService", service: this._databaseService });
-        if (this._windowService) services.push({ name: "WindowService", service: this._windowService });
-        if (this._autoUpdaterService) {
-            services.push({ name: "AutoUpdaterService", service: this._autoUpdaterService });
+        // Dynamically discover initialized services using reflection
+        const serviceMap: Record<string, unknown> = {
+            AutoUpdaterService: this._autoUpdaterService,
+            ConfigurationManager: this._configurationManager,
+            DatabaseManager: this._databaseManager,
+            DatabaseService: this._databaseService,
+            HistoryRepository: this._historyRepository,
+            IpcService: this._ipcService,
+            MonitorManager: this._monitorManager,
+            MonitorRepository: this._monitorRepository,
+            NotificationService: this._notificationService,
+            SettingsRepository: this._settingsRepository,
+            SiteManager: this._siteManager,
+            SiteRepository: this._siteRepository,
+            SiteService: this._siteService,
+            UptimeOrchestrator: this._uptimeOrchestrator,
+            WindowService: this._windowService,
+        };
+
+        // Only include services that are actually initialized
+        for (const [serviceName, serviceInstance] of Object.entries(serviceMap)) {
+            if (serviceInstance !== undefined) {
+                services.push({ name: serviceName, service: serviceInstance });
+            }
         }
-        if (this._notificationService) {
-            services.push({ name: "NotificationService", service: this._notificationService });
-        }
-        if (this._uptimeOrchestrator) services.push({ name: "UptimeOrchestrator", service: this._uptimeOrchestrator });
-        if (this._ipcService) services.push({ name: "IpcService", service: this._ipcService });
-        if (this._siteManager) services.push({ name: "SiteManager", service: this._siteManager });
-        if (this._monitorManager) services.push({ name: "MonitorManager", service: this._monitorManager });
-        if (this._databaseManager) services.push({ name: "DatabaseManager", service: this._databaseManager });
-        if (this._configurationManager)
-            services.push({ name: "ConfigurationManager", service: this._configurationManager });
 
         return services;
     }
@@ -221,7 +317,11 @@ export class ServiceContainer {
                 getSitesCache: () => {
                     // Direct access to avoid circular dependency - SiteManager should be created before MonitorManager
                     if (!this._siteManager) {
-                        throw new Error("SiteManager must be initialized before MonitorManager");
+                        throw new Error(
+                            "Service dependency error: SiteManager not fully initialized. " +
+                                "This usually indicates a circular dependency or incorrect initialization order. " +
+                                "Ensure ServiceContainer.initialize() completes before accessing SiteManager functionality."
+                        );
                     }
                     return this._siteManager.getSitesCache();
                 },
@@ -281,10 +381,32 @@ export class ServiceContainer {
         if (!this._siteManager) {
             // Create monitoring operations interface that will be passed to SiteManager
             const monitoringOperations: IMonitoringOperations = {
-                setHistoryLimit: (limit: number): Promise<void> => {
-                    // This could be implemented if needed
-                    logger.debug(`[ServiceContainer] setHistoryLimit called with ${limit}`);
-                    return Promise.resolve();
+                /**
+                 * Set history limit for monitor data retention.
+                 *
+                 * @param limit - Maximum number of history entries to retain
+                 * @returns Promise that resolves when limit is set
+                 *
+                 * @remarks
+                 * Delegates to DatabaseManager's setHistoryLimit method which:
+                 * - Validates input (must be non-negative integer)
+                 * - Updates database settings
+                 * - Cleans up excess history records
+                 * - Emits events to notify other components
+                 * - Updates internal history limit state
+                 */
+                setHistoryLimit: async (limit: number): Promise<void> => {
+                    try {
+                        const databaseManager = this.getDatabaseManager();
+                        await databaseManager.setHistoryLimit(limit);
+                        logger.debug(`[ServiceContainer] History limit set to ${limit} via DatabaseManager`);
+                    } catch (error) {
+                        logger.error("[ServiceContainer] Failed to set history limit", {
+                            error: error instanceof Error ? error.message : String(error),
+                            limit,
+                        });
+                        throw error; // Re-throw to let caller handle
+                    }
                 },
                 setupNewMonitors: async (site: Site, newMonitorIds: string[]): Promise<void> => {
                     const monitorManager = this.getMonitorManager();

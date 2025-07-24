@@ -1,6 +1,6 @@
 # Class: SiteService
 
-Defined in: [electron/services/site/SiteService.ts:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/site/SiteService.ts#L28)
+Defined in: [electron/services/site/SiteService.ts:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/site/SiteService.ts#L28)
 
 Service for coordinating site operations across multiple repositories.
 Handles complex operations that require coordination between site, monitor, and history data.
@@ -11,7 +11,7 @@ Handles complex operations that require coordination between site, monitor, and 
 
 > **new SiteService**(`dependencies`): `SiteService`
 
-Defined in: [electron/services/site/SiteService.ts:39](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/site/SiteService.ts#L39)
+Defined in: [electron/services/site/SiteService.ts:39](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/site/SiteService.ts#L39)
 
 #### Parameters
 
@@ -29,7 +29,7 @@ Defined in: [electron/services/site/SiteService.ts:39](https://github.com/Nick2b
 
 > **deleteSiteWithRelatedData**(`identifier`): `Promise`\<`boolean`\>
 
-Defined in: [electron/services/site/SiteService.ts:55](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/site/SiteService.ts#L55)
+Defined in: [electron/services/site/SiteService.ts:55](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/site/SiteService.ts#L55)
 
 Delete a site and all its related data (monitors and history).
 Uses transaction to ensure atomicity.
@@ -58,7 +58,7 @@ Error When any deletion operation fails
 
 > **findByIdentifierWithDetails**(`identifier`): `Promise`\<`undefined` \| [`Site`](../../../../../shared/types/interfaces/Site.md)\>
 
-Defined in: [electron/services/site/SiteService.ts:114](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/site/SiteService.ts#L114)
+Defined in: [electron/services/site/SiteService.ts:114](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/site/SiteService.ts#L114)
 
 Find a site by identifier with all related monitors and history data.
 This replaces the complex logic that was previously in SiteRepository.
@@ -83,7 +83,7 @@ Promise resolving to site with details or undefined if not found
 
 > **getAllWithDetails**(): `Promise`\<[`Site`](../../../../../shared/types/interfaces/Site.md)[]\>
 
-Defined in: [electron/services/site/SiteService.ts:168](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/services/site/SiteService.ts#L168)
+Defined in: [electron/services/site/SiteService.ts:168](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/services/site/SiteService.ts#L168)
 
 Get all sites with their related monitors and history data.
 This replaces the complex logic that was previously in SiteRepository.

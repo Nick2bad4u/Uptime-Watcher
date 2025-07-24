@@ -2,7 +2,7 @@
 
 > **Settings**(`props`): `Element`
 
-Defined in: [src/components/Settings/Settings.tsx:52](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/components/Settings/Settings.tsx#L52)
+Defined in: [src/components/Settings/Settings.tsx:52](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/Settings/Settings.tsx#L52)
 
 Settings component providing comprehensive application configuration.
 

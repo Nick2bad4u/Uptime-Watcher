@@ -1,6 +1,6 @@
 # Interface: StatusHistory
 
-Defined in: [shared/types.ts:48](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/shared/types.ts#L48)
+Defined in: [shared/types.ts:48](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/types.ts#L48)
 
 ## Properties
 
@@ -8,7 +8,7 @@ Defined in: [shared/types.ts:48](https://github.com/Nick2bad4u/Uptime-Watcher/bl
 
 > `optional` **details**: `string`
 
-Defined in: [shared/types.ts:49](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/shared/types.ts#L49)
+Defined in: [shared/types.ts:49](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/types.ts#L49)
 
 ***
 
@@ -16,7 +16,7 @@ Defined in: [shared/types.ts:49](https://github.com/Nick2bad4u/Uptime-Watcher/bl
 
 > **responseTime**: `number`
 
-Defined in: [shared/types.ts:50](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/shared/types.ts#L50)
+Defined in: [shared/types.ts:50](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/types.ts#L50)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [shared/types.ts:50](https://github.com/Nick2bad4u/Uptime-Watcher/bl
 
 > **status**: `"down"` \| `"up"`
 
-Defined in: [shared/types.ts:51](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/shared/types.ts#L51)
+Defined in: [shared/types.ts:51](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/types.ts#L51)
 
 ***
 
@@ -32,4 +32,4 @@ Defined in: [shared/types.ts:51](https://github.com/Nick2bad4u/Uptime-Watcher/bl
 
 > **timestamp**: `number`
 
-Defined in: [shared/types.ts:52](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/shared/types.ts#L52)
+Defined in: [shared/types.ts:52](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/shared/types.ts#L52)

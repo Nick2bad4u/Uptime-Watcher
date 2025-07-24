@@ -1,6 +1,6 @@
 # Interface: SettingsStore
 
-Defined in: [src/stores/settings/types.ts:12](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/stores/settings/types.ts#L12)
+Defined in: [src/stores/settings/types.ts:12](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/settings/types.ts#L12)
 
 Settings store interface.
 Manages user preferences and application configuration.
@@ -11,7 +11,7 @@ Manages user preferences and application configuration.
 
 > **initializeSettings**: () => `Promise`\<\` `message`: `string`; `settingsLoaded`: `boolean`; `success`: `boolean`; \`\>
 
-Defined in: [src/stores/settings/types.ts:14](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/stores/settings/types.ts#L14)
+Defined in: [src/stores/settings/types.ts:14](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/settings/types.ts#L14)
 
 Initialize settings from backend
 
@@ -25,7 +25,7 @@ Initialize settings from backend
 
 > **resetSettings**: () => `void`
 
-Defined in: [src/stores/settings/types.ts:17](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/stores/settings/types.ts#L17)
+Defined in: [src/stores/settings/types.ts:17](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/settings/types.ts#L17)
 
 Reset all settings to default values
 
@@ -39,7 +39,7 @@ Reset all settings to default values
 
 > **settings**: [`AppSettings`](../../../types/interfaces/AppSettings.md)
 
-Defined in: [src/stores/settings/types.ts:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/stores/settings/types.ts#L21)
+Defined in: [src/stores/settings/types.ts:21](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/settings/types.ts#L21)
 
 Application settings
 
@@ -49,7 +49,7 @@ Application settings
 
 > **updateHistoryLimitValue**: (`limit`) => `Promise`\<`void`\>
 
-Defined in: [src/stores/settings/types.ts:24](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/stores/settings/types.ts#L24)
+Defined in: [src/stores/settings/types.ts:24](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/settings/types.ts#L24)
 
 Update history limit with backend sync
 
@@ -69,7 +69,7 @@ Update history limit with backend sync
 
 > **updateSettings**: (`settings`) => `void`
 
-Defined in: [src/stores/settings/types.ts:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/stores/settings/types.ts#L28)
+Defined in: [src/stores/settings/types.ts:28](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/stores/settings/types.ts#L28)
 
 Update multiple settings at once
 

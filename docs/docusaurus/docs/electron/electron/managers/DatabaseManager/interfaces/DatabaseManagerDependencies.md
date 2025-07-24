@@ -1,6 +1,6 @@
 # Interface: DatabaseManagerDependencies
 
-Defined in: [electron/managers/DatabaseManager.ts:31](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/managers/DatabaseManager.ts#L31)
+Defined in: [electron/managers/DatabaseManager.ts:31](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/DatabaseManager.ts#L31)
 
 Dependencies interface for DatabaseManager constructor.
 
@@ -10,7 +10,7 @@ Dependencies interface for DatabaseManager constructor.
 
 > **eventEmitter**: [`TypedEventBus`](../../../events/TypedEventBus/classes/TypedEventBus.md)\<[`UptimeEvents`](../../../events/eventTypes/interfaces/UptimeEvents.md)\>
 
-Defined in: [electron/managers/DatabaseManager.ts:32](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/managers/DatabaseManager.ts#L32)
+Defined in: [electron/managers/DatabaseManager.ts:32](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/DatabaseManager.ts#L32)
 
 ***
 
@@ -18,7 +18,7 @@ Defined in: [electron/managers/DatabaseManager.ts:32](https://github.com/Nick2ba
 
 > **repositories**: `object`
 
-Defined in: [electron/managers/DatabaseManager.ts:33](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/electron/managers/DatabaseManager.ts#L33)
+Defined in: [electron/managers/DatabaseManager.ts:33](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/electron/managers/DatabaseManager.ts#L33)
 
 #### database
 

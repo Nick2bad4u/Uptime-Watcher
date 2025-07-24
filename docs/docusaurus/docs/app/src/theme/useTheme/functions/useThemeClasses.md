@@ -2,7 +2,7 @@
 
 > **useThemeClasses**(): `object`
 
-Defined in: [src/theme/useTheme.ts:218](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/theme/useTheme.ts#L218)
+Defined in: [src/theme/useTheme.ts:218](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/theme/useTheme.ts#L218)
 
 Hook for theme-aware CSS classes using CSS custom properties.
 Provides utility functions for generating dynamic CSS classes based on the current theme.

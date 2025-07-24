@@ -1,6 +1,6 @@
 # Interface: SelectFieldProperties
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:174](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/components/AddSiteForm/FormFields.tsx#L174)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:174](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/AddSiteForm/FormFields.tsx#L174)
 
 Props for the SelectField component
 
@@ -10,7 +10,7 @@ Props for the SelectField component
 
 > `optional` **disabled**: `boolean`
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:176](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/components/AddSiteForm/FormFields.tsx#L176)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:176](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/AddSiteForm/FormFields.tsx#L176)
 
 Whether the field is disabled
 
@@ -20,7 +20,7 @@ Whether the field is disabled
 
 > `optional` **error**: `string`
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:178](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/components/AddSiteForm/FormFields.tsx#L178)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:178](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/AddSiteForm/FormFields.tsx#L178)
 
 Error message to display
 
@@ -30,7 +30,7 @@ Error message to display
 
 > `optional` **helpText**: `string`
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:180](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/components/AddSiteForm/FormFields.tsx#L180)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:180](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/AddSiteForm/FormFields.tsx#L180)
 
 Help text to show below the field
 
@@ -40,7 +40,7 @@ Help text to show below the field
 
 > **id**: `string`
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:182](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/components/AddSiteForm/FormFields.tsx#L182)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:182](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/AddSiteForm/FormFields.tsx#L182)
 
 Unique ID for the select field
 
@@ -50,7 +50,7 @@ Unique ID for the select field
 
 > **label**: `string`
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:184](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/components/AddSiteForm/FormFields.tsx#L184)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:184](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/AddSiteForm/FormFields.tsx#L184)
 
 Label text to display
 
@@ -60,7 +60,7 @@ Label text to display
 
 > **onChange**: (`value`) => `void`
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:186](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/components/AddSiteForm/FormFields.tsx#L186)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:186](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/AddSiteForm/FormFields.tsx#L186)
 
 Callback when selection changes
 
@@ -80,7 +80,7 @@ Callback when selection changes
 
 > **options**: [`SelectOption`](SelectOption.md)[]
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:188](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/components/AddSiteForm/FormFields.tsx#L188)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:188](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/AddSiteForm/FormFields.tsx#L188)
 
 Array of options to display in dropdown
 
@@ -90,7 +90,7 @@ Array of options to display in dropdown
 
 > `optional` **placeholder**: `string`
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:190](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/components/AddSiteForm/FormFields.tsx#L190)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:190](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/AddSiteForm/FormFields.tsx#L190)
 
 Placeholder text for empty selection
 
@@ -100,7 +100,7 @@ Placeholder text for empty selection
 
 > `optional` **required**: `boolean`
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:191](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/components/AddSiteForm/FormFields.tsx#L191)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:191](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/AddSiteForm/FormFields.tsx#L191)
 
 ***
 
@@ -108,4 +108,4 @@ Defined in: [src/components/AddSiteForm/FormFields.tsx:191](https://github.com/N
 
 > **value**: `string` \| `number`
 
-Defined in: [src/components/AddSiteForm/FormFields.tsx:192](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/src/components/AddSiteForm/FormFields.tsx#L192)
+Defined in: [src/components/AddSiteForm/FormFields.tsx:192](https://github.com/Nick2bad4u/Uptime-Watcher/blob/2a45eeb1723f8f7089001af2c92aa07d82dfe7e4/src/components/AddSiteForm/FormFields.tsx#L192)
