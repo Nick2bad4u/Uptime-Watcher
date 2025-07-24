@@ -4,9 +4,9 @@ const path = require('path');
 // Accept multiple docs directories as an array
 const DOCS_DIRS = [
   // Add your directories here!
-  'C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/docs/docusaurus/docs/app',
-  'C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/docs/docusaurus/docs/electron',
-  'C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/docs/docusaurus/docs/shared',
+  'docs/docusaurus/docs/app',
+  'docs/docusaurus/docs/electron',
+  'docs/docusaurus/docs/shared',
 ];
 
 function fixFile(filePath) {

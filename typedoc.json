@@ -1,7 +1,7 @@
 {
     "entryPoints": [
-        "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/src/**/*.*",
-        "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/shared/**/*.*"
+        "src/**/*.*",
+        "shared/**/*.*"
     ],
     "out": "docs/docusaurus/docs/app",
     "docsPath": "docs/docusaurus/docs/app",

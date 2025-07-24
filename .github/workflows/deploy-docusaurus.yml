@@ -47,21 +47,19 @@ jobs:
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.3
         with:
           node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: 'docs/docusaurus/package-lock.json'
 
       - name: Install dependencies
-        working-directory: docs/docusaurus
-        run: npm ci
+        run: npm install --force
+
+      - name: Install dependencies
+        run: npm install prism-react-renderer && npm install @docusaurus/preset-classic
 
       - name: Generate TypeDoc API documentation
-        working-directory: docs/docusaurus
         run: |
           # Generate TypeDoc for Electron API
           npm run docs:typedoc
 
       - name: Build Docusaurus website
-        working-directory: docs/docusaurus
         run: npm run docusaurus:build
 
       - name: Setup Pages
