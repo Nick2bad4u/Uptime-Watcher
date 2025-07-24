@@ -32,7 +32,7 @@
     "@docusaurus/tsconfig": "3.8.1",
     "@docusaurus/types": "3.8.1",
     "typedoc": "^0.28.7",
-    "typedoc-docusaurus-theme": "^0.0.7",
+    "typedoc-docusaurus-theme": "^1.4.0",
     "typedoc-plugin-markdown": "^4.7.1",
     "typescript": "~5.6.2"
   },
