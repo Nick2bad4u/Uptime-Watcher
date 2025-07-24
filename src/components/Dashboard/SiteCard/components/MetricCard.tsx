@@ -44,6 +44,12 @@ export interface MetricCardProperties {
  * ```
  */
 
+/**
+ * Metric display card component implementation.
+ *
+ * @param props - MetricCard component props
+ * @returns JSX.Element containing the metric display
+ */
 export const MetricCard = React.memo(function MetricCard({ className = "", label, value }: MetricCardProperties) {
     return (
         <div className={`flex flex-col items-center text-center ${className}`}>

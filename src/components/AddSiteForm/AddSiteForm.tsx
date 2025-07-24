@@ -1,12 +1,19 @@
 /**
  * AddSiteForm component for creating new sites and adding monitors to existing sites.
- * Provides a comprehensive form with validation and flexible configuration options.
- * Supports both HTTP and port monitoring types, with customizable check intervals.
+ *
+ * @remarks
+ * - Provides a comprehensive form with validation and flexible configuration options.
+ * - Supports both HTTP and port monitoring types, with customizable check intervals.
+ * - Uses domain-specific Zustand stores for state management.
+ * - Loads monitor types dynamically from the backend.
+ * - Handles errors via a centralized error store and logger.
+ * - All form state is managed via the {@link useAddSiteForm} custom hook.
+ *
+ * @packageDocumentation
  */
 
+import { BASE_MONITOR_TYPES, type MonitorType } from "@shared/types";
 import React, { useCallback, useEffect, useState } from "react";
-
-import type { MonitorType } from "../../types";
 
 import { CHECK_INTERVALS, UI_DELAYS } from "../../constants";
 import { useDynamicHelpText } from "../../hooks/useDynamicHelpText";
@@ -23,25 +30,61 @@ import { RadioGroup, SelectField, TextField } from "./FormFields";
 import { handleSubmit } from "./Submit";
 
 /**
+ * Supported add modes for the form.
+ * @public
+ */
+type AddMode = "existing" | "new";
+
+/**
+ * Type-safe validation for add mode values.
+ *
+ * @param value - The value to validate as an add mode.
+ * @returns True if the value is a valid {@link AddMode}, otherwise false.
+ *
+ * @example
+ * ```typescript
+ * isValidAddMode("new"); // true
+ * isValidAddMode("invalid"); // false
+ * ```
+ */
+function isValidAddMode(value: string): value is AddMode {
+    return value === "existing" || value === "new";
+}
+
+/**
+ * Type-safe validation for monitor type values.
+ *
+ * @param value - The value to validate as a monitor type.
+ * @returns True if the value is a valid {@link MonitorType}, otherwise false.
+ *
+ * @remarks
+ * Checks against {@link BASE_MONITOR_TYPES} for allowed types.
+ */
+function isValidMonitorType(value: string): value is MonitorType {
+    return BASE_MONITOR_TYPES.includes(value as MonitorType);
+}
+
+/**
  * Main form component for adding new monitoring sites or monitors.
  *
- * Features:
- * - Create new sites with monitors
- * - Add monitors to existing sites
- * - Support for HTTP and port monitoring
- * - Form validation and error handling
- * - Configurable check intervals
- * - Responsive design with loading states
+ * @remarks
+ * - Allows creation of new sites with monitors, or adding monitors to existing sites.
+ * - Supports HTTP and port monitoring, with dynamic fields based on monitor type.
+ * - Handles form validation, error display, and loading states.
+ * - Uses Zustand stores for state and error management.
+ * - Loads monitor types from backend and displays dynamic help text.
  *
- * The component uses a custom hook (useAddSiteForm) for state management
- * and modular sub-components for form fields and submission handling.
+ * @returns The rendered AddSiteForm JSX element.
  *
- * @returns JSX element containing the complete add site form
+ * @example
+ * ```tsx
+ * <AddSiteForm />
+ * ```
  */
 export const AddSiteForm = React.memo(function AddSiteForm() {
-    const { clearError, lastError } = useErrorStore();
+    // Combine store calls to avoid duplicates and improve performance
+    const { clearError, isLoading, lastError } = useErrorStore();
     const { addMonitorToSite, createSite, sites } = useSitesStore();
-    const { isLoading } = useErrorStore();
     const { isDark } = useTheme();
 
     // Load monitor types from backend
@@ -91,22 +134,59 @@ export const AddSiteForm = React.memo(function AddSiteForm() {
         return () => clearTimeout(timeoutId);
     }, [isLoading]);
 
-    // Memoized submit handler
+    /**
+     * Handles form submission for adding a site or monitor.
+     *
+     * @param event - The form submission event.
+     * @remarks
+     * Delegates to {@link handleSubmit} with all relevant form state and handlers.
+     */
     const onSubmit = useCallback(
         (event: React.FormEvent) =>
             handleSubmit(event, {
-                ...formState,
+                addMode,
                 addMonitorToSite,
+                checkInterval,
                 clearError,
                 createSite,
+                formError,
                 generateUuid,
+                host,
                 logger,
-                onSuccess: resetForm, // Reset form on successful submission
+                monitorType,
+                name,
+                onSuccess: resetForm,
+                port,
+                selectedExistingSite,
+                setFormError,
+                siteId,
+                url,
             }),
-        [formState, addMonitorToSite, clearError, createSite, resetForm]
+        [
+            addMode,
+            addMonitorToSite,
+            checkInterval,
+            clearError,
+            createSite,
+            formError,
+            host,
+            monitorType,
+            name,
+            port,
+            resetForm,
+            selectedExistingSite,
+            setFormError,
+            siteId,
+            url,
+        ]
     );
 
-    // Memoized error clear handler
+    /**
+     * Clears both global and local form errors.
+     *
+     * @remarks
+     * Invokes the error store's clearError and resets local form error state.
+     */
     const onClearError = useCallback(() => {
         clearError();
         setFormError(undefined);
@@ -127,7 +207,13 @@ export const AddSiteForm = React.memo(function AddSiteForm() {
                     id="addMode"
                     label="Add Mode"
                     name="addMode"
-                    onChange={(value) => setAddMode(value as "existing" | "new")}
+                    onChange={(value) => {
+                        if (isValidAddMode(value)) {
+                            setAddMode(value);
+                        } else {
+                            logger.error(`Invalid add mode value: ${value}`);
+                        }
+                    }}
                     options={[
                         { label: "Create New Site", value: "new" },
                         { label: "Add to Existing Site", value: "existing" },
@@ -180,7 +266,13 @@ export const AddSiteForm = React.memo(function AddSiteForm() {
                     disabled={isLoading || isLoadingMonitorTypes}
                     id="monitorType"
                     label="Monitor Type"
-                    onChange={(value) => setMonitorType(value as MonitorType)}
+                    onChange={(value) => {
+                        if (isValidMonitorType(value)) {
+                            setMonitorType(value);
+                        } else {
+                            logger.error(`Invalid monitor type value: ${value}`);
+                        }
+                    }}
                     options={monitorTypeOptions}
                     value={monitorType}
                 />
@@ -205,7 +297,14 @@ export const AddSiteForm = React.memo(function AddSiteForm() {
                     disabled={isLoading}
                     id="checkInterval"
                     label="Check Interval"
-                    onChange={(value) => setCheckInterval(Number(value))}
+                    onChange={(value) => {
+                        const numericValue = Number(value);
+                        if (!Number.isNaN(numericValue)) {
+                            setCheckInterval(numericValue);
+                        } else {
+                            logger.error(`Invalid check interval value: ${value}`);
+                        }
+                    }}
                     options={CHECK_INTERVALS.map((interval) => ({
                         label: interval.label,
                         value: interval.value,

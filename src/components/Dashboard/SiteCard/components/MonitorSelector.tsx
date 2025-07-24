@@ -35,7 +35,7 @@ export interface MonitorSelectorProperties {
  * - Supports HTTP and port monitor types with descriptive labels
  *
  * @param props - Component props
- * @returns JSX element containing the monitor selector dropdown
+ * @returns JSX.Element containing the monitor selector dropdown
  *
  * @example
  * ```tsx
@@ -67,7 +67,7 @@ export const MonitorSelector = React.memo(function MonitorSelector({
         const monitorLabel = monitor.type.toUpperCase();
         const getDetail = () => {
             if (monitor.port) {
-                return `:${monitor.port}`;
+                return `: ${monitor.port}`;
             }
             if (monitor.url) {
                 return `: ${monitor.url}`;

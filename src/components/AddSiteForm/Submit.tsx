@@ -53,7 +53,12 @@ export interface StoreActions {
     /** Clear any existing error state */
     clearError: () => void;
     /** Create a new site with monitors */
-    createSite: (siteData: { identifier: string; monitors: Monitor[]; name?: string }) => Promise<void>;
+    createSite: (siteData: {
+        identifier: string;
+        monitoring?: boolean;
+        monitors?: Monitor[];
+        name?: string;
+    }) => Promise<void>;
 }
 
 /**
@@ -100,7 +105,7 @@ export async function handleSubmit(event: React.FormEvent, properties: FormSubmi
     } = properties;
 
     event.preventDefault();
-    setFormError(undefined);
+    setFormError("");
 
     // Log submission start
     logger.debug("Form submission started", {
@@ -247,7 +252,11 @@ function createMonitor(properties: FormSubmitProperties): Monitor {
 async function performSubmission(properties: FormSubmitProperties, monitor: Monitor): Promise<void> {
     const { addMode, logger } = properties;
 
-    await (addMode === "new" ? submitNewSite(properties, monitor) : addToExistingSite(properties, monitor));
+    if (addMode === "new") {
+        await submitNewSite(properties, monitor);
+    } else {
+        await addToExistingSite(properties, monitor);
+    }
 
     const { selectedExistingSite, siteId } = properties;
     const identifier = addMode === "new" ? siteId : selectedExistingSite;
@@ -263,7 +272,6 @@ async function submitNewSite(properties: FormSubmitProperties, monitor: Monitor)
     const trimmedName = name.trim();
     const siteData = {
         identifier: siteId,
-        monitoring: true, // Default to monitoring enabled
         monitors: [monitor],
         name: trimmedName || "Unnamed Site", // Provide default name
     };
@@ -281,12 +289,12 @@ async function submitNewSite(properties: FormSubmitProperties, monitor: Monitor)
 /**
  * Validates the add mode selection and site information.
  *
- * @param addMode - Mode of adding ("new" or "existing")
+ * @param addMode - Mode of adding ("existing" or "new")
  * @param name - Site name for new sites
  * @param selectedExistingSite - Selected existing site identifier
  * @returns Array of validation error messages
  */
-function validateAddMode(addMode: string, name: string, selectedExistingSite: string): string[] {
+function validateAddMode(addMode: "existing" | "new", name: string, selectedExistingSite: string): string[] {
     const errors: string[] = [];
 
     if (addMode === "new" && !name.trim()) {
@@ -304,7 +312,7 @@ function validateAddMode(addMode: string, name: string, selectedExistingSite: st
  * Validates check interval configuration using shared schema.
  *
  * @param checkInterval - Check interval in milliseconds
- * @returns Array of validation error messages
+ * @returns Promise resolving to array of validation error messages
  */
 async function validateCheckInterval(checkInterval: number): Promise<string[]> {
     return withUtilityErrorHandling(
@@ -326,7 +334,12 @@ async function validateCheckInterval(checkInterval: number): Promise<string[]> {
  * @param port - Port for port monitors
  * @returns Promise resolving to array of validation error messages
  */
-async function validateMonitorType(monitorType: string, url: string, host: string, port: string): Promise<string[]> {
+async function validateMonitorType(
+    monitorType: MonitorType,
+    url: string,
+    host: string,
+    port: string
+): Promise<string[]> {
     // Build form data object with only the relevant fields
     const formData: Record<string, unknown> = {
         type: monitorType,
@@ -335,12 +348,13 @@ async function validateMonitorType(monitorType: string, url: string, host: strin
     // Add type-specific fields
     if (monitorType === "http") {
         formData.url = url.trim();
-    } else if (monitorType === "port") {
+    } else {
+        // Port monitor
         formData.host = host.trim();
         formData.port = Number(port);
     }
 
     // Use form validation that only validates provided fields
-    const result = await validateMonitorFormData(monitorType as MonitorType, formData);
+    const result = await validateMonitorFormData(monitorType, formData);
     return result.errors;
 }

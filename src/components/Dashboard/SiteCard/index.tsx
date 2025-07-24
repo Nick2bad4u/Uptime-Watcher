@@ -41,6 +41,13 @@ export interface SiteCardProperties {
  * @param props - SiteCard component props
  * @returns JSX element containing the complete site monitoring card
  */
+
+/**
+ * SiteCard component implementation using composition pattern.
+ *
+ * @param props - SiteCard component props
+ * @returns JSX.Element containing the complete site monitoring card
+ */
 export const SiteCard = React.memo(function SiteCard({ site }: SiteCardProperties) {
     // Use our custom hook to get all the data and functionality we need
     const {
@@ -68,7 +75,7 @@ export const SiteCard = React.memo(function SiteCard({ site }: SiteCardPropertie
     return (
         <ThemedBox
             aria-label={`View details for ${latestSite.name}`}
-            className="flex flex-col w-full gap-2 text-left cursor-pointer site-card"
+            className="group flex flex-col w-full gap-2 text-left cursor-pointer site-card"
             onClick={handleCardClick}
             padding="md"
             rounded="md"
@@ -98,6 +105,7 @@ export const SiteCard = React.memo(function SiteCard({ site }: SiteCardPropertie
 
             <SiteCardHistory filteredHistory={filteredHistory} monitor={monitor} />
 
+            {/* SiteCardFooter requires no props as it displays static interactive hint text */}
             <SiteCardFooter />
         </ThemedBox>
     );

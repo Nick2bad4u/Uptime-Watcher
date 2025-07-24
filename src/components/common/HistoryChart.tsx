@@ -13,7 +13,7 @@ import { StatusHistory } from "../../types";
  *
  * @public
  */
-export interface HistoryChartProperties {
+export interface HistoryChartProps {
     /** Additional CSS classes */
     className?: string;
     /** Array of historical status records to display */
@@ -35,14 +35,14 @@ export interface HistoryChartProperties {
  * - Graceful handling of empty data
  *
  * @param props - HistoryChart component props
- * @returns JSX element containing the history chart or null if no data
+ * @returns JSX element containing the history chart, or null if no data (following React conventions for conditional rendering)
  */
 export const HistoryChart = React.memo(function HistoryChart({
     className = "",
     history,
     maxItems = 120,
     title,
-}: HistoryChartProperties) {
+}: HistoryChartProps) {
     // Return null for empty history (React convention for "render nothing")
     if (history.length === 0) {
         // React components, returning null from a render function
@@ -52,7 +52,8 @@ export const HistoryChart = React.memo(function HistoryChart({
         return null;
     }
 
-    // Show up to maxItems bars, most recent first (reverse chronological order)
+    // Show up to maxItems bars, oldest first after reversal (chronological order display)
+    // Note: Assumes input history is in newest-first order, toReversed() makes it oldest-first for display
     const displayedHistory = history.slice(0, maxItems).toReversed();
 
     return (
@@ -65,7 +66,7 @@ export const HistoryChart = React.memo(function HistoryChart({
             <div className="flex items-center justify-end flex-shrink min-w-0 gap-1 overflow-hidden">
                 {displayedHistory.map((record) => (
                     <MiniChartBar
-                        key={record.timestamp}
+                        key={`${record.timestamp}-${record.status}-${record.responseTime}`}
                         responseTime={record.responseTime}
                         status={record.status}
                         timestamp={record.timestamp}

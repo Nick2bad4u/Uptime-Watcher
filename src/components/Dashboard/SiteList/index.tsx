@@ -17,7 +17,7 @@ import { EmptyState } from "./EmptyState";
  * or an EmptyState component when no sites are configured. Automatically
  * applies theme-appropriate styling.
  *
- * @returns JSX element containing the site list or empty state
+ * @returns JSX.Element containing the site list or empty state
  *
  * @example
  * ```tsx
@@ -39,9 +39,13 @@ export function SiteList() {
         return <EmptyState />;
     }
 
+    // Construct className with proper conditional logic for dark mode
+    const containerClassName = `divider-y${isDark ? " dark" : ""}`;
+
     return (
-        <div className={`divider-y ${isDark ? "dark" : ""}`}>
+        <div className={containerClassName}>
             {sites.map((site) => (
+                // Note: site.identifier is guaranteed to be unique as per Site interface
                 <SiteCard key={site.identifier} site={site} />
             ))}
         </div>

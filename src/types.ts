@@ -1,15 +1,27 @@
 /**
- * Type definitions for the Uptime Watcher application frontend.
- *
+ * @remarks Type definitions for the Uptime Watcher frontend.
  * @remarks
- * All core domain types are imported from shared/types.ts for consistency.
- *
+ * - All core domain types are imported from shared/types.ts for consistency.
+ * - This module provides a single import location for all frontend type definitions.
  * @packageDocumentation
  */
 
-// Re-export specific type definitions
+/**
+ * @public
+ * @remarks Re-export monitor form-specific types for UI components.
+ * @remarks
+ * These types are used for form validation and UI state management
+ * in monitor creation and editing workflows.
+ */
 export * from "./types/monitor-forms";
 
+/**
+ * @public
+ * @remarks Re-export all shared domain types for frontend consumption.
+ * @remarks
+ * Provides a unified import for all core domain types (Site, Monitor, etc.),
+ * ensuring consistency with backend type definitions.
+ */
 export * from "@shared/types";
 
 // Import types for global declarations
@@ -24,178 +36,159 @@ import type {
 } from "@shared/types/events";
 
 /**
- * Electron API interface exposed to the renderer process.
- */
-declare global {
-    interface Window {
-        electronAPI: {
-            data: {
-                downloadSQLiteBackup: () => Promise<{ buffer: ArrayBuffer; fileName: string }>;
-                exportData: () => Promise<string>;
-                importData: (data: string) => Promise<boolean>;
-            };
-            events: {
-                onCacheInvalidated: (callback: (data: CacheInvalidatedEventData) => void) => () => void;
-                onMonitorDown: (callback: (data: MonitorDownEventData) => void) => () => void;
-                onMonitoringStarted: (callback: (data: MonitoringControlEventData) => void) => () => void;
-                onMonitoringStopped: (callback: (data: MonitoringControlEventData) => void) => () => void;
-                onMonitorStatusChanged: (callback: (update: StatusUpdate) => void) => () => void;
-                onMonitorUp: (callback: (data: MonitorUpEventData) => void) => () => void;
-                onTestEvent: (callback: (data: TestEventData) => void) => () => void;
-                onUpdateStatus: (callback: (data: UpdateStatusEventData) => void) => () => void;
-                removeAllListeners: (event: string) => void;
-            };
-            monitoring: {
-                startMonitoring: () => Promise<void>;
-                startMonitoringForSite: (siteId: string, monitorId?: string) => Promise<void>;
-                stopMonitoring: () => Promise<void>;
-                stopMonitoringForSite: (siteId: string, monitorId?: string) => Promise<void>;
-            };
-            monitorTypes: {
-                formatMonitorDetail: (type: string, details: string) => Promise<string>;
-                formatMonitorTitleSuffix: (type: string, monitor: Record<string, unknown>) => Promise<string>;
-                getMonitorTypes: () => Promise<
-                    {
-                        description: string;
-                        displayName: string;
-                        fields: {
-                            helpText?: string;
-                            label: string;
-                            max?: number;
-                            min?: number;
-                            name: string;
-                            placeholder?: string;
-                            required: boolean;
-                            type: "number" | "text" | "url";
-                        }[];
-                        type: string;
-                        version: string;
-                    }[]
-                >;
-                validateMonitorData: (
-                    type: string,
-                    data: unknown
-                ) => Promise<{
-                    errors: string[];
-                    success: boolean;
-                }>;
-            };
-            settings: {
-                getHistoryLimit: () => Promise<number>;
-                updateHistoryLimit: (limit: number) => Promise<void>;
-            };
-            sites: {
-                addSite: (site: Site) => Promise<Site>;
-                checkSiteNow: (siteId: string, monitorId: string) => Promise<void>;
-                getSites: () => Promise<Site[]>;
-                removeMonitor: (siteIdentifier: string, monitorId: string) => Promise<void>;
-                removeSite: (id: string) => Promise<void>;
-                updateSite: (id: string, updates: Partial<Site>) => Promise<void>;
-            };
-            stateSync: {
-                getSyncStatus: () => Promise<{
-                    lastSync: null | number;
-                    siteCount: number;
-                    success: boolean;
-                    synchronized: boolean;
-                }>;
-                onStateSyncEvent: (
-                    callback: (event: {
-                        action: "bulk-sync" | "delete" | "update";
-                        siteIdentifier?: string;
-                        sites?: Site[];
-                        source?: "cache" | "database" | "frontend";
-                        timestamp?: number;
-                    }) => void
-                ) => () => void;
-                requestFullSync: () => Promise<{ siteCount: number; success: boolean }>;
-            };
-            system: {
-                openExternal: (url: string) => void;
-                quitAndInstall: () => void;
-            };
-        };
-    }
-}
-
-/**
- * Electron API interface exposed to the renderer process.
- *
+ * @public
+ * @remarks Electron API interface exposed to the renderer process.
  * @remarks
  * Provides secure communication between the React frontend and Electron main process
- * through the contextBridge. All backend operations are accessed through this API
- * which is available as `window.electronAPI` in the renderer process.
+ * through the contextBridge. All backend operations are accessed through this API,
+ * available as `window.electronAPI` in the renderer process.
  *
- * The API is organized by functional domains for better maintainability and type safety:
+ * The API is organized by functional domains:
  * - `data`: Import/export and backup operations
  * - `events`: Event listening and management
  * - `monitoring`: Monitor control operations
+ * - `monitorTypes`: Monitor type registry and configuration
  * - `settings`: Application configuration
  * - `sites`: Site and monitor CRUD operations
+ * - `stateSync`: State synchronization operations
  * - `system`: System-level operations
  */
 declare global {
     interface Window {
         electronAPI: {
             /**
-             * Data management operations for import, export, and backup.
+             * @remarks Data management operations for import, export, and backup.
              */
             data: {
-                /** Download SQLite database backup as binary data */
+                /**
+                 * @remarks Download SQLite database backup as binary data.
+                 * @returns A promise resolving to an object containing the backup buffer and file name.
+                 */
                 downloadSQLiteBackup: () => Promise<{ buffer: ArrayBuffer; fileName: string }>;
-                /** Export all application data as JSON string */
+                /**
+                 * @remarks Export all application data as a JSON string.
+                 * @returns A promise resolving to the exported data as a string.
+                 */
                 exportData: () => Promise<string>;
-                /** Import application data from JSON string */
+                /**
+                 * @remarks Import application data from a JSON string.
+                 * @param data - The JSON string to import.
+                 * @returns A promise resolving to true if import succeeded, false otherwise.
+                 */
                 importData: (data: string) => Promise<boolean>;
             };
 
             /**
-             * Event management for real-time updates and communication.
+             * @remarks Event management for real-time updates and communication.
              */
             events: {
-                /** Register callback for cache invalidation events */
+                /**
+                 * @remarks Register callback for cache invalidation events.
+                 * @param callback - Function to invoke on cache invalidation.
+                 * @returns A function to remove the listener.
+                 */
                 onCacheInvalidated: (callback: (data: CacheInvalidatedEventData) => void) => () => void;
-                /** Register callback for monitor down events */
+                /**
+                 * @remarks Register callback for monitor down events.
+                 * @param callback - Function to invoke when a monitor is down.
+                 * @returns A function to remove the listener.
+                 */
                 onMonitorDown: (callback: (data: MonitorDownEventData) => void) => () => void;
-                /** Register callback for monitoring started events */
+                /**
+                 * @remarks Register callback for monitoring started events.
+                 * @param callback - Function to invoke when monitoring starts.
+                 * @returns A function to remove the listener.
+                 */
                 onMonitoringStarted: (callback: (data: MonitoringControlEventData) => void) => () => void;
-                /** Register callback for monitoring stopped events */
+                /**
+                 * @remarks Register callback for monitoring stopped events.
+                 * @param callback - Function to invoke when monitoring stops.
+                 * @returns A function to remove the listener.
+                 */
                 onMonitoringStopped: (callback: (data: MonitoringControlEventData) => void) => () => void;
-                /** Register callback for monitor status changes */
+                /**
+                 * @remarks Register callback for monitor status changes.
+                 * @param callback - Function to invoke on status update.
+                 * @returns A function to remove the listener.
+                 */
                 onMonitorStatusChanged: (callback: (update: StatusUpdate) => void) => () => void;
-                /** Register callback for monitor up events */
+                /**
+                 * @remarks Register callback for monitor up events.
+                 * @param callback - Function to invoke when a monitor is up.
+                 * @returns A function to remove the listener.
+                 */
                 onMonitorUp: (callback: (data: MonitorUpEventData) => void) => () => void;
-                /** Register callback for test events (development/debugging) */
+                /**
+                 * @remarks Register callback for test events (development/debugging).
+                 * @param callback - Function to invoke on test event.
+                 * @returns A function to remove the listener.
+                 */
                 onTestEvent: (callback: (data: TestEventData) => void) => () => void;
-                /** Register callback for application update status events */
+                /**
+                 * @remarks Register callback for application update status events.
+                 * @param callback - Function to invoke on update status event.
+                 * @returns A function to remove the listener.
+                 */
                 onUpdateStatus: (callback: (data: UpdateStatusEventData) => void) => () => void;
-                /** Remove all listeners for a specific event */
+                /**
+                 * @remarks Remove all listeners for a specific event.
+                 * @param event - The event name.
+                 */
                 removeAllListeners: (event: string) => void;
             };
 
             /**
-             * Monitoring control operations for starting and stopping checks.
+             * @remarks Monitoring control operations for starting and stopping checks.
              */
             monitoring: {
-                /** Start monitoring for all configured sites */
+                /**
+                 * @remarks Start monitoring for all configured sites.
+                 * @returns A promise that resolves when monitoring has started.
+                 */
                 startMonitoring: () => Promise<void>;
-                /** Start monitoring for a specific site or monitor */
+                /**
+                 * @remarks Start monitoring for a specific site or monitor.
+                 * @param siteId - The site identifier.
+                 * @param monitorId - Optional monitor identifier.
+                 * @returns A promise that resolves when monitoring has started.
+                 */
                 startMonitoringForSite: (siteId: string, monitorId?: string) => Promise<void>;
-                /** Stop monitoring for all sites */
+                /**
+                 * @remarks Stop monitoring for all sites.
+                 * @returns A promise that resolves when monitoring has stopped.
+                 */
                 stopMonitoring: () => Promise<void>;
-                /** Stop monitoring for a specific site or monitor */
+                /**
+                 * @remarks Stop monitoring for a specific site or monitor.
+                 * @param siteId - The site identifier.
+                 * @param monitorId - Optional monitor identifier.
+                 * @returns A promise that resolves when monitoring has stopped.
+                 */
                 stopMonitoringForSite: (siteId: string, monitorId?: string) => Promise<void>;
             };
 
             /**
-             * Monitor type registry and configuration operations.
+             * @remarks Monitor type registry and configuration operations.
              */
             monitorTypes: {
-                /** Format monitor detail using backend registry */
+                /**
+                 * @remarks Format monitor detail using backend registry.
+                 * @param type - The monitor type.
+                 * @param details - The monitor details as a string.
+                 * @returns A promise resolving to the formatted detail string.
+                 */
                 formatMonitorDetail: (type: string, details: string) => Promise<string>;
-                /** Format monitor title suffix using backend registry */
+                /**
+                 * @remarks Format monitor title suffix using backend registry.
+                 * @param type - The monitor type.
+                 * @param monitor - The monitor data.
+                 * @returns A promise resolving to the formatted title suffix.
+                 */
                 formatMonitorTitleSuffix: (type: string, monitor: Record<string, unknown>) => Promise<string>;
-                /** Get all available monitor type configurations */
+                /**
+                 * @remarks Get all available monitor type configurations.
+                 * @returns A promise resolving to an array of monitor type definitions.
+                 */
                 getMonitorTypes: () => Promise<
                     {
                         description: string;
@@ -214,7 +207,12 @@ declare global {
                         version: string;
                     }[]
                 >;
-                /** Validate monitor data using backend registry */
+                /**
+                 * @remarks Validate monitor data using backend registry.
+                 * @param type - The monitor type.
+                 * @param data - The monitor data to validate.
+                 * @returns A promise resolving to the validation result.
+                 */
                 validateMonitorData: (
                     type: string,
                     data: unknown
@@ -225,45 +223,85 @@ declare global {
             };
 
             /**
-             * Application settings and configuration management.
+             * @remarks Application settings and configuration management.
              */
             settings: {
-                /** Get current history retention limit */
+                /**
+                 * @remarks Get current history retention limit.
+                 * @returns A promise resolving to the history limit.
+                 */
                 getHistoryLimit: () => Promise<number>;
-                /** Update history retention limit */
+                /**
+                 * @remarks Update history retention limit.
+                 * @param limit - The new history limit.
+                 * @returns A promise that resolves when the update is complete.
+                 */
                 updateHistoryLimit: (limit: number) => Promise<void>;
             };
 
             /**
-             * Site and monitor CRUD operations.
+             * @remarks Site and monitor CRUD operations.
              */
             sites: {
-                /** Add a new site with its monitors */
+                /**
+                 * @remarks Add a new site with its monitors.
+                 * @param site - The site to add.
+                 * @returns A promise resolving to the added site.
+                 */
                 addSite: (site: Site) => Promise<Site>;
-                /** Perform immediate manual check for a specific monitor */
+                /**
+                 * @remarks Perform immediate manual check for a specific monitor.
+                 * @param siteId - The site identifier.
+                 * @param monitorId - The monitor identifier.
+                 * @returns A promise that resolves when the check is complete.
+                 */
                 checkSiteNow: (siteId: string, monitorId: string) => Promise<void>;
-                /** Retrieve all configured sites with their monitors */
+                /**
+                 * @remarks Retrieve all configured sites with their monitors.
+                 * @returns A promise resolving to an array of sites.
+                 */
                 getSites: () => Promise<Site[]>;
-                /** Remove a specific monitor from a site */
+                /**
+                 * @remarks Remove a specific monitor from a site.
+                 * @param siteIdentifier - The site identifier.
+                 * @param monitorId - The monitor identifier.
+                 * @returns A promise that resolves when the monitor is removed.
+                 */
                 removeMonitor: (siteIdentifier: string, monitorId: string) => Promise<void>;
-                /** Remove a site and all its monitors */
+                /**
+                 * @remarks Remove a site and all its monitors.
+                 * @param id - The site identifier.
+                 * @returns A promise that resolves when the site is removed.
+                 */
                 removeSite: (id: string) => Promise<void>;
-                /** Update site configuration */
+                /**
+                 * @remarks Update site configuration.
+                 * @param id - The site identifier.
+                 * @param updates - Partial site updates.
+                 * @returns A promise that resolves when the update is complete.
+                 */
                 updateSite: (id: string, updates: Partial<Site>) => Promise<void>;
             };
 
             /**
-             * State synchronization operations for real-time updates.
+             * @remarks State synchronization operations for real-time updates.
              */
             stateSync: {
-                /** Get current synchronization status */
+                /**
+                 * @remarks Get current synchronization status.
+                 * @returns A promise resolving to the sync status.
+                 */
                 getSyncStatus: () => Promise<{
                     lastSync: null | number;
                     siteCount: number;
                     success: boolean;
                     synchronized: boolean;
                 }>;
-                /** Register listener for state synchronization events */
+                /**
+                 * @remarks Register listener for state synchronization events.
+                 * @param callback - Function to invoke on sync event.
+                 * @returns A function to remove the listener.
+                 */
                 onStateSyncEvent: (
                     callback: (event: {
                         action: "bulk-sync" | "delete" | "update";
@@ -273,17 +311,25 @@ declare global {
                         timestamp?: number;
                     }) => void
                 ) => () => void;
-                /** Manually request full state synchronization */
+                /**
+                 * @remarks Manually request full state synchronization.
+                 * @returns A promise resolving to the sync result.
+                 */
                 requestFullSync: () => Promise<{ siteCount: number; success: boolean }>;
             };
 
             /**
-             * System-level operations and utilities.
+             * @remarks System-level operations and utilities.
              */
             system: {
-                /** Open URL in external browser */
+                /**
+                 * @remarks Open a URL in the external browser.
+                 * @param url - The URL to open.
+                 */
                 openExternal: (url: string) => void;
-                /** Quit application and install pending update */
+                /**
+                 * @remarks Quit application and install pending update.
+                 */
                 quitAndInstall: () => void;
             };
         };

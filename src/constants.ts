@@ -3,13 +3,32 @@
  * Contains configuration values, UI constants, and type definitions.
  */
 
-/** Font family constants for theme reuse */
+/**
+ * Font family constants for theme reuse.
+ *
+ * @remarks
+ * Monospace fonts prioritize consistent character width for code display.
+ */
 export const FONT_FAMILY_MONO = ["SF Mono", "Monaco", "Inconsolata", "Roboto Mono", "monospace"];
+
+/**
+ * Sans-serif font family constants for general UI text.
+ *
+ * @remarks
+ * Prioritizes system fonts for optimal performance and native appearance.
+ */
 export const FONT_FAMILY_SANS = ["Inter", "system-ui", "Avenir", "Helvetica", "Arial", "sans-serif"];
 
-/** Interface for interval options used in dropdowns */
+/**
+ * Interface for interval options used in dropdowns.
+ *
+ * @remarks
+ * Provides structured data for time interval selection components.
+ */
 export interface IntervalOption {
+    /** Human-readable label for the interval */
     label: string;
+    /** Interval value in milliseconds */
     value: number;
 }
 
@@ -56,19 +75,49 @@ export const CHECK_INTERVALS: IntervalOption[] = [
     { label: "30 days", value: 2_592_000_000 },
 ];
 
-/** Default check interval (5 minutes) */
+/**
+ * Default check interval in milliseconds.
+ *
+ * @remarks
+ * Set to 5 minutes (300,000ms) as a reasonable balance between
+ * monitoring frequency and system resource usage.
+ */
 export const DEFAULT_CHECK_INTERVAL = 300_000;
 
-/** Default request timeout (10 seconds) */
+/**
+ * Default request timeout in milliseconds.
+ *
+ * @remarks
+ * Set to 10 seconds to balance between allowing slow responses
+ * and preventing indefinite hangs.
+ */
 export const DEFAULT_REQUEST_TIMEOUT = 10_000;
 
-/** Default request timeout in seconds for UI display (10 seconds) */
+/**
+ * Default request timeout in seconds for UI display.
+ *
+ * @remarks
+ * UI-friendly representation of the timeout value for form fields
+ * and user-facing settings.
+ */
 export const DEFAULT_REQUEST_TIMEOUT_SECONDS = 10;
 
-/** Default history limit (500 records) */
+/**
+ * Default history limit for monitoring records.
+ *
+ * @remarks
+ * Set to 500 records as a reasonable default for most use cases,
+ * balancing data retention with storage efficiency.
+ */
 export const DEFAULT_HISTORY_LIMIT = 500;
 
-/** History limit options for controlling data retention */
+/**
+ * History limit options for controlling data retention.
+ *
+ * @remarks
+ * Provides a range of options from 25 to 1,000,000 records
+ * to accommodate different monitoring needs and storage constraints.
+ */
 export const HISTORY_LIMIT_OPTIONS: IntervalOption[] = [
     { label: "25 records", value: 25 },
     { label: "50 records", value: 50 },
@@ -86,46 +135,104 @@ export const HISTORY_LIMIT_OPTIONS: IntervalOption[] = [
     { label: "Unlimited", value: Number.MAX_SAFE_INTEGER },
 ];
 
-/** Request timeout constraints for HTTP monitoring */
+/**
+ * Request timeout constraints for HTTP monitoring.
+ *
+ * @remarks
+ * Defines the user-facing timeout limits in seconds for form validation
+ * and UI display. These values are converted to milliseconds for backend use.
+ */
 export const TIMEOUT_CONSTRAINTS = {
+    /** Maximum timeout in seconds */
     MAX: 300, // 300 seconds maximum (displayed to user)
+    /** Minimum timeout in seconds */
     MIN: 1, // 1 second minimum (displayed to user)
+    /** Step increment in seconds */
     STEP: 1, // 1 second increments (displayed to user)
 } as const;
 
-/** Internal timeout constraints in milliseconds (for backend) */
+/**
+ * Internal timeout constraints in milliseconds for backend operations.
+ *
+ * @remarks
+ * These values correspond to TIMEOUT_CONSTRAINTS but are converted
+ * to milliseconds for actual timeout implementation.
+ */
 export const TIMEOUT_CONSTRAINTS_MS = {
+    /** Maximum timeout in milliseconds */
     MAX: 300_000, // 300 seconds maximum
+    /** Minimum timeout in milliseconds */
     MIN: 1000, // 1 second minimum
+    /** Step increment in milliseconds */
     STEP: 1000, // 1 second increments
 } as const;
 
-/** Retry attempt constraints for per-monitor retry configuration */
+/**
+ * Retry attempt constraints for per-monitor retry configuration.
+ *
+ * @remarks
+ * Defines the limits for retry attempts when monitors fail,
+ * balancing between resilience and avoiding excessive load.
+ */
 export const RETRY_CONSTRAINTS = {
+    /** Default number of retry attempts */
     DEFAULT: 3, // Default retry attempts
+    /** Maximum retry attempts allowed */
     MAX: 10, // 10 retry attempts maximum
+    /** Minimum retry attempts (immediate failure) */
     MIN: 0, // 0 retries minimum (immediate failure)
+    /** Step increment for retry configuration */
     STEP: 1, // 1 retry increment
 } as const;
 
-/** UI delays and timing to prevent flashing and improve UX */
+/**
+ * UI delays and timing to prevent flashing and improve UX.
+ *
+ * @remarks
+ * These delays prevent UI flickering for operations that complete quickly
+ * while still providing feedback for longer operations.
+ */
 export const UI_DELAYS = {
+    /** Delay before showing loading spinners in milliseconds */
     LOADING_BUTTON: 100, // Delay before showing loading spinners (ms)
+    /** Delay before showing loading overlay in milliseconds */
     LOADING_OVERLAY: 100, // Delay before showing loading overlay (ms)
 } as const;
 
-/** Chart time periods for analytics components (in milliseconds) */
+/**
+ * Chart time periods for analytics components.
+ *
+ * @remarks
+ * Defines standard time periods in milliseconds for data visualization
+ * and historical analysis components.
+ */
 export const CHART_TIME_PERIODS = {
+    /** 1 hour in milliseconds */
     "1h": 60 * 60 * 1000,
+    /** 7 days in milliseconds */
     "7d": 7 * 24 * 60 * 60 * 1000,
+    /** 12 hours in milliseconds */
     "12h": 12 * 60 * 60 * 1000,
-
+    /** 24 hours in milliseconds */
     "24h": 24 * 60 * 60 * 1000,
+    /** 30 days in milliseconds */
     "30d": 30 * 24 * 60 * 60 * 1000,
 } as const;
 
-/** Common ARIA attribute constants for accessibility */
+/**
+ * Common ARIA attribute constants for accessibility.
+ *
+ * @remarks
+ * Provides standardized ARIA attribute strings to ensure consistent
+ * accessibility implementation across components.
+ */
 export const ARIA_LABEL = "aria-label";
 
-/** Standard transition timing for smooth animations */
+/**
+ * Standard transition timing for smooth animations.
+ *
+ * @remarks
+ * Provides consistent transition timing across the application
+ * for smooth user interface animations.
+ */
 export const TRANSITION_ALL = "all 0.2s ease-in-out";

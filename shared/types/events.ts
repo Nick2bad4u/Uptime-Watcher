@@ -1,82 +1,243 @@
 /**
- * Specific event payload type definitions for improved type safety.
- * Replaces generic `unknown` types in IPC event callbacks.
+ * Defines event payload types for improved type safety in IPC event callbacks.
+ *
+ * @remarks
+ * These interfaces replace generic `unknown` types, ensuring strict typing for all event payloads exchanged between the Electron main process and renderer.
  */
 
 import type { Monitor, Site } from "../types";
 
 /**
- * Event data for cache invalidation
+ * Payload for cache invalidation events.
+ *
+ * @remarks
+ * Used to notify listeners that a cache entry or the entire cache has been invalidated for a specific reason.
+ *
+ * @remarks
+ * - `identifier`: The specific identifier affected (optional for global invalidation).
+ * - `reason`: The reason for invalidation.
+ * - `timestamp`: The time (in ms since epoch) when invalidation occurred.
+ * - `type`: The type of cache invalidation.
+ *
+ * @example
+ * // Invalidate all site caches due to manual action
+ * @example
+ * ```typescript
+ * const event: CacheInvalidatedEventData = {
+ *   type: 'all',
+ *   reason: 'manual',
+ *   timestamp: Date.now()
+ * };
+ * ```
  */
 export interface CacheInvalidatedEventData {
-    /** Specific identifier affected (optional for global invalidation) */
+    /**
+     * The specific identifier affected (optional for global invalidation).
+     * @remarks If omitted, the invalidation is considered global.
+     */
     identifier?: string;
-    /** Reason for invalidation */
+    /**
+     * The reason for invalidation.
+     * @remarks Can be 'delete', 'expiry', 'manual', or 'update'.
+     */
     reason: "delete" | "expiry" | "manual" | "update";
-    /** Timestamp when invalidation occurred */
+    /**
+     * The time (in ms since epoch) when invalidation occurred.
+     */
     timestamp: number;
-    /** Type of cache invalidation */
+    /**
+     * The type of cache invalidation.
+     * @remarks 'all' for global, 'monitor' for a specific monitor, 'site' for a specific site.
+     */
     type: "all" | "monitor" | "site";
 }
 
 /**
- * Event data when a monitor goes down
+ * Payload for events when a monitor goes down (unavailable).
+ *
+ * @remarks
+ * Emitted when a monitored endpoint or service is detected as down.
+ *
+ * @remarks
+ * - `monitor`: The monitor that went down.
+ * - `site`: The site containing the monitor.
+ * - `siteId`: The unique identifier of the site.
+ * - `timestamp`: The time (in ms since epoch) when the event occurred.
+ *
+ * @example
+ * // Example event payload for a monitor down event
+ * @example
+ * ```typescript
+ * const event: MonitorDownEventData = {
+ *   monitor,
+ *   site,
+ *   siteId: site.id,
+ *   timestamp: Date.now()
+ * };
+ * ```
  */
 export interface MonitorDownEventData {
-    /** Monitor that went down */
+    /**
+     * The monitor that went down.
+     */
     monitor: Monitor;
-    /** Site containing the monitor */
+    /**
+     * The site containing the monitor.
+     */
     site: Site;
-    /** Site identifier */
+    /**
+     * The unique identifier of the site.
+     */
     siteId: string;
-    /** Timestamp when the event occurred */
+    /**
+     * The time (in ms since epoch) when the event occurred.
+     */
     timestamp: number;
 }
 
 /**
- * Event data for monitoring control operations (global monitoring start/stop)
+ * Payload for monitoring control events (global monitoring start/stop).
+ *
+ * @remarks
+ * Used to signal global monitoring state changes, such as starting or stopping all monitors.
+ *
+ * @remarks
+ * - `activeMonitors`: Number of active monitors (for stopped events).
+ * - `monitorCount`: Number of monitors involved in the operation.
+ * - `reason`: Reason for stopping (for stopped events).
+ * - `siteCount`: Number of sites involved in the operation.
+ * - `timestamp`: The time (in ms since epoch) when the event occurred.
+ *
+ * @example
+ * // Example: Monitoring stopped by user
+ * @example
+ * ```typescript
+ * const event: MonitoringControlEventData = {
+ *   reason: 'user',
+ *   activeMonitors: 0,
+ *   siteCount: 3,
+ *   timestamp: Date.now()
+ * };
+ * ```
  */
 export interface MonitoringControlEventData {
-    /** Number of active monitors (for stopped events) */
+    /**
+     * Number of active monitors (for stopped events).
+     */
     activeMonitors?: number;
-    /** Number of monitors involved */
+    /**
+     * Number of monitors involved in the operation.
+     */
     monitorCount?: number;
-    /** Reason for stopping (for stopped events) */
+    /**
+     * Reason for stopping (for stopped events).
+     * @remarks Can be 'error', 'shutdown', or 'user'.
+     */
     reason?: "error" | "shutdown" | "user";
-    /** Number of sites involved */
+    /**
+     * Number of sites involved in the operation.
+     */
     siteCount?: number;
-    /** Timestamp when the event occurred */
+    /**
+     * The time (in ms since epoch) when the event occurred.
+     */
     timestamp: number;
 }
 
 /**
- * Event data when a monitor comes back up
+ * Payload for events when a monitor comes back up (becomes available).
+ *
+ * @remarks
+ * Emitted when a previously down monitor is detected as up.
+ *
+ * @remarks
+ * - `monitor`: The monitor that came back up.
+ * - `site`: The site containing the monitor.
+ * - `siteId`: The unique identifier of the site.
+ * - `timestamp`: The time (in ms since epoch) when the event occurred.
+ *
+ * @example
+ * // Example event payload for a monitor up event
+ * @example
+ * ```typescript
+ * const event: MonitorUpEventData = {
+ *   monitor,
+ *   site,
+ *   siteId: site.id,
+ *   timestamp: Date.now()
+ * };
+ * ```
  */
 export interface MonitorUpEventData {
-    /** Monitor that came back up */
+    /**
+     * The monitor that came back up.
+     */
     monitor: Monitor;
-    /** Site containing the monitor */
+    /**
+     * The site containing the monitor.
+     */
     site: Site;
-    /** Site identifier */
+    /**
+     * The unique identifier of the site.
+     */
     siteId: string;
-    /** Timestamp when the event occurred */
+    /**
+     * The time (in ms since epoch) when the event occurred.
+     */
     timestamp: number;
 }
 
 /**
- * Event data for test events (used in development/testing)
+ * Payload for test events (used in development/testing).
+ *
+ * @remarks
+ * Used for development or testing purposes to transmit arbitrary data.
+ *
+ * @example
+ * @example
+ * ```typescript
+ * // Example: Sending a test event with custom data
+ * const event: TestEventData = {
+ *   foo: 'bar',
+ *   count: 42
+ * };
+ * ```
  */
 export interface TestEventData {
-    /** Test data payload */
+    /**
+     * Arbitrary test data payload.
+     * @remarks Keys and value types are not restricted.
+     */
     [key: string]: unknown;
 }
 
 /**
- * Event data for update status changes
+ * Payload for update status change events.
+ *
+ * @remarks
+ * Used to communicate the current status of application updates, including errors.
+ *
+ * @remarks
+ * - `error`: Error message if status is 'error'.
+ * - `status`: The current update status.
+ *
+ * @example
+ * // Example: Update downloaded
+ * @example
+ * ```typescript
+ * const event: UpdateStatusEventData = {
+ *   status: 'downloaded'
+ * };
+ * ```
  */
 export interface UpdateStatusEventData {
-    /** Error message if status is error */
+    /**
+     * Error message if status is 'error'.
+     */
     error?: string;
-    /** Current update status */
+    /**
+     * The current update status.
+     * @remarks Can be 'available', 'checking', 'downloaded', 'downloading', 'error', or 'idle'.
+     */
     status: "available" | "checking" | "downloaded" | "downloading" | "error" | "idle";
 }

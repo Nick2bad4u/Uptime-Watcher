@@ -1,10 +1,3 @@
-/**
- * Empty state component for the site list dashboard
- *
- * Displays a friendly message and icon when no sites have been added yet,
- * encouraging users to add their first website to monitor.
- */
-
 import { ThemedBox, ThemedText } from "../../../theme/components";
 
 /**
@@ -13,7 +6,7 @@ import { ThemedBox, ThemedText } from "../../../theme/components";
  * Shows a centered message with an icon to guide users towards adding their
  * first site. Uses themed components for consistent styling.
  *
- * @returns JSX element containing the empty state UI
+ * @returns JSX.Element containing the empty state UI
  *
  * @example
  * ```tsx
@@ -29,6 +22,7 @@ import { ThemedBox, ThemedText } from "../../../theme/components";
 export function EmptyState() {
     return (
         <ThemedBox className="text-center" padding="xl" surface="base">
+            {/* empty-state-icon class provides styling from src/theme/components.css */}
             <div className="empty-state-icon">🌐</div>
             <ThemedText className="mb-2" size="lg" weight="medium">
                 No sites to monitor

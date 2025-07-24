@@ -1,6 +1,12 @@
 /**
  * Main entry point for the Uptime Watcher React application.
- * Sets up React root and renders the main App component with strict mode enabled.
+ *
+ * @remarks
+ * This module initializes the React root and renders the main {@link App} component.
+ * React StrictMode is enabled for highlighting potential problems in development.
+ * The root element is located by its DOM ID ("root").
+ *
+ * @throws {@link Error} If the root element with ID "root" is not found in the DOM.
  */
 
 import React from "react";
@@ -10,16 +16,24 @@ import App from "./App";
 import "./index.css";
 
 /**
- * Initialize and render the React application.
+ * Initializes and renders the Uptime Watcher React application.
  *
  * @remarks
- * Creates the React root and renders the App component with StrictMode for development benefits.
- * Throws an error if the root element is not found in the DOM.
+ * - Locates the root DOM element by ID ("root").
+ * - Throws an error if the root element is missing.
+ * - Creates a React root and renders the {@link App} component inside {@link React.StrictMode}.
  *
- * @throws Error when the root element (#root) is not found in the DOM
+ * @throws {@link Error} If the root element with ID "root" is not found.
+ *
+ * @example
+ * ```typescript
+ * // This function is called automatically when the module loads.
+ * initializeApp();
+ * ```
  */
 function initializeApp(): void {
-    const rootElement = document.querySelector("#root");
+    // eslint-disable-next-line unicorn/prefer-query-selector -- getElementById is more performant for single ID lookups
+    const rootElement = document.getElementById("root");
     if (!rootElement) {
         throw new Error("Root element not found");
     }

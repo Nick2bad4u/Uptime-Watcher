@@ -10,6 +10,7 @@ import { ThemedButton } from "../../../../theme/components";
 /**
  * Props for the ActionButtonGroup component.
  *
+ * @see ActionButtonGroup
  * @public
  */
 export interface ActionButtonGroupProperties {
@@ -42,6 +43,8 @@ export interface ActionButtonGroupProperties {
  *
  * @example
  * ```tsx
+ * import { ActionButtonGroup } from './components/ActionButtonGroup';
+ *
  * <ActionButtonGroup
  *   onCheckNow={handleCheckNow}
  *   onStartMonitoring={handleStart}
@@ -95,6 +98,7 @@ export const ActionButtonGroup = React.memo(function ActionButtonGroup({
                 size="sm"
                 variant="ghost"
             >
+                {/* Using emoji icon consistent with project's status icon system */}
                 <span>🔄</span>
             </ThemedButton>
 
@@ -107,6 +111,7 @@ export const ActionButtonGroup = React.memo(function ActionButtonGroup({
                     size="sm"
                     variant="error"
                 >
+                    {/* Using emoji icon consistent with project's status icon system */}
                     ⏸️
                 </ThemedButton>
             ) : (
@@ -118,6 +123,7 @@ export const ActionButtonGroup = React.memo(function ActionButtonGroup({
                     size="sm"
                     variant="success"
                 >
+                    {/* Using emoji icon consistent with project's status icon system */}
                     ▶️
                 </ThemedButton>
             )}

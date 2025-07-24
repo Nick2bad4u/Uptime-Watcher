@@ -17,7 +17,12 @@ import { StatusIndicator, ThemedText } from "../../theme/components";
 export interface StatusBadgeProperties {
     /** Additional CSS classes */
     className?: string;
-    /** Label text to display */
+    /** Optional custom formatter for label and status display */
+    formatter?: (label: string, status: MonitorStatus) => string;
+    /**
+     * Label text to display (expected to be localized by caller)
+     * @example "Status", "Current State", "Monitor Status"
+     */
     label: string;
     /** Whether to show the status icon */
     showIcon?: boolean;
@@ -30,13 +35,18 @@ export interface StatusBadgeProperties {
 /**
  * Reusable status badge component that combines status indicator with text.
  * Can be used throughout the app for consistent status display.
- * Memoized for performance optimization.
+ *
+ * This component is memoized to prevent unnecessary re-renders when parent
+ * components update. The memoization is beneficial because status badges are
+ * often rendered in lists and don't change frequently. Consumers should ensure
+ * that props are stable (especially formatter function) to maximize memoization benefits.
  *
  * @param props - StatusBadge component props
  * @returns JSX element containing status indicator and text
  */
 export const StatusBadge = React.memo(function StatusBadge({
     className = "",
+    formatter,
     label,
     showIcon = true,
     size = "sm",
@@ -71,11 +81,14 @@ export const StatusBadge = React.memo(function StatusBadge({
         }
     };
 
+    // Use custom formatter if provided, otherwise default format
+    const displayText = formatter ? formatter(label, status) : `${label}: ${status}`;
+
     return (
         <div className={`flex items-center gap-3 ${className}`}>
             {showIcon && <StatusIndicator size={getIndicatorSize(size)} status={status} />}
             <ThemedText size={size} variant="secondary">
-                {label}: {status}
+                {displayText}
             </ThemedText>
         </div>
     );

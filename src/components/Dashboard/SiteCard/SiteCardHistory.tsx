@@ -10,6 +10,9 @@ import { Monitor, StatusHistory } from "../../../types";
 import { formatTitleSuffix } from "../../../utils/monitorTitleFormatters";
 import { HistoryChart } from "../../common/HistoryChart";
 
+/** Maximum number of history items to display in the chart */
+const MAX_HISTORY_ITEMS = 60;
+
 /**
  * Props for the SiteCardHistory component.
  *
@@ -50,7 +53,7 @@ export const SiteCardHistory = React.memo(
         // Get monitor type configurations
         const { options } = useMonitorTypes();
 
-        // Memoize the history title calculation
+        // Memoize the history title calculation with optimized dependencies
         const historyTitle = useMemo(() => {
             if (!monitor) {
                 return "No Monitor Selected";
@@ -66,7 +69,7 @@ export const SiteCardHistory = React.memo(
             return `${displayName} History${suffix}`;
         }, [monitor, options]);
 
-        return <HistoryChart history={filteredHistory} maxItems={60} title={historyTitle} />;
+        return <HistoryChart history={filteredHistory} maxItems={MAX_HISTORY_ITEMS} title={historyTitle} />;
     },
     (previousProperties, nextProperties) => {
         // Custom comparison function to ensure proper re-renders
@@ -78,11 +81,22 @@ export const SiteCardHistory = React.memo(
         const previousLastTimestamp = previousHistory[0]?.timestamp;
         const nextLastTimestamp = nextHistory[0]?.timestamp;
 
+        // Compare monitor properties that affect the chart title and display
+        const previousMonitor = previousProperties.monitor;
+        const nextMonitor = nextProperties.monitor;
+
+        const monitorChanged =
+            previousMonitor?.id !== nextMonitor?.id ||
+            previousMonitor?.type !== nextMonitor?.type ||
+            previousMonitor?.url !== nextMonitor?.url ||
+            previousMonitor?.port !== nextMonitor?.port ||
+            previousMonitor?.host !== nextMonitor?.host;
+
         // Return true if nothing important changed (skip re-render)
         return (
+            !monitorChanged &&
             previousHistory.length === nextHistory.length &&
-            previousLastTimestamp === nextLastTimestamp &&
-            previousProperties.monitor?.id === nextProperties.monitor?.id
+            previousLastTimestamp === nextLastTimestamp
         );
     }
 );

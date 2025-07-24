@@ -16,12 +16,17 @@ import { ThemedText } from "../../../theme/components";
  * - Static content optimized with React.memo
  * - Responsive design with themed text components
  *
- * @returns JSX element containing the footer with interaction hint
+ * @returns JSX.Element containing the footer with interaction hint (no props required)
  *
  * @example
  * ```tsx
  * <SiteCardFooter />
  * ```
+ *
+ * @remarks
+ * This component uses group-hover:opacity-100 which requires the parent
+ * container to have the Tailwind 'group' class applied. The parent SiteCard
+ * component provides this styling context.
  */
 export const SiteCardFooter = React.memo(function SiteCardFooter() {
     return (

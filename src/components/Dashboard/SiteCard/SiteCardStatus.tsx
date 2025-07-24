@@ -31,7 +31,7 @@ export interface SiteCardStatusProperties {
  * - Consistent styling with theme system
  *
  * @param props - Component props
- * @returns JSX element containing the status badge
+ * @returns JSX.Element containing the status badge
  *
  * @example
  * ```tsx
@@ -40,10 +40,15 @@ export interface SiteCardStatusProperties {
  *   status="up"
  * />
  * ```
+ *
+ * @see StatusBadge For the underlying status display component
  */
 export const SiteCardStatus = React.memo(function SiteCardStatus({
     selectedMonitorId,
     status,
 }: SiteCardStatusProperties) {
-    return <StatusBadge label={`${selectedMonitorId.toUpperCase()} Status`} size="sm" status={status} />;
+    // Ensure selectedMonitorId is a string to prevent runtime errors
+    const safeMonitorId = String(selectedMonitorId || "unknown");
+
+    return <StatusBadge label={`${safeMonitorId.toUpperCase()} Status`} size="sm" status={status} />;
 });

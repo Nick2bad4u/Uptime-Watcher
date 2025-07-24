@@ -39,10 +39,19 @@ export interface SiteCardHeaderProperties {
 /**
  * Header section of the site card containing site name, monitor selection, and action buttons.
  * Provides interactive controls for monitor management and site operations.
- * Memoized to prevent unnecessary re-renders when parent data hasn't changed.
+ *
+ * This component is memoized to prevent unnecessary re-renders when parent components
+ * update. For optimal performance, ensure that all callback props (onCheckNow,
+ * onMonitorIdChange, onStartMonitoring, onStopMonitoring) are stable references
+ * (wrapped in useCallback). The site object should also be stable to prevent
+ * unnecessary re-renders.
+ *
+ * UX Note: ActionButtonGroup is disabled when hasMonitor is false, preventing
+ * actions on sites without configured monitors. The isLoading state is handled
+ * internally by ActionButtonGroup to disable buttons during operations.
  *
  * @param props - SiteCardHeader component props
- * @returns JSX element containing site header with controls
+ * @returns JSX.Element containing site header with controls
  */
 export const SiteCardHeader = React.memo(function SiteCardHeader({
     hasMonitor,

@@ -2,6 +2,10 @@
  * Form field components for the AddSiteForm.
  * Provides reusable, accessible form inputs with consistent styling and validation.
  * Includes text inputs, select dropdowns, and radio groups.
+ *
+ * @remarks
+ * All components are designed for accessibility and consistent UI.
+ * Use these components to ensure form fields are rendered with proper labeling, error handling, and ARIA attributes.
  */
 
 import React from "react";
@@ -12,19 +16,29 @@ import { ThemedInput, ThemedSelect, ThemedText } from "../../theme/components";
 const REQUIRED_SUFFIX = " (required)";
 
 /**
- * Create accessible aria-label with required indicator.
- * @param label - Base label text
- * @param required - Whether field is required
- * @returns Formatted aria-label string
+ * Creates an accessible aria-label string, appending a required indicator if needed.
+ *
+ * @param label - The base label text for the field.
+ * @param required - Whether the field is required.
+ * @returns The formatted aria-label string.
+ *
+ * @example
+ * ```ts
+ * createAriaLabel("Site Name", true); // "Site Name (required)"
+ * ```
  */
 const createAriaLabel = (label: string, required: boolean): string => `${label}${required ? REQUIRED_SUFFIX : ""}`;
 
 /**
- * Determine the appropriate aria-describedby value based on error and help text.
- * @param id - The field ID for generating the describedby value
- * @param error - Error message if present
- * @param helpText - Help text if present
- * @returns The aria-describedby value or undefined
+ * Determines the appropriate aria-describedby value for a form field.
+ *
+ * @param id - The unique field ID.
+ * @param error - Error message, if present.
+ * @param helpText - Help text, if present.
+ * @returns The aria-describedby value or undefined if neither error nor helpText is present.
+ *
+ * @remarks
+ * If both error and helpText are present, error takes precedence for accessibility.
  */
 const getAriaDescribedBy = (id: string, error?: string, helpText?: string): string | undefined => {
     if (error) {
@@ -36,7 +50,9 @@ const getAriaDescribedBy = (id: string, error?: string, helpText?: string): stri
     return undefined;
 };
 
-/** Props for the base FormField wrapper component */
+/**
+ * Props for the base FormField wrapper component.
+ */
 export interface FormFieldProperties {
     /** Form input element(s) to wrap */
     children: React.ReactNode;
@@ -54,10 +70,13 @@ export interface FormFieldProperties {
 
 /**
  * Reusable form field wrapper with label, error handling, and accessibility features.
- * Provides consistent styling and behavior for all form inputs.
  *
- * @param props - FormField component props
- * @returns JSX element containing labeled form field with error/help text
+ * @remarks
+ * This component provides consistent styling and accessibility for all form fields.
+ * It displays a label, error/help text, and wraps the input element.
+ *
+ * @param props - {@link FormFieldProperties}
+ * @returns JSX element containing labeled form field with error/help text.
  */
 export const FormField = React.memo(function FormField({
     children,
@@ -93,7 +112,9 @@ export const FormField = React.memo(function FormField({
     );
 });
 
-/** Props for the TextField component */
+/**
+ * Props for the TextField component.
+ */
 export interface TextFieldProperties {
     /** Whether the field is disabled */
     disabled?: boolean;
@@ -122,11 +143,24 @@ export interface TextFieldProperties {
 }
 
 /**
- * Text input field component with proper accessibility and validation.
- * Supports different input types and provides consistent styling.
+ * Text input field component with accessibility and validation.
  *
- * @param props - TextField component props
- * @returns JSX element containing accessible text input field
+ * @remarks
+ * Supports "text", "url", and "number" input types. Handles error and help text display.
+ *
+ * @param props - {@link TextFieldProperties}
+ * @returns JSX element containing an accessible text input field.
+ *
+ * @example
+ * ```tsx
+ * <TextField
+ *   id="siteName"
+ *   label="Site Name"
+ *   value={siteName}
+ *   onChange={setSiteName}
+ *   required
+ * />
+ * ```
  */
 export const TextField = React.memo(function TextField({
     disabled = false,
@@ -160,7 +194,9 @@ export const TextField = React.memo(function TextField({
                 id={id}
                 {...(max !== undefined && { max })}
                 {...(min !== undefined && { min })}
-                onChange={(event) => onChange(event.target.value)}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    onChange(event.target.value);
+                }}
                 {...(placeholder !== undefined && { placeholder })}
                 required={required}
                 type={type}
@@ -170,7 +206,9 @@ export const TextField = React.memo(function TextField({
     );
 });
 
-/** Props for the SelectField component */
+/**
+ * Props for the SelectField component.
+ */
 export interface SelectFieldProperties {
     /** Whether the field is disabled */
     disabled?: boolean;
@@ -188,11 +226,15 @@ export interface SelectFieldProperties {
     options: SelectOption[];
     /** Placeholder text for empty selection */
     placeholder?: string;
+    /** Whether the field is required */
     required?: boolean;
+    /** Current selected value */
     value: number | string;
 }
 
-/** Option interface for SelectField dropdown items */
+/**
+ * Option interface for SelectField dropdown items.
+ */
 export interface SelectOption {
     /** Display text for the option */
     label: string;
@@ -200,6 +242,26 @@ export interface SelectOption {
     value: number | string;
 }
 
+/**
+ * Select dropdown field component with accessibility and validation.
+ *
+ * @remarks
+ * Renders a select dropdown with options, error/help text, and ARIA attributes.
+ *
+ * @param props - {@link SelectFieldProperties}
+ * @returns JSX element containing an accessible select dropdown.
+ *
+ * @example
+ * ```tsx
+ * <SelectField
+ *   id="monitorType"
+ *   label="Monitor Type"
+ *   options={[{ label: "HTTP", value: "http" }]}
+ *   value={monitorType}
+ *   onChange={setMonitorType}
+ * />
+ * ```
+ */
 export const SelectField = React.memo(function SelectField({
     disabled = false,
     error,
@@ -244,7 +306,9 @@ export const SelectField = React.memo(function SelectField({
     );
 });
 
-/** Props for the RadioGroup component */
+/**
+ * Props for the RadioGroup component.
+ */
 export interface RadioGroupProperties {
     /** Whether the radio group is disabled */
     disabled?: boolean;
@@ -268,7 +332,9 @@ export interface RadioGroupProperties {
     value: string;
 }
 
-/** Option interface for RadioGroup items */
+/**
+ * Option interface for RadioGroup items.
+ */
 export interface RadioOption {
     /** Display text for the radio option */
     label: string;
@@ -278,7 +344,12 @@ export interface RadioOption {
 
 /**
  * RadioGroup component for selecting one option from multiple choices.
- * Provides an accessible radio button group with proper ARIA attributes and keyboard navigation.
+ *
+ * @remarks
+ * Provides an accessible radio button group with ARIA attributes and keyboard navigation.
+ *
+ * @param props - {@link RadioGroupProperties}
+ * @returns JSX element containing a radio button group.
  *
  * @example
  * ```tsx

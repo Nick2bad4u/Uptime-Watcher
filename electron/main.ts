@@ -1,10 +1,11 @@
 /**
  * Main entry point for the Electron application.
- * Sets up proper shutdown handlers for graceful cleanup.
+ *
+ * @remarks
+ * Sets up logging, initializes the application service, and configures shutdown handlers
+ * for graceful cleanup. Uses context isolation and preload scripts for secure logging.
  *
  * @packageDocumentation
- * @remarks
- * contextIsolation is enabled and uses preload scripts for secure logging.
  */
 
 import { app } from "electron";
@@ -29,27 +30,29 @@ log.transports.console.format = "[{h}:{i}:{s}.{ms}] [{level}] {text}";
  * Main application class that initializes and manages the Electron app.
  *
  * @remarks
- * Uses modular ApplicationService for clean separation of concerns and follows
- * the single responsibility principle. Handles application lifecycle management
+ * Uses a modular {@link ApplicationService} for clean separation of concerns and follows
+ * the single responsibility principle. Handles application lifecycle management,
  * including initialization, cleanup, and graceful shutdown.
  *
- * The class ensures that cleanup is performed only once even if multiple
- * shutdown events are triggered, preventing resource leaks and errors.
+ * Ensures that cleanup is performed only once, even if multiple shutdown events are triggered,
+ * to prevent resource leaks and errors.
  */
 class Main {
     /** Application service instance for managing app lifecycle and features */
     private readonly applicationService: ApplicationService;
 
     /**
-     * Initialize the main application.
+     * Constructs the main application and sets up shutdown handlers.
      *
      * @remarks
-     * Sets up logging, creates application service, and configures cleanup handlers.
+     * Sets up logging, creates the application service, and configures cleanup handlers.
      * Establishes event listeners for both Node.js process events and Electron
      * app events to ensure proper cleanup in all shutdown scenarios.
      *
-     * The cleanup is designed to be idempotent - safe to call multiple times
+     * The cleanup is designed to be idempotent—safe to call multiple times
      * without side effects or errors.
+     *
+     * @throws {@link Error} If cleanup fails, the error is logged and re-thrown.
      */
     constructor() {
         logger.info("Starting Uptime Watcher application");
@@ -80,6 +83,7 @@ class Main {
 
 // Start the application
 /**
+ * @remarks
  * Intentionally not assigning the Main instance to a variable.
  * This ensures the instance persists for the application's lifetime,
  * preventing premature garbage collection and maintaining lifecycle handlers.
@@ -92,8 +96,15 @@ if (process.versions.electron) {
      * Installs React and Redux DevTools extensions after the Electron app is ready.
      *
      * @remarks
-     * Extensions are installed only after `app.whenReady()` to ensure the Electron environment is fully initialized,
+     * Extensions are installed only after {@link app.whenReady} to ensure the Electron environment is fully initialized,
      * as extension installation requires the app to be ready. In development, these extensions enhance debugging capabilities.
+     *
+     * @returns Promise\<ExtensionReference[]\> The installed extension references, or an empty array in production or on failure.
+     *
+     * @example
+     * ```typescript
+     * // Extensions are installed automatically in development mode.
+     * ```
      */
     void app.whenReady().then(async () => {
         // Wait a bit for the main window to be created and ready
