@@ -37,6 +37,12 @@ interface SetHistoryLimitParams {
 
     /**
      * Callback to update the internal history limit
+     *
+     * @remarks
+     * This callback updates the in-memory history limit value immediately,
+     * providing synchronous access for other components while the database
+     * update happens asynchronously. Should be called before database
+     * operations to ensure consistency between memory and database state.
      */
     setHistoryLimit: (limit: number) => void;
 }
@@ -44,22 +50,33 @@ interface SetHistoryLimitParams {
 /**
  * Get the current history limit.
  *
- * @param getHistoryLimit - Function to retrieve the current history limit
+ * Simple getter function that provides access to the history limit.
+ * This indirection enables dependency injection and testability.
+ *
+ * @param getHistoryLimitFn - Function to retrieve the current history limit
  * @returns The current history limit
  */
-export function getHistoryLimit(getHistoryLimit: () => number): number {
-    return getHistoryLimit();
+export function getHistoryLimit(getHistoryLimitFn: () => number): number {
+    return getHistoryLimitFn();
 }
 
 /**
  * Set the history retention limit and prune older history entries if needed.
  *
+ * Limit behavior:
+ * - 0 or negative: Disables history retention (unlimited)
+ * - 1-9: Will be increased to minimum of 10
+ * - 10+: Used as specified
+ *
  * @param params - Parameters for setting history limit
+ * @throws Error when database operations fail
  */
 export async function setHistoryLimit(params: SetHistoryLimitParams): Promise<void> {
     const { databaseService, limit, logger, repositories, setHistoryLimit } = params;
 
     // Determine the appropriate limit value
+    // Special case: 0 or negative disables history retention (unlimited)
+    // Otherwise: enforce minimum of 10 for meaningful history retention
     const finalLimit = limit <= 0 ? 0 : Math.max(10, limit);
 
     // Update the internal limit

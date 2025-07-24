@@ -1,6 +1,8 @@
 /**
  * Service for data import/export operations.
+ *
  * Provides a testable, dependency-injected service for application data management.
+ * Handles importing and exporting sites, monitors, history, and settings data.
  */
 
 import { Database } from "node-sqlite3-wasm";
@@ -34,6 +36,8 @@ export interface DataImportExportConfig {
 
 /**
  * Type for imported site data structure.
+ *
+ * Represents the structure of site data during import operations.
  */
 export interface ImportSite {
     identifier: string;
@@ -43,7 +47,10 @@ export interface ImportSite {
 
 /**
  * Service for handling data import/export operations.
+ *
  * Separates data operations from side effects for better testability.
+ * Handles the complete lifecycle of data import/export including validation,
+ * transformation, and persistence.
  */
 export class DataImportExportService {
     private static readonly DATABASE_ERROR_EVENT = "database:error" as const;
@@ -245,6 +252,12 @@ export class DataImportExportService {
 
 /**
  * Type guard for expected import data structure.
+ *
+ * Validates that the provided object matches the expected structure
+ * for import data containing sites and optional settings.
+ *
+ * @param obj - Object to validate
+ * @returns True if the object matches the expected import data structure
  */
 function isImportData(obj: unknown): obj is { settings?: Record<string, string>; sites: ImportSite[] } {
     return typeof obj === "object" && obj !== null && Array.isArray((obj as Record<string, unknown>).sites);

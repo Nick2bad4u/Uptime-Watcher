@@ -189,13 +189,10 @@ export class WindowService {
     private getPreloadPath(): string {
         const preloadFileName = "preload.js";
 
-        if (isDev()) {
-            // Development: look in dist-electron directory
-            return path.join(process.cwd(), "dist-electron", preloadFileName);
-        } else {
-            // Production: relative to current directory
-            return path.join(__dirname, preloadFileName);
-        }
+        // Use ternary for simple conditional path selection
+        return isDev()
+            ? path.join(process.cwd(), "dist-electron", preloadFileName) // Development: look in dist-electron directory
+            : path.join(__dirname, preloadFileName); // Production: relative to current directory
     }
 
     /**

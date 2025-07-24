@@ -59,12 +59,24 @@ export interface SiteWritingConfig {
     };
 }
 
+/**
+ * Custom error for site loading operations.
+ *
+ * Provides enhanced error context and stack trace preservation for site loading failures.
+ */
 export class SiteLoadingError extends Error {
+    /**
+     * Create a new SiteLoadingError.
+     *
+     * @param message - Descriptive error message
+     * @param cause - Optional underlying error that caused this failure
+     */
     constructor(message: string, cause?: Error) {
         super(`Failed to load sites: ${message}`);
         this.name = "SiteLoadingError";
         if (cause?.stack) {
-            this.stack = cause.stack;
+            // Preserve both stack traces for better debugging
+            this.stack = `${this.stack}\nCaused by: ${cause.stack}`;
         }
     }
 }
@@ -72,7 +84,18 @@ export class SiteLoadingError extends Error {
 /**
  * Custom error types for better error handling.
  */
+
+/**
+ * Custom error for site not found scenarios.
+ *
+ * Thrown when attempting to access a site that doesn't exist in the system.
+ */
 export class SiteNotFoundError extends Error {
+    /**
+     * Create a new SiteNotFoundError.
+     *
+     * @param identifier - The site identifier that was not found
+     */
     constructor(identifier: string) {
         super(`Site not found: ${identifier}`);
         this.name = "SiteNotFoundError";

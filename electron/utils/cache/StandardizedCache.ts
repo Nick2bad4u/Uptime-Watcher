@@ -13,7 +13,7 @@ import { logger } from "../logger";
  * Cache configuration.
  */
 export interface CacheConfig {
-    /** Default TTL in milliseconds */
+    /** Default TTL in milliseconds. Set to 0 or negative to disable expiration. */
     defaultTTL?: number;
     /** Enable statistics tracking */
     enableStats?: boolean;
@@ -50,7 +50,7 @@ export interface CacheStats {
     hitRatio: number;
     /** Total cache hits */
     hits: number;
-    /** Last access timestamp */
+    /** Last access timestamp. Only updated on cache hits, not misses. */
     lastAccess?: number;
     /** Total cache misses */
     misses: number;
@@ -109,6 +109,9 @@ export class StandardizedCache<T> {
 
     /**
      * Bulk update cache with new data.
+     *
+     * Note: Emits only a single bulk-updated event for performance.
+     * Individual item cache events are not emitted during bulk operations.
      */
     bulkUpdate(items: { data: T; key: string; ttl?: number }[]): void {
         logger.debug(`[Cache:${this.config.name}] Bulk updating ${items.length} items`);
@@ -225,6 +228,7 @@ export class StandardizedCache<T> {
         // Check expiration
         if (entry.expiresAt && Date.now() > entry.expiresAt) {
             this.cache.delete(key);
+            this.updateSize();
             this.recordMiss();
             this.emitEvent("internal:cache:item-expired", { key });
             this.notifyInvalidation(key);
@@ -269,6 +273,7 @@ export class StandardizedCache<T> {
 
     /**
      * Get cache statistics.
+     * Returns a snapshot of the current statistics, not a live reference.
      */
     getStats(): CacheStats {
         return { ...this.stats };
@@ -322,15 +327,39 @@ export class StandardizedCache<T> {
 
     /**
      * Get all cache keys.
+     * Filters out expired keys automatically.
      */
     keys(): string[] {
-        return [...this.cache.keys()];
+        const validKeys: string[] = [];
+        const expiredKeys: string[] = [];
+        const now = Date.now();
+
+        for (const [key, entry] of this.cache.entries()) {
+            // Skip expired entries
+            if (entry.expiresAt && now > entry.expiresAt) {
+                this.cache.delete(key);
+                expiredKeys.push(key);
+                continue;
+            }
+
+            validKeys.push(key);
+        }
+
+        // Notify callbacks for expired items
+        for (const key of expiredKeys) {
+            this.notifyInvalidation(key);
+        }
+
+        this.updateSize();
+        return validKeys;
     }
 
     /**
      * Register invalidation callback for cache events.
      *
-     * @param callback - Function to call when cache items are invalidated
+     * @param callback - Function to call when cache items are invalidated.
+     *                   Called with a specific key when a single item is invalidated,
+     *                   or with undefined when all items are invalidated.
      * @returns Cleanup function to remove the callback
      */
     onInvalidation(callback: (key?: string) => void): () => void {
@@ -346,6 +375,10 @@ export class StandardizedCache<T> {
 
     /**
      * Set item in cache.
+     *
+     * @param key - The cache key
+     * @param data - The data to cache
+     * @param ttl - Time to live in milliseconds. If 0 or negative, the item will not expire.
      */
     set(key: string, data: T, ttl?: number): void {
         // Evict if at capacity and this is a new key
@@ -399,6 +432,7 @@ export class StandardizedCache<T> {
 
         if (oldestKey) {
             this.cache.delete(oldestKey);
+            this.updateSize();
             logger.debug(`[Cache:${this.config.name}] Evicted LRU item: ${oldestKey}`);
             this.emitEvent("internal:cache:item-evicted", { key: oldestKey, reason: "lru" });
             this.notifyInvalidation(oldestKey);
@@ -407,11 +441,15 @@ export class StandardizedCache<T> {
 
     /**
      * Notify invalidation callbacks.
+     *
+     * Calls all registered invalidation callbacks, handling any errors gracefully.
+     *
+     * @param key - The invalidated cache key, or undefined if all keys were invalidated
      */
     private notifyInvalidation(key?: string): void {
         for (const callback of this.invalidationCallbacks) {
             try {
-                // eslint-disable-next-line n/callback-return -- This is a synchronous callback notification, not an async callback
+                // eslint-disable-next-line n/callback-return -- Synchronous callback for immediate invalidation notification
                 callback(key);
             } catch (error) {
                 logger.error(`[Cache:${this.config.name}] Error in invalidation callback:`, error);

@@ -1,6 +1,23 @@
 /**
  * Service for site writing operations.
- * Provides a testable, dependency-injected service for site creation, update, and deletion.
+ * Provides a testable, dependency-injected service for site c    /**
+ * Detect new monitors that were added to an existing site.
+ *
+ * @param originalMonitors - The original monitors before update
+ * @param updatedMonitors - The updated monitors after update
+ * @returns Array of new monitor IDs, including empty string placeholders for monitors without IDs
+ *
+ * @remarks
+ * This method handles two scenarios:
+ * 1. **Monitors with IDs**: Compares IDs to detect new ones
+ * 2. **Monitors without IDs**: Detects new monitors by comparing monitor objects
+ *    since IDs are assigned during database creation
+ *
+ * **Empty String Placeholder Contract:**
+ * - When a monitor doesn't have an ID yet (new monitors), an empty string ("") is returned
+ * - Downstream consumers MUST handle empty strings as "new monitor without ID" indicators
+ * - These placeholders signal that the monitor needs database creation and ID assignment
+ * - Empty strings should NOT be treated as valid monitor IDs for database operations
  */
 
 import { Database } from "node-sqlite3-wasm";
@@ -368,7 +385,11 @@ export class SiteWriterService {
         existingMonitor: Monitor
     ): void {
         if (!newMonitor.id) {
-            return; // Safety check - should not happen in this context
+            // Safety check - this should not happen in this context
+            this.logger.warn(`Attempted to update existing monitor without ID for site ${siteIdentifier}`, {
+                newMonitor,
+            });
+            return;
         }
 
         const updateData = this.buildMonitorUpdateData(newMonitor, existingMonitor);

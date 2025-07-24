@@ -8,6 +8,12 @@ import { monitorLogger } from "../logger";
 
 /**
  * Adapter for the logger to implement Logger interface.
+ *
+ * Adapts the monitorLogger instance to match the Logger interface required
+ * by database services, providing a consistent logging interface across
+ * different components while maintaining type safety.
+ *
+ * @see {@link Logger} for the interface this class implements
  */
 export class LoggerAdapter {
     private readonly logger: typeof monitorLogger;
@@ -36,12 +42,16 @@ export class LoggerAdapter {
 /**
  * Factory function to create a standardized site cache.
  *
- * @returns New StandardizedCache instance configured for temporary use
+ * Creates a temporary cache instance optimized for site operations
+ * with appropriate TTL and size limits for temporary data storage.
+ * Statistics are disabled for performance in temporary use cases.
+ *
+ * @returns New StandardizedCache instance configured for temporary site storage
  */
 export function createSiteCache(): StandardizedCache<Site> {
     return new StandardizedCache<Site>({
         defaultTTL: 300_000, // 5 minutes for temporary operations
-        enableStats: false, // No need for stats in temporary caches
+        enableStats: false, // Disabled for performance in temporary caches
         maxSize: 1000,
         name: "temporary-sites",
     });

@@ -16,6 +16,16 @@ import { withDatabaseOperation } from "../operationalHooks";
 
 /**
  * Type for the monitoring lifecycle callback functions.
+ *
+ * @param identifier - Site identifier for the monitoring operation
+ * @param monitorId - Optional specific monitor ID, if not provided operates on all site monitors
+ * @returns Promise resolving to true if operation succeeded, false otherwise
+ *
+ * @remarks
+ * Used for recursive calls in monitoring operations. The callback should handle
+ * both individual monitor operations (when monitorId is provided) and bulk
+ * operations (when monitorId is undefined). Error handling should be managed
+ * within the callback implementation.
  */
 export type MonitoringCallback = (identifier: string, monitorId?: string) => Promise<boolean>;
 
@@ -23,11 +33,17 @@ export type MonitoringCallback = (identifier: string, monitorId?: string) => Pro
  * Configuration object for monitoring lifecycle functions.
  */
 export interface MonitoringLifecycleConfig {
+    /** Database service for executing transactions and maintaining data consistency */
     databaseService: DatabaseService;
+    /** Event emitter for communicating monitoring state changes to other components */
     eventEmitter: TypedEventBus<UptimeEvents>;
+    /** Logger instance for debugging and operational information */
     logger: Logger;
+    /** Repository for monitor data access and manipulation */
     monitorRepository: MonitorRepository;
+    /** Scheduler service for managing monitor execution intervals and timing */
     monitorScheduler: MonitorScheduler;
+    /** Cache containing site data with associated monitors */
     sites: StandardizedCache<Site>;
 }
 
@@ -47,6 +63,8 @@ export async function startAllMonitoring(config: MonitoringLifecycleConfig, isMo
     config.logger.info(`Starting monitoring with ${config.sites.size} sites (per-site intervals)`);
 
     // Set all monitors to pending status and enable monitoring
+    // Note: Intentionally sets all monitors to "pending" regardless of previous state
+    // to indicate they are being initialized for monitoring startup
     for (const site of config.sites.getAll()) {
         for (const monitor of site.monitors) {
             if (monitor.id) {
@@ -115,6 +133,8 @@ export async function stopAllMonitoring(config: MonitoringLifecycleConfig): Prom
     config.monitorScheduler.stopAll();
 
     // Set all monitors to paused status
+    // Note: Intentionally sets all monitors to "paused" regardless of previous state
+    // to indicate monitoring has been stopped system-wide
     for (const site of config.sites.getAll()) {
         for (const monitor of site.monitors) {
             if (monitor.id && monitor.monitoring !== false) {
@@ -173,7 +193,44 @@ export async function stopMonitoringForSite(
 }
 
 /**
+ * Helper function to find a monitor by ID within a site.
+ *
+ * @param site - Site to search within
+ * @param monitorId - Monitor ID to find
+ * @param identifier - Site identifier for logging
+ * @param config - Configuration object for logging
+ * @returns Monitor object if found, null otherwise
+ */
+function findMonitorById(
+    site: Site,
+    monitorId: string,
+    identifier: string,
+    config: MonitoringLifecycleConfig
+): null | Site["monitors"][0] {
+    const monitor = site.monitors.find((m) => m.id === monitorId);
+    if (!monitor) {
+        config.logger.warn(`Monitor not found: ${identifier}:${monitorId}`);
+        return null;
+    }
+    return monitor;
+}
+
+/**
  * Helper function to start or stop monitoring for all monitors in a site.
+ *
+ * @param config - Configuration object with required dependencies
+ * @param site - Site containing monitors to process
+ * @param identifier - Site identifier for logging
+ * @param callback - Callback function to execute for each monitor
+ * @param useOptimisticLogic - Result aggregation strategy:
+ *   - true (optimistic): Success if ANY monitor operation succeeds (used for starting)
+ *   - false (pessimistic): Success only if ALL monitor operations succeed (used for stopping)
+ * @returns Promise resolving to aggregated success state based on logic type
+ *
+ * @remarks
+ * The different aggregation strategies reflect the operational semantics:
+ * - Starting: If any monitor starts successfully, the site is considered "partially active"
+ * - Stopping: All monitors must stop successfully for the site to be "fully stopped"
  */
 async function processAllSiteMonitors(
     config: MonitoringLifecycleConfig,
@@ -231,18 +288,18 @@ async function startSpecificMonitor(
     identifier: string,
     monitorId: string
 ): Promise<boolean> {
-    const monitor = site.monitors.find((m) => m.id === monitorId);
+    const monitor = findMonitorById(site, monitorId, identifier, config);
     if (!monitor) {
-        config.logger.warn(`Monitor not found: ${identifier}:${monitorId}`);
         return false;
     }
 
-    if (!monitor.checkInterval) {
-        config.logger.warn(`Monitor ${identifier}:${monitorId} has no check interval set`);
+    if (!validateCheckInterval(monitor, identifier, config)) {
         return false;
     }
 
     try {
+        // Note: Database update is performed before starting the monitor scheduler
+        // This design choice ensures status consistency even if scheduler fails
         // Use operational hooks for database update
         await withDatabaseOperation(
             () => {
@@ -289,9 +346,8 @@ async function stopSpecificMonitor(
     identifier: string,
     monitorId: string
 ): Promise<boolean> {
-    const monitor = site.monitors.find((m) => m.id === monitorId);
+    const monitor = findMonitorById(site, monitorId, identifier, config);
     if (!monitor) {
-        config.logger.warn(`Monitor not found: ${identifier}:${monitorId}`);
         return false;
     }
 
@@ -319,4 +375,26 @@ async function stopSpecificMonitor(
         config.logger.error(`Failed to stop monitoring for ${identifier}:${monitorId}`, error);
         return false;
     }
+}
+
+/**
+ * Validate monitor check interval.
+ *
+ * @param monitor - Monitor to validate
+ * @param identifier - Site identifier for logging
+ * @param config - Configuration object for logging
+ * @returns True if interval is valid, false otherwise
+ */
+function validateCheckInterval(
+    monitor: Site["monitors"][0],
+    identifier: string,
+    config: MonitoringLifecycleConfig
+): boolean {
+    // Check for falsy values that indicate no interval set
+    // This includes undefined, null, 0, and empty string
+    if (!monitor.checkInterval) {
+        config.logger.warn(`Monitor ${identifier}:${monitor.id} has no check interval set`);
+        return false;
+    }
+    return true;
 }

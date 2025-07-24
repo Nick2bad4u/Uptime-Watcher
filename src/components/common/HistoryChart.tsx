@@ -53,7 +53,7 @@ export const HistoryChart = React.memo(function HistoryChart({
     }
 
     // Show up to maxItems bars, most recent first (reverse chronological order)
-    const displayedHistory = history.slice(0, maxItems).reverse();
+    const displayedHistory = history.slice(0, maxItems).toReversed();
 
     return (
         <div className={`mb-3 w-full ${className}`}>

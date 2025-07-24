@@ -66,6 +66,18 @@ export const CACHE_SIZE_LIMITS = Object.freeze({
 });
 
 /**
+ * Main database file name.
+ * @defaultValue "uptime-watcher.sqlite"
+ */
+export const DB_FILE_NAME = "uptime-watcher.sqlite";
+
+/**
+ * Default site name when no name is provided.
+ * @defaultValue "Unnamed Site"
+ */
+export const DEFAULT_SITE_NAME = "Unnamed Site";
+
+/**
  * Default database file name for backups.
  * @defaultValue "uptime-watcher-backup.sqlite"
  */

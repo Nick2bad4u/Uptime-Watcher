@@ -150,6 +150,7 @@ SARIF
 scm
 Selecter
 sitecard
+sloc
 Smale
 sonarcloud
 sonarjs

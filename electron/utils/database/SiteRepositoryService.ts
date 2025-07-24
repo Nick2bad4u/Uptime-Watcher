@@ -9,7 +9,22 @@
  *
  * @public
  *
- * @beta
+ * @beta * Service for handling site repository operations.
+ *
+ * @remarks
+ * Provides pure data operations for site management without side effects,
+ * enabling easy testing and clean separation of concerns. All methods are
+ * designed to be deterministic and focused on data transformation and
+ * retrieval operations.
+ *
+ * The service abstracts repository complexity and provides a clean interface
+ * for higher-level components while maintaining transaction safety and
+ * comprehensive error handling throughout all operations.
+ *
+ * @see {@link SiteRepository} for data access patterns
+ * @see {@link MonitorRepository} for monitor data operations
+ * @see {@link HistoryRepository} for history data operations
+ * @see {@link SettingsRepository} for settings data operations
  * This service is currently in beta and may undergo breaking changes.
  *
  * @see {@link SiteLoadingOrchestrator} for orchestration logic
@@ -45,6 +60,7 @@
  * @packageDocumentation
  */
 
+import { DEFAULT_SITE_NAME } from "../../constants";
 import { UptimeEvents } from "../../events/eventTypes";
 import { TypedEventBus } from "../../events/TypedEventBus";
 import { HistoryRepository } from "../../services/database/HistoryRepository";
@@ -185,8 +201,8 @@ export class SiteRepositoryService {
      *
      * @remarks
      * Performs a complete site loading operation including all associated
-     * monitors and their status history. This is a pure data operation
-     * without side effects, making it ideal for testing and composition.
+     * monitors and their status history. This operation includes logging
+     * and error handling side effects for comprehensive error tracking.
      *
      * The operation builds complete site objects by fetching site metadata,
      * associated monitors, and historical data in an efficient manner while
@@ -247,18 +263,20 @@ export class SiteRepositoryService {
     private async buildSiteWithMonitorsAndHistory(siteRow: SiteRow): Promise<Site> {
         const monitors = await this.repositories.monitor.findBySiteIdentifier(siteRow.identifier);
 
-        // Load history for each monitor
-        for (const monitor of monitors) {
-            if (monitor.id) {
-                monitor.history = await this.repositories.history.findByMonitorId(monitor.id);
-            }
-        }
+        // Load history for all monitors in parallel for better performance
+        await Promise.all(
+            monitors.map(async (monitor) => {
+                if (monitor.id) {
+                    monitor.history = await this.repositories.history.findByMonitorId(monitor.id);
+                }
+            })
+        );
 
         const site: Site = {
             identifier: siteRow.identifier,
             monitoring: siteRow.monitoring ?? true, // Use the actual monitoring status with default
             monitors: monitors,
-            name: siteRow.name ?? "Unnamed Site", // Provide default name
+            name: siteRow.name ?? DEFAULT_SITE_NAME, // Use consistent default name
         };
 
         return site;

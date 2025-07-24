@@ -3,6 +3,7 @@ import { Database } from "node-sqlite3-wasm";
 // eslint-disable-next-line unicorn/import-style -- Need namespace import for both sync and async usage
 import * as path from "node:path";
 
+import { DB_FILE_NAME } from "../../constants";
 import { logger } from "../../utils/logger";
 import { createDatabaseIndexes, createDatabaseTables, setupMonitorTypeValidation } from "./utils/databaseSchema";
 
@@ -182,7 +183,7 @@ export class DatabaseService {
         }
 
         try {
-            const dbPath = path.join(app.getPath("userData"), "uptime-watcher.sqlite");
+            const dbPath = path.join(app.getPath("userData"), DB_FILE_NAME);
             logger.info(`[DatabaseService] Initializing SQLite DB at: ${dbPath}`);
 
             this._db = new Database(dbPath);

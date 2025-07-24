@@ -173,7 +173,7 @@ export function useSiteAnalytics(monitor: Monitor | undefined, timeRange: TimePe
         let currentDowntime: DowntimePeriod | undefined;
 
         // Process in reverse chronological order for proper downtime calculation
-        for (const record of [...filteredHistory].reverse()) {
+        for (const record of [...filteredHistory].toReversed()) {
             if (record.status === "down") {
                 if (currentDowntime) {
                     currentDowntime.end = record.timestamp;
