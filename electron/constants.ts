@@ -78,7 +78,7 @@ export const DB_FILE_NAME = "uptime-watcher.sqlite";
 export const DEFAULT_SITE_NAME = "Unnamed Site";
 
 /**
- * Default database file name for backups.
+ * Backup database file name for data export/import operations.
  * @defaultValue "uptime-watcher-backup.sqlite"
  */
-export const DATABASE_FILE_NAME = "uptime-watcher-backup.sqlite";
+export const BACKUP_DB_FILE_NAME = "uptime-watcher-backup.sqlite";

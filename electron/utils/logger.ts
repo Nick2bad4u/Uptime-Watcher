@@ -7,8 +7,14 @@ import log from "electron-log/main";
 
 /**
  * Creates a logger with a specific prefix for categorization.
+ *
  * @param prefix - The prefix to use for log messages (e.g., "MONITOR", "DB")
  * @returns A logger object with debug, error, info, and warn methods
+ *
+ * @remarks
+ * The error method provides special handling for Error objects, extracting
+ * both the error message and stack trace for comprehensive debugging information.
+ * Non-Error objects are logged as-is for additional context.
  */
 function createLogger(prefix: string) {
     return {
@@ -26,17 +32,19 @@ function createLogger(prefix: string) {
 }
 
 /**
- * Centralized logger utility for the backend.
- * Provides consistent logging across all backend services.
+ * Main backend logger for general application operations.
+ * Uses "BACKEND" prefix to distinguish from specialized loggers.
  */
-export const logger = createLogger("MONITOR");
+export const logger = createLogger("BACKEND");
 
 /**
  * Database-specific logger for database operations and queries.
+ * Uses "DB" prefix for clear categorization of database-related logs.
  */
 export const dbLogger = createLogger("DB");
 
 /**
  * Monitor-specific logger for monitoring operations and health checks.
+ * Uses "MONITOR" prefix for clear categorization of monitoring-related logs.
  */
 export const monitorLogger = createLogger("MONITOR");

@@ -9,9 +9,9 @@
 
 import { z } from "zod";
 
-import type { MonitorFieldDefinition } from "../../../shared/types";
 import type { MonitorType } from "./monitorTypes";
 
+import { MONITOR_STATUS, type MonitorFieldDefinition } from "../../../shared/types";
 // Import shared validation schemas
 import { withErrorHandling } from "../../../shared/utils/errorHandling";
 import { monitorSchemas, validateMonitorData as sharedValidateMonitorData } from "../../../shared/validation/schemas";
@@ -375,7 +375,7 @@ export function createMonitorWithTypeGuards(
         monitoring: true,
         responseTime: -1,
         retryAttempts: 3,
-        status: "pending",
+        status: MONITOR_STATUS.PENDING,
         timeout: 10_000,
         type: validMonitorType,
         ...data,

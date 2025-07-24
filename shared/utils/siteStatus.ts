@@ -141,7 +141,15 @@ export function getSiteStatusDescription(site: SiteForStatus): string {
  * Get the appropriate status indicator color for a site status.
  *
  * @param status - The site status
- * @returns Color variant for status indicators
+ * @returns Color variant for status indicators: "success" (up), "error" (down/unknown),
+ *          "warning" (mixed/paused), or "info" (pending)
+ *
+ * @remarks
+ * Maps site status values to UI color variants:
+ * - "success": up status (all monitors healthy)
+ * - "error": down or unknown status (problems detected)
+ * - "warning": mixed or paused status (partial issues)
+ * - "info": pending status (waiting for results)
  */
 export function getSiteStatusVariant(status: SiteStatus): "error" | "info" | "success" | "warning" {
     switch (status) {
@@ -164,7 +172,8 @@ export function getSiteStatusVariant(status: SiteStatus): "error" | "info" | "su
             return "success";
         }
         default: {
-            return "info";
+            // Align with unknown status handling - treat unexpected values as errors
+            return "error";
         }
     }
 }

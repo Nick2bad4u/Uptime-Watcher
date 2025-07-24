@@ -1,4 +1,4 @@
-import { DATABASE_FILE_NAME } from "../../../constants";
+import { BACKUP_DB_FILE_NAME } from "../../../constants";
 import { logger } from "../../../utils/logger";
 
 /**
@@ -68,7 +68,7 @@ export interface DatabaseBackupResult {
  */
 export async function createDatabaseBackup(
     dbPath: string,
-    fileName: string = DATABASE_FILE_NAME
+    fileName: string = BACKUP_DB_FILE_NAME
 ): Promise<DatabaseBackupResult> {
     try {
         // Enhanced dynamic import error handling

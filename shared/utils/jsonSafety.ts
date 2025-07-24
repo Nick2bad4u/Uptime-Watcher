@@ -19,6 +19,8 @@ export interface SafeJsonResult<T> {
  * @param validator - Type guard function to validate the parsed data
  * @returns Safe result object with parsed data or error
  *
+ * @throws Never throws - all errors are captured and returned in the result object
+ *
  * @example
  * ```typescript
  * const result = safeJsonParse(jsonString, (data): data is User => {
@@ -62,6 +64,8 @@ export function safeJsonParse<T>(json: string, validator: (data: unknown) => dat
  * @param json - JSON string to parse
  * @param elementValidator - Type guard for array elements
  * @returns Safe result object with validated array or error
+ *
+ * @throws Never throws - all errors are captured and returned in the result object
  *
  * @example
  * ```typescript
@@ -115,6 +119,8 @@ export function safeJsonParseArray<T>(
  * @param fallback - Fallback value if parsing fails
  * @returns Parsed data if successful, fallback if failed
  *
+ * @throws Never throws - parsing errors result in fallback value being returned
+ *
  * @example
  * ```typescript
  * const config = safeJsonParseWithFallback(
@@ -135,6 +141,8 @@ export function safeJsonParseWithFallback<T>(json: string, validator: (data: unk
  * @param value - Value to stringify
  * @param space - Space parameter for JSON.stringify (for formatting)
  * @returns Safe result object with JSON string or error
+ *
+ * @throws Never throws - all errors are captured and returned in the result object
  *
  * @example
  * ```typescript
@@ -175,6 +183,8 @@ export function safeJsonStringify(value: unknown, space?: number | string): Safe
  * @param space - Space parameter for JSON.stringify (for formatting)
  * @returns JSON string if successful, fallback if failed
  *
+ * @throws Never throws - stringification errors result in fallback value being returned
+ *
  * @example
  * ```typescript
  * const jsonString = safeJsonStringifyWithFallback(data, "{}");
@@ -187,6 +197,10 @@ export function safeJsonStringifyWithFallback(value: unknown, fallback: string, 
 
 /**
  * Ensures an error object is properly typed and formatted.
+ *
+ * @internal
+ * @param error - Unknown error value to convert to Error instance
+ * @returns Properly typed Error object
  */
 function ensureError(error: unknown): Error {
     return error instanceof Error ? error : new Error(String(error));

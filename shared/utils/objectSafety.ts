@@ -9,9 +9,15 @@ import { isObject } from "./typeGuards";
  * Type-safe object property access with fallback.
  *
  * @param obj - Object to access property from
- * @param key - Property key
+ * @param key - Property key (string or symbol only)
  * @param fallback - Fallback value if property doesn't exist or is wrong type
+ * @param validator - Optional type guard function to validate the property value
  * @returns Property value or fallback
+ *
+ * @remarks
+ * Only accepts string and symbol keys as these are the valid property key types
+ * in JavaScript. Number keys are automatically converted to strings by JavaScript,
+ * so use string keys directly to avoid confusion.
  *
  * @example
  * ```typescript
@@ -22,7 +28,7 @@ import { isObject } from "./typeGuards";
  */
 export function safeObjectAccess<T>(
     obj: unknown,
-    key: number | string,
+    key: PropertyKey,
     fallback: T,
     validator?: (value: unknown) => value is T
 ): T {
@@ -34,8 +40,10 @@ export function safeObjectAccess<T>(
         return fallback;
     }
 
+    // Cast obj to Record type after validation for safe property access
+    const typedObj = obj as Record<PropertyKey, unknown>;
     // eslint-disable-next-line security/detect-object-injection -- Safe object property access with validation
-    const value = obj[key];
+    const value = typedObj[key];
 
     if (validator) {
         return validator(value) ? value : fallback;
@@ -55,6 +63,7 @@ export function safeObjectAccess<T>(
  * @param obj - Object to iterate over (can be unknown)
  * @param callback - Function to call for each entry
  * @param context - Optional context for error logging
+ * @returns void
  */
 export function safeObjectIteration(
     obj: unknown,
@@ -145,6 +154,12 @@ export function safeObjectPick<T extends Record<PropertyKey, unknown>, K extends
  * @param obj - Object to get entries from
  * @returns Array of [key, value] tuples with proper typing
  *
+ * @remarks
+ * This function uses type assertion to preserve compile-time type information.
+ * The cast is safe for plain objects but should be used carefully with objects
+ * that may have prototype pollution, non-enumerable properties, or symbol keys.
+ * Object.entries() only returns enumerable string-keyed properties.
+ *
  * @example
  * ```typescript
  * const config = { timeout: 5000, retries: 3 } as const;
@@ -162,6 +177,13 @@ export function typedObjectEntries<T extends Record<PropertyKey, unknown>>(obj: 
  * @param obj - Object to get keys from
  * @returns Array of keys with proper typing
  *
+ * @remarks
+ * This function uses type assertion to preserve compile-time type information.
+ * Note that Object.keys() only returns enumerable string-keyed properties,
+ * so symbol keys are not included in the result. The cast assumes all keys
+ * are of type keyof T, which is safe for plain objects but may not include
+ * all possible keys for objects with symbol keys or inherited properties.
+ *
  * @example
  * ```typescript
  * const config = { timeout: 5000, retries: 3 } as const;
@@ -178,6 +200,13 @@ export function typedObjectKeys<T extends Record<PropertyKey, unknown>>(obj: T):
  *
  * @param obj - Object to get values from
  * @returns Array of values with proper typing
+ *
+ * @remarks
+ * This function uses type assertion to preserve compile-time type information.
+ * Object.values() only returns enumerable property values, so non-enumerable
+ * properties and symbol-keyed properties are not included. The cast assumes
+ * all values are of type T[keyof T], which is accurate for the enumerable
+ * properties that Object.values() actually returns.
  *
  * @example
  * ```typescript

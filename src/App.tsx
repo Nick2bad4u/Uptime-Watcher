@@ -3,7 +3,7 @@
  * Manages global state, modals, notifications, and renders the main application layout.
  */
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import type { StatusUpdate } from "./types";
 
@@ -14,6 +14,20 @@ import { Header } from "./components/Header/Header";
 import { Settings } from "./components/Settings/Settings";
 import { SiteDetails } from "./components/SiteDetails/SiteDetails";
 import { UI_DELAYS } from "./constants";
+
+// UI Message constants for consistency and future localization
+const UI_MESSAGES = {
+    ADD_SITE_LABEL: "Add New Site",
+    ERROR_CLOSE_BUTTON: "✕",
+    LOADING: "Loading...",
+    SITE_COUNT_LABEL: "Monitored Sites",
+    UPDATE_AVAILABLE: "A new update is available. Downloading...",
+    UPDATE_DISMISS_BUTTON: "Dismiss",
+    UPDATE_DOWNLOADED: "Update downloaded! Restart to apply.",
+    UPDATE_DOWNLOADING: "Update is downloading...",
+    UPDATE_ERROR_FALLBACK: "Update failed.",
+    UPDATE_RESTART_BUTTON: "Restart Now",
+} as const;
 import { useBackendFocusSync } from "./hooks/useBackendFocusSync";
 import { useSelectedSite } from "./hooks/useSelectedSite";
 import logger from "./services/logger";
@@ -66,8 +80,8 @@ function App() {
     // Sites store
     const { sites } = useSitesStore();
 
-    // Settings store
-    useSettingsStore();
+    // Settings store - store is initialized via the initialization effect below
+    // Store subscription happens automatically when store is accessed
 
     // UI store
     const { setShowSettings, setShowSiteDetails, showSettings, showSiteDetails } = useUIStore();
@@ -78,7 +92,7 @@ function App() {
     const { isDark } = useTheme();
 
     // Delayed loading state to prevent flash for quick operations
-    const [showLoadingOverlay, setShowLoadingOverlay] = useState(false);
+    const [showLoadingOverlay, setShowLoadingOverlay] = useState<boolean>(false);
 
     /**
      * Only show loading overlay if loading takes more than 100ms
@@ -154,18 +168,41 @@ function App() {
 
     const selectedSite = useSelectedSite();
 
+    // Memoized handlers to prevent unnecessary re-renders
+    const handleUpdateAction = useCallback(() => {
+        if (updateStatus === "downloaded") {
+            applyUpdate();
+        } else {
+            setUpdateStatus("idle");
+            setUpdateError(undefined);
+        }
+    }, [updateStatus, applyUpdate, setUpdateStatus, setUpdateError]);
+
+    const handleCloseSettings = useCallback(() => {
+        setShowSettings(false);
+    }, [setShowSettings]);
+
+    const handleCloseSiteDetails = useCallback(() => {
+        setShowSiteDetails(false);
+    }, [setShowSiteDetails]);
+
     return (
         <ErrorBoundary>
             <ThemeProvider>
                 <div className={`app-container ${isDark ? "dark" : ""}`}>
                     {/* Global Loading Overlay */}
                     {showLoadingOverlay && (
-                        <div className="loading-overlay">
+                        <div
+                            aria-label="Loading application"
+                            aria-live="polite"
+                            className="loading-overlay"
+                            role="status"
+                        >
                             <ThemedBox padding="lg" rounded="lg" shadow="xl" surface="elevated">
                                 <div className="loading-content">
                                     <div className="loading-spinner" />
                                     <ThemedText size="base" weight="medium">
-                                        Loading...
+                                        {UI_MESSAGES.LOADING}
                                     </ThemedText>
                                 </div>
                             </ThemedBox>
@@ -174,7 +211,7 @@ function App() {
 
                     {/* Global Error Notification */}
                     {lastError && (
-                        <div className="fixed top-0 left-0 right-0 z-50">
+                        <div aria-live="assertive" className="fixed top-0 left-0 right-0 z-50" role="alert">
                             <ThemedBox className="error-alert" padding="md" surface="elevated">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center space-x-2">
@@ -189,7 +226,7 @@ function App() {
                                         size="sm"
                                         variant="secondary"
                                     >
-                                        ✕
+                                        {UI_MESSAGES.ERROR_CLOSE_BUTTON}
                                     </ThemedButton>
                                 </div>
                             </ThemedBox>
@@ -201,7 +238,11 @@ function App() {
                         updateStatus === "downloading" ||
                         updateStatus === "downloaded" ||
                         updateStatus === "error") && (
-                        <div className="fixed left-0 right-0 z-50 top-12">
+                        <div
+                            aria-live={updateStatus === "error" ? "assertive" : "polite"}
+                            className="fixed left-0 right-0 z-50 top-12"
+                            role={updateStatus === "error" ? "alert" : "status"}
+                        >
                             <ThemedBox
                                 className={`update-alert update-alert--${updateStatus}`}
                                 padding="md"
@@ -216,28 +257,23 @@ function App() {
                                             {updateStatus === "error" && "⚠️"}
                                         </div>
                                         <ThemedText size="sm" variant={updateStatus === "error" ? "error" : "primary"}>
-                                            {updateStatus === "available" &&
-                                                "A new update is available. Downloading..."}
-                                            {updateStatus === "downloading" && "Update is downloading..."}
-                                            {updateStatus === "downloaded" && "Update downloaded! Restart to apply."}
-                                            {updateStatus === "error" && (updateError ?? "Update failed.")}
+                                            {updateStatus === "available" && UI_MESSAGES.UPDATE_AVAILABLE}
+                                            {updateStatus === "downloading" && UI_MESSAGES.UPDATE_DOWNLOADING}
+                                            {updateStatus === "downloaded" && UI_MESSAGES.UPDATE_DOWNLOADED}
+                                            {updateStatus === "error" &&
+                                                (updateError ?? UI_MESSAGES.UPDATE_ERROR_FALLBACK)}
                                         </ThemedText>
                                     </div>
                                     {(updateStatus === "downloaded" || updateStatus === "error") && (
                                         <ThemedButton
                                             className="ml-4 update-alert__action"
-                                            onClick={() => {
-                                                if (updateStatus === "downloaded") {
-                                                    applyUpdate();
-                                                } else {
-                                                    setUpdateStatus("idle");
-                                                    setUpdateError(undefined);
-                                                }
-                                            }}
+                                            onClick={handleUpdateAction}
                                             size="sm"
                                             variant="secondary"
                                         >
-                                            {updateStatus === "downloaded" ? "Restart Now" : "Dismiss"}
+                                            {updateStatus === "downloaded"
+                                                ? UI_MESSAGES.UPDATE_RESTART_BUTTON
+                                                : UI_MESSAGES.UPDATE_DISMISS_BUTTON}
                                         </ThemedButton>
                                     )}
                                 </div>
@@ -254,7 +290,7 @@ function App() {
                                 <ThemedBox padding="md" rounded="lg" shadow="sm" surface="elevated">
                                     <ThemedBox border className="border-b" padding="md" surface="base">
                                         <ThemedText size="lg" weight="medium">
-                                            Monitored Sites ({sites.length})
+                                            {UI_MESSAGES.SITE_COUNT_LABEL} ({sites.length})
                                         </ThemedText>
                                     </ThemedBox>
                                     <div className="p-0">
@@ -267,7 +303,7 @@ function App() {
                             <div>
                                 <ThemedBox padding="lg" rounded="lg" shadow="sm" surface="elevated">
                                     <ThemedText className="mb-4" size="lg" weight="medium">
-                                        Add New Site
+                                        {UI_MESSAGES.ADD_SITE_LABEL}
                                     </ThemedText>
                                     <AddSiteForm />
                                 </ThemedBox>
@@ -276,11 +312,11 @@ function App() {
                     </main>
 
                     {/* Settings Modal */}
-                    {showSettings && <Settings onClose={() => setShowSettings(false)} />}
+                    {showSettings && <Settings onClose={handleCloseSettings} />}
 
                     {/* Site Details Modal */}
                     {showSiteDetails && selectedSite && (
-                        <SiteDetails onClose={() => setShowSiteDetails(false)} site={selectedSite} />
+                        <SiteDetails onClose={handleCloseSiteDetails} site={selectedSite} />
                     )}
                 </div>
             </ThemeProvider>

@@ -33,6 +33,14 @@ export const baseMonitorSchema = z.object({
     id: z.string().min(1, "Monitor ID is required"),
     lastChecked: z.date().optional(),
     monitoring: z.boolean(),
+    /**
+     * Response time in milliseconds.
+     *
+     * @remarks
+     * Uses -1 as a sentinel value to indicate "never checked" state.
+     * Positive values represent actual response times in milliseconds.
+     * This sentinel pattern provides a clear API contract for consumers.
+     */
     responseTime: z.number().min(-1), // -1 is sentinel for "never checked"
     retryAttempts: z
         .number()
@@ -125,6 +133,23 @@ export interface ValidationResult {
 
 /**
  * Validate monitor data using shared Zod schemas.
+ *
+ * @param type - Monitor type string ("http" or "port")
+ * @param data - Monitor data to validate
+ * @returns Validation result with success status, data, errors, and warnings
+ *
+ * @example
+ * ```typescript
+ * const result = validateMonitorData("http", {
+ *   url: "https://example.com",
+ *   timeout: 5000
+ * });
+ * if (result.success) {
+ *   console.log("Valid monitor:", result.data);
+ * } else {
+ *   console.error("Validation errors:", result.errors);
+ * }
+ * ```
  */
 export function validateMonitorData(type: string, data: unknown): ValidationResult {
     try {
@@ -157,8 +182,14 @@ export function validateMonitorData(type: string, data: unknown): ValidationResu
             const warnings: string[] = [];
 
             for (const issue of error.issues) {
-                // Consider optional fields with format issues as warnings rather than errors
-                if (issue.code === "invalid_type" && issue.message.includes("optional")) {
+                // Use Zod's structured error codes for robust warning detection
+                const isOptionalField =
+                    issue.code === "invalid_type" &&
+                    "received" in issue &&
+                    issue.received === "undefined" &&
+                    issue.path.length > 0;
+
+                if (isOptionalField) {
                     warnings.push(`${issue.path.join(".")}: ${issue.message}`);
                 } else {
                     errors.push(`${issue.path.join(".")}: ${issue.message}`);
@@ -184,6 +215,15 @@ export function validateMonitorData(type: string, data: unknown): ValidationResu
 
 /**
  * Validate a specific field of a monitor.
+ *
+ * @param type - Monitor type string ("http" or "port")
+ * @param fieldName - Name of the field to validate
+ * @param value - Field value to validate
+ * @returns Validation result with success status and field-specific errors
+ *
+ * @remarks
+ * Validates individual monitor fields using the appropriate schema.
+ * Useful for real-time validation during form input.
  */
 export function validateMonitorField(type: string, fieldName: string, value: unknown): ValidationResult {
     try {
@@ -231,6 +271,13 @@ export function validateMonitorField(type: string, fieldName: string, value: unk
 
 /**
  * Validate site data using shared Zod schema.
+ *
+ * @param data - Site data to validate
+ * @returns Validation result with success status, data, and errors
+ *
+ * @remarks
+ * Validates complete site structure including all monitors.
+ * Ensures data integrity for site operations.
  */
 export function validateSiteData(data: unknown): ValidationResult {
     try {
@@ -268,18 +315,37 @@ export function validateSiteData(data: unknown): ValidationResult {
 
 /**
  * Get the appropriate schema for a monitor type.
+ *
+ * @param type - Monitor type string to get schema for
+ * @returns Monitor schema for the type, or undefined if type is unknown
+ *
+ * @remarks
+ * Returns undefined instead of null for consistency with TypeScript best practices.
+ * Supports "http" and "port" monitor types.
  */
-function getMonitorSchema(type: string) {
+function getMonitorSchema(type: string): typeof httpMonitorSchema | typeof portMonitorSchema | undefined {
     if (type === "http") {
         return httpMonitorSchema;
     } else if (type === "port") {
         return portMonitorSchema;
     }
-    return null;
+    return undefined;
 }
 
 /**
  * Validate a specific field using the appropriate schema.
+ *
+ * @param type - Monitor type string
+ * @param fieldName - Name of the field to validate
+ * @param value - Field value to validate
+ * @returns Validated field data
+ *
+ * @throws Error For unknown field names
+ * @throws z.ZodError For validation failures
+ *
+ * @remarks
+ * Internal helper function that creates a test object and validates
+ * the specific field using the appropriate monitor schema.
  */
 function validateFieldWithSchema(type: string, fieldName: string, value: unknown) {
     const testData = {

@@ -83,7 +83,7 @@
         "src/App.tsx",
         "global.d.ts",
         "vite/client",
-        "src/index.css",
+        "src/index.css", "shared/events.ts",
     ],
     "exclude": [
         "node_modules",

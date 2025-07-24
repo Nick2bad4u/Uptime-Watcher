@@ -8,6 +8,7 @@ import { dbLogger } from "./logger";
 /**
  * Database-specific retry wrapper with optimized settings for database operations.
  *
+ * @typeParam T - The return type of the database operation
  * @param operation - Database operation to retry
  * @param operationName - Name of the operation for logging
  * @param maxRetries - Maximum number of retry attempts (default: 5)
@@ -24,6 +25,7 @@ export async function withDbRetry<T>(operation: () => Promise<T>, operationName:
 /**
  * Generic retry utility with configurable parameters
  *
+ * @typeParam T - The return type of the async operation
  * @param operation - The async operation to retry
  * @param options - Retry configuration options
  * @returns Promise that resolves with the operation result

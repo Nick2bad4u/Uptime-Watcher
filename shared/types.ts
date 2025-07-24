@@ -20,8 +20,16 @@ export type MonitorType = (typeof BASE_MONITOR_TYPES)[number];
 
 export type SiteStatus = "mixed" | "unknown" | MonitorStatus;
 
+// Monitor status constants to avoid hardcoded strings
+export const MONITOR_STATUS = {
+    DOWN: "down" as const,
+    PAUSED: "paused" as const,
+    PENDING: "pending" as const,
+    UP: "up" as const,
+} satisfies Record<string, MonitorStatus>;
+
 // Default status constants
-export const DEFAULT_MONITOR_STATUS: MonitorStatus = "pending";
+export const DEFAULT_MONITOR_STATUS: MonitorStatus = MONITOR_STATUS.PENDING;
 export const DEFAULT_SITE_STATUS: SiteStatus = "unknown";
 
 export interface Monitor {

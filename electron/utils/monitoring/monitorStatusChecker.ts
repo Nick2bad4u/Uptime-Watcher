@@ -44,7 +44,7 @@ import { MonitorRepository } from "../../services/database/MonitorRepository";
 import { SiteRepository } from "../../services/database/SiteRepository";
 import { MonitorFactory } from "../../services/monitoring/MonitorFactory";
 import { SiteService } from "../../services/site/SiteService";
-import { Site, StatusHistory, StatusUpdate } from "../../types";
+import { Monitor, Site, StatusHistory, StatusUpdate } from "../../types";
 import { StandardizedCache } from "../cache/StandardizedCache";
 import { withDatabaseOperation } from "../operationalHooks";
 
@@ -156,10 +156,13 @@ export async function checkMonitor(
     // For manual checks, preserve the paused state but still record history
     const newStatus = isManualCheck && monitor.status === "paused" ? "paused" : checkResult.status;
 
-    // Update monitor with results (preserve paused status for manual checks)
-    monitor.status = newStatus;
-    monitor.responseTime = checkResult.responseTime;
-    monitor.lastChecked = now;
+    // Prepare update data for database transaction (no direct mutations)
+    const updateData: Partial<Monitor> = {
+        lastChecked: now, // Keep as Date object for type compatibility
+        responseTime: checkResult.responseTime,
+        status: newStatus,
+    };
+
     // Add to history (record the actual check result, not the preserved status)
     const historyEntry: StatusHistory = {
         responseTime: checkResult.responseTime,
@@ -194,16 +197,6 @@ export async function checkMonitor(
                     }
 
                     // Update monitor with new status using internal method (we're already in a transaction)
-                    const updateData: Record<string, unknown> = {
-                        responseTime: monitor.responseTime,
-                        status: monitor.status, // This preserves paused status for manual checks
-                    };
-                    // We just set lastChecked to 'now', so it's definitely defined
-                    if (monitor.lastChecked !== undefined) {
-                        // Convert Date object to timestamp for database storage
-                        updateData.lastChecked =
-                            monitor.lastChecked instanceof Date ? monitor.lastChecked.getTime() : monitor.lastChecked;
-                    }
                     config.repositories.monitor.updateInternal(db, monitor.id, updateData);
                     return Promise.resolve();
                 });
@@ -214,9 +207,9 @@ export async function checkMonitor(
         );
 
         const manualCheckInfo =
-            isManualCheck && monitor.status === "paused" ? ` (manual check result: ${checkResult.status})` : "";
+            isManualCheck && updateData.status === "paused" ? ` (manual check result: ${checkResult.status})` : "";
         config.logger.info(
-            `[checkMonitor] Database operations completed: monitor_id=${monitor.id}, status=${monitor.status}${manualCheckInfo}, responseTime=${historyEntry.responseTime}, timestamp=${historyEntry.timestamp}, details=${checkResult.details ?? "undefined"}`
+            `[checkMonitor] Database operations completed: monitor_id=${monitor.id}, status=${updateData.status}${manualCheckInfo}, responseTime=${historyEntry.responseTime}, timestamp=${historyEntry.timestamp}, details=${checkResult.details ?? "undefined"}`
         );
     } catch (error) {
         config.logger.error(`[checkMonitor] Failed to complete database operations: monitor_id=${monitor.id}`, error);
@@ -245,8 +238,14 @@ export async function checkMonitor(
     };
 
     // Emit typed monitor status changed event
+    const freshMonitor = freshSiteData.monitors.find((m) => m.id === monitor.id);
+    if (!freshMonitor) {
+        config.logger.error(`[checkMonitor] Fresh monitor data not found for ${monitor.id}`);
+        return undefined;
+    }
+
     await config.eventEmitter.emitTyped("monitor:status-changed", {
-        monitor: freshSiteData.monitors.find((m) => m.id === monitor.id) ?? monitor,
+        monitor: freshMonitor,
         newStatus: checkResult.status,
         previousStatus,
         responseTime: checkResult.responseTime,
@@ -266,14 +265,14 @@ export async function checkMonitor(
 
     if (shouldEmitDownEvent) {
         await config.eventEmitter.emitTyped("monitor:down", {
-            monitor: { ...monitor },
+            monitor: freshMonitor,
             site: freshSiteData,
             siteId: site.identifier,
             timestamp: Date.now(),
         });
     } else if (shouldEmitUpEvent) {
         await config.eventEmitter.emitTyped("monitor:up", {
-            monitor: { ...monitor },
+            monitor: freshMonitor,
             site: freshSiteData,
             siteId: site.identifier,
             timestamp: Date.now(),
@@ -289,7 +288,29 @@ export async function checkMonitor(
  * @param config - Configuration object with required dependencies
  * @param identifier - Site identifier
  * @param monitorId - Optional monitor ID, uses first monitor if not provided
- * @returns Promise\<StatusUpdate | undefined\> - Status update result or undefined if error
+ * @returns Promise resolving to StatusUpdate or undefined if error occurs
+ *
+ * @remarks
+ * Performs a manual health check on the specified monitor or the first monitor
+ * if no specific monitor ID is provided. Manual checks preserve the "paused" status
+ * for monitors that are intentionally stopped, while still recording the actual
+ * check result in history for diagnostic purposes.
+ *
+ * This function follows the same error handling pattern as checkMonitor,
+ * returning undefined for errors rather than throwing, to provide consistent
+ * error handling behavior across the module.
+ *
+ * @example
+ * ```typescript
+ * // Check specific monitor manually
+ * const result = await checkSiteManually(config, "site-1", "monitor-123");
+ * if (result) {
+ *   console.log(`Manual check result: ${result.status}`);
+ * }
+ *
+ * // Check first monitor if no ID specified
+ * const result = await checkSiteManually(config, "site-1");
+ * ```
  */
 export async function checkSiteManually(
     config: MonitorCheckConfig,
@@ -298,7 +319,8 @@ export async function checkSiteManually(
 ): Promise<StatusUpdate | undefined> {
     const site = config.sites.get(identifier);
     if (!site) {
-        throw new Error(`Site not found: ${identifier}`);
+        config.logger.error(`[checkSiteManually] Site not found: ${identifier}`);
+        return undefined;
     }
 
     // If no monitorId provided, use the first monitor's ID
@@ -307,15 +329,22 @@ export async function checkSiteManually(
         (() => {
             const firstMonitor = site.monitors[0];
             if (!firstMonitor?.id) {
-                throw new Error(`No monitors found for site ${identifier}`);
+                config.logger.error(`[checkSiteManually] No monitors found for site ${identifier}`);
+                return;
             }
             return String(firstMonitor.id);
         })();
 
+    // Early return if no valid monitor ID found
+    if (!targetMonitorId) {
+        return undefined;
+    }
+
     // Validate the monitor exists
     const monitor = site.monitors.find((m) => String(m.id) === String(targetMonitorId));
     if (!monitor) {
-        throw new Error(`Monitor with ID ${targetMonitorId} not found for site ${identifier}`);
+        config.logger.error(`[checkSiteManually] Monitor with ID ${targetMonitorId} not found for site ${identifier}`);
+        return undefined;
     }
 
     const result = await checkMonitor(config, site, targetMonitorId, true); // Mark as manual check

@@ -18,6 +18,8 @@ import { isDevelopment } from "../shared/utils/environment";
  * This function extends `isDevelopment()` by also checking that the Electron app is not packaged.
  * Use this to distinguish between development and production builds in Electron-specific code.
  *
+ * @returns `true` if running in Electron development mode (unpackaged and NODE_ENV=development), `false` otherwise
+ *
  * @example
  * ```typescript
  * if (isDev()) {
@@ -29,10 +31,8 @@ import { isDevelopment } from "../shared/utils/environment";
  * }
  * ```
  *
- * @returns `true` if running in Electron development mode (unpackaged and NODE_ENV=development), `false` otherwise
  * @public
  */
 export function isDev(): boolean {
-    // Returns true only if both isDevelopment() and Electron is not packaged
     return isDevelopment() && !app.isPackaged;
 }

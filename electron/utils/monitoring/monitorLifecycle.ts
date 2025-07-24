@@ -5,6 +5,7 @@
 
 import type { Logger } from "../interfaces";
 
+import { MONITOR_STATUS } from "../../../shared/types";
 import { UptimeEvents } from "../../events/eventTypes";
 import { TypedEventBus } from "../../events/TypedEventBus";
 import { DatabaseService } from "../../services/database/DatabaseService";
@@ -53,6 +54,16 @@ export interface MonitoringLifecycleConfig {
  * @param config - Configuration object with required dependencies
  * @param isMonitoring - Current monitoring state
  * @returns Promise<boolean> - New monitoring state
+ *
+ * @remarks
+ * **Side Effects:**
+ * - Sets all monitors to "pending" status regardless of previous state
+ * - Enables monitoring flag for all monitors
+ * - Starts monitor scheduling for all sites
+ *
+ * This intentionally sets all monitors to "pending" to indicate they are being
+ * initialized for monitoring startup, providing a clear signal that the system
+ * is transitioning to an active monitoring state.
  */
 export async function startAllMonitoring(config: MonitoringLifecycleConfig, isMonitoring: boolean): Promise<boolean> {
     if (isMonitoring) {
@@ -76,7 +87,7 @@ export async function startAllMonitoring(config: MonitoringLifecycleConfig, isMo
                             if (monitor.id) {
                                 config.monitorRepository.updateInternal(db, monitor.id, {
                                     monitoring: true,
-                                    status: "pending",
+                                    status: MONITOR_STATUS.PENDING,
                                 });
                             }
                             return Promise.resolve();
@@ -86,14 +97,17 @@ export async function startAllMonitoring(config: MonitoringLifecycleConfig, isMo
                         { monitorId: monitor.id }
                     );
                 } catch (error) {
-                    config.logger.error(`Failed to update monitor ${monitor.id} to pending status`, error);
+                    config.logger.error(
+                        `Failed to update monitor ${monitor.id} to ${MONITOR_STATUS.PENDING} status`,
+                        error
+                    );
                 }
             }
         }
         config.monitorScheduler.startSite(site);
     }
 
-    config.logger.info("Started all monitoring operations and set monitors to pending");
+    config.logger.info(`Started all monitoring operations and set monitors to ${MONITOR_STATUS.PENDING}`);
     return true;
 }
 
@@ -128,6 +142,16 @@ export async function startMonitoringForSite(
  *
  * @param config - Configuration object with required dependencies
  * @returns boolean - New monitoring state (always false)
+ *
+ * @remarks
+ * **Side Effects:**
+ * - Sets all monitors to "paused" status regardless of previous state
+ * - Disables monitoring flag for all actively monitoring monitors
+ * - Stops all monitor scheduling system-wide
+ *
+ * This intentionally sets all monitors to "paused" to indicate that monitoring
+ * has been stopped system-wide, providing a clear signal that the system is
+ * transitioning to an inactive monitoring state.
  */
 export async function stopAllMonitoring(config: MonitoringLifecycleConfig): Promise<boolean> {
     config.monitorScheduler.stopAll();
@@ -146,7 +170,7 @@ export async function stopAllMonitoring(config: MonitoringLifecycleConfig): Prom
                             if (monitor.id) {
                                 config.monitorRepository.updateInternal(db, monitor.id, {
                                     monitoring: false,
-                                    status: "paused",
+                                    status: MONITOR_STATUS.PAUSED,
                                 });
                             }
                             return Promise.resolve();
@@ -156,13 +180,16 @@ export async function stopAllMonitoring(config: MonitoringLifecycleConfig): Prom
                         { monitorId: monitor.id }
                     );
                 } catch (error) {
-                    config.logger.error(`Failed to update monitor ${monitor.id} to paused status`, error);
+                    config.logger.error(
+                        `Failed to update monitor ${monitor.id} to ${MONITOR_STATUS.PAUSED} status`,
+                        error
+                    );
                 }
             }
         }
     }
 
-    config.logger.info("Stopped all site monitoring intervals and set monitors to paused");
+    config.logger.info(`Stopped all site monitoring intervals and set monitors to ${MONITOR_STATUS.PAUSED}`);
     return false;
 }
 
@@ -306,7 +333,7 @@ async function startSpecificMonitor(
                 const db = config.databaseService.getDatabase();
                 config.monitorRepository.updateInternal(db, monitorId, {
                     monitoring: true,
-                    status: "pending",
+                    status: MONITOR_STATUS.PENDING,
                 });
                 return Promise.resolve();
             },
@@ -316,7 +343,9 @@ async function startSpecificMonitor(
         );
         const started = config.monitorScheduler.startMonitor(identifier, monitor);
         if (started) {
-            config.logger.debug(`Started monitoring for ${identifier}:${monitorId} - status set to pending`);
+            config.logger.debug(
+                `Started monitoring for ${identifier}:${monitorId} - status set to ${MONITOR_STATUS.PENDING}`
+            );
         }
         return started;
     } catch (error) {
@@ -358,7 +387,7 @@ async function stopSpecificMonitor(
                 const db = config.databaseService.getDatabase();
                 config.monitorRepository.updateInternal(db, monitorId, {
                     monitoring: false,
-                    status: "paused",
+                    status: MONITOR_STATUS.PAUSED,
                 });
                 return Promise.resolve();
             },
@@ -368,7 +397,9 @@ async function stopSpecificMonitor(
         );
         const stopped = config.monitorScheduler.stopMonitor(identifier, monitorId);
         if (stopped) {
-            config.logger.debug(`Stopped monitoring for ${identifier}:${monitorId} - status set to paused`);
+            config.logger.debug(
+                `Stopped monitoring for ${identifier}:${monitorId} - status set to ${MONITOR_STATUS.PAUSED}`
+            );
         }
         return stopped;
     } catch (error) {
@@ -384,6 +415,12 @@ async function stopSpecificMonitor(
  * @param identifier - Site identifier for logging
  * @param config - Configuration object for logging
  * @returns True if interval is valid, false otherwise
+ *
+ * @remarks
+ * Checks for falsy values that indicate no valid interval is set.
+ * This includes undefined, null, 0 (invalid - would cause infinite polling),
+ * and empty string. A checkInterval of 0 is intentionally treated as invalid
+ * since it would result in continuous polling without delay.
  */
 function validateCheckInterval(
     monitor: Site["monitors"][0],
@@ -392,8 +429,9 @@ function validateCheckInterval(
 ): boolean {
     // Check for falsy values that indicate no interval set
     // This includes undefined, null, 0, and empty string
+    // Note: 0 is intentionally invalid as it would cause infinite polling
     if (!monitor.checkInterval) {
-        config.logger.warn(`Monitor ${identifier}:${monitor.id} has no check interval set`);
+        config.logger.warn(`Monitor ${identifier}:${monitor.id} has no valid check interval set`);
         return false;
     }
     return true;

@@ -10,6 +10,12 @@
  * Get the current environment name safely.
  *
  * @returns Environment name or 'unknown' if not set
+ *
+ * @remarks
+ * Returns 'unknown' as fallback to indicate unspecified environment state.
+ * This is intentionally different from getNodeEnv() which assumes 'development'
+ * for safety in development workflows. Use this when you need to detect
+ * unspecified environments, use getNodeEnv() when you need development defaults.
  */
 export function getEnvironment(): string {
     // eslint-disable-next-line n/no-process-env -- Environment utility needs process.env access
@@ -21,6 +27,12 @@ export function getEnvironment(): string {
  * Safe alternative to direct process.env.NODE_ENV access.
  *
  * @returns The NODE_ENV value or 'development' as fallback
+ *
+ * @remarks
+ * Returns 'development' as fallback for safer development workflows and testing.
+ * This assumes development mode when environment is unspecified, which is
+ * appropriate for development tools and debugging features. Use getEnvironment()
+ * if you need to detect truly unspecified environments.
  *
  * @example
  * ```typescript
@@ -37,6 +49,13 @@ export function getNodeEnv(): string {
  * Check if running in browser environment.
  *
  * @returns True if in browser environment
+ *
+ * @remarks
+ * Detects browser environment by checking for `window` and `document` objects.
+ * This covers most browser contexts but may not detect some browser-like
+ * environments such as web workers, service workers, or server-side rendering
+ * contexts. For more specific environment detection, use additional checks
+ * tailored to your use case.
  */
 export function isBrowserEnvironment(): boolean {
     return typeof window !== "undefined" && typeof document !== "undefined";
@@ -47,6 +66,11 @@ export function isBrowserEnvironment(): boolean {
  * Safe alternative to direct process.env.NODE_ENV access.
  *
  * @returns True if in development mode
+ *
+ * @remarks
+ * Uses strict equality check against 'development' string. Only recognizes
+ * the standard NODE_ENV value 'development' - variants like 'dev' are not
+ * supported. This ensures consistent behavior across the application.
  *
  * @example
  * ```typescript

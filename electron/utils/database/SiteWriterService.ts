@@ -25,6 +25,7 @@ import { Database } from "node-sqlite3-wasm";
 import { DatabaseService } from "../../services/database/DatabaseService";
 import { MonitorRepository } from "../../services/database/MonitorRepository";
 import { SiteRepository } from "../../services/database/SiteRepository";
+import { rowsToMonitors } from "../../services/database/utils/monitorMapper";
 import { Monitor, Site } from "../../types";
 import { StandardizedCache } from "../cache/StandardizedCache";
 import { withDatabaseOperation } from "../operationalHooks";
@@ -51,6 +52,45 @@ export class SiteWriterService {
     /**
      * Create a new site in the database with its monitors.
      * Pure data operation without side effects.
+     *
+     * @param siteData - Site configuration including monitors to create
+     * @returns Promise resolving to the created site with assigned monitor IDs
+     *
+     * @throws DatabaseError When database operations fail
+     * @throws TransactionError When transaction rollback occurs
+     *
+     * @remarks
+     * This method performs atomic multi-step operations:
+     * 1. Creates the site record in the database
+     * 2. Removes any existing monitors for this site (cleanup)
+     * 3. Creates new monitors and assigns generated IDs
+     *
+     * All operations are wrapped in a transaction to ensure data consistency.
+     * Monitor IDs are assigned during creation and updated in the returned object.
+     *
+     * @example
+     * ```typescript
+     * const newSite = await siteWriter.createSite({
+     *   identifier: 'my-site',
+     *   name: 'My Website',
+     *   monitoring: false,
+     *   monitors: [
+     *     {
+     *       id: '', // Will be assigned during creation
+     *       type: 'http',
+     *       url: 'https://example.com',
+     *       checkInterval: 30000,
+     *       timeout: 5000,
+     *       retryAttempts: 3,
+     *       monitoring: false,
+     *       status: 'pending',
+     *       responseTime: 0,
+     *       history: []
+     *     }
+     *   ]
+     * });
+     * console.log(newSite.monitors[0].id); // Generated ID like 'mon_123'
+     * ```
      */
     async createSite(siteData: Site): Promise<Site> {
         return withDatabaseOperation(
@@ -92,6 +132,33 @@ export class SiteWriterService {
     /**
      * Delete a site and all its monitors from the database.
      * Pure data operation without side effects.
+     *
+     * @param sitesCache - Cache containing sites to update after deletion
+     * @param identifier - Site identifier to delete
+     * @returns Promise resolving to true if site was found and deleted, false if not found
+     *
+     * @throws DatabaseError When database operations fail
+     * @throws TransactionError When transaction rollback occurs
+     *
+     * @remarks
+     * This method performs atomic multi-table deletion:
+     * 1. Removes the site from the cache
+     * 2. Deletes all associated monitors from the database
+     * 3. Deletes the site record from the database
+     *
+     * All database operations are wrapped in a transaction to ensure consistency.
+     * If the site is not found in the cache, it will still attempt database cleanup
+     * to handle cases where cache and database are out of sync.
+     *
+     * @example
+     * ```typescript
+     * const deleted = await siteWriter.deleteSite(sitesCache, 'my-site-id');
+     * if (deleted) {
+     *   console.log('Site deleted successfully');
+     * } else {
+     *   console.log('Site not found');
+     * }
+     * ```
      */
     async deleteSite(sitesCache: StandardizedCache<Site>, identifier: string): Promise<boolean> {
         return withDatabaseOperation(
@@ -204,6 +271,50 @@ export class SiteWriterService {
     /**
      * Update a site with new values.
      * Pure data operation without side effects.
+     *
+     * @param sitesCache - Cache containing sites to update
+     * @param identifier - Site identifier to update
+     * @param updates - Partial site data with fields to update
+     * @returns Promise resolving to the updated site object
+     *
+     * @throws SiteNotFoundError When the site is not found in cache
+     * @throws DatabaseError When database operations fail
+     * @throws TransactionError When transaction rollback occurs
+     *
+     * @remarks
+     * This method performs atomic updates while preserving monitor history:
+     * 1. Validates the site exists in the cache
+     * 2. Merges updates with existing site data
+     * 3. Persists changes to the database within a transaction
+     * 4. Updates or creates monitors while preserving their IDs and history
+     *
+     * When monitors are updated, existing monitors are preserved and updated
+     * rather than being deleted and recreated. This maintains monitor history
+     * and prevents ID changes that could break external references.
+     *
+     * @example
+     * ```typescript
+     * const updatedSite = await siteWriter.updateSite(sitesCache, 'my-site', {
+     *   name: 'Updated Site Name',
+     *   monitoring: true,
+     *   monitors: [
+     *     {
+     *       id: 'existing-monitor-id', // Existing monitor - will be updated
+     *       type: 'http',
+     *       url: 'https://updated-url.com',
+     *       checkInterval: 60000,
+     *       // ... other fields
+     *     },
+     *     {
+     *       id: '', // New monitor - will get new ID
+     *       type: 'port',
+     *       host: 'example.com',
+     *       port: 443,
+     *       // ... other fields
+     *     }
+     *   ]
+     * });
+     * ```
      */
     async updateSite(sitesCache: StandardizedCache<Site>, identifier: string, updates: Partial<Site>): Promise<Site> {
         return withDatabaseOperation(
@@ -215,14 +326,16 @@ export class SiteWriterService {
                 const updatedSite = this.createUpdatedSite(sitesCache, site, updates);
 
                 // Use executeTransaction for atomic multi-step operation
-                await this.databaseService.executeTransaction(async (db) => {
+                await this.databaseService.executeTransaction((db) => {
                     // Persist to database using internal method
                     this.repositories.site.upsertInternal(db, updatedSite);
 
                     // Update monitors if provided - UPDATE existing monitors instead of recreating
                     if (updates.monitors) {
-                        await this.updateMonitorsPreservingHistory(db, identifier, updates.monitors);
+                        this.updateMonitorsPreservingHistory(db, identifier, updates.monitors);
                     }
+
+                    return Promise.resolve();
                 });
 
                 this.logger.info(`Site updated successfully: ${identifier}`);
@@ -400,13 +513,27 @@ export class SiteWriterService {
     /**
      * Update monitors preserving their history and IDs.
      * This method updates existing monitors and creates new ones as needed.
+     *
+     * @param db - Database transaction instance to ensure transactional consistency
+     * @param siteIdentifier - The site identifier to update monitors for
+     * @param newMonitors - Array of new monitor configurations
+     * @returns Promise that resolves when all monitor updates are complete
+     *
+     * @remarks
+     * This method operates within a transaction context and uses the provided
+     * database instance to maintain transactional consistency. All database
+     * operations must use the same transaction instance.
      */
-    private async updateMonitorsPreservingHistory(
-        db: Database,
-        siteIdentifier: string,
-        newMonitors: Site["monitors"]
-    ): Promise<void> {
-        const existingMonitors = await this.repositories.monitor.findBySiteIdentifier(siteIdentifier);
+    private updateMonitorsPreservingHistory(db: Database, siteIdentifier: string, newMonitors: Site["monitors"]): void {
+        // Fetch existing monitors using the transaction database instance
+        // This ensures consistent reads within the transaction boundary
+        const monitorRows = db.all("SELECT * FROM monitors WHERE site_identifier = ?", [siteIdentifier]) as Record<
+            string,
+            unknown
+        >[];
+
+        // Convert rows to monitor objects using the imported mapper
+        const existingMonitors = rowsToMonitors(monitorRows);
 
         // Process each monitor: update existing or create new
         this.processMonitorUpdates(db, siteIdentifier, newMonitors, existingMonitors);

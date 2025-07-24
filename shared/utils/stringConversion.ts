@@ -33,7 +33,7 @@ import { safeJsonStringifyWithFallback } from "./jsonSafety";
  * safeStringify(() => {}) // "[Function]"
  * safeStringify(Symbol("test")) // "Symbol(test)"
  * const circular = {}; circular.self = circular;
- * safeStringify(circular) // "[Object]" (for circular references)
+ * safeStringify(circular) // "[Complex Object]" (for circular references)
  * ```
  */
 export function safeStringify(value: unknown): string {

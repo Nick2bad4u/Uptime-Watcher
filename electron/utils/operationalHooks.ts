@@ -73,7 +73,21 @@ export interface OperationalHooksConfig<T = unknown> {
 }
 
 /**
- * Specialized wrapper for database operations with common patterns.
+ * Specialized wrapper for database operations with database-specific defaults.
+ *
+ * @remarks
+ * This function is a convenience wrapper around withOperationalHooks that applies
+ * database-optimized settings and adds a "database:" prefix to operation names for
+ * consistent event naming. While the underlying implementation is generic, this
+ * wrapper should only be used for actual database operations to maintain clear
+ * semantic boundaries and event categorization.
+ *
+ * @typeParam T - The return type of the database operation
+ * @param operation - Database operation to execute with retry logic
+ * @param operationName - Name of the database operation (will be prefixed with "database:")
+ * @param eventEmitter - Optional event emitter for operation lifecycle events
+ * @param context - Optional context data to include in events
+ * @returns Promise resolving to the operation result
  */
 export async function withDatabaseOperation<T>(
     operation: () => Promise<T>,
@@ -99,7 +113,16 @@ export async function withOperationalHooks<T>(
     operation: () => Promise<T>,
     config: OperationalHooksConfig<T>
 ): Promise<T> {
-    const { context = {}, emitEvents = true, eventEmitter, maxRetries = 3, operationName } = config;
+    const {
+        backoff = "exponential",
+        context = {},
+        emitEvents = true,
+        eventEmitter,
+        initialDelay = 100,
+        maxRetries = 3,
+        operationName,
+        throwOnFailure = true,
+    } = config;
 
     const operationId = generateOperationId();
     const startTime = Date.now();
@@ -136,11 +159,11 @@ export async function withOperationalHooks<T>(
 
             // If this was the last attempt, handle failure
             if (attempt === maxRetries) {
-                return handleFailure(lastError, config, operationName, startTime, attempt, operationId);
+                return handleFailure(lastError, config, operationName, startTime, attempt, operationId, throwOnFailure);
             }
 
             // Handle retry
-            await handleRetry(lastError, config, operationName, attempt, operationId);
+            await handleRetry(lastError, config, operationName, attempt, operationId, backoff, initialDelay);
         }
     }
 
@@ -170,7 +193,7 @@ async function emitStartEvent(
     try {
         await eventEmitter.emitTyped("database:transaction-completed", {
             duration: 0,
-            operation: `${operationName}:start`,
+            operation: `${operationName}:started`,
             success: true,
             timestamp: startTime,
             ...context,
@@ -185,9 +208,17 @@ async function emitStartEvent(
 
 /**
  * Generate a unique operation ID for tracking.
+ * Uses crypto.randomUUID() when available, falls back to timestamp-based ID.
  */
 function generateOperationId(): string {
-    return `op_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
+    try {
+        // Prefer crypto.randomUUID() for better uniqueness
+        return `op_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
+    } catch (error) {
+        // Fallback for environments where crypto.randomUUID() is not available
+        logger.debug("[OperationalHooks] crypto.randomUUID() not available, using fallback", error);
+        return `op_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+    }
 }
 
 /**
@@ -199,9 +230,10 @@ async function handleFailure<T>(
     operationName: string,
     startTime: number,
     attempt: number,
-    operationId: string
+    operationId: string,
+    throwOnFailure: boolean = true
 ): Promise<T> {
-    const { context = {}, emitEvents, eventEmitter, onFailure, throwOnFailure = true } = config;
+    const { context = {}, emitEvents, eventEmitter, onFailure } = config;
     const duration = Date.now() - startTime;
 
     if (onFailure) {
@@ -220,7 +252,7 @@ async function handleFailure<T>(
         try {
             await eventEmitter.emitTyped("database:transaction-completed", {
                 duration,
-                operation: operationName,
+                operation: `${operationName}:failed`,
                 success: false,
                 timestamp: Date.now(),
                 ...context,
@@ -257,9 +289,11 @@ async function handleRetry<T>(
     config: OperationalHooksConfig<T>,
     operationName: string,
     attempt: number,
-    operationId: string
+    operationId: string,
+    backoff: "exponential" | "linear" = "exponential",
+    initialDelay: number = 100
 ): Promise<void> {
-    const { backoff = "exponential", initialDelay = 100, onRetry } = config;
+    const { onRetry } = config;
 
     if (onRetry) {
         try {
@@ -315,7 +349,7 @@ async function handleSuccess<T>(
         try {
             await eventEmitter.emitTyped("database:transaction-completed", {
                 duration,
-                operation: operationName,
+                operation: `${operationName}:completed`,
                 success: true,
                 timestamp: Date.now(),
                 ...(typeof result === "number" && { recordsAffected: result }),
