@@ -10,8 +10,10 @@ import { Monitor } from "../../../../types";
 
 /**
  * Props for the MonitorSelector component.
+ *
+ * @public
  */
-interface MonitorSelectorProperties {
+export interface MonitorSelectorProperties {
     /** Optional CSS classes for custom styling */
     className?: string;
     /** Array of available monitors to choose from */

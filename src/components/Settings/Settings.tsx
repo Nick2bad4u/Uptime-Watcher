@@ -25,8 +25,12 @@ import { ThemeName } from "../../theme/types";
 import { useTheme } from "../../theme/useTheme";
 import { ensureError } from "../../utils/errorHandling";
 
-/** Props for the Settings component */
-interface SettingsProperties {
+/**
+ * Props for the Settings component
+ *
+ * @public
+ */
+export interface SettingsProperties {
     /** Callback function to close the settings modal/view */
     onClose: () => void;
 }

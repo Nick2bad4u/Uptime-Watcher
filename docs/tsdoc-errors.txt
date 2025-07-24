@@ -1,0 +1,108 @@
+PS C:\Users\Nick\Dropbox\PC (2)\Documents\GitHub\Uptime-Watcher> npm run docs:typedoc    
+
+> uptime-watcher@8.2.0 docs:typedoc
+> typedoc --options typedoc.json && typedoc --options typedoc.electron.json && node scripts/fix-mdx-typedoc.js
+
+[info] Loaded plugin typedoc-plugin-markdown
+[info] Loaded plugin typedoc-docusaurus-theme
+[warning] The entry point ./src/index.css is not referenced by the 'files' or 'include' option in your tsconfig
+[warning] The entry point ./src/theme/components.css is not referenced by the 'files' or 'include' option in your tsconfig
+[warning] The entry point ./src/components/Header/Header.css is not referenced by the 'files' or 'include' option in your tsconfig
+[warning] The entry point ./src/components/SiteDetails/SiteDetails.css is not referenced by the 'files' or 'include' option in your tsconfig
+[warning] The signature src/components/AddSiteForm/Submit.handleSubmit has an @param with name "e", which was not used
+[warning] The signature src/components/AddSiteForm/Submit.handleSubmit has an @param with name "props", which was not used
+[warning] The signature src/stores/sites/utils/fileDownload.handleSQLiteBackupDownload has an @param with name "downloadFn", which was not used
+[warning] HistoryChartProperties, defined in uptime-watcher/src/components/common/HistoryChart.tsx, is referenced by src/components/common/HistoryChart.HistoryChart but not included in the documentation
+[warning] StatusBadgeProperties, defined in uptime-watcher/src/components/common/StatusBadge.tsx, is referenced by src/components/common/StatusBadge.StatusBadge but not included in the documentation
+[warning] SiteCardProperties, defined in uptime-watcher/src/components/Dashboard/SiteCard/index.tsx, is referenced by src/components/Dashboard/SiteCard.SiteCard but not included in the documentation
+[warning] ActionButtonGroupProperties, defined in uptime-watcher/src/components/Dashboard/SiteCard/components/ActionButtonGroup.tsx, is referenced by src/components/Dashboard/SiteCard/components/ActionButtonGroup.ActionButtonGroup but not included in the documentation
+[warning] MetricCardProperties, defined in uptime-watcher/src/components/Dashboard/SiteCard/components/MetricCard.tsx, is referenced by src/components/Dashboard/SiteCard/components/MetricCard.MetricCard but not included in the documentation
+[warning] MonitorSelectorProperties, defined in uptime-watcher/src/components/Dashboard/SiteCard/components/MonitorSelector.tsx, is referenced by src/components/Dashboard/SiteCard/components/MonitorSelector.MonitorSelector but not included in the documentation
+[warning] SiteCardHeaderProperties, defined in uptime-watcher/src/components/Dashboard/SiteCard/SiteCardHeader.tsx, is referenced by src/components/Dashboard/SiteCard/SiteCardHeader.SiteCardHeader but not included in the documentation
+[warning] SiteCardHistoryProperties, defined in uptime-watcher/src/components/Dashboard/SiteCard/SiteCardHistory.tsx, is referenced by src/components/Dashboard/SiteCard/SiteCardHistory.SiteCardHistory but not included in the documentation
+[warning] SiteCardMetricsProperties, defined in uptime-watcher/src/components/Dashboard/SiteCard/SiteCardMetrics.tsx, is referenced by src/components/Dashboard/SiteCard/SiteCardMetrics.SiteCardMetrics but not included in the documentation
+[warning] SiteCardStatusProperties, defined in uptime-watcher/src/components/Dashboard/SiteCard/SiteCardStatus.tsx, is referenced by src/components/Dashboard/SiteCard/SiteCardStatus.SiteCardStatus but not included in the documentation
+[warning] SiteActionsResult, defined in uptime-watcher/src/hooks/site/useSiteActions.ts, is referenced by src/hooks/site/useSiteActions.useSiteActions but not included in the documentation
+[warning] SiteMonitorResult, defined in uptime-watcher/src/hooks/site/useSiteMonitor.ts, is referenced by src/hooks/site/useSiteMonitor.useSiteMonitor but not included in the documentation
+[warning] SiteStats, defined in uptime-watcher/src/hooks/site/useSiteStats.ts, is referenced by src/hooks/site/useSiteStats.useSiteStats but not included in the documentation
+[warning] UseMonitorFieldsResult, defined in uptime-watcher/src/hooks/useMonitorFields.ts, is referenced by src/hooks/useMonitorFields.useMonitorFields but not included in the documentation
+[warning] UseMonitorTypesResult, defined in uptime-watcher/src/hooks/useMonitorTypes.ts, is referenced by src/hooks/useMonitorTypes.useMonitorTypes but not included in the documentation
+[warning] ThemeStyles, defined in uptime-watcher/src/hooks/useThemeStyles.ts, is referenced by src/hooks/useThemeStyles.useThemeStyles but not included in the documentation
+[warning] DynamicMonitorFieldsProps, defined in uptime-watcher/src/components/AddSiteForm/DynamicMonitorFields.tsx, is referenced by src/components/AddSiteForm/DynamicMonitorFields.DynamicMonitorFields.__namedParameters but not included in the documentation
+[warning] FormSubmitProperties, defined in uptime-watcher/src/components/AddSiteForm/Submit.tsx, is referenced by src/components/AddSiteForm/Submit.handleSubmit.properties but not included in the documentation
+[warning] ConditionalResponseTimeProps, defined in uptime-watcher/src/components/common/MonitorUiComponents.tsx, is referenced by src/components/common/MonitorUiComponents.ConditionalResponseTime.__namedParameters but not included in the documentation
+[warning] DetailLabelProps, defined in uptime-watcher/src/components/common/MonitorUiComponents.tsx, is referenced by src/components/common/MonitorUiComponents.DetailLabel.__namedParameters but not included in the documentation
+[warning] SettingsProperties, defined in uptime-watcher/src/components/Settings/Settings.tsx, is referenced by src/components/Settings/Settings.Settings.props but not included in the documentation
+[warning] ScreenshotThumbnailProperties, defined in uptime-watcher/src/components/SiteDetails/ScreenshotThumbnail.tsx, is referenced by src/components/SiteDetails/ScreenshotThumbnail.ScreenshotThumbnail.__namedParameters but not included in the documentation
+[warning] SiteDetailsProperties, defined in uptime-watcher/src/components/SiteDetails/SiteDetails.tsx, is referenced by src/components/SiteDetails/SiteDetails.SiteDetails.props but not included in the documentation
+[warning] SiteDetailsHeaderProperties, defined in uptime-watcher/src/components/SiteDetails/SiteDetailsHeader.tsx, is referenced by src/components/SiteDetails/SiteDetailsHeader.SiteDetailsHeader.__namedParameters but not included in the documentation
+[warning] SiteDetailsNavigationProperties, defined in uptime-watcher/src/components/SiteDetails/SiteDetailsNavigation.tsx, is referenced by src/components/SiteDetails/SiteDetailsNavigation.SiteDetailsNavigation.props but not included in the documentation
+[warning] AnalyticsTabProperties, defined in uptime-watcher/src/components/SiteDetails/tabs/AnalyticsTab.tsx, is referenced by src/components/SiteDetails/tabs/AnalyticsTab.AnalyticsTab.props but not included in the documentation
+[warning] HistoryTabProperties, defined in uptime-watcher/src/components/SiteDetails/tabs/HistoryTab.tsx, is referenced by src/components/SiteDetails/tabs/HistoryTab.HistoryTab.props but not included in the documentation
+[warning] OverviewTabProperties, defined in uptime-watcher/src/components/SiteDetails/tabs/OverviewTab.tsx, is referenced by src/components/SiteDetails/tabs/OverviewTab.OverviewTab.props but not included in the documentation
+[warning] SettingsTabProperties, defined in uptime-watcher/src/components/SiteDetails/tabs/SettingsTab.tsx, is referenced by src/components/SiteDetails/tabs/SettingsTab.SettingsTab.props but not included in the documentation
+[warning] SiteOverviewTabProperties, defined in uptime-watcher/src/components/SiteDetails/tabs/SiteOverviewTab.tsx, is referenced by src/components/SiteDetails/tabs/SiteOverviewTab.SiteOverviewTab.props but not included in the documentation
+[warning] UseSiteDetailsProperties, defined in uptime-watcher/src/hooks/site/useSiteDetails.ts, is referenced by src/hooks/site/useSiteDetails.useSiteDetails.props but not included in the documentation
+[warning] ErrorBoundaryState, defined in uptime-watcher/src/stores/error/ErrorBoundary.tsx, is referenced by src/stores/error/ErrorBoundary.ErrorBoundary.getDerivedStateFromError but not included in the documentation
+[warning] MiniChartBarProperties, defined in uptime-watcher/src/theme/components.tsx, is referenced by src/theme/components.MiniChartBar.__namedParameters but not included in the documentation
+[warning] StatusIndicatorProperties, defined in uptime-watcher/src/theme/components.tsx, is referenced by src/theme/components.StatusIndicator.__namedParameters but not included in the documentation
+[warning] ThemedBadgeProperties, defined in uptime-watcher/src/theme/components.tsx, is referenced by src/theme/components.ThemedBadge.__namedParameters but not included in the documentation
+[warning] ThemedBoxProperties, defined in uptime-watcher/src/theme/components.tsx, is referenced by src/theme/components.ThemedBox.__namedParameters but not included in the documentation
+[warning] ThemedButtonProperties, defined in uptime-watcher/src/theme/components.tsx, is referenced by src/theme/components.ThemedButton.__namedParameters but not included in the documentation
+[warning] ThemedCardProperties, defined in uptime-watcher/src/theme/components.tsx, is referenced by src/theme/components.ThemedCard.__namedParameters but not included in the documentation
+[warning] ThemedCheckboxProperties, defined in uptime-watcher/src/theme/components.tsx, is referenced by src/theme/components.ThemedCheckbox.__namedParameters but not included in the documentation
+[warning] ThemedIconButtonProperties, defined in uptime-watcher/src/theme/components.tsx, is referenced by src/theme/components.ThemedIconButton.__namedParameters but not included in the documentation
+[warning] ThemedInputProperties, defined in uptime-watcher/src/theme/components.tsx, is referenced by src/theme/components.ThemedInput.__namedParameters but not included in the documentation
+[warning] ThemedProgressProperties, defined in uptime-watcher/src/theme/components.tsx, is referenced by src/theme/components.ThemedProgress.__namedParameters but not included in the documentation
+[warning] ThemedSelectProperties, defined in uptime-watcher/src/theme/components.tsx, is referenced by src/theme/components.ThemedSelect.__namedParameters but not included in the documentation
+[warning] ThemedTextProperties, defined in uptime-watcher/src/theme/components.tsx, is referenced by src/theme/components.ThemedText.__namedParameters but not included in the documentation
+[warning] ThemedTooltipProperties, defined in uptime-watcher/src/theme/components.tsx, is referenced by src/theme/components.ThemedTooltip.__namedParameters but not included in the documentation
+[warning] ThemeProviderProperties, defined in uptime-watcher/src/theme/components.tsx, is referenced by src/theme/components.ThemeProvider.__namedParameters but not included in the documentation
+[warning] ErrorBoundaryProperties, defined in uptime-watcher/src/stores/error/ErrorBoundary.tsx, is referenced by src/stores/error/ErrorBoundary.ErrorBoundary.constructor.properties but not included in the documentation
+[warning] Failed to resolve link to "ThemeManager" in comment for src/theme/useTheme.useTheme
+[info] markdown generated at ./docs/docusaurus/docs/app
+[warning] Found 0 errors and 55 warnings
+[info] Loaded plugin typedoc-plugin-markdown
+[info] Loaded plugin typedoc-docusaurus-theme
+./electron/services/ServiceContainer.ts:152:7 - [warning] Encountered an unknown block tag @testonly
+
+152         * @testonly
+
+[warning] At most one @remarks tag is expected in a comment, ignoring all but the first in comment at ./electron/services/monitoring/types.ts:103
+[warning] At most one @returns tag is expected in a comment, ignoring all but the first in comment at ./electron/services/monitoring/types.ts:103
+[warning] MigrationRegistry, defined in uptime-watcher/electron/services/monitoring/MigrationSystem.ts, is referenced by electron/services/monitoring/MigrationSystem.migrationRegistry but not included in the documentation
+[warning] VersionManager, defined in uptime-watcher/electron/services/monitoring/MigrationSystem.ts, is referenced by electron/services/monitoring/MigrationSystem.versionManager but not included in the documentation
+[warning] MigrationOrchestrator, defined in uptime-watcher/electron/services/monitoring/MigrationSystem.ts, is referenced by electron/services/monitoring/MigrationSystem.createMigrationOrchestrator but not included in the documentation
+[warning] ValidatorMap, defined in uptime-watcher/electron/events/middleware.ts, is referenced by electron/events/middleware.createValidationMiddleware.validators but not included in the documentation
+[warning] SetHistoryLimitParams, defined in uptime-watcher/electron/utils/database/historyLimitManager.ts, is referenced by electron/utils/database/historyLimitManager.setHistoryLimit.params but not included in the documentation
+[warning] Failed to resolve link to "Error" in comment for electron/UptimeOrchestrator.UptimeOrchestrator.emitTyped
+[warning] Failed to resolve link to "Error" in comment for electron/UptimeOrchestrator.UptimeOrchestrator.use
+[warning] Failed to resolve link to "Error" in comment for electron/events/TypedEventBus.TypedEventBus.constructor
+[warning] Failed to resolve link to "Error" in comment for electron/events/TypedEventBus.TypedEventBus.emitTyped
+[warning] Failed to resolve link to "Error" in comment for electron/events/TypedEventBus.TypedEventBus.use
+[warning] Failed to resolve link to "Error" in comment for electron/services/database/DatabaseService.DatabaseService.close
+[warning] Failed to resolve link to "Error" in comment for electron/services/database/DatabaseService.DatabaseService.executeTransaction
+[warning] Failed to resolve link to "Error" in comment for electron/services/database/DatabaseService.DatabaseService.getDatabase
+[warning] Failed to resolve link to "Error" in comment for electron/services/database/DatabaseService.DatabaseService.initialize
+[warning] Failed to resolve link to "Error" in comment for electron/services/database/MonitorRepository.MonitorRepository.createInternal
+[warning] Failed to resolve link to "Error" in comment for electron/services/database/SettingsRepository.SettingsRepository.bulkInsertInternal
+[warning] Failed to resolve link to "Error" in comment for electron/services/database/SettingsRepository.SettingsRepository.set
+[warning] Failed to resolve link to "MonitorTypeRegistry.getAllTypes" in comment for electron/services/monitoring/monitorTypes.getBaseMonitorTypes
+[warning] Failed to resolve link to "MonitorTypeRegistry.isValidType" in comment for electron/services/monitoring/monitorTypes.isBaseMonitorType
+[warning] Failed to resolve link to "Error" in comment for electron/services/monitoring/types.IMonitorService.check
+[warning] Failed to resolve link to "Monitor" in comment for electron/services/notifications/NotificationService.NotificationService
+[warning] Failed to resolve link to "Error" in comment for electron/services/database/utils/historyManipulation.addHistoryEntry
+[warning] Failed to resolve link to "Error" in comment for electron/services/database/utils/historyManipulation.bulkInsertHistory
+[warning] Failed to resolve link to "Error" in comment for electron/services/database/utils/historyManipulation.deleteAllHistory
+[warning] Failed to resolve link to "Error" in comment for electron/services/database/utils/historyManipulation.deleteHistoryByMonitorId
+[warning] Failed to resolve link to "Error" in comment for electron/services/database/utils/historyManipulation.pruneHistoryForMonitor
+[warning] Failed to resolve link to "Error" in comment for electron/services/database/utils/historyMapper.rowToHistoryEntry
+[warning] Failed to resolve link to "Error" in comment for electron/services/database/utils/historyQuery.findHistoryByMonitorId
+[warning] Failed to resolve link to "Error" in comment for electron/services/database/utils/historyQuery.getHistoryCount
+[warning] Failed to resolve link to "Error" in comment for electron/services/database/utils/historyQuery.getLatestHistoryEntry
+[warning] Failed to resolve link to "Error" in comment for electron/services/database/utils/monitorMapper.rowToMonitor
+[warning] Failed to resolve link to "Error" in comment for electron/services/database/utils/monitorMapper.rowToMonitorOrUndefined
+[warning] Failed to resolve link to "Error" in comment for electron/services/database/utils/settingsMapper.rowToSetting
+[warning] Failed to resolve link to "Error" in comment for electron/services/database/utils/settingsMapper.rowToSettingValue
+[info] markdown generated at ./docs/docusaurus/docs/electron
+[warning] Found 0 errors and 37 warnings

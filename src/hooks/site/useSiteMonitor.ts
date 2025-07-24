@@ -13,8 +13,10 @@ import { getDefaultMonitorId } from "../../utils/monitorUiHelpers";
 
 /**
  * Result interface for the useSiteMonitor hook.
+ *
+ * @public
  */
-interface SiteMonitorResult {
+export interface SiteMonitorResult {
     /** Filtered history for the selected monitor */
     filteredHistory: StatusHistory[];
     // Actions

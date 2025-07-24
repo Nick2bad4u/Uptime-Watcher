@@ -19,8 +19,10 @@ import { ResponseTimeChart, StatusChart, UptimeChart } from "../charts/ChartComp
 /**
  * Props for the AnalyticsTab component.
  * Contains comprehensive metrics, chart data, and formatting functions.
+ *
+ * @public
  */
-interface AnalyticsTabProperties {
+export interface AnalyticsTabProperties {
     /** Average response time across all checks */
     readonly avgResponseTime: number;
     /** Chart.js data configuration for bar chart */

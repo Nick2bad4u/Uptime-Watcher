@@ -9,8 +9,10 @@ import { MetricCard } from "./components/MetricCard";
 
 /**
  * Props for the SiteCardMetrics component.
+ *
+ * @public
  */
-interface SiteCardMetricsProperties {
+export interface SiteCardMetricsProperties {
     /** Total number of checks performed */
     checkCount: number;
     /** Average response time in milliseconds */

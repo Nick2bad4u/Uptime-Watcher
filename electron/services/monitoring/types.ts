@@ -105,8 +105,7 @@ export interface MonitorCheckResult {
      * @remarks
      * May include status codes, response headers, or other diagnostic information
      * useful for troubleshooting or display purposes.
-     *
-     * @remarks Examples: "HTTP 200 OK", "Connection timeout", "DNS resolution failed"
+     * Examples: "HTTP 200 OK", "Connection timeout", "DNS resolution failed"
      */
     details?: string;
 

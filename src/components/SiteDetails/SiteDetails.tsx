@@ -53,8 +53,12 @@ import { OverviewTab } from "./tabs/OverviewTab";
 import { SettingsTab } from "./tabs/SettingsTab";
 import { SiteOverviewTab } from "./tabs/SiteOverviewTab";
 
-/** Props for the SiteDetails component */
-interface SiteDetailsProperties {
+/**
+ * Props for the SiteDetails component
+ *
+ * @public
+ */
+export interface SiteDetailsProperties {
     /** Callback function to close the site details view */
     readonly onClose: () => void;
     /** The site object to display details for */

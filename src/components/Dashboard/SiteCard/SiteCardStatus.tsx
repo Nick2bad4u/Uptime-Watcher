@@ -11,8 +11,10 @@ import { StatusBadge } from "../../common/StatusBadge";
 
 /**
  * Props for the SiteCardStatus component.
+ *
+ * @public
  */
-interface SiteCardStatusProperties {
+export interface SiteCardStatusProperties {
     /** ID of the currently selected monitor */
     selectedMonitorId: string;
     /** Current status of the monitor */

@@ -23,8 +23,12 @@ import { validateMonitorFieldClientSide } from "../../utils/monitorValidation";
 import { clampTimeoutSeconds, getTimeoutSeconds, timeoutSecondsToMs } from "../../utils/timeoutUtils";
 import { useSiteAnalytics } from "./useSiteAnalytics";
 
-/** Props for the useSiteDetails hook */
-interface UseSiteDetailsProperties {
+/**
+ * Props for the useSiteDetails hook
+ *
+ * @public
+ */
+export interface UseSiteDetailsProperties {
     /** The site object to manage details for */
     site: Site;
 }

@@ -8,7 +8,12 @@ import { useEffect, useState } from "react";
 import logger from "../services/logger";
 import { getMonitorTypeOptions } from "../utils/monitorTypeHelper";
 
-interface UseMonitorTypesResult {
+/**
+ * Result interface for the useMonitorTypes hook
+ *
+ * @public
+ */
+export interface UseMonitorTypesResult {
     /** Error message if loading failed */
     error: string | undefined;
     /** Whether monitor types are currently loading */

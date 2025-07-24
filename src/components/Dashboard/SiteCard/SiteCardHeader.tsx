@@ -10,8 +10,12 @@ import { Site } from "../../../types";
 import { ActionButtonGroup } from "./components/ActionButtonGroup";
 import { MonitorSelector } from "./components/MonitorSelector";
 
-/** Props for the SiteCardHeader component */
-interface SiteCardHeaderProperties {
+/**
+ * Props for the SiteCardHeader component
+ *
+ * @public
+ */
+export interface SiteCardHeaderProperties {
     /** Whether site has any monitors configured */
     hasMonitor: boolean;
     /** Whether any operation is currently loading */

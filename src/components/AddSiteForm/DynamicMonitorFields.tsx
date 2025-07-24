@@ -13,7 +13,12 @@ import { ensureError } from "../../utils/errorHandling";
 import { getMonitorTypeConfig, type MonitorTypeConfig } from "../../utils/monitorTypeHelper";
 import { TextField } from "./FormFields";
 
-interface DynamicFieldProps {
+/**
+ * Props for the DynamicField component
+ *
+ * @public
+ */
+export interface DynamicFieldProps {
     /** Whether the field is disabled */
     readonly disabled?: boolean;
     /** Field definition */
@@ -24,7 +29,12 @@ interface DynamicFieldProps {
     readonly value: number | string;
 }
 
-interface DynamicMonitorFieldsProps {
+/**
+ * Props for the DynamicMonitorFields component
+ *
+ * @public
+ */
+export interface DynamicMonitorFieldsProps {
     /** Whether the form is in a loading state */
     readonly isLoading?: boolean;
     /** Selected monitor type */

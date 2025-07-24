@@ -6,7 +6,12 @@ import { useUIStore } from "../../stores/ui/useUiStore";
 import { Monitor, Site } from "../../types";
 import { ensureError } from "../../utils/errorHandling";
 
-interface SiteActionsResult {
+/**
+ * Result interface for the useSiteActions hook
+ *
+ * @public
+ */
+export interface SiteActionsResult {
     handleCardClick: () => void;
     handleCheckNow: () => void;
     // Action handlers

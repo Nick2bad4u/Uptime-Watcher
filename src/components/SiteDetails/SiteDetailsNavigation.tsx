@@ -13,8 +13,10 @@ import { Site } from "../../types";
 /**
  * Props for the SiteDetailsNavigation component.
  * Contains all necessary handlers and state for monitoring control.
+ *
+ * @public
  */
-interface SiteDetailsNavigationProperties {
+export interface SiteDetailsNavigationProperties {
     /** Currently active tab in the site details view */
     readonly activeSiteDetailsTab: string;
     /** The site object being displayed */

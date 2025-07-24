@@ -39,7 +39,7 @@ export function generateBackupFileName(prefix = "backup", extension = "sqlite"):
 
 /**
  * Handles downloading SQLite backup data as a file
- * @param downloadFn - Function that returns the backup data as Uint8Array
+ * @param downloadFunction - Function that returns the backup data as Uint8Array
  * @throws Error if download fails or browser APIs are not available
  */
 export async function handleSQLiteBackupDownload(downloadFunction: () => Promise<Uint8Array>): Promise<void> {

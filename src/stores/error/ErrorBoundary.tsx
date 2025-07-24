@@ -8,13 +8,23 @@ import React from "react";
 import { DefaultErrorFallback } from "../../components/error/DefaultErrorFallback";
 import logger from "../../services/logger";
 
-interface ErrorBoundaryProperties {
+/**
+ * Props for the ErrorBoundary component
+ *
+ * @public
+ */
+export interface ErrorBoundaryProperties {
     children: React.ReactNode;
     fallback?: React.ComponentType<{ error?: Error; retry: () => void }>;
     onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
 }
 
-interface ErrorBoundaryState {
+/**
+ * State for the ErrorBoundary component
+ *
+ * @public
+ */
+export interface ErrorBoundaryState {
     error?: Error;
     errorInfo?: React.ErrorInfo;
     hasError: boolean;

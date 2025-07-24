@@ -12,8 +12,10 @@ import { HistoryChart } from "../../common/HistoryChart";
 
 /**
  * Props for the SiteCardHistory component.
+ *
+ * @public
  */
-interface SiteCardHistoryProperties {
+export interface SiteCardHistoryProperties {
     /** Filtered history data for visualization */
     filteredHistory: StatusHistory[];
     /** Monitor data containing type and configuration */

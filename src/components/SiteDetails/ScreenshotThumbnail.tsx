@@ -12,8 +12,12 @@ import { createPortal } from "react-dom";
 import logger from "../../services/logger";
 import { useTheme } from "../../theme/useTheme";
 
-/** Props for the ScreenshotThumbnail component */
-interface ScreenshotThumbnailProperties {
+/**
+ * Props for the ScreenshotThumbnail component
+ *
+ * @public
+ */
+export interface ScreenshotThumbnailProperties {
     /** The site name for accessibility and alt text */
     readonly siteName: string;
     /** The URL to capture a screenshot of */

@@ -23,8 +23,10 @@ import { formatDuration, formatResponseTime } from "../../../utils/time";
 
 /**
  * Props for the SiteOverviewTab component
+ *
+ * @public
  */
-interface SiteOverviewTabProperties {
+export interface SiteOverviewTabProperties {
     /** Average response time across all monitors */
     readonly avgResponseTime: number;
     /** Handler for removing the site */

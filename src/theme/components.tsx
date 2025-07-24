@@ -19,23 +19,31 @@ import { formatResponseTime } from "../utils/time";
 import { useTheme, useThemeClasses } from "./useTheme";
 import "./components.css";
 
-type BadgeSize = "lg" | "md" | "sm" | "xs";
-type BadgeVariant = "error" | "info" | "primary" | "secondary" | "success" | "warning";
-type BoxElement = "article" | "aside" | "button" | "div" | "footer" | "header" | "nav" | "section";
-type BoxPadding = "lg" | "md" | "sm" | "xl" | "xs";
-type BoxRounded = "full" | "lg" | "md" | "none" | "sm" | "xl";
-type BoxShadow = "inner" | "lg" | "md" | "sm" | "xl";
+export type BadgeSize = "lg" | "md" | "sm" | "xs";
+export type BadgeVariant = "error" | "info" | "primary" | "secondary" | "success" | "warning";
+export type BoxElement = "article" | "aside" | "button" | "div" | "footer" | "header" | "nav" | "section";
+export type BoxPadding = "lg" | "md" | "sm" | "xl" | "xs";
+export type BoxRounded = "full" | "lg" | "md" | "none" | "sm" | "xl";
+export type BoxShadow = "inner" | "lg" | "md" | "sm" | "xl";
 
-type BoxSurface = "base" | "elevated" | "overlay";
+export type BoxSurface = "base" | "elevated" | "overlay";
 // Type aliases for commonly used union types
-type BoxVariant = "primary" | "secondary" | "tertiary";
-type ButtonSize = "lg" | "md" | "sm" | "xl" | "xs";
-type ButtonVariant = "error" | "ghost" | "outline" | "primary" | "secondary" | "success" | "tertiary" | "warning";
+export type BoxVariant = "primary" | "secondary" | "tertiary";
+export type ButtonSize = "lg" | "md" | "sm" | "xl" | "xs";
+export type ButtonVariant =
+    | "error"
+    | "ghost"
+    | "outline"
+    | "primary"
+    | "secondary"
+    | "success"
+    | "tertiary"
+    | "warning";
 
-type TextAlign = "center" | "justify" | "left" | "right";
-type TextSize = "2xl" | "3xl" | "4xl" | "base" | "lg" | "md" | "sm" | "xl" | "xs";
+export type TextAlign = "center" | "justify" | "left" | "right";
+export type TextSize = "2xl" | "3xl" | "4xl" | "base" | "lg" | "md" | "sm" | "xl" | "xs";
 
-type TextVariant =
+export type TextVariant =
     | "danger"
     | "error"
     | "info"
@@ -45,7 +53,7 @@ type TextVariant =
     | "success"
     | "tertiary"
     | "warning";
-type TextWeight = "bold" | "medium" | "normal" | "semibold";
+export type TextWeight = "bold" | "medium" | "normal" | "semibold";
 
 // Constants for commonly duplicated strings
 const CSS_CLASSES = {
@@ -55,21 +63,36 @@ const CSS_CLASSES = {
     THEMED_TEXT: "themed-text",
 } as const;
 
-interface MiniChartBarProperties {
+/**
+ * Props for the MiniChartBar component
+ *
+ * @public
+ */
+export interface MiniChartBarProperties {
     readonly className?: string;
     readonly responseTime?: number;
     readonly status: MonitorStatus | SiteStatus;
     readonly timestamp: Date | number | string;
 }
 
-interface StatusIndicatorProperties {
+/**
+ * Props for the StatusIndicator component
+ *
+ * @public
+ */
+export interface StatusIndicatorProperties {
     readonly className?: string;
     readonly showText?: boolean;
     readonly size?: "lg" | "md" | "sm";
     readonly status: SiteStatus;
 }
 
-interface ThemedBadgeProperties {
+/**
+ * Props for the ThemedBadge component
+ *
+ * @public
+ */
+export interface ThemedBadgeProperties {
     readonly children: React.ReactNode;
     readonly className?: string;
     readonly icon?: React.ReactNode;
@@ -78,7 +101,12 @@ interface ThemedBadgeProperties {
     readonly variant?: BadgeVariant;
 }
 
-interface ThemedBoxProperties {
+/**
+ * Props for the ThemedBox component
+ *
+ * @public
+ */
+export interface ThemedBoxProperties {
     readonly "aria-label"?: string;
     readonly as?: BoxElement;
     readonly border?: boolean;
@@ -98,7 +126,12 @@ interface ThemedBoxProperties {
     readonly variant?: BoxVariant;
 }
 
-interface ThemedButtonProperties {
+/**
+ * Props for the ThemedButton component
+ *
+ * @public
+ */
+export interface ThemedButtonProperties {
     readonly "aria-label"?: string;
     readonly children?: React.ReactNode;
     readonly className?: string;
@@ -116,7 +149,12 @@ interface ThemedButtonProperties {
     readonly variant?: ButtonVariant;
 }
 
-interface ThemedCardProperties {
+/**
+ * Props for the ThemedCard component
+ *
+ * @public
+ */
+export interface ThemedCardProperties {
     readonly children: React.ReactNode;
     readonly className?: string;
     readonly clickable?: boolean;
@@ -134,7 +172,12 @@ interface ThemedCardProperties {
     readonly variant?: BoxVariant;
 }
 
-interface ThemedCheckboxProperties {
+/**
+ * Props for the ThemedCheckbox component
+ *
+ * @public
+ */
+export interface ThemedCheckboxProperties {
     readonly "aria-label"?: string;
     readonly checked?: boolean;
     readonly className?: string;
@@ -143,7 +186,12 @@ interface ThemedCheckboxProperties {
     readonly required?: boolean;
 }
 
-interface ThemedIconButtonProperties {
+/**
+ * Props for the ThemedIconButton component
+ *
+ * @public
+ */
+export interface ThemedIconButtonProperties {
     readonly className?: string;
     readonly disabled?: boolean;
     readonly icon: React.ReactNode;
@@ -155,7 +203,12 @@ interface ThemedIconButtonProperties {
     readonly variant?: ButtonVariant;
 }
 
-interface ThemedInputProperties {
+/**
+ * Props for the ThemedInput component
+ *
+ * @public
+ */
+export interface ThemedInputProperties {
     readonly "aria-describedby"?: string;
     readonly "aria-label"?: string;
     readonly className?: string;
@@ -171,7 +224,12 @@ interface ThemedInputProperties {
     readonly value?: number | string;
 }
 
-interface ThemedProgressProperties {
+/**
+ * Props for the ThemedProgress component
+ *
+ * @public
+ */
+export interface ThemedProgressProperties {
     readonly className?: string;
     readonly label?: string;
     readonly max?: number;
@@ -181,7 +239,12 @@ interface ThemedProgressProperties {
     readonly variant?: "error" | "primary" | "success" | "warning";
 }
 
-interface ThemedSelectProperties {
+/**
+ * Props for the ThemedSelect component
+ *
+ * @public
+ */
+export interface ThemedSelectProperties {
     readonly "aria-describedby"?: string;
     readonly "aria-label"?: string;
     readonly children: React.ReactNode;
@@ -196,7 +259,12 @@ interface ThemedSelectProperties {
     readonly value?: number | string;
 }
 
-interface ThemedTextProperties {
+/**
+ * Props for the ThemedText component
+ *
+ * @public
+ */
+export interface ThemedTextProperties {
     readonly align?: TextAlign;
     readonly children: React.ReactNode;
     readonly className?: string;
@@ -206,13 +274,23 @@ interface ThemedTextProperties {
     readonly weight?: TextWeight;
 }
 
-interface ThemedTooltipProperties {
+/**
+ * Props for the ThemedTooltip component
+ *
+ * @public
+ */
+export interface ThemedTooltipProperties {
     readonly children: React.ReactNode;
     readonly className?: string;
     readonly content: string;
 }
 
-interface ThemeProviderProperties {
+/**
+ * Props for the ThemeProvider component
+ *
+ * @public
+ */
+export interface ThemeProviderProperties {
     readonly children: React.ReactNode;
 }
 

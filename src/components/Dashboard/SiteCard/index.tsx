@@ -14,8 +14,12 @@ import { SiteCardHistory } from "./SiteCardHistory";
 import { SiteCardMetrics } from "./SiteCardMetrics";
 import { SiteCardStatus } from "./SiteCardStatus";
 
-/** Props for the SiteCard component */
-interface SiteCardProperties {
+/**
+ * Props for the SiteCard component
+ *
+ * @public
+ */
+export interface SiteCardProperties {
     /** Site data to display */
     site: Site;
 }

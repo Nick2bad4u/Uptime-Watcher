@@ -149,7 +149,7 @@ export class ServiceContainer {
      * - Does not close database connections or cleanup resources
      * - Call cleanup methods on services before reset if needed
      *
-     * @testonly
+     * @internal
      */
     public static resetForTesting(): void {
         ServiceContainer.instance = undefined;

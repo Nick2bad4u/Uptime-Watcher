@@ -8,7 +8,12 @@ import { useMemo } from "react";
 
 import { StatusHistory } from "../../types";
 
-interface SiteStats {
+/**
+ * Interface for site statistics data
+ *
+ * @public
+ */
+export interface SiteStats {
     averageResponseTime: number;
     checkCount: number;
     uptime: number;

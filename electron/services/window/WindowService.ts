@@ -74,7 +74,7 @@ export class WindowService {
     } as const;
 
     /** Reference to the main application window (null if not created) */
-    private _mainWindow: BrowserWindow | null;
+    private _mainWindow: BrowserWindow | null = null;
 
     /**
      * Create a new WindowService instance.
@@ -84,8 +84,6 @@ export class WindowService {
      * Windows are not created automatically - call createMainWindow() to create the main window.
      */
     constructor() {
-        this._mainWindow = null;
-
         if (isDev()) {
             logger.debug("[WindowService] Created WindowService in development mode");
         }

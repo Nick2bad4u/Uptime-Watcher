@@ -9,13 +9,14 @@ import { ThemedText } from "../../../../theme/components";
 
 /**
  * Props for the MetricCard component.
+ *
+ * @public
  */
-interface MetricCardProperties {
+export interface MetricCardProperties {
+    /** Optional CSS classes for custom styling */
     className?: string;
     /** Label text describing the metric */
     label: string;
-    /** Optional CSS classes for custom styling */
-
     /** Value to display (string or number) */
     value: number | string;
 }

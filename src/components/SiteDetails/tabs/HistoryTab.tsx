@@ -17,8 +17,10 @@ import { DetailLabel } from "../../common/MonitorUiComponents";
 
 /**
  * Props for the HistoryTab component.
+ *
+ * @public
  */
-interface HistoryTabProperties {
+export interface HistoryTabProperties {
     /** Function to format timestamps for display */
     readonly formatFullTimestamp: (timestamp: number) => string;
     /** Function to format response times for display */

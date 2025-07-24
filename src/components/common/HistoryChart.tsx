@@ -8,8 +8,12 @@ import React from "react";
 import { MiniChartBar, ThemedText } from "../../theme/components";
 import { StatusHistory } from "../../types";
 
-/** Props for the HistoryChart component */
-interface HistoryChartProperties {
+/**
+ * Props for the HistoryChart component
+ *
+ * @public
+ */
+export interface HistoryChartProperties {
     /** Additional CSS classes */
     className?: string;
     /** Array of historical status records to display */

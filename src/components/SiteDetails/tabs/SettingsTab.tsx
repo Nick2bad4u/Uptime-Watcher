@@ -28,8 +28,10 @@ import { formatRetryAttemptsText, getIntervalLabel } from "../../../utils/time";
 
 /**
  * Props for the SettingsTab component.
+ *
+ * @public
  */
-interface SettingsTabProperties {
+export interface SettingsTabProperties {
     /** Current site being configured */
     readonly currentSite: Site;
     /** Handler for monitor check interval changes */

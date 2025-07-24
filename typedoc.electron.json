@@ -4,9 +4,12 @@
     "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/shared/**/*.*"
   ],
   "out": "docs/docusaurus/docs/electron",
+  "docsPath": "docs/docusaurus/docs/electron",
   "plugin": [
     "typedoc-plugin-markdown",
-    "typedoc-docusaurus-theme"
+    "typedoc-docusaurus-theme",
+    "typedoc-plugin-mdn-links",
+    "typedoc-plugin-zod"
   ],
   "tsconfig": "tsconfig.electron.json",
   "externalSymbolLinkMappings": {

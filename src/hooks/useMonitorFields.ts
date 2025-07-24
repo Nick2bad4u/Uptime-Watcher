@@ -9,7 +9,12 @@ import { useCallback, useEffect, useState } from "react";
 
 import logger from "../services/logger";
 
-interface UseMonitorFieldsResult {
+/**
+ * Result interface for the useMonitorFields hook
+ *
+ * @public
+ */
+export interface UseMonitorFieldsResult {
     /** Get field definitions for a specific monitor type */
     getFields: (monitorType: string) => MonitorFieldDefinition[];
     /** Get required fields for a specific monitor type */

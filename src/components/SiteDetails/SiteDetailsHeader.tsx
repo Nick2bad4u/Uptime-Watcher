@@ -13,8 +13,12 @@ import { StatusIndicator, ThemedBadge, ThemedBox, ThemedText } from "../../theme
 import { Monitor, Site } from "../../types";
 import { ScreenshotThumbnail } from "./ScreenshotThumbnail";
 
-/** Props for the SiteDetailsHeader component */
-interface SiteDetailsHeaderProperties {
+/**
+ * Props for the SiteDetailsHeader component
+ *
+ * @public
+ */
+export interface SiteDetailsHeaderProperties {
     /** Whether the header is collapsed */
     readonly isCollapsed?: boolean;
     /** Callback to toggle the header collapse state */

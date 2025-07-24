@@ -13,8 +13,10 @@ import { supportsResponseTime as checkSupportsResponseTime, formatMonitorDetail 
 
 /**
  * Component that conditionally renders based on response time support.
+ *
+ * @public
  */
-interface ConditionalResponseTimeProps {
+export interface ConditionalResponseTimeProps {
     readonly children: React.ReactNode;
     readonly fallback?: React.ReactNode;
     readonly monitorType: MonitorType;
@@ -23,8 +25,10 @@ interface ConditionalResponseTimeProps {
 /**
  * Component that dynamically formats monitor detail labels.
  * Handles async loading of monitor configuration.
+ *
+ * @public
  */
-interface DetailLabelProps {
+export interface DetailLabelProps {
     readonly details: string;
     readonly fallback?: string;
     readonly monitorType: MonitorType;

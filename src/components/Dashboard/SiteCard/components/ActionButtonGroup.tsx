@@ -9,8 +9,10 @@ import { ThemedButton } from "../../../../theme/components";
 
 /**
  * Props for the ActionButtonGroup component.
+ *
+ * @public
  */
-interface ActionButtonGroupProperties {
+export interface ActionButtonGroupProperties {
     /** Whether all buttons should be disabled */
     disabled: boolean;
     /** Whether any operation is currently loading */

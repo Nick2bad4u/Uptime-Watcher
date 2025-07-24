@@ -15,9 +15,26 @@ const config: Config = {
             {
                 sidebar: {
                     autoConfiguration: true,
-                    pretty: false,
+                    pretty: true,
                     typescript: true,
                     deprecatedItemClassName: "typedoc-sidebar-item-deprecated",
+                    entryPoints: ["../../src/**/*.*", "../../shared/**/*.*"],
+                    tsconfig: "../../tsconfig.json",
+                },
+                plugin: ["typedoc-plugin-markdown"],
+                gitRevision: "main",
+            },
+        ],
+        [
+            "docusaurus-plugin-typedoc",
+            {
+                sidebar: {
+                    autoConfiguration: true,
+                    pretty: true,
+                    typescript: true,
+                    deprecatedItemClassName: "typedoc-sidebar-item-deprecated",
+                    entryPoints: ["../../electron/**/*.*", "../../shared/**/*.*"],
+                    tsconfig: "../../tsconfig.electron.json",
                 },
                 plugin: ["typedoc-plugin-markdown"],
                 gitRevision: "main",

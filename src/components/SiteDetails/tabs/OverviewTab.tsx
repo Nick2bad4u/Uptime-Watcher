@@ -25,8 +25,10 @@ import { getIntervalLabel } from "../../../utils/time";
 
 /**
  * Props for the OverviewTab component.
+ *
+ * @public
  */
-interface OverviewTabProperties {
+export interface OverviewTabProperties {
     /** Average response time across all checks */
     readonly avgResponseTime: number;
     /** Fastest recorded response time */

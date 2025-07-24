@@ -5,7 +5,12 @@
 
 import { useMemo } from "react";
 
-interface ThemeStyles {
+/**
+ * Theme styles interface for CSS-in-JS styling
+ *
+ * @public
+ */
+export interface ThemeStyles {
     collapseButtonStyle: React.CSSProperties;
     contentStyle: React.CSSProperties;
     headerStyle: React.CSSProperties;

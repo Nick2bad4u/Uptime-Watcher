@@ -9,8 +9,12 @@ import React from "react";
 
 import { StatusIndicator, ThemedText } from "../../theme/components";
 
-/** Props for the StatusBadge component */
-interface StatusBadgeProperties {
+/**
+ * Props for the StatusBadge component
+ *
+ * @public
+ */
+export interface StatusBadgeProperties {
     /** Additional CSS classes */
     className?: string;
     /** Label text to display */

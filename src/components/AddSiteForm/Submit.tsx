@@ -23,8 +23,10 @@ import { validateMonitorFieldClientSide, validateMonitorFormData } from "../../u
  *
  * @remarks
  * Combines form state, actions, and store methods for the submission handler.
+ *
+ * @public
  */
-type FormSubmitProperties = AddSiteFormState &
+export type FormSubmitProperties = AddSiteFormState &
     Pick<AddSiteFormActions, "setFormError"> &
     StoreActions & {
         /** UUID generator function for creating unique identifiers */
@@ -42,8 +44,10 @@ type FormSubmitProperties = AddSiteFormState &
  * Defines the required store methods needed for form submission. This interface
  * decouples the submission logic from specific store implementations, making
  * the code more testable and flexible.
+ *
+ * @public
  */
-interface StoreActions {
+export interface StoreActions {
     /** Add a monitor to an existing site */
     addMonitorToSite: (siteId: string, monitor: Monitor) => Promise<void>;
     /** Clear any existing error state */
@@ -61,8 +65,8 @@ interface StoreActions {
  * - For HTTP monitors: validates URL format and protocol
  * - For port monitors: validates host and port number
  *
- * @param e - Form submission event
- * @param props - Form state, actions, and dependencies
+ * @param event - Form submission event
+ * @param properties - Form state, actions, and dependencies
  * @returns Promise that resolves when submission is complete
  *
  * @example
