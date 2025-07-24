@@ -221,7 +221,16 @@
     "docusaurus:serve": "npm run docs:typedoc && cd docs/docusaurus && docusaurus serve",
     "docusaurus:clean": "npm run docs:typedoc && cd docs/docusaurus && docusaurus clear",
     "docusaurus:broken-links": "npm run docs:typedoc && cd docs/docusaurus && docusaurus check",
-    "docusaurus:sitemap": "npm run docs:typedoc && cd docs/docusaurus && docusaurus sitemap"
+    "docusaurus:sitemap": "npm run docs:typedoc && cd docs/docusaurus && docusaurus sitemap",
+    "docs:build:local": "npm run docs:typedoc:local && cd docs/docusaurus && yarn build",
+    "docs:deploy:local": "npm run docs:typedoc:local && cd docs/docusaurus && yarn deploy",
+    "docusaurus:start:local": "npm run docs:typedoc:local && cd docs/docusaurus && docusaurus start",
+    "docusaurus:build:local": "npm run docs:typedoc:local && cd docs/docusaurus && docusaurus build",
+    "docusaurus:serve:local": "npm run docs:typedoc:local && cd docs/docusaurus && docusaurus serve",
+    "docusaurus:clean:local": "npm run docs:typedoc:local && cd docs/docusaurus && docusaurus clear",
+    "docusaurus:broken-links:local": "npm run docs:typedoc:local && cd docs/docusaurus && docusaurus check",
+    "docusaurus:sitemap:local": "npm run docs:typedoc:local && cd docs/docusaurus && docusaurus sitemap",
+    "docs:typedoc:local": "typedoc --options scripts/typedoc-local.json && typedoc --options scripts/typedoc.electron-local.json && node scripts/fix-mdx-typedoc-local.js"
   },
   "overrides": {
     "@codecov/vite-plugin": {

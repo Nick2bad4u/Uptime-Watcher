@@ -1,0 +1,49 @@
+{
+  "entryPoints": [
+    "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/electron/**/*.*",
+    "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/shared/**/*.*"
+  ],
+  "out": "docs/docusaurus/docs/electron",
+  "docsPath": "docs/docusaurus/docs/electron",
+  "plugin": [
+    "typedoc-plugin-markdown",
+    "typedoc-docusaurus-theme",
+    "typedoc-plugin-mdn-links",
+    "typedoc-plugin-zod",
+    "typedoc-plugin-dt-links",
+    "typedoc-plugin-external-package-links"
+  ],
+  "tsconfig": "tsconfig.electron.json",
+  "pretty": true,
+  "externalSymbolLinkMappings": {
+    "@types/react": {
+      "React.Component.setState": "https://react.dev/reference/react/Component#setstate",
+      "React.StaticLifecycle.getDerivedStateFromProps": "https://react.dev/reference/react/Component#getderivedstatefromprops",
+      "React.ComponentLifecycle.componentDidMount": "https://react.dev/reference/react/Component#componentdidmount",
+      "React.NewLifecycle.getSnapshotBeforeUpdate": "https://react.dev/reference/react/Component#getsnapshotbeforeupdate",
+      "React.Component.render": "https://react.dev/reference/react/Component#render"
+    }
+  },
+  "exclude": [
+    "**/dist",
+    "**/dist/**",
+    "**/dist-electron",
+    "**/dist-electron/**",
+    "**/node_modules",
+    "**/node_modules/**",
+    "**/coverage",
+    "**/coverage/**",
+    "**/build",
+    "**/build/**",
+    "**/out",
+    "**/out/**",
+    "**/tmp",
+    "**/tmp/**",
+    "**/test/**",
+    "**/tests/**",
+    "**/spec/**",
+    "**/specs/**",
+    "**/examples",
+    "**/examples/**"
+  ]
+}
