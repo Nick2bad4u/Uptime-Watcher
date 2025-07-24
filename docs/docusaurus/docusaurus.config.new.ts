@@ -19,6 +19,12 @@ const config: Config = {
                     typescript: true,
                     deprecatedItemClassName: "typedoc-sidebar-item-deprecated",
                 },
+                entryPoints: [
+                    "../electron/**/*.ts",
+                    "../shared/**/*.ts"
+                ],
+                tsconfig: "../tsconfig.electron.json",
+                out: "electron",
                 plugin: ["typedoc-plugin-markdown"],
                 gitRevision: "main",
             },
@@ -74,12 +80,8 @@ const config: Config = {
     themeConfig: {
         image: "img/uptime-watcher-social-card.jpg",
         metadata: [
-            { name: "keywords", content: "uptime monitoring, website monitoring, server monitoring, electron app" },
-            {
-                name: "description",
-                content:
-                    "Uptime Watcher - Cross-platform desktop application for monitoring website uptime and server availability",
-            },
+            {name: 'keywords', content: 'uptime monitoring, website monitoring, server monitoring, electron app'},
+            {name: 'description', content: 'Uptime Watcher - Cross-platform desktop application for monitoring website uptime and server availability'},
         ],
         navbar: {
             title: "Uptime Watcher",
@@ -92,15 +94,15 @@ const config: Config = {
             items: [
                 {
                     type: "docSidebar",
-                    sidebarId: "frontEndSidebar",
+                    sidebarId: "appSidebar",
                     position: "left",
-                    label: "React (Frontend)",
+                    label: "App Docs",
                 },
                 {
-                    type: "docSidebar",
-                    sidebarId: "backEndSidebar",
+                    type: "docSidebar", 
+                    sidebarId: "electronSidebar",
                     position: "left",
-                    label: "Electron (Backend)",
+                    label: "Electron API",
                 },
                 {
                     href: "https://github.com/Nick2bad4u/Uptime-Watcher",

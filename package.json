@@ -213,9 +213,15 @@
     "type-check": "npm run check:all",
     "update-tsdoc": "node scripts/download-tsdoc-tags.js",
     "validate:components": "node ./scripts/validate-components.js",
-    "docs:typedoc": "typedoc --options typedoc.json && typedoc --options typedoc.electron.json",
-    "docs:build": "cd docs/docusaurus && yarn build",
-    "docs:deploy": "npm run docs:typedoc && cd docs/docusaurus && yarn deploy"
+    "docs:typedoc": "typedoc --options typedoc.json && typedoc --options typedoc.electron.json && node scripts/fix-mdx-typedoc.js",
+    "docs:build": "node scripts/fix-mdx-typedoc.js && cd docs/docusaurus && yarn build",
+    "docs:deploy": "npm run docs:typedoc && node scripts/fix-mdx-typedoc.js && cd docs/docusaurus && yarn deploy",
+    "docusaurus:start": "node scripts/fix-mdx-typedoc.js && cd docs/docusaurus && docusaurus start",
+    "docusaurus:build": "node scripts/fix-mdx-typedoc.js && cd docs/docusaurus && docusaurus build",
+    "docusaurus:serve": "node scripts/fix-mdx-typedoc.js && cd docs/docusaurus && docusaurus serve",
+    "docusaurus:clean": "node scripts/fix-mdx-typedoc.js && cd docs/docusaurus && docusaurus clear",
+    "docusaurus:broken-links": "node scripts/fix-mdx-typedoc.js && cd docs/docusaurus && docusaurus check",
+    "docusaurus:sitemap": "node scripts/fix-mdx-typedoc.js && cd docs/docusaurus && docusaurus sitemap"
   },
   "overrides": {
     "@codecov/vite-plugin": {
@@ -249,6 +255,10 @@
     "@commitlint/prompt-cli": "^19.8.1",
     "@cspell/cspell-bundled-dicts": "^9.2.0",
     "@cspell/cspell-types": "^9.2.0",
+    "@docusaurus/core": "^3.8.1",
+    "@docusaurus/module-type-aliases": "^3.8.1",
+    "@docusaurus/tsconfig": "^3.8.1",
+    "@docusaurus/types": "^3.8.1",
     "@electron/notarize": "^3.0.1",
     "@eslint/css": "^0.10.0",
     "@eslint/eslintrc": "^3.3.1",
@@ -313,6 +323,7 @@
     "cross-env": "^7.0.3",
     "cspell": "^9.2.0",
     "depcheck": "^1.4.7",
+    "docusaurus-plugin-typedoc": "^1.4.0",
     "electron": "^37.2.3",
     "electron-builder": "^24.13.3",
     "electron-builder-squirrel-windows": "^24.13.3",

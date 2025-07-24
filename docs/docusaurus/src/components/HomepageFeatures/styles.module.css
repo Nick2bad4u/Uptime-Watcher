@@ -5,7 +5,18 @@
   width: 100%;
 }
 
-.featureSvg {
+.featureIcon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
   height: 200px;
-  width: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media screen and (max-width: 996px) {
+  .featureIcon {
+    height: 150px;
+    font-size: 3rem;
+  }
 }

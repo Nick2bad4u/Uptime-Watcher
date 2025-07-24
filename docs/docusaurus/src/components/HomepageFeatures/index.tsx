@@ -5,48 +5,78 @@ import styles from './styles.module.css';
 
 type FeatureItem = {
   title: string;
-  Svg: React.ComponentType<React.ComponentProps<'svg'>>;
+  icon: string;
   description: ReactNode;
 };
 
 const FeatureList: FeatureItem[] = [
   {
-    title: 'Easy to Use',
-    Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
+    title: 'Real-time Monitoring',
+    icon: '⚡',
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        Monitor your websites and services in real-time with customizable check intervals.
+        Get instant notifications when your sites go down or come back online.
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
-    Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
+    title: 'Multiple Monitor Types',
+    icon: '🌐',
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        Support for HTTP/HTTPS monitoring, TCP port checks, and custom monitoring scenarios.
+        Flexible configuration options for different types of services.
       </>
     ),
   },
   {
-    title: 'Powered by React',
-    Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
+    title: 'Cross-Platform Desktop App',
+    icon: '🖥️',
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        Native desktop application built with Electron. Runs on Windows, macOS, and Linux
+        with consistent performance and user experience across all platforms.
+      </>
+    ),
+  },
+  {
+    title: 'Historical Analytics',
+    icon: '📊',
+    description: (
+      <>
+        Track uptime trends, analyze historical data, and generate detailed reports.
+        Understand your infrastructure performance over time.
+      </>
+    ),
+  },
+  {
+    title: 'Privacy Focused',
+    icon: '🔒',
+    description: (
+      <>
+        All monitoring data is stored locally on your device. No cloud dependencies,
+        no data sharing, complete control over your monitoring information.
+      </>
+    ),
+  },
+  {
+    title: 'Open Source',
+    icon: '🚀',
+    description: (
+      <>
+        Fully open source project built with modern technologies. Contribute to the
+        codebase, request features, or customize it for your specific needs.
       </>
     ),
   },
 ];
 
-function Feature({title, Svg, description}: FeatureItem) {
+function Feature({title, icon, description}: FeatureItem) {
   return (
     <div className={clsx('col col--4')}>
       <div className="text--center">
-        <Svg className={styles.featureSvg} role="img" />
+        <div className={styles.featureIcon}>{icon}</div>
       </div>
       <div className="text--center padding-horiz--md">
         <Heading as="h3">{title}</Heading>
@@ -61,8 +91,8 @@ export default function HomepageFeatures(): ReactNode {
     <section className={styles.features}>
       <div className="container">
         <div className="row">
-          {FeatureList.map((props, idx) => (
-            <Feature key={idx} {...props} />
+          {FeatureList.map((props) => (
+            <Feature key={props.title} {...props} />
           ))}
         </div>
       </div>

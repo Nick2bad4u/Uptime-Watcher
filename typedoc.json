@@ -1,19 +1,43 @@
 {
-  "entryPoints": [
-    "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/src/**/*"
-  ],
-  "out": "docs/docusaurus/typedoc/app",
-  "plugin": [
-    "typedoc-plugin-markdown"
-  ],
-  "tsconfig": "tsconfig.json",
-  "externalSymbolLinkMappings": {
-    "@types/react": {
-      "React.Component.setState": "https://react.dev/reference/react/Component#setstate",
-      "React.StaticLifecycle.getDerivedStateFromProps": "https://react.dev/reference/react/Component#getderivedstatefromprops",
-      "React.ComponentLifecycle.componentDidMount": "https://react.dev/reference/react/Component#componentdidmount",
-      "React.NewLifecycle.getSnapshotBeforeUpdate": "https://react.dev/reference/react/Component#getsnapshotbeforeupdate",
-      "React.Component.render": "https://react.dev/reference/react/Component#render"
-    }
-  }
+    "entryPoints": [
+        "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/src/**/*.*",
+        "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/shared/**/*.*"
+    ],
+    "out": "docs/docusaurus/docs/app",
+    "plugin": [
+        "typedoc-plugin-markdown",
+        "typedoc-docusaurus-theme"
+    ],
+    "tsconfig": "tsconfig.json",
+    "externalSymbolLinkMappings": {
+        "@types/react": {
+            "React.Component.setState": "https://react.dev/reference/react/Component#setstate",
+            "React.StaticLifecycle.getDerivedStateFromProps": "https://react.dev/reference/react/Component#getderivedstatefromprops",
+            "React.ComponentLifecycle.componentDidMount": "https://react.dev/reference/react/Component#componentdidmount",
+            "React.NewLifecycle.getSnapshotBeforeUpdate": "https://react.dev/reference/react/Component#getsnapshotbeforeupdate",
+            "React.Component.render": "https://react.dev/reference/react/Component#render"
+        }
+    },
+    "exclude": [
+        "**/dist",
+        "**/dist/**",
+        "**/dist-electron",
+        "**/dist-electron/**",
+        "**/node_modules",
+        "**/node_modules/**",
+        "**/coverage",
+        "**/coverage/**",
+        "**/build",
+        "**/build/**",
+        "**/out",
+        "**/out/**",
+        "**/tmp",
+        "**/tmp/**",
+        "**/test/**",
+        "**/tests/**",
+        "**/spec/**",
+        "**/specs/**",
+        "**/examples",
+        "**/examples/**"
+    ]
 }
