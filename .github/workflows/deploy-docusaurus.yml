@@ -52,7 +52,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: docs/docusaurus
-        run: npm ci
+        run: npm install
 
       - name: Generate TypeDoc API documentation
         working-directory: docs/docusaurus
