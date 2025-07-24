@@ -7,9 +7,29 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[3dbd3fd](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3dbd3fdc0880ecbd39701e75c3f2fe6b28cd475c)...
+[736c481](https://github.com/Nick2bad4u/Uptime-Watcher/commit/736c481a4ba7cde0d314544f1e697db74c115e05)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/3dbd3fdc0880ecbd39701e75c3f2fe6b28cd475c...736c481a4ba7cde0d314544f1e697db74c115e05))
+
+
+### 📦 Dependencies
+
+- *(deps)* [dependency] Update dependency group (#38) [`(736c481)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/736c481a4ba7cde0d314544f1e697db74c115e05)
+
+
+- [dependency] Update version 8.4.0 [`(3dbd3fd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3dbd3fdc0880ecbd39701e75c3f2fe6b28cd475c)
+
+
+
+
+
+
+## [8.4.0] - 2025-07-24
+
+
 [[4a715b5](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4a715b5137d86b9917fcb1685f6b4acc46cafd34)...
-[9728383](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9728383a175f7cd4a9f6dd9d86cec5b53bced4e5)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/4a715b5137d86b9917fcb1685f6b4acc46cafd34...9728383a175f7cd4a9f6dd9d86cec5b53bced4e5))
+[04f85fb](https://github.com/Nick2bad4u/Uptime-Watcher/commit/04f85fbb657e59727b6ea017e039fdec19db2873)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/4a715b5137d86b9917fcb1685f6b4acc46cafd34...04f85fbb657e59727b6ea017e039fdec19db2873))
 
 
 ### 📦 Dependencies
@@ -36,6 +56,61 @@ All notable changes to this project will be documented in this file.
 
 ### � Documentation
 
+- 📝 [docs] Address AI review feedback and improve type safety
+
+- 📝 Updates and completes TSDoc documentation across shared, backend, and frontend utilities, including overloads, @throws, return values, and internal APIs for full API clarity and maintainability
+ - 📝 Documents rationale behind environment fallback strategies, internal API boundaries, and sentinel values for better developer guidance
+ - 🛠️ Fixes event naming and payload consistency in operational hooks to support explicit operation phases and enhance event-driven clarity
+ - 🛠️ Adds robust crypto fallback for UUID generation to avoid runtime errors in diverse environments
+ - 🛠️ Aligns function naming, return types, and usage patterns for validation and monitor utilities to match TypeScript conventions and prevent confusion
+ - 🚜 Refactors monitor status handling and internal APIs to use shared constants and safer type guards, improving runtime safety and code consistency
+ - 🛠️ Adds memoization and accessibility improvements in React entry points, and centralizes UI strings for future localization
+ - 📝 Clarifies error handling flows in monitoring and site writer services, ensuring robust logging for debugging and operational resilience
+ - 📝 Upgrades dependencies for zod, vite, and TypeScript native preview to maintain compatibility and leverage latest features
+ - 🧹 Cleans up redundant comments, aligns inline documentation with standards, and removes dead or misleading code and comments from multiple modules
+
+Relates to internal AI code review and documentation initiative. [`(04f85fb)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/04f85fbb657e59727b6ea017e039fdec19db2873)
+
+
+- 📝 [docs] Add detailed AI claim review docs and enhance code docs
+
+- 📝 Adds comprehensive documentation reviewing AI claims for multiple modules, including monitoring utilities, site writer service, monitor lifecycle, history limit manager, and service factory.
+- 📝 Documents rationale for code decisions, design choices, and false positives found in static analysis.
+- 📝 Improves and clarifies TSDoc/comments throughout service, repository, import/export, cache, and monitoring logic for better maintainability and onboarding.
+- 🚜 Refactors and clarifies comments for error handling, transaction safety, and status state management.
+- 🛠️ Fixes inconsistent documentation, return type order, and default value usage for site names and database file names.
+- 📝 Updates and clarifies scripts and documentation-related npm scripts for Docusaurus and Typedoc.
+- 🛠️ Fixes cache expiration checks and key retrieval logic for consistency and correctness.
+- 🎨 Applies minor style and clarity improvements to code comments and error messages.
+
+Relates to AI code review and architecture documentation initiatives. [`(ba60a45)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ba60a45131469672ea1a59b01960b4dd63ebaa57)
+
+
+- 📝 [docs] Add detailed AI review summaries and document fixes
+
+- Adds comprehensive documentation of low-confidence AI code review claims, including additional analysis and validation for several modules
+- Documents valid issues, false positives, and minor improvements, focusing on documentation clarity, edge case handling, parameter naming, and consistency
+- Details rationale and validation for lint fixes, error handling, documentation enhancements, and codebase patterns
+- Introduces new local Docusaurus and TypeDoc build scripts for improved documentation workflows
+- Improves traceability and future review process by outlining review patterns, recommendations, and decisions
+
+Relates to ongoing AI-assisted code review and documentation improvement efforts [`(dd23650)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/dd23650e0bc512c2133967eb2243f8decf4283e7)
+
+
+- 📝 [docs] Add and update AI review reports and documentation
+
+- Documents low-confidence AI claim reviews for multiple modules, summarizing both valid issues and false positives.
+- Details rationale for code/documentation improvements, especially around TSDoc usage, error handling, and code clarity.
+- Improves project maintainability by centralizing decisions, clarifying minimum value logic, standardizing comments, and aligning with error-handling guidelines.
+- Enhances future code reviews by providing a summarized audit trail and actionable recommendations. [`(e794e34)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e794e34be34c60cf260109132b52f72dd12368c7)
+
+
+- 📝 [docs] Enable pretty output for TypeDoc configs
+
+- Adds the "pretty" option to documentation generator configurations
+- Improves readability of generated documentation output for easier review and maintenance [`(d676508)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d676508a507b7f289fcef263d194937530441f45)
+
+
 - 📝 [docs] Remove sample blog content and cleanup docs output
 
 - Deletes all example blog posts, author and tag definitions, and related images from documentation
@@ -50,6 +125,12 @@ Cleans up legacy starter content and artifacts to streamline documentation and r
 - Cleans up project by deleting all example and introductory documentation previously generated by Docusaurus, including markdown, sidebar, and image files.
 - Updates project version to 8.3.0 to reflect removal of bundled documentation.
 - Reduces maintenance overhead and prepares the repository for custom or updated documentation content. [`(1981a6c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1981a6cff4f375b66d2490343970d93f7f9b02ae)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v8.3.0 [skip ci] [`(1eabc62)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1eabc6258476bd90a1e12208f33d6d65ddc5b0b8)
 
 
 
