@@ -29,27 +29,56 @@ import { MonitorValidator } from "./MonitorValidator";
  * Validates site configuration according to business rules.
  *
  * @remarks
- * Focused on site-level validation concerns including identifier validation
- * and monitor array validation.
+ * Focused on site-level validation concerns including identifier validation and monitor array validation.
+ * Delegates monitor validation to {@link MonitorValidator} for comprehensive monitor checks.
+ *
+ * @example
+ * ```typescript
+ * const validator = new SiteValidator();
+ * const result = validator.validateSiteConfiguration(site);
+ * if (!result.isValid) {
+ *   console.error('Validation errors:', result.errors);
+ * }
+ * ```
+ *
+ * @public
  */
 export class SiteValidator {
-    /** Monitor validator instance for delegating monitor-specific validation */
+    /**
+     * Monitor validator instance for delegating monitor-specific validation.
+     *
+     * @remarks
+     * Used internally to validate each monitor in the site configuration.
+     * @readonly
+     */
     private readonly monitorValidator: MonitorValidator;
 
+    /**
+     * Create a new SiteValidator instance.
+     *
+     * @remarks
+     * Instantiates a {@link MonitorValidator} for monitor validation delegation.
+     */
     constructor() {
         this.monitorValidator = new MonitorValidator();
     }
 
     /**
-     * Business rule: Determine if a site should be included in exports.
+     * Determines if a site should be included in exports according to business rules.
      *
-     * @param site - The site to evaluate for export inclusion
-     * @returns Whether the site should be included in exports
+     * @param site - The site to evaluate for export inclusion.
+     * @returns Whether the site should be included in exports.
      *
      * @remarks
-     * Business rule implementation: Sites are included in exports only if they have
-     * a valid, non-empty string identifier. This ensures exported data integrity
-     * and prevents corruption from sites with invalid identifiers.
+     * Sites are included in exports only if they have a valid, non-empty string identifier.
+     * This ensures exported data integrity and prevents corruption from sites with invalid identifiers.
+     *
+     * @example
+     * ```typescript
+     * if (validator.shouldIncludeInExport(site)) {
+     *   exportSite(site);
+     * }
+     * ```
      */
     public shouldIncludeInExport(site: Site): boolean {
         // Business rule: Include all sites with valid identifiers
@@ -57,10 +86,21 @@ export class SiteValidator {
     }
 
     /**
-     * Validate complete site configuration.
+     * Validates complete site configuration according to business rules.
      *
-     * @param site - The site configuration to validate
-     * @returns Validation result containing errors and validity status
+     * @param site - The site configuration to validate.
+     * @returns Validation result containing errors and validity status.
+     *
+     * @remarks
+     * Performs identifier and monitor array validation, delegating monitor validation to {@link MonitorValidator}.
+     *
+     * @example
+     * ```typescript
+     * const result = validator.validateSiteConfiguration(site);
+     * if (!result.isValid) {
+     *   console.error('Validation errors:', result.errors);
+     * }
+     * ```
      */
     public validateSiteConfiguration(site: Site): ValidationResult {
         const errors: string[] = [];
@@ -80,10 +120,22 @@ export class SiteValidator {
     }
 
     /**
-     * Validate site identifier according to business rules.
+     * Validates site identifier according to business rules.
      *
-     * @param site - The site containing the identifier to validate
-     * @returns Array of validation errors (empty if valid)
+     * @param site - The site containing the identifier to validate.
+     * @returns Array of validation errors (empty if valid).
+     *
+     * @remarks
+     * Checks for non-empty string identifier and correct type.
+     * Returns error messages if validation fails, or an empty array if valid.
+     *
+     * @example
+     * ```typescript
+     * const errors = validator["validateSiteIdentifier"](site);
+     * if (errors.length > 0) {
+     *   console.error(errors);
+     * }
+     * ```
      */
     private validateSiteIdentifier(site: Site): string[] {
         const errors: string[] = [];
@@ -101,10 +153,22 @@ export class SiteValidator {
     }
 
     /**
-     * Validate site monitors array and individual monitors.
+     * Validates site monitors array and individual monitors.
      *
-     * @param site - The site containing monitors to validate
-     * @returns Array of validation errors (empty if valid)
+     * @param site - The site containing monitors to validate.
+     * @returns Array of validation errors (empty if valid).
+     *
+     * @remarks
+     * Checks that monitors is an array and delegates individual monitor validation to {@link MonitorValidator}.
+     * Returns error messages for invalid monitors, or an empty array if all are valid.
+     *
+     * @example
+     * ```typescript
+     * const errors = validator["validateSiteMonitors"](site);
+     * if (errors.length > 0) {
+     *   console.error(errors);
+     * }
+     * ```
      */
     private validateSiteMonitors(site: Site): string[] {
         const errors: string[] = [];

@@ -87,11 +87,34 @@ type DatabaseManagerEvents = UptimeEvents;
  * ```
  */
 export class DatabaseManager {
+    /**
+     * Dependencies injected into the DatabaseManager.
+     * @readonly
+     */
     private readonly dependencies: DatabaseManagerDependencies;
+    /**
+     * Typed event emitter for database events.
+     * @readonly
+     */
     private readonly eventEmitter: TypedEventBus<DatabaseManagerEvents>;
+    /**
+     * Current history limit for status history retention.
+     * @defaultValue DEFAULT_HISTORY_LIMIT
+     */
     private historyLimit: number = DEFAULT_HISTORY_LIMIT;
+    /**
+     * Site cache for loaded site data.
+     * @readonly
+     */
     private readonly siteCache: StandardizedCache<Site>;
 
+    /**
+     * Create a new DatabaseManager instance.
+     *
+     * @param dependencies - Dependencies required for database operations.
+     * @remarks
+     * Instantiates the site cache and sets up event emitter and repositories.
+     */
     constructor(dependencies: DatabaseManagerDependencies) {
         this.dependencies = dependencies;
         this.eventEmitter = dependencies.eventEmitter;
@@ -100,6 +123,17 @@ export class DatabaseManager {
 
     /**
      * Download SQLite database backup.
+     */
+    /**
+     * Downloads a SQLite database backup.
+     *
+     * @returns Promise resolving to an object containing the backup buffer and file name.
+     *
+     * @example
+     * ```typescript
+     * const backup = await databaseManager.downloadBackup();
+     * // Use backup.buffer and backup.fileName
+     * ```
      */
     public async downloadBackup(): Promise<{ buffer: Buffer; fileName: string }> {
         const loggerAdapter = new LoggerAdapter(monitorLogger);
@@ -122,6 +156,16 @@ export class DatabaseManager {
 
     /**
      * Export all application data to JSON string.
+     */
+    /**
+     * Exports all application data to a JSON string.
+     *
+     * @returns Promise resolving to a JSON string containing all exported data.
+     *
+     * @example
+     * ```typescript
+     * const exportData = await databaseManager.exportData();
+     * ```
      */
     public async exportData(): Promise<string> {
         const loggerAdapter = new LoggerAdapter(monitorLogger);
@@ -153,6 +197,16 @@ export class DatabaseManager {
      * Get current history limit.
      *
      * @returns Current history limit value
+     */
+    /**
+     * Gets the current history limit for status history retention.
+     *
+     * @returns Current history limit value.
+     *
+     * @example
+     * ```typescript
+     * const limit = databaseManager.getHistoryLimit();
+     * ```
      */
     public getHistoryLimit(): number {
         return this.historyLimit;
@@ -255,7 +309,27 @@ export class DatabaseManager {
     /**
      * Initialize the database and load sites.
      */
+    /**
+     * Initializes the database and loads sites.
+     *
+     * @returns Promise resolving when initialization is complete.
+     *
+     * @example
+     * ```typescript
+     * await databaseManager.initialize();
+     * ```
+     */
     public async initialize(): Promise<void> {
+        /**
+         * Initializes the database and loads sites.
+         *
+         * @returns Promise resolving when initialization is complete.
+         *
+         * @example
+         * ```typescript
+         * await databaseManager.initialize();
+         * ```
+         */
         return withErrorHandling(
             async () => {
                 // First, load current settings from database including history limit
@@ -307,7 +381,27 @@ export class DatabaseManager {
      *
      * @returns Promise resolving to array of sites
      */
+    /**
+     * Refreshes sites from the database and updates the cache.
+     *
+     * @returns Promise resolving to an array of sites.
+     *
+     * @example
+     * ```typescript
+     * const sites = await databaseManager.refreshSites();
+     * ```
+     */
     public async refreshSites(): Promise<Site[]> {
+        /**
+         * Refreshes sites from the database and updates the cache.
+         *
+         * @returns Promise resolving to an array of sites.
+         *
+         * @example
+         * ```typescript
+         * const sites = await databaseManager.refreshSites();
+         * ```
+         */
         // Load sites first
         await this.loadSites();
 
@@ -345,7 +439,35 @@ export class DatabaseManager {
      * @param limit - Number of history records to retain (must be non-negative integer, 0 disables history tracking)
      * @throws Error if limit is not a valid non-negative integer
      */
+    /**
+     * Sets the history limit for status history retention.
+     *
+     * @param limit - The new history limit value to set.
+     * @returns Promise resolving when the history limit is updated.
+     *
+     * @throws TypeError if limit is not a valid number or integer.
+     * @throws RangeError if limit is negative, infinite, or too large.
+     *
+     * @example
+     * ```typescript
+     * await databaseManager.setHistoryLimit(100);
+     * ```
+     */
     public async setHistoryLimit(limit: number): Promise<void> {
+        /**
+         * Sets the history limit for status history retention.
+         *
+         * @param limit - The new history limit value to set.
+         * @returns Promise resolving when the history limit is updated.
+         *
+         * @throws TypeError if limit is not a valid number or integer.
+         * @throws RangeError if limit is negative, infinite, or too large.
+         *
+         * @example
+         * ```typescript
+         * await databaseManager.setHistoryLimit(100);
+         * ```
+         */
         // Comprehensive input validation
         if (typeof limit !== "number" || Number.isNaN(limit)) {
             throw new TypeError(
@@ -403,7 +525,21 @@ export class DatabaseManager {
      * This method consolidates all history limit event emissions to avoid redundancy
      * and ensure consistent event structure across the application.
      */
+    /**
+     * Emits a history limit updated event.
+     *
+     * @param limit - The new history limit.
+     * @remarks
+     * Consolidates all history limit event emissions to avoid redundancy and ensure consistent event structure.
+     */
     private async emitHistoryLimitUpdated(limit: number): Promise<void> {
+        /**
+         * Emits a history limit updated event.
+         *
+         * @param limit - The new history limit.
+         * @remarks
+         * Consolidates all history limit event emissions to avoid redundancy and ensure consistent event structure.
+         */
         try {
             await this.eventEmitter.emitTyped("internal:database:history-limit-updated", {
                 limit,
@@ -422,7 +558,19 @@ export class DatabaseManager {
      * This method consolidates all sites cache update event emissions to avoid redundancy
      * and ensure consistent event structure across the application.
      */
+    /**
+     * Emits a sites cache update requested event.
+     *
+     * @remarks
+     * Consolidates all sites cache update event emissions to avoid redundancy and ensure consistent event structure.
+     */
     private async emitSitesCacheUpdateRequested(): Promise<void> {
+        /**
+         * Emits a sites cache update requested event.
+         *
+         * @remarks
+         * Consolidates all sites cache update event emissions to avoid redundancy and ensure consistent event structure.
+         */
         try {
             await this.eventEmitter.emitTyped("internal:database:update-sites-cache-requested", {
                 operation: "update-sites-cache-requested",
@@ -450,7 +598,23 @@ export class DatabaseManager {
      * This method is private and intended for internal database operations only.
      * External consumers should use public methods like initialize() or refreshSites().
      */
+    /**
+     * Loads sites from the database and updates the cache using atomic replacement.
+     *
+     * @remarks
+     * Loads all sites from the database into a temporary cache, then atomically replaces the existing cache to prevent race conditions. Sets up monitoring configuration for each loaded site.
+     *
+     * @internal
+     */
     private async loadSites(): Promise<void> {
+        /**
+         * Loads sites from the database and updates the cache using atomic replacement.
+         *
+         * @remarks
+         * Loads all sites from the database into a temporary cache, then atomically replaces the existing cache to prevent race conditions. Sets up monitoring configuration for each loaded site.
+         *
+         * @internal
+         */
         const operationId = `loadSites-${Date.now()}`;
         monitorLogger.debug(`[DatabaseManager:${operationId}] Starting site loading operation`);
 

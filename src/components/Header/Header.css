@@ -55,19 +55,16 @@
 }
 
 .health-badge {
+    background-color: rgb(16 185 129 / 10%); /* Fallback color */
     background-color: color-mix(in srgb, var(--color-success) 10%, transparent);
-    border-color: var(--color-success-border, var(--color-success) 33);
+    border-color: var(--color-success-border, rgb(16 185 129 / 33%));
     border-width: 1px;
-    box-shadow: 0 0 0 0 var(--color-success-shadow, var(--color-success) 22);
+    box-shadow: 0 0 0 0 var(--color-success-shadow, rgb(16 185 129 / 22%));
     transition:
         box-shadow 0.22s cubic-bezier(0.4, 1.2, 0.4, 1),
         background 0.22s,
         transform 0.18s;
     will-change: transform, box-shadow;
-
-    &[data-health-color] {
-        --color-success: attr(data-health-color color);
-    }
 }
 
 .status-up-badge {
@@ -103,36 +100,41 @@
 }
 
 .health-badge:hover {
+    background-color: rgb(16 185 129 / 18%); /* Fallback color */
     background-color: color-mix(in srgb, var(--color-success) 18%, transparent);
-    box-shadow: 0 4px 18px 0 var(--color-success-shadow, var(--color-success) 33);
+    box-shadow: 0 4px 18px 0 var(--color-success-shadow, rgb(16 185 129 / 33%));
     filter: brightness(1.04) saturate(1.1);
     transform: scale(1.045) translateY(-2px);
 }
 
 .status-up-badge:hover {
+    background-color: rgb(16 185 129 / 12%); /* Fallback color */
     background-color: color-mix(in srgb, var(--color-success) 12%, transparent);
-    box-shadow: 0 2px 12px 0 var(--color-success-shadow, var(--color-success) 22);
+    box-shadow: 0 2px 12px 0 var(--color-success-shadow, rgb(16 185 129 / 22%));
     filter: brightness(1.03) saturate(1.08);
     transform: scale(1.04) translateY(-1px);
 }
 
 .status-down-badge:hover {
+    background-color: rgb(239 68 68 / 12%); /* Fallback color */
     background-color: color-mix(in srgb, var(--color-error) 12%, transparent);
-    box-shadow: 0 2px 12px 0 var(--color-error-shadow, var(--color-error) 22);
+    box-shadow: 0 2px 12px 0 var(--color-error-shadow, rgb(239 68 68 / 22%));
     filter: brightness(1.03) saturate(1.08);
     transform: scale(1.04) translateY(-1px);
 }
 
 .status-pending-badge:hover {
+    background-color: rgb(251 191 36 / 12%); /* Fallback color */
     background-color: color-mix(in srgb, var(--color-warning) 12%, transparent);
-    box-shadow: 0 2px 12px 0 var(--color-warning-shadow, var(--color-warning) 22);
+    box-shadow: 0 2px 12px 0 var(--color-warning-shadow, rgb(251 191 36 / 22%));
     filter: brightness(1.03) saturate(1.08);
     transform: scale(1.04) translateY(-1px);
 }
 
 .status-paused-badge:hover {
+    background-color: rgb(156 163 175 / 12%); /* Fallback color */
     background-color: color-mix(in srgb, var(--color-status-paused) 12%, transparent);
-    box-shadow: 0 2px 12px 0 var(--color-status-paused-shadow, var(--color-status-paused) 22);
+    box-shadow: 0 2px 12px 0 var(--color-status-paused-shadow, rgb(156 163 175 / 22%));
     filter: brightness(1.03) saturate(1.08);
     transform: scale(1.04) translateY(-1px);
 }
@@ -156,55 +158,63 @@
 /* Show visible outlines and subtle background on hover/focus */
 .header-title-box:hover,
 .header-title-box:focus-visible {
+    background: rgb(37 99 235 / 6%); /* Fallback color */
     background: color-mix(in srgb, var(--color-accent, var(--color-primary)) 6%, transparent);
     border-color: var(--color-accent, var(--color-primary));
-    box-shadow: 0 2px 12px 0 var(--color-accent, var(--color-primary) 22);
+    box-shadow: 0 2px 12px 0 var(--color-accent, rgb(37 99 235 / 22%));
 }
 
 .header-status-summary-box:hover,
 .header-status-summary-box:focus-visible {
+    background: rgb(37 99 235 / 6%); /* Fallback color */
     background: color-mix(in srgb, var(--color-accent, var(--color-primary)) 6%, transparent);
     border-color: var(--color-accent, var(--color-primary));
-    box-shadow: 0 2px 12px 0 var(--color-accent, var(--color-primary) 22);
+    box-shadow: 0 2px 12px 0 var(--color-accent, rgb(37 99 235 / 22%));
 }
 
 .health-badge:hover,
 .health-badge:focus-visible {
+    background: rgb(16 185 129 / 8%); /* Fallback color */
     background: color-mix(in srgb, var(--color-success, var(--color-accent)) 8%, transparent);
     border-color: var(--color-success, var(--color-accent));
-    box-shadow: 0 4px 18px 0 var(--color-success-shadow, var(--color-success) 33);
+    box-shadow: 0 4px 18px 0 var(--color-success-shadow, rgb(16 185 129 / 33%));
 }
 
 .status-up-badge:hover,
 .status-up-badge:focus-visible {
+    background: rgb(16 185 129 / 8%); /* Fallback color */
     background: color-mix(in srgb, var(--color-success) 8%, transparent);
     border-color: var(--color-success);
-    box-shadow: 0 2px 12px 0 var(--color-success-shadow, var(--color-success) 22);
+    box-shadow: 0 2px 12px 0 var(--color-success-shadow, rgb(16 185 129 / 22%));
 }
 
 .status-down-badge:hover,
 .status-down-badge:focus-visible {
+    background: rgb(239 68 68 / 8%); /* Fallback color */
     background: color-mix(in srgb, var(--color-error) 8%, transparent);
     border-color: var(--color-error);
-    box-shadow: 0 2px 12px 0 var(--color-error-shadow, var(--color-error) 22);
+    box-shadow: 0 2px 12px 0 var(--color-error-shadow, rgb(239 68 68 / 22%));
 }
 
 .status-pending-badge:hover,
 .status-pending-badge:focus-visible {
+    background: rgb(251 191 36 / 8%); /* Fallback color */
     background: color-mix(in srgb, var(--color-warning) 8%, transparent);
     border-color: var(--color-warning);
-    box-shadow: 0 2px 12px 0 var(--color-warning-shadow, var(--color-warning) 22);
+    box-shadow: 0 2px 12px 0 var(--color-warning-shadow, rgb(251 191 36 / 22%));
 }
 
 .status-paused-badge:hover,
 .status-paused-badge:focus-visible {
+    background: rgb(156 163 175 / 8%); /* Fallback color */
     background: color-mix(in srgb, var(--color-status-paused) 8%, transparent);
     border-color: var(--color-status-paused);
-    box-shadow: 0 2px 12px 0 var(--color-status-paused-shadow, var(--color-status-paused) 22);
+    box-shadow: 0 2px 12px 0 var(--color-status-paused-shadow, rgb(156 163 175 / 22%));
 }
 
 .total-sites-badge:hover,
 .total-sites-badge:focus-visible {
+    background: rgb(37 99 235 / 6%); /* Fallback color */
     background: color-mix(in srgb, var(--color-border, var(--color-accent)) 6%, transparent);
     border-color: var(--color-border, var(--color-accent));
     box-shadow: 0 2px 12px 0 var(--color-shadow, #0002);
@@ -212,16 +222,18 @@
 
 .header-interval-box:hover,
 .header-interval-box:focus-visible {
+    background: rgb(37 99 235 / 6%); /* Fallback color */
     background: color-mix(in srgb, var(--color-accent, var(--color-primary)) 6%, transparent);
     border-color: var(--color-accent, var(--color-primary));
-    box-shadow: 0 2px 12px 0 var(--color-accent, var(--color-primary) 22);
+    box-shadow: 0 2px 12px 0 var(--color-accent, rgb(37 99 235 / 22%));
 }
 
 .header-controls-box:hover,
 .header-controls-box:focus-visible {
+    background: rgb(37 99 235 / 6%); /* Fallback color */
     background: color-mix(in srgb, var(--color-accent, var(--color-primary)) 6%, transparent);
     border-color: var(--color-accent, var(--color-primary));
-    box-shadow: 0 2px 12px 0 var(--color-accent, var(--color-primary) 22);
+    box-shadow: 0 2px 12px 0 var(--color-accent, rgb(37 99 235 / 22%));
 }
 
 /* Accessibility: reduce motion */
@@ -233,7 +245,14 @@
     .status-up-badge,
     .status-down-badge,
     .status-pending-badge,
-    .status-paused-badge {
+    .status-paused-badge,
+    .header-title-box,
+    .header-status-summary-box,
+    .total-sites-badge,
+    .header-interval-box,
+    .header-controls-box {
+        transform: none !important;
         transition: none !important;
+        animation: none !important;
     }
 }

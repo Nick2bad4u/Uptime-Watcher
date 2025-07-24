@@ -1,4 +1,5 @@
 /**
+ * @public
  * Site management coordinator for CRUD operations and cache synchronization.
  *
  * @remarks
@@ -59,6 +60,7 @@ import { monitorLogger as logger } from "../utils/logger";
 import { ConfigurationManager } from "./ConfigurationManager";
 
 /**
+ * @public
  * Interface for monitoring operations integration.
  *
  * @remarks
@@ -67,18 +69,38 @@ import { ConfigurationManager } from "./ConfigurationManager";
  * the SiteManager and MonitorManager while enabling coordinated operations.
  */
 export interface IMonitoringOperations {
-    /** Update the global history limit setting */
+    /**
+     * Update the global history limit setting.
+     * @param limit - The new history limit value.
+     * @returns A promise that resolves when the limit is updated.
+     */
     setHistoryLimit: (limit: number) => Promise<void>;
-    /** Set up monitoring for newly created monitors */
+    /**
+     * Set up monitoring for newly created monitors.
+     * @param site - The site containing new monitors.
+     * @param newMonitorIds - Array of new monitor IDs to set up.
+     * @returns A promise that resolves when setup is complete.
+     */
     setupNewMonitors: (site: Site, newMonitorIds: string[]) => Promise<void>;
-    /** Start monitoring for a specific site and monitor */
+    /**
+     * Start monitoring for a specific site and monitor.
+     * @param identifier - The site identifier.
+     * @param monitorId - The monitor ID to start monitoring for.
+     * @returns A promise that resolves to true if monitoring started, false otherwise.
+     */
     startMonitoringForSite: (identifier: string, monitorId: string) => Promise<boolean>;
-    /** Stop monitoring for a specific site and monitor */
+    /**
+     * Stop monitoring for a specific site and monitor.
+     * @param identifier - The site identifier.
+     * @param monitorId - The monitor ID to stop monitoring for.
+     * @returns A promise that resolves to true if monitoring stopped, false otherwise.
+     */
     stopMonitoringForSite: (identifier: string, monitorId: string) => Promise<boolean>;
 }
 
 /**
- * Dependency injection configuration for SiteManager.
+ * @public
+ * Dependency injection configuration for {@link SiteManager}.
  *
  * @remarks
  * Provides all required dependencies for SiteManager operation, including
@@ -86,26 +108,27 @@ export interface IMonitoringOperations {
  * monitoring integration for coordinated operations.
  */
 export interface SiteManagerDependencies {
-    /** Configuration manager for business rules and validation */
+    /** Configuration manager for business rules and validation. */
     configurationManager: ConfigurationManager;
-    /** Database service for transaction management */
+    /** Database service for transaction management. */
     databaseService: DatabaseService;
-    /** Event emitter for system-wide communication */
+    /** Event emitter for system-wide communication. */
     eventEmitter: TypedEventBus<SiteManagerEvents>;
-    /** History repository for status history management */
+    /** History repository for status history management. */
     historyRepository: HistoryRepository;
-    /** Optional MonitorManager dependency for coordinated operations */
+    /** Optional MonitorManager dependency for coordinated operations. */
     monitoringOperations?: IMonitoringOperations;
-    /** Monitor repository for monitor-related operations */
+    /** Monitor repository for monitor-related operations. */
     monitorRepository: MonitorRepository;
-    /** Settings repository for configuration management */
+    /** Settings repository for configuration management. */
     settingsRepository: SettingsRepository;
-    /** Site repository for database operations */
+    /** Site repository for database operations. */
     siteRepository: SiteRepository;
 }
 
 /**
- * Combined events interface for SiteManager.
+ * @public
+ * Combined events interface for {@link SiteManager}.
  *
  * @remarks
  * Supports all uptime monitoring events for comprehensive event communication
@@ -114,6 +137,7 @@ export interface SiteManagerDependencies {
 type SiteManagerEvents = UptimeEvents;
 
 /**
+ * @public
  * Manages site operations and maintains in-memory cache.
  *
  * @remarks
@@ -140,15 +164,18 @@ export class SiteManager {
     private readonly siteWriterService: SiteWriterService;
 
     /**
-     * Create a new SiteManager instance.
+     * Constructs a new SiteManager instance.
      *
-     * @param dependencies - Required dependencies for site management operations
-     *
+     * @param dependencies - Required dependencies for site management operations.
      * @remarks
      * Initializes the SiteManager with all required dependencies including repositories,
      * database service, event emitter, and optional monitoring operations. Creates
      * internal service orchestrators for coordinated operations and sets up the
      * in-memory cache for performance optimization.
+     * @example
+     * ```typescript
+     * const siteManager = new SiteManager({ ... });
+     * ```
      */
     constructor(dependencies: SiteManagerDependencies) {
         this.configurationManager = dependencies.configurationManager;
@@ -198,7 +225,15 @@ export class SiteManager {
     }
 
     /**
-     * Add a new site to the database and cache.
+     * Adds a new site to the database and cache.
+     *
+     * @param siteData - The site data to add.
+     * @returns The newly added site object.
+     * @throws If site validation fails or database operation fails.
+     * @example
+     * ```typescript
+     * const site = await siteManager.addSite(siteData);
+     * ```
      */
     public async addSite(siteData: Site): Promise<Site> {
         // Business validation
@@ -230,7 +265,16 @@ export class SiteManager {
     }
 
     /**
-     * Get a specific site from cache with smart background loading.
+     * Gets a specific site from cache with smart background loading.
+     *
+     * @param identifier - The site identifier to retrieve.
+     * @returns The site object if found in cache, otherwise undefined.
+     * @remarks
+     * If the site is not found in cache, triggers background loading and emits a cache miss event.
+     * @example
+     * ```typescript
+     * const site = siteManager.getSiteFromCache("site_123");
+     * ```
      */
     public getSiteFromCache(identifier: string): Site | undefined {
         const site = this.sitesCache.get(identifier);
@@ -258,16 +302,15 @@ export class SiteManager {
     }
 
     /**
-     * Get all sites from database with full monitor and history data.
+     * Gets all sites from the database with full monitor and history data.
      *
-     * @returns Promise resolving to array of complete site objects
-     *
+     * @returns Promise resolving to array of complete site objects.
+     * @throws If database operation fails.
      * @remarks
      * Retrieves all sites from the database including their associated monitors
      * and status history. This operation also updates the cache to ensure it
      * stays synchronized with the database. Use this method when you need
      * guaranteed fresh data or during cache refresh operations.
-     *
      * @example
      * ```typescript
      * const allSites = await siteManager.getSites();
@@ -282,17 +325,20 @@ export class SiteManager {
     }
 
     /**
-     * Get the standardized sites cache (for internal use by other managers).
+     * Gets the standardized sites cache (for internal use by other managers).
+     *
+     * @returns The standardized cache instance for sites.
+     * @remarks
+     * Used for internal coordination between managers. External consumers should use getSites().
      */
     public getSitesCache(): StandardizedCache<Site> {
         return this.sitesCache;
     }
 
     /**
-     * Get sites from in-memory cache for fast access.
+     * Gets sites from in-memory cache for fast access.
      *
-     * @returns The current site cache instance
-     *
+     * @returns Array of site objects currently in cache.
      * @remarks
      * Returns the in-memory cache containing all sites for high-performance
      * access patterns. The cache is automatically synchronized with database
@@ -307,8 +353,16 @@ export class SiteManager {
     }
 
     /**
-     * Initialize the SiteManager by loading all sites into cache.
+     * Initializes the SiteManager by loading all sites into cache.
+     *
+     * @returns A promise that resolves when initialization is complete.
+     * @throws If loading sites from database fails.
+     * @remarks
      * This method should be called during application startup.
+     * @example
+     * ```typescript
+     * await siteManager.initialize();
+     * ```
      */
     public async initialize(): Promise<void> {
         try {
@@ -323,7 +377,16 @@ export class SiteManager {
     }
 
     /**
-     * Remove a monitor from a site.
+     * Removes a monitor from a site.
+     *
+     * @param siteIdentifier - The identifier of the site.
+     * @param monitorId - The monitor ID to remove.
+     * @returns True if the monitor was removed, false otherwise.
+     * @throws If database or cache update fails.
+     * @example
+     * ```typescript
+     * const success = await siteManager.removeMonitor("site_123", "monitor_456");
+     * ```
      */
     public async removeMonitor(siteIdentifier: string, monitorId: string): Promise<boolean> {
         try {
@@ -369,7 +432,15 @@ export class SiteManager {
     }
 
     /**
-     * Remove a site from the database and cache.
+     * Removes a site from the database and cache.
+     *
+     * @param identifier - The site identifier to remove.
+     * @returns True if the site was removed, false otherwise.
+     * @throws If database or cache update fails.
+     * @example
+     * ```typescript
+     * const success = await siteManager.removeSite("site_123");
+     * ```
      */
     public async removeSite(identifier: string): Promise<boolean> {
         // Get site information BEFORE deletion for accurate event data
@@ -400,7 +471,16 @@ export class SiteManager {
     }
 
     /**
-     * Update a site in the database and cache.
+     * Updates a site in the database and cache.
+     *
+     * @param identifier - The site identifier to update.
+     * @param updates - Partial site data to update.
+     * @returns The updated site object.
+     * @throws If validation, database, or cache update fails.
+     * @example
+     * ```typescript
+     * const updatedSite = await siteManager.updateSite("site_123", { name: "New Name" });
+     * ```
      */
     public async updateSite(identifier: string, updates: Partial<Site>): Promise<Site> {
         // Get original site before update for monitoring comparison
@@ -469,7 +549,14 @@ export class SiteManager {
     }
 
     /**
-     * Update the sites cache with new data.
+     * Updates the sites cache with new data.
+     *
+     * @param sites - Array of site objects to update the cache with.
+     * @returns A promise that resolves when cache update is complete.
+     * @example
+     * ```typescript
+     * await siteManager.updateSitesCache(sitesArray);
+     * ```
      */
     public async updateSitesCache(sites: Site[]): Promise<void> {
         this.sitesCache.clear();
@@ -486,9 +573,11 @@ export class SiteManager {
     }
 
     /**
-     * Create monitoring configuration for site operations.
+     * Creates monitoring configuration for site operations.
      *
-     * @returns Configuration for managing monitoring operations
+     * @returns Configuration for managing monitoring operations.
+     * @remarks
+     * Used internally for coordinated monitoring actions during site updates.
      */
     private createMonitoringConfig(): MonitoringConfig {
         return {
@@ -529,7 +618,11 @@ export class SiteManager {
     }
 
     /**
-     * Execute monitor deletion.
+     * Executes monitor deletion.
+     *
+     * @param monitorId - The monitor ID to delete.
+     * @returns True if the monitor was deleted, false otherwise.
+     * @throws If database operation fails.
      */
     private async executeMonitorDeletion(monitorId: string): Promise<boolean> {
         // MonitorRepository.delete() already handles its own transaction,
@@ -538,7 +631,10 @@ export class SiteManager {
     }
 
     /**
-     * Format validation errors for better readability.
+     * Formats validation errors for better readability.
+     *
+     * @param errors - Array of error messages.
+     * @returns Formatted error string.
      */
     private formatValidationErrors(errors: string[]): string {
         if (errors.length === 1) {
@@ -549,8 +645,10 @@ export class SiteManager {
     }
 
     /**
-     * Load a site in the background and update cache.
+     * Loads a site in the background and updates cache.
      *
+     * @param identifier - The site identifier to load.
+     * @returns A promise that resolves when background loading is complete.
      * @remarks
      * Performs silent background loading with error logging but no exception throwing.
      * This ensures background operations don't disrupt the main application flow while
@@ -583,7 +681,11 @@ export class SiteManager {
     }
 
     /**
-     * Business logic: Validate site data according to business rules.
+     * Validates site data according to business rules.
+     *
+     * @param site - The site object to validate.
+     * @returns A promise that resolves if validation passes.
+     * @throws If validation fails.
      */
     private async validateSite(site: Site): Promise<void> {
         const validationResult = await this.configurationManager.validateSiteConfiguration(site);

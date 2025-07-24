@@ -220,6 +220,23 @@ export const CHART_TIME_PERIODS = {
 } as const;
 
 /**
+ * Chart time range options for analytics and data visualization.
+ *
+ * @remarks
+ * Standardized time ranges used across chart components for consistent
+ * data filtering and display. Ranges progress from short-term to long-term monitoring.
+ */
+export const CHART_TIME_RANGES = ["1h", "24h", "7d", "30d"] as const;
+
+/**
+ * Type definition for chart time range values.
+ *
+ * @remarks
+ * Provides type safety for chart time range selection components.
+ */
+export type ChartTimeRange = (typeof CHART_TIME_RANGES)[number];
+
+/**
  * Common ARIA attribute constants for accessibility.
  *
  * @remarks

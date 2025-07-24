@@ -60,10 +60,10 @@ describe("ErrorBoundary", () => {
         });
 
         it("should render custom fallback when provided", () => {
-            const CustomFallback: React.FC<{ error?: Error; retry: () => void }> = ({ error, retry }) => (
+            const CustomFallback: React.FC<{ error?: Error; onRetry: () => void }> = ({ error, onRetry }) => (
                 <div>
                     <p>Custom error: {error?.message}</p>
-                    <button onClick={retry}>Custom retry</button>
+                    <button onClick={onRetry}>Custom retry</button>
                 </div>
             );
 
@@ -161,8 +161,8 @@ describe("ErrorBoundary", () => {
         });
 
         it("should handle retry without fallback error prop", async () => {
-            const CustomFallback: React.FC<{ retry: () => void }> = ({ retry }) => (
-                <button onClick={retry}>Retry without error</button>
+            const CustomFallback: React.FC<{ onRetry: () => void }> = ({ onRetry }) => (
+                <button onClick={onRetry}>Retry without error</button>
             );
 
             render(
@@ -225,10 +225,10 @@ describe("ErrorBoundary", () => {
         });
 
         it("should use custom fallback when provided", () => {
-            const CustomFallback: React.FC<{ error?: Error; retry: () => void }> = ({ error, retry }) => (
+            const CustomFallback: React.FC<{ error?: Error; onRetry: () => void }> = ({ error, onRetry }) => (
                 <div>
                     <p>HOC Custom error: {error?.message}</p>
-                    <button onClick={retry}>HOC retry</button>
+                    <button onClick={onRetry}>HOC retry</button>
                 </div>
             );
 
@@ -312,13 +312,13 @@ describe("ErrorBoundary", () => {
         });
 
         it("should handle undefined error", () => {
-            const CustomFallback: React.FC<{ retry: () => void }> = () => (
+            const CustomFallback: React.FC<{ onRetry: () => void }> = () => (
                 <ErrorBoundary>
                     <ThrowError />
                 </ErrorBoundary>
             );
 
-            render(<CustomFallback retry={() => {}} />);
+            render(<CustomFallback onRetry={() => {}} />);
 
             expect(screen.getByText("Something went wrong")).toBeInTheDocument();
         });

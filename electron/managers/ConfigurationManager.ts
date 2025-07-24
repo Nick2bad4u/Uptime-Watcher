@@ -28,15 +28,49 @@ export interface HistoryRetentionConfig {
  * Implements caching for validation results and configuration values for performance.
  *
  * @remarks
- * ConfigurationManager instances should be obtained via ServiceContainer.getInstance().getConfigurationManager()
- * This ensures proper dependency injection and lifecycle management
+ * ConfigurationManager instances should be obtained via ServiceContainer.getInstance().getConfigurationManager().
+ * This ensures proper dependency injection and lifecycle management.
+ *
+ * @example
+ * ```typescript
+ * const configManager = ServiceContainer.getInstance().getConfigurationManager();
+ * const defaultInterval = configManager.getDefaultMonitorInterval();
+ * const validation = await configManager.validateSiteConfiguration(site);
+ * if (!validation.isValid) {
+ *   console.error(validation.errors);
+ * }
+ * ```
+ *
+ * @public
  */
 export class ConfigurationManager {
+    /**
+     * Cache for configuration values.
+     * @readonly
+     */
     private readonly configCache: StandardizedCache<unknown>;
+    /**
+     * Monitor validator instance for monitor-specific validation.
+     * @readonly
+     */
     private readonly monitorValidator: MonitorValidator;
+    /**
+     * Site validator instance for site-level validation.
+     * @readonly
+     */
     private readonly siteValidator: SiteValidator;
+    /**
+     * Cache for validation results.
+     * @readonly
+     */
     private readonly validationCache: StandardizedCache<ValidationResult>;
 
+    /**
+     * Create a new ConfigurationManager instance.
+     *
+     * @remarks
+     * Instantiates specialized validators and initializes caches for configuration and validation results.
+     */
     constructor() {
         this.siteValidator = new SiteValidator();
         this.monitorValidator = new MonitorValidator();
@@ -58,14 +92,30 @@ export class ConfigurationManager {
     }
 
     /**
-     * Clear validation cache when configuration changes.
+     * Clears the validation cache when configuration changes.
+     *
+     * @remarks
+     * Use this method to invalidate cached validation results after configuration updates.
+     *
+     * @example
+     * ```typescript
+     * configManager.clearValidationCache();
+     * ```
      */
     public clearValidationCache(): void {
         this.validationCache.clear();
     }
 
     /**
-     * Get cache statistics for monitoring.
+     * Gets cache statistics for monitoring.
+     *
+     * @returns Object containing configuration and validation cache statistics.
+     *
+     * @example
+     * ```typescript
+     * const stats = configManager.getCacheStats();
+     * console.log(stats);
+     * ```
      */
     public getCacheStats(): {
         configuration: ReturnType<StandardizedCache<unknown>["getStats"]>;
@@ -78,15 +128,31 @@ export class ConfigurationManager {
     }
 
     /**
-     * Get the default monitor check interval according to business rules.
+     * Gets the default monitor check interval according to business rules.
+     *
+     * @returns The default check interval in milliseconds.
+     *
+     * @example
+     * ```typescript
+     * const interval = configManager.getDefaultMonitorInterval();
+     * ```
      */
     public getDefaultMonitorInterval(): number {
         return DEFAULT_CHECK_INTERVAL;
     }
 
     /**
-     * Get history retention configuration according to business rules.
+     * Gets history retention configuration according to business rules.
+     *
+     * @returns History retention configuration object.
+     *
+     * @remarks
      * These limits align with the history limit options available in the UI.
+     *
+     * @example
+     * ```typescript
+     * const rules = configManager.getHistoryRetentionRules();
+     * ```
      */
     public getHistoryRetentionRules(): HistoryRetentionConfig {
         return {
@@ -97,35 +163,80 @@ export class ConfigurationManager {
     }
 
     /**
-     * Business rule: Get the maximum allowed port number.
+     * Gets the maximum allowed port number according to business rules.
+     *
+     * @returns The maximum allowed port number.
+     *
+     * @example
+     * ```typescript
+     * const maxPort = configManager.getMaximumPortNumber();
+     * ```
      */
     public getMaximumPortNumber(): number {
         return 65_535;
     }
 
     /**
-     * Business rule: Get the minimum allowed check interval.
+     * Gets the minimum allowed check interval according to business rules.
+     *
+     * @returns The minimum allowed check interval in milliseconds.
+     *
+     * @example
+     * ```typescript
+     * const minInterval = configManager.getMinimumCheckInterval();
+     * ```
      */
     public getMinimumCheckInterval(): number {
         return 1000; // 1 second minimum
     }
 
     /**
-     * Business rule: Get the minimum allowed timeout.
+     * Gets the minimum allowed timeout according to business rules.
+     *
+     * @returns The minimum allowed timeout in milliseconds.
+     *
+     * @example
+     * ```typescript
+     * const minTimeout = configManager.getMinimumTimeout();
+     * ```
      */
     public getMinimumTimeout(): number {
         return 1000; // 1 second minimum
     }
 
     /**
-     * Business rule: Determine if a monitor should receive a default interval.
+     * Determines if a monitor should receive a default interval according to business rules.
+     *
+     * @param monitor - The monitor configuration to evaluate.
+     * @returns True if the monitor should receive a default check interval.
+     *
+     * @example
+     * ```typescript
+     * if (configManager.shouldApplyDefaultInterval(monitor)) {
+     *   monitor.checkInterval = configManager.getDefaultMonitorInterval();
+     * }
+     * ```
      */
     public shouldApplyDefaultInterval(monitor: Site["monitors"][0]): boolean {
         return this.monitorValidator.shouldApplyDefaultInterval(monitor);
     }
 
     /**
-     * Business rule: Determine if monitoring should be auto-started for a site.
+     * Determines if monitoring should be auto-started for a site according to business rules.
+     *
+     * @param site - The site configuration to evaluate.
+     * @returns True if monitoring should be auto-started for the site.
+     *
+     * @remarks
+     * Monitoring is not auto-started in development mode or for sites without monitors.
+     * The site's monitoring property takes precedence.
+     *
+     * @example
+     * ```typescript
+     * if (configManager.shouldAutoStartMonitoring(site)) {
+     *   startMonitoring(site);
+     * }
+     * ```
      */
     public shouldAutoStartMonitoring(site: Site): boolean {
         // Business rule: Don't auto-start in development mode
@@ -143,23 +254,40 @@ export class ConfigurationManager {
     }
 
     /**
-     * Business rule: Determine if a site should be included in exports.
+     * Determines if a site should be included in exports according to business rules.
      * Delegates to site validator for consistency.
+     *
+     * @param site - The site configuration to evaluate.
+     * @returns True if the site should be included in exports.
+     *
+     * @example
+     * ```typescript
+     * if (configManager.shouldIncludeInExport(site)) {
+     *   exportSite(site);
+     * }
+     * ```
      */
     public shouldIncludeInExport(site: Site): boolean {
         return this.siteValidator.shouldIncludeInExport(site);
     }
 
     /**
-     * Validate monitor configuration according to business rules with caching.
+     * Validates monitor configuration according to business rules with caching.
+     *
+     * @param monitor - The monitor configuration to validate.
+     * @returns Promise resolving to validation result with errors and validity status.
      *
      * @remarks
      * Delegates to specialized monitor validator and caches results for performance.
-     * Marked as async for forward compatibility with future validator implementations
-     * that may require asynchronous operations or cache backends.
+     * Marked as async for forward compatibility with future validator implementations that may require asynchronous operations or cache backends.
      *
-     * @param monitor - The monitor configuration to validate
-     * @returns Promise resolving to validation result with errors and validity status
+     * @example
+     * ```typescript
+     * const result = await configManager.validateMonitorConfiguration(monitor);
+     * if (!result.isValid) {
+     *   console.error(result.errors);
+     * }
+     * ```
      */
     public async validateMonitorConfiguration(monitor: Site["monitors"][0]): Promise<ValidationResult> {
         // Create stable cache key from monitor properties that affect validation
@@ -194,15 +322,22 @@ export class ConfigurationManager {
     }
 
     /**
-     * Validate site configuration according to business rules with caching.
+     * Validates site configuration according to business rules with caching.
+     *
+     * @param site - The site configuration to validate.
+     * @returns Promise resolving to validation result with errors and validity status.
      *
      * @remarks
      * Delegates to specialized site validator and caches results for performance.
-     * Marked as async for forward compatibility with future validator implementations
-     * that may require asynchronous operations or cache backends.
+     * Marked as async for forward compatibility with future validator implementations that may require asynchronous operations or cache backends.
      *
-     * @param site - The site configuration to validate
-     * @returns Promise resolving to validation result with errors and validity status
+     * @example
+     * ```typescript
+     * const result = await configManager.validateSiteConfiguration(site);
+     * if (!result.isValid) {
+     *   console.error(result.errors);
+     * }
+     * ```
      */
     public async validateSiteConfiguration(site: Site): Promise<ValidationResult> {
         // Create stable cache key from site properties that affect validation

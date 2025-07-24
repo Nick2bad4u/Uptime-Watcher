@@ -15,7 +15,7 @@ import logger from "../../services/logger";
  */
 export interface ErrorBoundaryProperties {
     children: React.ReactNode;
-    fallback?: React.ComponentType<{ error?: Error; retry: () => void }>;
+    fallback?: React.ComponentType<{ error?: Error; onRetry: () => void }>;
     onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
 }
 
@@ -71,7 +71,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProperties, Erro
             return (
                 <FallbackComponent
                     {...(this.state.error ? { error: this.state.error } : {})}
-                    retry={this.handleRetry}
+                    onRetry={this.handleRetry}
                 />
             );
         }
@@ -85,7 +85,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProperties, Erro
  */
 export const withErrorBoundary = <P extends object>(
     Component: React.ComponentType<P>,
-    fallback?: React.ComponentType<{ error?: Error; retry: () => void }>
+    fallback?: React.ComponentType<{ error?: Error; onRetry: () => void }>
 ) => {
     const WrappedComponent = (properties: P) => (
         <ErrorBoundary {...(fallback ? { fallback } : {})}>

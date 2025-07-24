@@ -1,4 +1,19 @@
 /**
+ * Header component providing global status overview and application controls
+ *
+ * This file exports the main Header component that displays:
+ * - Application title and branding
+ * - Global uptime statistics and monitor counts
+ * - Status indicators for up/down/pending/paused monitors
+ * - Theme toggle functionality
+ * - Settings modal access
+ * - Responsive layout with accessibility support
+ *
+ * The component integrates with the application's state management via Zustand stores
+ * and provides a consistent navigation and status overview experience.
+ */
+
+/**
  * Header component providing global status overview and application controls.
  * Displays uptime statistics, theme toggle, and settings access.
  */

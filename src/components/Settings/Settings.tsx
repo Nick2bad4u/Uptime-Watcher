@@ -8,6 +8,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 
+import type { AppSettings } from "../../stores/types";
+
 import { HISTORY_LIMIT_OPTIONS, UI_DELAYS } from "../../constants";
 import logger from "../../services/logger";
 import { useErrorStore } from "../../stores/error/useErrorStore";
@@ -24,6 +26,18 @@ import {
 import { ThemeName } from "../../theme/types";
 import { useTheme } from "../../theme/useTheme";
 import { ensureError } from "../../utils/errorHandling";
+
+/**
+ * Allowed settings keys that can be updated
+ */
+const ALLOWED_SETTINGS_KEYS = new Set<keyof AppSettings>([
+    "autoStart",
+    "historyLimit",
+    "minimizeToTray",
+    "notifications",
+    "soundAlerts",
+    "theme",
+]);
 
 /**
  * Props for the Settings component
@@ -68,28 +82,25 @@ export function Settings({ onClose }: Readonly<SettingsProperties>) {
     useEffect(() => {
         if (!isLoading) {
             setShowButtonLoading(false);
-            return () => {}; // Return empty cleanup function for consistency
         }
-
-        const timeoutId = setTimeout(() => {
-            setShowButtonLoading(true);
-        }, UI_DELAYS.LOADING_BUTTON);
-
-        return () => clearTimeout(timeoutId);
     }, [isLoading]);
 
-    // Only allow keys that are part of AppSettings
-    const allowedKeys = new Set<keyof typeof settings>([
-        "autoStart",
-        "historyLimit",
-        "minimizeToTray",
-        "notifications",
-        "soundAlerts",
-        "theme",
-    ]);
+    useEffect(() => {
+        if (isLoading) {
+            const timeoutId = setTimeout(() => {
+                setShowButtonLoading(true);
+            }, UI_DELAYS.LOADING_BUTTON);
+
+            return () => {
+                clearTimeout(timeoutId);
+            };
+        }
+
+        return () => {}; // Empty cleanup function when not loading
+    }, [isLoading]);
 
     const handleSettingChange = (key: keyof typeof settings, value: unknown) => {
-        if (!allowedKeys.has(key)) {
+        if (!ALLOWED_SETTINGS_KEYS.has(key)) {
             logger.warn("Attempted to update invalid settings key", key);
             return;
         }
@@ -110,7 +121,8 @@ export function Settings({ onClose }: Readonly<SettingsProperties>) {
     };
 
     const handleReset = () => {
-        if (globalThis.confirm("Are you sure you want to reset all settings to defaults?")) {
+        // Use window.confirm instead of globalThis for better React compatibility
+        if (window.confirm("Are you sure you want to reset all settings to defaults?")) {
             resetSettings();
             clearError(); // Clear any errors when resetting
             logger.user.action("Reset settings to defaults");
@@ -418,7 +430,7 @@ export function Settings({ onClose }: Readonly<SettingsProperties>) {
                                 Cancel
                             </ThemedButton>
                             <ThemedButton loading={showButtonLoading} onClick={onClose} size="sm" variant="primary">
-                                Save Changes
+                                Close
                             </ThemedButton>
                         </div>
                     </div>

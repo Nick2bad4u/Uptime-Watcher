@@ -6,15 +6,50 @@
 import { FiActivity, FiBarChart2, FiTrendingUp } from "react-icons/fi";
 import { MdAnalytics, MdPieChart, MdSpeed, MdTrendingUp } from "react-icons/md";
 
+import { CHART_TIME_RANGES, ChartTimeRange } from "../../../constants";
 import { DowntimePeriod } from "../../../hooks/site/useSiteAnalytics";
 import { ResponseTimeChartData, StatusBarChartData, UptimeChartData } from "../../../services/chartConfig";
 import { ChartOptions } from "../../../services/chartSetup";
 import logger from "../../../services/logger";
 import { ThemedBadge, ThemedButton, ThemedCard, ThemedProgress, ThemedText } from "../../../theme/components";
+import { Theme } from "../../../theme/types";
 import { useAvailabilityColors, useTheme } from "../../../theme/useTheme";
 import { MonitorType } from "../../../types";
 import { ConditionalResponseTime } from "../../common/MonitorUiComponents";
 import { ResponseTimeChart, StatusChart, UptimeChart } from "../charts/ChartComponents";
+
+/**
+ * Parse and validate uptime string to number
+ * Handles strings with percent signs and validates the result
+ */
+const parseUptimeValue = (uptimeString: string): number => {
+    // Remove any percent signs and whitespace
+    const cleanedUptime = uptimeString.replaceAll(/[\s%]/g, "");
+    const parsed = Number.parseFloat(cleanedUptime);
+
+    // Validate the parsed value is a valid number and within expected range
+    if (Number.isNaN(parsed)) {
+        logger.warn("Invalid uptime value received", { uptime: uptimeString });
+        return 0;
+    }
+
+    // Clamp to 0-100 range for safety
+    return Math.min(100, Math.max(0, parsed));
+};
+
+/**
+ * Get color for MTTR display based on recovery status
+ */
+const getMttrColor = (mttrValue: number, theme: Theme): string => {
+    return mttrValue === 0 ? theme.colors.success : theme.colors.error;
+};
+
+/**
+ * Get color for incidents display based on incident count
+ */
+const getIncidentsColor = (incidentCount: number, theme: Theme): string => {
+    return incidentCount === 0 ? theme.colors.success : theme.colors.error;
+};
 
 /**
  * Props for the AnalyticsTab component.
@@ -58,11 +93,11 @@ export interface AnalyticsTabProperties {
     /** Function to toggle advanced metrics visibility */
     readonly setShowAdvancedMetrics: (show: boolean) => void;
     /** Function to set the chart time range */
-    readonly setSiteDetailsChartTimeRange: (range: "1h" | "7d" | "24h" | "30d") => void;
+    readonly setSiteDetailsChartTimeRange: (range: ChartTimeRange) => void;
     /** Whether advanced metrics are currently shown */
     readonly showAdvancedMetrics: boolean;
     /** Current chart time range selection */
-    readonly siteDetailsChartTimeRange: "1h" | "7d" | "24h" | "30d";
+    readonly siteDetailsChartTimeRange: ChartTimeRange;
     /** Total number of checks performed */
     readonly totalChecks: number;
     /** Total downtime in milliseconds */
@@ -130,9 +165,12 @@ export function AnalyticsTab({
         return currentTheme.colors.error; // Red for poor (>500ms)
     };
 
+    // Parse uptime value once with validation
+    const uptimeValue = parseUptimeValue(uptime);
+
     // Icon colors configuration
     const getIconColors = () => {
-        const availabilityColor = getColor(Number.parseFloat(uptime));
+        const availabilityColor = getColor(uptimeValue);
         const responseTimeColor = getResponseTimeColor(avgResponseTime);
         return {
             analytics: currentTheme.colors.primary[500],
@@ -144,8 +182,8 @@ export function AnalyticsTab({
     };
 
     const iconColors = getIconColors();
-    const uptimeValue = Number.parseFloat(uptime);
     const variant = getVariant(uptimeValue);
+    // Map variant to progress/badge variant - "danger" becomes "error" for UI consistency
     const progressVariant = variant === "danger" ? "error" : variant;
 
     return (
@@ -157,14 +195,15 @@ export function AnalyticsTab({
                         Select time range for analytics data:
                     </ThemedText>
                     <div className="flex gap-2">
-                        {(["1h", "24h", "7d", "30d"] as const).map((range) => (
+                        {CHART_TIME_RANGES.map((range) => (
                             <ThemedButton
                                 key={range}
                                 onClick={() => {
+                                    const previousRange = siteDetailsChartTimeRange;
                                     logger.user.action("Chart time range changed", {
                                         monitorType: monitorType,
-
                                         newRange: range,
+                                        previousRange: previousRange,
                                     });
                                     setSiteDetailsChartTimeRange(range);
                                 }}
@@ -268,11 +307,12 @@ export function AnalyticsTab({
                             </ThemedText>
                             <ThemedButton
                                 onClick={() => {
+                                    const previousValue = showAdvancedMetrics;
                                     const newValue = !showAdvancedMetrics;
                                     logger.user.action("Advanced metrics toggle", {
                                         monitorType: monitorType,
-
                                         newValue: newValue,
+                                        previousValue: previousValue,
                                     });
                                     setShowAdvancedMetrics(newValue);
                                 }}
@@ -319,7 +359,7 @@ export function AnalyticsTab({
                                     <ThemedText
                                         size="lg"
                                         style={{
-                                            color: mttr === 0 ? currentTheme.colors.success : iconColors.downtime,
+                                            color: getMttrColor(mttr, currentTheme),
                                         }}
                                         weight="medium"
                                     >
@@ -333,10 +373,7 @@ export function AnalyticsTab({
                                     <ThemedText
                                         size="lg"
                                         style={{
-                                            color:
-                                                downtimePeriods.length === 0
-                                                    ? currentTheme.colors.success
-                                                    : iconColors.downtime,
+                                            color: getIncidentsColor(downtimePeriods.length, currentTheme),
                                         }}
                                         weight="medium"
                                     >

@@ -1,6 +1,11 @@
 /**
- * Pre-built middleware functions for the TypedEventBus.
- * Provides common functionality like logging, metrics, and filtering.
+ * Pre-built middleware functions and types for the TypedEventBus event system.
+ *
+ * @remarks
+ * Provides common middleware for logging, metrics, filtering, validation, error handling, and more.
+ * All middleware is type-safe and composable for robust event-driven architectures.
+ *
+ * @packageDocumentation
  */
 
 // eslint-disable-next-line eslint-comments/disable-enable-pair
@@ -12,9 +17,12 @@ import { isDevelopment } from "../../shared/utils/environment";
 import { logger as baseLogger } from "../utils/logger";
 
 /**
- * Type alias for validation result that can be either a boolean or detailed result object.
+ * Result type for event data validation.
  *
  * @remarks
+ * Can be a boolean (true/false) or an object with `isValid` and optional `error` message.
+ * Used by validator functions to indicate if event data is valid.
+ *
  * Validators can return:
  * - `true` for successful validation
  * - `false` for failed validation (generic error)
@@ -24,8 +32,9 @@ import { logger as baseLogger } from "../utils/logger";
 type ValidationResult = boolean | { error?: string; isValid: boolean };
 
 /**
- * Type alias for validator function that validates event data.
+ * Type for a function that validates event data.
  *
+ * @typeParam TData - The type of event data to validate
  * @param data - The event data to validate
  * @returns ValidationResult indicating if the data is valid
  *
@@ -39,10 +48,9 @@ type ValidationResult = boolean | { error?: string; isValid: boolean };
 type ValidatorFunction<TData = unknown> = (data: TData) => ValidationResult;
 
 /**
- * Type alias for validator map that maps event names to their validator functions.
+ * Map of event names to their validator functions.
  *
- * @param T - Record type defining event names as keys and their data types as values
- *
+ * @typeParam T - Record type defining event names and their data types
  * @example
  * ```typescript
  * interface EventMap {
@@ -60,12 +68,37 @@ type ValidatorMap<T extends Record<string, unknown>> = Partial<{
     [K in keyof T]: ValidatorFunction<T[K]>;
 }>;
 
+/**
+ * Constant log message for event emission.
+ * @internal
+ */
 const EVENT_EMITTED_MSG = "[EventBus] Event emitted";
 
 /**
  * Middleware composer to combine multiple middleware functions.
  *
  * @param middlewares - Array of middleware functions to compose into a single middleware chain
+ * @returns Combined middleware function that executes all provided middlewares in sequence
+ *
+ * @remarks
+ * Executes middlewares in the order they are provided. Each middleware must call `next()`
+ * to continue the chain, or omit it to stop execution.
+ *
+ * @example
+ * ```typescript
+ * const combinedMiddleware = composeMiddleware(
+ *   createLoggingMiddleware({ level: 'info' }),
+ *   createValidationMiddleware(validators),
+ *   createMetricsMiddleware({ trackTiming: true })
+ * );
+ *
+ * eventBus.use(combinedMiddleware);
+ * ```
+ */
+/**
+ * Compose multiple middleware functions into a single middleware chain.
+ *
+ * @param middlewares - Array of middleware functions to compose into a single chain
  * @returns Combined middleware function that executes all provided middlewares in sequence
  *
  * @remarks
@@ -387,16 +420,16 @@ export function createMetricsMiddleware(options: {
 }
 
 /**
- * Rate limiting middleware to prevent event spam.
+ * Creates middleware that rate-limits event processing.
  *
- * @param options - Configuration options for rate limiting
- * @returns EventMiddleware function that enforces rate limits on events
+ * @param options - Configuration options for rate limiting.
+ * @returns EventMiddleware function that enforces rate limits on events.
  *
  * @remarks
  * Options include:
- * - `burstLimit`: Maximum events allowed in rapid succession (default: 10)
- * - `maxEventsPerSecond`: Maximum events allowed per second (default: 100)
- * - `onRateLimit`: Optional callback when rate limit is exceeded
+ * - `burstLimit`: Maximum number of events allowed in a burst (default: 10).
+ * - `maxEventsPerSecond`: Maximum number of events allowed per second (default: 100).
+ * - `onRateLimit`: Optional callback invoked when an event is rate-limited.
  *
  * @example
  * ```typescript
@@ -404,7 +437,7 @@ export function createMetricsMiddleware(options: {
  *   burstLimit: 5,
  *   maxEventsPerSecond: 50,
  *   onRateLimit: (event, data) => {
- *     console.warn(`Rate limit exceeded for ${event}`);
+ *     console.warn(`Rate limit hit for event: ${event}`);
  *   }
  * });
  * eventBus.use(rateLimitMiddleware);
@@ -454,15 +487,14 @@ export function createRateLimitMiddleware(options: {
 }
 
 /**
- * Validation middleware that validates event data against schemas with type safety.
+ * Creates middleware that validates event data using a map of validator functions.
  *
- * @param validators - Map of event names to validator functions
- * @param T - Record type defining event names and their expected data structures
- * @returns EventMiddleware function
+ * @typeParam T - Record type defining event names and their data types.
+ * @param validators - Map of event names to their validator functions.
+ * @returns EventMiddleware function that validates event data before processing.
  *
  * @remarks
- * This middleware validates event data before processing. It supports both simple boolean
- * validators and detailed validators that can provide specific error messages.
+ * If validation fails, the event is blocked and an error is logged.
  *
  * @example
  * ```typescript
@@ -473,6 +505,7 @@ export function createRateLimitMiddleware(options: {
  * };
  *
  * const validationMiddleware = createValidationMiddleware(validators);
+ * eventBus.use(validationMiddleware);
  * ```
  */
 export function createValidationMiddleware<T extends Record<string, unknown>>(
@@ -533,11 +566,11 @@ export function createValidationMiddleware<T extends Record<string, unknown>>(
 }
 
 /**
- * Pre-configured middleware stacks for common use cases.
+ * Predefined middleware stacks for different environments.
  *
  * @remarks
- * These middleware stacks provide sensible defaults for different environments
- * and can be used directly with TypedEventBus or as starting points for custom configurations.
+ * Provides convenient factory functions for common middleware stacks: custom, development, production, and testing.
+ * Each stack returns a composed middleware chain suitable for the target environment.
  *
  * @example
  * ```typescript
@@ -627,6 +660,23 @@ export const MIDDLEWARE_STACKS = {
         ),
 };
 
+/**
+ * Safely serialize data for logging, handling circular references and type preservation.
+ *
+ * @param data - Data to serialize
+ * @returns Serialized data safe for logging
+ *
+ * @remarks
+ * This function is specifically designed for logging purposes to avoid circular reference
+ * errors during JSON serialization. It returns the original object when possible for
+ * better debugger inspection, or a safe placeholder string when serialization fails.
+ *
+ * **Behavior:**
+ * - **Primitives**: Returned as-is (string, number, boolean, null, undefined)
+ * - **Objects**: Original object returned if JSON-serializable, placeholder if not
+ * - **Circular References**: Returns descriptive placeholder string
+ * - **Functions/Symbols**: Converted to string representation
+ */
 /**
  * Safely serialize data for logging, handling circular references and type preservation.
  *

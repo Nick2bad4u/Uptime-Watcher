@@ -281,12 +281,18 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
     /**
      * Remove typed event listener(s).
      *
-     * @param event - The event name
-     * @param listener - Specific listener to remove, or undefined to remove all listeners
-     * @returns This event bus instance for chaining
+     * @param event - The event name to remove listeners for.
+     * @param listener - Specific listener to remove, or undefined to remove all listeners for the event.
+     * @returns This event bus instance for chaining.
      *
      * @remarks
      * If no listener is specified, all listeners for the event are removed.
+     *
+     * @example
+     * ```typescript
+     * bus.offTyped('user:login'); // Remove all listeners for 'user:login'
+     * bus.offTyped('user:login', myListener); // Remove specific listener
+     * ```
      */
     offTyped<K extends keyof EventMap>(
         event: K,
@@ -306,12 +312,19 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
     /**
      * Register a one-time typed event listener.
      *
-     * @param event - The event name to listen for
-     * @param listener - Function to call when the event is emitted (called only once)
-     * @returns This event bus instance for chaining
+     * @param event - The event name to listen for.
+     * @param listener - Function to call when the event is emitted (called only once).
+     * @returns This event bus instance for chaining.
      *
      * @remarks
      * The listener is automatically removed after the first time the event is emitted.
+     *
+     * @example
+     * ```typescript
+     * bus.onceTyped('user:login', (data) => {
+     *   console.log('User logged in:', data.userId);
+     * });
+     * ```
      */
     onceTyped<K extends keyof EventMap>(
         event: K,
@@ -497,23 +510,19 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
 }
 
 /**
- * Utility function to create a typed event bus instance.
+ * Factory function to create a new typed event bus instance.
  *
- * @param name - Optional name for the bus
- * @param options - Optional configuration options
- * @returns A new TypedEventBus instance
+ * @typeParam EventMap - Map of event names to their data types.
+ * @param name - Optional name for the bus (used in logging and diagnostics).
+ * @param options - Optional configuration options for the event bus.
+ * @returns A new {@link TypedEventBus} instance.
  *
  * @remarks
- * Convenience factory function for creating typed event bus instances.
- * Equivalent to `new TypedEventBus<EventMap>(name, options)`.
+ * This function is a convenience wrapper for the TypedEventBus constructor.
  *
  * @example
  * ```typescript
- * interface AppEvents {
- *   'user:login': { userId: string };
- * }
- *
- * const bus = createTypedEventBus<AppEvents>('main-bus', { maxMiddleware: 50 });
+ * const bus = createTypedEventBus<MyEvents>('my-bus', { maxMiddleware: 30 });
  * ```
  */
 export function createTypedEventBus<EventMap extends Record<string, unknown>>(

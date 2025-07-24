@@ -14,22 +14,53 @@ import {
 import { findHistoryByMonitorId, getHistoryCount, getLatestHistoryEntry } from "./utils/historyQuery";
 
 /**
- * Repository for managing history data persistence.
- * Handles CRUD operations for monitor history in the database.
+ * @public
+ * Repository dependencies for managing history data persistence.
+ *
+ * @remarks
+ * Provides the required database service for history operations.
  */
 export interface HistoryRepositoryDependencies {
+    /** Database service for transactional operations. */
     databaseService: DatabaseService;
 }
 
+/**
+ * @public
+ * Repository for managing history data persistence.
+ * Handles CRUD operations for monitor history in the database.
+ *
+ * @remarks
+ * All operations are wrapped in transactions and use the repository pattern for consistency and error handling.
+ */
 export class HistoryRepository {
     private readonly databaseService: DatabaseService;
 
+    /**
+     * Constructs a new HistoryRepository instance.
+     *
+     * @param dependencies - The required dependencies for history operations.
+     * @example
+     * ```typescript
+     * const repo = new HistoryRepository({ databaseService });
+     * ```
+     */
     constructor(dependencies: HistoryRepositoryDependencies) {
         this.databaseService = dependencies.databaseService;
     }
 
     /**
-     * Add a new history entry for a monitor.
+     * Adds a new history entry for a monitor.
+     *
+     * @param monitorId - The monitor ID to add history for.
+     * @param entry - The status history entry to add.
+     * @param details - Optional details string for the entry.
+     * @returns A promise that resolves when the entry is added.
+     * @throws If the database operation fails.
+     * @example
+     * ```typescript
+     * await repo.addEntry("monitor-123", entryObj, "details");
+     * ```
      */
     public async addEntry(monitorId: string, entry: StatusHistory, details?: string): Promise<void> {
         return withDatabaseOperation(
@@ -47,6 +78,13 @@ export class HistoryRepository {
 
     /**
      * Internal method to add a new history entry for a monitor within an existing transaction.
+     *
+     * @param db - Database connection (must be within active transaction).
+     * @param monitorId - The monitor ID to add history for.
+     * @param entry - The status history entry to add.
+     * @param details - Optional details string for the entry.
+     * @returns void
+     * @remarks
      * Use this method when you're already within a transaction context.
      */
     public addEntryInternal(db: Database, monitorId: string, entry: StatusHistory, details?: string): void {
@@ -54,7 +92,16 @@ export class HistoryRepository {
     }
 
     /**
-     * Bulk insert history entries (for import functionality).
+     * Bulk inserts history entries for a monitor (for import functionality).
+     *
+     * @param monitorId - The monitor ID to add history for.
+     * @param historyEntries - Array of status history entries to insert.
+     * @returns A promise that resolves when all entries are inserted.
+     * @throws If the database operation fails.
+     * @example
+     * ```typescript
+     * await repo.bulkInsert("monitor-123", entriesArray);
+     * ```
      */
     public async bulkInsert(
         monitorId: string,
@@ -100,11 +147,17 @@ export class HistoryRepository {
     }
 
     /**
-     * Clear all history from the database.
+     * Clears all history from the database.
      *
+     * @returns A promise that resolves when all history is deleted.
+     * @throws If the database operation fails.
      * @remarks
      * **WARNING**: This operation is irreversible and will delete all history data.
      * Now properly wrapped in transaction for data safety and error handling.
+     * @example
+     * ```typescript
+     * await repo.deleteAll();
+     * ```
      */
     public async deleteAll(): Promise<void> {
         return withDatabaseOperation(async () => {
@@ -118,8 +171,8 @@ export class HistoryRepository {
     /**
      * Internal method to clear all history from the database within an existing transaction.
      *
-     * @param db - Database connection (must be within active transaction)
-     *
+     * @param db - Database connection (must be within active transaction).
+     * @returns void
      * @remarks
      * **IMPORTANT**: This method must be called within an existing transaction context.
      * The operation is destructive and irreversible. Proper error handling is
@@ -130,7 +183,15 @@ export class HistoryRepository {
     }
 
     /**
-     * Delete history entries for a specific monitor.
+     * Deletes history entries for a specific monitor.
+     *
+     * @param monitorId - The monitor ID to delete history for.
+     * @returns A promise that resolves when history is deleted.
+     * @throws If the database operation fails.
+     * @example
+     * ```typescript
+     * await repo.deleteByMonitorId("monitor-123");
+     * ```
      */
     public async deleteByMonitorId(monitorId: string): Promise<void> {
         return withDatabaseOperation(
@@ -148,6 +209,11 @@ export class HistoryRepository {
 
     /**
      * Internal method to delete history entries for a specific monitor within an existing transaction.
+     *
+     * @param db - Database connection (must be within active transaction).
+     * @param monitorId - The monitor ID to delete history for.
+     * @returns void
+     * @remarks
      * Use this method when you're already within a transaction context.
      */
     public deleteByMonitorIdInternal(db: Database, monitorId: string): void {
@@ -155,7 +221,15 @@ export class HistoryRepository {
     }
 
     /**
-     * Find all history entries for a specific monitor.
+     * Finds all history entries for a specific monitor.
+     *
+     * @param monitorId - The monitor ID to find history for.
+     * @returns Promise resolving to array of status history entries.
+     * @throws If the database operation fails.
+     * @example
+     * ```typescript
+     * const entries = await repo.findByMonitorId("monitor-123");
+     * ```
      */
     public async findByMonitorId(monitorId: string): Promise<StatusHistory[]> {
         return withDatabaseOperation(() => {
@@ -165,14 +239,18 @@ export class HistoryRepository {
     }
 
     /**
-     * Get the count of history entries for a monitor.
+     * Gets the count of history entries for a monitor.
      *
-     * @param monitorId - Unique identifier for the monitor
-     * @returns Promise resolving to the number of history entries
-     *
+     * @param monitorId - Unique identifier for the monitor.
+     * @returns Promise resolving to the number of history entries.
+     * @throws If the database operation fails.
      * @remarks
      * Uses consistent async pattern with error handling for reliability.
      * Wrapped in withDatabaseOperation for proper error recovery.
+     * @example
+     * ```typescript
+     * const count = await repo.getHistoryCount("monitor-123");
+     * ```
      */
     public async getHistoryCount(monitorId: string): Promise<number> {
         return withDatabaseOperation(
@@ -187,12 +265,11 @@ export class HistoryRepository {
     }
 
     /**
-     * Get the count of history entries for a monitor (internal version for use within transactions).
+     * Gets the count of history entries for a monitor (internal version for use within transactions).
      *
-     * @param db - Database connection (must be within active transaction)
-     * @param monitorId - Unique identifier for the monitor
-     * @returns The number of history entries
-     *
+     * @param db - Database connection (must be within active transaction).
+     * @param monitorId - Unique identifier for the monitor.
+     * @returns The number of history entries.
      * @remarks
      * **IMPORTANT**: This method must be called within an existing transaction context.
      * Provides synchronous access for use in transaction-wrapped operations.
@@ -202,14 +279,18 @@ export class HistoryRepository {
     }
 
     /**
-     * Get the most recent history entry for a monitor.
+     * Gets the most recent history entry for a monitor.
      *
-     * @param monitorId - Unique identifier for the monitor
-     * @returns Promise resolving to the latest history entry, or undefined if none exists
-     *
+     * @param monitorId - Unique identifier for the monitor.
+     * @returns Promise resolving to the latest history entry, or undefined if none exists.
+     * @throws If the database operation fails.
      * @remarks
      * Uses consistent async pattern with error handling for reliability.
      * Wrapped in withDatabaseOperation for proper error recovery.
+     * @example
+     * ```typescript
+     * const latest = await repo.getLatestEntry("monitor-123");
+     * ```
      */
     public async getLatestEntry(monitorId: string): Promise<StatusHistory | undefined> {
         return withDatabaseOperation(
@@ -224,7 +305,15 @@ export class HistoryRepository {
     }
 
     /**
-     * Prune old history entries for all monitors.
+     * Prunes old history entries for all monitors, keeping only the most recent entries.
+     *
+     * @param limit - The maximum number of entries to keep per monitor.
+     * @returns A promise that resolves when pruning is complete.
+     * @throws If the database operation fails.
+     * @example
+     * ```typescript
+     * await repo.pruneAllHistory(100);
+     * ```
      */
     public async pruneAllHistory(limit: number): Promise<void> {
         if (limit <= 0) return;
@@ -257,6 +346,11 @@ export class HistoryRepository {
 
     /**
      * Internal method to prune old history entries for all monitors within an existing transaction.
+     *
+     * @param db - Database connection (must be within active transaction).
+     * @param limit - The maximum number of entries to keep per monitor.
+     * @returns void
+     * @remarks
      * Use this method when you're already within a transaction context.
      */
     public pruneAllHistoryInternal(db: Database, limit: number): void {
@@ -278,7 +372,16 @@ export class HistoryRepository {
     }
 
     /**
-     * Prune old history entries for a monitor, keeping only the most recent entries.
+     * Prunes old history entries for a monitor, keeping only the most recent entries.
+     *
+     * @param monitorId - The monitor ID to prune history for.
+     * @param limit - The maximum number of entries to keep.
+     * @returns A promise that resolves when pruning is complete.
+     * @throws If the database operation fails.
+     * @example
+     * ```typescript
+     * await repo.pruneHistory("monitor-123", 100);
+     * ```
      */
     public async pruneHistory(monitorId: string, limit: number): Promise<void> {
         return withDatabaseOperation(
@@ -295,6 +398,12 @@ export class HistoryRepository {
 
     /**
      * Internal method to prune old history entries for a specific monitor within an existing transaction.
+     *
+     * @param db - Database connection (must be within active transaction).
+     * @param monitorId - The monitor ID to prune history for.
+     * @param limit - The maximum number of entries to keep.
+     * @returns void
+     * @remarks
      * Use this method when you're already within a transaction context.
      */
     public pruneHistoryInternal(db: Database, monitorId: string, limit: number): void {
@@ -310,10 +419,9 @@ export class HistoryRepository {
     }
 
     /**
-     * Get the database instance for internal repository operations.
+     * Gets the database instance for internal repository operations.
      *
-     * @returns Database connection from the DatabaseService
-     *
+     * @returns Database connection from the DatabaseService.
      * @remarks
      * **Repository Pattern Justification:**
      * This method provides controlled access to the database connection for

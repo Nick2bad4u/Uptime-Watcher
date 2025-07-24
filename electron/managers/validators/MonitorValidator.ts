@@ -26,29 +26,63 @@ import { ValidationResult } from "./interfaces";
 /**
  * Validates monitor configuration according to business rules.
  * Uses registry-driven validation with Zod schemas.
+ *
+ * @remarks
+ * This class provides monitor validation logic for SiteManager and ConfigurationManager.
+ * It uses registry-driven validation and shared Zod schemas to ensure consistency between frontend and backend validation rules.
+ *
+ * @example
+ * ```typescript
+ * const validator = new MonitorValidator();
+ * const result = validator.validateMonitorConfiguration(monitor);
+ * if (!result.isValid) {
+ *   console.error(result.errors);
+ * }
+ * ```
+ *
+ * @public
  */
 export class MonitorValidator {
     /**
-     * Business rule: Determine if a monitor should receive a default interval.
+     * Determines if a monitor should receive a default check interval according to business rules.
      *
-     * @param monitor - The monitor configuration to evaluate
-     * @returns True if the monitor should receive a default check interval
+     * @param monitor - The monitor configuration to evaluate.
+     * @returns True if the monitor should receive a default check interval.
+     *
+     * @remarks
+     * A default interval is applied if the monitor's checkInterval is zero.
+     *
+     * @example
+     * ```typescript
+     * if (validator.shouldApplyDefaultInterval(monitor)) {
+     *   monitor.checkInterval = DEFAULT_INTERVAL;
+     * }
+     * ```
      */
     public shouldApplyDefaultInterval(monitor: Site["monitors"][0]): boolean {
         return monitor.checkInterval === 0;
     }
 
     /**
-     * Validate monitor configuration according to business rules.
-     * Uses shared Zod schemas for comprehensive validation.
+     * Validates a monitor configuration according to business rules and shared Zod schemas.
      *
-     * @param monitor - The monitor configuration to validate
-     * @returns Validation result with errors and validity status
+     * @param monitor - The monitor configuration to validate.
+     * @returns Validation result with errors and validity status.
+     *
+     * @remarks
+     * Uses registry-driven validation for timing, retry attempts, and type-specific requirements.
+     *
+     * @example
+     * ```typescript
+     * const result = validator.validateMonitorConfiguration(monitor);
+     * if (!result.isValid) {
+     *   console.error(result.errors);
+     * }
+     * ```
      */
     public validateMonitorConfiguration(monitor: Site["monitors"][0]): ValidationResult {
         // Use shared validation from registry (includes timing, retry attempts, and type-specific validation)
         const errors = this.validateMonitorTypeSpecific(monitor);
-
         return {
             errors,
             isValid: errors.length === 0,
@@ -56,10 +90,22 @@ export class MonitorValidator {
     }
 
     /**
-     * Validate monitor type-specific requirements using registry and Zod schemas.
+     * Validates monitor type-specific requirements using registry and Zod schemas.
      *
-     * @param monitor - The monitor configuration to validate
-     * @returns Array of validation errors (empty if valid)
+     * @param monitor - The monitor configuration to validate.
+     * @returns Array of validation errors (empty if valid).
+     *
+     * @remarks
+     * Checks monitor type against registered types and validates type-specific properties using Zod schemas.
+     * Returns an array of error messages if validation fails, or an empty array if valid.
+     *
+     * @example
+     * ```typescript
+     * const errors = validator["validateMonitorTypeSpecific"](monitor);
+     * if (errors.length > 0) {
+     *   console.error(errors);
+     * }
+     * ```
      */
     private validateMonitorTypeSpecific(monitor: Site["monitors"][0]): string[] {
         // Validate monitor type using registry

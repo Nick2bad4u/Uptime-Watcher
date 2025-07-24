@@ -1,11 +1,10 @@
 /**
  * History tab component for displaying monitor check history.
- * Provide    // Dropdown options: 25, 50, 100, All (clamped to backendLimit and available history)
-    const maxShow = Math.min(backendLimit, historyLength); pagination, and detailed history records view.
+ * Provides filtering, pagination, and detailed history records view.
  */
 
 import { useEffect, useRef, useState } from "react";
-import { FiFilter } from "react-icons/fi";
+import { FiFilter, FiInbox } from "react-icons/fi";
 import { MdHistory } from "react-icons/md";
 
 import logger from "../../../services/logger";
@@ -111,7 +110,7 @@ export const HistoryTab = ({
     useEffect(() => {
         const safeHistoryLength = selectedMonitor.history.length;
         setHistoryLimit(Math.min(50, backendLimit, safeHistoryLength));
-    }, [settings.historyLimit, backendLimit, selectedMonitor.history]);
+    }, [backendLimit, selectedMonitor.history]);
 
     const filteredHistoryRecords = selectedMonitor.history
         .filter((record: StatusHistory) => historyFilter === "all" || record.status === historyFilter)
@@ -186,7 +185,8 @@ export const HistoryTab = ({
                             ))}
                         </ThemedSelect>
                         <ThemedText size="xs" variant="secondary">
-                            of {filteredHistoryRecords.length} records
+                            {filteredHistoryRecords.length} of {historyLength} records
+                            {historyFilter !== "all" && ` (${historyFilter} filter)`}
                         </ThemedText>
                     </div>
                 </div>
@@ -195,7 +195,7 @@ export const HistoryTab = ({
             {/* History List */}
             <ThemedCard icon={<MdHistory color={iconColors.history} />} title="Check History">
                 <div className="space-y-2 overflow-y-auto max-h-96">
-                    {filteredHistoryRecords.map((record, index: number) => (
+                    {filteredHistoryRecords.map((record) => (
                         <div
                             className="flex items-center justify-between p-3 transition-colors rounded-lg hover:bg-surface-elevated"
                             key={record.timestamp}
@@ -207,7 +207,9 @@ export const HistoryTab = ({
                                         {formatFullTimestamp(record.timestamp)}
                                     </ThemedText>
                                     <ThemedText className="ml-4" size="xs" variant="secondary">
-                                        Check #{selectedMonitor.history.length - index}
+                                        Record #
+                                        {historyLength -
+                                            selectedMonitor.history.findIndex((r) => r.timestamp === record.timestamp)}
                                     </ThemedText>
                                     {renderDetails(record)}
                                 </div>
@@ -224,8 +226,16 @@ export const HistoryTab = ({
                     ))}
 
                     {filteredHistoryRecords.length === 0 && (
-                        <div className="py-8 text-center">
-                            <ThemedText variant="secondary">No records found for the selected filter.</ThemedText>
+                        <div className="flex flex-col items-center justify-center py-12 text-center">
+                            <FiInbox className="mb-4 text-4xl opacity-50" />
+                            <ThemedText className="mb-2" size="lg" variant="secondary">
+                                No records found
+                            </ThemedText>
+                            <ThemedText size="sm" variant="secondary">
+                                {historyFilter === "all"
+                                    ? "No monitoring records are available yet."
+                                    : `No "${historyFilter}" records found. Try adjusting your filter.`}
+                            </ThemedText>
                         </div>
                     )}
                 </div>

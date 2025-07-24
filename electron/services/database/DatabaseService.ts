@@ -8,6 +8,7 @@ import { logger } from "../../utils/logger";
 import { createDatabaseIndexes, createDatabaseTables, setupMonitorTypeValidation } from "./utils/databaseSchema";
 
 /**
+ * @public
  * Core database service for SQLite connection and schema management.
  *
  * @remarks
@@ -54,23 +55,26 @@ export class DatabaseService {
     }
 
     /**
-     * Get the singleton database service instance.
+     * Gets the singleton database service instance.
      *
-     * @returns The shared DatabaseService instance
-     *
+     * @returns The shared DatabaseService instance.
      * @remarks
      * Uses singleton pattern to ensure only one database connection
      * exists throughout the application lifecycle.
+     * @example
+     * ```typescript
+     * const dbService = DatabaseService.getInstance();
+     * ```
      */
     public static getInstance(): DatabaseService {
         return DatabaseService.instance;
     }
 
     /**
-     * Close the database connection safely.
+     * Closes the database connection safely.
      *
-     * @throws {@link Error} When connection close fails
-     *
+     * @returns void
+     * @throws {@link Error} When connection close fails.
      * @remarks
      * **Safety Considerations:**
      * - Safe to call multiple times (idempotent operation)
@@ -82,6 +86,10 @@ export class DatabaseService {
      * - Optimized for Electron main process environment
      * - Uses node-sqlite3-wasm which is compiled for Node.js compatibility
      * - No platform-specific caveats for Windows/macOS/Linux
+     * @example
+     * ```typescript
+     * dbService.close();
+     * ```
      */
     public close(): void {
         if (this._db) {
@@ -99,13 +107,12 @@ export class DatabaseService {
     }
 
     /**
-     * Execute a function within a database transaction.
+     * Executes a function within a database transaction.
      *
-     * @param operation - Function to execute within the transaction
-     * @returns Promise resolving to the operation result
-     *
-     * @throws {@link Error} When transaction fails or operation throws
-     *
+     * @typeParam T - The return type of the operation.
+     * @param operation - Function to execute within the transaction.
+     * @returns Promise resolving to the operation result.
+     * @throws {@link Error} When transaction fails or operation throws.
      * @remarks
      * **Transaction Behavior in node-sqlite3-wasm:**
      * - All operations (BEGIN, COMMIT, ROLLBACK) are synchronous
@@ -118,6 +125,12 @@ export class DatabaseService {
      * - Commits transaction on successful completion
      * - Rolls back transaction if operation throws
      * Ensures data consistency for complex operations involving multiple queries.
+     * @example
+     * ```typescript
+     * await dbService.executeTransaction(async (db) => {
+     *   // ...your db logic...
+     * });
+     * ```
      */
     public async executeTransaction<T>(operation: (db: Database) => Promise<T>): Promise<T> {
         const db = this.getDatabase();
@@ -138,14 +151,16 @@ export class DatabaseService {
     }
 
     /**
-     * Get the database instance.
+     * Gets the database instance.
      *
-     * @returns The active database connection
-     *
-     * @throws {@link Error} When database is not initialized
-     *
+     * @returns The active database connection.
+     * @throws {@link Error} When database is not initialized.
      * @remarks
      * Call {@link DatabaseService.initialize} first to set up the database connection.
+     * @example
+     * ```typescript
+     * const db = dbService.getDatabase();
+     * ```
      */
     public getDatabase(): Database {
         if (!this._db) {
@@ -155,12 +170,10 @@ export class DatabaseService {
     }
 
     /**
-     * Initialize the database connection and create schema if it doesn't exist.
+     * Initializes the database connection and creates schema if it doesn't exist.
      *
-     * @returns The initialized database instance
-     *
-     * @throws {@link Error} When database initialization fails
-     *
+     * @returns The initialized database instance.
+     * @throws {@link Error} When database initialization fails.
      * @remarks
      * **Initialization Behavior:**
      * - Creates the database file in the user data directory if it doesn't exist
@@ -176,6 +189,10 @@ export class DatabaseService {
      * **Schema Setup:**
      * - setupMonitorTypeValidation() intentionally receives no database parameter
      * - Future validation logic may require database access for consistency
+     * @example
+     * ```typescript
+     * dbService.initialize();
+     * ```
      */
     public initialize(): Database {
         if (this._db) {

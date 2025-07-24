@@ -5,6 +5,7 @@ import { logger } from "../../utils/logger";
 import { ServiceContainer } from "../ServiceContainer";
 
 /**
+ * @public
  * Main application service that orchestrates all other services.
  * Handles application lifecycle and service coordination.
  *
@@ -16,12 +17,16 @@ export class ApplicationService {
     private readonly serviceContainer: ServiceContainer;
 
     /**
-     * Initialize the ApplicationService and set up the service container.
+     * Constructs the ApplicationService and sets up the service container.
      *
      * @remarks
      * Creates a ServiceContainer instance with appropriate debug settings
      * and sets up application-level event handlers. This constructor should
      * be called once during application startup.
+     * @example
+     * ```typescript
+     * const appService = new ApplicationService();
+     * ```
      */
     constructor() {
         logger.info("[ApplicationService] Initializing application services");
@@ -35,14 +40,18 @@ export class ApplicationService {
     }
 
     /**
-     * Cleanup resources before application shutdown.
+     * Cleans up resources before application shutdown.
      *
+     * @returns A promise that resolves when cleanup is complete.
      * @remarks
      * Performs ordered shutdown of all services including IPC cleanup,
      * monitoring stoppage, and window closure. Follows project error handling
      * standards by re-throwing errors after logging for upstream handling.
-     *
-     * @throws Re-throws any errors encountered during cleanup for upstream handling
+     * @throws Re-throws any errors encountered during cleanup for upstream handling.
+     * @example
+     * ```typescript
+     * await appService.cleanup();
+     * ```
      */
     public async cleanup(): Promise<void> {
         logger.info("[ApplicationService] Starting cleanup");
@@ -77,14 +86,14 @@ export class ApplicationService {
     }
 
     /**
-     * Handle application ready event and initialize all services.
+     * Handles the application ready event and initializes all services.
      *
+     * @returns A promise that resolves when initialization is complete.
      * @remarks
      * Performs ordered initialization of all services through the ServiceContainer,
      * creates the main application window, and sets up event handlers and auto-updater.
      * This method is called automatically when Electron's 'ready' event fires.
-     *
-     * @throws Errors are caught and logged by the calling setupApplication method
+     * @throws Errors are caught and logged by the calling setupApplication method.
      */
     private async onAppReady(): Promise<void> {
         logger.info("[ApplicationService] App ready - initializing services");
@@ -105,7 +114,7 @@ export class ApplicationService {
     }
 
     /**
-     * Setup application-level Electron event handlers.
+     * Sets up application-level Electron event handlers.
      *
      * @remarks
      * Configures handlers for core Electron application lifecycle events:
@@ -142,7 +151,7 @@ export class ApplicationService {
     }
 
     /**
-     * Setup auto-updater service with status callbacks and initialization.
+     * Sets up the auto-updater service with status callbacks and initialization.
      *
      * @remarks
      * Configures the auto-updater service to:
@@ -168,7 +177,7 @@ export class ApplicationService {
     }
 
     /**
-     * Setup typed event handlers for uptime monitoring system events.
+     * Sets up typed event handlers for uptime monitoring system events.
      *
      * @remarks
      * Establishes communication bridge between the uptime monitoring system
