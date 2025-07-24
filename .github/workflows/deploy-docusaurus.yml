@@ -48,11 +48,11 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: 'docs/docusaurus/package-lock.json'
+          cache-dependency-path: 'package-lock.json'
 
       - name: Install dependencies
-        working-directory: docs/docusaurus
-        run: npm install
+        working-directory: /
+        run: npm install --force
 
       - name: Generate TypeDoc API documentation
         working-directory: docs/docusaurus
@@ -61,7 +61,7 @@ jobs:
           npm run docs:typedoc
 
       - name: Build Docusaurus website
-        working-directory: docs/docusaurus
+        working-directory: /
         run: npm run docusaurus:build
 
       - name: Setup Pages
