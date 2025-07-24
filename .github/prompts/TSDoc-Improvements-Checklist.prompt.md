@@ -6,7 +6,9 @@ description: "Review TSDoc comments to ensure they are accurate, complete, and c
 
 ## Task
 
-Look at this current file and systematically improve and standardize all TSDoc comments throughout the file.
+Look at this current file and systematically improve and standardize all TSDoc comments throughout the file. Take your time to accurately trace all data paths, function calls, and interactions to ensure that the documentation reflects the actual behavior of the code. This includes verifying types, parameters, return values, exceptions, and any other relevant details. You cannot make any changes until you have thoroughly reviewed the entire file and understood its structure and functionality.
+
+Make sure you update ALL things that should have a TSDoc comment, even if it is not currently documented. This includes functions, classes, interfaces, types, and any other relevant code constructs. Do not just do a few, do the ENTIRE file.
 
 ## Requirements
 
@@ -22,7 +24,7 @@ Look at this current file and systematically improve and standardize all TSDoc c
 - **Key Tag Emphasis:**  
   Pay special attention to the following tags. Add them wherever appropriate:
   - `@remarks` — Supplementary notes or important clarifications about the API.
-  - `@param` — Document all function and method parameters, specifying their purpose and expected types.
+  - `@param` — Document all function and method parameters, specifying their purpose and expected types. (DONT USE `@property`)
   - `@returns` — Clearly describe the return value of functions and methods.
   - `@throws` — List any errors or exceptions that can be thrown, with conditions for each.
   - `@example` — Provide usage examples, especially for complex or non-obvious APIs.
