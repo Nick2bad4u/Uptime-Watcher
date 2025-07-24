@@ -121,15 +121,11 @@ const config: Config = {
                     title: "Documentation",
                     items: [
                         {
-                            label: "Getting Started",
-                            to: "/docs/intro",
+                            label: "React Reference",
+                            to: "/docs/app",
                         },
                         {
-                            label: "User Guide",
-                            to: "/docs/user-guide",
-                        },
-                        {
-                            label: "API Reference",
+                            label: "Electron Reference",
                             to: "/docs/electron",
                         },
                     ],

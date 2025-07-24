@@ -1,0 +1,35 @@
+# Interface: SafeJsonResult\<T\>
+
+Defined in: [shared/utils/jsonSafety.ts:9](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/shared/utils/jsonSafety.ts#L9)
+
+Safe JSON parsing result.
+
+## Type Parameters
+
+### T
+
+`T`
+
+## Properties
+
+### data?
+
+> `optional` **data**: `T`
+
+Defined in: [shared/utils/jsonSafety.ts:10](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/shared/utils/jsonSafety.ts#L10)
+
+***
+
+### error?
+
+> `optional` **error**: `string`
+
+Defined in: [shared/utils/jsonSafety.ts:11](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/shared/utils/jsonSafety.ts#L11)
+
+***
+
+### success
+
+> **success**: `boolean`
+
+Defined in: [shared/utils/jsonSafety.ts:12](https://github.com/Nick2bad4u/Uptime-Watcher/blob/3cce0c3b352c8390536ca3c7399ece50a05faf18/shared/utils/jsonSafety.ts#L12)
