@@ -23,6 +23,7 @@ New claims to review, these are LOW confidence claims that need to be reviewed t
 - Trace all data paths before making recommending changes to ensure we don't break anything, and that the changes are properly implemented.
 - Backwards compatibility is not necessary as we are in a development phase - feel free to make breaking changes, as long as you update the entire data path properly. Never write backwards compatibility code without approval.
 - If you stumble upon any issues that are not related to the claims, add them to the document.
+- If you find any inadequate or missing TSDoc comments, create and/or add to them to improve the documentation of the codebase.
 
 ## Proceed to review all low confidence claims below using the outline above:
 
