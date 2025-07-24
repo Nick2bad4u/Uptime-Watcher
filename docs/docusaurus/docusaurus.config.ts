@@ -28,6 +28,7 @@ const config: Config = {
         [
             "docusaurus-plugin-typedoc",
             {
+                id: "typedoc-plugin-2",
                 sidebar: {
                     autoConfiguration: true,
                     pretty: true,
