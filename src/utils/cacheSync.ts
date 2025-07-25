@@ -9,6 +9,12 @@ import { clearMonitorTypeCache } from "./monitorTypeHelper";
 
 /**
  * Cache invalidation data from backend.
+ *
+ * @remarks
+ * Contains information about cache invalidation events:
+ * - identifier: Optional specific identifier for targeted invalidation
+ * - reason: Human-readable reason for the cache invalidation
+ * - type: Type of cache invalidation (all, monitor, or site-specific)
  */
 interface CacheInvalidationData {
     identifier?: string;
@@ -20,7 +26,9 @@ interface CacheInvalidationData {
  * Set up automatic cache synchronization with backend.
  * Listens for cache invalidation events and clears appropriate frontend caches.
  *
- * @returns Cleanup function to remove event listeners
+ * @returns Cleanup function to remove event listeners. Call this function
+ * when the component unmounts or cache sync is no longer needed to prevent
+ * memory leaks and avoid processing events after cleanup.
  */
 export function setupCacheSync(): () => void {
     // Check if we're in an Electron environment with cache invalidation events available
@@ -60,7 +68,7 @@ export function setupCacheSync(): () => void {
     });
 
     logger.debug("[CacheSync] Cache synchronization enabled");
-    return cleanup as () => void;
+    return cleanup;
 }
 
 /**
@@ -86,6 +94,12 @@ function clearMonitorRelatedCaches(identifier?: string): void {
 
 /**
  * Clear site-related frontend caches.
+ *
+ * @remarks
+ * Site-specific cache clearing is currently minimal as sites are managed
+ * through Zustand stores which handle their own cache invalidation and
+ * state management. Future enhancements may include more targeted
+ * site-specific cache clearing strategies.
  *
  * @param identifier - Optional site identifier for targeted clearing
  */

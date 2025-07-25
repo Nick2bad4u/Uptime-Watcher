@@ -1,22 +1,29 @@
 /**
- * HTTP status code utilities for monitoring.
- * Provides logic for determining monitor status based on HTTP response codes.
+ * Utilities for evaluating HTTP status codes in the context of uptime monitoring.
+ *
+ * @remarks
+ * Provides business logic for mapping HTTP response codes to monitor status ("up" or "down").
+ * Used by monitoring services to determine whether a site is considered operational
+ * based on its HTTP response.
+ *
+ * @see {@link determineMonitorStatus}
+ * @public
  */
 
 /**
- * Determine monitor status based on HTTP status code.
- *
- * @param httpStatus - HTTP status code to evaluate
- * @returns Monitor status: "up" if site is responding, "down" if server error or invalid code
+ * Determines the monitor status ("up" or "down") based on an HTTP status code.
  *
  * @remarks
  * Business rules for status determination:
- * - 1xx (Informational): "up" - rare but valid responses indicating server is active
- * - 2xx (Success): "up" - successful requests
- * - 3xx (Redirection): "up" - site is responding with redirects
- * - 4xx (Client Error): "up" - site is responding, client-side issue
- * - 5xx (Server Error): "down" - server-side issues indicate service problems
- * - Invalid codes (\< 100, \> 599): "down" - malformed or non-HTTP responses
+ * - 1xx (Informational): "up" — valid responses indicating server is active.
+ * - 2xx (Success): "up" — successful requests.
+ * - 3xx (Redirection): "up" — site is responding with redirects.
+ * - 4xx (Client Error): "up" — site is responding, client-side issue.
+ * - 5xx (Server Error): "down" — server-side issues indicate service problems.
+ * - Invalid codes (less than 100, greater than 599): "down" — malformed or non-HTTP responses.
+ *
+ * @param httpStatus - The HTTP status code to evaluate. Must be an integer.
+ * @returns "up" if the site is responding (including client errors and redirects), "down" if server error or invalid code.
  *
  * @example
  * ```typescript
@@ -25,6 +32,9 @@
  * determineMonitorStatus(500); // "down" - server error
  * determineMonitorStatus(999); // "down" - invalid HTTP status code
  * ```
+ *
+ * @see {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status | MDN: HTTP response status codes}
+ * @public
  */
 export function determineMonitorStatus(httpStatus: number): "down" | "up" {
     // Input validation - HTTP status codes are defined in 100-599 range

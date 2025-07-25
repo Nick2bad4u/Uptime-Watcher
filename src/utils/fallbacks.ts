@@ -71,6 +71,10 @@ export const UiDefaults = {
 
 /**
  * Get value with fallback, checking for null/undefined.
+ *
+ * @param value - The value to check for null or undefined
+ * @param fallback - The fallback value to use if value is null or undefined
+ * @returns The original value if not null/undefined, otherwise the fallback
  */
 export function withFallback<T>(value: null | T | undefined, fallback: T): T {
     return value ?? fallback;
@@ -150,6 +154,10 @@ export function getMonitorTypeDisplayLabel(monitorType: string): string {
  * @returns Truncated string safe for logging
  */
 export function truncateForLogging(value: string, maxLength = 50): string {
+    // Guard clause: return early if value is shorter than maxLength or empty
+    if (!value || value.length <= maxLength) {
+        return value;
+    }
     return value.slice(0, maxLength);
 }
 

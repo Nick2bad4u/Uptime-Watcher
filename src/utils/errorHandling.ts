@@ -25,6 +25,7 @@ export function ensureError(error: unknown): Error {
  * @param fallbackValue - Value to return if operation fails (required if shouldThrow is false)
  * @param shouldThrow - Whether to throw on error or return fallback value
  * @returns Promise resolving to operation result or fallback value
+ * @throws When shouldThrow is true or when shouldThrow is false but no fallbackValue is provided
  */
 export async function withUtilityErrorHandling<T>(
     operation: () => Promise<T>,

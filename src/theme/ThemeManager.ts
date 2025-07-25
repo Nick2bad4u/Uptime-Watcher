@@ -46,7 +46,16 @@ export class ThemeManager {
     }
 
     /**
-     * Create a custom theme based on an existing theme
+     * Create a custom theme based on an existing theme.
+     *
+     * @param baseTheme - The base theme to extend from
+     * @param overrides - Partial theme object with properties to override
+     * @returns New theme with deep-merged properties
+     *
+     * @remarks
+     * This method performs a deep merge of the override properties into the base theme,
+     * ensuring that nested objects are properly merged rather than replaced entirely.
+     * This allows for granular customization while preserving unmodified properties.
      */
     createCustomTheme(baseTheme: Theme, overrides: Partial<Theme>): Theme {
         return {
@@ -59,6 +68,34 @@ export class ThemeManager {
             colors: {
                 ...baseTheme.colors,
                 ...overrides.colors,
+                background: {
+                    ...baseTheme.colors.background,
+                    ...overrides.colors?.background,
+                },
+                border: {
+                    ...baseTheme.colors.border,
+                    ...overrides.colors?.border,
+                },
+                hover: {
+                    ...baseTheme.colors.hover,
+                    ...overrides.colors?.hover,
+                },
+                primary: {
+                    ...baseTheme.colors.primary,
+                    ...overrides.colors?.primary,
+                },
+                status: {
+                    ...baseTheme.colors.status,
+                    ...overrides.colors?.status,
+                },
+                surface: {
+                    ...baseTheme.colors.surface,
+                    ...overrides.colors?.surface,
+                },
+                text: {
+                    ...baseTheme.colors.text,
+                    ...overrides.colors?.text,
+                },
             },
             shadows: {
                 ...baseTheme.shadows,
@@ -71,6 +108,22 @@ export class ThemeManager {
             typography: {
                 ...baseTheme.typography,
                 ...overrides.typography,
+                fontFamily: {
+                    ...baseTheme.typography.fontFamily,
+                    ...overrides.typography?.fontFamily,
+                },
+                fontSize: {
+                    ...baseTheme.typography.fontSize,
+                    ...overrides.typography?.fontSize,
+                },
+                fontWeight: {
+                    ...baseTheme.typography.fontWeight,
+                    ...overrides.typography?.fontWeight,
+                },
+                lineHeight: {
+                    ...baseTheme.typography.lineHeight,
+                    ...overrides.typography?.lineHeight,
+                },
             },
         };
     }
@@ -124,10 +177,17 @@ export class ThemeManager {
     }
 
     /**
-     * Get all available theme names
+     * Get all available theme names.
+     *
+     * @returns Array of available theme names including system
+     *
+     * @remarks
+     * Dynamically generates the list from the themes object to ensure consistency.
+     * Always includes "system" for automatic theme detection.
      */
     getAvailableThemes(): ThemeName[] {
-        return ["light", "dark", "high-contrast", "system"];
+        const themeNames = Object.keys(themes) as ThemeName[];
+        return [...themeNames, "system"];
     }
 
     /**
@@ -135,6 +195,11 @@ export class ThemeManager {
      * Uses CSS media query to detect dark mode preference.
      *
      * @returns "dark" if user prefers dark mode, "light" otherwise
+     *
+     * @remarks
+     * In SSR or non-browser environments where window is undefined,
+     * this method will fallback to "light" theme as the default.
+     * This ensures safe operation across all deployment environments.
      */
     getSystemThemePreference(): "dark" | "light" {
         if (typeof window !== "undefined") {
@@ -231,13 +296,28 @@ export class ThemeManager {
     }
 
     /**
-     * Apply theme classes to document elements
+     * Apply theme classes to document elements.
+     *
+     * @param theme - Theme to apply classes for
+     *
+     * @remarks
+     * Safely removes old theme classes and applies new ones.
+     * Includes safety checks for SSR and non-browser environments.
      */
     private applyThemeClasses(theme: Theme): void {
-        const root = document.documentElement;
+        if (typeof document === "undefined") {
+            return;
+        }
 
-        // Set theme class on body
-        document.body.className = document.body.className.replaceAll(/theme-\w+/g, "").trim();
+        const root = document.documentElement;
+        const availableThemes = Object.keys(themes);
+
+        // Remove existing theme classes precisely
+        for (const themeName of availableThemes) {
+            document.body.classList.remove(`theme-${themeName}`);
+        }
+
+        // Add current theme class
         document.body.classList.add(`theme-${theme.name}`);
 
         // Set dark mode class for Tailwind CSS
@@ -266,4 +346,28 @@ export class ThemeManager {
     }
 }
 
+/**
+ * Global theme manager singleton instance.
+ *
+ * @remarks
+ * Provides convenient access to theme management functionality throughout
+ * the application. This singleton ensures consistent theme state and
+ * provides a centralized API for theme operations.
+ *
+ * @example
+ * ```typescript
+ * import { themeManager } from './ThemeManager';
+ *
+ * // Apply a theme
+ * const theme = themeManager.getTheme('dark');
+ * themeManager.applyTheme(theme);
+ *
+ * // Listen for system theme changes
+ * const cleanup = themeManager.onSystemThemeChange((isDark) => {
+ *   console.log('System theme changed:', isDark ? 'dark' : 'light');
+ * });
+ * ```
+ *
+ * @public
+ */
 export const themeManager = ThemeManager.getInstance();

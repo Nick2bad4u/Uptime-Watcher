@@ -1,6 +1,13 @@
 /**
  * Axios configuration utilities for HTTP monitoring.
- * Provides standardized HTTP client setup and interceptors.
+ *
+ * @remarks
+ * Provides standardized HTTP client setup and interceptors for precise timing and connection pooling.
+ * All HTTP responses are treated as "successful" for manual status code handling in monitoring logic.
+ *
+ * @see {@link setupTimingInterceptors}
+ * @see {@link MonitorConfig}
+ * @public
  */
 
 import axios, { AxiosInstance } from "axios";
@@ -10,23 +17,29 @@ import * as https from "node:https";
 import { MonitorConfig } from "../types";
 
 /**
- * Create a configured Axios instance optimized for HTTP monitoring.
- *
- * @param config - Monitor configuration containing timeout, userAgent, etc.
- * @returns Configured Axios instance with timing interceptors and connection pooling
+ * Creates a configured Axios instance optimized for HTTP monitoring.
  *
  * @remarks
  * Sets up connection pooling, custom status validation, and timing measurement.
  * All HTTP responses are treated as "successful" for manual status code handling
  * in monitoring logic. This allows proper evaluation of HTTP error codes as
  * legitimate monitoring results rather than Axios errors.
- *
  * The 10KB request limit is suitable for monitoring scenarios which typically
  * send minimal data (headers, basic payloads). Response limit is 10MB to handle
  * larger pages if needed.
  *
- * @see {@link MonitorConfig} for available configuration options
- * @see {@link setupTimingInterceptors} for timing measurement details
+ * @param config - The monitor configuration containing timeout, userAgent, etc.
+ * @returns A configured Axios instance with timing interceptors and connection pooling.
+ *
+ * @example
+ * ```typescript
+ * const client = createHttpClient({ timeout: 5000, userAgent: "UptimeWatcher/1.0" });
+ * const response = await client.get("https://example.com");
+ * ```
+ *
+ * @see {@link MonitorConfig}
+ * @see {@link setupTimingInterceptors}
+ * @public
  */
 export function createHttpClient(config: MonitorConfig): AxiosInstance {
     const headers: Record<string, string> = {};
@@ -72,17 +85,25 @@ export function createHttpClient(config: MonitorConfig): AxiosInstance {
 }
 
 /**
- * Set up request and response interceptors for precise timing measurement.
- *
- * @param axiosInstance - Axios instance to configure with timing interceptors
+ * Sets up request and response interceptors for precise timing measurement on an Axios instance.
  *
  * @remarks
- * Uses performance.now() for high-precision timing measurement. Adds metadata
+ * Uses `performance.now()` for high-precision timing measurement. Adds metadata
  * to request config and calculates duration in response interceptor.
  * Also handles timing for error responses to ensure consistent measurement.
- *
  * The timing data is attached to response/error objects via declaration merging
  * defined in HttpMonitor.ts for type safety.
+ *
+ * @param axiosInstance - The Axios instance to configure with timing interceptors.
+ *
+ * @example
+ * ```typescript
+ * const client = axios.create();
+ * setupTimingInterceptors(client);
+ * ```
+ *
+ * @see {@link createHttpClient}
+ * @public
  */
 export function setupTimingInterceptors(axiosInstance: AxiosInstance): void {
     // Add request interceptor to record start time
@@ -121,10 +142,20 @@ export function setupTimingInterceptors(axiosInstance: AxiosInstance): void {
 }
 
 /**
- * Ensure an unknown value is an Error instance.
+ * Ensures an unknown value is an Error instance.
  *
- * @param error - Unknown error value
- * @returns Error instance for consistent error handling
+ * @remarks
+ * Converts non-Error values to Error instances for consistent error handling.
+ *
+ * @param error - The unknown error value.
+ * @returns An Error instance for consistent error handling.
+ *
+ * @example
+ * ```typescript
+ * throw ensureErrorInstance("Something went wrong");
+ * ```
+ *
+ * @public
  */
 function ensureErrorInstance(error: unknown): Error {
     return error instanceof Error ? error : new Error(String(error));

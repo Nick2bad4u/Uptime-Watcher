@@ -1,6 +1,33 @@
 /**
  * Centralized error store for managing application errors and loading states.
  * Provides global error handling and store-specific error tracking.
+ *
+ * @remarks
+ * This store implements a comprehensive error management system that supports:
+ * - Global error state for application-wide error display
+ * - Store-specific error isolation to prevent error cross-contamination
+ * - Operation-specific loading states for fine-grained UI feedback
+ * - Centralized error clearing and recovery mechanisms
+ *
+ * The store integrates with the application's error boundary system and provides
+ * standardized error handling patterns across all application stores.
+ *
+ * @example
+ * ```typescript
+ * // Basic error handling
+ * const { setError, clearError, isLoading } = useErrorStore();
+ *
+ * // Store-specific error management
+ * const { setStoreError, clearStoreError } = useErrorStore();
+ * setStoreError('sites', 'Failed to load sites');
+ *
+ * // Operation-specific loading
+ * const { setOperationLoading, getOperationLoading } = useErrorStore();
+ * setOperationLoading('fetchSites', true);
+ * const isLoadingSites = getOperationLoading('fetchSites');
+ * ```
+ *
+ * @public
  */
 
 import { create } from "zustand";

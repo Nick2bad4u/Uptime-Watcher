@@ -4,44 +4,81 @@ import { getMonitorServiceFactory, getRegisteredMonitorTypes, isValidMonitorType
 import { IMonitorService, MonitorConfig } from "./types";
 
 /**
- * Factory for creating and managing monitor services.
- * Uses the registry's service factories for complete automation.
+ * Factory for creating and managing monitor service instances.
+ *
+ * @remarks
+ * - Uses the registry's service factories for automation.
+ * - Maintains singleton instances per monitor type.
+ * - Provides configuration management for all monitor services.
+ *
+ * @public
  */
-
 export class MonitorFactory {
+    /**
+     * Cache of monitor service instances, keyed by monitor type.
+     *
+     * @remarks
+     * Singleton pattern: only one instance per monitor type.
+     *
+     * @internal
+     * @readonly
+     */
     private static readonly serviceInstances = new Map<string, IMonitorService>();
 
     /**
-     * Clear all cached service instances.
-     * Useful for testing or configuration reloading.
+     * Clears all cached monitor service instances.
+     *
+     * @remarks
+     * Useful for testing or reloading configuration.
+     *
+     * @example
+     * ```typescript
+     * MonitorFactory.clearCache();
+     * ```
+     *
+     * @public
      */
     public static clearCache(): void {
         this.serviceInstances.clear();
     }
 
     /**
-     * Get all available monitor types from registry.
+     * Retrieves all available monitor types from the registry.
+     *
+     * @returns Array of registered monitor type strings.
+     *
+     * @example
+     * ```typescript
+     * const types = MonitorFactory.getAvailableTypes();
+     * ```
+     *
+     * @public
      */
     public static getAvailableTypes(): string[] {
         return getRegisteredMonitorTypes();
     }
 
     /**
-     * Get the appropriate monitor service for the given monitor type.
-     *
-     * @param type - Monitor type string
-     * @param config - Optional monitor configuration to apply
-     * @param forceConfigUpdate - Whether to update config on existing instances
-     * @returns Monitor service instance with applied configuration
-     * @throws Error if monitor type is not supported
+     * Gets the monitor service instance for a given monitor type.
      *
      * @remarks
-     * Uses singleton pattern to cache monitor instances per type. If an instance
-     * already exists and config is provided, the behavior depends on forceConfigUpdate:
-     * - true: Updates existing instance with new config
-     * - false: Returns existing instance without config changes (default)
+     * - Validates the monitor type against the registry.
+     * - Uses singleton pattern: returns cached instance if available.
+     * - If a config is provided, updates the instance's configuration if forced or if the instance is new.
+     * - Throws if monitor type is unsupported or if no factory is registered.
      *
-     * For consistent configuration across all instances, use {@link updateConfig} instead.
+     * @param type - The monitor type string.
+     * @param config - Optional monitor configuration to apply.
+     * @param forceConfigUpdate - If true, updates config on existing instance.
+     * @returns The monitor service instance for the specified type.
+     * @throws Error if monitor type is not supported or no factory is registered.
+     *
+     * @example
+     * ```typescript
+     * const monitor = MonitorFactory.getMonitor("http", { timeout: 5000 });
+     * ```
+     *
+     * @public
      */
     public static getMonitor(type: MonitorType, config?: MonitorConfig, forceConfigUpdate = false): IMonitorService {
         // Validate monitor type using registry
@@ -80,29 +117,23 @@ export class MonitorFactory {
     }
 
     /**
-     * Update configuration for all monitor types.
-     *
-     * @param config - Monitor configuration object containing settings to apply
+     * Updates configuration for all initialized monitor service instances.
      *
      * @remarks
-     * Applies the provided configuration to ALL currently initialized monitor instances.
-     * This ensures consistent configuration across all monitor types.
+     * - Applies the provided configuration to all currently cached monitor instances.
+     * - Only affects already-created instances; future instances require explicit config.
+     * - Type-specific settings in config may be ignored by some monitor types.
      *
-     * The config object should contain settings applicable to all monitor types.
-     * Type-specific settings may be ignored by monitors that don't support them.
-     *
-     * Note: Only affects already-created instances. Future instances created via
-     * {@link getMonitor} will need their configuration set explicitly.
+     * @param config - Monitor configuration object containing settings to apply.
      *
      * @example
      * ```typescript
-     * // Update timeout for all monitor instances
      * MonitorFactory.updateConfig({ timeout: 10000 });
      * ```
+     *
+     * @public
      */
     public static updateConfig(config: MonitorConfig): void {
-        // Validate config parameter - config parameter is typed as required
-
         // Update config for all initialized monitor instances
         for (const instance of this.serviceInstances.values()) {
             try {

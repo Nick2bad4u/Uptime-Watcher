@@ -15,27 +15,9 @@ import { ThemedBadge, ThemedButton, ThemedCard, ThemedProgress, ThemedText } fro
 import { Theme } from "../../../theme/types";
 import { useAvailabilityColors, useTheme } from "../../../theme/useTheme";
 import { MonitorType } from "../../../types";
+import { parseUptimeValue } from "../../../utils/monitoring/dataValidation";
 import { ConditionalResponseTime } from "../../common/MonitorUiComponents";
 import { ResponseTimeChart, StatusChart, UptimeChart } from "../charts/ChartComponents";
-
-/**
- * Parse and validate uptime string to number
- * Handles strings with percent signs and validates the result
- */
-const parseUptimeValue = (uptimeString: string): number => {
-    // Remove any percent signs and whitespace
-    const cleanedUptime = uptimeString.replaceAll(/[\s%]/g, "");
-    const parsed = Number.parseFloat(cleanedUptime);
-
-    // Validate the parsed value is a valid number and within expected range
-    if (Number.isNaN(parsed)) {
-        logger.warn("Invalid uptime value received", { uptime: uptimeString });
-        return 0;
-    }
-
-    // Clamp to 0-100 range for safety
-    return Math.min(100, Math.max(0, parsed));
-};
 
 /**
  * Get color for MTTR display based on recovery status

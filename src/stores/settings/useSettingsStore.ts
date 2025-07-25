@@ -1,6 +1,34 @@
 /**
  * Settings store for managing application preferences and configuration.
  * Handles user settings, theme preferences, and backend synchronization.
+ *
+ * @remarks
+ * This store manages all application settings with automatic persistence and
+ * backend synchronization. It provides:
+ * - Persistent storage using Zustand persist middleware
+ * - Backend synchronization for critical settings
+ * - Default value management and reset functionality
+ * - Error handling integration with the error store
+ *
+ * The store uses a partialize function to persist only essential settings data,
+ * avoiding persistence of transient state or computed values.
+ *
+ * @example
+ * ```typescript
+ * // Basic settings usage
+ * const { settings, updateSettings } = useSettingsStore();
+ * updateSettings({ theme: 'dark', notifications: true });
+ *
+ * // History limit with backend sync
+ * const { updateHistoryLimitValue } = useSettingsStore();
+ * await updateHistoryLimitValue(500);
+ *
+ * // Settings initialization
+ * const { initializeSettings } = useSettingsStore();
+ * const result = await initializeSettings();
+ * ```
+ *
+ * @public
  */
 
 import { create } from "zustand";
@@ -54,6 +82,10 @@ export const useSettingsStore = create<SettingsStore>()(
                 return result;
             },
             resetSettings: () => {
+                // Note: This method currently performs a local reset only.
+                // Future enhancement: Consider adding backend synchronization
+                // if reset operations need to be persisted across application restarts
+                // or synchronized with other application instances.
                 set({ settings: defaultSettings });
                 logStoreAction("SettingsStore", "resetSettings", {
                     message: "Settings reset to defaults",
@@ -94,6 +126,10 @@ export const useSettingsStore = create<SettingsStore>()(
         }),
         {
             name: "uptime-watcher-settings",
+            // Persistence configuration - only persist essential settings data
+            // This prevents persisting transient state, computed values, or functions
+            // If additional state properties are added in the future, review this
+            // partialize function to ensure appropriate data is persisted
             partialize: (state) => ({
                 settings: state.settings,
             }),

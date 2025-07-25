@@ -5,18 +5,26 @@
  * Provides structured logging functionality organized by functional domains
  * (app, site, monitor, store) for contextual logging that's easy to filter.
  *
+ * Uses electron-log/renderer for proper renderer process logging that automatically
+ * forwards logs to the main process via IPC for centralized file logging while
+ * maintaining console output in the renderer process for development.
+ *
  * @packageDocumentation
  */
 
 import log from "electron-log/renderer";
 
 // Configure electron-log for renderer process
-// The /renderer import handles the connection to main process automatically
-log.transports.console.level = "debug";
+// The /renderer import is specifically chosen because:
+// 1. It handles IPC communication with main process automatically
+// 2. Provides console logging in renderer while forwarding to main for file logging
+// 3. Avoids direct file access conflicts that would occur with main process logging
+log.transports.console.level = import.meta.env.PROD ? "info" : "debug";
 log.transports.console.format = "[{h}:{i}:{s}.{ms}] [{level}] {text}";
 
-// File logging will be handled by the main process via IPC
-if (log.transports.file) {
+// File logging is handled by the main process via IPC communication
+// Only configure if the transport exists and we're in a proper renderer context
+if (log.transports.file && typeof window !== "undefined") {
     log.transports.file.level = "info";
 }
 
@@ -38,34 +46,64 @@ const logger = {
         },
     },
     // Debug level - for development debugging
-    debug: (message: string, ...arguments_: unknown[]) => {
-        log.debug(`[UPTIME-WATCHER] ${message}`, ...arguments_);
+    debug: (message: string, ...args: unknown[]) => {
+        if (args.length > 0) {
+            log.debug(`[UPTIME-WATCHER] ${message}`, ...args);
+        } else {
+            log.debug(`[UPTIME-WATCHER] ${message}`);
+        }
     },
     // Error level - errors that should be investigated
-    error: (message: string, error?: Error, ...arguments_: unknown[]) => {
+    error: (message: string, error?: Error, ...args: unknown[]) => {
         if (error instanceof Error) {
-            log.error(
-                `[UPTIME-WATCHER] ${message}`,
-                {
-                    message: error.message,
-                    name: error.name,
-                    stack: error.stack,
-                },
-                ...arguments_
-            );
+            const errorData = {
+                message: error.message,
+                name: error.name,
+                stack: error.stack,
+            };
+            if (args.length > 0) {
+                log.error(`[UPTIME-WATCHER] ${message}`, errorData, ...args);
+            } else {
+                log.error(`[UPTIME-WATCHER] ${message}`, errorData);
+            }
         } else {
-            log.error(`[UPTIME-WATCHER] ${message}`, ...arguments_);
+            if (args.length > 0) {
+                log.error(`[UPTIME-WATCHER] ${message}`, ...args);
+            } else {
+                log.error(`[UPTIME-WATCHER] ${message}`);
+            }
         }
     },
     // Info level - general application flow
-    info: (message: string, ...arguments_: unknown[]) => {
-        log.info(`[UPTIME-WATCHER] ${message}`, ...arguments_);
+    info: (message: string, ...args: unknown[]) => {
+        if (args.length > 0) {
+            log.info(`[UPTIME-WATCHER] ${message}`, ...args);
+        } else {
+            log.info(`[UPTIME-WATCHER] ${message}`);
+        }
     },
-    // Raw access to electron-log for special cases
+    /**
+     * Raw access to the underlying electron-log instance.
+     *
+     * @remarks
+     * Use with caution! Direct access bypasses the application's
+     * logging conventions and structured format. Only use for advanced
+     * scenarios where the standard logger methods are insufficient.
+     *
+     * @example
+     * ```typescript
+     * // Only use when absolutely necessary
+     * logger.raw.transports.file.level = "warn";
+     * ```
+     */
     raw: log,
     // Silly level - extremely detailed debugging
-    silly: (message: string, ...arguments_: unknown[]) => {
-        log.silly(`[UPTIME-WATCHER] ${message}`, ...arguments_);
+    silly: (message: string, ...args: unknown[]) => {
+        if (args.length > 0) {
+            log.silly(`[UPTIME-WATCHER] ${message}`, ...args);
+        } else {
+            log.silly(`[UPTIME-WATCHER] ${message}`);
+        }
     },
     // Specialized logging methods for common scenarios
     // Log site monitoring events
@@ -116,16 +154,41 @@ const logger = {
         },
     },
     // Verbose level - very detailed debugging
-    verbose: (message: string, ...arguments_: unknown[]) => {
-        log.verbose(`[UPTIME-WATCHER] ${message}`, ...arguments_);
+    verbose: (message: string, ...args: unknown[]) => {
+        if (args.length > 0) {
+            log.verbose(`[UPTIME-WATCHER] ${message}`, ...args);
+        } else {
+            log.verbose(`[UPTIME-WATCHER] ${message}`);
+        }
     },
     // Warn level - something unexpected but not an error
-    warn: (message: string, ...arguments_: unknown[]) => {
-        log.warn(`[UPTIME-WATCHER] ${message}`, ...arguments_);
+    warn: (message: string, ...args: unknown[]) => {
+        if (args.length > 0) {
+            log.warn(`[UPTIME-WATCHER] ${message}`, ...args);
+        } else {
+            log.warn(`[UPTIME-WATCHER] ${message}`);
+        }
     },
 };
 
 export default logger;
 
-// Also export a typed interface for better IDE support
+/**
+ * TypeScript interface for the logger instance.
+ *
+ * @remarks
+ * Provides full type safety and IntelliSense support for the logger methods.
+ * Use this type for dependency injection or when you need to reference
+ * the logger type in function parameters or return types.
+ *
+ * @example
+ * ```typescript
+ * function setupLogging(loggerInstance: Logger): void {
+ *   loggerInstance.info("Application starting");
+ *   loggerInstance.site.added("example.com");
+ * }
+ * ```
+ *
+ * @public
+ */
 export type Logger = typeof logger;

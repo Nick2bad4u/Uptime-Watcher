@@ -295,8 +295,7 @@ export interface ThemeProviderProperties {
 }
 
 export function MiniChartBar({ className = "", responseTime, status, timestamp }: MiniChartBarProperties) {
-    const { getStatusColor } = useTheme();
-    const { currentTheme } = useTheme();
+    const { currentTheme, getStatusColor } = useTheme();
 
     const styles: React.CSSProperties = {
         backgroundColor: getStatusColor(status),
@@ -314,8 +313,7 @@ export function MiniChartBar({ className = "", responseTime, status, timestamp }
 }
 
 export function StatusIndicator({ className = "", showText = false, size = "md", status }: StatusIndicatorProperties) {
-    const { getStatusColor } = useTheme();
-    const { currentTheme } = useTheme();
+    const { currentTheme, getStatusColor } = useTheme();
 
     const getSizeStyles = () => {
         switch (size) {
@@ -1061,7 +1059,7 @@ export function ThemedTooltip({ children, className = "", content }: ThemedToolt
 
 // eslint-disable-next-line sonarjs/function-return-type -- React component returns children as-is
 export function ThemeProvider({ children }: ThemeProviderProperties) {
-    // Initialize theme on mount
+    // Initialize theme system on mount to ensure theme context is available
     useTheme();
 
     return children;
@@ -1072,6 +1070,8 @@ export function ThemeProvider({ children }: ThemeProviderProperties) {
  *
  * @param color - Color name or custom color value
  * @returns CSS class name or undefined for custom colors
+ *
+ * @internal
  */
 function getIconColorClass(color?: string): string | undefined {
     if (!color) {
@@ -1110,6 +1110,8 @@ function getIconColorClass(color?: string): string | undefined {
  * @param icon - React icon element
  * @param color - Color name or custom color value
  * @returns Colored icon wrapped in span
+ *
+ * @internal
  */
 function renderColoredIcon(icon: React.ReactNode, color?: string) {
     if (!icon) {

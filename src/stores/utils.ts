@@ -73,7 +73,7 @@ export { withErrorHandling } from "@shared/utils/errorHandling";
  */
 export const createPersistConfig = <T>(name: string, partialize?: (state: T) => Partial<T>) => ({
     name: `uptime-watcher-${name}`,
-    partialize: partialize as ((state: T) => T) | undefined,
+    partialize: partialize as ((state: T) => Partial<T>) | undefined,
 });
 
 /**

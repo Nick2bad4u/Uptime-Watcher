@@ -7,6 +7,12 @@
 
 import logger from "../../../services/logger";
 
+/**
+ * Options for downloading a file in the browser.
+ *
+ * @remarks
+ * Used to specify the file buffer, filename, and optional MIME type for download operations.
+ */
 export interface FileDownloadOptions {
     /** The file buffer to download */
     buffer: ArrayBuffer;
@@ -17,7 +23,22 @@ export interface FileDownloadOptions {
 }
 
 /**
- * Triggers a file download in the browser
+ * Triggers a file download in the browser.
+ *
+ * @remarks
+ * This function creates a Blob from the provided buffer and initiates a download using an anchor element.
+ * If the primary method fails, a fallback strategy is attempted.
+ *
+ * @param options - The file download options including buffer, fileName, and optional mimeType.
+ * @throws {@link Error} If the download fails due to browser API issues or DOM manipulation errors.
+ * @example
+ * ```typescript
+ * downloadFile({
+ *   buffer: myArrayBuffer,
+ *   fileName: "report.txt",
+ *   mimeType: "text/plain"
+ * });
+ * ```
  */
 export function downloadFile(options: FileDownloadOptions): void {
     const { buffer, fileName, mimeType = "application/octet-stream" } = options;
@@ -30,7 +51,19 @@ export function downloadFile(options: FileDownloadOptions): void {
 }
 
 /**
- * Generates a default backup filename with timestamp
+ * Generates a default backup filename with a timestamp.
+ *
+ * @remarks
+ * The filename is formatted as `${prefix}-${YYYY-MM-DD}.${extension}`.
+ *
+ * @param prefix - The prefix for the filename (default: "backup").
+ * @param extension - The file extension (default: "sqlite").
+ * @returns The generated filename string.
+ * @example
+ * ```typescript
+ * const fileName = generateBackupFileName("db", "sqlite3");
+ * // "db-2024-06-01.sqlite3"
+ * ```
  */
 export function generateBackupFileName(prefix = "backup", extension = "sqlite"): string {
     const timestamp = new Date().toISOString().split("T")[0];
@@ -38,9 +71,19 @@ export function generateBackupFileName(prefix = "backup", extension = "sqlite"):
 }
 
 /**
- * Handles downloading SQLite backup data as a file
- * @param downloadFunction - Function that returns the backup data as Uint8Array
- * @throws Error if download fails or browser APIs are not available
+ * Handles downloading SQLite backup data as a file.
+ *
+ * @remarks
+ * This function retrieves backup data using the provided function, validates it, and triggers a browser download.
+ * The download is performed using a Blob and anchor element with proper object URL lifecycle management.
+ *
+ * @param downloadFunction - An async function that returns the backup data as a Uint8Array
+ * @throws TypeError if the backup data is not a Uint8Array
+ * @throws Error if the download fails due to browser API or DOM errors
+ * @example
+ * ```typescript
+ * await handleSQLiteBackupDownload(() => fetchBackupData());
+ * ```
  */
 export async function handleSQLiteBackupDownload(downloadFunction: () => Promise<Uint8Array>): Promise<void> {
     // Get the backup data
@@ -62,7 +105,7 @@ export async function handleSQLiteBackupDownload(downloadFunction: () => Promise
         // Create anchor element for download
         const anchor = document.createElement("a");
         anchor.href = objectURL;
-        anchor.download = "uptime-watcher-backup.db";
+        anchor.download = generateBackupFileName("uptime-watcher", "db");
 
         // Trigger download
         try {
@@ -85,41 +128,63 @@ export async function handleSQLiteBackupDownload(downloadFunction: () => Promise
 }
 
 /**
- * Helper function to create and trigger download.
+ * Helper function to create and trigger a file download.
+ *
+ * @remarks
+ * Creates a Blob from the buffer and uses an anchor element to initiate the download.
+ * Falls back to direct click if DOM manipulation fails. Object URL is properly
+ * managed to avoid memory leaks.
  *
  * @param buffer - File data as ArrayBuffer
  * @param fileName - Name for the downloaded file
  * @param mimeType - MIME type for the file
+ * @throws Error if browser APIs are unavailable or download cannot be triggered
  */
 function createAndTriggerDownload(buffer: ArrayBuffer, fileName: string, mimeType: string): void {
     const blob = new Blob([buffer], { type: mimeType });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = fileName;
-    a.style.display = "none";
+    let objectURL: string | undefined;
 
-    // Safe DOM manipulation
-    const body = document.body;
-    // No need to check if body exists; it's always present in browser environments
     try {
-        body.append(a);
-        a.click();
-        a.remove();
-    } catch (domError) {
-        // Fallback: just click without DOM manipulation
-        logger.warn(
-            "DOM manipulation failed, using fallback click",
-            domError instanceof Error ? domError : new Error(String(domError))
-        );
-        a.click();
-    }
+        objectURL = URL.createObjectURL(blob);
+        const anchor = document.createElement("a");
+        anchor.href = objectURL;
+        anchor.download = fileName;
+        anchor.style.display = "none";
 
-    URL.revokeObjectURL(url);
+        // Safe DOM manipulation
+        const body = document.body;
+        // No need to check if body exists; it's always present in browser environments
+        try {
+            body.append(anchor);
+            anchor.click();
+            anchor.remove();
+        } catch (domError) {
+            // Fallback: just click without DOM manipulation
+            logger.warn(
+                "DOM manipulation failed, using fallback click",
+                domError instanceof Error ? domError : new Error(String(domError))
+            );
+            anchor.click();
+        }
+    } finally {
+        // Clean up object URL only if it was created
+        if (objectURL) {
+            URL.revokeObjectURL(objectURL);
+        }
+    }
 }
 
 /**
- * Handle download errors with appropriate fallback strategies
+ * Handles download errors and applies fallback strategies if possible.
+ *
+ * @remarks
+ * Logs errors and attempts fallback download for DOM-related issues.
+ *
+ * @param error - The error encountered during download.
+ * @param buffer - The file buffer.
+ * @param fileName - The filename.
+ * @param mimeType - The MIME type.
+ * @throws {@link Error} Always throws after logging and attempting fallback.
  */
 function handleDownloadError(error: unknown, buffer: ArrayBuffer, fileName: string, mimeType: string): void {
     if (!(error instanceof Error)) {
@@ -143,7 +208,10 @@ function handleDownloadError(error: unknown, buffer: ArrayBuffer, fileName: stri
 }
 
 /**
- * Check if error should be re-thrown without retry
+ * Determines if an error should be re-thrown without retry.
+ *
+ * @param error - The error to check.
+ * @returns True if the error should be re-thrown, false otherwise.
  */
 function shouldRethrowError(error: Error): boolean {
     const rethrownErrorMessages = [
@@ -159,7 +227,12 @@ function shouldRethrowError(error: Error): boolean {
 }
 
 /**
- * Attempt fallback download method
+ * Attempts a fallback download method if the primary method fails.
+ *
+ * @param buffer - The file buffer.
+ * @param fileName - The filename.
+ * @param mimeType - The MIME type.
+ * @throws {@link Error} If both primary and fallback methods fail.
  */
 function tryFallbackDownload(buffer: ArrayBuffer, fileName: string, mimeType: string): void {
     try {

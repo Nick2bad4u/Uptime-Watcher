@@ -56,6 +56,8 @@ export interface SiteAnalytics {
     upCount: number;
     /** Uptime percentage as formatted string */
     uptime: string;
+    /** Raw uptime percentage as number for calculations */
+    uptimeRaw: number;
 }
 
 /**
@@ -105,6 +107,7 @@ export function useChartData(monitor: Monitor, theme: Theme) {
  * @param monitor - The monitor to analyze (can be undefined)
  * @param timeRange - Time period to analyze (defaults to "24h")
  * @returns Comprehensive analytics object with all calculated metrics
+ * @see {@link SiteAnalytics} for the complete interface specification
  *
  * @example
  * ```tsx
@@ -139,7 +142,8 @@ export function useSiteAnalytics(monitor: Monitor | undefined, timeRange: TimePe
         const downCount = filteredHistory.filter((h) => h.status === "down").length;
 
         // Basic metrics
-        const uptime = totalChecks > 0 ? ((upCount / totalChecks) * 100).toFixed(2) : "0";
+        const uptimeRaw = totalChecks > 0 ? (upCount / totalChecks) * 100 : 0;
+        const uptime = uptimeRaw.toFixed(2);
         const avgResponseTime =
             totalChecks > 0 ? Math.round(filteredHistory.reduce((sum, h) => sum + h.responseTime, 0) / totalChecks) : 0;
 
@@ -159,7 +163,7 @@ export function useSiteAnalytics(monitor: Monitor | undefined, timeRange: TimePe
             }
             const index = Math.floor(arrayLength * safeP);
             const safeIndex = Math.max(0, Math.min(index, arrayLength - 1));
-            // eslint-disable-next-line security/detect-object-injection -- safeIdx is validated and sanitized
+            // eslint-disable-next-line security/detect-object-injection -- safeIndex is validated and sanitized
             return sortedResponseTimes[safeIndex] ?? 0;
         };
 
@@ -169,15 +173,23 @@ export function useSiteAnalytics(monitor: Monitor | undefined, timeRange: TimePe
 
         // Calculate downtime periods
         const downtimePeriods: DowntimePeriod[] = [];
-
         let currentDowntime: DowntimePeriod | undefined;
 
         // Process in reverse chronological order for proper downtime calculation
-        for (const record of [...filteredHistory].toReversed()) {
+        // Use efficient reverse iteration without creating a copy
+        for (let i = filteredHistory.length - 1; i >= 0; i--) {
+            // eslint-disable-next-line security/detect-object-injection -- i is a safe numeric index within array bounds
+            const record = filteredHistory[i];
+            if (!record) {
+                continue; // Skip if record is undefined
+            }
+
             if (record.status === "down") {
                 if (currentDowntime) {
-                    currentDowntime.end = record.timestamp;
+                    // Extend the downtime period backwards
+                    currentDowntime.start = record.timestamp;
                 } else {
+                    // Start a new downtime period
                     currentDowntime = {
                         duration: 0,
                         end: record.timestamp,
@@ -185,13 +197,14 @@ export function useSiteAnalytics(monitor: Monitor | undefined, timeRange: TimePe
                     };
                 }
             } else if (currentDowntime) {
+                // End of downtime period, calculate duration
                 currentDowntime.duration = currentDowntime.end - currentDowntime.start;
                 downtimePeriods.push(currentDowntime);
                 currentDowntime = undefined;
             }
         }
 
-        // Handle ongoing downtime
+        // Handle ongoing downtime (if the period started but never ended)
         if (currentDowntime) {
             currentDowntime.duration = currentDowntime.end - currentDowntime.start;
             downtimePeriods.push(currentDowntime);
@@ -216,6 +229,7 @@ export function useSiteAnalytics(monitor: Monitor | undefined, timeRange: TimePe
             totalDowntime,
             upCount,
             uptime,
+            uptimeRaw,
         };
     }, [monitor?.history, timeRange]);
 }
@@ -250,6 +264,12 @@ export const SiteAnalyticsUtils = {
     },
     /**
      * Get availability status based on uptime percentage
+     *
+     * @param uptime - Uptime percentage (0-100)
+     * @returns Status level based on uptime thresholds
+     *
+     * @remarks
+     * Thresholds: ≥99.9% = excellent, ≥99% = good, ≥95% = warning, \<95% = critical
      */
     getAvailabilityStatus(uptime: number): "critical" | "excellent" | "good" | "warning" {
         if (uptime >= 99.9) {
@@ -265,6 +285,12 @@ export const SiteAnalyticsUtils = {
     },
     /**
      * Get performance status based on response time
+     *
+     * @param responseTime - Average response time in milliseconds
+     * @returns Status level based on response time thresholds
+     *
+     * @remarks
+     * Thresholds: ≤200ms = excellent, ≤500ms = good, ≤1000ms = warning, \>1000ms = critical
      */
     getPerformanceStatus(responseTime: number): "critical" | "excellent" | "good" | "warning" {
         if (responseTime <= 200) {

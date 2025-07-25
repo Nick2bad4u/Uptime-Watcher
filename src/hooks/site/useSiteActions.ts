@@ -35,10 +35,10 @@ export function useSiteActions(site: Site, monitor: Monitor | undefined): SiteAc
     // Start monitoring the site with proper logging
     const handleStartMonitoring = useCallback(() => {
         if (!monitor) {
-            logger.error("Attempted to start monitoring without valid monitor", undefined, {
-                siteId: site.identifier,
-                siteName: site.name,
-            });
+            logger.site.error(
+                site.identifier,
+                ensureError(new Error("Attempted to start monitoring without valid monitor"))
+            );
             return;
         }
 
@@ -58,10 +58,10 @@ export function useSiteActions(site: Site, monitor: Monitor | undefined): SiteAc
     // Stop monitoring the site with proper logging
     const handleStopMonitoring = useCallback(() => {
         if (!monitor) {
-            logger.error("Attempted to stop monitoring without valid monitor", undefined, {
-                siteId: site.identifier,
-                siteName: site.name,
-            });
+            logger.site.error(
+                site.identifier,
+                ensureError(new Error("Attempted to stop monitoring without valid monitor"))
+            );
             return;
         }
 
@@ -81,10 +81,7 @@ export function useSiteActions(site: Site, monitor: Monitor | undefined): SiteAc
     // Perform an immediate status check with enhanced logging
     const handleCheckNow = useCallback(() => {
         if (!monitor) {
-            logger.error("Attempted to check site without valid monitor", undefined, {
-                siteId: site.identifier,
-                siteName: site.name,
-            });
+            logger.site.error(site.identifier, ensureError(new Error("Attempted to check site without valid monitor")));
             return;
         }
 
@@ -96,6 +93,7 @@ export function useSiteActions(site: Site, monitor: Monitor | undefined): SiteAc
         });
 
         // Handle async operation with proper error handling
+        // Note: This is a fire-and-forget operation that continues after component unmount
         void (async () => {
             try {
                 await checkSiteNow(site.identifier, monitor.id);
@@ -107,11 +105,6 @@ export function useSiteActions(site: Site, monitor: Monitor | undefined): SiteAc
             } catch (error) {
                 const errorObj = ensureError(error);
                 logger.site.error(site.identifier, errorObj);
-                logger.error("Manual site check failed", errorObj, {
-                    monitorId: monitor.id,
-                    siteId: site.identifier,
-                    siteName: site.name,
-                });
                 // Don't re-throw here since this is a fire-and-forget operation
             }
         })();

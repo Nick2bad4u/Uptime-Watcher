@@ -42,6 +42,7 @@ import "../../services/chartSetup";
 import { ThemedBox } from "../../theme/components";
 import { useTheme } from "../../theme/useTheme";
 import { Site } from "../../types";
+import { parseUptimeValue } from "../../utils/monitoring/dataValidation";
 import { formatStatusWithIcon } from "../../utils/status";
 import { formatDuration, formatFullTimestamp, formatResponseTime } from "../../utils/time";
 import "./SiteDetails.css";
@@ -268,7 +269,7 @@ export function SiteDetails({ onClose, site }: SiteDetailsProperties) {
                                 isLoading={isLoading}
                                 site={currentSite}
                                 totalChecks={analytics.totalChecks}
-                                uptime={Number.parseFloat(analytics.uptime)}
+                                uptime={parseUptimeValue(analytics.uptime)}
                             />
                         )}
 

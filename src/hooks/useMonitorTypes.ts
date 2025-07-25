@@ -1,10 +1,44 @@
 /**
  * Custom hook for managing monitor type configurations from the backend.
  * Provides async loading with caching and error handling.
+ *
+ * @returns Monitor type options and loading state
+ *
+ * @remarks
+ * This hook fetches monitor type configurations from the backend and transforms
+ * them into options suitable for form select fields. It includes error handling
+ * and fallback options to ensure the UI remains functional even when backend
+ * communication fails.
+ *
+ * Error handling strategy:
+ * - Network errors: Logged and fallback options provided
+ * - Parse errors: Logged with context for debugging
+ * - Fallback behavior: Uses FALLBACK_MONITOR_TYPE_OPTIONS from constants
+ *
+ * @example
+ * ```tsx
+ * function MonitorTypeSelector() {
+ *   const { options, isLoading, error, refresh } = useMonitorTypes();
+ *
+ *   if (isLoading) return <div>Loading monitor types...</div>;
+ *   if (error) return <div>Error: {error} <button onClick={refresh}>Retry</button></div>;
+ *
+ *   return (
+ *     <select>
+ *       {options.map(option => (
+ *         <option key={option.value} value={option.value}>
+ *           {option.label}
+ *         </option>
+ *       ))}
+ *     </select>
+ *   );
+ * }
+ * ```
  */
 
 import { useEffect, useState } from "react";
 
+import { FALLBACK_MONITOR_TYPE_OPTIONS } from "../constants";
 import logger from "../services/logger";
 import { getMonitorTypeOptions } from "../utils/monitorTypeHelper";
 
@@ -42,13 +76,14 @@ export function useMonitorTypes(): UseMonitorTypesResult {
             setOptions(monitorOptions);
         } catch (error_) {
             const errorMessage = error_ instanceof Error ? error_.message : "Failed to load monitor types";
-            setError(errorMessage);
-            logger.error("Failed to load monitor types", error_ instanceof Error ? error_ : new Error(String(error_)));
-            // Fallback to basic options if backend fails
-            setOptions([
-                { label: "HTTP (Website/API)", value: "http" },
-                { label: "Port (Host/Port)", value: "port" },
-            ]);
+            const contextualError = `Monitor types loading failed: ${errorMessage}. Using fallback options.`;
+            setError(contextualError);
+            logger.error(
+                "Failed to load monitor types from backend",
+                error_ instanceof Error ? error_ : new Error(String(error_))
+            );
+            // Use centralized fallback options to ensure consistency
+            setOptions([...FALLBACK_MONITOR_TYPE_OPTIONS]);
         } finally {
             setIsLoading(false);
         }

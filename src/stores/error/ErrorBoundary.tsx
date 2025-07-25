@@ -25,8 +25,8 @@ export interface ErrorBoundaryProperties {
  * @public
  */
 export interface ErrorBoundaryState {
-    error?: Error;
-    errorInfo?: React.ErrorInfo;
+    error?: Error | undefined;
+    errorInfo?: React.ErrorInfo | undefined;
     hasError: boolean;
 }
 
@@ -61,7 +61,11 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProperties, Erro
     }
 
     handleRetry = () => {
-        this.setState({ hasError: false });
+        this.setState({
+            error: undefined,
+            errorInfo: undefined,
+            hasError: false,
+        });
     };
 
     // eslint-disable-next-line sonarjs/function-return-type -- React component can return different node types
@@ -82,6 +86,15 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProperties, Erro
 
 /**
  * Higher-order component for wrapping components with error boundary
+ *
+ * @param Component - The component to wrap with error boundary protection
+ * @param fallback - Optional custom fallback component for error display
+ * @returns Wrapped component with error boundary functionality
+ *
+ * @example
+ * ```tsx
+ * const SafeComponent = withErrorBoundary(MyComponent, CustomErrorFallback);
+ * ```
  */
 export const withErrorBoundary = <P extends object>(
     Component: React.ComponentType<P>,
@@ -93,6 +106,8 @@ export const withErrorBoundary = <P extends object>(
         </ErrorBoundary>
     );
 
+    // Set display name for better debugging experience in React DevTools
+    // This helps developers identify wrapped components in the component tree
     WrappedComponent.displayName = `withErrorBoundary(${Component.displayName ?? Component.name})`;
 
     return WrappedComponent;

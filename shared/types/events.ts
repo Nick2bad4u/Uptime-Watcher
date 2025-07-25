@@ -12,8 +12,6 @@ import type { Monitor, Site } from "../types";
  *
  * @remarks
  * Used to notify listeners that a cache entry or the entire cache has been invalidated for a specific reason.
- *
- * @remarks
  * - `identifier`: The specific identifier affected (optional for global invalidation).
  * - `reason`: The reason for invalidation.
  * - `timestamp`: The time (in ms since epoch) when invalidation occurred.
@@ -21,7 +19,6 @@ import type { Monitor, Site } from "../types";
  *
  * @example
  * // Invalidate all site caches due to manual action
- * @example
  * ```typescript
  * const event: CacheInvalidatedEventData = {
  *   type: 'all',
@@ -57,8 +54,6 @@ export interface CacheInvalidatedEventData {
  *
  * @remarks
  * Emitted when a monitored endpoint or service is detected as down.
- *
- * @remarks
  * - `monitor`: The monitor that went down.
  * - `site`: The site containing the monitor.
  * - `siteId`: The unique identifier of the site.
@@ -66,7 +61,6 @@ export interface CacheInvalidatedEventData {
  *
  * @example
  * // Example event payload for a monitor down event
- * @example
  * ```typescript
  * const event: MonitorDownEventData = {
  *   monitor,
@@ -100,8 +94,6 @@ export interface MonitorDownEventData {
  *
  * @remarks
  * Used to signal global monitoring state changes, such as starting or stopping all monitors.
- *
- * @remarks
  * - `activeMonitors`: Number of active monitors (for stopped events).
  * - `monitorCount`: Number of monitors involved in the operation.
  * - `reason`: Reason for stopping (for stopped events).
@@ -110,7 +102,6 @@ export interface MonitorDownEventData {
  *
  * @example
  * // Example: Monitoring stopped by user
- * @example
  * ```typescript
  * const event: MonitoringControlEventData = {
  *   reason: 'user',
@@ -149,8 +140,6 @@ export interface MonitoringControlEventData {
  *
  * @remarks
  * Emitted when a previously down monitor is detected as up.
- *
- * @remarks
  * - `monitor`: The monitor that came back up.
  * - `site`: The site containing the monitor.
  * - `siteId`: The unique identifier of the site.
@@ -158,7 +147,6 @@ export interface MonitoringControlEventData {
  *
  * @example
  * // Example event payload for a monitor up event
- * @example
  * ```typescript
  * const event: MonitorUpEventData = {
  *   monitor,
@@ -194,9 +182,8 @@ export interface MonitorUpEventData {
  * Used for development or testing purposes to transmit arbitrary data.
  *
  * @example
- * @example
- * ```typescript
  * // Example: Sending a test event with custom data
+ * ```typescript
  * const event: TestEventData = {
  *   foo: 'bar',
  *   count: 42
@@ -216,14 +203,11 @@ export interface TestEventData {
  *
  * @remarks
  * Used to communicate the current status of application updates, including errors.
- *
- * @remarks
  * - `error`: Error message if status is 'error'.
  * - `status`: The current update status.
  *
  * @example
  * // Example: Update downloaded
- * @example
  * ```typescript
  * const event: UpdateStatusEventData = {
  *   status: 'downloaded'

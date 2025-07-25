@@ -115,5 +115,26 @@ export type StoreState<T> = {
  */
 export type UpdateStatus = "available" | "checking" | "downloaded" | "downloading" | "error" | "idle";
 
-// Re-export core types from shared/types for convenience
+/**
+ * Re-exported core types from shared module for convenience.
+ *
+ * @remarks
+ * These types are re-exported from the shared/types module to provide a single
+ * import location for commonly used domain types across the frontend application.
+ * This improves developer experience by reducing the need for multiple import
+ * statements and provides consistency in type usage across components.
+ *
+ * The re-exported types include:
+ * - ERROR_MESSAGES: Centralized error message constants
+ * - Monitor: Individual monitoring configuration interface
+ * - MonitorType: Enumeration of supported monitor types
+ * - Site: Complete site configuration with monitors
+ * - StatusUpdate: Real-time status update interface
+ *
+ * @example
+ * ```typescript
+ * import { Site, Monitor, StatusUpdate } from '@/stores/types';
+ * // Instead of multiple imports from @shared/types
+ * ```
+ */
 export type { ERROR_MESSAGES, Monitor, MonitorType, Site, StatusUpdate } from "@shared/types";

@@ -47,12 +47,12 @@ export function formatFullTimestamp(timestamp: number): string {
  */
 export function formatIntervalDuration(milliseconds: number): string {
     if (milliseconds < 60_000) {
-        return `${milliseconds / 1000}s`;
+        return `${Math.round(milliseconds / 1000)}s`;
     }
     if (milliseconds < 3_600_000) {
-        return `${milliseconds / 60_000}m`;
+        return `${Math.round(milliseconds / 60_000)}m`;
     }
-    return `${milliseconds / 3_600_000}h`;
+    return `${Math.round(milliseconds / 3_600_000)}h`;
 }
 
 /**
@@ -142,6 +142,9 @@ export function getIntervalLabel(interval: number | { label?: string; value: num
 
 /**
  * Format time periods for display
+ * Maps time period keys to human-readable labels.
+ *
+ * @public
  */
 export const TIME_PERIOD_LABELS: Record<TimePeriod, string> = {
     "1h": "Last Hour",
@@ -155,8 +158,13 @@ export const TIME_PERIOD_LABELS: Record<TimePeriod, string> = {
 /**
  * Format retry attempts with descriptive text.
  *
- * @param attempts - Number of retry attempts
+ * @param attempts - Number of retry attempts (expected range: 0-10)
  * @returns Descriptive text explaining retry behavior
+ *
+ * @remarks
+ * Handles edge cases: 0 attempts means no retries (immediate failure),
+ * negative values are not expected but will be formatted as-is.
+ * The function provides user-friendly text explaining the retry behavior.
  */
 export function formatRetryAttemptsText(attempts: number): string {
     if (attempts === 0) {

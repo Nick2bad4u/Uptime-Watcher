@@ -68,6 +68,11 @@ export function clearConfigCache(): void {
 export async function formatMonitorDetail(monitorType: MonitorType, details: string): Promise<string> {
     return withUtilityErrorHandling(
         async () => {
+            // Validate electronAPI availability before calling
+            if (!isElectronApiAvailable()) {
+                throw new Error("ElectronAPI not available for monitor detail formatting");
+            }
+
             // Use the IPC method to format on the backend where functions are available
             return window.electronAPI.monitorTypes.formatMonitorDetail(monitorType, details);
         },
@@ -95,6 +100,11 @@ export async function formatMonitorTitleSuffix(
 ): Promise<string> {
     return withUtilityErrorHandling(
         async () => {
+            // Validate electronAPI availability before calling
+            if (!isElectronApiAvailable()) {
+                throw new Error("ElectronAPI not available for monitor title suffix formatting");
+            }
+
             // Use the IPC method to format on the backend where functions are available
             return window.electronAPI.monitorTypes.formatMonitorTitleSuffix(monitorType, monitor);
         },
@@ -122,10 +132,14 @@ export async function getAnalyticsLabel(monitorType: MonitorType): Promise<strin
 
 /**
  * Get the default monitor ID from a list of monitor IDs.
- * Returns the first monitor ID or an empty string if none exist.
  *
  * @param monitorIds - Array of monitor IDs
- * @returns Default monitor ID (first in array or empty string)
+ * @returns Default monitor ID (first valid ID in array) or empty string if array is empty or contains no valid IDs
+ *
+ * @remarks
+ * This function returns the first element of the array if it exists, otherwise an empty string.
+ * It does not validate whether the IDs are actually valid monitor identifiers - that should
+ * be done by the caller if needed. Empty arrays return an empty string as a safe fallback.
  */
 export function getDefaultMonitorId(monitorIds: string[]): string {
     return monitorIds[0] ?? "";
@@ -233,10 +247,24 @@ export async function supportsResponseTime(monitorType: MonitorType): Promise<bo
 }
 
 /**
+ * Generate a robust cache key for monitor type configurations.
+ * Sanitizes input to prevent collisions and includes context.
+ *
+ * @param prefix - Cache key prefix
+ * @param monitorType - Monitor type identifier
+ * @returns Sanitized cache key
+ */
+function generateCacheKey(prefix: string, monitorType: MonitorType): string {
+    // Sanitize monitor type to prevent key collisions
+    const sanitizedType = monitorType.replaceAll(/[^\w-]/g, "_");
+    return `${prefix}_${sanitizedType}_v1`;
+}
+
+/**
  * Get monitor type configuration with caching
  */
 async function getConfig(monitorType: MonitorType): Promise<MonitorTypeConfig | undefined> {
-    const cacheKey = `config-${monitorType}`;
+    const cacheKey = generateCacheKey("config", monitorType);
 
     // Try to get from cache first
     const cached = AppCaches.uiHelpers.get(cacheKey) as MonitorTypeConfig | undefined;
@@ -251,4 +279,21 @@ async function getConfig(monitorType: MonitorType): Promise<MonitorTypeConfig | 
     }
 
     return config;
+}
+
+/**
+ * Validate that electronAPI is available and properly configured.
+ * Prevents runtime errors when preload context is missing.
+ *
+ * @returns Whether electronAPI is available and has required methods
+ */
+function isElectronApiAvailable(): boolean {
+    return (
+        typeof window !== "undefined" &&
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        window.electronAPI &&
+        typeof window.electronAPI.monitorTypes === "object" &&
+        typeof window.electronAPI.monitorTypes.formatMonitorDetail === "function" &&
+        typeof window.electronAPI.monitorTypes.formatMonitorTitleSuffix === "function"
+    );
 }

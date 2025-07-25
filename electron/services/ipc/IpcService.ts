@@ -8,12 +8,21 @@ import { getAllMonitorTypeConfigs, getMonitorTypeConfig, validateMonitorData } f
 import { AutoUpdaterService } from "../updater/AutoUpdaterService";
 
 /**
- * The result structure returned by the validate-monitor-data IPC handler.
+ * Structure for the result returned by the `validate-monitor-data` IPC handler.
+ *
+ * @remarks
+ * Used to communicate monitor validation results between main and renderer processes.
+ *
+ * @public
  */
 interface MonitorValidationResult {
+    /** List of validation errors encountered. */
     errors: string[];
+    /** Additional metadata produced during validation. */
     metadata: Record<string, unknown>;
+    /** Indicates if validation succeeded. */
     success: boolean;
+    /** List of non-critical warnings. */
     warnings: string[];
 }
 
@@ -24,17 +33,32 @@ interface MonitorValidationResult {
  * Manages all IPC handlers between the main process and renderer processes,
  * organized by functional domains (sites, monitoring, data, system).
  * Provides a secure interface for the frontend to interact with backend services.
+ *
+ * @public
  */
 export class IpcService {
+    /** @internal */
     private readonly autoUpdaterService: AutoUpdaterService;
+    /** @internal */
     private readonly registeredIpcHandlers = new Set<string>();
+    /** @internal */
     private readonly uptimeOrchestrator: UptimeOrchestrator;
 
     /**
-     * Create a new IPC service instance.
+     * Constructs a new {@link IpcService} instance.
      *
-     * @param uptimeOrchestrator - Core orchestrator for monitoring operations
-     * @param autoUpdaterService - Service for handling application updates
+     * @param uptimeOrchestrator - Core orchestrator for monitoring operations.
+     * @param autoUpdaterService - Service for handling application updates.
+     *
+     * @remarks
+     * Initializes the IPC service with required orchestrator and updater dependencies.
+     *
+     * @example
+     * ```typescript
+     * const ipcService = new IpcService(uptimeOrchestrator, autoUpdaterService);
+     * ```
+     *
+     * @public
      */
     constructor(uptimeOrchestrator: UptimeOrchestrator, autoUpdaterService: AutoUpdaterService) {
         this.uptimeOrchestrator = uptimeOrchestrator;
@@ -42,15 +66,18 @@ export class IpcService {
     }
 
     /**
-     * Clean up all IPC listeners.
+     * Removes all registered IPC handlers and event listeners.
      *
      * @remarks
-     * Removes all registered IPC handlers and event listeners to prevent memory leaks.
-     * This includes:
-     * - IPC handlers registered via ipcMain.handle (removed via removeHandler)
-     * - Event listeners registered via ipcMain.on (removed via removeAllListeners)
+     * Should be called during application shutdown to prevent memory leaks.
+     * Removes handlers registered via `ipcMain.handle` and listeners via `ipcMain.on`.
      *
-     * Should be called during application shutdown.
+     * @example
+     * ```typescript
+     * ipcService.cleanup();
+     * ```
+     *
+     * @public
      */
     public cleanup(): void {
         logger.info("[IpcService] Cleaning up IPC handlers");
@@ -58,20 +85,22 @@ export class IpcService {
             ipcMain.removeHandler(channel);
         }
         // Remove listeners for channels registered with ipcMain.on
-        // Currently, only "quit-and-install" is handled here.
-        // Note: If you add more ipcMain.on listeners, document and remove them below.
         ipcMain.removeAllListeners("quit-and-install");
     }
 
     /**
-     * Initialize all IPC handlers organized by functional domain.
+     * Initializes all IPC handlers for the main process.
      *
      * @remarks
-     * Sets up handlers for:
-     * - Site management (CRUD operations)
-     * - Monitoring control (start/stop operations)
-     * - Data management (import/export/backup)
-     * - System operations (updates, quit)
+     * Sets up handlers for site management, monitoring control, data management,
+     * system operations, and state synchronization.
+     *
+     * @example
+     * ```typescript
+     * ipcService.setupHandlers();
+     * ```
+     *
+     * @public
      */
     public setupHandlers(): void {
         this.setupSiteHandlers();
@@ -83,24 +112,18 @@ export class IpcService {
     }
 
     /**
-     * Safely serialize a monitor type configuration for IPC transmission.
-     * Excludes non-serializable data while preserving all useful information.
-     *
-     * @param config - The monitor type configuration to serialize. Expected structure includes:
-     *   - description: Human-readable description of the monitor type
-     *   - displayName: UI display name for the monitor type
-     *   - fields: Configuration fields for the monitor
-     *   - type: Unique identifier for the monitor type
-     *   - uiConfig: UI configuration options and formatting
-     *   - version: Version information for the monitor type
-     *   - serviceFactory: Service factory function (excluded from serialization)
-     *   - validationSchema: Validation schema object (excluded from serialization)
-     * @returns Serializable configuration object safe for IPC transmission
+     * Serializes a monitor type configuration for IPC transmission.
      *
      * @remarks
-     * This method filters out non-serializable properties like functions and schemas
-     * while preserving all data needed by the renderer process. Logs warnings if
-     * unexpected properties are encountered to aid in maintenance.
+     * Excludes non-serializable properties (functions, schemas) and logs unexpected properties.
+     * Preserves all data needed by the renderer process.
+     *
+     * @param config - The monitor type configuration to serialize.
+     * @returns Serializable configuration object safe for IPC transmission.
+     *
+     * @throws {@link Error} If unexpected properties are encountered.
+     *
+     * @internal
      */
     private serializeMonitorTypeConfig(config: ReturnType<typeof getAllMonitorTypeConfigs>[0]) {
         // Extract and validate base properties
@@ -172,15 +195,12 @@ export class IpcService {
     }
 
     /**
-     * Setup IPC handlers for data management operations.
+     * Registers IPC handlers for data management operations.
      *
      * @remarks
-     * Handles data persistence and backup operations:
-     * - `export-data`: Export all configuration and history as JSON
-     * - `import-data`: Import configuration from JSON data
-     * - `update-history-limit`: Configure history retention policy
-     * - `get-history-limit`: Retrieve current history retention setting
-     * - `download-sqlite-backup`: Create and download database backup
+     * Handles export/import of configuration, history limit management, and database backup.
+     *
+     * @internal
      */
     private setupDataHandlers(): void {
         this.registeredIpcHandlers.add("export-data");
@@ -221,15 +241,12 @@ export class IpcService {
     }
 
     /**
-     * Setup IPC handlers for monitoring control operations.
+     * Registers IPC handlers for monitoring control operations.
      *
      * @remarks
-     * Handles monitoring lifecycle operations:
-     * - `start-monitoring`: Begin monitoring all configured sites
-     * - `stop-monitoring`: Stop all monitoring activities
-     * - `start-monitoring-for-site`: Start monitoring specific site/monitor
-     * - `stop-monitoring-for-site`: Stop monitoring specific site/monitor
-     * - `check-site-now`: Perform immediate manual check
+     * Handles starting/stopping monitoring globally or per site/monitor, and manual checks.
+     *
+     * @internal
      */
     private setupMonitoringHandlers(): void {
         this.registeredIpcHandlers.add("start-monitoring");
@@ -284,24 +301,19 @@ export class IpcService {
     }
 
     /**
-     * Setup IPC handlers for monitor type registry operations.
+     * Registers IPC handlers for monitor type registry operations.
      *
      * @remarks
-     * Handles monitor type metadata operations:
-     * - `get-monitor-types`: Get all available monitor type configurations
-     * - `format-monitor-detail`: Format monitor detail strings using backend functions
-     * - `format-monitor-title-suffix`: Format monitor title suffixes using backend functions
-     * - `validate-monitor-data`: Validate monitor configuration data
+     * Handles retrieval of monitor type configs, formatting, and validation.
      *
-     * @returns For `validate-monitor-data`, returns a {@link MonitorValidationResult} object:
+     * @returns For `validate-monitor-data`, returns a {@link MonitorValidationResult} object.
+     *
+     * @example
      * ```typescript
-     * interface MonitorValidationResult {
-     *   success: boolean;
-     *   errors: string[];
-     *   warnings: string[];
-     *   metadata: Record<string, unknown>;
-     * }
+     * const result = await window.electronAPI.invoke("validate-monitor-data", type, data);
      * ```
+     *
+     * @internal
      */
     private setupMonitorTypeHandlers(): void {
         this.registeredIpcHandlers.add("get-monitor-types");
@@ -412,15 +424,12 @@ export class IpcService {
     }
 
     /**
-     * Setup IPC handlers for site management operations.
+     * Registers IPC handlers for site management operations.
      *
      * @remarks
-     * Handles site CRUD operations:
-     * - `add-site`: Create new site with monitors
-     * - `remove-site`: Delete site and all associated data
-     * - `get-sites`: Retrieve all configured sites
-     * - `update-site`: Modify existing site configuration
-     * - `remove-monitor`: Delete specific monitor from site
+     * Handles CRUD operations for sites and monitors.
+     *
+     * @internal
      */
     private setupSiteHandlers(): void {
         this.registeredIpcHandlers.add("add-site");
@@ -455,19 +464,13 @@ export class IpcService {
     }
 
     /**
-     * Setup IPC handlers for state synchronization operations.
+     * Registers IPC handlers for state synchronization operations.
      *
      * @remarks
-     * Handles:
-     * - `request-full-sync`: Manual full state synchronization request
-     * - `get-sync-status`: Get current synchronization status with response containing:
-     *   - lastSync: Current timestamp in milliseconds (Unix epoch) when status was retrieved
-     *   - siteCount: Number of sites currently configured
-     *   - success: Whether the status request was successful
-     *   - synchronized: Whether the system is in a synchronized state
+     * Handles manual full sync requests and sync status queries.
+     * Emits synchronization events to all renderer processes.
      *
-     * Note: lastSync represents the current time when the status was checked,
-     * not the actual last synchronization time.
+     * @internal
      */
     private setupStateSyncHandlers(): void {
         this.registeredIpcHandlers.add("request-full-sync");
@@ -526,16 +529,13 @@ export class IpcService {
     }
 
     /**
-     * Setup IPC handlers for system-level operations.
+     * Registers IPC handlers for system-level operations.
      *
      * @remarks
-     * Handles application lifecycle and system operations using ipcMain.on for event listeners:
-     * - `quit-and-install`: Quit application and install pending update
+     * Handles application quit and install events using event listeners.
+     * Event listeners must be removed via `cleanup()`.
      *
-     * Note: This method uses ipcMain.on (event listeners) rather than ipcMain.handle (request handlers),
-     * which affects cleanup requirements. Event listeners must be removed via removeAllListeners.
-     * If additional system handlers are added in the future, update this documentation and
-     * ensure proper cleanup in the cleanup() method.
+     * @internal
      */
     private setupSystemHandlers(): void {
         this.registeredIpcHandlers.add("quit-and-install");

@@ -49,6 +49,21 @@ ChartJS.register(
     zoomPlugin
 );
 
+/**
+ * Chart.js type exports for centralized type management.
+ *
+ * @remarks
+ * Re-exports essential Chart.js types to provide a single source of truth
+ * for chart-related TypeScript definitions. This enables proper type checking
+ * and IntelliSense support across the application while maintaining consistency.
+ *
+ * Types included:
+ * - ChartData: Defines the data structure for charts
+ * - ChartJS: Main Chart.js class for direct usage
+ * - ChartOptions: Configuration options for chart behavior and styling
+ *
+ * @public
+ */
 export { type ChartData, Chart as ChartJS, type ChartOptions } from "chart.js";
 
 /**

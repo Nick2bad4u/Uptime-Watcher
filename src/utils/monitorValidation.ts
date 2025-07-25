@@ -3,7 +3,7 @@
  * Provides both client-side and server-side validation support.
  */
 
-import type { MonitorType } from "@shared/types";
+import type { Monitor, MonitorType } from "@shared/types";
 
 // Import shared validation functions for client-side validation
 import {
@@ -14,14 +14,36 @@ import {
 import { withUtilityErrorHandling } from "./errorHandling";
 
 /**
- * Create monitor object with proper field mapping.
+ * Required fields for monitor creation, ensuring type safety.
+ * Prevents runtime errors by guaranteeing essential properties are present.
+ */
+export interface MonitorCreationData
+    extends Pick<Monitor, "history" | "monitoring" | "responseTime" | "retryAttempts" | "status" | "timeout" | "type"> {
+    /** Additional fields provided during creation */
+    [key: string]: unknown;
+}
+
+/**
+ * Standard validation result interface for consistency across all validation functions.
+ */
+export interface ValidationResult {
+    /** Array of error messages, empty if validation passes */
+    errors: string[];
+    /** Whether validation was successful */
+    success: boolean;
+    /** Array of warning messages (non-blocking issues) */
+    warnings: string[];
+}
+
+/**
+ * Create monitor object with proper field mapping and type safety.
  *
  * @param type - Monitor type
- * @param fields - Field values
- * @returns Monitor object with type-specific fields
+ * @param fields - Field values to merge with defaults
+ * @returns Monitor creation data with type-specific fields and guaranteed required fields
  */
-export function createMonitorObject(type: MonitorType, fields: Record<string, unknown>): Record<string, unknown> {
-    const monitor: Record<string, unknown> = {
+export function createMonitorObject(type: MonitorType, fields: Record<string, unknown>): MonitorCreationData {
+    const monitor: MonitorCreationData = {
         history: [],
         monitoring: true,
         responseTime: -1,
@@ -42,25 +64,26 @@ export function createMonitorObject(type: MonitorType, fields: Record<string, un
  * @param data - Monitor data to validate
  * @returns Promise resolving to validation result
  */
-export async function validateMonitorData(
-    type: MonitorType,
-    data: Record<string, unknown>
-): Promise<{ errors: string[]; success: boolean }> {
+export async function validateMonitorData(type: MonitorType, data: Record<string, unknown>): Promise<ValidationResult> {
     return withUtilityErrorHandling(
         async () => {
             // Use IPC to validate via backend registry
             const result = await window.electronAPI.monitorTypes.validateMonitorData(type, data);
 
-            // Handle the advanced validation result format
+            // Handle the advanced validation result format and standardize
+            // Backend may or may not include warnings, so we provide empty array as fallback
+            const backendResult = result as { errors: string[]; success: boolean; warnings?: string[] };
             return {
-                errors: result.errors,
-                success: result.success,
+                errors: backendResult.errors,
+                success: backendResult.success,
+                warnings: backendResult.warnings ?? [],
             };
         },
         "Monitor data validation",
         {
             errors: ["Validation failed - unable to connect to backend"],
             success: false,
+            warnings: [],
         }
     );
 }
@@ -76,7 +99,7 @@ export async function validateMonitorData(
 export async function validateMonitorDataClientSide(
     type: MonitorType,
     data: Record<string, unknown>
-): Promise<{ errors: string[]; success: boolean; warnings: string[] }> {
+): Promise<ValidationResult> {
     return withUtilityErrorHandling(
         () => {
             // Use shared validation directly on client-side
@@ -98,7 +121,7 @@ export async function validateMonitorDataClientSide(
 }
 
 /**
- * Validate individual monitor field.
+ * Validate individual monitor field with improved error filtering.
  *
  * @param type - Monitor type
  * @param fieldName - Field name to validate
@@ -119,9 +142,23 @@ export async function validateMonitorField(type: MonitorType, fieldName: string,
                 return [];
             }
 
-            // Filter errors to only include those for the specific field
-            const fieldErrors = result.errors.filter((error) => error.toLowerCase().includes(fieldName.toLowerCase()));
+            // Improved error filtering: look for field-specific errors more robustly
+            const fieldErrors = result.errors.filter((error) => {
+                const errorLower = error.toLowerCase();
+                const fieldLower = fieldName.toLowerCase();
 
+                // Check if error message contains the field name or common field error patterns
+                return (
+                    errorLower.includes(fieldLower) ||
+                    errorLower.includes(`"${fieldLower}"`) ||
+                    errorLower.includes(`'${fieldLower}'`) ||
+                    errorLower.includes(`${fieldLower}:`) ||
+                    errorLower.includes(`${fieldLower} `)
+                );
+            });
+
+            // If no field-specific errors found but validation failed, return all errors
+            // This prevents losing important validation information
             return fieldErrors.length > 0 ? fieldErrors : result.errors;
         },
         `Monitor field validation for ${fieldName}`,
@@ -142,7 +179,7 @@ export async function validateMonitorFieldClientSide(
     type: MonitorType,
     fieldName: string,
     value: unknown
-): Promise<{ errors: string[]; success: boolean }> {
+): Promise<ValidationResult> {
     return withUtilityErrorHandling(
         () => {
             // Use shared field validation for immediate feedback
@@ -151,12 +188,14 @@ export async function validateMonitorFieldClientSide(
             return Promise.resolve({
                 errors: result.errors,
                 success: result.success,
+                warnings: result.warnings,
             });
         },
         `Client-side field validation for ${fieldName}`,
         {
             errors: [`Failed to validate ${fieldName} on client-side`],
             success: false,
+            warnings: [],
         }
     );
 }
@@ -172,7 +211,7 @@ export async function validateMonitorFieldClientSide(
 export async function validateMonitorFormData(
     type: MonitorType,
     data: Record<string, unknown>
-): Promise<{ errors: string[]; success: boolean; warnings: string[] }> {
+): Promise<ValidationResult> {
     return withUtilityErrorHandling(
         () => {
             const errors: string[] = [];

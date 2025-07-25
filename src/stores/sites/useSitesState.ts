@@ -35,6 +35,13 @@ export interface SitesStateActions {
 
 export type SitesStateStore = SitesState & SitesStateActions;
 
+/**
+ * Creates state management actions for the sites store.
+ *
+ * @param set - Zustand state setter function for updating store state
+ * @param get - Zustand state getter function for reading current state
+ * @returns Object containing all state management action functions
+ */
 export const createSitesStateActions = (
     set: (function_: (state: SitesState) => Partial<SitesState>) => void,
     get: () => SitesState
@@ -62,7 +69,7 @@ export const createSitesStateActions = (
             const currentMonitorIds = state.selectedMonitorIds;
 
             // eslint-disable-next-line sonarjs/no-unused-vars
-            const { [identifier]: _unused, ...remainingMonitorIds } = currentMonitorIds;
+            const { [identifier]: _, ...remainingMonitorIds } = currentMonitorIds;
             return {
                 selectedMonitorIds: remainingMonitorIds,
                 selectedSiteId: state.selectedSiteId === identifier ? undefined : state.selectedSiteId,
@@ -84,11 +91,15 @@ export const createSitesStateActions = (
         set(() => ({ selectedSiteId: site ? site.identifier : undefined }));
     },
     setSites: (sites: Site[]) => {
-        logStoreAction("SitesStore", "setSites", { count: sites.length || 0 });
+        logStoreAction("SitesStore", "setSites", { count: sites.length });
         set(() => ({ sites }));
     },
 });
 
+/**
+ * Initial state for the sites store.
+ * Provides default values for all state properties.
+ */
 export const initialSitesState: SitesState = {
     selectedMonitorIds: {},
     selectedSiteId: undefined,

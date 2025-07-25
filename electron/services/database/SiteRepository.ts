@@ -6,21 +6,23 @@ import { DatabaseService } from "./DatabaseService";
 import { rowsToSites, rowToSite, type SiteRow } from "./utils/siteMapper";
 
 /**
- * Repository for managing site data persistence.
- * Handles CRUD operations for sites in the database.
+ * @public
+ * Dependencies required for constructing a {@link SiteRepository}.
  *
  * @remarks
- * **Data Consistency Standards:**
- * - Site names: Default to "Unnamed Site" when null/undefined for consistency
- * - Monitoring: Default to true (1) when undefined for safety
- * - All operations maintain referential integrity within transactions
+ * Used to inject the database service for transactional operations.
  */
 export interface SiteRepositoryDependencies {
+    /** Database service for transactional operations. */
     databaseService: DatabaseService;
 }
 
 /**
- * Standard site data defaults for consistency across operations.
+ * @internal
+ * Standard site data defaults for normalization across repository operations.
+ *
+ * @remarks
+ * Used to ensure consistent fallback values for site properties.
  */
 const SITE_DEFAULTS = {
     MONITORING: true,
@@ -28,7 +30,11 @@ const SITE_DEFAULTS = {
 } as const;
 
 /**
- * Common SQL queries to ensure consistency and maintainability.
+ * @internal
+ * Common SQL queries for site persistence operations.
+ *
+ * @remarks
+ * Centralizes query strings for maintainability and consistency.
  */
 const SITE_QUERIES = {
     DELETE_ALL: "DELETE FROM sites",
@@ -39,25 +45,47 @@ const SITE_QUERIES = {
     UPSERT: "INSERT OR REPLACE INTO sites (identifier, name, monitoring) VALUES (?, ?, ?)",
 } as const;
 
+/**
+ * @public
+ * Repository for managing site data persistence.
+ *
+ * @remarks
+ * Handles all CRUD operations for sites in the database using the repository pattern.
+ * All mutations are wrapped in transactions for consistency and error handling.
+ * Data normalization is applied for site names and monitoring status.
+ */
 export class SiteRepository {
+    /** @internal */
     private readonly databaseService: DatabaseService;
 
+    /**
+     * Constructs a new {@link SiteRepository} instance.
+     *
+     * @param dependencies - The required dependencies for site operations.
+     * @example
+     * ```typescript
+     * const repo = new SiteRepository({ databaseService });
+     * ```
+     */
     constructor(dependencies: SiteRepositoryDependencies) {
         this.databaseService = dependencies.databaseService;
     }
 
     /**
-     * Bulk insert sites (for import functionality).
-     * Uses executeTransaction for atomic operation.
-     *
-     * @param sites - Array of site data to insert
-     * @throws Re-throws database errors after logging for upstream handling
+     * Bulk inserts sites into the database.
      *
      * @remarks
-     * Performs bulk insertion with consistent data normalization:
-     * - Uses INSERT OR IGNORE to handle conflicts gracefully
-     * - Applies standard name and monitoring defaults
-     * - Wraps operation in database transaction for atomicity
+     * - Uses a transaction for atomicity.
+     * - Applies default values for missing name or monitoring fields.
+     * - Uses `INSERT OR IGNORE` to avoid duplicate identifiers.
+     *
+     * @param sites - Array of site data to insert.
+     * @returns A promise that resolves when all sites are inserted.
+     * @throws If the database operation fails.
+     * @example
+     * ```typescript
+     * await repo.bulkInsert([{ identifier: "abc", name: "Site", monitoring: true }]);
+     * ```
      */
     public async bulkInsert(sites: SiteRow[]): Promise<void> {
         if (sites.length === 0) {
@@ -80,18 +108,15 @@ export class SiteRepository {
     /**
      * Internal method to bulk insert sites within an existing transaction.
      *
-     * @param db - Database connection (must be within active transaction)
-     * @param sites - Array of site data to insert
-     *
      * @remarks
-     * **IMPORTANT**: This method is strictly synchronous and must be called
-     * within an existing database transaction context. It uses prepared
-     * statements for performance and applies consistent data normalization.
+     * - Must be called within an active transaction context.
+     * - Uses prepared statements for performance.
+     * - Normalizes site data before insertion.
      *
-     * **Data Normalization:**
-     * - Names: Default to "Unnamed Site" when null/undefined
-     * - Monitoring: Default to true when undefined
-     * - Uses INSERT OR IGNORE to handle identifier conflicts gracefully
+     * @param db - Database connection (must be within active transaction).
+     * @param sites - Array of site data to insert.
+     * @returns void
+     * @throws {@link Error} When database operations fail.
      */
     public bulkInsertInternal(db: Database, sites: SiteRow[]): void {
         if (sites.length === 0) {
@@ -118,10 +143,15 @@ export class SiteRepository {
     }
 
     /**
-     * Delete a site from the database.
+     * Deletes a site by its identifier.
      *
-     * @param identifier - Unique site identifier to delete
-     * @returns Promise resolving to true if site was deleted, false if not found
+     * @param identifier - Unique site identifier to delete.
+     * @returns Promise resolving to `true` if the site was deleted, `false` if not found.
+     * @throws If the database operation fails.
+     * @example
+     * ```typescript
+     * const deleted = await repo.delete("site-123");
+     * ```
      */
     public async delete(identifier: string): Promise<boolean> {
         return withDatabaseOperation(
@@ -137,11 +167,17 @@ export class SiteRepository {
     }
 
     /**
-     * Clear all sites from the database.
+     * Deletes all sites from the database.
      *
      * @remarks
      * **WARNING**: This operation is irreversible and will delete all site data.
-     * Use with caution in production environments.
+     *
+     * @returns Promise that resolves when all sites are deleted.
+     * @throws If the database operation fails.
+     * @example
+     * ```typescript
+     * await repo.deleteAll();
+     * ```
      */
     public async deleteAll(): Promise<void> {
         return withDatabaseOperation(async () => {
@@ -153,13 +189,14 @@ export class SiteRepository {
     }
 
     /**
-     * Internal method to clear all sites from the database within an existing transaction.
-     *
-     * @param db - Database connection (must be within active transaction)
+     * Internal method to delete all sites within an existing transaction.
      *
      * @remarks
-     * **IMPORTANT**: This method must be called within an existing transaction context.
-     * It performs a hard delete of all site records.
+     * - Must be called within an active transaction context.
+     * - Performs a hard delete of all site records.
+     *
+     * @param db - Database connection (must be within active transaction).
+     * @returns void
      */
     public deleteAllInternal(db: Database): void {
         db.run(SITE_QUERIES.DELETE_ALL);
@@ -167,13 +204,16 @@ export class SiteRepository {
     }
 
     /**
-     * Delete a site from the database (internal version for use within existing transactions).
+     * Internal method to delete a site by identifier within an existing transaction.
      *
-     * @param db - Database connection (must be within active transaction)
-     * @param identifier - Site identifier to delete
-     * @returns True if the site was deleted, false if not found
+     * @remarks
+     * - Must be called within an active transaction context.
+     * - Logs deletion status.
      *
-     * @throws Re-throws database errors after logging for upstream handling
+     * @param db - Database connection (must be within active transaction).
+     * @param identifier - Site identifier to delete.
+     * @returns `true` if the site was deleted, `false` if not found.
+     * @throws {@link Error} When database operations fail.
      */
     public deleteInternal(db: Database, identifier: string): boolean {
         try {
@@ -194,10 +234,15 @@ export class SiteRepository {
     }
 
     /**
-     * Check if a site exists by identifier.
+     * Checks if a site exists by its identifier.
      *
-     * @param identifier - Site identifier to check
-     * @returns Promise resolving to true if site exists, false otherwise
+     * @param identifier - Site identifier to check.
+     * @returns Promise resolving to `true` if the site exists, `false` otherwise.
+     * @throws If the database operation fails.
+     * @example
+     * ```typescript
+     * const exists = await repo.exists("site-123");
+     * ```
      */
     public async exists(identifier: string): Promise<boolean> {
         return withDatabaseOperation(
@@ -212,13 +257,17 @@ export class SiteRepository {
     }
 
     /**
-     * Export all sites for backup/import functionality.
-     *
-     * @returns Promise resolving to array of all site data
+     * Exports all sites for backup or import functionality.
      *
      * @remarks
      * Returns raw site data suitable for backup or export operations.
-     * Uses consistent query and validation patterns.
+     *
+     * @returns Promise resolving to an array of all site data.
+     * @throws If the database operation fails.
+     * @example
+     * ```typescript
+     * const allSites = await repo.exportAll();
+     * ```
      */
     public async exportAll(): Promise<SiteRow[]> {
         return withDatabaseOperation(() => {
@@ -229,13 +278,17 @@ export class SiteRepository {
     }
 
     /**
-     * Get all sites from the database (without monitors).
-     *
-     * @returns Promise resolving to array of all site data
+     * Retrieves all sites from the database.
      *
      * @remarks
-     * Uses consistent query patterns and validation. Identical to exportAll
-     * in functionality but semantically different purpose.
+     * Functionally identical to {@link exportAll}, but intended for general querying.
+     *
+     * @returns Promise resolving to an array of all site data.
+     * @throws If the database operation fails.
+     * @example
+     * ```typescript
+     * const sites = await repo.findAll();
+     * ```
      */
     public async findAll(): Promise<SiteRow[]> {
         return withDatabaseOperation(() => {
@@ -246,12 +299,15 @@ export class SiteRepository {
     }
 
     /**
-     * Find a site by its identifier with resilient error handling.
+     * Finds a site by its identifier.
      *
-     * @param identifier - Site identifier to find
-     * @returns Promise resolving to site data if found, undefined otherwise
-     *
-     * @throws Re-throws database errors after logging for upstream handling
+     * @param identifier - Site identifier to find.
+     * @returns Promise resolving to site data if found, or `undefined` if not found.
+     * @throws If the database operation fails.
+     * @example
+     * ```typescript
+     * const site = await repo.findByIdentifier("site-123");
+     * ```
      */
     public async findByIdentifier(identifier: string): Promise<SiteRow | undefined> {
         return withDatabaseOperation(
@@ -277,14 +333,19 @@ export class SiteRepository {
     }
 
     /**
-     * Create or update a site in the database.
-     *
-     * @param site - Site data to create or update
-     * @throws Re-throws database errors after logging for upstream handling
+     * Creates or updates a site in the database.
      *
      * @remarks
-     * Uses INSERT OR REPLACE to handle both creation and updates atomically.
-     * Applies consistent data normalization with standard defaults.
+     * - Uses `INSERT OR REPLACE` for atomic upsert.
+     * - Normalizes site data before persistence.
+     *
+     * @param site - Site data to create or update.
+     * @returns Promise that resolves when the operation completes.
+     * @throws If the database operation fails.
+     * @example
+     * ```typescript
+     * await repo.upsert({ identifier: "site-123", name: "My Site", monitoring: true });
+     * ```
      */
     public async upsert(site: Pick<SiteRow, "identifier" | "monitoring" | "name">): Promise<void> {
         return withDatabaseOperation(
@@ -302,16 +363,13 @@ export class SiteRepository {
     /**
      * Internal method to create or update a site within an existing transaction.
      *
-     * @param db - Database connection (must be within active transaction)
-     * @param site - Site data to create or update
-     *
      * @remarks
-     * **IMPORTANT**: This method must be called within an existing transaction context.
+     * - Must be called within an active transaction context.
+     * - Applies default values for missing fields.
      *
-     * **Data Normalization:**
-     * - Names: Default to "Unnamed Site" when null/undefined (consistent with bulk operations)
-     * - Monitoring: Default to true when undefined (safe default)
-     * - Uses INSERT OR REPLACE for atomic upsert operation
+     * @param db - Database connection (must be within active transaction).
+     * @param site - Site data to create or update.
+     * @returns void
      */
     public upsertInternal(db: Database, site: Pick<SiteRow, "identifier" | "monitoring" | "name">): void {
         // Apply consistent data normalization
@@ -325,13 +383,11 @@ export class SiteRepository {
     }
 
     /**
-     * Get the database instance for internal operations.
+     * Gets the database instance for internal operations.
      *
-     * @returns Database connection from the DatabaseService
-     *
+     * @returns Database connection from the {@link DatabaseService}.
      * @remarks
-     * Provides centralized access to the database connection for all repository methods.
-     * Used consistently across all query operations.
+     * Used for all direct query operations within the repository.
      */
     private getDb(): Database {
         return this.databaseService.getDatabase();

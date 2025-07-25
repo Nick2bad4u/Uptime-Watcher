@@ -11,6 +11,7 @@ import { useThemeStyles } from "../../hooks/useThemeStyles";
 import logger from "../../services/logger";
 import { StatusIndicator, ThemedBadge, ThemedBox, ThemedText } from "../../theme/components";
 import { Monitor, Site } from "../../types";
+import { isValidUrl, safeGetHostname } from "../../utils/monitoring/dataValidation";
 import { ScreenshotThumbnail } from "./ScreenshotThumbnail";
 
 /**
@@ -29,6 +30,16 @@ export interface SiteDetailsHeaderProperties {
     readonly site: Site;
 }
 
+/**
+ * Site details header component displaying site information and controls.
+ *
+ * Displays site name, URL (for HTTP monitors), status indicator with loading spinner,
+ * and a screenshot thumbnail. Handles external URL opening with proper fallbacks
+ * and validates URLs before processing.
+ *
+ * @param props - Component props containing site data and control handlers
+ * @returns JSX element containing the site details header
+ */
 export function SiteDetailsHeader({
     isCollapsed,
     onToggleCollapse,
@@ -37,6 +48,12 @@ export function SiteDetailsHeader({
 }: SiteDetailsHeaderProperties) {
     // Use theme-aware styles
     const styles = useThemeStyles(isCollapsed);
+
+    // Get validated URL for screenshot component
+    let screenshotUrl = "";
+    if (selectedMonitor?.type === "http" && selectedMonitor.url) {
+        screenshotUrl = isValidUrl(selectedMonitor.url) ? selectedMonitor.url : "";
+    }
 
     return (
         <div style={styles.headerStyle}>
@@ -48,12 +65,7 @@ export function SiteDetailsHeader({
                     {/* Left side: Screenshot, Status, and Site Info */}
                     <div className="flex items-center flex-1 min-w-0 gap-4">
                         {/* Website Screenshot Thumbnail - Only show URL for HTTP monitors */}
-                        {!isCollapsed && (
-                            <ScreenshotThumbnail
-                                siteName={site.name}
-                                url={selectedMonitor?.type === "http" ? (selectedMonitor.url ?? "") : ""}
-                            />
-                        )}
+                        {!isCollapsed && <ScreenshotThumbnail siteName={site.name} url={screenshotUrl} />}
                         <div className="site-details-status-indicator">
                             <StatusIndicator size="lg" status={selectedMonitor?.status ?? "unknown"} />
                         </div>
@@ -127,19 +139,10 @@ export function SiteDetailsHeader({
 }
 
 /**
- * Header component for site details view.
+ * Type guard to check if the window.electronAPI has openExternal method.
  *
- * Displays site name, URL (for HTTP monitors), status indicator with loading spinner,
- * and a screenshot thumbnail. Handles external URL opening with proper fallbacks.
- *
- * @param props - Component props
- * @returns JSX element containing the site details header
- */
-
-/**
- * Type guard to check if the window.electronAPI has openExternal method
  * @param api - The API object to check
- * @returns True if the API has openExternal method
+ * @returns True if the API has openExternal method, false otherwise
  */
 function hasOpenExternal(api: unknown): api is { openExternal: (url: string) => void } {
     return typeof (api as { openExternal?: unknown }).openExternal === "function";
@@ -147,7 +150,11 @@ function hasOpenExternal(api: unknown): api is { openExternal: (url: string) => 
 
 /**
  * Enhanced monitoring status display component for the site details header.
+ *
  * Shows larger indicators with monitor names and types using the theme system.
+ * Displays monitor status, type, and connection information with proper error handling
+ * for URL parsing.
+ *
  * @param monitors - Array of monitors to display status for
  * @returns JSX element with enhanced monitoring status indicators
  */
@@ -207,7 +214,9 @@ function MonitoringStatusDisplay({ monitors }: { readonly monitors: Monitor[] })
                             <ThemedText className="flex-1 min-w-0" size="xs" variant="secondary">
                                 {/* Display appropriate connection info based on monitor type */}
                                 {monitor.type === "http" && monitor.url && (
-                                    <span className="block truncate">{new URL(monitor.url).hostname}</span>
+                                    <span className="block truncate">
+                                        {safeGetHostname(monitor.url) || monitor.url}
+                                    </span>
                                 )}
                                 {monitor.type === "port" && monitor.host && monitor.port && (
                                     <span className="block truncate">

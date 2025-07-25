@@ -1,6 +1,38 @@
 /**
  * Updates store for managing application updates and notifications.
- * Handles update status, error states, and update operations.
+ *
+ * @remarks
+ * This store manages the complete update lifecycle for the Electron application,
+ * including checking for updates, downloading updates, tracking progress, and
+ * applying updates. It provides a centralized state management solution for
+ * update-related UI components and handles communication with the Electron
+ * main process for update operations.
+ *
+ * The store persists update information and status across sessions to provide
+ * continuity in the update process, while maintaining error states and progress
+ * information in memory for the current session.
+ *
+ * @example
+ * ```typescript
+ * import { useUpdatesStore } from './stores/updates/useUpdatesStore';
+ *
+ * function UpdateNotification() {
+ *   const { updateStatus, updateInfo, applyUpdate } = useUpdatesStore();
+ *
+ *   if (updateStatus === 'downloaded' && updateInfo) {
+ *     return (
+ *       <div>
+ *         Update {updateInfo.version} ready!
+ *         <button onClick={applyUpdate}>Install & Restart</button>
+ *       </div>
+ *     );
+ *   }
+ *
+ *   return null;
+ * }
+ * ```
+ *
+ * @public
  */
 
 import { create } from "zustand";
@@ -50,7 +82,7 @@ export const useUpdatesStore = create<UpdatesStore>()(
             updateInfo: undefined,
             updateProgress: 0,
             // State
-            updateStatus: "idle" as UpdateStatus,
+            updateStatus: "idle",
         }),
         {
             name: "uptime-watcher-updates",

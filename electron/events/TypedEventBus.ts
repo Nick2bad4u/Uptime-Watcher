@@ -451,7 +451,7 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
         if (typeof data === "object" && data != null) {
             const hasExistingMeta = Object.hasOwn(data, "_meta");
             if (hasExistingMeta) {
-                logger.warn(
+                logger.debug(
                     `[TypedEventBus:${this.busId}] Event data contains _meta property, preserving as _originalMeta`
                 );
                 return {

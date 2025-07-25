@@ -102,7 +102,15 @@ export interface PortMonitorFields extends BaseMonitorFields {
 }
 
 /**
- * Helper to get default fields for a monitor type
+ * Helper to get default fields for a monitor type.
+ *
+ * @param type - The monitor type to get defaults for
+ * @returns Default field values for the specified monitor type
+ *
+ * @remarks
+ * For unknown monitor types, this function falls back to HTTP monitor fields
+ * as they represent the most common monitoring use case. This ensures the
+ * function always returns valid form fields even for unsupported types.
  */
 export function getDefaultMonitorFields(type: MonitorType): MonitorFormFields {
     const baseFields: BaseMonitorFields = {
@@ -141,15 +149,29 @@ export function getDefaultMonitorFields(type: MonitorType): MonitorFormFields {
 }
 
 /**
- * Type guard to check if fields are for HTTP monitor
+ * Type guard to check if fields are for HTTP monitor.
+ *
+ * @param fields - Monitor form fields to check
+ * @returns True if fields contain HTTP monitor properties
+ *
+ * @remarks
+ * Checks for presence of required HTTP properties and absence of port-specific ones
+ * to provide more robust type detection and prevent false positives.
  */
 export function isHttpMonitorFields(fields: MonitorFormFields): fields is HttpMonitorFields {
-    return "url" in fields;
+    return "url" in fields && !("host" in fields && "port" in fields);
 }
 
 /**
- * Type guard to check if fields are for Port monitor
+ * Type guard to check if fields are for Port monitor.
+ *
+ * @param fields - Monitor form fields to check
+ * @returns True if fields contain valid port monitor properties
+ *
+ * @remarks
+ * Validates both presence and types of required properties to ensure
+ * runtime type safety and prevent incorrect type assumptions.
  */
 export function isPortMonitorFields(fields: MonitorFormFields): fields is PortMonitorFields {
-    return "host" in fields && "port" in fields;
+    return "host" in fields && "port" in fields && typeof fields.host === "string" && typeof fields.port === "number";
 }

@@ -15,26 +15,46 @@ import { SiteService } from "./services/SiteService";
 import { createStatusUpdateHandler, StatusUpdateManager } from "./utils/statusUpdateHandler";
 
 export interface SiteSyncActions {
-    /** Full sync from backend */
+    /**
+     * Full sync from backend.
+     * Triggers a complete synchronization of all sites from the backend.
+     */
     fullSyncFromBackend: () => Promise<void>;
-    /** Get sync status */
+    /**
+     * Get sync status.
+     * Retrieves current synchronization status including last sync time and site count.
+     */
     getSyncStatus: () => Promise<{
         lastSync: null | number | undefined;
         siteCount: number;
         success: boolean;
         synchronized: boolean;
     }>;
-    /** Subscribe to status updates */
+    /**
+     * Subscribe to status updates.
+     * Establishes subscription to monitor status change events from backend.
+     * Uses shared status update manager to handle race conditions and fallback logic.
+     */
     subscribeToStatusUpdates: (callback: (update: StatusUpdate) => void) => {
         message: string;
         subscribed: boolean;
         success: boolean;
     };
-    /** Subscribe to sync events */
+    /**
+     * Subscribe to sync events.
+     * Establishes subscription to backend sync events for bulk updates and single site changes.
+     */
     subscribeToSyncEvents: () => () => void;
-    /** Sync sites from backend */
+    /**
+     * Sync sites from backend.
+     * Retrieves latest sites data from backend and updates local store state.
+     * Handles error cases and provides centralized error logging.
+     */
     syncSitesFromBackend: () => Promise<void>;
-    /** Unsubscribe from status updates */
+    /**
+     * Unsubscribe from status updates.
+     * Cleanly removes status update subscription and cleans up event listeners.
+     */
     unsubscribeFromStatusUpdates: () => {
         message: string;
         success: boolean;
@@ -150,7 +170,6 @@ export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActio
             await withErrorHandling(
                 async () => {
                     const backendSites = await SiteService.getSites();
-                    // Handle null/undefined responses from backend by defaulting to empty array
                     deps.setSites(backendSites);
 
                     logStoreAction("SitesStore", "syncSitesFromBackend", {

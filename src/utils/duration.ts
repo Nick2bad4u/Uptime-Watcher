@@ -9,13 +9,25 @@
 export function calculateMaxDuration(timeout: number, retryAttempts: number): string {
     const totalAttempts = retryAttempts + 1;
     const timeoutTime = timeout * totalAttempts;
+
+    // Calculate exponential backoff time with cap at 5 seconds per retry
+    // Formula: 0.5 * 2^index with max of 5 seconds per attempt
     const backoffTime =
         retryAttempts > 0
-            ? Array.from({ length: retryAttempts }, (_, index) => Math.min(0.5 * Math.pow(2, index), 5)).reduce(
-                  (a, b) => a + b,
-                  0
-              )
+            ? Array.from(
+                  { length: retryAttempts },
+                  (_, index) => Math.min(0.5 * Math.pow(2, index), 5) // Exponential backoff capped at 5s
+              ).reduce((a, b) => a + b, 0)
             : 0;
+
     const totalTime = Math.ceil(timeoutTime + backoffTime);
-    return totalTime < 60 ? `${totalTime}s` : `${Math.ceil(totalTime / 60)}m`;
+
+    // Format duration with appropriate unit (seconds, minutes, or hours)
+    if (totalTime < 60) {
+        return `${totalTime}s`;
+    } else if (totalTime < 3600) {
+        return `${Math.ceil(totalTime / 60)}m`;
+    } else {
+        return `${Math.ceil(totalTime / 3600)}h`;
+    }
 }

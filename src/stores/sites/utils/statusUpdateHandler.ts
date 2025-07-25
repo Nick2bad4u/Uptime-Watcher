@@ -11,13 +11,13 @@ import { ensureError, withUtilityErrorHandling } from "../../../utils/errorHandl
 import { logStoreAction, waitForElectronAPI } from "../../utils";
 
 export interface StatusUpdateHandlerOptions {
-    /** Function to trigger full sync */
+    /** Function to trigger full sync from backend */
     fullSyncFromBackend: () => Promise<void>;
-    /** Function to get current sites */
+    /** Function to get current sites array */
     getSites: () => Site[];
-    /** Optional callback for additional processing */
+    /** Optional callback for additional processing of updates */
     onUpdate?: (update: StatusUpdate) => void;
-    /** Function to set sites */
+    /** Function to set sites array in store */
     setSites: (sites: Site[]) => void;
 }
 
@@ -129,7 +129,26 @@ export class StatusUpdateManager {
 }
 
 /**
- * Creates a status update handler with optimized incremental updates and race condition protection
+ * Creates a status update handler with optimized incremental updates and race condition protection.
+ *
+ * @remarks
+ * This handler processes status updates from the backend and applies them to the local store state.
+ * It includes race condition protection through pending update tracking and falls back to full sync
+ * when sites are not found in the current state.
+ *
+ * @param options - Configuration options for the status update handler
+ *
+ * @returns Async function that processes status updates
+ *
+ * @example
+ * ```typescript
+ * const handler = createStatusUpdateHandler({
+ *   fullSyncFromBackend: () => syncAll(),
+ *   getSites: () => store.sites,
+ *   setSites: (sites) => store.setSites(sites),
+ *   onUpdate: (update) => console.log('Update received:', update)
+ * });
+ * ```
  */
 export function createStatusUpdateHandler(options: StatusUpdateHandlerOptions) {
     const { fullSyncFromBackend, getSites, onUpdate, setSites } = options;
@@ -138,6 +157,9 @@ export function createStatusUpdateHandler(options: StatusUpdateHandlerOptions) {
     const pendingUpdates = new Map<string, number>();
 
     return async (update: StatusUpdate): Promise<void> => {
+        // Extract siteId at the top level for use in both try and catch blocks
+        const siteId = update.site?.identifier ?? update.siteIdentifier;
+
         try {
             // Call the optional callback first
             if (onUpdate) {
@@ -145,7 +167,6 @@ export function createStatusUpdateHandler(options: StatusUpdateHandlerOptions) {
             }
 
             const updateTimestamp = Date.now();
-            const siteId = update.site?.identifier ?? update.siteIdentifier;
 
             // Validate timestamp bounds
             if (!Number.isFinite(updateTimestamp) || updateTimestamp <= 0) {
@@ -183,16 +204,14 @@ export function createStatusUpdateHandler(options: StatusUpdateHandlerOptions) {
 
                     setSites(updatedSites);
                     logStoreAction("StatusUpdateHandler", "incrementalUpdate", {
-                        siteId: update.site?.identifier ?? update.siteIdentifier,
+                        siteId,
                         timestamp: updateTimestamp,
                     });
                 }
             } else {
                 // Site not found in current state - trigger full sync as fallback
                 if (isDevelopment()) {
-                    logger.warn(
-                        `Site ${update.site?.identifier ?? update.siteIdentifier} not found in store, triggering full sync`
-                    );
+                    logger.warn(`Site ${siteId} not found in store, triggering full sync`);
                 }
                 await withUtilityErrorHandling(
                     async () => {
@@ -211,7 +230,6 @@ export function createStatusUpdateHandler(options: StatusUpdateHandlerOptions) {
         } catch (error) {
             logger.error("Error processing status update", ensureError(error));
             // Clean up pending update tracking on error
-            const siteId = update.site?.identifier ?? update.siteIdentifier;
             pendingUpdates.delete(siteId);
             // Fallback to full sync on any processing error
             await withUtilityErrorHandling(

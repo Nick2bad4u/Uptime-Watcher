@@ -11,17 +11,23 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import { DEFAULT_CHECK_INTERVAL } from "../../constants";
+import { DEFAULT_CHECK_INTERVAL, RETRY_CONSTRAINTS } from "../../constants";
 import logger from "../../services/logger";
 import { useErrorStore } from "../../stores/error/useErrorStore";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
+import { type ChartTimeRange } from "../../stores/types";
 import { useUIStore } from "../../stores/ui/useUiStore";
-import { Site } from "../../types";
+import { Monitor, Site } from "../../types";
 import { withUtilityErrorHandling } from "../../utils/errorHandling";
 import { getDefaultMonitorId } from "../../utils/monitorUiHelpers";
 import { validateMonitorFieldClientSide } from "../../utils/monitorValidation";
 import { clampTimeoutSeconds, getTimeoutSeconds, timeoutSecondsToMs } from "../../utils/timeoutUtils";
-import { useSiteAnalytics } from "./useSiteAnalytics";
+import { type SiteAnalytics, useSiteAnalytics } from "./useSiteAnalytics";
+
+/**
+ * Default fallback site name when site is not found
+ */
+const DEFAULT_SITE_NAME = "Unnamed Site";
 
 /**
  * Props for the useSiteDetails hook
@@ -31,6 +37,57 @@ import { useSiteAnalytics } from "./useSiteAnalytics";
 export interface UseSiteDetailsProperties {
     /** The site object to manage details for */
     site: Site;
+}
+
+/**
+ * Result interface for the useSiteDetails hook
+ *
+ * @public
+ */
+export interface UseSiteDetailsResult {
+    // UI state
+    activeSiteDetailsTab: string;
+    // Analytics
+    analytics: SiteAnalytics;
+    // Site data
+    currentSite: Site;
+    // Handlers
+    handleCheckNow: () => Promise<void>;
+    handleIntervalChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    handleMonitorIdChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    handleRemoveMonitor: () => Promise<void>;
+    handleRemoveSite: () => Promise<void>;
+    handleRetryAttemptsChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    handleSaveInterval: () => Promise<void>;
+    handleSaveName: () => Promise<void>;
+    handleSaveRetryAttempts: () => Promise<void>;
+    handleSaveTimeout: () => Promise<void>;
+    handleStartMonitoring: () => Promise<void>;
+    handleStartSiteMonitoring: () => Promise<void>;
+    handleStopMonitoring: () => Promise<void>;
+    handleStopSiteMonitoring: () => Promise<void>;
+    handleTimeoutChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    // State
+    hasUnsavedChanges: boolean;
+    intervalChanged: boolean;
+    isLoading: boolean;
+    isMonitoring: boolean;
+    localCheckInterval: number;
+    localName: string;
+    localRetryAttempts: number;
+    localTimeout: number;
+    retryAttemptsChanged: boolean;
+    selectedMonitor: Monitor | undefined;
+    selectedMonitorId: string;
+    // Store actions
+    setActiveSiteDetailsTab: (tab: string) => void;
+    setLocalName: (name: string) => void;
+    setShowAdvancedMetrics: (show: boolean) => void;
+    setSiteDetailsChartTimeRange: (range: ChartTimeRange) => void;
+    showAdvancedMetrics: boolean;
+    siteDetailsChartTimeRange: ChartTimeRange;
+    siteExists: boolean;
+    timeoutChanged: boolean;
 }
 
 /**
@@ -60,7 +117,7 @@ export interface UseSiteDetailsProperties {
  * ```
  */
 
-export function useSiteDetails({ site }: UseSiteDetailsProperties) {
+export function useSiteDetails({ site }: UseSiteDetailsProperties): UseSiteDetailsResult {
     const {
         checkSiteNow,
         deleteSite,
@@ -94,7 +151,7 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties) {
         identifier: site.identifier,
         monitoring: true, // Default to monitoring enabled
         monitors: [],
-        name: "Unnamed Site", // Provide default name
+        name: DEFAULT_SITE_NAME, // Use constant for consistency
     };
 
     const monitorIds = currentSite.monitors.map((m) => m.id);
@@ -126,7 +183,9 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties) {
     const [timeoutChanged, setTimeoutChanged] = useState(false);
 
     // Retry attempts state
-    const [localRetryAttempts, setLocalRetryAttempts] = useState<number>(selectedMonitor?.retryAttempts ?? 0);
+    const [localRetryAttempts, setLocalRetryAttempts] = useState<number>(
+        selectedMonitor?.retryAttempts ?? RETRY_CONSTRAINTS.DEFAULT
+    );
     const [retryAttemptsChanged, setRetryAttemptsChanged] = useState(false);
 
     // Site name state for settings
@@ -139,7 +198,7 @@ export function useSiteDetails({ site }: UseSiteDetailsProperties) {
         setIntervalChanged(false);
         setLocalTimeout(getTimeoutSeconds(selectedMonitor?.timeout));
         setTimeoutChanged(false);
-        setLocalRetryAttempts(selectedMonitor?.retryAttempts ?? 3);
+        setLocalRetryAttempts(selectedMonitor?.retryAttempts ?? RETRY_CONSTRAINTS.DEFAULT);
         setRetryAttemptsChanged(false);
     }, [
         selectedMonitor?.checkInterval,

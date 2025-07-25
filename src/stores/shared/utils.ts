@@ -10,6 +10,10 @@ import logger from "../../services/logger";
  */
 export function logStoreAction(storeName: string, action: string, payload?: unknown): void {
     if (isDevelopment()) {
-        logger.debug(`[${storeName}] ${action}`, payload ?? "");
+        if (payload !== undefined) {
+            logger.debug(`[${storeName}] ${action}`, payload);
+        } else {
+            logger.debug(`[${storeName}] ${action}`);
+        }
     }
 }

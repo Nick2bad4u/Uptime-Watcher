@@ -102,12 +102,14 @@ export function validateMonitor(monitor: Partial<Monitor>): monitor is Monitor {
 }
 
 export const ERROR_MESSAGES = {
+    CANNOT_REMOVE_LAST_MONITOR: "Cannot remove the last monitor from a site. Use site removal instead.",
     FAILED_TO_ADD_MONITOR: "Failed to add monitor",
     FAILED_TO_ADD_SITE: "Failed to add site",
     FAILED_TO_CHECK_SITE: "Failed to check site",
     FAILED_TO_DELETE_SITE: "Failed to delete site",
     FAILED_TO_UPDATE_INTERVAL: "Failed to update check interval",
     FAILED_TO_UPDATE_SITE: "Failed to update site",
+    MONITOR_NOT_FOUND: "Monitor not found",
     SITE_NOT_FOUND: "Site not found",
 } as const;
 

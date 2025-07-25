@@ -7,6 +7,33 @@
  * Font family constants for theme reuse.
  *
  * @remarks
+ * Monospace fonts prioritize consist/**
+ * CSS transition timing for consistent animations.
+ *
+ * @remarks
+ * Provides consistent transition timing across the application
+ * for smooth user interface animations.
+ */
+export const TRANSITION_ALL = "all 0.2s ease-in-out";
+
+/**
+ * Fallback monitor type options when backend loading fails.
+ * These match the core monitor types available in the system.
+ *
+ * @remarks
+ * Used as a fallback to ensure the UI remains functional even when
+ * the backend monitor type registry is unavailable. These should
+ * match the BASE_MONITOR_TYPES defined in shared/types.ts.
+ */
+export const FALLBACK_MONITOR_TYPE_OPTIONS = [
+    { label: "HTTP (Website/API)", value: "http" },
+    { label: "Port (Host/Port)", value: "port" },
+] as const;
+
+/**
+ * Font family constants for theme reuse.
+ *
+ * @remarks
  * Monospace fonts prioritize consistent character width for code display.
  */
 export const FONT_FAMILY_MONO = ["SF Mono", "Monaco", "Inconsolata", "Roboto Mono", "monospace"];
@@ -244,12 +271,3 @@ export type ChartTimeRange = (typeof CHART_TIME_RANGES)[number];
  * accessibility implementation across components.
  */
 export const ARIA_LABEL = "aria-label";
-
-/**
- * Standard transition timing for smooth animations.
- *
- * @remarks
- * Provides consistent transition timing across the application
- * for smooth user interface animations.
- */
-export const TRANSITION_ALL = "all 0.2s ease-in-out";

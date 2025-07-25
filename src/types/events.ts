@@ -72,18 +72,28 @@ export interface TestEventData {
 }
 
 /**
+ * Update release information interface.
+ * Contains details about an available update.
+ */
+export interface UpdateReleaseInfo {
+    /** Release date timestamp or formatted string */
+    releaseDate: string;
+    /** Human-readable release name */
+    releaseName: string;
+    /** Detailed release notes in markdown format */
+    releaseNotes: string;
+    /** Semantic version number */
+    version: string;
+}
+
+/**
  * Event data for update status changes
  */
 export interface UpdateStatusEventData {
     /** Error message if status is error */
     error?: string;
     /** Update information if available */
-    info?: {
-        releaseDate: string;
-        releaseName: string;
-        releaseNotes: string;
-        version: string;
-    };
+    info?: UpdateReleaseInfo;
     /** Progress percentage (0-100) */
     progress?: number;
     /** Current update status */

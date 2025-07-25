@@ -21,21 +21,21 @@ export function useAvailabilityColors() {
         // Clamp percentage between 0 and 100
         const clampedPercentage = Math.max(0, Math.min(100, percentage));
 
-        // Use theme colors for consistency
-        if (clampedPercentage >= 99) {
+        // Use theme colors for consistency - aligned with description thresholds
+        if (clampedPercentage >= 99.9) {
             return currentTheme.colors.status.up; // Excellent
+        } else if (clampedPercentage >= 99) {
+            return currentTheme.colors.success; // Very Good
         } else if (clampedPercentage >= 95) {
-            return currentTheme.colors.success; // Very good
+            return currentTheme.colors.success; // Good
         } else if (clampedPercentage >= 90) {
-            return currentTheme.colors.status.up; // Good
+            return currentTheme.colors.status.pending; // Fair
         } else if (clampedPercentage >= 80) {
-            return currentTheme.colors.status.pending; // Fair (warning)
-        } else if (clampedPercentage >= 70) {
-            return currentTheme.colors.warning; // Warning
+            return currentTheme.colors.warning; // Poor
         } else if (clampedPercentage >= 50) {
-            return currentTheme.colors.error; // Poor
+            return currentTheme.colors.error; // Critical
         } else {
-            return currentTheme.colors.status.down; // Critical
+            return currentTheme.colors.status.down; // Failed
         }
     };
 
@@ -153,18 +153,50 @@ export function useTheme() {
         return cleanup;
     }, []);
 
-    // Change theme
+    /**
+     * Change the active theme.
+     *
+     * @param themeName - Name of the theme to activate
+     *
+     * @example
+     * ```typescript
+     * setTheme("dark"); // Switch to dark theme
+     * setTheme("system"); // Use system preference
+     * ```
+     */
     const setTheme = (themeName: ThemeName) => {
         updateSettings({ theme: themeName });
     };
 
-    // Toggle between light and dark
+    /**
+     * Toggle between light and dark themes.
+     *
+     * @remarks
+     * Switches from current theme to its opposite (light ↔ dark).
+     * If current theme is neither light nor dark, defaults to light.
+     *
+     * @example
+     * ```typescript
+     * toggleTheme(); // Dark theme → Light theme
+     * ```
+     */
     const toggleTheme = () => {
         const newTheme = currentTheme.isDark ? "light" : "dark";
         setTheme(newTheme);
     };
 
-    // Get theme-aware color
+    /**
+     * Get theme-aware color from a dot-notation path.
+     *
+     * @param path - Dot-notation path to the color (e.g., "colors.status.up")
+     * @returns Color value as string, or theme-aware fallback if path is invalid
+     *
+     * @example
+     * ```typescript
+     * const upColor = getColor("status.up");
+     * const primaryBg = getColor("background.primary");
+     * ```
+     */
     const getColor = (path: string): string => {
         const keys = path.split(".");
         let value: unknown = currentTheme.colors;
@@ -178,34 +210,63 @@ export function useTheme() {
             }
         }
 
-        return typeof value === "string" ? value : "#000000";
+        // Use theme-aware fallback instead of hard-coded black
+        return typeof value === "string" ? value : currentTheme.colors.text.primary;
     };
 
-    // Get status color
+    /**
+     * Get status-specific color from the current theme.
+     *
+     * @param status - Site status value
+     * @returns Status color from theme, or theme-aware fallback with warning
+     *
+     * @example
+     * ```typescript
+     * const upColor = getStatusColor("up");
+     * const downColor = getStatusColor("down");
+     * ```
+     */
     const getStatusColor = (status: SiteStatus): string => {
         // Validate status using shared type guard
         if (isSiteStatus(status)) {
             // eslint-disable-next-line security/detect-object-injection -- currentTheme.colors.status is validated against SiteStatus type
             return currentTheme.colors.status[status];
         }
-        // Fallback to a safe color if status is invalid
-        return "#000000";
+        // Use theme-aware fallback instead of hard-coded black
+        return currentTheme.colors.text.secondary;
     };
 
-    // Get available themes
+    /**
+     * Get all available theme names.
+     *
+     * @remarks
+     * Dynamically retrieved from ThemeManager to ensure consistency
+     * with actual available themes.
+     */
     const availableThemes = themeManager.getAvailableThemes();
 
     return {
+        /** Array of all available theme names */
         availableThemes,
+        /** Current active theme object */
         currentTheme,
+        /** Get color value from dot-notation path */
         getColor,
+        /** Get status-specific color */
         getStatusColor,
+        /** Whether current theme is dark mode */
         isDark: currentTheme.isDark,
+        /** Change active theme */
         setTheme,
+        /** Current system theme preference */
         systemTheme,
+        /** ThemeManager instance for advanced operations */
         themeManager,
+        /** Current theme name */
         themeName: settings.theme,
-        themeVersion, // Include for forcing re-renders
+        /** Theme version for forcing re-renders */
+        themeVersion,
+        /** Toggle between light and dark themes */
         toggleTheme,
     };
 }

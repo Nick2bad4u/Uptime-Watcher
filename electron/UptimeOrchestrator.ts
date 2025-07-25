@@ -577,34 +577,40 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * Set up event forwarding from internal events to public frontend events.
      */
     private setupEventForwarding(): void {
-        this.on("internal:site:added", (data: SiteEventData) => {
+        this.on("internal:site:added", (data: SiteEventData & { _meta?: unknown }) => {
             void (async () => {
+                // Extract original data without _meta to prevent conflicts
+                const { _meta, ...originalData } = data;
                 await this.emitTyped("site:added", {
-                    site: data.site,
+                    site: originalData.site,
                     source: "user" as const,
-                    timestamp: data.timestamp,
+                    timestamp: originalData.timestamp,
                 });
             })();
         });
 
-        this.on("internal:site:removed", (data: SiteEventData) => {
+        this.on("internal:site:removed", (data: SiteEventData & { _meta?: unknown }) => {
             void (async () => {
+                // Extract original data without _meta to prevent conflicts
+                const { _meta, ...originalData } = data;
                 await this.emitTyped("site:removed", {
                     cascade: true,
-                    siteId: data.identifier ?? data.site.identifier,
-                    siteName: data.site.name,
-                    timestamp: data.timestamp,
+                    siteId: originalData.identifier ?? originalData.site.identifier,
+                    siteName: originalData.site.name,
+                    timestamp: originalData.timestamp,
                 });
             })();
         });
 
-        this.on("internal:site:updated", (data: SiteEventData & { previousSite?: Site }) => {
+        this.on("internal:site:updated", (data: SiteEventData & { _meta?: unknown; previousSite?: Site }) => {
             void (async () => {
+                // Extract original data without _meta to prevent conflicts
+                const { _meta, ...originalData } = data;
                 await this.emitTyped("site:updated", {
-                    previousSite: data.previousSite ?? data.site,
-                    site: data.site,
-                    timestamp: data.timestamp,
-                    updatedFields: data.updatedFields ?? [],
+                    previousSite: originalData.previousSite ?? originalData.site,
+                    site: originalData.site,
+                    timestamp: originalData.timestamp,
+                    updatedFields: originalData.updatedFields ?? [],
                 });
             })();
         });

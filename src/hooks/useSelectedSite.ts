@@ -54,6 +54,6 @@ export function useSelectedSite(): Site | undefined {
         if (!selectedSiteId) {
             return undefined;
         }
-        return sites.find((site) => site.identifier === selectedSiteId) ?? undefined;
+        return sites.find((site) => site.identifier === selectedSiteId);
     }, [selectedSiteId, sites]);
 }

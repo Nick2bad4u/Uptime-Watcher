@@ -5,8 +5,8 @@
  *
  * @remarks
  * All operations are wrapped in transactions and use the repository pattern for consistency and error handling.
+ * All mutations are atomic and use the DatabaseService for transaction management.
  */
-
 import { Database } from "node-sqlite3-wasm";
 
 import { isDev } from "../../electronUtils";
@@ -37,6 +37,7 @@ export interface MonitorRepositoryDependencies {
  *
  * @remarks
  * All operations are wrapped in transactions and use the repository pattern for consistency and error handling.
+ * All mutations are atomic and use the DatabaseService for transaction management.
  */
 export class MonitorRepository {
     private readonly databaseService: DatabaseService;
@@ -55,14 +56,14 @@ export class MonitorRepository {
     }
 
     /**
-     * Bulk creates monitors (for import functionality).
-     * Returns the created monitors with their new IDs.
-     * Uses transactions to ensure atomicity.
+     * Bulk creates monitors for a site.
      *
      * @param siteIdentifier - The site identifier to associate monitors with.
      * @param monitors - Array of monitor configuration objects to create.
      * @returns Promise resolving to array of created monitors with IDs.
-     * @throws If the database operation fails.
+     * @throws Error if the database operation fails or monitor creation fails.
+     * @remarks
+     * Uses a transaction for atomicity. Each monitor is inserted and its ID is returned.
      * @example
      * ```typescript
      * await repo.bulkCreate("site-123", monitorsArray);
@@ -111,13 +112,14 @@ export class MonitorRepository {
     }
 
     /**
-     * Creates a new monitor and returns its ID.
-     * Uses transactions to ensure atomicity.
+     * Creates a new monitor for a site.
      *
      * @param siteIdentifier - The site identifier to associate the monitor with.
      * @param monitor - Monitor configuration data (without ID).
      * @returns Promise resolving to the created monitor ID as string.
-     * @throws If the database operation fails.
+     * @throws Error if the database operation fails or monitor creation fails.
+     * @remarks
+     * Uses a transaction for atomicity.
      * @example
      * ```typescript
      * const id = await repo.create("site-123", monitorObj);
@@ -143,10 +145,9 @@ export class MonitorRepository {
      * @param siteIdentifier - Site identifier to associate monitor with.
      * @param monitor - Monitor configuration data (without ID).
      * @returns Generated monitor ID as string.
-     * @throws {@link Error} When monitor creation fails or returns invalid ID.
+     * @throws Error when monitor creation fails or returns invalid ID.
      * @remarks
-     * **IMPORTANT**: This method must be called within an existing transaction context.
-     * Uses enhanced type safety validation to prevent silent failures from schema changes.
+     * Must be called within an active transaction context.
      */
     public createInternal(db: Database, siteIdentifier: string, monitor: Omit<Site["monitors"][0], "id">): string {
         // Generate dynamic SQL and parameters
@@ -178,11 +179,12 @@ export class MonitorRepository {
 
     /**
      * Deletes a monitor and its history.
-     * Uses a transaction to ensure atomicity.
      *
      * @param monitorId - The monitor ID to delete.
      * @returns Promise resolving to true if deleted, false otherwise.
-     * @throws If the database operation fails.
+     * @throws Error if the database operation fails.
+     * @remarks
+     * Uses a transaction for atomicity. History is deleted before monitor.
      * @example
      * ```typescript
      * const deleted = await repo.delete("monitor-123");
@@ -213,10 +215,11 @@ export class MonitorRepository {
 
     /**
      * Clears all monitors from the database.
-     * Uses transactions to ensure atomicity.
      *
-     * @returns A promise that resolves when all monitors are deleted.
-     * @throws If the database operation fails.
+     * @returns Promise that resolves when all monitors are deleted.
+     * @throws Error if the database operation fails.
+     * @remarks
+     * Uses a transaction for atomicity.
      * @example
      * ```typescript
      * await repo.deleteAll();
@@ -237,7 +240,7 @@ export class MonitorRepository {
      * @param db - Database connection (must be within active transaction).
      * @returns void
      * @remarks
-     * Use this method when you're already within a transaction context.
+     * Use this method when already within a transaction context.
      */
     public deleteAllInternal(db: Database): void {
         db.run("DELETE FROM monitors");
@@ -246,11 +249,12 @@ export class MonitorRepository {
 
     /**
      * Deletes all monitors for a specific site.
-     * Uses a transaction to ensure atomicity.
      *
      * @param siteIdentifier - The site identifier to delete monitors for.
-     * @returns A promise that resolves when all monitors are deleted for the site.
-     * @throws If the database operation fails.
+     * @returns Promise that resolves when all monitors are deleted for the site.
+     * @throws Error if the database operation fails.
+     * @remarks
+     * Uses a transaction for atomicity.
      * @example
      * ```typescript
      * await repo.deleteBySiteIdentifier("site-123");
@@ -281,7 +285,7 @@ export class MonitorRepository {
      * @param siteIdentifier - The site identifier to delete monitors for.
      * @returns void
      * @remarks
-     * This method should be called from within a database transaction.
+     * Deletes all history for monitors before deleting monitors.
      */
     public deleteBySiteIdentifierInternal(db: Database, siteIdentifier: string): void {
         // Get all monitor IDs for this site
@@ -305,7 +309,7 @@ export class MonitorRepository {
      * @param monitorId - The monitor ID to delete.
      * @returns True if deleted, false otherwise.
      * @remarks
-     * This method should be called from within a database transaction.
+     * Deletes history before deleting monitor.
      */
     public deleteInternal(db: Database, monitorId: string): boolean {
         // Delete history first (foreign key constraint)
@@ -317,11 +321,13 @@ export class MonitorRepository {
     }
 
     /**
-     * Finds a monitor by its identifier with resilient error handling.
+     * Finds a monitor by its identifier.
      *
      * @param monitorId - The monitor ID to find.
      * @returns Promise resolving to the monitor object or undefined if not found.
-     * @throws If the database operation fails.
+     * @throws Error if the database operation fails.
+     * @remarks
+     * Uses a direct database query and maps the result to a monitor object.
      * @example
      * ```typescript
      * const monitor = await repo.findByIdentifier("monitor-123");
@@ -348,7 +354,9 @@ export class MonitorRepository {
      *
      * @param siteIdentifier - Site identifier to find monitors for.
      * @returns Promise resolving to array of monitors for the site.
-     * @throws If the database operation fails.
+     * @throws Error if the database operation fails.
+     * @remarks
+     * Uses a direct database query and maps the results to monitor objects.
      * @example
      * ```typescript
      * const monitors = await repo.findBySiteIdentifier("site-123");
@@ -370,7 +378,9 @@ export class MonitorRepository {
      * Gets all monitor IDs.
      *
      * @returns Promise resolving to array of monitor ID objects.
-     * @throws If the database operation fails.
+     * @throws Error if the database operation fails.
+     * @remarks
+     * Returns all monitor IDs as objects with an `id` property.
      * @example
      * ```typescript
      * const ids = await repo.getAllMonitorIds();
@@ -386,12 +396,13 @@ export class MonitorRepository {
 
     /**
      * Updates an existing monitor.
-     * Uses transactions to ensure atomicity.
      *
      * @param monitorId - The monitor ID to update.
      * @param monitor - Partial monitor configuration data to update.
-     * @returns A promise that resolves when the monitor is updated.
-     * @throws If the database operation fails.
+     * @returns Promise that resolves when the monitor is updated.
+     * @throws Error if the database operation fails.
+     * @remarks
+     * Only provided fields are updated. Uses a transaction for atomicity.
      * @example
      * ```typescript
      * await repo.update("monitor-123", { checkInterval: 60000 });
@@ -418,18 +429,9 @@ export class MonitorRepository {
      * @param monitorId - The monitor ID to update.
      * @param monitor - Partial monitor configuration data to update.
      * @returns void
-     * @throws If the update query fails.
+     * @throws Error if the update query fails.
      * @remarks
-     * **IMPORTANT**: This method must be called within an existing transaction context.
-     *
-     * **Field Mapping Logic:**
-     * Converts camelCase field names to snake_case database columns using dynamic mapping.
-     * Only updates fields that are provided and are primitive types (string, number, boolean).
-     *
-     * **Domain-Specific Behavior**:
-     * The 'enabled' field is automatically derived from 'monitoring' state per domain contract.
-     * If neither 'monitoring' nor 'enabled' are provided, the 'enabled' field is skipped
-     * to preserve the current monitoring state (see shouldSkipMonitoringFields).
+     * Only provided fields are updated. Converts camelCase to snake_case for DB columns.
      */
     public updateInternal(db: Database, monitorId: string, monitor: Partial<Site["monitors"][0]>): void {
         if (isDev()) {
@@ -457,6 +459,12 @@ export class MonitorRepository {
 
     /**
      * Builds the update fields and values for the monitor update query.
+     *
+     * @param row - Row object mapping monitor fields to DB columns.
+     * @param monitor - Partial monitor configuration data to update.
+     * @returns Object containing updateFields (SQL fragments) and updateValues (DB values).
+     * @remarks
+     * Only primitive types are included. Monitoring fields may be skipped per domain logic.
      */
     private buildUpdateFieldsAndValues(
         row: Record<string, unknown>,
@@ -489,15 +497,11 @@ export class MonitorRepository {
     /**
      * Converts a value to the appropriate database format.
      *
-     * @param key - Field name for logging purposes
-     * @param value - Value to convert for database storage
-     * @returns Database-compatible value or null if conversion not possible
-     *
+     * @param key - Field name for logging purposes.
+     * @param value - Value to convert for database storage.
+     * @returns Database-compatible value or null if conversion not possible.
      * @remarks
-     * **Type Conversion Logic**:
-     * - Strings and numbers: passed through unchanged
-     * - Booleans: converted to 1 (true) or 0 (false) for SQLite compatibility
-     * - Other types: logged as warning and returned as null (skipped)
+     * Strings and numbers are passed through. Booleans are converted to 1/0. Other types are skipped.
      */
     private convertValueForDatabase(key: string, value: unknown): DbValue | null {
         if (typeof value === "string" || typeof value === "number") {
@@ -515,6 +519,14 @@ export class MonitorRepository {
 
     /**
      * Executes the update query with the given fields and values.
+     *
+     * @param db - Database connection (must be within active transaction).
+     * @param updateFields - Array of SQL field assignments.
+     * @param updateValues - Array of values to bind.
+     * @param monitorId - The monitor ID to update.
+     * @returns void
+     * @remarks
+     * Executes the SQL update statement for the monitor.
      */
     private executeUpdateQuery(db: Database, updateFields: string[], updateValues: DbValue[], monitorId: string): void {
         updateValues.push(monitorId);
@@ -532,15 +544,12 @@ export class MonitorRepository {
     }
 
     /**
-     * Get the database instance for internal repository operations.
+     * Gets the database instance for internal repository operations.
      *
-     * @returns Database connection from the DatabaseService
-     * @throws {@link Error} When database is not initialized
-     *
+     * @returns Database connection from the DatabaseService.
+     * @throws Error when database is not initialized.
      * @remarks
-     * **Usage Pattern**: Only used for read operations and internal methods.
-     * All mutations must use executeTransaction() for proper transaction management.
-     * Caller must ensure DatabaseService.initialize() was called first.
+     * Only used for read operations and internal methods. Mutations must use executeTransaction().
      */
     private getDb(): Database {
         return this.databaseService.getDatabase();
@@ -549,17 +558,11 @@ export class MonitorRepository {
     /**
      * Checks if monitoring-related fields should be skipped during update.
      *
-     * @param key - Database field name to check
-     * @param monitor - Monitor update data being processed
-     * @returns True if the field should be skipped, false otherwise
-     *
+     * @param key - Database field name to check.
+     * @param monitor - Monitor update data being processed.
+     * @returns True if the field should be skipped, false otherwise.
      * @remarks
-     * **Domain Logic**: The 'enabled' field is automatically derived from 'monitoring' state.
-     * If neither 'monitoring' nor 'enabled' are provided in the update, the 'enabled' field
-     * should be skipped to preserve the current monitoring state.
-     *
-     * **Referenced in Domain Event Contract**: Monitor state transitions must preserve
-     * monitoring status unless explicitly changed.
+     * The 'enabled' field is derived from 'monitoring' state. If neither is provided, skip 'enabled'.
      */
     private shouldSkipMonitoringFields(key: string, monitor: Partial<Site["monitors"][0]>): boolean {
         if (key === "enabled" && !("monitoring" in monitor) && !("enabled" in monitor)) {

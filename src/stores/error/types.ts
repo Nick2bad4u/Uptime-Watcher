@@ -1,7 +1,22 @@
 /**
- * Error store types and interfaces.
+ * Error store types and interfaces for centralized error management.
+ *
+ * @remarks
+ * Defines the structure for error state management across the application,
+ * including global errors, store-specific errors, and operation loading states.
+ *
+ * @packageDocumentation
  */
 
+/**
+ * Error management actions for the error store.
+ *
+ * @remarks
+ * Provides methods for managing application-wide error states and loading indicators.
+ * Supports both global errors and store-specific error isolation.
+ *
+ * @public
+ */
 export interface ErrorActions {
     /** Clear all errors */
     clearAllErrors: () => void;
@@ -23,6 +38,15 @@ export interface ErrorActions {
     setStoreError: (store: string, error: string | undefined) => void;
 }
 
+/**
+ * Error state structure for centralized error management.
+ *
+ * @remarks
+ * Maintains global error state, store-specific errors, and operation loading states
+ * to provide comprehensive error tracking across the application.
+ *
+ * @public
+ */
 export interface ErrorState {
     /** Global loading state */
     isLoading: boolean;
@@ -34,4 +58,13 @@ export interface ErrorState {
     storeErrors: Record<string, string | undefined>;
 }
 
+/**
+ * Combined error store interface with state and actions.
+ *
+ * @remarks
+ * Merges error state and actions into a single interface for the Zustand store.
+ * Provides complete error management functionality for the application.
+ *
+ * @public
+ */
 export type ErrorStore = ErrorActions & ErrorState;

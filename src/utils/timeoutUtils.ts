@@ -53,7 +53,11 @@ export function isValidTimeoutSeconds(timeoutSeconds: number): boolean {
 /**
  * Convert timeout from milliseconds to seconds for UI display.
  * @param timeoutMs - Timeout in milliseconds
- * @returns Timeout in seconds
+ * @returns Timeout in seconds (may include decimal places for precise conversion)
+ *
+ * @remarks
+ * Performs direct division without rounding. For UI display where whole seconds
+ * are preferred, consider using Math.round() or Math.floor() on the result.
  */
 export function timeoutMsToSeconds(timeoutMs: number): number {
     return timeoutMs / 1000;
@@ -61,8 +65,12 @@ export function timeoutMsToSeconds(timeoutMs: number): number {
 
 /**
  * Convert timeout from seconds to milliseconds for backend storage.
- * @param timeoutSeconds - Timeout in seconds
- * @returns Timeout in milliseconds
+ * @param timeoutSeconds - Timeout in seconds (accepts fractional values)
+ * @returns Timeout in milliseconds (result may be fractional if input has decimal places)
+ *
+ * @remarks
+ * Performs direct multiplication without rounding. Fractional seconds are preserved
+ * as fractional milliseconds. For whole millisecond values, ensure input is whole seconds.
  */
 export function timeoutSecondsToMs(timeoutSeconds: number): number {
     return timeoutSeconds * 1000;

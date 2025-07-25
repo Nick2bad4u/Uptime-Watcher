@@ -77,8 +77,11 @@ export type FormMode = "existing" | "new";
  * @remarks
  * Provides comprehensive form state management with real-time validation,
  * support for both new sites and adding monitors to existing sites.
+ * Handles dynamic field validation based on monitor type and maintains
+ * proper form state throughout the user interaction lifecycle.
  *
- * @returns Combined form state and action handlers
+ * @returns Combined form state and action handlers containing all form fields,
+ * validation state, and manipulation functions for managing the add site form
  */
 export function useAddSiteForm(): AddSiteFormActions & AddSiteFormState {
     // Form field state
@@ -88,7 +91,7 @@ export function useAddSiteForm(): AddSiteFormActions & AddSiteFormState {
     const [name, setName] = useState("");
     const [monitorType, setMonitorType] = useState<MonitorType>("http");
     const [checkInterval, setCheckInterval] = useState(DEFAULT_CHECK_INTERVAL);
-    const [siteId, setSiteId] = useState<string>(generateUuid());
+    const [siteId, setSiteId] = useState<string>(() => generateUuid()); // Lazy initialization
 
     // Mode and selection state
     const [addMode, setAddMode] = useState<FormMode>("new");
@@ -141,29 +144,18 @@ export function useAddSiteForm(): AddSiteFormActions & AddSiteFormState {
             return false;
         }
 
+        // Create field value mapping for dynamic access
+        const fieldValues = {
+            host,
+            port,
+            url,
+        };
+
         // Dynamic validation based on monitor type fields
         const currentFields = getFields(monitorType);
         for (const field of currentFields) {
             if (field.required) {
-                let value = "";
-                switch (field.name) {
-                    case "host": {
-                        value = host;
-                        break;
-                    }
-                    case "port": {
-                        value = port;
-                        break;
-                    }
-                    case "url": {
-                        value = url;
-                        break;
-                    }
-                    default: {
-                        // value already initialized to ""
-                        break;
-                    }
-                }
+                const value = fieldValues[field.name as keyof typeof fieldValues] || "";
                 if (!value.trim()) {
                     return false;
                 }

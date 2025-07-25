@@ -38,7 +38,8 @@ export interface SiteMonitorResult {
     /** ID of the currently selected monitor */
     selectedMonitorId: string;
 
-    /** Current status of the selected monitor */
+    /** Current status of the selected monitor
+     * @remarks Falls back to DEFAULT_MONITOR_STATUS ("pending") when no monitor is selected */
     status: MonitorStatus;
 }
 
@@ -47,6 +48,42 @@ export interface SiteMonitorResult {
  *
  * @param site - The site object to monitor
  * @returns Monitor data and helper functions
+ * @see {@link SiteMonitorResult} for the complete interface specification
+ *
+ * @remarks
+ * This hook manages monitor selection and provides current state for site monitoring.
+ * It handles edge cases including:
+ * - Sites with no monitors (returns empty data with safe defaults)
+ * - Invalid monitor selections (falls back to first available monitor)
+ * - Undefined monitor references (provides safe fallback values)
+ *
+ * The hook automatically selects the most recent site data from the store to ensure
+ * UI consistency when site data is updated elsewhere in the application.
+ * @example
+ * ```tsx
+ * function SiteMonitorCard({ site }) {
+ *   const {
+ *     monitor,
+ *     status,
+ *     isMonitoring,
+ *     handleMonitorIdChange
+ *   } = useSiteMonitor(site);
+ *
+ *   if (!monitor) {
+ *     return <div>No monitors configured for this site</div>;
+ *   }
+ *
+ *   return (
+ *     <div>
+ *       <select onChange={handleMonitorIdChange}>
+ *         {monitorIds.map(id => <option key={id} value={id}>{id}</option>)}
+ *       </select>
+ *       <p>Status: {status}</p>
+ *       <p>Monitoring: {isMonitoring ? 'Active' : 'Paused'}</p>
+ *     </div>
+ *   );
+ * }
+ * ```
  */
 export function useSiteMonitor(site: Site): SiteMonitorResult {
     const { getSelectedMonitorId, setSelectedMonitorId, sites } = useSitesStore();
@@ -77,7 +114,10 @@ export function useSiteMonitor(site: Site): SiteMonitorResult {
         const history = monitor?.history ?? [];
         return history;
     }, [monitor]);
-    const isMonitoring = monitor?.monitoring !== false; // default to true if undefined
+
+    // Fix: Explicitly check for monitor existence before checking monitoring status
+    // Only return true if monitor exists AND monitoring is not explicitly false
+    const isMonitoring = monitor ? monitor.monitoring !== false : false;
 
     // Handler for changing the monitor - memoized to prevent recreation
     const handleMonitorIdChange = useCallback(

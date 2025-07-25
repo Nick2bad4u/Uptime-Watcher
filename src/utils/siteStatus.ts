@@ -1,6 +1,10 @@
 /**
  * Site status calculation utilities - Frontend wrapper.
- * This file re-exports the shared status utilities for frontend use.
+ *
+ * @remarks
+ * This file re-exports the shared status utilities for frontend use,
+ * providing a convenient access point for site status calculations
+ * and formatting functions.
  */
 
 export {
@@ -10,5 +14,4 @@ export {
     getSiteStatusDescription,
     getSiteStatusVariant,
 } from "../../shared/utils/siteStatus";
-// Re-export everything from shared utilities
 export type { SiteStatus } from "@shared/types";

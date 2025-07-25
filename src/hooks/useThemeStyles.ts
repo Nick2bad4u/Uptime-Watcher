@@ -1,9 +1,37 @@
 /**
  * Custom hook for theme-aware CSS-in-JS styles
  * Provides consistent styling that respects user's theme preference
+ *
+ * @param isCollapsed - boolean - Whether the component is in collapsed state (default: false)
+ * @returns ThemeStyles object containing all CSS-in-JS style properties
+ *
+ * @remarks
+ * This hook provides theme-aware styling with proper SSR support and runtime
+ * theme change reactivity. It uses media query listeners to detect theme changes
+ * and updates styles accordingly.
+ *
+ * The hook handles:
+ * - Server-side rendering compatibility
+ * - Runtime theme preference changes
+ * - Graceful fallback when window APIs are unavailable
+ * - Smooth transitions between themes
+ *
+ * @example
+ * ```tsx
+ * function ThemeAwareComponent({ collapsed }) {
+ *   const styles = useThemeStyles(collapsed);
+ *
+ *   return (
+ *     <div style={styles.headerStyle}>
+ *       <button style={styles.collapseButtonStyle}>Toggle</button>
+ *       <div style={styles.contentStyle}>Content</div>
+ *     </div>
+ *   );
+ * }
+ * ```
  */
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 /**
  * Theme styles interface for CSS-in-JS styling
@@ -11,21 +39,65 @@ import { useMemo } from "react";
  * @public
  */
 export interface ThemeStyles {
+    /** Button styles for collapse/expand controls */
     collapseButtonStyle: React.CSSProperties;
+    /** Main content area styling */
     contentStyle: React.CSSProperties;
+    /** Header section styling */
     headerStyle: React.CSSProperties;
+    /** Metadata text styling */
     metaStyle: React.CSSProperties;
+    /** Overlay/modal backdrop styling */
     overlayStyle: React.CSSProperties;
+    /** Primary title text styling */
     titleStyle: React.CSSProperties;
+    /** URL/link text styling */
     urlStyle: React.CSSProperties;
 }
 
 export function useThemeStyles(isCollapsed = false): ThemeStyles {
+    // Use state to track theme changes for reactivity
+    const [isDarkMode, setIsDarkMode] = useState(() => {
+        // SSR-safe initialization
+        if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
+            return false; // Default to light mode for SSR
+        }
+        return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    });
+
+    // Use ref to store cleanup function to avoid linting issues
+    const cleanupRef = useRef<(() => void) | null>(null);
+
+    // Set up media query listener for theme changes
+    useEffect(() => {
+        if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
+            return; // Skip in SSR environments
+        }
+
+        const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+        const handleThemeChange = (e: MediaQueryListEvent) => {
+            setIsDarkMode(e.matches);
+        };
+
+        // Use modern addEventListener API
+        mediaQuery.addEventListener("change", handleThemeChange);
+
+        // Store cleanup function in ref
+        cleanupRef.current = () => {
+            mediaQuery.removeEventListener("change", handleThemeChange);
+        };
+    }, []);
+
+    // Cleanup effect for component unmount
+    useEffect(() => {
+        return () => {
+            if (cleanupRef.current) {
+                cleanupRef.current();
+            }
+        };
+    }, []);
+
     const styles = useMemo<ThemeStyles>(() => {
-        const isDarkMode =
-            typeof window !== "undefined" && typeof window.matchMedia === "function"
-                ? window.matchMedia("(prefers-color-scheme: dark)").matches
-                : false;
         const transitionEasing = "0.3s cubic-bezier(0.4, 0, 0.2, 1)";
 
         return {
@@ -116,7 +188,7 @@ export function useThemeStyles(isCollapsed = false): ThemeStyles {
                 wordBreak: "break-all",
             },
         };
-    }, [isCollapsed]);
+    }, [isCollapsed, isDarkMode]);
 
     return styles;
 }

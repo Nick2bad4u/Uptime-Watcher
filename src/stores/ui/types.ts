@@ -1,6 +1,11 @@
 /**
  * UI store types and interfaces.
  * Manages UI state, modal visibility, and user interface interactions.
+ *
+ * @remarks
+ * This store is responsible for managing the UI state of the application,
+ * including modal visibility, selected site, active tabs, and chart time ranges.
+ * All state mutations must be performed via store actions.
  */
 
 import type { Site } from "@shared/types";
@@ -8,37 +13,87 @@ import type { Site } from "@shared/types";
 import type { ChartTimeRange } from "../types";
 
 /**
- * UI store interface.
- * Manages user interface state and interactions.
+ * Interface for the UI store.
+ *
+ * @remarks
+ * Provides state and actions for managing user interface interactions and modal visibility.
  */
 export interface UIStore {
-    /** Active tab in site details modal */
+    /**
+     * The active tab in the site details modal.
+     */
     activeSiteDetailsTab: string;
-    /** Currently selected site identifier */
+
+    /**
+     * The identifier of the currently selected site.
+     */
     selectedSiteId: string | undefined;
-    /** Set active tab in site details modal */
+
+    /**
+     * Sets the active tab in the site details modal.
+     *
+     * @param tab - The tab identifier to activate.
+     */
     setActiveSiteDetailsTab: (tab: string) => void;
-    /** Set selected site */
+
+    /**
+     * Sets the selected site.
+     *
+     * @param site - The site to select, or `undefined` to clear selection.
+     */
     setSelectedSite: (site: Site | undefined) => void;
-    /** Set advanced metrics visibility */
+
+    /**
+     * Sets the visibility of advanced metrics in the UI.
+     *
+     * @param show - Whether to show advanced metrics.
+     */
     setShowAdvancedMetrics: (show: boolean) => void;
+
     // Actions
-    /** Set settings modal visibility */
+
+    /**
+     * Sets the visibility of the settings modal.
+     *
+     * @param show - Whether to show the settings modal.
+     */
     setShowSettings: (show: boolean) => void;
 
-    /** Set site details modal visibility */
+    /**
+     * Sets the visibility of the site details modal.
+     *
+     * @param show - Whether to show the site details modal.
+     */
     setShowSiteDetails: (show: boolean) => void;
-    /** Set chart time range */
+
+    /**
+     * Sets the selected time range for site details charts.
+     *
+     * @param range - The chart time range to select.
+     */
     setSiteDetailsChartTimeRange: (range: ChartTimeRange) => void;
-    /** Whether to show advanced metrics */
+
+    /**
+     * Whether advanced metrics are visible in the UI.
+     */
     showAdvancedMetrics: boolean;
+
     // State
-    /** Whether settings modal is open */
+
+    /**
+     * Whether the settings modal is currently open.
+     */
     showSettings: boolean;
-    /** Whether site details modal is open */
+
+    /**
+     * Whether the site details modal is currently open.
+     */
     showSiteDetails: boolean;
-    /** Selected time range for charts */
+
+    /**
+     * The selected time range for charts in the site details modal.
+     */
     siteDetailsChartTimeRange: ChartTimeRange;
 
-    // NOTE: getSelectedSite removed - use useSelectedSite hook instead
+    // NOTE: getSelectedSite removed - use useSelectedSite hook instead (src/hooks/useSelectedSite.ts)
 }

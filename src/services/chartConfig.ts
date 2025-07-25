@@ -89,6 +89,7 @@ export class ChartConfigService {
      * Creates a new chart configuration service.
      *
      * @param theme - Theme instance containing colors, typography, and spacing
+     * @public
      */
     constructor(theme: Theme) {
         this.theme = theme;
@@ -96,6 +97,9 @@ export class ChartConfigService {
 
     /**
      * Status distribution bar chart configuration
+     *
+     * @returns Chart configuration options for bar charts
+     * @public
      */
     getBarChartConfig(): ChartOptions<"bar"> {
         return {
@@ -118,12 +122,19 @@ export class ChartConfigService {
 
     /**
      * Uptime doughnut chart configuration
+     *
+     * @param totalChecks - Total number of checks for percentage calculation
+     * @returns Chart configuration options for doughnut charts
+     * @public
      */
     getDoughnutChartConfig(totalChecks: number): ChartOptions<"doughnut"> {
+        // Store base config to avoid redundant calls
+        const baseConfig = this.getBaseConfig();
+
         return {
-            ...this.getBaseConfig(),
+            ...baseConfig,
             plugins: {
-                ...this.getBaseConfig().plugins,
+                ...baseConfig.plugins,
                 legend: {
                     labels: {
                         color: this.theme.colors.text.primary,
@@ -133,9 +144,9 @@ export class ChartConfigService {
                 },
                 title: this.getChartTitle("Uptime Distribution"),
                 tooltip: {
-                    ...this.getBaseConfig().plugins?.tooltip,
+                    ...baseConfig.plugins?.tooltip,
                     callbacks: {
-                        label: function (context) {
+                        label: (context) => {
                             const percentage =
                                 totalChecks > 0 ? ((context.parsed / totalChecks) * 100).toFixed(1) : "0";
                             return `${context.label}: ${context.parsed} (${percentage}%)`;
@@ -148,6 +159,9 @@ export class ChartConfigService {
 
     /**
      * Response time line chart configuration
+     *
+     * @returns Chart configuration options for line charts with responsive scaling
+     * @public
      */
     getLineChartConfig(): ChartOptions<"line"> {
         return {
@@ -289,6 +303,18 @@ export class ChartConfigService {
  * @param theme - Current theme object for styling charts
  * @param totalChecks - Total number of checks for pie chart configuration
  * @returns Object containing various chart configuration options
+ * @returns barChartOptions - Configuration for bar charts with theme-aware styling
+ * @returns doughnutOptions - Configuration for doughnut/pie charts with tooltips and legends
+ * @returns lineChartOptions - Configuration for line charts with responsive scaling and interactions
+ *
+ * @example
+ * ```typescript
+ * const { barChartOptions, doughnutOptions, lineChartOptions } = useChartConfigs(theme, 100);
+ * // Use with Chart.js components
+ * <Bar data={chartData} options={barChartOptions} />
+ * <Doughnut data={statusData} options={doughnutOptions} />
+ * <Line data={timeSeriesData} options={lineChartOptions} />
+ * ```
  */
 export function useChartConfigs(theme: Theme, totalChecks = 0) {
     const chartService = new ChartConfigService(theme);

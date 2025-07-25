@@ -49,9 +49,13 @@ import { createSiteSyncActions } from "./useSiteSync";
  * a complete interface for site management. The store uses dependency injection
  * to share common functions between modules while maintaining clear boundaries.
  *
+ * @returns Complete sites store with all actions and state
  * @public
  */
-export const useSitesStore = create<SitesStore>()((set, get) => {
+export const useSitesStore = create<SitesStore>()((
+    set: (function_: (state: SitesStore) => Partial<SitesStore>) => void,
+    get: () => SitesStore
+) => {
     // Create state actions
     const stateActions = createSitesStateActions(set, get);
 

@@ -228,7 +228,7 @@ export const createSiteOperationsActions = (deps: SiteOperationsDependencies): S
 
                 // Check if this is the only monitor - prevent removal if so
                 if (site.monitors.length <= 1) {
-                    throw new Error("Cannot remove the last monitor from a site. Use site removal instead.");
+                    throw new Error(ERROR_MESSAGES.CANNOT_REMOVE_LAST_MONITOR);
                 }
 
                 // Stop monitoring for this specific monitor first

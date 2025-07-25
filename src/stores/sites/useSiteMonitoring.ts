@@ -23,8 +23,16 @@ export interface SiteMonitoringActions {
     stopSiteMonitorMonitoring: (siteId: string, monitorId: string) => Promise<void>;
 }
 
-export type SiteMonitoringDependencies = Record<string, never>;
-
+/**
+ * Creates site monitoring actions for managing monitoring lifecycle operations.
+ *
+ * @remarks
+ * This factory function creates actions for starting, stopping, and manually checking sites.
+ * All operations communicate with the backend via IPC services and rely on event-driven
+ * updates for state synchronization.
+ *
+ * @returns Object containing all site monitoring action functions
+ */
 export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
     checkSiteNow: async (siteId: string, monitorId: string) => {
         logStoreAction("SitesStore", "checkSiteNow", { monitorId, siteId });

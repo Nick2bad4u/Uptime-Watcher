@@ -4,6 +4,7 @@
  */
 
 import {
+    BASE_MONITOR_TYPES,
     DEFAULT_MONITOR_STATUS,
     ERROR_MESSAGES,
     isMonitorStatus,
@@ -25,6 +26,14 @@ export function addMonitorToSite(site: Site, monitor: Monitor): Site {
 
 /**
  * Creates a default monitor for a site
+ *
+ * @param overrides - Partial monitor object to override defaults
+ * @returns Complete monitor object with defaults applied
+ *
+ * @example
+ * ```typescript
+ * const monitor = createDefaultMonitor({ url: "https://example.com" });
+ * ```
  */
 export function createDefaultMonitor(overrides: Partial<Monitor> = {}): Monitor {
     return {
@@ -36,7 +45,7 @@ export function createDefaultMonitor(overrides: Partial<Monitor> = {}): Monitor 
         retryAttempts: 3, // Default retry attempts
         status: DEFAULT_MONITOR_STATUS,
         timeout: 5000, // Default timeout
-        type: "http" as MonitorType,
+        type: BASE_MONITOR_TYPES[0] as MonitorType, // Use first available monitor type (http)
         ...overrides,
     };
 }
@@ -50,28 +59,45 @@ export function findMonitorInSite(site: Site, monitorId: string): Monitor | unde
 
 /**
  * Normalizes monitor data ensuring all required fields are present
+ *
+ * @param monitor - Partial monitor object to normalize
+ * @returns Complete monitor object with validated and normalized fields
+ *
+ * @example
+ * ```typescript
+ * const normalized = normalizeMonitor({ id: "123", url: "https://example.com" });
+ * ```
  */
 export function normalizeMonitor(monitor: Partial<Monitor>): Monitor {
     return {
-        checkInterval: monitor.checkInterval ?? 300_000, // 5 minutes default
-        history: monitor.history ?? [],
+        checkInterval: validatePositiveNumber(monitor.checkInterval, 300_000),
+        history: Array.isArray(monitor.history) ? monitor.history : [],
         id: monitor.id ?? crypto.randomUUID(),
         monitoring: monitor.monitoring ?? true,
-        responseTime: monitor.responseTime ?? -1, // Sentinel value for never checked
-        retryAttempts: monitor.retryAttempts ?? 3, // Default retry attempts
+        responseTime: typeof monitor.responseTime === "number" ? monitor.responseTime : -1,
+        retryAttempts: validateNonNegativeNumber(monitor.retryAttempts, 3),
         status: monitor.status && isMonitorStatus(monitor.status) ? monitor.status : DEFAULT_MONITOR_STATUS,
-        timeout: monitor.timeout ?? 5000, // Default timeout
-        type: monitor.type ?? "http",
-        // Only add optional fields if they are explicitly provided
-        ...(monitor.url !== undefined && { url: monitor.url }),
-        ...(monitor.host !== undefined && { host: monitor.host }),
-        ...(monitor.port !== undefined && { port: monitor.port }),
-        ...(monitor.lastChecked !== undefined && { lastChecked: monitor.lastChecked }),
+        timeout: validatePositiveNumber(monitor.timeout, 5000),
+        type: validateMonitorType(monitor.type),
+        // Only add optional fields if they are explicitly provided and valid
+        ...(typeof monitor.url === "string" && monitor.url.length > 0 && { url: monitor.url }),
+        ...(typeof monitor.host === "string" && monitor.host.length > 0 && { host: monitor.host }),
+        ...(typeof monitor.port === "number" && monitor.port > 0 && { port: monitor.port }),
+        ...(monitor.lastChecked instanceof Date && { lastChecked: monitor.lastChecked }),
     };
 }
 
 /**
  * Removes a monitor from a site
+ *
+ * @param site - The site to remove the monitor from
+ * @param monitorId - The ID of the monitor to remove
+ * @returns Updated site without the specified monitor
+ *
+ * @example
+ * ```typescript
+ * const updatedSite = removeMonitorFromSite(site, "monitor-123");
+ * ```
  */
 export function removeMonitorFromSite(site: Site, monitorId: string): Site {
     const updatedMonitors = site.monitors.filter((monitor) => monitor.id !== monitorId);
@@ -80,22 +106,50 @@ export function removeMonitorFromSite(site: Site, monitorId: string): Site {
 
 /**
  * Updates a monitor in a site
+ *
+ * @param site - The site containing the monitor
+ * @param monitorId - The ID of the monitor to update
+ * @param updates - Partial monitor updates to apply
+ * @returns Updated site with modified monitor
+ * @throws Error if monitor is not found
+ *
+ * @example
+ * ```typescript
+ * const updatedSite = updateMonitorInSite(site, "monitor-123", { timeout: 10000 });
+ * ```
  */
 export function updateMonitorInSite(site: Site, monitorId: string, updates: Partial<Monitor>): Site {
     const monitorExists = site.monitors.some((monitor) => monitor.id === monitorId);
     if (!monitorExists) {
-        throw new Error("Monitor not found");
+        throw new Error(ERROR_MESSAGES.MONITOR_NOT_FOUND);
     }
 
-    const updatedMonitors = site.monitors.map((monitor) =>
-        monitor.id === monitorId ? { ...monitor, ...updates } : monitor
-    );
+    const updatedMonitors = site.monitors.map((monitor) => {
+        if (monitor.id === monitorId) {
+            // Validate and normalize the updated monitor
+            const updatedMonitor = {
+                ...monitor,
+                ...updates,
+            };
+            return normalizeMonitor(updatedMonitor);
+        }
+        return monitor;
+    });
 
     return { ...site, monitors: updatedMonitors };
 }
 
 /**
  * Validates that a monitor exists in a site
+ *
+ * @param site - The site to check for the monitor
+ * @param monitorId - The ID of the monitor to validate
+ * @throws Error if site is not found or monitor does not exist
+ *
+ * @example
+ * ```typescript
+ * validateMonitorExists(site, "monitor-123");
+ * ```
  */
 export function validateMonitorExists(site: Site | undefined, monitorId: string): void {
     if (!site) {
@@ -104,7 +158,7 @@ export function validateMonitorExists(site: Site | undefined, monitorId: string)
 
     const monitor = findMonitorInSite(site, monitorId);
     if (!monitor) {
-        throw new Error("Monitor not found");
+        throw new Error(ERROR_MESSAGES.MONITOR_NOT_FOUND);
     }
 }
 
@@ -135,11 +189,21 @@ export const monitorOperations = {
     }),
     /**
      * Update monitor status
+     *
+     * @param monitor - The monitor to update
+     * @param status - The new status to set
+     * @returns Updated monitor with validated status
+     * @throws Error if status is not valid
      */
-    updateStatus: (monitor: Monitor, status: Monitor["status"]): Monitor => ({
-        ...monitor,
-        status,
-    }),
+    updateStatus: (monitor: Monitor, status: Monitor["status"]): Monitor => {
+        if (!isMonitorStatus(status)) {
+            throw new Error(`Invalid monitor status: ${String(status)}`);
+        }
+        return {
+            ...monitor,
+            status,
+        };
+    },
     /**
      * Update monitor timeout
      */
@@ -148,3 +212,26 @@ export const monitorOperations = {
         timeout,
     }),
 };
+
+/**
+ * Validates and returns a monitor type or default
+ */
+function validateMonitorType(type: unknown): MonitorType {
+    return typeof type === "string" && BASE_MONITOR_TYPES.includes(type as MonitorType)
+        ? (type as MonitorType)
+        : BASE_MONITOR_TYPES[0];
+}
+
+/**
+ * Validates and returns a non-negative number or default value
+ */
+function validateNonNegativeNumber(value: unknown, defaultValue: number): number {
+    return typeof value === "number" && value >= 0 ? value : defaultValue;
+}
+
+/**
+ * Validates and returns a positive number or default value
+ */
+function validatePositiveNumber(value: unknown, defaultValue: number): number {
+    return typeof value === "number" && value > 0 ? value : defaultValue;
+}

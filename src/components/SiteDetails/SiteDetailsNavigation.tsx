@@ -64,6 +64,12 @@ export function SiteDetailsNavigation({
     selectedMonitorId,
     setActiveSiteDetailsTab,
 }: SiteDetailsNavigationProperties) {
+    /**
+     * Logs tab change events for analytics and debugging purposes.
+     *
+     * @param tab - The tab name being changed to
+     * @param additionalData - Optional additional data to include in the log
+     */
     const logTabChange = (tab: string, additionalData?: Record<string, unknown>) => {
         logger.user.action("Site details tab changed", {
             siteId: currentSite.identifier,
@@ -75,6 +81,10 @@ export function SiteDetailsNavigation({
     // Site-level monitoring state calculation
     const allMonitorsRunning =
         currentSite.monitors.length > 0 && currentSite.monitors.every((monitor) => monitor.monitoring === true);
+
+    // Find selected monitor to get its type for better labeling
+    const selectedMonitor = currentSite.monitors.find((monitor) => monitor.id === selectedMonitorId);
+    const monitorTypeLabel = selectedMonitor ? selectedMonitor.type.toUpperCase() : "ANALYTICS";
 
     // Button variant constants
     const BUTTON_VARIANT_PRIMARY = "primary";
@@ -114,7 +124,6 @@ export function SiteDetailsNavigation({
                     </ThemedButton>
                     {/* Render analytics tab for selected monitor type only */}
                     <ThemedButton
-                        key={selectedMonitorId}
                         onClick={() => {
                             setActiveSiteDetailsTab(`${selectedMonitorId}-analytics`);
                             logTabChange("analytics", { monitorId: selectedMonitorId });
@@ -126,7 +135,7 @@ export function SiteDetailsNavigation({
                                 : BUTTON_VARIANT_SECONDARY
                         }
                     >
-                        {`📈 ${selectedMonitorId.toUpperCase()}`}
+                        {`📈 ${monitorTypeLabel} Analytics`}
                     </ThemedButton>
                     <ThemedButton
                         onClick={() => {

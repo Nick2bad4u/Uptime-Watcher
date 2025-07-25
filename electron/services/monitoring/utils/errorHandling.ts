@@ -1,6 +1,12 @@
 /**
- * HTTP monitoring error handling utilities.
- * Provides standardized error processing for HTTP monitors.
+ * Utilities for standardized error handling in HTTP monitoring.
+ *
+ * @remarks
+ * These helpers provide consistent error result construction and logging for HTTP monitor checks,
+ * including handling of Axios-specific errors and generic runtime errors.
+ *
+ * @see {@link MonitorCheckResult}
+ * @public
  */
 
 import axios, { AxiosError } from "axios";
@@ -10,17 +16,24 @@ import { logger } from "../../../utils/logger";
 import { MonitorCheckResult } from "../types";
 
 /**
- * Create a standardized error result for monitor checks.
- *
- * @param error - Error message describing what went wrong
- * @param responseTime - Response time in milliseconds at point of failure
- * @param correlationId - Optional correlation ID for event tracking
- * @returns Standardized monitor check result indicating failure
+ * Constructs a standardized error result for monitor checks.
  *
  * @remarks
- * The details field is set to "Error" as a placeholder to indicate
- * an error state rather than a specific HTTP status code.
- * This distinguishes error results from successful HTTP responses.
+ * The `details` field is set to `"Error"` to distinguish error states from valid HTTP responses.
+ * This function is used for both network and generic errors.
+ *
+ * @param error - The error message describing what went wrong.
+ * @param responseTime - The response time in milliseconds at the point of failure.
+ * @param correlationId - Optional correlation ID for event tracking and logging.
+ * @returns A {@link MonitorCheckResult} object indicating failure.
+ *
+ * @example
+ * ```typescript
+ * createErrorResult("Timeout", 500, "corr-123");
+ * ```
+ *
+ * @see {@link MonitorCheckResult}
+ * @public
  */
 export function createErrorResult(error: string, responseTime: number, correlationId?: string): MonitorCheckResult {
     if (correlationId && isDev()) {
@@ -36,18 +49,26 @@ export function createErrorResult(error: string, responseTime: number, correlati
 }
 
 /**
- * Handle Axios-specific errors during HTTP monitoring.
- *
- * @param error - Axios error instance containing request/response details
- * @param url - The URL that was being monitored when error occurred
- * @param responseTime - Response time in milliseconds at point of failure
- * @param correlationId - Optional correlation ID for event tracking
- * @returns Standardized monitor check result for the network error
+ * Handles Axios-specific errors encountered during HTTP monitoring.
  *
  * @remarks
- * With validateStatus: () =\> true configuration, this primarily handles
- * network errors like timeouts, DNS failures, connection refused, etc.
- * HTTP response errors are handled in the success path for manual evaluation.
+ * This function is intended for network errors such as timeouts, DNS failures, or connection refusals.
+ * HTTP response errors (status codes) are handled separately in the success path.
+ *
+ * @param error - The {@link AxiosError} instance containing request/response details.
+ * @param url - The URL that was being monitored when the error occurred.
+ * @param responseTime - The response time in milliseconds at the point of failure.
+ * @param correlationId - Optional correlation ID for event tracking and logging.
+ * @returns A {@link MonitorCheckResult} object representing the network error.
+ *
+ * @example
+ * ```typescript
+ * handleAxiosError(error, "https://example.com", 1200, "corr-456");
+ * ```
+ *
+ * @see {@link AxiosError}
+ * @see {@link MonitorCheckResult}
+ * @public
  */
 export function handleAxiosError(
     error: AxiosError,
@@ -67,17 +88,27 @@ export function handleAxiosError(
 }
 
 /**
- * Handle errors that occur during health checks with correlation tracking.
- *
- * @param error - Unknown error that occurred during monitoring
- * @param url - The URL being monitored when error occurred
- * @param correlationId - Optional correlation ID for event tracking
- * @returns Standardized monitor check result for the error
+ * Handles unknown errors that occur during health checks, with correlation tracking.
  *
  * @remarks
- * Attempts to extract response time from Axios errors via declaration merging.
- * For non-Error objects, uses "Unknown error" as a fallback message since
- * we cannot guarantee the structure of thrown values in JavaScript.
+ * Attempts to extract response time from Axios errors if available.
+ * For non-Error objects, uses "Unknown error" as a fallback message.
+ * Logs all errors for diagnostic purposes.
+ *
+ * @param error - The unknown error thrown during monitoring.
+ * @param url - The URL being monitored when the error occurred.
+ * @param correlationId - Optional correlation ID for event tracking and logging.
+ * @returns A {@link MonitorCheckResult} object representing the error.
+ *
+ * @throws Never throws; always returns a {@link MonitorCheckResult}.
+ *
+ * @example
+ * ```typescript
+ * handleCheckError(new Error("Unexpected failure"), "https://example.com", "corr-789");
+ * ```
+ *
+ * @see {@link MonitorCheckResult}
+ * @public
  */
 export function handleCheckError(error: unknown, url: string, correlationId?: string): MonitorCheckResult {
     const responseTime = axios.isAxiosError(error) && error.responseTime ? error.responseTime : 0;

@@ -123,6 +123,14 @@ const baseTheme: Theme = {
 /**
  * Creates a theme by merging base theme with specific overrides.
  * This approach eliminates duplication while maintaining type safety.
+ *
+ * @param overrides - Partial theme object with properties to override
+ * @returns Complete theme object with merged properties
+ *
+ * @remarks
+ * Performs deep merging of nested objects like colors, typography, and spacing
+ * to ensure that only specified properties are overridden while preserving
+ * all other base theme properties.
  */
 function createTheme(overrides: Partial<Theme>): Theme {
     return {
@@ -194,6 +202,16 @@ function createTheme(overrides: Partial<Theme>): Theme {
 /**
  * Light theme configuration.
  * Provides a clean, bright appearance suitable for well-lit environments.
+ *
+ * @remarks
+ * This is the default theme that uses the base theme values without modifications.
+ * It provides optimal readability and accessibility in bright environments.
+ *
+ * @example
+ * ```typescript
+ * import { lightTheme } from './themes';
+ * themeManager.applyTheme(lightTheme);
+ * ```
  */
 export const lightTheme: Theme = createTheme({
     // Light theme uses base theme values (no overrides needed)
@@ -202,6 +220,17 @@ export const lightTheme: Theme = createTheme({
 /**
  * Dark theme configuration.
  * Provides a modern dark appearance suitable for low-light environments.
+ *
+ * @remarks
+ * Features reduced blue light emission and carefully adjusted contrasts
+ * to minimize eye strain during extended use in dark environments.
+ * All colors maintain WCAG accessibility standards.
+ *
+ * @example
+ * ```typescript
+ * import { darkTheme } from './themes';
+ * themeManager.applyTheme(darkTheme);
+ * ```
  */
 export const darkTheme: Theme = createTheme({
     colors: {
@@ -272,6 +301,17 @@ export const darkTheme: Theme = createTheme({
 /**
  * High contrast theme for accessibility.
  * Provides maximum contrast for users with visual impairments.
+ *
+ * @remarks
+ * Designed specifically for users with visual impairments, featuring
+ * maximum contrast ratios, larger typography, and saturated colors
+ * for optimal readability and accessibility compliance.
+ *
+ * @example
+ * ```typescript
+ * import { highContrastTheme } from './themes';
+ * themeManager.applyTheme(highContrastTheme);
+ * ```
  */
 export const highContrastTheme: Theme = createTheme({
     borderRadius: {
@@ -374,6 +414,25 @@ export const highContrastTheme: Theme = createTheme({
     },
 });
 
+/**
+ * Collection of all available themes in the application.
+ *
+ * @remarks
+ * Provides a centralized registry of all theme configurations available
+ * for use throughout the application. Used by the ThemeManager to resolve
+ * theme names to actual theme objects.
+ *
+ * @example
+ * ```typescript
+ * import { themes } from './themes';
+ *
+ * // Get a specific theme
+ * const theme = themes.dark;
+ *
+ * // List all available themes
+ * const themeNames = Object.keys(themes);
+ * ```
+ */
 export const themes = {
     dark: darkTheme,
     "high-contrast": highContrastTheme,

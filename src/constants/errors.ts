@@ -11,7 +11,10 @@
 
 /**
  * Standardized error messages used across the application.
- * @readonly
+ *
+ * @remarks
+ * These constants provide consistent error messaging throughout the application.
+ * The `as const` assertion ensures type safety and prevents modification.
  */
 export const ERROR_MESSAGES = {
     FAILED_TO_ADD_MONITOR: "Failed to add monitor",

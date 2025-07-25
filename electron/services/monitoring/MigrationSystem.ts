@@ -1,35 +1,121 @@
 /**
- * Basic migration system for monitor types.
- * Simple, functional implementation without over-complexity.
+ * Migration system for monitor types.
+ *
+ * @remarks
+ * Provides a registry, orchestrator, and version manager for monitor configuration migrations.
+ * All migrations are registered per monitor type and applied in sequence.
+ * Designed for extensibility and maintainability.
  */
 
 import { logger } from "../../utils/logger";
 
+/**
+ * Describes a migration rule for a monitor type.
+ *
+ * @remarks
+ * Each migration rule transforms monitor configuration data from one version to another.
+ *
+ * @example
+ * ```typescript
+ * {
+ *   description: "Add timeout field",
+ *   fromVersion: "1.0.0",
+ *   toVersion: "1.1.0",
+ *   isBreaking: false,
+ *   transform: async (data) => ({ ...data, timeout: 30000 })
+ * }
+ * ```
+ *
+ * @public
+ */
 export interface MigrationRule {
+    /**
+     * Human-readable description of the migration.
+     */
     description: string;
+    /**
+     * Source version for the migration.
+     */
     fromVersion: string;
+    /**
+     * Indicates if the migration is breaking.
+     */
     isBreaking: boolean;
+    /**
+     * Target version for the migration.
+     */
     toVersion: string;
+    /**
+     * Transformation function to migrate data.
+     *
+     * @param data - The monitor configuration data to transform.
+     * @returns A promise resolving to the transformed data.
+     * @throws May throw if transformation fails or data is invalid.
+     */
     transform: (data: Record<string, unknown>) => Promise<Record<string, unknown>>;
 }
 
+/**
+ * Tracks version information for a monitor type.
+ *
+ * @remarks
+ * Used by {@link VersionManager} to record migration state.
+ *
+ * @public
+ */
 export interface VersionInfo {
+    /**
+     * Indicates if the version has been applied.
+     */
     applied: boolean;
+    /**
+     * Timestamp when the version was set.
+     */
     timestamp: number;
+    /**
+     * The version string.
+     */
     version: string;
 }
 
 /**
- * Basic migration orchestrator
+ * Orchestrates migration of monitor configuration data.
+ *
+ * @remarks
+ * Applies registered migration rules in sequence to upgrade monitor data.
+ * Handles errors, warnings, and version updates.
+ *
+ * @public
  */
 class MigrationOrchestrator {
+    /**
+     * Constructs a MigrationOrchestrator.
+     *
+     * @param registry - The migration registry instance.
+     * @param versionManager - The version manager instance.
+     */
     constructor(
         private readonly registry: MigrationRegistry,
         private readonly versionManager: VersionManager
     ) {}
 
     /**
-     * Migrate monitor data from one version to another
+     * Migrates monitor configuration data from one version to another.
+     *
+     * @remarks
+     * Applies all necessary migrations in order. Updates version state if successful.
+     *
+     * @param monitorType - The monitor type (e.g., "http", "port").
+     * @param data - The monitor configuration data to migrate.
+     * @param fromVersion - The current version of the data.
+     * @param toVersion - The target version to migrate to.
+     * @returns An object containing applied migrations, migrated data, errors, success flag, and warnings.
+     * @throws Throws if migration orchestration fails unexpectedly.
+     *
+     * @example
+     * ```typescript
+     * const result = await orchestrator.migrateMonitorData("http", config, "1.0.0", "1.1.0");
+     * ```
      */
     async migrateMonitorData(
         monitorType: string,
@@ -112,13 +198,23 @@ class MigrationOrchestrator {
 }
 
 /**
- * Simple migration registry
+ * Registry for migration rules per monitor type.
+ *
+ * @remarks
+ * Stores and retrieves migration rules, calculates migration paths, and validates migration feasibility.
+ *
+ * @public
  */
 class MigrationRegistry {
     private readonly migrations = new Map<string, MigrationRule[]>();
 
     /**
-     * Check if migration is possible
+     * Determines if migration is possible between two versions for a monitor type.
+     *
+     * @param monitorType - The monitor type.
+     * @param fromVersion - The source version.
+     * @param toVersion - The target version.
+     * @returns True if migration is possible, false otherwise.
      */
     canMigrate(monitorType: string, fromVersion: string, toVersion: string): boolean {
         try {
@@ -130,7 +226,16 @@ class MigrationRegistry {
     }
 
     /**
-     * Get migration path from one version to another
+     * Calculates the migration path (sequence of rules) from one version to another.
+     *
+     * @remarks
+     * Throws if no valid path exists or if a circular path is detected.
+     *
+     * @param monitorType - The monitor type.
+     * @param fromVersion - The source version.
+     * @param toVersion - The target version.
+     * @returns Array of migration rules to apply in order.
+     * @throws Throws if no migration path exists, circular path detected, or path exceeds 100 steps.
      */
     getMigrationPath(monitorType: string, fromVersion: string, toVersion: string): MigrationRule[] {
         const rules = this.migrations.get(monitorType) ?? [];
@@ -167,7 +272,14 @@ class MigrationRegistry {
     }
 
     /**
-     * Register a migration for a monitor type
+     * Registers a migration rule for a monitor type.
+     *
+     * @remarks
+     * Rules are sorted by source version after registration.
+     *
+     * @param monitorType - The monitor type.
+     * @param rule - The migration rule to register.
+     * @throws Throws if migration rules cannot be created for the monitor type.
      */
     registerMigration(monitorType: string, rule: MigrationRule): void {
         if (!this.migrations.has(monitorType)) {
@@ -188,7 +300,11 @@ class MigrationRegistry {
     }
 
     /**
-     * Compare semantic versions
+     * Compares two semantic version strings.
+     *
+     * @param a - First version string.
+     * @param b - Second version string.
+     * @returns -1 if a \< b, 1 if a \> b, 0 if equal.
      */
     private compareVersions(a: string, b: string): number {
         const versionA = a.split(".").map(Number);
@@ -209,27 +325,41 @@ class MigrationRegistry {
 }
 
 /**
- * Simple version manager
+ * Manages version state for monitor types.
+ *
+ * @remarks
+ * Tracks applied versions and timestamps for each monitor type.
+ *
+ * @public
  */
 class VersionManager {
     private readonly versions = new Map<string, VersionInfo>();
 
     /**
-     * Get all versions
+     * Retrieves all version info for all monitor types.
+     *
+     * @returns Map of monitor type to version info.
      */
     getAllVersions(): Map<string, VersionInfo> {
         return new Map(this.versions);
     }
 
     /**
-     * Get version for a monitor type
+     * Gets the current version for a monitor type.
+     *
+     * @param monitorType - The monitor type.
+     * @returns The version string, or undefined if not set.
      */
     getVersion(monitorType: string): string | undefined {
         return this.versions.get(monitorType)?.version;
     }
 
     /**
-     * Check if version is applied
+     * Checks if a specific version is applied for a monitor type.
+     *
+     * @param monitorType - The monitor type.
+     * @param version - The version string to check.
+     * @returns True if the version is applied, false otherwise.
      */
     isVersionApplied(monitorType: string, version: string): boolean {
         const info = this.versions.get(monitorType);
@@ -237,7 +367,10 @@ class VersionManager {
     }
 
     /**
-     * Set version for a monitor type
+     * Sets the version for a monitor type.
+     *
+     * @param monitorType - The monitor type.
+     * @param version - The version string to set.
      */
     setVersion(monitorType: string, version: string): void {
         this.versions.set(monitorType, {
@@ -249,15 +382,13 @@ class VersionManager {
 }
 
 /**
- * Registry for monitor type migrations.
+ * Singleton registry for monitor type migrations.
  *
  * @remarks
- * Singleton instance for registering and retrieving migration rules.
- * Provides migration path calculation and validation for monitor data upgrades.
+ * Use to register and retrieve migration rules for all monitor types.
  *
  * @example
  * ```typescript
- * // Register a migration
  * migrationRegistry.registerMigration("http", {
  *   fromVersion: "1.0.0",
  *   toVersion: "1.1.0",
@@ -266,26 +397,35 @@ class VersionManager {
  *   transform: async (data) => ({ ...data, timeout: 30000 })
  * });
  * ```
+ *
+ * @public
  */
 export const migrationRegistry = new MigrationRegistry();
 
 /**
- * Manager for monitor type version tracking.
+ * Singleton manager for monitor type version tracking.
  *
  * @remarks
- * Singleton instance for tracking applied versions and migration state.
- * Provides version queries and updates for monitor types.
+ * Use to query and update migration state for all monitor types.
+ *
+ * @public
  */
 export const versionManager = new VersionManager();
 
 /**
- * Factory function for creating migration orchestrator instances.
- *
- * @returns New migration orchestrator instance
+ * Factory for creating migration orchestrator instances.
  *
  * @remarks
- * Use this when you need an isolated orchestrator instance instead of
- * the shared singleton pattern. Useful for testing or specialized workflows.
+ * Use for isolated migration workflows or testing.
+ *
+ * @returns A new {@link MigrationOrchestrator} instance.
+ *
+ * @example
+ * ```typescript
+ * const orchestrator = createMigrationOrchestrator();
+ * ```
+ *
+ * @public
  */
 export function createMigrationOrchestrator(): MigrationOrchestrator {
     return new MigrationOrchestrator(migrationRegistry, versionManager);
@@ -295,23 +435,30 @@ export function createMigrationOrchestrator(): MigrationOrchestrator {
  * Example migration definitions for reference and testing.
  *
  * @remarks
- * Provides working examples of migration rules for different monitor types.
- * Use these as templates when creating new migrations for your monitor types.
+ * Provides templates for common migration scenarios.
  *
  * @example
  * ```typescript
- * // Register example migrations
  * migrationRegistry.registerMigration("http", exampleMigrations.httpV1_0_to_1_1);
  * migrationRegistry.registerMigration("port", exampleMigrations.portV1_0_to_1_1);
  * ```
+ *
+ * @public
  */
 export const exampleMigrations = {
     /**
-     * Example HTTP monitor migration: Add timeout field with default value.
+     * HTTP monitor migration: Adds a timeout field with default value.
      *
      * @remarks
-     * Demonstrates non-breaking migration that adds a new field with sensible default.
-     * Safe to apply to existing HTTP monitor configurations.
+     * Non-breaking migration. Adds `timeout` field if missing.
+     *
+     * @param data - The monitor configuration data.
+     * @returns Promise resolving to data with `timeout` field set.
+     * @defaultValue timeout = 30000
+     * @example
+     * ```typescript
+     * const migrated = await exampleMigrations.httpV1_0_to_1_1.transform({ url: "https://..." });
+     * ```
      */
     httpV1_0_to_1_1: {
         description: "Add timeout field with default 30s",
@@ -326,11 +473,18 @@ export const exampleMigrations = {
     } as MigrationRule,
 
     /**
-     * Example port monitor migration: Ensure port is numeric.
+     * Port monitor migration: Ensures port is numeric and valid.
      *
      * @remarks
-     * Demonstrates data type normalization migration with validation.
-     * Converts string port numbers to integers with proper error handling.
+     * Converts string port numbers to integers. Validates port range.
+     *
+     * @param data - The monitor configuration data.
+     * @returns Promise resolving to data with numeric port.
+     * @throws Throws if port is invalid or not in range 1-65535.
+     * @example
+     * ```typescript
+     * const migrated = await exampleMigrations.portV1_0_to_1_1.transform({ port: "8080" });
+     * ```
      */
     portV1_0_to_1_1: {
         description: "Ensure port is a number",

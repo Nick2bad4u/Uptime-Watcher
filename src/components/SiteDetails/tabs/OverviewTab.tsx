@@ -21,6 +21,7 @@ import {
 } from "../../../theme/components";
 import { useAvailabilityColors, useTheme } from "../../../theme/useTheme";
 import { Monitor } from "../../../types";
+import { parseUptimeValue } from "../../../utils/monitoring/dataValidation";
 import { getIntervalLabel } from "../../../utils/time";
 
 /**
@@ -109,7 +110,7 @@ export const OverviewTab = ({
         return variant === "danger" ? "error" : variant;
     };
 
-    const uptimeValue = Number.parseFloat(uptime);
+    const uptimeValue = parseUptimeValue(uptime);
     const progressVariant = mapAvailabilityToBadgeVariant(uptimeValue);
 
     // Icon colors configuration

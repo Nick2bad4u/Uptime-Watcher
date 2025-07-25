@@ -77,4 +77,8 @@ export interface SitesState {
     sites: Site[];
 }
 
+/**
+ * Combined interface for Sites store actions and state.
+ * Provides a complete interface for site management functionality.
+ */
 export type SitesStore = SitesActions & SitesState;
