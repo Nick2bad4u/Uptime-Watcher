@@ -122,7 +122,6 @@ const config: Config = {
                     label: "React (Frontend)",
                 },
                 {
-                    type: "link",
                     label: "Electron (Backend)",
                     href: "https://nick2bad4u.github.io/Uptime-Watcher/docs/electron",
                     position: "left",
