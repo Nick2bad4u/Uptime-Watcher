@@ -252,7 +252,6 @@ export default [
             ...tailwind.configs["flat/recommended"].rules,
             ...cssPlugin.configs["flat/standard"].rules,
 
-
             "no-unsanitized/method": "error",
             "no-unsanitized/property": "error",
             "n/no-missing-file-extension": "off", // Allow missing file extensions for imports
@@ -593,7 +592,6 @@ export default [
             ...eslintPluginMath.configs.recommended.rules,
             ...tailwind.configs["flat/recommended"].rules,
             ...cssPlugin.configs["flat/standard"].rules,
-
 
             "no-unsanitized/method": "error",
             "no-unsanitized/property": "error",

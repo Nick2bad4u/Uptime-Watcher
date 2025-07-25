@@ -2,17 +2,7 @@
     "compilerOptions": {
         "target": "ES2024",
         "useDefineForClassFields": true,
-        "lib": [
-            "ES7",
-            "ES6",
-            "DOM",
-            "DOM.Iterable",
-            "ESNext",
-            "ES2023",
-            "ES2022",
-            "ES2021",
-            "ES2020"
-        ],
+        "lib": ["ES7", "ES6", "DOM", "DOM.Iterable", "ESNext", "ES2023", "ES2022", "ES2021", "ES2020"],
         "module": "ESNext",
         "moduleResolution": "bundler",
         "resolveJsonModule": true,
@@ -33,12 +23,8 @@
         "outDir": "dist",
         "baseUrl": ".",
         "paths": {
-            "@/*": [
-                "src/*"
-            ],
-            "@shared/*": [
-                "shared/*"
-            ]
+            "@/*": ["src/*"],
+            "@shared/*": ["shared/*"]
         },
         "esModuleInterop": true,
         "allowJs": true,
@@ -83,7 +69,8 @@
         "src/App.tsx",
         "global.d.ts",
         "vite/client",
-        "src/index.css", "shared/events.ts",
+        "src/index.css",
+        "shared/events.ts"
     ],
     "exclude": [
         "node_modules",

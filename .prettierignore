@@ -11,6 +11,7 @@ coverage/
 *.min.css
 dist/
 dist-electron/
+docs/docusaurus/
 
 # Ignore Change Logs
 **/CHANGELOG.md
