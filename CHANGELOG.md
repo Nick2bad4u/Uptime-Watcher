@@ -7,14 +7,131 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[2738df8](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2738df87a4d7ee6c7bdb7e177dc3789650b84751)...
-[2738df8](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2738df87a4d7ee6c7bdb7e177dc3789650b84751)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/2738df87a4d7ee6c7bdb7e177dc3789650b84751...2738df87a4d7ee6c7bdb7e177dc3789650b84751))
+[[c08abb4](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c08abb4792d5f9af460b82fe175cc155664023f4)...
+[c08abb4](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c08abb4792d5f9af460b82fe175cc155664023f4)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/c08abb4792d5f9af460b82fe175cc155664023f4...c08abb4792d5f9af460b82fe175cc155664023f4))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 8.6.0 [`(c08abb4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c08abb4792d5f9af460b82fe175cc155664023f4)
+
+
+
+
+
+
+## [8.6.0] - 2025-07-25
+
+
+[[1c15bf4](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1c15bf455bc9cd476cb2cef4a2694ebdce62e7c8)...
+[5a390b9](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5a390b97e9f425a2cb8759c4fa0963e8604a1c04)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/1c15bf455bc9cd476cb2cef4a2694ebdce62e7c8...5a390b97e9f425a2cb8759c4fa0963e8604a1c04))
+
+
+### ✨ Features
+
+- ✨ [feat] Standardize IPC, QA, and import patterns for consistency
+
+- ✨ [feat] Introduces a fully standardized IPC architecture with type-safe handlers, unified validation, and consistent response formats across the Electron main and renderer processes, improving maintainability and reliability.
+- 🧪 [test] Adds comprehensive IPC handler coverage, automated import pattern audits, performance benchmarking, and console statement remediation tools for proactive technical debt reduction and code health monitoring.
+- 📝 [docs] Provides detailed guides on IPC standardization, QA/testing methodology, and import pattern best practices to enhance onboarding and ongoing development quality.
+- 🚜 [refactor] Refactors site analytics and related hooks to encapsulate metrics logic, improve testability, and leverage new IPC response handling patterns.
+- 🛠️ [fix] Fixes minor bugs in database pruning logic, object property checks, and type conversions for improved type safety and stability.
+- 👷 [ci] Adds Codacy coverage reporter workflow for automated code coverage reporting.
+- Improves developer experience, enables future scalability, and establishes robust QA/testing foundations for long-term maintainability.
+
+Relates to QA and architectural consistency milestones. [`(5a390b9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5a390b97e9f425a2cb8759c4fa0963e8604a1c04)
+
+
+- ✨ [feat] Improve theme, monitoring, and analytics robustness
+
+- 📝 [docs] Enhances code documentation for theme system, monitoring, IPC, stores, hooks, and utilities to clarify interfaces, rationale, and advanced usage.
+- 🚜 [refactor] Refactors theme manager, monitoring services, stores, and hooks for better type safety, dynamic theme management, and deep merge logic.
+- 🛠️ [fix] Fixes color/description alignment, fallback logic, and runtime validation for monitor types and analytics calculations.
+- ✨ [feat] Adds robust validation, error handling, and dynamic cache management across UI, monitoring, and backend synchronization.
+- 🎨 [style] Improves CSS variable naming consistency and theme-aware style hooks.
+- ⚡ [perf] Optimizes cache and state management for incremental updates and large datasets.
+- 🧹 [chore] Consolidates duplicate logic, improves code organization, and increases maintainability across the codebase.
+- Relates to improved accessibility, reliability, and extensibility for advanced monitoring scenarios. [`(62ebb4f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/62ebb4f5a8164cd104b529b921cf051265aeb2cb)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 8.5.0 [`(2738df8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2738df87a4d7ee6c7bdb7e177dc3789650b84751)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(ebcd5ea)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ebcd5ea4bdda97209ff76a337883e9e1149acd64)
+
+
+
+### � Documentation
+
+- 📝 [docs] Add Codacy AI instructions and update ignore rules
+
+- Introduces detailed guidelines for AI behavior when interacting with Codacy's MCP Server, emphasizing immediate post-edit analysis and critical security checks after dependency changes.
+ - Updates .gitignore to exclude VS Code AI rules instructions from version control.
+ - Renames legacy Copilot instruction files for improved history and clarity.
+ - Enhances automation, encourages proactive code quality and security enforcement, and clarifies repository setup error handling. [`(f4a1f44)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f4a1f44a2d9322c3daac32842215ee2acac7e49a)
+
+
+- 📝 [docs] Improve and standardize TSDoc comments across codebase
+
+- Updates and clarifies TSDoc comments for all major backend services and utilities, enhancing type safety, discoverability, and editor integration.
+- Ensures public APIs, error structures, utility functions, and class members provide clear, concise, and project-standard documentation.
+- Adds missing remarks, param/returns/throws details, and usage examples, while streamlining repetitive or overly verbose sections.
+- Improves internal documentation for maintainability and onboarding, supporting future code generation, tooling, and static analysis.
+- No logic or runtime changes; strictly documentation improvements for developer experience. [`(ff31ac4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ff31ac4897131c6b720f47680042b875e30e20a4)
+
+
+- 📝 [docs] Add example for Algolia site verification meta tag
+
+- Clarifies site verification process by providing explicit sample meta tag and usage in documentation.
+- Helps users easily enable Algolia verification by copying the correct meta tag format. [`(5cbb8e1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5cbb8e1f9ad717806c8538ff1c20ba1f0b1ada9b)
+
+
+- 📝 [docs] Add verification instructions for DocSearch
+
+- Improves onboarding by introducing DocsSearch verification details
+- Adds a descriptive title, Markdown header, and explanation to clarify the purpose of the Algolia meta tag
+- Formats example HTML in a code block for easier reference [`(9815c2a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9815c2a06eefdb565d24542622ba6252ce333d96)
+
+
+- 📝 [docs] Update Electron docs link to internal route
+
+- Switches Electron (Backend) sidebar link from external URL to internal documentation route for improved navigation consistency and better integration with site routing. [`(71e0966)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/71e096675f0ce977cb7d08296f1402a84bf6bf90)
+
+
+- 📝 [docs] Rename docsearch verification page to markdown
+
+- Improves consistency by switching the verification page from HTML to Markdown format.
+ - Facilitates easier editing and better integration with documentation tools. [`(33c976c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/33c976c057963742ef108fb0c846eff5a348ceb8)
+
+
+- 📝 [docs] Remove redundant type from Electron link config
+
+- Simplifies sidebar configuration by omitting unnecessary 'type' property for the Electron documentation link.
+- Enhances maintainability and reduces potential confusion in the navigation setup. [`(8b814e0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8b814e051debcf6dc50c13aac1884bba0be854b4)
+
+
+- 📝 [docs] Add and update low-confidence AI claim review docs, improve TSDoc standards
+
+- Documents comprehensive reviews and resolutions of low-confidence AI claims across multiple areas, including React hooks, utility helpers, site/store modules, services, and monitor-related utilities.
+- Enhances TSDoc standards and documentation order guidelines for project consistency.
+- Adds new review documents detailing identified issues, validation status, implementation fixes, and architectural improvements.
+- Updates documentation configuration to display last update author/time, includes Algolia verification page, and removes unused config.
+- Improves clarity and maintainability by standardizing documentation, centralizing error messages, extracting constants, and refining code patterns for performance and robustness.
+- No breaking changes; all enhancements maintain backward compatibility and improve developer experience. [`(1c15bf4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1c15bf455bc9cd476cb2cef4a2694ebdce62e7c8)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v8.5.0 [skip ci] [`(128548f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/128548fffc1f23908823869d3373beb2f34f710e)
 
 
 
