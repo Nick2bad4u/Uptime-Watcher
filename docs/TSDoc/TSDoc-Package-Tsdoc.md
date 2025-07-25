@@ -17,7 +17,7 @@ Suppose we are analyzing a TypeScript code comment such as this:
 
 **input example 1:**
 
-``` ts
+```ts
 /**
  * This API calculates the average of a list of numbers.
  *
@@ -32,9 +32,9 @@ Let's say we're making a documentation tool, and we want to analyze
 whether this comment was tagged as `@internal`. We could forget about
 fancy parsers and do a simple test like this:
 
-``` ts
+```ts
 function isApiInternal(docComment: string): boolean {
-  return docComment.indexOf('@internal') >= 0;
+ return docComment.indexOf("@internal") >= 0;
 }
 ```
 
@@ -43,7 +43,7 @@ correctly:
 
 **input example 2:**
 
-``` ts
+```ts
 /**
  * @internalDefault
  */
@@ -51,7 +51,7 @@ correctly:
 
 **input example 3:**
 
-``` ts
+```ts
 /**
  * For more information, please contact support@internalwebsite.com.
  */
@@ -60,9 +60,9 @@ correctly:
 No problem! A regular expression can distinguish `@internal` from words
 containing it:
 
-``` ts
+```ts
 function isApiInternal(docComment: string): boolean {
-  return /(^|\s)@internal(\s|$)/.test(docComment);
+ return /(^|\s)@internal(\s|$)/.test(docComment);
 }
 ```
 
@@ -74,7 +74,7 @@ document its own APIs!)
 
 **input example 4:**
 
-``` ts
+````ts
 /**
  * Returns `true` if a comment string contains the
  * {@link http://tsdoc.org/pages/tags/internal | @internal tag}.
@@ -85,7 +85,7 @@ document its own APIs!)
  * console.log(isApiInternal(input));
  * ```
  */
-```
+````
 
 The `@internal` substring appears twice in example 4, but neither of
 these usages was meant to designate `isApiInternal()` itself as being an
@@ -99,9 +99,9 @@ It is not even a context-free grammar.)
 This leads to a couple insights:
 
 - In order to correctly analyze doc comments, you need a proper parser
-- Different parsers can disagree about a basic question like *"Is this
-  API tagged as `@internal` or not?"* For example, if a parser doesn't
-  support ```` ``` ```` code blocks, then it would misinterpret the
+- Different parsers can disagree about a basic question like _"Is this
+  API tagged as `@internal` or not?"_ For example, if a parser doesn't
+  support ` ``` ` code blocks, then it would misinterpret the
   above input.
 
 ## Invoking the TSDoc parser
@@ -109,42 +109,42 @@ This leads to a couple insights:
 Here's how we might implement `isApiInternal()` using the
 **@microsoft/tsdoc** engine:
 
-``` ts
-import { TSDocParser, ParserContext } from '@microsoft/tsdoc';
+````ts
+import { TSDocParser, ParserContext } from "@microsoft/tsdoc";
 
 function isApiInternal(docComment: string): boolean {
-  const tsdocParser: TSDocParser = new TSDocParser();
+ const tsdocParser: TSDocParser = new TSDocParser();
 
-  // Analyze the input doc comment
-  const parserContext: ParserContext = tsdocParser.parseString(docComment);
+ // Analyze the input doc comment
+ const parserContext: ParserContext = tsdocParser.parseString(docComment);
 
-  // Check for any syntax errors
-  if (parserContext.log.messages.length > 0) {
-    throw new Error('Syntax error: ' + parserContext.log.messages[0].text);
-  }
+ // Check for any syntax errors
+ if (parserContext.log.messages.length > 0) {
+  throw new Error("Syntax error: " + parserContext.log.messages[0].text);
+ }
 
-  // Since "@internal" is a standardized tag and a "modifier", it is automatically
-  // added to the modifierTagSet:
-  return parserContext.docComment.modifierTagSet.isInternal();
+ // Since "@internal" is a standardized tag and a "modifier", it is automatically
+ // added to the modifierTagSet:
+ return parserContext.docComment.modifierTagSet.isInternal();
 }
 
 const input: string = [
-  '/**',
-  ' * @ Returns `true` if a comment string contains the',
-  ' * {@link http://tsdoc.org/pages/tags/internal | @internal tag}.',
-  ' *',
-  ' * @example',
-  ' * ```ts',
-  ' * // Prints "true" if comment contains "@internal"',
-  ' * console.log(isApiInternal(input));',
-  ' * ```',
-  ' */'
-].join('\n');
+ "/**",
+ " * @ Returns `true` if a comment string contains the",
+ " * {@link http://tsdoc.org/pages/tags/internal | @internal tag}.",
+ " *",
+ " * @example",
+ " * ```ts",
+ ' * // Prints "true" if comment contains "@internal"',
+ " * console.log(isApiInternal(input));",
+ " * ```",
+ " */",
+].join("\n");
 
 // Prints "false" because the two "@internal" usages in our example are embedded
 // in other constructs, and thus should not be interpreted as tags.
 console.log(isApiInternal(input));
-```
+````
 
 The library provides a number of other nice features:
 

@@ -2,11 +2,12 @@
 
 **File:** `electron/utils/database/interfaces.ts`  
 **Review Date:** July 24, 2025  
-**Reviewer:** AI Agent  
+**Reviewer:** AI Agent
 
 ## Claims Analysis
 
 ### Claim 1: Stack overwriting in SiteLoadingError
+
 **Status:** ✅ **VALID ISSUE**  
 **Description:** "Overwriting this.stack with cause.stack in SiteLoadingError may lose the original error context. Consider appending the cause's stack instead of replacing it to preserve the full error trace."
 
@@ -15,6 +16,7 @@
 **Action:** Modify to preserve both stack traces by appending the cause stack.
 
 ### Claim 2: Missing TSDoc for SiteLoadingError constructor
+
 **Status:** ✅ **VALID ISSUE**  
 **Description:** "The constructor for SiteLoadingError does not have a TSDoc comment."
 
@@ -23,6 +25,7 @@
 **Action:** Add comprehensive TSDoc for the constructor.
 
 ### Claim 3: Missing TSDoc for SiteNotFoundError constructor
+
 **Status:** ✅ **VALID ISSUE**  
 **Description:** "The constructor for SiteNotFoundError lacks a TSDoc comment."
 
@@ -33,10 +36,12 @@
 ## Implementation Plan
 
 ### 1. Fix stack trace preservation in SiteLoadingError
+
 - Append cause stack instead of overwriting
 - Preserve original error creation context
 
 ### 2. Add comprehensive TSDoc documentation
+
 - Document both error class constructors
 - Follow project TSDoc standards
 

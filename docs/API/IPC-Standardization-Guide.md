@@ -12,11 +12,11 @@ All IPC handlers now return responses in the `IpcResponse<T>` format:
 
 ```typescript
 interface IpcResponse<T> {
-    success: boolean;      // Indicates operation success/failure
-    data?: T;             // Response data when successful
-    error?: string;       // Error message when operation fails
-    metadata?: Record<string, unknown>;  // Additional operation metadata
-    warnings?: string[];  // Non-critical warnings
+ success: boolean; // Indicates operation success/failure
+ data?: T; // Response data when successful
+ error?: string; // Error message when operation fails
+ metadata?: Record<string, unknown>; // Additional operation metadata
+ warnings?: string[]; // Non-critical warnings
 }
 ```
 
@@ -26,12 +26,13 @@ All handlers are now registered using `registerStandardizedIpcHandler()`:
 
 ```typescript
 registerStandardizedIpcHandler(
-    "channel-name",                    // IPC channel name
-    async (...args: unknown[]) => {   // Handler function
-        // Implementation
-    },
-    validatorFunction,                 // Parameter validator
-    registeredHandlers                 // Handler tracking set
+ "channel-name", // IPC channel name
+ async (...args: unknown[]) => {
+  // Handler function
+  // Implementation
+ },
+ validatorFunction, // Parameter validator
+ registeredHandlers // Handler tracking set
 );
 ```
 
@@ -91,14 +92,14 @@ The `IpcValidators` utility provides common validation functions:
 
 ```typescript
 // String validation
-IpcValidators.requiredString(value, "paramName")
-IpcValidators.optionalString(value, "paramName")
+IpcValidators.requiredString(value, "paramName");
+IpcValidators.optionalString(value, "paramName");
 
 // Number validation
-IpcValidators.requiredNumber(value, "paramName")
+IpcValidators.requiredNumber(value, "paramName");
 
 // Object validation
-IpcValidators.requiredObject(value, "paramName")
+IpcValidators.requiredObject(value, "paramName");
 ```
 
 ### Custom Validators
@@ -107,10 +108,10 @@ Each handler group has specific validators in the `*HandlerValidators` objects:
 
 ```typescript
 export const SiteHandlerValidators = {
-    addSite: ((params: unknown[]): null | string[] => {
-        // Validation logic
-        return errors.length > 0 ? errors : null;
-    }) satisfies IpcParameterValidator,
+ addSite: ((params: unknown[]): null | string[] => {
+  // Validation logic
+  return errors.length > 0 ? errors : null;
+ }) satisfies IpcParameterValidator,
 } as const;
 ```
 
@@ -147,13 +148,13 @@ Failed operations return:
 ```typescript
 this.registeredIpcHandlers.add("add-site");
 ipcMain.handle("add-site", async (_, site: Site) => {
-    if (isDev()) logger.debug("[IpcService] Handling add-site");
-    try {
-        return this.uptimeOrchestrator.addSite(site);
-    } catch (error) {
-        logger.error("[IpcService] Failed to add site", error);
-        throw error;
-    }
+ if (isDev()) logger.debug("[IpcService] Handling add-site");
+ try {
+  return this.uptimeOrchestrator.addSite(site);
+ } catch (error) {
+  logger.error("[IpcService] Failed to add site", error);
+  throw error;
+ }
 });
 ```
 
@@ -161,10 +162,10 @@ ipcMain.handle("add-site", async (_, site: Site) => {
 
 ```typescript
 registerStandardizedIpcHandler(
-    "add-site",
-    async (...args: unknown[]) => this.uptimeOrchestrator.addSite(args[0] as Site),
-    SiteHandlerValidators.addSite,
-    this.registeredIpcHandlers
+ "add-site",
+ async (...args: unknown[]) => this.uptimeOrchestrator.addSite(args[0] as Site),
+ SiteHandlerValidators.addSite,
+ this.registeredIpcHandlers
 );
 ```
 
@@ -178,19 +179,19 @@ All standardized IPC handlers now return the `IpcResponse<T>` format. Frontend c
 // Updated approach - all handlers now use this format
 const response = await window.electronAPI.sites.getSites();
 if (response.success) {
-    const sites = response.data;
-    
-    // Handle any warnings
-    if (response.warnings?.length) {
-        console.warn("Operation completed with warnings:", response.warnings);
-    }
+ const sites = response.data;
+
+ // Handle any warnings
+ if (response.warnings?.length) {
+  console.warn("Operation completed with warnings:", response.warnings);
+ }
 } else {
-    console.error("Failed to get sites:", response.error);
-    
-    // Access additional error context
-    if (response.metadata) {
-        console.debug("Error metadata:", response.metadata);
-    }
+ console.error("Failed to get sites:", response.error);
+
+ // Access additional error context
+ if (response.metadata) {
+  console.debug("Error metadata:", response.metadata);
+ }
 }
 ```
 
@@ -199,34 +200,40 @@ if (response.success) {
 **Breaking Change**: The standardization introduces a breaking change to the IPC response format. Frontend code needs to be updated to handle the new `IpcResponse<T>` structure.
 
 **Migration Strategy**:
+
 1. **Update Frontend Code**: Modify all IPC calls to handle the new response format
 2. **Error Handling**: Take advantage of improved error information and metadata
 3. **Testing**: Verify all IPC interactions work with the new format
-3. Validation responses use the existing format for monitor validation
+4. Validation responses use the existing format for monitor validation
 
 ## Benefits Achieved
 
 ### 1. Consistency
+
 - All 21 IPC handlers follow identical patterns
 - Uniform error handling and logging
 - Consistent response formats
 
 ### 2. Type Safety
+
 - Parameter validation catches type errors before processing
 - Strongly typed response interfaces
 - Compile-time type checking for validators
 
 ### 3. Debugging & Monitoring
+
 - Automatic performance timing for all handlers
 - Consistent debug logging patterns
 - Structured error reporting with metadata
 
 ### 4. Maintainability
+
 - Centralized error handling logic
 - Reusable validation utilities
 - Clear separation of concerns
 
 ### 5. Reliability
+
 - Parameter validation prevents runtime errors
 - Standardized error recovery patterns
 - Consistent fallback behaviors
@@ -236,39 +243,37 @@ if (response.success) {
 ### Adding a New IPC Handler
 
 1. **Define the handler logic**:
+
 ```typescript
 const newHandler = async (...args: unknown[]) => {
-    const param1 = args[0] as ExpectedType;
-    return await someOperation(param1);
+ const param1 = args[0] as ExpectedType;
+ return await someOperation(param1);
 };
 ```
 
 2. **Create parameter validator**:
+
 ```typescript
 const newValidator: IpcParameterValidator = (params: unknown[]): null | string[] => {
-    const errors: string[] = [];
-    
-    if (params.length !== 1) {
-        errors.push("Expected exactly 1 parameter");
-    }
-    
-    const param1Error = IpcValidators.requiredString(params[0], "param1");
-    if (param1Error) {
-        errors.push(param1Error);
-    }
-    
-    return errors.length > 0 ? errors : null;
+ const errors: string[] = [];
+
+ if (params.length !== 1) {
+  errors.push("Expected exactly 1 parameter");
+ }
+
+ const param1Error = IpcValidators.requiredString(params[0], "param1");
+ if (param1Error) {
+  errors.push(param1Error);
+ }
+
+ return errors.length > 0 ? errors : null;
 };
 ```
 
 3. **Register the handler**:
+
 ```typescript
-registerStandardizedIpcHandler(
-    "new-operation",
-    newHandler,
-    newValidator,
-    this.registeredIpcHandlers
-);
+registerStandardizedIpcHandler("new-operation", newHandler, newValidator, this.registeredIpcHandlers);
 ```
 
 ### Error Response Handling
@@ -277,15 +282,15 @@ registerStandardizedIpcHandler(
 const response = await window.electronAPI.someOperation();
 
 if (!response.success) {
-    // Handle error
-    console.error(`Operation failed: ${response.error}`);
-    
-    // Check for validation errors
-    if (response.metadata?.validationErrors) {
-        console.log("Validation errors:", response.metadata.validationErrors);
-    }
-    
-    return;
+ // Handle error
+ console.error(`Operation failed: ${response.error}`);
+
+ // Check for validation errors
+ if (response.metadata?.validationErrors) {
+  console.log("Validation errors:", response.metadata.validationErrors);
+ }
+
+ return;
 }
 
 // Handle success
@@ -294,7 +299,7 @@ console.log("Operation completed successfully:", result);
 
 // Check for warnings
 if (response.warnings?.length) {
-    console.warn("Operation completed with warnings:", response.warnings);
+ console.warn("Operation completed with warnings:", response.warnings);
 }
 ```
 

@@ -2,7 +2,7 @@
 
 **Date**: 2025-01-23  
 **File**: `electron/services/database/utils/monitorMapper.ts`  
-**Reviewer**: AI Agent  
+**Reviewer**: AI Agent
 
 ## Summary
 
@@ -16,7 +16,8 @@ Reviewing low confidence AI claims regarding database row mapping utilities for 
 
 **Assessment**: **VALID**
 
-**Analysis**: 
+**Analysis**:
+
 - `MonitorRow.id` is typed as `string`
 - Database operations often return numeric IDs that need conversion
 - Type inconsistency can cause runtime errors if not handled properly
@@ -31,6 +32,7 @@ Reviewing low confidence AI claims regarding database row mapping utilities for 
 **Assessment**: **VALID**
 
 **Analysis**:
+
 - Interface declares `lastChecked?: Date`
 - Database stores timestamps as numbers (Unix timestamps)
 - Conversion between Date objects and timestamps must be consistent
@@ -45,6 +47,7 @@ Reviewing low confidence AI claims regarding database row mapping utilities for 
 **Assessment**: **VALID**
 
 **Analysis**:
+
 - Frontend uses `monitoring` property
 - Database/backend uses `enabled` column
 - This mapping should be clearly documented
@@ -59,6 +62,7 @@ Reviewing low confidence AI claims regarding database row mapping utilities for 
 **Assessment**: **VALID**
 
 **Analysis**:
+
 - Project guidelines explicitly discourage `null` usage
 - Should use `undefined` or sentinel values instead
 - Database insertion logic should handle missing values appropriately
@@ -69,9 +73,10 @@ Reviewing low confidence AI claims regarding database row mapping utilities for 
 
 **Claim**: The conversion of enabled to monitoring in rowToMonitor should be documented.
 
-**Assessment**: **VALID** 
+**Assessment**: **VALID**
 
 **Analysis**:
+
 - This field mapping is a critical business logic transformation
 - Lack of documentation makes maintenance difficult
 - Should explain why this mapping exists and when it applies
@@ -85,7 +90,8 @@ Reviewing low confidence AI claims regarding database row mapping utilities for 
 **Assessment**: **VALID**
 
 **Analysis**:
-- Database uses snake_case column names (`site_identifier`)  
+
+- Database uses snake_case column names (`site_identifier`)
 - TypeScript interfaces use camelCase (`siteIdentifier`)
 - Validation functions should check the actual database column names
 - This mismatch can cause validation failures
@@ -99,6 +105,7 @@ Reviewing low confidence AI claims regarding database row mapping utilities for 
 **Assessment**: **VALID**
 
 **Analysis**:
+
 - This is indeed a type safety workaround
 - Could be improved with more type-safe approaches
 - Should be documented why this cast is necessary
@@ -109,87 +116,96 @@ Reviewing low confidence AI claims regarding database row mapping utilities for 
 ## Additional Issues Found
 
 ### 1. Missing Comprehensive TSDoc
+
 - Interface lacks `@property` tags for all fields
 - Functions need `@param`, `@returns`, `@throws` documentation
 
-### 2. Type Conversion Robustness  
+### 2. Type Conversion Robustness
+
 - Number conversions don't validate for NaN results
 - Date conversions lack null/undefined handling
 - Should use utility functions for consistent conversion
 
 ### 3. Field Mapping Documentation
+
 - Complex dynamic mapping logic needs better documentation
 - Relationship between database schema and application objects unclear
 
 ## Recommendations
 
 ### 1. Standardize ID Types
+
 ```typescript
 // Choose one approach consistently:
 export interface MonitorRow {
-    id: number; // Or string, but be consistent
-    // ... other fields
+ id: number; // Or string, but be consistent
+ // ... other fields
 }
 ```
 
 ### 2. Improve Type Conversions
+
 ```typescript
 function safeDateConversion(value: unknown): Date | undefined {
-    if (value instanceof Date) return value;
-    if (typeof value === 'number') return new Date(value);
-    if (typeof value === 'string') {
-        const parsed = new Date(value);
-        return isNaN(parsed.getTime()) ? undefined : parsed;
-    }
-    return undefined;
+ if (value instanceof Date) return value;
+ if (typeof value === "number") return new Date(value);
+ if (typeof value === "string") {
+  const parsed = new Date(value);
+  return isNaN(parsed.getTime()) ? undefined : parsed;
+ }
+ return undefined;
 }
 ```
 
 ### 3. Document Field Mappings
+
 ```typescript
 /**
  * Convert database row to monitor object using dynamic schema.
- * 
+ *
  * @param row - Database row data
  * @returns Converted monitor object
- * 
+ *
  * @remarks
  * **Field Mappings:**
  * - `enabled` (database) → `monitoring` (application)
  * - `site_identifier` (database) → `siteIdentifier` (application)
  * - Timestamps are converted from Unix timestamps to Date objects
- * 
+ *
  * **Type Safety:** Uses dynamic mapping based on monitor type registry.
  * The type assertion is necessary due to dynamic field assignment from schema.
  */
 ```
 
 ### 4. Eliminate Null Usage
+
 ```typescript
 // Instead of returning null, use undefined or omit the field
 function buildMonitorParameters(siteIdentifier: string, monitor: Site["monitors"][0]): DbValue[] {
-    // Use undefined instead of null
-    const value = someValue ?? undefined;
-    return columns.map(column => row[column] ?? undefined);
+ // Use undefined instead of null
+ const value = someValue ?? undefined;
+ return columns.map((column) => row[column] ?? undefined);
 }
 ```
 
 ### 5. Fix Validation Consistency
+
 ```typescript
 export function isValidMonitorRow(row: Record<string, unknown>): boolean {
-    return (
-        row.id !== undefined &&
-        row.site_identifier !== undefined && // Use actual database column name
-        row.type !== undefined &&
-        typeof row.site_identifier === "string" &&
-        typeof row.type === "string"
-    );
+ return (
+  row.id !== undefined &&
+  row.site_identifier !== undefined && // Use actual database column name
+  row.type !== undefined &&
+  typeof row.site_identifier === "string" &&
+  typeof row.type === "string"
+ );
 }
 ```
 
 ## Conclusion
 
 **Valid Claims**: 7 out of 7 claims were valid
+
 - Type inconsistencies between database and application layers
 - Naming convention mismatches need documentation
 - Null usage violates project guidelines
@@ -203,22 +219,26 @@ These are legitimate concerns that affect type safety, maintainability, and adhe
 **IMPLEMENTED**: The following improvements have been made to address valid concerns:
 
 ### 1. Enhanced Type Safety ✅
+
 - Added proper ID type validation in `isValidMonitorRow()` function
 - Improved type checking for all required monitor fields
 - Enhanced validation logic to prevent runtime type errors
 
 ### 2. Documentation Improvements ✅
+
 - Added comprehensive TSDoc documentation for all public functions
 - Documented the `enabled` ↔ `monitoring` semantic mapping
 - Clarified error handling behavior and edge cases
 - Added `@remarks` sections explaining complex mapping logic
 
 ### 3. Validation Logic Improvements ✅
+
 - Fixed validation to properly check database row structure (snake_case)
 - Added proper type guards for all critical fields
 - Enhanced error context in mapping functions
 
 ### 4. Code Quality Enhancements ✅
+
 - Improved consistency in type conversion patterns
 - Enhanced error messages with better debugging context
 - Added proper validation for edge cases and missing data

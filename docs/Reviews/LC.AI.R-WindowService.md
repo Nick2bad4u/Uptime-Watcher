@@ -2,7 +2,7 @@
 
 **File**: `electron/services/window/WindowService.ts`  
 **Date**: July 23, 2025  
-**Reviewer**: AI Assistant  
+**Reviewer**: AI Assistant
 
 ## Executive Summary
 
@@ -13,63 +13,80 @@ Reviewed 9 low confidence AI claims for WindowService.ts. **ALL 9 claims are VAL
 ### ✅ **VALID CLAIMS**
 
 #### **Claim #1**: VALID - waitForViteServer Uses Tight Loop Without Exponential Backoff
+
 **Issue**: Method uses fixed 1s delay which could be optimized for better responsiveness  
 **Analysis**: Line 221 shows:
+
 ```typescript
 await new Promise((resolve) => setTimeout(resolve, retryDelay));
 ```
+
 Fixed 1000ms delay for all 30 retries. Exponential backoff would be more responsive and efficient.  
 **Status**: NEEDS FIX - Implement exponential backoff for better development experience
 
 #### **Claim #2**: VALID - Hardcoded Preload Script Path
+
 **Issue**: Preload script path "preload.js" is hardcoded and could break if filename changes  
 **Analysis**: Line 100 shows:
+
 ```typescript
 preload: path.join(__dirname, "preload.js"),
 ```
+
 If the preload file is renamed or moved, this will break IPC communication.  
 **Status**: NEEDS FIX - Use more robust path resolution
 
 #### **Claim #3**: VALID - Missing Error Handling Documentation in loadContent
+
 **Issue**: TSDoc doesn't specify error handling behavior  
 **Analysis**: Method at line 147 lacks documentation about how errors are surfaced/logged.  
 **Status**: NEEDS FIX - Add comprehensive error handling documentation
 
 #### **Claim #4**: VALID - Inline mainWindow Initialization
+
 **Issue**: Property initialized inline rather than in constructor  
 **Analysis**: Line 60:
+
 ```typescript
 private mainWindow: BrowserWindow | null = null;
 ```
+
 For future extensibility with multiple window types, constructor initialization would be clearer.  
 **Status**: NEEDS FIX - Move to constructor for better maintainability
 
 #### **Claim #5**: VALID - waitForViteServer Lacks Fetch Timeout
+
 **Issue**: Fetch without timeout could hang if server unreachable  
 **Analysis**: Line 217:
+
 ```typescript
 const response = await fetch("http://localhost:5173");
 ```
+
 No timeout specified, could hang indefinitely on unreachable server.  
 **Status**: NEEDS FIX - Add timeout to prevent hanging
 
 #### **Claim #6**: VALID - Missing @returns Tag in loadContent
+
 **Issue**: TSDoc missing @returns tag and error handling documentation  
 **Analysis**: Private method lacks complete documentation.  
 **Status**: NEEDS FIX - Add complete TSDoc
 
 #### **Claim #7**: VALID - Missing @returns Tag in loadDevelopmentContent
+
 **Issue**: TSDoc missing @returns tag and error propagation documentation  
 **Analysis**: Async method lacks proper documentation of return type and error behavior.  
 **Status**: NEEDS FIX - Add complete TSDoc
 
 #### **Claim #8**: DUPLICATE - Same as Claim #7
+
 **Issue**: Duplicate claim about loadDevelopmentContent  
 **Status**: DUPLICATE OF CLAIM #7
 
 #### **Claim #9**: VALID - Consider Private Field Naming Convention
+
 **Issue**: mainWindow could use underscore prefix for clarity  
-**Analysis**: Some TypeScript conventions prefer _mainWindow for private fields.  
+**Analysis**: Some TypeScript conventions prefer \_mainWindow for private fields.  
 **Status**: NEEDS FIX - Consider project naming conventions
 
 ### 🔍 **ADDITIONAL ISSUES FOUND**
@@ -82,6 +99,7 @@ No timeout specified, could hang indefinitely on unreachable server.
 ## 📋 **IMPLEMENTATION PLAN**
 
 ### 1. **Implement Exponential Backoff and Fetch Timeout**
+
 ```typescript
 /**
  * Configuration constants for Vite server connection.
@@ -117,19 +135,19 @@ private static readonly VITE_SERVER_CONFIG = {
  */
 private async waitForViteServer(): Promise<void> {
     const { BASE_DELAY, FETCH_TIMEOUT, MAX_DELAY, MAX_RETRIES, SERVER_URL } = WindowService.VITE_SERVER_CONFIG;
-    
+
     for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
         try {
             // Create AbortController for fetch timeout
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
-            
+
             const response = await fetch(SERVER_URL, {
                 signal: controller.signal,
             });
-            
+
             clearTimeout(timeoutId);
-            
+
             if (response.ok) {
                 logger.debug("[WindowService] Vite dev server is ready");
                 return;
@@ -155,6 +173,7 @@ private async waitForViteServer(): Promise<void> {
 ```
 
 ### 2. **Robust Preload Path Resolution**
+
 ```typescript
 /**
  * Get the correct preload script path based on environment.
@@ -171,7 +190,7 @@ private getPreloadPath(): string {
     // In development, preload script is in dist-electron
     // In production, it's bundled with the app
     const preloadFileName = "preload.js";
-    
+
     if (isDev()) {
         // Development: look in dist-electron directory
         return path.join(process.cwd(), "dist-electron", preloadFileName);
@@ -209,6 +228,7 @@ public createMainWindow(): BrowserWindow {
 ```
 
 ### 3. **Enhanced Documentation**
+
 ```typescript
 /**
  * Load the appropriate content based on the current environment.
@@ -217,25 +237,25 @@ public createMainWindow(): BrowserWindow {
  *
  * @remarks
  * Handles environment-specific content loading with comprehensive error handling:
- * 
+ *
  * **Development Mode:**
  * - Waits for Vite dev server to be ready using exponential backoff
  * - Loads from localhost:5173 when available
  * - Opens DevTools automatically after 1s delay
  * - Logs detailed connection progress for debugging
- * 
+ *
  * **Production Mode:**
  * - Loads from built static files in app bundle
  * - Handles missing file errors gracefully
  * - Logs errors for production debugging
- * 
+ *
  * **Error Handling:**
  * - All errors are logged with full context
  * - Development errors include server connection details
  * - Production errors include file path information
  * - Method continues execution on errors to prevent blocking
  * - Window remains functional even if content loading fails
- * 
+ *
  * **Side Effects:**
  * - May open DevTools in development mode
  * - Sets up automatic retry mechanisms for server connection
@@ -270,22 +290,22 @@ private loadContent(): void {
  *
  * @remarks
  * Handles the complete development content loading workflow:
- * 
+ *
  * **Process:**
  * 1. Waits for Vite dev server using exponential backoff retry
  * 2. Loads content from localhost:5173 when server is ready
  * 3. Opens DevTools after 1s delay for better UX
- * 
+ *
  * **Error Propagation:**
  * - Server connection errors are logged and re-thrown
  * - Content loading errors include URL and timing context
  * - DevTools opening errors are non-fatal and logged only
- * 
+ *
  * **Timing Considerations:**
  * - DevTools delay prevents race conditions with renderer setup
  * - Server wait timeout prevents indefinite hanging
  * - All timeouts are configurable via constants
- * 
+ *
  * **Recovery Strategy:**
  * - Method continues even if DevTools fail to open
  * - Window remains functional if content loads but DevTools fail
@@ -294,13 +314,13 @@ private loadContent(): void {
 private async loadDevelopmentContent(): Promise<void> {
     try {
         await this.waitForViteServer();
-        
+
         if (!this.mainWindow || this.mainWindow.isDestroyed()) {
             throw new Error("Main window was destroyed while waiting for Vite server");
         }
-        
+
         await this.mainWindow.loadURL(WindowService.VITE_SERVER_CONFIG.SERVER_URL);
-        
+
         // Delay opening DevTools to ensure renderer is ready
         setTimeout(() => {
             if (this.mainWindow && !this.mainWindow.isDestroyed()) {
@@ -314,7 +334,7 @@ private async loadDevelopmentContent(): Promise<void> {
                 }
             }
         }, 1000);
-        
+
     } catch (error) {
         const errorContext = {
             error: error instanceof Error ? error.message : String(error),
@@ -322,7 +342,7 @@ private async loadDevelopmentContent(): Promise<void> {
             windowState: this.mainWindow?.isDestroyed() ? "destroyed" : "active",
             environment: getNodeEnv()
         };
-        
+
         logger.error("[WindowService] Failed to load development content", errorContext);
         throw error; // Re-throw to allow caller to handle
     }
@@ -330,6 +350,7 @@ private async loadDevelopmentContent(): Promise<void> {
 ```
 
 ### 4. **Constructor Initialization**
+
 ```typescript
 /**
  * Service responsible for window management and lifecycle.
@@ -339,64 +360,66 @@ private async loadDevelopmentContent(): Promise<void> {
  * security configuration, content loading, and event handling. Ensures
  * windows are created with appropriate security settings including context
  * isolation and disabled node integration.
- * 
+ *
  * **Window Management:**
  * - Singleton pattern for main application window
  * - Proper lifecycle management with cleanup
  * - Environment-specific content loading strategies
- * 
+ *
  * **Security Features:**
  * - Context isolation enabled by default
  * - Node integration disabled in renderer
  * - Secure preload script for IPC communication
  */
 export class WindowService {
-    /** Reference to the main application window */
-    private _mainWindow: BrowserWindow | null;
+ /** Reference to the main application window */
+ private _mainWindow: BrowserWindow | null;
 
-    /**
-     * Create a new WindowService instance.
-     *
-     * @remarks
-     * Initializes the service with proper defaults and prepares for window creation.
-     * Windows are not created automatically - call createMainWindow() to create the main window.
-     */
-    constructor() {
-        this._mainWindow = null;
-        
-        if (isDev()) {
-            logger.debug("[WindowService] Created WindowService in development mode");
-        }
-    }
+ /**
+  * Create a new WindowService instance.
+  *
+  * @remarks
+  * Initializes the service with proper defaults and prepares for window creation.
+  * Windows are not created automatically - call createMainWindow() to create the main window.
+  */
+ constructor() {
+  this._mainWindow = null;
 
-    /**
-     * Get the main window instance.
-     *
-     * @returns Main window instance or null if not created
-     */
-    public getMainWindow(): BrowserWindow | null {
-        return this._mainWindow;
-    }
+  if (isDev()) {
+   logger.debug("[WindowService] Created WindowService in development mode");
+  }
+ }
 
-    /**
-     * Check if the main window exists and is not destroyed.
-     *
-     * @returns True if main window is available for operations
-     */
-    public hasMainWindow(): boolean {
-        return this._mainWindow !== null && !this._mainWindow.isDestroyed();
-    }
+ /**
+  * Get the main window instance.
+  *
+  * @returns Main window instance or null if not created
+  */
+ public getMainWindow(): BrowserWindow | null {
+  return this._mainWindow;
+ }
 
-    // ... rest of methods updated to use this._mainWindow
+ /**
+  * Check if the main window exists and is not destroyed.
+  *
+  * @returns True if main window is available for operations
+  */
+ public hasMainWindow(): boolean {
+  return this._mainWindow !== null && !this._mainWindow.isDestroyed();
+ }
+
+ // ... rest of methods updated to use this._mainWindow
 }
 ```
 
 ## 🎯 **RISK ASSESSMENT**
+
 - **Medium Risk**: Fixed delays could impact development productivity
 - **Low Risk**: Hardcoded paths could break on filename changes
 - **Low Risk**: Documentation improvements don't affect runtime
 
 ## 📊 **QUALITY SCORE**: 6/10 → 9/10
+
 - **Performance**: 5/10 → 9/10 (exponential backoff implementation)
 - **Robustness**: 6/10 → 9/10 (timeout handling and error recovery)
 - **Maintainability**: 7/10 → 9/10 (better documentation and constants)

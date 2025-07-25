@@ -1,8 +1,5 @@
 {
-    "entryPoints": [
-        "src/**/*.*",
-        "shared/**/*.*"
-    ],
+    "entryPoints": ["src/**/*.*", "shared/**/*.*"],
     "out": "docs/docusaurus/docs/app",
     "docsPath": "docs/docusaurus/docs/app",
     "plugin": [

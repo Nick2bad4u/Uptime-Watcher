@@ -2,11 +2,12 @@
 
 **File:** `electron/utils/database/SiteRepositoryService.ts`  
 **Review Date:** July 24, 2025  
-**Reviewer:** AI Agent  
+**Reviewer:** AI Agent
 
 ## Claims Analysis
 
 ### Claim 1: Sequential history loading performance
+
 **Status:** ✅ **VALID ISSUE**  
 **Description:** "The loop in buildSiteWithMonitorsAndHistory loads monitor history sequentially. If there are many monitors, this could be slow. Consider loading histories in parallel with Promise.all."
 
@@ -15,6 +16,7 @@
 **Action:** Refactor to use Promise.all for parallel history loading.
 
 ### Claim 2: Default monitoring value consistency
+
 **Status:** ⚠️ **MINOR ISSUE**  
 **Description:** "The default value for monitoring is true. Ensure this matches the domain model and is consistent with other parts of the codebase."
 
@@ -23,6 +25,7 @@
 **Action:** Verify consistency and document if needed.
 
 ### Claim 3: Use constant for "Unnamed Site"
+
 **Status:** ✅ **VALID ISSUE**  
 **Description:** "The default name 'Unnamed Site' is used. Confirm this is the intended fallback everywhere sites are created. (use a constant instead?)"
 
@@ -31,6 +34,7 @@
 **Action:** Import and use the existing constant.
 
 ### Claim 4: TSDoc accuracy about side effects
+
 **Status:** ✅ **VALID ISSUE**  
 **Description:** "The TSDoc for getSitesFromDatabase mentions 'pure data operation', but the method logs errors and throws a custom error, which are side effects."
 
@@ -39,6 +43,7 @@
 **Action:** Update TSDoc to accurately reflect the method's behavior.
 
 ### Claim 5: Missing @see references
+
 **Status:** ✅ **VALID ISSUE**  
 **Description:** "The class-level TSDoc for SiteRepositoryService should include a @see reference to the repository interfaces it depends on."
 

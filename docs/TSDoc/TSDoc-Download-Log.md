@@ -1,4 +1,5 @@
 ## 🕓 TSDoc sync @ 2025-07-23T04:12:43.387Z
+
 - ✅ TSDoc-Tag-Readonly.md
   ↳ Hash: `78eb1efa5fab50cf37aa0f9480a80a2e8a8823f69c54072eb3fcb918bcfb912d`
 - ✅ TSDoc-Tag-Public.md
@@ -68,5 +69,4 @@
 - 📘 TSDoc-Home.md
   ↳ Hash: `1d530a3f672e8d50656ab8524f8b47d37be4ffea6fb67fabe3687538f59c659a`
 
-🔧 34 changed files
----
+## 🔧 34 changed files

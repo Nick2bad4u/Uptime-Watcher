@@ -32,15 +32,42 @@ const tags = [
 ];
 
 const extraPages = [
-    { url: "https://github.com/microsoft/rushstack-websites/raw/refs/heads/main/websites/tsdoc.org/docs/pages/spec/overview.md", fileName: "TSDoc-Spec-Overview.md" },
-    { url: "https://github.com/microsoft/rushstack-websites/raw/refs/heads/main/websites/tsdoc.org/docs/pages/spec/tag_kinds.md", fileName: "TSDoc-Spec-TagKinds.md" },
-    { url: "https://github.com/microsoft/rushstack-websites/raw/refs/heads/main/websites/tsdoc.org/docs/pages/spec/standardization_groups.md", fileName: "TSDoc-Spec-StandardizationGroups.md" },
-    { url: "https://github.com/microsoft/rushstack-websites/raw/refs/heads/main/websites/tsdoc.org/docs/index.md", fileName: "TSDoc-Home.md" },
-    { url: "https://github.com/microsoft/rushstack-websites/raw/refs/heads/main/websites/tsdoc.org/docs/pages/intro/approach.md", fileName: "TSDoc-Intro-Approach.md" },
-    { url: "https://github.com/microsoft/rushstack-websites/raw/refs/heads/main/websites/tsdoc.org/docs/pages/intro/using_tsdoc.md", fileName: "TSDoc-Intro-UsingTsdoc.md" },
-    { url: "https://github.com/microsoft/rushstack-websites/raw/refs/heads/main/websites/tsdoc.org/docs/pages/packages/tsdoc.md", fileName: "TSDoc-Package-Tsdoc.md" },
-    { url: "https://github.com/microsoft/rushstack-websites/raw/refs/heads/main/websites/tsdoc.org/docs/pages/packages/tsdoc-config.md", fileName: "TSDoc-Package-TsdocConfig.md" },
-    { url: "https://github.com/microsoft/rushstack-websites/raw/refs/heads/main/websites/tsdoc.org/docs/pages/packages/eslint-plugin-tsdoc.md", fileName: "TSDoc-Package-EslintPluginTsdoc.md" },
+    {
+        url: "https://github.com/microsoft/rushstack-websites/raw/refs/heads/main/websites/tsdoc.org/docs/pages/spec/overview.md",
+        fileName: "TSDoc-Spec-Overview.md",
+    },
+    {
+        url: "https://github.com/microsoft/rushstack-websites/raw/refs/heads/main/websites/tsdoc.org/docs/pages/spec/tag_kinds.md",
+        fileName: "TSDoc-Spec-TagKinds.md",
+    },
+    {
+        url: "https://github.com/microsoft/rushstack-websites/raw/refs/heads/main/websites/tsdoc.org/docs/pages/spec/standardization_groups.md",
+        fileName: "TSDoc-Spec-StandardizationGroups.md",
+    },
+    {
+        url: "https://github.com/microsoft/rushstack-websites/raw/refs/heads/main/websites/tsdoc.org/docs/index.md",
+        fileName: "TSDoc-Home.md",
+    },
+    {
+        url: "https://github.com/microsoft/rushstack-websites/raw/refs/heads/main/websites/tsdoc.org/docs/pages/intro/approach.md",
+        fileName: "TSDoc-Intro-Approach.md",
+    },
+    {
+        url: "https://github.com/microsoft/rushstack-websites/raw/refs/heads/main/websites/tsdoc.org/docs/pages/intro/using_tsdoc.md",
+        fileName: "TSDoc-Intro-UsingTsdoc.md",
+    },
+    {
+        url: "https://github.com/microsoft/rushstack-websites/raw/refs/heads/main/websites/tsdoc.org/docs/pages/packages/tsdoc.md",
+        fileName: "TSDoc-Package-Tsdoc.md",
+    },
+    {
+        url: "https://github.com/microsoft/rushstack-websites/raw/refs/heads/main/websites/tsdoc.org/docs/pages/packages/tsdoc-config.md",
+        fileName: "TSDoc-Package-TsdocConfig.md",
+    },
+    {
+        url: "https://github.com/microsoft/rushstack-websites/raw/refs/heads/main/websites/tsdoc.org/docs/pages/packages/eslint-plugin-tsdoc.md",
+        fileName: "TSDoc-Package-EslintPluginTsdoc.md",
+    },
 ];
 
 const baseGitHubUrl =
@@ -116,7 +143,9 @@ function downloadFile(cmd, filePath, logMsg, name) {
             try {
                 content = fs.readFileSync(filePath, "utf8");
             } catch (readErr) {
-                console.error(logMsg.replace("✅", "❌").replace("📘", "❌") + ` → Failed to read file: ${readErr.message}`);
+                console.error(
+                    logMsg.replace("✅", "❌").replace("📘", "❌") + ` → Failed to read file: ${readErr.message}`
+                );
                 return reject(readErr);
             }
             if (!content || content.trim().length === 0) {
@@ -126,7 +155,9 @@ function downloadFile(cmd, filePath, logMsg, name) {
             try {
                 fs.writeFileSync(filePath, rewriteLinks(content));
             } catch (writeErr) {
-                console.error(logMsg.replace("✅", "❌").replace("📘", "❌") + ` → Failed to write file: ${writeErr.message}`);
+                console.error(
+                    logMsg.replace("✅", "❌").replace("📘", "❌") + ` → Failed to write file: ${writeErr.message}`
+                );
                 return reject(writeErr);
             }
             console.log(logMsg);
@@ -160,7 +191,6 @@ const extraPagePromises = extraPages.map(({ url, fileName }) => {
         throw err;
     }
 })();
-
 
 /**
  * Writes a log entry summarizing the results of all TSDoc downloads.

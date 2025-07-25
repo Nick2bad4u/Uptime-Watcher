@@ -2,7 +2,7 @@
 
 **File**: `electron/services/monitoring/utils/portChecker.ts`  
 **Date**: July 23, 2025  
-**Reviewer**: AI Assistant  
+**Reviewer**: AI Assistant
 
 ## Executive Summary
 
@@ -13,14 +13,16 @@ Reviewed 1 low confidence AI claim for portChecker.ts. **The claim is VALID** an
 ### ✅ **VALID CLAIMS**
 
 #### **Claim #1**: VALID - Missing TSDoc Documentation
+
 **Issue**: Function `performSinglePortCheck` lacks TSDoc comment describing parameters, return value, and error behavior  
 **Analysis**: The function only has a basic comment. According to project standards, all functions should have comprehensive TSDoc with:
+
 - Parameter descriptions
-- Return value description  
+- Return value description
 - Error behavior documentation
 - Usage examples where appropriate  
-**Current**: Minimal comment only  
-**Status**: NEEDS FIX - Add comprehensive TSDoc
+  **Current**: Minimal comment only  
+  **Status**: NEEDS FIX - Add comprehensive TSDoc
 
 ### 🔍 **ADDITIONAL ISSUES FOUND**
 
@@ -32,7 +34,8 @@ Reviewed 1 low confidence AI claim for portChecker.ts. **The claim is VALID** an
 ## 📋 **IMPLEMENTATION PLAN**
 
 ### 1. **Add Comprehensive TSDoc**
-```typescript
+
+````typescript
 /**
  * Perform a single port check attempt without retry logic.
  *
@@ -45,7 +48,7 @@ Reviewed 1 low confidence AI claim for portChecker.ts. **The claim is VALID** an
  * @remarks
  * Uses the `is-port-reachable` library to test TCP connectivity to the specified port.
  * Measures response time using high-precision performance.now() timing.
- * 
+ *
  * On successful connection, returns a result with status "up" and actual response time.
  * On connection failure, throws PortCheckError with timing information to support
  * retry mechanisms that need response time data.
@@ -67,44 +70,46 @@ Reviewed 1 low confidence AI claim for portChecker.ts. **The claim is VALID** an
  * @see {@link PortCheckError} for error details
  * @see {@link MonitorCheckResult} for return type structure
  */
-```
+````
 
 ### 2. **Improve Inline Comments**
+
 ```typescript
 export async function performSinglePortCheck(host: string, port: number, timeout: number): Promise<MonitorCheckResult> {
-    // Start high-precision timing for response time measurement
-    const startTime = performance.now();
+ // Start high-precision timing for response time measurement
+ const startTime = performance.now();
 
-    if (isDev()) {
-        logger.debug(`[PortMonitor] Checking port: ${host}:${port} with timeout: ${timeout}ms`);
-    }
+ if (isDev()) {
+  logger.debug(`[PortMonitor] Checking port: ${host}:${port} with timeout: ${timeout}ms`);
+ }
 
-    // Test TCP connectivity using is-port-reachable library
-    const isReachable = await isPortReachable(port, {
-        host: host,
-        timeout: timeout,
-    });
+ // Test TCP connectivity using is-port-reachable library
+ const isReachable = await isPortReachable(port, {
+  host: host,
+  timeout: timeout,
+ });
 
-    // Calculate precise response time in milliseconds
-    const responseTime = Math.round(performance.now() - startTime);
+ // Calculate precise response time in milliseconds
+ const responseTime = Math.round(performance.now() - startTime);
 
-    if (isReachable) {
-        if (isDev()) {
-            logger.debug(`[PortMonitor] Port ${host}:${port} is reachable in ${responseTime}ms`);
-        }
-        return {
-            details: String(port),
-            responseTime,
-            status: "up",
-        };
-    } else {
-        // Port not reachable - throw custom error with response time to support retry logic
-        throw new PortCheckError(PORT_NOT_REACHABLE, responseTime);
-    }
+ if (isReachable) {
+  if (isDev()) {
+   logger.debug(`[PortMonitor] Port ${host}:${port} is reachable in ${responseTime}ms`);
+  }
+  return {
+   details: String(port),
+   responseTime,
+   status: "up",
+  };
+ } else {
+  // Port not reachable - throw custom error with response time to support retry logic
+  throw new PortCheckError(PORT_NOT_REACHABLE, responseTime);
+ }
 }
 ```
 
 ### 3. **File-Level Documentation Enhancement**
+
 ```typescript
 /**
  * Utility functions for performing port connectivity checks.
@@ -119,9 +124,11 @@ export async function performSinglePortCheck(host: string, port: number, timeout
 ```
 
 ## 🎯 **RISK ASSESSMENT**
+
 - **No Risk**: Documentation improvements only, no functional changes
 
 ## 📊 **QUALITY SCORE**: 7/10 → 9/10
+
 - **Documentation**: 3/10 → 9/10 (comprehensive TSDoc added)
 - **Code Clarity**: 7/10 → 9/10 (better inline comments)
 - **Maintainability**: 7/10 → 9/10 (clearer purpose and usage)

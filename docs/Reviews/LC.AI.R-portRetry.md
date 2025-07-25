@@ -2,7 +2,7 @@
 
 **File**: `electron/services/monitoring/utils/portRetry.ts`  
 **Date**: July 23, 2025  
-**Reviewer**: AI Assistant  
+**Reviewer**: AI Assistant
 
 ## Executive Summary
 
@@ -12,31 +12,38 @@ Reviewed 5 low confidence AI claims for portRetry.ts. **ALL 5 claims are VALID**
 
 ### ✅ **VALID CLAIMS**
 
-#### **Claim #1**: VALID - Parameter Naming Confusion  
+#### **Claim #1**: VALID - Parameter Naming Confusion
+
 **Issue**: `maxRetries` parameter passed to `withOperationalHooks` should be `totalAttempts` for clarity  
 **Analysis**: Looking at the interface from `operationalHooks.ts`:
+
 ```typescript
 maxRetries?: number; // Maximum number of retry attempts. @defaultValue 3
 ```
+
 The code correctly calculates `totalAttempts = maxRetries + 1` but the naming is confusing. The comment clarifies this but it's error-prone.  
 **Status**: NEEDS FIX - Improve naming or documentation
 
-#### **Claim #2**: VALID - Conditional Spread Readability  
+#### **Claim #2**: VALID - Conditional Spread Readability
+
 **Issue**: Conditional spread `...(isDev() && { onRetry: ... })` reduces readability  
 **Analysis**: While clever, this pattern makes the code harder to read and debug  
 **Status**: NEEDS FIX - Extract dev-only config for clarity
 
-#### **Claim #3**: VALID - Error Handling Contract Consistency  
+#### **Claim #3**: VALID - Error Handling Contract Consistency
+
 **Issue**: Ensure `handlePortCheckError` result matches `MonitorCheckResult` contract  
 **Analysis**: Need to verify the return type is consistent across all error paths  
 **Status**: NEEDS VERIFICATION - Check type consistency
 
-#### **Claim #4**: VALID - Missing Comprehensive TSDoc  
+#### **Claim #4**: VALID - Missing Comprehensive TSDoc
+
 **Issue**: TSDoc for `performPortCheckWithRetry` is minimal, needs expansion  
 **Analysis**: Function lacks proper parameter documentation, return type description, and error handling behavior  
 **Status**: NEEDS FIX - Add comprehensive TSDoc
 
-#### **Claim #5**: VALID - File-Level Documentation  
+#### **Claim #5**: VALID - File-Level Documentation
+
 **Issue**: File-level comment is minimal, should clarify retry logic relationship  
 **Analysis**: Should explain how this module relates to `withOperationalHooks` and the overall retry strategy  
 **Status**: NEEDS FIX - Expand file-level documentation
@@ -50,12 +57,13 @@ The code correctly calculates `totalAttempts = maxRetries + 1` but the naming is
 ## 📋 **IMPLEMENTATION PLAN**
 
 ### 1. **Fix Parameter Naming and Documentation**
-```typescript
+
+````typescript
 /**
  * Perform port check with sophisticated retry logic and exponential backoff.
  *
  * @param host - Target hostname or IP address to check
- * @param port - Port number to test connectivity  
+ * @param port - Port number to test connectivity
  * @param timeout - Maximum time to wait for each connection attempt in milliseconds
  * @param maxRetries - Number of additional retry attempts after initial failure (0 = try once only)
  * @returns Promise resolving to monitor check result with timing and status information
@@ -75,7 +83,7 @@ The code correctly calculates `totalAttempts = maxRetries + 1` but the naming is
  * ```typescript
  * // Try once, no retries
  * const result = await performPortCheckWithRetry("example.com", 80, 5000, 0);
- * 
+ *
  * // Try 4 times total (1 initial + 3 retries)
  * const result = await performPortCheckWithRetry("example.com", 443, 3000, 3);
  * ```
@@ -85,42 +93,43 @@ The code correctly calculates `totalAttempts = maxRetries + 1` but the naming is
  * @see {@link handlePortCheckError} for error result formatting
  */
 export async function performPortCheckWithRetry(
-    host: string,
-    port: number,
-    timeout: number,
-    maxRetries: number
+ host: string,
+ port: number,
+ timeout: number,
+ maxRetries: number
 ): Promise<MonitorCheckResult> {
-    try {
-        // Convert "additional retries" to "total attempts" for withOperationalHooks
-        // maxRetries=3 means: 1 initial attempt + 3 retries = 4 total attempts
-        const totalAttempts = maxRetries + 1;
+ try {
+  // Convert "additional retries" to "total attempts" for withOperationalHooks
+  // maxRetries=3 means: 1 initial attempt + 3 retries = 4 total attempts
+  const totalAttempts = maxRetries + 1;
 
-        // Prepare configuration with conditional dev-only features
-        const config = {
-            initialDelay: RETRY_BACKOFF.INITIAL_DELAY,
-            maxRetries: totalAttempts, // withOperationalHooks expects total attempts
-            operationName: `Port check for ${host}:${port}`,
-        };
+  // Prepare configuration with conditional dev-only features
+  const config = {
+   initialDelay: RETRY_BACKOFF.INITIAL_DELAY,
+   maxRetries: totalAttempts, // withOperationalHooks expects total attempts
+   operationName: `Port check for ${host}:${port}`,
+  };
 
-        // Add debug logging in development mode
-        const devConfig = isDev() ? {
-            ...config,
-            onRetry: (attempt: number, error: Error) => {
-                const errorMessage = error instanceof Error ? error.message : String(error);
-                logger.debug(
-                    `[PortMonitor] Port ${host}:${port} failed attempt ${attempt}/${totalAttempts}: ${errorMessage}`
-                );
-            },
-        } : config;
+  // Add debug logging in development mode
+  const devConfig = isDev()
+   ? {
+      ...config,
+      onRetry: (attempt: number, error: Error) => {
+       const errorMessage = error instanceof Error ? error.message : String(error);
+       logger.debug(`[PortMonitor] Port ${host}:${port} failed attempt ${attempt}/${totalAttempts}: ${errorMessage}`);
+      },
+     }
+   : config;
 
-        return await withOperationalHooks(() => performSinglePortCheck(host, port, timeout), devConfig);
-    } catch (error) {
-        return handlePortCheckError(error, host, port);
-    }
+  return await withOperationalHooks(() => performSinglePortCheck(host, port, timeout), devConfig);
+ } catch (error) {
+  return handlePortCheckError(error, host, port);
+ }
 }
-```
+````
 
 ### 2. **Improve File-Level Documentation**
+
 ```typescript
 /**
  * Utility functions for performing port checks with retry logic.
@@ -144,16 +153,19 @@ export async function performPortCheckWithRetry(
 ```
 
 ### 3. **Type Safety Verification**
+
 ```typescript
 // Ensure MonitorCheckResult consistency
 const errorResult: MonitorCheckResult = handlePortCheckError(error, host, port);
 ```
 
 ## 🎯 **RISK ASSESSMENT**
+
 - **Low Risk**: Documentation and readability improvements
 - **No Breaking Changes**: Function signatures remain the same
 
 ## 📊 **QUALITY SCORE**: 6/10 → 9/10
+
 - **Documentation**: 3/10 → 9/10 (comprehensive TSDoc)
 - **Code Clarity**: 6/10 → 9/10 (clearer config handling)
 - **Maintainability**: 5/10 → 9/10 (better structure and comments)

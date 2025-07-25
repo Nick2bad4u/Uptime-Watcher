@@ -2,11 +2,12 @@
 
 **File:** `electron/utils/monitoring/monitorLifecycle.ts`  
 **Review Date:** July 24, 2025  
-**Reviewer:** AI Agent  
+**Reviewer:** AI Agent
 
 ## Claims Analysis
 
 ### Claims 1-4: Missing await on updateInternal methods
+
 **Status:** ❌ **FALSE POSITIVE (ALL)**  
 **Description:** Multiple claims about missing await on `updateInternal` calls.
 
@@ -15,6 +16,7 @@
 **Action:** No changes needed - this is the correct usage pattern.
 
 ### Claim 5: Status overwrite concerns (pending)
+
 **Status:** ✅ **VALID ISSUE**  
 **Description:** "The status is set to 'pending' for all monitors when starting, regardless of their previous state."
 
@@ -23,6 +25,7 @@
 **Action:** Add comment explaining this intentional behavior.
 
 ### Claim 6: Status overwrite concerns (paused)
+
 **Status:** ✅ **VALID ISSUE**  
 **Description:** "The status is set to 'paused' for all monitors when stopping, regardless of their previous state."
 
@@ -31,6 +34,7 @@
 **Action:** Add comment explaining this intentional behavior.
 
 ### Claim 7: Duplicate monitor search logic
+
 **Status:** ✅ **VALID ISSUE**  
 **Description:** "The search for a monitor by ID is repeated in both startSpecificMonitor and stopSpecificMonitor."
 
@@ -39,6 +43,7 @@
 **Action:** Extract common monitor lookup logic to helper function.
 
 ### Claim 8: checkInterval validation
+
 **Status:** ✅ **VALID ISSUE**  
 **Description:** "If monitor.checkInterval is falsy (e.g., 0), the function logs a warning and returns false. If 0 is a valid interval, this check may be too strict."
 
@@ -47,6 +52,7 @@
 **Action:** Improve checkInterval validation logic.
 
 ### Claims 9-11: Database update timing
+
 **Status:** ⚠️ **DESIGN DECISION**  
 **Description:** "The database update is performed before starting the monitor in the scheduler. If the scheduler fails, the DB will still reflect it as 'pending'."
 
@@ -55,6 +61,7 @@
 **Action:** Document this behavior in comments for clarity.
 
 ### Claim 12: Optimistic/pessimistic logic documentation
+
 **Status:** ✅ **VALID ISSUE**  
 **Description:** "The logic for optimistic vs. pessimistic result aggregation is not documented."
 
@@ -63,6 +70,7 @@
 **Action:** Add detailed documentation for the aggregation logic.
 
 ### Claim 13: MonitoringCallback documentation
+
 **Status:** ✅ **VALID ISSUE**  
 **Description:** "The MonitoringCallback type is not fully documented regarding its expected behavior and error handling."
 
@@ -71,6 +79,7 @@
 **Action:** Enhance TSDoc for MonitoringCallback type.
 
 ### Claim 14: MonitoringLifecycleConfig documentation
+
 **Status:** ✅ **VALID ISSUE**  
 **Description:** "The MonitoringLifecycleConfig interface could benefit from more detailed property descriptions."
 

@@ -1,5 +1,5 @@
 ---
-title: '@experimental'
+title: "@experimental"
 ---
 
 <!-- prettier-ignore-start -->
@@ -22,16 +22,16 @@ Same semantics as `@beta`, but used by tools that don't support an `@alpha` rele
  * @public
  */
 export class Book {
-  /**
-   * The title of the book.
-   * @experimental
-   */
-  public get title(): string;
+ /**
+  * The title of the book.
+  * @experimental
+  */
+ public get title(): string;
 
-  /**
-   * The author of the book.
-   */
-  public get author(): string;
+ /**
+  * The author of the book.
+  */
+ public get author(): string;
 }
 ```
 

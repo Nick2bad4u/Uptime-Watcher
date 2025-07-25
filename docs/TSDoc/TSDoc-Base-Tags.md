@@ -30,20 +30,19 @@
 - `@eventProperty` -- Indicates that the property returns an event object that event handlers can be attached to.
 - `@internal` -- Designates that an API item is not planned to be used by third-party developers. May be trimmed from public release.
 
-
 ## Inline Tags
 
 - `{@link ...}` -- Creates a hyperlink to another API or URL.
 - `{@inheritDoc ...}` -- Inherits documentation from another API.
 - `{@label ...}` -- Used to label a declaration, so it can be referenced using a selector in TSDoc declaration reference notation.
 
-
 ## Not Recommended Tags for this Project
+
 - `@packageDocumentation` -- Used to indicate a doc comment that describes an entire NPM package, found in the entry point \*.d.ts file.
 
 ## Recommended General Order for Block Tags:
 
-- *Summary* (first line, no tag)  
+- _Summary_ (first line, no tag)  
   (Always begins the comment, not a tag.)
 
 - `@remarks`  

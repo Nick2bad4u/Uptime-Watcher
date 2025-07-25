@@ -41,6 +41,7 @@ Critical Instructions:
 - Never create backwards compatibility code/wrappers/hacks without strict approval first.
 
 ⚠️ **Absolute Prohibitions**:
+
 - No direct state mutations
 - No bypassing repository pattern
 - No untyped IPC messages

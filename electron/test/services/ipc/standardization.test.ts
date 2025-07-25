@@ -23,7 +23,7 @@ describe("IPC Standardization Concepts", () => {
         expect(response).toBeTypeOf("object");
         expect(response).toHaveProperty("success");
         expect(typeof response.success).toBe("boolean");
-        
+
         if (response.success) {
             // Success responses may have data, metadata, warnings
             if (response.data !== undefined) {
@@ -66,7 +66,7 @@ describe("IPC Standardization Concepts", () => {
     ) {
         return async (...args: unknown[]): Promise<IpcResponse<T>> => {
             const startTime = performance.now();
-            
+
             try {
                 // Parameter validation
                 if (validator) {
@@ -78,22 +78,22 @@ describe("IPC Standardization Concepts", () => {
                             metadata: {
                                 handler: "mock-handler",
                                 duration: performance.now() - startTime,
-                                validationErrors
-                            }
+                                validationErrors,
+                            },
                         };
                     }
                 }
 
                 // Execute handler
                 const result = await handler(...args);
-                
+
                 return {
                     success: true,
                     data: result,
                     metadata: {
                         handler: "mock-handler",
-                        duration: performance.now() - startTime
-                    }
+                        duration: performance.now() - startTime,
+                    },
                 };
             } catch (error) {
                 return {
@@ -101,8 +101,8 @@ describe("IPC Standardization Concepts", () => {
                     error: error instanceof Error ? error.message : String(error),
                     metadata: {
                         handler: "mock-handler",
-                        duration: performance.now() - startTime
-                    }
+                        duration: performance.now() - startTime,
+                    },
                 };
             }
         };
@@ -110,12 +110,10 @@ describe("IPC Standardization Concepts", () => {
 
     describe("Response Format Validation", () => {
         it("should validate successful response format", async () => {
-            const mockHandler = createMockStandardizedHandler(
-                async (data: string) => ({ result: data })
-            );
-            
+            const mockHandler = createMockStandardizedHandler(async (data: string) => ({ result: data }));
+
             const response = await mockHandler("test-data");
-            
+
             validateIpcResponse(response);
             expect(response.success).toBe(true);
             expect(response.data).toEqual({ result: "test-data" });
@@ -124,14 +122,12 @@ describe("IPC Standardization Concepts", () => {
         });
 
         it("should validate error response format", async () => {
-            const mockHandler = createMockStandardizedHandler(
-                async () => {
-                    throw new Error("Test error");
-                }
-            );
-            
+            const mockHandler = createMockStandardizedHandler(async () => {
+                throw new Error("Test error");
+            });
+
             const response = await mockHandler();
-            
+
             validateIpcResponse(response);
             expect(response.success).toBe(false);
             expect(response.error).toBe("Test error");
@@ -146,13 +142,10 @@ describe("IPC Standardization Concepts", () => {
                 return null;
             };
 
-            const mockHandler = createMockStandardizedHandler(
-                async (data: string) => data,
-                validator
-            );
-            
+            const mockHandler = createMockStandardizedHandler(async (data: string) => data, validator);
+
             const response = await mockHandler(123); // Invalid parameter
-            
+
             validateIpcResponse(response);
             expect(response.success).toBe(false);
             expect(response.error).toBe("Parameter validation failed");
@@ -229,14 +222,12 @@ describe("IPC Standardization Concepts", () => {
             ];
 
             for (const testError of testErrors) {
-                const mockHandler = createMockStandardizedHandler(
-                    async () => {
-                        throw testError;
-                    }
-                );
-                
+                const mockHandler = createMockStandardizedHandler(async () => {
+                    throw testError;
+                });
+
                 const response = await mockHandler();
-                
+
                 validateIpcResponse(response);
                 expect(response.success).toBe(false);
                 expect(typeof response.error).toBe("string");
@@ -245,19 +236,15 @@ describe("IPC Standardization Concepts", () => {
         });
 
         it("should provide consistent metadata across responses", async () => {
-            const successHandler = createMockStandardizedHandler(
-                async () => "success"
-            );
-            
-            const errorHandler = createMockStandardizedHandler(
-                async () => {
-                    throw new Error("failure");
-                }
-            );
-            
+            const successHandler = createMockStandardizedHandler(async () => "success");
+
+            const errorHandler = createMockStandardizedHandler(async () => {
+                throw new Error("failure");
+            });
+
             const successResponse = await successHandler();
             const errorResponse = await errorHandler();
-            
+
             // Both should have consistent metadata structure
             expect(successResponse.metadata?.handler).toBe("mock-handler");
             expect(errorResponse.metadata?.handler).toBe("mock-handler");
@@ -268,30 +255,26 @@ describe("IPC Standardization Concepts", () => {
 
     describe("Performance Monitoring", () => {
         it("should track execution time for all operations", async () => {
-            const slowHandler = createMockStandardizedHandler(
-                async () => {
-                    await new Promise(resolve => setTimeout(resolve, 10));
-                    return "completed";
-                }
-            );
-            
+            const slowHandler = createMockStandardizedHandler(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 10));
+                return "completed";
+            });
+
             const response = await slowHandler();
-            
+
             validateIpcResponse(response);
             expect(response.success).toBe(true);
             expect(response.metadata?.duration).toBeGreaterThan(5); // Should take at least 5ms
         });
 
         it("should include performance metadata even for errors", async () => {
-            const errorHandler = createMockStandardizedHandler(
-                async () => {
-                    await new Promise(resolve => setTimeout(resolve, 5));
-                    throw new Error("Delayed error");
-                }
-            );
-            
+            const errorHandler = createMockStandardizedHandler(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 5));
+                throw new Error("Delayed error");
+            });
+
             const response = await errorHandler();
-            
+
             validateIpcResponse(response);
             expect(response.success).toBe(false);
             expect(response.metadata?.duration).toBeGreaterThan(3); // Should include processing time
@@ -308,15 +291,15 @@ describe("IPC Standardization Concepts", () => {
                 "Handler names must be included in metadata for debugging",
                 "Validation errors must include detailed error messages",
                 "Success responses may include warnings for non-critical issues",
-                "Error responses must never expose internal system details"
+                "Error responses must never expose internal system details",
             ];
-            
+
             console.log("\\nIPC Standardization Guidelines:");
-            console.log("=" .repeat(40));
+            console.log("=".repeat(40));
             guidelines.forEach((guideline, index) => {
                 console.log(`${index + 1}. ${guideline}`);
             });
-            
+
             expect(guidelines.length).toBe(8);
         });
 
@@ -347,7 +330,7 @@ registerStandardizedIpcHandler(
     registeredHandlers
 );
 `;
-            
+
             expect(registrationPattern.length).toBeGreaterThan(0);
             expect(registrationPattern).toContain("registerStandardizedIpcHandler");
             expect(registrationPattern).toContain("Parameter validation");
@@ -360,38 +343,38 @@ registerStandardizedIpcHandler(
                 {
                     name: "Response Format Validation",
                     description: "Ensure all handlers return proper IpcResponse<T> format",
-                    example: "validateIpcResponse(response); expect(response.success).toBe(true);"
+                    example: "validateIpcResponse(response); expect(response.success).toBe(true);",
                 },
                 {
                     name: "Parameter Validation Testing",
                     description: "Test all parameter validation scenarios",
-                    example: "expect(response.error).toContain('Parameter validation failed');"
+                    example: "expect(response.error).toContain('Parameter validation failed');",
                 },
                 {
                     name: "Error Handling Testing",
                     description: "Verify consistent error response formatting",
-                    example: "expect(response.success).toBe(false); expect(response.error).toBeDefined();"
+                    example: "expect(response.success).toBe(false); expect(response.error).toBeDefined();",
                 },
                 {
                     name: "Performance Monitoring",
                     description: "Validate performance metadata inclusion",
-                    example: "expect(response.metadata?.duration).toBeTypeOf('number');"
+                    example: "expect(response.metadata?.duration).toBeTypeOf('number');",
                 },
                 {
                     name: "Success Path Testing",
                     description: "Test successful operation responses",
-                    example: "expect(response.data).toEqual(expectedResult);"
-                }
+                    example: "expect(response.data).toEqual(expectedResult);",
+                },
             ];
-            
+
             console.log("\\nIPC Testing Patterns:");
-            console.log("=" .repeat(30));
+            console.log("=".repeat(30));
             testingApproaches.forEach(({ name, description, example }) => {
                 console.log(`\\n${name}:`);
                 console.log(`  Description: ${description}`);
                 console.log(`  Example: ${example}`);
             });
-            
+
             expect(testingApproaches.length).toBe(5);
         });
     });

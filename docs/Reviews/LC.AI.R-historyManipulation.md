@@ -2,7 +2,7 @@
 
 **Date**: 2025-01-23  
 **File**: `electron/services/database/utils/historyManipulation.ts`  
-**Reviewer**: AI Agent  
+**Reviewer**: AI Agent
 
 ## Summary
 
@@ -11,6 +11,7 @@ Reviewing low confidence AI claims regarding database utility functions for hist
 ## Architecture Context
 
 Based on code analysis, the project follows these patterns:
+
 - **Repository Pattern**: All DB mutations should go through repositories with `executeTransaction()`
 - **Internal/External Methods**: Repositories have public async methods that wrap internal synchronous methods
 - **Transaction Management**: External methods use `withDatabaseOperation()` + `executeTransaction()`
@@ -24,10 +25,11 @@ Based on code analysis, the project follows these patterns:
 
 **Assessment**: **FALSE POSITIVE**
 
-**Analysis**: 
+**Analysis**:
 These are utility functions designed to be called from repository internal methods that are already within transaction contexts. Evidence:
 
-1. **HistoryRepository Pattern**: 
+1. **HistoryRepository Pattern**:
+
    - `addEntryInternal()` calls `addHistoryEntry()`
    - `deleteAllInternal()` calls `deleteAllHistory()`
    - `deleteByMonitorIdInternal()` calls `deleteHistoryByMonitorId()`
@@ -46,6 +48,7 @@ These are utility functions designed to be called from repository internal metho
 **Assessment**: **VALID**
 
 **Analysis**: Current documentation is minimal. Should include:
+
 - `@param` for all parameters
 - `@returns` for return values (though most are void)
 - `@throws` for error conditions
@@ -63,7 +66,8 @@ These are utility functions designed to be called from repository internal metho
 
 **Assessment**: **PARTIALLY VALID**
 
-**Analysis**: 
+**Analysis**:
+
 - SQLite does support `LIMIT -1` to mean "no limit"
 - Combined with `OFFSET ?`, this gets all rows after the first `limit` entries
 - This is actually correct SQL for the intended behavior
@@ -98,24 +102,30 @@ During review, I identified these additional issues:
 ## Recommendations
 
 ### 1. Enhance TSDoc Documentation
+
 Add comprehensive TSDoc comments following project standards.
 
 ### 2. Improve Error Context
+
 Ensure all error messages include sufficient context for debugging.
 
 ### 3. Add Input Validation
+
 Validate parameters to prevent runtime errors.
 
 ### 4. Document Transaction Requirements
+
 Clearly document that these functions require transaction context.
 
 ## Conclusion
 
 **Valid Claims**: 2 out of 10 claims were valid
+
 - Missing TSDoc documentation
 - Inline comment should be part of TSDoc
 
 **False Positives**: 8 out of 10 claims were false positives
+
 - Async/transaction claims misunderstand the architectural pattern
 - SQL and empty IN() clause issues are already handled
 
@@ -126,17 +136,20 @@ The functions follow the correct architectural pattern for internal utility func
 **IMPLEMENTED**: The following improvements have been made to address valid concerns:
 
 ### 1. Enhanced TSDoc Documentation ✅
+
 - Added comprehensive `@param`, `@returns`, `@throws` documentation to all functions
 - Documented transaction context and usage patterns with `@remarks`
 - Added `@internal` tags to clarify intended usage scope
 - Improved domain contract documentation (StatusHistory.status validation)
 
 ### 2. Improved Comments ✅
+
 - Replaced generic "StatusHistoryType" comment with domain-specific documentation
 - Enhanced algorithm documentation in `pruneHistoryForMonitor()`
 - Added performance and safety notes in bulk operations
 
 ### 3. Code Quality Improvements ✅
+
 - Better structured documentation explains the repository pattern context
 - Clear warnings about destructive operations (`deleteAllHistory`)
 - Enhanced error context for debugging

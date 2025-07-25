@@ -2,11 +2,12 @@
 
 **File:** `electron/utils/database/historyLimitManager.ts`  
 **Review Date:** July 24, 2025  
-**Reviewer:** AI Agent  
+**Reviewer:** AI Agent
 
 ## Claims Analysis
 
 ### Claim 1: Missing await on setInternal
+
 **Status:** ❌ **FALSE POSITIVE**  
 **Description:** "The call to repositories.settings.setInternal is not awaited, but the method signature for setInternal in the repository pattern should be async."
 
@@ -14,7 +15,8 @@
 
 **Action:** No change needed - this is the correct usage pattern.
 
-### Claim 2: Missing await on pruneAllHistoryInternal  
+### Claim 2: Missing await on pruneAllHistoryInternal
+
 **Status:** ❌ **FALSE POSITIVE**  
 **Description:** "The call to repositories.history.pruneAllHistoryInternal is not awaited, but the repository pattern expects async mutation methods."
 
@@ -23,6 +25,7 @@
 **Action:** No change needed - this is the correct usage pattern.
 
 ### Claim 3: Transaction function not marked as async
+
 **Status:** ❌ **FALSE POSITIVE**  
 **Description:** "The function passed to executeTransaction is not marked as async, but it contains calls that should be awaited."
 
@@ -31,6 +34,7 @@
 **Action:** No change needed.
 
 ### Claim 4: Missing documentation for minimum limit logic
+
 **Status:** ✅ **ALREADY FIXED**  
 **Description:** "The logic for enforcing a minimum limit of 10 is not documented in the TSDoc."
 
@@ -39,6 +43,7 @@
 **Action:** No additional changes needed.
 
 ### Claim 5: Missing documentation for setHistoryLimit callback
+
 **Status:** ✅ **VALID ISSUE**  
 **Description:** "The setHistoryLimit callback parameter in SetHistoryLimitParams is not documented with its expected side effects."
 

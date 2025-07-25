@@ -41,9 +41,10 @@ import type { MonitorFieldDefinition } from "@shared/types";
 
 import { useCallback, useEffect, useState } from "react";
 
+import type { MonitorTypeConfig } from "../utils/monitorTypeHelper";
+
 import logger from "../services/logger";
 import { safeExtractIpcData } from "../types/ipc";
-import type { MonitorTypeConfig } from "../utils/monitorTypeHelper";
 
 /**
  * Result interface for the useMonitorFields hook

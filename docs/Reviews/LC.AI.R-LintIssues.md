@@ -2,11 +2,12 @@
 
 **Files:** `src/components/common/HistoryChart.tsx`, `electron/services/window/WindowService.ts`, `src/hooks/site/useSiteAnalytics.ts`  
 **Review Date:** July 24, 2025  
-**Reviewer:** AI Agent  
+**Reviewer:** AI Agent
 
 ## Lint Issues Analysis
 
 ### Issue 1: HistoryChart.tsx - Array#reverse() usage
+
 **Status:** ✅ **VALID ISSUE**  
 **Description:** "Use `Array#toReversed()` instead of `Array#reverse()`" at line 56.
 
@@ -15,6 +16,7 @@
 **Action:** Replace `.reverse()` with `.toReversed()` for better immutability practices.
 
 ### Issue 2: WindowService.ts - Ternary preference
+
 **Status:** ✅ **VALID ISSUE**  
 **Description:** "This `if` statement can be replaced by a ternary expression" at line 192.
 
@@ -23,6 +25,7 @@
 **Action:** Review and convert if statement to ternary if appropriate.
 
 ### Issue 3: useSiteAnalytics.ts - Array#reverse() usage
+
 **Status:** ✅ **VALID ISSUE**  
 **Description:** "Use `Array#toReversed()` instead of `Array#reverse()`" at line 176.
 

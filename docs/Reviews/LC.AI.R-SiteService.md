@@ -2,7 +2,7 @@
 
 **File**: `electron/services/site/SiteService.ts`  
 **Date**: July 23, 2025  
-**Reviewer**: AI Assistant  
+**Reviewer**: AI Assistant
 
 ## Executive Summary
 
@@ -13,8 +13,10 @@ Reviewed 4 low confidence AI claims for SiteService.ts. **ALL 4 claims are VALID
 ### ✅ **VALID CLAIMS**
 
 #### **Claim #1**: VALID - Missing withErrorHandling for deleteSiteWithRelatedData
+
 **Issue**: Method doesn't use `withErrorHandling` as required by project conventions  
 **Analysis**: Line 40 shows `deleteSiteWithRelatedData` is a mutation operation but doesn't follow the project's error handling pattern:
+
 ```typescript
 public async deleteSiteWithRelatedData(identifier: string): Promise<boolean> {
     return this.databaseService.executeTransaction(async () => {
@@ -22,14 +24,17 @@ public async deleteSiteWithRelatedData(identifier: string): Promise<boolean> {
     });
 }
 ```
+
 Project conventions require all mutation operations to use `withErrorHandling`.  
 **Status**: NEEDS FIX - Add withErrorHandling wrapper
 
 #### **Claim #2**: VALID - Incomplete Error Handling for Related Data Deletions
+
 **Issue**: Method doesn't check if related deletions succeed, potentially causing inconsistent state  
 **Analysis**: In `deleteSiteWithRelatedData`, the method:
+
 - Deletes history for each monitor (line 46)
-- Deletes monitors (line 50) 
+- Deletes monitors (line 50)
 - Deletes site (line 53)
 - Only returns the result of the final site deletion
 
@@ -37,8 +42,10 @@ If history or monitor deletions fail but site deletion succeeds, the state becom
 **Status**: NEEDS FIX - Check all deletion results and handle failures
 
 #### **Claim #3**: VALID - Code Duplication for Default Site Name
+
 **Issue**: `"Unnamed Site"` default repeated in multiple places  
 **Analysis**: Default value appears in:
+
 - Line 80: `name: siteRow.name ?? "Unnamed Site"`
 - Line 114: `name: siteRow.name ?? "Unnamed Site"`
 
@@ -46,13 +53,16 @@ This duplication violates DRY principle and could lead to inconsistencies.
 **Status**: NEEDS FIX - Centralize default value
 
 #### **Claim #4**: VALID - Performance Issue with Sequential History Fetches
+
 **Issue**: `getAllWithDetails` uses sequential awaits for history fetches  
 **Analysis**: Lines 106-108 show sequential processing:
+
 ```typescript
 for (const monitor of monitors) {
-    monitor.history = await this.historyRepository.findByMonitorId(monitor.id);
+ monitor.history = await this.historyRepository.findByMonitorId(monitor.id);
 }
 ```
+
 For sites with many monitors, this creates a chain of sequential database calls instead of parallelizing them.  
 **Status**: NEEDS FIX - Implement parallel fetching for better performance
 
@@ -66,18 +76,19 @@ For sites with many monitors, this creates a chain of sequential database calls 
 ## 📋 **IMPLEMENTATION PLAN**
 
 ### 1. **Add withErrorHandling and Improved Error Checking**
+
 ```typescript
 import { withErrorHandling } from "../../../shared/utils/errorHandling";
 
 /**
  * Delete a site and all its related data (monitors and history).
  * Uses transaction to ensure atomicity.
- * 
+ *
  * @param identifier - Site identifier to delete
  * @returns Promise resolving to true if all deletions succeeded
- * 
+ *
  * @throws {Error} When any deletion operation fails
- * 
+ *
  * @remarks
  * Follows project conventions by using withErrorHandling for proper
  * error logging and re-throwing. All related data is deleted in a
@@ -126,8 +137,8 @@ public async deleteSiteWithRelatedData(identifier: string): Promise<boolean> {
                 return true;
             });
         },
-        { 
-            logger, 
+        {
+            logger,
             operationName: `Delete site with related data: ${identifier}`,
             context: { siteIdentifier: identifier }
         }
@@ -136,6 +147,7 @@ public async deleteSiteWithRelatedData(identifier: string): Promise<boolean> {
 ```
 
 ### 2. **Centralize Default Site Name**
+
 ```typescript
 /**
  * Default name for sites when no name is provided.
@@ -144,7 +156,7 @@ private static readonly DEFAULT_SITE_NAME = "Unnamed Site";
 
 /**
  * Get the display name for a site, using default if none provided.
- * 
+ *
  * @param siteName - The site name from database
  * @returns Display name with fallback to default
  */
@@ -154,13 +166,14 @@ private getDisplayName(siteName: string | null | undefined): string {
 ```
 
 ### 3. **Optimize Performance with Parallel History Fetching**
+
 ```typescript
 /**
  * Get all sites with their related monitors and history data.
  * This replaces the complex logic that was previously in SiteRepository.
- * 
+ *
  * @returns Promise resolving to array of sites with complete data
- * 
+ *
  * @remarks
  * Optimized to fetch monitor history in parallel for better performance.
  * Uses Promise.all to avoid sequential database calls.
@@ -198,9 +211,9 @@ public async getAllWithDetails(): Promise<Site[]> {
             logger.info(`[SiteService] Loaded ${sites.length} sites with complete details`);
             return sites;
         },
-        { 
-            logger, 
-            operationName: "Get all sites with details" 
+        {
+            logger,
+            operationName: "Get all sites with details"
         }
     );
 }
@@ -208,7 +221,7 @@ public async getAllWithDetails(): Promise<Site[]> {
 /**
  * Find a site by identifier with all related monitors and history data.
  * This replaces the complex logic that was previously in SiteRepository.
- * 
+ *
  * @param identifier - Site identifier to find
  * @returns Promise resolving to site with details or undefined if not found
  */
@@ -250,8 +263,8 @@ public async findByIdentifierWithDetails(identifier: string): Promise<Site | und
             logger.debug(`[SiteService] Found site ${identifier} with ${monitors.length} monitors`);
             return site;
         },
-        { 
-            logger, 
+        {
+            logger,
             operationName: `Find site by identifier: ${identifier}`,
             context: { siteIdentifier: identifier }
         }
@@ -260,10 +273,11 @@ public async findByIdentifierWithDetails(identifier: string): Promise<Site | und
 ```
 
 ### 4. **Enhanced Input Validation**
+
 ```typescript
 /**
  * Validate site identifier parameter.
- * 
+ *
  * @param identifier - Site identifier to validate
  * @throws {Error} When identifier is invalid
  */
@@ -271,11 +285,11 @@ private validateSiteIdentifier(identifier: string): void {
     if (!identifier) {
         throw new Error("Site identifier is required");
     }
-    
+
     if (typeof identifier !== 'string') {
         throw new Error(`Site identifier must be a string, got: ${typeof identifier}`);
     }
-    
+
     if (identifier.trim().length === 0) {
         throw new Error("Site identifier cannot be empty");
     }
@@ -283,11 +297,13 @@ private validateSiteIdentifier(identifier: string): void {
 ```
 
 ## 🎯 **RISK ASSESSMENT**
+
 - **High Risk**: Missing error handling could cause silent failures and data inconsistency
 - **Medium Risk**: Performance issues will worsen with scale
 - **Low Risk**: Code duplication is maintainability issue
 
 ## 📊 **QUALITY SCORE**: 5/10 → 9/10
+
 - **Error Handling**: 3/10 → 9/10 (proper withErrorHandling and validation)
 - **Performance**: 4/10 → 8/10 (parallel processing implementation)
 - **Code Quality**: 6/10 → 9/10 (eliminated duplication, better structure)
