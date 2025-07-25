@@ -7,9 +7,26 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[3dbd3fd](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3dbd3fdc0880ecbd39701e75c3f2fe6b28cd475c)...
-[736c481](https://github.com/Nick2bad4u/Uptime-Watcher/commit/736c481a4ba7cde0d314544f1e697db74c115e05)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/3dbd3fdc0880ecbd39701e75c3f2fe6b28cd475c...736c481a4ba7cde0d314544f1e697db74c115e05))
+[[2738df8](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2738df87a4d7ee6c7bdb7e177dc3789650b84751)...
+[2738df8](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2738df87a4d7ee6c7bdb7e177dc3789650b84751)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/2738df87a4d7ee6c7bdb7e177dc3789650b84751...2738df87a4d7ee6c7bdb7e177dc3789650b84751))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 8.5.0 [`(2738df8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2738df87a4d7ee6c7bdb7e177dc3789650b84751)
+
+
+
+
+
+
+## [8.5.0] - 2025-07-24
+
+
+[[46bbcf7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/46bbcf7c05ca47f4eb98d35723fe116fbd3ef3f2)...
+[679f54e](https://github.com/Nick2bad4u/Uptime-Watcher/commit/679f54e8314294e2cc05eeedf5a66a07e55f81a9)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/46bbcf7c05ca47f4eb98d35723fe116fbd3ef3f2...679f54e8314294e2cc05eeedf5a66a07e55f81a9))
 
 
 ### 📦 Dependencies
@@ -18,6 +35,52 @@ All notable changes to this project will be documented in this file.
 
 
 - [dependency] Update version 8.4.0 [`(3dbd3fd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3dbd3fdc0880ecbd39701e75c3f2fe6b28cd475c)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(679f54e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/679f54e8314294e2cc05eeedf5a66a07e55f81a9)
+
+
+
+### � Documentation
+
+- 📝 [docs] Improve documentation, accessibility, and code standards
+
+- Updates and expands code documentation across core managers, services, repositories, and components for clarity, maintainability, and API usage.
+- Enhances accessibility and browser compatibility by adding reduced motion coverage and CSS fallbacks for modern features.
+- Refactors event handler and prop naming to align with React conventions and best practices.
+- Standardizes chart time range options and improves type safety for analytics components.
+- Unifies loading state management and removes misleading comments for better code quality.
+- Improves test coverage and updates tests for renamed props.
+- Refines user experience with improved empty states, filter messaging, and icon usage.
+- Adds architectural notes and rationale to support long-term maintainability and developer onboarding.
+Relates to ongoing codebase quality and accessibility initiatives. [`(433d6d2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/433d6d22725fe137a449bc3bf62d5170ebd62d5d)
+
+
+- 📝 [docs] Clarifies TSDoc improvement checklist instructions
+
+- Expands guidelines to require thorough review and updating of all TSDoc comments, ensuring documentation accurately reflects code behavior, types, parameters, return values, and exceptions.
+- Stresses comprehensive coverage for all relevant code constructs and clarifies use of key tags, including discouraging the use of `@property` in favor of `@param`.
+- Improves clarity for contributors, promoting higher documentation standards. [`(121e08e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/121e08ead1c3dd85a484dcd183c167d7dad6237b)
+
+
+- 📝 [docs] Standardize TSDoc and clarify type safety, error handling, and UI docs
+
+- Refines TSDoc comments across backend, shared, and frontend modules to enforce project documentation standards and improve clarity for maintainers and onboarding.
+- Enhances documentation on type safety, runtime validation, and error handling throughout form components and domain types, aligning with stricter TypeScript usage.
+- Adds comprehensive remarks, examples, and parameter details, especially for component props, event payloads, and exported APIs.
+- Clarifies memoization strategies and prop stability requirements for React components to support performance optimizations.
+- Documents UI constraints, ARIA accessibility, and CSS variable usage for consistency and maintainability.
+- Fixes ambiguous or missing comments on domain models, utility functions, and system-level APIs, aiding future refactoring and debugging.
+Relates to internal documentation and code quality improvement tasks. [`(46bbcf7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/46bbcf7c05ca47f4eb98d35723fe116fbd3ef3f2)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v8.4.0 [skip ci] [`(a1abb29)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a1abb29bec73f703cca690c29b3f885f8275ef04)
 
 
 
