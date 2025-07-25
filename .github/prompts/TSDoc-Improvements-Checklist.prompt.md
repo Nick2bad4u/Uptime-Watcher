@@ -10,6 +10,8 @@ Look at this current file and systematically improve and standardize all TSDoc c
 
 Make sure you update ALL things that should have a TSDoc comment, even if it is not currently documented. This includes functions, classes, interfaces, types, and any other relevant code constructs. Do not just do a few, do the ENTIRE file.
 
+Use proper linking where available, and ensure that all TSDoc comments are clear, concise, and follow the project's TSDoc standards. Example "@param error - The {@link AxiosError} instance containing request/response details."
+
 ## Requirements
 
 - **Accuracy First:**  
@@ -19,7 +21,7 @@ Make sure you update ALL things that should have a TSDoc comment, even if it is 
   Use **only** the standard TSDoc base tags as detailed in [/docs/TSDoc/TSDoc-Base-Tags.md](../../docs/TSDoc/TSDoc-Base-Tags.md).
   **Do not use any tags that are not explicitly listed in the TSDoc base tags section below.**  
   Ensure that tags are used correctly and consistently.
-  Make sure that the TSDoc comments are high quality, but not overly verbose just for the sake of verbosity.
+  Make sure that the TSDoc comments are high quality.
 
 - **Key Tag Emphasis:**  
   Pay special attention to the following tags. Add them wherever appropriate:

@@ -1,22 +1,15 @@
 /**
- * Utility functions for performing port checks with retry logic.
+ * Provides retry-enabled TCP port connectivity checks with exponential backoff and standardized error handling.
  *
  * @remarks
- * This module provides high-level port checking with sophisticated retry mechanisms.
- * It builds on the basic port checking in {@link portChecker.ts} by adding:
- * - Exponential backoff retry logic via {@link withOperationalHooks}
- * - Development mode debug logging
- * - Standardized error handling and formatting
- * - Timing preservation across retry attempts
- *
- * The retry logic is configurable through the {@link RETRY_BACKOFF} constants and
- * integrates with the operational hooks system for consistent error handling
- * and event emission across the monitoring system.
- *
- * For single port checks without retry logic, use {@link portChecker.ts} directly.
+ * This module builds on the basic port checking utilities by adding configurable retry logic, exponential backoff,
+ * and development-mode debug logging. It integrates with the operational hooks system for consistent error handling
+ * and event emission across the monitoring system. For single port checks without retry logic, use {@link portChecker.ts} directly.
  * For error handling utilities, see {@link portErrorHandling.ts}.
  *
  * @see {@link performPortCheckWithRetry}
+ * @see {@link portChecker.ts}
+ * @see {@link portErrorHandling.ts}
  * @public
  */
 
@@ -35,7 +28,7 @@ import { handlePortCheckError } from "./portErrorHandling";
  * This function wraps {@link performSinglePortCheck} with retry logic using {@link withOperationalHooks}.
  * It attempts to connect to the specified host and port, retrying on failure up to `maxRetries` times
  * (for a total of `maxRetries + 1` attempts). Exponential backoff is applied between attempts.
- * Debug logging is enabled in development mode. Errors are standardized via {@link handlePortCheckError}.
+ * Debug logging is enabled in development mode. If all attempts fail, a standardized error result is returned via {@link handlePortCheckError}.
  *
  * @example
  * ```typescript
@@ -50,8 +43,7 @@ import { handlePortCheckError } from "./portErrorHandling";
  * @param port - Port number to test connectivity.
  * @param timeout - Maximum time to wait for each connection attempt in milliseconds.
  * @param maxRetries - Number of additional retry attempts after initial failure (0 = try once only).
- * @returns A promise resolving to a {@link MonitorCheckResult} containing port details, response time, and status.
- * @throws Error - If all attempts fail, returns a standardized error result via {@link handlePortCheckError}.
+ * @returns A promise that resolves to a {@link MonitorCheckResult} containing port details, response time, and status. If all attempts fail, the result is a standardized error result.
  * @see {@link withOperationalHooks}
  * @see {@link performSinglePortCheck}
  * @see {@link handlePortCheckError}

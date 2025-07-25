@@ -4,21 +4,31 @@ import { getMonitorServiceFactory, getRegisteredMonitorTypes, isValidMonitorType
 import { IMonitorService, MonitorConfig } from "./types";
 
 /**
- * Factory for creating and managing monitor service instances.
+ * Factory for creating, caching, and managing monitor service instances for all registered monitor types.
  *
  * @remarks
- * - Uses the registry's service factories for automation.
- * - Maintains singleton instances per monitor type.
- * - Provides configuration management for all monitor services.
+ * This class provides a singleton instance per monitor type, using the registry's service factories for instantiation.
+ * It ensures that only one instance per monitor type exists at a time, and provides configuration management for all monitor services.
+ * All monitor type validation and service instantiation is delegated to the monitor type registry.
+ *
+ * @example
+ * ```typescript
+ * // Retrieve a monitor service instance for HTTP
+ * const httpMonitor = MonitorFactory.getMonitor("http", { timeout: 5000 });
+ * // Update configuration for all monitor services
+ * MonitorFactory.updateConfig({ timeout: 10000 });
+ * // Clear all cached monitor service instances
+ * MonitorFactory.clearCache();
+ * ```
  *
  * @public
  */
 export class MonitorFactory {
     /**
-     * Cache of monitor service instances, keyed by monitor type.
+     * Cache of monitor service instances, keyed by monitor type string.
      *
      * @remarks
-     * Singleton pattern: only one instance per monitor type.
+     * Implements the singleton pattern: only one instance per monitor type is created and reused.
      *
      * @internal
      * @readonly
@@ -29,7 +39,8 @@ export class MonitorFactory {
      * Clears all cached monitor service instances.
      *
      * @remarks
-     * Useful for testing or reloading configuration.
+     * Useful for testing, reloading configuration, or resetting the monitor service state.
+     * After calling this method, new service instances will be created on demand.
      *
      * @example
      * ```typescript
@@ -45,7 +56,10 @@ export class MonitorFactory {
     /**
      * Retrieves all available monitor types from the registry.
      *
-     * @returns Array of registered monitor type strings.
+     * @remarks
+     * This method returns all monitor types currently registered in the system, including both built-in and dynamically registered types.
+     *
+     * @returns An array of registered monitor type strings.
      *
      * @example
      * ```typescript
@@ -59,25 +73,30 @@ export class MonitorFactory {
     }
 
     /**
-     * Gets the monitor service instance for a given monitor type.
+     * Retrieves the monitor service instance for a given monitor type, creating it if necessary.
      *
      * @remarks
      * - Validates the monitor type against the registry.
-     * - Uses singleton pattern: returns cached instance if available.
-     * - If a config is provided, updates the instance's configuration if forced or if the instance is new.
-     * - Throws if monitor type is unsupported or if no factory is registered.
+     * - Uses the singleton pattern: returns the cached instance if available, otherwise creates a new one.
+     * - If a configuration is provided, updates the instance's configuration if forced or if the instance is new.
+     * - Throws if the monitor type is unsupported or if no factory is registered for the type.
      *
-     * @param type - The monitor type string.
-     * @param config - Optional monitor configuration to apply.
-     * @param forceConfigUpdate - If true, updates config on existing instance.
+     * @param type - The monitor type string. Must be a valid registered type.
+     * @param config - Optional monitor configuration to apply to the instance.
+     * @param forceConfigUpdate - If true, updates the configuration on an existing instance even if already set.
      * @returns The monitor service instance for the specified type.
-     * @throws Error if monitor type is not supported or no factory is registered.
+     *
+     * @throws Error If the monitor type is not supported or no service factory is registered for the type.
      *
      * @example
      * ```typescript
      * const monitor = MonitorFactory.getMonitor("http", { timeout: 5000 });
      * ```
      *
+     * @see {@link IMonitorService}
+     * @see {@link MonitorConfig}
+     * @see {@link getMonitorServiceFactory}
+     * @see {@link isValidMonitorType}
      * @public
      */
     public static getMonitor(type: MonitorType, config?: MonitorConfig, forceConfigUpdate = false): IMonitorService {
@@ -109,6 +128,7 @@ export class MonitorFactory {
             try {
                 instance.updateConfig(config);
             } catch (error) {
+                // Log and continue; do not throw from config update
                 logger.warn(`Failed to update config for monitor type ${type}`, { error });
             }
         }
@@ -117,20 +137,22 @@ export class MonitorFactory {
     }
 
     /**
-     * Updates configuration for all initialized monitor service instances.
+     * Updates configuration for all currently initialized monitor service instances.
      *
      * @remarks
-     * - Applies the provided configuration to all currently cached monitor instances.
-     * - Only affects already-created instances; future instances require explicit config.
-     * - Type-specific settings in config may be ignored by some monitor types.
+     * - Applies the provided configuration to all cached monitor service instances.
+     * - Only affects already-created instances; future instances require explicit config on creation.
+     * - Type-specific settings in the config object may be ignored by some monitor types if not applicable.
+     * - Errors during config update are logged and do not interrupt updates for other instances.
      *
-     * @param config - Monitor configuration object containing settings to apply.
+     * @param config - Monitor configuration object containing settings to apply to all monitor services.
      *
      * @example
      * ```typescript
      * MonitorFactory.updateConfig({ timeout: 10000 });
      * ```
      *
+     * @see {@link MonitorConfig}
      * @public
      */
     public static updateConfig(config: MonitorConfig): void {
@@ -139,6 +161,7 @@ export class MonitorFactory {
             try {
                 instance.updateConfig(config);
             } catch (error) {
+                // Log and continue; do not throw from config update
                 logger.warn("Failed to update config for monitor instance", { error });
             }
         }

@@ -6,23 +6,26 @@ import { DatabaseService } from "./DatabaseService";
 import { rowsToSites, rowToSite, type SiteRow } from "./utils/siteMapper";
 
 /**
- * @public
- * Dependencies required for constructing a {@link SiteRepository}.
+ * Defines the dependencies required by the {@link SiteRepository} for managing site data persistence.
  *
  * @remarks
- * Used to inject the database service for transactional operations.
+ * Used to inject the {@link DatabaseService} for transactional operations. This interface is used for dependency injection.
+ * @public
  */
 export interface SiteRepositoryDependencies {
-    /** Database service for transactional operations. */
+    /**
+     * The database service used for transactional operations.
+     * @readonly
+     */
     databaseService: DatabaseService;
 }
 
 /**
- * @internal
  * Standard site data defaults for normalization across repository operations.
  *
  * @remarks
- * Used to ensure consistent fallback values for site properties.
+ * Used to ensure consistent fallback values for site properties. This constant is internal to the repository and not exported.
+ * @internal
  */
 const SITE_DEFAULTS = {
     MONITORING: true,
@@ -30,11 +33,11 @@ const SITE_DEFAULTS = {
 } as const;
 
 /**
- * @internal
  * Common SQL queries for site persistence operations.
  *
  * @remarks
- * Centralizes query strings for maintainability and consistency.
+ * Centralizes query strings for maintainability and consistency. This constant is internal to the repository and not exported.
+ * @internal
  */
 const SITE_QUERIES = {
     DELETE_ALL: "DELETE FROM sites",
@@ -361,15 +364,13 @@ export class SiteRepository {
     }
 
     /**
-     * Internal method to create or update a site within an existing transaction.
+     * Creates or updates a site within an existing transaction context.
      *
+     * @param db - The database connection (must be within an active transaction).
+     * @param site - Site data to create or update.
      * @remarks
      * - Must be called within an active transaction context.
      * - Applies default values for missing fields.
-     *
-     * @param db - Database connection (must be within active transaction).
-     * @param site - Site data to create or update.
-     * @returns void
      */
     public upsertInternal(db: Database, site: Pick<SiteRow, "identifier" | "monitoring" | "name">): void {
         // Apply consistent data normalization

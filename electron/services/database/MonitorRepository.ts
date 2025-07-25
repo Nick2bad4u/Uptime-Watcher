@@ -321,10 +321,10 @@ export class MonitorRepository {
     }
 
     /**
-     * Finds a monitor by its identifier.
+     * Finds a monitor by its unique identifier.
      *
-     * @param monitorId - The monitor ID to find.
-     * @returns Promise resolving to the monitor object or undefined if not found.
+     * @param monitorId - The unique identifier of the monitor to find.
+     * @returns A promise resolving to the monitor object, or `undefined` if not found.
      * @throws Error if the database operation fails.
      * @remarks
      * Uses a direct database query and maps the result to a monitor object.
@@ -352,8 +352,8 @@ export class MonitorRepository {
     /**
      * Finds all monitors for a specific site.
      *
-     * @param siteIdentifier - Site identifier to find monitors for.
-     * @returns Promise resolving to array of monitors for the site.
+     * @param siteIdentifier - The site identifier to find monitors for.
+     * @returns A promise resolving to an array of monitor objects.
      * @throws Error if the database operation fails.
      * @remarks
      * Uses a direct database query and maps the results to monitor objects.
@@ -375,9 +375,9 @@ export class MonitorRepository {
     }
 
     /**
-     * Gets all monitor IDs.
+     * Gets all monitor IDs in the database.
      *
-     * @returns Promise resolving to array of monitor ID objects.
+     * @returns A promise resolving to an array of objects with monitor IDs.
      * @throws Error if the database operation fails.
      * @remarks
      * Returns all monitor IDs as objects with an `id` property.
@@ -395,11 +395,11 @@ export class MonitorRepository {
     }
 
     /**
-     * Updates an existing monitor.
+     * Updates a monitor's configuration.
      *
-     * @param monitorId - The monitor ID to update.
+     * @param monitorId - The unique identifier of the monitor to update.
      * @param monitor - Partial monitor configuration data to update.
-     * @returns Promise that resolves when the monitor is updated.
+     * @returns A promise that resolves when the update is complete.
      * @throws Error if the database operation fails.
      * @remarks
      * Only provided fields are updated. Uses a transaction for atomicity.
@@ -423,15 +423,14 @@ export class MonitorRepository {
     }
 
     /**
-     * Internal method to update an existing monitor within an existing transaction.
+     * Updates a monitor's configuration within an existing transaction context.
      *
-     * @param db - Database connection (must be within active transaction).
-     * @param monitorId - The monitor ID to update.
+     * @param db - The database connection (must be within an active transaction).
+     * @param monitorId - The unique identifier of the monitor to update.
      * @param monitor - Partial monitor configuration data to update.
-     * @returns void
      * @throws Error if the update query fails.
      * @remarks
-     * Only provided fields are updated. Converts camelCase to snake_case for DB columns.
+     * Only provided fields are updated. Converts camelCase to snake_case for DB columns. Use this method only when already within a transaction context.
      */
     public updateInternal(db: Database, monitorId: string, monitor: Partial<Site["monitors"][0]>): void {
         if (isDev()) {

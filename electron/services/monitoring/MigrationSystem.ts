@@ -2,9 +2,9 @@
  * Migration system for monitor types.
  *
  * @remarks
- * Provides a registry, orchestrator, and version manager for monitor configuration migrations.
- * All migrations are registered per monitor type and applied in sequence.
- * Designed for extensibility and maintainability.
+ * Provides a registry, orchestrator, and version manager for monitor configuration migrations. All migrations are registered per monitor type and applied in sequence. Designed for extensibility, maintainability, and robust error handling.
+ *
+ * @public
  */
 
 import { logger } from "../../utils/logger";
@@ -13,7 +13,7 @@ import { logger } from "../../utils/logger";
  * Describes a migration rule for a monitor type.
  *
  * @remarks
- * Each migration rule transforms monitor configuration data from one version to another.
+ * Each migration rule transforms monitor configuration data from one version to another. Used by the migration system to upgrade or modify monitor configuration schemas.
  *
  * @example
  * ```typescript
@@ -31,26 +31,41 @@ import { logger } from "../../utils/logger";
 export interface MigrationRule {
     /**
      * Human-readable description of the migration.
+     *
+     * @remarks
+     * Used for logging and diagnostics.
      */
     description: string;
     /**
      * Source version for the migration.
+     *
+     * @remarks
+     * The version string this migration starts from (e.g., "1.0.0").
      */
     fromVersion: string;
     /**
      * Indicates if the migration is breaking.
+     *
+     * @remarks
+     * If true, migration may require user intervention or data review.
      */
     isBreaking: boolean;
     /**
      * Target version for the migration.
+     *
+     * @remarks
+     * The version string this migration upgrades to (e.g., "1.1.0").
      */
     toVersion: string;
     /**
      * Transformation function to migrate data.
      *
+     * @remarks
+     * Receives the monitor configuration data and returns a Promise resolving to the transformed data. May throw if transformation fails or data is invalid.
+     *
      * @param data - The monitor configuration data to transform.
      * @returns A promise resolving to the transformed data.
-     * @throws May throw if transformation fails or data is invalid.
+     * @throws Throws if transformation fails or data is invalid.
      */
     transform: (data: Record<string, unknown>) => Promise<Record<string, unknown>>;
 }
@@ -59,37 +74,45 @@ export interface MigrationRule {
  * Tracks version information for a monitor type.
  *
  * @remarks
- * Used by {@link VersionManager} to record migration state.
+ * Used by {@link VersionManager} to record migration state and applied versions for each monitor type.
  *
  * @public
  */
 export interface VersionInfo {
     /**
      * Indicates if the version has been applied.
+     *
+     * @remarks
+     * True if the migration to this version has been completed.
      */
     applied: boolean;
     /**
      * Timestamp when the version was set.
+     *
+     * @remarks
+     * Milliseconds since epoch.
      */
     timestamp: number;
     /**
      * The version string.
+     *
+     * @remarks
+     * Semantic version string (e.g., "1.1.0").
      */
     version: string;
 }
 
 /**
- * Orchestrates migration of monitor configuration data.
+ * Orchestrates migration of monitor configuration data for a given monitor type.
  *
  * @remarks
- * Applies registered migration rules in sequence to upgrade monitor data.
- * Handles errors, warnings, and version updates.
+ * Applies registered migration rules in sequence to upgrade monitor data. Handles errors, warnings, and version updates. Used internally by the migration system and exposed via factory.
  *
  * @public
  */
 class MigrationOrchestrator {
     /**
-     * Constructs a MigrationOrchestrator.
+     * Constructs a new {@link MigrationOrchestrator}.
      *
      * @param registry - The migration registry instance.
      * @param versionManager - The version manager instance.
@@ -103,7 +126,7 @@ class MigrationOrchestrator {
      * Migrates monitor configuration data from one version to another.
      *
      * @remarks
-     * Applies all necessary migrations in order. Updates version state if successful.
+     * Applies all necessary migrations in order. Updates version state if successful. Returns a summary object with migration results, errors, and warnings. Throws only if orchestration fails unexpectedly (e.g., registry or version manager error).
      *
      * @param monitorType - The monitor type (e.g., "http", "port").
      * @param data - The monitor configuration data to migrate.
@@ -201,7 +224,7 @@ class MigrationOrchestrator {
  * Registry for migration rules per monitor type.
  *
  * @remarks
- * Stores and retrieves migration rules, calculates migration paths, and validates migration feasibility.
+ * Stores and retrieves migration rules, calculates migration paths, and validates migration feasibility. Used by orchestrators and migration utilities.
  *
  * @public
  */
@@ -210,6 +233,9 @@ class MigrationRegistry {
 
     /**
      * Determines if migration is possible between two versions for a monitor type.
+     *
+     * @remarks
+     * Returns true if a valid migration path exists, false otherwise. Does not mutate state.
      *
      * @param monitorType - The monitor type.
      * @param fromVersion - The source version.
@@ -229,7 +255,7 @@ class MigrationRegistry {
      * Calculates the migration path (sequence of rules) from one version to another.
      *
      * @remarks
-     * Throws if no valid path exists or if a circular path is detected.
+     * Throws if no valid path exists, a circular path is detected, or the path exceeds 100 steps. Used internally by orchestrators and for migration feasibility checks.
      *
      * @param monitorType - The monitor type.
      * @param fromVersion - The source version.
@@ -275,7 +301,7 @@ class MigrationRegistry {
      * Registers a migration rule for a monitor type.
      *
      * @remarks
-     * Rules are sorted by source version after registration.
+     * Rules are sorted by source version after registration. Throws if migration rules cannot be created for the monitor type.
      *
      * @param monitorType - The monitor type.
      * @param rule - The migration rule to register.
@@ -302,9 +328,13 @@ class MigrationRegistry {
     /**
      * Compares two semantic version strings.
      *
+     * @remarks
+     * Used for sorting migration rules and determining migration order.
+     *
      * @param a - First version string.
      * @param b - Second version string.
      * @returns -1 if a \< b, 1 if a \> b, 0 if equal.
+     * @internal
      */
     private compareVersions(a: string, b: string): number {
         const versionA = a.split(".").map(Number);
@@ -328,7 +358,7 @@ class MigrationRegistry {
  * Manages version state for monitor types.
  *
  * @remarks
- * Tracks applied versions and timestamps for each monitor type.
+ * Tracks applied versions and timestamps for each monitor type. Used by orchestrators and migration utilities to record and query migration state.
  *
  * @public
  */
@@ -338,7 +368,7 @@ class VersionManager {
     /**
      * Retrieves all version info for all monitor types.
      *
-     * @returns Map of monitor type to version info.
+     * @returns Map of monitor type to version info. Keys are monitor type strings, values are {@link VersionInfo} objects.
      */
     getAllVersions(): Map<string, VersionInfo> {
         return new Map(this.versions);
@@ -348,7 +378,7 @@ class VersionManager {
      * Gets the current version for a monitor type.
      *
      * @param monitorType - The monitor type.
-     * @returns The version string, or undefined if not set.
+     * @returns The version string, or undefined if not set for this monitor type.
      */
     getVersion(monitorType: string): string | undefined {
         return this.versions.get(monitorType)?.version;
@@ -371,6 +401,8 @@ class VersionManager {
      *
      * @param monitorType - The monitor type.
      * @param version - The version string to set.
+     * @remarks
+     * Updates the version info and timestamp for the given monitor type.
      */
     setVersion(monitorType: string, version: string): void {
         this.versions.set(monitorType, {
@@ -385,7 +417,7 @@ class VersionManager {
  * Singleton registry for monitor type migrations.
  *
  * @remarks
- * Use to register and retrieve migration rules for all monitor types.
+ * Use to register and retrieve migration rules for all monitor types. Shared across the application.
  *
  * @example
  * ```typescript
@@ -406,7 +438,7 @@ export const migrationRegistry = new MigrationRegistry();
  * Singleton manager for monitor type version tracking.
  *
  * @remarks
- * Use to query and update migration state for all monitor types.
+ * Use to query and update migration state for all monitor types. Shared across the application.
  *
  * @public
  */
@@ -416,7 +448,7 @@ export const versionManager = new VersionManager();
  * Factory for creating migration orchestrator instances.
  *
  * @remarks
- * Use for isolated migration workflows or testing.
+ * Use for isolated migration workflows or testing. Returns a new {@link MigrationOrchestrator} instance using the shared registry and version manager.
  *
  * @returns A new {@link MigrationOrchestrator} instance.
  *
@@ -435,7 +467,7 @@ export function createMigrationOrchestrator(): MigrationOrchestrator {
  * Example migration definitions for reference and testing.
  *
  * @remarks
- * Provides templates for common migration scenarios.
+ * Provides templates for common migration scenarios. These are not registered by default; register as needed for tests or new monitor types.
  *
  * @example
  * ```typescript

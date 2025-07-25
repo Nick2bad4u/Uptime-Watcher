@@ -6,6 +6,18 @@ import { MonitorCheckResult } from "../types";
 import { PORT_NOT_REACHABLE, PortCheckError } from "./portErrorHandling";
 
 /**
+ * TCP port connectivity check utilities for monitoring services.
+ *
+ * @remarks
+ * Provides low-level, single-attempt TCP port checking for use in monitor health checks. Measures precise response times and supplies detailed error information for retry and diagnostics. All database and event updates are handled outside this utility. For port checks with retry logic, see {@link portRetry.ts}.
+ *
+ * @see {@link performSinglePortCheck}
+ * @see {@link MonitorCheckResult}
+ * @see {@link PortCheckError}
+ * @public
+ */
+
+/**
  * Utility functions for performing port connectivity checks via TCP.
  *
  * @remarks
@@ -18,15 +30,12 @@ import { PORT_NOT_REACHABLE, PortCheckError } from "./portErrorHandling";
  */
 
 /**
- * Performs a single TCP port connectivity check without retry logic.
+ * Performs a single TCP port connectivity check to a specified host and port, without retry logic.
  *
  * @remarks
- * Uses the `is-port-reachable` library to test TCP connectivity to the specified port and host.
- * Measures response time using high-precision `performance.now()` timing. Debug logging is enabled
- * in development mode for troubleshooting.
+ * Uses the {@link "is-port-reachable"} library to test TCP connectivity to the given host and port, measuring response time with high-precision `performance.now()`. Debug logging is enabled in development mode. This function does not mutate state or trigger events; it is intended for use within repository or service layers that handle orchestration and event propagation.
  *
- * On successful connection, returns a {@link MonitorCheckResult} with status `"up"` and actual response time.
- * On connection failure, throws a {@link PortCheckError} with timing information to support retry mechanisms.
+ * On success, resolves to a {@link MonitorCheckResult} with status `"up"` and the measured response time. On failure, throws a {@link PortCheckError} containing the error message and response time for use in retry or error handling logic.
  *
  * @example
  * ```typescript
@@ -40,13 +49,13 @@ import { PORT_NOT_REACHABLE, PortCheckError } from "./portErrorHandling";
  * }
  * ```
  *
- * @param host - Target hostname or IP address to check.
- * @param port - Port number to test connectivity.
- * @param timeout - Maximum time to wait for connection in milliseconds.
- * @returns A promise resolving to a {@link MonitorCheckResult} containing port details, response time, and status.
- * @throws {@link PortCheckError} When the port is not reachable, includes response time for retry logic.
- * @see {@link PortCheckError}
+ * @param host - The target hostname or IP address to check (e.g., "localhost", "192.168.1.1").
+ * @param port - The TCP port number to test for connectivity.
+ * @param timeout - The maximum time to wait for a connection, in milliseconds.
+ * @returns A promise that resolves to a {@link MonitorCheckResult} containing port details, response time, and status.
+ * @throws {@link PortCheckError} Thrown if the port is not reachable within the timeout, with response time included for diagnostics and retry logic.
  * @see {@link MonitorCheckResult}
+ * @see {@link PortCheckError}
  * @public
  */
 export async function performSinglePortCheck(host: string, port: number, timeout: number): Promise<MonitorCheckResult> {

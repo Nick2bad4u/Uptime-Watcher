@@ -8,50 +8,85 @@ import { getAllMonitorTypeConfigs, getMonitorTypeConfig, validateMonitorData } f
 import { AutoUpdaterService } from "../updater/AutoUpdaterService";
 
 /**
- * Structure for the result returned by the `validate-monitor-data` IPC handler.
+ * Result structure for monitor data validation via IPC.
  *
  * @remarks
- * Used to communicate monitor validation results between main and renderer processes.
+ * Used to communicate monitor validation results between main and renderer processes. Contains errors, warnings, metadata, and success status.
+ *
+ * @example
+ * ```typescript
+ * const result: MonitorValidationResult = await window.electronAPI.invoke("validate-monitor-data", type, data);
+ * if (!result.success) {
+ *   // handle errors
+ * }
+ * ```
  *
  * @public
  */
 interface MonitorValidationResult {
-    /** List of validation errors encountered. */
+    /**
+     * List of validation errors encountered during monitor data validation.
+     * @readonly
+     */
     errors: string[];
-    /** Additional metadata produced during validation. */
+    /**
+     * Additional metadata produced during validation.
+     * @readonly
+     */
     metadata: Record<string, unknown>;
-    /** Indicates if validation succeeded. */
+    /**
+     * Indicates if validation succeeded.
+     * @readonly
+     */
     success: boolean;
-    /** List of non-critical warnings. */
+    /**
+     * List of non-critical warnings encountered during validation.
+     * @readonly
+     */
     warnings: string[];
 }
 
 /**
- * Inter-Process Communication service for Electron main-renderer communication.
+ * Inter-Process Communication (IPC) service for Electron main-renderer communication.
  *
  * @remarks
- * Manages all IPC handlers between the main process and renderer processes,
- * organized by functional domains (sites, monitoring, data, system).
- * Provides a secure interface for the frontend to interact with backend services.
+ * Manages all IPC handlers between the main process and renderer processes, organized by functional domains (sites, monitoring, data, system, state sync). Provides a secure interface for the frontend to interact with backend services. All handler registration and cleanup is managed through this service.
+ *
+ * @example
+ * ```typescript
+ * const ipcService = new IpcService(uptimeOrchestrator, autoUpdaterService);
+ * ipcService.setupHandlers();
+ * // ...
+ * ipcService.cleanup();
+ * ```
  *
  * @public
  */
 export class IpcService {
-    /** @internal */
+    /**
+     * Service for handling application updates.
+     * @internal
+     */
     private readonly autoUpdaterService: AutoUpdaterService;
-    /** @internal */
+    /**
+     * Set of registered IPC handler channel names.
+     * @internal
+     */
     private readonly registeredIpcHandlers = new Set<string>();
-    /** @internal */
+    /**
+     * Core orchestrator for monitoring operations.
+     * @internal
+     */
     private readonly uptimeOrchestrator: UptimeOrchestrator;
 
     /**
      * Constructs a new {@link IpcService} instance.
      *
-     * @param uptimeOrchestrator - Core orchestrator for monitoring operations.
-     * @param autoUpdaterService - Service for handling application updates.
+     * @param uptimeOrchestrator - The core orchestrator for monitoring operations.
+     * @param autoUpdaterService - The service for handling application updates.
      *
      * @remarks
-     * Initializes the IPC service with required orchestrator and updater dependencies.
+     * Initializes the IPC service with required orchestrator and updater dependencies. This does not register any handlers until {@link setupHandlers} is called.
      *
      * @example
      * ```typescript
@@ -69,8 +104,7 @@ export class IpcService {
      * Removes all registered IPC handlers and event listeners.
      *
      * @remarks
-     * Should be called during application shutdown to prevent memory leaks.
-     * Removes handlers registered via `ipcMain.handle` and listeners via `ipcMain.on`.
+     * Should be called during application shutdown to prevent memory leaks. Removes handlers registered via `ipcMain.handle` and listeners via `ipcMain.on` for all registered channels.
      *
      * @example
      * ```typescript
@@ -92,8 +126,7 @@ export class IpcService {
      * Initializes all IPC handlers for the main process.
      *
      * @remarks
-     * Sets up handlers for site management, monitoring control, data management,
-     * system operations, and state synchronization.
+     * Sets up handlers for site management, monitoring control, monitor type registry, data management, system operations, and state synchronization. Should be called once during application startup.
      *
      * @example
      * ```typescript
@@ -115,13 +148,11 @@ export class IpcService {
      * Serializes a monitor type configuration for IPC transmission.
      *
      * @remarks
-     * Excludes non-serializable properties (functions, schemas) and logs unexpected properties.
-     * Preserves all data needed by the renderer process.
+     * Excludes non-serializable properties (functions, schemas) and logs unexpected properties. Preserves all data needed by the renderer process. Throws if unexpected properties are encountered.
      *
      * @param config - The monitor type configuration to serialize.
      * @returns Serializable configuration object safe for IPC transmission.
-     *
-     * @throws {@link Error} If unexpected properties are encountered.
+     * @throws Error If unexpected properties are encountered in the config object.
      *
      * @internal
      */
@@ -198,7 +229,7 @@ export class IpcService {
      * Registers IPC handlers for data management operations.
      *
      * @remarks
-     * Handles export/import of configuration, history limit management, and database backup.
+     * Handles export/import of configuration, history limit management, and database backup. All handlers are registered with unique channel names and are tracked for cleanup.
      *
      * @internal
      */
@@ -244,7 +275,7 @@ export class IpcService {
      * Registers IPC handlers for monitoring control operations.
      *
      * @remarks
-     * Handles starting/stopping monitoring globally or per site/monitor, and manual checks.
+     * Handles starting/stopping monitoring globally or per site/monitor, and manual checks. All handlers are registered with unique channel names and are tracked for cleanup.
      *
      * @internal
      */
@@ -304,13 +335,16 @@ export class IpcService {
      * Registers IPC handlers for monitor type registry operations.
      *
      * @remarks
-     * Handles retrieval of monitor type configs, formatting, and validation.
+     * Handles retrieval of monitor type configs, formatting, and validation. All handlers are registered with unique channel names and are tracked for cleanup.
      *
      * @returns For `validate-monitor-data`, returns a {@link MonitorValidationResult} object.
      *
      * @example
      * ```typescript
      * const result = await window.electronAPI.invoke("validate-monitor-data", type, data);
+     * if (!result.success) {
+     *   // handle errors
+     * }
      * ```
      *
      * @internal
@@ -427,7 +461,7 @@ export class IpcService {
      * Registers IPC handlers for site management operations.
      *
      * @remarks
-     * Handles CRUD operations for sites and monitors.
+     * Handles CRUD operations for sites and monitors. All handlers are registered with unique channel names and are tracked for cleanup.
      *
      * @internal
      */
@@ -467,8 +501,7 @@ export class IpcService {
      * Registers IPC handlers for state synchronization operations.
      *
      * @remarks
-     * Handles manual full sync requests and sync status queries.
-     * Emits synchronization events to all renderer processes.
+     * Handles manual full sync requests and sync status queries. Emits synchronization events to all renderer processes. All handlers are registered with unique channel names and are tracked for cleanup.
      *
      * @internal
      */
@@ -532,8 +565,7 @@ export class IpcService {
      * Registers IPC handlers for system-level operations.
      *
      * @remarks
-     * Handles application quit and install events using event listeners.
-     * Event listeners must be removed via `cleanup()`.
+     * Handles application quit and install events using event listeners. Event listeners must be removed via {@link cleanup}.
      *
      * @internal
      */

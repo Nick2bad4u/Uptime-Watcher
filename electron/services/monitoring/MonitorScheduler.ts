@@ -3,13 +3,17 @@ import { Site } from "../../types";
 import { logger } from "../../utils/logger";
 
 /**
- * Manages scheduling and execution of monitor checks for sites.
+ * Manages scheduling, execution, and lifecycle of monitor checks for sites and their monitors.
  *
  * @remarks
- * - Maintains per-monitor interval timers, allowing different check frequencies.
- * - Provides lifecycle management for starting, stopping, and restarting monitoring operations.
- * - All monitor checks are triggered via an async callback.
- * - Errors during checks are logged and do not affect other monitors.
+ * Maintains per-monitor interval timers, supports dynamic check intervals, and provides lifecycle management for starting, stopping, and restarting monitoring operations. All monitor checks are triggered via an async callback, and errors during checks are logged without affecting other monitors. Designed for robust, event-driven monitoring orchestration.
+ *
+ * @example
+ * ```typescript
+ * const scheduler = new MonitorScheduler();
+ * scheduler.setCheckCallback(async (siteId, monitorId) => { ... });
+ * scheduler.startSite(siteObj);
+ * ```
  *
  * @public
  */
@@ -18,7 +22,7 @@ export class MonitorScheduler {
      * Map of interval keys to active NodeJS.Timeout objects.
      *
      * @remarks
-     * Keys are formatted as `${siteIdentifier}|${monitorId}`.
+     * Keys are formatted as `${siteIdentifier}|${monitorId}`. Used internally to track all active monitor intervals for efficient management and lookup.
      *
      * @internal
      * @readonly
@@ -26,12 +30,10 @@ export class MonitorScheduler {
     private readonly intervals = new Map<string, NodeJS.Timeout>();
 
     /**
-     * Callback invoked to perform a monitor check.
+     * Callback invoked to perform a monitor check for a given site and monitor.
      *
      * @remarks
-     * - Must be set via {@link setCheckCallback} before starting monitoring.
-     * - Should be async and handle timeouts internally.
-     * - Errors are logged but do not interrupt scheduling.
+     * Must be set via {@link setCheckCallback} before starting monitoring. The callback should be async and handle timeouts and errors internally. Errors are logged but do not interrupt scheduling.
      *
      * @param siteIdentifier - Unique identifier for the site.
      * @param monitorId - Unique identifier for the monitor.
@@ -42,9 +44,9 @@ export class MonitorScheduler {
     private onCheckCallback?: (siteIdentifier: string, monitorId: string) => Promise<void>;
 
     /**
-     * Returns the number of active monitoring intervals.
+     * Returns the number of currently active monitoring intervals.
      *
-     * @returns Number of currently scheduled monitor intervals.
+     * @returns The number of scheduled monitor intervals.
      *
      * @public
      */
@@ -55,7 +57,7 @@ export class MonitorScheduler {
     /**
      * Returns all active monitor interval keys.
      *
-     * @returns Array of interval keys in the format `${siteIdentifier}|${monitorId}`.
+     * @returns An array of interval keys in the format `${siteIdentifier}|${monitorId}`.
      *
      * @public
      */
@@ -64,11 +66,11 @@ export class MonitorScheduler {
     }
 
     /**
-     * Determines if a monitor is currently being scheduled.
+     * Determines if a monitor is currently being scheduled and actively monitored.
      *
      * @param siteIdentifier - Unique identifier for the site.
      * @param monitorId - Unique identifier for the monitor.
-     * @returns True if the monitor is actively scheduled; otherwise, false.
+     * @returns `true` if the monitor is actively scheduled; otherwise, `false`.
      *
      * @public
      */
@@ -78,17 +80,16 @@ export class MonitorScheduler {
     }
 
     /**
-     * Performs an immediate check for a monitor.
+     * Performs an immediate check for a specific monitor by invoking the registered check callback.
      *
      * @remarks
-     * - Invokes the registered check callback for the specified monitor.
-     * - Errors are logged and do not interrupt execution.
+     * Invokes the registered check callback for the specified monitor. Errors are logged and do not interrupt execution. If no callback is set, this method does nothing.
      *
      * @param siteIdentifier - Unique identifier for the site.
      * @param monitorId - Unique identifier for the monitor.
-     * @returns Promise resolving when the check completes.
+     * @returns A promise that resolves when the check completes.
      *
-     * @throws Any error thrown by the callback is caught and logged.
+     * @throws Any error thrown by the callback is caught and logged; errors are not re-thrown.
      *
      * @public
      */
@@ -107,12 +108,11 @@ export class MonitorScheduler {
      * Restarts monitoring for a specific monitor.
      *
      * @remarks
-     * - Stops any existing interval for the monitor, then starts a new one.
-     * - Useful when monitor settings (e.g., interval) change.
+     * Stops any existing interval for the monitor, then starts a new one. Useful when monitor settings (such as interval) change. If the monitor has no ID, no action is taken.
      *
      * @param siteIdentifier - Unique identifier for the site.
      * @param monitor - Monitor configuration object.
-     * @returns True if monitoring was restarted; false if monitor has no ID.
+     * @returns `true` if monitoring was restarted; `false` if the monitor has no ID.
      *
      * @example
      * ```typescript
@@ -134,10 +134,9 @@ export class MonitorScheduler {
      * Registers the callback to execute when a monitor check is scheduled.
      *
      * @remarks
-     * - Must be called before starting any monitoring.
-     * - The callback should be async and handle errors internally.
+     * Must be called before starting any monitoring. The callback should be async and handle errors internally. This callback is invoked for every scheduled or immediate monitor check.
      *
-     * @param callback - Function to execute for each scheduled monitor check.
+     * @param callback - Function to execute for each scheduled monitor check. Receives the site identifier and monitor ID.
      *
      * @example
      * ```typescript
@@ -154,13 +153,11 @@ export class MonitorScheduler {
      * Starts monitoring for a specific monitor with its own interval.
      *
      * @remarks
-     * - Stops any existing interval for the monitor before starting.
-     * - Validates and applies the monitor's checkInterval.
-     * - Triggers an immediate check after starting.
+     * Stops any existing interval for the monitor before starting. Validates and applies the monitor's checkInterval. Triggers an immediate check after starting. Throws if the checkInterval is invalid. If the monitor has no ID, no action is taken.
      *
      * @param siteIdentifier - Unique identifier for the site.
      * @param monitor - Monitor configuration object.
-     * @returns True if monitoring started; false if monitor has no ID.
+     * @returns `true` if monitoring started; `false` if the monitor has no ID.
      *
      * @throws Error if checkInterval is invalid.
      *
@@ -225,7 +222,7 @@ export class MonitorScheduler {
      * Starts monitoring for all monitors in a site.
      *
      * @remarks
-     * - Only monitors with `monitoring: true` and a valid ID are started.
+     * Only monitors with `monitoring: true` and a valid ID are started. This method is idempotent and safe to call multiple times.
      *
      * @param site - Site configuration object containing monitors.
      *
@@ -245,11 +242,10 @@ export class MonitorScheduler {
     }
 
     /**
-     * Stops all monitoring intervals.
+     * Stops all monitoring intervals and clears all tracked monitors.
      *
      * @remarks
-     * - Clears all interval timers and removes all monitors from tracking.
-     * - Logs an info message when complete.
+     * Clears all interval timers and removes all monitors from tracking. Logs an info message when complete. Safe to call even if no monitors are active.
      *
      * @example
      * ```typescript
@@ -270,13 +266,11 @@ export class MonitorScheduler {
      * Stops monitoring for a specific monitor.
      *
      * @remarks
-     * - Clears the interval timer and removes the monitor from tracking.
-     * - Safe to call even if monitor is not currently monitored.
-     * - Logs debug information about the stop operation.
+     * Clears the interval timer and removes the monitor from tracking. Safe to call even if the monitor is not currently monitored. Logs debug information about the stop operation.
      *
      * @param siteIdentifier - Unique identifier for the site.
      * @param monitorId - Unique identifier for the monitor.
-     * @returns True if monitoring was stopped; false if not currently monitored.
+     * @returns `true` if monitoring was stopped; `false` if not currently monitored.
      *
      * @example
      * ```typescript
@@ -303,11 +297,10 @@ export class MonitorScheduler {
      * Stops monitoring for all monitors in a site.
      *
      * @remarks
-     * - If `monitors` is provided, only those monitors are stopped.
-     * - Otherwise, all monitors for the site are stopped.
+     * If `monitors` is provided, only those monitors are stopped. Otherwise, all monitors for the site are stopped. Safe to call even if no monitors are active for the site.
      *
      * @param siteIdentifier - Unique identifier for the site.
-     * @param monitors - Optional array of monitor configurations to stop.
+     * @param monitors - Optional array of monitor configurations to stop. If omitted, all monitors for the site are stopped.
      *
      * @example
      * ```typescript
@@ -341,11 +334,11 @@ export class MonitorScheduler {
      * Creates a standardized interval key for monitor tracking.
      *
      * @remarks
-     * - Format: `${siteIdentifier}|${monitorId}`.
+     * Format: `${siteIdentifier}|${monitorId}`. Used internally for consistent lookup and management of monitor intervals.
      *
      * @param siteIdentifier - Unique identifier for the site.
      * @param monitorId - Unique identifier for the monitor.
-     * @returns Formatted interval key string.
+     * @returns The formatted interval key string.
      *
      * @example
      * ```typescript
@@ -359,13 +352,13 @@ export class MonitorScheduler {
     }
 
     /**
-     * Parses an interval key into its components.
+     * Parses an interval key into its site and monitor components.
      *
      * @remarks
-     * - Returns null if the key is invalid.
+     * Returns `null` if the key is invalid or does not match the expected format.
      *
      * @param intervalKey - Interval key string in the format `${siteIdentifier}|${monitorId}`.
-     * @returns Object with `siteIdentifier` and `monitorId`, or null if invalid.
+     * @returns An object with `siteIdentifier` and `monitorId`, or `null` if invalid.
      *
      * @example
      * ```typescript
@@ -389,14 +382,12 @@ export class MonitorScheduler {
      * Validates a monitor's check interval value.
      *
      * @remarks
-     * - Ensures the interval is a positive integer.
-     * - Warns if interval is less than 1000ms.
-     * - Throws if interval is invalid.
+     * Ensures the interval is a positive integer. Warns if the interval is less than 1000ms. Throws if the interval is invalid.
      *
      * @param checkInterval - Interval value in milliseconds.
-     * @returns Validated interval value.
+     * @returns The validated interval value.
      *
-     * @throws Error if interval is not a positive integer.
+     * @throws Error if the interval is not a positive integer.
      *
      * @example
      * ```typescript
