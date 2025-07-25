@@ -123,7 +123,7 @@ const config: Config = {
                 },
                 {
                     label: "Electron (Backend)",
-                    href: "https://nick2bad4u.github.io/Uptime-Watcher/docs/electron",
+                    to: "/docs/electron",
                     position: "left",
                 },
                 {
