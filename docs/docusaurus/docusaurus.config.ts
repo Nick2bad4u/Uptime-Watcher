@@ -80,8 +80,15 @@ const config: Config = {
                         "**/*.test.{js,jsx,ts,tsx}",
                         "**/__tests__/**",
                     ],
+                    showLastUpdateAuthor: true,
+                    showLastUpdateTime: true,
                 },
                 blog: false, // Disable blog
+                pages: {
+                    showLastUpdateAuthor: true,
+                    showLastUpdateTime: true,
+                },
+                sitemap: { lastmod: "datetime" },
                 theme: {
                     customCss: "./src/css/custom.css",
                 },
@@ -115,10 +122,10 @@ const config: Config = {
                     label: "React (Frontend)",
                 },
                 {
-                    type: "docSidebar",
-                    sidebarId: "backEndSidebar",
-                    position: "left",
+                    type: "link",
                     label: "Electron (Backend)",
+                    href: "https://nick2bad4u.github.io/Uptime-Watcher/docs/electron",
+                    position: "left",
                 },
                 {
                     href: "https://github.com/Nick2bad4u/Uptime-Watcher",

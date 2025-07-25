@@ -72,12 +72,58 @@ Elevate the clarity, accuracy, and completeness of TSDoc comments for enhanced m
 - `@alpha`, `@beta`, `@experimental` — Indicate release stages.
 - `@eventProperty` — Indicates the property returns an event object.
 - `@internal` — Not for third-party consumption; may be omitted from public releases.
-- `@packageDocumentation` — Describes an entire NPM package.
 
 #### Inline Tags
 
 - `{@link ...}` — Hyperlink to another API or URL.
 - `{@inheritDoc ...}` — Inherits documentation from another API.
 - `{@label ...}` — Labels a declaration for reference.
+
+#### Not Recommended Tags for this Project
+- `@packageDocumentation` -- Used to indicate a doc comment that describes an entire NPM package, found in the entry point \*.d.ts file.
+
+#### Recommended General Order for Block Tags
+
+- *Summary* (first line, no tag)  
+  (Always begins the comment, not a tag.)
+
+- `@remarks`  
+  Additional information or context.
+
+- `@deprecated`  
+  If the API is deprecated, state it early.
+
+- `@example`  
+  Show usage before listing technical details.
+
+- `@typeParam`  
+  Document generic parameters before regular parameters.
+
+- `@param`  
+  List all function or method parameters, one per tag.
+
+- `@returns`  
+  Describe what the function returns.
+
+- `@throws`  
+  List possible exceptions/errors.
+
+- `@defaultValue`  
+  For properties/parameters with defaults.
+
+- `@see`  
+  Cross-references.
+
+- `@decorator`  
+  If applicable.
+
+- `@privateRemarks`  
+  Internal documentation (usually at the end).
+
+- Modifier tags (such as `@public`, `@protected`, `@internal`, `@beta`, etc.)  
+  These are typically placed at the very beginning of the comment block (after the summary and before block tags), or even outside the comment block, depending on your project's conventions.
+
+- Inline tags  
+  Used within the summary or other tag descriptions as needed (e.g., `{@link ...}`).
 
 Refer to the full documentation in `/docs/TSDoc/TSDoc-Base-Tags.md` for detailed usage.

@@ -12,8 +12,6 @@
             "@shared/*": ["shared/*"]
         }
     },
-    "esModuleInterop": true,
-    "downlevelIteration": true,
     "include": [
         "electron/**/*.ts",
         "electron/**/*.tsx",
