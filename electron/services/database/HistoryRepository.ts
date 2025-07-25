@@ -328,10 +328,15 @@ export class HistoryRepository {
                             [String(monitor.id), limit]
                         ) as { id: number }[];
                         if (excessEntries.length > 0) {
-                            // Convert numeric IDs to ensure type safety
-                            const excessIds = excessEntries.map((e) => Number(e.id));
-                            const placeholders = excessIds.map(() => "?").join(",");
-                            db.run(`DELETE FROM history WHERE id IN (${placeholders})`, excessIds);
+                            // Convert numeric IDs to ensure type safety and validate they are numbers
+                            const excessIds = excessEntries
+                                .map((e) => Number(e.id))
+                                .filter((id) => Number.isFinite(id) && id > 0);
+
+                            if (excessIds.length > 0) {
+                                const placeholders = excessIds.map(() => "?").join(",");
+                                db.run(`DELETE FROM history WHERE id IN (${placeholders})`, excessIds);
+                            }
                         }
                     }
                     return Promise.resolve();
@@ -361,7 +366,11 @@ export class HistoryRepository {
 
         // Prune history for each monitor
         for (const row of monitorRows) {
-            pruneHistoryForMonitor(db, String(row.id), limit);
+            // Validate monitor ID is a positive number before using it
+            const monitorId = Number(row.id);
+            if (Number.isFinite(monitorId) && monitorId > 0) {
+                pruneHistoryForMonitor(db, String(monitorId), limit);
+            }
         }
 
         if (isDev()) {

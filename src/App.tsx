@@ -192,12 +192,7 @@ function App() {
                 <div className={`app-container ${isDark ? "dark" : ""}`}>
                     {/* Global Loading Overlay */}
                     {showLoadingOverlay && (
-                        <div
-                            aria-label="Loading application"
-                            aria-live="polite"
-                            className="loading-overlay"
-                            role="status"
-                        >
+                        <output aria-label="Loading application" aria-live="polite" className="loading-overlay">
                             <ThemedBox padding="lg" rounded="lg" shadow="xl" surface="elevated">
                                 <div className="loading-content">
                                     <div className="loading-spinner" />
@@ -206,7 +201,7 @@ function App() {
                                     </ThemedText>
                                 </div>
                             </ThemedBox>
-                        </div>
+                        </output>
                     )}
 
                     {/* Global Error Notification */}
@@ -237,49 +232,66 @@ function App() {
                     {(updateStatus === "available" ||
                         updateStatus === "downloading" ||
                         updateStatus === "downloaded" ||
-                        updateStatus === "error") && (
-                        <div
-                            aria-live={updateStatus === "error" ? "assertive" : "polite"}
-                            className="fixed left-0 right-0 z-50 top-12"
-                            role={updateStatus === "error" ? "alert" : "status"}
-                        >
-                            <ThemedBox
-                                className={`update-alert update-alert--${updateStatus}`}
-                                padding="md"
-                                surface="elevated"
-                            >
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center space-x-2">
-                                        <div className="update-alert__icon">
-                                            {updateStatus === "available" && "⬇️"}
-                                            {updateStatus === "downloading" && "⏬"}
-                                            {updateStatus === "downloaded" && "✅"}
-                                            {updateStatus === "error" && "⚠️"}
+                        updateStatus === "error") &&
+                        (updateStatus === "error" ? (
+                            <div aria-live="assertive" className="fixed left-0 right-0 z-50 top-12" role="alert">
+                                <ThemedBox
+                                    className={`update-alert update-alert--${updateStatus}`}
+                                    padding="md"
+                                    surface="elevated"
+                                >
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center space-x-2">
+                                            <div className="update-alert__icon">⚠️</div>
+                                            <ThemedText size="sm" variant="error">
+                                                {updateError ?? UI_MESSAGES.UPDATE_ERROR_FALLBACK}
+                                            </ThemedText>
                                         </div>
-                                        <ThemedText size="sm" variant={updateStatus === "error" ? "error" : "primary"}>
-                                            {updateStatus === "available" && UI_MESSAGES.UPDATE_AVAILABLE}
-                                            {updateStatus === "downloading" && UI_MESSAGES.UPDATE_DOWNLOADING}
-                                            {updateStatus === "downloaded" && UI_MESSAGES.UPDATE_DOWNLOADED}
-                                            {updateStatus === "error" &&
-                                                (updateError ?? UI_MESSAGES.UPDATE_ERROR_FALLBACK)}
-                                        </ThemedText>
-                                    </div>
-                                    {(updateStatus === "downloaded" || updateStatus === "error") && (
                                         <ThemedButton
                                             className="ml-4 update-alert__action"
                                             onClick={handleUpdateAction}
                                             size="sm"
                                             variant="secondary"
                                         >
-                                            {updateStatus === "downloaded"
-                                                ? UI_MESSAGES.UPDATE_RESTART_BUTTON
-                                                : UI_MESSAGES.UPDATE_DISMISS_BUTTON}
+                                            {UI_MESSAGES.UPDATE_DISMISS_BUTTON}
                                         </ThemedButton>
-                                    )}
-                                </div>
-                            </ThemedBox>
-                        </div>
-                    )}
+                                    </div>
+                                </ThemedBox>
+                            </div>
+                        ) : (
+                            <output aria-live="polite" className="fixed left-0 right-0 z-50 top-12">
+                                <ThemedBox
+                                    className={`update-alert update-alert--${updateStatus}`}
+                                    padding="md"
+                                    surface="elevated"
+                                >
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center space-x-2">
+                                            <div className="update-alert__icon">
+                                                {updateStatus === "available" && "⬇️"}
+                                                {updateStatus === "downloading" && "⏬"}
+                                                {updateStatus === "downloaded" && "✅"}
+                                            </div>
+                                            <ThemedText size="sm" variant="primary">
+                                                {updateStatus === "available" && UI_MESSAGES.UPDATE_AVAILABLE}
+                                                {updateStatus === "downloading" && UI_MESSAGES.UPDATE_DOWNLOADING}
+                                                {updateStatus === "downloaded" && UI_MESSAGES.UPDATE_DOWNLOADED}
+                                            </ThemedText>
+                                        </div>
+                                        {updateStatus === "downloaded" && (
+                                            <ThemedButton
+                                                className="ml-4 update-alert__action"
+                                                onClick={handleUpdateAction}
+                                                size="sm"
+                                                variant="secondary"
+                                            >
+                                                {UI_MESSAGES.UPDATE_RESTART_BUTTON}
+                                            </ThemedButton>
+                                        )}
+                                    </div>
+                                </ThemedBox>
+                            </output>
+                        ))}
 
                     <Header />
 

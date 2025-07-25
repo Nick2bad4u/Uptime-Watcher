@@ -5,6 +5,7 @@
 
 import type { MonitorType } from "@shared/types";
 
+import { safeExtractIpcData } from "../types/ipc";
 import { AppCaches } from "./cache";
 import { withUtilityErrorHandling } from "./errorHandling";
 import { getAvailableMonitorTypes, getMonitorTypeConfig, type MonitorTypeConfig } from "./monitorTypeHelper";
@@ -74,7 +75,8 @@ export async function formatMonitorDetail(monitorType: MonitorType, details: str
             }
 
             // Use the IPC method to format on the backend where functions are available
-            return window.electronAPI.monitorTypes.formatMonitorDetail(monitorType, details);
+            const response = await window.electronAPI.monitorTypes.formatMonitorDetail(monitorType, details);
+            return safeExtractIpcData(response, details);
         },
         `Format monitor detail for ${monitorType}`,
         details
@@ -106,7 +108,8 @@ export async function formatMonitorTitleSuffix(
             }
 
             // Use the IPC method to format on the backend where functions are available
-            return window.electronAPI.monitorTypes.formatMonitorTitleSuffix(monitorType, monitor);
+            const response = await window.electronAPI.monitorTypes.formatMonitorTitleSuffix(monitorType, monitor);
+            return safeExtractIpcData(response, "");
         },
         `Format monitor title suffix for ${monitorType}`,
         ""

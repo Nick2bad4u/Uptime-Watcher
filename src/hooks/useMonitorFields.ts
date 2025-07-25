@@ -42,6 +42,8 @@ import type { MonitorFieldDefinition } from "@shared/types";
 import { useCallback, useEffect, useState } from "react";
 
 import logger from "../services/logger";
+import { safeExtractIpcData } from "../types/ipc";
+import type { MonitorTypeConfig } from "../utils/monitorTypeHelper";
 
 /**
  * Result interface for the useMonitorFields hook
@@ -70,7 +72,8 @@ export function useMonitorFields(): UseMonitorFieldsResult {
         const loadFieldConfigs = async () => {
             try {
                 setError(undefined);
-                const configs = await window.electronAPI.monitorTypes.getMonitorTypes();
+                const response = await window.electronAPI.monitorTypes.getMonitorTypes();
+                const configs = safeExtractIpcData<MonitorTypeConfig[]>(response, []);
                 const fieldMap: Record<string, MonitorFieldDefinition[]> = {};
 
                 for (const config of configs) {

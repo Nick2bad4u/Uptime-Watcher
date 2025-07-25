@@ -513,7 +513,7 @@ export function createValidationMiddleware<T extends Record<string, unknown>>(
 ): EventMiddleware {
     return async (event: string, data: unknown, next: () => Promise<void> | void) => {
         // Type-safe validator lookup with runtime validation
-        if (!Object.prototype.hasOwnProperty.call(validators, event)) {
+        if (!Object.hasOwn(validators, event)) {
             // No validator for this event - continue processing
             await next();
             return;

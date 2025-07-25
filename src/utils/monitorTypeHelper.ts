@@ -7,6 +7,7 @@ import type { MonitorFieldDefinition } from "@shared/types";
 
 import { AppCaches } from "./cache";
 import { withUtilityErrorHandling } from "./errorHandling";
+import { safeExtractIpcData } from "../types/ipc";
 
 /**
  * Frontend representation of monitor type configuration.
@@ -82,7 +83,8 @@ export async function getAvailableMonitorTypes(): Promise<MonitorTypeConfig[]> {
     // Fetch from backend and cache
     const types = await withUtilityErrorHandling(
         async () => {
-            return window.electronAPI.monitorTypes.getMonitorTypes();
+            const response = await window.electronAPI.monitorTypes.getMonitorTypes();
+            return safeExtractIpcData(response, []);
         },
         "Fetch monitor types from backend",
         []

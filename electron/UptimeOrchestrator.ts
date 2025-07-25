@@ -76,9 +76,9 @@ import type { UptimeEvents } from "./events/eventTypes";
 
 import { createErrorHandlingMiddleware, createLoggingMiddleware } from "./events/middleware";
 import { TypedEventBus } from "./events/TypedEventBus";
+import { DatabaseManager } from "./managers/DatabaseManager";
 import { MonitorManager } from "./managers/MonitorManager";
 import { SiteManager } from "./managers/SiteManager";
-import { DatabaseManager } from "./services/DatabaseManager";
 import { Monitor, Site, StatusUpdate } from "./types";
 import { logger } from "./utils/logger";
 

@@ -34,6 +34,7 @@
  * @packageDocumentation
  */
 
+import type { MonitorCheckResult } from "../../services/monitoring/types";
 import type { Logger } from "../interfaces";
 
 import { UptimeEvents } from "../../events/eventTypes";
@@ -44,7 +45,7 @@ import { MonitorRepository } from "../../services/database/MonitorRepository";
 import { SiteRepository } from "../../services/database/SiteRepository";
 import { MonitorFactory } from "../../services/monitoring/MonitorFactory";
 import { SiteService } from "../../services/site/SiteService";
-import { Monitor, Site, StatusHistory, StatusUpdate } from "../../types";
+import { Monitor, MonitorStatus, Site, StatusHistory, StatusUpdate } from "../../types";
 import { StandardizedCache } from "../cache/StandardizedCache";
 import { withDatabaseOperation } from "../operationalHooks";
 
@@ -131,24 +132,7 @@ export async function checkMonitor(
     config.logger.info(`[checkMonitor] Checking monitor: site=${site.identifier}, id=${monitor.id}`);
 
     // Use the monitoring service to perform the check
-    const getCheckResult = async () => {
-        try {
-            const monitorService = MonitorFactory.getMonitor(monitor.type, {
-                timeout: monitor.timeout,
-            });
-            return await monitorService.check(monitor);
-        } catch (error) {
-            config.logger.error(`[checkMonitor] Error using monitor service for type ${monitor.type}`, error);
-            return {
-                details: "0",
-                error: "Monitor service error",
-                responseTime: 0,
-                status: "down" as const,
-            };
-        }
-    };
-
-    const checkResult = await getCheckResult();
+    const checkResult = await executeMonitorCheck(monitor, config.logger);
 
     const previousStatus = monitor.status;
     const now = new Date();
@@ -171,40 +155,7 @@ export async function checkMonitor(
     };
 
     try {
-        // Use operational hooks for database operations
-        await withDatabaseOperation(
-            async () => {
-                return config.databaseService.executeTransaction((db) => {
-                    // Add history entry using internal method to avoid nested transactions
-                    config.repositories.history.addEntryInternal(db, monitor.id, historyEntry, checkResult.details);
-
-                    // Smart history pruning: Only prune when necessary to avoid performance overhead
-                    if (config.historyLimit > 0) {
-                        // Use a buffer strategy: only prune when we exceed limit + buffer
-                        // This reduces frequency of pruning operations while maintaining reasonable limits
-                        const bufferSize = Math.max(Math.floor(config.historyLimit * 0.2), 5); // 20% buffer, min 5 entries
-                        const pruneThreshold = config.historyLimit + bufferSize;
-
-                        // Get current count for this monitor (lightweight operation)
-                        const currentCount = config.repositories.history.getHistoryCountInternal(db, monitor.id);
-
-                        if (currentCount > pruneThreshold) {
-                            config.repositories.history.pruneHistoryInternal(db, monitor.id, config.historyLimit);
-                            config.logger.debug(
-                                `[MonitorStatusChecker] Pruned history for monitor ${monitor.id}: ${currentCount} -> ${config.historyLimit} entries`
-                            );
-                        }
-                    }
-
-                    // Update monitor with new status using internal method (we're already in a transaction)
-                    config.repositories.monitor.updateInternal(db, monitor.id, updateData);
-                    return Promise.resolve();
-                });
-            },
-            "monitor-status-update",
-            config.eventEmitter,
-            { monitorId: monitor.id, status: historyEntry.status }
-        );
+        await updateMonitorInDatabase(config, monitor, updateData, historyEntry, checkResult);
 
         const manualCheckInfo =
             isManualCheck && updateData.status === "paused" ? ` (manual check result: ${checkResult.status})` : "";
@@ -244,40 +195,7 @@ export async function checkMonitor(
         return undefined;
     }
 
-    await config.eventEmitter.emitTyped("monitor:status-changed", {
-        monitor: freshMonitor,
-        newStatus: checkResult.status,
-        previousStatus,
-        responseTime: checkResult.responseTime,
-        site: freshSiteData,
-        siteId: site.identifier,
-        timestamp: Date.now(),
-    });
-
-    // Emit monitor state change events with proper typing
-    const shouldEmitDownEvent =
-        (previousStatus === "up" && checkResult.status === "down") ||
-        (previousStatus === "pending" && checkResult.status === "down");
-
-    const shouldEmitUpEvent =
-        (previousStatus === "down" && checkResult.status === "up") ||
-        (previousStatus === "pending" && checkResult.status === "up");
-
-    if (shouldEmitDownEvent) {
-        await config.eventEmitter.emitTyped("monitor:down", {
-            monitor: freshMonitor,
-            site: freshSiteData,
-            siteId: site.identifier,
-            timestamp: Date.now(),
-        });
-    } else if (shouldEmitUpEvent) {
-        await config.eventEmitter.emitTyped("monitor:up", {
-            monitor: freshMonitor,
-            site: freshSiteData,
-            siteId: site.identifier,
-            timestamp: Date.now(),
-        });
-    }
+    await emitMonitorStateEvents(config, previousStatus, checkResult, freshMonitor, freshSiteData, site.identifier);
 
     return statusUpdate;
 }
@@ -349,4 +267,115 @@ export async function checkSiteManually(
 
     const result = await checkMonitor(config, site, targetMonitorId, true); // Mark as manual check
     return result ?? undefined;
+}
+
+/**
+ * Emits the appropriate monitor state change events
+ */
+async function emitMonitorStateEvents(
+    config: MonitorCheckConfig,
+    previousStatus: MonitorStatus,
+    checkResult: MonitorCheckResult,
+    freshMonitor: Monitor,
+    freshSiteData: Site,
+    siteIdentifier: string
+): Promise<void> {
+    await config.eventEmitter.emitTyped("monitor:status-changed", {
+        monitor: freshMonitor,
+        newStatus: checkResult.status,
+        previousStatus,
+        responseTime: checkResult.responseTime,
+        site: freshSiteData,
+        siteId: siteIdentifier,
+        timestamp: Date.now(),
+    });
+
+    const shouldEmitDownEvent =
+        (previousStatus === "up" && checkResult.status === "down") ||
+        (previousStatus === "pending" && checkResult.status === "down");
+
+    const shouldEmitUpEvent =
+        (previousStatus === "down" && checkResult.status === "up") ||
+        (previousStatus === "pending" && checkResult.status === "up");
+
+    if (shouldEmitDownEvent) {
+        await config.eventEmitter.emitTyped("monitor:down", {
+            monitor: freshMonitor,
+            site: freshSiteData,
+            siteId: siteIdentifier,
+            timestamp: Date.now(),
+        });
+    } else if (shouldEmitUpEvent) {
+        await config.eventEmitter.emitTyped("monitor:up", {
+            monitor: freshMonitor,
+            site: freshSiteData,
+            siteId: siteIdentifier,
+            timestamp: Date.now(),
+        });
+    }
+}
+
+/**
+ * Executes the monitor check using the appropriate monitoring service
+ */
+async function executeMonitorCheck(
+    monitor: Monitor,
+    logger: { error: (message: string, error?: unknown) => void }
+): Promise<MonitorCheckResult> {
+    try {
+        const monitorService = MonitorFactory.getMonitor(monitor.type, {
+            timeout: monitor.timeout,
+        });
+        return await monitorService.check(monitor);
+    } catch (error) {
+        logger.error(`[checkMonitor] Error using monitor service for type ${monitor.type}`, error);
+        return {
+            details: "0",
+            error: "Monitor service error",
+            responseTime: 0,
+            status: "down" as const,
+        };
+    }
+}
+
+/**
+ * Handles the database operations for monitor status update
+ */
+async function updateMonitorInDatabase(
+    config: MonitorCheckConfig,
+    monitor: Monitor,
+    updateData: Partial<Monitor>,
+    historyEntry: StatusHistory,
+    checkResult: MonitorCheckResult
+): Promise<void> {
+    await withDatabaseOperation(
+        async () => {
+            return config.databaseService.executeTransaction((db) => {
+                // Add history entry using internal method to avoid nested transactions
+                config.repositories.history.addEntryInternal(db, monitor.id, historyEntry, checkResult.details);
+
+                // Smart history pruning: Only prune when necessary to avoid performance overhead
+                if (config.historyLimit > 0) {
+                    // Use a buffer strategy: only prune when we exceed limit + buffer
+                    const bufferSize = Math.max(Math.floor(config.historyLimit * 0.2), 5);
+                    const pruneThreshold = config.historyLimit + bufferSize;
+                    const currentCount = config.repositories.history.getHistoryCountInternal(db, monitor.id);
+
+                    if (currentCount > pruneThreshold) {
+                        config.repositories.history.pruneHistoryInternal(db, monitor.id, config.historyLimit);
+                        config.logger.debug(
+                            `[MonitorStatusChecker] Pruned history for monitor ${monitor.id}: ${currentCount} -> ${config.historyLimit} entries`
+                        );
+                    }
+                }
+
+                // Update monitor with new status using internal method
+                config.repositories.monitor.updateInternal(db, monitor.id, updateData);
+                return Promise.resolve();
+            });
+        },
+        "monitor-status-update",
+        config.eventEmitter,
+        { monitorId: monitor.id, status: historyEntry.status }
+    );
 }

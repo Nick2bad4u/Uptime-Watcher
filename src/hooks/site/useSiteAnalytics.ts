@@ -129,13 +129,7 @@ export function useSiteAnalytics(monitor: Monitor | undefined, timeRange: TimePe
         // Defensive: handle undefined monitor
         const history = monitor?.history ?? [];
         // Filter history based on time range
-        const now = Date.now();
-        // Sanitize timeRange to prevent object injection
-        const allowedTimeRanges = Object.keys(TIME_PERIOD_LABELS) as TimePeriod[];
-        const safeTimeRange = allowedTimeRanges.includes(timeRange) ? timeRange : "24h";
-        // eslint-disable-next-line security/detect-object-injection -- false positive: safeTimeRange is validated against allowedTimeRanges
-        const cutoff = now - CHART_TIME_PERIODS[safeTimeRange];
-        const filteredHistory = history.filter((record) => record.timestamp >= cutoff);
+        const filteredHistory = filterHistoryByTimeRange(history, timeRange);
 
         const totalChecks = filteredHistory.length;
         const upCount = filteredHistory.filter((h) => h.status === "up").length;
@@ -144,72 +138,13 @@ export function useSiteAnalytics(monitor: Monitor | undefined, timeRange: TimePe
         // Basic metrics
         const uptimeRaw = totalChecks > 0 ? (upCount / totalChecks) * 100 : 0;
         const uptime = uptimeRaw.toFixed(2);
-        const avgResponseTime =
-            totalChecks > 0 ? Math.round(filteredHistory.reduce((sum, h) => sum + h.responseTime, 0) / totalChecks) : 0;
+        const avgResponseTime = calculateAverageResponseTime(filteredHistory);
 
         // Performance metrics
-        const responseTimes = filteredHistory.map((h) => h.responseTime);
-        const fastestResponse = responseTimes.length > 0 ? Math.min(...responseTimes) : 0;
-        const slowestResponse = responseTimes.length > 0 ? Math.max(...responseTimes) : 0;
-
-        // Calculate percentiles
-        const sortedResponseTimes = [...responseTimes].sort((a, b) => a - b);
-        const getPercentile = (p: number): number => {
-            // Ensure p is between 0 and 1
-            const safeP = Math.max(0, Math.min(1, p));
-            const arrayLength = sortedResponseTimes.length;
-            if (arrayLength === 0) {
-                return 0;
-            }
-            const index = Math.floor(arrayLength * safeP);
-            const safeIndex = Math.max(0, Math.min(index, arrayLength - 1));
-            // eslint-disable-next-line security/detect-object-injection -- safeIndex is validated and sanitized
-            return sortedResponseTimes[safeIndex] ?? 0;
-        };
-
-        const p50 = getPercentile(0.5);
-        const p95 = getPercentile(0.95);
-        const p99 = getPercentile(0.99);
+        const responseMetrics = calculateResponseMetrics(filteredHistory);
 
         // Calculate downtime periods
-        const downtimePeriods: DowntimePeriod[] = [];
-        let currentDowntime: DowntimePeriod | undefined;
-
-        // Process in reverse chronological order for proper downtime calculation
-        // Use efficient reverse iteration without creating a copy
-        for (let i = filteredHistory.length - 1; i >= 0; i--) {
-            // eslint-disable-next-line security/detect-object-injection -- i is a safe numeric index within array bounds
-            const record = filteredHistory[i];
-            if (!record) {
-                continue; // Skip if record is undefined
-            }
-
-            if (record.status === "down") {
-                if (currentDowntime) {
-                    // Extend the downtime period backwards
-                    currentDowntime.start = record.timestamp;
-                } else {
-                    // Start a new downtime period
-                    currentDowntime = {
-                        duration: 0,
-                        end: record.timestamp,
-                        start: record.timestamp,
-                    };
-                }
-            } else if (currentDowntime) {
-                // End of downtime period, calculate duration
-                currentDowntime.duration = currentDowntime.end - currentDowntime.start;
-                downtimePeriods.push(currentDowntime);
-                currentDowntime = undefined;
-            }
-        }
-
-        // Handle ongoing downtime (if the period started but never ended)
-        if (currentDowntime) {
-            currentDowntime.duration = currentDowntime.end - currentDowntime.start;
-            downtimePeriods.push(currentDowntime);
-        }
-
+        const downtimePeriods = calculateDowntimePeriods(filteredHistory);
         const totalDowntime = downtimePeriods.reduce((sum, period) => sum + period.duration, 0);
         const mttr = downtimePeriods.length > 0 ? totalDowntime / downtimePeriods.length : 0;
 
@@ -217,19 +152,15 @@ export function useSiteAnalytics(monitor: Monitor | undefined, timeRange: TimePe
             avgResponseTime,
             downCount,
             downtimePeriods,
-            fastestResponse,
             filteredHistory,
             incidentCount: downtimePeriods.length,
             mttr,
-            p50,
-            p95,
-            p99,
-            slowestResponse,
             totalChecks,
             totalDowntime,
             upCount,
             uptime,
             uptimeRaw,
+            ...responseMetrics,
         };
     }, [monitor?.history, timeRange]);
 }
@@ -305,3 +236,107 @@ export const SiteAnalyticsUtils = {
         return "critical";
     },
 };
+
+/**
+ * Calculate average response time from filtered history
+ */
+function calculateAverageResponseTime(filteredHistory: StatusHistory[]): number {
+    const totalChecks = filteredHistory.length;
+    return totalChecks > 0 ? Math.round(filteredHistory.reduce((sum, h) => sum + h.responseTime, 0) / totalChecks) : 0;
+}
+
+/**
+ * Calculate downtime periods from filtered history
+ */
+function calculateDowntimePeriods(filteredHistory: StatusHistory[]): DowntimePeriod[] {
+    const downtimePeriods: DowntimePeriod[] = [];
+    let currentDowntime: DowntimePeriod | undefined;
+
+    // Process in reverse chronological order for proper downtime calculation
+    // Use efficient reverse iteration without creating a copy
+    for (let i = filteredHistory.length - 1; i >= 0; i--) {
+        // eslint-disable-next-line security/detect-object-injection -- i is a safe numeric index within array bounds
+        const record = filteredHistory[i];
+        if (!record) {
+            continue; // Skip if record is undefined
+        }
+
+        if (record.status === "down") {
+            if (currentDowntime) {
+                // Extend the downtime period backwards
+                currentDowntime.start = record.timestamp;
+            } else {
+                // Start a new downtime period
+                currentDowntime = {
+                    duration: 0,
+                    end: record.timestamp,
+                    start: record.timestamp,
+                };
+            }
+        } else if (currentDowntime) {
+            // End of downtime period, calculate duration
+            currentDowntime.duration = currentDowntime.end - currentDowntime.start;
+            downtimePeriods.push(currentDowntime);
+            currentDowntime = undefined;
+        }
+    }
+
+    // Handle ongoing downtime (if the period started but never ended)
+    if (currentDowntime) {
+        currentDowntime.duration = currentDowntime.end - currentDowntime.start;
+        downtimePeriods.push(currentDowntime);
+    }
+
+    return downtimePeriods;
+}
+
+/**
+ * Calculate response time metrics including percentiles
+ */
+function calculateResponseMetrics(filteredHistory: StatusHistory[]): {
+    fastestResponse: number;
+    p50: number;
+    p95: number;
+    p99: number;
+    slowestResponse: number;
+} {
+    const responseTimes = filteredHistory.map((h) => h.responseTime);
+    const fastestResponse = responseTimes.length > 0 ? Math.min(...responseTimes) : 0;
+    const slowestResponse = responseTimes.length > 0 ? Math.max(...responseTimes) : 0;
+
+    // Calculate percentiles
+    const sortedResponseTimes = [...responseTimes].sort((a, b) => a - b);
+    const getPercentile = (p: number): number => {
+        // Ensure p is between 0 and 1
+        const safeP = Math.max(0, Math.min(1, p));
+        const arrayLength = sortedResponseTimes.length;
+        if (arrayLength === 0) {
+            return 0;
+        }
+        const index = Math.floor(arrayLength * safeP);
+        const safeIndex = Math.max(0, Math.min(index, arrayLength - 1));
+        // eslint-disable-next-line security/detect-object-injection -- safeIndex is validated and sanitized
+        return sortedResponseTimes[safeIndex] ?? 0;
+    };
+
+    return {
+        fastestResponse,
+        p50: getPercentile(0.5),
+        p95: getPercentile(0.95),
+        p99: getPercentile(0.99),
+        slowestResponse,
+    };
+}
+
+/**
+ * Filter history records based on time range
+ */
+function filterHistoryByTimeRange(history: StatusHistory[], timeRange: TimePeriod): StatusHistory[] {
+    const now = Date.now();
+    // Sanitize timeRange to prevent object injection
+    const allowedTimeRanges = Object.keys(TIME_PERIOD_LABELS) as TimePeriod[];
+    const safeTimeRange = allowedTimeRanges.includes(timeRange) ? timeRange : "24h";
+    // eslint-disable-next-line security/detect-object-injection -- false positive: safeTimeRange is validated against allowedTimeRanges
+    const cutoff = now - CHART_TIME_PERIODS[safeTimeRange];
+    return history.filter((record) => record.timestamp >= cutoff);
+}

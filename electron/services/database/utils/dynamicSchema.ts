@@ -291,7 +291,7 @@ function convertFromDatabase(value: unknown, sqlType: string): unknown {
             return Number(value);
         }
         case "TEXT": {
-            return typeof value === "string" ? value : JSON.stringify(value);
+            return safeStringify(value);
         }
         default: {
             return value;
@@ -324,10 +324,10 @@ function convertToDatabase(value: unknown, sqlType: string): unknown {
             return Number(value);
         }
         case "TEXT": {
-            return typeof value === "string" ? value : JSON.stringify(value);
+            return safeStringify(value);
         }
         default: {
-            return typeof value === "string" ? value : JSON.stringify(value);
+            return safeStringify(value);
         } // Convert anything else to string to avoid object binding errors
     }
 }
@@ -359,6 +359,22 @@ function getSqlTypeFromFieldType(fieldType: string): string {
         default: {
             return "TEXT"; // Safe default for unknown types
         }
+    }
+}
+
+/**
+ * Helper function to safely convert value to string
+ */
+function safeStringify(val: unknown): string {
+    if (typeof val === "string") {
+        return val;
+    }
+    // For non-string values, use JSON.stringify to properly serialize
+    try {
+        return JSON.stringify(val);
+    } catch {
+        // Fallback to string conversion if JSON.stringify fails
+        return String(val);
     }
 }
 

@@ -1,50 +1,19 @@
 import { BrowserWindow, ipcMain } from "electron";
 
-import { isDev } from "../../electronUtils";
 import { Site } from "../../types";
 import { UptimeOrchestrator } from "../../UptimeOrchestrator";
 import { logger } from "../../utils/logger";
 import { getAllMonitorTypeConfigs, getMonitorTypeConfig, validateMonitorData } from "../monitoring/MonitorTypeRegistry";
 import { AutoUpdaterService } from "../updater/AutoUpdaterService";
-
-/**
- * Result structure for monitor data validation via IPC.
- *
- * @remarks
- * Used to communicate monitor validation results between main and renderer processes. Contains errors, warnings, metadata, and success status.
- *
- * @example
- * ```typescript
- * const result: MonitorValidationResult = await window.electronAPI.invoke("validate-monitor-data", type, data);
- * if (!result.success) {
- *   // handle errors
- * }
- * ```
- *
- * @public
- */
-interface MonitorValidationResult {
-    /**
-     * List of validation errors encountered during monitor data validation.
-     * @readonly
-     */
-    errors: string[];
-    /**
-     * Additional metadata produced during validation.
-     * @readonly
-     */
-    metadata: Record<string, unknown>;
-    /**
-     * Indicates if validation succeeded.
-     * @readonly
-     */
-    success: boolean;
-    /**
-     * List of non-critical warnings encountered during validation.
-     * @readonly
-     */
-    warnings: string[];
-}
+import {
+    createValidationResponse,
+    DataHandlerValidators,
+    MonitoringHandlerValidators,
+    MonitorTypeHandlerValidators,
+    registerStandardizedIpcHandler,
+    SiteHandlerValidators,
+    StateSyncHandlerValidators,
+} from "./";
 
 /**
  * Inter-Process Communication (IPC) service for Electron main-renderer communication.
@@ -229,106 +198,122 @@ export class IpcService {
      * Registers IPC handlers for data management operations.
      *
      * @remarks
-     * Handles export/import of configuration, history limit management, and database backup. All handlers are registered with unique channel names and are tracked for cleanup.
+     * Handles export/import of configuration, history limit management, and database backup using standardized IPC patterns.
+     * All handlers use consistent response formatting, parameter validation, and error handling.
+     * All handlers are registered with unique channel names and are tracked for cleanup.
      *
      * @internal
      */
     private setupDataHandlers(): void {
-        this.registeredIpcHandlers.add("export-data");
-        ipcMain.handle("export-data", async () => {
-            if (isDev()) logger.debug("[IpcService] Handling export-data");
-            return this.uptimeOrchestrator.exportData();
-        });
+        // Export data handler (no parameters)
+        registerStandardizedIpcHandler(
+            "export-data",
+            async () => this.uptimeOrchestrator.exportData(),
+            DataHandlerValidators.exportData,
+            this.registeredIpcHandlers
+        );
 
-        this.registeredIpcHandlers.add("import-data");
-        ipcMain.handle("import-data", async (_, data: string) => {
-            if (isDev()) logger.debug("[IpcService] Handling import-data");
-            return this.uptimeOrchestrator.importData(data);
-        });
+        // Import data handler with validation
+        registerStandardizedIpcHandler(
+            "import-data",
+            async (...args: unknown[]) => this.uptimeOrchestrator.importData(args[0] as string),
+            DataHandlerValidators.importData,
+            this.registeredIpcHandlers
+        );
 
-        this.registeredIpcHandlers.add("update-history-limit");
-        ipcMain.handle("update-history-limit", async (_, limit: number) => {
-            if (isDev()) logger.debug("[IpcService] Handling update-history-limit", { limit });
-            return this.uptimeOrchestrator.setHistoryLimit(limit);
-        });
+        // Update history limit handler with validation
+        registerStandardizedIpcHandler(
+            "update-history-limit",
+            async (...args: unknown[]) => this.uptimeOrchestrator.setHistoryLimit(args[0] as number),
+            DataHandlerValidators.updateHistoryLimit,
+            this.registeredIpcHandlers
+        );
 
-        this.registeredIpcHandlers.add("get-history-limit");
-        ipcMain.handle("get-history-limit", () => {
-            if (isDev()) logger.debug("[IpcService] Handling get-history-limit");
-            return this.uptimeOrchestrator.getHistoryLimit();
-        });
+        // Get history limit handler (no parameters)
+        registerStandardizedIpcHandler(
+            "get-history-limit",
+            () => this.uptimeOrchestrator.getHistoryLimit(),
+            DataHandlerValidators.getHistoryLimit,
+            this.registeredIpcHandlers
+        );
 
-        this.registeredIpcHandlers.add("download-sqlite-backup");
-        ipcMain.handle("download-sqlite-backup", async () => {
-            if (isDev()) logger.debug("[IpcService] Handling download-sqlite-backup");
-            try {
-                return await this.uptimeOrchestrator.downloadBackup();
-            } catch (error) {
-                logger.error("[IpcService] Failed to download SQLite backup", error);
-                const message = error instanceof Error ? error.message : String(error);
-                throw new Error("Failed to download SQLite backup: " + message);
-            }
-        });
+        // Download SQLite backup handler (no parameters)
+        registerStandardizedIpcHandler(
+            "download-sqlite-backup",
+            async () => this.uptimeOrchestrator.downloadBackup(),
+            DataHandlerValidators.downloadSqliteBackup,
+            this.registeredIpcHandlers
+        );
     }
 
     /**
      * Registers IPC handlers for monitoring control operations.
      *
      * @remarks
-     * Handles starting/stopping monitoring globally or per site/monitor, and manual checks. All handlers are registered with unique channel names and are tracked for cleanup.
+     * Handles starting/stopping monitoring globally or per site/monitor, and manual checks using standardized IPC patterns.
+     * All handlers use consistent response formatting, parameter validation, and error handling.
+     * All handlers are registered with unique channel names and are tracked for cleanup.
      *
      * @internal
      */
     private setupMonitoringHandlers(): void {
-        this.registeredIpcHandlers.add("start-monitoring");
-        ipcMain.handle("start-monitoring", async () => {
-            if (isDev()) logger.debug("[IpcService] Handling start-monitoring");
-            await this.uptimeOrchestrator.startMonitoring();
-            return true;
-        });
+        // Start monitoring globally (no parameters)
+        registerStandardizedIpcHandler(
+            "start-monitoring",
+            async () => {
+                await this.uptimeOrchestrator.startMonitoring();
+                return true;
+            },
+            MonitoringHandlerValidators.startMonitoring,
+            this.registeredIpcHandlers
+        );
 
-        this.registeredIpcHandlers.add("stop-monitoring");
-        ipcMain.handle("stop-monitoring", async () => {
-            if (isDev()) logger.debug("[IpcService] Handling stop-monitoring");
-            await this.uptimeOrchestrator.stopMonitoring();
-            return true;
-        });
+        // Stop monitoring globally (no parameters)
+        registerStandardizedIpcHandler(
+            "stop-monitoring",
+            async () => {
+                await this.uptimeOrchestrator.stopMonitoring();
+                return true;
+            },
+            MonitoringHandlerValidators.stopMonitoring,
+            this.registeredIpcHandlers
+        );
 
-        this.registeredIpcHandlers.add("start-monitoring-for-site");
-        ipcMain.handle("start-monitoring-for-site", async (_, identifier: string, monitorId?: string) => {
-            if (isDev())
-                logger.debug("[IpcService] Handling start-monitoring-for-site", {
-                    identifier,
-                    monitorId,
-                });
-            return this.uptimeOrchestrator.startMonitoringForSite(identifier, monitorId);
-        });
+        // Start monitoring for specific site/monitor
+        registerStandardizedIpcHandler(
+            "start-monitoring-for-site",
+            async (...args: unknown[]) => {
+                const identifier = args[0] as string;
+                const monitorId = args[1] as string | undefined;
+                return this.uptimeOrchestrator.startMonitoringForSite(identifier, monitorId);
+            },
+            MonitoringHandlerValidators.startMonitoringForSite,
+            this.registeredIpcHandlers
+        );
 
-        this.registeredIpcHandlers.add("stop-monitoring-for-site");
-        ipcMain.handle("stop-monitoring-for-site", async (_, identifier: string, monitorId?: string) => {
-            if (isDev())
-                logger.debug("[IpcService] Handling stop-monitoring-for-site", {
-                    identifier,
-                    monitorId,
-                });
-            return this.uptimeOrchestrator.stopMonitoringForSite(identifier, monitorId);
-        });
+        // Stop monitoring for specific site/monitor
+        registerStandardizedIpcHandler(
+            "stop-monitoring-for-site",
+            async (...args: unknown[]) => {
+                const identifier = args[0] as string;
+                const monitorId = args[1] as string | undefined;
+                return this.uptimeOrchestrator.stopMonitoringForSite(identifier, monitorId);
+            },
+            MonitoringHandlerValidators.stopMonitoringForSite,
+            this.registeredIpcHandlers
+        );
 
-        this.registeredIpcHandlers.add("check-site-now");
-        ipcMain.handle("check-site-now", async (_, identifier: string, monitorId: string) => {
-            if (isDev()) logger.debug("[IpcService] Handling check-site-now", { identifier, monitorId });
-
-            // Runtime validation for type safety
-            if (typeof identifier !== "string") {
-                throw new TypeError("Invalid site identifier");
-            }
-
-            if (typeof monitorId !== "string") {
-                throw new TypeError("Invalid monitor ID");
-            }
-
-            return this.uptimeOrchestrator.checkSiteManually(identifier, monitorId);
-        });
+        // Check site manually with validation
+        registerStandardizedIpcHandler(
+            "check-site-now",
+            async (...args: unknown[]) => {
+                const identifier = args[0] as string;
+                const monitorId = args[1] as string;
+                return this.uptimeOrchestrator.checkSiteManually(identifier, monitorId);
+            },
+            MonitoringHandlerValidators.checkSiteNow,
+            this.registeredIpcHandlers
+        );
     }
 
     /**
@@ -350,36 +335,28 @@ export class IpcService {
      * @internal
      */
     private setupMonitorTypeHandlers(): void {
-        this.registeredIpcHandlers.add("get-monitor-types");
-        ipcMain.handle("get-monitor-types", () => {
-            if (isDev()) logger.debug("[IpcService] Handling get-monitor-types");
-
-            try {
+        // Get monitor types handler (no parameters)
+        registerStandardizedIpcHandler(
+            "get-monitor-types",
+            () => {
                 // Get all monitor type configs and serialize them safely for IPC
                 const configs = getAllMonitorTypeConfigs();
                 return configs.map((config) => this.serializeMonitorTypeConfig(config));
-            } catch (error) {
-                logger.error("[IpcService] Failed to get monitor types", error);
-                throw new Error("Failed to retrieve monitor type configurations");
-            }
-        });
+            },
+            MonitorTypeHandlerValidators.getMonitorTypes,
+            this.registeredIpcHandlers
+        );
 
-        this.registeredIpcHandlers.add("format-monitor-detail");
-        ipcMain.handle("format-monitor-detail", (_, type: string, details: string) => {
-            if (isDev()) logger.debug("[IpcService] Handling format-monitor-detail", { details, type });
+        // Format monitor detail handler with validation
+        registerStandardizedIpcHandler(
+            "format-monitor-detail",
+            (...args: unknown[]) => {
+                const monitorType = args[0] as string;
+                const details = args[1] as string;
 
-            try {
-                // Input validation
-                if (typeof type !== "string" || !type.trim()) {
-                    throw new TypeError("Invalid monitor type provided");
-                }
-                if (typeof details !== "string") {
-                    throw new TypeError("Invalid details provided");
-                }
-
-                const config = getMonitorTypeConfig(type.trim());
+                const config = getMonitorTypeConfig(monitorType.trim());
                 if (!config) {
-                    logger.warn("[IpcService] Unknown monitor type for detail formatting", { type });
+                    logger.warn("[IpcService] Unknown monitor type for detail formatting", { monitorType });
                     return details; // Return original details if type is unknown
                 }
 
@@ -388,26 +365,21 @@ export class IpcService {
                 }
 
                 return details;
-            } catch (error) {
-                logger.error("[IpcService] Failed to format monitor detail", { details, error, type });
-                return details; // Return original details on error
-            }
-        });
+            },
+            MonitorTypeHandlerValidators.formatMonitorDetail,
+            this.registeredIpcHandlers
+        );
 
-        this.registeredIpcHandlers.add("format-monitor-title-suffix");
-        ipcMain.handle("format-monitor-title-suffix", (_, type: string, monitor: Record<string, unknown>) => {
-            if (isDev()) logger.debug("[IpcService] Handling format-monitor-title-suffix", { monitor, type });
+        // Format monitor title suffix handler with validation
+        registerStandardizedIpcHandler(
+            "format-monitor-title-suffix",
+            (...args: unknown[]) => {
+                const monitorType = args[0] as string;
+                const monitor = args[1] as Record<string, unknown>;
 
-            try {
-                // Input validation
-                if (typeof type !== "string" || !type.trim()) {
-                    throw new TypeError("Invalid monitor type provided");
-                }
-                // monitor is already typed as Record<string, unknown>, so basic validation is sufficient
-
-                const config = getMonitorTypeConfig(type.trim());
+                const config = getMonitorTypeConfig(monitorType.trim());
                 if (!config) {
-                    logger.warn("[IpcService] Unknown monitor type for title suffix formatting", { type });
+                    logger.warn("[IpcService] Unknown monitor type for title suffix formatting", { monitorType });
                     return ""; // Return empty string if type is unknown
                 }
 
@@ -416,100 +388,98 @@ export class IpcService {
                 }
 
                 return "";
-            } catch (error) {
-                logger.error("[IpcService] Failed to format monitor title suffix", { error, monitor, type });
-                return ""; // Return empty string on error
-            }
-        });
+            },
+            MonitorTypeHandlerValidators.formatMonitorTitleSuffix,
+            this.registeredIpcHandlers
+        );
 
-        this.registeredIpcHandlers.add("validate-monitor-data");
-        ipcMain.handle("validate-monitor-data", (_, type: string, data: unknown): MonitorValidationResult => {
-            if (isDev()) logger.debug("[IpcService] Handling validate-monitor-data", { data, type });
-
-            try {
-                // Input validation
-                if (typeof type !== "string" || !type.trim()) {
-                    return {
-                        errors: ["Invalid monitor type provided"],
-                        metadata: {},
-                        success: false,
-                        warnings: [],
-                    };
-                }
+        // Validate monitor data handler with special validation response format
+        registerStandardizedIpcHandler(
+            "validate-monitor-data",
+            (...args: unknown[]) => {
+                const monitorType = args[0] as string;
+                const data = args[1];
 
                 // Use the validation function from the registry
-                const result = validateMonitorData(type.trim(), data);
-                return {
-                    errors: result.errors,
-                    metadata: result.metadata,
-                    success: result.success,
-                    warnings: result.warnings,
-                };
-            } catch (error) {
-                logger.error("[IpcService] Failed to validate monitor data", { data, error, type });
-                return {
-                    errors: ["Validation failed due to internal error"],
-                    metadata: {},
-                    success: false,
-                    warnings: [],
-                };
-            }
-        });
+                const result = validateMonitorData(monitorType.trim(), data);
+
+                // Return in the expected validation format for backward compatibility
+                return createValidationResponse(result.success, result.errors, result.warnings, result.metadata);
+            },
+            MonitorTypeHandlerValidators.validateMonitorData,
+            this.registeredIpcHandlers
+        );
     }
 
     /**
      * Registers IPC handlers for site management operations.
      *
      * @remarks
-     * Handles CRUD operations for sites and monitors. All handlers are registered with unique channel names and are tracked for cleanup.
+     * Handles CRUD operations for sites and monitors using standardized IPC patterns.
+     * All handlers use consistent response formatting, parameter validation, and error handling.
+     * All handlers are registered with unique channel names and are tracked for cleanup.
      *
      * @internal
      */
     private setupSiteHandlers(): void {
-        this.registeredIpcHandlers.add("add-site");
-        ipcMain.handle("add-site", async (_, site: Site) => {
-            if (isDev()) logger.debug("[IpcService] Handling add-site");
-            return this.uptimeOrchestrator.addSite(site);
-        });
+        // Add site handler with validation
+        registerStandardizedIpcHandler(
+            "add-site",
+            async (...args: unknown[]) => this.uptimeOrchestrator.addSite(args[0] as Site),
+            SiteHandlerValidators.addSite,
+            this.registeredIpcHandlers
+        );
 
-        this.registeredIpcHandlers.add("remove-site");
-        ipcMain.handle("remove-site", async (_, identifier: string) => {
-            if (isDev()) logger.debug("[IpcService] Handling remove-site", { identifier });
-            return this.uptimeOrchestrator.removeSite(identifier);
-        });
+        // Remove site handler with validation
+        registerStandardizedIpcHandler(
+            "remove-site",
+            async (...args: unknown[]) => this.uptimeOrchestrator.removeSite(args[0] as string),
+            SiteHandlerValidators.removeSite,
+            this.registeredIpcHandlers
+        );
 
-        this.registeredIpcHandlers.add("get-sites");
-        ipcMain.handle("get-sites", async () => {
-            if (isDev()) logger.debug("[IpcService] Handling get-sites");
-            return this.uptimeOrchestrator.getSites();
-        });
+        // Get sites handler (no parameters)
+        registerStandardizedIpcHandler(
+            "get-sites",
+            async () => this.uptimeOrchestrator.getSites(),
+            SiteHandlerValidators.getSites,
+            this.registeredIpcHandlers
+        );
 
-        this.registeredIpcHandlers.add("update-site");
-        ipcMain.handle("update-site", async (_, identifier: string, updates: Partial<Site>) => {
-            if (isDev()) logger.debug("[IpcService] Handling update-site", { identifier });
-            return this.uptimeOrchestrator.updateSite(identifier, updates);
-        });
+        // Update site handler with validation
+        registerStandardizedIpcHandler(
+            "update-site",
+            async (...args: unknown[]) =>
+                this.uptimeOrchestrator.updateSite(args[0] as string, args[1] as Partial<Site>),
+            SiteHandlerValidators.updateSite,
+            this.registeredIpcHandlers
+        );
 
-        this.registeredIpcHandlers.add("remove-monitor");
-        ipcMain.handle("remove-monitor", async (_, siteIdentifier: string, monitorId: string) => {
-            if (isDev()) logger.debug("[IpcService] Handling remove-monitor", { monitorId, siteIdentifier });
-            return this.uptimeOrchestrator.removeMonitor(siteIdentifier, monitorId);
-        });
+        // Remove monitor handler with validation
+        registerStandardizedIpcHandler(
+            "remove-monitor",
+            async (...args: unknown[]) => this.uptimeOrchestrator.removeMonitor(args[0] as string, args[1] as string),
+            SiteHandlerValidators.removeMonitor,
+            this.registeredIpcHandlers
+        );
     }
 
     /**
      * Registers IPC handlers for state synchronization operations.
      *
      * @remarks
-     * Handles manual full sync requests and sync status queries. Emits synchronization events to all renderer processes. All handlers are registered with unique channel names and are tracked for cleanup.
+     * Handles manual full sync requests and sync status queries using standardized IPC patterns.
+     * Emits synchronization events to all renderer processes. All handlers use consistent response
+     * formatting, parameter validation, and error handling. All handlers are registered with
+     * unique channel names and are tracked for cleanup.
      *
      * @internal
      */
     private setupStateSyncHandlers(): void {
-        this.registeredIpcHandlers.add("request-full-sync");
-        ipcMain.handle("request-full-sync", async () => {
-            logger.debug("[IpcService] Handling request-full-sync");
-            try {
+        // Request full sync handler (no parameters)
+        registerStandardizedIpcHandler(
+            "request-full-sync",
+            async () => {
                 // Get all sites and send to frontend
                 const sites = await this.uptimeOrchestrator.getSites();
 
@@ -532,16 +502,15 @@ export class IpcService {
 
                 logger.debug("[IpcService] Full sync completed", { siteCount: sites.length });
                 return { siteCount: sites.length, success: true };
-            } catch (error) {
-                logger.error("[IpcService] Failed to perform full sync", error);
-                throw error;
-            }
-        });
+            },
+            StateSyncHandlerValidators.requestFullSync,
+            this.registeredIpcHandlers
+        );
 
-        this.registeredIpcHandlers.add("get-sync-status");
-        ipcMain.handle("get-sync-status", async () => {
-            logger.debug("[IpcService] Handling get-sync-status");
-            try {
+        // Get sync status handler (no parameters)
+        registerStandardizedIpcHandler(
+            "get-sync-status",
+            async () => {
                 const sites = await this.uptimeOrchestrator.getSites();
                 return {
                     lastSync: Date.now(),
@@ -549,16 +518,10 @@ export class IpcService {
                     success: true,
                     synchronized: true,
                 };
-            } catch (error) {
-                logger.error("[IpcService] Failed to get sync status", error);
-                return {
-                    lastSync: null,
-                    siteCount: 0,
-                    success: false,
-                    synchronized: false,
-                };
-            }
-        });
+            },
+            StateSyncHandlerValidators.getSyncStatus,
+            this.registeredIpcHandlers
+        );
     }
 
     /**

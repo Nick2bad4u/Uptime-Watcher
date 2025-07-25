@@ -194,15 +194,18 @@ export function pruneHistoryForMonitor(db: Database, monitorId: string, limit: n
         ]) as { id: number }[];
 
         if (excess.length > 0) {
-            // Convert numeric IDs to ensure type safety
-            const excessIds = excess.map((row) => Number(row.id));
-            // Use parameterized query to avoid SQL injection
-            const placeholders = excessIds.map(() => "?").join(",");
-            db.run(`DELETE FROM history WHERE id IN (${placeholders})`, excessIds);
-            if (isDev()) {
-                logger.debug(
-                    `[HistoryManipulation] Pruned ${excess.length} old history entries for monitor: ${monitorId}`
-                );
+            // Convert numeric IDs to ensure type safety and validate they are numbers
+            const excessIds = excess.map((row) => Number(row.id)).filter((id) => Number.isFinite(id) && id > 0);
+
+            if (excessIds.length > 0) {
+                // Use parameterized query to avoid SQL injection
+                const placeholders = excessIds.map(() => "?").join(",");
+                db.run(`DELETE FROM history WHERE id IN (${placeholders})`, excessIds);
+                if (isDev()) {
+                    logger.debug(
+                        `[HistoryManipulation] Pruned ${excessIds.length} old history entries for monitor: ${monitorId}`
+                    );
+                }
             }
         }
     } catch (error) {
