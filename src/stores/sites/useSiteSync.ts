@@ -12,7 +12,7 @@ import { ensureError } from "../../utils/errorHandling";
 import { useErrorStore } from "../error/useErrorStore";
 import { logStoreAction, withErrorHandling } from "../utils";
 import { SiteService } from "./services/SiteService";
-import { createStatusUpdateHandler, StatusUpdateManager } from "./utils/statusUpdateHandler";
+import { StatusUpdateManager } from "./utils/statusUpdateHandler";
 
 export interface SiteSyncActions {
     /**
@@ -67,8 +67,8 @@ export interface SiteSyncDependencies {
     setSites: (sites: Site[]) => void;
 }
 
-// Create a shared status update manager instance
-const statusUpdateManager = new StatusUpdateManager();
+// Create a shared status update manager instance - will be initialized when first used
+let statusUpdateManager: StatusUpdateManager | undefined;
 
 export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActions => {
     const actions: SiteSyncActions = {
@@ -111,19 +111,23 @@ export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActio
             }
         },
         subscribeToStatusUpdates: (callback: (update: StatusUpdate) => void) => {
-            const handler = createStatusUpdateHandler({
+            // Initialize status update manager if not already done
+            statusUpdateManager ??= new StatusUpdateManager({
                 fullSyncFromBackend: actions.fullSyncFromBackend,
                 getSites: deps.getSites,
                 onUpdate: callback,
                 setSites: deps.setSites,
             });
 
-            statusUpdateManager.subscribe(handler, actions.fullSyncFromBackend).catch((error) => {
+            try {
+                // Use the new efficient StatusUpdateManager that handles incremental updates
+                statusUpdateManager.subscribe();
+            } catch (error) {
                 logger.error("Failed to subscribe to status updates:", ensureError(error));
-            });
+            }
 
             const result = {
-                message: "Successfully subscribed to status updates",
+                message: "Successfully subscribed to status updates with efficient incremental updates",
                 subscribed: true,
                 success: true,
             };
@@ -186,7 +190,7 @@ export const createSiteSyncActions = (deps: SiteSyncDependencies): SiteSyncActio
             );
         },
         unsubscribeFromStatusUpdates: () => {
-            statusUpdateManager.unsubscribe();
+            statusUpdateManager?.unsubscribe();
             const result = {
                 message: "Successfully unsubscribed from status updates",
                 success: true,

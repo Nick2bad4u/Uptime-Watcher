@@ -347,7 +347,7 @@ function getMonitorSchema(type: string): typeof httpMonitorSchema | typeof portM
  * Internal helper function that creates a test object and validates
  * the specific field using the appropriate monitor schema.
  */
-function validateFieldWithSchema(type: string, fieldName: string, value: unknown) {
+function validateFieldWithSchema(type: string, fieldName: string, value: unknown): Record<string, unknown> {
     const testData = {
         [fieldName]: value,
     };

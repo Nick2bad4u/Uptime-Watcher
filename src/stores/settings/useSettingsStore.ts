@@ -98,17 +98,33 @@ export const useSettingsStore = create<SettingsStore>()(
                 logStoreAction("SettingsStore", "updateHistoryLimitValue", { limit });
 
                 const errorStore = useErrorStore.getState();
+                const currentSettings = get().settings;
+                
                 await withErrorHandling(
                     async () => {
+                        // Update local state immediately for responsive UI
+                        get().updateSettings({ historyLimit: limit });
+                        
                         // Call backend to update and prune history
                         await window.electronAPI.settings.updateHistoryLimit(limit);
-                        // Reload the value from backend to ensure sync
-                        const newLimit = await window.electronAPI.settings.getHistoryLimit();
-                        get().updateSettings({ historyLimit: newLimit });
+                        
+                        // Verify the value from backend to ensure sync
+                        const backendLimit = await window.electronAPI.settings.getHistoryLimit();
+                        
+                        // Ensure we have a valid number from backend
+                        const validBackendLimit =
+                            typeof backendLimit === "number" && backendLimit > 0 ? backendLimit : limit;
+                        
+                        // Update with backend value to ensure consistency
+                        get().updateSettings({ historyLimit: validBackendLimit });
                     },
                     {
                         clearError: () => errorStore.clearStoreError("settings"),
-                        setError: (error) => errorStore.setStoreError("settings", error),
+                        setError: (error) => {
+                            // Revert to previous state on error instead of using default
+                            errorStore.setStoreError("settings", error);
+                            get().updateSettings({ historyLimit: currentSettings.historyLimit });
+                        },
                         setLoading: (loading) => errorStore.setOperationLoading("updateHistoryLimit", loading),
                     }
                 );

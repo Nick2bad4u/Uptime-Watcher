@@ -7,19 +7,38 @@ import { DatabaseService } from "./DatabaseService";
 import { rowsToSettings, rowToSettingValue, settingsToRecord } from "./utils/settingsMapper";
 
 /**
- * Defines the dependencies required by the {@link SettingsRepository} for managing application settings persistence.
+ * Defines the dependencies required by the SettingsRepository for managing application settings persistence.
  *
  * @remarks
- * Provides the required {@link DatabaseService} for all settings operations. This interface is used for dependency injection.
+ * Provides the required DatabaseService for all settings operations.
+ * This interface is used for dependency injection to ensure proper service coupling.
+ *
  * @public
  */
 export interface SettingsRepositoryDependencies {
     /**
      * The database service used for transactional operations.
-     * @readonly
+     *
+     * @remarks
+     * Must be properly initialized before being passed to the repository.
      */
     databaseService: DatabaseService;
 }
+
+/**
+ * Common SQL queries for settings persistence operations.
+ *
+ * @remarks
+ * Centralizes query strings for maintainability and consistency. This constant is internal to the repository and not exported.
+ * @internal
+ */
+const SETTINGS_QUERIES = {
+    DELETE_ALL: "DELETE FROM settings",
+    DELETE_BY_KEY: "DELETE FROM settings WHERE key = ?",
+    INSERT_OR_REPLACE: "INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)",
+    SELECT_ALL: "SELECT * FROM settings",
+    SELECT_VALUE_BY_KEY: "SELECT value FROM settings WHERE key = ?",
+} as const;
 
 /**
  * Repository for managing application settings persistence.
@@ -31,10 +50,7 @@ export interface SettingsRepositoryDependencies {
  * @public
  */
 export class SettingsRepository {
-    /**
-     * The database service used for all transactional operations.
-     * @readonly
-     */
+    /** @internal */
     private readonly databaseService: DatabaseService;
 
     /**
@@ -102,7 +118,7 @@ export class SettingsRepository {
         }
 
         // Prepare the statement once for better performance
-        const stmt = db.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)");
+        const stmt = db.prepare(SETTINGS_QUERIES.INSERT_OR_REPLACE);
 
         try {
             for (const [key, value] of entries) {
@@ -167,7 +183,7 @@ export class SettingsRepository {
      * Use this method only when already within a transaction context.
      */
     public deleteAllInternal(db: Database): void {
-        db.run("DELETE FROM settings");
+        db.run(SETTINGS_QUERIES.DELETE_ALL);
         logger.info("[SettingsRepository] All settings deleted (internal)");
     }
 
@@ -180,7 +196,7 @@ export class SettingsRepository {
      * Use this method only when already within a transaction context.
      */
     public deleteInternal(db: Database, key: string): void {
-        db.run("DELETE FROM settings WHERE key = ?", [key]);
+        db.run(SETTINGS_QUERIES.DELETE_BY_KEY, [key]);
         if (isDev()) {
             logger.debug(`[SettingsRepository] Deleted setting (internal): ${key}`);
         }
@@ -200,9 +216,7 @@ export class SettingsRepository {
     public async get(key: string): Promise<string | undefined> {
         return withDatabaseOperation(() => {
             const db = this.getDb();
-            const result = db.get("SELECT value FROM settings WHERE key = ?", [key]) as
-                | Record<string, unknown>
-                | undefined;
+            const result = db.get(SETTINGS_QUERIES.SELECT_VALUE_BY_KEY, [key]) as Record<string, unknown> | undefined;
             return Promise.resolve(rowToSettingValue(result));
         }, `get-setting-${key}`);
     }
@@ -222,7 +236,7 @@ export class SettingsRepository {
     public async getAll(): Promise<Record<string, string>> {
         return withDatabaseOperation(() => {
             const db = this.getDb();
-            const settings = db.all("SELECT * FROM settings") as Record<string, unknown>[];
+            const settings = db.all(SETTINGS_QUERIES.SELECT_ALL) as Record<string, unknown>[];
             const settingRows = rowsToSettings(settings);
             return Promise.resolve(settingsToRecord(settingRows));
         }, "settings-get-all");

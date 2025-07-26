@@ -29,7 +29,7 @@ import { monitorLogger } from "../utils/logger";
  * Dependencies interface for DatabaseManager constructor.
  */
 export interface DatabaseManagerDependencies {
-    eventEmitter: TypedEventBus<DatabaseManagerEvents>;
+    eventEmitter: TypedEventBus<UptimeEvents>;
     repositories: {
         database: DatabaseService;
         history: HistoryRepository;
@@ -38,11 +38,6 @@ export interface DatabaseManagerDependencies {
         site: SiteRepository;
     };
 }
-
-/**
- * Combined events interface for DatabaseManager.
- */
-type DatabaseManagerEvents = UptimeEvents;
 
 /**
  * Database operations manager for the Uptime Watcher application.
@@ -96,7 +91,7 @@ export class DatabaseManager {
      * Typed event emitter for database events.
      * @readonly
      */
-    private readonly eventEmitter: TypedEventBus<DatabaseManagerEvents>;
+    private readonly eventEmitter: TypedEventBus<UptimeEvents>;
     /**
      * Current history limit for status history retention.
      * @defaultValue DEFAULT_HISTORY_LIMIT

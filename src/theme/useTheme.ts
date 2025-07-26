@@ -14,7 +14,11 @@ import { themeManager } from "./ThemeManager";
 import { Theme, ThemeName } from "./types";
 
 // Hook for availability-based colors
-export function useAvailabilityColors() {
+export function useAvailabilityColors(): {
+    getAvailabilityColor: (percentage: number) => string;
+    getAvailabilityDescription: (percentage: number) => string;
+    getAvailabilityVariant: (percentage: number) => "danger" | "success" | "warning";
+} {
     const { currentTheme } = useTheme();
 
     const getAvailabilityColor = (percentage: number): string => {
@@ -82,7 +86,12 @@ export function useAvailabilityColors() {
  * Hook for accessing theme-aware status colors.
  * @returns Object containing status colors from the current theme
  */
-export function useStatusColors() {
+export function useStatusColors(): {
+    down: string;
+    pending: string;
+    unknown: string;
+    up: string;
+} {
     const { currentTheme } = useTheme();
 
     return {

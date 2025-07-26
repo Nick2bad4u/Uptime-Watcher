@@ -6,6 +6,7 @@
  * All APIs are strictly typed and designed for extensibility.
  */
 
+import { safeStringify } from "../../../../shared/utils/stringConversion";
 import { getAllMonitorTypeConfigs } from "../../monitoring/MonitorTypeRegistry";
 
 /**
@@ -363,22 +364,6 @@ function getSqlTypeFromFieldType(fieldType: string): string {
 }
 
 /**
- * Helper function to safely convert value to string
- */
-function safeStringify(val: unknown): string {
-    if (typeof val === "string") {
-        return val;
-    }
-    // For non-string values, use JSON.stringify to properly serialize
-    try {
-        return JSON.stringify(val);
-    } catch {
-        // Fallback to string conversion if JSON.stringify fails
-        return String(val);
-    }
-}
-
-/**
  * Safely converts an error value to a string for database storage.
  *
  * @remarks
@@ -410,9 +395,9 @@ function safeStringifyError(value: unknown): string {
         try {
             const result = JSON.stringify(value);
             // Handle empty object case
-            return result === "{}" ? String(value) : result;
+            return result === "{}" ? "[Empty Object]" : result;
         } catch {
-            return String(value);
+            return "[Non-Serializable Object]";
         }
     }
 

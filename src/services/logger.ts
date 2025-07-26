@@ -66,12 +66,10 @@ const logger = {
             } else {
                 log.error(`[UPTIME-WATCHER] ${message}`, errorData);
             }
+        } else if (args.length > 0) {
+            log.error(`[UPTIME-WATCHER] ${message}`, ...args);
         } else {
-            if (args.length > 0) {
-                log.error(`[UPTIME-WATCHER] ${message}`, ...args);
-            } else {
-                log.error(`[UPTIME-WATCHER] ${message}`);
-            }
+            log.error(`[UPTIME-WATCHER] ${message}`);
         }
     },
     // Info level - general application flow

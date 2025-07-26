@@ -82,7 +82,7 @@ export function createDatabaseTables(db: Database): void {
             CREATE TABLE IF NOT EXISTS history (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 monitor_id INTEGER NOT NULL,
-                checked_at INTEGER,
+                timestamp INTEGER,
                 status TEXT,
                 responseTime INTEGER,
                 details TEXT,

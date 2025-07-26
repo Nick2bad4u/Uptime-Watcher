@@ -217,6 +217,7 @@ function generateOperationId(): string {
     } catch (error) {
         // Fallback for environments where crypto.randomUUID() is not available
         logger.debug("[OperationalHooks] crypto.randomUUID() not available, using fallback", error);
+        // eslint-disable-next-line sonarjs/pseudo-random
         return `op_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
     }
 }

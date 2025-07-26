@@ -10,7 +10,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import type { AppSettings } from "../../stores/types";
 
-import { HISTORY_LIMIT_OPTIONS, UI_DELAYS } from "../../constants";
+import { DEFAULT_HISTORY_LIMIT, HISTORY_LIMIT_OPTIONS, UI_DELAYS } from "../../constants";
 import logger from "../../services/logger";
 import { useErrorStore } from "../../stores/error/useErrorStore";
 import { useSettingsStore } from "../../stores/settings/useSettingsStore";
@@ -112,8 +112,16 @@ export function Settings({ onClose }: Readonly<SettingsProperties>) {
 
     const handleHistoryLimitChange = async (limit: number) => {
         try {
+            // Get the actual primitive value from settings
+            const oldLimit =
+                typeof settings.historyLimit === "number"
+                    ? settings.historyLimit
+                    : Number(settings.historyLimit) || DEFAULT_HISTORY_LIMIT;
+
             await updateHistoryLimitValue(limit);
-            logger.user.settingsChange("historyLimit", settings.historyLimit, limit);
+
+            // Log the change after successful update
+            logger.user.settingsChange("historyLimit", oldLimit, limit);
         } catch (error) {
             logger.error("Failed to update history limit from settings", ensureError(error));
             // Error is already handled by the store action

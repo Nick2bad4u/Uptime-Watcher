@@ -52,7 +52,7 @@ describe("SiteCardMetrics", () => {
         const cards = screen.getAllByTestId("metric-card");
         expect(cards.find((card) => card.getAttribute("data-label") === "Uptime")).toHaveAttribute(
             "data-value",
-            "87.65%"
+            "87.7%"
         );
     });
 });

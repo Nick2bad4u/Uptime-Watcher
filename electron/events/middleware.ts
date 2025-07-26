@@ -717,5 +717,5 @@ function safeSerialize(data: unknown): unknown {
         }
     }
 
-    return String(data);
+    return typeof data === "string" ? data : JSON.stringify(data);
 }

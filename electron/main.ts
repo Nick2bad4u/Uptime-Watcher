@@ -17,10 +17,47 @@ import { ApplicationService } from "./services/application/ApplicationService";
 import { logger } from "./utils/logger";
 
 // Configure electron-log for main process
+// Configure logging based on environment and command line arguments
+const configureLogging = () => {
+    // Check for debug flag in command line arguments
+    const args = new Set(process.argv.slice(2));
+    const debugFlag = args.has("--debug") || args.has("--log-debug");
+    const productionFlag = args.has("--log-production") || args.has("--log-prod");
+    const infoFlag = args.has("--log-info");
+
+    // Determine log level based on flags and environment
+    let consoleLevel: string;
+    let fileLevel: string;
+
+    if (debugFlag) {
+        consoleLevel = "debug";
+        fileLevel = "debug";
+        console.log("[LOGGING] Debug logging enabled via command line flag");
+    } else if (productionFlag) {
+        consoleLevel = "info";
+        fileLevel = "warn";
+        console.log("[LOGGING] Production logging level enabled via command line flag");
+    } else if (infoFlag) {
+        consoleLevel = "info";
+        fileLevel = "info";
+        console.log("[LOGGING] Info logging level enabled via command line flag");
+    } else {
+        // Default development behavior
+        const isDev = !app.isPackaged;
+        consoleLevel = isDev ? "debug" : "info";
+        fileLevel = isDev ? "info" : "warn";
+        console.log(`[LOGGING] Default logging: console=${consoleLevel}, file=${fileLevel} (isDev=${isDev})`);
+    }
+
+    return { consoleLevel, fileLevel };
+};
+
 // Enable preload mode for reliable logging in Electron's main process, especially with context isolation enabled
 log.initialize({ preload: true });
-log.transports.file.level = "info";
-log.transports.console.level = "debug";
+
+const { consoleLevel, fileLevel } = configureLogging();
+log.transports.file.level = fileLevel as any;
+log.transports.console.level = consoleLevel as any;
 log.transports.file.fileName = "uptime-watcher-main.log";
 log.transports.file.maxSize = 1024 * 1024 * 5; // 5MB max file size
 log.transports.file.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}";

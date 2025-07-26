@@ -220,14 +220,17 @@ export async function withIpcHandler<T>(channelName: string, handler: () => Prom
     const startTime = Date.now();
 
     try {
-        if (isDev()) {
+        // Reduce logging spam for high-frequency operations
+        const isHighFrequencyOperation = ["format-monitor-detail", "get-monitor-types"].includes(channelName);
+
+        if (isDev() && !isHighFrequencyOperation) {
             logger.debug(`[IpcHandler] Starting ${channelName}`);
         }
 
         const result = await handler();
         const duration = Date.now() - startTime;
 
-        if (isDev()) {
+        if (isDev() && !isHighFrequencyOperation) {
             logger.debug(`[IpcHandler] Completed ${channelName}`, { duration });
         }
 
@@ -280,7 +283,10 @@ export async function withIpcHandlerValidation<T>(
     const startTime = Date.now();
 
     try {
-        if (isDev()) {
+        // Reduce logging spam for high-frequency operations
+        const isHighFrequencyOperation = ["format-monitor-detail", "get-monitor-types"].includes(channelName);
+
+        if (isDev() && !isHighFrequencyOperation) {
             logger.debug(`[IpcHandler] Starting ${channelName}`, { paramCount: params.length });
         }
 
@@ -295,7 +301,7 @@ export async function withIpcHandlerValidation<T>(
         const result = await handler(...params);
         const duration = Date.now() - startTime;
 
-        if (isDev()) {
+        if (isDev() && !isHighFrequencyOperation) {
             logger.debug(`[IpcHandler] Completed ${channelName}`, { duration });
         }
 

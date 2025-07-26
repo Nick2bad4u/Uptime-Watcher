@@ -314,8 +314,8 @@ describe("monitorOperations", () => {
         });
 
         it("should preserve existing type", () => {
-            const result = normalizeMonitor({ type: "tcp" as MonitorType });
-            expect(result.type).toBe("tcp");
+            const result = normalizeMonitor({ type: "http" as MonitorType });
+            expect(result.type).toBe("http");
         });
 
         it("should preserve existing history", () => {

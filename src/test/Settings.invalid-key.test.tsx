@@ -232,7 +232,7 @@ describe("Settings Component - Invalid Key Coverage", () => {
         // modifying the component to expose it for testing
 
         // Get the Settings component from the render result
-        const settingsComponent = screen.getByRole("button", { name: /save changes/i }).closest(".modal-container");
+        const settingsComponent = screen.getByRole("button", { name: /Close/i }).closest(".modal-container");
         expect(settingsComponent).toBeTruthy();
 
         // We need to simulate the internal handleSettingChange call

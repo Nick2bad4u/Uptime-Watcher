@@ -25,7 +25,7 @@ export interface MonitorManagerDependencies {
     /** Database service for transactional operations. */
     databaseService: DatabaseService;
     /** Event bus for emitting and listening to monitor events. */
-    eventEmitter: TypedEventBus<MonitorManagerEvents>;
+    eventEmitter: TypedEventBus<UptimeEvents>;
     /** Returns the history limit for status checks. */
     getHistoryLimit: () => number;
     /** Returns the current sites cache. */
@@ -48,7 +48,7 @@ import { MonitorScheduler } from "../services/monitoring/MonitorScheduler";
 import { SiteService } from "../services/site/SiteService";
 import { Site, StatusUpdate } from "../types";
 import { StandardizedCache } from "../utils/cache/StandardizedCache";
-import { monitorLogger as logger } from "../utils/logger";
+import { logger } from "../utils/logger";
 import {
     startAllMonitoring,
     startMonitoringForSite,
@@ -57,16 +57,6 @@ import {
 } from "../utils/monitoring/monitorLifecycle";
 import { checkMonitor, checkSiteManually, MonitorCheckConfig } from "../utils/monitoring/monitorStatusChecker";
 import { withDatabaseOperation } from "../utils/operationalHooks";
-
-/**
- * Combined events interface for {@link MonitorManager}.
- *
- * @remarks
- * Type aliases all uptime-related events for manager event emission.
- *
- * @public
- */
-type MonitorManagerEvents = UptimeEvents;
 
 /**
  * Main class for orchestrating monitor scheduling, status checks, and event-driven updates.
@@ -89,7 +79,7 @@ export class MonitorManager {
      *
      * @readonly
      */
-    private readonly eventEmitter: TypedEventBus<MonitorManagerEvents>;
+    private readonly eventEmitter: TypedEventBus<UptimeEvents>;
 
     /**
      * Indicates if monitoring is currently active.

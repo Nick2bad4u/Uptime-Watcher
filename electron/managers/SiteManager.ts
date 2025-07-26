@@ -56,7 +56,7 @@ import { MonitoringConfig } from "../utils/database/interfaces";
 import { LoggerAdapter } from "../utils/database/serviceFactory";
 import { SiteRepositoryService } from "../utils/database/SiteRepositoryService";
 import { SiteWriterService } from "../utils/database/SiteWriterService";
-import { monitorLogger as logger } from "../utils/logger";
+import { logger } from "../utils/logger";
 import { ConfigurationManager } from "./ConfigurationManager";
 
 /**
@@ -113,7 +113,7 @@ export interface SiteManagerDependencies {
     /** Database service for transaction management. */
     databaseService: DatabaseService;
     /** Event emitter for system-wide communication. */
-    eventEmitter: TypedEventBus<SiteManagerEvents>;
+    eventEmitter: TypedEventBus<UptimeEvents>;
     /** History repository for status history management. */
     historyRepository: HistoryRepository;
     /** Optional MonitorManager dependency for coordinated operations. */
@@ -125,16 +125,6 @@ export interface SiteManagerDependencies {
     /** Site repository for database operations. */
     siteRepository: SiteRepository;
 }
-
-/**
- * @public
- * Combined events interface for {@link SiteManager}.
- *
- * @remarks
- * Supports all uptime monitoring events for comprehensive event communication
- * between the SiteManager and other system components.
- */
-type SiteManagerEvents = UptimeEvents;
 
 /**
  * @public
@@ -153,7 +143,7 @@ type SiteManagerEvents = UptimeEvents;
  */
 export class SiteManager {
     private readonly configurationManager: ConfigurationManager;
-    private readonly eventEmitter: TypedEventBus<SiteManagerEvents>;
+    private readonly eventEmitter: TypedEventBus<UptimeEvents>;
     private readonly monitoringOperations: IMonitoringOperations | undefined;
     private readonly repositories: Omit<
         SiteManagerDependencies,

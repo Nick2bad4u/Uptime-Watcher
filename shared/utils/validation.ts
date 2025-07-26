@@ -18,35 +18,11 @@ import { isMonitorStatus, type Monitor, type MonitorType, type Site } from "../t
 export function getMonitorValidationErrors(monitor: Partial<Monitor>): string[] {
     const errors: string[] = [];
 
-    if (!monitor.id) {
-        errors.push("Monitor ID is required");
-    }
+    // Validate basic required fields
+    validateBasicMonitorFields(monitor, errors);
 
-    if (!monitor.type) {
-        errors.push("Monitor type is required");
-    } else if (!validateMonitorType(monitor.type)) {
-        errors.push("Invalid monitor type");
-    }
-
-    if (!monitor.status) {
-        errors.push("Monitor status is required");
-    } else if (!isMonitorStatus(monitor.status)) {
-        errors.push("Invalid monitor status");
-    }
-
-    // Type-specific validation
-    if (monitor.type === "http") {
-        if (!monitor.url || typeof monitor.url !== "string") {
-            errors.push("URL is required for HTTP monitors");
-        }
-    } else if (monitor.type === "port") {
-        if (!monitor.host || typeof monitor.host !== "string") {
-            errors.push("Host is required for port monitors");
-        }
-        if (typeof monitor.port !== "number" || monitor.port < 1 || monitor.port > 65_535) {
-            errors.push("Valid port number (1-65535) is required for port monitors");
-        }
-    }
+    // Validate type-specific requirements
+    validateTypeSpecificFields(monitor, errors);
 
     return errors;
 }
@@ -113,4 +89,57 @@ export function validateSite(site: Partial<Site>): site is Site {
  */
 function isPartialMonitor(value: unknown): value is Partial<Monitor> {
     return typeof value === "object" && value !== null;
+}
+
+/**
+ * Validate basic required monitor fields
+ */
+function validateBasicMonitorFields(monitor: Partial<Monitor>, errors: string[]): void {
+    if (!monitor.id) {
+        errors.push("Monitor ID is required");
+    }
+
+    if (!monitor.type) {
+        errors.push("Monitor type is required");
+    } else if (!validateMonitorType(monitor.type)) {
+        errors.push("Invalid monitor type");
+    }
+
+    if (!monitor.status) {
+        errors.push("Monitor status is required");
+    } else if (!isMonitorStatus(monitor.status)) {
+        errors.push("Invalid monitor status");
+    }
+}
+
+/**
+ * Validate HTTP monitor specific fields
+ */
+function validateHttpMonitorFields(monitor: Partial<Monitor>, errors: string[]): void {
+    if (!monitor.url || typeof monitor.url !== "string") {
+        errors.push("URL is required for HTTP monitors");
+    }
+}
+
+/**
+ * Validate port monitor specific fields
+ */
+function validatePortMonitorFields(monitor: Partial<Monitor>, errors: string[]): void {
+    if (!monitor.host || typeof monitor.host !== "string") {
+        errors.push("Host is required for port monitors");
+    }
+    if (typeof monitor.port !== "number" || monitor.port < 1 || monitor.port > 65_535) {
+        errors.push("Valid port number (1-65535) is required for port monitors");
+    }
+}
+
+/**
+ * Validate type-specific monitor fields
+ */
+function validateTypeSpecificFields(monitor: Partial<Monitor>, errors: string[]): void {
+    if (monitor.type === "http") {
+        validateHttpMonitorFields(monitor, errors);
+    } else if (monitor.type === "port") {
+        validatePortMonitorFields(monitor, errors);
+    }
 }

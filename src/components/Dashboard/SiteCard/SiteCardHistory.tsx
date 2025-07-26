@@ -72,31 +72,49 @@ export const SiteCardHistory = React.memo(
         return <HistoryChart history={filteredHistory} maxItems={MAX_HISTORY_ITEMS} title={historyTitle} />;
     },
     (previousProperties, nextProperties) => {
-        // Custom comparison function to ensure proper re-renders
-        // Compare by history array length and last timestamp to detect changes
-        const previousHistory = previousProperties.filteredHistory;
-        const nextHistory = nextProperties.filteredHistory;
-
-        // Fix: History is sorted DESC (newest first), so latest is at index 0, not length-1
-        const previousLastTimestamp = previousHistory[0]?.timestamp;
-        const nextLastTimestamp = nextHistory[0]?.timestamp;
-
-        // Compare monitor properties that affect the chart title and display
-        const previousMonitor = previousProperties.monitor;
-        const nextMonitor = nextProperties.monitor;
-
-        const monitorChanged =
-            previousMonitor?.id !== nextMonitor?.id ||
-            previousMonitor?.type !== nextMonitor?.type ||
-            previousMonitor?.url !== nextMonitor?.url ||
-            previousMonitor?.port !== nextMonitor?.port ||
-            previousMonitor?.host !== nextMonitor?.host;
-
-        // Return true if nothing important changed (skip re-render)
-        return (
-            !monitorChanged &&
-            previousHistory.length === nextHistory.length &&
-            previousLastTimestamp === nextLastTimestamp
-        );
+        return areHistoryPropsEqual(previousProperties, nextProperties);
     }
 );
+
+/**
+ * Compare SiteCardHistory props to determine if re-render is needed.
+ * Broken into smaller functions to reduce complexity.
+ */
+
+function areHistoryPropsEqual(previous: SiteCardHistoryProperties, next: SiteCardHistoryProperties): boolean {
+    // Compare history arrays
+    if (previous.filteredHistory.length !== next.filteredHistory.length) {
+        return false;
+    }
+    const prevTimestamp = previous.filteredHistory[0]?.timestamp;
+    const nextTimestamp = next.filteredHistory[0]?.timestamp;
+    if (prevTimestamp !== nextTimestamp) {
+        return false;
+    }
+
+    // Compare monitor objects
+    const prevMonitor = previous.monitor;
+    const nextMonitor = next.monitor;
+    if (prevMonitor === undefined && nextMonitor === undefined) {
+        return true;
+    }
+    if (prevMonitor === undefined || nextMonitor === undefined) {
+        return false;
+    }
+    if (prevMonitor.id !== nextMonitor.id || prevMonitor.type !== nextMonitor.type) {
+        return false;
+    }
+    return !(
+        prevMonitor.url !== nextMonitor.url ||
+        prevMonitor.port !== nextMonitor.port ||
+        prevMonitor.host !== nextMonitor.host
+    );
+}
+
+/**
+ * Check if history data has changed in a meaningful way.
+ */
+
+/**
+ * Check if type-specific properties that affect display have changed.
+ */

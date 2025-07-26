@@ -33,36 +33,17 @@
  */
 export function determineMonitorStatus(httpStatus: number): "down" | "up" {
     // Input validation - HTTP status codes are defined in 100-599 range
-    if (!Number.isInteger(httpStatus) || httpStatus < 100 || httpStatus > 599) {
-        // Invalid HTTP status codes - treat as error
+    if (!isValidHttpStatus(httpStatus)) {
         return "down";
     }
 
-    // 1xx = informational (up - site is responding)
-    if (httpStatus >= 100 && httpStatus < 200) {
-        return "up";
-    }
+    // 5xx = server error (down), all others are considered "up" (responding)
+    return httpStatus >= 500 && httpStatus < 600 ? "down" : "up";
+}
 
-    // 2xx = success (up)
-    if (httpStatus >= 200 && httpStatus < 300) {
-        return "up";
-    }
-
-    // 3xx = redirects (up - site is responding)
-    if (httpStatus >= 300 && httpStatus < 400) {
-        return "up";
-    }
-
-    // 4xx = client error but site is responding (up)
-    if (httpStatus >= 400 && httpStatus < 500) {
-        return "up";
-    }
-
-    // 5xx = server error (down)
-    if (httpStatus >= 500 && httpStatus < 600) {
-        return "down";
-    }
-
-    // Should never reach here due to input validation, but defensive programming
-    return "down";
+/**
+ * Validate HTTP status code range
+ */
+function isValidHttpStatus(httpStatus: number): boolean {
+    return Number.isInteger(httpStatus) && httpStatus >= 100 && httpStatus <= 599;
 }

@@ -7,7 +7,65 @@ jobs:
         runs-on: ubuntu-latest
         name: codacy-coverage-reporter
         steps:
-            - uses: actions/checkout@v2
+            - name: Harden the runner (Audit all outbound calls)
+              uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
+              with:
+                  egress-policy: audit
+
+            - name: Checkout
+              id: checkout
+              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+              with:
+                  fetch-depth: 0
+
+            - name: Set up Node
+              id: setup-node
+              uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+              with:
+                  node-version: "22"
+                  cache: "npm"
+
+            - name: Install dependencies
+              id: install-deps
+              run: npm install --force
+
+            - name: Build Frontend and Backend
+              id: build
+              run: |
+                  npm run build
+
+            # Run frontend tests with coverage
+            - name: Run frontend tests
+              id: test-frontend
+              run: |
+                  mkdir -p coverage
+                  # Clean any existing coverage to avoid conflicts
+                  rm -f coverage/lcov.info
+                  npx vitest run --coverage --reporter=verbose --reporter=junit --outputFile=coverage/frontend-test-report.junit.xml
+
+
+            # Run electron tests with coverage
+            - name: Run electron tests
+              id: test-electron
+              run: |
+                  mkdir -p coverage/electron
+                  # Clean any existing coverage to avoid conflicts
+                  rm -f coverage/electron/lcov.info
+                  npx vitest run --config vitest.electron.config.ts --coverage --reporter=verbose --reporter=junit --outputFile=coverage/electron/electron-test-report.junit.xml
+
+
+            # Verify coverage files exist
+            - name: Verify coverage files
+              run: |
+                  echo "=== Checking coverage files ==="
+                  ls -la coverage/ || echo "No coverage directory"
+                  ls -la coverage/electron/ || echo "No electron coverage directory"
+                  echo "=== Frontend coverage files ==="
+                  find coverage/ -name "*.info" -o -name "lcov.info" || echo "No lcov files found in coverage/"
+                  echo "=== Electron coverage files ==="
+                  find coverage/electron/ -name "*.info" -o -name "lcov.info" || echo "No lcov files found in coverage/electron/"
+                  echo "=== Test report files ==="
+                  find coverage/ -name "*.junit.xml" || echo "No junit files"
             - name: Run codacy-coverage-reporter
               uses: codacy/codacy-coverage-reporter-action@v1.3.0
               with:

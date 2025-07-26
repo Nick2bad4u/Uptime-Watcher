@@ -86,13 +86,28 @@ export const HistoryTab = ({
     // Dropdown options: 25, 50, 100, All (clamped to backendLimit and available history)
     const maxShow = Math.min(backendLimit, historyLength);
     const showOptions = [10, 25, 50, 100, 250, 500, 1000, 10_000].filter((opt) => opt <= maxShow);
+
     // Always include 'All' if there are fewer than backendLimit
     if (historyLength > 0 && historyLength <= backendLimit && !showOptions.includes(historyLength)) {
         showOptions.push(historyLength);
     }
+
+    // Ensure we always have at least one valid option, even for small history counts
+    if (showOptions.length === 0) {
+        if (historyLength > 0) {
+            showOptions.push(historyLength);
+        } else {
+            showOptions.push(10);
+        }
+    }
+
     // Default to 50, but never more than backendLimit or available history
-    const defaultHistoryLimit = Math.min(50, backendLimit, historyLength);
+    const defaultHistoryLimit = Math.min(50, backendLimit, Math.max(1, historyLength));
     const [historyLimit, setHistoryLimit] = useState(defaultHistoryLimit);
+
+    // Ensure historyLimit is always valid
+    const safeHistoryLimit =
+        Number.isFinite(historyLimit) && historyLimit > 0 ? historyLimit : Math.min(10, Math.max(1, historyLength));
 
     // Log when history tab is viewed - only when monitor actually changes
     useEffect(() => {
@@ -108,13 +123,14 @@ export const HistoryTab = ({
     }, [selectedMonitor.id, selectedMonitor.type]);
 
     useEffect(() => {
-        const safeHistoryLength = selectedMonitor.history.length;
-        setHistoryLimit(Math.min(50, backendLimit, safeHistoryLength));
+        const safeHistoryLength = selectedMonitor.history.length || 0;
+        const newLimit = Math.min(50, backendLimit, Math.max(1, safeHistoryLength));
+        setHistoryLimit(newLimit);
     }, [backendLimit, selectedMonitor.history]);
 
     const filteredHistoryRecords = selectedMonitor.history
         .filter((record: StatusHistory) => historyFilter === "all" || record.status === historyFilter)
-        .slice(0, historyLimit);
+        .slice(0, safeHistoryLimit);
 
     // Helper to render details with label using dynamic formatting
     function renderDetails(record: StatusHistory) {
@@ -176,7 +192,7 @@ export const HistoryTab = ({
                                     totalRecords: historyLength,
                                 });
                             }}
-                            value={historyLimit}
+                            value={safeHistoryLimit}
                         >
                             {showOptions.map((option) => (
                                 <option key={option} value={option}>

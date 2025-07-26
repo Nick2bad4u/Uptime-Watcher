@@ -1,11 +1,12 @@
 /**
- * @public
  * Database repository for monitor persistence and management.
- * Handles CRUD operations for site monitoring configurations.
  *
  * @remarks
- * All operations are wrapped in transactions and use the repository pattern for consistency and error handling.
- * All mutations are atomic and use the DatabaseService for transaction management.
+ * Handles CRUD operations for site monitoring configurations using the repository pattern.
+ * All operations are wrapped in transactions and use the DatabaseService for transaction management.
+ * All mutations are atomic to ensure data consistency and proper error handling.
+ *
+ * @public
  */
 import { Database } from "node-sqlite3-wasm";
 
@@ -19,27 +20,57 @@ import { buildMonitorParameters, rowsToMonitors, rowToMonitorOrUndefined } from 
 import { DbValue } from "./utils/valueConverters";
 
 /**
- * @public
  * Repository dependencies for managing monitor data persistence.
  *
  * @remarks
  * Provides the required database service for monitor operations.
+ * Used for dependency injection pattern to ensure proper service coupling.
+ *
+ * @public
  */
 export interface MonitorRepositoryDependencies {
-    /** Database service for transactional operations. */
+    /**
+     * Database service for transactional operations.
+     *
+     * @remarks
+     * Must be properly initialized before being passed to the repository.
+     */
     databaseService: DatabaseService;
 }
 
 /**
- * @public
- * Repository for managing monitor data persistence.
- * Handles CRUD operations for monitors in the database.
+ * Common SQL queries for monitor persistence operations.
  *
  * @remarks
- * All operations are wrapped in transactions and use the repository pattern for consistency and error handling.
- * All mutations are atomic and use the DatabaseService for transaction management.
+ * Centralizes query strings for maintainability and consistency. This constant is internal to the repository and not exported.
+ * @internal
+ */
+const MONITOR_QUERIES = {
+    DELETE_ALL: "DELETE FROM monitors",
+    DELETE_BY_ID: "DELETE FROM monitors WHERE id = ?",
+    DELETE_BY_SITE: "DELETE FROM monitors WHERE site_identifier = ?",
+    DELETE_HISTORY_BY_MONITOR: "DELETE FROM history WHERE monitor_id = ?",
+    INSERT_WITH_RETURNING: `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, timeout, retryAttempts, monitoring, status, responseTime, lastChecked) 
+                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
+                           RETURNING id`,
+    SELECT_ALL_IDS: "SELECT id FROM monitors",
+    SELECT_BY_ID: "SELECT * FROM monitors WHERE id = ?",
+    SELECT_BY_SITE: "SELECT * FROM monitors WHERE site_identifier = ?",
+    SELECT_IDS_BY_SITE: "SELECT id FROM monitors WHERE site_identifier = ?",
+    UPDATE_STATUS: "UPDATE monitors SET status = ?, responseTime = ?, lastChecked = ? WHERE id = ?",
+} as const;
+
+/**
+ * @public
+ * Repository for managing monitor data persistence.
+ *
+ * @remarks
+ * Handles all CRUD operations for monitors in the database using the repository pattern.
+ * All mutations are wrapped in transactions for consistency and error handling.
+ * All operations use the DatabaseService for transaction management and maintain atomicity.
  */
 export class MonitorRepository {
+    /** @internal */
     private readonly databaseService: DatabaseService;
 
     /**
@@ -79,9 +110,7 @@ export class MonitorRepository {
                     for (const monitor of monitors) {
                         // Use RETURNING clause to get the ID directly from the insert
                         const insertResult = db.get(
-                            `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, timeout, retryAttempts, monitoring, status, responseTime, lastChecked) 
-                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
-                             RETURNING id`,
+                            MONITOR_QUERIES.INSERT_WITH_RETURNING,
                             buildMonitorParameters(siteIdentifier, monitor)
                         ) as Record<string, unknown> | undefined;
 
@@ -243,7 +272,7 @@ export class MonitorRepository {
      * Use this method when already within a transaction context.
      */
     public deleteAllInternal(db: Database): void {
-        db.run("DELETE FROM monitors");
+        db.run(MONITOR_QUERIES.DELETE_ALL);
         logger.debug("[MonitorRepository] Cleared all monitors (internal)");
     }
 
@@ -289,17 +318,17 @@ export class MonitorRepository {
      */
     public deleteBySiteIdentifierInternal(db: Database, siteIdentifier: string): void {
         // Get all monitor IDs for this site
-        const monitorRows = db.all("SELECT id FROM monitors WHERE site_identifier = ?", [siteIdentifier]) as {
+        const monitorRows = db.all(MONITOR_QUERIES.SELECT_IDS_BY_SITE, [siteIdentifier]) as {
             id: number;
         }[];
 
         // Delete history for all monitors
         for (const row of monitorRows) {
-            db.run("DELETE FROM history WHERE monitor_id = ?", [row.id]);
+            db.run(MONITOR_QUERIES.DELETE_HISTORY_BY_MONITOR, [row.id]);
         }
 
         // Delete all monitors for this site
-        db.run("DELETE FROM monitors WHERE site_identifier = ?", [siteIdentifier]);
+        db.run(MONITOR_QUERIES.DELETE_BY_SITE, [siteIdentifier]);
     }
 
     /**
@@ -313,10 +342,10 @@ export class MonitorRepository {
      */
     public deleteInternal(db: Database, monitorId: string): boolean {
         // Delete history first (foreign key constraint)
-        db.run("DELETE FROM history WHERE monitor_id = ?", [monitorId]);
+        db.run(MONITOR_QUERIES.DELETE_HISTORY_BY_MONITOR, [monitorId]);
 
         // Delete the monitor
-        const deleteResult = db.run("DELETE FROM monitors WHERE id = ?", [monitorId]);
+        const deleteResult = db.run(MONITOR_QUERIES.DELETE_BY_ID, [monitorId]);
         return deleteResult.changes > 0;
     }
 
@@ -337,9 +366,7 @@ export class MonitorRepository {
         return withDatabaseOperation(
             () => {
                 const db = this.getDb();
-                const row = db.get("SELECT * FROM monitors WHERE id = ?", [monitorId]) as
-                    | Record<string, unknown>
-                    | undefined;
+                const row = db.get(MONITOR_QUERIES.SELECT_BY_ID, [monitorId]) as Record<string, unknown> | undefined;
 
                 return Promise.resolve(rowToMonitorOrUndefined(row));
             },
@@ -365,10 +392,7 @@ export class MonitorRepository {
     public async findBySiteIdentifier(siteIdentifier: string): Promise<Site["monitors"]> {
         return withDatabaseOperation(() => {
             const db = this.getDb();
-            const monitorRows = db.all("SELECT * FROM monitors WHERE site_identifier = ?", [siteIdentifier]) as Record<
-                string,
-                unknown
-            >[];
+            const monitorRows = db.all(MONITOR_QUERIES.SELECT_BY_SITE, [siteIdentifier]) as Record<string, unknown>[];
 
             return Promise.resolve(rowsToMonitors(monitorRows));
         }, `find-monitors-by-site-${siteIdentifier}`);
@@ -389,7 +413,7 @@ export class MonitorRepository {
     public async getAllMonitorIds(): Promise<{ id: number }[]> {
         return withDatabaseOperation(() => {
             const db = this.getDb();
-            const rows = db.all("SELECT id FROM monitors") as { id: number }[];
+            const rows = db.all(MONITOR_QUERIES.SELECT_ALL_IDS) as { id: number }[];
             return Promise.resolve(rows);
         }, "monitor-get-all-ids");
     }
