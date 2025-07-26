@@ -1,6 +1,8 @@
 {
     "threshold": 3,
-    "reporters": ["html", "markdown", "json", "console", "sarif", "xml"],
+    "reporters": ["html", "markdown", "json", "console", "sarif", "xml", "badge", "csv"],
+    "minLines": 10,
+    "mode": "strict",
     "ignore": [
         "**/node_modules/**",
         "**/.git/**",
