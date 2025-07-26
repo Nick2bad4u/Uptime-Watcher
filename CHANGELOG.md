@@ -7,14 +7,104 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[c08abb4](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c08abb4792d5f9af460b82fe175cc155664023f4)...
-[c08abb4](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c08abb4792d5f9af460b82fe175cc155664023f4)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/c08abb4792d5f9af460b82fe175cc155664023f4...c08abb4792d5f9af460b82fe175cc155664023f4))
+[[ea90eee](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ea90eee642760d0f577bd4371c5ee1e96184e9cd)...
+[ea90eee](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ea90eee642760d0f577bd4371c5ee1e96184e9cd)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/ea90eee642760d0f577bd4371c5ee1e96184e9cd...ea90eee642760d0f577bd4371c5ee1e96184e9cd))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 8.7.0 [`(ea90eee)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ea90eee642760d0f577bd4371c5ee1e96184e9cd)
+
+
+
+
+
+
+## [8.7.0] - 2025-07-26
+
+
+[[913db17](https://github.com/Nick2bad4u/Uptime-Watcher/commit/913db17b96d46575a679c2cd609d0b343f7079c6)...
+[5420e72](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5420e727200b919b308c678fd16a6d168500aecc)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/913db17b96d46575a679c2cd609d0b343f7079c6...5420e727200b919b308c678fd16a6d168500aecc))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 8.6.0 [`(c08abb4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c08abb4792d5f9af460b82fe175cc155664023f4)
+
+
+
+### 🔀 Merge Commits
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(fd27338)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fd2733851306dc62b3b8f8452e67604cbacdf609)
+
+
+- [chore] Merge Branch 'main' of https://github.com/Nick2bad4u/Uptime-Watcher [`(4c2496b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4c2496b7294579a9dda65c4581cb5374bb80fdd4)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Streamline backend status updates & code quality
+
+- Refactors status update handling for sites and monitors to enable more efficient, incremental updates and minimize unnecessary full syncs
+- Improves code quality and maintainability by modularizing validation logic and reducing cyclomatic complexity in several areas
+- Updates IPC logging to reduce output for high-frequency operations and adjusts error handling for robustness
+- Unifies manager event types, improves schema handling, and tidies type usage across repositories
+- Harden CI workflow, enhance commit documentation, and introduce new logging CLI commands for better development and production diagnostics
+- Fixes UI details in history tab and metric rounding in tests for consistency
+
+Relates to ongoing code quality remediation and performance improvements [`(5a9ec9f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5a9ec9fc2a14b7f39f98fc5a8381821c554931b2)
+
+
+
+### � Documentation
+
+- 📝 [docs] Improve formatting and clarity in quality review
+
+- Enhances markdown formatting, table alignment, and section separation for better readability
+- Adds line breaks and spacing for clarity in remediation plans and implementation status
+- Updates language to be more consistent and actionable
+- Improves presentation of code analysis metrics and recommendations [`(c1ddf2a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c1ddf2a5851447f0c2075ace3c641ca1826621c0)
+
+
+- 📝 [docs] Finalize and standardize AI claims review docs
+
+- Updates summary, review, and implementation documentation for low-confidence AI claim reviews across all service, utility, infrastructure, and monitoring layers
+- Aligns tables, formatting, and section ordering for clarity and consistency
+- Expands on rationale, architectural impact, and validation results for each review batch
+- Ensures comprehensive TSDoc standards, error handling, type safety, and code quality commentary are reflected in documentation
+- Documents additional improvements, architectural insights, and future recommendations
+- Clarifies false positive findings and documents architectural decisions
+- No functional code changes; documentation and review summaries only [`(543efe4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/543efe4bb8ba01e1ab2b3071e322824620139594)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Reformat config files for improved readability
+
+- Consolidates array and object definitions in config files to single lines where appropriate, reducing vertical space and enhancing clarity.
+- Removes unnecessary blank lines, making configuration files more concise and easier to maintain. [`(913db17)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/913db17b96d46575a679c2cd609d0b343f7079c6)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v8.6.0 [skip ci] [`(b3ca602)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b3ca602d05e947f86a1beff08b76749dd8b1d82e)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Enhance jscpd config and scripts; add badge reporter
+
+- Updates code duplication detection to use strict mode and raise minLines threshold for improved accuracy
+- Adds badge and csv reporters for richer output and reporting options
+- Introduces @jscpd/badge-reporter dependency
+- Expands lint scripts for flexible duplicate analysis, supporting local skipping and custom min-lines
+- [dependency] Updates project version for new build capabilities [`(5420e72)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5420e727200b919b308c678fd16a6d168500aecc)
 
 
 
