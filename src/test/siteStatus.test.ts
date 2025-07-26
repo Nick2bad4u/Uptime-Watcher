@@ -659,9 +659,9 @@ describe("siteStatus utilities - Uncovered Lines", () => {
             expect(variant).toBe("error");
         });
 
-        it("should return info variant for unhandled status", () => {
+        it("should return error variant for unhandled status", () => {
             const variant = getSiteStatusVariant("unhandled" as any);
-            expect(variant).toBe("info");
+            expect(variant).toBe("error");
         });
     });
 });

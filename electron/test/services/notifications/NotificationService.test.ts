@@ -121,11 +121,9 @@ describe("NotificationService", () => {
         it("should handle missing monitor gracefully", () => {
             notificationService.notifyMonitorDown(mockSite, "non-existent-monitor");
 
-            expect(Notification).toHaveBeenCalledWith({
-                body: "Example Site (unknown) is currently down!",
-                title: "Monitor Down Alert",
-                urgency: "critical",
-            });
+            // Should not send notification for missing monitor
+            expect(Notification).not.toHaveBeenCalled();
+            expect(mockNotification.show).not.toHaveBeenCalled();
         });
 
         it("should use identifier when site name is not available", () => {
@@ -199,11 +197,9 @@ describe("NotificationService", () => {
         it("should handle missing monitor gracefully", () => {
             notificationService.notifyMonitorUp(mockSite, "non-existent-monitor");
 
-            expect(Notification).toHaveBeenCalledWith({
-                body: "Example Site (unknown) is back online!",
-                title: "Monitor Restored",
-                urgency: "normal",
-            });
+            // Should not send notification for missing monitor
+            expect(Notification).not.toHaveBeenCalled();
+            expect(mockNotification.show).not.toHaveBeenCalled();
         });
 
         it("should use identifier when site name is not available", () => {

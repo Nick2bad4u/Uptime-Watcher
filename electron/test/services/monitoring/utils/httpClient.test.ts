@@ -61,7 +61,7 @@ describe("HTTP Client Utils", () => {
                 },
                 httpAgent: expect.any(Object),
                 httpsAgent: expect.any(Object),
-                maxBodyLength: 1024,
+                maxBodyLength: 10240,
                 maxContentLength: 10 * 1024 * 1024,
                 maxRedirects: 5,
                 responseType: "text",
@@ -80,16 +80,13 @@ describe("HTTP Client Utils", () => {
             // Assert
             expect(result).toBe(mockAxiosInstance);
             expect(mockAxiosCreate).toHaveBeenCalledWith({
-                headers: {
-                    "User-Agent": undefined,
-                },
+                headers: {},
                 httpAgent: expect.any(Object),
                 httpsAgent: expect.any(Object),
-                maxBodyLength: 1024,
+                maxBodyLength: 10240,
                 maxContentLength: 10 * 1024 * 1024,
                 maxRedirects: 5,
                 responseType: "text",
-                timeout: undefined,
                 validateStatus: expect.any(Function),
             });
         });

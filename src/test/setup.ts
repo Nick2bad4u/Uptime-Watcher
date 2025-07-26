@@ -96,12 +96,55 @@ Object.defineProperty(window, "matchMedia", {
     })),
 });
 
+// Mock crypto API for UUID generation
+Object.defineProperty(global, "crypto", {
+    value: {
+        randomUUID: vi.fn(() => "mock-uuid-" + Math.random().toString(36).substring(2, 15)),
+        getRandomValues: vi.fn((arr) => {
+            for (let i = 0; i < arr.length; i++) {
+                arr[i] = Math.floor(Math.random() * 256);
+            }
+            return arr;
+        }),
+    },
+    writable: true,
+});
+
+// Mock document.body.classList for theme tests
+Object.defineProperty(document.body, "classList", {
+    value: {
+        add: vi.fn(),
+        remove: vi.fn(),
+        contains: vi.fn(),
+        toggle: vi.fn(),
+    },
+    writable: true,
+});
+
+// Mock document.getElementById for main.tsx tests
+const originalGetElementById = document.getElementById;
+document.getElementById = vi.fn((id) => {
+    if (id === "root") {
+        return document.createElement("div");
+    }
+    return originalGetElementById.call(document, id);
+});
+
 vi.mock("electron-log/renderer", () => ({
     default: {
         info: vi.fn(),
         error: vi.fn(),
         warn: vi.fn(),
         debug: vi.fn(),
+        transports: {
+            console: {
+                level: "debug",
+                format: "[{h}:{i}:{s}.{ms}] [{level}] {text}",
+            },
+            file: {
+                level: "info",
+            },
+        },
     },
 }));
 

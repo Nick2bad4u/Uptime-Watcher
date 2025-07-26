@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 
 import { DEFAULT_CHECK_INTERVAL } from "../../../constants";
-import { MonitorScheduler } from "../../../services/monitoring";
+import { MonitorScheduler } from "../../../services/monitoring/MonitorScheduler";
 import { Site } from "../../../types";
 import { isDev } from "../../../electronUtils";
 import { logger } from "../../../utils/logger";

@@ -27,6 +27,17 @@ describe("ThemeManager", () => {
             matches: false,
             removeEventListener: vi.fn(),
         });
+
+        // Mock document.body.classList for theme tests
+        Object.defineProperty(document.body, "classList", {
+            value: {
+                add: vi.fn(),
+                remove: vi.fn(),
+                contains: vi.fn(),
+                toggle: vi.fn(),
+            },
+            writable: true,
+        });
     });
 
     afterEach(() => {

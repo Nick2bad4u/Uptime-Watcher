@@ -250,10 +250,10 @@ function calculateAverageResponseTime(filteredHistory: StatusHistory[]): number 
  */
 function calculateDowntimePeriods(filteredHistory: StatusHistory[]): DowntimePeriod[] {
     const downtimePeriods: DowntimePeriod[] = [];
-    let currentDowntime: DowntimePeriod | undefined;
+    let downtimeEnd: number | undefined; // Most recent "down" timestamp
+    let downtimeStart: number | undefined; // Earliest "down" timestamp in the period
 
-    // Process in reverse chronological order for proper downtime calculation
-    // Use efficient reverse iteration without creating a copy
+    // Process in reverse chronological order (newest to oldest)
     for (let i = filteredHistory.length - 1; i >= 0; i--) {
         // eslint-disable-next-line security/detect-object-injection -- i is a safe numeric index within array bounds
         const record = filteredHistory[i];
@@ -262,29 +262,37 @@ function calculateDowntimePeriods(filteredHistory: StatusHistory[]): DowntimePer
         }
 
         if (record.status === "down") {
-            if (currentDowntime) {
-                // Extend the downtime period backwards
-                currentDowntime.start = record.timestamp;
+            if (downtimeEnd === undefined) {
+                // This is the first "down" we've encountered, so it's the END of the period
+                downtimeEnd = record.timestamp;
+                downtimeStart = record.timestamp;
             } else {
-                // Start a new downtime period
-                currentDowntime = {
-                    duration: 0,
-                    end: record.timestamp,
-                    start: record.timestamp,
-                };
+                // We're extending the downtime period backwards
+                downtimeStart = record.timestamp;
             }
-        } else if (currentDowntime) {
-            // End of downtime period, calculate duration
-            currentDowntime.duration = currentDowntime.end - currentDowntime.start;
-            downtimePeriods.push(currentDowntime);
-            currentDowntime = undefined;
+        } else if (downtimeEnd !== undefined && downtimeStart !== undefined) {
+            // We hit an "up" status, so the downtime period is complete
+            const period: DowntimePeriod = {
+                duration: downtimeEnd - downtimeStart,
+                end: downtimeEnd,
+                start: downtimeStart,
+            };
+            downtimePeriods.push(period);
+
+            // Reset for next period
+            downtimeEnd = undefined;
+            downtimeStart = undefined;
         }
     }
 
-    // Handle ongoing downtime (if the period started but never ended)
-    if (currentDowntime) {
-        currentDowntime.duration = currentDowntime.end - currentDowntime.start;
-        downtimePeriods.push(currentDowntime);
+    // Handle ongoing downtime (reached end of history while in downtime)
+    if (downtimeEnd !== undefined && downtimeStart !== undefined) {
+        const period: DowntimePeriod = {
+            duration: downtimeEnd - downtimeStart,
+            end: downtimeEnd,
+            start: downtimeStart,
+        };
+        downtimePeriods.push(period);
     }
 
     return downtimePeriods;

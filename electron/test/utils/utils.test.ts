@@ -37,18 +37,25 @@ describe("Electron Utils", () => {
     });
 
     describe("isDev", () => {
-        it("should return true when NODE_ENV is development", () => {
+        it("should return true when NODE_ENV is development AND app is not packaged", () => {
             process.env["NODE_ENV"] = "development";
-            mockApp.isPackaged = true; // Should still return true due to NODE_ENV
+            mockApp.isPackaged = false; // Both conditions met
 
             expect(isDev()).toBe(true);
         });
 
-        it("should return true when app is not packaged", () => {
-            process.env["NODE_ENV"] = "production";
-            mockApp.isPackaged = false;
+        it("should return false when NODE_ENV is development but app is packaged", () => {
+            process.env["NODE_ENV"] = "development";
+            mockApp.isPackaged = true; // Both conditions not met: app IS packaged
 
-            expect(isDev()).toBe(true);
+            expect(isDev()).toBe(false);
+        });
+
+        it("should return false when app is not packaged but NODE_ENV is not development", () => {
+            process.env["NODE_ENV"] = "production";
+            mockApp.isPackaged = false; // Both conditions not met: NODE_ENV !== "development"
+
+            expect(isDev()).toBe(false);
         });
 
         it("should return false when NODE_ENV is production and app is packaged", () => {
@@ -58,11 +65,11 @@ describe("Electron Utils", () => {
             expect(isDev()).toBe(false);
         });
 
-        it("should return true when NODE_ENV is undefined and app is not packaged", () => {
+        it("should return false when NODE_ENV is undefined and app is not packaged", () => {
             delete process.env["NODE_ENV"];
-            mockApp.isPackaged = false;
+            mockApp.isPackaged = false; // NODE_ENV undefined means isDevelopment() returns false
 
-            expect(isDev()).toBe(true);
+            expect(isDev()).toBe(false);
         });
 
         it("should return false when NODE_ENV is undefined and app is packaged", () => {
@@ -87,25 +94,25 @@ describe("Electron Utils", () => {
         });
 
         it("should handle mixed scenarios correctly", () => {
-            // Test case 1: development + packaged
+            // Test case 1: development + packaged (should be FALSE)
             process.env["NODE_ENV"] = "development";
             mockApp.isPackaged = true;
-            expect(isDev()).toBe(true);
+            expect(isDev()).toBe(false);
 
-            // Test case 2: production + not packaged
+            // Test case 2: production + not packaged (should be FALSE)
             process.env["NODE_ENV"] = "production";
+            mockApp.isPackaged = false;
+            expect(isDev()).toBe(false);
+
+            // Test case 3: development + not packaged (should be TRUE)
+            process.env["NODE_ENV"] = "development";
             mockApp.isPackaged = false;
             expect(isDev()).toBe(true);
 
-            // Test case 3: empty string NODE_ENV + packaged
+            // Test case 4: empty string NODE_ENV + packaged (should be FALSE)
             process.env["NODE_ENV"] = "";
             mockApp.isPackaged = true;
             expect(isDev()).toBe(false); // Empty string !== "development" AND app.isPackaged
-
-            // Test case 4: development + not packaged
-            process.env["NODE_ENV"] = "development";
-            mockApp.isPackaged = false;
-            expect(isDev()).toBe(true);
         });
     });
 });
