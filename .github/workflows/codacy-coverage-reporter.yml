@@ -43,7 +43,6 @@ jobs:
                   rm -f coverage/lcov.info
                   npx vitest run --coverage --reporter=verbose --reporter=junit --outputFile=coverage/frontend-test-report.junit.xml
 
-
             # Run electron tests with coverage
             - name: Run electron tests
               id: test-electron
@@ -52,7 +51,6 @@ jobs:
                   # Clean any existing coverage to avoid conflicts
                   rm -f coverage/electron/lcov.info
                   npx vitest run --config vitest.electron.config.ts --coverage --reporter=verbose --reporter=junit --outputFile=coverage/electron/electron-test-report.junit.xml
-
 
             # Verify coverage files exist
             - name: Verify coverage files

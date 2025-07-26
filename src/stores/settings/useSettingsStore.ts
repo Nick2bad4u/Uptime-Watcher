@@ -99,22 +99,22 @@ export const useSettingsStore = create<SettingsStore>()(
 
                 const errorStore = useErrorStore.getState();
                 const currentSettings = get().settings;
-                
+
                 await withErrorHandling(
                     async () => {
                         // Update local state immediately for responsive UI
                         get().updateSettings({ historyLimit: limit });
-                        
+
                         // Call backend to update and prune history
                         await window.electronAPI.settings.updateHistoryLimit(limit);
-                        
+
                         // Verify the value from backend to ensure sync
                         const backendLimit = await window.electronAPI.settings.getHistoryLimit();
-                        
+
                         // Ensure we have a valid number from backend
                         const validBackendLimit =
                             typeof backendLimit === "number" && backendLimit > 0 ? backendLimit : limit;
-                        
+
                         // Update with backend value to ensure consistency
                         get().updateSettings({ historyLimit: validBackendLimit });
                     },

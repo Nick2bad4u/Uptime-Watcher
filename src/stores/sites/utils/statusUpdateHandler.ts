@@ -307,7 +307,7 @@ export class StatusUpdateManager {
         try {
             const currentSites = this.getSites();
             const site = this.findSiteInStore(currentSites, event.siteId);
-            
+
             if (!site) {
                 if (isDevelopment()) {
                     logger.debug(`Site ${event.siteId} not found in store, triggering full sync`);
@@ -317,7 +317,7 @@ export class StatusUpdateManager {
             }
 
             const monitor = this.findMonitorInSite(site, event.monitorId);
-            
+
             if (!monitor) {
                 if (isDevelopment()) {
                     logger.debug(`Monitor ${event.monitorId} not found in site ${event.siteId}, triggering full sync`);
