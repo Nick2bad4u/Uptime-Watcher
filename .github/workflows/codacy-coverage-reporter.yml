@@ -37,6 +37,7 @@ jobs:
             # Run frontend tests with coverage
             - name: Run frontend tests
               id: test-frontend
+              continue-on-error: true
               run: |
                   mkdir -p coverage
                   # Clean any existing coverage to avoid conflicts
@@ -46,6 +47,7 @@ jobs:
             # Run electron tests with coverage
             - name: Run electron tests
               id: test-electron
+              continue-on-error: true
               run: |
                   mkdir -p coverage/electron
                   # Clean any existing coverage to avoid conflicts

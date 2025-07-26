@@ -35,7 +35,7 @@ export function generateUuid(): string {
 
     // Fallback implementation for environments without crypto.randomUUID
     // eslint-disable-next-line sonarjs/pseudo-random -- Using Math.random() is acceptable here as this is a fallback for UUID generation
-    const randomPart = Math.random().toString(36).substring(2, 11);
+    const randomPart = Math.random().toString(36).slice(2, 11);
     const timestamp = Date.now();
     return `site-${randomPart}-${timestamp}`;
 }
