@@ -15,6 +15,7 @@ import { Site, Monitor, StatusUpdate } from "../types";
 const mockDatabaseManager = {
     getHistoryLimit: vi.fn(() => 1000),
     setHistoryLimit: vi.fn(() => Promise.resolve()),
+    resetSettings: vi.fn(() => Promise.resolve()),
     downloadBackup: vi.fn(() =>
         Promise.resolve({
             buffer: Buffer.from("test"),
@@ -46,6 +47,10 @@ const mockMonitorManager = {
     stopMonitoringForSite: vi.fn(() => Promise.resolve(true)),
     startMonitoring: vi.fn(() => Promise.resolve()),
     stopMonitoring: vi.fn(() => Promise.resolve()),
+    isMonitoringActive: vi.fn(() => true),
+    getActiveMonitorCount: vi.fn(() => 5),
+    isMonitorActiveInScheduler: vi.fn(() => true),
+    restartMonitorWithNewConfig: vi.fn(() => true),
 } as unknown as MonitorManager;
 
 const mockSiteManager = {
@@ -67,6 +72,15 @@ const mockSiteManager = {
         } as Site)
     ),
     getSites: vi.fn(() => Promise.resolve([])),
+    getSitesFromCache: vi.fn(() => [
+        {
+            identifier: "test-site",
+            name: "Test Site",
+            monitors: [{ id: "monitor-1" }, { id: "monitor-2" }],
+            monitoring: true,
+        } as Site,
+    ]),
+    updateSitesCache: vi.fn(() => Promise.resolve()),
     removeMonitor: vi.fn(() => Promise.resolve(true)),
     initialize: vi.fn(() => Promise.resolve()),
 } as unknown as SiteManager;
@@ -117,6 +131,59 @@ describe("UptimeOrchestrator", () => {
             vi.mocked(mockDatabaseManager.initialize).mockRejectedValueOnce(new Error("Init failed"));
 
             await expect(orchestrator.initialize()).rejects.toThrow("Init failed");
+        });
+
+        it("should validate initialization and throw for missing database manager method", () => {
+            const invalidDependencies = {
+                databaseManager: { initialize: undefined } as any,
+                monitorManager: mockMonitorManager,
+                siteManager: mockSiteManager,
+            };
+
+            const invalidOrchestrator = new UptimeOrchestrator(invalidDependencies);
+            expect(() => invalidOrchestrator["validateInitialization"]()).toThrow(
+                "DatabaseManager not properly initialized - missing initialize method"
+            );
+        });
+
+        it("should validate initialization and throw for missing site manager method", () => {
+            const invalidDependencies = {
+                databaseManager: mockDatabaseManager,
+                monitorManager: mockMonitorManager,
+                siteManager: { initialize: undefined } as any,
+            };
+
+            const invalidOrchestrator = new UptimeOrchestrator(invalidDependencies);
+            expect(() => invalidOrchestrator["validateInitialization"]()).toThrow(
+                "SiteManager not properly initialized - missing initialize method"
+            );
+        });
+
+        it("should validate initialization and throw for missing monitor manager method", () => {
+            const invalidDependencies = {
+                databaseManager: mockDatabaseManager,
+                monitorManager: { startMonitoring: undefined } as any,
+                siteManager: mockSiteManager,
+            };
+
+            const invalidOrchestrator = new UptimeOrchestrator(invalidDependencies);
+            expect(() => invalidOrchestrator["validateInitialization"]()).toThrow(
+                "MonitorManager not properly initialized - missing startMonitoring method"
+            );
+        });
+    });
+
+    describe("Settings Management", () => {
+        it("should reset settings successfully", async () => {
+            await orchestrator.resetSettings();
+
+            expect(mockDatabaseManager.resetSettings).toHaveBeenCalled();
+        });
+
+        it("should set history limit successfully", async () => {
+            await orchestrator.setHistoryLimit(500);
+
+            expect(mockDatabaseManager.setHistoryLimit).toHaveBeenCalledWith(500);
         });
     });
 
@@ -386,6 +453,589 @@ describe("UptimeOrchestrator", () => {
                     timestamp: Date.now(),
                 });
             }).not.toThrow();
+        });
+
+        it("should handle internal database events", async () => {
+            const sites = [
+                {
+                    identifier: "test-site-1",
+                    name: "Test Site 1",
+                    monitors: [],
+                    monitoring: true,
+                } as Site,
+            ];
+
+            // Emit internal database event
+            orchestrator.emitTyped("internal:database:update-sites-cache-requested", {
+                sites,
+                operation: "update-sites-cache-requested",
+                timestamp: Date.now(),
+            });
+
+            // Wait for async processing
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            expect(mockSiteManager.updateSitesCache).toHaveBeenCalledWith(sites);
+            expect(mockMonitorManager.setupSiteForMonitoring).toHaveBeenCalledWith(sites[0]);
+        });
+
+        it("should handle internal database events with monitoring setup failures", async () => {
+            const sites = [
+                {
+                    identifier: "test-site-fail",
+                    name: "Test Site Fail",
+                    monitors: [],
+                    monitoring: true,
+                } as Site,
+            ];
+
+            vi.mocked(mockMonitorManager.setupSiteForMonitoring).mockRejectedValueOnce(new Error("Setup failed"));
+
+            // Emit internal database event
+            orchestrator.emitTyped("internal:database:update-sites-cache-requested", {
+                sites,
+                operation: "update-sites-cache-requested",
+                timestamp: Date.now(),
+            });
+
+            // Wait for async processing
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            expect(mockSiteManager.updateSitesCache).toHaveBeenCalledWith(sites);
+            expect(mockMonitorManager.setupSiteForMonitoring).toHaveBeenCalledWith(sites[0]);
+        });
+
+        it("should handle get sites from cache request", async () => {
+            // Emit internal database event
+            orchestrator.emitTyped("internal:database:get-sites-from-cache-requested", {
+                operation: "get-sites-from-cache-requested",
+                timestamp: Date.now(),
+            });
+
+            // Wait for async processing
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            expect(mockSiteManager.getSitesFromCache).toHaveBeenCalled();
+        });
+
+        it("should handle database initialized event", async () => {
+            const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
+
+            // Emit internal database event
+            orchestrator.emitTyped("internal:database:initialized", {
+                operation: "initialized",
+                success: true,
+                timestamp: Date.now(),
+            });
+
+            // Wait for async processing
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            expect(emitTypedSpy).toHaveBeenCalledWith(
+                "database:transaction-completed",
+                expect.objectContaining({
+                    operation: "initialize",
+                    success: true,
+                })
+            );
+        });
+
+        it("should handle database initialized event with errors", async () => {
+            // Mock emitTyped to throw an error specifically for "database:transaction-completed"
+            const originalEmitTyped = orchestrator.emitTyped.bind(orchestrator);
+            const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped").mockImplementation((event, data) => {
+                if (event === "database:transaction-completed") {
+                    throw new Error("Emit failed");
+                }
+                return originalEmitTyped(event, data);
+            });
+
+            // Emit internal database event - this should trigger the error catch block
+            orchestrator.emitTyped("internal:database:initialized", {
+                operation: "initialized",
+                success: true,
+                timestamp: Date.now(),
+            });
+
+            // Wait for async processing to complete and handle the error
+            await new Promise((resolve) => setTimeout(resolve, 50));
+
+            // Verify that emitTyped was called and the error was caught
+            expect(emitTypedSpy).toHaveBeenCalledWith(
+                "database:transaction-completed",
+                expect.objectContaining({
+                    operation: "initialize",
+                    success: true,
+                })
+            );
+
+            // Restore the spy
+            emitTypedSpy.mockRestore();
+        });
+
+        it("should handle internal site added events", async () => {
+            const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
+
+            // Create the test site object
+            const testSite = {
+                identifier: "test-site",
+                name: "Test Site",
+                monitors: [],
+                monitoring: true,
+            };
+
+            // Emit internal site event with SiteEventData format (what the actual implementation expects)
+            // Note: Using 'as any' due to type mismatch between eventTypes.ts and actual implementation
+            orchestrator.emitTyped("internal:site:added" as any, {
+                identifier: "test-site",
+                site: testSite,
+                timestamp: Date.now(),
+            });
+
+            // Wait for async processing
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            expect(emitTypedSpy).toHaveBeenCalledWith(
+                "site:added",
+                expect.objectContaining({
+                    source: "user",
+                })
+            );
+        });
+
+        it("should handle internal site removed events", async () => {
+            const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
+
+            // Create the test site object
+            const testSite = {
+                identifier: "test-site",
+                name: "Test Site",
+                monitors: [],
+                monitoring: true,
+            };
+
+            // Emit internal site event with SiteEventData format (what the actual implementation expects)
+            // Note: Using 'as any' due to type mismatch between eventTypes.ts and actual implementation
+            orchestrator.emitTyped("internal:site:removed" as any, {
+                identifier: "test-site",
+                site: testSite,
+                timestamp: Date.now(),
+            });
+
+            // Wait for async processing
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            expect(emitTypedSpy).toHaveBeenCalledWith(
+                "site:removed",
+                expect.objectContaining({
+                    cascade: true,
+                    siteId: "test-site",
+                    siteName: "Test Site",
+                })
+            );
+        });
+
+        it("should handle internal site removed events with missing identifier", async () => {
+            const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
+
+            // Create the test site object
+            const testSite = {
+                identifier: "fallback-site",
+                name: "Test Site",
+                monitors: [],
+                monitoring: true,
+            };
+
+            // Emit internal site event without identifier to test fallback to site.identifier
+            // Note: Using 'as any' due to type mismatch between eventTypes.ts and actual implementation
+            orchestrator.emitTyped("internal:site:removed" as any, {
+                site: testSite,
+                timestamp: Date.now(),
+            });
+
+            // Wait for async processing
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            expect(emitTypedSpy).toHaveBeenCalledWith(
+                "site:removed",
+                expect.objectContaining({
+                    cascade: true,
+                    siteId: "fallback-site", // Should use site.identifier as fallback
+                    siteName: "Test Site",
+                })
+            );
+        });
+
+        it("should handle internal site updated events", async () => {
+            const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
+
+            // Create the test site objects
+            const updatedSite = {
+                identifier: "test-site",
+                name: "Updated Site",
+                monitors: [],
+                monitoring: true,
+            };
+
+            const previousSite = {
+                identifier: "test-site",
+                name: "Test Site",
+                monitors: [],
+                monitoring: true,
+            };
+
+            // Emit internal site event with SiteEventData format (what the actual implementation expects)
+            // Note: Using 'as any' due to type mismatch between eventTypes.ts and actual implementation
+            orchestrator.emitTyped("internal:site:updated" as any, {
+                identifier: "test-site",
+                site: updatedSite,
+                previousSite: previousSite,
+                timestamp: Date.now(),
+                updatedFields: ["name"],
+            });
+
+            // Wait for async processing
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            expect(emitTypedSpy).toHaveBeenCalledWith(
+                "site:updated",
+                expect.objectContaining({
+                    updatedFields: ["name"],
+                })
+            );
+        });
+
+        it("should handle internal site updated events with fallback values", async () => {
+            const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
+
+            // Create the test site object
+            const updatedSite = {
+                identifier: "test-site",
+                name: "Updated Site",
+                monitors: [],
+                monitoring: true,
+            };
+
+            // Emit internal site event without previousSite and updatedFields to test fallbacks
+            // Note: Using 'as any' due to type mismatch between eventTypes.ts and actual implementation
+            orchestrator.emitTyped("internal:site:updated" as any, {
+                identifier: "test-site",
+                site: updatedSite,
+                timestamp: Date.now(),
+                // No previousSite or updatedFields provided to test fallbacks
+            });
+
+            // Wait for async processing
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            expect(emitTypedSpy).toHaveBeenCalledWith(
+                "site:updated",
+                expect.objectContaining({
+                    previousSite: updatedSite, // Should fallback to site
+                    site: updatedSite,
+                    updatedFields: [], // Should fallback to empty array
+                })
+            );
+        });
+
+        it("should handle monitor started events", async () => {
+            const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
+
+            // Emit internal monitor event
+            orchestrator.emitTyped("internal:monitor:started", {
+                identifier: "test-site",
+                operation: "started",
+                timestamp: Date.now(),
+            });
+
+            // Wait for async processing
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            expect(mockSiteManager.getSitesFromCache).toHaveBeenCalled();
+            expect(emitTypedSpy).toHaveBeenCalledWith(
+                "monitoring:started",
+                expect.objectContaining({
+                    monitorCount: 2, // Two monitors from mock site
+                    siteCount: 1,
+                })
+            );
+        });
+
+        it("should handle monitor started events with errors", async () => {
+            vi.mocked(mockSiteManager.getSitesFromCache).mockImplementationOnce(() => {
+                throw new Error("Cache error");
+            });
+
+            // Emit internal monitor event
+            orchestrator.emitTyped("internal:monitor:started", {
+                identifier: "test-site",
+                operation: "started",
+                timestamp: Date.now(),
+            });
+
+            // Wait for async processing
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            // Should not throw, but should log error
+            expect(mockSiteManager.getSitesFromCache).toHaveBeenCalled();
+        });
+
+        it("should handle monitor stopped events when monitoring is active", async () => {
+            const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
+
+            // Emit internal monitor event
+            orchestrator.emitTyped("internal:monitor:stopped", {
+                identifier: "test-site",
+                operation: "stopped",
+                reason: "user",
+                timestamp: Date.now(),
+            });
+
+            // Wait for async processing
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            expect(mockMonitorManager.isMonitoringActive).toHaveBeenCalled();
+            expect(mockMonitorManager.getActiveMonitorCount).toHaveBeenCalled();
+            expect(emitTypedSpy).toHaveBeenCalledWith(
+                "monitoring:stopped",
+                expect.objectContaining({
+                    activeMonitors: 5,
+                    reason: "user",
+                })
+            );
+        });
+
+        it("should handle monitor stopped events when monitoring is inactive", async () => {
+            const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
+            vi.mocked(mockMonitorManager.isMonitoringActive).mockReturnValueOnce(false);
+
+            // Emit internal monitor event
+            orchestrator.emitTyped("internal:monitor:stopped", {
+                identifier: "test-site",
+                operation: "stopped",
+                reason: "user",
+                timestamp: Date.now(),
+            });
+
+            // Wait for async processing
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            expect(mockMonitorManager.isMonitoringActive).toHaveBeenCalled();
+            expect(emitTypedSpy).toHaveBeenCalledWith(
+                "monitoring:stopped",
+                expect.objectContaining({
+                    activeMonitors: 0,
+                    reason: "user",
+                })
+            );
+        });
+
+        it("should handle monitor stopped events with errors", async () => {
+            vi.mocked(mockMonitorManager.isMonitoringActive).mockImplementationOnce(() => {
+                throw new Error("Monitor error");
+            });
+
+            // Emit internal monitor event
+            orchestrator.emitTyped("internal:monitor:stopped", {
+                identifier: "test-site",
+                operation: "stopped",
+                reason: "user",
+                timestamp: Date.now(),
+            });
+
+            // Wait for async processing
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            // Should not throw, but should log error
+            expect(mockMonitorManager.isMonitoringActive).toHaveBeenCalled();
+        });
+
+        it("should handle start monitoring requests successfully", async () => {
+            const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
+
+            // Emit start monitoring request
+            orchestrator.emitTyped("internal:site:start-monitoring-requested", {
+                identifier: "test-site",
+                monitorId: "monitor-1",
+                operation: "start-monitoring-requested",
+                timestamp: Date.now(),
+            });
+
+            // Wait for async processing
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            expect(mockMonitorManager.startMonitoringForSite).toHaveBeenCalledWith("test-site", "monitor-1");
+            expect(emitTypedSpy).toHaveBeenCalledWith(
+                "internal:site:start-monitoring-response",
+                expect.objectContaining({
+                    success: true,
+                    identifier: "test-site",
+                    monitorId: "monitor-1",
+                })
+            );
+        });
+
+        it("should handle start monitoring requests with errors", async () => {
+            const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
+            vi.mocked(mockMonitorManager.startMonitoringForSite).mockRejectedValueOnce(new Error("Start failed"));
+
+            // Emit start monitoring request
+            orchestrator.emitTyped("internal:site:start-monitoring-requested", {
+                identifier: "test-site",
+                monitorId: "monitor-1",
+                operation: "start-monitoring-requested",
+                timestamp: Date.now(),
+            });
+
+            // Wait for async processing
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            expect(emitTypedSpy).toHaveBeenCalledWith(
+                "internal:site:start-monitoring-response",
+                expect.objectContaining({
+                    success: false,
+                    identifier: "test-site",
+                    monitorId: "monitor-1",
+                })
+            );
+        });
+
+        it("should handle stop monitoring requests successfully", async () => {
+            const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
+
+            // Emit stop monitoring request
+            orchestrator.emitTyped("internal:site:stop-monitoring-requested", {
+                identifier: "test-site",
+                monitorId: "monitor-1",
+                operation: "stop-monitoring-requested",
+                timestamp: Date.now(),
+            });
+
+            // Wait for async processing
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            expect(mockMonitorManager.stopMonitoringForSite).toHaveBeenCalledWith("test-site", "monitor-1");
+            expect(emitTypedSpy).toHaveBeenCalledWith(
+                "internal:site:stop-monitoring-response",
+                expect.objectContaining({
+                    success: true,
+                    identifier: "test-site",
+                    monitorId: "monitor-1",
+                })
+            );
+        });
+
+        it("should handle stop monitoring requests with errors", async () => {
+            const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
+            vi.mocked(mockMonitorManager.stopMonitoringForSite).mockRejectedValueOnce(new Error("Stop failed"));
+
+            // Emit stop monitoring request
+            orchestrator.emitTyped("internal:site:stop-monitoring-requested", {
+                identifier: "test-site",
+                monitorId: "monitor-1",
+                operation: "stop-monitoring-requested",
+                timestamp: Date.now(),
+            });
+
+            // Wait for async processing
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            expect(emitTypedSpy).toHaveBeenCalledWith(
+                "internal:site:stop-monitoring-response",
+                expect.objectContaining({
+                    success: false,
+                    identifier: "test-site",
+                    monitorId: "monitor-1",
+                })
+            );
+        });
+
+        it("should handle is monitoring active requests", async () => {
+            const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
+
+            // Emit is monitoring active request
+            orchestrator.emitTyped("internal:site:is-monitoring-active-requested", {
+                identifier: "test-site",
+                monitorId: "monitor-1",
+                operation: "is-monitoring-active-requested",
+                timestamp: Date.now(),
+            });
+
+            // Wait for async processing
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            expect(mockMonitorManager.isMonitorActiveInScheduler).toHaveBeenCalledWith("test-site", "monitor-1");
+            expect(emitTypedSpy).toHaveBeenCalledWith(
+                "internal:site:is-monitoring-active-response",
+                expect.objectContaining({
+                    isActive: true,
+                    identifier: "test-site",
+                    monitorId: "monitor-1",
+                })
+            );
+        });
+
+        it("should handle restart monitoring requests successfully", async () => {
+            const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
+            const testMonitor = {
+                id: "monitor-1",
+                type: "http",
+                url: "https://example.com",
+            } as Monitor;
+
+            // Emit restart monitoring request
+            orchestrator.emitTyped("internal:site:restart-monitoring-requested", {
+                identifier: "test-site",
+                monitor: testMonitor,
+                operation: "restart-monitoring-requested",
+                timestamp: Date.now(),
+            });
+
+            // Wait for async processing
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            expect(mockMonitorManager.restartMonitorWithNewConfig).toHaveBeenCalledWith("test-site", testMonitor);
+            expect(emitTypedSpy).toHaveBeenCalledWith(
+                "internal:site:restart-monitoring-response",
+                expect.objectContaining({
+                    success: true,
+                    identifier: "test-site",
+                    monitorId: "monitor-1",
+                })
+            );
+        });
+
+        it("should handle restart monitoring requests with errors", async () => {
+            const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
+            const testMonitor = {
+                id: "monitor-1",
+                type: "http",
+                url: "https://example.com",
+            } as Monitor;
+
+            vi.mocked(mockMonitorManager.restartMonitorWithNewConfig).mockImplementationOnce(() => {
+                throw new Error("Restart failed");
+            });
+
+            // Emit restart monitoring request
+            orchestrator.emitTyped("internal:site:restart-monitoring-requested", {
+                identifier: "test-site",
+                monitor: testMonitor,
+                operation: "restart-monitoring-requested",
+                timestamp: Date.now(),
+            });
+
+            // Wait for async processing
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            expect(emitTypedSpy).toHaveBeenCalledWith(
+                "internal:site:restart-monitoring-response",
+                expect.objectContaining({
+                    success: false,
+                    identifier: "test-site",
+                    monitorId: "monitor-1",
+                })
+            );
         });
     });
 

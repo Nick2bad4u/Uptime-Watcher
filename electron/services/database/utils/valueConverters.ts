@@ -122,6 +122,10 @@ export function convertDateForDb(value: Date | null | string | undefined): null 
         return null;
     }
     if (value instanceof Date) {
+        // Check if the date is invalid
+        if (Number.isNaN(value.getTime())) {
+            return "Invalid Date";
+        }
         return value.toISOString();
     }
     return String(value);
