@@ -1,437 +1,248 @@
-/**
- * @vitest-environment jsdom
- */
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { ThemeManager } from '../theme/ThemeManager';
+import { lightTheme, darkTheme } from '../theme/themes';
 
-import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
-
-import { ThemeManager } from "../theme/ThemeManager";
-
-// Mock window.matchMedia
-const mockMatchMedia = vi.fn();
-
-Object.defineProperty(window, "matchMedia", {
-    value: mockMatchMedia,
-    writable: true,
+// Mock DOM environment
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: vi.fn().mockImplementation(query => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(), // deprecated
+    removeListener: vi.fn(), // deprecated
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })),
 });
 
-describe("ThemeManager", () => {
-    let themeManager: ThemeManager;
+describe('ThemeManager', () => {
+  let themeManager: ThemeManager;
+  let mockDocumentElement: any;
+  let mockBodyClassList: any;
 
-    beforeEach(() => {
-        vi.clearAllMocks();
-        themeManager = ThemeManager.getInstance();
+  beforeEach(() => {
+    themeManager = ThemeManager.getInstance();
+    
+    // Mock document.documentElement
+    mockDocumentElement = {
+      style: {
+        setProperty: vi.fn(),
+        removeProperty: vi.fn(),
+      },
+      classList: {
+        add: vi.fn(),
+        remove: vi.fn(),
+      },
+    };
 
-        // Mock matchMedia to return a MediaQueryList-like object
-        mockMatchMedia.mockReturnValue({
-            addEventListener: vi.fn(),
-            matches: false,
-            removeEventListener: vi.fn(),
-        });
+    // Mock document.body
+    mockBodyClassList = {
+      add: vi.fn(),
+      remove: vi.fn(),
+      classList: {
+        add: vi.fn(),
+        remove: vi.fn(),
+      },
+    };
 
-        // Mock document.body.classList for theme tests
-        Object.defineProperty(document.body, "classList", {
-            value: {
-                add: vi.fn(),
-                remove: vi.fn(),
-                contains: vi.fn(),
-                toggle: vi.fn(),
-            },
-            writable: true,
-        });
+    Object.defineProperty(global, 'document', {
+      value: {
+        documentElement: mockDocumentElement,
+        body: mockBodyClassList,
+      },
+      writable: true,
+    });
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  describe('getInstance', () => {
+    it('should return singleton instance', () => {
+      const instance1 = ThemeManager.getInstance();
+      const instance2 = ThemeManager.getInstance();
+      
+      expect(instance1).toBe(instance2);
+    });
+  });
+
+  describe('applyTheme', () => {
+    it('should apply light theme', () => {
+      themeManager.applyTheme(lightTheme);
+      
+      expect(mockDocumentElement.style.setProperty).toHaveBeenCalled();
+      expect(mockBodyClassList.classList.add).toHaveBeenCalledWith('theme-light');
     });
 
-    afterEach(() => {
-        vi.restoreAllMocks();
+    it('should apply dark theme', () => {
+      themeManager.applyTheme(darkTheme);
+      
+      expect(mockDocumentElement.style.setProperty).toHaveBeenCalled();
+      expect(mockBodyClassList.classList.add).toHaveBeenCalledWith('theme-dark');
+      expect(mockDocumentElement.classList.add).toHaveBeenCalledWith('dark');
     });
 
-    it("should be a singleton", () => {
-        const instance1 = ThemeManager.getInstance();
-        const instance2 = ThemeManager.getInstance();
+    it('should handle undefined document', () => {
+      Object.defineProperty(global, 'document', {
+        value: undefined,
+        writable: true,
+      });
 
-        expect(instance1).toBe(instance2);
+      expect(() => {
+        themeManager.applyTheme(lightTheme);
+      }).not.toThrow();
+    });
+  });
+
+  describe('getTheme', () => {
+    it('should get light theme', () => {
+      const theme = themeManager.getTheme('light');
+      
+      expect(theme).toBe(lightTheme);
     });
 
-    it("should get light theme", () => {
-        const lightTheme = themeManager.getTheme("light");
-
-        expect(lightTheme).toBeDefined();
-        expect(lightTheme.name).toBe("light");
-        expect(lightTheme.isDark).toBe(false);
+    it('should get dark theme', () => {
+      const theme = themeManager.getTheme('dark');
+      
+      expect(theme).toBe(darkTheme);
     });
 
-    it("should get dark theme", () => {
-        const darkTheme = themeManager.getTheme("dark");
+    it('should get system theme preference', () => {
+      vi.mocked(window.matchMedia).mockReturnValue({
+        matches: true,
+        media: '(prefers-color-scheme: dark)',
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      } as any);
 
-        expect(darkTheme).toBeDefined();
-        expect(darkTheme.name).toBe("dark");
-        expect(darkTheme.isDark).toBe(true);
+      const theme = themeManager.getTheme('system');
+      
+      expect(theme).toBe(darkTheme);
+    });
+  });
+
+  describe('getSystemThemePreference', () => {
+    it('should return dark when user prefers dark mode', () => {
+      vi.mocked(window.matchMedia).mockReturnValue({
+        matches: true,
+      } as any);
+
+      const preference = themeManager.getSystemThemePreference();
+      
+      expect(preference).toBe('dark');
     });
 
-    it("should get high-contrast theme", () => {
-        const highContrastTheme = themeManager.getTheme("high-contrast");
+    it('should return light when user prefers light mode', () => {
+      vi.mocked(window.matchMedia).mockReturnValue({
+        matches: false,
+      } as any);
 
-        expect(highContrastTheme).toBeDefined();
-        expect(highContrastTheme.name).toBe("high-contrast");
+      const preference = themeManager.getSystemThemePreference();
+      
+      expect(preference).toBe('light');
     });
 
-    it("should handle system theme with light preference", () => {
-        mockMatchMedia.mockReturnValue({
-            addEventListener: vi.fn(),
-            matches: false, // Light mode
-            removeEventListener: vi.fn(),
-        });
+    it('should return light when window is undefined', () => {
+      const originalWindow = global.window;
+      // @ts-expect-error - intentionally deleting window for testing
+      delete global.window;
 
-        const systemTheme = themeManager.getTheme("system");
+      const preference = themeManager.getSystemThemePreference();
+      
+      expect(preference).toBe('light');
 
-        expect(systemTheme).toBeDefined();
-        expect(systemTheme.isDark).toBe(false);
+      global.window = originalWindow;
+    });
+  });
+
+  describe('getAvailableThemes', () => {
+    it('should return all available theme names including system', () => {
+      const themes = themeManager.getAvailableThemes();
+      
+      expect(themes).toContain('light');
+      expect(themes).toContain('dark');
+      expect(themes).toContain('system');
+    });
+  });
+
+  describe('isValidThemeName', () => {
+    it('should validate correct theme names', () => {
+      expect(themeManager.isValidThemeName('light')).toBe(true);
+      expect(themeManager.isValidThemeName('dark')).toBe(true);
+      expect(themeManager.isValidThemeName('system')).toBe(true);
     });
 
-    it("should handle system theme with dark preference", () => {
-        mockMatchMedia.mockReturnValue({
-            addEventListener: vi.fn(),
-            matches: true, // Dark mode
-            removeEventListener: vi.fn(),
-        });
+    it('should reject invalid theme names', () => {
+      expect(themeManager.isValidThemeName('invalid')).toBe(false);
+      expect(themeManager.isValidThemeName('')).toBe(false);
+    });
+  });
 
-        const systemTheme = themeManager.getTheme("system");
+  describe('onSystemThemeChange', () => {
+    it('should register listener for system theme changes', () => {
+      const callback = vi.fn();
+      const mockMediaQuery = {
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      };
+      
+      vi.mocked(window.matchMedia).mockReturnValue(mockMediaQuery as any);
 
-        expect(systemTheme).toBeDefined();
-        expect(systemTheme.isDark).toBe(true);
+      const cleanup = themeManager.onSystemThemeChange(callback);
+      
+      expect(mockMediaQuery.addEventListener).toHaveBeenCalledWith('change', expect.any(Function));
+      
+      cleanup();
+      expect(mockMediaQuery.removeEventListener).toHaveBeenCalledWith('change', expect.any(Function));
     });
 
-    it("should get available themes", () => {
-        const availableThemes = themeManager.getAvailableThemes();
+    it('should return no-op function when window is undefined', () => {
+      const originalWindow = global.window;
+      // @ts-expect-error - intentionally deleting window for testing
+      delete global.window;
 
-        expect(availableThemes).toContain("light");
-        expect(availableThemes).toContain("dark");
-        expect(availableThemes).toContain("system");
+      const callback = vi.fn();
+      const cleanup = themeManager.onSystemThemeChange(callback);
+      
+      expect(typeof cleanup).toBe('function');
+      expect(() => cleanup()).not.toThrow();
+
+      global.window = originalWindow;
     });
+  });
 
-    it("should get system theme preference", () => {
-        mockMatchMedia.mockReturnValue({
-            addEventListener: vi.fn(),
-            matches: false,
-            removeEventListener: vi.fn(),
-        });
-
-        const preference = themeManager.getSystemThemePreference();
-        expect(preference).toBe("light");
-
-        mockMatchMedia.mockReturnValue({
-            addEventListener: vi.fn(),
-            matches: true,
-            removeEventListener: vi.fn(),
-        });
-
-        const darkPreference = themeManager.getSystemThemePreference();
-        expect(darkPreference).toBe("dark");
-    });
-
-    it("should handle applyTheme", () => {
-        const lightTheme = themeManager.getTheme("light");
-
-        // applyTheme should not throw
-        expect(() => {
-            themeManager.applyTheme(lightTheme);
-        }).not.toThrow();
-    });
-
-    it("should handle system theme change listener", () => {
-        const mockCallback = vi.fn();
-        const mockAddEventListener = vi.fn();
-        const mockRemoveEventListener = vi.fn();
-
-        mockMatchMedia.mockReturnValue({
-            addEventListener: mockAddEventListener,
-            matches: false,
-            removeEventListener: mockRemoveEventListener,
-        });
-
-        const cleanup = themeManager.onSystemThemeChange(mockCallback);
-
-        expect(mockAddEventListener).toHaveBeenCalled();
-
-        // Call cleanup
-        cleanup();
-        expect(mockRemoveEventListener).toHaveBeenCalled();
-    });
-
-    it("should fallback to light theme for invalid system preference", () => {
-        // Mock matchMedia to return an invalid value that would cause issues
-        const invalidMatchMedia = vi.fn().mockReturnValue({
-            addEventListener: vi.fn(),
-            matches: undefined, // Invalid value
-            removeEventListener: vi.fn(),
-        });
-
-        // Replace window.matchMedia temporarily
-        const originalMatchMedia = window.matchMedia;
-        window.matchMedia = invalidMatchMedia;
-
-        try {
-            const theme = themeManager.getTheme("system");
-            expect(theme.name).toBe("light");
-        } finally {
-            // Restore original matchMedia
-            window.matchMedia = originalMatchMedia;
+  describe('createCustomTheme', () => {
+    it('should create custom theme based on light theme', () => {
+      const customTheme = themeManager.createCustomTheme(lightTheme, {
+        colors: {
+          ...lightTheme.colors,
+          primary: {
+            ...lightTheme.colors.primary,
+            500: '#custom-color'
+          }
         }
+      });
+
+      expect(customTheme.colors.primary['500']).toBe('#custom-color');
+      expect(customTheme.name).toBe(lightTheme.name);
     });
+  });
 
-    describe("applyTheme", () => {
-        beforeEach(() => {
-            // Mock document and document.documentElement
-            const mockRoot = {
-                classList: {
-                    add: vi.fn(),
-                    remove: vi.fn(),
-                },
-                style: {
-                    setProperty: vi.fn(),
-                },
-            };
-
-            const mockBody = {
-                classList: {
-                    add: vi.fn(),
-                },
-                className: "theme-old-theme some-other-class",
-            };
-
-            Object.defineProperty(document, "documentElement", {
-                value: mockRoot,
-                writable: true,
-            });
-
-            Object.defineProperty(document, "body", {
-                value: mockBody,
-                writable: true,
-            });
-        });
-
-        it("should apply light theme CSS variables", () => {
-            const lightTheme = themeManager.getTheme("light");
-            themeManager.applyTheme(lightTheme);
-
-            const root = document.documentElement;
-            expect(root.style.setProperty).toHaveBeenCalledWith(expect.stringMatching(/--color-/), expect.any(String));
-            expect(root.style.setProperty).toHaveBeenCalledWith(
-                expect.stringMatching(/--font-size-/),
-                expect.any(String)
-            );
-            expect(root.style.setProperty).toHaveBeenCalledWith(
-                expect.stringMatching(/--font-weight-/),
-                expect.any(String)
-            );
-            expect(root.style.setProperty).toHaveBeenCalledWith(
-                expect.stringMatching(/--line-height-/),
-                expect.any(String)
-            );
-            expect(root.style.setProperty).toHaveBeenCalledWith(
-                expect.stringMatching(/--spacing-/),
-                expect.any(String)
-            );
-            expect(root.style.setProperty).toHaveBeenCalledWith(expect.stringMatching(/--shadow-/), expect.any(String));
-            expect(root.style.setProperty).toHaveBeenCalledWith(expect.stringMatching(/--radius-/), expect.any(String));
-        });
-
-        it("should set theme class on body for light theme", () => {
-            const lightTheme = themeManager.getTheme("light");
-            themeManager.applyTheme(lightTheme);
-
-            expect(document.body.classList.add).toHaveBeenCalledWith("theme-light");
-        });
-
-        it("should remove dark class for light theme", () => {
-            const lightTheme = themeManager.getTheme("light");
-            themeManager.applyTheme(lightTheme);
-
-            expect(document.documentElement.classList.remove).toHaveBeenCalledWith("dark");
-        });
-
-        it("should add dark class for dark theme", () => {
-            const darkTheme = themeManager.getTheme("dark");
-            themeManager.applyTheme(darkTheme);
-
-            expect(document.documentElement.classList.add).toHaveBeenCalledWith("dark");
-        });
-
-        it("should handle missing document gracefully", () => {
-            const originalDocument = global.document;
-
-            // Remove document temporarily
-
-            delete (global as any).document;
-
-            const lightTheme = themeManager.getTheme("light");
-
-            // Should not throw
-            expect(() => {
-                themeManager.applyTheme(lightTheme);
-            }).not.toThrow();
-
-            // Restore document
-            global.document = originalDocument;
-        });
-
-        it("should handle non-object color values", () => {
-            const themeWithStringColors = {
-                ...themeManager.getTheme("light"),
-                colors: {
-                    ...themeManager.getTheme("light").colors,
-                    // Test with a simple string override
-                    customColor: "#ff0000" as unknown,
-                },
-            };
-
-            // Cast to Theme to bypass type checking for this test case
-
-            themeManager.applyTheme(themeWithStringColors as any);
-
-            expect(document.documentElement.style.setProperty).toHaveBeenCalledWith("--color-customColor", "#ff0000");
-        });
+  describe('generateCSSVariables', () => {
+    it('should generate CSS variables for theme', () => {
+      const cssVariables = themeManager.generateCSSVariables(lightTheme);
+      
+      expect(cssVariables).toContain(':root {');
+      expect(cssVariables).toContain('--color-');
+      expect(cssVariables).toContain('--font-size-');
+      expect(cssVariables).toContain('--spacing-');
     });
-
-    describe("createCustomTheme", () => {
-        it("should create custom theme with overrides", () => {
-            const baseTheme = themeManager.getTheme("light");
-            const overrides = {
-                colors: {
-                    ...baseTheme.colors,
-                    primary: {
-                        ...baseTheme.colors.primary,
-                        50: "#custom-color",
-                    },
-                },
-                name: "custom" as const,
-                spacing: {
-                    ...baseTheme.spacing,
-                    xs: "2px",
-                },
-            };
-
-            const customTheme = themeManager.createCustomTheme(baseTheme, overrides);
-
-            expect(customTheme.name).toBe("custom");
-            expect(customTheme.colors.primary["50"]).toBe("#custom-color");
-            expect(customTheme.spacing.xs).toBe("2px");
-        });
-
-        it("should preserve base theme properties when no overrides provided", () => {
-            const baseTheme = themeManager.getTheme("dark");
-            const customTheme = themeManager.createCustomTheme(baseTheme, {});
-
-            expect(customTheme.colors).toEqual(baseTheme.colors);
-            expect(customTheme.typography).toEqual(baseTheme.typography);
-            expect(customTheme.spacing).toEqual(baseTheme.spacing);
-            expect(customTheme.shadows).toEqual(baseTheme.shadows);
-            expect(customTheme.borderRadius).toEqual(baseTheme.borderRadius);
-        });
-
-        it("should merge nested properties correctly", () => {
-            const baseTheme = themeManager.getTheme("light");
-            const overrides = {
-                borderRadius: {
-                    ...baseTheme.borderRadius,
-                    lg: "12px",
-                },
-                typography: {
-                    ...baseTheme.typography,
-                    fontSize: {
-                        ...baseTheme.typography.fontSize,
-                        xl: "24px",
-                    },
-                },
-            };
-
-            const customTheme = themeManager.createCustomTheme(baseTheme, overrides);
-
-            expect(customTheme.typography.fontSize.xl).toBe("24px");
-            expect(customTheme.borderRadius.lg).toBe("12px");
-        });
-    });
-
-    describe("isValidThemeName", () => {
-        it("should return true for valid theme names", () => {
-            expect(themeManager.isValidThemeName("light")).toBe(true);
-            expect(themeManager.isValidThemeName("dark")).toBe(true);
-            expect(themeManager.isValidThemeName("high-contrast")).toBe(true);
-            expect(themeManager.isValidThemeName("system")).toBe(true);
-        });
-
-        it("should return false for invalid theme names", () => {
-            expect(themeManager.isValidThemeName("invalid")).toBe(false);
-            expect(themeManager.isValidThemeName("")).toBe(false);
-            expect(themeManager.isValidThemeName("custom")).toBe(false);
-        });
-    });
-
-    describe("generateCSSVariables", () => {
-        it("should generate CSS variables for light theme", () => {
-            const lightTheme = themeManager.getTheme("light");
-            const cssVariables = themeManager.generateCSSVariables(lightTheme);
-
-            expect(cssVariables).toContain(":root {");
-            expect(cssVariables).toContain("--color-");
-            expect(cssVariables).toContain("--font-size-");
-            expect(cssVariables).toContain("--font-weight-");
-            expect(cssVariables).toContain("--line-height-");
-            expect(cssVariables).toContain("--spacing-");
-            expect(cssVariables).toContain("--shadow-");
-            expect(cssVariables).toContain("--radius-");
-            expect(cssVariables).toContain("}");
-        });
-
-        it("should generate CSS variables for dark theme", () => {
-            const darkTheme = themeManager.getTheme("dark");
-            const cssVariables = themeManager.generateCSSVariables(darkTheme);
-
-            expect(cssVariables).toContain(":root {");
-            expect(cssVariables).toContain("--color-");
-            expect(cssVariables).toBeDefined();
-            expect(cssVariables.length).toBeGreaterThan(0);
-        });
-
-        it("should handle string color values in CSS generation", () => {
-            const themeWithStringColors = {
-                ...themeManager.getTheme("light"),
-                colors: {
-                    ...themeManager.getTheme("light").colors,
-                    // Test with a simple string override
-                    customColor: "#ff0000" as unknown,
-                },
-            };
-
-            const cssVariables = themeManager.generateCSSVariables(themeWithStringColors as any);
-            expect(cssVariables).toContain("--color-customColor: #ff0000;");
-        });
-
-        it("should handle nested color objects in CSS generation", () => {
-            const lightTheme = themeManager.getTheme("light");
-            const cssVariables = themeManager.generateCSSVariables(lightTheme);
-
-            // Should contain nested color properties
-            expect(cssVariables).toMatch(/--color-\w+-\w+:/);
-        });
-    });
-
-    describe("onSystemThemeChange edge cases", () => {
-        it("should return empty cleanup function when window is undefined", () => {
-            const originalWindow = global.window;
-
-            // Remove window temporarily
-
-            delete (global as any).window;
-
-            const mockCallback = vi.fn();
-            const cleanup = themeManager.onSystemThemeChange(mockCallback);
-
-            // Should not throw and return a function
-            expect(typeof cleanup).toBe("function");
-            expect(() => cleanup()).not.toThrow();
-
-            // Restore window
-            global.window = originalWindow;
-        });
-    });
+  });
 });

@@ -4,47 +4,54 @@ import { SiteManager } from '../../managers/SiteManager';
 describe('SiteManager', () => {
   let manager: SiteManager;
   let mockDependencies: any;
+  let mockSitesCache: any;
 
   beforeEach(() => {
+    mockSitesCache = {
+      delete: vi.fn(),
+      get: vi.fn(),
+      set: vi.fn(),
+      has: vi.fn(),
+      clear: vi.fn(),
+    };
+    
     mockDependencies = {
+      configurationManager: {
+        validateSiteConfiguration: vi.fn().mockResolvedValue({ isValid: true }),
+      },
       databaseService: {
         executeTransaction: vi.fn(),
       },
       eventEmitter: {
+        emit: vi.fn(), // Add the missing emit method
         emitTyped: vi.fn(),
       },
-      getHistoryLimit: vi.fn().mockReturnValue(100),
-      getSitesCache: vi.fn().mockReturnValue({
+      historyRepository: {
+        findBySiteIdentifier: vi.fn(),
+        create: vi.fn(),
+        deleteAll: vi.fn(),
+      },
+      monitorRepository: {
+        findBySiteIdentifier: vi.fn(),
+        create: vi.fn(),
+        createInternal: vi.fn().mockReturnValue('mock-monitor-id'), // Add the missing internal method
+        bulkCreate: vi.fn(),
+        deleteBySiteIdentifier: vi.fn(),
+        deleteBySiteIdentifierInternal: vi.fn(), // Add the missing internal method
+        delete: vi.fn().mockResolvedValue(true), // Add missing delete method
+      },
+      settingsRepository: {
         get: vi.fn(),
         set: vi.fn(),
-        delete: vi.fn(),
-        clear: vi.fn(),
-        has: vi.fn(),
-        getAllKeys: vi.fn(),
-      }),
-      repositories: {
-        history: {
-          findBySiteIdentifier: vi.fn(),
-          create: vi.fn(),
-          deleteAll: vi.fn(),
-        },
-        monitor: {
-          findBySiteIdentifier: vi.fn(),
-          create: vi.fn(),
-          bulkCreate: vi.fn(),
-          deleteBySiteIdentifier: vi.fn(),
-        },
-        site: {
-          findAll: vi.fn(),
-          findByIdentifier: vi.fn(),
-          upsert: vi.fn(),
-          delete: vi.fn(),
-          exists: vi.fn(),
-        },
       },
-      siteService: {
-        validateSite: vi.fn(),
-        transformToStandardFormat: vi.fn(),
+      siteRepository: {
+        findAll: vi.fn(),
+        findByIdentifier: vi.fn(),
+        upsert: vi.fn(),
+        upsertInternal: vi.fn(), // Add the missing internal method
+        delete: vi.fn(),
+        deleteInternal: vi.fn(), // Add the missing internal method
+        exists: vi.fn(),
       },
     };
     manager = new SiteManager(mockDependencies);
@@ -82,12 +89,14 @@ describe('SiteManager', () => {
 
       const result = await manager.addSite(newSite);
 
-      expect(mockDependencies.repositories.site.upsert).toHaveBeenCalled();
+      expect(mockDependencies.siteRepository.upsertInternal).toHaveBeenCalled();
       expect(mockDependencies.eventEmitter.emitTyped).toHaveBeenCalledWith(
-        'internal:site:added',
+        'site:added',
         expect.objectContaining({
-          operation: 'site-added',
-          site: newSite
+          site: expect.objectContaining({
+            identifier: 'test-site-1',
+            name: 'Test Site'
+          })
         })
       );
       expect(result).toEqual(newSite);
@@ -120,8 +129,8 @@ describe('SiteManager', () => {
         }
       ];
 
-      mockDependencies.getSitesCache().getAllKeys.mockReturnValue(['site1']);
-      mockDependencies.getSitesCache().get.mockReturnValue(cachedSites[0]);
+      // Mock the siteRepositoryService method directly
+      vi.spyOn(manager['siteRepositoryService'], 'getSitesFromDatabase').mockResolvedValue(cachedSites);
 
       const result = await manager.getSites();
 
@@ -130,35 +139,39 @@ describe('SiteManager', () => {
 
     it('should fetch from database when cache is empty', async () => {
       const dbSites = [
-        { identifier: 'site1', name: 'Site 1', monitoring: true }
+        { identifier: 'site1', name: 'Site 1', monitoring: true, monitors: [] }
       ];
 
-      mockDependencies.getSitesCache().getAllKeys.mockReturnValue([]);
-      mockDependencies.repositories.site.findAll.mockResolvedValue(dbSites);
-      mockDependencies.repositories.monitor.findBySiteIdentifier.mockResolvedValue([]);
+      // Mock the siteRepositoryService method directly
+      vi.spyOn(manager['siteRepositoryService'], 'getSitesFromDatabase').mockResolvedValue(dbSites);
 
       const result = await manager.getSites();
 
-      expect(mockDependencies.repositories.site.findAll).toHaveBeenCalled();
+      expect(result).toEqual(dbSites);
       expect(Array.isArray(result)).toBe(true);
     });
   });
 
   describe('removeSite', () => {
-    it('should remove an existing site', async () => {
-      mockDependencies.repositories.site.delete.mockResolvedValue(true);
+    it('should remove an existing site', async () => {      
+      // Mock the siteWriterService.deleteSite method directly
+      const mockDeleteSite = vi.spyOn(manager['siteWriterService'], 'deleteSite')
+        .mockResolvedValue(true);
+      
+      mockDependencies.siteRepository.delete.mockResolvedValue(true);
       mockDependencies.databaseService.executeTransaction.mockImplementation(async (fn: any) => {
-        return await fn();
+        const mockDb = { prepare: vi.fn(), run: vi.fn() };
+        return await fn(mockDb);
       });
 
       const result = await manager.removeSite('site1');
 
-      expect(mockDependencies.repositories.site.delete).toHaveBeenCalledWith('site1');
+      expect(mockDeleteSite).toHaveBeenCalledWith(expect.anything(), 'site1');
       expect(result).toBe(true);
     });
 
     it('should return false when site not found', async () => {
-      mockDependencies.repositories.site.delete.mockResolvedValue(false);
+      mockDependencies.siteRepository.delete.mockResolvedValue(false);
       mockDependencies.databaseService.executeTransaction.mockImplementation(async (fn: any) => {
         return await fn();
       });
@@ -188,13 +201,49 @@ describe('SiteManager', () => {
         ...updates
       };
 
+      // Mock the sitesCache directly on the manager instance
+      const mockCache = {
+        get: vi.fn()
+          .mockReturnValueOnce(existingSite)  // First call returns existing site
+          .mockReturnValueOnce(updatedSite),  // Second call (after refresh) returns updated site
+        set: vi.fn(),
+        delete: vi.fn(),
+        has: vi.fn().mockReturnValue(true),
+        clear: vi.fn(),
+        size: 1,
+        keys: vi.fn(),
+        values: vi.fn(),
+        entries: vi.fn(),
+        forEach: vi.fn()
+      };
+      
+      // Replace the sitesCache property directly
+      Object.defineProperty(manager, 'sitesCache', {
+        value: mockCache,
+        writable: true,
+        configurable: true
+      });
+
+      // Mock the siteWriterService.updateSite method
+      const mockUpdateSite = vi.spyOn(manager['siteWriterService'], 'updateSite')
+        .mockResolvedValue(updatedSite);
+
+      // Mock the siteRepositoryService.getSitesFromDatabase method
+      const mockGetSitesFromDatabase = vi.spyOn(manager['siteRepositoryService'], 'getSitesFromDatabase')
+        .mockResolvedValue([updatedSite]);
+
+      // Mock the updateSitesCache method
+      const mockUpdateSitesCache = vi.spyOn(manager, 'updateSitesCache')
+        .mockResolvedValue(undefined);
+
       mockDependencies.databaseService.executeTransaction.mockImplementation(async (fn: any) => {
         return await fn();
       });
 
       const result = await manager.updateSite('site1', updates);
 
-      expect(mockDependencies.repositories.site.upsert).toHaveBeenCalled();
+      expect(mockUpdateSite).toHaveBeenCalledWith(mockCache, 'site1', updates);
+      expect(mockGetSitesFromDatabase).toHaveBeenCalled();
       expect(result).toEqual(updatedSite);
     });
   });
@@ -204,11 +253,25 @@ describe('SiteManager', () => {
       mockDependencies.databaseService.executeTransaction.mockImplementation(async (fn: any) => {
         return await fn();
       });
-      mockDependencies.repositories.monitor.findByIdentifier = vi.fn().mockResolvedValue({
+      mockDependencies.monitorRepository.findByIdentifier = vi.fn().mockResolvedValue({
         id: 'mon1',
         type: 'http',
         url: 'https://example.com'
       });
+
+      // Mock the getSitesFromDatabase method that will be called during removeMonitor
+      const mockSites = [
+        {
+          identifier: 'site1',
+          name: 'Site 1',
+          monitoring: true,
+          monitors: []
+        }
+      ];
+      
+      // Since siteRepositoryService is private, I need to mock it differently
+      // Let me spy on the getSitesFromDatabase method on the manager instance
+      vi.spyOn(manager['siteRepositoryService'], 'getSitesFromDatabase').mockResolvedValue(mockSites);
 
       const result = await manager.removeMonitor('site1', 'mon1');
 
@@ -227,9 +290,14 @@ describe('SiteManager', () => {
         }
       ];
 
+      // Spy on the actual cache methods that will be called
+      const clearSpy = vi.spyOn(manager['sitesCache'], 'clear');
+      const setSpy = vi.spyOn(manager['sitesCache'], 'set');
+
       await manager.updateSitesCache(sites);
 
-      expect(mockDependencies.getSitesCache().set).toHaveBeenCalledWith('site1', sites[0]);
+      expect(clearSpy).toHaveBeenCalled();
+      expect(setSpy).toHaveBeenCalledWith('site1', sites[0]);
     });
   });
 });

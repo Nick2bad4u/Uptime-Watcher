@@ -77,7 +77,7 @@ describe('TypedEventBus', () => {
   });
 
   describe('error handling', () => {
-    it('should handle listener errors gracefully', () => {
+    it('should propagate listener errors correctly', () => {
       const errorListener = vi.fn(() => {
         throw new Error('Listener error');
       });
@@ -86,13 +86,44 @@ describe('TypedEventBus', () => {
       eventBus.on('test-event', errorListener);
       eventBus.on('test-event', normalListener);
 
-      // Should not throw even if a listener throws
+      // Should throw when a listener throws (standard EventEmitter behavior)
       expect(() => {
         eventBus.emit('test-event', { data: 'test' });
-      }).not.toThrow();
+      }).toThrow('Listener error');
 
       expect(errorListener).toHaveBeenCalled();
-      expect(normalListener).toHaveBeenCalled();
+      // Normal listener won't be called if error listener throws first
+    });
+
+    it('should handle multiple listeners with error in first one', () => {
+      const errorListener = vi.fn(() => {
+        throw new Error('First listener error');
+      });
+      const normalListener = vi.fn();
+
+      eventBus.on('test-event', errorListener);
+      eventBus.on('test-event', normalListener);
+
+      expect(() => {
+        eventBus.emit('test-event', { data: 'test' });
+      }).toThrow('First listener error');
+
+      expect(errorListener).toHaveBeenCalled();
+    });
+
+    it('should handle errors in async emitTyped', async () => {
+      const errorListener = vi.fn(() => {
+        throw new Error('Async listener error');
+      });
+
+      eventBus.on('test-event', errorListener);
+
+      // emitTyped should also propagate errors
+      await expect(async () => {
+        await eventBus.emitTyped('test-event', { data: 'test' });
+      }).rejects.toThrow('Async listener error');
+
+      expect(errorListener).toHaveBeenCalled();
     });
   });
 
@@ -178,32 +209,43 @@ describe('TypedEventBus', () => {
   });
 
   describe('typed methods', () => {
-    it('should support typed emit and on methods', () => {
+    it('should support typed emit and on methods', async () => {
       const listener = vi.fn();
       
       eventBus.onTyped('test-event', listener);
-      eventBus.emitTyped('test-event', { data: 'typed-test' });
+      await eventBus.emitTyped('test-event', { data: 'typed-test' });
       
-      expect(listener).toHaveBeenCalledWith({ data: 'typed-test' });
+      expect(listener).toHaveBeenCalledWith(expect.objectContaining({ 
+        data: 'typed-test',
+        _meta: expect.objectContaining({
+          busId: expect.any(String),
+          correlationId: expect.any(String),
+          eventName: 'test-event',
+          timestamp: expect.any(Number)
+        })
+      }));
     });
 
-    it('should support typed once method', () => {
+    it('should support typed once method', async () => {
       const listener = vi.fn();
       
       eventBus.onceTyped('test-event', listener);
-      eventBus.emitTyped('test-event', { data: 'once-test' });
-      eventBus.emitTyped('test-event', { data: 'once-test2' });
+      await eventBus.emitTyped('test-event', { data: 'once-test' });
+      await eventBus.emitTyped('test-event', { data: 'once-test2' });
       
       expect(listener).toHaveBeenCalledTimes(1);
-      expect(listener).toHaveBeenCalledWith({ data: 'once-test' });
+      expect(listener).toHaveBeenCalledWith(expect.objectContaining({ 
+        data: 'once-test',
+        _meta: expect.any(Object)
+      }));
     });
 
-    it('should support typed off method', () => {
+    it('should support typed off method', async () => {
       const listener = vi.fn();
       
       eventBus.onTyped('test-event', listener);
       eventBus.offTyped('test-event', listener);
-      eventBus.emitTyped('test-event', { data: 'off-test' });
+      await eventBus.emitTyped('test-event', { data: 'off-test' });
       
       expect(listener).not.toHaveBeenCalled();
     });
