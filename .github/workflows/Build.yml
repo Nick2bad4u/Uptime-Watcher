@@ -188,7 +188,7 @@ jobs:
             - name: Install dmg-license workaround for Mac Builder
               id: install_dmg_license
               if: runner.os == 'macOS'
-              run: npm install --save-dev dmg-license
+              run: npm install --force --save-dev dmg-license
               working-directory: .
 
             - name: Install Windows build dependencies (Chocolatey)

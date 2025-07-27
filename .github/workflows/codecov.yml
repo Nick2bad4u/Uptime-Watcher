@@ -33,7 +33,7 @@ jobs:
 
             - name: Install dependencies
               id: install-deps
-              run: npm ci
+              run: npm install --force
 
             - name: Build Frontend and Backend
               id: build

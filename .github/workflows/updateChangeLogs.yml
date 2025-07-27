@@ -53,7 +53,7 @@ jobs:
 
             - name: Install git-cliff
               shell: pwsh
-              run: npm install -g git-cliff
+              run: npm install -g git-cliff --force
 
             - name: Generate CHANGELOG.md files (With verbose logging)
               shell: pwsh
