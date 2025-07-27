@@ -15,10 +15,12 @@ import { Site, Monitor, StatusUpdate } from "../types";
 const mockDatabaseManager = {
     getHistoryLimit: vi.fn(() => 1000),
     setHistoryLimit: vi.fn(() => Promise.resolve()),
-    downloadBackup: vi.fn(() => Promise.resolve({
-        buffer: Buffer.from("test"),
-        fileName: "backup.db"
-    })),
+    downloadBackup: vi.fn(() =>
+        Promise.resolve({
+            buffer: Buffer.from("test"),
+            fileName: "backup.db",
+        })
+    ),
     exportData: vi.fn(() => Promise.resolve('{"sites": []}')),
     importData: vi.fn(() => Promise.resolve(true)),
     initialize: vi.fn(() => Promise.resolve()),
@@ -26,18 +28,20 @@ const mockDatabaseManager = {
 
 const mockMonitorManager = {
     setupSiteForMonitoring: vi.fn(() => Promise.resolve()),
-    checkSiteManually: vi.fn(() => Promise.resolve({
-        siteIdentifier: "test-site",
-        monitorId: "test-monitor",
-        status: "up",
-        timestamp: "2024-01-01T00:00:00.000Z",
-        site: {
-            identifier: "test-site",
-            name: "Test Site",
-            monitors: [],
-            monitoring: true
-        }
-    } as StatusUpdate)),
+    checkSiteManually: vi.fn(() =>
+        Promise.resolve({
+            siteIdentifier: "test-site",
+            monitorId: "test-monitor",
+            status: "up",
+            timestamp: "2024-01-01T00:00:00.000Z",
+            site: {
+                identifier: "test-site",
+                name: "Test Site",
+                monitors: [],
+                monitoring: true,
+            },
+        } as StatusUpdate)
+    ),
     startMonitoringForSite: vi.fn(() => Promise.resolve(true)),
     stopMonitoringForSite: vi.fn(() => Promise.resolve(true)),
     startMonitoring: vi.fn(() => Promise.resolve()),
@@ -45,19 +49,23 @@ const mockMonitorManager = {
 } as unknown as MonitorManager;
 
 const mockSiteManager = {
-    addSite: vi.fn(() => Promise.resolve({
-        identifier: "test-site",
-        name: "Test Site",
-        monitors: [],
-        monitoring: true
-    } as Site)),
+    addSite: vi.fn(() =>
+        Promise.resolve({
+            identifier: "test-site",
+            name: "Test Site",
+            monitors: [],
+            monitoring: true,
+        } as Site)
+    ),
     removeSite: vi.fn(() => Promise.resolve(true)),
-    updateSite: vi.fn(() => Promise.resolve({
-        identifier: "test-site",
-        name: "Updated Site",
-        monitors: [],
-        monitoring: true
-    } as Site)),
+    updateSite: vi.fn(() =>
+        Promise.resolve({
+            identifier: "test-site",
+            name: "Updated Site",
+            monitors: [],
+            monitoring: true,
+        } as Site)
+    ),
     getSites: vi.fn(() => Promise.resolve([])),
     removeMonitor: vi.fn(() => Promise.resolve(true)),
     initialize: vi.fn(() => Promise.resolve()),
@@ -90,9 +98,7 @@ describe("UptimeOrchestrator", () => {
         });
 
         it("should throw error when dependencies are not provided", () => {
-            expect(() => new UptimeOrchestrator()).toThrow(
-                "UptimeOrchestrator requires dependencies to be injected"
-            );
+            expect(() => new UptimeOrchestrator()).toThrow("UptimeOrchestrator requires dependencies to be injected");
         });
 
         it("should throw error when dependencies are undefined", () => {
@@ -118,19 +124,21 @@ describe("UptimeOrchestrator", () => {
         const testSite: Site = {
             identifier: "test-site",
             name: "Test Site",
-            monitors: [{
-                id: "monitor-1",
-                type: "http",
-                status: "pending",
-                history: [],
-                url: "https://example.com",
-                checkInterval: 30000,
-                timeout: 5000,
-                monitoring: true,
-                responseTime: 0,
-                retryAttempts: 3
-            } as Monitor],
-            monitoring: true
+            monitors: [
+                {
+                    id: "monitor-1",
+                    type: "http",
+                    status: "pending",
+                    history: [],
+                    url: "https://example.com",
+                    checkInterval: 30000,
+                    timeout: 5000,
+                    monitoring: true,
+                    responseTime: 0,
+                    retryAttempts: 3,
+                } as Monitor,
+            ],
+            monitoring: true,
         };
 
         it("should add site successfully", async () => {
@@ -138,16 +146,16 @@ describe("UptimeOrchestrator", () => {
 
             expect(mockSiteManager.addSite).toHaveBeenCalledWith(testSite);
             expect(mockMonitorManager.setupSiteForMonitoring).toHaveBeenCalled();
-            expect(result).toEqual(expect.objectContaining({
-                identifier: "test-site",
-                name: "Test Site"
-            }));
+            expect(result).toEqual(
+                expect.objectContaining({
+                    identifier: "test-site",
+                    name: "Test Site",
+                })
+            );
         });
 
         it("should handle site addition failure and cleanup", async () => {
-            vi.mocked(mockMonitorManager.setupSiteForMonitoring).mockRejectedValueOnce(
-                new Error("Setup failed")
-            );
+            vi.mocked(mockMonitorManager.setupSiteForMonitoring).mockRejectedValueOnce(new Error("Setup failed"));
 
             await expect(orchestrator.addSite(testSite)).rejects.toThrow("Setup failed");
 
@@ -155,12 +163,8 @@ describe("UptimeOrchestrator", () => {
         });
 
         it("should handle cleanup failure during site addition rollback", async () => {
-            vi.mocked(mockMonitorManager.setupSiteForMonitoring).mockRejectedValueOnce(
-                new Error("Setup failed")
-            );
-            vi.mocked(mockSiteManager.removeSite).mockRejectedValueOnce(
-                new Error("Cleanup failed")
-            );
+            vi.mocked(mockMonitorManager.setupSiteForMonitoring).mockRejectedValueOnce(new Error("Setup failed"));
+            vi.mocked(mockSiteManager.removeSite).mockRejectedValueOnce(new Error("Cleanup failed"));
 
             await expect(orchestrator.addSite(testSite)).rejects.toThrow("Setup failed");
 
@@ -179,9 +183,11 @@ describe("UptimeOrchestrator", () => {
             const result = await orchestrator.updateSite("test-site", updateData);
 
             expect(mockSiteManager.updateSite).toHaveBeenCalledWith("test-site", updateData);
-            expect(result).toEqual(expect.objectContaining({
-                name: "Updated Site"
-            }));
+            expect(result).toEqual(
+                expect.objectContaining({
+                    name: "Updated Site",
+                })
+            );
         });
 
         it("should get sites successfully", async () => {
@@ -197,10 +203,12 @@ describe("UptimeOrchestrator", () => {
             const result = await orchestrator.checkSiteManually("test-site", "monitor-1");
 
             expect(mockMonitorManager.checkSiteManually).toHaveBeenCalledWith("test-site", "monitor-1");
-            expect(result).toEqual(expect.objectContaining({
-                siteIdentifier: "test-site",
-                status: "up"
-            }));
+            expect(result).toEqual(
+                expect.objectContaining({
+                    siteIdentifier: "test-site",
+                    status: "up",
+                })
+            );
         });
 
         it("should check site manually without monitor ID", async () => {
@@ -301,7 +309,7 @@ describe("UptimeOrchestrator", () => {
             expect(mockDatabaseManager.downloadBackup).toHaveBeenCalled();
             expect(result).toEqual({
                 buffer: expect.any(Buffer),
-                fileName: "backup.db"
+                fileName: "backup.db",
             });
         });
 
@@ -343,10 +351,10 @@ describe("UptimeOrchestrator", () => {
                         identifier: "test-site",
                         name: "Test Site",
                         monitors: [],
-                        monitoring: true
+                        monitoring: true,
                     },
                     source: "user",
-                    timestamp: Date.now()
+                    timestamp: Date.now(),
                 });
             }).not.toThrow();
         });
@@ -363,7 +371,7 @@ describe("UptimeOrchestrator", () => {
                         monitoring: true,
                         responseTime: 100,
                         retryAttempts: 3,
-                        timeout: 5000
+                        timeout: 5000,
                     },
                     newStatus: "up",
                     previousStatus: "down",
@@ -372,10 +380,10 @@ describe("UptimeOrchestrator", () => {
                         identifier: "test-site",
                         name: "Test Site",
                         monitors: [],
-                        monitoring: true
+                        monitoring: true,
                     },
                     siteId: "test-site",
-                    timestamp: Date.now()
+                    timestamp: Date.now(),
                 });
             }).not.toThrow();
         });
@@ -394,7 +402,7 @@ describe("UptimeOrchestrator", () => {
                 identifier: "",
                 name: "",
                 monitors: [],
-                monitoring: false
+                monitoring: false,
             };
 
             await expect(orchestrator.addSite(emptySite)).resolves.toBeDefined();
@@ -428,7 +436,7 @@ describe("UptimeOrchestrator", () => {
                 identifier: "test-site",
                 name: "Test Site",
                 monitors: [],
-                monitoring: true
+                monitoring: true,
             };
 
             await expect(orchestrator.addSite(testSite)).rejects.toThrow("Site error");

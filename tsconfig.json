@@ -54,7 +54,7 @@
         "useDefineForClassFields": true,
         "useUnknownInCatchVariables": true,
         "declaration": true,
-        "declarationMap": true,
+        "declarationMap": true
     },
     "exclude": [
         "node_modules",

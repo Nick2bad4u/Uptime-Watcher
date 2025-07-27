@@ -63,10 +63,12 @@ vi.mock("../../utils/database/databaseInitializer", () => ({
 
 vi.mock("../../utils/database/DataBackupService", () => ({
     DataBackupService: vi.fn().mockImplementation(() => ({
-        downloadDatabaseBackup: vi.fn(() => Promise.resolve({
-            buffer: Buffer.from("backup data"),
-            fileName: "backup-test.db"
-        })),
+        downloadDatabaseBackup: vi.fn(() =>
+            Promise.resolve({
+                buffer: Buffer.from("backup data"),
+                fileName: "backup-test.db",
+            })
+        ),
     })),
 }));
 
@@ -84,11 +86,13 @@ vi.mock("../../utils/database/SiteRepositoryService", () => ({
     })),
     SiteLoadingOrchestrator: vi.fn().mockImplementation(() => ({
         loadSites: vi.fn(() => Promise.resolve()),
-        loadSitesFromDatabase: vi.fn(() => Promise.resolve({
-            success: true,
-            sitesLoaded: 2,
-            message: "Sites loaded successfully"
-        })),
+        loadSitesFromDatabase: vi.fn(() =>
+            Promise.resolve({
+                success: true,
+                sitesLoaded: 2,
+                message: "Sites loaded successfully",
+            })
+        ),
     })),
 }));
 
@@ -200,10 +204,12 @@ describe("DatabaseManager", () => {
 
             // Mock the DataBackupService instance
             const mockDataBackupService = {
-                downloadDatabaseBackup: vi.fn(() => Promise.resolve({
-                    buffer: Buffer.from("backup data"),
-                    fileName: "backup-test.db"
-                })),
+                downloadDatabaseBackup: vi.fn(() =>
+                    Promise.resolve({
+                        buffer: Buffer.from("backup data"),
+                        fileName: "backup-test.db",
+                    })
+                ),
             };
 
             // Get references to the mocked modules
@@ -218,7 +224,7 @@ describe("DatabaseManager", () => {
 
             expect(result).toEqual({
                 buffer: expect.any(Buffer),
-                fileName: "backup-test.db"
+                fileName: "backup-test.db",
             });
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
                 "internal:database:backup-downloaded",
@@ -505,8 +511,10 @@ describe("DatabaseManager", () => {
         });
 
         it("should handle site loading errors", async () => {
-            const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-            const loadSitesSpy = vi.spyOn(databaseManager as any, 'loadSites').mockRejectedValue(new Error("Load failed"));
+            const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+            const loadSitesSpy = vi
+                .spyOn(databaseManager as any, "loadSites")
+                .mockRejectedValue(new Error("Load failed"));
 
             const result = await databaseManager.refreshSites();
 
@@ -518,16 +526,16 @@ describe("DatabaseManager", () => {
         });
 
         it("should emit site loading events", async () => {
-            const loadSitesSpy = vi.spyOn(databaseManager as any, 'loadSites').mockResolvedValue(undefined);
-            const eventEmitterSpy = vi.spyOn((databaseManager as any).eventEmitter, 'emitTyped');
+            const loadSitesSpy = vi.spyOn(databaseManager as any, "loadSites").mockResolvedValue(undefined);
+            const eventEmitterSpy = vi.spyOn((databaseManager as any).eventEmitter, "emitTyped");
 
             const result = await databaseManager.refreshSites();
 
             expect(loadSitesSpy).toHaveBeenCalled();
-            expect(eventEmitterSpy).toHaveBeenCalledWith('internal:database:sites-refreshed', {
-                operation: 'sites-refreshed',
+            expect(eventEmitterSpy).toHaveBeenCalledWith("internal:database:sites-refreshed", {
+                operation: "sites-refreshed",
                 siteCount: 0,
-                timestamp: expect.any(Number)
+                timestamp: expect.any(Number),
             });
 
             loadSitesSpy.mockRestore();
@@ -628,12 +636,14 @@ describe("DatabaseManager", () => {
             await databaseManager.setHistoryLimit(500);
 
             const historyManager = await import("../../utils/database/historyLimitManager");
-            expect(historyManager.setHistoryLimit).toHaveBeenCalledWith(expect.objectContaining({
-                limit: 500,
-                repositories: expect.any(Object),
-                databaseService: expect.any(Object),
-                logger: expect.any(Object)
-            }));
+            expect(historyManager.setHistoryLimit).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    limit: 500,
+                    repositories: expect.any(Object),
+                    databaseService: expect.any(Object),
+                    logger: expect.any(Object),
+                })
+            );
         });
     });
 
@@ -641,14 +651,14 @@ describe("DatabaseManager", () => {
         it("should handle empty export data", async () => {
             const { DataImportExportService } = await import("../../utils/database/DataImportExportService");
             const mockInstance = vi.mocked(DataImportExportService).mock.instances[0] as any;
-            mockInstance.exportAllData.mockResolvedValueOnce('{}');
+            mockInstance.exportAllData.mockResolvedValueOnce("{}");
 
             const result = await databaseManager.exportData();
-            expect(result).toBe('{}');
+            expect(result).toBe("{}");
         });
 
         it("should handle empty import data", async () => {
-            const result = await databaseManager.importData('{}');
+            const result = await databaseManager.importData("{}");
             expect(result).toBe(false); // Empty data should return false
         });
 
@@ -656,15 +666,17 @@ describe("DatabaseManager", () => {
             await databaseManager.setHistoryLimit(0);
 
             const historyManager = await import("../../utils/database/historyLimitManager");
-            expect(historyManager.setHistoryLimit).toHaveBeenCalledWith(expect.objectContaining({
-                limit: 0
-            }));
+            expect(historyManager.setHistoryLimit).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    limit: 0,
+                })
+            );
         });
 
         it("should handle negative history limit", async () => {
-            await expect(databaseManager.setHistoryLimit(-1))
-                .rejects
-                .toThrow("History limit must be non-negative, received: -1");
+            await expect(databaseManager.setHistoryLimit(-1)).rejects.toThrow(
+                "History limit must be non-negative, received: -1"
+            );
         });
     });
 });

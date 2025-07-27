@@ -49,8 +49,8 @@ describe("ServiceContainer", () => {
                 enableDebugLogging: true,
                 notificationConfig: {
                     showDownAlerts: false,
-                    showUpAlerts: true
-                }
+                    showUpAlerts: true,
+                },
             };
 
             const customContainer = ServiceContainer.getInstance(config);
@@ -60,7 +60,7 @@ describe("ServiceContainer", () => {
         it("should handle partial configuration", () => {
             ServiceContainer.resetForTesting();
             const config: ServiceContainerConfig = {
-                enableDebugLogging: true
+                enableDebugLogging: true,
             };
 
             const customContainer = ServiceContainer.getInstance(config);
@@ -72,8 +72,8 @@ describe("ServiceContainer", () => {
             const config: ServiceContainerConfig = {
                 notificationConfig: {
                     showDownAlerts: true,
-                    showUpAlerts: false
-                }
+                    showUpAlerts: false,
+                },
             };
 
             const customContainer = ServiceContainer.getInstance(config);
@@ -258,7 +258,7 @@ describe("ServiceContainer", () => {
             expect(services.length).toBeGreaterThan(0);
 
             // Should include the services we initialized
-            const serviceNames = services.map(s => s.name);
+            const serviceNames = services.map((s) => s.name);
             expect(serviceNames).toContain("DatabaseService");
             expect(serviceNames).toContain("NotificationService");
         });
@@ -291,7 +291,7 @@ describe("ServiceContainer", () => {
             const services = await Promise.all([
                 Promise.resolve(container.getDatabaseService()),
                 Promise.resolve(container.getNotificationService()),
-                Promise.resolve(container.getUptimeOrchestrator())
+                Promise.resolve(container.getUptimeOrchestrator()),
             ]);
 
             expect(services).toBeDefined();
@@ -311,7 +311,7 @@ describe("ServiceContainer", () => {
         it("should handle configuration with only enableDebugLogging false", () => {
             ServiceContainer.resetForTesting();
             const config: ServiceContainerConfig = {
-                enableDebugLogging: false
+                enableDebugLogging: false,
             };
 
             const customContainer = ServiceContainer.getInstance(config);
@@ -323,8 +323,8 @@ describe("ServiceContainer", () => {
             const config: ServiceContainerConfig = {
                 notificationConfig: {
                     showDownAlerts: false,
-                    showUpAlerts: false
-                }
+                    showUpAlerts: false,
+                },
             };
 
             const customContainer = ServiceContainer.getInstance(config);
@@ -368,10 +368,10 @@ describe("ServiceContainer", () => {
                 container.getSiteService(),
                 container.getAutoUpdaterService(),
                 container.getWindowService(),
-                container.getUptimeOrchestrator()
+                container.getUptimeOrchestrator(),
             ];
 
-            allServices.forEach(service => {
+            allServices.forEach((service) => {
                 expect(service).toBeDefined();
             });
         });
@@ -394,7 +394,7 @@ describe("ServiceContainer", () => {
         it("should handle debug logging configuration", () => {
             ServiceContainer.resetForTesting();
             const config: ServiceContainerConfig = {
-                enableDebugLogging: true
+                enableDebugLogging: true,
             };
 
             const debugContainer = ServiceContainer.getInstance(config);
