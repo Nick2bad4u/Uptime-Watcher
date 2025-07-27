@@ -61,3 +61,8 @@ updates:
               applies-to: version-updates
               patterns:
                   - "*"
+
+    - package-ecosystem: npm
+      directory: /docs/docusaurus
+      schedule:
+        interval: daily
