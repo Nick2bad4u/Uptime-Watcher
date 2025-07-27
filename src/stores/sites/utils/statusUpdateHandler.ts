@@ -378,10 +378,10 @@ export class StatusUpdateManager {
             "newStatus" in data &&
             "previousStatus" in data &&
             "siteId" in data &&
-            typeof record.monitorId === "string" &&
-            typeof record.newStatus === "string" &&
-            typeof record.previousStatus === "string" &&
-            typeof record.siteId === "string"
+            typeof record["monitorId"] === "string" &&
+            typeof record["newStatus"] === "string" &&
+            typeof record["previousStatus"] === "string" &&
+            typeof record["siteId"] === "string"
         );
     }
 }

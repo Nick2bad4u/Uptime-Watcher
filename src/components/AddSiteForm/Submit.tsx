@@ -202,12 +202,12 @@ function buildMonitorData(
 
     // Build type-specific fields based on monitor type
     if (monitorType === "http") {
-        monitorData.url = formData.url.trim();
+        monitorData["url"] = formData["url"].trim();
     }
 
     if (monitorType === "port") {
-        monitorData.host = formData.host.trim();
-        monitorData.port = Number(formData.port);
+        monitorData["host"] = formData["host"].trim();
+        monitorData["port"] = Number(formData["port"]);
     }
 
     return monitorData;
@@ -347,11 +347,11 @@ async function validateMonitorType(
 
     // Add type-specific fields
     if (monitorType === "http") {
-        formData.url = url.trim();
+        formData["url"] = url.trim();
     } else {
         // Port monitor
-        formData.host = host.trim();
-        formData.port = Number(port);
+        formData["host"] = host.trim();
+        formData["port"] = Number(port);
     }
 
     // Use form validation that only validates provided fields

@@ -257,6 +257,14 @@ export const DataHandlerValidators = {
     }) satisfies IpcParameterValidator,
 
     /**
+     * Validates parameters for reset-settings handler.
+     * Expects: []
+     */
+    resetSettings: ((params: unknown[]): null | string[] => {
+        return params.length === 0 ? null : ["No parameters expected"];
+    }) satisfies IpcParameterValidator,
+
+    /**
      * Validates parameters for update-history-limit handler.
      * Expects: [number] (limit)
      */

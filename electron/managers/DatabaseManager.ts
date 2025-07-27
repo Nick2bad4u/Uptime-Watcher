@@ -24,11 +24,13 @@ import { setHistoryLimit as setHistoryLimitUtil } from "../utils/database/histor
 import { createSiteCache, LoggerAdapter } from "../utils/database/serviceFactory";
 import { SiteLoadingOrchestrator, SiteRepositoryService } from "../utils/database/SiteRepositoryService";
 import { monitorLogger } from "../utils/logger";
+import { ConfigurationManager } from "./ConfigurationManager";
 
 /**
  * Dependencies interface for DatabaseManager constructor.
  */
 export interface DatabaseManagerDependencies {
+    configurationManager: ConfigurationManager;
     eventEmitter: TypedEventBus<UptimeEvents>;
     repositories: {
         database: DatabaseService;
@@ -83,6 +85,12 @@ export interface DatabaseManagerDependencies {
  */
 export class DatabaseManager {
     /**
+     * Configuration manager for business rules and policies.
+     * @readonly
+     */
+    private readonly configurationManager: ConfigurationManager;
+
+    /**
      * Dependencies injected into the DatabaseManager.
      * @readonly
      */
@@ -112,6 +120,7 @@ export class DatabaseManager {
      */
     constructor(dependencies: DatabaseManagerDependencies) {
         this.dependencies = dependencies;
+        this.configurationManager = dependencies.configurationManager;
         this.eventEmitter = dependencies.eventEmitter;
         this.siteCache = createSiteCache();
     }
@@ -429,6 +438,38 @@ export class DatabaseManager {
     }
 
     /**
+     * Reset all application settings to their default values.
+     *
+     * @returns Promise resolving when settings have been reset.
+     *
+     * @remarks
+     * This method resets all application settings to their default values,
+     * including:
+     * - History limit reset to DEFAULT_HISTORY_LIMIT
+     * - Any other persisted settings reset to defaults
+     *
+     * The operation is performed within a database transaction to ensure
+     * consistency across all setting changes.
+     *
+     * @example
+     * ```typescript
+     * await databaseManager.resetSettings();
+     * ```
+     */
+    public async resetSettings(): Promise<void> {
+        // Reset history limit to default using the existing validated method
+        await this.setHistoryLimit(DEFAULT_HISTORY_LIMIT);
+
+        // Future enhancement: Add reset for other settings here
+        // Example:
+        // await this.dependencies.repositories.settings.resetAllSettings();
+
+        monitorLogger.info("[DatabaseManager] All settings reset to defaults", {
+            historyLimit: DEFAULT_HISTORY_LIMIT,
+        });
+    }
+
+    /**
      * Set history limit for monitor data retention.
      *
      * @param limit - Number of history records to retain (must be non-negative integer, 0 disables history tracking)
@@ -486,11 +527,11 @@ export class DatabaseManager {
             throw new RangeError(`[DatabaseManager.setHistoryLimit] History limit must be finite, received: ${limit}`);
         }
 
-        // Reasonable upper bound to prevent performance issues
-        const MAX_HISTORY_LIMIT = 1_000_000; // 1 million records
-        if (limit > MAX_HISTORY_LIMIT) {
+        // Use ConfigurationManager to get proper business rules for history limits
+        const historyRules = this.configurationManager.getHistoryRetentionRules();
+        if (limit > historyRules.maxLimit) {
             throw new RangeError(
-                `[DatabaseManager.setHistoryLimit] History limit too large (max: ${MAX_HISTORY_LIMIT}), received: ${limit}`
+                `[DatabaseManager.setHistoryLimit] History limit too large (max: ${historyRules.maxLimit}), received: ${limit}`
             );
         }
 

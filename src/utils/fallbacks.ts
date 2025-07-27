@@ -92,25 +92,62 @@ export const MonitorDefaults = {
 } as const;
 
 /**
+ * Configuration for monitor display identifier generation.
+ * Maps monitor types to functions that generate display identifiers.
+ */
+const MONITOR_IDENTIFIER_GENERATORS = new Map<string, (monitor: Monitor) => string | undefined>([
+    ["http", (monitor) => monitor.url ?? undefined],
+    ["port", (monitor) => (monitor.host && monitor.port ? `${monitor.host}:${monitor.port}` : undefined)],
+    // Add new monitor types here as they're implemented
+    // ["ping", (monitor) => monitor.host ?? undefined],
+    // ["dns", (monitor) => `${monitor.domain} (${monitor.recordType})` ?? undefined],
+    // ["ssl", (monitor) => monitor.host ?? undefined],
+    // ["api", (monitor) => monitor.endpoint ?? undefined],
+]);
+
+/**
  * Generate display identifier for a monitor dynamically.
  * Replaces hardcoded backward compatibility patterns.
  *
  * @param monitor - Monitor object
  * @param siteFallback - Fallback site identifier
  * @returns Display identifier string
+ *
+ * @remarks
+ * This function uses a configuration-driven approach to support new monitor types
+ * without requiring code changes. To add support for a new monitor type:
+ * 1. Add an entry to MONITOR_IDENTIFIER_GENERATORS with a function that extracts the identifier
+ * 2. The function will automatically use the new generator
+ *
+ * @example
+ * ```typescript
+ * // HTTP monitor
+ * getMonitorDisplayIdentifier({type: "http", url: "https://example.com"}, "Site");
+ * // Returns: "https://example.com"
+ *
+ * // Port monitor
+ * getMonitorDisplayIdentifier({type: "port", host: "example.com", port: 80}, "Site");
+ * // Returns: "example.com:80"
+ *
+ * // Unknown type
+ * getMonitorDisplayIdentifier({type: "unknown"}, "My Site");
+ * // Returns: "My Site"
+ * ```
  */
 export function getMonitorDisplayIdentifier(monitor: Monitor, siteFallback: string): string {
     return withSyncErrorHandling(
         () => {
-            // Dynamic generation based on monitor type and available fields
-            if (monitor.type === "http" && monitor.url) {
-                return monitor.url;
+            // First, try the configured generator for the monitor type
+            const generator = MONITOR_IDENTIFIER_GENERATORS.get(monitor.type);
+            if (generator) {
+                const identifier = generator(monitor);
+                if (identifier !== undefined) {
+                    return identifier;
+                }
             }
-            if (monitor.type === "port" && monitor.host && monitor.port) {
-                return `${monitor.host}:${monitor.port}`;
-            }
-            // Could be extended with other monitor types dynamically
-            return siteFallback;
+
+            // Fallback: Try common identifier fields
+            return getGenericIdentifier(monitor) ?? siteFallback;
         },
         "Generate monitor display identifier",
         siteFallback
@@ -118,28 +155,78 @@ export function getMonitorDisplayIdentifier(monitor: Monitor, siteFallback: stri
 }
 
 /**
+ * Generate identifier from common monitor fields.
+ * Extracted to reduce complexity of main function.
+ */
+function getGenericIdentifier(monitor: Monitor): string | undefined {
+    // Check common identifier fields in order of preference
+    if (monitor.url) {
+        return monitor.url;
+    }
+    if (monitor.host) {
+        return monitor.port ? `${monitor.host}:${monitor.port}` : monitor.host;
+    }
+    return undefined;
+}
+
+/**
+ * Configuration for monitor type display labels.
+ * This makes it easy to add new monitor types without code changes.
+ */
+const MONITOR_TYPE_LABELS = new Map<string, string>([
+    ["http", "Website URL"],
+    ["port", "Host & Port"],
+    // Add new monitor types here as they're implemented
+    // ["ping", "Ping Monitor"],
+    // ["dns", "DNS Monitor"],
+    // ["ssl", "SSL Certificate"],
+    // ["api", "API Endpoint"],
+]);
+
+/**
  * Generate display label for monitor type dynamically.
  * Replaces hardcoded backward compatibility patterns.
  *
  * @param monitorType - Type of monitor
  * @returns Display label for the monitor type
+ *
+ * @remarks
+ * This function uses a configuration-driven approach to support new monitor types
+ * without requiring code changes. To add support for a new monitor type:
+ * 1. Add an entry to MONITOR_TYPE_LABELS
+ * 2. The function will automatically use the new label
+ *
+ * @example
+ * ```typescript
+ * getMonitorTypeDisplayLabel("http"); // "Website URL"
+ * getMonitorTypeDisplayLabel("port"); // "Host & Port"
+ * getMonitorTypeDisplayLabel("unknown"); // "Unknown Monitor"
+ * ```
  */
 export function getMonitorTypeDisplayLabel(monitorType: string): string {
     return withSyncErrorHandling(
         () => {
-            // Dynamic generation based on monitor type
-            switch (monitorType) {
-                case "http": {
-                    return "Website URL";
+            // Check if we have a configured label for this monitor type
+            if (monitorType && typeof monitorType === "string") {
+                const configuredLabel = MONITOR_TYPE_LABELS.get(monitorType);
+                if (configuredLabel) {
+                    return configuredLabel;
                 }
-                case "port": {
-                    return "Host & Port";
-                }
-                // Could be extended with other types dynamically
-                default: {
-                    return "Monitor Configuration";
-                }
+
+                // Fallback: Generate a reasonable label from the monitor type
+                // Convert from camelCase/snake_case to Title Case
+                const titleCase = monitorType
+                    .replaceAll(/[_-]/g, " ") // Replace underscores and hyphens with spaces
+                    .replaceAll(/([a-z])([A-Z])/g, "$1 $2") // Add space before capitals
+                    .split(" ")
+                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                    .join(" ");
+
+                return `${titleCase} Monitor`;
             }
+
+            // Final fallback for empty/invalid types
+            return "Monitor Configuration";
         },
         "Get monitor type display label",
         UiDefaults.unknownLabel

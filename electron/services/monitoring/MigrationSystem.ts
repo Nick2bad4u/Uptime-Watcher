@@ -500,7 +500,7 @@ export const exampleMigrations = {
         transform: (data: Record<string, unknown>) =>
             Promise.resolve({
                 ...data,
-                timeout: (data.timeout as number | undefined) ?? 30_000, // Default 30 seconds
+                timeout: (data["timeout"] as number | undefined) ?? 30_000, // Default 30 seconds
             }),
     } as MigrationRule,
 
@@ -524,7 +524,7 @@ export const exampleMigrations = {
         isBreaking: false,
         toVersion: "1.1.0",
         transform: (data: Record<string, unknown>) => {
-            const portValue = data.port;
+            const portValue = data["port"];
 
             // Handle different port value types
             if (typeof portValue === "string") {

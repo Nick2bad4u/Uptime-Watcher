@@ -237,6 +237,14 @@ export class IpcService {
             this.registeredIpcHandlers
         );
 
+        // Reset settings handler (no parameters)
+        registerStandardizedIpcHandler(
+            "reset-settings",
+            async () => this.uptimeOrchestrator.resetSettings(),
+            DataHandlerValidators.resetSettings,
+            this.registeredIpcHandlers
+        );
+
         // Download SQLite backup handler (no parameters)
         registerStandardizedIpcHandler(
             "download-sqlite-backup",

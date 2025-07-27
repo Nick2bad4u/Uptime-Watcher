@@ -25,23 +25,27 @@ export interface SettingsStore {
     initializeSettings: () => Promise<{ message: string; settingsLoaded: boolean; success: boolean }>;
 
     /**
-     * Reset all settings to default values
+     * Reset all settings to default values with backend synchronization
+     *
+     * @returns Promise resolving to operation result
      *
      * @remarks
-     * This method performs a synchronous reset to default values.
-     * For consistency with other backend operations, this could be made async
-     * in the future if backend synchronization is required for reset operations.
+     * This method performs both local and backend reset operations.
+     * Backend synchronization ensures settings are persisted across
+     * application restarts and synchronized with other instances.
      */
-    resetSettings: () => void;
+    resetSettings: () => Promise<{ message: string; success: boolean }>;
 
     // State
     /** Application settings */
     settings: AppSettings;
 
+    /** Force synchronize settings from backend */
+    syncFromBackend: () => Promise<{ message: string; success: boolean }>;
+
     /** Update history limit with backend sync */
     updateHistoryLimitValue: (limit: number) => Promise<void>;
 
-    // Actions
     /** Update multiple settings at once */
     updateSettings: (settings: Partial<AppSettings>) => void;
 }

@@ -6,6 +6,7 @@
  * All APIs are strictly typed and designed for extensibility.
  */
 
+import { safeGetRowProperty } from "../../../../shared/types/database";
 import { safeStringify } from "../../../../shared/utils/stringConversion";
 import { getAllMonitorTypeConfigs } from "../../monitoring/MonitorTypeRegistry";
 
@@ -195,21 +196,62 @@ export function generateSqlParameters(): { columns: string[]; placeholders: stri
  * ```
  */
 export function mapMonitorToRow(monitor: Record<string, unknown>): Record<string, unknown> {
-    const row: Record<string, unknown> = {
-        check_interval: monitor.checkInterval,
-        created_at: monitor.createdAt,
-        enabled: (monitor.monitoring ?? monitor.enabled) ? 1 : 0,
-        last_checked: monitor.lastChecked instanceof Date ? monitor.lastChecked.getTime() : monitor.lastChecked,
-        last_error: monitor.lastError,
-        next_check: monitor.nextCheck,
-        response_time: monitor.responseTime,
-        retry_attempts: monitor.retryAttempts,
-        site_identifier: monitor.siteIdentifier,
-        status: monitor.status,
-        timeout: monitor.timeout,
-        type: monitor.type,
-        updated_at: monitor.updatedAt,
-    };
+    const row: Record<string, unknown> = {};
+
+    // Only map fields that are actually present in the monitor object
+    // This prevents overwriting existing database values with defaults during partial updates
+    if (monitor["checkInterval"] !== undefined) {
+        row["check_interval"] = safeGetRowProperty(monitor, "checkInterval", 300_000);
+    }
+    if (monitor["createdAt"] !== undefined) {
+        row["created_at"] = safeGetRowProperty(monitor, "createdAt", Date.now());
+    }
+    if (monitor["monitoring"] !== undefined || monitor["enabled"] !== undefined) {
+        row["enabled"] = (() => {
+            const monitoring = monitor["monitoring"];
+            const enabled = monitor["enabled"];
+            return monitoring === true || enabled === true ? 1 : 0;
+        })();
+    }
+    if (monitor["lastChecked"] !== undefined) {
+        row["last_checked"] = (() => {
+            const lastChecked = monitor["lastChecked"];
+            if (lastChecked instanceof Date) {
+                return lastChecked.getTime();
+            }
+            if (typeof lastChecked === "number") {
+                return lastChecked;
+            }
+            return null;
+        })();
+    }
+    if (monitor["lastError"] !== undefined) {
+        row["last_error"] = safeGetRowProperty(monitor, "lastError", null);
+    }
+    if (monitor["nextCheck"] !== undefined) {
+        row["next_check"] = safeGetRowProperty(monitor, "nextCheck", null);
+    }
+    if (monitor["responseTime"] !== undefined) {
+        row["response_time"] = safeGetRowProperty(monitor, "responseTime", -1);
+    }
+    if (monitor["retryAttempts"] !== undefined) {
+        row["retry_attempts"] = safeGetRowProperty(monitor, "retryAttempts", 3);
+    }
+    if (monitor["siteIdentifier"] !== undefined) {
+        row["site_identifier"] = safeGetRowProperty(monitor, "siteIdentifier", "");
+    }
+    if (monitor["status"] !== undefined) {
+        row["status"] = safeGetRowProperty(monitor, "status", "pending");
+    }
+    if (monitor["timeout"] !== undefined) {
+        row["timeout"] = safeGetRowProperty(monitor, "timeout", 10_000);
+    }
+    if (monitor["type"] !== undefined) {
+        row["type"] = safeGetRowProperty(monitor, "type", "http");
+    }
+    if (monitor["updatedAt"] !== undefined) {
+        row["updated_at"] = safeGetRowProperty(monitor, "updatedAt", Date.now());
+    }
 
     // Dynamically map monitor type specific fields
     const fieldDefs = generateDatabaseFieldDefinitions();
@@ -239,21 +281,21 @@ export function mapMonitorToRow(monitor: Record<string, unknown>): Record<string
  */
 export function mapRowToMonitor(row: Record<string, unknown>): Record<string, unknown> {
     const monitor: Record<string, unknown> = {
-        checkInterval: Number(row.check_interval),
-        createdAt: Number(row.created_at),
-        enabled: row.enabled === 1, // Explicit SQLite boolean mapping
-        id: Number(row.id),
-        lastChecked: row.last_checked ? Number(row.last_checked) : undefined,
-        lastError: row.last_error ? safeStringifyError(row.last_error) : undefined,
-        monitoring: row.enabled === 1, // Map enabled -> monitoring for frontend consistency
-        nextCheck: row.next_check ? Number(row.next_check) : undefined,
-        responseTime: row.response_time ? Number(row.response_time) : undefined,
-        retryAttempts: Number(row.retry_attempts),
-        siteIdentifier: String(row.site_identifier),
-        status: row.status as "down" | "paused" | "pending" | "up",
-        timeout: Number(row.timeout),
-        type: String(row.type),
-        updatedAt: Number(row.updated_at),
+        checkInterval: Number(row["check_interval"]),
+        createdAt: Number(row["created_at"]),
+        enabled: row["enabled"] === 1, // Explicit SQLite boolean mapping
+        id: Number(row["id"]),
+        lastChecked: row["last_checked"] ? Number(row["last_checked"]) : undefined,
+        lastError: row["last_error"] ? safeStringifyError(row["last_error"]) : undefined,
+        monitoring: row["enabled"] === 1, // Map enabled -> monitoring for frontend consistency
+        nextCheck: row["next_check"] ? Number(row["next_check"]) : undefined,
+        responseTime: row["response_time"] ? Number(row["response_time"]) : undefined,
+        retryAttempts: Number(row["retry_attempts"]),
+        siteIdentifier: String(row["site_identifier"]),
+        status: row["status"] as "down" | "paused" | "pending" | "up",
+        timeout: Number(row["timeout"]),
+        type: String(row["type"]),
+        updatedAt: Number(row["updated_at"]),
     };
 
     // Dynamically map monitor type specific fields

@@ -260,5 +260,5 @@ export class DataImportExportService {
  * @returns True if the object matches the expected import data structure
  */
 function isImportData(obj: unknown): obj is { settings?: Record<string, string>; sites: ImportSite[] } {
-    return typeof obj === "object" && obj !== null && Array.isArray((obj as Record<string, unknown>).sites);
+    return typeof obj === "object" && obj !== null && Array.isArray((obj as Record<string, unknown>)["sites"]);
 }

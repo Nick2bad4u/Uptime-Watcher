@@ -131,7 +131,7 @@ export function Settings({ onClose }: Readonly<SettingsProperties>) {
     const handleReset = () => {
         // Use window.confirm instead of globalThis for better React compatibility
         if (window.confirm("Are you sure you want to reset all settings to defaults?")) {
-            resetSettings();
+            void resetSettings(); // Explicitly mark promise as ignored for fire-and-forget operation
             clearError(); // Clear any errors when resetting
             logger.user.action("Reset settings to defaults");
         }

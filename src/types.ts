@@ -232,6 +232,11 @@ declare global {
                  */
                 getHistoryLimit: () => Promise<number>;
                 /**
+                 * @remarks Reset all application settings to their default values.
+                 * @returns A promise that resolves when all settings have been reset.
+                 */
+                resetSettings: () => Promise<void>;
+                /**
                  * @remarks Update history retention limit.
                  * @param limit - The new history limit.
                  * @returns A promise that resolves when the update is complete.

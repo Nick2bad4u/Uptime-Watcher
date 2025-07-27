@@ -177,6 +177,19 @@ const settingsAPI = {
     getHistoryLimit: () => ipcRenderer.invoke("get-history-limit"),
 
     /**
+     * Reset all application settings to their default values.
+     *
+     * @returns Promise resolving when all settings have been reset to defaults
+     *
+     * @remarks
+     * This operation will reset all application settings including:
+     * - History retention limit to default value
+     * - Any other persisted settings to their defaults
+     * The operation is performed atomically within a database transaction.
+     */
+    resetSettings: () => ipcRenderer.invoke("reset-settings"),
+
+    /**
      * Update the history retention limit and prune existing history.
      *
      * @param limit - The new maximum number of history records to keep per monitor

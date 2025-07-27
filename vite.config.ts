@@ -8,6 +8,7 @@ import react from "@vitejs/plugin-react";
 import * as path from "node:path";
 import electron from "vite-plugin-electron";
 import { ViteMcp } from "vite-plugin-mcp";
+import { getEnvVar } from "./shared/utils/environment";
 import { viteStaticCopy } from "vite-plugin-static-copy";
 import { visualizer } from "rollup-plugin-visualizer";
 import { defineConfig, type PluginOption } from "vite";
@@ -16,7 +17,10 @@ import { defineConfig, type PluginOption } from "vite";
  * Vite configuration object.
  * Sets up build settings for both renderer (React) and main/preload processes.
  */
-export default defineConfig({
+export default defineConfig(() => {
+    const codecovToken = getEnvVar("CODECOV_TOKEN");
+    
+    return {
     base: "./", // Ensures relative asset paths for Electron
     build: {
         emptyOutDir: true, // Clean output before build
@@ -113,8 +117,8 @@ export default defineConfig({
         // Put the Codecov vite plugin after all other plugins
         codecovVitePlugin({
             bundleName: "uptime-watcher",
-            enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
-            ...(process.env.CODECOV_TOKEN && { uploadToken: process.env.CODECOV_TOKEN }),
+            enableBundleAnalysis: codecovToken !== undefined,
+            ...(codecovToken ? { uploadToken: codecovToken } : {}),
             telemetry: false, // Disable telemetry for faster builds
         }),
     ],
@@ -154,7 +158,7 @@ export default defineConfig({
                 "src/theme/types.ts", // Exclude theme types
             ],
             ignoreEmptyLines: true, // Ignore empty lines in coverage reports
-            provider: "v8",
+            provider: "v8" as const,
             reporter: ["text", "json", "lcov", "html"],
             reportsDirectory: "./coverage",
         },
@@ -166,4 +170,5 @@ export default defineConfig({
         setupFiles: ["./src/test/setup.ts"], // Setup file for testing
         testTimeout: 10_000, // Set Vitest timeout to 10 seconds
     },
+    };
 });

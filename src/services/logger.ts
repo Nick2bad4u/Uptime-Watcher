@@ -14,6 +14,37 @@
 
 import log from "electron-log/renderer";
 
+/**
+ * Type-safe access to log transports.
+ * Avoids index signature issues with transport properties.
+ */
+interface LogTransports {
+    console: {
+        format: string;
+        level: string;
+    };
+    file?: {
+        level: string;
+    };
+}
+
+/**
+ * Safely access a log transport property.
+ *
+ * @param transportName - Name of the transport
+ * @returns Transport object or undefined if not available
+ */
+function getLogTransport<K extends keyof LogTransports>(transportName: K): LogTransports[K] | undefined {
+    const transports = log.transports as unknown as Record<string, unknown>;
+
+    if (transportName in transports) {
+        // eslint-disable-next-line security/detect-object-injection -- transportName is from known LogTransports keys
+        return transports[transportName] as LogTransports[K];
+    }
+
+    return undefined;
+}
+
 // Configure electron-log for renderer process
 // The /renderer import is specifically chosen because:
 // 1. It handles IPC communication with main process automatically
@@ -24,8 +55,9 @@ log.transports.console.format = "[{h}:{i}:{s}.{ms}] [{level}] {text}";
 
 // File logging is handled by the main process via IPC communication
 // Only configure if the transport exists and we're in a proper renderer context
-if (log.transports.file && typeof window !== "undefined") {
-    log.transports.file.level = "info";
+const fileTransport = getLogTransport("file");
+if (fileTransport && typeof window !== "undefined") {
+    fileTransport.level = "info";
 }
 
 // Create logger with app context

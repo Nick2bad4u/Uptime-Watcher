@@ -127,6 +127,13 @@ describe("DatabaseManager", () => {
 
     beforeEach(() => {
         dependencies = {
+            configurationManager: {
+                getHistoryRetentionRules: vi.fn().mockReturnValue({
+                    defaultLimit: 500,
+                    maxLimit: Number.MAX_SAFE_INTEGER,
+                    minLimit: 25,
+                }),
+            } as any,
             eventEmitter: mockEventEmitter,
             repositories: {
                 database: mockDatabaseService,

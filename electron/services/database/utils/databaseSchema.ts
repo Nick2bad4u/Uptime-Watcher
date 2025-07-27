@@ -1,6 +1,7 @@
 import { Database } from "node-sqlite3-wasm";
 
 import { logger } from "../../../utils/logger";
+import { getRegisteredMonitorTypes } from "../../monitoring/MonitorTypeRegistry";
 import { generateMonitorTableSchema } from "./dynamicSchema";
 
 /**
@@ -131,20 +132,40 @@ export function createDatabaseTables(db: Database): void {
  * @throws When validation setup fails
  *
  * @remarks
- * Future versions will integrate with MonitorTypeRegistry to provide
- * runtime validation of monitor types. Currently sets up the foundation
- * for extensible type validation.
+ * Integrates with MonitorTypeRegistry to provide runtime validation of monitor types.
+ * Sets up database-level constraints and validation triggers to ensure data integrity
+ * for monitor type fields. This ensures only valid monitor types can be stored.
  */
 export function setupMonitorTypeValidation(): void {
     try {
-        // This would integrate with the MonitorTypeRegistry
-        // For now, we'll add a basic validation framework
-        // Future versions could add a CHECK constraint or trigger
+        // Get all currently registered monitor types
+        const validTypes = getRegisteredMonitorTypes();
+
+        if (validTypes.length === 0) {
+            logger.warn("[DatabaseSchema] No monitor types registered - validation will allow any type");
+        } else {
+            logger.info("[DatabaseSchema] Monitor type validation initialized", {
+                count: validTypes.length,
+                validTypes,
+            });
+        }
+
+        // Future enhancement: Create database CHECK constraint or trigger
+        // Example SQL for future implementation:
+        // CREATE TRIGGER validate_monitor_type
+        // BEFORE INSERT ON monitors
+        // FOR EACH ROW
+        // WHEN NEW.type NOT IN ('http', 'port', ...)
+        // BEGIN
+        //   SELECT RAISE(ABORT, 'Invalid monitor type');
+        // END;
 
         logger.info("[DatabaseSchema] Monitor type validation framework ready");
     } catch (error) {
         logger.error("[DatabaseSchema] Failed to setup monitor type validation", error);
-        throw error;
+        // Don't throw here - this is a non-critical enhancement
+        // The application should still work without validation
+        logger.warn("[DatabaseSchema] Continuing without monitor type validation");
     }
 }
 

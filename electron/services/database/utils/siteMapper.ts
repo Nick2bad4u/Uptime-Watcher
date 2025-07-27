@@ -50,10 +50,10 @@ export interface SiteRow {
  */
 export function isValidSiteRow(row: Record<string, unknown>): boolean {
     return (
-        row.identifier !== undefined &&
-        row.identifier !== null &&
-        typeof row.identifier === "string" &&
-        row.identifier.trim().length > 0
+        row["identifier"] !== undefined &&
+        row["identifier"] !== null &&
+        typeof row["identifier"] === "string" &&
+        row["identifier"].trim().length > 0
     );
 }
 
@@ -99,20 +99,20 @@ export function rowToSite(row: Record<string, unknown>): SiteRow {
         }
 
         // Handle identifier (required field) - we know it's valid from validation above
-        const identifier = safeStringify(row.identifier);
+        const identifier = safeStringify(row["identifier"]);
 
         const site: SiteRow = {
             identifier,
         };
 
         // Handle optional name field
-        if (row.name !== undefined && row.name !== null) {
-            site.name = safeStringify(row.name);
+        if (row["name"] !== undefined && row["name"] !== null) {
+            site.name = safeStringify(row["name"]);
         }
 
         // Handle optional monitoring field
-        if (row.monitoring !== undefined && row.monitoring !== null) {
-            site.monitoring = Boolean(row.monitoring);
+        if (row["monitoring"] !== undefined && row["monitoring"] !== null) {
+            site.monitoring = Boolean(row["monitoring"]);
         }
 
         return site;

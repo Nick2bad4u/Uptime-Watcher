@@ -23,7 +23,7 @@ export interface SettingRow {
  * @public
  */
 export function isValidSettingRow(row: Record<string, unknown>): boolean {
-    return row.key !== undefined && row.key !== null && typeof row.key === "string" && row.key.length > 0;
+    return row["key"] !== undefined && row["key"] !== null && typeof row["key"] === "string" && row["key"].length > 0;
 }
 
 /**
@@ -60,13 +60,13 @@ export function rowsToSettings(rows: Record<string, unknown>[]): SettingRow[] {
 export function rowToSetting(row: Record<string, unknown>): SettingRow {
     try {
         // Handle key (required field) with precise type checking
-        const key = row.key;
+        const key = row["key"];
         if (key == null || typeof key !== "string" || key.length === 0) {
             throw new Error(`[SettingsMapper] Invalid setting key: ${key}`);
         }
 
         // Handle value (required field)
-        const value = row.value;
+        const value = row["value"];
 
         const setting: SettingRow = {
             key,
@@ -108,11 +108,11 @@ export function rowToSetting(row: Record<string, unknown>): SettingRow {
  * @public
  */
 export function rowToSettingValue(row: Record<string, unknown> | undefined): string | undefined {
-    if (row?.value == null) {
+    if (row?.["value"] == null) {
         return undefined;
     }
 
-    const value = safeStringify(row.value);
+    const value = safeStringify(row["value"]);
     return value;
 }
 

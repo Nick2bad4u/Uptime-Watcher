@@ -5,6 +5,7 @@
 
 import { FONT_FAMILY_MONO, FONT_FAMILY_SANS } from "../constants";
 import { Theme } from "./types";
+import { deepMergeTheme } from "./utils/themeMerging";
 
 /**
  * Base theme configuration with common properties.
@@ -133,70 +134,7 @@ const baseTheme: Theme = {
  * all other base theme properties.
  */
 function createTheme(overrides: Partial<Theme>): Theme {
-    return {
-        ...baseTheme,
-        ...overrides,
-        colors: {
-            ...baseTheme.colors,
-            ...overrides.colors,
-            background: {
-                ...baseTheme.colors.background,
-                ...overrides.colors?.background,
-            },
-            border: {
-                ...baseTheme.colors.border,
-                ...overrides.colors?.border,
-            },
-            hover: {
-                ...baseTheme.colors.hover,
-                ...overrides.colors?.hover,
-            },
-            primary: {
-                ...baseTheme.colors.primary,
-                ...overrides.colors?.primary,
-            },
-            status: {
-                ...baseTheme.colors.status,
-                ...overrides.colors?.status,
-            },
-            surface: {
-                ...baseTheme.colors.surface,
-                ...overrides.colors?.surface,
-            },
-            text: {
-                ...baseTheme.colors.text,
-                ...overrides.colors?.text,
-            },
-        },
-        shadows: {
-            ...baseTheme.shadows,
-            ...overrides.shadows,
-        },
-        spacing: {
-            ...baseTheme.spacing,
-            ...overrides.spacing,
-        },
-        typography: {
-            ...baseTheme.typography,
-            ...overrides.typography,
-            fontFamily: {
-                ...baseTheme.typography.fontFamily,
-                ...overrides.typography?.fontFamily,
-            },
-            fontSize: {
-                ...baseTheme.typography.fontSize,
-                ...overrides.typography?.fontSize,
-            },
-            fontWeight: {
-                ...baseTheme.typography.fontWeight,
-                ...overrides.typography?.fontWeight,
-            },
-            lineHeight: {
-                ...baseTheme.typography.lineHeight,
-                ...overrides.typography?.lineHeight,
-            },
-        },
-    };
+    return deepMergeTheme(baseTheme, overrides);
 }
 
 /**

@@ -64,7 +64,7 @@ export function createHttpClient(config: MonitorConfig): AxiosInstance {
     };
 
     if (config.timeout !== undefined) {
-        createConfig.timeout = config.timeout;
+        createConfig["timeout"] = config.timeout;
     }
 
     const axiosInstance = axios.create(createConfig);

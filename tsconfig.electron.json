@@ -7,6 +7,7 @@
         "lib": ["ES7", "ES6", "DOM", "DOM.Iterable", "ESNext", "ES2023", "ES2022", "ES2021", "ES2020"],
         "moduleResolution": "bundler",
         "baseUrl": ".",
+        "declarationMap": false,
         "paths": {
             "@/*": ["electron/*"],
             "@shared/*": ["shared/*"]

@@ -323,8 +323,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         return this.siteManager.getSites();
     }
 
-    // Site Management Operations
-
     /**
      * Imports application data from a JSON string.
      *
@@ -334,6 +332,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     public async importData(data: string): Promise<boolean> {
         return this.databaseManager.importData(data);
     }
+
+    // Site Management Operations
 
     /**
      * Initializes the orchestrator and all its managers.
@@ -416,8 +416,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         }
     }
 
-    // Monitoring Operations
-
     /**
      * Removes a site by its identifier.
      *
@@ -431,6 +429,27 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      */
     public async removeSite(identifier: string): Promise<boolean> {
         return this.siteManager.removeSite(identifier);
+    }
+
+    // Monitoring Operations
+
+    /**
+     * Resets all application settings to their default values.
+     *
+     * @returns Promise that resolves when settings have been reset.
+     *
+     * @remarks
+     * This method delegates to the DatabaseManager to reset all settings
+     * to their default values in the database. The operation is performed
+     * within a database transaction to ensure consistency.
+     *
+     * This includes:
+     * - History limit reset to default value
+     * - Any other persisted settings reset to defaults
+     * - Backend cache invalidation
+     */
+    public async resetSettings(): Promise<void> {
+        await this.databaseManager.resetSettings();
     }
 
     /**

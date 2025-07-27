@@ -7,6 +7,7 @@
 
 import { themes } from "./themes";
 import { Theme, ThemeName } from "./types";
+import { deepMergeTheme } from "./utils/themeMerging";
 
 /**
  * Singleton service for managing application themes.
@@ -58,74 +59,7 @@ export class ThemeManager {
      * This allows for granular customization while preserving unmodified properties.
      */
     createCustomTheme(baseTheme: Theme, overrides: Partial<Theme>): Theme {
-        return {
-            ...baseTheme,
-            ...overrides,
-            borderRadius: {
-                ...baseTheme.borderRadius,
-                ...overrides.borderRadius,
-            },
-            colors: {
-                ...baseTheme.colors,
-                ...overrides.colors,
-                background: {
-                    ...baseTheme.colors.background,
-                    ...overrides.colors?.background,
-                },
-                border: {
-                    ...baseTheme.colors.border,
-                    ...overrides.colors?.border,
-                },
-                hover: {
-                    ...baseTheme.colors.hover,
-                    ...overrides.colors?.hover,
-                },
-                primary: {
-                    ...baseTheme.colors.primary,
-                    ...overrides.colors?.primary,
-                },
-                status: {
-                    ...baseTheme.colors.status,
-                    ...overrides.colors?.status,
-                },
-                surface: {
-                    ...baseTheme.colors.surface,
-                    ...overrides.colors?.surface,
-                },
-                text: {
-                    ...baseTheme.colors.text,
-                    ...overrides.colors?.text,
-                },
-            },
-            shadows: {
-                ...baseTheme.shadows,
-                ...overrides.shadows,
-            },
-            spacing: {
-                ...baseTheme.spacing,
-                ...overrides.spacing,
-            },
-            typography: {
-                ...baseTheme.typography,
-                ...overrides.typography,
-                fontFamily: {
-                    ...baseTheme.typography.fontFamily,
-                    ...overrides.typography?.fontFamily,
-                },
-                fontSize: {
-                    ...baseTheme.typography.fontSize,
-                    ...overrides.typography?.fontSize,
-                },
-                fontWeight: {
-                    ...baseTheme.typography.fontWeight,
-                    ...overrides.typography?.fontWeight,
-                },
-                lineHeight: {
-                    ...baseTheme.typography.lineHeight,
-                    ...overrides.typography?.lineHeight,
-                },
-            },
-        };
+        return deepMergeTheme(baseTheme, overrides);
     }
 
     /**
@@ -137,7 +71,8 @@ export class ThemeManager {
         // Colors
         for (const [category, colors] of Object.entries(theme.colors)) {
             if (typeof colors === "object" && colors !== null) {
-                for (const [key, value] of Object.entries(colors as Record<string, unknown>)) {
+                // Type-safe access to color values - colors are either string or nested color objects
+                for (const [key, value] of Object.entries(colors as Record<string, string>)) {
                     variables.push(`  --color-${category}-${key}: ${value};`);
                 }
             } else {
@@ -268,7 +203,8 @@ export class ThemeManager {
     private applyColors(root: HTMLElement, colors: Theme["colors"]): void {
         for (const [category, colorValue] of Object.entries(colors)) {
             if (typeof colorValue === "object" && colorValue !== null) {
-                for (const [key, value] of Object.entries(colorValue as Record<string, unknown>)) {
+                // Type-safe access to color values - colorValue is a nested color object with string values
+                for (const [key, value] of Object.entries(colorValue as Record<string, string>)) {
                     root.style.setProperty(`--color-${category}-${key}`, String(value));
                 }
             } else {

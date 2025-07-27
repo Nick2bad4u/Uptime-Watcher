@@ -181,8 +181,9 @@ export class ServiceContainer {
             // Create a separate event bus for DatabaseManager to avoid circular dependency
             const databaseEventBus = new TypedEventBus<UptimeEvents>("DatabaseManagerEventBus");
 
-            // DatabaseManager requires repositories and event bus
+            // DatabaseManager requires repositories, configuration manager, and event bus
             this._databaseManager = new DatabaseManager({
+                configurationManager: this.getConfigurationManager(),
                 eventEmitter: databaseEventBus,
                 repositories: {
                     database: this.getDatabaseService(),

@@ -218,29 +218,29 @@ export async function validateMonitorFormData(
 
             // Validate type-specific required fields only
             if (type === "http") {
-                if (!data.url || typeof data.url !== "string") {
+                if (!data["url"] || typeof data["url"] !== "string") {
                     errors.push("URL is required for HTTP monitors");
                 } else {
                     // Validate URL field specifically
-                    const urlResult = sharedValidateMonitorField(type, "url", data.url);
+                    const urlResult = sharedValidateMonitorField(type, "url", data["url"]);
                     errors.push(...urlResult.errors);
                 }
             }
 
             if (type === "port") {
-                if (!data.host || typeof data.host !== "string") {
+                if (!data["host"] || typeof data["host"] !== "string") {
                     errors.push("Host is required for port monitors");
                 } else {
                     // Validate host field specifically
-                    const hostResult = sharedValidateMonitorField(type, "host", data.host);
+                    const hostResult = sharedValidateMonitorField(type, "host", data["host"]);
                     errors.push(...hostResult.errors);
                 }
 
-                if (!data.port || typeof data.port !== "number") {
+                if (!data["port"] || typeof data["port"] !== "number") {
                     errors.push("Port is required for port monitors");
                 } else {
                     // Validate port field specifically
-                    const portResult = sharedValidateMonitorField(type, "port", data.port);
+                    const portResult = sharedValidateMonitorField(type, "port", data["port"]);
                     errors.push(...portResult.errors);
                 }
             }

@@ -457,7 +457,7 @@ export class TypedEventBus<EventMap extends Record<string, unknown>> extends Eve
                 return {
                     ...data,
                     _meta: metadata,
-                    _originalMeta: (data as Record<string, unknown>)._meta,
+                    _originalMeta: (data as Record<string, unknown>)["_meta"],
                 } as T & { _meta: EventMetadata };
             }
 

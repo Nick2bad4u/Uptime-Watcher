@@ -83,12 +83,12 @@ export function buildMonitorParameters(siteIdentifier: string, monitor: Site["mo
  */
 export function isValidMonitorRow(row: Record<string, unknown>): boolean {
     return (
-        row.id !== undefined &&
-        row.site_identifier !== undefined &&
-        row.type !== undefined &&
-        (typeof row.id === "string" || typeof row.id === "number") &&
-        typeof row.site_identifier === "string" &&
-        typeof row.type === "string"
+        row["id"] !== undefined &&
+        row["site_identifier"] !== undefined &&
+        row["type"] !== undefined &&
+        (typeof row["id"] === "string" || typeof row["id"] === "number") &&
+        typeof row["site_identifier"] === "string" &&
+        typeof row["type"] === "string"
     );
 }
 
@@ -137,23 +137,25 @@ export function rowToMonitor(row: Record<string, unknown>): Site["monitors"][0] 
 
         // Convert to Site monitor format with defaults
         const monitor: Site["monitors"][0] = {
-            checkInterval: Number(dynamicMonitor.checkInterval) || 300_000,
+            checkInterval: Number(dynamicMonitor["checkInterval"]) || 300_000,
             history: [], // History will be loaded separately
             id:
-                dynamicMonitor.id && (typeof dynamicMonitor.id === "string" || typeof dynamicMonitor.id === "number")
-                    ? String(dynamicMonitor.id)
+                dynamicMonitor["id"] &&
+                (typeof dynamicMonitor["id"] === "string" || typeof dynamicMonitor["id"] === "number")
+                    ? String(dynamicMonitor["id"])
                     : "-1",
-            monitoring: Boolean(dynamicMonitor.enabled),
-            responseTime: Number(dynamicMonitor.responseTime) || (row.responseTime ? Number(row.responseTime) : -1),
-            retryAttempts: Number(dynamicMonitor.retryAttempts) || 3,
-            status: dynamicMonitor.status ? (dynamicMonitor.status as Site["monitors"][0]["status"]) : "down",
-            timeout: Number(dynamicMonitor.timeout) || 5000,
-            type: dynamicMonitor.type ? (dynamicMonitor.type as Site["monitors"][0]["type"]) : "http",
+            monitoring: Boolean(dynamicMonitor["enabled"]),
+            responseTime:
+                Number(dynamicMonitor["responseTime"]) || (row["responseTime"] ? Number(row["responseTime"]) : -1),
+            retryAttempts: Number(dynamicMonitor["retryAttempts"]) || 3,
+            status: dynamicMonitor["status"] ? (dynamicMonitor["status"] as Site["monitors"][0]["status"]) : "down",
+            timeout: Number(dynamicMonitor["timeout"]) || 5000,
+            type: dynamicMonitor["type"] ? (dynamicMonitor["type"] as Site["monitors"][0]["type"]) : "http",
         };
 
         // Add lastChecked if available
-        if (dynamicMonitor.lastChecked) {
-            monitor.lastChecked = new Date(Number(dynamicMonitor.lastChecked));
+        if (dynamicMonitor["lastChecked"]) {
+            monitor.lastChecked = new Date(Number(dynamicMonitor["lastChecked"]));
         }
 
         // Copy all dynamic fields (monitor type specific fields)

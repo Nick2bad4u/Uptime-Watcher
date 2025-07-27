@@ -118,13 +118,17 @@ export class MonitorRepository {
                         if (!insertResult || typeof insertResult !== "object") {
                             throw new Error("Failed to create monitor: invalid database response");
                         }
-                        if (!("id" in insertResult) || typeof insertResult.id !== "number" || insertResult.id <= 0) {
+                        if (
+                            !("id" in insertResult) ||
+                            typeof insertResult["id"] !== "number" ||
+                            insertResult["id"] <= 0
+                        ) {
                             throw new Error("Failed to create monitor: invalid or missing ID in database response");
                         }
 
                         const newMonitor = {
                             ...monitor,
-                            id: String(insertResult.id),
+                            id: String(insertResult["id"]),
                         };
                         createdMonitors.push(newMonitor);
                     }
@@ -191,7 +195,7 @@ export class MonitorRepository {
         if (!insertResult || typeof insertResult !== "object") {
             throw new Error(`Failed to create monitor for site ${siteIdentifier}: invalid database response`);
         }
-        if (!("id" in insertResult) || typeof insertResult.id !== "number" || insertResult.id <= 0) {
+        if (!("id" in insertResult) || typeof insertResult["id"] !== "number" || insertResult["id"] <= 0) {
             throw new Error(
                 `Failed to create monitor for site ${siteIdentifier}: invalid or missing ID in database response`
             );
@@ -199,11 +203,11 @@ export class MonitorRepository {
 
         if (isDev()) {
             logger.debug(
-                `[MonitorRepository] Created monitor with id: ${insertResult.id} for site: ${siteIdentifier} (internal)`
+                `[MonitorRepository] Created monitor with id: ${insertResult["id"]} for site: ${siteIdentifier} (internal)`
             );
         }
 
-        return String(insertResult.id);
+        return String(insertResult["id"]);
     }
 
     /**

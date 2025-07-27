@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 
 import { ChartConfigService, useChartConfigs } from "../services/chartConfig";
 import { Theme } from "../theme/types";
+import { getScaleProperty, getNestedScaleProperty } from "../utils/chartUtils";
 
 // Mock theme object for testing
 const mockTheme: Theme = {
@@ -166,13 +167,13 @@ describe("ChartConfigService", () => {
         it("should have correct scale configuration", () => {
             const config = chartService.getLineChartConfig();
 
-            expect(config.scales?.x?.type).toBe("time");
+            expect(getScaleProperty(config, "x", "type")).toBe("time");
             // TypeScript has overly strict Chart.js types, so we use assertions for deep nested properties
-            expect((config.scales?.x as any)?.time?.displayFormats?.day).toBe("MMM dd");
-            expect((config.scales?.x as any)?.time?.displayFormats?.hour).toBe("HH:mm");
-            expect((config.scales?.x as any)?.time?.displayFormats?.minute).toBe("HH:mm");
-            expect((config.scales?.y as any)?.beginAtZero).toBe(true);
-            expect(config.scales?.y?.title?.text).toBe("Response Time (ms)");
+            expect(getNestedScaleProperty(config, "x", "time.displayFormats.day")).toBe("MMM dd");
+            expect(getNestedScaleProperty(config, "x", "time.displayFormats.hour")).toBe("HH:mm");
+            expect(getNestedScaleProperty(config, "x", "time.displayFormats.minute")).toBe("HH:mm");
+            expect(getNestedScaleProperty(config, "y", "beginAtZero")).toBe(true);
+            expect(getNestedScaleProperty(config, "y", "title.text")).toBe("Response Time (ms)");
         });
 
         it("should have correct title", () => {
@@ -232,23 +233,23 @@ describe("ChartConfigService", () => {
         it("should have correct scale configuration", () => {
             const config = chartService.getBarChartConfig();
 
-            expect((config.scales?.y as any)?.beginAtZero).toBe(true);
-            expect(config.scales?.y?.title?.text).toBe("Count");
-            expect(config.scales?.y?.title?.display).toBe(true);
+            expect(getNestedScaleProperty(config, "y", "beginAtZero")).toBe(true);
+            expect(getNestedScaleProperty(config, "y", "title.text")).toBe("Count");
+            expect(getNestedScaleProperty(config, "y", "title.display")).toBe(true);
         });
 
         it("should apply theme colors", () => {
             const config = chartService.getBarChartConfig();
 
             expect(config.plugins?.title?.color).toBe(mockTheme.colors.text.primary);
-            expect(config.scales?.y?.title?.color).toBe(mockTheme.colors.text.secondary);
+            expect(getNestedScaleProperty(config, "y", "title.color")).toBe(mockTheme.colors.text.secondary);
         });
 
         it("should apply theme typography", () => {
             const config = chartService.getBarChartConfig();
 
             expect((config.plugins?.title?.font as any)?.family).toBe(mockTheme.typography.fontFamily.sans.join(", "));
-            expect((config.scales?.y?.title?.font as any)?.family).toBe(
+            expect(getNestedScaleProperty(config, "y", "title.font.family")).toBe(
                 mockTheme.typography.fontFamily.sans.join(", ")
             );
         });
@@ -360,12 +361,12 @@ describe("ChartConfigService", () => {
             const barConfig = chartService.getBarChartConfig();
 
             // Check that grid colors are consistent
-            expect(lineConfig.scales?.x?.grid?.color).toBe(mockTheme.colors.border.secondary);
-            expect(barConfig.scales?.x?.grid?.color).toBe(mockTheme.colors.border.secondary);
+            expect(getNestedScaleProperty(lineConfig, "x", "grid.color")).toBe(mockTheme.colors.border.secondary);
+            expect(getNestedScaleProperty(barConfig, "x", "grid.color")).toBe(mockTheme.colors.border.secondary);
 
             // Check that tick colors are consistent
-            expect(lineConfig.scales?.x?.ticks?.color).toBe(mockTheme.colors.text.secondary);
-            expect(barConfig.scales?.x?.ticks?.color).toBe(mockTheme.colors.text.secondary);
+            expect(getNestedScaleProperty(lineConfig, "x", "ticks.color")).toBe(mockTheme.colors.text.secondary);
+            expect(getNestedScaleProperty(barConfig, "x", "ticks.color")).toBe(mockTheme.colors.text.secondary);
         });
     });
 });

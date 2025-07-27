@@ -57,12 +57,12 @@ export function historyEntryToRow(monitorId: string, entry: StatusHistory, detai
  */
 export function isValidHistoryRow(row: Record<string, unknown>): boolean {
     return (
-        row.monitorId !== undefined &&
-        row.status !== undefined &&
-        row.timestamp !== undefined &&
-        typeof row.monitorId === "string" &&
-        (row.status === "up" || row.status === "down") &&
-        !Number.isNaN(Number(row.timestamp))
+        row["monitorId"] !== undefined &&
+        row["status"] !== undefined &&
+        row["timestamp"] !== undefined &&
+        typeof row["monitorId"] === "string" &&
+        (row["status"] === "up" || row["status"] === "down") &&
+        !Number.isNaN(Number(row["timestamp"]))
     );
 }
 
@@ -95,21 +95,21 @@ export function rowsToHistoryEntries(rows: Record<string, unknown>[]): StatusHis
 export function rowToHistoryEntry(row: Record<string, unknown>): StatusHistory {
     try {
         return {
-            ...(row.details !== undefined &&
-                row.details !== null && {
-                    details: typeof row.details === "string" ? row.details : JSON.stringify(row.details),
+            ...(row["details"] !== undefined &&
+                row["details"] !== null && {
+                    details: typeof row["details"] === "string" ? row["details"] : JSON.stringify(row["details"]),
                 }),
-            responseTime: safeNumber(row.responseTime, 0),
-            status: validateStatus(row.status),
-            timestamp: safeNumber(row.timestamp, Date.now()),
+            responseTime: safeNumber(row["responseTime"], 0),
+            status: validateStatus(row["status"]),
+            timestamp: safeNumber(row["timestamp"], Date.now()),
         };
     } catch (error) {
         logger.error("[HistoryMapper] Failed to map database row to history entry", {
             error,
-            responseTime: row.responseTime,
+            responseTime: row["responseTime"],
             row,
-            status: row.status,
-            timestamp: row.timestamp,
+            status: row["status"],
+            timestamp: row["timestamp"],
         });
         throw error;
     }

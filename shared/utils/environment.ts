@@ -7,6 +7,15 @@
  */
 
 /**
+ * Typed interface for environment variables we use in the application.
+ * This provides type safety for environment variable access.
+ */
+interface KnownEnvironmentVariables {
+    CODECOV_TOKEN?: string;
+    NODE_ENV?: "development" | "production" | "test";
+}
+
+/**
  * Get the current environment name safely.
  *
  * @returns Environment name or 'unknown' if not set
@@ -18,8 +27,26 @@
  * unspecified environments, use getNodeEnv() when you need development defaults.
  */
 export function getEnvironment(): string {
-    // eslint-disable-next-line n/no-process-env -- Environment utility needs process.env access
-    return typeof process === "undefined" ? "unknown" : (process.env.NODE_ENV ?? "unknown");
+    const nodeEnv = getEnvVar("NODE_ENV");
+    return typeof process === "undefined" ? "unknown" : (nodeEnv ?? "unknown");
+}
+
+/**
+ * Type-safe environment variable access utility.
+ * Avoids index signature issues with process.env.
+ *
+ * @param key - The environment variable key to access
+ * @returns The environment variable value or undefined
+ */
+export function getEnvVar<K extends keyof KnownEnvironmentVariables>(key: K): KnownEnvironmentVariables[K] | undefined {
+    if (typeof process === "undefined") {
+        return undefined;
+    }
+
+    // Use bracket notation to access the environment variable safely
+    // eslint-disable-next-line n/no-process-env,security/detect-object-injection -- Environment utility needs safe process.env access
+    const value = process.env[key];
+    return value as KnownEnvironmentVariables[K] | undefined;
 }
 
 /**
@@ -41,8 +68,8 @@ export function getEnvironment(): string {
  * ```
  */
 export function getNodeEnv(): string {
-    // eslint-disable-next-line n/no-process-env -- Environment utility needs process.env access
-    return typeof process === "undefined" ? "development" : (process.env.NODE_ENV ?? "development");
+    const nodeEnv = getEnvVar("NODE_ENV");
+    return typeof process === "undefined" ? "development" : (nodeEnv ?? "development");
 }
 
 /**
@@ -80,8 +107,8 @@ export function isBrowserEnvironment(): boolean {
  * ```
  */
 export function isDevelopment(): boolean {
-    // eslint-disable-next-line n/no-process-env -- Environment utility needs process.env access
-    return typeof process !== "undefined" && process.env.NODE_ENV === "development";
+    const nodeEnv = getEnvVar("NODE_ENV");
+    return typeof process !== "undefined" && nodeEnv === "development";
 }
 
 /**
@@ -101,8 +128,8 @@ export function isNodeEnvironment(): boolean {
  * @returns True if in production mode
  */
 export function isProduction(): boolean {
-    // eslint-disable-next-line n/no-process-env -- Environment utility needs process.env access
-    return typeof process !== "undefined" && process.env.NODE_ENV === "production";
+    const nodeEnv = getEnvVar("NODE_ENV");
+    return typeof process !== "undefined" && nodeEnv === "production";
 }
 
 /**
@@ -112,6 +139,6 @@ export function isProduction(): boolean {
  * @returns True if in test mode
  */
 export function isTest(): boolean {
-    // eslint-disable-next-line n/no-process-env -- Environment utility needs process.env access
-    return typeof process !== "undefined" && process.env.NODE_ENV === "test";
+    const nodeEnv = getEnvVar("NODE_ENV");
+    return typeof process !== "undefined" && nodeEnv === "test";
 }

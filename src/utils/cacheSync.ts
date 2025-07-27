@@ -72,39 +72,83 @@ export function setupCacheSync(): () => void {
 }
 
 /**
+ * Registry of cache clearing functions for different cache types.
+ * This makes it easy to add new cache types without modifying the core logic.
+ */
+const CACHE_CLEARERS = new Map<string, (identifier?: string) => void>([
+    ["monitorType", () => clearMonitorTypeCache()],
+    // Add new cache types here as they're implemented
+    // ["siteData", (id) => clearSiteDataCache(id)],
+    // ["monitorHistory", (id) => clearMonitorHistoryCache(id)],
+    // ["analytics", (id) => clearAnalyticsCache(id)],
+    // ["settings", () => clearSettingsCache()],
+]);
+
+/**
  * Clear all frontend caches.
  */
 function clearAllFrontendCaches(): void {
     logger.debug("[CacheSync] Clearing all frontend caches");
-    clearMonitorTypeCache();
-    // Note: configCache in monitorUiHelpers is automatically cleared when monitorTypeCache is cleared
-    // since getAvailableMonitorTypes will fetch fresh data
+
+    // Clear all registered cache types
+    for (const [cacheType, clearer] of CACHE_CLEARERS) {
+        try {
+            clearer();
+            logger.debug(`[CacheSync] Cleared ${cacheType} cache`);
+        } catch (error) {
+            logger.error(`[CacheSync] Failed to clear ${cacheType} cache:`, ensureError(error));
+        }
+    }
 }
 
 /**
  * Clear monitor-related frontend caches.
  *
  * @param identifier - Optional monitor identifier for targeted clearing
+ *
+ * @remarks
+ * This function can be enhanced to support monitor-specific cache clearing
+ * as new monitor-related caches are added to the application.
  */
 function clearMonitorRelatedCaches(identifier?: string): void {
     logger.debug("[CacheSync] Clearing monitor-related caches", { identifier });
-    clearMonitorTypeCache();
-    // Monitor-specific cache clearing could be added here if needed
+
+    // Clear monitor type cache (affects all monitors)
+    const monitorTypeClearer = CACHE_CLEARERS.get("monitorType");
+    if (monitorTypeClearer) {
+        monitorTypeClearer(identifier);
+    }
+
+    // Future enhancement: Add monitor-specific cache clearing
+    // if (identifier) {
+    //     const monitorHistoryClearer = CACHE_CLEARERS.get("monitorHistory");
+    //     if (monitorHistoryClearer) {
+    //         monitorHistoryClearer(identifier);
+    //     }
+    // }
 }
 
 /**
  * Clear site-related frontend caches.
  *
- * @remarks
- * Site-specific cache clearing is currently minimal as sites are managed
- * through Zustand stores which handle their own cache invalidation and
- * state management. Future enhancements may include more targeted
- * site-specific cache clearing strategies.
- *
  * @param identifier - Optional site identifier for targeted clearing
+ *
+ * @remarks
+ * Site-specific cache clearing can be enhanced as new site-related caches
+ * are added to the application. Currently, sites are managed through
+ * Zustand stores which handle their own cache invalidation.
  */
 function clearSiteRelatedCaches(identifier?: string): void {
     logger.debug("[CacheSync] Clearing site-related caches", { identifier });
-    // Site-specific cache clearing could be added here if needed
-    // For now, sites are managed through Zustand stores which handle their own cache invalidation
+
+    // Future enhancement: Add site-specific cache clearing
+    // if (identifier) {
+    //     const siteDataClearer = CACHE_CLEARERS.get("siteData");
+    //     if (siteDataClearer) {
+    //         siteDataClearer(identifier);
+    //     }
+    // }
+
+    // Note: Sites are currently managed through Zustand stores which handle
+    // their own cache invalidation and state management
 }

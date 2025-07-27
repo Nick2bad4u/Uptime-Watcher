@@ -38,6 +38,7 @@ import type { AppSettings } from "../types";
 import type { SettingsStore } from "./types";
 
 import { DEFAULT_HISTORY_LIMIT } from "../../constants";
+import { extractIpcData } from "../../types/ipc";
 import { useErrorStore } from "../error/useErrorStore";
 import { logStoreAction, withErrorHandling } from "../utils";
 
@@ -50,6 +51,24 @@ const defaultSettings: AppSettings = {
     theme: "system",
 };
 
+const syncSettingsAfterRehydration = (state: SettingsStore | undefined) => {
+    if (state) {
+        // Use setTimeout to avoid blocking the rehydration process
+        setTimeout(() => {
+            // Use an IIFE to handle the async operation properly
+            void (async () => {
+                try {
+                    const historyLimitResponse = await window.electronAPI.settings.getHistoryLimit();
+                    const historyLimit = extractIpcData<number>(historyLimitResponse);
+                    state.updateSettings({ historyLimit });
+                } catch (error) {
+                    console.warn("Failed to sync settings after rehydration:", error);
+                }
+            })();
+        }, 100); // Small delay to ensure everything is initialized
+    }
+};
+
 export const useSettingsStore = create<SettingsStore>()(
     persist(
         (set, get) => ({
@@ -58,8 +77,19 @@ export const useSettingsStore = create<SettingsStore>()(
                 const errorStore = useErrorStore.getState();
                 const result = await withErrorHandling(
                     async () => {
-                        const historyLimit = await window.electronAPI.settings.getHistoryLimit();
-                        get().updateSettings({ historyLimit });
+                        // Fetch all available settings from backend
+                        const historyLimitResponse = await window.electronAPI.settings.getHistoryLimit();
+                        const historyLimit = extractIpcData<number>(historyLimitResponse); // Extract the actual number
+
+                        // Update local state with backend values, keeping defaults for others
+                        const updatedSettings = {
+                            ...defaultSettings,
+                            historyLimit, // Use actual backend value
+                        };
+
+                        // Force update the state to ensure it overrides any persisted values
+                        set({ settings: updatedSettings });
+
                         return {
                             message: "Successfully loaded settings",
                             settingsLoaded: true,
@@ -81,19 +111,76 @@ export const useSettingsStore = create<SettingsStore>()(
 
                 return result;
             },
-            resetSettings: () => {
-                // Note: This method currently performs a local reset only.
-                // Future enhancement: Consider adding backend synchronization
-                // if reset operations need to be persisted across application restarts
-                // or synchronized with other application instances.
-                set({ settings: defaultSettings });
+            resetSettings: async () => {
+                const errorStore = useErrorStore.getState();
+                const result = await withErrorHandling(
+                    async () => {
+                        // Call backend to reset all settings
+                        await window.electronAPI.settings.resetSettings();
+
+                        // Fetch the actual reset values from backend to ensure synchronization
+                        const historyLimitResponse = await window.electronAPI.settings.getHistoryLimit();
+                        const historyLimit = extractIpcData<number>(historyLimitResponse);
+
+                        // Update local state to match backend defaults
+                        set({
+                            settings: {
+                                ...defaultSettings,
+                                historyLimit, // Use the actual value from backend
+                            },
+                        });
+
+                        return {
+                            message: "Settings successfully reset to defaults",
+                            success: true,
+                        };
+                    },
+                    {
+                        clearError: () => errorStore.clearStoreError("settings"),
+                        setError: (error) => errorStore.setStoreError("settings", error),
+                        setLoading: (loading) => errorStore.setOperationLoading("resetSettings", loading),
+                    }
+                );
+
                 logStoreAction("SettingsStore", "resetSettings", {
-                    message: "Settings reset to defaults",
-                    success: true,
+                    message: result.message,
+                    success: result.success,
                 });
+
+                return result;
             },
             // State
             settings: defaultSettings,
+            // Force sync settings from backend (useful for debugging persistence issues)
+            syncFromBackend: async () => {
+                const errorStore = useErrorStore.getState();
+                const result = await withErrorHandling(
+                    async () => {
+                        const historyLimitResponse = await window.electronAPI.settings.getHistoryLimit();
+                        const historyLimit = extractIpcData<number>(historyLimitResponse);
+
+                        const currentSettings = get().settings;
+                        const updatedSettings = {
+                            ...currentSettings,
+                            historyLimit,
+                        };
+
+                        set({ settings: updatedSettings });
+
+                        return {
+                            message: "Settings synchronized from backend",
+                            success: true,
+                        };
+                    },
+                    {
+                        clearError: () => errorStore.clearStoreError("settings"),
+                        setError: (error) => errorStore.setStoreError("settings", error),
+                        setLoading: (loading) => errorStore.setOperationLoading("syncFromBackend", loading),
+                    }
+                );
+
+                return result;
+            },
             updateHistoryLimitValue: async (limit: number) => {
                 logStoreAction("SettingsStore", "updateHistoryLimitValue", { limit });
 
@@ -109,7 +196,8 @@ export const useSettingsStore = create<SettingsStore>()(
                         await window.electronAPI.settings.updateHistoryLimit(limit);
 
                         // Verify the value from backend to ensure sync
-                        const backendLimit = await window.electronAPI.settings.getHistoryLimit();
+                        const backendLimitResponse = await window.electronAPI.settings.getHistoryLimit();
+                        const backendLimit = extractIpcData<number>(backendLimitResponse);
 
                         // Ensure we have a valid number from backend
                         const validBackendLimit =
@@ -142,6 +230,8 @@ export const useSettingsStore = create<SettingsStore>()(
         }),
         {
             name: "uptime-watcher-settings",
+            // After rehydration, sync critical settings from backend
+            onRehydrateStorage: () => syncSettingsAfterRehydration,
             // Persistence configuration - only persist essential settings data
             // This prevents persisting transient state, computed values, or functions
             // If additional state properties are added in the future, review this

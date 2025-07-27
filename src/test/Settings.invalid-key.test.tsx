@@ -168,8 +168,8 @@ vi.mock("../theme/components", () => ({
     }) => {
         const filteredProps = { ...props };
         // Remove non-DOM props
-        delete filteredProps.border;
-        delete filteredProps.loading;
+        delete filteredProps["border"];
+        delete filteredProps["loading"];
         if (border !== undefined) filteredProps["data-border"] = border.toString();
         if (loading !== undefined) filteredProps["data-loading"] = loading.toString();
         return React.createElement("div", filteredProps, children);
@@ -185,7 +185,7 @@ vi.mock("../theme/components", () => ({
     }) => {
         const filteredProps = { ...props };
         // Remove non-DOM props
-        delete filteredProps.loading;
+        delete filteredProps["loading"];
         if (loading !== undefined) filteredProps["data-loading"] = loading.toString();
         return React.createElement("button", filteredProps, children);
     },

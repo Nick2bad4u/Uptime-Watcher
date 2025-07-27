@@ -250,7 +250,7 @@ registerMonitorType({
         },
         formatDetail: (details: string) => `Response Code: ${details}`,
         formatTitleSuffix: (monitor: Record<string, unknown>) => {
-            const url = monitor.url as string;
+            const url = monitor["url"] as string;
             return url ? ` (${url})` : "";
         },
         helpTexts: {
@@ -300,8 +300,8 @@ registerMonitorType({
         },
         formatDetail: (details: string) => `Port: ${details}`,
         formatTitleSuffix: (monitor: Record<string, unknown>) => {
-            const host = monitor.host as string;
-            const port = monitor.port as number;
+            const host = monitor["host"] as string;
+            const port = monitor["port"] as number;
             return host && port ? ` (${host}:${port})` : "";
         },
         helpTexts: {
