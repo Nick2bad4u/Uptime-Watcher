@@ -44,7 +44,6 @@ import tomlEslintParser from "toml-eslint-parser";
 import jsoncEslintParser from "jsonc-eslint-parser";
 import reactRefresh from "eslint-plugin-react-refresh";
 import putout from "eslint-plugin-putout";
-import { defineConfig } from "eslint/config";
 import pluginNoOnly from "eslint-plugin-no-only-tests";
 import nodePlugin from "eslint-plugin-n";
 // import stylistic from "@stylistic/eslint-plugin";

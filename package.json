@@ -478,7 +478,7 @@
   },
   "packageManager": "npm@11.5.1",
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=23.0.0"
   },
   "os": [
     "windows",

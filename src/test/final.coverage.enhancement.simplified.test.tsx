@@ -302,17 +302,14 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                     return obj.map((item) => deepClone(item));
                 }
 
-                if (typeof obj === "object") {
-                    const cloned: any = {};
-                    for (const key in obj) {
-                        if (Object.hasOwn(obj, key)) {
-                            cloned[key] = deepClone(obj[key]);
-                        }
+                // At this point, obj is definitely an object
+                const cloned: any = {};
+                for (const key in obj) {
+                    if (Object.hasOwn(obj, key)) {
+                        cloned[key] = deepClone(obj[key]);
                     }
-                    return cloned;
                 }
-
-                return obj;
+                return cloned;
             };
 
             const original = {
