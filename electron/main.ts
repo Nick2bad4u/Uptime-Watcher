@@ -55,9 +55,11 @@ const configureLogging = () => {
 // Enable preload mode for reliable logging in Electron's main process, especially with context isolation enabled
 log.initialize({ preload: true });
 
+type ElectronLogLevel = "debug" | "error" | "info" | "silly" | "verbose" | "warn";
+
 const { consoleLevel, fileLevel } = configureLogging();
-log.transports.file.level = fileLevel as any;
-log.transports.console.level = consoleLevel as any;
+log.transports.file.level = fileLevel as ElectronLogLevel;
+log.transports.console.level = consoleLevel as ElectronLogLevel;
 log.transports.file.fileName = "uptime-watcher-main.log";
 log.transports.file.maxSize = 1024 * 1024 * 5; // 5MB max file size
 log.transports.file.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}";
