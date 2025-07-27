@@ -1,5 +1,4 @@
 import { MonitorManager } from "../../managers/MonitorManager";
-import { Site, StatusUpdate } from "../../types";
 import { vi } from "vitest";
 
 describe("MonitorManager", () => {
